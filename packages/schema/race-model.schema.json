@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://boxthislap.app/schema/race-model.schema.json",
+  "title": "RaceModel",
+  "description": "Compact fitted model + event timeline for one race. Written by the Python pipeline, consumed by the TypeScript simulator.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "race",
+    "era",
+    "track",
+    "compounds",
+    "drivers",
+    "fuelEffectPerLap",
+    "events",
+    "decisionMoments",
+    "realResult",
+    "userSide"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Bumped on any breaking change to this schema."
+    },
+    "race": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "laps", "takeoverLap", "seed"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+        "name": { "type": "string" },
+        "laps": { "type": "integer", "minimum": 1 },
+        "takeoverLap": { "type": "integer", "minimum": 1 },
+        "seed": { "type": "integer" }
+      }
+    },
+    "era": {
+      "type": "string",
+      "enum": ["1988-1993", "1994-2009", "2010-2013", "2014-2025", "2026+"]
+    },
+    "track": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pitLoss", "pitLossUnderSC", "overtakeDifficulty", "dirtyAirPenalty"],
+      "properties": {
+        "pitLoss": { "type": "number" },
+        "pitLossUnderSC": { "type": "number" },
+        "overtakeDifficulty": { "type": "number", "minimum": 0, "maximum": 1 },
+        "dirtyAirPenalty": { "type": "number", "minimum": 0 }
+      }
+    },
+    "compounds": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["offset", "degPerLap", "cliffLap"],
+        "properties": {
+          "offset": { "type": "number" },
+          "degPerLap": { "type": "number", "minimum": 0 },
+          "cliffLap": { "type": "integer", "minimum": 1 }
+        }
+      }
+    },
+    "drivers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "team", "basePace", "noise", "stateAtTakeover", "realStrategy"],
+        "properties": {
+          "code": { "type": "string", "minLength": 2, "maxLength": 4 },
+          "team": { "type": "string" },
+          "basePace": { "type": "number" },
+          "noise": { "type": "number", "minimum": 0 },
+          "stateAtTakeover": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["position", "gapAhead", "compound", "tyreAge"],
+            "properties": {
+              "position": { "type": "integer", "minimum": 1 },
+              "gapAhead": { "type": "number", "minimum": 0 },
+              "compound": { "type": "string" },
+              "tyreAge": { "type": "integer", "minimum": 0 }
+            }
+          },
+          "realStrategy": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["lap", "to"],
+              "properties": {
+                "lap": { "type": "integer", "minimum": 1 },
+                "to": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "fuelEffectPerLap": { "type": "number", "minimum": 0 },
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["lap", "type"],
+        "properties": {
+          "lap": { "type": "integer", "minimum": 1 },
+          "type": { "type": "string", "enum": ["SC", "VSC", "RED", "RAIN", "RETIREMENT"] },
+          "laps": { "type": "integer", "minimum": 1 },
+          "driver": { "type": "string" }
+        }
+      }
+    },
+    "decisionMoments": {
+      "type": "array",
+      "items": { "type": "integer", "minimum": 1 }
+    },
+    "realResult": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "userSide": {
+      "type": "string",
+      "description": "Driver code the user controls — always the hard/controversial side."
+    },
+    "reconstructed": {
+      "type": "boolean",
+      "description": "True for hand-built races without official lap timing (labelled in the UI)."
+    }
+  }
+}

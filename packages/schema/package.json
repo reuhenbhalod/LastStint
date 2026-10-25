@@ -1,0 +1,11 @@
+{
+  "name": "@boxthislap/schema",
+  "version": "0.0.0",
+  "private": true,
+  "description": "race-model JSON schema — single source of truth for the race model",
+  "type": "module",
+  "exports": {
+    "./race-model.schema.json": "./race-model.schema.json"
+  },
+  "files": ["race-model.schema.json"]
+}

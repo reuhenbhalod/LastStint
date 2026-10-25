@@ -1,0 +1,28 @@
+{
+  // Cloudflare Worker — API + score verification + daily queue-check cron.
+  // The web app deploys separately to Cloudflare Pages (apps/web), so this Worker
+  // serves no static assets.
+  "name": "pitwall",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-24",
+
+  // D1 database. Create it once with:
+  //   npx wrangler d1 create pitwall-db
+  // then paste the returned database_id below.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "pitwall-db",
+      "database_id": "REPLACE_WITH_D1_DATABASE_ID"
+    }
+  ],
+
+  // Daily queue-check cron (Implementation Plan 4.6) — handled by scheduled() in src/index.ts.
+  "triggers": { "crons": ["0 9 * * *"] },
+
+  // Production web origin allowed to call /api/* (CORS). Fill in once the Pages project
+  // exists, e.g. "https://pitwall-web.pages.dev". Leave empty for local dev (Vite proxy).
+  "vars": { "WEB_ORIGIN": "" },
+
+  "observability": { "enabled": true }
+}

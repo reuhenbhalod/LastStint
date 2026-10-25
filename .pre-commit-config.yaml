@@ -1,0 +1,20 @@
+# Pre-commit hooks. Install with: uv run pre-commit install
+# Runs the same lint/format checks CI enforces, before each commit.
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.4
+    hooks:
+      - id: ruff
+        args: [--fix]
+        files: ^pipeline/
+      - id: ruff-format
+        files: ^pipeline/
+
+  - repo: local
+    hooks:
+      - id: biome-check
+        name: biome check
+        entry: pnpm biome check --write
+        language: system
+        files: \.(ts|tsx|js|jsx)$
+        pass_filenames: false

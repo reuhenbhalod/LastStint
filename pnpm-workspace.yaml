@@ -1,0 +1,10 @@
+packages:
+  - "packages/*"
+  - "apps/*"
+
+# Allow these dependencies to run their (native binary) build scripts.
+allowBuilds:
+  '@biomejs/biome': true
+  esbuild: true
+  sharp: true
+  workerd: true
