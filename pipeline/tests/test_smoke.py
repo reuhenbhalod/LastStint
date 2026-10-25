@@ -2,9 +2,6 @@
 
 from __future__ import annotations
 
-import json
-from pathlib import Path
-
 import pipeline
 from pipeline import clean, export, ingest
 
@@ -25,8 +22,6 @@ def test_lap_columns_present():
 
 
 def test_schema_file_is_valid_json():
-    # Resolve the repo-root schema path from this test file's location.
-    repo_root = Path(__file__).resolve().parents[2]
-    schema = json.loads((repo_root / export.SCHEMA_PATH).read_text())
+    schema = export.load_schema()
     assert schema["$schema"].startswith("http")
     assert "schemaVersion" in schema.get("properties", {})

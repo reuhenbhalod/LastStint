@@ -9,8 +9,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-SCHEMA_PATH = Path("packages") / "schema" / "race-model.schema.json"
-RACES_DIR = Path("data") / "races"
+from .paths import RACES_DIR, SCHEMA_PATH
 
 
 def load_schema(schema_path: Path = SCHEMA_PATH) -> dict:
