@@ -56,3 +56,12 @@ def test_abu_dhabi_clears_gate_g1(race):
         score_positions=meta["score_positions"],
     )
     assert report.passed, report.summary()
+
+
+def test_robust_status_uses_two_seed_sets(race):
+    model, laps = race
+    res = validate.robust_status(model, validate.real_finishing_gaps(laps), rival="VER", runs=40)
+    assert res.status in {"pass", "borderline", "fail"}
+    assert len(res.reports) == len(validate.ROBUST_SEEDS) == 2
+    expected = {2: "pass", 1: "borderline", 0: "fail"}[sum(r.passed for r in res.reports)]
+    assert res.status == expected

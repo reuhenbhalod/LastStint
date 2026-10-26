@@ -78,11 +78,21 @@ def build(
 def validate(
     race_id: str = typer.Argument(None),
     all_races: bool = typer.Option(False, "--all", help="Validate every registered race."),
+    split: str = typer.Option(None, help="Only races in this split (tune / holdout)."),
     runs: int = typer.Option(validate_mod.DEFAULT_RUNS, help="Simulations per race."),
+    robust: bool = typer.Option(
+        False, help="Guard mode: 1000 runs on two seed sets; pass / borderline / fail."
+    ),
 ) -> None:
     """Run the Gate G1 validation report; exit code 1 if any race fails."""
+    ids = _race_ids(race_id, all_races or split is not None)
+    if split:
+        ids = [r for r in ids if build_mod.RACES[r].get("split") == split]
+    if robust:
+        _robust(ids)
+        return
     failed = []
-    for rid in _race_ids(race_id, all_races):
+    for rid in ids:
         model, laps = build_mod.build_race_model(rid)
         meta = build_mod.resolved_meta(rid, laps)
         report = validate_mod.validate_race(
@@ -98,6 +108,28 @@ def validate(
     if failed:
         typer.echo(f"G1 FAILED: {', '.join(failed)}")
         raise typer.Exit(code=1)
+
+
+def _robust(ids: list[str]) -> None:
+    counts = {"pass": 0, "borderline": 0, "fail": 0}
+    errs = []
+    for rid in ids:
+        model, laps = build_mod.build_race_model(rid)
+        meta = build_mod.resolved_meta(rid, laps)
+        res = validate_mod.robust_status(
+            model,
+            validate_mod.real_finishing_gaps(laps),
+            rival=meta.get("rival"),
+            score_positions=meta.get("score_positions", validate_mod.DEFAULT_SCORE_POSITIONS),
+        )
+        counts[res.status] += 1
+        errs.append(res.mean_gap_error)
+        typer.echo(f"{rid:24s} {res.status:10s} mean gap error {res.mean_gap_error:.2f}s")
+    mean = sum(errs) / len(errs) if errs else 0.0
+    typer.echo(
+        f"== {counts['pass']} pass, {counts['borderline']} borderline, {counts['fail']} fail;"
+        f" mean gap error {mean:.2f}s over {len(ids)} races"
+    )
 
 
 if __name__ == "__main__":
