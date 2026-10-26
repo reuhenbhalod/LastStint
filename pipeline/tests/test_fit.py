@@ -1,9 +1,8 @@
 """Unit tests for fit (Phase 1.3).
 
-Fits the lap-time model on the committed Abu Dhabi 2021 snapshot (offline) and checks the
-robust sanity properties. We deliberately do NOT assert the full soft<med<hard ordering:
-on a single real race, track evolution and when each compound ran can put medium and hard
-out of the textbook order. The reliable signals are asserted instead.
+Fits the lap-time model on the committed snapshots (offline) and checks the sanity
+properties from the Phase 1 spec, including the physical compound ordering, which the fit
+enforces and shrinks toward pipeline/config/compound_priors.json.
 """
 
 from __future__ import annotations
@@ -65,12 +64,44 @@ def test_predict_at_origin_equals_base_pace(fitted: fit.LapTimeFit):
     assert got == pytest.approx(fitted.driver_pace["HAM"])
 
 
-def test_detect_cliff_structure(fitted: fit.LapTimeFit):
-    laps = pd.read_parquet(ingest.raw_snapshot_path("abu-dhabi-2021"))
-    clean_df, _, _ = clean.clean_laps(laps)
-    cliffs = fit.detect_cliff(clean_df, fitted)
-    assert set(cliffs) == set(fitted.compound_wear)
-    for age in cliffs.values():
-        assert age is None or isinstance(age, int)
+def test_compounds_in_physical_order(fitted: fit.LapTimeFit):
+    off, wear = fitted.compound_offset, fitted.compound_wear
+    # Softer is faster and wears faster, strictly (the prior keeps steps apart).
+    assert off["SOFT"] < off["MEDIUM"] < off["HARD"]
+    assert wear["SOFT"] > wear["MEDIUM"] > wear["HARD"] >= 0
+
+
+def test_prior_notes_flag_collapsed_steps(fitted: fit.LapTimeFit):
+    # Abu Dhabi alone can't separate medium from hard pace; the fit must say so.
+    assert any("MEDIUM->HARD" in note for note in fitted.prior_notes)
+
+
+def test_cliff_structure(fitted: fit.LapTimeFit):
+    assert set(fitted.compound_cliff) == set(fitted.compound_wear)
+    for hinge in fitted.compound_cliff.values():
+        if hinge is not None:
+            age, slope = hinge
+            assert isinstance(age, int) and slope > 0
     # Softs fall off a cliff within the first ~20 laps of a stint.
-    assert cliffs["SOFT"] is not None and 10 <= cliffs["SOFT"] <= 30
+    soft = fitted.compound_cliff["SOFT"]
+    assert soft is not None and 10 <= soft[0] <= 30
+
+
+def test_predict_includes_cliff(fitted: fit.LapTimeFit):
+    age, slope = fitted.compound_cliff["SOFT"]
+    before = fit.predict(fitted, "HAM", "SOFT", tyre_age=age, lap=0)
+    after = fit.predict(fitted, "HAM", "SOFT", tyre_age=age + 1, lap=0)
+    assert after - before == pytest.approx(fitted.compound_wear["SOFT"] + slope)
+
+
+def test_unknown_era_raises():
+    with pytest.raises(KeyError):
+        fit.load_compound_priors("1950s")
+
+
+def test_spain_two_compound_order():
+    laps = pd.read_parquet(ingest.raw_snapshot_path("spain-2021"))
+    clean_df, _, _ = clean.clean_laps(laps)
+    f = fit.fit_lap_model(clean_df)
+    assert f.compound_offset["SOFT"] < f.compound_offset["MEDIUM"]
+    assert f.compound_wear["SOFT"] > f.compound_wear["MEDIUM"]

@@ -22,6 +22,7 @@ BUNCH_GAP = 0.9  # safety-car train spacing per car
 PACE_PASS_GAIN = 1.1  # how strongly a per-lap pace edge overrides overtake difficulty
 SC_FALLBACK = 1.6  # SC lap = this x green if not supplied
 VSC_FALLBACK = 1.35  # VSC lap = this x green if not supplied
+CLIFF_FALLBACK = 2.0  # extra wear past the cliff = this x degPerLap if not fitted
 
 
 @dataclass
@@ -42,7 +43,8 @@ def _clean_lap(car: Car, compounds: dict, fuel_per_lap: float, lap: int) -> floa
     c = compounds[car.compound]
     t = car.base_pace + c["offset"] + c["degPerLap"] * car.tyre_age - fuel_per_lap * lap
     if car.tyre_age > c["cliffLap"]:  # past the cliff: wear accelerates
-        t += 2.0 * c["degPerLap"] * (car.tyre_age - c["cliffLap"])
+        extra = c.get("cliffDegPerLap", CLIFF_FALLBACK * c["degPerLap"])
+        t += extra * (car.tyre_age - c["cliffLap"])
     return t
 
 

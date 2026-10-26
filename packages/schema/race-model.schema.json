@@ -64,7 +64,12 @@
         "properties": {
           "offset": { "type": "number" },
           "degPerLap": { "type": "number", "minimum": 0 },
-          "cliffLap": { "type": "integer", "minimum": 1 }
+          "cliffLap": { "type": "integer", "minimum": 1 },
+          "cliffDegPerLap": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Extra seconds per lap of tyre age past cliffLap. Absent: no fitted cliff."
+          }
         }
       }
     },

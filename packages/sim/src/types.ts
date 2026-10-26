@@ -15,6 +15,8 @@ export interface CompoundModel {
   offset: number;
   degPerLap: number;
   cliffLap: number;
+  /** Extra seconds per lap of tyre age past cliffLap; absent when no cliff was fitted. */
+  cliffDegPerLap?: number;
 }
 
 export interface DriverModel {

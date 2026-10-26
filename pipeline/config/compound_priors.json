@@ -1,0 +1,9 @@
+{
+  "_comment": "Physical baseline for the dry-compound fit (fit.py). Offsets are seconds vs the softest compound; wear is seconds per lap of tyre age. The fit enforces the ordering (softer = faster and wears faster) and shrinks each adjacent-compound step toward the difference of these priors with the weight of `pseudoLaps` laps of evidence. Wet compounds are unordered and unshrunk.",
+  "2014-2025": {
+    "order": ["SOFT", "MEDIUM", "HARD"],
+    "offset": { "SOFT": 0.0, "MEDIUM": 0.4, "HARD": 0.8 },
+    "wear": { "SOFT": 0.06, "MEDIUM": 0.035, "HARD": 0.02 },
+    "pseudoLaps": 40
+  }
+}

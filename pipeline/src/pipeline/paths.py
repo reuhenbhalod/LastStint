@@ -15,4 +15,7 @@ RAW_DIR = DATA_DIR / "raw"
 RACES_DIR = DATA_DIR / "races"
 GOLDEN_DIR = DATA_DIR / "golden"
 
+CONFIG_DIR = REPO_ROOT / "pipeline" / "config"
+COMPOUND_PRIORS_PATH = CONFIG_DIR / "compound_priors.json"
+
 SCHEMA_PATH = REPO_ROOT / "packages" / "schema" / "race-model.schema.json"

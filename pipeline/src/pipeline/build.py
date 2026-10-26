@@ -44,7 +44,7 @@ def build_race_model(race_id: str, laps: pd.DataFrame | None = None) -> tuple[di
 
     clean_df, traffic_df, _ = clean.clean_laps(laps)
     pace_laps = pd.concat([clean_df, traffic_df])
-    fitted = fit.fit_lap_model(clean_df, pace_laps=pace_laps)
+    fitted = fit.fit_lap_model(clean_df, pace_laps=pace_laps, era=meta["era"])
     params = track.fit_track_params(laps, clean_df, traffic_df, fitted)
 
     model = assemble.assemble_race_model(
