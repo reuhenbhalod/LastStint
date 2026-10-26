@@ -428,7 +428,57 @@
       "driver": "PER"
     }
   ],
-  "decisionMoments": [],
+  "decisionMoments": [
+    {
+      "id": "sc-53",
+      "lap": 53,
+      "trigger": "SC",
+      "target": {
+        "kind": "beat-rival"
+      },
+      "options": [
+        {
+          "id": "stay-out",
+          "label": "Stay out",
+          "decisions": []
+        },
+        {
+          "id": "box-soft",
+          "label": "Box for softs",
+          "decisions": [
+            {
+              "lap": 53,
+              "kind": "pit",
+              "compound": "SOFT"
+            }
+          ]
+        },
+        {
+          "id": "box-medium",
+          "label": "Box for mediums",
+          "decisions": [
+            {
+              "lap": 53,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "box-hard",
+          "label": "Box for hards",
+          "decisions": [
+            {
+              "lap": 53,
+              "kind": "pit",
+              "compound": "HARD"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "stay-out"
+    }
+  ],
   "candidateMomentLaps": [
     36,
     37,
