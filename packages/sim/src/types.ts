@@ -115,7 +115,7 @@ export type Decision =
 /** Something the sim did on its own that the game may narrate (e.g. the rival covering). */
 export interface RaceNote {
   lap: number;
-  kind: 'rival-cover' | 'error';
+  kind: 'rival-cover' | 'rival-stays-out' | 'error';
   driver: string;
   detail?: string;
 }

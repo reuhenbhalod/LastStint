@@ -323,6 +323,46 @@ function rivalReacts(
   run.notes.push({ lap, kind: 'rival-cover', driver: rival.code, detail: to });
 }
 
+/**
+ * Rival goes long (product doc design decision 3: "cover the stop, go long, or switch
+ * tires"). Run at the end of the user's in-lap, when the user's stop is due next lap: a rival
+ * still behind the user (so it reaches pit entry after seeing the call) that would be ahead
+ * once the user's stop is charged under a SC/VSC skips its own stop planned within
+ * COVER_WINDOW laps to keep track position. The stop moves to when its tyres reach the
+ * cliff, or is dropped if that is past the flag. Under green the plan's cover rule applies
+ * instead (rivalReacts).
+ */
+function rivalGoesLong(run: Run, lap: number): void {
+  const { model, state } = run;
+  const user = state.cars[model.userSide];
+  const rival = state.cars[model.rival];
+  if (!run.live || !user || !rival || user.retired || rival.retired) return;
+  const stopLap = lap + 1;
+  if (!user.strategy.some((s) => s.lap === stopLap)) return;
+  const stopFlag = run.neutral.get(stopLap);
+  if (stopFlag !== 'sc' && stopFlag !== 'vsc') return;
+  if (rival.totalTime <= user.totalTime) return; // ahead: already past pit entry
+
+  const planned = rival.strategy
+    .filter((s) => s.lap >= stopLap && s.lap - stopLap <= COVER_WINDOW)
+    .sort((a, b) => a.lap - b.lap)[0];
+  if (!planned) return;
+  const userCost = stopFlag === 'sc' ? model.track.pitLossUnderSC : model.track.pitLossUnderVSC;
+  if (user.totalTime + userCost <= rival.totalTime) return; // staying out wouldn't lead
+
+  const compound = model.compounds[rival.compound];
+  const lapsToCliff = compound ? Math.max(1, Math.floor(compound.cliffLap - rival.tyreWear)) : 1;
+  const laterLap = stopLap + lapsToCliff;
+  rival.strategy = rival.strategy.filter((s) => s !== planned);
+  if (laterLap < model.race.laps) rival.strategy.push({ lap: laterLap, to: planned.to });
+  run.notes.push({
+    lap,
+    kind: 'rival-stays-out',
+    driver: rival.code,
+    detail: laterLap < model.race.laps ? `stop moved to lap ${laterLap}` : 'no stop',
+  });
+}
+
 /** True once the chequered flag has fallen. */
 export function isFinished(run: Run): boolean {
   return run.state.lap >= run.model.race.laps;
@@ -414,6 +454,7 @@ export function stepLap(run: Run): RaceState {
     resolveOrder(run, clean, prevTime, pitted);
   }
   rivalReacts(run, lap, flag, prevTime);
+  rivalGoesLong(run, lap);
 
   state.lap = lap;
   state.flag = flag ?? 'green';

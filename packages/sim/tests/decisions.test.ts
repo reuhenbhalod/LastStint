@@ -133,10 +133,30 @@ describe('rival policy', () => {
     expect(run.notes.filter((n) => n.kind === 'rival-cover')).toEqual([]);
   });
 
-  it('stays out when pitting would hand the user track position', () => {
-    // Real sides: HAM (player) boxes on lap 53 from the lead; VER's real stop is charged on 54
-    // as well, so no extra reaction is needed - and none is logged.
+  it('goes long under a SC to take track position when the user pits from ahead', () => {
+    // The flagship call: HAM (player) boxes from the lead on lap 53. VER, behind and due to
+    // stop on 54, sees it and stays out to lead the restart (his tyres won't reach the cliff
+    // before the flag, so the stop is dropped).
     const run = runTo(abu, 1, [{ lap: 53, kind: 'pit', compound: 'SOFT' }], 56);
-    expect(run.notes.filter((n) => n.kind === 'rival-cover')).toEqual([]);
+    expect(run.notes).toContainEqual({
+      lap: 53,
+      kind: 'rival-stays-out',
+      driver: 'VER',
+      detail: 'no stop',
+    });
+    expect(run.state.cars.VER?.strategy).toEqual([]);
+    expect(run.state.order.indexOf('VER')).toBeLessThan(run.state.order.indexOf('HAM'));
+  });
+
+  it('only a rival behind the user can go long', () => {
+    // Swap sides: the rival HAM leads, so he is past pit entry before VER's call.
+    const swapped: RaceModel = { ...abu, userSide: 'VER', rival: 'HAM' };
+    const run = runTo(swapped, 1, [{ lap: 53, kind: 'pit', compound: 'SOFT' }], 56);
+    expect(run.notes.filter((n) => n.kind === 'rival-stays-out')).toEqual([]);
+  });
+
+  it('does not go long under green (the plan covers instead)', () => {
+    const run = runTo(spain, 1, [{ lap: 24, kind: 'pit', compound: 'MEDIUM' }], 30);
+    expect(run.notes.filter((n) => n.kind === 'rival-stays-out')).toEqual([]);
   });
 });
