@@ -8,6 +8,7 @@ export {
   classify,
   cleanLap,
   decide,
+  forkRun,
   initRun,
   isFinished,
   passProbability,

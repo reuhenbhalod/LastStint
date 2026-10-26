@@ -70,6 +70,8 @@ export const DEFAULT_MODES: Modes = { pace: 'standard', fuel: 'normal', battle: 
 /** Internal run state: the public RaceState plus the per-car random streams. */
 export interface Run {
   model: RaceModel;
+  /** The seed the run's random streams were derived from. */
+  seed: number;
   state: RaceState;
   /** The player's calls so far (the run log the Worker replays). */
   decisions: Decision[];
@@ -213,6 +215,30 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
     };
   }
 
+  return {
+    model,
+    seed,
+    ...makeStreams(model, seed),
+    decisions: [...(options.decisions ?? [])],
+    live,
+    notes: [],
+    headset: HEADSET[model.era],
+    state: {
+      lap: model.race.takeoverLap,
+      flag: 'green',
+      order: ordered.map((d) => d.code),
+      cars,
+    },
+    neutral,
+    retireAt,
+  };
+}
+
+/** Per-car random streams for a seed (see the header comment for the stream layout). */
+function makeStreams(
+  model: RaceModel,
+  seed: number,
+): Pick<Run, 'noiseRng' | 'passRng' | 'errorRng'> {
   const noiseRng: Record<string, Rng> = {};
   const passRng: Record<string, Rng> = {};
   const errorRng: Record<string, Rng> = {};
@@ -221,24 +247,34 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
     passRng[d.code] = mulberry32(deriveSeed(seed, OVERTAKE_STREAM + i));
     errorRng[d.code] = mulberry32(deriveSeed(seed, ERROR_STREAM + i));
   });
+  return { noiseRng, passRng, errorRng };
+}
 
+function cloneCar(c: CarState): CarState {
+  return { ...c, strategy: c.strategy.map((s) => ({ ...s })), modes: { ...c.modes } };
+}
+
+/**
+ * Branch a live run at its current lap: the same race state and past calls, with fresh
+ * random streams from `seed` for everything still to come, plus `decisions` (calls for laps
+ * not yet run). The grader forks once per (option, sample); forks that share a seed share
+ * every future draw (common random numbers).
+ */
+export function forkRun(run: Run, seed: number, decisions: Decision[] = []): Run {
+  if (!run.live) throw new Error('only a live run can be forked');
+  for (const d of decisions) {
+    if (d.lap <= run.state.lap) throw new Error(`lap ${d.lap} has already run`);
+  }
+  validateDecisions(run.model, decisions);
+  const cars: Record<string, CarState> = {};
+  for (const [code, c] of Object.entries(run.state.cars)) cars[code] = cloneCar(c);
   return {
-    model,
-    decisions: [...(options.decisions ?? [])],
-    live,
+    ...run,
+    seed,
+    ...makeStreams(run.model, seed),
+    state: { ...run.state, order: [...run.state.order], cars },
+    decisions: [...run.decisions.filter((d) => d.lap > run.state.lap), ...decisions],
     notes: [],
-    headset: HEADSET[model.era],
-    errorRng,
-    state: {
-      lap: model.race.takeoverLap,
-      flag: 'green',
-      order: ordered.map((d) => d.code),
-      cars,
-    },
-    noiseRng,
-    passRng,
-    neutral,
-    retireAt,
   };
 }
 
