@@ -78,6 +78,18 @@ Every item here ships only if it passes the **guard**: it improves mean gap erro
 | B1 reference | 5 / 0 / 11 | 4.14s |
 | + B2 | 4 / 2 / 10 | 4.02s |
 
+**Investigated and not shipped** (measured on the tuning races):
+
+- **B3, traffic.** The sim doesn't lack traffic; it packs followers too tightly.
+  - Laps within 1s of the car ahead: 22% in the sim vs 15% real. Laps 1–2s back: 13% vs 17%.
+  - Setting the follow gap to the measured 0.76s made results much worse (4.78s, 2 pass): it lowered pass chances, so stuck cars paid dirty air for more laps.
+  - Halving dirty air (which may double-count being held) moved error only 4.03 → 3.98s, within noise. No traffic change shipped.
+- **Safety-car bunching.** Real SCs keep gaps on the deployment lap; afterwards each gap keeps about 34% of its excess per lap (259 gaps). The current 20 s/lap closing ignores both.
+  - The faithful model fixes Miami 2024 (13.2 → 6.7s), where Norris's win came from stopping while gaps were still open.
+  - But it breaks Abu Dhabi 2021 (2.6 → 11.1s) and Bahrain 2022, and overall error rises to 4.47s.
+  - Cause: the instant closing had been **hiding pre-SC pace errors**. At Abu Dhabi the sim has HAM 39s ahead of VER when the SC comes out (real: 15s); it underrates VER's fresh hards against HAM's 40-lap-old hards by about 0.7 s/lap.
+  - The faithful SC model should return once long-stint tyre fade is fixed.
+
 **B1. Pit-stop durations**
 
 - **a. Frozen + sampled.** ← recommended
