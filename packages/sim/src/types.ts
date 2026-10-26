@@ -48,6 +48,9 @@ export interface RaceModel {
     pitLossUnderSC: number;
     overtakeDifficulty: number;
     dirtyAirPenalty: number;
+    greenLapTime?: number;
+    scLapTime?: number;
+    vscLapTime?: number;
   };
   compounds: Record<Compound, CompoundModel>;
   drivers: DriverModel[];

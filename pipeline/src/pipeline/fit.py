@@ -47,8 +47,38 @@ def _design_matrix(df: pd.DataFrame, drivers, compounds, reference):
     return x, nonref
 
 
-def fit_lap_model(clean_laps: pd.DataFrame, reference_compound: str = "SOFT") -> LapTimeFit:
-    """Fit the lap-time model; return fitted driver pace, compound params, fuel, noise."""
+def _driver_pace_from(laps, compound_offset, compound_wear, fuel_per_lap):
+    """Per-driver base pace and noise from the tyre/fuel-adjusted laps given.
+
+    Using all green racing laps (not just the cleanest) captures true race-pace spread:
+    slower teams run more compromised laps, so their base pace is correctly slower.
+    """
+    df = laps.dropna(subset=_FIT_COLUMNS).copy()
+    df["Compound"] = df["Compound"].astype(str)
+    base = (
+        df["LapTime"].astype(float)
+        - df["Compound"].map(compound_offset).astype(float)
+        - df["Compound"].map(compound_wear).astype(float) * df["TyreLife"].astype(float)
+        + fuel_per_lap * df["LapNumber"].astype(float)
+    )
+    df = df.assign(_base=base)
+    pace, noise = {}, {}
+    for driver, grp in df.groupby("Driver"):
+        pace[str(driver)] = float(grp["_base"].median())
+        noise[str(driver)] = float(grp["_base"].std(ddof=1)) if len(grp) > 1 else 0.3
+    return pace, noise
+
+
+def fit_lap_model(
+    clean_laps: pd.DataFrame,
+    reference_compound: str = "SOFT",
+    pace_laps: pd.DataFrame | None = None,
+) -> LapTimeFit:
+    """Fit the lap-time model; return fitted driver pace, compound params, fuel, noise.
+
+    Compound/wear/fuel are fit by OLS on the clean laps. Driver base pace and noise come
+    from `pace_laps` (all green racing laps) when supplied, else from the clean-lap fit.
+    """
     import statsmodels.api as sm
 
     df = clean_laps.dropna(subset=_FIT_COLUMNS).copy()
@@ -62,20 +92,26 @@ def fit_lap_model(clean_laps: pd.DataFrame, reference_compound: str = "SOFT") ->
     result = sm.OLS(df["LapTime"].astype(float), x).fit()
     p = result.params
 
-    driver_pace = {d: float(p[f"drv::{d}"]) for d in drivers}
     compound_offset = {reference: 0.0}
     compound_offset.update({c: float(p[f"off::{c}"]) for c in nonref})
     compound_wear = {c: float(p[f"wear::{c}"]) for c in compounds}
+    fuel_per_lap = -float(p["fuel"])
 
-    resid = result.resid
-    driver_noise = {d: float(resid[df["Driver"] == d].std(ddof=1)) for d in drivers}
+    if pace_laps is not None:
+        driver_pace, driver_noise = _driver_pace_from(
+            pace_laps, compound_offset, compound_wear, fuel_per_lap
+        )
+    else:
+        driver_pace = {d: float(p[f"drv::{d}"]) for d in drivers}
+        resid = result.resid
+        driver_noise = {d: float(resid[df["Driver"] == d].std(ddof=1)) for d in drivers}
 
     return LapTimeFit(
         driver_pace=driver_pace,
         driver_noise=driver_noise,
         compound_offset=compound_offset,
         compound_wear=compound_wear,
-        fuel_per_lap=-float(p["fuel"]),  # negate: coef is negative when pace improves
+        fuel_per_lap=fuel_per_lap,
         reference_compound=reference,
         r_squared=float(result.rsquared),
         n_obs=int(result.nobs),

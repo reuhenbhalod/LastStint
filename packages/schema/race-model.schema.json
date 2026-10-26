@@ -48,7 +48,10 @@
         "pitLoss": { "type": "number" },
         "pitLossUnderSC": { "type": "number" },
         "overtakeDifficulty": { "type": "number", "minimum": 0, "maximum": 1 },
-        "dirtyAirPenalty": { "type": "number", "minimum": 0 }
+        "dirtyAirPenalty": { "type": "number", "minimum": 0 },
+        "greenLapTime": { "type": "number" },
+        "scLapTime": { "type": "number" },
+        "vscLapTime": { "type": "number" }
       }
     },
     "compounds": {
