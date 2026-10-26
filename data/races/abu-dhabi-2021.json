@@ -9,9 +9,9 @@
   },
   "era": "2014-2025",
   "track": {
-    "pitLoss": 22.686,
-    "pitLossUnderSC": 12.477,
-    "pitLossUnderVSC": 18.604,
+    "pitLoss": 22.569,
+    "pitLossUnderSC": 12.413,
+    "pitLossUnderVSC": 20.115,
     "overtakeDifficulty": 0.962,
     "overtakeModel": {
       "intercept": -0.2633,

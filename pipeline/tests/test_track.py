@@ -106,3 +106,16 @@ def test_overtake_model_falls_back_on_thin_data(abu):
     model, note = track.fit_overtake_model(few, fitted)
     assert model == track.DEFAULT_OVERTAKE_MODEL
     assert note is not None
+
+
+def test_stop_losses_are_pace_corrected(abu):
+    # A slow car's slow in/out laps must not count as pit time: green-stop losses for the
+    # quickest and slowest teams should sit near the track median, not ~2x their pace gap.
+    laps, *_ = abu
+    green = {(d, i): loss for i, (d, f, loss) in enumerate(track.stop_losses(laps)) if f == "green"}
+    median = track.pit_loss(laps)
+    # (PER's one genuinely slow ~29s stop is the only outlier.)
+    near = [abs(loss - median) < 2.5 for loss in green.values()]
+    assert sum(near) / len(near) >= 0.9
+    ham = [loss for (d, _), loss in green.items() if d == "HAM"]
+    assert abs(ham[0] - median) < 2.5

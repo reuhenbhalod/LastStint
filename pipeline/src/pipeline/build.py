@@ -21,6 +21,10 @@ RACES: dict[str, dict] = {
         "takeover_lap": 34,
         "seed": 81723,
         "user_side": "HAM",
+        "rival": "VER",
+        # P7 and back were decided by race control (only the lapped cars between HAM and
+        # VER unlapped before the restart), a frozen event the sim can't reproduce.
+        "score_positions": 6,
     },
     "spain-2021": {
         "year": 2021,
@@ -30,6 +34,8 @@ RACES: dict[str, dict] = {
         "takeover_lap": 20,
         "seed": 49123,
         "user_side": "VER",
+        "rival": "HAM",
+        "score_positions": 6,
     },
 }
 

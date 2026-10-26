@@ -1,7 +1,7 @@
 """Unit tests for the validation harness (Phase 1.7).
 
-Checks the harness computes real gaps and runs the report. Gate G1 (passed == True) is NOT
-asserted here — the model does not yet clear it (see the reference-sim notes).
+Checks the harness computes real gaps and runs the report, and locks in Gate G1 for Abu
+Dhabi 2021. Spain 2021 does not yet clear G1 (BOT/PER gaps; traffic model open item).
 """
 
 from __future__ import annotations
@@ -27,18 +27,32 @@ def test_real_finishing_gaps(race):
 
 def test_validate_race_runs_and_reports(race):
     model, laps = race
-    report = validate.validate_race(model, validate.real_finishing_gaps(laps), runs=20)
+    report = validate.validate_race(model, validate.real_finishing_gaps(laps), runs=20, rival="VER")
     assert report.runs == 20
     assert report.contenders[0] == "VER"
+    assert report.duel == ("HAM", "VER")
     assert 0.0 <= report.order_match_rate <= 1.0
-    assert set(report.contenders) <= set(report.mean_gap_error)
+    names = [c.name for c in report.checks]
+    assert any(n.startswith("duel HAM vs VER") for n in names)
+    assert any(n.startswith("podium") for n in names)
+    assert report.passed == (not report.failures)
     assert isinstance(report.summary(), str)
 
 
+def test_field_tolerance_scales_with_real_gap():
+    # A car 60s back is held to 10% of its gap (6s), not the flat 5s.
+    assert max(validate.GAP_TOLERANCE, validate.FIELD_RELATIVE_TOLERANCE * 60) == 6.0
+
+
 def test_abu_dhabi_clears_gate_g1(race):
-    """Gate G1 regression: the sim reproduces Abu Dhabi's podium order and gaps."""
+    """Gate G1 regression: duel, podium and scored field all within the bar."""
     model, laps = race
-    report = validate.validate_race(model, validate.real_finishing_gaps(laps), runs=150)
-    assert report.order_match_rate >= 0.5  # VER/HAM/SAI podium in most runs
-    assert max(report.mean_gap_error[c] for c in report.contenders[:3]) < 5.0
-    assert report.passed
+    meta = build.RACES["abu-dhabi-2021"]
+    report = validate.validate_race(
+        model,
+        validate.real_finishing_gaps(laps),
+        runs=300,
+        rival=meta["rival"],
+        score_positions=meta["score_positions"],
+    )
+    assert report.passed, report.summary()

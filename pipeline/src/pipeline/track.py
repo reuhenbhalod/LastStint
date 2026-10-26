@@ -83,8 +83,9 @@ def _has_vsc(status_value: object) -> bool:
 def stop_losses(laps: pd.DataFrame) -> list[tuple[str, str, float]]:
     """Per pit stop: (driver, flag, loss). Loss = in-lap + out-lap minus the median lap time
     of cars that did not pit on those same laps, so fuel, track evolution and neutralized
-    pace cancel out. Flag is "SC" if either lap touched a safety car, "VSC" if either touched
-    a virtual safety car, else "green".
+    pace cancel out, minus twice the driver's own green-lap pace offset to that field median,
+    so a slow car's slow in/out laps aren't counted as pit time. Flag is "SC" if either lap
+    touched a safety car, "VSC" if either touched a virtual safety car, else "green".
     """
     stops = pit_stops(laps)
     pitting = set()
@@ -95,6 +96,10 @@ def stop_losses(laps: pd.DataFrame) -> list[tuple[str, str, float]]:
     keys = list(zip(timed["Driver"].astype(str), timed["LapNumber"].astype(int), strict=True))
     non_pit = timed[[k not in pitting for k in keys]]
     field_median = non_pit.groupby("LapNumber")["LapTime"].median()
+    green = non_pit[non_pit["TrackStatus"].astype(str) == "1"]
+    pace_offset = (
+        (green["LapTime"] - green["LapNumber"].map(field_median)).groupby(green["Driver"]).median()
+    )
 
     out: list[tuple[str, str, float]] = []
     for driver, in_lap, out_lap in stops:
@@ -111,6 +116,7 @@ def stop_losses(laps: pd.DataFrame) -> list[tuple[str, str, float]]:
         else:
             flag = "green"
         reference = sum(float(field_median[lap]) for lap in laps_used)
+        reference += 2 * float(pace_offset.get(driver, 0.0))
         loss = float(in_lap["LapTime"]) + float(out_lap["LapTime"]) - reference
         out.append((driver, flag, loss))
     return out
