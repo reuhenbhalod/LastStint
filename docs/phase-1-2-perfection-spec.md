@@ -1,6 +1,6 @@
 # Phase 1–2 Perfection Spec: Model v2 and a Complete Simulator
 
-Status: decisions made (Oct 26, 2026: all recommended options) · Owner: @Abhiram
+Status: closed Oct 26, 2026 with documented limits (owner decision, see "Close-out") · Owner: @Abhiram
 
 ## Purpose
 
@@ -326,3 +326,17 @@ Acceptance:
 | FastF1 rate limit with about 30 races | Resumable ingest with backoff (Stage A); the cache means each race downloads once. |
 | Schema changes (v6, v7) break Reuhen's UI | Announce them in `docs/sim-api.md`, bump `schemaVersion`, and keep the API surface stable. |
 | Data terms (now using an F1 account) | Product doc open question; no commercial use before it is answered. |
+
+## Close-out (Oct 26, 2026)
+
+**Owner decision: close Phases 1 and 2 with documented limits** (option A). A model v3 for driver/stint pace (option B) was not started.
+
+| Exit criterion | Result |
+|---|---|
+| G1: at least 75% of held-out races pass | **Not met.** Held-out 1 pass / 0 borderline / 15 fail (mean gap error 5.61s). Tuning 5 / 1 / 10 (3.49s). |
+| G2: parity, grader budget, features tested | Parity on every golden race. The grader takes 75 ms single-threaded against the 60 ms target, and 42 ms on 2 Web Workers (the browser path). All features are tested. |
+| API documented | Met: `docs/sim-api.md`, with an example CI runs. |
+
+- **Validated pool for daily content:** abu-dhabi-2021, canada-2022, bahrain-2022, miami-2022, hungary-2019 and spain-2020 pass G1; mexico-2021 is borderline.
+- **Known limit:** the race model uses one pace per driver per race, so it misses driver- and stint-specific pace (for example VER's fresh hards at Abu Dhabi 2021). `docs/g1-report.md` diagnoses it as the dominant error in 11 of the 15 failing held-out races. Every general fix tried (per-driver wear, driver × compound pace, season pooling) failed the all-races guard.
+- **Held-out set finding:** some 2018–19 timing labels a car's out-lap with its old tyres. Five Bahrain 2018 stops and Hamilton's race-winning lap-49 stop at Hungary 2019 had been lost; this is fixed and tested.
