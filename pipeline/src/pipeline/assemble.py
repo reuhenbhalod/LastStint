@@ -103,7 +103,9 @@ def assemble_race_model(
         "track": {
             "pitLoss": round(track_params.pit_loss, 3),
             "pitLossUnderSC": round(track_params.pit_loss_under_sc, 3),
+            "pitLossUnderVSC": round(track_params.pit_loss_under_vsc, 3),
             "overtakeDifficulty": round(track_params.overtake_difficulty, 4),
+            "overtakeModel": {k: round(v, 4) for k, v in track_params.overtake_model.items()},
             "dirtyAirPenalty": round(track_params.dirty_air_penalty, 4),
             # Neutralized-lap pace for the simulator; omitted when a race had none.
             **(

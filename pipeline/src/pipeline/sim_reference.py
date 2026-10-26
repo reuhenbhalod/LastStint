@@ -11,15 +11,18 @@ reproduces real races.
 from __future__ import annotations
 
 import json
+import math
 import random
 from dataclasses import dataclass, field
 
 from .paths import GOLDEN_DIR
 
 DIRTY_AIR_RANGE = 1.0  # within this gap (s) a car is in dirty air
-CATCH_WINDOW = 1.0  # a close follower within this gap (s) can attempt a pass (DRS range)
-BUNCH_GAP = 0.9  # safety-car train spacing per car
-PACE_PASS_GAIN = 1.1  # how strongly a per-lap pace edge overrides overtake difficulty
+PASS_WINDOW = 2.0  # a follower within this gap (s) gets one pass roll (matches the fit)
+FOLLOW_GAP = 0.3  # a follower that fails to pass is held this far (s) behind
+PASS_MARGIN = 0.05  # a completed pass puts the follower this far (s) ahead
+BUNCH_GAP = 0.5  # SC train spacing per car (measured on the final SC lap, 2021 races)
+SC_CLOSE_PER_LAP = 20.0  # s a gap closes per full SC lap (measured >= 15.4s)
 SC_FALLBACK = 1.6  # SC lap = this x green if not supplied
 VSC_FALLBACK = 1.35  # VSC lap = this x green if not supplied
 CLIFF_FALLBACK = 2.0  # extra wear past the cliff = this x degPerLap if not fitted
@@ -54,31 +57,37 @@ def _car_ahead(order: list[str], code: str, cars: dict[str, Car]) -> str:
     return live[i - 1] if i > 0 else code
 
 
-def _resolve_order(order, cars, clean, rng, overtake_diff):
-    """Set green-flag race order. Natural time sort handles pit-driven moves; then a close,
-    faster follower (within a lap's reach) gets a pass chance gated by overtake difficulty,
-    modelling an on-track overtake rather than a pure cumulative-time crossover.
+def pass_probability(overtake: dict, advantage: float, gap: float) -> float:
+    """Fitted logistic P(follower passes this lap) from pace advantage (s/lap) and gap (s)."""
+    z = overtake["intercept"] + overtake["paceCoef"] * advantage + overtake["gapCoef"] * gap
+    return 1.0 / (1.0 + math.exp(-z))
+
+
+def _resolve_order(order, cars, clean, rng, overtake, prev_time, pitted):
+    """Set green-flag race order after a lap.
+
+    Walking the start-of-lap order front to back, each follower that started the lap within
+    PASS_WINDOW of the car ahead gets ONE pass roll from the fitted overtake model. Success
+    puts it ahead; failure holds it FOLLOW_GAP behind even if its lap was faster (it was
+    stuck in traffic). Pairs involving a car that pitted this lap, or that started further
+    apart, are left to the natural time order (pit-driven moves, or a gap closed in one lap).
     """
-    codes = [c for c in order if not cars[c].retired]
-    codes.sort(key=lambda c: cars[c].total_time)
-    improved = True
-    guard = 0
-    while improved and guard < len(codes) * 3:
-        improved = False
-        guard += 1
-        for i in range(1, len(codes)):
-            a, b = cars[codes[i - 1]], cars[codes[i]]  # a ahead, b behind (by time)
-            if b.total_time - a.total_time > CATCH_WINDOW:
-                continue
-            advantage = clean.get(a.code, 0) - clean.get(b.code, 0)  # >0: b is faster
-            if advantage <= 0:
-                continue
-            pprob = min(0.98, (1 - overtake_diff) + PACE_PASS_GAIN * advantage)
-            if rng.random() < pprob:
-                b.total_time = a.total_time - 0.05  # b completes the pass
-                codes[i - 1], codes[i] = codes[i], codes[i - 1]
-                improved = True
-    order[:] = codes + [c for c in order if cars[c].retired]
+    live = [c for c in order if not cars[c].retired]
+    for i in range(1, len(live)):
+        a, b = cars[live[i - 1]], cars[live[i]]
+        if a.code in pitted or b.code in pitted:
+            continue
+        gap = prev_time[b.code] - prev_time[a.code]
+        if not 0 <= gap < PASS_WINDOW:
+            continue
+        advantage = clean[a.code] - clean[b.code]  # >0: b is faster on model pace
+        if rng.random() < pass_probability(overtake, advantage, gap):
+            if b.total_time >= a.total_time:
+                b.total_time = a.total_time - PASS_MARGIN
+        elif b.total_time < a.total_time + FOLLOW_GAP:
+            b.total_time = a.total_time + FOLLOW_GAP
+    live.sort(key=lambda c: cars[c].total_time)
+    order[:] = live + [c for c in order if cars[c].retired]
 
 
 def _classify(order, cars) -> dict:
@@ -102,10 +111,11 @@ def simulate(model: dict, seed: int, strategies: dict | None = None) -> dict:
     fuel = model["fuelEffectPerLap"]
     total_laps = int(model["race"]["laps"])
     takeover = int(model["race"]["takeoverLap"])
-    overtake_diff = track["overtakeDifficulty"]
+    overtake = track["overtakeModel"]
     dirty_air = track["dirtyAirPenalty"]
     pit_loss = track["pitLoss"]
     pit_loss_sc = track["pitLossUnderSC"]
+    pit_loss_vsc = track["pitLossUnderVSC"]
     green = track.get("greenLapTime")
     sc_time = track.get("scLapTime") or (green * SC_FALLBACK if green else None)
     vsc_time = track.get("vscLapTime") or (green * VSC_FALLBACK if green else None)
@@ -146,16 +156,18 @@ def simulate(model: dict, seed: int, strategies: dict | None = None) -> dict:
         flag = neutral.get(lap)
         prev_time = {c: cars[c].total_time for c in active_codes()}
         clean: dict[str, float] = {}
+        pitted: set[str] = set()
 
         for code in active_codes():
             car = cars[code]
             pit = next((st for st in car.strategy if st["lap"] == lap), None)
             pit_cost = 0.0
             if pit:
+                pitted.add(code)
                 car.strategy.remove(pit)
                 car.compound = pit["to"]
                 car.tyre_age = 0
-                pit_cost = pit_loss_sc if flag in ("SC", "VSC") else pit_loss
+                pit_cost = {"SC": pit_loss_sc, "VSC": pit_loss_vsc}.get(flag, pit_loss)
 
             if flag == "SC" and sc_time:
                 lt = sc_time
@@ -179,16 +191,21 @@ def simulate(model: dict, seed: int, strategies: dict | None = None) -> dict:
                 cars[code].retired = True
                 cars[code].retired_lap = lap
 
-        if flag == "SC":
-            # No overtaking under a safety car: positions are frozen. Bunch the field
-            # nose-to-tail in the EXISTING race order. A car that pitted this lap keeps its
-            # place (rejoining the slow train), which is why SC stops are nearly free -
-            # re-sorting by total time here would wrongly bury it by its pit loss.
-            live = active_codes()
-            for i in range(1, len(live)):
-                cars[live[i]].total_time = cars[live[i - 1]].total_time + BUNCH_GAP
-        elif not flag:
-            _resolve_order(order, cars, clean, rng, overtake_diff)
+        if flag:
+            # No overtaking under neutralization: every car ran the same neutralized lap, so
+            # sorting by total time moves only cars that pitted, by their pit loss against
+            # the gaps on track. Under a SC each gap then closes by SC_CLOSE_PER_LAP down to
+            # nose-to-tail, so an early SC stop (gaps still open) is cheap while a stop into
+            # an already bunched train drops places.
+            live = sorted(active_codes(), key=lambda c: cars[c].total_time)
+            order[:] = live + [c for c in order if cars[c].retired]
+            if flag == "SC":
+                for i in range(1, len(live)):
+                    ahead, car = cars[live[i - 1]], cars[live[i]]
+                    gap = car.total_time - ahead.total_time
+                    car.total_time = ahead.total_time + max(BUNCH_GAP, gap - SC_CLOSE_PER_LAP)
+        else:
+            _resolve_order(order, cars, clean, rng, overtake, prev_time, pitted)
 
     return _classify(order, cars)
 

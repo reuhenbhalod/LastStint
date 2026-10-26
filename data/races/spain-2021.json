@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "race": {
     "id": "spain-2021",
     "name": "Spain 2021: Hamilton vs Verstappen",
@@ -9,9 +9,15 @@
   },
   "era": "2014-2025",
   "track": {
-    "pitLoss": 23.239,
-    "pitLossUnderSC": 12.781,
+    "pitLoss": 22.142,
+    "pitLossUnderSC": 12.178,
+    "pitLossUnderVSC": 17.714,
     "overtakeDifficulty": 0.9232,
+    "overtakeModel": {
+      "intercept": 1.9477,
+      "paceCoef": 2.379,
+      "gapCoef": -7.9941
+    },
     "dirtyAirPenalty": 0.4538,
     "greenLapTime": 84.114,
     "scLapTime": 117.318

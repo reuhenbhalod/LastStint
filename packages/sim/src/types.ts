@@ -48,7 +48,10 @@ export interface RaceModel {
   track: {
     pitLoss: number;
     pitLossUnderSC: number;
+    pitLossUnderVSC: number;
     overtakeDifficulty: number;
+    /** P(pass) = sigmoid(intercept + paceCoef * paceAdvantage + gapCoef * gap). */
+    overtakeModel: { intercept: number; paceCoef: number; gapCoef: number };
     dirtyAirPenalty: number;
     greenLapTime?: number;
     scLapTime?: number;

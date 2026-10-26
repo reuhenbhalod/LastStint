@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "race": {
     "id": "abu-dhabi-2021",
     "name": "Abu Dhabi 2021: Hamilton vs Verstappen",
@@ -9,9 +9,15 @@
   },
   "era": "2014-2025",
   "track": {
-    "pitLoss": 23.448,
-    "pitLossUnderSC": 12.896,
+    "pitLoss": 22.686,
+    "pitLossUnderSC": 12.477,
+    "pitLossUnderVSC": 18.604,
     "overtakeDifficulty": 0.962,
+    "overtakeModel": {
+      "intercept": -0.2633,
+      "paceCoef": 1.9008,
+      "gapCoef": -3.6175
+    },
     "dirtyAirPenalty": 0.4961,
     "greenLapTime": 89.624,
     "scLapTime": 135.27,

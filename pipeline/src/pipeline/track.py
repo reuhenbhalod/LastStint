@@ -2,15 +2,17 @@
 
 Fits the track-level constants the simulator needs:
 
-- pit loss (green) and pit loss under neutralization,
+- pit loss under green, VSC (both measured) and SC (estimated),
 - dirty-air penalty (time lost per lap stuck behind a car),
 - safety-car and virtual-safety-car lap times,
-- overtaking difficulty (how hard it is for a faster car to get past).
+- overtaking difficulty (share of close-following laps without a pass, for display) and
+  the overtake model the simulator rolls against: logistic P(pass) on the follower's
+  model pace advantage and the gap.
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import pandas as pd
 
@@ -22,6 +24,7 @@ from .fit import LapTimeFit, predict
 class TrackParams:
     pit_loss: float | None
     pit_loss_under_sc: float | None
+    pit_loss_under_vsc: float | None
     dirty_air_penalty: float
     overtake_difficulty: float
     green_lap_time: float
@@ -29,6 +32,8 @@ class TrackParams:
     vsc_lap_time: float | None
     n_pass_opportunities: int
     n_passes: int
+    overtake_model: dict[str, float] = field(default_factory=dict)
+    notes: list[str] = field(default_factory=list)  # where a fallback/estimate was used
 
 
 def _status(laps: pd.DataFrame) -> pd.Series:
@@ -53,31 +58,74 @@ def pit_stops(laps: pd.DataFrame) -> list[tuple[str, pd.Series, pd.Series]]:
     return stops
 
 
-# Under a safety car the field is slowed, so pitting costs far less track time than under
-# green. A single race has too few, too-noisy SC in/out laps to measure this directly
-# (SC lap times swing wildly between the bunching lap and steady state), so we estimate it
-# as a fraction of the green pit loss. The product doc's own example is 12.1/21.4 ~= 0.55.
-# This is a calibration constant, refinable later with telemetry or pooled races.
+# Under a safety car the field bunches behind the SC car, so lap times on those laps mix the
+# bunching lap with steady SC pace and a stop's in/out laps can't be compared with the
+# field's (the comparison comes out negative). We estimate it as a fraction of the green
+# loss instead; the product doc's own example is 12.1/21.4 ~= 0.55. Refinable later with
+# telemetry or pooled races.
 SC_PIT_LOSS_FACTOR = 0.55
+# Under a VSC the field keeps its gaps at a fixed delta, so VSC stops CAN be measured against
+# same-lap non-pitters. With fewer than MIN_VSC_STOPS measured, fall back to this fraction of
+# the green loss (Abu Dhabi 2021 measures ~0.82).
+VSC_PIT_LOSS_FACTOR = 0.8
+MIN_VSC_STOPS = 2
 
 
-def pit_loss(laps: pd.DataFrame, clean_laps: pd.DataFrame) -> float | None:
-    """Green-flag pit loss: (in-lap + out-lap) - 2 x driver median clean lap, median over
-    green stops. SC/VSC stops are excluded (handled via SC_PIT_LOSS_FACTOR). None if no stops.
+def _has_sc(status_value: object) -> bool:
+    return "4" in ("" if status_value is None else str(status_value))
+
+
+def _has_vsc(status_value: object) -> bool:
+    s = "" if status_value is None else str(status_value)
+    return "6" in s or "7" in s
+
+
+def stop_losses(laps: pd.DataFrame) -> list[tuple[str, str, float]]:
+    """Per pit stop: (driver, flag, loss). Loss = in-lap + out-lap minus the median lap time
+    of cars that did not pit on those same laps, so fuel, track evolution and neutralized
+    pace cancel out. Flag is "SC" if either lap touched a safety car, "VSC" if either touched
+    a virtual safety car, else "green".
     """
-    median_clean = clean_laps.groupby("Driver")["LapTime"].median()
-    losses: list[float] = []
-    for driver, in_lap, out_lap in pit_stops(laps):
-        if driver not in median_clean.index:
-            continue
-        if _is_neutralized(in_lap["TrackStatus"]) or _is_neutralized(out_lap["TrackStatus"]):
-            continue
+    stops = pit_stops(laps)
+    pitting = set()
+    for driver, in_lap, out_lap in stops:
+        pitting.add((driver, int(in_lap["LapNumber"])))
+        pitting.add((driver, int(out_lap["LapNumber"])))
+    timed = laps[laps["LapTime"].notna()]
+    keys = list(zip(timed["Driver"].astype(str), timed["LapNumber"].astype(int), strict=True))
+    non_pit = timed[[k not in pitting for k in keys]]
+    field_median = non_pit.groupby("LapNumber")["LapTime"].median()
+
+    out: list[tuple[str, str, float]] = []
+    for driver, in_lap, out_lap in stops:
         if pd.isna(in_lap["LapTime"]) or pd.isna(out_lap["LapTime"]):
             continue
-        losses.append(float(in_lap["LapTime"] + out_lap["LapTime"] - 2 * median_clean[driver]))
-    if not losses:
-        return None
-    return float(pd.Series(losses).median())
+        laps_used = (in_lap["LapNumber"], out_lap["LapNumber"])
+        if any(lap not in field_median.index for lap in laps_used):
+            continue
+        statuses = (in_lap["TrackStatus"], out_lap["TrackStatus"])
+        if any(_has_sc(st) for st in statuses):
+            flag = "SC"
+        elif any(_has_vsc(st) for st in statuses):
+            flag = "VSC"
+        else:
+            flag = "green"
+        reference = sum(float(field_median[lap]) for lap in laps_used)
+        loss = float(in_lap["LapTime"]) + float(out_lap["LapTime"]) - reference
+        out.append((driver, flag, loss))
+    return out
+
+
+def pit_loss(laps: pd.DataFrame) -> float | None:
+    """Green-flag pit loss: median over green stops of `stop_losses`. None if no stops."""
+    losses = [loss for _, flag, loss in stop_losses(laps) if flag == "green"]
+    return float(pd.Series(losses).median()) if losses else None
+
+
+def pit_loss_under_vsc(laps: pd.DataFrame) -> tuple[float | None, int]:
+    """Median VSC-stop loss and how many VSC stops it rests on (None if none measured)."""
+    losses = [loss for _, flag, loss in stop_losses(laps) if flag == "VSC"]
+    return (float(pd.Series(losses).median()) if losses else None), len(losses)
 
 
 def dirty_air_penalty(traffic_laps: pd.DataFrame, fit: LapTimeFit) -> float:
@@ -167,6 +215,60 @@ def overtake_difficulty(laps: pd.DataFrame, close_gap: float = 2.0) -> tuple[flo
     return 1.0 - passes / n, n, passes
 
 
+# Overtake model fallback: between the Abu Dhabi and Spain 2021 fits. Used when a race has
+# too few passes to fit, or the fit has the wrong signs.
+DEFAULT_OVERTAKE_MODEL = {"intercept": 0.5, "paceCoef": 2.0, "gapCoef": -5.0}
+MIN_PASSES = 8
+
+
+def fit_overtake_model(
+    laps: pd.DataFrame, fit: LapTimeFit, close_gap: float = 2.0
+) -> tuple[dict[str, float], str | None]:
+    """Logistic P(pass next lap) = sigmoid(intercept + paceCoef*adv + gapCoef*gap).
+
+    `adv` is the follower's MODEL pace advantage (leader's predicted lap minus follower's,
+    from the fitted lap-time model), the same quantity the simulator compares, rather than
+    the observed lap delta (which the pass itself distorts). Returns (model, note); the note
+    is set when the default model was used.
+    """
+    import statsmodels.api as sm
+
+    events = extract_pass_events(laps, close_gap=close_gap)
+    if events.empty:
+        return dict(DEFAULT_OVERTAKE_MODEL), "overtakeModel: no pass opportunities, default"
+    state = {
+        (int(r.LapNumber), str(r.Driver)): r
+        for r in laps.itertuples()
+        if not pd.isna(r.Compound) and not pd.isna(r.TyreLife)
+    }
+
+    def predicted(driver: str, lap: int) -> float:
+        r = state.get((lap, driver))
+        if r is None or driver not in fit.driver_pace:
+            return float("nan")
+        return predict(fit, driver, str(r.Compound), float(r.TyreLife), lap)
+
+    events = events.assign(
+        adv=[predicted(e.leader, e.lap) - predicted(e.follower, e.lap) for e in events.itertuples()]
+    ).dropna(subset=["adv"])
+    n_passes = int(events["passed"].sum())
+    if n_passes < MIN_PASSES:
+        return dict(DEFAULT_OVERTAKE_MODEL), f"overtakeModel: {n_passes} passes, default"
+    x = sm.add_constant(events[["adv", "gap"]].astype(float))
+    try:
+        params = sm.Logit(events["passed"].astype(float), x).fit(disp=0).params
+    except Exception:  # perfect separation / non-convergence on thin data
+        return dict(DEFAULT_OVERTAKE_MODEL), "overtakeModel: fit failed, default"
+    if params["adv"] <= 0 or params["gap"] >= 0:
+        return dict(DEFAULT_OVERTAKE_MODEL), "overtakeModel: wrong-signed fit, default"
+    model = {
+        "intercept": float(params["const"]),
+        "paceCoef": float(params["adv"]),
+        "gapCoef": float(params["gap"]),
+    }
+    return model, None
+
+
 def fit_track_params(
     laps: pd.DataFrame,
     clean_laps: pd.DataFrame,
@@ -177,10 +279,24 @@ def fit_track_params(
     times = sc_vsc_lap_times(laps)
     difficulty, n_opp, n_pass = overtake_difficulty(laps)
     green = times["green"]
-    green_pit = pit_loss(laps, clean_laps)
+    green_pit = pit_loss(laps)
+    notes: list[str] = []
+    sc_pit = green_pit * SC_PIT_LOSS_FACTOR if green_pit is not None else None
+    notes.append(f"pitLossUnderSC estimated as {SC_PIT_LOSS_FACTOR} x green")
+    vsc_pit, n_vsc = pit_loss_under_vsc(laps)
+    if n_vsc < MIN_VSC_STOPS:
+        vsc_pit = green_pit * VSC_PIT_LOSS_FACTOR if green_pit is not None else None
+        notes.append(
+            f"pitLossUnderVSC: {n_vsc} VSC stops measured, using {VSC_PIT_LOSS_FACTOR} x green"
+        )
+    overtake, overtake_note = fit_overtake_model(laps, fit)
+    if overtake_note:
+        notes.append(overtake_note)
     return TrackParams(
+        overtake_model=overtake,
         pit_loss=green_pit,
-        pit_loss_under_sc=(green_pit * SC_PIT_LOSS_FACTOR if green_pit is not None else None),
+        pit_loss_under_sc=sc_pit,
+        pit_loss_under_vsc=vsc_pit,
         dirty_air_penalty=dirty_air_penalty(traffic_laps, fit),
         overtake_difficulty=difficulty,
         green_lap_time=green if green is not None else float("nan"),
@@ -188,4 +304,5 @@ def fit_track_params(
         vsc_lap_time=times["vsc"],
         n_pass_opportunities=n_opp,
         n_passes=n_pass,
+        notes=notes,
     )

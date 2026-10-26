@@ -32,6 +32,29 @@ def test_sc_pit_loss_is_discounted_green(abu):
     assert params.pit_loss_under_sc == pytest.approx(params.pit_loss * track.SC_PIT_LOSS_FACTOR)
 
 
+def test_vsc_pit_loss_measured_between_sc_and_green(abu):
+    laps, *_, params = abu
+    # Abu Dhabi 2021: VER, PER, GAS, ALO, LEC pitted under the lap-36 VSC.
+    _, n_vsc = track.pit_loss_under_vsc(laps)
+    assert n_vsc >= track.MIN_VSC_STOPS
+    assert params.pit_loss_under_sc < params.pit_loss_under_vsc < params.pit_loss
+    assert 15 < params.pit_loss_under_vsc < 21
+
+
+def test_stop_losses_flag_each_stop(abu):
+    laps, *_ = abu
+    flags = {(driver, flag) for driver, flag, _ in track.stop_losses(laps)}
+    assert ("VER", "VSC") in flags and ("VER", "SC") in flags and ("VER", "green") in flags
+
+
+def test_vsc_fallback_when_no_vsc_stops():
+    laps = pd.read_parquet(ingest.raw_snapshot_path("spain-2021"))
+    clean_df, traffic_df, _ = clean.clean_laps(laps)
+    params = track.fit_track_params(laps, clean_df, traffic_df, fit.fit_lap_model(clean_df))
+    assert params.pit_loss_under_vsc == pytest.approx(params.pit_loss * track.VSC_PIT_LOSS_FACTOR)
+    assert any("pitLossUnderVSC" in note for note in params.notes)
+
+
 def test_dirty_air_penalty_positive_and_small(abu):
     *_, params = abu
     assert 0 < params.dirty_air_penalty < 2
@@ -68,3 +91,18 @@ def test_is_neutralized():
     assert track._is_neutralized("671")  # VSC codes present
     assert not track._is_neutralized("1")  # green
     assert not track._is_neutralized("12")  # green then yellow, no SC/VSC
+
+
+def test_overtake_model_fitted_with_expected_signs(abu):
+    *_, params = abu
+    model = params.overtake_model
+    assert model["paceCoef"] > 0 and model["gapCoef"] < 0
+    assert not any("overtakeModel" in note for note in params.notes)  # fitted, not default
+
+
+def test_overtake_model_falls_back_on_thin_data(abu):
+    laps, _, _, fitted, _ = abu
+    few = laps[laps["LapNumber"] <= 4]  # opening laps only: too few passes to fit
+    model, note = track.fit_overtake_model(few, fitted)
+    assert model == track.DEFAULT_OVERTAKE_MODEL
+    assert note is not None
