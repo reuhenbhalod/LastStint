@@ -34,19 +34,29 @@ def list_races() -> None:
     for race_id, meta in build_mod.RACES.items():
         raw = ingest.raw_snapshot_path(race_id).exists()
         model = (paths.RACES_DIR / f"{race_id}.json").exists()
+        duel = f"{meta['user_side']} vs {meta['rival']}" if meta["user_side"] else "auto duel "
         typer.echo(
-            f"{race_id:24s} {meta['user_side']} vs {meta.get('rival', '?'):4s}"
+            f"{race_id:24s} {duel:10s} {meta.get('split', '?'):7s}"
             f" snapshot={'yes' if raw else 'no ':3s} model={'yes' if model else 'no'}"
         )
 
 
-@app.command()
-def ingest_race(race_id: str) -> None:
-    """Download a registered race from FastF1 and save its raw snapshot (needs network)."""
-    (race_id,) = _race_ids(race_id, False)
-    meta = build_mod.RACES[race_id]
-    laps, facts = ingest.ingest_race(race_id, meta["year"], meta["event"])
-    typer.echo(f"{race_id}: {len(laps)} laps, {facts['totalLaps']} race laps -> data/raw/")
+@app.command("ingest")
+def ingest_race(
+    race_id: str = typer.Argument(None),
+    all_races: bool = typer.Option(False, "--all", help="Ingest every registered race."),
+    force: bool = typer.Option(False, help="Re-download even if a snapshot exists."),
+) -> None:
+    """Download registered races from FastF1 into data/raw/ (network; rate-limit safe)."""
+    for rid in _race_ids(race_id, all_races):
+        if ingest.raw_snapshot_path(rid).exists() and not force:
+            typer.echo(f"{rid}: snapshot exists, skipped")
+            continue
+        meta = build_mod.RACES[rid]
+        laps, facts = ingest.ingest_race(rid, meta["year"], meta["event"])
+        problems = ingest.race_suitability(laps)
+        note = f"  NOT SUITABLE: {'; '.join(problems)}" if problems else ""
+        typer.echo(f"{rid}: {len(laps)} laps, {facts['totalLaps']} race laps -> data/raw/{note}")
 
 
 @app.command()
@@ -68,13 +78,26 @@ def build(
 def validate(
     race_id: str = typer.Argument(None),
     all_races: bool = typer.Option(False, "--all", help="Validate every registered race."),
+    split: str = typer.Option(None, help="Only races in this split (tune / holdout)."),
     runs: int = typer.Option(validate_mod.DEFAULT_RUNS, help="Simulations per race."),
+    robust: bool = typer.Option(
+        False, help="Guard mode: 1000 runs on two seed sets; pass / borderline / fail."
+    ),
+    report: str = typer.Option(
+        None, help="With --robust: write a Markdown G1 report (with diagnoses) to this path."
+    ),
 ) -> None:
     """Run the Gate G1 validation report; exit code 1 if any race fails."""
+    ids = _race_ids(race_id, all_races or split is not None)
+    if split:
+        ids = [r for r in ids if build_mod.RACES[r].get("split") == split]
+    if robust:
+        _robust(ids, report)
+        return
     failed = []
-    for rid in _race_ids(race_id, all_races):
-        meta = build_mod.RACES[rid]
+    for rid in ids:
         model, laps = build_mod.build_race_model(rid)
+        meta = build_mod.resolved_meta(rid, laps)
         report = validate_mod.validate_race(
             model,
             validate_mod.real_finishing_gaps(laps),
@@ -88,6 +111,77 @@ def validate(
     if failed:
         typer.echo(f"G1 FAILED: {', '.join(failed)}")
         raise typer.Exit(code=1)
+
+
+def _robust(ids: list[str], report: str | None = None) -> None:
+    from pathlib import Path
+
+    from . import diagnose
+
+    rows = []
+    for rid in ids:
+        model, laps = build_mod.build_race_model(rid)
+        meta = build_mod.resolved_meta(rid, laps)
+        positions = meta.get("score_positions", validate_mod.DEFAULT_SCORE_POSITIONS)
+        res = validate_mod.robust_status(
+            model,
+            validate_mod.real_finishing_gaps(laps),
+            rival=meta.get("rival"),
+            score_positions=positions,
+        )
+        failing = sorted(
+            {c.name for r in res.reports for c in r.checks if not c.passed},
+            key=str,
+        )
+        why = diagnose.diagnose(model, laps, positions).line() if res.status != "pass" else ""
+        rows.append((rid, meta, res, failing, why))
+        typer.echo(f"{rid:24s} {res.status:10s} mean gap error {res.mean_gap_error:.2f}s")
+    for split in sorted({m.get("split", "?") for _, m, *_ in rows}, reverse=True):
+        part = [r for r in rows if r[1].get("split") == split]
+        n = {s: sum(r[2].status == s for r in part) for s in ("pass", "borderline", "fail")}
+        mean = sum(r[2].mean_gap_error for r in part) / len(part)
+        typer.echo(
+            f"== {split}: {n['pass']} pass, {n['borderline']} borderline, {n['fail']} fail;"
+            f" mean gap error {mean:.2f}s over {len(part)} races"
+        )
+    if report:
+        Path(report).write_text(_report_markdown(rows))
+        typer.echo(f"wrote {report}")
+
+
+def _report_markdown(rows: list) -> str:
+    lines = [
+        "# Gate G1 report",
+        "",
+        "Generated by `pipeline validate --all --robust --report docs/g1-report.md`. Status is",
+        "robust: 1,000 runs on each of two seed sets (pass = both pass, borderline = one).",
+        "Mean gap error averages the gap checks. Held-out races were never used to choose a",
+        "model change. Diagnosis = the dominant source of the race's gap error",
+        "(`pipeline/src/pipeline/diagnose.py`).",
+        "",
+    ]
+    for split in ("holdout", "tune"):
+        part = [r for r in rows if r[1].get("split") == split]
+        if not part:
+            continue
+        n = {s: sum(r[2].status == s for r in part) for s in ("pass", "borderline", "fail")}
+        mean = sum(r[2].mean_gap_error for r in part) / len(part)
+        title = "Held-out races" if split == "holdout" else "Tuning races"
+        lines += [
+            f"## {title}: {n['pass']} pass, {n['borderline']} borderline, {n['fail']} fail"
+            f" (mean gap error {mean:.2f}s)",
+            "",
+            "| Race | Duel | Status | Mean gap error | Failing checks | Diagnosis |",
+            "|---|---|---|---|---|---|",
+        ]
+        for rid, meta, res, failing, why in part:
+            duel = f"{meta['user_side']} vs {meta['rival']}"
+            checks = "; ".join(failing) if failing else ""
+            lines.append(
+                f"| {rid} | {duel} | {res.status} | {res.mean_gap_error:.2f}s | {checks} | {why} |"
+            )
+        lines.append("")
+    return "\n".join(lines)
 
 
 if __name__ == "__main__":

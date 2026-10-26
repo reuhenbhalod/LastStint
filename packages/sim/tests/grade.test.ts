@@ -93,8 +93,9 @@ describe('gradeMoment', () => {
 });
 
 describe('sensible-strategist continuation', () => {
-  it('plans the stop the model says pays (Spain lap 23: softs until 33, then softs)', () => {
-    expect(planRemainingStop(pausedAt(spain, 23))).toEqual({ lap: 33, to: 'SOFT' });
+  it('plans the best legal stop (Spain lap 23: VER has only run softs, so not softs again)', () => {
+    // Without the two-compound rule the planner preferred lap 33 for softs, which is illegal.
+    expect(planRemainingStop(pausedAt(spain, 23))).toEqual({ lap: 35, to: 'MEDIUM' });
   });
 
   it('plans no stop when one would not pay before the flag', () => {
@@ -104,8 +105,83 @@ describe('sensible-strategist continuation', () => {
   it("a playout gives 'stay out' a later stop instead of none", () => {
     const run = pausedAt(spain, 23);
     const fork = playOption(run, 1, { id: 'stay-out', decisions: [] });
-    expect(fork.state.cars.VER?.strategy).toEqual([{ lap: 33, to: 'SOFT' }]);
+    expect(fork.state.cars.VER?.strategy).toEqual([{ lap: 35, to: 'MEDIUM', added: true }]);
     while (!isFinished(fork)) stepLap(fork);
-    expect(fork.state.cars.VER?.tyreAge).toBe(spain.race.laps - 33 + 1);
+    expect(fork.state.cars.VER?.tyreAge).toBe(spain.race.laps - 35 + 1);
+  });
+});
+
+describe('grading without hindsight (spec decision, Oct 26 2026)', () => {
+  it("playouts don't know future real events, but keep the one underway", async () => {
+    const { forkRun, initRun: init, stepLap: step } = await import('../src/sim.js');
+    // Abu Dhabi 2021 paused after lap 43: the lap-53 SC is in the future.
+    const early = init(abu, abu.race.seed, { decisions: [] });
+    while (early.state.lap < 43) step(early);
+    let withSc = 0;
+    for (let s = 1; s <= 200; s++) {
+      if (forkRun(early, s, [], { blindAfter: 44 }).neutral.get(53) === 'sc') withSc++;
+    }
+    expect(withSc / 200).toBeLessThan(0.1); // only by chance, at about the base rate
+    // Paused after lap 52, deciding on lap 53: the SC that prompts the call is known.
+    const late = init(abu, abu.race.seed, { decisions: [] });
+    while (late.state.lap < 52) step(late);
+    const fork = forkRun(late, 1, [], { blindAfter: 53 });
+    expect([53, 54, 55, 56, 57].map((l) => fork.neutral.get(l))).toEqual([
+      'sc',
+      'sc',
+      'sc',
+      'sc',
+      'sc',
+    ]);
+  });
+
+  it('forks with the same seed see the same random future (common random numbers)', async () => {
+    const { forkRun, initRun: init } = await import('../src/sim.js');
+    const run = init(abu, 1, { decisions: [] });
+    const a = forkRun(run, 7, [], { blindAfter: 35 });
+    const b = forkRun(run, 7, [{ lap: 35, kind: 'pit', compound: 'SOFT' }], { blindAfter: 35 });
+    expect([...a.neutral]).toEqual([...b.neutral]);
+  });
+});
+
+describe('planner fast path', () => {
+  it('chooses exactly what the full O(laps^2) search chooses', async () => {
+    const { initRun: init, stepLap: step, planRemainingStop: plan } = await import('../src/sim.js');
+    let compared = 0;
+    for (const model of [abu, spain]) {
+      for (let pause = model.race.takeoverLap; pause < model.race.laps - 1; pause += 3) {
+        const run = init(model, 5, { decisions: [] });
+        while (run.state.lap < pause) step(run);
+        expect(plan(run)).toEqual(plan(run, { exact: true }));
+        compared++;
+      }
+    }
+    expect(compared).toBeGreaterThan(15);
+  });
+});
+
+describe('Web Worker grading (spec D7)', () => {
+  it('a JSON job split into ranges grades exactly like gradeMoment', async () => {
+    const g = await import('../src/grade.js');
+    const run = pausedAt(abu, 52);
+    const options = [
+      { id: 'stay-out', decisions: [] },
+      { id: 'box-soft', decisions: [{ lap: 53, kind: 'pit' as const, compound: 'SOFT' }] },
+    ];
+    const direct = g.gradeMoment(run, options, { kind: 'win' }, 60);
+    const job = JSON.parse(JSON.stringify(g.gradeJob(run, options, { kind: 'win' }, 60)));
+    const parts = [
+      g.runGradeJob(job, 0, 25),
+      g.runGradeJob(job, 25, 40),
+      g.runGradeJob(job, 40, 60),
+    ];
+    expect(g.mergeGradeJobs(job, JSON.parse(JSON.stringify(parts)))).toEqual(direct);
+  });
+
+  it('rejects ranges that do not tile the samples', async () => {
+    const g = await import('../src/grade.js');
+    const run = pausedAt(abu, 52);
+    const job = g.gradeJob(run, [{ id: 'a', decisions: [] }], { kind: 'win' }, 10);
+    expect(() => g.mergeGradeJobs(job, [g.runGradeJob(job, 0, 5)])).toThrow();
   });
 });

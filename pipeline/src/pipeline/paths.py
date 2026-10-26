@@ -14,7 +14,9 @@ DATA_DIR = REPO_ROOT / "data"
 RAW_DIR = DATA_DIR / "raw"
 RACES_DIR = DATA_DIR / "races"
 GOLDEN_DIR = DATA_DIR / "golden"
+MOMENTS_DIR = DATA_DIR / "moments"  # approved decision moments per race
 
+PIPELINE_ENV = REPO_ROOT / "pipeline" / ".env"  # git-ignored F1 account credentials
 CONFIG_DIR = REPO_ROOT / "pipeline" / "config"
 COMPOUND_PRIORS_PATH = CONFIG_DIR / "compound_priors.json"
 

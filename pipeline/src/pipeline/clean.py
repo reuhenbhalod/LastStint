@@ -33,6 +33,40 @@ def is_lap_one(laps: pd.DataFrame) -> pd.Series:
     return laps["LapNumber"] == 1
 
 
+def _new_set(laps: pd.DataFrame) -> pd.DataFrame:
+    """Per out-lap row: whether tyres changed and the compound fitted.
+
+    Tyres changed if the set differs on the out-lap itself, or on the lap after it: some
+    timing (e.g. Bahrain 2018, Hungary 2019 HAM lap 49) still labels the out-lap with the old
+    set and shows the new one from the next lap. A pit-lane pass without a stop (Brazil 2021,
+    laps 7-9, the whole field routed through the pit lane under the SC) keeps the same set,
+    tyre age counting up, on both laps.
+    """
+    ordered = laps.sort_values(["Driver", "LapNumber"])
+    g = ordered.groupby("Driver")[["Compound", "TyreLife"]]
+    prev, nxt = g.shift(1), g.shift(-1)
+    same_now = (ordered["Compound"] == prev["Compound"]) & (
+        ordered["TyreLife"] == prev["TyreLife"] + 1
+    )
+    same_next = (nxt["Compound"] == ordered["Compound"]) & (
+        nxt["TyreLife"] == ordered["TyreLife"] + 1
+    )
+    changed = ordered["PitOutTime"].notna() & ~(same_now & same_next)
+    fitted = ordered["Compound"].where(~same_now, nxt["Compound"])
+    return pd.DataFrame({"changed": changed, "compound": fitted}).reindex(laps.index)
+
+
+def tyre_change_out_laps(laps: pd.DataFrame) -> pd.Series:
+    """True for out-laps where tyres were actually changed (see _new_set)."""
+    return _new_set(laps)["changed"]
+
+
+def fitted_compound(laps: pd.DataFrame) -> pd.Series:
+    """The compound fitted at each out-lap (the out-lap's, or the next lap's if the timing
+    still shows the old set on the out-lap)."""
+    return _new_set(laps)["compound"]
+
+
 def gap_to_car_ahead(laps: pd.DataFrame) -> pd.Series:
     """Seconds to the car ahead on the same lap. NaN for the leader or missing timing.
 

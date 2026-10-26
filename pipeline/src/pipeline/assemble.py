@@ -7,12 +7,16 @@ browser simulator needs, and nothing it doesn't.
 
 from __future__ import annotations
 
+import json
+
 import pandas as pd
 
 from . import SCHEMA_VERSION
 from . import events as events_mod
 from . import scenario as scenario_mod
+from . import track as track_mod
 from .fit import LapTimeFit
+from .paths import MOMENTS_DIR
 from .track import TrackParams
 
 
@@ -21,6 +25,18 @@ def finishing_order(laps: pd.DataFrame) -> list[str]:
     last_rows = laps.loc[laps.groupby("Driver")["LapNumber"].idxmax()]
     ordered = last_rows.sort_values(["LapNumber", "Time"], ascending=[False, True])
     return [str(d) for d in ordered["Driver"]]
+
+
+def approved_moments(race_id: str) -> list[dict]:
+    """Approved decision moments for a race (data/moments/<race>.json), else none."""
+    path = MOMENTS_DIR / f"{race_id}.json"
+    return json.loads(path.read_text()) if path.exists() else []
+
+
+def longest_stints(laps: pd.DataFrame) -> dict[str, int]:
+    """Longest tyre age observed per compound in the race (the edge of the evidence)."""
+    known = laps.dropna(subset=["Compound", "TyreLife"])
+    return {str(c): int(v) for c, v in known.groupby("Compound")["TyreLife"].max().items()}
 
 
 def _team_map(laps: pd.DataFrame) -> dict[str, str]:
@@ -45,6 +61,7 @@ def assemble_race_model(
     """Build the race-model dict (validate + write it with export.write_race)."""
     total_laps = int(laps["LapNumber"].max())
     cliffs = fit.compound_cliff
+    longest = longest_stints(laps)
 
     compounds = {}
     for compound, offset in fit.compound_offset.items():
@@ -52,8 +69,10 @@ def assemble_race_model(
         compounds[compound] = {
             "offset": round(offset, 4),
             "degPerLap": round(fit.compound_wear[compound], 5),
-            # No fitted cliff -> put it past the race so it never triggers within a stint.
-            "cliffLap": int(hinge[0]) if hinge else total_laps,
+            # No fitted cliff -> the edge of the evidence: the longest stint seen on this
+            # compound. Past it the sim's fallback wear applies (spec D5), instead of assuming
+            # the tyre never falls off.
+            "cliffLap": int(hinge[0]) if hinge else longest.get(compound, total_laps),
             **({"cliffDegPerLap": round(hinge[1], 4)} if hinge else {}),
         }
 
@@ -65,6 +84,8 @@ def assemble_race_model(
     takeover_state = scenario_mod.state_at_takeover(laps, takeover_lap)
     strategy = scenario_mod.real_strategy(laps)
     teams = _team_map(laps)
+    # Real stops keep their measured time (spec B1): a slow or quick stop is a real event.
+    measured = track_mod.measured_stop_losses(laps)
 
     drivers = []
     for code in sorted(set(takeover_state) & set(fit.driver_pace)):
@@ -82,8 +103,20 @@ def assemble_race_model(
                     "gapAhead": s["gapAhead"] if s["gapAhead"] is not None else 0.0,
                     "compound": s["compound"],
                     "tyreAge": s["tyreAge"] if s["tyreAge"] is not None else 0,
+                    "compoundsUsed": s["compoundsUsed"],
                 },
-                "realStrategy": [st for st in strategy.get(code, []) if st["lap"] >= takeover_lap],
+                "realStrategy": [
+                    {
+                        **st,
+                        **(
+                            {"loss": round(measured[(code, st["lap"])], 3)}
+                            if (code, st["lap"]) in measured
+                            else {}
+                        ),
+                    }
+                    for st in strategy.get(code, [])
+                    if st["lap"] >= takeover_lap
+                ],
             }
         )
 
@@ -105,6 +138,7 @@ def assemble_race_model(
             "pitLoss": round(track_params.pit_loss, 3),
             "pitLossUnderSC": round(track_params.pit_loss_under_sc, 3),
             "pitLossUnderVSC": round(track_params.pit_loss_under_vsc, 3),
+            "pitLossDeviations": track_params.pit_loss_deviations,
             "overtakeDifficulty": round(track_params.overtake_difficulty, 4),
             "overtakeModel": {k: round(v, 4) for k, v in track_params.overtake_model.items()},
             "dirtyAirPenalty": round(track_params.dirty_air_penalty, 4),
@@ -128,8 +162,10 @@ def assemble_race_model(
         "compounds": compounds,
         "drivers": drivers,
         "fuelEffectPerLap": round(fit.fuel_per_lap, 5),
+        "freshTyre": {"bonus": round(fit.fresh_tyre_bonus, 4), "laps": fit.fresh_tyre_laps},
         "events": future_events,
-        "decisionMoments": moments,
+        "decisionMoments": approved_moments(race_id),
+        "candidateMomentLaps": moments,
         "realResult": finishing_order(laps),
         "userSide": user_side,
         "rival": rival,

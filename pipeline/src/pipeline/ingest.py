@@ -9,12 +9,14 @@ Heavy imports (fastf1) are done inside functions so `import pipeline` stays ligh
 
 from __future__ import annotations
 
+import os
 import re
+import time
 from pathlib import Path
 
 import pandas as pd
 
-from .paths import CACHE_DIR, RAW_DIR
+from .paths import CACHE_DIR, PIPELINE_ENV, RAW_DIR
 
 # Columns we keep per lap (Implementation Plan 1.1).
 LAP_COLUMNS = [
@@ -37,9 +39,23 @@ LAP_COLUMNS = [
 _TIMEDELTA_COLUMNS = ("LapTime", "Time", "PitInTime", "PitOutTime")
 
 
+def load_credentials(env_path: Path = PIPELINE_ENV) -> bool:
+    """Load F1_USERNAME / F1_PASSWORD from the git-ignored pipeline/.env into the environment
+    (FastF1 reads them there to log in for years outside the open archive). Existing env vars
+    win. Returns whether a username is now set; never logs the values.
+    """
+    from dotenv import load_dotenv
+
+    if env_path.exists():
+        load_dotenv(env_path, override=False)
+    return bool(os.environ.get("F1_USERNAME"))
+
+
 def enable_cache(cache_dir: Path = CACHE_DIR) -> None:
-    """Enable the FastF1 on-disk cache."""
+    """Enable the FastF1 on-disk cache (and load F1 account credentials if present)."""
     import fastf1
+
+    load_credentials()
 
     cache_dir.mkdir(parents=True, exist_ok=True)
     fastf1.Cache.enable_cache(str(cache_dir))
@@ -79,6 +95,36 @@ def project_laps(laps: pd.DataFrame) -> pd.DataFrame:
     return df.reset_index(drop=True)
 
 
+# 2018 compound names, softest first. From 2019 Pirelli labels each race's three dry
+# compounds SOFT/MEDIUM/HARD relative to each other; relabel_2018_compounds does the same.
+COMPOUNDS_2018 = ["HYPERSOFT", "ULTRASOFT", "SUPERSOFT", "SOFT", "MEDIUM", "HARD", "SUPERHARD"]
+WET_COMPOUNDS = {"INTERMEDIATE", "WET"}
+
+
+def relabel_2018_compounds(df: pd.DataFrame) -> pd.DataFrame:
+    """Map a 2018 race's dry compounds onto relative SOFT/MEDIUM/HARD by softness rank."""
+    used = [c for c in COMPOUNDS_2018 if c in set(df["Compound"].dropna().astype(str))]
+    if not used:
+        return df
+    if len(used) > 3:
+        raise IncompleteDataError(f"more than three dry compounds used: {used}")
+    # With only two of the three nominated compounds used, the unused one is unknown; the
+    # common case is that the hardest went unused, so the pair maps to SOFT/MEDIUM.
+    mapping = dict(zip(used, ["SOFT", "MEDIUM", "HARD"][: len(used)], strict=True))
+    return df.assign(Compound=df["Compound"].map(lambda c: mapping.get(c, c)))
+
+
+def race_suitability(df: pd.DataFrame) -> list[str]:
+    """Reasons a race can't be modelled yet (spec D8): wet tyres or a red flag."""
+    reasons = []
+    wet = sorted(set(df["Compound"].dropna().astype(str)) & WET_COMPOUNDS)
+    if wet:
+        reasons.append(f"wet ({', '.join(wet)})")
+    if df["TrackStatus"].astype(str).str.contains("5").any():
+        reasons.append("red flag")
+    return reasons
+
+
 def race_facts(session) -> dict:
     """Race-level facts captured at ingest: total laps, event name, location, date."""
     laps = session.laps
@@ -100,16 +146,51 @@ def race_facts(session) -> dict:
     }
 
 
+class IncompleteDataError(RuntimeError):
+    """FastF1 returned laps but not the timing a race model needs (it can 'succeed' while
+    missing track status or positions, e.g. when rate-limited or unauthenticated)."""
+
+
+def check_complete(df: pd.DataFrame) -> None:
+    """Raise IncompleteDataError unless every column the pipeline depends on is populated."""
+    if df.empty:
+        raise IncompleteDataError("no laps")
+    for col in ("TrackStatus", "Position", "LapTime", "Time", "Compound"):
+        share = float(df[col].notna().mean())
+        if share < 0.8:
+            raise IncompleteDataError(f"{col} only {share:.0%} populated")
+
+
+RATE_LIMIT_WAITS = (60, 300, 900)  # seconds to back off before each retry
+
+
 def ingest_race(
     race_id: str,
     year: int,
     event: str,
     cache_dir: Path = CACHE_DIR,
     raw_dir: Path = RAW_DIR,
+    sleep=time.sleep,
 ) -> tuple[pd.DataFrame, dict]:
-    """Load a race, project laps, save the raw parquet snapshot. Returns (laps, facts)."""
-    session = load_race(year, event, cache_dir)
+    """Load a race, project laps, save the raw parquet snapshot. Returns (laps, facts).
+
+    Retries with backoff when FastF1 rate-limits (RATE_LIMIT_WAITS); the on-disk cache means
+    a retry only fetches what is still missing. Refuses to write an incomplete snapshot.
+    """
+    from fastf1.req import RateLimitExceededError
+
+    for attempt in range(len(RATE_LIMIT_WAITS) + 1):
+        try:
+            session = load_race(year, event, cache_dir)
+            break
+        except RateLimitExceededError:
+            if attempt == len(RATE_LIMIT_WAITS):
+                raise
+            sleep(RATE_LIMIT_WAITS[attempt])
     df = project_laps(session.laps)
+    if year == 2018:
+        df = relabel_2018_compounds(df)
+    check_complete(df)
     facts = race_facts(session)
 
     path = raw_snapshot_path(race_id, raw_dir)

@@ -22,7 +22,11 @@ PASS_WINDOW = 2.0  # a follower within this gap (s) gets one pass roll (matches 
 FOLLOW_GAP = 0.3  # a follower that fails to pass is held this far (s) behind
 PASS_MARGIN = 0.05  # a completed pass puts the follower this far (s) ahead
 BUNCH_GAP = 0.5  # SC train spacing per car (measured on the final SC lap, 2021 races)
-SC_CLOSE_PER_LAP = 20.0  # s a gap closes per full SC lap (measured >= 15.4s)
+# SC bunching (measured on the tuning races' SCs, 259 gaps): gaps are kept on the deployment
+# lap (everyone runs the same delta), each middle SC lap keeps SC_GAP_KEEP of a gap's excess
+# over BUNCH_GAP, and the last lap before the restart is nose-to-tail (race control restarts a
+# bunched field).
+SC_GAP_KEEP = 0.34
 SC_FALLBACK = 1.6  # SC lap = this x green if not supplied
 VSC_FALLBACK = 1.35  # VSC lap = this x green if not supplied
 GOLDEN_SEEDS = list(range(1, 21))  # fixed seeds for the TS parity golden files
@@ -48,9 +52,17 @@ class Car:
     laps_done: int = 0
 
 
-def _clean_lap(car: Car, compounds: dict, fuel_per_lap: float, lap: int) -> float:
+def fresh_weight_sim(tyre_age: int, laps: int) -> float:
+    """Fresh-tyre weight by sim tyre age (0 = the out-lap): 1 on the first lap after the out-lap,
+    fading linearly over `laps` laps (FastF1 TyreLife = sim age + 1 on a new set)."""
+    return min(1.0, max(0.0, (laps + 1 - tyre_age) / laps)) if tyre_age >= 1 else 0.0
+
+
+def _clean_lap(car: Car, compounds: dict, fuel_per_lap: float, lap: int, fresh=None) -> float:
     c = compounds[car.compound]
     t = car.base_pace + c["offset"] + c["degPerLap"] * car.tyre_age - fuel_per_lap * lap
+    if fresh:
+        t += fresh["bonus"] * fresh_weight_sim(car.tyre_age, fresh["laps"])
     if car.tyre_age > c["cliffLap"]:  # past the cliff: wear accelerates
         extra = c.get("cliffDegPerLap", CLIFF_FALLBACK * c["degPerLap"])
         t += extra * (car.tyre_age - c["cliffLap"])
@@ -114,6 +126,7 @@ def simulate(model: dict, seed: int, strategies: dict | None = None) -> dict:
     track = model["track"]
     compounds = model["compounds"]
     fuel = model["fuelEffectPerLap"]
+    fresh_tyre = model.get("freshTyre")
     total_laps = int(model["race"]["laps"])
     takeover = int(model["race"]["takeoverLap"])
     overtake = track["overtakeModel"]
@@ -175,7 +188,8 @@ def simulate(model: dict, seed: int, strategies: dict | None = None) -> dict:
                 car.strategy.remove(pit)
                 car.compound = pit["to"]
                 car.tyre_age = 0
-                pit_cost = {"SC": pit_loss_sc, "VSC": pit_loss_vsc}.get(flag, pit_loss)
+                default = {"SC": pit_loss_sc, "VSC": pit_loss_vsc}.get(flag, pit_loss)
+                pit_cost = pit.get("loss", default)
 
             if flag == "SC" and sc_time:
                 lt = sc_time
@@ -184,12 +198,14 @@ def simulate(model: dict, seed: int, strategies: dict | None = None) -> dict:
             elif flag == "RED" and green:
                 lt = green
             else:
-                lt = _clean_lap(car, compounds, fuel, lap) + noise_rngs[code].normal(car.noise)
+                lt = _clean_lap(car, compounds, fuel, lap, fresh_tyre) + noise_rngs[code].normal(
+                    car.noise
+                )
                 ahead = _car_ahead(order, code, cars)
                 ahead_gap = car.total_time - prev_time.get(ahead, car.total_time)
                 if 0 < ahead_gap < DIRTY_AIR_RANGE:
                     lt += dirty_air
-            clean[code] = _clean_lap(car, compounds, fuel, lap)
+            clean[code] = _clean_lap(car, compounds, fuel, lap, fresh_tyre)
             car.total_time += lt + pit_cost
             car.tyre_age += 1
             car.laps_done = lap
@@ -202,16 +218,18 @@ def simulate(model: dict, seed: int, strategies: dict | None = None) -> dict:
         if flag:
             # No overtaking under neutralization: every car ran the same neutralized lap, so
             # sorting by total time moves only cars that pitted, by their pit loss against
-            # the gaps on track. Under a SC each gap then closes by SC_CLOSE_PER_LAP down to
-            # nose-to-tail, so an early SC stop (gaps still open) is cheap while a stop into
-            # an already bunched train drops places.
+            # the gaps on track. Under a SC the gaps then close (SC_GAP_KEEP), so an early SC
+            # stop (gaps still open) is cheap while a stop into a bunched train drops places.
             live = sorted(active_codes(), key=lambda c: cars[c].total_time)
             order[:] = live + [c for c in order if cars[c].retired]
-            if flag == "SC":
+            if flag == "SC" and neutral.get(lap - 1) == "SC":
+                # Deployment lap: gaps kept (delta time). Middle laps: each gap keeps
+                # SC_GAP_KEEP of its excess. Last lap before the restart: nose-to-tail.
+                keep = 0.0 if neutral.get(lap + 1) != "SC" else SC_GAP_KEEP
                 for i in range(1, len(live)):
                     ahead, car = cars[live[i - 1]], cars[live[i]]
-                    gap = car.total_time - ahead.total_time
-                    car.total_time = ahead.total_time + max(BUNCH_GAP, gap - SC_CLOSE_PER_LAP)
+                    excess = max(0.0, car.total_time - ahead.total_time - BUNCH_GAP)
+                    car.total_time = ahead.total_time + BUNCH_GAP + keep * excess
         else:
             _resolve_order(order, cars, clean, pass_rngs, overtake, prev_time, pitted)
 

@@ -1,8 +1,8 @@
 {
   "name": "@boxthislap/sim",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
-  "description": "Deterministic F1 race simulator — pure TS, runs in the browser and the Worker",
+  "description": "Deterministic F1 race simulator \u2014 pure TS, runs in the browser and the Worker",
   "type": "module",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
@@ -11,9 +11,13 @@
   },
   "scripts": {
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.scripts.json",
+    "moments": "tsx scripts/moments.ts",
+    "bench": "tsx scripts/bench.ts"
   },
   "devDependencies": {
+    "@types/node": "22.10.2",
+    "tsx": "4.19.2",
     "typescript": "^5.6.3",
     "vitest": "^2.1.8"
   }

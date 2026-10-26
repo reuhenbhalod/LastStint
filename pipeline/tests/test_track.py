@@ -38,7 +38,16 @@ def test_vsc_pit_loss_measured_between_sc_and_green(abu):
     _, n_vsc = track.pit_loss_under_vsc(laps)
     assert n_vsc >= track.MIN_VSC_STOPS
     assert params.pit_loss_under_sc < params.pit_loss_under_vsc < params.pit_loss
-    assert 15 < params.pit_loss_under_vsc < 21
+    # Measured by gap change to non-stopping cars: VER's VSC stop matches the real gap trace
+    # (+2.1, +12.4, -3.8s over laps 36-38), far below a green stop.
+    assert 13 < params.pit_loss_under_vsc < 17
+
+
+def test_vsc_stop_measured_by_gap_change(abu):
+    laps, *_ = abu
+    vsc = {d: loss for d, f, loss in track.stop_losses(laps) if f == "VSC"}
+    assert set(vsc) == {"ALO", "GAS", "LEC", "PER", "VER"}
+    assert 13 < vsc["VER"] < 16
 
 
 def test_stop_losses_flag_each_stop(abu):

@@ -168,3 +168,34 @@ def validate_race(
         duel=duel,
         checks=checks,
     )
+
+
+# Robust pass status (Phase 1-2 perfection spec, guard amendment of Oct 26, 2026): a race's
+# G1 status for the guard comes from ROBUST_RUNS runs on each of two seed sets, so a coin
+# flip at a limit isn't counted as a real change.
+ROBUST_RUNS = 1000
+ROBUST_SEEDS = (10000, 20000)
+
+
+@dataclass
+class RobustStatus:
+    status: str  # "pass" (both seed sets), "borderline" (one), "fail" (neither)
+    mean_gap_error: float  # mean over the gap checks, averaged across both seed sets
+    reports: list[ValidationReport]
+
+
+def robust_status(
+    model: dict,
+    real_gaps: dict[str, float],
+    rival: str | None = None,
+    score_positions: int = DEFAULT_SCORE_POSITIONS,
+    runs: int = ROBUST_RUNS,
+) -> RobustStatus:
+    """G1 on two independent seed sets; status by how many of them pass."""
+    reports = [
+        validate_race(model, real_gaps, runs, seed, rival, score_positions) for seed in ROBUST_SEEDS
+    ]
+    passes = sum(r.passed for r in reports)
+    status = {2: "pass", 1: "borderline", 0: "fail"}[passes]
+    errs = [c.value for r in reports for c in r.checks if "gap error" in c.name]
+    return RobustStatus(status, sum(errs) / len(errs) if errs else 0.0, reports)

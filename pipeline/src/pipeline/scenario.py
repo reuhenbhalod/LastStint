@@ -9,24 +9,31 @@ from __future__ import annotations
 
 import pandas as pd
 
-from .clean import gap_to_car_ahead
+from .clean import fitted_compound, gap_to_car_ahead, tyre_change_out_laps
+
+DRY_COMPOUNDS = ("SOFT", "MEDIUM", "HARD")
 
 
 def real_strategy(laps: pd.DataFrame) -> dict[str, list[dict]]:
     """Per driver, the pit stops as {lap, to} — the out-lap and the compound fitted."""
     out: dict[str, list[dict]] = {}
+    changed = tyre_change_out_laps(laps)
+    fitted = fitted_compound(laps)
     for driver, grp in laps.groupby("Driver"):
-        stops = grp[grp["PitOutTime"].notna()].sort_values("LapNumber")
+        stops = grp[changed.loc[grp.index].fillna(False).astype(bool)].sort_values("LapNumber")
         out[str(driver)] = [
-            {"lap": int(r.LapNumber), "to": str(r.Compound)} for r in stops.itertuples()
+            {"lap": int(r.LapNumber), "to": str(fitted.loc[r.Index])} for r in stops.itertuples()
         ]
     return out
 
 
 def state_at_takeover(laps: pd.DataFrame, takeover_lap: int) -> dict[str, dict]:
-    """Per-car position, gap ahead (s), compound and tyre age at the takeover lap."""
+    """Per-car position, gap ahead (s), compound, tyre age and the dry compounds used so far
+    (for the two-compound rule) at the takeover lap."""
     gaps = gap_to_car_ahead(laps)
     rows = laps[laps["LapNumber"] == takeover_lap]
+    so_far = laps[(laps["LapNumber"] <= takeover_lap) & laps["Compound"].isin(DRY_COMPOUNDS)]
+    used = so_far.groupby("Driver")["Compound"].agg(lambda c: sorted(set(map(str, c))))
     state: dict[str, dict] = {}
     for r in rows.itertuples():
         gap = gaps.get(r.Index)
@@ -35,6 +42,7 @@ def state_at_takeover(laps: pd.DataFrame, takeover_lap: int) -> dict[str, dict]:
             "gapAhead": None if gap is None or pd.isna(gap) else round(float(gap), 3),
             "compound": None if pd.isna(r.Compound) else str(r.Compound),
             "tyreAge": None if pd.isna(r.TyreLife) else int(r.TyreLife),
+            "compoundsUsed": list(used.get(r.Driver, [])),
         }
     return state
 
@@ -53,3 +61,23 @@ def candidate_decision_moments(laps: pd.DataFrame, events: list[dict]) -> list[i
         for stop in stops:
             moments.add(int(stop["lap"]))
     return sorted(moments)
+
+
+TAKEOVER_LEAD = 3  # laps of play before the first strategic event
+TAKEOVER_EARLIEST_EVENT = 10  # ignore events before this lap (opening-lap chaos, lap-1 stops)
+
+
+def default_takeover_lap(laps: pd.DataFrame, events: list[dict], drivers: list[str]) -> int:
+    """Phase 1 close-out D3: TAKEOVER_LEAD laps before the first strategic event after lap
+    TAKEOVER_EARLIEST_EVENT that involves `drivers` (the user and the rival): one of their
+    stops (its in-lap) or the start of a SC/VSC. Falls back to mid-race if there is none.
+    """
+    candidates: list[int] = []
+    strategy = real_strategy(laps)
+    for d in drivers:
+        candidates += [s["lap"] - 1 for s in strategy.get(d, [])]
+    candidates += [e["lap"] for e in events if e["type"] in ("SC", "VSC")]
+    after = [lap for lap in candidates if lap > TAKEOVER_EARLIEST_EVENT]
+    total = int(laps["LapNumber"].max())
+    first = min(after) if after else total // 2
+    return max(2, first - TAKEOVER_LEAD)

@@ -13,6 +13,7 @@
     "compounds",
     "drivers",
     "fuelEffectPerLap",
+    "freshTyre",
     "events",
     "decisionMoments",
     "realResult",
@@ -56,6 +57,11 @@
         "pitLoss": { "type": "number" },
         "pitLossUnderSC": { "type": "number" },
         "pitLossUnderVSC": { "type": "number" },
+        "pitLossDeviations": {
+          "type": "array",
+          "items": { "type": "number" },
+          "description": "Measured green-stop losses minus pitLoss, for sampling new stops (slow-stop tail included)."
+        },
         "overtakeDifficulty": { "type": "number", "minimum": 0, "maximum": 1 },
         "overtakeModel": {
           "type": "object",
@@ -108,12 +114,18 @@
           "stateAtTakeover": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["position", "gapAhead", "compound", "tyreAge"],
+            "required": ["position", "gapAhead", "compound", "tyreAge", "compoundsUsed"],
             "properties": {
               "position": { "type": "integer", "minimum": 1 },
               "gapAhead": { "type": "number", "minimum": 0 },
               "compound": { "type": "string" },
-              "tyreAge": { "type": "integer", "minimum": 0 }
+              "tyreAge": { "type": "integer", "minimum": 0 },
+              "compoundsUsed": {
+                "type": "array",
+                "items": { "type": "string" },
+                "uniqueItems": true,
+                "description": "Dry compounds run up to and including the takeover lap (two-compound rule)."
+              }
             }
           },
           "realStrategy": {
@@ -124,11 +136,25 @@
               "required": ["lap", "to"],
               "properties": {
                 "lap": { "type": "integer", "minimum": 1 },
-                "to": { "type": "string" }
+                "to": { "type": "string" },
+                "loss": {
+                  "type": "number",
+                  "description": "Measured time lost to this real stop (green/VSC stops; frozen like other real events). Absent: the track's figure for the flag."
+                }
               }
             }
           }
         }
+      }
+    },
+    "freshTyre": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bonus", "laps"],
+      "description": "Lap-time bonus (s, negative = faster) on a new set's first laps after the out-lap: full weight on the first, fading linearly over `laps` laps.",
+      "properties": {
+        "bonus": { "type": "number" },
+        "laps": { "type": "integer", "minimum": 1 }
       }
     },
     "fuelEffectPerLap": { "type": "number", "minimum": 0 },
@@ -148,6 +174,38 @@
     },
     "decisionMoments": {
       "type": "array",
+      "description": "Approved decision moments (data/moments/<race>.json; proposed by the sim's moment finder, picked by a human). The calls in each option are validated by the simulator.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "lap", "trigger", "target", "options", "realOptionId"],
+        "properties": {
+          "id": { "type": "string" },
+          "lap": { "type": "integer", "minimum": 1 },
+          "trigger": { "enum": ["SC", "VSC", "rivalPit", "undercut", "cliff"] },
+          "target": { "type": "object", "required": ["kind"] },
+          "options": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 4,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["id", "label", "decisions"],
+              "properties": {
+                "id": { "type": "string" },
+                "label": { "type": "string" },
+                "decisions": { "type": "array", "items": { "type": "object" } }
+              }
+            }
+          },
+          "realOptionId": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "candidateMomentLaps": {
+      "type": "array",
+      "description": "Laps with a strategic event after takeover (SC/VSC starts, stops): input for the moment finder.",
       "items": { "type": "integer", "minimum": 1 }
     },
     "realResult": {

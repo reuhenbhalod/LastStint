@@ -74,12 +74,13 @@ def test_sc_stop_cost_depends_on_timing(model: dict):
     assert late < 0.3
 
 
-def test_one_cars_strategy_does_not_shift_other_cars_draws(model: dict):
-    # Per-car streams: changing HAM's stops must leave a far-away car (MSC, never near HAM
-    # on track in the sim) with exactly the same race.
-    base = sim_reference.simulate(model, seed=11)
+def test_one_cars_strategy_does_not_shift_other_cars_draws():
+    # Per-car streams: changing VER's stops must leave a far-away car (MAZ) with exactly the
+    # same race. Spain 2021 has no SC after takeover (a SC train links every car's gaps).
+    spain, _ = build.build_race_model("spain-2021")
+    base = sim_reference.simulate(spain, seed=11)
     changed = sim_reference.simulate(
-        model, seed=11, strategies={"HAM": [{"lap": 40, "to": "MEDIUM"}]}
+        spain, seed=11, strategies={"VER": [{"lap": 40, "to": "MEDIUM"}]}
     )
-    assert base["times"]["HAM"] != changed["times"]["HAM"]
-    assert base["times"]["MSC"] == changed["times"]["MSC"]
+    assert base["times"]["VER"] != changed["times"]["VER"]
+    assert base["times"]["MAZ"] == changed["times"]["MAZ"]

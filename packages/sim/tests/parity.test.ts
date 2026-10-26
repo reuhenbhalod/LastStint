@@ -10,9 +10,10 @@ import spainModel from '../../../data/races/spain-2021.json';
 import { simulate } from '../src/sim.js';
 import type { RaceModel, RaceResult } from '../src/types.js';
 
+// Python's reference output: the RaceResult fields replays produce (no disqualifications).
 type Golden = Record<
   string,
-  Omit<RaceResult, 'gaps' | 'times'> & Record<'gaps' | 'times', Record<string, number>>
+  Pick<RaceResult, 'order' | 'finishers'> & Record<'gaps' | 'times', Record<string, number>>
 >;
 
 const RACES: Array<[string, RaceModel, Golden]> = [

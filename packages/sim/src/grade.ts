@@ -7,6 +7,10 @@
 // options face identical luck and their difference is far less noisy at the same N. Seeds
 // derive from the run's seed and the moment's lap, so the server reproduces every grade.
 //
+// Playouts don't know the future: events starting after the decision lap are replaced by
+// SC/VSC periods drawn from base rates, and future retirements are dropped (forkRun's
+// blindAfter). The race the player sees still has every real event.
+//
 // After an option's calls, the player's car follows a "sensible strategist" continuation in
 // every playout: the model-planned best of no more stops or one stop (planRemainingStop).
 // The spec doesn't define the continuation; this choice is recorded in the implementation
@@ -17,12 +21,13 @@ import {
   type Run,
   classify,
   forkRun,
+  initRun,
   isFinished,
   planRemainingStop,
   realDecisions,
   stepLap,
 } from './sim.js';
-import type { Decision, RaceResult } from './types.js';
+import type { Decision, RaceModel, RaceResult } from './types.js';
 
 export const GRADE_SAMPLES = 300;
 export const GRADE_STREAM = 3000;
@@ -96,7 +101,9 @@ export function sampleSeed(run: Run, i: number): number {
  * to the sensible-strategist continuation (planRemainingStop) for the rest of the race.
  */
 export function playOption(run: Run, seed: number, option: GradeOption): Run {
-  const fork = forkRun(run, seed, option.decisions);
+  // The decision lap's own events (e.g. the SC that prompted the call) are known; the rest of
+  // the race's future isn't (spec decision Oct 26 2026: grade against the sim, not hindsight).
+  const fork = forkRun(run, seed, option.decisions, { blindAfter: run.state.lap + 1 });
   const settled = Math.max(
     run.state.lap,
     ...option.decisions.map((d) => (d.kind === 'pit' ? d.lap + 1 : d.lap)),
@@ -105,9 +112,55 @@ export function playOption(run: Run, seed: number, option: GradeOption): Run {
   const user = fork.state.cars[fork.model.userSide];
   if (user && !isFinished(fork) && !user.strategy.some((s) => s.lap > fork.state.lap)) {
     const stop = planRemainingStop(fork);
-    if (stop) user.strategy.push(stop);
+    if (stop) user.strategy.push({ ...stop, added: true });
   }
   return fork;
+}
+
+/**
+ * Successes per option over samples [from, to). Sample i always uses sampleSeed(run, i), so
+ * ranges can be counted separately (e.g. one per Web Worker) and summed exactly.
+ */
+export function countHits(
+  run: Run,
+  options: GradeOption[],
+  target: Target,
+  from: number,
+  to: number,
+): number[] {
+  const hits = new Array<number>(options.length).fill(0);
+  for (let i = from; i < to; i++) {
+    const seed = sampleSeed(run, i);
+    for (let k = 0; k < options.length; k++) {
+      const fork = playOption(run, seed, options[k] as GradeOption);
+      while (!isFinished(fork)) stepLap(fork);
+      if (reachedTarget(fork, classify(fork), target)) hits[k] = (hits[k] ?? 0) + 1;
+    }
+  }
+  return hits;
+}
+
+/** Turn per-option success counts into chances, bands and the best option. */
+export function gradeFromHits(
+  lap: number,
+  options: GradeOption[],
+  target: Target,
+  samples: number,
+  hits: number[],
+): MomentGrade {
+  const probs = hits.map((h) => h / samples);
+  const bestP = Math.max(...probs);
+  const bestIdx = probs.indexOf(bestP);
+  return {
+    lap,
+    samples,
+    target,
+    best: (options[bestIdx] as GradeOption).id,
+    options: options.map((o, k) => {
+      const behindBest = (bestP - (probs[k] as number)) * 100;
+      return { id: o.id, probability: probs[k] as number, behindBest, band: bandFor(behindBest) };
+    }),
+  };
 }
 
 /** Grade every option at the run's current lap (a live run paused at a decision moment). */
@@ -118,26 +171,130 @@ export function gradeMoment(
   samples = GRADE_SAMPLES,
 ): MomentGrade {
   if (options.length === 0) throw new Error('no options to grade');
-  const hits = new Array<number>(options.length).fill(0);
-  for (let i = 0; i < samples; i++) {
-    const seed = sampleSeed(run, i);
-    options.forEach((option, k) => {
-      const fork = playOption(run, seed, option);
-      while (!isFinished(fork)) stepLap(fork);
-      if (reachedTarget(fork, classify(fork), target)) hits[k] = (hits[k] ?? 0) + 1;
-    });
-  }
-  const probs = hits.map((h) => h / samples);
-  const bestP = Math.max(...probs);
-  const bestIdx = probs.indexOf(bestP);
-  return {
-    lap: run.state.lap,
-    samples,
+  return gradeFromHits(
+    run.state.lap,
+    options,
     target,
-    best: (options[bestIdx] as GradeOption).id,
-    options: options.map((o, k) => {
-      const behindBest = (bestP - (probs[k] as number)) * 100;
-      return { id: o.id, probability: probs[k] as number, behindBest, band: bandFor(behindBest) };
-    }),
+    samples,
+    countHits(run, options, target, 0, samples),
+  );
+}
+
+/**
+ * A decision moment as plain JSON, for a Web Worker (spec D7): a live Run holds class
+ * instances and Maps that don't survive structured cloning, so the worker rebuilds it from the
+ * model, seed and calls (deterministically) and grades a range of samples.
+ */
+export interface GradeJob {
+  model: RaceModel;
+  /** The run's seed (Run.seed). */
+  seed: number;
+  /** All the player's calls so far (Run.decisions), including any for laps not yet run. */
+  decisions: Decision[];
+  /** The last completed lap: the run is paused here (Run.state.lap). */
+  pausedAtLap: number;
+  options: GradeOption[];
+  target: Target;
+  samples?: number;
+}
+
+export interface GradeJobResult {
+  from: number;
+  to: number;
+  hits: number[];
+}
+
+/** Describe a paused live run's decision moment as a GradeJob. */
+export function gradeJob(
+  run: Run,
+  options: GradeOption[],
+  target: Target,
+  samples = GRADE_SAMPLES,
+): GradeJob {
+  return {
+    model: run.model,
+    seed: run.seed,
+    decisions: [...run.decisions],
+    pausedAtLap: run.state.lap,
+    options,
+    target,
+    samples,
+  };
+}
+
+/** Rebuild the paused run from a job (deterministic replay). */
+export function runFromJob(job: GradeJob): Run {
+  const run = initRun(job.model, job.seed, { decisions: job.decisions });
+  while (run.state.lap < job.pausedAtLap) stepLap(run);
+  return run;
+}
+
+/**
+ * Worker entry point: count successes for samples [from, to) of a job (default: all).
+ * Inputs and outputs are plain JSON.
+ */
+export function runGradeJob(
+  job: GradeJob,
+  from = 0,
+  to = job.samples ?? GRADE_SAMPLES,
+): GradeJobResult {
+  return { from, to, hits: countHits(runFromJob(job), job.options, job.target, from, to) };
+}
+
+/** Merge workers' ranges (which must cover 0..samples exactly once) into the moment's grade. */
+export function mergeGradeJobs(job: GradeJob, results: GradeJobResult[]): MomentGrade {
+  const samples = job.samples ?? GRADE_SAMPLES;
+  const ranges = [...results].sort((a, b) => a.from - b.from);
+  let next = 0;
+  for (const r of ranges) {
+    if (r.from !== next) throw new Error(`sample ranges must tile 0..${samples}`);
+    next = r.to;
+  }
+  if (next !== samples) throw new Error(`sample ranges must tile 0..${samples}`);
+  const hits = job.options.map((_, k) => ranges.reduce((sum, r) => sum + (r.hits[k] ?? 0), 0));
+  return gradeFromHits(job.pausedAtLap, job.options, job.target, samples, hits);
+}
+
+/** Spec D5: points per call by band; a run's score is the mean over its graded calls. */
+export const BAND_POINTS: Record<Band, number> = { green: 100, yellow: 70, orange: 40, red: 0 };
+
+export interface CallScore {
+  lap: number;
+  optionId: string;
+  band: Band;
+  points: number;
+  /** The chosen option's chance of the target (tie-break). */
+  probability: number;
+}
+
+export interface RunScore {
+  /** 0-100: mean band points over the race's calls. */
+  score: number;
+  calls: CallScore[];
+  /** First tie-break: mean chance of the target over the chosen options. */
+  meanProbability: number;
+}
+
+/**
+ * Score a finished run from its graded moments and the option chosen at each. Ties on
+ * `score` break on `meanProbability`, then on the finishing result (the caller's to compare).
+ */
+export function scoreRun(calls: Array<{ grade: MomentGrade; chosen: string }>): RunScore {
+  const scored = calls.map(({ grade, chosen }) => {
+    const option = grade.options.find((o) => o.id === chosen);
+    if (!option) throw new Error(`option ${chosen} not graded at lap ${grade.lap}`);
+    return {
+      lap: grade.lap,
+      optionId: chosen,
+      band: option.band,
+      points: BAND_POINTS[option.band],
+      probability: option.probability,
+    };
+  });
+  const mean = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0);
+  return {
+    score: mean(scored.map((c) => c.points)),
+    calls: scored,
+    meanProbability: mean(scored.map((c) => c.probability)),
   };
 }

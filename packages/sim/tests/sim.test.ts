@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import abuModel from '../../../data/races/abu-dhabi-2021.json';
+import spainJson from '../../../data/races/spain-2021.json';
 import { classify, initRun, isFinished, passProbability, simulate, stepLap } from '../src/sim.js';
 import type { RaceModel } from '../src/types.js';
 
 const model = abuModel as unknown as RaceModel;
+const spain = spainJson as unknown as RaceModel;
 
 describe('simulator mechanics', () => {
   it('is deterministic for a seed', () => {
@@ -35,10 +37,12 @@ describe('simulator mechanics', () => {
   });
 
   it("one car's strategy does not shift another car's draws", () => {
-    const base = simulate(model, 11);
-    const changed = simulate(model, 11, { strategies: { HAM: [{ lap: 40, to: 'MEDIUM' }] } });
-    expect(changed.times.HAM).not.toBe(base.times.HAM);
-    expect(changed.times.MSC).toBe(base.times.MSC);
+    // Spain 2021 has no SC after takeover: under a SC the train links every car's gaps, so
+    // a stop there legitimately moves cars behind it.
+    const base = simulate(spain, 11);
+    const changed = simulate(spain, 11, { strategies: { VER: [{ lap: 40, to: 'MEDIUM' }] } });
+    expect(changed.times.VER).not.toBe(base.times.VER);
+    expect(changed.times.MAZ).toBe(base.times.MAZ);
   });
 
   it('pass probability rises with pace edge and falls with gap', () => {
