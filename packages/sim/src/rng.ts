@@ -6,6 +6,8 @@
 export interface Rng {
   /** Next float in [0, 1). */
   next(): number;
+  /** Normal(0, sd) by Box-Muller; consumes two draws. Mirrors pipeline/src/pipeline/rng.py. */
+  normal(sd?: number): number;
 }
 
 /** mulberry32: a 32-bit seeded generator. */
@@ -18,6 +20,11 @@ export function mulberry32(seed: number): Rng {
       let t = Math.imul(a ^ (a >>> 15), 1 | a);
       t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    },
+    normal(sd = 1): number {
+      const u1 = 1 - this.next(); // (0, 1]: log is finite
+      const u2 = this.next();
+      return sd * Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
     },
   };
 }

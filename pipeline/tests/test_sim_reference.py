@@ -72,3 +72,14 @@ def test_sc_stop_cost_depends_on_timing(model: dict):
     late = _ham_win_rate(model, [{"lap": 57, "to": "SOFT"}])
     assert cover > 0.8
     assert late < 0.3
+
+
+def test_one_cars_strategy_does_not_shift_other_cars_draws(model: dict):
+    # Per-car streams: changing HAM's stops must leave a far-away car (MSC, never near HAM
+    # on track in the sim) with exactly the same race.
+    base = sim_reference.simulate(model, seed=11)
+    changed = sim_reference.simulate(
+        model, seed=11, strategies={"HAM": [{"lap": 40, "to": "MEDIUM"}]}
+    )
+    assert base["times"]["HAM"] != changed["times"]["HAM"]
+    assert base["times"]["MSC"] == changed["times"]["MSC"]

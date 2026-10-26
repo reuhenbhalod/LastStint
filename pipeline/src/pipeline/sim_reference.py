@@ -12,10 +12,10 @@ from __future__ import annotations
 
 import json
 import math
-import random
 from dataclasses import dataclass, field
 
 from .paths import GOLDEN_DIR
+from .rng import Mulberry32, derive_seed
 
 DIRTY_AIR_RANGE = 1.0  # within this gap (s) a car is in dirty air
 PASS_WINDOW = 2.0  # a follower within this gap (s) gets one pass roll (matches the fit)
@@ -26,6 +26,11 @@ SC_CLOSE_PER_LAP = 20.0  # s a gap closes per full SC lap (measured >= 15.4s)
 SC_FALLBACK = 1.6  # SC lap = this x green if not supplied
 VSC_FALLBACK = 1.35  # VSC lap = this x green if not supplied
 GOLDEN_SEEDS = [1, 2, 3, 4, 5]  # fixed seeds for the TS parity golden files
+# Random streams per car, indexed by the car's position in model["drivers"]: lap noise uses
+# stream i, the car's own pass attempts (as follower) use OVERTAKE_STREAM + i. Separate
+# streams mean one car's strategy never shifts another car's draws (fair grading, and
+# common random numbers across a decision's options).
+OVERTAKE_STREAM = 1000
 CLIFF_FALLBACK = 2.0  # extra wear past the cliff = this x degPerLap if not fitted
 
 
@@ -64,7 +69,7 @@ def pass_probability(overtake: dict, advantage: float, gap: float) -> float:
     return 1.0 / (1.0 + math.exp(-z))
 
 
-def _resolve_order(order, cars, clean, rng, overtake, prev_time, pitted):
+def _resolve_order(order, cars, clean, pass_rngs, overtake, prev_time, pitted):
     """Set green-flag race order after a lap.
 
     Walking the start-of-lap order front to back, each follower that started the lap within
@@ -82,7 +87,7 @@ def _resolve_order(order, cars, clean, rng, overtake, prev_time, pitted):
         if not 0 <= gap < PASS_WINDOW:
             continue
         advantage = clean[a.code] - clean[b.code]  # >0: b is faster on model pace
-        if rng.random() < pass_probability(overtake, advantage, gap):
+        if pass_rngs[b.code].next() < pass_probability(overtake, advantage, gap):
             if b.total_time >= a.total_time:
                 b.total_time = a.total_time - PASS_MARGIN
         elif b.total_time < a.total_time + FOLLOW_GAP:
@@ -106,7 +111,6 @@ def _classify(order, cars) -> dict:
 
 def simulate(model: dict, seed: int, strategies: dict | None = None) -> dict:
     """Run one seeded simulation to the flag. Returns finishing order and gaps to winner."""
-    rng = random.Random(seed)
     track = model["track"]
     compounds = model["compounds"]
     fuel = model["fuelEffectPerLap"]
@@ -149,6 +153,9 @@ def simulate(model: dict, seed: int, strategies: dict | None = None) -> dict:
         )
 
     order = [d["code"] for d in ordered]
+    stream = {d["code"]: i for i, d in enumerate(model["drivers"])}
+    noise_rngs = {c: Mulberry32(derive_seed(seed, stream[c])) for c in cars}
+    pass_rngs = {c: Mulberry32(derive_seed(seed, OVERTAKE_STREAM + stream[c])) for c in cars}
 
     def active_codes() -> list[str]:
         return [c for c in order if not cars[c].retired]
@@ -177,7 +184,7 @@ def simulate(model: dict, seed: int, strategies: dict | None = None) -> dict:
             elif flag == "RED" and green:
                 lt = green
             else:
-                lt = _clean_lap(car, compounds, fuel, lap) + rng.gauss(0, car.noise)
+                lt = _clean_lap(car, compounds, fuel, lap) + noise_rngs[code].normal(car.noise)
                 ahead = _car_ahead(order, code, cars)
                 ahead_gap = car.total_time - prev_time.get(ahead, car.total_time)
                 if 0 < ahead_gap < DIRTY_AIR_RANGE:
@@ -206,7 +213,7 @@ def simulate(model: dict, seed: int, strategies: dict | None = None) -> dict:
                     gap = car.total_time - ahead.total_time
                     car.total_time = ahead.total_time + max(BUNCH_GAP, gap - SC_CLOSE_PER_LAP)
         else:
-            _resolve_order(order, cars, clean, rng, overtake, prev_time, pitted)
+            _resolve_order(order, cars, clean, pass_rngs, overtake, prev_time, pitted)
 
     return _classify(order, cars)
 
