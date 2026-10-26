@@ -17,14 +17,38 @@ def _status(laps: pd.DataFrame) -> pd.Series:
     return laps["TrackStatus"].astype("string")
 
 
+def leader_laps(laps: pd.DataFrame) -> pd.DataFrame:
+    """One row per race lap: the leader's lap, which defines race-lap numbering.
+
+    Lapped cars run behind in lap count, so their "lap 34" can coincide with the leader's
+    lap 36. Events and retirements are keyed to the leader's laps to avoid that skew.
+    Falls back to the earliest lap-end Time per lap where Position is missing.
+    """
+    timed = laps.dropna(subset=["Time"])
+    by_pos = timed[timed["Position"] == 1].drop_duplicates("LapNumber")
+    by_time = timed.loc[timed.groupby("LapNumber")["Time"].idxmin()]
+    missing = by_time[~by_time["LapNumber"].isin(by_pos["LapNumber"])]
+    return pd.concat([by_pos, missing]).sort_values("LapNumber").reset_index(drop=True)
+
+
+def race_lap_at(laps: pd.DataFrame, time: float) -> int:
+    """The race lap (leader's lap number) in progress at session time `time`."""
+    lead = leader_laps(laps)
+    ended_after = lead[lead["Time"] >= time]
+    if ended_after.empty:
+        return int(lead["LapNumber"].max())
+    return int(ended_after["LapNumber"].iloc[0])
+
+
 def neutralization_events(laps: pd.DataFrame) -> list[dict]:
     """SC / VSC / RED events with their start lap and duration, from TrackStatus.
 
-    A lap counts as neutralized if any car's status carries the code that lap. Priority
-    when codes overlap: red flag > safety car > virtual safety car.
+    A race lap counts as neutralized if the leader's status carries the code that lap.
+    Priority when codes overlap: red flag > safety car > virtual safety car.
     """
-    status = _status(laps)
-    flags = laps.assign(
+    lead = leader_laps(laps)
+    status = _status(lead)
+    flags = lead.assign(
         _sc=status.str.contains("4", na=False),
         _vsc=status.str.contains("6", na=False) | status.str.contains("7", na=False),
         _red=status.str.contains("5", na=False),
@@ -61,7 +85,8 @@ def retirement_events(laps: pd.DataFrame, total_laps: int | None = None) -> list
     """Drivers whose last lap ends well before the leader takes the flag.
 
     Uses lap-end session Time rather than lap count, so lapped finishers (who cross the
-    line with the leader) are not mistaken for retirements.
+    line with the leader) are not mistaken for retirements. The event lap is the race lap
+    (leader's lap) in progress when the car stopped, not the car's own lap count.
     """
     total = total_laps or int(laps["LapNumber"].max())
     lead = laps[laps["LapNumber"] == total]
@@ -77,7 +102,11 @@ def retirement_events(laps: pd.DataFrame, total_laps: int | None = None) -> list
             continue
         if float(last["Time"]) < race_end - 1.5 * typical_lap:
             events.append(
-                {"lap": int(last["LapNumber"]), "type": "RETIREMENT", "driver": str(driver)}
+                {
+                    "lap": race_lap_at(laps, float(last["Time"])),
+                    "type": "RETIREMENT",
+                    "driver": str(driver),
+                }
             )
     return events
 

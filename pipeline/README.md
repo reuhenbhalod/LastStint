@@ -4,10 +4,17 @@ Offline Python pipeline that turns raw F1 timing (via FastF1) into a compact rac
 JSON file per race. Runs locally or in GitHub Actions — **never on a server**.
 
 ```bash
-uv sync                           # create .venv and install deps
-uv run pytest                     # tests
-uv run pipeline build abu-dhabi-2021   # (Phase 1) build one race model
+uv sync                                  # create .venv and install deps
+uv run pytest                            # tests (offline, committed snapshots)
+uv run pipeline list                     # registered races + snapshot/model status
+uv run pipeline ingest <race-id>         # download a race into data/raw/ (network)
+uv run pipeline build <race-id>|--all    # data/races/<id>.json + data/golden/<id>.json
+uv run pipeline validate <race-id>|--all # Gate G1 report; exit 1 on failure
 ```
+
+Races are registered in `src/pipeline/build.py` (`RACES`): year/event, takeover lap,
+seed, user side, rival, and how many finishing positions G1 scores. Dry-compound priors
+live in `config/compound_priors.json`.
 
 ## Modules (`src/pipeline/`)
 

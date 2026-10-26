@@ -7,4 +7,4 @@ Heavy dependencies are imported inside the functions that need them.
 __version__ = "0.0.0"
 
 # v2: added track.greenLapTime / scLapTime / vscLapTime (neutralized-lap pace for the sim).
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 5

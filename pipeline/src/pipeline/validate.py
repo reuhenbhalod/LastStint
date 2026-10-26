@@ -1,39 +1,72 @@
 """Model validation (Phase 1.7, Gate G1).
 
-Runs N simulations with every team's real strategy and reports mean absolute error in each
-main contender's gap to the winner and how often the predicted contender order matches
-reality. Pass bar: contenders' gaps within a few seconds and order correct in most runs.
+Runs N simulations with every team's real strategy and scores them against the real result
+on the cars the game depends on. Gate G1 passes only if every check passes:
+
+- duel: the user's driver vs the rival. Mean error in the gap between them within
+  DUEL_GAP_TOLERANCE, and their relative order right in at least DUEL_ORDER_TOLERANCE of runs.
+- podium: each podium finisher's mean gap to the winner within GAP_TOLERANCE, and the exact
+  podium order in at least PODIUM_ORDER_TOLERANCE of runs.
+- field: every scored finisher's mean gap to the winner within GAP_TOLERANCE or
+  FIELD_RELATIVE_TOLERANCE of their real gap, whichever is larger.
+
+Scored finishers are the lead-lap finishers down to `score_positions`, which the race
+registry can lower where race control decided the order (frozen events the sim can't model).
+Errors are the bias of the MEAN simulated gap vs the real gap; noise averages out over runs.
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import pandas as pd
 
 from .sim_reference import simulate
 
 DEFAULT_RUNS = 500
+DEFAULT_SCORE_POSITIONS = 6
+DUEL_GAP_TOLERANCE = 3.0
+# The duel bar is no stricter than real races are decisive: Abu Dhabi 2021's duel came down
+# to a single restart pass on the final lap, which the sim reproduces in ~70% of runs.
+DUEL_ORDER_TOLERANCE = 0.6
 GAP_TOLERANCE = 5.0  # seconds: "within a few seconds"
-ORDER_TOLERANCE = 0.5  # fraction of runs whose podium order matches
-CONTENDERS = 6  # how many front-runners we score gaps for
-PODIUM = 3  # exact-order bar: the podium (midfield within tenths is genuinely noisy)
+PODIUM_ORDER_TOLERANCE = 0.5
+FIELD_RELATIVE_TOLERANCE = 0.10
+PODIUM = 3
+
+
+@dataclass
+class Check:
+    name: str
+    value: float
+    limit: float
+    passed: bool
+
+    def line(self) -> str:
+        mark = "PASS" if self.passed else "FAIL"
+        return f"  [{mark}] {self.name}: {self.value:.2f} (limit {self.limit:.2f})"
 
 
 @dataclass
 class ValidationReport:
     runs: int
-    contenders: list[str]
+    contenders: list[str]  # scored finishers, real order
     mean_gap_error: dict[str, float]
-    order_match_rate: float
-    passed: bool
+    order_match_rate: float  # exact podium order
+    duel: tuple[str, str] | None
+    checks: list[Check] = field(default_factory=list)
+
+    @property
+    def passed(self) -> bool:
+        return all(c.passed for c in self.checks)
+
+    @property
+    def failures(self) -> list[Check]:
+        return [c for c in self.checks if not c.passed]
 
     def summary(self) -> str:
-        return (
-            f"runs={self.runs}  order_match={self.order_match_rate:.0%}  passed={self.passed}\n"
-            "  gap MAE (s): "
-            + ", ".join(f"{c}={self.mean_gap_error[c]:.2f}" for c in self.contenders)
-        )
+        head = f"runs={self.runs}  podium_order={self.order_match_rate:.0%}  passed={self.passed}"
+        return "\n".join([head, *(c.line() for c in self.checks)])
 
 
 def real_finishing_gaps(laps: pd.DataFrame, total_laps: int | None = None) -> dict[str, float]:
@@ -50,20 +83,25 @@ def validate_race(
     real_gaps: dict[str, float],
     runs: int = DEFAULT_RUNS,
     base_seed: int = 1000,
+    rival: str | None = None,
+    score_positions: int = DEFAULT_SCORE_POSITIONS,
 ) -> ValidationReport:
-    """Replay real strategies `runs` times; score contender gap error and order accuracy."""
+    """Replay real strategies `runs` times and score the G1 checks (module docstring)."""
     real_order = [c for c in model["realResult"] if c in real_gaps]
-    contenders = real_order[:CONTENDERS]
+    contenders = real_order[:score_positions]
     podium = real_order[:PODIUM]
-    real_winner = contenders[0]
+    real_winner = real_order[0]
+    user = model["userSide"]
+    duel = (user, rival) if rival and user in real_gaps and rival in real_gaps else None
 
     gap_sum = dict.fromkeys(contenders, 0.0)
     gap_counts = dict.fromkeys(contenders, 0)
-    order_matches = 0
+    podium_matches = 0
+    duel_sum, duel_n, duel_order = 0.0, 0, 0
+    real_duel = real_gaps[duel[0]] - real_gaps[duel[1]] if duel else 0.0
 
     for i in range(runs):
-        result = simulate(model, seed=base_seed + i)
-        times = result["times"]
+        times = simulate(model, seed=base_seed + i)["times"]
         if real_winner not in times:
             continue
         ref = times[real_winner]
@@ -71,24 +109,62 @@ def validate_race(
             if c in times:
                 gap_sum[c] += times[c] - ref
                 gap_counts[c] += 1
-        sim_podium = sorted((c for c in podium if c in times), key=lambda c: times[c])
-        if sim_podium == podium:
-            order_matches += 1
+        if sorted((c for c in podium if c in times), key=lambda c: times[c]) == podium:
+            podium_matches += 1
+        if duel and duel[0] in times and duel[1] in times:
+            sim_duel = times[duel[0]] - times[duel[1]]
+            duel_sum += sim_duel
+            duel_n += 1
+            duel_order += (sim_duel > 0) == (real_duel > 0)
 
-    # Error = bias of the MEAN simulated gap vs the real gap (noise averages out across runs).
     mean_gap_error = {
         c: (abs(gap_sum[c] / gap_counts[c] - real_gaps[c]) if gap_counts[c] else float("inf"))
         for c in contenders
     }
-    order_match_rate = order_matches / runs if runs else 0.0
-    # "Main contenders' gaps within a few seconds": hold the podium battle to the gap bar
-    # (deep-midfield absolute gaps are beyond a clean-pace model's resolution for now).
-    podium_gap_ok = max(mean_gap_error[c] for c in podium) < GAP_TOLERANCE
-    passed = podium_gap_ok and order_match_rate >= ORDER_TOLERANCE
+    order_match_rate = podium_matches / runs if runs else 0.0
+
+    checks: list[Check] = []
+    if duel:
+        duel_err = abs(duel_sum / duel_n - real_duel) if duel_n else float("inf")
+        duel_rate = duel_order / duel_n if duel_n else 0.0
+        name = f"{duel[0]} vs {duel[1]}"
+        checks.append(
+            Check(
+                f"duel {name} gap error",
+                duel_err,
+                DUEL_GAP_TOLERANCE,
+                duel_err <= DUEL_GAP_TOLERANCE,
+            )
+        )
+        checks.append(
+            Check(
+                f"duel {name} order rate",
+                duel_rate,
+                DUEL_ORDER_TOLERANCE,
+                duel_rate >= DUEL_ORDER_TOLERANCE,
+            )
+        )
+    checks.append(
+        Check(
+            "podium order rate",
+            order_match_rate,
+            PODIUM_ORDER_TOLERANCE,
+            order_match_rate >= PODIUM_ORDER_TOLERANCE,
+        )
+    )
+    for c in contenders:
+        limit = GAP_TOLERANCE
+        if c not in podium:
+            limit = max(GAP_TOLERANCE, FIELD_RELATIVE_TOLERANCE * real_gaps[c])
+        group = "podium" if c in podium else "field"
+        err = mean_gap_error[c]
+        checks.append(Check(f"{group} {c} gap error", err, limit, err <= limit))
+
     return ValidationReport(
         runs=runs,
         contenders=contenders,
         mean_gap_error=mean_gap_error,
         order_match_rate=order_match_rate,
-        passed=passed,
+        duel=duel,
+        checks=checks,
     )

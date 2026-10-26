@@ -34,9 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 12
+      - uses: pnpm/action-setup@v4  # version from package.json "packageManager"
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -49,11 +47,28 @@ jobs:
       - name: Test
         run: pnpm test
 
-  # Parity job: TS sim vs Python golden files (wired up in Phase 1/2 once golden
-  # files exist in data/golden). Placeholder keeps the job name stable in branch rules.
+  # Parity (Gate G2): the committed race models and golden files must be exactly what the
+  # Python pipeline produces from the committed snapshots, and the TS sim must reproduce them.
   parity:
     name: TS<->Python parity
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: echo "Parity tests run once data/golden is populated (Phase 1/2)."
+      - uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+      - uses: pnpm/action-setup@v4  # version from package.json "packageManager"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: uv sync --dev
+        working-directory: pipeline
+      - name: Rebuild race models + golden files from snapshots
+        run: uv run pipeline build --all
+        working-directory: pipeline
+      - name: Committed data is up to date
+        run: git diff --exit-code -- data/
+      - run: pnpm install --frozen-lockfile
+      - name: TS sim matches golden files
+        run: pnpm --filter @boxthislap/sim test

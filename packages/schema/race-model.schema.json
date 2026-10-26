@@ -16,7 +16,8 @@
     "events",
     "decisionMoments",
     "realResult",
-    "userSide"
+    "userSide",
+    "rival"
   ],
   "properties": {
     "schemaVersion": {
@@ -43,11 +44,30 @@
     "track": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["pitLoss", "pitLossUnderSC", "overtakeDifficulty", "dirtyAirPenalty"],
+      "required": [
+        "pitLoss",
+        "pitLossUnderSC",
+        "pitLossUnderVSC",
+        "overtakeDifficulty",
+        "overtakeModel",
+        "dirtyAirPenalty"
+      ],
       "properties": {
         "pitLoss": { "type": "number" },
         "pitLossUnderSC": { "type": "number" },
+        "pitLossUnderVSC": { "type": "number" },
         "overtakeDifficulty": { "type": "number", "minimum": 0, "maximum": 1 },
+        "overtakeModel": {
+          "type": "object",
+          "description": "P(pass) = sigmoid(intercept + paceCoef*paceAdvantage + gapCoef*gap), rolled once per lap for a follower within 2s.",
+          "additionalProperties": false,
+          "required": ["intercept", "paceCoef", "gapCoef"],
+          "properties": {
+            "intercept": { "type": "number" },
+            "paceCoef": { "type": "number", "exclusiveMinimum": 0 },
+            "gapCoef": { "type": "number", "exclusiveMaximum": 0 }
+          }
+        },
         "dirtyAirPenalty": { "type": "number", "minimum": 0 },
         "greenLapTime": { "type": "number" },
         "scLapTime": { "type": "number" },
@@ -64,7 +84,12 @@
         "properties": {
           "offset": { "type": "number" },
           "degPerLap": { "type": "number", "minimum": 0 },
-          "cliffLap": { "type": "integer", "minimum": 1 }
+          "cliffLap": { "type": "integer", "minimum": 1 },
+          "cliffDegPerLap": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Extra seconds per lap of tyre age past cliffLap. Absent: no fitted cliff."
+          }
         }
       }
     },
@@ -132,6 +157,10 @@
     "userSide": {
       "type": "string",
       "description": "Driver code the user controls — always the hard/controversial side."
+    },
+    "rival": {
+      "type": "string",
+      "description": "Driver code of the direct rival, which reacts to the user's calls; every other car follows its real strategy."
     },
     "reconstructed": {
       "type": "boolean",

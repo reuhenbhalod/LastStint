@@ -34,6 +34,6 @@ def test_state_at_takeover_matches_timing_screen(laps: pd.DataFrame):
 def test_candidate_moments_include_neutralizations(laps: pd.DataFrame):
     evs = events.extract_events(laps)
     moments = scenario.candidate_decision_moments(laps, evs)
-    assert 34 in moments  # VSC
-    assert 51 in moments  # safety car
+    assert 36 in moments  # VSC (race lap)
+    assert 53 in moments  # safety car (race lap)
     assert moments == sorted(set(moments))

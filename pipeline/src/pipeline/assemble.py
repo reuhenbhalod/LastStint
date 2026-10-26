@@ -12,7 +12,7 @@ import pandas as pd
 from . import SCHEMA_VERSION
 from . import events as events_mod
 from . import scenario as scenario_mod
-from .fit import LapTimeFit, detect_cliff
+from .fit import LapTimeFit
 from .track import TrackParams
 
 
@@ -40,20 +40,22 @@ def assemble_race_model(
     takeover_lap: int,
     seed: int,
     user_side: str,
+    rival: str,
 ) -> dict:
     """Build the race-model dict (validate + write it with export.write_race)."""
     total_laps = int(laps["LapNumber"].max())
-    cliffs = detect_cliff(clean_laps, fit)
+    cliffs = fit.compound_cliff
 
-    compounds = {
-        compound: {
+    compounds = {}
+    for compound, offset in fit.compound_offset.items():
+        hinge = cliffs.get(compound)
+        compounds[compound] = {
             "offset": round(offset, 4),
             "degPerLap": round(fit.compound_wear[compound], 5),
-            # No detected cliff -> put it past the race so it never triggers within a stint.
-            "cliffLap": int(cliffs.get(compound) or total_laps),
+            # No fitted cliff -> put it past the race so it never triggers within a stint.
+            "cliffLap": int(hinge[0]) if hinge else total_laps,
+            **({"cliffDegPerLap": round(hinge[1], 4)} if hinge else {}),
         }
-        for compound, offset in fit.compound_offset.items()
-    }
 
     # Events and remaining strategy from the takeover lap onward; earlier history is already
     # baked into stateAtTakeover.
@@ -102,7 +104,9 @@ def assemble_race_model(
         "track": {
             "pitLoss": round(track_params.pit_loss, 3),
             "pitLossUnderSC": round(track_params.pit_loss_under_sc, 3),
+            "pitLossUnderVSC": round(track_params.pit_loss_under_vsc, 3),
             "overtakeDifficulty": round(track_params.overtake_difficulty, 4),
+            "overtakeModel": {k: round(v, 4) for k, v in track_params.overtake_model.items()},
             "dirtyAirPenalty": round(track_params.dirty_air_penalty, 4),
             # Neutralized-lap pace for the simulator; omitted when a race had none.
             **(
@@ -128,4 +132,5 @@ def assemble_race_model(
         "decisionMoments": moments,
         "realResult": finishing_order(laps),
         "userSide": user_side,
+        "rival": rival,
     }

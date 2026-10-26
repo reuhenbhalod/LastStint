@@ -1,0 +1,23 @@
+{
+  "_comment": "Headset standing-mode effects per era (Implementation Plan 2.6; product doc 'Standing modes'). Calibrated estimates, not measured: FastF1 can't observe them. Start modest, tune by playtesting. lapDelta: s added per lap. wearMult: multiplies tyre wear (effective tyre age advances by this per lap). errorMult: multiplies the era's base error rate; only the excess over 1 is applied. attackLogit / defendLogit: added to the overtake model's logit when this car attacks / is attacked.",
+  "2014-2025": {
+    "baseErrorRate": 0.01,
+    "errorCost": 1.5,
+    "modes": {
+      "pace": {
+        "push": { "lapDelta": -0.25, "wearMult": 1.3, "errorMult": 1.8 },
+        "standard": { "lapDelta": 0, "wearMult": 1, "errorMult": 1 },
+        "manage": { "lapDelta": 0.35, "wearMult": 0.75, "errorMult": 1 }
+      },
+      "fuel": {
+        "normal": { "lapDelta": 0, "wearMult": 1, "errorMult": 1 },
+        "liftAndCoast": { "lapDelta": 0.3, "wearMult": 0.9, "errorMult": 1 }
+      },
+      "battle": {
+        "attack": { "lapDelta": 0.05, "errorMult": 1.5, "attackLogit": 0.6 },
+        "hold": { "lapDelta": 0 },
+        "defend": { "lapDelta": 0.15, "defendLogit": -0.6 }
+      }
+    }
+  }
+}

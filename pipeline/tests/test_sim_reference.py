@@ -46,3 +46,40 @@ def test_write_golden(model: dict, tmp_path, monkeypatch):
     sim_reference.write_golden(model, seeds=[1, 2, 3])
     out = tmp_path / "abu-dhabi-2021.json"
     assert out.exists()
+
+
+def test_pass_probability_direction(model: dict):
+    overtake = model["track"]["overtakeModel"]
+    p = sim_reference.pass_probability
+    assert p(overtake, 1.0, 0.5) > p(overtake, 0.2, 0.5)  # faster follower passes more
+    assert p(overtake, 1.0, 0.5) > p(overtake, 1.0, 1.5)  # closer follower passes more
+    assert 0.0 < p(overtake, 0.0, 1.0) < 0.5
+
+
+def _ham_win_rate(model: dict, ham_strategy: list, runs: int = 60) -> float:
+    strategies = {"HAM": ham_strategy}
+    wins = sum(
+        sim_reference.simulate(model, seed=500 + i, strategies=strategies)["order"][0] == "HAM"
+        for i in range(runs)
+    )
+    return wins / runs
+
+
+def test_sc_stop_cost_depends_on_timing(model: dict):
+    # Abu Dhabi 2021, SC laps 53-57; VER really pitted (out-lap 54). Covering on the same
+    # lap keeps HAM ahead; stopping into the already-bunched train (lap 57) loses the lead.
+    cover = _ham_win_rate(model, [{"lap": 54, "to": "SOFT"}])
+    late = _ham_win_rate(model, [{"lap": 57, "to": "SOFT"}])
+    assert cover > 0.8
+    assert late < 0.3
+
+
+def test_one_cars_strategy_does_not_shift_other_cars_draws(model: dict):
+    # Per-car streams: changing HAM's stops must leave a far-away car (MSC, never near HAM
+    # on track in the sim) with exactly the same race.
+    base = sim_reference.simulate(model, seed=11)
+    changed = sim_reference.simulate(
+        model, seed=11, strategies={"HAM": [{"lap": 40, "to": "MEDIUM"}]}
+    )
+    assert base["times"]["HAM"] != changed["times"]["HAM"]
+    assert base["times"]["MSC"] == changed["times"]["MSC"]

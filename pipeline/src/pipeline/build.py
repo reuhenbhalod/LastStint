@@ -7,6 +7,8 @@ the tests, the golden-file generator, and the CLI so they never drift.
 
 from __future__ import annotations
 
+from dataclasses import dataclass, field
+
 import pandas as pd
 
 from . import assemble, clean, fit, ingest, track
@@ -21,6 +23,10 @@ RACES: dict[str, dict] = {
         "takeover_lap": 34,
         "seed": 81723,
         "user_side": "HAM",
+        "rival": "VER",
+        # P7 and back were decided by race control (only the lapped cars between HAM and
+        # VER unlapped before the restart), a frozen event the sim can't reproduce.
+        "score_positions": 6,
     },
     "spain-2021": {
         "year": 2021,
@@ -30,12 +36,21 @@ RACES: dict[str, dict] = {
         "takeover_lap": 20,
         "seed": 49123,
         "user_side": "VER",
+        "rival": "HAM",
+        "score_positions": 6,
     },
 }
 
 
-def build_race_model(race_id: str, laps: pd.DataFrame | None = None) -> tuple[dict, pd.DataFrame]:
-    """Build a validated race-model dict for a registered race. Returns (model, laps)."""
+@dataclass
+class BuildResult:
+    model: dict
+    laps: pd.DataFrame
+    notes: list[str] = field(default_factory=list)  # priors/fallbacks the build relied on
+
+
+def build_race(race_id: str, laps: pd.DataFrame | None = None) -> BuildResult:
+    """Build a validated race-model dict for a registered race, with its build notes."""
     if race_id not in RACES:
         raise KeyError(f"unknown race '{race_id}'; known: {sorted(RACES)}")
     meta = RACES[race_id]
@@ -44,7 +59,7 @@ def build_race_model(race_id: str, laps: pd.DataFrame | None = None) -> tuple[di
 
     clean_df, traffic_df, _ = clean.clean_laps(laps)
     pace_laps = pd.concat([clean_df, traffic_df])
-    fitted = fit.fit_lap_model(clean_df, pace_laps=pace_laps)
+    fitted = fit.fit_lap_model(clean_df, pace_laps=pace_laps, era=meta["era"])
     params = track.fit_track_params(laps, clean_df, traffic_df, fitted)
 
     model = assemble.assemble_race_model(
@@ -58,5 +73,12 @@ def build_race_model(race_id: str, laps: pd.DataFrame | None = None) -> tuple[di
         takeover_lap=meta["takeover_lap"],
         seed=meta["seed"],
         user_side=meta["user_side"],
+        rival=meta["rival"],
     )
-    return model, laps
+    return BuildResult(model=model, laps=laps, notes=[*fitted.prior_notes, *params.notes])
+
+
+def build_race_model(race_id: str, laps: pd.DataFrame | None = None) -> tuple[dict, pd.DataFrame]:
+    """Build a validated race-model dict for a registered race. Returns (model, laps)."""
+    result = build_race(race_id, laps)
+    return result.model, result.laps

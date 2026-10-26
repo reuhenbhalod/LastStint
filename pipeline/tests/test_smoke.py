@@ -8,7 +8,7 @@ from pipeline import clean, export, ingest
 
 def test_version_and_schema_version():
     assert pipeline.__version__ == "0.0.0"
-    assert pipeline.SCHEMA_VERSION == 2
+    assert pipeline.SCHEMA_VERSION == 5
 
 
 def test_cleaning_constants():

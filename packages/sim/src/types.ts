@@ -6,15 +6,24 @@ export type Compound = string; // e.g. 'SOFT' | 'MEDIUM' | 'HARD'; era-dependent
 
 export type Era = '1988-1993' | '1994-2009' | '2010-2013' | '2014-2025' | '2026+';
 
-export type FlagState = 'green' | 'sc' | 'vsc';
+export type FlagState = 'green' | 'sc' | 'vsc' | 'red';
 
 export type PaceMode = 'push' | 'standard' | 'manage';
+export type FuelMode = 'normal' | 'liftAndCoast';
 export type BattleMode = 'attack' | 'hold' | 'defend';
+
+export interface Modes {
+  pace: PaceMode;
+  fuel: FuelMode;
+  battle: BattleMode;
+}
 
 export interface CompoundModel {
   offset: number;
   degPerLap: number;
   cliffLap: number;
+  /** Extra seconds per lap of tyre age past cliffLap; absent when no cliff was fitted. */
+  cliffDegPerLap?: number;
 }
 
 export interface DriverModel {
@@ -46,7 +55,10 @@ export interface RaceModel {
   track: {
     pitLoss: number;
     pitLossUnderSC: number;
+    pitLossUnderVSC: number;
     overtakeDifficulty: number;
+    /** P(pass) = sigmoid(intercept + paceCoef * paceAdvantage + gapCoef * gap). */
+    overtakeModel: { intercept: number; paceCoef: number; gapCoef: number };
     dirtyAirPenalty: number;
     greenLapTime?: number;
     scLapTime?: number;
@@ -59,28 +71,71 @@ export interface RaceModel {
   decisionMoments: number[];
   realResult: string[];
   userSide: string;
+  /** The direct rival: reacts to the user's calls (rival policy); everyone else is scripted. */
+  rival: string;
   reconstructed?: boolean;
+}
+
+export interface PitStop {
+  /** The out-lap: the first lap run on the new tyres (pit loss is charged on this lap). */
+  lap: number;
+  to: Compound;
 }
 
 export interface CarState {
   code: string;
-  position: number;
-  totalTime: number;
+  team: string;
+  basePace: number;
+  noise: number;
   compound: Compound;
+  /** Laps on the current tyres (what the timing tower shows). */
   tyreAge: number;
-  lapsOnFuel: number;
-  inPitThisLap: boolean;
+  /** Effective wear in laps: advances by the headset wear multiplier each green lap. */
+  tyreWear: number;
+  /** Cumulative race time (s) since the takeover snapshot; order is by this. */
+  totalTime: number;
+  /** Remaining planned stops (real strategy, or the player's/rival's plan). */
+  strategy: PitStop[];
+  pittedThisLap: boolean;
   retired: boolean;
-  modes: { pace: PaceMode; battle: BattleMode };
+  retiredLap: number | null;
+  modes: Modes;
 }
 
+/**
+ * A user call. `pit`: box at the end of `lap` (the in-lap); the stop is charged on lap + 1.
+ * `mode`: the standing mode applies from `lap` on. `radio`: an answer to a radio moment
+ * (mapped to pit/mode calls by the game; no direct sim effect).
+ */
 export type Decision =
   | { lap: number; kind: 'pit'; compound: Compound }
-  | { lap: number; kind: 'mode'; key: 'pace' | 'battle'; value: string }
+  | { lap: number; kind: 'mode'; key: keyof Modes; value: string }
   | { lap: number; kind: 'radio'; momentId: string; optionId: string };
 
-export interface RaceState {
+/** Something the sim did on its own that the game may narrate (e.g. the rival covering). */
+export interface RaceNote {
   lap: number;
-  cars: CarState[];
+  kind: 'rival-cover' | 'rival-stays-out' | 'error';
+  driver: string;
+  detail?: string;
+}
+
+export interface RaceState {
+  /** Last completed lap (the takeover lap before the first stepLap). */
+  lap: number;
+  /** Flag the last completed lap ran under. */
   flag: FlagState;
+  /** Race order: running cars by total time, then retired cars. */
+  order: string[];
+  cars: Record<string, CarState>;
+}
+
+export interface RaceResult {
+  /** Finishers by time, then retirees (latest retirement first). */
+  order: string[];
+  finishers: string[];
+  /** Seconds behind the winner, finishers only. */
+  gaps: Record<string, number>;
+  /** Total time since takeover, finishers only. */
+  times: Record<string, number>;
 }
