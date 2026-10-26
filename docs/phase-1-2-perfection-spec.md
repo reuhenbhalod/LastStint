@@ -66,6 +66,18 @@ Each decision lists its options; ← marks the recommendation.
 
 Every item here ships only if it passes the **guard**: it improves mean gap error on the tuning races, loses no G1 pass there, and doesn't make the held-out races worse.
 
+**Guard amendments (Oct 26, 2026, owner decisions):**
+
+- **Robust pass status.** A race's G1 status for the guard comes from 1,000 runs on each of two seed sets (`pipeline validate --split tune --robust`): pass (both), borderline (one), fail (neither). Only a race going from pass to fail counts as a lost pass, so a coin flip at a limit doesn't decide whether a fix ships.
+- **B1 exception.** B1 shipped although Hungary 2019 then missed by 0.04s, because it freezes real events and isn't tuned to any race. It was approved as a one-off, and the guard stays strict for everything else.
+
+**Results so far** (tuning races, robust; mean gap error averaged per race):
+
+| Change | Pass / borderline / fail | Mean gap error |
+|---|---|---|
+| B1 reference | 5 / 0 / 11 | 4.14s |
+| + B2 | 4 / 2 / 10 | 4.02s |
+
 **B1. Pit-stop durations**
 
 - **a. Frozen + sampled.** ← recommended
