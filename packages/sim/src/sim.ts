@@ -329,7 +329,8 @@ export const NOISE_STREAM = 0;
  * error or stop streams; seeds are unchanged, so results are identical to eager creation.
  */
 export class Streams {
-  private readonly cache = new Map<number, Rng>();
+  // Slot per (stream base, car): bases are multiples of 1000, cars fewer than 64.
+  private readonly cache: Array<Rng | undefined> = [];
 
   constructor(
     private readonly seed: number,
@@ -337,11 +338,12 @@ export class Streams {
   ) {}
 
   get(base: number, code: string): Rng {
-    const id = base + (this.index[code] as number);
-    let rng = this.cache.get(id);
+    const car = this.index[code] as number;
+    const slot = (base / 1000) * 64 + car;
+    let rng = this.cache[slot];
     if (!rng) {
-      rng = mulberry32(deriveSeed(this.seed, id));
-      this.cache.set(id, rng);
+      rng = mulberry32(deriveSeed(this.seed, base + car));
+      this.cache[slot] = rng;
     }
     return rng;
   }
@@ -489,7 +491,16 @@ function live(run: Run): string[] {
 }
 
 function retiredInOrder(run: Run): string[] {
-  return run.state.order.filter((c) => car(run, c).retired);
+  const { order, cars } = run.state;
+  const out: string[] = [];
+  for (const code of order) if ((cars[code] as CarState).retired) out.push(code);
+  return out;
+}
+
+/** order (running cars, by time) followed by the retired cars, in one array. */
+function withRetired(run: Run, order: string[]): string[] {
+  for (const code of retiredInOrder(run)) order.push(code);
+  return order;
 }
 
 /**
@@ -931,7 +942,7 @@ function resolveOrder(
     }
   }
   sortByTime(order, cars);
-  run.state.order = [...order, ...retiredInOrder(run)];
+  run.state.order = withRetired(run, order);
 }
 
 /** Classification: finishers by time, then retirees (latest retirement first). */
