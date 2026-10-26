@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from .clean import gap_to_car_ahead, tyre_change_out_laps
+from .clean import fitted_compound, gap_to_car_ahead, tyre_change_out_laps
 
 DRY_COMPOUNDS = ("SOFT", "MEDIUM", "HARD")
 
@@ -18,10 +18,11 @@ def real_strategy(laps: pd.DataFrame) -> dict[str, list[dict]]:
     """Per driver, the pit stops as {lap, to} — the out-lap and the compound fitted."""
     out: dict[str, list[dict]] = {}
     changed = tyre_change_out_laps(laps)
+    fitted = fitted_compound(laps)
     for driver, grp in laps.groupby("Driver"):
-        stops = grp[changed.loc[grp.index]].sort_values("LapNumber")
+        stops = grp[changed.loc[grp.index].fillna(False).astype(bool)].sort_values("LapNumber")
         out[str(driver)] = [
-            {"lap": int(r.LapNumber), "to": str(r.Compound)} for r in stops.itertuples()
+            {"lap": int(r.LapNumber), "to": str(fitted.loc[r.Index])} for r in stops.itertuples()
         ]
     return out
 

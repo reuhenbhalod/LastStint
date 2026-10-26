@@ -65,3 +65,13 @@ def test_robust_status_uses_two_seed_sets(race):
     assert len(res.reports) == len(validate.ROBUST_SEEDS) == 2
     expected = {2: "pass", 1: "borderline", 0: "fail"}[sum(r.passed for r in res.reports)]
     assert res.status == expected
+
+
+def test_diagnose_splits_the_error():
+    from pipeline import diagnose
+
+    model, laps = build.build_race_model("miami-2024")
+    d = diagnose.diagnose(model, laps, score_positions=6, runs=20)
+    assert abs(sum(d.share.values()) - 1) < 1e-9
+    assert d.dominant in diagnose.LABELS
+    assert d.line().startswith(diagnose.LABELS[d.dominant])

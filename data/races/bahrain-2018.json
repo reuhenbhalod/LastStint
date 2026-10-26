@@ -4,40 +4,45 @@
     "id": "bahrain-2018",
     "name": "Bahrain 2018",
     "laps": 57,
-    "takeoverLap": 25,
+    "takeoverLap": 14,
     "seed": 57550
   },
   "era": "2014-2025",
   "track": {
-    "pitLoss": 22.853,
-    "pitLossUnderSC": 12.569,
+    "pitLoss": 22.827,
+    "pitLossUnderSC": 12.555,
     "pitLossUnderVSC": 39.747,
     "pitLossDeviations": [
-      -1.975,
-      -1.671,
-      -1.598,
-      -1.508,
-      -1.464,
-      -1.051,
-      -0.867,
-      -0.811,
-      -0.723,
-      -0.641,
-      -0.134,
-      -0.026,
-      0.026,
-      0.027,
-      0.129,
-      0.778,
-      0.791,
-      0.876,
-      1.105,
-      1.777,
-      1.938,
-      2.759,
-      3.821,
-      6.978,
-      14.448
+      -1.995,
+      -1.762,
+      -1.67,
+      -1.645,
+      -1.554,
+      -1.072,
+      -0.914,
+      -0.876,
+      -0.84,
+      -0.727,
+      -0.655,
+      -0.496,
+      -0.154,
+      -0.019,
+      0.0,
+      0.237,
+      0.331,
+      0.75,
+      0.757,
+      0.762,
+      0.804,
+      0.809,
+      1.522,
+      1.65,
+      1.768,
+      1.867,
+      2.404,
+      3.847,
+      7.004,
+      14.562
     ],
     "overtakeDifficulty": 0.8734,
     "overtakeModel": {
@@ -75,20 +80,24 @@
       "basePace": 96.9831,
       "noise": 0.521,
       "stateAtTakeover": {
-        "position": 8,
-        "gapAhead": 3.429,
-        "compound": "HARD",
-        "tyreAge": 11,
+        "position": 7,
+        "gapAhead": 4.606,
+        "compound": "MEDIUM",
+        "tyreAge": 13,
         "compoundsUsed": [
-          "HARD",
           "MEDIUM"
         ]
       },
       "realStrategy": [
         {
+          "lap": 15,
+          "to": "HARD",
+          "loss": 21.157
+        },
+        {
           "lap": 40,
           "to": "SOFT",
-          "loss": 23.729
+          "loss": 23.631
         }
       ]
     },
@@ -99,15 +108,20 @@
       "noise": 0.4814,
       "stateAtTakeover": {
         "position": 2,
-        "gapAhead": 5.083,
-        "compound": "HARD",
-        "tyreAge": 5,
+        "gapAhead": 2.98,
+        "compound": "SOFT",
+        "tyreAge": 16,
         "compoundsUsed": [
-          "HARD",
           "SOFT"
         ]
       },
-      "realStrategy": []
+      "realStrategy": [
+        {
+          "lap": 20,
+          "to": "HARD",
+          "loss": 23.636
+        }
+      ]
     },
     {
       "code": "ERI",
@@ -115,16 +129,21 @@
       "basePace": 97.2765,
       "noise": 0.725,
       "stateAtTakeover": {
-        "position": 16,
-        "gapAhead": 0.366,
-        "compound": "HARD",
-        "tyreAge": 2,
+        "position": 11,
+        "gapAhead": 1.071,
+        "compound": "MEDIUM",
+        "tyreAge": 13,
         "compoundsUsed": [
-          "HARD",
           "MEDIUM"
         ]
       },
-      "realStrategy": []
+      "realStrategy": [
+        {
+          "lap": 24,
+          "to": "HARD",
+          "loss": 24.595
+        }
+      ]
     },
     {
       "code": "GAS",
@@ -133,19 +152,23 @@
       "noise": 0.3793,
       "stateAtTakeover": {
         "position": 5,
-        "gapAhead": 26.374,
-        "compound": "MEDIUM",
-        "tyreAge": 10,
+        "gapAhead": 8.885,
+        "compound": "SOFT",
+        "tyreAge": 16,
         "compoundsUsed": [
-          "MEDIUM",
           "SOFT"
         ]
       },
       "realStrategy": [
         {
+          "lap": 16,
+          "to": "MEDIUM",
+          "loss": 21.755
+        },
+        {
           "lap": 35,
           "to": "SOFT",
-          "loss": 23.631
+          "loss": 23.583
         }
       ]
     },
@@ -155,20 +178,24 @@
       "basePace": 97.7544,
       "noise": 0.7975,
       "stateAtTakeover": {
-        "position": 13,
-        "gapAhead": 0.502,
-        "compound": "MEDIUM",
-        "tyreAge": 7,
+        "position": 12,
+        "gapAhead": 0.978,
+        "compound": "SOFT",
+        "tyreAge": 13,
         "compoundsUsed": [
-          "MEDIUM",
           "SOFT"
         ]
       },
       "realStrategy": [
         {
+          "lap": 19,
+          "to": "MEDIUM",
+          "loss": 22.1
+        },
+        {
           "lap": 31,
           "to": "SOFT",
-          "loss": 22.982
+          "loss": 23.064
         },
         {
           "lap": 46,
@@ -183,15 +210,21 @@
       "basePace": 95.4975,
       "noise": 0.5065,
       "stateAtTakeover": {
-        "position": 3,
-        "gapAhead": 0.688,
+        "position": 4,
+        "gapAhead": 7.801,
         "compound": "MEDIUM",
-        "tyreAge": 27,
+        "tyreAge": 16,
         "compoundsUsed": [
           "MEDIUM"
         ]
       },
-      "realStrategy": []
+      "realStrategy": [
+        {
+          "lap": 26,
+          "to": "HARD",
+          "loss": 24.349
+        }
+      ]
     },
     {
       "code": "HAR",
@@ -199,20 +232,24 @@
       "basePace": 97.4083,
       "noise": 0.6743,
       "stateAtTakeover": {
-        "position": 17,
-        "gapAhead": 4.928,
-        "compound": "MEDIUM",
-        "tyreAge": 5,
+        "position": 9,
+        "gapAhead": 1.502,
+        "compound": "SOFT",
+        "tyreAge": 13,
         "compoundsUsed": [
-          "MEDIUM",
           "SOFT"
         ]
       },
       "realStrategy": [
         {
+          "lap": 21,
+          "to": "MEDIUM",
+          "loss": 37.388
+        },
+        {
           "lap": 43,
           "to": "SOFT",
-          "loss": 24.791
+          "loss": 24.694
         }
       ]
     },
@@ -222,20 +259,24 @@
       "basePace": 96.9859,
       "noise": 0.6485,
       "stateAtTakeover": {
-        "position": 7,
-        "gapAhead": 1.782,
-        "compound": "MEDIUM",
-        "tyreAge": 10,
+        "position": 6,
+        "gapAhead": 5.505,
+        "compound": "SOFT",
+        "tyreAge": 16,
         "compoundsUsed": [
-          "MEDIUM",
           "SOFT"
         ]
       },
       "realStrategy": [
         {
+          "lap": 16,
+          "to": "MEDIUM",
+          "loss": 21.987
+        },
+        {
           "lap": 40,
           "to": "SOFT",
-          "loss": 23.643
+          "loss": 23.589
         }
       ]
     },
@@ -246,9 +287,9 @@
       "noise": 0.7715,
       "stateAtTakeover": {
         "position": 15,
-        "gapAhead": 4.803,
+        "gapAhead": 1.152,
         "compound": "HARD",
-        "tyreAge": 22,
+        "tyreAge": 11,
         "compoundsUsed": [
           "HARD",
           "MEDIUM"
@@ -268,19 +309,24 @@
       "basePace": 96.6822,
       "noise": 0.6124,
       "stateAtTakeover": {
-        "position": 6,
-        "gapAhead": 7.528,
+        "position": 16,
+        "gapAhead": 0.238,
         "compound": "SOFT",
-        "tyreAge": 15,
+        "tyreAge": 4,
         "compoundsUsed": [
           "SOFT"
         ]
       },
       "realStrategy": [
         {
+          "lap": 14,
+          "to": "SOFT",
+          "loss": 21.273
+        },
+        {
           "lap": 28,
           "to": "MEDIUM",
-          "loss": 22.88
+          "loss": 22.808
         }
       ]
     },
@@ -290,16 +336,20 @@
       "basePace": 97.7359,
       "noise": 0.5285,
       "stateAtTakeover": {
-        "position": 11,
-        "gapAhead": 1.142,
-        "compound": "HARD",
-        "tyreAge": 10,
+        "position": 8,
+        "gapAhead": 0.984,
+        "compound": "SOFT",
+        "tyreAge": 16,
         "compoundsUsed": [
-          "HARD",
           "SOFT"
         ]
       },
       "realStrategy": [
+        {
+          "lap": 16,
+          "to": "HARD",
+          "loss": 21.182
+        },
         {
           "lap": 36,
           "to": "MEDIUM",
@@ -313,10 +363,10 @@
       "basePace": 97.4301,
       "noise": 0.8536,
       "stateAtTakeover": {
-        "position": 12,
-        "gapAhead": 2.765,
+        "position": 18,
+        "gapAhead": 1.452,
         "compound": "HARD",
-        "tyreAge": 16,
+        "tyreAge": 5,
         "compoundsUsed": [
           "HARD",
           "MEDIUM"
@@ -326,7 +376,7 @@
         {
           "lap": 33,
           "to": "SOFT",
-          "loss": 22.719
+          "loss": 22.673
         }
       ]
     },
@@ -336,16 +386,21 @@
       "basePace": 95.6062,
       "noise": 0.2023,
       "stateAtTakeover": {
-        "position": 4,
-        "gapAhead": 1.618,
-        "compound": "MEDIUM",
-        "tyreAge": 6,
+        "position": 3,
+        "gapAhead": 3.776,
+        "compound": "SOFT",
+        "tyreAge": 16,
         "compoundsUsed": [
-          "MEDIUM",
           "SOFT"
         ]
       },
-      "realStrategy": []
+      "realStrategy": [
+        {
+          "lap": 19,
+          "to": "MEDIUM",
+          "loss": 21.951
+        }
+      ]
     },
     {
       "code": "SAI",
@@ -353,19 +408,24 @@
       "basePace": 96.6955,
       "noise": 0.7742,
       "stateAtTakeover": {
-        "position": 14,
-        "gapAhead": 1.089,
+        "position": 10,
+        "gapAhead": 0.895,
         "compound": "SOFT",
-        "tyreAge": 12,
+        "tyreAge": 16,
         "compoundsUsed": [
           "SOFT"
         ]
       },
       "realStrategy": [
         {
+          "lap": 17,
+          "to": "SOFT",
+          "loss": 23.158
+        },
+        {
           "lap": 27,
           "to": "MEDIUM",
-          "loss": 22.212
+          "loss": 22.331
         }
       ]
     },
@@ -375,20 +435,24 @@
       "basePace": 98.0134,
       "noise": 0.9667,
       "stateAtTakeover": {
-        "position": 18,
-        "gapAhead": 15.78,
-        "compound": "HARD",
-        "tyreAge": 3,
+        "position": 14,
+        "gapAhead": 1.776,
+        "compound": "MEDIUM",
+        "tyreAge": 13,
         "compoundsUsed": [
-          "HARD",
           "MEDIUM"
         ]
       },
       "realStrategy": [
         {
+          "lap": 23,
+          "to": "HARD",
+          "loss": 25.231
+        },
+        {
           "lap": 41,
           "to": "SOFT",
-          "loss": 23.958
+          "loss": 23.577
         }
       ]
     },
@@ -398,16 +462,22 @@
       "basePace": 98.0383,
       "noise": 0.5619,
       "stateAtTakeover": {
-        "position": 9,
-        "gapAhead": 5.428,
+        "position": 13,
+        "gapAhead": 6.754,
         "compound": "SOFT",
-        "tyreAge": 15,
+        "tyreAge": 4,
         "compoundsUsed": [
           "MEDIUM",
           "SOFT"
         ]
       },
-      "realStrategy": []
+      "realStrategy": [
+        {
+          "lap": 30,
+          "to": "HARD",
+          "loss": 24.477
+        }
+      ]
     },
     {
       "code": "VAN",
@@ -415,10 +485,10 @@
       "basePace": 97.3698,
       "noise": 0.5144,
       "stateAtTakeover": {
-        "position": 10,
-        "gapAhead": 4.34,
+        "position": 17,
+        "gapAhead": 6.447,
         "compound": "MEDIUM",
-        "tyreAge": 15,
+        "tyreAge": 4,
         "compoundsUsed": [
           "MEDIUM",
           "SOFT"
@@ -428,7 +498,7 @@
         {
           "lap": 29,
           "to": "HARD",
-          "loss": 22.13
+          "loss": 22.172
         }
       ]
     },
@@ -440,14 +510,19 @@
       "stateAtTakeover": {
         "position": 1,
         "gapAhead": 0.0,
-        "compound": "MEDIUM",
-        "tyreAge": 7,
+        "compound": "SOFT",
+        "tyreAge": 15,
         "compoundsUsed": [
-          "MEDIUM",
           "SOFT"
         ]
       },
-      "realStrategy": []
+      "realStrategy": [
+        {
+          "lap": 18,
+          "to": "MEDIUM",
+          "loss": 21.065
+        }
+      ]
     }
   ],
   "fuelEffectPerLap": 0.06783,
@@ -464,9 +539,21 @@
   ],
   "decisionMoments": [],
   "candidateMomentLaps": [
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    23,
+    24,
+    26,
     27,
     28,
     29,
+    30,
     31,
     33,
     35,

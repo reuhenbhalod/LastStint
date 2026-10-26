@@ -56,3 +56,15 @@ def test_pit_lane_pass_is_not_a_stop():
     strategy = scenario.real_strategy(brazil)
     assert [s["lap"] for s in strategy["VER"]] == [28, 41]
     assert [s["lap"] for s in strategy["HAM"]] == [27, 44]
+
+
+def test_stop_whose_new_set_shows_a_lap_late():
+    # Bahrain 2018 / Hungary 2019 timing labels the out-lap with the old set; the new compound
+    # shows from the next lap. HAM's race-winning lap-49 stop in Hungary 2019 must count.
+    hungary = pd.read_parquet(ingest.raw_snapshot_path("hungary-2019"))
+    assert scenario.real_strategy(hungary)["HAM"] == [
+        {"lap": 32, "to": "HARD"},
+        {"lap": 49, "to": "MEDIUM"},
+    ]
+    bahrain = pd.read_parquet(ingest.raw_snapshot_path("bahrain-2018"))
+    assert scenario.real_strategy(bahrain)["HAM"] == [{"lap": 26, "to": "HARD"}]
