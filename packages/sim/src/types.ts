@@ -119,15 +119,24 @@ export interface CarState {
  * `mode`: the standing mode applies from `lap` on. `radio`: an answer to a radio moment
  * (mapped to pit/mode calls by the game; no direct sim effect).
  */
+/**
+ * Team orders (product doc). `letTeammatePast`: the user's car yields to its teammate;
+ * `teammateLetsYouPast`: the teammate yields to the user. Either happens only when the
+ * yielding car is directly ahead within the swap window. `holdUp`: the teammate defends
+ * against the rival whenever directly ahead of it, until `release`.
+ */
+export type TeamOrder = 'letTeammatePast' | 'teammateLetsYouPast' | 'holdUp' | 'release';
+
 export type Decision =
   | { lap: number; kind: 'pit'; compound: Compound }
   | { lap: number; kind: 'mode'; key: keyof Modes; value: string }
+  | { lap: number; kind: 'teamOrder'; order: TeamOrder }
   | { lap: number; kind: 'radio'; momentId: string; optionId: string };
 
 /** Something the sim did on its own that the game may narrate (e.g. the rival covering). */
 export interface RaceNote {
   lap: number;
-  kind: 'rival-cover' | 'rival-stays-out' | 'error';
+  kind: 'rival-cover' | 'rival-stays-out' | 'error' | 'team-swap';
   driver: string;
   detail?: string;
 }
@@ -140,6 +149,12 @@ export interface RaceState {
   /** Race order: running cars by total time, then retired cars. */
   order: string[];
   cars: Record<string, CarState>;
+  /** Standing team orders for the user's team. */
+  teamOrders: {
+    holdUp: boolean;
+    /** A pending yield call: which car yields, and the last lap it stays open. */
+    swap: { yielder: string; untilLap: number } | null;
+  };
 }
 
 export interface RaceResult {

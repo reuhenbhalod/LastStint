@@ -18,6 +18,7 @@ export {
   ruleSatisfied,
   simulate,
   stepLap,
+  teammateOf,
   validateDecisions,
 } from './sim.js';
 export type { Run, RunOptions, Strategies } from './sim.js';

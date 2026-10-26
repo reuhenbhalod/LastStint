@@ -62,6 +62,13 @@ interface HeadsetEra {
   baseErrorRate: number;
   errorCost: number;
   modes: { [K in keyof Modes]: Record<string, ModeEffect> };
+  teamOrders?: {
+    holdUpLogit: number;
+    holdUpCost: number;
+    swapWindow: number;
+    swapCost: number;
+    swapLaps: number;
+  };
 }
 
 const HEADSET = headsetConfig as unknown as Record<string, HeadsetEra>;
@@ -200,10 +207,20 @@ export function validateDecisions(model: RaceModel, decisions: Decision[]): void
       if (d.lap >= model.race.laps) throw new Error('no stop on the final lap');
     } else if (d.kind === 'mode') {
       if (!headset?.modes[d.key]?.[d.value]) throw new Error(`unknown mode ${d.key}=${d.value}`);
+    } else if (d.kind === 'teamOrder') {
+      const orders = ['letTeammatePast', 'teammateLetsYouPast', 'holdUp', 'release'];
+      if (!orders.includes(d.order)) throw new Error('unknown team order');
+      if (!teammateOf(model)) throw new Error(`${model.userSide} has no teammate in this race`);
     } else if (d.kind !== 'radio') {
       throw new Error('unknown decision kind');
     }
   }
+}
+
+/** The user's teammate (same team), if one is in the race. */
+export function teammateOf(model: RaceModel): string | undefined {
+  const team = model.drivers.find((d) => d.code === model.userSide)?.team;
+  return model.drivers.find((d) => d.team === team && d.code !== model.userSide)?.code;
 }
 
 /** The user's real calls as pit decisions (in-lap = real out-lap - 1), for comparison. */
@@ -270,6 +287,7 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
       flag: 'green',
       order: ordered.map((d) => d.code),
       cars,
+      teamOrders: { holdUp: false, swap: null },
     },
     neutral,
     retireAt,
@@ -321,7 +339,15 @@ export function forkRun(run: Run, seed: number, decisions: Decision[] = []): Run
     ...run,
     seed,
     ...makeStreams(run.model, seed),
-    state: { ...run.state, order: [...run.state.order], cars },
+    state: {
+      ...run.state,
+      order: [...run.state.order],
+      cars,
+      teamOrders: {
+        holdUp: run.state.teamOrders.holdUp,
+        swap: run.state.teamOrders.swap ? { ...run.state.teamOrders.swap } : null,
+      },
+    },
     decisions: [...run.decisions.filter((d) => d.lap > run.state.lap), ...decisions],
     notes: [],
   };
@@ -364,8 +390,68 @@ function applyDecisions(run: Run, lap: number): void {
     } else if (d.kind === 'pit') {
       user.strategy = user.strategy.filter((s) => s.lap !== lap + 1);
       user.strategy.push({ lap: lap + 1, to: d.compound, added: true });
+    } else if (d.kind === 'teamOrder') {
+      const orders = run.state.teamOrders;
+      if (d.order === 'holdUp') orders.holdUp = true;
+      if (d.order === 'release') orders.holdUp = false;
+      if (d.order === 'letTeammatePast' || d.order === 'teammateLetsYouPast') {
+        const mate = teammateOf(run.model) as string;
+        orders.swap = {
+          yielder: d.order === 'letTeammatePast' ? run.model.userSide : mate,
+          untilLap: lap + (run.headset?.teamOrders?.swapLaps ?? 3) - 1,
+        };
+      }
     }
   }
+}
+
+/** True while the user's teammate is holding up the rival from directly ahead of it. */
+function holdingUp(run: Run, aheadCode: string, behindCode: string): boolean {
+  return (
+    run.live &&
+    run.state.teamOrders.holdUp &&
+    aheadCode === teammateOf(run.model) &&
+    behindCode === run.model.rival
+  );
+}
+
+/**
+ * A pending yield call: when the yielding car started a green lap directly ahead of the other
+ * and within the swap window, it lifts and lets the other through, losing swapCost. Live
+ * runs only.
+ */
+function applySwap(run: Run, lap: number, prevTime: Record<string, number>): void {
+  const orders = run.state.teamOrders;
+  const cfg = run.headset?.teamOrders;
+  if (!run.live || !cfg || !orders.swap) return;
+  if (lap > orders.swap.untilLap) {
+    orders.swap = null;
+    return;
+  }
+  const mate = teammateOf(run.model) as string;
+  const yielder = orders.swap.yielder;
+  const other = yielder === run.model.userSide ? mate : run.model.userSide;
+  const order = live(run);
+  const startGap = (prevTime[other] ?? Number.POSITIVE_INFINITY) - (prevTime[yielder] ?? 0);
+  if (!(startGap >= 0 && startGap <= cfg.swapWindow)) return;
+  const between = Object.entries(prevTime).some(
+    ([code, t]) =>
+      code !== yielder &&
+      code !== other &&
+      t > (prevTime[yielder] ?? 0) &&
+      t < (prevTime[other] ?? 0),
+  );
+  if (between) return; // only directly-adjacent teammates can swap
+  const a = car(run, yielder);
+  const b = car(run, other);
+  b.totalTime = a.totalTime - PASS_MARGIN;
+  a.totalTime = b.totalTime + PASS_MARGIN + cfg.swapCost;
+  orders.swap = null;
+  run.notes.push({ lap, kind: 'team-swap', driver: other, detail: yielder });
+  run.state.order = [
+    ...order.sort((x, y) => car(run, x).totalTime - car(run, y).totalTime),
+    ...retiredInOrder(run),
+  ];
 }
 
 /**
@@ -575,6 +661,12 @@ export function stepLap(run: Run): RaceState {
       const aheadGap = c.totalTime - (prevTime[ahead] ?? c.totalTime);
       if (aheadGap > 0 && aheadGap < DIRTY_AIR_RANGE) lt += track.dirtyAirPenalty;
       lt += modeLapDelta(run, c);
+      const behind = running[i + 1];
+      if (behind && holdingUp(run, code, behind)) {
+        const gapBehind = (prevTime[behind] ?? 0) - (prevTime[code] ?? 0);
+        if (gapBehind >= 0 && gapBehind < PASS_WINDOW)
+          lt += run.headset?.teamOrders?.holdUpCost ?? 0;
+      }
       const errorRate = extraErrorRate(run, c);
       if (errorRate > 0 && run.headset && (run.errorRng[code] as Rng).next() < errorRate) {
         lt += run.headset.errorCost;
@@ -610,6 +702,7 @@ export function stepLap(run: Run): RaceState {
     }
   } else {
     resolveOrder(run, clean, prevTime, pitted);
+    applySwap(run, lap, prevTime);
   }
   rivalReacts(run, lap, flag, prevTime);
   rivalGoesLong(run, lap);
@@ -641,7 +734,9 @@ function resolveOrder(
     if (!(gap >= 0 && gap < PASS_WINDOW)) continue;
     const advantage = (clean[a.code] as number) - (clean[b.code] as number);
     const shift =
-      (effect(run, b, 'battle').attackLogit ?? 0) + (effect(run, a, 'battle').defendLogit ?? 0);
+      (effect(run, b, 'battle').attackLogit ?? 0) +
+      (effect(run, a, 'battle').defendLogit ?? 0) +
+      (holdingUp(run, a.code, b.code) ? (run.headset?.teamOrders?.holdUpLogit ?? 0) : 0);
     if ((run.passRng[b.code] as Rng).next() < passProbability(overtake, advantage, gap, shift)) {
       if (b.totalTime >= a.totalTime) b.totalTime = a.totalTime - PASS_MARGIN;
     } else if (b.totalTime < a.totalTime + FOLLOW_GAP) {
