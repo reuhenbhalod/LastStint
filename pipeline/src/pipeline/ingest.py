@@ -9,13 +9,14 @@ Heavy imports (fastf1) are done inside functions so `import pipeline` stays ligh
 
 from __future__ import annotations
 
+import os
 import re
 import time
 from pathlib import Path
 
 import pandas as pd
 
-from .paths import CACHE_DIR, RAW_DIR
+from .paths import CACHE_DIR, PIPELINE_ENV, RAW_DIR
 
 # Columns we keep per lap (Implementation Plan 1.1).
 LAP_COLUMNS = [
@@ -38,9 +39,23 @@ LAP_COLUMNS = [
 _TIMEDELTA_COLUMNS = ("LapTime", "Time", "PitInTime", "PitOutTime")
 
 
+def load_credentials(env_path: Path = PIPELINE_ENV) -> bool:
+    """Load F1_USERNAME / F1_PASSWORD from the git-ignored pipeline/.env into the environment
+    (FastF1 reads them there to log in for years outside the open archive). Existing env vars
+    win. Returns whether a username is now set; never logs the values.
+    """
+    from dotenv import load_dotenv
+
+    if env_path.exists():
+        load_dotenv(env_path, override=False)
+    return bool(os.environ.get("F1_USERNAME"))
+
+
 def enable_cache(cache_dir: Path = CACHE_DIR) -> None:
-    """Enable the FastF1 on-disk cache."""
+    """Enable the FastF1 on-disk cache (and load F1 account credentials if present)."""
     import fastf1
+
+    load_credentials()
 
     cache_dir.mkdir(parents=True, exist_ok=True)
     fastf1.Cache.enable_cache(str(cache_dir))

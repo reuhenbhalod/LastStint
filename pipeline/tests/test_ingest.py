@@ -95,3 +95,22 @@ def test_ingest_backs_off_on_rate_limit(monkeypatch, tmp_path):
     assert len(calls) == 3
     assert waits == list(ingest.RATE_LIMIT_WAITS[:2])
     assert (tmp_path / "x-2021.parquet").exists()
+
+
+def test_load_credentials_reads_env_file_without_overriding(tmp_path, monkeypatch):
+    env = tmp_path / ".env"
+    env.write_text("F1_USERNAME=someone@example.com\nF1_PASSWORD='p#ss'\n")
+    monkeypatch.delenv("F1_USERNAME", raising=False)
+    monkeypatch.delenv("F1_PASSWORD", raising=False)
+    assert ingest.load_credentials(env) is True
+    import os
+
+    assert os.environ["F1_PASSWORD"] == "p#ss"  # quoted '#' is part of the value
+    monkeypatch.setenv("F1_USERNAME", "already@set.com")
+    ingest.load_credentials(env)
+    assert os.environ["F1_USERNAME"] == "already@set.com"  # existing env wins
+
+
+def test_load_credentials_without_file(tmp_path, monkeypatch):
+    monkeypatch.delenv("F1_USERNAME", raising=False)
+    assert ingest.load_credentials(tmp_path / "missing.env") is False
