@@ -12,9 +12,21 @@ export {
   initRun,
   isFinished,
   passProbability,
+  planRemainingStop,
   realDecisions,
   simulate,
   stepLap,
   validateDecisions,
 } from './sim.js';
 export type { Run, RunOptions, Strategies } from './sim.js';
+export {
+  BAND_EDGES,
+  GRADE_SAMPLES,
+  bandFor,
+  gradeMoment,
+  playOption,
+  reachedTarget,
+  realOption,
+  sampleSeed,
+} from './grade.js';
+export type { Band, GradeOption, MomentGrade, OptionGrade, Target } from './grade.js';

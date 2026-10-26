@@ -242,6 +242,8 @@ Tune these rules on test races until a fan would find the rival's reactions beli
 - Metric per option: probability of the target result (beat the rival, or win). Grade = best option's probability minus the user's option's probability.
 - Bands: green within 0.5 points of best; yellow close; orange costly; red a big miss. Tune band edges on playtests.
 - Also grade the real team's call with the same method, for the comparison screen.
+- **Continuation (decided Oct 25, 2026):** after an option's calls, the user's car follows a "sensible strategist" in every playout: the best of no more stops or one stop at any remaining lap and compound, by the model's predicted time (`planRemainingStop`). It is deterministic and the same for every option, so options are compared on the call alone, against the sim rather than hindsight. Limitation: it plans at most one more stop.
+- **Band edges at launch:** green ≤ 0.5, yellow ≤ 5, orange ≤ 15 percentage points behind the best; red beyond.
 
 ### 2.8 Performance
 
