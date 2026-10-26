@@ -143,3 +143,19 @@ describe('grading without hindsight (spec decision, Oct 26 2026)', () => {
     expect([...a.neutral]).toEqual([...b.neutral]);
   });
 });
+
+describe('planner fast path', () => {
+  it('chooses exactly what the full O(laps^2) search chooses', async () => {
+    const { initRun: init, stepLap: step, planRemainingStop: plan } = await import('../src/sim.js');
+    let compared = 0;
+    for (const model of [abu, spain]) {
+      for (let pause = model.race.takeoverLap; pause < model.race.laps - 1; pause += 3) {
+        const run = init(model, 5, { decisions: [] });
+        while (run.state.lap < pause) step(run);
+        expect(plan(run)).toEqual(plan(run, { exact: true }));
+        compared++;
+      }
+    }
+    expect(compared).toBeGreaterThan(15);
+  });
+});

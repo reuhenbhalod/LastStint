@@ -12,7 +12,8 @@
   "scripts": {
     "test": "vitest run",
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.scripts.json",
-    "moments": "tsx scripts/moments.ts"
+    "moments": "tsx scripts/moments.ts",
+    "bench": "tsx scripts/bench.ts"
   },
   "devDependencies": {
     "@types/node": "22.10.2",

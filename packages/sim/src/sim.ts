@@ -89,10 +89,10 @@ export interface Run {
   live: boolean;
   notes: RaceNote[];
   headset: HeadsetEra | undefined;
-  noiseRng: Record<string, Rng>;
-  passRng: Record<string, Rng>;
-  errorRng: Record<string, Rng>;
-  stopRng: Record<string, Rng>;
+  /** Per-car random streams, created on first use (see Streams). */
+  rng: Streams;
+  /** Per-lap working tables, reused every lap (no allocation in the grader's hot loop). */
+  scratch: { prevTime: Record<string, number>; clean: Record<string, number>; pitted: Set<string> };
   /** Neutralizations (start lap, length, flag): the real ones, or a grader fork's view. */
   events: NeutralEvent[];
   /** Neutralization flag per lap, and retirements per lap, precomputed from events. */
@@ -124,7 +124,7 @@ function stopCost(run: Run, code: string, flag: FlagState | undefined, added: bo
     flag === 'sc' ? track.pitLossUnderSC : flag === 'vsc' ? track.pitLossUnderVSC : track.pitLoss;
   const devs = track.pitLossDeviations ?? [];
   if (!added || devs.length === 0) return base;
-  const pick = Math.floor((run.stopRng[code] as Rng).next() * devs.length);
+  const pick = Math.floor(run.rng.get(STOP_STREAM, code).next() * devs.length);
   return base + (devs[pick] as number);
 }
 
@@ -179,12 +179,21 @@ function tyreLapTime(
   return t;
 }
 
+const NO_EFFECT: ModeEffect = {};
+
 function effect(run: Run, car: CarState, key: keyof Modes): ModeEffect {
-  return run.headset?.modes[key][car.modes[key]] ?? {};
+  if (car.modes[key] === DEFAULT_MODES[key]) return NO_EFFECT; // defaults have no effect
+  return run.headset?.modes[key][car.modes[key]] ?? NO_EFFECT;
+}
+
+function defaultModes(car: CarState): boolean {
+  const m = car.modes;
+  return m.pace === 'standard' && m.fuel === 'normal' && m.battle === 'hold';
 }
 
 /** Sum of the car's standing-mode lap-time deltas (0 on default modes). */
 function modeLapDelta(run: Run, car: CarState): number {
+  if (defaultModes(car)) return 0;
   return (
     (effect(run, car, 'pace').lapDelta ?? 0) +
     (effect(run, car, 'fuel').lapDelta ?? 0) +
@@ -193,12 +202,13 @@ function modeLapDelta(run: Run, car: CarState): number {
 }
 
 function modeWearMult(run: Run, car: CarState): number {
+  if (defaultModes(car)) return 1;
   return (effect(run, car, 'pace').wearMult ?? 1) * (effect(run, car, 'fuel').wearMult ?? 1);
 }
 
 /** Per-lap probability of a costly mistake above the baseline (0 on default modes). */
 function extraErrorRate(run: Run, car: CarState): number {
-  if (!run.headset) return 0;
+  if (!run.headset || defaultModes(car)) return 0;
   const mult =
     (effect(run, car, 'pace').errorMult ?? 1) *
     (effect(run, car, 'fuel').errorMult ?? 1) *
@@ -311,22 +321,45 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
   };
 }
 
-/** Per-car random streams for a seed (see the header comment for the stream layout). */
-function makeStreams(
-  model: RaceModel,
-  seed: number,
-): Pick<Run, 'noiseRng' | 'passRng' | 'errorRng' | 'stopRng'> {
-  const noiseRng: Record<string, Rng> = {};
-  const passRng: Record<string, Rng> = {};
-  const errorRng: Record<string, Rng> = {};
-  const stopRng: Record<string, Rng> = {};
+export const NOISE_STREAM = 0;
+
+/**
+ * Per-car random streams for a seed: stream base + the car's index in model.drivers (see the
+ * header comment). Each is created on first use, since most cars never touch their pass,
+ * error or stop streams; seeds are unchanged, so results are identical to eager creation.
+ */
+export class Streams {
+  private readonly cache = new Map<number, Rng>();
+
+  constructor(
+    private readonly seed: number,
+    private readonly index: Readonly<Record<string, number>>,
+  ) {}
+
+  get(base: number, code: string): Rng {
+    const id = base + (this.index[code] as number);
+    let rng = this.cache.get(id);
+    if (!rng) {
+      rng = mulberry32(deriveSeed(this.seed, id));
+      this.cache.set(id, rng);
+    }
+    return rng;
+  }
+}
+
+function driverIndex(model: RaceModel): Record<string, number> {
+  const index: Record<string, number> = {};
   model.drivers.forEach((d, i) => {
-    noiseRng[d.code] = mulberry32(deriveSeed(seed, i));
-    passRng[d.code] = mulberry32(deriveSeed(seed, OVERTAKE_STREAM + i));
-    errorRng[d.code] = mulberry32(deriveSeed(seed, ERROR_STREAM + i));
-    stopRng[d.code] = mulberry32(deriveSeed(seed, STOP_STREAM + i));
+    index[d.code] = i;
   });
-  return { noiseRng, passRng, errorRng, stopRng };
+  return index;
+}
+
+function makeStreams(model: RaceModel, seed: number): Pick<Run, 'rng' | 'scratch'> {
+  return {
+    rng: new Streams(seed, driverIndex(model)),
+    scratch: { prevTime: {}, clean: {}, pitted: new Set() },
+  };
 }
 
 function cloneCar(c: CarState): CarState {
@@ -433,8 +466,26 @@ function car(run: Run, code: string): CarState {
   return c;
 }
 
+/** Stable sort by total time; the order is almost always nearly sorted already. */
+function sortByTime(codes: string[], cars: Record<string, CarState>): string[] {
+  for (let i = 1; i < codes.length; i++) {
+    const code = codes[i] as string;
+    const t = (cars[code] as CarState).totalTime;
+    let j = i - 1;
+    while (j >= 0 && (cars[codes[j] as string] as CarState).totalTime > t) {
+      codes[j + 1] = codes[j] as string;
+      j--;
+    }
+    codes[j + 1] = code;
+  }
+  return codes;
+}
+
 function live(run: Run): string[] {
-  return run.state.order.filter((c) => !car(run, c).retired);
+  const { order, cars } = run.state;
+  const out: string[] = [];
+  for (const code of order) if (!(cars[code] as CarState).retired) out.push(code);
+  return out;
 }
 
 function retiredInOrder(run: Run): string[] {
@@ -481,12 +532,8 @@ function applyDecisions(run: Run, lap: number): void {
 
 /** True while the user's teammate is holding up the rival from directly ahead of it. */
 function holdingUp(run: Run, aheadCode: string, behindCode: string): boolean {
-  return (
-    run.live &&
-    run.state.teamOrders.holdUp &&
-    aheadCode === teammateOf(run.model) &&
-    behindCode === run.model.rival
-  );
+  if (!run.live || !run.state.teamOrders.holdUp || behindCode !== run.model.rival) return false;
+  return aheadCode === teammateOf(run.model);
 }
 
 /**
@@ -625,10 +672,9 @@ function predictedRemaining(
   car: CarState,
   fromLap: number,
   stop: PitStop | null,
+  known: Map<number, Exclude<FlagState, 'green'>>,
 ): number {
   const { model } = run;
-  // Plan only on what is known now: neutralizations that have started by the next lap.
-  const known = neutralMap(run.events.filter((e) => e.lap <= fromLap + 1));
   const wearMult = modeWearMult(run, car);
   let compound = car.compound;
   let wear = car.tyreWear;
@@ -664,23 +710,82 @@ function predictedRemaining(
  * Deterministic and the same for every option, so options are compared on the call alone.
  * Returns the stop (out-lap, compound) or null; it never plans more than one stop.
  */
-export function planRemainingStop(run: Run): PitStop | null {
+export function planRemainingStop(run: Run, options: { exact?: boolean } = {}): PitStop | null {
   const { model, state } = run;
   const user = state.cars[model.userSide];
   if (!user || user.retired) return null;
   // Two-compound rule: a car that hasn't yet run two dry compounds must stop for a new one.
   const mustChange = !ruleSatisfied(user);
   let best: PitStop | null = null;
+  // Plan only on what is known now: neutralizations that have started by the next lap.
+  const known = neutralMap(run.events.filter((e) => e.lap <= state.lap + 1));
+  let knownAhead = false;
+  for (const lap of known.keys()) if (lap > state.lap) knownAhead = true;
+  if (!knownAhead && !options.exact) return planGreenToFlag(run, user, mustChange);
   let bestTime = mustChange
     ? Number.POSITIVE_INFINITY
-    : predictedRemaining(run, user, state.lap, null);
+    : predictedRemaining(run, user, state.lap, null, known);
   for (let lap = state.lap + 1; lap <= model.race.laps; lap++) {
     for (const to of Object.keys(model.compounds)) {
       if (mustChange && user.compoundsUsed.includes(to)) continue;
-      const t = predictedRemaining(run, user, state.lap, { lap, to });
+      const t = predictedRemaining(run, user, state.lap, { lap, to }, known);
       if (t < bestTime) {
         bestTime = t;
         best = { lap, to };
+      }
+    }
+  }
+  return best;
+}
+
+/**
+ * planRemainingStop for the usual case of no known neutralization ahead, in O(laps x
+ * compounds) instead of O(laps^2 x compounds). A lap's model time splits into a lap term
+ * (pace and fuel, the same whatever the tyres) and a tyre-age term, so a one-stop plan's time
+ * is a prefix sum on the current set + the pit loss + a suffix sum of lap terms + a per-
+ * compound cumulative sum over tyre age. Same choices as the full loop (sums differ only in
+ * floating-point order).
+ */
+function planGreenToFlag(run: Run, user: CarState, mustChange: boolean): PitStop | null {
+  const { model, state } = run;
+  const first = state.lap + 1;
+  const last = model.race.laps;
+  const n = last - first + 1;
+  const m = modeWearMult(run, user);
+  const lapTerm = (lap: number) => user.basePace - model.fuelEffectPerLap * lap;
+  const ageTerm = (compound: string, age: number) =>
+    tyreLapTime(model, 0, compound, age * m, 0) + freshTyreDelta(model, age);
+
+  // pre[i]: time for laps first..first+i-1 on the current set; suffix[i]: lap terms from
+  // lap first+i to the flag.
+  const pre = new Float64Array(n + 1);
+  for (let i = 0; i < n; i++) {
+    const lap = first + i;
+    const wear = user.tyreWear + i * m;
+    pre[i + 1] =
+      (pre[i] as number) +
+      tyreLapTime(model, user.basePace, user.compound, wear, lap) +
+      freshTyreDelta(model, user.tyreAge + i);
+  }
+  const suffix = new Float64Array(n + 1);
+  for (let i = n - 1; i >= 0; i--) suffix[i] = (suffix[i + 1] as number) + lapTerm(first + i);
+
+  let best: PitStop | null = null;
+  let bestTime = mustChange ? Number.POSITIVE_INFINITY : (pre[n] as number);
+  for (const to of Object.keys(model.compounds)) {
+    if (mustChange && user.compoundsUsed.includes(to)) continue;
+    // ageSum[a]: tyre-age terms for ages 0..a-1 on a fresh set of `to`.
+    const ageSum = new Float64Array(n + 1);
+    for (let a = 0; a < n; a++) ageSum[a + 1] = (ageSum[a] as number) + ageTerm(to, a);
+    for (let i = 0; i < n; i++) {
+      const t =
+        (pre[i] as number) +
+        model.track.pitLoss +
+        (suffix[i] as number) +
+        (ageSum[n - i] as number);
+      if (t < bestTime) {
+        bestTime = t;
+        best = { lap: first + i, to };
       }
     }
   }
@@ -704,14 +809,15 @@ export function stepLap(run: Run): RaceState {
   const scTime = track.scLapTime || (green ? green * SC_FALLBACK : undefined);
   const vscTime = track.vscLapTime || (green ? green * VSC_FALLBACK : undefined);
 
+  const cars = state.cars;
   const running = live(run);
-  const prevTime: Record<string, number> = {};
-  for (const c of running) prevTime[c] = car(run, c).totalTime;
-  const clean: Record<string, number> = {};
-  const pitted = new Set<string>();
+  const { prevTime, clean, pitted } = run.scratch;
+  pitted.clear();
+  for (const code of running) prevTime[code] = (cars[code] as CarState).totalTime;
 
-  running.forEach((code, i) => {
-    const c = car(run, code);
+  for (let i = 0; i < running.length; i++) {
+    const code = running[i] as string;
+    const c = cars[code] as CarState;
     c.pittedThisLap = false;
     let pitCost = 0;
     const stopIdx = c.strategy.findIndex((st) => st.lap === lap);
@@ -727,16 +833,18 @@ export function stepLap(run: Run): RaceState {
       pitCost = stop.loss ?? stopCost(run, code, flag, stop.added === true);
     }
 
+    const base = cleanLap(model, c, lap);
+    const modeDelta = flag ? 0 : modeLapDelta(run, c);
     let lt: number;
     if (flag === 'sc' && scTime) lt = scTime;
     else if (flag === 'vsc' && vscTime) lt = vscTime;
     else if (flag === 'red' && green) lt = green;
     else {
-      lt = cleanLap(model, c, lap) + (run.noiseRng[code] as Rng).normal(c.noise);
+      lt = base + run.rng.get(NOISE_STREAM, code).normal(c.noise);
       const ahead = i > 0 ? (running[i - 1] as string) : code;
       const aheadGap = c.totalTime - (prevTime[ahead] ?? c.totalTime);
       if (aheadGap > 0 && aheadGap < DIRTY_AIR_RANGE) lt += track.dirtyAirPenalty;
-      lt += modeLapDelta(run, c);
+      lt += modeDelta;
       const behind = running[i + 1];
       if (behind && holdingUp(run, code, behind)) {
         const gapBehind = (prevTime[behind] ?? 0) - (prevTime[code] ?? 0);
@@ -744,16 +852,16 @@ export function stepLap(run: Run): RaceState {
           lt += run.headset?.teamOrders?.holdUpCost ?? 0;
       }
       const errorRate = extraErrorRate(run, c);
-      if (errorRate > 0 && run.headset && (run.errorRng[code] as Rng).next() < errorRate) {
+      if (errorRate > 0 && run.headset && run.rng.get(ERROR_STREAM, code).next() < errorRate) {
         lt += run.headset.errorCost;
         run.notes.push({ lap, kind: 'error', driver: code });
       }
     }
-    clean[code] = cleanLap(model, c, lap) + (flag ? 0 : modeLapDelta(run, c));
+    clean[code] = base + modeDelta;
     c.totalTime += lt + pitCost;
     c.tyreAge += 1;
     c.tyreWear += flag ? 1 : modeWearMult(run, c);
-  });
+  }
 
   for (const code of run.retireAt.get(lap) ?? []) {
     const c = state.cars[code];
@@ -766,12 +874,12 @@ export function stepLap(run: Run): RaceState {
   if (flag) {
     // No overtaking under neutralization: sorting by total time moves only cars that pitted.
     // Under a SC each gap then closes by SC_CLOSE_PER_LAP down to nose-to-tail.
-    const order = live(run).sort((a, b) => car(run, a).totalTime - car(run, b).totalTime);
+    const order = sortByTime(live(run), cars);
     state.order = [...order, ...retiredInOrder(run)];
     if (flag === 'sc') {
       for (let i = 1; i < order.length; i++) {
-        const ahead = car(run, order[i - 1] as string);
-        const c = car(run, order[i] as string);
+        const ahead = cars[order[i - 1] as string] as CarState;
+        const c = cars[order[i] as string] as CarState;
         const gap = c.totalTime - ahead.totalTime;
         c.totalTime = ahead.totalTime + Math.max(BUNCH_GAP, gap - SC_CLOSE_PER_LAP);
       }
@@ -801,10 +909,11 @@ function resolveOrder(
   pitted: Set<string>,
 ): void {
   const overtake = run.model.track.overtakeModel;
+  const cars = run.state.cars;
   const order = live(run);
   for (let i = 1; i < order.length; i++) {
-    const a = car(run, order[i - 1] as string);
-    const b = car(run, order[i] as string);
+    const a = cars[order[i - 1] as string] as CarState;
+    const b = cars[order[i] as string] as CarState;
     if (pitted.has(a.code) || pitted.has(b.code)) continue;
     const gap = (prevTime[b.code] as number) - (prevTime[a.code] as number);
     if (!(gap >= 0 && gap < PASS_WINDOW)) continue;
@@ -813,13 +922,15 @@ function resolveOrder(
       (effect(run, b, 'battle').attackLogit ?? 0) +
       (effect(run, a, 'battle').defendLogit ?? 0) +
       (holdingUp(run, a.code, b.code) ? (run.headset?.teamOrders?.holdUpLogit ?? 0) : 0);
-    if ((run.passRng[b.code] as Rng).next() < passProbability(overtake, advantage, gap, shift)) {
+    if (
+      run.rng.get(OVERTAKE_STREAM, b.code).next() < passProbability(overtake, advantage, gap, shift)
+    ) {
       if (b.totalTime >= a.totalTime) b.totalTime = a.totalTime - PASS_MARGIN;
     } else if (b.totalTime < a.totalTime + FOLLOW_GAP) {
       b.totalTime = a.totalTime + FOLLOW_GAP;
     }
   }
-  order.sort((x, y) => car(run, x).totalTime - car(run, y).totalTime);
+  sortByTime(order, cars);
   run.state.order = [...order, ...retiredInOrder(run)];
 }
 
