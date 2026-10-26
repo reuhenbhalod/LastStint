@@ -309,37 +309,35 @@
   "fuelEffectPerLap": 0.05583,
   "events": [
     {
-      "lap": 34,
+      "lap": 36,
       "type": "RETIREMENT",
       "driver": "GIO"
     },
     {
-      "lap": 34,
+      "lap": 36,
       "type": "VSC",
+      "laps": 3
+    },
+    {
+      "lap": 53,
+      "type": "SC",
       "laps": 5
     },
     {
-      "lap": 51,
+      "lap": 54,
       "type": "RETIREMENT",
       "driver": "LAT"
     },
     {
-      "lap": 51,
-      "type": "SC",
-      "laps": 7
-    },
-    {
-      "lap": 55,
+      "lap": 56,
       "type": "RETIREMENT",
       "driver": "PER"
     }
   ],
   "decisionMoments": [
-    34,
     36,
     37,
     49,
-    51,
     53,
     54,
     55
