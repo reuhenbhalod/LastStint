@@ -11,7 +11,7 @@
   "track": {
     "pitLoss": 23.304,
     "pitLossUnderSC": 12.817,
-    "pitLossUnderVSC": 19.423,
+    "pitLossUnderVSC": 18.712,
     "pitLossDeviations": [
       -5.126,
       -4.43,
@@ -297,7 +297,8 @@
         },
         {
           "lap": 68,
-          "to": "SOFT"
+          "to": "SOFT",
+          "loss": 14.638
         }
       ]
     },

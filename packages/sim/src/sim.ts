@@ -30,7 +30,10 @@ export const PASS_WINDOW = 2.0; // a follower within this gap (s) gets one pass 
 export const FOLLOW_GAP = 0.3; // a follower that fails to pass is held this far (s) behind
 export const PASS_MARGIN = 0.05; // a completed pass puts the follower this far (s) ahead
 export const BUNCH_GAP = 0.5; // SC train spacing per car (measured on the final SC lap)
-export const SC_CLOSE_PER_LAP = 20.0; // s a gap closes per full SC lap
+// SC bunching (measured on the tuning races' SCs, 259 gaps): gaps are kept on the deployment
+// lap, each middle SC lap keeps SC_GAP_KEEP of a gap's excess over BUNCH_GAP, and the last lap
+// before the restart is nose-to-tail. Mirrors sim_reference.py.
+export const SC_GAP_KEEP = 0.34;
 export const SC_FALLBACK = 1.6; // SC lap = this x green if not supplied
 export const VSC_FALLBACK = 1.35; // VSC lap = this x green if not supplied
 export const CLIFF_FALLBACK = 2.0; // extra wear past the cliff = this x degPerLap if not fitted
@@ -884,15 +887,17 @@ export function stepLap(run: Run): RaceState {
 
   if (flag) {
     // No overtaking under neutralization: sorting by total time moves only cars that pitted.
-    // Under a SC each gap then closes by SC_CLOSE_PER_LAP down to nose-to-tail.
+    // Under a SC the gaps then close toward nose-to-tail (see SC_GAP_KEEP).
     const order = sortByTime(live(run), cars);
     state.order = [...order, ...retiredInOrder(run)];
-    if (flag === 'sc') {
+    if (flag === 'sc' && run.neutral.get(lap - 1) === 'sc') {
+      // Deployment lap: gaps kept. Middle laps: SC_GAP_KEEP of the excess. Last lap: bunched.
+      const keep = run.neutral.get(lap + 1) === 'sc' ? SC_GAP_KEEP : 0;
       for (let i = 1; i < order.length; i++) {
         const ahead = cars[order[i - 1] as string] as CarState;
         const c = cars[order[i] as string] as CarState;
-        const gap = c.totalTime - ahead.totalTime;
-        c.totalTime = ahead.totalTime + Math.max(BUNCH_GAP, gap - SC_CLOSE_PER_LAP);
+        const excess = Math.max(0, c.totalTime - ahead.totalTime - BUNCH_GAP);
+        c.totalTime = ahead.totalTime + BUNCH_GAP + keep * excess;
       }
     }
   } else {

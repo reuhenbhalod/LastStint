@@ -135,10 +135,13 @@ describe('rival policy', () => {
   });
 
   it('goes long under a SC to take track position when the user pits from ahead', () => {
-    // The flagship call: HAM (player) boxes from the lead on lap 53. VER, behind and due to
-    // stop on 54, sees it and stays out to lead the restart (his tyres won't reach the cliff
-    // before the flag, so the stop is dropped).
-    const run = runTo(abu, 1, [{ lap: 53, kind: 'pit', compound: 'SOFT' }], 56);
+    // The flagship call: HAM (player) boxes from the lead on lap 53 with VER 8s behind (less
+    // than a SC stop costs). VER, due to stop on 54, sees it and stays out to lead the restart
+    // (his tyres won't reach the cliff before the flag, so the stop is dropped).
+    const run = runTo(abu, 1, [{ lap: 53, kind: 'pit', compound: 'SOFT' }], 52);
+    const ham = run.state.cars.HAM as { totalTime: number };
+    (run.state.cars.VER as { totalTime: number }).totalTime = ham.totalTime + 8;
+    while (run.state.lap < 56) stepLap(run);
     expect(run.notes).toContainEqual({
       lap: 53,
       kind: 'rival-stays-out',
@@ -148,6 +151,14 @@ describe('rival policy', () => {
     expect(run.state.cars.VER?.strategy).toEqual([]);
     // Whether HAM rejoins ahead depends on his (sampled) stop time; that trade-off is what the
     // grader measures, so it is not asserted for a single seed here.
+  });
+
+  it('does not go long when the gap is bigger than a SC stop costs', () => {
+    const run = runTo(abu, 1, [{ lap: 53, kind: 'pit', compound: 'SOFT' }], 52);
+    const ham = run.state.cars.HAM as { totalTime: number };
+    (run.state.cars.VER as { totalTime: number }).totalTime = ham.totalTime + 20;
+    while (run.state.lap < 56) stepLap(run);
+    expect(run.notes.filter((n) => n.kind === 'rival-stays-out')).toEqual([]);
   });
 
   it('only a rival behind the user can go long', () => {

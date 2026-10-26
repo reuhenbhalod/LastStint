@@ -11,7 +11,7 @@
   "track": {
     "pitLoss": 18.62,
     "pitLossUnderSC": 10.241,
-    "pitLossUnderVSC": 14.896,
+    "pitLossUnderVSC": 12.848,
     "pitLossDeviations": [
       -1.456,
       -0.333,
@@ -141,7 +141,8 @@
       "realStrategy": [
         {
           "lap": 33,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 10.354
         }
       ]
     },

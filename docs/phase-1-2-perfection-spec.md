@@ -77,6 +77,22 @@ Every item here ships only if it passes the **guard**: it improves mean gap erro
 |---|---|---|
 | B1 reference | 5 / 0 / 11 | 4.14s |
 | + B2 | 4 / 2 / 10 | 4.02s |
+| + hybrid SC bunching | 5 / 1 / 10 | 3.53s |
+| + VSC stops by gap change | 5 / 1 / 10 | 3.47s |
+
+**S3 changes shipped after S4–S5:**
+
+- **Hybrid SC bunching** (supersedes the earlier finding below).
+  - Gaps are kept on the deployment lap and each middle SC lap keeps 34% of a gap's excess (both measured), but the last lap before the restart is nose-to-tail, because race control restarts a bunched field.
+  - Miami 2024 13.2 → 6.7s, Bahrain 2022 1.6 → 1.1s, Abu Dhabi 2.6 → 2.0s; mean 4.02 → 3.53s.
+- **VSC stops by gap change.**
+  - A VSC stop's cost is now measured by the change in gap to nearby cars that didn't stop (all at the same delta), and those stops are frozen like green ones, as B1 originally intended.
+  - The old same-lap-field method overstated them (Abu Dhabi VER 21.9s vs 14.5s, which matches the real gap trace).
+  - Median 0.69 × green on the tuning races (the fallback factor). Brazil 2021 4.0 → 2.7s; mean → 3.47s.
+- **B4 re-tested on 16 races (robust guard): rejected again.**
+  - Driver × compound pace: mean 4.02 → 3.96s, but Miami 2022 goes pass → fail.
+  - Per-driver wear factor: 6.16s.
+  - Per-driver tyre effects don't generalise between races.
 
 **Investigated and not shipped** (measured on the tuning races):
 

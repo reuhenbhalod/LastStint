@@ -11,7 +11,7 @@
   "track": {
     "pitLoss": 21.343,
     "pitLossUnderSC": 11.739,
-    "pitLossUnderVSC": 19.056,
+    "pitLossUnderVSC": 17.112,
     "pitLossDeviations": [
       -2.302,
       -2.297,
@@ -106,7 +106,8 @@
       "realStrategy": [
         {
           "lap": 31,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 12.793
         },
         {
           "lap": 42,
@@ -159,7 +160,8 @@
       "realStrategy": [
         {
           "lap": 30,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 19.763
         },
         {
           "lap": 43,
@@ -212,7 +214,8 @@
       "realStrategy": [
         {
           "lap": 14,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 15.804
         },
         {
           "lap": 40,
@@ -287,7 +290,8 @@
       "realStrategy": [
         {
           "lap": 12,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 64.149
         },
         {
           "lap": 30,
@@ -334,7 +338,8 @@
       "realStrategy": [
         {
           "lap": 31,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 17.112
         }
       ]
     },
@@ -387,7 +392,8 @@
       "realStrategy": [
         {
           "lap": 29,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 21.687
         },
         {
           "lap": 53,
@@ -413,7 +419,8 @@
       "realStrategy": [
         {
           "lap": 31,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 14.586
         }
       ]
     },

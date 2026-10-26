@@ -69,11 +69,16 @@ def pit_stops(laps: pd.DataFrame) -> list[tuple[str, pd.Series, pd.Series]]:
 # loss instead; the product doc's own example is 12.1/21.4 ~= 0.55. Refinable later with
 # telemetry or pooled races.
 SC_PIT_LOSS_FACTOR = 0.55
-# Under a VSC the field keeps its gaps at a fixed delta, so VSC stops CAN be measured against
-# same-lap non-pitters. With fewer than MIN_VSC_STOPS measured, fall back to this fraction of
-# the green loss (Abu Dhabi 2021 measures ~0.82).
-VSC_PIT_LOSS_FACTOR = 0.8
+# Under a VSC every car runs the same delta, so a VSC stop's cost is the change in gap to
+# nearby cars that didn't stop (vsc_gap_change_loss). Comparing lap times with the same-lap
+# field instead breaks when the VSC covers only part of the in- or out-lap (Abu Dhabi 2021:
+# VER 21.9s by that method, 14.5s by gap change, which matches the real gap trace). With
+# fewer than MIN_VSC_STOPS measured, fall back to VSC_PIT_LOSS_FACTOR x green, the median
+# ratio on the tuning races.
+VSC_PIT_LOSS_FACTOR = 0.69
 MIN_VSC_STOPS = 2
+VSC_REF_WINDOW = 30.0  # s: reference cars must be within this of the stopping car beforehand
+VSC_REF_CLEAR_LAPS = 2  # reference cars must not stop within this many laps of the stop
 
 
 def _has_sc(status_value: object) -> bool:
@@ -108,6 +113,17 @@ def stop_records(laps: pd.DataFrame) -> list[dict]:
         (green["LapTime"] - green["LapNumber"].map(field_median)).groupby(green["Driver"]).median()
     )
 
+    end_time = {
+        (str(d), int(n)): float(t)
+        for d, n, t in zip(laps["Driver"], laps["LapNumber"], laps["Time"], strict=True)
+        if not pd.isna(t) and not pd.isna(n)
+    }
+    stop_laps: dict[str, set[int]] = {}
+    for driver, in_lap, out_lap in stops:
+        stop_laps.setdefault(driver, set()).update(
+            {int(in_lap["LapNumber"]), int(out_lap["LapNumber"])}
+        )
+
     out: list[dict] = []
     for driver, in_lap, out_lap in stops:
         if pd.isna(in_lap["LapTime"]) or pd.isna(out_lap["LapTime"]):
@@ -122,13 +138,43 @@ def stop_records(laps: pd.DataFrame) -> list[dict]:
             flag = "VSC"
         else:
             flag = "green"
-        reference = sum(float(field_median[lap]) for lap in laps_used)
-        reference += 2 * float(pace_offset.get(driver, 0.0))
-        loss = float(in_lap["LapTime"]) + float(out_lap["LapTime"]) - reference
+        if flag == "VSC":
+            loss = vsc_gap_change_loss(driver, int(out_lap["LapNumber"]), end_time, stop_laps)
+            if loss is None:
+                continue
+        else:
+            reference = sum(float(field_median[lap]) for lap in laps_used)
+            reference += 2 * float(pace_offset.get(driver, 0.0))
+            loss = float(in_lap["LapTime"]) + float(out_lap["LapTime"]) - reference
         out.append(
             {"driver": driver, "out_lap": int(out_lap["LapNumber"]), "flag": flag, "loss": loss}
         )
     return out
+
+
+def vsc_gap_change_loss(
+    driver: str,
+    out_lap: int,
+    end_time: dict[tuple[str, int], float],
+    stop_laps: dict[str, set[int]],
+) -> float | None:
+    """A VSC stop's cost: the median change in gap, from the end of the lap before the in-lap
+    to the end of the out-lap, to nearby cars that didn't stop around then (all running the
+    same delta). None without a usable reference car."""
+    in_lap = out_lap - 1
+    a0, a1 = end_time.get((driver, in_lap - 1)), end_time.get((driver, out_lap))
+    if a0 is None or a1 is None:
+        return None
+    window = range(in_lap - VSC_REF_CLEAR_LAPS, out_lap + VSC_REF_CLEAR_LAPS + 1)
+    changes = []
+    for other, laps_stopped in {**{d: set() for d, _ in end_time}, **stop_laps}.items():
+        if other == driver or any(lap in laps_stopped for lap in window):
+            continue
+        b0, b1 = end_time.get((other, in_lap - 1)), end_time.get((other, out_lap))
+        if b0 is None or b1 is None or abs(a0 - b0) > VSC_REF_WINDOW:
+            continue
+        changes.append((a1 - b1) - (a0 - b0))
+    return float(pd.Series(changes).median()) if changes else None
 
 
 def stop_losses(laps: pd.DataFrame) -> list[tuple[str, str, float]]:
@@ -141,15 +187,9 @@ MAX_STOP_DEVIATION = 15.0
 
 
 def measured_stop_losses(laps: pd.DataFrame) -> dict[tuple[str, int], float]:
-    """(driver, out-lap) -> measured loss for every fully green-flag stop.
-
-    Stops touching a SC can't be measured, and stops touching a VSC usually catch it for only
-    part of the in- or out-lap, which makes their measurement unreliable (Canada 2022: 7.9s
-    and 25.9s against an 18.9s median), so both keep the track's figure for their flag.
-    """
-    return {
-        (r["driver"], r["out_lap"]): r["loss"] for r in stop_records(laps) if r["flag"] == "green"
-    }
+    """(driver, out-lap) -> measured loss for every green-flag or VSC stop (VSC by gap
+    change). Stops touching a SC can't be measured and keep the track's SC figure."""
+    return {(r["driver"], r["out_lap"]): r["loss"] for r in stop_records(laps) if r["flag"] != "SC"}
 
 
 def pit_loss_deviations(laps: pd.DataFrame, median: float | None) -> list[float]:

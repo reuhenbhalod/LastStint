@@ -22,7 +22,11 @@ PASS_WINDOW = 2.0  # a follower within this gap (s) gets one pass roll (matches 
 FOLLOW_GAP = 0.3  # a follower that fails to pass is held this far (s) behind
 PASS_MARGIN = 0.05  # a completed pass puts the follower this far (s) ahead
 BUNCH_GAP = 0.5  # SC train spacing per car (measured on the final SC lap, 2021 races)
-SC_CLOSE_PER_LAP = 20.0  # s a gap closes per full SC lap (measured >= 15.4s)
+# SC bunching (measured on the tuning races' SCs, 259 gaps): gaps are kept on the deployment
+# lap (everyone runs the same delta), each middle SC lap keeps SC_GAP_KEEP of a gap's excess
+# over BUNCH_GAP, and the last lap before the restart is nose-to-tail (race control restarts a
+# bunched field).
+SC_GAP_KEEP = 0.34
 SC_FALLBACK = 1.6  # SC lap = this x green if not supplied
 VSC_FALLBACK = 1.35  # VSC lap = this x green if not supplied
 GOLDEN_SEEDS = list(range(1, 21))  # fixed seeds for the TS parity golden files
@@ -214,16 +218,18 @@ def simulate(model: dict, seed: int, strategies: dict | None = None) -> dict:
         if flag:
             # No overtaking under neutralization: every car ran the same neutralized lap, so
             # sorting by total time moves only cars that pitted, by their pit loss against
-            # the gaps on track. Under a SC each gap then closes by SC_CLOSE_PER_LAP down to
-            # nose-to-tail, so an early SC stop (gaps still open) is cheap while a stop into
-            # an already bunched train drops places.
+            # the gaps on track. Under a SC the gaps then close (SC_GAP_KEEP), so an early SC
+            # stop (gaps still open) is cheap while a stop into a bunched train drops places.
             live = sorted(active_codes(), key=lambda c: cars[c].total_time)
             order[:] = live + [c for c in order if cars[c].retired]
-            if flag == "SC":
+            if flag == "SC" and neutral.get(lap - 1) == "SC":
+                # Deployment lap: gaps kept (delta time). Middle laps: each gap keeps
+                # SC_GAP_KEEP of its excess. Last lap before the restart: nose-to-tail.
+                keep = 0.0 if neutral.get(lap + 1) != "SC" else SC_GAP_KEEP
                 for i in range(1, len(live)):
                     ahead, car = cars[live[i - 1]], cars[live[i]]
-                    gap = car.total_time - ahead.total_time
-                    car.total_time = ahead.total_time + max(BUNCH_GAP, gap - SC_CLOSE_PER_LAP)
+                    excess = max(0.0, car.total_time - ahead.total_time - BUNCH_GAP)
+                    car.total_time = ahead.total_time + BUNCH_GAP + keep * excess
         else:
             _resolve_order(order, cars, clean, pass_rngs, overtake, prev_time, pitted)
 
