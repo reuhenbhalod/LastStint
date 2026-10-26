@@ -1,6 +1,6 @@
 # Phase 1 Close-out Spec: Race Pool and Model Fixes
 
-Status: decisions made (Oct 25, 2026: all recommended options) · Owner: @Abhiram · Depends on: Phase 1 S1–S6 (merged), Phase 2 S7–S9 (S9 in PR #2)
+Status: superseded after Stage B by `phase-1-2-perfection-spec.md` (Oct 26, 2026) · Owner: @Abhiram · Depends on: Phase 1 S1–S6 (merged), Phase 2 S7–S9 (S9 in PR #2)
 
 ## Purpose
 
