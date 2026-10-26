@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 8,
+  "schemaVersion": 9,
   "race": {
     "id": "hungary-2022",
     "name": "Hungary 2022: Leclerc vs Verstappen",
@@ -643,7 +643,8 @@
       "laps": 2
     }
   ],
-  "decisionMoments": [
+  "decisionMoments": [],
+  "candidateMomentLaps": [
     14,
     15,
     16,

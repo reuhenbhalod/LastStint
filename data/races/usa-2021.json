@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 8,
+  "schemaVersion": 9,
   "race": {
     "id": "usa-2021",
     "name": "USA 2021: Hamilton vs Verstappen",
@@ -632,7 +632,8 @@
       "driver": "ALO"
     }
   ],
-  "decisionMoments": [
+  "decisionMoments": [],
+  "candidateMomentLaps": [
     10,
     11,
     12,

@@ -7,6 +7,8 @@ browser simulator needs, and nothing it doesn't.
 
 from __future__ import annotations
 
+import json
+
 import pandas as pd
 
 from . import SCHEMA_VERSION
@@ -14,6 +16,7 @@ from . import events as events_mod
 from . import scenario as scenario_mod
 from . import track as track_mod
 from .fit import LapTimeFit
+from .paths import MOMENTS_DIR
 from .track import TrackParams
 
 
@@ -22,6 +25,12 @@ def finishing_order(laps: pd.DataFrame) -> list[str]:
     last_rows = laps.loc[laps.groupby("Driver")["LapNumber"].idxmax()]
     ordered = last_rows.sort_values(["LapNumber", "Time"], ascending=[False, True])
     return [str(d) for d in ordered["Driver"]]
+
+
+def approved_moments(race_id: str) -> list[dict]:
+    """Approved decision moments for a race (data/moments/<race>.json), else none."""
+    path = MOMENTS_DIR / f"{race_id}.json"
+    return json.loads(path.read_text()) if path.exists() else []
 
 
 def longest_stints(laps: pd.DataFrame) -> dict[str, int]:
@@ -155,7 +164,8 @@ def assemble_race_model(
         "fuelEffectPerLap": round(fit.fuel_per_lap, 5),
         "freshTyre": {"bonus": round(fit.fresh_tyre_bonus, 4), "laps": fit.fresh_tyre_laps},
         "events": future_events,
-        "decisionMoments": moments,
+        "decisionMoments": approved_moments(race_id),
+        "candidateMomentLaps": moments,
         "realResult": finishing_order(laps),
         "userSide": user_side,
         "rival": rival,

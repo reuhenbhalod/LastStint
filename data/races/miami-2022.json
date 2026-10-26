@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 8,
+  "schemaVersion": 9,
   "race": {
     "id": "miami-2022",
     "name": "Miami 2022: Leclerc vs Verstappen",
@@ -494,7 +494,8 @@
       "driver": "VET"
     }
   ],
-  "decisionMoments": [
+  "decisionMoments": [],
+  "candidateMomentLaps": [
     23,
     25,
     27,

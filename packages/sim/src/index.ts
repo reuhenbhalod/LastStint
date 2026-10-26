@@ -32,4 +32,27 @@ export {
   realOption,
   sampleSeed,
 } from './grade.js';
-export type { Band, GradeOption, MomentGrade, OptionGrade, Target } from './grade.js';
+export type {
+  Band,
+  CallScore,
+  GradeOption,
+  MomentGrade,
+  OptionGrade,
+  RunScore,
+  Target,
+} from './grade.js';
+export { BAND_POINTS, scoreRun } from './grade.js';
+export {
+  QUALITY,
+  candidateMoments,
+  pauseAt,
+  proposeMoments,
+  verdictFor,
+} from './moments.js';
+export type {
+  DecisionMoment,
+  MomentOption,
+  MomentTrigger,
+  ProposedMoment,
+  Verdict,
+} from './moments.js';

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 8,
+  "schemaVersion": 9,
   "race": {
     "id": "france-2021",
     "name": "France 2021: Hamilton vs Verstappen",
@@ -521,7 +521,8 @@
     "laps": 3
   },
   "events": [],
-  "decisionMoments": [
+  "decisionMoments": [],
+  "candidateMomentLaps": [
     15,
     16,
     17,

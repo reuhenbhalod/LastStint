@@ -141,3 +141,47 @@ export function gradeMoment(
     }),
   };
 }
+
+/** Spec D5: points per call by band; a run's score is the mean over its graded calls. */
+export const BAND_POINTS: Record<Band, number> = { green: 100, yellow: 70, orange: 40, red: 0 };
+
+export interface CallScore {
+  lap: number;
+  optionId: string;
+  band: Band;
+  points: number;
+  /** The chosen option's chance of the target (tie-break). */
+  probability: number;
+}
+
+export interface RunScore {
+  /** 0-100: mean band points over the race's calls. */
+  score: number;
+  calls: CallScore[];
+  /** First tie-break: mean chance of the target over the chosen options. */
+  meanProbability: number;
+}
+
+/**
+ * Score a finished run from its graded moments and the option chosen at each. Ties on
+ * `score` break on `meanProbability`, then on the finishing result (the caller's to compare).
+ */
+export function scoreRun(calls: Array<{ grade: MomentGrade; chosen: string }>): RunScore {
+  const scored = calls.map(({ grade, chosen }) => {
+    const option = grade.options.find((o) => o.id === chosen);
+    if (!option) throw new Error(`option ${chosen} not graded at lap ${grade.lap}`);
+    return {
+      lap: grade.lap,
+      optionId: chosen,
+      band: option.band,
+      points: BAND_POINTS[option.band],
+      probability: option.probability,
+    };
+  });
+  const mean = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0);
+  return {
+    score: mean(scored.map((c) => c.points)),
+    calls: scored,
+    meanProbability: mean(scored.map((c) => c.probability)),
+  };
+}

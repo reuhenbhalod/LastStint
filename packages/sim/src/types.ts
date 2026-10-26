@@ -1,4 +1,6 @@
 // Core simulator types (Implementation Plan 2.1).
+
+import type { DecisionMoment } from './moments.js';
 // A run is fully defined by (race model, seed, list of decisions) — that is what the
 // Worker replays to verify a score.
 
@@ -74,7 +76,10 @@ export interface RaceModel {
   /** Bonus (s, negative = faster) on a new set's first laps after the out-lap. */
   freshTyre?: { bonus: number; laps: number };
   events: RaceEvent[];
-  decisionMoments: number[];
+  /** Approved decision moments (data/moments/<race>.json); empty until curated. */
+  decisionMoments: DecisionMoment[];
+  /** Laps where a strategic event happened (SC/VSC starts, stops): raw input for the finder. */
+  candidateMomentLaps?: number[];
   realResult: string[];
   userSide: string;
   /** The direct rival: reacts to the user's calls (rival policy); everyone else is scripted. */

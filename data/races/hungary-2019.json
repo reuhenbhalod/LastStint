@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 8,
+  "schemaVersion": 9,
   "race": {
     "id": "hungary-2019",
     "name": "Hungary 2019",
@@ -500,7 +500,8 @@
       "driver": "GRO"
     }
   ],
-  "decisionMoments": [
+  "decisionMoments": [],
+  "candidateMomentLaps": [
     22,
     26,
     28,

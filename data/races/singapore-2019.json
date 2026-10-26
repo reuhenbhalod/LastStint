@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 8,
+  "schemaVersion": 9,
   "race": {
     "id": "singapore-2019",
     "name": "Singapore 2019",
@@ -555,7 +555,8 @@
       "driver": "RAI"
     }
   ],
-  "decisionMoments": [
+  "decisionMoments": [],
+  "candidateMomentLaps": [
     16,
     19,
     20,

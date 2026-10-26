@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 8,
+  "schemaVersion": 9,
   "race": {
     "id": "portugal-2020",
     "name": "Portugal 2020",
@@ -464,7 +464,8 @@
       "driver": "STR"
     }
   ],
-  "decisionMoments": [
+  "decisionMoments": [],
+  "candidateMomentLaps": [
     37,
     41,
     42,

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 8,
+  "schemaVersion": 9,
   "race": {
     "id": "italy-2024",
     "name": "Italy 2024",
@@ -546,7 +546,8 @@
     "laps": 3
   },
   "events": [],
-  "decisionMoments": [
+  "decisionMoments": [],
+  "candidateMomentLaps": [
     12,
     13,
     15,

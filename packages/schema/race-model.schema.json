@@ -174,6 +174,38 @@
     },
     "decisionMoments": {
       "type": "array",
+      "description": "Approved decision moments (data/moments/<race>.json; proposed by the sim's moment finder, picked by a human). The calls in each option are validated by the simulator.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "lap", "trigger", "target", "options", "realOptionId"],
+        "properties": {
+          "id": { "type": "string" },
+          "lap": { "type": "integer", "minimum": 1 },
+          "trigger": { "enum": ["SC", "VSC", "rivalPit", "undercut", "cliff"] },
+          "target": { "type": "object", "required": ["kind"] },
+          "options": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 4,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["id", "label", "decisions"],
+              "properties": {
+                "id": { "type": "string" },
+                "label": { "type": "string" },
+                "decisions": { "type": "array", "items": { "type": "object" } }
+              }
+            }
+          },
+          "realOptionId": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "candidateMomentLaps": {
+      "type": "array",
+      "description": "Laps with a strategic event after takeover (SC/VSC starts, stops): input for the moment finder.",
       "items": { "type": "integer", "minimum": 1 }
     },
     "realResult": {

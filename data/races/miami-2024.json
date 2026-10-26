@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 8,
+  "schemaVersion": 9,
   "race": {
     "id": "miami-2024",
     "name": "Miami 2024",
@@ -509,7 +509,8 @@
       "driver": "SAR"
     }
   ],
-  "decisionMoments": [
+  "decisionMoments": [],
+  "candidateMomentLaps": [
     20,
     23,
     24,

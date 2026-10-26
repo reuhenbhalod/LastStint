@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 8,
+  "schemaVersion": 9,
   "race": {
     "id": "canada-2022",
     "name": "Canada 2022: Sainz vs Verstappen",
@@ -508,7 +508,8 @@
       "laps": 6
     }
   ],
-  "decisionMoments": [
+  "decisionMoments": [],
+  "candidateMomentLaps": [
     19,
     20,
     21,

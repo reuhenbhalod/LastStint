@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 8,
+  "schemaVersion": 9,
   "race": {
     "id": "austria-2019",
     "name": "Austria 2019",
@@ -517,7 +517,8 @@
     "laps": 3
   },
   "events": [],
-  "decisionMoments": [
+  "decisionMoments": [],
+  "candidateMomentLaps": [
     20,
     22,
     23,

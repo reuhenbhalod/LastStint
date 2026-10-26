@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 8,
+  "schemaVersion": 9,
   "race": {
     "id": "saudi-2022",
     "name": "Saudi Arabia 2022: Leclerc vs Verstappen",
@@ -461,7 +461,8 @@
       "driver": "ALB"
     }
   ],
-  "decisionMoments": [
+  "decisionMoments": [],
+  "candidateMomentLaps": [
     14,
     16,
     17,

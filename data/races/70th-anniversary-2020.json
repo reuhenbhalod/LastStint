@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 8,
+  "schemaVersion": 9,
   "race": {
     "id": "70th-anniversary-2020",
     "name": "70th Anniversary 2020",
@@ -617,7 +617,8 @@
       "driver": "MAG"
     }
   ],
-  "decisionMoments": [
+  "decisionMoments": [],
+  "candidateMomentLaps": [
     13,
     14,
     15,

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 8,
+  "schemaVersion": 9,
   "race": {
     "id": "mexico-2021",
     "name": "Mexico 2021: Perez vs Hamilton",
@@ -468,7 +468,8 @@
     "laps": 3
   },
   "events": [],
-  "decisionMoments": [
+  "decisionMoments": [],
+  "candidateMomentLaps": [
     30,
     31,
     32,
