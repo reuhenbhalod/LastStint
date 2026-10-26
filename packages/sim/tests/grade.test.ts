@@ -159,3 +159,29 @@ describe('planner fast path', () => {
     expect(compared).toBeGreaterThan(15);
   });
 });
+
+describe('Web Worker grading (spec D7)', () => {
+  it('a JSON job split into ranges grades exactly like gradeMoment', async () => {
+    const g = await import('../src/grade.js');
+    const run = pausedAt(abu, 52);
+    const options = [
+      { id: 'stay-out', decisions: [] },
+      { id: 'box-soft', decisions: [{ lap: 53, kind: 'pit' as const, compound: 'SOFT' }] },
+    ];
+    const direct = g.gradeMoment(run, options, { kind: 'win' }, 60);
+    const job = JSON.parse(JSON.stringify(g.gradeJob(run, options, { kind: 'win' }, 60)));
+    const parts = [
+      g.runGradeJob(job, 0, 25),
+      g.runGradeJob(job, 25, 40),
+      g.runGradeJob(job, 40, 60),
+    ];
+    expect(g.mergeGradeJobs(job, JSON.parse(JSON.stringify(parts)))).toEqual(direct);
+  });
+
+  it('rejects ranges that do not tile the samples', async () => {
+    const g = await import('../src/grade.js');
+    const run = pausedAt(abu, 52);
+    const job = g.gradeJob(run, [{ id: 'a', decisions: [] }], { kind: 'win' }, 10);
+    expect(() => g.mergeGradeJobs(job, [g.runGradeJob(job, 0, 5)])).toThrow();
+  });
+});

@@ -200,6 +200,13 @@ In a dry race each car must use at least two dry compounds. Today the player can
   - "No real choice" means no option grades orange or worse (more than 5pp behind the best). The plan's literal 0.5 points passed moments where every call won 98–100%.
   - Abu Dhabi 2021 now proposes only the lap-53 SC: box for softs 42%, mediums 39%, hards 36%, stay out (the real call) 34%.
 
+### D7 outcome (Oct 26, 2026)
+
+- Grader budget case (4 options × 300 samples × 25 laps, M-series laptop) went from 158 ms to **75 ms single-threaded**. Every step kept exact results, checked by the parity tests.
+- **The 60 ms single-thread target is not met.** What's left is mostly irreducible math: Box–Muller normals and the pass model's `exp`.
+- **Worker entry point.** `gradeJob` / `runGradeJob` / `mergeGradeJobs` grade sample ranges as plain JSON, so the UI can split one moment across Web Workers. Measured: 2 workers 42 ms, 4 workers 22 ms (near-linear). That puts a mid-range phone, assuming it's about 3× slower, at roughly 65–130 ms, within D7's 200 ms aim.
+- **Tried and reverted:** using both Box–Muller normals per draw (81 → 79 ms; it reshuffles every random sequence).
+
 ### Fixed (not decisions)
 
 - Rival policy, headset effects, and the decision-making features stay TypeScript-only. The Python sim remains the reference for real-strategy replays and golden parity.

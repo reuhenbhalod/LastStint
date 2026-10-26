@@ -21,12 +21,13 @@ import {
   type Run,
   classify,
   forkRun,
+  initRun,
   isFinished,
   planRemainingStop,
   realDecisions,
   stepLap,
 } from './sim.js';
-import type { Decision, RaceResult } from './types.js';
+import type { Decision, RaceModel, RaceResult } from './types.js';
 
 export const GRADE_SAMPLES = 300;
 export const GRADE_STREAM = 3000;
@@ -116,28 +117,42 @@ export function playOption(run: Run, seed: number, option: GradeOption): Run {
   return fork;
 }
 
-/** Grade every option at the run's current lap (a live run paused at a decision moment). */
-export function gradeMoment(
+/**
+ * Successes per option over samples [from, to). Sample i always uses sampleSeed(run, i), so
+ * ranges can be counted separately (e.g. one per Web Worker) and summed exactly.
+ */
+export function countHits(
   run: Run,
   options: GradeOption[],
   target: Target,
-  samples = GRADE_SAMPLES,
-): MomentGrade {
-  if (options.length === 0) throw new Error('no options to grade');
+  from: number,
+  to: number,
+): number[] {
   const hits = new Array<number>(options.length).fill(0);
-  for (let i = 0; i < samples; i++) {
+  for (let i = from; i < to; i++) {
     const seed = sampleSeed(run, i);
-    options.forEach((option, k) => {
-      const fork = playOption(run, seed, option);
+    for (let k = 0; k < options.length; k++) {
+      const fork = playOption(run, seed, options[k] as GradeOption);
       while (!isFinished(fork)) stepLap(fork);
       if (reachedTarget(fork, classify(fork), target)) hits[k] = (hits[k] ?? 0) + 1;
-    });
+    }
   }
+  return hits;
+}
+
+/** Turn per-option success counts into chances, bands and the best option. */
+export function gradeFromHits(
+  lap: number,
+  options: GradeOption[],
+  target: Target,
+  samples: number,
+  hits: number[],
+): MomentGrade {
   const probs = hits.map((h) => h / samples);
   const bestP = Math.max(...probs);
   const bestIdx = probs.indexOf(bestP);
   return {
-    lap: run.state.lap,
+    lap,
     samples,
     target,
     best: (options[bestIdx] as GradeOption).id,
@@ -146,6 +161,98 @@ export function gradeMoment(
       return { id: o.id, probability: probs[k] as number, behindBest, band: bandFor(behindBest) };
     }),
   };
+}
+
+/** Grade every option at the run's current lap (a live run paused at a decision moment). */
+export function gradeMoment(
+  run: Run,
+  options: GradeOption[],
+  target: Target,
+  samples = GRADE_SAMPLES,
+): MomentGrade {
+  if (options.length === 0) throw new Error('no options to grade');
+  return gradeFromHits(
+    run.state.lap,
+    options,
+    target,
+    samples,
+    countHits(run, options, target, 0, samples),
+  );
+}
+
+/**
+ * A decision moment as plain JSON, for a Web Worker (spec D7): a live Run holds class
+ * instances and Maps that don't survive structured cloning, so the worker rebuilds it from the
+ * model, seed and calls (deterministically) and grades a range of samples.
+ */
+export interface GradeJob {
+  model: RaceModel;
+  /** The run's seed (Run.seed). */
+  seed: number;
+  /** All the player's calls so far (Run.decisions), including any for laps not yet run. */
+  decisions: Decision[];
+  /** The last completed lap: the run is paused here (Run.state.lap). */
+  pausedAtLap: number;
+  options: GradeOption[];
+  target: Target;
+  samples?: number;
+}
+
+export interface GradeJobResult {
+  from: number;
+  to: number;
+  hits: number[];
+}
+
+/** Describe a paused live run's decision moment as a GradeJob. */
+export function gradeJob(
+  run: Run,
+  options: GradeOption[],
+  target: Target,
+  samples = GRADE_SAMPLES,
+): GradeJob {
+  return {
+    model: run.model,
+    seed: run.seed,
+    decisions: [...run.decisions],
+    pausedAtLap: run.state.lap,
+    options,
+    target,
+    samples,
+  };
+}
+
+/** Rebuild the paused run from a job (deterministic replay). */
+export function runFromJob(job: GradeJob): Run {
+  const run = initRun(job.model, job.seed, { decisions: job.decisions });
+  while (run.state.lap < job.pausedAtLap) stepLap(run);
+  return run;
+}
+
+/**
+ * Worker entry point: count successes for samples [from, to) of a job (default: all).
+ * Inputs and outputs are plain JSON.
+ */
+export function runGradeJob(
+  job: GradeJob,
+  from = 0,
+  to = job.samples ?? GRADE_SAMPLES,
+): GradeJobResult {
+  return { from, to, hits: countHits(runFromJob(job), job.options, job.target, from, to) };
+}
+
+/** Merge workers' ranges (which must cover 0..samples exactly once) into the moment's grade. */
+export function mergeGradeJobs(job: GradeJob, results: GradeJobResult[]): MomentGrade {
+  const samples = job.samples ?? GRADE_SAMPLES;
+  const ranges = [...results].sort((a, b) => a.from - b.from);
+  let next = 0;
+  for (const r of ranges) {
+    if (r.from !== next) throw new Error(`sample ranges must tile 0..${samples}`);
+    next = r.to;
+  }
+  if (next !== samples) throw new Error(`sample ranges must tile 0..${samples}`);
+  const hits = job.options.map((_, k) => ranges.reduce((sum, r) => sum + (r.hits[k] ?? 0), 0));
+  return gradeFromHits(job.pausedAtLap, job.options, job.target, samples, hits);
 }
 
 /** Spec D5: points per call by band; a run's score is the mean over its graded calls. */
