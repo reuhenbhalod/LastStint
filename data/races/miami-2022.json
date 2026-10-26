@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 7,
+  "schemaVersion": 8,
   "race": {
     "id": "miami-2022",
     "name": "Miami 2022: Leclerc vs Verstappen",
@@ -31,11 +31,11 @@
     ],
     "overtakeDifficulty": 0.9133,
     "overtakeModel": {
-      "intercept": -0.4513,
-      "paceCoef": 2.457,
-      "gapCoef": -2.877
+      "intercept": -0.4332,
+      "paceCoef": 2.4972,
+      "gapCoef": -2.9243
     },
-    "dirtyAirPenalty": 0.179,
+    "dirtyAirPenalty": 0.2067,
     "greenLapTime": 94.853,
     "scLapTime": 139.146,
     "vscLapTime": 106.482
@@ -43,17 +43,17 @@
   "compounds": {
     "SOFT": {
       "offset": 0.0,
-      "degPerLap": 0.04027,
+      "degPerLap": 0.03845,
       "cliffLap": 19
     },
     "MEDIUM": {
-      "offset": 0.3955,
-      "degPerLap": 0.01609,
+      "offset": 0.396,
+      "degPerLap": 0.01428,
       "cliffLap": 30
     },
     "HARD": {
-      "offset": 0.5781,
-      "degPerLap": 0.00221,
+      "offset": 0.5764,
+      "degPerLap": 0.00117,
       "cliffLap": 43
     }
   },
@@ -61,8 +61,8 @@
     {
       "code": "ALB",
       "team": "Williams",
-      "basePace": 95.9321,
-      "noise": 0.6731,
+      "basePace": 95.9566,
+      "noise": 0.6775,
       "stateAtTakeover": {
         "position": 17,
         "gapAhead": 4.578,
@@ -78,8 +78,8 @@
     {
       "code": "ALO",
       "team": "Alpine",
-      "basePace": 95.84,
-      "noise": 0.3953,
+      "basePace": 95.876,
+      "noise": 0.403,
       "stateAtTakeover": {
         "position": 11,
         "gapAhead": 4.402,
@@ -95,8 +95,8 @@
     {
       "code": "BOT",
       "team": "Alfa Romeo",
-      "basePace": 95.2514,
-      "noise": 0.6437,
+      "basePace": 95.2694,
+      "noise": 0.6414,
       "stateAtTakeover": {
         "position": 5,
         "gapAhead": 7.86,
@@ -117,8 +117,8 @@
     {
       "code": "GAS",
       "team": "AlphaTauri",
-      "basePace": 95.8346,
-      "noise": 0.8098,
+      "basePace": 95.8563,
+      "noise": 0.8043,
       "stateAtTakeover": {
         "position": 10,
         "gapAhead": 2.105,
@@ -139,8 +139,8 @@
     {
       "code": "HAM",
       "team": "Mercedes",
-      "basePace": 95.2468,
-      "noise": 0.6211,
+      "basePace": 95.2746,
+      "noise": 0.6243,
       "stateAtTakeover": {
         "position": 6,
         "gapAhead": 6.87,
@@ -161,8 +161,8 @@
     {
       "code": "LAT",
       "team": "Williams",
-      "basePace": 97.0498,
-      "noise": 0.809,
+      "basePace": 97.0857,
+      "noise": 0.823,
       "stateAtTakeover": {
         "position": 18,
         "gapAhead": 2.276,
@@ -183,8 +183,8 @@
     {
       "code": "LEC",
       "team": "Ferrari",
-      "basePace": 94.1924,
-      "noise": 0.4855,
+      "basePace": 94.2122,
+      "noise": 0.4829,
       "stateAtTakeover": {
         "position": 2,
         "gapAhead": 4.279,
@@ -205,8 +205,8 @@
     {
       "code": "MAG",
       "team": "Haas F1 Team",
-      "basePace": 95.9419,
-      "noise": 0.8126,
+      "basePace": 95.9508,
+      "noise": 0.8107,
       "stateAtTakeover": {
         "position": 14,
         "gapAhead": 1.137,
@@ -227,8 +227,8 @@
     {
       "code": "MSC",
       "team": "Haas F1 Team",
-      "basePace": 95.8095,
-      "noise": 0.6077,
+      "basePace": 95.8262,
+      "noise": 0.6071,
       "stateAtTakeover": {
         "position": 15,
         "gapAhead": 1.461,
@@ -250,8 +250,8 @@
     {
       "code": "NOR",
       "team": "McLaren",
-      "basePace": 95.8423,
-      "noise": 0.4523,
+      "basePace": 95.8579,
+      "noise": 0.4559,
       "stateAtTakeover": {
         "position": 16,
         "gapAhead": 2.452,
@@ -267,8 +267,8 @@
     {
       "code": "OCO",
       "team": "Alpine",
-      "basePace": 96.0077,
-      "noise": 0.4461,
+      "basePace": 96.0266,
+      "noise": 0.449,
       "stateAtTakeover": {
         "position": 9,
         "gapAhead": 2.625,
@@ -288,8 +288,8 @@
     {
       "code": "PER",
       "team": "Red Bull Racing",
-      "basePace": 94.7142,
-      "noise": 0.7025,
+      "basePace": 94.7629,
+      "noise": 0.702,
       "stateAtTakeover": {
         "position": 4,
         "gapAhead": 7.602,
@@ -314,8 +314,8 @@
     {
       "code": "RIC",
       "team": "McLaren",
-      "basePace": 96.1088,
-      "noise": 0.6452,
+      "basePace": 96.1387,
+      "noise": 0.6492,
       "stateAtTakeover": {
         "position": 8,
         "gapAhead": 6.458,
@@ -340,8 +340,8 @@
     {
       "code": "RUS",
       "team": "Mercedes",
-      "basePace": 95.3609,
-      "noise": 0.7865,
+      "basePace": 95.4053,
+      "noise": 0.788,
       "stateAtTakeover": {
         "position": 7,
         "gapAhead": 13.082,
@@ -361,8 +361,8 @@
     {
       "code": "SAI",
       "team": "Ferrari",
-      "basePace": 94.5937,
-      "noise": 0.3392,
+      "basePace": 94.6387,
+      "noise": 0.3406,
       "stateAtTakeover": {
         "position": 3,
         "gapAhead": 4.042,
@@ -383,8 +383,8 @@
     {
       "code": "STR",
       "team": "Aston Martin",
-      "basePace": 95.9963,
-      "noise": 0.5728,
+      "basePace": 96.0135,
+      "noise": 0.5684,
       "stateAtTakeover": {
         "position": 12,
         "gapAhead": 1.158,
@@ -404,8 +404,8 @@
     {
       "code": "TSU",
       "team": "AlphaTauri",
-      "basePace": 96.1936,
-      "noise": 0.7155,
+      "basePace": 96.2179,
+      "noise": 0.7105,
       "stateAtTakeover": {
         "position": 19,
         "gapAhead": 1.712,
@@ -426,8 +426,8 @@
     {
       "code": "VER",
       "team": "Red Bull Racing",
-      "basePace": 94.076,
-      "noise": 0.278,
+      "basePace": 94.1021,
+      "noise": 0.2781,
       "stateAtTakeover": {
         "position": 1,
         "gapAhead": 0.0,
@@ -448,8 +448,8 @@
     {
       "code": "VET",
       "team": "Aston Martin",
-      "basePace": 96.2369,
-      "noise": 0.8058,
+      "basePace": 96.2508,
+      "noise": 0.8044,
       "stateAtTakeover": {
         "position": 13,
         "gapAhead": 0.71,
@@ -467,7 +467,11 @@
       ]
     }
   ],
-  "fuelEffectPerLap": 0.05637,
+  "fuelEffectPerLap": 0.05646,
+  "freshTyre": {
+    "bonus": -0.1386,
+    "laps": 3
+  },
   "events": [
     {
       "lap": 41,

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 7,
+  "schemaVersion": 8,
   "race": {
     "id": "italy-2024",
     "name": "Italy 2024",
@@ -46,37 +46,37 @@
     ],
     "overtakeDifficulty": 0.9159,
     "overtakeModel": {
-      "intercept": 0.5463,
-      "paceCoef": 2.3064,
-      "gapCoef": -6.7091
+      "intercept": 0.6114,
+      "paceCoef": 2.2175,
+      "gapCoef": -6.7261
     },
-    "dirtyAirPenalty": 0.1881,
+    "dirtyAirPenalty": 0.2428,
     "greenLapTime": 84.891
   },
   "compounds": {
     "SOFT": {
       "offset": 0.0,
-      "degPerLap": 0.08163,
+      "degPerLap": 0.07841,
       "cliffLap": 2
     },
     "MEDIUM": {
-      "offset": 0.4156,
-      "degPerLap": 0.05681,
+      "offset": 0.413,
+      "degPerLap": 0.05356,
       "cliffLap": 21
     },
     "HARD": {
-      "offset": 0.5497,
-      "degPerLap": 0.02414,
+      "offset": 0.5444,
+      "degPerLap": 0.02113,
       "cliffLap": 10,
-      "cliffDegPerLap": 0.0323
+      "cliffDegPerLap": 0.0347
     }
   },
   "drivers": [
     {
       "code": "ALB",
       "team": "Williams",
-      "basePace": 85.6464,
-      "noise": 0.4643,
+      "basePace": 85.6828,
+      "noise": 0.4698,
       "stateAtTakeover": {
         "position": 8,
         "gapAhead": 8.214,
@@ -97,8 +97,8 @@
     {
       "code": "ALO",
       "team": "Aston Martin",
-      "basePace": 85.4751,
-      "noise": 0.3534,
+      "basePace": 85.5036,
+      "noise": 0.3617,
       "stateAtTakeover": {
         "position": 11,
         "gapAhead": 0.489,
@@ -124,8 +124,8 @@
     {
       "code": "BOT",
       "team": "Kick Sauber",
-      "basePace": 86.2734,
-      "noise": 0.6747,
+      "basePace": 86.3134,
+      "noise": 0.6746,
       "stateAtTakeover": {
         "position": 14,
         "gapAhead": 1.31,
@@ -146,8 +146,8 @@
     {
       "code": "COL",
       "team": "Williams",
-      "basePace": 85.8028,
-      "noise": 0.5177,
+      "basePace": 85.8389,
+      "noise": 0.5204,
       "stateAtTakeover": {
         "position": 13,
         "gapAhead": 3.207,
@@ -168,8 +168,8 @@
     {
       "code": "GAS",
       "team": "Alpine",
-      "basePace": 85.999,
-      "noise": 0.6449,
+      "basePace": 86.0612,
+      "noise": 0.6365,
       "stateAtTakeover": {
         "position": 17,
         "gapAhead": 3.549,
@@ -191,8 +191,8 @@
     {
       "code": "HAM",
       "team": "Mercedes",
-      "basePace": 84.5606,
-      "noise": 0.6342,
+      "basePace": 84.5938,
+      "noise": 0.6453,
       "stateAtTakeover": {
         "position": 5,
         "gapAhead": 2.096,
@@ -218,8 +218,8 @@
     {
       "code": "HUL",
       "team": "Haas F1 Team",
-      "basePace": 85.6989,
-      "noise": 0.8407,
+      "basePace": 85.7303,
+      "noise": 0.8402,
       "stateAtTakeover": {
         "position": 19,
         "gapAhead": 6.73,
@@ -241,8 +241,8 @@
     {
       "code": "LEC",
       "team": "Ferrari",
-      "basePace": 84.4104,
-      "noise": 0.2793,
+      "basePace": 84.4732,
+      "noise": 0.2921,
       "stateAtTakeover": {
         "position": 2,
         "gapAhead": 1.996,
@@ -263,8 +263,8 @@
     {
       "code": "MAG",
       "team": "Haas F1 Team",
-      "basePace": 85.4229,
-      "noise": 0.5613,
+      "basePace": 85.4617,
+      "noise": 0.57,
       "stateAtTakeover": {
         "position": 9,
         "gapAhead": 3.394,
@@ -285,8 +285,8 @@
     {
       "code": "NOR",
       "team": "McLaren",
-      "basePace": 84.2979,
-      "noise": 0.547,
+      "basePace": 84.3323,
+      "noise": 0.5563,
       "stateAtTakeover": {
         "position": 3,
         "gapAhead": 1.123,
@@ -312,8 +312,8 @@
     {
       "code": "OCO",
       "team": "Alpine",
-      "basePace": 86.1803,
-      "noise": 0.4997,
+      "basePace": 86.2261,
+      "noise": 0.5016,
       "stateAtTakeover": {
         "position": 10,
         "gapAhead": 1.354,
@@ -334,8 +334,8 @@
     {
       "code": "PER",
       "team": "Red Bull Racing",
-      "basePace": 85.135,
-      "noise": 0.6127,
+      "basePace": 85.1847,
+      "noise": 0.6224,
       "stateAtTakeover": {
         "position": 7,
         "gapAhead": 1.842,
@@ -361,8 +361,8 @@
     {
       "code": "PIA",
       "team": "McLaren",
-      "basePace": 84.3045,
-      "noise": 0.3995,
+      "basePace": 84.3434,
+      "noise": 0.4064,
       "stateAtTakeover": {
         "position": 1,
         "gapAhead": 0.0,
@@ -388,8 +388,8 @@
     {
       "code": "RIC",
       "team": "RB",
-      "basePace": 85.5062,
-      "noise": 0.3711,
+      "basePace": 85.5396,
+      "noise": 0.3838,
       "stateAtTakeover": {
         "position": 18,
         "gapAhead": 4.651,
@@ -411,8 +411,8 @@
     {
       "code": "RUS",
       "team": "Mercedes",
-      "basePace": 84.7927,
-      "noise": 0.6147,
+      "basePace": 84.8619,
+      "noise": 0.6171,
       "stateAtTakeover": {
         "position": 16,
         "gapAhead": 13.144,
@@ -439,8 +439,8 @@
     {
       "code": "SAI",
       "team": "Ferrari",
-      "basePace": 84.7763,
-      "noise": 0.4195,
+      "basePace": 84.8201,
+      "noise": 0.4318,
       "stateAtTakeover": {
         "position": 4,
         "gapAhead": 3.041,
@@ -461,8 +461,8 @@
     {
       "code": "STR",
       "team": "Aston Martin",
-      "basePace": 85.7681,
-      "noise": 0.7167,
+      "basePace": 85.8052,
+      "noise": 0.7192,
       "stateAtTakeover": {
         "position": 12,
         "gapAhead": 2.227,
@@ -493,8 +493,8 @@
     {
       "code": "VER",
       "team": "Red Bull Racing",
-      "basePace": 84.7892,
-      "noise": 0.3863,
+      "basePace": 84.8261,
+      "noise": 0.3888,
       "stateAtTakeover": {
         "position": 6,
         "gapAhead": 1.597,
@@ -520,8 +520,8 @@
     {
       "code": "ZHO",
       "team": "Kick Sauber",
-      "basePace": 86.3535,
-      "noise": 0.7856,
+      "basePace": 86.3951,
+      "noise": 0.7884,
       "stateAtTakeover": {
         "position": 15,
         "gapAhead": 1.662,
@@ -540,7 +540,11 @@
       ]
     }
   ],
-  "fuelEffectPerLap": 0.06171,
+  "fuelEffectPerLap": 0.06163,
+  "freshTyre": {
+    "bonus": -0.1405,
+    "laps": 3
+  },
   "events": [],
   "decisionMoments": [
     12,

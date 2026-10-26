@@ -122,7 +122,20 @@ export function passProbability(
 
 /** Model (noise-free) lap time for a car on this lap: pace + tyres - fuel. */
 export function cleanLap(model: RaceModel, car: CarState, lap: number): number {
-  return tyreLapTime(model, car.basePace, car.compound, car.tyreWear, lap);
+  return (
+    tyreLapTime(model, car.basePace, car.compound, car.tyreWear, lap) +
+    freshTyreDelta(model, car.tyreAge)
+  );
+}
+
+/**
+ * Fresh-tyre bonus by tyre age (0 = the out-lap): full on the first lap after the out-lap,
+ * fading linearly over freshTyre.laps laps. Mirrors fresh_weight_sim in the Python sim.
+ */
+export function freshTyreDelta(model: RaceModel, tyreAge: number): number {
+  const f = model.freshTyre;
+  if (!f || tyreAge < 1) return 0;
+  return f.bonus * Math.min(1, Math.max(0, (f.laps + 1 - tyreAge) / f.laps));
 }
 
 /** The lap-time model for a given pace, compound and tyre wear (laps) on this lap. */
@@ -457,12 +470,14 @@ function predictedRemaining(
   const wearMult = modeWearMult(run, car);
   let compound = car.compound;
   let wear = car.tyreWear;
+  let age = car.tyreAge;
   let total = 0;
   for (let lap = fromLap + 1; lap <= model.race.laps; lap++) {
     const flag = run.neutral.get(lap);
     if (stop && lap === stop.lap) {
       compound = stop.to;
       wear = 0;
+      age = 0;
       const { track } = model;
       total +=
         flag === 'sc'
@@ -471,8 +486,11 @@ function predictedRemaining(
             ? track.pitLossUnderVSC
             : track.pitLoss;
     }
-    if (!flag) total += tyreLapTime(model, car.basePace, compound, wear, lap);
+    if (!flag) {
+      total += tyreLapTime(model, car.basePace, compound, wear, lap) + freshTyreDelta(model, age);
+    }
     wear += flag ? 1 : wearMult;
+    age += 1;
   }
   return total;
 }

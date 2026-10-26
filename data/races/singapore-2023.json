@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 7,
+  "schemaVersion": 8,
   "race": {
     "id": "singapore-2023",
     "name": "Singapore 2023",
@@ -20,11 +20,11 @@
     ],
     "overtakeDifficulty": 0.9486,
     "overtakeModel": {
-      "intercept": -0.5231,
-      "paceCoef": 1.1458,
-      "gapCoef": -3.9245
+      "intercept": -0.5508,
+      "paceCoef": 1.1608,
+      "gapCoef": -3.9025
     },
-    "dirtyAirPenalty": 0.208,
+    "dirtyAirPenalty": 0.2116,
     "greenLapTime": 100.414,
     "scLapTime": 142.499,
     "vscLapTime": 116.357
@@ -32,28 +32,28 @@
   "compounds": {
     "SOFT": {
       "offset": 0.0,
-      "degPerLap": 0.05316,
+      "degPerLap": 0.05224,
       "cliffLap": 23
     },
     "MEDIUM": {
-      "offset": 0.4163,
-      "degPerLap": 0.03076,
+      "offset": 0.4174,
+      "degPerLap": 0.02984,
       "cliffLap": 20,
-      "cliffDegPerLap": 0.2051
+      "cliffDegPerLap": 0.2059
     },
     "HARD": {
-      "offset": 1.0482,
-      "degPerLap": 0.02469,
+      "offset": 1.0466,
+      "degPerLap": 0.02419,
       "cliffLap": 32,
-      "cliffDegPerLap": 0.1886
+      "cliffDegPerLap": 0.1899
     }
   },
   "drivers": [
     {
       "code": "ALB",
       "team": "Williams",
-      "basePace": 101.2164,
-      "noise": 0.9107,
+      "basePace": 101.2394,
+      "noise": 0.9164,
       "stateAtTakeover": {
         "position": 15,
         "gapAhead": 1.605,
@@ -77,8 +77,8 @@
     {
       "code": "ALO",
       "team": "Aston Martin",
-      "basePace": 100.9511,
-      "noise": 1.0152,
+      "basePace": 100.9606,
+      "noise": 1.0207,
       "stateAtTakeover": {
         "position": 6,
         "gapAhead": 2.699,
@@ -102,8 +102,8 @@
     {
       "code": "BOT",
       "team": "Alfa Romeo",
-      "basePace": 100.8801,
-      "noise": 1.1677,
+      "basePace": 100.8979,
+      "noise": 1.1701,
       "stateAtTakeover": {
         "position": 17,
         "gapAhead": 3.908,
@@ -124,8 +124,8 @@
     {
       "code": "GAS",
       "team": "Alpine",
-      "basePace": 100.7602,
-      "noise": 0.9901,
+      "basePace": 100.7659,
+      "noise": 0.9944,
       "stateAtTakeover": {
         "position": 11,
         "gapAhead": 0.555,
@@ -145,8 +145,8 @@
     {
       "code": "HAM",
       "team": "Mercedes",
-      "basePace": 100.1494,
-      "noise": 0.9447,
+      "basePace": 100.1566,
+      "noise": 0.9506,
       "stateAtTakeover": {
         "position": 5,
         "gapAhead": 1.651,
@@ -170,8 +170,8 @@
     {
       "code": "HUL",
       "team": "Haas F1 Team",
-      "basePace": 101.2703,
-      "noise": 0.8663,
+      "basePace": 101.2783,
+      "noise": 0.8706,
       "stateAtTakeover": {
         "position": 10,
         "gapAhead": 0.949,
@@ -191,8 +191,8 @@
     {
       "code": "LAW",
       "team": "AlphaTauri",
-      "basePace": 101.1714,
-      "noise": 0.7801,
+      "basePace": 101.1862,
+      "noise": 0.7852,
       "stateAtTakeover": {
         "position": 12,
         "gapAhead": 1.571,
@@ -212,8 +212,8 @@
     {
       "code": "LEC",
       "team": "Ferrari",
-      "basePace": 100.1975,
-      "noise": 0.8916,
+      "basePace": 100.2048,
+      "noise": 0.8998,
       "stateAtTakeover": {
         "position": 2,
         "gapAhead": 2.57,
@@ -233,8 +233,8 @@
     {
       "code": "MAG",
       "team": "Haas F1 Team",
-      "basePace": 101.051,
-      "noise": 0.8842,
+      "basePace": 101.066,
+      "noise": 0.8887,
       "stateAtTakeover": {
         "position": 9,
         "gapAhead": 3.808,
@@ -258,8 +258,8 @@
     {
       "code": "NOR",
       "team": "McLaren",
-      "basePace": 100.087,
-      "noise": 0.6888,
+      "basePace": 100.1016,
+      "noise": 0.6974,
       "stateAtTakeover": {
         "position": 4,
         "gapAhead": 1.251,
@@ -279,8 +279,8 @@
     {
       "code": "OCO",
       "team": "Alpine",
-      "basePace": 100.8057,
-      "noise": 0.895,
+      "basePace": 100.8255,
+      "noise": 0.9026,
       "stateAtTakeover": {
         "position": 7,
         "gapAhead": 1.43,
@@ -300,8 +300,8 @@
     {
       "code": "PER",
       "team": "Red Bull Racing",
-      "basePace": 100.4376,
-      "noise": 1.1236,
+      "basePace": 100.4523,
+      "noise": 1.124,
       "stateAtTakeover": {
         "position": 13,
         "gapAhead": 0.796,
@@ -322,8 +322,8 @@
     {
       "code": "PIA",
       "team": "McLaren",
-      "basePace": 100.9,
-      "noise": 1.0207,
+      "basePace": 100.9056,
+      "noise": 1.0254,
       "stateAtTakeover": {
         "position": 14,
         "gapAhead": 1.328,
@@ -343,8 +343,8 @@
     {
       "code": "RUS",
       "team": "Mercedes",
-      "basePace": 100.0968,
-      "noise": 0.7795,
+      "basePace": 100.1104,
+      "noise": 0.7801,
       "stateAtTakeover": {
         "position": 3,
         "gapAhead": 2.165,
@@ -368,8 +368,8 @@
     {
       "code": "SAI",
       "team": "Ferrari",
-      "basePace": 100.0349,
-      "noise": 0.6764,
+      "basePace": 100.0459,
+      "noise": 0.6822,
       "stateAtTakeover": {
         "position": 1,
         "gapAhead": 0.0,
@@ -389,8 +389,8 @@
     {
       "code": "SAR",
       "team": "Williams",
-      "basePace": 100.9263,
-      "noise": 0.5649,
+      "basePace": 100.9366,
+      "noise": 0.5658,
       "stateAtTakeover": {
         "position": 16,
         "gapAhead": 3.006,
@@ -414,8 +414,8 @@
     {
       "code": "VER",
       "team": "Red Bull Racing",
-      "basePace": 100.0239,
-      "noise": 0.7698,
+      "basePace": 100.0343,
+      "noise": 0.7704,
       "stateAtTakeover": {
         "position": 8,
         "gapAhead": 1.693,
@@ -436,8 +436,8 @@
     {
       "code": "ZHO",
       "team": "Alfa Romeo",
-      "basePace": 100.5153,
-      "noise": 1.3704,
+      "basePace": 100.5199,
+      "noise": 1.3692,
       "stateAtTakeover": {
         "position": 18,
         "gapAhead": 15.871,
@@ -456,7 +456,11 @@
       ]
     }
   ],
-  "fuelEffectPerLap": 0.05896,
+  "fuelEffectPerLap": 0.05895,
+  "freshTyre": {
+    "bonus": -0.1185,
+    "laps": 3
+  },
   "events": [
     {
       "lap": 20,

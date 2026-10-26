@@ -48,9 +48,17 @@ class Car:
     laps_done: int = 0
 
 
-def _clean_lap(car: Car, compounds: dict, fuel_per_lap: float, lap: int) -> float:
+def fresh_weight_sim(tyre_age: int, laps: int) -> float:
+    """Fresh-tyre weight by sim tyre age (0 = the out-lap): 1 on the first lap after the out-lap,
+    fading linearly over `laps` laps (FastF1 TyreLife = sim age + 1 on a new set)."""
+    return min(1.0, max(0.0, (laps + 1 - tyre_age) / laps)) if tyre_age >= 1 else 0.0
+
+
+def _clean_lap(car: Car, compounds: dict, fuel_per_lap: float, lap: int, fresh=None) -> float:
     c = compounds[car.compound]
     t = car.base_pace + c["offset"] + c["degPerLap"] * car.tyre_age - fuel_per_lap * lap
+    if fresh:
+        t += fresh["bonus"] * fresh_weight_sim(car.tyre_age, fresh["laps"])
     if car.tyre_age > c["cliffLap"]:  # past the cliff: wear accelerates
         extra = c.get("cliffDegPerLap", CLIFF_FALLBACK * c["degPerLap"])
         t += extra * (car.tyre_age - c["cliffLap"])
@@ -114,6 +122,7 @@ def simulate(model: dict, seed: int, strategies: dict | None = None) -> dict:
     track = model["track"]
     compounds = model["compounds"]
     fuel = model["fuelEffectPerLap"]
+    fresh_tyre = model.get("freshTyre")
     total_laps = int(model["race"]["laps"])
     takeover = int(model["race"]["takeoverLap"])
     overtake = track["overtakeModel"]
@@ -185,12 +194,14 @@ def simulate(model: dict, seed: int, strategies: dict | None = None) -> dict:
             elif flag == "RED" and green:
                 lt = green
             else:
-                lt = _clean_lap(car, compounds, fuel, lap) + noise_rngs[code].normal(car.noise)
+                lt = _clean_lap(car, compounds, fuel, lap, fresh_tyre) + noise_rngs[code].normal(
+                    car.noise
+                )
                 ahead = _car_ahead(order, code, cars)
                 ahead_gap = car.total_time - prev_time.get(ahead, car.total_time)
                 if 0 < ahead_gap < DIRTY_AIR_RANGE:
                     lt += dirty_air
-            clean[code] = _clean_lap(car, compounds, fuel, lap)
+            clean[code] = _clean_lap(car, compounds, fuel, lap, fresh_tyre)
             car.total_time += lt + pit_cost
             car.tyre_age += 1
             car.laps_done = lap

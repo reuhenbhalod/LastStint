@@ -47,6 +47,8 @@ class LapTimeFit:
     n_obs: int
     # per compound (cliff age, extra s/lap past it), or None when no cliff was fitted
     compound_cliff: dict[str, tuple[int, float] | None] = field(default_factory=dict)
+    fresh_tyre_bonus: float = 0.0  # s at full weight on the first clean lap of a new set
+    fresh_tyre_laps: int = 3
     prior_notes: list[str] = field(default_factory=list)  # where the prior decided a step
 
 
@@ -64,6 +66,13 @@ def _solve(x: np.ndarray, y: np.ndarray, lower: np.ndarray):
     return lsq_linear(x, y, bounds=(lower, np.full_like(lower, np.inf))).x
 
 
+def fresh_weight(tyre_life, laps: int = 3):
+    """Weight of the fresh-tyre bonus by FastF1 TyreLife: 1 on the first clean lap after the
+    out-lap (TyreLife 2), fading linearly to 0 over `laps` laps."""
+    age = np.asarray(tyre_life, dtype=float)
+    return np.clip((laps + 2 - age) / laps, 0.0, 1.0) * (age >= 2)
+
+
 def _cliff_term(df: pd.DataFrame, compound_cliff: dict) -> pd.Series:
     """Extra seconds from each lap's compound cliff (0 before the cliff or with none)."""
     extra = pd.Series(0.0, index=df.index)
@@ -75,7 +84,9 @@ def _cliff_term(df: pd.DataFrame, compound_cliff: dict) -> pd.Series:
     return extra
 
 
-def _driver_pace_from(laps, compound_offset, compound_wear, fuel_per_lap, compound_cliff):
+def _driver_pace_from(
+    laps, compound_offset, compound_wear, fuel_per_lap, compound_cliff, fresh=(0.0, 3)
+):
     """Per-driver base pace and noise from the tyre/fuel-adjusted laps given.
 
     Using all green racing laps (not just the cleanest) captures true race-pace spread:
@@ -88,6 +99,7 @@ def _driver_pace_from(laps, compound_offset, compound_wear, fuel_per_lap, compou
         - df["Compound"].map(compound_offset).astype(float)
         - df["Compound"].map(compound_wear).astype(float) * df["TyreLife"].astype(float)
         - _cliff_term(df, compound_cliff)
+        - fresh[0] * fresh_weight(df["TyreLife"], fresh[1])
         + fuel_per_lap * df["LapNumber"].astype(float)
     )
     df = df.assign(_base=base)
@@ -137,6 +149,10 @@ def _fit_core(df, drivers, ordered, free, reference, prior, cliff_ages) -> _Core
         add(age * (comp == c), f"wear::{c}", 0.0)
     for c, k in cliff_ages.items():  # extra wear past the cliff, fitted jointly
         add(np.maximum(0.0, age - k) * (comp == c), f"cliff::{c}", 0.0)
+    fresh = prior.get("freshTyre")
+    if fresh:  # bonus on a new set's first clean laps, shrunk toward the pooled prior
+        scale = float(np.sqrt(fresh["pseudoLaps"] / prior["pseudoLaps"]))
+        add(fresh_weight(age, fresh["laps"]), "fresh", -np.inf, fresh["bonus"], scale)
     add(-df["LapNumber"].astype(float).to_numpy(), "fuel")
 
     x = np.column_stack(cols)
@@ -257,6 +273,8 @@ def fit_lap_model(
         for c in present
     }
     fuel_per_lap = float(params["fuel"])
+    fresh_laps = int(prior.get("freshTyre", {}).get("laps", 3))
+    fresh_bonus = float(params.get("fresh", 0.0))
 
     notes = []
     collapsed = "no separation in data, prior used"
@@ -272,7 +290,12 @@ def fit_lap_model(
 
     if pace_laps is not None:
         driver_pace, driver_noise = _driver_pace_from(
-            pace_laps, compound_offset, compound_wear, fuel_per_lap, compound_cliff
+            pace_laps,
+            compound_offset,
+            compound_wear,
+            fuel_per_lap,
+            compound_cliff,
+            (fresh_bonus, fresh_laps),
         )
     else:
         driver_pace = {d: float(params[f"drv::{d}"]) for d in drivers}
@@ -289,6 +312,8 @@ def fit_lap_model(
         r_squared=r_squared,
         n_obs=int(len(df)),
         compound_cliff=compound_cliff,
+        fresh_tyre_bonus=fresh_bonus,
+        fresh_tyre_laps=fresh_laps,
         prior_notes=notes,
     )
 
@@ -303,4 +328,5 @@ def predict(fit: LapTimeFit, driver: str, compound: str, tyre_age: float, lap: f
         + fit.compound_wear.get(compound, 0.0) * tyre_age
         + cliff
         - fit.fuel_per_lap * lap
+        + fit.fresh_tyre_bonus * float(fresh_weight(tyre_age, fit.fresh_tyre_laps))
     )

@@ -71,6 +71,8 @@ export interface RaceModel {
   compounds: Record<Compound, CompoundModel>;
   drivers: DriverModel[];
   fuelEffectPerLap: number;
+  /** Bonus (s, negative = faster) on a new set's first laps after the out-lap. */
+  freshTyre?: { bonus: number; laps: number };
   events: RaceEvent[];
   decisionMoments: number[];
   realResult: string[];

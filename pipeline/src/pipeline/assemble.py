@@ -153,6 +153,7 @@ def assemble_race_model(
         "compounds": compounds,
         "drivers": drivers,
         "fuelEffectPerLap": round(fit.fuel_per_lap, 5),
+        "freshTyre": {"bonus": round(fit.fresh_tyre_bonus, 4), "laps": fit.fresh_tyre_laps},
         "events": future_events,
         "decisionMoments": moments,
         "realResult": finishing_order(laps),

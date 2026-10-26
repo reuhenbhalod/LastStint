@@ -13,6 +13,7 @@
     "compounds",
     "drivers",
     "fuelEffectPerLap",
+    "freshTyre",
     "events",
     "decisionMoments",
     "realResult",
@@ -144,6 +145,16 @@
             }
           }
         }
+      }
+    },
+    "freshTyre": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bonus", "laps"],
+      "description": "Lap-time bonus (s, negative = faster) on a new set's first laps after the out-lap: full weight on the first, fading linearly over `laps` laps.",
+      "properties": {
+        "bonus": { "type": "number" },
+        "laps": { "type": "integer", "minimum": 1 }
       }
     },
     "fuelEffectPerLap": { "type": "number", "minimum": 0 },
