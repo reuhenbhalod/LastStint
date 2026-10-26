@@ -6,9 +6,22 @@
 // Common random numbers: sample i of every option forks the race with the same seed, so the
 // options face identical luck and their difference is far less noisy at the same N. Seeds
 // derive from the run's seed and the moment's lap, so the server reproduces every grade.
+//
+// After an option's calls, the player's car follows a "sensible strategist" continuation in
+// every playout: the model-planned best of no more stops or one stop (planRemainingStop).
+// The spec doesn't define the continuation; this choice is recorded in the implementation
+// plan (2.7).
 
 import { deriveSeed } from './rng.js';
-import { type Run, classify, forkRun, isFinished, stepLap } from './sim.js';
+import {
+  type Run,
+  classify,
+  forkRun,
+  isFinished,
+  planRemainingStop,
+  realDecisions,
+  stepLap,
+} from './sim.js';
 import type { Decision, RaceResult } from './types.js';
 
 export const GRADE_SAMPLES = 300;
@@ -63,9 +76,38 @@ export function reachedTarget(run: Run, result: RaceResult, target: Target): boo
   return result.finishers.includes(user) && pos < rivalPos;
 }
 
+/**
+ * The real team's call at this moment, as an option to grade alongside the player's: a stop
+ * if the real team boxed on this lap (realDecisions), otherwise staying out.
+ */
+export function realOption(run: Run, lap: number): GradeOption {
+  const calls = realDecisions(run.model).filter((d) => d.lap === lap);
+  return { id: 'real', decisions: calls };
+}
+
 /** Seed of sample i at this moment: shared by every option (common random numbers). */
 export function sampleSeed(run: Run, i: number): number {
   return deriveSeed(deriveSeed(run.seed, GRADE_STREAM + run.state.lap), i);
+}
+
+/**
+ * Fork the run for one sample of one option: apply the option's calls, run until the last of
+ * them has taken effect (a pit call is charged the lap after it), then hand the player's car
+ * to the sensible-strategist continuation (planRemainingStop) for the rest of the race.
+ */
+export function playOption(run: Run, seed: number, option: GradeOption): Run {
+  const fork = forkRun(run, seed, option.decisions);
+  const settled = Math.max(
+    run.state.lap,
+    ...option.decisions.map((d) => (d.kind === 'pit' ? d.lap + 1 : d.lap)),
+  );
+  while (fork.state.lap < settled && !isFinished(fork)) stepLap(fork);
+  const user = fork.state.cars[fork.model.userSide];
+  if (user && !isFinished(fork) && !user.strategy.some((s) => s.lap > fork.state.lap)) {
+    const stop = planRemainingStop(fork);
+    if (stop) user.strategy.push(stop);
+  }
+  return fork;
 }
 
 /** Grade every option at the run's current lap (a live run paused at a decision moment). */
@@ -80,7 +122,7 @@ export function gradeMoment(
   for (let i = 0; i < samples; i++) {
     const seed = sampleSeed(run, i);
     options.forEach((option, k) => {
-      const fork = forkRun(run, seed, option.decisions);
+      const fork = playOption(run, seed, option);
       while (!isFinished(fork)) stepLap(fork);
       if (reachedTarget(fork, classify(fork), target)) hits[k] = (hits[k] ?? 0) + 1;
     });

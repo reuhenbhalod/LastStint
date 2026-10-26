@@ -104,10 +104,20 @@ export function passProbability(
 
 /** Model (noise-free) lap time for a car on this lap: pace + tyres - fuel. */
 export function cleanLap(model: RaceModel, car: CarState, lap: number): number {
-  const c = model.compounds[car.compound];
-  if (!c) throw new Error(`no compound model for ${car.compound}`);
-  const wear = car.tyreWear;
-  let t = car.basePace + c.offset + c.degPerLap * wear - model.fuelEffectPerLap * lap;
+  return tyreLapTime(model, car.basePace, car.compound, car.tyreWear, lap);
+}
+
+/** The lap-time model for a given pace, compound and tyre wear (laps) on this lap. */
+function tyreLapTime(
+  model: RaceModel,
+  basePace: number,
+  compound: string,
+  wear: number,
+  lap: number,
+): number {
+  const c = model.compounds[compound];
+  if (!c) throw new Error(`no compound model for ${compound}`);
+  let t = basePace + c.offset + c.degPerLap * wear - model.fuelEffectPerLap * lap;
   if (wear > c.cliffLap) {
     const extra = c.cliffDegPerLap ?? CLIFF_FALLBACK * c.degPerLap;
     t += extra * (wear - c.cliffLap);
@@ -397,6 +407,67 @@ function rivalGoesLong(run: Run, lap: number): void {
     driver: rival.code,
     detail: laterLap < model.race.laps ? `stop moved to lap ${laterLap}` : 'no stop',
   });
+}
+
+/**
+ * Predicted time for `car` to run laps (fromLap, laps] with at most one more stop, from the
+ * lap-time model alone (no noise, traffic or rivals): `stop` is the out-lap and compound, or
+ * null for no stop. Neutralized laps cost the same whatever the tyres, so they are skipped;
+ * a stop pays the pit loss for its lap's flag. Wear advances as in stepLap.
+ */
+function predictedRemaining(
+  run: Run,
+  car: CarState,
+  fromLap: number,
+  stop: PitStop | null,
+): number {
+  const { model } = run;
+  const wearMult = modeWearMult(run, car);
+  let compound = car.compound;
+  let wear = car.tyreWear;
+  let total = 0;
+  for (let lap = fromLap + 1; lap <= model.race.laps; lap++) {
+    const flag = run.neutral.get(lap);
+    if (stop && lap === stop.lap) {
+      compound = stop.to;
+      wear = 0;
+      const { track } = model;
+      total +=
+        flag === 'sc'
+          ? track.pitLossUnderSC
+          : flag === 'vsc'
+            ? track.pitLossUnderVSC
+            : track.pitLoss;
+    }
+    if (!flag) total += tyreLapTime(model, car.basePace, compound, wear, lap);
+    wear += flag ? 1 : wearMult;
+  }
+  return total;
+}
+
+/**
+ * The "sensible strategist" continuation the grader uses for the player's car after a graded
+ * option (decision recorded in the implementation plan, 2.7): from the current state, the
+ * best of no more stops or one stop at any remaining lap on any compound, by predicted time.
+ * Deterministic and the same for every option, so options are compared on the call alone.
+ * Returns the stop (out-lap, compound) or null; it never plans more than one stop.
+ */
+export function planRemainingStop(run: Run): PitStop | null {
+  const { model, state } = run;
+  const user = state.cars[model.userSide];
+  if (!user || user.retired) return null;
+  let best: PitStop | null = null;
+  let bestTime = predictedRemaining(run, user, state.lap, null);
+  for (let lap = state.lap + 1; lap < model.race.laps; lap++) {
+    for (const to of Object.keys(model.compounds)) {
+      const t = predictedRemaining(run, user, state.lap, { lap, to });
+      if (t < bestTime) {
+        bestTime = t;
+        best = { lap, to };
+      }
+    }
+  }
+  return best;
 }
 
 /** True once the chequered flag has fallen. */
