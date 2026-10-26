@@ -16,7 +16,7 @@ from dataclasses import dataclass, field
 
 import pandas as pd
 
-from .clean import gap_to_car_ahead
+from .clean import gap_to_car_ahead, tyre_change_out_laps
 from .fit import LapTimeFit, predict
 
 
@@ -47,12 +47,16 @@ def _is_neutralized(status_value: object) -> bool:
 
 
 def pit_stops(laps: pd.DataFrame) -> list[tuple[str, pd.Series, pd.Series]]:
-    """Return (driver, in_lap, out_lap) for each pit stop (in-lap paired with next out-lap)."""
+    """Return (driver, in_lap, out_lap) for each pit stop (in-lap paired with next out-lap).
+
+    Only stops where tyres changed count (clean.tyre_change_out_laps).
+    """
     stops: list[tuple[str, pd.Series, pd.Series]] = []
+    changed = tyre_change_out_laps(laps)
     for driver, grp in laps.groupby("Driver"):
         grp = grp.sort_values("LapNumber")
         for _, in_lap in grp[grp["PitInTime"].notna()].iterrows():
-            out = grp[(grp["LapNumber"] == in_lap["LapNumber"] + 1) & grp["PitOutTime"].notna()]
+            out = grp[(grp["LapNumber"] == in_lap["LapNumber"] + 1) & changed.loc[grp.index]]
             if len(out):
                 stops.append((str(driver), in_lap, out.iloc[0]))
     return stops

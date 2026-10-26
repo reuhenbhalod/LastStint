@@ -48,3 +48,50 @@ def test_project_laps_preserves_non_time_dtypes():
 def test_default_race_id():
     assert ingest.default_race_id(2021, "Abu Dhabi") == "abu-dhabi-2021"
     assert ingest.default_race_id(2019, "Hungary") == "hungary-2019"
+
+
+def _snapshot(race_id: str) -> pd.DataFrame:
+    return pd.read_parquet(ingest.raw_snapshot_path(race_id))
+
+
+def test_check_complete_accepts_a_real_snapshot():
+    ingest.check_complete(_snapshot("abu-dhabi-2021"))
+
+
+def test_check_complete_rejects_missing_track_status():
+    laps = _snapshot("abu-dhabi-2021").assign(TrackStatus=None)
+    try:
+        ingest.check_complete(laps)
+    except ingest.IncompleteDataError as e:
+        assert "TrackStatus" in str(e)
+    else:
+        raise AssertionError("incomplete snapshot accepted")
+
+
+def test_ingest_backs_off_on_rate_limit(monkeypatch, tmp_path):
+    from fastf1.req import RateLimitExceededError
+
+    calls, waits = [], []
+    good = _snapshot("abu-dhabi-2021")
+
+    class FakeSession:
+        laps = good
+        event = {}
+        date = None
+
+        def __getattr__(self, name):
+            raise AttributeError(name)
+
+    def fake_load(year, event, cache_dir):
+        calls.append(1)
+        if len(calls) < 3:
+            raise RateLimitExceededError("slow down")
+        return FakeSession()
+
+    monkeypatch.setattr(ingest, "load_race", fake_load)
+    monkeypatch.setattr(ingest, "project_laps", lambda laps: laps)
+    monkeypatch.setattr(ingest, "race_facts", lambda s: {"totalLaps": 58})
+    ingest.ingest_race("x-2021", 2021, "X", raw_dir=tmp_path, sleep=waits.append)
+    assert len(calls) == 3
+    assert waits == list(ingest.RATE_LIMIT_WAITS[:2])
+    assert (tmp_path / "x-2021.parquet").exists()

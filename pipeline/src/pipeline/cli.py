@@ -40,13 +40,20 @@ def list_races() -> None:
         )
 
 
-@app.command()
-def ingest_race(race_id: str) -> None:
-    """Download a registered race from FastF1 and save its raw snapshot (needs network)."""
-    (race_id,) = _race_ids(race_id, False)
-    meta = build_mod.RACES[race_id]
-    laps, facts = ingest.ingest_race(race_id, meta["year"], meta["event"])
-    typer.echo(f"{race_id}: {len(laps)} laps, {facts['totalLaps']} race laps -> data/raw/")
+@app.command("ingest")
+def ingest_race(
+    race_id: str = typer.Argument(None),
+    all_races: bool = typer.Option(False, "--all", help="Ingest every registered race."),
+    force: bool = typer.Option(False, help="Re-download even if a snapshot exists."),
+) -> None:
+    """Download registered races from FastF1 into data/raw/ (network; rate-limit safe)."""
+    for rid in _race_ids(race_id, all_races):
+        if ingest.raw_snapshot_path(rid).exists() and not force:
+            typer.echo(f"{rid}: snapshot exists, skipped")
+            continue
+        meta = build_mod.RACES[rid]
+        laps, facts = ingest.ingest_race(rid, meta["year"], meta["event"])
+        typer.echo(f"{rid}: {len(laps)} laps, {facts['totalLaps']} race laps -> data/raw/")
 
 
 @app.command()

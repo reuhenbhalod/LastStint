@@ -10,6 +10,7 @@ Heavy imports (fastf1) are done inside functions so `import pipeline` stays ligh
 from __future__ import annotations
 
 import re
+import time
 from pathlib import Path
 
 import pandas as pd
@@ -100,16 +101,49 @@ def race_facts(session) -> dict:
     }
 
 
+class IncompleteDataError(RuntimeError):
+    """FastF1 returned laps but not the timing a race model needs (it can 'succeed' while
+    missing track status or positions, e.g. when rate-limited or unauthenticated)."""
+
+
+def check_complete(df: pd.DataFrame) -> None:
+    """Raise IncompleteDataError unless every column the pipeline depends on is populated."""
+    if df.empty:
+        raise IncompleteDataError("no laps")
+    for col in ("TrackStatus", "Position", "LapTime", "Time", "Compound"):
+        share = float(df[col].notna().mean())
+        if share < 0.8:
+            raise IncompleteDataError(f"{col} only {share:.0%} populated")
+
+
+RATE_LIMIT_WAITS = (60, 300, 900)  # seconds to back off before each retry
+
+
 def ingest_race(
     race_id: str,
     year: int,
     event: str,
     cache_dir: Path = CACHE_DIR,
     raw_dir: Path = RAW_DIR,
+    sleep=time.sleep,
 ) -> tuple[pd.DataFrame, dict]:
-    """Load a race, project laps, save the raw parquet snapshot. Returns (laps, facts)."""
-    session = load_race(year, event, cache_dir)
+    """Load a race, project laps, save the raw parquet snapshot. Returns (laps, facts).
+
+    Retries with backoff when FastF1 rate-limits (RATE_LIMIT_WAITS); the on-disk cache means
+    a retry only fetches what is still missing. Refuses to write an incomplete snapshot.
+    """
+    from fastf1.req import RateLimitExceededError
+
+    for attempt in range(len(RATE_LIMIT_WAITS) + 1):
+        try:
+            session = load_race(year, event, cache_dir)
+            break
+        except RateLimitExceededError:
+            if attempt == len(RATE_LIMIT_WAITS):
+                raise
+            sleep(RATE_LIMIT_WAITS[attempt])
     df = project_laps(session.laps)
+    check_complete(df)
     facts = race_facts(session)
 
     path = raw_snapshot_path(race_id, raw_dir)

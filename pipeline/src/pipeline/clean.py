@@ -33,6 +33,21 @@ def is_lap_one(laps: pd.DataFrame) -> pd.Series:
     return laps["LapNumber"] == 1
 
 
+def tyre_change_out_laps(laps: pd.DataFrame) -> pd.Series:
+    """True for out-laps where tyres were actually changed.
+
+    A pit-lane pass without a stop (e.g. Brazil 2021, laps 7-9, when race control routed the
+    whole field through the pit lane under the SC) has a PitOutTime but the same compound with
+    tyre age still counting up. Those are not stops.
+    """
+    ordered = laps.sort_values(["Driver", "LapNumber"])
+    prev = ordered.groupby("Driver")[["Compound", "TyreLife"]].shift(1)
+    same_set = (ordered["Compound"] == prev["Compound"]) & (
+        ordered["TyreLife"] == prev["TyreLife"] + 1
+    )
+    return (ordered["PitOutTime"].notna() & ~same_set).reindex(laps.index)
+
+
 def gap_to_car_ahead(laps: pd.DataFrame) -> pd.Series:
     """Seconds to the car ahead on the same lap. NaN for the leader or missing timing.
 
