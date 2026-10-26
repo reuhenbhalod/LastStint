@@ -89,6 +89,10 @@ Every item here ships only if it passes the **guard**: it improves mean gap erro
   - A VSC stop's cost is now measured by the change in gap to nearby cars that didn't stop (all at the same delta), and those stops are frozen like green ones, as B1 originally intended.
   - The old same-lap-field method overstated them (Abu Dhabi VER 21.9s vs 14.5s, which matches the real gap trace).
   - Median 0.69 × green on the tuning races (the fallback factor). Brazil 2021 4.0 → 2.7s; mean → 3.47s.
+- **A2, season pooling: tested for overtaking, rejected.**
+  - Other seasons' pass events at the same circuit were added at half weight as a prior.
+  - Mean error 3.47 → 3.46s, but Abu Dhabi 2021 went pass → fail and Mexico 2021 borderline → fail. No gain, so no extra seasons were downloaded.
+  - Tyre-wear pooling was not pursued. Per-race fits are already unbiased by tyre age on average, the remaining pace error is driver- and stint-specific (which pooling can't reach), and Pirelli's compound names map to different compounds each season.
 - **B4 re-tested on 16 races (robust guard): rejected again.**
   - Driver × compound pace: mean 4.02 → 3.96s, but Miami 2022 goes pass → fail.
   - Per-driver wear factor: 6.16s.
