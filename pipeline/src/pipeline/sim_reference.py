@@ -25,7 +25,7 @@ BUNCH_GAP = 0.5  # SC train spacing per car (measured on the final SC lap, 2021 
 SC_CLOSE_PER_LAP = 20.0  # s a gap closes per full SC lap (measured >= 15.4s)
 SC_FALLBACK = 1.6  # SC lap = this x green if not supplied
 VSC_FALLBACK = 1.35  # VSC lap = this x green if not supplied
-GOLDEN_SEEDS = [1, 2, 3, 4, 5]  # fixed seeds for the TS parity golden files
+GOLDEN_SEEDS = list(range(1, 21))  # fixed seeds for the TS parity golden files
 # Random streams per car, indexed by the car's position in model["drivers"]: lap noise uses
 # stream i, the car's own pass attempts (as follower) use OVERTAKE_STREAM + i. Separate
 # streams mean one car's strategy never shifts another car's draws (fair grading, and

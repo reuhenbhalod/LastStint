@@ -6,7 +6,7 @@ export type Compound = string; // e.g. 'SOFT' | 'MEDIUM' | 'HARD'; era-dependent
 
 export type Era = '1988-1993' | '1994-2009' | '2010-2013' | '2014-2025' | '2026+';
 
-export type FlagState = 'green' | 'sc' | 'vsc';
+export type FlagState = 'green' | 'sc' | 'vsc' | 'red';
 
 export type PaceMode = 'push' | 'standard' | 'manage';
 export type BattleMode = 'attack' | 'hold' | 'defend';
@@ -67,15 +67,26 @@ export interface RaceModel {
   reconstructed?: boolean;
 }
 
+export interface PitStop {
+  /** The out-lap: the first lap run on the new tyres (pit loss is charged on this lap). */
+  lap: number;
+  to: Compound;
+}
+
 export interface CarState {
   code: string;
-  position: number;
-  totalTime: number;
+  team: string;
+  basePace: number;
+  noise: number;
   compound: Compound;
   tyreAge: number;
-  lapsOnFuel: number;
-  inPitThisLap: boolean;
+  /** Cumulative race time (s) since the takeover snapshot; order is by this. */
+  totalTime: number;
+  /** Remaining planned stops (real strategy, or the player's/rival's plan). */
+  strategy: PitStop[];
+  pittedThisLap: boolean;
   retired: boolean;
+  retiredLap: number | null;
   modes: { pace: PaceMode; battle: BattleMode };
 }
 
@@ -85,7 +96,21 @@ export type Decision =
   | { lap: number; kind: 'radio'; momentId: string; optionId: string };
 
 export interface RaceState {
+  /** Last completed lap (the takeover lap before the first stepLap). */
   lap: number;
-  cars: CarState[];
+  /** Flag the last completed lap ran under. */
   flag: FlagState;
+  /** Race order: running cars by total time, then retired cars. */
+  order: string[];
+  cars: Record<string, CarState>;
+}
+
+export interface RaceResult {
+  /** Finishers by time, then retirees (latest retirement first). */
+  order: string[];
+  finishers: string[];
+  /** Seconds behind the winner, finishers only. */
+  gaps: Record<string, number>;
+  /** Total time since takeover, finishers only. */
+  times: Record<string, number>;
 }
