@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 4,
+  "schemaVersion": 5,
   "race": {
     "id": "spain-2021",
     "name": "Spain 2021: Hamilton vs Verstappen",
@@ -481,5 +481,6 @@
     "MAZ",
     "TSU"
   ],
-  "userSide": "VER"
+  "userSide": "VER",
+  "rival": "HAM"
 }

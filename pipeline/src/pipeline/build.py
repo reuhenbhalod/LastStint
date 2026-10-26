@@ -73,6 +73,7 @@ def build_race(race_id: str, laps: pd.DataFrame | None = None) -> BuildResult:
         takeover_lap=meta["takeover_lap"],
         seed=meta["seed"],
         user_side=meta["user_side"],
+        rival=meta["rival"],
     )
     return BuildResult(model=model, laps=laps, notes=[*fitted.prior_notes, *params.notes])
 

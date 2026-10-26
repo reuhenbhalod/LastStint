@@ -36,7 +36,7 @@ describe('simulator mechanics', () => {
 
   it("one car's strategy does not shift another car's draws", () => {
     const base = simulate(model, 11);
-    const changed = simulate(model, 11, { HAM: [{ lap: 40, to: 'MEDIUM' }] });
+    const changed = simulate(model, 11, { strategies: { HAM: [{ lap: 40, to: 'MEDIUM' }] } });
     expect(changed.times.HAM).not.toBe(base.times.HAM);
     expect(changed.times.MSC).toBe(base.times.MSC);
   });

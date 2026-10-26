@@ -9,7 +9,14 @@ export type Era = '1988-1993' | '1994-2009' | '2010-2013' | '2014-2025' | '2026+
 export type FlagState = 'green' | 'sc' | 'vsc' | 'red';
 
 export type PaceMode = 'push' | 'standard' | 'manage';
+export type FuelMode = 'normal' | 'liftAndCoast';
 export type BattleMode = 'attack' | 'hold' | 'defend';
+
+export interface Modes {
+  pace: PaceMode;
+  fuel: FuelMode;
+  battle: BattleMode;
+}
 
 export interface CompoundModel {
   offset: number;
@@ -64,6 +71,8 @@ export interface RaceModel {
   decisionMoments: number[];
   realResult: string[];
   userSide: string;
+  /** The direct rival: reacts to the user's calls (rival policy); everyone else is scripted. */
+  rival: string;
   reconstructed?: boolean;
 }
 
@@ -79,7 +88,10 @@ export interface CarState {
   basePace: number;
   noise: number;
   compound: Compound;
+  /** Laps on the current tyres (what the timing tower shows). */
   tyreAge: number;
+  /** Effective wear in laps: advances by the headset wear multiplier each green lap. */
+  tyreWear: number;
   /** Cumulative race time (s) since the takeover snapshot; order is by this. */
   totalTime: number;
   /** Remaining planned stops (real strategy, or the player's/rival's plan). */
@@ -87,13 +99,26 @@ export interface CarState {
   pittedThisLap: boolean;
   retired: boolean;
   retiredLap: number | null;
-  modes: { pace: PaceMode; battle: BattleMode };
+  modes: Modes;
 }
 
+/**
+ * A user call. `pit`: box at the end of `lap` (the in-lap); the stop is charged on lap + 1.
+ * `mode`: the standing mode applies from `lap` on. `radio`: an answer to a radio moment
+ * (mapped to pit/mode calls by the game; no direct sim effect).
+ */
 export type Decision =
   | { lap: number; kind: 'pit'; compound: Compound }
-  | { lap: number; kind: 'mode'; key: 'pace' | 'battle'; value: string }
+  | { lap: number; kind: 'mode'; key: keyof Modes; value: string }
   | { lap: number; kind: 'radio'; momentId: string; optionId: string };
+
+/** Something the sim did on its own that the game may narrate (e.g. the rival covering). */
+export interface RaceNote {
+  lap: number;
+  kind: 'rival-cover' | 'error';
+  driver: string;
+  detail?: string;
+}
 
 export interface RaceState {
   /** Last completed lap (the takeover lap before the first stepLap). */

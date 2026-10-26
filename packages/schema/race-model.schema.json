@@ -16,7 +16,8 @@
     "events",
     "decisionMoments",
     "realResult",
-    "userSide"
+    "userSide",
+    "rival"
   ],
   "properties": {
     "schemaVersion": {
@@ -156,6 +157,10 @@
     "userSide": {
       "type": "string",
       "description": "Driver code the user controls — always the hard/controversial side."
+    },
+    "rival": {
+      "type": "string",
+      "description": "Driver code of the direct rival, which reacts to the user's calls; every other car follows its real strategy."
     },
     "reconstructed": {
       "type": "boolean",

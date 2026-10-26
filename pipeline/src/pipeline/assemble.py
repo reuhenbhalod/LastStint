@@ -40,6 +40,7 @@ def assemble_race_model(
     takeover_lap: int,
     seed: int,
     user_side: str,
+    rival: str,
 ) -> dict:
     """Build the race-model dict (validate + write it with export.write_race)."""
     total_laps = int(laps["LapNumber"].max())
@@ -131,4 +132,5 @@ def assemble_race_model(
         "decisionMoments": moments,
         "realResult": finishing_order(laps),
         "userSide": user_side,
+        "rival": rival,
     }
