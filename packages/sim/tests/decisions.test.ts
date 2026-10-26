@@ -8,6 +8,7 @@ import {
   initRun,
   isFinished,
   realDecisions,
+  ruleSatisfied,
   simulate,
   stepLap,
   validateDecisions,
@@ -158,5 +159,39 @@ describe('rival policy', () => {
   it('does not go long under green (the plan covers instead)', () => {
     const run = runTo(spain, 1, [{ lap: 24, kind: 'pit', compound: 'MEDIUM' }], 30);
     expect(run.notes.filter((n) => n.kind === 'rival-stays-out')).toEqual([]);
+  });
+});
+
+describe('two-compound rule', () => {
+  it('disqualifies a player who finishes on one dry compound', () => {
+    // Spain 2021: VER had only run softs at takeover; no calls means no stop -> excluded.
+    const result = simulate(spain, 1, { decisions: [] });
+    expect(result.disqualified).toEqual(['VER']);
+    expect(result.finishers).not.toContain('VER');
+    expect(result.order.at(-1)).toBe('VER');
+  });
+
+  it('a stop for a new compound satisfies it', () => {
+    const result = simulate(spain, 1, {
+      decisions: [{ lap: 30, kind: 'pit', compound: 'MEDIUM' }],
+    });
+    expect(result.disqualified).toEqual([]);
+    expect(result.finishers).toContain('VER');
+  });
+
+  it('a stop for the same compound does not', () => {
+    const result = simulate(spain, 1, { decisions: [{ lap: 30, kind: 'pit', compound: 'SOFT' }] });
+    expect(result.disqualified).toEqual(['VER']);
+  });
+
+  it('never applies to replays of real strategies', () => {
+    expect(simulate(spain, 1).disqualified).toEqual([]);
+  });
+
+  it('ruleSatisfied reports it live, for the UI to warn', () => {
+    const run = initRun(spain, 1, { decisions: [{ lap: 30, kind: 'pit', compound: 'MEDIUM' }] });
+    expect(ruleSatisfied(run.state.cars.VER as never)).toBe(false);
+    while (run.state.lap < 31) stepLap(run);
+    expect(ruleSatisfied(run.state.cars.VER as never)).toBe(true);
   });
 });

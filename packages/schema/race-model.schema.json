@@ -108,12 +108,18 @@
           "stateAtTakeover": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["position", "gapAhead", "compound", "tyreAge"],
+            "required": ["position", "gapAhead", "compound", "tyreAge", "compoundsUsed"],
             "properties": {
               "position": { "type": "integer", "minimum": 1 },
               "gapAhead": { "type": "number", "minimum": 0 },
               "compound": { "type": "string" },
-              "tyreAge": { "type": "integer", "minimum": 0 }
+              "tyreAge": { "type": "integer", "minimum": 0 },
+              "compoundsUsed": {
+                "type": "array",
+                "items": { "type": "string" },
+                "uniqueItems": true,
+                "description": "Dry compounds run up to and including the takeover lap (two-compound rule)."
+              }
             }
           },
           "realStrategy": {

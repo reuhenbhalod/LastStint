@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 5,
+  "schemaVersion": 6,
   "race": {
     "id": "bahrain-2022",
     "name": "Bahrain 2022: Leclerc vs Verstappen",
@@ -51,7 +51,10 @@
         "position": 14,
         "gapAhead": 3.282,
         "compound": "SOFT",
-        "tyreAge": 11
+        "tyreAge": 11,
+        "compoundsUsed": [
+          "SOFT"
+        ]
       },
       "realStrategy": [
         {
@@ -77,7 +80,10 @@
         "position": 11,
         "gapAhead": 0.937,
         "compound": "SOFT",
-        "tyreAge": 14
+        "tyreAge": 14,
+        "compoundsUsed": [
+          "SOFT"
+        ]
       },
       "realStrategy": [
         {
@@ -103,7 +109,10 @@
         "position": 12,
         "gapAhead": 2.221,
         "compound": "SOFT",
-        "tyreAge": 14
+        "tyreAge": 14,
+        "compoundsUsed": [
+          "SOFT"
+        ]
       },
       "realStrategy": [
         {
@@ -129,7 +138,10 @@
         "position": 8,
         "gapAhead": 1.599,
         "compound": "SOFT",
-        "tyreAge": 14
+        "tyreAge": 14,
+        "compoundsUsed": [
+          "SOFT"
+        ]
       },
       "realStrategy": [
         {
@@ -151,7 +163,10 @@
         "position": 5,
         "gapAhead": 3.975,
         "compound": "SOFT",
-        "tyreAge": 13
+        "tyreAge": 13,
+        "compoundsUsed": [
+          "SOFT"
+        ]
       },
       "realStrategy": [
         {
@@ -177,7 +192,10 @@
         "position": 17,
         "gapAhead": 1.074,
         "compound": "SOFT",
-        "tyreAge": 11
+        "tyreAge": 11,
+        "compoundsUsed": [
+          "SOFT"
+        ]
       },
       "realStrategy": [
         {
@@ -203,7 +221,10 @@
         "position": 19,
         "gapAhead": 1.86,
         "compound": "SOFT",
-        "tyreAge": 11
+        "tyreAge": 11,
+        "compoundsUsed": [
+          "SOFT"
+        ]
       },
       "realStrategy": [
         {
@@ -229,7 +250,10 @@
         "position": 1,
         "gapAhead": 0.0,
         "compound": "SOFT",
-        "tyreAge": 11
+        "tyreAge": 11,
+        "compoundsUsed": [
+          "SOFT"
+        ]
       },
       "realStrategy": [
         {
@@ -255,7 +279,10 @@
         "position": 7,
         "gapAhead": 6.023,
         "compound": "SOFT",
-        "tyreAge": 11
+        "tyreAge": 11,
+        "compoundsUsed": [
+          "SOFT"
+        ]
       },
       "realStrategy": [
         {
@@ -281,7 +308,10 @@
         "position": 16,
         "gapAhead": 1.567,
         "compound": "SOFT",
-        "tyreAge": 11
+        "tyreAge": 11,
+        "compoundsUsed": [
+          "SOFT"
+        ]
       },
       "realStrategy": [
         {
@@ -303,7 +333,10 @@
         "position": 18,
         "gapAhead": 0.999,
         "compound": "MEDIUM",
-        "tyreAge": 11
+        "tyreAge": 11,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
       },
       "realStrategy": [
         {
@@ -329,7 +362,10 @@
         "position": 9,
         "gapAhead": 2.577,
         "compound": "SOFT",
-        "tyreAge": 11
+        "tyreAge": 11,
+        "compoundsUsed": [
+          "SOFT"
+        ]
       },
       "realStrategy": [
         {
@@ -355,7 +391,10 @@
         "position": 4,
         "gapAhead": 3.186,
         "compound": "SOFT",
-        "tyreAge": 14
+        "tyreAge": 14,
+        "compoundsUsed": [
+          "SOFT"
+        ]
       },
       "realStrategy": [
         {
@@ -381,7 +420,10 @@
         "position": 20,
         "gapAhead": 0.849,
         "compound": "MEDIUM",
-        "tyreAge": 11
+        "tyreAge": 11,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
       },
       "realStrategy": [
         {
@@ -407,7 +449,10 @@
         "position": 6,
         "gapAhead": 0.303,
         "compound": "SOFT",
-        "tyreAge": 14
+        "tyreAge": 14,
+        "compoundsUsed": [
+          "SOFT"
+        ]
       },
       "realStrategy": [
         {
@@ -433,7 +478,10 @@
         "position": 3,
         "gapAhead": 5.101,
         "compound": "SOFT",
-        "tyreAge": 14
+        "tyreAge": 14,
+        "compoundsUsed": [
+          "SOFT"
+        ]
       },
       "realStrategy": [
         {
@@ -459,7 +507,10 @@
         "position": 15,
         "gapAhead": 1.259,
         "compound": "SOFT",
-        "tyreAge": 11
+        "tyreAge": 11,
+        "compoundsUsed": [
+          "SOFT"
+        ]
       },
       "realStrategy": [
         {
@@ -485,7 +536,10 @@
         "position": 10,
         "gapAhead": 4.979,
         "compound": "SOFT",
-        "tyreAge": 11
+        "tyreAge": 11,
+        "compoundsUsed": [
+          "SOFT"
+        ]
       },
       "realStrategy": [
         {
@@ -511,7 +565,10 @@
         "position": 2,
         "gapAhead": 3.318,
         "compound": "SOFT",
-        "tyreAge": 14
+        "tyreAge": 14,
+        "compoundsUsed": [
+          "SOFT"
+        ]
       },
       "realStrategy": [
         {
@@ -537,7 +594,10 @@
         "position": 13,
         "gapAhead": 3.565,
         "compound": "SOFT",
-        "tyreAge": 11
+        "tyreAge": 11,
+        "compoundsUsed": [
+          "SOFT"
+        ]
       },
       "realStrategy": [
         {

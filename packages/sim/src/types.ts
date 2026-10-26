@@ -36,6 +36,8 @@ export interface DriverModel {
     gapAhead: number;
     compound: Compound;
     tyreAge: number;
+    /** Dry compounds run up to the takeover lap (two-compound rule). */
+    compoundsUsed: Compound[];
   };
   realStrategy: Array<{ lap: number; to: Compound }>;
 }
@@ -92,6 +94,8 @@ export interface CarState {
   tyreAge: number;
   /** Effective wear in laps: advances by the headset wear multiplier each green lap. */
   tyreWear: number;
+  /** Dry compounds run so far, including the takeover state (two-compound rule). */
+  compoundsUsed: Compound[];
   /** Cumulative race time (s) since the takeover snapshot; order is by this. */
   totalTime: number;
   /** Remaining planned stops (real strategy, or the player's/rival's plan). */
@@ -131,9 +135,11 @@ export interface RaceState {
 }
 
 export interface RaceResult {
-  /** Finishers by time, then retirees (latest retirement first). */
+  /** Finishers by time, then retirees (latest retirement first), then disqualified cars. */
   order: string[];
   finishers: string[];
+  /** Cars excluded from the result (e.g. two-compound rule); empty unless a live run. */
+  disqualified: string[];
   /** Seconds behind the winner, finishers only. */
   gaps: Record<string, number>;
   /** Total time since takeover, finishers only. */

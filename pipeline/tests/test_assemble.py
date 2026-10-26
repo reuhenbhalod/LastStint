@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 
+import pandas as pd
 import pytest
 
 from pipeline import assemble, build, export
@@ -73,3 +74,16 @@ def test_no_fitted_cliff_means_cliff_at_longest_observed_stint():
     soft = model["compounds"]["SOFT"]
     assert "cliffDegPerLap" not in soft
     assert soft["cliffLap"] == assemble.longest_stints(laps)["SOFT"] == 32
+
+
+def test_resolved_meta_fills_an_automatic_duel(monkeypatch):
+    # A validation-only entry (no sides) gets runner-up vs winner from the data.
+    entry = {**build.RACES["abu-dhabi-2021"], "user_side": None, "rival": None}
+    monkeypatch.setitem(build.RACES, "auto-test", entry)
+    laps = pd.read_parquet(build.ingest.raw_snapshot_path("abu-dhabi-2021"))
+    meta = build.resolved_meta("auto-test", laps)
+    assert (meta["user_side"], meta["rival"]) == ("HAM", "VER")
+
+
+def test_every_race_has_a_split():
+    assert {m["split"] for m in build.RACES.values()} == {"tune", "holdout"}

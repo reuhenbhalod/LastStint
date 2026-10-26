@@ -95,6 +95,36 @@ def project_laps(laps: pd.DataFrame) -> pd.DataFrame:
     return df.reset_index(drop=True)
 
 
+# 2018 compound names, softest first. From 2019 Pirelli labels each race's three dry
+# compounds SOFT/MEDIUM/HARD relative to each other; relabel_2018_compounds does the same.
+COMPOUNDS_2018 = ["HYPERSOFT", "ULTRASOFT", "SUPERSOFT", "SOFT", "MEDIUM", "HARD", "SUPERHARD"]
+WET_COMPOUNDS = {"INTERMEDIATE", "WET"}
+
+
+def relabel_2018_compounds(df: pd.DataFrame) -> pd.DataFrame:
+    """Map a 2018 race's dry compounds onto relative SOFT/MEDIUM/HARD by softness rank."""
+    used = [c for c in COMPOUNDS_2018 if c in set(df["Compound"].dropna().astype(str))]
+    if not used:
+        return df
+    if len(used) > 3:
+        raise IncompleteDataError(f"more than three dry compounds used: {used}")
+    # With only two of the three nominated compounds used, the unused one is unknown; the
+    # common case is that the hardest went unused, so the pair maps to SOFT/MEDIUM.
+    mapping = dict(zip(used, ["SOFT", "MEDIUM", "HARD"][: len(used)], strict=True))
+    return df.assign(Compound=df["Compound"].map(lambda c: mapping.get(c, c)))
+
+
+def race_suitability(df: pd.DataFrame) -> list[str]:
+    """Reasons a race can't be modelled yet (spec D8): wet tyres or a red flag."""
+    reasons = []
+    wet = sorted(set(df["Compound"].dropna().astype(str)) & WET_COMPOUNDS)
+    if wet:
+        reasons.append(f"wet ({', '.join(wet)})")
+    if df["TrackStatus"].astype(str).str.contains("5").any():
+        reasons.append("red flag")
+    return reasons
+
+
 def race_facts(session) -> dict:
     """Race-level facts captured at ingest: total laps, event name, location, date."""
     laps = session.laps
@@ -158,6 +188,8 @@ def ingest_race(
                 raise
             sleep(RATE_LIMIT_WAITS[attempt])
     df = project_laps(session.laps)
+    if year == 2018:
+        df = relabel_2018_compounds(df)
     check_complete(df)
     facts = race_facts(session)
 

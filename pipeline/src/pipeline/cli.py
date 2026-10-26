@@ -34,8 +34,9 @@ def list_races() -> None:
     for race_id, meta in build_mod.RACES.items():
         raw = ingest.raw_snapshot_path(race_id).exists()
         model = (paths.RACES_DIR / f"{race_id}.json").exists()
+        duel = f"{meta['user_side']} vs {meta['rival']}" if meta["user_side"] else "auto duel "
         typer.echo(
-            f"{race_id:24s} {meta['user_side']} vs {meta.get('rival', '?'):4s}"
+            f"{race_id:24s} {duel:10s} {meta.get('split', '?'):7s}"
             f" snapshot={'yes' if raw else 'no ':3s} model={'yes' if model else 'no'}"
         )
 
@@ -53,7 +54,9 @@ def ingest_race(
             continue
         meta = build_mod.RACES[rid]
         laps, facts = ingest.ingest_race(rid, meta["year"], meta["event"])
-        typer.echo(f"{rid}: {len(laps)} laps, {facts['totalLaps']} race laps -> data/raw/")
+        problems = ingest.race_suitability(laps)
+        note = f"  NOT SUITABLE: {'; '.join(problems)}" if problems else ""
+        typer.echo(f"{rid}: {len(laps)} laps, {facts['totalLaps']} race laps -> data/raw/{note}")
 
 
 @app.command()
@@ -80,8 +83,8 @@ def validate(
     """Run the Gate G1 validation report; exit code 1 if any race fails."""
     failed = []
     for rid in _race_ids(race_id, all_races):
-        meta = build_mod.RACES[rid]
         model, laps = build_mod.build_race_model(rid)
+        meta = build_mod.resolved_meta(rid, laps)
         report = validate_mod.validate_race(
             model,
             validate_mod.real_finishing_gaps(laps),

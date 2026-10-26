@@ -11,6 +11,8 @@ import pandas as pd
 
 from .clean import gap_to_car_ahead, tyre_change_out_laps
 
+DRY_COMPOUNDS = ("SOFT", "MEDIUM", "HARD")
+
 
 def real_strategy(laps: pd.DataFrame) -> dict[str, list[dict]]:
     """Per driver, the pit stops as {lap, to} — the out-lap and the compound fitted."""
@@ -25,9 +27,12 @@ def real_strategy(laps: pd.DataFrame) -> dict[str, list[dict]]:
 
 
 def state_at_takeover(laps: pd.DataFrame, takeover_lap: int) -> dict[str, dict]:
-    """Per-car position, gap ahead (s), compound and tyre age at the takeover lap."""
+    """Per-car position, gap ahead (s), compound, tyre age and the dry compounds used so far
+    (for the two-compound rule) at the takeover lap."""
     gaps = gap_to_car_ahead(laps)
     rows = laps[laps["LapNumber"] == takeover_lap]
+    so_far = laps[(laps["LapNumber"] <= takeover_lap) & laps["Compound"].isin(DRY_COMPOUNDS)]
+    used = so_far.groupby("Driver")["Compound"].agg(lambda c: sorted(set(map(str, c))))
     state: dict[str, dict] = {}
     for r in rows.itertuples():
         gap = gaps.get(r.Index)
@@ -36,6 +41,7 @@ def state_at_takeover(laps: pd.DataFrame, takeover_lap: int) -> dict[str, dict]:
             "gapAhead": None if gap is None or pd.isna(gap) else round(float(gap), 3),
             "compound": None if pd.isna(r.Compound) else str(r.Compound),
             "tyreAge": None if pd.isna(r.TyreLife) else int(r.TyreLife),
+            "compoundsUsed": list(used.get(r.Driver, [])),
         }
     return state
 

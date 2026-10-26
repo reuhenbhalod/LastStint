@@ -299,6 +299,12 @@ def fit_track_params(
         notes.append(
             f"pitLossUnderVSC: {n_vsc} VSC stops measured, using {VSC_PIT_LOSS_FACTOR} x green"
         )
+    dirty_air = dirty_air_penalty(traffic_laps, fit)
+    if dirty_air < 0:
+        # Following within 1s was faster on average (DRS outweighing the turbulence, e.g.
+        # Miami 2025). The sim's term is a penalty, so floor it; DRS is modelled separately.
+        notes.append(f"dirtyAirPenalty measured {dirty_air:.3f}s (DRS-dominated), floored at 0")
+        dirty_air = 0.0
     overtake, overtake_note = fit_overtake_model(laps, fit)
     if overtake_note:
         notes.append(overtake_note)
@@ -307,7 +313,7 @@ def fit_track_params(
         pit_loss=green_pit,
         pit_loss_under_sc=sc_pit,
         pit_loss_under_vsc=vsc_pit,
-        dirty_air_penalty=dirty_air_penalty(traffic_laps, fit),
+        dirty_air_penalty=dirty_air,
         overtake_difficulty=difficulty,
         green_lap_time=green if green is not None else float("nan"),
         sc_lap_time=times["sc"],

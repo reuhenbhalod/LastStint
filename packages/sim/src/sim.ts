@@ -214,6 +214,7 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
       compound: s.compound,
       tyreAge: s.tyreAge,
       tyreWear: s.tyreAge,
+      compoundsUsed: [...(s.compoundsUsed ?? [])],
       totalTime: cum,
       // A player-controlled car pits only when the player calls it.
       strategy:
@@ -261,7 +262,12 @@ function makeStreams(
 }
 
 function cloneCar(c: CarState): CarState {
-  return { ...c, strategy: c.strategy.map((s) => ({ ...s })), modes: { ...c.modes } };
+  return {
+    ...c,
+    strategy: c.strategy.map((s) => ({ ...s })),
+    compoundsUsed: [...c.compoundsUsed],
+    modes: { ...c.modes },
+  };
 }
 
 /**
@@ -398,14 +404,19 @@ function rivalGoesLong(run: Run, lap: number): void {
 
   const compound = model.compounds[rival.compound];
   const lapsToCliff = compound ? Math.max(1, Math.floor(compound.cliffLap - rival.tyreWear)) : 1;
-  const laterLap = stopLap + lapsToCliff;
-  rival.strategy = rival.strategy.filter((s) => s !== planned);
-  if (laterLap < model.race.laps) rival.strategy.push({ lap: laterLap, to: planned.to });
+  const others = rival.strategy.filter((s) => s !== planned);
+  // Two-compound rule: going long may not drop the stop that would make the rival comply.
+  // If no other planned stop brings a new compound, the stop moves at most to the final lap.
+  const needsThisStop =
+    !ruleSatisfied(rival) && !others.some((s) => !rival.compoundsUsed.includes(s.to));
+  let laterLap: number | null = stopLap + lapsToCliff;
+  if (laterLap > model.race.laps) laterLap = needsThisStop ? model.race.laps : null;
+  rival.strategy = laterLap === null ? others : [...others, { lap: laterLap, to: planned.to }];
   run.notes.push({
     lap,
     kind: 'rival-stays-out',
     driver: rival.code,
-    detail: laterLap < model.race.laps ? `stop moved to lap ${laterLap}` : 'no stop',
+    detail: laterLap === null ? 'no stop' : `stop moved to lap ${laterLap}`,
   });
 }
 
@@ -456,10 +467,15 @@ export function planRemainingStop(run: Run): PitStop | null {
   const { model, state } = run;
   const user = state.cars[model.userSide];
   if (!user || user.retired) return null;
+  // Two-compound rule: a car that hasn't yet run two dry compounds must stop for a new one.
+  const mustChange = !ruleSatisfied(user);
   let best: PitStop | null = null;
-  let bestTime = predictedRemaining(run, user, state.lap, null);
-  for (let lap = state.lap + 1; lap < model.race.laps; lap++) {
+  let bestTime = mustChange
+    ? Number.POSITIVE_INFINITY
+    : predictedRemaining(run, user, state.lap, null);
+  for (let lap = state.lap + 1; lap <= model.race.laps; lap++) {
     for (const to of Object.keys(model.compounds)) {
+      if (mustChange && user.compoundsUsed.includes(to)) continue;
       const t = predictedRemaining(run, user, state.lap, { lap, to });
       if (t < bestTime) {
         bestTime = t;
@@ -504,6 +520,7 @@ export function stepLap(run: Run): RaceState {
       pitted.add(code);
       c.pittedThisLap = true;
       c.compound = stop.to;
+      if (!c.compoundsUsed.includes(stop.to)) c.compoundsUsed.push(stop.to);
       c.tyreAge = 0;
       c.tyreWear = 0;
       pitCost =
@@ -602,8 +619,32 @@ function resolveOrder(
 }
 
 /** Classification: finishers by time, then retirees (latest retirement first). */
+/** Dry compounds counted by the two-compound rule. */
+export const DRY_COMPOUNDS = ['SOFT', 'MEDIUM', 'HARD'] as const;
+
+/**
+ * Two-compound rule: in a dry race every car must run at least two different dry compounds.
+ * (No modelled race is wet; wet tyres would waive it.)
+ */
+export function ruleSatisfied(car: CarState): boolean {
+  const dry = new Set(
+    car.compoundsUsed.filter((c) => (DRY_COMPOUNDS as readonly string[]).includes(c)),
+  );
+  return dry.size >= 2;
+}
+
+/**
+ * Classification: finishers by time, then retirees (latest retirement first). In a live run
+ * a car that reaches the flag without satisfying the two-compound rule is disqualified and
+ * listed last, as in the real rules. Scripted real strategies always comply, so replays
+ * (and Python parity) are unaffected.
+ */
 export function classify(run: Run): RaceResult {
-  const finishers = live(run).sort((a, b) => car(run, a).totalTime - car(run, b).totalTime);
+  const running = live(run).sort((a, b) => car(run, a).totalTime - car(run, b).totalTime);
+  const finished = isFinished(run);
+  const disqualified =
+    run.live && finished ? running.filter((c) => !ruleSatisfied(car(run, c))) : [];
+  const finishers = running.filter((c) => !disqualified.includes(c));
   const retirees = retiredInOrder(run).sort(
     (a, b) => (car(run, b).retiredLap ?? 0) - (car(run, a).retiredLap ?? 0),
   );
@@ -614,7 +655,13 @@ export function classify(run: Run): RaceResult {
     gaps[c] = car(run, c).totalTime - winner;
     times[c] = car(run, c).totalTime;
   }
-  return { order: [...finishers, ...retirees], finishers, gaps, times };
+  return {
+    order: [...finishers, ...retirees, ...disqualified],
+    finishers,
+    disqualified,
+    gaps,
+    times,
+  };
 }
 
 /** Run one seeded simulation from the takeover lap to the flag. */

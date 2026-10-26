@@ -114,3 +114,23 @@ def test_load_credentials_reads_env_file_without_overriding(tmp_path, monkeypatc
 def test_load_credentials_without_file(tmp_path, monkeypatch):
     monkeypatch.delenv("F1_USERNAME", raising=False)
     assert ingest.load_credentials(tmp_path / "missing.env") is False
+
+
+def test_relabel_2018_compounds_by_softness_rank():
+    laps = pd.DataFrame({"Compound": ["ULTRASOFT", "SUPERSOFT", "SOFT", "INTERMEDIATE", None]})
+    out = ingest.relabel_2018_compounds(laps)["Compound"].tolist()
+    assert out[:4] == ["SOFT", "MEDIUM", "HARD", "INTERMEDIATE"]
+
+
+def test_relabel_2018_two_compounds_map_to_soft_medium():
+    laps = pd.DataFrame({"Compound": ["SUPERSOFT", "SOFT"]})
+    assert ingest.relabel_2018_compounds(laps)["Compound"].tolist() == ["SOFT", "MEDIUM"]
+
+
+def test_race_suitability_flags_wet_and_red():
+    dry = _snapshot("abu-dhabi-2021")
+    assert ingest.race_suitability(dry) == []
+    wet = dry.assign(Compound=["INTERMEDIATE"] + list(dry["Compound"][1:]))
+    red = dry.assign(TrackStatus=["15"] + list(dry["TrackStatus"][1:]))
+    assert "wet" in ingest.race_suitability(wet)[0]
+    assert ingest.race_suitability(red) == ["red flag"]

@@ -91,6 +91,7 @@ def assemble_race_model(
                     "gapAhead": s["gapAhead"] if s["gapAhead"] is not None else 0.0,
                     "compound": s["compound"],
                     "tyreAge": s["tyreAge"] if s["tyreAge"] is not None else 0,
+                    "compoundsUsed": s["compoundsUsed"],
                 },
                 "realStrategy": [st for st in strategy.get(code, []) if st["lap"] >= takeover_lap],
             }

@@ -1,0 +1,513 @@
+{
+  "schemaVersion": 6,
+  "race": {
+    "id": "mexico-2019",
+    "name": "Mexico 2019",
+    "laps": 71,
+    "takeoverLap": 20,
+    "seed": 19428
+  },
+  "era": "2014-2025",
+  "track": {
+    "pitLoss": 22.807,
+    "pitLossUnderSC": 12.544,
+    "pitLossUnderVSC": 18.245,
+    "overtakeDifficulty": 0.8991,
+    "overtakeModel": {
+      "intercept": -1.1682,
+      "paceCoef": 2.8896,
+      "gapCoef": -2.4026
+    },
+    "dirtyAirPenalty": 0.5169,
+    "greenLapTime": 81.805,
+    "vscLapTime": 104.674
+  },
+  "compounds": {
+    "SOFT": {
+      "offset": 0.0,
+      "degPerLap": 0.05961,
+      "cliffLap": 18
+    },
+    "MEDIUM": {
+      "offset": 0.2373,
+      "degPerLap": 0.02969,
+      "cliffLap": 40
+    },
+    "HARD": {
+      "offset": 0.5703,
+      "degPerLap": 0.01822,
+      "cliffLap": 66
+    }
+  },
+  "drivers": [
+    {
+      "code": "ALB",
+      "team": "Red Bull Racing",
+      "basePace": 81.6204,
+      "noise": 0.3679,
+      "stateAtTakeover": {
+        "position": 5,
+        "gapAhead": 10.546,
+        "compound": "MEDIUM",
+        "tyreAge": 6,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 45,
+          "to": "HARD"
+        }
+      ]
+    },
+    {
+      "code": "BOT",
+      "team": "Mercedes",
+      "basePace": 81.4639,
+      "noise": 0.5398,
+      "stateAtTakeover": {
+        "position": 3,
+        "gapAhead": 6.777,
+        "compound": "MEDIUM",
+        "tyreAge": 23,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 37,
+          "to": "HARD"
+        }
+      ]
+    },
+    {
+      "code": "GAS",
+      "team": "Toro Rosso",
+      "basePace": 82.5457,
+      "noise": 0.9863,
+      "stateAtTakeover": {
+        "position": 14,
+        "gapAhead": 2.075,
+        "compound": "HARD",
+        "tyreAge": 11,
+        "compoundsUsed": [
+          "HARD",
+          "SOFT"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 50,
+          "to": "MEDIUM"
+        }
+      ]
+    },
+    {
+      "code": "GIO",
+      "team": "Alfa Romeo Racing",
+      "basePace": 82.9292,
+      "noise": 0.7297,
+      "stateAtTakeover": {
+        "position": 9,
+        "gapAhead": 4.06,
+        "compound": "MEDIUM",
+        "tyreAge": 20,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 22,
+          "to": "HARD"
+        }
+      ]
+    },
+    {
+      "code": "GRO",
+      "team": "Haas F1 Team",
+      "basePace": 84.4071,
+      "noise": 1.2705,
+      "stateAtTakeover": {
+        "position": 19,
+        "gapAhead": 1.164,
+        "compound": "MEDIUM",
+        "tyreAge": 20,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 38,
+          "to": "HARD"
+        }
+      ]
+    },
+    {
+      "code": "HAM",
+      "team": "Mercedes",
+      "basePace": 81.6045,
+      "noise": 0.4251,
+      "stateAtTakeover": {
+        "position": 2,
+        "gapAhead": 2.075,
+        "compound": "MEDIUM",
+        "tyreAge": 23,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 24,
+          "to": "HARD"
+        }
+      ]
+    },
+    {
+      "code": "HUL",
+      "team": "Renault",
+      "basePace": 82.6262,
+      "noise": 0.7937,
+      "stateAtTakeover": {
+        "position": 13,
+        "gapAhead": 1.065,
+        "compound": "HARD",
+        "tyreAge": 2,
+        "compoundsUsed": [
+          "HARD",
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "KUB",
+      "team": "Williams",
+      "basePace": 84.1866,
+      "noise": 0.9882,
+      "stateAtTakeover": {
+        "position": 17,
+        "gapAhead": 2.671,
+        "compound": "MEDIUM",
+        "tyreAge": 20,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 22,
+          "to": "HARD"
+        },
+        {
+          "lap": 61,
+          "to": "MEDIUM"
+        }
+      ]
+    },
+    {
+      "code": "KVY",
+      "team": "Toro Rosso",
+      "basePace": 82.5007,
+      "noise": 0.8831,
+      "stateAtTakeover": {
+        "position": 10,
+        "gapAhead": 9.918,
+        "compound": "HARD",
+        "tyreAge": 10,
+        "compoundsUsed": [
+          "HARD",
+          "SOFT"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 45,
+          "to": "MEDIUM"
+        }
+      ]
+    },
+    {
+      "code": "LEC",
+      "team": "Ferrari",
+      "basePace": 81.5367,
+      "noise": 0.4581,
+      "stateAtTakeover": {
+        "position": 4,
+        "gapAhead": 7.36,
+        "compound": "MEDIUM",
+        "tyreAge": 5,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 44,
+          "to": "HARD"
+        }
+      ]
+    },
+    {
+      "code": "MAG",
+      "team": "Haas F1 Team",
+      "basePace": 83.5769,
+      "noise": 0.8071,
+      "stateAtTakeover": {
+        "position": 12,
+        "gapAhead": 0.521,
+        "compound": "MEDIUM",
+        "tyreAge": 20,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 29,
+          "to": "HARD"
+        }
+      ]
+    },
+    {
+      "code": "NOR",
+      "team": "McLaren",
+      "basePace": 82.9965,
+      "noise": 1.1158,
+      "stateAtTakeover": {
+        "position": 20,
+        "gapAhead": 85.195,
+        "compound": "HARD",
+        "tyreAge": 8,
+        "compoundsUsed": [
+          "HARD",
+          "SOFT"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "PER",
+      "team": "Racing Point",
+      "basePace": 82.3603,
+      "noise": 0.5757,
+      "stateAtTakeover": {
+        "position": 7,
+        "gapAhead": 0.025,
+        "compound": "MEDIUM",
+        "tyreAge": 20,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 21,
+          "to": "HARD"
+        }
+      ]
+    },
+    {
+      "code": "RAI",
+      "team": "Alfa Romeo Racing",
+      "basePace": 82.9247,
+      "noise": 1.0466,
+      "stateAtTakeover": {
+        "position": 16,
+        "gapAhead": 5.29,
+        "compound": "HARD",
+        "tyreAge": 5,
+        "compoundsUsed": [
+          "HARD",
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 53,
+          "to": "MEDIUM"
+        }
+      ]
+    },
+    {
+      "code": "RIC",
+      "team": "Renault",
+      "basePace": 82.3789,
+      "noise": 0.517,
+      "stateAtTakeover": {
+        "position": 6,
+        "gapAhead": 10.716,
+        "compound": "HARD",
+        "tyreAge": 20,
+        "compoundsUsed": [
+          "HARD"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 51,
+          "to": "MEDIUM"
+        }
+      ]
+    },
+    {
+      "code": "RUS",
+      "team": "Williams",
+      "basePace": 84.229,
+      "noise": 0.9469,
+      "stateAtTakeover": {
+        "position": 18,
+        "gapAhead": 0.971,
+        "compound": "MEDIUM",
+        "tyreAge": 20,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 23,
+          "to": "HARD"
+        }
+      ]
+    },
+    {
+      "code": "SAI",
+      "team": "McLaren",
+      "basePace": 82.7373,
+      "noise": 0.901,
+      "stateAtTakeover": {
+        "position": 11,
+        "gapAhead": 2.664,
+        "compound": "HARD",
+        "tyreAge": 5,
+        "compoundsUsed": [
+          "HARD",
+          "SOFT"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 36,
+          "to": "MEDIUM"
+        }
+      ]
+    },
+    {
+      "code": "STR",
+      "team": "Racing Point",
+      "basePace": 82.9322,
+      "noise": 0.8186,
+      "stateAtTakeover": {
+        "position": 8,
+        "gapAhead": 4.022,
+        "compound": "MEDIUM",
+        "tyreAge": 20,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 38,
+          "to": "HARD"
+        }
+      ]
+    },
+    {
+      "code": "VER",
+      "team": "Red Bull Racing",
+      "basePace": 81.7049,
+      "noise": 0.8025,
+      "stateAtTakeover": {
+        "position": 15,
+        "gapAhead": 1.105,
+        "compound": "HARD",
+        "tyreAge": 15,
+        "compoundsUsed": [
+          "HARD",
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "VET",
+      "team": "Ferrari",
+      "basePace": 81.5658,
+      "noise": 0.4624,
+      "stateAtTakeover": {
+        "position": 1,
+        "gapAhead": 0.0,
+        "compound": "MEDIUM",
+        "tyreAge": 23,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 38,
+          "to": "HARD"
+        }
+      ]
+    }
+  ],
+  "fuelEffectPerLap": 0.04427,
+  "events": [
+    {
+      "lap": 51,
+      "type": "RETIREMENT",
+      "driver": "NOR"
+    },
+    {
+      "lap": 60,
+      "type": "RETIREMENT",
+      "driver": "RAI"
+    }
+  ],
+  "decisionMoments": [
+    21,
+    22,
+    23,
+    24,
+    29,
+    36,
+    37,
+    38,
+    44,
+    45,
+    50,
+    51,
+    53,
+    61
+  ],
+  "realResult": [
+    "HAM",
+    "VET",
+    "BOT",
+    "LEC",
+    "ALB",
+    "VER",
+    "PER",
+    "RIC",
+    "KVY",
+    "GAS",
+    "HUL",
+    "STR",
+    "SAI",
+    "GIO",
+    "MAG",
+    "RUS",
+    "GRO",
+    "KUB",
+    "RAI",
+    "NOR"
+  ],
+  "userSide": "VET",
+  "rival": "HAM"
+}

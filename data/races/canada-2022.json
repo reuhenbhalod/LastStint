@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 5,
+  "schemaVersion": 6,
   "race": {
     "id": "canada-2022",
     "name": "Canada 2022: Sainz vs Verstappen",
@@ -46,7 +46,10 @@
         "position": 12,
         "gapAhead": 0.075,
         "compound": "MEDIUM",
-        "tyreAge": 17
+        "tyreAge": 17,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
       },
       "realStrategy": [
         {
@@ -68,7 +71,10 @@
         "position": 3,
         "gapAhead": 3.859,
         "compound": "MEDIUM",
-        "tyreAge": 17
+        "tyreAge": 17,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
       },
       "realStrategy": [
         {
@@ -90,7 +96,10 @@
         "position": 10,
         "gapAhead": 3.916,
         "compound": "HARD",
-        "tyreAge": 17
+        "tyreAge": 17,
+        "compoundsUsed": [
+          "HARD"
+        ]
       },
       "realStrategy": [
         {
@@ -108,7 +117,11 @@
         "position": 17,
         "gapAhead": 3.307,
         "compound": "HARD",
-        "tyreAge": 12
+        "tyreAge": 12,
+        "compoundsUsed": [
+          "HARD",
+          "MEDIUM"
+        ]
       },
       "realStrategy": [
         {
@@ -126,7 +139,11 @@
         "position": 5,
         "gapAhead": 1.776,
         "compound": "HARD",
-        "tyreAge": 8
+        "tyreAge": 8,
+        "compoundsUsed": [
+          "HARD",
+          "MEDIUM"
+        ]
       },
       "realStrategy": [
         {
@@ -144,7 +161,11 @@
         "position": 19,
         "gapAhead": 2.778,
         "compound": "HARD",
-        "tyreAge": 8
+        "tyreAge": 8,
+        "compoundsUsed": [
+          "HARD",
+          "MEDIUM"
+        ]
       },
       "realStrategy": [
         {
@@ -162,7 +183,10 @@
         "position": 11,
         "gapAhead": 0.846,
         "compound": "HARD",
-        "tyreAge": 17
+        "tyreAge": 17,
+        "compoundsUsed": [
+          "HARD"
+        ]
       },
       "realStrategy": [
         {
@@ -180,7 +204,11 @@
         "position": 18,
         "gapAhead": 7.324,
         "compound": "HARD",
-        "tyreAge": 10
+        "tyreAge": 10,
+        "compoundsUsed": [
+          "HARD",
+          "MEDIUM"
+        ]
       },
       "realStrategy": []
     },
@@ -193,7 +221,10 @@
         "position": 7,
         "gapAhead": 3.581,
         "compound": "MEDIUM",
-        "tyreAge": 17
+        "tyreAge": 17,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
       },
       "realStrategy": []
     },
@@ -206,7 +237,10 @@
         "position": 13,
         "gapAhead": 0.521,
         "compound": "HARD",
-        "tyreAge": 17
+        "tyreAge": 17,
+        "compoundsUsed": [
+          "HARD"
+        ]
       },
       "realStrategy": [
         {
@@ -228,7 +262,10 @@
         "position": 6,
         "gapAhead": 6.853,
         "compound": "MEDIUM",
-        "tyreAge": 17
+        "tyreAge": 17,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
       },
       "realStrategy": [
         {
@@ -250,7 +287,10 @@
         "position": 9,
         "gapAhead": 1.408,
         "compound": "MEDIUM",
-        "tyreAge": 17
+        "tyreAge": 17,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
       },
       "realStrategy": [
         {
@@ -272,7 +312,10 @@
         "position": 4,
         "gapAhead": 3.814,
         "compound": "MEDIUM",
-        "tyreAge": 17
+        "tyreAge": 17,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
       },
       "realStrategy": [
         {
@@ -294,7 +337,10 @@
         "position": 1,
         "gapAhead": 0.0,
         "compound": "MEDIUM",
-        "tyreAge": 17
+        "tyreAge": 17,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
       },
       "realStrategy": [
         {
@@ -316,7 +362,10 @@
         "position": 14,
         "gapAhead": 1.226,
         "compound": "HARD",
-        "tyreAge": 17
+        "tyreAge": 17,
+        "compoundsUsed": [
+          "HARD"
+        ]
       },
       "realStrategy": [
         {
@@ -334,7 +383,11 @@
         "position": 15,
         "gapAhead": 5.047,
         "compound": "HARD",
-        "tyreAge": 8
+        "tyreAge": 8,
+        "compoundsUsed": [
+          "HARD",
+          "MEDIUM"
+        ]
       },
       "realStrategy": []
     },
@@ -347,7 +400,11 @@
         "position": 2,
         "gapAhead": 5.07,
         "compound": "HARD",
-        "tyreAge": 8
+        "tyreAge": 8,
+        "compoundsUsed": [
+          "HARD",
+          "MEDIUM"
+        ]
       },
       "realStrategy": [
         {
@@ -365,7 +422,11 @@
         "position": 16,
         "gapAhead": 2.876,
         "compound": "HARD",
-        "tyreAge": 12
+        "tyreAge": 12,
+        "compoundsUsed": [
+          "HARD",
+          "MEDIUM"
+        ]
       },
       "realStrategy": [
         {
@@ -383,7 +444,10 @@
         "position": 8,
         "gapAhead": 0.513,
         "compound": "MEDIUM",
-        "tyreAge": 17
+        "tyreAge": 17,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
       },
       "realStrategy": [
         {
