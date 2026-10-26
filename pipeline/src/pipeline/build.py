@@ -7,6 +7,8 @@ the tests, the golden-file generator, and the CLI so they never drift.
 
 from __future__ import annotations
 
+from dataclasses import dataclass, field
+
 import pandas as pd
 
 from . import assemble, clean, fit, ingest, track
@@ -40,8 +42,15 @@ RACES: dict[str, dict] = {
 }
 
 
-def build_race_model(race_id: str, laps: pd.DataFrame | None = None) -> tuple[dict, pd.DataFrame]:
-    """Build a validated race-model dict for a registered race. Returns (model, laps)."""
+@dataclass
+class BuildResult:
+    model: dict
+    laps: pd.DataFrame
+    notes: list[str] = field(default_factory=list)  # priors/fallbacks the build relied on
+
+
+def build_race(race_id: str, laps: pd.DataFrame | None = None) -> BuildResult:
+    """Build a validated race-model dict for a registered race, with its build notes."""
     if race_id not in RACES:
         raise KeyError(f"unknown race '{race_id}'; known: {sorted(RACES)}")
     meta = RACES[race_id]
@@ -65,4 +74,10 @@ def build_race_model(race_id: str, laps: pd.DataFrame | None = None) -> tuple[di
         seed=meta["seed"],
         user_side=meta["user_side"],
     )
-    return model, laps
+    return BuildResult(model=model, laps=laps, notes=[*fitted.prior_notes, *params.notes])
+
+
+def build_race_model(race_id: str, laps: pd.DataFrame | None = None) -> tuple[dict, pd.DataFrame]:
+    """Build a validated race-model dict for a registered race. Returns (model, laps)."""
+    result = build_race(race_id, laps)
+    return result.model, result.laps

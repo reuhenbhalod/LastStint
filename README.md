@@ -46,6 +46,9 @@ uv run pytest
 
 ## Status
 
-Phase 0 (foundation / scaffolding). See `docs/F1 Pit Wall Implementation Plan.md`.
+Phase 1 (data pipeline + race model) is built: two race models (`abu-dhabi-2021`,
+`spain-2021`), a Python reference simulator, and a Gate G1 validation report.
+Abu Dhabi 2021 passes G1; Spain 2021 has two open field-gap items (traffic model).
+Phase 2 (TypeScript simulator) is next. See `docs/F1 Pit Wall Implementation Plan.md`.
 
 > Not affiliated with Formula 1. No F1 wordmark, team logos or liveries are used.
