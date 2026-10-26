@@ -10,7 +10,7 @@ import json
 
 import pytest
 
-from pipeline import build, export
+from pipeline import assemble, build, export
 
 
 @pytest.fixture(scope="module")
@@ -65,3 +65,11 @@ def test_write_and_reload_roundtrip(model: dict, tmp_path):
     reloaded = json.loads(out.read_text())
     export.validate_model(reloaded)  # still valid after a round-trip
     assert reloaded["race"]["id"] == "abu-dhabi-2021"
+
+
+def test_no_fitted_cliff_means_cliff_at_longest_observed_stint():
+    # Spain 2021: no soft cliff is fitted, and the longest soft stint in the data is 32 laps.
+    model, laps = build.build_race_model("spain-2021")
+    soft = model["compounds"]["SOFT"]
+    assert "cliffDegPerLap" not in soft
+    assert soft["cliffLap"] == assemble.longest_stints(laps)["SOFT"] == 32

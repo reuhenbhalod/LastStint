@@ -27,17 +27,17 @@
     "SOFT": {
       "offset": 0.0,
       "degPerLap": 0.07574,
-      "cliffLap": 71
+      "cliffLap": 5
     },
     "MEDIUM": {
       "offset": 0.419,
       "degPerLap": 0.05111,
-      "cliffLap": 71
+      "cliffLap": 34
     },
     "HARD": {
       "offset": 0.6634,
       "degPerLap": 0.03694,
-      "cliffLap": 71
+      "cliffLap": 69
     }
   },
   "drivers": [

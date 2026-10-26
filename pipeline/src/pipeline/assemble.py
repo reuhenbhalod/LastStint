@@ -23,6 +23,12 @@ def finishing_order(laps: pd.DataFrame) -> list[str]:
     return [str(d) for d in ordered["Driver"]]
 
 
+def longest_stints(laps: pd.DataFrame) -> dict[str, int]:
+    """Longest tyre age observed per compound in the race (the edge of the evidence)."""
+    known = laps.dropna(subset=["Compound", "TyreLife"])
+    return {str(c): int(v) for c, v in known.groupby("Compound")["TyreLife"].max().items()}
+
+
 def _team_map(laps: pd.DataFrame) -> dict[str, str]:
     teams = laps.dropna(subset=["Team"]).groupby("Driver")["Team"].first()
     return {str(k): str(v) for k, v in teams.items()}
@@ -45,6 +51,7 @@ def assemble_race_model(
     """Build the race-model dict (validate + write it with export.write_race)."""
     total_laps = int(laps["LapNumber"].max())
     cliffs = fit.compound_cliff
+    longest = longest_stints(laps)
 
     compounds = {}
     for compound, offset in fit.compound_offset.items():
@@ -52,8 +59,10 @@ def assemble_race_model(
         compounds[compound] = {
             "offset": round(offset, 4),
             "degPerLap": round(fit.compound_wear[compound], 5),
-            # No fitted cliff -> put it past the race so it never triggers within a stint.
-            "cliffLap": int(hinge[0]) if hinge else total_laps,
+            # No fitted cliff -> the edge of the evidence: the longest stint seen on this
+            # compound. Past it the sim's fallback wear applies (spec D5), instead of assuming
+            # the tyre never falls off.
+            "cliffLap": int(hinge[0]) if hinge else longest.get(compound, total_laps),
             **({"cliffDegPerLap": round(hinge[1], 4)} if hinge else {}),
         }
 
