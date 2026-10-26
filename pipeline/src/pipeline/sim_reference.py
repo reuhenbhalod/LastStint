@@ -175,7 +175,8 @@ def simulate(model: dict, seed: int, strategies: dict | None = None) -> dict:
                 car.strategy.remove(pit)
                 car.compound = pit["to"]
                 car.tyre_age = 0
-                pit_cost = {"SC": pit_loss_sc, "VSC": pit_loss_vsc}.get(flag, pit_loss)
+                default = {"SC": pit_loss_sc, "VSC": pit_loss_vsc}.get(flag, pit_loss)
+                pit_cost = pit.get("loss", default)
 
             if flag == "SC" and sc_time:
                 lt = sc_time

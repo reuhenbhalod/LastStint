@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 7,
   "race": {
     "id": "bahrain-2022",
     "name": "Bahrain 2022: Leclerc vs Verstappen",
@@ -12,6 +12,52 @@
     "pitLoss": 23.641,
     "pitLossUnderSC": 13.003,
     "pitLossUnderVSC": 18.913,
+    "pitLossDeviations": [
+      -4.916,
+      -2.867,
+      -2.832,
+      -2.399,
+      -2.262,
+      -2.137,
+      -1.756,
+      -1.526,
+      -1.526,
+      -1.509,
+      -1.258,
+      -1.223,
+      -1.208,
+      -1.163,
+      -1.08,
+      -1.022,
+      -0.893,
+      -0.639,
+      -0.621,
+      -0.32,
+      -0.062,
+      -0.043,
+      0.043,
+      0.119,
+      0.207,
+      0.209,
+      0.3,
+      0.512,
+      0.667,
+      1.506,
+      1.548,
+      1.56,
+      2.097,
+      2.15,
+      2.15,
+      2.507,
+      2.598,
+      2.755,
+      2.883,
+      3.509,
+      3.964,
+      4.225,
+      4.486,
+      5.159
+    ],
     "overtakeDifficulty": 0.8862,
     "overtakeModel": {
       "intercept": 1.1117,
@@ -59,11 +105,13 @@
       "realStrategy": [
         {
           "lap": 14,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 21.242
         },
         {
           "lap": 36,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 27.605
         },
         {
           "lap": 47,
@@ -88,15 +136,18 @@
       "realStrategy": [
         {
           "lap": 12,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 21.379
         },
         {
           "lap": 26,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 23.941
         },
         {
           "lap": 43,
-          "to": "SOFT"
+          "to": "SOFT",
+          "loss": 23.02
         }
       ]
     },
@@ -117,11 +168,13 @@
       "realStrategy": [
         {
           "lap": 15,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 22.434
         },
         {
           "lap": 37,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 24.153
         },
         {
           "lap": 46,
@@ -146,11 +199,13 @@
       "realStrategy": [
         {
           "lap": 15,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 23.599
         },
         {
           "lap": 33,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 23.684
         }
       ]
     },
@@ -171,11 +226,13 @@
       "realStrategy": [
         {
           "lap": 12,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 26.148
         },
         {
           "lap": 28,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 25.201
         },
         {
           "lap": 45,
@@ -200,11 +257,13 @@
       "realStrategy": [
         {
           "lap": 20,
-          "to": "SOFT"
+          "to": "SOFT",
+          "loss": 28.8
         },
         {
           "lap": 38,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 27.15
         },
         {
           "lap": 45,
@@ -229,11 +288,13 @@
       "realStrategy": [
         {
           "lap": 15,
-          "to": "SOFT"
+          "to": "SOFT",
+          "loss": 18.725
         },
         {
           "lap": 33,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 25.148
         },
         {
           "lap": 46,
@@ -258,11 +319,13 @@
       "realStrategy": [
         {
           "lap": 16,
-          "to": "SOFT"
+          "to": "SOFT",
+          "loss": 22.115
         },
         {
           "lap": 32,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 21.885
         },
         {
           "lap": 47,
@@ -287,11 +350,13 @@
       "realStrategy": [
         {
           "lap": 15,
-          "to": "SOFT"
+          "to": "SOFT",
+          "loss": 22.561
         },
         {
           "lap": 35,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 26.239
         },
         {
           "lap": 47,
@@ -316,11 +381,13 @@
       "realStrategy": [
         {
           "lap": 13,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 20.774
         },
         {
           "lap": 36,
-          "to": "SOFT"
+          "to": "SOFT",
+          "loss": 23.002
         }
       ]
     },
@@ -341,11 +408,13 @@
       "realStrategy": [
         {
           "lap": 25,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 25.791
         },
         {
           "lap": 42,
-          "to": "SOFT"
+          "to": "SOFT",
+          "loss": 23.76
         },
         {
           "lap": 46,
@@ -370,15 +439,18 @@
       "realStrategy": [
         {
           "lap": 15,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 27.866
         },
         {
           "lap": 31,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 23.851
         },
         {
           "lap": 44,
-          "to": "SOFT"
+          "to": "SOFT",
+          "loss": 21.505
         }
       ]
     },
@@ -399,15 +471,18 @@
       "realStrategy": [
         {
           "lap": 16,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 22.749
         },
         {
           "lap": 34,
-          "to": "SOFT"
+          "to": "SOFT",
+          "loss": 22.478
         },
         {
           "lap": 44,
-          "to": "SOFT"
+          "to": "SOFT",
+          "loss": 22.418
         }
       ]
     },
@@ -428,11 +503,13 @@
       "realStrategy": [
         {
           "lap": 18,
-          "to": "SOFT"
+          "to": "SOFT",
+          "loss": 26.525
         },
         {
           "lap": 34,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 25.189
         },
         {
           "lap": 45,
@@ -457,11 +534,13 @@
       "realStrategy": [
         {
           "lap": 16,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 25.738
         },
         {
           "lap": 34,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 23.849
         },
         {
           "lap": 46,
@@ -486,11 +565,13 @@
       "realStrategy": [
         {
           "lap": 15,
-          "to": "SOFT"
+          "to": "SOFT",
+          "loss": 22.132
         },
         {
           "lap": 34,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 22.619
         },
         {
           "lap": 45,
@@ -515,11 +596,13 @@
       "realStrategy": [
         {
           "lap": 19,
-          "to": "SOFT"
+          "to": "SOFT",
+          "loss": 25.791
         },
         {
           "lap": 39,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 28.127
         },
         {
           "lap": 46,
@@ -544,11 +627,13 @@
       "realStrategy": [
         {
           "lap": 16,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 24.308
         },
         {
           "lap": 30,
-          "to": "SOFT"
+          "to": "SOFT",
+          "loss": 22.115
         },
         {
           "lap": 45,
@@ -573,15 +658,18 @@
       "realStrategy": [
         {
           "lap": 15,
-          "to": "SOFT"
+          "to": "SOFT",
+          "loss": 20.809
         },
         {
           "lap": 31,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 22.383
         },
         {
           "lap": 44,
-          "to": "SOFT"
+          "to": "SOFT",
+          "loss": 23.321
         }
       ]
     },
@@ -602,11 +690,13 @@
       "realStrategy": [
         {
           "lap": 16,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 23.579
         },
         {
           "lap": 38,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 26.396
         },
         {
           "lap": 46,

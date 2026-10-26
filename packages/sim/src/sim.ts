@@ -36,6 +36,7 @@ export const VSC_FALLBACK = 1.35; // VSC lap = this x green if not supplied
 export const CLIFF_FALLBACK = 2.0; // extra wear past the cliff = this x degPerLap if not fitted
 export const OVERTAKE_STREAM = 1000;
 export const ERROR_STREAM = 2000;
+export const STOP_STREAM = 4000;
 // Rival policy (Implementation Plan 2.5): under green the rival covers a stop only if its own
 // next planned stop is within this many laps.
 export const COVER_WINDOW = 4;
@@ -82,9 +83,26 @@ export interface Run {
   noiseRng: Record<string, Rng>;
   passRng: Record<string, Rng>;
   errorRng: Record<string, Rng>;
+  stopRng: Record<string, Rng>;
   /** Neutralization flag per lap, and retirements per lap, precomputed from events. */
   neutral: Map<number, Exclude<FlagState, 'green'>>;
   retireAt: Map<number, string[]>;
+}
+
+/**
+ * Time lost to a stop with no measured loss: the track's figure for the flag. A stop added
+ * during the run (the player's call, a rival reaction) also draws a deviation from the race's
+ * measured green stops, so it can be quick or slow like a real one (spec B1). Real stops
+ * never sample, so replays match the Python sim.
+ */
+function stopCost(run: Run, code: string, flag: FlagState | undefined, added: boolean): number {
+  const { track } = run.model;
+  const base =
+    flag === 'sc' ? track.pitLossUnderSC : flag === 'vsc' ? track.pitLossUnderVSC : track.pitLoss;
+  const devs = track.pitLossDeviations ?? [];
+  if (!added || devs.length === 0) return base;
+  const pick = Math.floor((run.stopRng[code] as Rng).next() * devs.length);
+  return base + (devs[pick] as number);
 }
 
 /**
@@ -249,16 +267,18 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
 function makeStreams(
   model: RaceModel,
   seed: number,
-): Pick<Run, 'noiseRng' | 'passRng' | 'errorRng'> {
+): Pick<Run, 'noiseRng' | 'passRng' | 'errorRng' | 'stopRng'> {
   const noiseRng: Record<string, Rng> = {};
   const passRng: Record<string, Rng> = {};
   const errorRng: Record<string, Rng> = {};
+  const stopRng: Record<string, Rng> = {};
   model.drivers.forEach((d, i) => {
     noiseRng[d.code] = mulberry32(deriveSeed(seed, i));
     passRng[d.code] = mulberry32(deriveSeed(seed, OVERTAKE_STREAM + i));
     errorRng[d.code] = mulberry32(deriveSeed(seed, ERROR_STREAM + i));
+    stopRng[d.code] = mulberry32(deriveSeed(seed, STOP_STREAM + i));
   });
-  return { noiseRng, passRng, errorRng };
+  return { noiseRng, passRng, errorRng, stopRng };
 }
 
 function cloneCar(c: CarState): CarState {
@@ -330,7 +350,7 @@ function applyDecisions(run: Run, lap: number): void {
       (user.modes as unknown as Record<string, string>)[d.key] = d.value;
     } else if (d.kind === 'pit') {
       user.strategy = user.strategy.filter((s) => s.lap !== lap + 1);
-      user.strategy.push({ lap: lap + 1, to: d.compound });
+      user.strategy.push({ lap: lap + 1, to: d.compound, added: true });
     }
   }
 }
@@ -371,7 +391,7 @@ function rivalReacts(
   if (!cover) return;
   const to = nextStop?.to ?? user.compound;
   rival.strategy = rival.strategy.filter((s) => s !== nextStop);
-  rival.strategy.push({ lap: lap + 1, to });
+  rival.strategy.push({ lap: lap + 1, to, added: true });
   run.notes.push({ lap, kind: 'rival-cover', driver: rival.code, detail: to });
 }
 
@@ -411,7 +431,8 @@ function rivalGoesLong(run: Run, lap: number): void {
     !ruleSatisfied(rival) && !others.some((s) => !rival.compoundsUsed.includes(s.to));
   let laterLap: number | null = stopLap + lapsToCliff;
   if (laterLap > model.race.laps) laterLap = needsThisStop ? model.race.laps : null;
-  rival.strategy = laterLap === null ? others : [...others, { lap: laterLap, to: planned.to }];
+  rival.strategy =
+    laterLap === null ? others : [...others, { lap: laterLap, to: planned.to, added: true }];
   run.notes.push({
     lap,
     kind: 'rival-stays-out',
@@ -523,12 +544,7 @@ export function stepLap(run: Run): RaceState {
       if (!c.compoundsUsed.includes(stop.to)) c.compoundsUsed.push(stop.to);
       c.tyreAge = 0;
       c.tyreWear = 0;
-      pitCost =
-        flag === 'sc'
-          ? track.pitLossUnderSC
-          : flag === 'vsc'
-            ? track.pitLossUnderVSC
-            : track.pitLoss;
+      pitCost = stop.loss ?? stopCost(run, code, flag, stop.added === true);
     }
 
     let lt: number;

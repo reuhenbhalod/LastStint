@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 7,
   "race": {
     "id": "bahrain-2018",
     "name": "Bahrain 2018",
@@ -12,6 +12,33 @@
     "pitLoss": 22.853,
     "pitLossUnderSC": 12.569,
     "pitLossUnderVSC": 39.233,
+    "pitLossDeviations": [
+      -1.975,
+      -1.671,
+      -1.598,
+      -1.508,
+      -1.464,
+      -1.051,
+      -0.867,
+      -0.811,
+      -0.723,
+      -0.641,
+      -0.134,
+      -0.026,
+      0.026,
+      0.027,
+      0.129,
+      0.778,
+      0.791,
+      0.876,
+      1.105,
+      1.777,
+      1.938,
+      2.759,
+      3.821,
+      6.978,
+      14.448
+    ],
     "overtakeDifficulty": 0.8734,
     "overtakeModel": {
       "intercept": 0.8203,
@@ -60,7 +87,8 @@
       "realStrategy": [
         {
           "lap": 40,
-          "to": "SOFT"
+          "to": "SOFT",
+          "loss": 23.729
         }
       ]
     },
@@ -116,7 +144,8 @@
       "realStrategy": [
         {
           "lap": 35,
-          "to": "SOFT"
+          "to": "SOFT",
+          "loss": 23.631
         }
       ]
     },
@@ -138,11 +167,13 @@
       "realStrategy": [
         {
           "lap": 31,
-          "to": "SOFT"
+          "to": "SOFT",
+          "loss": 22.982
         },
         {
           "lap": 46,
-          "to": "SOFT"
+          "to": "SOFT",
+          "loss": 29.831
         }
       ]
     },
@@ -180,7 +211,8 @@
       "realStrategy": [
         {
           "lap": 43,
-          "to": "SOFT"
+          "to": "SOFT",
+          "loss": 24.791
         }
       ]
     },
@@ -202,7 +234,8 @@
       "realStrategy": [
         {
           "lap": 40,
-          "to": "SOFT"
+          "to": "SOFT",
+          "loss": 23.643
         }
       ]
     },
@@ -224,7 +257,8 @@
       "realStrategy": [
         {
           "lap": 35,
-          "to": "SOFT"
+          "to": "SOFT",
+          "loss": 26.674
         }
       ]
     },
@@ -245,7 +279,8 @@
       "realStrategy": [
         {
           "lap": 28,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 22.88
         }
       ]
     },
@@ -267,7 +302,8 @@
       "realStrategy": [
         {
           "lap": 36,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 22.827
         }
       ]
     },
@@ -289,7 +325,8 @@
       "realStrategy": [
         {
           "lap": 33,
-          "to": "SOFT"
+          "to": "SOFT",
+          "loss": 22.719
         }
       ]
     },
@@ -327,7 +364,8 @@
       "realStrategy": [
         {
           "lap": 27,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 22.212
         }
       ]
     },
@@ -349,7 +387,8 @@
       "realStrategy": [
         {
           "lap": 41,
-          "to": "SOFT"
+          "to": "SOFT",
+          "loss": 23.958
         }
       ]
     },
@@ -388,7 +427,8 @@
       "realStrategy": [
         {
           "lap": 29,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 22.13
         }
       ]
     },

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 7,
   "race": {
     "id": "usa-2021",
     "name": "USA 2021: Hamilton vs Verstappen",
@@ -12,6 +12,46 @@
     "pitLoss": 20.587,
     "pitLossUnderSC": 11.323,
     "pitLossUnderVSC": 26.955,
+    "pitLossDeviations": [
+      -3.82,
+      -2.557,
+      -2.425,
+      -2.369,
+      -2.098,
+      -1.972,
+      -1.751,
+      -1.589,
+      -1.418,
+      -1.259,
+      -1.156,
+      -1.035,
+      -1.002,
+      -0.752,
+      -0.673,
+      -0.63,
+      -0.35,
+      -0.198,
+      -0.077,
+      0.077,
+      0.56,
+      0.588,
+      0.661,
+      1.134,
+      1.228,
+      1.29,
+      1.357,
+      1.583,
+      1.768,
+      2.241,
+      3.143,
+      3.228,
+      3.284,
+      3.645,
+      3.931,
+      5.119,
+      5.728,
+      14.137
+    ],
     "overtakeDifficulty": 0.9273,
     "overtakeModel": {
       "intercept": -1.4624,
@@ -59,11 +99,13 @@
       "realStrategy": [
         {
           "lap": 29,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 18.03
         },
         {
           "lap": 40,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 18.218
         }
       ]
     },
@@ -84,11 +126,13 @@
       "realStrategy": [
         {
           "lap": 16,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 19.552
         },
         {
           "lap": 35,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 19.835
         }
       ]
     },
@@ -109,7 +153,8 @@
       "realStrategy": [
         {
           "lap": 11,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 19.329
         }
       ]
     },
@@ -151,11 +196,13 @@
       "realStrategy": [
         {
           "lap": 14,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 21.249
         },
         {
           "lap": 38,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 22.828
         }
       ]
     },
@@ -198,11 +245,13 @@
       "realStrategy": [
         {
           "lap": 13,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 19.585
         },
         {
           "lap": 33,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 21.147
         }
       ]
     },
@@ -224,11 +273,13 @@
       "realStrategy": [
         {
           "lap": 25,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 24.232
         },
         {
           "lap": 38,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 23.73
         }
       ]
     },
@@ -249,11 +300,13 @@
       "realStrategy": [
         {
           "lap": 12,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 21.815
         },
         {
           "lap": 35,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 20.665
         }
       ]
     },
@@ -274,11 +327,13 @@
       "realStrategy": [
         {
           "lap": 11,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 18.999
         },
         {
           "lap": 31,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 23.815
         }
       ]
     },
@@ -321,11 +376,13 @@
       "realStrategy": [
         {
           "lap": 13,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 20.51
         },
         {
           "lap": 31,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 21.877
         }
       ]
     },
@@ -346,11 +403,13 @@
       "realStrategy": [
         {
           "lap": 13,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 19.17
         },
         {
           "lap": 32,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 22.356
         }
       ]
     },
@@ -371,11 +430,13 @@
       "realStrategy": [
         {
           "lap": 12,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 20.237
         },
         {
           "lap": 31,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 19.431
         }
       ]
     },
@@ -397,11 +458,13 @@
       "realStrategy": [
         {
           "lap": 10,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 18.489
         },
         {
           "lap": 32,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 23.871
         }
       ]
     },
@@ -422,11 +485,13 @@
       "realStrategy": [
         {
           "lap": 12,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 18.836
         },
         {
           "lap": 30,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 21.721
         }
       ]
     },
@@ -447,11 +512,13 @@
       "realStrategy": [
         {
           "lap": 19,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 21.945
         },
         {
           "lap": 35,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 19.957
         }
       ]
     },
@@ -473,11 +540,13 @@
       "realStrategy": [
         {
           "lap": 10,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 20.389
         },
         {
           "lap": 33,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 24.518
         }
       ]
     },
@@ -498,11 +567,13 @@
       "realStrategy": [
         {
           "lap": 11,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 18.162
         },
         {
           "lap": 30,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 19.914
         }
       ]
     },
@@ -523,11 +594,13 @@
       "realStrategy": [
         {
           "lap": 18,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 21.175
         },
         {
           "lap": 39,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 22.171
         }
       ]
     }

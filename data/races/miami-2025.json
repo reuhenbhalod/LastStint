@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 7,
   "race": {
     "id": "miami-2025",
     "name": "Miami 2025",
@@ -12,6 +12,13 @@
     "pitLoss": 18.62,
     "pitLossUnderSC": 10.241,
     "pitLossUnderVSC": 14.896,
+    "pitLossDeviations": [
+      -1.456,
+      -0.333,
+      0.0,
+      0.699,
+      1.06
+    ],
     "overtakeDifficulty": 0.9545,
     "overtakeModel": {
       "intercept": 0.5,
@@ -188,7 +195,8 @@
       "realStrategy": [
         {
           "lap": 37,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 19.32
         }
       ]
     },

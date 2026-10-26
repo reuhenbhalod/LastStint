@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 7,
   "race": {
     "id": "saudi-2022",
     "name": "Saudi Arabia 2022: Leclerc vs Verstappen",
@@ -12,6 +12,11 @@
     "pitLoss": 22.655,
     "pitLossUnderSC": 12.46,
     "pitLossUnderVSC": 26.509,
+    "pitLossDeviations": [
+      -2.759,
+      -1.019,
+      1.019
+    ],
     "overtakeDifficulty": 0.908,
     "overtakeModel": {
       "intercept": -0.1006,
@@ -54,7 +59,8 @@
       "realStrategy": [
         {
           "lap": 14,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 21.636
         }
       ]
     },
@@ -100,7 +106,8 @@
         },
         {
           "lap": 36,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 45.105
         }
       ]
     },
@@ -364,7 +371,8 @@
       "realStrategy": [
         {
           "lap": 14,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 23.674
         }
       ]
     },

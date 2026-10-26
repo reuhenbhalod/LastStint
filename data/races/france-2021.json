@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 7,
   "race": {
     "id": "france-2021",
     "name": "France 2021: Hamilton vs Verstappen",
@@ -12,6 +12,30 @@
     "pitLoss": 23.164,
     "pitLossUnderSC": 12.74,
     "pitLossUnderVSC": 18.531,
+    "pitLossDeviations": [
+      -2.714,
+      -2.375,
+      -1.685,
+      -1.494,
+      -1.191,
+      -1.061,
+      -0.928,
+      -0.601,
+      -0.559,
+      -0.081,
+      -0.067,
+      0.067,
+      0.197,
+      0.448,
+      0.475,
+      0.497,
+      0.558,
+      0.611,
+      0.831,
+      0.838,
+      1.043,
+      3.124
+    ],
     "overtakeDifficulty": 0.8951,
     "overtakeModel": {
       "intercept": -0.4452,
@@ -56,7 +80,8 @@
       "realStrategy": [
         {
           "lap": 19,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 24.003
         }
       ]
     },
@@ -77,7 +102,8 @@
       "realStrategy": [
         {
           "lap": 18,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 21.479
         }
       ]
     },
@@ -98,7 +124,8 @@
       "realStrategy": [
         {
           "lap": 18,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 23.083
         }
       ]
     },
@@ -119,7 +146,8 @@
       "realStrategy": [
         {
           "lap": 29,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 23.361
         }
       ]
     },
@@ -140,7 +168,8 @@
       "realStrategy": [
         {
           "lap": 20,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 23.776
         }
       ]
     },
@@ -161,7 +190,8 @@
       "realStrategy": [
         {
           "lap": 19,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 22.605
         }
       ]
     },
@@ -183,11 +213,13 @@
       "realStrategy": [
         {
           "lap": 15,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 21.67
         },
         {
           "lap": 39,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 23.661
         }
       ]
     },
@@ -208,7 +240,8 @@
       "realStrategy": [
         {
           "lap": 32,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 26.288
         }
       ]
     },
@@ -229,7 +262,8 @@
       "realStrategy": [
         {
           "lap": 16,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 23.613
         }
       ]
     },
@@ -250,7 +284,8 @@
       "realStrategy": [
         {
           "lap": 25,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 23.723
         }
       ]
     },
@@ -271,7 +306,8 @@
       "realStrategy": [
         {
           "lap": 29,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 23.231
         }
       ]
     },
@@ -292,7 +328,8 @@
       "realStrategy": [
         {
           "lap": 25,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 22.237
         }
       ]
     },
@@ -313,7 +350,8 @@
       "realStrategy": [
         {
           "lap": 34,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 23.639
         }
       ]
     },
@@ -334,7 +372,8 @@
       "realStrategy": [
         {
           "lap": 17,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 20.45
         }
       ]
     },
@@ -355,7 +394,8 @@
       "realStrategy": [
         {
           "lap": 18,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 20.789
         }
       ]
     },
@@ -376,7 +416,8 @@
       "realStrategy": [
         {
           "lap": 18,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 23.097
         }
       ]
     },
@@ -397,7 +438,8 @@
       "realStrategy": [
         {
           "lap": 35,
-          "to": "SOFT"
+          "to": "SOFT",
+          "loss": 24.208
         }
       ]
     },
@@ -418,7 +460,8 @@
       "realStrategy": [
         {
           "lap": 16,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 22.563
         }
       ]
     },
@@ -439,11 +482,13 @@
       "realStrategy": [
         {
           "lap": 19,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 21.974
         },
         {
           "lap": 33,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 22.103
         }
       ]
     },
@@ -464,7 +509,8 @@
       "realStrategy": [
         {
           "lap": 38,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 23.995
         }
       ]
     }

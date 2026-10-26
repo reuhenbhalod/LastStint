@@ -56,6 +56,11 @@
         "pitLoss": { "type": "number" },
         "pitLossUnderSC": { "type": "number" },
         "pitLossUnderVSC": { "type": "number" },
+        "pitLossDeviations": {
+          "type": "array",
+          "items": { "type": "number" },
+          "description": "Measured green-stop losses minus pitLoss, for sampling new stops (slow-stop tail included)."
+        },
         "overtakeDifficulty": { "type": "number", "minimum": 0, "maximum": 1 },
         "overtakeModel": {
           "type": "object",
@@ -130,7 +135,11 @@
               "required": ["lap", "to"],
               "properties": {
                 "lap": { "type": "integer", "minimum": 1 },
-                "to": { "type": "string" }
+                "to": { "type": "string" },
+                "loss": {
+                  "type": "number",
+                  "description": "Measured time lost to this real stop (green/VSC stops; frozen like other real events). Absent: the track's figure for the flag."
+                }
               }
             }
           }

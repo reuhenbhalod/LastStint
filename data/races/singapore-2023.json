@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 7,
   "race": {
     "id": "singapore-2023",
     "name": "Singapore 2023",
@@ -12,6 +12,12 @@
     "pitLoss": 28.947,
     "pitLossUnderSC": 15.921,
     "pitLossUnderVSC": 32.587,
+    "pitLossDeviations": [
+      -0.603,
+      -0.601,
+      0.601,
+      1.922
+    ],
     "overtakeDifficulty": 0.9486,
     "overtakeModel": {
       "intercept": -0.5231,
@@ -110,7 +116,8 @@
       "realStrategy": [
         {
           "lap": 41,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 29.548
         }
       ]
     },
@@ -307,7 +314,8 @@
       "realStrategy": [
         {
           "lap": 40,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 30.869
         }
       ]
     },
@@ -420,7 +428,8 @@
       "realStrategy": [
         {
           "lap": 41,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 28.345
         }
       ]
     },

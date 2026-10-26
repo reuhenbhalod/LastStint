@@ -12,6 +12,7 @@ import pandas as pd
 from . import SCHEMA_VERSION
 from . import events as events_mod
 from . import scenario as scenario_mod
+from . import track as track_mod
 from .fit import LapTimeFit
 from .track import TrackParams
 
@@ -74,6 +75,8 @@ def assemble_race_model(
     takeover_state = scenario_mod.state_at_takeover(laps, takeover_lap)
     strategy = scenario_mod.real_strategy(laps)
     teams = _team_map(laps)
+    # Real stops keep their measured time (spec B1): a slow or quick stop is a real event.
+    measured = track_mod.measured_stop_losses(laps)
 
     drivers = []
     for code in sorted(set(takeover_state) & set(fit.driver_pace)):
@@ -93,7 +96,18 @@ def assemble_race_model(
                     "tyreAge": s["tyreAge"] if s["tyreAge"] is not None else 0,
                     "compoundsUsed": s["compoundsUsed"],
                 },
-                "realStrategy": [st for st in strategy.get(code, []) if st["lap"] >= takeover_lap],
+                "realStrategy": [
+                    {
+                        **st,
+                        **(
+                            {"loss": round(measured[(code, st["lap"])], 3)}
+                            if (code, st["lap"]) in measured
+                            else {}
+                        ),
+                    }
+                    for st in strategy.get(code, [])
+                    if st["lap"] >= takeover_lap
+                ],
             }
         )
 
@@ -115,6 +129,7 @@ def assemble_race_model(
             "pitLoss": round(track_params.pit_loss, 3),
             "pitLossUnderSC": round(track_params.pit_loss_under_sc, 3),
             "pitLossUnderVSC": round(track_params.pit_loss_under_vsc, 3),
+            "pitLossDeviations": track_params.pit_loss_deviations,
             "overtakeDifficulty": round(track_params.overtake_difficulty, 4),
             "overtakeModel": {k: round(v, 4) for k, v in track_params.overtake_model.items()},
             "dirtyAirPenalty": round(track_params.dirty_air_penalty, 4),

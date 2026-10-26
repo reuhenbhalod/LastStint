@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 7,
   "race": {
     "id": "portugal-2020",
     "name": "Portugal 2020",
@@ -12,6 +12,32 @@
     "pitLoss": 28.441,
     "pitLossUnderSC": 15.643,
     "pitLossUnderVSC": 22.753,
+    "pitLossDeviations": [
+      -4.304,
+      -2.61,
+      -2.552,
+      -1.736,
+      -1.495,
+      -1.319,
+      -1.259,
+      -0.577,
+      -0.519,
+      -0.509,
+      -0.371,
+      -0.333,
+      0.0,
+      0.051,
+      0.804,
+      0.914,
+      1.337,
+      1.594,
+      2.631,
+      4.786,
+      6.396,
+      8.539,
+      9.097,
+      14.278
+    ],
     "overtakeDifficulty": 0.8903,
     "overtakeModel": {
       "intercept": 2.0825,
@@ -57,7 +83,8 @@
       "realStrategy": [
         {
           "lap": 47,
-          "to": "SOFT"
+          "to": "SOFT",
+          "loss": 25.831
         }
       ]
     },
@@ -78,7 +105,8 @@
       "realStrategy": [
         {
           "lap": 42,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 31.072
         }
       ]
     },
@@ -150,7 +178,8 @@
       "realStrategy": [
         {
           "lap": 41,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 30.035
         }
       ]
     },
@@ -172,7 +201,8 @@
       "realStrategy": [
         {
           "lap": 56,
-          "to": "SOFT"
+          "to": "SOFT",
+          "loss": 42.719
         }
       ]
     },
@@ -245,7 +275,8 @@
       "realStrategy": [
         {
           "lap": 44,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 29.355
         }
       ]
     },
@@ -266,7 +297,8 @@
       "realStrategy": [
         {
           "lap": 54,
-          "to": "SOFT"
+          "to": "SOFT",
+          "loss": 28.441
         }
       ]
     },
@@ -288,7 +320,8 @@
       "realStrategy": [
         {
           "lap": 46,
-          "to": "SOFT"
+          "to": "SOFT",
+          "loss": 26.705
         }
       ]
     },
@@ -344,7 +377,8 @@
       "realStrategy": [
         {
           "lap": 37,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 34.837
         }
       ]
     },

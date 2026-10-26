@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 7,
   "race": {
     "id": "miami-2022",
     "name": "Miami 2022: Leclerc vs Verstappen",
@@ -12,6 +12,23 @@
     "pitLoss": 21.79,
     "pitLossUnderSC": 11.984,
     "pitLossUnderVSC": 17.432,
+    "pitLossDeviations": [
+      -1.964,
+      -1.714,
+      -1.688,
+      -1.635,
+      -1.247,
+      -1.219,
+      -0.742,
+      -0.152,
+      0.152,
+      0.456,
+      1.489,
+      1.634,
+      1.882,
+      2.531,
+      2.66
+    ],
     "overtakeDifficulty": 0.9133,
     "overtakeModel": {
       "intercept": -0.4513,
@@ -92,7 +109,8 @@
       "realStrategy": [
         {
           "lap": 27,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 21.048
         }
       ]
     },
@@ -135,7 +153,8 @@
       "realStrategy": [
         {
           "lap": 23,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 20.543
         }
       ]
     },
@@ -156,7 +175,8 @@
       "realStrategy": [
         {
           "lap": 35,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 23.671
         }
       ]
     },
@@ -177,7 +197,8 @@
       "realStrategy": [
         {
           "lap": 25,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 23.278
         }
       ]
     },
@@ -221,7 +242,8 @@
       "realStrategy": [
         {
           "lap": 55,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 45.691
         }
       ]
     },
@@ -280,7 +302,8 @@
       "realStrategy": [
         {
           "lap": 28,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 20.57
         },
         {
           "lap": 42,
@@ -305,7 +328,8 @@
       "realStrategy": [
         {
           "lap": 31,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 22.246
         },
         {
           "lap": 42,
@@ -351,7 +375,8 @@
       "realStrategy": [
         {
           "lap": 28,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 24.321
         }
       ]
     },
@@ -415,7 +440,8 @@
       "realStrategy": [
         {
           "lap": 27,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 20.102
         }
       ]
     },

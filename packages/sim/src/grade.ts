@@ -105,7 +105,7 @@ export function playOption(run: Run, seed: number, option: GradeOption): Run {
   const user = fork.state.cars[fork.model.userSide];
   if (user && !isFinished(fork) && !user.strategy.some((s) => s.lap > fork.state.lap)) {
     const stop = planRemainingStop(fork);
-    if (stop) user.strategy.push(stop);
+    if (stop) user.strategy.push({ ...stop, added: true });
   }
   return fork;
 }

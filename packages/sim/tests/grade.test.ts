@@ -105,7 +105,7 @@ describe('sensible-strategist continuation', () => {
   it("a playout gives 'stay out' a later stop instead of none", () => {
     const run = pausedAt(spain, 23);
     const fork = playOption(run, 1, { id: 'stay-out', decisions: [] });
-    expect(fork.state.cars.VER?.strategy).toEqual([{ lap: 35, to: 'MEDIUM' }]);
+    expect(fork.state.cars.VER?.strategy).toEqual([{ lap: 35, to: 'MEDIUM', added: true }]);
     while (!isFinished(fork)) stepLap(fork);
     expect(fork.state.cars.VER?.tyreAge).toBe(spain.race.laps - 35 + 1);
   });

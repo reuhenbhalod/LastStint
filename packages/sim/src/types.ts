@@ -39,7 +39,7 @@ export interface DriverModel {
     /** Dry compounds run up to the takeover lap (two-compound rule). */
     compoundsUsed: Compound[];
   };
-  realStrategy: Array<{ lap: number; to: Compound }>;
+  realStrategy: PitStop[];
 }
 
 export interface RaceEvent {
@@ -58,6 +58,8 @@ export interface RaceModel {
     pitLoss: number;
     pitLossUnderSC: number;
     pitLossUnderVSC: number;
+    /** Measured green-stop losses minus pitLoss: new stops sample from these (spec B1). */
+    pitLossDeviations?: number[];
     overtakeDifficulty: number;
     /** P(pass) = sigmoid(intercept + paceCoef * paceAdvantage + gapCoef * gap). */
     overtakeModel: { intercept: number; paceCoef: number; gapCoef: number };
@@ -82,6 +84,10 @@ export interface PitStop {
   /** The out-lap: the first lap run on the new tyres (pit loss is charged on this lap). */
   lap: number;
   to: Compound;
+  /** Measured loss of a real green-flag stop (frozen). */
+  loss?: number;
+  /** A stop the player or the rival added during the run: its loss is sampled (spec B1). */
+  added?: boolean;
 }
 
 export interface CarState {

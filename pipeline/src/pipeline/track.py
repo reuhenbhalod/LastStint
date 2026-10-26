@@ -33,6 +33,7 @@ class TrackParams:
     n_pass_opportunities: int
     n_passes: int
     overtake_model: dict[str, float] = field(default_factory=dict)
+    pit_loss_deviations: list[float] = field(default_factory=list)
     notes: list[str] = field(default_factory=list)  # where a fallback/estimate was used
 
 
@@ -84,8 +85,10 @@ def _has_vsc(status_value: object) -> bool:
     return "6" in s or "7" in s
 
 
-def stop_losses(laps: pd.DataFrame) -> list[tuple[str, str, float]]:
-    """Per pit stop: (driver, flag, loss). Loss = in-lap + out-lap minus the median lap time
+def stop_records(laps: pd.DataFrame) -> list[dict]:
+    """Per measurable pit stop: {driver, out_lap, flag, loss}.
+
+    Loss = in-lap + out-lap minus the median lap time
     of cars that did not pit on those same laps, so fuel, track evolution and neutralized
     pace cancel out, minus twice the driver's own green-lap pace offset to that field median,
     so a slow car's slow in/out laps aren't counted as pit time. Flag is "SC" if either lap
@@ -105,7 +108,7 @@ def stop_losses(laps: pd.DataFrame) -> list[tuple[str, str, float]]:
         (green["LapTime"] - green["LapNumber"].map(field_median)).groupby(green["Driver"]).median()
     )
 
-    out: list[tuple[str, str, float]] = []
+    out: list[dict] = []
     for driver, in_lap, out_lap in stops:
         if pd.isna(in_lap["LapTime"]) or pd.isna(out_lap["LapTime"]):
             continue
@@ -122,8 +125,39 @@ def stop_losses(laps: pd.DataFrame) -> list[tuple[str, str, float]]:
         reference = sum(float(field_median[lap]) for lap in laps_used)
         reference += 2 * float(pace_offset.get(driver, 0.0))
         loss = float(in_lap["LapTime"]) + float(out_lap["LapTime"]) - reference
-        out.append((driver, flag, loss))
+        out.append(
+            {"driver": driver, "out_lap": int(out_lap["LapNumber"]), "flag": flag, "loss": loss}
+        )
     return out
+
+
+def stop_losses(laps: pd.DataFrame) -> list[tuple[str, str, float]]:
+    """(driver, flag, loss) for every measurable stop (see stop_records)."""
+    return [(r["driver"], r["flag"], r["loss"]) for r in stop_records(laps)]
+
+
+# Stops slower than this beyond the median are penalties or damage, not pit-stop variance.
+MAX_STOP_DEVIATION = 15.0
+
+
+def measured_stop_losses(laps: pd.DataFrame) -> dict[tuple[str, int], float]:
+    """(driver, out-lap) -> measured loss for every fully green-flag stop.
+
+    Stops touching a SC can't be measured, and stops touching a VSC usually catch it for only
+    part of the in- or out-lap, which makes their measurement unreliable (Canada 2022: 7.9s
+    and 25.9s against an 18.9s median), so both keep the track's figure for their flag.
+    """
+    return {
+        (r["driver"], r["out_lap"]): r["loss"] for r in stop_records(laps) if r["flag"] == "green"
+    }
+
+
+def pit_loss_deviations(laps: pd.DataFrame, median: float | None) -> list[float]:
+    """Green-stop losses minus the median, excluding penalty-sized outliers."""
+    if median is None:
+        return []
+    devs = [loss - median for _, flag, loss in stop_losses(laps) if flag == "green"]
+    return sorted(round(d, 3) for d in devs if abs(d) <= MAX_STOP_DEVIATION)
 
 
 def pit_loss(laps: pd.DataFrame) -> float | None:
@@ -310,6 +344,7 @@ def fit_track_params(
         notes.append(overtake_note)
     return TrackParams(
         overtake_model=overtake,
+        pit_loss_deviations=pit_loss_deviations(laps, green_pit),
         pit_loss=green_pit,
         pit_loss_under_sc=sc_pit,
         pit_loss_under_vsc=vsc_pit,

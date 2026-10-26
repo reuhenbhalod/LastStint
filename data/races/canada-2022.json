@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 7,
   "race": {
     "id": "canada-2022",
     "name": "Canada 2022: Sainz vs Verstappen",
@@ -12,6 +12,18 @@
     "pitLoss": 18.918,
     "pitLossUnderSC": 10.405,
     "pitLossUnderVSC": 12.441,
+    "pitLossDeviations": [
+      -1.39,
+      -0.966,
+      -0.928,
+      -0.849,
+      -0.223,
+      0.223,
+      0.637,
+      0.716,
+      2.079,
+      9.466
+    ],
     "overtakeDifficulty": 0.949,
     "overtakeModel": {
       "intercept": -1.8877,
@@ -79,7 +91,8 @@
       "realStrategy": [
         {
           "lap": 29,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 19.634
         },
         {
           "lap": 50,
@@ -126,7 +139,8 @@
       "realStrategy": [
         {
           "lap": 37,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 18.695
         }
       ]
     },
@@ -148,7 +162,8 @@
       "realStrategy": [
         {
           "lap": 45,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 19.555
         }
       ]
     },
@@ -170,7 +185,8 @@
       "realStrategy": [
         {
           "lap": 38,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 28.383
         }
       ]
     },
@@ -191,7 +207,8 @@
       "realStrategy": [
         {
           "lap": 42,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 20.996
         }
       ]
     },
@@ -249,7 +266,8 @@
         },
         {
           "lap": 43,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 18.069
         }
       ]
     },
@@ -324,7 +342,8 @@
         },
         {
           "lap": 46,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 19.141
         }
       ]
     },
@@ -409,7 +428,8 @@
       "realStrategy": [
         {
           "lap": 44,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 17.952
         }
       ]
     },

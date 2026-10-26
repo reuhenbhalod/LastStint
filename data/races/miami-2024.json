@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 7,
   "race": {
     "id": "miami-2024",
     "name": "Miami 2024",
@@ -12,6 +12,20 @@
     "pitLoss": 19.44,
     "pitLossUnderSC": 10.692,
     "pitLossUnderVSC": 14.558,
+    "pitLossDeviations": [
+      -1.776,
+      -0.861,
+      -0.677,
+      -0.556,
+      -0.236,
+      -0.116,
+      0.116,
+      0.231,
+      1.349,
+      2.063,
+      9.368,
+      11.641
+    ],
     "overtakeDifficulty": 0.9542,
     "overtakeModel": {
       "intercept": -0.8682,
@@ -59,7 +73,8 @@
       "realStrategy": [
         {
           "lap": 54,
-          "to": "SOFT"
+          "to": "SOFT",
+          "loss": 28.808
         }
       ]
     },
@@ -140,7 +155,8 @@
       "realStrategy": [
         {
           "lap": 27,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 18.884
         }
       ]
     },
@@ -184,7 +200,8 @@
       "realStrategy": [
         {
           "lap": 20,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 19.204
         }
       ]
     },
@@ -298,7 +315,8 @@
         },
         {
           "lap": 41,
-          "to": "MEDIUM"
+          "to": "MEDIUM",
+          "loss": 31.081
         }
       ]
     },
@@ -340,7 +358,8 @@
       "realStrategy": [
         {
           "lap": 25,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 18.763
         }
       ]
     },

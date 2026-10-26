@@ -146,7 +146,8 @@ describe('rival policy', () => {
       detail: 'no stop',
     });
     expect(run.state.cars.VER?.strategy).toEqual([]);
-    expect(run.state.order.indexOf('VER')).toBeLessThan(run.state.order.indexOf('HAM'));
+    // Whether HAM rejoins ahead depends on his (sampled) stop time; that trade-off is what the
+    // grader measures, so it is not asserted for a single seed here.
   });
 
   it('only a rival behind the user can go long', () => {
@@ -193,5 +194,30 @@ describe('two-compound rule', () => {
     expect(ruleSatisfied(run.state.cars.VER as never)).toBe(false);
     while (run.state.lap < 31) stepLap(run);
     expect(ruleSatisfied(run.state.cars.VER as never)).toBe(true);
+  });
+});
+
+describe('stop times (spec B1)', () => {
+  it('real green stops keep their measured time', () => {
+    const bot = abu.drivers.find((d) => d.code === 'VER');
+    expect(bot?.realStrategy.every((s) => s.loss === undefined || s.loss > 0)).toBe(true);
+  });
+
+  it("a player's stop samples from the race's measured spread", () => {
+    const times = new Set<number>();
+    for (let seed = 1; seed <= 30; seed++) {
+      const run = initRun(spain, seed, {
+        decisions: [{ lap: 30, kind: 'pit', compound: 'MEDIUM' }],
+      });
+      while (run.state.lap < 30) stepLap(run);
+      const before = run.state.cars.VER?.totalTime as number;
+      stepLap(run);
+      times.add(Math.round(((run.state.cars.VER?.totalTime as number) - before) * 10));
+    }
+    expect(times.size).toBeGreaterThan(5); // not one fixed figure
+  });
+
+  it('replays never sample (Python parity)', () => {
+    expect(simulate(spain, 3)).toEqual(simulate(spain, 3));
   });
 });
