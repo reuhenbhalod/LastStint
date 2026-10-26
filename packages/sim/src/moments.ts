@@ -29,11 +29,12 @@ export interface DecisionMoment {
 }
 
 /**
- * Plan 5.3 quality bar, in percentage points of the target's chance. A moment fails if every
- * option is within NO_CHOICE of the best (no real choice) or the best leads the runner-up by
- * more than NO_TENSION (one option is obviously right).
+ * Plan 5.3 quality bar, in percentage points of the target's chance. A moment fails if no
+ * option is more than NO_CHOICE behind the best, i.e. none grades orange or worse (no real
+ * choice: the plan's literal 0.5 points passed moments where every call won 98-100%), or if
+ * the best leads the runner-up by more than NO_TENSION (one option is obviously right).
  */
-export const QUALITY = { NO_CHOICE: 0.5, NO_TENSION: 30 } as const;
+export const QUALITY = { NO_CHOICE: 5, NO_TENSION: 30 } as const;
 
 export type Verdict = 'keep' | 'no-choice' | 'no-tension';
 
@@ -43,8 +44,16 @@ export interface ProposedMoment extends DecisionMoment {
 }
 
 const DEFAULT_TARGET: Target = { kind: 'beat-rival' };
-/** Candidates closer together than this are merged (the earlier one is kept). */
+/** Candidates closer together than this are merged, keeping the higher-priority trigger. */
 const MIN_SPACING = 3;
+/** Merge priority: the events that make a call unavoidable come first. */
+const PRIORITY: Record<MomentTrigger, number> = {
+  SC: 0,
+  VSC: 1,
+  rivalPit: 2,
+  undercut: 3,
+  cliff: 4,
+};
 /** Laps before the rival's real stop at which the undercut window is offered. */
 const UNDERCUT_LEAD = 2;
 /** Laps before the user's tyres reach the cliff at which that moment is offered. */
@@ -123,7 +132,7 @@ export function candidateMoments(model: RaceModel, target = DEFAULT_TARGET): Dec
   const moments: DecisionMoment[] = [];
   for (const { lap, trigger } of found
     .filter((f) => f.lap >= first && f.lap <= last)
-    .sort((a, b) => a.lap - b.lap)) {
+    .sort((a, b) => PRIORITY[a.trigger] - PRIORITY[b.trigger] || a.lap - b.lap)) {
     if (moments.some((m) => Math.abs(m.lap - lap) < MIN_SPACING)) continue;
     const box = boxOptions(model, lap);
     const extra =
@@ -142,7 +151,7 @@ export function candidateMoments(model: RaceModel, target = DEFAULT_TARGET): Dec
       realOptionId: realOptionId(model, lap, options),
     });
   }
-  return moments;
+  return moments.sort((a, b) => a.lap - b.lap);
 }
 
 /** The plan 5.3 verdict for a graded moment. */

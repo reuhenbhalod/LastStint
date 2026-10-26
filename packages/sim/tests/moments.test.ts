@@ -53,8 +53,14 @@ describe('candidate moments', () => {
 });
 
 describe('quality bar (plan 5.3)', () => {
-  it('rejects a moment with no real choice', () => {
+  it('rejects a moment with no real choice (no option worse than yellow)', () => {
     expect(verdictFor(grade({ a: 0.5, b: 0.498, c: 0.5 }))).toBe('no-choice');
+    expect(verdictFor(grade({ a: 1.0, b: 0.98, c: 0.99 }))).toBe('no-choice');
+  });
+
+  it('keeps the SC over a nearby lower-priority trigger', () => {
+    const laps = candidateMoments(abu).map((m) => `${m.trigger}@${m.lap}`);
+    expect(laps).toContain('SC@53');
   });
 
   it('rejects a moment with one obviously right option', () => {

@@ -110,3 +110,36 @@ describe('sensible-strategist continuation', () => {
     expect(fork.state.cars.VER?.tyreAge).toBe(spain.race.laps - 35 + 1);
   });
 });
+
+describe('grading without hindsight (spec decision, Oct 26 2026)', () => {
+  it("playouts don't know future real events, but keep the one underway", async () => {
+    const { forkRun, initRun: init, stepLap: step } = await import('../src/sim.js');
+    // Abu Dhabi 2021 paused after lap 43: the lap-53 SC is in the future.
+    const early = init(abu, abu.race.seed, { decisions: [] });
+    while (early.state.lap < 43) step(early);
+    let withSc = 0;
+    for (let s = 1; s <= 200; s++) {
+      if (forkRun(early, s, [], { blindAfter: 44 }).neutral.get(53) === 'sc') withSc++;
+    }
+    expect(withSc / 200).toBeLessThan(0.1); // only by chance, at about the base rate
+    // Paused after lap 52, deciding on lap 53: the SC that prompts the call is known.
+    const late = init(abu, abu.race.seed, { decisions: [] });
+    while (late.state.lap < 52) step(late);
+    const fork = forkRun(late, 1, [], { blindAfter: 53 });
+    expect([53, 54, 55, 56, 57].map((l) => fork.neutral.get(l))).toEqual([
+      'sc',
+      'sc',
+      'sc',
+      'sc',
+      'sc',
+    ]);
+  });
+
+  it('forks with the same seed see the same random future (common random numbers)', async () => {
+    const { forkRun, initRun: init } = await import('../src/sim.js');
+    const run = init(abu, 1, { decisions: [] });
+    const a = forkRun(run, 7, [], { blindAfter: 35 });
+    const b = forkRun(run, 7, [{ lap: 35, kind: 'pit', compound: 'SOFT' }], { blindAfter: 35 });
+    expect([...a.neutral]).toEqual([...b.neutral]);
+  });
+});

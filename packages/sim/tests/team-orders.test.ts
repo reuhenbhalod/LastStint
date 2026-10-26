@@ -98,25 +98,35 @@ describe('team orders', () => {
     expect(simulate(abu, 2)).toEqual(simulate(abu, 2));
   });
 
-  it('known answer: holding up the rival grades best when the teammate is in between', () => {
-    // HAM leads; BOT 2s back, directly ahead of VER (0.8s). Telling BOT to hold VER up must
-    // raise HAM's win chance over leaving them to race.
-    const model = withFront(abu, [
-      ['HAM', 0],
-      ['BOT', 2.0],
-      ['VER', 0.8],
-    ]);
+  it('known answer: holding up a faster rival behind your teammate grades best', () => {
+    // Controlled scenario: VER (user) leads, teammate PER 0.6s back, rival HAM 0.6s behind PER
+    // and 0.3s/lap faster than VER. Without the order HAM gets through to VER eventually;
+    // with PER holding him up, VER's chance of finishing ahead must rise.
+    const fast = withFront(
+      abu,
+      [
+        ['VER', 0],
+        ['PER', 0.6],
+        ['HAM', 0.6],
+      ],
+      'VER',
+    );
+    const ver = fast.drivers.find((d) => d.code === 'VER')?.basePace as number;
+    const model: RaceModel = {
+      ...fast,
+      rival: 'HAM',
+      drivers: fast.drivers.map((d) => (d.code === 'HAM' ? { ...d, basePace: ver - 0.3 } : d)),
+    };
     const run = initRun(model, model.race.seed, { decisions: [] });
-    while (run.state.lap < 35) stepLap(run);
     const options: Array<{ id: string; decisions: Decision[] }> = [
       { id: 'race', decisions: [] },
-      { id: 'hold-up', decisions: [{ lap: 36, kind: 'teamOrder', order: 'holdUp' }] },
+      { id: 'hold-up', decisions: [{ lap: 35, kind: 'teamOrder', order: 'holdUp' }] },
     ];
-    const g = gradeMoment(run, options, { kind: 'win' }, 200);
+    const g = gradeMoment(run, options, { kind: 'beat-rival' }, 300);
     expect(g.best).toBe('hold-up');
     const race = g.options.find((o) => o.id === 'race');
     const hold = g.options.find((o) => o.id === 'hold-up');
-    expect((hold?.probability ?? 0) - (race?.probability ?? 0)).toBeGreaterThan(0.02);
+    expect((hold?.probability ?? 0) - (race?.probability ?? 0)).toBeGreaterThan(0.03);
   });
 
   it('holding up costs the teammate time', () => {

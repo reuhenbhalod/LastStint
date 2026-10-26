@@ -37,6 +37,7 @@ export const CLIFF_FALLBACK = 2.0; // extra wear past the cliff = this x degPerL
 export const OVERTAKE_STREAM = 1000;
 export const ERROR_STREAM = 2000;
 export const STOP_STREAM = 4000;
+export const EVENT_STREAM = 5000;
 // Rival policy (Implementation Plan 2.5): under green the rival covers a stop only if its own
 // next planned stop is within this many laps.
 export const COVER_WINDOW = 4;
@@ -62,6 +63,7 @@ interface HeadsetEra {
   baseErrorRate: number;
   errorCost: number;
   modes: { [K in keyof Modes]: Record<string, ModeEffect> };
+  neutralization?: { scPerLap: number; vscPerLap: number; scLaps: number; vscLaps: number };
   teamOrders?: {
     holdUpLogit: number;
     holdUpCost: number;
@@ -91,9 +93,23 @@ export interface Run {
   passRng: Record<string, Rng>;
   errorRng: Record<string, Rng>;
   stopRng: Record<string, Rng>;
+  /** Neutralizations (start lap, length, flag): the real ones, or a grader fork's view. */
+  events: NeutralEvent[];
   /** Neutralization flag per lap, and retirements per lap, precomputed from events. */
   neutral: Map<number, Exclude<FlagState, 'green'>>;
   retireAt: Map<number, string[]>;
+}
+
+export interface NeutralEvent {
+  lap: number;
+  laps: number;
+  flag: Exclude<FlagState, 'green'>;
+}
+
+function neutralMap(events: NeutralEvent[]): Map<number, Exclude<FlagState, 'green'>> {
+  const map = new Map<number, Exclude<FlagState, 'green'>>();
+  for (const e of events) for (let lap = e.lap; lap < e.lap + e.laps; lap++) map.set(lap, e.flag);
+  return map;
 }
 
 /**
@@ -236,11 +252,11 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
   const strategies = options.strategies ?? {};
   const live = options.decisions !== undefined;
   if (live) validateDecisions(model, options.decisions ?? []);
-  const neutral = new Map<number, Exclude<FlagState, 'green'>>();
+  const events: NeutralEvent[] = [];
   const retireAt = new Map<number, string[]>();
   for (const e of model.events) {
     if (e.type === 'SC' || e.type === 'VSC' || e.type === 'RED') {
-      for (let lap = e.lap; lap < e.lap + (e.laps ?? 1); lap++) neutral.set(lap, FLAG_OF[e.type]);
+      events.push({ lap: e.lap, laps: e.laps ?? 1, flag: FLAG_OF[e.type] });
     } else if (e.type === 'RETIREMENT' && e.driver) {
       retireAt.set(e.lap, [...(retireAt.get(e.lap) ?? []), e.driver]);
     }
@@ -289,7 +305,8 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
       cars,
       teamOrders: { holdUp: false, swap: null },
     },
-    neutral,
+    events,
+    neutral: neutralMap(events),
     retireAt,
   };
 }
@@ -327,7 +344,49 @@ function cloneCar(c: CarState): CarState {
  * not yet run). The grader forks once per (option, sample); forks that share a seed share
  * every future draw (common random numbers).
  */
-export function forkRun(run: Run, seed: number, decisions: Decision[] = []): Run {
+export interface ForkOptions {
+  /**
+   * Grader playouts: the fork doesn't know the race's future. Events that start on or before
+   * this lap are kept as they really were; later real neutralizations and retirements are
+   * dropped, and SC/VSC periods are drawn instead from the era's base rates on the fork's
+   * own event stream (shared by forks with the same seed, so options see the same future).
+   */
+  blindAfter?: number;
+}
+
+/** Random SC/VSC periods for laps after `from`, around the events already known. */
+function sampledEvents(
+  run: Run,
+  seed: number,
+  known: NeutralEvent[],
+  from: number,
+): NeutralEvent[] {
+  const rates = run.headset?.neutralization;
+  if (!rates) return [];
+  const rng = mulberry32(deriveSeed(seed, EVENT_STREAM));
+  const events: NeutralEvent[] = [];
+  const busy = neutralMap(known);
+  for (let lap = from + 1; lap <= run.model.race.laps; lap++) {
+    const u = rng.next(); // one draw per lap, so the stream doesn't depend on the outcome
+    if (busy.has(lap)) continue;
+    const flag = u < rates.scPerLap ? 'sc' : u < rates.scPerLap + rates.vscPerLap ? 'vsc' : null;
+    if (!flag) continue;
+    const laps = Math.min(
+      flag === 'sc' ? rates.scLaps : rates.vscLaps,
+      run.model.race.laps - lap + 1,
+    );
+    events.push({ lap, laps, flag });
+    for (let l = lap; l < lap + laps; l++) busy.set(l, flag);
+  }
+  return events;
+}
+
+export function forkRun(
+  run: Run,
+  seed: number,
+  decisions: Decision[] = [],
+  options: ForkOptions = {},
+): Run {
   if (!run.live) throw new Error('only a live run can be forked');
   for (const d of decisions) {
     if (d.lap <= run.state.lap) throw new Error(`lap ${d.lap} has already run`);
@@ -350,7 +409,22 @@ export function forkRun(run: Run, seed: number, decisions: Decision[] = []): Run
     },
     decisions: [...run.decisions.filter((d) => d.lap > run.state.lap), ...decisions],
     notes: [],
+    ...blindView(run, seed, options.blindAfter),
   };
+}
+
+function blindView(
+  run: Run,
+  seed: number,
+  blindAfter: number | undefined,
+): Pick<Run, 'events' | 'neutral' | 'retireAt'> {
+  if (blindAfter === undefined) {
+    return { events: run.events, neutral: run.neutral, retireAt: run.retireAt };
+  }
+  const known = run.events.filter((e) => e.lap <= blindAfter);
+  const events = [...known, ...sampledEvents(run, seed, known, blindAfter)];
+  const retireAt = new Map([...run.retireAt].filter(([lap]) => lap <= blindAfter));
+  return { events, neutral: neutralMap(events), retireAt };
 }
 
 function car(run: Run, code: string): CarState {
@@ -553,13 +627,15 @@ function predictedRemaining(
   stop: PitStop | null,
 ): number {
   const { model } = run;
+  // Plan only on what is known now: neutralizations that have started by the next lap.
+  const known = neutralMap(run.events.filter((e) => e.lap <= fromLap + 1));
   const wearMult = modeWearMult(run, car);
   let compound = car.compound;
   let wear = car.tyreWear;
   let age = car.tyreAge;
   let total = 0;
   for (let lap = fromLap + 1; lap <= model.race.laps; lap++) {
-    const flag = run.neutral.get(lap);
+    const flag = known.get(lap);
     if (stop && lap === stop.lap) {
       compound = stop.to;
       wear = 0;

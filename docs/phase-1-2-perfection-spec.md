@@ -192,6 +192,14 @@ In a dry race each car must use at least two dry compounds. Today the player can
 - **a. `docs/sim-api.md` plus runnable examples (a daily race end to end), with semver for `@boxthislap/sim`.** ← recommended
 - b. Code comments only.
 
+### Decided during S4 (Oct 26, 2026)
+
+- **No hindsight in grading (owner decision, option A).** Grader playouts keep events that start on or before the decision lap (so the SC that prompts a call is known). Later real SCs, VSCs and retirements are dropped; SC/VSC periods are drawn instead from base rates measured on the 32 races (SC 0.62% and VSC 1.24% per lap; 5 and 2 laps), identically for every option. The continuation planner uses only known events. The race the player sees is unchanged.
+- **Moment finder refinements.**
+  - Nearby candidates merge by trigger priority (SC > VSC > rival pit > undercut > cliff), not by which comes first. Before this, the lap-51 undercut candidate hid Abu Dhabi's lap-53 SC.
+  - "No real choice" means no option grades orange or worse (more than 5pp behind the best). The plan's literal 0.5 points passed moments where every call won 98–100%.
+  - Abu Dhabi 2021 now proposes only the lap-53 SC: box for softs 42%, mediums 39%, hards 36%, stay out (the real call) 34%.
+
 ### Fixed (not decisions)
 
 - Rival policy, headset effects, and the decision-making features stay TypeScript-only. The Python sim remains the reference for real-strategy replays and golden parity.

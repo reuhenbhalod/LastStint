@@ -7,6 +7,10 @@
 // options face identical luck and their difference is far less noisy at the same N. Seeds
 // derive from the run's seed and the moment's lap, so the server reproduces every grade.
 //
+// Playouts don't know the future: events starting after the decision lap are replaced by
+// SC/VSC periods drawn from base rates, and future retirements are dropped (forkRun's
+// blindAfter). The race the player sees still has every real event.
+//
 // After an option's calls, the player's car follows a "sensible strategist" continuation in
 // every playout: the model-planned best of no more stops or one stop (planRemainingStop).
 // The spec doesn't define the continuation; this choice is recorded in the implementation
@@ -96,7 +100,9 @@ export function sampleSeed(run: Run, i: number): number {
  * to the sensible-strategist continuation (planRemainingStop) for the rest of the race.
  */
 export function playOption(run: Run, seed: number, option: GradeOption): Run {
-  const fork = forkRun(run, seed, option.decisions);
+  // The decision lap's own events (e.g. the SC that prompted the call) are known; the rest of
+  // the race's future isn't (spec decision Oct 26 2026: grade against the sim, not hindsight).
+  const fork = forkRun(run, seed, option.decisions, { blindAfter: run.state.lap + 1 });
   const settled = Math.max(
     run.state.lap,
     ...option.decisions.map((d) => (d.kind === 'pit' ? d.lap + 1 : d.lap)),

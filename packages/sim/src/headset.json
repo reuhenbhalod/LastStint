@@ -1,5 +1,5 @@
 {
-  "_comment": "Headset standing-mode effects per era (Implementation Plan 2.6; product doc 'Standing modes'). Calibrated estimates, not measured: FastF1 can't observe them. Start modest, tune by playtesting. lapDelta: s added per lap. wearMult: multiplies tyre wear (effective tyre age advances by this per lap). errorMult: multiplies the era's base error rate; only the excess over 1 is applied. attackLogit / defendLogit: added to the overtake model's logit when this car attacks / is attacked. teamOrders (product doc decision type; estimates to tune in playtests): holdUpLogit is added to the rival's pass logit while the user's teammate defends directly ahead of it; holdUpCost is the time the teammate loses per lap doing so; swapWindow is how close (s) the user and teammate must be to swap; swapCost is what the yielding car loses; swapLaps is how long a swap call stays open.",
+  "_comment": "Headset standing-mode effects per era (Implementation Plan 2.6; product doc 'Standing modes'). Calibrated estimates, not measured: FastF1 can't observe them. Start modest, tune by playtesting. lapDelta: s added per lap. wearMult: multiplies tyre wear (effective tyre age advances by this per lap). errorMult: multiplies the era's base error rate; only the excess over 1 is applied. attackLogit / defendLogit: added to the overtake model's logit when this car attacks / is attacked. teamOrders (product doc decision type; estimates to tune in playtests): holdUpLogit is added to the rival's pass logit while the user's teammate defends directly ahead of it; holdUpCost is the time the teammate loses per lap doing so; swapWindow is how close (s) the user and teammate must be to swap; swapCost is what the yielding car loses; swapLaps is how long a swap call stays open. neutralization: base rates for grader playouts, which don't know the race's future (spec decision Oct 26 2026): chance per lap that a SC / VSC starts and their typical length, measured over the 32-race validation set (12 SC and 24 VSC starts in 1931 racing laps; median 5 and 2 laps).",
   "2014-2025": {
     "baseErrorRate": 0.01,
     "errorCost": 1.5,
@@ -54,6 +54,12 @@
       "swapWindow": 1.0,
       "swapCost": 0.5,
       "swapLaps": 3
+    },
+    "neutralization": {
+      "scPerLap": 0.0062,
+      "vscPerLap": 0.0124,
+      "scLaps": 5,
+      "vscLaps": 2
     }
   }
 }
