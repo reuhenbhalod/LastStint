@@ -99,6 +99,18 @@ Alternates: dutch-2021, spain-2022, qatar-2021, italy-2021.
 
 Guard for any option: it ships only if it **improves aggregate validation across all 12 races and loses no G1 pass** (see D7). Otherwise it's reverted and logged.
 
+**Revised Oct 25, 2026 (after prototyping a and b on the two existing races):** don't commit to a variant up front. Prototype **a** and **b** on all 12 races in Stage C, and ship whichever passes the guard (or neither).
+
+Evidence so far, gap errors in seconds (limits: BOT 5.0, PER 6.4, the VER duel 3.0):
+
+| | Baseline | a: wear factor | b: driver × compound |
+|---|---|---|---|
+| BOT | 5.7 ❌ | 5.3–5.5 ❌ | **4.7 ✅** |
+| PER | 14.6 ❌ | **2.8–8.1** | 13.1 ❌ |
+| VER (duel) | 0.9 ✅ | **5.7–7.7 ❌** | 2.4 ✅ |
+
+Abu Dhabi passes in every variant. Option a's per-driver factors don't replicate between races (e.g. PER 1.12 at Abu Dhabi vs 0.85 at Spain), which points to noise. Expect Spain's PER miss to remain as a documented limitation; it looks specific to that race (old-medium stint after lap 50, rejoin position after the lap-58 stop).
+
 ### D5. Edge-of-evidence cliff
 
 - **a. Adopt.** ← recommended. Where no cliff is fitted, set `cliffLap` to the longest stint observed on that compound; past it the sim's existing fallback (2× wear) applies. Real-strategy replays are unchanged (0/200 differ on both races).
@@ -118,6 +130,11 @@ Known limitation: pit laps and the takeover snapshot use each car's own lap coun
 - c. A majority of the 12 pass.
 
 The G1 bar itself does not change (S4: duel 3s / 60%, podium 5s / 50%, field max(5s, 10%)).
+
+**Fallback (added Oct 25, 2026).** If fewer than 8 of the 10 new races pass:
+
+- A failing race may be swapped for an alternate **only** when its failure is traced to something the sim can't model by design: a race-control ruling, lapped-car handling, or an unmodelled incident. Never just because it's hard to fit.
+- Spain 2021's PER miss counts as an open, documented limitation. It doesn't block Phase 1 if every other check passes.
 
 ### D8. Exclusions
 
