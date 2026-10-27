@@ -1,6 +1,6 @@
 """G1 status on the TUNING races with the current pipeline (both rules). Spec stage 5.
 
-    uv run python experiments/tune_status.py
+uv run python experiments/tune_status.py
 """
 
 from __future__ import annotations
