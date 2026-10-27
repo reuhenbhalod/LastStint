@@ -91,7 +91,7 @@ def _has_vsc(status_value: object) -> bool:
 
 
 def stop_records(laps: pd.DataFrame) -> list[dict]:
-    """Per measurable pit stop: {driver, out_lap, flag, loss}.
+    """Per measurable pit stop: {driver, out_lap, flag, loss, in_loss}.
 
     Loss = in-lap + out-lap minus the median lap time
     of cars that did not pit on those same laps, so fuel, track evolution and neutralized
@@ -138,6 +138,10 @@ def stop_records(laps: pd.DataFrame) -> list[dict]:
             flag = "VSC"
         else:
             flag = "green"
+        # The in-lap's share of the stop, by the same pace-corrected comparison (it is already
+        # in the takeover state when the in-lap is the takeover lap).
+        in_loss = float(in_lap["LapTime"]) - float(field_median[in_lap["LapNumber"]])
+        in_loss -= float(pace_offset.get(driver, 0.0))
         if flag == "VSC":
             loss = vsc_gap_change_loss(driver, int(out_lap["LapNumber"]), end_time, stop_laps)
             if loss is None:
@@ -147,7 +151,13 @@ def stop_records(laps: pd.DataFrame) -> list[dict]:
             reference += 2 * float(pace_offset.get(driver, 0.0))
             loss = float(in_lap["LapTime"]) + float(out_lap["LapTime"]) - reference
         out.append(
-            {"driver": driver, "out_lap": int(out_lap["LapNumber"]), "flag": flag, "loss": loss}
+            {
+                "driver": driver,
+                "out_lap": int(out_lap["LapNumber"]),
+                "flag": flag,
+                "loss": loss,
+                "in_loss": in_loss,
+            }
         )
     return out
 
@@ -186,10 +196,24 @@ def stop_losses(laps: pd.DataFrame) -> list[tuple[str, str, float]]:
 MAX_STOP_DEVIATION = 15.0
 
 
-def measured_stop_losses(laps: pd.DataFrame) -> dict[tuple[str, int], float]:
+def measured_stop_losses(
+    laps: pd.DataFrame, takeover_lap: int | None = None
+) -> dict[tuple[str, int], float]:
     """(driver, out-lap) -> measured loss for every green-flag or VSC stop (VSC by gap
-    change). Stops touching a SC can't be measured and keep the track's SC figure."""
-    return {(r["driver"], r["out_lap"]): r["loss"] for r in stop_records(laps) if r["flag"] != "SC"}
+    change). Stops touching a SC can't be measured and keep the track's SC figure.
+
+    A stop whose in-lap is the takeover lap straddles the takeover: its in-lap time is already
+    in the takeover gaps, so only the rest of the loss is left to charge (at some tracks the
+    timing line puts most of the stop in the in-lap, e.g. France 2019: ~20 of 25s)."""
+    out = {}
+    for r in stop_records(laps):
+        if r["flag"] == "SC":
+            continue
+        loss = r["loss"]
+        if takeover_lap is not None and r["out_lap"] == takeover_lap + 1:
+            loss = max(0.0, loss - r["in_loss"])
+        out[(r["driver"], r["out_lap"])] = loss
+    return out
 
 
 def pit_loss_deviations(laps: pd.DataFrame, median: float | None) -> list[float]:

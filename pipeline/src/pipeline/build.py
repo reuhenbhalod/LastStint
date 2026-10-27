@@ -413,6 +413,10 @@ RACES: dict[str, dict] = {
         "rival": None,
         "score_positions": 6,
         "split": "holdout",
+        # FastF1's tyre timing for this race is corrupt for the whole field (stints start at
+        # lap 25 and all second stints at lap 33, while the pit flags are at laps 26-30; the
+        # same on a fresh download, Oct 26 2026). Reported, but not counted in G1.
+        "data_issue": "tyre timing corrupt upstream (stints misaligned with the pit stops)",
     },
 }
 

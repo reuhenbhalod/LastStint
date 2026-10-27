@@ -87,7 +87,7 @@
     {
       "code": "ALB",
       "team": "Williams",
-      "basePace": 85.0,
+      "basePace": 85.411,
       "noise": 1.0042,
       "stateAtTakeover": {
         "position": 19,
@@ -115,7 +115,7 @@
     {
       "code": "ALO",
       "team": "Alpine",
-      "basePace": 84.7523,
+      "basePace": 84.907,
       "noise": 0.8022,
       "stateAtTakeover": {
         "position": 9,
@@ -137,7 +137,7 @@
     {
       "code": "BOT",
       "team": "Alfa Romeo",
-      "basePace": 84.8976,
+      "basePace": 85.1141,
       "noise": 0.8002,
       "stateAtTakeover": {
         "position": 12,
@@ -159,7 +159,7 @@
     {
       "code": "GAS",
       "team": "AlphaTauri",
-      "basePace": 84.9608,
+      "basePace": 85.3217,
       "noise": 0.9764,
       "stateAtTakeover": {
         "position": 16,
@@ -186,7 +186,7 @@
     {
       "code": "HAM",
       "team": "Mercedes",
-      "basePace": 83.6896,
+      "basePace": 83.8131,
       "noise": 0.5895,
       "stateAtTakeover": {
         "position": 4,
@@ -213,7 +213,7 @@
     {
       "code": "LAT",
       "team": "Williams",
-      "basePace": 85.7183,
+      "basePace": 85.9287,
       "noise": 0.86,
       "stateAtTakeover": {
         "position": 18,
@@ -245,7 +245,7 @@
     {
       "code": "LEC",
       "team": "Ferrari",
-      "basePace": 83.5683,
+      "basePace": 83.7415,
       "noise": 0.4631,
       "stateAtTakeover": {
         "position": 3,
@@ -277,7 +277,7 @@
     {
       "code": "MAG",
       "team": "Haas F1 Team",
-      "basePace": 85.0503,
+      "basePace": 85.4011,
       "noise": 0.9457,
       "stateAtTakeover": {
         "position": 20,
@@ -305,7 +305,7 @@
     {
       "code": "MSC",
       "team": "Haas F1 Team",
-      "basePace": 85.2542,
+      "basePace": 85.4089,
       "noise": 0.9537,
       "stateAtTakeover": {
         "position": 11,
@@ -332,7 +332,7 @@
     {
       "code": "NOR",
       "team": "McLaren",
-      "basePace": 84.3222,
+      "basePace": 84.7431,
       "noise": 0.5966,
       "stateAtTakeover": {
         "position": 7,
@@ -359,7 +359,7 @@
     {
       "code": "OCO",
       "team": "Alpine",
-      "basePace": 84.8078,
+      "basePace": 84.9835,
       "noise": 0.6745,
       "stateAtTakeover": {
         "position": 8,
@@ -381,7 +381,7 @@
     {
       "code": "PER",
       "team": "Red Bull Racing",
-      "basePace": 83.8253,
+      "basePace": 83.9244,
       "noise": 0.6963,
       "stateAtTakeover": {
         "position": 6,
@@ -408,7 +408,7 @@
     {
       "code": "RIC",
       "team": "McLaren",
-      "basePace": 84.8434,
+      "basePace": 85.2659,
       "noise": 1.0865,
       "stateAtTakeover": {
         "position": 10,
@@ -435,7 +435,7 @@
     {
       "code": "RUS",
       "team": "Mercedes",
-      "basePace": 83.8267,
+      "basePace": 84.1303,
       "noise": 0.592,
       "stateAtTakeover": {
         "position": 1,
@@ -462,7 +462,7 @@
     {
       "code": "SAI",
       "team": "Ferrari",
-      "basePace": 83.826,
+      "basePace": 83.9246,
       "noise": 0.4034,
       "stateAtTakeover": {
         "position": 2,
@@ -489,7 +489,7 @@
     {
       "code": "STR",
       "team": "Aston Martin",
-      "basePace": 84.7667,
+      "basePace": 84.932,
       "noise": 0.9147,
       "stateAtTakeover": {
         "position": 13,
@@ -516,7 +516,7 @@
     {
       "code": "TSU",
       "team": "AlphaTauri",
-      "basePace": 85.4653,
+      "basePace": 86.3349,
       "noise": 1.3256,
       "stateAtTakeover": {
         "position": 17,
@@ -531,7 +531,7 @@
         {
           "lap": 14,
           "to": "MEDIUM",
-          "loss": 23.07
+          "loss": 19.009
         },
         {
           "lap": 34,
@@ -548,7 +548,7 @@
     {
       "code": "VER",
       "team": "Red Bull Racing",
-      "basePace": 83.6342,
+      "basePace": 83.7204,
       "noise": 0.4882,
       "stateAtTakeover": {
         "position": 5,
@@ -575,7 +575,7 @@
     {
       "code": "VET",
       "team": "Aston Martin",
-      "basePace": 84.9223,
+      "basePace": 85.0651,
       "noise": 0.9647,
       "stateAtTakeover": {
         "position": 14,
@@ -602,7 +602,7 @@
     {
       "code": "ZHO",
       "team": "Alfa Romeo",
-      "basePace": 85.0154,
+      "basePace": 85.0979,
       "noise": 0.9511,
       "stateAtTakeover": {
         "position": 15,

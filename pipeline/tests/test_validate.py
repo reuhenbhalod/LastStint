@@ -6,6 +6,7 @@ Dhabi 2021. Spain 2021 does not yet clear G1 (BOT/PER gaps; traffic model open i
 
 from __future__ import annotations
 
+import pandas as pd
 import pytest
 
 from pipeline import build, validate
@@ -75,3 +76,26 @@ def test_diagnose_splits_the_error():
     assert abs(sum(d.share.values()) - 1) < 1e-9
     assert d.dominant in diagnose.LABELS
     assert d.line().startswith(diagnose.LABELS[d.dominant])
+
+
+def test_broken_final_lap_is_repaired():
+    # Bahrain 2018: the leaders' last laps carry no LapTime and a timestamp ~53s late.
+    def driver(code, ends, last_lap_time):
+        return [
+            {
+                "Driver": code,
+                "LapNumber": i + 1,
+                "Time": t,
+                "LapTime": (last_lap_time if i == len(ends) - 1 else 96.0),
+            }
+            for i, t in enumerate(ends)
+        ]
+
+    rows = driver("VET", [100.0, 196.0, 346.0], float("nan"))  # 150s "lap": broken
+    rows += driver("GAS", [104.0, 200.0, 299.0], 99.0)  # a real lap
+    rows += driver("BOT", [101.0, 197.0, 300.0], float("nan"))  # no LapTime but plausible
+    laps = pd.DataFrame(rows)
+    gaps = validate.real_finishing_gaps(laps)
+    assert gaps["VET"] == 0.0  # repaired: 196 + 96 = 292
+    assert gaps["GAS"] == pytest.approx(7.0)
+    assert gaps["BOT"] == pytest.approx(8.0)  # kept as recorded

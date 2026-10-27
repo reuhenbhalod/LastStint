@@ -69,13 +69,37 @@ class ValidationReport:
         return "\n".join([head, *(c.line() for c in self.checks)])
 
 
+# A final lap with no LapTime whose timestamp step is longer than this x the driver's recent
+# laps is a timing glitch, not a real lap (Bahrain 2018: the top three's last laps are stored
+# ~53s late, which shrank every other finisher's gap by as much).
+BROKEN_LAST_LAP = 1.5
+RECENT_LAPS = 3
+
+
+def _finish_time(driver_laps: pd.DataFrame) -> float:
+    """Session time at the flag; repairs a broken final lap (BROKEN_LAST_LAP)."""
+    d = driver_laps.sort_values("LapNumber")
+    end = float(d["Time"].iloc[-1])
+    if len(d) < 2 or pd.notna(d["LapTime"].iloc[-1]):
+        return end
+    recent = d["LapTime"].iloc[:-1].dropna().tail(RECENT_LAPS)
+    prev_end = d["Time"].iloc[-2]
+    if recent.empty or pd.isna(prev_end):
+        return end
+    typical = float(recent.median())
+    if end - float(prev_end) > BROKEN_LAST_LAP * typical:
+        return float(prev_end) + typical
+    return end
+
+
 def real_finishing_gaps(laps: pd.DataFrame, total_laps: int | None = None) -> dict[str, float]:
     """Gap (s) to the winner for each lead-lap finisher, from lap-end session Time."""
     total = total_laps or int(laps["LapNumber"].max())
     last = laps.loc[laps.groupby("Driver")["LapNumber"].idxmax()]
     lead = last[(last["LapNumber"] == total) & last["Time"].notna()]
-    winner_time = float(lead["Time"].min())
-    return {str(r.Driver): float(r.Time) - winner_time for r in lead.itertuples()}
+    finish = {str(c): _finish_time(laps[laps["Driver"] == c]) for c in lead["Driver"]}
+    winner_time = min(finish.values())
+    return {c: t - winner_time for c, t in finish.items()}
 
 
 def validate_race(

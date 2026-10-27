@@ -75,7 +75,7 @@
     {
       "code": "ALB",
       "team": "Williams",
-      "basePace": 85.6828,
+      "basePace": 85.7761,
       "noise": 0.4698,
       "stateAtTakeover": {
         "position": 8,
@@ -97,7 +97,7 @@
     {
       "code": "ALO",
       "team": "Aston Martin",
-      "basePace": 85.5036,
+      "basePace": 85.5307,
       "noise": 0.3617,
       "stateAtTakeover": {
         "position": 11,
@@ -112,7 +112,7 @@
         {
           "lap": 13,
           "to": "HARD",
-          "loss": 24.637
+          "loss": 20.118
         },
         {
           "lap": 36,
@@ -124,7 +124,7 @@
     {
       "code": "BOT",
       "team": "Kick Sauber",
-      "basePace": 86.3134,
+      "basePace": 86.566,
       "noise": 0.6746,
       "stateAtTakeover": {
         "position": 14,
@@ -146,7 +146,7 @@
     {
       "code": "COL",
       "team": "Williams",
-      "basePace": 85.8389,
+      "basePace": 85.8447,
       "noise": 0.5204,
       "stateAtTakeover": {
         "position": 13,
@@ -168,7 +168,7 @@
     {
       "code": "GAS",
       "team": "Alpine",
-      "basePace": 86.0612,
+      "basePace": 86.2339,
       "noise": 0.6365,
       "stateAtTakeover": {
         "position": 17,
@@ -191,7 +191,7 @@
     {
       "code": "HAM",
       "team": "Mercedes",
-      "basePace": 84.5938,
+      "basePace": 84.7585,
       "noise": 0.6453,
       "stateAtTakeover": {
         "position": 5,
@@ -218,7 +218,7 @@
     {
       "code": "HUL",
       "team": "Haas F1 Team",
-      "basePace": 85.7303,
+      "basePace": 85.8911,
       "noise": 0.8402,
       "stateAtTakeover": {
         "position": 19,
@@ -241,7 +241,7 @@
     {
       "code": "LEC",
       "team": "Ferrari",
-      "basePace": 84.4732,
+      "basePace": 84.525,
       "noise": 0.2921,
       "stateAtTakeover": {
         "position": 2,
@@ -263,7 +263,7 @@
     {
       "code": "MAG",
       "team": "Haas F1 Team",
-      "basePace": 85.4617,
+      "basePace": 85.4106,
       "noise": 0.57,
       "stateAtTakeover": {
         "position": 9,
@@ -285,7 +285,7 @@
     {
       "code": "NOR",
       "team": "McLaren",
-      "basePace": 84.3323,
+      "basePace": 84.5199,
       "noise": 0.5563,
       "stateAtTakeover": {
         "position": 3,
@@ -312,7 +312,7 @@
     {
       "code": "OCO",
       "team": "Alpine",
-      "basePace": 86.2261,
+      "basePace": 86.485,
       "noise": 0.5016,
       "stateAtTakeover": {
         "position": 10,
@@ -334,7 +334,7 @@
     {
       "code": "PER",
       "team": "Red Bull Racing",
-      "basePace": 85.1847,
+      "basePace": 85.4086,
       "noise": 0.6224,
       "stateAtTakeover": {
         "position": 7,
@@ -361,7 +361,7 @@
     {
       "code": "PIA",
       "team": "McLaren",
-      "basePace": 84.3434,
+      "basePace": 84.4615,
       "noise": 0.4064,
       "stateAtTakeover": {
         "position": 1,
@@ -388,7 +388,7 @@
     {
       "code": "RIC",
       "team": "RB",
-      "basePace": 85.5396,
+      "basePace": 85.5959,
       "noise": 0.3838,
       "stateAtTakeover": {
         "position": 18,
@@ -411,7 +411,7 @@
     {
       "code": "RUS",
       "team": "Mercedes",
-      "basePace": 84.8619,
+      "basePace": 84.8455,
       "noise": 0.6171,
       "stateAtTakeover": {
         "position": 16,
@@ -439,7 +439,7 @@
     {
       "code": "SAI",
       "team": "Ferrari",
-      "basePace": 84.8201,
+      "basePace": 84.896,
       "noise": 0.4318,
       "stateAtTakeover": {
         "position": 4,
@@ -461,7 +461,7 @@
     {
       "code": "STR",
       "team": "Aston Martin",
-      "basePace": 85.8052,
+      "basePace": 86.026,
       "noise": 0.7192,
       "stateAtTakeover": {
         "position": 12,
@@ -493,7 +493,7 @@
     {
       "code": "VER",
       "team": "Red Bull Racing",
-      "basePace": 84.8261,
+      "basePace": 84.9741,
       "noise": 0.3888,
       "stateAtTakeover": {
         "position": 6,
@@ -520,7 +520,7 @@
     {
       "code": "ZHO",
       "team": "Kick Sauber",
-      "basePace": 86.3951,
+      "basePace": 86.7015,
       "noise": 0.7884,
       "stateAtTakeover": {
         "position": 15,
