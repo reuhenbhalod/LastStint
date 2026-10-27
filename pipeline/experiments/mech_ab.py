@@ -1,6 +1,6 @@
 """A/B a mechanics switch on the TUNING races, in model mode and replay mode (spec stage 5).
 
-    uv run python experiments/mech_ab.py pace.SIM_FRAME_LOSS
+uv run python experiments/mech_ab.py pace.SIM_FRAME_LOSS
 """
 
 from __future__ import annotations
@@ -9,6 +9,7 @@ import importlib
 import sys
 
 import ceiling
+
 from pipeline import build as build_mod
 from pipeline import sim_reference as sim
 from pipeline import validate as validate_mod
@@ -23,9 +24,9 @@ def status(rid: str, replay: bool) -> tuple[str, float]:
     m = model
     if replay:
         off = ceiling.offsets(model, laps, "replay")
-        sim._clean_lap = lambda car, c, f, lap, fresh=None: ceiling.ORIGINAL(
-            car, c, f, lap, fresh
-        ) + off.get((car.code, lap), 0.0)
+        sim._clean_lap = lambda car, c, f, lap, fresh=None: (
+            ceiling.ORIGINAL(car, c, f, lap, fresh) + off.get((car.code, lap), 0.0)
+        )
         m = {
             **model,
             "track": {**model["track"], "dirtyAirPenalty": 0.0},

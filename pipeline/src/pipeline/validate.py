@@ -10,6 +10,12 @@ on the cars the game depends on. Gate G1 passes only if every check passes:
 - field: every scored finisher's mean gap to the winner within GAP_TOLERANCE or
   FIELD_RELATIVE_TOLERANCE of their real gap, whichever is larger.
 
+Near-ties (model v3 spec C2): cars that really finished within TIE_GAP of each other are
+treated as tied, because their order is close to a coin flip that even a perfect model can't
+call. The duel order check is skipped when the duel's real gap is under TIE_GAP (its gap check
+still applies), and the podium order matches when the sim's order differs from the real one
+only by swaps within such ties. `strict_checks` keeps the original rule for comparison.
+
 Scored finishers are the lead-lap finishers down to `score_positions`, which the race
 registry can lower where race control decided the order (frozen events the sim can't model).
 Errors are the bias of the MEAN simulated gap vs the real gap; noise averages out over runs.
@@ -33,6 +39,7 @@ GAP_TOLERANCE = 5.0  # seconds: "within a few seconds"
 PODIUM_ORDER_TOLERANCE = 0.5
 FIELD_RELATIVE_TOLERANCE = 0.10
 PODIUM = 3
+TIE_GAP = 1.0  # seconds: real finishes closer than this are near-ties (C2)
 
 
 @dataclass
@@ -55,10 +62,15 @@ class ValidationReport:
     order_match_rate: float  # exact podium order
     duel: tuple[str, str] | None
     checks: list[Check] = field(default_factory=list)
+    strict_checks: list[Check] = field(default_factory=list)  # without the near-tie rule
 
     @property
     def passed(self) -> bool:
         return all(c.passed for c in self.checks)
+
+    @property
+    def strict_passed(self) -> bool:
+        return all(c.passed for c in self.strict_checks)
 
     @property
     def failures(self) -> list[Check]:
@@ -102,6 +114,18 @@ def real_finishing_gaps(laps: pd.DataFrame, total_laps: int | None = None) -> di
     return {c: t - winner_time for c, t in finish.items()}
 
 
+def tie_groups(order: list[str], real_gaps: dict[str, float]) -> dict[str, int]:
+    """Group index per car in real order; a car within TIE_GAP of the one ahead shares its
+    group (chains of near-ties form one group)."""
+    groups: dict[str, int] = {}
+    g = 0
+    for i, c in enumerate(order):
+        if i > 0 and real_gaps[c] - real_gaps[order[i - 1]] >= TIE_GAP:
+            g += 1
+        groups[c] = g
+    return groups
+
+
 def validate_race(
     model: dict,
     real_gaps: dict[str, float],
@@ -121,6 +145,8 @@ def validate_race(
     gap_sum = dict.fromkeys(contenders, 0.0)
     gap_counts = dict.fromkeys(contenders, 0)
     podium_matches = 0
+    podium_tied_matches = 0
+    groups = tie_groups(podium, real_gaps)
     duel_sum, duel_n, duel_order = 0.0, 0, 0
     real_duel = real_gaps[duel[0]] - real_gaps[duel[1]] if duel else 0.0
 
@@ -133,8 +159,13 @@ def validate_race(
             if c in times:
                 gap_sum[c] += times[c] - ref
                 gap_counts[c] += 1
-        if sorted((c for c in podium if c in times), key=lambda c: times[c]) == podium:
+        sim_podium = sorted((c for c in podium if c in times), key=lambda c: times[c])
+        if sim_podium == podium:
             podium_matches += 1
+        if len(sim_podium) == len(podium) and [groups[c] for c in sim_podium] == [
+            groups[c] for c in podium
+        ]:
+            podium_tied_matches += 1
         if duel and duel[0] in times and duel[1] in times:
             sim_duel = times[duel[0]] - times[duel[1]]
             duel_sum += sim_duel
@@ -146,43 +177,43 @@ def validate_race(
         for c in contenders
     }
     order_match_rate = podium_matches / runs if runs else 0.0
+    tied_rate = podium_tied_matches / runs if runs else 0.0
+    duel_err = abs(duel_sum / duel_n - real_duel) if duel_n else float("inf")
+    duel_rate = duel_order / duel_n if duel_n else 0.0
 
-    checks: list[Check] = []
-    if duel:
-        duel_err = abs(duel_sum / duel_n - real_duel) if duel_n else float("inf")
-        duel_rate = duel_order / duel_n if duel_n else 0.0
-        name = f"{duel[0]} vs {duel[1]}"
-        checks.append(
-            Check(
-                f"duel {name} gap error",
-                duel_err,
-                DUEL_GAP_TOLERANCE,
-                duel_err <= DUEL_GAP_TOLERANCE,
+    def build(ties: bool) -> list[Check]:
+        checks: list[Check] = []
+        if duel:
+            name = f"{duel[0]} vs {duel[1]}"
+            checks.append(
+                Check(
+                    f"duel {name} gap error",
+                    duel_err,
+                    DUEL_GAP_TOLERANCE,
+                    duel_err <= DUEL_GAP_TOLERANCE,
+                )
             )
-        )
+            if not (ties and abs(real_duel) < TIE_GAP):
+                checks.append(
+                    Check(
+                        f"duel {name} order rate",
+                        duel_rate,
+                        DUEL_ORDER_TOLERANCE,
+                        duel_rate >= DUEL_ORDER_TOLERANCE,
+                    )
+                )
+        rate = tied_rate if ties else order_match_rate
         checks.append(
-            Check(
-                f"duel {name} order rate",
-                duel_rate,
-                DUEL_ORDER_TOLERANCE,
-                duel_rate >= DUEL_ORDER_TOLERANCE,
-            )
+            Check("podium order rate", rate, PODIUM_ORDER_TOLERANCE, rate >= PODIUM_ORDER_TOLERANCE)
         )
-    checks.append(
-        Check(
-            "podium order rate",
-            order_match_rate,
-            PODIUM_ORDER_TOLERANCE,
-            order_match_rate >= PODIUM_ORDER_TOLERANCE,
-        )
-    )
-    for c in contenders:
-        limit = GAP_TOLERANCE
-        if c not in podium:
-            limit = max(GAP_TOLERANCE, FIELD_RELATIVE_TOLERANCE * real_gaps[c])
-        group = "podium" if c in podium else "field"
-        err = mean_gap_error[c]
-        checks.append(Check(f"{group} {c} gap error", err, limit, err <= limit))
+        for c in contenders:
+            limit = GAP_TOLERANCE
+            if c not in podium:
+                limit = max(GAP_TOLERANCE, FIELD_RELATIVE_TOLERANCE * real_gaps[c])
+            group = "podium" if c in podium else "field"
+            err = mean_gap_error[c]
+            checks.append(Check(f"{group} {c} gap error", err, limit, err <= limit))
+        return checks
 
     return ValidationReport(
         runs=runs,
@@ -190,7 +221,8 @@ def validate_race(
         mean_gap_error=mean_gap_error,
         order_match_rate=order_match_rate,
         duel=duel,
-        checks=checks,
+        checks=build(ties=True),
+        strict_checks=build(ties=False),
     )
 
 
@@ -206,6 +238,7 @@ class RobustStatus:
     status: str  # "pass" (both seed sets), "borderline" (one), "fail" (neither)
     mean_gap_error: float  # mean over the gap checks, averaged across both seed sets
     reports: list[ValidationReport]
+    strict_status: str = ""  # the same without the near-tie rule (C2)
 
 
 def robust_status(
@@ -219,7 +252,8 @@ def robust_status(
     reports = [
         validate_race(model, real_gaps, runs, seed, rival, score_positions) for seed in ROBUST_SEEDS
     ]
-    passes = sum(r.passed for r in reports)
-    status = {2: "pass", 1: "borderline", 0: "fail"}[passes]
+    names = {2: "pass", 1: "borderline", 0: "fail"}
+    status = names[sum(r.passed for r in reports)]
+    strict = names[sum(r.strict_passed for r in reports)]
     errs = [c.value for r in reports for c in r.checks if "gap error" in c.name]
-    return RobustStatus(status, sum(errs) / len(errs) if errs else 0.0, reports)
+    return RobustStatus(status, sum(errs) / len(errs) if errs else 0.0, reports, strict)

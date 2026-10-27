@@ -5,45 +5,47 @@ robust: 1,000 runs on each of two seed sets (pass = both pass, borderline = one)
 Mean gap error averages the gap checks. Held-out races were never used to choose a
 model change. Diagnosis = the dominant source of the race's gap error
 (`pipeline/src/pipeline/diagnose.py`). Races with a data issue are listed, not counted.
+Near-ties: cars that really finished within 1.0s are tied for the order checks (model
+v3 spec C2); the status without that rule is shown alongside.
 
-## Held-out races: 4 pass, 0 borderline, 11 fail (mean gap error 2.56s)
+## Held-out races: 5 pass, 0 borderline, 10 fail (mean gap error 2.37s)
 
-| Race | Duel | Status | Mean gap error | Failing checks | Diagnosis |
-|---|---|---|---|---|---|
-| bahrain-2018 | BOT vs VET | fail | 3.92s | duel BOT vs VET order rate; field GAS gap error; podium order rate | race mechanics (passes, traffic, SC bunching and SC stops) (pace 5%, rest 95%) |
-| usa-2018 | VER vs RAI | fail | 4.55s | duel VER vs RAI gap error; podium HAM gap error | race mechanics (passes, traffic, SC bunching and SC stops) (pace 6%, rest 94%) |
-| mexico-2018 | VET vs VER | fail | 3.64s | field HAM gap error | race mechanics (passes, traffic, SC bunching and SC stops) (pace 3%, rest 97%) |
-| austria-2019 | LEC vs VER | fail | 2.08s | duel LEC vs VER gap error; duel LEC vs VER order rate; podium order rate | race mechanics (passes, traffic, SC bunching and SC stops) (pace 4%, rest 96%) |
-| singapore-2019 | LEC vs VET | fail | 3.16s | field BOT gap error | race mechanics (passes, traffic, SC bunching and SC stops) (pace 5%, rest 95%) |
-| france-2019 | BOT vs HAM | pass | 0.75s |  |  |
-| 70th-anniversary-2020 | HAM vs VER | fail | 2.40s | field ALB gap error | race mechanics (passes, traffic, SC bunching and SC stops) (pace 18%, rest 82%) |
-| spain-2020 | VER vs HAM | pass | 2.10s |  |  |
-| portugal-2020 | BOT vs HAM | pass | 0.44s |  |  |
-| bahrain-2023 | PER vs VER | fail | 2.51s | podium ALO gap error | race mechanics (passes, traffic, SC bunching and SC stops) (pace 5%, rest 95%) |
-| singapore-2023 | NOR vs SAI | fail | 4.65s | duel NOR vs SAI gap error; field GAS gap error; podium HAM gap error; podium NOR gap error; podium order rate | race mechanics (passes, traffic, SC bunching and SC stops) (pace 2%, rest 98%) |
-| japan-2023 | NOR vs VER | fail | 2.90s | duel NOR vs VER gap error | race mechanics (passes, traffic, SC bunching and SC stops) (pace 1%, rest 99%) |
-| italy-2024 | PIA vs LEC | pass | 0.77s |  |  |
-| hungary-2024 | NOR vs PIA | fail | 1.66s | duel NOR vs PIA order rate | race mechanics (passes, traffic, SC bunching and SC stops) (pace 2%, rest 98%) |
-| hungary-2025 | PIA vs NOR | fail | 2.81s | podium RUS gap error | race mechanics (passes, traffic, SC bunching and SC stops) (pace 4%, rest 96%) |
-| miami-2025 | NOR vs PIA | data issue | 3.17s | field ALB gap error; field ANT gap error | tyre timing corrupt upstream (stints misaligned with the pit stops) |
+| Race | Duel | Status | Without near-tie rule | Mean gap error | Failing checks | Diagnosis |
+|---|---|---|---|---|---|---|
+| bahrain-2018 | BOT vs VET | fail | fail | 4.70s | field GAS gap error | race mechanics (passes, traffic, SC bunching and SC stops) (pace 4%, rest 96%) |
+| usa-2018 | VER vs RAI | fail | fail | 3.90s | duel VER vs RAI gap error; podium HAM gap error; podium VER gap error | race mechanics (passes, traffic, SC bunching and SC stops) (pace 8%, rest 92%) |
+| mexico-2018 | VET vs VER | fail | fail | 3.99s | field HAM gap error | race mechanics (passes, traffic, SC bunching and SC stops) (pace 3%, rest 97%) |
+| austria-2019 | LEC vs VER | fail | fail | 1.66s | duel LEC vs VER order rate; podium order rate | race mechanics (passes, traffic, SC bunching and SC stops) (pace 7%, rest 93%) |
+| singapore-2019 | LEC vs VET | fail | fail | 2.94s | field BOT gap error | race mechanics (passes, traffic, SC bunching and SC stops) (pace 6%, rest 94%) |
+| france-2019 | BOT vs HAM | pass | pass | 0.80s |  |  |
+| 70th-anniversary-2020 | HAM vs VER | fail | fail | 1.86s | field ALB gap error | race mechanics (passes, traffic, SC bunching and SC stops) (pace 24%, rest 76%) |
+| spain-2020 | VER vs HAM | pass | pass | 0.64s |  |  |
+| portugal-2020 | BOT vs HAM | pass | pass | 0.69s |  |  |
+| bahrain-2023 | PER vs VER | fail | fail | 2.53s | podium ALO gap error | race mechanics (passes, traffic, SC bunching and SC stops) (pace 5%, rest 95%) |
+| singapore-2023 | NOR vs SAI | fail | fail | 4.68s | duel NOR vs SAI gap error; field GAS gap error; podium HAM gap error; podium NOR gap error | race mechanics (passes, traffic, SC bunching and SC stops) (pace 2%, rest 98%) |
+| japan-2023 | NOR vs VER | fail | fail | 3.10s | duel NOR vs VER gap error; field HAM gap error | race mechanics (passes, traffic, SC bunching and SC stops) (pace 1%, rest 99%) |
+| italy-2024 | PIA vs LEC | pass | pass | 0.74s |  |  |
+| hungary-2024 | NOR vs PIA | fail | fail | 2.23s | duel NOR vs PIA order rate; field LEC gap error; field SAI gap error | race mechanics (passes, traffic, SC bunching and SC stops) (pace 1%, rest 99%) |
+| hungary-2025 | PIA vs NOR | pass | borderline | 1.04s |  |  |
+| miami-2025 | NOR vs PIA | data issue | data issue | 3.17s | field ALB gap error; field ANT gap error | tyre timing corrupt upstream (stints misaligned with the pit stops) |
 
-## Tuning races: 7 pass, 1 borderline, 8 fail (mean gap error 2.34s)
+## Tuning races: 8 pass, 1 borderline, 7 fail (mean gap error 2.36s)
 
-| Race | Duel | Status | Mean gap error | Failing checks | Diagnosis |
-|---|---|---|---|---|---|
-| abu-dhabi-2021 | HAM vs VER | pass | 2.23s |  |  |
-| spain-2021 | VER vs HAM | fail | 4.87s | duel VER vs HAM gap error; field PER gap error; podium BOT gap error; podium VER gap error | race mechanics (passes, traffic, SC bunching and SC stops) (pace 1%, rest 99%) |
-| bahrain-2021 | VER vs HAM | pass | 1.10s |  |  |
-| france-2021 | HAM vs VER | fail | 3.03s | duel HAM vs VER gap error | race mechanics (passes, traffic, SC bunching and SC stops) (pace 5%, rest 95%) |
-| usa-2021 | HAM vs VER | fail | 2.35s | podium PER gap error | race mechanics (passes, traffic, SC bunching and SC stops) (pace 2%, rest 98%) |
-| brazil-2021 | VER vs HAM | fail | 1.33s | podium order rate | race mechanics (passes, traffic, SC bunching and SC stops) (pace 5%, rest 95%) |
-| mexico-2021 | PER vs HAM | pass | 1.05s |  |  |
-| saudi-2022 | LEC vs VER | fail | 6.02s | duel LEC vs VER order rate; field OCO gap error; field PER gap error; field RUS gap error; podium order rate | race mechanics (passes, traffic, SC bunching and SC stops) (pace 0%, rest 100%) |
-| miami-2022 | LEC vs VER | pass | 1.32s |  |  |
-| canada-2022 | SAI vs VER | pass | 1.30s |  |  |
-| bahrain-2022 | LEC vs VER | pass | 1.08s |  |  |
-| hungary-2022 | LEC vs VER | fail | 2.64s | field SAI gap error | race mechanics (passes, traffic, SC bunching and SC stops) (pace 7%, rest 93%) |
-| abu-dhabi-2018 | VET vs HAM | pass | 1.84s |  |  |
-| hungary-2019 | VER vs HAM | fail | 2.00s | duel VER vs HAM gap error | race mechanics (passes, traffic, SC bunching and SC stops) (pace 3%, rest 97%) |
-| mexico-2019 | VET vs HAM | borderline | 1.51s | podium order rate | race mechanics (passes, traffic, SC bunching and SC stops) (pace 2%, rest 98%) |
-| miami-2024 | VER vs NOR | fail | 3.73s | duel VER vs NOR gap error; field PER gap error; field SAI gap error | race mechanics (passes, traffic, SC bunching and SC stops) (pace 5%, rest 95%) |
+| Race | Duel | Status | Without near-tie rule | Mean gap error | Failing checks | Diagnosis |
+|---|---|---|---|---|---|---|
+| abu-dhabi-2021 | HAM vs VER | pass | pass | 2.24s |  |  |
+| spain-2021 | VER vs HAM | fail | fail | 5.68s | duel VER vs HAM gap error; field PER gap error; podium BOT gap error; podium VER gap error | race mechanics (passes, traffic, SC bunching and SC stops) (pace 1%, rest 99%) |
+| bahrain-2021 | VER vs HAM | pass | fail | 0.51s |  |  |
+| france-2021 | HAM vs VER | borderline | borderline | 3.44s | duel HAM vs VER gap error | race mechanics (passes, traffic, SC bunching and SC stops) (pace 4%, rest 96%) |
+| usa-2021 | HAM vs VER | fail | fail | 2.79s | duel HAM vs VER order rate; podium PER gap error | race mechanics (passes, traffic, SC bunching and SC stops) (pace 2%, rest 98%) |
+| brazil-2021 | VER vs HAM | fail | fail | 1.46s | duel VER vs HAM gap error; podium order rate | race mechanics (passes, traffic, SC bunching and SC stops) (pace 4%, rest 96%) |
+| mexico-2021 | PER vs HAM | pass | pass | 0.84s |  |  |
+| saudi-2022 | LEC vs VER | fail | fail | 6.02s | field OCO gap error; field PER gap error; field RUS gap error | race mechanics (passes, traffic, SC bunching and SC stops) (pace 0%, rest 100%) |
+| miami-2022 | LEC vs VER | pass | pass | 1.32s |  |  |
+| canada-2022 | SAI vs VER | pass | pass | 1.34s |  |  |
+| bahrain-2022 | LEC vs VER | pass | pass | 0.98s |  |  |
+| hungary-2022 | LEC vs VER | fail | fail | 1.26s | field SAI gap error | race mechanics (passes, traffic, SC bunching and SC stops) (pace 10%, rest 90%) |
+| abu-dhabi-2018 | VET vs HAM | fail | fail | 3.17s | duel VET vs HAM gap error; podium VET gap error | race mechanics (passes, traffic, SC bunching and SC stops) (pace 16%, rest 84%) |
+| hungary-2019 | VER vs HAM | pass | pass | 1.27s |  |  |
+| mexico-2019 | VET vs HAM | pass | pass | 1.71s |  |  |
+| miami-2024 | VER vs NOR | fail | fail | 3.71s | duel VER vs NOR gap error; field PER gap error; field SAI gap error | race mechanics (passes, traffic, SC bunching and SC stops) (pace 5%, rest 95%) |

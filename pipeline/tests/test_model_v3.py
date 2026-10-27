@@ -24,8 +24,27 @@ def test_stop_straddling_the_takeover_is_charged_its_out_lap_only(france):
     # Stops later in the race are unchanged.
     later = [k for k in whole if k[1] > takeover + 1]
     assert later and all(straddling[k] == whole[k] for k in later)
+    # The model charges it in the sim's frame (M1): the out-lap only, well under the full stop.
     ver = next(d for d in model["drivers"] if d["code"] == "VER")
-    assert ver["realStrategy"][0]["loss"] == round(straddling[("VER", takeover + 1)], 3)
+    assert ver["realStrategy"][0]["loss"] < whole[("VER", takeover + 1)] - 15
+
+
+def test_sim_frame_loss_reproduces_the_real_in_and_out_laps(france):
+    model, laps = france
+    drivers = {d["code"]: d for d in model["drivers"]}
+    pace_now = {c: d["basePace"] for c, d in drivers.items()}
+    losses = pace.sim_frame_losses(
+        laps,
+        pace_now,
+        model["compounds"],
+        model["fuelEffectPerLap"],
+        model["freshTyre"],
+        model["race"]["takeoverLap"],
+    )
+    for d in model["drivers"]:
+        for stop in d["realStrategy"]:
+            if (d["code"], stop["lap"]) in losses:
+                assert stop["loss"] == pytest.approx(losses[(d["code"], stop["lap"])], abs=0.01)
 
 
 def test_post_takeover_pace_is_shrunk_by_lap_count(france):

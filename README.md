@@ -49,8 +49,8 @@ uv run pytest
 **Phases 1 and 2 are closed** (Oct 26, 2026) with documented limits. Details are in `docs/phase-1-2-perfection-spec.md` and `docs/g1-report.md`.
 
 - **Race model (Phase 1):** 32 races from 2018–2025, built from FastF1 timing. Model v3 (`docs/model-v3-spec.md`) adds each driver's pace after the takeover and fixes three data and mechanics bugs.
-  - Gate G1 passes on 11 races (Abu Dhabi 21, Bahrain 21, Mexico 21, Miami 22, Canada 22, Bahrain 22, Abu Dhabi 18, France 19, Spain 20, Portugal 20, Italy 24), with Mexico 19 borderline. These are the validated pool for daily content.
-  - Mean gap error on held-out races fell from 5.6 s to 2.6 s. A perfect-pace replay passes only 7 of 15 held-out races, so the remaining misses are race mechanics (passing, lapped cars under SC), not pace.
+  - Gate G1 passes on 13 races (Abu Dhabi 21, Bahrain 21, Mexico 21, Miami 22, Canada 22, Bahrain 22, Hungary 19, Mexico 19, France 19, Spain 20, Portugal 20, Italy 24, Hungary 25), with France 21 borderline. These are the validated pool for daily content. Cars that really finished within 1.0 s count as tied for the order checks.
+  - Mean gap error on held-out races fell from 5.6 s to 2.4 s. Given perfect pace, the sim reproduces 11 of 15 held-out races; the model passes 5. The remaining misses are mostly pace that varies within a driver's race.
   - Miami 2025 is excluded: its tyre timing is corrupt upstream.
 - **Simulator (Phase 2):** `packages/sim`, documented in `docs/sim-api.md`.
   - Matches the Python reference sim.

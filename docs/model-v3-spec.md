@@ -140,6 +140,8 @@ Phase 1 closed on Oct 26 with documented limits: Gate G1 passes on 1 of 16 held-
 
 ## Stage 5: race mechanics (Oct 27, 2026; owner chose B: one more day on the model)
 
+**Decided Oct 27, 2026: the recommended option for every decision** (C1a–C5a).
+
 ### Evidence
 
 - **Remaining failures.** These are the races that fail even with perfect pace (`replay`), checked one by one with `experiments/audit.py` and the replay detail. They fall into four kinds:
@@ -194,3 +196,40 @@ Phase 1 closed on Oct 26 with documented limits: Gate G1 passes on 1 of 16 held-
   - Every change is chosen on the tuning races.
   - The held-out races are checked once at the end of the day.
   - Any G1 rule change (C2) applies to every race and is reported next to the old rule.
+
+### Stage 5 results (Oct 27, 2026)
+
+**Changes kept and rejected**
+
+- **C1 (M1): kept.** Each green stop's frozen loss is the real in- and out-laps minus the sim's own prediction for them.
+- **C2: in force.** Cars that really finished within 1.0 s are tied for the order checks. The report shows every race's status under both rules.
+- **C3: rejected.** Calibrating the SC stop factor on the six tuning races with a SC after the takeover gives 4 passes at every value from 0.55 to 1.0, with the mean flat (2.59–2.63 s). Saudi 22 improves and Miami 24 gets worse, so 0.55 stays.
+- **C4: deferred** (lapped cars under a SC).
+
+**Tuning races**
+- 8 pass / 1 borderline / 7 fail, mean 2.36 s (under the old order rule: 7 / 1 / 8).
+- Hungary 2019 passes again (1.27 s), and Mexico 2019 passes.
+- Abu Dhabi 2018 now fails (VET duel gap 5 s). Bahrain 2021 passes only through the near-tie rule (0.51 s mean error, real gap 0.7 s).
+
+**Held-out check (run once, end of day)**
+
+| Held-out (15 counted) | Model | `replay` ceiling (same rules) |
+|---|---|---|
+| Oct 26 | 4 pass, 2.56 s | 7 pass, 2.19 s |
+| **Oct 27** | **5 pass, 2.37 s** | **11 pass, 2.06 s** |
+
+- **The model passes:** France 19, Spain 20, Portugal 20, Italy 24 and Hungary 25 (Hungary 25 only through the near-tie rule; borderline under the old one).
+- **The ceiling passes 11:** Austria 19, Singapore 19, France 19, 70th Anniversary 20, Portugal 20, Bahrain 23, Singapore 23, Japan 23, Italy 24, Hungary 24, Hungary 25.
+
+**What this shows**
+
+- **The mechanics fix mattered.** With M1 the sim reproduces 11 of 15 held-out races given the right pace, up from 7.
+- **A1: not met.** The model passes 4 of the ceiling's 11 (36%, against the 80% bar).
+- **The gap is pace again,** this time pace that varies within a driver's race (by stint or phase), which one per-driver number can't hold.
+- **Next candidates** (strategy-independent, so they stay honest for what-ifs):
+  - Re-test per-driver tyre wear (rejected on Oct 25, before tonight's fixes).
+  - Pace that drifts over the race per driver.
+- **Validated pool:** 13 races.
+  - Abu Dhabi 21, Bahrain 21, Mexico 21, Miami 22, Canada 22, Bahrain 22, Hungary 19, Mexico 19
+  - France 19, Spain 20, Portugal 20, Italy 24, Hungary 25
+  - France 21 is borderline.

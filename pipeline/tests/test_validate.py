@@ -99,3 +99,25 @@ def test_broken_final_lap_is_repaired():
     assert gaps["VET"] == 0.0  # repaired: 196 + 96 = 292
     assert gaps["GAS"] == pytest.approx(7.0)
     assert gaps["BOT"] == pytest.approx(8.0)  # kept as recorded
+
+
+def test_tie_groups_chain_near_ties():
+    gaps = {"A": 0.0, "B": 0.7, "C": 1.5, "D": 9.0}
+    assert validate.tie_groups(["A", "B", "C", "D"], gaps) == {"A": 0, "B": 0, "C": 0, "D": 1}
+    assert validate.tie_groups(["A", "D"], gaps) == {"A": 0, "D": 1}
+
+
+def test_near_tie_duel_drops_only_the_order_check(race):
+    model, laps = race
+    gaps = validate.real_finishing_gaps(laps)
+    # Abu Dhabi 2021's HAM-VER gap is ~2.3s: not a near-tie, so both rules check the order.
+    report = validate.validate_race(model, gaps, runs=20, rival="VER")
+    names = [c.name for c in report.checks]
+    assert names == [c.name for c in report.strict_checks]
+    # Make it a near-tie: the order check goes, the gap check stays; strict keeps both.
+    tied = {**gaps, "HAM": gaps["VER"] + 0.5}
+    report = validate.validate_race(model, tied, runs=20, rival="VER")
+    names = [c.name for c in report.checks]
+    assert "duel HAM vs VER gap error" in names
+    assert "duel HAM vs VER order rate" not in names
+    assert "duel HAM vs VER order rate" in [c.name for c in report.strict_checks]
