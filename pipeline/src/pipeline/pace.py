@@ -20,6 +20,8 @@ import pandas as pd
 from .sim_reference import Car, _clean_lap
 
 SHRINK_LAPS = 5.0
+# Stage 6 (T1): measure the offset on clear-air laps only (the sim adds dirty air itself).
+CLEAR_AIR = False  # rejected (stage 6 T1): 5 pass, 4.85s on the tuning races
 
 
 def post_takeover_offsets(
@@ -32,8 +34,16 @@ def post_takeover_offsets(
     shrink_laps: float = SHRINK_LAPS,
 ) -> dict[str, float]:
     """Per-driver pace offset (s/lap) on green, non-pit laps after the takeover lap."""
+    from .clean import TRAFFIC_GAP_SECONDS, gap_to_car_ahead
+
+    clear = (
+        (gap_to_car_ahead(laps) >= TRAFFIC_GAP_SECONDS).reindex(laps.index).fillna(True)
+        if CLEAR_AIR
+        else pd.Series(True, index=laps.index)
+    )
     post = laps[
-        (laps["LapNumber"] > takeover_lap)
+        clear
+        & (laps["LapNumber"] > takeover_lap)
         & (laps["TrackStatus"].astype(str) == "1")
         & laps["PitInTime"].isna()
         & laps["PitOutTime"].isna()

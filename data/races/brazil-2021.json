@@ -71,7 +71,7 @@
       "code": "ALO",
       "team": "Alpine",
       "basePace": 75.8415,
-      "noise": 1.3638,
+      "noise": 0.528,
       "stateAtTakeover": {
         "position": 11,
         "gapAhead": 0.501,
@@ -93,7 +93,7 @@
       "code": "BOT",
       "team": "Mercedes",
       "basePace": 74.464,
-      "noise": 0.549,
+      "noise": 0.3776,
       "stateAtTakeover": {
         "position": 4,
         "gapAhead": 0.147,
@@ -120,7 +120,7 @@
       "code": "GAS",
       "team": "AlphaTauri",
       "basePace": 75.5169,
-      "noise": 0.6803,
+      "noise": 0.4185,
       "stateAtTakeover": {
         "position": 8,
         "gapAhead": 0.386,
@@ -147,7 +147,7 @@
       "code": "GIO",
       "team": "Alfa Romeo Racing",
       "basePace": 76.3853,
-      "noise": 0.8464,
+      "noise": 0.6064,
       "stateAtTakeover": {
         "position": 13,
         "gapAhead": 0.131,
@@ -174,7 +174,7 @@
       "code": "HAM",
       "team": "Mercedes",
       "basePace": 74.1757,
-      "noise": 0.5207,
+      "noise": 0.3489,
       "stateAtTakeover": {
         "position": 3,
         "gapAhead": 0.247,
@@ -201,7 +201,7 @@
       "code": "LAT",
       "team": "Williams",
       "basePace": 76.4773,
-      "noise": 1.0223,
+      "noise": 0.4582,
       "stateAtTakeover": {
         "position": 16,
         "gapAhead": 0.165,
@@ -228,7 +228,7 @@
       "code": "LEC",
       "team": "Ferrari",
       "basePace": 75.0191,
-      "noise": 0.4828,
+      "noise": 0.3703,
       "stateAtTakeover": {
         "position": 5,
         "gapAhead": 0.16,
@@ -255,7 +255,7 @@
       "code": "MAZ",
       "team": "Haas F1 Team",
       "basePace": 77.3291,
-      "noise": 0.9889,
+      "noise": 0.822,
       "stateAtTakeover": {
         "position": 14,
         "gapAhead": 0.292,
@@ -277,7 +277,7 @@
       "code": "MSC",
       "team": "Haas F1 Team",
       "basePace": 76.9793,
-      "noise": 1.1924,
+      "noise": 0.7832,
       "stateAtTakeover": {
         "position": 15,
         "gapAhead": 0.08,
@@ -308,7 +308,7 @@
       "code": "NOR",
       "team": "McLaren",
       "basePace": 75.1437,
-      "noise": 1.1165,
+      "noise": 1.2306,
       "stateAtTakeover": {
         "position": 20,
         "gapAhead": 0.098,
@@ -325,7 +325,7 @@
       "code": "OCO",
       "team": "Alpine",
       "basePace": 75.9084,
-      "noise": 0.6969,
+      "noise": 0.3595,
       "stateAtTakeover": {
         "position": 9,
         "gapAhead": 0.287,
@@ -347,7 +347,7 @@
       "code": "PER",
       "team": "Red Bull Racing",
       "basePace": 74.4225,
-      "noise": 0.3722,
+      "noise": 0.3075,
       "stateAtTakeover": {
         "position": 2,
         "gapAhead": 0.338,
@@ -379,7 +379,7 @@
       "code": "RAI",
       "team": "Alfa Romeo Racing",
       "basePace": 75.8864,
-      "noise": 0.8271,
+      "noise": 0.4722,
       "stateAtTakeover": {
         "position": 17,
         "gapAhead": 0.527,
@@ -406,7 +406,7 @@
       "code": "RIC",
       "team": "McLaren",
       "basePace": 75.5255,
-      "noise": 0.6807,
+      "noise": 0.4262,
       "stateAtTakeover": {
         "position": 10,
         "gapAhead": 0.306,
@@ -428,7 +428,7 @@
       "code": "RUS",
       "team": "Williams",
       "basePace": 76.5712,
-      "noise": 0.9769,
+      "noise": 0.4633,
       "stateAtTakeover": {
         "position": 18,
         "gapAhead": 0.104,
@@ -451,7 +451,7 @@
       "code": "SAI",
       "team": "Ferrari",
       "basePace": 75.04,
-      "noise": 0.54,
+      "noise": 0.3583,
       "stateAtTakeover": {
         "position": 6,
         "gapAhead": 0.178,
@@ -478,7 +478,7 @@
       "code": "STR",
       "team": "Aston Martin",
       "basePace": 76.3343,
-      "noise": 0.7936,
+      "noise": 0.664,
       "stateAtTakeover": {
         "position": 12,
         "gapAhead": 0.282,
@@ -500,7 +500,7 @@
       "code": "TSU",
       "team": "AlphaTauri",
       "basePace": 76.3436,
-      "noise": 0.9729,
+      "noise": 0.4894,
       "stateAtTakeover": {
         "position": 19,
         "gapAhead": 0.075,
@@ -523,7 +523,7 @@
       "code": "VER",
       "team": "Red Bull Racing",
       "basePace": 74.3294,
-      "noise": 0.5963,
+      "noise": 0.4508,
       "stateAtTakeover": {
         "position": 1,
         "gapAhead": 0.0,
@@ -550,7 +550,7 @@
       "code": "VET",
       "team": "Aston Martin",
       "basePace": 75.7301,
-      "noise": 0.4849,
+      "noise": 0.2457,
       "stateAtTakeover": {
         "position": 7,
         "gapAhead": 0.347,

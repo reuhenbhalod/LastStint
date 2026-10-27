@@ -12,6 +12,7 @@ from dataclasses import dataclass, field
 import pandas as pd
 
 from . import assemble, clean, events, fit, ingest, scenario, track
+from . import pace as pace_mod
 
 # Race registry: metadata that isn't derivable from the timing data. `split` is the Phase
 # 1-2 perfection spec's fixed tune / held-out assignment (A1): held-out races are never used
@@ -448,8 +449,15 @@ def build_race(race_id: str, laps: pd.DataFrame | None = None) -> BuildResult:
     meta = resolved_meta(race_id, laps)
 
     clean_df, traffic_df, _ = clean.clean_laps(laps)
+    # Model v3 stage 6 (T1): pace from clear-air laps only; the sim adds the dirty-air
+    # penalty itself when a car follows within range, so traffic laps would count it twice.
     pace_laps = pd.concat([clean_df, traffic_df])
-    fitted = fit.fit_lap_model(clean_df, pace_laps=pace_laps, era=meta["era"])
+    fitted = fit.fit_lap_model(
+        clean_df,
+        pace_laps=clean_df if pace_mod.CLEAR_AIR else pace_laps,
+        fallback_pace_laps=pace_laps,
+        era=meta["era"],
+    )
     params = track.fit_track_params(laps, clean_df, traffic_df, fitted)
 
     takeover = meta["takeover_lap"]

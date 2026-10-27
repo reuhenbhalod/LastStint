@@ -233,3 +233,56 @@ Phase 1 closed on Oct 26 with documented limits: Gate G1 passes on 1 of 16 held-
   - Abu Dhabi 21, Bahrain 21, Mexico 21, Miami 22, Canada 22, Bahrain 22, Hungary 19, Mexico 19
   - France 19, Spain 20, Portugal 20, Italy 24, Hungary 25
   - France 21 is borderline.
+
+## Stage 6: the remaining list (Oct 27, 2026; owner: "start on all these")
+
+The owner approved the whole list, so these defaults apply, each with the usual guard: tuning races choose, held-out is checked once at the end, and nothing is kept that doesn't help.
+
+| # | Work | Default |
+|---|---|---|
+| D1 | Pace that changes within a driver's race | Screen two strategy-independent shapes on the tuning races: **per-driver wear** (extra s/lap per lap of tyre age) and **per-driver drift** (extra s/lap per race lap). Each slope is shrunk toward 0. A shape is built into both sims (schema, TS, Python, parity) only if it wins. |
+| D2 | Lapped cars behind a SC | A lapped car (more than one green lap behind the leader) is not pulled into the leaders' queue: its gap is kept, minus the one lap it gets back by unlapping. In both sims, kept only if it helps the tuning races. |
+| D3 | Races that can't be fixed | Documented in `g1-report.md` (data issue, or a named unexplained loss). |
+| D4 | When the model is done | The owner's call after the held-out check. |
+
+### Stage 6 results (Oct 27, 2026)
+
+**D1: pace that changes within a race.** Screened on the tuning races; the baseline is 8 pass / 1 borderline, 2.36 s.
+
+| Change | Pass / borderline | Mean | Verdict |
+|---|---|---|---|
+| Per-driver wear slope (shrink 10 / 30) | 6 / 0, 7 / 0 | 2.49, 2.47 s | Rejected |
+| Per-driver drift over the race (shrink 10 / 30) | 6 / 2, 7 / 1 | 2.44, 2.41 s | Rejected |
+| T1: pace from clear-air laps only | 5 / 0 | 4.85 s | Rejected |
+| **T2: lap noise as a robust spread (1.4826 × MAD)** | **9 / 0** | **2.40 s** | **Kept** |
+| T2 with the dirty-air penalty at 50 / 25 / 0% | 6 / 3, 6 / 1, 6 / 1 | 2.26, 2.21, 2.18 s | Rejected (fewer passes) |
+
+- **Linear pace shapes don't help.**
+- **T1 shows something useful.** The sim produces less traffic than real races do (Spain 21: PER spent 14 real laps within 1 s of the car ahead, against about 2 in the sim). Base pace fitted on traffic laps was compensating for that, so taking those laps out makes every driver too fast.
+- **T2 is a principled fix.** The old noise was the standard deviation over every green lap, which traffic and model misfit inflate. With T2, France 21 moves from borderline to pass, and no race changes status for the worse.
+- **A test fix that came with it.** The team-orders known-answer test (`tests/team-orders.test.ts`) took its lap noise from the fitted Abu Dhabi model, so T2 moved it. The scenario now pins its own noise (0.5 s), and holding up the rival leads by 10.7 points.
+
+**D2: lapped cars behind a SC.** No general rule fits, so the sim is unchanged and this is documented as a race-control limit.
+- `experiments/unlap.py` measured where cars that unlapped behind a SC actually rejoined the queue.
+- **Canada 22 and Miami 22:** at its back, 0–3 s behind. That is what the sim does now.
+- **Bahrain 22, Abu Dhabi 21 and Singapore 19:** race control released them late, and cars far back on track restarted 22–90 s behind the queue.
+- When race control releases lapped cars isn't in the timing data, so one rule would fix two races and break two others.
+- If it is ever needed, it could become a per-SC field in the event data.
+
+**D3: races that can't be fixed.** Each is documented in `g1-report.md` (data issue or diagnosis):
+- Miami 2025: data issue.
+- Saudi 22: early SC with mass stops.
+- Spain 21, USA 18/21, Mexico 18, Bahrain 18: single cars losing time in laps the data doesn't explain (yellow flags, pit laps).
+
+**Held-out check (run once, end of stage 6)**
+
+| | Tuning (16) | Held-out (15 counted) |
+|---|---|---|
+| Stage 5 | 8 pass / 1 borderline, 2.36 s | 5 pass, 2.37 s |
+| **Stage 6** | **9 pass, 2.40 s** | **5 pass, 2.33 s** |
+
+- **The validated pool is now 14 races:**
+  - Abu Dhabi 21, Bahrain 21, France 21, Mexico 21, Miami 22, Canada 22, Bahrain 22
+  - Hungary 19, Mexico 19, France 19, Spain 20, Portugal 20, Italy 24, Hungary 25
+- **A1 is still not met.** The `replay` ceiling passes 11 held-out races, and the model passes 4 of them.
+- **D4, when the model is done, is the owner's call.**
