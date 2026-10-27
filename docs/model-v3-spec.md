@@ -286,3 +286,50 @@ The owner approved the whole list, so these defaults apply, each with the usual 
   - Hungary 19, Mexico 19, France 19, Spain 20, Portugal 20, Italy 24, Hungary 25
 - **A1 is still not met.** The `replay` ceiling passes 11 held-out races, and the model passes 4 of them.
 - **D4, when the model is done, is the owner's call.**
+
+## Stage 7: traffic, tyre-wear shape, driver × compound (Oct 27, 2026)
+
+The owner chose to keep improving the model until the UI is ready. The usual guard applies: tuning races choose, held-out is checked once at the end, nothing is kept that doesn't help.
+
+| # | Work | Default |
+|---|---|---|
+| E1 | Traffic | First **measure** traffic and passing, real against sim: laps within 1 s of the car ahead, and on-track passes per race. Then change the sim's following and passing rules in both sims (TS and Python, in parity) so that they match the measurements, and re-check whether pace can then come from clear-air laps (T1). |
+| E2 | Tyre-wear shape | Screen a quadratic tyre-age term per compound (wear that accelerates smoothly), against the linear wear plus cliff. |
+| E3 | Driver × compound pace | Re-screen it, since it was rejected on Oct 25 before three bugs were fixed. One offset per driver per compound, shrunk toward the driver's own pace. |
+
+### Stage 7 results so far (Oct 27, 2026)
+
+The baseline is the current model on the tuning races: 9 pass / 0 borderline, 2.40 s.
+
+**E2 and E3: rejected.**
+- Driver × compound pace, shrink 10 / 30: 5 / 0 and 5 / 1, 2.55 and 2.51 s.
+- Quadratic (accelerating) tyre wear per compound, shrink 0 / 50: 6 / 1 and 7 / 1, 2.64 and 2.56 s.
+
+**E1: traffic measured** (`experiments/traffic_stats.py`, tuning races after the takeover).
+
+| | Real | Sim |
+|---|---|---|
+| Car-laps within 1 s of the car ahead | 15% | 21% |
+| On-track passes per race | 17 | 40 |
+| Passes undone within 3 laps | ~4% | 25–60% |
+| Gap of a follower that fails to pass | median 1.0 s (p25 0.68) | 0.3 s (FOLLOW_GAP) |
+| Gap of a car just passed | median 1.25 s (p25 0.76) | 0.05 s (PASS_MARGIN) |
+
+- **The sim has more traffic and far more passing than real races, not less.** The Oct 26 claim that it had too little traffic came from one car (Spain 21 PER) and was wrong in general.
+- **The cause is the following rules.** A held car sits at 0.3 s and a passed car at 0.05 s, where the fitted pass odds are high, so cars keep swapping back.
+
+**E1: passing variants on the tuning races** (reference sim switches: `REPASS_COOLDOWN`, `FOLLOW_GAP`, `PASS_MARGIN`).
+
+| Cooldown, held gap, pass margin | G1 | Mean | Passes per race (real 17) |
+|---|---|---|---|
+| 0, 0.3, 0.05 (current) | 9 / 0 | 2.40 s | 40 |
+| **3, 0.3, 0.05** | **8 / 2** | **2.37 s** | **29** |
+| 5, 0.3, 0.05 | 8 / 2 | 2.38 s | 28 |
+| 3, 0.7, 0.76 | 8 / 0 | 2.80 s | 21 |
+| 3, 0.7, 0.05 | 6 / 0 | 2.96 s | 21 |
+| 3, 1.0, 1.25 (measured medians) | 5 / 0 | 3.08 s | 16 |
+| 3, 1.0, 0.05 | 5 / 0 | 3.26 s | 16 |
+
+- **Realistic passing counts cost G1.** At a held gap near 1.0 s, the fitted pass odds keep faster cars stuck longer than the real races show.
+- **The re-pass cooldown alone removes the back-and-forth swapping** (40 → 29 passes) with G1 unchanged within noise: France 21 drops from pass to borderline, and Hungary 22 rises from fail to borderline.
+- **Decision for the owner:** whether to adopt the cooldown (a realism fix that is neutral on G1). It needs a TS port with parity.
