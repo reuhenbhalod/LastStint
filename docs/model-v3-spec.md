@@ -333,3 +333,24 @@ The baseline is the current model on the tuning races: 9 pass / 0 borderline, 2.
 - **Realistic passing counts cost G1.** At a held gap near 1.0 s, the fitted pass odds keep faster cars stuck longer than the real races show.
 - **The re-pass cooldown alone removes the back-and-forth swapping** (40 → 29 passes) with G1 unchanged within noise: France 21 drops from pass to borderline, and Hungary 22 rises from fail to borderline.
 - **Decision for the owner:** whether to adopt the cooldown (a realism fix that is neutral on G1). It needs a TS port with parity.
+
+### Stage 7 close (Oct 27, 2026)
+
+**The owner adopted the re-pass cooldown, and it is now in both sims.**
+- `REPASS_COOLDOWN = 3` in `sim_reference.py` and `packages/sim/src/sim.ts`: no roll and no random draw while cooling.
+- The TS run carries `passedBy`, and grader forks copy it.
+- Golden files were rebuilt, and TS↔Python parity holds on all 32 races.
+- `tests/passing.test.ts` pins the rule. A car 1 s/lap faster and 0.2 s behind passes in most seeds (more than 20 of 40), but never past the car that has just passed it.
+
+**Held-out check (run once):**
+
+| | Tuning (16) | Held-out (15 counted) | Passes per race, tuning races (real 17) |
+|---|---|---|---|
+| Stage 6 | 9 / 0 / 7, 2.40 s | 5 pass, 2.33 s | 40 |
+| **Stage 7** | **8 / 2 / 6, 2.37 s** | **5 pass, 2.33 s** | **29** |
+
+- **G1 is neutral; the realism gain is that cars no longer trade places back and forth.**
+- **Validated pool:** 13 races pass, plus 2 borderline (France 21 and Hungary 22).
+  - Abu Dhabi 21, Bahrain 21, Mexico 21, Miami 22, Canada 22, Bahrain 22, Hungary 19, Mexico 19
+  - France 19, Spain 20, Portugal 20, Italy 24, Hungary 25
+- **Still too much passing (29 against a real 17).** Matching the real count needs a larger held gap, which costs G1 (see the E1 table). Left open.

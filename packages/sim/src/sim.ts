@@ -29,6 +29,9 @@ export const DIRTY_AIR_RANGE = 1.0; // within this gap (s) a car is in dirty air
 export const PASS_WINDOW = 2.0; // a follower within this gap (s) gets one pass roll
 export const FOLLOW_GAP = 0.3; // a follower that fails to pass is held this far (s) behind
 export const PASS_MARGIN = 0.05; // a completed pass puts the follower this far (s) ahead
+// A car that has just been passed gets no pass roll against the car that passed it for this
+// many laps (real races undo ~4% of passes within 3 laps; without it the sim undid 25-60%).
+export const REPASS_COOLDOWN = 3;
 export const BUNCH_GAP = 0.5; // SC train spacing per car (measured on the final SC lap)
 // SC bunching (measured on the tuning races' SCs, 259 gaps): gaps are kept on the deployment
 // lap, each middle SC lap keeps SC_GAP_KEEP of a gap's excess over BUNCH_GAP, and the last lap
@@ -101,6 +104,8 @@ export interface Run {
   /** Neutralization flag per lap, and retirements per lap, precomputed from events. */
   neutral: Map<number, Exclude<FlagState, 'green'>>;
   retireAt: Map<number, string[]>;
+  /** Lap of each recent pass, keyed `${passed}>${passer}` (REPASS_COOLDOWN). */
+  passedBy: Map<string, number>;
 }
 
 export interface NeutralEvent {
@@ -311,6 +316,7 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
     live,
     notes: [],
     headset: HEADSET[model.era],
+    passedBy: new Map(),
     state: {
       lap: model.race.takeoverLap,
       flag: 'green',
@@ -436,6 +442,7 @@ export function forkRun(
     ...run,
     seed,
     ...makeStreams(run.model, seed),
+    passedBy: new Map(run.passedBy),
     state: {
       ...run.state,
       order: [...run.state.order],
@@ -901,7 +908,7 @@ export function stepLap(run: Run): RaceState {
       }
     }
   } else {
-    resolveOrder(run, clean, prevTime, pitted);
+    resolveOrder(run, lap, clean, prevTime, pitted);
     applySwap(run, lap, prevTime);
   }
   rivalReacts(run, lap, flag, prevTime);
@@ -915,11 +922,13 @@ export function stepLap(run: Run): RaceState {
 /**
  * Green-flag order after a lap. Walking the start-of-lap order front to back, each follower
  * that started within PASS_WINDOW of the car ahead gets ONE pass roll; success puts it ahead,
- * failure holds it FOLLOW_GAP behind. Pairs involving a car that pitted this lap, or that
+ * failure holds it FOLLOW_GAP behind. A car passed within REPASS_COOLDOWN laps gets no roll
+ * against the car that passed it. Pairs involving a car that pitted this lap, or that
  * started further apart, are left to the natural time order.
  */
 function resolveOrder(
   run: Run,
+  lap: number,
   clean: Record<string, number>,
   prevTime: Record<string, number>,
   pitted: Set<string>,
@@ -938,9 +947,13 @@ function resolveOrder(
       (effect(run, b, 'battle').attackLogit ?? 0) +
       (effect(run, a, 'battle').defendLogit ?? 0) +
       (holdingUp(run, a.code, b.code) ? (run.headset?.teamOrders?.holdUpLogit ?? 0) : 0);
+    // No roll (and no draw) while b is in its cooldown after being passed by a.
+    const cooling = lap - (run.passedBy.get(`${b.code}>${a.code}`) ?? -1e9) <= REPASS_COOLDOWN;
     if (
+      !cooling &&
       run.rng.get(OVERTAKE_STREAM, b.code).next() < passProbability(overtake, advantage, gap, shift)
     ) {
+      run.passedBy.set(`${a.code}>${b.code}`, lap);
       if (b.totalTime >= a.totalTime) b.totalTime = a.totalTime - PASS_MARGIN;
     } else if (b.totalTime < a.totalTime + FOLLOW_GAP) {
       b.totalTime = a.totalTime + FOLLOW_GAP;

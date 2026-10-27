@@ -23,8 +23,8 @@ FOLLOW_GAP = 0.3  # a follower that fails to pass is held this far (s) behind
 PASS_MARGIN = 0.05  # a completed pass puts the follower this far (s) ahead
 # A car that has just been passed gets no pass roll against the car that passed it for this
 # many laps (real races: ~4% of passes are undone within 3 laps; without it the sim undid
-# 25-60%). 0 = off. Model v3 spec stage 7 (E1).
-REPASS_COOLDOWN = 0
+# 25-60%). 0 = off. Model v3 spec stage 7 (E1). Same rule in packages/sim (parity).
+REPASS_COOLDOWN = 3
 BUNCH_GAP = 0.5  # SC train spacing per car (measured on the final SC lap, 2021 races)
 # SC bunching (measured on the tuning races' SCs, 259 gaps): gaps are kept on the deployment
 # lap (everyone runs the same delta), each middle SC lap keeps SC_GAP_KEEP of a gap's excess
