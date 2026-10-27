@@ -1,6 +1,6 @@
 # Phase 4 Spec: Backend and Leaderboard (Cloudflare)
 
-Status: draft, decisions pending · Owner: @Abhiram
+Status: in progress · Owner: @Abhiram
 
 ## Purpose
 
@@ -17,6 +17,8 @@ The server side of the Daily Race, on Cloudflare: serve the day's race, verify e
 | Tests | vitest on `@cloudflare/vitest-pool-workers`, so the tests run inside workerd with a local D1 |
 | Deploy | Wrangler; GitHub Actions deploys `main` once a Cloudflare API token is in the repo secrets |
 | Web | Cloudflare Pages (Reuhen's side); the Worker only allows its origin through CORS |
+
+**Decided Oct 26, 2026: the recommended option for every decision** (A1a–A3a, B1a–B3a, C1a–C4a).
 
 ## Where things stand
 

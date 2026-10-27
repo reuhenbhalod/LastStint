@@ -1,0 +1,205 @@
+// Server-side verification (Phase 4 spec stage 1): a run rebuilt from its call log must grade
+// and score exactly as the player's game did, and tampered logs must be rejected.
+
+import { describe, expect, it } from 'vitest';
+import abuJson from '../../../data/races/abu-dhabi-2021.json';
+import { playDailyRace } from '../examples/daily-race.js';
+import { decide, initRun } from '../src/sim.js';
+import type { Decision, RaceModel } from '../src/types.js';
+import { VerifyError, verifyRun } from '../src/verify.js';
+
+const abu = abuJson as unknown as RaceModel;
+const SAMPLES = 40;
+
+// Abu Dhabi with a second, earlier moment whose real call is none of its options, so a run
+// carries two graded moments and the real team's call is graded separately.
+const twoMoments: RaceModel = {
+  ...abu,
+  decisionMoments: [
+    {
+      id: 'undercut-44',
+      lap: 44,
+      trigger: 'undercut',
+      target: { kind: 'beat-rival' },
+      options: [
+        { id: 'stay-out', label: 'Stay out', decisions: [] },
+        {
+          id: 'box-hard',
+          label: 'Box for hards',
+          decisions: [{ lap: 44, kind: 'pit', compound: 'HARD' }],
+        },
+        {
+          id: 'push',
+          label: 'Stay out and push',
+          decisions: [{ lap: 44, kind: 'mode', key: 'pace', value: 'push' }],
+        },
+      ],
+      realOptionId: null,
+    },
+    ...abu.decisionMoments,
+  ],
+};
+
+function play(model: RaceModel, choices: Record<string, string>, between?: (run: never) => void) {
+  return playDailyRace(model, model.race.seed, (m) => choices[m.id] as string, {
+    samples: SAMPLES,
+    between: between as never,
+  });
+}
+
+function reasonFor(model: RaceModel, decisions: unknown): string {
+  try {
+    verifyRun(model, model.race.seed, decisions, SAMPLES);
+  } catch (e) {
+    if (e instanceof VerifyError) return e.code;
+    throw e;
+  }
+  return 'ok';
+}
+
+describe('decide() timestamps', () => {
+  it('stamps each call with the last completed lap', () => {
+    const run = initRun(abu, abu.race.seed, { decisions: [] });
+    decide(run, { lap: 40, kind: 'pit', compound: 'HARD' });
+    expect(run.decisions[0]?.at).toBe(abu.race.takeoverLap);
+  });
+
+  it('rejects a call stamped at or after its own lap', () => {
+    expect(() =>
+      initRun(abu, abu.race.seed, {
+        decisions: [{ lap: 40, at: 40, kind: 'pit', compound: 'HARD' }],
+      }),
+    ).toThrow(/made at lap 40/);
+  });
+});
+
+describe('verifyRun', () => {
+  it('reproduces a played run: result, grades and score', () => {
+    const played = play(abu, { 'sc-53': 'box-soft' });
+    const v = verifyRun(abu, abu.race.seed, played.decisions, SAMPLES);
+    expect(v.result).toEqual(played.result);
+    expect(v.score).toEqual(played.score);
+    expect(v.moments.map((m) => m.grade)).toEqual(played.calls.map((c) => c.grade));
+    expect(v.moments[0]?.chosen).toBe('box-soft');
+    expect(v.moments[0]?.matchedReal).toBe(false);
+    expect(v.moments[0]?.real.optionId).toBe('stay-out');
+    expect(v.finishPosition).toBe(played.result.order.indexOf('HAM') + 1);
+    expect(v.disqualified).toBe(false);
+  });
+
+  it('survives a JSON round trip (what the Worker receives)', () => {
+    const played = play(abu, { 'sc-53': 'stay-out' });
+    const wire = JSON.parse(JSON.stringify(played.decisions));
+    const v = verifyRun(abu, abu.race.seed, wire, SAMPLES);
+    expect(v.score).toEqual(played.score);
+    expect(v.moments[0]?.matchedReal).toBe(true);
+  });
+
+  it('rebuilds each grade from the calls known at its pause, including queued ones', () => {
+    // A stop queued early for a lap after both moments, and headset calls made later: the
+    // early one is part of both grades, the late ones of neither.
+    const between = (run: { state: { lap: number } }) => {
+      const r = run as Parameters<typeof decide>[0];
+      if (r.state.lap === 36) decide(r, { lap: 56, kind: 'pit', compound: 'MEDIUM' });
+      if (r.state.lap === 50) decide(r, { lap: 51, kind: 'mode', key: 'pace', value: 'push' });
+      if (r.state.lap === 54) decide(r, { lap: 55, kind: 'mode', key: 'pace', value: 'manage' });
+    };
+    const played = play(
+      twoMoments,
+      { 'undercut-44': 'push', 'sc-53': 'stay-out' },
+      between as never,
+    );
+    expect(played.decisions.map((d) => d.at)).toEqual(
+      [...played.decisions.map((d) => d.at)].sort((a, b) => (a as number) - (b as number)),
+    );
+    const v = verifyRun(twoMoments, twoMoments.race.seed, played.decisions, SAMPLES);
+    expect(v.moments.map((m) => m.grade)).toEqual(played.calls.map((c) => c.grade));
+    expect(v.score).toEqual(played.score);
+    expect(v.result).toEqual(played.result);
+    // The second moment's real call (stay out) is one of its options; the first's is not.
+    expect(v.moments[0]?.real.optionId).toBeNull();
+    expect(v.moments[0]?.real.probability).toBeGreaterThanOrEqual(0);
+    expect(v.moments[1]?.matchedReal).toBe(true);
+  });
+
+  describe('rejects tampered logs', () => {
+    const played = play(abu, { 'sc-53': 'box-soft' });
+    const log = played.decisions;
+    const radio = log.findIndex((d) => d.kind === 'radio');
+    const edit = (f: (l: Decision[]) => void) => {
+      const copy = JSON.parse(JSON.stringify(log)) as Decision[];
+      f(copy);
+      return copy;
+    };
+
+    it('accepts the untouched log', () => expect(reasonFor(abu, log)).toBe('ok'));
+    it('not an array', () => expect(reasonFor(abu, { calls: [] })).toBe('invalid-calls'));
+    it('a call without its timestamp', () =>
+      expect(
+        reasonFor(
+          abu,
+          edit((l) => {
+            l[0] = { ...(l[0] as Decision), at: undefined };
+          }),
+        ),
+      ).toBe('invalid-calls'));
+    it('calls out of order', () =>
+      expect(
+        reasonFor(
+          abu,
+          edit((l) => l.push({ lap: 57, at: 40, kind: 'pit', compound: 'HARD' })),
+        ),
+      ).toBe('invalid-calls'));
+    it('a call for a lap that had already run', () =>
+      expect(
+        reasonFor(
+          abu,
+          edit((l) => l.push({ lap: 55, at: 56, kind: 'pit', compound: 'HARD' })),
+        ),
+      ).toBe('invalid-calls'));
+    it('an unknown compound', () =>
+      expect(
+        reasonFor(
+          abu,
+          edit((l) => l.push({ lap: 56, at: 55, kind: 'pit', compound: 'WET' })),
+        ),
+      ).toBe('invalid-calls'));
+    it('no answer to a moment', () =>
+      expect(
+        reasonFor(
+          abu,
+          edit((l) => l.splice(radio, 1)),
+        ),
+      ).toBe('missing-answer'));
+    it('two answers to a moment', () =>
+      expect(
+        reasonFor(
+          abu,
+          edit((l) => l.splice(radio, 0, { ...(l[radio] as Decision) })),
+        ),
+      ).toBe('missing-answer'));
+    it('an answer that claims a different option than the calls made', () =>
+      expect(
+        reasonFor(
+          abu,
+          edit((l) => {
+            (l[radio] as { optionId: string }).optionId = 'stay-out';
+          }),
+        ),
+      ).toBe('bad-answer'));
+    it('an extra call on the moment lap', () =>
+      expect(
+        reasonFor(
+          abu,
+          edit((l) => l.push({ lap: 53, at: 52, kind: 'mode', key: 'pace', value: 'push' })),
+        ),
+      ).toBe('bad-answer'));
+    it('an answer to a moment that does not exist', () =>
+      expect(
+        reasonFor(
+          abu,
+          edit((l) => l.push({ lap: 57, at: 56, kind: 'radio', momentId: 'x', optionId: 'y' })),
+        ),
+      ).toBe('bad-answer'));
+  });
+});
