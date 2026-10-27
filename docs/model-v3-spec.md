@@ -137,3 +137,60 @@ Phase 1 closed on Oct 26 with documented limits: Gate G1 passes on 1 of 16 held-
   - Mechanics work on lapped cars under SC and on passing.
   - Accept borderline races for content.
   - Close Phase 1 on this result.
+
+## Stage 5: race mechanics (Oct 27, 2026; owner chose B: one more day on the model)
+
+### Evidence
+
+- **Remaining failures.** These are the races that fail even with perfect pace (`replay`), checked one by one with `experiments/audit.py` and the replay detail. They fall into four kinds:
+  1. **Stop accounting.** Frozen green-stop losses are measured against the field's median lap, but the sim adds them to *its own* predicted in- and out-laps.
+  2. **SC stops.** A stop under a safety car costs a flat 0.55 × a green stop. In Saudi 22, PER, RUS and OCO come out 7–10 s too fast after their SC stops.
+  3. **Near-ties.** When two cars really finished within about a second, the order-rate checks ask the sim to predict a coin flip.
+     - Bahrain 21 with M1: VER is 0.7 s behind HAM in reality. The sim's mean error is 0.5 s, yet the duel order rate is 56–58% against the 60% bar.
+     - Singapore 23: the podium finished within 1.3 s.
+  4. **Lapped cars unlapping behind a SC.** Almost always outside the top 6 that G1 scores.
+- **M1 measured (tuning races only).** Each green stop's frozen loss becomes the real in- and out-laps minus the sim's own prediction for them (`pace.sim_frame_losses`).
+
+  | | Pass / borderline (model) | Mean (model) | Pass (replay ceiling) | Mean (replay) |
+  |---|---|---|---|---|
+  | Without M1 | 7 / 1 | 2.34 s | 9 | 2.00 s |
+  | With M1 | 7 / 1 | 2.36 s | 10 | 1.83 s |
+
+  - **Better with M1:** Hungary 2019 passes again (2.00 → 1.27 s). Mexico 2019 moves from borderline to pass, France 2021 from fail to borderline, and Hungary 2022 halves (2.64 → 1.26 s).
+  - **Worse with M1:** Abu Dhabi 2018 fails (VET duel gap 5 s), and Bahrain 2021 fails on the near-tie only.
+
+### Decisions
+
+← marks the recommendation.
+
+**C1. Stop accounting (M1)**
+
+- **a. Adopt the sim-frame loss.** ← recommended
+  - It is the accounting the sim actually uses, and the replay ceiling confirms it (9 → 10 passes).
+  - It brings Hungary 2019, a race the plan's G1 names, back to pass.
+- b. Keep the field-median loss.
+
+**C2. Near-ties in the G1 order checks**
+
+- **a. Treat cars that really finished within 1.0 s of each other as tied.** ← recommended
+  - The duel order check is skipped when the duel's real gap is under 1.0 s; the duel gap check still applies.
+  - Podium order matches when the sim's order differs from the real one only by swaps within such ties.
+  - Rationale: a check that a perfect model would fail measures luck, not the model.
+- b. Keep the order checks as they are.
+
+**C3. Cost of stops under a SC (M2)**
+
+- **a. Measure them from data, as VSC stops already are:** the change in gap to nearby cars that didn't stop, across the neutralization. Kept only if it helps the tuning races. ← recommended
+- b. Keep 0.55 × green.
+
+**C4. Lapped cars under a SC (M3)**
+
+- **a. Defer and document.** It changes both sims (TS and Python, in parity) and rarely touches a scored car. ← recommended
+- b. Do it today.
+
+**C5. Process**
+
+- **a. Same guard as before.** ← recommended
+  - Every change is chosen on the tuning races.
+  - The held-out races are checked once at the end of the day.
+  - Any G1 rule change (C2) applies to every race and is reported next to the old rule.

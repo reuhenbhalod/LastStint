@@ -98,6 +98,13 @@ def assemble_race_model(
         takeover_lap,
         pace_mod.SHRINK_LAPS,
     )
+    if pace_mod.SIM_FRAME_LOSS:
+        v3_pace = {c: p + race_pace.get(c, 0.0) for c, p in fit.driver_pace.items()}
+        measured.update(
+            pace_mod.sim_frame_losses(
+                laps, v3_pace, compounds, round(fit.fuel_per_lap, 5), fresh, takeover_lap
+            )
+        )
 
     drivers = []
     for code in sorted(set(takeover_state) & set(fit.driver_pace)):
