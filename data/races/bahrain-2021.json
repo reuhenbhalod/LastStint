@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 9,
+  "schemaVersion": 10,
   "race": {
     "id": "bahrain-2021",
     "name": "Bahrain 2021: Verstappen vs Hamilton",
@@ -137,7 +137,8 @@
         {
           "lap": 55,
           "to": "MEDIUM",
-          "loss": 26.09
+          "loss": 26.09,
+          "optional": true
         }
       ]
     },

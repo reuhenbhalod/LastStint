@@ -524,6 +524,30 @@ export function decide(run: Run, decision: Decision): void {
   run.decisions.push(decision);
 }
 
+/**
+ * The stop a pit call schedules. Boxing on the real lap for the real compound is the real stop
+ * (its measured time, or the track's figure where none was measured), so the real team's
+ * calls replay the real race in live play too; any other stop is an added stop with a
+ * sampled time (stopCost).
+ */
+function playerStop(run: Run, outLap: number, compound: string): PitStop {
+  const real = run.model.drivers
+    .find((d) => d.code === run.model.userSide)
+    ?.realStrategy.find((s) => s.lap === outLap && s.to === compound);
+  if (!real) return { lap: outLap, to: compound, added: true };
+  // A real stop without a measured loss (e.g. under a SC) costs the track's figure, as in replay.
+  return real.loss !== undefined
+    ? { lap: outLap, to: compound, loss: real.loss }
+    : { lap: outLap, to: compound };
+}
+
+/** True if the user's real strategy has this stop (out-lap and compound). */
+function isRealStop(run: Run, outLap: number, compound: string): boolean {
+  return !!run.model.drivers
+    .find((d) => d.code === run.model.userSide)
+    ?.realStrategy.some((s) => s.lap === outLap && s.to === compound);
+}
+
 /** Apply the player's calls for this lap to the user's car before it is run. */
 function applyDecisions(run: Run, lap: number): void {
   if (!run.live) return;
@@ -535,7 +559,7 @@ function applyDecisions(run: Run, lap: number): void {
       (user.modes as unknown as Record<string, string>)[d.key] = d.value;
     } else if (d.kind === 'pit') {
       user.strategy = user.strategy.filter((s) => s.lap !== lap + 1);
-      user.strategy.push({ lap: lap + 1, to: d.compound, added: true });
+      user.strategy.push(playerStop(run, lap + 1, d.compound));
     } else if (d.kind === 'teamOrder') {
       const orders = run.state.teamOrders;
       if (d.order === 'holdUp') orders.holdUp = true;
@@ -615,6 +639,8 @@ function rivalReacts(
   const rival = state.cars[model.rival];
   if (!run.live || !user || !rival || !user.pittedThisLap) return;
   if (rival.retired || rival.pittedThisLap || lap >= model.race.laps) return;
+  // The real stop: the rival's real answer to it is already its real strategy.
+  if (isRealStop(run, lap, user.compound)) return;
 
   const nextStop = rival.strategy.filter((s) => s.lap > lap).sort((a, b) => a.lap - b.lap)[0];
   const nextFlag = run.neutral.get(lap + 1);
@@ -651,7 +677,8 @@ function rivalGoesLong(run: Run, lap: number): void {
   const rival = state.cars[model.rival];
   if (!run.live || !user || !rival || user.retired || rival.retired) return;
   const stopLap = lap + 1;
-  if (!user.strategy.some((s) => s.lap === stopLap)) return;
+  const userStop = user.strategy.find((s) => s.lap === stopLap);
+  if (!userStop || isRealStop(run, stopLap, userStop.to)) return;
   const stopFlag = run.neutral.get(stopLap);
   if (stopFlag !== 'sc' && stopFlag !== 'vsc') return;
   if (rival.totalTime <= user.totalTime) return; // ahead: already past pit entry
@@ -841,7 +868,27 @@ export function stepLap(run: Run): RaceState {
     const c = cars[code] as CarState;
     c.pittedThisLap = false;
     let pitCost = 0;
-    const stopIdx = c.strategy.findIndex((st) => st.lap === lap);
+    let stopIdx = c.strategy.findIndex((st) => st.lap === lap);
+    if (
+      stopIdx >= 0 &&
+      run.live &&
+      code === model.rival &&
+      (c.strategy[stopIdx] as PitStop).optional
+    ) {
+      // The rival's fastest-lap stop, in live play: taken only if the gap behind covers its
+      // cost (it really stopped only because it could do so for free). Replays, and every
+      // other car, keep the real stop, so validation and parity are unchanged.
+      const stop = c.strategy[stopIdx] as PitStop;
+      const behind = running[i + 1];
+      const gapBehind =
+        behind !== undefined
+          ? (prevTime[behind] as number) - (prevTime[code] as number)
+          : Number.POSITIVE_INFINITY;
+      if (gapBehind <= (stop.loss ?? stopCost(run, code, flag, false))) {
+        c.strategy.splice(stopIdx, 1);
+        stopIdx = -1;
+      }
+    }
     if (stopIdx >= 0) {
       const stop = c.strategy[stopIdx] as PitStop;
       c.strategy.splice(stopIdx, 1);

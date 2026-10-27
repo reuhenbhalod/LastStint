@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 9,
+  "schemaVersion": 10,
   "race": {
     "id": "miami-2024",
     "name": "Miami 2024",
@@ -74,7 +74,8 @@
         {
           "lap": 54,
           "to": "SOFT",
-          "loss": 29.638
+          "loss": 29.638,
+          "optional": true
         }
       ]
     },

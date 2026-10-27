@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 9,
+  "schemaVersion": 10,
   "race": {
     "id": "brazil-2021",
     "name": "Brazil 2021: Verstappen vs Hamilton",
@@ -371,7 +371,8 @@
         {
           "lap": 70,
           "to": "SOFT",
-          "loss": 27.623
+          "loss": 27.623,
+          "optional": true
         }
       ]
     },

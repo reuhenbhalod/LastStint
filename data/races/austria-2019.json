@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 9,
+  "schemaVersion": 10,
   "race": {
     "id": "austria-2019",
     "name": "Austria 2019",
@@ -303,7 +303,8 @@
         {
           "lap": 63,
           "to": "SOFT",
-          "loss": 22.95
+          "loss": 22.95,
+          "optional": true
         }
       ]
     },

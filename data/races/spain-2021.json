@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 9,
+  "schemaVersion": 10,
   "race": {
     "id": "spain-2021",
     "name": "Spain 2021: Hamilton vs Verstappen",
@@ -250,7 +250,8 @@
         {
           "lap": 59,
           "to": "SOFT",
-          "loss": 23.376
+          "loss": 23.376,
+          "optional": true
         }
       ]
     },
@@ -380,7 +381,8 @@
         {
           "lap": 58,
           "to": "SOFT",
-          "loss": 23.089
+          "loss": 23.089,
+          "optional": true
         }
       ]
     },

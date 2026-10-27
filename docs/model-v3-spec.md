@@ -354,3 +354,45 @@ The baseline is the current model on the tuning races: 9 pass / 0 borderline, 2.
   - Abu Dhabi 21, Bahrain 21, Mexico 21, Miami 22, Canada 22, Bahrain 22, Hungary 19, Mexico 19
   - France 19, Spain 20, Portugal 20, Italy 24, Hungary 25
 - **Still too much passing (29 against a real 17).** Matching the real count needs a larger held gap, which costs G1 (see the E1 table). Left open.
+
+## What-if check (Oct 27, 2026)
+
+`pnpm --filter @boxthislap/sim whatif` grades famous calls with a broad fan consensus, from the real race state, at 1,000 samples per option.
+
+### Bugs it found (all fixed, TS only, so replays and parity are unchanged)
+
+1. **The real call didn't get the real stop in live play.** A player boxing on the real lap was charged the track's typical stop plus a sampled deviation, whose tail runs to +14 s, instead of the real stop's measured time.
+   - Every decision moment was therefore graded from a drifted state. At Italy 2024 lap 37, PIA was about 10 s off his real race.
+   - *Fix:* boxing on the real lap for the real compound is the real stop: its measured loss, or the track figure where none was measured.
+2. **The rival "reacted" to the player's real stops.** For example, VER covered in Bahrain 2023 and ended 8 s off his real race. The rival's real answer to a real stop is already its real strategy.
+   - *Fix:* the rival reacts only to stops that differ from the real ones.
+   - `tests/live-replay.test.ts`: on all 32 races, playing the real calls now reproduces the replay exactly.
+3. **Fastest-lap stops were unconditional.** Hungary 2019 VER stopped on lap 68 only because HAM had already passed him. In a what-if where VER still leads, he threw the race away.
+   - *Fix:* the pipeline marks real late green stops made with a free gap behind in 2019–2024 as `optional` (schema v10; 12 stops in 10 races).
+   - In live play the **rival** takes such a stop only if its gap behind exceeds the stop's cost.
+   - Applying the rule to every car, in replays too, was tried and rejected: G1 fell to 7/2/7 tuning and 3/15 held-out, because cars skipped stops they really made over sub-second gap differences.
+
+### Result
+
+| Call | Grader | Consensus |
+|---|---|---|
+| Abu Dhabi 21, lap 36 VSC: HAM boxes | box 99.8% vs stay 98.5% | Agrees |
+| Abu Dhabi 21, lap 53 SC: HAM boxes | box soft 89% vs stay 21% | Divided (informational) |
+| Hungary 19, lap 48: HAM second stop | stay 37.5% vs box 12.9% | **Disagrees** |
+| Hungary 22, lap 39: LEC hards | hards worst (2.1%) | Agrees |
+| Bahrain 21, lap 13: HAM undercut | box 97.6% vs stay 73.1% | Agrees |
+| Canada 22, lap 49 SC: SAI boxes | box 10.3% vs stay 1.4% | Agrees |
+| Miami 22, lap 41 SC: LEC stays out | box 31% vs stay 17% | Disagrees (a plausible gamble for a trailing car) |
+| Italy 24, lap 38: PIA stays out | stay 16% vs box 4.2% | Agrees (after fix 1) |
+
+**5 of 7 agree.**
+
+### Why Hungary 2019 disagrees
+
+This is the known long-stint fade limit.
+- VER's hards, 37 or more laps old, fell off about 1.5 s/lap from lap 62 while HAM chased on fresh mediums.
+- Backmarkers ran the same hards 47–53 laps with no fall-off, so the fitted wear is gentle (0.032 s/lap, cliff only at the 53-lap edge of evidence).
+- Fall-off depends on how hard a car is pushed, which the timing data can't separate per driver. Per-driver wear was screened today and made G1 worse.
+- **Recommendation:** keep Hungary 2019 out of the daily pool until tyre fade under pressure is modelled, even though it passes G1.
+
+**G1 after these fixes** is unchanged: tuning 8 / 2 / 6 at 2.37 s, held-out 5 / 15 at 2.33 s.

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 9,
+  "schemaVersion": 10,
   "race": {
     "id": "bahrain-2023",
     "name": "Bahrain 2023",
@@ -388,7 +388,8 @@
         {
           "lap": 55,
           "to": "SOFT",
-          "loss": 32.447
+          "loss": 32.447,
+          "optional": true
         }
       ]
     },

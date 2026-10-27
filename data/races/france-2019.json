@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 9,
+  "schemaVersion": 10,
   "race": {
     "id": "france-2019",
     "name": "France 2019",
@@ -489,7 +489,8 @@
         {
           "lap": 52,
           "to": "SOFT",
-          "loss": 30.999
+          "loss": 30.999,
+          "optional": true
         }
       ]
     }

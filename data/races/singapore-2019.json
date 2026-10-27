@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 9,
+  "schemaVersion": 10,
   "race": {
     "id": "singapore-2019",
     "name": "Singapore 2019",
@@ -316,7 +316,8 @@
         {
           "lap": 57,
           "to": "SOFT",
-          "loss": 38.83
+          "loss": 38.83,
+          "optional": true
         }
       ]
     },

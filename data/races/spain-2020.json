@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 9,
+  "schemaVersion": 10,
   "race": {
     "id": "spain-2020",
     "name": "Spain 2020",
@@ -132,7 +132,8 @@
         {
           "lap": 65,
           "to": "MEDIUM",
-          "loss": 23.344
+          "loss": 23.344,
+          "optional": true
         }
       ]
     },
@@ -213,7 +214,8 @@
         {
           "lap": 63,
           "to": "SOFT",
-          "loss": 41.063
+          "loss": 41.063,
+          "optional": true
         }
       ]
     },

@@ -94,11 +94,12 @@ describe('headset modes', () => {
 
 describe('rival policy', () => {
   it('covers a green-flag undercut when its own stop is near', () => {
-    // Spain 2021: HAM (rival) really stopped on lap 29. VER boxing on 24 (stop charged on
-    // 25) is inside the undercut window and within 4 laps of HAM's stop -> HAM covers on 26.
-    const run = runTo(spain, 1, [{ lap: 24, kind: 'pit', compound: 'MEDIUM' }], 26);
+    // Spain 2021: HAM (rival) really stopped on lap 29. VER boxing on 23 (stop charged on
+    // 24; his real stop was a lap later) is inside the undercut window and within 4 laps of
+    // HAM's stop -> HAM covers on 25. (VER's real stop draws no cover: live-replay.test.ts.)
+    const run = runTo(spain, 1, [{ lap: 23, kind: 'pit', compound: 'MEDIUM' }], 25);
     expect(run.notes).toContainEqual({
-      lap: 25,
+      lap: 24,
       kind: 'rival-cover',
       driver: 'HAM',
       detail: 'MEDIUM',

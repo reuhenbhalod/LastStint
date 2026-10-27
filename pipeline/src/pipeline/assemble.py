@@ -58,6 +58,7 @@ def assemble_race_model(
     seed: int,
     user_side: str,
     rival: str,
+    fastest_lap_point: bool = False,
 ) -> dict:
     """Build the race-model dict (validate + write it with export.write_race)."""
     total_laps = int(laps["LapNumber"].max())
@@ -106,6 +107,12 @@ def assemble_race_model(
             )
         )
 
+    optional = (
+        scenario_mod.fastest_lap_stops(laps, measured, track_params.pit_loss)
+        if fastest_lap_point and track_params.pit_loss is not None
+        else set()
+    )
+
     drivers = []
     for code in sorted(set(takeover_state) & set(fit.driver_pace)):
         s = takeover_state[code]
@@ -132,6 +139,7 @@ def assemble_race_model(
                             if (code, st["lap"]) in measured
                             else {}
                         ),
+                        **({"optional": True} if (code, st["lap"]) in optional else {}),
                     }
                     for st in strategy.get(code, [])
                     if st["lap"] >= takeover_lap
