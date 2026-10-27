@@ -178,6 +178,17 @@ Each stage ends with its tests passing and one commit pushed.
 | **5. Deploy** (after A3 login) | Create D1, apply migrations remotely, deploy, schedule Abu Dhabi 2021 for the coming days, CI deploy job | `curl` on the live `/api/daily` and a scripted full run submitted to the live Worker returns a verified score |
 | **6. Docs** | `docs/api.md` for Reuhen: endpoints, request/response shapes, the radio-answer rule, local dev (`pnpm --filter @boxthislap/worker dev` + Vite proxy) | Reuhen can call every endpoint from the doc alone |
 
+## Progress
+
+| Stage | Status |
+|---|---|
+| 1. Sim: call timing | **Done.** Sim 0.2.0: `at`, `answerMoment`, `verifyRun`. `verifyRun` lives in the sim package, not the Worker, so it is tested against the game's own example. A test shows that grading with every logged call (no `at`) gives different odds, so the timestamp matters. |
+| 2. Harness and verification | **Done.** `@cloudflare/vitest-plugin` (the renamed vitest-pool-workers); compatibility date 2026-10-13, the newest the test runtime supports. **Measured:** a full verification of an Abu Dhabi run takes 24–38 ms in the local Worker (replay, 300-sample re-grade, store), well inside the paid plan's limit, so B2a stands. |
+| 3. Endpoints | **Done.** 19 Worker tests. The rank's last tie-break is insertion order (`rowid`), so runs stored in the same millisecond still rank deterministically. |
+| 4. Abuse and ops | **Done.** Rate limit binding, cron and webhook, `queueDays`, the `schedule` and `smoke` scripts. Checked end to end against `wrangler dev`: the schedule script's hash matches the Worker's, and a smoke run verifies to the client's score. |
+| 5. Deploy | Waiting on the Cloudflare login and the Workers Paid plan (A1, A3). |
+| 6. Docs | **Done.** `docs/api.md`. |
+
 ## Out of scope
 
 - Mystery Races, share text and persona (Phase 6). The API returns `number`, `calls` (bands) and `percentile`, which is everything the share text needs.
