@@ -66,7 +66,7 @@ def post_takeover_offsets(
 # out-lap, so the loss that reproduces the real time is the real in- and out-laps minus the
 # sim's prediction for them. (The field-median measurement in track.stop_records is in a
 # different frame: it ignores the tyres each car is on, which the sim then adds again.)
-SIM_FRAME_LOSS = True
+SIM_FRAME_LOSS = False  # pending decision C1
 
 
 def sim_frame_losses(
