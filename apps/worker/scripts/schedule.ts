@@ -1,0 +1,191 @@
+// Schedule dailies (Implementation Plan 5.4, Phase 4 spec C4): pick eligible races, draw a
+// random seed per date, number the days, pin each model's hash, and write to D1 via Wrangler.
+//
+//   pnpm --filter @boxthislap/worker schedule --local --from 2026-11-01 --days 14
+//   pnpm --filter @boxthislap/worker schedule --remote --days 7 --race abu-dhabi-2021
+//
+// Options:
+//   --local | --remote     which D1 to write (one is required)
+//   --from YYYY-MM-DD      first date (default: today, UTC)
+//   --days N               how many dates (default 1)
+//   --race ID              schedule this race on every date (default: rotate eligible races)
+//   --allow-ineligible     allow races that aren't eligible (local only, for testing)
+//   --dry-run              print the plan without writing
+//
+// A race is eligible when it has approved decision moments and its Gate G1 status in
+// docs/g1-report.md is pass or borderline. Dates already scheduled are never changed.
+
+import { spawnSync } from 'node:child_process';
+import { randomInt } from 'node:crypto';
+import { mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { addDays, isDate, todayUtc } from '../src/dates.js';
+import { modelHash } from '../src/hash.js';
+
+const here = dirname(fileURLToPath(import.meta.url));
+const workerDir = join(here, '..');
+const repo = join(workerDir, '..', '..');
+const DB_NAME = 'pitwall-db';
+
+interface Model {
+  race: { id: string };
+  userSide: string;
+  decisionMoments: unknown[];
+}
+
+function fail(message: string): never {
+  console.error(`schedule: ${message}`);
+  process.exit(1);
+}
+
+function parseArgs(argv: string[]) {
+  const args = {
+    target: '' as '' | 'local' | 'remote',
+    from: todayUtc(Date.now()),
+    days: 1,
+    race: undefined as string | undefined,
+    allowIneligible: false,
+    dryRun: false,
+  };
+  for (let i = 0; i < argv.length; i++) {
+    const a = argv[i];
+    const value = () => argv[++i] ?? fail(`${a} needs a value`);
+    if (a === '--local' || a === '--remote') {
+      if (args.target) fail('pass only one of --local and --remote');
+      args.target = a === '--local' ? 'local' : 'remote';
+    } else if (a === '--from') args.from = value();
+    else if (a === '--days') args.days = Number(value());
+    else if (a === '--race') args.race = value();
+    else if (a === '--allow-ineligible') args.allowIneligible = true;
+    else if (a === '--dry-run') args.dryRun = true;
+    else fail(`unknown option ${a}`);
+  }
+  if (!args.target) fail('pass --local or --remote');
+  if (!isDate(args.from)) fail('--from must be YYYY-MM-DD');
+  if (!Number.isInteger(args.days) || args.days < 1 || args.days > 366) {
+    fail('--days must be 1-366');
+  }
+  if (args.allowIneligible && args.target === 'remote') {
+    fail('--allow-ineligible is for local testing only');
+  }
+  return args;
+}
+
+/** Gate G1 status per race, from the generated report's tables. */
+export function g1Statuses(report: string): Map<string, string> {
+  const statuses = new Map<string, string>();
+  for (const line of report.split('\n')) {
+    const cells = line.split('|').map((c) => c.trim());
+    // | race | duel | status | ...
+    if (cells.length > 4 && /^[a-z0-9-]+-\d{4}$/.test(cells[1] ?? '')) {
+      statuses.set(cells[1] as string, cells[3] as string);
+    }
+  }
+  return statuses;
+}
+
+function loadModels(): Map<string, Model> {
+  const dir = join(repo, 'data', 'races');
+  const models = new Map<string, Model>();
+  for (const f of readdirSync(dir)
+    .filter((f) => f.endsWith('.json'))
+    .sort()) {
+    const model = JSON.parse(readFileSync(join(dir, f), 'utf8')) as Model;
+    models.set(model.race.id, model);
+  }
+  return models;
+}
+
+function wrangler(target: string, ...args: string[]): string {
+  const res = spawnSync('npx', ['wrangler', 'd1', 'execute', DB_NAME, `--${target}`, ...args], {
+    cwd: workerDir,
+    encoding: 'utf8',
+  });
+  if (res.status !== 0) fail(`wrangler failed:\n${res.stderr || res.stdout}`);
+  return res.stdout;
+}
+
+function query<T>(target: string, sql: string): T[] {
+  const out = wrangler(target, '--json', '--command', sql);
+  const parsed = JSON.parse(out) as Array<{ results: T[] }>;
+  return parsed[0]?.results ?? [];
+}
+
+const sqlString = (s: string) => `'${s.replace(/'/g, "''")}'`;
+
+async function main() {
+  const args = parseArgs(process.argv.slice(2));
+  const models = loadModels();
+  const statuses = g1Statuses(readFileSync(join(repo, 'docs', 'g1-report.md'), 'utf8'));
+  const eligible = (id: string) => {
+    const m = models.get(id);
+    const status = statuses.get(id);
+    return !!m && m.decisionMoments.length > 0 && (status === 'pass' || status === 'borderline');
+  };
+
+  let pool: string[];
+  if (args.race) {
+    if (!models.has(args.race)) fail(`unknown race ${args.race}`);
+    if (!eligible(args.race) && !args.allowIneligible) {
+      fail(
+        `${args.race} is not eligible (moments: ${models.get(args.race)?.decisionMoments.length}, G1: ${statuses.get(args.race) ?? 'not validated'})`,
+      );
+    }
+    pool = [args.race];
+  } else {
+    pool = [...models.keys()].filter(eligible);
+    if (pool.length === 0) fail('no eligible races');
+  }
+
+  const existing = query<{ date: string; number: number; race_id: string }>(
+    args.target,
+    'SELECT date, number, race_id FROM daily ORDER BY number',
+  );
+  const taken = new Set(existing.map((r) => r.date));
+  let number = existing.reduce((n, r) => Math.max(n, r.number), 0);
+  // Rotate from the race after the last one scheduled.
+  const lastRace = existing.at(-1)?.race_id;
+  let next = lastRace && pool.includes(lastRace) ? pool.indexOf(lastRace) + 1 : 0;
+
+  const rows: string[] = [];
+  const plan: string[] = [];
+  const now = new Date().toISOString();
+  for (let i = 0; i < args.days; i++) {
+    const date = addDays(args.from, i);
+    if (taken.has(date)) {
+      plan.push(`${date}  already scheduled, skipped`);
+      continue;
+    }
+    const id = pool[next++ % pool.length] as string;
+    const model = models.get(id) as Model;
+    const seed = randomInt(1, 2 ** 31);
+    number++;
+    const hash = await modelHash(model);
+    rows.push(
+      `INSERT INTO daily (date, race_id, seed, side, published_at, number, model_hash) VALUES (${[
+        sqlString(date),
+        sqlString(id),
+        seed,
+        sqlString(model.userSide),
+        sqlString(now),
+        number,
+        sqlString(hash),
+      ].join(', ')});`,
+    );
+    plan.push(`${date}  #${number}  ${id}  ${model.userSide}  ${hash.slice(0, 12)}`);
+  }
+
+  console.log(plan.join('\n'));
+  if (args.dryRun || rows.length === 0) {
+    console.log(args.dryRun ? '(dry run: nothing written)' : 'nothing to write');
+    return;
+  }
+  const file = join(mkdtempSync(join(tmpdir(), 'schedule-')), 'daily.sql');
+  writeFileSync(file, rows.join('\n'));
+  wrangler(args.target, '--file', file, ...(args.target === 'remote' ? ['--yes'] : []));
+  console.log(`wrote ${rows.length} dailies to the ${args.target} D1`);
+}
+
+await main();

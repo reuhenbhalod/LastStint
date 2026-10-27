@@ -44,6 +44,8 @@ jobs:
         run: pnpm lint
       - name: Typecheck
         run: pnpm typecheck
+      - name: Worker race bundle is up to date
+        run: pnpm --filter @boxthislap/worker races && git diff --exit-code apps/worker/src/races.gen.ts
       - name: Test
         run: pnpm test
 
