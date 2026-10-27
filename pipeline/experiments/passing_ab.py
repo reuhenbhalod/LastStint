@@ -13,6 +13,7 @@ from __future__ import annotations
 import sys
 
 import traffic_stats
+
 from pipeline import build as build_mod
 from pipeline import sim_reference as sim
 from pipeline import validate as validate_mod
@@ -50,7 +51,8 @@ for name in sys.argv[1:]:
         sim_p += sp
         rows.append((rid, res.status, res.mean_gap_error))
         print(
-            f"  {name} {rid:22s} {res.status:10s} {res.mean_gap_error:.2f}  passes real {rp} sim {sp:.1f}",
+            f"  {name} {rid:22s} {res.status:10s} {res.mean_gap_error:.2f}"
+            f"  passes real {rp} sim {sp:.1f}",
             flush=True,
         )
     n = sum(s == "pass" for _, s, _ in rows)

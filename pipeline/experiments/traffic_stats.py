@@ -27,7 +27,7 @@ def real_stats(model, laps):
     gap = gap_to_car_ahead(laps)
     df = laps.assign(gap=gap)
     pit = df["PitInTime"].notna() | df["PitOutTime"].notna()
-    pitting = set(zip(df.loc[pit, "Driver"], df.loc[pit, "LapNumber"].astype(int)))
+    pitting = set(zip(df.loc[pit, "Driver"], df.loc[pit, "LapNumber"].astype(int), strict=False))
     green = df["TrackStatus"].astype(str) == "1"
     post = df[(df["LapNumber"] > takeover) & green & ~pit & df["gap"].notna()]
     traffic = float((post["gap"] < 1.0).mean())
@@ -98,5 +98,6 @@ if __name__ == "__main__":
         )
     n = len(ids)
     print(
-        f"== mean traffic real {tot[0] / n:.1%} sim {tot[1] / n:.1%} | passes real {tot[2] / n:.1f} sim {tot[3] / n:.1f}"
+        f"== mean traffic real {tot[0] / n:.1%} sim {tot[1] / n:.1%}"
+        f" | passes real {tot[2] / n:.1f} sim {tot[3] / n:.1f}"
     )

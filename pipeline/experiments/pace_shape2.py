@@ -12,9 +12,9 @@ from __future__ import annotations
 
 import sys
 
+import ceiling
 import numpy as np
 
-import ceiling
 from pipeline import build as build_mod
 from pipeline import sim_reference as sim
 from pipeline import validate as validate_mod
@@ -28,10 +28,14 @@ def terms(model, laps, kind, k):
     info = {
         (r.Driver, int(r.LapNumber)): (str(r.Compound), max(0, int(r.TyreLife) - 1))
         for r in post.itertuples()
-        if not (r.TyreLife != r.TyreLife)
+        if r.TyreLife == r.TyreLife
     }
-    res["compound"] = [info.get((c, lap), (None, 0))[0] for c, lap in zip(res.code, res.lap)]
-    res["age"] = [info.get((c, lap), (None, 0))[1] for c, lap in zip(res.code, res.lap)]
+    res["compound"] = [
+        info.get((c, lap), (None, 0))[0] for c, lap in zip(res.code, res.lap, strict=False)
+    ]
+    res["age"] = [
+        info.get((c, lap), (None, 0))[1] for c, lap in zip(res.code, res.lap, strict=False)
+    ]
     if kind == "compound":
         out = {}
         for code, g in res.groupby("code"):
