@@ -54,7 +54,7 @@ def check(rid):
         top = [(str(r.Driver), float(r.Time) - lead_t) for r in real.head(6).itertuples()]
         errs, order_ok = [], 0
         for snap in snaps[lap]:
-            sim_lead = min(snap.values())
+            min(snap.values())
             sim_order = sorted(snap, key=snap.get)[:3]
             order_ok += sim_order == [c for c, _ in top[:3]]
         for c, real_gap in top:
@@ -71,6 +71,9 @@ if __name__ == "__main__":
     for rid in ids:
         rows = check(rid)
         allerr += [e for _, e, _, _ in rows]
-        cells = "  ".join(f"lap {lap}: gap err {e:4.1f}s, top-3 order {o:4.0%} (real leader {ldr})" for lap, e, o, ldr in rows)
+        cells = "  ".join(
+            f"lap {lap}: gap err {e:4.1f}s, top-3 order {o:4.0%} (real leader {ldr})"
+            for lap, e, o, ldr in rows
+        )
         print(f"{rid:22s} {cells}", flush=True)
     print(f"== mean top-6 gap error mid-race {np.mean(allerr):.1f}s")
