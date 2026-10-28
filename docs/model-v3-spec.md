@@ -487,3 +487,17 @@ The sim holds a car that fails to pass at a fixed 0.3 s (FOLLOW_GAP), always in 
 - **Rejected: the current passing predicts better even on the fair score.** The losses concentrate where a much faster car had to carve through: Brazil 21 (2.05 → 4.64), Miami 24 (2.86 → 7.09), Canada 22, Abu Dhabi 18. Realistic passing helps Abu Dhabi 21 and Miami 22 a little.
 - The sim is reasonably calibrated: 74% of real gaps fall inside its 10–90% range (80% ideal).
 - **Open:** the sim needs more passing than real races to reach the right finishing gaps. So the time a real faster car loses while stuck must be smaller than the sim's hold-plus-dirty-air charges, or real faster cars gain somewhere else. Not identified.
+
+**Follow-up: the cost of being stuck.** A faster follower (advantage over 0.3 s/lap) that starts a lap within 1.0 s and is still behind after it loses 0.51 s median (0.71 mean) against its own clean lap in real races (344 laps), but 0.80 s median (0.90 mean) in the sim, at a similar number of stuck laps per race (21.5 real, 23.7 sim). Two causes were screened (`held_gap_ab.py`; `/D` scales dirty air, `advnp` never moves a car that failed to pass further back than it started):
+
+| Variant | Tuning G1 | Mean | Passes per race |
+|---|---|---|---|
+| Current | 8 / 2 | 2.37 s | 29 |
+| Current, dirty air × 0.5 | 7 / 2 | 2.26 s | 30 |
+| Realistic, dirty air × 0.5 | 6 / 0 | 3.22 s | 19 |
+| Realistic, no dirty air | 6 / 0 | 3.14 s | 19 |
+| Realistic, no push-back | 6 / 0 | 3.02 s | 21 |
+| Advantage-scaled 0.8 × U(0.65, 1.35), no push-back, dirty air × 0.5 | 8 / 0 | 2.52 s | 26 |
+
+- Both causes are real but small. Fixing them doesn't make realistic passing competitive, so the current passing stays.
+- Half dirty air on the current passing trades one pass for a lower mean (stage 6 rejected the same change).

@@ -8,6 +8,8 @@ draws the held gap per hold from uniform [lo, hi] (from the follower's pass stre
   adv:B:S:LO:HI  held gap = (B - S * clamp(advantage, 0, 1)) * uniform [LO, HI]: real held
                  gaps shrink from ~1.1 s (advantage < 0.3 s/lap) to ~0.7 s (> 1.0 s/lap)
 
+  advnp:...      the same, but a failed pass never moves the car further back than it started
+  /D             suffix: scale each race's dirty-air penalty by D (before +clear)
   +clear         suffix: post-takeover pace from clear-air laps only (pace.CLEAR_AIR)
 
     uv run python experiments/held_gap_ab.py fixed:0.3 u:0.2:1.0 adv:1.1:0.4:0.65:1.35+clear
@@ -28,7 +30,7 @@ EXCLUDED = {"miami-2025"}
 ORIGINAL = sim._resolve_order
 
 
-def patched_resolve(lo, hi, base=None, slope=0.0):
+def patched_resolve(lo, hi, base=None, slope=0.0, nopush=False):
     def resolve(order, cars, clean, pass_rngs, overtake, prev_time, pitted, recent=None, lap=0):
         live = [c for c in order if not cars[c].retired]
         for i in range(1, len(live)):
@@ -54,6 +56,8 @@ def patched_resolve(lo, hi, base=None, slope=0.0):
                 held = lo + (hi - lo) * rng.next()
                 if base is not None:  # gap shrinks with pace advantage; lo/hi scale it
                     held *= base - slope * min(max(advantage, 0.0), 1.0)
+                if nopush:  # a failed pass never drops the car further back than it started
+                    held = min(held, gap)
                 if b.total_time < a.total_time + held:
                     b.total_time = a.total_time + held
         live.sort(key=lambda c: cars[c].total_time)
@@ -65,10 +69,13 @@ def patched_resolve(lo, hi, base=None, slope=0.0):
 def run(spec):
     # a "+clear" suffix also measures post-takeover pace on clear-air laps only (T1)
     pace_mod.CLEAR_AIR = spec.endswith("+clear")
-    parts = spec.removesuffix("+clear").split(":")
-    if parts[0] == "adv":  # adv:base:slope:lo:hi
+    # a "/D" suffix scales each race's dirty-air penalty by D
+    spec_core, _, dirty = spec.removesuffix("+clear").partition("/")
+    dirty_scale = float(dirty) if dirty else 1.0
+    parts = spec_core.split(":")
+    if parts[0] in ("adv", "advnp"):  # adv:base:slope:lo:hi; advnp = no push-back
         base, slope, lo, hi = map(float, parts[1:])
-        sim._resolve_order = patched_resolve(lo, hi, base, slope)
+        sim._resolve_order = patched_resolve(lo, hi, base, slope, parts[0] == "advnp")
     elif parts[0] == "fixed":
         sim._resolve_order = ORIGINAL
         sim.FOLLOW_GAP = float(parts[1])
@@ -80,6 +87,7 @@ def run(spec):
             if meta0.get("split") != "tune" or rid in EXCLUDED:
                 continue
             model, laps = build_mod.build_race_model(rid)
+            model["track"]["dirtyAirPenalty"] *= dirty_scale
             meta = build_mod.resolved_meta(rid, laps)
             res = validate_mod.robust_status(
                 model,
