@@ -396,3 +396,56 @@ This is the known long-stint fade limit.
 - **Recommendation:** keep Hungary 2019 out of the daily pool until tyre fade under pressure is modelled, even though it passes G1.
 
 **G1 after these fixes** is unchanged: tuning 8 / 2 / 6 at 2.37 s, held-out 5 / 15 at 2.33 s.
+
+## Stage 8: tyre fade, passing, and a wider what-if check (Oct 28, 2026)
+
+The owner chose to keep working on the model. Measurements use the tuning races only. Nothing changed in the model this stage, so G1 and the held-out check are unchanged (tuning 8 / 2 / 6 at 2.37 s; held-out 5 / 15 at 2.33 s).
+
+### F1. Tyre fade under pressure: rejected
+
+`experiments/fade_stats.py`: lap residuals, demeaned within each driver stint, regressed on laps spent fighting (11,164 laps).
+
+| Term | Effect per lap | t |
+|---|---|---|
+| Laps so far this stint chasing within 1.5 s | −0.004 s | −1.5 |
+| Laps so far this stint defending within 1.5 s | −0.014 s | −4.6 |
+| Car within 1.0 s ahead now (dirty air) | +0.41 s | +19.7 |
+
+- **Fighting doesn't wear tyres faster in the data.** A defending car runs *faster* (it pushes), and chasing has no lasting effect.
+- **Front-runners do fade a little late in long stints.** For stints of 25+ laps, the late slope is +0.013 s/lap for the fastest third against ~0 for the rest (t ≈ 2.4).
+- `experiments/fade_ab.py` screened extra late wear for faster cars, `K × (1 − pace rank) × max(0, age − A)`:
+
+| K, A | Tuning G1 | Mean |
+|---|---|---|
+| 0 (current) | 8 / 2 | 2.37 s |
+| 0.015, 18 | 7 / 0 | 2.62 s |
+| 0.025, 18 | 7 / 0 | 2.96 s |
+| 0.015, 12 | 7 / 0 | 2.80 s |
+
+- **Rejected.** It hurt Hungary 2019 itself (0.96 → 1.20 s) and broke Mexico 2019, where HAM ran 48 laps on hards with no fade. Whether a front-runner fades depends on whether the driver is pushing or managing, and the timing data can't tell those apart.
+- **Hungary 2019 stays held back from content.**
+
+### F2. Straight-line speed and passing: rejected
+
+`experiments/speed_pass.py`: on 3,227 real pass opportunities (297 passes), each race's own fitted overtake model is the offset, and the follower-minus-leader speed-trap difference (race median, FastF1 `SpeedST`) is the added term.
+- The effect is +0.015 per km/h (p = 0.25); the deviance drops by 1.3.
+- Each race's fitted model already predicts the real pass counts in every speed band (49 vs 51, 78 vs 82, 115 vs 101, 55 vs 52).
+- **The fitted pass odds are right.** The sim's extra passing comes from held cars sitting at 0.3 s (FOLLOW_GAP), where those odds are high, instead of the ~1 s real followers keep.
+
+### What-if check, widened
+
+Added: Spain 21 (HAM's second stop), France 21 (VER's two-stop), Saudi 22 (SC stop), Singapore 23 (Mercedes VSC stop). USA 21 (VER's lap-10 undercut) can't be tested, because the takeover is on lap 10. A **tie** rule now applies: options within 1 point of the best count as no preference, not agreement.
+
+| Call | Grader | Verdict |
+|---|---|---|
+| Spain 21, lap 42: HAM second stop | box 98.6% vs stay 98.2% | Tie |
+| France 21, lap 32: VER second stop | stay 99.8% vs box 99.7% | Tie |
+| Saudi 22, SC lap 16: LEC boxes | box 66.8% vs stay 21.3% | Agrees |
+| Singapore 23, VSC lap 44: RUS boxes | box 52.1% vs stay 11.1% | Agrees |
+
+**7 of 11 agree, 2 tie, 2 disagree** (Hungary 19 and Miami 22, as before).
+- **Why the ties:** in both races the faster car wins either way in the sim, because it passes on track. In reality it was stuck about 1 s behind, which is why the team switched strategy.
+  - Spain: the model fits VER's real fade well (cliff at 23 laps on mediums), and HAM's tyres were 4 laps younger. Staying out might really have worked; Mercedes judged it too risky.
+  - France: VER was faster but never got close enough to pass for 13 laps.
+- **The passing settings were re-tested on this check** (held gap and pass margin 0.3 / 0.05, 0.7 / 0.76, 1.0 / 1.25). Each gets 8 of 11 under the old scoring, with different calls going wrong. None fixes Spain or France, and 1.0 / 1.25 flips Hungary 22 to the hards.
+- **Conclusion:** a realistic held gap is right in principle, but it costs G1 (stage 7) and doesn't improve the what-if check. Left open.

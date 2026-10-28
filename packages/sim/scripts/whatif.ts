@@ -130,9 +130,64 @@ const CASES: Case[] = [
     expect: ['stay-out'],
     why: "LEC's one-stop beat the two-stoppers",
   },
+  {
+    name: 'Spain 21, lap 42: HAM second stop?',
+    race: 'spain-2021',
+    user: 'HAM',
+    rival: 'VER',
+    lap: 42,
+    options: [
+      ['stay-out', null],
+      ['box-medium', 'MEDIUM'],
+    ],
+    expect: ['box-medium'],
+    why: 'the extra stop ran VER down and won the race',
+  },
+  {
+    name: 'France 21, lap 32: VER second stop?',
+    race: 'france-2021',
+    user: 'VER',
+    rival: 'HAM',
+    lap: 32,
+    options: [
+      ['stay-out', null],
+      ['box-medium', 'MEDIUM'],
+    ],
+    expect: ['box-medium'],
+    why: 'the two-stop caught and passed HAM a lap from the end',
+  },
+  {
+    name: 'Saudi 22, SC lap 16: LEC boxes?',
+    race: 'saudi-2022',
+    user: 'LEC',
+    rival: 'VER',
+    lap: 16,
+    options: [
+      ['box-hard', 'HARD'],
+      ['stay-out', null],
+    ],
+    expect: ['box-hard'],
+    why: 'a cheap SC stop that jumped PER, who had just pitted',
+  },
+  {
+    name: 'Singapore 23, VSC lap 44: RUS boxes?',
+    race: 'singapore-2023',
+    user: 'RUS',
+    rival: 'SAI',
+    lap: 44,
+    options: [
+      ['stay-out', null],
+      ['box-medium', 'MEDIUM'],
+    ],
+    expect: ['box-medium'],
+    why: 'the VSC stop for mediums brought Mercedes back onto the leaders',
+  },
 ];
 
 const SAMPLES = Number(process.argv[2] ?? 1000);
+// Options within this many win-probability points of the best are a tie: the grader has no
+// real preference, so a tie doesn't count as agreeing.
+const TIE = 0.01;
 const target: Target = { kind: 'beat-rival' };
 let agree = 0;
 let scored = 0;
@@ -144,7 +199,10 @@ for (const c of CASES) {
     decisions: compound ? [{ lap: c.lap, kind: 'pit', compound }] : [],
   }));
   const g = gradeMoment(run, options, target, SAMPLES);
-  const verdict = c.expect === null ? 'info' : c.expect.includes(g.best) ? 'AGREES' : 'DISAGREES';
+  const top = Math.max(...g.options.map((o) => o.probability));
+  const tied = g.options.filter((o) => top - o.probability < TIE).length > 1;
+  const verdict =
+    c.expect === null ? 'info' : tied ? 'TIE' : c.expect.includes(g.best) ? 'AGREES' : 'DISAGREES';
   if (c.expect !== null) {
     scored++;
     if (verdict === 'AGREES') agree++;
