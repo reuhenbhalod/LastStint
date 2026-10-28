@@ -449,3 +449,41 @@ Added: Spain 21 (HAM's second stop), France 21 (VER's two-stop), Saudi 22 (SC st
   - France: VER was faster but never got close enough to pass for 13 laps.
 - **The passing settings were re-tested on this check** (held gap and pass margin 0.3 / 0.05, 0.7 / 0.76, 1.0 / 1.25). Each gets 8 of 11 under the old scoring, with different calls going wrong. None fixes Spain or France, and 1.0 / 1.25 flips Hungary 22 to the hards.
 - **Conclusion:** a realistic held gap is right in principle, but it costs G1 (stage 7) and doesn't improve the what-if check. Left open.
+
+### F3. Realistic passing, measured properly: rejected again (Oct 28, 2026)
+
+The sim holds a car that fails to pass at a fixed 0.3 s (FOLLOW_GAP), always in prime passing range. Real data from the tuning races (3,227 pass opportunities, model pace advantage):
+
+| Advantage (s/lap) | Real held gap (median) | Real pass rate per lap | Sim now | Sim, realistic held gap |
+|---|---|---|---|---|
+| −0.3–0 | 1.10 s | 1.7% | 4.8% | 2.0% |
+| 0–0.3 | 1.09 s | 5.1% | 9.5% | 2.6% |
+| 0.3–0.6 | 0.79 s | 9.6% | 18.2% | 5.4% |
+| 0.6–1.0 | 0.92 s | 24.8% | 27.7% | 13.3% |
+| over 1.0 | 0.69 s | 42.4% | 50.8% | 37.3% |
+
+- Real held cars sit 0.44 s (p10) to 2.08 s (p90) back, and real passes start from a median 0.46 s.
+- `experiments/held_gap_ab.py` screened random held gaps, gaps that shrink with pace advantage (the "realistic" column is `adv:1.1:0.4:1:1`), and each combined with clear-air pace (`+clear`). Every step toward real passing costs G1:
+
+| Variant | Tuning G1 | Mean | Passes per race (real 17) |
+|---|---|---|---|
+| Fixed 0.3 (current) | 8 / 2 | 2.37 s | 29 |
+| Uniform 0.1–0.8 | 9 / 0 | 2.51 s | 27 |
+| Uniform 0.2–1.0 | 8 / 0 | 2.71 s | 24 |
+| Uniform 0.4–1.6 | 5 / 0 | 3.28 s | 19 |
+| Advantage-scaled, 0.5 − 0.3·adv | 8 / 0 | 2.48 s | 27 |
+| Advantage-scaled, 1.1 − 0.4·adv (realistic) | 6 / 0 | 3.30 s | 19 |
+| Any of the above + clear-air pace | 4–5 / 0–1 | 4.59–4.97 s | 19–29 |
+
+- **The fair-metric check.** G1's gap error compares the *mean* sim gap with the real one, which penalises a sim that is honestly unsure (Brazil 21: HAM gets past VER in about half the realistic runs, and the mean lands between the outcomes). `experiments/crps_ab.py` scores the whole distribution instead (CRPS, 300 runs per race, P2–P6 gaps):
+
+| Variant | CRPS | Mean-gap error | Real gap inside sim 10–90% |
+|---|---|---|---|
+| **Current** | **2.29 s** | 2.97 s | 74% |
+| Advantage-scaled 0.6 × U(0.65, 1.35) | 2.42 s | 3.16 s | 71% |
+| Advantage-scaled 0.8 × U(0.65, 1.35) | 2.63 s | 3.44 s | 73% |
+| Realistic, 1.1 − 0.4·adv | 3.02 s | 4.07 s | 73% |
+
+- **Rejected: the current passing predicts better even on the fair score.** The losses concentrate where a much faster car had to carve through: Brazil 21 (2.05 → 4.64), Miami 24 (2.86 → 7.09), Canada 22, Abu Dhabi 18. Realistic passing helps Abu Dhabi 21 and Miami 22 a little.
+- The sim is reasonably calibrated: 74% of real gaps fall inside its 10–90% range (80% ideal).
+- **Open:** the sim needs more passing than real races to reach the right finishing gaps. So the time a real faster car loses while stuck must be smaller than the sim's hold-plus-dirty-air charges, or real faster cars gain somewhere else. Not identified.
