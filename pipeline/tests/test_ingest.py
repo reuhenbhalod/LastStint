@@ -78,6 +78,9 @@ def test_ingest_backs_off_on_rate_limit(monkeypatch, tmp_path):
         laps = good
         event = {}
         date = None
+        track_status = pd.DataFrame(
+            {"Time": pd.to_timedelta([0.0, 95.5], unit="s"), "Status": ["1", "4"]}
+        )
 
         def __getattr__(self, name):
             raise AttributeError(name)
@@ -95,6 +98,10 @@ def test_ingest_backs_off_on_rate_limit(monkeypatch, tmp_path):
     assert len(calls) == 3
     assert waits == list(ingest.RATE_LIMIT_WAITS[:2])
     assert (tmp_path / "x-2021.parquet").exists()
+    assert ingest.load_track_status("x-2021", tmp_path) == [
+        {"time": 0.0, "status": "1"},
+        {"time": 95.5, "status": "4"},
+    ]
 
 
 def test_load_credentials_reads_env_file_without_overriding(tmp_path, monkeypatch):

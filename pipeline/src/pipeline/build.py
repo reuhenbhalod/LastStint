@@ -480,6 +480,7 @@ def build_race(race_id: str, laps: pd.DataFrame | None = None) -> BuildResult:
         user_side=meta["user_side"],
         fastest_lap_point=meta["year"] in scenario.FASTEST_LAP_POINT_YEARS,
         rival=meta["rival"],
+        track_status=ingest.load_track_status(race_id),
     )
     return BuildResult(model=model, laps=laps, notes=[*fitted.prior_notes, *params.notes])
 

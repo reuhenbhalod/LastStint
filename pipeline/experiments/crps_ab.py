@@ -14,6 +14,8 @@ from __future__ import annotations
 
 import sys
 
+import ceiling
+import cruise_ab
 import held_gap_ab as h
 import numpy as np
 
@@ -54,8 +56,12 @@ def score_race(model, laps, meta):
 
 
 def run(spec, split):
+    cruise = None
     if spec == "current":
         sim._resolve_order = h.ORIGINAL
+    elif spec.startswith("cruise:"):  # cruise:N:G:C (cruise_ab.py)
+        cruise = [float(x) for x in spec.split(":")[1:]]
+        sim._resolve_order = cruise_ab.resolve
     else:
         base, slope, lo, hi = map(float, spec.split(":")[1:])
         sim._resolve_order = h.patched_resolve(lo, hi, base, slope)
@@ -65,6 +71,8 @@ def run(spec, split):
             if meta.get("split") != split or rid in EXCLUDED:
                 continue
             model, laps = build_mod.build_race_model(rid)
+            if cruise:
+                sim._clean_lap = cruise_ab.patched_clean(*cruise, int(model["race"]["laps"]))
             r = score_race(model, laps, build_mod.resolved_meta(rid, laps))
             rows += r
             c = np.mean([x[0] for x in r])
@@ -72,6 +80,7 @@ def run(spec, split):
             print(f"  {spec:18s} {rid:22s} crps {c:5.2f}  mean-err {e:5.2f}", flush=True)
     finally:
         sim._resolve_order = h.ORIGINAL
+        sim._clean_lap = ceiling.ORIGINAL
     c, e, cov = (np.mean([x[k] for x in rows]) for k in range(3))
     print(f"== {spec} ({split}): crps {c:.2f}s  mean-err {e:.2f}s  coverage {cov:.0%}", flush=True)
 

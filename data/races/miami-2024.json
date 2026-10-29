@@ -315,7 +315,8 @@
       "realStrategy": [
         {
           "lap": 28,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 19.44
         },
         {
           "lap": 41,
@@ -384,7 +385,8 @@
       "realStrategy": [
         {
           "lap": 28,
-          "to": "HARD"
+          "to": "HARD",
+          "loss": 19.44
         }
       ]
     },

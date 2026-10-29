@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from pipeline import build, pace, track
+from pipeline import build, events, ingest, pace, track
 
 
 @pytest.fixture(scope="module")
@@ -63,3 +63,29 @@ def test_post_takeover_pace_is_shrunk_by_lap_count(france):
     for code, offset in raw.items():
         assert abs(shrunk[code]) < abs(offset) or offset == 0
     assert pace.post_takeover_offsets(*args, shrink_laps=float("inf")) == dict.fromkeys(raw, 0.0)
+
+
+def test_deployment_times_start_each_neutralization_once():
+    status = [
+        {"time": 0.0, "status": "1"},
+        {"time": 10.0, "status": "2"},
+        {"time": 20.0, "status": "6"},  # VSC
+        {"time": 25.0, "status": "4"},  # upgraded to SC: same neutralization
+        {"time": 90.0, "status": "1"},
+        {"time": 120.0, "status": "6"},
+    ]
+    assert events.deployment_times(status) == [20.0, 120.0]
+
+
+def test_saudi_2022_perez_pitted_before_the_safety_car():
+    """PER boxed at the end of lap 15; the SC came out during lap 16, so his stop was a
+    green-flag stop while LEC, VER and SAI pitted under the SC a lap later."""
+    model, laps = build.build_race_model("saudi-2022")
+    status = ingest.load_track_status("saudi-2022")
+    green = events.green_entry_stops(laps, events.extract_events(laps), status)
+    assert ("PER", 16) in green
+    assert not {("LEC", 17), ("VER", 17), ("SAI", 17)} & green
+    per = next(d for d in model["drivers"] if d["code"] == "PER")
+    assert per["realStrategy"][0]["loss"] == round(model["track"]["pitLoss"], 3)
+    lec = next(d for d in model["drivers"] if d["code"] == "LEC")
+    assert "loss" not in lec["realStrategy"][0]  # priced as an SC stop by the sim

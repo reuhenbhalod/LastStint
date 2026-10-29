@@ -29,7 +29,7 @@ v3 spec C2); the status without that rule is shown alongside.
 | hungary-2025 | PIA vs NOR | pass | fail | 0.99s |  |  |
 | miami-2025 | NOR vs PIA | data issue | data issue | 3.15s | field ANT gap error | tyre timing corrupt upstream (stints misaligned with the pit stops) |
 
-## Tuning races: 8 pass, 2 borderline, 6 fail (mean gap error 2.37s)
+## Tuning races: 8 pass, 2 borderline, 6 fail (mean gap error 2.19s)
 
 | Race | Duel | Status | Without near-tie rule | Mean gap error | Failing checks | Diagnosis |
 |---|---|---|---|---|---|---|
@@ -40,7 +40,7 @@ v3 spec C2); the status without that rule is shown alongside.
 | usa-2021 | HAM vs VER | fail | fail | 2.78s | duel HAM vs VER order rate; podium PER gap error | race mechanics (passes, traffic, SC bunching and SC stops) (pace 2%, rest 98%) |
 | brazil-2021 | VER vs HAM | fail | fail | 1.23s | podium order rate | race mechanics (passes, traffic, SC bunching and SC stops) (pace 8%, rest 92%) |
 | mexico-2021 | PER vs HAM | pass | pass | 0.85s |  |  |
-| saudi-2022 | LEC vs VER | fail | fail | 5.99s | field OCO gap error; field PER gap error; field RUS gap error; podium SAI gap error | race mechanics (passes, traffic, SC bunching and SC stops) (pace 0%, rest 100%) |
+| saudi-2022 | LEC vs VER | fail | fail | 4.27s | field RUS gap error | race mechanics (passes, traffic, SC bunching and SC stops) (pace 0%, rest 100%) |
 | miami-2022 | LEC vs VER | pass | pass | 1.41s |  |  |
 | canada-2022 | SAI vs VER | pass | pass | 1.39s |  |  |
 | bahrain-2022 | LEC vs VER | pass | pass | 0.99s |  |  |
@@ -48,4 +48,4 @@ v3 spec C2); the status without that rule is shown alongside.
 | abu-dhabi-2018 | VET vs HAM | fail | fail | 3.18s | duel VET vs HAM gap error; podium VET gap error | race mechanics (passes, traffic, SC bunching and SC stops) (pace 16%, rest 84%) |
 | hungary-2019 | VER vs HAM | pass | pass | 0.96s |  |  |
 | mexico-2019 | VET vs HAM | pass | pass | 1.45s |  |  |
-| miami-2024 | VER vs NOR | fail | fail | 4.00s | duel VER vs NOR gap error; field PER gap error; field SAI gap error | race mechanics (passes, traffic, SC bunching and SC stops) (pace 3%, rest 97%) |
+| miami-2024 | VER vs NOR | fail | fail | 2.84s | duel VER vs NOR gap error | race mechanics (passes, traffic, SC bunching and SC stops) (pace 9%, rest 91%) |

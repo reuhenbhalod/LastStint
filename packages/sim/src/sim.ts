@@ -126,10 +126,25 @@ function neutralMap(events: NeutralEvent[]): Map<number, Exclude<FlagState, 'gre
  * measured green stops, so it can be quick or slow like a real one (spec B1). Real stops
  * never sample, so replays match the Python sim.
  */
-function stopCost(run: Run, code: string, flag: FlagState | undefined, added: boolean): number {
+function stopCost(
+  run: Run,
+  code: string,
+  flag: FlagState | undefined,
+  added: boolean,
+  lap: number,
+): number {
   const { track } = run.model;
-  const base =
-    flag === 'sc' ? track.pitLossUnderSC : flag === 'vsc' ? track.pitLossUnderVSC : track.pitLoss;
+  // A new call (the player's or the rival's) whose out-lap is the first lap of an SC/VSC
+  // was boxed at the end of the green lap before it, ahead of the deployment: a green-flag
+  // stop (model v3 stage 9). Real stops carry their own priced loss from the pipeline.
+  const greenEntry = added && flag !== undefined && !run.neutral.get(lap - 1);
+  const base = greenEntry
+    ? track.pitLoss
+    : flag === 'sc'
+      ? track.pitLossUnderSC
+      : flag === 'vsc'
+        ? track.pitLossUnderVSC
+        : track.pitLoss;
   const devs = track.pitLossDeviations ?? [];
   if (!added || devs.length === 0) return base;
   const pick = Math.floor(run.rng.get(STOP_STREAM, code).next() * devs.length);
@@ -884,7 +899,7 @@ export function stepLap(run: Run): RaceState {
         behind !== undefined
           ? (prevTime[behind] as number) - (prevTime[code] as number)
           : Number.POSITIVE_INFINITY;
-      if (gapBehind <= (stop.loss ?? stopCost(run, code, flag, false))) {
+      if (gapBehind <= (stop.loss ?? stopCost(run, code, flag, false, lap))) {
         c.strategy.splice(stopIdx, 1);
         stopIdx = -1;
       }
@@ -898,7 +913,7 @@ export function stepLap(run: Run): RaceState {
       if (!c.compoundsUsed.includes(stop.to)) c.compoundsUsed.push(stop.to);
       c.tyreAge = 0;
       c.tyreWear = 0;
-      pitCost = stop.loss ?? stopCost(run, code, flag, stop.added === true);
+      pitCost = stop.loss ?? stopCost(run, code, flag, stop.added === true, lap);
     }
 
     const base = cleanLap(model, c, lap);

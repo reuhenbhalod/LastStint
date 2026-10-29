@@ -501,3 +501,50 @@ The sim holds a car that fails to pass at a fixed 0.3 s (FOLLOW_GAP), always in 
 
 - Both causes are real but small. Fixing them doesn't make realistic passing competitive, so the current passing stays.
 - Half dirty air on the current passing trades one pass for a lower mean (stage 6 rejected the same change).
+
+### F4. Leader cruise: rejected on the held-out check (Oct 29, 2026)
+
+Spain 21 (tuning, 5.9 s) traced to HAM easing off once he led: laps 59–66 ran 0.6–1.2 s/lap slower than the sim, which adds ~6 s to every gap to the winner. `experiments/cruise_stats.py` (tuning races): a leader with a lead of 5 s or more runs +0.40 to +0.65 s/lap slower over the last 5 laps (under pressure, 0.12 s/lap faster); other cars barely change.
+
+`experiments/cruise_ab.py`, "in the last N laps a leader at least G s clear runs C s/lap slower":
+
+| N, G, C | Tuning G1 | Mean | CRPS (`crps_ab.py`) |
+|---|---|---|---|
+| Off | 8 / 2 | 2.37 s | 2.29 s |
+| **5, 5, 0.5 (measured)** | **9 / 0** | **2.30 s** | **2.16 s** |
+| 5, 5, 0.8 | 10 / 0 | 2.34 s | 2.16 s |
+| 5, 10, 0.6 | 9 / 0 | 2.27 s | 2.11 s |
+| 8, 5, 0.5 | 8 / 1 | 2.45 s | |
+
+The measured rule was built into both sims (parity held on all 32 races) and run through the held-out check once:
+
+| | Tuning | Held-out |
+|---|---|---|
+| Before | 8 / 2 / 6, 2.37 s | 5 / 0 / 10, 2.33 s |
+| Leader cruise | 9 / 0 / 7, 2.32 s | 6 / 0 / 9, **2.53 s** |
+
+- Held-out: 70th Anniversary 20 and Bahrain 23 now pass; Portugal 20 fails; Spain 20 rose from 0.64 to 2.51 s, and Mexico 18 from 3.71 to 5.52 s.
+- **Held-out winners mostly didn't cruise.** With a lead of 5 s or more over the last 5 laps, they averaged +0.06 s/lap against +0.48 on the tuning races: HAM in Spain 20 (−0.11, with a 21 s lead) and Portugal 20 (−0.22, chasing the fastest-lap point), VER in Bahrain 23 (−0.36). Only Japan 23 (+0.47) and Austria 19 (+0.41) eased off.
+- **Rejected and reverted.** Like tyre fade, it depends on the driver's choice that day, which the data can't predict. No smaller value was tried afterwards, because that would use the held-out races for tuning.
+
+## Stage 9: stops entered before an SC or VSC (Oct 29, 2026)
+
+**The bug.** Saudi 22 (tuning, 6.0 s): PER pitted at the end of lap 15; the SC came out during lap 16, and LEC, VER and SAI pitted under it for about half the cost, coming out ahead. The sim prices a stop by its out-lap's flag, and PER's out-lap 16 is an SC lap, so it charged him the SC price (12.5 s instead of 22.7 s) and he kept the lead. In live play, boxing the lap before a safety car was just as cheap as boxing under it.
+
+**The data.** The pipeline's events mark an SC from the first leader lap carrying the flag, which includes the deployment lap. Per-lap status can't say whether a pit entry came before the deployment, so the exact deployment times now come from FastF1's track-status timeline (`data/raw/<race>.status.json`, saved at ingest and backfilled for all 32 races from the local cache).
+
+**The fix.**
+- *Pipeline* (`events.green_entry_stops`): a real stop whose pit entry came before the neutralization covering its out-lap was deployed is priced at the track's green pit loss, unless it already has a measured loss. This changes 5 stops: Saudi 22 PER and GAS, Miami 24 PIA and SAI, and Singapore 19 GRO. Lapped cars whose own-lap numbering puts their stop on a deployment lap really did pit under the SC (pit-in after the deployment) and keep the SC price.
+- *Game sim* (`stopCost`): a new call (the player's or the rival's) whose out-lap is the first lap of an SC or VSC pays the green price. The Python sim replays only real stops, which carry their price from the pipeline, so parity is unchanged.
+- Tests: `test_saudi_2022_perez_pitted_before_the_safety_car`, `test_deployment_times_start_each_neutralization_once`, and `tests/green-entry.test.ts`.
+
+**Result (held-out run once).**
+
+| | Tuning | Held-out |
+|---|---|---|
+| Before | 8 / 2 / 6, 2.37 s | 5 / 0 / 10, 2.33 s |
+| **Stage 9** | **8 / 2 / 6, 2.19 s** | **5 / 0 / 10, 2.33 s** |
+
+- Saudi 22 5.99 → 4.27 s, Miami 24 4.00 → 2.84 s. Singapore 19 (held-out) is unchanged at 2.86 s, and no race got worse.
+- **What-if check: 8 of 11 agree.** Saudi 22's SC stop is now clear-cut (box 76.9% vs stay 3.9%). Spain 21 moves from a tie to a narrow agreement (box 98.6% vs stay 97.5%), because grading forks now price a stop just before a sampled SC as a green stop.
+- **Kept.**

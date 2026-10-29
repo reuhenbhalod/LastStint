@@ -59,6 +59,7 @@ def assemble_race_model(
     user_side: str,
     rival: str,
     fastest_lap_point: bool = False,
+    track_status: list[dict] | None = None,
 ) -> dict:
     """Build the race-model dict (validate + write it with export.write_race)."""
     total_laps = int(laps["LapNumber"].max())
@@ -106,6 +107,13 @@ def assemble_race_model(
                 laps, v3_pace, compounds, round(fit.fuel_per_lap, 5), fresh, takeover_lap
             )
         )
+
+    # Model v3 stage 9: a stop entered before an SC/VSC was deployed is a green-flag stop,
+    # though its out-lap is neutralized (the sim prices a stop by its out-lap's flag).
+    if track_status and track_params.pit_loss is not None:
+        all_events = events_mod.extract_events(laps, total_laps)
+        for key in events_mod.green_entry_stops(laps, all_events, track_status):
+            measured.setdefault(key, track_params.pit_loss)
 
     optional = (
         scenario_mod.fastest_lap_stops(laps, measured, track_params.pit_loss)
