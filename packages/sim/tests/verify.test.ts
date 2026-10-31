@@ -8,8 +8,14 @@ import { decide, initRun } from '../src/sim.js';
 import type { Decision, RaceModel } from '../src/types.js';
 import { VerifyError, verifyRun } from '../src/verify.js';
 
-const abu = abuJson as unknown as RaceModel;
+const fullAbu = abuJson as unknown as RaceModel;
 const SAMPLES = 40;
+
+// The verification rules are exercised on Abu Dhabi with only its lap-53 SC moment; the
+// shipped four-moment race is checked end to end at the bottom.
+const scStop = fullAbu.decisionMoments.find((m) => m.id === 'sc-stop');
+if (!scStop) throw new Error('Abu Dhabi 2021 has no sc-stop moment');
+const abu: RaceModel = { ...fullAbu, decisionMoments: [scStop] };
 
 // Abu Dhabi with a second, earlier moment whose real call is none of its options, so a run
 // carries two graded moments and the real team's call is graded separately.
@@ -36,7 +42,7 @@ const twoMoments: RaceModel = {
       ],
       realOptionId: null,
     },
-    ...abu.decisionMoments,
+    scStop,
   ],
 };
 
@@ -75,20 +81,20 @@ describe('decide() timestamps', () => {
 
 describe('verifyRun', () => {
   it('reproduces a played run: result, grades and score', () => {
-    const played = play(abu, { 'sc-53': 'box-soft' });
+    const played = play(abu, { 'sc-stop': 'box-soft' });
     const v = verifyRun(abu, abu.race.seed, played.decisions, SAMPLES);
     expect(v.result).toEqual(played.result);
     expect(v.score).toEqual(played.score);
     expect(v.moments.map((m) => m.grade)).toEqual(played.calls.map((c) => c.grade));
     expect(v.moments[0]?.chosen).toBe('box-soft');
     expect(v.moments[0]?.matchedReal).toBe(false);
-    expect(v.moments[0]?.real.optionId).toBe('stay-out');
+    expect(v.moments[0]?.real.optionId).toBe('stay');
     expect(v.finishPosition).toBe(played.result.order.indexOf('HAM') + 1);
     expect(v.disqualified).toBe(false);
   });
 
   it('survives a JSON round trip (what the Worker receives)', () => {
-    const played = play(abu, { 'sc-53': 'stay-out' });
+    const played = play(abu, { 'sc-stop': 'stay' });
     const wire = JSON.parse(JSON.stringify(played.decisions));
     const v = verifyRun(abu, abu.race.seed, wire, SAMPLES);
     expect(v.score).toEqual(played.score);
@@ -106,7 +112,7 @@ describe('verifyRun', () => {
     };
     const played = play(
       twoMoments,
-      { 'undercut-44': 'push', 'sc-53': 'stay-out' },
+      { 'undercut-44': 'push', 'sc-stop': 'stay' },
       between as never,
     );
     expect(played.decisions.map((d) => d.at)).toEqual(
@@ -123,7 +129,7 @@ describe('verifyRun', () => {
   });
 
   describe('rejects tampered logs', () => {
-    const played = play(abu, { 'sc-53': 'box-soft' });
+    const played = play(abu, { 'sc-stop': 'box-soft' });
     const log = played.decisions;
     const radio = log.findIndex((d) => d.kind === 'radio');
     const edit = (f: (l: Decision[]) => void) => {
@@ -183,7 +189,7 @@ describe('verifyRun', () => {
         reasonFor(
           abu,
           edit((l) => {
-            (l[radio] as { optionId: string }).optionId = 'stay-out';
+            (l[radio] as { optionId: string }).optionId = 'stay';
           }),
         ),
       ).toBe('bad-answer'));
@@ -201,5 +207,19 @@ describe('verifyRun', () => {
           edit((l) => l.push({ lap: 57, at: 56, kind: 'radio', momentId: 'x', optionId: 'y' })),
         ),
       ).toBe('bad-answer'));
+  });
+
+  it('verifies the shipped four-moment Abu Dhabi run', () => {
+    const choices = {
+      'vsc-cover': 'cover-hard',
+      'manage-or-push': 'manage',
+      'sc-stop': 'box-soft',
+      'restart-stance': 'defend',
+    };
+    const played = play(fullAbu, choices);
+    const v = verifyRun(fullAbu, fullAbu.race.seed, played.decisions, SAMPLES);
+    expect(v.moments.map((m) => [m.momentId, m.chosen])).toEqual(Object.entries(choices));
+    expect(v.moments.map((m) => m.grade)).toEqual(played.calls.map((c) => c.grade));
+    expect(v.score).toEqual(played.score);
   });
 });

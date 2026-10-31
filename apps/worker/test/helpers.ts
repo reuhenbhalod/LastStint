@@ -31,9 +31,14 @@ export async function schedule(
     .run();
 }
 
-/** Play today's Abu Dhabi daily as the game does, choosing `optionId` at the moment. */
-export function play(optionId: string) {
-  return playDailyRace(abu, SEED, () => optionId);
+/**
+ * Play today's Abu Dhabi daily as the game does: `scStop` at the lap-53 SC, and at the other
+ * moments the real team's call (or the first option where the real team took none).
+ */
+export function play(scStop: string) {
+  return playDailyRace(abu, SEED, (m) =>
+    m.id === 'sc-stop' ? scStop : (m.realOptionId ?? (m.options[0]?.id as string)),
+  );
 }
 
 let ip = 0;

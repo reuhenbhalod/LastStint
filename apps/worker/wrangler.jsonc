@@ -3,6 +3,9 @@
   // The web app deploys separately to Cloudflare Pages (apps/web), so this Worker
   // serves no static assets.
   "name": "pitwall",
+  // Reuhen's Cloudflare account, which hosts the Worker and pitwall-db (CI sets the same ID
+  // from its CLOUDFLARE_ACCOUNT_ID secret).
+  "account_id": "20a233209db4b2680328a2c547039f17",
   "main": "src/index.ts",
   "compatibility_date": "2026-10-13",
 

@@ -16,7 +16,7 @@ import { abu, get, ids, play, post, schedule, submit, today } from './helpers.js
 
 // Played once (each play grades the moment with the full 300 samples).
 const boxSoft = play('box-soft');
-const stayOut = play('stay-out');
+const stayOut = play('stay');
 
 describe('GET /api/health', () => {
   it('reports how many days are scheduled from today', async () => {
@@ -98,14 +98,19 @@ describe('POST /api/runs', () => {
       total: 1,
     });
     expect(run.result.order).toEqual(boxSoft.result.order);
-    expect(run.calls).toHaveLength(1);
-    expect(run.calls[0]).toMatchObject({
-      momentId: 'sc-53',
+    expect(run.calls.map((c) => c.momentId)).toEqual([
+      'vsc-cover',
+      'manage-or-push',
+      'sc-stop',
+      'restart-stance',
+    ]);
+    expect(run.calls[2]).toMatchObject({
+      momentId: 'sc-stop',
       chosen: 'box-soft',
-      band: boxSoft.score.calls[0]?.band,
-      options: boxSoft.calls[0]?.grade.options,
+      band: boxSoft.score.calls[2]?.band,
+      options: boxSoft.calls[2]?.grade.options,
       matchedReal: false,
-      real: { optionId: 'stay-out' },
+      real: { optionId: 'stay' },
     });
 
     // The same result comes back after a refresh.
@@ -146,7 +151,7 @@ describe('POST /api/runs', () => {
     await schedule(today());
     const log = JSON.parse(JSON.stringify(boxSoft.decisions));
     const radio = log.findIndex((d: { kind: string }) => d.kind === 'radio');
-    log[radio].optionId = 'stay-out'; // claims the real call while having boxed
+    log[radio].optionId = 'cover-hard'; // claims the cover while having stayed out
     const tampered = await submit(ids.a, log);
     expect(tampered.status).toBe(400);
     expect(await tampered.json()).toMatchObject({ error: 'bad-answer' });
@@ -187,8 +192,8 @@ describe('stats and leaderboard', () => {
     };
     expect(stats.runs).toBe(3);
     expect(stats.meanScore).toBeCloseTo((boxSoft.score.score + 2 * stayOut.score.score) / 3, 9);
-    const moment = stats.moments[0];
-    expect(moment?.id).toBe('sc-53');
+    const moment = stats.moments.find((m) => m.id === 'sc-stop');
+    expect(moment).toBeDefined();
     expect(moment?.matchedReal).toBeCloseTo(2 / 3, 9);
     expect(moment?.options.find((o) => o.id === 'box-soft')?.share).toBeCloseTo(1 / 3, 9);
     expect(moment?.options.find((o) => o.id === 'box-hard')?.share).toBe(0);

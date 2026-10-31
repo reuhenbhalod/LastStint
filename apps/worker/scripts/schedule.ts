@@ -1,5 +1,7 @@
-// Schedule dailies (Implementation Plan 5.4, Phase 4 spec C4): pick eligible races, draw a
-// random seed per date, number the days, pin each model's hash, and write to D1 via Wrangler.
+// Schedule dailies (Implementation Plan 5.4, Phase 4 spec C4): pick eligible races, number the
+// days, pin each model's hash, and write to D1 via Wrangler. Every day of a race uses the race
+// file's own seed, which is chosen so the race plays like the real one (Abu Dhabi 2021: HAM
+// reaches the lap-53 SC 11.9s ahead, so boxing isn't free; beta spec B1).
 //
 //   pnpm --filter @boxthislap/worker schedule --local --from 2026-11-01 --days 14
 //   pnpm --filter @boxthislap/worker schedule --remote --days 7 --race abu-dhabi-2021
@@ -16,7 +18,6 @@
 // docs/g1-report.md is pass or borderline. Dates already scheduled are never changed.
 
 import { spawnSync } from 'node:child_process';
-import { randomInt } from 'node:crypto';
 import { mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
@@ -30,7 +31,7 @@ const repo = join(workerDir, '..', '..');
 const DB_NAME = 'pitwall-db';
 
 interface Model {
-  race: { id: string };
+  race: { id: string; seed: number };
   userSide: string;
   decisionMoments: unknown[];
 }
@@ -160,7 +161,7 @@ async function main() {
     }
     const id = pool[next++ % pool.length] as string;
     const model = models.get(id) as Model;
-    const seed = randomInt(1, 2 ** 31);
+    const seed = model.race.seed;
     number++;
     const hash = await modelHash(model);
     rows.push(
@@ -174,7 +175,7 @@ async function main() {
         sqlString(hash),
       ].join(', ')});`,
     );
-    plan.push(`${date}  #${number}  ${id}  ${model.userSide}  ${hash.slice(0, 12)}`);
+    plan.push(`${date}  #${number}  ${id}  seed ${seed}  ${model.userSide}  ${hash.slice(0, 12)}`);
   }
 
   console.log(plan.join('\n'));
