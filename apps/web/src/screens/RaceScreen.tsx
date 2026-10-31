@@ -4,9 +4,10 @@
 // decision card rises as a bottom sheet.
 
 import type { RaceModel } from '@boxthislap/sim';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { BoxButton } from '../components/BoxButton.js';
 import { DecisionPanel } from '../components/DecisionPanel.js';
+import { GapTrace } from '../components/GapTrace.js';
 import { HeadsetPanel } from '../components/HeadsetPanel.js';
 import { TimingTower } from '../components/TimingTower.js';
 import { TrackMap } from '../components/TrackMap.js';
@@ -36,6 +37,11 @@ export function RaceScreen({
   const flag = FLAG[state.race.flag];
   const lapsLeft = totalLaps - state.race.lap;
   const gap = me && them && !me.retired && !them.retired ? them.totalTime - me.totalTime : null;
+
+  // Gap history for the trace (> 0: we're ahead), from the laps this screen has seen.
+  const trace = useRef(new Map<number, number>());
+  if (gap !== null) trace.current.set(state.race.lap, gap);
+  const points = [...trace.current.entries()].sort((a, b) => a[0] - b[0]).slice(-15);
 
   const pickCar = (code: string) => {
     setPick(code);
@@ -189,6 +195,7 @@ export function RaceScreen({
             </p>
           )}
           <div className="flex flex-col gap-3 rounded-xl border border-[var(--rule)] bg-[var(--card)] p-3">
+            <GapTrace points={points} rival={rival} />
             {me && (
               <HeadsetPanel
                 modes={me.modes}
