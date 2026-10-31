@@ -34,7 +34,10 @@ function base(phase: Phase): GameState {
     resolved: [],
     decisions: [],
     result: null,
+    grades: {},
+    submission: { status: 'none' },
     meta: {
+      source: 'live',
       raceId: 'abu-dhabi-2021',
       date: '2021-12-12',
       totalLaps: 58,
@@ -117,9 +120,31 @@ describe('reducer', () => {
   it('SUBMIT then RESULT only along finished -> submitting -> results', () => {
     const submitting = reducer(base('finished'), { type: 'SUBMIT' });
     expect(submitting.phase).toBe('submitting');
-    expect(reducer(submitting, { type: 'RESULT', result }).phase).toBe('results');
+    expect(submitting.submission).toEqual({ status: 'sending' });
+    const done = reducer(submitting, {
+      type: 'RESULT',
+      result,
+      submission: { status: 'practice' },
+    });
+    expect(done.phase).toBe('results');
+    expect(done.submission).toEqual({ status: 'practice' });
     expect(reducer(base('racing'), { type: 'SUBMIT' }).phase).toBe('racing');
-    expect(reducer(base('finished'), { type: 'RESULT', result }).phase).toBe('finished');
+    expect(
+      reducer(base('finished'), { type: 'RESULT', result, submission: { status: 'practice' } })
+        .phase,
+    ).toBe('finished');
+  });
+
+  it('a failed submission can be retried from the results', () => {
+    const failed = { ...base('results'), submission: { status: 'error', error: 'x' } as const };
+    expect(reducer(failed, { type: 'SUBMIT' }).phase).toBe('submitting');
+    expect(reducer(base('results'), { type: 'SUBMIT' }).phase).toBe('results');
+  });
+
+  it('GRADED stores a grade in any phase', () => {
+    const graded = { grade: {} as never, claim: { momentId: 'm', probabilities: [1] } };
+    const s = reducer(base('racing'), { type: 'GRADED', momentId: 'm', graded });
+    expect(s.grades.m).toBe(graded);
   });
 
   it('HYDRATE replaces the whole state', () => {

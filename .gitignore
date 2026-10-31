@@ -33,3 +33,5 @@ pipeline/cache/
 .idea/
 .vscode/*
 !.vscode/extensions.json
+test-results/
+playwright-report/

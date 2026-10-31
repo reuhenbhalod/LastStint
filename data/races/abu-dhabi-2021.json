@@ -565,6 +565,18 @@
               "value": "hold"
             }
           ]
+        },
+        {
+          "id": "attack",
+          "label": "Attack",
+          "decisions": [
+            {
+              "lap": 57,
+              "kind": "mode",
+              "key": "battle",
+              "value": "attack"
+            }
+          ]
         }
       ],
       "realOptionId": null

@@ -20,5 +20,5 @@ export default defineConfig({
       '/api': 'http://localhost:8787',
     },
   },
-  test: { environment: 'node' },
+  test: { environment: 'node', include: ['src/**/*.test.ts'] },
 });

@@ -35,12 +35,16 @@ describe('GameEngine', () => {
 });
 
 describe('decisionMoments', () => {
-  it('derives the Abu Dhabi VSC moment with the real call marked', async () => {
+  it("are the race file's approved moments (the ones the server grades), in lap order", async () => {
     const { model } = await daily();
     const moments = decisionMoments(model);
-    const vsc = moments.find((m) => m.trigger === 'VSC');
-    expect(vsc?.lap).toBe(36);
-    expect(vsc?.realOptionId).toBe('stay-out');
+    expect(moments.map((m) => [m.id, m.lap])).toEqual([
+      ['vsc-cover', 36],
+      ['manage-or-push', 49],
+      ['sc-stop', 53],
+      ['restart-stance', 57],
+    ]);
+    expect(moments[0]?.realOptionId).toBe('stay');
     for (const m of moments) {
       expect(m.options.length).toBeGreaterThanOrEqual(2);
       expect(m.options.length).toBeLessThanOrEqual(4);

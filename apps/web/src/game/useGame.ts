@@ -1,11 +1,14 @@
 // useGame: the React driver for a Daily Race. It owns a GameSession in a ref (which owns the
 // mutable sim engine), mirrors its state into React state after every action, runs the lap
-// clock while racing, and persists/resumes the run. The session does the real work; this hook
-// just wires it to render and to timers.
+// clock while racing, persists/resumes the run, and talks to the Worker: "already played
+// today?" on load, and the run submission (calls + the game's grades) at the flag.
 
 import type { Decision, RaceModel } from '@boxthislap/sim';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { ApiError, type RunResponse, api } from '../data/api.js';
+import { anonId } from '../data/player.js';
 import type { Daily, DailyProvider } from '../data/types.js';
+import { type Grader, browserGrader } from '../engine/grading.js';
 import type { GameState, Speed } from '../state/machine.js';
 import { GameSession } from '../state/session.js';
 import { clearRun, loadRun, saveRun } from '../state/storage.js';
@@ -15,19 +18,39 @@ const LAP_MS: Record<Speed, number> = { 1: 2600, 2: 1200 };
 export interface Game {
   state: GameState | null;
   model: RaceModel | null;
+  daily: Daily | null;
+  /** The game's own score from its grades (shown before/without the server's). */
+  localScore: () => ReturnType<GameSession['localScore']> | null;
+  error: string | null;
   start: () => void;
   setSpeed: (s: Speed) => void;
   choose: (optionId: string) => void;
   call: (decision: Decision) => void;
   submit: () => void;
   reset: () => void;
+  reload: () => void;
 }
 
-export function useGame(provider: DailyProvider): Game {
+/** POST the run, retrying once if the request itself failed (network or server error). */
+async function postRun(session: GameSession): Promise<RunResponse> {
+  const body = await session.submission(anonId());
+  try {
+    return await api.submit(body);
+  } catch (e) {
+    if (e instanceof ApiError && e.status < 500) throw e;
+    return api.submit(body);
+  }
+}
+
+export function useGame(provider: DailyProvider, grader?: Grader): Game {
   const session = useRef<GameSession | null>(null);
-  const daily = useRef<Daily | null>(null);
+  const [daily, setDaily] = useState<Daily | null>(null);
   const [state, setState] = useState<GameState | null>(null);
-  const [model, setModel] = useState<RaceModel | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [attempt, setAttempt] = useState(0);
+  // One grading worker for the page's lifetime.
+  const graderRef = useRef<Grader | null>(null);
+  if (!graderRef.current) graderRef.current = grader ?? browserGrader();
 
   const sync = useCallback(() => {
     const s = session.current;
@@ -36,21 +59,46 @@ export function useGame(provider: DailyProvider): Game {
     saveRun(s.persist());
   }, []);
 
-  // Load today's race once (resuming a saved run if it's for the same day).
+  const adopt = useCallback(
+    (s: GameSession) => {
+      session.current = s;
+      s.onChange = sync;
+      sync();
+    },
+    [sync],
+  );
+
+  // Load today's race once (resuming a saved run if it's for the same day and seed), then
+  // check whether this player already submitted today's run.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `attempt` re-runs the load ("Try again").
   useEffect(() => {
     let alive = true;
-    provider.today().then((today) => {
+    setError(null);
+    (async () => {
+      const today = await provider.today();
       if (!alive) return;
-      daily.current = today;
+      setDaily(today);
       const saved = loadRun();
-      session.current = (saved && GameSession.restore(today, saved)) || new GameSession(today);
-      setModel(today.model);
-      setState(session.current.state);
-    });
+      const s =
+        (saved && GameSession.restore(today, saved, graderRef.current ?? undefined)) ||
+        new GameSession(today, { grader: graderRef.current ?? undefined });
+      adopt(s);
+      if (today.source === 'live' && s.state.submission.status !== 'done') {
+        try {
+          const played = await api.run(today.date, anonId());
+          if (alive) {
+            s.alreadyPlayed(played);
+            sync();
+          }
+        } catch {
+          // 404: not played yet (or offline) — play on
+        }
+      }
+    })().catch((e) => alive && setError(String((e as Error).message ?? e)));
     return () => {
       alive = false;
     };
-  }, [provider]);
+  }, [provider, adopt, sync, attempt]);
 
   // The lap clock: advance one lap on an interval while racing.
   useEffect(() => {
@@ -62,43 +110,62 @@ export function useGame(provider: DailyProvider): Game {
     return () => clearInterval(id);
   }, [state?.phase, state?.speed, sync]);
 
-  const start = useCallback(() => {
-    session.current?.start();
-    sync();
-  }, [sync]);
-  const setSpeed = useCallback(
-    (s: Speed) => {
-      session.current?.setSpeed(s);
+  const act = useCallback(
+    (f: (s: GameSession) => void) => () => {
+      if (session.current) f(session.current);
       sync();
     },
     [sync],
   );
-  const choose = useCallback(
-    (optionId: string) => {
-      session.current?.choose(optionId);
-      sync();
-    },
-    [sync],
-  );
-  const call = useCallback(
-    (decision: Decision) => {
-      session.current?.call(decision);
-      sync();
-    },
-    [sync],
-  );
+
   const submit = useCallback(() => {
-    session.current?.submit();
+    const s = session.current;
+    if (!s) return;
+    s.beginSubmit();
     sync();
+    (async () => {
+      if (s.state.meta.source === 'practice') {
+        await s.allGraded();
+        s.finish({ status: 'practice' });
+        return;
+      }
+      try {
+        s.finish({ status: 'done', response: await postRun(s) });
+      } catch (e) {
+        if (e instanceof ApiError && e.code === 'already-submitted') {
+          s.finish({ status: 'already', response: await api.run(s.state.meta.date, anonId()) });
+        } else {
+          s.finish({
+            status: 'error',
+            error: e instanceof ApiError ? e.code : 'Can’t reach the server.',
+          });
+        }
+      }
+    })()
+      .catch(() => s.finish({ status: 'error', error: 'Can’t reach the server.' }))
+      .finally(sync);
   }, [sync]);
 
-  // Clear the saved run and start a fresh session back at the daily card.
+  // Clear the saved run and start a fresh session back at the daily card (practice only:
+  // a submitted daily can't be replayed).
   const reset = useCallback(() => {
-    if (!daily.current) return;
+    if (!daily) return;
     clearRun();
-    session.current = new GameSession(daily.current);
-    setState(session.current.state);
-  }, []);
+    adopt(new GameSession(daily, { grader: graderRef.current ?? undefined }));
+  }, [daily, adopt]);
 
-  return { state, model, start, setSpeed, choose, call, submit, reset };
+  return {
+    state,
+    model: daily?.model ?? null,
+    daily,
+    localScore: () => session.current?.localScore() ?? null,
+    error,
+    start: act((s) => s.start()),
+    setSpeed: (speed) => act((s) => s.setSpeed(speed))(),
+    choose: (optionId) => act((s) => s.choose(optionId))(),
+    call: (decision) => act((s) => s.call(decision))(),
+    submit,
+    reset,
+    reload: () => setAttempt((n) => n + 1),
+  };
 }

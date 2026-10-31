@@ -8,13 +8,31 @@
 // (loading lives in the React layer, while the daily is being fetched.)
 
 import type { Decision, DecisionMoment, RaceResult, RaceState } from '@boxthislap/sim';
+import type { RunResponse } from '../data/api.js';
+import type { GradedMoment } from '../engine/grading.js';
 
 export type Phase = 'intro' | 'racing' | 'decision' | 'finished' | 'submitting' | 'results';
 
 export type Speed = 1 | 2;
 
+/**
+ * The run's submission: `practice` (not submitted), `sending`, `done` (the server's numbers),
+ * `already` (this player already played today; `response` is that run), or `error`.
+ */
+export type Submission =
+  | { status: 'none' }
+  | { status: 'practice' }
+  | { status: 'sending' }
+  | { status: 'done' | 'already'; response: RunResponse }
+  | { status: 'error'; error: string };
+
 export interface GameMeta {
   raceId: string;
+  /** Puzzle number, for the share line (live dailies only). */
+  number?: number;
+  /** A live daily is submitted and ranked; practice is played locally only. */
+  source: 'live' | 'practice';
+  practiceReason?: string;
   date: string;
   totalLaps: number;
   takeoverLap: number;
@@ -37,6 +55,9 @@ export interface GameState {
   decisions: Decision[];
   /** Final classification, set once the race finishes. */
   result: RaceResult | null;
+  /** Each moment's grade and claim, by moment id, as grading finishes. */
+  grades: Record<string, GradedMoment>;
+  submission: Submission;
   meta: GameMeta;
 }
 
@@ -52,8 +73,10 @@ export type Action =
   | { type: 'RESOLVE'; momentId: string; decisions: Decision[] }
   | { type: 'CALL'; race: RaceState; decisions: Decision[] }
   | { type: 'SET_SPEED'; speed: Speed }
+  | { type: 'GRADED'; momentId: string; graded: GradedMoment }
   | { type: 'SUBMIT' }
-  | { type: 'RESULT'; result: RaceResult }
+  | { type: 'RESULT'; result: RaceResult; submission: Submission }
+  | { type: 'ALREADY_PLAYED'; response: RunResponse }
   | { type: 'HYDRATE'; state: GameState };
 
 export function reducer(state: GameState, action: Action): GameState {
@@ -97,13 +120,26 @@ export function reducer(state: GameState, action: Action): GameState {
     case 'SET_SPEED':
       return { ...state, speed: action.speed };
 
+    case 'GRADED': // grading finishes in a worker, whatever the phase
+      return { ...state, grades: { ...state.grades, [action.momentId]: action.graded } };
+
     case 'SUBMIT':
-      return state.phase === 'finished' ? { ...state, phase: 'submitting' } : state;
+      return state.phase === 'finished' ||
+        (state.phase === 'results' && state.submission.status === 'error')
+        ? { ...state, phase: 'submitting', submission: { status: 'sending' } }
+        : state;
 
     case 'RESULT':
       return state.phase === 'submitting'
-        ? { ...state, phase: 'results', result: action.result }
+        ? { ...state, phase: 'results', result: action.result, submission: action.submission }
         : state;
+
+    case 'ALREADY_PLAYED': // today's run was submitted before (another tab or device)
+      return {
+        ...state,
+        phase: 'results',
+        submission: { status: 'already', response: action.response },
+      };
 
     case 'HYDRATE':
       return action.state;

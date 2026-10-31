@@ -1,3 +1,4 @@
+import { verifyRun } from '@boxthislap/sim';
 import { describe, expect, it } from 'vitest';
 import { StaticDailyProvider } from '../data/provider.js';
 import { GameSession } from './session.js';
@@ -23,7 +24,7 @@ describe('GameSession', () => {
     const session = new GameSession(await daily());
     const vsc = session.state.moments.find((m) => m.trigger === 'VSC');
     expect(vsc?.lap).toBe(36);
-    expect(vsc?.realOptionId).toBe('stay-out');
+    expect(vsc?.realOptionId).toBe('stay');
   });
 
   it('plays from intro to results choosing the real options', async () => {
@@ -31,9 +32,24 @@ describe('GameSession', () => {
     expect(session.state.phase).toBe('intro');
     autoplay(session);
     expect(session.state.phase).toBe('finished');
-    session.submit();
+    session.beginSubmit();
+    await session.allGraded();
+    session.finish({ status: 'practice' });
     expect(session.state.phase).toBe('results');
     expect(session.state.result?.finishers).toContain('HAM');
+    expect(Object.keys(session.state.grades)).toHaveLength(4);
+  });
+
+  it('submits a run the server accepts and scores exactly as full grading does', async () => {
+    const today = await daily();
+    const session = new GameSession(today);
+    autoplay(session);
+    const body = await session.submission('11111111-1111-4111-8111-111111111111');
+    const wire = JSON.parse(JSON.stringify(body));
+    const live = verifyRun(today.model, today.seed, wire.decisions, undefined, wire.grades);
+    const full = verifyRun(today.model, today.seed, body.decisions);
+    expect(live).toEqual(full);
+    expect(session.localScore()).toEqual(full.score);
   });
 
   it('pauses at a moment and never re-pauses on it after a choice', async () => {
@@ -65,6 +81,22 @@ describe('GameSession', () => {
     expect(resumed?.state.decisions).toEqual(session.state.decisions);
     expect(resumed?.state.resolved).toEqual(session.state.resolved);
     expect(resumed?.state.race.order).toEqual(session.state.race.order);
+    // Grades survive the refresh, or are rebuilt from a replay to the pause.
+    await resumed?.allGraded();
+    await session.allGraded();
+    expect(resumed?.state.grades).toEqual(session.state.grades);
+  });
+
+  it('re-grades a moment missing from the save, identically', async () => {
+    const session = new GameSession(await daily());
+    session.start();
+    for (let i = 0; i < 100 && session.state.phase === 'racing'; i++) session.tick();
+    answer(session);
+    await session.allGraded();
+    const saved = { ...session.persist(), grades: {} };
+    const resumed = GameSession.restore(await daily(), saved);
+    await resumed?.allGraded();
+    expect(resumed?.state.grades).toEqual(session.state.grades);
   });
 
   it('rejects a save from a different race', async () => {
