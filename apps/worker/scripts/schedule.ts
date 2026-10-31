@@ -17,18 +17,12 @@
 // A race is eligible when it has approved decision moments and its Gate G1 status in
 // docs/g1-report.md is pass or borderline. Dates already scheduled are never changed.
 
-import { spawnSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
 import { addDays, isDate, todayUtc } from '../src/dates.js';
 import { modelHash } from '../src/hash.js';
-
-const here = dirname(fileURLToPath(import.meta.url));
-const workerDir = join(here, '..');
-const repo = join(workerDir, '..', '..');
-const DB_NAME = 'pitwall-db';
+import { type Target, wrangler as d1, query as d1Query, repo, sqlString } from './d1.js';
 
 interface Model {
   race: { id: string; seed: number };
@@ -100,21 +94,20 @@ function loadModels(): Map<string, Model> {
 }
 
 function wrangler(target: string, ...args: string[]): string {
-  const res = spawnSync('npx', ['wrangler', 'd1', 'execute', DB_NAME, `--${target}`, ...args], {
-    cwd: workerDir,
-    encoding: 'utf8',
-  });
-  if (res.status !== 0) fail(`wrangler failed:\n${res.stderr || res.stdout}`);
-  return res.stdout;
+  try {
+    return d1(target as Target, ...args);
+  } catch (e) {
+    return fail((e as Error).message);
+  }
 }
 
 function query<T>(target: string, sql: string): T[] {
-  const out = wrangler(target, '--json', '--command', sql);
-  const parsed = JSON.parse(out) as Array<{ results: T[] }>;
-  return parsed[0]?.results ?? [];
+  try {
+    return d1Query<T>(target as Target, sql);
+  } catch (e) {
+    return fail((e as Error).message);
+  }
 }
-
-const sqlString = (s: string) => `'${s.replace(/'/g, "''")}'`;
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));

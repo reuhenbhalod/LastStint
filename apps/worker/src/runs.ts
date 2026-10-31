@@ -1,14 +1,9 @@
 // POST /api/runs: verify a finished run from its call log and rank it (Phase 4 spec,
 // "Verifying a run" and "Percentile and rank"). The client sends calls, never a score.
+// On the free plan (10 ms CPU) the run is scored from the grades the game claims, checked for
+// shape; a nightly job re-grades it with full playouts (scripts/reverify.ts, beta spec B6).
 
-import {
-  type Band,
-  type OptionGrade,
-  type RealCall,
-  type VerifiedRun,
-  VerifyError,
-  verifyRun,
-} from '@boxthislap/sim';
+import { GRADE_SAMPLES, type VerifiedRun, VerifyError, verifyRun } from '@boxthislap/sim';
 import { isDate, isSubmittable } from './dates.js';
 import {
   type DailyRow,
@@ -20,44 +15,14 @@ import {
   standing,
 } from './db.js';
 import { getRace } from './races.js';
+import { type StoredResult, stored } from './results.js';
+
+export type { CallResult, StoredResult } from './results.js';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export function isAnonId(s: unknown): s is string {
   return typeof s === 'string' && UUID_RE.test(s);
-}
-
-/** One graded call, as the results screen and the share card show it. */
-export interface CallResult {
-  momentId: string;
-  lap: number;
-  chosen: string;
-  band: Band;
-  points: number;
-  probability: number;
-  /** The best option at that moment. */
-  best: string;
-  options: OptionGrade[];
-  real: RealCall;
-  matchedReal: boolean;
-}
-
-/** What a stored run holds; the response adds the live standing. */
-export interface StoredResult {
-  date: string;
-  number: number;
-  raceId: string;
-  score: number;
-  meanProbability: number;
-  finishPosition: number;
-  disqualified: boolean;
-  result: {
-    order: string[];
-    finishers: string[];
-    disqualified: string[];
-    gaps: Record<string, number>;
-  };
-  calls: CallResult[];
 }
 
 export interface RunResponse extends StoredResult {
@@ -76,39 +41,6 @@ export class ApiError extends Error {
   ) {
     super(detail ?? code);
   }
-}
-
-function stored(daily: DailyRow, v: VerifiedRun): StoredResult {
-  return {
-    date: daily.date,
-    number: daily.number,
-    raceId: daily.race_id,
-    score: v.score.score,
-    meanProbability: v.score.meanProbability,
-    finishPosition: v.finishPosition,
-    disqualified: v.disqualified,
-    result: {
-      order: v.result.order,
-      finishers: v.result.finishers,
-      disqualified: v.result.disqualified,
-      gaps: v.result.gaps,
-    },
-    calls: v.moments.map((m, i) => {
-      const call = v.score.calls[i];
-      return {
-        momentId: m.momentId,
-        lap: m.lap,
-        chosen: m.chosen,
-        band: call?.band as Band,
-        points: call?.points as number,
-        probability: call?.probability as number,
-        best: m.grade.best,
-        options: m.grade.options,
-        real: m.real,
-        matchedReal: m.matchedReal,
-      };
-    }),
-  };
 }
 
 /** The day's daily and its pinned race model; refuses a model that changed since scheduling. */
@@ -135,7 +67,7 @@ export async function withStanding(db: D1Database, row: RunRow): Promise<RunResp
 }
 
 export async function submitRun(db: D1Database, body: unknown, now: number): Promise<RunResponse> {
-  const { date, anonId, decisions } = (body ?? {}) as Record<string, unknown>;
+  const { date, anonId, decisions, grades } = (body ?? {}) as Record<string, unknown>;
   if (!isDate(date)) throw new ApiError(400, 'bad-request', 'date must be YYYY-MM-DD');
   if (!isAnonId(anonId)) throw new ApiError(400, 'bad-request', 'anonId must be a UUID');
   if (!isSubmittable(date, now)) throw new ApiError(404, 'no-daily', `${date} is not playable now`);
@@ -144,7 +76,7 @@ export async function submitRun(db: D1Database, body: unknown, now: number): Pro
 
   let verified: VerifiedRun;
   try {
-    verified = verifyRun(race.model, daily.seed, decisions);
+    verified = verifyRun(race.model, daily.seed, decisions, GRADE_SAMPLES, grades ?? null);
   } catch (e) {
     if (e instanceof VerifyError) throw new ApiError(400, e.code, e.message);
     throw e;
@@ -165,7 +97,12 @@ export async function submitRun(db: D1Database, body: unknown, now: number): Pro
   try {
     await insertRun(
       db,
-      { ...row, disqualified: result.disqualified, decisions: JSON.stringify(decisions) },
+      {
+        ...row,
+        disqualified: result.disqualified,
+        decisions: JSON.stringify(decisions),
+        grades: JSON.stringify(grades),
+      },
       result.calls.map((c) => ({
         momentId: c.momentId,
         optionId: c.chosen,

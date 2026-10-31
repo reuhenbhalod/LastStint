@@ -30,7 +30,12 @@ const t0 = performance.now();
 const res = await fetch(`${base}/api/runs`, {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ date, anonId: randomUUID(), decisions: played.decisions }),
+  body: JSON.stringify({
+    date,
+    anonId: randomUUID(),
+    decisions: played.decisions,
+    grades: played.grades,
+  }),
 });
 const run = await json<{ score: number; rank: number; total: number; percentile: number }>(res);
 const ms = performance.now() - t0;

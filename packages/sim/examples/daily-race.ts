@@ -2,6 +2,7 @@
 // It is a test too (tests/example.test.ts), so CI keeps it working.
 
 import {
+  type ClaimedGrade,
   type Decision,
   type DecisionMoment,
   type MomentGrade,
@@ -10,6 +11,7 @@ import {
   type Run,
   type RunScore,
   answerMoment,
+  claimGrade,
   classify,
   gradeMoment,
   initRun,
@@ -31,6 +33,8 @@ export interface DailyRaceResult {
   calls: PlayedCall[];
   /** The full call log (run.decisions), as sent to POST /api/runs. */
   decisions: Decision[];
+  /** The game's grade for each moment, sent with the calls (POST /api/runs `grades`). */
+  grades: ClaimedGrade[];
 }
 
 /**
@@ -56,6 +60,7 @@ export function playDailyRace(
   const run = initRun(model, seed, { decisions: [] });
   const moments = [...model.decisionMoments].sort((a, b) => a.lap - b.lap);
   const calls: PlayedCall[] = [];
+  const grades: ClaimedGrade[] = [];
 
   while (!isFinished(run)) {
     const moment = moments.find((m) => m.lap === run.state.lap + 1);
@@ -63,6 +68,8 @@ export function playDailyRace(
       // Pause. In the browser this grade runs in Web Workers (gradeJob / runGradeJob /
       // mergeGradeJobs) while the player reads the options.
       const grade = gradeMoment(run, moment.options, moment.target, options.samples);
+      // What the server scores from (it re-grades every run overnight); before the answer.
+      grades.push(claimGrade(run, moment, grade, options.samples));
       const chosen = choose(moment, run);
       // Logs the radio answer and the option's calls: the server checks both (verifyRun).
       answerMoment(run, moment, chosen);
@@ -88,5 +95,6 @@ export function playDailyRace(
     score: scoreRun(calls.map(({ grade, chosen }) => ({ grade, chosen }))),
     calls,
     decisions: run.decisions,
+    grades,
   };
 }

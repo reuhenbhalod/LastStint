@@ -45,15 +45,15 @@ export function getRun(db: D1Database, date: string, anonId: string): Promise<Ru
 /** Store a verified run and its calls in one batch. Throws on a duplicate (date, anon_id). */
 export async function insertRun(
   db: D1Database,
-  run: Omit<RunRow, 'disqualified'> & { disqualified: boolean; decisions: string },
+  run: Omit<RunRow, 'disqualified'> & { disqualified: boolean; decisions: string; grades: string },
   calls: NewCall[],
 ): Promise<void> {
   await db.batch([
     db
       .prepare(
         `INSERT INTO runs (id, date, anon_id, decisions, score, result, created_at,
-           mean_probability, finish_position, disqualified)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+           mean_probability, finish_position, disqualified, grades)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       )
       .bind(
         run.id,
@@ -66,6 +66,7 @@ export async function insertRun(
         run.mean_probability,
         run.finish_position,
         run.disqualified ? 1 : 0,
+        run.grades,
       ),
     ...calls.map((c) =>
       db

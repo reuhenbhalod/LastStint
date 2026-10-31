@@ -34,6 +34,7 @@ A tester opens Reuhen's site, plays Abu Dhabi 2021 as Mercedes, and submits the 
 | Stage | State |
 |---|---|
 | 1 | **Done.** `main` merged in; the verify and API tests now use the four moments (a one-moment copy for the rule tests, plus a full four-moment run); the schedule script uses the race file's seed (dry run: #1–#3, seed 1205); `account_id` pinned. The races bundle imports the race files directly, so it needs no regeneration. 167 sim + 19 Worker tests pass. |
+| 1b | **Done.** `verifyRun(…, claimed)` checks and uses the game's grades (`claimGrade()` builds them; 0.07 ms against 99 ms for full grading, same score). `POST /api/runs` requires `grades` (`400 bad-grades` otherwise). Migration 0003 adds `grades`, `verified` and `corrected`. `scripts/reverify.ts` + `.github/workflows/reverify.yml` (10:30 UTC nightly, or run by hand) re-grade unverified runs. Tested: an honest run matches full grading exactly; a run with edited grades is accepted live, then corrected to its true score and bands. `docs/api.md` and `docs/sim-api.md` updated. 171 sim + 20 Worker tests pass. |
 
 ## Decisions (recommended first)
 

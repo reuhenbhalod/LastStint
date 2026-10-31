@@ -218,4 +218,78 @@ describe('verifyRun', () => {
     expect(v.moments.map((m) => m.grade)).toEqual(played.calls.map((c) => c.grade));
     expect(v.score).toEqual(played.score);
   });
+
+  describe("with the game's claimed grades (free-plan scoring)", () => {
+    const choices = {
+      'vsc-cover': 'stay',
+      'manage-or-push': 'push',
+      'sc-stop': 'box-soft',
+      'restart-stance': 'defend',
+    };
+    const played = play(fullAbu, choices);
+    const claimed = (grades: unknown) =>
+      verifyRun(fullAbu, fullAbu.race.seed, played.decisions, SAMPLES, grades);
+    const reason = (grades: unknown) => {
+      try {
+        claimed(grades);
+      } catch (e) {
+        if (e instanceof VerifyError) return e.code;
+        throw e;
+      }
+      return 'ok';
+    };
+    const edit = (f: (g: Array<{ probabilities: number[]; real?: number }>) => void) => {
+      const copy = JSON.parse(JSON.stringify(played.grades));
+      f(copy);
+      return copy;
+    };
+
+    it('scores an honest run exactly as full grading does, real calls included', () => {
+      const full = verifyRun(fullAbu, fullAbu.race.seed, played.decisions, SAMPLES);
+      expect(claimed(JSON.parse(JSON.stringify(played.grades)))).toEqual(full);
+      // Laps 49 and 57: the real team took none of the options, so their chance is claimed.
+      expect(played.grades.map((g) => g.real !== undefined)).toEqual([false, true, false, true]);
+    });
+
+    it('an edited chance passes the live check but not full grading (the nightly check)', () => {
+      const cheat = edit((g) => {
+        const sc = g[2] as { probabilities: number[] };
+        sc.probabilities = sc.probabilities.map((_, i) => (i === 1 ? 1 : 0)); // box-soft best
+      });
+      const full = verifyRun(fullAbu, fullAbu.race.seed, played.decisions, SAMPLES);
+      expect(claimed(cheat).score).not.toEqual(full.score);
+    });
+
+    it('rejects grades of the wrong shape', () => {
+      expect(reason(played.grades)).toBe('ok');
+      expect(reason({})).toBe('bad-grades');
+      expect(reason(played.grades.slice(1))).toBe('bad-grades');
+      expect(reason(edit((g) => g.push({ ...(g[0] as { probabilities: number[] }) })))).toBe(
+        'bad-grades',
+      );
+      expect(reason(edit((g) => (g[0] as { probabilities: number[] }).probabilities.pop()))).toBe(
+        'bad-grades',
+      );
+      const firstChance = (p: number) =>
+        edit((g) => {
+          (g[0] as { probabilities: number[] }).probabilities[0] = p;
+        });
+      expect(reason(firstChance(0.333))).toBe('bad-grades'); // not a whole number of samples
+      expect(reason(firstChance(2))).toBe('bad-grades');
+      const realChance = (i: number, p: number | undefined) =>
+        edit((g) => {
+          (g[i] as { real?: number }).real = p;
+        });
+      expect(reason(JSON.parse(JSON.stringify(realChance(1, undefined))))).toBe('bad-grades');
+      expect(reason(realChance(0, 0.5))).toBe('bad-grades');
+    });
+
+    it('still checks the call log first', () => {
+      const log = JSON.parse(JSON.stringify(played.decisions)) as Decision[];
+      log.push({ lap: 55, at: 56, kind: 'pit', compound: 'HARD' });
+      expect(() => verifyRun(fullAbu, fullAbu.race.seed, log, SAMPLES, played.grades)).toThrow(
+        VerifyError,
+      );
+    });
+  });
 });

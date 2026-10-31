@@ -22,10 +22,11 @@ import { initRun, stepLap, decide, answerMoment, gradeMoment, classify, scoreRun
 3. **Calls between moments.** The BOX button and the headset panel call `decide(run, call)` for a lap that hasn't run yet (see [Calls](#calls)).
 4. **Decision moments.** When `run.state.lap + 1` equals a moment's `lap` (from `model.decisionMoments`), pause **straight after that lap is drawn**.
    - Start grading the moment's options before taking any other call (in Web Workers, see [Grading](#grading)). The server rebuilds the grade from the calls made before the pause, so a call slipped in first would make the two disagree.
+   - While paused, once the grade is ready, keep `claimGrade(run, moment, grade)` for the submission (before answering).
    - While paused, the only call is the answer: `answerMoment(run, moment, optionId)`. It logs the radio answer and the option's calls. Then resume ticking.
    - Don't let the player queue a call for a moment's lap ahead of time. The server rejects any call on a moment's lap that isn't part of the chosen option.
 5. **Flag.** `isFinished(run)` becomes true. `classify(run)` gives the result; `scoreRun(...)` gives the score.
-6. **Submit.** Send `run.decisions` (the full call log) to `POST /api/runs`. The server runs `verifyRun(model, seed, decisions)`: it rebuilds the identical race, re-grades every moment from the pause the player saw, and scores the run. Show the server's numbers.
+6. **Submit.** Send `run.decisions` (the full call log) and the kept grades to `POST /api/runs`. The server runs `verifyRun(model, seed, decisions, 300, grades)`: it rebuilds the identical race, checks the claimed grades' shape, and scores the run from them. A nightly job re-grades each run in full (see [api.md](api.md)). Show the server's numbers.
 
 The example implements exactly this loop.
 
@@ -134,7 +135,7 @@ Measured on an M-series laptop, for 4 options × 300 samples × 25 laps: 1 worke
 
 ## Server verification
 
-`verifyRun(model, seed, decisions, samples?)` → `VerifiedRun` `{ result, score, moments, finishPosition, disqualified }`. Each entry in `moments` is `{ momentId, lap, chosen, grade, real, matchedReal }`, and `real` grades the real team's call against the moment's best option.
+`verifyRun(model, seed, decisions, samples?, claimed?)` → `VerifiedRun`. Without `claimed` every moment is re-graded in full (the nightly job); with the game's `ClaimedGrade[]` (from `claimGrade`), they are checked for shape and used instead (the Worker, within the free plan's 10 ms). Returns `{ result, score, moments, finishPosition, disqualified }`. Each entry in `moments` is `{ momentId, lap, chosen, grade, real, matchedReal }`, and `real` grades the real team's call against the moment's best option.
 
 It throws a `VerifyError` with a `code`:
 
@@ -161,7 +162,7 @@ A run is fully defined by `(model, seed, decisions)`. Same inputs, same race, sa
 | `gradeMoment`, `realOption`, `bandFor`, `BAND_EDGES`, `GRADE_SAMPLES` | Grading |
 | `gradeJob`, `runGradeJob`, `mergeGradeJobs`, `runFromJob`, `countHits`, `gradeFromHits` | Grading in Web Workers |
 | `scoreRun`, `BAND_POINTS` | Scoring |
-| `answerMoment`, `verifyRun`, `VerifyError`, `MAX_DECISIONS` | Answering moments; server verification |
+| `answerMoment`, `claimGrade`, `verifyRun`, `VerifyError`, `MAX_DECISIONS` | Answering moments; the grades sent with a run; server verification |
 | `candidateMoments`, `proposeMoments`, `pauseAt`, `verdictFor`, `QUALITY` | Moment finding (tooling) |
 | `forkRun`, `playOption`, `planRemainingStop`, `sampleSeed`, `reachedTarget` | Lower-level grader pieces |
 | `cleanLap`, `passProbability`, `mulberry32`, `deriveSeed` | Model internals, exposed for tests and tools |

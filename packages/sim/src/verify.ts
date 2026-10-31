@@ -4,6 +4,12 @@
 // rebuilds each decision moment's grade exactly as the player's game computed it at the pause,
 // and scores the run. The game answers a moment with answerMoment(), which logs the radio
 // answer and the chosen option's calls; that is the shape verifyRun() checks.
+//
+// On Cloudflare's free plan a request gets 10 ms of CPU and full grading takes ~100 ms, so the
+// Worker scores a run from the grades the game claims (beta spec B6): verifyRun() with
+// `claimed` checks everything but the playouts and rebuilds each grade from the claimed
+// chances. Grading is deterministic, so a nightly job re-runs verifyRun() without `claimed`
+// and any difference means the claimed grades were edited.
 
 import {
   type Band,
@@ -11,6 +17,7 @@ import {
   type MomentGrade,
   type RunScore,
   bandFor,
+  gradeFromHits,
   gradeMoment,
   realOption,
   scoreRun,
@@ -30,7 +37,18 @@ import type { Decision, RaceModel, RaceResult } from './types.js';
 /** The most calls a run may log (a 70-lap race with a call every lap fits easily). */
 export const MAX_DECISIONS = 500;
 
-export type VerifyErrorCode = 'invalid-calls' | 'missing-answer' | 'bad-answer';
+export type VerifyErrorCode = 'invalid-calls' | 'missing-answer' | 'bad-answer' | 'bad-grades';
+
+/**
+ * The grades the game computed for one moment at its pause: each option's chance of the
+ * target in the moment's option order (`grade.options[i].probability`), and the real team's
+ * call's chance when it took none of the options (realOptionId null), else omitted.
+ */
+export interface ClaimedGrade {
+  momentId: string;
+  probabilities: number[];
+  real?: number;
+}
 
 export class VerifyError extends Error {
   constructor(
@@ -54,6 +72,30 @@ export function answerMoment(run: Run, moment: DecisionMoment, optionId: string)
   }
   decide(run, { lap: moment.lap, kind: 'radio', momentId: moment.id, optionId });
   for (const call of option.decisions) decide(run, call);
+}
+
+/**
+ * The game's grades for a moment, as POST /api/runs takes them: call at the pause, with the
+ * moment's grade, BEFORE answerMoment(). When the real team took none of the options, this
+ * grades its call too (one more option's playouts).
+ */
+export function claimGrade(
+  run: Run,
+  moment: DecisionMoment,
+  grade: MomentGrade,
+  samples = GRADE_SAMPLES,
+): ClaimedGrade {
+  const claim: ClaimedGrade = {
+    momentId: moment.id,
+    probabilities: moment.options.map(
+      (o) => grade.options.find((g) => g.id === o.id)?.probability as number,
+    ),
+  };
+  if (!moment.options.some((o) => o.id === moment.realOptionId)) {
+    const real = gradeMoment(run, [realOption(run, moment.lap)], moment.target, samples);
+    claim.real = real.options[0]?.probability as number;
+  }
+  return claim;
 }
 
 /** The real team's call at a moment, graded against the moment's best option. */
@@ -153,18 +195,64 @@ function pausedBefore(model: RaceModel, seed: number, decisions: Decision[], lap
   return run;
 }
 
+/** A claimed chance as a whole number of the `samples` playouts, or null if it isn't one. */
+function hitsFor(p: unknown, samples: number): number | null {
+  if (typeof p !== 'number' || !Number.isFinite(p) || p < 0 || p > 1) return null;
+  const hits = Math.round(p * samples);
+  return Math.abs(hits - p * samples) < 1e-6 ? hits : null;
+}
+
+/** The claimed grade for each moment (by id), checked for shape. Throws `bad-grades`. */
+function claimedGrades(
+  model: RaceModel,
+  claimed: unknown,
+  samples: number,
+): Map<string, { hits: number[]; real: number | null }> {
+  const bad = (why: string): never => {
+    throw new VerifyError('bad-grades', why);
+  };
+  if (!Array.isArray(claimed) || claimed.length !== model.decisionMoments.length) {
+    bad('grades must list every moment once');
+  }
+  const out = new Map<string, { hits: number[]; real: number | null }>();
+  for (const c of claimed as ClaimedGrade[]) {
+    const m = model.decisionMoments.find((x) => x.id === c?.momentId);
+    if (!m || out.has(m.id)) return bad('grades must list every moment once');
+    const probs = c.probabilities;
+    if (!Array.isArray(probs) || probs.length !== m.options.length) {
+      return bad(`moment ${m.id} needs one chance per option`);
+    }
+    const hits = probs.map((p) => hitsFor(p, samples));
+    if (hits.some((h) => h === null)) return bad(`moment ${m.id} has an invalid chance`);
+    const needsReal = !m.options.some((o) => o.id === m.realOptionId);
+    let real: number | null = null;
+    if (needsReal) {
+      real = hitsFor(c.real, samples);
+      if (real === null) return bad(`moment ${m.id} needs the real call's chance`);
+    } else if (c.real !== undefined) {
+      return bad(`moment ${m.id}'s real call is one of its options`);
+    }
+    out.set(m.id, { hits: hits as number[], real });
+  }
+  return out;
+}
+
 /**
- * Verify a finished run: check the call log, replay the race to the flag, re-grade every
- * moment from the pause the player saw, and score it. Throws VerifyError on a bad log.
+ * Verify a finished run: check the call log, replay the race to the flag, grade every moment
+ * from the pause the player saw, and score it. Without `claimed`, each moment is re-graded
+ * with full playouts; with it (the game's grades, see ClaimedGrade), the claimed chances are
+ * checked for shape and used instead. Throws VerifyError on a bad log or bad grades.
  */
 export function verifyRun(
   model: RaceModel,
   seed: number,
   decisions: unknown,
   samples = GRADE_SAMPLES,
+  claimed?: unknown,
 ): VerifiedRun {
   checkLog(model, decisions);
   const chosen = answers(model, decisions);
+  const claims = claimed === undefined ? null : claimedGrades(model, claimed, samples);
 
   const run = initRun(model, seed, { decisions });
   while (!isFinished(run)) stepLap(run);
@@ -173,16 +261,21 @@ export function verifyRun(
   const moments = [...model.decisionMoments]
     .sort((a, b) => a.lap - b.lap)
     .map((m): VerifiedMoment => {
-      const paused = pausedBefore(model, seed, decisions, m.lap);
-      const grade = gradeMoment(paused, m.options, m.target, samples);
+      const claim = claims?.get(m.id);
+      const paused = claim ? null : pausedBefore(model, seed, decisions, m.lap);
+      const grade = claim
+        ? gradeFromHits(m.lap - 1, m.options, m.target, samples, claim.hits)
+        : gradeMoment(paused as Run, m.options, m.target, samples);
       const best = Math.max(...grade.options.map((o) => o.probability));
       let real: RealCall;
       const taken = grade.options.find((o) => o.id === m.realOptionId);
       if (taken) {
         real = { optionId: taken.id, probability: taken.probability, band: taken.band };
       } else {
-        const p = gradeMoment(paused, [realOption(paused, m.lap)], m.target, samples).options[0]
-          ?.probability as number;
+        const p = claim
+          ? (claim.real as number) / samples
+          : (gradeMoment(paused as Run, [realOption(paused as Run, m.lap)], m.target, samples)
+              .options[0]?.probability as number);
         real = { optionId: null, probability: p, band: bandFor((best - p) * 100) };
       }
       const pick = chosen.get(m.id) as string;

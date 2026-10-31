@@ -60,8 +60,13 @@ export function get(path: string) {
   return SELF.fetch(`https://api.test${path}`);
 }
 
-export function submit(anonId: string, decisions: Decision[], date = today()) {
-  return post({ date, anonId, decisions });
+/** Submit a played run the way the game does: its call log and its claimed grades. */
+export function submit(
+  anonId: string,
+  run: { decisions: Decision[]; grades: unknown },
+  date = today(),
+) {
+  return post({ date, anonId, decisions: run.decisions, grades: run.grades });
 }
 
 export const ids = {

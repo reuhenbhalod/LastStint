@@ -11,6 +11,7 @@ import { addDays } from '../src/dates.js';
 import worker from '../src/index.js';
 import { checkQueue } from '../src/ops.js';
 import { modelHash } from '../src/races.js';
+import { type UnverifiedRun, recheckRun, recheckSql } from '../src/reverify.js';
 import type { RunResponse } from '../src/runs.js';
 import { abu, get, ids, play, post, schedule, submit, today } from './helpers.js';
 
@@ -82,7 +83,7 @@ describe('GET /api/races/:id', () => {
 describe('POST /api/runs', () => {
   it('verifies a played run and returns the same score the game computed', async () => {
     await schedule(today(), { number: 3 });
-    const res = await submit(ids.a, boxSoft.decisions);
+    const res = await submit(ids.a, boxSoft);
     expect(res.status).toBe(201);
     const run = (await res.json()) as RunResponse;
     expect(run).toMatchObject({
@@ -120,17 +121,17 @@ describe('POST /api/runs', () => {
 
   it('accepts one run per player per day', async () => {
     await schedule(today());
-    expect((await submit(ids.a, boxSoft.decisions)).status).toBe(201);
-    const dup = await submit(ids.a, stayOut.decisions);
+    expect((await submit(ids.a, boxSoft)).status).toBe(201);
+    const dup = await submit(ids.a, stayOut);
     expect(dup.status).toBe(409);
     expect(await dup.json()).toEqual({ error: 'already-submitted' });
   });
 
   it('ranks runs by score, then the tie-breaks', async () => {
     await schedule(today());
-    const a = (await (await submit(ids.a, boxSoft.decisions)).json()) as RunResponse;
-    const b = (await (await submit(ids.b, stayOut.decisions)).json()) as RunResponse;
-    const c = (await (await submit(ids.c, stayOut.decisions)).json()) as RunResponse;
+    const a = (await (await submit(ids.a, boxSoft)).json()) as RunResponse;
+    const b = (await (await submit(ids.b, stayOut)).json()) as RunResponse;
+    const c = (await (await submit(ids.c, stayOut)).json()) as RunResponse;
     // c ties b exactly and submitted later, so it ranks behind b.
     expect(c.score).toBe(b.score);
     expect(c.total).toBe(3);
@@ -152,14 +153,20 @@ describe('POST /api/runs', () => {
     const log = JSON.parse(JSON.stringify(boxSoft.decisions));
     const radio = log.findIndex((d: { kind: string }) => d.kind === 'radio');
     log[radio].optionId = 'cover-hard'; // claims the cover while having stayed out
-    const tampered = await submit(ids.a, log);
+    const tampered = await submit(ids.a, { decisions: log, grades: boxSoft.grades });
     expect(tampered.status).toBe(400);
     expect(await tampered.json()).toMatchObject({ error: 'bad-answer' });
 
-    expect((await submit('not-a-uuid', boxSoft.decisions)).status).toBe(400);
+    expect((await submit('not-a-uuid', boxSoft)).status).toBe(400);
     expect((await post('{nope')).status).toBe(400);
     expect((await post({ date: today(), anonId: ids.b, decisions: 'x' })).status).toBe(400);
-    expect((await submit(ids.b, boxSoft.decisions, addDays(today(), 5))).status).toBe(404);
+    // Grades are required and must have the right shape.
+    const noGrades = await post({ date: today(), anonId: ids.b, decisions: boxSoft.decisions });
+    expect(noGrades.status).toBe(400);
+    expect(await noGrades.json()).toMatchObject({ error: 'bad-grades' });
+    const short = await submit(ids.b, { ...boxSoft, grades: boxSoft.grades.slice(1) });
+    expect(await short.json()).toMatchObject({ error: 'bad-grades' });
+    expect((await submit(ids.b, boxSoft, addDays(today(), 5))).status).toBe(404);
     // Nothing was stored.
     expect((await get(`/api/runs/${today()}/${ids.a}`)).status).toBe(404);
   });
@@ -177,9 +184,9 @@ describe('POST /api/runs', () => {
 describe('stats and leaderboard', () => {
   it('aggregates the day and lists the top runs with generated names', async () => {
     await schedule(today());
-    await submit(ids.a, boxSoft.decisions);
-    await submit(ids.b, stayOut.decisions);
-    await submit(ids.c, stayOut.decisions);
+    await submit(ids.a, boxSoft);
+    await submit(ids.b, stayOut);
+    await submit(ids.c, stayOut);
 
     const stats = (await (await get(`/api/daily/${today()}/stats`)).json()) as {
       runs: number;
@@ -243,3 +250,49 @@ describe('queue check (cron)', () => {
 function SELF_fetch(url: string) {
   return get(new URL(url).pathname + new URL(url).search);
 }
+
+describe('nightly re-grading (beta spec B6)', () => {
+  it('verifies honest runs and corrects runs with edited grades', async () => {
+    await schedule(today());
+    expect((await submit(ids.a, boxSoft)).status).toBe(201);
+    // Edited grades: claims staying out at the SC was the best call.
+    const cheat = JSON.parse(JSON.stringify(stayOut.grades)) as Array<{
+      momentId: string;
+      probabilities: number[];
+    }>;
+    const sc = cheat.find((g) => g.momentId === 'sc-stop') as { probabilities: number[] };
+    sc.probabilities = sc.probabilities.map((_, i) => (i === 0 ? 1 : 0));
+    const claimed = (await (
+      await submit(ids.b, { decisions: stayOut.decisions, grades: cheat })
+    ).json()) as RunResponse;
+    expect(claimed.score).toBeGreaterThan(stayOut.score.score);
+
+    const { results } = await env.DB.prepare(
+      `SELECT r.id, r.date, d.number, d.race_id, d.seed, r.decisions, r.result
+       FROM runs r JOIN daily d ON d.date = r.date WHERE r.verified = 0 ORDER BY r.created_at`,
+    ).all<UnverifiedRun>();
+    expect(results).toHaveLength(2);
+    const checks = results.map((r) => recheckRun(abu, r));
+    expect(checks.map((c) => c.correct)).toEqual([true, false]);
+    await env.DB.batch(checks.flatMap(recheckSql).map((q) => env.DB.prepare(q)));
+
+    const rows = await env.DB.prepare(
+      'SELECT anon_id, verified, corrected, score FROM runs ORDER BY created_at',
+    ).all<{ anon_id: string; verified: number; corrected: number; score: number }>();
+    expect(rows.results).toEqual([
+      { anon_id: ids.a, verified: 1, corrected: 0, score: boxSoft.score.score },
+      { anon_id: ids.b, verified: 1, corrected: 1, score: stayOut.score.score },
+    ]);
+    const fixed = (await (await get(`/api/runs/${today()}/${ids.b}`)).json()) as RunResponse;
+    expect(fixed.score).toBe(stayOut.score.score);
+    expect(fixed.calls.find((c) => c.momentId === 'sc-stop')?.band).toBe(
+      stayOut.score.calls[2]?.band,
+    );
+    const band = await env.DB.prepare(
+      "SELECT band FROM run_calls WHERE run_id = ? AND moment_id = 'sc-stop'",
+    )
+      .bind(claimed.runId)
+      .first<{ band: string }>();
+    expect(band?.band).toBe(stayOut.score.calls[2]?.band);
+  });
+});

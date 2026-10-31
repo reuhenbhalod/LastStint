@@ -20,9 +20,10 @@ The game's backend: a Cloudflare Worker (`apps/worker`) with a D1 database. It s
 3. **Load the race.** `GET modelUrl` (immutable, so the browser caches it).
 4. **Check for a run already played today.** `GET /api/runs/:date/:anonId`. A `200` means show the results screen; a `404` means play.
 5. **Play.** Use `initRun(model, seed, { decisions: [] })`, then follow [sim-api.md](sim-api.md).
-   - Answer each decision moment with `answerMoment()`.
    - Pause and start grading **straight after** the lap before a moment.
-6. **Submit.** `POST /api/runs` with `run.decisions`.
+   - At the pause, once the grade is ready and **before** answering, call `claimGrade(run, moment, grade)` and keep the result.
+   - Answer each decision moment with `answerMoment()`.
+6. **Submit.** `POST /api/runs` with `run.decisions` and the kept grades.
 7. **Show the results.** Use the response, plus `GET .../stats` and `GET .../leaderboard` for the post-race screens.
 
 ## Endpoints
@@ -54,15 +55,28 @@ A race model (schema v9). Requested through `modelUrl` (with `?h=<hash>`), it is
 ### `POST /api/runs`
 
 ```json
-{ "date": "2026-10-27", "anonId": "…uuid…", "decisions": [ …run.decisions… ] }
+{
+  "date": "2026-10-27",
+  "anonId": "…uuid…",
+  "decisions": [ …run.decisions… ],
+  "grades": [ …one claimGrade() result per moment… ]
+}
 ```
+
+Each entry of `grades` is `{ momentId, probabilities, real? }`:
+- `probabilities` are the moment's option chances, in the moment's option order.
+- `real` is the real team's call's chance, present only when the real team took none of the options.
+
+`claimGrade()` (from `@boxthislap/sim`) builds the entry; don't build it by hand.
 
 **Before it responds, the server:**
 
 1. Checks the call log.
 2. Replays the race to the flag.
-3. Re-grades every moment from the pause the player saw, using the full 300 samples.
-4. Scores the run, stores it and ranks it.
+3. Checks the grades' shape: one per moment, one chance per option, each a whole number of the 300 samples.
+4. Scores the run from them, stores it and ranks it.
+
+**Why the game's grades.** Full grading takes about 100 ms, and Cloudflare's free plan allows 10 ms per request. So the server scores from the game's grades, and a nightly job re-grades every run with the full 300 samples. Grading is deterministic, so an honest run always matches. A run whose grades were edited gets its true score overnight, so its score, rank and bands can change the next day.
 
 It returns `201`:
 
@@ -115,6 +129,7 @@ A `400` with one of these codes means the client built the call log wrongly. The
 |---|---|
 | `invalid-calls` | Calls not made through `decide()` (no `at`), edited, or reordered |
 | `missing-answer` | A moment answered without `answerMoment()`, or answered twice |
+| `bad-grades` | `grades` missing, or not built with `claimGrade()` for every moment |
 | `bad-answer` | A call queued for a moment's lap, or another call made at the pause before the answer |
 | `bad-request` | Malformed body, date or `anonId` |
 
