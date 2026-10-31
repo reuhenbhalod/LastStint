@@ -13,6 +13,7 @@ import pandas as pd
 
 from . import SCHEMA_VERSION
 from . import events as events_mod
+from . import pace as pace_mod
 from . import scenario as scenario_mod
 from . import track as track_mod
 from .fit import LapTimeFit
@@ -57,6 +58,8 @@ def assemble_race_model(
     seed: int,
     user_side: str,
     rival: str,
+    fastest_lap_point: bool = False,
+    track_status: list[dict] | None = None,
 ) -> dict:
     """Build the race-model dict (validate + write it with export.write_race)."""
     total_laps = int(laps["LapNumber"].max())
@@ -85,7 +88,38 @@ def assemble_race_model(
     strategy = scenario_mod.real_strategy(laps)
     teams = _team_map(laps)
     # Real stops keep their measured time (spec B1): a slow or quick stop is a real event.
-    measured = track_mod.measured_stop_losses(laps)
+    measured = track_mod.measured_stop_losses(laps, takeover_lap)
+    # Model v3 (spec B2a): each driver's pace over the laps the game replays.
+    fresh = {"bonus": round(fit.fresh_tyre_bonus, 4), "laps": fit.fresh_tyre_laps}
+    race_pace = pace_mod.post_takeover_offsets(
+        laps,
+        fit.driver_pace,
+        compounds,
+        round(fit.fuel_per_lap, 5),
+        fresh,
+        takeover_lap,
+        pace_mod.SHRINK_LAPS,
+    )
+    if pace_mod.SIM_FRAME_LOSS:
+        v3_pace = {c: p + race_pace.get(c, 0.0) for c, p in fit.driver_pace.items()}
+        measured.update(
+            pace_mod.sim_frame_losses(
+                laps, v3_pace, compounds, round(fit.fuel_per_lap, 5), fresh, takeover_lap
+            )
+        )
+
+    # Model v3 stage 9: a stop entered before an SC/VSC was deployed is a green-flag stop,
+    # though its out-lap is neutralized (the sim prices a stop by its out-lap's flag).
+    if track_status and track_params.pit_loss is not None:
+        all_events = events_mod.extract_events(laps, total_laps)
+        for key in events_mod.green_entry_stops(laps, all_events, track_status):
+            measured.setdefault(key, track_params.pit_loss)
+
+    optional = (
+        scenario_mod.fastest_lap_stops(laps, measured, track_params.pit_loss)
+        if fastest_lap_point and track_params.pit_loss is not None
+        else set()
+    )
 
     drivers = []
     for code in sorted(set(takeover_state) & set(fit.driver_pace)):
@@ -96,7 +130,7 @@ def assemble_race_model(
             {
                 "code": code,
                 "team": teams.get(code, "Unknown"),
-                "basePace": round(fit.driver_pace[code], 4),
+                "basePace": round(fit.driver_pace[code] + race_pace.get(code, 0.0), 4),
                 "noise": round(fit.driver_noise[code], 4),
                 "stateAtTakeover": {
                     "position": s["position"],
@@ -113,6 +147,7 @@ def assemble_race_model(
                             if (code, st["lap"]) in measured
                             else {}
                         ),
+                        **({"optional": True} if (code, st["lap"]) in optional else {}),
                     }
                     for st in strategy.get(code, [])
                     if st["lap"] >= takeover_lap

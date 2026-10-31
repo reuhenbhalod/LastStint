@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 9,
+  "schemaVersion": 10,
   "race": {
     "id": "hungary-2024",
     "name": "Hungary 2024",
@@ -85,8 +85,8 @@
     {
       "code": "ALB",
       "team": "Williams",
-      "basePace": 84.7513,
-      "noise": 0.8166,
+      "basePace": 84.8691,
+      "noise": 0.508,
       "stateAtTakeover": {
         "position": 15,
         "gapAhead": 1.071,
@@ -101,15 +101,15 @@
         {
           "lap": 30,
           "to": "HARD",
-          "loss": 23.151
+          "loss": 21.905
         }
       ]
     },
     {
       "code": "ALO",
       "team": "Aston Martin",
-      "basePace": 84.5099,
-      "noise": 0.6933,
+      "basePace": 84.433,
+      "noise": 0.7762,
       "stateAtTakeover": {
         "position": 14,
         "gapAhead": 3.381,
@@ -124,15 +124,15 @@
         {
           "lap": 38,
           "to": "HARD",
-          "loss": 19.72
+          "loss": 19.292
         }
       ]
     },
     {
       "code": "BOT",
       "team": "Kick Sauber",
-      "basePace": 85.3159,
-      "noise": 1.0201,
+      "basePace": 85.4825,
+      "noise": 1.1592,
       "stateAtTakeover": {
         "position": 9,
         "gapAhead": 2.943,
@@ -146,20 +146,20 @@
         {
           "lap": 17,
           "to": "HARD",
-          "loss": 19.02
+          "loss": 19.16
         },
         {
           "lap": 46,
           "to": "HARD",
-          "loss": 22.106
+          "loss": 20.59
         }
       ]
     },
     {
       "code": "GAS",
       "team": "Alpine",
-      "basePace": 84.7671,
-      "noise": 0.5649,
+      "basePace": 84.7589,
+      "noise": 0.2734,
       "stateAtTakeover": {
         "position": 12,
         "gapAhead": 6.06,
@@ -173,15 +173,15 @@
         {
           "lap": 29,
           "to": "MEDIUM",
-          "loss": 20.07
+          "loss": 20.66
         }
       ]
     },
     {
       "code": "HAM",
       "team": "Mercedes",
-      "basePace": 83.6786,
-      "noise": 0.4626,
+      "basePace": 83.7478,
+      "noise": 0.4364,
       "stateAtTakeover": {
         "position": 4,
         "gapAhead": 1.128,
@@ -195,20 +195,20 @@
         {
           "lap": 17,
           "to": "HARD",
-          "loss": 17.958
+          "loss": 19.353
         },
         {
           "lap": 41,
           "to": "HARD",
-          "loss": 21.801
+          "loss": 22.016
         }
       ]
     },
     {
       "code": "HUL",
       "team": "Haas F1 Team",
-      "basePace": 84.545,
-      "noise": 0.922,
+      "basePace": 84.8745,
+      "noise": 0.5015,
       "stateAtTakeover": {
         "position": 13,
         "gapAhead": 2.366,
@@ -223,15 +223,15 @@
         {
           "lap": 30,
           "to": "HARD",
-          "loss": 21.947
+          "loss": 20.347
         }
       ]
     },
     {
       "code": "LEC",
       "team": "Ferrari",
-      "basePace": 83.7999,
-      "noise": 0.5294,
+      "basePace": 83.8646,
+      "noise": 0.3738,
       "stateAtTakeover": {
         "position": 5,
         "gapAhead": 1.735,
@@ -245,20 +245,20 @@
         {
           "lap": 24,
           "to": "HARD",
-          "loss": 19.393
+          "loss": 20.598
         },
         {
           "lap": 41,
           "to": "MEDIUM",
-          "loss": 21.123
+          "loss": 21.945
         }
       ]
     },
     {
       "code": "MAG",
       "team": "Haas F1 Team",
-      "basePace": 84.9141,
-      "noise": 0.8903,
+      "basePace": 85.1488,
+      "noise": 0.4556,
       "stateAtTakeover": {
         "position": 16,
         "gapAhead": 1.281,
@@ -273,15 +273,15 @@
         {
           "lap": 35,
           "to": "HARD",
-          "loss": 22.25
+          "loss": 20.957
         }
       ]
     },
     {
       "code": "NOR",
       "team": "McLaren",
-      "basePace": 83.459,
-      "noise": 0.7606,
+      "basePace": 83.6421,
+      "noise": 0.2868,
       "stateAtTakeover": {
         "position": 2,
         "gapAhead": 3.408,
@@ -295,20 +295,20 @@
         {
           "lap": 18,
           "to": "HARD",
-          "loss": 19.172
+          "loss": 20.308
         },
         {
           "lap": 46,
           "to": "MEDIUM",
-          "loss": 19.365
+          "loss": 18.868
         }
       ]
     },
     {
       "code": "OCO",
       "team": "Alpine",
-      "basePace": 84.9011,
-      "noise": 0.907,
+      "basePace": 85.2334,
+      "noise": 0.4197,
       "stateAtTakeover": {
         "position": 18,
         "gapAhead": 1.699,
@@ -323,20 +323,20 @@
         {
           "lap": 31,
           "to": "HARD",
-          "loss": 22.148
+          "loss": 19.731
         },
         {
           "lap": 65,
           "to": "SOFT",
-          "loss": 25.427
+          "loss": 25.011
         }
       ]
     },
     {
       "code": "PER",
       "team": "Red Bull Racing",
-      "basePace": 84.0597,
-      "noise": 0.8892,
+      "basePace": 83.9569,
+      "noise": 0.7819,
       "stateAtTakeover": {
         "position": 11,
         "gapAhead": 0.891,
@@ -350,20 +350,20 @@
         {
           "lap": 29,
           "to": "MEDIUM",
-          "loss": 21.714
+          "loss": 22.435
         },
         {
           "lap": 48,
           "to": "MEDIUM",
-          "loss": 18.262
+          "loss": 19.515
         }
       ]
     },
     {
       "code": "PIA",
       "team": "McLaren",
-      "basePace": 83.5168,
-      "noise": 0.4978,
+      "basePace": 83.6126,
+      "noise": 0.3908,
       "stateAtTakeover": {
         "position": 1,
         "gapAhead": 0.0,
@@ -377,20 +377,20 @@
         {
           "lap": 19,
           "to": "HARD",
-          "loss": 20.269
+          "loss": 21.063
         },
         {
           "lap": 48,
           "to": "MEDIUM",
-          "loss": 21.86
+          "loss": 21.331
         }
       ]
     },
     {
       "code": "RIC",
       "team": "RB",
-      "basePace": 84.581,
-      "noise": 0.9337,
+      "basePace": 84.583,
+      "noise": 0.8739,
       "stateAtTakeover": {
         "position": 17,
         "gapAhead": 0.566,
@@ -405,15 +405,15 @@
         {
           "lap": 29,
           "to": "HARD",
-          "loss": 17.963
+          "loss": 18.924
         }
       ]
     },
     {
       "code": "RUS",
       "team": "Mercedes",
-      "basePace": 84.0049,
-      "noise": 0.7812,
+      "basePace": 83.9301,
+      "noise": 0.6306,
       "stateAtTakeover": {
         "position": 10,
         "gapAhead": 1.173,
@@ -427,20 +427,20 @@
         {
           "lap": 34,
           "to": "MEDIUM",
-          "loss": 20.146
+          "loss": 19.882
         },
         {
           "lap": 54,
           "to": "HARD",
-          "loss": 18.33
+          "loss": 18.218
         }
       ]
     },
     {
       "code": "SAI",
       "team": "Ferrari",
-      "basePace": 83.8865,
-      "noise": 0.5221,
+      "basePace": 83.8912,
+      "noise": 0.3559,
       "stateAtTakeover": {
         "position": 6,
         "gapAhead": 4.296,
@@ -454,20 +454,20 @@
         {
           "lap": 22,
           "to": "HARD",
-          "loss": 20.287
+          "loss": 21.059
         },
         {
           "lap": 48,
           "to": "MEDIUM",
-          "loss": 21.161
+          "loss": 21.216
         }
       ]
     },
     {
       "code": "SAR",
       "team": "Williams",
-      "basePace": 85.0254,
-      "noise": 0.696,
+      "basePace": 85.2084,
+      "noise": 0.3655,
       "stateAtTakeover": {
         "position": 19,
         "gapAhead": 2.143,
@@ -482,20 +482,20 @@
         {
           "lap": 34,
           "to": "HARD",
-          "loss": 20.382
+          "loss": 19.537
         },
         {
           "lap": 64,
           "to": "SOFT",
-          "loss": 21.269
+          "loss": 22.049
         }
       ]
     },
     {
       "code": "STR",
       "team": "Aston Martin",
-      "basePace": 84.2782,
-      "noise": 0.6867,
+      "basePace": 84.5113,
+      "noise": 0.6465,
       "stateAtTakeover": {
         "position": 8,
         "gapAhead": 0.481,
@@ -509,20 +509,20 @@
         {
           "lap": 15,
           "to": "MEDIUM",
-          "loss": 22.669
+          "loss": 20.633
         },
         {
           "lap": 46,
           "to": "HARD",
-          "loss": 21.096
+          "loss": 20.75
         }
       ]
     },
     {
       "code": "TSU",
       "team": "RB",
-      "basePace": 84.467,
-      "noise": 0.8125,
+      "basePace": 84.3736,
+      "noise": 0.801,
       "stateAtTakeover": {
         "position": 7,
         "gapAhead": 10.951,
@@ -536,15 +536,15 @@
         {
           "lap": 30,
           "to": "HARD",
-          "loss": 21.414
+          "loss": 20.555
         }
       ]
     },
     {
       "code": "VER",
       "team": "Red Bull Racing",
-      "basePace": 83.8027,
-      "noise": 0.6478,
+      "basePace": 83.9107,
+      "noise": 0.5069,
       "stateAtTakeover": {
         "position": 3,
         "gapAhead": 3.353,
@@ -558,20 +558,20 @@
         {
           "lap": 22,
           "to": "HARD",
-          "loss": 19.454
+          "loss": 20.347
         },
         {
           "lap": 50,
           "to": "MEDIUM",
-          "loss": 19.917
+          "loss": 19.279
         }
       ]
     },
     {
       "code": "ZHO",
       "team": "Kick Sauber",
-      "basePace": 85.067,
-      "noise": 0.8666,
+      "basePace": 85.4276,
+      "noise": 0.5009,
       "stateAtTakeover": {
         "position": 20,
         "gapAhead": 2.124,
@@ -586,7 +586,7 @@
         {
           "lap": 37,
           "to": "HARD",
-          "loss": 23.645
+          "loss": 22.015
         }
       ]
     }

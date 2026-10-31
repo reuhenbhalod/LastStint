@@ -99,6 +99,7 @@ describe('team orders', () => {
   });
 
   it('known answer: holding up a faster rival behind your teammate grades best', () => {
+    const SCENARIO_NOISE = 0.5; // s/lap, a typical race-pace spread
     // Controlled scenario: VER (user) leads, teammate PER 0.6s back, rival HAM 0.6s behind PER
     // and 0.3s/lap faster than VER. Without the order HAM gets through to VER eventually;
     // with PER holding him up, VER's chance of finishing ahead must rise.
@@ -112,10 +113,15 @@ describe('team orders', () => {
       'VER',
     );
     const ver = fast.drivers.find((d) => d.code === 'VER')?.basePace as number;
+    // Lap noise is pinned too, so the scenario doesn't move when the race's fitted noise does.
     const model: RaceModel = {
       ...fast,
       rival: 'HAM',
-      drivers: fast.drivers.map((d) => (d.code === 'HAM' ? { ...d, basePace: ver - 0.3 } : d)),
+      drivers: fast.drivers.map((d) => ({
+        ...d,
+        noise: SCENARIO_NOISE,
+        ...(d.code === 'HAM' ? { basePace: ver - 0.3 } : {}),
+      })),
     };
     const run = initRun(model, model.race.seed, { decisions: [] });
     const options: Array<{ id: string; decisions: Decision[] }> = [

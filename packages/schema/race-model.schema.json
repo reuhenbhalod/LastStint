@@ -140,6 +140,10 @@
                 "loss": {
                   "type": "number",
                   "description": "Measured time lost to this real stop (green/VSC stops; frozen like other real events). Absent: the track's figure for the flag."
+                },
+                "optional": {
+                  "type": "boolean",
+                  "description": "A fastest-lap stop (late, green, 2019-2024, made with a free gap behind): in live play the rival takes it only if the gap behind at the start of the out-lap exceeds its cost; replays keep it (schema v10)."
                 }
               }
             }

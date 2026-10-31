@@ -95,6 +95,12 @@ export interface PitStop {
   loss?: number;
   /** A stop the player or the rival added during the run: its loss is sampled (spec B1). */
   added?: boolean;
+  /**
+   * A real fastest-lap stop (late, green, 2019-2024, made with a free gap behind). In live play
+   * the rival takes it only if its gap to the car behind at the start of the out-lap exceeds
+   * the stop's cost; replays and every other car keep it.
+   */
+  optional?: boolean;
 }
 
 export interface CarState {

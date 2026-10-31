@@ -63,6 +63,50 @@ def candidate_decision_moments(laps: pd.DataFrame, events: list[dict]) -> list[i
     return sorted(moments)
 
 
+# Fastest-lap stops (2019-2024, when the fastest lap scored a point): a late green stop for
+# fresh tyres, made only because the gap behind was big enough to stop for free. In a what-if
+# where that gap is gone, a real team wouldn't stop, so the sims treat these as optional.
+FASTEST_LAP_POINT_YEARS = range(2019, 2025)
+FASTEST_LAP_WINDOW = 8  # laps from the flag
+
+
+def _gap_behind(laps: pd.DataFrame, driver: str, lap: int) -> float:
+    """Seconds to the car behind at the end of `lap` (inf if last or untimed: free)."""
+    field = laps[laps["LapNumber"] == lap].dropna(subset=["Position", "Time"])
+    field = field.sort_values("Position")
+    codes = list(field["Driver"].astype(str))
+    if driver not in codes:
+        return -1.0
+    i = codes.index(driver)
+    if i + 1 >= len(codes):
+        return float("inf")
+    times = list(field["Time"].astype(float))
+    return times[i + 1] - times[i]
+
+
+def fastest_lap_stops(
+    laps: pd.DataFrame, losses: dict[tuple[str, int], float], default_loss: float
+) -> set[tuple[str, int]]:
+    """(driver, out-lap) of real stops in the last FASTEST_LAP_WINDOW laps, on green in- and
+    out-laps, made with a gap behind above the stop's cost at the end of the lap before the
+    in-lap or of the in-lap itself (Hungary 2019 VER stopped only after HAM passed him on the
+    in-lap; an in-lap's own time includes pit entry, so either may show the free gap)."""
+    total = int(laps["LapNumber"].max())
+    status = {(str(r.Driver), int(r.LapNumber)): str(r.TrackStatus) for r in laps.itertuples()}
+    out: set[tuple[str, int]] = set()
+    for driver, stops in real_strategy(laps).items():
+        for stop in stops:
+            out_lap = stop["lap"]
+            if out_lap < total - FASTEST_LAP_WINDOW:
+                continue
+            if any(status.get((driver, n)) != "1" for n in (out_lap - 1, out_lap)):
+                continue
+            cost = losses.get((driver, out_lap), default_loss)
+            if any(_gap_behind(laps, driver, n) > cost for n in (out_lap - 2, out_lap - 1)):
+                out.add((driver, out_lap))
+    return out
+
+
 TAKEOVER_LEAD = 3  # laps of play before the first strategic event
 TAKEOVER_EARLIEST_EVENT = 10  # ignore events before this lap (opening-lap chaos, lap-1 stops)
 
