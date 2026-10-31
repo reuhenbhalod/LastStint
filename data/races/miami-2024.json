@@ -11,7 +11,7 @@
   "track": {
     "pitLoss": 19.44,
     "pitLossUnderSC": 10.692,
-    "pitLossUnderVSC": 11.814,
+    "pitLossUnderVSC": 10.976,
     "pitLossDeviations": [
       -1.776,
       -0.861,
@@ -97,7 +97,7 @@
         {
           "lap": 23,
           "to": "MEDIUM",
-          "loss": 9.746
+          "loss": 9.221
         }
       ]
     },
@@ -225,7 +225,7 @@
         {
           "lap": 23,
           "to": "MEDIUM",
-          "loss": 11.182
+          "loss": 10.443
         },
         {
           "lap": 29,
@@ -272,7 +272,7 @@
         {
           "lap": 23,
           "to": "HARD",
-          "loss": 12.447
+          "loss": 11.51
         }
       ]
     },
@@ -468,7 +468,7 @@
         {
           "lap": 24,
           "to": "HARD",
-          "loss": 18.943
+          "loss": 18.555
         }
       ]
     },

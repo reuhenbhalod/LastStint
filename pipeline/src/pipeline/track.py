@@ -79,6 +79,12 @@ VSC_PIT_LOSS_FACTOR = 0.69
 MIN_VSC_STOPS = 2
 VSC_REF_WINDOW = 30.0  # s: reference cars must be within this of the stopping car beforehand
 VSC_REF_CLEAR_LAPS = 2  # reference cars must not stop within this many laps of the stop
+# A VSC stretches every time gap (all cars slower) and racing shrinks it back, so the gap
+# change is read at the end of the first green lap after the out-lap, where the sim's frame
+# is (Abu Dhabi 2021 VER: 14.5s read on the VSC out-lap, 10.7s once green, matching the
+# real gap trace). Only when that lap is within VSC_SETTLE_MAX laps of the out-lap.
+VSC_SETTLE_MAX = 4
+GREEN_LAP_SHARE = 0.9  # a lap is green when this share of the field ran it all green
 
 
 def _has_sc(status_value: object) -> bool:
@@ -118,6 +124,10 @@ def stop_records(laps: pd.DataFrame) -> list[dict]:
         for d, n, t in zip(laps["Driver"], laps["LapNumber"], laps["Time"], strict=True)
         if not pd.isna(t) and not pd.isna(n)
     }
+    green_share = laps.groupby("LapNumber")["TrackStatus"].agg(
+        lambda st: (st.astype(str) == "1").mean()
+    )
+    green_laps = {int(n) for n, v in green_share.items() if v >= GREEN_LAP_SHARE}
     stop_laps: dict[str, set[int]] = {}
     for driver, in_lap, out_lap in stops:
         stop_laps.setdefault(driver, set()).update(
@@ -143,7 +153,8 @@ def stop_records(laps: pd.DataFrame) -> list[dict]:
         in_loss = float(in_lap["LapTime"]) - float(field_median[in_lap["LapNumber"]])
         in_loss -= float(pace_offset.get(driver, 0.0))
         if flag == "VSC":
-            loss = vsc_gap_change_loss(driver, int(out_lap["LapNumber"]), end_time, stop_laps)
+            n = int(out_lap["LapNumber"])
+            loss = vsc_gap_change_loss(driver, n, end_time, stop_laps, settle_lap(green_laps, n))
             if loss is None:
                 continue
         else:
@@ -162,25 +173,36 @@ def stop_records(laps: pd.DataFrame) -> list[dict]:
     return out
 
 
+def settle_lap(green_laps: set[int], out_lap: int) -> int:
+    """The lap at whose end a VSC stop's gap change is read: the first green lap after the
+    out-lap, or the out-lap itself if racing doesn't resume within VSC_SETTLE_MAX laps."""
+    for lap in range(out_lap + 1, out_lap + VSC_SETTLE_MAX + 1):
+        if lap in green_laps:
+            return lap
+    return out_lap
+
+
 def vsc_gap_change_loss(
     driver: str,
     out_lap: int,
     end_time: dict[tuple[str, int], float],
     stop_laps: dict[str, set[int]],
+    end_lap: int | None = None,
 ) -> float | None:
     """A VSC stop's cost: the median change in gap, from the end of the lap before the in-lap
-    to the end of the out-lap, to nearby cars that didn't stop around then (all running the
-    same delta). None without a usable reference car."""
+    to the end of `end_lap` (default the out-lap; see settle_lap), to nearby cars that didn't
+    stop around then. None without a usable reference car."""
     in_lap = out_lap - 1
-    a0, a1 = end_time.get((driver, in_lap - 1)), end_time.get((driver, out_lap))
+    end_lap = out_lap if end_lap is None else end_lap
+    a0, a1 = end_time.get((driver, in_lap - 1)), end_time.get((driver, end_lap))
     if a0 is None or a1 is None:
         return None
-    window = range(in_lap - VSC_REF_CLEAR_LAPS, out_lap + VSC_REF_CLEAR_LAPS + 1)
+    window = range(in_lap - VSC_REF_CLEAR_LAPS, end_lap + VSC_REF_CLEAR_LAPS + 1)
     changes = []
     for other, laps_stopped in {**{d: set() for d, _ in end_time}, **stop_laps}.items():
         if other == driver or any(lap in laps_stopped for lap in window):
             continue
-        b0, b1 = end_time.get((other, in_lap - 1)), end_time.get((other, out_lap))
+        b0, b1 = end_time.get((other, in_lap - 1)), end_time.get((other, end_lap))
         if b0 is None or b1 is None or abs(a0 - b0) > VSC_REF_WINDOW:
             continue
         changes.append((a1 - b1) - (a0 - b0))

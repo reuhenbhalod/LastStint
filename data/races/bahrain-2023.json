@@ -11,7 +11,7 @@
   "track": {
     "pitLoss": 25.007,
     "pitLossUnderSC": 13.754,
-    "pitLossUnderVSC": 14.336,
+    "pitLossUnderVSC": 10.623,
     "pitLossDeviations": [
       -3.452,
       -3.387,
@@ -113,7 +113,7 @@
         {
           "lap": 41,
           "to": "SOFT",
-          "loss": 14.285
+          "loss": 14.081
         }
       ]
     },
@@ -222,7 +222,7 @@
         {
           "lap": 41,
           "to": "SOFT",
-          "loss": 13.526
+          "loss": 9.934
         }
       ]
     },
@@ -281,7 +281,7 @@
         {
           "lap": 41,
           "to": "SOFT",
-          "loss": 17.034
+          "loss": 11.311
         }
       ]
     },
@@ -340,7 +340,7 @@
         {
           "lap": 41,
           "to": "SOFT",
-          "loss": 14.388
+          "loss": 9.586
         }
       ]
     },
@@ -545,7 +545,7 @@
         {
           "lap": 41,
           "to": "SOFT",
-          "loss": 13.56
+          "loss": 9.516
         }
       ]
     },
@@ -605,7 +605,7 @@
         {
           "lap": 41,
           "to": "SOFT",
-          "loss": 16.407
+          "loss": 15.47
         }
       ]
     },

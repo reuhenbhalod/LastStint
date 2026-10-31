@@ -548,3 +548,23 @@ The measured rule was built into both sims (parity held on all 32 races) and run
 - Saudi 22 5.99 → 4.27 s, Miami 24 4.00 → 2.84 s. Singapore 19 (held-out) is unchanged at 2.86 s, and no race got worse.
 - **What-if check: 8 of 11 agree.** Saudi 22's SC stop is now clear-cut (box 76.9% vs stay 3.9%). Spain 21 moves from a tie to a narrow agreement (box 98.6% vs stay 97.5%), because grading forks now price a stop just before a sampled SC as a green stop.
 - **Kept.**
+
+## Stage 10: VSC stops measured once racing resumes (Oct 30, 2026)
+
+**Found in the Abu Dhabi 21 beta review.** The sim's HAM–VER gap before the lap-53 SC averaged 16.0 s against the real 11.9 s. The SC stop costs 12.4 s, so in the sim HAM could box for free in almost every run (2% of runs had a gap below 12.4 s). That erased the real dilemma.
+
+**The bug.** A VSC stop's cost was the gap change to nearby non-stoppers, read at the end of the out-lap. When the out-lap is still under the VSC, every time gap is stretched by the slower speed and shrinks back once racing resumes. The sim keeps the stretched gap. VER's lap-36 stop read 14.5 s on lap 37. The real gap went from 5.7 s before the VSC to 16.4 s after it, so the stop really cost 10.7 s.
+
+**The fix** (`track.settle_lap`). The gap change is read at the end of the first green lap after the out-lap: the first lap at least 90% of the field ran all green, within 4 laps. Otherwise it is read on the out-lap as before. 15 race files changed. Abu Dhabi 21's VSC median moves from 14.9 to 13.9 s.
+
+**Result (held-out run once).**
+
+| | Tuning | Held-out | Lap-by-lap gap error (15 changed races) |
+|---|---|---|---|
+| Before | 8 / 2 / 6, 2.19 s | 5 / 0 / 10, 2.33 s | 3.80 s |
+| **Stage 10** | **8 / 2 / 6, 2.20 s** | **6 / 0 / 9, 2.26 s** | **3.62 s** |
+
+- **Lap-by-lap gap error** is a new check for mid-race fidelity, which the finish-gap G1 can't see. It is each car's mean simulated gap to the leader against the real one, on green laps, over 200 replays. It improved on 9 races, for example USA 18 5.62 → 4.86 s, Japan 23 3.93 → 3.25 s and Abu Dhabi 21 2.75 → 2.35 s. No race got worse by more than 0.03 s.
+- **Abu Dhabi 21 before the lap-53 SC:** mean gap 12.1 s (real 11.9 s); 57% of runs are now below the SC stop cost.
+- **What-if: 8 of 11 agree**, unchanged.
+- **Kept.** Test: `test_vsc_stop_measured_by_gap_change` (VER 10–11.5 s) and `test_settle_lap_is_first_green_lap_after_the_out_lap`.
