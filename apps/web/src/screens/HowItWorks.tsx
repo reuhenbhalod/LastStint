@@ -4,11 +4,11 @@ export function HowItWorks({ onClose }: { onClose: () => void }) {
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col gap-5 p-6 text-neutral-300">
       <header className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-neutral-100">How it works</h1>
+        <h1 className="disp text-[32px] leading-none text-[var(--ink)]">How it works</h1>
         <button
           type="button"
           onClick={onClose}
-          className="rounded-lg border border-neutral-700 px-3 py-1 text-sm"
+          className="rounded-lg border border-[var(--rule)] px-3 py-1 text-sm"
           aria-label="Close How it works"
         >
           Back

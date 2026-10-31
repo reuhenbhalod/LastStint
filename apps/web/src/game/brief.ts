@@ -4,18 +4,30 @@
 
 import type { DecisionMoment, RaceModel, RaceState } from '@boxthislap/sim';
 
+export interface TyreFact {
+  code: string;
+  compound: string;
+  age: number;
+}
+
 export interface Brief {
+  /** Short label for the moment: "Safety car", "Virtual safety car", "Restart"… */
+  kind: string;
   /** The radio line. */
   headline: string;
-  /** Short facts under it: gap, tyres, pit loss, laps left. */
-  facts: string[];
+  /** Seconds between us and the rival; > 0 when we're ahead. Null if either car is out. */
+  gap: number | null;
+  us: TyreFact | null;
+  rival: TyreFact | null;
+  /** What a stop costs right now, and under green, when the moment offers a stop. */
+  stop: { now: number; green: number } | null;
+  lapsLeft: number;
 }
 
 const TYRE: Record<string, string> = { SOFT: 'softs', MEDIUM: 'mediums', HARD: 'hards' };
 const tyres = (compound: string) => TYRE[compound] ?? compound.toLowerCase();
-const letter = (compound: string) => compound[0] ?? '?';
 
-/** The neutralization starting on the moment's lap, if any (known at the pause). */
+/** The neutralization covering the moment's lap, if any (known at the pause). */
 function flagAt(model: RaceModel, lap: number): 'SC' | 'VSC' | null {
   for (const e of model.events) {
     if ((e.type === 'SC' || e.type === 'VSC') && lap >= e.lap && lap < e.lap + (e.laps ?? 1)) {
@@ -27,57 +39,56 @@ function flagAt(model: RaceModel, lap: number): 'SC' | 'VSC' | null {
 
 export function briefFor(moment: DecisionMoment, race: RaceState, model: RaceModel): Brief {
   const me = race.cars[model.userSide];
-  const rival = race.cars[model.rival];
+  const them = race.cars[model.rival];
   const r = model.rival;
-  const lapsLeft = model.race.laps - race.lap;
-  const facts: string[] = [];
-  let lead = '';
-  if (me && rival && !me.retired && !rival.retired) {
-    const gap = rival.totalTime - me.totalTime; // > 0: we're ahead
-    lead =
-      gap >= 0 ? `We lead ${r} by ${gap.toFixed(1)}s` : `${r} leads us by ${(-gap).toFixed(1)}s`;
-    facts.push(lead);
-    facts.push(
-      `Us: ${letter(me.compound)} ${me.tyreAge} laps · ${r}: ${letter(rival.compound)} ${rival.tyreAge} laps`,
-    );
-  }
+  const live = me && them && !me.retired && !them.retired;
+  const gap = live ? them.totalTime - me.totalTime : null;
   const flag = flagAt(model, moment.lap);
   const { pitLoss, pitLossUnderSC, pitLossUnderVSC } = model.track;
   const stops = moment.options.some((o) => o.decisions.some((d) => d.kind === 'pit'));
-  if (stops) {
-    const loss = flag === 'SC' ? pitLossUnderSC : flag === 'VSC' ? pitLossUnderVSC : pitLoss;
-    facts.push(
-      flag
-        ? `A stop costs ~${loss.toFixed(0)}s now (~${pitLoss.toFixed(0)}s under green)`
-        : `A stop costs ~${loss.toFixed(0)}s`,
-    );
-  }
-  facts.push(`${lapsLeft} laps to go`);
+  const only = (key: 'battle' | 'pace') =>
+    moment.options.every((o) => o.decisions.every((d) => d.kind === 'mode' && d.key === key));
 
-  const battle = moment.options.every((o) =>
-    o.decisions.every((d) => d.kind === 'mode' && d.key === 'battle'),
-  );
-  const pace = moment.options.every((o) =>
-    o.decisions.every((d) => d.kind === 'mode' && d.key === 'pace'),
-  );
+  let kind: string;
   let headline: string;
-  if (battle) {
-    const ahead = me && rival ? rival.totalTime >= me.totalTime : true;
-    headline = ahead
-      ? `Restart is coming. ${r} is right behind us on ${rival ? tyres(rival.compound) : 'his tyres'}. How do we race him?`
-      : `Restart is coming. We're behind ${r}, on ${me ? tyres(me.compound) : 'our tyres'}. How do we race him?`;
-  } else if (pace) {
+  if (only('battle')) {
+    kind = 'Restart';
+    headline =
+      gap === null || gap >= 0
+        ? `Restart is coming and ${r} is right behind us. How do we race him?`
+        : `Restart is coming. ${r} is ahead and we’re on ${me ? tyres(me.compound) : 'our tyres'}. How do we race him?`;
+  } else if (only('pace')) {
+    kind = 'Tyres';
     headline = `Our ${me ? tyres(me.compound) : 'tyres'} are ${me?.tyreAge ?? '?'} laps old. Push to hold the gap, or look after them for the end?`;
   } else if (flag === 'SC') {
+    kind = 'Safety car';
     headline = 'Safety car! The pit lane is cheap. Box for fresh tyres, or keep track position?';
   } else if (flag === 'VSC') {
+    kind = 'Virtual safety car';
     headline = 'Virtual safety car. A cheap stop is on. Box, or stay out?';
   } else if (moment.trigger === 'rivalPit') {
+    kind = `${r} pitted`;
     headline = `${r} has boxed. Do we cover?`;
   } else if (moment.trigger === 'undercut') {
+    kind = 'Undercut window';
     headline = 'We’re in the undercut window. Box now, or stay out?';
   } else {
+    kind = 'Decision';
     headline = 'Your call.';
   }
-  return { headline, facts };
+
+  return {
+    kind,
+    headline,
+    gap,
+    us: me && !me.retired ? { code: model.userSide, compound: me.compound, age: me.tyreAge } : null,
+    rival: them && !them.retired ? { code: r, compound: them.compound, age: them.tyreAge } : null,
+    stop: stops
+      ? {
+          now: flag === 'SC' ? pitLossUnderSC : flag === 'VSC' ? pitLossUnderVSC : pitLoss,
+          green: pitLoss,
+        }
+      : null,
+    lapsLeft: model.race.laps - race.lap,
+  };
 }

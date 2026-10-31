@@ -13,7 +13,7 @@ import type { GameState, Speed } from '../state/machine.js';
 import { GameSession } from '../state/session.js';
 import { clearRun, loadRun, saveRun } from '../state/storage.js';
 
-const LAP_MS: Record<Speed, number> = { 1: 2600, 2: 1200 };
+export const LAP_MS: Record<Speed, number> = { 1: 2600, 2: 1200 };
 
 export interface Game {
   state: GameState | null;
