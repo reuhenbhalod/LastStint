@@ -110,11 +110,7 @@ describe('verifyRun', () => {
       if (r.state.lap === 50) decide(r, { lap: 51, kind: 'mode', key: 'pace', value: 'push' });
       if (r.state.lap === 54) decide(r, { lap: 55, kind: 'mode', key: 'pace', value: 'manage' });
     };
-    const played = play(
-      twoMoments,
-      { 'undercut-44': 'push', 'sc-stop': 'stay' },
-      between as never,
-    );
+    const played = play(twoMoments, { 'undercut-44': 'push', 'sc-stop': 'stay' }, between as never);
     expect(played.decisions.map((d) => d.at)).toEqual(
       [...played.decisions.map((d) => d.at)].sort((a, b) => (a as number) - (b as number)),
     );
