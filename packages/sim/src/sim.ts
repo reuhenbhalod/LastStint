@@ -259,6 +259,12 @@ export function validateDecisions(model: RaceModel, decisions: Decision[]): void
         `decision lap ${d.lap} outside ${model.race.takeoverLap + 1}-${model.race.laps}`,
       );
     }
+    if (
+      d.at !== undefined &&
+      (!Number.isInteger(d.at) || d.at < model.race.takeoverLap || d.at >= d.lap)
+    ) {
+      throw new Error(`decision for lap ${d.lap} made at lap ${d.at}`);
+    }
     if (d.kind === 'pit') {
       if (!model.compounds[d.compound]) throw new Error(`unknown compound ${d.compound}`);
       if (d.lap >= model.race.laps) throw new Error('no stop on the final lap');
@@ -538,13 +544,15 @@ function withRetired(run: Run, order: string[]): string[] {
 
 /**
  * Log a player call during the race (the BOX button, a headset change, a radio answer). It
- * must be for a lap not yet run. Throws on an invalid call.
+ * must be for a lap not yet run. Throws on an invalid call. The logged call is stamped with
+ * `at`, the last completed lap.
  */
 export function decide(run: Run, decision: Decision): void {
   if (!run.live) throw new Error('this run has no player-controlled car');
   if (decision.lap <= run.state.lap) throw new Error(`lap ${decision.lap} has already run`);
-  validateDecisions(run.model, [decision]);
-  run.decisions.push(decision);
+  const stamped = { ...decision, at: run.state.lap };
+  validateDecisions(run.model, [stamped]);
+  run.decisions.push(stamped);
 }
 
 /**

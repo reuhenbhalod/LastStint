@@ -25,9 +25,11 @@ RACES: dict[str, dict] = {
         "name": "Abu Dhabi 2021: Hamilton vs Verstappen",
         "era": "2014-2025",
         "takeover_lap": 34,
-        # Beta seed (Oct 30 2026): its run reaches the lap-53 SC with HAM 11.9s ahead, as in
-        # the real race, which is less than a SC stop costs, so boxing there isn't free.
-        "seed": 1205,
+        # Beta seed (Oct 31 2026): its run reaches the lap-53 SC with HAM 11.9s ahead, as in
+        # the real race, which is less than a SC stop costs, so boxing there isn't free. Of
+        # the seeds that do, its last-lap luck follows the odds: covering at the lap-36 VSC
+        # then staying out wins, Mercedes' real calls lose (packages/sim scripts/combos.ts).
+        "seed": 64,
         "user_side": "HAM",
         "rival": "VER",
         # P7 and back were decided by race control (only the lapped cars between HAM and

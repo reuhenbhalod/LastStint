@@ -3,8 +3,11 @@
   // The web app deploys separately to Cloudflare Pages (apps/web), so this Worker
   // serves no static assets.
   "name": "pitwall",
+  // Reuhen's Cloudflare account, which hosts the Worker and pitwall-db (CI sets the same ID
+  // from its CLOUDFLARE_ACCOUNT_ID secret).
+  "account_id": "20a233209db4b2680328a2c547039f17",
   "main": "src/index.ts",
-  "compatibility_date": "2026-10-24",
+  "compatibility_date": "2026-10-13",
 
   // D1 database. Create it once with:
   //   npx wrangler d1 create pitwall-db
@@ -23,6 +26,14 @@
   // Production web origin allowed to call /api/* (CORS). Fill in once the Pages project
   // exists, e.g. "https://pitwall-web.pages.dev". Leave empty for local dev (Vite proxy).
   "vars": { "WEB_ORIGIN": "" },
+
+  // Run submissions per IP (Phase 4 spec C1). namespace_id is any account-unique number.
+  "ratelimits": [
+    { "name": "RUNS_LIMITER", "namespace_id": "4101", "simple": { "limit": 10, "period": 60 } }
+  ],
+
+  // Queue alerts (Phase 4 spec C3): optionally set a Discord or Slack webhook with
+  //   npx wrangler secret put ALERT_WEBHOOK
 
   "observability": { "enabled": true }
 }

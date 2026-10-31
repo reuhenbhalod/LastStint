@@ -2,12 +2,12 @@
 
 The race simulator, grader and scoring for the game. It is pure TypeScript with no browser or Node dependencies, so the same code runs in the page, in Web Workers and in the Cloudflare Worker that verifies scores.
 
-- **Version:** 0.1.0 (semver, see [Versioning](#versioning)).
+- **Version:** 0.2.0 (semver, see [Versioning](#versioning)).
 - **Race files:** the race-model JSON at schema v9, in `data/races/<race-id>.json`.
 - **Working example:** [`packages/sim/examples/daily-race.ts`](../packages/sim/examples/daily-race.ts) plays a full daily race. CI runs it (`tests/example.test.ts`), so it always matches this document.
 
 ```ts
-import { initRun, stepLap, decide, gradeMoment, classify, scoreRun } from '@boxthislap/sim';
+import { initRun, stepLap, decide, answerMoment, gradeMoment, classify, scoreRun } from '@boxthislap/sim';
 ```
 
 ## How a daily race runs
@@ -20,11 +20,13 @@ import { initRun, stepLap, decide, gradeMoment, classify, scoreRun } from '@boxt
    - It returns `run.state`: the order, each car's tyre/compound/total time, and the flag.
    - New entries in `run.notes` are things to narrate: the rival covering or staying out, a team-order swap, a driver error.
 3. **Calls between moments.** The BOX button and the headset panel call `decide(run, call)` for a lap that hasn't run yet (see [Calls](#calls)).
-4. **Decision moments.** When `run.state.lap + 1` equals a moment's `lap` (from `model.decisionMoments`), pause.
-   - Grade the moment's options while the player reads them (in Web Workers, see [Grading](#grading)).
-   - Apply the chosen option's calls with `decide()`, then resume ticking.
+4. **Decision moments.** When `run.state.lap + 1` equals a moment's `lap` (from `model.decisionMoments`), pause **straight after that lap is drawn**.
+   - Start grading the moment's options before taking any other call (in Web Workers, see [Grading](#grading)). The server rebuilds the grade from the calls made before the pause, so a call slipped in first would make the two disagree.
+   - While paused, once the grade is ready, keep `claimGrade(run, moment, grade)` for the submission (before answering).
+   - While paused, the only call is the answer: `answerMoment(run, moment, optionId)`. It logs the radio answer and the option's calls. Then resume ticking.
+   - Don't let the player queue a call for a moment's lap ahead of time. The server rejects any call on a moment's lap that isn't part of the chosen option.
 5. **Flag.** `isFinished(run)` becomes true. `classify(run)` gives the result; `scoreRun(...)` gives the score.
-6. **Submit.** Send `run.decisions` (the full call log) to `POST /api/runs`. The server rebuilds the identical race from `(model, seed, decisions)` and recomputes everything.
+6. **Submit.** Send `run.decisions` (the full call log) and the kept grades to `POST /api/runs`. The server runs `verifyRun(model, seed, decisions, 300, grades)`: it rebuilds the identical race, checks the claimed grades' shape, and scores the run from them. A nightly job re-grades each run in full (see [api.md](api.md)). Show the server's numbers.
 
 The example implements exactly this loop.
 
@@ -34,13 +36,14 @@ All calls go through `decide(run, call)`.
 
 - It throws if the lap has already run or the call is invalid. `validateDecisions(model, calls)` checks a list up front.
 - A call's `lap` is a lap that hasn't run yet: `run.state.lap + 1` or later.
+- `decide()` stamps the logged call with `at`, the last completed lap. Moment grades count calls already queued for later laps, so the server needs `at` to know which calls existed at each pause. Send the log as `decide()` built it.
 
 | Call | Shape | Effect |
 |---|---|---|
 | Pit | `{ lap, kind: 'pit', compound }` | Box at the end of `lap`. The stop is charged on `lap + 1`, the out-lap. `compound` is a key of `model.compounds`. |
 | Headset mode | `{ lap, kind: 'mode', key, value }` | Standing mode from `lap` on (green laps only). `key`: `pace` (`push` / `standard` / `manage`), `fuel` (`normal` / `liftAndCoast`), `battle` (`attack` / `hold` / `defend`). |
 | Team order | `{ lap, kind: 'teamOrder', order }` | `letTeammatePast` or `teammateLetsYouPast`: the yielding car lifts if it starts a green lap directly ahead within 1s (open for 3 laps). `holdUp` / `release`: the teammate defends against the rival while directly ahead of it. Requires a teammate (`teammateOf(model)`). |
-| Radio answer | `{ lap, kind: 'radio', momentId, optionId }` | Logged only. Radio moments map their options to the calls above. |
+| Radio answer | `{ lap, kind: 'radio', momentId, optionId }` | Records the option chosen at a moment; `answerMoment()` logs it with the option's calls. Every moment needs exactly one. |
 
 Mode and team-order effects are calibrated estimates in `packages/sim/src/headset.json`, tuned in playtests.
 
@@ -130,12 +133,24 @@ Measured on an M-series laptop, for 4 options × 300 samples × 25 laps: 1 worke
 - `meanProbability`: the first tie-break; the finishing result breaks any remaining tie.
 - The calls' bands are the share card's coloured squares.
 
-## Determinism and server verification
+## Server verification
+
+`verifyRun(model, seed, decisions, samples?, claimed?)` → `VerifiedRun`. Without `claimed` every moment is re-graded in full (the nightly job); with the game's `ClaimedGrade[]` (from `claimGrade`), they are checked for shape and used instead (the Worker, within the free plan's 10 ms). Returns `{ result, score, moments, finishPosition, disqualified }`. Each entry in `moments` is `{ momentId, lap, chosen, grade, real, matchedReal }`, and `real` grades the real team's call against the moment's best option.
+
+It throws a `VerifyError` with a `code`:
+
+| Code | Meaning |
+|---|---|
+| `invalid-calls` | Not an array, more than `MAX_DECISIONS` calls, a call without `at` or out of order, or a call `validateDecisions` rejects |
+| `missing-answer` | A moment has no radio answer, or more than one |
+| `bad-answer` | An answer on the wrong lap or at the wrong time, an unknown option or moment, or calls on the moment's lap that aren't exactly the chosen option's |
+
+## Determinism
 
 A run is fully defined by `(model, seed, decisions)`. Same inputs, same race, same grades, on any machine.
 
 - **Randomness.** Each car draws from its own seeded streams, so one car's calls never shift another car's luck.
-- **Server.** The Worker re-runs `initRun(model, seed, { decisions })` to the flag, re-grades each moment with `gradeMoment`, and calls `scoreRun`. Never trust a client score.
+- **Server.** The Worker calls `verifyRun` (above). Never trust a client score.
 - **Without `decisions`.** `initRun(model, seed)` replays every car's real strategy. This is how the model is validated against the Python reference (`tests/parity.test.ts`).
 
 ## Reference
@@ -147,10 +162,11 @@ A run is fully defined by `(model, seed, decisions)`. Same inputs, same race, sa
 | `gradeMoment`, `realOption`, `bandFor`, `BAND_EDGES`, `GRADE_SAMPLES` | Grading |
 | `gradeJob`, `runGradeJob`, `mergeGradeJobs`, `runFromJob`, `countHits`, `gradeFromHits` | Grading in Web Workers |
 | `scoreRun`, `BAND_POINTS` | Scoring |
+| `answerMoment`, `claimGrade`, `verifyRun`, `VerifyError`, `MAX_DECISIONS` | Answering moments; the grades sent with a run; server verification |
 | `candidateMoments`, `proposeMoments`, `pauseAt`, `verdictFor`, `QUALITY` | Moment finding (tooling) |
 | `forkRun`, `playOption`, `planRemainingStop`, `sampleSeed`, `reachedTarget` | Lower-level grader pieces |
 | `cleanLap`, `passProbability`, `mulberry32`, `deriveSeed` | Model internals, exposed for tests and tools |
-| Types | `RaceModel`, `RaceState`, `CarState`, `Decision`, `TeamOrder`, `Modes`, `RaceResult`, `RaceNote`, `DecisionMoment`, `MomentOption`, `Target`, `MomentGrade`, `OptionGrade`, `RunScore`, `GradeJob`, `GradeJobResult`, `Run`, `RunOptions`, `ForkOptions` |
+| Types | `RaceModel`, `RaceState`, `CarState`, `Decision`, `TeamOrder`, `Modes`, `RaceResult`, `RaceNote`, `DecisionMoment`, `MomentOption`, `Target`, `MomentGrade`, `OptionGrade`, `RunScore`, `VerifiedRun`, `VerifiedMoment`, `RealCall`, `GradeJob`, `GradeJobResult`, `Run`, `RunOptions`, `ForkOptions` |
 
 ## Versioning
 
@@ -159,3 +175,4 @@ A run is fully defined by `(model, seed, decisions)`. Same inputs, same race, sa
 | Version | Schema | Notes |
 |---|---|---|
 | 0.1.0 | v9 | First documented API. |
+| 0.2.0 | v9 | `decide()` stamps `at`; moments are answered with `answerMoment()` (radio answer required); `verifyRun` for the server. |

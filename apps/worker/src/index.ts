@@ -1,17 +1,33 @@
-// Cloudflare Worker API (Implementation Plan 4.1).
-// Serves the daily, verifies every score by replaying the run with the shared TS sim, and
-// computes ranks. Endpoints are stubs in Phase 0; score verification lands in Phase 4.
+// Cloudflare Worker API (Implementation Plan 4.1, docs/phase-4-backend-spec.md).
+// Serves the daily, verifies every run by replaying it with the shared TS sim, and computes
+// ranks, stats and the leaderboard. docs/api.md documents the endpoints for the web app.
 
-import { Hono } from 'hono';
+import { type Context, Hono } from 'hono';
 import { cors } from 'hono/cors';
+import type { ContentfulStatusCode } from 'hono/utils/http-status';
+import { isDate, isPlayable, playableDates } from './dates.js';
+import { LEADERBOARD_SIZE, dailyStats, getDaily, getRun, leaderboard } from './db.js';
+import { displayName } from './names.js';
+import { checkQueue, queueDays } from './ops.js';
+import { getRace } from './races.js';
+import { ApiError, dailyWithModel, isAnonId, submitRun, withStanding } from './runs.js';
 
 export interface Env {
   DB: D1Database;
+  /** Run submissions per IP (Phase 4 spec C1). */
+  RUNS_LIMITER?: RateLimit;
   // Production web origin allowed to call the API (e.g. https://pitwall-web.pages.dev).
-  // Set via wrangler.jsonc `vars` / the Pages project. Empty in local dev (Vite proxy
-  // makes requests same-origin, so no CORS is needed there).
+  // Set via wrangler.jsonc `vars`. Empty in local dev (Vite proxy makes requests
+  // same-origin, so no CORS is needed there).
   WEB_ORIGIN?: string;
+  /** Seconds stats and the leaderboard are cached for (default 60; tests use 0). */
+  CACHE_SECONDS?: string;
+  /** Optional Discord or Slack webhook for queue alerts (a secret). */
+  ALERT_WEBHOOK?: string;
 }
+
+/** Largest accepted POST /api/runs body. */
+const MAX_BODY_BYTES = 64 * 1024;
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -34,22 +50,156 @@ app.use(
   }),
 );
 
-app.get('/api/health', (c) => c.json({ ok: true }));
+app.onError((e, c) => {
+  if (e instanceof ApiError) {
+    return c.json(
+      { error: e.code, ...(e.detail ? { detail: e.detail } : {}) },
+      e.status as ContentfulStatusCode,
+    );
+  }
+  console.error(e);
+  return c.json({ error: 'internal' }, 500);
+});
 
-// GET /api/daily — today's race (date boundary decided in Phase 4).
-app.get('/api/daily', (c) => c.json({ error: 'not implemented: Phase 4' }, 501));
+/** Serve a GET from the Cache API for CACHE_SECONDS (stats and leaderboard). */
+async function cached(
+  c: Context<{ Bindings: Env }>,
+  build: () => Promise<Response>,
+): Promise<Response> {
+  const seconds = Number(c.env.CACHE_SECONDS ?? 60);
+  if (!(seconds > 0)) return build();
+  const cache = caches.default;
+  const hit = await cache.match(c.req.raw);
+  if (hit) return hit;
+  const res = await build();
+  if (res.ok) {
+    res.headers.set('Cache-Control', `public, max-age=${seconds}`);
+    c.executionCtx.waitUntil(cache.put(c.req.raw, res.clone()));
+  }
+  return res;
+}
 
-// POST /api/runs — submit a finished run (decisions only; score computed server-side).
-app.post('/api/runs', (c) => c.json({ error: 'not implemented: Phase 4' }, 501));
+app.get('/api/health', async (c) =>
+  c.json({ ok: true, queueDays: await queueDays(c.env.DB, Date.now()) }),
+);
 
-// GET /api/daily/:date/leaderboard — top scores for a date.
-app.get('/api/daily/:date/leaderboard', (c) => c.json({ error: 'not implemented: Phase 4' }, 501));
+// GET /api/daily?date=YYYY-MM-DD: the player's local date (spec B1).
+app.get('/api/daily', async (c) => {
+  const date = c.req.query('date');
+  if (!isDate(date)) throw new ApiError(400, 'bad-request', 'date must be YYYY-MM-DD');
+  if (!isPlayable(date, Date.now()))
+    throw new ApiError(404, 'no-daily', `${date} is not playable now`);
+  const { daily, race } = await dailyWithModel(c.env.DB, date);
+  const origin = new URL(c.req.url).origin;
+  return c.json({
+    date: daily.date,
+    number: daily.number,
+    raceId: daily.race_id,
+    seed: daily.seed,
+    side: daily.side,
+    modelUrl: `${origin}/api/races/${daily.race_id}?h=${race.hash}`,
+    modelHash: race.hash,
+  });
+});
+
+// GET /api/races/:id: a race model. Immutable when requested by its hash (modelUrl).
+app.get('/api/races/:id', async (c) => {
+  const race = await getRace(c.req.param('id'));
+  if (!race) throw new ApiError(404, 'no-race');
+  const pinned = c.req.query('h') === race.hash;
+  return c.body(JSON.stringify(race.model), 200, {
+    'Content-Type': 'application/json',
+    'Cache-Control': pinned ? 'public, max-age=31536000, immutable' : 'public, max-age=300',
+    ETag: `"${race.hash}"`,
+  });
+});
+
+// POST /api/runs: submit a finished run (calls only; the score is computed here).
+app.post('/api/runs', async (c) => {
+  const ip = c.req.header('cf-connecting-ip') ?? 'unknown';
+  if (c.env.RUNS_LIMITER) {
+    const { success } = await c.env.RUNS_LIMITER.limit({ key: ip });
+    if (!success) throw new ApiError(429, 'rate-limited');
+  }
+  const text = await c.req.text();
+  if (text.length > MAX_BODY_BYTES) throw new ApiError(400, 'bad-request', 'body too large');
+  let body: unknown;
+  try {
+    body = JSON.parse(text);
+  } catch {
+    throw new ApiError(400, 'bad-request', 'body must be JSON');
+  }
+  // CPU time per request shows in Workers observability (the clock doesn't move during compute).
+  const res = await submitRun(c.env.DB, body, Date.now());
+  console.log(`run verified: ${res.date} score ${res.score}`);
+  return c.json(res, 201);
+});
+
+// GET /api/runs/:date/:anonId: a player's verified run again (after a refresh).
+app.get('/api/runs/:date/:anonId', async (c) => {
+  const { date, anonId } = c.req.param();
+  if (!isDate(date) || !isAnonId(anonId)) throw new ApiError(400, 'bad-request');
+  const row = await getRun(c.env.DB, date, anonId);
+  if (!row) throw new ApiError(404, 'no-run');
+  return c.json(await withStanding(c.env.DB, row));
+});
+
+// GET /api/daily/:date/stats: how everyone played the day.
+app.get('/api/daily/:date/stats', (c) =>
+  cached(c, async () => {
+    const date = c.req.param('date');
+    if (!isDate(date)) throw new ApiError(400, 'bad-request');
+    // Past and current days only: a future day's stats would give its race away.
+    if (date > playableDates(Date.now()).last) throw new ApiError(404, 'no-daily');
+    const daily = await getDaily(c.env.DB, date);
+    if (!daily) throw new ApiError(404, 'no-daily');
+    const race = await getRace(daily.race_id);
+    const { scores, calls } = await dailyStats(c.env.DB, date);
+    const runs = scores.reduce((n, s) => n + s.runs, 0);
+    const share = (n: number) => (runs ? n / runs : 0);
+    return c.json({
+      date,
+      runs,
+      meanScore: runs ? scores.reduce((t, s) => t + s.score * s.runs, 0) / runs : 0,
+      scores,
+      moments: (race?.model.decisionMoments ?? []).map((m) => {
+        const options = m.options.map((o) => ({
+          id: o.id,
+          label: o.label,
+          share: share(calls.find((r) => r.moment_id === m.id && r.option_id === o.id)?.runs ?? 0),
+        }));
+        return {
+          id: m.id,
+          lap: m.lap,
+          realOptionId: m.realOptionId,
+          matchedReal: options.find((o) => o.id === m.realOptionId)?.share ?? 0,
+          options,
+        };
+      }),
+    });
+  }),
+);
+
+// GET /api/daily/:date/leaderboard: the top 100, with generated names (spec B3).
+app.get('/api/daily/:date/leaderboard', (c) =>
+  cached(c, async () => {
+    const date = c.req.param('date');
+    if (!isDate(date)) throw new ApiError(400, 'bad-request');
+    const rows = await leaderboard(c.env.DB, date);
+    return c.json({
+      date,
+      size: LEADERBOARD_SIZE,
+      entries: rows.map((r, i) => ({ rank: i + 1, name: displayName(r.anon_id), score: r.score })),
+    });
+  }),
+);
+
+app.notFound((c) => c.json({ error: 'not-found' }, 404));
 
 export default {
   fetch: app.fetch,
-  // Daily queue-check cron (Implementation Plan 4.6): verify the next daily exists and
-  // alert if the queue runs low. Wired up in Phase 4.
-  async scheduled(_event: ScheduledController, _env: Env, _ctx: ExecutionContext): Promise<void> {
-    // not implemented: Phase 4
+  // Daily queue check (Implementation Plan 4.6): alert when the queue runs low.
+  async scheduled(_event: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
+    ctx.waitUntil(checkQueue(env.DB, Date.now(), env.ALERT_WEBHOOK).then(() => undefined));
   },
 } satisfies ExportedHandler<Env>;
