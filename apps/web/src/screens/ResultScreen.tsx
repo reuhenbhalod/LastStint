@@ -273,8 +273,8 @@ export function ResultScreen({ state, game }: { state: GameState; game: Game }) 
               return (
                 <li key={m.id}>
                   Lap {moment?.lap}:{' '}
-                  {top ? `${pct(top.share)} chose “${labelOf(moment, top.id)}”` : ''} ·{' '}
-                  {pct(m.matchedReal)} matched the real team
+                  {top ? `${pct(top.share)} chose “${labelOf(moment, top.id)}”` : ''}
+                  {moment?.realOptionId ? ` · ${pct(m.matchedReal)} matched the real team` : ''}
                 </li>
               );
             })}
