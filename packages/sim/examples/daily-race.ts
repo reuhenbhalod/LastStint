@@ -2,14 +2,17 @@
 // It is a test too (tests/example.test.ts), so CI keeps it working.
 
 import {
+  type ClaimedGrade,
+  type Decision,
   type DecisionMoment,
   type MomentGrade,
   type RaceModel,
   type RaceResult,
   type Run,
   type RunScore,
+  answerMoment,
+  claimGrade,
   classify,
-  decide,
   gradeMoment,
   initRun,
   isFinished,
@@ -28,6 +31,10 @@ export interface DailyRaceResult {
   result: RaceResult;
   score: RunScore;
   calls: PlayedCall[];
+  /** The full call log (run.decisions), as sent to POST /api/runs. */
+  decisions: Decision[];
+  /** The game's grade for each moment, sent with the calls (POST /api/runs `grades`). */
+  grades: ClaimedGrade[];
 }
 
 /**
@@ -43,6 +50,8 @@ export function playDailyRace(
   choose: (moment: DecisionMoment, run: Run) => string,
   options: {
     samples?: number;
+    /** Calls between moments (the BOX button, headset), made after each lap is drawn. */
+    between?: (run: Run) => void;
     onLap?: (run: Run) => void;
     onRuleWarning?: (run: Run) => void;
   } = {},
@@ -51,6 +60,7 @@ export function playDailyRace(
   const run = initRun(model, seed, { decisions: [] });
   const moments = [...model.decisionMoments].sort((a, b) => a.lap - b.lap);
   const calls: PlayedCall[] = [];
+  const grades: ClaimedGrade[] = [];
 
   while (!isFinished(run)) {
     const moment = moments.find((m) => m.lap === run.state.lap + 1);
@@ -58,14 +68,19 @@ export function playDailyRace(
       // Pause. In the browser this grade runs in Web Workers (gradeJob / runGradeJob /
       // mergeGradeJobs) while the player reads the options.
       const grade = gradeMoment(run, moment.options, moment.target, options.samples);
+      // What the server scores from (it re-grades every run overnight); before the answer.
+      grades.push(claimGrade(run, moment, grade, options.samples));
       const chosen = choose(moment, run);
-      const option = moment.options.find((o) => o.id === chosen);
-      if (!option) throw new Error(`unknown option ${chosen}`);
-      for (const call of option.decisions) decide(run, call);
+      // Logs the radio answer and the option's calls: the server checks both (verifyRun).
+      answerMoment(run, moment, chosen);
       calls.push({ moment, grade, chosen });
     }
     // Between moments the BOX button and headset modes call decide() for a future lap.
     stepLap(run);
+    // A moment pauses the game as soon as the lap before it is drawn: it is graded before any
+    // other call, so the server can rebuild that grade (calls made at the pause come after).
+    const pausing = moments.some((m) => m.lap === run.state.lap + 1);
+    if (!isFinished(run) && !pausing) options.between?.(run);
     options.onLap?.(run);
     // Two-compound rule: warn the player in the last laps if their car still needs a stop
     // (classify() disqualifies a car that reaches the flag without one).
@@ -79,5 +94,7 @@ export function playDailyRace(
     result: classify(run),
     score: scoreRun(calls.map(({ grade, chosen }) => ({ grade, chosen }))),
     calls,
+    decisions: run.decisions,
+    grades,
   };
 }

@@ -21,6 +21,10 @@ DIRTY_AIR_RANGE = 1.0  # within this gap (s) a car is in dirty air
 PASS_WINDOW = 2.0  # a follower within this gap (s) gets one pass roll (matches the fit)
 FOLLOW_GAP = 0.3  # a follower that fails to pass is held this far (s) behind
 PASS_MARGIN = 0.05  # a completed pass puts the follower this far (s) ahead
+# A car that has just been passed gets no pass roll against the car that passed it for this
+# many laps (real races: ~4% of passes are undone within 3 laps; without it the sim undid
+# 25-60%). 0 = off. Model v3 spec stage 7 (E1). Same rule in packages/sim (parity).
+REPASS_COOLDOWN = 3
 BUNCH_GAP = 0.5  # SC train spacing per car (measured on the final SC lap, 2021 races)
 # SC bunching (measured on the tuning races' SCs, 259 gaps): gaps are kept on the deployment
 # lap (everyone runs the same delta), each middle SC lap keeps SC_GAP_KEEP of a gap's excess
@@ -81,7 +85,7 @@ def pass_probability(overtake: dict, advantage: float, gap: float) -> float:
     return 1.0 / (1.0 + math.exp(-z))
 
 
-def _resolve_order(order, cars, clean, pass_rngs, overtake, prev_time, pitted):
+def _resolve_order(order, cars, clean, pass_rngs, overtake, prev_time, pitted, recent=None, lap=0):
     """Set green-flag race order after a lap.
 
     Walking the start-of-lap order front to back, each follower that started the lap within
@@ -99,7 +103,14 @@ def _resolve_order(order, cars, clean, pass_rngs, overtake, prev_time, pitted):
         if not 0 <= gap < PASS_WINDOW:
             continue
         advantage = clean[a.code] - clean[b.code]  # >0: b is faster on model pace
-        if pass_rngs[b.code].next() < pass_probability(overtake, advantage, gap):
+        cooling = (
+            recent is not None
+            and REPASS_COOLDOWN > 0
+            and lap - recent.get((b.code, a.code), -(10**6)) <= REPASS_COOLDOWN
+        )
+        if not cooling and pass_rngs[b.code].next() < pass_probability(overtake, advantage, gap):
+            if recent is not None:
+                recent[(a.code, b.code)] = lap  # a was passed by b on this lap
             if b.total_time >= a.total_time:
                 b.total_time = a.total_time - PASS_MARGIN
         elif b.total_time < a.total_time + FOLLOW_GAP:
@@ -170,6 +181,8 @@ def simulate(model: dict, seed: int, strategies: dict | None = None) -> dict:
     noise_rngs = {c: Mulberry32(derive_seed(seed, stream[c])) for c in cars}
     pass_rngs = {c: Mulberry32(derive_seed(seed, OVERTAKE_STREAM + stream[c])) for c in cars}
 
+    recent: dict[tuple[str, str], int] = {}
+
     def active_codes() -> list[str]:
         return [c for c in order if not cars[c].retired]
 
@@ -231,7 +244,7 @@ def simulate(model: dict, seed: int, strategies: dict | None = None) -> dict:
                     excess = max(0.0, car.total_time - ahead.total_time - BUNCH_GAP)
                     car.total_time = ahead.total_time + BUNCH_GAP + keep * excess
         else:
-            _resolve_order(order, cars, clean, pass_rngs, overtake, prev_time, pitted)
+            _resolve_order(order, cars, clean, pass_rngs, overtake, prev_time, pitted, recent, lap)
 
     return _classify(order, cars)
 

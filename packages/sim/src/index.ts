@@ -64,3 +64,11 @@ export type {
   ProposedMoment,
   Verdict,
 } from './moments.js';
+export { MAX_DECISIONS, VerifyError, answerMoment, claimGrade, verifyRun } from './verify.js';
+export type {
+  ClaimedGrade,
+  RealCall,
+  VerifiedMoment,
+  VerifiedRun,
+  VerifyErrorCode,
+} from './verify.js';

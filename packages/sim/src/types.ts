@@ -95,6 +95,12 @@ export interface PitStop {
   loss?: number;
   /** A stop the player or the rival added during the run: its loss is sampled (spec B1). */
   added?: boolean;
+  /**
+   * A real fastest-lap stop (late, green, 2019-2024, made with a free gap behind). In live play
+   * the rival takes it only if its gap to the car behind at the start of the out-lap exceeds
+   * the stop's cost; replays and every other car keep it.
+   */
+  optional?: boolean;
 }
 
 export interface CarState {
@@ -132,11 +138,18 @@ export interface CarState {
  */
 export type TeamOrder = 'letTeammatePast' | 'teammateLetsYouPast' | 'holdUp' | 'release';
 
-export type Decision =
+export type Decision = (
   | { lap: number; kind: 'pit'; compound: Compound }
   | { lap: number; kind: 'mode'; key: keyof Modes; value: string }
   | { lap: number; kind: 'teamOrder'; order: TeamOrder }
-  | { lap: number; kind: 'radio'; momentId: string; optionId: string };
+  | { lap: number; kind: 'radio'; momentId: string; optionId: string }
+) & {
+  /**
+   * The last completed lap when the call was made; decide() stamps it. The server needs it to
+   * rebuild a moment's grade, which counts the calls already queued for later laps.
+   */
+  at?: number;
+};
 
 /** Something the sim did on its own that the game may narrate (e.g. the rival covering). */
 export interface RaceNote {

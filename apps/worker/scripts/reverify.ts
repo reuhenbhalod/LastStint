@@ -1,0 +1,81 @@
+// Nightly re-grading (beta spec B6): every run the Worker scored from the game's claimed grades
+// is re-graded here with full playouts. A run that matches is marked verified; one that doesn't
+// (its claimed grades were edited) gets its true score and is marked corrected.
+//
+//   pnpm --filter @boxthislap/worker reverify --remote            (what CI runs nightly)
+//   pnpm --filter @boxthislap/worker reverify --local --dry-run
+//
+// A run whose daily's race file changed since it was scheduled can't be re-graded and is
+// reported and left unverified.
+
+import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import type { RaceModel } from '@boxthislap/sim';
+import { modelHash } from '../src/hash.js';
+import { type UnverifiedRun, recheckRun, recheckSql } from '../src/reverify.js';
+import { type Target, query, repo, wrangler } from './d1.js';
+
+const args = process.argv.slice(2);
+const target: Target | null = args.includes('--remote')
+  ? 'remote'
+  : args.includes('--local')
+    ? 'local'
+    : null;
+if (!target || (args.includes('--remote') && args.includes('--local'))) {
+  console.error('reverify: pass --local or --remote');
+  process.exit(1);
+}
+const dryRun = args.includes('--dry-run');
+
+const runs = query<UnverifiedRun & { model_hash: string }>(
+  target,
+  `SELECT r.id, r.date, d.number, d.race_id, d.seed, d.model_hash, r.decisions, r.result
+   FROM runs r JOIN daily d ON d.date = r.date WHERE r.verified = 0 ORDER BY r.created_at`,
+);
+
+const models = new Map<string, RaceModel | null>();
+async function modelFor(raceId: string, hash: string): Promise<RaceModel | null> {
+  const key = `${raceId}:${hash}`;
+  if (!models.has(key)) {
+    const file = join(repo, 'data', 'races', `${raceId}.json`);
+    const model = JSON.parse(readFileSync(file, 'utf8')) as RaceModel;
+    models.set(key, (await modelHash(model)) === hash ? model : null);
+  }
+  return models.get(key) ?? null;
+}
+
+const statements: string[] = [];
+let ok = 0;
+let corrected = 0;
+let skipped = 0;
+for (const run of runs) {
+  const model = await modelFor(run.race_id, run.model_hash);
+  if (!model) {
+    console.warn(`run ${run.id} (${run.date}): ${run.race_id} changed since scheduling, skipped`);
+    skipped++;
+    continue;
+  }
+  const check = recheckRun(model, run);
+  if (check.correct) ok++;
+  else {
+    corrected++;
+    const before = (JSON.parse(run.result) as { score: number }).score;
+    console.warn(
+      `run ${run.id} (${run.date}): claimed score ${before}, true ${check.result.score}`,
+    );
+  }
+  statements.push(...recheckSql(check));
+}
+
+console.log(
+  `${runs.length} unverified: ${ok} verified, ${corrected} corrected, ${skipped} skipped`,
+);
+if (dryRun || statements.length === 0) {
+  console.log(dryRun ? '(dry run: nothing written)' : 'nothing to write');
+} else {
+  const file = join(mkdtempSync(join(tmpdir(), 'reverify-')), 'reverify.sql');
+  writeFileSync(file, statements.join('\n'));
+  wrangler(target, '--file', file, ...(target === 'remote' ? ['--yes'] : []));
+  console.log(`wrote ${statements.length} updates to the ${target} D1`);
+}

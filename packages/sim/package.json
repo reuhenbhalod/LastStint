@@ -1,6 +1,6 @@
 {
   "name": "@boxthislap/sim",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Deterministic F1 race simulator \u2014 pure TS, runs in the browser and the Worker",
   "type": "module",
@@ -13,7 +13,9 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.scripts.json",
     "moments": "tsx scripts/moments.ts",
-    "bench": "tsx scripts/bench.ts"
+    "bench": "tsx scripts/bench.ts",
+    "whatif": "tsx scripts/whatif.ts",
+    "combos": "tsx scripts/combos.ts"
   },
   "devDependencies": {
     "@types/node": "22.10.2",

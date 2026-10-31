@@ -1,17 +1,17 @@
 {
-  "schemaVersion": 9,
+  "schemaVersion": 10,
   "race": {
     "id": "abu-dhabi-2021",
     "name": "Abu Dhabi 2021: Hamilton vs Verstappen",
     "laps": 58,
     "takeoverLap": 34,
-    "seed": 81723
+    "seed": 64
   },
   "era": "2014-2025",
   "track": {
     "pitLoss": 22.569,
     "pitLossUnderSC": 12.413,
-    "pitLossUnderVSC": 14.942,
+    "pitLossUnderVSC": 13.885,
     "pitLossDeviations": [
       -2.302,
       -1.813,
@@ -65,8 +65,8 @@
     {
       "code": "ALO",
       "team": "Alpine",
-      "basePace": 90.9695,
-      "noise": 0.5662,
+      "basePace": 91.2831,
+      "noise": 0.4753,
       "stateAtTakeover": {
         "position": 4,
         "gapAhead": 17.409,
@@ -80,15 +80,15 @@
         {
           "lap": 37,
           "to": "MEDIUM",
-          "loss": 17.644
+          "loss": 18.953
         }
       ]
     },
     {
       "code": "BOT",
       "team": "Mercedes",
-      "basePace": 90.2226,
-      "noise": 0.6531,
+      "basePace": 90.2465,
+      "noise": 0.4261,
       "stateAtTakeover": {
         "position": 8,
         "gapAhead": 2.636,
@@ -104,8 +104,8 @@
     {
       "code": "GAS",
       "team": "AlphaTauri",
-      "basePace": 90.6067,
-      "noise": 0.5873,
+      "basePace": 90.4231,
+      "noise": 0.5941,
       "stateAtTakeover": {
         "position": 5,
         "gapAhead": 1.628,
@@ -119,7 +119,7 @@
         {
           "lap": 37,
           "to": "MEDIUM",
-          "loss": 14.942
+          "loss": 15.678
         },
         {
           "lap": 55,
@@ -130,8 +130,8 @@
     {
       "code": "HAM",
       "team": "Mercedes",
-      "basePace": 88.6646,
-      "noise": 0.9562,
+      "basePace": 88.9462,
+      "noise": 0.2843,
       "stateAtTakeover": {
         "position": 1,
         "gapAhead": 0.0,
@@ -147,8 +147,8 @@
     {
       "code": "LAT",
       "team": "Williams",
-      "basePace": 91.6231,
-      "noise": 0.7781,
+      "basePace": 91.9311,
+      "noise": 0.4389,
       "stateAtTakeover": {
         "position": 16,
         "gapAhead": 2.599,
@@ -164,8 +164,8 @@
     {
       "code": "LEC",
       "team": "Ferrari",
-      "basePace": 90.441,
-      "noise": 0.6249,
+      "basePace": 90.9994,
+      "noise": 0.3739,
       "stateAtTakeover": {
         "position": 9,
         "gapAhead": 1.384,
@@ -180,15 +180,15 @@
         {
           "lap": 36,
           "to": "MEDIUM",
-          "loss": 14.528
+          "loss": 12.082
         }
       ]
     },
     {
       "code": "MSC",
       "team": "Haas F1 Team",
-      "basePace": 91.6691,
-      "noise": 0.8799,
+      "basePace": 91.863,
+      "noise": 0.5061,
       "stateAtTakeover": {
         "position": 15,
         "gapAhead": 19.72,
@@ -209,8 +209,8 @@
     {
       "code": "NOR",
       "team": "McLaren",
-      "basePace": 90.2659,
-      "noise": 0.2815,
+      "basePace": 90.143,
+      "noise": 0.186,
       "stateAtTakeover": {
         "position": 7,
         "gapAhead": 1.938,
@@ -225,15 +225,15 @@
         {
           "lap": 49,
           "to": "MEDIUM",
-          "loss": 21.813
+          "loss": 22.584
         }
       ]
     },
     {
       "code": "OCO",
       "team": "Alpine",
-      "basePace": 90.7082,
-      "noise": 0.4689,
+      "basePace": 90.9503,
+      "noise": 0.3954,
       "stateAtTakeover": {
         "position": 11,
         "gapAhead": 4.022,
@@ -249,8 +249,8 @@
     {
       "code": "PER",
       "team": "Red Bull Racing",
-      "basePace": 89.0706,
-      "noise": 0.452,
+      "basePace": 88.9853,
+      "noise": 0.2712,
       "stateAtTakeover": {
         "position": 3,
         "gapAhead": 25.387,
@@ -265,7 +265,7 @@
         {
           "lap": 37,
           "to": "HARD",
-          "loss": 15.514
+          "loss": 13.885
         },
         {
           "lap": 54,
@@ -276,8 +276,8 @@
     {
       "code": "RIC",
       "team": "McLaren",
-      "basePace": 90.9038,
-      "noise": 0.5402,
+      "basePace": 91.1816,
+      "noise": 0.4524,
       "stateAtTakeover": {
         "position": 12,
         "gapAhead": 2.877,
@@ -298,8 +298,8 @@
     {
       "code": "SAI",
       "team": "Ferrari",
-      "basePace": 90.1458,
-      "noise": 0.4462,
+      "basePace": 90.081,
+      "noise": 0.3264,
       "stateAtTakeover": {
         "position": 6,
         "gapAhead": 2.087,
@@ -315,8 +315,8 @@
     {
       "code": "STR",
       "team": "Aston Martin",
-      "basePace": 90.9343,
-      "noise": 0.914,
+      "basePace": 91.3203,
+      "noise": 0.2264,
       "stateAtTakeover": {
         "position": 14,
         "gapAhead": 2.325,
@@ -337,8 +337,8 @@
     {
       "code": "TSU",
       "team": "AlphaTauri",
-      "basePace": 90.2307,
-      "noise": 0.3899,
+      "basePace": 90.1508,
+      "noise": 0.2821,
       "stateAtTakeover": {
         "position": 10,
         "gapAhead": 1.766,
@@ -359,8 +359,8 @@
     {
       "code": "VER",
       "team": "Red Bull Racing",
-      "basePace": 89.042,
-      "noise": 0.3941,
+      "basePace": 88.9635,
+      "noise": 0.3273,
       "stateAtTakeover": {
         "position": 2,
         "gapAhead": 5.535,
@@ -375,7 +375,7 @@
         {
           "lap": 37,
           "to": "HARD",
-          "loss": 14.52
+          "loss": 10.684
         },
         {
           "lap": 54,
@@ -386,8 +386,8 @@
     {
       "code": "VET",
       "team": "Aston Martin",
-      "basePace": 90.8475,
-      "noise": 0.6219,
+      "basePace": 90.9031,
+      "noise": 0.276,
       "stateAtTakeover": {
         "position": 13,
         "gapAhead": 14.149,
@@ -435,7 +435,69 @@
   ],
   "decisionMoments": [
     {
-      "id": "sc-53",
+      "id": "vsc-cover",
+      "lap": 36,
+      "trigger": "VSC",
+      "target": {
+        "kind": "beat-rival"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "Stay out \u2014 keep the lead",
+          "decisions": []
+        },
+        {
+          "id": "cover-hard",
+          "label": "Box, fresh hards",
+          "decisions": [
+            {
+              "lap": 36,
+              "kind": "pit",
+              "compound": "HARD"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "stay"
+    },
+    {
+      "id": "manage-or-push",
+      "lap": 49,
+      "trigger": "cliff",
+      "target": {
+        "kind": "beat-rival"
+      },
+      "options": [
+        {
+          "id": "push",
+          "label": "Push now",
+          "decisions": [
+            {
+              "lap": 49,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "manage",
+          "label": "Manage the tyres",
+          "decisions": [
+            {
+              "lap": 49,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "sc-stop",
       "lap": 53,
       "trigger": "SC",
       "target": {
@@ -443,13 +505,13 @@
       },
       "options": [
         {
-          "id": "stay-out",
-          "label": "Stay out",
+          "id": "stay",
+          "label": "Stay out \u2014 keep the lead",
           "decisions": []
         },
         {
           "id": "box-soft",
-          "label": "Box for softs",
+          "label": "Box, softs",
           "decisions": [
             {
               "lap": 53,
@@ -459,19 +521,8 @@
           ]
         },
         {
-          "id": "box-medium",
-          "label": "Box for mediums",
-          "decisions": [
-            {
-              "lap": 53,
-              "kind": "pit",
-              "compound": "MEDIUM"
-            }
-          ]
-        },
-        {
           "id": "box-hard",
-          "label": "Box for hards",
+          "label": "Box, hards",
           "decisions": [
             {
               "lap": 53,
@@ -481,7 +532,42 @@
           ]
         }
       ],
-      "realOptionId": "stay-out"
+      "realOptionId": "stay"
+    },
+    {
+      "id": "restart-stance",
+      "lap": 57,
+      "trigger": "SC",
+      "target": {
+        "kind": "beat-rival"
+      },
+      "options": [
+        {
+          "id": "defend",
+          "label": "Defend hard",
+          "decisions": [
+            {
+              "lap": 57,
+              "kind": "mode",
+              "key": "battle",
+              "value": "defend"
+            }
+          ]
+        },
+        {
+          "id": "hold",
+          "label": "Hold the line",
+          "decisions": [
+            {
+              "lap": 57,
+              "kind": "mode",
+              "key": "battle",
+              "value": "hold"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
     }
   ],
   "candidateMomentLaps": [

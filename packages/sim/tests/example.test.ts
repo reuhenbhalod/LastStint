@@ -8,25 +8,41 @@ import type { RaceModel } from '../src/types.js';
 const abu = abuJson as unknown as RaceModel;
 
 describe('daily race example', () => {
-  it('plays Abu Dhabi 2021 with its approved lap-53 moment and scores the call', () => {
-    expect(abu.decisionMoments.map((m) => m.id)).toEqual(['sc-53']);
+  it('plays Abu Dhabi 2021 with its four approved moments and scores every call', () => {
+    // The moments match the UI's race script (data/scripts/abu-dhabi-2021.json).
+    expect(abu.decisionMoments.map((m) => m.id)).toEqual([
+      'vsc-cover',
+      'manage-or-push',
+      'sc-stop',
+      'restart-stance',
+    ]);
     const laps: number[] = [];
-    const { result, score, calls } = playDailyRace(abu, abu.race.seed, () => 'box-soft', {
-      samples: 60,
-      onLap: (run) => laps.push(run.state.lap),
-    });
+    const pick = (id: string) => (id === 'sc-stop' ? 'box-soft' : undefined);
+    const { result, score, calls } = playDailyRace(
+      abu,
+      abu.race.seed,
+      (m) => pick(m.id) ?? (m.options[0]?.id as string),
+      { samples: 60, onLap: (run) => laps.push(run.state.lap) },
+    );
     expect(laps.at(-1)).toBe(abu.race.laps);
-    expect(calls.map((c) => [c.moment.id, c.chosen])).toEqual([['sc-53', 'box-soft']]);
-    expect(score.calls[0]?.band).toBeDefined();
-    expect(score.score).toBe(score.calls[0]?.points);
+    expect(calls.map((c) => [c.moment.id, c.chosen])).toEqual([
+      ['vsc-cover', 'stay'],
+      ['manage-or-push', 'push'],
+      ['sc-stop', 'box-soft'],
+      ['restart-stance', 'defend'],
+    ]);
+    expect(score.calls.every((c) => c.band !== undefined)).toBe(true);
     expect(result.finishers).toContain('HAM');
     expect(result.disqualified).toEqual([]); // boxing for softs satisfies the two-compound rule
   });
 
   it('the real call (stay out) is graded and scored like any other', () => {
-    const { score } = playDailyRace(abu, abu.race.seed, (m) => m.realOptionId ?? 'stay-out', {
-      samples: 60,
-    });
-    expect(score.calls[0]?.optionId).toBe('stay-out');
+    const { score } = playDailyRace(
+      abu,
+      abu.race.seed,
+      (m) => m.realOptionId ?? (m.options[0]?.id as string),
+      { samples: 60 },
+    );
+    expect(score.calls.map((c) => c.optionId)).toEqual(['stay', 'push', 'stay', 'defend']);
   });
 });

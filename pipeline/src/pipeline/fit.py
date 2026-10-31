@@ -31,6 +31,9 @@ from .paths import COMPOUND_PRIORS_PATH
 
 _FIT_COLUMNS = ["LapTime", "TyreLife", "LapNumber", "Compound", "Driver"]
 _COLLAPSED = 1e-6  # a data-only step at or below this is "no separation in the data"
+# Model v3 stage 6 (T2): lap noise as a robust spread (1.4826 x MAD) instead of the standard
+# deviation, which slow traffic laps and model misfit inflate.
+ROBUST_NOISE = True
 
 
 @dataclass
@@ -106,7 +109,13 @@ def _driver_pace_from(
     pace, noise = {}, {}
     for driver, grp in df.groupby("Driver"):
         pace[str(driver)] = float(grp["_base"].median())
-        noise[str(driver)] = float(grp["_base"].std(ddof=1)) if len(grp) > 1 else 0.3
+        if len(grp) < 2:
+            noise[str(driver)] = 0.3
+        elif ROBUST_NOISE:
+            dev = (grp["_base"] - grp["_base"].median()).abs().median()
+            noise[str(driver)] = float(1.4826 * dev)
+        else:
+            noise[str(driver)] = float(grp["_base"].std(ddof=1))
     return pace, noise
 
 
@@ -224,6 +233,7 @@ def fit_lap_model(
     reference_compound: str | None = None,
     pace_laps: pd.DataFrame | None = None,
     era: str = "2014-2025",
+    fallback_pace_laps: pd.DataFrame | None = None,
     min_laps_beyond_cliff: int = 6,
     min_stints_beyond_cliff: int = 2,
 ) -> LapTimeFit:
@@ -231,7 +241,8 @@ def fit_lap_model(
 
     Compound/wear/fuel/cliffs are fit jointly on the clean laps with the ordering + prior
     described in the module docstring. Driver base pace and noise come from `pace_laps` (all
-    green racing laps) when supplied, else from the clean-lap fit. `reference_compound`
+    green racing laps) when supplied, else from the clean-lap fit; a driver missing from
+    `pace_laps` takes its pace from `fallback_pace_laps` if given. `reference_compound`
     defaults to the softest dry compound present.
     """
     prior = load_compound_priors(era)
@@ -289,14 +300,16 @@ def fit_lap_model(
     r_squared = float(1 - core.resid.var() / y.var())
 
     if pace_laps is not None:
-        driver_pace, driver_noise = _driver_pace_from(
-            pace_laps,
-            compound_offset,
-            compound_wear,
-            fuel_per_lap,
-            compound_cliff,
-            (fresh_bonus, fresh_laps),
-        )
+        args = (compound_offset, compound_wear, fuel_per_lap, compound_cliff)
+        driver_pace, driver_noise = _driver_pace_from(pace_laps, *args, (fresh_bonus, fresh_laps))
+        if fallback_pace_laps is not None:
+            # Drivers with no laps in `pace_laps` (e.g. a whole race in traffic) use these.
+            more_pace, more_noise = _driver_pace_from(
+                fallback_pace_laps, *args, (fresh_bonus, fresh_laps)
+            )
+            for d, p in more_pace.items():
+                if d not in driver_pace:
+                    driver_pace[d], driver_noise[d] = p, more_noise[d]
     else:
         driver_pace = {d: float(params[f"drv::{d}"]) for d in drivers}
         drv = df["Driver"].to_numpy()

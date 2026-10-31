@@ -12,6 +12,7 @@ from dataclasses import dataclass, field
 import pandas as pd
 
 from . import assemble, clean, events, fit, ingest, scenario, track
+from . import pace as pace_mod
 
 # Race registry: metadata that isn't derivable from the timing data. `split` is the Phase
 # 1-2 perfection spec's fixed tune / held-out assignment (A1): held-out races are never used
@@ -24,7 +25,11 @@ RACES: dict[str, dict] = {
         "name": "Abu Dhabi 2021: Hamilton vs Verstappen",
         "era": "2014-2025",
         "takeover_lap": 34,
-        "seed": 81723,
+        # Beta seed (Oct 31 2026): its run reaches the lap-53 SC with HAM 11.9s ahead, as in
+        # the real race, which is less than a SC stop costs, so boxing there isn't free. Of
+        # the seeds that do, its last-lap luck follows the odds: covering at the lap-36 VSC
+        # then staying out wins, Mercedes' real calls lose (packages/sim scripts/combos.ts).
+        "seed": 64,
         "user_side": "HAM",
         "rival": "VER",
         # P7 and back were decided by race control (only the lapped cars between HAM and
@@ -413,6 +418,10 @@ RACES: dict[str, dict] = {
         "rival": None,
         "score_positions": 6,
         "split": "holdout",
+        # FastF1's tyre timing for this race is corrupt for the whole field (stints start at
+        # lap 25 and all second stints at lap 33, while the pit flags are at laps 26-30; the
+        # same on a fresh download, Oct 26 2026). Reported, but not counted in G1.
+        "data_issue": "tyre timing corrupt upstream (stints misaligned with the pit stops)",
     },
 }
 
@@ -444,8 +453,15 @@ def build_race(race_id: str, laps: pd.DataFrame | None = None) -> BuildResult:
     meta = resolved_meta(race_id, laps)
 
     clean_df, traffic_df, _ = clean.clean_laps(laps)
+    # Model v3 stage 6 (T1): pace from clear-air laps only; the sim adds the dirty-air
+    # penalty itself when a car follows within range, so traffic laps would count it twice.
     pace_laps = pd.concat([clean_df, traffic_df])
-    fitted = fit.fit_lap_model(clean_df, pace_laps=pace_laps, era=meta["era"])
+    fitted = fit.fit_lap_model(
+        clean_df,
+        pace_laps=clean_df if pace_mod.CLEAR_AIR else pace_laps,
+        fallback_pace_laps=pace_laps,
+        era=meta["era"],
+    )
     params = track.fit_track_params(laps, clean_df, traffic_df, fitted)
 
     takeover = meta["takeover_lap"]
@@ -466,7 +482,9 @@ def build_race(race_id: str, laps: pd.DataFrame | None = None) -> BuildResult:
         takeover_lap=takeover,
         seed=meta["seed"],
         user_side=meta["user_side"],
+        fastest_lap_point=meta["year"] in scenario.FASTEST_LAP_POINT_YEARS,
         rival=meta["rival"],
+        track_status=ingest.load_track_status(race_id),
     )
     return BuildResult(model=model, laps=laps, notes=[*fitted.prior_notes, *params.notes])
 
