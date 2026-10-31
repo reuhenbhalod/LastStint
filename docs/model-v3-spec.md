@@ -586,3 +586,12 @@ Goal: Abu Dhabi 21 ready for beta testing on its own. The rule from the owner: t
 - **No push gain on tyres past their cliff** (`modeLapDelta`). Pushing 39-lap-old hards for 17 laps gained 0.7 s, enough for a free SC stop. HAM was already flat out in the real race. Push still wears the tyres 1.3× faster. No push window now beats the real pace into lap 53. Live play only.
 
 **Unchanged:** G1 (replays use real strategies, so these live-play fixes don't touch it) and what-if 8 of 11.
+
+**Moments (owner decision Oct 31, 2026): Reuhen's four.** `data/moments/abu-dhabi-2021.json` now holds the moments from the UI's race script, with the same ids and options, so the Worker grades exactly what the UI asks. The script's wording stays in the script. Grades on the real path (seed 1205, 1000 samples):
+
+| Lap | Moment | Grades | Real call |
+|---|---|---|---|
+| 36 | `vsc-cover` | stay 97.8% yellow, cover-hard 99.4% green | stay |
+| 49 | `manage-or-push` | push 97.9% green, manage 97.9% green (no preference without hindsight) | none |
+| 53 | `sc-stop` | stay 21.9% red, box-soft 46.3% green, box-hard 41.8% yellow | stay |
+| 57 | `restart-stance` | defend 26.6% green, hold 21.4% orange | none |
