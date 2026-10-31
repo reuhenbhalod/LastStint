@@ -13,7 +13,9 @@ import type { GameState, Speed } from '../state/machine.js';
 import { GameSession } from '../state/session.js';
 import { clearRun, loadRun, saveRun } from '../state/storage.js';
 
-export const LAP_MS: Record<Speed, number> = { 1: 2600, 2: 1200 };
+// One lap tick on screen (product doc: laps tick by every 3-5 seconds). The track map runs the
+// field one lap round per tick, so this is also how fast the dots move.
+export const LAP_MS: Record<Speed, number> = { 1: 4500, 2: 2250 };
 
 export interface Game {
   state: GameState | null;
