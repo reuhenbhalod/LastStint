@@ -1,15 +1,31 @@
-// Phase 0 placeholder shell. The real game screens (daily card, race, decision, results)
-// arrive in Phase 3. Mobile-first: designed for a 390px screen.
+// Phase-routed game shell: load today's race, then render by game phase.
+
+import { useMemo } from 'react';
+import { StaticDailyProvider } from './data/provider.js';
+import { useGame } from './game/useGame.js';
+import { IntroCard } from './screens/IntroCard.js';
+import { RaceScreen } from './screens/RaceScreen.js';
+import { ResultScreen } from './screens/ResultScreen.js';
 
 export function App() {
-  return (
-    <main className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center gap-4 p-6 text-center">
-      <p className="font-mono text-xs uppercase tracking-widest text-neutral-500">Pit Wall</p>
-      <h1 className="text-3xl font-bold">BoxThisLap</h1>
-      <p className="text-neutral-400">
-        A daily F1 strategy game. Phase 0 scaffold — the daily race arrives in Phase 3.
-      </p>
-      <footer className="mt-8 text-[10px] text-neutral-600">Not affiliated with Formula 1.</footer>
-    </main>
-  );
+  const provider = useMemo(() => new StaticDailyProvider(), []);
+  const game = useGame(provider);
+
+  if (!game.state || !game.model) {
+    return (
+      <main className="flex min-h-screen items-center justify-center">
+        <p className="font-mono text-sm text-neutral-500">Loading today’s race…</p>
+      </main>
+    );
+  }
+
+  switch (game.state.phase) {
+    case 'intro':
+      return <IntroCard state={game.state} model={game.model} onStart={game.start} />;
+    case 'racing':
+    case 'decision':
+      return <RaceScreen game={game} state={game.state} model={game.model} />;
+    default:
+      return <ResultScreen state={game.state} onSubmit={game.submit} onReset={game.reset} />;
+  }
 }
