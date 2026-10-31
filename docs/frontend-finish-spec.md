@@ -65,3 +65,14 @@ A tester opens the site on a phone, plays today's Abu Dhabi 2021 daily as Merced
 ## Coordination
 
 Reuhen is building this same frontend right now. This work goes on branch `frontend`, starting from `main` (which has his 3.1–3.2), and keeps his structure (`data/`, `engine/`, `state/`, the reducer). He should know before he writes 3.3 so the two don't collide.
+
+## Track view (Oct 31, 2026, owner request)
+
+The race screen was rebuilt after the track-view mockup (inspired by Two-Minute Drill), keeping the dark default palette (plan 3.5).
+- **Circuit outline:** `pipeline outline <race>` writes `data/tracks/<race>.json`. Yas Marina's comes from HAM's fastest 2021 lap: 132 points and 16 corners, rotated by the circuit's official map rotation.
+- **`track/geometry.ts`:** places each car `gap / lapTime` of a lap behind the leader, with the lap time by flag, so SC and VSC gaps stretch. Tested.
+- **`TrackMap`:** draws the field, rival and player dots (lapped cars dashed). They animate round the lap between ticks and stop at a pause.
+- **`DecisionPanel`** replaces the modal: the radio line, four stat tiles, and Stay out / Box. Box goes to the tyre choice (`game/choices.ts`, tested), and a single tyre commits directly. Number keys work, and Escape backs out of the tyre step.
+- **Layout:** three columns at 1280 px and up; two at 768 px, with the standings below; one column on phones, with the decision card as a bottom sheet.
+- **E2E:** now presses Box → Softs at lap 53, and Attack at lap 57.
+

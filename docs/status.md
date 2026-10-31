@@ -14,6 +14,17 @@ Oct 31, 2026. A summary of what is built, the decisions that shaped it, and what
 
 Cloudflare dashboards (account `20a233209db4b2680328a2c547039f17`): the Workers `pitwall` (API) and `pitwall-web` (site), and the D1 database `pitwall-db`.
 
+## The race screen
+
+Modelled on Two-Minute Drill's play view (Oct 31, 2026):
+- **Layout:** standings on the left; the scoreboard and the circuit in the middle; the call column on the right.
+- **Track map:** the real circuit outline (`data/tracks/<race>.json`, written by `pipeline outline <race>` from FastF1 position data), with a dot per car.
+  - Each dot is placed by the car's gap to the leader, so lapped cars appear among the leaders.
+  - The field moves round the lap between ticks.
+- **Decision card:** the radio line, four stat tiles (gap, both tyres, pit stop cost, laps left), then **Stay out / Box**, with Box followed by the tyre choice.
+  - Only the presentation changed. The graded options are the same, so the server is unaffected.
+- **On a phone** the screen stacks, and the decision card rises as a compact bottom sheet.
+
 ## How a game works, end to end
 
 1. The site asks the API for today's daily (`/api/daily?date=<player's local date>`) and downloads that race's model file.
@@ -70,7 +81,7 @@ With no daily scheduled, or no connection, the site plays the bundled copy of th
   - the strategist persona (plan 6.2; no line shown yet)
   - the Mystery Race reveal
   - the image share card
-  - the track map, sound and haptics
+  - sound and haptics
   - a privacy page (plan 6.5)
 - **No analytics or error reporting yet** (plan 6.4: the funnel events and Sentry).
 - **Accessibility:** keyboard play, labels and focus are done, but no Lighthouse audit has been run.

@@ -11,7 +11,7 @@ from __future__ import annotations
 import typer
 
 from . import build as build_mod
-from . import export, ingest, paths, sim_reference
+from . import export, ingest, outline, paths, sim_reference
 from . import validate as validate_mod
 
 app = typer.Typer(help="F1 timing data -> race-model JSON pipeline", no_args_is_help=True)
@@ -57,6 +57,22 @@ def ingest_race(
         problems = ingest.race_suitability(laps)
         note = f"  NOT SUITABLE: {'; '.join(problems)}" if problems else ""
         typer.echo(f"{rid}: {len(laps)} laps, {facts['totalLaps']} race laps -> data/raw/{note}")
+
+
+@app.command("outline")
+def outline_cmd(
+    race_id: str = typer.Argument(..., help="A registered race, e.g. abu-dhabi-2021."),
+    driver: str = typer.Option(None, help="Whose fastest lap to trace (default: the fastest)."),
+) -> None:
+    """Write data/tracks/<race-id>.json: the circuit outline for the game's track map
+    (network: FastF1 position data)."""
+    meta = build_mod.RACES[race_id]
+    shape = outline.fetch_outline(meta["year"], meta["event"], driver)
+    path = outline.write_outline(race_id, shape)
+    typer.echo(
+        f"{race_id}: {len(shape['points'])} points, {len(shape['corners'])} corners"
+        f" -> {path.relative_to(paths.REPO_ROOT)}"
+    )
 
 
 @app.command()

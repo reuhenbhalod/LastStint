@@ -40,31 +40,31 @@ export function IntroCard({
         <p className="font-mono text-xs uppercase tracking-widest text-neutral-500">
           {number ? `Daily Race #${number}` : 'Daily Race'}
         </p>
-        <h1 className="mt-1 text-3xl font-bold leading-tight">
+        <h1 className="mt-1 disp text-[40px] leading-none leading-tight">
           {model.race.name ?? model.race.id}
         </h1>
       </div>
       <dl className="grid grid-cols-2 gap-3 font-mono text-sm">
-        <div className="rounded-lg bg-neutral-900 p-3">
+        <div className="rounded-lg bg-[var(--card)] p-3">
           <dt className="text-xs uppercase tracking-wide text-neutral-500">You run</dt>
-          <dd className="text-lg font-bold text-sky-300">
+          <dd className="text-lg font-bold text-[var(--you)]">
             {userSide} {userTeam ? `· ${userTeam}` : ''}
           </dd>
         </div>
-        <div className="rounded-lg bg-neutral-900 p-3">
+        <div className="rounded-lg bg-[var(--card)] p-3">
           <dt className="text-xs uppercase tracking-wide text-neutral-500">Laps left</dt>
           <dd className="text-lg font-bold">{lapsLeft}</dd>
         </div>
       </dl>
       {situation && <p className="font-mono text-sm text-neutral-300">{situation}</p>}
       <p className="text-neutral-400">
-        Beat <span className="font-semibold text-orange-300">{rival}</span> to the flag. Make the
-        calls; every one is graded.
+        Beat <span className="font-semibold text-[var(--rival)]">{rival}</span> to the flag. Make
+        the calls; every one is graded.
       </p>
       <button
         type="button"
         onClick={onStart}
-        className="rounded-xl bg-sky-500 py-4 text-lg font-bold text-neutral-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+        className="rounded-xl bg-[var(--you)] py-4 text-lg font-bold text-neutral-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
       >
         Take the pit wall
       </button>

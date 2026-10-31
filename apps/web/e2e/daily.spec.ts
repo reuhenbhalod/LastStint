@@ -123,20 +123,23 @@ test('plays the Abu Dhabi daily end to end', async ({ page, context }) => {
   await page.getByRole('button', { name: 'Take the pit wall' }).click();
   await page.getByRole('button', { name: '2×' }).click();
 
-  const answers: Record<string, string> = {
-    '36': 'Box, fresh hards',
-    '49': 'Push now',
-    '53': 'Stay out — keep the lead',
-    '57': 'Defend hard',
+  // Each moment: the top-level option, then (after Box) the tyre.
+  const answers: Record<string, string[]> = {
+    '36': ['Box'],
+    '49': ['Push now'],
+    '53': ['Box', 'Softs'],
+    '57': ['Attack'],
   };
   for (const lap of ['36', '49', '53', '57']) {
-    const dialog = page.getByRole('dialog');
-    await expect(dialog).toContainText(`Lap ${lap}`, { timeout: 90_000 });
+    const card = page.locator('section.decision');
+    await expect(card).toContainText(`Lap ${lap}`, { timeout: 90_000 });
     if (shots && lap === '53')
       await page.screenshot({ path: `${shots}/3-decision-53.png`, fullPage: true });
     if (shots && lap === '49')
       await page.screenshot({ path: `${shots}/2-race.png`, fullPage: true });
-    await dialog.getByRole('button', { name: answers[lap] }).click();
+    for (const name of answers[lap] as string[]) {
+      await card.getByRole('button', { name, exact: true }).click();
+    }
   }
 
   await page.getByRole('button', { name: 'See how you did' }).click({ timeout: 90_000 });

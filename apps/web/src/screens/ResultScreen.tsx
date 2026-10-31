@@ -82,7 +82,7 @@ function CallRow({ call, moment }: { call: CallResult; moment?: DecisionMoment }
   const best = call.options.find((o) => o.id === call.best);
   const behind = call.options.find((o) => o.id === call.chosen)?.behindBest ?? 0;
   return (
-    <li className="rounded-lg bg-neutral-900 p-3">
+    <li className="rounded-lg bg-[var(--card)] p-3">
       <details>
         <summary className="flex cursor-pointer list-none items-center justify-between gap-2">
           <span>
@@ -158,7 +158,7 @@ export function ResultScreen({ state, game }: { state: GameState; game: Game }) 
         <p className="font-mono text-xs uppercase tracking-widest text-neutral-500">
           Chequered flag
         </p>
-        <h1 className="text-3xl font-bold">
+        <h1 className="disp text-[40px] leading-none">
           {pos === 1 ? 'You won!' : `P${pos}`}{' '}
           {pos !== 1 && (
             <span className="text-neutral-400">
@@ -170,7 +170,7 @@ export function ResultScreen({ state, game }: { state: GameState; game: Game }) 
           type="button"
           disabled={state.phase === 'submitting'}
           onClick={game.submit}
-          className="rounded-xl bg-sky-500 py-4 text-lg font-bold text-neutral-950 disabled:opacity-60"
+          className="rounded-xl bg-[var(--you)] py-4 text-lg font-bold text-neutral-950 disabled:opacity-60"
         >
           {state.phase === 'submitting' ? 'Grading your calls…' : 'See how you did'}
         </button>
@@ -185,7 +185,7 @@ export function ResultScreen({ state, game }: { state: GameState; game: Game }) 
           {number ? `Pit Wall #${number}` : 'Practice'} ·{' '}
           {game.model?.race.name ?? state.meta.raceId}
         </p>
-        <h1 className="mt-1 text-3xl font-bold">
+        <h1 className="mt-1 disp text-[40px] leading-none">
           {pos === 1 ? 'You won!' : `P${pos}`}{' '}
           {pos !== 1 && (
             <span className="text-neutral-400">
@@ -196,17 +196,17 @@ export function ResultScreen({ state, game }: { state: GameState; game: Game }) 
       </header>
 
       <section className="grid grid-cols-3 gap-2 text-center">
-        <div className="rounded-lg bg-neutral-900 p-3">
+        <div className="rounded-lg bg-[var(--card)] p-3">
           <p className="text-xs uppercase text-neutral-500">Score</p>
           <p className="font-mono text-2xl font-bold">{score != null ? Math.round(score) : '—'}</p>
         </div>
-        <div className="rounded-lg bg-neutral-900 p-3">
+        <div className="rounded-lg bg-[var(--card)] p-3">
           <p className="text-xs uppercase text-neutral-500">Rank</p>
           <p className="font-mono text-2xl font-bold">
             {response ? `${response.rank}/${response.total}` : '—'}
           </p>
         </div>
-        <div className="rounded-lg bg-neutral-900 p-3">
+        <div className="rounded-lg bg-[var(--card)] p-3">
           <p className="text-xs uppercase text-neutral-500">Beat</p>
           <p className="font-mono text-2xl font-bold">
             {response ? `${response.percentile}%` : '—'}
@@ -215,12 +215,12 @@ export function ResultScreen({ state, game }: { state: GameState; game: Game }) 
       </section>
 
       {sub.status === 'practice' && (
-        <p className="rounded-lg bg-neutral-900 p-3 text-sm text-neutral-400">
+        <p className="rounded-lg bg-[var(--card)] p-3 text-sm text-neutral-400">
           Practice run: graded on this device, not submitted.
         </p>
       )}
       {sub.status === 'already' && (
-        <p className="rounded-lg bg-neutral-900 p-3 text-sm text-neutral-400">
+        <p className="rounded-lg bg-[var(--card)] p-3 text-sm text-neutral-400">
           You’ve already played today’s race. Here’s your run; a new race arrives at midnight.
         </p>
       )}
@@ -249,7 +249,7 @@ export function ResultScreen({ state, game }: { state: GameState; game: Game }) 
         </ol>
       </section>
 
-      <section className="flex flex-col gap-2 rounded-xl border border-neutral-800 p-3">
+      <section className="flex flex-col gap-2 rounded-xl border border-[var(--rule)] p-3">
         <p className="font-mono text-lg">{share}</p>
         <button
           type="button"
@@ -291,7 +291,7 @@ export function ResultScreen({ state, game }: { state: GameState; game: Game }) 
             {board.map((e) => (
               <li
                 key={`${e.rank}-${e.name}`}
-                className="flex justify-between rounded bg-neutral-900 px-2 py-1"
+                className="flex justify-between rounded bg-[var(--card)] px-2 py-1"
               >
                 <span>
                   <span className="mr-2 text-neutral-500">{e.rank}</span>
@@ -304,7 +304,7 @@ export function ResultScreen({ state, game }: { state: GameState; game: Game }) 
         </section>
       )}
 
-      <details className="rounded-lg bg-neutral-900 p-3">
+      <details className="rounded-lg bg-[var(--card)] p-3">
         <summary className="cursor-pointer text-sm font-bold uppercase tracking-wide text-neutral-400">
           Classification
         </summary>
@@ -314,9 +314,9 @@ export function ResultScreen({ state, game }: { state: GameState; game: Game }) 
               key={code}
               className={`flex justify-between rounded px-2 py-1 ${
                 code === userSide
-                  ? 'bg-sky-500/20 text-sky-200'
+                  ? 'bg-[color-mix(in_srgb,var(--you)_16%,transparent)] text-[var(--you)]'
                   : code === rival
-                    ? 'text-orange-300'
+                    ? 'text-[var(--rival)]'
                     : ''
               }`}
             >
@@ -336,7 +336,7 @@ export function ResultScreen({ state, game }: { state: GameState; game: Game }) 
         <button
           type="button"
           onClick={game.reset}
-          className="rounded-xl border border-neutral-700 py-3 font-semibold text-neutral-300"
+          className="rounded-xl border border-[var(--rule)] py-3 font-semibold text-neutral-300"
         >
           Play again
         </button>

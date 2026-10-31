@@ -1,5 +1,5 @@
-// Standing headset modes — always live. Flipping one books a `mode` decision on the next lap.
-// Reads the current setting from the user's car so it reflects what the sim is applying.
+// Standing headset modes, always live. Flipping one books a `mode` call for the next lap. The
+// current setting is read from the user's car, so it shows what the sim is applying.
 
 import type { Modes } from '@boxthislap/sim';
 
@@ -22,9 +22,12 @@ export function HeadsetPanel({
   return (
     <div className="flex flex-col gap-2">
       {ROWS.map((row) => (
-        <div key={row.key} className="flex items-center gap-2">
-          <span className="w-14 text-xs uppercase tracking-wide text-neutral-500">{row.label}</span>
-          <div className="flex flex-1 overflow-hidden rounded-lg border border-neutral-700 text-xs">
+        <div key={row.key} className="grid grid-cols-[58px_1fr] items-center gap-2">
+          <span className="eyebrow">{row.label}</span>
+          <fieldset
+            className="m-0 grid grid-cols-3 overflow-hidden rounded-lg border border-[var(--rule)] p-0"
+            aria-label={row.label}
+          >
             {row.values.map((v) => {
               const active = modes[row.key] === v;
               return (
@@ -34,15 +37,17 @@ export function HeadsetPanel({
                   disabled={disabled}
                   aria-pressed={active}
                   onClick={() => onFlip(row.key, v)}
-                  className={`flex-1 py-1.5 capitalize disabled:opacity-40 ${
-                    active ? 'bg-sky-500/30 font-semibold text-sky-200' : 'text-neutral-400'
+                  className={`py-1.5 text-[13px] font-semibold capitalize disabled:opacity-40 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--you)] ${
+                    active
+                      ? 'bg-[var(--you)] text-[#08231f]'
+                      : 'bg-[var(--card)] text-[var(--muted)]'
                   }`}
                 >
                   {v}
                 </button>
               );
             })}
-          </div>
+          </fieldset>
         </div>
       ))}
     </div>

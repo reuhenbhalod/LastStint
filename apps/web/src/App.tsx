@@ -24,7 +24,7 @@ export function App() {
         <button
           type="button"
           onClick={game.reload}
-          className="rounded-xl bg-sky-500 px-6 py-3 font-bold text-neutral-950"
+          className="rounded-xl bg-[var(--you)] px-6 py-3 font-bold text-neutral-950"
         >
           Try again
         </button>
