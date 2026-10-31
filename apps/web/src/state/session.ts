@@ -1,17 +1,21 @@
 // GameSession: the headless driver that connects the mutable sim engine to the pure state
-// machine. It decides when to pause (at the sim's decision moments), advances the engine lap
-// by lap, applies the player's calls, and serialises/resumes a run. The React layer (3.3)
-// drives the same reducer with the engine in a ref; this class is its testable twin.
+// machine. It decides when to pause (at the race's approved decision moments), grades each
+// moment off-thread as it pauses, advances the engine lap by lap, applies the player's calls,
+// and serialises/resumes a run. The React layer (useGame) wraps it with timers and the
+// network; this class is fully testable headless.
 
-import type { Decision, DecisionMoment, RaceState } from '@boxthislap/sim';
+import { type Decision, type DecisionMoment, type RaceState, scoreRun } from '@boxthislap/sim';
+import type { RunResponse, RunSubmission } from '../data/api.js';
 import type { Daily } from '../data/types.js';
 import { GameEngine, decisionMoments } from '../engine/engine.js';
+import { type GradedMoment, type Grader, gradedFromHits, inlineGrader } from '../engine/grading.js';
 import {
   type Action,
   type GameMeta,
   type GameState,
   type Phase,
   type Speed,
+  type Submission,
   reducer,
 } from './machine.js';
 
@@ -24,12 +28,17 @@ export interface PersistedRun {
   lap: number;
   decisions: Decision[];
   resolved: string[];
+  grades?: Record<string, GradedMoment>;
+  submission?: Submission;
 }
 
 function metaOf(daily: Daily): GameMeta {
   const m = daily.model;
   return {
     raceId: m.race.id,
+    number: daily.number,
+    source: daily.source,
+    practiceReason: daily.practiceReason,
     date: daily.date,
     totalLaps: m.race.laps,
     takeoverLap: m.race.takeoverLap,
@@ -50,12 +59,20 @@ function momentAt(
 export class GameSession {
   private readonly engine: GameEngine;
   private readonly daily: Daily;
+  private readonly grader: Grader;
+  private readonly grading = new Map<string, Promise<void>>();
   state: GameState;
+  /** Called after a change that happens outside a method call (a grade arriving). */
+  onChange: () => void = () => {};
 
-  constructor(daily: Daily, engine?: GameEngine, state?: GameState) {
+  constructor(
+    daily: Daily,
+    options: { engine?: GameEngine; state?: GameState; grader?: Grader } = {},
+  ) {
     this.daily = daily;
-    this.engine = engine ?? new GameEngine(daily.model, daily.seed, { decisions: [] });
-    this.state = state ?? {
+    this.grader = options.grader ?? inlineGrader;
+    this.engine = options.engine ?? new GameEngine(daily.model, daily.seed, { decisions: [] });
+    this.state = options.state ?? {
       phase: 'intro',
       speed: 1,
       race: this.engine.state,
@@ -64,6 +81,8 @@ export class GameSession {
       resolved: [],
       decisions: this.engine.decisions,
       result: null,
+      grades: {},
+      submission: { status: daily.source === 'live' ? 'none' : 'practice' },
       meta: metaOf(daily),
     };
   }
@@ -80,6 +99,32 @@ export class GameSession {
       : momentAt(this.state.moments, this.engine.lap, this.state.resolved);
     const result = finished ? this.engine.result() : null;
     this.dispatch({ type: 'SYNC', race: this.engine.state, moment, finished, result });
+    if (moment) this.startGrading(moment, this.engine);
+  }
+
+  /**
+   * Grade a moment from the run paused at it (before the answer: the server rebuilds the grade
+   * from the calls made before the pause). The worker runs while the player reads.
+   */
+  private startGrading(moment: DecisionMoment, paused: GameEngine): void {
+    if (this.state.grades[moment.id] || this.grading.has(moment.id)) return;
+    const job = paused.gradingJob(moment);
+    const done = this.grader.hits(job.job).then((hits) => {
+      this.dispatch({
+        type: 'GRADED',
+        momentId: moment.id,
+        graded: gradedFromHits(moment, job, hits),
+      });
+      this.grading.delete(moment.id);
+      this.onChange();
+    });
+    this.grading.set(moment.id, done);
+  }
+
+  /** Every moment's grade, once all are in (for submitting). */
+  async allGraded(): Promise<Record<string, GradedMoment>> {
+    await Promise.all(this.grading.values());
+    return this.state.grades;
   }
 
   start(): void {
@@ -98,9 +143,10 @@ export class GameSession {
   choose(optionId: string): void {
     const moment = this.state.currentMoment;
     if (this.state.phase !== 'decision' || !moment) return;
-    const option = moment.options.find((o) => o.id === optionId);
-    if (!option) throw new Error(`unknown option '${optionId}' for moment '${moment.id}'`);
-    for (const decision of option.decisions) this.engine.apply(decision);
+    if (!moment.options.some((o) => o.id === optionId)) {
+      throw new Error(`unknown option '${optionId}' for moment '${moment.id}'`);
+    }
+    this.engine.answer(moment, optionId);
     this.dispatch({ type: 'RESOLVE', momentId: moment.id, decisions: this.engine.decisions });
     this.sync();
   }
@@ -116,10 +162,42 @@ export class GameSession {
     this.dispatch({ type: 'SET_SPEED', speed });
   }
 
-  submit(): void {
-    if (this.state.phase !== 'finished') return;
+  /** Move to submitting; then `submission()` builds the body and `finish()` takes the answer. */
+  beginSubmit(): void {
     this.dispatch({ type: 'SUBMIT' });
-    this.dispatch({ type: 'RESULT', result: this.engine.result() });
+  }
+
+  /** The POST /api/runs body: the call log and each moment's claim, in lap order. */
+  async submission(anonId: string): Promise<RunSubmission> {
+    const grades = await this.allGraded();
+    return {
+      date: this.daily.date,
+      anonId,
+      decisions: this.engine.decisions,
+      grades: this.state.moments.map((m) => (grades[m.id] as GradedMoment).claim),
+    };
+  }
+
+  /** Show the results: the server's response, a practice run, or a failed submission. */
+  finish(submission: Submission): void {
+    this.dispatch({ type: 'RESULT', result: this.engine.result(), submission });
+  }
+
+  /** Today's run was already submitted: go straight to its results. */
+  alreadyPlayed(response: RunResponse): void {
+    this.dispatch({ type: 'ALREADY_PLAYED', response });
+  }
+
+  /** The game's own score from its grades (practice mode, or until the server answers). */
+  localScore() {
+    const calls = this.state.moments.flatMap((m) => {
+      const graded = this.state.grades[m.id];
+      const radio = this.engine.decisions.find((d) => d.kind === 'radio' && d.momentId === m.id) as
+        | Extract<Decision, { kind: 'radio' }>
+        | undefined;
+      return graded && radio ? [{ grade: graded.grade, chosen: radio.optionId }] : [];
+    });
+    return scoreRun(calls);
   }
 
   /** Serialisable run: a run is fully defined by (model, seed, decisions); lap/phase let
@@ -134,30 +212,59 @@ export class GameSession {
       lap: this.engine.lap,
       decisions: this.engine.decisions,
       resolved: this.state.resolved,
+      grades: this.state.grades,
+      submission: this.state.submission,
     };
   }
 
   /** Rebuild a session from a saved run by replaying its decisions to the saved lap. Returns
-   * null if the save is for a different race/day. Deterministic, so it lands exactly. */
-  static restore(daily: Daily, saved: PersistedRun): GameSession | null {
-    if (saved.raceId !== daily.model.race.id || saved.date !== daily.date) return null;
+   * null if the save is for a different race/day/seed. Deterministic, so it lands exactly.
+   * Moments graded before the refresh keep their grades; any still missing are re-graded from
+   * a replay to their pause. */
+  static restore(daily: Daily, saved: PersistedRun, grader?: Grader): GameSession | null {
+    if (
+      saved.raceId !== daily.model.race.id ||
+      saved.date !== daily.date ||
+      saved.seed !== daily.seed
+    ) {
+      return null;
+    }
     const engine = new GameEngine(daily.model, daily.seed, { decisions: saved.decisions });
     while (engine.lap < saved.lap && !engine.isFinished()) engine.step();
 
     const moments = decisionMoments(daily.model);
     const finished = engine.isFinished();
+    // A save made mid-submit resumes at the finish, to submit again.
+    const phase = saved.phase === 'submitting' ? 'finished' : saved.phase;
     const state: GameState = {
-      phase: saved.phase,
+      phase,
       speed: saved.speed,
       race: engine.state as RaceState,
       moments,
-      currentMoment:
-        saved.phase === 'decision' ? momentAt(moments, engine.lap, saved.resolved) : null,
+      currentMoment: phase === 'decision' ? momentAt(moments, engine.lap, saved.resolved) : null,
       resolved: saved.resolved,
       decisions: engine.decisions,
       result: finished ? engine.result() : null,
+      grades: saved.grades ?? {},
+      submission:
+        saved.submission && saved.submission.status !== 'sending'
+          ? saved.submission
+          : { status: daily.source === 'live' ? 'none' : 'practice' },
       meta: metaOf(daily),
     };
-    return new GameSession(daily, engine, state);
+    const session = new GameSession(daily, { engine, state, grader });
+    for (const m of moments) {
+      const reached = saved.resolved.includes(m.id) || state.currentMoment?.id === m.id;
+      if (reached) session.startGrading(m, session.pausedAt(m, saved.decisions));
+    }
+    return session;
+  }
+
+  /** A replay paused before `moment`, holding only the calls made before that pause. */
+  private pausedAt(moment: DecisionMoment, decisions: Decision[]): GameEngine {
+    const known = decisions.filter((d) => (d.at as number) < moment.lap - 1);
+    const engine = new GameEngine(this.daily.model, this.daily.seed, { decisions: known });
+    while (engine.lap < moment.lap - 1) engine.step();
+    return engine;
   }
 }

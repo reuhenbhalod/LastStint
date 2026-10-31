@@ -1,31 +1,50 @@
 // API base resolution.
 //
 // Dev:  VITE_API_BASE is unset -> base is '' -> fetch('/api/daily') is relative and the
-//       Vite proxy (see vite.config.ts) forwards it to the local Worker on :8787.
-// Prod: set VITE_API_BASE to the deployed Worker origin (e.g.
-//       https://pitwall.<account>.workers.dev) at build time. Requests then go
-//       cross-origin to the Worker, which allows them via CORS (WEB_ORIGIN).
+//       Vite proxy (see vite.config.ts) forwards it to the Worker.
+// Prod: VITE_API_BASE is the deployed Worker origin (https://pitwall.boxboxbox.workers.dev),
+//       set at build time. Requests go cross-origin; the Worker allows the site via CORS
+//       (WEB_ORIGIN).
 
 const API_BASE = import.meta.env.VITE_API_BASE ?? '';
+
+/** An API error with the server's code (`already-submitted`, `bad-grades`, …). */
+export class ApiError extends Error {
+  constructor(
+    readonly status: number,
+    readonly code: string,
+  ) {
+    super(`${status} ${code}`);
+  }
+}
 
 /** Build a full API URL for a path like '/api/daily'. */
 export function apiUrl(path: string): string {
   return `${API_BASE}${path}`;
 }
 
-/** Fetch JSON from the API, throwing on a non-2xx response. */
+async function parse<T>(res: Response): Promise<T> {
+  if (res.ok) return res.json() as Promise<T>;
+  let code = 'http-error';
+  try {
+    code = ((await res.json()) as { error?: string }).error ?? code;
+  } catch {
+    // not JSON
+  }
+  throw new ApiError(res.status, code);
+}
+
+/** Fetch JSON from the API (or an absolute URL, such as a daily's modelUrl). */
 export async function apiGet<T>(path: string): Promise<T> {
-  const res = await fetch(apiUrl(path));
-  if (!res.ok) throw new Error(`GET ${path} failed: ${res.status}`);
-  return res.json() as Promise<T>;
+  return parse<T>(await fetch(path.startsWith('http') ? path : apiUrl(path)));
 }
 
 export async function apiPost<T>(path: string, body: unknown): Promise<T> {
-  const res = await fetch(apiUrl(path), {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) throw new Error(`POST ${path} failed: ${res.status}`);
-  return res.json() as Promise<T>;
+  return parse<T>(
+    await fetch(apiUrl(path), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    }),
+  );
 }

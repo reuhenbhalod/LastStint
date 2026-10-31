@@ -77,10 +77,27 @@ jobs:
       - name: TS sim matches golden files
         run: pnpm --filter @boxthislap/sim test
 
+  # One browser playthrough of the Daily Race (frontend spec C4): start, four calls, results,
+  # share. The API is mocked in the test, so it needs no Worker.
+  e2e:
+    name: Web end-to-end
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4  # version from package.json "packageManager"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @boxthislap/web exec playwright install --with-deps chromium
+      - name: Playthrough
+        run: pnpm --filter @boxthislap/web e2e
+
   # Deploy runs only on main and only once every check above has passed.
   deploy:
     name: Deploy Worker + D1 migrations
-    needs: [python, js, parity]
+    needs: [python, js, parity, e2e]
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     concurrency:
@@ -101,3 +118,30 @@ jobs:
         run: pnpm --filter @boxthislap/worker migrate:remote
       - name: Deploy worker
         run: pnpm --filter @boxthislap/worker run deploy
+
+  # The website (apps/web): built against the live API and deployed as a static-assets Worker,
+  # after the API so the site never calls an API older than itself.
+  deploy-web:
+    name: Deploy website
+    needs: [deploy]
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: deploy-web
+      cancel-in-progress: false
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      VITE_API_BASE: https://pitwall.boxboxbox.workers.dev
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4  # version from package.json "packageManager"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Build
+        run: pnpm --filter @boxthislap/web build
+      - name: Deploy
+        run: pnpm --filter @boxthislap/web run deploy

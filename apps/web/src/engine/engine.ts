@@ -11,14 +11,14 @@ import {
   type RaceState,
   type Run,
   type RunOptions,
-  type Target,
-  candidateMoments,
+  answerMoment,
   classify,
   decide,
   initRun,
   isFinished,
   stepLap,
 } from '@boxthislap/sim';
+import { type MomentJob, momentJob } from './grading.js';
 
 export class GameEngine {
   private readonly run: Run;
@@ -49,9 +49,22 @@ export class GameEngine {
     return isFinished(this.run);
   }
 
-  /** Record a player call (BOX, a mode flip, a radio answer) on the current lap. */
+  /** Record a player call (BOX, a mode flip) on the current lap. */
   apply(decision: Decision): void {
     decide(this.run, decision);
+  }
+
+  /**
+   * Answer a decision moment while paused at it: logs the radio answer and the option's calls,
+   * the shape the server verifies (`answerMoment`).
+   */
+  answer(moment: DecisionMoment, optionId: string): void {
+    answerMoment(this.run, moment, optionId);
+  }
+
+  /** Describe the paused moment for a grading worker (call before answering). */
+  gradingJob(moment: DecisionMoment, samples?: number): MomentJob {
+    return momentJob(this.run, moment, samples);
   }
 
   /** Advance one lap; returns the new race state. */
@@ -70,7 +83,10 @@ export class GameEngine {
   }
 }
 
-/** The decision moments for a race, derived from the model by the simulator. */
-export function decisionMoments(model: RaceModel, target?: Target): DecisionMoment[] {
-  return candidateMoments(model, target);
+/**
+ * The race's approved decision moments, in lap order. These are the moments the server grades
+ * (`verifyRun` requires one answer each), so the game must ask exactly these.
+ */
+export function decisionMoments(model: RaceModel): DecisionMoment[] {
+  return [...model.decisionMoments].sort((a, b) => a.lap - b.lap);
 }

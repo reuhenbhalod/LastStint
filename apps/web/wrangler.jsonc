@@ -1,0 +1,9 @@
+{
+  // The game's website: the built Vite app (dist/) served as static assets by a Worker
+  // (Cloudflare Pages is now part of Workers). CI builds it with VITE_API_BASE pointing at the
+  // API Worker (apps/worker) and deploys it from main; the API allows this origin (WEB_ORIGIN).
+  "name": "pitwall-web",
+  "account_id": "20a233209db4b2680328a2c547039f17",
+  "compatibility_date": "2026-10-13",
+  "assets": { "directory": "./dist", "not_found_handling": "single-page-application" }
+}

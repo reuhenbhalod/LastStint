@@ -1,8 +1,10 @@
 // The race view: timing tower + the user's controls, with the decision overlay when paused.
 
 import type { RaceModel } from '@boxthislap/sim';
+import { useRef } from 'react';
 import { BoxButton } from '../components/BoxButton.js';
 import { DecisionModal } from '../components/DecisionModal.js';
+import { GapTrace } from '../components/GapTrace.js';
 import { HeadsetPanel } from '../components/HeadsetPanel.js';
 import { LapClock } from '../components/LapClock.js';
 import { SpeedControl } from '../components/SpeedControl.js';
@@ -24,6 +26,11 @@ export function RaceScreen({
 
   const toRival =
     me && rivalCar && !me.retired && !rivalCar.retired ? me.totalTime - rivalCar.totalTime : null;
+  // Gap history for the trace (> 0: we're ahead), from the laps this screen has seen.
+  const trace = useRef(new Map<number, number>());
+  if (toRival !== null) trace.current.set(state.race.lap, -toRival);
+  const points = [...trace.current.entries()].sort((a, b) => a[0] - b[0]).slice(-15);
+  const live = state.meta.source === 'live';
 
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col gap-4 p-4">
@@ -34,24 +41,30 @@ export function RaceScreen({
             <p className="font-mono text-sm">
               <span className="text-orange-300">{rival}</span>{' '}
               <span className={toRival > 0 ? 'text-red-400' : 'text-green-400'}>
-                {toRival > 0 ? `+${toRival.toFixed(1)}s ahead` : `${(-toRival).toFixed(1)}s behind`}
+                {toRival > 0
+                  ? `${toRival.toFixed(1)}s ahead of us`
+                  : `${(-toRival).toFixed(1)}s behind us`}
               </span>
             </p>
           ) : (
             <span />
           )}
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={game.reset}
-              title="Restart"
-              className="rounded-full border border-neutral-700 px-2 py-1 text-xs text-neutral-400"
-            >
-              ↺
-            </button>
+            {!live && (
+              <button
+                type="button"
+                onClick={game.reset}
+                title="Restart"
+                aria-label="Restart the race"
+                className="rounded-full border border-neutral-700 px-2 py-1 text-xs text-neutral-400"
+              >
+                ↺
+              </button>
+            )}
             <SpeedControl speed={state.speed} onChange={game.setSpeed} />
           </div>
         </div>
+        <GapTrace points={points} rival={rival} />
       </header>
 
       <section className="min-h-0 flex-1 overflow-y-auto">
@@ -84,7 +97,13 @@ export function RaceScreen({
       </section>
 
       {paused && state.currentMoment && (
-        <DecisionModal moment={state.currentMoment} rival={rival} onChoose={game.choose} />
+        <DecisionModal
+          key={state.currentMoment.id}
+          moment={state.currentMoment}
+          race={state.race}
+          model={model}
+          onChoose={game.choose}
+        />
       )}
     </main>
   );
