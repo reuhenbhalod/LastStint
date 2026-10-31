@@ -214,11 +214,19 @@ function defaultModes(car: CarState): boolean {
   return m.pace === 'standard' && m.fuel === 'normal' && m.battle === 'hold';
 }
 
-/** Sum of the car's standing-mode lap-time deltas (0 on default modes). */
+/**
+ * Sum of the car's standing-mode lap-time deltas (0 on default modes). Pushing gains nothing
+ * on tyres past their cliff, which have no grip left to push with (it still wears them
+ * faster): otherwise a player could push worn tyres to open a gap the real driver, already
+ * flat out, couldn't (Abu Dhabi 21: a free stop under the lap-53 SC).
+ */
 function modeLapDelta(run: Run, car: CarState): number {
   if (defaultModes(car)) return 0;
+  const pace = effect(run, car, 'pace').lapDelta ?? 0;
+  const cliff = run.model.compounds[car.compound]?.cliffLap;
+  const worn = pace < 0 && cliff !== undefined && car.tyreWear >= cliff;
   return (
-    (effect(run, car, 'pace').lapDelta ?? 0) +
+    (worn ? 0 : pace) +
     (effect(run, car, 'fuel').lapDelta ?? 0) +
     (effect(run, car, 'battle').lapDelta ?? 0)
   );
@@ -682,9 +690,11 @@ function rivalReacts(
  * tires"). Run at the end of the user's in-lap, when the user's stop is due next lap: a rival
  * still behind the user (so it reaches pit entry after seeing the call) that would be ahead
  * once the user's stop is charged under a SC/VSC skips its own stop planned within
- * COVER_WINDOW laps to keep track position. The stop moves to when its tyres reach the
- * cliff, or is dropped if that is past the flag. Under green the plan's cover rule applies
- * instead (rivalReacts).
+ * COVER_WINDOW laps to keep track position, but only when its tyres reach the flag without
+ * it. A rival that would have to stop later anyway keeps its cheap neutralized stop: going
+ * long would trade it for a full green stop (Abu Dhabi 21: HAM boxing under the lap-36 VSC
+ * had VER skip his VSC stop and pay ~22s on lap 46). Under green the plan's cover rule
+ * applies instead (rivalReacts).
  */
 function rivalGoesLong(run: Run, lap: number): void {
   const { model, state } = run;
@@ -707,21 +717,14 @@ function rivalGoesLong(run: Run, lap: number): void {
 
   const compound = model.compounds[rival.compound];
   const lapsToCliff = compound ? Math.max(1, Math.floor(compound.cliffLap - rival.tyreWear)) : 1;
+  if (stopLap + lapsToCliff <= model.race.laps) return; // would have to stop later anyway
   const others = rival.strategy.filter((s) => s !== planned);
   // Two-compound rule: going long may not drop the stop that would make the rival comply.
-  // If no other planned stop brings a new compound, the stop moves at most to the final lap.
   const needsThisStop =
     !ruleSatisfied(rival) && !others.some((s) => !rival.compoundsUsed.includes(s.to));
-  let laterLap: number | null = stopLap + lapsToCliff;
-  if (laterLap > model.race.laps) laterLap = needsThisStop ? model.race.laps : null;
-  rival.strategy =
-    laterLap === null ? others : [...others, { lap: laterLap, to: planned.to, added: true }];
-  run.notes.push({
-    lap,
-    kind: 'rival-stays-out',
-    driver: rival.code,
-    detail: laterLap === null ? 'no stop' : `stop moved to lap ${laterLap}`,
-  });
+  if (needsThisStop) return;
+  rival.strategy = others;
+  run.notes.push({ lap, kind: 'rival-stays-out', driver: rival.code, detail: 'no stop' });
 }
 
 /**

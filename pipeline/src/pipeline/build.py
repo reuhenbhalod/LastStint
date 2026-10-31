@@ -25,7 +25,9 @@ RACES: dict[str, dict] = {
         "name": "Abu Dhabi 2021: Hamilton vs Verstappen",
         "era": "2014-2025",
         "takeover_lap": 34,
-        "seed": 81723,
+        # Beta seed (Oct 30 2026): its run reaches the lap-53 SC with HAM 11.9s ahead, as in
+        # the real race, which is less than a SC stop costs, so boxing there isn't free.
+        "seed": 1205,
         "user_side": "HAM",
         "rival": "VER",
         # P7 and back were decided by race control (only the lapped cars between HAM and

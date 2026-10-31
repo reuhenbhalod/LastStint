@@ -568,3 +568,21 @@ The measured rule was built into both sims (parity held on all 32 races) and run
 - **Abu Dhabi 21 before the lap-53 SC:** mean gap 12.1 s (real 11.9 s); 57% of runs are now below the SC stop cost.
 - **What-if: 8 of 11 agree**, unchanged.
 - **Kept.** Test: `test_vsc_stop_measured_by_gap_change` (VER 10–11.5 s) and `test_settle_lap_is_first_green_lap_after_the_out_lap`.
+
+## Stage 11: Abu Dhabi 21 beta readiness (Oct 30, 2026)
+
+Goal: Abu Dhabi 21 ready for beta testing on its own. The rule from the owner: the lap-53 call must be a real challenge, with no unrealistic free pit stop. Each player path into lap 53 was played on the daily seed.
+
+| Path into lap 53 (seed 1205) | Gap at lap 52 | Lap-53 grades (beat VER) |
+|---|---|---|
+| Real calls | 11.9 s (real 11.9 s) | stay out 18% red, box softs 46% green |
+| Push from lap 35 | 10.6 s (was 12.6 s, a free stop) | stay out 10%, box softs 36% |
+| Manage from lap 35 | 8.6 s | stay out 26%, box softs 11% |
+| Box under the lap-36 VSC | 3.8 s (was 15.9 s) | stay out 82%, box softs 18% |
+
+**Fixes.**
+- **Daily seed 81723 → 1205.** The old seed's run reached lap 53 with a 14.1 s gap, more than an SC stop costs (12.4 s), so boxing was free. Seed 1205 reaches lap 53 with the real 11.9 s gap and the real top three. It was chosen from 5,000 seeds by the field's lap-52 gaps.
+- **The rival goes long only when its tyres reach the flag** (`rivalGoesLong`). When HAM boxed under the lap-36 VSC, VER skipped his cheap VSC stop "to take track position" and then paid a full green stop on lap 46, about 22 s, handing HAM a free stop under the SC. Now a rival that would have to stop later anyway keeps its neutralized stop. Live play only, so replays and parity are unchanged. Test: `keeps its cheap VSC stop when its tyres would not reach the flag`.
+- **No push gain on tyres past their cliff** (`modeLapDelta`). Pushing 39-lap-old hards for 17 laps gained 0.7 s, enough for a free SC stop. HAM was already flat out in the real race. Push still wears the tyres 1.3× faster. No push window now beats the real pace into lap 53. Live play only.
+
+**Unchanged:** G1 (replays use real strategies, so these live-play fixes don't touch it) and what-if 8 of 11.

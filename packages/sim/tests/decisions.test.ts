@@ -169,6 +169,14 @@ describe('rival policy', () => {
     expect(run.notes.filter((n) => n.kind === 'rival-stays-out')).toEqual([]);
   });
 
+  it('keeps its cheap VSC stop when its tyres would not reach the flag', () => {
+    // HAM boxes under the lap-36 VSC with 22 laps left. Going long would leave VER a full
+    // green stop at his tyres' cliff, so he takes his real VSC stop instead.
+    const run = runTo(abu, 1, [{ lap: 36, kind: 'pit', compound: 'HARD' }], 40);
+    expect(run.notes.filter((n) => n.kind === 'rival-stays-out')).toEqual([]);
+    expect(run.state.cars.VER?.tyreAge).toBeLessThan(5);
+  });
+
   it('does not go long under green (the plan covers instead)', () => {
     const run = runTo(spain, 1, [{ lap: 24, kind: 'pit', compound: 'MEDIUM' }], 30);
     expect(run.notes.filter((n) => n.kind === 'rival-stays-out')).toEqual([]);

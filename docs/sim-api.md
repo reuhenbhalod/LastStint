@@ -47,7 +47,7 @@ Mode and team-order effects are calibrated estimates in `packages/sim/src/headse
 ### Rules the UI should surface
 
 - **Two-compound rule.** In a dry race a car must run two different dry compounds. `ruleSatisfied(run.state.cars[model.userSide])` says whether the player has. A car reaching the flag without it is disqualified: `result.disqualified`, classified last. Warn before the last laps (the example has an `onRuleWarning` hook).
-- **Rival reactions.** Under a SC/VSC the rival covers your stop if it stays ahead after both stops, or goes long to take track position. Under green it covers inside the undercut window when its own stop is near. Each reaction adds a note: `rival-cover` or `rival-stays-out`.
+- **Rival reactions.** Under a SC/VSC the rival covers your stop if it stays ahead after both stops, or goes long to take track position when its tyres reach the flag without stopping. Under green it covers inside the undercut window when its own stop is near. Each reaction adds a note: `rival-cover` or `rival-stays-out`.
 - **Fixed events.** Real safety cars, VSCs and retirements happen on the laps they really did, whatever the player does.
 
 ## State you render
