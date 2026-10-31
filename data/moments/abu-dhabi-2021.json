@@ -1,6 +1,68 @@
 [
   {
-    "id": "sc-53",
+    "id": "vsc-cover",
+    "lap": 36,
+    "trigger": "VSC",
+    "target": {
+      "kind": "beat-rival"
+    },
+    "options": [
+      {
+        "id": "stay",
+        "label": "Stay out \u2014 keep the lead",
+        "decisions": []
+      },
+      {
+        "id": "cover-hard",
+        "label": "Box, fresh hards",
+        "decisions": [
+          {
+            "lap": 36,
+            "kind": "pit",
+            "compound": "HARD"
+          }
+        ]
+      }
+    ],
+    "realOptionId": "stay"
+  },
+  {
+    "id": "manage-or-push",
+    "lap": 49,
+    "trigger": "cliff",
+    "target": {
+      "kind": "beat-rival"
+    },
+    "options": [
+      {
+        "id": "push",
+        "label": "Push now",
+        "decisions": [
+          {
+            "lap": 49,
+            "kind": "mode",
+            "key": "pace",
+            "value": "push"
+          }
+        ]
+      },
+      {
+        "id": "manage",
+        "label": "Manage the tyres",
+        "decisions": [
+          {
+            "lap": 49,
+            "kind": "mode",
+            "key": "pace",
+            "value": "manage"
+          }
+        ]
+      }
+    ],
+    "realOptionId": null
+  },
+  {
+    "id": "sc-stop",
     "lap": 53,
     "trigger": "SC",
     "target": {
@@ -8,13 +70,13 @@
     },
     "options": [
       {
-        "id": "stay-out",
-        "label": "Stay out",
+        "id": "stay",
+        "label": "Stay out \u2014 keep the lead",
         "decisions": []
       },
       {
         "id": "box-soft",
-        "label": "Box for softs",
+        "label": "Box, softs",
         "decisions": [
           {
             "lap": 53,
@@ -24,19 +86,8 @@
         ]
       },
       {
-        "id": "box-medium",
-        "label": "Box for mediums",
-        "decisions": [
-          {
-            "lap": 53,
-            "kind": "pit",
-            "compound": "MEDIUM"
-          }
-        ]
-      },
-      {
         "id": "box-hard",
-        "label": "Box for hards",
+        "label": "Box, hards",
         "decisions": [
           {
             "lap": 53,
@@ -46,6 +97,41 @@
         ]
       }
     ],
-    "realOptionId": "stay-out"
+    "realOptionId": "stay"
+  },
+  {
+    "id": "restart-stance",
+    "lap": 57,
+    "trigger": "SC",
+    "target": {
+      "kind": "beat-rival"
+    },
+    "options": [
+      {
+        "id": "defend",
+        "label": "Defend hard",
+        "decisions": [
+          {
+            "lap": 57,
+            "kind": "mode",
+            "key": "battle",
+            "value": "defend"
+          }
+        ]
+      },
+      {
+        "id": "hold",
+        "label": "Hold the line",
+        "decisions": [
+          {
+            "lap": 57,
+            "kind": "mode",
+            "key": "battle",
+            "value": "hold"
+          }
+        ]
+      }
+    ],
+    "realOptionId": null
   }
 ]

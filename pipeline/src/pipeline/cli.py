@@ -129,15 +129,26 @@ def _robust(ids: list[str], report: str | None = None) -> None:
             rival=meta.get("rival"),
             score_positions=positions,
         )
+        if meta.get("data_issue"):
+            res.status = res.strict_status = "data issue"
         failing = sorted(
             {c.name for r in res.reports for c in r.checks if not c.passed},
             key=str,
         )
-        why = diagnose.diagnose(model, laps, positions).line() if res.status != "pass" else ""
+        why = (
+            meta["data_issue"]
+            if meta.get("data_issue")
+            else diagnose.diagnose(model, laps, positions).line()
+            if res.status != "pass"
+            else ""
+        )
         rows.append((rid, meta, res, failing, why))
-        typer.echo(f"{rid:24s} {res.status:10s} mean gap error {res.mean_gap_error:.2f}s")
+        typer.echo(
+            f"{rid:24s} {res.status:10s} (strict {res.strict_status:10s})"
+            f" mean gap error {res.mean_gap_error:.2f}s"
+        )
     for split in sorted({m.get("split", "?") for _, m, *_ in rows}, reverse=True):
-        part = [r for r in rows if r[1].get("split") == split]
+        part = [r for r in rows if r[1].get("split") == split and not r[1].get("data_issue")]
         n = {s: sum(r[2].status == s for r in part) for s in ("pass", "borderline", "fail")}
         mean = sum(r[2].mean_gap_error for r in part) / len(part)
         typer.echo(
@@ -157,28 +168,33 @@ def _report_markdown(rows: list) -> str:
         "robust: 1,000 runs on each of two seed sets (pass = both pass, borderline = one).",
         "Mean gap error averages the gap checks. Held-out races were never used to choose a",
         "model change. Diagnosis = the dominant source of the race's gap error",
-        "(`pipeline/src/pipeline/diagnose.py`).",
+        "(`pipeline/src/pipeline/diagnose.py`). Races with a data issue are listed, not counted.",
+        "Near-ties: cars that really finished within 1.0s are tied for the order checks (model",
+        "v3 spec C2); the status without that rule is shown alongside.",
         "",
     ]
     for split in ("holdout", "tune"):
         part = [r for r in rows if r[1].get("split") == split]
         if not part:
             continue
-        n = {s: sum(r[2].status == s for r in part) for s in ("pass", "borderline", "fail")}
-        mean = sum(r[2].mean_gap_error for r in part) / len(part)
+        counted = [r for r in part if not r[1].get("data_issue")]
+        n = {s: sum(r[2].status == s for r in counted) for s in ("pass", "borderline", "fail")}
+        mean = sum(r[2].mean_gap_error for r in counted) / len(counted)
         title = "Held-out races" if split == "holdout" else "Tuning races"
         lines += [
             f"## {title}: {n['pass']} pass, {n['borderline']} borderline, {n['fail']} fail"
             f" (mean gap error {mean:.2f}s)",
             "",
-            "| Race | Duel | Status | Mean gap error | Failing checks | Diagnosis |",
-            "|---|---|---|---|---|---|",
+            "| Race | Duel | Status | Without near-tie rule | Mean gap error | Failing checks"
+            " | Diagnosis |",
+            "|---|---|---|---|---|---|---|",
         ]
         for rid, meta, res, failing, why in part:
             duel = f"{meta['user_side']} vs {meta['rival']}"
             checks = "; ".join(failing) if failing else ""
             lines.append(
-                f"| {rid} | {duel} | {res.status} | {res.mean_gap_error:.2f}s | {checks} | {why} |"
+                f"| {rid} | {duel} | {res.status} | {res.strict_status} |"
+                f" {res.mean_gap_error:.2f}s | {checks} | {why} |"
             )
         lines.append("")
     return "\n".join(lines)

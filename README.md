@@ -48,9 +48,10 @@ uv run pytest
 
 **Phases 1 and 2 are closed** (Oct 26, 2026) with documented limits. Details are in `docs/phase-1-2-perfection-spec.md` and `docs/g1-report.md`.
 
-- **Race model (Phase 1):** 32 races from 2018–2025, built from FastF1 timing.
-  - Gate G1 passes on 6 races (Abu Dhabi 21, Canada 22, Bahrain 22, Miami 22, Hungary 19, Spain 20), with Mexico 21 borderline. These are the validated pool for daily content.
-  - Known limit: the model doesn't capture driver- or stint-specific pace. That is the dominant error in most failing races (see the report's diagnoses). A model v3 would target it.
+- **Race model (Phase 1):** 32 races from 2018–2025, built from FastF1 timing. Model v3 (`docs/model-v3-spec.md`) adds each driver's pace after the takeover and fixes three data and mechanics bugs.
+  - Gate G1 passes on 13 races (Abu Dhabi 21, Bahrain 21, Mexico 21, Miami 22, Canada 22, Bahrain 22, Hungary 19, Mexico 19, France 19, Spain 20, Portugal 20, Italy 24, Hungary 25), with France 21 and Hungary 22 borderline. Cars that really finished within 1.0 s count as tied for the order checks. Hungary 2019 is held back from daily content: its famous two-stop chase fails in the sim (long-stint tyre fade, see `docs/model-v3-spec.md`, What-if check).
+  - Mean gap error on held-out races fell from 5.6 s to 2.3 s. Given perfect pace, the sim reproduces 11 of 15 held-out races; the model passes 5. The remaining misses are mostly pace that varies within a driver's race.
+  - Miami 2025 is excluded: its tyre timing is corrupt upstream.
 - **Simulator (Phase 2):** `packages/sim`, documented in `docs/sim-api.md`.
   - Matches the Python reference sim.
   - Player calls, headset modes, team orders, the reactive rival and the two-compound rule.

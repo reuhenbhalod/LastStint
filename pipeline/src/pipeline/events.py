@@ -81,6 +81,52 @@ def neutralization_events(laps: pd.DataFrame) -> list[dict]:
     return events
 
 
+NEUTRAL_CODES = {"4", "5", "6"}  # SC, red flag, VSC deployed
+
+
+def deployment_times(track_status: list[dict]) -> list[float]:
+    """Session times at which a neutralization began: a status of SC, VSC or red flag
+    following one that wasn't neutralized (an SC replacing a VSC continues it)."""
+    out, neutral = [], False
+    for row in track_status:
+        now = str(row["status"]) in NEUTRAL_CODES
+        if now and not neutral:
+            out.append(float(row["time"]))
+        neutral = now
+    return out
+
+
+def green_entry_stops(
+    laps: pd.DataFrame, events: list[dict], track_status: list[dict]
+) -> set[tuple[str, int]]:
+    """(driver, out-lap) of real stops whose out-lap is a neutralized race lap but whose pit
+    entry came BEFORE that neutralization was deployed (Saudi 2022 PER, Miami 2024 PIA): they
+    paid a green-flag stop, though the sim would price them by the out-lap's flag."""
+    lead = leader_laps(laps).set_index("LapNumber")["Time"]
+    deploys = deployment_times(track_status)
+    neutral_laps: dict[int, float] = {}
+    for e in events:
+        if e["type"] not in ("SC", "VSC", "RED"):
+            continue
+        start = lead.get(e["lap"] - 1)
+        end = lead.get(e["lap"])
+        if start is None or end is None or pd.isna(start) or pd.isna(end):
+            continue
+        t = next((d for d in deploys if start - 1.0 <= d <= end), None)
+        if t is None:
+            continue
+        for lap in range(e["lap"], e["lap"] + int(e.get("laps", 1))):
+            neutral_laps[lap] = t
+    out: set[tuple[str, int]] = set()
+    pit_in = laps[laps["PitInTime"].notna()]
+    for r in pit_in.itertuples():
+        out_lap = int(r.LapNumber) + 1
+        deployed = neutral_laps.get(out_lap)
+        if deployed is not None and float(r.PitInTime) < deployed:
+            out.add((str(r.Driver), out_lap))
+    return out
+
+
 def retirement_events(laps: pd.DataFrame, total_laps: int | None = None) -> list[dict]:
     """Drivers whose last lap ends well before the leader takes the flag.
 

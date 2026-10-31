@@ -47,7 +47,14 @@ def test_vsc_stop_measured_by_gap_change(abu):
     laps, *_ = abu
     vsc = {d: loss for d, f, loss in track.stop_losses(laps) if f == "VSC"}
     assert set(vsc) == {"ALO", "GAS", "LEC", "PER", "VER"}
-    assert 13 < vsc["VER"] < 16
+    # Read once racing resumes (end of lap 38): the real gap to HAM went 5.7s before the VSC
+    # to 16.4s after it, so ~10.7s, not the 14.5s still stretched by the VSC on lap 37.
+    assert 10 < vsc["VER"] < 11.5
+
+
+def test_settle_lap_is_first_green_lap_after_the_out_lap():
+    assert track.settle_lap({30, 38, 39}, 37) == 38
+    assert track.settle_lap({30}, 37) == 37  # no green lap close enough: read on the out-lap
 
 
 def test_stop_losses_flag_each_stop(abu):

@@ -9,6 +9,7 @@ Heavy imports (fastf1) are done inside functions so `import pipeline` stays ligh
 
 from __future__ import annotations
 
+import json
 import os
 import re
 import time
@@ -70,6 +71,32 @@ def default_race_id(year: int, event: str) -> str:
 def raw_snapshot_path(race_id: str, raw_dir: Path = RAW_DIR) -> Path:
     """Path to the raw parquet snapshot for a race."""
     return raw_dir / f"{race_id}.parquet"
+
+
+def track_status_path(race_id: str, raw_dir: Path = RAW_DIR) -> Path:
+    """Path to the race's track-status timeline (session seconds, status code)."""
+    return raw_dir / f"{race_id}.status.json"
+
+
+def project_track_status(track_status: pd.DataFrame) -> list[dict]:
+    """FastF1 `session.track_status` as [{time (session s), status}]: the exact moments SCs,
+    VSCs and red flags were deployed, which the per-lap TrackStatus can't place."""
+    return [
+        {"time": round(r.Time.total_seconds(), 3), "status": str(r.Status)}
+        for r in track_status.itertuples()
+    ]
+
+
+def save_track_status(race_id: str, session, raw_dir: Path = RAW_DIR) -> Path:
+    path = track_status_path(race_id, raw_dir)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(project_track_status(session.track_status), indent=1) + "\n")
+    return path
+
+
+def load_track_status(race_id: str, raw_dir: Path = RAW_DIR) -> list[dict] | None:
+    path = track_status_path(race_id, raw_dir)
+    return json.loads(path.read_text()) if path.exists() else None
 
 
 def load_race(year: int, event: str, cache_dir: Path = CACHE_DIR):
@@ -196,4 +223,5 @@ def ingest_race(
     path = raw_snapshot_path(race_id, raw_dir)
     path.parent.mkdir(parents=True, exist_ok=True)
     df.to_parquet(path)
+    save_track_status(race_id, session, raw_dir)
     return df, facts
