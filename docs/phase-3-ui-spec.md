@@ -17,7 +17,7 @@ Most players arrive from a shared link on a phone, so **design for a 390px scree
 **In scope**
 - The full Daily Race, playable end to end, client-side: daily card → race → decisions →
   result, with grading, headset modes, percentile/rank placeholders, and a share card.
-- A data layer that loads a static race model + race script now and swaps to the Worker API
+- A data layer that loads a static race model now and swaps to the Worker API
   (`/api/daily`, `/api/runs`) later with no UI changes.
 - The grader running in a Web Worker so the race animation never stutters.
 - Resume-after-refresh for an in-progress run.
@@ -35,42 +35,26 @@ Most players arrive from a shared link on a phone, so **design for a 390px scree
 
 - **`@boxthislap/sim`** (workspace package) — the only source of race behaviour:
   `initRun`, `stepLap`, `decide`, `isFinished`, `classify`, `forkRun`, `realDecisions`,
-  `validateDecisions`, `DEFAULT_MODES`, and `gradeMoment`/`bandFor` with `Target`,
-  `GradeOption`, `MomentGrade`. Types: `RaceModel`, `RaceState`, `CarState`, `Decision`,
-  `Modes`, `RaceResult`, `RaceNote`.
+  `validateDecisions`, `DEFAULT_MODES`; the moment layer `candidateMoments`, `proposeMoments`,
+  `pauseAt`, `verdictFor`; and the grader `gradeMoment`/`bandFor` with `Target`, `GradeOption`,
+  `MomentGrade`. Types: `RaceModel`, `RaceState`, `CarState`, `Decision`, `Modes`,
+  `RaceResult`, `RaceNote`, `DecisionMoment`, `MomentOption`.
 - **Race model JSON** (`data/races/<id>.json`, schema v5) — fitted model + event timeline.
-- **Race script JSON** (new, see below) — the authored decision moments, their options, and
-  radio copy.
 
-### The race script (new authored artifact)
+### Decision moments come from the simulator
 
-The race model says *when* the game pauses (`decisionMoments` laps) but not *what to ask* or
-*which options to offer*. That is authored content, one file per race, validated by its own
-schema in `packages/schema/race-script.schema.json`:
+The sim derives the moments from the model, so the UI does **not** hand-author them.
+`candidateMoments(model, target)` returns `DecisionMoment[]` — each with a `trigger`
+(SC / VSC / rivalPit / undercut / cliff), its `lap`, the `target`, `options`
+(`MomentOption {id, label, decisions}` — the box/stay-out/mode calls), and `realOptionId`
+(the option matching what the real team did). `proposeMoments(model)` grades each and assigns
+a `verdict` (`keep` / `no-choice` / `no-tension`) — the Phase-5 quality bar, automated. At
+runtime the UI pauses via `pauseAt`, offers the moment's `options`, grades them with
+`gradeMoment`, and applies the chosen option's `decisions` with `decide`.
 
-```jsonc
-{
-  "raceId": "abu-dhabi-2021",
-  "target": { "kind": "beat-rival" },          // or {"win"} / {"position","atBest":N}
-  "intro": "You're Mercedes. 24 laps left, leading Max by 5s on worn hards.",
-  "moments": [
-    {
-      "lap": 36,
-      "id": "vsc-cover",
-      "prompt": "Max has boxed for fresh hards under the VSC. Do you cover?",
-      "options": [
-        { "id": "stay", "label": "Stay out", "decisions": [] },
-        { "id": "box", "label": "Box, hard",
-          "decisions": [{ "lap": 36, "kind": "pit", "compound": "HARD" }] }
-      ]
-    }
-  ]
-}
-```
-
-Each option's `decisions[]` are real `Decision`s the sim understands; the grader grades them
-with `gradeMoment(run, options, target)`. Standing headset modes are separate (always-live
-controls, not moments). Radio copy is original (never real team radio).
+The only layer left to author is **prose** — an intro line and nicer prompt/label copy — a
+thin overlay keyed by moment `id`. It's deferred: the sim's `label`s carry the UI for now and
+radio prose lands in Phase 5. There is **no** `race-script` schema or per-race file.
 
 ## Architecture
 
@@ -80,8 +64,9 @@ flow driven by the state machine).
 
 **Layers**
 1. **Data layer** (`src/data/`) — a `DailyProvider` interface returning `{ date, raceId,
-   seed, model, script }`. `StaticDailyProvider` loads a bundled/fetched model + script now;
-   `ApiDailyProvider` hits `/api/daily` later. The UI depends only on the interface.
+   seed, model }`. `StaticDailyProvider` bundles the model (via the `@data` alias to the
+   shared `data/` dir); `ApiDailyProvider` hits `/api/daily` later. The UI depends only on
+   the interface. Moments are derived from the model by the sim, not carried here.
 2. **Engine layer** (`src/engine/`) — thin wrappers over `@boxthislap/sim`: own the `Run`,
    expose `step()`, `apply(decision)`, `result()`, and post grading jobs to the worker.
 3. **Grader worker** (`src/engine/grader.worker.ts`) — receives `(model, seed, decisions,
@@ -125,7 +110,7 @@ is a reasonable alternative if the chart grows; not needed at launch.
   visible. Each flip is a `mode` decision on the current lap.
 - **FR4 BOX** — always live; pressing it opens compound choice and books a pit decision for
   the current lap; cancellable until the car reaches pit entry.
-- **FR5 Decision moments** — at each scripted moment the clock pauses and 3–4 options (with
+- **FR5 Decision moments** — at each decision moment the clock pauses and 3–4 options (with
   short context: gap, tyre age, pit loss) are shown; selecting one applies its decisions and
   resumes.
 - **FR6 Radio moments** — driver/engineer messages rendered with original copy; the answer
@@ -141,8 +126,8 @@ is a reasonable alternative if the chart grows; not needed at launch.
 
 ### Non-functional
 
-- **NFR1** Mobile-first at 390px; works offline for a loaded daily (model + script + sim are
-  all client-side).
+- **NFR1** Mobile-first at 390px; works offline for a loaded daily (model + sim are all
+  client-side).
 - **NFR2** The grade for a moment resolves within a lap-tick or two (worker, ~300 samples);
   never blocks the animation.
 - **NFR3** Deterministic: the same (model, seed, decisions) renders the same race — the
@@ -174,14 +159,14 @@ is a reasonable alternative if the chart grows; not needed at launch.
 
 ## Implementation steps
 
-### 3.1 Data + engine foundation
-- Define the `DailyProvider` interface and `StaticDailyProvider` (bundles `abu-dhabi-2021`
-  model + an authored script).
-- Add `packages/schema/race-script.schema.json` and author `data/scripts/abu-dhabi-2021.json`
-  (2–4 moments; validated).
-- Engine wrapper owning a `Run` with `step/apply/result`.
-- **Acceptance:** a test drives a full race through the engine with scripted real decisions
-  and reproduces the sim's `classify` result; the script validates against its schema.
+### 3.1 Data + engine foundation — DONE
+- `DailyProvider` interface + `StaticDailyProvider` (bundles `abu-dhabi-2021` via `@data`).
+- `GameEngine` wrapper owning a `Run` with `state`/`lap`/`step`/`apply`/`result`/`runToFlag`,
+  plus `decisionMoments(model)` surfacing the sim's `candidateMoments`.
+- Web app wired for tests: vitest, `@data` alias, JSON imports.
+- **Acceptance (met):** a test drives the full race through the engine and reproduces
+  `simulate`/`classify`; `decisionMoments(abu)` yields the VSC moment with `stay-out` as the
+  real call; `StaticDailyProvider` serves the fixture. 5 tests, typecheck, build all pass.
 
 ### 3.2 State machine + race loop (no visuals)
 - Typed reducer for the state chart; auto-tick with 1×/2× and pause at `decisionMoments`.
@@ -217,7 +202,7 @@ is a reasonable alternative if the chart grows; not needed at launch.
 
 | Layer | Tests |
 |---|---|
-| Engine | Full-race playthrough matches `sim.classify`; script-schema validation |
+| Engine | Full-race playthrough matches `sim.classify`; moments derived from the model |
 | State machine | Reducer transition + resume unit tests (vitest) |
 | Grader worker | Message round-trip returns a `MomentGrade`; determinism |
 | Components | Render tests for TimingTower/GradeChip from fixture state |
@@ -228,10 +213,12 @@ must pass. Grading uses the bundled fixture (no network).
 
 ## Open decisions
 
-- [ ] **State management:** typed `useReducer` (recommended, dependency-light) vs XState.
-- [ ] **Backend now:** confirm static provider + client-side grading for this phase, Worker
-  wired in Phase 4 (recommended), vs stand up a minimal Worker first.
-- [ ] **Decision-moment authoring:** this spec's `race-script.json` format — confirm before
-  authoring the pool in Phase 5.
+- [x] **State management:** typed `useReducer` (dependency-light). *Decided.*
+- [x] **Backend now:** static provider + client-side grading this phase; Worker wired in
+  Phase 4. *Decided.*
+- [x] **Moments source:** derived from the model by the sim (`candidateMoments`), not a
+  hand-authored race-script. *Decided — supersedes the earlier race-script design.*
+- [ ] **Copy overlay:** format for the authored prose (intro + per-moment prompts/labels,
+  keyed by moment `id`) — deferred to Phase 5; sim `label`s carry the UI until then.
 - [ ] **Target per race:** `beat-rival` as the default grading target (vs `win` / `position`).
 - [ ] **Mystery Race:** include the reveal mechanic now or defer to polish.
