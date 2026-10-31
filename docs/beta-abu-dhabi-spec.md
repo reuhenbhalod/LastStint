@@ -36,11 +36,12 @@ A tester opens Reuhen's site, plays Abu Dhabi 2021 as Mercedes, and submits the 
 | 1 | **Done.** `main` merged in; the verify and API tests now use the four moments (a one-moment copy for the rule tests, plus a full four-moment run); the schedule script uses the race file's seed (dry run: #1–#3, seed 1205); `account_id` pinned. The races bundle imports the race files directly, so it needs no regeneration. 167 sim + 19 Worker tests pass. |
 | 1b | **Done.** `verifyRun(…, claimed)` checks and uses the game's grades (`claimGrade()` builds them; 0.07 ms against 99 ms for full grading, same score). `POST /api/runs` requires `grades` (`400 bad-grades` otherwise). Migration 0003 adds `grades`, `verified` and `corrected`. `scripts/reverify.ts` + `.github/workflows/reverify.yml` (10:30 UTC nightly, or run by hand) re-grade unverified runs. Tested: an honest run matches full grading exactly; a run with edited grades is accepted live, then corrected to its true score and bands. `docs/api.md` and `docs/sim-api.md` updated. 171 sim + 20 Worker tests pass. |
 | 2 | **Done.** `packages/sim/tests/scripts-sync.test.ts` checks that every `data/scripts/*.json` matches its race file (moment ids, laps, targets, option ids and calls). It fails on a renamed moment, a moved lap or a dropped option. |
+| 3 | **Done.** `pnpm --filter @boxthislap/sim combos abu-dhabi-2021` plays all 24 answer combinations through the server's scoring. **0 live/full mismatches**, none rejected, no disqualification. **Seed 1205 → 64 (owner decision):** with 1205 the last-lap overtaking draw favoured the chaser so heavily that every path that covered at lap 36 (the best-graded call; HAM 72–91% at lap 53) still lost the race. Seed 64 also reaches lap 53 with the real gap (11.93 s against 11.91 s), and its results follow the odds: covering at lap 36 and then staying out wins (scores 77.5–100), and Mercedes' real calls lose (52.5–67.5), as in history. Boxing for softs at lap 53 (about 50%) loses on this seed. What-if is 8 of 11 and Abu Dhabi passes G1 (2.33 s), both unchanged. The team-orders known-answer test now pins its own seed. Lap 49: push and manage still tie on the real path; after a cover, manage grades yellow. |
 
 ## Decisions (recommended first)
 
 **B1. Daily seed**
-- **a. Every Abu Dhabi day uses the race file's seed (1205).** ← recommended. That's the seed chosen so lap 53 is the real dilemma. A random seed per day can bring back a free pit stop.
+- **a. Every Abu Dhabi day uses the race file's seed (64; was 1205, see stage 3).** ← recommended. That's the seed chosen so lap 53 is the real dilemma. A random seed per day can bring back a free pit stop.
 - b. A random seed per day (as built in October).
 
 **B2. Keeping the UI script and the race file in sync**

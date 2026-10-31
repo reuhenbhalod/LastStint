@@ -100,6 +100,7 @@ describe('team orders', () => {
 
   it('known answer: holding up a faster rival behind your teammate grades best', () => {
     const SCENARIO_NOISE = 0.5; // s/lap, a typical race-pace spread
+    const SCENARIO_SEED = 1205; // pinned like the noise: the race's daily seed can change
     // Controlled scenario: VER (user) leads, teammate PER 0.6s back, rival HAM 0.6s behind PER
     // and 0.3s/lap faster than VER. Without the order HAM gets through to VER eventually;
     // with PER holding him up, VER's chance of finishing ahead must rise.
@@ -123,7 +124,7 @@ describe('team orders', () => {
         ...(d.code === 'HAM' ? { basePace: ver - 0.3 } : {}),
       })),
     };
-    const run = initRun(model, model.race.seed, { decisions: [] });
+    const run = initRun(model, SCENARIO_SEED, { decisions: [] });
     const options: Array<{ id: string; decisions: Decision[] }> = [
       { id: 'race', decisions: [] },
       { id: 'hold-up', decisions: [{ lap: 35, kind: 'teamOrder', order: 'holdUp' }] },
