@@ -52,8 +52,19 @@ export function RaceScreen({
     <main className="mx-auto flex min-h-screen max-w-[1320px] flex-col gap-3 px-4 pb-6 pt-3">
       <header className="flex items-center justify-between gap-3 border-b border-[var(--rule)] pb-2">
         <span className="disp shrink-0 text-[24px] leading-none">Pit Wall</span>
-        <span className="eyebrow min-w-0 truncate">
-          {number ? `Daily #${number}` : 'Practice'} · {model.race.name ?? model.race.id}
+        <span className="flex min-w-0 items-center gap-2">
+          {source === 'practice' && (
+            <span
+              className="shrink-0 rounded-full bg-[var(--flag)] px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-[#141716]"
+              title={state.meta.practiceReason ?? 'Practice run'}
+            >
+              Practice · not saved
+            </span>
+          )}
+          <span className="eyebrow min-w-0 truncate">
+            {number ? `Daily #${number}` : (state.meta.practiceReason ?? 'Practice')} ·{' '}
+            {model.race.name ?? model.race.id}
+          </span>
         </span>
       </header>
 
