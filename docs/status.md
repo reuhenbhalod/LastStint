@@ -55,6 +55,14 @@ With no daily scheduled, or no connection, the site plays the bundled copy of th
   - A real browser played the live site against the real server (score 100, rank 1/1, leaderboard and stats).
   - A second submit was refused, a tampered log was refused, and a cheated run was corrected by the nightly job.
 
+## Running it locally
+
+- **The website against the live API:** `pnpm --filter @boxthislap/web dev:live`, then open http://localhost:5173. The API allows `localhost:5173`.
+- **Everything local:**
+  - Run `pnpm --filter @boxthislap/worker dev` (API on :8787, local database) next to `pnpm --filter @boxthislap/web dev`.
+  - Seed the local calendar with `pnpm --filter @boxthislap/worker schedule --local --days 2 --race abu-dhabi-2021`.
+- **"Practice · not saved"** (yellow badge) means there's no live daily: none is scheduled for that date, or the API can't be reached. The run is played locally and not submitted. This is what testers see until beta days are scheduled.
+
 ## Before the beta starts
 
 1. **Schedule the beta days:** `pnpm --filter @boxthislap/worker schedule --remote --from <YYYY-MM-DD> --days 7 --race abu-dhabi-2021`. The site switches from practice to the live daily automatically.
