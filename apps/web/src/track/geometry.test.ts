@@ -9,6 +9,7 @@ import {
   pointAlong,
   pointAt,
   polyline,
+  spreadLane,
 } from './geometry.js';
 
 describe('pointAt', () => {
@@ -84,6 +85,16 @@ describe('pit lane', () => {
     expect(lane?.exit).toBeCloseTo(0.525);
     expect(lane && pointAlong(lane.path, 0.5)).toEqual([50, 95]);
     expect(lane?.path.length).toBe(80);
+  });
+
+  it('spreads the lane clear of the track, tapering to the real entry and exit', () => {
+    // The lane runs 5 inside the bottom edge; spread to 20, ends untouched.
+    const pit: Array<[number, number]> = Array.from({ length: 11 }, (_, i) => [10 + i * 8, 95]);
+    const out = spreadLane(lap, pit, 20, 3);
+    expect(out[0]?.[1]).toBeCloseTo(95);
+    expect(out[10]?.[1]).toBeCloseTo(95);
+    expect(out[5]?.[1]).toBeCloseTo(80);
+    expect(out[5]?.[0]).toBeCloseTo(50);
   });
 
   it('has no lane without pit points', () => {

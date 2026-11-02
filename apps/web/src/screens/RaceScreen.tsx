@@ -19,6 +19,7 @@ import { RadioLog } from '../components/RadioLog.js';
 import { TimingTower } from '../components/TimingTower.js';
 import { TrackMap } from '../components/TrackMap.js';
 import { TyreBadge } from '../components/TyreBadge.js';
+import { modeLine } from '../game/guide.js';
 import { useRaceLog } from '../game/raceLog.js';
 import { radioChirp, setSoundOn, soundOn } from '../game/sound.js';
 import type { Game } from '../game/useGame.js';
@@ -300,6 +301,7 @@ export function RaceScreen({
               <HeadsetPanel
                 modes={me.modes}
                 pending={pending}
+                describe={(key, value) => modeLine(model, key, value)}
                 disabled={paused}
                 onFlip={(key, value) =>
                   game.call({ lap: state.race.lap + 1, kind: 'mode', key, value })

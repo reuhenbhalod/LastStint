@@ -72,20 +72,77 @@ export function nearestFraction(line: Polyline, p: [number, number]): number {
 }
 
 export interface PitLane {
+  /** The lane as drawn (pushed clear of the track, see `spreadLane`). */
   path: Polyline;
   /** Where the lane leaves and rejoins the lap, as fractions of the outline. */
   entry: number;
   exit: number;
 }
 
-export function pitLane(outline: TrackOutline, lap: Polyline): PitLane | null {
+/** The nearest point on the closed outline to `p`, and the outline's direction there. */
+function nearestOn(line: Polyline, p: [number, number]) {
+  let best = { d: Number.POSITIVE_INFINITY, q: [0, 0] as [number, number], dir: [1, 0] };
+  const n = line.points.length;
+  for (let i = 0; i < n; i++) {
+    const [ax, ay] = line.points[i] as [number, number];
+    const [bx, by] = line.points[(i + 1) % n] as [number, number];
+    const dx = bx - ax;
+    const dy = by - ay;
+    const len2 = dx * dx + dy * dy;
+    if (!len2) continue;
+    const u = Math.min(1, Math.max(0, ((p[0] - ax) * dx + (p[1] - ay) * dy) / len2));
+    const q: [number, number] = [ax + dx * u, ay + dy * u];
+    const d = Math.hypot(q[0] - p[0], q[1] - p[1]);
+    if (d < best.d) best = { d, q, dir: [dx / Math.sqrt(len2), dy / Math.sqrt(len2)] };
+  }
+  return best;
+}
+
+/**
+ * The real pit lane runs a few metres off the track, which at map scale is under the drawn
+ * asphalt. Push each point out to `gap` from the track's centre line on its own side, easing
+ * in over the first and last `taper` points so the lane still leaves and rejoins the track
+ * where it really does. Where the lane crosses the track (a tunnel) it switches side, and the
+ * drawn lane passes under the asphalt there.
+ */
+export function spreadLane(
+  lap: Polyline,
+  pit: Array<[number, number]>,
+  gap: number,
+  taper = 5,
+): Array<[number, number]> {
+  const n = pit.length;
+  return pit.map((p, i) => {
+    const { d, q, dir } = nearestOn(lap, p);
+    const ends = Math.min(i, n - 1 - i);
+    const w = ease(ends / taper);
+    const target = d + (Math.max(gap, d) - d) * w;
+    // Which side of the track the point is on: the sign of the cross product.
+    const side =
+      Math.sign((dir[0] as number) * (p[1] - q[1]) - (dir[1] as number) * (p[0] - q[0])) || 1;
+    const nx = -(dir[1] as number) * side;
+    const ny = (dir[0] as number) * side;
+    return [q[0] + nx * target, q[1] + ny * target];
+  });
+}
+
+/** The lane's drawn path: spread clear of a track `trackWidth` wide. */
+export function pitLane(outline: TrackOutline, lap: Polyline, trackWidth = 30): PitLane | null {
   const pts = outline.pit;
   if (!pts || pts.length < 2) return null;
+  const drawn = spreadLane(lap, pts, trackWidth * 1.15);
   return {
-    path: polyline(pts, false),
+    path: polyline(drawn, false),
     entry: nearestFraction(lap, pts[0] as [number, number]),
     exit: nearestFraction(lap, pts[pts.length - 1] as [number, number]),
   };
+}
+
+/** Direction (radians) of an open polyline at fraction `t`. */
+export function angleAlong(line: Polyline, t: number): number {
+  const [ax, ay] = pointAlong(line, Math.max(0, t - 0.01));
+  const [bx, by] = pointAlong(line, Math.min(1, t + 0.01));
+  return Math.atan2(by - ay, bx - ax);
 }
 
 /** Ease in and out over [0, 1]. */

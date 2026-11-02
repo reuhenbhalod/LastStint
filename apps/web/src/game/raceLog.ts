@@ -62,15 +62,26 @@ export function lapEvents(prev: RaceState, cur: RaceState): LapEvents {
   return { lap: cur.lap, pits, lapTimes };
 }
 
-/** The log so far, updated as new laps arrive (one entry per lap, oldest first). */
-export function useRaceLog(race: RaceState): LapEvents[] {
-  const log = useRef<{ last: RaceState | null; laps: LapEvents[] }>({ last: null, laps: [] });
-  const cur = log.current;
-  if (cur.last && race.lap === cur.last.lap + 1) {
-    cur.laps = [...cur.laps, lapEvents(cur.last, race)];
-  } else if (cur.last && race.lap < cur.last.lap) {
-    cur.laps = []; // the race was restarted
+/** The log so far, given each new race state (one entry per lap, oldest first). The sim
+ * updates its state in place, so the log keeps its own copy of the last lap to compare with. */
+export class RaceLog {
+  private last: RaceState | null = null;
+  laps: LapEvents[] = [];
+
+  see(race: RaceState): LapEvents[] {
+    if (this.last && race.lap === this.last.lap) return this.laps;
+    if (this.last && race.lap === this.last.lap + 1) {
+      this.laps = [...this.laps, lapEvents(this.last, race)];
+    } else if (this.last && race.lap < this.last.lap) {
+      this.laps = []; // the race was restarted
+    }
+    this.last = structuredClone(race);
+    return this.laps;
   }
-  cur.last = race;
-  return cur.laps;
+}
+
+export function useRaceLog(race: RaceState): LapEvents[] {
+  const log = useRef<RaceLog | null>(null);
+  log.current ??= new RaceLog();
+  return log.current.see(race);
 }
