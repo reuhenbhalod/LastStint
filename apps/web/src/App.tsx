@@ -1,7 +1,8 @@
 // Phase-routed game shell: load today's race from the Worker (practice on the bundled race if
 // there's no daily), then render by game phase.
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useAccount } from './account/useAccount.js';
 import { ApiDailyProvider } from './data/provider.js';
 import { useGame } from './game/useGame.js';
 import { HowItWorks } from './screens/HowItWorks.js';
@@ -12,7 +13,14 @@ import { ResultScreen } from './screens/ResultScreen.js';
 export function App() {
   const provider = useMemo(() => new ApiDailyProvider(), []);
   const game = useGame(provider);
+  const account = useAccount(game.reload);
   const [help, setHelp] = useState(false);
+  // A submitted run adds to the streak.
+  const submitted = game.state?.submission.status;
+  const { refresh } = account;
+  useEffect(() => {
+    if (submitted === 'done') refresh();
+  }, [submitted, refresh]);
 
   if (help) return <HowItWorks onClose={() => setHelp(false)} />;
 
@@ -48,12 +56,13 @@ export function App() {
           model={game.model}
           onStart={game.start}
           onHelp={() => setHelp(true)}
+          account={account}
         />
       );
     case 'racing':
     case 'decision':
       return <RaceScreen game={game} state={game.state} model={game.model} />;
     default:
-      return <ResultScreen state={game.state} game={game} />;
+      return <ResultScreen state={game.state} game={game} account={account} />;
   }
 }

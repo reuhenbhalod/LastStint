@@ -13,6 +13,17 @@
         "decisions": []
       },
       {
+        "id": "cover-medium",
+        "label": "Box, fresh mediums",
+        "decisions": [
+          {
+            "lap": 36,
+            "kind": "pit",
+            "compound": "MEDIUM"
+          }
+        ]
+      },
+      {
         "id": "cover-hard",
         "label": "Box, fresh hards",
         "decisions": [
@@ -43,6 +54,18 @@
             "kind": "mode",
             "key": "pace",
             "value": "push"
+          }
+        ]
+      },
+      {
+        "id": "standard",
+        "label": "Standard pace",
+        "decisions": [
+          {
+            "lap": 49,
+            "kind": "mode",
+            "key": "pace",
+            "value": "standard"
           }
         ]
       },
@@ -82,6 +105,17 @@
             "lap": 53,
             "kind": "pit",
             "compound": "SOFT"
+          }
+        ]
+      },
+      {
+        "id": "box-medium",
+        "label": "Box, mediums",
+        "decisions": [
+          {
+            "lap": 53,
+            "kind": "pit",
+            "compound": "MEDIUM"
           }
         ]
       },

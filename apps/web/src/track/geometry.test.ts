@@ -1,7 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import { StaticDailyProvider } from '../data/provider.js';
 import { GameEngine } from '../engine/engine.js';
-import { carsOnTrack, lapTime, pointAt, polyline } from './geometry.js';
+import {
+  carsOnTrack,
+  lapTime,
+  nearestFraction,
+  pitLane,
+  pointAlong,
+  pointAt,
+  polyline,
+} from './geometry.js';
 
 describe('pointAt', () => {
   const square = polyline([
@@ -38,5 +46,49 @@ describe('carsOnTrack', () => {
       expect(c.lapped).toBe(c.behind >= 1);
     }
     expect(cars.some((c) => c.lapped)).toBe(true); // backmarkers are a lap down by lap 52
+  });
+});
+
+describe('pit lane', () => {
+  // A 100 x 100 square lap; the lane runs inside the bottom edge.
+  const square: Array<[number, number]> = [
+    [0, 0],
+    [100, 0],
+    [100, 100],
+    [0, 100],
+  ];
+  const lap = polyline(square);
+
+  it('finds the fraction of the lap nearest a point', () => {
+    expect(nearestFraction(lap, [50, -5])).toBeCloseTo(0.125);
+    expect(nearestFraction(lap, [105, 50])).toBeCloseTo(0.375);
+  });
+
+  it('places entry and exit on the lap and walks the open lane', () => {
+    const lane = pitLane(
+      {
+        raceId: 'x',
+        width: 100,
+        height: 100,
+        points: square,
+        corners: [],
+        pit: [
+          [10, 95],
+          [90, 95],
+        ],
+      },
+      lap,
+    );
+    expect(lane).not.toBeNull();
+    expect(lane?.entry).toBeCloseTo(0.725);
+    expect(lane?.exit).toBeCloseTo(0.525);
+    expect(lane && pointAlong(lane.path, 0.5)).toEqual([50, 95]);
+    expect(lane?.path.length).toBe(80);
+  });
+
+  it('has no lane without pit points', () => {
+    expect(
+      pitLane({ raceId: 'x', width: 1, height: 1, points: square, corners: [] }, lap),
+    ).toBeNull();
   });
 });

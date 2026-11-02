@@ -104,4 +104,41 @@ describe('GameSession', () => {
     const saved = { ...session.persist(), raceId: 'spain-2021' };
     expect(GameSession.restore(await daily(), saved)).toBeNull();
   });
+
+  it('drops refused live calls from the log and keeps accepted ones', async () => {
+    const session = new GameSession(await daily());
+    session.start();
+    let refused = 0;
+    let accepted = 0;
+    for (let i = 0; i < 300 && session.state.phase !== 'finished'; i++) {
+      if (session.state.phase === 'decision') answer(session);
+      else {
+        const lap = session.state.race.lap + 1;
+        const before = session.state.decisions.length;
+        const booked = session.state.decisions.some(
+          (d) => d.lap === lap && d.kind === 'mode' && d.key === 'pace',
+        );
+        session.call({ lap, kind: 'mode', key: 'pace', value: lap % 2 ? 'push' : 'manage' });
+        const said = session.state.radio.at(-1);
+        if (booked) {
+          // A moment's answer already set the pace for this lap: the call is ignored.
+          expect(session.state.decisions).toHaveLength(before);
+        } else if (said?.lap !== lap) {
+          throw new Error(`no radio reply on lap ${lap}`);
+        } else if (said.refused) {
+          refused++;
+          expect(session.state.decisions).toHaveLength(before);
+        } else {
+          accepted++;
+          expect(session.state.decisions).toHaveLength(before + 1);
+          // A second pace call for the same lap is already booked: ignored.
+          session.call({ lap, kind: 'mode', key: 'pace', value: 'standard' });
+          expect(session.state.decisions).toHaveLength(before + 1);
+        }
+        session.tick();
+      }
+    }
+    expect(refused).toBeGreaterThan(0);
+    expect(accepted).toBeGreaterThan(refused);
+  });
 });

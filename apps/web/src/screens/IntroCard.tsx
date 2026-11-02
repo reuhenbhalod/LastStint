@@ -1,6 +1,9 @@
-// The daily card: what race, which side, how long, the situation, and Start.
+// The daily card: what race, whose pit wall you're running, how long, the situation, the bar
+// to beat (the real team's result), and Start.
 
 import type { RaceModel } from '@boxthislap/sim';
+import type { AccountState } from '../account/useAccount.js';
+import { AccountBar } from '../components/AccountBar.js';
 import type { GameState } from '../state/machine.js';
 
 export function IntroCard({
@@ -8,15 +11,18 @@ export function IntroCard({
   model,
   onStart,
   onHelp,
+  account,
 }: {
   state: GameState;
   model: RaceModel;
   onStart: () => void;
   onHelp: () => void;
+  account?: AccountState;
 }) {
   const { userSide, rival, takeoverLap, totalLaps, number, source, practiceReason } = state.meta;
   const lapsLeft = totalLaps - takeoverLap;
   const userTeam = model.drivers.find((d) => d.code === userSide)?.team;
+  const realPos = model.realResult.indexOf(userSide) + 1;
   const me = state.race.cars[userSide];
   const them = state.race.cars[rival];
   const gap = me && them ? them.totalTime - me.totalTime : null;
@@ -46,7 +52,7 @@ export function IntroCard({
       </div>
       <dl className="grid grid-cols-2 gap-3 font-mono text-sm">
         <div className="rounded-lg bg-[var(--card)] p-3">
-          <dt className="text-xs uppercase tracking-wide text-neutral-500">You run</dt>
+          <dt className="text-xs uppercase tracking-wide text-neutral-500">You’re running</dt>
           <dd className="text-lg font-bold text-[var(--you)]">
             {userSide} {userTeam ? `· ${userTeam}` : ''}
           </dd>
@@ -57,17 +63,30 @@ export function IntroCard({
         </div>
       </dl>
       {situation && <p className="font-mono text-sm text-neutral-300">{situation}</p>}
-      <p className="text-neutral-400">
-        Beat <span className="font-semibold text-[var(--rival)]">{rival}</span> to the flag. Make
-        the calls; every one is graded.
+      <p className="text-neutral-300">
+        You’re the {userTeam ?? userSide} team manager. Every strategy call is yours: when to box,
+        which tyres, how hard to push, how to race{' '}
+        <span className="font-semibold text-[var(--rival)]">{rival}</span>.
+        {realPos > 0 && (
+          <>
+            {' '}
+            The real {userTeam ?? 'team'} pit wall finished{' '}
+            <span className="font-semibold text-[var(--ink)]">P{realPos}</span>. Beat that.
+          </>
+        )}
+      </p>
+      <p className="text-[13px] text-neutral-500">
+        Every big call is graded against the race model. Drivers don’t always follow your live
+        calls.
       </p>
       <button
         type="button"
         onClick={onStart}
         className="rounded-xl bg-[var(--you)] py-4 text-lg font-bold text-neutral-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
       >
-        Take the pit wall
+        Take the {userTeam ? `${userTeam} ` : ''}pit wall
       </button>
+      {account && <AccountBar account={account} />}
       <footer className="flex justify-center gap-4 text-xs text-neutral-500">
         <button type="button" onClick={onHelp} className="underline">
           How it works

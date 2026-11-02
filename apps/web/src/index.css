@@ -34,6 +34,15 @@ body {
   font-family: var(--body);
 }
 
+/* Tailwind v4's preflight leaves buttons with the default arrow; anything clickable gets the
+   hand. */
+button:not(:disabled),
+[role="button"],
+summary,
+label:has(input) {
+  cursor: pointer;
+}
+
 .disp {
   font-family: var(--display);
   text-transform: uppercase;
@@ -74,6 +83,55 @@ body {
 }
 .tyre.WET {
   border-color: #3d7fe0;
+}
+
+/* A decision moment (feedback spec S2): the radio banner drops in and flashes, its dot
+   pulses, the map's frame glows, and the decision card rises. */
+@keyframes radio-in {
+  0% {
+    transform: translateY(-16px);
+    opacity: 0;
+  }
+  100% {
+    transform: none;
+    opacity: 1;
+  }
+}
+@keyframes radio-flash {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--flag) 0%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 8px color-mix(in srgb, var(--flag) 35%, transparent);
+  }
+}
+@keyframes rise {
+  0% {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+  100% {
+    transform: none;
+    opacity: 1;
+  }
+}
+.radio-alert {
+  animation: radio-in 0.25s ease-out, radio-flash 1.2s ease-in-out 0.25s 3;
+}
+.radio-dot {
+  animation: radio-flash 1s ease-in-out infinite;
+}
+.map-alert {
+  box-shadow: 0 0 0 3px var(--flag);
+  animation: radio-flash 1.2s ease-in-out 3;
+}
+.decision {
+  animation: rise 0.25s ease-out, radio-flash 1.2s ease-in-out 0.25s 2;
+  border-color: var(--flag);
+}
+.pit-card {
+  animation: rise 0.25s ease-out;
 }
 
 @media (prefers-reduced-motion: reduce) {

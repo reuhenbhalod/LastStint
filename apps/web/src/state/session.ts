@@ -9,6 +9,7 @@ import type { RunResponse, RunSubmission } from '../data/api.js';
 import type { Daily } from '../data/types.js';
 import { GameEngine, decisionMoments } from '../engine/engine.js';
 import { type GradedMoment, type Grader, gradedFromHits, inlineGrader } from '../engine/grading.js';
+import { acknowledge, refusal } from '../game/refusal.js';
 import {
   type Action,
   type GameMeta,
@@ -84,6 +85,7 @@ export class GameSession {
       grades: {},
       submission: { status: daily.source === 'live' ? 'none' : 'practice' },
       meta: metaOf(daily),
+      radio: [],
     };
   }
 
@@ -151,9 +153,37 @@ export class GameSession {
     this.sync();
   }
 
-  /** A standing-mode flip or BOX call mid-lap; never pauses. */
+  /**
+   * A standing-mode flip or BOX call mid-lap; never pauses. The driver may refuse it
+   * (game/refusal.ts): a refused call is not applied, so it never reaches the call log.
+   * A call already booked for the coming lap is ignored.
+   */
   call(decision: Decision): void {
     if (this.state.phase !== 'racing') return;
+    if (decision.kind === 'pit' || decision.kind === 'mode') {
+      const side = this.state.meta.userSide;
+      const car = this.engine.state.cars[side];
+      if (!car || car.retired) return;
+      const booked = this.engine.decisions.some(
+        (d) =>
+          d.lap === decision.lap &&
+          d.kind === decision.kind &&
+          (d.kind === 'pit' ||
+            (decision.kind === 'mode' && d.kind === 'mode' && d.key === decision.key)),
+      );
+      if (booked) return;
+      const no = refusal(this.daily.seed, this.engine.lap, decision, car);
+      this.dispatch({
+        type: 'RADIO',
+        message: {
+          lap: decision.lap,
+          from: side,
+          text: no ?? acknowledge(decision),
+          refused: !!no,
+        },
+      });
+      if (no) return;
+    }
     this.engine.apply(decision);
     this.dispatch({ type: 'CALL', race: this.engine.state, decisions: this.engine.decisions });
   }
@@ -251,6 +281,7 @@ export class GameSession {
           ? saved.submission
           : { status: daily.source === 'live' ? 'none' : 'practice' },
       meta: metaOf(daily),
+      radio: [],
     };
     const session = new GameSession(daily, { engine, state, grader });
     for (const m of moments) {

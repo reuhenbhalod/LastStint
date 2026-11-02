@@ -70,7 +70,8 @@ def outline_cmd(
     shape = outline.fetch_outline(meta["year"], meta["event"], driver)
     path = outline.write_outline(race_id, shape)
     typer.echo(
-        f"{race_id}: {len(shape['points'])} points, {len(shape['corners'])} corners"
+        f"{race_id}: {len(shape['points'])} points, {len(shape['corners'])} corners,"
+        f" {len(shape.get('pit', []))} pit-lane points"
         f" -> {path.relative_to(paths.REPO_ROOT)}"
     )
 

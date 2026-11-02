@@ -10,6 +10,7 @@ describe('choicesFor', () => {
     expect(c.direct.map((o) => o.id)).toEqual(['stay']);
     expect(c.box?.tyres.map((t) => [t.option.id, t.compound])).toEqual([
       ['box-soft', 'SOFT'],
+      ['box-medium', 'MEDIUM'],
       ['box-hard', 'HARD'],
     ]);
     expect(c.boxIndex).toBe(1);
@@ -18,8 +19,13 @@ describe('choicesFor', () => {
   it('a single stop option is still one Box, with one tyre', async () => {
     const { model } = await new StaticDailyProvider().today();
     const vsc = model.decisionMoments.find((m) => m.id === 'vsc-cover');
-    const c = choicesFor(vsc as NonNullable<typeof vsc>);
-    expect(c.box?.tyres).toHaveLength(1);
+    const one = { ...(vsc as NonNullable<typeof vsc>) };
+    one.options = one.options.filter((o) => o.id !== 'cover-medium');
+    expect(choicesFor(one).box?.tyres).toHaveLength(1);
+    expect(choicesFor(vsc as NonNullable<typeof vsc>).box?.tyres.map((t) => t.compound)).toEqual([
+      'MEDIUM',
+      'HARD',
+    ]);
   });
 
   it('moments without stops have no Box', async () => {

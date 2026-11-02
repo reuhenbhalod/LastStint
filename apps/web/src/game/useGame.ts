@@ -13,14 +13,23 @@ import type { GameState, Speed } from '../state/machine.js';
 import { GameSession } from '../state/session.js';
 import { clearRun, loadRun, saveRun } from '../state/storage.js';
 
-// One lap tick on screen (product doc: laps tick by every 3-5 seconds). The track map runs the
-// field one lap round per tick, so this is also how fast the dots move.
-export const LAP_MS: Record<Speed, number> = { 1: 4500, 2: 2250 };
+// One lap tick on screen. Testers found 3-5 s per lap too fast to follow (feedback spec D4).
+// The track map runs the field one lap round per tick, so this is also how fast the dots move.
+export const LAP_MS: Record<Speed, number> = { 1: 10000, 2: 5000 };
+
+/** The lap tick in progress: when it started (performance.now()) and how long it lasts. The
+ * track map animates from this, so the dots and the lap clock never drift apart. */
+export interface LapClock {
+  start: number;
+  ms: number;
+}
 
 export interface Game {
   state: GameState | null;
   model: RaceModel | null;
   daily: Daily | null;
+  /** The running lap tick, or null while paused / not racing. */
+  clock: LapClock | null;
   /** The game's own score from its grades (shown before/without the server's). */
   localScore: () => ReturnType<GameSession['localScore']> | null;
   error: string | null;
@@ -50,6 +59,9 @@ export function useGame(provider: DailyProvider, grader?: Grader): Game {
   const [state, setState] = useState<GameState | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
+  const [clock, setClock] = useState<LapClock | null>(null);
+  // How far through the lap tick the clock was when it stopped (a speed change keeps it).
+  const carry = useRef(0);
   // One grading worker for the page's lifetime.
   const graderRef = useRef<Grader | null>(null);
   if (!graderRef.current) graderRef.current = grader ?? browserGrader();
@@ -102,14 +114,35 @@ export function useGame(provider: DailyProvider, grader?: Grader): Game {
     };
   }, [provider, adopt, sync, attempt]);
 
-  // The lap clock: advance one lap on an interval while racing.
+  // The lap clock: advance one lap per tick while racing. A tick starts the moment racing
+  // starts or resumes (no dead wait after a decision), and a speed change keeps the lap's
+  // progress rather than starting it over.
   useEffect(() => {
-    if (state?.phase !== 'racing') return;
-    const id = setInterval(() => {
-      session.current?.tick();
-      sync();
-    }, LAP_MS[state.speed]);
-    return () => clearInterval(id);
+    if (state?.phase !== 'racing') {
+      setClock(null);
+      return;
+    }
+    const ms = LAP_MS[state.speed];
+    let start = performance.now() - carry.current * ms;
+    let id = 0;
+    const schedule = () => {
+      setClock({ start, ms });
+      id = window.setTimeout(
+        () => {
+          carry.current = 0;
+          start = performance.now();
+          session.current?.tick();
+          sync();
+          schedule();
+        },
+        Math.max(0, start + ms - performance.now()),
+      );
+    };
+    schedule();
+    return () => {
+      clearTimeout(id);
+      carry.current = Math.min(0.99, (performance.now() - start) / ms);
+    };
   }, [state?.phase, state?.speed, sync]);
 
   const act = useCallback(
@@ -160,6 +193,7 @@ export function useGame(provider: DailyProvider, grader?: Grader): Game {
     state,
     model: daily?.model ?? null,
     daily,
+    clock,
     localScore: () => session.current?.localScore() ?? null,
     error,
     start: act((s) => s.start()),

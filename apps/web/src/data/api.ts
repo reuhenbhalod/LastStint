@@ -73,6 +73,17 @@ export interface RunSubmission {
   grades: ClaimedGrade[];
 }
 
+export interface Account {
+  playerId: string;
+  name: string;
+  email: string;
+}
+
+export interface PlayerResponse {
+  account: Account | null;
+  streak: { current: number; best: number; days: number };
+}
+
 export const api = {
   daily: (date: string) => apiGet<DailyResponse>(`/api/daily?date=${date}`),
   run: (date: string, anonId: string) => apiGet<RunResponse>(`/api/runs/${date}/${anonId}`),
@@ -80,4 +91,8 @@ export const api = {
   leaderboard: (date: string) =>
     apiGet<{ entries: LeaderboardEntry[] }>(`/api/daily/${date}/leaderboard`),
   stats: (date: string) => apiGet<DailyStats>(`/api/daily/${date}/stats`),
+  signIn: (credential: string, anonId: string) =>
+    apiPost<Account>('/api/auth/google', { credential, anonId }),
+  player: (anonId: string, today: string) =>
+    apiGet<PlayerResponse>(`/api/players/${anonId}?today=${today}`),
 };
