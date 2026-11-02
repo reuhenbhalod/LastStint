@@ -4,6 +4,8 @@
 
 import { type Band, type DecisionMoment, bandFor } from '@boxthislap/sim';
 import { useEffect, useState } from 'react';
+import type { AccountState } from '../account/useAccount.js';
+import { AccountBar } from '../components/AccountBar.js';
 import {
   type CallResult,
   type DailyStats,
@@ -12,6 +14,7 @@ import {
   api,
 } from '../data/api.js';
 import type { Game } from '../game/useGame.js';
+import { verdict } from '../game/verdict.js';
 import type { GameState } from '../state/machine.js';
 
 const BAND: Record<Band, { label: string; cls: string; square: string }> = {
@@ -115,7 +118,15 @@ function CallRow({ call, moment }: { call: CallResult; moment?: DecisionMoment }
   );
 }
 
-export function ResultScreen({ state, game }: { state: GameState; game: Game }) {
+export function ResultScreen({
+  state,
+  game,
+  account,
+}: {
+  state: GameState;
+  game: Game;
+  account?: AccountState;
+}) {
   const sub = state.submission;
   const response = sub.status === 'done' || sub.status === 'already' ? sub.response : null;
   const order = response?.result.order ?? state.result?.order ?? state.race.order;
@@ -123,6 +134,10 @@ export function ResultScreen({ state, game }: { state: GameState; game: Game }) 
   const { userSide, rival, date, number } = state.meta;
   const pos = response?.finishPosition ?? order.indexOf(userSide) + 1;
   const beatRival = order.indexOf(userSide) < order.indexOf(rival);
+  const model = game.model;
+  const team = model?.drivers.find((d) => d.code === userSide)?.team ?? userSide;
+  const realPos = (model?.realResult.indexOf(userSide) ?? -1) + 1;
+  const v = verdict(pos, realPos, team, userSide, rival, beatRival);
   const calls = callsFrom(state, response);
   const local = game.localScore();
   const score = response?.score ?? (calls.length ? local?.score : null);
@@ -141,7 +156,7 @@ export function ResultScreen({ state, game }: { state: GameState; game: Game }) 
     api.stats(date).then(setStats, () => {});
   }, [response, date]);
 
-  const share = shareLine(number, pos === 1, calls, response?.percentile ?? null);
+  const share = shareLine(number, v.outcome === 'beat', calls, response?.percentile ?? null);
   const copy = async () => {
     const text = `${share}\n${location.origin}`;
     try {
@@ -158,14 +173,12 @@ export function ResultScreen({ state, game }: { state: GameState; game: Game }) 
         <p className="font-mono text-xs uppercase tracking-widest text-neutral-500">
           Chequered flag
         </p>
-        <h1 className="disp text-[40px] leading-none">
-          {pos === 1 ? 'You won!' : `P${pos}`}{' '}
-          {pos !== 1 && (
-            <span className="text-neutral-400">
-              {beatRival ? `ahead of ${rival}` : `behind ${rival}`}
-            </span>
-          )}
-        </h1>
+        <h1 className="disp text-[40px] leading-none">{v.headline}</h1>
+        <p
+          className={`m-0 mt-2 text-[15px] ${v.outcome === 'beat' ? 'text-[var(--you)]' : 'text-[var(--muted)]'}`}
+        >
+          {v.detail}
+        </p>
         <button
           type="button"
           disabled={state.phase === 'submitting'}
@@ -185,14 +198,12 @@ export function ResultScreen({ state, game }: { state: GameState; game: Game }) 
           {number ? `Pit Wall #${number}` : 'Practice'} ·{' '}
           {game.model?.race.name ?? state.meta.raceId}
         </p>
-        <h1 className="mt-1 disp text-[40px] leading-none">
-          {pos === 1 ? 'You won!' : `P${pos}`}{' '}
-          {pos !== 1 && (
-            <span className="text-neutral-400">
-              {beatRival ? `ahead of ${rival}` : `behind ${rival}`}
-            </span>
-          )}
-        </h1>
+        <h1 className="mt-1 disp text-[40px] leading-none">{v.headline}</h1>
+        <p
+          className={`m-0 mt-2 text-[15px] ${v.outcome === 'beat' ? 'text-[var(--you)]' : 'text-[var(--muted)]'}`}
+        >
+          {v.detail}
+        </p>
       </header>
 
       <section className="grid grid-cols-3 gap-2 text-center">
@@ -213,6 +224,8 @@ export function ResultScreen({ state, game }: { state: GameState; game: Game }) 
           </p>
         </div>
       </section>
+
+      {account && live && <AccountBar account={account} />}
 
       {sub.status === 'practice' && (
         <p className="rounded-lg bg-[var(--card)] p-3 text-sm text-neutral-400">

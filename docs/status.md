@@ -1,14 +1,14 @@
 # BoxThisLap: where things stand
 
-Oct 31, 2026. A summary of what is built, the decisions that shaped it, and what to improve. The specs in this folder have the details.
+Oct 31, 2026 (updated Nov 1 for the beta feedback round, `feedback-round-1-spec.md`). A summary of what is built, the decisions that shaped it, and what to improve. The specs in this folder have the details.
 
 ## What's live
 
 | Piece | Where | State |
 |---|---|---|
-| Website | https://pitwall-web.boxboxbox.workers.dev | Playable Abu Dhabi 2021 daily. Practice mode until a beta day is scheduled. |
-| API | https://pitwall.boxboxbox.workers.dev | Daily, run submission, rank, leaderboard, stats, nightly re-grade |
-| Database | Cloudflare D1 `pitwall-db` (Reuhen's account) | Migrations 0001–0003 applied; empty (test data wiped) |
+| Website | https://pitwall-web.boxboxbox.workers.dev | **Offline** (`workers_dev: false` in `apps/web/wrangler.jsonc`; set it to `true` to bring it back). Playable Abu Dhabi 2021 daily. |
+| API | https://pitwall.boxboxbox.workers.dev | Daily, run submission, rank, leaderboard, stats, nightly re-grade, Google sign-in, streaks |
+| Database | Cloudflare D1 `pitwall-db` (Reuhen's account) | Migrations 0001–0004 (0004: accounts) |
 | Deploys | GitHub Actions (`ci.yml`) | Every merge to `main`: Python, JS/TS, parity and browser playthrough → API deploy → website deploy |
 | Nightly check | GitHub Actions (`reverify.yml`, 10:30 UTC) | Re-grades every new run with full playouts and corrects any edited score |
 
@@ -24,6 +24,17 @@ Modelled on Two-Minute Drill's play view (Oct 31, 2026):
 - **Decision card:** the radio line, four stat tiles (gap, both tyres, pit stop cost, laps left), then **Stay out / Box**, with Box followed by the tyre choice.
   - Only the presentation changed. The graded options are the same, so the server is unaffected.
 - **On a phone** the screen stacks, and the decision card rises as a compact bottom sheet.
+
+Beta feedback round 1 (Nov 1, 2026) added:
+- **You're the team manager.** The intro, header and results say "Mercedes team manager"; the result compares with the real team's finish ("You beat Mercedes!" / "You matched Mercedes" / "Mercedes did better").
+- **Slower race:** 10 s a lap at 1×, 5 s at 2×, and no dead wait after a decision (the lap clock and the map share one timer).
+- **Decision alert:** a radio banner over the map (a compact strip on a phone), the map dims and its frame flashes, the card glows, and an optional radio chirp (🔇/🔊).
+- **Map:** cars glide to their new gaps each lap; tyre-coloured rings; a safety car leads the field; the real pit lane (from FastF1, `pipeline outline`) with stopping cars driving it and a pit card (tyres, stop time, places lost).
+- **Driver card:** tap any car on the map or in the standings: name, number, team, place, gaps, tyres, last lap, stops, real finish, and your driver's modes.
+- **More options:** lap 36 stay / mediums / hards; lap 49 push / standard / manage; lap 53 stay / softs / mediums / hards (108 paths, 0 live/full mismatches).
+- **Drivers can refuse live calls** (about 1 in 8, more with a reason, such as boxing on new tyres). A refused call is never applied or logged; the four graded moments are always followed. Booked calls show at once.
+- **Google sign-in + streaks:** the streak shows on the intro and results. Signing in links the browser to an account so the streak and one-run-a-day follow you.
+  - Needs a Google OAuth client ID: `VITE_GOOGLE_CLIENT_ID` (site build) and `GOOGLE_CLIENT_ID` (Worker var). Without it there's no sign-in button.
 
 ## How a game works, end to end
 
@@ -76,12 +87,14 @@ With no daily scheduled, or no connection, the site plays the bundled copy of th
   - Submissions measured 7–13 ms (21 ms once, cold) against a 10 ms limit. Cloudflare served them all, but doesn't promise to.
   - The game retries once. If testers see failed submissions, Workers Paid ($5/month) fixes it with no code change.
   - Watch the `pitwall` Worker's logs for CPU-limit errors.
-- **One run per browser, not per person.** A player with a private window or a cleared browser gets a new ID and can submit again. Fine for a friends beta; accounts (Phase 7) would fix it.
+- **One run per browser unless signed in.** A signed-out player with a private window or a cleared browser gets a new ID and can submit again. Signed-in players get one run a day across devices.
+- **The player ID is the only key.** Accounts have no session token: anyone who learned a player's ID could submit as them. Fine for a beta; add a signed session before launch.
 - **The race can be scouted.** The sim runs in the browser, so a player could replay the daily in practice or devtools before submitting. Inherent to client-side play.
 - **Faked scores stand for up to a day** before the nightly job corrects them. Run `reverify.yml` by hand if needed.
 
 ### Game and content
-- **Lap 49 (push or manage) is a tie on the real path** (97.9% each), so it's a free green. It now matters only after a cover at lap 36. Consider replacing it with a call that has a real right answer.
+- **Lap 49 is close to a tie on the real path** (push and standard both green), so it's an easy green. Consider replacing it with a call that has a real right answer.
+- **Out of scope for now (beta feedback):** survivor mode and races where you must defend need more races.
 - **Only one race is playable.** Each new race needs approved moments, a seed chosen like Abu Dhabi's (`combos` script), and a G1 pass. The 21-race queue (plan 6.7) is Phase 5.
 - **The radio prompts are functional, not flavourful.** The authored prose layer (intro and per-moment lines) was deferred to Phase 5.
 - **BOX can't be cancelled** once a compound is picked (spec FR4 says "cancellable until pit entry"); the sim has no un-call.
@@ -89,7 +102,7 @@ With no daily scheduled, or no connection, the site plays the bundled copy of th
   - the strategist persona (plan 6.2; no line shown yet)
   - the Mystery Race reveal
   - the image share card
-  - sound and haptics
+  - haptics
   - a privacy page (plan 6.5)
 - **No analytics or error reporting yet** (plan 6.4: the funnel events and Sentry).
 - **Accessibility:** keyboard play, labels and focus are done, but no Lighthouse audit has been run.

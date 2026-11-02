@@ -26,6 +26,15 @@ export type Submission =
   | { status: 'done' | 'already'; response: RunResponse }
   | { status: 'error'; error: string };
 
+/** A radio message from the driver: a "copy" or a refused call (feedback spec D1). */
+export interface RadioMessage {
+  /** The lap it was said on (the lap being run). */
+  lap: number;
+  from: string;
+  text: string;
+  refused: boolean;
+}
+
 export interface GameMeta {
   raceId: string;
   /** Puzzle number, for the share line (live dailies only). */
@@ -59,6 +68,8 @@ export interface GameState {
   grades: Record<string, GradedMoment>;
   submission: Submission;
   meta: GameMeta;
+  /** The driver's radio replies to live calls, newest last (not persisted). */
+  radio: RadioMessage[];
 }
 
 export type Action =
@@ -73,6 +84,7 @@ export type Action =
   | { type: 'RESOLVE'; momentId: string; decisions: Decision[] }
   | { type: 'CALL'; race: RaceState; decisions: Decision[] }
   | { type: 'SET_SPEED'; speed: Speed }
+  | { type: 'RADIO'; message: RadioMessage }
   | { type: 'GRADED'; momentId: string; graded: GradedMoment }
   | { type: 'SUBMIT' }
   | { type: 'RESULT'; result: RaceResult; submission: Submission }
@@ -119,6 +131,9 @@ export function reducer(state: GameState, action: Action): GameState {
 
     case 'SET_SPEED':
       return { ...state, speed: action.speed };
+
+    case 'RADIO':
+      return { ...state, radio: [...state.radio, action.message].slice(-6) };
 
     case 'GRADED': // grading finishes in a worker, whatever the phase
       return { ...state, grades: { ...state.grades, [action.momentId]: action.graded } };

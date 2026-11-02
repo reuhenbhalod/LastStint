@@ -1,18 +1,27 @@
 // The race view, after the track-view mockup: standings on the left, the scoreboard and the
 // circuit with a dot per car in the middle, and the call column on the right (the decision
 // card when the game pauses, otherwise the headset and BOX). On a phone it stacks, and the
-// decision card rises as a bottom sheet.
+// decision card rises as a bottom sheet. You run the team's pit wall: when the race stops for
+// a call, a radio banner drops over the map (and chirps, if sound is on). Tap any car, on the
+// map or in the standings, for its card; a stop by your car or the rival is called out while
+// it drives the pit lane.
 
-import type { RaceModel } from '@boxthislap/sim';
-import { useRef, useState } from 'react';
+import type { Modes, RaceModel } from '@boxthislap/sim';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { BoxButton } from '../components/BoxButton.js';
 import { DecisionPanel } from '../components/DecisionPanel.js';
+import { DriverCard } from '../components/DriverCard.js';
 import { GapTrace } from '../components/GapTrace.js';
 import { HeadsetPanel } from '../components/HeadsetPanel.js';
+import { PitCard } from '../components/PitCard.js';
+import { RadioAlert } from '../components/RadioAlert.js';
+import { RadioLog } from '../components/RadioLog.js';
 import { TimingTower } from '../components/TimingTower.js';
 import { TrackMap } from '../components/TrackMap.js';
 import { TyreBadge } from '../components/TyreBadge.js';
-import { type Game, LAP_MS } from '../game/useGame.js';
+import { useRaceLog } from '../game/raceLog.js';
+import { radioChirp, setSoundOn, soundOn } from '../game/sound.js';
+import type { Game } from '../game/useGame.js';
 import type { GameState } from '../state/machine.js';
 import { outlineFor } from '../track/outlines.js';
 
@@ -33,7 +42,10 @@ export function RaceScreen({
   const them = state.race.cars[rival];
   const paused = state.phase === 'decision';
   const outline = outlineFor(model.race.id);
-  const [pick, setPick] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string | null>(null);
+  const [sound, setSound] = useState(soundOn);
+  const log = useRaceLog(state.race);
+  const team = model.drivers.find((d) => d.code === userSide)?.team;
   const flag = FLAG[state.race.flag];
   const lapsLeft = totalLaps - state.race.lap;
   const gap = me && them && !me.retired && !them.retired ? them.totalTime - me.totalTime : null;
@@ -43,15 +55,43 @@ export function RaceScreen({
   if (gap !== null) trace.current.set(state.race.lap, gap);
   const points = [...trace.current.entries()].sort((a, b) => a[0] - b[0]).slice(-15);
 
-  const pickCar = (code: string) => {
-    setPick(code);
-    setTimeout(() => setPick((c) => (c === code ? null : c)), 1500);
-  };
+  const select = useCallback((code: string) => setSelected((c) => (c === code ? null : code)), []);
+  const close = useCallback(() => setSelected(null), []);
+
+  // Chirp when the race stops for a call.
+  const momentId = paused ? state.currentMoment?.id : undefined;
+  useEffect(() => {
+    if (momentId && soundOn()) radioChirp();
+  }, [momentId]);
+
+  // Calls booked for the coming lap show at once (they act when it's run).
+  const next = state.race.lap + 1;
+  const pending: Partial<Modes> = {};
+  let boxing: string | null = null;
+  for (const d of state.decisions) {
+    if (d.lap !== next) continue;
+    if (d.kind === 'mode') (pending as Record<string, string>)[d.key] = d.value;
+    if (d.kind === 'pit') boxing = d.compound;
+  }
+
+  // A stop by your car or the rival on the lap just run, while the next lap animates.
+  const latest = log.at(-1);
+  const stop =
+    state.phase === 'racing' && latest?.lap === state.race.lap
+      ? latest.pits.find((p) => p.code === userSide || p.code === rival)
+      : undefined;
 
   return (
     <main className="mx-auto flex min-h-screen max-w-[1320px] flex-col gap-3 px-4 pb-6 pt-3">
       <header className="flex items-center justify-between gap-3 border-b border-[var(--rule)] pb-2">
-        <span className="disp shrink-0 text-[24px] leading-none">Pit Wall</span>
+        <span className="flex min-w-0 items-baseline gap-2">
+          <span className="disp shrink-0 text-[24px] leading-none">Pit Wall</span>
+          {team && (
+            <span className="eyebrow hidden truncate !text-[var(--you)] sm:inline">
+              {team} team manager
+            </span>
+          )}
+        </span>
         <span className="flex min-w-0 items-center gap-2">
           {source === 'practice' && (
             <span
@@ -83,7 +123,7 @@ export function RaceScreen({
             model={model}
             userSide={userSide}
             rival={rival}
-            onPick={pickCar}
+            onPick={select}
           />
         </aside>
 
@@ -93,7 +133,7 @@ export function RaceScreen({
             <div className="flex items-center gap-2">
               <span className="h-7 w-1.5 rounded-sm bg-[var(--you)]" />
               <span className="disp text-[24px] leading-none">{userSide}</span>
-              <span className="eyebrow hidden sm:inline">You</span>
+              <span className="eyebrow hidden sm:inline">Your driver</span>
               {me && !me.retired && <TyreBadge compound={me.compound} age={me.tyreAge} />}
             </div>
             <div className="text-center">
@@ -116,7 +156,9 @@ export function RaceScreen({
               <span className="h-7 w-1.5 rounded-sm bg-[var(--rival)]" />
             </div>
           </div>
-          <div className="relative overflow-hidden rounded-b-xl bg-[var(--tarmac)]">
+          <div
+            className={`relative overflow-hidden rounded-b-xl bg-[var(--tarmac)] ${paused ? 'map-alert' : ''}`}
+          >
             {outline ? (
               <TrackMap
                 outline={outline}
@@ -124,9 +166,10 @@ export function RaceScreen({
                 model={model}
                 userSide={userSide}
                 rival={rival}
-                running={state.phase === 'racing'}
-                lapMs={LAP_MS[state.speed]}
-                highlight={pick}
+                clock={game.clock}
+                selected={selected}
+                onSelect={select}
+                dim={paused}
               />
             ) : (
               <p className="p-8 text-center text-[var(--muted)]">No track map for this race yet.</p>
@@ -141,7 +184,48 @@ export function RaceScreen({
                 {flag.text}
               </span>
             </div>
+            {paused && state.currentMoment && (
+              <RadioAlert moment={state.currentMoment} race={state.race} model={model} />
+            )}
+            {stop && (
+              <div className="absolute right-2.5 top-12 z-10">
+                <PitCard
+                  key={`${stop.code}-${stop.lap}`}
+                  stop={stop}
+                  race={state.race}
+                  userSide={userSide}
+                  rival={rival}
+                />
+              </div>
+            )}
+            {selected && (
+              <div className="absolute bottom-2.5 right-2.5 z-10">
+                <DriverCard
+                  code={selected}
+                  race={state.race}
+                  model={model}
+                  log={log}
+                  userSide={userSide}
+                  rival={rival}
+                  onClose={close}
+                />
+              </div>
+            )}
             <div className="absolute right-2.5 top-2.5 flex gap-1.5">
+              <button
+                type="button"
+                aria-pressed={sound}
+                aria-label={sound ? 'Radio sound on' : 'Radio sound off'}
+                title="Radio chirp at decisions"
+                onClick={() => {
+                  setSoundOn(!sound);
+                  setSound(!sound);
+                  if (!sound) radioChirp();
+                }}
+                className="rounded-md border border-white/20 bg-black/55 px-2 py-1 text-[12px] font-semibold text-white"
+              >
+                {sound ? '🔊' : '🔇'}
+              </button>
               {source !== 'live' && (
                 <button
                   type="button"
@@ -166,7 +250,9 @@ export function RaceScreen({
                 </button>
               ))}
             </div>
-            <div className="absolute bottom-2.5 left-2.5 flex flex-wrap gap-3 rounded-md bg-black/45 px-2 py-1 text-[11px] font-semibold text-[#cfd6d3]">
+            <div
+              className={`absolute bottom-2.5 left-2.5 flex-wrap gap-3 rounded-md bg-black/45 px-2 py-1 text-[11px] font-semibold text-[#cfd6d3] ${selected ? 'hidden md:flex' : 'flex'}`}
+            >
               <span>
                 <i className="mr-1 inline-block h-2 w-2 rounded-full bg-[var(--you)]" />
                 You
@@ -183,6 +269,7 @@ export function RaceScreen({
                 <i className="mr-1 inline-block h-2 w-2 rounded-full border border-dashed border-[var(--field)]" />
                 Lapped
               </span>
+              <span className="hidden sm:inline">Ring = tyre · tap a car</span>
             </div>
           </div>
         </section>
@@ -202,14 +289,17 @@ export function RaceScreen({
             </div>
           ) : (
             <p className="m-0 text-[14px] text-[var(--muted)]">
-              The race pauses for the big calls. BOX and the headset are always live.
+              The race stops for the big calls. BOX and the headset are always live, but your driver
+              doesn’t always listen.
             </p>
           )}
           <div className="flex flex-col gap-3 rounded-xl border border-[var(--rule)] bg-[var(--card)] p-3">
             <GapTrace points={points} rival={rival} />
+            <RadioLog messages={state.radio} />
             {me && (
               <HeadsetPanel
                 modes={me.modes}
+                pending={pending}
                 disabled={paused}
                 onFlip={(key, value) =>
                   game.call({ lap: state.race.lap + 1, kind: 'mode', key, value })
@@ -218,6 +308,7 @@ export function RaceScreen({
             )}
             <BoxButton
               compounds={Object.keys(model.compounds)}
+              booked={boxing}
               disabled={paused}
               onBox={(compound) => game.call({ lap: state.race.lap + 1, kind: 'pit', compound })}
             />

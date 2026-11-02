@@ -1,4 +1,7 @@
-// D1 access (migrations 0001-0002). Every query the API runs lives here.
+// D1 access (migrations 0001-0004). Every query the API runs lives here (accounts and
+// streaks: players.ts).
+
+import { SAME_PLAYER } from './players.js';
 
 export interface DailyRow {
   date: string;
@@ -35,9 +38,13 @@ export function getDaily(db: D1Database, date: string): Promise<DailyRow | null>
     .first<DailyRow>();
 }
 
+/** The player's run for a date: this anonId's, or any browser's linked to the same account. */
 export function getRun(db: D1Database, date: string, anonId: string): Promise<RunRow | null> {
   return db
-    .prepare('SELECT * FROM runs WHERE date = ? AND anon_id = ?')
+    .prepare(
+      `SELECT * FROM runs WHERE date = ?1 AND anon_id IN ${SAME_PLAYER(2)}
+       ORDER BY created_at LIMIT 1`,
+    )
     .bind(date, anonId)
     .first<RunRow>();
 }

@@ -1,4 +1,5 @@
-// Start → four calls → results → share, on a 390 px phone screen. The Worker is mocked: the
+// Start → four calls (with the radio alert, and a driver card from the map) → results → share,
+// on a 390 px phone screen. The Worker is mocked: the
 // daily serves the real race file, and POST /api/runs answers from the claimed grades the game
 // sent (the real verification of those grades is unit-tested: src/state/session.test.ts and
 // packages/sim/tests/verify.test.ts). Playwright loads only plain JSON here, not the sim's TS.
@@ -120,12 +121,18 @@ test('plays the Abu Dhabi daily end to end', async ({ page, context }) => {
   await page.goto('/');
   await expect(page.getByText('Daily Race #1')).toBeVisible();
   if (shots) await page.screenshot({ path: `${shots}/1-intro.png`, fullPage: true });
-  await page.getByRole('button', { name: 'Take the pit wall' }).click();
+  await page.getByRole('button', { name: /pit wall/ }).click();
   await page.getByRole('button', { name: '2×' }).click();
+
+  // Tap the rival on the map: the driver card opens. (The dot never stops moving, so the click
+  // is dispatched rather than waiting for it to be still.)
+  await page.getByRole('button', { name: 'VER: details' }).dispatchEvent('click');
+  await expect(page.getByLabel('Max Verstappen details')).toContainText('Red Bull Racing');
+  await page.getByRole('button', { name: 'Close driver details' }).click();
 
   // Each moment: the top-level option, then (after Box) the tyre.
   const answers: Record<string, string[]> = {
-    '36': ['Box'],
+    '36': ['Box', 'Hards'],
     '49': ['Push now'],
     '53': ['Box', 'Softs'],
     '57': ['Attack'],
@@ -133,6 +140,7 @@ test('plays the Abu Dhabi daily end to end', async ({ page, context }) => {
   for (const lap of ['36', '49', '53', '57']) {
     const card = page.locator('section.decision');
     await expect(card).toContainText(`Lap ${lap}`, { timeout: 90_000 });
+    await expect(page.getByRole('alert')).toContainText(`Lap ${lap}`);
     if (shots && lap === '53')
       await page.screenshot({ path: `${shots}/3-decision-53.png`, fullPage: true });
     if (shots && lap === '49')

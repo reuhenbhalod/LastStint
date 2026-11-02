@@ -45,6 +45,7 @@ function base(phase: Phase): GameState {
       userSide: 'HAM',
       rival: 'VER',
     },
+    radio: [],
   };
 }
 

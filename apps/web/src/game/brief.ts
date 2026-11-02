@@ -59,7 +59,7 @@ export function briefFor(moment: DecisionMoment, race: RaceState, model: RaceMod
         : `Restart is coming. ${r} is ahead and we’re on ${me ? tyres(me.compound) : 'our tyres'}. How do we race him?`;
   } else if (only('pace')) {
     kind = 'Tyres';
-    headline = `Our ${me ? tyres(me.compound) : 'tyres'} are ${me?.tyreAge ?? '?'} laps old. Push to hold the gap, or look after them for the end?`;
+    headline = `Our ${me ? tyres(me.compound) : 'tyres'} are ${me?.tyreAge ?? '?'} laps old. Push to hold the gap, run to plan, or look after them for the end?`;
   } else if (flag === 'SC') {
     kind = 'Safety car';
     headline = 'Safety car! The pit lane is cheap. Box for fresh tyres, or keep track position?';

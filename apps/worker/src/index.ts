@@ -5,10 +5,12 @@
 import { type Context, Hono } from 'hono';
 import { cors } from 'hono/cors';
 import type { ContentfulStatusCode } from 'hono/utils/http-status';
+import { verifyGoogleToken } from './auth.js';
 import { isDate, isPlayable, playableDates } from './dates.js';
 import { LEADERBOARD_SIZE, dailyStats, getDaily, getRun, leaderboard } from './db.js';
 import { displayName } from './names.js';
 import { checkQueue, queueDays } from './ops.js';
+import { accountOf, playedDates, signIn, streakOf } from './players.js';
 import { getRace } from './races.js';
 import { ApiError, dailyWithModel, isAnonId, submitRun, withStanding } from './runs.js';
 
@@ -24,6 +26,10 @@ export interface Env {
   CACHE_SECONDS?: string;
   /** Optional Discord or Slack webhook for queue alerts (a secret). */
   ALERT_WEBHOOK?: string;
+  /** Google OAuth client ID for sign-in (feedback spec D3). Unset: sign-in is off. */
+  GOOGLE_CLIENT_ID?: string;
+  /** JWKS to trust instead of Google's published keys (tests only). */
+  GOOGLE_JWKS?: string;
 }
 
 /** Largest accepted POST /api/runs body. */
@@ -142,6 +148,41 @@ app.get('/api/runs/:date/:anonId', async (c) => {
   const row = await getRun(c.env.DB, date, anonId);
   if (!row) throw new ApiError(404, 'no-run');
   return c.json(await withStanding(c.env.DB, row));
+});
+
+// POST /api/auth/google: sign in with a Google ID token; links this browser's anonId to the
+// account and returns the account's player ID, which the browser adopts.
+app.post('/api/auth/google', async (c) => {
+  const clientId = c.env.GOOGLE_CLIENT_ID;
+  if (!clientId) throw new ApiError(503, 'auth-off', 'sign-in is not set up');
+  const ip = c.req.header('cf-connecting-ip') ?? 'unknown';
+  if (c.env.RUNS_LIMITER) {
+    const { success } = await c.env.RUNS_LIMITER.limit({ key: `auth:${ip}` });
+    if (!success) throw new ApiError(429, 'rate-limited');
+  }
+  const body = (await c.req.json().catch(() => null)) as Record<string, unknown> | null;
+  const credential = body?.credential;
+  const anonId = body?.anonId;
+  if (typeof credential !== 'string' || credential.length > 8192 || !isAnonId(anonId)) {
+    throw new ApiError(400, 'bad-request', 'credential and anonId are required');
+  }
+  const keys = c.env.GOOGLE_JWKS ? JSON.parse(c.env.GOOGLE_JWKS).keys : undefined;
+  const who = await verifyGoogleToken(credential, clientId, Date.now(), keys);
+  if (!who) throw new ApiError(401, 'bad-credential');
+  return c.json(await signIn(c.env.DB, who, anonId, Date.now()));
+});
+
+// GET /api/players/:anonId?today=YYYY-MM-DD: the player's account (if signed in) and streak,
+// counted to the player's local date.
+app.get('/api/players/:anonId', async (c) => {
+  const anonId = c.req.param('anonId');
+  const today = c.req.query('today');
+  if (!isAnonId(anonId) || !isDate(today)) throw new ApiError(400, 'bad-request');
+  const [account, dates] = await Promise.all([
+    accountOf(c.env.DB, anonId),
+    playedDates(c.env.DB, anonId),
+  ]);
+  return c.json({ account, streak: streakOf(dates, today) });
 });
 
 // GET /api/daily/:date/stats: how everyone played the day.
