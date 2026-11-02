@@ -142,7 +142,7 @@ export function RaceScreen({
         <span className="flex min-w-0 items-baseline gap-2">
           <span className="disp shrink-0 text-[24px] leading-none">Pit Wall</span>
           {team && (
-            <span className="eyebrow hidden truncate !text-[var(--you)] sm:inline">
+            <span className="disp hidden truncate text-[24px] leading-none text-[var(--you)] sm:inline">
               {team} team manager
             </span>
           )}

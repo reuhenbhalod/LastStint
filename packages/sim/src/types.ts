@@ -54,7 +54,16 @@ export interface RaceEvent {
 // Parsed + validated race JSON (validated at load time with zod or ajv).
 export interface RaceModel {
   schemaVersion: number;
-  race: { id: string; name?: string; laps: number; takeoverLap: number; seed: number };
+  race: {
+    id: string;
+    name?: string;
+    laps: number;
+    takeoverLap: number;
+    seed: number;
+    /** Which lapped cars unlap before a SC restart: all (the rule, default), or only those
+     * between userSide and rival (Abu Dhabi 2021's race-control call). */
+    scUnlap?: 'all' | 'duel';
+  };
   era: Era;
   track: {
     pitLoss: number;

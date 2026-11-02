@@ -41,7 +41,7 @@ function Tile({
 // Option buttons: number, label, then what it does. Grid rows stretch, so a row of options
 // is always one height.
 const optBtn =
-  'flex min-h-[64px] flex-col items-start justify-start gap-1 rounded-lg border-2 border-transparent bg-[var(--ink)] px-3 py-2 text-left text-[var(--paper)] hover:border-[var(--you)] focus-visible:border-[var(--you)] focus-visible:outline-none';
+  'relative flex min-h-[64px] flex-col items-center justify-center gap-1 rounded-lg border-2 border-transparent bg-[var(--ink)] px-2.5 pb-2.5 pt-5 text-center text-[var(--paper)] hover:border-[var(--you)] focus-visible:border-[var(--you)] focus-visible:outline-none';
 
 export function DecisionPanel({
   moment,
@@ -192,10 +192,17 @@ export function DecisionPanel({
               title={t.note ?? undefined}
               className={`${optBtn} ${t.id === 'box' ? '!bg-[var(--box)] !text-white' : ''}`}
             >
-              <span aria-hidden="true" className="mono text-[10px] opacity-60">
+              <span
+                aria-hidden="true"
+                className="mono absolute left-2.5 top-1.5 text-[10px] opacity-60"
+              >
                 {i + 1}
               </span>
-              <span className="disp text-[21px] leading-none md:text-[23px]">{t.label}</span>
+              <span
+                className={`disp leading-none ${top.length === 3 ? 'text-[19px] md:text-[20px]' : 'text-[21px] md:text-[23px]'}`}
+              >
+                {t.label}
+              </span>
               {t.note && (
                 <span className="text-[11.5px] font-medium leading-snug opacity-75">{t.note}</span>
               )}

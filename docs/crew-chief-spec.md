@@ -53,3 +53,16 @@ Nov 2, 2026 · Branch `crew-chief`. Feedback: the field bunches on the last lap;
   - Combos: 1,296 paths, 0 live/full mismatches. Only 4 paths score 100; most land between 80 and 90.
 - **D3:** quick calls after laps 39, 41, 45, 47 and 50 on the real path, built from the race (`quickCallAt`), 8 s to answer at 1× (4.5 s at 2×).
 - **D4:** every card in the call column uses `.card`; options are equal height with their notes inside; the gap card has a heading and the current gap.
+
+## Follow-up (Nov 2, 2026): lapped cars under the last safety car
+
+- **What testers saw:** on the last laps every lapped car (NOR, OCO, LEC, ALO…, about a minute back) jumped into the queue behind the leaders. By the rules (and in races since 2022) all lapped cars do unlap and join the back of the queue, which is what the model did. Abu Dhabi 2021 was different: race control waved through only the five lapped cars between HAM and VER.
+- **Decided (option 1):** a race can follow that call.
+  - New `race.scUnlap: "duel"` in the model (schema, pipeline meta `sc_unlap`, both sims).
+  - Only the lead lap closes up behind the safety car. Lapped cars stay where they are, a lap down. On the last lap, the lapped cars between the user's car and the rival are waved through to the back of the lead-lap queue.
+  - Abu Dhabi 2021 uses it. Every other race keeps the rule, so their golden files and G1 results are unchanged.
+- **Checks:**
+  - Applying "duel" to every race broke Bahrain 2022 (BOT really did unlap), which is why it's per race.
+  - Abu Dhabi passes G1 at the gate's 500 runs. The CLI test now uses the gate's run count, since at 150 runs GAS, a lap down in ~9% of runs (he was close to being lapped in the real race), tips it over.
+  - Combos: 1,296 paths, 0 mismatches.
+- **UI:** decision options have centered text; "Mercedes team manager" is set at the size of "Pit Wall".

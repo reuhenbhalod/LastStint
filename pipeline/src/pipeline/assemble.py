@@ -60,6 +60,7 @@ def assemble_race_model(
     rival: str,
     fastest_lap_point: bool = False,
     track_status: list[dict] | None = None,
+    sc_unlap: str | None = None,
 ) -> dict:
     """Build the race-model dict (validate + write it with export.write_race)."""
     total_laps = int(laps["LapNumber"].max())
@@ -167,6 +168,7 @@ def assemble_race_model(
             "laps": total_laps,
             "takeoverLap": takeover_lap,
             "seed": seed,
+            **({"scUnlap": sc_unlap} if sc_unlap else {}),
         },
         "era": era,
         "track": {

@@ -38,6 +38,7 @@ def test_build_rejects_unknown_race():
 
 @pytest.mark.parametrize(("race_id", "code"), [("abu-dhabi-2021", 0), ("spain-2021", 1)])
 def test_validate_exit_code_reflects_g1(race_id, code):
-    result = runner.invoke(cli.app, ["validate", race_id, "--runs", "150"])
+    # The G1 gate's own run count (fewer runs can tip a borderline race either way).
+    result = runner.invoke(cli.app, ["validate", race_id])
     assert result.exit_code == code, result.output
     assert "podium order rate" in result.output

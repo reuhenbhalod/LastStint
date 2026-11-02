@@ -55,9 +55,12 @@ export function QuickCallCard({
             key={o.id}
             type="button"
             onClick={() => onAnswer(o.id)}
-            className="relative min-h-[48px] rounded-lg border-2 border-transparent bg-[var(--ink)] px-3 py-2 text-left font-bold text-[var(--paper)] hover:border-[var(--you)] focus-visible:border-[var(--you)] focus-visible:outline-none"
+            className="relative min-h-[48px] rounded-lg border-2 border-transparent bg-[var(--ink)] px-3 py-2 text-center font-bold text-[var(--paper)] hover:border-[var(--you)] focus-visible:border-[var(--you)] focus-visible:outline-none"
           >
-            <span aria-hidden="true" className="mono mr-1.5 text-[10px] opacity-60">
+            <span
+              aria-hidden="true"
+              className="mono absolute left-2.5 top-1.5 text-[10px] opacity-60"
+            >
               {i + 1}
             </span>
             {o.label}

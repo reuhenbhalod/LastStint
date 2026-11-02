@@ -239,14 +239,63 @@ def simulate(model: dict, seed: int, strategies: dict | None = None) -> dict:
                 # Deployment lap: gaps kept (delta time). Middle laps: each gap keeps
                 # SC_GAP_KEEP of its excess. Last lap before the restart: nose-to-tail.
                 keep = 0.0 if neutral.get(lap + 1) != "SC" else SC_GAP_KEEP
-                for i in range(1, len(live)):
-                    ahead, car = cars[live[i - 1]], cars[live[i]]
-                    excess = max(0.0, car.total_time - ahead.total_time - BUNCH_GAP)
-                    car.total_time = ahead.total_time + BUNCH_GAP + keep * excess
+                duel = (model["userSide"], model["rival"])
+                _bunch(
+                    live,
+                    cars,
+                    green,
+                    keep,
+                    duel if model["race"].get("scUnlap") == "duel" else None,
+                )
+                live = sorted(live, key=lambda c: cars[c].total_time)
+                order[:] = live + [c for c in order if cars[c].retired]
         else:
             _resolve_order(order, cars, clean, pass_rngs, overtake, prev_time, pitted, recent, lap)
 
     return _classify(order, cars)
+
+
+def _bunch(
+    live: list[str],
+    cars: dict[str, Car],
+    lap_time: float | None,
+    keep: float,
+    duel: tuple[str, str] | None,
+) -> None:
+    """Close the SC queue: each gap keeps `keep` of its excess over BUNCH_GAP (nose-to-tail on
+    the last lap). By the rules every lapped car unlaps and joins the back of the queue, so
+    the whole field closes up in race order (duel None). A race with scUnlap "duel" follows
+    Abu Dhabi 2021's call instead: only the lead lap closes up, the lapped cars stay where
+    they are a lap down, and on the last lap (keep 0) the lapped cars sitting between the
+    user's car and the rival are waved through to the back of the lead-lap queue."""
+    if not live:
+        return
+    if duel is None:
+        for i in range(1, len(live)):
+            ahead, car = cars[live[i - 1]], cars[live[i]]
+            excess = max(0.0, car.total_time - ahead.total_time - BUNCH_GAP)
+            car.total_time = ahead.total_time + BUNCH_GAP + keep * excess
+        return
+    lead = cars[live[0]].total_time
+    down = {c: math.floor((cars[c].total_time - lead) / lap_time) if lap_time else 0 for c in live}
+    on_track = {c: cars[c].total_time - lead - down[c] * (lap_time or 0.0) for c in live}
+    lead_lap = [c for c in live if down[c] == 0]
+    waved: list[str] = []
+    a, b = duel
+    if keep == 0.0 and a in lead_lap and b in lead_lap:
+        lo, hi = sorted((on_track[a], on_track[b]))
+        waved = sorted(
+            (c for c in live if down[c] >= 1 and lo < on_track[c] < hi),
+            key=lambda c: on_track[c],
+        )
+    for i in range(1, len(lead_lap)):
+        ahead, car = cars[lead_lap[i - 1]], cars[lead_lap[i]]
+        excess = max(0.0, car.total_time - ahead.total_time - BUNCH_GAP)
+        car.total_time = ahead.total_time + BUNCH_GAP + keep * excess
+    last = cars[lead_lap[-1]].total_time
+    for c in waved:
+        last += BUNCH_GAP
+        cars[c].total_time = last
 
 
 def write_golden(model: dict, seeds: list[int]) -> None:
