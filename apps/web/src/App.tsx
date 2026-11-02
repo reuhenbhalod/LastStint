@@ -15,6 +15,12 @@ export function App() {
   const game = useGame(provider);
   const account = useAccount(game.reload);
   const [help, setHelp] = useState(false);
+  // At the flag the race screen runs the field to the line; then the results.
+  const [flagDone, setFlagDone] = useState(false);
+  const phase = game.state?.phase;
+  useEffect(() => {
+    if (phase === 'intro' || phase === 'racing') setFlagDone(false);
+  }, [phase]);
   // A submitted run adds to the streak.
   const submitted = game.state?.submission.status;
   const { refresh } = account;
@@ -62,6 +68,18 @@ export function App() {
     case 'racing':
     case 'decision':
       return <RaceScreen game={game} state={game.state} model={game.model} />;
+    case 'finished':
+      if (!flagDone) {
+        return (
+          <RaceScreen
+            game={game}
+            state={game.state}
+            model={game.model}
+            onFinished={() => setFlagDone(true)}
+          />
+        );
+      }
+      return <ResultScreen state={game.state} game={game} account={account} />;
     default:
       return <ResultScreen state={game.state} game={game} account={account} />;
   }

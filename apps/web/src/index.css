@@ -135,6 +135,31 @@ label:has(input) {
   animation: rise 0.25s ease-out, radio-flash 1.2s ease-in-out 0.25s 2;
   border-color: var(--flag);
 }
+@keyframes drain {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0;
+  }
+}
+.quick-timer {
+  animation: drain linear forwards;
+}
+.quick-call {
+  animation: rise 0.25s ease-out, radio-flash 1.2s ease-in-out 0.25s 1;
+}
+/* One card style for the call column (crew-chief spec D4). In the components layer, so
+   utilities (a highlight border) still win. */
+@layer components {
+  .card {
+    border-radius: 0.75rem;
+    border: 1px solid var(--rule);
+    background: var(--card);
+    padding: 1rem;
+  }
+}
+
 .pit-card {
   animation: rise 0.25s ease-out;
 }

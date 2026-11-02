@@ -12,7 +12,7 @@ const fullAbu = abuJson as unknown as RaceModel;
 const SAMPLES = 40;
 
 // The verification rules are exercised on Abu Dhabi with only its lap-53 SC moment; the
-// shipped four-moment race is checked end to end at the bottom.
+// shipped six-moment race is checked end to end at the bottom.
 const scStop = fullAbu.decisionMoments.find((m) => m.id === 'sc-stop');
 if (!scStop) throw new Error('Abu Dhabi 2021 has no sc-stop moment');
 const abu: RaceModel = { ...fullAbu, decisionMoments: [scStop] };
@@ -205,11 +205,13 @@ describe('verifyRun', () => {
       ).toBe('bad-answer'));
   });
 
-  it('verifies the shipped four-moment Abu Dhabi run', () => {
+  it('verifies the shipped six-moment Abu Dhabi run', () => {
     const choices = {
       'vsc-cover': 'cover-hard',
+      'tyres-going': 'box-medium',
       'manage-or-push': 'manage',
       'sc-stop': 'box-soft',
+      'sc-last-chance': 'stay',
       'restart-stance': 'defend',
     };
     const played = play(fullAbu, choices);
@@ -222,8 +224,10 @@ describe('verifyRun', () => {
   describe("with the game's claimed grades (free-plan scoring)", () => {
     const choices = {
       'vsc-cover': 'stay',
+      'tyres-going': 'stay',
       'manage-or-push': 'push',
       'sc-stop': 'box-soft',
+      'sc-last-chance': 'stay',
       'restart-stance': 'defend',
     };
     const played = play(fullAbu, choices);
@@ -248,12 +252,19 @@ describe('verifyRun', () => {
       const full = verifyRun(fullAbu, fullAbu.race.seed, played.decisions, SAMPLES);
       expect(claimed(JSON.parse(JSON.stringify(played.grades)))).toEqual(full);
       // Laps 49 and 57: the real team took none of the options, so their chance is claimed.
-      expect(played.grades.map((g) => g.real !== undefined)).toEqual([false, true, false, true]);
+      expect(played.grades.map((g) => g.real !== undefined)).toEqual([
+        false,
+        false,
+        true,
+        false,
+        false,
+        true,
+      ]);
     });
 
     it('an edited chance passes the live check but not full grading (the nightly check)', () => {
       const cheat = edit((g) => {
-        const sc = g[2] as { probabilities: number[] };
+        const sc = g[3] as { probabilities: number[] };
         sc.probabilities = sc.probabilities.map((_, i) => (i === 1 ? 1 : 0)); // box-soft best
       });
       const full = verifyRun(fullAbu, fullAbu.race.seed, played.decisions, SAMPLES);
@@ -280,7 +291,7 @@ describe('verifyRun', () => {
         edit((g) => {
           (g[i] as { real?: number }).real = p;
         });
-      expect(reason(JSON.parse(JSON.stringify(realChance(1, undefined))))).toBe('bad-grades');
+      expect(reason(JSON.parse(JSON.stringify(realChance(2, undefined))))).toBe('bad-grades');
       expect(reason(realChance(0, 0.5))).toBe('bad-grades');
     });
 

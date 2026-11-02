@@ -7,22 +7,24 @@
 // it drives the pit lane.
 
 import type { Modes, RaceModel } from '@boxthislap/sim';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BoxButton } from '../components/BoxButton.js';
 import { DecisionPanel } from '../components/DecisionPanel.js';
 import { DriverCard } from '../components/DriverCard.js';
 import { GapTrace } from '../components/GapTrace.js';
 import { HeadsetPanel } from '../components/HeadsetPanel.js';
 import { PitCard } from '../components/PitCard.js';
+import { QuickCallCard } from '../components/QuickCallCard.js';
 import { RadioAlert } from '../components/RadioAlert.js';
 import { RadioLog } from '../components/RadioLog.js';
 import { TimingTower } from '../components/TimingTower.js';
 import { TrackMap } from '../components/TrackMap.js';
 import { TyreBadge } from '../components/TyreBadge.js';
 import { modeLine } from '../game/guide.js';
+import { type QuickCall, quickCallAt, quickCallLaps } from '../game/quickCalls.js';
 import { useRaceLog } from '../game/raceLog.js';
 import { radioChirp, setSoundOn, soundOn } from '../game/sound.js';
-import type { Game } from '../game/useGame.js';
+import { type Game, LAP_MS } from '../game/useGame.js';
 import type { GameState } from '../state/machine.js';
 import { outlineFor } from '../track/outlines.js';
 
@@ -37,7 +39,14 @@ export function RaceScreen({
   game,
   state,
   model,
-}: { game: Game; state: GameState; model: RaceModel }) {
+  onFinished,
+}: {
+  game: Game;
+  state: GameState;
+  model: RaceModel;
+  /** The run to the flag is over (your car crossed the line): show the results. */
+  onFinished?: () => void;
+}) {
   const { userSide, rival, totalLaps, number, source } = state.meta;
   const me = state.race.cars[userSide];
   const them = state.race.cars[rival];
@@ -55,6 +64,51 @@ export function RaceScreen({
   const trace = useRef(new Map<number, number>());
   if (gap !== null) trace.current.set(state.race.lap, gap);
   const points = [...trace.current.entries()].sort((a, b) => a[0] - b[0]).slice(-15);
+
+  // The flag: run the field to the line, then hold the chequered flag before the results.
+  const finishing = state.phase === 'finished';
+  const [crossed, setCrossed] = useState(false);
+  const onCrossed = useCallback(() => setCrossed(true), []);
+  useEffect(() => {
+    if (!finishing) return;
+    if (!outline) {
+      onFinished?.();
+      return;
+    }
+    if (!crossed) return;
+    const id = setTimeout(() => onFinished?.(), 2600);
+    return () => clearTimeout(id);
+  }, [finishing, crossed, outline, onFinished]);
+  const finishPos = state.race.order.indexOf(userSide) + 1;
+  const finishMeta = useMemo(
+    () => (finishing ? { lapMs: LAP_MS[state.speed], onCrossed } : null),
+    [finishing, state.speed, onCrossed],
+  );
+
+  // Quick calls between the big moments: asked once each, answered or timed out.
+  const quickLaps = useMemo(() => new Set(quickCallLaps(model)), [model]);
+  const asked = useRef(new Set<number>());
+  const [quick, setQuick] = useState<QuickCall | null>(null);
+  const raceLap = state.race.lap;
+  // biome-ignore lint/correctness/useExhaustiveDependencies: asked once, when its lap completes.
+  useEffect(() => {
+    if (state.phase !== 'racing' || !quickLaps.has(raceLap) || asked.current.has(raceLap)) return;
+    asked.current.add(raceLap);
+    setQuick(quickCallAt(state.race, model, log));
+  }, [raceLap, state.phase, quickLaps]);
+  const answerQuick = useCallback(
+    (id: string) => {
+      const o = quick?.options.find((x) => x.id === id);
+      if (o?.call) game.call({ ...o.call, lap: state.race.lap + 1 }, { asked: true });
+      else game.radio('Copy. No change.');
+      setQuick(null);
+    },
+    [quick, game, state.race],
+  );
+  const quickTimeout = useCallback(() => {
+    game.radio('No answer from the wall. Sticking to the plan.');
+    setQuick(null);
+  }, [game]);
 
   const select = useCallback((code: string) => setSelected((c) => (c === code ? null : code)), []);
   const close = useCallback(() => setSelected(null), []);
@@ -171,6 +225,7 @@ export function RaceScreen({
                 selected={selected}
                 onSelect={select}
                 dim={paused}
+                finishing={finishMeta}
               />
             ) : (
               <p className="p-8 text-center text-[var(--muted)]">No track map for this race yet.</p>
@@ -185,6 +240,16 @@ export function RaceScreen({
                 {flag.text}
               </span>
             </div>
+            {finishing && crossed && (
+              <output className="radio-alert absolute inset-x-2.5 bottom-12 z-10 mx-auto flex max-w-[420px] items-center justify-center gap-3 rounded-xl border-2 border-white bg-[#141716]/90 px-4 py-3 text-white shadow-2xl">
+                <span aria-hidden="true" className="text-[26px]">
+                  🏁
+                </span>
+                <span className="disp text-[26px] leading-none">
+                  Chequered flag · {userSide} P{finishPos}
+                </span>
+              </output>
+            )}
             {paused && state.currentMoment && (
               <RadioAlert moment={state.currentMoment} race={state.race} model={model} />
             )}
@@ -288,21 +353,46 @@ export function RaceScreen({
                 onChoose={game.choose}
               />
             </div>
+          ) : quick && state.phase === 'racing' ? (
+            <QuickCallCard
+              key={quick.lap}
+              call={quick}
+              ms={Math.min(8000, LAP_MS[state.speed] * 0.9)}
+              onAnswer={answerQuick}
+              onTimeout={quickTimeout}
+            />
           ) : (
-            <p className="m-0 text-[14px] text-[var(--muted)]">
-              The race stops for the big calls. BOX and the headset are always live, but your driver
-              doesn’t always listen.
+            <p className="card m-0 text-[14px] leading-snug text-[var(--muted)]">
+              {finishing
+                ? 'Chequered flag. Bringing the cars home.'
+                : `The race stops for the big calls, and the radio asks quick ones in between. BOX and the headset are always live, but ${userSide} doesn’t always listen.`}
             </p>
           )}
-          <div className="flex flex-col gap-3 rounded-xl border border-[var(--rule)] bg-[var(--card)] p-3">
+          <section aria-label={`Gap to ${rival}`} className="card flex flex-col gap-2">
+            <div className="flex items-baseline justify-between">
+              <span className="eyebrow">Gap to {rival}</span>
+              <span
+                className={`mono text-[15px] font-semibold ${gap === null ? '' : gap >= 0 ? 'text-[var(--you)]' : 'text-[var(--rival)]'}`}
+              >
+                {gap === null ? '—' : `${gap >= 0 ? '+' : '−'}${Math.abs(gap).toFixed(1)}s`}
+              </span>
+            </div>
             <GapTrace points={points} rival={rival} />
-            <RadioLog messages={state.radio} />
+          </section>
+          {state.radio.length > 0 && (
+            <section aria-label="Radio" className="card flex flex-col gap-2">
+              <span className="eyebrow">Radio</span>
+              <RadioLog messages={state.radio} />
+            </section>
+          )}
+          <section aria-label="Headset and box" className="card flex flex-col gap-3">
+            <span className="eyebrow">Headset</span>
             {me && (
               <HeadsetPanel
                 modes={me.modes}
                 pending={pending}
                 describe={(key, value) => modeLine(model, key, value)}
-                disabled={paused}
+                disabled={state.phase !== 'racing'}
                 onFlip={(key, value) =>
                   game.call({ lap: state.race.lap + 1, kind: 'mode', key, value })
                 }
@@ -311,10 +401,10 @@ export function RaceScreen({
             <BoxButton
               compounds={Object.keys(model.compounds)}
               booked={boxing}
-              disabled={paused}
+              disabled={state.phase !== 'racing'}
               onBox={(compound) => game.call({ lap: state.race.lap + 1, kind: 'pit', compound })}
             />
-          </div>
+          </section>
         </aside>
       </div>
     </main>

@@ -40,8 +40,10 @@ describe('decisionMoments', () => {
     const moments = decisionMoments(model);
     expect(moments.map((m) => [m.id, m.lap])).toEqual([
       ['vsc-cover', 36],
+      ['tyres-going', 44],
       ['manage-or-push', 49],
       ['sc-stop', 53],
+      ['sc-last-chance', 55],
       ['restart-stance', 57],
     ]);
     expect(moments[0]?.realOptionId).toBe('stay');

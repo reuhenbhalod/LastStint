@@ -3,12 +3,16 @@ import { StaticDailyProvider } from '../data/provider.js';
 import { GameEngine } from '../engine/engine.js';
 import {
   carsOnTrack,
+  flagOn,
   lapTime,
+  lapsToFlag,
   nearestFraction,
   pitLane,
   pointAlong,
   pointAt,
   polyline,
+  runToFlag,
+  spaceOut,
   spreadLane,
 } from './geometry.js';
 
@@ -101,5 +105,52 @@ describe('pit lane', () => {
     expect(
       pitLane({ raceId: 'x', width: 1, height: 1, points: square, corners: [] }, lap),
     ).toBeNull();
+  });
+});
+
+describe('finish and spacing', () => {
+  it('keeps cars a dot apart, by where they are on track', () => {
+    const out = spaceOut(
+      new Map([
+        ['A', 0],
+        ['B', 0.001],
+        ['C', 0.002],
+        ['L', 1.0015], // lapped: on track between B and C
+      ]),
+      0.01,
+    );
+    expect(out.get('A')).toBe(0);
+    expect(out.get('B')).toBeCloseTo(0.01);
+    expect(out.get('L')).toBeCloseTo(1.02);
+    expect(out.get('C')).toBeCloseTo(0.03);
+  });
+
+  it('runs each car to the line from its finishing gap', () => {
+    const behind = new Map([
+      ['P1', 0],
+      ['P2', 0.05],
+      ['LAP', 1.2],
+    ]);
+    expect(lapsToFlag(0)).toBe(0);
+    expect(lapsToFlag(0.05)).toBeCloseTo(0.05);
+    expect(lapsToFlag(1.2)).toBeCloseTo(0.2);
+    const early = runToFlag(behind, 0.01);
+    expect(early.get('P1')?.finished).toBe(true);
+    expect(early.get('P2')).toMatchObject({ finished: false });
+    expect(early.get('P2')?.at).toBeCloseTo(-0.04);
+    const later = runToFlag(behind, 0.3);
+    expect(later.get('P2')?.finished).toBe(true);
+    expect(later.get('LAP')?.finished).toBe(true);
+    expect(later.get('P2')?.at).toBeLessThan(0.045);
+    // Parked in finishing order: the winner furthest past the line.
+    expect(later.get('P1')?.at as number).toBeGreaterThan(later.get('P2')?.at as number);
+  });
+
+  it('knows the flag a lap runs under', async () => {
+    const { model } = await new StaticDailyProvider().today();
+    expect(flagOn(model, 36)).toBe('vsc');
+    expect(flagOn(model, 53)).toBe('sc');
+    expect(flagOn(model, 57)).toBe('sc');
+    expect(flagOn(model, 58)).toBe('green');
   });
 });

@@ -156,9 +156,10 @@ export class GameSession {
   /**
    * A standing-mode flip or BOX call mid-lap; never pauses. The driver may refuse it
    * (game/refusal.ts): a refused call is not applied, so it never reaches the call log.
-   * A call already booked for the coming lap is ignored.
+   * A call already booked for the coming lap is ignored. An answer to a quick call (`asked`:
+   * the driver or engineer asked for the order) is always followed.
    */
-  call(decision: Decision): void {
+  call(decision: Decision, options: { asked?: boolean } = {}): void {
     if (this.state.phase !== 'racing') return;
     if (decision.kind === 'pit' || decision.kind === 'mode') {
       const side = this.state.meta.userSide;
@@ -172,7 +173,7 @@ export class GameSession {
             (decision.kind === 'mode' && d.kind === 'mode' && d.key === decision.key)),
       );
       if (booked) return;
-      const no = refusal(this.daily.seed, this.engine.lap, decision, car);
+      const no = options.asked ? null : refusal(this.daily.seed, this.engine.lap, decision, car);
       this.dispatch({
         type: 'RADIO',
         message: {
@@ -186,6 +187,14 @@ export class GameSession {
     }
     this.engine.apply(decision);
     this.dispatch({ type: 'CALL', race: this.engine.state, decisions: this.engine.decisions });
+  }
+
+  /** A radio line with no call behind it (an unanswered quick call). */
+  radio(text: string): void {
+    this.dispatch({
+      type: 'RADIO',
+      message: { lap: this.engine.lap + 1, from: 'Engineer', text, refused: false },
+    });
   }
 
   setSpeed(speed: Speed): void {

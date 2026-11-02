@@ -37,7 +37,7 @@ describe('GameSession', () => {
     session.finish({ status: 'practice' });
     expect(session.state.phase).toBe('results');
     expect(session.state.result?.finishers).toContain('HAM');
-    expect(Object.keys(session.state.grades)).toHaveLength(4);
+    expect(Object.keys(session.state.grades)).toHaveLength(6);
   });
 
   it('submits a run the server accepts and scores exactly as full grading does', async () => {

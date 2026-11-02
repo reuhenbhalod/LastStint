@@ -90,7 +90,7 @@ Other useful parts of the model:
 - Writes them to `data/moments/proposed/<race-id>.json`.
 - A person picks 2–4 and saves them as `data/moments/<race-id>.json`; `pipeline build <race-id>` embeds them.
 
-Abu Dhabi 2021 ships with four approved moments, matching the UI race script (`data/scripts/abu-dhabi-2021.json` on main): `vsc-cover` (lap 36), `manage-or-push` (49), `sc-stop` (53) and `restart-stance` (57).
+Abu Dhabi 2021 ships with six approved moments: `vsc-cover` (lap 36), `tyres-going` (44), `manage-or-push` (49), `sc-stop` (53), `sc-last-chance` (55) and `restart-stance` (57).
 
 ## Grading
 

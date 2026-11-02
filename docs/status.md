@@ -33,6 +33,11 @@ Beta feedback round 1 (Nov 1, 2026) added:
 - **Driver card:** tap any car on the map or in the standings: name, number, team, place, gaps, tyres, last lap, stops, real finish, and your driver's modes.
 - **More options:** lap 36 stay / mediums / hards; lap 49 push / standard / manage; lap 53 stay / softs / mediums / hards (108 paths, 0 live/full mismatches).
 - **Drivers can refuse live calls** (about 1 in 8, more with a reason, such as boxing on new tyres). A refused call is never applied or logged; the four graded moments are always followed. Booked calls show at once.
+- **Crew chief (Nov 2, `crew-chief-spec.md`):**
+  - Six graded moments (laps 36, 44, 49, 53, 55, 57).
+  - Timed quick calls between them.
+  - Every decision option explains itself; tyres show pace, drop-off and gain (`tyres-and-track-spec.md`).
+  - At the flag the field runs to the line and the race ends when your car crosses it.
 - **Google sign-in + streaks:** the streak shows on the intro and results. Signing in links the browser to an account so the streak and one-run-a-day follow you.
   - Google OAuth client `318278030629-…` (project "Pit Wall"), set as `GOOGLE_CLIENT_ID` in `apps/worker/wrangler.jsonc` and `VITE_GOOGLE_CLIENT_ID` in CI and `dev:live`. The consent screen is in Testing: only listed test users can sign in until it is published.
 

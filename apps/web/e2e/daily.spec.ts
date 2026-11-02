@@ -1,4 +1,4 @@
-// Start → four calls (with the radio alert, and a driver card from the map) → results → share,
+// Start → six calls (with the radio alert, and a driver card from the map) → results → share,
 // on a 390 px phone screen. The Worker is mocked: the
 // daily serves the real race file, and POST /api/runs answers from the claimed grades the game
 // sent (the real verification of those grades is unit-tested: src/state/session.test.ts and
@@ -133,11 +133,13 @@ test('plays the Abu Dhabi daily end to end', async ({ page, context }) => {
   // Each moment: the top-level option, then (after Box) the tyre.
   const answers: Record<string, string[]> = {
     '36': ['Box', 'Hards'],
+    '44': ['Stay out'],
     '49': ['Push now'],
     '53': ['Box', 'Softs'],
+    '55': ['Stay out'],
     '57': ['Attack'],
   };
-  for (const lap of ['36', '49', '53', '57']) {
+  for (const lap of ['36', '44', '49', '53', '55', '57']) {
     const card = page.locator('section.decision');
     await expect(card).toContainText(`Lap ${lap}`, { timeout: 90_000 });
     await expect(page.getByRole('alert')).toContainText(`Lap ${lap}`);

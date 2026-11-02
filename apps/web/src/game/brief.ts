@@ -27,11 +27,12 @@ export interface Brief {
 const TYRE: Record<string, string> = { SOFT: 'softs', MEDIUM: 'mediums', HARD: 'hards' };
 const tyres = (compound: string) => TYRE[compound] ?? compound.toLowerCase();
 
-/** The neutralization covering the moment's lap, if any (known at the pause). */
-function flagAt(model: RaceModel, lap: number): 'SC' | 'VSC' | null {
+/** The neutralization covering the moment's lap, if any (known at the pause), and the lap
+ * it came out on. */
+function neutralAt(model: RaceModel, lap: number): { type: 'SC' | 'VSC'; from: number } | null {
   for (const e of model.events) {
     if ((e.type === 'SC' || e.type === 'VSC') && lap >= e.lap && lap < e.lap + (e.laps ?? 1)) {
-      return e.type;
+      return { type: e.type, from: e.lap };
     }
   }
   return null;
@@ -43,7 +44,8 @@ export function briefFor(moment: DecisionMoment, race: RaceState, model: RaceMod
   const r = model.rival;
   const live = me && them && !me.retired && !them.retired;
   const gap = live ? them.totalTime - me.totalTime : null;
-  const flag = flagAt(model, moment.lap);
+  const neutral = neutralAt(model, moment.lap);
+  const flag = neutral?.type ?? null;
   const { pitLoss, pitLossUnderSC, pitLossUnderVSC } = model.track;
   const stops = moment.options.some((o) => o.decisions.some((d) => d.kind === 'pit'));
   const only = (key: 'battle' | 'pace') =>
@@ -60,12 +62,21 @@ export function briefFor(moment: DecisionMoment, race: RaceState, model: RaceMod
   } else if (only('pace')) {
     kind = 'Tyres';
     headline = `Our ${me ? tyres(me.compound) : 'tyres'} are ${me?.tyreAge ?? '?'} laps old. Push to hold the gap, run to plan, or look after them for the end?`;
+  } else if (flag === 'SC' && neutral && moment.lap > neutral.from) {
+    kind = 'Safety car';
+    headline =
+      them && !them.retired && them.tyreAge < (me?.tyreAge ?? 0)
+        ? `Safety car still out, restart coming. ${r} is on ${them.tyreAge}-lap-old ${tyres(them.compound)}. Last chance to box: fresh tyres, or keep track position?`
+        : 'Safety car still out, restart coming. Last chance to box: fresh tyres, or keep track position?';
   } else if (flag === 'SC') {
     kind = 'Safety car';
     headline = 'Safety car! The pit lane is cheap. Box for fresh tyres, or keep track position?';
   } else if (flag === 'VSC') {
     kind = 'Virtual safety car';
     headline = 'Virtual safety car. A cheap stop is on. Box, or stay out?';
+  } else if (moment.trigger === 'cliff' && stops) {
+    kind = 'Tyres';
+    headline = `Our ${me ? tyres(me.compound) : 'tyres'} are ${me?.tyreAge ?? '?'} laps old and the lap times are starting to drop. Box under green for fresh tyres, or run them to the end?`;
   } else if (moment.trigger === 'rivalPit') {
     kind = `${r} pitted`;
     headline = `${r} has boxed. Do we cover?`;
