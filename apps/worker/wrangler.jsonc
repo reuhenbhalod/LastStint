@@ -25,7 +25,12 @@
 
   // The website's origin, allowed to call /api/* (CORS): the pitwall-web Worker (apps/web).
   // Local dev (localhost:5173) is always allowed.
-  "vars": { "WEB_ORIGIN": "https://pitwall-web.boxboxbox.workers.dev" },
+  // GOOGLE_CLIENT_ID: the Google OAuth client for sign-in (public; not a secret). Its
+  // authorized origins are the website and http://localhost:5173.
+  "vars": {
+    "WEB_ORIGIN": "https://pitwall-web.boxboxbox.workers.dev",
+    "GOOGLE_CLIENT_ID": "318278030629-s860fnjjpk6ihcn4iubjqiakf8vu0pqi.apps.googleusercontent.com"
+  },
 
   // Run submissions per IP (Phase 4 spec C1). namespace_id is any account-unique number.
   "ratelimits": [

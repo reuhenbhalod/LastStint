@@ -34,7 +34,7 @@ Beta feedback round 1 (Nov 1, 2026) added:
 - **More options:** lap 36 stay / mediums / hards; lap 49 push / standard / manage; lap 53 stay / softs / mediums / hards (108 paths, 0 live/full mismatches).
 - **Drivers can refuse live calls** (about 1 in 8, more with a reason, such as boxing on new tyres). A refused call is never applied or logged; the four graded moments are always followed. Booked calls show at once.
 - **Google sign-in + streaks:** the streak shows on the intro and results. Signing in links the browser to an account so the streak and one-run-a-day follow you.
-  - Needs a Google OAuth client ID: `VITE_GOOGLE_CLIENT_ID` (site build) and `GOOGLE_CLIENT_ID` (Worker var). Without it there's no sign-in button.
+  - Google OAuth client `318278030629-…` (project "Pit Wall"), set as `GOOGLE_CLIENT_ID` in `apps/worker/wrangler.jsonc` and `VITE_GOOGLE_CLIENT_ID` in CI and `dev:live`. The consent screen is in Testing: only listed test users can sign in until it is published.
 
 ## How a game works, end to end
 
