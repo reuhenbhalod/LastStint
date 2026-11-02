@@ -1,7 +1,7 @@
 import type { RaceModel } from '@boxthislap/sim';
 import { describe, expect, it } from 'vitest';
 import { ApiError } from '../api.js';
-import { ApiDailyProvider, StaticDailyProvider } from './provider.js';
+import { ApiDailyProvider, ModelError, StaticDailyProvider, practiceReason } from './provider.js';
 
 describe('StaticDailyProvider', () => {
   it('serves the Abu Dhabi 2021 race as practice', async () => {
@@ -62,5 +62,29 @@ describe('ApiDailyProvider', () => {
       throw new TypeError('fetch failed');
     });
     expect((await p.today()).practiceReason).toMatch(/reach the server/);
+  });
+
+  it('says exactly why there is no live daily', () => {
+    expect(practiceReason(new ApiError(503, 'model-changed'))).toBe(
+      'Today’s race is being updated on the server.',
+    );
+    expect(practiceReason(new ApiError(404, 'no-daily'))).toMatch(/No daily race/);
+    expect(practiceReason(new ApiError(429, 'rate-limited'))).toMatch(/busy/);
+    expect(practiceReason(new ApiError(500, 'internal'))).toBe(
+      'The server hit an error loading today’s race (500 internal).',
+    );
+    expect(practiceReason(new ModelError('HTTP 404'))).toBe(
+      'Today’s race file didn’t download (HTTP 404).',
+    );
+    expect(practiceReason(new TypeError('fetch failed'))).toMatch(/Can’t reach the server/);
+  });
+
+  it('never says the server is unreachable when it answered', async () => {
+    const p = new ApiDailyProvider(async () => {
+      throw new ApiError(503, 'model-changed');
+    });
+    const today = await p.today();
+    expect(today.source).toBe('practice');
+    expect(today.practiceReason).not.toMatch(/reach/);
   });
 });
