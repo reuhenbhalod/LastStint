@@ -36,9 +36,9 @@ export function GapTrace({ points, rival }: { points: Array<[number, number]>; r
         />
       </svg>
       <figcaption className="flex justify-between font-mono text-[10px] text-[var(--muted)]">
-        <span>lap {lo}</span>
-        <span>gap to {rival} · above the line: ahead</span>
-        <span>lap {hi}</span>
+        <span>L{lo}</span>
+        <span>above the line: you lead</span>
+        <span>L{hi}</span>
       </figcaption>
     </figure>
   );

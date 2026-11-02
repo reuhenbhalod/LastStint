@@ -101,15 +101,17 @@ describe('POST /api/runs', () => {
     expect(run.result.order).toEqual(boxSoft.result.order);
     expect(run.calls.map((c) => c.momentId)).toEqual([
       'vsc-cover',
+      'tyres-going',
       'manage-or-push',
       'sc-stop',
+      'sc-last-chance',
       'restart-stance',
     ]);
-    expect(run.calls[2]).toMatchObject({
+    expect(run.calls[3]).toMatchObject({
       momentId: 'sc-stop',
       chosen: 'box-soft',
-      band: boxSoft.score.calls[2]?.band,
-      options: boxSoft.calls[2]?.grade.options,
+      band: boxSoft.score.calls[3]?.band,
+      options: boxSoft.calls[3]?.grade.options,
       matchedReal: false,
       real: { optionId: 'stay' },
     });
@@ -286,13 +288,13 @@ describe('nightly re-grading (beta spec B6)', () => {
     const fixed = (await (await get(`/api/runs/${today()}/${ids.b}`)).json()) as RunResponse;
     expect(fixed.score).toBe(stayOut.score.score);
     expect(fixed.calls.find((c) => c.momentId === 'sc-stop')?.band).toBe(
-      stayOut.score.calls[2]?.band,
+      stayOut.score.calls[3]?.band,
     );
     const band = await env.DB.prepare(
       "SELECT band FROM run_calls WHERE run_id = ? AND moment_id = 'sc-stop'",
     )
       .bind(claimed.runId)
       .first<{ band: string }>();
-    expect(band?.band).toBe(stayOut.score.calls[2]?.band);
+    expect(band?.band).toBe(stayOut.score.calls[3]?.band);
   });
 });

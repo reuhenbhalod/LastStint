@@ -8,12 +8,14 @@ import type { RaceModel } from '../src/types.js';
 const abu = abuJson as unknown as RaceModel;
 
 describe('daily race example', () => {
-  it('plays Abu Dhabi 2021 with its four approved moments and scores every call', () => {
+  it('plays Abu Dhabi 2021 with its six approved moments and scores every call', () => {
     // The moments match the UI's race script (data/scripts/abu-dhabi-2021.json).
     expect(abu.decisionMoments.map((m) => m.id)).toEqual([
       'vsc-cover',
+      'tyres-going',
       'manage-or-push',
       'sc-stop',
+      'sc-last-chance',
       'restart-stance',
     ]);
     const laps: number[] = [];
@@ -27,8 +29,10 @@ describe('daily race example', () => {
     expect(laps.at(-1)).toBe(abu.race.laps);
     expect(calls.map((c) => [c.moment.id, c.chosen])).toEqual([
       ['vsc-cover', 'stay'],
+      ['tyres-going', 'stay'],
       ['manage-or-push', 'push'],
       ['sc-stop', 'box-soft'],
+      ['sc-last-chance', 'stay'],
       ['restart-stance', 'defend'],
     ]);
     expect(score.calls.every((c) => c.band !== undefined)).toBe(true);
@@ -43,6 +47,13 @@ describe('daily race example', () => {
       (m) => m.realOptionId ?? (m.options[0]?.id as string),
       { samples: 60 },
     );
-    expect(score.calls.map((c) => c.optionId)).toEqual(['stay', 'push', 'stay', 'defend']);
+    expect(score.calls.map((c) => c.optionId)).toEqual([
+      'stay',
+      'stay',
+      'push',
+      'stay',
+      'stay',
+      'defend',
+    ]);
   });
 });

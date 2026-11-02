@@ -14,11 +14,14 @@ import {
   angleAlong,
   carsOnTrack,
   ease,
+  flagOn,
   nearestFraction,
   pitLane,
   pointAlong,
   pointAt,
   polyline,
+  runToFlag,
+  spaceOut,
 } from '../track/geometry.js';
 
 const REDUCED =
@@ -321,6 +324,7 @@ export function TrackMap({
   selected,
   onSelect,
   dim,
+  finishing = null,
 }: {
   outline: TrackOutline;
   race: RaceState;
@@ -334,10 +338,16 @@ export function TrackMap({
   onSelect: (code: string) => void;
   /** Dim the circuit (a decision is waiting). */
   dim: boolean;
+  /** The race is over: run the field to the flag, and say when your car crosses the line. */
+  finishing?: { lapMs: number; onCrossed: () => void } | null;
 }) {
   const line = useMemo(() => polyline(outline.points), [outline]);
   const lane = useMemo(() => pitLane(outline, line, TRACK), [outline, line]);
-  const cars = carsOnTrack(race, model);
+  // Gaps become distance at the pace of the lap being driven (the restart lap at racing
+  // speed); at the flag, the final gaps at racing speed.
+  const driven = finishing ? race.flag : flagOn(model, race.lap + 1);
+  const cars = carsOnTrack(race, model, driven);
+  const minGap = 24 / line.length;
 
   // Progress of the lap tick, from the shared lap clock.
   const [progress, setProgress] = useState(0);
@@ -376,11 +386,42 @@ export function TrackMap({
   // At the start of a tick the leader is still crossing the line from the last one.
   const lead = clock ? progress : 0;
 
+  // The run to the flag, timed from when the race finished.
+  const [sinceFlag, setSinceFlag] = useState(0);
+  const crossed = useRef(false);
+  const onCrossed = finishing?.onCrossed;
+  const finishMs = finishing?.lapMs;
+  useEffect(() => {
+    if (!finishMs) return;
+    const start = performance.now();
+    let raf = 0;
+    const frame = (now: number) => {
+      setSinceFlag((now - start) / finishMs);
+      raf = requestAnimationFrame(frame);
+    };
+    raf = requestAnimationFrame(frame);
+    return () => cancelAnimationFrame(raf);
+  }, [finishMs]);
+  const shown = spaceOut(
+    new Map(cars.map((c) => [c.code, finishing ? c.behind : behindOf(c.code, c.behind)])),
+    minGap,
+  );
+  const atFlag = finishing ? runToFlag(shown, REDUCED ? 99 : sinceFlag) : null;
+  const youDone = atFlag?.get(userSide)?.finished ?? false;
+  useEffect(() => {
+    if (youDone && !crossed.current) {
+      crossed.current = true;
+      onCrossed?.();
+    }
+  }, [youDone, onCrossed]);
+  const positionOf = (code: string): number =>
+    atFlag ? (atFlag.get(code)?.at ?? 0) : lead - (shown.get(code) ?? 0);
+
   // Draw the field first, then the rival, then the player's car on top.
   const drawOrder = [...cars].sort(
     (a, b) => rank(a.code, userSide, rival) - rank(b.code, userSide, rival),
   );
-  const sc = race.flag === 'sc' ? pointAt(line, lead + 0.018) : null;
+  const sc = !finishing && driven === 'sc' ? pointAt(line, lead + 0.018) : null;
 
   return (
     <svg
@@ -414,10 +455,10 @@ export function TrackMap({
       )}
       {drawOrder.map((c) => {
         const car = race.cars[c.code];
-        const inLane = lane && car?.pittedThisLap && raw < 1;
+        const inLane = !finishing && lane && car?.pittedThisLap && raw < 1;
         const [x, y] = inLane
           ? pointAlong(lane.path, laneT(raw, garageAt(car?.team)))
-          : pointAt(line, lead - behindOf(c.code, c.behind));
+          : pointAt(line, positionOf(c.code));
         const you = c.code === userSide;
         const isRival = c.code === rival;
         const key = you || isRival;

@@ -36,7 +36,9 @@ export interface Game {
   start: () => void;
   setSpeed: (s: Speed) => void;
   choose: (optionId: string) => void;
-  call: (decision: Decision) => void;
+  call: (decision: Decision, options?: { asked?: boolean }) => void;
+  /** Put a line on the radio (no call). */
+  radio: (text: string) => void;
   submit: () => void;
   reset: () => void;
   reload: () => void;
@@ -199,7 +201,8 @@ export function useGame(provider: DailyProvider, grader?: Grader): Game {
     start: act((s) => s.start()),
     setSpeed: (speed) => act((s) => s.setSpeed(speed))(),
     choose: (optionId) => act((s) => s.choose(optionId))(),
-    call: (decision) => act((s) => s.call(decision))(),
+    call: (decision, options) => act((s) => s.call(decision, options))(),
+    radio: (text) => act((s) => s.radio(text))(),
     submit,
     reset,
     reload: () => setAttempt((n) => n + 1),

@@ -38,8 +38,10 @@ function Tile({
   );
 }
 
+// Option buttons: number, label, then what it does. Grid rows stretch, so a row of options
+// is always one height.
 const optBtn =
-  'relative flex min-h-[52px] items-end rounded-lg border-2 border-transparent bg-[var(--ink)] px-3 pb-2 pt-5 text-left text-[var(--paper)] disp text-[20px] leading-none md:min-h-[64px] md:pb-2.5 md:pt-6 md:text-[24px] hover:border-[var(--you)] focus-visible:border-[var(--you)] focus-visible:outline-none';
+  'flex min-h-[64px] flex-col items-start justify-start gap-1 rounded-lg border-2 border-transparent bg-[var(--ink)] px-3 py-2 text-left text-[var(--paper)] hover:border-[var(--you)] focus-visible:border-[var(--you)] focus-visible:outline-none';
 
 export function DecisionPanel({
   moment,
@@ -64,7 +66,8 @@ export function DecisionPanel({
       const mode = modeOf(o.decisions);
       return {
         id: o.id,
-        label: o.label,
+        // "Stay out — keep the lead" reads long beside its note: the note carries the detail.
+        label: o.decisions.length === 0 ? (o.label.split(' — ')[0] ?? o.label) : o.label,
         note: mode
           ? modeLine(model, mode.key, mode.value)
           : o.decisions.length === 0 && me
@@ -112,7 +115,7 @@ export function DecisionPanel({
   return (
     <section
       aria-labelledby="decision-headline"
-      className="decision flex flex-col gap-2 rounded-xl border border-[var(--rule)] bg-[var(--card)] p-3 shadow-2xl md:gap-3 md:p-4"
+      className="decision card flex flex-col gap-2 shadow-2xl md:gap-3"
     >
       <p className="eyebrow !text-[var(--rival)]">
         📻 Lap {moment.lap} · {b.kind}
@@ -180,27 +183,23 @@ export function DecisionPanel({
       {!picking ? (
         <div className={`grid gap-2 ${top.length === 3 ? 'grid-cols-3' : 'grid-cols-2'}`}>
           {top.map((t, i) => (
-            <div key={t.id} className="flex min-w-0 flex-col gap-1">
-              <button
-                ref={i === 0 ? first : undefined}
-                type="button"
-                onClick={t.act}
-                className={`${optBtn} ${t.id === 'box' ? '!bg-[var(--box)] !text-white' : ''}`}
-              >
-                <span
-                  aria-hidden="true"
-                  className="mono absolute left-2.5 top-2 text-[10px] opacity-70"
-                >
-                  {i + 1}
-                </span>
-                {t.label}
-              </button>
+            <button
+              key={t.id}
+              ref={i === 0 ? first : undefined}
+              type="button"
+              onClick={t.act}
+              aria-label={t.label}
+              title={t.note ?? undefined}
+              className={`${optBtn} ${t.id === 'box' ? '!bg-[var(--box)] !text-white' : ''}`}
+            >
+              <span aria-hidden="true" className="mono text-[10px] opacity-60">
+                {i + 1}
+              </span>
+              <span className="disp text-[21px] leading-none md:text-[23px]">{t.label}</span>
               {t.note && (
-                <span className="px-0.5 text-[11.5px] leading-snug text-[var(--muted)]">
-                  {t.note}
-                </span>
+                <span className="text-[11.5px] font-medium leading-snug opacity-75">{t.note}</span>
               )}
-            </div>
+            </button>
           ))}
         </div>
       ) : (

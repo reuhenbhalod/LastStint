@@ -188,14 +188,87 @@ export interface CarOnTrack {
   lapped: boolean;
 }
 
-/** Every running car's distance behind the leader, as a fraction of a lap, in race order. */
-export function carsOnTrack(race: RaceState, model: RaceModel): CarOnTrack[] {
+/** The flag a lap is run under, from the race's neutralizations (green if none). */
+export function flagOn(model: RaceModel, lap: number): RaceState['flag'] {
+  for (const e of model.events) {
+    if ((e.type === 'SC' || e.type === 'VSC') && lap >= e.lap && lap < e.lap + (e.laps ?? 1)) {
+      return e.type === 'SC' ? 'sc' : 'vsc';
+    }
+  }
+  return 'green';
+}
+
+/**
+ * Every running car's distance behind the leader, as a fraction of a lap, in race order.
+ * Time gaps become distance at the pace of `flag` (default: the last lap's flag); the map
+ * passes the flag of the lap being driven, so a restart lap opens out at racing speed.
+ */
+export function carsOnTrack(
+  race: RaceState,
+  model: RaceModel,
+  flag: RaceState['flag'] = race.flag,
+): CarOnTrack[] {
   const live = race.order.filter((c) => race.cars[c] && !race.cars[c]?.retired);
   const leader = race.cars[live[0] as string];
   if (!leader) return [];
-  const lap = lapTime(model, race.flag);
+  const lap = lapTime(model, flag);
   return live.map((code) => {
     const gap = (race.cars[code]?.totalTime ?? 0) - leader.totalTime;
     return { code, behind: gap / lap, lapped: gap >= lap };
   });
+}
+
+/**
+ * Keep cars at least `min` (a fraction of a lap) apart on screen. Behind a safety car the
+ * field runs 0.5 s apart, about 20 m: less than a dot. Cars are ordered by where they are on
+ * track (a lapped car sits among the leaders) and each is pushed back to clear the one ahead.
+ * Display only: the timing is untouched.
+ */
+export function spaceOut(behind: Map<string, number>, min: number): Map<string, number> {
+  const onTrack = [...behind.entries()]
+    .map(([code, b]) => ({ code, laps: Math.floor(b), at: b - Math.floor(b) }))
+    .sort((a, b) => a.at - b.at);
+  const out = new Map<string, number>();
+  let prev = Number.NEGATIVE_INFINITY;
+  for (const c of onTrack) {
+    const at = Math.max(c.at, prev + min);
+    out.set(c.code, c.laps + at);
+    prev = at;
+  }
+  return out;
+}
+
+/**
+ * The run to the flag: once the leader has finished, each car keeps going at racing speed from
+ * its finishing gap until it reaches the line, then rolls a little past it and stops.
+ * `elapsedLaps` is the time since the leader finished, in laps. Returns each car's position
+ * as a fraction of the lap (the line is 0) and whether it has finished.
+ */
+export function runToFlag(
+  behind: Map<string, number>,
+  elapsedLaps: number,
+): Map<string, { at: number; finished: boolean }> {
+  // Finishers stop in finishing order down the road (the winner furthest), not on one spot.
+  const rank = new Map(
+    [...behind.entries()].sort((a, b) => a[1] - b[1]).map(([code], i) => [code, i]),
+  );
+  const out = new Map<string, { at: number; finished: boolean }>();
+  for (const [code, b] of behind) {
+    const start = -b;
+    const line = Math.ceil(start - 1e-9);
+    const pos = start + elapsedLaps;
+    const over = pos - line;
+    const stop = Math.max(0.004, 0.045 - 0.006 * (rank.get(code) ?? 0));
+    out.set(code, {
+      at: over >= 0 ? line + Math.min(over, stop * (1 - Math.exp(-over / stop))) : pos,
+      finished: over >= 0,
+    });
+  }
+  return out;
+}
+
+/** Laps after the leader finishes until a car `behind` (fraction of a lap) reaches the line. */
+export function lapsToFlag(behind: number): number {
+  const start = -behind;
+  return Math.ceil(start - 1e-9) - start;
 }
