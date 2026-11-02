@@ -35,6 +35,9 @@ RACES: dict[str, dict] = {
         # P7 and back were decided by race control (only the lapped cars between HAM and
         # VER unlapped before the restart), a frozen event the sim can't reproduce.
         "score_positions": 6,
+        # ...but the sim follows that call at the restart (the lapped cars elsewhere stay a
+        # lap down), so the field doesn't close up behind the leaders on the last lap.
+        "sc_unlap": "duel",
         "split": "tune",
     },
     "spain-2021": {
@@ -485,6 +488,7 @@ def build_race(race_id: str, laps: pd.DataFrame | None = None) -> BuildResult:
         fastest_lap_point=meta["year"] in scenario.FASTEST_LAP_POINT_YEARS,
         rival=meta["rival"],
         track_status=ingest.load_track_status(race_id),
+        sc_unlap=meta.get("sc_unlap"),
     )
     return BuildResult(model=model, laps=laps, notes=[*fitted.prior_notes, *params.notes])
 

@@ -29,18 +29,50 @@
     "race": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "laps", "takeoverLap", "seed"],
+      "required": [
+        "id",
+        "laps",
+        "takeoverLap",
+        "seed"
+      ],
       "properties": {
-        "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
-        "name": { "type": "string" },
-        "laps": { "type": "integer", "minimum": 1 },
-        "takeoverLap": { "type": "integer", "minimum": 1 },
-        "seed": { "type": "integer" }
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$"
+        },
+        "name": {
+          "type": "string"
+        },
+        "laps": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "takeoverLap": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "seed": {
+          "type": "integer"
+        },
+        "scUnlap": {
+          "type": "string",
+          "enum": [
+            "all",
+            "duel"
+          ],
+          "description": "Which lapped cars unlap before a safety-car restart: all of them (the rule, default), or only those between userSide and rival (Abu Dhabi 2021's race-control call)."
+        }
       }
     },
     "era": {
       "type": "string",
-      "enum": ["1988-1993", "1994-2009", "2010-2013", "2014-2025", "2026+"]
+      "enum": [
+        "1988-1993",
+        "1994-2009",
+        "2010-2013",
+        "2014-2025",
+        "2026+"
+      ]
     },
     "track": {
       "type": "object",
@@ -54,30 +86,63 @@
         "dirtyAirPenalty"
       ],
       "properties": {
-        "pitLoss": { "type": "number" },
-        "pitLossUnderSC": { "type": "number" },
-        "pitLossUnderVSC": { "type": "number" },
+        "pitLoss": {
+          "type": "number"
+        },
+        "pitLossUnderSC": {
+          "type": "number"
+        },
+        "pitLossUnderVSC": {
+          "type": "number"
+        },
         "pitLossDeviations": {
           "type": "array",
-          "items": { "type": "number" },
+          "items": {
+            "type": "number"
+          },
           "description": "Measured green-stop losses minus pitLoss, for sampling new stops (slow-stop tail included)."
         },
-        "overtakeDifficulty": { "type": "number", "minimum": 0, "maximum": 1 },
+        "overtakeDifficulty": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
         "overtakeModel": {
           "type": "object",
           "description": "P(pass) = sigmoid(intercept + paceCoef*paceAdvantage + gapCoef*gap), rolled once per lap for a follower within 2s.",
           "additionalProperties": false,
-          "required": ["intercept", "paceCoef", "gapCoef"],
+          "required": [
+            "intercept",
+            "paceCoef",
+            "gapCoef"
+          ],
           "properties": {
-            "intercept": { "type": "number" },
-            "paceCoef": { "type": "number", "exclusiveMinimum": 0 },
-            "gapCoef": { "type": "number", "exclusiveMaximum": 0 }
+            "intercept": {
+              "type": "number"
+            },
+            "paceCoef": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "gapCoef": {
+              "type": "number",
+              "exclusiveMaximum": 0
+            }
           }
         },
-        "dirtyAirPenalty": { "type": "number", "minimum": 0 },
-        "greenLapTime": { "type": "number" },
-        "scLapTime": { "type": "number" },
-        "vscLapTime": { "type": "number" }
+        "dirtyAirPenalty": {
+          "type": "number",
+          "minimum": 0
+        },
+        "greenLapTime": {
+          "type": "number"
+        },
+        "scLapTime": {
+          "type": "number"
+        },
+        "vscLapTime": {
+          "type": "number"
+        }
       }
     },
     "compounds": {
@@ -86,11 +151,23 @@
       "additionalProperties": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["offset", "degPerLap", "cliffLap"],
+        "required": [
+          "offset",
+          "degPerLap",
+          "cliffLap"
+        ],
         "properties": {
-          "offset": { "type": "number" },
-          "degPerLap": { "type": "number", "minimum": 0 },
-          "cliffLap": { "type": "integer", "minimum": 1 },
+          "offset": {
+            "type": "number"
+          },
+          "degPerLap": {
+            "type": "number",
+            "minimum": 0
+          },
+          "cliffLap": {
+            "type": "integer",
+            "minimum": 1
+          },
           "cliffDegPerLap": {
             "type": "number",
             "minimum": 0,
@@ -105,24 +182,61 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["code", "team", "basePace", "noise", "stateAtTakeover", "realStrategy"],
+        "required": [
+          "code",
+          "team",
+          "basePace",
+          "noise",
+          "stateAtTakeover",
+          "realStrategy"
+        ],
         "properties": {
-          "code": { "type": "string", "minLength": 2, "maxLength": 4 },
-          "team": { "type": "string" },
-          "basePace": { "type": "number" },
-          "noise": { "type": "number", "minimum": 0 },
+          "code": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 4
+          },
+          "team": {
+            "type": "string"
+          },
+          "basePace": {
+            "type": "number"
+          },
+          "noise": {
+            "type": "number",
+            "minimum": 0
+          },
           "stateAtTakeover": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["position", "gapAhead", "compound", "tyreAge", "compoundsUsed"],
+            "required": [
+              "position",
+              "gapAhead",
+              "compound",
+              "tyreAge",
+              "compoundsUsed"
+            ],
             "properties": {
-              "position": { "type": "integer", "minimum": 1 },
-              "gapAhead": { "type": "number", "minimum": 0 },
-              "compound": { "type": "string" },
-              "tyreAge": { "type": "integer", "minimum": 0 },
+              "position": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "gapAhead": {
+                "type": "number",
+                "minimum": 0
+              },
+              "compound": {
+                "type": "string"
+              },
+              "tyreAge": {
+                "type": "integer",
+                "minimum": 0
+              },
               "compoundsUsed": {
                 "type": "array",
-                "items": { "type": "string" },
+                "items": {
+                  "type": "string"
+                },
                 "uniqueItems": true,
                 "description": "Dry compounds run up to and including the takeover lap (two-compound rule)."
               }
@@ -133,10 +247,18 @@
             "items": {
               "type": "object",
               "additionalProperties": false,
-              "required": ["lap", "to"],
+              "required": [
+                "lap",
+                "to"
+              ],
               "properties": {
-                "lap": { "type": "integer", "minimum": 1 },
-                "to": { "type": "string" },
+                "lap": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "to": {
+                  "type": "string"
+                },
                 "loss": {
                   "type": "number",
                   "description": "Measured time lost to this real stop (green/VSC stops; frozen like other real events). Absent: the track's figure for the flag."
@@ -154,25 +276,56 @@
     "freshTyre": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["bonus", "laps"],
+      "required": [
+        "bonus",
+        "laps"
+      ],
       "description": "Lap-time bonus (s, negative = faster) on a new set's first laps after the out-lap: full weight on the first, fading linearly over `laps` laps.",
       "properties": {
-        "bonus": { "type": "number" },
-        "laps": { "type": "integer", "minimum": 1 }
+        "bonus": {
+          "type": "number"
+        },
+        "laps": {
+          "type": "integer",
+          "minimum": 1
+        }
       }
     },
-    "fuelEffectPerLap": { "type": "number", "minimum": 0 },
+    "fuelEffectPerLap": {
+      "type": "number",
+      "minimum": 0
+    },
     "events": {
       "type": "array",
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["lap", "type"],
+        "required": [
+          "lap",
+          "type"
+        ],
         "properties": {
-          "lap": { "type": "integer", "minimum": 1 },
-          "type": { "type": "string", "enum": ["SC", "VSC", "RED", "RAIN", "RETIREMENT"] },
-          "laps": { "type": "integer", "minimum": 1 },
-          "driver": { "type": "string" }
+          "lap": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "SC",
+              "VSC",
+              "RED",
+              "RAIN",
+              "RETIREMENT"
+            ]
+          },
+          "laps": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "driver": {
+            "type": "string"
+          }
         }
       }
     },
@@ -182,12 +335,37 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "lap", "trigger", "target", "options", "realOptionId"],
+        "required": [
+          "id",
+          "lap",
+          "trigger",
+          "target",
+          "options",
+          "realOptionId"
+        ],
         "properties": {
-          "id": { "type": "string" },
-          "lap": { "type": "integer", "minimum": 1 },
-          "trigger": { "enum": ["SC", "VSC", "rivalPit", "undercut", "cliff"] },
-          "target": { "type": "object", "required": ["kind"] },
+          "id": {
+            "type": "string"
+          },
+          "lap": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "trigger": {
+            "enum": [
+              "SC",
+              "VSC",
+              "rivalPit",
+              "undercut",
+              "cliff"
+            ]
+          },
+          "target": {
+            "type": "object",
+            "required": [
+              "kind"
+            ]
+          },
           "options": {
             "type": "array",
             "minItems": 2,
@@ -195,30 +373,53 @@
             "items": {
               "type": "object",
               "additionalProperties": false,
-              "required": ["id", "label", "decisions"],
+              "required": [
+                "id",
+                "label",
+                "decisions"
+              ],
               "properties": {
-                "id": { "type": "string" },
-                "label": { "type": "string" },
-                "decisions": { "type": "array", "items": { "type": "object" } }
+                "id": {
+                  "type": "string"
+                },
+                "label": {
+                  "type": "string"
+                },
+                "decisions": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
               }
             }
           },
-          "realOptionId": { "type": ["string", "null"] }
+          "realOptionId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
         }
       }
     },
     "candidateMomentLaps": {
       "type": "array",
       "description": "Laps with a strategic event after takeover (SC/VSC starts, stops): input for the moment finder.",
-      "items": { "type": "integer", "minimum": 1 }
+      "items": {
+        "type": "integer",
+        "minimum": 1
+      }
     },
     "realResult": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "userSide": {
       "type": "string",
-      "description": "Driver code the user controls — always the hard/controversial side."
+      "description": "Driver code the user controls \u2014 always the hard/controversial side."
     },
     "rival": {
       "type": "string",

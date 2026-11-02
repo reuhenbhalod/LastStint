@@ -978,12 +978,14 @@ export function stepLap(run: Run): RaceState {
     if (flag === 'sc' && run.neutral.get(lap - 1) === 'sc') {
       // Deployment lap: gaps kept. Middle laps: SC_GAP_KEEP of the excess. Last lap: bunched.
       const keep = run.neutral.get(lap + 1) === 'sc' ? SC_GAP_KEEP : 0;
-      for (let i = 1; i < order.length; i++) {
-        const ahead = cars[order[i - 1] as string] as CarState;
-        const c = cars[order[i] as string] as CarState;
-        const excess = Math.max(0, c.totalTime - ahead.totalTime - BUNCH_GAP);
-        c.totalTime = ahead.totalTime + BUNCH_GAP + keep * excess;
-      }
+      bunch(
+        order,
+        cars,
+        green,
+        keep,
+        model.race.scUnlap === 'duel' ? [model.userSide, model.rival] : null,
+      );
+      state.order = [...sortByTime(order, cars), ...retiredInOrder(run)];
     }
   } else {
     resolveOrder(run, lap, clean, prevTime, pitted);
@@ -995,6 +997,65 @@ export function stepLap(run: Run): RaceState {
   state.lap = lap;
   state.flag = flag ?? 'green';
   return state;
+}
+
+/**
+ * Close the SC queue: each gap keeps `keep` of its excess over BUNCH_GAP (nose-to-tail on the
+ * last lap). By the rules every lapped car unlaps and joins the back of the queue, so the
+ * whole field closes up in race order (duel null). A race with scUnlap "duel" follows Abu
+ * Dhabi 2021's call instead: only the lead lap closes up, the lapped cars stay where they are
+ * a lap down, and on the last lap (keep 0) the lapped cars sitting between the user's car and
+ * the rival are waved through to the back of the lead-lap queue. Mirrors _bunch in
+ * sim_reference.py.
+ */
+function bunch(
+  live: string[],
+  cars: Record<string, CarState>,
+  lapTime: number | undefined,
+  keep: number,
+  duel: [string, string] | null,
+): void {
+  if (!live.length) return;
+  if (!duel) {
+    for (let i = 1; i < live.length; i++) {
+      const ahead = cars[live[i - 1] as string] as CarState;
+      const c = cars[live[i] as string] as CarState;
+      const excess = Math.max(0, c.totalTime - ahead.totalTime - BUNCH_GAP);
+      c.totalTime = ahead.totalTime + BUNCH_GAP + keep * excess;
+    }
+    return;
+  }
+  const len = lapTime ?? 0;
+  const time = (c: string) => (cars[c] as CarState).totalTime;
+  const lead = time(live[0] as string);
+  const down = new Map(live.map((c) => [c, len ? Math.floor((time(c) - lead) / len) : 0]));
+  const onTrack = new Map(live.map((c) => [c, time(c) - lead - (down.get(c) as number) * len]));
+  const leadLap = live.filter((c) => down.get(c) === 0);
+  let waved: string[] = [];
+  const [a, b] = duel;
+  if (keep === 0 && leadLap.includes(a) && leadLap.includes(b)) {
+    const lo = Math.min(onTrack.get(a) as number, onTrack.get(b) as number);
+    const hi = Math.max(onTrack.get(a) as number, onTrack.get(b) as number);
+    waved = live
+      .filter(
+        (c) =>
+          (down.get(c) as number) >= 1 &&
+          (onTrack.get(c) as number) > lo &&
+          (onTrack.get(c) as number) < hi,
+      )
+      .sort((x, y) => (onTrack.get(x) as number) - (onTrack.get(y) as number));
+  }
+  for (let i = 1; i < leadLap.length; i++) {
+    const ahead = cars[leadLap[i - 1] as string] as CarState;
+    const c = cars[leadLap[i] as string] as CarState;
+    const excess = Math.max(0, c.totalTime - ahead.totalTime - BUNCH_GAP);
+    c.totalTime = ahead.totalTime + BUNCH_GAP + keep * excess;
+  }
+  let last = time(leadLap[leadLap.length - 1] as string);
+  for (const c of waved) {
+    last += BUNCH_GAP;
+    (cars[c] as CarState).totalTime = last;
+  }
 }
 
 /**

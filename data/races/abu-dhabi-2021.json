@@ -5,7 +5,8 @@
     "name": "Abu Dhabi 2021: Hamilton vs Verstappen",
     "laps": 58,
     "takeoverLap": 34,
-    "seed": 64
+    "seed": 64,
+    "scUnlap": "duel"
   },
   "era": "2014-2025",
   "track": {
