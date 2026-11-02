@@ -14,9 +14,12 @@ const ROWS: { key: ModeKey; label: string; values: string[] }[] = [
 export function HeadsetPanel({
   modes,
   pending = {},
+  describe,
   disabled,
   onFlip,
 }: {
+  /** What a mode does (tooltip). */
+  describe?: (key: ModeKey, value: string) => string | null;
   modes: Modes;
   /** Mode calls booked for the coming lap. */
   pending?: Partial<Modes>;
@@ -42,7 +45,9 @@ export function HeadsetPanel({
                   type="button"
                   disabled={disabled}
                   aria-pressed={active}
-                  title={soon ? 'Booked from next lap' : undefined}
+                  title={[soon ? 'Booked from next lap' : null, describe?.(row.key, v)]
+                    .filter(Boolean)
+                    .join(' · ')}
                   onClick={() => onFlip(row.key, v)}
                   className={`py-1.5 text-[13px] font-semibold capitalize transition-colors disabled:opacity-40 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--you)] ${
                     soon

@@ -57,7 +57,7 @@ export interface RunOptions {
   decisions?: Decision[];
 }
 
-interface ModeEffect {
+export interface ModeEffect {
   lapDelta?: number;
   wearMult?: number;
   errorMult?: number;
@@ -80,6 +80,11 @@ interface HeadsetEra {
 }
 
 const HEADSET = headsetConfig as unknown as Record<string, HeadsetEra>;
+
+/** The headset modes' effects for a model's era (for explaining the options in the game). */
+export function modeEffects(model: RaceModel): HeadsetEra['modes'] | null {
+  return HEADSET[model.era]?.modes ?? null;
+}
 
 export const DEFAULT_MODES: Modes = { pace: 'standard', fuel: 'normal', battle: 'hold' };
 

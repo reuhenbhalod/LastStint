@@ -1,12 +1,15 @@
 // The decision card in the call column: the radio line, four stat tiles (gap, tyres, pit
-// stop, laps left), then the options. Stops fold into one "Box" button followed by the tyre
-// choice (game/choices.ts). Number keys pick options. On a phone it rises as a bottom sheet
-// over the map so the call is always in reach.
+// stop, laps left), then the options, each with a line on what it does. Stops fold into one
+// "Box" button followed by the tyre choice (game/choices.ts), where each compound shows its
+// pace, drop-off, whether it reaches the flag and what it gains over the laps left
+// (game/guide.ts). Number keys pick options. On a phone it rises as a bottom sheet over the
+// map so the call is always in reach.
 
 import type { DecisionMoment, RaceModel, RaceState } from '@boxthislap/sim';
 import { useEffect, useRef, useState } from 'react';
 import { briefFor } from '../game/brief.js';
 import { choicesFor, tyreName } from '../game/choices.js';
+import { modeLine, modeOf, tyreOutlooks } from '../game/guide.js';
 
 const LETTER: Record<string, string> = { SOFT: 'S', MEDIUM: 'M', HARD: 'H' };
 
@@ -55,20 +58,39 @@ export function DecisionPanel({
   const first = useRef<HTMLButtonElement>(null);
 
   // The top-level buttons, with Box in the stop options' place.
-  const top: Array<{ id: string; label: string; act: () => void }> = c.direct.map((o) => ({
-    id: o.id,
-    label: o.label,
-    act: () => onChoose(o.id),
-  }));
+  const me = race.cars[model.userSide];
+  const top: Array<{ id: string; label: string; note: string | null; act: () => void }> =
+    c.direct.map((o) => {
+      const mode = modeOf(o.decisions);
+      return {
+        id: o.id,
+        label: o.label,
+        note: mode
+          ? modeLine(model, mode.key, mode.value)
+          : o.decisions.length === 0 && me
+            ? `Keep track position on ${me.tyreAge}-lap-old ${tyreName(me.compound).toLowerCase()}`
+            : null,
+        act: () => onChoose(o.id),
+      };
+    });
   if (c.box) {
     const only = c.box.tyres.length === 1 ? c.box.tyres[0] : null;
     top.splice(c.boxIndex, 0, {
       id: 'box',
       label: 'Box',
+      note: b.stop
+        ? `Stop costs ~${b.stop.now.toFixed(0)} s now${only ? '' : ' · pick tyres next'}`
+        : null,
       act: () => (only ? onChoose(only.option.id) : setPicking(true)),
     });
   }
   const tyreOpts = c.box?.tyres ?? [];
+  const outlooks = tyreOutlooks(
+    model,
+    me,
+    moment.lap,
+    tyreOpts.map((t) => t.compound),
+  );
 
   // Focus the first button when the card or its tyre step opens (keyed by moment upstream).
   // biome-ignore lint/correctness/useExhaustiveDependencies: refocus when the step changes.
@@ -158,35 +180,12 @@ export function DecisionPanel({
       {!picking ? (
         <div className={`grid gap-2 ${top.length === 3 ? 'grid-cols-3' : 'grid-cols-2'}`}>
           {top.map((t, i) => (
-            <button
-              key={t.id}
-              ref={i === 0 ? first : undefined}
-              type="button"
-              onClick={t.act}
-              className={`${optBtn} ${t.id === 'box' ? '!bg-[var(--box)] !text-white' : ''}`}
-            >
-              <span
-                aria-hidden="true"
-                className="mono absolute left-2.5 top-2 text-[10px] opacity-70"
-              >
-                {i + 1}
-              </span>
-              {t.label}
-            </button>
-          ))}
-        </div>
-      ) : (
-        <div className="flex flex-col gap-2">
-          <p className="eyebrow">Box: which tyres?</p>
-          <div className={`grid gap-2 ${tyreOpts.length === 3 ? 'grid-cols-3' : 'grid-cols-2'}`}>
-            {tyreOpts.map((t, i) => (
+            <div key={t.id} className="flex min-w-0 flex-col gap-1">
               <button
-                key={t.option.id}
                 ref={i === 0 ? first : undefined}
                 type="button"
-                onClick={() => onChoose(t.option.id)}
-                className={`${optBtn} flex-col !items-start justify-end gap-2`}
-                aria-label={tyreName(t.compound)}
+                onClick={t.act}
+                className={`${optBtn} ${t.id === 'box' ? '!bg-[var(--box)] !text-white' : ''}`}
               >
                 <span
                   aria-hidden="true"
@@ -194,14 +193,79 @@ export function DecisionPanel({
                 >
                   {i + 1}
                 </span>
-                <span
-                  className={`tyre ${t.compound} !border-[3px] bg-[var(--tarmac)] !text-[var(--ink)]`}
-                >
-                  {LETTER[t.compound] ?? t.compound[0]}
-                </span>
-                {tyreName(t.compound)}
+                {t.label}
               </button>
-            ))}
+              {t.note && (
+                <span className="px-0.5 text-[11.5px] leading-snug text-[var(--muted)]">
+                  {t.note}
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col gap-2">
+          <p className="eyebrow">Box: which tyres?</p>
+          <p className="m-0 text-[12px] leading-snug text-[var(--muted)]">
+            {b.stop ? `The stop costs ~${b.stop.now.toFixed(0)} s. ` : ''}
+            {(outlooks[0]?.greenLaps ?? 0) > 0
+              ? `“Gain” is lap time over the ${outlooks[0]?.greenLaps} green lap${outlooks[0]?.greenLaps === 1 ? '' : 's'} left, against staying out (no traffic or passing).`
+              : 'No green laps left: fresh tyres only help at a restart.'}
+          </p>
+          <div className="flex flex-col gap-2">
+            {tyreOpts.map((t, i) => {
+              const o = outlooks[i];
+              return (
+                <button
+                  key={t.option.id}
+                  ref={i === 0 ? first : undefined}
+                  type="button"
+                  onClick={() => onChoose(t.option.id)}
+                  className="relative grid grid-cols-[auto_1fr_auto] items-start gap-x-3 gap-y-1 rounded-lg border-2 border-transparent bg-[var(--card-2)] p-2.5 text-left hover:border-[var(--you)] focus-visible:border-[var(--you)] focus-visible:outline-none"
+                  aria-label={tyreName(t.compound)}
+                >
+                  <span
+                    className={`tyre ${t.compound} mt-0.5 !h-8 !w-8 !border-[4px] bg-[var(--tarmac)] !text-[12px]`}
+                  >
+                    {LETTER[t.compound] ?? t.compound[0]}
+                  </span>
+                  <span className="min-w-0">
+                    <span className="disp block text-[22px] leading-none">
+                      <span aria-hidden="true" className="mono mr-1.5 text-[10px] opacity-60">
+                        {i + 1}
+                      </span>
+                      {tyreName(t.compound)}
+                    </span>
+                    {o && (
+                      <span className="mt-1 block text-[12px] leading-snug text-[var(--muted)]">
+                        {o.newPace < 0.005
+                          ? 'Fastest when new'
+                          : `+${o.newPace.toFixed(2)} s a lap vs softs`}{' '}
+                        · drops off after ~{o.dropOff} laps ·{' '}
+                        <span className={o.toFlag ? 'text-[var(--you)]' : 'text-[var(--box)]'}>
+                          {o.toFlag ? 'lasts to the flag' : `won’t last ${b.lapsLeft} laps`}
+                        </span>
+                      </span>
+                    )}
+                    {o && (
+                      <span className="mt-1 block text-[12px] leading-snug">
+                        <span className="text-[var(--you)]">Good:</span> {o.good}{' '}
+                        <span className="text-[var(--box)]">Bad:</span> {o.bad}
+                      </span>
+                    )}
+                  </span>
+                  {o?.gain != null && (
+                    <span className="text-right">
+                      <span className="eyebrow block">Gain</span>
+                      <span className="mono block text-[16px] font-semibold">
+                        {o.gain >= 0 ? '+' : '−'}
+                        {Math.abs(o.gain).toFixed(1)}s
+                      </span>
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
           <button
             type="button"

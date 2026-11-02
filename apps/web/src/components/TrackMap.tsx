@@ -5,12 +5,16 @@
 // leads the field while it's out. Click any car for its card.
 
 import type { RaceModel, RaceState } from '@boxthislap/sim';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import type { LapClock } from '../game/useGame.js';
 import {
+  type PitLane,
+  type Polyline,
   type TrackOutline,
+  angleAlong,
   carsOnTrack,
   ease,
+  nearestFraction,
   pitLane,
   pointAlong,
   pointAt,
@@ -22,6 +26,284 @@ const REDUCED =
 
 /** Share of a lap tick the cars take to glide to the new gaps (and to drive the pit lane). */
 const GLIDE = 0.45;
+
+/** Track width in map units (the asphalt band). */
+const TRACK = 30;
+
+/** Garage order along the pit lane, entry to exit (2021's, by 2020 constructors' standings
+ * in reverse: the champions sit nearest the exit). Short names for the box labels. */
+const GARAGES: Array<[string, string]> = [
+  ['Williams', 'WIL'],
+  ['Haas F1 Team', 'HAA'],
+  ['Alfa Romeo Racing', 'ALF'],
+  ['AlphaTauri', 'AT'],
+  ['Ferrari', 'FER'],
+  ['Alpine', 'ALP'],
+  ['Aston Martin', 'AM'],
+  ['McLaren', 'MCL'],
+  ['Red Bull Racing', 'RBR'],
+  ['Mercedes', 'MER'],
+];
+/** Where the garages sit along the drawn lane (fractions of its length). */
+const GARAGE_FROM = 0.22;
+const GARAGE_TO = 0.62;
+
+function garageAt(team: string | undefined): number {
+  const i = GARAGES.findIndex(([t]) => t === team);
+  const k = i < 0 ? 0.5 : i / (GARAGES.length - 1);
+  return GARAGE_FROM + (GARAGE_TO - GARAGE_FROM) * k;
+}
+
+/** A car's place along the lane during its stop: in, a pause at its garage, out. */
+function laneT(raw: number, garage: number): number {
+  if (raw < 0.45) return garage * ease(raw / 0.45);
+  if (raw < 0.6) return garage;
+  return garage + (1 - garage) * ease((raw - 0.6) / 0.4);
+}
+
+const pathOf = (pts: Array<[number, number]>, closed: boolean) =>
+  `M${pts.map((p) => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join('L')}${closed ? 'Z' : ''}`;
+
+/** Points of the lap from fraction a to b (a short stretch: a kerb). */
+function stretch(line: Polyline, a: number, b: number, n = 8): Array<[number, number]> {
+  return Array.from({ length: n + 1 }, (_, i) => pointAt(line, a + ((b - a) * i) / n));
+}
+
+/** The circuit itself: drawn once per outline (cars move over it). */
+const TrackArt = memo(function TrackArt({
+  outline,
+  line,
+  lane,
+  userTeam,
+  rivalTeam,
+}: {
+  outline: TrackOutline;
+  line: Polyline;
+  lane: PitLane | null;
+  userTeam?: string;
+  rivalTeam?: string;
+}) {
+  const lap = pathOf(outline.points, true);
+  const lanePts = lane?.path.points ?? [];
+  const lanePath = lanePts.length ? pathOf(lanePts, false) : null;
+  // Centre of the circuit, to put corner badges on the outside.
+  const cx = outline.points.reduce((t, p) => t + p[0], 0) / outline.points.length;
+  const cy = outline.points.reduce((t, p) => t + p[1], 0) / outline.points.length;
+  const kerbs = outline.corners.map(([n, x, y]) => {
+    const f = nearestFraction(line, [x, y]);
+    return { n, d: pathOf(stretch(line, f - 0.012, f + 0.012), false) };
+  });
+  // Start/finish: across the track at the first point.
+  const [sx, sy] = outline.points[0] ?? [0, 0];
+  const [nx, ny] = outline.points[1] ?? [sx + 1, sy];
+  const startAngle = (Math.atan2(ny - sy, nx - sx) * 180) / Math.PI;
+  // Garages, on the side of the lane away from the track.
+  const garages = lane
+    ? GARAGES.map(([team, short]) => {
+        const t = garageAt(team);
+        const [gx, gy] = pointAlong(lane.path, t);
+        const a = angleAlong(lane.path, t);
+        const ox = -Math.sin(a);
+        const oy = Math.cos(a);
+        // Pick the side further from the track.
+        const far = (s: number): number => {
+          const p: [number, number] = [gx + ox * s * 12, gy + oy * s * 12];
+          const [qx, qy] = pointAt(line, nearestFraction(line, p));
+          return Math.hypot(p[0] - qx, p[1] - qy);
+        };
+        const s = far(1) >= far(-1) ? 1 : -1;
+        return {
+          team,
+          short,
+          x: gx + ox * s * 13,
+          y: gy + oy * s * 13,
+          deg: (a * 180) / Math.PI,
+        };
+      })
+    : [];
+  const laneEnd = (t: number) => {
+    const [x, y] = pointAlong(lane?.path as Polyline, t);
+    return { x, y, deg: (angleAlong(lane?.path as Polyline, t) * 180) / Math.PI };
+  };
+  const pitIn = lane ? laneEnd(0.12) : null;
+  const pitOut = lane ? laneEnd(0.72) : null;
+
+  return (
+    <g>
+      {/* Run-off */}
+      <path
+        d={lap}
+        fill="none"
+        stroke="var(--runoff)"
+        strokeWidth={TRACK + 34}
+        strokeLinejoin="round"
+      />
+      {/* Pit lane: under the track, so the exit tunnel passes beneath it */}
+      {lanePath && (
+        <>
+          <path
+            d={lanePath}
+            fill="none"
+            stroke="var(--pit-edge)"
+            strokeWidth={16}
+            strokeLinejoin="round"
+            strokeLinecap="round"
+          />
+          <path
+            d={lanePath}
+            fill="none"
+            stroke="var(--pit-lane)"
+            strokeWidth={12}
+            strokeLinejoin="round"
+            strokeLinecap="round"
+          />
+          <path
+            d={lanePath}
+            fill="none"
+            stroke="var(--box)"
+            strokeWidth={1.2}
+            strokeDasharray="5 5"
+            opacity={0.8}
+          />
+        </>
+      )}
+      {/* Kerbs: red and white, just wider than the track at each corner */}
+      {kerbs.map((k) => (
+        <g key={k.n}>
+          <path d={k.d} fill="none" stroke="#f3f4f2" strokeWidth={TRACK + 7} strokeLinecap="butt" />
+          <path
+            d={k.d}
+            fill="none"
+            stroke="#d63a2f"
+            strokeWidth={TRACK + 7}
+            strokeDasharray="5 5"
+            strokeLinecap="butt"
+          />
+        </g>
+      ))}
+      {/* Track edges, then the asphalt */}
+      <path
+        d={lap}
+        fill="none"
+        stroke="var(--track-line)"
+        strokeWidth={TRACK + 3}
+        strokeLinejoin="round"
+      />
+      <path
+        d={lap}
+        fill="none"
+        stroke="var(--tarmac-lane)"
+        strokeWidth={TRACK}
+        strokeLinejoin="round"
+      />
+      <path
+        d={lap}
+        fill="none"
+        stroke="#56615d"
+        strokeWidth={1.2}
+        strokeDasharray="10 14"
+        opacity={0.7}
+      />
+      {/* Start/finish: a chequered band */}
+      <g transform={`translate(${sx},${sy}) rotate(${startAngle})`}>
+        {Array.from({ length: 10 }, (_, i) =>
+          [0, 1].map((col) => (
+            <rect
+              key={`${i}-${col}`}
+              x={-4 + col * 4}
+              y={-TRACK / 2 + i * (TRACK / 10)}
+              width={4}
+              height={TRACK / 10}
+              fill={(i + col) % 2 ? '#141716' : '#f3f4f2'}
+            />
+          )),
+        )}
+      </g>
+      {/* Pit building and garages */}
+      {garages.map((g) => {
+        const mine = g.team === userTeam;
+        const theirs = g.team === rivalTeam;
+        return (
+          <g
+            key={g.team}
+            transform={`translate(${g.x.toFixed(1)},${g.y.toFixed(1)}) rotate(${g.deg.toFixed(1)})`}
+          >
+            <rect
+              x={-8}
+              y={-5}
+              width={16}
+              height={10}
+              rx={1.5}
+              fill={mine ? 'var(--you)' : theirs ? 'var(--rival)' : 'var(--garage)'}
+              stroke="var(--pit-edge)"
+              strokeWidth={1}
+            />
+          </g>
+        );
+      })}
+      {garages
+        .filter((g) => g.team === userTeam || g.team === rivalTeam)
+        .map((g) => (
+          <text
+            key={`${g.team}-label`}
+            x={g.x}
+            y={g.y - 11}
+            textAnchor="middle"
+            fontSize={10}
+            fontWeight={800}
+            fontFamily="var(--mono)"
+            fill={g.team === userTeam ? 'var(--you)' : 'var(--rival)'}
+          >
+            {g.short}
+          </text>
+        ))}
+      {[pitIn && { ...pitIn, label: 'PIT IN' }, pitOut && { ...pitOut, label: 'PIT OUT' }].map(
+        (m) =>
+          m && (
+            <g
+              key={m.label}
+              transform={`translate(${m.x.toFixed(1)},${m.y.toFixed(1)}) rotate(${m.deg.toFixed(1)})`}
+            >
+              <rect x={-1.5} y={-8} width={3} height={16} fill="var(--flag)" />
+              <text
+                y={-11}
+                textAnchor="middle"
+                fontSize={9}
+                fontWeight={800}
+                fontFamily="var(--mono)"
+                fill="var(--flag)"
+              >
+                {m.label}
+              </text>
+            </g>
+          ),
+      )}
+      {/* Corner numbers, in badges on the outside */}
+      {outline.corners.map(([n, x, y]) => {
+        const dx = x - cx;
+        const dy = y - cy;
+        const len = Math.hypot(dx, dy) || 1;
+        const bx = x + (dx / len) * 34;
+        const by = y + (dy / len) * 34;
+        return (
+          <g key={n} transform={`translate(${bx.toFixed(1)},${by.toFixed(1)})`}>
+            <circle r={9} fill="var(--paper)" stroke="var(--tarmac-edge)" strokeWidth={1.5} />
+            <text
+              y={3.5}
+              textAnchor="middle"
+              fontSize={9.5}
+              fontWeight={700}
+              fontFamily="var(--mono)"
+              fill="#9aa39f"
+            >
+              {n}
+            </text>
+          </g>
+        );
+      })}
+    </g>
+  );
+});
 
 const TYRE_RING: Record<string, string> = {
   SOFT: 'var(--soft)',
@@ -54,12 +336,7 @@ export function TrackMap({
   dim: boolean;
 }) {
   const line = useMemo(() => polyline(outline.points), [outline]);
-  const lane = useMemo(() => pitLane(outline, line), [outline, line]);
-  const path = useMemo(() => `M${outline.points.map((p) => p.join(',')).join('L')}Z`, [outline]);
-  const lanePath = useMemo(
-    () => (outline.pit ? `M${outline.pit.map((p) => p.join(',')).join('L')}` : null),
-    [outline],
-  );
+  const lane = useMemo(() => pitLane(outline, line, TRACK), [outline, line]);
   const cars = carsOnTrack(race, model);
 
   // Progress of the lap tick, from the shared lap clock.
@@ -99,7 +376,6 @@ export function TrackMap({
   // At the start of a tick the leader is still crossing the line from the last one.
   const lead = clock ? progress : 0;
 
-  const [sx, sy] = outline.points[0] ?? [0, 0];
   // Draw the field first, then the rival, then the player's car on top.
   const drawOrder = [...cars].sort(
     (a, b) => rank(a.code, userSide, rival) - rank(b.code, userSide, rival),
@@ -113,60 +389,13 @@ export function TrackMap({
       aria-labelledby="track-map-title"
     >
       <title id="track-map-title">{`Track map, lap ${race.lap}. Select a car for its details.`}</title>
-      <path
-        d={path}
-        fill="none"
-        stroke="var(--tarmac-edge)"
-        strokeWidth={34}
-        strokeLinejoin="round"
+      <TrackArt
+        outline={outline}
+        line={line}
+        lane={lane}
+        userTeam={race.cars[userSide]?.team}
+        rivalTeam={race.cars[rival]?.team}
       />
-      <path
-        d={path}
-        fill="none"
-        stroke="var(--tarmac-lane)"
-        strokeWidth={26}
-        strokeLinejoin="round"
-      />
-      <path d={path} fill="none" stroke="#5b6662" strokeWidth={1.5} strokeDasharray="6 10" />
-      {lanePath && (
-        <path
-          d={lanePath}
-          fill="none"
-          stroke="var(--tarmac-lane)"
-          strokeWidth={10}
-          strokeLinejoin="round"
-          strokeLinecap="round"
-        />
-      )}
-      {lanePath && (
-        <path
-          d={lanePath}
-          fill="none"
-          stroke="var(--box)"
-          strokeWidth={1.5}
-          strokeDasharray="4 6"
-        />
-      )}
-      {lane && outline.pit?.[0] && (
-        <text
-          x={(outline.pit[Math.floor(outline.pit.length / 2)] as [number, number])[0]}
-          y={(outline.pit[Math.floor(outline.pit.length / 2)] as [number, number])[1] - 14}
-          fill="var(--box)"
-          fontSize={12}
-          fontWeight={700}
-          fontFamily="var(--mono)"
-          textAnchor="middle"
-          opacity={0.85}
-        >
-          PIT
-        </text>
-      )}
-      <rect x={sx - 3} y={sy - 17} width={6} height={34} fill="var(--hard)" />
-      {outline.corners.map(([n, x, y]) => (
-        <text key={n} x={x + 16} y={y - 12} fill="#7e8985" fontSize={13} fontFamily="var(--mono)">
-          T{n}
-        </text>
-      ))}
       {dim && <rect width={outline.width} height={outline.height} fill="#000" opacity={0.35} />}
       {sc && (
         <g transform={`translate(${sc[0].toFixed(1)},${sc[1].toFixed(1)})`}>
@@ -187,7 +416,7 @@ export function TrackMap({
         const car = race.cars[c.code];
         const inLane = lane && car?.pittedThisLap && raw < 1;
         const [x, y] = inLane
-          ? pointAlong(lane.path, t)
+          ? pointAlong(lane.path, laneT(raw, garageAt(car?.team)))
           : pointAt(line, lead - behindOf(c.code, c.behind));
         const you = c.code === userSide;
         const isRival = c.code === rival;
@@ -215,6 +444,7 @@ export function TrackMap({
             }}
           >
             <circle r={24} fill="transparent" stroke="none" />
+            {key && <circle r={20} fill={fill} opacity={0.22} />}
             {lit && <circle r={21} fill="none" stroke="var(--ink)" strokeWidth={2.5} />}
             <circle
               r={key ? 13 : 9.5}

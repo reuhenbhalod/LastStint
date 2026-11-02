@@ -12,6 +12,7 @@ export {
   forkRun,
   initRun,
   isFinished,
+  modeEffects,
   passProbability,
   planRemainingStop,
   realDecisions,
@@ -21,7 +22,14 @@ export {
   teammateOf,
   validateDecisions,
 } from './sim.js';
-export type { ForkOptions, NeutralEvent, Run, RunOptions, Strategies } from './sim.js';
+export type {
+  ForkOptions,
+  ModeEffect,
+  NeutralEvent,
+  Run,
+  RunOptions,
+  Strategies,
+} from './sim.js';
 export {
   BAND_EDGES,
   GRADE_SAMPLES,
