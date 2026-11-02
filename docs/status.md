@@ -6,7 +6,7 @@ Oct 31, 2026 (updated Nov 1 for the beta feedback round, `feedback-round-1-spec.
 
 | Piece | Where | State |
 |---|---|---|
-| Website | https://pitwall-web.boxboxbox.workers.dev | **Offline** (`workers_dev: false` in `apps/web/wrangler.jsonc`; set it to `true` to bring it back). Playable Abu Dhabi 2021 daily. |
+| Website | https://pitwall-web.boxboxbox.workers.dev | Online. Playable Abu Dhabi 2021 daily (`workers_dev` in `apps/web/wrangler.jsonc` takes it offline). |
 | API | https://pitwall.boxboxbox.workers.dev | Daily, run submission, rank, leaderboard, stats, nightly re-grade, Google sign-in, streaks |
 | Database | Cloudflare D1 `pitwall-db` (Reuhen's account) | Migrations 0001–0004 (0004: accounts) |
 | Deploys | GitHub Actions (`ci.yml`) | Every merge to `main`: Python, JS/TS, parity and browser playthrough → API deploy → website deploy |
