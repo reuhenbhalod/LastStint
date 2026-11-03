@@ -125,7 +125,7 @@ export function reducer(state: GameState, action: Action): GameState {
         decisions: action.decisions,
       };
 
-    case 'CALL': // a BOX / mode flip mid-lap — never pauses
+    case 'CALL': // a BOX / mode flip mid-lap, never pauses
       if (state.phase !== 'racing') return state;
       return { ...state, race: action.race, decisions: action.decisions };
 

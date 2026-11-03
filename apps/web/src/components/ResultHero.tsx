@@ -104,7 +104,7 @@ export function ResultHero({
         <h1 className="disp m-0 text-[30px] leading-none">{v.headline}</h1>
         <div className="grid w-full grid-cols-3 gap-2">
           <Figure label="You" value={pos > 0 ? `P${pos}` : 'OUT'} tone={tone.text} />
-          <Figure label={`Real ${team}`} value={realPos > 0 ? `P${realPos}` : '—'} />
+          <Figure label={`Real ${team}`} value={realPos > 0 ? `P${realPos}` : '-'} />
           <Figure
             label={rival}
             value={rivalPos > 0 ? `P${rivalPos}` : 'OUT'}

@@ -32,9 +32,56 @@ function GoogleButton({ onCredential }: { onCredential: (credential: string) => 
   return <div ref={el} className="gsi-button min-h-[32px]" />;
 }
 
-export function AccountBar({ account }: { account: AccountState }) {
+export function AccountBar({
+  account,
+  compact = false,
+}: {
+  account: AccountState;
+  /** One line for a top bar: the streak as a chip, then sign-in. */
+  compact?: boolean;
+}) {
   const p = account.player;
   const streak = p?.streak;
+  if (compact) {
+    return (
+      <div className="flex items-center gap-2">
+        <span
+          className="flex items-center gap-1.5 rounded-full border border-[var(--rule)] px-3 py-1 text-[13px] font-semibold"
+          title={
+            streak && streak.days > 0
+              ? `Best ${streak.best} · ${streak.days} race${streak.days === 1 ? '' : 's'} played`
+              : 'Play every day to build it'
+          }
+        >
+          <span aria-hidden="true">🔥</span>
+          {streak ? `${streak.current}-day streak` : 'Daily streak'}
+        </span>
+        {p?.account ? (
+          <span className="flex items-center gap-2 text-[13px]">
+            <span
+              className="hidden max-w-[160px] truncate text-[var(--muted)] sm:inline"
+              title={p.account.email}
+            >
+              {p.account.name || p.account.email}
+            </span>
+            <button
+              type="button"
+              onClick={account.signOut}
+              className="rounded-full border border-[var(--rule)] px-3 py-1 text-[var(--muted)] hover:text-[var(--ink)]"
+            >
+              Sign out
+            </button>
+          </span>
+        ) : GOOGLE_CLIENT_ID ? (
+          account.busy ? (
+            <span className="text-[13px] text-[var(--muted)]">Signing in…</span>
+          ) : (
+            <GoogleButton onCredential={account.signIn} />
+          )
+        ) : null}
+      </div>
+    );
+  }
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-[var(--card)] px-3 py-2">
       <div className="flex items-center gap-2">

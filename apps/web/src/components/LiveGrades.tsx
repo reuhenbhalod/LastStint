@@ -29,7 +29,7 @@ export function LiveGrades({ state }: { state: GameState }) {
       return {
         id: m.id,
         lap: m.lap,
-        label: (m.options.find((o) => o.id === chosen)?.label ?? chosen ?? '').split(' — ')[0],
+        label: (m.options.find((o) => o.id === chosen)?.label ?? chosen ?? '').split(', ')[0],
         auto: !!chosen && autoStay(m, state.decisions) === chosen,
         mine,
         best,

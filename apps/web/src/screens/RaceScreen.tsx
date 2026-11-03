@@ -178,7 +178,7 @@ export function RaceScreen({
       ? latest.pits.find((p) => p.code === userSide || p.code === rival)
       : undefined;
 
-  const gapText = gap === null ? '—' : `${gap >= 0 ? '+' : '−'}${Math.abs(gap).toFixed(1)}s`;
+  const gapText = gap === null ? '-' : `${gap >= 0 ? '+' : '−'}${Math.abs(gap).toFixed(1)}s`;
   const panelBody =
     panel === 'gap' ? (
       <section aria-label={`Gap to ${rival}`} className="flex flex-col gap-2">

@@ -90,7 +90,7 @@ export function DriverCard({
         <Stat label="Position">{car.retired ? 'OUT' : `P${pos}`}</Stat>
         <Stat label="To leader">
           {car.retired
-            ? '—'
+            ? '-'
             : pos === 1
               ? 'Leader'
               : down >= 1
@@ -101,15 +101,15 @@ export function DriverCard({
           {code === userSide
             ? realPos
               ? `P${realPos}`
-              : '—'
+              : '-'
             : toYou === null
-              ? '—'
+              ? '-'
               : `${toYou >= 0 ? '+' : '−'}${Math.abs(toYou).toFixed(1)}s`}
         </Stat>
         <Stat label="Tyres">
-          {car.retired ? '—' : <TyreBadge compound={car.compound} age={car.tyreAge} />}
+          {car.retired ? '-' : <TyreBadge compound={car.compound} age={car.tyreAge} />}
         </Stat>
-        <Stat label="Last lap">{last ? lapClock(last) : '—'}</Stat>
+        <Stat label="Last lap">{last ? lapClock(last) : '-'}</Stat>
         <Stat label="Stops">
           {stops.length
             ? stops.map((s) => `L${s.lap - 1} ${s.compound[0]}`).join(', ')

@@ -107,8 +107,8 @@ export function DecisionPanel({
           ];
     return {
       id: o.id,
-      // "Stay out — keep the lead": the facts carry the detail.
-      label: o.decisions.length === 0 ? (o.label.split(' — ')[0] ?? o.label) : o.label,
+      // "Stay out, keep the lead": the facts carry the detail.
+      label: o.decisions.length === 0 ? (o.label.split(', ')[0] ?? o.label) : o.label,
       note: facts.map((f) => `${f.label}: ${f.value}`).join(' · '),
       facts,
       act: () => onChoose(o.id),
@@ -191,7 +191,7 @@ export function DecisionPanel({
           }
         >
           <span className="mono text-[17px] font-semibold md:text-[20px]">
-            {gap === null ? '—' : `${gap >= 0 ? '+' : '−'}${Math.abs(gap).toFixed(1)}s`}
+            {gap === null ? '-' : `${gap >= 0 ? '+' : '−'}${Math.abs(gap).toFixed(1)}s`}
           </span>
         </Tile>
         <Tile label="Laps left">

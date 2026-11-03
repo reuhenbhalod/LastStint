@@ -1,5 +1,5 @@
 // GameEngine: a thin, UI-facing wrapper over a sim Run. It owns the run, advances it lap by
-// lap, applies player calls, and reports the result. It holds no race physics of its own —
+// lap, applies player calls, and reports the result. It holds no race physics of its own ,
 // everything delegates to @boxthislap/sim, so the browser shows exactly what the Worker will
 // later recompute from the same (model, seed, decisions).
 
@@ -41,7 +41,7 @@ export class GameEngine {
     return this.run.state.lap;
   }
 
-  /** The player's calls so far — the run log the Worker replays. */
+  /** The player's calls so far, the run log the Worker replays. */
   get decisions(): Decision[] {
     return this.run.decisions;
   }

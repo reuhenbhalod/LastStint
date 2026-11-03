@@ -48,7 +48,7 @@ export function DriverProfile({
         <div>
           <dt className="eyebrow">Tyres</dt>
           <dd className="m-0 flex justify-center pt-0.5">
-            {car && !car.retired ? <TyreBadge compound={car.compound} age={car.tyreAge} /> : '—'}
+            {car && !car.retired ? <TyreBadge compound={car.compound} age={car.tyreAge} /> : '-'}
           </dd>
         </div>
         <div>
@@ -57,15 +57,15 @@ export function DriverProfile({
         </div>
         <div>
           <dt className="eyebrow">Pace</dt>
-          <dd className="m-0 text-[13px] font-semibold capitalize">{car?.modes.pace ?? '—'}</dd>
+          <dd className="m-0 text-[13px] font-semibold capitalize">{car?.modes.pace ?? '-'}</dd>
         </div>
         <div>
           <dt className="eyebrow">Battle</dt>
-          <dd className="m-0 text-[13px] font-semibold capitalize">{car?.modes.battle ?? '—'}</dd>
+          <dd className="m-0 text-[13px] font-semibold capitalize">{car?.modes.battle ?? '-'}</dd>
         </div>
         <div>
           <dt className="eyebrow">Real</dt>
-          <dd className="m-0 text-[13px] font-semibold">{realPos ? `P${realPos}` : '—'}</dd>
+          <dd className="m-0 text-[13px] font-semibold">{realPos ? `P${realPos}` : '-'}</dd>
         </div>
       </dl>
     </section>

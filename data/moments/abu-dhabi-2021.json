@@ -71,7 +71,7 @@
     "options": [
       {
         "id": "stay",
-        "label": "Stay out \u2014 keep the lead",
+        "label": "Stay out, keep the lead",
         "decisions": []
       },
       {
@@ -120,7 +120,7 @@
     "options": [
       {
         "id": "stay",
-        "label": "Stay out \u2014 run to the end",
+        "label": "Stay out, run to the end",
         "decisions": []
       },
       {
@@ -256,7 +256,7 @@
     "options": [
       {
         "id": "stay",
-        "label": "Stay out \u2014 keep the lead",
+        "label": "Stay out, keep the lead",
         "decisions": []
       },
       {
@@ -316,7 +316,7 @@
     "options": [
       {
         "id": "stay",
-        "label": "Stay out \u2014 keep the lead",
+        "label": "Stay out, keep the lead",
         "decisions": []
       },
       {

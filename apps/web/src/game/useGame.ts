@@ -107,7 +107,7 @@ export function useGame(provider: DailyProvider, grader?: Grader): Game {
             sync();
           }
         } catch {
-          // 404: not played yet (or offline) — play on
+          // 404: not played yet (or offline), play on
         }
       }
     })().catch((e) => alive && setError(String((e as Error).message ?? e)));

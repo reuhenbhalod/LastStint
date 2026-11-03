@@ -73,18 +73,18 @@ export function CarStats({
       <dl className="m-0 grid grid-cols-3 gap-2 text-center">
         <div>
           <dt className="eyebrow">Last lap</dt>
-          <dd className="m-0 mono text-[14px] font-semibold">{mine ? lapClock(mine) : '—'}</dd>
+          <dd className="m-0 mono text-[14px] font-semibold">{mine ? lapClock(mine) : '-'}</dd>
         </div>
         <div>
           <dt className="eyebrow">{rival} last</dt>
-          <dd className="m-0 mono text-[14px] font-semibold">{theirs ? lapClock(theirs) : '—'}</dd>
+          <dd className="m-0 mono text-[14px] font-semibold">{theirs ? lapClock(theirs) : '-'}</dd>
         </div>
         <div>
           <dt className="eyebrow">Gap</dt>
           <dd
             className={`m-0 mono text-[14px] font-semibold ${gap === null ? '' : gap >= 0 ? 'text-[var(--you)]' : 'text-[var(--rival)]'}`}
           >
-            {gap === null ? '—' : `${gap >= 0 ? '+' : '−'}${Math.abs(gap).toFixed(1)}s`}
+            {gap === null ? '-' : `${gap >= 0 ? '+' : '−'}${Math.abs(gap).toFixed(1)}s`}
           </dd>
         </div>
       </dl>

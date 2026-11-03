@@ -123,7 +123,7 @@ function CallRow({
           </dd>
           <dt>Best call</dt>
           <dd>
-            {labelOf(moment, call.best)} · {best ? pct(best.probability) : '—'}
+            {labelOf(moment, call.best)} · {best ? pct(best.probability) : '-'}
           </dd>
           <dt>Real team</dt>
           <dd>
@@ -232,9 +232,9 @@ export function ResultScreen({
 
         <section className="grid grid-cols-3 gap-2 text-center">
           {[
-            ['Score', score != null ? String(Math.round(score)) : '—', 'out of 100'],
-            ['Rank', response ? `${response.rank}/${response.total}` : '—', 'today'],
-            ['Beat', response ? `${response.percentile}%` : '—', 'of players'],
+            ['Score', score != null ? String(Math.round(score)) : '-', 'out of 100'],
+            ['Rank', response ? `${response.rank}/${response.total}` : '-', 'today'],
+            ['Beat', response ? `${response.percentile}%` : '-', 'of players'],
           ].map(([label, value, sub]) => (
             <div
               key={label}
@@ -370,7 +370,7 @@ export function ResultScreen({
                   {code}
                 </span>
                 <span className="text-neutral-400">
-                  {i === 0 ? '—' : gaps[code] != null ? `+${gaps[code]?.toFixed(1)}` : ''}
+                  {i === 0 ? '-' : gaps[code] != null ? `+${gaps[code]?.toFixed(1)}` : ''}
                 </span>
               </li>
             ))}
