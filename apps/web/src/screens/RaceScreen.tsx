@@ -276,7 +276,8 @@ export function RaceScreen({
           aria-label="Race"
           className="order-1 flex min-w-0 flex-col gap-3 xl:order-2 xl:min-h-0 xl:overflow-y-auto"
         >
-          <div>
+          {/* On a laptop the map takes all the height the calls and team radio leave. */}
+          <div className="xl:flex xl:min-h-[220px] xl:flex-1 xl:flex-col">
             <div className="grid grid-cols-[1fr_auto_1fr] items-center rounded-t-xl border border-b-0 border-[var(--rule)] bg-[var(--card)] px-3 py-2">
               <div className="flex items-center gap-2">
                 <span className="h-7 w-1.5 rounded-sm bg-[var(--you)]" />
@@ -303,7 +304,7 @@ export function RaceScreen({
               </div>
             </div>
             <div
-              className={`relative overflow-hidden rounded-b-xl bg-[var(--tarmac)] ${paused ? 'map-alert' : ''}`}
+              className={`relative overflow-hidden rounded-b-xl bg-[var(--tarmac)] xl:min-h-0 xl:flex-1 ${paused ? 'map-alert' : ''}`}
             >
               {outline ? (
                 <TrackMap

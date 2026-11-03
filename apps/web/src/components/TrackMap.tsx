@@ -446,7 +446,9 @@ export function TrackMap({
   return (
     <svg
       viewBox={`0 0 ${outline.width} ${outline.height}`}
-      className={`block h-auto w-full transition-[max-height] duration-300 ${dim ? 'max-h-[max(180px,calc(100vh-610px))]' : 'max-h-[max(240px,calc(100vh-560px))]'}`}
+      // Phone/tablet: full width at the outline's shape. Laptop: fills its box (the rest of the
+      // column), keeping the shape.
+      className="block h-auto w-full xl:absolute xl:inset-0 xl:h-full"
       aria-labelledby="track-map-title"
     >
       <title id="track-map-title">{`Track map, lap ${race.lap}. Select a car for its details.`}</title>
