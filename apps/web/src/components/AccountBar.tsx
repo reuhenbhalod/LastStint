@@ -1,6 +1,6 @@
 // Streak and sign-in, on the daily card and the results (feedback spec D3). The streak shows
 // signed in or not; "Sign in with Google" keeps it across devices. Without a Google client ID
-// configured, only the streak shows.
+// configured, only the streak shows. Admin accounts also get an Admin button.
 
 import { useEffect, useRef } from 'react';
 import { GOOGLE_CLIENT_ID, loadGoogle } from '../account/google.js';
@@ -32,6 +32,18 @@ function GoogleButton({ onCredential }: { onCredential: (credential: string) => 
   return <div ref={el} className="gsi-button min-h-[32px]" />;
 }
 
+/** Only for accounts on the admin list (the server says so; it checks every admin call too). */
+function AdminLink() {
+  return (
+    <a
+      href="/admin"
+      className="rounded-full border border-[var(--you)] px-3 py-1 font-semibold text-[var(--you)] hover:bg-[color-mix(in_srgb,var(--you)_12%,transparent)]"
+    >
+      Admin
+    </a>
+  );
+}
+
 export function AccountBar({
   account,
   compact = false,
@@ -58,6 +70,7 @@ export function AccountBar({
         </span>
         {p?.account ? (
           <span className="flex items-center gap-2 text-[13px]">
+            {p.account.admin && <AdminLink />}
             <span
               className="hidden max-w-[160px] truncate text-[var(--muted)] sm:inline"
               title={p.account.email}
@@ -101,6 +114,7 @@ export function AccountBar({
       </div>
       {p?.account ? (
         <div className="flex items-center gap-2 text-[13px]">
+          {p.account.admin && <AdminLink />}
           <span className="max-w-[160px] truncate text-[var(--muted)]" title={p.account.email}>
             {p.account.name || p.account.email}
           </span>

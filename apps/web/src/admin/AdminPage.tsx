@@ -37,10 +37,11 @@ interface Day {
 function useRaces(): RaceCard[] | null {
   const [races, setRaces] = useState<RaceCard[] | null>(null);
   useEffect(() => {
-    Promise.all(Object.values(RACE_FILES).map((load) => load())).then((mods) =>
+    // One file failing to load (a race file removed while the dev server ran) skips that race.
+    Promise.allSettled(Object.values(RACE_FILES).map((load) => load())).then((mods) =>
       setRaces(
         mods
-          .map((m) => m.default)
+          .flatMap((m) => (m.status === 'fulfilled' ? [m.value.default] : []))
           .filter((m) => m.decisionMoments.length > 0)
           .map((m) => {
             const goal = goalOf(m);

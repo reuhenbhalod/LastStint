@@ -70,6 +70,30 @@ describe('admin access', () => {
     expect(ok.status).toBe(200);
     expect(await ok.json()).toMatchObject({ admin: true, email: 'admin@example.com' });
   });
+
+  it('marks an admin account at sign-in and on the player (for the Admin button)', async () => {
+    const signIn = (credential: string, anonId: string) =>
+      SELF.fetch('https://api.test/api/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ credential, anonId }),
+      });
+    const adminId = '6f1c2d3e-4a5b-4c6d-8e9f-0a1b2c3d4e5f';
+    const otherId = '7a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d';
+    const res = await signIn(await idToken(), adminId);
+    expect(await res.json()).toMatchObject({ email: 'admin@example.com', admin: true });
+    const me = await (
+      await SELF.fetch(`https://api.test/api/players/${adminId}?today=${today}`)
+    ).json();
+    expect(me).toMatchObject({ account: { admin: true } });
+
+    const other = await signIn(await idToken({ sub: 'google-x', email: 'x@example.com' }), otherId);
+    expect(await other.json()).toMatchObject({ admin: false });
+    const them = await (
+      await SELF.fetch(`https://api.test/api/players/${otherId}?today=${today}`)
+    ).json();
+    expect(them).toMatchObject({ account: { admin: false } });
+  });
 });
 
 describe('admin controls', () => {

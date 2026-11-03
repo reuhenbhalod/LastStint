@@ -1,8 +1,10 @@
 // The player's account and streak (feedback spec D3). Loads them for the current player ID;
 // signing in adopts the account's player ID (and tells the game to reload, so "already played
-// today" is checked for the account); signing out goes back to a fresh anonymous ID.
+// today" is checked for the account); signing out goes back to a fresh anonymous ID. An admin
+// account (on the Worker's ADMIN_EMAILS) gets the Admin button and keeps its token for /admin.
 
 import { useCallback, useEffect, useState } from 'react';
+import { setAdminToken } from '../admin/session.js';
 import { type PlayerResponse, api } from '../data/api.js';
 import { adoptPlayerId, anonId, localDate, resetPlayerId } from '../data/player.js';
 import { loadGoogle } from './google.js';
@@ -42,6 +44,8 @@ export function useAccount(onSwitch: () => void): AccountState {
       setError(null);
       try {
         const account = await api.signIn(credential, anonId());
+        // An admin's Google token also opens the admin page (for its hour).
+        setAdminToken(account.admin ? credential : null);
         const switched = account.playerId !== anonId();
         adoptPlayerId(account.playerId);
         refresh();
@@ -57,6 +61,7 @@ export function useAccount(onSwitch: () => void): AccountState {
 
   const signOut = useCallback(() => {
     resetPlayerId();
+    setAdminToken(null);
     loadGoogle().then(
       (g) => g.disableAutoSelect(),
       () => {},
