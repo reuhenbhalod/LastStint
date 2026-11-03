@@ -105,6 +105,12 @@ export class GameSession {
     this.dispatch({ type: 'SYNC', race: this.engine.state, moment, finished, result });
     if (!moment) return;
     this.startGrading(moment, this.engine);
+    // Your car is out: nothing left to call, so each moment takes its first (do-nothing) option.
+    if (this.engine.state.cars[this.state.meta.userSide]?.retired) {
+      const none = moment.options.find((o) => o.decisions.length === 0) ?? moment.options[0];
+      if (none) this.choose(none.id);
+      return;
+    }
     // Just stopped: the wall stays out without asking (game/autoStay.ts).
     const stay = autoStay(moment, this.engine.decisions);
     if (stay) {
@@ -155,7 +161,32 @@ export class GameSession {
   tick(): void {
     if (this.state.phase !== 'racing') return;
     this.engine.step();
+    this.reportIncidents();
     this.sync();
+  }
+
+  /** Race control and the driver on the radio for the lap's crashes, failures and punctures. */
+  private reportIncidents(): void {
+    const lap = this.engine.lap;
+    const race = this.engine.state;
+    const side = this.state.meta.userSide;
+    for (const n of this.engine.notes) {
+      if (n.kind !== 'incident' || n.lap !== lap) continue;
+      const mine = n.driver === side;
+      const text =
+        n.detail === 'puncture'
+          ? mine
+            ? 'Puncture! I’ve got a puncture! Coming in.'
+            : `${n.driver} has a puncture and is limping to the pits.`
+          : n.detail === 'crash'
+            ? mine
+              ? 'I’m in the wall. I’m sorry, guys.'
+              : `${n.driver} has crashed out.${race.nextFlag === 'sc' ? ' Safety car.' : race.nextFlag === 'vsc' ? ' Virtual safety car.' : ''}`
+            : mine
+              ? 'I’ve lost power… the car’s stopped. It’s over.'
+              : `${n.driver} has stopped on track with a failure.`;
+      this.say(mine ? side : 'Race control', text, false, lap);
+    }
   }
 
   /** Answer the current decision moment with one of its options, then resume. */

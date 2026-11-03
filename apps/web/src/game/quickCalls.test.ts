@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { StaticDailyProvider } from '../data/provider.js';
 import { GameEngine } from '../engine/engine.js';
-import { quickCallAt, quickCallLaps } from './quickCalls.js';
+import { quickCallAt, quickCallLaps, safetyCarCall } from './quickCalls.js';
 import { RaceLog } from './raceLog.js';
 
 describe('quick calls', () => {
@@ -39,5 +39,22 @@ describe('quick calls', () => {
       }
     }
     expect(asked).toBe(laps.size);
+  });
+});
+
+describe('safetyCarCall', () => {
+  it('asks to box when a crash brings out a safety car the race model does not have', async () => {
+    const { model } = await new StaticDailyProvider().today();
+    const engine = new GameEngine(model, 64, { decisions: [] });
+    while (engine.lap < 40) engine.step();
+    const race = { ...engine.state, nextFlag: 'sc' as const };
+    const call = safetyCarCall(race, model);
+    expect(call?.text).toMatch(/Safety car!/);
+    expect(call?.options.map((o) => o.id)).toEqual(['box', 'stay']);
+    expect(call?.options[0]?.call).toMatchObject({ lap: 41, kind: 'pit' });
+    // Green next lap, or the race's own SC: no call.
+    expect(safetyCarCall({ ...race, nextFlag: 'green' }, model)).toBeNull();
+    while (engine.lap < 53) engine.step();
+    expect(safetyCarCall(engine.state, model)).toBeNull();
   });
 });

@@ -22,10 +22,14 @@ describe('tyre guide', () => {
   it('describes the headset modes from the sim', async () => {
     const { model } = await new StaticDailyProvider().today();
     expect(modeLine(model, 'pace', 'push')).toBe(
-      '−0.25 s a lap · tyres wear 30% faster · more mistakes',
+      '−0.25 s a lap · tyres wear 30% faster · more mistakes · more risk of a failure or puncture',
     );
     expect(modeLine(model, 'pace', 'manage')).toBe('+0.35 s a lap · tyres wear 25% slower');
     expect(modeLine(model, 'battle', 'hold')).toBe('No change: the baseline');
-    expect(modeLine(model, 'battle', 'defend')).toBe('+0.15 s a lap · harder to pass you');
+    expect(modeLine(model, 'battle', 'defend')).toBe(
+      '+0.15 s a lap · harder to pass you · more crash risk in a fight',
+    );
+    expect(modeLine(model, 'ers', 'deploy')).toBe('−0.20 s a lap · uses 15% of the battery a lap');
+    expect(modeLine(model, 'ers', 'harvest')).toBe('+0.25 s a lap · battery +15% a lap');
   });
 });

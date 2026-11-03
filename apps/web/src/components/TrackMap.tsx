@@ -339,7 +339,8 @@ export function TrackMap({
   const lane = useMemo(() => pitLane(outline, line, TRACK), [outline, line]);
   // Gaps become distance at the pace of the lap being driven (the restart lap at racing
   // speed); at the flag, the final gaps at racing speed.
-  const driven = finishing ? race.flag : flagOn(model, race.lap + 1);
+  // (Live play adds neutralizations after crashes: the state knows the next lap's flag.)
+  const driven = finishing ? race.flag : (race.nextFlag ?? flagOn(model, race.lap + 1));
   const cars = carsOnTrack(race, model, driven);
   const minGap = 24 / line.length;
 
@@ -424,7 +425,9 @@ export function TrackMap({
     minGap,
   );
   const atFlag = finishing ? runToFlag(shown, REDUCED ? 99 : sinceFlag) : null;
-  const youDone = atFlag?.get(userSide)?.finished ?? false;
+  // Your car crossing the line ends it; if it's out of the race, the winner does.
+  const you = atFlag?.get(userSide);
+  const youDone = you ? you.finished : !!atFlag && [...atFlag.values()].some((c) => c.finished);
   useEffect(() => {
     if (youDone && !crossed.current) {
       crossed.current = true;

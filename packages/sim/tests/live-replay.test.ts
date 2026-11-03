@@ -29,7 +29,7 @@ describe('live play with the real calls', () => {
         .map((s) => s.lap - 1),
     );
     const calls = realDecisions(model).filter((d) => !skipped.has(d.lap));
-    const live = initRun(model, model.race.seed, { decisions: calls });
+    const live = initRun(model, model.race.seed, { decisions: calls, incidents: false });
     while (!isFinished(live)) stepLap(live);
     for (const [code, car] of Object.entries(replay.state.cars)) {
       expect(live.state.cars[code]?.totalTime).toBeCloseTo(car.totalTime, 9);

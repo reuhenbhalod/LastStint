@@ -86,6 +86,26 @@ export function CarStats({
           </dd>
         </div>
       </dl>
+      {me.battery !== undefined && (
+        <div className="flex items-center gap-2">
+          <span className="eyebrow w-14">Battery</span>
+          <div
+            className="h-1.5 flex-1 overflow-hidden rounded-full bg-[var(--card-2)]"
+            aria-hidden="true"
+          >
+            <div
+              className="h-full rounded-full transition-[width] duration-700"
+              style={{
+                width: `${Math.round(me.battery)}%`,
+                background: me.battery <= 15 ? 'var(--box)' : 'var(--you)',
+              }}
+            />
+          </div>
+          <span className="mono whitespace-nowrap text-right text-[12px] capitalize">
+            {Math.round(me.battery)}% · {me.modes.ers}
+          </span>
+        </div>
+      )}
       {trend !== null && (
         <p className="m-0 text-center text-[13px] text-[var(--muted)]">
           {Math.abs(trend) < 0.05

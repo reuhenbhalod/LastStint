@@ -168,3 +168,36 @@ export function quickCallAt(race: RaceState, model: RaceModel, log: LapEvents[])
     ],
   };
 }
+
+/**
+ * A crash brought out a safety car (or VSC) the race model doesn't have (live play's
+ * incidents): the pit lane is suddenly cheap, so the wall is asked straight away. Boxing
+ * takes the softest tyre that lasts to the flag (or the hardest). Null if the next lap's flag
+ * is the race's own, or there's no time left to use it.
+ */
+export function safetyCarCall(race: RaceState, model: RaceModel): QuickCall | null {
+  const me = race.cars[model.userSide];
+  const next = race.lap + 1;
+  const flag = race.nextFlag;
+  if (!me || me.retired || (flag !== 'sc' && flag !== 'vsc')) return null;
+  if (flagOn(model, next) !== 'green' || next >= model.race.laps) return null;
+  if (model.decisionMoments.some((m) => m.lap === next)) return null;
+  const left = model.race.laps - race.lap;
+  const byGrip = Object.entries(model.compounds).sort((a, b) => a[1].offset - b[1].offset);
+  const lasts = byGrip.find(([, c]) => c.cliffLap >= left);
+  const compound = (lasts ?? byGrip.at(-1))?.[0] ?? me.compound;
+  const name = flag === 'sc' ? 'Safety car' : 'Virtual safety car';
+  return {
+    lap: race.lap,
+    from: 'Engineer',
+    text: `${name}! The pit lane is cheap. Box for ${compound.toLowerCase()}s, or stay out?`,
+    options: [
+      {
+        id: 'box',
+        label: `Box, ${compound.toLowerCase()}s`,
+        call: { lap: next, kind: 'pit', compound },
+      },
+      { id: 'stay', label: 'Stay out', call: null },
+    ],
+  };
+}

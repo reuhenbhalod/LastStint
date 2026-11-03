@@ -44,6 +44,7 @@ export const OVERTAKE_STREAM = 1000;
 export const ERROR_STREAM = 2000;
 export const STOP_STREAM = 4000;
 export const EVENT_STREAM = 5000;
+export const INCIDENT_STREAM = 6000;
 // Rival policy (Implementation Plan 2.5): under green the rival covers a stop only if its own
 // next planned stop is within this many laps.
 export const COVER_WINDOW = 4;
@@ -55,6 +56,11 @@ export interface RunOptions {
   strategies?: Strategies;
   /** The player's calls. When given (even empty), the user's car and the rival go live. */
   decisions?: Decision[];
+  /**
+   * Live play only: crashes, failures and punctures across the field (headset `incidents`).
+   * On by default; off reproduces the real race exactly from the real calls.
+   */
+  incidents?: boolean;
 }
 
 export interface ModeEffect {
@@ -63,6 +69,22 @@ export interface ModeEffect {
   errorMult?: number;
   attackLogit?: number;
   defendLogit?: number;
+  /** ERS: battery % gained (+) or spent (-) each green lap. */
+  charge?: number;
+}
+
+interface IncidentRates {
+  crash: number;
+  mechanical: number;
+  puncture: number;
+  puncturePerWornLap: number;
+  punctureMax: number;
+  pushMechanical: number;
+  pushPuncture: number;
+  attackCrash: number;
+  defendCrash: number;
+  punctureCost: number;
+  scShare: number;
 }
 
 interface HeadsetEra {
@@ -70,6 +92,8 @@ interface HeadsetEra {
   errorCost: number;
   modes: { [K in keyof Modes]: Record<string, ModeEffect> };
   neutralization?: { scPerLap: number; vscPerLap: number; scLaps: number; vscLaps: number };
+  ers?: { startBattery: number; scCharge: number };
+  incidents?: IncidentRates;
   teamOrders?: {
     holdUpLogit: number;
     holdUpCost: number;
@@ -86,7 +110,12 @@ export function modeEffects(model: RaceModel): HeadsetEra['modes'] | null {
   return HEADSET[model.era]?.modes ?? null;
 }
 
-export const DEFAULT_MODES: Modes = { pace: 'standard', fuel: 'normal', battle: 'hold' };
+export const DEFAULT_MODES: Modes = {
+  pace: 'standard',
+  fuel: 'normal',
+  battle: 'hold',
+  ers: 'balanced',
+};
 
 /** Internal run state: the public RaceState plus the per-car random streams. */
 export interface Run {
@@ -111,6 +140,10 @@ export interface Run {
   retireAt: Map<number, string[]>;
   /** Lap of each recent pass, keyed `${passed}>${passer}` (REPASS_COOLDOWN). */
   passedBy: Map<string, number>;
+  /** Live play: crashes, failures and punctures happen (RunOptions.incidents). */
+  incidents: boolean;
+  /** A crash brings out a SC/VSC (off in grader playouts, which sample neutralizations). */
+  incidentFlags: boolean;
 }
 
 export interface NeutralEvent {
@@ -211,12 +244,20 @@ const NO_EFFECT: ModeEffect = {};
 
 function effect(run: Run, car: CarState, key: keyof Modes): ModeEffect {
   if (car.modes[key] === DEFAULT_MODES[key]) return NO_EFFECT; // defaults have no effect
-  return run.headset?.modes[key][car.modes[key]] ?? NO_EFFECT;
+  const e = run.headset?.modes[key]?.[car.modes[key]] ?? NO_EFFECT;
+  // A spending ERS mode does nothing with the battery empty.
+  if (key === 'ers' && (e.charge ?? 0) < 0 && (car.battery ?? 0) <= 0) return NO_EFFECT;
+  return e;
 }
 
 function defaultModes(car: CarState): boolean {
   const m = car.modes;
-  return m.pace === 'standard' && m.fuel === 'normal' && m.battle === 'hold';
+  return (
+    m.pace === 'standard' &&
+    m.fuel === 'normal' &&
+    m.battle === 'hold' &&
+    (m.ers ?? 'balanced') === 'balanced'
+  );
 }
 
 /**
@@ -233,7 +274,8 @@ function modeLapDelta(run: Run, car: CarState): number {
   return (
     (worn ? 0 : pace) +
     (effect(run, car, 'fuel').lapDelta ?? 0) +
-    (effect(run, car, 'battle').lapDelta ?? 0)
+    (effect(run, car, 'battle').lapDelta ?? 0) +
+    (effect(run, car, 'ers').lapDelta ?? 0)
   );
 }
 
@@ -341,8 +383,11 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
       modes: { ...DEFAULT_MODES },
     };
   }
+  const ers = HEADSET[model.era]?.ers;
+  const userCar = cars[model.userSide];
+  if (live && ers && userCar) userCar.battery = ers.startBattery;
 
-  return {
+  const run: Run = {
     model,
     seed,
     ...makeStreams(model, seed),
@@ -351,6 +396,8 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
     notes: [],
     headset: HEADSET[model.era],
     passedBy: new Map(),
+    incidents: live && options.incidents !== false && !!HEADSET[model.era]?.incidents,
+    incidentFlags: true,
     state: {
       lap: model.race.takeoverLap,
       flag: 'green',
@@ -362,6 +409,13 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
     neutral: neutralMap(events),
     retireAt,
   };
+  markNextFlag(run);
+  return run;
+}
+
+/** Set the flag the next lap will run under, from the neutralizations known so far. */
+function markNextFlag(run: Run): void {
+  run.state.nextFlag = run.neutral.get(run.state.lap + 1) ?? 'green';
 }
 
 export const NOISE_STREAM = 0;
@@ -489,6 +543,8 @@ export function forkRun(
     decisions: [...run.decisions.filter((d) => d.lap > run.state.lap), ...decisions],
     notes: [],
     ...blindView(run, seed, options.blindAfter),
+    // Blind playouts already draw neutralizations at the base rates, crashes included.
+    incidentFlags: options.blindAfter === undefined ? run.incidentFlags : false,
   };
 }
 
@@ -960,7 +1016,13 @@ export function stepLap(run: Run): RaceState {
     c.totalTime += lt + pitCost;
     c.tyreAge += 1;
     c.tyreWear += flag ? 1 : modeWearMult(run, c);
+    if (c.battery !== undefined) {
+      const gain = flag ? (run.headset?.ers?.scCharge ?? 0) : (effect(run, c, 'ers').charge ?? 0);
+      c.battery = Math.min(100, Math.max(0, c.battery + gain));
+    }
   }
+
+  if (run.incidents && !flag) incidents(run, lap, prevTime);
 
   for (const code of run.retireAt.get(lap) ?? []) {
     const c = state.cars[code];
@@ -996,7 +1058,80 @@ export function stepLap(run: Run): RaceState {
 
   state.lap = lap;
   state.flag = flag ?? 'green';
+  markNextFlag(run);
   return state;
+}
+
+/**
+ * Crashes, mechanical failures and punctures (feedback round 2; live play only, green laps).
+ * Each running car takes one draw a lap from its own incident stream, so one car's fate never
+ * shifts another's. The chance of each grows with what provokes it: pushing (failures,
+ * punctures), tyres past their cliff (punctures), attacking or defending in a fight
+ * (crashes). A crash or a failure retires the car; a crash also brings out a SC or VSC from
+ * the next lap (not in grader playouts, which sample those). A puncture costs a slow lap and
+ * forces a stop next lap onto the next planned compound (or mediums, or hards).
+ */
+function incidents(run: Run, lap: number, prevTime: Record<string, number>): void {
+  const rates = run.headset?.incidents;
+  if (!rates) return;
+  const { model, state } = run;
+  const order = live(run);
+  for (let i = 0; i < order.length; i++) {
+    const code = order[i] as string;
+    const c = state.cars[code] as CarState;
+    const rng = run.rng.get(INCIDENT_STREAM, code);
+    const u = rng.next();
+    const push = c.modes.pace === 'push';
+    const cliff = model.compounds[c.compound]?.cliffLap ?? Number.POSITIVE_INFINITY;
+    const worn = Math.max(0, c.tyreWear - cliff);
+    const ahead = i > 0 ? (order[i - 1] as string) : null;
+    const behind = order[i + 1];
+    const fightAhead =
+      ahead !== null &&
+      (prevTime[code] ?? 0) - (prevTime[ahead] ?? 0) < PASS_WINDOW &&
+      (prevTime[code] ?? 0) >= (prevTime[ahead] ?? 0);
+    const fightBehind =
+      behind !== undefined && (prevTime[behind] ?? 0) - (prevTime[code] ?? 0) < PASS_WINDOW;
+    const crash =
+      rates.crash *
+      (fightAhead && c.modes.battle === 'attack' ? rates.attackCrash : 1) *
+      (fightBehind && c.modes.battle === 'defend' ? rates.defendCrash : 1);
+    const mechanical = rates.mechanical * (push ? rates.pushMechanical : 1);
+    const puncture =
+      Math.min(rates.punctureMax, rates.puncture + rates.puncturePerWornLap * worn) *
+      (push ? rates.pushPuncture : 1);
+    let kind: 'crash' | 'mechanical' | 'puncture' | null = null;
+    if (u < crash) kind = 'crash';
+    else if (u < crash + mechanical) kind = 'mechanical';
+    else if (u < crash + mechanical + puncture) kind = 'puncture';
+    if (!kind) continue;
+    run.notes.push({ lap, kind: 'incident', driver: code, detail: kind });
+    if (kind === 'puncture') {
+      c.totalTime += rates.punctureCost;
+      if (lap >= model.race.laps) continue; // limps to the flag
+      const next = c.strategy.filter((st) => st.lap > lap).sort((a, b) => a.lap - b.lap)[0];
+      const to =
+        next?.to ??
+        (model.compounds.MEDIUM ? 'MEDIUM' : model.compounds.HARD ? 'HARD' : c.compound);
+      c.strategy = c.strategy.filter((st) => st !== next && st.lap !== lap + 1);
+      c.strategy.push({ lap: lap + 1, to, added: true });
+      continue;
+    }
+    c.retired = true;
+    c.retiredLap = lap;
+    if (kind === 'crash' && run.incidentFlags && lap < model.race.laps) {
+      const cfg = run.headset?.neutralization;
+      const sc = rng.next() < rates.scShare;
+      const from = lap + 1;
+      if (cfg && !run.neutral.has(from)) {
+        const laps = Math.min(sc ? cfg.scLaps : cfg.vscLaps, model.race.laps - from + 1);
+        // New arrays: forks share the parent's events until they change them.
+        run.events = [...run.events, { lap: from, laps, flag: sc ? 'sc' : 'vsc' }];
+        run.neutral = neutralMap(run.events);
+      }
+    }
+  }
+  // The order is settled after the lap (resolveOrder), which drops retired cars to the back.
 }
 
 /**
@@ -1085,6 +1220,8 @@ function resolveOrder(
     const shift =
       (effect(run, b, 'battle').attackLogit ?? 0) +
       (effect(run, a, 'battle').defendLogit ?? 0) +
+      (effect(run, b, 'ers').attackLogit ?? 0) +
+      (effect(run, a, 'ers').defendLogit ?? 0) +
       (holdingUp(run, a.code, b.code) ? (run.headset?.teamOrders?.holdUpLogit ?? 0) : 0);
     // No roll (and no draw) while b is in its cooldown after being passed by a.
     const cooling = lap - (run.passedBy.get(`${b.code}>${a.code}`) ?? -1e9) <= REPASS_COOLDOWN;

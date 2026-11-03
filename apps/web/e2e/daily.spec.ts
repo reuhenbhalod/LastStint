@@ -138,13 +138,14 @@ test('plays the Abu Dhabi daily end to end', async ({ page, context }) => {
   // Each moment: the top-level option, then (after Box) the tyre. Lap 55's stop call isn't
   // asked: the car stopped on lap 53, so the wall stays out by itself.
   const answers: Record<string, string[]> = {
+    '35': ['Run to plan'],
     '36': ['Box', 'Hards'],
     '44': ['Stay out'],
     '49': ['Push now'],
     '53': ['Box', 'Softs'],
     '57': ['Attack'],
   };
-  for (const lap of ['36', '44', '49', '53', '57']) {
+  for (const lap of ['35', '36', '44', '49', '53', '57']) {
     const card = page.locator('section.decision');
     await expect(card).toContainText(`Lap ${lap}`, { timeout: 90_000 });
     await expect(page.getByRole('alert')).toContainText(`Lap ${lap}`);

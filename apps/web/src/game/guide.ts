@@ -116,6 +116,13 @@ export function modeLine(model: RaceModel, key: string, value: string): string |
   if ((e.attackLogit ?? 0) > 0) parts.push('better chance to pass');
   if ((e.defendLogit ?? 0) < 0) parts.push('harder to pass you');
   if ((e.errorMult ?? 1) > 1.001) parts.push('more mistakes');
+  const charge = e.charge ?? 0;
+  if (charge > 0) parts.push(`battery +${charge}% a lap`);
+  if (charge < 0) parts.push(`uses ${-charge}% of the battery a lap`);
+  // Failures, punctures and crashes (the sim's incidents): what provokes them.
+  if (key === 'pace' && value === 'push') parts.push('more risk of a failure or puncture');
+  if (key === 'battle' && (value === 'attack' || value === 'defend'))
+    parts.push('more crash risk in a fight');
   return parts.length ? parts.join(' · ') : 'No change: the baseline';
 }
 

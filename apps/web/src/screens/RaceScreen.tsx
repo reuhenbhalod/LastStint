@@ -25,7 +25,7 @@ import { TimingTower } from '../components/TimingTower.js';
 import { TrackMap } from '../components/TrackMap.js';
 import { TyreBadge } from '../components/TyreBadge.js';
 import { modeLine } from '../game/guide.js';
-import { type QuickCall, quickCallAt, quickCallLaps } from '../game/quickCalls.js';
+import { type QuickCall, quickCallAt, quickCallLaps, safetyCarCall } from '../game/quickCalls.js';
 import { useRaceLog } from '../game/raceLog.js';
 import { radioChirp, setSoundOn, soundOn } from '../game/sound.js';
 import { type Game, LAP_MS } from '../game/useGame.js';
@@ -99,9 +99,12 @@ export function RaceScreen({
   const raceLap = state.race.lap;
   // biome-ignore lint/correctness/useExhaustiveDependencies: asked once, when its lap completes.
   useEffect(() => {
-    if (state.phase !== 'racing' || !quickLaps.has(raceLap) || asked.current.has(raceLap)) return;
+    if (state.phase !== 'racing' || asked.current.has(raceLap)) return;
+    // A crash's safety car is asked about at once; otherwise the regular quick calls.
+    const sc = safetyCarCall(state.race, model);
+    if (!sc && !quickLaps.has(raceLap)) return;
     asked.current.add(raceLap);
-    setQuick(quickCallAt(state.race, model, log));
+    setQuick(sc ?? quickCallAt(state.race, model, log));
   }, [raceLap, state.phase, quickLaps]);
   const answerQuick = useCallback(
     (id: string) => {
@@ -167,6 +170,7 @@ export function RaceScreen({
         {me && (
           <HeadsetPanel
             modes={me.modes}
+            battery={me.battery}
             pending={pending}
             describe={(key, value) => modeLine(model, key, value)}
             disabled={state.phase !== 'racing'}
@@ -351,7 +355,7 @@ export function RaceScreen({
               )}
               {/* The map's pop-overs (under the map on a phone). */}
               {panel && (
-                <div className="absolute bottom-12 right-2.5 z-20 hidden w-[320px] rounded-xl border border-[var(--rule)] bg-[var(--card)]/95 p-3 shadow-2xl backdrop-blur md:block">
+                <div className="absolute bottom-12 right-2.5 z-20 hidden w-[380px] rounded-xl border border-[var(--rule)] bg-[var(--card)]/95 p-3 shadow-2xl backdrop-blur md:block">
                   {panelBody}
                 </div>
               )}
@@ -368,7 +372,7 @@ export function RaceScreen({
                   type="button"
                   aria-pressed={panel === 'headset'}
                   aria-label="Headset"
-                  title="Headset: pace and battle modes"
+                  title="Headset: pace, battle, ERS and fuel"
                   onClick={() => toggle('headset')}
                   className={mapButton(panel === 'headset')}
                 >

@@ -8,9 +8,10 @@ import type { RaceModel } from '../src/types.js';
 const abu = abuJson as unknown as RaceModel;
 
 describe('daily race example', () => {
-  it('plays Abu Dhabi 2021 with its six approved moments and scores every call', () => {
+  it('plays Abu Dhabi 2021 with its seven approved moments and scores every call', () => {
     // The moments match the UI's race script (data/scripts/abu-dhabi-2021.json).
     expect(abu.decisionMoments.map((m) => m.id)).toEqual([
+      'race-plan',
       'vsc-cover',
       'tyres-going',
       'manage-or-push',
@@ -28,6 +29,7 @@ describe('daily race example', () => {
     );
     expect(laps.at(-1)).toBe(abu.race.laps);
     expect(calls.map((c) => [c.moment.id, c.chosen])).toEqual([
+      ['race-plan', 'plan-standard'],
       ['vsc-cover', 'stay'],
       ['tyres-going', 'stay'],
       ['manage-or-push', 'push'],
@@ -48,6 +50,7 @@ describe('daily race example', () => {
       { samples: 60 },
     );
     expect(score.calls.map((c) => c.optionId)).toEqual([
+      'plan-standard',
       'stay',
       'stay',
       'push',
