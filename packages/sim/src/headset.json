@@ -1,5 +1,5 @@
 {
-  "_comment": "Headset standing-mode effects per era (Implementation Plan 2.6; product doc 'Standing modes'). Calibrated estimates, not measured: FastF1 can't observe them. Start modest, tune by playtesting. lapDelta: s added per lap. wearMult: multiplies tyre wear (effective tyre age advances by this per lap). errorMult: multiplies the era's base error rate; only the excess over 1 is applied. attackLogit / defendLogit: added to the overtake model's logit when this car attacks / is attacked. teamOrders (product doc decision type; estimates to tune in playtests): holdUpLogit is added to the rival's pass logit while the user's teammate defends directly ahead of it; holdUpCost is the time the teammate loses per lap doing so; swapWindow is how close (s) the user and teammate must be to swap; swapCost is what the yielding car loses; swapLaps is how long a swap call stays open. neutralization: base rates for grader playouts, which don't know the race's future (spec decision Oct 26 2026): chance per lap that a SC / VSC starts and their typical length, measured over the 32-race validation set (12 SC and 24 VSC starts in 1931 racing laps; median 5 and 2 laps). ers (feedback round 2, live play only): the hybrid battery. Each mode's charge is the battery % it gains (+) or spends (-) a green lap; a SC/VSC lap recharges scCharge; a car starts with startBattery. A spending mode does nothing with the battery empty. incidents (round 2, live play only; estimates, not measured): per-car chances each green lap of a crash, a mechanical failure and a puncture. A puncture costs punctureCost and forces a stop; a crash retires the car and brings out a SC (scShare) or a VSC on the next lap; a failure retires it. Multipliers: push (pace) on failures and punctures, attack/defend within PASS_WINDOW on crashes, punctures per lap of wear past the cliff, up to punctureMax a lap.",
+  "_comment": "Headset standing-mode effects per era (Implementation Plan 2.6; product doc 'Standing modes'). Calibrated estimates, not measured: FastF1 can't observe them. Start modest, tune by playtesting. lapDelta: s added per lap. wearMult: multiplies tyre wear (effective tyre age advances by this per lap). errorMult: multiplies the era's base error rate; only the excess over 1 is applied. attackLogit / defendLogit: added to the overtake model's logit when this car attacks / is attacked. teamOrders (product doc decision type; estimates to tune in playtests): holdUpLogit is added to the rival's pass logit while the user's teammate defends directly ahead of it; holdUpCost is the time the teammate loses per lap doing so; swapWindow is how close (s) the user and teammate must be to swap; swapCost is what the yielding car loses; swapLaps is how long a swap call stays open. neutralization: base rates for grader playouts, which don't know the race's future (spec decision Oct 26 2026): chance per lap that a SC / VSC starts and their typical length, measured over the 32-race validation set (12 SC and 24 VSC starts in 1931 racing laps; median 5 and 2 laps). ers (feedback round 2, live play only): the hybrid battery. Each mode's charge is the battery % it gains (+) or spends (-) a green lap; a SC/VSC lap recharges scCharge; a car starts with startBattery. A spending mode does nothing with the battery empty. incidents (round 2, live play only; estimates, not measured): per-car chances each green lap of a crash, a mechanical failure and a puncture. A puncture costs punctureCost and forces a stop; a crash retires the car and brings out a SC (scShare) or a VSC on the next lap; a failure retires it. Multipliers: push (pace) on failures and punctures, attack/defend within PASS_WINDOW on crashes, punctures per lap of wear past the cliff, up to punctureMax a lap. engineer (race engineer spec, Nov 3 2026, live play only; estimates to tune in playtests): battle moves for one lap against the car directly ahead (attacks) or behind (defences) within battleWindow: attackLogit/defendLogit shift that pass roll, lapDelta is the time the move costs, contact multiplies contactBase (a contact is a front wing with wingDamage s/lap until a stop, which costs noseCost more; a puncture; or a spin costing spinCost), strike multiplies the track-limit strike chance, battery is what the overtake button spends. wait-drs gives the next lap's attack drsLogit. Track limits: strikeBase a green lap (x strikePush pushing, x strikeCareful when careful, which costs carefulCost a lap); penalty s at strike penaltyAt and every penaltyEvery after, added at the flag. blue: a lapped car within window ahead on track: waiting for the blue flags costs nothing extra (the measured lap times already include traffic); going round him at once gains goRoundGain but adds goRoundContact. trust: the driver starts at start - perIgnore x his ignores % (min..max); deltas per reason; settles by settle a lap after settleAfter quiet laps; more than ordersLimit headset orders within 3 laps is micromanaging; a refused request is judged after watch laps. Moods by trust (calm/tense/frustrated lower edges); a frustrated or furious driver overdrives (moodEffects), and a furious one picks his own battle moves.",
   "2014-2025": {
     "baseErrorRate": 0.01,
     "errorCost": 1.5,
@@ -96,6 +96,125 @@
       "punctureCost": 22,
       "scShare": 0.7,
       "punctureMax": 0.01
+    },
+    "engineer": {
+      "battleWindow": 1.0,
+      "moves": {
+        "cover-inside": {
+          "defendLogit": -1.0,
+          "lapDelta": 0.25,
+          "contact": 1.3
+        },
+        "hold-outside": {
+          "defendLogit": -0.4,
+          "lapDelta": 0.1,
+          "contact": 0.5,
+          "strike": 2
+        },
+        "defend-hard": {
+          "defendLogit": -1.8,
+          "lapDelta": 0.35,
+          "contact": 4.0,
+          "strike": 3
+        },
+        "let-go": {
+          "defendLogit": 6.0,
+          "lapDelta": 0.3,
+          "wearMult": 0.9,
+          "contact": 0.1
+        },
+        "dive-inside": {
+          "attackLogit": 2.0,
+          "lapDelta": 0.1,
+          "contact": 3.5
+        },
+        "round-outside": {
+          "attackLogit": 1.3,
+          "lapDelta": 0.05,
+          "contact": 1.2,
+          "strike": 3
+        },
+        "wait-drs": {
+          "attackLogit": -1.0,
+          "lapDelta": 0,
+          "wearMult": 1.05,
+          "contact": 0.2
+        },
+        "overtake-button": {
+          "attackLogit": 1.6,
+          "lapDelta": -0.15,
+          "contact": 0.8,
+          "battery": -25
+        }
+      },
+      "drsLogit": 1.5,
+      "contactBase": 0.012,
+      "contactWing": 0.55,
+      "contactPuncture": 0.2,
+      "wingDamage": [
+        0.3,
+        0.8
+      ],
+      "spinCost": 2.5,
+      "noseCost": 3.0,
+      "strikeBase": 0.012,
+      "strikePush": 2,
+      "strikeCareful": 0.2,
+      "carefulCost": 0.1,
+      "penaltyAt": 4,
+      "penaltyEvery": 3,
+      "penalty": 5,
+      "blue": {
+        "window": 1.0,
+        "goRoundGain": 0.2,
+        "goRoundContact": 0.03
+      },
+      "trust": {
+        "start": 85,
+        "perIgnore": 1.2,
+        "min": 55,
+        "max": 85,
+        "deltas": {
+          "pass-called": 6,
+          "pass-failed": -2,
+          "held-called": 3,
+          "passed-anyway": -7,
+          "let-rival-go": -10,
+          "contact": -12,
+          "undercut": 10,
+          "stop-lost": -8,
+          "micromanaging": -3,
+          "request-yes": 2,
+          "request-wrong": -10,
+          "request-right": 3,
+          "penalty": -8,
+          "strike": -1,
+          "settled": 0
+        },
+        "settleAfter": 3,
+        "settle": 1.5,
+        "ordersLimit": 4,
+        "watch": 3,
+        "stopWatch": 6
+      },
+      "moods": {
+        "calm": 60,
+        "tense": 40,
+        "frustrated": 20
+      },
+      "moodEffects": {
+        "frustrated": {
+          "lapDelta": -0.05,
+          "wearMult": 1.1,
+          "errorRate": 0.015
+        },
+        "furious": {
+          "lapDelta": -0.1,
+          "wearMult": 1.2,
+          "errorRate": 0.03,
+          "rogue": true
+        }
+      }
     }
   }
 }

@@ -152,11 +152,53 @@ export interface CarState {
  */
 export type TeamOrder = 'letTeammatePast' | 'teammateLetsYouPast' | 'holdUp' | 'release';
 
+/**
+ * Race engineer spec: a battle call for one lap, against the car directly behind (the defending
+ * moves) or directly ahead (the attacking moves). `wait-drs` holds station this lap to attack
+ * with DRS on the next; `overtake-button` spends battery on the attempt.
+ */
+export type BattleMove =
+  | 'cover-inside'
+  | 'hold-outside'
+  | 'defend-hard'
+  | 'let-go'
+  | 'dive-inside'
+  | 'round-outside'
+  | 'wait-drs'
+  | 'overtake-button';
+
+export const DEFEND_MOVES: readonly BattleMove[] = [
+  'cover-inside',
+  'hold-outside',
+  'defend-hard',
+  'let-go',
+];
+export const ATTACK_MOVES: readonly BattleMove[] = [
+  'dive-inside',
+  'round-outside',
+  'wait-drs',
+  'overtake-button',
+];
+
+/** What the driver asks the wall for (race engineer spec D5). */
+export type DriverRequest = 'box' | 'push';
+
+/** A lapped car ahead: wait for the blue flags (and complain to race control), or go round. */
+export type BlueAction = 'complain' | 'go-round';
+
 export type Decision = (
   | { lap: number; kind: 'pit'; compound: Compound }
   | { lap: number; kind: 'mode'; key: keyof Modes; value: string }
   | { lap: number; kind: 'teamOrder'; order: TeamOrder }
   | { lap: number; kind: 'radio'; momentId: string; optionId: string }
+  /** One lap's battle move. `driver`: the driver's own choice (no answer, or a refused call). */
+  | { lap: number; kind: 'battle'; move: BattleMove; driver?: boolean }
+  /** Track limits: careful (give a little time at the corner) or normal, from this lap on. */
+  | { lap: number; kind: 'limits'; careful: boolean }
+  /** One lap behind a lapped car. */
+  | { lap: number; kind: 'blue'; action: BlueAction }
+  /** The wall's answer to a driver's request (a yes also logs the call it asked for). */
+  | { lap: number; kind: 'reply'; request: DriverRequest; yes: boolean }
 ) & {
   /**
    * The last completed lap when the call was made; decide() stamps it. The server needs it to
@@ -168,10 +210,78 @@ export type Decision = (
 /** Something the sim did on its own that the game may narrate (e.g. the rival covering). */
 export interface RaceNote {
   lap: number;
-  kind: 'rival-cover' | 'rival-stays-out' | 'error' | 'team-swap' | 'incident';
+  kind:
+    | 'rival-cover'
+    | 'rival-stays-out'
+    | 'error'
+    | 'team-swap'
+    | 'incident'
+    // Race engineer spec (the user's car, live play):
+    | 'battle' // detail: 'passed' | 'held' | 'lost' | 'stuck' (other: the car fought)
+    | 'contact' // detail: 'wing' | 'puncture' | 'spin'
+    | 'strike' // track limits; value: the strike count
+    | 'penalty' // value: seconds added at the flag
+    | 'nose' // a stop fixed the front wing
+    | 'blue' // went round a lapped car; value: the time it gained (negative)
+    | 'trust' // value: the change; detail: why (TrustReason)
+    | 'rogue'; // a furious driver picks his own battle move (detail: the move)
   driver: string;
-  /** For an incident: 'crash', 'mechanical' or 'puncture'. */
+  /** For an incident: 'crash', 'mechanical' or 'puncture'; see the kinds above. */
   detail?: string;
+  /** The other car in a battle or a blue flag. */
+  other?: string;
+  value?: number;
+}
+
+/** Why the driver's trust in the wall moved (race engineer spec D4). */
+export type TrustReason =
+  | 'pass-called' // an attack the wall called worked
+  | 'pass-failed'
+  | 'held-called' // a defence the wall called held
+  | 'passed-anyway' // a defence the wall called didn't
+  | 'let-rival-go' // told to let the rival by
+  | 'contact' // contact on a move the wall called
+  | 'undercut' // a stop put him ahead of the rival
+  | 'stop-lost' // a stop dropped him behind the rival
+  | 'micromanaging' // too many orders in a few laps
+  | 'request-yes'
+  | 'request-wrong' // the wall said no and he was right
+  | 'request-right' // the wall said no and it was right
+  | 'penalty'
+  | 'strike'
+  | 'settled'; // a few quiet laps calm him down
+
+/** The four moods trust maps to (race engineer spec D4). */
+export type Mood = 'calm' | 'tense' | 'frustrated' | 'furious';
+
+/** The race engineer's side of the user's car (live play only). */
+export interface EngineerState {
+  /** The driver's trust in the wall, 0-100. */
+  trust: number;
+  /** Where trust started (the driver's attitude); quiet laps drift back toward it. */
+  baseTrust: number;
+  /** Front-wing damage: seconds a lap until a stop fixes it (0: none). */
+  damage: number;
+  /** Track-limit strikes so far, and the time penalty they've earned (added at the flag). */
+  strikes: number;
+  penalty: number;
+  careful: boolean;
+  /** This lap's battle move (set from the calls before the lap is run). */
+  move: BattleMove | null;
+  /** The move is the driver's own (no trust change on its outcome). */
+  moveByDriver: boolean;
+  /** `wait-drs` last lap: the next attack gets DRS. */
+  drsLap: number;
+  /** This lap's answer to a lapped car ahead. */
+  blue: BlueAction | null;
+  /** Laps of recent headset orders (micromanaging). */
+  orders: number[];
+  /** Requests the wall turned down, watched for a few laps to see who was right. */
+  refused: Array<{ request: DriverRequest; lap: number; gap: number }>;
+  /** His last stop, judged once the rival answers it: was he ahead of the rival before it? */
+  stopWatch: { lap: number; ahead: boolean } | null;
+  /** The last lap anything moved trust (quiet laps after it settle him). */
+  lastEvent: number;
 }
 
 export interface RaceState {
@@ -188,6 +298,8 @@ export interface RaceState {
     /** A pending yield call: which car yields, and the last lap it stays open. */
     swap: { yielder: string; untilLap: number } | null;
   };
+  /** The race engineer's side of the user's car (live play only). */
+  engineer?: EngineerState;
   /** The flag the next lap will run under, as known now (live play adds neutralizations
    * after crashes, so the race model's events alone don't say). */
   nextFlag?: FlagState;
