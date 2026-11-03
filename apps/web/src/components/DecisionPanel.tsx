@@ -213,7 +213,7 @@ export function DecisionPanel({
                 {i + 1}
               </span>
               <span
-                className={`disp leading-none ${top.length === 3 ? 'text-[19px] md:text-[20px]' : 'text-[21px] md:text-[23px]'}`}
+                className={`disp leading-none ${top.length === 3 ? 'text-[14px] md:text-[15px]' : 'text-[16px] md:text-[17px]'}`}
               >
                 {t.label}
               </span>
@@ -250,7 +250,7 @@ export function DecisionPanel({
                     {LETTER[t.compound] ?? t.compound[0]}
                   </span>
                   <span className="min-w-0">
-                    <span className="disp block text-[22px] leading-none">
+                    <span className="disp block text-[16px] leading-none">
                       <span aria-hidden="true" className="mono mr-1.5 text-[10px] opacity-60">
                         {i + 1}
                       </span>

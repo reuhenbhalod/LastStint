@@ -191,7 +191,7 @@ export function ResultScreen({
         <p className="font-mono text-xs uppercase tracking-widest text-neutral-500">
           Chequered flag
         </p>
-        <h1 className="disp text-[40px] leading-none">{v.headline}</h1>
+        <h1 className="disp text-[30px] leading-none">{v.headline}</h1>
         <p
           className={`m-0 mt-2 text-[15px] ${v.outcome === 'beat' ? 'text-[var(--you)]' : 'text-[var(--muted)]'}`}
         >
@@ -216,7 +216,7 @@ export function ResultScreen({
           {number ? `Pit Wall #${number}` : 'Practice'} ·{' '}
           {game.model?.race.name ?? state.meta.raceId}
         </p>
-        <h1 className="mt-1 disp text-[40px] leading-none">{v.headline}</h1>
+        <h1 className="mt-1 disp text-[30px] leading-none">{v.headline}</h1>
         <p
           className={`m-0 mt-2 text-[15px] ${v.outcome === 'beat' ? 'text-[var(--you)]' : 'text-[var(--muted)]'}`}
         >

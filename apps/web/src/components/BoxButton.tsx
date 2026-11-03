@@ -66,7 +66,7 @@ export function BoxButton({
       type="button"
       disabled={disabled}
       onClick={() => setOpen(true)}
-      className="disp w-full rounded-lg bg-[var(--box)] py-3 text-[26px] leading-none tracking-[0.2em] text-white hover:brightness-110 active:scale-[0.98] disabled:opacity-40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
+      className="disp wide w-full rounded-lg bg-[var(--box)] py-3 text-[22px] leading-none tracking-[0.12em] text-white hover:brightness-110 active:scale-[0.98] disabled:opacity-40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
     >
       Box
     </button>

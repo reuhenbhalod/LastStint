@@ -68,7 +68,7 @@ export function DriverCard({
       <header className="mb-2 flex items-start gap-2.5">
         <span className="mt-0.5 h-9 w-1.5 rounded-sm" style={{ background: accent }} />
         <div className="min-w-0 flex-1">
-          <p className="m-0 disp text-[22px] leading-none">
+          <p className="m-0 disp text-[16px] leading-none">
             {info ? `${info.number} · ` : ''}
             {info?.name ?? code}
           </p>

@@ -26,7 +26,7 @@ export function PitCard({
       className="pit-card flex flex-col gap-1 rounded-lg border-l-4 bg-black/75 px-3 py-2 text-white shadow-xl"
       style={{ borderColor: you ? 'var(--you)' : 'var(--rival)' }}
     >
-      <p className="m-0 disp text-[18px] leading-none">
+      <p className="m-0 disp text-[13px] leading-none">
         {stop.code} boxes · {tyreName(stop.compound)}
       </p>
       <p className="m-0 mono text-[12px] text-[#cfd6d3]">

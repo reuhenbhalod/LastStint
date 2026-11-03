@@ -42,7 +42,7 @@ export function AccountBar({ account }: { account: AccountState }) {
           🔥
         </span>
         <span>
-          <span className="block disp text-[22px] leading-none">
+          <span className="block disp text-[16px] leading-none">
             {streak ? `${streak.current}-day streak` : 'Daily streak'}
           </span>
           <span className="block text-[12px] text-[var(--muted)]">
