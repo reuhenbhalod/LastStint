@@ -191,7 +191,7 @@ describe('verifyRun', () => {
           }),
         ),
       ).toBe('bad-answer'));
-    it('a call slipped between the answer and its option\'s calls', () =>
+    it("a call slipped between the answer and its option's calls", () =>
       expect(
         reasonFor(
           abu,
@@ -222,7 +222,13 @@ describe('verifyRun', () => {
     const log = play(abu, { 'sc-stop': 'box-soft' }).decisions;
     const radio = log.findIndex((d) => d.kind === 'radio');
     const withLive = [...log];
-    withLive.splice(radio + 2, 0, { lap: 53, at: 52, kind: 'mode', key: 'battle', value: 'defend' });
+    withLive.splice(radio + 2, 0, {
+      lap: 53,
+      at: 52,
+      kind: 'mode',
+      key: 'battle',
+      value: 'defend',
+    });
     const v = verifyRun(abu, abu.race.seed, withLive, SAMPLES);
     expect(v.moments[0]?.chosen).toBe('box-soft');
   });
