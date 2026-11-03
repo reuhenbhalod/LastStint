@@ -36,3 +36,29 @@ A race is ready when it has all of these:
 | R5 | Names, rebuild the race files with their moments | Schema-valid race files; parity and G1 unchanged |
 | R6 | Combos check per race | 0 live/full mismatches; the best play beats the real result |
 | R7 | Tests, docs, screenshots of each race on localhost | All green |
+
+## Tuning and batch 2 (Nov 2-3, 2026, overnight)
+
+**Seeds (`scripts/tune.ts`).** The moments are graded without hindsight, so they don't depend on the daily seed; the seed only sets the race's luck. The tuner tries 80 seeds per race, playing 120 fixed answer paths on each the way the server replays a run (about 2 s a race), and keeps a seed where:
+
+1. **Real way:** answering every call the way the real team did, and boxing on their real laps, gives the real result, with the rival within a place of theirs (no luck taking them out).
+2. **Good play wins:** taking the best-graded option at every call, and boxing when the grader's sensible plan says to, finishes ahead of the rival (the game's goal in a beat race and a defend race alike).
+3. **Careless play mostly loses:** random answers (boxing only when the two-compound warning shows) win 3-35% of the time, closest to 15%.
+
+Every simulated player uses the BOX button between calls like a real one. The old combos fairness numbers didn't: a path that skipped a stop call was disqualified, which is why Bahrain 2022 looked unwinnable (best P6).
+
+The current seed is kept when it passes. Abu Dhabi 2021 is not tuned: on its seed the real way loses and good play wins, but random play wins only about 1%, so it stays the hardest race.
+
+**Results.** All 18 tuned races pass: real way = real result, good play wins, random play wins 3-18%. Seeds changed on 17 (Hungary 2019's already passed); `build.py` holds the same seeds.
+
+**Revived.** Bahrain 2022 (LEC holds P1 from SAI). Portugal 2020 as a defend race (BOT holds P2 from VER), taking over on lap 26 instead of 37 for more calls (G1 0.42 s). Japan 2023 fails G1 as a NOR vs PIA defend race and stays out.
+
+**Batch 2.**
+- *Existing races:* the 18 built races without calls were re-checked. None passes G1 with its automatic duel. As defend races, France 2021 (HAM from PER) and Austria 2019 (LEC from BOT) pass and are in. Brazil 2021, Hungary 2022 and 70th Anniversary 2020 still fail.
+- *New races:* 12 new ones were downloaded from FastF1. Kept: Italy 2019 (BOT vs LEC), USA 2022 (HAM vs VER), Mexico 2024 (NOR vs SAI), Abu Dhabi 2024 (SAI vs NOR, taking over on lap 10).
+- *Dropped:*
+  - Britain 2019, Spain 2019, Qatar 2021, Spain 2024: G1 fails with either duel.
+  - Austria 2022: validation crashes on NaN data.
+  - USA 2024, Netherlands 2024, Netherlands 2021: too few calls, and an earlier takeover fails G1 or still leaves too few.
+
+**Not yet scheduled.** No production database writes were made. Scheduling these as dailies waits for the owner's OK (D4).
