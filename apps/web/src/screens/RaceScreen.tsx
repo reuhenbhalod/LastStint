@@ -1,6 +1,6 @@
 // The race view (feedback round 2 layout): the standings on the left; in the middle the
-// scoreboard and the circuit, with your calls under it (the big decision as a wide strip, a
-// driver's question, a quick call) and BOX and the race controls below; on the right the
+// scoreboard and the circuit, with your calls under it (the big decision as a wide strip, or
+// a quick call) and BOX and the race controls below; on the right the
 // stats (your driver, the car, the radio). The headset and the gap trace open from buttons on
 // the map. On a phone it stacks, and the decision card rises as a bottom sheet. When the race
 // stops for a call, a radio banner drops over the map (and chirps, if sound is on). Tap any
@@ -17,7 +17,6 @@ import { DriverProfile } from '../components/DriverProfile.js';
 import { GapTrace } from '../components/GapTrace.js';
 import { HeadsetPanel } from '../components/HeadsetPanel.js';
 import { PitCard } from '../components/PitCard.js';
-import { QuestionCard } from '../components/QuestionCard.js';
 import { QuickCallCard } from '../components/QuickCallCard.js';
 import { RadioAlert } from '../components/RadioAlert.js';
 import { RadioLog } from '../components/RadioLog.js';
@@ -389,7 +388,7 @@ export function RaceScreen({
 
           {panel && <div className="card md:hidden">{panelBody}</div>}
 
-          {/* Your calls, under the map: the big decision, a driver's question, a quick call. */}
+          {/* Your calls, under the map: the big decision, or a quick call. */}
           {paused && state.currentMoment ? (
             <div
               ref={callRef}
@@ -403,13 +402,6 @@ export function RaceScreen({
                 onChoose={game.choose}
               />
             </div>
-          ) : state.question && state.phase === 'racing' ? (
-            <QuestionCard
-              from={userSide}
-              text={state.question.text}
-              onConfirm={() => game.confirm(true)}
-              onDrop={() => game.confirm(false)}
-            />
           ) : quick && state.phase === 'racing' ? (
             <QuickCallCard
               key={quick.lap}

@@ -54,7 +54,7 @@ function steps(team: string, user: string, rival: string, realPos: number, laps:
       title: 'Quick calls and your controls',
       body: [
         'Between the big calls the radio asks quick questions. Answer before the timer runs out.',
-        `BOX (under the map) and the headset (on the map: pace and battle) are always yours. ${user} may ask “are you sure?”, or say no.`,
+        'BOX (under the map) and the headset (on the map: pace, battle, ERS, fuel) are always yours. Drivers don’t always listen: each one ignores a share of calls, from their real team-radio history.',
       ],
     },
     {

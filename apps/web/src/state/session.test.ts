@@ -157,7 +157,6 @@ describe('GameSession', () => {
     session.start();
     let refused = 0;
     let accepted = 0;
-    let questioned = 0;
     for (let i = 0; i < 300 && session.state.phase !== 'finished'; i++) {
       if (session.state.phase === 'decision') answer(session);
       else {
@@ -176,13 +175,6 @@ describe('GameSession', () => {
         } else if (said.refused) {
           refused++;
           expect(session.state.decisions).toHaveLength(before);
-        } else if (session.state.question) {
-          // HAM asks first: confirm every other one, drop the rest.
-          questioned++;
-          expect(session.state.decisions).toHaveLength(before);
-          session.confirm(questioned % 2 === 1);
-          expect(session.state.question).toBeNull();
-          expect(session.state.decisions).toHaveLength(before + (questioned % 2));
         } else {
           accepted++;
           expect(session.state.decisions).toHaveLength(before + 1);
@@ -193,7 +185,7 @@ describe('GameSession', () => {
         session.tick();
       }
     }
-    expect(refused + questioned).toBeGreaterThan(0);
+    expect(refused).toBeGreaterThan(0);
     expect(accepted).toBeGreaterThan(refused);
   });
 });

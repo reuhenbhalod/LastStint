@@ -1,20 +1,19 @@
 import type { CarState } from '@boxthislap/sim';
 import { describe, expect, it } from 'vitest';
-import { attitudeOf } from '../data/drivers.js';
-import { type LiveCall, QUESTION, REFUSE, respond, roll } from './refusal.js';
+import { ignoreRate } from '../data/drivers.js';
+import { type LiveCall, refusal, roll } from './refusal.js';
 
 const car = (tyreAge: number) => ({ tyreAge }) as CarState;
 const box: LiveCall = { lap: 40, kind: 'pit', compound: 'SOFT' };
-const hold: LiveCall = { lap: 40, kind: 'mode', key: 'battle', value: 'hold' };
 
-function rates(call: LiveCall, age: number, attitude: Parameters<typeof respond>[4]) {
-  const n = 4000;
-  const count = { ok: 0, refuse: 0, question: 0 };
-  for (let seed = 0; seed < n; seed++) count[respond(seed, 40, call, car(age), attitude).kind]++;
-  return { ok: count.ok / n, refuse: count.refuse / n, question: count.question / n };
+/** Share of 4000 seeds on which the call is refused. */
+function refused(ignores: number, age = 20, call = box): number {
+  let n = 0;
+  for (let seed = 0; seed < 4000; seed++) if (refusal(seed, 40, call, car(age), ignores)) n++;
+  return n / 4000;
 }
 
-describe('driver answers', () => {
+describe('driver refusals', () => {
   it('rolls in [0, 1) and is deterministic', () => {
     expect(roll('a')).toBe(roll('a'));
     expect(roll('a')).not.toBe(roll('b'));
@@ -26,44 +25,25 @@ describe('driver answers', () => {
 
   it('gives the same answer to the same call on the same lap', () => {
     for (let lap = 34; lap < 58; lap++) {
-      expect(respond(64, lap, box, car(20), 'questions')).toEqual(
-        respond(64, lap, box, car(20), 'questions'),
-      );
+      expect(refusal(64, lap, box, car(20), 0.15)).toBe(refusal(64, lap, box, car(20), 0.15));
     }
   });
 
-  it('an always-listens driver does every call', () => {
-    expect(rates(box, 2, 'always').ok).toBe(1);
-  });
-
-  it('a sometimes-listens driver refuses about one in four, more with a reason', () => {
-    const r = rates(box, 20, 'sometimes');
-    expect(r.refuse).toBeGreaterThan(REFUSE.sometimes[0] - 0.03);
-    expect(r.refuse).toBeLessThan(REFUSE.sometimes[0] + 0.03);
-    expect(r.question).toBe(0);
-    expect(rates(box, 2, 'sometimes').refuse).toBeGreaterThan(0.45);
-  });
-
-  it('a questions driver mostly asks rather than refuses', () => {
-    const r = rates(box, 20, 'questions');
-    expect(r.refuse).toBeLessThan(REFUSE.questions[0] + 0.02);
-    expect(r.question).toBeGreaterThan(QUESTION[0] - 0.03);
-    expect(r.question).toBeLessThan(QUESTION[0] + 0.03);
-    expect(rates(box, 2, 'questions').question).toBeGreaterThan(0.55);
-    // Routine calls aren't questioned.
-    expect(rates(hold, 20, 'questions').question).toBe(0);
+  it("refuses at the driver's researched rate, and only that", () => {
+    const ham = ignoreRate('HAM');
+    expect(ham).toBe(0.15);
+    expect(refused(ham)).toBeGreaterThan(ham - 0.02);
+    expect(refused(ham)).toBeLessThan(ham + 0.02);
+    // A reason (brand-new tyres) changes what he says, not how often.
+    expect(refused(ham, 2)).toBeCloseTo(refused(ham, 20), 5);
+    expect(refused(ignoreRate('BOT'))).toBeLessThan(0.02);
+    expect(refused(0)).toBe(0);
   });
 
   it('says why when the tyres are new', () => {
-    const seed = Array.from({ length: 200 }, (_, i) => i).find(
-      (s) => respond(s, 40, box, car(2), 'questions').kind === 'question',
+    const seed = Array.from({ length: 400 }, (_, i) => i).find((s) =>
+      refusal(s, 40, box, car(2), 0.15),
     );
-    const r = respond(seed as number, 40, box, car(2), 'questions');
-    expect(r.kind === 'question' && r.text).toMatch(/brand new/);
-  });
-
-  it('HAM listens with questions', () => {
-    expect(attitudeOf('HAM')).toBe('questions');
-    expect(attitudeOf('BOT')).toBe('always');
+    expect(refusal(seed as number, 40, box, car(2), 0.15)).toMatch(/brand new/);
   });
 });

@@ -1,16 +1,11 @@
-// Your driver, on the left of the race screen: who they are, how they take the wall's calls
-// (their attitude, data/drivers.ts), and where they stand: place, tyres, stops, headset modes.
+// Your driver, in the stats column: who they are, how they take the wall's calls (attitude
+// tier, how often they ignore a call and a real radio moment behind it, data/drivers.json),
+// and where they stand: place, tyres, stops, headset modes.
 
 import type { RaceModel, RaceState } from '@boxthislap/sim';
-import { ATTITUDE_LABEL, attitudeOf, driverInfo } from '../data/drivers.js';
+import { TIER_LABEL, driverInfo } from '../data/drivers.js';
 import type { LapEvents } from '../game/raceLog.js';
 import { TyreBadge } from './TyreBadge.js';
-
-const ATTITUDE_NOTE = {
-  always: 'Does every call you make.',
-  questions: 'Asks “are you sure?” on some calls. Confirm or drop them. Rarely says no.',
-  sometimes: 'Refuses about one call in four.',
-} as const;
 
 export function DriverProfile({
   code,
@@ -25,7 +20,6 @@ export function DriverProfile({
 }) {
   const car = race.cars[code];
   const info = driverInfo(code);
-  const attitude = attitudeOf(code);
   const pos = race.order.indexOf(code) + 1;
   const stops = log.flatMap((l) => l.pits.filter((p) => p.code === code));
   const realPos = model.realResult.indexOf(code) + 1;
@@ -42,13 +36,30 @@ export function DriverProfile({
           </span>
         </span>
       </header>
-      <div className="rounded-lg bg-[var(--card-2)] px-3 py-2">
-        <span className="eyebrow">On the radio</span>
-        <p className="m-0 text-[14px] font-semibold">{ATTITUDE_LABEL[attitude]}</p>
-        <p className="m-0 text-[12px] leading-snug text-[var(--muted)]">
-          {ATTITUDE_NOTE[attitude]}
-        </p>
-      </div>
+      {info && (
+        <div className="rounded-lg bg-[var(--card-2)] px-3 py-2">
+          <div className="flex items-baseline justify-between gap-2">
+            <span className="eyebrow">On the radio</span>
+            <span className="text-[13px] font-semibold">{TIER_LABEL[info.tier]}</span>
+          </div>
+          <p className="m-0 text-[13px] leading-snug">
+            Ignores <span className="font-semibold">{info.ignores}%</span> of your live calls
+          </p>
+          {info.evidence[0] && (
+            <p className="m-0 text-[12px] leading-snug text-[var(--muted)]">
+              Real radio:{' '}
+              <a
+                href={info.evidence[0].source}
+                target="_blank"
+                rel="noreferrer"
+                className="underline hover:text-[var(--ink)]"
+              >
+                {info.evidence[0].note}
+              </a>
+            </p>
+          )}
+        </div>
+      )}
       <dl className="m-0 grid grid-cols-3 gap-2 text-center">
         <div>
           <dt className="eyebrow">Place</dt>
