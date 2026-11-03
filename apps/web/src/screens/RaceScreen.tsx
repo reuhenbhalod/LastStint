@@ -1,25 +1,24 @@
-// The race view (feedback round 2 layout): the standings on the left; in the middle the
-// scoreboard and the circuit, with your calls under it (the big decision as a wide strip, or
-// a quick call) and BOX and the race controls below; on the right the
-// stats (your driver, the car, the radio). The headset and the gap trace open from buttons on
-// the map. On a phone it stacks, and the decision card rises as a bottom sheet. When the race
-// stops for a call, a radio banner drops over the map (and chirps, if sound is on). Tap any
-// car, on the map or in the standings, for its card; a stop by your car or the rival is
-// called out while it drives the pit lane.
+// The race view: the standings on the left; in the middle the scoreboard and the circuit,
+// with your calls under it (the big decision as a wide strip, or a quick call) and the team
+// radio below (every order the wall can give: box, headset, team orders); on the right the
+// stats (your driver, the car, the radio log). Speed, sound and restart sit in the header; the
+// gap trace opens from a button on the map. On a phone it stacks, and the decision card
+// rises as a bottom sheet. When the race stops for a call, a radio banner drops over the map
+// (and chirps, if sound is on). Tap any car, on the map or in the standings, for its card; a
+// stop by your car or the rival is called out while it drives the pit lane.
 
 import type { Modes, RaceModel } from '@boxthislap/sim';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { BoxButton } from '../components/BoxButton.js';
 import { CarStats } from '../components/CarStats.js';
 import { DecisionPanel } from '../components/DecisionPanel.js';
 import { DriverCard } from '../components/DriverCard.js';
 import { DriverProfile } from '../components/DriverProfile.js';
 import { GapTrace } from '../components/GapTrace.js';
-import { HeadsetPanel } from '../components/HeadsetPanel.js';
 import { PitCard } from '../components/PitCard.js';
 import { QuickCallCard } from '../components/QuickCallCard.js';
 import { RadioAlert } from '../components/RadioAlert.js';
 import { RadioLog } from '../components/RadioLog.js';
+import { TeamRadio } from '../components/TeamRadio.js';
 import { TimingTower } from '../components/TimingTower.js';
 import { TrackMap } from '../components/TrackMap.js';
 import { TyreBadge } from '../components/TyreBadge.js';
@@ -57,9 +56,9 @@ export function RaceScreen({
   const outline = outlineFor(model.race.id);
   const [selected, setSelected] = useState<string | null>(null);
   const [sound, setSound] = useState(soundOn);
-  // The map's pop-overs: the headset or the gap trace (one at a time).
-  const [panel, setPanel] = useState<'headset' | 'gap' | null>(null);
-  const toggle = (p: 'headset' | 'gap') => setPanel((c) => (c === p ? null : p));
+  // The map's pop-over: the gap trace.
+  const [panel, setPanel] = useState<'gap' | null>(null);
+  const toggle = (p: 'gap') => setPanel((c) => (c === p ? null : p));
   const log = useRaceLog(state.race);
   const team = model.drivers.find((d) => d.code === userSide)?.team;
   const flag = FLAG[state.race.flag];
@@ -171,22 +170,6 @@ export function RaceScreen({
           <p className="m-0 text-[13px] text-[var(--muted)]">The trace builds as laps go by.</p>
         )}
       </section>
-    ) : panel === 'headset' ? (
-      <section aria-label="Headset" className="flex flex-col gap-2">
-        <span className="eyebrow">Headset · from next lap</span>
-        {me && (
-          <HeadsetPanel
-            modes={me.modes}
-            battery={me.battery}
-            pending={pending}
-            describe={(key, value) => modeLine(model, key, value)}
-            disabled={state.phase !== 'racing'}
-            onFlip={(key, value) =>
-              game.call({ lap: state.race.lap + 1, kind: 'mode', key, value })
-            }
-          />
-        )}
-      </section>
     ) : null;
 
   const mapButton = (on: boolean) =>
@@ -211,13 +194,55 @@ export function RaceScreen({
               className="shrink-0 rounded-full bg-[var(--flag)] px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-[#141716]"
               title={state.meta.practiceReason ?? 'Practice run'}
             >
-              Practice · not saved
+              Practice<span className="hidden sm:inline"> · not saved</span>
             </span>
           )}
-          <span className="eyebrow hidden min-w-0 truncate sm:inline">
+          <span className="eyebrow hidden min-w-0 truncate 2xl:inline">
             {number ? `Daily #${number}` : (state.meta.practiceReason ?? 'Practice')} ·{' '}
             {model.race.name ?? model.race.id}
           </span>
+          <div className="flex items-center gap-1.5">
+            {([1, 2] as const).map((s) => (
+              <button
+                key={s}
+                type="button"
+                aria-pressed={state.speed === s}
+                onClick={() => game.setSpeed(s)}
+                className={`h-8 rounded-md border px-2.5 text-[12px] font-semibold ${
+                  state.speed === s
+                    ? 'border-[var(--ink)] bg-[var(--ink)] text-[var(--paper)]'
+                    : 'border-[var(--rule)] text-[var(--muted)] hover:text-[var(--ink)]'
+                }`}
+              >
+                {s}×
+              </button>
+            ))}
+            <button
+              type="button"
+              aria-pressed={sound}
+              aria-label={sound ? 'Radio sound on' : 'Radio sound off'}
+              title="Radio chirp at decisions"
+              onClick={() => {
+                setSoundOn(!sound);
+                setSound(!sound);
+                if (!sound) radioChirp();
+              }}
+              className="h-8 rounded-md border border-[var(--rule)] px-3 text-[14px]"
+            >
+              {sound ? '🔊' : '🔇'}
+            </button>
+            {source !== 'live' && (
+              <button
+                type="button"
+                onClick={game.reset}
+                aria-label="Restart the race"
+                title="Restart the race"
+                className="h-8 rounded-md border border-[var(--rule)] px-3 text-[14px] text-[var(--muted)] hover:text-[var(--ink)]"
+              >
+                ↺
+              </button>
+            )}
+          </div>
         </span>
       </header>
 
@@ -372,16 +397,6 @@ export function RaceScreen({
                 >
                   Gap {gap === null ? '' : `${gap >= 0 ? '+' : '−'}${Math.abs(gap).toFixed(1)}`}
                 </button>
-                <button
-                  type="button"
-                  aria-pressed={panel === 'headset'}
-                  aria-label="Headset"
-                  title="Headset: pace, battle, ERS and fuel"
-                  onClick={() => toggle('headset')}
-                  className={mapButton(panel === 'headset')}
-                >
-                  🎧 Headset
-                </button>
               </div>
             </div>
           </div>
@@ -412,59 +427,20 @@ export function RaceScreen({
             />
           ) : null}
 
-          {/* Controls (BOX, speed, sound): hidden while a big call waits. */}
-          <div className={`card flex-wrap items-center gap-2 ${paused ? 'hidden' : 'flex'}`}>
-            <div className="min-w-[200px] flex-1">
-              <BoxButton
-                compounds={Object.keys(model.compounds)}
-                booked={boxing}
-                disabled={state.phase !== 'racing'}
-                onBox={(compound) => game.call({ lap: state.race.lap + 1, kind: 'pit', compound })}
-              />
-            </div>
-            <div className="flex items-center gap-1.5">
-              {([1, 2] as const).map((s) => (
-                <button
-                  key={s}
-                  type="button"
-                  aria-pressed={state.speed === s}
-                  onClick={() => game.setSpeed(s)}
-                  className={`h-10 rounded-md border px-3 text-[13px] font-semibold ${
-                    state.speed === s
-                      ? 'border-[var(--ink)] bg-[var(--ink)] text-[var(--paper)]'
-                      : 'border-[var(--rule)] text-[var(--muted)] hover:text-[var(--ink)]'
-                  }`}
-                >
-                  {s}×
-                </button>
-              ))}
-              <button
-                type="button"
-                aria-pressed={sound}
-                aria-label={sound ? 'Radio sound on' : 'Radio sound off'}
-                title="Radio chirp at decisions"
-                onClick={() => {
-                  setSoundOn(!sound);
-                  setSound(!sound);
-                  if (!sound) radioChirp();
-                }}
-                className="h-10 rounded-md border border-[var(--rule)] px-3 text-[14px]"
-              >
-                {sound ? '🔊' : '🔇'}
-              </button>
-              {source !== 'live' && (
-                <button
-                  type="button"
-                  onClick={game.reset}
-                  aria-label="Restart the race"
-                  title="Restart the race"
-                  className="h-10 rounded-md border border-[var(--rule)] px-3 text-[14px] text-[var(--muted)] hover:text-[var(--ink)]"
-                >
-                  ↺
-                </button>
-              )}
-            </div>
-          </div>
+          {/* Team radio: every order, any time (hidden while a big call waits). */}
+          {!paused && (
+            <TeamRadio
+              race={state.race}
+              model={model}
+              userSide={userSide}
+              rival={rival}
+              pending={pending}
+              boxing={boxing}
+              disabled={state.phase !== 'racing'}
+              describe={(key, value) => modeLine(model, key, value)}
+              onCall={(call) => game.call(call)}
+            />
+          )}
         </section>
 
         {/* Stats: your driver, the car, the radio. */}

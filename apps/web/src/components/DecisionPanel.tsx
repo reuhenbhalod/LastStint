@@ -251,47 +251,61 @@ export function DecisionPanel({
                   ref={i === 0 ? first : undefined}
                   type="button"
                   onClick={() => onChoose(t.option.id)}
-                  className="relative grid grid-cols-[auto_1fr_auto] items-start gap-x-3 gap-y-1 rounded-lg border-2 border-transparent bg-[var(--card-2)] p-2.5 text-left hover:border-[var(--you)] focus-visible:border-[var(--you)] focus-visible:outline-none"
+                  className="relative flex flex-col gap-2.5 rounded-lg border-2 border-transparent bg-[var(--card-2)] p-3 text-left hover:border-[var(--you)] focus-visible:border-[var(--you)] focus-visible:outline-none"
                   aria-label={tyreName(t.compound)}
                 >
-                  <span
-                    className={`tyre ${t.compound} mt-0.5 !h-8 !w-8 !border-[4px] bg-[var(--tarmac)] !text-[12px]`}
-                  >
-                    {LETTER[t.compound] ?? t.compound[0]}
-                  </span>
-                  <span className="min-w-0">
-                    <span className="disp block text-[16px] leading-none">
+                  {/* Head: the tyre, its name, and what it gains. */}
+                  <span className="flex items-center gap-2.5">
+                    <span
+                      className={`tyre ${t.compound} !h-8 !w-8 !border-[4px] bg-[var(--tarmac)] !text-[12px]`}
+                    >
+                      {LETTER[t.compound] ?? t.compound[0]}
+                    </span>
+                    <span className="disp flex-1 text-[17px] leading-none">
                       <span aria-hidden="true" className="mono mr-1.5 text-[10px] opacity-60">
                         {i + 1}
                       </span>
                       {tyreName(t.compound)}
                     </span>
-                    {o && (
-                      <span className="mt-1 block text-[12px] leading-snug text-[var(--muted)]">
-                        {o.newPace < 0.005
-                          ? 'Fastest when new'
-                          : `+${o.newPace.toFixed(2)} s a lap vs softs`}{' '}
-                        · drops off after ~{o.dropOff} laps ·{' '}
-                        <span className={o.toFlag ? 'text-[var(--you)]' : 'text-[var(--box)]'}>
-                          {o.toFlag ? 'lasts to the flag' : `won’t last ${b.lapsLeft} laps`}
+                    {o?.gain != null && (
+                      <span className="ml-auto text-right">
+                        <span className="eyebrow block">Gain</span>
+                        <span className="mono block text-[17px] font-semibold leading-tight">
+                          {o.gain >= 0 ? '+' : '−'}
+                          {Math.abs(o.gain).toFixed(1)}s
                         </span>
                       </span>
                     )}
-                    {o && (
-                      <span className="mt-1 block text-[12px] leading-snug">
-                        <span className="text-[var(--you)]">Good:</span> {o.good}{' '}
-                        <span className="text-[var(--box)]">Bad:</span> {o.bad}
-                      </span>
-                    )}
                   </span>
-                  {o?.gain != null && (
-                    <span className="text-right">
-                      <span className="eyebrow block">Gain</span>
-                      <span className="mono block text-[16px] font-semibold">
-                        {o.gain >= 0 ? '+' : '−'}
-                        {Math.abs(o.gain).toFixed(1)}s
+                  {o && (
+                    <>
+                      {/* The facts, as chips. */}
+                      <span className="flex flex-wrap gap-1.5 text-[12px]">
+                        <span className="rounded bg-[var(--card)] px-1.5 py-0.5">
+                          {o.newPace < 0.005
+                            ? 'Fastest when new'
+                            : `+${o.newPace.toFixed(2)}s/lap vs softs`}
+                        </span>
+                        <span className="rounded bg-[var(--card)] px-1.5 py-0.5">
+                          Drops off ~{o.dropOff} laps
+                        </span>
+                        <span
+                          className={`rounded bg-[var(--card)] px-1.5 py-0.5 ${o.toFlag ? 'text-[var(--you)]' : 'text-[var(--box)]'}`}
+                        >
+                          {o.toFlag ? 'Lasts to the flag' : `Won’t last ${b.lapsLeft} laps`}
+                        </span>
                       </span>
-                    </span>
+                      <span className="flex flex-col gap-1 text-[12.5px] leading-snug">
+                        <span>
+                          <span className="font-semibold text-[var(--you)]">Good </span>
+                          {o.good}
+                        </span>
+                        <span className="text-[var(--muted)]">
+                          <span className="font-semibold text-[var(--box)]">Bad </span>
+                          {o.bad}
+                        </span>
+                      </span>
+                    </>
                   )}
                 </button>
               );

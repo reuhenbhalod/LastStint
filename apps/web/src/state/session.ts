@@ -59,6 +59,14 @@ function momentAt(
   return moments.find((m) => m.lap === lap + 1 && !resolved.includes(m.id)) ?? null;
 }
 
+/** The engineer's radio for each team order (to the team-mate, or to your driver). */
+const ORDER_COPY: Record<Extract<Decision, { kind: 'teamOrder' }>['order'], string> = {
+  holdUp: 'Team-mate told: hold him up when he gets to you.',
+  release: 'Team-mate released: race your own race.',
+  teammateLetsYouPast: 'Team-mate told to let you through.',
+  letTeammatePast: 'Let your team-mate through, please.',
+};
+
 export class GameSession {
   private readonly engine: GameEngine;
   private readonly daily: Daily;
@@ -229,6 +237,8 @@ export class GameSession {
     }
     this.engine.apply(decision);
     this.dispatch({ type: 'CALL', race: this.engine.state, decisions: this.engine.decisions });
+    if (decision.kind === 'teamOrder')
+      this.say('Engineer', ORDER_COPY[decision.order], false, decision.lap);
   }
 
   private say(from: string, text: string, refused: boolean, lap: number): void {
