@@ -121,8 +121,31 @@ export function RaceScreen({
     setQuick(null);
   }, [game]);
 
+  // A phone-sized screen (cards open under the map, not on it).
+  const [narrow, setNarrow] = useState(
+    () => typeof matchMedia !== 'undefined' && matchMedia('(max-width: 767px)').matches,
+  );
+  useEffect(() => {
+    if (typeof matchMedia === 'undefined') return;
+    const q = matchMedia('(max-width: 767px)');
+    const on = () => setNarrow(q.matches);
+    q.addEventListener('change', on);
+    return () => q.removeEventListener('change', on);
+  }, []);
+
   const select = useCallback((code: string) => setSelected((c) => (c === code ? null : code)), []);
   const close = useCallback(() => setSelected(null), []);
+  const driverCard = selected ? (
+    <DriverCard
+      code={selected}
+      race={state.race}
+      model={model}
+      log={log}
+      userSide={userSide}
+      rival={rival}
+      onClose={close}
+    />
+  ) : null;
 
   const momentIdFor = paused ? state.currentMoment?.id : undefined;
   // A big call scrolls into view under the map (on a laptop it can sit below the fold).
@@ -358,19 +381,11 @@ export function RaceScreen({
                   />
                 </div>
               )}
-              {selected && (
+              {selected && !narrow && (
                 <div
                   className={`absolute bottom-12 z-10 ${corner === 'left' ? 'left-2.5' : 'right-2.5'}`}
                 >
-                  <DriverCard
-                    code={selected}
-                    race={state.race}
-                    model={model}
-                    log={log}
-                    userSide={userSide}
-                    rival={rival}
-                    onClose={close}
-                  />
+                  {driverCard}
                 </div>
               )}
               {/* The map's pop-overs (under the map on a phone). */}
@@ -419,6 +434,8 @@ export function RaceScreen({
           </div>
 
           {panel && <div className="card md:hidden">{panelBody}</div>}
+          {/* On a phone the map is too small to hold a car's card: it opens under it. */}
+          {selected && narrow && driverCard}
 
           {/* Your calls, under the map: the big decision, or a quick call. */}
           {paused && state.currentMoment ? (
