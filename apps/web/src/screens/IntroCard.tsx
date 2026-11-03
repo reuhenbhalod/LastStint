@@ -216,7 +216,17 @@ export function IntroCard({
             <span className="disp wide text-[20px] leading-none">Pit Wall</span>
             <span className="eyebrow hidden sm:inline">Daily F1 strategy</span>
           </a>
-          {account && <AccountBar account={account} compact />}
+          <span className="flex flex-wrap items-center gap-2">
+            {source !== 'survivor' && (
+              <a
+                href="/survivor"
+                className="rounded-full border border-[var(--box)] px-3 py-1 text-[13px] font-semibold text-[var(--ink)] hover:bg-[color-mix(in_srgb,var(--box)_14%,transparent)]"
+              >
+                Survivor
+              </a>
+            )}
+            {account && <AccountBar account={account} compact />}
+          </span>
         </div>
       </header>
 
@@ -298,14 +308,6 @@ export function IntroCard({
                     →
                   </span>
                 </button>
-                {source !== 'survivor' && (
-                  <a
-                    href="/survivor"
-                    className="flex items-center justify-center gap-2 rounded-xl border-2 border-[var(--box)] px-6 py-[14px] text-[16px] font-bold text-[var(--ink)] hover:bg-[color-mix(in_srgb,var(--box)_14%,transparent)]"
-                  >
-                    Survivor mode
-                  </a>
-                )}
                 <span className="flex gap-4 text-[13px] text-[var(--muted)]">
                   <button
                     type="button"
