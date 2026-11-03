@@ -194,7 +194,7 @@ label:has(input) {
   }
 }
 .battle-flash > * {
-  animation: battle-pop 3s ease-out forwards;
+  animation: battle-pop 4s ease-out forwards;
 }
 /* One card style for the call column (crew-chief spec D4). In the components layer, so
    utilities (a highlight border) still win. */

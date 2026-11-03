@@ -17,7 +17,7 @@ import { clearRun, loadRun, saveRun } from '../state/storage.js';
 // The track map runs the field one lap round per tick, so this is also how fast the dots move.
 export const LAP_MS: Record<Speed, number> = { 1: 10000, 2: 5000 };
 /** A battle call slows the lap by this much (race engineer spec D7). */
-export const SLOW_MOTION = 2;
+export const SLOW_MOTION = 3;
 
 /** The lap tick in progress: when it started (performance.now()) and how long it lasts. The
  * track map animates from this, so the dots and the lap clock never drift apart. */

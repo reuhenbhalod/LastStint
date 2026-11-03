@@ -57,6 +57,16 @@ export function QuickCallCard({
         {call.from !== 'Engineer' && <span className="mr-1 text-[var(--muted)]">{call.from}:</span>}
         {call.text}
       </p>
+      {call.stats && (
+        <dl className="m-0 flex flex-wrap gap-x-4 gap-y-1 text-[12px]">
+          {call.stats.map((s) => (
+            <div key={s.label} className="flex items-baseline gap-1.5">
+              <dt className="eyebrow">{s.label}</dt>
+              <dd className="m-0 font-semibold">{s.value}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
       <div className="h-1 overflow-hidden rounded-full bg-[var(--card-2)]">
         <div
           className="quick-timer h-full"

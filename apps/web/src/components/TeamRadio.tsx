@@ -40,8 +40,8 @@ export function TeamRadio({
   rival: string;
   /** Mode calls booked for the coming lap. */
   pending: Partial<Modes>;
-  /** The compound of a stop booked for the end of this lap, if any. */
-  boxing: string | null;
+  /** A stop under way: its tyres, and when ("at the end of this lap", "in the pits"...). */
+  boxing: { compound: string; when: string } | null;
   disabled: boolean;
   describe: (key: keyof Modes, value: string) => string | null;
   onCall: (call: Call) => void;
@@ -72,7 +72,7 @@ export function TeamRadio({
         <span className="ml-auto flex flex-wrap items-center gap-1.5 text-[12px] capitalize">
           {boxing && (
             <span className="rounded bg-[var(--box)] px-1.5 py-0.5 font-semibold text-white">
-              Boxing · {tyreName(boxing)}
+              Boxing · {tyreName(boxing.compound)}
             </span>
           )}
           <span className="rounded bg-[var(--card-2)] px-1.5 py-0.5">Pace {me.modes.pace}</span>
@@ -86,13 +86,13 @@ export function TeamRadio({
       {open && (
         <div className="grid gap-2.5 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.3fr)]">
           <div className="flex min-w-0 flex-col gap-2.5">
-            <Section title="Pit stop · box this lap">
+            <Section title="Pit stop · box">
               {boxing ? (
                 <output className="flex items-center justify-center gap-2 rounded-lg border-2 border-dashed border-[var(--box)] py-2.5 text-[14px] font-bold">
-                  <span className={`tyre ${boxing} bg-[var(--tarmac)]`}>
-                    {LETTER[boxing] ?? boxing[0]}
+                  <span className={`tyre ${boxing.compound} bg-[var(--tarmac)]`}>
+                    {LETTER[boxing.compound] ?? boxing.compound[0]}
                   </span>
-                  Boxing this lap · {tyreName(boxing)}
+                  {tyreName(boxing.compound)} · {boxing.when}
                 </output>
               ) : (
                 <div className="grid grid-cols-3 gap-2">

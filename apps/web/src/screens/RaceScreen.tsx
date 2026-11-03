@@ -7,7 +7,7 @@
 // (and chirps, if sound is on). Tap any car, on the map or in the standings, for its card; a
 // stop by your car or the rival is called out while it drives the pit lane.
 
-import { type Modes, type RaceModel, engineerConfig } from '@boxthislap/sim';
+import { type Decision, type Modes, type RaceModel, engineerConfig } from '@boxthislap/sim';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CarStats } from '../components/CarStats.js';
 import { DecisionPanel } from '../components/DecisionPanel.js';
@@ -28,10 +28,10 @@ import { modeLine } from '../game/guide.js';
 import { type QuickCall, quickCallLaps } from '../game/quickCalls.js';
 import { useRaceLog } from '../game/raceLog.js';
 import { radioChirp, setSoundOn, soundOn } from '../game/sound.js';
-import { type Game, LAP_MS } from '../game/useGame.js';
+import { type Game, LAP_MS, SLOW_MOTION } from '../game/useGame.js';
 import type { GameState } from '../state/machine.js';
 import { overtakingCorners } from '../track/corners.js';
-import { quietCorner } from '../track/geometry.js';
+import { carsOnTrack, pitEntryAt, pitLane, polyline, quietCorner } from '../track/geometry.js';
 import { outlineFor } from '../track/outlines.js';
 
 const FLAG = {
@@ -105,7 +105,12 @@ export function RaceScreen({
   const asked = useRef(new Set<number>());
   const [quick, setQuick] = useState<QuickCall | null>(null);
   // The battle this lap (from its call until the lap is run), and its result on the map.
-  const [fight, setFight] = useState<{ other: string; corner: number } | null>(null);
+  const [fight, setFight] = useState<{
+    other: string;
+    corner: number;
+    attacking: boolean;
+    gap: number;
+  } | null>(null);
   const [flash, setFlash] = useState<{ text: string; good: boolean; corner: number } | null>(null);
   const raceLap = state.race.lap;
   const { setSlow } = game;
@@ -144,18 +149,26 @@ export function RaceScreen({
       corners,
       memory.current,
       quickLaps.has(raceLap),
+      state.decisions.some((d) => d.kind === 'pit' && d.lap > raceLap),
     );
     if (call) {
       setQuick(call);
       if (call.kind === 'battle') {
         setSlow(true);
-        if (call.other) setFight({ other: call.other, corner: call.corner ?? corner });
+        if (call.other)
+          setFight({
+            other: call.other,
+            corner: call.corner ?? corner,
+            attacking: !!call.attacking,
+            gap: call.gap ?? 0,
+          });
       }
       return;
     }
     // A quiet lap: the engineer's info, every other lap or so.
     const last = memory.current.last.info ?? -99;
-    if (raceLap - last >= 2 && state.race.nextFlag === 'green') {
+    const neutral = state.race.nextFlag !== 'green' || state.race.flag !== 'green';
+    if (raceLap - last >= (neutral ? 1 : 2)) {
       const line = infoLine(state.race, model, log);
       if (line) {
         memory.current.last.info = raceLap;
@@ -165,20 +178,46 @@ export function RaceScreen({
   }, [raceLap, state.phase]);
   useEffect(() => {
     if (!flash) return;
-    const id = setTimeout(() => setFlash(null), 3000);
+    const id = setTimeout(() => setFlash(null), 4000);
     return () => clearTimeout(id);
   }, [flash]);
+  // The lap a BOX call turns in at (pit fix): the end of the lap being shown, if your car can
+  // still reach pit entry on it; otherwise the end of the next one. (Paused, the cars sit at the
+  // line with the entry ahead.)
+  const laneInfo = useMemo(
+    () => (outline ? pitLane(outline, polyline(outline.points)) : null),
+    [outline],
+  );
+  const boxLap = useCallback((): number => {
+    const n = state.race.lap + 1;
+    const clock = game.clock;
+    if (!laneInfo || !clock) return n;
+    const mine = carsOnTrack(state.race, model, state.race.nextFlag ?? 'green').find(
+      (c) => c.code === userSide,
+    );
+    if (!mine) return n;
+    const tIn = pitEntryAt(mine.behind, laneInfo);
+    const progress = (performance.now() - clock.start) / clock.ms;
+    return tIn === null || progress > tIn - 0.03 ? n + 1 : n;
+  }, [laneInfo, game.clock, state.race, model, userSide]);
+  const place = useCallback(
+    <T extends Decision>(call: T): T => ({
+      ...call,
+      lap: call.kind === 'pit' ? boxLap() : state.race.lap + 1,
+    }),
+    [boxLap, state.race.lap],
+  );
   const answerQuick = useCallback(
     (id: string) => {
       const o = quick?.options.find((x) => x.id === id);
-      const next = state.race.lap + 1;
       const asked = quick?.asked ?? true;
-      if (o?.call) game.call({ ...o.call, lap: next }, { asked });
+      if (o?.call) game.call(place(o.call), { asked });
       else game.radio('Copy. No change.');
-      for (const c of o?.also ?? []) game.call({ ...c, lap: next }, { asked: true });
+      for (const c of o?.also ?? []) game.call(place(c), { asked: true });
       setQuick(null);
+      setSlow(false); // answered: back to full speed, the move plays out this lap
     },
-    [quick, game, state.race],
+    [quick, game, place, setSlow],
   );
   const quickTimeout = useCallback(() => {
     if (quick?.driverChoice) {
@@ -187,7 +226,8 @@ export function RaceScreen({
       game.call({ ...quick.driverChoice, lap: state.race.lap + 1 }, { quiet: true });
     } else game.radio('No answer from the wall. Sticking to the plan.');
     setQuick(null);
-  }, [game, quick, state.race, userSide]);
+    setSlow(false);
+  }, [game, quick, state.race, userSide, setSlow]);
 
   // A phone-sized screen (cards open under the map, not on it).
   const [narrow, setNarrow] = useState(
@@ -232,12 +272,27 @@ export function RaceScreen({
   // Calls booked for the coming lap show at once (they act when it's run).
   const next = state.race.lap + 1;
   const pending: Partial<Modes> = {};
-  let boxing: string | null = null;
   for (const d of state.decisions) {
-    if (d.lap !== next) continue;
-    if (d.kind === 'mode') (pending as Record<string, string>)[d.key] = d.value;
-    if (d.kind === 'pit') boxing = d.compound;
+    if (d.lap === next && d.kind === 'mode') (pending as Record<string, string>)[d.key] = d.value;
   }
+  // A stop under way (pit fix). The lap being shown is `next`: a stop called for it turns in at
+  // the end of this lap; one called for the lap after, at the end of the next. Once the race
+  // model has it (from the in-lap on), it's on the car's plan until the out-lap is run.
+  const callPit = state.decisions.find((d) => d.kind === 'pit' && d.lap >= next);
+  const planned = me?.strategy.find((s) => s.lap > state.race.lap);
+  const boxing =
+    callPit?.kind === 'pit'
+      ? {
+          compound: callPit.compound,
+          when: callPit.lap === next ? 'boxing this lap' : 'boxing next lap',
+        }
+      : planned
+        ? {
+            compound: planned.to,
+            when: planned.lap === next ? 'in the pits now' : 'boxing this lap',
+          }
+        : null;
+  const userBoxing = callPit?.kind === 'pit' && callPit.lap === next;
 
   // A stop by your car or the rival on the lap just run, while the next lap animates.
   const latest = log.at(-1);
@@ -368,7 +423,7 @@ export function RaceScreen({
           className="order-1 flex min-w-0 flex-col gap-3 xl:order-2 xl:min-h-0 xl:overflow-y-auto"
         >
           {/* On a laptop the map takes all the height the calls and team radio leave. */}
-          <div className="xl:flex xl:min-h-[220px] xl:flex-1 xl:flex-col">
+          <div className="xl:flex xl:min-h-[380px] xl:flex-1 xl:flex-col">
             <div className="grid grid-cols-[1fr_auto_1fr] items-center rounded-t-xl border border-b-0 border-[var(--rule)] bg-[var(--card)] px-3 py-2">
               <div className="flex items-center gap-2">
                 <span className="h-7 w-1.5 rounded-sm bg-[var(--you)]" />
@@ -412,6 +467,7 @@ export function RaceScreen({
                     finishing={finishMeta}
                     fight={fight}
                     flash={flash}
+                    userBoxing={userBoxing}
                   />
                 ) : (
                   <p className="p-8 text-center text-[var(--muted)]">
@@ -435,6 +491,25 @@ export function RaceScreen({
                     </span>
                     <span className="disp text-[19px] leading-none">
                       Chequered flag · {userSide} P{finishPos}
+                    </span>
+                  </output>
+                )}
+                {fight && !paused && (
+                  <output
+                    className="radio-alert absolute inset-x-2.5 top-12 z-10 mx-auto flex max-w-[460px] items-center gap-2 rounded-xl border-2 px-3 py-2 text-white shadow-2xl"
+                    style={{ borderColor: 'var(--box)', background: 'rgba(20,23,22,0.9)' }}
+                  >
+                    <span aria-hidden="true" className="text-[20px]">
+                      ⚔️
+                    </span>
+                    <span className="text-[14px] font-semibold leading-snug">
+                      {fight.attacking
+                        ? `${userSide} attacks ${fight.other} (${fight.gap.toFixed(1)} s ahead)`
+                        : `${fight.other} attacks ${userSide} (${fight.gap.toFixed(1)} s behind)`}
+                      <span className="block text-[12px] font-normal text-[#cfd6d3]">
+                        The move comes into Turn {fight.corner}, this lap
+                        {quick?.kind === 'battle' ? ' · your call' : ''}
+                      </span>
                     </span>
                   </output>
                 )}
@@ -525,10 +600,11 @@ export function RaceScreen({
             <QuickCallCard
               key={quick.lap}
               call={quick}
-              ms={Math.min(
-                quick.kind === 'battle' ? BATTLE_MS : CALL_MS,
-                LAP_MS[state.speed] * 0.9,
-              )}
+              ms={
+                quick.kind === 'battle'
+                  ? Math.min(BATTLE_MS, LAP_MS[state.speed] * SLOW_MOTION * 0.85)
+                  : Math.min(CALL_MS, LAP_MS[state.speed] * 0.9)
+              }
               onAnswer={answerQuick}
               onTimeout={quickTimeout}
             />
@@ -545,7 +621,7 @@ export function RaceScreen({
               boxing={boxing}
               disabled={state.phase !== 'racing'}
               describe={(key, value) => modeLine(model, key, value)}
-              onCall={(call) => game.call(call)}
+              onCall={(call) => game.call(place(call))}
             />
           )}
         </section>

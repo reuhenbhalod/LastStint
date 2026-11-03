@@ -258,6 +258,16 @@ export class GameSession {
     const side = this.state.meta.userSide;
     const car = this.engine.state.cars[side];
     if (decision.kind !== 'radio' && (!car || car.retired)) return;
+    if (decision.kind === 'pit') {
+      // One stop at a time: none while one is called or under way (pit fix).
+      const lap = this.engine.lap;
+      const called = this.engine.decisions.some((d) => d.kind === 'pit' && d.lap > lap);
+      if (called || car?.strategy.some((s) => s.lap > lap)) return;
+      if (decision.lap >= this.daily.model.race.laps) {
+        this.say('Engineer', 'Too late to box: this is the last lap.', false, decision.lap);
+        return;
+      }
+    }
     // One call of a kind per lap (a mode: one per key).
     const booked = this.engine.decisions.some(
       (d) =>
@@ -279,7 +289,12 @@ export class GameSession {
         options.asked || (decision.kind === 'battle' && decision.driver)
           ? null
           : refusal(this.daily.seed, this.engine.lap, decision, car, rate);
-      if (!options.quiet || no) this.say(side, no ?? acknowledge(decision), !!no, decision.lap);
+      // A stop booked past this lap's pit entry is for the next one: say so.
+      const copy =
+        decision.kind === 'pit' && decision.lap > this.engine.lap + 1
+          ? `Copy, box next lap for ${decision.compound.toLowerCase()}s.`
+          : acknowledge(decision);
+      if (!options.quiet || no) this.say(side, no ?? copy, !!no, decision.lap);
       if (no) {
         // Refusing a battle call, he makes his own move.
         if (decision.kind === 'battle') {

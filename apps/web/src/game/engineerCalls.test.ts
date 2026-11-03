@@ -64,8 +64,8 @@ function play(model: RaceModel, seed: number) {
       const calls = o ? [o.call, ...(o.also ?? [])] : [call.driverChoice];
       for (const c of calls) if (c) engine.apply({ ...c, lap: next });
     } else if (
-      lap - lastInfo >= 2 &&
-      engine.state.nextFlag === 'green' &&
+      lap - lastInfo >=
+        (engine.state.nextFlag !== 'green' || engine.state.flag !== 'green' ? 1 : 2) &&
       infoLine(engine.state, model, events)
     ) {
       lastInfo = lap;

@@ -4,9 +4,12 @@ import { GameEngine } from '../engine/engine.js';
 import {
   carsOnTrack,
   flagOn,
+  inLapPosition,
   lapTime,
   lapsToFlag,
   nearestFraction,
+  outLapPosition,
+  pitEntryAt,
   pitLane,
   pitPosition,
   pointAlong,
@@ -199,6 +202,31 @@ describe('pitPosition', () => {
     const p = pitPosition(0, 0.02, 0.25, lane, 0.4);
     expect(p.lane).not.toBeNull();
     expect(p.lane).toBeGreaterThan(0);
+  });
+});
+
+describe('a stop over two laps (pit fix)', () => {
+  const lane = { entry: 0.95, exit: 0.1 };
+  it('in-lap: drives to pit entry, then down the lane to the garage, and waits there', () => {
+    // 0.3 behind: at pit entry when the leader is at 0.25.
+    expect(pitEntryAt(0.3, lane)).toBeCloseTo(0.25, 9);
+    const before = inLapPosition(0.2, 0.3, lane, 0.4);
+    expect(before?.lane).toBeNull();
+    expect(before?.at).toBeCloseTo(-0.1, 9);
+    expect(inLapPosition(0.26, 0.3, lane, 0.4)?.lane).toBeGreaterThan(0);
+    expect(inLapPosition(0.9, 0.3, lane, 0.4)?.lane).toBeCloseTo(0.4, 6);
+  });
+  it('in-lap: a car already past pit entry stops on the next lap instead', () => {
+    expect(pitEntryAt(0.02, lane)).toBeNull();
+    expect(inLapPosition(0.5, 0.02, lane, 0.4)).toBeNull();
+  });
+  it('out-lap: from the garage to pit exit, then on at the new gap', () => {
+    // New gap 0.5: at pit exit when the leader is at 0.6.
+    expect(outLapPosition(0, 0.5, lane, 0.4, 0.4).lane).toBeCloseTo(0.4, 6);
+    expect(outLapPosition(0.59, 0.5, lane, 0.4, 0.4).lane).toBeGreaterThan(0.9);
+    const out = outLapPosition(0.61, 0.5, lane, 0.4, 0.4);
+    expect(out.lane).toBeNull();
+    expect(out.at).toBeCloseTo(0.11, 6);
   });
 });
 

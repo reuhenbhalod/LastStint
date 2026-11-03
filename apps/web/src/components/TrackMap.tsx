@@ -11,13 +11,18 @@ import { cornerPoint } from '../track/corners.js';
 import { garagesFor, seasonOf } from '../track/garages.js';
 import {
   type PitLane,
+  type PitPosition,
   type Polyline,
   type TrackOutline,
   angleAlong,
   carsOnTrack,
   ease,
   flagOn,
+  inLapEnd,
+  inLapPosition,
+  lapTime,
   nearestFraction,
+  outLapPosition,
   pitLane,
   pitPosition,
   pointAlong,
@@ -317,6 +322,7 @@ export function TrackMap({
   finishing = null,
   fight = null,
   flash = null,
+  userBoxing = false,
 }: {
   outline: TrackOutline;
   race: RaceState;
@@ -336,6 +342,8 @@ export function TrackMap({
   fight?: { other: string; corner: number } | null;
   /** A battle's result, shown at its corner for a moment. */
   flash?: { text: string; good: boolean; corner: number } | null;
+  /** Your car is called in at the end of the lap being shown (a BOX not yet in the race model). */
+  userBoxing?: boolean;
 }) {
   const line = useMemo(() => polyline(outline.points), [outline]);
   const lane = useMemo(() => pitLane(outline, line, TRACK), [outline, line]);
@@ -391,6 +399,46 @@ export function TrackMap({
     to: new Map(),
   });
   const to = new Map(cars.map((c) => [c.code, c.behind]));
+  // Pit stops, drawn on the laps they really happen (pit fix): the lap being shown is the one
+  // after `race.lap`. A car whose stop is charged on the lap after that is on its in-lap: it
+  // turns into the lane at pit entry and waits at its garage. A car whose stop is charged on the
+  // lap being shown is on its out-lap: it leaves the garage and rejoins at pit exit at its new
+  // gap (the stop's expected cost; the next lap's real gap glides in from there).
+  const showing = race.lap + 1;
+  const animate = !finishing && !!lane && !REDUCED;
+  const lapSeconds = lapTime(model, driven);
+  const onInLap = (code: string) =>
+    animate &&
+    !!race.cars[code] &&
+    ((code === userSide && userBoxing) ||
+      !!race.cars[code]?.strategy.some((st) => st.lap === showing + 1));
+  const outStop = (code: string) =>
+    animate ? race.cars[code]?.strategy.find((st) => st.lap === showing) : undefined;
+  const expectedAfter = (code: string, before: number): number => {
+    const stop = outStop(code);
+    if (!stop) return before;
+    const t = model.track;
+    const flagNow = race.nextFlag ?? 'green';
+    let loss =
+      stop.loss ??
+      (flagNow === 'sc' ? t.pitLossUnderSC : flagNow === 'vsc' ? t.pitLossUnderVSC : t.pitLoss);
+    if (code === userSide && (race.engineer?.damage ?? 0) > 0) loss += 3;
+    return before + loss / lapSeconds;
+  };
+  for (const c of cars) if (outStop(c.code)) to.set(c.code, expectedAfter(c.code, c.behind));
+  // Where each in-lap car ends up in the lane, kept for its out-lap on the next tick.
+  const entered = useRef({
+    lap: race.lap,
+    ends: new Map<string, number>(),
+    prev: new Map<string, number>(),
+  });
+  if (entered.current.lap !== race.lap) {
+    entered.current = {
+      lap: race.lap,
+      ends: new Map(),
+      prev: entered.current.lap === race.lap - 1 ? entered.current.ends : new Map(),
+    };
+  }
   const g = glideRef.current;
   if (g.lap !== race.lap) {
     glideRef.current = { lap: race.lap, from: g.to, prev: g.to, to };
@@ -429,17 +477,26 @@ export function TrackMap({
     raf = requestAnimationFrame(frame);
     return () => cancelAnimationFrame(raf);
   }, [finishMs]);
-  // A car that stopped on the lap just run drives the pit lane this tick (not at the flag).
-  const stopping = (code: string) =>
-    !finishing && !!lane && !REDUCED && !!race.cars[code]?.pittedThisLap;
-  const pitAt = (code: string, after: number) =>
-    pitPosition(
-      lead,
-      glideRef.current.prev.get(code) ?? after,
-      after,
-      lane as PitLane,
-      garageAt(race.cars[code]?.team, garages),
-    );
+  // A car stopping this tick: in the lane (or, on its out-lap, placed by its stop all tick).
+  const garageOf = (code: string) => garageAt(race.cars[code]?.team, garages);
+  const pitAt = (code: string, before: number): PitPosition | null => {
+    if (outStop(code)) {
+      const after = expectedAfter(code, before);
+      const from = entered.current.prev.get(code);
+      // In from the last tick: out of the garage. Otherwise (a stop forced at the end of the
+      // last lap, a puncture or the rival covering) the whole stop this tick.
+      return from !== undefined
+        ? outLapPosition(lead, after, lane as PitLane, garageOf(code), from)
+        : pitPosition(lead, before, after, lane as PitLane, garageOf(code));
+    }
+    if (onInLap(code)) {
+      entered.current.ends.set(code, inLapEnd(before, lane as PitLane, garageOf(code)));
+      const p = inLapPosition(lead, before, lane as PitLane, garageOf(code));
+      return p && p.lane !== null ? p : null; // on track until pit entry
+    }
+    return null;
+  };
+  const stopping = (code: string) => !!outStop(code);
   const shown = spaceOut(
     new Map(
       cars
@@ -525,7 +582,7 @@ export function TrackMap({
       )}
       {drawOrder.map((c) => {
         const car = race.cars[c.code];
-        const pit = stopping(c.code) ? pitAt(c.code, c.behind) : null;
+        const pit = pitAt(c.code, c.behind);
         const inLane = pit?.lane != null;
         // A car in (or just out of) the pit lane: its drawn track position follows it, so it
         // rejoins at pit exit rather than sliding round from where it went in.
@@ -611,32 +668,59 @@ export function TrackMap({
         (() => {
           const at = cornerPoint(outline, fight.corner);
           const other = drawnXY.current.get(fight.other);
+          const me = drawnXY.current.get(userSide);
+          // "NOW" as your car reaches the corner.
+          const cornerF = at ? nearestFraction(line, at) : null;
+          const mine = drawn.current.get(userSide);
+          const d =
+            cornerF !== null && mine !== undefined
+              ? ((((cornerF - mine + 0.5) % 1) + 1) % 1) - 0.5
+              : 1;
+          const now = Math.abs(d) < 0.04;
           return (
             <g pointerEvents="none">
+              {other && me && (
+                <line
+                  x1={me[0]}
+                  y1={me[1]}
+                  x2={other[0]}
+                  y2={other[1]}
+                  stroke="var(--box)"
+                  strokeWidth={4}
+                  strokeDasharray="6 4"
+                  className="battle-ring"
+                />
+              )}
               {other && (
                 <circle
                   cx={other[0]}
                   cy={other[1]}
-                  r={17}
+                  r={18}
                   fill="none"
                   stroke="var(--box)"
-                  strokeWidth={3}
+                  strokeWidth={3.5}
                   className="battle-ring"
                 />
               )}
               {at && (
                 <g transform={`translate(${at[0].toFixed(1)},${at[1].toFixed(1)})`}>
-                  <circle r={26} fill="var(--box)" opacity={0.18} className="battle-ring" />
-                  <rect x={-30} y={-42} width={60} height={20} rx={5} fill="var(--box)" />
+                  <circle
+                    r={now ? 34 : 26}
+                    fill="var(--box)"
+                    opacity={now ? 0.35 : 0.18}
+                    className="battle-ring"
+                  />
+                  <circle r={6} fill="var(--box)" />
+                  <rect x={-46} y={-46} width={92} height={24} rx={6} fill="var(--box)" />
                   <text
-                    y={-27}
+                    y={-29}
                     textAnchor="middle"
                     fill="#fff"
-                    fontSize={12}
+                    fontSize={14}
                     fontWeight={800}
                     fontFamily="var(--display)"
                   >
-                    {`⚔ T${fight.corner}`}
+                    {now ? '⚔ NOW' : `⚔ Turn ${fight.corner}`}
                   </text>
                 </g>
               )}
@@ -647,7 +731,7 @@ export function TrackMap({
         (() => {
           const at = cornerPoint(outline, flash.corner) ?? drawnXY.current.get(userSide);
           if (!at) return null;
-          const w = Math.max(70, flash.text.length * 9 + 20);
+          const w = Math.max(90, flash.text.length * 11 + 24);
           return (
             <g
               transform={`translate(${at[0].toFixed(1)},${at[1].toFixed(1)})`}
@@ -656,17 +740,17 @@ export function TrackMap({
             >
               <rect
                 x={-w / 2}
-                y={-56}
+                y={-62}
                 width={w}
-                height={28}
-                rx={7}
+                height={34}
+                rx={8}
                 fill={flash.good ? 'var(--you)' : 'var(--box)'}
               />
               <text
-                y={-37}
+                y={-39}
                 textAnchor="middle"
                 fill={flash.good ? '#08231f' : '#fff'}
-                fontSize={15}
+                fontSize={19}
                 fontWeight={800}
                 fontFamily="var(--display)"
               >

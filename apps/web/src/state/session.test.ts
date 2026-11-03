@@ -77,6 +77,32 @@ describe('GameSession', () => {
     expect(() => verifyRun(today.model, today.seed, body.decisions)).not.toThrow();
   });
 
+  it('boxes on the lap called, one stop at a time, never on the last lap', async () => {
+    const today = await daily();
+    const session = new GameSession(today);
+    session.start();
+    if (session.state.phase === 'decision') answer(session);
+    const lap = session.state.race.lap;
+    // A BOX for the lap being shown: the stop is charged on the lap after it.
+    session.call({ lap: lap + 1, kind: 'pit', compound: 'HARD' }, { asked: true });
+    // A second stop while it's under way is ignored (BOX twice, a quick call's box...).
+    session.call({ lap: lap + 2, kind: 'pit', compound: 'MEDIUM' }, { asked: true });
+    expect(session.state.decisions.filter((d) => d.kind === 'pit')).toHaveLength(1);
+    session.tick(); // the in-lap
+    expect(session.state.race.cars.HAM?.strategy).toEqual([
+      expect.objectContaining({ lap: lap + 2, to: 'HARD' }),
+    ]);
+    session.call({ lap: lap + 2, kind: 'pit', compound: 'MEDIUM' }, { asked: true });
+    expect(session.state.decisions.filter((d) => d.kind === 'pit')).toHaveLength(1);
+    session.tick(); // the out-lap: the stop is made
+    expect(session.state.race.cars.HAM?.pittedThisLap).toBe(true);
+    expect(session.state.race.cars.HAM?.compound).toBe('HARD');
+    // The last lap: too late.
+    const last = today.model.race.laps;
+    session.call({ lap: last, kind: 'pit', compound: 'SOFT' }, { asked: true });
+    expect(session.state.decisions.filter((d) => d.kind === 'pit')).toHaveLength(1);
+  });
+
   it('reports incidents on the radio, and plays on to the flag if your car is out', async () => {
     const today = await daily();
     // A seed where HAM's race ends early (a crash or a failure), found by playing it.
