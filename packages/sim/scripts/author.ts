@@ -180,6 +180,28 @@ function battleCall(lap: number, trigger: 'SC' | 'cliff'): DecisionMoment {
 // The candidates.
 const candidates: DecisionMoment[] = [];
 for (const m of candidateMoments(model, target)) candidates.push(stopCall(m));
+// The real team's own stops (the in-lap): the calls they actually made. Kept even when the
+// answer is clear (verdict no-tension), so a race can always be played the real way.
+const realStops = new Set<number>();
+for (const s of model.drivers.find((d) => d.code === model.userSide)?.realStrategy ?? []) {
+  const lap = s.lap - 1;
+  if (lap <= first || lap > last || candidates.some((c) => c.lap === lap)) continue;
+  realStops.add(lap);
+  const call = stopCall({
+    id: '',
+    lap,
+    trigger: neutral.has(lap) ? 'SC' : 'cliff',
+    target,
+    options: [],
+    realOptionId: `box-${s.to.toLowerCase()}`,
+  });
+  candidates.push({ ...call, id: `stop-${lap}` });
+}
+// Stops that land on an existing candidate's lap mark that one as the real stop call.
+for (const s of model.drivers.find((d) => d.code === model.userSide)?.realStrategy ?? []) {
+  const c = candidates.find((x) => x.lap === s.lap - 1 && !x.id.startsWith('pace-'));
+  if (c) realStops.add(c.lap);
+}
 for (let lap = first + 3; lap <= last - 2; lap += PACE_EVERY) candidates.push(paceCall(lap));
 for (const e of model.events) {
   if (e.type !== 'SC') continue;
@@ -224,7 +246,17 @@ for (const g of graded) show(g.m, g.grade, g.verdict);
 const MAX_PACE = 2;
 const MIN_CALLS = 4;
 const picked: DecisionMoment[] = [plan];
-const keep = graded.filter((x) => x.verdict === 'keep').sort((a, b) => b.spread - a.spread);
+const keep = graded
+  .filter(
+    (x) =>
+      x.verdict === 'keep' ||
+      (realStops.has(x.m.lap) && x.verdict === 'no-tension' && !x.m.id.startsWith('pace-')),
+  )
+  // The real stops first (a race must be playable the real way), then the most tense.
+  .sort(
+    (a, b) =>
+      Number(realStops.has(b.m.lap)) - Number(realStops.has(a.m.lap)) || b.spread - a.spread,
+  );
 // Calls are MIN_SPACING laps apart; the race plan only needs a lap of its own (Abu Dhabi
 // has the plan on lap 35 and the VSC call on 36).
 const fits = (m: DecisionMoment) =>

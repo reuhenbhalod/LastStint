@@ -29,7 +29,9 @@
   // authorized origins are the website and http://localhost:5173.
   "vars": {
     "WEB_ORIGIN": "https://pitwall-web.boxboxbox.workers.dev",
-    "GOOGLE_CLIENT_ID": "318278030629-s860fnjjpk6ihcn4iubjqiakf8vu0pqi.apps.googleusercontent.com"
+    "GOOGLE_CLIENT_ID": "318278030629-s860fnjjpk6ihcn4iubjqiakf8vu0pqi.apps.googleusercontent.com",
+    // Admins (the /admin page): Google account emails, comma-separated. Add yours here.
+    "ADMIN_EMAILS": "purohit.abhiram@gmail.com"
   },
 
   // Run submissions per IP (Phase 4 spec C1). namespace_id is any account-unique number.

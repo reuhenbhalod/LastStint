@@ -63,6 +63,7 @@ describe('verifyGoogleToken', () => {
       sub: 'google-1',
       email: 'driver@example.com',
       name: 'Test Driver',
+      emailVerified: false,
     });
   });
 

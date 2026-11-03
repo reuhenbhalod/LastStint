@@ -3,6 +3,8 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useAccount } from './account/useAccount.js';
+import { AdminPage } from './admin/AdminPage.js';
+import { adminToken } from './admin/session.js';
 import { ApiDailyProvider, RaceFileProvider } from './data/provider.js';
 import { useGame } from './game/useGame.js';
 import { HowItWorks } from './screens/HowItWorks.js';
@@ -11,10 +13,20 @@ import { RaceScreen } from './screens/RaceScreen.js';
 import { ResultScreen } from './screens/ResultScreen.js';
 
 export function App() {
-  // On localhost, ?race=<id> practises any race file (e.g. ?race=canada-2022).
+  if (location.pathname.startsWith('/admin')) return <AdminPage />;
+  return <Game />;
+}
+
+function Game() {
+  // ?race=<id>&seed=<n> practises any race file: on localhost, or for a signed-in admin
+  // (the admin page links here).
   const provider = useMemo(() => {
-    const race = import.meta.env.DEV ? new URLSearchParams(location.search).get('race') : null;
-    return race ? new RaceFileProvider(race) : new ApiDailyProvider();
+    const q = new URLSearchParams(location.search);
+    const race = import.meta.env.DEV || adminToken() ? q.get('race') : null;
+    const seed = q.get('seed');
+    return race
+      ? new RaceFileProvider(race, seed ? Number(seed) : undefined)
+      : new ApiDailyProvider();
   }, []);
   const game = useGame(provider);
   const account = useAccount(game.reload);

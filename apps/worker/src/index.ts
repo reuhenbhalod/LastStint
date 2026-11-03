@@ -5,6 +5,7 @@
 import { type Context, Hono } from 'hono';
 import { cors } from 'hono/cors';
 import type { ContentfulStatusCode } from 'hono/utils/http-status';
+import { registerAdmin } from './admin.js';
 import { verifyGoogleToken } from './auth.js';
 import { isDate, isPlayable, playableDates } from './dates.js';
 import { LEADERBOARD_SIZE, dailyStats, getDaily, getRun, leaderboard } from './db.js';
@@ -30,6 +31,8 @@ export interface Env {
   GOOGLE_CLIENT_ID?: string;
   /** JWKS to trust instead of Google's published keys (tests only). */
   GOOGLE_JWKS?: string;
+  /** Admins (src/admin.ts): Google account emails, comma-separated. */
+  ADMIN_EMAILS?: string;
 }
 
 /** Largest accepted POST /api/runs body. */
@@ -51,7 +54,7 @@ app.use(
       return allowed.includes(origin) ? origin : null;
     },
     allowMethods: ['GET', 'POST', 'OPTIONS'],
-    allowHeaders: ['Content-Type'],
+    allowHeaders: ['Content-Type', 'Authorization'],
     maxAge: 86400,
   }),
 );
@@ -84,6 +87,8 @@ async function cached(
   }
   return res;
 }
+
+registerAdmin(app);
 
 app.get('/api/health', async (c) =>
   c.json({ ok: true, queueDays: await queueDays(c.env.DB, Date.now()) }),

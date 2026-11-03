@@ -21,6 +21,7 @@ export default defineConfig(async () => {
             GOOGLE_CLIENT_ID: 'test-client.apps.googleusercontent.com',
             GOOGLE_JWKS: JSON.stringify({ keys: [pub] }),
             TEST_GOOGLE_PRIVATE_JWK: JSON.stringify(priv),
+            ADMIN_EMAILS: 'Admin@Example.com, other@example.com',
           },
         },
       }),

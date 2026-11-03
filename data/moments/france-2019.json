@@ -62,69 +62,64 @@
     "realOptionId": "plan-standard"
   },
   {
-    "id": "pace-32",
-    "lap": 32,
+    "id": "stop-23",
+    "lap": 23,
     "trigger": "cliff",
     "target": {
       "kind": "beat-rival"
     },
     "options": [
       {
-        "id": "push",
-        "label": "Push now",
+        "id": "stay",
+        "label": "Stay out",
+        "decisions": []
+      },
+      {
+        "id": "box-soft",
+        "label": "Box, softs",
         "decisions": [
           {
-            "lap": 32,
-            "kind": "mode",
-            "key": "pace",
-            "value": "push"
+            "lap": 23,
+            "kind": "pit",
+            "compound": "SOFT"
           }
         ]
       },
       {
-        "id": "standard",
-        "label": "Standard pace",
+        "id": "box-medium",
+        "label": "Box, mediums",
         "decisions": [
           {
-            "lap": 32,
-            "kind": "mode",
-            "key": "pace",
-            "value": "standard"
+            "lap": 23,
+            "kind": "pit",
+            "compound": "MEDIUM"
           }
         ]
       },
       {
-        "id": "manage",
-        "label": "Manage the tyres",
+        "id": "box-hard",
+        "label": "Box, hards",
         "decisions": [
           {
-            "lap": 32,
-            "kind": "mode",
-            "key": "pace",
-            "value": "manage"
+            "lap": 23,
+            "kind": "pit",
+            "compound": "HARD"
           }
         ]
       },
       {
-        "id": "push-attack",
-        "label": "Push and attack",
+        "id": "box-next-hard",
+        "label": "Box next lap, hards",
         "decisions": [
           {
-            "lap": 32,
-            "kind": "mode",
-            "key": "pace",
-            "value": "push"
-          },
-          {
-            "lap": 32,
-            "kind": "mode",
-            "key": "battle",
-            "value": "attack"
+            "lap": 24,
+            "kind": "pit",
+            "compound": "HARD"
           }
         ]
       }
     ],
-    "realOptionId": null
+    "realOptionId": "box-hard"
   },
   {
     "id": "pace-40",

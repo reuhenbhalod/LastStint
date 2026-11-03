@@ -116,8 +116,8 @@ describe('finish and spacing', () => {
       new Map([
         ['A', 0],
         ['B', 0.001],
-        ['C', 0.002],
-        ['L', 1.0015], // lapped: on track between B and C
+        ['C', 0.012],
+        ['L', 1.0065], // lapped: on track between B and C
       ]),
       0.01,
     );
@@ -125,6 +125,24 @@ describe('finish and spacing', () => {
     expect(out.get('B')).toBeCloseTo(0.01);
     expect(out.get('L')).toBeCloseTo(1.02);
     expect(out.get('C')).toBeCloseTo(0.03);
+  });
+
+  it('keeps race order for cars within half a gap (no swapping in a safety-car queue)', () => {
+    const queue = (c: number) =>
+      spaceOut(
+        new Map([
+          ['A', 0],
+          ['B', 0.0021],
+          ['C', c],
+        ]),
+        0.01,
+      );
+    // C a hair either side of B: the order on screen stays A, B, C.
+    for (const c of [0.002, 0.0022]) {
+      const out = queue(c);
+      expect(out.get('B')).toBeCloseTo(0.01);
+      expect(out.get('C')).toBeCloseTo(0.02);
+    }
   });
 
   it('runs each car to the line from its finishing gap', () => {

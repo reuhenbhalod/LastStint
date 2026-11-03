@@ -761,8 +761,8 @@
       "realOptionId": null
     },
     {
-      "id": "cliff-36",
-      "lap": 36,
+      "id": "stop-37",
+      "lap": 37,
       "trigger": "cliff",
       "target": {
         "kind": "beat-rival"
@@ -778,7 +778,7 @@
           "label": "Box, softs",
           "decisions": [
             {
-              "lap": 36,
+              "lap": 37,
               "kind": "pit",
               "compound": "SOFT"
             }
@@ -789,7 +789,7 @@
           "label": "Box, mediums",
           "decisions": [
             {
-              "lap": 36,
+              "lap": 37,
               "kind": "pit",
               "compound": "MEDIUM"
             }
@@ -800,7 +800,7 @@
           "label": "Box, hards",
           "decisions": [
             {
-              "lap": 36,
+              "lap": 37,
               "kind": "pit",
               "compound": "HARD"
             }
@@ -811,14 +811,14 @@
           "label": "Box next lap, hards",
           "decisions": [
             {
-              "lap": 37,
+              "lap": 38,
               "kind": "pit",
               "compound": "HARD"
             }
           ]
         }
       ],
-      "realOptionId": "stay"
+      "realOptionId": "box-hard"
     }
   ],
   "candidateMomentLaps": [

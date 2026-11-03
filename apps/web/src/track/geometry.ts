@@ -225,9 +225,11 @@ export function carsOnTrack(
  * Display only: the timing is untouched.
  */
 export function spaceOut(behind: Map<string, number>, min: number): Map<string, number> {
+  // Cars within half a gap of each other keep the order they're listed in (race order), so a
+  // nose-to-tail queue behind a safety car doesn't swap places frame to frame.
   const onTrack = [...behind.entries()]
-    .map(([code, b]) => ({ code, laps: Math.floor(b), at: b - Math.floor(b) }))
-    .sort((a, b) => a.at - b.at);
+    .map(([code, b], i) => ({ code, i, laps: Math.floor(b), at: b - Math.floor(b) }))
+    .sort((a, b) => (Math.abs(a.at - b.at) < min / 2 ? a.i - b.i : a.at - b.at));
   const out = new Map<string, number>();
   let prev = Number.NEGATIVE_INFINITY;
   for (const c of onTrack) {

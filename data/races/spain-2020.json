@@ -671,8 +671,68 @@
       "realOptionId": "plan-standard"
     },
     {
-      "id": "pace-22",
-      "lap": 22,
+      "id": "stop-21",
+      "lap": 21,
+      "trigger": "cliff",
+      "target": {
+        "kind": "beat-rival"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "Stay out",
+          "decisions": []
+        },
+        {
+          "id": "box-soft",
+          "label": "Box, softs",
+          "decisions": [
+            {
+              "lap": 21,
+              "kind": "pit",
+              "compound": "SOFT"
+            }
+          ]
+        },
+        {
+          "id": "box-medium",
+          "label": "Box, mediums",
+          "decisions": [
+            {
+              "lap": 21,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "box-hard",
+          "label": "Box, hards",
+          "decisions": [
+            {
+              "lap": 21,
+              "kind": "pit",
+              "compound": "HARD"
+            }
+          ]
+        },
+        {
+          "id": "box-next-hard",
+          "label": "Box next lap, hards",
+          "decisions": [
+            {
+              "lap": 22,
+              "kind": "pit",
+              "compound": "HARD"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "box-medium"
+    },
+    {
+      "id": "pace-26",
+      "lap": 26,
       "trigger": "cliff",
       "target": {
         "kind": "beat-rival"
@@ -683,7 +743,7 @@
           "label": "Push now",
           "decisions": [
             {
-              "lap": 22,
+              "lap": 26,
               "kind": "mode",
               "key": "pace",
               "value": "push"
@@ -695,7 +755,7 @@
           "label": "Standard pace",
           "decisions": [
             {
-              "lap": 22,
+              "lap": 26,
               "kind": "mode",
               "key": "pace",
               "value": "standard"
@@ -707,7 +767,7 @@
           "label": "Manage the tyres",
           "decisions": [
             {
-              "lap": 22,
+              "lap": 26,
               "kind": "mode",
               "key": "pace",
               "value": "manage"
@@ -719,13 +779,13 @@
           "label": "Push and attack",
           "decisions": [
             {
-              "lap": 22,
+              "lap": 26,
               "kind": "mode",
               "key": "pace",
               "value": "push"
             },
             {
-              "lap": 22,
+              "lap": 26,
               "kind": "mode",
               "key": "battle",
               "value": "attack"
@@ -736,69 +796,64 @@
       "realOptionId": null
     },
     {
-      "id": "pace-42",
-      "lap": 42,
+      "id": "stop-41",
+      "lap": 41,
       "trigger": "cliff",
       "target": {
         "kind": "beat-rival"
       },
       "options": [
         {
-          "id": "push",
-          "label": "Push now",
+          "id": "stay",
+          "label": "Stay out",
+          "decisions": []
+        },
+        {
+          "id": "box-soft",
+          "label": "Box, softs",
           "decisions": [
             {
-              "lap": 42,
-              "kind": "mode",
-              "key": "pace",
-              "value": "push"
+              "lap": 41,
+              "kind": "pit",
+              "compound": "SOFT"
             }
           ]
         },
         {
-          "id": "standard",
-          "label": "Standard pace",
+          "id": "box-medium",
+          "label": "Box, mediums",
           "decisions": [
             {
-              "lap": 42,
-              "kind": "mode",
-              "key": "pace",
-              "value": "standard"
+              "lap": 41,
+              "kind": "pit",
+              "compound": "MEDIUM"
             }
           ]
         },
         {
-          "id": "manage",
-          "label": "Manage the tyres",
+          "id": "box-hard",
+          "label": "Box, hards",
           "decisions": [
             {
-              "lap": 42,
-              "kind": "mode",
-              "key": "pace",
-              "value": "manage"
+              "lap": 41,
+              "kind": "pit",
+              "compound": "HARD"
             }
           ]
         },
         {
-          "id": "push-attack",
-          "label": "Push and attack",
+          "id": "box-next-medium",
+          "label": "Box next lap, mediums",
           "decisions": [
             {
               "lap": 42,
-              "kind": "mode",
-              "key": "pace",
-              "value": "push"
-            },
-            {
-              "lap": 42,
-              "kind": "mode",
-              "key": "battle",
-              "value": "attack"
+              "kind": "pit",
+              "compound": "MEDIUM"
             }
           ]
         }
       ],
-      "realOptionId": null
+      "realOptionId": "box-medium"
     },
     {
       "id": "rivalpit-48",
