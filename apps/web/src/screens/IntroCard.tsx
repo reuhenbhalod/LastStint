@@ -5,6 +5,7 @@ import type { RaceModel } from '@boxthislap/sim';
 import { useState } from 'react';
 import type { AccountState } from '../account/useAccount.js';
 import { AccountBar } from '../components/AccountBar.js';
+import { driverInfo } from '../data/drivers.js';
 import type { GameState } from '../state/machine.js';
 import { HowToPlay, seenHowToPlay } from './HowToPlay.js';
 
@@ -90,8 +91,8 @@ export function IntroCard({
         )}
       </p>
       <p className="text-[13px] text-neutral-500">
-        Every big call is graded against the race model. {userSide} questions some live calls, and
-        doesn’t always follow them.
+        Every big call is graded against the race model. {userSide} ignores about{' '}
+        {driverInfo(userSide)?.ignores ?? 0}% of your live calls.
       </p>
       <button
         type="button"

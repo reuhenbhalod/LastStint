@@ -70,8 +70,6 @@ export interface GameState {
   meta: GameMeta;
   /** The driver's radio replies to live calls, newest last (not persisted). */
   radio: RadioMessage[];
-  /** A live call the driver questioned, waiting for the wall to confirm or drop it. */
-  question?: { decision: Decision; text: string } | null;
 }
 
 export type Action =
@@ -87,7 +85,6 @@ export type Action =
   | { type: 'CALL'; race: RaceState; decisions: Decision[] }
   | { type: 'SET_SPEED'; speed: Speed }
   | { type: 'RADIO'; message: RadioMessage }
-  | { type: 'QUESTION'; question: { decision: Decision; text: string } | null }
   | { type: 'GRADED'; momentId: string; graded: GradedMoment }
   | { type: 'SUBMIT' }
   | { type: 'RESULT'; result: RaceResult; submission: Submission }
@@ -137,9 +134,6 @@ export function reducer(state: GameState, action: Action): GameState {
 
     case 'RADIO':
       return { ...state, radio: [...state.radio, action.message].slice(-6) };
-
-    case 'QUESTION':
-      return { ...state, question: action.question };
 
     case 'GRADED': // grading finishes in a worker, whatever the phase
       return { ...state, grades: { ...state.grades, [action.momentId]: action.graded } };

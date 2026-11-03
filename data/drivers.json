@@ -1,0 +1,660 @@
+{
+  "_comment": "Driver attitudes (Nov 2, 2026 research: team-radio defiance and pushback across each driver's career). ignores: the % of the wall's live calls (BOX, headset) the driver refuses in the game. pushback: how often they'd argue (kept for later; not used). tier: high (ignores >= 10), medium (3-9), low (<= 2). Game odds scaled from documented incidents, not measured frequencies. Every driver in data/races must be listed (apps/web/src/data/drivers.test.ts).",
+  "drivers": {
+    "ALB": {
+      "name": "Alexander Albon",
+      "number": 23,
+      "tier": "low",
+      "ignores": 2,
+      "pushback": 20,
+      "confidence": "medium",
+      "evidence": [
+        {
+          "note": "'I don't know why you don't listen to me', Canada 2025",
+          "source": "https://www.the-race.com/formula-1/what-was-misunderstood-in-albons-you-dont-listen-to-me-rant/"
+        }
+      ]
+    },
+    "ALO": {
+      "name": "Fernando Alonso",
+      "number": 14,
+      "tier": "medium",
+      "ignores": 8,
+      "pushback": 45,
+      "confidence": "high",
+      "evidence": [
+        {
+          "note": "Admitted ignoring a kerb instruction, Japan 2023",
+          "source": "https://www.gpfans.com/en/f1-news/1004494/fernando-alonso-aston-martin-ignore-team-orders-f1-japanese-grand-prix/"
+        },
+        {
+          "note": "Talked Alpine out of a team order, France 2021",
+          "source": "https://the-race.com/formula-1/how-alonso-talked-alpine-out-of-a-team-order/"
+        },
+        {
+          "note": "'GP2 engine', Japan 2015",
+          "source": "https://www.planetf1.com/features/fernando-alonso-best-f1-team-radio-messages-gp2-engine"
+        }
+      ]
+    },
+    "ANT": {
+      "name": "Andrea Kimi Antonelli",
+      "number": 12,
+      "tier": "medium",
+      "ignores": 3,
+      "pushback": 20,
+      "confidence": "low",
+      "evidence": [
+        {
+          "note": "Moved aside for Russell when told, Mexico 2025",
+          "source": "https://www.the-race.com/formula-1/mercedes-antonelli-russell-mexico-team-orders-f1/"
+        },
+        {
+          "note": "Told to stop 'radio moaning', Canada 2026",
+          "source": "https://www.planetf1.com/news/toto-wolff-radio-message-kimi-antonelli-george-russell-clash"
+        }
+      ]
+    },
+    "BEA": {
+      "name": "Oliver Bearman",
+      "number": 87,
+      "tier": "low",
+      "ignores": 2,
+      "pushback": 10,
+      "confidence": "low",
+      "evidence": [
+        {
+          "note": "Obeyed a Haas order to let Hulkenberg by",
+          "source": "https://www.the-race.com/formula-1/haas-ollie-bearman-ferrari-f1-future"
+        }
+      ]
+    },
+    "BOR": {
+      "name": "Gabriel Bortoleto",
+      "number": 5,
+      "tier": "low",
+      "ignores": 2,
+      "pushback": 12,
+      "confidence": "low",
+      "evidence": []
+    },
+    "BOT": {
+      "name": "Valtteri Bottas",
+      "number": 77,
+      "tier": "low",
+      "ignores": 1,
+      "pushback": 10,
+      "confidence": "high",
+      "evidence": [
+        {
+          "note": "'Valtteri, it's James': gave Hamilton the win, Russia 2018",
+          "source": "https://www.the-race.com/formula-1/the-real-significance-of-valtteri-its-james-meme"
+        }
+      ]
+    },
+    "COL": {
+      "name": "Franco Colapinto",
+      "number": 43,
+      "tier": "high",
+      "ignores": 15,
+      "pushback": 30,
+      "confidence": "medium",
+      "evidence": [
+        {
+          "note": "Passed Gasly against 'hold position', US GP 2025",
+          "source": "https://www.formula1.com/en/latest/article/we-will-review-and-deal-with-internally-alpine-disappointed-after-colapinto.6QmchEg46kkbLmtUAowcnD"
+        },
+        {
+          "note": "Angry swap demands, Spain 2026",
+          "source": "https://www.planetf1.com/news/2026-spanish-gp-alpine-team-radio"
+        }
+      ]
+    },
+    "DEV": {
+      "name": "Nyck de Vries",
+      "number": 21,
+      "tier": "low",
+      "ignores": 2,
+      "pushback": 8,
+      "confidence": "low",
+      "evidence": []
+    },
+    "ERI": {
+      "name": "Marcus Ericsson",
+      "number": 9,
+      "tier": "medium",
+      "ignores": 6,
+      "pushback": 20,
+      "confidence": "low",
+      "evidence": [
+        {
+          "note": "Monaco crash with Nasr over a swap, 2016",
+          "source": "https://racer.com/2016/05/29/both-drivers-in-the-wrong-sauber/"
+        },
+        {
+          "note": "Fuming but obeyed, Mexico 2018",
+          "source": "https://www.autosport.com/f1/news/ericsson-was-fuming-over-order-to-help-leclerc-in-mexican-gp-5284434/5284434/"
+        }
+      ]
+    },
+    "GAS": {
+      "name": "Pierre Gasly",
+      "number": 10,
+      "tier": "medium",
+      "ignores": 4,
+      "pushback": 25,
+      "confidence": "medium",
+      "evidence": [
+        {
+          "note": "'Are you serious?' then gave the place back, Japan 2023",
+          "source": "https://pitdebrief.com/?p=10287"
+        },
+        {
+          "note": "'Don't even talk to me', Spain 2026",
+          "source": "https://www.planetf1.com/news/2026-spanish-gp-alpine-team-radio"
+        }
+      ]
+    },
+    "GIO": {
+      "name": "Antonio Giovinazzi",
+      "number": 99,
+      "tier": "medium",
+      "ignores": 5,
+      "pushback": 15,
+      "confidence": "medium",
+      "evidence": [
+        {
+          "note": "Ignored two calls to let Räikkönen by, Turkey 2021",
+          "source": "https://the-race.com/formula-1/how-giovinazzis-ignored-team-orders-cost-raikkonen-a-point/"
+        }
+      ]
+    },
+    "GRO": {
+      "name": "Romain Grosjean",
+      "number": 8,
+      "tier": "medium",
+      "ignores": 5,
+      "pushback": 45,
+      "confidence": "high",
+      "evidence": [
+        {
+          "note": "Constant car complaints; Steiner: 'it's getting old'",
+          "source": "https://africa.espn.com/f1/story/_/id/21172069/guenther-steiner-clarifies-shut-message-romain-grosjean-us-gp"
+        }
+      ]
+    },
+    "HAD": {
+      "name": "Isack Hadjar",
+      "number": 6,
+      "tier": "medium",
+      "ignores": 9,
+      "pushback": 35,
+      "confidence": "medium",
+      "evidence": [
+        {
+          "note": "'I can't let him by. Sorry.' then complied, US GP 2026",
+          "source": "https://www.planetf1.com/news/isack-hadjar-red-bull-team-orders-max-verstappen-us-gp"
+        },
+        {
+          "note": "Accepted a refused swap, Baku 2026",
+          "source": "https://www.planetf1.com/news/red-bull-isack-hadjar-team-orders-2026-azerbaijan-grand-prix"
+        }
+      ]
+    },
+    "HAM": {
+      "name": "Lewis Hamilton",
+      "number": 44,
+      "tier": "high",
+      "ignores": 15,
+      "pushback": 40,
+      "confidence": "high",
+      "evidence": [
+        {
+          "note": "Refused to let Rosberg by, Hungary 2014",
+          "source": "https://www.racefans.net/?p=347623"
+        },
+        {
+          "note": "Ignored orders to speed up, Abu Dhabi 2016",
+          "source": "https://www.eurosport.com/formula-1/lewis-hamilton-facing-uncertain-future-after-abu-dhabi-antics-could-he-be-sacked_sto5964428/story.shtml"
+        },
+        {
+          "note": "Long pit-call argument, Turkey 2021",
+          "source": "https://www.formula1.com/en/latest/article/watch-hamilton-and-mercedes-pit-stop-dilemma-at-the-2021-turkish-grand-prix.5frEjBXU4SanVBiT6bPQ2Q"
+        }
+      ]
+    },
+    "HAR": {
+      "name": "Brendon Hartley",
+      "number": 28,
+      "tier": "low",
+      "ignores": 2,
+      "pushback": 12,
+      "confidence": "medium",
+      "evidence": [
+        {
+          "note": "Let Gasly by 'many times'",
+          "source": "https://au.motorsport.com/f1/news/hartley-gasly-nice-speech/4301992/"
+        }
+      ]
+    },
+    "HUL": {
+      "name": "Nico Hülkenberg",
+      "number": 27,
+      "tier": "medium",
+      "ignores": 9,
+      "pushback": 25,
+      "confidence": "medium",
+      "evidence": [
+        {
+          "note": "Overruled the pit wall three times to a podium, Britain 2025",
+          "source": "https://www.motorsportmagazine.com/articles/single-seaters/f1/from-p19-to-first-f1-podium-hulkenbergs-sensational-british-gp-drive"
+        },
+        {
+          "note": "Upset but obeyed hold-position, Canada 2019",
+          "source": "https://www.autosport.com/f1/news/renault-f1-boss-hulkenberg-upset-by-canadian-gp-team-orders-4986594/4986594/"
+        }
+      ]
+    },
+    "KUB": {
+      "name": "Robert Kubica",
+      "number": 88,
+      "tier": "medium",
+      "ignores": 3,
+      "pushback": 25,
+      "confidence": "medium",
+      "evidence": [
+        {
+          "note": "Questioned pit priority, Monaco 2019",
+          "source": "https://www.gpblog.com/en/news/listen-robert-kubica-questions-william-s-priority-rules-on-team-radio.html"
+        }
+      ]
+    },
+    "KVY": {
+      "name": "Daniil Kvyat",
+      "number": 26,
+      "tier": "medium",
+      "ignores": 8,
+      "pushback": 30,
+      "confidence": "medium",
+      "evidence": [
+        {
+          "note": "Disputed tow row with Sainz, Canada 2017",
+          "source": "https://www.autosport.com/f1/news/130272/kvyat-could-stop-collaborating-with-sainz"
+        },
+        {
+          "note": "Told to be 'more disciplined, less emotional'",
+          "source": "https://us.motorsport.com/f1/news/toro-rosso-tost-kvyat-more-disciplined-sainz-939464/3039772/"
+        }
+      ]
+    },
+    "LAT": {
+      "name": "Nicholas Latifi",
+      "number": 6,
+      "tier": "low",
+      "ignores": 2,
+      "pushback": 12,
+      "confidence": "medium",
+      "evidence": [
+        {
+          "note": "Told 'not on the radio mate', Brazil 2021",
+          "source": "https://the-race.com/formula-1/why-one-drivers-best-f1-weekend-yet-ended-in-a-telling-off"
+        }
+      ]
+    },
+    "LAW": {
+      "name": "Liam Lawson",
+      "number": 30,
+      "tier": "medium",
+      "ignores": 5,
+      "pushback": 30,
+      "confidence": "medium",
+      "evidence": [
+        {
+          "note": "'Last time' he'd listen, but obeyed, Austria 2026",
+          "source": "https://www.planetf1.com/news/liam-lawson-radio-team-orders-2026-austrian-grand-prix"
+        },
+        {
+          "note": "Ran the hold-up strategy for Hadjar, Monaco 2025",
+          "source": "https://www.autosport.com/f1/news/how-liam-lawsons-hold-up-play-affected-the-monaco-gp/10727119/"
+        }
+      ]
+    },
+    "LEC": {
+      "name": "Charles Leclerc",
+      "number": 16,
+      "tier": "high",
+      "ignores": 10,
+      "pushback": 35,
+      "confidence": "high",
+      "evidence": [
+        {
+          "note": "Passed Vettel against orders, Bahrain 2019",
+          "source": "https://www.motorsport.com/f1/news/leclerc-defiance-bahrain-order-ferrari-vettel/4368100/"
+        },
+        {
+          "note": "'No, no, let's go soft', Spain 2022",
+          "source": "https://crash.net/f1/news/1027977/1/ferrari-strategy-woes-continue-after-leclerc-radio-confusion-spanish-gp"
+        },
+        {
+          "note": "Stayed out when told to pit, Dutch GP 2026",
+          "source": "https://www.gpblog.com/en/news/hamilton-rages-on-the-radio-over-ferrari-dutch-gp-strategy-as-leclerc-disobeys-orders"
+        }
+      ]
+    },
+    "MAG": {
+      "name": "Kevin Magnussen",
+      "number": 20,
+      "tier": "medium",
+      "ignores": 3,
+      "pushback": 15,
+      "confidence": "medium",
+      "evidence": [
+        {
+          "note": "Gave the place to Grosjean when told, Singapore 2017",
+          "source": "https://www.grandprix.com/ns/ns37364.html"
+        }
+      ]
+    },
+    "MAZ": {
+      "name": "Nikita Mazepin",
+      "number": 9,
+      "tier": "medium",
+      "ignores": 6,
+      "pushback": 30,
+      "confidence": "low",
+      "evidence": [
+        {
+          "note": "'Are you joking?' over team rules, Mexico 2021",
+          "source": "https://crash.net/f1/news/991295/1/mazepin-haas-f1-has-different-rules-schumacher"
+        }
+      ]
+    },
+    "MSC": {
+      "name": "Mick Schumacher",
+      "number": 47,
+      "tier": "low",
+      "ignores": 2,
+      "pushback": 15,
+      "confidence": "low",
+      "evidence": [
+        {
+          "note": "'I don't agree, like, seriously', Austria 2022",
+          "source": "https://www.the-race.com/formula-1/schumacher-puzzled-by-how-haas-handled-austrian-gp-sprint/"
+        }
+      ]
+    },
+    "NOR": {
+      "name": "Lando Norris",
+      "number": 4,
+      "tier": "high",
+      "ignores": 10,
+      "pushback": 40,
+      "confidence": "high",
+      "evidence": [
+        {
+          "note": "Refused intermediates and lost the win, Russia 2021",
+          "source": "https://www.the-race.com/formula-1/mclaren-needs-to-work-out-why-it-didnt-overrule-norris"
+        },
+        {
+          "note": "About 20 laps before giving the lead back, Hungary 2024",
+          "source": "https://www.motorsport.com/f1/news/f1-hungarian-gp-race-report/10637230/"
+        },
+        {
+          "note": "McLaren asks its drivers to challenge calls",
+          "source": "https://www.racefans.net/2023/10/17/why-mclaren-tell-their-drivers-to-challenge-us-over-team-orders-on-radio/"
+        }
+      ]
+    },
+    "OCO": {
+      "name": "Esteban Ocon",
+      "number": 31,
+      "tier": "high",
+      "ignores": 15,
+      "pushback": 25,
+      "confidence": "high",
+      "evidence": [
+        {
+          "note": "Broke pre-race team guidance on Gasly, Monaco 2024",
+          "source": "https://racer.com/2024/05/27/gasly-wants-alpine-discussions-after-ocon-defies-clear-instructions/"
+        },
+        {
+          "note": "Passed Gasly after 'hold position', Las Vegas 2023",
+          "source": "https://www.motorsport.com/f1/news/ocon-explains-why-he-didnt-follow-hold-position-f1-team-order/10549695/"
+        },
+        {
+          "note": "Called team orders 'nonsense', Canada 2024",
+          "source": "https://www.espn.co.uk/f1/story/_/id/40320369/ocon-blasts-alpine-unexplainable-orders-canada-gp"
+        }
+      ]
+    },
+    "PER": {
+      "name": "Sergio Pérez",
+      "number": 11,
+      "tier": "medium",
+      "ignores": 5,
+      "pushback": 25,
+      "confidence": "high",
+      "evidence": [
+        {
+          "note": "Refused a swap with Ocon, Canada 2017",
+          "source": "https://www.thedrive.com/start-finish/11408/perez-ignored-orders-from-force-india-to-let-ocon-pass-at-canadian-grand-prix"
+        },
+        {
+          "note": "'Very unfair, but OK', Spain 2022",
+          "source": "https://www.espn.com/f1/story/_/id/33964727/christian-horner-defends-red-bull-team-orders-spanish-gp"
+        }
+      ]
+    },
+    "PIA": {
+      "name": "Oscar Piastri",
+      "number": 81,
+      "tier": "low",
+      "ignores": 1,
+      "pushback": 20,
+      "confidence": "medium",
+      "evidence": [
+        {
+          "note": "'I'm faster, but okay', held position, Australia 2025",
+          "source": "https://www.crash.net/f1/news/1065434/1/oscar-piastri-wants-mclaren-talks-over-hold-position-order"
+        },
+        {
+          "note": "Gave the place back to Norris, Monza 2025",
+          "source": "https://www.the-race.com/formula-1/piastri-admits-mclarens-monza-orders-were-in-his-mind-as-slump-began"
+        }
+      ]
+    },
+    "RAI": {
+      "name": "Kimi Räikkönen",
+      "number": 7,
+      "tier": "high",
+      "ignores": 12,
+      "pushback": 35,
+      "confidence": "high",
+      "evidence": [
+        {
+          "note": "Pitted against the call with a broken DRS flap, Spa 2018",
+          "source": "https://essentiallysports.com/f1-news-when-kimi-raikkonen-overruled-team-orders-at-ferrari-f1"
+        },
+        {
+          "note": "Didn't yield to Grosjean, India 2013",
+          "source": "https://www.crash.net/f1/news/197568/1/lotus-drivers-fall-out-over-ontrack-clash"
+        },
+        {
+          "note": "'Leave me alone, I know what I'm doing', Abu Dhabi 2012",
+          "source": "https://www.formula1.com/en/latest/article/leave-me-alone-i-know-what-doing-best-of-raikkonen-race-radio.rCKOidDkwt70dZdOENU3e"
+        }
+      ]
+    },
+    "RIC": {
+      "name": "Daniel Ricciardo",
+      "number": 3,
+      "tier": "low",
+      "ignores": 2,
+      "pushback": 12,
+      "confidence": "medium",
+      "evidence": [
+        {
+          "note": "Took team orders 'on the chin', Imola 2021",
+          "source": "https://www.gpfans.com/en/f1-news/64192/why-ricciardo-took-mclaren-team-orders-on-the-chin/"
+        }
+      ]
+    },
+    "RUS": {
+      "name": "George Russell",
+      "number": 63,
+      "tier": "medium",
+      "ignores": 5,
+      "pushback": 35,
+      "confidence": "high",
+      "evidence": [
+        {
+          "note": "Took a penalty rather than give a place back, Monaco 2025",
+          "source": "https://www.gpfans.com/en/f1-news/1050956/george-russell-takes-intentional-fia-penalty-at-monaco-grand-prix"
+        },
+        {
+          "note": "Angry over a slow swap, Mexico 2025",
+          "source": "https://www.planetf1.com/news/george-russell-angry-mercedes-radio-mexico-city-gp"
+        }
+      ]
+    },
+    "SAI": {
+      "name": "Carlos Sainz",
+      "number": 55,
+      "tier": "high",
+      "ignores": 12,
+      "pushback": 35,
+      "confidence": "high",
+      "evidence": [
+        {
+          "note": "'Leave it with me': ran his own race to win, Britain 2022",
+          "source": "https://the-race.com/formula-1/leave-it-with-me-why-sainz-overruled-ferraris-instructions/"
+        },
+        {
+          "note": "Passed Leclerc against instructions, Las Vegas 2024",
+          "source": "https://www.autosport.com/f1/news/was-sainz-wrong-to-ignore-ferraris-orders-in-las-vegas-gp-our-writers-have-their-say/10676667/"
+        },
+        {
+          "note": "Team-order anger at Williams, Miami 2025",
+          "source": "https://www.autosport.com/f1/news/how-sainzs-miami-f1-team-radio-anger-emulated-that-of-hamilton/10720972/"
+        }
+      ]
+    },
+    "SAR": {
+      "name": "Logan Sargeant",
+      "number": 2,
+      "tier": "low",
+      "ignores": 2,
+      "pushback": 8,
+      "confidence": "low",
+      "evidence": []
+    },
+    "SIR": {
+      "name": "Sergey Sirotkin",
+      "number": 35,
+      "tier": "low",
+      "ignores": 2,
+      "pushback": 8,
+      "confidence": "low",
+      "evidence": []
+    },
+    "STR": {
+      "name": "Lance Stroll",
+      "number": 18,
+      "tier": "medium",
+      "ignores": 7,
+      "pushback": 25,
+      "confidence": "medium",
+      "evidence": [
+        {
+          "note": "Refused to swap back with Alonso, Hungary 2024",
+          "source": "https://f1i.com/news/514782-stroll-defied-aston-team-order-to-claim-final-point-in-hungary.html"
+        }
+      ]
+    },
+    "TSU": {
+      "name": "Yuki Tsunoda",
+      "number": 22,
+      "tier": "medium",
+      "ignores": 5,
+      "pushback": 45,
+      "confidence": "high",
+      "evidence": [
+        {
+          "note": "'Are you kidding me?' then let Ricciardo by, Bahrain 2024",
+          "source": "https://www.autosport.com/f1/news/ricciardo-and-tsunoda-disagree-over-rb-swap-call-in-f1-bahrain-gp/10582468/"
+        },
+        {
+          "note": "Expletive radio 'went too far' (Marko, 2022)",
+          "source": "https://www.motorsportweek.com/2022/08/17/marko-tsunodas-expletive-radio-messages-went-too-far"
+        }
+      ]
+    },
+    "VAN": {
+      "name": "Stoffel Vandoorne",
+      "number": 2,
+      "tier": "low",
+      "ignores": 1,
+      "pushback": 5,
+      "confidence": "medium",
+      "evidence": [
+        {
+          "note": "'Almost always' let Alonso pass when asked",
+          "source": "https://www.grandprix247.com/2019/11/24/vandoorne-almost-always-they-asked-me-to-let-alonso-pass/"
+        }
+      ]
+    },
+    "VER": {
+      "name": "Max Verstappen",
+      "number": 33,
+      "tier": "high",
+      "ignores": 15,
+      "pushback": 35,
+      "confidence": "high",
+      "evidence": [
+        {
+          "note": "Refused to give P6 back to Perez, Brazil 2022",
+          "source": "https://www.skysports.com/f1/news/12433/12746514/red-bull-drivers-row-as-max-verstappen-refuses-team-order-to-let-sergio-perez-past-in-sao-paulo-gp"
+        },
+        {
+          "note": "Ignored five calls to slow down, Saudi Arabia 2024",
+          "source": "https://racingnews365.com/transcript-reveals-verstappen-disobeying-team-orders-during-saudi-gp"
+        },
+        {
+          "note": "Strategy row with his engineer, Hungary 2024",
+          "source": "https://racer.com/2024/07/21/verstappen-tells-off-critics-as-he-fumes-over-red-bulls-poor-strategy/"
+        }
+      ]
+    },
+    "VET": {
+      "name": "Sebastian Vettel",
+      "number": 5,
+      "tier": "high",
+      "ignores": 12,
+      "pushback": 30,
+      "confidence": "high",
+      "evidence": [
+        {
+          "note": "'Multi 21': passed Webber against orders, Malaysia 2013",
+          "source": "https://www.formula1.com/en/latest/article/horner-reveals-what-sparked-multi-21-controversy.6rSHG4O9lCE0yUQaMC0SWq"
+        },
+        {
+          "note": "Wouldn't give the lead back to Leclerc, Russia 2019",
+          "source": "https://www.motorsportmagazine.com/articles/single-seaters/f1/vettel-admits-he-was-wrong-over-russian-gp-team-orders"
+        },
+        {
+          "note": "'Tough luck', then moved over, China 2014",
+          "source": "https://www.racefans.net/2014/04/23/2014-chinese-grand-prix-team-radio-transcript/"
+        }
+      ]
+    },
+    "ZHO": {
+      "name": "Zhou Guanyu",
+      "number": 24,
+      "tier": "low",
+      "ignores": 1,
+      "pushback": 8,
+      "confidence": "medium",
+      "evidence": []
+    }
+  }
+}

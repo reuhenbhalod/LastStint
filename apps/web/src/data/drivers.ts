@@ -1,65 +1,39 @@
-// Who's who for the driver card: full name and race number by timing code. The race model
-// carries codes and teams only; these are the 2021 grid's (the one race in the beta).
+// Who's who, and how each driver takes the wall's calls: data/drivers.json (feedback round 2
+// research, every driver in our races). The race model carries codes and teams only.
 
-/** How a driver takes the wall's live calls (feedback round 2, D3): `always` does them,
- * `questions` asks "are you sure?" on some (and rarely refuses), `sometimes` refuses about
- * one in four. */
-export type Attitude = 'always' | 'questions' | 'sometimes';
+import db from '@data/drivers.json';
 
-export const ATTITUDE_LABEL: Record<Attitude, string> = {
-  always: 'Always listens',
-  questions: 'Listens, with questions',
-  sometimes: 'Sometimes listens',
-};
+export type Tier = 'high' | 'medium' | 'low';
 
 export interface DriverInfo {
   name: string;
   number: number;
+  /** Attitude tier, from how often the driver ignores the wall. */
+  tier: Tier;
+  /** % of the wall's live calls (BOX, headset) the driver refuses. */
+  ignores: number;
+  /** % of calls they'd argue with (researched, not used in the game yet). */
+  pushback: number;
+  confidence: 'high' | 'medium' | 'low';
+  evidence: Array<{ note: string; source: string }>;
 }
 
-const DRIVERS: Record<string, DriverInfo> = {
-  VER: { name: 'Max Verstappen', number: 33 },
-  HAM: { name: 'Lewis Hamilton', number: 44 },
-  BOT: { name: 'Valtteri Bottas', number: 77 },
-  PER: { name: 'Sergio Pérez', number: 11 },
-  NOR: { name: 'Lando Norris', number: 4 },
-  RIC: { name: 'Daniel Ricciardo', number: 3 },
-  LEC: { name: 'Charles Leclerc', number: 16 },
-  SAI: { name: 'Carlos Sainz', number: 55 },
-  GAS: { name: 'Pierre Gasly', number: 10 },
-  TSU: { name: 'Yuki Tsunoda', number: 22 },
-  ALO: { name: 'Fernando Alonso', number: 14 },
-  OCO: { name: 'Esteban Ocon', number: 31 },
-  VET: { name: 'Sebastian Vettel', number: 5 },
-  STR: { name: 'Lance Stroll', number: 18 },
-  RAI: { name: 'Kimi Räikkönen', number: 7 },
-  GIO: { name: 'Antonio Giovinazzi', number: 99 },
-  RUS: { name: 'George Russell', number: 63 },
-  LAT: { name: 'Nicholas Latifi', number: 6 },
-  MSC: { name: 'Mick Schumacher', number: 47 },
-  MAZ: { name: 'Nikita Mazepin', number: 9 },
+const DRIVERS = db.drivers as Record<string, DriverInfo>;
+
+export const TIER_LABEL: Record<Tier, string> = {
+  high: 'High attitude',
+  medium: 'Medium attitude',
+  low: 'Low attitude',
 };
 
-export function driverInfo(code: string): DriverInfo | null {
-  return DRIVERS[code] ?? null;
+export function driverInfo(code: string): DriverInfo | undefined {
+  return DRIVERS[code];
 }
 
-/** Each driver's attitude on the radio (one fixed personality per driver). */
-const ATTITUDES: Record<string, Attitude> = {
-  HAM: 'questions',
-  VER: 'questions',
-  LEC: 'questions',
-  SAI: 'questions',
-  RIC: 'questions',
-  GAS: 'questions',
-  VET: 'questions',
-  ALO: 'sometimes',
-  RAI: 'sometimes',
-  TSU: 'sometimes',
-  MAZ: 'sometimes',
-};
-
-/** A driver's attitude; anyone not listed always listens. */
-export function attitudeOf(code: string): Attitude {
-  return ATTITUDES[code] ?? 'always';
+/** The share (0-1) of live calls a driver refuses; a driver not in the file always listens. */
+export function ignoreRate(code: string): number {
+  return (DRIVERS[code]?.ignores ?? 0) / 100;
 }
+
+/** Every driver code in the file (for the coverage test). */
+export const driverCodes = (): string[] => Object.keys(DRIVERS);
