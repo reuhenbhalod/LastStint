@@ -68,12 +68,12 @@ RACES: dict[str, dict] = {
     "france-2021": {
         "year": 2021,
         "event": "France",
-        "name": "France 2021: Hamilton vs Verstappen",
+        "name": "France 2021: Hamilton vs Perez",
         "era": "2014-2025",
-        "takeover_lap": 15,  # D3 rule
-        "seed": 97680,
+        "takeover_lap": 15,  # pinned: the duel below changed (races batch 2)
+        "seed": 6466,  # tuned: scripts/tune.ts (races batch 2)
         "user_side": "HAM",
-        "rival": "VER",
+        "rival": "PER",  # defend race: the car behind (races batch 2)
         "score_positions": 6,
         "split": "tune",
         "dilemma": "Cover Red Bull's second stop or stay on one stop",
@@ -245,12 +245,12 @@ RACES: dict[str, dict] = {
     "austria-2019": {
         "year": 2019,
         "event": "Austria",
-        "name": "Austria 2019",
+        "name": "Austria 2019: Leclerc vs Bottas",
         "era": "2014-2025",
-        "takeover_lap": None,  # D3 rule
-        "seed": 34134,
-        "user_side": None,  # validation race: automatic duel, runner-up vs winner
-        "rival": None,
+        "takeover_lap": 19,  # pinned: the duel below changed (races batch 2)
+        "seed": 24531,  # tuned: scripts/tune.ts (races batch 2)
+        "user_side": "LEC",
+        "rival": "BOT",  # defend race: the car behind (races batch 2)
         "score_positions": 6,
         "split": "holdout",
     },
