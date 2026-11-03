@@ -146,6 +146,15 @@
         }
       ]
     },
+    "FIT": {
+      "name": "Pietro Fittipaldi",
+      "number": 51,
+      "tier": "low",
+      "ignores": 2,
+      "pushback": 10,
+      "confidence": "low",
+      "evidence": []
+    },
     "GAS": {
       "name": "Pierre Gasly",
       "number": 10,
