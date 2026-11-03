@@ -16,7 +16,7 @@ type Call = Decision;
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="flex min-w-0 flex-col gap-2 rounded-lg bg-[var(--card-2)] p-3">
+    <section className="flex min-w-0 flex-col gap-1.5 rounded-lg bg-[var(--card-2)] p-2.5">
       <span className="eyebrow">{title}</span>
       {children}
     </section>
@@ -57,10 +57,10 @@ export function TeamRadio({
   if (!me) return null;
 
   const btn =
-    'rounded-lg px-2 py-2 text-[13px] font-semibold disabled:opacity-40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--you)]';
+    'rounded-lg px-2 py-1.5 text-[13px] font-semibold disabled:opacity-40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--you)]';
 
   return (
-    <section aria-label="Team radio" className="card flex flex-col gap-3">
+    <section aria-label="Team radio" className="card flex flex-col gap-2.5">
       <button
         type="button"
         aria-expanded={open}
@@ -84,8 +84,8 @@ export function TeamRadio({
       </button>
 
       {open && (
-        <div className="grid gap-3 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.3fr)]">
-          <div className="flex min-w-0 flex-col gap-3">
+        <div className="grid gap-2.5 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.3fr)]">
+          <div className="flex min-w-0 flex-col gap-2.5">
             <Section title="Pit stop · box this lap">
               {boxing ? (
                 <output className="flex items-center justify-center gap-2 rounded-lg border-2 border-dashed border-[var(--box)] py-2.5 text-[14px] font-bold">
@@ -102,7 +102,7 @@ export function TeamRadio({
                       type="button"
                       disabled={disabled || me.retired}
                       onClick={() => onCall({ lap: next, kind: 'pit', compound: c })}
-                      className={`${btn} flex flex-col items-center justify-center gap-1 bg-[var(--box)] text-white hover:brightness-110`}
+                      className={`${btn} flex items-center justify-center gap-1 whitespace-nowrap !px-1 !text-[12px] bg-[var(--box)] text-white hover:brightness-110`}
                     >
                       <span className={`tyre ${c} bg-[var(--tarmac)]`}>{LETTER[c] ?? c[0]}</span>
                       {tyreName(c)}

@@ -42,7 +42,9 @@ export function CarStats({
   const last = log.at(-1);
   const mine = last?.lapTimes[userSide];
   const theirs = last?.lapTimes[rival];
+  // (Laps either car stopped on don't count: a stop isn't pace.)
   const recent = log
+    .filter((l) => !l.pits.some((p) => p.code === userSide || p.code === rival))
     .slice(-3)
     .map((l) => [l.lapTimes[userSide], l.lapTimes[rival]] as const)
     .filter(([a, b]) => a !== undefined && b !== undefined) as Array<[number, number]>;

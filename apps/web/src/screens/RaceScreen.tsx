@@ -181,7 +181,7 @@ export function RaceScreen({
     }`;
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-[1360px] flex-col gap-3 px-4 pb-6 pt-3">
+    <main className="mx-auto flex min-h-screen max-w-[1360px] flex-col gap-3 px-4 pb-6 pt-3 xl:h-screen xl:pb-3">
       <header className="flex items-center justify-between gap-3 border-b border-[var(--rule)] pb-2">
         <span className="flex min-w-0 items-baseline gap-2">
           <span className="disp wide shrink-0 text-[18px] leading-none">Pit Wall</span>
@@ -249,7 +249,8 @@ export function RaceScreen({
         </span>
       </header>
 
-      <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[250px_minmax(0,1fr)_320px]">
+      {/* On a laptop the race view fits the screen: each column scrolls inside itself. */}
+      <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_300px] xl:min-h-0 xl:flex-1 xl:grid-cols-[250px_minmax(0,1fr)_320px]">
         {/* Standings: left on wide screens, under the race otherwise. */}
         <section
           aria-label="Standings"
@@ -259,19 +260,21 @@ export function RaceScreen({
             <span className="eyebrow">Standings</span>
             <span className="eyebrow">Tyre · gap</span>
           </div>
-          <TimingTower
-            race={state.race}
-            model={model}
-            userSide={userSide}
-            rival={rival}
-            onPick={select}
-          />
+          <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+            <TimingTower
+              race={state.race}
+              model={model}
+              userSide={userSide}
+              rival={rival}
+              onPick={select}
+            />
+          </div>
         </section>
 
         {/* The race: scoreboard over the circuit, the controls under it. */}
         <section
           aria-label="Race"
-          className="order-1 flex min-w-0 flex-col gap-3 self-start xl:order-2"
+          className="order-1 flex min-w-0 flex-col gap-3 xl:order-2 xl:min-h-0 xl:overflow-y-auto"
         >
           <div>
             <div className="grid grid-cols-[1fr_auto_1fr] items-center rounded-t-xl border border-b-0 border-[var(--rule)] bg-[var(--card)] px-3 py-2">
@@ -457,11 +460,11 @@ export function RaceScreen({
         </section>
 
         {/* Stats: your driver, the car, the radio. */}
-        <aside aria-label="Stats" className="order-2 flex flex-col gap-3 xl:order-3">
+        <aside aria-label="Stats" className="order-2 flex flex-col gap-3 xl:order-3 xl:min-h-0">
           <DriverProfile code={userSide} race={state.race} model={model} log={log} />
           <CarStats race={state.race} model={model} log={log} userSide={userSide} rival={rival} />
           {/* The rest of the column, in two halves: your calls graded, then the radio. */}
-          <div className="flex min-h-[260px] flex-1 basis-0 flex-col gap-3">
+          <div className="flex min-h-[260px] flex-1 basis-0 flex-col gap-3 xl:min-h-0">
             <LiveGrades state={state} />
             <section aria-label="Radio" className="card flex min-h-0 flex-1 flex-col gap-2">
               <span className="eyebrow">Radio</span>
