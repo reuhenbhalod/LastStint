@@ -311,3 +311,19 @@ export function laneT(raw: number, garage: number): number {
   if (raw < 0.6) return garage;
   return garage + (1 - garage) * ease((raw - 0.6) / 0.4);
 }
+
+/**
+ * The bottom corner of the map with the least circuit in it, for the legend and map buttons
+ * to sit on clear ground: counts the lap's and pit lane's points inside a box `w` x `h`
+ * (fractions of the map) at each bottom corner.
+ */
+export function quietCorner(outline: TrackOutline, w = 0.45, h = 0.16): 'left' | 'right' {
+  const pts = [...outline.points, ...(outline.pit ?? [])];
+  const inBox = (left: boolean) =>
+    pts.filter(
+      ([x, y]) =>
+        y > outline.height * (1 - h) &&
+        (left ? x < outline.width * w : x > outline.width * (1 - w)),
+    ).length;
+  return inBox(true) <= inBox(false) ? 'left' : 'right';
+}

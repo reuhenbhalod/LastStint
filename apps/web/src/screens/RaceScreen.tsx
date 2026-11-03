@@ -28,6 +28,7 @@ import { useRaceLog } from '../game/raceLog.js';
 import { radioChirp, setSoundOn, soundOn } from '../game/sound.js';
 import { type Game, LAP_MS } from '../game/useGame.js';
 import type { GameState } from '../state/machine.js';
+import { quietCorner } from '../track/geometry.js';
 import { outlineFor } from '../track/outlines.js';
 
 const FLAG = {
@@ -54,6 +55,7 @@ export function RaceScreen({
   const them = state.race.cars[rival];
   const paused = state.phase === 'decision';
   const outline = outlineFor(model.race.id);
+  const corner = useMemo(() => (outline ? quietCorner(outline) : 'left'), [outline]);
   const [selected, setSelected] = useState<string | null>(null);
   const [sound, setSound] = useState(soundOn);
   // The map's pop-over: the gap trace.
@@ -246,11 +248,11 @@ export function RaceScreen({
         </span>
       </header>
 
-      <div className="grid items-start gap-4 md:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[250px_minmax(0,1fr)_320px]">
+      <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[250px_minmax(0,1fr)_320px]">
         {/* Standings: left on wide screens, under the race otherwise. */}
         <section
           aria-label="Standings"
-          className="order-3 overflow-hidden rounded-xl border border-[var(--rule)] bg-[var(--card)] md:col-span-2 xl:order-1 xl:col-span-1"
+          className="order-3 flex flex-col overflow-hidden rounded-xl border border-[var(--rule)] bg-[var(--card)] md:col-span-2 xl:order-1 xl:col-span-1"
         >
           <div className="flex justify-between border-b border-[var(--rule)] px-3 py-2">
             <span className="eyebrow">Standings</span>
@@ -266,7 +268,10 @@ export function RaceScreen({
         </section>
 
         {/* The race: scoreboard over the circuit, the controls under it. */}
-        <section aria-label="Race" className="order-1 flex min-w-0 flex-col gap-3 xl:order-2">
+        <section
+          aria-label="Race"
+          className="order-1 flex min-w-0 flex-col gap-3 self-start xl:order-2"
+        >
           <div>
             <div className="grid grid-cols-[1fr_auto_1fr] items-center rounded-t-xl border border-b-0 border-[var(--rule)] bg-[var(--card)] px-3 py-2">
               <div className="flex items-center gap-2">
@@ -349,7 +354,9 @@ export function RaceScreen({
                 </div>
               )}
               {selected && (
-                <div className="absolute bottom-2.5 left-2.5 z-10">
+                <div
+                  className={`absolute bottom-12 z-10 ${corner === 'left' ? 'left-2.5' : 'right-2.5'}`}
+                >
                   <DriverCard
                     code={selected}
                     race={state.race}
@@ -361,34 +368,18 @@ export function RaceScreen({
                   />
                 </div>
               )}
-              {!selected && (
-                <div className="absolute bottom-2.5 left-2.5 hidden flex-wrap gap-3 sm:flex rounded-md bg-black/45 px-2 py-1 text-[11px] font-semibold text-[#cfd6d3]">
-                  <span>
-                    <i className="mr-1 inline-block h-2 w-2 rounded-full bg-[var(--you)]" />
-                    {userSide}
-                  </span>
-                  <span>
-                    <i className="mr-1 inline-block h-2 w-2 rounded-full bg-[var(--rival)]" />
-                    {rival}
-                  </span>
-                  <span>
-                    <i className="mr-1 inline-block h-2 w-2 rounded-full bg-[var(--field)]" />
-                    Field
-                  </span>
-                  <span>
-                    <i className="mr-1 inline-block h-2 w-2 rounded-full border border-dashed border-[var(--field)]" />
-                    Lapped
-                  </span>
-                  <span className="hidden lg:inline">Ring = tyre · tap a car</span>
-                </div>
-              )}
               {/* The map's pop-overs (under the map on a phone). */}
               {panel && (
-                <div className="absolute bottom-12 right-2.5 z-20 hidden w-[380px] rounded-xl border border-[var(--rule)] bg-[var(--card)]/95 p-3 shadow-2xl backdrop-blur md:block">
+                <div
+                  className={`absolute bottom-12 z-20 hidden w-[380px] ${corner === 'left' ? 'left-2.5' : 'right-2.5'} rounded-xl border border-[var(--rule)] bg-[var(--card)]/95 p-3 shadow-2xl backdrop-blur md:block`}
+                >
                   {panelBody}
                 </div>
               )}
-              <div className="absolute bottom-2.5 right-2.5 z-20 flex gap-1.5">
+              {/* Legend and the gap button, in the bottom corner the circuit leaves clear. */}
+              <div
+                className={`absolute bottom-2.5 z-20 flex items-center gap-1.5 ${corner === 'left' ? 'left-2.5' : 'right-2.5 flex-row-reverse'}`}
+              >
                 <button
                   type="button"
                   aria-pressed={panel === 'gap'}
@@ -397,6 +388,27 @@ export function RaceScreen({
                 >
                   Gap {gap === null ? '' : `${gap >= 0 ? '+' : '−'}${Math.abs(gap).toFixed(1)}`}
                 </button>
+                {!selected && (
+                  <div className="hidden flex-wrap gap-3 rounded-md bg-black/45 px-2 py-1 text-[11px] font-semibold text-[#cfd6d3] sm:flex">
+                    <span>
+                      <i className="mr-1 inline-block h-2 w-2 rounded-full bg-[var(--you)]" />
+                      {userSide}
+                    </span>
+                    <span>
+                      <i className="mr-1 inline-block h-2 w-2 rounded-full bg-[var(--rival)]" />
+                      {rival}
+                    </span>
+                    <span>
+                      <i className="mr-1 inline-block h-2 w-2 rounded-full bg-[var(--field)]" />
+                      Field
+                    </span>
+                    <span>
+                      <i className="mr-1 inline-block h-2 w-2 rounded-full border border-dashed border-[var(--field)]" />
+                      Lapped
+                    </span>
+                    <span className="hidden lg:inline">Ring = tyre · tap a car</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -447,12 +459,14 @@ export function RaceScreen({
         <aside aria-label="Stats" className="order-2 flex flex-col gap-3 xl:order-3">
           <DriverProfile code={userSide} race={state.race} model={model} log={log} />
           <CarStats race={state.race} model={model} log={log} userSide={userSide} rival={rival} />
-          {state.radio.length > 0 && (
-            <section aria-label="Radio" className="card flex flex-col gap-2">
-              <span className="eyebrow">Radio</span>
-              <RadioLog messages={state.radio} />
-            </section>
-          )}
+          <section aria-label="Radio" className="card flex min-h-[120px] flex-1 flex-col gap-2">
+            <span className="eyebrow">Radio</span>
+            {state.radio.length ? (
+              <RadioLog messages={state.radio} max={8} />
+            ) : (
+              <p className="m-0 text-[13px] text-[var(--muted)]">Quiet so far.</p>
+            )}
+          </section>
         </aside>
       </div>
     </main>

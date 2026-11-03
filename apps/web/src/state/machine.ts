@@ -133,7 +133,7 @@ export function reducer(state: GameState, action: Action): GameState {
       return { ...state, speed: action.speed };
 
     case 'RADIO':
-      return { ...state, radio: [...state.radio, action.message].slice(-6) };
+      return { ...state, radio: [...state.radio, action.message].slice(-12) };
 
     case 'GRADED': // grading finishes in a worker, whatever the phase
       return { ...state, grades: { ...state.grades, [action.momentId]: action.graded } };

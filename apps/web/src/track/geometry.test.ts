@@ -12,6 +12,7 @@ import {
   pointAlong,
   pointAt,
   polyline,
+  quietCorner,
   runToFlag,
   spaceOut,
   spreadLane,
@@ -180,5 +181,27 @@ describe('pitPosition', () => {
     const p = pitPosition(0, 0.02, 0.25, lane, 0.4);
     expect(p.lane).not.toBeNull();
     expect(p.lane).toBeGreaterThan(0);
+  });
+});
+
+describe('quietCorner', () => {
+  it('picks the bottom corner the circuit stays out of', () => {
+    const outline = {
+      raceId: 't',
+      width: 100,
+      height: 100,
+      corners: [],
+      // A loop down the left side, reaching the bottom-left corner.
+      points: [
+        [10, 10],
+        [40, 10],
+        [40, 95],
+        [10, 95],
+      ] as Array<[number, number]>,
+    };
+    expect(quietCorner(outline as never)).toBe('right');
+    expect(
+      quietCorner({ ...outline, points: outline.points.map(([x, y]) => [100 - x, y]) } as never),
+    ).toBe('left');
   });
 });

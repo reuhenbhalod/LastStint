@@ -2,13 +2,13 @@
 
 import type { RadioMessage } from '../state/machine.js';
 
-export function RadioLog({ messages }: { messages: RadioMessage[] }) {
+export function RadioLog({ messages, max = 3 }: { messages: RadioMessage[]; max?: number }) {
   if (!messages.length) return null;
   return (
     <ul aria-live="polite" className="m-0 flex list-none flex-col gap-1.5 p-0">
       {[...messages]
         .reverse()
-        .slice(0, 3)
+        .slice(0, max)
         .map((m, i) => (
           <li
             key={`${m.lap}-${m.text}-${messages.length - i}`}
@@ -16,7 +16,7 @@ export function RadioLog({ messages }: { messages: RadioMessage[] }) {
               m.refused
                 ? 'border-[var(--box)] bg-[color-mix(in_srgb,var(--box)_14%,transparent)]'
                 : 'border-[var(--you)] bg-[var(--card-2)]'
-            } ${i > 0 ? 'opacity-60' : ''}`}
+            } ${i > 0 ? 'opacity-70' : ''}`}
           >
             <span className="mono mr-1.5 text-[11px] text-[var(--muted)]">
               L{m.lap} {m.from}
