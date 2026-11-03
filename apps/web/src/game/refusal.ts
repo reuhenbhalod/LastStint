@@ -67,5 +67,6 @@ export function refusal(
 /** The radio's "copy" for a call the driver will make. */
 export function acknowledge(call: LiveCall): string {
   if (call.kind === 'pit') return `Copy, box this lap for ${call.compound.toLowerCase()}s.`;
-  return `Copy, ${call.value} mode.`;
+  const mode = call.value === 'liftAndCoast' ? 'lift and coast' : call.value;
+  return `Copy, ${mode} mode.`;
 }

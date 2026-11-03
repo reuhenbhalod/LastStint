@@ -14,6 +14,7 @@ import { DecisionPanel } from '../components/DecisionPanel.js';
 import { DriverCard } from '../components/DriverCard.js';
 import { DriverProfile } from '../components/DriverProfile.js';
 import { GapTrace } from '../components/GapTrace.js';
+import { LiveGrades } from '../components/LiveGrades.js';
 import { PitCard } from '../components/PitCard.js';
 import { QuickCallCard } from '../components/QuickCallCard.js';
 import { RadioAlert } from '../components/RadioAlert.js';
@@ -459,14 +460,20 @@ export function RaceScreen({
         <aside aria-label="Stats" className="order-2 flex flex-col gap-3 xl:order-3">
           <DriverProfile code={userSide} race={state.race} model={model} log={log} />
           <CarStats race={state.race} model={model} log={log} userSide={userSide} rival={rival} />
-          <section aria-label="Radio" className="card flex min-h-[120px] flex-1 flex-col gap-2">
-            <span className="eyebrow">Radio</span>
-            {state.radio.length ? (
-              <RadioLog messages={state.radio} max={8} />
-            ) : (
-              <p className="m-0 text-[13px] text-[var(--muted)]">Quiet so far.</p>
-            )}
-          </section>
+          {/* The rest of the column, in two halves: your calls graded, then the radio. */}
+          <div className="flex min-h-[260px] flex-1 basis-0 flex-col gap-3">
+            <LiveGrades state={state} />
+            <section aria-label="Radio" className="card flex min-h-0 flex-1 flex-col gap-2">
+              <span className="eyebrow">Radio</span>
+              {state.radio.length ? (
+                <div className="min-h-0 overflow-y-auto">
+                  <RadioLog messages={state.radio} max={8} />
+                </div>
+              ) : (
+                <p className="m-0 text-[13px] text-[var(--muted)]">Quiet so far.</p>
+              )}
+            </section>
+          </div>
         </aside>
       </div>
     </main>

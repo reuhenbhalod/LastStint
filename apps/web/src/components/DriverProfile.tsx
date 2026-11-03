@@ -1,6 +1,5 @@
-// Your driver, in the stats column: who they are, how they take the wall's calls (attitude
-// tier, how often they ignore a call and a real radio moment behind it, data/drivers.json),
-// and where they stand: place, tyres, stops, headset modes.
+// Your driver, in the stats column: who they are, their attitude (data/drivers.json), and
+// where they stand: place, tyres, stops, headset modes.
 
 import type { RaceModel, RaceState } from '@boxthislap/sim';
 import { TIER_LABEL, driverInfo } from '../data/drivers.js';
@@ -34,32 +33,13 @@ export function DriverProfile({
           <span className="block truncate text-[13px] text-[var(--muted)]">
             {car?.team} · {code}
           </span>
+          {info && (
+            <span className="block text-[13px] font-semibold text-[var(--you)]">
+              {TIER_LABEL[info.tier]}
+            </span>
+          )}
         </span>
       </header>
-      {info && (
-        <div className="rounded-lg bg-[var(--card-2)] px-3 py-2">
-          <div className="flex items-baseline justify-between gap-2">
-            <span className="eyebrow">On the radio</span>
-            <span className="text-[13px] font-semibold">{TIER_LABEL[info.tier]}</span>
-          </div>
-          <p className="m-0 text-[13px] leading-snug">
-            Ignores <span className="font-semibold">{info.ignores}%</span> of your live calls
-          </p>
-          {info.evidence[0] && (
-            <p className="m-0 text-[12px] leading-snug text-[var(--muted)]">
-              Real radio:{' '}
-              <a
-                href={info.evidence[0].source}
-                target="_blank"
-                rel="noreferrer"
-                className="underline hover:text-[var(--ink)]"
-              >
-                {info.evidence[0].note}
-              </a>
-            </p>
-          )}
-        </div>
-      )}
       <dl className="m-0 grid grid-cols-3 gap-2 text-center">
         <div>
           <dt className="eyebrow">Place</dt>

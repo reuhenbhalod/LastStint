@@ -42,7 +42,7 @@ export function HeadsetPanel({
         <div key={row.key} className="grid grid-cols-[58px_1fr] items-center gap-2">
           <span className="eyebrow">{row.label}</span>
           <fieldset
-            className={`m-0 grid ${COLS[row.values.length] ?? 'grid-cols-3'} overflow-hidden rounded-lg border border-[var(--rule)] p-0`}
+            className={`m-0 grid ${COLS[row.values.length] ?? 'grid-cols-3'} ${row.values.length === 2 ? 'w-1/2' : ''} overflow-hidden rounded-lg border border-[var(--rule)] p-0`}
             aria-label={row.label}
           >
             {row.values.map((v) => {
