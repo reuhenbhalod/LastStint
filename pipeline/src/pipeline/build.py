@@ -159,12 +159,12 @@ RACES: dict[str, dict] = {
     "bahrain-2022": {
         "year": 2022,
         "event": "Bahrain",
-        "name": "Bahrain 2022: Leclerc vs Verstappen",
+        "name": "Bahrain 2022: Leclerc vs Sainz",
         "era": "2014-2025",
-        "takeover_lap": 11,  # D3 rule
+        "takeover_lap": 11,  # pinned: the duel below changed (races batch 1)
         "seed": 78727,
         "user_side": "LEC",
-        "rival": "VER",
+        "rival": "SAI",  # defend race: the car behind (races batch 1)
         "score_positions": 6,
         "split": "tune",
         "dilemma": "Late safety car; Verstappen's retirement is frozen",
@@ -233,7 +233,7 @@ RACES: dict[str, dict] = {
     "hungary-2019": {
         "year": 2019,
         "event": "Hungary",
-        "name": "Hungary 2019",
+        "name": "Hungary 2019: Verstappen vs Hamilton",
         "era": "2014-2025",
         "takeover_lap": None,  # D3 rule
         "seed": 80284,
@@ -269,7 +269,7 @@ RACES: dict[str, dict] = {
     "mexico-2019": {
         "year": 2019,
         "event": "Mexico",
-        "name": "Mexico 2019",
+        "name": "Mexico 2019: Vettel vs Hamilton",
         "era": "2014-2025",
         "takeover_lap": None,  # D3 rule
         "seed": 19428,
@@ -281,12 +281,12 @@ RACES: dict[str, dict] = {
     "france-2019": {
         "year": 2019,
         "event": "France",
-        "name": "France 2019",
+        "name": "France 2019: Bottas vs Leclerc",
         "era": "2014-2025",
-        "takeover_lap": None,  # D3 rule
+        "takeover_lap": 20,  # pinned: the duel below changed (races batch 1)
         "seed": 92053,
-        "user_side": None,  # validation race: automatic duel, runner-up vs winner
-        "rival": None,
+        "user_side": "BOT",
+        "rival": "LEC",  # defend race: the car behind (races batch 1)
         "score_positions": 6,
         "split": "holdout",
     },
@@ -305,19 +305,19 @@ RACES: dict[str, dict] = {
     "spain-2020": {
         "year": 2020,
         "event": "Spain",
-        "name": "Spain 2020",
+        "name": "Spain 2020: Verstappen vs Bottas",
         "era": "2014-2025",
-        "takeover_lap": None,  # D3 rule
+        "takeover_lap": 18,  # pinned: the duel below changed (races batch 1)
         "seed": 62761,
-        "user_side": None,  # validation race: automatic duel, runner-up vs winner
-        "rival": None,
+        "user_side": "VER",
+        "rival": "BOT",  # defend race: the car behind (races batch 1)
         "score_positions": 6,
         "split": "holdout",
     },
     "portugal-2020": {
         "year": 2020,
         "event": "Portugal",
-        "name": "Portugal 2020",
+        "name": "Portugal 2020: Bottas vs Hamilton",
         "era": "2014-2025",
         "takeover_lap": None,  # D3 rule
         "seed": 99081,
@@ -377,7 +377,7 @@ RACES: dict[str, dict] = {
     "italy-2024": {
         "year": 2024,
         "event": "Italy",
-        "name": "Italy 2024",
+        "name": "Italy 2024: Piastri vs Leclerc",
         "era": "2014-2025",
         "takeover_lap": None,  # D3 rule
         "seed": 18811,
@@ -401,7 +401,7 @@ RACES: dict[str, dict] = {
     "hungary-2025": {
         "year": 2025,
         "event": "Hungary",
-        "name": "Hungary 2025",
+        "name": "Hungary 2025: Piastri vs Norris",
         "era": "2014-2025",
         "takeover_lap": None,  # D3 rule
         "seed": 41185,

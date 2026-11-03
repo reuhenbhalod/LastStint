@@ -76,7 +76,7 @@ export function LiveGrades({ state }: { state: GameState }) {
               </div>
               {r.mine && r.best && (
                 <p className="m-0 text-[12px] text-[var(--muted)]">
-                  {pct(r.mine.probability)} to beat the rival
+                  {pct(r.mine.probability)} chance
                   {r.mine.id === r.best.id
                     ? ' · the best option'
                     : ` · best ${pct(r.best.probability)}`}

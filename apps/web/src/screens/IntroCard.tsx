@@ -9,6 +9,7 @@ import type { AccountState } from '../account/useAccount.js';
 import { AccountBar } from '../components/AccountBar.js';
 import { TyreBadge } from '../components/TyreBadge.js';
 import { TIER_LABEL, driverInfo } from '../data/drivers.js';
+import { goalOf } from '../game/goal.js';
 import type { GameState } from '../state/machine.js';
 import { HowToPlay } from './HowToPlay.js';
 
@@ -64,6 +65,7 @@ export function IntroCard({
   const them = state.race.cars[rival];
   const gap = me && them ? them.totalTime - me.totalTime : null;
   const info = driverInfo(userSide);
+  const goal = goalOf(model);
   const [title, subtitle] = (model.race.name ?? model.race.id).split(': ');
 
   return (
@@ -75,6 +77,7 @@ export function IntroCard({
           rival={rival}
           realPos={realPos}
           laps={lapsLeft}
+          goal={goal.line}
           onClose={() => setHowTo(false)}
         />
       )}
@@ -116,6 +119,21 @@ export function IntroCard({
               You’re the {userTeam ?? userSide} team manager. Every strategy call is yours: when to
               box, which tyres, how hard to push, how to race{' '}
               <span className="font-semibold text-[var(--rival)]">{rival}</span>.
+            </p>
+            <p className="m-0 flex flex-wrap items-center gap-2 text-[14px]">
+              <span className="eyebrow">Goal</span>
+              <span
+                className={`rounded-full px-3 py-1 font-semibold ${goal.kind === 'defend' ? 'bg-[color-mix(in_srgb,var(--rival)_18%,transparent)] text-[var(--rival)]' : 'bg-[color-mix(in_srgb,var(--you)_18%,transparent)] text-[var(--you)]'}`}
+              >
+                {goal.short}
+              </span>
+              {realPos > 0 && (
+                <span className="text-[var(--muted)]">
+                  {goal.kind === 'defend'
+                    ? `and keep the real result (P${realPos})`
+                    : `and beat the real result (P${realPos})`}
+                </span>
+              )}
             </p>
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <button

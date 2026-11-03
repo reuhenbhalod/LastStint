@@ -15,9 +15,14 @@ export function verdict(
   driver: string,
   rival: string,
   beatRival: boolean,
+  /** A defend race (game/goal.ts): holding the real result is the job, so say so. */
+  defend = false,
 ): Verdict {
   const you = `${driver} P${pos}${beatRival ? `, ahead of ${rival}` : `, behind ${rival}`}.`;
   const real = realPos > 0 ? `The real ${team} pit wall finished P${realPos}.` : '';
+  if (defend && realPos > 0 && pos === realPos) {
+    return { outcome: 'matched', headline: `You held P${pos}!`, detail: `${you} ${real}`.trim() };
+  }
   if (realPos <= 0 || pos === realPos) {
     return {
       outcome: 'matched',

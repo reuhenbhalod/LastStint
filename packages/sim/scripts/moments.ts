@@ -1,5 +1,6 @@
 // Moment finder CLI (perfection spec D4):
-//   pnpm --filter @boxthislap/sim moments <race-id> [--samples N]
+//   pnpm --filter @boxthislap/sim moments <race-id> [--samples N] [--hold P]
+// (--hold P grades on finishing P or better instead of beating the rival.)
 // Grades every candidate decision moment from the real race's state, prints the verdicts, and
 // writes the ones that pass the plan 5.3 quality bar to data/moments/proposed/<race-id>.json.
 // A human picks the final 2-4 and saves them as data/moments/<race-id>.json; the pipeline
@@ -19,11 +20,17 @@ if (!raceId) {
 }
 const samplesFlag = rest.indexOf('--samples');
 const samples = samplesFlag >= 0 ? Number(rest[samplesFlag + 1]) : undefined;
+const holdFlag = rest.indexOf('--hold');
+const hold = holdFlag >= 0 ? Number(rest[holdFlag + 1]) : undefined;
 
 const model = JSON.parse(
   readFileSync(join(repo, 'data', 'races', `${raceId}.json`), 'utf8'),
 ) as RaceModel;
-const proposed = proposeMoments(model, samples);
+const proposed = proposeMoments(
+  model,
+  samples,
+  hold ? { kind: 'position', atBest: hold } : undefined,
+);
 
 for (const m of proposed) {
   const grades = m.grade.options

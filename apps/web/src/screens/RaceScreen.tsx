@@ -327,79 +327,100 @@ export function RaceScreen({
               </div>
             </div>
             <div
-              className={`relative overflow-hidden rounded-b-xl bg-[var(--tarmac)] xl:min-h-0 xl:flex-1 ${paused ? 'map-alert' : ''}`}
+              className={`flex flex-col overflow-hidden rounded-b-xl bg-[var(--tarmac)] xl:min-h-0 xl:flex-1 ${paused ? 'map-alert' : ''}`}
             >
-              {outline ? (
-                <TrackMap
-                  outline={outline}
-                  race={state.race}
-                  model={model}
-                  userSide={userSide}
-                  rival={rival}
-                  clock={game.clock}
-                  selected={selected}
-                  onSelect={select}
-                  dim={paused}
-                  finishing={finishMeta}
-                />
-              ) : (
-                <p className="p-8 text-center text-[var(--muted)]">
-                  No track map for this race yet.
-                </p>
-              )}
-              <div className="absolute left-2.5 top-2.5 flex flex-col items-start gap-1.5">
-                <span className="rounded-md bg-black/55 px-2 py-1 text-[12px] font-semibold text-white">
-                  Lap {state.race.lap} · {lapsLeft} to go
-                </span>
-                <span
-                  className={`rounded-md px-2 py-1 text-[11px] font-bold uppercase tracking-wider ${flag.cls}`}
-                >
-                  {flag.text}
-                </span>
-              </div>
-              {finishing && crossed && (
-                <output className="radio-alert absolute inset-x-2.5 bottom-12 z-10 mx-auto flex max-w-[420px] items-center justify-center gap-3 rounded-xl border-2 border-white bg-[#141716]/90 px-4 py-3 text-white shadow-2xl">
-                  <span aria-hidden="true" className="text-[26px]">
-                    🏁
-                  </span>
-                  <span className="disp text-[19px] leading-none">
-                    Chequered flag · {userSide} P{finishPos}
-                  </span>
-                </output>
-              )}
-              {paused && state.currentMoment && (
-                <RadioAlert moment={state.currentMoment} race={state.race} model={model} />
-              )}
-              {stop && (
-                <div className="absolute right-2.5 top-2.5 z-10">
-                  <PitCard
-                    key={`${stop.code}-${stop.lap}`}
-                    stop={stop}
+              <div className="relative xl:min-h-0 xl:flex-1">
+                {outline ? (
+                  <TrackMap
+                    outline={outline}
                     race={state.race}
+                    model={model}
                     userSide={userSide}
                     rival={rival}
+                    clock={game.clock}
+                    selected={selected}
+                    onSelect={select}
+                    dim={paused}
+                    finishing={finishMeta}
                   />
+                ) : (
+                  <p className="p-8 text-center text-[var(--muted)]">
+                    No track map for this race yet.
+                  </p>
+                )}
+                <div className="absolute left-2.5 top-2.5 flex flex-col items-start gap-1.5">
+                  <span className="rounded-md bg-black/55 px-2 py-1 text-[12px] font-semibold text-white">
+                    Lap {state.race.lap} · {lapsLeft} to go
+                  </span>
+                  <span
+                    className={`rounded-md px-2 py-1 text-[11px] font-bold uppercase tracking-wider ${flag.cls}`}
+                  >
+                    {flag.text}
+                  </span>
                 </div>
-              )}
-              {selected && !narrow && (
-                <div
-                  className={`absolute bottom-12 z-10 ${corner === 'left' ? 'left-2.5' : 'right-2.5'}`}
-                >
-                  {driverCard}
+                {finishing && crossed && (
+                  <output className="radio-alert absolute inset-x-2.5 bottom-12 z-10 mx-auto flex max-w-[420px] items-center justify-center gap-3 rounded-xl border-2 border-white bg-[#141716]/90 px-4 py-3 text-white shadow-2xl">
+                    <span aria-hidden="true" className="text-[26px]">
+                      🏁
+                    </span>
+                    <span className="disp text-[19px] leading-none">
+                      Chequered flag · {userSide} P{finishPos}
+                    </span>
+                  </output>
+                )}
+                {paused && state.currentMoment && (
+                  <RadioAlert moment={state.currentMoment} race={state.race} model={model} />
+                )}
+                {stop && (
+                  <div className="absolute right-2.5 top-2.5 z-10">
+                    <PitCard
+                      key={`${stop.code}-${stop.lap}`}
+                      stop={stop}
+                      race={state.race}
+                      userSide={userSide}
+                      rival={rival}
+                    />
+                  </div>
+                )}
+                {selected && !narrow && (
+                  <div
+                    className={`absolute bottom-2.5 z-10 ${corner === 'left' ? 'left-2.5' : 'right-2.5'}`}
+                  >
+                    {driverCard}
+                  </div>
+                )}
+                {/* The map's pop-overs (under the map on a phone). */}
+                {panel && (
+                  <div
+                    className={
+                      'absolute bottom-2.5 right-2.5 z-20 hidden w-[380px] rounded-xl border border-[var(--rule)] bg-[var(--card)]/95 p-3 shadow-2xl backdrop-blur md:block'
+                    }
+                  >
+                    {panelBody}
+                  </div>
+                )}
+              </div>
+              {/* Legend and the gap button, in a bar under the map: never on the circuit. */}
+              <div className="flex items-center justify-between gap-2 border-t border-white/10 px-2.5 py-1.5">
+                <div className="flex flex-wrap gap-3 text-[11px] font-semibold text-[#cfd6d3]">
+                  <span>
+                    <i className="mr-1 inline-block h-2 w-2 rounded-full bg-[var(--you)]" />
+                    {userSide}
+                  </span>
+                  <span>
+                    <i className="mr-1 inline-block h-2 w-2 rounded-full bg-[var(--rival)]" />
+                    {rival}
+                  </span>
+                  <span className="hidden sm:inline">
+                    <i className="mr-1 inline-block h-2 w-2 rounded-full bg-[var(--field)]" />
+                    Field
+                  </span>
+                  <span className="hidden sm:inline">
+                    <i className="mr-1 inline-block h-2 w-2 rounded-full border border-dashed border-[var(--field)]" />
+                    Lapped
+                  </span>
+                  <span className="hidden lg:inline">Ring = tyre · tap a car</span>
                 </div>
-              )}
-              {/* The map's pop-overs (under the map on a phone). */}
-              {panel && (
-                <div
-                  className={`absolute bottom-12 z-20 hidden w-[380px] ${corner === 'left' ? 'left-2.5' : 'right-2.5'} rounded-xl border border-[var(--rule)] bg-[var(--card)]/95 p-3 shadow-2xl backdrop-blur md:block`}
-                >
-                  {panelBody}
-                </div>
-              )}
-              {/* Legend and the gap button, in the bottom corner the circuit leaves clear. */}
-              <div
-                className={`absolute bottom-2.5 z-20 flex items-center gap-1.5 ${corner === 'left' ? 'left-2.5' : 'right-2.5 flex-row-reverse'}`}
-              >
                 <button
                   type="button"
                   aria-pressed={panel === 'gap'}
@@ -408,27 +429,6 @@ export function RaceScreen({
                 >
                   Gap {gap === null ? '' : `${gap >= 0 ? '+' : '−'}${Math.abs(gap).toFixed(1)}`}
                 </button>
-                {!selected && (
-                  <div className="hidden flex-wrap gap-3 rounded-md bg-black/45 px-2 py-1 text-[11px] font-semibold text-[#cfd6d3] sm:flex">
-                    <span>
-                      <i className="mr-1 inline-block h-2 w-2 rounded-full bg-[var(--you)]" />
-                      {userSide}
-                    </span>
-                    <span>
-                      <i className="mr-1 inline-block h-2 w-2 rounded-full bg-[var(--rival)]" />
-                      {rival}
-                    </span>
-                    <span>
-                      <i className="mr-1 inline-block h-2 w-2 rounded-full bg-[var(--field)]" />
-                      Field
-                    </span>
-                    <span>
-                      <i className="mr-1 inline-block h-2 w-2 rounded-full border border-dashed border-[var(--field)]" />
-                      Lapped
-                    </span>
-                    <span className="hidden lg:inline">Ring = tyre · tap a car</span>
-                  </div>
-                )}
               </div>
             </div>
           </div>

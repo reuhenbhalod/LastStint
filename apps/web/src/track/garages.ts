@@ -1,0 +1,143 @@
+// Pit garages along the lane, entry to exit, per season. Garages go by the previous season's
+// constructors' championship, the champions nearest the exit, so each list is that standings
+// order reversed, under the season's own team names (as the race models spell them).
+
+/** Previous season's constructors' standings, champions first, in this season's names. */
+const STANDINGS: Record<number, string[]> = {
+  2018: [
+    'Mercedes',
+    'Ferrari',
+    'Red Bull Racing',
+    'Force India|Racing Point',
+    'Williams',
+    'Renault',
+    'Toro Rosso',
+    'Haas F1 Team',
+    'McLaren',
+    'Sauber',
+  ],
+  2019: [
+    'Mercedes',
+    'Ferrari',
+    'Red Bull Racing',
+    'Renault',
+    'Haas F1 Team',
+    'McLaren',
+    'Racing Point',
+    'Alfa Romeo Racing',
+    'Toro Rosso',
+    'Williams',
+  ],
+  2020: [
+    'Mercedes',
+    'Ferrari',
+    'Red Bull Racing',
+    'McLaren',
+    'Renault',
+    'AlphaTauri',
+    'Racing Point',
+    'Alfa Romeo Racing',
+    'Haas F1 Team',
+    'Williams',
+  ],
+  2021: [
+    'Mercedes',
+    'Red Bull Racing',
+    'McLaren',
+    'Aston Martin',
+    'Alpine',
+    'Ferrari',
+    'AlphaTauri',
+    'Alfa Romeo Racing',
+    'Haas F1 Team',
+    'Williams',
+  ],
+  2022: [
+    'Mercedes',
+    'Red Bull Racing',
+    'Ferrari',
+    'McLaren',
+    'Alpine',
+    'AlphaTauri',
+    'Aston Martin',
+    'Williams',
+    'Alfa Romeo',
+    'Haas F1 Team',
+  ],
+  2023: [
+    'Red Bull Racing',
+    'Ferrari',
+    'Mercedes',
+    'Alpine',
+    'McLaren',
+    'Alfa Romeo',
+    'Aston Martin',
+    'Haas F1 Team',
+    'AlphaTauri',
+    'Williams',
+  ],
+  2024: [
+    'Red Bull Racing',
+    'Mercedes',
+    'Ferrari',
+    'McLaren',
+    'Aston Martin',
+    'Alpine',
+    'Williams',
+    'RB',
+    'Kick Sauber',
+    'Haas F1 Team',
+  ],
+  2025: [
+    'McLaren',
+    'Ferrari',
+    'Red Bull Racing',
+    'Mercedes',
+    'Aston Martin',
+    'Alpine',
+    'Haas F1 Team',
+    'Racing Bulls',
+    'Williams',
+    'Kick Sauber',
+  ],
+};
+
+const SHORT: Record<string, string> = {
+  Mercedes: 'MER',
+  Ferrari: 'FER',
+  'Red Bull Racing': 'RBR',
+  McLaren: 'MCL',
+  Renault: 'REN',
+  Alpine: 'ALP',
+  'Racing Point': 'RP',
+  'Force India': 'FI',
+  'Aston Martin': 'AM',
+  'Toro Rosso': 'STR',
+  AlphaTauri: 'AT',
+  RB: 'RB',
+  'Racing Bulls': 'RB',
+  'Alfa Romeo Racing': 'ALF',
+  'Alfa Romeo': 'ALF',
+  Sauber: 'SAU',
+  'Kick Sauber': 'SAU',
+  'Haas F1 Team': 'HAA',
+  Williams: 'WIL',
+};
+
+/**
+ * The garages for a race, entry to exit: [team, short label], under the names the race uses
+ * (a team renamed mid-season, like Force India to Racing Point in 2018, is listed both ways).
+ * Unknown seasons use the nearest one listed.
+ */
+export function garagesFor(season: number, teams: string[] = []): Array<[string, string]> {
+  const years = Object.keys(STANDINGS).map(Number);
+  const near = years.reduce((a, b) => (Math.abs(b - season) < Math.abs(a - season) ? b : a));
+  return [...(STANDINGS[near] as string[])].reverse().map((entry) => {
+    const names = entry.split('|');
+    const team = names.find((n) => teams.includes(n)) ?? (names[0] as string);
+    return [team, SHORT[team] ?? team.slice(0, 3).toUpperCase()];
+  });
+}
+
+/** A race's season, from its id (e.g. abu-dhabi-2021). */
+export const seasonOf = (raceId: string): number => Number(raceId.slice(-4)) || 2021;

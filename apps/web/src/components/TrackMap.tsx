@@ -7,6 +7,7 @@
 import type { RaceModel, RaceState } from '@boxthislap/sim';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import type { LapClock } from '../game/useGame.js';
+import { garagesFor, seasonOf } from '../track/garages.js';
 import {
   type PitLane,
   type Polyline,
@@ -34,27 +35,14 @@ const GLIDE = 0.45;
 /** Track width in map units (the asphalt band). */
 const TRACK = 30;
 
-/** Garage order along the pit lane, entry to exit (2021's, by 2020 constructors' standings
- * in reverse: the champions sit nearest the exit). Short names for the box labels. */
-const GARAGES: Array<[string, string]> = [
-  ['Williams', 'WIL'],
-  ['Haas F1 Team', 'HAA'],
-  ['Alfa Romeo Racing', 'ALF'],
-  ['AlphaTauri', 'AT'],
-  ['Ferrari', 'FER'],
-  ['Alpine', 'ALP'],
-  ['Aston Martin', 'AM'],
-  ['McLaren', 'MCL'],
-  ['Red Bull Racing', 'RBR'],
-  ['Mercedes', 'MER'],
-];
 /** Where the garages sit along the drawn lane (fractions of its length). */
 const GARAGE_FROM = 0.22;
 const GARAGE_TO = 0.62;
 
-function garageAt(team: string | undefined): number {
-  const i = GARAGES.findIndex(([t]) => t === team);
-  const k = i < 0 ? 0.5 : i / (GARAGES.length - 1);
+/** Where a team's garage sits on the drawn lane (track/garages.ts has each season's order). */
+function garageAt(team: string | undefined, garages: Array<[string, string]>): number {
+  const i = garages.findIndex(([t]) => t === team);
+  const k = i < 0 ? 0.5 : i / (garages.length - 1);
   return GARAGE_FROM + (GARAGE_TO - GARAGE_FROM) * k;
 }
 
@@ -69,12 +57,14 @@ function stretch(line: Polyline, a: number, b: number, n = 8): Array<[number, nu
 /** The circuit itself: drawn once per outline (cars move over it). */
 const TrackArt = memo(function TrackArt({
   outline,
+  garageList,
   line,
   lane,
   userTeam,
   rivalTeam,
 }: {
   outline: TrackOutline;
+  garageList: Array<[string, string]>;
   line: Polyline;
   lane: PitLane | null;
   userTeam?: string;
@@ -96,8 +86,8 @@ const TrackArt = memo(function TrackArt({
   const startAngle = (Math.atan2(ny - sy, nx - sx) * 180) / Math.PI;
   // Garages, on the side of the lane away from the track.
   const garages = lane
-    ? GARAGES.map(([team, short]) => {
-        const t = garageAt(team);
+    ? garageList.map(([team, short]) => {
+        const t = garageAt(team, garageList);
         const [gx, gy] = pointAlong(lane.path, t);
         const a = angleAlong(lane.path, t);
         const ox = -Math.sin(a);
@@ -337,6 +327,14 @@ export function TrackMap({
 }) {
   const line = useMemo(() => polyline(outline.points), [outline]);
   const lane = useMemo(() => pitLane(outline, line, TRACK), [outline, line]);
+  const garages = useMemo(
+    () =>
+      garagesFor(
+        seasonOf(model.race.id),
+        model.drivers.map((d) => d.team),
+      ),
+    [model],
+  );
   // Gaps become distance at the pace of the lap being driven (the restart lap at racing
   // speed); at the flag, the final gaps at racing speed.
   // (Live play adds neutralizations after crashes: the state knows the next lap's flag.)
@@ -414,7 +412,7 @@ export function TrackMap({
       glideRef.current.prev.get(code) ?? after,
       after,
       lane as PitLane,
-      garageAt(race.cars[code]?.team),
+      garageAt(race.cars[code]?.team, garages),
     );
   const shown = spaceOut(
     new Map(
@@ -454,6 +452,7 @@ export function TrackMap({
       <title id="track-map-title">{`Track map, lap ${race.lap}. Select a car for its details.`}</title>
       <TrackArt
         outline={outline}
+        garageList={garages}
         line={line}
         lane={lane}
         userTeam={race.cars[userSide]?.team}

@@ -15,6 +15,7 @@ import {
   api,
 } from '../data/api.js';
 import { autoStay } from '../game/autoStay.js';
+import { goalOf } from '../game/goal.js';
 import type { Game } from '../game/useGame.js';
 import { verdict } from '../game/verdict.js';
 import type { GameState } from '../state/machine.js';
@@ -118,7 +119,7 @@ function CallRow({
         <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 font-mono text-xs text-neutral-400">
           <dt>Your call</dt>
           <dd>
-            {pct(call.probability)} to beat the rival
+            {pct(call.probability)} chance of your goal
             {behind > 0 ? ` (${behind.toFixed(1)} pts behind the best)` : ''}
           </dd>
           <dt>Best call</dt>
@@ -156,7 +157,15 @@ export function ResultScreen({
   const model = game.model;
   const team = model?.drivers.find((d) => d.code === userSide)?.team ?? userSide;
   const realPos = (model?.realResult.indexOf(userSide) ?? -1) + 1;
-  const v = verdict(pos, realPos, team, userSide, rival, beatRival);
+  const v = verdict(
+    pos,
+    realPos,
+    team,
+    userSide,
+    rival,
+    beatRival,
+    model ? goalOf(model).kind === 'defend' : false,
+  );
   const calls = callsFrom(state, response);
   const local = game.localScore();
   const score = response?.score ?? (calls.length ? local?.score : null);

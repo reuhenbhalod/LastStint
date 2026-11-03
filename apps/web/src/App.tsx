@@ -3,7 +3,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useAccount } from './account/useAccount.js';
-import { ApiDailyProvider } from './data/provider.js';
+import { ApiDailyProvider, RaceFileProvider } from './data/provider.js';
 import { useGame } from './game/useGame.js';
 import { HowItWorks } from './screens/HowItWorks.js';
 import { IntroCard } from './screens/IntroCard.js';
@@ -11,7 +11,11 @@ import { RaceScreen } from './screens/RaceScreen.js';
 import { ResultScreen } from './screens/ResultScreen.js';
 
 export function App() {
-  const provider = useMemo(() => new ApiDailyProvider(), []);
+  // On localhost, ?race=<id> practises any race file (e.g. ?race=canada-2022).
+  const provider = useMemo(() => {
+    const race = import.meta.env.DEV ? new URLSearchParams(location.search).get('race') : null;
+    return race ? new RaceFileProvider(race) : new ApiDailyProvider();
+  }, []);
   const game = useGame(provider);
   const account = useAccount(game.reload);
   const [help, setHelp] = useState(false);

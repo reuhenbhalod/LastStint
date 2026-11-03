@@ -9,6 +9,10 @@ describe('verdict', () => {
     expect(v.detail).toBe('HAM P1, ahead of VER. The real Mercedes pit wall finished P2.');
   });
 
+  it('a defend race held is "you held P2"', () => {
+    expect(verdict(2, 2, 'Mercedes', 'BOT', 'LEC', true, true).headline).toBe('You held P2!');
+  });
+
   it('matches it on the same place', () => {
     expect(verdict(2, 2, 'Mercedes', 'HAM', 'VER', false).headline).toBe('You matched Mercedes');
     expect(verdict(1, 1, 'Red Bull Racing', 'VER', 'HAM', true).headline).toBe(

@@ -3,7 +3,8 @@
 // them, because its real answer is already its real strategy. (What-if check, Oct 27 2026:
 // before this, Italy 2024's paused state had PIA 10 s off his real race.) A player's BOX call
 // is always a stop, so the user's real fastest-lap stop (optional for scripted cars) is
-// called only when the replay took it.
+// called only when the replay took it. The rival's own optional stop is taken in live play only
+// if the gap behind covers it (sim.ts); when it's skipped, the replay is compared without it.
 
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
@@ -31,7 +32,15 @@ describe('live play with the real calls', () => {
     const calls = realDecisions(model).filter((d) => !skipped.has(d.lap));
     const live = initRun(model, model.race.seed, { decisions: calls, incidents: false });
     while (!isFinished(live)) stepLap(live);
-    for (const [code, car] of Object.entries(replay.state.cars)) {
+    const rival = model.drivers.find((d) => d.code === model.rival);
+    let expected = replay;
+    if (live.state.cars[model.rival]?.tyreAge !== replay.state.cars[model.rival]?.tyreAge) {
+      expected = initRun(model, model.race.seed, {
+        strategies: { [model.rival]: (rival?.realStrategy ?? []).filter((s) => !s.optional) },
+      });
+      while (!isFinished(expected)) stepLap(expected);
+    }
+    for (const [code, car] of Object.entries(expected.state.cars)) {
       expect(live.state.cars[code]?.totalTime).toBeCloseTo(car.totalTime, 9);
     }
     expect(live.notes).toEqual([]);

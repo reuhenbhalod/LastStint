@@ -8,13 +8,20 @@ interface Step {
   body: string[];
 }
 
-function steps(team: string, user: string, rival: string, realPos: number, laps: number): Step[] {
+function steps(
+  team: string,
+  user: string,
+  rival: string,
+  realPos: number,
+  laps: number,
+  goal: string,
+): Step[] {
   return [
     {
       title: `You’re the ${team} team manager`,
       body: [
         `A real race, as it really was, until you take over the pit wall with ${laps} laps to go.`,
-        `Your goal: finish ahead of ${rival}${realPos ? `, and do better than the real ${team} pit wall did (P${realPos})` : ''}.`,
+        `Your goal: ${goal}${realPos ? `, and do better than the real ${team} pit wall did (P${realPos})` : ''}.`,
       ],
     },
     {
@@ -54,6 +61,7 @@ export function HowToPlay({
   rival,
   realPos,
   laps,
+  goal,
   onClose,
 }: {
   team: string;
@@ -61,9 +69,11 @@ export function HowToPlay({
   rival: string;
   realPos: number;
   laps: number;
+  /** What you race for, as a phrase ("finish ahead of VER"). */
+  goal: string;
   onClose: () => void;
 }) {
-  const all = steps(team, user, rival, realPos, laps);
+  const all = steps(team, user, rival, realPos, laps, goal);
   const [i, setI] = useState(0);
   const step = all[i] as Step;
   const last = i === all.length - 1;
