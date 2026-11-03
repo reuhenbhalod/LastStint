@@ -191,9 +191,9 @@ export function RaceScreen({
     <main className="mx-auto flex min-h-screen max-w-[1360px] flex-col gap-3 px-4 pb-6 pt-3">
       <header className="flex items-center justify-between gap-3 border-b border-[var(--rule)] pb-2">
         <span className="flex min-w-0 items-baseline gap-2">
-          <span className="disp shrink-0 text-[24px] leading-none">Pit Wall</span>
+          <span className="disp wide shrink-0 text-[18px] leading-none">Pit Wall</span>
           {team && (
-            <span className="disp hidden truncate text-[24px] leading-none text-[var(--you)] sm:inline">
+            <span className="disp hidden truncate text-[18px] leading-none text-[var(--you)] sm:inline">
               {team} team manager
             </span>
           )}
@@ -207,7 +207,7 @@ export function RaceScreen({
               Practice · not saved
             </span>
           )}
-          <span className="eyebrow min-w-0 truncate">
+          <span className="eyebrow hidden min-w-0 truncate sm:inline">
             {number ? `Daily #${number}` : (state.meta.practiceReason ?? 'Practice')} ·{' '}
             {model.race.name ?? model.race.id}
           </span>
@@ -242,15 +242,15 @@ export function RaceScreen({
             <div className="grid grid-cols-[1fr_auto_1fr] items-center rounded-t-xl border border-b-0 border-[var(--rule)] bg-[var(--card)] px-3 py-2">
               <div className="flex items-center gap-2">
                 <span className="h-7 w-1.5 rounded-sm bg-[var(--you)]" />
-                <span className="disp text-[24px] leading-none">{userSide}</span>
+                <span className="disp wide text-[20px] leading-none">{userSide}</span>
                 {me && !me.retired && <TyreBadge compound={me.compound} age={me.tyreAge} />}
               </div>
               <div className="text-center">
-                <div className="disp text-[32px] leading-none">
+                <div className="disp wide text-[26px] leading-none">
                   {state.race.lap}
                   <span className="text-[18px] text-[var(--muted)]"> / {totalLaps}</span>
                 </div>
-                <div className="mono text-[12px] text-[var(--muted)]">
+                <div className="mono whitespace-nowrap text-[11px] text-[var(--muted)] sm:text-[12px]">
                   {gap === null
                     ? ''
                     : gap >= 0
@@ -260,7 +260,7 @@ export function RaceScreen({
               </div>
               <div className="flex items-center justify-end gap-2">
                 {them && !them.retired && <TyreBadge compound={them.compound} age={them.tyreAge} />}
-                <span className="disp text-[24px] leading-none">{rival}</span>
+                <span className="disp wide text-[20px] leading-none">{rival}</span>
                 <span className="h-7 w-1.5 rounded-sm bg-[var(--rival)]" />
               </div>
             </div>
@@ -300,7 +300,7 @@ export function RaceScreen({
                   <span aria-hidden="true" className="text-[26px]">
                     🏁
                   </span>
-                  <span className="disp text-[26px] leading-none">
+                  <span className="disp text-[19px] leading-none">
                     Chequered flag · {userSide} P{finishPos}
                   </span>
                 </output>
@@ -441,7 +441,7 @@ export function RaceScreen({
 
         {/* The call column. */}
         <aside aria-label="Your call" className="order-2 flex flex-col gap-3 xl:order-3">
-          <h2 className="disp m-0 text-[26px] leading-none">Your call</h2>
+          <h2 className="disp m-0 text-[19px] leading-none">Your call</h2>
           {paused && state.currentMoment ? (
             <div className="fixed inset-x-0 bottom-0 z-30 max-h-[75vh] overflow-y-auto p-3 md:static md:max-h-none md:p-0">
               <DecisionPanel

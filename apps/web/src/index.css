@@ -27,9 +27,16 @@
   --medium: #f2c230;
   --hard: #e9ece9;
   --box: #d4432f;
-  --display: "Saira Extra Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
-  --body: "Barlow", "Helvetica Neue", Arial, sans-serif;
-  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  /* One family, Archivo (feedback round 2): wide and heavy for headlines and big numbers (the
+     F1 broadcast look), normal width for text, lined-up figures for timing. */
+  --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --body: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --mono: "Archivo", "Helvetica Neue", Arial, sans-serif;
+}
+
+@theme {
+  --font-sans: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "Archivo", "Helvetica Neue", Arial, sans-serif;
 }
 
 body {
@@ -50,10 +57,17 @@ label:has(input) {
 
 .disp {
   font-family: var(--display);
+  font-stretch: 100%;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.01em;
+  letter-spacing: -0.005em;
 }
-.mono {
+/* The widest cut, for the few hero figures (lap counter, scoreboard, BOX). */
+.wide {
+  font-stretch: 125%;
+}
+.mono,
+.font-mono {
   font-family: var(--mono);
   font-variant-numeric: tabular-nums;
 }

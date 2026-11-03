@@ -32,11 +32,11 @@ export function DriverProfile({
   return (
     <section aria-label="Your driver" className="card flex flex-col gap-3">
       <header className="flex items-center gap-3">
-        <span className="disp flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-[var(--you)] text-[26px] leading-none text-[#08231f]">
+        <span className="disp flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-[var(--you)] text-[19px] leading-none text-[#08231f]">
           {info?.number ?? code}
         </span>
         <span className="min-w-0">
-          <span className="disp block truncate text-[24px] leading-none">{info?.name ?? code}</span>
+          <span className="disp block truncate text-[18px] leading-none">{info?.name ?? code}</span>
           <span className="block truncate text-[13px] text-[var(--muted)]">
             {car?.team} · {code}
           </span>
@@ -52,7 +52,7 @@ export function DriverProfile({
       <dl className="m-0 grid grid-cols-3 gap-2 text-center">
         <div>
           <dt className="eyebrow">Place</dt>
-          <dd className="m-0 disp text-[22px] leading-none">{car?.retired ? 'OUT' : `P${pos}`}</dd>
+          <dd className="m-0 disp text-[16px] leading-none">{car?.retired ? 'OUT' : `P${pos}`}</dd>
         </div>
         <div>
           <dt className="eyebrow">Tyres</dt>
@@ -62,7 +62,7 @@ export function DriverProfile({
         </div>
         <div>
           <dt className="eyebrow">Stops</dt>
-          <dd className="m-0 disp text-[22px] leading-none">{stops.length}</dd>
+          <dd className="m-0 disp text-[16px] leading-none">{stops.length}</dd>
         </div>
         <div>
           <dt className="eyebrow">Pace</dt>

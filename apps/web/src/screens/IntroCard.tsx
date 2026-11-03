@@ -60,7 +60,7 @@ export function IntroCard({
         <p className="font-mono text-xs uppercase tracking-widest text-neutral-500">
           {number ? `Daily Race #${number}` : 'Daily Race'}
         </p>
-        <h1 className="mt-1 disp text-[40px] leading-none leading-tight">
+        <h1 className="mt-1 disp text-[30px] leading-none leading-tight">
           {model.race.name ?? model.race.id}
         </h1>
       </div>

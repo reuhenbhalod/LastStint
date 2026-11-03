@@ -55,7 +55,7 @@ export function TimingTower({
                   background: you ? 'var(--you)' : isRival ? 'var(--rival)' : 'var(--rule)',
                 }}
               />
-              <span className="disp text-[19px] leading-none">{code}</span>
+              <span className="disp text-[14px] leading-none">{code}</span>
               <span>{!car.retired && <TyreBadge compound={car.compound} age={car.tyreAge} />}</span>
               <span className="mono text-right text-[12px] text-[var(--muted)]">{text}</span>
             </button>

@@ -117,7 +117,7 @@ export function HowToPlay({
             Skip
           </button>
         </div>
-        <h2 id="how-to-play-title" className="disp m-0 text-[32px] leading-none">
+        <h2 id="how-to-play-title" className="disp m-0 text-[24px] leading-none">
           {step.title}
         </h2>
         {step.body.map((p) => (
