@@ -1,26 +1,7 @@
-// How to play (feedback round 2, A4): a short walkthrough over the daily card. It opens by
-// itself on a player's first visit, and "How to play" reopens it. Remembered per browser; if
-// storage is blocked it just shows again next time.
+// How to play: a short walkthrough over the daily card. It opens every time the daily card
+// shows (Skip closes it), and "How to play" reopens it.
 
 import { useEffect, useState } from 'react';
-
-const SEEN = 'pitwall:how-to-play';
-
-export function seenHowToPlay(): boolean {
-  try {
-    return localStorage.getItem(SEEN) === '1';
-  } catch {
-    return false;
-  }
-}
-
-function markSeen(): void {
-  try {
-    localStorage.setItem(SEEN, '1');
-  } catch {
-    // ignore: storage blocked
-  }
-}
 
 interface Step {
   title: string;
@@ -86,10 +67,7 @@ export function HowToPlay({
   const [i, setI] = useState(0);
   const step = all[i] as Step;
   const last = i === all.length - 1;
-  const close = () => {
-    markSeen();
-    onClose();
-  };
+  const close = onClose;
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') close();

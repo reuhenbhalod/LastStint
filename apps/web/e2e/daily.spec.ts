@@ -119,7 +119,7 @@ test('plays the Abu Dhabi daily end to end', async ({ page, context }) => {
   });
 
   await page.goto('/');
-  // First visit: the how-to-play walkthrough opens by itself.
+  // The how-to-play walkthrough opens with the daily card.
   await expect(page.getByRole('dialog')).toContainText('team manager');
   for (let i = 0; i < 4; i++) await page.getByRole('button', { name: 'Next' }).click();
   await page.getByRole('button', { name: 'Got it' }).click();

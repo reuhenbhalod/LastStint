@@ -7,7 +7,7 @@ import type { AccountState } from '../account/useAccount.js';
 import { AccountBar } from '../components/AccountBar.js';
 import { driverInfo } from '../data/drivers.js';
 import type { GameState } from '../state/machine.js';
-import { HowToPlay, seenHowToPlay } from './HowToPlay.js';
+import { HowToPlay } from './HowToPlay.js';
 
 export function IntroCard({
   state,
@@ -23,8 +23,8 @@ export function IntroCard({
   account?: AccountState;
 }) {
   const { userSide, rival, takeoverLap, totalLaps, number, source, practiceReason } = state.meta;
-  // The walkthrough opens by itself the first time.
-  const [howTo, setHowTo] = useState(() => !seenHowToPlay());
+  // The walkthrough opens every time the daily card does.
+  const [howTo, setHowTo] = useState(true);
   const lapsLeft = totalLaps - takeoverLap;
   const userTeam = model.drivers.find((d) => d.code === userSide)?.team;
   const realPos = model.realResult.indexOf(userSide) + 1;
