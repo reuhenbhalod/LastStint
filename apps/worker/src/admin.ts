@@ -17,7 +17,7 @@ import type { Context } from 'hono';
 import { verifyGoogleToken } from './auth.js';
 import { addDays, isDate, todayUtc } from './dates.js';
 import type { Env } from './index.js';
-import { RACE_FILES } from './races.gen.js';
+import { DAILY_POOL } from './pools.js';
 import { getRace } from './races.js';
 import { ApiError } from './runs.js';
 
@@ -46,10 +46,10 @@ export async function requireAdmin(c: Ctx): Promise<{ email: string; sub: string
   return { email, sub: who.sub };
 }
 
-/** Races that can be played as a daily: those with decision moments. */
+/** Races that can be played as a daily: the daily pool's (data/pools.json), with moments. */
 export async function playableRaces() {
   const out = [];
-  for (const id of Object.keys(RACE_FILES).sort()) {
+  for (const id of [...DAILY_POOL].sort()) {
     const race = await getRace(id);
     if (!race || race.model.decisionMoments.length === 0) continue;
     const m = race.model;

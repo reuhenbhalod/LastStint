@@ -11,9 +11,11 @@ import { HowItWorks } from './screens/HowItWorks.js';
 import { IntroCard } from './screens/IntroCard.js';
 import { RaceScreen } from './screens/RaceScreen.js';
 import { ResultScreen } from './screens/ResultScreen.js';
+import { Survivor } from './screens/Survivor.js';
 
 export function App() {
   if (location.pathname.startsWith('/admin')) return <AdminPage />;
+  if (location.pathname.startsWith('/survivor')) return <Survivor />;
   return <Game />;
 }
 

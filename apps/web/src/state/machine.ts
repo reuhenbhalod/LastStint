@@ -40,7 +40,7 @@ export interface GameMeta {
   /** Puzzle number, for the share line (live dailies only). */
   number?: number;
   /** A live daily is submitted and ranked; practice is played locally only. */
-  source: 'live' | 'practice';
+  source: 'live' | 'practice' | 'survivor';
   practiceReason?: string;
   date: string;
   totalLaps: number;

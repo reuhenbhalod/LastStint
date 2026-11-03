@@ -94,6 +94,31 @@ export class ApiDailyProvider implements DailyProvider {
 /** Every race file, loaded on demand (practice on any playable race, `?race=` on localhost). */
 const RACE_FILES = import.meta.glob<{ default: RaceModel }>('../../../../data/races/*.json');
 
+/** A race of a survivor run: the race the server dealt, on its seed (`number`: the round). */
+export class SurvivorProvider implements DailyProvider {
+  constructor(
+    private readonly runId: string,
+    private readonly round: number,
+    private readonly raceId: string,
+    private readonly seed: number,
+  ) {}
+
+  async today(): Promise<Daily> {
+    const load = RACE_FILES[`../../../../data/races/${this.raceId}.json`];
+    if (!load) throw new Error(`no race file ${this.raceId}`);
+    const model = (await load()).default;
+    return {
+      // Unique per round: the save slot only restores this round's race.
+      date: `${this.runId}#${this.round}`,
+      raceId: this.raceId,
+      seed: this.seed,
+      model,
+      number: this.round,
+      source: 'survivor',
+    };
+  }
+}
+
 /** Practice on a chosen race file (`?race=canada-2022&seed=…`: localhost, or an admin). */
 export class RaceFileProvider implements DailyProvider {
   constructor(

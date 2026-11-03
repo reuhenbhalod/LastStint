@@ -22,6 +22,9 @@ export default defineConfig(async () => {
             GOOGLE_JWKS: JSON.stringify({ keys: [pub] }),
             TEST_GOOGLE_PRIVATE_JWK: JSON.stringify(priv),
             ADMIN_EMAILS: 'Admin@Example.com, other@example.com',
+            // Survivor tests deal from two bundled races: Spain 2020 (the real calls win: VER
+            // holds BOT) and Canada 2022 (they lose: SAI P2 behind VER).
+            SURVIVOR_POOL: JSON.stringify({ 'spain-2020': [85579], 'canada-2022': [592] }),
           },
         },
       }),

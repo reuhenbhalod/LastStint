@@ -3,31 +3,32 @@
 
 import type { PersistedRun } from './session.js';
 
-const KEY = 'pitwall:run';
+/** The daily's slot; survivor keeps its race in its own (useGame's `storageKey`). */
+export const RUN_KEY = 'pitwall:run';
 
-export function saveRun(run: PersistedRun): void {
+export function saveRun(run: PersistedRun, key = RUN_KEY): void {
   if (typeof localStorage === 'undefined') return;
   try {
-    localStorage.setItem(KEY, JSON.stringify(run));
+    localStorage.setItem(key, JSON.stringify(run));
   } catch {
     // ignore: storage full or blocked
   }
 }
 
-export function loadRun(): PersistedRun | null {
+export function loadRun(key = RUN_KEY): PersistedRun | null {
   if (typeof localStorage === 'undefined') return null;
   try {
-    const raw = localStorage.getItem(KEY);
+    const raw = localStorage.getItem(key);
     return raw ? (JSON.parse(raw) as PersistedRun) : null;
   } catch {
     return null;
   }
 }
 
-export function clearRun(): void {
+export function clearRun(key = RUN_KEY): void {
   if (typeof localStorage === 'undefined') return;
   try {
-    localStorage.removeItem(KEY);
+    localStorage.removeItem(key);
   } catch {
     // ignore
   }

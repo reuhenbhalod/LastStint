@@ -1,0 +1,25 @@
+{
+  "_comment": "Which races each game mode plays (survivor spec D3). A race is in one pool, never both. daily: the scheduler and the admin page rotate these (each plays on its race file's tuned seed). survivor: race id -> the seeds survivor deals from (each passes scripts/tune.ts: the real way gives the real result, good play wins, random play mostly loses); a run picks one at random per race.",
+  "daily": [
+    "abu-dhabi-2021",
+    "abu-dhabi-2024",
+    "austria-2019",
+    "bahrain-2021",
+    "bahrain-2022",
+    "canada-2022",
+    "france-2019",
+    "france-2021",
+    "hungary-2019",
+    "hungary-2025",
+    "italy-2019",
+    "italy-2024",
+    "mexico-2019",
+    "mexico-2021",
+    "mexico-2024",
+    "miami-2022",
+    "portugal-2020",
+    "spain-2020",
+    "usa-2022"
+  ],
+  "survivor": {}
+}

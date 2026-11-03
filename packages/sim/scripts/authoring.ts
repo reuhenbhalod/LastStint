@@ -16,12 +16,13 @@ const MAX_MOMENTS = 6;
 const MIN_SPACING = 3;
 const PACE_EVERY = 4;
 
-/** The race plan and up to MAX_MOMENTS graded calls for `model` (its seed, rival and takeover
- * as given). `log` receives a line per candidate. */
+/** The race plan and up to `max` graded calls (MAX_MOMENTS; survivor races take 2) for
+ * `model` (its seed, rival and takeover as given). `log` receives a line per candidate. */
 export function authorMoments(
   model: RaceModel,
   samples?: number,
   log: (line: string) => void = () => {},
+  max = MAX_MOMENTS,
 ): DecisionMoment[] {
   const target = { kind: 'beat-rival' } as const;
   const first = model.race.takeoverLap + 1;
@@ -234,7 +235,7 @@ export function authorMoments(
   // Calls are MIN_SPACING laps apart; the race plan only needs a lap of its own (Abu Dhabi
   // has the plan on lap 35 and the VSC call on 36).
   const fits = (m: DecisionMoment) =>
-    picked.length <= MAX_MOMENTS &&
+    picked.length <= max &&
     m.lap !== plan.lap &&
     !picked.some((p) => p !== plan && Math.abs(p.lap - m.lap) < MIN_SPACING);
   const kind = (m: DecisionMoment) =>
