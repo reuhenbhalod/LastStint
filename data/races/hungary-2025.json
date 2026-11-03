@@ -27,7 +27,7 @@
       -0.493,
       -0.443,
       -0.334,
-      0,
+      0.0,
       0.429,
       0.472,
       0.491,
@@ -54,7 +54,7 @@
   },
   "compounds": {
     "SOFT": {
-      "offset": 0,
+      "offset": 0.0,
       "degPerLap": 0.08807,
       "cliffLap": 17
     },
@@ -327,7 +327,7 @@
       "noise": 0.6416,
       "stateAtTakeover": {
         "position": 1,
-        "gapAhead": 0,
+        "gapAhead": 0.0,
         "compound": "MEDIUM",
         "tyreAge": 15,
         "compoundsUsed": [

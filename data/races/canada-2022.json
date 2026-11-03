@@ -37,7 +37,7 @@
   },
   "compounds": {
     "MEDIUM": {
-      "offset": 0,
+      "offset": 0.0,
       "degPerLap": 0.02564,
       "cliffLap": 29
     },
@@ -359,7 +359,7 @@
       "noise": 0.3362,
       "stateAtTakeover": {
         "position": 1,
-        "gapAhead": 0,
+        "gapAhead": 0.0,
         "compound": "MEDIUM",
         "tyreAge": 17,
         "compoundsUsed": [

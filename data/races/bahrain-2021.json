@@ -65,7 +65,7 @@
   },
   "compounds": {
     "SOFT": {
-      "offset": 0,
+      "offset": 0.0,
       "degPerLap": 0.10482,
       "cliffLap": 18
     },
@@ -188,7 +188,7 @@
         {
           "lap": 13,
           "to": "HARD",
-          "loss": 31
+          "loss": 31.0
         },
         {
           "lap": 31,
@@ -555,7 +555,7 @@
       "noise": 0.382,
       "stateAtTakeover": {
         "position": 1,
-        "gapAhead": 0,
+        "gapAhead": 0.0,
         "compound": "MEDIUM",
         "tyreAge": 13,
         "compoundsUsed": [

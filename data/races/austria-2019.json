@@ -47,7 +47,7 @@
   },
   "compounds": {
     "SOFT": {
-      "offset": 0,
+      "offset": 0.0,
       "degPerLap": 0.03663,
       "cliffLap": 28
     },
@@ -269,7 +269,7 @@
       "noise": 0.2606,
       "stateAtTakeover": {
         "position": 1,
-        "gapAhead": 0,
+        "gapAhead": 0.0,
         "compound": "SOFT",
         "tyreAge": 22,
         "compoundsUsed": [
