@@ -14,8 +14,8 @@
 //   --allow-ineligible     allow races that aren't eligible (local only, for testing)
 //   --dry-run              print the plan without writing
 //
-// A race is eligible when it has approved decision moments and its Gate G1 status in
-// docs/g1-report.md is pass or borderline. Dates already scheduled are never changed.
+// A race is eligible when it's in the daily pool (data/pools.json), has approved decision
+// moments, and its Gate G1 status in docs/g1-report.md is pass or borderline. Dates already scheduled are never changed.
 
 import { mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -113,10 +113,21 @@ async function main() {
   const args = parseArgs(process.argv.slice(2));
   const models = loadModels();
   const statuses = g1Statuses(readFileSync(join(repo, 'docs', 'g1-report.md'), 'utf8'));
+  const daily = (
+    JSON.parse(readFileSync(join(repo, 'data', 'pools.json'), 'utf8')) as {
+      daily: string[];
+    }
+  ).daily;
+  // In the daily pool (survivor races never play as dailies), with moments, passing G1.
   const eligible = (id: string) => {
     const m = models.get(id);
     const status = statuses.get(id);
-    return !!m && m.decisionMoments.length > 0 && (status === 'pass' || status === 'borderline');
+    return (
+      daily.includes(id) &&
+      !!m &&
+      m.decisionMoments.length > 0 &&
+      (status === 'pass' || status === 'borderline')
+    );
   };
 
   let pool: string[];

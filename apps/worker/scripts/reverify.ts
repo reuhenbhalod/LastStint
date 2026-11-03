@@ -71,6 +71,66 @@ for (const run of runs) {
 console.log(
   `${runs.length} unverified: ${ok} verified, ${corrected} corrected, ${skipped} skipped`,
 );
+
+// Survivor rounds (docs/survivor-spec.md): the same re-grade. A round's win or loss is the
+// replayed race, so it never changes; an edited score is corrected, and a won round's run total
+// with it.
+const rounds = query<{
+  run_id: string;
+  round: number;
+  race_id: string;
+  seed: number;
+  model_hash: string;
+  decisions: string;
+  result: string;
+  score: number;
+  won: number;
+  started_at: string;
+}>(
+  target,
+  `SELECT s.run_id, s.round, s.race_id, s.seed, s.model_hash, s.decisions, s.result, s.score,
+     s.won, r.started_at
+   FROM survivor_rounds s JOIN survivor_runs r ON r.id = s.run_id
+   WHERE s.verified = 0 AND s.won IS NOT NULL ORDER BY s.submitted_at`,
+);
+let roundsOk = 0;
+let roundsFixed = 0;
+for (const r of rounds) {
+  const model = await modelFor(r.race_id, r.model_hash);
+  if (!model) {
+    console.warn(`survivor ${r.run_id} round ${r.round}: ${r.race_id} changed, skipped`);
+    continue;
+  }
+  const check = recheckRun(model, {
+    id: r.run_id,
+    date: r.started_at.slice(0, 10),
+    number: r.round,
+    race_id: r.race_id,
+    seed: r.seed,
+    decisions: r.decisions,
+    result: r.result,
+  });
+  const where = `run_id = '${r.run_id}' AND round = ${r.round}`;
+  if (check.correct) {
+    roundsOk++;
+    statements.push(`UPDATE survivor_rounds SET verified = 1 WHERE ${where};`);
+    continue;
+  }
+  roundsFixed++;
+  const res = check.result;
+  console.warn(`survivor ${r.run_id} round ${r.round}: claimed ${r.score}, true ${res.score}`);
+  statements.push(
+    `UPDATE survivor_rounds SET verified = 1, corrected = 1, score = ${res.score}, result = '${JSON.stringify(
+      res,
+    ).replace(/'/g, "''")}' WHERE ${where};`,
+  );
+  if (r.won) {
+    statements.push(
+      `UPDATE survivor_runs SET score_sum = score_sum + ${res.score - r.score} WHERE id = '${r.run_id}';`,
+    );
+  }
+}
+console.log(`${rounds.length} survivor rounds: ${roundsOk} verified, ${roundsFixed} corrected`);
 if (dryRun || statements.length === 0) {
   console.log(dryRun ? '(dry run: nothing written)' : 'nothing to write');
 } else {

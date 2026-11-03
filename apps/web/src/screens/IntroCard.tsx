@@ -243,7 +243,12 @@ export function IntroCard({
               )}
               <p className="eyebrow m-0 flex items-center gap-2 !text-[var(--you)]">
                 <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-[var(--you)]" />
-                {number ? `Daily race #${number}` : 'Daily race'} · lap {takeoverLap} of {totalLaps}
+                {source === 'survivor'
+                  ? `Survivor · round ${number}`
+                  : number
+                    ? `Daily race #${number}`
+                    : 'Daily race'}{' '}
+                · lap {takeoverLap} of {totalLaps}
               </p>
               <h1 className="m-0 flex flex-col gap-3">
                 <span className="disp wide text-[52px] leading-[0.9] sm:text-[76px]">{title}</span>
@@ -293,6 +298,14 @@ export function IntroCard({
                     →
                   </span>
                 </button>
+                {source !== 'survivor' && (
+                  <a
+                    href="/survivor"
+                    className="flex items-center justify-center gap-2 rounded-xl border-2 border-[var(--box)] px-6 py-[14px] text-[16px] font-bold text-[var(--ink)] hover:bg-[color-mix(in_srgb,var(--box)_14%,transparent)]"
+                  >
+                    Survivor mode
+                  </a>
+                )}
                 <span className="flex gap-4 text-[13px] text-[var(--muted)]">
                   <button
                     type="button"
@@ -301,13 +314,15 @@ export function IntroCard({
                   >
                     How to play
                   </button>
-                  <button
-                    type="button"
-                    onClick={onHelp}
-                    className="underline hover:text-[var(--ink)]"
-                  >
-                    How it works
-                  </button>
+                  {source !== 'survivor' && (
+                    <button
+                      type="button"
+                      onClick={onHelp}
+                      className="underline hover:text-[var(--ink)]"
+                    >
+                      How it works
+                    </button>
+                  )}
                 </span>
               </div>
             </div>

@@ -14,9 +14,10 @@ export interface Daily {
   number?: number;
   /**
    * `live`: today's daily from the Worker, submitted and ranked. `practice`: the bundled race,
-   * played locally when there's no daily (or no connection); not submitted.
+   * played locally when there's no daily (or no connection); not submitted. `survivor`: a race
+   * of a survivor run (`number` is its round), submitted by the survivor screen.
    */
-  source: 'live' | 'practice';
+  source: 'live' | 'practice' | 'survivor';
   /** Why the game fell back to practice, for the banner. */
   practiceReason?: string;
 }

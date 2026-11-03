@@ -86,6 +86,48 @@ export interface PlayerResponse {
   streak: { current: number; best: number; days: number };
 }
 
+/** A survivor run as the server has it (docs/survivor-spec.md). */
+export interface SurvivorState {
+  runId: string;
+  status: 'live' | 'over';
+  rounds: number;
+  meanScore: number;
+  current: { round: number; raceId: string; seed: number } | null;
+  history: Array<{
+    round: number;
+    raceId: string;
+    won: boolean;
+    score: number;
+    finishPosition: number;
+  }>;
+  rank?: number;
+  total?: number;
+}
+
+export interface SurvivorBoardEntry {
+  rank: number;
+  name: string;
+  rounds: number;
+  meanScore: number;
+  live: boolean;
+  date: string;
+}
+
+export const survivorApi = {
+  start: (anonId: string) => apiPost<SurvivorState>('/api/survivor/start', { anonId }),
+  state: (runId: string, anonId: string) =>
+    apiGet<SurvivorState>(`/api/survivor/${runId}?anonId=${anonId}`),
+  round: (runId: string, body: RunSubmission & { round: number }) =>
+    apiPost<{ won: boolean; result: RunResponse; state: SurvivorState }>(
+      `/api/survivor/${runId}/round`,
+      body,
+    ),
+  leaderboard: () =>
+    apiGet<{ allTime: SurvivorBoardEntry[]; week: SurvivorBoardEntry[] }>(
+      '/api/survivor/leaderboard',
+    ),
+};
+
 export const api = {
   daily: (date: string) => apiGet<DailyResponse>(`/api/daily?date=${date}`),
   run: (date: string, anonId: string) => apiGet<RunResponse>(`/api/runs/${date}/${anonId}`),

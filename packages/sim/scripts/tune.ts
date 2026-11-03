@@ -18,6 +18,9 @@
 // random play only when the two-compound warning shows (the last 5 laps).
 // The current seed is kept when it already passes.
 //   pnpm --filter @boxthislap/sim tune <race-id> [--seeds N] [--paths N] [--target 0.15] [--write]
+//   pnpm --filter @boxthislap/sim tune <race-id> --survivor N [--write]
+// --survivor collects up to N seeds that each pass (survivor deals one at random per run);
+// with --write it puts them in data/pools.json under survivor, instead of changing the file.
 
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -52,6 +55,7 @@ if (!raceId) {
 const SEEDS = Number(flag('--seeds') ?? 80);
 const PATHS = Number(flag('--paths') ?? 120);
 const write = args.includes('--write');
+const survivorN = flag('--survivor') ? Number(flag('--survivor')) : 0;
 const TARGET = Number(flag('--target') ?? 0.15);
 /** Random-play win shares a tuned race may have. */
 const BAND = [0.03, 0.35] as const;
@@ -248,6 +252,41 @@ const fmt = (t: Trial) =>
 console.log(
   `${raceId}: ${model.userSide} vs ${model.rival} (${realWins ? 'defend' : 'beat'}), ${moments.length} calls, ${sample.length} paths x ${seeds.length} seeds (${((Date.now() - t0) / 1000).toFixed(0)}s), target ${(TARGET * 100).toFixed(0)}%`,
 );
+if (survivorN > 0) {
+  // Survivor: every passing seed, up to N (good play checked on each).
+  const passing: Trial[] = [];
+  let checked = 0;
+  for (const t of order) {
+    if (passing.length >= survivorN || checked >= survivorN * 3) break;
+    if (!realWay(t, slack) || !inBand(t)) continue;
+    checked++;
+    const good = goodPlay(model, t.seed, moments);
+    console.log(`try    ${fmt(t)}, good play P${good.pos} ${good.win ? 'wins' : 'loses'}`);
+    if (good.win && !passing.includes(t)) passing.push(t);
+  }
+  if (!passing.length) {
+    console.log('no seed passes: real way, good play wins, random play in the band');
+    process.exit(1);
+  }
+  const seeds = passing.map((t) => t.seed);
+  console.log(`survivor seeds: ${seeds.join(' ')}`);
+  if (write) {
+    const poolPath = join(repo, 'data', 'pools.json');
+    const pools = JSON.parse(readFileSync(poolPath, 'utf8')) as {
+      daily: string[];
+      survivor: Record<string, number[]>;
+    };
+    if (pools.daily.includes(raceId)) throw new Error(`${raceId} is a daily race`);
+    pools.survivor[raceId] = seeds;
+    pools.survivor = Object.fromEntries(
+      Object.entries(pools.survivor).sort(([a], [b]) => a.localeCompare(b)),
+    );
+    writeFileSync(poolPath, `${JSON.stringify(pools, null, 2)}\n`);
+    console.log(`wrote ${seeds.length} survivor seeds for ${raceId} to data/pools.json`);
+  }
+  process.exit(0);
+}
+
 let chosen: Trial | undefined;
 let tries = 0;
 for (const t of order) {

@@ -5,13 +5,13 @@
 
 import type { Decision, RaceModel, RaceNote } from '@boxthislap/sim';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ApiError, type RunResponse, api } from '../data/api.js';
+import { ApiError, type RunResponse, type RunSubmission, api } from '../data/api.js';
 import { anonId } from '../data/player.js';
 import type { Daily, DailyProvider } from '../data/types.js';
 import { type Grader, browserGrader } from '../engine/grading.js';
 import type { GameState, Speed } from '../state/machine.js';
 import { GameSession } from '../state/session.js';
-import { clearRun, loadRun, saveRun } from '../state/storage.js';
+import { RUN_KEY, clearRun, loadRun, saveRun } from '../state/storage.js';
 
 // One lap tick on screen. Testers found 3-5 s per lap too fast to follow (feedback spec D4).
 // The track map runs the field one lap round per tick, so this is also how fast the dots move.
@@ -45,6 +45,8 @@ export interface Game {
   call: (decision: Decision, options?: { asked?: boolean; quiet?: boolean }) => void;
   /** What the race model noted so far (battles, contact, trust...). */
   notes: () => RaceNote[];
+  /** The finished race's call log and grades, for a submission (survivor posts its own). */
+  submission: () => Promise<RunSubmission | null>;
   /** Put a line on the radio (no call). */
   radio: (text: string) => void;
   submit: () => void;
@@ -63,7 +65,12 @@ async function postRun(session: GameSession): Promise<RunResponse> {
   }
 }
 
-export function useGame(provider: DailyProvider, grader?: Grader): Game {
+export function useGame(
+  provider: DailyProvider,
+  grader?: Grader,
+  /** Where the in-progress race is saved (survivor keeps its own, apart from the daily's). */
+  storageKey = RUN_KEY,
+): Game {
   const session = useRef<GameSession | null>(null);
   const [daily, setDaily] = useState<Daily | null>(null);
   const [state, setState] = useState<GameState | null>(null);
@@ -82,8 +89,8 @@ export function useGame(provider: DailyProvider, grader?: Grader): Game {
     const s = session.current;
     if (!s) return;
     setState(s.state);
-    saveRun(s.persist());
-  }, []);
+    saveRun(s.persist(), storageKey);
+  }, [storageKey]);
 
   const adopt = useCallback(
     (s: GameSession) => {
@@ -104,7 +111,7 @@ export function useGame(provider: DailyProvider, grader?: Grader): Game {
       const today = await provider.today();
       if (!alive) return;
       setDaily(today);
-      const saved = loadRun();
+      const saved = loadRun(storageKey);
       const s =
         (saved && GameSession.restore(today, saved, graderRef.current ?? undefined)) ||
         new GameSession(today, { grader: graderRef.current ?? undefined });
@@ -124,7 +131,7 @@ export function useGame(provider: DailyProvider, grader?: Grader): Game {
     return () => {
       alive = false;
     };
-  }, [provider, adopt, sync, attempt]);
+  }, [provider, adopt, sync, attempt, storageKey]);
 
   // The lap clock: advance one lap per tick while racing. A tick starts the moment racing
   // starts or resumes (no dead wait after a decision), and a speed change keeps the lap's
@@ -197,9 +204,9 @@ export function useGame(provider: DailyProvider, grader?: Grader): Game {
   // a submitted daily can't be replayed).
   const reset = useCallback(() => {
     if (!daily) return;
-    clearRun();
+    clearRun(storageKey);
     adopt(new GameSession(daily, { grader: graderRef.current ?? undefined }));
-  }, [daily, adopt]);
+  }, [daily, adopt, storageKey]);
 
   return {
     state,
@@ -216,6 +223,7 @@ export function useGame(provider: DailyProvider, grader?: Grader): Game {
     call: (decision, options) => act((s) => s.call(decision, options))(),
     radio: (text) => act((s) => s.radio(text))(),
     notes: () => session.current?.notes ?? [],
+    submission: async () => session.current?.submission(anonId()) ?? null,
     submit,
     reset,
     reload: () => setAttempt((n) => n + 1),

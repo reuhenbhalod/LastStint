@@ -421,6 +421,16 @@ export function ResultScreen({
           </ol>
         </details>
 
+        <a
+          href="/survivor"
+          className="flex flex-col items-center gap-1 rounded-xl border-2 border-[var(--box)] px-4 py-4 text-center hover:bg-[color-mix(in_srgb,var(--box)_12%,transparent)]"
+        >
+          <span className="disp text-[20px] leading-none">Keep racing: Survivor</span>
+          <span className="text-[13px] text-[var(--muted)]">
+            Different races back to back until you lose one
+          </span>
+        </a>
+
         {!live && (
           <button
             type="button"

@@ -349,6 +349,11 @@ export function RaceScreen({
           )}
         </span>
         <span className="flex min-w-0 items-center gap-2">
+          {source === 'survivor' && (
+            <span className="shrink-0 rounded-full bg-[var(--box)] px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-white">
+              Survivor · round {number}
+            </span>
+          )}
           {source === 'practice' && (
             <span
               className="shrink-0 rounded-full bg-[var(--flag)] px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-[#141716]"
@@ -358,8 +363,12 @@ export function RaceScreen({
             </span>
           )}
           <span className="eyebrow hidden min-w-0 truncate 2xl:inline">
-            {number ? `Daily #${number}` : (state.meta.practiceReason ?? 'Practice')} ·{' '}
-            {model.race.name ?? model.race.id}
+            {source === 'survivor'
+              ? 'Survivor'
+              : number
+                ? `Daily #${number}`
+                : (state.meta.practiceReason ?? 'Practice')}{' '}
+            · {model.race.name ?? model.race.id}
           </span>
           <div className="flex items-center gap-1.5">
             {([1, 2] as const).map((s) => (
@@ -391,7 +400,7 @@ export function RaceScreen({
             >
               {sound ? <SoundOnIcon size={16} /> : <SoundOffIcon size={16} />}
             </button>
-            {source !== 'live' && (
+            {source === 'practice' && (
               <button
                 type="button"
                 onClick={game.reset}

@@ -12,8 +12,10 @@ import { LEADERBOARD_SIZE, dailyStats, getDaily, getRun, leaderboard } from './d
 import { displayName } from './names.js';
 import { checkQueue, queueDays } from './ops.js';
 import { accountOf, playedDates, signIn, streakOf } from './players.js';
+import { SURVIVOR_POOL } from './pools.js';
 import { getRace } from './races.js';
 import { ApiError, dailyWithModel, isAnonId, submitRun, withStanding } from './runs.js';
+import { getState, startRun, submitRound, survivorBoard } from './survivor.js';
 
 export interface Env {
   DB: D1Database;
@@ -33,6 +35,13 @@ export interface Env {
   GOOGLE_JWKS?: string;
   /** Admins (src/admin.ts): Google account emails, comma-separated. */
   ADMIN_EMAILS?: string;
+  /** A survivor pool to use instead of data/pools.json's (JSON; tests only). */
+  SURVIVOR_POOL?: string;
+}
+
+/** The survivor races and their seeds (data/pools.json, or the tests' own). */
+function survivorPool(env: Env): Readonly<Record<string, number[]>> {
+  return env.SURVIVOR_POOL ? JSON.parse(env.SURVIVOR_POOL) : SURVIVOR_POOL;
 }
 
 /** Largest accepted POST /api/runs body. */
@@ -248,6 +257,50 @@ app.get('/api/daily/:date/leaderboard', (c) =>
     });
   }),
 );
+
+// Survivor mode (docs/survivor-spec.md).
+app.post('/api/survivor/start', async (c) => {
+  const ip = c.req.header('cf-connecting-ip') ?? 'unknown';
+  if (c.env.RUNS_LIMITER) {
+    const { success } = await c.env.RUNS_LIMITER.limit({ key: `survivor:${ip}` });
+    if (!success) throw new ApiError(429, 'rate-limited');
+  }
+  const body = await c.req.json().catch(() => null);
+  return c.json(await startRun(c.env.DB, body, Date.now(), survivorPool(c.env)), 201);
+});
+
+app.get('/api/survivor/leaderboard', (c) =>
+  cached(c, async () => c.json(await survivorBoard(c.env.DB, Date.now()))),
+);
+
+app.get('/api/survivor/:runId', async (c) =>
+  c.json(await getState(c.env.DB, c.req.param('runId'), c.req.query('anonId'))),
+);
+
+app.post('/api/survivor/:runId/round', async (c) => {
+  const ip = c.req.header('cf-connecting-ip') ?? 'unknown';
+  if (c.env.RUNS_LIMITER) {
+    const { success } = await c.env.RUNS_LIMITER.limit({ key: ip });
+    if (!success) throw new ApiError(429, 'rate-limited');
+  }
+  const text = await c.req.text();
+  if (text.length > MAX_BODY_BYTES) throw new ApiError(400, 'bad-request', 'body too large');
+  let body: unknown;
+  try {
+    body = JSON.parse(text);
+  } catch {
+    throw new ApiError(400, 'bad-request', 'body must be JSON');
+  }
+  const res = await submitRound(
+    c.env.DB,
+    c.req.param('runId'),
+    body,
+    Date.now(),
+    survivorPool(c.env),
+  );
+  console.log(`survivor round verified: ${res.result.raceId} ${res.won ? 'won' : 'lost'}`);
+  return c.json(res);
+});
 
 app.notFound((c) => c.json({ error: 'not-found' }, 404));
 
