@@ -319,7 +319,7 @@ RACES: dict[str, dict] = {
         "event": "Portugal",
         "name": "Portugal 2020: Bottas vs Verstappen",
         "era": "2014-2025",
-        "takeover_lap": 26,  # pinned: the duel below changed; earlier for more calls (races batch 1)
+        "takeover_lap": 26,  # pinned (the duel changed); earlier for more calls (batch 1)
         "seed": 26892,  # tuned: scripts/tune.ts (races batch 1)
         "user_side": "BOT",
         "rival": "VER",  # defend race: the car behind (races batch 1)
