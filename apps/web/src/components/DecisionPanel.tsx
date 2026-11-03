@@ -39,10 +39,11 @@ function Tile({
   );
 }
 
-// Option buttons: number, label, then what it does. Grid rows stretch, so a row of options
-// is always one height.
+// Option buttons: number, label, then what it does. Each button spans two rows of the options
+// grid (a subgrid), so across a row every label sits in one band and every note starts on one
+// line, however many lines each takes.
 const optBtn =
-  'relative flex min-h-[64px] flex-col items-center justify-center gap-1 rounded-lg border-2 border-transparent bg-[var(--ink)] px-2.5 pb-2.5 pt-5 text-center text-[var(--paper)] hover:border-[var(--you)] focus-visible:border-[var(--you)] focus-visible:outline-none';
+  'relative row-span-2 grid grid-rows-subgrid gap-y-1.5 rounded-lg border-2 border-transparent bg-[var(--ink)] px-3 pb-3 pt-6 text-center text-[var(--paper)] hover:border-[var(--you)] focus-visible:border-[var(--you)] focus-visible:outline-none';
 
 /** Options side by side on a wide screen. */
 const WIDE: Record<number, string> = {
@@ -205,7 +206,7 @@ export function DecisionPanel({
 
       {!picking ? (
         <div
-          className={`grid gap-2 ${top.length === 3 ? 'grid-cols-3' : 'grid-cols-2'} ${WIDE[top.length] ?? ''}`}
+          className={`grid gap-x-2 gap-y-2 ${top.length === 3 ? 'grid-cols-3' : 'grid-cols-2'} ${WIDE[top.length] ?? ''}`}
         >
           {top.map((t, i) => (
             <button
@@ -224,13 +225,11 @@ export function DecisionPanel({
                 {i + 1}
               </span>
               <span
-                className={`disp leading-none ${top.length === 3 ? 'text-[14px] md:text-[15px]' : 'text-[16px] md:text-[17px]'}`}
+                className={`disp flex items-center justify-center leading-[1.1] ${top.length === 3 ? 'text-[14px] md:text-[15px]' : 'text-[16px] md:text-[17px]'}`}
               >
                 {t.label}
               </span>
-              {t.note && (
-                <span className="text-[11.5px] font-medium leading-snug opacity-75">{t.note}</span>
-              )}
+              <span className="text-[12px] font-medium leading-snug opacity-75">{t.note}</span>
             </button>
           ))}
         </div>
