@@ -52,6 +52,31 @@ describe('GameSession', () => {
     expect(session.localScore()).toEqual(full.score);
   });
 
+  it('does not ask for a stop again right after one (and the server accepts it)', async () => {
+    const today = await daily();
+    const session = new GameSession(today);
+    session.start();
+    const asked: string[] = [];
+    for (let i = 0; i < 300 && session.state.phase !== 'finished'; i++) {
+      const m = session.state.currentMoment;
+      if (session.state.phase === 'decision' && m) {
+        asked.push(m.id);
+        session.choose(
+          m.id === 'sc-stop' ? 'box-soft' : (m.realOptionId ?? (m.options[0]?.id as string)),
+        );
+      } else session.tick();
+    }
+    expect(asked).toContain('sc-stop');
+    expect(asked).not.toContain('sc-last-chance');
+    const radio = session.state.decisions.find(
+      (d) => d.kind === 'radio' && d.momentId === 'sc-last-chance',
+    );
+    expect(radio).toMatchObject({ optionId: 'stay' });
+    expect(session.state.radio.some((r) => r.text.includes('Staying out'))).toBe(true);
+    const body = await session.submission('11111111-1111-4111-8111-111111111111');
+    expect(() => verifyRun(today.model, today.seed, body.decisions)).not.toThrow();
+  });
+
   it('pauses at a moment and never re-pauses on it after a choice', async () => {
     const session = new GameSession(await daily());
     session.start();
@@ -110,6 +135,7 @@ describe('GameSession', () => {
     session.start();
     let refused = 0;
     let accepted = 0;
+    let questioned = 0;
     for (let i = 0; i < 300 && session.state.phase !== 'finished'; i++) {
       if (session.state.phase === 'decision') answer(session);
       else {
@@ -128,6 +154,13 @@ describe('GameSession', () => {
         } else if (said.refused) {
           refused++;
           expect(session.state.decisions).toHaveLength(before);
+        } else if (session.state.question) {
+          // HAM asks first: confirm every other one, drop the rest.
+          questioned++;
+          expect(session.state.decisions).toHaveLength(before);
+          session.confirm(questioned % 2 === 1);
+          expect(session.state.question).toBeNull();
+          expect(session.state.decisions).toHaveLength(before + (questioned % 2));
         } else {
           accepted++;
           expect(session.state.decisions).toHaveLength(before + 1);
@@ -138,7 +171,7 @@ describe('GameSession', () => {
         session.tick();
       }
     }
-    expect(refused).toBeGreaterThan(0);
+    expect(refused + questioned).toBeGreaterThan(0);
     expect(accepted).toBeGreaterThan(refused);
   });
 });

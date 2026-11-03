@@ -172,3 +172,9 @@ label:has(input) {
     transition: none !important;
   }
 }
+
+/* Google's button is a cross-origin iframe. On a dark page the browser paints it a white
+   backdrop (its own colour scheme is light); matching the scheme makes it transparent. */
+.gsi-button iframe {
+  color-scheme: light;
+}

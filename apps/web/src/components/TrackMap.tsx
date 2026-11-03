@@ -17,6 +17,7 @@ import {
   flagOn,
   nearestFraction,
   pitLane,
+  pitPosition,
   pointAlong,
   pointAt,
   polyline,
@@ -55,13 +56,6 @@ function garageAt(team: string | undefined): number {
   const i = GARAGES.findIndex(([t]) => t === team);
   const k = i < 0 ? 0.5 : i / (GARAGES.length - 1);
   return GARAGE_FROM + (GARAGE_TO - GARAGE_FROM) * k;
-}
-
-/** A car's place along the lane during its stop: in, a pause at its garage, out. */
-function laneT(raw: number, garage: number): number {
-  if (raw < 0.45) return garage * ease(raw / 0.45);
-  if (raw < 0.6) return garage;
-  return garage + (1 - garage) * ease((raw - 0.6) / 0.4);
 }
 
 const pathOf = (pts: Array<[number, number]>, closed: boolean) =>
@@ -364,15 +358,23 @@ export function TrackMap({
 
   // Gaps glide from where each car was shown to the new lap's gaps. While paused there is no
   // glide: the map shows the exact gaps the decision card quotes.
-  const glideRef = useRef<{ lap: number; from: Map<string, number>; to: Map<string, number> }>({
+  // `prev` keeps the last lap's gaps for the whole tick (a stopping car drives to pit entry at
+  // its old gap).
+  const glideRef = useRef<{
+    lap: number;
+    from: Map<string, number>;
+    prev: Map<string, number>;
+    to: Map<string, number>;
+  }>({
     lap: race.lap,
     from: new Map(),
+    prev: new Map(),
     to: new Map(),
   });
   const to = new Map(cars.map((c) => [c.code, c.behind]));
   const g = glideRef.current;
   if (g.lap !== race.lap) {
-    glideRef.current = { lap: race.lap, from: g.to, to };
+    glideRef.current = { lap: race.lap, from: g.to, prev: g.to, to };
   } else {
     g.to = to;
   }
@@ -402,8 +404,23 @@ export function TrackMap({
     raf = requestAnimationFrame(frame);
     return () => cancelAnimationFrame(raf);
   }, [finishMs]);
+  // A car that stopped on the lap just run drives the pit lane this tick (not at the flag).
+  const stopping = (code: string) =>
+    !finishing && !!lane && !REDUCED && !!race.cars[code]?.pittedThisLap;
+  const pitAt = (code: string, after: number) =>
+    pitPosition(
+      lead,
+      glideRef.current.prev.get(code) ?? after,
+      after,
+      lane as PitLane,
+      garageAt(race.cars[code]?.team),
+    );
   const shown = spaceOut(
-    new Map(cars.map((c) => [c.code, finishing ? c.behind : behindOf(c.code, c.behind)])),
+    new Map(
+      cars
+        .filter((c) => !stopping(c.code))
+        .map((c) => [c.code, finishing ? c.behind : behindOf(c.code, c.behind)]),
+    ),
     minGap,
   );
   const atFlag = finishing ? runToFlag(shown, REDUCED ? 99 : sinceFlag) : null;
@@ -455,10 +472,12 @@ export function TrackMap({
       )}
       {drawOrder.map((c) => {
         const car = race.cars[c.code];
-        const inLane = !finishing && lane && car?.pittedThisLap && raw < 1;
-        const [x, y] = inLane
-          ? pointAlong(lane.path, laneT(raw, garageAt(car?.team)))
-          : pointAt(line, positionOf(c.code));
+        const pit = stopping(c.code) ? pitAt(c.code, c.behind) : null;
+        const inLane = pit?.lane != null;
+        const [x, y] =
+          pit && pit.lane !== null && lane
+            ? pointAlong(lane.path, pit.lane)
+            : pointAt(line, pit && pit.at !== null ? pit.at : positionOf(c.code));
         const you = c.code === userSide;
         const isRival = c.code === rival;
         const key = you || isRival;

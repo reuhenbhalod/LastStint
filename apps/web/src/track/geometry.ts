@@ -272,3 +272,42 @@ export function lapsToFlag(behind: number): number {
   const start = -behind;
   return Math.ceil(start - 1e-9) - start;
 }
+
+const frac = (x: number) => ((x % 1) + 1) % 1;
+
+/** Where a car that stopped is during a lap tick: on the lap (`at`, as in carsOnTrack) or in
+ * the pit lane (`lane`, 0 at the entry to 1 at the exit). */
+export type PitPosition = { lane: null; at: number } | { lane: number; at: null };
+
+/**
+ * A car's stop, drawn: it drives the lap at its old gap (`before`, fractions of a lap behind
+ * the leader) until it reaches pit entry, runs down the lane (pausing at its garage, a
+ * fraction of the lane), and rejoins at pit exit just as its new gap (`after`) puts it there.
+ * `progress` is how far through the tick the leader is (0 at the line). A car already past
+ * pit entry when the tick starts is in the lane from the start.
+ */
+export function pitPosition(
+  progress: number,
+  before: number,
+  after: number,
+  lane: { entry: number; exit: number },
+  garage: number,
+): PitPosition {
+  const span = frac(lane.exit - lane.entry) || 1e-3;
+  // When the car reaches pit entry, then pit exit (as tick progress).
+  let tIn = frac(lane.entry + before);
+  if (frac(-before - lane.entry) < span) tIn -= 1; // already in the lane at the start
+  let tOut = tIn + frac(lane.exit + after - tIn);
+  if (tOut - tIn < span) tOut += 1;
+  if (progress < tIn) return { lane: null, at: progress - before };
+  if (progress >= tOut) return { lane: null, at: progress - after };
+  const raw = (progress - tIn) / (tOut - tIn);
+  return { lane: laneT(raw, garage), at: null };
+}
+
+/** A car's place along the lane during its stop: in, a pause at its garage, out. */
+export function laneT(raw: number, garage: number): number {
+  if (raw < 0.45) return garage * ease(raw / 0.45);
+  if (raw < 0.6) return garage;
+  return garage + (1 - garage) * ease((raw - 0.6) / 0.4);
+}

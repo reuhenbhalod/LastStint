@@ -119,6 +119,11 @@ test('plays the Abu Dhabi daily end to end', async ({ page, context }) => {
   });
 
   await page.goto('/');
+  // First visit: the how-to-play walkthrough opens by itself.
+  await expect(page.getByRole('dialog')).toContainText('team manager');
+  for (let i = 0; i < 4; i++) await page.getByRole('button', { name: 'Next' }).click();
+  await page.getByRole('button', { name: 'Got it' }).click();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
   await expect(page.getByText('Daily Race #1')).toBeVisible();
   if (shots) await page.screenshot({ path: `${shots}/1-intro.png`, fullPage: true });
   await page.getByRole('button', { name: /pit wall/ }).click();
@@ -130,16 +135,16 @@ test('plays the Abu Dhabi daily end to end', async ({ page, context }) => {
   await expect(page.getByLabel('Max Verstappen details')).toContainText('Red Bull Racing');
   await page.getByRole('button', { name: 'Close driver details' }).click();
 
-  // Each moment: the top-level option, then (after Box) the tyre.
+  // Each moment: the top-level option, then (after Box) the tyre. Lap 55's stop call isn't
+  // asked: the car stopped on lap 53, so the wall stays out by itself.
   const answers: Record<string, string[]> = {
     '36': ['Box', 'Hards'],
     '44': ['Stay out'],
     '49': ['Push now'],
     '53': ['Box', 'Softs'],
-    '55': ['Stay out'],
     '57': ['Attack'],
   };
-  for (const lap of ['36', '44', '49', '53', '55', '57']) {
+  for (const lap of ['36', '44', '49', '53', '57']) {
     const card = page.locator('section.decision');
     await expect(card).toContainText(`Lap ${lap}`, { timeout: 90_000 });
     await expect(page.getByRole('alert')).toContainText(`Lap ${lap}`);

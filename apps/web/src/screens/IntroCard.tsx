@@ -2,9 +2,11 @@
 // to beat (the real team's result), and Start.
 
 import type { RaceModel } from '@boxthislap/sim';
+import { useState } from 'react';
 import type { AccountState } from '../account/useAccount.js';
 import { AccountBar } from '../components/AccountBar.js';
 import type { GameState } from '../state/machine.js';
+import { HowToPlay, seenHowToPlay } from './HowToPlay.js';
 
 export function IntroCard({
   state,
@@ -20,6 +22,8 @@ export function IntroCard({
   account?: AccountState;
 }) {
   const { userSide, rival, takeoverLap, totalLaps, number, source, practiceReason } = state.meta;
+  // The walkthrough opens by itself the first time.
+  const [howTo, setHowTo] = useState(() => !seenHowToPlay());
   const lapsLeft = totalLaps - takeoverLap;
   const userTeam = model.drivers.find((d) => d.code === userSide)?.team;
   const realPos = model.realResult.indexOf(userSide) + 1;
@@ -37,6 +41,16 @@ export function IntroCard({
 
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-6 p-6">
+      {howTo && (
+        <HowToPlay
+          team={userTeam ?? userSide}
+          user={userSide}
+          rival={rival}
+          realPos={realPos}
+          laps={lapsLeft}
+          onClose={() => setHowTo(false)}
+        />
+      )}
       {source === 'practice' && (
         <p className="rounded-lg border border-yellow-700/60 bg-yellow-950/40 p-3 text-sm text-yellow-200">
           {practiceReason ?? 'Practice mode.'} You can play a practice run; it won’t be submitted.
@@ -76,8 +90,8 @@ export function IntroCard({
         )}
       </p>
       <p className="text-[13px] text-neutral-500">
-        Every big call is graded against the race model. Drivers don’t always follow your live
-        calls.
+        Every big call is graded against the race model. {userSide} questions some live calls, and
+        doesn’t always follow them.
       </p>
       <button
         type="button"
@@ -88,6 +102,9 @@ export function IntroCard({
       </button>
       {account && <AccountBar account={account} />}
       <footer className="flex justify-center gap-4 text-xs text-neutral-500">
+        <button type="button" onClick={() => setHowTo(true)} className="underline">
+          How to play
+        </button>
         <button type="button" onClick={onHelp} className="underline">
           How it works
         </button>

@@ -185,15 +185,26 @@ describe('verifyRun', () => {
         reasonFor(
           abu,
           edit((l) => {
-            (l[radio] as { optionId: string }).optionId = 'stay';
+            // Calls made for soft tyres, answer claims mediums. (Claiming "stay" with a stop
+            // after it reads as answering stay, then pressing BOX: a legal run.)
+            (l[radio] as { optionId: string }).optionId = 'box-medium';
           }),
         ),
       ).toBe('bad-answer'));
-    it('an extra call on the moment lap', () =>
+    it("a call slipped between the answer and its option's calls", () =>
       expect(
         reasonFor(
           abu,
-          edit((l) => l.push({ lap: 53, at: 52, kind: 'mode', key: 'pace', value: 'push' })),
+          edit((l) =>
+            l.splice(radio + 1, 0, { lap: 53, at: 52, kind: 'mode', key: 'pace', value: 'push' }),
+          ),
+        ),
+      ).toBe('bad-answer'));
+    it('an option call missing after the answer', () =>
+      expect(
+        reasonFor(
+          abu,
+          edit((l) => l.splice(radio + 1, 1)),
         ),
       ).toBe('bad-answer'));
     it('an answer to a moment that does not exist', () =>
@@ -203,6 +214,23 @@ describe('verifyRun', () => {
           edit((l) => l.push({ lap: 57, at: 56, kind: 'radio', momentId: 'x', optionId: 'y' })),
         ),
       ).toBe('bad-answer'));
+  });
+
+  it('accepts live calls the player makes on a moment lap after answering it', () => {
+    // BOX or a headset flip in the lap right after a pause lands on the moment's lap, after
+    // the answer and its option's calls.
+    const log = play(abu, { 'sc-stop': 'box-soft' }).decisions;
+    const radio = log.findIndex((d) => d.kind === 'radio');
+    const withLive = [...log];
+    withLive.splice(radio + 2, 0, {
+      lap: 53,
+      at: 52,
+      kind: 'mode',
+      key: 'battle',
+      value: 'defend',
+    });
+    const v = verifyRun(abu, abu.race.seed, withLive, SAMPLES);
+    expect(v.moments[0]?.chosen).toBe('box-soft');
   });
 
   it('verifies the shipped six-moment Abu Dhabi run', () => {

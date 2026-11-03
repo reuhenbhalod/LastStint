@@ -29,7 +29,7 @@ function GoogleButton({ onCredential }: { onCredential: (credential: string) => 
       alive = false;
     };
   }, []);
-  return <div ref={el} className="min-h-[32px]" />;
+  return <div ref={el} className="gsi-button min-h-[32px]" />;
 }
 
 export function AccountBar({ account }: { account: AccountState }) {
