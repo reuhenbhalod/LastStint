@@ -6,10 +6,12 @@
 
 import { type Decision, type DecisionMoment, type RaceState, scoreRun } from '@boxthislap/sim';
 import type { RunResponse, RunSubmission } from '../data/api.js';
+import { attitudeOf } from '../data/drivers.js';
 import type { Daily } from '../data/types.js';
 import { GameEngine, decisionMoments } from '../engine/engine.js';
 import { type GradedMoment, type Grader, gradedFromHits, inlineGrader } from '../engine/grading.js';
-import { acknowledge, refusal } from '../game/refusal.js';
+import { autoStay } from '../game/autoStay.js';
+import { acknowledge, respond } from '../game/refusal.js';
 import {
   type Action,
   type GameMeta,
@@ -101,7 +103,22 @@ export class GameSession {
       : momentAt(this.state.moments, this.engine.lap, this.state.resolved);
     const result = finished ? this.engine.result() : null;
     this.dispatch({ type: 'SYNC', race: this.engine.state, moment, finished, result });
-    if (moment) this.startGrading(moment, this.engine);
+    if (!moment) return;
+    this.startGrading(moment, this.engine);
+    // Just stopped: the wall stays out without asking (game/autoStay.ts).
+    const stay = autoStay(moment, this.engine.decisions);
+    if (stay) {
+      this.dispatch({
+        type: 'RADIO',
+        message: {
+          lap: moment.lap,
+          from: 'Engineer',
+          text: 'We’ve just stopped. Staying out.',
+          refused: false,
+        },
+      });
+      this.choose(stay);
+    }
   }
 
   /**
@@ -154,12 +171,13 @@ export class GameSession {
   }
 
   /**
-   * A standing-mode flip or BOX call mid-lap; never pauses. The driver may refuse it
-   * (game/refusal.ts): a refused call is not applied, so it never reaches the call log.
-   * A call already booked for the coming lap is ignored. An answer to a quick call (`asked`:
-   * the driver or engineer asked for the order) is always followed.
+   * A standing-mode flip or BOX call mid-lap; never pauses. The driver answers by attitude
+   * (game/refusal.ts): a refused call is not applied, so it never reaches the call log; a
+   * questioned one waits for `confirm`. A call already booked for the coming lap is ignored.
+   * An answer to a quick call (`asked`: the driver or engineer asked for the order) and a
+   * confirmed question are always followed.
    */
-  call(decision: Decision, options: { asked?: boolean } = {}): void {
+  call(decision: Decision, options: { asked?: boolean; confirmed?: boolean } = {}): void {
     if (this.state.phase !== 'racing') return;
     if (decision.kind === 'pit' || decision.kind === 'mode') {
       const side = this.state.meta.userSide;
@@ -173,28 +191,40 @@ export class GameSession {
             (decision.kind === 'mode' && d.kind === 'mode' && d.key === decision.key)),
       );
       if (booked) return;
-      const no = options.asked ? null : refusal(this.daily.seed, this.engine.lap, decision, car);
-      this.dispatch({
-        type: 'RADIO',
-        message: {
-          lap: decision.lap,
-          from: side,
-          text: no ?? acknowledge(decision),
-          refused: !!no,
-        },
-      });
+      const answer =
+        options.asked || options.confirmed
+          ? ({ kind: 'ok' } as const)
+          : respond(this.daily.seed, this.engine.lap, decision, car, attitudeOf(side));
+      if (answer.kind === 'question') {
+        this.dispatch({ type: 'QUESTION', question: { decision, text: answer.text } });
+        this.say(side, answer.text, false, decision.lap);
+        return;
+      }
+      if (this.state.question) this.dispatch({ type: 'QUESTION', question: null });
+      const no = answer.kind === 'refuse';
+      this.say(side, no ? answer.text : acknowledge(decision), no, decision.lap);
       if (no) return;
     }
     this.engine.apply(decision);
     this.dispatch({ type: 'CALL', race: this.engine.state, decisions: this.engine.decisions });
   }
 
+  /** The wall's answer to a questioned call: do it (on the coming lap) or drop it. */
+  confirm(yes: boolean): void {
+    const q = this.state.question;
+    if (!q) return;
+    this.dispatch({ type: 'QUESTION', question: null });
+    if (yes) this.call({ ...q.decision, lap: this.engine.lap + 1 }, { confirmed: true });
+    else this.say('Engineer', 'Okay, forget it. Stay as you are.', false, this.engine.lap + 1);
+  }
+
+  private say(from: string, text: string, refused: boolean, lap: number): void {
+    this.dispatch({ type: 'RADIO', message: { lap, from, text, refused } });
+  }
+
   /** A radio line with no call behind it (an unanswered quick call). */
   radio(text: string): void {
-    this.dispatch({
-      type: 'RADIO',
-      message: { lap: this.engine.lap + 1, from: 'Engineer', text, refused: false },
-    });
+    this.say('Engineer', text, false, this.engine.lap + 1);
   }
 
   setSpeed(speed: Speed): void {

@@ -1,6 +1,17 @@
 // Who's who for the driver card: full name and race number by timing code. The race model
 // carries codes and teams only; these are the 2021 grid's (the one race in the beta).
 
+/** How a driver takes the wall's live calls (feedback round 2, D3): `always` does them,
+ * `questions` asks "are you sure?" on some (and rarely refuses), `sometimes` refuses about
+ * one in four. */
+export type Attitude = 'always' | 'questions' | 'sometimes';
+
+export const ATTITUDE_LABEL: Record<Attitude, string> = {
+  always: 'Always listens',
+  questions: 'Listens, with questions',
+  sometimes: 'Sometimes listens',
+};
+
 export interface DriverInfo {
   name: string;
   number: number;
@@ -31,4 +42,24 @@ const DRIVERS: Record<string, DriverInfo> = {
 
 export function driverInfo(code: string): DriverInfo | null {
   return DRIVERS[code] ?? null;
+}
+
+/** Each driver's attitude on the radio (one fixed personality per driver). */
+const ATTITUDES: Record<string, Attitude> = {
+  HAM: 'questions',
+  VER: 'questions',
+  LEC: 'questions',
+  SAI: 'questions',
+  RIC: 'questions',
+  GAS: 'questions',
+  VET: 'questions',
+  ALO: 'sometimes',
+  RAI: 'sometimes',
+  TSU: 'sometimes',
+  MAZ: 'sometimes',
+};
+
+/** A driver's attitude; anyone not listed always listens. */
+export function attitudeOf(code: string): Attitude {
+  return ATTITUDES[code] ?? 'always';
 }

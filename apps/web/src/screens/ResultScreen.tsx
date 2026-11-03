@@ -13,6 +13,7 @@ import {
   type RunResponse,
   api,
 } from '../data/api.js';
+import { autoStay } from '../game/autoStay.js';
 import type { Game } from '../game/useGame.js';
 import { verdict } from '../game/verdict.js';
 import type { GameState } from '../state/machine.js';
@@ -80,7 +81,16 @@ export function shareLine(
   return `${head} ${won ? '🏆 ' : ''}${squares}${tail}`;
 }
 
-function CallRow({ call, moment }: { call: CallResult; moment?: DecisionMoment }) {
+function CallRow({
+  call,
+  moment,
+  auto,
+}: {
+  call: CallResult;
+  moment?: DecisionMoment;
+  /** The wall answered for you (just stopped, see game/autoStay.ts). */
+  auto?: boolean;
+}) {
   const band = BAND[call.band];
   const best = call.options.find((o) => o.id === call.best);
   const behind = call.options.find((o) => o.id === call.chosen)?.behindBest ?? 0;
@@ -91,6 +101,14 @@ function CallRow({ call, moment }: { call: CallResult; moment?: DecisionMoment }
           <span>
             <span className="block font-mono text-xs text-neutral-500">Lap {call.lap}</span>
             <span className="font-medium">{labelOf(moment, call.chosen)}</span>
+            {auto && (
+              <span
+                className="ml-2 rounded bg-[var(--rule)] px-1.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--muted)]"
+                title="You had just stopped, so the wall stayed out without asking"
+              >
+                Auto
+              </span>
+            )}
           </span>
           <span className={`rounded-full px-2 py-1 text-xs font-bold ring-1 ${band.cls}`}>
             {band.square} {band.label}
@@ -257,7 +275,15 @@ export function ResultScreen({
         </h2>
         <ol className="flex flex-col gap-2">
           {calls.map((c) => (
-            <CallRow key={c.momentId} call={c} moment={momentById.get(c.momentId)} />
+            <CallRow
+              key={c.momentId}
+              call={c}
+              moment={momentById.get(c.momentId)}
+              auto={(() => {
+                const m = momentById.get(c.momentId);
+                return !!m && autoStay(m, state.decisions) === c.chosen;
+              })()}
+            />
           ))}
         </ol>
       </section>

@@ -38,6 +38,14 @@ Beta feedback round 1 (Nov 1, 2026) added:
   - Timed quick calls between them.
   - Every decision option explains itself; tyres show pace, drop-off and gain (`tyres-and-track-spec.md`).
   - At the flag the field runs to the line and the race ends when your car crosses it.
+
+Beta feedback round 2, part A (Nov 2, 2026, `feedback-round-2-spec.md`):
+- **Layout:** your driver's profile and the standings on the left; the map with BOX, speed, sound and restart under it; the call column, car stats (tyre life to the drop-off, last laps against the rival, pace trend, gap) and the radio on the right. The headset and the gap trace open from buttons on the map (under the map on a phone). The map legend names the cars (HAM, VER).
+- **Pit stops on the map:** a stopping car drives the lap to pit entry, runs the lane, stops at its garage and rejoins at pit exit at its new gap (`pitPosition` in `track/geometry.ts`).
+- **No double stop call:** a stop moment within 3 laps of a stop isn't asked; the wall stays out by itself, says so on the radio, and the results mark it "Auto" (`game/autoStay.ts`).
+- **Driver attitudes:** one fixed personality per driver (`data/drivers.ts`): always listens, listens with questions (HAM: "are you sure?", and you confirm or drop it), or sometimes listens.
+- **How to play:** a five-step walkthrough on the first visit; "How to play" on the daily card reopens it.
+- **Google button:** no white box round it on the dark page.
 - **Google sign-in + streaks:** the streak shows on the intro and results. Signing in links the browser to an account so the streak and one-run-a-day follow you.
   - Google OAuth client `318278030629-…` (project "Pit Wall"), set as `GOOGLE_CLIENT_ID` in `apps/worker/wrangler.jsonc` and `VITE_GOOGLE_CLIENT_ID` in CI and `dev:live`. The consent screen is in Testing: only listed test users can sign in until it is published.
 
