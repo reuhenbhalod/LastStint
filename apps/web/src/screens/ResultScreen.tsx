@@ -6,6 +6,7 @@ import { type Band, type DecisionMoment, bandFor } from '@boxthislap/sim';
 import { useEffect, useState } from 'react';
 import type { AccountState } from '../account/useAccount.js';
 import { AccountBar } from '../components/AccountBar.js';
+import { ResultHero } from '../components/ResultHero.js';
 import {
   type CallResult,
   type DailyStats,
@@ -161,6 +162,26 @@ export function ResultScreen({
   const score = response?.score ?? (calls.length ? local?.score : null);
   const momentById = new Map(state.moments.map((m) => [m.id, m]));
   const live = state.meta.source === 'live';
+  const finishers = response?.result.finishers ?? state.result?.finishers ?? [];
+  const rivalPos = finishers.includes(rival) ? order.indexOf(rival) + 1 : 0;
+  const gapToRival =
+    gaps[userSide] !== undefined && gaps[rival] !== undefined
+      ? (gaps[rival] as number) - (gaps[userSide] as number)
+      : null;
+  const hero = (
+    <ResultHero
+      v={v}
+      raceName={model?.race.name ?? state.meta.raceId}
+      userSide={userSide}
+      rival={rival}
+      pos={finishers.includes(userSide) ? pos : 0}
+      realPos={realPos}
+      rivalPos={rivalPos}
+      team={team}
+      gapToRival={gapToRival}
+      podium={finishers.slice(0, 3)}
+    />
+  );
 
   const [board, setBoard] = useState<LeaderboardEntry[] | null>(null);
   const [stats, setStats] = useState<DailyStats | null>(null);
@@ -187,16 +208,8 @@ export function ResultScreen({
 
   if (state.phase === 'finished' || state.phase === 'submitting') {
     return (
-      <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-5 p-6">
-        <p className="font-mono text-xs uppercase tracking-widest text-neutral-500">
-          Chequered flag
-        </p>
-        <h1 className="disp text-[30px] leading-none">{v.headline}</h1>
-        <p
-          className={`m-0 mt-2 text-[15px] ${v.outcome === 'beat' ? 'text-[var(--you)]' : 'text-[var(--muted)]'}`}
-        >
-          {v.detail}
-        </p>
+      <main className="mx-auto flex min-h-screen max-w-lg flex-col justify-center gap-5 p-6">
+        {hero}
         <button
           type="button"
           disabled={state.phase === 'submitting'}
@@ -210,176 +223,170 @@ export function ResultScreen({
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-md flex-col gap-5 p-6">
-      <header>
-        <p className="font-mono text-xs uppercase tracking-widest text-neutral-500">
-          {number ? `Pit Wall #${number}` : 'Practice'} ·{' '}
-          {game.model?.race.name ?? state.meta.raceId}
-        </p>
-        <h1 className="mt-1 disp text-[30px] leading-none">{v.headline}</h1>
-        <p
-          className={`m-0 mt-2 text-[15px] ${v.outcome === 'beat' ? 'text-[var(--you)]' : 'text-[var(--muted)]'}`}
-        >
-          {v.detail}
-        </p>
-      </header>
+    // A laptop shows two columns: the result, score and share on the left; your calls and
+    // the day's numbers on the right.
+    <main className="mx-auto grid min-h-screen max-w-5xl items-start gap-6 p-6 lg:grid-cols-2">
+      <div className="flex flex-col gap-5 lg:sticky lg:top-6">
+        <p className="eyebrow m-0">{number ? `Pit Wall #${number}` : 'Practice run'}</p>
+        {hero}
 
-      <section className="grid grid-cols-3 gap-2 text-center">
-        <div className="rounded-lg bg-[var(--card)] p-3">
-          <p className="text-xs uppercase text-neutral-500">Score</p>
-          <p className="font-mono text-2xl font-bold">{score != null ? Math.round(score) : '—'}</p>
-        </div>
-        <div className="rounded-lg bg-[var(--card)] p-3">
-          <p className="text-xs uppercase text-neutral-500">Rank</p>
-          <p className="font-mono text-2xl font-bold">
-            {response ? `${response.rank}/${response.total}` : '—'}
+        <section className="grid grid-cols-3 gap-2 text-center">
+          {[
+            ['Score', score != null ? String(Math.round(score)) : '—', 'out of 100'],
+            ['Rank', response ? `${response.rank}/${response.total}` : '—', 'today'],
+            ['Beat', response ? `${response.percentile}%` : '—', 'of players'],
+          ].map(([label, value, sub]) => (
+            <div
+              key={label}
+              className="flex flex-col items-center gap-1 rounded-xl bg-[var(--card)] px-2 py-3"
+            >
+              <span className="eyebrow">{label}</span>
+              <span className="disp wide text-[28px] leading-none">{value}</span>
+              <span className="text-[12px] text-[var(--muted)]">{sub}</span>
+            </div>
+          ))}
+        </section>
+
+        {account && live && <AccountBar account={account} />}
+
+        {sub.status === 'practice' && (
+          <p className="rounded-lg bg-[var(--card)] p-3 text-sm text-neutral-400">
+            Practice run: graded on this device, not submitted.
           </p>
-        </div>
-        <div className="rounded-lg bg-[var(--card)] p-3">
-          <p className="text-xs uppercase text-neutral-500">Beat</p>
-          <p className="font-mono text-2xl font-bold">
-            {response ? `${response.percentile}%` : '—'}
+        )}
+        {sub.status === 'already' && (
+          <p className="rounded-lg bg-[var(--card)] p-3 text-sm text-neutral-400">
+            You’ve already played today’s race. Here’s your run; a new race arrives at midnight.
           </p>
-        </div>
-      </section>
+        )}
+        {sub.status === 'error' && (
+          <div className="flex items-center justify-between gap-3 rounded-lg bg-red-950/60 p-3 text-sm">
+            <span>Not submitted ({sub.error}). Your grades are below.</span>
+            <button
+              type="button"
+              onClick={game.submit}
+              className="rounded-lg bg-red-600 px-3 py-2 font-bold"
+            >
+              Retry
+            </button>
+          </div>
+        )}
 
-      {account && live && <AccountBar account={account} />}
-
-      {sub.status === 'practice' && (
-        <p className="rounded-lg bg-[var(--card)] p-3 text-sm text-neutral-400">
-          Practice run: graded on this device, not submitted.
-        </p>
-      )}
-      {sub.status === 'already' && (
-        <p className="rounded-lg bg-[var(--card)] p-3 text-sm text-neutral-400">
-          You’ve already played today’s race. Here’s your run; a new race arrives at midnight.
-        </p>
-      )}
-      {sub.status === 'error' && (
-        <div className="flex items-center justify-between gap-3 rounded-lg bg-red-950/60 p-3 text-sm">
-          <span>Not submitted ({sub.error}). Your grades are below.</span>
+        <section className="flex flex-col gap-2 rounded-xl border border-[var(--rule)] p-3">
+          <p className="font-mono text-lg">{share}</p>
           <button
             type="button"
-            onClick={game.submit}
-            className="rounded-lg bg-red-600 px-3 py-2 font-bold"
+            onClick={copy}
+            className="rounded-lg bg-neutral-100 py-3 font-bold text-neutral-900"
           >
-            Retry
+            {copied ? 'Copied!' : 'Share result'}
           </button>
-        </div>
-      )}
-
-      <section>
-        <h2 className="mb-2 text-sm font-bold uppercase tracking-wide text-neutral-400">
-          Your calls{' '}
-          <span className="font-normal normal-case text-neutral-600">(tap for details)</span>
-        </h2>
-        <ol className="flex flex-col gap-2">
-          {calls.map((c) => (
-            <CallRow
-              key={c.momentId}
-              call={c}
-              moment={momentById.get(c.momentId)}
-              auto={(() => {
-                const m = momentById.get(c.momentId);
-                return !!m && autoStay(m, state.decisions) === c.chosen;
-              })()}
-            />
-          ))}
-        </ol>
-      </section>
-
-      <section className="flex flex-col gap-2 rounded-xl border border-[var(--rule)] p-3">
-        <p className="font-mono text-lg">{share}</p>
-        <button
-          type="button"
-          onClick={copy}
-          className="rounded-lg bg-neutral-100 py-3 font-bold text-neutral-900"
-        >
-          {copied ? 'Copied!' : 'Share result'}
-        </button>
-      </section>
-
-      {stats && stats.runs > 0 && (
-        <section>
-          <h2 className="mb-2 text-sm font-bold uppercase tracking-wide text-neutral-400">
-            Today: {stats.runs} {stats.runs === 1 ? 'run' : 'runs'}, average score{' '}
-            {Math.round(stats.meanScore)}
-          </h2>
-          <ul className="flex flex-col gap-1 text-sm text-neutral-400">
-            {stats.moments.map((m) => {
-              const moment = momentById.get(m.id);
-              const top = [...m.options].sort((a, b) => b.share - a.share)[0];
-              return (
-                <li key={m.id}>
-                  Lap {moment?.lap}:{' '}
-                  {top ? `${pct(top.share)} chose “${labelOf(moment, top.id)}”` : ''}
-                  {moment?.realOptionId ? ` · ${pct(m.matchedReal)} matched the real team` : ''}
-                </li>
-              );
-            })}
-          </ul>
         </section>
-      )}
+      </div>
 
-      {board && board.length > 0 && (
+      <div className="flex flex-col gap-5">
         <section>
           <h2 className="mb-2 text-sm font-bold uppercase tracking-wide text-neutral-400">
-            Leaderboard
+            Your calls{' '}
+            <span className="font-normal normal-case text-neutral-600">(tap for details)</span>
           </h2>
-          <ol className="flex flex-col gap-0.5 font-mono text-sm">
-            {board.map((e) => (
-              <li
-                key={`${e.rank}-${e.name}`}
-                className="flex justify-between rounded bg-[var(--card)] px-2 py-1"
-              >
-                <span>
-                  <span className="mr-2 text-neutral-500">{e.rank}</span>
-                  {e.name}
-                </span>
-                <span>{Math.round(e.score)}</span>
-              </li>
+          <ol className="flex flex-col gap-2">
+            {calls.map((c) => (
+              <CallRow
+                key={c.momentId}
+                call={c}
+                moment={momentById.get(c.momentId)}
+                auto={(() => {
+                  const m = momentById.get(c.momentId);
+                  return !!m && autoStay(m, state.decisions) === c.chosen;
+                })()}
+              />
             ))}
           </ol>
         </section>
-      )}
 
-      <details className="rounded-lg bg-[var(--card)] p-3">
-        <summary className="cursor-pointer text-sm font-bold uppercase tracking-wide text-neutral-400">
-          Classification
-        </summary>
-        <ol className="mt-2 flex flex-col gap-0.5 font-mono text-sm">
-          {order.map((code, i) => (
-            <li
-              key={code}
-              className={`flex justify-between rounded px-2 py-1 ${
-                code === userSide
-                  ? 'bg-[color-mix(in_srgb,var(--you)_16%,transparent)] text-[var(--you)]'
-                  : code === rival
-                    ? 'text-[var(--rival)]'
-                    : ''
-              }`}
-            >
-              <span>
-                <span className="mr-2 text-neutral-500">{i + 1}</span>
-                {code}
-              </span>
-              <span className="text-neutral-400">
-                {i === 0 ? '—' : gaps[code] != null ? `+${gaps[code]?.toFixed(1)}` : ''}
-              </span>
-            </li>
-          ))}
-        </ol>
-      </details>
+        {stats && stats.runs > 0 && (
+          <section>
+            <h2 className="mb-2 text-sm font-bold uppercase tracking-wide text-neutral-400">
+              Today: {stats.runs} {stats.runs === 1 ? 'run' : 'runs'}, average score{' '}
+              {Math.round(stats.meanScore)}
+            </h2>
+            <ul className="flex flex-col gap-1 text-sm text-neutral-400">
+              {stats.moments.map((m) => {
+                const moment = momentById.get(m.id);
+                const top = [...m.options].sort((a, b) => b.share - a.share)[0];
+                return (
+                  <li key={m.id}>
+                    Lap {moment?.lap}:{' '}
+                    {top ? `${pct(top.share)} chose “${labelOf(moment, top.id)}”` : ''}
+                    {moment?.realOptionId ? ` · ${pct(m.matchedReal)} matched the real team` : ''}
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        )}
 
-      {!live && (
-        <button
-          type="button"
-          onClick={game.reset}
-          className="rounded-xl border border-[var(--rule)] py-3 font-semibold text-neutral-300"
-        >
-          Play again
-        </button>
-      )}
+        {board && board.length > 0 && (
+          <section>
+            <h2 className="mb-2 text-sm font-bold uppercase tracking-wide text-neutral-400">
+              Leaderboard
+            </h2>
+            <ol className="flex flex-col gap-0.5 font-mono text-sm">
+              {board.map((e) => (
+                <li
+                  key={`${e.rank}-${e.name}`}
+                  className="flex justify-between rounded bg-[var(--card)] px-2 py-1"
+                >
+                  <span>
+                    <span className="mr-2 text-neutral-500">{e.rank}</span>
+                    {e.name}
+                  </span>
+                  <span>{Math.round(e.score)}</span>
+                </li>
+              ))}
+            </ol>
+          </section>
+        )}
+
+        <details className="rounded-lg bg-[var(--card)] p-3">
+          <summary className="cursor-pointer text-sm font-bold uppercase tracking-wide text-neutral-400">
+            Classification
+          </summary>
+          <ol className="mt-2 flex flex-col gap-0.5 font-mono text-sm">
+            {order.map((code, i) => (
+              <li
+                key={code}
+                className={`flex justify-between rounded px-2 py-1 ${
+                  code === userSide
+                    ? 'bg-[color-mix(in_srgb,var(--you)_16%,transparent)] text-[var(--you)]'
+                    : code === rival
+                      ? 'text-[var(--rival)]'
+                      : ''
+                }`}
+              >
+                <span>
+                  <span className="mr-2 text-neutral-500">{i + 1}</span>
+                  {code}
+                </span>
+                <span className="text-neutral-400">
+                  {i === 0 ? '—' : gaps[code] != null ? `+${gaps[code]?.toFixed(1)}` : ''}
+                </span>
+              </li>
+            ))}
+          </ol>
+        </details>
+
+        {!live && (
+          <button
+            type="button"
+            onClick={game.reset}
+            className="rounded-xl border border-[var(--rule)] py-3 font-semibold text-neutral-300"
+          >
+            Play again
+          </button>
+        )}
+      </div>
     </main>
   );
 }

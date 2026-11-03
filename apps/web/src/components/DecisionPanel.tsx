@@ -39,11 +39,20 @@ function Tile({
   );
 }
 
-// Option buttons: number, label, then what it does. Each button spans two rows of the options
-// grid (a subgrid), so across a row every label sits in one band and every note starts on one
-// line, however many lines each takes.
+// Option buttons, all laid out the same: a headline (the label up to its first comma), an
+// optional second line (the rest of the label), then what it does as a list, one effect a
+// line. Each button spans three rows of the options grid (a subgrid), so across a row the
+// headlines, second lines and lists each start on one line.
 const optBtn =
-  'relative row-span-2 grid grid-rows-subgrid gap-y-1.5 rounded-lg border-2 border-transparent bg-[var(--ink)] px-3 pb-3 pt-6 text-center text-[var(--paper)] hover:border-[var(--you)] focus-visible:border-[var(--you)] focus-visible:outline-none';
+  'relative row-span-3 grid grid-rows-subgrid gap-y-1 rounded-lg border-2 border-transparent bg-[var(--ink)] p-3 text-left text-[var(--paper)] hover:border-[var(--you)] focus-visible:border-[var(--you)] focus-visible:outline-none';
+
+/** "Push now, build the gap" → ["Push now", "Build the gap"]. */
+function splitLabel(label: string): [string, string] {
+  const i = label.indexOf(', ');
+  if (i < 0) return [label, ''];
+  const rest = label.slice(i + 2);
+  return [label.slice(0, i), rest.charAt(0).toUpperCase() + rest.slice(1)];
+}
 
 /** Options side by side on a wide screen. */
 const WIDE: Record<number, string> = {
@@ -208,30 +217,37 @@ export function DecisionPanel({
         <div
           className={`grid gap-x-2 gap-y-2 ${top.length === 3 ? 'grid-cols-3' : 'grid-cols-2'} ${WIDE[top.length] ?? ''}`}
         >
-          {top.map((t, i) => (
-            <button
-              key={t.id}
-              ref={i === 0 ? first : undefined}
-              type="button"
-              onClick={t.act}
-              aria-label={t.label}
-              title={t.note ?? undefined}
-              className={`${optBtn} ${t.id.startsWith('box-') ? '!bg-[var(--box)] !text-white' : ''}`}
-            >
-              <span
-                aria-hidden="true"
-                className="mono absolute left-2.5 top-1.5 text-[10px] opacity-60"
+          {top.map((t, i) => {
+            const [head, sub] = splitLabel(t.label);
+            const effects = (t.note ?? '').split(' · ').filter(Boolean);
+            return (
+              <button
+                key={t.id}
+                ref={i === 0 ? first : undefined}
+                type="button"
+                onClick={t.act}
+                aria-label={t.label}
+                title={t.note ?? undefined}
+                className={`${optBtn} ${t.id.startsWith('box-') ? '!bg-[var(--box)] !text-white' : ''}`}
               >
-                {i + 1}
-              </span>
-              <span
-                className={`disp flex items-center justify-center leading-[1.1] ${top.length === 3 ? 'text-[14px] md:text-[15px]' : 'text-[16px] md:text-[17px]'}`}
-              >
-                {t.label}
-              </span>
-              <span className="text-[12px] font-medium leading-snug opacity-75">{t.note}</span>
-            </button>
-          ))}
+                <span className="flex items-start justify-between gap-2">
+                  <span className="disp text-[15px] leading-[1.15]">{head}</span>
+                  <span aria-hidden="true" className="mono pt-0.5 text-[10px] opacity-50">
+                    {i + 1}
+                  </span>
+                </span>
+                <span className="text-[12px] font-semibold leading-snug opacity-80">{sub}</span>
+                <ul className="m-0 flex list-none flex-col gap-0.5 p-0 text-[12px] leading-snug opacity-75">
+                  {effects.map((e) => (
+                    <li key={e} className="flex gap-1.5">
+                      <span aria-hidden="true">·</span>
+                      <span>{e.charAt(0).toUpperCase() + e.slice(1)}</span>
+                    </li>
+                  ))}
+                </ul>
+              </button>
+            );
+          })}
         </div>
       ) : (
         <div className="flex flex-col gap-2">
