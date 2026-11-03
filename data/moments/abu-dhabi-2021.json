@@ -1,5 +1,67 @@
 [
   {
+    "id": "race-plan",
+    "lap": 35,
+    "trigger": "takeover",
+    "target": {
+      "kind": "beat-rival"
+    },
+    "options": [
+      {
+        "id": "plan-standard",
+        "label": "Run to plan",
+        "decisions": []
+      },
+      {
+        "id": "plan-manage",
+        "label": "Manage the tyres to the flag",
+        "decisions": [
+          {
+            "lap": 35,
+            "kind": "mode",
+            "key": "pace",
+            "value": "manage"
+          }
+        ]
+      },
+      {
+        "id": "plan-push",
+        "label": "Push now, build the gap",
+        "decisions": [
+          {
+            "lap": 35,
+            "kind": "mode",
+            "key": "pace",
+            "value": "push"
+          }
+        ]
+      },
+      {
+        "id": "plan-box-medium",
+        "label": "Box now, mediums",
+        "decisions": [
+          {
+            "lap": 35,
+            "kind": "pit",
+            "compound": "MEDIUM"
+          }
+        ]
+      },
+      {
+        "id": "plan-box-hard",
+        "label": "Box now, hards",
+        "decisions": [
+          {
+            "lap": 35,
+            "kind": "pit",
+            "compound": "HARD"
+          }
+        ]
+      }
+    ],
+    "realOptionId": "plan-standard"
+  },
+  {
     "id": "vsc-cover",
     "lap": 36,
     "trigger": "VSC",
@@ -31,6 +93,17 @@
             "lap": 36,
             "kind": "pit",
             "compound": "HARD"
+          }
+        ]
+      },
+      {
+        "id": "cover-next-medium",
+        "label": "Box next lap, mediums",
+        "decisions": [
+          {
+            "lap": 37,
+            "kind": "pit",
+            "compound": "MEDIUM"
           }
         ]
       }
@@ -82,6 +155,28 @@
             "compound": "HARD"
           }
         ]
+      },
+      {
+        "id": "box-next-medium",
+        "label": "Box next lap, mediums",
+        "decisions": [
+          {
+            "lap": 45,
+            "kind": "pit",
+            "compound": "MEDIUM"
+          }
+        ]
+      },
+      {
+        "id": "box-next-hard",
+        "label": "Box next lap, hards",
+        "decisions": [
+          {
+            "lap": 45,
+            "kind": "pit",
+            "compound": "HARD"
+          }
+        ]
       }
     ],
     "realOptionId": "stay"
@@ -127,6 +222,24 @@
             "kind": "mode",
             "key": "pace",
             "value": "manage"
+          }
+        ]
+      },
+      {
+        "id": "push-attack",
+        "label": "Push and attack",
+        "decisions": [
+          {
+            "lap": 49,
+            "kind": "mode",
+            "key": "pace",
+            "value": "push"
+          },
+          {
+            "lap": 49,
+            "kind": "mode",
+            "key": "battle",
+            "value": "attack"
           }
         ]
       }
@@ -176,6 +289,17 @@
             "lap": 53,
             "kind": "pit",
             "compound": "HARD"
+          }
+        ]
+      },
+      {
+        "id": "box-next-soft",
+        "label": "Box next lap, softs",
+        "decisions": [
+          {
+            "lap": 54,
+            "kind": "pit",
+            "compound": "SOFT"
           }
         ]
       }

@@ -1,5 +1,5 @@
 {
-  "_comment": "Headset standing-mode effects per era (Implementation Plan 2.6; product doc 'Standing modes'). Calibrated estimates, not measured: FastF1 can't observe them. Start modest, tune by playtesting. lapDelta: s added per lap. wearMult: multiplies tyre wear (effective tyre age advances by this per lap). errorMult: multiplies the era's base error rate; only the excess over 1 is applied. attackLogit / defendLogit: added to the overtake model's logit when this car attacks / is attacked. teamOrders (product doc decision type; estimates to tune in playtests): holdUpLogit is added to the rival's pass logit while the user's teammate defends directly ahead of it; holdUpCost is the time the teammate loses per lap doing so; swapWindow is how close (s) the user and teammate must be to swap; swapCost is what the yielding car loses; swapLaps is how long a swap call stays open. neutralization: base rates for grader playouts, which don't know the race's future (spec decision Oct 26 2026): chance per lap that a SC / VSC starts and their typical length, measured over the 32-race validation set (12 SC and 24 VSC starts in 1931 racing laps; median 5 and 2 laps).",
+  "_comment": "Headset standing-mode effects per era (Implementation Plan 2.6; product doc 'Standing modes'). Calibrated estimates, not measured: FastF1 can't observe them. Start modest, tune by playtesting. lapDelta: s added per lap. wearMult: multiplies tyre wear (effective tyre age advances by this per lap). errorMult: multiplies the era's base error rate; only the excess over 1 is applied. attackLogit / defendLogit: added to the overtake model's logit when this car attacks / is attacked. teamOrders (product doc decision type; estimates to tune in playtests): holdUpLogit is added to the rival's pass logit while the user's teammate defends directly ahead of it; holdUpCost is the time the teammate loses per lap doing so; swapWindow is how close (s) the user and teammate must be to swap; swapCost is what the yielding car loses; swapLaps is how long a swap call stays open. neutralization: base rates for grader playouts, which don't know the race's future (spec decision Oct 26 2026): chance per lap that a SC / VSC starts and their typical length, measured over the 32-race validation set (12 SC and 24 VSC starts in 1931 racing laps; median 5 and 2 laps). ers (feedback round 2, live play only): the hybrid battery. Each mode's charge is the battery % it gains (+) or spends (-) a green lap; a SC/VSC lap recharges scCharge; a car starts with startBattery. A spending mode does nothing with the battery empty. incidents (round 2, live play only; estimates, not measured): per-car chances each green lap of a crash, a mechanical failure and a puncture. A puncture costs punctureCost and forces a stop; a crash retires the car and brings out a SC (scShare) or a VSC on the next lap; a failure retires it. Multipliers: push (pace) on failures and punctures, attack/defend within PASS_WINDOW on crashes, punctures per lap of wear past the cliff, up to punctureMax a lap.",
   "2014-2025": {
     "baseErrorRate": 0.01,
     "errorCost": 1.5,
@@ -46,6 +46,25 @@
           "lapDelta": 0.15,
           "defendLogit": -0.6
         }
+      },
+      "ers": {
+        "harvest": {
+          "lapDelta": 0.25,
+          "charge": 15
+        },
+        "balanced": {
+          "lapDelta": 0
+        },
+        "deploy": {
+          "lapDelta": -0.2,
+          "charge": -15
+        },
+        "overtake": {
+          "lapDelta": -0.3,
+          "attackLogit": 0.5,
+          "defendLogit": -0.3,
+          "charge": -30
+        }
       }
     },
     "teamOrders": {
@@ -60,6 +79,23 @@
       "vscPerLap": 0.0124,
       "scLaps": 5,
       "vscLaps": 2
+    },
+    "ers": {
+      "startBattery": 60,
+      "scCharge": 20
+    },
+    "incidents": {
+      "crash": 0.0004,
+      "mechanical": 0.0004,
+      "puncture": 0.0002,
+      "puncturePerWornLap": 0.0004,
+      "pushMechanical": 2.5,
+      "pushPuncture": 2.0,
+      "attackCrash": 4.0,
+      "defendCrash": 2.0,
+      "punctureCost": 22,
+      "scShare": 0.7,
+      "punctureMax": 0.01
     }
   }
 }

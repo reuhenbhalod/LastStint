@@ -46,6 +46,13 @@ Beta feedback round 2, part A (Nov 2, 2026, `feedback-round-2-spec.md`):
 - **Driver attitudes:** one fixed personality per driver (`data/drivers.ts`): always listens, listens with questions (HAM: "are you sure?", and you confirm or drop it), or sometimes listens.
 - **How to play:** a five-step walkthrough on the first visit; "How to play" on the daily card reopens it.
 - **Google button:** no white box round it on the dark page.
+- **Server fix:** a BOX press or headset flip in the lap right after answering a big call no longer gets the whole run rejected (`verifyRun` checks the option's calls where they're logged, straight after the answer).
+
+Beta feedback round 2, part B (Nov 2, 2026):
+- **Race plan** (lap 35, the first call): run to plan, manage to the flag, push now, or box now (mediums or hards). Seven graded moments.
+- **Timing options:** "Box next lap" at the lap-36 VSC, the lap-44 cliff and the lap-53 SC; "Push and attack" at lap 49. The decision card has a Box button per timing.
+- **Headset:** ERS (harvest / balanced / deploy / overtake, with a battery) and fuel (normal / lift and coast) join pace and battle.
+- **Incidents:** crashes, failures and punctures across the field in live play; a crash can bring out a SC or VSC, and the radio asks whether to box under it. Race control and your driver call them on the radio. If your car is out, the race runs to the flag with nothing left to call.
 - **Google sign-in + streaks:** the streak shows on the intro and results. Signing in links the browser to an account so the streak and one-run-a-day follow you.
   - Google OAuth client `318278030629-…` (project "Pit Wall"), set as `GOOGLE_CLIENT_ID` in `apps/worker/wrangler.jsonc` and `VITE_GOOGLE_CLIENT_ID` in CI and `dev:live`. The consent screen is in Testing: only listed test users can sign in until it is published.
 

@@ -37,7 +37,7 @@ describe('GameSession', () => {
     session.finish({ status: 'practice' });
     expect(session.state.phase).toBe('results');
     expect(session.state.result?.finishers).toContain('HAM');
-    expect(Object.keys(session.state.grades)).toHaveLength(6);
+    expect(Object.keys(session.state.grades)).toHaveLength(7);
   });
 
   it('submits a run the server accepts and scores exactly as full grading does', async () => {
@@ -75,6 +75,28 @@ describe('GameSession', () => {
     expect(session.state.radio.some((r) => r.text.includes('Staying out'))).toBe(true);
     const body = await session.submission('11111111-1111-4111-8111-111111111111');
     expect(() => verifyRun(today.model, today.seed, body.decisions)).not.toThrow();
+  });
+
+  it('reports incidents on the radio, and plays on to the flag if your car is out', async () => {
+    const today = await daily();
+    // A seed where HAM's race ends early (a crash or a failure), found by playing it.
+    const out = (seed: number) => {
+      const s = new GameSession({ ...today, seed });
+      autoplay(s);
+      return s;
+    };
+    let session: GameSession | null = null;
+    for (let seed = 1; seed < 400 && !session; seed++) {
+      const s = out(seed);
+      if (s.state.race.cars.HAM?.retired) session = s;
+    }
+    if (!session) throw new Error('HAM never retired in 400 seeds');
+    expect(session.state.phase).toBe('finished');
+    expect(session.state.resolved).toHaveLength(session.state.moments.length);
+    expect(session.state.radio.some((r) => r.from === 'HAM')).toBe(true);
+    const body = await session.submission('11111111-1111-4111-8111-111111111111');
+    const { seed } = (session as unknown as { daily: { seed: number } }).daily;
+    expect(() => verifyRun(today.model, seed, body.decisions)).not.toThrow();
   });
 
   it('pauses at a moment and never re-pauses on it after a choice', async () => {

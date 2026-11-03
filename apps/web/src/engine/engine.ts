@@ -7,6 +7,7 @@ import {
   type Decision,
   type DecisionMoment,
   type RaceModel,
+  type RaceNote,
   type RaceResult,
   type RaceState,
   type Run,
@@ -43,6 +44,11 @@ export class GameEngine {
   /** The player's calls so far — the run log the Worker replays. */
   get decisions(): Decision[] {
     return this.run.decisions;
+  }
+
+  /** What happened in the run so far: rival reactions, mistakes, incidents. */
+  get notes(): RaceNote[] {
+    return this.run.notes;
   }
 
   isFinished(): boolean {

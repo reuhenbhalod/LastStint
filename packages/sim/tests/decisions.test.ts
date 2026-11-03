@@ -19,7 +19,8 @@ const abu = abuJson as unknown as RaceModel;
 const spain = spainJson as unknown as RaceModel;
 
 function runTo(model: RaceModel, seed: number, decisions: Decision[], lap: number) {
-  const run = initRun(model, seed, { decisions });
+  // Incidents off: these check the calls' own effects on a known race.
+  const run = initRun(model, seed, { decisions, incidents: false });
   while (run.state.lap < lap && !isFinished(run)) stepLap(run);
   return run;
 }
@@ -41,7 +42,9 @@ describe('player-controlled car', () => {
   it("the user's real calls reproduce the scripted race when the rival never reacts", () => {
     // Abu Dhabi 2021: HAM made no stops after takeover, so nothing triggers the rival.
     expect(realDecisions(abu)).toEqual([]);
-    expect(simulate(abu, 5, { decisions: realDecisions(abu) })).toEqual(simulate(abu, 5));
+    expect(simulate(abu, 5, { decisions: realDecisions(abu), incidents: false })).toEqual(
+      simulate(abu, 5),
+    );
   });
 
   it('realDecisions turns real out-laps into in-lap pit calls', () => {
@@ -186,7 +189,7 @@ describe('rival policy', () => {
 describe('two-compound rule', () => {
   it('disqualifies a player who finishes on one dry compound', () => {
     // Spain 2021: VER had only run softs at takeover; no calls means no stop -> excluded.
-    const result = simulate(spain, 1, { decisions: [] });
+    const result = simulate(spain, 1, { decisions: [], incidents: false });
     expect(result.disqualified).toEqual(['VER']);
     expect(result.finishers).not.toContain('VER');
     expect(result.order.at(-1)).toBe('VER');

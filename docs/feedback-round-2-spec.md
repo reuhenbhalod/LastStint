@@ -81,3 +81,9 @@ PR A (stages A1–A6) is done:
 - Web: 63 unit tests, including the auto-stay (and the server accepting it), pit-stop positions and driver attitudes.
 - The browser playthrough steps through the walkthrough, and lap 55 is no longer asked after the lap-53 stop.
 - The car moves the moment an option is picked (measured in the browser: it is moving within 0.6 s). Picking Box makes the car turn into the lane at the end of that lap.
+
+PR B (stages B1–B4):
+- Sim: 182 tests, including incidents (never in replays; deterministic; rates; a crash's neutralization; a puncture's stop; grader playouts) and ERS (drain, recharge, empty battery).
+- Measured over 2,000 Abu Dhabi runs with no calls: an incident in ~30%, an extra SC/VSC in ~9%, the player's car hit in ~3% (~8% pushing all race). Rates in `headset.json` (`incidents`).
+- Parity, G1 and the live-replay check are unchanged: incidents are live-only, and the live-replay check runs with them off.
+- The combos check samples 1,500 of the 21,600 paths (every option of every moment included).

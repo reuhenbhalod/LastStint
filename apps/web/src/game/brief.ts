@@ -48,12 +48,27 @@ export function briefFor(moment: DecisionMoment, race: RaceState, model: RaceMod
   const flag = neutral?.type ?? null;
   const { pitLoss, pitLossUnderSC, pitLossUnderVSC } = model.track;
   const stops = moment.options.some((o) => o.decisions.some((d) => d.kind === 'pit'));
+  // A moment of headset calls only: which modes it sets.
+  const modesOnly = moment.options.every((o) => o.decisions.every((d) => d.kind === 'mode'));
+  const keys = new Set(
+    moment.options.flatMap((o) => o.decisions.flatMap((d) => (d.kind === 'mode' ? [d.key] : []))),
+  );
   const only = (key: 'battle' | 'pace') =>
-    moment.options.every((o) => o.decisions.every((d) => d.kind === 'mode' && d.key === key));
+    modesOnly && keys.has(key) && (key === 'pace' || keys.size === 1);
 
   let kind: string;
   let headline: string;
-  if (only('battle')) {
+  if (moment.trigger === 'takeover') {
+    kind = 'Race plan';
+    const lead =
+      gap === null
+        ? ''
+        : gap >= 0
+          ? ` We lead ${r} by ${gap.toFixed(1)}s`
+          : ` ${r} leads us by ${(-gap).toFixed(1)}s`;
+    const tyre = me ? `, on ${me.tyreAge}-lap-old ${tyres(me.compound)}` : '';
+    headline = `You have the pit wall, ${model.race.laps - race.lap} laps to go.${lead}${tyre}. What’s the plan?`;
+  } else if (only('battle')) {
     kind = 'Restart';
     headline =
       gap === null || gap >= 0

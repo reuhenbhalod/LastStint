@@ -41,11 +41,20 @@ All calls go through `decide(run, call)`.
 | Call | Shape | Effect |
 |---|---|---|
 | Pit | `{ lap, kind: 'pit', compound }` | Box at the end of `lap`. The stop is charged on `lap + 1`, the out-lap. `compound` is a key of `model.compounds`. |
-| Headset mode | `{ lap, kind: 'mode', key, value }` | Standing mode from `lap` on (green laps only). `key`: `pace` (`push` / `standard` / `manage`), `fuel` (`normal` / `liftAndCoast`), `battle` (`attack` / `hold` / `defend`). |
+| Headset mode | `{ lap, kind: 'mode', key, value }` | Standing mode from `lap` on (green laps only). `key`: `pace` (`push` / `standard` / `manage`), `fuel` (`normal` / `liftAndCoast`), `battle` (`attack` / `hold` / `defend`), `ers` (`harvest` / `balanced` / `deploy` / `overtake`). |
 | Team order | `{ lap, kind: 'teamOrder', order }` | `letTeammatePast` or `teammateLetsYouPast`: the yielding car lifts if it starts a green lap directly ahead within 1s (open for 3 laps). `holdUp` / `release`: the teammate defends against the rival while directly ahead of it. Requires a teammate (`teammateOf(model)`). |
 | Radio answer | `{ lap, kind: 'radio', momentId, optionId }` | Records the option chosen at a moment; `answerMoment()` logs it with the option's calls. Every moment needs exactly one. |
 
 Mode and team-order effects are calibrated estimates in `packages/sim/src/headset.json`, tuned in playtests.
+
+**ERS** (live play): the player's car has a battery (`CarState.battery`, 0–100, starting at 60). `harvest` refills it 15% a green lap, `deploy` and `overtake` spend 15% and 30%, and a SC/VSC lap recharges 20%. With the battery empty a spending mode does nothing.
+
+**Incidents** (live play; `RunOptions.incidents: false` turns them off): every running car may crash, fail or puncture on a green lap, from its own random stream (`INCIDENT_STREAM`).
+- Pushing raises the failure and puncture chances; tyres past their cliff raise punctures; attacking or defending in a fight raises crashes.
+- A crash or a failure retires the car. A crash also brings out a SC or VSC from the next lap (not in grader playouts, which sample neutralizations).
+- A puncture costs ~22 s and forces a stop next lap.
+- Each one is logged in `run.notes` as `{ kind: 'incident', driver, detail: 'crash' | 'mechanical' | 'puncture' }`.
+- Over 2,000 Abu Dhabi runs with no calls: about 30% see an incident, 9% an extra SC/VSC, and the player's car is hit in 3% (8% when pushing all race).
 
 ### Rules the UI should surface
 
@@ -64,8 +73,9 @@ Mode and team-order effects are calibrated estimates in `packages/sim/src/headse
   - `compound`, `tyreAge` (laps on the set) and `tyreWear` (effective wear).
   - `totalTime`: seconds since takeover; gaps are differences of these.
   - `pittedThisLap`, `retired`.
-  - `modes`, `compoundsUsed`.
+  - `modes`, `compoundsUsed`, and `battery` (the player's car in live play).
 - `teamOrders`: `{ holdUp, swap }`.
+- `nextFlag`: the flag the next lap runs under, as known now (live play can add a SC or VSC after a crash).
 
 Other useful parts of the model:
 
@@ -78,9 +88,9 @@ Other useful parts of the model:
 `model.decisionMoments` (`DecisionMoment[]`) comes from `data/moments/<race-id>.json`. Each moment has:
 
 - `id`, `lap` (the calls are for this lap, so pause after `lap - 1`).
-- `trigger`: `SC` / `VSC` / `rivalPit` / `undercut` / `cliff`.
+- `trigger`: `SC` / `VSC` / `rivalPit` / `undercut` / `cliff` / `takeover` (the race plan when the player takes over).
 - `target`: `{ kind: 'win' }`, `{ kind: 'beat-rival' }` or `{ kind: 'position', atBest }`.
-- `options`: `{ id, label, decisions }[]`, 2–4 of them.
+- `options`: `{ id, label, decisions }[]`, 2–8 of them. An option's calls can be for a later lap ("Box next lap").
 - `realOptionId`: which option the real team took. Show it, graded, on the results screen.
 
 **Finding moments.** `pnpm --filter @boxthislap/sim moments <race-id>`:
@@ -90,7 +100,7 @@ Other useful parts of the model:
 - Writes them to `data/moments/proposed/<race-id>.json`.
 - A person picks 2–4 and saves them as `data/moments/<race-id>.json`; `pipeline build <race-id>` embeds them.
 
-Abu Dhabi 2021 ships with six approved moments: `vsc-cover` (lap 36), `tyres-going` (44), `manage-or-push` (49), `sc-stop` (53), `sc-last-chance` (55) and `restart-stance` (57).
+Abu Dhabi 2021 ships with seven approved moments: `race-plan` (lap 35), `vsc-cover` (36), `tyres-going` (44), `manage-or-push` (49), `sc-stop` (53), `sc-last-chance` (55) and `restart-stance` (57).
 
 ## Grading
 
@@ -143,7 +153,7 @@ It throws a `VerifyError` with a `code`:
 |---|---|
 | `invalid-calls` | Not an array, more than `MAX_DECISIONS` calls, a call without `at` or out of order, or a call `validateDecisions` rejects |
 | `missing-answer` | A moment has no radio answer, or more than one |
-| `bad-answer` | An answer on the wrong lap or at the wrong time, an unknown option or moment, or calls on the moment's lap that aren't exactly the chosen option's |
+| `bad-answer` | An answer on the wrong lap or at the wrong time, an unknown option or moment, or the calls logged straight after the answer aren't exactly the chosen option's (live calls made later on the same lap are fine) |
 
 ## Determinism
 

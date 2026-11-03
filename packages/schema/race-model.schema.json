@@ -357,7 +357,8 @@
               "VSC",
               "rivalPit",
               "undercut",
-              "cliff"
+              "cliff",
+              "takeover"
             ]
           },
           "target": {
@@ -369,7 +370,7 @@
           "options": {
             "type": "array",
             "minItems": 2,
-            "maxItems": 4,
+            "maxItems": 8,
             "items": {
               "type": "object",
               "additionalProperties": false,

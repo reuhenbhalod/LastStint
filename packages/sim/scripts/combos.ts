@@ -1,17 +1,22 @@
 // Every combination of a race's decision-moment answers, played and scored the way the server
 // does (beta spec stage 3): the live check from the game's grades must equal full grading, and
 // the results show whether the race's seed plays fairly (the best play shouldn't always lose).
-//   pnpm --filter @boxthislap/sim combos <race-id> [seed]
+// Races with more than MAX_COMBOS paths are checked on a fixed random sample of them, which
+// still takes every option of every moment (feedback round 2); --all checks every path.
+//   pnpm --filter @boxthislap/sim combos <race-id> [seed] [--all]
 
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { playDailyRace } from '../examples/daily-race.js';
+import { mulberry32 } from '../src/rng.js';
 import type { RaceModel } from '../src/types.js';
 import { verifyRun } from '../src/verify.js';
 
 const repo = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
-const [raceId, seedArg] = process.argv.slice(2);
+const args = process.argv.slice(2);
+const all = args.includes('--all');
+const [raceId, seedArg] = args.filter((a) => a !== '--all');
 if (!raceId) {
   console.error('usage: combos <race-id> [seed]');
   process.exit(2);
@@ -25,6 +30,22 @@ const moments = [...model.decisionMoments].sort((a, b) => a.lap - b.lap);
 
 let combos: string[][] = [[]];
 for (const m of moments) combos = combos.flatMap((c) => m.options.map((o) => [...c, o.id]));
+const MAX_COMBOS = 1500;
+const total = combos.length;
+if (!all && total > MAX_COMBOS) {
+  // A fixed shuffle (so reruns check the same paths), cut to MAX_COMBOS.
+  const rng = mulberry32(seed);
+  for (let i = combos.length - 1; i > 0; i--) {
+    const j = Math.floor(rng.next() * (i + 1));
+    [combos[i], combos[j]] = [combos[j] as string[], combos[i] as string[]];
+  }
+  combos = combos.slice(0, MAX_COMBOS);
+  moments.forEach((m, i) => {
+    for (const o of m.options) {
+      if (!combos.some((c) => c[i] === o.id)) throw new Error(`sample misses ${m.id}:${o.id}`);
+    }
+  });
+}
 
 const rows: Array<{ score: number; line: string }> = [];
 let mismatches = 0;
@@ -49,5 +70,7 @@ for (const combo of combos) {
 rows.sort((a, b) => b.score - a.score);
 console.log(`${raceId}, seed ${seed}: score, result, calls (g/y/o/r = band)`);
 for (const r of rows) console.log(r.line);
-console.log(`${combos.length} combinations, ${mismatches} live/full mismatches`);
+console.log(
+  `${combos.length}${combos.length < total ? ` of ${total}` : ''} combinations, ${mismatches} live/full mismatches`,
+);
 if (mismatches) process.exit(1);

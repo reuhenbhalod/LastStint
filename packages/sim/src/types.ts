@@ -13,11 +13,14 @@ export type FlagState = 'green' | 'sc' | 'vsc' | 'red';
 export type PaceMode = 'push' | 'standard' | 'manage';
 export type FuelMode = 'normal' | 'liftAndCoast';
 export type BattleMode = 'attack' | 'hold' | 'defend';
+/** The hybrid battery's use (feedback round 2): spending modes drain it, harvest refills it. */
+export type ErsMode = 'harvest' | 'balanced' | 'deploy' | 'overtake';
 
 export interface Modes {
   pace: PaceMode;
   fuel: FuelMode;
   battle: BattleMode;
+  ers: ErsMode;
 }
 
 export interface CompoundModel {
@@ -132,6 +135,8 @@ export interface CarState {
   retired: boolean;
   retiredLap: number | null;
   modes: Modes;
+  /** Hybrid battery charge, 0-100 (the player's car in live play only). */
+  battery?: number;
 }
 
 /**
@@ -163,8 +168,9 @@ export type Decision = (
 /** Something the sim did on its own that the game may narrate (e.g. the rival covering). */
 export interface RaceNote {
   lap: number;
-  kind: 'rival-cover' | 'rival-stays-out' | 'error' | 'team-swap';
+  kind: 'rival-cover' | 'rival-stays-out' | 'error' | 'team-swap' | 'incident';
   driver: string;
+  /** For an incident: 'crash', 'mechanical' or 'puncture'. */
   detail?: string;
 }
 
@@ -182,6 +188,9 @@ export interface RaceState {
     /** A pending yield call: which car yields, and the last lap it stays open. */
     swap: { yielder: string; untilLap: number } | null;
   };
+  /** The flag the next lap will run under, as known now (live play adds neutralizations
+   * after crashes, so the race model's events alone don't say). */
+  nextFlag?: FlagState;
 }
 
 export interface RaceResult {

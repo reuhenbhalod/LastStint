@@ -1,6 +1,6 @@
 // The decision card in the call column: the radio line, four stat tiles (gap, tyres, pit
-// stop, laps left), then the options, each with a line on what it does. Stops fold into one
-// "Box" button followed by the tyre choice (game/choices.ts), where each compound shows its
+// stop, laps left), then the options, each with a line on what it does. Stops fold into a
+// "Box" button per timing (this lap, next lap) followed by the tyre choice (game/choices.ts), where each compound shows its
 // pace, drop-off, whether it reaches the flag and what it gains over the laps left
 // (game/guide.ts). Number keys pick options. On a phone it rises as a bottom sheet over the
 // map so the call is always in reach.
@@ -56,7 +56,8 @@ export function DecisionPanel({
 }) {
   const b = briefFor(moment, race, model);
   const c = choicesFor(moment);
-  const [picking, setPicking] = useState(false);
+  // The Box button whose tyre step is open.
+  const [picking, setPicking] = useState<'now' | 'next' | null>(null);
   const first = useRef<HTMLButtonElement>(null);
 
   // The top-level buttons, with Box in the stop options' place.
@@ -64,34 +65,47 @@ export function DecisionPanel({
   const top: Array<{ id: string; label: string; note: string | null; act: () => void }> =
     c.direct.map((o) => {
       const mode = modeOf(o.decisions);
+      // Several headset calls at once (push and attack): each one's effects, once each.
+      const modes = o.decisions.flatMap((d) =>
+        d.kind === 'mode' ? (modeLine(model, d.key, d.value)?.split(' · ') ?? []) : [],
+      );
       return {
         id: o.id,
         // "Stay out — keep the lead" reads long beside its note: the note carries the detail.
         label: o.decisions.length === 0 ? (o.label.split(' — ')[0] ?? o.label) : o.label,
         note: mode
           ? modeLine(model, mode.key, mode.value)
-          : o.decisions.length === 0 && me
-            ? `Keep track position on ${me.tyreAge}-lap-old ${tyreName(me.compound).toLowerCase()}`
-            : null,
+          : modes.length
+            ? [...new Set(modes)].join(' · ')
+            : o.decisions.length === 0 && moment.trigger === 'takeover'
+              ? 'Standard pace: react to the race as it comes'
+              : o.decisions.length === 0 && me
+                ? `Keep track position on ${me.tyreAge}-lap-old ${tyreName(me.compound).toLowerCase()}`
+                : null,
         act: () => onChoose(o.id),
       };
     });
-  if (c.box) {
-    const only = c.box.tyres.length === 1 ? c.box.tyres[0] : null;
-    top.splice(c.boxIndex, 0, {
-      id: 'box',
-      label: 'Box',
-      note: b.stop
-        ? `Stop costs ~${b.stop.now.toFixed(0)} s now${only ? '' : ' · pick tyres next'}`
-        : null,
-      act: () => (only ? onChoose(only.option.id) : setPicking(true)),
+  c.boxes.forEach((box, i) => {
+    const only = box.tyres.length === 1 ? box.tyres[0] : null;
+    const tyres = only ? ` · ${tyreName(only.compound).toLowerCase()}` : ' · pick tyres next';
+    top.splice(c.boxIndex + i, 0, {
+      id: `box-${box.key}`,
+      label: box.label,
+      note:
+        box.key === 'now'
+          ? b.stop
+            ? `Stop costs ~${b.stop.now.toFixed(0)} s now${tyres}`
+            : null
+          : `One more lap on these tyres first${tyres}`,
+      act: () => (only ? onChoose(only.option.id) : setPicking(box.key)),
     });
-  }
-  const tyreOpts = c.box?.tyres ?? [];
+  });
+  const box = c.boxes.find((x) => x.key === picking) ?? null;
+  const tyreOpts = box?.tyres ?? [];
   const outlooks = tyreOutlooks(
     model,
     me,
-    moment.lap,
+    box?.lap ?? moment.lap,
     tyreOpts.map((t) => t.compound),
   );
 
@@ -101,7 +115,7 @@ export function DecisionPanel({
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const n = Number(e.key);
-      if (e.key === 'Escape' && picking) setPicking(false);
+      if (e.key === 'Escape' && picking) setPicking(null);
       if (!Number.isInteger(n) || n < 1) return;
       if (picking)
         tyreOpts[n - 1] && onChoose((tyreOpts[n - 1] as (typeof tyreOpts)[number]).option.id);
@@ -190,7 +204,7 @@ export function DecisionPanel({
               onClick={t.act}
               aria-label={t.label}
               title={t.note ?? undefined}
-              className={`${optBtn} ${t.id === 'box' ? '!bg-[var(--box)] !text-white' : ''}`}
+              className={`${optBtn} ${t.id.startsWith('box-') ? '!bg-[var(--box)] !text-white' : ''}`}
             >
               <span
                 aria-hidden="true"
@@ -211,7 +225,7 @@ export function DecisionPanel({
         </div>
       ) : (
         <div className="flex flex-col gap-2">
-          <p className="eyebrow">Box: which tyres?</p>
+          <p className="eyebrow">{box?.label ?? 'Box'}: which tyres?</p>
           <p className="m-0 text-[12px] leading-snug text-[var(--muted)]">
             {b.stop ? `The stop costs ~${b.stop.now.toFixed(0)} s. ` : ''}
             {(outlooks[0]?.greenLaps ?? 0) > 0
@@ -275,7 +289,7 @@ export function DecisionPanel({
           </div>
           <button
             type="button"
-            onClick={() => setPicking(false)}
+            onClick={() => setPicking(null)}
             className="self-start rounded-md px-2 py-1 text-[13px] text-[var(--muted)] underline"
           >
             Back
