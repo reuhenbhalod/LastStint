@@ -1,4 +1,5 @@
-// The decision card in the call column: the radio line, four stat tiles (gap, tyres, pit
+// The decision card, under the map (a wide strip on a laptop: tiles in one row, options in
+// one row): the radio line, four stat tiles (gap, tyres, pit
 // stop, laps left), then the options, each with a line on what it does. Stops fold into a
 // "Box" button per timing (this lap, next lap) followed by the tyre choice (game/choices.ts), where each compound shows its
 // pace, drop-off, whether it reaches the flag and what it gains over the laps left
@@ -42,6 +43,14 @@ function Tile({
 // is always one height.
 const optBtn =
   'relative flex min-h-[64px] flex-col items-center justify-center gap-1 rounded-lg border-2 border-transparent bg-[var(--ink)] px-2.5 pb-2.5 pt-5 text-center text-[var(--paper)] hover:border-[var(--you)] focus-visible:border-[var(--you)] focus-visible:outline-none';
+
+/** Options side by side on a wide screen. */
+const WIDE: Record<number, string> = {
+  2: 'md:grid-cols-2',
+  3: 'md:grid-cols-3',
+  4: 'md:grid-cols-4',
+  5: 'md:grid-cols-5',
+};
 
 export function DecisionPanel({
   moment,
@@ -140,7 +149,7 @@ export function DecisionPanel({
       >
         {b.headline}
       </p>
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
         <Tile
           label="Gap"
           note={
@@ -195,7 +204,9 @@ export function DecisionPanel({
       </div>
 
       {!picking ? (
-        <div className={`grid gap-2 ${top.length === 3 ? 'grid-cols-3' : 'grid-cols-2'}`}>
+        <div
+          className={`grid gap-2 ${top.length === 3 ? 'grid-cols-3' : 'grid-cols-2'} ${WIDE[top.length] ?? ''}`}
+        >
           {top.map((t, i) => (
             <button
               key={t.id}
@@ -232,7 +243,7 @@ export function DecisionPanel({
               ? `“Gain” is lap time over the ${outlooks[0]?.greenLaps} green lap${outlooks[0]?.greenLaps === 1 ? '' : 's'} left, against staying out (no traffic or passing).`
               : 'No green laps left: fresh tyres only help at a restart.'}
           </p>
-          <div className="flex flex-col gap-2">
+          <div className={`grid gap-2 ${WIDE[tyreOpts.length] ?? ''}`}>
             {tyreOpts.map((t, i) => {
               const o = outlooks[i];
               return (

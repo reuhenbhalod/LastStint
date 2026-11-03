@@ -446,7 +446,7 @@ export function TrackMap({
   return (
     <svg
       viewBox={`0 0 ${outline.width} ${outline.height}`}
-      className="block h-auto w-full"
+      className="block h-auto max-h-[52vh] w-full"
       aria-labelledby="track-map-title"
     >
       <title id="track-map-title">{`Track map, lap ${race.lap}. Select a car for its details.`}</title>
