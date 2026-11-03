@@ -8,7 +8,7 @@ model change. Diagnosis = the dominant source of the race's gap error
 Near-ties: cars that really finished within 1.0s are tied for the order checks (model
 v3 spec C2); the status without that rule is shown alongside.
 
-## Held-out races: 11 pass, 0 borderline, 8 fail (mean gap error 2.04s)
+## Held-out races: 30 pass, 0 borderline, 8 fail (mean gap error 1.69s)
 
 | Race | Duel | Status | Without near-tie rule | Mean gap error | Failing checks | Diagnosis |
 |---|---|---|---|---|---|---|
@@ -32,6 +32,25 @@ v3 spec C2); the status without that rule is shown alongside.
 | usa-2022 | HAM vs VER | pass | pass | 0.52s |  |  |
 | mexico-2024 | NOR vs SAI | pass | pass | 1.52s |  |  |
 | abu-dhabi-2024 | SAI vs NOR | pass | pass | 2.14s |  |  |
+| canada-2019 | HAM vs VET | pass | pass | 0.83s |  |  |
+| united-states-2019 | HAM vs BOT | pass | fail | 0.98s |  |  |
+| styria-2020 | BOT vs HAM | pass | pass | 1.01s |  |  |
+| russia-2020 | VER vs BOT | pass | pass | 2.68s |  |  |
+| abu-dhabi-2020 | BOT vs VER | pass | pass | 2.81s |  |  |
+| portugal-2021 | VER vs HAM | pass | pass | 0.77s |  |  |
+| styria-2021 | HAM vs VER | pass | pass | 0.67s |  |  |
+| netherlands-2022 | RUS vs VER | pass | pass | 2.10s |  |  |
+| italy-2022 | LEC vs VER | pass | pass | 2.40s |  |  |
+| mexico-2022 | HAM vs VER | pass | pass | 0.69s |  |  |
+| miami-2023 | PER vs VER | pass | pass | 0.82s |  |  |
+| spain-2023 | HAM vs VER | pass | pass | 2.14s |  |  |
+| united-states-2023 | HAM vs VER | pass | pass | 0.14s |  |  |
+| japan-2024 | PER vs VER | pass | pass | 1.47s |  |  |
+| china-2024 | NOR vs VER | pass | pass | 1.65s |  |  |
+| belgium-2024 | HAM vs RUS | pass | fail | 1.34s |  |  |
+| china-2025 | NOR vs PIA | pass | pass | 1.28s |  |  |
+| saudi-arabia-2025 | VER vs PIA | pass | pass | 0.81s |  |  |
+| austria-2025 | PIA vs NOR | pass | pass | 0.84s |  |  |
 
 ## Tuning races: 9 pass, 1 borderline, 6 fail (mean gap error 2.17s)
 

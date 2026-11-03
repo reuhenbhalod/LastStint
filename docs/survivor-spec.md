@@ -51,3 +51,41 @@ Nov 3, 2026 · Branch `survivor`. A second game mode, separate from the daily: r
    - tests.
 4. **Game:** the mode flow (start, race, between-races card, run over), entry points, the leaderboard, and local practice when offline.
 5. **Checks:** all suites, the e2e survivor run, browser playthroughs on laptop and phone, and docs.
+
+## Done (Nov 3-4, 2026)
+
+**Batch 3, the survivor pool: 19 races.**
+- 80 dry races from 2018-2025 were downloaded and built, with track maps and pit lanes. Wet and red-flagged races were left out.
+- Each race had to:
+  - pass G1, with the automatic duel, or another close pair found by `pipeline/scripts/duels.py`;
+  - get 1-2 calls after the race plan (`author --max 2`);
+  - have at least one seed passing the tuner (`tune --survivor 5`).
+- Kept: canada-2019 (HAM vs VET), united-states-2019 (HAM vs BOT), styria-2020 (BOT vs HAM), russia-2020 (VER vs BOT), abu-dhabi-2020 (BOT vs VER), portugal-2021 (VER vs HAM), styria-2021 (HAM vs VER), netherlands-2022 (RUS vs VER), italy-2022 (LEC vs VER), mexico-2022 (HAM vs VER), miami-2023 (PER vs VER), spain-2023 (HAM vs VER), united-states-2023 (HAM vs VER), japan-2024 (PER vs VER), china-2024 (NOR vs VER), belgium-2024 (HAM vs RUS), china-2025 (NOR vs PIA), saudi-arabia-2025 (VER vs PIA), austria-2025 (PIA vs NOR).
+- Dropped:
+  - 46 fail G1 on checks no pairing changes (the field's gaps or the podium order, most often in 2018);
+  - 5 crash on missing data;
+  - 5 have no fair setup;
+  - 10 have too few calls, even taking over 8 or 15 laps earlier (USA 2024, Netherlands 2021 and Netherlands 2024 among them).
+- The bar wasn't lowered. A looser G1 for survivor (only the duel and our cars' gaps) would add more races, and is the owner's call.
+
+**Pools:**
+- `data/pools.json`; the scheduler and the admin page use only the daily pool.
+- The Worker bundles only the pool races: 38, 97 KB gzipped.
+- Tests:
+  - the pools are disjoint;
+  - every pool race is playable, and every playable race is in a pool;
+  - every pool race has a map and a pit lane.
+
+**Server:**
+- migration 0005;
+- `/api/survivor/start`, `/:runId`, `/:runId/round`, `/leaderboard` (`src/survivor.ts`);
+- the nightly re-grade covers survivor rounds;
+- tests cover a win carrying on, a loss ending the run, ranking, other players, wrong rounds, tampered logs and double submits.
+
+**Game:**
+- `/survivor`: the lobby (rules, Start, this week's and all-time leaderboards), each race's card (the home hero, "Survivor · round N"), the race, "Round N survived" with the next race, and "Run over" with the history and rank.
+- A run in progress survives a refresh: its own save slot, never the daily's.
+- Entry points: "Survivor mode" on the home page, and "Keep racing: Survivor" on the daily results.
+- An e2e test plays a round.
+
+**Driver data:** Pietro Fittipaldi (Abu Dhabi 2020) added to `data/drivers.json` as low attitude, with no researched radio history, like Doohan.
