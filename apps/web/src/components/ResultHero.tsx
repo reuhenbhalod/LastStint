@@ -67,6 +67,7 @@ export function ResultHero({
   userSide,
   rival,
   pos,
+  dsq = false,
   realPos,
   rivalPos,
   team,
@@ -78,6 +79,8 @@ export function ResultHero({
   userSide: string;
   rival: string;
   pos: number;
+  /** Disqualified (two-compound rule): shown as DSQ, not OUT. */
+  dsq?: boolean;
   realPos: number;
   rivalPos: number;
   team: string;
@@ -95,7 +98,7 @@ export function ResultHero({
         <p className="eyebrow m-0">Chequered flag · {raceName.split(':')[0]}</p>
         <div className="flex flex-col items-center gap-1">
           <span className={`disp wide text-[72px] leading-[0.9] ${tone.text}`}>
-            {pos > 0 ? `P${pos}` : 'OUT'}
+            {pos > 0 ? `P${pos}` : dsq ? 'DSQ' : 'OUT'}
           </span>
           <span className="disp text-[15px] leading-none text-[var(--muted)]">
             {userSide} · {tone.word}
@@ -103,7 +106,7 @@ export function ResultHero({
         </div>
         <h1 className="disp m-0 text-[30px] leading-none">{v.headline}</h1>
         <div className="grid w-full grid-cols-3 gap-2">
-          <Figure label="You" value={pos > 0 ? `P${pos}` : 'OUT'} tone={tone.text} />
+          <Figure label="You" value={pos > 0 ? `P${pos}` : dsq ? 'DSQ' : 'OUT'} tone={tone.text} />
           <Figure label={`Real ${team}`} value={realPos > 0 ? `P${realPos}` : '-'} />
           <Figure
             label={rival}

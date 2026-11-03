@@ -1208,9 +1208,7 @@ function incidents(run: Run, lap: number, prevTime: Record<string, number>): voi
       c.totalTime += rates.punctureCost;
       if (lap >= model.race.laps) continue; // limps to the flag
       const next = c.strategy.filter((st) => st.lap > lap).sort((a, b) => a.lap - b.lap)[0];
-      const to =
-        next?.to ??
-        (model.compounds.MEDIUM ? 'MEDIUM' : model.compounds.HARD ? 'HARD' : c.compound);
+      const to = next?.to ?? forcedCompound(model, c);
       c.strategy = c.strategy.filter((st) => st !== next && st.lap !== lap + 1);
       c.strategy.push({ lap: lap + 1, to, added: true });
       continue;
@@ -1230,6 +1228,20 @@ function incidents(run: Run, lap: number, prevTime: Record<string, number>): voi
     }
   }
   // The order is settled after the lap (resolveOrder), which drops retired cars to the back.
+}
+
+/**
+ * The tyres a forced stop (a puncture) fits when no stop was planned: mediums, else hards, but
+ * a dry compound the car hasn't run yet if it still needs one for the two-compound rule (a
+ * puncture must never leave the car disqualified).
+ */
+function forcedCompound(model: RaceModel, c: CarState): string {
+  const prefs = ['MEDIUM', 'HARD', 'SOFT'].filter((x) => model.compounds[x]);
+  if (!ruleSatisfied(c)) {
+    const fresh = prefs.find((x) => !c.compoundsUsed.includes(x));
+    if (fresh) return fresh;
+  }
+  return prefs[0] ?? c.compound;
 }
 
 /**
@@ -1397,8 +1409,7 @@ function engineerLap(
       run.notes.push({ lap, kind: 'contact', driver: c.code, detail: 'puncture', other });
       if (lap < run.model.race.laps) {
         const next = c.strategy.filter((st) => st.lap > lap).sort((a, b) => a.lap - b.lap)[0];
-        const m = run.model.compounds;
-        const to = next?.to ?? (m.MEDIUM ? 'MEDIUM' : m.HARD ? 'HARD' : c.compound);
+        const to = next?.to ?? forcedCompound(run.model, c);
         c.strategy = c.strategy.filter((st) => st !== next && st.lap !== lap + 1);
         c.strategy.push({ lap: lap + 1, to, added: true });
       }
@@ -1492,7 +1503,7 @@ function engineerAfterLap(
         other: t,
       });
       if (called && move === 'let-go') {
-        if (lost && t === model.rival) trust(run, lap, 'let-rival-go');
+        if (lost) trust(run, lap, t === model.rival ? 'let-rival-go' : 'let-car-go');
       } else if (called) trust(run, lap, lost ? 'passed-anyway' : 'held-called');
     }
   }

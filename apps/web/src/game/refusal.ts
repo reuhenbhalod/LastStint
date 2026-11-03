@@ -6,9 +6,20 @@
 // always gets the same answer, so neither a refresh nor pressing again re-rolls it. The
 // graded decision moments, and answers to the radio's quick calls, are always followed.
 
-import type { CarState, Decision } from '@boxthislap/sim';
+import type { CarState, Decision, Mood } from '@boxthislap/sim';
 
-export type LiveCall = Extract<Decision, { kind: 'pit' } | { kind: 'mode' }>;
+export type LiveCall = Extract<Decision, { kind: 'pit' } | { kind: 'mode' } | { kind: 'battle' }>;
+
+/**
+ * How the driver's mood scales his refusals (race engineer spec D4): a calm driver takes more
+ * of the wall's calls, a furious one far fewer.
+ */
+export const MOOD_REFUSALS: Record<Mood, number> = {
+  calm: 0.6,
+  tense: 1,
+  frustrated: 2,
+  furious: 3.5,
+};
 
 /** FNV-1a over the text, mapped to [0, 1). */
 export function roll(text: string): number {
@@ -21,7 +32,9 @@ export function roll(text: string): number {
 }
 
 function callKey(call: LiveCall): string {
-  return call.kind === 'pit' ? `pit:${call.compound}` : `mode:${call.key}:${call.value}`;
+  if (call.kind === 'pit') return `pit:${call.compound}`;
+  if (call.kind === 'battle') return `battle:${call.move}`;
+  return `mode:${call.key}:${call.value}`;
 }
 
 /** The driver's reason, when the call gives them one (the radio says it when they refuse). */
@@ -60,13 +73,27 @@ export function refusal(
     reason(call, car) ??
     (call.kind === 'pit'
       ? (REPLY.pit as string)
-      : (REPLY[`${call.key}:${call.value}`] ?? 'Negative.'))
+      : call.kind === 'battle'
+        ? 'No. I’ll do it my way.'
+        : (REPLY[`${call.key}:${call.value}`] ?? 'Negative.'))
   );
 }
 
 /** The radio's "copy" for a call the driver will make. */
 export function acknowledge(call: LiveCall): string {
   if (call.kind === 'pit') return `Copy, box this lap for ${call.compound.toLowerCase()}s.`;
+  if (call.kind === 'battle') return BATTLE_COPY[call.move];
   const mode = call.value === 'liftAndCoast' ? 'lift and coast' : call.value;
   return `Copy, ${mode} mode.`;
 }
+
+const BATTLE_COPY: Record<Extract<LiveCall, { kind: 'battle' }>['move'], string> = {
+  'cover-inside': 'Copy, covering the inside.',
+  'hold-outside': 'Copy, I’ll hold the outside.',
+  'defend-hard': 'Copy. He’s not getting by.',
+  'let-go': 'Copy… letting him through.',
+  'dive-inside': 'Copy, going up the inside!',
+  'round-outside': 'Copy, round the outside.',
+  'wait-drs': 'Copy, I’ll sit in DRS.',
+  'overtake-button': 'Copy, overtake button.',
+};

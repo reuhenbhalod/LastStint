@@ -7,7 +7,7 @@
 // (and chirps, if sound is on). Tap any car, on the map or in the standings, for its card; a
 // stop by your car or the rival is called out while it drives the pit lane.
 
-import type { Modes, RaceModel } from '@boxthislap/sim';
+import { type Modes, type RaceModel, engineerConfig } from '@boxthislap/sim';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CarStats } from '../components/CarStats.js';
 import { DecisionPanel } from '../components/DecisionPanel.js';
@@ -23,12 +23,14 @@ import { TeamRadio } from '../components/TeamRadio.js';
 import { TimingTower } from '../components/TimingTower.js';
 import { TrackMap } from '../components/TrackMap.js';
 import { TyreBadge } from '../components/TyreBadge.js';
+import { BATTLE_MS, CALL_MS, directorCall, infoLine, newMemory } from '../game/engineerCalls.js';
 import { modeLine } from '../game/guide.js';
-import { type QuickCall, quickCallAt, quickCallLaps, safetyCarCall } from '../game/quickCalls.js';
+import { type QuickCall, quickCallLaps } from '../game/quickCalls.js';
 import { useRaceLog } from '../game/raceLog.js';
 import { radioChirp, setSoundOn, soundOn } from '../game/sound.js';
 import { type Game, LAP_MS } from '../game/useGame.js';
 import type { GameState } from '../state/machine.js';
+import { overtakingCorners } from '../track/corners.js';
 import { quietCorner } from '../track/geometry.js';
 import { outlineFor } from '../track/outlines.js';
 
@@ -93,33 +95,99 @@ export function RaceScreen({
     [finishing, state.speed, onCrossed],
   );
 
-  // Quick calls between the big moments: asked once each, answered or timed out.
+  // The race engineer's radio (race engineer spec): after every lap the director picks the
+  // most pressing call (a battle, trouble, the driver asking, the engineer's question); a quiet
+  // lap gets an info line now and then. A battle runs the lap in slow motion until its result.
+  const cfg = useMemo(() => engineerConfig(model), [model]);
+  const corners = useMemo(() => overtakingCorners(outline), [outline]);
   const quickLaps = useMemo(() => new Set(quickCallLaps(model)), [model]);
+  const memory = useRef(newMemory());
   const asked = useRef(new Set<number>());
   const [quick, setQuick] = useState<QuickCall | null>(null);
+  // The battle this lap (from its call until the lap is run), and its result on the map.
+  const [fight, setFight] = useState<{ other: string; corner: number } | null>(null);
+  const [flash, setFlash] = useState<{ text: string; good: boolean; corner: number } | null>(null);
   const raceLap = state.race.lap;
+  const { setSlow } = game;
   // biome-ignore lint/correctness/useExhaustiveDependencies: asked once, when its lap completes.
   useEffect(() => {
+    setSlow(false); // a battle's lap is over
+    setQuick(null);
+    setFight(null);
     if (state.phase !== 'racing' || asked.current.has(raceLap)) return;
-    // A crash's safety car is asked about at once; otherwise the regular quick calls.
-    const sc = safetyCarCall(state.race, model);
-    if (!sc && !quickLaps.has(raceLap)) return;
     asked.current.add(raceLap);
-    setQuick(sc ?? quickCallAt(state.race, model, log));
-  }, [raceLap, state.phase, quickLaps]);
+    // The last lap's battle, at its corner.
+    const corner = corners[0] ?? 1;
+    const lapNotes = game.notes().filter((n) => n.lap === raceLap && n.driver === userSide);
+    const contact = lapNotes.find((n) => n.kind === 'contact');
+    const fought = lapNotes.find((n) => n.kind === 'battle');
+    if (contact)
+      setFlash({ text: contact.detail === 'spin' ? 'SPIN!' : 'CONTACT!', good: false, corner });
+    else if (fought) {
+      const good = fought.detail === 'passed' || fought.detail === 'held';
+      const text =
+        fought.detail === 'passed'
+          ? `PAST ${fought.other}!`
+          : fought.detail === 'held'
+            ? 'HELD!'
+            : fought.detail === 'lost'
+              ? `${fought.other} THROUGH`
+              : 'NO WAY BY';
+      setFlash({ text, good, corner });
+    }
+    const call = directorCall(
+      state.race,
+      model,
+      cfg,
+      log,
+      game.notes(),
+      corners,
+      memory.current,
+      quickLaps.has(raceLap),
+    );
+    if (call) {
+      setQuick(call);
+      if (call.kind === 'battle') {
+        setSlow(true);
+        if (call.other) setFight({ other: call.other, corner: call.corner ?? corner });
+      }
+      return;
+    }
+    // A quiet lap: the engineer's info, every other lap or so.
+    const last = memory.current.last.info ?? -99;
+    if (raceLap - last >= 2 && state.race.nextFlag === 'green') {
+      const line = infoLine(state.race, model, log);
+      if (line) {
+        memory.current.last.info = raceLap;
+        game.radio(line);
+      }
+    }
+  }, [raceLap, state.phase]);
+  useEffect(() => {
+    if (!flash) return;
+    const id = setTimeout(() => setFlash(null), 3000);
+    return () => clearTimeout(id);
+  }, [flash]);
   const answerQuick = useCallback(
     (id: string) => {
       const o = quick?.options.find((x) => x.id === id);
-      if (o?.call) game.call({ ...o.call, lap: state.race.lap + 1 }, { asked: true });
+      const next = state.race.lap + 1;
+      const asked = quick?.asked ?? true;
+      if (o?.call) game.call({ ...o.call, lap: next }, { asked });
       else game.radio('Copy. No change.');
+      for (const c of o?.also ?? []) game.call({ ...c, lap: next }, { asked: true });
       setQuick(null);
     },
     [quick, game, state.race],
   );
   const quickTimeout = useCallback(() => {
-    game.radio('No answer from the wall. Sticking to the plan.');
+    if (quick?.driverChoice) {
+      // No answer: the driver makes his own call (logged like any other).
+      game.radio(`No call from the wall: ${userSide} makes his own move.`);
+      game.call({ ...quick.driverChoice, lap: state.race.lap + 1 }, { quiet: true });
+    } else game.radio('No answer from the wall. Sticking to the plan.');
     setQuick(null);
-  }, [game]);
+  }, [game, quick, state.race, userSide]);
 
   // A phone-sized screen (cards open under the map, not on it).
   const [narrow, setNarrow] = useState(
@@ -210,7 +278,7 @@ export function RaceScreen({
           <span className="disp wide shrink-0 text-[18px] leading-none">Pit Wall</span>
           {team && (
             <span className="disp hidden truncate text-[18px] leading-none text-[var(--you)] sm:inline">
-              {team} team manager
+              {team} race engineer
             </span>
           )}
         </span>
@@ -342,6 +410,8 @@ export function RaceScreen({
                     onSelect={select}
                     dim={paused}
                     finishing={finishMeta}
+                    fight={fight}
+                    flash={flash}
                   />
                 ) : (
                   <p className="p-8 text-center text-[var(--muted)]">
@@ -455,7 +525,10 @@ export function RaceScreen({
             <QuickCallCard
               key={quick.lap}
               call={quick}
-              ms={Math.min(8000, LAP_MS[state.speed] * 0.9)}
+              ms={Math.min(
+                quick.kind === 'battle' ? BATTLE_MS : CALL_MS,
+                LAP_MS[state.speed] * 0.9,
+              )}
               onAnswer={answerQuick}
               onTimeout={quickTimeout}
             />

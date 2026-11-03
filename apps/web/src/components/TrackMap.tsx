@@ -7,6 +7,7 @@
 import type { RaceModel, RaceState } from '@boxthislap/sim';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import type { LapClock } from '../game/useGame.js';
+import { cornerPoint } from '../track/corners.js';
 import { garagesFor, seasonOf } from '../track/garages.js';
 import {
   type PitLane,
@@ -278,7 +279,7 @@ const TrackArt = memo(function TrackArt({
         const bx = x + (dx / len) * 34;
         const by = y + (dy / len) * 34;
         return (
-          <g key={n} transform={`translate(${bx.toFixed(1)},${by.toFixed(1)})`}>
+          <g key={`${n}-${x}-${y}`} transform={`translate(${bx.toFixed(1)},${by.toFixed(1)})`}>
             <circle r={9} fill="var(--paper)" stroke="var(--tarmac-edge)" strokeWidth={1.5} />
             <text
               y={3.5}
@@ -314,6 +315,8 @@ export function TrackMap({
   onSelect,
   dim,
   finishing = null,
+  fight = null,
+  flash = null,
 }: {
   outline: TrackOutline;
   race: RaceState;
@@ -329,6 +332,10 @@ export function TrackMap({
   dim: boolean;
   /** The race is over: run the field to the flag, and say when your car crosses the line. */
   finishing?: { lapMs: number; onCrossed: () => void } | null;
+  /** A battle this lap (race engineer spec): the other car, and the corner it's fought into. */
+  fight?: { other: string; corner: number } | null;
+  /** A battle's result, shown at its corner for a moment. */
+  flash?: { text: string; good: boolean; corner: number } | null;
 }) {
   const line = useMemo(() => polyline(outline.points), [outline]);
   const lane = useMemo(() => pitLane(outline, line, TRACK), [outline, line]);
@@ -600,6 +607,74 @@ export function TrackMap({
           </g>
         );
       })}
+      {fight &&
+        (() => {
+          const at = cornerPoint(outline, fight.corner);
+          const other = drawnXY.current.get(fight.other);
+          return (
+            <g pointerEvents="none">
+              {other && (
+                <circle
+                  cx={other[0]}
+                  cy={other[1]}
+                  r={17}
+                  fill="none"
+                  stroke="var(--box)"
+                  strokeWidth={3}
+                  className="battle-ring"
+                />
+              )}
+              {at && (
+                <g transform={`translate(${at[0].toFixed(1)},${at[1].toFixed(1)})`}>
+                  <circle r={26} fill="var(--box)" opacity={0.18} className="battle-ring" />
+                  <rect x={-30} y={-42} width={60} height={20} rx={5} fill="var(--box)" />
+                  <text
+                    y={-27}
+                    textAnchor="middle"
+                    fill="#fff"
+                    fontSize={12}
+                    fontWeight={800}
+                    fontFamily="var(--display)"
+                  >
+                    {`⚔ T${fight.corner}`}
+                  </text>
+                </g>
+              )}
+            </g>
+          );
+        })()}
+      {flash &&
+        (() => {
+          const at = cornerPoint(outline, flash.corner) ?? drawnXY.current.get(userSide);
+          if (!at) return null;
+          const w = Math.max(70, flash.text.length * 9 + 20);
+          return (
+            <g
+              transform={`translate(${at[0].toFixed(1)},${at[1].toFixed(1)})`}
+              pointerEvents="none"
+              className="battle-flash"
+            >
+              <rect
+                x={-w / 2}
+                y={-56}
+                width={w}
+                height={28}
+                rx={7}
+                fill={flash.good ? 'var(--you)' : 'var(--box)'}
+              />
+              <text
+                y={-37}
+                textAnchor="middle"
+                fill={flash.good ? '#08231f' : '#fff'}
+                fontSize={15}
+                fontWeight={800}
+                fontFamily="var(--display)"
+              >
+                {flash.text}
+              </text>
+            </g>
+          );
+        })()}
     </svg>
   );
 }

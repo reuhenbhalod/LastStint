@@ -6,6 +6,7 @@ import { type Band, type DecisionMoment, bandFor } from '@boxthislap/sim';
 import { useEffect, useState } from 'react';
 import type { AccountState } from '../account/useAccount.js';
 import { AccountBar } from '../components/AccountBar.js';
+import { DriverDebrief } from '../components/DriverDebrief.js';
 import { ResultHero } from '../components/ResultHero.js';
 import {
   type CallResult,
@@ -184,6 +185,7 @@ export function ResultScreen({
       userSide={userSide}
       rival={rival}
       pos={finishers.includes(userSide) ? pos : 0}
+      dsq={(response?.result.disqualified ?? state.result?.disqualified ?? []).includes(userSide)}
       realPos={realPos}
       rivalPos={rivalPos}
       team={team}
@@ -238,6 +240,9 @@ export function ResultScreen({
       <div className="flex flex-col gap-5 lg:sticky lg:top-6">
         <p className="eyebrow m-0">{number ? `Pit Wall #${number}` : 'Practice run'}</p>
         {hero}
+        {model && (
+          <DriverDebrief race={state.race} model={model} notes={game.notes()} won={beatRival} />
+        )}
 
         <section className="grid grid-cols-3 gap-2 text-center">
           {[

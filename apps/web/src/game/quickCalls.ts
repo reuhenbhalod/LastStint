@@ -3,7 +3,7 @@
 // second, old tyres, a big gap). The race keeps running; the answer is an order for the next
 // lap, logged like any live call, so the server's replay matches. Not scored.
 
-import type { Modes, RaceModel, RaceState } from '@boxthislap/sim';
+import type { Decision, Modes, RaceModel, RaceState } from '@boxthislap/sim';
 import { flagOn } from '../track/geometry.js';
 import type { LapEvents } from './raceLog.js';
 import type { LiveCall } from './refusal.js';
@@ -11,8 +11,12 @@ import type { LiveCall } from './refusal.js';
 export interface QuickOption {
   id: string;
   label: string;
+  /** A short line under the label: what it does (race engineer calls). */
+  note?: string;
   /** The order this answer gives (null: no change). */
-  call: LiveCall | null;
+  call: Decision | null;
+  /** More calls the answer makes (a yes to "can I box?" also boxes). */
+  also?: Decision[];
 }
 
 export interface QuickCall {
@@ -22,6 +26,19 @@ export interface QuickCall {
   from: string;
   text: string;
   options: QuickOption[];
+  /**
+   * What kind of call (race engineer spec): a battle (5 s, slow motion), trouble (damage,
+   * track limits, a lapped car), a request from the driver, or the engineer's question.
+   */
+  kind?: 'battle' | 'trouble' | 'request' | 'quick';
+  /** The driver's own choice when the wall doesn't answer (logged like any call). */
+  driverChoice?: Decision;
+  /** The other car in a battle or a blue flag. */
+  other?: string;
+  /** The corner the battle is fought into (track outline numbering). */
+  corner?: number;
+  /** An answer the driver asked for is always followed; the wall's orders may be refused. */
+  asked?: boolean;
 }
 
 /** How often a quick call comes, in laps. */

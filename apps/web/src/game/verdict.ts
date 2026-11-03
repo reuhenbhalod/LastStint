@@ -1,4 +1,4 @@
-// The result as the team manager sees it (feedback spec S3): you're running the real team's
+// The result as the race engineer sees it (feedback spec S3): you're running the real team's
 // pit wall, so the bar is what that pit wall really achieved. Finish ahead of the real result
 // and you beat them; level, you matched them; behind, the real team did better.
 

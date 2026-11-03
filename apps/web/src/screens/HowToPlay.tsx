@@ -18,9 +18,9 @@ function steps(
 ): Step[] {
   return [
     {
-      title: `You’re the ${team} team manager`,
+      title: `You’re ${user}’s race engineer`,
       body: [
-        `A real race, as it really was, until you take over the pit wall with ${laps} laps to go.`,
+        `A real race, as it really was, until you take over ${user}’s radio at ${team} with ${laps} laps to go.`,
         `Your goal: ${goal}${realPos ? `, and do better than the real ${team} pit wall did (P${realPos})` : ''}.`,
       ],
     },
@@ -39,10 +39,17 @@ function steps(
       ],
     },
     {
-      title: 'Quick calls and your controls',
+      title: 'Run the car, lap by lap',
       body: [
-        'Between the big calls the radio asks quick questions. Answer before the timer runs out.',
-        'BOX (under the map) and the headset (on the map: pace, battle, ERS, fuel) are always yours. Drivers don’t always listen: each one ignores a share of calls, from their real team-radio history.',
+        'Between the big calls the radio keeps coming: a car within a second means a battle (cover the inside, go round the outside, wait for DRS), and there’s damage, track limits, lapped cars, and your driver asking for things. Answer before the timer runs out, or he decides himself.',
+        'BOX and the team radio (pace, battle, ERS, fuel) are always yours.',
+      ],
+    },
+    {
+      title: 'Keep your driver on side',
+      body: [
+        'Your driver’s trust in you rises when your calls work and drops when they don’t: a failed dive, contact, letting the rival go, saying no when he was right.',
+        'Calm, he listens. Frustrated, he overdrives and makes mistakes. Furious, he ignores you and races his own way.',
       ],
     },
     {

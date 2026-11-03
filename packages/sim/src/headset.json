@@ -175,9 +175,9 @@
         "min": 55,
         "max": 85,
         "deltas": {
-          "pass-called": 6,
+          "pass-called": 5,
           "pass-failed": -2,
-          "held-called": 3,
+          "held-called": 1,
           "passed-anyway": -7,
           "let-rival-go": -10,
           "contact": -12,
@@ -189,7 +189,8 @@
           "request-right": 3,
           "penalty": -8,
           "strike": -1,
-          "settled": 0
+          "settled": 0,
+          "let-car-go": -4
         },
         "settleAfter": 3,
         "settle": 1.5,

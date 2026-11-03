@@ -128,3 +128,40 @@ The game already has stops, pace, battle stance, ERS, fuel, team orders and time
 - A battle call's result shows on the map within 5 seconds of answering.
 - Trust visibly moves with outcomes, and a Furious driver acts on his own, logged.
 - On all 19 races: 0 live/full mismatches; the G1 results, golden files and tuned seeds unchanged; all tests and e2e green.
+
+## Done (Nov 3, 2026)
+
+**Race model (`packages/sim/src/engineer.ts`, `sim.ts`, `headset.json` → `engineer`).** All of it is live play only, on the same switch as crashes (`incidents`). Replays, golden files, G1 and the "real calls replay the real race" check are unchanged.
+- **Battle moves** for one lap against the car directly ahead (dive up the inside, round the outside, wait for DRS, overtake button) or behind (cover the inside, hold the outside, defend hard, let him go). Each move shifts that lap's pass roll and adds its time and wear. Waiting for DRS boosts the next lap's attack. `scripts/battle-odds.ts <race>` measures them.
+  - Hungary 2019, evenly matched cars: a dive takes the chance of being ahead after the lap from 14% to 23%, with about 3% contact.
+  - Defending: defend hard holds 90-95%; letting him go is a pass almost every time.
+  - The real overtaking data still rules, so attacking a faster car rarely works (Canada 2022: SAI on VER).
+- **Contact:**
+  - a front wing costs 0.3-0.8 s a lap until a stop, and the stop costs 3 s more for the nose;
+  - a puncture forces a stop, on a compound that keeps the car legal;
+  - a spin costs 2.5 s.
+- **Track limits:** strikes, with care costing 0.1 s a lap; a 5 s penalty at strike 4, added at the flag.
+- **Lapped cars:** waiting for the blue flags costs nothing extra (the measured laps include traffic); going round gains 0.2 s, with a small chance of contact.
+- **Driver requests:** box or push. A "no" is judged 3 laps later, to see whether he was right.
+- **Trust:**
+  - starts from the driver's attitude;
+  - moves with called moves, contact, stops judged once the rival has answered, requests, micromanaging and penalties;
+  - quiet laps settle it.
+  - Frustrated: faster, harder on the tyres, more mistakes. Furious: also picks his own battle moves.
+
+**Server:** the call log carries the new calls (`battle`, `limits`, `blue`, `reply`). The Worker's replay and the nightly full re-grade match the game on all 19 races (`tests/engineer-verify.test.ts`).
+
+**Game:**
+- **The radio director (`game/engineerCalls.ts`)** picks each lap's call in this order:
+  - a crash's safety car;
+  - a battle (5 s, slow motion, named by the corner after the longest straight). A long battle is asked about every other lap after the first two; no answer means the driver picks by attitude.
+  - trouble: front wing, track limits, the two-compound rule, a lapped car;
+  - the driver asking;
+  - the battery;
+  - the engineer's quick calls.
+  - A quiet lap gets an info line. Result: about one call every two laps, plus the radio in between. The test checks that no race goes more than 2 racing laps without anything being said.
+- **Refusals** are scaled by mood: calm ×0.6, tense ×1, frustrated ×2, furious ×3.5. They now cover battle calls too: a refused battle call means the driver's own move.
+- **Map:** the battle's corner and the other car pulse, and the result pops up at the corner ("PAST VER!", "HELD!", "CONTACT!").
+- **Driver card:** a trust meter with the mood, plus badges for damage, track limits and penalties.
+- **Results:** the driver after the flag (mood, his post-race radio, the best and worst call in his eyes, battles won, contact, penalties). A disqualified car shows DSQ.
+- **Role:** "race engineer" throughout. How to play has two new steps.

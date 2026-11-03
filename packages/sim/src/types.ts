@@ -240,6 +240,7 @@ export type TrustReason =
   | 'held-called' // a defence the wall called held
   | 'passed-anyway' // a defence the wall called didn't
   | 'let-rival-go' // told to let the rival by
+  | 'let-car-go' // told to let another car by
   | 'contact' // contact on a move the wall called
   | 'undercut' // a stop put him ahead of the rival
   | 'stop-lost' // a stop dropped him behind the rival

@@ -116,9 +116,10 @@ export function IntroCard({
               )}
             </h1>
             <p className="m-0 max-w-[52ch] text-[16px] leading-relaxed text-[var(--ink)]">
-              You’re the {userTeam ?? userSide} team manager. Every strategy call is yours: when to
-              box, which tyres, how hard to push, how to race{' '}
-              <span className="font-semibold text-[var(--rival)]">{rival}</span>.
+              You’re {userSide}’s race engineer at {userTeam ?? 'the team'}, on the radio for every
+              lap. Every call is yours: when to box, which tyres, how hard to push, how to race{' '}
+              <span className="font-semibold text-[var(--rival)]">{rival}</span>. Make good calls
+              and {userSide} trusts you; make bad ones and he’ll stop listening.
             </p>
             <p className="m-0 flex flex-wrap items-center gap-2 text-[14px]">
               <span className="eyebrow">Goal</span>
