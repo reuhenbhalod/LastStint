@@ -171,12 +171,15 @@ function answers(model: RaceModel, decisions: Decision[]): Map<string, string> {
     if (!option || answer.lap !== m.lap || answer.at !== m.lap - 1) {
       throw new VerifyError('bad-answer', `moment ${m.id} was answered wrongly`);
     }
-    // The moment's lap carries exactly the chosen option's calls, made at the pause.
-    const logged = decisions.filter((d) => d.lap === m.lap && d.kind !== 'radio');
+    // The chosen option's calls follow the answer in the log (answerMoment), made at the
+    // pause. Live calls the player makes after it (BOX, the headset) are their own and may
+    // fall on the same lap.
+    const from = decisions.indexOf(answer) + 1;
+    const logged = decisions.slice(from, from + option.decisions.length);
     const want = option.decisions.map(callKey).sort();
     const got = logged.map(callKey).sort();
     if (
-      logged.some((d) => d.at !== m.lap - 1) ||
+      logged.some((d) => d.kind === 'radio' || d.at !== m.lap - 1) ||
       want.length !== got.length ||
       want.some((k, i) => k !== got[i])
     ) {
