@@ -14,6 +14,7 @@ import { DecisionPanel } from '../components/DecisionPanel.js';
 import { DriverCard } from '../components/DriverCard.js';
 import { DriverProfile } from '../components/DriverProfile.js';
 import { GapTrace } from '../components/GapTrace.js';
+import { ChequeredIcon, OvertakeIcon, SoundOffIcon, SoundOnIcon } from '../components/Icons.js';
 import { LiveGrades } from '../components/LiveGrades.js';
 import { PitCard } from '../components/PitCard.js';
 import { QuickCallCard } from '../components/QuickCallCard.js';
@@ -46,12 +47,15 @@ export function RaceScreen({
   state,
   model,
   onFinished,
+  onHome,
 }: {
   game: Game;
   state: GameState;
   model: RaceModel;
   /** The run to the flag is over (your car crossed the line): show the results. */
   onFinished?: () => void;
+  /** The Pit Wall brand: the home page (the race holds). */
+  onHome?: () => void;
 }) {
   const { userSide, rival, totalLaps, number, source } = state.meta;
   const me = state.race.cars[userSide];
@@ -330,7 +334,14 @@ export function RaceScreen({
     <main className="mx-auto flex min-h-screen max-w-[1360px] flex-col gap-3 px-4 pb-6 pt-3 xl:h-screen xl:pb-3">
       <header className="flex items-center justify-between gap-3 border-b border-[var(--rule)] pb-2">
         <span className="flex min-w-0 items-baseline gap-2">
-          <span className="disp wide shrink-0 text-[18px] leading-none">Pit Wall</span>
+          <button
+            type="button"
+            onClick={onHome}
+            title="Home (the race waits for you)"
+            className="disp wide shrink-0 text-[18px] leading-none hover:text-[var(--you)]"
+          >
+            Pit Wall
+          </button>
           {team && (
             <span className="disp hidden truncate text-[18px] leading-none text-[var(--you)] sm:inline">
               {team} race engineer
@@ -378,7 +389,7 @@ export function RaceScreen({
               }}
               className="h-8 rounded-md border border-[var(--rule)] px-3 text-[14px]"
             >
-              {sound ? '🔊' : '🔇'}
+              {sound ? <SoundOnIcon size={16} /> : <SoundOffIcon size={16} />}
             </button>
             {source !== 'live' && (
               <button
@@ -486,9 +497,7 @@ export function RaceScreen({
                 </div>
                 {finishing && crossed && (
                   <output className="radio-alert absolute inset-x-2.5 bottom-12 z-10 mx-auto flex max-w-[420px] items-center justify-center gap-3 rounded-xl border-2 border-white bg-[#141716]/90 px-4 py-3 text-white shadow-2xl">
-                    <span aria-hidden="true" className="text-[26px]">
-                      🏁
-                    </span>
+                    <ChequeredIcon size={26} />
                     <span className="disp text-[19px] leading-none">
                       Chequered flag · {userSide} P{finishPos}
                     </span>
@@ -499,8 +508,8 @@ export function RaceScreen({
                     className="radio-alert absolute inset-x-2.5 top-12 z-10 mx-auto flex max-w-[460px] items-center gap-2 rounded-xl border-2 px-3 py-2 text-white shadow-2xl"
                     style={{ borderColor: 'var(--box)', background: 'rgba(20,23,22,0.9)' }}
                   >
-                    <span aria-hidden="true" className="text-[20px]">
-                      ⚔️
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--box)] text-white">
+                      <OvertakeIcon size={16} />
                     </span>
                     <span className="text-[14px] font-semibold leading-snug">
                       {fight.attacking

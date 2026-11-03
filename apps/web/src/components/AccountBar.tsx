@@ -5,6 +5,7 @@
 import { useEffect, useRef } from 'react';
 import { GOOGLE_CLIENT_ID, loadGoogle } from '../account/google.js';
 import type { AccountState } from '../account/useAccount.js';
+import { StreakIcon } from './Icons.js';
 
 function GoogleButton({ onCredential }: { onCredential: (credential: string) => void }) {
   const el = useRef<HTMLDivElement>(null);
@@ -65,7 +66,7 @@ export function AccountBar({
               : 'Play every day to build it'
           }
         >
-          <span aria-hidden="true">🔥</span>
+          <StreakIcon size={14} className="text-[var(--flag)]" />
           {streak ? `${streak.current}-day streak` : 'Daily streak'}
         </span>
         {p?.account ? (
@@ -98,9 +99,7 @@ export function AccountBar({
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-[var(--card)] px-3 py-2">
       <div className="flex items-center gap-2">
-        <span aria-hidden="true" className="text-[20px]">
-          🔥
-        </span>
+        <StreakIcon size={20} className="text-[var(--flag)]" />
         <span>
           <span className="block disp text-[16px] leading-none">
             {streak ? `${streak.current}-day streak` : 'Daily streak'}

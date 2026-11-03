@@ -225,3 +225,14 @@ label:has(input) {
 .gsi-button iframe {
   color-scheme: light;
 }
+
+/* A chequered strip (the home page's hero). */
+.checker {
+  background-image: conic-gradient(
+    var(--ink) 25%,
+    transparent 0 50%,
+    var(--ink) 0 75%,
+    transparent 0
+  );
+  background-size: 16px 16px;
+}

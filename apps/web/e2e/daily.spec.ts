@@ -63,4 +63,9 @@ test('plays the Abu Dhabi daily end to end', async ({ page, context }) => {
   if (shots) await page.screenshot({ path: `${shots}/4-results.png`, fullPage: true });
   await page.getByRole('button', { name: 'Share result' }).click();
   await expect(page.getByRole('button', { name: 'Copied!' })).toBeVisible();
+
+  // The Pit Wall brand goes home; from there, back to the result.
+  await page.getByRole('button', { name: 'Pit Wall', exact: true }).click();
+  await page.getByRole('button', { name: /See your result/ }).click();
+  await expect(page.getByText('Your calls')).toBeVisible();
 });

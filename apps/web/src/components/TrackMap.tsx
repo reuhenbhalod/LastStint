@@ -720,7 +720,7 @@ export function TrackMap({
                     fontWeight={800}
                     fontFamily="var(--display)"
                   >
-                    {now ? '⚔ NOW' : `⚔ Turn ${fight.corner}`}
+                    {now ? 'NOW' : `T${fight.corner} · MOVE`}
                   </text>
                 </g>
               )}

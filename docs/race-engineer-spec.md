@@ -165,3 +165,26 @@ The game already has stops, pace, battle stance, ERS, fuel, team orders and time
 - **Driver card:** a trust meter with the mood, plus badges for damage, track limits and penalties.
 - **Results:** the driver after the flag (mood, his post-race radio, the best and worst call in his eyes, battles won, contact, penalties). A disqualified car shows DSQ.
 - **Role:** "race engineer" throughout. How to play has two new steps.
+
+## Follow-up (Nov 3, 2026): pit stops, battles, home page
+
+**Pit stops (tester feedback, Mexico 2021).**
+- **The extra lap:** the map draws each lap tick after the race model has computed the lap before it, and it used to draw a whole stop on the tick after the out-lap: a lap late. Now each stop is drawn on the two laps it happens over. On the in-lap the car turns in at pit entry and waits at its garage; on the out-lap it rejoins at pit exit at its expected new gap. This applies to every car (`inLapPosition` / `outLapPosition` in `track/geometry.ts`).
+- **BOX:** it books the end of the lap being shown if your car can still reach pit entry, else the next lap. The button and the radio say which ("boxing this lap", "boxing next lap", "in the pits now").
+- **One stop at a time:** no second stop while one is called or under way, and no stop on the last lap.
+- **The crash safety car's "the pit lane is cheap" call** is asked once, as it comes out, and not with a stop called, under way or just made. The same guard covers the front-wing, two-compound and "I want to box" calls. Under a safety car the engineer talks instead (the delta, tyre temperatures, the restart).
+
+**Battle calls:**
+- 12 s to answer, with the lap at a third of its speed while the card is open (normal speed again once answered);
+- the facts on the card (gap, DRS, both cars' tyres, recent pace, battery);
+- each option's odds of the pass and of contact;
+- a banner over the map naming who attacks whom and the corner;
+- a dashed line joining the two cars;
+- a corner marker that reads "NOW" as your car reaches it.
+
+**Home page:**
+- a full-width hero with the day's circuit drawn large and both cars on it, the race and duel in big type, the goal and Start;
+- the duel card, the numbers, and "your job tonight";
+- "Pit Wall" in the race and results screens goes home, with the race held, and back with "Back to the race".
+
+**Icons:** line icons (`components/Icons.tsx`) replace every emoji on screen. The driver's mood is an indicator light. The coloured squares stay only in the share text.

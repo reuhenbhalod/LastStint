@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import { driverInfo } from '../data/drivers.js';
 import type { LapEvents } from '../game/raceLog.js';
 import { lapTime } from '../track/geometry.js';
+import { CloseIcon } from './Icons.js';
 import { TyreBadge } from './TyreBadge.js';
 
 const lapClock = (s: number) => `${Math.floor(s / 60)}:${(s % 60).toFixed(1).padStart(4, '0')}`;
@@ -83,7 +84,7 @@ export function DriverCard({
           aria-label="Close driver details"
           className="rounded-md px-1.5 text-[18px] leading-none text-[var(--muted)] hover:text-[var(--ink)]"
         >
-          ✕
+          <CloseIcon size={18} />
         </button>
       </header>
       <dl className="m-0 grid grid-cols-3 gap-x-3 gap-y-2.5">

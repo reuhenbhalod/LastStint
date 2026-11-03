@@ -1,7 +1,7 @@
 // Phase-routed game shell: load today's race from the Worker (practice on the bundled race if
 // there's no daily), then render by game phase.
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAccount } from './account/useAccount.js';
 import { AdminPage } from './admin/AdminPage.js';
 import { adminToken } from './admin/session.js';
@@ -31,6 +31,18 @@ function Game() {
   const game = useGame(provider);
   const account = useAccount(game.reload);
   const [help, setHelp] = useState(false);
+  // The home page mid-race (the Pit Wall brand): the race holds until you go back to it.
+  const [home, setHome] = useState(false);
+  const { setHold } = game;
+  const goHome = useCallback(() => {
+    setHold(true);
+    setHome(true);
+    window.scrollTo(0, 0);
+  }, [setHold]);
+  const leaveHome = useCallback(() => {
+    setHome(false);
+    setHold(false);
+  }, [setHold]);
   // At the flag the race screen runs the field to the line; then the results.
   const [flagDone, setFlagDone] = useState(false);
   const phase = game.state?.phase;
@@ -70,6 +82,20 @@ function Game() {
     );
   }
 
+  if (home && game.state.phase !== 'intro') {
+    const racing = game.state.phase === 'racing' || game.state.phase === 'decision';
+    return (
+      <IntroCard
+        state={game.state}
+        model={game.model}
+        onStart={leaveHome}
+        onHelp={() => setHelp(true)}
+        account={account}
+        resume={racing ? `Back to the race · lap ${game.state.race.lap}` : 'See your result'}
+      />
+    );
+  }
+
   switch (game.state.phase) {
     case 'intro':
       return (
@@ -83,7 +109,7 @@ function Game() {
       );
     case 'racing':
     case 'decision':
-      return <RaceScreen game={game} state={game.state} model={game.model} />;
+      return <RaceScreen game={game} state={game.state} model={game.model} onHome={goHome} />;
     case 'finished':
       if (!flagDone) {
         return (
@@ -92,11 +118,12 @@ function Game() {
             state={game.state}
             model={game.model}
             onFinished={() => setFlagDone(true)}
+            onHome={goHome}
           />
         );
       }
-      return <ResultScreen state={game.state} game={game} account={account} />;
+      return <ResultScreen state={game.state} game={game} account={account} onHome={goHome} />;
     default:
-      return <ResultScreen state={game.state} game={game} account={account} />;
+      return <ResultScreen state={game.state} game={game} account={account} onHome={goHome} />;
   }
 }

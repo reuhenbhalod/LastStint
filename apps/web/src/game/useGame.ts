@@ -39,6 +39,8 @@ export interface Game {
   setSpeed: (s: Speed) => void;
   /** Slow motion (a battle call is open): the lap runs at half speed. */
   setSlow: (on: boolean) => void;
+  /** Hold the race (the player went to the home page); the lap resumes where it was. */
+  setHold: (on: boolean) => void;
   choose: (optionId: string) => void;
   call: (decision: Decision, options?: { asked?: boolean; quiet?: boolean }) => void;
   /** What the race model noted so far (battles, contact, trust...). */
@@ -69,6 +71,7 @@ export function useGame(provider: DailyProvider, grader?: Grader): Game {
   const [attempt, setAttempt] = useState(0);
   const [clock, setClock] = useState<LapClock | null>(null);
   const [slow, setSlow] = useState(false);
+  const [hold, setHold] = useState(false);
   // How far through the lap tick the clock was when it stopped (a speed change keeps it).
   const carry = useRef(0);
   // One grading worker for the page's lifetime.
@@ -127,7 +130,7 @@ export function useGame(provider: DailyProvider, grader?: Grader): Game {
   // starts or resumes (no dead wait after a decision), and a speed change keeps the lap's
   // progress rather than starting it over.
   useEffect(() => {
-    if (state?.phase !== 'racing') {
+    if (state?.phase !== 'racing' || hold) {
       setClock(null);
       return;
     }
@@ -152,7 +155,7 @@ export function useGame(provider: DailyProvider, grader?: Grader): Game {
       clearTimeout(id);
       carry.current = Math.min(0.99, (performance.now() - start) / ms);
     };
-  }, [state?.phase, state?.speed, slow, sync]);
+  }, [state?.phase, state?.speed, slow, hold, sync]);
 
   const act = useCallback(
     (f: (s: GameSession) => void) => () => {
@@ -208,6 +211,7 @@ export function useGame(provider: DailyProvider, grader?: Grader): Game {
     start: act((s) => s.start()),
     setSpeed: (speed) => act((s) => s.setSpeed(speed))(),
     setSlow,
+    setHold,
     choose: (optionId) => act((s) => s.choose(optionId))(),
     call: (decision, options) => act((s) => s.call(decision, options))(),
     radio: (text) => act((s) => s.radio(text))(),

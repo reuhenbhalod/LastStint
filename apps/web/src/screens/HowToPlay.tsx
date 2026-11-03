@@ -56,7 +56,7 @@ function steps(
       title: 'How you’re graded',
       body: [
         'At each big call the simulator plays every option hundreds of times. Your call is graded against the best one, not on luck.',
-        '🟩 best call · 🟨 close · 🟧 costly · 🟥 big miss. One race a day; come back tomorrow to build your streak.',
+        'Each call gets a grade: best call, close, costly or big miss. One race a day; come back tomorrow to build your streak.',
       ],
     },
   ];

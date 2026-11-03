@@ -11,6 +11,7 @@ import {
 } from '@boxthislap/sim';
 import { MOOD_LABEL } from '../game/engineerCalls.js';
 import { postRaceRadio } from '../game/engineerRadio.js';
+import { MoodLight } from './Icons.js';
 
 const REASON: Partial<Record<TrustReason, string>> = {
   'pass-called': 'The attack you called worked',
@@ -66,7 +67,7 @@ export function DriverDebrief({
       <div className="flex items-baseline justify-between">
         <span className="eyebrow">{side} after the flag</span>
         <span className="text-[14px] font-bold" style={{ color }}>
-          <span aria-hidden="true">{MOOD_LABEL[mood].icon}</span> {MOOD_LABEL[mood].text} ·{' '}
+          <MoodLight color={MOOD_LABEL[mood].color} /> {MOOD_LABEL[mood].text} ·{' '}
           {Math.round(eng.trust)}% trust
         </span>
       </div>

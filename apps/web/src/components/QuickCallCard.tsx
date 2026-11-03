@@ -4,6 +4,7 @@
 
 import { useEffect, useRef } from 'react';
 import type { QuickCall } from '../game/quickCalls.js';
+import { FlagIcon, HeadsetIcon, OvertakeIcon } from './Icons.js';
 
 export function QuickCallCard({
   call,
@@ -35,12 +36,13 @@ export function QuickCallCard({
   const battle = call.kind === 'battle';
   const accent = battle ? 'var(--box)' : 'var(--you)';
   const tag = battle
-    ? `⚔️ Battle${call.other ? ` with ${call.other}` : ''} · slow motion`
+    ? `Battle${call.other ? ` with ${call.other}` : ''} · slow motion`
     : call.kind === 'trouble'
-      ? '⚠️ Trouble'
+      ? 'Trouble'
       : call.kind === 'request'
-        ? `📻 ${call.from} is asking`
-        : `📻 ${call.from === 'Engineer' ? 'Engineer' : `${call.from} on the radio`} · quick call`;
+        ? `${call.from} is asking`
+        : `${call.from === 'Engineer' ? 'Engineer' : `${call.from} on the radio`} · quick call`;
+  const TagIcon = battle ? OvertakeIcon : call.kind === 'trouble' ? FlagIcon : HeadsetIcon;
   return (
     <section
       aria-label={battle ? 'Battle call' : 'Quick call'}
@@ -48,8 +50,11 @@ export function QuickCallCard({
       style={{ borderColor: accent }}
     >
       <div className="flex items-center justify-between gap-2">
-        <span className="eyebrow" style={{ color: battle ? 'var(--box-ink)' : accent }}>
-          {tag}
+        <span
+          className="eyebrow flex items-center gap-1.5"
+          style={{ color: battle ? 'var(--box-ink)' : accent }}
+        >
+          <TagIcon size={14} /> {tag}
         </span>
         <span className="eyebrow">Lap {call.lap + 1}</span>
       </div>

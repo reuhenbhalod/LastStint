@@ -11,6 +11,7 @@ import { Fragment, useEffect, useRef, useState } from 'react';
 import { briefFor } from '../game/brief.js';
 import { choicesFor, tyreName } from '../game/choices.js';
 import { type Fact, modeFacts, tyreOutlooks } from '../game/guide.js';
+import { HeadsetIcon } from './Icons.js';
 
 const LETTER: Record<string, string> = { SOFT: 'S', MEDIUM: 'M', HARD: 'H' };
 
@@ -171,7 +172,7 @@ export function DecisionPanel({
       className="decision card flex flex-col gap-2 shadow-2xl md:gap-3"
     >
       <p className="eyebrow !text-[var(--rival)]">
-        📻 Lap {moment.lap} · {b.kind}
+        <HeadsetIcon size={14} /> Lap {moment.lap} · {b.kind}
       </p>
       <p
         id="decision-headline"

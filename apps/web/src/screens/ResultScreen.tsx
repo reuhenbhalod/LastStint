@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import type { AccountState } from '../account/useAccount.js';
 import { AccountBar } from '../components/AccountBar.js';
 import { DriverDebrief } from '../components/DriverDebrief.js';
+import { BandChip } from '../components/Icons.js';
 import { ResultHero } from '../components/ResultHero.js';
 import {
   type CallResult,
@@ -21,15 +22,32 @@ import type { Game } from '../game/useGame.js';
 import { verdict } from '../game/verdict.js';
 import type { GameState } from '../state/machine.js';
 
-const BAND: Record<Band, { label: string; cls: string; square: string }> = {
-  green: { label: 'Best call', cls: 'bg-green-500/20 text-green-300 ring-green-500', square: '🟩' },
-  yellow: { label: 'Close', cls: 'bg-yellow-500/20 text-yellow-200 ring-yellow-500', square: '🟨' },
+// `square` is for the share text (pasted elsewhere, the familiar grid); on screen, `color`.
+const BAND: Record<Band, { label: string; cls: string; square: string; color: string }> = {
+  green: {
+    label: 'Best call',
+    cls: 'bg-green-500/20 text-green-300 ring-green-500',
+    square: '🟩',
+    color: '#22c55e',
+  },
+  yellow: {
+    label: 'Close',
+    cls: 'bg-yellow-500/20 text-yellow-200 ring-yellow-500',
+    square: '🟨',
+    color: '#eab308',
+  },
   orange: {
     label: 'Costly',
     cls: 'bg-orange-500/20 text-orange-200 ring-orange-500',
     square: '🟧',
+    color: '#f97316',
   },
-  red: { label: 'Big miss', cls: 'bg-red-500/20 text-red-300 ring-red-500', square: '🟥' },
+  red: {
+    label: 'Big miss',
+    cls: 'bg-red-500/20 text-red-300 ring-red-500',
+    square: '🟥',
+    color: '#ef4444',
+  },
 };
 
 const pct = (p: number) => `${Math.round(p * 100)}%`;
@@ -81,7 +99,7 @@ export function shareLine(
   const squares = calls.map((c) => BAND[c.band].square).join('');
   const head = number ? `Pit Wall #${number}` : 'Pit Wall (practice)';
   const tail = percentile !== null ? ` P${percentile}` : '';
-  return `${head} ${won ? '🏆 ' : ''}${squares}${tail}`;
+  return `${head} ${won ? 'WIN ' : ''}${squares}${tail}`;
 }
 
 function CallRow({
@@ -114,7 +132,7 @@ function CallRow({
             )}
           </span>
           <span className={`rounded-full px-2 py-1 text-xs font-bold ring-1 ${band.cls}`}>
-            {band.square} {band.label}
+            <BandChip color={band.color} /> {band.label}
           </span>
         </summary>
         <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 font-mono text-xs text-neutral-400">
@@ -130,7 +148,7 @@ function CallRow({
           <dt>Real team</dt>
           <dd>
             {labelOf(moment, call.real.optionId)} · {pct(call.real.probability)} ·{' '}
-            {BAND[call.real.band].square}
+            <BandChip color={BAND[call.real.band].color} />
             {call.matchedReal ? ' (you matched it)' : ''}
           </dd>
         </dl>
@@ -143,10 +161,13 @@ export function ResultScreen({
   state,
   game,
   account,
+  onHome,
 }: {
   state: GameState;
   game: Game;
   account?: AccountState;
+  /** The Pit Wall brand: the home page. */
+  onHome?: () => void;
 }) {
   const sub = state.submission;
   const response = sub.status === 'done' || sub.status === 'already' ? sub.response : null;
@@ -238,7 +259,16 @@ export function ResultScreen({
     // the day's numbers on the right.
     <main className="mx-auto grid min-h-screen max-w-5xl items-start gap-6 p-6 lg:grid-cols-2">
       <div className="flex flex-col gap-5 lg:sticky lg:top-6">
-        <p className="eyebrow m-0">{number ? `Pit Wall #${number}` : 'Practice run'}</p>
+        <p className="m-0 flex items-baseline gap-2">
+          <button
+            type="button"
+            onClick={onHome}
+            className="disp wide text-[18px] leading-none hover:text-[var(--you)]"
+          >
+            Pit Wall
+          </button>
+          <span className="eyebrow">{number ? `Daily #${number}` : 'Practice run'}</span>
+        </p>
         {hero}
         {model && (
           <DriverDebrief race={state.race} model={model} notes={game.notes()} won={beatRival} />

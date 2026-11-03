@@ -6,6 +6,7 @@ import { type RaceModel, type RaceState, engineerConfig, moodOf } from '@boxthis
 import { TIER_LABEL, driverInfo } from '../data/drivers.js';
 import { MOOD_LABEL } from '../game/engineerCalls.js';
 import type { LapEvents } from '../game/raceLog.js';
+import { MoodLight } from './Icons.js';
 import { TyreBadge } from './TyreBadge.js';
 
 export function DriverProfile({
@@ -52,7 +53,7 @@ export function DriverProfile({
           <div className="flex items-baseline justify-between">
             <span className="eyebrow">Trust in the wall</span>
             <span className="text-[13px] font-bold" style={{ color: moodColor }}>
-              <span aria-hidden="true">{MOOD_LABEL[mood].icon}</span> {MOOD_LABEL[mood].text}
+              <MoodLight color={MOOD_LABEL[mood].color} /> {MOOD_LABEL[mood].text}
             </span>
           </div>
           <div

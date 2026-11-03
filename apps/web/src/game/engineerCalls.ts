@@ -172,7 +172,7 @@ function battleCall(
     ];
     if (battery >= -(cfg.moves['overtake-button'].battery ?? -25)) {
       options.push(
-        opt('button', `Overtake button into Turn ${t1}`, 'overtake-button', `Spends 25% battery`),
+        opt('button', `Overtake button into Turn ${t1}`, 'overtake-button', 'Spends 25% battery'),
       );
     }
     return {
@@ -556,10 +556,10 @@ export function directorCall(
 
 /** The driver's mood as the game shows it. */
 export const MOOD_LABEL = {
-  calm: { text: 'Calm', icon: '😌' },
-  tense: { text: 'Tense', icon: '😐' },
-  frustrated: { text: 'Frustrated', icon: '😤' },
-  furious: { text: 'Furious', icon: '🤬' },
+  calm: { text: 'Calm', color: 'var(--you)' },
+  tense: { text: 'Tense', color: 'var(--flag)' },
+  frustrated: { text: 'Frustrated', color: 'var(--rival)' },
+  furious: { text: 'Furious', color: 'var(--box)' },
 } as const;
 
 export function moodNow(race: RaceState, cfg: EngineerConfig | null) {
