@@ -296,6 +296,7 @@ export function AdminPage() {
                   days
                 </label>
                 <select
+                  aria-label="Races to schedule"
                   value={pick}
                   onChange={(e) => setPick(e.target.value)}
                   className="rounded-md border border-[var(--rule)] bg-[var(--card-2)] px-2 py-1.5 text-[13px]"
@@ -398,6 +399,7 @@ export function AdminPage() {
                       </td>
                       <td className="px-3 py-2">
                         <select
+                          aria-label={`Race on ${d.date}`}
                           disabled={busy || d.runs > 0 || d.date < today}
                           value={d.raceId}
                           onChange={(e) =>

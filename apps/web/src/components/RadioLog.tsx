@@ -21,7 +21,8 @@ export function RadioLog({ messages, max = 3 }: { messages: RadioMessage[]; max?
             <span className="mono mr-1.5 text-[11px] text-[var(--muted)]">
               L{m.lap} {m.from}
             </span>
-            {m.refused && <strong className="mr-1 text-[var(--box)]">Refused:</strong>}“{m.text}”
+            {m.refused && <strong className="mr-1 text-[var(--box-ink)]">Refused:</strong>}“{m.text}
+            ”
           </li>
         ))}
     </ul>

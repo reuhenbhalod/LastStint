@@ -20,7 +20,7 @@ const TONE: Record<Verdict['outcome'], { text: string; ring: string; glow: strin
       word: 'Level with the real team',
     },
     worse: {
-      text: 'text-[var(--box)]',
+      text: 'text-[var(--box-ink)]',
       ring: 'border-[var(--box)]',
       glow: 'shadow-[0_0_80px_-30px_var(--box)]',
       word: 'Behind the real team',

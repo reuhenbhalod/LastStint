@@ -234,9 +234,7 @@ export function DecisionPanel({
       </div>
 
       {!picking ? (
-        <div
-          className={`grid gap-x-2 gap-y-2 ${top.length === 3 ? 'grid-cols-3' : 'grid-cols-2'} ${WIDE[top.length] ?? ''}`}
-        >
+        <div className={`grid gap-x-2 gap-y-2 grid-cols-2 ${WIDE[top.length] ?? ''}`}>
           {top.map((t, i) => {
             const box = t.id.startsWith('box-');
             return (
@@ -328,7 +326,7 @@ export function DecisionPanel({
                           Drops off ~{o.dropOff} laps
                         </span>
                         <span
-                          className={`rounded bg-[var(--card)] px-1.5 py-0.5 ${o.toFlag ? 'text-[var(--you)]' : 'text-[var(--box)]'}`}
+                          className={`rounded bg-[var(--card)] px-1.5 py-0.5 ${o.toFlag ? 'text-[var(--you)]' : 'text-[var(--box-ink)]'}`}
                         >
                           {o.toFlag ? 'Lasts to the flag' : `Won’t last ${b.lapsLeft} laps`}
                         </span>
@@ -339,7 +337,7 @@ export function DecisionPanel({
                           {o.good}
                         </span>
                         <span className="text-[var(--muted)]">
-                          <span className="font-semibold text-[var(--box)]">Bad </span>
+                          <span className="font-semibold text-[var(--box-ink)]">Bad </span>
                           {o.bad}
                         </span>
                       </span>

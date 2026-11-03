@@ -59,7 +59,7 @@ export function HeadsetPanel({
                     .filter(Boolean)
                     .join(' · ')}
                   onClick={() => onFlip(row.key, v)}
-                  className={`whitespace-nowrap px-3 py-1 ${row.values.length > 3 ? 'text-[12px]' : 'text-[13px]'} font-semibold capitalize transition-colors disabled:opacity-40 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--you)] ${
+                  className={`whitespace-nowrap py-1 ${row.values.length > 3 ? 'px-1 text-[12px] sm:px-3' : 'px-3 text-[13px]'} font-semibold capitalize transition-colors disabled:opacity-40 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--you)] ${
                     soon
                       ? 'bg-[color-mix(in_srgb,var(--you)_22%,transparent)] text-[var(--you)] shadow-[inset_0_0_0_2px_var(--you)]'
                       : active

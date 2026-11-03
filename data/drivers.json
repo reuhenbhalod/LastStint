@@ -119,6 +119,15 @@
       "confidence": "low",
       "evidence": []
     },
+    "DOO": {
+      "name": "Jack Doohan",
+      "number": 7,
+      "tier": "low",
+      "ignores": 2,
+      "pushback": 10,
+      "confidence": "low",
+      "evidence": []
+    },
     "ERI": {
       "name": "Marcus Ericsson",
       "number": 9,

@@ -27,6 +27,8 @@
   --medium: #f2c230;
   --hard: #e9ece9;
   --box: #d4432f;
+  /* --box as text: the same red, light enough to read on the cards (5:1 and up). */
+  --box-ink: #f07462;
   /* One family, Archivo (feedback round 2): wide and heavy for headlines and big numbers (the
      F1 broadcast look), normal width for text, lined-up figures for timing. */
   --display: "Archivo", "Helvetica Neue", Arial, sans-serif;

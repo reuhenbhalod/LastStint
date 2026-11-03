@@ -126,12 +126,6 @@ export function modeLine(model: RaceModel, key: string, value: string): string |
   return parts.length ? parts.join(' · ') : 'No change: the baseline';
 }
 
-/** The headset call an option makes, if it's a single mode call. */
-export function modeOf(decisions: Array<{ kind: string; key?: string; value?: string }>) {
-  const m = decisions.length === 1 ? decisions[0] : undefined;
-  return m?.kind === 'mode' && m.key && m.value ? { key: m.key, value: m.value } : null;
-}
-
 /** One row of an option's fact table: what it does to pace, tyres, racing or risk. */
 export interface Fact {
   label: 'Pace' | 'Tyres' | 'Racing' | 'Risk';

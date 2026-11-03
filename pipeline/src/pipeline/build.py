@@ -426,6 +426,54 @@ RACES: dict[str, dict] = {
         # same on a fresh download, Oct 26 2026). Reported, but not counted in G1.
         "data_issue": "tyre timing corrupt upstream (stints misaligned with the pit stops)",
     },
+    "italy-2019": {  # races batch 2
+        "year": 2019,
+        "event": "Italy",
+        "name": "Italy 2019: Bottas vs Leclerc",
+        "era": "2014-2025",
+        "takeover_lap": 17,  # pinned (races batch 2)
+        "seed": 18948,  # tuned: scripts/tune.ts (races batch 2)
+        "user_side": "BOT",
+        "rival": "LEC",
+        "score_positions": 6,
+        "split": "holdout",
+    },
+    "usa-2022": {  # races batch 2
+        "year": 2022,
+        "event": "United States",
+        "name": "USA 2022: Hamilton vs Verstappen",
+        "era": "2014-2025",
+        "takeover_lap": 9,  # pinned (races batch 2)
+        "seed": 84707,  # tuned: scripts/tune.ts (races batch 2)
+        "user_side": "HAM",
+        "rival": "VER",
+        "score_positions": 6,
+        "split": "holdout",
+    },
+    "mexico-2024": {  # races batch 2
+        "year": 2024,
+        "event": "Mexico",
+        "name": "Mexico 2024: Norris vs Sainz",
+        "era": "2014-2025",
+        "takeover_lap": 27,  # pinned (races batch 2)
+        "seed": 59811,  # tuned: scripts/tune.ts (races batch 2)
+        "user_side": "NOR",
+        "rival": "SAI",
+        "score_positions": 6,
+        "split": "holdout",
+    },
+    "abu-dhabi-2024": {  # races batch 2
+        "year": 2024,
+        "event": "Abu Dhabi",
+        "name": "Abu Dhabi 2024: Sainz vs Norris",
+        "era": "2014-2025",
+        "takeover_lap": 10,  # pinned: earlier for more calls (races batch 2)
+        "seed": 50123,  # tuned: scripts/tune.ts (races batch 2)
+        "user_side": "SAI",
+        "rival": "NOR",
+        "score_positions": 6,
+        "split": "holdout",
+    },
 }
 
 

@@ -119,7 +119,9 @@ export function AccountBar({
           ) : (
             <GoogleButton onCredential={account.signIn} />
           )}
-          {account.error && <span className="text-[12px] text-[var(--box)]">{account.error}</span>}
+          {account.error && (
+            <span className="text-[12px] text-[var(--box-ink)]">{account.error}</span>
+          )}
         </div>
       ) : null}
     </div>
