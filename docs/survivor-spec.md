@@ -62,9 +62,9 @@ Nov 3, 2026 · Branch `survivor`. A second game mode, separate from the daily: r
   - have at least one seed passing the tuner (`tune --survivor 5`).
 - Kept: canada-2019 (HAM vs VET), united-states-2019 (HAM vs BOT), styria-2020 (BOT vs HAM), russia-2020 (VER vs BOT), abu-dhabi-2020 (BOT vs VER), portugal-2021 (VER vs HAM), styria-2021 (HAM vs VER), netherlands-2022 (RUS vs VER), italy-2022 (LEC vs VER), mexico-2022 (HAM vs VER), miami-2023 (PER vs VER), spain-2023 (HAM vs VER), united-states-2023 (HAM vs VER), japan-2024 (PER vs VER), china-2024 (NOR vs VER), belgium-2024 (HAM vs RUS), china-2025 (NOR vs PIA), saudi-arabia-2025 (VER vs PIA), austria-2025 (PIA vs NOR).
 - Dropped:
-  - 46 fail G1 on checks no pairing changes (the field's gaps or the podium order, most often in 2018);
-  - 5 crash on missing data;
-  - 5 have no fair setup;
+  - 35 fail G1 on checks no pairing changes (the field's gaps or the podium order, most often in 2018);
+  - 10 have missing or broken data (2 didn't download, 8 fail to build);
+  - 6 have no fair setup;
   - 10 have too few calls, even taking over 8 or 15 laps earlier (USA 2024, Netherlands 2021 and Netherlands 2024 among them).
 - The bar wasn't lowered. A looser G1 for survivor (only the duel and our cars' gaps) would add more races, and is the owner's call.
 
