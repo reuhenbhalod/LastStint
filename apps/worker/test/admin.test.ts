@@ -118,9 +118,7 @@ describe('admin controls', () => {
   });
 
   it('refuses races that are not playable, and clears your own runs', async () => {
-    expect((await admin('/api/admin/day', { date: today, raceId: 'portugal-2020' })).status).toBe(
-      400,
-    );
+    expect((await admin('/api/admin/day', { date: today, raceId: 'japan-2023' })).status).toBe(400);
     const cleared = (await (await admin('/api/admin/runs/clear', { date: today })).json()) as {
       cleared: number;
     };
