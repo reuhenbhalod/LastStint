@@ -131,3 +131,65 @@ export function modeOf(decisions: Array<{ kind: string; key?: string; value?: st
   const m = decisions.length === 1 ? decisions[0] : undefined;
   return m?.kind === 'mode' && m.key && m.value ? { key: m.key, value: m.value } : null;
 }
+
+/** One row of an option's fact table: what it does to pace, tyres, racing or risk. */
+export interface Fact {
+  label: 'Pace' | 'Tyres' | 'Racing' | 'Risk';
+  value: string;
+  /** good (teal), bad (red) or neutral. */
+  tone: 'good' | 'bad' | 'neutral';
+}
+
+/**
+ * The fact table for headset calls (one or several at once): lap time, tyre wear, passing and
+ * risk, from the era's mode effects. The same four rows for every option, so a row of options
+ * reads straight across.
+ */
+export function modeFacts(model: RaceModel, calls: Array<{ key: string; value: string }>): Fact[] {
+  const modes = modeEffects(model) as Record<string, Record<string, Record<string, number>>> | null;
+  let delta = 0;
+  let wear = 1;
+  let attack = 0;
+  let defend = 0;
+  let risky = false;
+  for (const c of calls) {
+    const e = modes?.[c.key]?.[c.value] ?? {};
+    delta += e.lapDelta ?? 0;
+    wear *= e.wearMult ?? 1;
+    attack += e.attackLogit ?? 0;
+    defend += e.defendLogit ?? 0;
+    // Failures and punctures (push), crashes in a fight (attack, defend): see the sim's incidents.
+    if ((e.errorMult ?? 1) > 1.001) risky = true;
+    if (c.key === 'pace' && c.value === 'push') risky = true;
+    if (c.key === 'battle' && c.value !== 'hold') risky = true;
+  }
+  const w = Math.round((wear - 1) * 100);
+  return [
+    {
+      label: 'Pace',
+      value:
+        Math.abs(delta) < 0.01
+          ? 'Same'
+          : `${delta < 0 ? '−' : '+'}${Math.abs(delta).toFixed(2)}s a lap`,
+      tone: delta < -0.01 ? 'good' : delta > 0.01 ? 'bad' : 'neutral',
+    },
+    {
+      label: 'Tyres',
+      value: w === 0 ? 'Normal wear' : `${w > 0 ? '+' : '−'}${Math.abs(w)}% wear`,
+      tone: w > 0 ? 'bad' : w < 0 ? 'good' : 'neutral',
+    },
+    {
+      label: 'Racing',
+      value:
+        attack > 0 && defend < 0
+          ? 'Fights harder'
+          : attack > 0
+            ? 'Better passing'
+            : defend < 0
+              ? 'Harder to pass'
+              : 'As normal',
+      tone: attack > 0 || defend < 0 ? 'good' : 'neutral',
+    },
+    { label: 'Risk', value: risky ? 'Higher' : 'Normal', tone: risky ? 'bad' : 'neutral' },
+  ];
+}
