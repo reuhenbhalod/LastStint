@@ -127,6 +127,11 @@ test('plays the Abu Dhabi daily end to end', async ({ page, context }) => {
   await expect(page.getByText('Daily Race #1')).toBeVisible();
   if (shots) await page.screenshot({ path: `${shots}/1-intro.png`, fullPage: true });
   await page.getByRole('button', { name: /pit wall/ }).click();
+  // The race plan comes first; the controls (and the speed) show once it's answered.
+  await page
+    .locator('section.decision')
+    .getByRole('button', { name: 'Run to plan', exact: true })
+    .click();
   await page.getByRole('button', { name: '2×' }).click();
 
   // Tap the rival on the map: the driver card opens. (The dot never stops moving, so the click
@@ -138,14 +143,13 @@ test('plays the Abu Dhabi daily end to end', async ({ page, context }) => {
   // Each moment: the top-level option, then (after Box) the tyre. Lap 55's stop call isn't
   // asked: the car stopped on lap 53, so the wall stays out by itself.
   const answers: Record<string, string[]> = {
-    '35': ['Run to plan'],
     '36': ['Box', 'Hards'],
     '44': ['Stay out'],
     '49': ['Push now'],
     '53': ['Box', 'Softs'],
     '57': ['Attack'],
   };
-  for (const lap of ['35', '36', '44', '49', '53', '57']) {
+  for (const lap of ['36', '44', '49', '53', '57']) {
     const card = page.locator('section.decision');
     await expect(card).toContainText(`Lap ${lap}`, { timeout: 90_000 });
     await expect(page.getByRole('alert')).toContainText(`Lap ${lap}`);

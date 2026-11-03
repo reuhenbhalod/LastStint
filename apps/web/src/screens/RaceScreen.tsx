@@ -1,11 +1,11 @@
-// The race view (feedback round 2 layout): your driver's profile and the standings on the
-// left, the scoreboard and the circuit in the middle with BOX and the race controls under it,
-// and on the right the call column (the decision card when the game pauses, a quick call or a
-// driver's question otherwise) over your car's stats and the radio. The headset and the gap
-// trace open from buttons on the map. On a phone it stacks, and the decision card rises as a
-// bottom sheet. When the race stops for a call, a radio banner drops over the map (and
-// chirps, if sound is on). Tap any car, on the map or in the standings, for its card; a stop
-// by your car or the rival is called out while it drives the pit lane.
+// The race view (feedback round 2 layout): the standings on the left; in the middle the
+// scoreboard and the circuit, with your calls under it (the big decision as a wide strip, a
+// driver's question, a quick call) and BOX and the race controls below; on the right the
+// stats (your driver, the car, the radio). The headset and the gap trace open from buttons on
+// the map. On a phone it stacks, and the decision card rises as a bottom sheet. When the race
+// stops for a call, a radio banner drops over the map (and chirps, if sound is on). Tap any
+// car, on the map or in the standings, for its card; a stop by your car or the rival is
+// called out while it drives the pit lane.
 
 import type { Modes, RaceModel } from '@boxthislap/sim';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -123,6 +123,14 @@ export function RaceScreen({
   const select = useCallback((code: string) => setSelected((c) => (c === code ? null : code)), []);
   const close = useCallback(() => setSelected(null), []);
 
+  const momentIdFor = paused ? state.currentMoment?.id : undefined;
+  // A big call scrolls into view under the map (on a laptop it can sit below the fold).
+  const callRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (momentIdFor && typeof window !== 'undefined' && window.innerWidth >= 768)
+      callRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, [momentIdFor]);
+
   // Chirp when the race stops for a call.
   const momentId = paused ? state.currentMoment?.id : undefined;
   useEffect(() => {
@@ -214,27 +222,24 @@ export function RaceScreen({
         </span>
       </header>
 
-      <div className="grid items-start gap-4 md:grid-cols-[minmax(0,1fr)_310px] xl:grid-cols-[270px_minmax(0,1fr)_320px]">
-        {/* Your driver and the standings: left on wide screens, under the race otherwise. */}
-        <aside className="order-3 grid gap-3 md:col-span-2 md:grid-cols-2 xl:order-1 xl:col-span-1 xl:grid-cols-1">
-          <DriverProfile code={userSide} race={state.race} model={model} log={log} />
-          <section
-            aria-label="Standings"
-            className="overflow-hidden rounded-xl border border-[var(--rule)] bg-[var(--card)]"
-          >
-            <div className="flex justify-between border-b border-[var(--rule)] px-3 py-2">
-              <span className="eyebrow">Standings</span>
-              <span className="eyebrow">Tyre · gap</span>
-            </div>
-            <TimingTower
-              race={state.race}
-              model={model}
-              userSide={userSide}
-              rival={rival}
-              onPick={select}
-            />
-          </section>
-        </aside>
+      <div className="grid items-start gap-4 md:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[250px_minmax(0,1fr)_320px]">
+        {/* Standings: left on wide screens, under the race otherwise. */}
+        <section
+          aria-label="Standings"
+          className="order-3 overflow-hidden rounded-xl border border-[var(--rule)] bg-[var(--card)] md:col-span-2 xl:order-1 xl:col-span-1"
+        >
+          <div className="flex justify-between border-b border-[var(--rule)] px-3 py-2">
+            <span className="eyebrow">Standings</span>
+            <span className="eyebrow">Tyre · gap</span>
+          </div>
+          <TimingTower
+            race={state.race}
+            model={model}
+            userSide={userSide}
+            rival={rival}
+            onPick={select}
+          />
+        </section>
 
         {/* The race: scoreboard over the circuit, the controls under it. */}
         <section aria-label="Race" className="order-1 flex min-w-0 flex-col gap-3 xl:order-2">
@@ -384,8 +389,39 @@ export function RaceScreen({
 
           {panel && <div className="card md:hidden">{panelBody}</div>}
 
-          {/* Controls, under the map. */}
-          <div className="card flex flex-wrap items-center gap-2">
+          {/* Your calls, under the map: the big decision, a driver's question, a quick call. */}
+          {paused && state.currentMoment ? (
+            <div
+              ref={callRef}
+              className="fixed inset-x-0 bottom-0 z-30 max-h-[75vh] overflow-y-auto p-3 md:static md:max-h-none md:p-0"
+            >
+              <DecisionPanel
+                key={state.currentMoment.id}
+                moment={state.currentMoment}
+                race={state.race}
+                model={model}
+                onChoose={game.choose}
+              />
+            </div>
+          ) : state.question && state.phase === 'racing' ? (
+            <QuestionCard
+              from={userSide}
+              text={state.question.text}
+              onConfirm={() => game.confirm(true)}
+              onDrop={() => game.confirm(false)}
+            />
+          ) : quick && state.phase === 'racing' ? (
+            <QuickCallCard
+              key={quick.lap}
+              call={quick}
+              ms={Math.min(8000, LAP_MS[state.speed] * 0.9)}
+              onAnswer={answerQuick}
+              onTimeout={quickTimeout}
+            />
+          ) : null}
+
+          {/* Controls (BOX, speed, sound): hidden while a big call waits. */}
+          <div className={`card flex-wrap items-center gap-2 ${paused ? 'hidden' : 'flex'}`}>
             <div className="min-w-[200px] flex-1">
               <BoxButton
                 compounds={Object.keys(model.compounds)}
@@ -439,41 +475,9 @@ export function RaceScreen({
           </div>
         </section>
 
-        {/* The call column. */}
-        <aside aria-label="Your call" className="order-2 flex flex-col gap-3 xl:order-3">
-          <h2 className="disp m-0 text-[19px] leading-none">Your call</h2>
-          {paused && state.currentMoment ? (
-            <div className="fixed inset-x-0 bottom-0 z-30 max-h-[75vh] overflow-y-auto p-3 md:static md:max-h-none md:p-0">
-              <DecisionPanel
-                key={state.currentMoment.id}
-                moment={state.currentMoment}
-                race={state.race}
-                model={model}
-                onChoose={game.choose}
-              />
-            </div>
-          ) : state.question && state.phase === 'racing' ? (
-            <QuestionCard
-              from={userSide}
-              text={state.question.text}
-              onConfirm={() => game.confirm(true)}
-              onDrop={() => game.confirm(false)}
-            />
-          ) : quick && state.phase === 'racing' ? (
-            <QuickCallCard
-              key={quick.lap}
-              call={quick}
-              ms={Math.min(8000, LAP_MS[state.speed] * 0.9)}
-              onAnswer={answerQuick}
-              onTimeout={quickTimeout}
-            />
-          ) : (
-            <p className="card m-0 text-[14px] leading-snug text-[var(--muted)]">
-              {finishing
-                ? 'Chequered flag. Bringing the cars home.'
-                : 'The race stops for the big calls, and the radio asks quick ones in between. BOX is under the map; the headset is on it.'}
-            </p>
-          )}
+        {/* Stats: your driver, the car, the radio. */}
+        <aside aria-label="Stats" className="order-2 flex flex-col gap-3 xl:order-3">
+          <DriverProfile code={userSide} race={state.race} model={model} log={log} />
           <CarStats race={state.race} model={model} log={log} userSide={userSide} rival={rival} />
           {state.radio.length > 0 && (
             <section aria-label="Radio" className="card flex flex-col gap-2">
