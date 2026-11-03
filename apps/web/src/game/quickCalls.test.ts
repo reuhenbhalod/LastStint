@@ -52,6 +52,15 @@ describe('safetyCarCall', () => {
     expect(call?.text).toMatch(/Safety car!/);
     expect(call?.options.map((o) => o.id)).toEqual(['box', 'stay']);
     expect(call?.options[0]?.call).toMatchObject({ lap: 41, kind: 'pit' });
+    // Asked once, as it comes out: not on the next SC lap, nor with a stop called or booked.
+    expect(safetyCarCall({ ...race, flag: 'sc' }, model)).toBeNull();
+    expect(safetyCarCall(race, model, true)).toBeNull();
+    const me = race.cars[model.userSide];
+    const booked = {
+      ...race,
+      cars: { ...race.cars, [model.userSide]: { ...me, strategy: [{ lap: 42, to: 'HARD' }] } },
+    } as typeof race;
+    expect(safetyCarCall(booked, model)).toBeNull();
     // Green next lap, or the race's own SC: no call.
     expect(safetyCarCall({ ...race, nextFlag: 'green' }, model)).toBeNull();
     while (engine.lap < 53) engine.step();

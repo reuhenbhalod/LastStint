@@ -166,8 +166,14 @@ export function verdictFor(grade: MomentGrade): Verdict {
 }
 
 /** Grade every candidate from the real race's state and give each a verdict. */
-export function proposeMoments(model: RaceModel, samples?: number): ProposedMoment[] {
-  return candidateMoments(model).map((m) => {
+export function proposeMoments(
+  model: RaceModel,
+  samples?: number,
+  target?: Target,
+): ProposedMoment[] {
+  return candidateMoments(model).map((c) => {
+    // A race can be graded on another goal than beating the rival (e.g. holding P2).
+    const m = target ? { ...c, target } : c;
     const grade = gradeMoment(pauseAt(model, m.lap), m.options, m.target, samples);
     return { ...m, grade, verdict: verdictFor(grade) };
   });

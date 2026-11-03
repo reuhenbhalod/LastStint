@@ -3,7 +3,7 @@
 // second, old tyres, a big gap). The race keeps running; the answer is an order for the next
 // lap, logged like any live call, so the server's replay matches. Not scored.
 
-import type { Modes, RaceModel, RaceState } from '@boxthislap/sim';
+import type { Decision, Modes, RaceModel, RaceState } from '@boxthislap/sim';
 import { flagOn } from '../track/geometry.js';
 import type { LapEvents } from './raceLog.js';
 import type { LiveCall } from './refusal.js';
@@ -11,8 +11,12 @@ import type { LiveCall } from './refusal.js';
 export interface QuickOption {
   id: string;
   label: string;
+  /** A short line under the label: what it does (race engineer calls). */
+  note?: string;
   /** The order this answer gives (null: no change). */
-  call: LiveCall | null;
+  call: Decision | null;
+  /** More calls the answer makes (a yes to "can I box?" also boxes). */
+  also?: Decision[];
 }
 
 export interface QuickCall {
@@ -22,6 +26,24 @@ export interface QuickCall {
   from: string;
   text: string;
   options: QuickOption[];
+  /**
+   * What kind of call (race engineer spec): a battle (5 s, slow motion), trouble (damage,
+   * track limits, a lapped car), a request from the driver, or the engineer's question.
+   */
+  kind?: 'battle' | 'trouble' | 'request' | 'quick';
+  /** The driver's own choice when the wall doesn't answer (logged like any call). */
+  driverChoice?: Decision;
+  /** The other car in a battle or a blue flag. */
+  other?: string;
+  /** The corner the battle is fought into (track outline numbering). */
+  corner?: number;
+  /** A battle: you're the attacker (else defending), and the gap. */
+  attacking?: boolean;
+  gap?: number;
+  /** The facts for the call (gap, DRS, tyres, pace, battery). */
+  stats?: Array<{ label: string; value: string }>;
+  /** An answer the driver asked for is always followed; the wall's orders may be refused. */
+  asked?: boolean;
 }
 
 /** How often a quick call comes, in laps. */
@@ -173,13 +195,21 @@ export function quickCallAt(race: RaceState, model: RaceModel, log: LapEvents[])
  * A crash brought out a safety car (or VSC) the race model doesn't have (live play's
  * incidents): the pit lane is suddenly cheap, so the wall is asked straight away. Boxing
  * takes the softest tyre that lasts to the flag (or the hardest). Null if the next lap's flag
- * is the race's own, or there's no time left to use it.
+ * is the race's own, or there's no time left to use it. Asked once, on the lap it comes out,
+ * and not when the car has a stop called, under way, or just made.
  */
-export function safetyCarCall(race: RaceState, model: RaceModel): QuickCall | null {
+export function safetyCarCall(
+  race: RaceState,
+  model: RaceModel,
+  pendingPit = false,
+): QuickCall | null {
   const me = race.cars[model.userSide];
   const next = race.lap + 1;
   const flag = race.nextFlag;
   if (!me || me.retired || (flag !== 'sc' && flag !== 'vsc')) return null;
+  // Asked once, as it comes out; not with a stop called or under way, or just made (pit fix).
+  if (race.flag !== 'green' || pendingPit || me.tyreAge < 3) return null;
+  if (me.strategy.some((s) => s.lap > race.lap)) return null;
   if (flagOn(model, next) !== 'green' || next >= model.race.laps) return null;
   if (model.decisionMoments.some((m) => m.lap === next)) return null;
   const left = model.race.laps - race.lap;

@@ -21,7 +21,7 @@ export function TimingTower({
   const leader = race.cars[race.order.find((c) => !race.cars[c]?.retired) ?? ''];
   const lap = lapTime(model, race.flag);
   return (
-    <ol className="m-0 flex list-none flex-col p-1">
+    <ol className="m-0 flex min-h-full list-none flex-col justify-around p-1">
       {race.order.map((code, i) => {
         const car = race.cars[code];
         if (!car) return null;

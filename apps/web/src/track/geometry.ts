@@ -225,9 +225,11 @@ export function carsOnTrack(
  * Display only: the timing is untouched.
  */
 export function spaceOut(behind: Map<string, number>, min: number): Map<string, number> {
+  // Cars within half a gap of each other keep the order they're listed in (race order), so a
+  // nose-to-tail queue behind a safety car doesn't swap places frame to frame.
   const onTrack = [...behind.entries()]
-    .map(([code, b]) => ({ code, laps: Math.floor(b), at: b - Math.floor(b) }))
-    .sort((a, b) => a.at - b.at);
+    .map(([code, b], i) => ({ code, i, laps: Math.floor(b), at: b - Math.floor(b) }))
+    .sort((a, b) => (Math.abs(a.at - b.at) < min / 2 ? a.i - b.i : a.at - b.at));
   const out = new Map<string, number>();
   let prev = Number.NEGATIVE_INFINITY;
   for (const c of onTrack) {
@@ -305,9 +307,89 @@ export function pitPosition(
   return { lane: laneT(raw, garage), at: null };
 }
 
+/**
+ * When, in a lap tick, a car reaches pit entry (as tick progress, 0-1), or null if it can't
+ * this tick: it starts the tick already in the pit zone (between entry and exit), so it is past
+ * the entry. `behind` is its gap to the leader in fractions of a lap.
+ */
+export function pitEntryAt(behind: number, lane: { entry: number; exit: number }): number | null {
+  const span = frac(lane.exit - lane.entry) || 1e-3;
+  if (frac(-behind - lane.entry) < span) return null;
+  return frac(lane.entry + behind);
+}
+
+/**
+ * The in-lap of a stop (race engineer spec, pit fix): the car drives the lap being shown at its
+ * gap until pit entry, turns into the lane and drives down to its garage, where it waits for the
+ * tick to end (the stop itself is charged on the next lap). Null when it can't reach the entry
+ * this tick (see pitEntryAt): it then stops on the next one.
+ */
+export function inLapPosition(
+  progress: number,
+  behind: number,
+  lane: { entry: number; exit: number },
+  garage: number,
+): PitPosition | null {
+  const tIn = pitEntryAt(behind, lane);
+  if (tIn === null) return null;
+  if (progress < tIn) return { lane: null, at: progress - behind };
+  // Down the lane to the garage: a quarter of a tick at most, sooner if the tick is ending.
+  const d = Math.max(0.02, Math.min(0.25, (1 - tIn) * 0.9));
+  return { lane: garage * ease(Math.min(1, (progress - tIn) / d)), at: null };
+}
+
+/** Where a car is in the lane at the end of its in-lap tick (0 if it never got in). */
+export function inLapEnd(
+  behind: number,
+  lane: { entry: number; exit: number },
+  garage: number,
+): number {
+  const p = inLapPosition(0.995, behind, lane, garage);
+  return p?.lane ?? 0;
+}
+
+/**
+ * The out-lap of a stop: the car starts the tick in the lane (where its in-lap left it, `from`),
+ * finishes the stop at its garage, and rejoins at pit exit just as its new gap (`after`) puts it
+ * there; then it drives on at that gap.
+ */
+export function outLapPosition(
+  progress: number,
+  after: number,
+  lane: { entry: number; exit: number },
+  garage: number,
+  from: number,
+): PitPosition {
+  let tOut = frac(lane.exit + after);
+  if (tOut < 0.08) tOut += 1; // rejoins right at the start: give the lane a moment
+  if (progress >= tOut) return { lane: null, at: progress - after };
+  const h = tOut * 0.45;
+  if (progress < h) {
+    const start = Math.min(from, garage);
+    return { lane: start + (garage - start) * ease(progress / h), at: null };
+  }
+  return { lane: garage + (1 - garage) * ease((progress - h) / (tOut - h)), at: null };
+}
+
 /** A car's place along the lane during its stop: in, a pause at its garage, out. */
 export function laneT(raw: number, garage: number): number {
   if (raw < 0.45) return garage * ease(raw / 0.45);
   if (raw < 0.6) return garage;
   return garage + (1 - garage) * ease((raw - 0.6) / 0.4);
+}
+
+/**
+ * The bottom corner of the map with the least circuit in it, for the legend and map buttons
+ * to sit on clear ground: counts the lap's and pit lane's points inside a box `w` x `h`
+ * (fractions of the map) at each bottom corner.
+ */
+export function quietCorner(outline: TrackOutline, w = 0.45, h = 0.16): 'left' | 'right' {
+  const pts = [...outline.points, ...(outline.pit ?? [])];
+  const inBox = (left: boolean) =>
+    pts.filter(
+      ([x, y]) =>
+        y > outline.height * (1 - h) &&
+        (left ? x < outline.width * w : x > outline.width * (1 - w)),
+    ).length;
+  return inBox(true) <= inBox(false) ? 'left' : 'right';
 }

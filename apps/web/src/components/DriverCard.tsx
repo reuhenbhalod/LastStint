@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import { driverInfo } from '../data/drivers.js';
 import type { LapEvents } from '../game/raceLog.js';
 import { lapTime } from '../track/geometry.js';
+import { CloseIcon } from './Icons.js';
 import { TyreBadge } from './TyreBadge.js';
 
 const lapClock = (s: number) => `${Math.floor(s / 60)}:${(s % 60).toFixed(1).padStart(4, '0')}`;
@@ -83,14 +84,14 @@ export function DriverCard({
           aria-label="Close driver details"
           className="rounded-md px-1.5 text-[18px] leading-none text-[var(--muted)] hover:text-[var(--ink)]"
         >
-          ✕
+          <CloseIcon size={18} />
         </button>
       </header>
       <dl className="m-0 grid grid-cols-3 gap-x-3 gap-y-2.5">
         <Stat label="Position">{car.retired ? 'OUT' : `P${pos}`}</Stat>
         <Stat label="To leader">
           {car.retired
-            ? '—'
+            ? '-'
             : pos === 1
               ? 'Leader'
               : down >= 1
@@ -101,15 +102,15 @@ export function DriverCard({
           {code === userSide
             ? realPos
               ? `P${realPos}`
-              : '—'
+              : '-'
             : toYou === null
-              ? '—'
+              ? '-'
               : `${toYou >= 0 ? '+' : '−'}${Math.abs(toYou).toFixed(1)}s`}
         </Stat>
         <Stat label="Tyres">
-          {car.retired ? '—' : <TyreBadge compound={car.compound} age={car.tyreAge} />}
+          {car.retired ? '-' : <TyreBadge compound={car.compound} age={car.tyreAge} />}
         </Stat>
-        <Stat label="Last lap">{last ? lapClock(last) : '—'}</Stat>
+        <Stat label="Last lap">{last ? lapClock(last) : '-'}</Stat>
         <Stat label="Stops">
           {stops.length
             ? stops.map((s) => `L${s.lap - 1} ${s.compound[0]}`).join(', ')

@@ -15,7 +15,9 @@
     "moments": "tsx scripts/moments.ts",
     "bench": "tsx scripts/bench.ts",
     "whatif": "tsx scripts/whatif.ts",
-    "combos": "tsx scripts/combos.ts"
+    "combos": "tsx scripts/combos.ts",
+    "author": "tsx scripts/author.ts",
+    "tune": "tsx scripts/tune.ts"
   },
   "devDependencies": {
     "@types/node": "22.10.2",

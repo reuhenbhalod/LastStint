@@ -58,7 +58,7 @@ RACES: dict[str, dict] = {
         "name": "Bahrain 2021: Verstappen vs Hamilton",
         "era": "2014-2025",
         "takeover_lap": 10,  # D3 rule
-        "seed": 86636,
+        "seed": 53576,  # tuned: scripts/tune.ts (races batch 1)
         "user_side": "VER",
         "rival": "HAM",
         "score_positions": 6,
@@ -68,12 +68,12 @@ RACES: dict[str, dict] = {
     "france-2021": {
         "year": 2021,
         "event": "France",
-        "name": "France 2021: Hamilton vs Verstappen",
+        "name": "France 2021: Hamilton vs Perez",
         "era": "2014-2025",
-        "takeover_lap": 15,  # D3 rule
-        "seed": 97680,
+        "takeover_lap": 15,  # pinned: the duel below changed (races batch 2)
+        "seed": 6466,  # tuned: scripts/tune.ts (races batch 2)
         "user_side": "HAM",
-        "rival": "VER",
+        "rival": "PER",  # defend race: the car behind (races batch 2)
         "score_positions": 6,
         "split": "tune",
         "dilemma": "Cover Red Bull's second stop or stay on one stop",
@@ -110,7 +110,7 @@ RACES: dict[str, dict] = {
         "name": "Mexico 2021: Perez vs Hamilton",
         "era": "2014-2025",
         "takeover_lap": 26,  # D3 rule
-        "seed": 56351,
+        "seed": 21052,  # tuned: scripts/tune.ts (races batch 1)
         "user_side": "PER",
         "rival": "HAM",
         "score_positions": 6,
@@ -136,7 +136,7 @@ RACES: dict[str, dict] = {
         "name": "Miami 2022: Leclerc vs Verstappen",
         "era": "2014-2025",
         "takeover_lap": 21,  # D3 rule
-        "seed": 81093,
+        "seed": 23160,  # tuned: scripts/tune.ts (races batch 1)
         "user_side": "LEC",
         "rival": "VER",
         "score_positions": 6,
@@ -149,7 +149,7 @@ RACES: dict[str, dict] = {
         "name": "Canada 2022: Sainz vs Verstappen",
         "era": "2014-2025",
         "takeover_lap": 17,  # D3 rule
-        "seed": 96345,
+        "seed": 592,  # tuned: scripts/tune.ts (races batch 1)
         "user_side": "SAI",
         "rival": "VER",
         "score_positions": 6,
@@ -159,12 +159,12 @@ RACES: dict[str, dict] = {
     "bahrain-2022": {
         "year": 2022,
         "event": "Bahrain",
-        "name": "Bahrain 2022: Leclerc vs Verstappen",
+        "name": "Bahrain 2022: Leclerc vs Sainz",
         "era": "2014-2025",
-        "takeover_lap": 11,  # D3 rule
-        "seed": 78727,
+        "takeover_lap": 11,  # pinned: the duel below changed (races batch 1)
+        "seed": 33967,  # tuned: scripts/tune.ts (races batch 1)
         "user_side": "LEC",
-        "rival": "VER",
+        "rival": "SAI",  # defend race: the car behind (races batch 1)
         "score_positions": 6,
         "split": "tune",
         "dilemma": "Late safety car; Verstappen's retirement is frozen",
@@ -233,7 +233,7 @@ RACES: dict[str, dict] = {
     "hungary-2019": {
         "year": 2019,
         "event": "Hungary",
-        "name": "Hungary 2019",
+        "name": "Hungary 2019: Verstappen vs Hamilton",
         "era": "2014-2025",
         "takeover_lap": None,  # D3 rule
         "seed": 80284,
@@ -245,12 +245,12 @@ RACES: dict[str, dict] = {
     "austria-2019": {
         "year": 2019,
         "event": "Austria",
-        "name": "Austria 2019",
+        "name": "Austria 2019: Leclerc vs Bottas",
         "era": "2014-2025",
-        "takeover_lap": None,  # D3 rule
-        "seed": 34134,
-        "user_side": None,  # validation race: automatic duel, runner-up vs winner
-        "rival": None,
+        "takeover_lap": 19,  # pinned: the duel below changed (races batch 2)
+        "seed": 24531,  # tuned: scripts/tune.ts (races batch 2)
+        "user_side": "LEC",
+        "rival": "BOT",  # defend race: the car behind (races batch 2)
         "score_positions": 6,
         "split": "holdout",
     },
@@ -269,10 +269,10 @@ RACES: dict[str, dict] = {
     "mexico-2019": {
         "year": 2019,
         "event": "Mexico",
-        "name": "Mexico 2019",
+        "name": "Mexico 2019: Vettel vs Hamilton",
         "era": "2014-2025",
         "takeover_lap": None,  # D3 rule
-        "seed": 19428,
+        "seed": 11977,  # tuned: scripts/tune.ts (races batch 1)
         "user_side": None,  # validation race: automatic duel, runner-up vs winner
         "rival": None,
         "score_positions": 6,
@@ -281,12 +281,12 @@ RACES: dict[str, dict] = {
     "france-2019": {
         "year": 2019,
         "event": "France",
-        "name": "France 2019",
+        "name": "France 2019: Bottas vs Leclerc",
         "era": "2014-2025",
-        "takeover_lap": None,  # D3 rule
-        "seed": 92053,
-        "user_side": None,  # validation race: automatic duel, runner-up vs winner
-        "rival": None,
+        "takeover_lap": 20,  # pinned: the duel below changed (races batch 1)
+        "seed": 50312,  # tuned: scripts/tune.ts (races batch 1)
+        "user_side": "BOT",
+        "rival": "LEC",  # defend race: the car behind (races batch 1)
         "score_positions": 6,
         "split": "holdout",
     },
@@ -305,24 +305,24 @@ RACES: dict[str, dict] = {
     "spain-2020": {
         "year": 2020,
         "event": "Spain",
-        "name": "Spain 2020",
+        "name": "Spain 2020: Verstappen vs Bottas",
         "era": "2014-2025",
-        "takeover_lap": None,  # D3 rule
-        "seed": 62761,
-        "user_side": None,  # validation race: automatic duel, runner-up vs winner
-        "rival": None,
+        "takeover_lap": 18,  # pinned: the duel below changed (races batch 1)
+        "seed": 85579,  # tuned: scripts/tune.ts (races batch 1)
+        "user_side": "VER",
+        "rival": "BOT",  # defend race: the car behind (races batch 1)
         "score_positions": 6,
         "split": "holdout",
     },
     "portugal-2020": {
         "year": 2020,
         "event": "Portugal",
-        "name": "Portugal 2020",
+        "name": "Portugal 2020: Bottas vs Verstappen",
         "era": "2014-2025",
-        "takeover_lap": None,  # D3 rule
-        "seed": 99081,
-        "user_side": None,  # validation race: automatic duel, runner-up vs winner
-        "rival": None,
+        "takeover_lap": 26,  # pinned (the duel changed); earlier for more calls (batch 1)
+        "seed": 26892,  # tuned: scripts/tune.ts (races batch 1)
+        "user_side": "BOT",
+        "rival": "VER",  # defend race: the car behind (races batch 1)
         "score_positions": 6,
         "split": "holdout",
     },
@@ -377,10 +377,10 @@ RACES: dict[str, dict] = {
     "italy-2024": {
         "year": 2024,
         "event": "Italy",
-        "name": "Italy 2024",
+        "name": "Italy 2024: Piastri vs Leclerc",
         "era": "2014-2025",
         "takeover_lap": None,  # D3 rule
-        "seed": 18811,
+        "seed": 99524,  # tuned: scripts/tune.ts (races batch 1)
         "user_side": None,  # validation race: automatic duel, runner-up vs winner
         "rival": None,
         "score_positions": 6,
@@ -401,10 +401,10 @@ RACES: dict[str, dict] = {
     "hungary-2025": {
         "year": 2025,
         "event": "Hungary",
-        "name": "Hungary 2025",
+        "name": "Hungary 2025: Piastri vs Norris",
         "era": "2014-2025",
         "takeover_lap": None,  # D3 rule
-        "seed": 41185,
+        "seed": 95190,  # tuned: scripts/tune.ts (races batch 1)
         "user_side": None,  # validation race: automatic duel, runner-up vs winner
         "rival": None,
         "score_positions": 6,
@@ -425,6 +425,54 @@ RACES: dict[str, dict] = {
         # lap 25 and all second stints at lap 33, while the pit flags are at laps 26-30; the
         # same on a fresh download, Oct 26 2026). Reported, but not counted in G1.
         "data_issue": "tyre timing corrupt upstream (stints misaligned with the pit stops)",
+    },
+    "italy-2019": {  # races batch 2
+        "year": 2019,
+        "event": "Italy",
+        "name": "Italy 2019: Bottas vs Leclerc",
+        "era": "2014-2025",
+        "takeover_lap": 17,  # pinned (races batch 2)
+        "seed": 18948,  # tuned: scripts/tune.ts (races batch 2)
+        "user_side": "BOT",
+        "rival": "LEC",
+        "score_positions": 6,
+        "split": "holdout",
+    },
+    "usa-2022": {  # races batch 2
+        "year": 2022,
+        "event": "United States",
+        "name": "USA 2022: Hamilton vs Verstappen",
+        "era": "2014-2025",
+        "takeover_lap": 9,  # pinned (races batch 2)
+        "seed": 84707,  # tuned: scripts/tune.ts (races batch 2)
+        "user_side": "HAM",
+        "rival": "VER",
+        "score_positions": 6,
+        "split": "holdout",
+    },
+    "mexico-2024": {  # races batch 2
+        "year": 2024,
+        "event": "Mexico",
+        "name": "Mexico 2024: Norris vs Sainz",
+        "era": "2014-2025",
+        "takeover_lap": 27,  # pinned (races batch 2)
+        "seed": 59811,  # tuned: scripts/tune.ts (races batch 2)
+        "user_side": "NOR",
+        "rival": "SAI",
+        "score_positions": 6,
+        "split": "holdout",
+    },
+    "abu-dhabi-2024": {  # races batch 2
+        "year": 2024,
+        "event": "Abu Dhabi",
+        "name": "Abu Dhabi 2024: Sainz vs Norris",
+        "era": "2014-2025",
+        "takeover_lap": 10,  # pinned: earlier for more calls (races batch 2)
+        "seed": 50123,  # tuned: scripts/tune.ts (races batch 2)
+        "user_side": "SAI",
+        "rival": "NOR",
+        "score_positions": 6,
+        "split": "holdout",
     },
 }
 

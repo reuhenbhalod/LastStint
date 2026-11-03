@@ -4,14 +4,18 @@ import { GameEngine } from '../engine/engine.js';
 import {
   carsOnTrack,
   flagOn,
+  inLapPosition,
   lapTime,
   lapsToFlag,
   nearestFraction,
+  outLapPosition,
+  pitEntryAt,
   pitLane,
   pitPosition,
   pointAlong,
   pointAt,
   polyline,
+  quietCorner,
   runToFlag,
   spaceOut,
   spreadLane,
@@ -115,8 +119,8 @@ describe('finish and spacing', () => {
       new Map([
         ['A', 0],
         ['B', 0.001],
-        ['C', 0.002],
-        ['L', 1.0015], // lapped: on track between B and C
+        ['C', 0.012],
+        ['L', 1.0065], // lapped: on track between B and C
       ]),
       0.01,
     );
@@ -124,6 +128,24 @@ describe('finish and spacing', () => {
     expect(out.get('B')).toBeCloseTo(0.01);
     expect(out.get('L')).toBeCloseTo(1.02);
     expect(out.get('C')).toBeCloseTo(0.03);
+  });
+
+  it('keeps race order for cars within half a gap (no swapping in a safety-car queue)', () => {
+    const queue = (c: number) =>
+      spaceOut(
+        new Map([
+          ['A', 0],
+          ['B', 0.0021],
+          ['C', c],
+        ]),
+        0.01,
+      );
+    // C a hair either side of B: the order on screen stays A, B, C.
+    for (const c of [0.002, 0.0022]) {
+      const out = queue(c);
+      expect(out.get('B')).toBeCloseTo(0.01);
+      expect(out.get('C')).toBeCloseTo(0.02);
+    }
   });
 
   it('runs each car to the line from its finishing gap', () => {
@@ -180,5 +202,52 @@ describe('pitPosition', () => {
     const p = pitPosition(0, 0.02, 0.25, lane, 0.4);
     expect(p.lane).not.toBeNull();
     expect(p.lane).toBeGreaterThan(0);
+  });
+});
+
+describe('a stop over two laps (pit fix)', () => {
+  const lane = { entry: 0.95, exit: 0.1 };
+  it('in-lap: drives to pit entry, then down the lane to the garage, and waits there', () => {
+    // 0.3 behind: at pit entry when the leader is at 0.25.
+    expect(pitEntryAt(0.3, lane)).toBeCloseTo(0.25, 9);
+    const before = inLapPosition(0.2, 0.3, lane, 0.4);
+    expect(before?.lane).toBeNull();
+    expect(before?.at).toBeCloseTo(-0.1, 9);
+    expect(inLapPosition(0.26, 0.3, lane, 0.4)?.lane).toBeGreaterThan(0);
+    expect(inLapPosition(0.9, 0.3, lane, 0.4)?.lane).toBeCloseTo(0.4, 6);
+  });
+  it('in-lap: a car already past pit entry stops on the next lap instead', () => {
+    expect(pitEntryAt(0.02, lane)).toBeNull();
+    expect(inLapPosition(0.5, 0.02, lane, 0.4)).toBeNull();
+  });
+  it('out-lap: from the garage to pit exit, then on at the new gap', () => {
+    // New gap 0.5: at pit exit when the leader is at 0.6.
+    expect(outLapPosition(0, 0.5, lane, 0.4, 0.4).lane).toBeCloseTo(0.4, 6);
+    expect(outLapPosition(0.59, 0.5, lane, 0.4, 0.4).lane).toBeGreaterThan(0.9);
+    const out = outLapPosition(0.61, 0.5, lane, 0.4, 0.4);
+    expect(out.lane).toBeNull();
+    expect(out.at).toBeCloseTo(0.11, 6);
+  });
+});
+
+describe('quietCorner', () => {
+  it('picks the bottom corner the circuit stays out of', () => {
+    const outline = {
+      raceId: 't',
+      width: 100,
+      height: 100,
+      corners: [],
+      // A loop down the left side, reaching the bottom-left corner.
+      points: [
+        [10, 10],
+        [40, 10],
+        [40, 95],
+        [10, 95],
+      ] as Array<[number, number]>,
+    };
+    expect(quietCorner(outline as never)).toBe('right');
+    expect(
+      quietCorner({ ...outline, points: outline.points.map(([x, y]) => [100 - x, y]) } as never),
+    ).toBe('left');
   });
 });

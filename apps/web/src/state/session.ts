@@ -4,14 +4,25 @@
 // and serialises/resumes a run. The React layer (useGame) wraps it with timers and the
 // network; this class is fully testable headless.
 
-import { type Decision, type DecisionMoment, type RaceState, scoreRun } from '@boxthislap/sim';
+import {
+  type Decision,
+  type DecisionMoment,
+  type RaceState,
+  engineerConfig,
+  moodOf,
+  scoreRun,
+} from '@boxthislap/sim';
 import type { RunResponse, RunSubmission } from '../data/api.js';
 import { ignoreRate } from '../data/drivers.js';
 import type { Daily } from '../data/types.js';
 import { GameEngine, decisionMoments } from '../engine/engine.js';
 import { type GradedMoment, type Grader, gradedFromHits, inlineGrader } from '../engine/grading.js';
 import { autoStay } from '../game/autoStay.js';
-import { acknowledge, refusal } from '../game/refusal.js';
+import { ownMove } from '../game/engineerCalls.js';
+import { engineerRadio } from '../game/engineerRadio.js';
+import { MOOD_REFUSALS, acknowledge, refusal } from '../game/refusal.js';
+import { overtakingCorners } from '../track/corners.js';
+import { outlineFor } from '../track/outlines.js';
 import {
   type Action,
   type GameMeta,
@@ -58,6 +69,14 @@ function momentAt(
 ): DecisionMoment | null {
   return moments.find((m) => m.lap === lap + 1 && !resolved.includes(m.id)) ?? null;
 }
+
+/** The engineer's radio for each team order (to the team-mate, or to your driver). */
+const ORDER_COPY: Record<Extract<Decision, { kind: 'teamOrder' }>['order'], string> = {
+  holdUp: 'Team-mate told: hold him up when he gets to you.',
+  release: 'Team-mate released: race your own race.',
+  teammateLetsYouPast: 'Team-mate told to let you through.',
+  letTeammatePast: 'Let your team-mate through, please.',
+};
 
 export class GameSession {
   private readonly engine: GameEngine;
@@ -162,6 +181,7 @@ export class GameSession {
     if (this.state.phase !== 'racing') return;
     this.engine.step();
     this.reportIncidents();
+    this.reportEngineer();
     this.sync();
   }
 
@@ -189,6 +209,32 @@ export class GameSession {
     }
   }
 
+  /** What the race model noted so far (battles, contact, trust...). */
+  get notes() {
+    return this.engine.notes;
+  }
+
+  /** The radio for the race engineer side of the lap: battles, contact, track limits, trust. */
+  private reportEngineer(): void {
+    const model = this.daily.model;
+    const lap = this.engine.lap;
+    const corner = overtakingCorners(outlineFor(model.race.id))[0] ?? 1;
+    const lines = engineerRadio(
+      this.engine.notes,
+      lap,
+      this.state.meta.userSide,
+      this.engine.state,
+      engineerConfig(model),
+      corner,
+    );
+    // The same line from the same voice within a few laps is left out (a long battle).
+    const recent = this.state.radio.filter((m) => m.lap >= lap - 3);
+    for (const l of lines) {
+      if (recent.some((m) => m.from === l.from && m.text === l.text)) continue;
+      this.say(l.from, l.text, false, lap);
+    }
+  }
+
   /** Answer the current decision moment with one of its options, then resume. */
   choose(optionId: string): void {
     const moment = this.state.currentMoment;
@@ -207,28 +253,69 @@ export class GameSession {
    * never reaches the call log. A call already booked for the coming lap is ignored. An answer
    * to a quick call (`asked`: the driver or engineer asked for the order) is always followed.
    */
-  call(decision: Decision, options: { asked?: boolean } = {}): void {
+  call(decision: Decision, options: { asked?: boolean; quiet?: boolean } = {}): void {
     if (this.state.phase !== 'racing') return;
-    if (decision.kind === 'pit' || decision.kind === 'mode') {
-      const side = this.state.meta.userSide;
-      const car = this.engine.state.cars[side];
-      if (!car || car.retired) return;
-      const booked = this.engine.decisions.some(
-        (d) =>
-          d.lap === decision.lap &&
-          d.kind === decision.kind &&
-          (d.kind === 'pit' ||
-            (decision.kind === 'mode' && d.kind === 'mode' && d.key === decision.key)),
-      );
-      if (booked) return;
-      const no = options.asked
-        ? null
-        : refusal(this.daily.seed, this.engine.lap, decision, car, ignoreRate(side));
-      this.say(side, no ?? acknowledge(decision), !!no, decision.lap);
-      if (no) return;
+    const side = this.state.meta.userSide;
+    const car = this.engine.state.cars[side];
+    if (decision.kind !== 'radio' && (!car || car.retired)) return;
+    if (decision.kind === 'pit') {
+      // One stop at a time: none while one is called or under way (pit fix).
+      const lap = this.engine.lap;
+      const called = this.engine.decisions.some((d) => d.kind === 'pit' && d.lap > lap);
+      if (called || car?.strategy.some((s) => s.lap > lap)) return;
+      if (decision.lap >= this.daily.model.race.laps) {
+        this.say('Engineer', 'Too late to box: this is the last lap.', false, decision.lap);
+        return;
+      }
+    }
+    // One call of a kind per lap (a mode: one per key).
+    const booked = this.engine.decisions.some(
+      (d) =>
+        d.lap === decision.lap &&
+        d.kind === decision.kind &&
+        (d.kind !== 'mode' || (decision.kind === 'mode' && d.key === decision.key)),
+    );
+    if (booked) return;
+    if (
+      car &&
+      (decision.kind === 'pit' || decision.kind === 'mode' || decision.kind === 'battle')
+    ) {
+      // The driver may refuse the wall's orders, more so the angrier he is.
+      const cfg = engineerConfig(this.daily.model);
+      const eng = this.engine.state.engineer;
+      const mood = eng && cfg ? moodOf(cfg, eng.trust) : 'tense';
+      const rate = Math.min(0.9, ignoreRate(side) * MOOD_REFUSALS[mood]);
+      const no =
+        options.asked || (decision.kind === 'battle' && decision.driver)
+          ? null
+          : refusal(this.daily.seed, this.engine.lap, decision, car, rate);
+      // A stop booked past this lap's pit entry is for the next one: say so.
+      const copy =
+        decision.kind === 'pit' && decision.lap > this.engine.lap + 1
+          ? `Copy, box next lap for ${decision.compound.toLowerCase()}s.`
+          : acknowledge(decision);
+      if (!options.quiet || no) this.say(side, no ?? copy, !!no, decision.lap);
+      if (no) {
+        // Refusing a battle call, he makes his own move.
+        if (decision.kind === 'battle') {
+          const own = ownMove(
+            side,
+            ['dive-inside', 'round-outside', 'wait-drs', 'overtake-button'].includes(decision.move),
+          );
+          this.engine.apply({ lap: decision.lap, kind: 'battle', move: own, driver: true });
+          this.dispatch({
+            type: 'CALL',
+            race: this.engine.state,
+            decisions: this.engine.decisions,
+          });
+        }
+        return;
+      }
     }
     this.engine.apply(decision);
     this.dispatch({ type: 'CALL', race: this.engine.state, decisions: this.engine.decisions });
+    if (decision.kind === 'teamOrder')
+      this.say('Engineer', ORDER_COPY[decision.order], false, decision.lap);
   }
 
   private say(from: string, text: string, refused: boolean, lap: number): void {

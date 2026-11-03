@@ -2,6 +2,8 @@
 
 export * from './types.js';
 export { mulberry32, deriveSeed } from './rng.js';
+export { battlesFor, isAttack, isDefend, lappedAhead, moodOf, startTrust } from './engineer.js';
+export type { EngineerConfig, MoodEffect, MoveEffect } from './engineer.js';
 export type { Rng } from './rng.js';
 export {
   DEFAULT_MODES,
@@ -9,6 +11,7 @@ export {
   cleanLap,
   DRY_COMPOUNDS,
   decide,
+  engineerConfig,
   forkRun,
   initRun,
   isFinished,

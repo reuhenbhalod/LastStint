@@ -5,6 +5,7 @@
 import { type Context, Hono } from 'hono';
 import { cors } from 'hono/cors';
 import type { ContentfulStatusCode } from 'hono/utils/http-status';
+import { adminEmails, registerAdmin } from './admin.js';
 import { verifyGoogleToken } from './auth.js';
 import { isDate, isPlayable, playableDates } from './dates.js';
 import { LEADERBOARD_SIZE, dailyStats, getDaily, getRun, leaderboard } from './db.js';
@@ -30,6 +31,8 @@ export interface Env {
   GOOGLE_CLIENT_ID?: string;
   /** JWKS to trust instead of Google's published keys (tests only). */
   GOOGLE_JWKS?: string;
+  /** Admins (src/admin.ts): Google account emails, comma-separated. */
+  ADMIN_EMAILS?: string;
 }
 
 /** Largest accepted POST /api/runs body. */
@@ -51,7 +54,7 @@ app.use(
       return allowed.includes(origin) ? origin : null;
     },
     allowMethods: ['GET', 'POST', 'OPTIONS'],
-    allowHeaders: ['Content-Type'],
+    allowHeaders: ['Content-Type', 'Authorization'],
     maxAge: 86400,
   }),
 );
@@ -84,6 +87,8 @@ async function cached(
   }
   return res;
 }
+
+registerAdmin(app);
 
 app.get('/api/health', async (c) =>
   c.json({ ok: true, queueDays: await queueDays(c.env.DB, Date.now()) }),
@@ -151,7 +156,9 @@ app.get('/api/runs/:date/:anonId', async (c) => {
 });
 
 // POST /api/auth/google: sign in with a Google ID token; links this browser's anonId to the
-// account and returns the account's player ID, which the browser adopts.
+// account and returns the account's player ID, which the browser adopts. `admin` says the
+// account is on ADMIN_EMAILS (verified by Google): the browser then keeps the token for the
+// admin page and shows the Admin button.
 app.post('/api/auth/google', async (c) => {
   const clientId = c.env.GOOGLE_CLIENT_ID;
   if (!clientId) throw new ApiError(503, 'auth-off', 'sign-in is not set up');
@@ -169,11 +176,14 @@ app.post('/api/auth/google', async (c) => {
   const keys = c.env.GOOGLE_JWKS ? JSON.parse(c.env.GOOGLE_JWKS).keys : undefined;
   const who = await verifyGoogleToken(credential, clientId, Date.now(), keys);
   if (!who) throw new ApiError(401, 'bad-credential');
-  return c.json(await signIn(c.env.DB, who, anonId, Date.now()));
+  const account = await signIn(c.env.DB, who, anonId, Date.now());
+  const admin = who.emailVerified && adminEmails(c.env).includes(who.email.toLowerCase());
+  return c.json({ ...account, admin });
 });
 
 // GET /api/players/:anonId?today=YYYY-MM-DD: the player's account (if signed in) and streak,
-// counted to the player's local date.
+// counted to the player's local date. An admin account says so (it shows the Admin button;
+// every admin action still checks a Google token).
 app.get('/api/players/:anonId', async (c) => {
   const anonId = c.req.param('anonId');
   const today = c.req.query('today');
@@ -182,7 +192,11 @@ app.get('/api/players/:anonId', async (c) => {
     accountOf(c.env.DB, anonId),
     playedDates(c.env.DB, anonId),
   ]);
-  return c.json({ account, streak: streakOf(dates, today) });
+  const admin = !!account && adminEmails(c.env).includes(account.email.toLowerCase());
+  return c.json({
+    account: account && { ...account, admin },
+    streak: streakOf(dates, today),
+  });
 });
 
 // GET /api/daily/:date/stats: how everyone played the day.

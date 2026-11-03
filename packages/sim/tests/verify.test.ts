@@ -4,7 +4,8 @@
 import { describe, expect, it } from 'vitest';
 import abuJson from '../../../data/races/abu-dhabi-2021.json';
 import { playDailyRace } from '../examples/daily-race.js';
-import { decide, initRun } from '../src/sim.js';
+import { battlesFor } from '../src/engineer.js';
+import { type Run, decide, engineerConfig, initRun } from '../src/sim.js';
 import type { Decision, RaceModel } from '../src/types.js';
 import { VerifyError, verifyRun } from '../src/verify.js';
 
@@ -231,6 +232,30 @@ describe('verifyRun', () => {
     });
     const v = verifyRun(abu, abu.race.seed, withLive, SAMPLES);
     expect(v.moments[0]?.chosen).toBe('box-soft');
+  });
+
+  it('replays and re-grades a run full of race engineer calls exactly', () => {
+    // A battle move every lap there's a car within a second, track-limit care, a lapped car,
+    // and a turned-down request: the server's replay (full re-grade, no claimed grades) must
+    // match the game's result, grades and score, trust and all.
+    const cfg = engineerConfig(abu);
+    if (!cfg) throw new Error('no engineer config');
+    const between = (run: Run) => {
+      const next = run.state.lap + 1;
+      const b = battlesFor(run.state, abu, cfg);
+      if (b.ahead) decide(run, { lap: next, kind: 'battle', move: 'dive-inside' });
+      else if (b.behind) decide(run, { lap: next, kind: 'battle', move: 'defend-hard' });
+      if (next === 40) decide(run, { lap: next, kind: 'limits', careful: true });
+      if (next === 42) decide(run, { lap: next, kind: 'reply', request: 'push', yes: false });
+      if (next % 3 === 0) decide(run, { lap: next, kind: 'blue', action: 'go-round' });
+    };
+    const played = play(abu, { 'sc-stop': 'box-soft' }, between as never);
+    expect(played.decisions.some((d) => d.kind === 'battle')).toBe(true);
+    const wire = JSON.parse(JSON.stringify(played.decisions));
+    const v = verifyRun(abu, abu.race.seed, wire, SAMPLES);
+    expect(v.result).toEqual(played.result);
+    expect(v.score).toEqual(played.score);
+    expect(v.moments.map((m) => m.grade)).toEqual(played.calls.map((c) => c.grade));
   });
 
   it('verifies the shipped seven-moment Abu Dhabi run', () => {

@@ -7,10 +7,11 @@
 // map so the call is always in reach.
 
 import type { DecisionMoment, RaceModel, RaceState } from '@boxthislap/sim';
-import { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { briefFor } from '../game/brief.js';
 import { choicesFor, tyreName } from '../game/choices.js';
-import { modeLine, modeOf, tyreOutlooks } from '../game/guide.js';
+import { type Fact, modeFacts, tyreOutlooks } from '../game/guide.js';
+import { HeadsetIcon } from './Icons.js';
 
 const LETTER: Record<string, string> = { SOFT: 'S', MEDIUM: 'M', HARD: 'H' };
 
@@ -39,11 +40,11 @@ function Tile({
   );
 }
 
-// Option buttons: number, label, then what it does. Each button spans two rows of the options
-// grid (a subgrid), so across a row every label sits in one band and every note starts on one
-// line, however many lines each takes.
+// Option buttons, all laid out the same: the call, then the same four facts for every option
+// (pace, tyres, racing, risk; game/guide.ts), so a row of options compares straight across.
+// Each button spans two rows of the options grid (a subgrid): the facts start on one line.
 const optBtn =
-  'relative row-span-2 grid grid-rows-subgrid gap-y-1.5 rounded-lg border-2 border-transparent bg-[var(--ink)] px-3 pb-3 pt-6 text-center text-[var(--paper)] hover:border-[var(--you)] focus-visible:border-[var(--you)] focus-visible:outline-none';
+  'relative row-span-2 grid grid-rows-subgrid gap-y-2 rounded-lg border-2 border-transparent bg-[var(--ink)] p-3 text-left text-[var(--paper)] hover:border-[var(--you)] focus-visible:border-[var(--you)] focus-visible:outline-none';
 
 /** Options side by side on a wide screen. */
 const WIDE: Record<number, string> = {
@@ -72,41 +73,70 @@ export function DecisionPanel({
 
   // The top-level buttons, with Box in the stop options' place.
   const me = race.cars[model.userSide];
-  const top: Array<{ id: string; label: string; note: string | null; act: () => void }> =
-    c.direct.map((o) => {
-      const mode = modeOf(o.decisions);
-      // Several headset calls at once (push and attack): each one's effects, once each.
-      const modes = o.decisions.flatMap((d) =>
-        d.kind === 'mode' ? (modeLine(model, d.key, d.value)?.split(' · ') ?? []) : [],
-      );
-      return {
-        id: o.id,
-        // "Stay out — keep the lead" reads long beside its note: the note carries the detail.
-        label: o.decisions.length === 0 ? (o.label.split(' — ')[0] ?? o.label) : o.label,
-        note: mode
-          ? modeLine(model, mode.key, mode.value)
-          : modes.length
-            ? [...new Set(modes)].join(' · ')
-            : o.decisions.length === 0 && moment.trigger === 'takeover'
-              ? 'Standard pace: react to the race as it comes'
-              : o.decisions.length === 0 && me
-                ? `Keep track position on ${me.tyreAge}-lap-old ${tyreName(me.compound).toLowerCase()}`
-                : null,
-        act: () => onChoose(o.id),
-      };
-    });
+  const oldTyres = me
+    ? `${me.tyreAge}-lap-old ${tyreName(me.compound).toLowerCase()}`
+    : 'Current set';
+  const worn = !!me && me.tyreWear >= (model.compounds[me.compound]?.cliffLap ?? 99);
+  const top: Array<{
+    id: string;
+    label: string;
+    note: string | null;
+    facts: Fact[];
+    act: () => void;
+  }> = c.direct.map((o) => {
+    const calls = o.decisions.flatMap((d) =>
+      d.kind === 'mode' ? [{ key: d.key, value: d.value }] : [],
+    );
+    const facts: Fact[] = calls.length
+      ? modeFacts(model, calls)
+      : moment.trigger === 'takeover'
+        ? [
+            { label: 'Pace', value: 'Standard', tone: 'neutral' },
+            { label: 'Tyres', value: 'Normal wear', tone: 'neutral' },
+            { label: 'Racing', value: 'Adapt', tone: 'neutral' },
+            { label: 'Risk', value: 'Normal', tone: 'neutral' },
+          ]
+        : [
+            { label: 'Pace', value: 'Same', tone: 'neutral' },
+            { label: 'Tyres', value: oldTyres, tone: worn ? 'bad' : 'neutral' },
+            { label: 'Racing', value: 'Keep track position', tone: 'good' },
+            {
+              label: 'Risk',
+              value: worn ? 'Worn tyres' : 'Normal',
+              tone: worn ? 'bad' : 'neutral',
+            },
+          ];
+    return {
+      id: o.id,
+      // "Stay out, keep the lead": the facts carry the detail.
+      label: o.decisions.length === 0 ? (o.label.split(', ')[0] ?? o.label) : o.label,
+      note: facts.map((f) => `${f.label}: ${f.value}`).join(' · '),
+      facts,
+      act: () => onChoose(o.id),
+    };
+  });
   c.boxes.forEach((box, i) => {
     const only = box.tyres.length === 1 ? box.tyres[0] : null;
-    const tyres = only ? ` · ${tyreName(only.compound).toLowerCase()}` : ' · pick tyres next';
+    const stop = b.stop ? `−${b.stop.now.toFixed(0)}s in the pits` : 'Pit stop';
+    const facts: Fact[] = [
+      {
+        label: 'Pace',
+        value: box.key === 'now' ? 'Fresh tyres' : 'One lap, then fresh',
+        tone: 'good',
+      },
+      {
+        label: 'Tyres',
+        value: only ? `New ${tyreName(only.compound).toLowerCase()}` : 'New set',
+        tone: 'good',
+      },
+      { label: 'Racing', value: stop, tone: 'bad' },
+      { label: 'Risk', value: 'Normal', tone: 'neutral' },
+    ];
     top.splice(c.boxIndex + i, 0, {
       id: `box-${box.key}`,
       label: box.label,
-      note:
-        box.key === 'now'
-          ? b.stop
-            ? `Stop costs ~${b.stop.now.toFixed(0)} s now${tyres}`
-            : null
-          : `One more lap on these tyres first${tyres}`,
+      note: facts.map((f) => `${f.label}: ${f.value}`).join(' · '),
+      facts,
       act: () => (only ? onChoose(only.option.id) : setPicking(box.key)),
     });
   });
@@ -142,7 +172,7 @@ export function DecisionPanel({
       className="decision card flex flex-col gap-2 shadow-2xl md:gap-3"
     >
       <p className="eyebrow !text-[var(--rival)]">
-        📻 Lap {moment.lap} · {b.kind}
+        <HeadsetIcon size={14} /> Lap {moment.lap} · {b.kind}
       </p>
       <p
         id="decision-headline"
@@ -162,7 +192,7 @@ export function DecisionPanel({
           }
         >
           <span className="mono text-[17px] font-semibold md:text-[20px]">
-            {gap === null ? '—' : `${gap >= 0 ? '+' : '−'}${Math.abs(gap).toFixed(1)}s`}
+            {gap === null ? '-' : `${gap >= 0 ? '+' : '−'}${Math.abs(gap).toFixed(1)}s`}
           </span>
         </Tile>
         <Tile label="Laps left">
@@ -205,33 +235,40 @@ export function DecisionPanel({
       </div>
 
       {!picking ? (
-        <div
-          className={`grid gap-x-2 gap-y-2 ${top.length === 3 ? 'grid-cols-3' : 'grid-cols-2'} ${WIDE[top.length] ?? ''}`}
-        >
-          {top.map((t, i) => (
-            <button
-              key={t.id}
-              ref={i === 0 ? first : undefined}
-              type="button"
-              onClick={t.act}
-              aria-label={t.label}
-              title={t.note ?? undefined}
-              className={`${optBtn} ${t.id.startsWith('box-') ? '!bg-[var(--box)] !text-white' : ''}`}
-            >
-              <span
-                aria-hidden="true"
-                className="mono absolute left-2.5 top-1.5 text-[10px] opacity-60"
+        <div className={`grid gap-x-2 gap-y-2 grid-cols-2 ${WIDE[top.length] ?? ''}`}>
+          {top.map((t, i) => {
+            const box = t.id.startsWith('box-');
+            return (
+              <button
+                key={t.id}
+                ref={i === 0 ? first : undefined}
+                type="button"
+                onClick={t.act}
+                aria-label={t.label}
+                title={t.note ?? undefined}
+                className={`${optBtn} ${box ? '!bg-[var(--box)] !text-white' : ''}`}
               >
-                {i + 1}
-              </span>
-              <span
-                className={`disp flex items-center justify-center leading-[1.1] ${top.length === 3 ? 'text-[14px] md:text-[15px]' : 'text-[16px] md:text-[17px]'}`}
-              >
-                {t.label}
-              </span>
-              <span className="text-[12px] font-medium leading-snug opacity-75">{t.note}</span>
-            </button>
-          ))}
+                <span className="flex items-start justify-between gap-2">
+                  <span className="disp text-[15px] leading-[1.15]">{t.label}</span>
+                  <span aria-hidden="true" className="mono pt-0.5 text-[10px] opacity-50">
+                    {i + 1}
+                  </span>
+                </span>
+                <dl className="m-0 grid grid-cols-[auto_1fr] gap-x-2 gap-y-0.5 text-[12px] leading-snug">
+                  {t.facts.map((f) => (
+                    <Fragment key={f.label}>
+                      <dt className="opacity-55">{f.label}</dt>
+                      <dd
+                        className={`m-0 font-semibold ${box ? '' : f.tone === 'good' ? 'text-[#0d8a7c]' : f.tone === 'bad' ? 'text-[#c0392b]' : ''}`}
+                      >
+                        {f.value}
+                      </dd>
+                    </Fragment>
+                  ))}
+                </dl>
+              </button>
+            );
+          })}
         </div>
       ) : (
         <div className="flex flex-col gap-2">
@@ -251,47 +288,61 @@ export function DecisionPanel({
                   ref={i === 0 ? first : undefined}
                   type="button"
                   onClick={() => onChoose(t.option.id)}
-                  className="relative grid grid-cols-[auto_1fr_auto] items-start gap-x-3 gap-y-1 rounded-lg border-2 border-transparent bg-[var(--card-2)] p-2.5 text-left hover:border-[var(--you)] focus-visible:border-[var(--you)] focus-visible:outline-none"
+                  className="relative flex flex-col gap-2.5 rounded-lg border-2 border-transparent bg-[var(--card-2)] p-3 text-left hover:border-[var(--you)] focus-visible:border-[var(--you)] focus-visible:outline-none"
                   aria-label={tyreName(t.compound)}
                 >
-                  <span
-                    className={`tyre ${t.compound} mt-0.5 !h-8 !w-8 !border-[4px] bg-[var(--tarmac)] !text-[12px]`}
-                  >
-                    {LETTER[t.compound] ?? t.compound[0]}
-                  </span>
-                  <span className="min-w-0">
-                    <span className="disp block text-[16px] leading-none">
+                  {/* Head: the tyre, its name, and what it gains. */}
+                  <span className="flex items-center gap-2.5">
+                    <span
+                      className={`tyre ${t.compound} !h-8 !w-8 !border-[4px] bg-[var(--tarmac)] !text-[12px]`}
+                    >
+                      {LETTER[t.compound] ?? t.compound[0]}
+                    </span>
+                    <span className="disp flex-1 text-[17px] leading-none">
                       <span aria-hidden="true" className="mono mr-1.5 text-[10px] opacity-60">
                         {i + 1}
                       </span>
                       {tyreName(t.compound)}
                     </span>
-                    {o && (
-                      <span className="mt-1 block text-[12px] leading-snug text-[var(--muted)]">
-                        {o.newPace < 0.005
-                          ? 'Fastest when new'
-                          : `+${o.newPace.toFixed(2)} s a lap vs softs`}{' '}
-                        · drops off after ~{o.dropOff} laps ·{' '}
-                        <span className={o.toFlag ? 'text-[var(--you)]' : 'text-[var(--box)]'}>
-                          {o.toFlag ? 'lasts to the flag' : `won’t last ${b.lapsLeft} laps`}
+                    {o?.gain != null && (
+                      <span className="ml-auto text-right">
+                        <span className="eyebrow block">Gain</span>
+                        <span className="mono block text-[17px] font-semibold leading-tight">
+                          {o.gain >= 0 ? '+' : '−'}
+                          {Math.abs(o.gain).toFixed(1)}s
                         </span>
                       </span>
                     )}
-                    {o && (
-                      <span className="mt-1 block text-[12px] leading-snug">
-                        <span className="text-[var(--you)]">Good:</span> {o.good}{' '}
-                        <span className="text-[var(--box)]">Bad:</span> {o.bad}
-                      </span>
-                    )}
                   </span>
-                  {o?.gain != null && (
-                    <span className="text-right">
-                      <span className="eyebrow block">Gain</span>
-                      <span className="mono block text-[16px] font-semibold">
-                        {o.gain >= 0 ? '+' : '−'}
-                        {Math.abs(o.gain).toFixed(1)}s
+                  {o && (
+                    <>
+                      {/* The facts, as chips. */}
+                      <span className="flex flex-wrap gap-1.5 text-[12px]">
+                        <span className="rounded bg-[var(--card)] px-1.5 py-0.5">
+                          {o.newPace < 0.005
+                            ? 'Fastest when new'
+                            : `+${o.newPace.toFixed(2)}s/lap vs softs`}
+                        </span>
+                        <span className="rounded bg-[var(--card)] px-1.5 py-0.5">
+                          Drops off ~{o.dropOff} laps
+                        </span>
+                        <span
+                          className={`rounded bg-[var(--card)] px-1.5 py-0.5 ${o.toFlag ? 'text-[var(--you)]' : 'text-[var(--box-ink)]'}`}
+                        >
+                          {o.toFlag ? 'Lasts to the flag' : `Won’t last ${b.lapsLeft} laps`}
+                        </span>
                       </span>
-                    </span>
+                      <span className="flex flex-col gap-1 text-[12.5px] leading-snug">
+                        <span>
+                          <span className="font-semibold text-[var(--you)]">Good </span>
+                          {o.good}
+                        </span>
+                        <span className="text-[var(--muted)]">
+                          <span className="font-semibold text-[var(--box-ink)]">Bad </span>
+                          {o.bad}
+                        </span>
+                      </span>
+                    </>
                   )}
                 </button>
               );

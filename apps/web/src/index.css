@@ -27,6 +27,8 @@
   --medium: #f2c230;
   --hard: #e9ece9;
   --box: #d4432f;
+  /* --box as text: the same red, light enough to read on the cards (5:1 and up). */
+  --box-ink: #f07462;
   /* One family, Archivo (feedback round 2): wide and heavy for headlines and big numbers (the
      F1 broadcast look), normal width for text, lined-up figures for timing. */
   --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
@@ -163,6 +165,37 @@ label:has(input) {
 .quick-call {
   animation: rise 0.25s ease-out, radio-flash 1.2s ease-in-out 0.25s 1;
 }
+/* A battle on the map (race engineer spec): the corner and the other car pulse; the result
+   pops up at the corner. */
+@keyframes battle-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+.battle-ring {
+  animation: battle-pulse 0.9s ease-in-out infinite;
+}
+@keyframes battle-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  15%,
+  80% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.battle-flash > * {
+  animation: battle-pop 4s ease-out forwards;
+}
 /* One card style for the call column (crew-chief spec D4). In the components layer, so
    utilities (a highlight border) still win. */
 @layer components {
@@ -191,4 +224,15 @@ label:has(input) {
    backdrop (its own colour scheme is light); matching the scheme makes it transparent. */
 .gsi-button iframe {
   color-scheme: light;
+}
+
+/* A chequered strip (the home page's hero). */
+.checker {
+  background-image: conic-gradient(
+    var(--ink) 25%,
+    transparent 0 50%,
+    var(--ink) 0 75%,
+    transparent 0
+  );
+  background-size: 16px 16px;
 }

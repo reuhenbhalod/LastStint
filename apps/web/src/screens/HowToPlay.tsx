@@ -1,39 +1,27 @@
-// How to play (feedback round 2, A4): a short walkthrough over the daily card. It opens by
-// itself on a player's first visit, and "How to play" reopens it. Remembered per browser; if
-// storage is blocked it just shows again next time.
+// How to play: a short walkthrough over the daily card. It opens every time the daily card
+// shows (Skip closes it), and "How to play" reopens it.
 
 import { useEffect, useState } from 'react';
-
-const SEEN = 'pitwall:how-to-play';
-
-export function seenHowToPlay(): boolean {
-  try {
-    return localStorage.getItem(SEEN) === '1';
-  } catch {
-    return false;
-  }
-}
-
-function markSeen(): void {
-  try {
-    localStorage.setItem(SEEN, '1');
-  } catch {
-    // ignore: storage blocked
-  }
-}
 
 interface Step {
   title: string;
   body: string[];
 }
 
-function steps(team: string, user: string, rival: string, realPos: number, laps: number): Step[] {
+function steps(
+  team: string,
+  user: string,
+  rival: string,
+  realPos: number,
+  laps: number,
+  goal: string,
+): Step[] {
   return [
     {
-      title: `You’re the ${team} team manager`,
+      title: `You’re ${user}’s race engineer`,
       body: [
-        `A real race, as it really was, until you take over the pit wall with ${laps} laps to go.`,
-        `Your goal: finish ahead of ${rival}${realPos ? `, and do better than the real ${team} pit wall did (P${realPos})` : ''}.`,
+        `A real race, as it really was, until you take over ${user}’s radio at ${team} with ${laps} laps to go.`,
+        `Your goal: ${goal}${realPos ? `, and do better than the real ${team} pit wall did (P${realPos})` : ''}.`,
       ],
     },
     {
@@ -51,17 +39,24 @@ function steps(team: string, user: string, rival: string, realPos: number, laps:
       ],
     },
     {
-      title: 'Quick calls and your controls',
+      title: 'Run the car, lap by lap',
       body: [
-        'Between the big calls the radio asks quick questions. Answer before the timer runs out.',
-        'BOX (under the map) and the headset (on the map: pace, battle, ERS, fuel) are always yours. Drivers don’t always listen: each one ignores a share of calls, from their real team-radio history.',
+        'Between the big calls the radio keeps coming: a car within a second means a battle (cover the inside, go round the outside, wait for DRS), and there’s damage, track limits, lapped cars, and your driver asking for things. Answer before the timer runs out, or he decides himself.',
+        'BOX and the team radio (pace, battle, ERS, fuel) are always yours.',
+      ],
+    },
+    {
+      title: 'Keep your driver on side',
+      body: [
+        'Your driver’s trust in you rises when your calls work and drops when they don’t: a failed dive, contact, letting the rival go, saying no when he was right.',
+        'Calm, he listens. Frustrated, he overdrives and makes mistakes. Furious, he ignores you and races his own way.',
       ],
     },
     {
       title: 'How you’re graded',
       body: [
         'At each big call the simulator plays every option hundreds of times. Your call is graded against the best one, not on luck.',
-        '🟩 best call · 🟨 close · 🟧 costly · 🟥 big miss. One race a day; come back tomorrow to build your streak.',
+        'Each call gets a grade: best call, close, costly or big miss. One race a day; come back tomorrow to build your streak.',
       ],
     },
   ];
@@ -73,6 +68,7 @@ export function HowToPlay({
   rival,
   realPos,
   laps,
+  goal,
   onClose,
 }: {
   team: string;
@@ -80,16 +76,15 @@ export function HowToPlay({
   rival: string;
   realPos: number;
   laps: number;
+  /** What you race for, as a phrase ("finish ahead of VER"). */
+  goal: string;
   onClose: () => void;
 }) {
-  const all = steps(team, user, rival, realPos, laps);
+  const all = steps(team, user, rival, realPos, laps, goal);
   const [i, setI] = useState(0);
   const step = all[i] as Step;
   const last = i === all.length - 1;
-  const close = () => {
-    markSeen();
-    onClose();
-  };
+  const close = onClose;
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') close();

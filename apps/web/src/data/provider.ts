@@ -90,3 +90,27 @@ export class ApiDailyProvider implements DailyProvider {
     };
   }
 }
+
+/** Every race file, loaded on demand (practice on any playable race, `?race=` on localhost). */
+const RACE_FILES = import.meta.glob<{ default: RaceModel }>('../../../../data/races/*.json');
+
+/** Practice on a chosen race file (`?race=canada-2022&seed=…`: localhost, or an admin). */
+export class RaceFileProvider implements DailyProvider {
+  constructor(
+    private readonly raceId: string,
+    private readonly seed?: number,
+  ) {}
+
+  async today(): Promise<Daily> {
+    const load = RACE_FILES[`../../../../data/races/${this.raceId}.json`];
+    if (!load) throw new Error(`no race file ${this.raceId}`);
+    const model = (await load()).default;
+    const daily = await new StaticDailyProvider(
+      model,
+      `Practice on ${model.race.name ?? this.raceId}`,
+    ).today();
+    return this.seed !== undefined && Number.isInteger(this.seed)
+      ? { ...daily, seed: this.seed }
+      : daily;
+  }
+}

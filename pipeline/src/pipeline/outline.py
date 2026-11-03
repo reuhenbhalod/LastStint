@@ -81,6 +81,57 @@ def pit_lane(
     return in_lap[start:] + out_lap[: end + 1]
 
 
+PIT_MAX_STEP = 400  # position units (40 m): a longer jump between samples is a data gap
+PIT_MIN_SPAN = 1000  # the lane covers at least 100 m
+PIT_END_NEAR = 400  # its ends are within 40 m of the racing line
+
+
+def valid_pit(path: list[tuple[float, float]], lap: list[tuple[float, float]]) -> bool:
+    """A usable pit-lane trace: enough points, no jumps (dropped position data), a real length,
+    and both ends near the track (where the lane leaves and rejoins it)."""
+    if len(path) < 15:
+        return False
+    if any(math.dist(a, b) > PIT_MAX_STEP for a, b in zip(path, path[1:], strict=False)):
+        return False
+    xs = [p[0] for p in path]
+    ys = [p[1] for p in path]
+    if max(max(xs) - min(xs), max(ys) - min(ys)) < PIT_MIN_SPAN:
+        return False
+    return all(min(math.dist(p, q) for q in lap) < PIT_END_NEAR for p in (path[0], path[-1]))
+
+
+def frozen_pit_lane(
+    lap: list[tuple[float, float]],
+    in_lap: list[tuple[float, float]],
+    out_lap: list[tuple[float, float]],
+) -> list[tuple[float, float]]:
+    """A stand-in pit lane for seasons whose position data freezes in the pit lane (2019: a
+    car's position sticks at one point from pit entry to pit exit). Where the in-lap's
+    position froze is the pit entry, where the out-lap's comes back is the exit; the lane
+    follows the racing line between them (the map draws it beside the track)."""
+    if len(in_lap) < 3 or len(out_lap) < 3:
+        return []
+    frozen = in_lap[-1]
+    i = len(in_lap) - 1
+    while i > 0 and in_lap[i] == frozen:
+        i -= 1
+    j = 0
+    while j < len(out_lap) - 1 and out_lap[j] == frozen:
+        j += 1
+    if i == len(in_lap) - 1 or j == 0:
+        return []  # nothing froze: not this case
+
+    def nearest(p: tuple[float, float]) -> int:
+        return min(range(len(lap)), key=lambda k: math.dist(p, lap[k]))
+
+    a, b = nearest(in_lap[i]), nearest(out_lap[j])
+    n = len(lap)
+    span = (b - a) % n
+    if span == 0 or span > n // 3:  # a pit lane is a short stretch, not a third of a lap
+        return []
+    return [lap[(a + k) % n] for k in range(span + 1)]
+
+
 def fetch_outline(year: int, event: str, driver: str | None = None, step: int = 3) -> dict:
     """One fast lap's positions from FastF1 (network on first use; cached after)."""
     import fastf1
@@ -95,15 +146,37 @@ def fetch_outline(year: int, event: str, driver: str | None = None, step: int = 
         return [(float(x), float(y)) for x, y in lap.get_pos_data()[["X", "Y"]].to_numpy()]
 
     full = xy_of(fastest)
-    # The same driver's first stop: its in-lap ends in the pit lane, its out-lap starts there.
-    mine = session.laps.pick_drivers(fastest["Driver"])
-    stops = mine[mine["PitInTime"].notna()]
-    pit = []
-    if len(stops):
-        n = int(stops.iloc[0]["LapNumber"])
-        in_lap, out_lap = mine[mine["LapNumber"] == n], mine[mine["LapNumber"] == n + 1]
-        if len(in_lap) and len(out_lap):
-            pit = pit_lane(full, xy_of(in_lap), xy_of(out_lap))[::step]
+    # The pit lane from a stop's in-lap and out-lap: the fastest driver's stops first, then
+    # everyone else's, until one traces cleanly (position data can drop out in the pits).
+    pit: list[tuple[float, float]] = []
+    order = [fastest["Driver"]] + [
+        d for d in session.laps["Driver"].unique() if d != fastest["Driver"]
+    ]
+    for code in order:
+        mine = session.laps.pick_drivers(code)
+        for n in mine[mine["PitInTime"].notna()]["LapNumber"]:
+            in_lap = mine[mine["LapNumber"] == int(n)]
+            out_lap = mine[mine["LapNumber"] == int(n) + 1]
+            if not len(in_lap) or not len(out_lap):
+                continue
+            try:
+                path = pit_lane(full, xy_of(in_lap), xy_of(out_lap))
+            except Exception:  # noqa: BLE001 - a lap without position data
+                continue
+            if valid_pit(path, full):
+                pit = path[::step]
+                break
+        if pit:
+            break
+    if not pit:
+        # No clean trace (2019: positions freeze in the pit lane): stand one in from where
+        # the fastest driver's first stop froze and came back.
+        mine = session.laps.pick_drivers(fastest["Driver"])
+        for n in mine[mine["PitInTime"].notna()]["LapNumber"][:1]:
+            in_lap = mine[mine["LapNumber"] == int(n)]
+            out_lap = mine[mine["LapNumber"] == int(n) + 1]
+            if len(in_lap) and len(out_lap):
+                pit = frozen_pit_lane(full, xy_of(in_lap), xy_of(out_lap))[::step]
     info = session.get_circuit_info()
     corners = [(int(c.Number), float(c.X), float(c.Y)) for c in info.corners.itertuples()]
     return normalize(full[::step], float(info.rotation), corners, pit=pit)

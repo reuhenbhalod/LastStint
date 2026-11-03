@@ -125,7 +125,7 @@ export function reducer(state: GameState, action: Action): GameState {
         decisions: action.decisions,
       };
 
-    case 'CALL': // a BOX / mode flip mid-lap — never pauses
+    case 'CALL': // a BOX / mode flip mid-lap, never pauses
       if (state.phase !== 'racing') return state;
       return { ...state, race: action.race, decisions: action.decisions };
 
@@ -133,7 +133,7 @@ export function reducer(state: GameState, action: Action): GameState {
       return { ...state, speed: action.speed };
 
     case 'RADIO':
-      return { ...state, radio: [...state.radio, action.message].slice(-6) };
+      return { ...state, radio: [...state.radio, action.message].slice(-12) };
 
     case 'GRADED': // grading finishes in a worker, whatever the phase
       return { ...state, grades: { ...state.grades, [action.momentId]: action.graded } };

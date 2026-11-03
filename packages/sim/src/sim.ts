@@ -11,11 +11,23 @@
 // One car's calls never shift another car's draws. The no-decision path is the Python
 // reference sim's; rival policy and headset effects are TS-only.
 
+import {
+  type EngineerConfig,
+  applyEngineerCall,
+  cloneEngineer,
+  isAttack,
+  isDefend,
+  moodEffect,
+  moodOf,
+  newEngineer,
+  validEngineerCall,
+} from './engineer.js';
 import headsetConfig from './headset.json';
 import { type Rng, deriveSeed, mulberry32 } from './rng.js';
 import type {
   CarState,
   Decision,
+  EngineerState,
   FlagState,
   Modes,
   PitStop,
@@ -23,6 +35,7 @@ import type {
   RaceNote,
   RaceResult,
   RaceState,
+  TrustReason,
 } from './types.js';
 
 export const DIRTY_AIR_RANGE = 1.0; // within this gap (s) a car is in dirty air
@@ -45,6 +58,8 @@ export const ERROR_STREAM = 2000;
 export const STOP_STREAM = 4000;
 export const EVENT_STREAM = 5000;
 export const INCIDENT_STREAM = 6000;
+export const CONTACT_STREAM = 7000; // the user's car: contact in a battle (race engineer spec)
+export const LIMITS_STREAM = 8000; // the user's car: track-limit strikes
 // Rival policy (Implementation Plan 2.5): under green the rival covers a stop only if its own
 // next planned stop is within this many laps.
 export const COVER_WINDOW = 4;
@@ -94,6 +109,7 @@ interface HeadsetEra {
   neutralization?: { scPerLap: number; vscPerLap: number; scLaps: number; vscLaps: number };
   ers?: { startBattery: number; scCharge: number };
   incidents?: IncidentRates;
+  engineer?: EngineerConfig;
   teamOrders?: {
     holdUpLogit: number;
     holdUpCost: number;
@@ -104,6 +120,11 @@ interface HeadsetEra {
 }
 
 const HEADSET = headsetConfig as unknown as Record<string, HeadsetEra>;
+
+/** The race engineer config for a model's era (battles, trust...), or null. */
+export function engineerConfig(model: RaceModel): EngineerConfig | null {
+  return HEADSET[model.era]?.engineer ?? null;
+}
 
 /** The headset modes' effects for a model's era (for explaining the options in the game). */
 export function modeEffects(model: RaceModel): HeadsetEra['modes'] | null {
@@ -321,6 +342,13 @@ export function validateDecisions(model: RaceModel, decisions: Decision[]): void
       const orders = ['letTeammatePast', 'teammateLetsYouPast', 'holdUp', 'release'];
       if (!orders.includes(d.order)) throw new Error('unknown team order');
       if (!teammateOf(model)) throw new Error(`${model.userSide} has no teammate in this race`);
+    } else if (
+      d.kind === 'battle' ||
+      d.kind === 'limits' ||
+      d.kind === 'blue' ||
+      d.kind === 'reply'
+    ) {
+      if (!headset?.engineer || !validEngineerCall(d)) throw new Error(`bad ${d.kind} call`);
     } else if (d.kind !== 'radio') {
       throw new Error('unknown decision kind');
     }
@@ -386,6 +414,9 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
   const ers = HEADSET[model.era]?.ers;
   const userCar = cars[model.userSide];
   if (live && ers && userCar) userCar.battery = ers.startBattery;
+  // The race engineer side comes with live play's chaos (incidents): without it the real
+  // calls replay the real race exactly.
+  const engineer = live && options.incidents !== false ? HEADSET[model.era]?.engineer : undefined;
 
   const run: Run = {
     model,
@@ -404,6 +435,7 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
       order: ordered.map((d) => d.code),
       cars,
       teamOrders: { holdUp: false, swap: null },
+      ...(live && engineer ? { engineer: newEngineer(engineer, model.userSide) } : {}),
     },
     events,
     neutral: neutralMap(events),
@@ -539,6 +571,7 @@ export function forkRun(
         holdUp: run.state.teamOrders.holdUp,
         swap: run.state.teamOrders.swap ? { ...run.state.teamOrders.swap } : null,
       },
+      ...(run.state.engineer ? { engineer: cloneEngineer(run.state.engineer) } : {}),
     },
     decisions: [...run.decisions.filter((d) => d.lap > run.state.lap), ...decisions],
     notes: [],
@@ -645,8 +678,23 @@ function applyDecisions(run: Run, lap: number): void {
   if (!run.live) return;
   const user = run.state.cars[run.model.userSide];
   if (!user || user.retired) return;
+  const eng = run.state.engineer;
+  if (eng) {
+    eng.move = null;
+    eng.moveByDriver = false;
+    eng.blue = null;
+  }
   for (const d of run.decisions) {
     if (d.lap !== lap) continue;
+    if (eng) applyEngineerCall(eng, d, lap);
+    if (d.kind === 'reply' && eng) {
+      if (d.yes) trust(run, lap, 'request-yes');
+      else {
+        const rival = run.state.cars[run.model.rival];
+        const gap = rival && !rival.retired ? rival.totalTime - user.totalTime : 0;
+        eng.refused.push({ request: d.request, lap, gap });
+      }
+    }
     if (d.kind === 'mode') {
       (user.modes as unknown as Record<string, string>)[d.key] = d.value;
     } else if (d.kind === 'pit') {
@@ -665,6 +713,44 @@ function applyDecisions(run: Run, lap: number): void {
       }
     }
   }
+  if (eng) engineerBeforeLap(run, lap, user, eng);
+}
+
+/**
+ * Race engineer spec, before the user's lap is run: count recent headset orders (too many in
+ * a few laps and the driver feels micromanaged), and let a furious driver pick his own battle
+ * move when the wall called none.
+ */
+function engineerBeforeLap(run: Run, lap: number, user: CarState, eng: EngineerState): void {
+  const cfg = run.headset?.engineer as EngineerConfig;
+  eng.orders = eng.orders.filter((l) => l > lap - 3);
+  if (eng.orders.length > cfg.trust.ordersLimit && eng.orders.at(-1) === lap) {
+    trust(run, lap, 'micromanaging');
+  }
+  if (eng.move || run.neutral.get(lap) || !moodEffect(cfg, eng.trust)?.rogue) return;
+  const order = live(run);
+  const i = order.indexOf(user.code);
+  const t = (c: string | undefined) => (c ? car(run, c).totalTime : Number.NaN);
+  const ahead = order[i - 1];
+  const behind = order[i + 1];
+  if (ahead && user.totalTime - t(ahead) < cfg.battleWindow) eng.move = 'dive-inside';
+  else if (behind && t(behind) - user.totalTime < cfg.battleWindow) eng.move = 'defend-hard';
+  if (!eng.move) return;
+  eng.moveByDriver = true;
+  run.notes.push({ lap, kind: 'rogue', driver: user.code, detail: eng.move });
+}
+
+/** Move the driver's trust for a reason (its delta in the config); notes it for the game. */
+function trust(run: Run, lap: number, reason: TrustReason, scale = 1): void {
+  const eng = run.state.engineer;
+  const cfg = run.headset?.engineer;
+  if (!eng || !cfg) return;
+  const delta = cfg.trust.deltas[reason] * scale;
+  const next = Math.min(100, Math.max(0, eng.trust + delta));
+  if (next === eng.trust) return;
+  eng.trust = next;
+  eng.lastEvent = lap;
+  run.notes.push({ lap, kind: 'trust', driver: run.model.userSide, detail: reason, value: delta });
 }
 
 /** True while the user's teammate is holding up the rival from directly ahead of it. */
@@ -948,6 +1034,7 @@ export function stepLap(run: Run): RaceState {
   const running = live(run);
   const { prevTime, clean, pitted } = run.scratch;
   pitted.clear();
+  let battle: EngineerLap | null = null;
   for (const code of running) prevTime[code] = (cars[code] as CarState).totalTime;
 
   for (let i = 0; i < running.length; i++) {
@@ -986,10 +1073,20 @@ export function stepLap(run: Run): RaceState {
       c.tyreAge = 0;
       c.tyreWear = 0;
       pitCost = stop.loss ?? stopCost(run, code, flag, stop.added === true, lap);
+      const eng = code === model.userSide ? state.engineer : undefined;
+      if (eng && eng.damage > 0) {
+        // A new nose on the stop: slower than a tyre change alone.
+        pitCost += run.headset?.engineer?.noseCost ?? 0;
+        eng.damage = 0;
+        run.notes.push({ lap, kind: 'nose', driver: code });
+      }
     }
 
     const base = cleanLap(model, c, lap);
-    const modeDelta = flag ? 0 : modeLapDelta(run, c);
+    const eng = code === model.userSide && !flag ? state.engineer : undefined;
+    const lapEng = eng ? engineerLap(run, lap, c, running, i, prevTime, eng) : null;
+    if (lapEng) battle = lapEng;
+    const modeDelta = flag ? 0 : modeLapDelta(run, c) + (lapEng?.pace ?? 0);
     let lt: number;
     if (flag === 'sc' && scTime) lt = scTime;
     else if (flag === 'vsc' && vscTime) lt = vscTime;
@@ -999,14 +1096,14 @@ export function stepLap(run: Run): RaceState {
       const ahead = i > 0 ? (running[i - 1] as string) : code;
       const aheadGap = c.totalTime - (prevTime[ahead] ?? c.totalTime);
       if (aheadGap > 0 && aheadGap < DIRTY_AIR_RANGE) lt += track.dirtyAirPenalty;
-      lt += modeDelta;
+      lt += modeDelta + (lapEng?.extra ?? 0);
       const behind = running[i + 1];
       if (behind && holdingUp(run, code, behind)) {
         const gapBehind = (prevTime[behind] ?? 0) - (prevTime[code] ?? 0);
         if (gapBehind >= 0 && gapBehind < PASS_WINDOW)
           lt += run.headset?.teamOrders?.holdUpCost ?? 0;
       }
-      const errorRate = extraErrorRate(run, c);
+      const errorRate = extraErrorRate(run, c) + (lapEng?.errorRate ?? 0);
       if (errorRate > 0 && run.headset && run.rng.get(ERROR_STREAM, code).next() < errorRate) {
         lt += run.headset.errorCost;
         run.notes.push({ lap, kind: 'error', driver: code });
@@ -1015,7 +1112,7 @@ export function stepLap(run: Run): RaceState {
     clean[code] = base + modeDelta;
     c.totalTime += lt + pitCost;
     c.tyreAge += 1;
-    c.tyreWear += flag ? 1 : modeWearMult(run, c);
+    c.tyreWear += flag ? 1 : modeWearMult(run, c) * (lapEng?.wearMult ?? 1);
     if (c.battery !== undefined) {
       const gain = flag ? (run.headset?.ers?.scCharge ?? 0) : (effect(run, c, 'ers').charge ?? 0);
       c.battery = Math.min(100, Math.max(0, c.battery + gain));
@@ -1053,6 +1150,7 @@ export function stepLap(run: Run): RaceState {
     resolveOrder(run, lap, clean, prevTime, pitted);
     applySwap(run, lap, prevTime);
   }
+  if (state.engineer) engineerAfterLap(run, lap, battle, prevTime, pitted);
   rivalReacts(run, lap, flag, prevTime);
   rivalGoesLong(run, lap);
 
@@ -1110,9 +1208,7 @@ function incidents(run: Run, lap: number, prevTime: Record<string, number>): voi
       c.totalTime += rates.punctureCost;
       if (lap >= model.race.laps) continue; // limps to the flag
       const next = c.strategy.filter((st) => st.lap > lap).sort((a, b) => a.lap - b.lap)[0];
-      const to =
-        next?.to ??
-        (model.compounds.MEDIUM ? 'MEDIUM' : model.compounds.HARD ? 'HARD' : c.compound);
+      const to = next?.to ?? forcedCompound(model, c);
       c.strategy = c.strategy.filter((st) => st !== next && st.lap !== lap + 1);
       c.strategy.push({ lap: lap + 1, to, added: true });
       continue;
@@ -1132,6 +1228,20 @@ function incidents(run: Run, lap: number, prevTime: Record<string, number>): voi
     }
   }
   // The order is settled after the lap (resolveOrder), which drops retired cars to the back.
+}
+
+/**
+ * The tyres a forced stop (a puncture) fits when no stop was planned: mediums, else hards, but
+ * a dry compound the car hasn't run yet if it still needs one for the two-compound rule (a
+ * puncture must never leave the car disqualified).
+ */
+function forcedCompound(model: RaceModel, c: CarState): string {
+  const prefs = ['MEDIUM', 'HARD', 'SOFT'].filter((x) => model.compounds[x]);
+  if (!ruleSatisfied(c)) {
+    const fresh = prefs.find((x) => !c.compoundsUsed.includes(x));
+    if (fresh) return fresh;
+  }
+  return prefs[0] ?? c.compound;
 }
 
 /**
@@ -1193,6 +1303,274 @@ function bunch(
   }
 }
 
+/** The user's lap on the engineer side: what it adds, and the battle it fought (if any). */
+interface EngineerLap {
+  /** Pace change (damage, mood): counts in the pass model's pace advantage. */
+  pace: number;
+  /** Time the lap's calls cost (the battle move, track-limit care, a lapped car, contact). */
+  extra: number;
+  wearMult: number;
+  errorRate: number;
+  /** The car the move was against, when it was a fight (within PASS_WINDOW). */
+  target: string | null;
+  move: EngineerState['move'];
+  byDriver: boolean;
+}
+
+/**
+ * Race engineer spec: the user's green lap. The battle move against the car directly ahead
+ * (attacks) or behind (defences), contact in the fight (a front wing, a puncture or a spin),
+ * a lapped car in the way, a track-limit strike, and the driver's mood. Contact and strikes
+ * each take one draw a green lap from the user's own streams, so the streams don't depend on
+ * the calls.
+ */
+function engineerLap(
+  run: Run,
+  lap: number,
+  c: CarState,
+  running: string[],
+  i: number,
+  prevTime: Record<string, number>,
+  eng: EngineerState,
+): EngineerLap {
+  const cfg = run.headset?.engineer as EngineerConfig;
+  const mood = moodEffect(cfg, eng.trust);
+  const out: EngineerLap = {
+    pace: eng.damage + (mood?.lapDelta ?? 0),
+    extra: eng.careful ? cfg.carefulCost : 0,
+    wearMult: mood?.wearMult ?? 1,
+    errorRate: mood?.errorRate ?? 0,
+    target: null,
+    move: eng.move,
+    byDriver: eng.moveByDriver,
+  };
+  const me = prevTime[c.code] as number;
+  let move = eng.move ? cfg.moves[eng.move] : null;
+  if (eng.move === 'overtake-button' && (c.battery ?? 0) < -(move?.battery ?? 0)) {
+    move = null; // no battery left: an ordinary lap
+    out.move = null;
+    eng.move = null;
+  }
+  const target = isAttack(eng.move)
+    ? running[i - 1]
+    : isDefend(eng.move)
+      ? running[i + 1]
+      : undefined;
+  const fighting =
+    target !== undefined && Math.abs((prevTime[target] as number) - me) < PASS_WINDOW;
+  let contact = 0;
+  if (move && fighting) {
+    out.target = target as string;
+    out.extra += move.lapDelta ?? 0;
+    out.wearMult *= move.wearMult ?? 1;
+    contact = cfg.contactBase * (move.contact ?? 1);
+    if (move.battery && c.battery !== undefined) {
+      c.battery = Math.max(0, c.battery + move.battery);
+    }
+  }
+
+  // A lapped car just ahead on track.
+  const len = run.model.track.greenLapTime ?? cleanLap(run.model, c, lap);
+  let blue: { code: string; gap: number } | null = null;
+  for (let j = i + 1; j < running.length; j++) {
+    const code = running[j] as string;
+    const d = (prevTime[code] as number) - me;
+    if (d < len * 0.5) continue;
+    const x = Math.ceil(d / len) * len - d;
+    if (x > 0 && x < cfg.blue.window && (!blue || x < blue.gap)) blue = { code, gap: x };
+  }
+  if (blue && eng.blue === 'go-round') {
+    // Waiting for the blue flags is what the measured lap times already include; going round
+    // at once gains a little and risks contact.
+    out.extra -= cfg.blue.goRoundGain;
+    contact += cfg.blue.goRoundContact;
+    run.notes.push({
+      lap,
+      kind: 'blue',
+      driver: c.code,
+      other: blue.code,
+      value: -cfg.blue.goRoundGain,
+    });
+  }
+
+  // Contact in the fight.
+  const crng = run.rng.get(CONTACT_STREAM, c.code);
+  if (crng.next() < contact) {
+    const u = crng.next();
+    const other = out.target ?? blue?.code;
+    if (u < cfg.contactWing) {
+      const [lo, hi] = cfg.wingDamage;
+      const dmg = lo + (hi - lo) * crng.next();
+      eng.damage = Math.min(hi * 1.5, eng.damage + dmg);
+      run.notes.push({ lap, kind: 'contact', driver: c.code, detail: 'wing', other, value: dmg });
+    } else if (u < cfg.contactWing + cfg.contactPuncture) {
+      const rates = run.headset?.incidents;
+      out.extra += rates?.punctureCost ?? 20;
+      run.notes.push({ lap, kind: 'contact', driver: c.code, detail: 'puncture', other });
+      if (lap < run.model.race.laps) {
+        const next = c.strategy.filter((st) => st.lap > lap).sort((a, b) => a.lap - b.lap)[0];
+        const to = next?.to ?? forcedCompound(run.model, c);
+        c.strategy = c.strategy.filter((st) => st !== next && st.lap !== lap + 1);
+        c.strategy.push({ lap: lap + 1, to, added: true });
+      }
+    } else {
+      out.extra += cfg.spinCost;
+      run.notes.push({ lap, kind: 'contact', driver: c.code, detail: 'spin', other });
+    }
+    if (out.move && !out.byDriver) trust(run, lap, 'contact');
+  }
+
+  // Track limits.
+  const strike =
+    cfg.strikeBase *
+    (c.modes.pace === 'push' ? cfg.strikePush : 1) *
+    (move && fighting ? (move.strike ?? 1) : 1) *
+    (eng.careful ? cfg.strikeCareful : 1);
+  if (run.rng.get(LIMITS_STREAM, c.code).next() < strike) {
+    eng.strikes += 1;
+    run.notes.push({ lap, kind: 'strike', driver: c.code, value: eng.strikes });
+    const over = eng.strikes - cfg.penaltyAt;
+    if (over >= 0 && over % cfg.penaltyEvery === 0) {
+      eng.penalty += cfg.penalty;
+      run.notes.push({ lap, kind: 'penalty', driver: c.code, value: cfg.penalty });
+      trust(run, lap, 'penalty');
+    } else {
+      trust(run, lap, 'strike');
+    }
+  }
+  return out;
+}
+
+/** The user's battle move (and DRS after waiting) on the pass roll between a and b behind it. */
+function engineerShift(run: Run, lap: number, ahead: string, behind: string): number {
+  const eng = run.state.engineer;
+  const cfg = run.headset?.engineer;
+  if (!eng || !cfg) return 0;
+  const user = run.model.userSide;
+  if (behind === user) {
+    const m = isAttack(eng.move)
+      ? (cfg.moves[eng.move as keyof typeof cfg.moves].attackLogit ?? 0)
+      : 0;
+    return m + (eng.drsLap === lap ? cfg.drsLogit : 0);
+  }
+  if (ahead === user && isDefend(eng.move)) {
+    return cfg.moves[eng.move as keyof typeof cfg.moves].defendLogit ?? 0;
+  }
+  return 0;
+}
+
+/**
+ * Race engineer spec, after the lap: how the battle went (and the driver's trust in the call),
+ * a stop that swapped places with the rival, requests the wall turned down (who was right),
+ * and a calmer driver after some quiet laps.
+ */
+function engineerAfterLap(
+  run: Run,
+  lap: number,
+  battle: EngineerLap | null,
+  prevTime: Record<string, number>,
+  pitted: Set<string>,
+): void {
+  const { model, state } = run;
+  const eng = state.engineer as EngineerState;
+  const cfg = run.headset?.engineer as EngineerConfig;
+  const user = state.cars[model.userSide];
+  if (!user || user.retired) return;
+  const pos = (c: string) => state.order.indexOf(c);
+  const t = battle?.target;
+  if (battle && t && !pitted.has(t) && !pitted.has(user.code) && !car(run, t).retired) {
+    const move = battle.move;
+    const called = !battle.byDriver;
+    if (isAttack(move)) {
+      const passed = pos(user.code) < pos(t);
+      run.notes.push({
+        lap,
+        kind: 'battle',
+        driver: user.code,
+        detail: passed ? 'passed' : 'stuck',
+        other: t,
+      });
+      if (passed && called) trust(run, lap, 'pass-called');
+      else if (!passed && called && move !== 'wait-drs') trust(run, lap, 'pass-failed');
+      if (!passed && move === 'wait-drs') eng.drsLap = lap + 1;
+    } else {
+      const lost = pos(t) < pos(user.code);
+      run.notes.push({
+        lap,
+        kind: 'battle',
+        driver: user.code,
+        detail: lost ? 'lost' : 'held',
+        other: t,
+      });
+      if (called && move === 'let-go') {
+        if (lost) trust(run, lap, t === model.rival ? 'let-rival-go' : 'let-car-go');
+      } else if (called) trust(run, lap, lost ? 'passed-anyway' : 'held-called');
+    }
+  }
+
+  // A stop that swapped places with the rival, judged once the rival has answered it (its own
+  // stop) or a few laps on: a stop that only drops him behind until the rival pits is fine.
+  const rival = state.cars[model.rival];
+  if (rival && !rival.retired) {
+    if (user.pittedThisLap) {
+      eng.stopWatch = {
+        lap,
+        ahead: (prevTime[user.code] as number) < (prevTime[rival.code] as number),
+      };
+    } else if (
+      eng.stopWatch &&
+      (rival.pittedThisLap || lap >= eng.stopWatch.lap + cfg.trust.stopWatch)
+    ) {
+      const after = user.totalTime < rival.totalTime;
+      if (eng.stopWatch.ahead && !after) trust(run, lap, 'stop-lost');
+      if (!eng.stopWatch.ahead && after) trust(run, lap, 'undercut');
+      eng.stopWatch = null;
+    }
+  }
+
+  // Requests the wall turned down, once the watch is over (or he boxed anyway).
+  const keep: EngineerState['refused'] = [];
+  for (const r of eng.refused) {
+    if (r.request === 'box' && user.pittedThisLap) continue; // boxed after all
+    if (lap < r.lap + cfg.trust.watch - 1) {
+      keep.push(r);
+      continue;
+    }
+    let wrong: boolean;
+    if (r.request === 'box') {
+      const cliff = model.compounds[user.compound]?.cliffLap ?? Number.POSITIVE_INFINITY;
+      wrong =
+        user.tyreWear > cliff ||
+        run.notes.some(
+          (n) =>
+            n.lap >= r.lap &&
+            n.driver === user.code &&
+            (n.detail === 'puncture' || (n.kind === 'incident' && n.detail === 'puncture')),
+        );
+    } else {
+      const gap = rival && !rival.retired ? rival.totalTime - user.totalTime : r.gap;
+      wrong = gap - r.gap < -1.0;
+    }
+    trust(run, lap, wrong ? 'request-wrong' : 'request-right');
+  }
+  eng.refused = keep;
+
+  // Quiet laps calm him down, back toward where he started.
+  if (eng.trust < eng.baseTrust && lap - eng.lastEvent >= cfg.trust.settleAfter) {
+    const before = moodOf(cfg, eng.trust);
+    eng.trust = Math.min(eng.baseTrust, eng.trust + cfg.trust.settle);
+    if (moodOf(cfg, eng.trust) !== before) {
+      run.notes.push({
+        lap,
+        kind: 'trust',
+        driver: user.code,
+        detail: 'settled',
+        value: cfg.trust.settle,
+      });
+    }
+  }
+}
+
 /**
  * Green-flag order after a lap. Walking the start-of-lap order front to back, each follower
  * that started within PASS_WINDOW of the car ahead gets ONE pass roll; success puts it ahead,
@@ -1222,7 +1600,8 @@ function resolveOrder(
       (effect(run, a, 'battle').defendLogit ?? 0) +
       (effect(run, b, 'ers').attackLogit ?? 0) +
       (effect(run, a, 'ers').defendLogit ?? 0) +
-      (holdingUp(run, a.code, b.code) ? (run.headset?.teamOrders?.holdUpLogit ?? 0) : 0);
+      (holdingUp(run, a.code, b.code) ? (run.headset?.teamOrders?.holdUpLogit ?? 0) : 0) +
+      engineerShift(run, lap, a.code, b.code);
     // No roll (and no draw) while b is in its cooldown after being passed by a.
     const cooling = lap - (run.passedBy.get(`${b.code}>${a.code}`) ?? -1e9) <= REPASS_COOLDOWN;
     if (
@@ -1261,7 +1640,11 @@ export function ruleSatisfied(car: CarState): boolean {
  * (and Python parity) are unaffected.
  */
 export function classify(run: Run): RaceResult {
-  const running = live(run).sort((a, b) => car(run, a).totalTime - car(run, b).totalTime);
+  // Track-limit penalties are added at the flag (race engineer spec).
+  const penalty = run.state.engineer?.penalty ?? 0;
+  const time = (c: string) =>
+    car(run, c).totalTime + (penalty && c === run.model.userSide ? penalty : 0);
+  const running = live(run).sort((a, b) => time(a) - time(b));
   const finished = isFinished(run);
   const disqualified =
     run.live && finished ? running.filter((c) => !ruleSatisfied(car(run, c))) : [];
@@ -1269,12 +1652,12 @@ export function classify(run: Run): RaceResult {
   const retirees = retiredInOrder(run).sort(
     (a, b) => (car(run, b).retiredLap ?? 0) - (car(run, a).retiredLap ?? 0),
   );
-  const winner = finishers.length ? car(run, finishers[0] as string).totalTime : 0;
+  const winner = finishers.length ? time(finishers[0] as string) : 0;
   const gaps: Record<string, number> = {};
   const times: Record<string, number> = {};
   for (const c of finishers) {
-    gaps[c] = car(run, c).totalTime - winner;
-    times[c] = car(run, c).totalTime;
+    gaps[c] = time(c) - winner;
+    times[c] = time(c);
   }
   return {
     order: [...finishers, ...retirees, ...disqualified],

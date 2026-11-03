@@ -63,6 +63,7 @@ describe('verifyGoogleToken', () => {
       sub: 'google-1',
       email: 'driver@example.com',
       name: 'Test Driver',
+      emailVerified: false,
     });
   });
 
@@ -106,6 +107,7 @@ describe('POST /api/auth/google + GET /api/players/:anonId', () => {
       playerId: ids.a,
       name: 'Test Driver',
       email: 'driver@example.com',
+      admin: false,
     });
     const second = (await (await signIn(await idToken({}), ids.b)).json()) as { playerId: string };
     expect(second.playerId).toBe(ids.a);

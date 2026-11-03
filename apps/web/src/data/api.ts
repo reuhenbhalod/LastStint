@@ -77,6 +77,8 @@ export interface Account {
   playerId: string;
   name: string;
   email: string;
+  /** On the admin list: the Admin button shows. */
+  admin?: boolean;
 }
 
 export interface PlayerResponse {

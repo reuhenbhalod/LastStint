@@ -1,10 +1,12 @@
-// Your driver, in the stats column: who they are, how they take the wall's calls (attitude
-// tier, how often they ignore a call and a real radio moment behind it, data/drivers.json),
-// and where they stand: place, tyres, stops, headset modes.
+// Your driver, in the stats column: who they are, their attitude (data/drivers.json), how
+// they feel about the wall right now (trust, race engineer spec D4), any damage or track-limit
+// trouble, and where they stand: place, tyres, stops, headset modes.
 
-import type { RaceModel, RaceState } from '@boxthislap/sim';
+import { type RaceModel, type RaceState, engineerConfig, moodOf } from '@boxthislap/sim';
 import { TIER_LABEL, driverInfo } from '../data/drivers.js';
+import { MOOD_LABEL } from '../game/engineerCalls.js';
 import type { LapEvents } from '../game/raceLog.js';
+import { MoodLight } from './Icons.js';
 import { TyreBadge } from './TyreBadge.js';
 
 export function DriverProfile({
@@ -23,6 +25,11 @@ export function DriverProfile({
   const pos = race.order.indexOf(code) + 1;
   const stops = log.flatMap((l) => l.pits.filter((p) => p.code === code));
   const realPos = model.realResult.indexOf(code) + 1;
+  const eng = race.engineer;
+  const cfg = engineerConfig(model);
+  const mood = eng && cfg ? moodOf(cfg, eng.trust) : null;
+  const moodColor =
+    mood === 'calm' ? 'var(--you)' : mood === 'tense' ? 'var(--flag)' : 'var(--box)';
   return (
     <section aria-label="Your driver" className="card flex flex-col gap-3">
       <header className="flex items-center gap-3">
@@ -34,29 +41,52 @@ export function DriverProfile({
           <span className="block truncate text-[13px] text-[var(--muted)]">
             {car?.team} · {code}
           </span>
+          {info && (
+            <span className="block text-[13px] font-semibold text-[var(--you)]">
+              {TIER_LABEL[info.tier]}
+            </span>
+          )}
         </span>
       </header>
-      {info && (
-        <div className="rounded-lg bg-[var(--card-2)] px-3 py-2">
-          <div className="flex items-baseline justify-between gap-2">
-            <span className="eyebrow">On the radio</span>
-            <span className="text-[13px] font-semibold">{TIER_LABEL[info.tier]}</span>
+      {eng && mood && (
+        <div className="flex flex-col gap-1.5" aria-label={`${code}'s mood`}>
+          <div className="flex items-baseline justify-between">
+            <span className="eyebrow">Trust in the wall</span>
+            <span className="text-[13px] font-bold" style={{ color: moodColor }}>
+              <MoodLight color={MOOD_LABEL[mood].color} /> {MOOD_LABEL[mood].text}
+            </span>
           </div>
-          <p className="m-0 text-[13px] leading-snug">
-            Ignores <span className="font-semibold">{info.ignores}%</span> of your live calls
-          </p>
-          {info.evidence[0] && (
-            <p className="m-0 text-[12px] leading-snug text-[var(--muted)]">
-              Real radio:{' '}
-              <a
-                href={info.evidence[0].source}
-                target="_blank"
-                rel="noreferrer"
-                className="underline hover:text-[var(--ink)]"
-              >
-                {info.evidence[0].note}
-              </a>
-            </p>
+          <div
+            className="h-2 overflow-hidden rounded-full bg-[var(--card-2)]"
+            role="meter"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={Math.round(eng.trust)}
+            aria-label="Trust"
+          >
+            <div
+              className="h-full rounded-full transition-[width] duration-700"
+              style={{ width: `${eng.trust}%`, background: moodColor }}
+            />
+          </div>
+          {(eng.damage > 0 || eng.strikes > 0 || eng.penalty > 0) && (
+            <div className="flex flex-wrap gap-1.5 text-[11px] font-bold">
+              {eng.damage > 0 && (
+                <span className="rounded-full bg-[color-mix(in_srgb,var(--box)_18%,transparent)] px-2 py-0.5 text-[var(--box-ink)]">
+                  Front wing damage · +{eng.damage.toFixed(1)}s/lap
+                </span>
+              )}
+              {eng.strikes > 0 && (
+                <span className="rounded-full bg-[color-mix(in_srgb,var(--flag)_18%,transparent)] px-2 py-0.5 text-[var(--flag)]">
+                  Track limits · {eng.strikes}
+                </span>
+              )}
+              {eng.penalty > 0 && (
+                <span className="rounded-full bg-[color-mix(in_srgb,var(--box)_18%,transparent)] px-2 py-0.5 text-[var(--box-ink)]">
+                  +{eng.penalty}s penalty
+                </span>
+              )}
+            </div>
           )}
         </div>
       )}
@@ -68,7 +98,7 @@ export function DriverProfile({
         <div>
           <dt className="eyebrow">Tyres</dt>
           <dd className="m-0 flex justify-center pt-0.5">
-            {car && !car.retired ? <TyreBadge compound={car.compound} age={car.tyreAge} /> : '—'}
+            {car && !car.retired ? <TyreBadge compound={car.compound} age={car.tyreAge} /> : '-'}
           </dd>
         </div>
         <div>
@@ -77,15 +107,15 @@ export function DriverProfile({
         </div>
         <div>
           <dt className="eyebrow">Pace</dt>
-          <dd className="m-0 text-[13px] font-semibold capitalize">{car?.modes.pace ?? '—'}</dd>
+          <dd className="m-0 text-[13px] font-semibold capitalize">{car?.modes.pace ?? '-'}</dd>
         </div>
         <div>
           <dt className="eyebrow">Battle</dt>
-          <dd className="m-0 text-[13px] font-semibold capitalize">{car?.modes.battle ?? '—'}</dd>
+          <dd className="m-0 text-[13px] font-semibold capitalize">{car?.modes.battle ?? '-'}</dd>
         </div>
         <div>
           <dt className="eyebrow">Real</dt>
-          <dd className="m-0 text-[13px] font-semibold">{realPos ? `P${realPos}` : '—'}</dd>
+          <dd className="m-0 text-[13px] font-semibold">{realPos ? `P${realPos}` : '-'}</dd>
         </div>
       </dl>
     </section>

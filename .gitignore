@@ -35,3 +35,6 @@ pipeline/cache/
 !.vscode/extensions.json
 test-results/
 playwright-report/
+
+# Moment finder output (pnpm moments): a working file, not the approved moments.
+data/moments/proposed/

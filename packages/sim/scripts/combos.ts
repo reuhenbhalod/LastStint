@@ -3,7 +3,7 @@
 // the results show whether the race's seed plays fairly (the best play shouldn't always lose).
 // Races with more than MAX_COMBOS paths are checked on a fixed random sample of them, which
 // still takes every option of every moment (feedback round 2); --all checks every path.
-//   pnpm --filter @boxthislap/sim combos <race-id> [seed] [--all]
+//   pnpm --filter @boxthislap/sim combos <race-id> [seed] [--all] [--max N]
 
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -16,7 +16,9 @@ import { verifyRun } from '../src/verify.js';
 const repo = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const args = process.argv.slice(2);
 const all = args.includes('--all');
-const [raceId, seedArg] = args.filter((a) => a !== '--all');
+const maxAt = args.indexOf('--max');
+const maxArg = maxAt >= 0 ? Number(args[maxAt + 1]) : undefined;
+const [raceId, seedArg] = args.filter((a, i) => a !== '--all' && i !== maxAt && i !== maxAt + 1);
 if (!raceId) {
   console.error('usage: combos <race-id> [seed]');
   process.exit(2);
@@ -30,7 +32,7 @@ const moments = [...model.decisionMoments].sort((a, b) => a.lap - b.lap);
 
 let combos: string[][] = [[]];
 for (const m of moments) combos = combos.flatMap((c) => m.options.map((o) => [...c, o.id]));
-const MAX_COMBOS = 1500;
+const MAX_COMBOS = maxArg ?? 1500;
 const total = combos.length;
 if (!all && total > MAX_COMBOS) {
   // A fixed shuffle (so reruns check the same paths), cut to MAX_COMBOS.
@@ -70,7 +72,14 @@ for (const combo of combos) {
 rows.sort((a, b) => b.score - a.score);
 console.log(`${raceId}, seed ${seed}: score, result, calls (g/y/o/r = band)`);
 for (const r of rows) console.log(r.line);
+const realPos = model.realResult.indexOf(model.userSide) + 1;
+const positions = rows.map((r) => Number(/ P(\d+) /.exec(r.line)?.[1] ?? 99));
+const better = positions.filter((p) => p < realPos).length;
+const asGood = positions.filter((p) => p <= realPos).length;
 console.log(
   `${combos.length}${combos.length < total ? ` of ${total}` : ''} combinations, ${mismatches} live/full mismatches`,
+);
+console.log(
+  `fair: real P${realPos}; ${better} paths beat it, ${asGood} match or beat it; best P${Math.min(...positions)}`,
 );
 if (mismatches) process.exit(1);

@@ -68,12 +68,21 @@ export function briefFor(moment: DecisionMoment, race: RaceState, model: RaceMod
           : ` ${r} leads us by ${(-gap).toFixed(1)}s`;
     const tyre = me ? `, on ${me.tyreAge}-lap-old ${tyres(me.compound)}` : '';
     headline = `You have the pit wall, ${model.race.laps - race.lap} laps to go.${lead}${tyre}. What’s the plan?`;
-  } else if (only('battle')) {
+  } else if (only('battle') && flag) {
     kind = 'Restart';
     headline =
       gap === null || gap >= 0
         ? `Restart is coming and ${r} is right behind us. How do we race him?`
         : `Restart is coming. ${r} is ahead and we’re on ${me ? tyres(me.compound) : 'our tyres'}. How do we race him?`;
+  } else if (only('battle')) {
+    kind = 'Final laps';
+    const left = model.race.laps - race.lap;
+    headline =
+      gap === null
+        ? `${left} laps to go. How do we race it?`
+        : gap >= 0
+          ? `${left} laps to go and ${r} is ${gap.toFixed(1)}s behind. How do we race him?`
+          : `${left} laps to go and ${r} is ${(-gap).toFixed(1)}s ahead. How do we race him?`;
   } else if (only('pace')) {
     kind = 'Tyres';
     headline = `Our ${me ? tyres(me.compound) : 'tyres'} are ${me?.tyreAge ?? '?'} laps old. Push to hold the gap, run to plan, or look after them for the end?`;
@@ -93,8 +102,8 @@ export function briefFor(moment: DecisionMoment, race: RaceState, model: RaceMod
     kind = 'Tyres';
     headline = `Our ${me ? tyres(me.compound) : 'tyres'} are ${me?.tyreAge ?? '?'} laps old and the lap times are starting to drop. Box under green for fresh tyres, or run them to the end?`;
   } else if (moment.trigger === 'rivalPit') {
-    kind = `${r} pitted`;
-    headline = `${r} has boxed. Do we cover?`;
+    kind = `${r} due in`;
+    headline = `${r} is due in for tyres. Box with him to cover, or stay out?`;
   } else if (moment.trigger === 'undercut') {
     kind = 'Undercut window';
     headline = 'We’re in the undercut window. Box now, or stay out?';

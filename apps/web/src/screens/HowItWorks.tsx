@@ -1,5 +1,7 @@
 // Rules, grading, data sources and the disclaimer (product doc "How it works"; plan 6.5).
 
+import { BandChip } from '../components/Icons.js';
+
 export function HowItWorks({ onClose }: { onClose: () => void }) {
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col gap-5 p-6 text-neutral-300">
@@ -34,10 +36,18 @@ export function HowItWorks({ onClose }: { onClose: () => void }) {
           race turned out: a good call that didn’t pay off is still a good call.
         </p>
         <ul className="flex flex-col gap-1 font-mono text-sm">
-          <li>🟩 Best call, or within half a point of it</li>
-          <li>🟨 Close (within 5 points)</li>
-          <li>🟧 Costly (within 15 points)</li>
-          <li>🟥 A big miss</li>
+          <li className="flex items-center gap-2">
+            <BandChip color="#22c55e" /> Best call, or within half a point of it
+          </li>
+          <li className="flex items-center gap-2">
+            <BandChip color="#eab308" /> Close (within 5 points)
+          </li>
+          <li className="flex items-center gap-2">
+            <BandChip color="#f97316" /> Costly (within 15 points)
+          </li>
+          <li className="flex items-center gap-2">
+            <BandChip color="#ef4444" /> A big miss
+          </li>
         </ul>
         <p>
           You also see what the real team did and how that call grades. One run per day; the server

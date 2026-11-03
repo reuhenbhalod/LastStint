@@ -174,6 +174,20 @@ The top 100, cached for 60 seconds.
 
 `{ ok, queueDays }`: how many consecutive days, from today (UTC), have a race scheduled.
 
+## Admin
+
+For the people running the game (`apps/worker/src/admin.ts`, the website's `/admin` page). Every request sends the admin's Google ID token as `Authorization: Bearer <token>`. The token must verify (Google's keys, our client ID, not expired), its email must be verified by Google, and the email must be in `ADMIN_EMAILS` (`apps/worker/wrangler.jsonc` vars, comma-separated). Otherwise: 401 `sign-in-required` / `bad-credential`, or 403 `not-admin`.
+
+| Endpoint | What it does |
+|---|---|
+| `GET /api/admin/me` | `{ admin: true, email, sub }` |
+| `GET /api/admin/races` | The playable races (those with decision moments): id, name, userSide, rival, moments, seed, hash |
+| `GET /api/admin/schedule?from&to` | Days from a week ago to 60 days ahead (default): date, number, raceId, runs, and `current` (the day still pins the race file's hash) |
+| `POST /api/admin/schedule` `{ from, days, raceId? }` | Schedules the dates that aren't scheduled yet, rotating the playable races (or always `raceId`), numbered on from the last day |
+| `POST /api/admin/day` `{ date, raceId }` | Sets a day's race (a new day, or one with no runs: 409 `day-has-runs` otherwise) |
+| `POST /api/admin/repin` | Re-pins today's and later days to their race file's current hash; days with runs are left as they are |
+| `POST /api/admin/runs/clear` `{ date }` | Deletes the admin's own runs on that day (every browser linked to their Google account), to play it again |
+
 ## Operations
 
 | Task | Command (from the repo root) |

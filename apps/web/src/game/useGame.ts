@@ -3,7 +3,7 @@
 // clock while racing, persists/resumes the run, and talks to the Worker: "already played
 // today?" on load, and the run submission (calls + the game's grades) at the flag.
 
-import type { Decision, RaceModel } from '@boxthislap/sim';
+import type { Decision, RaceModel, RaceNote } from '@boxthislap/sim';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ApiError, type RunResponse, api } from '../data/api.js';
 import { anonId } from '../data/player.js';
@@ -16,6 +16,8 @@ import { clearRun, loadRun, saveRun } from '../state/storage.js';
 // One lap tick on screen. Testers found 3-5 s per lap too fast to follow (feedback spec D4).
 // The track map runs the field one lap round per tick, so this is also how fast the dots move.
 export const LAP_MS: Record<Speed, number> = { 1: 10000, 2: 5000 };
+/** A battle call slows the lap by this much (race engineer spec D7). */
+export const SLOW_MOTION = 3;
 
 /** The lap tick in progress: when it started (performance.now()) and how long it lasts. The
  * track map animates from this, so the dots and the lap clock never drift apart. */
@@ -35,8 +37,14 @@ export interface Game {
   error: string | null;
   start: () => void;
   setSpeed: (s: Speed) => void;
+  /** Slow motion (a battle call is open): the lap runs at half speed. */
+  setSlow: (on: boolean) => void;
+  /** Hold the race (the player went to the home page); the lap resumes where it was. */
+  setHold: (on: boolean) => void;
   choose: (optionId: string) => void;
-  call: (decision: Decision, options?: { asked?: boolean }) => void;
+  call: (decision: Decision, options?: { asked?: boolean; quiet?: boolean }) => void;
+  /** What the race model noted so far (battles, contact, trust...). */
+  notes: () => RaceNote[];
   /** Put a line on the radio (no call). */
   radio: (text: string) => void;
   submit: () => void;
@@ -62,6 +70,8 @@ export function useGame(provider: DailyProvider, grader?: Grader): Game {
   const [error, setError] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
   const [clock, setClock] = useState<LapClock | null>(null);
+  const [slow, setSlow] = useState(false);
+  const [hold, setHold] = useState(false);
   // How far through the lap tick the clock was when it stopped (a speed change keeps it).
   const carry = useRef(0);
   // One grading worker for the page's lifetime.
@@ -107,7 +117,7 @@ export function useGame(provider: DailyProvider, grader?: Grader): Game {
             sync();
           }
         } catch {
-          // 404: not played yet (or offline) — play on
+          // 404: not played yet (or offline), play on
         }
       }
     })().catch((e) => alive && setError(String((e as Error).message ?? e)));
@@ -120,11 +130,11 @@ export function useGame(provider: DailyProvider, grader?: Grader): Game {
   // starts or resumes (no dead wait after a decision), and a speed change keeps the lap's
   // progress rather than starting it over.
   useEffect(() => {
-    if (state?.phase !== 'racing') {
+    if (state?.phase !== 'racing' || hold) {
       setClock(null);
       return;
     }
-    const ms = LAP_MS[state.speed];
+    const ms = LAP_MS[state.speed] * (slow ? SLOW_MOTION : 1);
     let start = performance.now() - carry.current * ms;
     let id = 0;
     const schedule = () => {
@@ -145,7 +155,7 @@ export function useGame(provider: DailyProvider, grader?: Grader): Game {
       clearTimeout(id);
       carry.current = Math.min(0.99, (performance.now() - start) / ms);
     };
-  }, [state?.phase, state?.speed, sync]);
+  }, [state?.phase, state?.speed, slow, hold, sync]);
 
   const act = useCallback(
     (f: (s: GameSession) => void) => () => {
@@ -200,9 +210,12 @@ export function useGame(provider: DailyProvider, grader?: Grader): Game {
     error,
     start: act((s) => s.start()),
     setSpeed: (speed) => act((s) => s.setSpeed(speed))(),
+    setSlow,
+    setHold,
     choose: (optionId) => act((s) => s.choose(optionId))(),
     call: (decision, options) => act((s) => s.call(decision, options))(),
     radio: (text) => act((s) => s.radio(text))(),
+    notes: () => session.current?.notes ?? [],
     submit,
     reset,
     reload: () => setAttempt((n) => n + 1),

@@ -42,7 +42,9 @@ export function CarStats({
   const last = log.at(-1);
   const mine = last?.lapTimes[userSide];
   const theirs = last?.lapTimes[rival];
+  // (Laps either car stopped on don't count: a stop isn't pace.)
   const recent = log
+    .filter((l) => !l.pits.some((p) => p.code === userSide || p.code === rival))
     .slice(-3)
     .map((l) => [l.lapTimes[userSide], l.lapTimes[rival]] as const)
     .filter(([a, b]) => a !== undefined && b !== undefined) as Array<[number, number]>;
@@ -71,18 +73,18 @@ export function CarStats({
       <dl className="m-0 grid grid-cols-3 gap-2 text-center">
         <div>
           <dt className="eyebrow">Last lap</dt>
-          <dd className="m-0 mono text-[14px] font-semibold">{mine ? lapClock(mine) : '—'}</dd>
+          <dd className="m-0 mono text-[14px] font-semibold">{mine ? lapClock(mine) : '-'}</dd>
         </div>
         <div>
           <dt className="eyebrow">{rival} last</dt>
-          <dd className="m-0 mono text-[14px] font-semibold">{theirs ? lapClock(theirs) : '—'}</dd>
+          <dd className="m-0 mono text-[14px] font-semibold">{theirs ? lapClock(theirs) : '-'}</dd>
         </div>
         <div>
           <dt className="eyebrow">Gap</dt>
           <dd
             className={`m-0 mono text-[14px] font-semibold ${gap === null ? '' : gap >= 0 ? 'text-[var(--you)]' : 'text-[var(--rival)]'}`}
           >
-            {gap === null ? '—' : `${gap >= 0 ? '+' : '−'}${Math.abs(gap).toFixed(1)}s`}
+            {gap === null ? '-' : `${gap >= 0 ? '+' : '−'}${Math.abs(gap).toFixed(1)}s`}
           </dd>
         </div>
       </dl>

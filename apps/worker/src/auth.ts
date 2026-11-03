@@ -7,6 +7,8 @@ export interface GoogleIdentity {
   sub: string;
   email: string;
   name: string;
+  /** Google has verified the account owns the email (admin access needs it). */
+  emailVerified: boolean;
 }
 
 interface Jwk extends JsonWebKey {
@@ -89,5 +91,6 @@ export async function verifyGoogleToken(
     sub: claims.sub,
     email: typeof claims.email === 'string' ? claims.email : '',
     name: typeof claims.name === 'string' ? claims.name : '',
+    emailVerified: claims.email_verified === true || claims.email_verified === 'true',
   };
 }
