@@ -274,7 +274,10 @@ if (!chosen) {
 console.log(`chosen ${fmt(chosen)}${chosen === now ? ' (unchanged)' : ''}`);
 
 if (write && chosen.seed !== model.race.seed) {
-  const out = { ...JSON.parse(raw), race: { ...model.race, seed: chosen.seed } };
-  writeFileSync(path, `${JSON.stringify(out, null, 2)}${raw.endsWith('\n') ? '\n' : ''}`);
+  // Only the seed line changes: the rest stays as the pipeline wrote it (CI rebuilds the
+  // files and checks they match, so a JSON round trip's 0 for 0.0 would fail it).
+  const seedLine = new RegExp(`("seed":\\s*)${model.race.seed}\\b`);
+  if (!seedLine.test(raw)) throw new Error('no seed line to update');
+  writeFileSync(path, raw.replace(seedLine, `$1${chosen.seed}`));
   console.log(`wrote seed ${chosen.seed} to data/races/${raceId}.json`);
 }
