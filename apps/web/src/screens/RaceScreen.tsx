@@ -24,7 +24,14 @@ import { TeamRadio } from '../components/TeamRadio.js';
 import { TimingTower } from '../components/TimingTower.js';
 import { TrackMap } from '../components/TrackMap.js';
 import { TyreBadge } from '../components/TyreBadge.js';
-import { BATTLE_MS, CALL_MS, directorCall, infoLine, newMemory } from '../game/engineerCalls.js';
+import {
+  BATTLE_MS,
+  CALL_MS,
+  directorCall,
+  infoLine,
+  newMemory,
+  offersStop,
+} from '../game/engineerCalls.js';
 import { modeLine } from '../game/guide.js';
 import { type QuickCall, quickCallLaps } from '../game/quickCalls.js';
 import { useRaceLog } from '../game/raceLog.js';
@@ -32,7 +39,8 @@ import { radioChirp, setSoundOn, soundOn } from '../game/sound.js';
 import { type Game, LAP_MS, SLOW_MOTION } from '../game/useGame.js';
 import type { GameState } from '../state/machine.js';
 import { overtakingCorners } from '../track/corners.js';
-import { carsOnTrack, pitEntryAt, pitLane, polyline, quietCorner } from '../track/geometry.js';
+import { quietCorner } from '../track/geometry.js';
+import type { MapMotion } from '../track/motion.js';
 import { outlineFor } from '../track/outlines.js';
 
 const FLAG = {
@@ -186,24 +194,16 @@ export function RaceScreen({
     return () => clearTimeout(id);
   }, [flash]);
   // The lap a BOX call turns in at (pit fix): the end of the lap being shown, if your car can
-  // still reach pit entry on it; otherwise the end of the next one. (Paused, the cars sit at the
-  // line with the entry ahead.)
-  const laneInfo = useMemo(
-    () => (outline ? pitLane(outline, polyline(outline.points)) : null),
-    [outline],
-  );
+  // still reach pit entry on it (the map knows where it is); otherwise the end of the next one.
+  // (Paused, the cars sit at the line with the entry ahead.)
+  const motion = useRef<MapMotion | null>(null);
   const boxLap = useCallback((): number => {
     const n = state.race.lap + 1;
     const clock = game.clock;
-    if (!laneInfo || !clock) return n;
-    const mine = carsOnTrack(state.race, model, state.race.nextFlag ?? 'green').find(
-      (c) => c.code === userSide,
-    );
-    if (!mine) return n;
-    const tIn = pitEntryAt(mine.behind, laneInfo);
-    const progress = (performance.now() - clock.start) / clock.ms;
-    return tIn === null || progress > tIn - 0.03 ? n + 1 : n;
-  }, [laneInfo, game.clock, state.race, model, userSide]);
+    if (!clock || !motion.current) return n;
+    const progress = Math.min(1, (performance.now() - clock.start) / clock.ms);
+    return motion.current.reachesEntry(userSide, state.race, progress) ? n : n + 1;
+  }, [game.clock, state.race, userSide]);
   const place = useCallback(
     <T extends Decision>(call: T): T => ({
       ...call,
@@ -214,7 +214,8 @@ export function RaceScreen({
   const answerQuick = useCallback(
     (id: string) => {
       const o = quick?.options.find((x) => x.id === id);
-      const asked = quick?.asked ?? true;
+      // A stop the wall picks in answer to a question is made (the driver doesn't argue it).
+      const asked = (quick?.asked ?? true) || o?.call?.kind === 'pit';
       if (o?.call) game.call(place(o.call), { asked });
       else game.radio('Copy. No change.');
       for (const c of o?.also ?? []) game.call(place(c), { asked: true });
@@ -293,10 +294,15 @@ export function RaceScreen({
       : planned
         ? {
             compound: planned.to,
-            when: planned.lap === next ? 'in the pits now' : 'boxing this lap',
+            when: planned.lap === next ? 'stop under way' : 'boxing this lap',
           }
         : null;
-  const userBoxing = callPit?.kind === 'pit' && callPit.lap === next;
+  const userBox = callPit?.kind === 'pit' ? callPit.lap : null;
+  // A stop booked another way (the team radio's BOX) answers a stop question already up.
+  const stopQuestion = !!quick && offersStop(quick);
+  useEffect(() => {
+    if (userBox !== null && stopQuestion) setQuick(null);
+  }, [userBox, stopQuestion]);
 
   // A stop by your car or the rival on the lap just run, while the next lap animates.
   const latest = log.at(-1);
@@ -487,7 +493,8 @@ export function RaceScreen({
                     finishing={finishMeta}
                     fight={fight}
                     flash={flash}
-                    userBoxing={userBoxing}
+                    userBox={userBox}
+                    motionRef={motion}
                   />
                 ) : (
                   <p className="p-8 text-center text-[var(--muted)]">

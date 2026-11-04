@@ -46,6 +46,12 @@ export interface QuickCall {
   asked?: boolean;
 }
 
+/**
+ * Laps on new tyres before the wall is asked about another stop (pit fix 2): nobody boxes
+ * fresh tyres, so a stop question waits (a broken wing and the two-compound rule excepted).
+ */
+export const FRESH_TYRES = 5;
+
 /** How often a quick call comes, in laps. */
 export const QUICK_EVERY = 2;
 
@@ -196,7 +202,7 @@ export function quickCallAt(race: RaceState, model: RaceModel, log: LapEvents[])
  * incidents): the pit lane is suddenly cheap, so the wall is asked straight away. Boxing
  * takes the softest tyre that lasts to the flag (or the hardest). Null if the next lap's flag
  * is the race's own, or there's no time left to use it. Asked once, on the lap it comes out,
- * and not when the car has a stop called, under way, or just made.
+ * and not when the car has a stop called or under way, or is on fresh tyres.
  */
 export function safetyCarCall(
   race: RaceState,
@@ -208,7 +214,7 @@ export function safetyCarCall(
   const flag = race.nextFlag;
   if (!me || me.retired || (flag !== 'sc' && flag !== 'vsc')) return null;
   // Asked once, as it comes out; not with a stop called or under way, or just made (pit fix).
-  if (race.flag !== 'green' || pendingPit || me.tyreAge < 3) return null;
+  if (race.flag !== 'green' || pendingPit || me.tyreAge < FRESH_TYRES) return null;
   if (me.strategy.some((s) => s.lap > race.lap)) return null;
   if (flagOn(model, next) !== 'green' || next >= model.race.laps) return null;
   if (model.decisionMoments.some((m) => m.lap === next)) return null;

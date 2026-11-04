@@ -19,6 +19,7 @@ export {
   passProbability,
   planRemainingStop,
   realDecisions,
+  rivalCover,
   ruleSatisfied,
   simulate,
   stepLap,

@@ -17,7 +17,7 @@ import { ignoreRate } from '../data/drivers.js';
 import type { Daily } from '../data/types.js';
 import { GameEngine, decisionMoments } from '../engine/engine.js';
 import { type GradedMoment, type Grader, gradedFromHits, inlineGrader } from '../engine/grading.js';
-import { autoStay } from '../game/autoStay.js';
+import { autoStay, boxingAt } from '../game/autoStay.js';
 import { ownMove } from '../game/engineerCalls.js';
 import { engineerRadio } from '../game/engineerRadio.js';
 import { MOOD_REFUSALS, acknowledge, refusal } from '../game/refusal.js';
@@ -130,7 +130,7 @@ export class GameSession {
       if (none) this.choose(none.id);
       return;
     }
-    // Just stopped: the wall stays out without asking (game/autoStay.ts).
+    // A stop booked, or just made: the wall stays out without asking (game/autoStay.ts).
     const stay = autoStay(moment, this.engine.decisions);
     if (stay) {
       this.dispatch({
@@ -138,7 +138,9 @@ export class GameSession {
         message: {
           lap: moment.lap,
           from: 'Engineer',
-          text: 'We’ve just stopped. Staying out.',
+          text: boxingAt(moment, this.engine.decisions)
+            ? 'We’re boxing already. No change to the plan.'
+            : 'We’ve just stopped. Staying out.',
           refused: false,
         },
       });

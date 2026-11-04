@@ -1,47 +1,31 @@
 // The circuit, centre stage: the race's real outline (data/tracks) with a dot per running car,
-// placed by its gap to the leader (track/geometry.ts). The field runs round the lap with the
-// lap clock; when a lap's new gaps arrive, cars glide to them (overtakes happen on screen
-// rather than in a jump). A car that stopped drives down the real pit lane. The safety car
+// placed by its gap on the field's clock (track/motion.ts). The field runs round the lap with
+// the lap clock; when a lap's new gaps arrive, cars glide to them (overtakes happen on screen
+// rather than in a jump). A car that stops drives down the real pit lane. The safety car
 // leads the field while it's out. Click any car for its card.
 
-import type { RaceModel, RaceState } from '@boxthislap/sim';
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { type RaceModel, type RaceState, engineerConfig } from '@boxthislap/sim';
+import { type MutableRefObject, memo, useEffect, useMemo, useRef, useState } from 'react';
 import type { LapClock } from '../game/useGame.js';
 import { cornerPoint } from '../track/corners.js';
 import { garagesFor, seasonOf } from '../track/garages.js';
 import {
   type PitLane,
-  type PitPosition,
   type Polyline,
   type TrackOutline,
   angleAlong,
   carsOnTrack,
-  ease,
   flagOn,
-  inLapEnd,
-  inLapPosition,
-  lapTime,
   nearestFraction,
-  outLapPosition,
   pitLane,
-  pitPosition,
   pointAlong,
   pointAt,
   polyline,
-  runToFlag,
-  spaceOut,
 } from '../track/geometry.js';
+import { MapMotion } from '../track/motion.js';
 
 const REDUCED =
   typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-/** Share of a lap tick the cars take to glide to the new gaps (and to drive the pit lane). */
-const GLIDE = 0.45;
-
-/** Share of the way to its target a drawn car moves each frame (eases out jumps). */
-const EASE_PER_FRAME = 0.18;
-/** On-screen move (map units) beyond which a frame's step is spread over a few frames. */
-const JUMP_PX = 24;
 
 /** Track width in map units (the asphalt band). */
 const TRACK = 30;
@@ -322,7 +306,8 @@ export function TrackMap({
   finishing = null,
   fight = null,
   flash = null,
-  userBoxing = false,
+  userBox = null,
+  motionRef,
 }: {
   outline: TrackOutline;
   race: RaceState;
@@ -342,8 +327,10 @@ export function TrackMap({
   fight?: { other: string; corner: number } | null;
   /** A battle's result, shown at its corner for a moment. */
   flash?: { text: string; good: boolean; corner: number } | null;
-  /** Your car is called in at the end of the lap being shown (a BOX not yet in the race model). */
-  userBoxing?: boolean;
+  /** Your BOX not yet in the race model: its lap (the car turns in at the end of it). */
+  userBox?: number | null;
+  /** Filled with the map's motion (the race screen asks it whether a BOX makes this lap). */
+  motionRef?: MutableRefObject<MapMotion | null>;
 }) {
   const line = useMemo(() => polyline(outline.points), [outline]);
   const lane = useMemo(() => pitLane(outline, line, TRACK), [outline, line]);
@@ -360,106 +347,31 @@ export function TrackMap({
   // (Live play adds neutralizations after crashes: the state knows the next lap's flag.)
   const driven = finishing ? race.flag : (race.nextFlag ?? flagOn(model, race.lap + 1));
   const cars = carsOnTrack(race, model, driven);
-  const minGap = 24 / line.length;
 
-  // Progress of the lap tick, from the shared lap clock.
+  // Where every car is drawn, frame by frame (track/motion.ts: the field's clock, the glide to
+  // each lap's gaps, and each stop down the pit lane).
+  const teams = useMemo(() => new Map(model.drivers.map((d) => [d.code, d.team])), [model]);
+  const motion = useMemo(
+    () => new MapMotion(line, lane, (code) => garageAt(teams.get(code), garages), 24 / line.length),
+    [line, lane, teams, garages],
+  );
+  if (motionRef) motionRef.current = motion;
+
+  // Progress of the lap tick, from the shared lap clock. While paused, frames keep coming until
+  // every car has eased into place.
   const [progress, setProgress] = useState(0);
-  // Each car's position as drawn (a fraction of the lap), easing toward where it should be:
-  // a change of gaps (a pause, a new lap, a safety car, an overtake) slides along the track
-  // instead of jumping. `settling` keeps frames coming until every car has arrived.
-  const drawn = useRef(new Map<string, number>());
-  const drawnXY = useRef(new Map<string, [number, number]>());
-  const settling = useRef(false);
   const [, setFrame] = useState(0);
   useEffect(() => {
     if (REDUCED) return;
     let raf = 0;
     const frame = (now: number) => {
       if (clock) setProgress(Math.min(0.995, Math.max(0, (now - clock.start) / clock.ms)));
-      else if (settling.current) setFrame((n) => n + 1);
+      else if (motion.moving) setFrame((n) => n + 1);
       raf = requestAnimationFrame(frame);
     };
     raf = requestAnimationFrame(frame);
     return () => cancelAnimationFrame(raf);
-  }, [clock]);
-
-  // Gaps glide from where each car was shown to the new lap's gaps. While paused there is no
-  // glide: the map shows the exact gaps the decision card quotes.
-  // `prev` keeps the last lap's gaps for the whole tick (a stopping car drives to pit entry at
-  // its old gap).
-  const glideRef = useRef<{
-    lap: number;
-    from: Map<string, number>;
-    prev: Map<string, number>;
-    to: Map<string, number>;
-  }>({
-    lap: race.lap,
-    from: new Map(),
-    prev: new Map(),
-    to: new Map(),
-  });
-  const to = new Map(cars.map((c) => [c.code, c.behind]));
-  // Pit stops, drawn on the laps they really happen (pit fix): the lap being shown is the one
-  // after `race.lap`. A car whose stop is charged on the lap after that is on its in-lap: it
-  // turns into the lane at pit entry and waits at its garage. A car whose stop is charged on the
-  // lap being shown is on its out-lap: it leaves the garage and rejoins at pit exit at its new
-  // gap (the stop's expected cost; the next lap's real gap glides in from there).
-  const showing = race.lap + 1;
-  const animate = !finishing && !!lane && !REDUCED;
-  const lapSeconds = lapTime(model, driven);
-  const onInLap = (code: string) =>
-    animate &&
-    !!race.cars[code] &&
-    ((code === userSide && userBoxing) ||
-      !!race.cars[code]?.strategy.some((st) => st.lap === showing + 1));
-  const outStop = (code: string) =>
-    animate ? race.cars[code]?.strategy.find((st) => st.lap === showing) : undefined;
-  const expectedAfter = (code: string, before: number): number => {
-    const stop = outStop(code);
-    if (!stop) return before;
-    const t = model.track;
-    const flagNow = race.nextFlag ?? 'green';
-    let loss =
-      stop.loss ??
-      (flagNow === 'sc' ? t.pitLossUnderSC : flagNow === 'vsc' ? t.pitLossUnderVSC : t.pitLoss);
-    if (code === userSide && (race.engineer?.damage ?? 0) > 0) loss += 3;
-    return before + loss / lapSeconds;
-  };
-  for (const c of cars) if (outStop(c.code)) to.set(c.code, expectedAfter(c.code, c.behind));
-  // Where each in-lap car ends up in the lane, kept for its out-lap on the next tick.
-  const entered = useRef({
-    lap: race.lap,
-    ends: new Map<string, number>(),
-    prev: new Map<string, number>(),
-  });
-  if (entered.current.lap !== race.lap) {
-    entered.current = {
-      lap: race.lap,
-      ends: new Map(),
-      prev: entered.current.lap === race.lap - 1 ? entered.current.ends : new Map(),
-    };
-  }
-  const g = glideRef.current;
-  if (g.lap !== race.lap) {
-    glideRef.current = { lap: race.lap, from: g.to, prev: g.to, to };
-  } else {
-    g.to = to;
-  }
-  // Worked out from the clock at render time: the stored progress only drives re-renders, and
-  // on the first frame of a new lap tick it still holds the last tick's value.
-  const now = clock
-    ? Math.min(0.995, Math.max(0, (performance.now() - clock.start) / clock.ms))
-    : 0;
-  void progress;
-  const raw = clock && !REDUCED ? Math.min(1, now / GLIDE) : 1;
-  if (raw >= 1) glideRef.current.from = to;
-  const t = ease(raw);
-  const behindOf = (code: string, now: number) => {
-    const was = glideRef.current.from.get(code);
-    return was === undefined ? now : was + (now - was) * t;
-  };
-  // At the start of a tick the leader is still crossing the line from the last one.
-  const lead = clock ? now : 0;
+  }, [clock, motion]);
 
   // The run to the flag, timed from when the race finished.
   const [sinceFlag, setSinceFlag] = useState(0);
@@ -477,75 +389,44 @@ export function TrackMap({
     raf = requestAnimationFrame(frame);
     return () => cancelAnimationFrame(raf);
   }, [finishMs]);
-  // A car stopping this tick: in the lane (or, on its out-lap, placed by its stop all tick).
-  const garageOf = (code: string) => garageAt(race.cars[code]?.team, garages);
-  const pitAt = (code: string, before: number): PitPosition | null => {
-    if (outStop(code)) {
-      const after = expectedAfter(code, before);
-      const from = entered.current.prev.get(code);
-      // In from the last tick: out of the garage. Otherwise (a stop forced at the end of the
-      // last lap, a puncture or the rival covering) the whole stop this tick.
-      return from !== undefined
-        ? outLapPosition(lead, after, lane as PitLane, garageOf(code), from)
-        : pitPosition(lead, before, after, lane as PitLane, garageOf(code));
-    }
-    if (onInLap(code)) {
-      entered.current.ends.set(code, inLapEnd(before, lane as PitLane, garageOf(code)));
-      const p = inLapPosition(lead, before, lane as PitLane, garageOf(code));
-      return p && p.lane !== null ? p : null; // on track until pit entry
-    }
-    return null;
-  };
-  const stopping = (code: string) => !!outStop(code);
-  const shown = spaceOut(
-    new Map(
-      cars
-        .filter((c) => !stopping(c.code))
-        .map((c) => [c.code, finishing ? c.behind : behindOf(c.code, c.behind)]),
-    ),
-    minGap,
-  );
-  const atFlag = finishing ? runToFlag(shown, REDUCED ? 99 : sinceFlag) : null;
+
+  // Worked out from the clock at render time: the stored progress only drives re-renders, and
+  // on the first frame of a new lap tick it still holds the last tick's value.
+  const now = clock
+    ? Math.min(0.995, Math.max(0, (performance.now() - clock.start) / clock.ms))
+    : 0;
+  void progress;
+  const places = motion.frame({
+    race,
+    model,
+    flag: driven,
+    progress: now,
+    smooth: !REDUCED,
+    userSide,
+    userBox,
+    userExtra: (race.engineer?.damage ?? 0) > 0 ? (engineerConfig(model)?.noseCost ?? 0) : 0,
+    sinceFlag: finishing ? sinceFlag : null,
+  });
   // Your car crossing the line ends it; if it's out of the race, the winner does.
-  const you = atFlag?.get(userSide);
-  const youDone = you ? you.finished : !!atFlag && [...atFlag.values()].some((c) => c.finished);
+  const youDone = finishing
+    ? (places.get(userSide)?.finished ?? [...places.values()].some((c) => c.finished === true))
+    : false;
   useEffect(() => {
     if (youDone && !crossed.current) {
       crossed.current = true;
       onCrossed?.();
     }
   }, [youDone, onCrossed]);
-  const target = (code: string): number =>
-    atFlag ? (atFlag.get(code)?.at ?? 0) : lead - (shown.get(code) ?? 0);
-  let moving = false;
-  const positionOf = (code: string): number => {
-    const want = target(code);
-    const was = drawn.current.get(code);
-    if (was === undefined || REDUCED || atFlag) {
-      drawn.current.set(code, want);
-      return want;
-    }
-    // The shortest way round the lap to the target, a share of it each frame.
-    const delta = ((((want - was + 0.5) % 1) + 1) % 1) - 0.5;
-    if (Math.abs(delta) < 0.0005) {
-      drawn.current.set(code, want);
-      return want;
-    }
-    moving = true;
-    const next = was + delta * EASE_PER_FRAME;
-    drawn.current.set(code, next);
-    return next;
-  };
 
   // Draw the field first, then the rival, then the player's car on top.
   const drawOrder = [...cars].sort(
     (a, b) => rank(a.code, userSide, rival) - rank(b.code, userSide, rival),
   );
-  const sc = !finishing && driven === 'sc' ? pointAt(line, lead + 0.018) : null;
-  // (Settling is decided as the cars are placed below; read it after this render.)
-  useEffect(() => {
-    settling.current = moving;
-  });
+  // The safety car runs just ahead of the leader on track.
+  const leader = race.order.find((c) => places.get(c) && !places.get(c)?.lane);
+  const leadAt = leader ? places.get(leader)?.at : undefined;
+  const sc =
+    !finishing && driven === 'sc' && leadAt !== undefined ? pointAt(line, leadAt + 0.018) : null;
 
   return (
     <svg
@@ -582,26 +463,10 @@ export function TrackMap({
       )}
       {drawOrder.map((c) => {
         const car = race.cars[c.code];
-        const pit = pitAt(c.code, c.behind);
-        const inLane = pit?.lane != null;
-        // A car in (or just out of) the pit lane: its drawn track position follows it, so it
-        // rejoins at pit exit rather than sliding round from where it went in.
-        if (pit) drawn.current.set(c.code, pit.at ?? target(c.code));
-        const [tx, ty] =
-          pit && pit.lane !== null && lane
-            ? pointAlong(lane.path, pit.lane)
-            : pointAt(line, pit && pit.at !== null ? pit.at : positionOf(c.code));
-        // A last guard on screen: a move far bigger than a frame's driving (into or out of
-        // the pit lane, a reshuffle) is spread over a few frames.
-        const was = drawnXY.current.get(c.code);
-        let x = tx;
-        let y = ty;
-        if (was && !REDUCED && !atFlag && Math.hypot(tx - was[0], ty - was[1]) > JUMP_PX) {
-          x = was[0] + (tx - was[0]) * 0.35;
-          y = was[1] + (ty - was[1]) * 0.35;
-          moving = true;
-        }
-        drawnXY.current.set(c.code, [x, y]);
+        const place = places.get(c.code);
+        if (!place) return null;
+        const { x, y } = place;
+        const inLane = place.lane;
         const you = c.code === userSide;
         const isRival = c.code === rival;
         const key = you || isRival;
@@ -667,11 +532,11 @@ export function TrackMap({
       {fight &&
         (() => {
           const at = cornerPoint(outline, fight.corner);
-          const other = drawnXY.current.get(fight.other);
-          const me = drawnXY.current.get(userSide);
+          const other = motion.xyOf(fight.other);
+          const me = motion.xyOf(userSide);
           // "NOW" as your car reaches the corner.
           const cornerF = at ? nearestFraction(line, at) : null;
-          const mine = drawn.current.get(userSide);
+          const mine = motion.atOf(userSide);
           const d =
             cornerF !== null && mine !== undefined
               ? ((((cornerF - mine + 0.5) % 1) + 1) % 1) - 0.5
@@ -729,7 +594,7 @@ export function TrackMap({
         })()}
       {flash &&
         (() => {
-          const at = cornerPoint(outline, flash.corner) ?? drawnXY.current.get(userSide);
+          const at = cornerPoint(outline, flash.corner) ?? motion.xyOf(userSide);
           if (!at) return null;
           const w = Math.max(90, flash.text.length * 11 + 24);
           return (

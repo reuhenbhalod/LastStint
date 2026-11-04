@@ -72,3 +72,20 @@ def test_frozen_pit_lane_follows_the_line_between_freeze_and_thaw():
     assert path[-1] == lap[20]
     assert len(path) == (20 - 394) % 400 + 1
     assert frozen_pit_lane(lap, lap[:50], lap[50:100]) == []  # nothing froze
+
+
+def test_pit_lane_ends_where_the_out_lap_rejoins_for_good():
+    # After rejoining, the out-lap runs on the line for a while, then a little wide at a later
+    # corner (off the fastest lap's line): that is racing, not the pit lane.
+    line = [(float(x), 0.0) for x in range(0, 5001, 50)]
+    in_lap = [(100.0, 0.0), (200.0, 100.0), (300.0, 100.0)]
+    out_lap = [(400.0, 100.0), (500.0, 100.0)]
+    out_lap += [(600.0 + 100 * k, 0.0) for k in range(outline.PIT_REJOIN + 2)]
+    out_lap += [(3000.0, 60.0), (3100.0, 60.0)]
+    lane = outline.pit_lane(line, in_lap, out_lap)
+    assert lane == [(200.0, 100.0), (300.0, 100.0), (400.0, 100.0), (500.0, 100.0)]
+
+
+def test_a_pit_lane_most_of_a_lap_long_is_not_valid():
+    lap = _square()
+    assert not outline.valid_pit(lap[: len(lap) // 2], lap)

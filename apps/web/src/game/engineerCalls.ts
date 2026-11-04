@@ -26,12 +26,34 @@ import {
 } from '@boxthislap/sim';
 import { driverInfo } from '../data/drivers.js';
 import { lapTime } from '../track/geometry.js';
-import { type QuickCall, type QuickOption, quickCallAt, safetyCarCall } from './quickCalls.js';
+import {
+  FRESH_TYRES,
+  type QuickCall,
+  type QuickOption,
+  quickCallAt,
+  safetyCarCall,
+} from './quickCalls.js';
 import type { LapEvents } from './raceLog.js';
 
 /** Seconds to answer: a battle is now or never; the rest can wait a little longer. */
 export const BATTLE_MS = 12000;
 export const CALL_MS = 8000;
+
+/** Laps between two stop questions (a "stay out" answer stands for a while). */
+export const STOP_ASK_EVERY = 3;
+
+/** Whether a call puts a stop to the wall. */
+export function offersStop(call: QuickCall): boolean {
+  return call.options.some((o) => [o.call, ...(o.also ?? [])].some((d) => d?.kind === 'pit'));
+}
+
+/** What the tyres cost now against new ones (s a lap): wear, and more past the cliff. */
+export function tyreLoss(model: RaceModel, compound: string, wear: number): number {
+  const c = model.compounds[compound];
+  if (!c) return 0;
+  const past = Math.max(0, wear - c.cliffLap);
+  return c.degPerLap * wear + (c.cliffDegPerLap ?? 2 * c.degPerLap) * past;
+}
 
 /** What the director remembers between laps (so it doesn't ask the same thing every lap). */
 export interface DirectorMemory {
@@ -104,7 +126,9 @@ function battleCall(
   const other = (b[pick] as { code: string; gap: number }).code;
   const gap = (b[pick] as { code: string; gap: number }).gap;
   const them = race.cars[other];
-  if (!them || !battleDue(other, race.lap, mem)) return null;
+  // No fight with a car on its out-lap: it's in the pit lane.
+  if (!them || them.strategy.some((s) => s.lap === next)) return null;
+  if (!battleDue(other, race.lap, mem)) return null;
   const t1 = corners[0] ?? 1;
   const t2 = corners[1] ?? t1;
   const us = model.userSide;
@@ -231,6 +255,7 @@ function troubleCall(
   notes: RaceNote[],
   mem: DirectorMemory,
   stopping: boolean,
+  canStop: boolean,
 ): QuickCall | null {
   const eng = race.engineer;
   const me = race.cars[model.userSide];
@@ -240,10 +265,9 @@ function troubleCall(
   const lapNotes = notes.filter((n) => n.lap === race.lap && n.driver === model.userSide);
 
   // The two-compound rule: no second dry compound yet and no stop booked, late on.
-  const booked = stopping;
   if (
     !ruleSatisfied(me) &&
-    !booked &&
+    canStop &&
     left <= 8 &&
     left > 1 &&
     race.lap - (mem.last.rule ?? -99) >= 2
@@ -270,12 +294,12 @@ function troubleCall(
     };
   }
 
-  // A broken front wing.
+  // A broken front wing: asked when it breaks (whatever the tyres), then now and then.
   const wing = lapNotes.find((n) => n.kind === 'contact' && n.detail === 'wing');
   if (
     !stopping &&
     eng.damage > 0 &&
-    (wing || (race.lap - (mem.last.wing ?? -99) >= 5 && eng.damage > 0.4)) &&
+    (wing || (canStop && race.lap - (mem.last.wing ?? -99) >= 5 && eng.damage > 0.4)) &&
     left > 2
   ) {
     mem.last.wing = race.lap;
@@ -371,17 +395,17 @@ function requestCall(
   model: RaceModel,
   log: LapEvents[],
   mem: DirectorMemory,
-  stopping: boolean,
+  canStop: boolean,
 ): QuickCall | null {
   const me = race.cars[model.userSide];
   const them = race.cars[model.rival];
   if (!me) return null;
   const next = race.lap + 1;
   const left = model.race.laps - race.lap;
-  const cliff = model.compounds[me.compound]?.cliffLap ?? 99;
-  const boxing = stopping;
   const us = model.userSide;
-  if (!boxing && me.tyreWear > cliff - 2 && left > 4 && race.lap - (mem.last.reqBox ?? -99) >= 6) {
+  // The tyres really are gone: well worn, and losing over a second a lap to new ones.
+  const gone = me.tyreAge >= 6 && tyreLoss(model, me.compound, me.tyreWear) >= 1.2;
+  if (canStop && gone && left > 4 && race.lap - (mem.last.reqBox ?? -99) >= 6) {
     mem.last.reqBox = race.lap;
     const compound = lastingCompound(race, model);
     return {
@@ -510,7 +534,9 @@ export function infoLine(race: RaceState, model: RaceModel, log: LapEvents[]): s
   const ours = last?.lapTimes[model.userSide];
   const theirs = last?.lapTimes[model.rival];
   const left = model.race.laps - race.lap;
-  if (ours && theirs && Math.abs(ours - theirs) > 0.25) {
+  // (A lap with a stop in it isn't a pace comparison.)
+  const stopped = last?.pits.some((p) => p.code === model.userSide || p.code === model.rival);
+  if (ours && theirs && !stopped && Math.abs(ours - theirs) > 0.25) {
     const quicker = theirs < ours;
     return `${model.rival} ${quicker ? 'was' : 'lost'} ${Math.abs(ours - theirs).toFixed(1)} ${quicker ? 's quicker' : 's to us'} that lap. Gap ${gap >= 0 ? '+' : '−'}${Math.abs(gap).toFixed(1)}.`;
   }
@@ -533,21 +559,34 @@ export function directorCall(
   /** A BOX is called and not yet in the race model. */
   pendingPit = false,
 ): QuickCall | null {
-  const sc = safetyCarCall(race, model, pendingPit);
-  if (sc) return sc;
   const me = race.cars[model.userSide];
+  if (!me || me.retired) return null;
+  // One gate for every stop question (pit fix 2): none while a stop is called or under way,
+  // none on fresh tyres, and not again within a few laps of the last one.
+  const stopping = pendingPit || me.strategy.some((s) => s.lap > race.lap);
+  const canStop =
+    !stopping && me.tyreAge >= FRESH_TYRES && race.lap - (mem.last.stop ?? -99) >= STOP_ASK_EVERY;
+  const asked = (call: QuickCall | null): QuickCall | null => {
+    if (call && offersStop(call)) mem.last.stop = race.lap;
+    return call;
+  };
+  if (!stopping) {
+    const sc = safetyCarCall(race, model, false);
+    if (sc) return asked(sc);
+  }
   const next = race.lap + 1;
-  if (!me || me.retired || next > model.race.laps) return null;
+  if (next > model.race.laps) return null;
   // No calls into a neutralized lap (no racing), or on a big moment's lap.
   if (race.nextFlag !== 'green' || model.decisionMoments.some((m) => m.lap === next)) return null;
   if (cfg && race.engineer) {
-    const fight = battleCall(race, model, cfg, corners, mem, log);
+    // No battle with a stop booked (your car is about to box), or on its in-lap or out-lap.
+    const pitLap = pendingPit || me.strategy.some((s) => s.lap === next || s.lap === next + 1);
+    const fight = pitLap ? null : battleCall(race, model, cfg, corners, mem, log);
     if (fight) return fight;
-    const stopping = pendingPit || me.strategy.some((s) => s.lap > race.lap);
-    const trouble = troubleCall(race, model, cfg, notes, mem, stopping);
-    if (trouble) return trouble;
-    const ask = requestCall(race, model, log, mem, stopping);
-    if (ask) return ask;
+    const trouble = troubleCall(race, model, cfg, notes, mem, stopping, canStop);
+    if (trouble) return asked(trouble);
+    const ask = requestCall(race, model, log, mem, canStop);
+    if (ask) return asked(ask);
     const battery = batteryCall(race, model, cfg, mem);
     if (battery) return battery;
   }

@@ -103,6 +103,38 @@ describe('GameSession', () => {
     expect(session.state.decisions.filter((d) => d.kind === 'pit')).toHaveLength(1);
   });
 
+  it('does not ask about a stop already booked (Abu Dhabi: box on the radio, then the SC call)', async () => {
+    const today = await daily();
+    const session = new GameSession(today);
+    session.start();
+    const asked: string[] = [];
+    let booked = false;
+    for (let i = 0; i < 300 && session.state.phase !== 'finished'; i++) {
+      const m = session.state.currentMoment;
+      if (session.state.phase === 'decision' && m) {
+        asked.push(m.id);
+        session.choose(m.realOptionId ?? (m.options[0]?.id as string));
+        continue;
+      }
+      // Two laps before the late safety car's stop call, BOX from the team radio for the lap
+      // after the one being shown (past pit entry): booked, not yet made, at the pause.
+      if (!booked && session.state.race.lap === 51) {
+        session.call({ lap: 53, kind: 'pit', compound: 'HARD' });
+        booked = session.state.decisions.some((d) => d.kind === 'pit' && d.lap === 53);
+      }
+      session.tick();
+    }
+    expect(booked).toBe(true);
+    // Neither SC stop call is asked: the wall stays out for you, and the booked stop happens.
+    expect(asked).not.toContain('sc-stop');
+    expect(asked).not.toContain('sc-last-chance');
+    expect(session.state.radio.some((r) => r.text.includes('boxing already'))).toBe(true);
+    const stops = session.state.decisions.filter((d) => d.kind === 'pit' && d.lap >= 52);
+    expect(stops).toEqual([expect.objectContaining({ lap: 53, compound: 'HARD' })]);
+    const body = await session.submission('11111111-1111-4111-8111-111111111111');
+    expect(() => verifyRun(today.model, today.seed, body.decisions)).not.toThrow();
+  });
+
   it('reports incidents on the radio, and plays on to the flag if your car is out', async () => {
     const today = await daily();
     // A seed where HAM's race ends early (a crash or a failure), found by playing it.
