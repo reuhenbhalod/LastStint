@@ -1586,17 +1586,22 @@ function engineerAfterLap(
   }
   eng.refused = keep;
 
-  // Quiet laps calm him down, back toward where he started.
-  if (eng.trust < eng.baseTrust && lap - eng.lastEvent >= cfg.trust.settleAfter) {
+  // Quiet laps settle him, back toward where he started: calmer after a row, a little less
+  // sure of the wall after a run of good calls.
+  if (eng.trust !== eng.baseTrust && lap - eng.lastEvent >= cfg.trust.settleAfter) {
     const before = moodOf(cfg, eng.trust);
-    eng.trust = Math.min(eng.baseTrust, eng.trust + cfg.trust.settle);
+    const was = eng.trust;
+    eng.trust =
+      eng.trust < eng.baseTrust
+        ? Math.min(eng.baseTrust, eng.trust + cfg.trust.settle)
+        : Math.max(eng.baseTrust, eng.trust - cfg.trust.settle);
     if (moodOf(cfg, eng.trust) !== before) {
       run.notes.push({
         lap,
         kind: 'trust',
         driver: user.code,
         detail: 'settled',
-        value: cfg.trust.settle,
+        value: eng.trust - was,
       });
     }
   }

@@ -8,11 +8,24 @@ import { flagOn } from '../track/geometry.js';
 import type { LapEvents } from './raceLog.js';
 import type { LiveCall } from './refusal.js';
 
+/** Where a battle option is drawn on the track (battles and trust spec D1). */
+export type BattleLine = 'inside' | 'outside' | 'wait' | 'boost' | 'hard' | 'let';
+
+/** A battle option's odds: the good outcome (a pass, or holding him off) and contact. */
+export interface BattleOdds {
+  good: number;
+  label: 'pass' | 'hold';
+  contact: number;
+}
+
 export interface QuickOption {
   id: string;
   label: string;
   /** A short line under the label: what it does (race engineer calls). */
   note?: string;
+  /** A battle option: its odds and where it's drawn. */
+  odds?: BattleOdds;
+  line?: BattleLine;
   /** The order this answer gives (null: no change). */
   call: Decision | null;
   /** More calls the answer makes (a yes to "can I box?" also boxes). */

@@ -236,3 +236,27 @@ label:has(input) {
   );
   background-size: 16px 16px;
 }
+
+/* A trust change on the driver's card (battles and trust spec): pops in, then settles. */
+@keyframes trust-pop {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.trust-pop > * {
+  animation: trust-pop 420ms ease-out both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .trust-pop > * {
+    animation: none;
+  }
+}

@@ -81,7 +81,15 @@ export interface MotionInput {
   userExtra?: number;
   /** The run to the flag: laps since the leader finished (null while racing). */
   sinceFlag?: number | null;
+  /**
+   * A battle's result shown at its corner (battles and trust spec): from tick progress `at`,
+   * `code` moves to `gap` seconds behind `other` (negative: ahead), its order after the lap.
+   */
+  swap?: { code: string; other: string; gap: number; at: number } | null;
 }
+
+/** Progress over which a battle's new order slides in after the corner. */
+const SWAP_SPAN = 0.04;
 
 export interface CarPlace {
   x: number;
@@ -298,6 +306,13 @@ export class MapMotion {
     return progress < off + this.lane.entry - ENTRY_MARGIN;
   }
 
+  /** The tick progress at which `code` reaches `fraction` of the lap on this tick (it may be
+   * past 1: not this tick). */
+  reach(code: string, fraction: number): number | null {
+    const off = this.offsets.get(code);
+    return off === undefined ? null : frac(fraction + off);
+  }
+
   /** Where `code` was last drawn: on screen, and round the lap. */
   xyOf(code: string): [number, number] | undefined {
     return this.xy.get(code);
@@ -384,6 +399,13 @@ export class MapMotion {
         continue;
       }
       free.set(code, glide(code, off));
+    }
+    const sw = input.swap;
+    if (sw && p >= sw.at && free.has(sw.code) && free.has(sw.other)) {
+      const base = free.get(sw.code) as number;
+      const target = (free.get(sw.other) as number) + sw.gap / this.lapSec;
+      const k = input.smooth ? ease(Math.min(1, (p - sw.at) / SWAP_SPAN)) : 1;
+      free.set(sw.code, base + (target - base) * k);
     }
     const spaced = spaceOut(free, this.minGap);
 

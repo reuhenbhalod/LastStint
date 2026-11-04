@@ -7,6 +7,7 @@
 import {
   type Decision,
   type DecisionMoment,
+  type RaceNote,
   type RaceState,
   engineerConfig,
   moodOf,
@@ -214,6 +215,21 @@ export class GameSession {
   /** What the race model noted so far (battles, contact, trust...). */
   get notes() {
     return this.engine.notes;
+  }
+
+  /**
+   * The lap being shown, run ahead (battles and trust spec): a replay of the call log to the
+   * end of it. The race model is deterministic, so this is exactly what the lap will give if
+   * no more calls are made for it (a battle's result shown at its corner). Null at the flag.
+   */
+  previewLap(): { race: RaceState; notes: RaceNote[] } | null {
+    if (this.engine.isFinished()) return null;
+    const lap = this.engine.lap + 1;
+    const replay = new GameEngine(this.daily.model, this.daily.seed, {
+      decisions: this.engine.decisions,
+    });
+    while (replay.lap < lap && !replay.isFinished()) replay.step();
+    return { race: replay.state, notes: replay.notes.filter((n) => n.lap === lap) };
   }
 
   /** The radio for the race engineer side of the lap: battles, contact, track limits, trust. */

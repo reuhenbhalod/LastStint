@@ -2,23 +2,52 @@
 // they feel about the wall right now (trust, race engineer spec D4), any damage or track-limit
 // trouble, and where they stand: place, tyres, stops, headset modes.
 
-import { type RaceModel, type RaceState, engineerConfig, moodOf } from '@boxthislap/sim';
+import {
+  type RaceModel,
+  type RaceNote,
+  type RaceState,
+  engineerConfig,
+  moodOf,
+} from '@boxthislap/sim';
 import { TIER_LABEL, driverInfo } from '../data/drivers.js';
 import { MOOD_LABEL } from '../game/engineerCalls.js';
 import type { LapEvents } from '../game/raceLog.js';
 import { MoodLight } from './Icons.js';
 import { TyreBadge } from './TyreBadge.js';
 
+/** Why his trust moved, in a few words (battles and trust spec: the change shows). */
+const TRUST_WHY: Record<string, string> = {
+  'pass-called': 'pass you called',
+  'pass-failed': 'move that failed',
+  'held-called': 'held him off',
+  'passed-anyway': 'passed anyway',
+  'let-rival-go': 'told to let the rival go',
+  contact: 'contact',
+  undercut: 'undercut worked',
+  'stop-lost': 'stop lost places',
+  micromanaging: 'too many orders',
+  'request-yes': 'you listened',
+  'request-wrong': 'he was right',
+  'request-right': 'you were right',
+  penalty: 'penalty',
+  strike: 'track limits',
+  'let-car-go': 'let a car go',
+  settled: 'settled down',
+};
+
 export function DriverProfile({
   code,
   race,
   model,
   log,
+  notes = [],
 }: {
   code: string;
   race: RaceState;
   model: RaceModel;
   log: LapEvents[];
+  /** The race model's notes (the last lap's trust changes show as chips). */
+  notes?: RaceNote[];
 }) {
   const car = race.cars[code];
   const info = driverInfo(code);
@@ -56,6 +85,34 @@ export function DriverProfile({
               <MoodLight color={MOOD_LABEL[mood].color} /> {MOOD_LABEL[mood].text}
             </span>
           </div>
+          {(() => {
+            const changes = notes.filter(
+              (n) => n.kind === 'trust' && n.lap === race.lap && (n.value ?? 0) !== 0,
+            );
+            return changes.length ? (
+              <div
+                key={race.lap}
+                className="trust-pop flex flex-wrap gap-1.5 text-[12px] font-bold"
+              >
+                {changes.map((n, i) => {
+                  const v = Math.round(n.value ?? 0);
+                  return (
+                    <span
+                      // biome-ignore lint/suspicious/noArrayIndexKey: a lap's changes, in order.
+                      key={i}
+                      className="rounded-full px-2 py-0.5"
+                      style={{
+                        background: v > 0 ? 'var(--you)' : 'var(--box)',
+                        color: v > 0 ? '#08231f' : '#ffffff',
+                      }}
+                    >
+                      {v > 0 ? `+${v}` : `−${-v}`} {TRUST_WHY[n.detail ?? ''] ?? n.detail}
+                    </span>
+                  );
+                })}
+              </div>
+            ) : null;
+          })()}
           <div
             className="h-2 overflow-hidden rounded-full bg-[var(--card-2)]"
             role="meter"

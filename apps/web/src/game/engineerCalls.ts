@@ -27,6 +27,8 @@ import {
 import { driverInfo } from '../data/drivers.js';
 import { lapTime } from '../track/geometry.js';
 import {
+  type BattleLine,
+  type BattleOdds,
   FRESH_TYRES,
   type QuickCall,
   type QuickOption,
@@ -65,16 +67,11 @@ export interface DirectorMemory {
 
 export const newMemory = (): DirectorMemory => ({ last: {} });
 
-/**
- * A long battle with the same car is asked about on its first two laps, then every other lap
- * (on the laps between, the driver races him normally).
- */
+/** A battle is asked about every lap it lasts (battles and trust spec D4); the memory keeps
+ * the fight's length for the radio. */
 function battleDue(other: string, lap: number, mem: DirectorMemory): boolean {
   const f = mem.fight;
-  const running = f && f.other === other && lap - (mem.last.battle ?? -99) <= 2;
-  if (running && (f as { streak: number }).streak >= 2 && lap - (mem.last.battle ?? -99) < 2) {
-    return false;
-  }
+  const running = f && f.other === other && lap - (mem.last.battle ?? -99) <= 1;
   mem.fight = { other, streak: running ? (f as { streak: number }).streak + 1 : 1 };
   mem.last.battle = lap;
   return true;
@@ -100,8 +97,6 @@ function paceGap(log: LapEvents[], us: string, them: string): number | null {
     laps.length
   );
 }
-
-const pct = (p: number) => `${Math.round(p * 100)}%`;
 
 function battleCall(
   race: RaceState,
@@ -129,11 +124,11 @@ function battleCall(
   // No fight with a car on its out-lap: it's in the pit lane.
   if (!them || them.strategy.some((s) => s.lap === next)) return null;
   if (!battleDue(other, race.lap, mem)) return null;
-  const t1 = corners[0] ?? 1;
-  const t2 = corners[1] ?? t1;
   const us = model.userSide;
   const attacking = pick === 'ahead';
   const eng = race.engineer;
+  // Outside DRS range he has to close in first (battles and trust spec D4).
+  const drsRange = gap < 1;
 
   // The odds the race model will roll this lap (race engineer spec): the track's overtaking
   // curve on the two cars' pace and the gap, shifted by the move. (Approximate: the headset's
@@ -144,19 +139,28 @@ function battleCall(
   const leader = attacking ? other : us;
   const advantage = pace(leader) - pace(follower);
   const drs = attacking && eng?.drsLap === next ? cfg.drsLogit : 0;
-  const odds = (move: BattleMove) => {
+  const odds = (move: BattleMove): BattleOdds => {
     const m = cfg.moves[move];
     const shift = attacking ? (m.attackLogit ?? 0) + drs : (m.defendLogit ?? 0);
     const p = passProbability(model.track.overtakeModel, advantage, gap, shift);
-    const contact = cfg.contactBase * (m.contact ?? 1);
-    return attacking
-      ? `≈${pct(p)} to pass · ${pct(contact)} contact`
-      : `≈${pct(p)} he gets by · ${pct(contact)} contact`;
+    return {
+      good: attacking ? p : 1 - p,
+      label: attacking ? 'pass' : 'hold',
+      contact: cfg.contactBase * (m.contact ?? 1),
+    };
   };
-  const opt = (id: string, label: string, move: BattleMove, what: string): QuickOption => ({
+  const opt = (
+    id: string,
+    label: string,
+    move: BattleMove,
+    what: string,
+    line: BattleLine,
+  ): QuickOption => ({
     id,
     label,
-    note: `${what} · ${odds(move)}`,
+    note: what,
+    odds: odds(move),
+    line,
     call: battle(next, move),
   });
 
@@ -168,7 +172,7 @@ function battleCall(
     { label: 'Gap', value: `${gap.toFixed(1)} s ${attacking ? 'ahead' : 'behind'}` },
     {
       label: 'DRS',
-      value: gap < 1 ? `${attacking ? 'You' : other} ${attacking ? 'have' : 'has'} it` : 'No',
+      value: drsRange ? `${attacking ? 'You' : other} ${attacking ? 'have' : 'has'} it` : 'No',
     },
     { label: 'Tyres', value: `${us} ${tyre(me)} · ${other} ${tyre(them)}` },
     {
@@ -182,21 +186,36 @@ function battleCall(
     },
     ...(me.battery !== undefined ? [{ label: 'Battery', value: `${battery}%` }] : []),
   ];
+  const corner = corners[0] ?? 1;
+  const rival = other === model.rival ? ' (the rival)' : '';
 
   if (attacking) {
     const options: QuickOption[] = [
-      opt('dive', `Dive up the inside into Turn ${t1}`, 'dive-inside', 'Late on the brakes'),
+      opt('dive', 'Dive up the inside', 'dive-inside', 'Late on the brakes', 'inside'),
       opt(
         'outside',
-        `Round the outside at Turn ${t2}`,
+        'Round the outside',
         'round-outside',
-        'Cleaner, harder to stick',
+        'Cleaner, harder to make stick',
+        'outside',
       ),
-      opt('drs', 'Sit in DRS, go next lap', 'wait-drs', 'Better shot next lap'),
+      opt(
+        'drs',
+        'Wait for DRS, go next lap',
+        'wait-drs',
+        'No risk now, a better shot next lap',
+        'wait',
+      ),
     ];
     if (battery >= -(cfg.moves['overtake-button'].battery ?? -25)) {
       options.push(
-        opt('button', `Overtake button into Turn ${t1}`, 'overtake-button', 'Spends 25% battery'),
+        opt(
+          'button',
+          'Overtake boost',
+          'overtake-button',
+          'Inside line, spends 25% battery',
+          'boost',
+        ),
       );
     }
     return {
@@ -204,12 +223,14 @@ function battleCall(
       from: us,
       kind: 'battle',
       other,
-      corner: t1,
+      corner,
       attacking: true,
       gap,
       stats,
       asked: false,
-      text: `I’m ${gap.toFixed(1)} s behind ${other}${other === model.rival ? ', the rival' : ''}. The move is into Turn ${t1}. How do I get by?`,
+      text: drsRange
+        ? `${other}${rival} is ${gap.toFixed(1)} s ahead. I can get him. How do I go?`
+        : `${other}${rival} is ${gap.toFixed(1)} s ahead. I have to close in first, but I can try.`,
       options,
       driverChoice: battle(next, ownMove(us, true), true),
     };
@@ -219,22 +240,17 @@ function battleCall(
     from: 'Engineer',
     kind: 'battle',
     other,
-    corner: t1,
+    corner,
     attacking: false,
     gap,
     stats,
     asked: false,
-    text: `${other}${other === model.rival ? ' (the rival)' : ''} is ${gap.toFixed(1)} s behind${gap < 1 ? ' with DRS' : ''}. He’ll try into Turn ${t1}. How do we defend?`,
+    text: `${other}${rival} is ${gap.toFixed(1)} s behind${drsRange ? ' with DRS' : ', closing'}. How do we defend?`,
     options: [
-      opt(
-        'cover',
-        `Cover the inside into Turn ${t1}`,
-        'cover-inside',
-        'Solid, costs a little time',
-      ),
-      opt('outside', 'Hold the outside line', 'hold-outside', 'Quick, easier to pass'),
-      opt('hard', 'Defend hard', 'defend-hard', 'Contact and track-limits risk'),
-      opt('let', 'Let him go, save the tyres', 'let-go', 'Tyres saved'),
+      opt('cover', 'Cover the inside', 'cover-inside', 'Solid, costs a little time', 'inside'),
+      opt('outside', 'Hold the outside line', 'hold-outside', 'Quicker, easier to pass', 'outside'),
+      opt('hard', 'Defend hard', 'defend-hard', 'Contact and track-limits risk', 'hard'),
+      opt('let', 'Let him go', 'let-go', 'Save the tyres', 'let'),
     ],
     driverChoice: battle(next, ownMove(us, false), true),
   };
