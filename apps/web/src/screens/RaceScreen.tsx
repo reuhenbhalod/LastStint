@@ -40,6 +40,7 @@ import {
   offersStop,
 } from '../game/engineerCalls.js';
 import { modeLine } from '../game/guide.js';
+import { neutralCause } from '../game/neutral.js';
 import { type QuickCall, quickCallLaps } from '../game/quickCalls.js';
 import { useRaceLog } from '../game/raceLog.js';
 import { radioChirp, setSoundOn, soundOn } from '../game/sound.js';
@@ -47,7 +48,7 @@ import { type Game, LAP_MS, SLOW_MOTION, clockProgress } from '../game/useGame.j
 import type { GameState } from '../state/machine.js';
 import { BRAKE_BEFORE } from '../track/battle.js';
 import { cornerPoint, overtakingCorners } from '../track/corners.js';
-import { nearestFraction, polyline, quietCorner } from '../track/geometry.js';
+import { flagOn, nearestFraction, polyline, quietCorner } from '../track/geometry.js';
 import type { MapMotion } from '../track/motion.js';
 import { outlineFor } from '../track/outlines.js';
 
@@ -137,7 +138,10 @@ export function RaceScreen({
   const toggle = (p: 'gap') => setPanel((c) => (c === p ? null : p));
   const log = useRaceLog(state.race);
   const team = model.drivers.find((d) => d.code === userSide)?.team;
-  const flag = FLAG[state.race.flag];
+  // The flag of the lap being driven, and why it's out.
+  const drivenFlag = state.race.nextFlag ?? flagOn(model, state.race.lap + 1);
+  const flag = FLAG[drivenFlag];
+  const why = neutralCause(model, game.notes(), state.race.lap + 1, drivenFlag);
   const lapsLeft = totalLaps - state.race.lap;
   const gap = me && them && !me.retired && !them.retired ? them.totalTime - me.totalTime : null;
 
@@ -542,7 +546,7 @@ export function RaceScreen({
 
   return (
     <main className="mx-auto flex min-h-screen max-w-[1360px] flex-col gap-3 px-4 pb-6 pt-3 xl:h-screen xl:pb-3">
-      <header className="flex items-center justify-between gap-3 border-b border-[var(--rule)] pb-2">
+      <header className="flex items-center justify-between gap-3 border-b-2 border-[var(--you)] pb-2">
         <span className="flex min-w-0 items-baseline gap-2">
           <button
             type="button"
@@ -714,6 +718,11 @@ export function RaceScreen({
                   >
                     {flag.text}
                   </span>
+                  {why && (
+                    <span className="max-w-[220px] rounded-md bg-black/70 px-2 py-1 text-[12px] font-semibold leading-snug text-white">
+                      {why}
+                    </span>
+                  )}
                 </div>
                 {finishing && crossed && (
                   <output className="radio-alert absolute inset-x-2.5 bottom-12 z-10 mx-auto flex max-w-[420px] items-center justify-center gap-3 rounded-xl border-2 border-white bg-[#141716]/90 px-4 py-3 text-white shadow-2xl">

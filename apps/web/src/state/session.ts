@@ -21,6 +21,7 @@ import { type GradedMoment, type Grader, gradedFromHits, inlineGrader } from '..
 import { autoStay, boxingAt } from '../game/autoStay.js';
 import { ownMove } from '../game/engineerCalls.js';
 import { engineerRadio } from '../game/engineerRadio.js';
+import { neutralCause } from '../game/neutral.js';
 import { MOOD_REFUSALS, acknowledge, refusal } from '../game/refusal.js';
 import { overtakingCorners } from '../track/corners.js';
 import { outlineFor } from '../track/outlines.js';
@@ -184,6 +185,7 @@ export class GameSession {
     if (this.state.phase !== 'racing') return;
     this.engine.step();
     this.reportIncidents();
+    this.reportNeutral();
     this.reportEngineer();
     this.sync();
   }
@@ -210,6 +212,24 @@ export class GameSession {
               : `${n.driver} has stopped on track with a failure.`;
       this.say(mine ? side : 'Race control', text, false, lap);
     }
+  }
+
+  /**
+   * Race control as a safety car or VSC is called for the next lap, and why (game/neutral.ts).
+   * A crash in live play already said so with its own line.
+   */
+  private reportNeutral(): void {
+    const race = this.engine.state;
+    const lap = this.engine.lap;
+    const next = race.nextFlag;
+    if ((next !== 'sc' && next !== 'vsc') || race.flag === next) return;
+    const crashed = this.engine.notes.some(
+      (n) => n.kind === 'incident' && n.detail === 'crash' && n.lap === lap,
+    );
+    if (crashed) return;
+    const why = neutralCause(this.daily.model, this.engine.notes, lap + 1, next);
+    const name = next === 'sc' ? 'Safety car' : 'Virtual safety car';
+    this.say('Race control', `${name}${why ? `: ${why}.` : '.'}`, false, lap);
   }
 
   /** What the race model noted so far (battles, contact, trust...). */

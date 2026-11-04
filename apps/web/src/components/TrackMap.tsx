@@ -819,7 +819,7 @@ export function TrackMap({
                 width={w}
                 height={34}
                 rx={8}
-                fill={flash.good ? 'var(--you)' : 'var(--box)'}
+                fill={flash.good ? 'var(--good)' : 'var(--box)'}
               />
               <text
                 y={-39}

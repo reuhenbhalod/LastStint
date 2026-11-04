@@ -36,7 +36,7 @@ export function CarStats({
   const cliff = compound?.cliffLap ?? 40;
   const left = Math.max(0, Math.round(cliff - me.tyreWear));
   const used = Math.min(1, me.tyreWear / Math.max(1, cliff));
-  const tone = left <= 2 ? 'var(--box)' : left <= 6 ? 'var(--flag)' : 'var(--you)';
+  const tone = left <= 2 ? 'var(--box)' : left <= 6 ? 'var(--flag)' : 'var(--good)';
 
   // Last lap, and the average difference to the rival over the last 3 green laps.
   const last = log.at(-1);
@@ -99,7 +99,7 @@ export function CarStats({
               className="h-full rounded-full transition-[width] duration-700"
               style={{
                 width: `${Math.round(me.battery)}%`,
-                background: me.battery <= 15 ? 'var(--box)' : 'var(--you)',
+                background: me.battery <= 15 ? 'var(--box)' : 'var(--good)',
               }}
             />
           </div>

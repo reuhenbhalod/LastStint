@@ -77,6 +77,16 @@ Beta feedback round 2, part B (Nov 2, 2026):
     - A big stop moment stays out for you if a stop is booked or was made in the last 5 laps ("We're boxing already").
     - A stop picked in answer to a question is never refused.
     - A team-radio BOX clears a stop question already on screen.
+- **Team colours and safety-car causes (Nov 4, localhost only):**
+  - **Team colours (`game/teamTheme.ts`):** each race is shown in your driver's team colour: Ferrari red, McLaren papaya, Red Bull blue and so on.
+    - It covers your car, the header stripe, buttons, the home page and the timing tower.
+    - The rival takes their team's colour, or a contrasting one when the two would look alike (team-mates, two reds).
+    - Good news has its own fixed colour (`--good`), so a Ferrari player never sees good news in red.
+  - **Why the safety car is out:** `pipeline incidents` writes `data/incidents.json`, display only.
+    - Each SC/VSC is put down to the car that retired as it came out, with its official result status from FastF1 ("Accident", "Gearbox") and the corner when race control gives one.
+    - With no car out, race control's words are used instead: a clash just before (debris), or a yellow in a sector.
+    - All 20 neutralizations in the pool races are explained.
+    - The game says it on the radio ("Race control: Safety car: Latifi crashed.") and under the flag on the map; a crash in live play brings its own cause.
 - **Seed tuner (`pnpm --filter @boxthislap/sim tune <race>`):** picks each race's daily seed so the real team's calls give the real result, a good player (best-graded call every time) wins, and random play wins about 15% of the time. Abu Dhabi 2021 keeps its seed (random play wins about 1%: the hardest race).
 - **Admin page (`/admin`):** sign in with Google (emails in `ADMIN_EMAILS`); play any race with any seed; see and run the daily schedule (schedule days rotating the races, change a day's race, re-pin stale days, clear your own run to replay a day). API in `docs/api.md`.
 - **Google sign-in + streaks:** the streak shows on the intro and results. Signing in links the browser to an account so the streak and one-run-a-day follow you.

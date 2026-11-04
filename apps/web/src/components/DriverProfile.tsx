@@ -58,11 +58,11 @@ export function DriverProfile({
   const cfg = engineerConfig(model);
   const mood = eng && cfg ? moodOf(cfg, eng.trust) : null;
   const moodColor =
-    mood === 'calm' ? 'var(--you)' : mood === 'tense' ? 'var(--flag)' : 'var(--box)';
+    mood === 'calm' ? 'var(--good)' : mood === 'tense' ? 'var(--flag)' : 'var(--box)';
   return (
     <section aria-label="Your driver" className="card flex flex-col gap-3">
       <header className="flex items-center gap-3">
-        <span className="disp flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-[var(--you)] text-[19px] leading-none text-[#08231f]">
+        <span className="disp flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-[var(--you)] text-[19px] leading-none text-[var(--you-ink)]">
           {info?.number ?? code}
         </span>
         <span className="min-w-0">
@@ -102,7 +102,7 @@ export function DriverProfile({
                       key={i}
                       className="rounded-full px-2 py-0.5"
                       style={{
-                        background: v > 0 ? 'var(--you)' : 'var(--box)',
+                        background: v > 0 ? 'var(--good)' : 'var(--box)',
                         color: v > 0 ? '#08231f' : '#ffffff',
                       }}
                     >

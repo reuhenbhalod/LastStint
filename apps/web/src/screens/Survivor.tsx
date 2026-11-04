@@ -11,6 +11,7 @@ import { ApiError, type SurvivorBoardEntry, type SurvivorState, survivorApi } fr
 import { anonId } from '../data/player.js';
 import { SurvivorProvider } from '../data/provider.js';
 import { goalOf } from '../game/goal.js';
+import { useTeamTheme } from '../game/teamTheme.js';
 import { useGame } from '../game/useGame.js';
 import { clearRun } from '../state/storage.js';
 import { IntroCard } from './IntroCard.js';
@@ -229,6 +230,8 @@ function RoundRace({
     [run.runId, cur.round, cur.raceId, cur.seed],
   );
   const game = useGame(provider, undefined, RACE_KEY);
+  // The race in the driver's team colours (game/teamTheme.ts).
+  useTeamTheme(game.model);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -297,7 +300,7 @@ function RoundRace({
             <button
               type="button"
               onClick={send}
-              className="rounded-xl bg-[var(--you)] px-6 py-3 font-bold text-[#08231f]"
+              className="rounded-xl bg-[var(--you)] px-6 py-3 font-bold text-[var(--you-ink)]"
             >
               Try again
             </button>
@@ -349,7 +352,7 @@ function Between({
       <button
         type="button"
         onClick={onNext}
-        className="rounded-xl bg-[var(--you)] px-10 py-4 text-[18px] font-bold text-[#08231f] hover:brightness-110"
+        className="rounded-xl bg-[var(--you)] px-10 py-4 text-[18px] font-bold text-[var(--you-ink)] hover:brightness-110"
       >
         Next race →
       </button>
@@ -400,7 +403,7 @@ function Over({
                 </span>
                 <span
                   className="font-semibold"
-                  style={{ color: h.won ? 'var(--you)' : 'var(--box-ink)' }}
+                  style={{ color: h.won ? 'var(--good)' : 'var(--box-ink)' }}
                 >
                   {h.won ? 'Survived' : 'Out'} · P{h.finishPosition}
                 </span>

@@ -116,7 +116,7 @@ export function BattleCard({
         <output
           className="rounded-lg px-3 py-2 text-center text-[18px] font-extrabold uppercase tracking-wide"
           style={{
-            background: result.good ? 'var(--you)' : 'var(--box)',
+            background: result.good ? 'var(--good)' : 'var(--box)',
             color: result.good ? '#08231f' : '#ffffff',
           }}
         >
@@ -160,7 +160,7 @@ export function BattleCard({
                     <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/15">
                       <span
                         className="block h-full rounded-full"
-                        style={{ width: pct(o.odds.good), background: 'var(--you)' }}
+                        style={{ width: pct(o.odds.good), background: 'var(--good)' }}
                       />
                     </span>
                     <span>

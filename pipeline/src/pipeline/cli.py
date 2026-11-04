@@ -8,10 +8,12 @@ pipeline validate <race-id>   run the Gate G1 report; exits 1 if the race fails
 
 from __future__ import annotations
 
+import json
+
 import typer
 
 from . import build as build_mod
-from . import export, ingest, outline, paths, sim_reference
+from . import export, incidents, ingest, outline, paths, sim_reference
 from . import validate as validate_mod
 
 app = typer.Typer(help="F1 timing data -> race-model JSON pipeline", no_args_is_help=True)
@@ -74,6 +76,21 @@ def outline_cmd(
         f" {len(shape.get('pit', []))} pit-lane points"
         f" -> {path.relative_to(paths.REPO_ROOT)}"
     )
+
+
+@app.command("incidents")
+def incidents_cmd(
+    race_ids: list[str] = typer.Argument(..., help="Registered races, e.g. abu-dhabi-2021."),  # noqa: B008
+) -> None:
+    """Write data/incidents.json: why each safety car / VSC came out, for the race screen
+    (network: FastF1 results and race control messages)."""
+    for race_id in race_ids:
+        meta = build_mod.RACES[race_id]
+        model = json.loads((paths.DATA_DIR / "races" / f"{race_id}.json").read_text())
+        status, msgs = incidents.fetch(meta["year"], meta["event"])
+        items = incidents.causes(model, status, msgs)
+        incidents.write(race_id, items)
+        typer.echo(f"{race_id}: {items}")
 
 
 @app.command()

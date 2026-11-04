@@ -123,7 +123,7 @@ export function TeamRadio({
                     aria-pressed={orders.holdUp}
                     onClick={() => order(orders.holdUp ? 'release' : 'holdUp')}
                     title={`${mate} defends against ${rival} whenever he's right ahead of him`}
-                    className={`${btn} ${orders.holdUp ? 'bg-[var(--you)] text-[#08231f]' : 'bg-[var(--card)] hover:bg-[var(--rule)]'}`}
+                    className={`${btn} ${orders.holdUp ? 'bg-[var(--you)] text-[var(--you-ink)]' : 'bg-[var(--card)] hover:bg-[var(--rule)]'}`}
                   >
                     {orders.holdUp ? `Release ${rival}` : `Hold up ${rival}`}
                   </button>

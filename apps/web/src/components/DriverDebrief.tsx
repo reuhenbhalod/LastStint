@@ -61,7 +61,7 @@ export function DriverDebrief({
   const battles = mine.filter((n) => n.kind === 'battle');
   const won_ = battles.filter((n) => n.detail === 'passed' || n.detail === 'held').length;
   const contact = mine.filter((n) => n.kind === 'contact').length;
-  const color = mood === 'calm' ? 'var(--you)' : mood === 'tense' ? 'var(--flag)' : 'var(--box)';
+  const color = mood === 'calm' ? 'var(--good)' : mood === 'tense' ? 'var(--flag)' : 'var(--box)';
   return (
     <section aria-label="Your driver" className="card flex flex-col gap-3">
       <div className="flex items-baseline justify-between">
@@ -79,7 +79,7 @@ export function DriverDebrief({
           {best && (
             <div className="flex justify-between gap-3">
               <dt className="text-[var(--muted)]">Best call · lap {best.lap}</dt>
-              <dd className="m-0 text-right font-semibold text-[var(--you)]">
+              <dd className="m-0 text-right font-semibold text-[var(--good)]">
                 {REASON[best.detail as TrustReason]}
               </dd>
             </div>

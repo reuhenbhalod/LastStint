@@ -41,7 +41,7 @@ function steps(
     {
       title: 'Run the car, lap by lap',
       body: [
-        'Between the big calls the radio keeps coming: a car within a second means a battle (cover the inside, go round the outside, wait for DRS), and there’s damage, track limits, lapped cars, and your driver asking for things. Answer before the timer runs out, or he decides himself.',
+        'Between the big calls the radio keeps coming: a car within a second and a half means a battle: the race stops at the braking zone while you pick a line (cover the inside, go round the outside, wait for DRS), and there’s damage, track limits, lapped cars, and your driver asking for things. Answer before the timer runs out, or he decides himself.',
         'BOX and the team radio (pace, battle, ERS, fuel) are always yours.',
       ],
     },
@@ -140,7 +140,7 @@ export function HowToPlay({
           <button
             type="button"
             onClick={() => (last ? close() : setI(i + 1))}
-            className="rounded-lg bg-[var(--you)] py-2.5 font-bold text-[#08231f]"
+            className="rounded-lg bg-[var(--you)] py-2.5 font-bold text-[var(--you-ink)]"
           >
             {last ? 'Got it' : 'Next'}
           </button>

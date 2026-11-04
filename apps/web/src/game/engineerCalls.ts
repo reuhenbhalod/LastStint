@@ -1,7 +1,7 @@
 // The race engineer's radio (race engineer spec D2-D5): what the wall is asked, lap by lap,
 // between the big graded moments. Most pressing first:
 //   1. a safety car the race model doesn't have (a crash): box or stay;
-//   2. a battle with the car directly ahead or behind (within a second): the move for the lap,
+//   2. a battle with the car directly ahead or behind (within 1.5 s): the move for the lap,
 //      named by the corner it's fought into; 5 seconds, in slow motion; no answer and the
 //      driver picks his own;
 //   3. trouble: a broken front wing (box for a nose?), track-limit strikes, a lapped car;
@@ -611,7 +611,7 @@ export function directorCall(
 
 /** The driver's mood as the game shows it. */
 export const MOOD_LABEL = {
-  calm: { text: 'Calm', color: 'var(--you)' },
+  calm: { text: 'Calm', color: 'var(--good)' },
   tense: { text: 'Tense', color: 'var(--flag)' },
   frustrated: { text: 'Frustrated', color: 'var(--rival)' },
   furious: { text: 'Furious', color: 'var(--box)' },
