@@ -25,6 +25,7 @@ import {
 import headsetConfig from './headset.json';
 import { type Rng, deriveSeed, mulberry32 } from './rng.js';
 import type {
+  BattleMove,
   CarState,
   CompoundModel,
   Decision,
@@ -1508,14 +1509,36 @@ function engineerShift(run: Run, lap: number, ahead: string, behind: string): nu
   const user = run.model.userSide;
   if (behind === user) {
     const m = isAttack(eng.move)
-      ? (cfg.moves[eng.move as keyof typeof cfg.moves].attackLogit ?? 0)
+      ? (cfg.moves[eng.move as keyof typeof cfg.moves].attackLogit ?? 0) -
+        readMove(cfg, eng, eng.move, ahead, lap)
       : 0;
     return m + (eng.drsLap === lap ? cfg.drsLogit : 0);
   }
   if (ahead === user && isDefend(eng.move)) {
-    return cfg.moves[eng.move as keyof typeof cfg.moves].defendLogit ?? 0;
+    return (
+      (cfg.moves[eng.move as keyof typeof cfg.moves].defendLogit ?? 0) +
+      readMove(cfg, eng, eng.move, behind, lap)
+    );
   }
   return 0;
+}
+
+/**
+ * The other driver reads a repeated move (battle variety): the same attack or defence against
+ * the same car within two laps loses `adapt` of its logit (he covers the inside he was dived
+ * on, or goes round the outside of a car that covered the inside). Waiting and yielding are
+ * never read.
+ */
+export function readMove(
+  cfg: EngineerConfig,
+  eng: Pick<EngineerState, 'lastMove'>,
+  move: BattleMove | null,
+  other: string,
+  lap: number,
+): number {
+  const last = eng.lastMove;
+  if (!move || !last || move === 'wait-drs' || move === 'let-go') return 0;
+  return last.move === move && last.other === other && lap - last.lap <= 2 ? (cfg.adapt ?? 0) : 0;
 }
 
 /**
@@ -1540,6 +1563,7 @@ function engineerAfterLap(
   if (battle && t && !pitted.has(t) && !pitted.has(user.code) && !car(run, t).retired) {
     const move = battle.move;
     const called = !battle.byDriver;
+    if (move) eng.lastMove = { move, other: t, lap };
     if (isAttack(move)) {
       const passed = pos(user.code) < pos(t);
       run.notes.push({

@@ -112,3 +112,16 @@ Nov 4, 2026 · branch `gameplay-fixes` (localhost only). Battles should be about
   - Browser playthroughs: Canada 2022 defending (T8, T13, T1), Mexico 2021 attacking (PER past HAM at T12).
   - Seed tuner, report only: 18 of 19 daily seeds unchanged. Abu Dhabi 2021 is 0% random wins, the known exception, before and after. Bahrain 2022 slips just under the 3% band floor.
   - Survivor seeds not re-checked yet.
+
+## Battle variety (Nov 5, 2026, localhost)
+
+Feedback: in a close race the same battle came up at the same corner 7-8 times. Now:
+- **The other driver reads you** (race model, `readMove`): the same move against the same car within two laps loses 1.0 logit. He covers the inside you dived up last lap; an attacker goes round a car that covered the inside. The card says "he's covering / expecting it now" with the lower odds, and the driver says so on the radio. Waiting and yielding are never read.
+- **Different corners:** the battle rotates between the track's four best overtaking corners, never the one fought for last time against the same car when there's another.
+- **Moves in the corner's words** (`cornerKind`, read from the track's shape):
+  - a chicane: "Lunge into the first apex", "Cut back at the second apex";
+  - a hairpin: "Late-brake up the inside", "Switchback on the exit";
+  - a fast sweeper: "Around the outside, flat".
+  - Tested on Monza T1/T4, Canada T10/T13, Abu Dhabi T6, Spa T1/T5, Austria T4, USA T12, Hungary T1 and Russia T2.
+- **The driver's line varies** lap to lap (a few ways of putting each situation).
+- **A long fight changes rhythm:** every third lap with the same car is a pressure call, not a corner. Attacking: keep the pressure on (his tyres overheat) or drop back and cool yours. Defending: push on the exits or save the tyres.

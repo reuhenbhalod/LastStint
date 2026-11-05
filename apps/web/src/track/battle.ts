@@ -110,3 +110,39 @@ export function cameraBox(
   const y = Math.min(Math.max(0, cy - h / 2), outline.height - h);
   return { x, y, w, h };
 }
+
+/** What kind of corner a battle is fought into: the moves (and the words) suit it. */
+export type CornerKind = 'hairpin' | 'sweeper' | 'chicane' | 'corner';
+
+/** The signed change of direction (radians) from fraction `a` to `b` along the lap. */
+function turnBetween(line: Polyline, a: number, b: number): number {
+  const [ax, ay] = tangentAt(line, a);
+  const [bx, by] = tangentAt(line, b);
+  return Math.atan2(ax * by - ay * bx, ax * bx + ay * by);
+}
+
+/**
+ * The corner at `f`, from the track's shape around it, in steps of a hundredth of a lap (the
+ * map's outline smooths a tight chicane, so it's read in short steps):
+ *  - a chicane turns one way then the other close to the corner (Monza T1, Canada T13);
+ *  - a hairpin turns over 110 degrees through it (La Source, Hungary T1);
+ *  - a sweeper is a fast bend that doesn't end a straight (overtaking corners nearly all do);
+ *  - anything else is a corner (a braking zone at the end of a straight).
+ */
+export function cornerKind(line: Polyline, f: number): CornerKind {
+  const deg = (r: number) => (r * 180) / Math.PI;
+  const step = (k: number) => deg(turnBetween(line, f + k * 0.01, f + (k + 1) * 0.01));
+  const near = [-1, 0, 1].map(step);
+  if (
+    near.some((x) => x >= 12) &&
+    near.some((x) => x <= -12) &&
+    near.some((x) => Math.abs(x) >= 20)
+  ) {
+    return 'chicane';
+  }
+  const total = Math.abs([-2, -1, 0, 1, 2].map(step).reduce((a, b) => a + b, 0));
+  if (total >= 110) return 'hairpin';
+  const before = Math.abs(deg(turnBetween(line, f - 0.08, f - 0.02)));
+  if (before > 25 && total < 50) return 'sweeper';
+  return 'corner';
+}

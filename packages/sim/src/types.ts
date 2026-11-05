@@ -283,6 +283,8 @@ export interface EngineerState {
   stopWatch: { lap: number; ahead: boolean } | null;
   /** The last lap anything moved trust (quiet laps after it settle him). */
   lastEvent: number;
+  /** The last battle move, against whom and when: the other driver reads a repeat of it. */
+  lastMove?: { move: BattleMove; other: string; lap: number } | null;
 }
 
 export interface RaceState {

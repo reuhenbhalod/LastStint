@@ -36,6 +36,7 @@ import {
   BATTLE_MS,
   CALL_MS,
   directorCall,
+  flavourBattle,
   infoLine,
   newMemory,
   offersStop,
@@ -47,7 +48,7 @@ import { useRaceLog } from '../game/raceLog.js';
 import { radioChirp, setSoundOn, soundOn } from '../game/sound.js';
 import { type Game, LAP_MS, SLOW_MOTION, clockProgress } from '../game/useGame.js';
 import type { GameState } from '../state/machine.js';
-import { BRAKE_BEFORE } from '../track/battle.js';
+import { BRAKE_BEFORE, cornerKind } from '../track/battle.js';
 import { cornerPoint, overtakingCorners } from '../track/corners.js';
 import { flagOn, nearestFraction, polyline, quietCorner } from '../track/geometry.js';
 import type { LiveStanding, MapMotion } from '../track/motion.js';
@@ -184,6 +185,8 @@ export function RaceScreen({
   const quickLaps = useMemo(() => new Set(quickCallLaps(model)), [model]);
   const line = useMemo(() => (outline ? polyline(outline.points) : null), [outline]);
   const memory = useRef(newMemory());
+  // The corner each car was last fought for (the next battle with it goes elsewhere).
+  const lastCorner = useRef(new Map<string, number>());
   const asked = useRef(new Set<number>());
   const [quick, setQuick] = useState<QuickCall | null>(null);
   const [battle, setBattleState] = useState<Battle | null>(null);
@@ -203,14 +206,16 @@ export function RaceScreen({
   // Leaving the race screen never leaves the race frozen.
   useEffect(() => () => setPace('normal'), [setPace]);
 
-  /** The battle's corner: of the overtaking corners, the first your car reaches this lap with
-   * time to read the card (the map knows where it is). Null if none can be drawn. */
+  /** The battle's corner (battle variety): one of the track's best overtaking corners your
+   * car reaches this lap with time to read the card (the map knows where it is), varied lap to
+   * lap and never the one fought for last time against the same car when there's another.
+   * Null if none can be drawn. */
   const battleAt = useCallback(
     (call: QuickCall): Battle | null => {
       const m = motion.current;
       if (!m || !line || !outline || !call.other) return null;
       const p0 = clockRef.current ? clockProgress(clockRef.current) : 0;
-      const pick = (from: number, list: number[]) =>
+      const reachable = (from: number, list: number[]) =>
         list
           .map((n) => {
             const pt = cornerPoint(outline, n);
@@ -221,12 +226,15 @@ export function RaceScreen({
           .filter(
             (x): x is { n: number; f: number; p: number } => !!x && x.p >= from && x.p <= 0.96,
           )
-          .sort((a, b) => a.p - b.p)[0];
-      const best =
-        pick(p0 + 0.12, corners.slice(0, 3)) ??
-        pick(p0 + 0.12, corners) ??
-        pick(p0 + 0.04, corners);
+          .sort((a, b) => a.p - b.p);
+      let pool = reachable(p0 + 0.12, corners.slice(0, 4));
+      if (!pool.length) pool = reachable(p0 + 0.12, corners);
+      if (!pool.length) pool = reachable(p0 + 0.04, corners);
+      const fresh = pool.filter((c) => c.n !== lastCorner.current.get(call.other as string));
+      const from = fresh.length ? fresh : pool;
+      const best = from[(raceLap + (call.other as string).charCodeAt(0)) % from.length];
       if (!best) return null;
+      lastCorner.current.set(call.other, best.n);
       return {
         call,
         lap: raceLap,
@@ -279,7 +287,9 @@ export function RaceScreen({
     if (call?.kind === 'battle') {
       const fight = battleAt(call);
       if (fight) {
-        setBattle({ ...fight, call: { ...call, corner: fight.corner } });
+        // The moves in the words of the corner it's fought into (hairpin, sweeper, chicane).
+        const kind = line ? cornerKind(line, fight.at) : 'corner';
+        setBattle({ ...fight, call: flavourBattle({ ...call, corner: fight.corner }, kind) });
         return;
       }
       // No corner to draw it at: the plain card, the lap in slow motion.

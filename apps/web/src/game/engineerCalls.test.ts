@@ -39,6 +39,7 @@ function play(model: RaceModel, seed: number) {
   const said: number[] = [];
   const kinds: Record<string, number> = {};
   const stopAsks: Array<{ lap: number; age: number; stopping: boolean; wing: boolean }> = [];
+  const battleLaps: Array<{ lap: number; other: string }> = [];
   let lastInfo = -99;
   let radio = 0;
   while (!engine.isFinished()) {
@@ -78,6 +79,10 @@ function play(model: RaceModel, seed: number) {
     if (call) {
       said.push(lap);
       kinds[call.kind ?? 'quick'] = (kinds[call.kind ?? 'quick'] ?? 0) + 1;
+      if (call.options.some((o) => ['press', 'cool', 'save'].includes(o.id))) {
+        kinds.pressure = (kinds.pressure ?? 0) + 1;
+      }
+      if (call.kind === 'battle') battleLaps.push({ lap, other: call.other ?? '' });
       const pick = Math.floor(rng.next() * (call.options.length + 1));
       const o = call.options[pick];
       const next = lap + 1;
@@ -93,7 +98,7 @@ function play(model: RaceModel, seed: number) {
       said.push(lap);
     }
   }
-  return { engine, said, kinds, radio, stopAsks };
+  return { engine, said, kinds, radio, stopAsks, battleLaps };
 }
 
 function engineRadioLines(
@@ -154,6 +159,24 @@ describe('the race engineer’s radio', () => {
       }
     },
   );
+
+  it('a long fight changes rhythm: never three corner battles in a row with one car', () => {
+    let pressure = 0;
+    for (const model of races) {
+      for (const seed of [model.race.seed, 11, 23]) {
+        const { battleLaps, kinds } = play(model, seed);
+        pressure += kinds.pressure ?? 0;
+        let run = 1;
+        for (let i = 1; i < battleLaps.length; i++) {
+          const a = battleLaps[i - 1] as { lap: number; other: string };
+          const b = battleLaps[i] as { lap: number; other: string };
+          run = b.lap === a.lap + 1 && b.other === a.other ? run + 1 : 1;
+          expect(run).toBeLessThanOrEqual(2);
+        }
+      }
+    }
+    expect(pressure).toBeGreaterThan(0);
+  });
 
   it('a driver left to himself picks by attitude', () => {
     expect(ownMove('HAM', true)).toBe('dive-inside'); // high attitude

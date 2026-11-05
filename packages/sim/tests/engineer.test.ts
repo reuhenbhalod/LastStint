@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 import abuJson from '../../../data/races/abu-dhabi-2021.json';
 import canadaJson from '../../../data/races/canada-2022.json';
 import { battlesFor, moodOf, startTrust } from '../src/engineer.js';
+import { readMove } from '../src/sim.js';
 import {
   type Run,
   classify,
@@ -90,6 +91,26 @@ describe('race engineer', () => {
     for (let i = 0; i < 4; i++) stepLap(run);
     expect(eng.trust).toBeLessThan(eng.baseTrust + 20);
     expect(eng.trust).toBeGreaterThanOrEqual(eng.baseTrust);
+  });
+
+  it('the other driver reads a move tried on him lap after lap (battle variety)', () => {
+    const last = { lastMove: { move: 'dive-inside' as const, other: 'VER', lap: 40 } };
+    expect(readMove(cfg, last, 'dive-inside', 'VER', 41)).toBe(cfg.adapt);
+    expect(readMove(cfg, last, 'dive-inside', 'VER', 42)).toBe(cfg.adapt);
+    // A different move, another car, or a few laps later: fresh.
+    expect(readMove(cfg, last, 'round-outside', 'VER', 41)).toBe(0);
+    expect(readMove(cfg, last, 'dive-inside', 'LEC', 41)).toBe(0);
+    expect(readMove(cfg, last, 'dive-inside', 'VER', 44)).toBe(0);
+    // Waiting and yielding are never read.
+    expect(
+      readMove(
+        cfg,
+        { lastMove: { move: 'wait-drs', other: 'VER', lap: 40 } },
+        'wait-drs',
+        'VER',
+        41,
+      ),
+    ).toBe(0);
   });
 
   it('battle moves change the pass odds', () => {
