@@ -1,0 +1,180 @@
+{
+ "abu-dhabi-2020": [
+  {
+   "lap": 10,
+   "type": "VSC",
+   "driver": "PER",
+   "status": "Transmission"
+  },
+  {
+   "lap": 11,
+   "type": "SC",
+   "driver": "PER",
+   "status": "Transmission"
+  }
+ ],
+ "abu-dhabi-2021": [
+  {
+   "lap": 36,
+   "type": "VSC",
+   "driver": "GIO",
+   "status": "Gearbox"
+  },
+  {
+   "lap": 53,
+   "type": "SC",
+   "driver": "LAT",
+   "status": "Accident"
+  }
+ ],
+ "abu-dhabi-2024": [],
+ "austria-2019": [],
+ "austria-2025": [],
+ "bahrain-2021": [],
+ "bahrain-2022": [
+  {
+   "lap": 46,
+   "type": "SC",
+   "driver": "GAS",
+   "status": "Power Unit"
+  }
+ ],
+ "belgium-2024": [],
+ "canada-2019": [],
+ "canada-2022": [
+  {
+   "lap": 20,
+   "type": "VSC",
+   "driver": "MSC",
+   "status": "Engine"
+  },
+  {
+   "lap": 49,
+   "type": "SC",
+   "driver": "TSU",
+   "status": "Accident"
+  }
+ ],
+ "china-2024": [
+  {
+   "lap": 22,
+   "type": "VSC",
+   "driver": "BOT",
+   "status": "Retired"
+  },
+  {
+   "lap": 23,
+   "type": "SC",
+   "driver": "BOT",
+   "status": "Retired"
+  }
+ ],
+ "china-2025": [],
+ "france-2019": [
+  {
+   "lap": 50,
+   "type": "VSC",
+   "status": "Hazard",
+   "sector": 2
+  }
+ ],
+ "france-2021": [],
+ "hungary-2019": [],
+ "hungary-2025": [],
+ "italy-2019": [
+  {
+   "lap": 29,
+   "type": "VSC",
+   "driver": "SAI",
+   "status": "Wheel"
+  },
+  {
+   "lap": 31,
+   "type": "VSC",
+   "driver": "KVY",
+   "status": "Engine",
+   "turn": 2
+  }
+ ],
+ "italy-2022": [
+  {
+   "lap": 12,
+   "type": "VSC",
+   "driver": "VET",
+   "status": "Engine"
+  },
+  {
+   "lap": 48,
+   "type": "SC",
+   "driver": "RIC",
+   "status": "Oil leak"
+  }
+ ],
+ "italy-2024": [],
+ "japan-2024": [],
+ "mexico-2019": [],
+ "mexico-2021": [],
+ "mexico-2022": [
+  {
+   "lap": 65,
+   "type": "VSC",
+   "driver": "ALO",
+   "status": "Engine",
+   "turn": 1
+  }
+ ],
+ "mexico-2024": [],
+ "miami-2022": [
+  {
+   "lap": 41,
+   "type": "SC",
+   "driver": "NOR",
+   "status": "Collision"
+  }
+ ],
+ "miami-2023": [],
+ "netherlands-2022": [
+  {
+   "lap": 48,
+   "type": "VSC",
+   "driver": "TSU",
+   "status": "Differential"
+  },
+  {
+   "lap": 56,
+   "type": "SC",
+   "driver": "BOT",
+   "status": "Engine"
+  }
+ ],
+ "portugal-2020": [],
+ "portugal-2021": [],
+ "russia-2020": [
+  {
+   "lap": 43,
+   "type": "VSC",
+   "status": "Debris",
+   "cars": [
+    "GRO",
+    "VET"
+   ],
+   "turn": 2
+  }
+ ],
+ "saudi-arabia-2025": [],
+ "spain-2020": [],
+ "spain-2023": [],
+ "styria-2020": [],
+ "styria-2021": [],
+ "united-states-2019": [],
+ "united-states-2023": [],
+ "usa-2022": [
+  {
+   "lap": 18,
+   "type": "SC",
+   "driver": "BOT",
+   "status": "Spun off",
+   "turn": 19
+  }
+ ]
+}

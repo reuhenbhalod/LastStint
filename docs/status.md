@@ -61,6 +61,32 @@ Beta feedback round 2, part B (Nov 2, 2026):
   - A call about every other lap: battles by corner, in slow motion; damage, track limits, lapped cars, the two-compound rule; the driver asking to box or push.
   - The driver's trust in you rises and falls with how your calls turn out. Frustrated drivers overdrive; furious ones race their own way.
   - All of it is in the shared race model, so the server's replay matches the game exactly.
+- **Pit and map fixes (Nov 4, localhost only):**
+  - **Pit lanes:** 10 tracks had a traced "pit lane" half a lap to two laps long (an out-lap's later off-line corner counted as the lane): Bahrain 2022, China 2025, Hungary 2025, Italy 2022, Japan 2024, Mexico 2024, Miami 2022, Portugal 2021, Spain 2023, USA 2023. `pipeline outline` now ends the lane where the out-lap rejoins for good and rejects a lane over 35% of the lap. Re-traced; every lane is now 8-28% of the lap.
+  - **Map motion (`apps/web/src/track/motion.ts`):**
+    - The map's clock follows the field (the median lap of the cars that didn't stop, drifting toward the leader). A gap is a distance: each lap's time gained or lost moves a car at that lap's pace.
+    - So a leader's stop, a change of leader or a safety car no longer moves the whole field at once.
+    - Each stop has its own timeline: in at pit entry when its old gap gets it there (a car well back pits on the next tick), down the lane to its garage, a pause, out at pit exit at its new gap.
+    - The rival's cover is drawn from its in-lap (`rivalCover` in the sim, shared).
+    - A test runs every pool race frame by frame: no jumps, in at the entry, out at the exit.
+  - **Stop questions:** one gate for every question that offers a stop:
+    - none while a stop is booked or under way;
+    - none on tyres under 5 laps old (a wing broken that lap excepted);
+    - none within 3 laps of the last one;
+    - "the tyres are gone" only when they cost over 1.2 s a lap.
+    - A big stop moment stays out for you if a stop is booked or was made in the last 5 laps ("We're boxing already").
+    - A stop picked in answer to a question is never refused.
+    - A team-radio BOX clears a stop question already on screen.
+- **Team colours and safety-car causes (Nov 4, localhost only):**
+  - **Team colours (`game/teamTheme.ts`):** each race is shown in your driver's team colour: Ferrari red, McLaren papaya, Red Bull blue and so on.
+    - It covers your car, the header stripe, buttons, the home page and the timing tower.
+    - The rival takes their team's colour, or a contrasting one when the two would look alike (team-mates, two reds).
+    - Good news has its own fixed colour (`--good`), so a Ferrari player never sees good news in red.
+  - **Why the safety car is out:** `pipeline incidents` writes `data/incidents.json`, display only.
+    - Each SC/VSC is put down to the car that retired as it came out, with its official result status from FastF1 ("Accident", "Gearbox") and the corner when race control gives one.
+    - With no car out, race control's words are used instead: a clash just before (debris), or a yellow in a sector.
+    - All 20 neutralizations in the pool races are explained.
+    - The game says it on the radio ("Race control: Safety car: Latifi crashed.") and under the flag on the map; a crash in live play brings its own cause.
 - **Seed tuner (`pnpm --filter @boxthislap/sim tune <race>`):** picks each race's daily seed so the real team's calls give the real result, a good player (best-graded call every time) wins, and random play wins about 15% of the time. Abu Dhabi 2021 keeps its seed (random play wins about 1%: the hardest race).
 - **Admin page (`/admin`):** sign in with Google (emails in `ADMIN_EMAILS`); play any race with any seed; see and run the daily schedule (schedule days rotating the races, change a day's race, re-pin stale days, clear your own run to replay a day). API in `docs/api.md`.
 - **Google sign-in + streaks:** the streak shows on the intro and results. Signing in links the browser to an account so the streak and one-run-a-day follow you.

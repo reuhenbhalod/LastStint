@@ -122,8 +122,9 @@ function Side({
       className={`flex min-w-0 items-center gap-3 ${right ? 'flex-row-reverse text-right' : ''}`}
     >
       <span
-        className="disp hidden h-14 w-14 shrink-0 items-center justify-center rounded-xl text-[24px] leading-none text-[#0b0e0d] sm:flex"
-        style={{ background: accent }}
+        className="disp hidden h-14 w-14 shrink-0 items-center justify-center rounded-xl text-[24px] leading-none sm:flex"
+        // The team colour, and its readable text (--you-ink / --rival-ink).
+        style={{ background: accent, color: accent.replace(')', '-ink)') }}
       >
         {info?.number ?? code}
       </span>
@@ -150,7 +151,7 @@ const JOBS = [
   {
     icon: OvertakeIcon,
     title: 'Call the battles',
-    body: 'A car within a second? Dive up the inside, go round the outside, or wait for DRS. You see the odds; the corner decides.',
+    body: 'A car within a second and a half? The race stops at the braking zone for your call: dive up the inside, go round the outside, or wait for DRS. You see the odds; the corner decides.',
   },
   {
     icon: TyreIcon,
@@ -298,7 +299,7 @@ export function IntroCard({
                 <button
                   type="button"
                   onClick={onStart}
-                  className="group flex items-center justify-center gap-3 rounded-xl bg-[var(--you)] px-8 py-4 text-[18px] font-bold text-[#08231f] shadow-[0_10px_40px_-10px_var(--you)] hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
+                  className="group flex items-center justify-center gap-3 rounded-xl bg-[var(--you)] px-8 py-4 text-[18px] font-bold text-[var(--you-ink)] shadow-[0_10px_40px_-10px_var(--you)] hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
                 >
                   {resume ?? `Take the ${userTeam ? `${userTeam} ` : ''}pit wall`}
                   <span

@@ -1,8 +1,9 @@
 @import "tailwindcss";
 
 /* Pit-wall palette (dark by default, plan 3.5) from the track-view mockup: cool neutrals, an
-   asphalt map, teal for the player's car, orange for the rival, SC yellow. Team-neutral: no
-   liveries. */
+   asphalt map, SC yellow. The player's and the rival's colours are their teams' in a race
+   (game/teamTheme.ts sets --you and --rival); these are the defaults. Good news has its own
+   colour (--good), whatever the team. */
 :root {
   color-scheme: dark;
   --paper: #121514;
@@ -20,7 +21,11 @@
   --pit-edge: #4b5653;
   --garage: #59645f;
   --you: #19c7b4;
+  /* Text on a --you (or --rival) background. */
+  --you-ink: #08231f;
   --rival: #f2a13a;
+  --rival-ink: #141716;
+  --good: #19c7b4;
   --field: #8b9692;
   --flag: #f5c518;
   --soft: #e5483b;
@@ -235,4 +240,28 @@ label:has(input) {
     transparent 0
   );
   background-size: 16px 16px;
+}
+
+/* A trust change on the driver's card (battles and trust spec): pops in, then settles. */
+@keyframes trust-pop {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.trust-pop > * {
+  animation: trust-pop 420ms ease-out both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .trust-pop > * {
+    animation: none;
+  }
 }

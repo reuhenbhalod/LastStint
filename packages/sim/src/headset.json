@@ -98,7 +98,7 @@
       "punctureMax": 0.01
     },
     "engineer": {
-      "battleWindow": 1.0,
+      "battleWindow": 1.5,
       "moves": {
         "cover-inside": {
           "defendLogit": -1.0,
@@ -170,30 +170,30 @@
         "goRoundContact": 0.03
       },
       "trust": {
-        "start": 85,
-        "perIgnore": 1.2,
-        "min": 55,
-        "max": 85,
+        "start": 70,
+        "perIgnore": 0.6,
+        "min": 50,
+        "max": 80,
         "deltas": {
-          "pass-called": 5,
-          "pass-failed": -2,
-          "held-called": 1,
-          "passed-anyway": -7,
-          "let-rival-go": -10,
-          "contact": -12,
-          "undercut": 10,
-          "stop-lost": -8,
-          "micromanaging": -3,
-          "request-yes": 2,
-          "request-wrong": -10,
-          "request-right": 3,
-          "penalty": -8,
-          "strike": -1,
+          "pass-called": 12,
+          "pass-failed": -6,
+          "held-called": 5,
+          "passed-anyway": -15,
+          "let-rival-go": -20,
+          "contact": -25,
+          "undercut": 15,
+          "stop-lost": -15,
+          "micromanaging": -6,
+          "request-yes": 5,
+          "request-wrong": -20,
+          "request-right": 8,
+          "penalty": -15,
+          "strike": -3,
           "settled": 0,
-          "let-car-go": -4
+          "let-car-go": -8
         },
-        "settleAfter": 3,
-        "settle": 1.5,
+        "settleAfter": 2,
+        "settle": 2,
         "ordersLimit": 4,
         "watch": 3,
         "stopWatch": 6

@@ -63,6 +63,28 @@ describe('race engineer', () => {
     expect(initRun(abu, 1, { decisions: [], incidents: false }).state.engineer).toBeUndefined();
   });
 
+  it('trust swings hard (battles and trust spec D3) and settles back from either side', () => {
+    // Starts calm-ish, 50-80 by attitude.
+    for (const code of ['HAM', 'BOT', 'VER']) {
+      expect(startTrust(cfg, code)).toBeGreaterThanOrEqual(50);
+      expect(startTrust(cfg, code)).toBeLessThanOrEqual(80);
+    }
+    // One contact takes a calm driver a mood down; two bad calls in a row, two.
+    const d = cfg.trust.deltas;
+    expect(moodOf(cfg, 70 + d.contact)).toBe('tense');
+    expect(moodOf(cfg, 70 + d.contact + d['passed-anyway'])).toBe('frustrated');
+    // And good calls win him back fast.
+    expect(moodOf(cfg, 40 + 2 * d['pass-called'])).toBe('calm');
+    // Above where he started, quiet laps bring him back down.
+    const run = initRun(abu, 1, { decisions: [] });
+    const eng = run.state.engineer as NonNullable<typeof run.state.engineer>;
+    eng.trust = eng.baseTrust + 20;
+    eng.lastEvent = run.state.lap;
+    for (let i = 0; i < 4; i++) stepLap(run);
+    expect(eng.trust).toBeLessThan(eng.baseTrust + 20);
+    expect(eng.trust).toBeGreaterThanOrEqual(eng.baseTrust);
+  });
+
   it('battle moves change the pass odds', () => {
     const attack = aheadShare(canada, 'ahead', 'dive-inside');
     const sit = aheadShare(canada, 'ahead', null);

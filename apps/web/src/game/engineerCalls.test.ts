@@ -9,9 +9,16 @@ import { describe, expect, it } from 'vitest';
 import { GameEngine } from '../engine/engine.js';
 import { overtakingCorners } from '../track/corners.js';
 import { outlineFor } from '../track/outlines.js';
-import { directorCall, infoLine, newMemory, ownMove } from './engineerCalls.js';
+import {
+  STOP_ASK_EVERY,
+  directorCall,
+  infoLine,
+  newMemory,
+  offersStop,
+  ownMove,
+} from './engineerCalls.js';
 import { engineerRadio } from './engineerRadio.js';
-import { quickCallLaps } from './quickCalls.js';
+import { FRESH_TYRES, quickCallLaps } from './quickCalls.js';
 import { RaceLog } from './raceLog.js';
 
 const dir = join(__dirname, '..', '..', '..', '..', 'data', 'races');
@@ -31,6 +38,7 @@ function play(model: RaceModel, seed: number) {
   const rng = mulberry32(seed);
   const said: number[] = [];
   const kinds: Record<string, number> = {};
+  const stopAsks: Array<{ lap: number; age: number; stopping: boolean; wing: boolean }> = [];
   let lastInfo = -99;
   let radio = 0;
   while (!engine.isFinished()) {
@@ -44,6 +52,7 @@ function play(model: RaceModel, seed: number) {
     const lap = engine.lap;
     radio += engineRadioLines(model, engine, lap, cfg, corners[0] ?? 1);
     if (moment) said.push(lap - 1, lap);
+    const pendingPit = engine.decisions.some((d) => d.kind === 'pit' && d.lap > lap);
     const call = directorCall(
       engine.state,
       model,
@@ -53,7 +62,19 @@ function play(model: RaceModel, seed: number) {
       corners,
       memory,
       quick.has(lap),
+      pendingPit,
     );
+    if (call && offersStop(call)) {
+      const me = engine.state.cars[model.userSide];
+      stopAsks.push({
+        lap,
+        age: me?.tyreAge ?? 0,
+        stopping: pendingPit || !!me?.strategy.some((st) => st.lap > lap),
+        wing: engine.notes.some(
+          (n) => n.lap === lap && n.driver === model.userSide && n.detail === 'wing',
+        ),
+      });
+    }
     if (call) {
       said.push(lap);
       kinds[call.kind ?? 'quick'] = (kinds[call.kind ?? 'quick'] ?? 0) + 1;
@@ -72,7 +93,7 @@ function play(model: RaceModel, seed: number) {
       said.push(lap);
     }
   }
-  return { engine, said, kinds, radio };
+  return { engine, said, kinds, radio, stopAsks };
 }
 
 function engineRadioLines(
@@ -90,7 +111,7 @@ describe('the race engineer’s radio', () => {
     '%s: valid calls, never quiet for long, battles come up',
     (_id, model) => {
       let battles = 0;
-      for (const seed of [model.race.seed, 11, 23]) {
+      for (const seed of [model.race.seed, 11, 23, 37, 51, 77]) {
         const { said, kinds, engine } = play(model, seed);
         battles += kinds.battle ?? 0;
         // The longest stretch of green racing laps with nothing said.
@@ -112,6 +133,25 @@ describe('the race engineer’s radio', () => {
         expect(longest).toBeLessThanOrEqual(2);
       }
       expect(battles).toBeGreaterThan(0);
+    },
+  );
+
+  it.each(races.map((m) => [m.race.id, m] as const))(
+    '%s: a stop is never asked about while one is booked, on fresh tyres, or twice running',
+    (_id, model) => {
+      for (const seed of [model.race.seed, 11, 23]) {
+        const { stopAsks } = play(model, seed);
+        let last = Number.NEGATIVE_INFINITY;
+        for (const a of stopAsks) {
+          expect(a.stopping).toBe(false);
+          // A wing broken that lap is asked about whatever the tyres.
+          if (!a.wing) {
+            expect(a.age).toBeGreaterThanOrEqual(FRESH_TYRES);
+            expect(a.lap - last).toBeGreaterThanOrEqual(STOP_ASK_EVERY);
+          }
+          last = a.lap;
+        }
+      }
     },
   );
 

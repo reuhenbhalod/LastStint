@@ -7,8 +7,15 @@
 // (and chirps, if sound is on). Tap any car, on the map or in the standings, for its card; a
 // stop by your car or the rival is called out while it drives the pit lane.
 
-import { type Decision, type Modes, type RaceModel, engineerConfig } from '@boxthislap/sim';
+import {
+  type Decision,
+  type Modes,
+  type RaceModel,
+  type RaceNote,
+  engineerConfig,
+} from '@boxthislap/sim';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { BattleCard, type BattleStage } from '../components/BattleCard.js';
 import { CarStats } from '../components/CarStats.js';
 import { DecisionPanel } from '../components/DecisionPanel.js';
 import { DriverCard } from '../components/DriverCard.js';
@@ -22,17 +29,27 @@ import { RadioAlert } from '../components/RadioAlert.js';
 import { RadioLog } from '../components/RadioLog.js';
 import { TeamRadio } from '../components/TeamRadio.js';
 import { TimingTower } from '../components/TimingTower.js';
-import { TrackMap } from '../components/TrackMap.js';
+import { type BattleView, TrackMap } from '../components/TrackMap.js';
 import { TyreBadge } from '../components/TyreBadge.js';
-import { BATTLE_MS, CALL_MS, directorCall, infoLine, newMemory } from '../game/engineerCalls.js';
+import {
+  BATTLE_MS,
+  CALL_MS,
+  directorCall,
+  infoLine,
+  newMemory,
+  offersStop,
+} from '../game/engineerCalls.js';
 import { modeLine } from '../game/guide.js';
+import { neutralCause } from '../game/neutral.js';
 import { type QuickCall, quickCallLaps } from '../game/quickCalls.js';
 import { useRaceLog } from '../game/raceLog.js';
 import { radioChirp, setSoundOn, soundOn } from '../game/sound.js';
-import { type Game, LAP_MS, SLOW_MOTION } from '../game/useGame.js';
+import { type Game, LAP_MS, SLOW_MOTION, clockProgress } from '../game/useGame.js';
 import type { GameState } from '../state/machine.js';
-import { overtakingCorners } from '../track/corners.js';
-import { carsOnTrack, pitEntryAt, pitLane, polyline, quietCorner } from '../track/geometry.js';
+import { BRAKE_BEFORE } from '../track/battle.js';
+import { cornerPoint, overtakingCorners } from '../track/corners.js';
+import { flagOn, nearestFraction, polyline, quietCorner } from '../track/geometry.js';
+import type { MapMotion } from '../track/motion.js';
 import { outlineFor } from '../track/outlines.js';
 
 const FLAG = {
@@ -41,6 +58,57 @@ const FLAG = {
   vsc: { text: 'Virtual safety car', cls: 'bg-[var(--flag)] text-[#141716] animate-pulse' },
   red: { text: 'Red flag', cls: 'bg-red-600 text-white animate-pulse' },
 } as const;
+
+/** A battle on screen (battles and trust spec): its call, its corner (number, and where it is
+ * as a fraction of the lap), when your car gets to the braking zone and the corner (tick
+ * progress), your call, its result read ahead, and whether the camera is on it. */
+interface Battle {
+  call: QuickCall;
+  lap: number;
+  corner: number;
+  at: number;
+  fromP: number;
+  brakeP: number;
+  cornerP: number;
+  stage: BattleStage;
+  chosen: string | null;
+  result: { text: string; good: boolean } | null;
+  swap: { gap: number; at: number } | null;
+  zoom: boolean;
+}
+
+/** The race slows this far (tick progress) before the braking zone. */
+const SLOW_BEFORE = 0.05;
+/** How long the race waits at the braking zone for your call before the driver goes alone. */
+const BATTLE_WAIT_MS = 8000;
+
+/** What a lap's fight came to for your car, from the race model's notes. */
+function battleResult(
+  notes: RaceNote[],
+  userSide: string,
+  call: Decision | null,
+): { text: string; good: boolean } | null {
+  const mine = notes.filter((n) => n.driver === userSide);
+  const contact = mine.find((n) => n.kind === 'contact');
+  if (contact) return { text: contact.detail === 'spin' ? 'SPIN!' : 'CONTACT!', good: false };
+  const fought = mine.find((n) => n.kind === 'battle');
+  if (fought) {
+    const good = fought.detail === 'passed' || fought.detail === 'held';
+    const text =
+      fought.detail === 'passed'
+        ? `PAST ${fought.other}!`
+        : fought.detail === 'held'
+          ? 'HELD!'
+          : fought.detail === 'lost'
+            ? `${fought.other} THROUGH`
+            : 'NO WAY BY';
+    return { text, good };
+  }
+  if (call?.kind === 'battle' && call.move === 'wait-drs')
+    return { text: 'IN DRS FOR NEXT LAP', good: true };
+  if (call?.kind === 'battle' && call.move === 'let-go') return { text: 'LET HIM BY', good: true };
+  return null;
+}
 
 export function RaceScreen({
   game,
@@ -70,7 +138,10 @@ export function RaceScreen({
   const toggle = (p: 'gap') => setPanel((c) => (c === p ? null : p));
   const log = useRaceLog(state.race);
   const team = model.drivers.find((d) => d.code === userSide)?.team;
-  const flag = FLAG[state.race.flag];
+  // The flag of the lap being driven, and why it's out.
+  const drivenFlag = state.race.nextFlag ?? flagOn(model, state.race.lap + 1);
+  const flag = FLAG[drivenFlag];
+  const why = neutralCause(model, game.notes(), state.race.lap + 1, drivenFlag);
   const lapsLeft = totalLaps - state.race.lap;
   const gap = me && them && !me.retired && !them.retired ? them.totalTime - me.totalTime : null;
 
@@ -101,48 +172,94 @@ export function RaceScreen({
 
   // The race engineer's radio (race engineer spec): after every lap the director picks the
   // most pressing call (a battle, trouble, the driver asking, the engineer's question); a quiet
-  // lap gets an info line now and then. A battle runs the lap in slow motion until its result.
+  // lap gets an info line now and then. A battle (battles and trust spec) is fought at a corner
+  // on the map: the race runs to the braking zone and waits there for your call, then the move
+  // plays out and its result shows at the corner.
   const cfg = useMemo(() => engineerConfig(model), [model]);
   const corners = useMemo(() => overtakingCorners(outline), [outline]);
   const quickLaps = useMemo(() => new Set(quickCallLaps(model)), [model]);
+  const line = useMemo(() => (outline ? polyline(outline.points) : null), [outline]);
   const memory = useRef(newMemory());
   const asked = useRef(new Set<number>());
   const [quick, setQuick] = useState<QuickCall | null>(null);
-  // The battle this lap (from its call until the lap is run), and its result on the map.
-  const [fight, setFight] = useState<{
-    other: string;
-    corner: number;
-    attacking: boolean;
-    gap: number;
-  } | null>(null);
+  const [battle, setBattleState] = useState<Battle | null>(null);
+  const battleRef = useRef<Battle | null>(null);
+  const setBattle = useCallback((b: Battle | null) => {
+    battleRef.current = b;
+    setBattleState(b);
+  }, []);
+  // Calls made after a battle call are for the next lap (the result shown can't change).
+  const battleLock = useRef<number | null>(null);
   const [flash, setFlash] = useState<{ text: string; good: boolean; corner: number } | null>(null);
+  const motion = useRef<MapMotion | null>(null);
+  const clockRef = useRef(game.clock);
+  clockRef.current = game.clock;
   const raceLap = state.race.lap;
-  const { setSlow } = game;
+  const { setPace } = game;
+  // Leaving the race screen never leaves the race frozen.
+  useEffect(() => () => setPace('normal'), [setPace]);
+
+  /** The battle's corner: of the overtaking corners, the first your car reaches this lap with
+   * time to read the card (the map knows where it is). Null if none can be drawn. */
+  const battleAt = useCallback(
+    (call: QuickCall): Battle | null => {
+      const m = motion.current;
+      if (!m || !line || !outline || !call.other) return null;
+      const p0 = clockRef.current ? clockProgress(clockRef.current) : 0;
+      const pick = (from: number, list: number[]) =>
+        list
+          .map((n) => {
+            const pt = cornerPoint(outline, n);
+            const f = pt ? nearestFraction(line, pt) : null;
+            const p = f === null ? null : m.reach(userSide, f);
+            return f === null || p === null ? null : { n, f, p };
+          })
+          .filter(
+            (x): x is { n: number; f: number; p: number } => !!x && x.p >= from && x.p <= 0.96,
+          )
+          .sort((a, b) => a.p - b.p)[0];
+      const best =
+        pick(p0 + 0.12, corners.slice(0, 3)) ??
+        pick(p0 + 0.12, corners) ??
+        pick(p0 + 0.04, corners);
+      if (!best) return null;
+      return {
+        call,
+        lap: raceLap,
+        corner: best.n,
+        at: best.f,
+        fromP: p0,
+        brakeP: Math.max(p0 + 0.02, best.p - BRAKE_BEFORE),
+        cornerP: best.p,
+        stage: 'approach',
+        chosen: null,
+        result: null,
+        swap: null,
+        zoom: true,
+      };
+    },
+    [line, outline, corners, userSide, raceLap],
+  );
+
   // biome-ignore lint/correctness/useExhaustiveDependencies: asked once, when its lap completes.
   useEffect(() => {
-    setSlow(false); // a battle's lap is over
+    setPace('normal'); // a battle's lap is over
     setQuick(null);
-    setFight(null);
+    // A battle whose result never reached its corner on screen shows it now.
+    const done = battleRef.current;
+    if (done?.result && done.stage !== 'done') setFlash({ ...done.result, corner: done.corner });
+    setBattle(null);
     if (state.phase !== 'racing' || asked.current.has(raceLap)) return;
     asked.current.add(raceLap);
-    // The last lap's battle, at its corner.
-    const corner = corners[0] ?? 1;
-    const lapNotes = game.notes().filter((n) => n.lap === raceLap && n.driver === userSide);
-    const contact = lapNotes.find((n) => n.kind === 'contact');
-    const fought = lapNotes.find((n) => n.kind === 'battle');
-    if (contact)
-      setFlash({ text: contact.detail === 'spin' ? 'SPIN!' : 'CONTACT!', good: false, corner });
-    else if (fought) {
-      const good = fought.detail === 'passed' || fought.detail === 'held';
-      const text =
-        fought.detail === 'passed'
-          ? `PAST ${fought.other}!`
-          : fought.detail === 'held'
-            ? 'HELD!'
-            : fought.detail === 'lost'
-              ? `${fought.other} THROUGH`
-              : 'NO WAY BY';
-      setFlash({ text, good, corner });
+    // The last lap's fight, at its corner, unless the battle showed it already.
+    if (done?.lap !== raceLap - 1) {
+      const corner = corners[0] ?? 1;
+      const result = battleResult(
+        game.notes().filter((n) => n.lap === raceLap),
+        userSide,
+        null,
+      );
+      if (result) setFlash({ ...result, corner });
     }
     const call = directorCall(
       state.race,
@@ -155,18 +272,17 @@ export function RaceScreen({
       quickLaps.has(raceLap),
       state.decisions.some((d) => d.kind === 'pit' && d.lap > raceLap),
     );
+    if (call?.kind === 'battle') {
+      const fight = battleAt(call);
+      if (fight) {
+        setBattle({ ...fight, call: { ...call, corner: fight.corner } });
+        return;
+      }
+      // No corner to draw it at: the plain card, the lap in slow motion.
+      setPace('slow');
+    }
     if (call) {
       setQuick(call);
-      if (call.kind === 'battle') {
-        setSlow(true);
-        if (call.other)
-          setFight({
-            other: call.other,
-            corner: call.corner ?? corner,
-            attacking: !!call.attacking,
-            gap: call.gap ?? 0,
-          });
-      }
       return;
     }
     // A quiet lap: the engineer's info, every other lap or so.
@@ -185,43 +301,122 @@ export function RaceScreen({
     const id = setTimeout(() => setFlash(null), 4000);
     return () => clearTimeout(id);
   }, [flash]);
-  // The lap a BOX call turns in at (pit fix): the end of the lap being shown, if your car can
-  // still reach pit entry on it; otherwise the end of the next one. (Paused, the cars sit at the
-  // line with the entry ahead.)
-  const laneInfo = useMemo(
-    () => (outline ? pitLane(outline, polyline(outline.points)) : null),
-    [outline],
+
+  // The battle, lap clock in hand: slow into the braking zone and stop there until you call;
+  // once called, slow through the corner and show the result as your car gets there.
+  const stage = battle?.stage;
+  useEffect(() => {
+    if (stage !== 'approach' && stage !== 'move') return;
+    let raf = 0;
+    const frame = () => {
+      const c = clockRef.current;
+      const b = battleRef.current;
+      if (c && b && c.frozen === undefined) {
+        const p = clockProgress(c);
+        if (b.stage === 'approach' && p >= b.brakeP) {
+          setPace('frozen');
+          setBattle({ ...b, stage: 'waiting' });
+          return;
+        }
+        if (b.stage === 'move' && p >= b.cornerP + 0.012) {
+          if (b.result) setFlash({ ...b.result, corner: b.corner });
+          setPace('normal');
+          setBattle({ ...b, stage: 'done' });
+          return;
+        }
+        if (p >= b.brakeP - SLOW_BEFORE) setPace('slow');
+      }
+      raf = requestAnimationFrame(frame);
+    };
+    raf = requestAnimationFrame(frame);
+    return () => cancelAnimationFrame(raf);
+  }, [stage, setPace, setBattle]);
+  // The camera eases back out a moment after the result.
+  useEffect(() => {
+    if (stage !== 'done') return;
+    const id = setTimeout(() => {
+      const b = battleRef.current;
+      if (b) setBattle({ ...b, zoom: false });
+    }, 1800);
+    return () => clearTimeout(id);
+  }, [stage, setBattle]);
+
+  /** Your call in a battle (or, with none, the driver's own): the move, and its result read
+   * ahead from the race model so it shows at the corner. */
+  const answerBattle = useCallback(
+    (id: string, byDriver = false) => {
+      const b = battleRef.current;
+      const o = b?.call.options.find((x) => x.id === id);
+      if (!b || b.chosen || !o) return;
+      const next = state.race.lap + 1;
+      if (!byDriver && o.call) game.call({ ...o.call, lap: next }, { asked: b.call.asked });
+      battleLock.current = next;
+      const preview = game.preview();
+      const other = b.call.other as string;
+      const result = preview ? battleResult(preview.notes, userSide, o.call) : null;
+      const me = preview?.race.cars[userSide];
+      const them = preview?.race.cars[other];
+      const swap =
+        me && them && !me.retired && !them.retired
+          ? { gap: me.totalTime - them.totalTime, at: b.cornerP }
+          : null;
+      setBattle({
+        ...b,
+        chosen: id,
+        stage: 'move',
+        result: result ?? { text: 'NO MOVE', good: true },
+        swap,
+      });
+      setPace('slow');
+    },
+    [game, state.race.lap, userSide, setPace, setBattle],
   );
+  // No call while the race waits at the braking zone: the driver makes his own move.
+  useEffect(() => {
+    if (stage !== 'waiting') return;
+    const id = setTimeout(() => {
+      const b = battleRef.current;
+      const own = b?.call.driverChoice;
+      if (!b || !own || own.kind !== 'battle') return;
+      game.radio(`No call from the wall: ${userSide} makes his own move.`);
+      game.call({ ...own, lap: state.race.lap + 1 }, { quiet: true });
+      const match = b.call.options.find(
+        (x) => x.call?.kind === 'battle' && x.call.move === own.move,
+      );
+      if (match) answerBattle(match.id, true);
+    }, BATTLE_WAIT_MS);
+    return () => clearTimeout(id);
+  }, [stage, game, userSide, state.race.lap, answerBattle]);
+
+  // The lap a BOX call turns in at (pit fix): the end of the lap being shown, if your car can
+  // still reach pit entry on it (the map knows where it is); otherwise the end of the next one.
+  // (Paused, the cars sit at the line with the entry ahead.)
   const boxLap = useCallback((): number => {
     const n = state.race.lap + 1;
     const clock = game.clock;
-    if (!laneInfo || !clock) return n;
-    const mine = carsOnTrack(state.race, model, state.race.nextFlag ?? 'green').find(
-      (c) => c.code === userSide,
-    );
-    if (!mine) return n;
-    const tIn = pitEntryAt(mine.behind, laneInfo);
-    const progress = (performance.now() - clock.start) / clock.ms;
-    return tIn === null || progress > tIn - 0.03 ? n + 1 : n;
-  }, [laneInfo, game.clock, state.race, model, userSide]);
+    if (!clock || !motion.current) return n;
+    return motion.current.reachesEntry(userSide, state.race, clockProgress(clock)) ? n : n + 1;
+  }, [game.clock, state.race, userSide]);
   const place = useCallback(
-    <T extends Decision>(call: T): T => ({
-      ...call,
-      lap: call.kind === 'pit' ? boxLap() : state.race.lap + 1,
-    }),
+    <T extends Decision>(call: T): T => {
+      const next = state.race.lap + 1;
+      const after = battleLock.current === next ? next + 1 : next;
+      return { ...call, lap: call.kind === 'pit' ? Math.max(boxLap(), after) : after };
+    },
     [boxLap, state.race.lap],
   );
   const answerQuick = useCallback(
     (id: string) => {
       const o = quick?.options.find((x) => x.id === id);
-      const asked = quick?.asked ?? true;
+      // A stop the wall picks in answer to a question is made (the driver doesn't argue it).
+      const asked = (quick?.asked ?? true) || o?.call?.kind === 'pit';
       if (o?.call) game.call(place(o.call), { asked });
       else game.radio('Copy. No change.');
       for (const c of o?.also ?? []) game.call(place(c), { asked: true });
       setQuick(null);
-      setSlow(false); // answered: back to full speed, the move plays out this lap
+      setPace('normal');
     },
-    [quick, game, place, setSlow],
+    [quick, game, place, setPace],
   );
   const quickTimeout = useCallback(() => {
     if (quick?.driverChoice) {
@@ -230,8 +425,8 @@ export function RaceScreen({
       game.call({ ...quick.driverChoice, lap: state.race.lap + 1 }, { quiet: true });
     } else game.radio('No answer from the wall. Sticking to the plan.');
     setQuick(null);
-    setSlow(false);
-  }, [game, quick, state.race, userSide, setSlow]);
+    setPace('normal');
+  }, [game, quick, state.race, userSide, setPace]);
 
   // A phone-sized screen (cards open under the map, not on it).
   const [narrow, setNarrow] = useState(
@@ -293,10 +488,29 @@ export function RaceScreen({
       : planned
         ? {
             compound: planned.to,
-            when: planned.lap === next ? 'in the pits now' : 'boxing this lap',
+            when: planned.lap === next ? 'stop under way' : 'boxing this lap',
           }
         : null;
-  const userBoxing = callPit?.kind === 'pit' && callPit.lap === next;
+  const userBox = callPit?.kind === 'pit' ? callPit.lap : null;
+  // A stop booked another way (the team radio's BOX) answers a stop question already up.
+  const stopQuestion = !!quick && offersStop(quick);
+  useEffect(() => {
+    if (userBox !== null && stopQuestion) setQuick(null);
+  }, [userBox, stopQuestion]);
+
+  // The battle as the map draws it.
+  const battleView: BattleView | null =
+    battle?.call.other !== undefined
+      ? {
+          other: battle.call.other,
+          corner: battle.corner,
+          at: battle.at,
+          options: battle.call.options.map((o, i) => ({ n: i + 1, line: o.line ?? 'wait' })),
+          chosen: battle.call.options.find((o) => o.id === battle.chosen)?.line ?? null,
+          zoom: battle.zoom,
+          swap: battle.swap,
+        }
+      : null;
 
   // A stop by your car or the rival on the lap just run, while the next lap animates.
   const latest = log.at(-1);
@@ -332,7 +546,7 @@ export function RaceScreen({
 
   return (
     <main className="mx-auto flex min-h-screen max-w-[1360px] flex-col gap-3 px-4 pb-6 pt-3 xl:h-screen xl:pb-3">
-      <header className="flex items-center justify-between gap-3 border-b border-[var(--rule)] pb-2">
+      <header className="flex items-center justify-between gap-3 border-b-2 border-[var(--you)] pb-2">
         <span className="flex min-w-0 items-baseline gap-2">
           <button
             type="button"
@@ -485,9 +699,10 @@ export function RaceScreen({
                     onSelect={select}
                     dim={paused}
                     finishing={finishMeta}
-                    fight={fight}
+                    battle={battleView}
                     flash={flash}
-                    userBoxing={userBoxing}
+                    userBox={userBox}
+                    motionRef={motion}
                   />
                 ) : (
                   <p className="p-8 text-center text-[var(--muted)]">
@@ -503,6 +718,11 @@ export function RaceScreen({
                   >
                     {flag.text}
                   </span>
+                  {why && (
+                    <span className="max-w-[220px] rounded-md bg-black/70 px-2 py-1 text-[12px] font-semibold leading-snug text-white">
+                      {why}
+                    </span>
+                  )}
                 </div>
                 {finishing && crossed && (
                   <output className="radio-alert absolute inset-x-2.5 bottom-12 z-10 mx-auto flex max-w-[420px] items-center justify-center gap-3 rounded-xl border-2 border-white bg-[#141716]/90 px-4 py-3 text-white shadow-2xl">
@@ -512,22 +732,20 @@ export function RaceScreen({
                     </span>
                   </output>
                 )}
-                {fight && !paused && (
+                {battle && !paused && battle.stage !== 'done' && (
                   <output
-                    className="radio-alert absolute inset-x-2.5 top-12 z-10 mx-auto flex max-w-[460px] items-center gap-2 rounded-xl border-2 px-3 py-2 text-white shadow-2xl"
+                    className={`radio-alert absolute inset-x-2.5 bottom-2.5 z-10 mx-auto flex max-w-[420px] items-center gap-2 rounded-xl border-2 px-3 py-1.5 text-white shadow-2xl ${battle.stage === 'waiting' ? 'animate-pulse' : ''}`}
                     style={{ borderColor: 'var(--box)', background: 'rgba(20,23,22,0.9)' }}
                   >
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--box)] text-white">
-                      <OvertakeIcon size={16} />
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--box)] text-white">
+                      <OvertakeIcon size={14} />
                     </span>
                     <span className="text-[14px] font-semibold leading-snug">
-                      {fight.attacking
-                        ? `${userSide} attacks ${fight.other} (${fight.gap.toFixed(1)} s ahead)`
-                        : `${fight.other} attacks ${userSide} (${fight.gap.toFixed(1)} s behind)`}
-                      <span className="block text-[12px] font-normal text-[#cfd6d3]">
-                        The move comes into Turn {fight.corner}, this lap
-                        {quick?.kind === 'battle' ? ' · your call' : ''}
-                      </span>
+                      {battle.stage === 'waiting'
+                        ? `Braking for T${battle.corner}: your call`
+                        : battle.call.attacking
+                          ? `${userSide} on ${battle.call.other} into T${battle.corner}`
+                          : `${battle.call.other} on ${userSide} into T${battle.corner}`}
                     </span>
                   </output>
                 )}
@@ -614,6 +832,20 @@ export function RaceScreen({
                 onChoose={game.choose}
               />
             </div>
+          ) : battle && state.phase === 'racing' && (battle.stage !== 'done' || battle.zoom) ? (
+            <BattleCard
+              key={battle.lap}
+              call={battle.call}
+              corner={battle.corner}
+              stage={battle.stage}
+              clock={game.clock}
+              fromP={battle.fromP}
+              brakeP={battle.brakeP}
+              waitMs={BATTLE_WAIT_MS}
+              chosen={battle.chosen}
+              result={battle.stage === 'done' ? battle.result : null}
+              onAnswer={answerBattle}
+            />
           ) : quick && state.phase === 'racing' ? (
             <QuickCallCard
               key={quick.lap}
@@ -646,7 +878,13 @@ export function RaceScreen({
 
         {/* Stats: your driver, the car, the radio. */}
         <aside aria-label="Stats" className="order-2 flex flex-col gap-3 xl:order-3 xl:min-h-0">
-          <DriverProfile code={userSide} race={state.race} model={model} log={log} />
+          <DriverProfile
+            code={userSide}
+            race={state.race}
+            model={model}
+            log={log}
+            notes={game.notes()}
+          />
           <CarStats race={state.race} model={model} log={log} userSide={userSide} rival={rival} />
           {/* The rest of the column, in two halves: your calls graded, then the radio. */}
           <div className="flex min-h-[260px] flex-1 basis-0 flex-col gap-3 xl:min-h-0">

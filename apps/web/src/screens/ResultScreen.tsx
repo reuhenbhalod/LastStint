@@ -246,7 +246,7 @@ export function ResultScreen({
           type="button"
           disabled={state.phase === 'submitting'}
           onClick={game.submit}
-          className="rounded-xl bg-[var(--you)] py-4 text-lg font-bold text-neutral-950 disabled:opacity-60"
+          className="rounded-xl bg-[var(--you)] py-4 text-lg font-bold text-[var(--you-ink)] disabled:opacity-60"
         >
           {state.phase === 'submitting' ? 'Grading your calls…' : 'See how you did'}
         </button>

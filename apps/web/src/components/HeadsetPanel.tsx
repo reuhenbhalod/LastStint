@@ -63,7 +63,7 @@ export function HeadsetPanel({
                     soon
                       ? 'bg-[color-mix(in_srgb,var(--you)_22%,transparent)] text-[var(--you)] shadow-[inset_0_0_0_2px_var(--you)]'
                       : active
-                        ? 'bg-[var(--you)] text-[#08231f]'
+                        ? 'bg-[var(--you)] text-[var(--you-ink)]'
                         : 'bg-[var(--card)] text-[var(--muted)] hover:bg-[var(--card-2)] hover:text-[var(--ink)]'
                   }`}
                 >
@@ -89,7 +89,7 @@ export function HeadsetPanel({
               className="h-full rounded-full transition-[width] duration-700"
               style={{
                 width: `${Math.round(battery)}%`,
-                background: battery <= 15 ? 'var(--box)' : 'var(--you)',
+                background: battery <= 15 ? 'var(--box)' : 'var(--good)',
               }}
             />
           </div>

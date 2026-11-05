@@ -7,6 +7,7 @@
 import {
   type Decision,
   type DecisionMoment,
+  type RaceNote,
   type RaceState,
   engineerConfig,
   moodOf,
@@ -17,9 +18,10 @@ import { ignoreRate } from '../data/drivers.js';
 import type { Daily } from '../data/types.js';
 import { GameEngine, decisionMoments } from '../engine/engine.js';
 import { type GradedMoment, type Grader, gradedFromHits, inlineGrader } from '../engine/grading.js';
-import { autoStay } from '../game/autoStay.js';
+import { autoStay, boxingAt } from '../game/autoStay.js';
 import { ownMove } from '../game/engineerCalls.js';
 import { engineerRadio } from '../game/engineerRadio.js';
+import { neutralCause } from '../game/neutral.js';
 import { MOOD_REFUSALS, acknowledge, refusal } from '../game/refusal.js';
 import { overtakingCorners } from '../track/corners.js';
 import { outlineFor } from '../track/outlines.js';
@@ -130,7 +132,7 @@ export class GameSession {
       if (none) this.choose(none.id);
       return;
     }
-    // Just stopped: the wall stays out without asking (game/autoStay.ts).
+    // A stop booked, or just made: the wall stays out without asking (game/autoStay.ts).
     const stay = autoStay(moment, this.engine.decisions);
     if (stay) {
       this.dispatch({
@@ -138,7 +140,9 @@ export class GameSession {
         message: {
           lap: moment.lap,
           from: 'Engineer',
-          text: 'We’ve just stopped. Staying out.',
+          text: boxingAt(moment, this.engine.decisions)
+            ? 'We’re boxing already. No change to the plan.'
+            : 'We’ve just stopped. Staying out.',
           refused: false,
         },
       });
@@ -181,6 +185,7 @@ export class GameSession {
     if (this.state.phase !== 'racing') return;
     this.engine.step();
     this.reportIncidents();
+    this.reportNeutral();
     this.reportEngineer();
     this.sync();
   }
@@ -209,9 +214,42 @@ export class GameSession {
     }
   }
 
+  /**
+   * Race control as a safety car or VSC is called for the next lap, and why (game/neutral.ts).
+   * A crash in live play already said so with its own line.
+   */
+  private reportNeutral(): void {
+    const race = this.engine.state;
+    const lap = this.engine.lap;
+    const next = race.nextFlag;
+    if ((next !== 'sc' && next !== 'vsc') || race.flag === next) return;
+    const crashed = this.engine.notes.some(
+      (n) => n.kind === 'incident' && n.detail === 'crash' && n.lap === lap,
+    );
+    if (crashed) return;
+    const why = neutralCause(this.daily.model, this.engine.notes, lap + 1, next);
+    const name = next === 'sc' ? 'Safety car' : 'Virtual safety car';
+    this.say('Race control', `${name}${why ? `: ${why}.` : '.'}`, false, lap);
+  }
+
   /** What the race model noted so far (battles, contact, trust...). */
   get notes() {
     return this.engine.notes;
+  }
+
+  /**
+   * The lap being shown, run ahead (battles and trust spec): a replay of the call log to the
+   * end of it. The race model is deterministic, so this is exactly what the lap will give if
+   * no more calls are made for it (a battle's result shown at its corner). Null at the flag.
+   */
+  previewLap(): { race: RaceState; notes: RaceNote[] } | null {
+    if (this.engine.isFinished()) return null;
+    const lap = this.engine.lap + 1;
+    const replay = new GameEngine(this.daily.model, this.daily.seed, {
+      decisions: this.engine.decisions,
+    });
+    while (replay.lap < lap && !replay.isFinished()) replay.step();
+    return { race: replay.state, notes: replay.notes.filter((n) => n.lap === lap) };
   }
 
   /** The radio for the race engineer side of the lap: battles, contact, track limits, trust. */

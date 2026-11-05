@@ -327,14 +327,14 @@ export function DecisionPanel({
                           Drops off ~{o.dropOff} laps
                         </span>
                         <span
-                          className={`rounded bg-[var(--card)] px-1.5 py-0.5 ${o.toFlag ? 'text-[var(--you)]' : 'text-[var(--box-ink)]'}`}
+                          className={`rounded bg-[var(--card)] px-1.5 py-0.5 ${o.toFlag ? 'text-[var(--good)]' : 'text-[var(--box-ink)]'}`}
                         >
                           {o.toFlag ? 'Lasts to the flag' : `Won’t last ${b.lapsLeft} laps`}
                         </span>
                       </span>
                       <span className="flex flex-col gap-1 text-[12.5px] leading-snug">
                         <span>
-                          <span className="font-semibold text-[var(--you)]">Good </span>
+                          <span className="font-semibold text-[var(--good)]">Good </span>
                           {o.good}
                         </span>
                         <span className="text-[var(--muted)]">

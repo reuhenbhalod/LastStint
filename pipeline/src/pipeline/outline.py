@@ -55,6 +55,7 @@ def normalize(
 
 
 PIT_OFF_LINE = 20  # position units (0.1 m): further than this from the racing line = pit lane
+PIT_REJOIN = 10  # out-lap samples back on the line in a row (about 2 s): rejoined
 
 
 def pit_lane(
@@ -63,8 +64,10 @@ def pit_lane(
     out_lap: list[tuple[float, float]],
 ) -> list[tuple[float, float]]:
     """The pit-lane path: from where the in-lap leaves the racing line (`lap`) to where the
-    out-lap last rejoins it. A pit exit that crosses the track (a tunnel) touches the line
-    for a moment, so the span runs to the last off-line point, not the first on-line one."""
+    out-lap rejoins it for good. A pit exit that crosses the track (a tunnel) touches the line
+    for a moment, so the lane runs on through a short touch; it ends once the out-lap has been
+    back on the line for PIT_REJOIN samples (a car racing a little off the fastest lap's line
+    later on is not the pit lane)."""
     dense = []
     for (ax, ay), (bx, by) in zip(lap, lap[1:] + lap[:1], strict=True):
         dense += [(ax + (bx - ax) * t / 20, ay + (by - ay) * t / 20) for t in range(20)]
@@ -74,8 +77,15 @@ def pit_lane(
 
     in_off = [off(p) for p in in_lap]
     start = next((i for i, o in enumerate(in_off) if o and all(in_off[i:])), None)
-    out_off = [off(p) for p in out_lap]
-    end = max((i for i, o in enumerate(out_off) if o), default=None)
+    end = None
+    on = 0
+    for i, p in enumerate(out_lap):
+        if off(p):
+            end, on = i, 0
+        else:
+            on += 1
+            if on >= PIT_REJOIN:
+                break
     if start is None or end is None:
         return []
     return in_lap[start:] + out_lap[: end + 1]
@@ -84,12 +94,17 @@ def pit_lane(
 PIT_MAX_STEP = 400  # position units (40 m): a longer jump between samples is a data gap
 PIT_MIN_SPAN = 1000  # the lane covers at least 100 m
 PIT_END_NEAR = 400  # its ends are within 40 m of the racing line
+PIT_MAX_SHARE = 0.35  # and it is a short stretch: at most this share of the lap's length
 
 
 def valid_pit(path: list[tuple[float, float]], lap: list[tuple[float, float]]) -> bool:
-    """A usable pit-lane trace: enough points, no jumps (dropped position data), a real length,
-    and both ends near the track (where the lane leaves and rejoins it)."""
+    """A usable pit-lane trace: enough points, no jumps (dropped position data), a real length
+    but not much of a lap, and both ends near the track (where the lane leaves and rejoins it)."""
     if len(path) < 15:
+        return False
+    length = sum(math.dist(a, b) for a, b in zip(path, path[1:], strict=False))
+    lap_length = sum(math.dist(a, b) for a, b in zip(lap, lap[1:] + lap[:1], strict=True))
+    if length > PIT_MAX_SHARE * lap_length:
         return False
     if any(math.dist(a, b) > PIT_MAX_STEP for a, b in zip(path, path[1:], strict=False)):
         return False

@@ -1,4 +1,4 @@
-import { verifyRun } from '@boxthislap/sim';
+import { type RaceState, battlesFor, engineerConfig, verifyRun } from '@boxthislap/sim';
 import { describe, expect, it } from 'vitest';
 import { StaticDailyProvider } from '../data/provider.js';
 import { GameSession } from './session.js';
@@ -101,6 +101,70 @@ describe('GameSession', () => {
     const last = today.model.race.laps;
     session.call({ lap: last, kind: 'pit', compound: 'SOFT' }, { asked: true });
     expect(session.state.decisions.filter((d) => d.kind === 'pit')).toHaveLength(1);
+  });
+
+  it('does not ask about a stop already booked (Abu Dhabi: box on the radio, then the SC call)', async () => {
+    const today = await daily();
+    const session = new GameSession(today);
+    session.start();
+    const asked: string[] = [];
+    let booked = false;
+    for (let i = 0; i < 300 && session.state.phase !== 'finished'; i++) {
+      const m = session.state.currentMoment;
+      if (session.state.phase === 'decision' && m) {
+        asked.push(m.id);
+        session.choose(m.realOptionId ?? (m.options[0]?.id as string));
+        continue;
+      }
+      // Two laps before the late safety car's stop call, BOX from the team radio for the lap
+      // after the one being shown (past pit entry): booked, not yet made, at the pause.
+      if (!booked && session.state.race.lap === 51) {
+        session.call({ lap: 53, kind: 'pit', compound: 'HARD' });
+        booked = session.state.decisions.some((d) => d.kind === 'pit' && d.lap === 53);
+      }
+      session.tick();
+    }
+    expect(booked).toBe(true);
+    // Neither SC stop call is asked: the wall stays out for you, and the booked stop happens.
+    expect(asked).not.toContain('sc-stop');
+    expect(asked).not.toContain('sc-last-chance');
+    expect(session.state.radio.some((r) => r.text.includes('boxing already'))).toBe(true);
+    const stops = session.state.decisions.filter((d) => d.kind === 'pit' && d.lap >= 52);
+    expect(stops).toEqual([expect.objectContaining({ lap: 53, compound: 'HARD' })]);
+    const body = await session.submission('11111111-1111-4111-8111-111111111111');
+    expect(() => verifyRun(today.model, today.seed, body.decisions)).not.toThrow();
+  });
+
+  it('previews a battle lap exactly: the lap then runs to the same result', async () => {
+    const today = await daily();
+    const model = today.model;
+    const cfg = engineerConfig(model) as NonNullable<ReturnType<typeof engineerConfig>>;
+    let checked = 0;
+    for (let seed = 1; seed < 60 && checked < 5; seed++) {
+      const s = new GameSession({ ...today, seed });
+      s.start();
+      for (let i = 0; i < 200 && s.state.phase !== 'finished'; i++) {
+        if (s.state.phase === 'decision') {
+          answer(s);
+          continue;
+        }
+        const b = battlesFor(s.state.race, model, cfg);
+        if (b.ahead || b.behind) {
+          const lap = s.state.race.lap + 1;
+          s.call({ lap, kind: 'battle', move: b.ahead ? 'dive-inside' : 'cover-inside' });
+          const preview = s.previewLap();
+          s.tick();
+          expect(preview?.race.order).toEqual(s.state.race.order);
+          const times = (r: RaceState) => r.order.map((c) => r.cars[c]?.totalTime);
+          expect(times(preview?.race as RaceState)).toEqual(times(s.state.race));
+          expect(preview?.notes).toEqual(s.notes.filter((n) => n.lap === lap));
+          checked++;
+          break;
+        }
+        s.tick();
+      }
+    }
+    expect(checked).toBeGreaterThan(0);
   });
 
   it('reports incidents on the radio, and plays on to the flag if your car is out', async () => {

@@ -817,27 +817,58 @@ function rivalReacts(
   const rival = state.cars[model.rival];
   if (!run.live || !user || !rival || !user.pittedThisLap) return;
   if (rival.retired || rival.pittedThisLap || lap >= model.race.laps) return;
-  // The real stop: the rival's real answer to it is already its real strategy.
-  if (isRealStop(run, lap, user.compound)) return;
-
+  const to = rivalCover(model, rival, {
+    lap,
+    flag,
+    nextFlag: run.neutral.get(lap + 1),
+    startGap: Math.abs((prevTime[user.code] ?? 0) - (prevTime[rival.code] ?? 0)),
+    userBehind: user.totalTime - rival.totalTime,
+    userCompound: user.compound,
+  });
+  if (!to) return;
   const nextStop = rival.strategy.filter((s) => s.lap > lap).sort((a, b) => a.lap - b.lap)[0];
-  const nextFlag = run.neutral.get(lap + 1);
+  rival.strategy = rival.strategy.filter((s) => s !== nextStop);
+  rival.strategy.push({ lap: lap + 1, to, added: true });
+  run.notes.push({ lap, kind: 'rival-cover', driver: rival.code, detail: to });
+}
+
+/**
+ * The rival's answer to the user's stop charged on `lap` (rivalReacts): the tyre it covers
+ * on next lap, or null if it keeps its plan. Pure, so the game's map can tell a lap ahead
+ * (the cover's in-lap is the lap the user's stop is charged on). `flag`/`nextFlag`: the flags
+ * of `lap` and the lap after; `startGap`: the two cars' gap (s) at the start of `lap`;
+ * `userBehind`: how far (s) the user is behind the rival after `lap`.
+ */
+export function rivalCover(
+  model: RaceModel,
+  rival: CarState,
+  at: {
+    lap: number;
+    flag: FlagState | undefined;
+    nextFlag: FlagState | undefined;
+    startGap: number;
+    userBehind: number;
+    userCompound: string;
+  },
+): string | null {
+  const { lap, flag, nextFlag } = at;
+  // The real stop: the rival's real answer to it is already its real strategy.
+  const real = model.drivers
+    .find((d) => d.code === model.userSide)
+    ?.realStrategy.some((s) => s.lap === lap && s.to === at.userCompound);
+  if (real) return null;
+  const nextStop = rival.strategy.filter((s) => s.lap > lap).sort((a, b) => a.lap - b.lap)[0];
   let cover = false;
   if (flag === 'sc' || flag === 'vsc') {
     if (nextFlag === 'sc' || nextFlag === 'vsc') {
       const cost = nextFlag === 'sc' ? model.track.pitLossUnderSC : model.track.pitLossUnderVSC;
-      cover = user.totalTime - rival.totalTime > cost;
+      cover = at.userBehind > cost;
     }
   } else {
-    const startGap = Math.abs((prevTime[user.code] ?? 0) - (prevTime[rival.code] ?? 0));
     cover =
-      startGap < model.track.pitLoss && !!nextStop && nextStop.lap - (lap + 1) <= COVER_WINDOW;
+      at.startGap < model.track.pitLoss && !!nextStop && nextStop.lap - (lap + 1) <= COVER_WINDOW;
   }
-  if (!cover) return;
-  const to = nextStop?.to ?? user.compound;
-  rival.strategy = rival.strategy.filter((s) => s !== nextStop);
-  rival.strategy.push({ lap: lap + 1, to, added: true });
-  run.notes.push({ lap, kind: 'rival-cover', driver: rival.code, detail: to });
+  return cover ? (nextStop?.to ?? at.userCompound) : null;
 }
 
 /**
@@ -1555,17 +1586,22 @@ function engineerAfterLap(
   }
   eng.refused = keep;
 
-  // Quiet laps calm him down, back toward where he started.
-  if (eng.trust < eng.baseTrust && lap - eng.lastEvent >= cfg.trust.settleAfter) {
+  // Quiet laps settle him, back toward where he started: calmer after a row, a little less
+  // sure of the wall after a run of good calls.
+  if (eng.trust !== eng.baseTrust && lap - eng.lastEvent >= cfg.trust.settleAfter) {
     const before = moodOf(cfg, eng.trust);
-    eng.trust = Math.min(eng.baseTrust, eng.trust + cfg.trust.settle);
+    const was = eng.trust;
+    eng.trust =
+      eng.trust < eng.baseTrust
+        ? Math.min(eng.baseTrust, eng.trust + cfg.trust.settle)
+        : Math.max(eng.baseTrust, eng.trust - cfg.trust.settle);
     if (moodOf(cfg, eng.trust) !== before) {
       run.notes.push({
         lap,
         kind: 'trust',
         driver: user.code,
         detail: 'settled',
-        value: cfg.trust.settle,
+        value: eng.trust - was,
       });
     }
   }

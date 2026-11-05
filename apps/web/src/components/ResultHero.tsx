@@ -8,9 +8,9 @@ import type { Verdict } from '../game/verdict.js';
 const TONE: Record<Verdict['outcome'], { text: string; ring: string; glow: string; word: string }> =
   {
     beat: {
-      text: 'text-[var(--you)]',
-      ring: 'border-[var(--you)]',
-      glow: 'shadow-[0_0_80px_-20px_var(--you)]',
+      text: 'text-[var(--good)]',
+      ring: 'border-[var(--good)]',
+      glow: 'shadow-[0_0_80px_-20px_var(--good)]',
       word: 'Better than the real team',
     },
     matched: {

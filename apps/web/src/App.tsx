@@ -6,6 +6,7 @@ import { useAccount } from './account/useAccount.js';
 import { AdminPage } from './admin/AdminPage.js';
 import { adminToken } from './admin/session.js';
 import { ApiDailyProvider, RaceFileProvider } from './data/provider.js';
+import { useTeamTheme } from './game/teamTheme.js';
 import { useGame } from './game/useGame.js';
 import { HowItWorks } from './screens/HowItWorks.js';
 import { IntroCard } from './screens/IntroCard.js';
@@ -31,6 +32,8 @@ function Game() {
       : new ApiDailyProvider();
   }, []);
   const game = useGame(provider);
+  // The race in the driver's team colours (game/teamTheme.ts).
+  useTeamTheme(game.model);
   const account = useAccount(game.reload);
   const [help, setHelp] = useState(false);
   // The home page mid-race (the Pit Wall brand): the race holds until you go back to it.
@@ -68,7 +71,7 @@ function Game() {
         <button
           type="button"
           onClick={game.reload}
-          className="rounded-xl bg-[var(--you)] px-6 py-3 font-bold text-neutral-950"
+          className="rounded-xl bg-[var(--you)] px-6 py-3 font-bold text-[var(--you-ink)]"
         >
           Try again
         </button>
