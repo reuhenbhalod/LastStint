@@ -1,0 +1,26 @@
+[
+  {
+    "title": "Safety car box call shows the wrong lap",
+    "description": "In Abu Dhabi 2021 the box call during the lap-53 safety car says lap 52.",
+    "category": "bug",
+    "status": "open",
+    "notes": "",
+    "source": "Playtest, Nov 2026"
+  },
+  {
+    "title": "Let players replay yesterday's daily",
+    "description": "A practice replay of the previous day's race that doesn't touch streaks.",
+    "category": "feature",
+    "status": "in_progress",
+    "notes": "Check how it interacts with the leaderboard.",
+    "source": "Team call"
+  },
+  {
+    "title": "Team colours on the results card",
+    "description": "Use the player's team colour for their row on the results screen.",
+    "category": "ui",
+    "status": "done",
+    "notes": "Shipped with the team colours change.",
+    "source": "Feedback form"
+  }
+]
