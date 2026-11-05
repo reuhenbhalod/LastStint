@@ -11,7 +11,8 @@ test('plays a defend race end to end on a laptop screen', async ({ page }) => {
   const submitted = await mockApi(page, model);
   await page.goto('/');
   await page.getByRole('button', { name: 'Skip' }).click();
-  await expect(page.getByText(`Hold P2 from ${model.rival}`).first()).toBeVisible();
+  // The goal names the rival (Bottas), as the game says drivers' names.
+  await expect(page.getByText(/^Hold P2 from Bottas/).first()).toBeVisible();
   await page.getByRole('button', { name: /pit wall/ }).click();
 
   // Answer each call with its first choice (and, after Box, the first tyre) until the flag.

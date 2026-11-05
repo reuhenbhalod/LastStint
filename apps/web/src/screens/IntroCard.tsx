@@ -298,7 +298,8 @@ export function IntroCard({
                   </span>
                 )}
               </div>
-              <div className="flex flex-col gap-3 pt-1 sm:flex-row sm:items-center">
+              {/* The start button, with how to play and how it works under it. */}
+              <div className="flex w-full flex-col items-stretch gap-2.5 pt-1 sm:w-fit">
                 <button
                   type="button"
                   onClick={onStart}
@@ -312,7 +313,7 @@ export function IntroCard({
                     →
                   </span>
                 </button>
-                <span className="flex gap-4 text-[13px] text-[var(--muted)]">
+                <span className="flex justify-center gap-5 text-[13px] text-[var(--muted)]">
                   <button
                     type="button"
                     onClick={() => setHowTo(true)}

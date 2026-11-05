@@ -9,7 +9,7 @@ describe('goalOf', () => {
   it('beat: the rival really finished ahead', () => {
     expect(goalOf(model('HAM', 'VER', ['VER', 'HAM']))).toMatchObject({
       kind: 'beat',
-      short: 'Beat VER',
+      short: 'Beat Verstappen',
     });
   });
 
@@ -17,7 +17,7 @@ describe('goalOf', () => {
     expect(goalOf(model('BOT', 'LEC', ['HAM', 'BOT', 'LEC']))).toMatchObject({
       kind: 'defend',
       place: 2,
-      short: 'Hold P2 from LEC',
+      short: 'Hold P2 from Leclerc',
     });
   });
 });
