@@ -99,6 +99,36 @@ def load_track_status(race_id: str, raw_dir: Path = RAW_DIR) -> list[dict] | Non
     return json.loads(path.read_text()) if path.exists() else None
 
 
+def weather_path(race_id: str, raw_dir: Path = RAW_DIR) -> Path:
+    """Path to the race's weather by the minute (weather spec): [{time, rain, track, air}]."""
+    return raw_dir / f"{race_id}.weather.json"
+
+
+def project_weather(weather: pd.DataFrame) -> list[dict]:
+    """FastF1 `session.weather_data` as [{time (session s), rain, track, air}]."""
+    return [
+        {
+            "time": round(pd.Timedelta(r.Time).total_seconds(), 3),
+            "rain": bool(r.Rainfall),
+            "track": float(r.TrackTemp),
+            "air": float(r.AirTemp),
+        }
+        for r in weather.itertuples()
+    ]
+
+
+def save_weather(race_id: str, weather: list[dict], raw_dir: Path = RAW_DIR) -> Path:
+    path = weather_path(race_id, raw_dir)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(weather, indent=1) + "\n")
+    return path
+
+
+def load_weather(race_id: str, raw_dir: Path = RAW_DIR) -> list[dict] | None:
+    path = weather_path(race_id, raw_dir)
+    return json.loads(path.read_text()) if path.exists() else None
+
+
 def load_race(year: int, event: str, cache_dir: Path = CACHE_DIR):
     """Load a race session (laps + weather + messages, no telemetry)."""
     import fastf1
@@ -142,11 +172,9 @@ def relabel_2018_compounds(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def race_suitability(df: pd.DataFrame) -> list[str]:
-    """Reasons a race can't be modelled yet (spec D8): wet tyres or a red flag."""
+    """Reasons a race can't be modelled yet (spec D8): a red flag. (Wet races are, since the
+    weather spec.)"""
     reasons = []
-    wet = sorted(set(df["Compound"].dropna().astype(str)) & WET_COMPOUNDS)
-    if wet:
-        reasons.append(f"wet ({', '.join(wet)})")
     if df["TrackStatus"].astype(str).str.contains("5").any():
         reasons.append("red flag")
     return reasons
@@ -224,4 +252,33 @@ def ingest_race(
     path.parent.mkdir(parents=True, exist_ok=True)
     df.to_parquet(path)
     save_track_status(race_id, session, raw_dir)
+    if getattr(session, "weather_data", None) is not None and len(session.weather_data):
+        save_weather(race_id, project_weather(session.weather_data), raw_dir)
     return df, facts
+
+
+def ingest_openf1(
+    race_id: str, year: int, country: str, cache_dir: Path = CACHE_DIR, raw_dir: Path = RAW_DIR
+) -> tuple[pd.DataFrame, dict]:
+    """Load a race from OpenF1 (openf1.py) and save the same raw snapshot, track status and
+    weather as the FastF1 ingest."""
+    import urllib.parse
+    import urllib.request
+
+    from . import openf1
+
+    query = urllib.parse.urlencode({"year": year, "session_name": "Race", "country_name": country})
+    with urllib.request.urlopen(f"{openf1.API}/sessions?{query}", timeout=60) as r:
+        sessions = json.load(r)
+    if len(sessions) != 1:
+        raise IncompleteDataError(f"{len(sessions)} OpenF1 race sessions for {year} {country}")
+    raw = openf1.fetch(int(sessions[0]["session_key"]), cache_dir)
+    df = openf1.laps_frame(raw)
+    check_complete(df)
+    path = raw_snapshot_path(race_id, raw_dir)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    df.to_parquet(path)
+    status = track_status_path(race_id, raw_dir)
+    status.write_text(json.dumps(openf1.track_status(raw), indent=1) + "\n")
+    save_weather(race_id, openf1.weather(raw), raw_dir)
+    return df, openf1.race_facts(raw, df)

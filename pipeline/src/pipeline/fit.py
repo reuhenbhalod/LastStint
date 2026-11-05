@@ -129,8 +129,9 @@ class _Core:
     resid: np.ndarray
 
 
-def _fit_core(df, drivers, ordered, free, reference, prior, cliff_ages) -> _Core:
-    """Solve the ordered, prior-shrunk lap-time model with hinge columns at `cliff_ages`."""
+def _fit_core(df, drivers, ordered, free, reference, prior, cliff_ages, fixed_fuel=None) -> _Core:
+    """Solve the ordered, prior-shrunk lap-time model with hinge columns at `cliff_ages`.
+    `fixed_fuel`: the fuel effect is taken as given (s/lap), not fitted."""
     age = df["TyreLife"].astype(float).to_numpy()
     comp = df["Compound"].to_numpy()
     age_ref = float(np.median(age))  # turns a wear prior into lap-time units
@@ -162,10 +163,13 @@ def _fit_core(df, drivers, ordered, free, reference, prior, cliff_ages) -> _Core
     if fresh:  # bonus on a new set's first clean laps, shrunk toward the pooled prior
         scale = float(np.sqrt(fresh["pseudoLaps"] / prior["pseudoLaps"]))
         add(fresh_weight(age, fresh["laps"]), "fresh", -np.inf, fresh["bonus"], scale)
-    add(-df["LapNumber"].astype(float).to_numpy(), "fuel")
+    if fixed_fuel is None:
+        add(-df["LapNumber"].astype(float).to_numpy(), "fuel")
 
     x = np.column_stack(cols)
     y = df["LapTime"].astype(float).to_numpy()
+    if fixed_fuel is not None:
+        y = y + fixed_fuel * df["LapNumber"].astype(float).to_numpy()
     lower = np.array([s[1] for s in specs])
     names = [s[0] for s in specs]
 
@@ -188,10 +192,14 @@ def _fit_core(df, drivers, ordered, free, reference, prior, cliff_ages) -> _Core
     else:
         params = data_only
     resid = y - x @ np.array([params[n] for n in names])
+    if fixed_fuel is not None:
+        params["fuel"] = data_only["fuel"] = float(fixed_fuel)
     return _Core(params=params, data_only=data_only, sse=float(resid @ resid), resid=resid)
 
 
-def _search_cliffs(df, drivers, ordered, free, reference, prior, min_laps, min_stints):
+def _search_cliffs(
+    df, drivers, ordered, free, reference, prior, min_laps, min_stints, fixed_fuel=None
+):
     """Per compound, the cliff age that best improves the joint fit, kept only if BIC drops.
 
     A candidate age needs `min_laps` laps past it from at least `min_stints` stints, so one
@@ -211,7 +219,7 @@ def _search_cliffs(df, drivers, ordered, free, reference, prior, min_laps, min_s
         return n * np.log(sse / n) + extra_params * np.log(n)
 
     accepted: dict[str, int] = {}
-    current = _fit_core(df, drivers, ordered, free, reference, prior, accepted)
+    current = _fit_core(df, drivers, ordered, free, reference, prior, accepted, fixed_fuel)
     for c in [*ordered, *free]:
         on = comp == c
         best_age, best_core = None, None
@@ -219,7 +227,9 @@ def _search_cliffs(df, drivers, ordered, free, reference, prior, min_laps, min_s
             beyond = on & (ages > k)
             if beyond.sum() < min_laps or len(set(stint_key[beyond])) < min_stints:
                 continue
-            core = _fit_core(df, drivers, ordered, free, reference, prior, {**accepted, c: k})
+            core = _fit_core(
+                df, drivers, ordered, free, reference, prior, {**accepted, c: k}, fixed_fuel
+            )
             if core.params[f"cliff::{c}"] > 0 and (best_core is None or core.sse < best_core.sse):
                 best_age, best_core = k, core
         if best_core is not None and bic(best_core.sse, 2) < bic(current.sse, 0):
@@ -236,6 +246,7 @@ def fit_lap_model(
     fallback_pace_laps: pd.DataFrame | None = None,
     min_laps_beyond_cliff: int = 6,
     min_stints_beyond_cliff: int = 2,
+    fixed_fuel: float | None = None,
 ) -> LapTimeFit:
     """Fit the lap-time model; return fitted driver pace, compound params, fuel, noise.
 
@@ -264,6 +275,7 @@ def fit_lap_model(
         prior,
         min_laps_beyond_cliff,
         min_stints_beyond_cliff,
+        fixed_fuel,
     )
     params, data_only = core.params, core.data_only
 

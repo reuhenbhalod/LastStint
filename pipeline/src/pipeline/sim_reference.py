@@ -54,6 +54,14 @@ class Car:
     retired: bool = False
     retired_lap: int | None = None
     laps_done: int = 0
+    # Tyre wear in dry-lap units (the weather changes how fast a set wears); None: tyre_age.
+    tyre_wear: float | None = None
+    # A wet race: the driver's extra share of a lap in the wet (wet.driver_wet_pace).
+    wet_pace: float = 0.0
+
+    def __post_init__(self):
+        if self.tyre_wear is None:
+            self.tyre_wear = float(self.tyre_age)
 
 
 def fresh_weight_sim(tyre_age: int, laps: int) -> float:
@@ -62,14 +70,52 @@ def fresh_weight_sim(tyre_age: int, laps: int) -> float:
     return min(1.0, max(0.0, (laps + 1 - tyre_age) / laps)) if tyre_age >= 1 else 0.0
 
 
-def _clean_lap(car: Car, compounds: dict, fuel_per_lap: float, lap: int, fresh=None) -> float:
+def wetness(weather: dict | None, lap: int) -> float:
+    """The track's wetness on `lap` (0 in a dry race)."""
+    if not weather:
+        return 0.0
+    w = weather["wetness"]
+    return float(w[min(len(w), max(1, lap)) - 1])
+
+
+def wet_penalty(weather: dict | None, compound: str, lap: int) -> float:
+    """The share of a dry lap the tyre loses on `lap` (weather spec; wet.py fits the curves)."""
+    w = wetness(weather, lap)
+    if not weather or w <= 0 and compound not in ("INTERMEDIATE", "WET"):
+        return 0.0
+    curves = weather["curves"]
+    if compound == "INTERMEDIATE" or compound == "WET":
+        c = curves["inter" if compound == "INTERMEDIATE" else "wet"]
+        return c["min"] + c["dry"] * max(0.0, c["best"] - w) + c["wet"] * max(0.0, w - c["best"])
+    c = curves["slick"]
+    return c["a"] * w + c["b"] * w * w
+
+
+def weather_wear(weather: dict | None, compound: str, lap: int) -> float:
+    """Tyre wear on `lap` against a dry lap (wet.wear_mult)."""
+    if not weather:
+        return 1.0
+    w = wetness(weather, lap)
+    if compound == "INTERMEDIATE" or compound == "WET":
+        edge = 0.15 if compound == "INTERMEDIATE" else 0.3
+        return 1.0 + 2.0 * max(0.0, (edge - w) / edge)
+    return 1.0 - 0.8 * min(1.0, w / 0.05)
+
+
+def _clean_lap(
+    car: Car, compounds: dict, fuel_per_lap: float, lap: int, fresh=None, weather=None
+) -> float:
     c = compounds[car.compound]
-    t = car.base_pace + c["offset"] + c["degPerLap"] * car.tyre_age - fuel_per_lap * lap
+    wear = car.tyre_wear
+    t = car.base_pace + c["offset"] + c["degPerLap"] * wear - fuel_per_lap * lap
     if fresh:
         t += fresh["bonus"] * fresh_weight_sim(car.tyre_age, fresh["laps"])
-    if car.tyre_age > c["cliffLap"]:  # past the cliff: wear accelerates
+    if wear > c["cliffLap"]:  # past the cliff: wear accelerates
         extra = c.get("cliffDegPerLap", CLIFF_FALLBACK * c["degPerLap"])
-        t += extra * (car.tyre_age - c["cliffLap"])
+        t += extra * (wear - c["cliffLap"])
+    if weather:
+        w = wetness(weather, lap)
+        t *= 1 + wet_penalty(weather, car.compound, lap) + car.wet_pace * min(1.0, w / 0.1)
     return t
 
 
@@ -138,6 +184,7 @@ def simulate(model: dict, seed: int, strategies: dict | None = None) -> dict:
     compounds = model["compounds"]
     fuel = model["fuelEffectPerLap"]
     fresh_tyre = model.get("freshTyre")
+    weather = model.get("weather")
     total_laps = int(model["race"]["laps"])
     takeover = int(model["race"]["takeoverLap"])
     overtake = track["overtakeModel"]
@@ -174,6 +221,7 @@ def simulate(model: dict, seed: int, strategies: dict | None = None) -> dict:
             total_time=cum,
             strategy=list(strat),
             laps_done=takeover,
+            wet_pace=d.get("wetPace", 0.0),
         )
 
     order = [d["code"] for d in ordered]
@@ -201,6 +249,7 @@ def simulate(model: dict, seed: int, strategies: dict | None = None) -> dict:
                 car.strategy.remove(pit)
                 car.compound = pit["to"]
                 car.tyre_age = 0
+                car.tyre_wear = 0.0
                 default = {"SC": pit_loss_sc, "VSC": pit_loss_vsc}.get(flag, pit_loss)
                 pit_cost = pit.get("loss", default)
 
@@ -211,16 +260,17 @@ def simulate(model: dict, seed: int, strategies: dict | None = None) -> dict:
             elif flag == "RED" and green:
                 lt = green
             else:
-                lt = _clean_lap(car, compounds, fuel, lap, fresh_tyre) + noise_rngs[code].normal(
-                    car.noise
-                )
+                lt = _clean_lap(car, compounds, fuel, lap, fresh_tyre, weather) + noise_rngs[
+                    code
+                ].normal(car.noise)
                 ahead = _car_ahead(order, code, cars)
                 ahead_gap = car.total_time - prev_time.get(ahead, car.total_time)
                 if 0 < ahead_gap < DIRTY_AIR_RANGE:
                     lt += dirty_air
-            clean[code] = _clean_lap(car, compounds, fuel, lap, fresh_tyre)
+            clean[code] = _clean_lap(car, compounds, fuel, lap, fresh_tyre, weather)
             car.total_time += lt + pit_cost
             car.tyre_age += 1
+            car.tyre_wear += weather_wear(weather, car.compound, lap)
             car.laps_done = lap
 
         for code in retire_at.get(lap, ()):

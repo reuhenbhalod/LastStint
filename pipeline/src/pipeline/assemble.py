@@ -108,6 +108,8 @@ def assemble_race_model(
     fastest_lap_point: bool = False,
     track_status: list[dict] | None = None,
     sc_unlap: str | None = None,
+    weather: dict | None = None,
+    wet_pace: dict[str, float] | None = None,
 ) -> dict:
     """Build the race-model dict (validate + write it with export.write_race)."""
     total_laps = int(laps["LapNumber"].max())
@@ -143,6 +145,39 @@ def assemble_race_model(
             **({"cliffDegPerLap": round(hinge[1], 4)} if hinge else {}),
         }
 
+    # A wet race (weather spec): the wet tyres too (their pace is in the weather curves).
+    if weather:
+        from . import wet as wet_mod
+
+        for compound, model in wet_mod.WET_TYRES.items():
+            compounds.setdefault(compound, dict(model))
+        # A dry tyre run only in the wet (softs fitted for a damp track) has no dry laps to
+        # fit: the era's prior, against the nearest fitted one.
+        from .fit import load_compound_priors
+
+        prior = load_compound_priors(era)
+        used = set(laps["Compound"].dropna().astype(str))
+        fitted_dry = [c for c in prior["order"] if c in compounds]
+        for c in prior["order"]:
+            if c in used and c not in compounds and fitted_dry:
+                anchor = min(
+                    fitted_dry,
+                    key=lambda f: abs(prior["order"].index(f) - prior["order"].index(c)),
+                )
+                compounds[c] = {
+                    "offset": round(
+                        compounds[anchor]["offset"] + prior["offset"][c] - prior["offset"][anchor],
+                        4,
+                    ),
+                    "degPerLap": prior["wear"][c],
+                    "cliffLap": max(
+                        longest.get(c, 1), life_floor(c, longest, stints, total_laps) or 1
+                    ),
+                }
+        wear = wet_mod.sim_wear(laps, weather)
+    else:
+        wear = None
+
     # Events and remaining strategy from the takeover lap onward; earlier history is already
     # baked into stateAtTakeover.
     future_events = [
@@ -163,12 +198,22 @@ def assemble_race_model(
         fresh,
         takeover_lap,
         pace_mod.SHRINK_LAPS,
+        weather,
+        wear,
     )
     if pace_mod.SIM_FRAME_LOSS:
         v3_pace = {c: p + race_pace.get(c, 0.0) for c, p in fit.driver_pace.items()}
         measured.update(
             pace_mod.sim_frame_losses(
-                laps, v3_pace, compounds, round(fit.fuel_per_lap, 5), fresh, takeover_lap
+                laps,
+                v3_pace,
+                compounds,
+                round(fit.fuel_per_lap, 5),
+                fresh,
+                takeover_lap,
+                weather,
+                wear,
+                wet_pace,
             )
         )
 
@@ -196,6 +241,7 @@ def assemble_race_model(
                 "team": teams.get(code, "Unknown"),
                 "basePace": round(fit.driver_pace[code] + race_pace.get(code, 0.0), 4),
                 "noise": round(fit.driver_noise[code], 4),
+                **({"wetPace": wet_pace[code]} if wet_pace and code in wet_pace else {}),
                 "stateAtTakeover": {
                     "position": s["position"],
                     "gapAhead": s["gapAhead"] if s["gapAhead"] is not None else 0.0,
@@ -269,4 +315,5 @@ def assemble_race_model(
         "realResult": finishing_order(laps),
         "userSide": user_side,
         "rival": rival,
+        **({"weather": weather} if weather else {}),
     }
