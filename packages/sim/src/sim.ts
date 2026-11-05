@@ -23,6 +23,7 @@ import {
   validEngineerCall,
 } from './engineer.js';
 import headsetConfig from './headset.json';
+import { validatePlan } from './plan.js';
 import { type Rng, deriveSeed, mulberry32 } from './rng.js';
 import type {
   BattleMove,
@@ -79,7 +80,7 @@ export function tyreLife(c: CompoundModel): number {
 }
 
 /** Usable life of `compound` in `model` (Infinity if the race has no model for it). */
-function lifeOf(model: RaceModel, compound: string): number {
+export function lifeOf(model: RaceModel, compound: string): number {
   const c = model.compounds[compound];
   return c ? tyreLife(c) : Number.POSITIVE_INFINITY;
 }
@@ -203,7 +204,7 @@ export interface NeutralEvent {
   flag: Exclude<FlagState, 'green'>;
 }
 
-function neutralMap(events: NeutralEvent[]): Map<number, Exclude<FlagState, 'green'>> {
+export function neutralMap(events: NeutralEvent[]): Map<number, Exclude<FlagState, 'green'>> {
   const map = new Map<number, Exclude<FlagState, 'green'>>();
   for (const e of events) for (let lap = e.lap; lap < e.lap + e.laps; lap++) map.set(lap, e.flag);
   return map;
@@ -274,7 +275,7 @@ export function freshTyreDelta(model: RaceModel, tyreAge: number): number {
 }
 
 /** The lap-time model for a given pace, compound and tyre wear (laps) on this lap. */
-function tyreLapTime(
+export function tyreLapTime(
   model: RaceModel,
   basePace: number,
   compound: string,
@@ -378,6 +379,8 @@ export function validateDecisions(model: RaceModel, decisions: Decision[]): void
       d.kind === 'reply'
     ) {
       if (!headset?.engineer || !validEngineerCall(d)) throw new Error(`bad ${d.kind} call`);
+    } else if (d.kind === 'plan') {
+      validatePlan(model, d, model.race.takeoverLap);
     } else if (d.kind !== 'radio') {
       throw new Error('unknown decision kind');
     }

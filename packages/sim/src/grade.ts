@@ -45,6 +45,11 @@ export interface GradeOption {
   id: string;
   /** The calls this option makes, for laps not yet run (empty = stay out / no change). */
   decisions: Decision[];
+  /**
+   * A whole race plan (planner.ts): its calls run to the flag and the sensible-strategist
+   * continuation adds nothing (a no-stop plan stays a no-stop plan).
+   */
+  final?: boolean;
 }
 
 export interface OptionGrade {
@@ -110,7 +115,12 @@ export function playOption(run: Run, seed: number, option: GradeOption): Run {
   );
   while (fork.state.lap < settled && !isFinished(fork)) stepLap(fork);
   const user = fork.state.cars[fork.model.userSide];
-  if (user && !isFinished(fork) && !user.strategy.some((s) => s.lap > fork.state.lap)) {
+  if (
+    !option.final &&
+    user &&
+    !isFinished(fork) &&
+    !user.strategy.some((s) => s.lap > fork.state.lap)
+  ) {
     const stop = planRemainingStop(fork);
     if (stop) user.strategy.push({ ...stop, added: true });
   }

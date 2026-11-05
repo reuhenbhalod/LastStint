@@ -11,6 +11,25 @@ export type Era = '1988-1993' | '1994-2009' | '2010-2013' | '2014-2025' | '2026+
 export type FlagState = 'green' | 'sc' | 'vsc' | 'red';
 
 export type PaceMode = 'push' | 'standard' | 'manage';
+
+/** One planned stop: box at the end of `lap` (the in-lap) for `compound`. */
+export interface PlanStop {
+  lap: number;
+  compound: Compound;
+}
+
+/**
+ * A race plan (strategy planner spec): the stops to the flag and the pace of each stint
+ * (`pace.length === stops.length + 1`). `id` is the engineer's plan it is ('a', 'b', 'c'),
+ * or 'own' for a plan the player built.
+ */
+export interface RacePlan {
+  id: PlanId;
+  stops: PlanStop[];
+  pace: PaceMode[];
+}
+
+export type PlanId = 'a' | 'b' | 'c' | 'own';
 export type FuelMode = 'normal' | 'liftAndCoast';
 export type BattleMode = 'attack' | 'hold' | 'defend';
 /** The hybrid battery's use (feedback round 2): spending modes drain it, harvest refills it. */
@@ -199,6 +218,11 @@ export type Decision = (
   | { lap: number; kind: 'blue'; action: BlueAction }
   /** The wall's answer to a driver's request (a yes also logs the call it asked for). */
   | { lap: number; kind: 'reply'; request: DriverRequest; yes: boolean }
+  /**
+   * The race plan picked at takeover (strategy planner spec): graded, but it makes no calls
+   * itself; the game logs the plan's pit and pace calls as their laps come.
+   */
+  | ({ lap: number; kind: 'plan' } & RacePlan)
 ) & {
   /**
    * The last completed lap when the call was made; decide() stamps it. The server needs it to
