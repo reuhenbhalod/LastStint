@@ -708,7 +708,7 @@ RACES: dict[str, dict] = {
         "name": "Russia 2021: Norris vs Hamilton",
         "era": "2014-2025",
         "takeover_lap": 38,
-        "seed": 1,
+        "seed": 8436,  # tuned: scripts/tune.ts (weather)
         "user_side": "NOR",
         "rival": "HAM",
         "score_positions": 6,
@@ -734,7 +734,7 @@ RACES: dict[str, dict] = {
         "name": "Canada 2024: Norris vs Verstappen",
         "era": "2014-2025",
         "takeover_lap": 20,
-        "seed": 1,
+        "seed": 37410,  # tuned: scripts/tune.ts (weather)
         "user_side": "NOR",
         "rival": "VER",
         "score_positions": 6,

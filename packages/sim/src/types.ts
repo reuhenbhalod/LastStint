@@ -12,6 +12,24 @@ export type FlagState = 'green' | 'sc' | 'vsc' | 'red';
 
 export type PaceMode = 'push' | 'standard' | 'manage';
 
+/** One wet-tyre curve: the share of a dry lap lost, least (`min`) at wetness `best`. */
+export interface WetCurve {
+  min: number;
+  dry: number;
+  wet: number;
+  best: number;
+}
+
+/**
+ * A wet race (docs/weather-spec.md; fitted by pipeline/wet.py). At wetness w (0 dry .. 1
+ * soaked) a slick loses a·w + b·w² of a dry lap, an inter or a wet its curve's share.
+ * `wetness[lap - 1]` is the real race's wetness on each lap.
+ */
+export interface Weather {
+  curves: { slick: { a: number; b: number }; inter: WetCurve; wet: WetCurve };
+  wetness: number[];
+}
+
 /** One planned stop: box at the end of `lap` (the in-lap) for `compound`. */
 export interface PlanStop {
   lap: number;
@@ -55,6 +73,8 @@ export interface DriverModel {
   team: string;
   basePace: number;
   noise: number;
+  /** A wet race: the driver's extra share of a lap in the wet beyond the curves. */
+  wetPace?: number;
   stateAtTakeover: {
     position: number;
     gapAhead: number;
@@ -103,6 +123,8 @@ export interface RaceModel {
   };
   compounds: Record<Compound, CompoundModel>;
   drivers: DriverModel[];
+  /** A wet race (weather spec): the curves and the track's wetness on each lap. */
+  weather?: Weather;
   fuelEffectPerLap: number;
   /** Bonus (s, negative = faster) on a new set's first laps after the out-lap. */
   freshTyre?: { bonus: number; laps: number };
@@ -139,6 +161,8 @@ export interface CarState {
   team: string;
   basePace: number;
   noise: number;
+  /** A wet race: the driver's extra share of a lap in the wet (DriverModel.wetPace). */
+  wetPace?: number;
   compound: Compound;
   /** Laps on the current tyres (what the timing tower shows). */
   tyreAge: number;

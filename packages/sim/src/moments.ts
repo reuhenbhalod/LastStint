@@ -9,9 +9,11 @@
 import { type GradeOption, type MomentGrade, type Target, gradeMoment } from './grade.js';
 import { type Run, initRun, realDecisions, stepLap, tyreLife } from './sim.js';
 import type { Decision, RaceModel } from './types.js';
+import { wetnessOn } from './weather.js';
 
-/** What brought a moment on (the race plan at takeover is the strategy planner's, not a moment). */
-export type MomentTrigger = 'SC' | 'VSC' | 'rivalPit' | 'undercut' | 'cliff';
+/** What brought a moment on (the race plan at takeover is the strategy planner's, not a
+ * moment). `rain` / `drying`: the track turning wet or drying out (weather spec). */
+export type MomentTrigger = 'SC' | 'VSC' | 'rivalPit' | 'undercut' | 'cliff' | 'rain' | 'drying';
 
 export interface MomentOption extends GradeOption {
   /** Short label for the UI; radio copy is written in Phase 5. */
@@ -49,6 +51,8 @@ const DEFAULT_TARGET: Target = { kind: 'beat-rival' };
 const MIN_SPACING = 3;
 /** Merge priority: the events that make a call unavoidable come first. */
 const PRIORITY: Record<MomentTrigger, number> = {
+  rain: 0,
+  drying: 0,
   SC: 0,
   VSC: 1,
   rivalPit: 2,
@@ -59,6 +63,10 @@ const PRIORITY: Record<MomentTrigger, number> = {
 const UNDERCUT_LEAD = 2;
 /** Laps before the user's tyres reach the cliff at which that moment is offered. */
 const CLIFF_LEAD = 2;
+/** Weather spec: the call for wet tyres comes as the track turns wet (wetness past RAIN), the
+ * call back to slicks as it dries (back under DRYING). */
+const RAIN = 0.05;
+const DRYING = 0.12;
 
 /** The real race paused just before `lap`: the user follows the real team's calls so far. */
 export function pauseAt(model: RaceModel, lap: number): Run {
@@ -114,6 +122,16 @@ export function candidateMoments(model: RaceModel, target = DEFAULT_TARGET): Dec
   for (const stop of rival?.realStrategy ?? []) {
     found.push({ lap: stop.lap - 1, trigger: 'rivalPit' });
     found.push({ lap: stop.lap - 1 - UNDERCUT_LEAD, trigger: 'undercut' });
+  }
+  // The track turning wet, or drying out (weather spec).
+  if (model.weather) {
+    const w = model.weather.wetness;
+    for (let lap = first; lap <= last; lap++) {
+      const now = wetnessOn(w, lap);
+      const before = wetnessOn(w, lap - 1);
+      if (now >= RAIN && before < RAIN) found.push({ lap, trigger: 'rain' });
+      if (now < DRYING && before >= DRYING) found.push({ lap, trigger: 'drying' });
+    }
   }
   // The user's tyres approaching the cliff along the real race.
   const user = model.drivers.find((d) => d.code === model.userSide);

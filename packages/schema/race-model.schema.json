@@ -362,7 +362,9 @@
               "rivalPit",
               "undercut",
               "cliff",
-              "takeover"
+              "takeover",
+              "rain",
+              "drying"
             ]
           },
           "target": {

@@ -16,6 +16,7 @@ import {
   tyreLapTime,
 } from './sim.js';
 import type { CarState, PaceMode, PlanId, RacePlan } from './types.js';
+import { isWetTyre, weatherWear, wetFactor, wetnessOn } from './weather.js';
 
 /** Plans are graded on beating the rival (or holding them off in a defend race). */
 export const PLAN_TARGET: Target = { kind: 'beat-rival' };
@@ -153,21 +154,27 @@ function stintTimes(
   let t = 0;
   for (let lap = from; lap <= to; lap++) {
     const neutral = known.has(lap);
+    // A wet race: the weather the run knows (the real race's, as a radar would show it; a
+    // grader fork's forecast).
+    const wet = wetnessOn(run.wetness, lap);
     if (!neutral) {
       // Pushing gains nothing on tyres past their life (the sim's modeLapDelta).
-      t += tyreLapTime(model, car.basePace, compound, wear, lap) + freshTyreDelta(model, age);
+      const dry =
+        tyreLapTime(model, car.basePace, compound, wear, lap) + freshTyreDelta(model, age);
+      t += dry * wetFactor(model.weather, compound, wet, car.wetPace ?? 0);
       t += lapDelta < 0 && wear >= life ? 0 : lapDelta;
     }
     out[lap - from] = t;
-    wear += neutral ? 1 : wearMult;
+    wear += (neutral ? 1 : wearMult) * weatherWear(model.weather, compound, wet);
     age += 1;
   }
   return out;
 }
 
-/** True if the car ends the race with two dry compounds used (or doesn't need to). */
+/** True if the car ends the race with two dry compounds used (or doesn't need to): wet tyres
+ * anywhere in the plan waive the rule. */
 function legal(car: CarState, stops: RacePlan['stops']): boolean {
-  if (ruleSatisfied(car)) return true;
+  if (ruleSatisfied(car) || stops.some((s) => isWetTyre(s.compound))) return true;
   const dry = new Set(
     [...car.compoundsUsed, car.compound, ...stops.map((s) => s.compound)].filter((c) =>
       (DRY_COMPOUNDS as readonly string[]).includes(c),

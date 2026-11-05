@@ -72,6 +72,28 @@
    "status": "Accident"
   }
  },
+ "canada-2024": {
+  "SAR": {
+   "lap": 25,
+   "status": "Retired"
+  },
+  "LEC": {
+   "lap": 42,
+   "status": "Retired"
+  },
+  "PER": {
+   "lap": 52,
+   "status": "Retired"
+  },
+  "ALB": {
+   "lap": 53,
+   "status": "Retired"
+  },
+  "SAI": {
+   "lap": 53,
+   "status": "Retired"
+  }
+ },
  "china-2024": {
   "BOT": {
    "lap": 21,
@@ -202,6 +224,12 @@
  },
  "portugal-2021": {},
  "russia-2020": {},
+ "russia-2021": {
+  "LAT": {
+   "lap": 49,
+   "status": "Accident"
+  }
+ },
  "saudi-arabia-2025": {},
  "spain-2020": {
   "LEC": {

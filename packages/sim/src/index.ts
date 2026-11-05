@@ -97,3 +97,13 @@ export type {
   VerifiedRun,
   VerifyErrorCode,
 } from './verify.js';
+export {
+  WET_TYRES,
+  wetCrash,
+  forecastWetness,
+  isWetTyre,
+  weatherWear,
+  wetFactor,
+  wetPenalty,
+  wetnessOn,
+} from './weather.js';

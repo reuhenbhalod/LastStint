@@ -11,6 +11,7 @@ import {
   verdictFor,
 } from '../src/moments.js';
 import type { Decision, RaceModel } from '../src/types.js';
+import { wetnessOn } from '../src/weather.js';
 
 const MAX_MOMENTS = 6;
 const MIN_SPACING = 3;
@@ -28,7 +29,13 @@ export function authorMoments(
   const target = { kind: 'beat-rival' } as const;
   const first = model.race.takeoverLap + 1;
   const last = model.race.laps - 1;
-  const NAME: Record<string, string> = { SOFT: 'softs', MEDIUM: 'mediums', HARD: 'hards' };
+  const NAME: Record<string, string> = {
+    SOFT: 'softs',
+    MEDIUM: 'mediums',
+    HARD: 'hards',
+    INTERMEDIATE: 'inters',
+    WET: 'wets',
+  };
   const pit = (lap: number, compound: string): Decision => ({ lap, kind: 'pit', compound });
   const mode = (lap: number, key: 'pace' | 'battle', value: string): Decision =>
     ({ lap, kind: 'mode', key, value }) as Decision;
@@ -55,7 +62,14 @@ export function authorMoments(
     // Box next lap: under a neutralization that runs another lap, or a green call (one more lap
     // on these tyres).
     const nextOk = next && (neutral.has(lap) ? neutral.has(lap + 1) : true);
-    const nextCompound = lasting(lap + 1).at(-1) as string;
+    // A wet race: the tyre for the track next lap (inters as it turns wet, wets when soaked).
+    const wetNext = model.weather ? wetnessOn(model.weather.wetness, lap + 1) : 0;
+    const nextCompound =
+      wetNext >= 0.6 && model.compounds.WET
+        ? 'WET'
+        : wetNext >= 0.05 && model.compounds.INTERMEDIATE
+          ? 'INTERMEDIATE'
+          : (lasting(lap + 1).at(-1) as string);
     const options: MomentOption[] = [
       { id: 'stay', label: 'Stay out', decisions: [] },
       ...compounds.map((c) => ({

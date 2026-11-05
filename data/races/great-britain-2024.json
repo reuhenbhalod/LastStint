@@ -664,7 +664,13 @@
     "bonus": -0.0663,
     "laps": 3
   },
-  "events": [],
+  "events": [
+    {
+      "lap": 34,
+      "type": "RETIREMENT",
+      "driver": "RUS"
+    }
+  ],
   "decisionMoments": [],
   "candidateMomentLaps": [
     20,

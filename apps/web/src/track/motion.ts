@@ -197,7 +197,13 @@ interface Timeline {
   aOut: number;
   b0: number;
   b1: number;
+  /** Laps of the stop's loss spent crawling the in-lap rather than in the lane (a real wet
+   * stop: an in-lap on slicks in a downpour). The gap grows by this over the in-lap. */
+  crawl: number;
 }
+
+/** At most this much more than a normal stop is drawn in the lane (s); the rest is in-lap. */
+const LANE_SLACK = 12;
 
 /** A stop being drawn: its out-lap, what it costs (s, taken once), and its timeline, fixed
  * once the car is in the lane (a later lap's gaps don't move a car already in it). */
@@ -336,6 +342,11 @@ export class MapMotion {
   ): number {
     const stop = race.cars[code]?.strategy.find((s) => s.lap === out);
     if (stop?.loss !== undefined) return stop.loss + extra;
+    return this.normalLoss(race, out, model) + extra;
+  }
+
+  /** A stop's usual cost on its out-lap's flag (s). */
+  private normalLoss(race: RaceState, out: number, model: RaceModel | null): number {
     const f =
       out === race.lap
         ? race.flag
@@ -345,8 +356,8 @@ export class MapMotion {
             ? flagOn(model, out)
             : 'green';
     const t = model?.track;
-    if (!t) return 22 + extra;
-    return (f === 'sc' ? t.pitLossUnderSC : f === 'vsc' ? t.pitLossUnderVSC : t.pitLoss) + extra;
+    if (!t) return 22;
+    return f === 'sc' ? t.pitLossUnderSC : f === 'vsc' ? t.pitLossUnderVSC : t.pitLoss;
   }
 
   /** A stop's timeline on the map's time axis (race.lap + tick progress). */
@@ -367,9 +378,12 @@ export class MapMotion {
     const b1 = charged ? off : off + loss;
     if (!charged) stop.b0 = off;
     const span = frac(this.lane.exit - this.lane.entry) || 1e-3;
+    // A stop far dearer than usual (a real wet stop) spends the excess crawling the in-lap.
+    const lane = Math.min(stop.loss, this.normalLoss(race, out, model) + extra + LANE_SLACK);
+    const crawl = Math.max(0, stop.loss - lane) / this.lapSec;
     // The in-lap is lap `out - 1`; the car reaches the entry near the end of it.
-    const aIn = out - 2 + b0 + this.lane.entry;
-    return { out, aIn, aOut: aIn + span + Math.max(0.05, b1 - b0), b0, b1 };
+    const aIn = out - 2 + b0 + crawl + this.lane.entry;
+    return { out, aIn, aOut: aIn + span + Math.max(0.05, b1 - b0 - crawl), b0, b1, crawl };
   }
 
   /** The lap being shown, run ahead: each car's gap at its end, and the stops it brings (a
@@ -523,11 +537,19 @@ export class MapMotion {
       const tl = this.timeline(code, input);
       if (tl && now >= tl.aOut && race.lap >= tl.out) this.stops.delete(code);
       else if (tl && now < tl.aIn) {
-        // On its in-lap: the new gap glides in before the car reaches pit entry.
+        // On its in-lap: the new gap glides in before the car reaches pit entry; a crawling
+        // in-lap then drops back steadily until it gets there.
         const by = Math.max(0.05, Math.min(GLIDE, tl.aIn - race.lap));
         const was = this.from.get(code);
         const k = input.smooth ? ease(Math.min(1, p / by)) : 1;
-        exact.set(code, was === undefined ? tl.b0 : was + (tl.b0 - was) * k);
+        const base = was === undefined ? tl.b0 : was + (tl.b0 - was) * k;
+        const crawled =
+          tl.crawl > 0 ? tl.crawl * Math.min(1, Math.max(0, 1 - (tl.aIn - now) / 1)) : 0;
+        // Once crawling, the stop's timeline holds (the next lap's gaps don't move it), as
+        // it does once the car is in the lane.
+        const stop = this.stops.get(code);
+        if (stop && tl.crawl > 0 && now >= tl.aIn - 1) stop.fixed = tl;
+        exact.set(code, (stop?.fixed ? tl.b0 : base) + crawled);
         continue;
       } else if (tl && now >= tl.aOut) {
         exact.set(code, tl.b1);

@@ -55,6 +55,20 @@
    "status": "Accident"
   }
  ],
+ "canada-2024": [
+  {
+   "lap": 25,
+   "type": "SC",
+   "driver": "SAR",
+   "status": "Retired"
+  },
+  {
+   "lap": 54,
+   "type": "SC",
+   "driver": "ALB",
+   "status": "Retired"
+  }
+ ],
  "china-2024": [
   {
    "lap": 22,
@@ -161,6 +175,7 @@
    "turn": 2
   }
  ],
+ "russia-2021": [],
  "saudi-arabia-2025": [],
  "spain-2020": [],
  "spain-2023": [],

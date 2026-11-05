@@ -4,8 +4,12 @@
 
 import { describe, expect, it } from 'vitest';
 import abuGolden from '../../../data/golden/abu-dhabi-2021.json';
+import canadaGolden from '../../../data/golden/canada-2024.json';
+import russiaGolden from '../../../data/golden/russia-2021.json';
 import spainGolden from '../../../data/golden/spain-2021.json';
 import abuModel from '../../../data/races/abu-dhabi-2021.json';
+import canadaModel from '../../../data/races/canada-2024.json';
+import russiaModel from '../../../data/races/russia-2021.json';
 import spainModel from '../../../data/races/spain-2021.json';
 import { simulate } from '../src/sim.js';
 import type { RaceModel, RaceResult } from '../src/types.js';
@@ -19,6 +23,9 @@ type Golden = Record<
 const RACES: Array<[string, RaceModel, Golden]> = [
   ['abu-dhabi-2021', abuModel as unknown as RaceModel, abuGolden as Golden],
   ['spain-2021', spainModel as unknown as RaceModel, spainGolden as Golden],
+  // Wet races (weather spec): the wet lap and tyre wear match too.
+  ['russia-2021', russiaModel as unknown as RaceModel, russiaGolden as Golden],
+  ['canada-2024', canadaModel as unknown as RaceModel, canadaGolden as Golden],
 ];
 
 describe.each(RACES)('%s matches the Python reference sim', (_id, model, golden) => {

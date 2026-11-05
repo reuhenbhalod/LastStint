@@ -5,7 +5,7 @@
     "name": "Canada 2024: Norris vs Verstappen",
     "laps": 70,
     "takeoverLap": 20,
-    "seed": 1
+    "seed": 37410
   },
   "era": "2014-2025",
   "track": {
@@ -33,11 +33,11 @@
       4.343,
       5.303
     ],
-    "overtakeDifficulty": 0.9464,
+    "overtakeDifficulty": 0.9447,
     "overtakeModel": {
-      "intercept": -1.1299,
-      "paceCoef": 0.2283,
-      "gapCoef": -2.397
+      "intercept": -1.0759,
+      "paceCoef": 0.2799,
+      "gapCoef": -2.4405
     },
     "dirtyAirPenalty": 0.0,
     "greenLapTime": 87.411,
@@ -529,8 +529,33 @@
   "events": [
     {
       "lap": 25,
+      "type": "RETIREMENT",
+      "driver": "SAR"
+    },
+    {
+      "lap": 25,
       "type": "SC",
       "laps": 5
+    },
+    {
+      "lap": 42,
+      "type": "RETIREMENT",
+      "driver": "LEC"
+    },
+    {
+      "lap": 52,
+      "type": "RETIREMENT",
+      "driver": "PER"
+    },
+    {
+      "lap": 53,
+      "type": "RETIREMENT",
+      "driver": "ALB"
+    },
+    {
+      "lap": 53,
+      "type": "RETIREMENT",
+      "driver": "SAI"
     },
     {
       "lap": 54,
@@ -538,7 +563,340 @@
       "laps": 5
     }
   ],
-  "decisionMoments": [],
+  "decisionMoments": [
+    {
+      "id": "stop-26",
+      "lap": 26,
+      "trigger": "SC",
+      "target": {
+        "kind": "beat-rival"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "Stay out",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "Box, mediums",
+          "decisions": [
+            {
+              "lap": 26,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "box-hard",
+          "label": "Box, hards",
+          "decisions": [
+            {
+              "lap": 26,
+              "kind": "pit",
+              "compound": "HARD"
+            }
+          ]
+        },
+        {
+          "id": "box-intermediate",
+          "label": "Box, inters",
+          "decisions": [
+            {
+              "lap": 26,
+              "kind": "pit",
+              "compound": "INTERMEDIATE"
+            }
+          ]
+        },
+        {
+          "id": "box-wet",
+          "label": "Box, wets",
+          "decisions": [
+            {
+              "lap": 26,
+              "kind": "pit",
+              "compound": "WET"
+            }
+          ]
+        },
+        {
+          "id": "box-next-intermediate",
+          "label": "Box next lap, inters",
+          "decisions": [
+            {
+              "lap": 27,
+              "kind": "pit",
+              "compound": "INTERMEDIATE"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "box-intermediate"
+    },
+    {
+      "id": "cliff-29",
+      "lap": 29,
+      "trigger": "cliff",
+      "target": {
+        "kind": "beat-rival"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "Stay out",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "Box, mediums",
+          "decisions": [
+            {
+              "lap": 29,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "box-hard",
+          "label": "Box, hards",
+          "decisions": [
+            {
+              "lap": 29,
+              "kind": "pit",
+              "compound": "HARD"
+            }
+          ]
+        },
+        {
+          "id": "box-intermediate",
+          "label": "Box, inters",
+          "decisions": [
+            {
+              "lap": 29,
+              "kind": "pit",
+              "compound": "INTERMEDIATE"
+            }
+          ]
+        },
+        {
+          "id": "box-wet",
+          "label": "Box, wets",
+          "decisions": [
+            {
+              "lap": 29,
+              "kind": "pit",
+              "compound": "WET"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "stay"
+    },
+    {
+      "id": "pace-44",
+      "lap": 44,
+      "trigger": "cliff",
+      "target": {
+        "kind": "beat-rival"
+      },
+      "options": [
+        {
+          "id": "push",
+          "label": "Push now",
+          "decisions": [
+            {
+              "lap": 44,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "standard",
+          "label": "Standard pace",
+          "decisions": [
+            {
+              "lap": 44,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "manage",
+          "label": "Manage the tyres",
+          "decisions": [
+            {
+              "lap": 44,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "push-attack",
+          "label": "Push and attack",
+          "decisions": [
+            {
+              "lap": 44,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            },
+            {
+              "lap": 44,
+              "kind": "mode",
+              "key": "battle",
+              "value": "attack"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "stop-47",
+      "lap": 47,
+      "trigger": "cliff",
+      "target": {
+        "kind": "beat-rival"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "Stay out",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "Box, mediums",
+          "decisions": [
+            {
+              "lap": 47,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "box-hard",
+          "label": "Box, hards",
+          "decisions": [
+            {
+              "lap": 47,
+              "kind": "pit",
+              "compound": "HARD"
+            }
+          ]
+        },
+        {
+          "id": "box-intermediate",
+          "label": "Box, inters",
+          "decisions": [
+            {
+              "lap": 47,
+              "kind": "pit",
+              "compound": "INTERMEDIATE"
+            }
+          ]
+        },
+        {
+          "id": "box-wet",
+          "label": "Box, wets",
+          "decisions": [
+            {
+              "lap": 47,
+              "kind": "pit",
+              "compound": "WET"
+            }
+          ]
+        },
+        {
+          "id": "box-next-intermediate",
+          "label": "Box next lap, inters",
+          "decisions": [
+            {
+              "lap": 48,
+              "kind": "pit",
+              "compound": "INTERMEDIATE"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "box-medium"
+    },
+    {
+      "id": "pace-52",
+      "lap": 52,
+      "trigger": "cliff",
+      "target": {
+        "kind": "beat-rival"
+      },
+      "options": [
+        {
+          "id": "push",
+          "label": "Push now",
+          "decisions": [
+            {
+              "lap": 52,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "standard",
+          "label": "Standard pace",
+          "decisions": [
+            {
+              "lap": 52,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "manage",
+          "label": "Manage the tyres",
+          "decisions": [
+            {
+              "lap": 52,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "push-attack",
+          "label": "Push and attack",
+          "decisions": [
+            {
+              "lap": 52,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            },
+            {
+              "lap": 52,
+              "kind": "mode",
+              "key": "battle",
+              "value": "attack"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    }
+  ],
   "candidateMomentLaps": [
     25,
     26,
@@ -572,8 +930,8 @@
     "BOT",
     "TSU",
     "ZHO",
-    "ALB",
     "SAI",
+    "ALB",
     "PER",
     "LEC",
     "SAR"

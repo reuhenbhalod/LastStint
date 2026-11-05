@@ -183,6 +183,11 @@ def laps_frame(raw: dict) -> pd.DataFrame:
                 end = round(start + dur, 3)
             if dur is None and start is not None and end is not None:
                 dur = round(end - start, 3)
+            # A car's last lap, never finished (it stopped on it): timed at its start, so the
+            # pipeline sees the retirement on that lap (events.retirement_events). No lap time.
+            stopped = end is None and nxt is None and start is not None and n > 1
+            if stopped:
+                end = start
             # The stint covering the lap; a lap past the last recorded one (a crash, the
             # final lap) is still on the latest set.
             started = [x for x in mine if x["lap_start"] and x["lap_start"] <= n]

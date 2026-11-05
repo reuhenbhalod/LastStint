@@ -116,7 +116,10 @@ def incidents_cmd(
     for race_id in race_ids:
         meta = build_mod.RACES[race_id]
         model = json.loads((paths.DATA_DIR / "races" / f"{race_id}.json").read_text())
-        status, msgs = incidents.fetch(meta["year"], meta["event"])
+        if meta.get("source") == "openf1":
+            status, msgs = incidents.fetch_openf1(meta["year"], meta["event"])
+        else:
+            status, msgs = incidents.fetch(meta["year"], meta["event"])
         items = incidents.causes(model, status, msgs)
         incidents.write(race_id, items)
         incidents.write(

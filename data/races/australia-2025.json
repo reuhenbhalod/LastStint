@@ -21,11 +21,11 @@
       1.779,
       2.634
     ],
-    "overtakeDifficulty": 0.9603,
+    "overtakeDifficulty": 0.957,
     "overtakeModel": {
-      "intercept": -1.1114,
-      "paceCoef": 0.7502,
-      "gapCoef": -2.5047
+      "intercept": -0.7468,
+      "paceCoef": 0.6261,
+      "gapCoef": -2.7148
     },
     "dirtyAirPenalty": 0.0,
     "greenLapTime": 91.861,
@@ -449,9 +449,24 @@
   },
   "events": [
     {
+      "lap": 33,
+      "type": "RETIREMENT",
+      "driver": "ALO"
+    },
+    {
       "lap": 34,
       "type": "SC",
       "laps": 8
+    },
+    {
+      "lap": 46,
+      "type": "RETIREMENT",
+      "driver": "BOR"
+    },
+    {
+      "lap": 47,
+      "type": "RETIREMENT",
+      "driver": "LAW"
     },
     {
       "lap": 47,

@@ -40,6 +40,14 @@ import type {
   RaceState,
   TrustReason,
 } from './types.js';
+import {
+  forecastWetness,
+  isWetTyre,
+  weatherWear,
+  wetCrash,
+  wetFactor,
+  wetnessOn,
+} from './weather.js';
 
 export const DIRTY_AIR_RANGE = 1.0; // within this gap (s) a car is in dirty air
 export const PASS_WINDOW = 2.0; // a follower within this gap (s) gets one pass roll
@@ -196,6 +204,11 @@ export interface Run {
   incidents: boolean;
   /** A crash brings out a SC/VSC (off in grader playouts, which sample neutralizations). */
   incidentFlags: boolean;
+  /**
+   * The track's wetness on each lap (index lap - 1): the real race's, or a grader fork's
+   * forecast (weather spec W3). Empty in a dry race.
+   */
+  wetness: number[];
 }
 
 export interface NeutralEvent {
@@ -256,12 +269,17 @@ export function passProbability(
   return 1 / (1 + Math.exp(-z));
 }
 
-/** Model (noise-free) lap time for a car on this lap: pace + tyres - fuel. */
-export function cleanLap(model: RaceModel, car: CarState, lap: number): number {
-  return (
+/**
+ * Model (noise-free) lap time for a car on this lap: pace + tyres - fuel, times the weather's
+ * factor in a wet race at wetness `w` (default: the real race's on that lap).
+ */
+export function cleanLap(model: RaceModel, car: CarState, lap: number, w?: number): number {
+  const dry =
     tyreLapTime(model, car.basePace, car.compound, car.tyreWear, lap) +
-    freshTyreDelta(model, car.tyreAge)
-  );
+    freshTyreDelta(model, car.tyreAge);
+  if (!model.weather) return dry;
+  const wet = w ?? wetnessOn(model.weather.wetness, lap);
+  return dry * wetFactor(model.weather, car.compound, wet, car.wetPace ?? 0);
 }
 
 /**
@@ -429,6 +447,7 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
       team: d.team,
       basePace: d.basePace,
       noise: d.noise,
+      ...(d.wetPace ? { wetPace: d.wetPace } : {}),
       compound: s.compound,
       tyreAge: s.tyreAge,
       tyreWear: s.tyreAge,
@@ -461,6 +480,7 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
     passedBy: new Map(),
     incidents: live && options.incidents !== false && !!HEADSET[model.era]?.incidents,
     incidentFlags: true,
+    wetness: [...(model.weather?.wetness ?? [])],
     state: {
       lap: model.race.takeoverLap,
       flag: 'green',
@@ -610,6 +630,11 @@ export function forkRun(
     ...blindView(run, seed, options.blindAfter),
     // Blind playouts already draw neutralizations at the base rates, crashes included.
     incidentFlags: options.blindAfter === undefined ? run.incidentFlags : false,
+    // Blind: the weather after the decision is the forecast's, not the real race's (W3).
+    wetness:
+      options.blindAfter === undefined
+        ? run.wetness
+        : forecastWetness(run.wetness, options.blindAfter, seed),
   };
 }
 
@@ -979,10 +1004,13 @@ function predictedRemaining(
             ? track.pitLossUnderVSC
             : track.pitLoss;
     }
+    const wet = wetnessOn(run.wetness, lap);
     if (!flag) {
-      total += tyreLapTime(model, car.basePace, compound, wear, lap) + freshTyreDelta(model, age);
+      const dry =
+        tyreLapTime(model, car.basePace, compound, wear, lap) + freshTyreDelta(model, age);
+      total += dry * wetFactor(model.weather, compound, wet, car.wetPace ?? 0);
     }
-    wear += flag ? 1 : wearMult;
+    wear += (flag ? 1 : wearMult) * weatherWear(model.weather, compound, wet);
     age += 1;
   }
   return total;
@@ -1006,7 +1034,9 @@ export function planRemainingStop(run: Run, options: { exact?: boolean } = {}): 
   const known = neutralMap(run.events.filter((e) => e.lap <= state.lap + 1));
   let knownAhead = false;
   for (const lap of known.keys()) if (lap > state.lap) knownAhead = true;
-  if (!knownAhead && !options.exact) return planGreenToFlag(run, user, mustChange);
+  // The fast path assumes a dry race (a lap's time splits into a lap term and a tyre term).
+  if (!knownAhead && !options.exact && !model.weather)
+    return planGreenToFlag(run, user, mustChange);
   let bestTime = mustChange
     ? Number.POSITIVE_INFINITY
     : predictedRemaining(run, user, state.lap, null, known);
@@ -1146,7 +1176,8 @@ export function stepLap(run: Run): RaceState {
       }
     }
 
-    const base = cleanLap(model, c, lap);
+    const wet = wetnessOn(run.wetness, lap);
+    const base = cleanLap(model, c, lap, wet);
     const eng = code === model.userSide && !flag ? state.engineer : undefined;
     const lapEng = eng ? engineerLap(run, lap, c, running, i, prevTime, eng) : null;
     if (lapEng) battle = lapEng;
@@ -1176,7 +1207,9 @@ export function stepLap(run: Run): RaceState {
     clean[code] = base + modeDelta;
     c.totalTime += lt + pitCost;
     c.tyreAge += 1;
-    c.tyreWear += flag ? 1 : modeWearMult(run, c) * (lapEng?.wearMult ?? 1);
+    c.tyreWear +=
+      (flag ? 1 : modeWearMult(run, c) * (lapEng?.wearMult ?? 1)) *
+      weatherWear(model.weather, c.compound, wet);
     if (c.battery !== undefined) {
       const gain = flag ? (run.headset?.ers?.scCharge ?? 0) : (effect(run, c, 'ers').charge ?? 0);
       c.battery = Math.min(100, Math.max(0, c.battery + gain));
@@ -1256,7 +1289,8 @@ function incidents(run: Run, lap: number, prevTime: Record<string, number>): voi
     const crash =
       rates.crash *
       (fightAhead && c.modes.battle === 'attack' ? rates.attackCrash : 1) *
-      (fightBehind && c.modes.battle === 'defend' ? rates.defendCrash : 1);
+      (fightBehind && c.modes.battle === 'defend' ? rates.defendCrash : 1) *
+      wetCrash(model.weather, c.compound, wetnessOn(run.wetness, lap));
     const mechanical = rates.mechanical * (push ? rates.pushMechanical : 1);
     const puncture =
       Math.min(rates.punctureMax, rates.puncture + rates.puncturePerWornLap * worn) *
@@ -1271,7 +1305,7 @@ function incidents(run: Run, lap: number, prevTime: Record<string, number>): voi
       c.totalTime += rates.punctureCost;
       if (lap >= model.race.laps) continue; // limps to the flag
       const next = c.strategy.filter((st) => st.lap > lap).sort((a, b) => a.lap - b.lap)[0];
-      const to = next?.to ?? forcedCompound(model, c);
+      const to = next?.to ?? forcedCompound(model, c, wetnessOn(run.wetness, lap));
       c.strategy = c.strategy.filter((st) => st !== next && st.lap !== lap + 1);
       c.strategy.push({ lap: lap + 1, to, added: true });
       continue;
@@ -1298,7 +1332,9 @@ function incidents(run: Run, lap: number, prevTime: Record<string, number>): voi
  * a dry compound the car hasn't run yet if it still needs one for the two-compound rule (a
  * puncture must never leave the car disqualified).
  */
-function forcedCompound(model: RaceModel, c: CarState): string {
+function forcedCompound(model: RaceModel, c: CarState, w = 0): string {
+  // In the wet, the tyre for the track.
+  if (model.weather && w >= 0.15) return w >= 0.6 && model.compounds.WET ? 'WET' : 'INTERMEDIATE';
   const prefs = ['MEDIUM', 'HARD', 'SOFT'].filter((x) => model.compounds[x]);
   if (!ruleSatisfied(c)) {
     const fresh = prefs.find((x) => !c.compoundsUsed.includes(x));
@@ -1717,6 +1753,8 @@ export const DRY_COMPOUNDS = ['SOFT', 'MEDIUM', 'HARD'] as const;
  * (No modelled race is wet; wet tyres would waive it.)
  */
 export function ruleSatisfied(car: CarState): boolean {
+  // Running wet tyres waives the rule (weather spec W6).
+  if (isWetTyre(car.compound) || car.compoundsUsed.some(isWetTyre)) return true;
   const dry = new Set(
     car.compoundsUsed.filter((c) => (DRY_COMPOUNDS as readonly string[]).includes(c)),
   );

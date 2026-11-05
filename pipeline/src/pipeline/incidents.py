@@ -101,6 +101,22 @@ def fetch(year: int, event: str) -> tuple[dict[str, str], list[tuple[int | None,
     return status, msgs
 
 
+def fetch_openf1(year: int, country: str) -> tuple[dict[str, str], list[tuple[int | None, str]]]:
+    """The same from OpenF1 (races registered with source "openf1"): race control's messages;
+    OpenF1 has no result statuses, so a retirement reads "Retired"."""
+    import urllib.parse
+    import urllib.request
+
+    from . import openf1
+
+    query = urllib.parse.urlencode({"year": year, "session_name": "Race", "country_name": country})
+    with urllib.request.urlopen(f"{openf1.API}/sessions?{query}", timeout=60) as r:
+        key = int(json.load(r)[0]["session_key"])
+    raw = openf1.fetch(key)
+    msgs = [(m.get("lap_number"), str(m.get("message") or "")) for m in raw["race_control"]]
+    return {}, msgs
+
+
 def write(race_id: str, items: list[dict] | dict, path: Path = INCIDENTS_PATH) -> Path:
     """Put one race's entry into data/incidents.json (or retirements.json; other races kept,
     keys sorted)."""
