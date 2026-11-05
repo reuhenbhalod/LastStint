@@ -25,6 +25,14 @@ import { GapTrace } from '../components/GapTrace.js';
 import { ChequeredIcon, OvertakeIcon, SoundOffIcon, SoundOnIcon } from '../components/Icons.js';
 import { LiveGrades } from '../components/LiveGrades.js';
 import { PitCard } from '../components/PitCard.js';
+import {
+  PlanBar,
+  PlanHeadsUp,
+  ReplanOffer,
+  betterPlan,
+  headsUpStop,
+} from '../components/PlanBar.js';
+import { PlanCard } from '../components/PlanCard.js';
 import { QuickCallCard } from '../components/QuickCallCard.js';
 import { RadioAlert } from '../components/RadioAlert.js';
 import { RadioLog } from '../components/RadioLog.js';
@@ -44,6 +52,7 @@ import {
 } from '../game/engineerCalls.js';
 import { modeLine } from '../game/guide.js';
 import { neutralCause } from '../game/neutral.js';
+import { delayStop } from '../game/plans.js';
 import { type QuickCall, quickCallLaps } from '../game/quickCalls.js';
 import { useRaceLog } from '../game/raceLog.js';
 import { radioChirp, setSoundOn, soundOn } from '../game/sound.js';
@@ -135,6 +144,15 @@ export function RaceScreen({
   const me = state.race.cars[userSide];
   const them = state.race.cars[rival];
   const paused = state.phase === 'decision';
+  const planning = state.phase === 'planning';
+  // The race plan: the heads-up before a planned stop (once per stop), the engineer's better
+  // plan (until you keep yours), and the plan editor.
+  const headsUp = headsUpStop(state);
+  const [headsUpSeen, setHeadsUpSeen] = useState<number | null>(null);
+  const replan = betterPlan(state);
+  const replanKey = replan ? JSON.stringify([replan.plan.stops, replan.plan.pace]) : null;
+  const [keepKey, setKeepKey] = useState<string | null>(null);
+  const [planEdit, setPlanEdit] = useState(false);
   const outline = outlineFor(model.race.id);
   const corner = useMemo(() => (outline ? quietCorner(outline) : 'left'), [outline]);
   const [selected, setSelected] = useState<string | null>(null);
@@ -283,7 +301,9 @@ export function RaceScreen({
       corners,
       memory.current,
       quickLaps.has(raceLap),
-      state.decisions.some((d) => d.kind === 'pit' && d.lap > raceLap),
+      // A stop called, or the plan's within two laps (its heads-up asks instead).
+      state.decisions.some((d) => d.kind === 'pit' && d.lap > raceLap) ||
+        !!state.plan.active?.stops.some((s) => s.lap > raceLap && s.lap <= raceLap + 2),
     );
     if (call?.kind === 'battle') {
       const fight = battleAt(call);
@@ -578,7 +598,7 @@ export function RaceScreen({
 
   return (
     <main className="mx-auto flex min-h-screen max-w-[1360px] flex-col gap-3 px-4 pb-6 pt-3 xl:h-screen xl:pb-3">
-      <header className="flex items-center justify-between gap-3 border-b-2 border-[var(--you)] pb-2">
+      <header className="flex items-center justify-between gap-2 border-b-2 border-[var(--you)] pb-2 sm:gap-3">
         <span className="flex min-w-0 items-baseline gap-2">
           <button
             type="button"
@@ -617,14 +637,14 @@ export function RaceScreen({
                 : (state.meta.practiceReason ?? 'Practice')}{' '}
             · {model.race.name ?? model.race.id}
           </span>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1 sm:gap-1.5">
             {([1, 2] as const).map((s) => (
               <button
                 key={s}
                 type="button"
                 aria-pressed={state.speed === s}
                 onClick={() => game.setSpeed(s)}
-                className={`h-8 rounded-md border px-2.5 text-[12px] font-semibold ${
+                className={`h-8 rounded-md border px-2 text-[12px] font-semibold sm:px-2.5 ${
                   state.speed === s
                     ? 'border-[var(--ink)] bg-[var(--ink)] text-[var(--paper)]'
                     : 'border-[var(--rule)] text-[var(--muted)] hover:text-[var(--ink)]'
@@ -643,7 +663,7 @@ export function RaceScreen({
                 setSound(!sound);
                 if (!sound) radioChirp();
               }}
-              className="h-8 rounded-md border border-[var(--rule)] px-3 text-[14px]"
+              className="h-8 rounded-md border border-[var(--rule)] px-2 text-[14px] sm:px-3"
             >
               {sound ? <SoundOnIcon size={16} /> : <SoundOffIcon size={16} />}
             </button>
@@ -653,7 +673,7 @@ export function RaceScreen({
                 onClick={game.reset}
                 aria-label="Restart the race"
                 title="Restart the race"
-                className="h-8 rounded-md border border-[var(--rule)] px-3 text-[14px] text-[var(--muted)] hover:text-[var(--ink)]"
+                className="h-8 rounded-md border border-[var(--rule)] px-2 text-[14px] text-[var(--muted)] hover:text-[var(--ink)] sm:px-3"
               >
                 ↺
               </button>
@@ -695,7 +715,7 @@ export function RaceScreen({
             <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 rounded-t-xl border border-b-0 border-[var(--rule)] bg-[var(--card)] px-3 py-2">
               <div className="flex min-w-0 items-center gap-2">
                 <span className="h-7 w-1.5 shrink-0 rounded-sm bg-[var(--you)]" />
-                <span className="disp wide min-w-0 truncate text-[20px] leading-none">
+                <span className="disp wide min-w-0 truncate text-[17px] leading-none sm:text-[20px]">
                   {/* On a phone there's room for the code only (it heads the map). */}
                   <span className="sm:hidden">{userSide}</span>
                   <span className="hidden sm:inline">{surname(userSide)}</span>
@@ -708,16 +728,21 @@ export function RaceScreen({
                   <span className="text-[18px] text-[var(--muted)]"> / {totalLaps}</span>
                 </div>
                 <div className="mono whitespace-nowrap text-[11px] text-[var(--muted)] sm:text-[12px]">
-                  {gap === null
-                    ? ''
-                    : gap >= 0
-                      ? `${surname(rival)} +${gap.toFixed(1)}s behind`
-                      : `${surname(rival)} ${(-gap).toFixed(1)}s ahead`}
+                  {/* On a phone the gap alone: the sides keep room for the codes. */}
+                  {gap === null ? (
+                    ''
+                  ) : (
+                    <>
+                      <span className="hidden sm:inline">{surname(rival)} </span>
+                      {gap >= 0 ? `+${gap.toFixed(1)}s` : `−${(-gap).toFixed(1)}s`}
+                      <span className="hidden sm:inline">{gap >= 0 ? ' behind' : ' ahead'}</span>
+                    </>
+                  )}
                 </div>
               </div>
               <div className="flex min-w-0 items-center justify-end gap-2">
                 {them && !them.retired && <TyreBadge compound={them.compound} age={them.tyreAge} />}
-                <span className="disp wide min-w-0 truncate text-[20px] leading-none">
+                <span className="disp wide min-w-0 truncate text-[17px] leading-none sm:text-[20px]">
                   {/* On a phone there's room for the code only (it heads the map). */}
                   <span className="sm:hidden">{rival}</span>
                   <span className="hidden sm:inline">{surname(rival)}</span>
@@ -861,6 +886,18 @@ export function RaceScreen({
           {/* On a phone the map is too small to hold a car's card: it opens under it. */}
           {selected && narrow && driverCard}
 
+          {/* The race plan at takeover (the race waits for it). */}
+          {planning && (
+            <div className="fixed inset-x-0 bottom-0 z-30 max-h-[80vh] overflow-y-auto p-3 md:static md:max-h-none md:p-0">
+              <PlanCard
+                state={state}
+                model={model}
+                onBuild={game.buildPlan}
+                onPick={game.pickPlan}
+              />
+            </div>
+          )}
+
           {/* Your calls, under the map: the big decision, or a quick call. */}
           {paused && state.currentMoment ? (
             <div
@@ -889,6 +926,29 @@ export function RaceScreen({
               result={battle.stage === 'done' ? battle.result : null}
               onAnswer={answerBattle}
             />
+          ) : headsUp && racing && headsUpSeen !== headsUp.lap ? (
+            <PlanHeadsUp
+              key={`plan-${headsUp.lap}`}
+              stop={headsUp}
+              onBox={() => setHeadsUpSeen(headsUp.lap)}
+              canLater={
+                !!(state.plan.active && delayStop(state.plan.active, headsUp.lap, totalLaps))
+              }
+              onLater={() => {
+                game.delayPlannedStop(headsUp.lap);
+                setHeadsUpSeen(headsUp.lap);
+              }}
+              onChange={() => {
+                setHeadsUpSeen(headsUp.lap);
+                setPlanEdit(true);
+              }}
+            />
+          ) : replan && racing && !quick && replanKey !== keepKey ? (
+            <ReplanOffer
+              offer={replan}
+              onSwitch={() => game.changePlan(replan.plan)}
+              onKeep={() => setKeepKey(replanKey)}
+            />
           ) : quick && state.phase === 'racing' ? (
             <QuickCallCard
               key={quick.lap}
@@ -903,8 +963,19 @@ export function RaceScreen({
             />
           ) : null}
 
+          {/* The plan you're running to, and changing it. */}
+          {!planning && state.plan.active && (
+            <PlanBar
+              state={state}
+              model={model}
+              onChange={game.changePlan}
+              editing={planEdit}
+              setEditing={setPlanEdit}
+            />
+          )}
+
           {/* Team radio: every order, any time (hidden while a big call waits). */}
-          {!paused && (
+          {!paused && !planning && (
             <TeamRadio
               race={state.race}
               model={model}

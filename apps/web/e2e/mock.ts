@@ -31,7 +31,7 @@ const POINTS: Record<string, number> = { green: 100, yellow: 70, orange: 40, red
 function respond(
   model: Model,
   body: {
-    decisions: Array<{ kind: string; momentId?: string; optionId?: string }>;
+    decisions: Array<{ kind: string; momentId?: string; optionId?: string; id?: string }>;
     grades: Array<{ momentId: string; probabilities: number[]; real?: number }>;
   },
   date: string,
@@ -69,7 +69,40 @@ function respond(
       matchedReal: chosen === m.realOptionId,
     };
   });
-  const score = calls.reduce((s, c) => s + (c.points ?? 0), 0) / calls.length;
+  // The race plan's claim (strategy planner): plans a, b, c (then the player's own).
+  const planCall = body.decisions.find((d) => d.kind === 'plan');
+  const pg = body.grades.find((x) => x.momentId === 'plan');
+  const plan =
+    planCall && pg
+      ? (() => {
+          const ids = ['a', 'b', 'c'].slice(
+            0,
+            pg.probabilities.length - (planCall.id === 'own' ? 1 : 0),
+          );
+          if (planCall.id === 'own') ids.push('own');
+          const best = Math.max(...pg.probabilities);
+          const options = ids.map((id, i) => {
+            const p = pg.probabilities[i] as number;
+            return {
+              id,
+              probability: p,
+              behindBest: (best - p) * 100,
+              band: band((best - p) * 100),
+            };
+          });
+          const mine = options.find((o) => o.id === planCall.id) as (typeof options)[number];
+          return {
+            chosen: mine.id,
+            band: mine.band,
+            points: POINTS[mine.band],
+            probability: mine.probability,
+            best: (options.find((o) => o.probability === best) as { id: string }).id,
+            options,
+          };
+        })()
+      : undefined;
+  const all = [...calls, ...(plan ? [plan] : [])];
+  const score = all.reduce((s, c) => s + (c.points ?? 0), 0) / all.length;
   return {
     runId: 'r1',
     date,
@@ -86,6 +119,7 @@ function respond(
       gaps: { [model.rival]: 0.6 },
     },
     calls,
+    ...(plan ? { plan } : {}),
     percentile: 50,
     rank: 2,
     total: 3,

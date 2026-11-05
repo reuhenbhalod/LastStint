@@ -20,11 +20,13 @@ test('plays the Abu Dhabi daily end to end', async ({ page, context }) => {
   await expect(page.getByText('Daily Race #1')).toBeVisible();
   if (shots) await page.screenshot({ path: `${shots}/1-intro.png`, fullPage: true });
   await page.getByRole('button', { name: /pit wall/ }).click();
-  // The race plan comes first; the controls (and the speed) show once it's answered.
-  await page
-    .locator('section.decision')
-    .getByRole('button', { name: 'Run to plan', exact: true })
-    .click();
+  // The race plan comes first (the strategy planner): the engineer's plans, each with its
+  // chance. Plan A here is no stop, so the calls below are the race's own.
+  const plans = page.getByRole('region', { name: 'Race plan' });
+  await expect(plans).toContainText('No stop', { timeout: 30_000 });
+  await expect(plans).not.toContainText('…', { timeout: 30_000 }); // every plan graded
+  await plans.getByRole('button', { name: /^A · No stop/ }).click();
+  await plans.getByRole('button', { name: /Go with plan A/ }).click();
   await page.getByRole('button', { name: '2×' }).click();
 
   // Tap the rival on the map: the driver card opens. (The dot never stops moving, so the click
@@ -57,6 +59,9 @@ test('plays the Abu Dhabi daily end to end', async ({ page, context }) => {
 
   await page.getByRole('button', { name: 'See how you did' }).click({ timeout: 90_000 });
   await expect(page.getByText('Your calls')).toBeVisible({ timeout: 60_000 });
+  // The plan picked at takeover is graded with the calls.
+  await expect(page.getByText(/race plan/).first()).toBeVisible();
+  expect(JSON.stringify(submitted())).toContain('"momentId":"plan"');
   expect(submitted()).not.toBeNull();
   await expect(page.getByText('2/3')).toBeVisible(); // the server's rank
   await expect(page.getByText(/LastStint #1 .*P50/)).toBeVisible();

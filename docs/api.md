@@ -69,11 +69,13 @@ Each entry of `grades` is `{ momentId, probabilities, real? }`:
 
 `claimGrade()` (from `@boxthislap/sim`) builds the entry; don't build it by hand.
 
+**The race plan** (docs/strategy-planner-spec.md). A run that logged a plan at takeover (one `{ kind: "plan" }` call, made at the takeover lap) adds one more entry, `{ momentId: "plan", probabilities }`: each plan's chance, in the order graded (the engineer's plans a, b, c, then `own` if the player built and picked their own). `claimPlanGrade()` builds it. The plan counts as one more call in the score. A run without a plan has no plan entry and no plan grade.
+
 **Before it responds, the server:**
 
 1. Checks the call log.
 2. Replays the race to the flag.
-3. Checks the grades' shape: one per moment, one chance per option, each a whole number of the 300 samples.
+3. Checks the grades' shape: one per moment (and one for the plan, if the run has one), one chance per option, each a whole number of the 300 samples. The nightly re-grade also rebuilds the engineer's plans and checks a picked one matches.
 4. Scores the run from them, stores it and ranks it.
 
 **Why the game's grades.** Full grading takes about 100 ms, and Cloudflare's free plan allows 10 ms per request. So the server scores from the game's grades, and a nightly job re-grades every run with the full 300 samples. Grading is deterministic, so an honest run always matches. A run whose grades were edited gets its true score overnight, so its score, rank and bands can change the next day.
@@ -105,6 +107,14 @@ It returns `201`:
       "matchedReal": false
     }
   ],
+  "plan": {
+    "chosen": "b",
+    "band": "green",
+    "points": 100,
+    "probability": 0.47,
+    "best": "b",
+    "options": [{ "id": "a", "probability": 0.16, "behindBest": 31, "band": "red" }]
+  },
   "percentile": 63,
   "rank": 120,
   "total": 324

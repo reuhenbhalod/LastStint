@@ -136,3 +136,10 @@ export function delayStop(plan: RacePlan, lap: number, raceLaps: number): RacePl
 export function samePlan(a: RacePlan, b: RacePlan): boolean {
   return JSON.stringify([a.stops, a.pace]) === JSON.stringify([b.stops, b.pace]);
 }
+
+/** True if some stint of the plan (laps `first` to the flag) has room for one more stop. */
+export function stintsOk(plan: RacePlan, first: number, laps: number): boolean {
+  const starts = [first, ...plan.stops.map((s) => s.lap + 1)];
+  const ends = [...plan.stops.map((s) => s.lap), laps - 1];
+  return starts.some((st, i) => (ends[i] as number) - st >= 2 * MIN_STINT);
+}

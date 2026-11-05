@@ -89,7 +89,7 @@ function Game() {
   }
 
   if (home && game.state.phase !== 'intro') {
-    const racing = game.state.phase === 'racing' || game.state.phase === 'decision';
+    const racing = ['planning', 'racing', 'decision'].includes(game.state.phase);
     return (
       <IntroCard
         state={game.state}
@@ -113,6 +113,7 @@ function Game() {
           account={account}
         />
       );
+    case 'planning':
     case 'racing':
     case 'decision':
       return <RaceScreen game={game} state={game.state} model={game.model} onHome={goHome} />;

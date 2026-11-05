@@ -44,6 +44,7 @@ test('survivor: start a run, win round 1, get round 2', async ({ page }) => {
   await page.getByRole('button', { name: /Start a run/ }).click();
   await expect(page.getByText(/Gauntlet · round 1/)).toBeVisible();
   await page.getByRole('button', { name: /Start round 1/ }).click();
+  await page.getByRole('button', { name: /Go with plan/ }).click();
 
   // Answer every big call with its first choice until the race is over.
   const card = page.locator('section.decision');

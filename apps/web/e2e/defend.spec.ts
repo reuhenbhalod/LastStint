@@ -14,6 +14,8 @@ test('plays a defend race end to end on a laptop screen', async ({ page }) => {
   // The goal names the rival (Bottas), as the game says drivers' names.
   await expect(page.getByText(/^Hold P2 from Bottas/).first()).toBeVisible();
   await page.getByRole('button', { name: /pit wall/ }).click();
+  // The engineer's pick of the race plans.
+  await page.getByRole('button', { name: /Go with plan/ }).click();
 
   // Answer each call with its first choice (and, after Box, the first tyre) until the flag.
   const card = page.locator('section.decision');

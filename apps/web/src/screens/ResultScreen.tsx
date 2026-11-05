@@ -15,11 +15,13 @@ import {
   type CallResult,
   type DailyStats,
   type LeaderboardEntry,
+  type PlanResult,
   type RunResponse,
   api,
 } from '../data/api.js';
 import { autoStay } from '../game/autoStay.js';
 import { goalOf } from '../game/goal.js';
+import { planGrade, stopsLine, stopsWord } from '../game/plans.js';
 import type { Game } from '../game/useGame.js';
 import { verdict } from '../game/verdict.js';
 import type { GameState } from '../state/machine.js';
@@ -53,6 +55,67 @@ const BAND: Record<Band, { label: string; cls: string; square: string; color: st
 };
 
 const pct = (p: number) => `${Math.round(p * 100)}%`;
+
+/** The race plan's grade: the server's, or the game's own (practice). */
+function planFrom(state: GameState, response: RunResponse | null): PlanResult | null {
+  if (response) return response.plan ?? null;
+  const picked = state.plan.picked;
+  const grade = planGrade(state.plan, state.meta.takeoverLap);
+  const mine = grade?.options.find((o) => o.id === picked?.id);
+  if (!grade || !mine || !picked) return null;
+  return {
+    chosen: picked.id,
+    band: mine.band,
+    points: 0,
+    probability: mine.probability,
+    best: grade.best,
+    options: grade.options,
+  };
+}
+
+/** A plan by its id, in words ("Plan C: two stops"). */
+function planLabel(state: GameState, id: string): string {
+  const all = [...state.plan.offered, ...(state.plan.own ? [state.plan.own] : [])];
+  const plan = all.find((p) => p.id === id);
+  const name = id === 'own' ? 'Your own plan' : `Plan ${id.toUpperCase()}`;
+  return plan
+    ? `${name}: ${stopsWord(plan).toLowerCase()}, ${stopsLine(plan).toLowerCase()}`
+    : name;
+}
+
+function PlanRow({ plan, state }: { plan: PlanResult; state: GameState }) {
+  const band = BAND[plan.band];
+  const best = plan.options.find((o) => o.id === plan.best);
+  const behind = plan.options.find((o) => o.id === plan.chosen)?.behindBest ?? 0;
+  return (
+    <li className="rounded-lg bg-[var(--card)] p-3">
+      <details>
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-2">
+          <span>
+            <span className="block font-mono text-xs text-neutral-500">
+              Lap {state.meta.takeoverLap + 1} · race plan
+            </span>
+            <span className="font-medium">{planLabel(state, plan.chosen)}</span>
+          </span>
+          <span className={`rounded-full px-2 py-1 text-xs font-bold ring-1 ${band.cls}`}>
+            <BandChip color={band.color} /> {band.label}
+          </span>
+        </summary>
+        <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 font-mono text-xs text-neutral-400">
+          <dt>Your plan</dt>
+          <dd>
+            {pct(plan.probability)} chance of your goal
+            {behind > 0 ? ` (${behind.toFixed(1)} pts behind the best)` : ''}
+          </dd>
+          <dt>Best plan</dt>
+          <dd>
+            {planLabel(state, plan.best)} · {best ? pct(best.probability) : '-'}
+          </dd>
+        </dl>
+      </details>
+    </li>
+  );
+}
 
 /** The calls as the results screen shows them: the server's, or the game's own grades. */
 function callsFrom(state: GameState, response: RunResponse | null): CallResult[] {
@@ -97,8 +160,9 @@ export function shareLine(
   won: boolean,
   calls: CallResult[],
   percentile: number | null,
+  plan: { band: Band } | null = null,
 ): string {
-  const squares = calls.map((c) => BAND[c.band].square).join('');
+  const squares = [...(plan ? [plan] : []), ...calls].map((c) => BAND[c.band].square).join('');
   const head = number ? `LastStint #${number}` : 'LastStint (practice)';
   const tail = percentile !== null ? ` P${percentile}` : '';
   return `${head} ${won ? 'WIN ' : ''}${squares}${tail}`;
@@ -191,6 +255,7 @@ export function ResultScreen({
     model ? goalOf(model).kind === 'defend' : false,
   );
   const calls = callsFrom(state, response);
+  const planResult = planFrom(state, response);
   const local = game.localScore();
   const score = response?.score ?? (calls.length ? local?.score : null);
   const momentById = new Map(state.moments.map((m) => [m.id, m]));
@@ -229,7 +294,13 @@ export function ResultScreen({
     api.stats(date).then(setStats, () => {});
   }, [response, date]);
 
-  const share = shareLine(number, v.outcome === 'beat', calls, response?.percentile ?? null);
+  const share = shareLine(
+    number,
+    v.outcome === 'beat',
+    calls,
+    response?.percentile ?? null,
+    planResult,
+  );
   const copy = async () => {
     const text = `${share}\n${location.origin}`;
     try {
@@ -337,6 +408,7 @@ export function ResultScreen({
             <span className="font-normal normal-case text-neutral-600">(tap for details)</span>
           </h2>
           <ol className="flex flex-col gap-2">
+            {planResult && <PlanRow plan={planResult} state={state} />}
             {calls.map((c) => (
               <CallRow
                 key={c.momentId}

@@ -6,6 +6,7 @@
 
 import { BAND_POINTS, type Band } from '@boxthislap/sim';
 import { autoStay } from '../game/autoStay.js';
+import { planGrade, stopsWord } from '../game/plans.js';
 import type { GameState } from '../state/machine.js';
 
 const BAND: Record<Band, { label: string; cls: string }> = {
@@ -35,6 +36,19 @@ export function LiveGrades({ state }: { state: GameState }) {
         best,
       };
     });
+  // The race plan picked at takeover is graded like a call (strategy planner spec D7).
+  const picked = state.plan.picked;
+  if (picked) {
+    const grade = planGrade(state.plan, state.meta.takeoverLap);
+    rows.unshift({
+      id: 'plan',
+      lap: state.meta.takeoverLap + 1,
+      label: `Plan ${picked.id === 'own' ? '(yours)' : picked.id.toUpperCase()}: ${stopsWord(picked).toLowerCase()}`,
+      auto: false,
+      mine: grade?.options.find((o) => o.id === picked.id),
+      best: grade?.options.find((o) => o.id === grade.best),
+    });
+  }
   const scored = rows.flatMap((r) => (r.mine ? [BAND_POINTS[r.mine.band]] : []));
   const score = scored.length ? scored.reduce((a, b) => a + b, 0) / scored.length : null;
 
@@ -43,7 +57,9 @@ export function LiveGrades({ state }: { state: GameState }) {
       <div className="flex items-baseline justify-between">
         <span className="eyebrow">Your calls</span>
         <span className="text-[12px] text-[var(--muted)]">
-          {score === null ? `0 of ${state.moments.length}` : `Score ${Math.round(score)}`}
+          {score === null
+            ? `0 of ${state.moments.length + (state.plan.offered.length ? 1 : 0)}`
+            : `Score ${Math.round(score)}`}
         </span>
       </div>
       {rows.length === 0 ? (

@@ -207,3 +207,5 @@ With no daily scheduled, or no connection, the site plays the bundled copy of th
 | Frontend | `phase-3-ui-spec.md` (Reuhen), `frontend-finish-spec.md` |
 
 - 2026-11-05: renamed to **LastStint** (wordmark LAST + STINT in the team colour, `components/Brand.tsx`); Survivor is shown as **Gauntlet** (route `/gauntlet`, `/survivor` still works; code, API and storage keep the survivor name). Favicon `public/favicon.svg`, link preview `public/og.png` (its URL in index.html is absolute: switch to laststint.com when the domain points here). Race header: "Sainz’s race engineer · Ferrari".
+
+- 2026-11-05: **strategy planner** built (docs/strategy-planner-spec.md): pick a plan at takeover (graded like a call), the car runs to it, heads-up before a planned stop, re-plan offers. The takeover `race-plan` moment is retired; 7 daily seeds and every Gauntlet seed re-tuned (build.py and pools.json). At the merge the scheduled dailies must be re-pinned (race files changed).

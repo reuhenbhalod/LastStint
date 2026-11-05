@@ -1,6 +1,6 @@
 # Strategy planner spec
 
-Status: decided 2026-11-05. The owner chose the recommended option for D1–D6 and D8, and **B for
+Status: built 2026-11-05 (see Built). Decided 2026-11-05. The owner chose the recommended option for D1–D6 and D8, and **B for
 D7** (a strategy grade). See "Decided: the strategy grade" below.
 
 ## Goal
@@ -112,6 +112,20 @@ faster)
 - Later plan changes aren't graded (they're just the calls they make). Following the plan
   isn't required.
 - Scores from before and after the change aren't comparable; old runs keep their scores.
+
+## Built (Nov 5 2026)
+
+- Sim: `plan.ts` (the plan's shape, its check, its calls), `planner.ts` (the engineer's plans by
+  the lap-time model; a plan as a `final` grading option), `verify.ts` (the run's plan graded
+  and scored, `claimPlanGrade`).
+- The old `race-plan` moment at takeover is retired: the planner replaces it (it asked the same
+  thing with fewer choices). Moments start from the second lap; seeds were re-tuned with a
+  plan-aware tuner (good play takes the best plan and the engineer's re-plan offers; random
+  play picks a random plan): 7 dailies and every Gauntlet race got new seeds.
+- Game: the planning phase (the race waits for a pick), plan calls made after any pause, a
+  stop off the plan drops the planned stop it replaced, "stay out" at a moment drops that
+  lap's planned stop, the heads-up, the re-plan offer, the plan bar and the editor; the plan's
+  grade in Your calls, on the results and in the share squares.
 
 ## Out of scope
 

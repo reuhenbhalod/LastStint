@@ -3,7 +3,7 @@
 // clock while racing, persists/resumes the run, and talks to the Worker: "already played
 // today?" on load, and the run submission (calls + the game's grades) at the flag.
 
-import type { Decision, RaceModel, RaceNote } from '@boxthislap/sim';
+import type { Decision, PlanId, RaceModel, RaceNote, RacePlan } from '@boxthislap/sim';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ApiError, type RunResponse, type RunSubmission, api } from '../data/api.js';
 import { anonId } from '../data/player.js';
@@ -54,6 +54,11 @@ export interface Game {
   /** Hold the race (the player went to the home page); the lap resumes where it was. */
   setHold: (on: boolean) => void;
   choose: (optionId: string) => void;
+  /** The race plan (strategy planner spec): build your own, pick one, change or delay it. */
+  buildPlan: (plan: RacePlan) => boolean;
+  pickPlan: (id: PlanId) => void;
+  changePlan: (plan: RacePlan) => boolean;
+  delayPlannedStop: (lap: number) => boolean;
   call: (decision: Decision, options?: { asked?: boolean; quiet?: boolean }) => void;
   /** What the race model noted so far (battles, contact, trust...). */
   notes: () => RaceNote[];
@@ -191,6 +196,16 @@ export function useGame(
     [sync],
   );
 
+  // Stable: the plan card grades a draft from an effect.
+  const buildPlan = useCallback(
+    (plan: RacePlan) => {
+      const ok = session.current?.buildPlan(plan) ?? false;
+      sync();
+      return ok;
+    },
+    [sync],
+  );
+
   const submit = useCallback(() => {
     const s = session.current;
     if (!s) return;
@@ -239,6 +254,18 @@ export function useGame(
     setPace,
     setHold,
     choose: (optionId) => act((s) => s.choose(optionId))(),
+    buildPlan,
+    pickPlan: (id) => act((s) => s.pickPlan(id))(),
+    changePlan: (plan) => {
+      const ok = session.current?.changePlan(plan) ?? false;
+      sync();
+      return ok;
+    },
+    delayPlannedStop: (lap) => {
+      const ok = session.current?.delayPlannedStop(lap) ?? false;
+      sync();
+      return ok;
+    },
     call: (decision, options) => act((s) => s.call(decision, options))(),
     radio: (text) => act((s) => s.radio(text))(),
     notes: () => session.current?.notes ?? [],
