@@ -5,7 +5,7 @@
     "name": "Mexico 2021: Perez vs Hamilton",
     "laps": 71,
     "takeoverLap": 26,
-    "seed": 21052
+    "seed": 7383
   },
   "era": "2014-2025",
   "track": {
@@ -469,68 +469,6 @@
   },
   "events": [],
   "decisionMoments": [
-    {
-      "id": "race-plan",
-      "lap": 27,
-      "trigger": "takeover",
-      "target": {
-        "kind": "beat-rival"
-      },
-      "options": [
-        {
-          "id": "plan-standard",
-          "label": "Run to plan",
-          "decisions": []
-        },
-        {
-          "id": "plan-manage",
-          "label": "Manage the tyres to the flag",
-          "decisions": [
-            {
-              "lap": 27,
-              "kind": "mode",
-              "key": "pace",
-              "value": "manage"
-            }
-          ]
-        },
-        {
-          "id": "plan-push",
-          "label": "Push now, build the gap",
-          "decisions": [
-            {
-              "lap": 27,
-              "kind": "mode",
-              "key": "pace",
-              "value": "push"
-            }
-          ]
-        },
-        {
-          "id": "plan-box-medium",
-          "label": "Box now, mediums",
-          "decisions": [
-            {
-              "lap": 27,
-              "kind": "pit",
-              "compound": "MEDIUM"
-            }
-          ]
-        },
-        {
-          "id": "plan-box-hard",
-          "label": "Box now, hards",
-          "decisions": [
-            {
-              "lap": 27,
-              "kind": "pit",
-              "compound": "HARD"
-            }
-          ]
-        }
-      ],
-      "realOptionId": "plan-standard"
-    },
     {
       "id": "rivalpit-29",
       "lap": 29,

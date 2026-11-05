@@ -39,7 +39,6 @@ describe('decisionMoments', () => {
     const { model } = await daily();
     const moments = decisionMoments(model);
     expect(moments.map((m) => [m.id, m.lap])).toEqual([
-      ['race-plan', 35],
       ['vsc-cover', 36],
       ['tyres-going', 44],
       ['manage-or-push', 49],
@@ -47,7 +46,7 @@ describe('decisionMoments', () => {
       ['sc-last-chance', 55],
       ['restart-stance', 57],
     ]);
-    expect(moments[0]?.realOptionId).toBe('plan-standard');
+    expect(moments[0]?.realOptionId).toBe('stay');
     for (const m of moments) {
       expect(m.options.length).toBeGreaterThanOrEqual(2);
       expect(m.options.length).toBeLessThanOrEqual(8); // the schema's limit

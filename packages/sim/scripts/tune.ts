@@ -12,10 +12,11 @@
 //     and a defend race;
 //   - careless play mostly loses: the share of random answer paths that win is in BAND,
 //     closest to --target. Abu Dhabi's own seed: good play wins, random play wins 1%.
-// Between calls, each player uses the BOX button as a real one would (calls made between
-// pauses, as in examples/daily-race.ts): the real way boxes on the real team's stop laps, the
-// good player when the grader's sensible-strategist plan (planRemainingStop) says now, and
-// random play only when the two-compound warning shows (the last 5 laps).
+// At takeover each player picks a race plan (docs/strategy-planner-spec.md) and the car runs
+// to it, as in the game: the good player the best-graded of the engineer's plans, random play
+// one of them at random; the real way picks none and boxes on the real team's stop laps.
+// Between calls, random play also uses the BOX button when the two-compound warning shows
+// (the last 5 laps). A stop a call makes takes out the planned stop it replaced.
 // The current seed is kept when it already passes.
 //   pnpm --filter @boxthislap/sim tune <race-id> [--seeds N] [--paths N] [--target 0.15] [--write]
 //   pnpm --filter @boxthislap/sim tune <race-id> --survivor N [--write]
@@ -27,14 +28,19 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   type DecisionMoment,
+  PLAN_TARGET,
   type RaceModel,
+  type RacePlan,
   type Run,
   answerMoment,
   classify,
   decide,
+  enginePlans,
   gradeMoment,
   initRun,
   isFinished,
+  planCalls,
+  planOption,
   planRemainingStop,
   ruleSatisfied,
   stepLap,
@@ -72,7 +78,7 @@ const load = (id: string) => {
  * they faced (a pace or battle call). */
 function realPick(m: DecisionMoment): string {
   if (m.realOptionId && m.options.some((o) => o.id === m.realOptionId)) return m.realOptionId;
-  for (const id of ['plan-standard', 'stay', 'standard', 'hold']) {
+  for (const id of ['stay', 'standard', 'hold']) {
     if (m.options.some((o) => o.id === id)) return id;
   }
   return m.options[0]?.id as string;
@@ -113,14 +119,8 @@ const realBox: Box = (run) => {
   if (stop && !stopAhead(run) && stop.lap - 1 < run.model.race.laps) boxNext(run, stop.to);
 };
 
-/** The good player: the sensible-strategist plan, boxing when it says now. */
-const sensibleBox: Box = (run) => {
-  if (stopAhead(run)) return;
-  const stop = planRemainingStop(run);
-  if (stop && stop.lap <= run.state.lap + 2 && run.state.lap + 1 < run.model.race.laps) {
-    boxNext(run, stop.to);
-  }
-};
+/** No BOX button between calls (the good player runs to its plan). */
+const noBox: Box = () => {};
 
 /** Random play: boxes only when the two-compound warning shows. */
 const warnedBox: Box = (run) => {
@@ -133,21 +133,66 @@ const warnedBox: Box = (run) => {
   if (to) boxNext(run, to);
 };
 
-/** Where the user's car finishes, answering each call with `choose`: the server's replay. */
+/**
+ * Where the user's car finishes, picking `plan` at takeover (null: none) and answering each
+ * call with `choose`: the server's replay. The plan's calls are made the lap before, as the
+ * game does; a stop it didn't make takes out a planned stop within 4 laps.
+ */
 function play(
   model: RaceModel,
   seed: number,
   moments: DecisionMoment[],
   choose: (i: number, run: Run) => string,
   box: Box,
+  plan: RacePlan | null = null,
+  replan?: (run: Run, rest: RacePlan) => RacePlan | null,
 ) {
   const run = initRun(model, seed, { decisions: [] });
+  const takeover = model.race.takeoverLap;
+  let calls = plan ? planCalls(plan, takeover, 'standard') : [];
+  if (plan) decide(run, { lap: takeover + 1, kind: 'plan', ...plan });
+  const made = new Set<number>();
+  const follow = () => {
+    for (const d of run.decisions) {
+      if (d.kind !== 'pit' || made.has(d.lap)) continue;
+      made.add(d.lap);
+      calls = calls.filter(
+        (c) => c.kind !== 'pit' || c.lap === d.lap || Math.abs(c.lap - d.lap) > 4,
+      );
+    }
+    const me = run.state.cars[model.userSide];
+    if (!me || me.retired) return;
+    for (const c of calls.filter((x) => x.lap === run.state.lap + 1)) {
+      if (c.kind === 'pit' && (stopAhead(run) || c.lap >= model.race.laps)) continue;
+      if (c.kind === 'pit') made.add(c.lap);
+      decide(run, c);
+    }
+  };
+  follow();
   while (!isFinished(run)) {
     const i = moments.findIndex((m) => m.lap === run.state.lap + 1);
     if (i >= 0) answerMoment(run, moments[i] as DecisionMoment, choose(i, run));
     stepLap(run);
+    if (isFinished(run)) break;
+    // The engineer's re-plan offer (spec D5), taken every few laps when nothing is booked.
+    const lap = run.state.lap;
+    if (replan && (lap - takeover) % REPLAN_EVERY === 0 && !stopAhead(run)) {
+      const pending = run.decisions.some((d) => d.kind === 'pit' && d.lap > lap);
+      const rest: RacePlan = {
+        id: 'own',
+        stops: calls.flatMap((c) =>
+          c.kind === 'pit' && c.lap > lap ? [{ lap: c.lap, compound: c.compound }] : [],
+        ),
+        pace: [],
+      };
+      rest.pace = Array(rest.stops.length + 1).fill('standard');
+      const next = pending ? null : replan(run, rest);
+      if (next)
+        calls = planCalls(next, lap, run.state.cars[model.userSide]?.modes.pace ?? 'standard');
+    }
+    follow();
     const pausing = moments.some((m) => m.lap === run.state.lap + 1);
-    if (!isFinished(run) && !pausing) box(run);
+    if (!pausing) box(run);
   }
   const result = classify(run);
   const out = (code: string) =>
@@ -165,21 +210,60 @@ const finish = (
   moments: DecisionMoment[],
   path: string[],
   box: Box,
-) => play(model, seed, moments, (i) => path[i] as string, box);
+  plan: RacePlan | null,
+) => play(model, seed, moments, (i) => path[i] as string, box, plan);
 
-/** The good player: the best-graded option at every call. */
-const goodPlay = (model: RaceModel, seed: number, moments: DecisionMoment[]) =>
-  play(
+/** The engineer's plans at takeover (the same for every seed: no lap has run). */
+function plansOf(model: RaceModel): RacePlan[] {
+  return enginePlans(initRun(model, 1, { decisions: [] }));
+}
+
+/** Laps between the good player's re-plan checks; the switch margin is the game's (8 points). */
+const REPLAN_EVERY = 4;
+const REPLAN_MARGIN = 0.08;
+const REPLAN_SAMPLES = 120;
+
+/** The engineer's best plan now, if it beats the rest of `rest` by the margin. */
+function betterPlan(run: Run, rest: RacePlan): RacePlan | null {
+  const alts = enginePlans(run);
+  if (!alts.length) return null;
+  const g = gradeMoment(
+    run,
+    [{ ...planOption(run, rest), id: 'mine' }, ...alts.map((p) => planOption(run, p))],
+    PLAN_TARGET,
+    REPLAN_SAMPLES,
+  );
+  const mine = g.options[0]?.probability ?? 0;
+  const best = [...g.options.slice(1)].sort((a, b) => b.probability - a.probability)[0];
+  return best && best.probability - mine >= REPLAN_MARGIN
+    ? (alts.find((p) => p.id === best.id) ?? null)
+    : null;
+}
+
+/** The good player: the best-graded plan, then the best-graded option at every call. */
+function goodPlay(model: RaceModel, seed: number, moments: DecisionMoment[]) {
+  const start = initRun(model, seed, { decisions: [] });
+  const plans = enginePlans(start);
+  const g = gradeMoment(
+    start,
+    plans.map((p) => planOption(start, p)),
+    PLAN_TARGET,
+  );
+  const best = [...g.options].sort((a, b) => b.probability - a.probability)[0]?.id;
+  return play(
     model,
     seed,
     moments,
     (i, run) => {
       const m = moments[i] as DecisionMoment;
-      const g = gradeMoment(run, m.options, m.target);
-      return [...g.options].sort((a, b) => b.probability - a.probability)[0]?.id as string;
+      const mg = gradeMoment(run, m.options, m.target);
+      return [...mg.options].sort((a, b) => b.probability - a.probability)[0]?.id as string;
     },
-    sensibleBox,
+    noBox,
+    plans.find((p) => p.id === best) ?? null,
+    betterPlan,
   );
+}
 
 interface Trial {
   seed: number;
@@ -192,7 +276,13 @@ interface Trial {
 
 function trial(model: RaceModel, seed: number, sample: string[][]): Trial {
   const moments = [...model.decisionMoments].sort((a, b) => a.lap - b.lap);
-  const runs = sample.map((p, k) => finish(model, seed, moments, p, k === 0 ? realBox : warnedBox));
+  const plans = plansOf(model);
+  // Path k picks plan k mod n (the real way, path 0, picks none).
+  const runs = sample.map((p, k) =>
+    k === 0
+      ? finish(model, seed, moments, p, realBox, null)
+      : finish(model, seed, moments, p, warnedBox, plans[k % plans.length] ?? null),
+  );
   const real = runs[0] as { pos: number; rival: number; win: boolean };
   return {
     seed,

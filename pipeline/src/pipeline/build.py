@@ -58,7 +58,7 @@ RACES: dict[str, dict] = {
         "name": "Bahrain 2021: Verstappen vs Hamilton",
         "era": "2014-2025",
         "takeover_lap": 10,  # D3 rule
-        "seed": 53576,  # tuned: scripts/tune.ts (races batch 1)
+        "seed": 17370,  # tuned: scripts/tune.ts (strategy planner, Nov 5 2026)
         "user_side": "VER",
         "rival": "HAM",
         "score_positions": 6,
@@ -110,7 +110,7 @@ RACES: dict[str, dict] = {
         "name": "Mexico 2021: Perez vs Hamilton",
         "era": "2014-2025",
         "takeover_lap": 26,  # D3 rule
-        "seed": 21052,  # tuned: scripts/tune.ts (races batch 1)
+        "seed": 7383,  # tuned: scripts/tune.ts (strategy planner, Nov 5 2026)
         "user_side": "PER",
         "rival": "HAM",
         "score_positions": 6,
@@ -136,7 +136,7 @@ RACES: dict[str, dict] = {
         "name": "Miami 2022: Leclerc vs Verstappen",
         "era": "2014-2025",
         "takeover_lap": 21,  # D3 rule
-        "seed": 23160,  # tuned: scripts/tune.ts (races batch 1)
+        "seed": 46029,  # tuned: scripts/tune.ts (strategy planner, Nov 5 2026)
         "user_side": "LEC",
         "rival": "VER",
         "score_positions": 6,
@@ -236,7 +236,7 @@ RACES: dict[str, dict] = {
         "name": "Hungary 2019: Verstappen vs Hamilton",
         "era": "2014-2025",
         "takeover_lap": None,  # D3 rule
-        "seed": 80284,
+        "seed": 56769,  # tuned: scripts/tune.ts (strategy planner, Nov 5 2026)
         "user_side": None,  # validation race: automatic duel, runner-up vs winner
         "rival": None,
         "score_positions": 6,
@@ -308,7 +308,7 @@ RACES: dict[str, dict] = {
         "name": "Spain 2020: Verstappen vs Bottas",
         "era": "2014-2025",
         "takeover_lap": 18,  # pinned: the duel below changed (races batch 1)
-        "seed": 85579,  # tuned: scripts/tune.ts (races batch 1)
+        "seed": 27170,  # tuned: scripts/tune.ts (strategy planner, Nov 5 2026)
         "user_side": "VER",
         "rival": "BOT",  # defend race: the car behind (races batch 1)
         "score_positions": 6,
@@ -456,7 +456,7 @@ RACES: dict[str, dict] = {
         "name": "Mexico 2024: Norris vs Sainz",
         "era": "2014-2025",
         "takeover_lap": 27,  # pinned (races batch 2)
-        "seed": 59811,  # tuned: scripts/tune.ts (races batch 2)
+        "seed": 50116,  # tuned: scripts/tune.ts (strategy planner, Nov 5 2026)
         "user_side": "NOR",
         "rival": "SAI",
         "score_positions": 6,
@@ -468,7 +468,7 @@ RACES: dict[str, dict] = {
         "name": "Abu Dhabi 2024: Sainz vs Norris",
         "era": "2014-2025",
         "takeover_lap": 10,  # pinned: earlier for more calls (races batch 2)
-        "seed": 50123,  # tuned: scripts/tune.ts (races batch 2)
+        "seed": 21142,  # tuned: scripts/tune.ts (strategy planner, Nov 5 2026)
         "user_side": "SAI",
         "rival": "NOR",
         "score_positions": 6,

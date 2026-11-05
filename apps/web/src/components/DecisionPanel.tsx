@@ -91,23 +91,16 @@ export function DecisionPanel({
     );
     const facts: Fact[] = calls.length
       ? modeFacts(model, calls)
-      : moment.trigger === 'takeover'
-        ? [
-            { label: 'Pace', value: 'Standard', tone: 'neutral' },
-            { label: 'Tyres', value: 'Normal wear', tone: 'neutral' },
-            { label: 'Racing', value: 'Adapt', tone: 'neutral' },
-            { label: 'Risk', value: 'Normal', tone: 'neutral' },
-          ]
-        : [
-            { label: 'Pace', value: 'Same', tone: 'neutral' },
-            { label: 'Tyres', value: oldTyres, tone: worn ? 'bad' : 'neutral' },
-            { label: 'Racing', value: 'Keep track position', tone: 'good' },
-            {
-              label: 'Risk',
-              value: worn ? 'Worn tyres' : 'Normal',
-              tone: worn ? 'bad' : 'neutral',
-            },
-          ];
+      : [
+          { label: 'Pace', value: 'Same', tone: 'neutral' },
+          { label: 'Tyres', value: oldTyres, tone: worn ? 'bad' : 'neutral' },
+          { label: 'Racing', value: 'Keep track position', tone: 'good' },
+          {
+            label: 'Risk',
+            value: worn ? 'Worn tyres' : 'Normal',
+            tone: worn ? 'bad' : 'neutral',
+          },
+        ];
     return {
       id: o.id,
       // "Stay out, keep the lead": the facts carry the detail.

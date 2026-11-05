@@ -13,7 +13,7 @@ const fullAbu = abuJson as unknown as RaceModel;
 const SAMPLES = 40;
 
 // The verification rules are exercised on Abu Dhabi with only its lap-53 SC moment; the
-// shipped seven-moment race is checked end to end at the bottom.
+// shipped six-moment race is checked end to end at the bottom.
 const scStop = fullAbu.decisionMoments.find((m) => m.id === 'sc-stop');
 if (!scStop) throw new Error('Abu Dhabi 2021 has no sc-stop moment');
 const abu: RaceModel = { ...fullAbu, decisionMoments: [scStop] };
@@ -258,9 +258,8 @@ describe('verifyRun', () => {
     expect(v.moments.map((m) => m.grade)).toEqual(played.calls.map((c) => c.grade));
   });
 
-  it('verifies the shipped seven-moment Abu Dhabi run', () => {
+  it('verifies the shipped six-moment Abu Dhabi run', () => {
     const choices = {
-      'race-plan': 'plan-push',
       'vsc-cover': 'cover-hard',
       'tyres-going': 'box-medium',
       'manage-or-push': 'manage',
@@ -277,7 +276,6 @@ describe('verifyRun', () => {
 
   describe("with the game's claimed grades (free-plan scoring)", () => {
     const choices = {
-      'race-plan': 'plan-standard',
       'vsc-cover': 'stay',
       'tyres-going': 'stay',
       'manage-or-push': 'push',
@@ -310,7 +308,6 @@ describe('verifyRun', () => {
       expect(played.grades.map((g) => g.real !== undefined)).toEqual([
         false,
         false,
-        false,
         true,
         false,
         false,
@@ -320,7 +317,7 @@ describe('verifyRun', () => {
 
     it('an edited chance passes the live check but not full grading (the nightly check)', () => {
       const cheat = edit((g) => {
-        const sc = g[4] as { probabilities: number[] };
+        const sc = g[3] as { probabilities: number[] };
         sc.probabilities = sc.probabilities.map((_, i) => (i === 1 ? 1 : 0)); // box-soft best
       });
       const full = verifyRun(fullAbu, fullAbu.race.seed, played.decisions, SAMPLES);
@@ -347,7 +344,7 @@ describe('verifyRun', () => {
         edit((g) => {
           (g[i] as { real?: number }).real = p;
         });
-      expect(reason(JSON.parse(JSON.stringify(realChance(3, undefined))))).toBe('bad-grades');
+      expect(reason(JSON.parse(JSON.stringify(realChance(2, undefined))))).toBe('bad-grades');
       expect(reason(realChance(0, 0.5))).toBe('bad-grades');
     });
 

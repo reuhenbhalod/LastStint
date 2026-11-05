@@ -1,5 +1,6 @@
 import type { DecisionMoment, RaceResult, RaceState } from '@boxthislap/sim';
 import { describe, expect, it } from 'vitest';
+import { NO_PLAN } from '../game/plans.js';
 import { type GameState, type Phase, reducer } from './machine.js';
 
 const race: RaceState = {
@@ -46,12 +47,13 @@ function base(phase: Phase): GameState {
       rival: 'VER',
     },
     radio: [],
+    plan: NO_PLAN,
   };
 }
 
 describe('reducer', () => {
   it('START only leaves intro', () => {
-    expect(reducer(base('intro'), { type: 'START' }).phase).toBe('racing');
+    expect(reducer(base('intro'), { type: 'START' }).phase).toBe('planning');
     expect(reducer(base('racing'), { type: 'START' }).phase).toBe('racing');
     expect(reducer(base('results'), { type: 'START' }).phase).toBe('results');
   });

@@ -6,8 +6,11 @@
 import {
   type Decision,
   type DecisionMoment,
+  type GradeJob,
+  PLAN_TARGET,
   type RaceModel,
   type RaceNote,
+  type RacePlan,
   type RaceResult,
   type RaceState,
   type Run,
@@ -15,8 +18,11 @@ import {
   answerMoment,
   classify,
   decide,
+  enginePlans,
+  gradeJob,
   initRun,
   isFinished,
+  planOption,
   stepLap,
 } from '@boxthislap/sim';
 import { type MomentJob, momentJob } from './grading.js';
@@ -71,6 +77,20 @@ export class GameEngine {
   /** Describe the paused moment for a grading worker (call before answering). */
   gradingJob(moment: DecisionMoment, samples?: number): MomentJob {
     return momentJob(this.run, moment, samples);
+  }
+
+  /** The engineer's plans from the current lap (strategy planner spec). */
+  plans(): RacePlan[] {
+    return enginePlans(this.run);
+  }
+
+  /**
+   * A grading job for plans from the current lap, each played to the flag on its own calls.
+   * `ids` renames the options (a live re-rank grades the remainder of the player's plan too).
+   */
+  planJob(plans: RacePlan[], samples?: number, ids?: string[]): GradeJob {
+    const options = plans.map((p, i) => ({ ...planOption(this.run, p), id: ids?.[i] ?? p.id }));
+    return gradeJob(this.run, options, PLAN_TARGET, samples);
   }
 
   /** Advance one lap; returns the new race state. */

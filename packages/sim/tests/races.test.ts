@@ -23,10 +23,11 @@ describe('playable races', () => {
   it.each(playable.map((m) => [m.race.id, m] as const))(
     '%s plays through and verifies',
     (_id, model) => {
-      // A moment's options are 2-8, with the race plan first, all after the takeover.
-      expect(model.decisionMoments[0]?.trigger).toBe('takeover');
+      // A moment has 2-8 options. None is on the first lap: the race plan is picked there
+      // (the strategy planner), not asked as a moment.
       for (const m of model.decisionMoments) {
-        expect(m.lap).toBeGreaterThan(model.race.takeoverLap);
+        expect(m.trigger).not.toBe('takeover');
+        expect(m.lap).toBeGreaterThan(model.race.takeoverLap + 1);
         expect(m.options.length).toBeGreaterThanOrEqual(2);
       }
       const played = playDailyRace(

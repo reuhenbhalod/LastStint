@@ -7,11 +7,16 @@
 import {
   type Decision,
   type DecisionMoment,
+  GRADE_SAMPLES,
+  type PlanId,
   type RaceNote,
+  type RacePlan,
   type RaceState,
   engineerConfig,
   moodOf,
+  planCalls,
   scoreRun,
+  validatePlan,
 } from '@boxthislap/sim';
 import type { RunResponse, RunSubmission } from '../data/api.js';
 import { ignoreRate } from '../data/drivers.js';
@@ -22,6 +27,15 @@ import { autoStay, boxingAt } from '../game/autoStay.js';
 import { ownMove } from '../game/engineerCalls.js';
 import { engineerRadio } from '../game/engineerRadio.js';
 import { neutralCause } from '../game/neutral.js';
+import {
+  NO_PLAN,
+  delayStop,
+  dropNear,
+  planClaim,
+  planGrade,
+  planRadio,
+  remainder,
+} from '../game/plans.js';
 import { MOOD_REFUSALS, acknowledge, refusal } from '../game/refusal.js';
 import { overtakingCorners } from '../track/corners.js';
 import { outlineFor } from '../track/outlines.js';
@@ -30,6 +44,7 @@ import {
   type GameMeta,
   type GameState,
   type Phase,
+  type PlanState,
   type Speed,
   type Submission,
   reducer,
@@ -46,7 +61,13 @@ export interface PersistedRun {
   resolved: string[];
   grades?: Record<string, GradedMoment>;
   submission?: Submission;
+  plan?: PlanState;
+  /** Laps of the pit calls the plan made (other stops change the plan). */
+  planned?: number[];
 }
+
+/** Playouts per plan for the re-rank each lap (the takeover grade uses GRADE_SAMPLES). */
+export const LIVE_SAMPLES = 120;
 
 function metaOf(daily: Daily): GameMeta {
   const m = daily.model;
@@ -85,6 +106,10 @@ export class GameSession {
   private readonly daily: Daily;
   private readonly grader: Grader;
   private readonly grading = new Map<string, Promise<void>>();
+  /** In-laps of the pit calls the plan made; any other stop changes the plan. */
+  private readonly planned = new Set<number>();
+  /** Stops off the plan already taken into account. */
+  private readonly offPlan = new Set<number>();
   state: GameState;
   /** Called after a change that happens outside a method call (a grade arriving). */
   onChange: () => void = () => {};
@@ -109,6 +134,7 @@ export class GameSession {
       submission: { status: daily.source === 'live' ? 'none' : 'practice' },
       meta: metaOf(daily),
       radio: [],
+      plan: NO_PLAN,
     };
   }
 
@@ -175,9 +201,163 @@ export class GameSession {
     return this.state.grades;
   }
 
+  /** Off the daily card: the engineer brings the plans (the race waits for a pick). */
   start(): void {
     this.dispatch({ type: 'START' });
-    this.sync(); // pause immediately if a moment sits at takeoverLap + 1
+    const offered = this.engine.plans();
+    this.dispatch({ type: 'PLAN', plan: { ...NO_PLAN, offered }, go: offered.length === 0 });
+    this.gradePlans(offered);
+    if (offered.length === 0) this.sync();
+  }
+
+  /**
+   * Grade plans at takeover (the server rebuilds the grade from a run with no calls yet), each
+   * played to the flag, in the worker. A plan's chance lands in `plan.chances` by id; the
+   * player's own plan only if it's still the one built when its grade arrives.
+   */
+  private gradePlans(plans: RacePlan[]): void {
+    if (!plans.length) return;
+    const key = `plan:${plans.map((p) => `${p.id}${JSON.stringify(p.stops)}${p.pace}`).join('|')}`;
+    if (this.grading.has(key)) return;
+    const takeover = new GameEngine(this.daily.model, this.daily.seed, { decisions: [] });
+    const job = takeover.planJob(plans);
+    const samples = job.samples ?? GRADE_SAMPLES;
+    const done = this.grader.hits(job).then((hits) => {
+      const chances = { ...this.state.plan.chances };
+      plans.forEach((p, i) => {
+        const own = this.state.plan.own;
+        if (p.id === 'own' && (!own || JSON.stringify(own) !== JSON.stringify(p))) return;
+        chances[p.id] = { hits: hits[i] ?? 0, samples };
+      });
+      this.setPlan({ ...this.state.plan, chances });
+      this.grading.delete(key);
+      this.onChange();
+    });
+    this.grading.set(key, done);
+  }
+
+  private setPlan(plan: PlanState, go = false): void {
+    this.dispatch({ type: 'PLAN', plan, go });
+  }
+
+  /** The player's own plan (the planner's editor), graded beside the engineer's. */
+  buildPlan(plan: RacePlan): boolean {
+    if (this.state.phase !== 'planning') return false;
+    const own: RacePlan = { ...plan, id: 'own' };
+    try {
+      validatePlan(this.daily.model, own, this.state.meta.takeoverLap);
+    } catch {
+      return false;
+    }
+    const { own: _, ...rest } = this.state.plan.chances;
+    this.setPlan({ ...this.state.plan, own, chances: rest });
+    this.gradePlans([own]);
+    return true;
+  }
+
+  /** Pick the plan and go racing: the plan is logged (graded) and its first calls made. */
+  pickPlan(id: PlanId): void {
+    if (this.state.phase !== 'planning') return;
+    const { plan: state } = this.state;
+    const plan = id === 'own' ? state.own : state.offered.find((p) => p.id === id);
+    if (!plan) return;
+    const lap = this.state.meta.takeoverLap;
+    this.engine.apply({ lap: lap + 1, kind: 'plan', ...plan });
+    this.setPlan({ ...state, picked: plan, active: plan }, true);
+    this.say('Engineer', planRadio(plan), false, lap + 1);
+    this.sync(); // pause at once if a moment sits at takeoverLap + 1
+    this.followPlan();
+  }
+
+  /**
+   * Change the plan the car runs to during the race (not graded; the plan picked at takeover
+   * is). Its stops must be after the coming lap, whose calls are already made.
+   */
+  changePlan(plan: RacePlan): boolean {
+    if (!this.state.plan.picked || this.engine.isFinished()) return false;
+    const next: RacePlan = { ...plan, id: 'own' };
+    try {
+      validatePlan(this.daily.model, next, this.engine.lap + 1);
+    } catch {
+      return false;
+    }
+    this.setPlan({ ...this.state.plan, active: next, live: null });
+    this.say('Engineer', `New plan. ${planRadio(next)}`, false, this.engine.lap + 1);
+    return true;
+  }
+
+  /** Stay out one more lap than planned (the heads-up before a planned stop). */
+  delayPlannedStop(lap: number): boolean {
+    const active = this.state.plan.active;
+    const later = active && delayStop(active, lap, this.daily.model.race.laps);
+    if (!later) return false;
+    this.setPlan({ ...this.state.plan, active: later, live: null });
+    this.say('Engineer', `Copy, one more lap. Box lap ${lap + 1}.`, false, this.engine.lap + 1);
+    return true;
+  }
+
+  /**
+   * Make the plan's calls for the coming lap: the pit call on a planned in-lap and the pace
+   * at the start of a stint. A stop the plan didn't make first takes out the planned stop it
+   * replaced. Planned calls are the wall's own: the driver follows them. Only while racing:
+   * at a pause the calls wait for the answer (the server grades a moment on the calls made
+   * before its pause, so none may be made at it).
+   */
+  private followPlan(): void {
+    if (this.state.phase !== 'racing') return;
+    let active = this.state.plan.active;
+    const side = this.state.meta.userSide;
+    const car = this.engine.state.cars[side];
+    if (!active || !car || car.retired || this.engine.isFinished()) return;
+    for (const d of this.engine.decisions) {
+      if (d.kind !== 'pit' || this.planned.has(d.lap) || this.offPlan.has(d.lap)) continue;
+      this.offPlan.add(d.lap);
+      const after = dropNear(active, d.lap);
+      if (after !== active) {
+        active = after;
+        this.say('Engineer', 'Plan updated for that stop.', false, this.engine.lap + 1);
+      }
+    }
+    if (active !== this.state.plan.active) this.setPlan({ ...this.state.plan, active });
+    const next = this.engine.lap + 1;
+    const calls = planCalls(active, this.state.meta.takeoverLap, 'standard');
+    for (const c of calls.filter((d) => d.lap === next)) {
+      if (c.kind === 'mode' && car.modes.pace === c.value) continue;
+      if (c.kind === 'pit') this.planned.add(c.lap);
+      this.call(c, { asked: true });
+    }
+  }
+
+  /**
+   * Re-rank the plan after a lap (spec D4, D5): the rest of the player's plan against the
+   * engineer's plans from now, in the worker. Skipped while a stop is booked. A result that
+   * arrives after the next lap has run is dropped.
+   */
+  private rerank(): void {
+    const active = this.state.plan.active;
+    const n = this.engine.lap;
+    const car = this.engine.state.cars[this.state.meta.userSide];
+    if (!active || !car || car.retired || this.engine.isFinished()) return;
+    if (this.engine.decisions.some((d) => d.kind === 'pit' && d.lap > n)) return;
+    const mine = { ...remainder(active, n), id: 'own' as const };
+    const alts = this.engine.plans();
+    const job = this.engine.planJob([mine, ...alts], LIVE_SAMPLES, [
+      'mine',
+      ...alts.map((p) => p.id),
+    ]);
+    this.grader.hits(job).then((hits) => {
+      if (this.engine.lap !== n || this.state.plan.active !== active) return;
+      let best: { plan: RacePlan; chance: number } | null = null;
+      alts.forEach((plan, i) => {
+        const chance = (hits[i + 1] ?? 0) / LIVE_SAMPLES;
+        if (!best || chance > best.chance) best = { plan, chance };
+      });
+      this.setPlan({
+        ...this.state.plan,
+        live: { lap: n, mine: (hits[0] ?? 0) / LIVE_SAMPLES, best },
+      });
+      this.onChange();
+    });
   }
 
   /** Advance one lap (no-op unless racing), then settle the phase. */
@@ -188,6 +368,8 @@ export class GameSession {
     this.reportNeutral();
     this.reportEngineer();
     this.sync();
+    this.followPlan();
+    this.rerank();
   }
 
   /** Race control and the driver on the radio for the lap's crashes, failures and punctures. */
@@ -282,7 +464,17 @@ export class GameSession {
     }
     this.engine.answer(moment, optionId);
     this.dispatch({ type: 'RESOLVE', momentId: moment.id, decisions: this.engine.decisions });
+    // Staying out when the plan boxes this lap: the answer stands, the planned stop goes.
+    const active = this.state.plan.active;
+    const option = moment.options.find((o) => o.id === optionId);
+    if (
+      active?.stops.some((s) => s.lap === moment.lap) &&
+      !option?.decisions.some((d) => d.kind === 'pit')
+    ) {
+      this.setPlan({ ...this.state.plan, active: dropNear(active, moment.lap, 0), live: null });
+    }
     this.sync();
+    this.followPlan();
   }
 
   /**
@@ -381,8 +573,19 @@ export class GameSession {
       date: this.daily.date,
       anonId,
       decisions: this.engine.decisions,
-      grades: this.state.moments.map((m) => (grades[m.id] as GradedMoment).claim),
+      grades: [
+        ...this.state.moments.map((m) => (grades[m.id] as GradedMoment).claim),
+        ...this.planClaims(),
+      ],
     };
+  }
+
+  /** The plan's claim, if the run picked one (its grading is awaited by allGraded). */
+  private planClaims() {
+    if (!this.engine.decisions.some((d) => d.kind === 'plan')) return [];
+    const claim = planClaim(this.state.plan, this.state.meta.takeoverLap);
+    if (!claim) throw new Error('the plan is not graded yet');
+    return [claim];
   }
 
   /** Show the results: the server's response, a practice run, or a failed submission. */
@@ -404,7 +607,9 @@ export class GameSession {
         | undefined;
       return graded && radio ? [{ grade: graded.grade, chosen: radio.optionId }] : [];
     });
-    return scoreRun(calls);
+    const plan = planGrade(this.state.plan, this.state.meta.takeoverLap);
+    const picked = this.state.plan.picked;
+    return scoreRun(plan && picked ? [...calls, { grade: plan, chosen: picked.id }] : calls);
   }
 
   /** Serialisable run: a run is fully defined by (model, seed, decisions); lap/phase let
@@ -421,6 +626,8 @@ export class GameSession {
       resolved: this.state.resolved,
       grades: this.state.grades,
       submission: this.state.submission,
+      plan: { ...this.state.plan, live: null },
+      planned: [...this.planned],
     };
   }
 
@@ -459,8 +666,18 @@ export class GameSession {
           : { status: daily.source === 'live' ? 'none' : 'practice' },
       meta: metaOf(daily),
       radio: [],
+      plan: saved.plan ?? NO_PLAN,
     };
     const session = new GameSession(daily, { engine, state, grader });
+    for (const lap of saved.planned ?? []) session.planned.add(lap);
+    // Stops already made are known: only new ones change the plan.
+    for (const d of saved.decisions) if (d.kind === 'pit') session.offPlan.add(d.lap);
+    // Plans whose grade didn't arrive before the refresh are graded again (identically).
+    const plan = state.plan;
+    const ungraded = [...plan.offered, ...(plan.own ? [plan.own] : [])].filter(
+      (p) => !plan.chances[p.id],
+    );
+    if (ungraded.length) session.gradePlans(ungraded);
     for (const m of moments) {
       const reached = saved.resolved.includes(m.id) || state.currentMoment?.id === m.id;
       if (reached) session.startGrading(m, session.pausedAt(m, saved.decisions));

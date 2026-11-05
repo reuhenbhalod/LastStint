@@ -10,8 +10,8 @@ import { type GradeOption, type MomentGrade, type Target, gradeMoment } from './
 import { type Run, initRun, realDecisions, stepLap, tyreLife } from './sim.js';
 import type { Decision, RaceModel } from './types.js';
 
-/** `takeover`: the race plan when the player takes over (feedback round 2). */
-export type MomentTrigger = 'SC' | 'VSC' | 'rivalPit' | 'undercut' | 'cliff' | 'takeover';
+/** What brought a moment on (the race plan at takeover is the strategy planner's, not a moment). */
+export type MomentTrigger = 'SC' | 'VSC' | 'rivalPit' | 'undercut' | 'cliff';
 
 export interface MomentOption extends GradeOption {
   /** Short label for the UI; radio copy is written in Phase 5. */
@@ -54,7 +54,6 @@ const PRIORITY: Record<MomentTrigger, number> = {
   rivalPit: 2,
   undercut: 3,
   cliff: 4,
-  takeover: 5,
 };
 /** Laps before the rival's real stop at which the undercut window is offered. */
 const UNDERCUT_LEAD = 2;

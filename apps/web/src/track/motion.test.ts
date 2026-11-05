@@ -35,6 +35,8 @@ function run(id: string) {
   const perFrame = line.length / FRAMES;
   const out = {
     fastest: 0,
+    /** The same for cars unlapping themselves (they pass the queue, a lap back in the model). */
+    fastestUnlapping: 0,
     quick: 0,
     frames: 0,
     entries: 0,
@@ -88,7 +90,8 @@ function run(id: string) {
         const q = prev.get(code);
         if (q) {
           const pace = Math.hypot(p.x - q.x, p.y - q.y) / perFrame;
-          out.fastest = Math.max(out.fastest, pace);
+          if (unlapping.has(code)) out.fastestUnlapping = Math.max(out.fastestUnlapping, pace);
+          else out.fastest = Math.max(out.fastest, pace);
           out.frames++;
           if (pace > 2.5 && !unlapping.has(code)) out.quick++;
           if (!q.lane && p.lane) {
@@ -127,6 +130,7 @@ describe('the map’s motion', () => {
     // after its in-lap (the rival covering you) hops into the lane. A car flying round the
     // lap would be 10x and more, frame after frame.
     expect(r.fastest).toBeLessThan(6);
+    expect(r.fastestUnlapping).toBeLessThan(8);
     expect(r.quick / r.frames).toBeLessThan(0.0005);
     expect(r.entries).toBeGreaterThan(5);
     expect(r.exits).toBeGreaterThanOrEqual(r.entries - 2); // a stop or two in the lane at the flag

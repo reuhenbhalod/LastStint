@@ -5,13 +5,19 @@ import { GameSession } from './session.js';
 
 const daily = () => new StaticDailyProvider().today();
 
+/** Off the daily card with the engineer's first plan (at Abu Dhabi: no stop, standard pace). */
+function begin(session: GameSession, plan: 'a' | 'b' | 'c' = 'a'): void {
+  session.start();
+  session.pickPlan(plan);
+}
+
 function answer(session: GameSession): void {
   const moment = session.state.currentMoment;
   if (moment) session.choose(moment.realOptionId ?? (moment.options[0]?.id as string));
 }
 
 function autoplay(session: GameSession, maxSteps = 300): void {
-  session.start();
+  begin(session);
   for (let i = 0; i < maxSteps && session.state.phase !== 'finished'; i++) {
     if (session.state.phase === 'decision') answer(session);
     else if (session.state.phase === 'racing') session.tick();
@@ -37,7 +43,7 @@ describe('GameSession', () => {
     session.finish({ status: 'practice' });
     expect(session.state.phase).toBe('results');
     expect(session.state.result?.finishers).toContain('HAM');
-    expect(Object.keys(session.state.grades)).toHaveLength(7);
+    expect(Object.keys(session.state.grades)).toHaveLength(6);
   });
 
   it('submits a run the server accepts and scores exactly as full grading does', async () => {
@@ -55,7 +61,7 @@ describe('GameSession', () => {
   it('does not ask for a stop again right after one (and the server accepts it)', async () => {
     const today = await daily();
     const session = new GameSession(today);
-    session.start();
+    begin(session);
     const asked: string[] = [];
     for (let i = 0; i < 300 && session.state.phase !== 'finished'; i++) {
       const m = session.state.currentMoment;
@@ -80,7 +86,7 @@ describe('GameSession', () => {
   it('boxes on the lap called, one stop at a time, never on the last lap', async () => {
     const today = await daily();
     const session = new GameSession(today);
-    session.start();
+    begin(session);
     if (session.state.phase === 'decision') answer(session);
     const lap = session.state.race.lap;
     // A BOX for the lap being shown: the stop is charged on the lap after it.
@@ -106,7 +112,7 @@ describe('GameSession', () => {
   it('does not ask about a stop already booked (Abu Dhabi: box on the radio, then the SC call)', async () => {
     const today = await daily();
     const session = new GameSession(today);
-    session.start();
+    begin(session);
     const asked: string[] = [];
     let booked = false;
     for (let i = 0; i < 300 && session.state.phase !== 'finished'; i++) {
@@ -142,7 +148,7 @@ describe('GameSession', () => {
     let checked = 0;
     for (let seed = 1; seed < 60 && checked < 5; seed++) {
       const s = new GameSession({ ...today, seed });
-      s.start();
+      begin(s);
       for (let i = 0; i < 200 && s.state.phase !== 'finished'; i++) {
         if (s.state.phase === 'decision') {
           answer(s);
@@ -191,7 +197,7 @@ describe('GameSession', () => {
 
   it('pauses at a moment and never re-pauses on it after a choice', async () => {
     const session = new GameSession(await daily());
-    session.start();
+    begin(session);
     for (let i = 0; i < 100 && session.state.phase === 'racing'; i++) session.tick();
     expect(session.state.phase).toBe('decision');
     const moment = session.state.currentMoment;
@@ -205,7 +211,7 @@ describe('GameSession', () => {
 
   it('resumes to the same lap, decisions and order after a refresh', async () => {
     const session = new GameSession(await daily());
-    session.start();
+    begin(session);
     for (let i = 0; i < 100 && session.state.phase === 'racing'; i++) session.tick();
     answer(session); // resolve the first moment
     for (let i = 0; i < 3 && session.state.phase === 'racing'; i++) session.tick();
@@ -226,7 +232,7 @@ describe('GameSession', () => {
 
   it('re-grades a moment missing from the save, identically', async () => {
     const session = new GameSession(await daily());
-    session.start();
+    begin(session);
     for (let i = 0; i < 100 && session.state.phase === 'racing'; i++) session.tick();
     answer(session);
     await session.allGraded();
@@ -244,7 +250,7 @@ describe('GameSession', () => {
 
   it('drops refused live calls from the log and keeps accepted ones', async () => {
     const session = new GameSession(await daily());
-    session.start();
+    begin(session);
     let refused = 0;
     let accepted = 0;
     for (let i = 0; i < 300 && session.state.phase !== 'finished'; i++) {
@@ -277,5 +283,112 @@ describe('GameSession', () => {
     }
     expect(refused).toBeGreaterThan(0);
     expect(accepted).toBeGreaterThan(refused);
+  });
+});
+
+describe('the race plan (strategy planner spec)', () => {
+  const ID = '11111111-1111-4111-8111-111111111111';
+  const own = (lap: number) => ({
+    id: 'own' as const,
+    stops: [{ lap, compound: 'SOFT' }],
+    pace: ['standard' as const, 'push' as const],
+  });
+
+  /** Race on from wherever the session is, answering moments with the real call. */
+  function playOn(session: GameSession, until = Number.POSITIVE_INFINITY): void {
+    for (let i = 0; i < 300 && session.state.phase !== 'finished'; i++) {
+      if (session.state.race.lap >= until) return;
+      if (session.state.phase === 'decision') answer(session);
+      else session.tick();
+    }
+  }
+
+  it('waits for a plan, logs it, and makes its calls on their laps', async () => {
+    const today = await daily();
+    const session = new GameSession(today);
+    session.start();
+    expect(session.state.phase).toBe('planning');
+    expect(session.state.plan.offered.map((p) => p.id)).toEqual(['a', 'b', 'c']);
+    session.tick();
+    expect(session.state.race.lap).toBe(today.model.race.takeoverLap);
+    const b = session.state.plan.offered[1];
+    session.pickPlan('b');
+    expect(session.state.phase).not.toBe('planning');
+    expect(session.state.decisions[0]).toMatchObject({ kind: 'plan', id: 'b' });
+    playOn(session);
+    const stops = session.state.decisions.filter((d) => d.kind === 'pit');
+    expect(stops.map((d) => d.lap)).toEqual(b?.stops.map((s) => s.lap));
+    const body = await session.submission(ID);
+    const wire = JSON.parse(JSON.stringify(body));
+    const live = verifyRun(today.model, today.seed, wire.decisions, undefined, wire.grades);
+    const full = verifyRun(today.model, today.seed, body.decisions);
+    expect(live).toEqual(full);
+    expect(full.plan?.chosen).toBe('b');
+    expect(session.localScore()).toEqual(full.score);
+  });
+
+  it('grades the player’s own plan beside the engineer’s, and the server agrees', async () => {
+    const today = await daily();
+    const session = new GameSession(today);
+    session.start();
+    expect(session.buildPlan(own(45))).toBe(true);
+    expect(session.buildPlan({ ...own(45), pace: ['standard'] })).toBe(false);
+    await session.allGraded();
+    expect(session.state.plan.chances.own).toBeDefined();
+    session.pickPlan('own');
+    playOn(session);
+    expect(session.state.decisions.some((d) => d.kind === 'pit' && d.lap === 45)).toBe(true);
+    const body = await session.submission(ID);
+    const live = verifyRun(today.model, today.seed, body.decisions, undefined, body.grades);
+    expect(live).toEqual(verifyRun(today.model, today.seed, body.decisions));
+    expect(live.plan?.grade.options.map((o) => o.id)).toEqual(['a', 'b', 'c', 'own']);
+  });
+
+  it('a stop off the plan takes out the planned stop it replaced', async () => {
+    const session = new GameSession(await daily());
+    session.start();
+    session.buildPlan(own(45));
+    session.pickPlan('own');
+    playOn(session, 41);
+    while (session.state.phase === 'decision') answer(session);
+    // Answered (the driver follows it): a refusal isn't what this checks.
+    session.call({ lap: 43, kind: 'pit', compound: 'HARD' }, { asked: true });
+    expect(session.state.decisions.some((d) => d.kind === 'pit' && d.lap === 43)).toBe(true);
+    playOn(session);
+    expect(session.state.plan.active?.stops).toEqual([]);
+    const stops = session.state.decisions.filter((d) => d.kind === 'pit').map((d) => d.lap);
+    expect(stops).toEqual([43]);
+  });
+
+  it('stays out one more lap when asked', async () => {
+    const session = new GameSession(await daily());
+    session.start();
+    session.buildPlan(own(45));
+    session.pickPlan('own');
+    playOn(session, 43);
+    expect(session.delayPlannedStop(45)).toBe(true);
+    playOn(session);
+    const stops = session.state.decisions.filter((d) => d.kind === 'pit').map((d) => d.lap);
+    expect(stops).toEqual([46]);
+  });
+
+  it('keeps the plan through a refresh', async () => {
+    const today = await daily();
+    const session = new GameSession(today);
+    session.start();
+    session.buildPlan(own(45));
+    await session.allGraded();
+    session.pickPlan('own');
+    playOn(session, 40);
+    const resumed = GameSession.restore(today, JSON.parse(JSON.stringify(session.persist())));
+    expect(resumed?.state.plan.active).toEqual(session.state.plan.active);
+    if (!resumed) throw new Error('no resume');
+    playOn(resumed);
+    const stops = resumed.state.decisions.filter((d) => d.kind === 'pit').map((d) => d.lap);
+    expect(stops).toEqual([45]);
+    const body = await resumed.submission(ID);
+    expect(() =>
+      verifyRun(today.model, today.seed, body.decisions, undefined, body.grades),
+    ).not.toThrow();
   });
 });

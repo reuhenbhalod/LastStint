@@ -59,17 +59,7 @@ export function briefFor(moment: DecisionMoment, race: RaceState, model: RaceMod
 
   let kind: string;
   let headline: string;
-  if (moment.trigger === 'takeover') {
-    kind = 'Race plan';
-    const lead =
-      gap === null
-        ? ''
-        : gap >= 0
-          ? ` We lead ${r} by ${gap.toFixed(1)}s`
-          : ` ${r} leads us by ${(-gap).toFixed(1)}s`;
-    const tyre = me ? `, on ${me.tyreAge}-lap-old ${tyres(me.compound)}` : '';
-    headline = `You have the pit wall, ${model.race.laps - race.lap} laps to go.${lead}${tyre}. What’s the plan?`;
-  } else if (only('battle') && flag) {
+  if (only('battle') && flag) {
     kind = 'Restart';
     headline =
       gap === null || gap >= 0
