@@ -16,6 +16,7 @@ import {
 } from '@boxthislap/sim';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BattleCard, type BattleStage } from '../components/BattleCard.js';
+import { Brand } from '../components/Brand.js';
 import { CarStats } from '../components/CarStats.js';
 import { DecisionPanel } from '../components/DecisionPanel.js';
 import { DriverCard } from '../components/DriverCard.js';
@@ -585,18 +586,19 @@ export function RaceScreen({
             title="Home (the race waits for you)"
             className="disp wide shrink-0 text-[18px] leading-none hover:text-[var(--you)]"
           >
-            Pit Wall
+            <Brand />
           </button>
           {team && (
             <span className="disp hidden truncate text-[18px] leading-none text-[var(--you)] sm:inline">
-              {team} race engineer
+              {surname(userSide)}’s race engineer
+              <span className="text-[var(--muted)]"> · {team}</span>
             </span>
           )}
         </span>
         <span className="flex min-w-0 items-center gap-2">
           {source === 'survivor' && (
             <span className="shrink-0 rounded-full bg-[var(--box)] px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-white">
-              Survivor · round {number}
+              Gauntlet · round {number}
             </span>
           )}
           {source === 'practice' && (
@@ -609,7 +611,7 @@ export function RaceScreen({
           )}
           <span className="eyebrow hidden min-w-0 truncate 2xl:inline">
             {source === 'survivor'
-              ? 'Survivor'
+              ? 'Gauntlet'
               : number
                 ? `Daily #${number}`
                 : (state.meta.practiceReason ?? 'Practice')}{' '}

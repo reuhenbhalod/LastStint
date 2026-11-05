@@ -16,7 +16,8 @@ import { Survivor } from './screens/Survivor.js';
 
 export function App() {
   if (location.pathname.startsWith('/admin')) return <AdminPage />;
-  if (location.pathname.startsWith('/survivor')) return <Survivor />;
+  if (location.pathname.startsWith('/gauntlet') || location.pathname.startsWith('/survivor'))
+    return <Survivor />;
   return <Game />;
 }
 

@@ -38,11 +38,11 @@ test('survivor: start a run, win round 1, get round 2', async ({ page }) => {
     return route.fulfill({ status: 404, json: { error: 'not-found' } });
   });
 
-  await page.goto('/survivor');
-  await expect(page.getByRole('heading', { name: 'Survivor' })).toBeVisible();
+  await page.goto('/gauntlet');
+  await expect(page.getByRole('heading', { name: 'Gauntlet' })).toBeVisible();
   await expect(page.getByText('No runs yet')).toBeVisible();
   await page.getByRole('button', { name: /Start a run/ }).click();
-  await expect(page.getByText(/Survivor · round 1/)).toBeVisible();
+  await expect(page.getByText(/Gauntlet · round 1/)).toBeVisible();
   await page.getByRole('button', { name: /Start round 1/ }).click();
 
   // Answer every big call with its first choice until the race is over.

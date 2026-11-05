@@ -9,6 +9,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { takeHowToPending } from '../account/howTo.js';
 import type { AccountState } from '../account/useAccount.js';
 import { AccountBar } from '../components/AccountBar.js';
+import { Brand } from '../components/Brand.js';
 import { Disclaimer } from '../components/Disclaimer.js';
 import { HeadsetIcon, OvertakeIcon, TyreIcon } from '../components/Icons.js';
 import { TyreBadge } from '../components/TyreBadge.js';
@@ -229,16 +230,16 @@ export function IntroCard({
       <header className="relative z-10 border-b border-[var(--rule)] bg-[var(--paper)]/80 backdrop-blur">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
           <a href="/" className="flex items-baseline gap-2">
-            <span className="disp wide text-[20px] leading-none">Pit Wall</span>
+            <Brand className="text-[20px]" />
             <span className="eyebrow hidden sm:inline">Daily race strategy</span>
           </a>
           <span className="flex flex-wrap items-center gap-2">
             {source !== 'survivor' && (
               <a
-                href="/survivor"
+                href="/gauntlet"
                 className="rounded-full border border-[var(--box)] px-3 py-1 text-[13px] font-semibold text-[var(--ink)] hover:bg-[color-mix(in_srgb,var(--box)_14%,transparent)]"
               >
-                Survivor
+                Gauntlet
               </a>
             )}
             {account && <AccountBar account={account} compact />}
@@ -270,7 +271,7 @@ export function IntroCard({
               <p className="eyebrow m-0 flex items-center gap-2 !text-[var(--you)]">
                 <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-[var(--you)]" />
                 {source === 'survivor'
-                  ? `Survivor · round ${number}`
+                  ? `Gauntlet · round ${number}`
                   : number
                     ? `Daily race #${number}`
                     : 'Daily race'}{' '}

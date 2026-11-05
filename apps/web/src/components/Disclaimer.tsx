@@ -4,6 +4,8 @@
 // aren't associated with it either. The brand and what the game is on one side, the notice on
 // the other (stacked on a phone).
 
+import { Brand } from './Brand.js';
+
 export function Disclaimer({
   className = '',
   compact = false,
@@ -22,7 +24,7 @@ export function Disclaimer({
         }
       >
         <div className="flex flex-col gap-2">
-          <span className="disp wide text-[18px] leading-none">Pit Wall</span>
+          <Brand className="text-[18px]" />
           <p className="m-0 max-w-xs text-[13px] leading-relaxed text-[var(--muted)]">
             A fan-made race-strategy game. Take the pit wall in a real race, one a day.
           </p>
@@ -38,7 +40,7 @@ export function Disclaimer({
             and related marks are trade marks of Formula One Licensing B.V.
           </p>
           <p className="m-0">
-            Pit Wall isn’t endorsed by or associated with the FIA, any team or any driver. Team and
+            LastStint isn’t endorsed by or associated with the FIA, any team or any driver. Team and
             driver names are used only to describe the real races, and team names and colours belong
             to their owners.
           </p>

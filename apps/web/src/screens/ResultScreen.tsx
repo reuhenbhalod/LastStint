@@ -6,6 +6,7 @@ import { type Band, type DecisionMoment, bandFor } from '@boxthislap/sim';
 import { useEffect, useState } from 'react';
 import type { AccountState } from '../account/useAccount.js';
 import { AccountBar } from '../components/AccountBar.js';
+import { Brand } from '../components/Brand.js';
 import { Disclaimer } from '../components/Disclaimer.js';
 import { DriverDebrief } from '../components/DriverDebrief.js';
 import { BandChip } from '../components/Icons.js';
@@ -98,7 +99,7 @@ export function shareLine(
   percentile: number | null,
 ): string {
   const squares = calls.map((c) => BAND[c.band].square).join('');
-  const head = number ? `Pit Wall #${number}` : 'Pit Wall (practice)';
+  const head = number ? `LastStint #${number}` : 'LastStint (practice)';
   const tail = percentile !== null ? ` P${percentile}` : '';
   return `${head} ${won ? 'WIN ' : ''}${squares}${tail}`;
 }
@@ -266,7 +267,7 @@ export function ResultScreen({
             onClick={onHome}
             className="disp wide text-[18px] leading-none hover:text-[var(--you)]"
           >
-            Pit Wall
+            <Brand />
           </button>
           <span className="eyebrow">{number ? `Daily #${number}` : 'Practice run'}</span>
         </p>
@@ -423,10 +424,10 @@ export function ResultScreen({
         </details>
 
         <a
-          href="/survivor"
+          href="/gauntlet"
           className="flex flex-col items-center gap-1 rounded-xl border-2 border-[var(--box)] px-4 py-4 text-center hover:bg-[color-mix(in_srgb,var(--box)_12%,transparent)]"
         >
-          <span className="disp text-[20px] leading-none">Keep racing: Survivor</span>
+          <span className="disp text-[20px] leading-none">Keep racing: Gauntlet</span>
           <span className="text-[13px] text-[var(--muted)]">
             Different races back to back until you lose one
           </span>

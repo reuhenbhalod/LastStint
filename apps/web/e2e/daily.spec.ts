@@ -59,13 +59,13 @@ test('plays the Abu Dhabi daily end to end', async ({ page, context }) => {
   await expect(page.getByText('Your calls')).toBeVisible({ timeout: 60_000 });
   expect(submitted()).not.toBeNull();
   await expect(page.getByText('2/3')).toBeVisible(); // the server's rank
-  await expect(page.getByText(/Pit Wall #1 .*P50/)).toBeVisible();
+  await expect(page.getByText(/LastStint #1 .*P50/)).toBeVisible();
   if (shots) await page.screenshot({ path: `${shots}/4-results.png`, fullPage: true });
   await page.getByRole('button', { name: 'Share result' }).click();
   await expect(page.getByRole('button', { name: 'Copied!' })).toBeVisible();
 
   // The Pit Wall brand goes home; from there, back to the result.
-  await page.getByRole('button', { name: 'Pit Wall', exact: true }).click();
+  await page.getByRole('button', { name: 'LastStint', exact: true }).click();
   await page.getByRole('button', { name: /See your result/ }).click();
   await expect(page.getByText('Your calls')).toBeVisible();
 });
