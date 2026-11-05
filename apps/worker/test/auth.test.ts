@@ -108,9 +108,14 @@ describe('POST /api/auth/google + GET /api/players/:anonId', () => {
       name: 'Test Driver',
       email: 'driver@example.com',
       admin: false,
+      created: true, // a new account: the game shows how to play once
     });
-    const second = (await (await signIn(await idToken({}), ids.b)).json()) as { playerId: string };
+    const second = (await (await signIn(await idToken({}), ids.b)).json()) as {
+      playerId: string;
+      created: boolean;
+    };
     expect(second.playerId).toBe(ids.a);
+    expect(second.created).toBe(false); // signing in again: no walkthrough
     const me = await (await get(`/api/players/${ids.b}?today=${today()}`)).json();
     expect(me).toMatchObject({ account: { playerId: ids.a, name: 'Test Driver' } });
   });

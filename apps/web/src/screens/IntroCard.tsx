@@ -5,7 +5,8 @@
 // fresh visit; coming back mid-race (the Pit Wall brand), Start becomes "Back to the race".
 
 import type { RaceModel } from '@boxthislap/sim';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { takeHowToPending } from '../account/howTo.js';
 import type { AccountState } from '../account/useAccount.js';
 import { AccountBar } from '../components/AccountBar.js';
 import { Disclaimer } from '../components/Disclaimer.js';
@@ -184,8 +185,20 @@ export function IntroCard({
   resume?: string;
 }) {
   const { userSide, rival, takeoverLap, totalLaps, number, source, practiceReason } = state.meta;
-  // The walkthrough opens with the daily card, not when coming back mid-race.
-  const [howTo, setHowTo] = useState(!resume);
+  // The walkthrough opens with the daily card on its own for a signed-out player, and for a
+  // signed-in one only the first time after the account is created (account/howTo.ts); never
+  // when coming back mid-race. It waits for the account lookup, so a signed-in player doesn't
+  // see it flash open. Without an account system (tests), it opens as before.
+  const [howTo, setHowTo] = useState(!resume && !account);
+  const signedIn = account?.player?.account?.playerId ?? null;
+  const decided = useRef<string | null>(null);
+  useEffect(() => {
+    if (resume || !account?.loaded) return;
+    const who = signedIn ?? 'signed-out';
+    if (decided.current === who) return;
+    decided.current = who;
+    if (!signedIn || takeHowToPending(signedIn)) setHowTo(true);
+  }, [account?.loaded, signedIn, resume]);
   const lapsLeft = totalLaps - takeoverLap;
   const userTeam = model.drivers.find((d) => d.code === userSide)?.team;
   const rivalTeam = model.drivers.find((d) => d.code === rival)?.team;

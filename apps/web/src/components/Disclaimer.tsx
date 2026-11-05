@@ -24,7 +24,7 @@ export function Disclaimer({
         <div className="flex flex-col gap-2">
           <span className="disp wide text-[18px] leading-none">Pit Wall</span>
           <p className="m-0 max-w-xs text-[13px] leading-relaxed text-[var(--muted)]">
-            A fan-made race-strategy game. Real races, your calls from the pit wall, one a day.
+            A fan-made race-strategy game. Take the pit wall in a real race, one a day.
           </p>
           <span className="mt-1 w-fit rounded-full border border-[var(--rule)] px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--muted)]">
             Unofficial fan game

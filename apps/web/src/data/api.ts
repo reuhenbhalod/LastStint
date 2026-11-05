@@ -79,6 +79,8 @@ export interface Account {
   email: string;
   /** On the admin list: the Admin button shows. */
   admin?: boolean;
+  /** Sign-in only: the account was created just now. */
+  created?: boolean;
 }
 
 export interface PlayerResponse {
