@@ -6,7 +6,7 @@
 // (game/guide.ts). Number keys pick options. On a phone it rises as a bottom sheet over the
 // map so the call is always in reach.
 
-import type { DecisionMoment, RaceModel, RaceState } from '@boxthislap/sim';
+import { type DecisionMoment, type RaceModel, type RaceState, tyreLife } from '@boxthislap/sim';
 import { Fragment, useEffect, useRef, useState } from 'react';
 import { briefFor } from '../game/brief.js';
 import { choicesFor, tyreName } from '../game/choices.js';
@@ -76,7 +76,8 @@ export function DecisionPanel({
   const oldTyres = me
     ? `${me.tyreAge}-lap-old ${tyreName(me.compound).toLowerCase()}`
     : 'Current set';
-  const worn = !!me && me.tyreWear >= (model.compounds[me.compound]?.cliffLap ?? 99);
+  const tyre = me ? model.compounds[me.compound] : undefined;
+  const worn = !!me && !!tyre && me.tyreWear >= tyreLife(tyre);
   const top: Array<{
     id: string;
     label: string;

@@ -7,7 +7,7 @@
 // still picks the final 2-4 (plan 1.5); approved moments go in data/moments/<race>.json.
 
 import { type GradeOption, type MomentGrade, type Target, gradeMoment } from './grade.js';
-import { type Run, initRun, realDecisions, stepLap } from './sim.js';
+import { type Run, initRun, realDecisions, stepLap, tyreLife } from './sim.js';
 import type { Decision, RaceModel } from './types.js';
 
 /** `takeover`: the race plan when the player takes over (feedback round 2). */
@@ -123,7 +123,8 @@ export function candidateMoments(model: RaceModel, target = DEFAULT_TARGET): Dec
     while (run.state.lap < last) {
       const car = run.state.cars[model.userSide];
       const c = car ? model.compounds[car.compound] : undefined;
-      if (car && c && c.cliffLap < model.race.laps && car.tyreWear >= c.cliffLap - CLIFF_LEAD) {
+      const life = c ? tyreLife(c) : Number.POSITIVE_INFINITY;
+      if (car && c && life < model.race.laps && car.tyreWear >= life - CLIFF_LEAD) {
         found.push({ lap: run.state.lap + 1, trigger: 'cliff' });
         break;
       }

@@ -51,8 +51,7 @@
     "SOFT": {
       "offset": 0.0,
       "degPerLap": 0.0888,
-      "cliffLap": 4,
-      "cliffDegPerLap": 0.0702
+      "cliffLap": 25
     },
     "MEDIUM": {
       "offset": 0.4464,
@@ -285,7 +284,7 @@
     {
       "code": "MAG",
       "team": "Haas F1 Team",
-      "basePace": 90.2256,
+      "basePace": 90.522,
       "noise": 0.4613,
       "stateAtTakeover": {
         "position": 9,
@@ -300,7 +299,7 @@
         {
           "lap": 13,
           "to": "HARD",
-          "loss": 25.31
+          "loss": 24.717
         },
         {
           "lap": 30,

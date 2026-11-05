@@ -1,3 +1,4 @@
+import { tyreLife } from '@boxthislap/sim';
 import { describe, expect, it } from 'vitest';
 import { StaticDailyProvider } from '../data/provider.js';
 import { GameEngine } from '../engine/engine.js';
@@ -12,7 +13,8 @@ describe('tyre guide', () => {
     const [soft, medium, hard] = tyreOutlooks(model, ham, 53, ['SOFT', 'MEDIUM', 'HARD']);
     expect(soft?.newPace).toBe(0);
     expect(medium?.newPace).toBeCloseTo(model.compounds.MEDIUM?.offset as number);
-    expect(hard?.dropOff).toBe(model.compounds.HARD?.cliffLap);
+    // Its usable life, not the fitted cliff.
+    expect(hard?.dropOff).toBe(tyreLife(model.compounds.HARD as never));
     expect(soft?.toFlag).toBe(true); // 5 laps left
     // Fresh tyres beat 30-lap-old hards over the last laps, softs most of all.
     expect(soft?.gain).toBeGreaterThan(0);

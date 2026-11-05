@@ -21,6 +21,7 @@ export {
   realDecisions,
   rivalCover,
   ruleSatisfied,
+  tyreLife,
   simulate,
   stepLap,
   teammateOf,

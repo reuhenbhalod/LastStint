@@ -89,3 +89,5 @@ Nov 3, 2026 · Branch `survivor`. A second game mode, separate from the daily: r
 - An e2e test plays a round.
 
 **Driver data:** Pietro Fittipaldi (Abu Dhabi 2020) added to `data/drivers.json` as low attitude, with no researched radio history, like Doohan.
+
+**Update (Nov 5, 2026):** the tyre-life fix re-tuned the survivor seeds. Styria 2021 has no seed left where good play wins, so it left the pool (its moments removed): 18 survivor races.

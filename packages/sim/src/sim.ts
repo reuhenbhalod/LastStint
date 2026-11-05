@@ -26,6 +26,7 @@ import headsetConfig from './headset.json';
 import { type Rng, deriveSeed, mulberry32 } from './rng.js';
 import type {
   CarState,
+  CompoundModel,
   Decision,
   EngineerState,
   FlagState,
@@ -53,6 +54,34 @@ export const SC_GAP_KEEP = 0.34;
 export const SC_FALLBACK = 1.6; // SC lap = this x green if not supplied
 export const VSC_FALLBACK = 1.35; // VSC lap = this x green if not supplied
 export const CLIFF_FALLBACK = 2.0; // extra wear past the cliff = this x degPerLap if not fitted
+/** A tyre is worn out once it's this much slower than new (s/lap): its usable life. */
+export const LIFE_LOSS = 2.0;
+/** Laps of life a rival keeps in hand when it skips a stop to go long. */
+const GO_LONG_MARGIN = 3;
+
+/**
+ * A compound's usable life (tyre-life fix): the tyre age at which its wear and its cliff make it
+ * LIFE_LOSS s a lap slower than new. A fitted cliff is where wear bends upward, often gently
+ * (Canada 22 hards: lap 7, +0.03 s a lap), so it isn't the end of a tyre; this is. With no
+ * fitted cliff, cliffLap is the edge of the evidence (the longest stint run on it) and the life
+ * goes no further. What the game shows as life, and what "worn" means for pushing, punctures,
+ * the rival and requests.
+ */
+export function tyreLife(c: CompoundModel): number {
+  const extra = c.cliffDegPerLap ?? CLIFF_FALLBACK * c.degPerLap;
+  const loss =
+    c.degPerLap * c.cliffLap >= LIFE_LOSS
+      ? LIFE_LOSS / c.degPerLap
+      : (LIFE_LOSS + extra * c.cliffLap) / (c.degPerLap + extra);
+  const life = c.cliffDegPerLap === undefined ? Math.min(loss, c.cliffLap) : loss;
+  return Math.min(99, Math.floor(life));
+}
+
+/** Usable life of `compound` in `model` (Infinity if the race has no model for it). */
+function lifeOf(model: RaceModel, compound: string): number {
+  const c = model.compounds[compound];
+  return c ? tyreLife(c) : Number.POSITIVE_INFINITY;
+}
 export const OVERTAKE_STREAM = 1000;
 export const ERROR_STREAM = 2000;
 export const STOP_STREAM = 4000;
@@ -290,8 +319,7 @@ function defaultModes(car: CarState): boolean {
 function modeLapDelta(run: Run, car: CarState): number {
   if (defaultModes(car)) return 0;
   const pace = effect(run, car, 'pace').lapDelta ?? 0;
-  const cliff = run.model.compounds[car.compound]?.cliffLap;
-  const worn = pace < 0 && cliff !== undefined && car.tyreWear >= cliff;
+  const worn = pace < 0 && car.tyreWear >= lifeOf(run.model, car.compound);
   return (
     (worn ? 0 : pace) +
     (effect(run, car, 'fuel').lapDelta ?? 0) +
@@ -901,8 +929,9 @@ function rivalGoesLong(run: Run, lap: number): void {
   const userCost = stopFlag === 'sc' ? model.track.pitLossUnderSC : model.track.pitLossUnderVSC;
   if (user.totalTime + userCost <= rival.totalTime) return; // staying out wouldn't lead
 
-  const compound = model.compounds[rival.compound];
-  const lapsToCliff = compound ? Math.max(1, Math.floor(compound.cliffLap - rival.tyreWear)) : 1;
+  // A team goes long only with a few laps of life to spare at the flag.
+  const life = lifeOf(model, rival.compound) - GO_LONG_MARGIN;
+  const lapsToCliff = Number.isFinite(life) ? Math.max(1, Math.floor(life - rival.tyreWear)) : 1;
   if (stopLap + lapsToCliff <= model.race.laps) return; // would have to stop later anyway
   const others = rival.strategy.filter((s) => s !== planned);
   // Two-compound rule: going long may not drop the stop that would make the rival comply.
@@ -1211,8 +1240,7 @@ function incidents(run: Run, lap: number, prevTime: Record<string, number>): voi
     const rng = run.rng.get(INCIDENT_STREAM, code);
     const u = rng.next();
     const push = c.modes.pace === 'push';
-    const cliff = model.compounds[c.compound]?.cliffLap ?? Number.POSITIVE_INFINITY;
-    const worn = Math.max(0, c.tyreWear - cliff);
+    const worn = Math.max(0, c.tyreWear - lifeOf(model, c.compound));
     const ahead = i > 0 ? (order[i - 1] as string) : null;
     const behind = order[i + 1];
     const fightAhead =
@@ -1569,9 +1597,8 @@ function engineerAfterLap(
     }
     let wrong: boolean;
     if (r.request === 'box') {
-      const cliff = model.compounds[user.compound]?.cliffLap ?? Number.POSITIVE_INFINITY;
       wrong =
-        user.tyreWear > cliff ||
+        user.tyreWear > lifeOf(model, user.compound) ||
         run.notes.some(
           (n) =>
             n.lap >= r.lap &&

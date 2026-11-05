@@ -23,6 +23,7 @@ import {
   moodOf,
   passProbability,
   ruleSatisfied,
+  tyreLife,
 } from '@boxthislap/sim';
 import { driverInfo } from '../data/drivers.js';
 import { lapTime } from '../track/geometry.js';
@@ -260,7 +261,7 @@ function battleCall(
 function lastingCompound(race: RaceState, model: RaceModel): string {
   const left = model.race.laps - race.lap;
   const byGrip = Object.entries(model.compounds).sort((a, b) => a[1].offset - b[1].offset);
-  const lasts = byGrip.find(([, c]) => c.cliffLap >= left);
+  const lasts = byGrip.find(([, c]) => tyreLife(c) >= left);
   return (lasts ?? byGrip.at(-1))?.[0] ?? race.cars[model.userSide]?.compound ?? 'HARD';
 }
 

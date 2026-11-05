@@ -40,6 +40,53 @@ def longest_stints(laps: pd.DataFrame) -> dict[str, int]:
     return {str(c): int(v) for c, v in known.groupby("Compound")["TyreLife"].max().items()}
 
 
+def stint_counts(laps: pd.DataFrame) -> dict[str, int]:
+    """How many stints were run on each compound in the race (the weight of the evidence)."""
+    known = laps.dropna(subset=["Compound", "Stint"])
+    stints = known[["Driver", "Stint", "Compound"]].drop_duplicates()
+    return {str(c): int(n) for c, n in stints.groupby("Compound").size().items()}
+
+
+# Tyre-life fix: a compound run in fewer stints than this has too little evidence for its own
+# life (Monza 24: one soft stint, 2 laps), so its life comes from the compounds that were run,
+# at these ratios of their longest stints (a soft lasts about 0.4x the longest hard stint...).
+THIN_STINTS = 3
+LIFE_RATIO = {
+    ("SOFT", "MEDIUM"): 0.55,
+    ("SOFT", "HARD"): 0.4,
+    ("MEDIUM", "HARD"): 0.65,
+    ("MEDIUM", "SOFT"): 1.6,
+    ("HARD", "MEDIUM"): 1.5,
+    ("HARD", "SOFT"): 2.2,
+}
+
+
+def life_floor(
+    compound: str, longest: dict[str, int], stints: dict[str, int], total_laps: int
+) -> int | None:
+    """The least life the well-run compounds suggest for `compound`, or None with none to go
+    on. (Teams that only ran a compound briefly chose to: it says nothing of its life.)"""
+    floors = [
+        ratio * longest[other]
+        for (c, other), ratio in LIFE_RATIO.items()
+        if c == compound and stints.get(other, 0) >= THIN_STINTS and other in longest
+    ]
+    return min(total_laps, round(max(floors))) if floors else None
+
+
+def thin_life(
+    compound: str, longest: dict[str, int], stints: dict[str, int], total_laps: int
+) -> int | None:
+    """The life of a thinly-run compound, from the well-run ones (None if it isn't thin, or
+    nothing well-run to go on)."""
+    if stints.get(compound, 0) >= THIN_STINTS:
+        return None
+    floor = life_floor(compound, longest, stints, total_laps)
+    if floor is None:
+        return None
+    return min(total_laps, max(longest.get(compound, 0), floor))
+
+
 def _team_map(laps: pd.DataFrame) -> dict[str, str]:
     teams = laps.dropna(subset=["Team"]).groupby("Driver")["Team"].first()
     return {str(k): str(v) for k, v in teams.items()}
@@ -66,17 +113,33 @@ def assemble_race_model(
     total_laps = int(laps["LapNumber"].max())
     cliffs = fit.compound_cliff
     longest = longest_stints(laps)
+    stints = stint_counts(laps)
 
     compounds = {}
     for compound, offset in fit.compound_offset.items():
         hinge = cliffs.get(compound)
+        thin = thin_life(compound, longest, stints, total_laps)
+        if thin is not None:
+            # Too few stints to trust its own cliff: the life the well-run compounds suggest.
+            compounds[compound] = {
+                "offset": round(offset, 4),
+                "degPerLap": round(fit.compound_wear[compound], 5),
+                "cliffLap": thin,
+            }
+            continue
         compounds[compound] = {
             "offset": round(offset, 4),
             "degPerLap": round(fit.compound_wear[compound], 5),
             # No fitted cliff -> the edge of the evidence: the longest stint seen on this
-            # compound. Past it the sim's fallback wear applies (spec D5), instead of assuming
-            # the tyre never falls off.
-            "cliffLap": int(hinge[0]) if hinge else longest.get(compound, total_laps),
+            # compound, or the life the other compounds suggest if teams only ran it briefly
+            # (tyre-life fix). Past it the sim's fallback wear applies (spec D5), instead of
+            # assuming the tyre never falls off.
+            "cliffLap": int(hinge[0])
+            if hinge
+            else max(
+                longest.get(compound, total_laps),
+                life_floor(compound, longest, stints, total_laps) or 0,
+            ),
             **({"cliffDegPerLap": round(hinge[1], 4)} if hinge else {}),
         }
 

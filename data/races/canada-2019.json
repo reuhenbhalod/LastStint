@@ -48,12 +48,12 @@
     "SOFT": {
       "offset": 0.0,
       "degPerLap": 0.04565,
-      "cliffLap": 19
+      "cliffLap": 26
     },
     "MEDIUM": {
       "offset": 0.4412,
       "degPerLap": 0.0215,
-      "cliffLap": 38
+      "cliffLap": 42
     },
     "HARD": {
       "offset": 0.4412,

@@ -2,7 +2,7 @@
 // against the rival's, the pace trend over the last laps, and the gap. All from the race state
 // and the lap log (game/raceLog.ts); the tyre life from the race model's compound fit.
 
-import type { RaceModel, RaceState } from '@boxthislap/sim';
+import { type RaceModel, type RaceState, tyreLife } from '@boxthislap/sim';
 import { tyreName } from '../game/choices.js';
 import type { LapEvents } from '../game/raceLog.js';
 
@@ -33,7 +33,8 @@ export function CarStats({
     );
   }
   const compound = model.compounds[me.compound];
-  const cliff = compound?.cliffLap ?? 40;
+  // Its usable life (sim tyreLife): laps until it's 2 s a lap slower than new.
+  const cliff = compound ? tyreLife(compound) : 40;
   const left = Math.max(0, Math.round(cliff - me.tyreWear));
   const used = Math.min(1, me.tyreWear / Math.max(1, cliff));
   const tone = left <= 2 ? 'var(--box)' : left <= 6 ? 'var(--flag)' : 'var(--good)';

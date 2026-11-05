@@ -87,3 +87,25 @@ def test_resolved_meta_fills_an_automatic_duel(monkeypatch):
 
 def test_every_race_has_a_split():
     assert {m["split"] for m in build.RACES.values()} == {"tune", "holdout"}
+
+
+def test_a_thinly_run_compound_takes_its_life_from_the_well_run_ones():
+    from pipeline import assemble
+
+    longest = {"SOFT": 2, "MEDIUM": 21, "HARD": 42}
+    stints = {"SOFT": 1, "MEDIUM": 19, "HARD": 30}
+    # Monza 24: one 2-lap soft stint; softs last ~0.4x the longest hard stint (42 -> 17).
+    assert assemble.thin_life("SOFT", longest, stints, 53) == 17
+    # Well-run compounds keep their own fit.
+    assert assemble.thin_life("HARD", longest, stints, 53) is None
+    # Never past the race distance, nor short of what was actually run.
+    assert assemble.thin_life("SOFT", {"SOFT": 30, "HARD": 200}, {"SOFT": 1, "HARD": 9}, 53) == 53
+
+
+def test_the_edge_of_the_evidence_is_not_short_of_what_the_other_compounds_suggest():
+    from pipeline import assemble
+
+    # Mexico 24: three short soft stints (5 laps at most), mediums run 39 laps.
+    longest = {"SOFT": 5, "MEDIUM": 39, "HARD": 49}
+    stints = {"SOFT": 3, "MEDIUM": 21, "HARD": 17}
+    assert assemble.life_floor("SOFT", longest, stints, 71) == 21

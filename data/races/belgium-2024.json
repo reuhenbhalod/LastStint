@@ -66,12 +66,12 @@
     "MEDIUM": {
       "offset": 0.4189,
       "degPerLap": 0.06186,
-      "cliffLap": 32
+      "cliffLap": 44
     },
     "HARD": {
       "offset": 0.4928,
       "degPerLap": 0.03662,
-      "cliffLap": 34
+      "cliffLap": 44
     }
   },
   "drivers": [

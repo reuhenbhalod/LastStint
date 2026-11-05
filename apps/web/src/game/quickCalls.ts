@@ -3,7 +3,13 @@
 // second, old tyres, a big gap). The race keeps running; the answer is an order for the next
 // lap, logged like any live call, so the server's replay matches. Not scored.
 
-import type { Decision, Modes, RaceModel, RaceState } from '@boxthislap/sim';
+import {
+  type Decision,
+  type Modes,
+  type RaceModel,
+  type RaceState,
+  tyreLife,
+} from '@boxthislap/sim';
 import { flagOn } from '../track/geometry.js';
 import type { LapEvents } from './raceLog.js';
 import type { LiveCall } from './refusal.js';
@@ -126,7 +132,9 @@ export function quickCallAt(race: RaceState, model: RaceModel, log: LapEvents[])
   const next = race.lap + 1;
   const m = me.modes;
   const gap = them && !them.retired ? them.totalTime - me.totalTime : null; // > 0: we lead
-  const cliff = model.compounds[me.compound as keyof typeof model.compounds]?.cliffLap ?? 99;
+  // Its usable life (sim tyreLife), not the fitted cliff (often a gentle bend early on).
+  const tyre = model.compounds[me.compound as keyof typeof model.compounds];
+  const cliff = tyre ? tyreLife(tyre) : 99;
   const quicker = them ? paceDiff(log, us, r) : null;
   const lapsLeft = model.race.laps - race.lap;
 
@@ -233,7 +241,7 @@ export function safetyCarCall(
   if (model.decisionMoments.some((m) => m.lap === next)) return null;
   const left = model.race.laps - race.lap;
   const byGrip = Object.entries(model.compounds).sort((a, b) => a[1].offset - b[1].offset);
-  const lasts = byGrip.find(([, c]) => c.cliffLap >= left);
+  const lasts = byGrip.find(([, c]) => tyreLife(c) >= left);
   const compound = (lasts ?? byGrip.at(-1))?.[0] ?? me.compound;
   const name = flag === 'sc' ? 'Safety car' : 'Virtual safety car';
   return {

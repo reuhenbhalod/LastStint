@@ -77,6 +77,14 @@ Beta feedback round 2, part B (Nov 2, 2026):
     - A big stop moment stays out for you if a stop is booked or was made in the last 5 laps ("We're boxing already").
     - A stop picked in answer to a question is never refused.
     - A team-radio BOX clears a stop question already on screen.
+- **Tyre life (Nov 5, localhost only):** a compound's life is now `tyreLife` in the sim.
+  - **Before:** the fitted cliff stood in for life, and is often a gentle bend early on (Canada 22 hards: lap 7), so the game showed "hards done in 7 laps".
+  - **The rule:** laps until the tyre is 2 s a lap slower than new (calibrated on 96 well-run compounds: the median life equals the longest real stint). With no fitted cliff, no further than the edge of the evidence.
+  - **Used for:** the display, the engineer's calls, and "worn" in the race model (pushing, punctures, the rival going long with 3 laps in hand, the driver's box request).
+  - **The data:** a compound run in under 3 stints, or only briefly, gets its life from the well-run compounds (e.g. softs at least 0.4x the longest hard stint), so Monza 24 softs go from 2 laps to 17.
+  - **Checks:** every pool race still passes G1 with unchanged gap errors; 18/19 daily seeds pass (Bahrain 22 back in band, Abu Dhabi 21 the known exception); survivor seeds re-tuned.
+  - **Styria 2021** left the survivor pool: no setup lets good play win any more. 18 survivor races.
+  - **At merge:** the race files changed, so scheduled dailies need re-pinning.
 - **Team colours and safety-car causes (Nov 4, localhost only):**
   - **Team colours (`game/teamTheme.ts`):** each race is shown in your driver's team colour: Ferrari red, McLaren papaya, Red Bull blue and so on.
     - It covers your car, the header stripe, buttons, the home page and the timing tower.

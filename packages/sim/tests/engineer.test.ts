@@ -14,6 +14,7 @@ import {
   initRun,
   isFinished,
   stepLap,
+  tyreLife,
   validateDecisions,
 } from '../src/sim.js';
 import type { BattleMove, Decision, RaceModel } from '../src/types.js';
@@ -26,9 +27,15 @@ const cfg = engineerConfig(abu) as NonNullable<ReturnType<typeof engineerConfig>
  * battle window, or null. */
 function toBattle(model: RaceModel, seed: number, side: 'ahead' | 'behind'): Run | null {
   const run = initRun(model, seed, { decisions: [] });
+  // A real fight: within DRS range (the engineer asks from further back too).
+  const drs = { ...cfg, battleWindow: 1.0 };
   while (!isFinished(run) && run.state.lap < model.race.laps - 2) {
-    const b = battlesFor(run.state, model, cfg)[side];
-    if (b && run.state.nextFlag === 'green' && run.state.flag === 'green') return run;
+    const b = battlesFor(run.state, model, drs)[side];
+    // ...on tyres in the first half of their life (with no calls the player never stops, and
+    // on worn tyres no move gets by).
+    const me = run.state.cars[model.userSide];
+    const fresh = !!me && me.tyreWear < 0.5 * tyreLife(model.compounds[me.compound] as never);
+    if (b && fresh && run.state.nextFlag === 'green' && run.state.flag === 'green') return run;
     stepLap(run);
   }
   return null;
@@ -41,7 +48,7 @@ function aheadShare(model: RaceModel, side: 'ahead' | 'behind', move: BattleMove
   for (let seed = 1; laps < n && seed < 2000; seed++) {
     const run = toBattle(model, seed, side);
     if (!run) continue;
-    const other = battlesFor(run.state, model, cfg)[side]?.code as string;
+    const other = battlesFor(run.state, model, { ...cfg, battleWindow: 1.0 })[side]?.code as string;
     const lap = run.state.lap + 1;
     const calls: Decision[] = move ? [{ lap, kind: 'battle', move }] : [];
     const fork = forkRun(run, seed * 7 + 3, calls);
@@ -150,12 +157,14 @@ describe('race engineer', () => {
     expect(rogue).toBe(true);
   });
 
-  it('judges a refused request: tyres past the cliff prove him right', () => {
+  it('judges a refused request: tyres past their life prove him right', () => {
     const run = initRun(abu, 5, { decisions: [] });
     while (run.state.lap < 50) stepLap(run);
     const lap = run.state.lap + 1;
+    // HAM's tyres worn past their usable life (tyreLife).
+    const ham = run.state.cars.HAM as NonNullable<(typeof run.state.cars)['HAM']>;
+    ham.tyreWear = 60;
     const fork = forkRun(run, 9, [{ lap, kind: 'reply', request: 'box', yes: false }]);
-    // HAM's hards from lap 14 are far past their cliff by now.
     for (let i = 0; i < 3; i++) stepLap(fork);
     const verdict = fork.notes.find((n) => n.kind === 'trust' && n.detail?.startsWith('request'));
     expect(verdict?.detail).toBe('request-wrong');
