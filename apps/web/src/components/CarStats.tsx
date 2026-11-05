@@ -3,6 +3,7 @@
 // and the lap log (game/raceLog.ts); the tyre life from the race model's compound fit.
 
 import { type RaceModel, type RaceState, tyreLife } from '@boxthislap/sim';
+import { surname } from '../data/names.js';
 import { tyreName } from '../game/choices.js';
 import type { LapEvents } from '../game/raceLog.js';
 
@@ -28,7 +29,9 @@ export function CarStats({
     return (
       <section aria-label="Car stats" className="card">
         <span className="eyebrow">Car</span>
-        <p className="m-0 text-[14px] text-[var(--muted)]">{userSide} is out of the race.</p>
+        <p className="m-0 text-[14px] text-[var(--muted)]">
+          {surname(userSide)} is out of the race.
+        </p>
       </section>
     );
   }
@@ -54,7 +57,7 @@ export function CarStats({
 
   return (
     <section aria-label="Car stats" className="card flex flex-col gap-3">
-      <span className="eyebrow">Car · {userSide}</span>
+      <span className="eyebrow">Car · {surname(userSide)}</span>
       <div className="flex flex-col gap-1.5">
         <div className="flex items-baseline justify-between">
           <span className="text-[13px] font-semibold">
@@ -77,7 +80,7 @@ export function CarStats({
           <dd className="m-0 mono text-[14px] font-semibold">{mine ? lapClock(mine) : '-'}</dd>
         </div>
         <div>
-          <dt className="eyebrow">{rival} last</dt>
+          <dt className="eyebrow">{surname(rival)} last</dt>
           <dd className="m-0 mono text-[14px] font-semibold">{theirs ? lapClock(theirs) : '-'}</dd>
         </div>
         <div>
@@ -112,10 +115,10 @@ export function CarStats({
       {trend !== null && (
         <p className="m-0 text-center text-[13px] text-[var(--muted)]">
           {Math.abs(trend) < 0.05
-            ? `Same pace as ${rival} over the last laps`
+            ? `Same pace as ${surname(rival)} over the last laps`
             : trend < 0
-              ? `${secs(trend)} a lap quicker than ${rival} lately`
-              : `${secs(trend)} a lap slower than ${rival} lately`}
+              ? `${secs(trend)} a lap quicker than ${surname(rival)} lately`
+              : `${secs(trend)} a lap slower than ${surname(rival)} lately`}
         </p>
       )}
     </section>

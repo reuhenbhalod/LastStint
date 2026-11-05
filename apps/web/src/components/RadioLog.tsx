@@ -1,5 +1,6 @@
 // The driver's replies to your live calls: "Copy" or a refusal (game/refusal.ts). Newest first.
 
+import { named } from '../data/names.js';
 import type { RadioMessage } from '../state/machine.js';
 
 export function RadioLog({ messages, max = 3 }: { messages: RadioMessage[]; max?: number }) {
@@ -19,10 +20,10 @@ export function RadioLog({ messages, max = 3 }: { messages: RadioMessage[]; max?
             } ${i > 0 ? 'opacity-70' : ''}`}
           >
             <span className="mono mr-1.5 text-[11px] text-[var(--muted)]">
-              L{m.lap} {m.from}
+              L{m.lap} {named(m.from)}
             </span>
-            {m.refused && <strong className="mr-1 text-[var(--box-ink)]">Refused:</strong>}“{m.text}
-            ”
+            {m.refused && <strong className="mr-1 text-[var(--box-ink)]">Refused:</strong>}“
+            {named(m.text)}”
           </li>
         ))}
     </ul>

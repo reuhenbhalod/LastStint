@@ -18,6 +18,7 @@ from pathlib import Path
 from . import ingest, paths
 
 INCIDENTS_PATH = paths.DATA_DIR / "incidents.json"
+RETIREMENTS_PATH = paths.DATA_DIR / "retirements.json"
 STOPPED = re.compile(r"CAR \d+ \((\w{3})\) STOPPED AT TURN (\d+)")
 CLASH = re.compile(r"TURN (\d+) INCIDENT INVOLVING CARS \d+ \((\w{3})\) AND \d+ \((\w{3})\)")
 YELLOW = re.compile(r"YELLOW IN TRACK SECTOR (\d+)")
@@ -65,6 +66,26 @@ def causes(
     return out
 
 
+def retirements(
+    model: dict, status: dict[str, str], messages: list[tuple[int | None, str]]
+) -> dict[str, dict]:
+    """Why each car in `model` retired (its official status), and where when race control said
+    ("CAR n (ABC) STOPPED AT TURN t" near its lap): the race screen parks it there."""
+    out: dict[str, dict] = {}
+    for e in model["events"]:
+        if e["type"] != "RETIREMENT":
+            continue
+        code = e["driver"]
+        item: dict = {"lap": e["lap"], "status": status.get(code, "Retired")}
+        for m_lap, text in messages:
+            hit = STOPPED.search(text)
+            if hit and hit.group(1) == code and (m_lap is None or abs(m_lap - e["lap"]) <= 3):
+                item["turn"] = int(hit.group(2))
+                break
+        out[code] = item
+    return out
+
+
 def fetch(year: int, event: str) -> tuple[dict[str, str], list[tuple[int | None, str]]]:
     """Result statuses by driver code, and race control's messages (network on first use)."""
     import fastf1
@@ -80,8 +101,9 @@ def fetch(year: int, event: str) -> tuple[dict[str, str], list[tuple[int | None,
     return status, msgs
 
 
-def write(race_id: str, items: list[dict], path: Path = INCIDENTS_PATH) -> Path:
-    """Put one race's causes into data/incidents.json (other races kept, keys sorted)."""
+def write(race_id: str, items: list[dict] | dict, path: Path = INCIDENTS_PATH) -> Path:
+    """Put one race's entry into data/incidents.json (or retirements.json; other races kept,
+    keys sorted)."""
     data = json.loads(path.read_text()) if path.exists() else {}
     data[race_id] = items
     path.write_text(json.dumps(dict(sorted(data.items())), indent=1) + "\n")

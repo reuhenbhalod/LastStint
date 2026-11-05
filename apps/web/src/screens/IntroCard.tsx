@@ -11,6 +11,7 @@ import { AccountBar } from '../components/AccountBar.js';
 import { HeadsetIcon, OvertakeIcon, TyreIcon } from '../components/Icons.js';
 import { TyreBadge } from '../components/TyreBadge.js';
 import { TIER_LABEL, driverInfo } from '../data/drivers.js';
+import { surname } from '../data/names.js';
 import { goalOf } from '../game/goal.js';
 import type { GameState } from '../state/machine.js';
 import { carsOnTrack, pointAt, polyline } from '../track/geometry.js';
@@ -276,10 +277,12 @@ export function IntroCard({
                 )}
               </h1>
               <p className="m-0 max-w-[50ch] text-[17px] leading-relaxed text-[var(--ink)]">
-                You’re {userSide}’s race engineer at {userTeam ?? 'the team'}, on the radio for the
-                last {lapsLeft} laps. Every call is yours.{' '}
+                You’re {surname(userSide)}’s race engineer at {userTeam ?? 'the team'}, on the radio
+                for the last {lapsLeft} laps. Every call is yours.{' '}
                 <span className="font-semibold">
-                  {defend ? `Keep ${rival} behind.` : `Get ${userSide} ahead of ${rival}.`}
+                  {defend
+                    ? `Keep ${surname(rival)} behind.`
+                    : `Get ${surname(userSide)} ahead of ${surname(rival)}.`}
                 </span>
               </p>
               <div className="flex flex-wrap items-center gap-2 text-[14px]">
@@ -359,7 +362,11 @@ export function IntroCard({
                       {gap === null ? '-' : `${Math.abs(gap).toFixed(1)}s`}
                     </span>
                     <span className="text-[11px] text-[var(--muted)]">
-                      {gap === null ? '' : gap >= 0 ? `${userSide} leads` : `${rival} leads`}
+                      {gap === null
+                        ? ''
+                        : gap >= 0
+                          ? `${surname(userSide)} leads`
+                          : `${surname(rival)} leads`}
                     </span>
                   </div>
                   <Side
@@ -381,10 +388,10 @@ export function IntroCard({
           <dl className="m-0 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {[
               ['Laps to run', String(lapsLeft)],
-              [`${userSide} really finished`, realPos ? `P${realPos}` : '-'],
-              [`${rival} really finished`, realRival ? `P${realRival}` : '-'],
+              [`${surname(userSide)} really finished`, realPos ? `P${realPos}` : '-'],
+              [`${surname(rival)} really finished`, realRival ? `P${realRival}` : '-'],
               [
-                `${userSide}'s attitude`,
+                `${surname(userSide)}'s attitude`,
                 info ? TIER_LABEL[info.tier].replace(' attitude', '') : '-',
               ],
             ].map(([label, value]) => (

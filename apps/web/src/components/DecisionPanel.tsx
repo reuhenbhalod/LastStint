@@ -8,6 +8,7 @@
 
 import { type DecisionMoment, type RaceModel, type RaceState, tyreLife } from '@boxthislap/sim';
 import { Fragment, useEffect, useRef, useState } from 'react';
+import { named, surname } from '../data/names.js';
 import { briefFor } from '../game/brief.js';
 import { choicesFor, tyreName } from '../game/choices.js';
 import { type Fact, modeFacts, tyreOutlooks } from '../game/guide.js';
@@ -110,7 +111,7 @@ export function DecisionPanel({
     return {
       id: o.id,
       // "Stay out, keep the lead": the facts carry the detail.
-      label: o.decisions.length === 0 ? (o.label.split(', ')[0] ?? o.label) : o.label,
+      label: named(o.decisions.length === 0 ? (o.label.split(', ')[0] ?? o.label) : o.label),
       note: facts.map((f) => `${f.label}: ${f.value}`).join(' · '),
       facts,
       act: () => onChoose(o.id),
@@ -202,13 +203,15 @@ export function DecisionPanel({
         <Tile label="Tyres">
           {b.us && (
             <span className="inline-flex items-center gap-1.5">
-              <span className="text-[12px] font-bold text-[var(--you)]">{b.us.code}</span>
+              <span className="text-[12px] font-bold text-[var(--you)]">{surname(b.us.code)}</span>
               <Tyre compound={b.us.compound} age={b.us.age} />
             </span>
           )}
           {b.rival && (
             <span className="inline-flex items-center gap-1.5">
-              <span className="text-[12px] font-bold text-[var(--rival)]">{b.rival.code}</span>
+              <span className="text-[12px] font-bold text-[var(--rival)]">
+                {surname(b.rival.code)}
+              </span>
               <Tyre compound={b.rival.compound} age={b.rival.age} />
             </span>
           )}

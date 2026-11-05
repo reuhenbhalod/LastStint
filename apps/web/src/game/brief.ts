@@ -3,6 +3,7 @@
 // race's prose layer (Phase 5) can replace the headlines later; the facts stay computed.
 
 import type { DecisionMoment, RaceModel, RaceState } from '@boxthislap/sim';
+import { named } from '../data/names.js';
 
 export interface TyreFact {
   code: string;
@@ -114,7 +115,8 @@ export function briefFor(moment: DecisionMoment, race: RaceState, model: RaceMod
 
   return {
     kind,
-    headline,
+    // Drivers by name in the radio line (data/names.ts).
+    headline: named(headline),
     gap,
     us: me && !me.retired ? { code: model.userSide, compound: me.compound, age: me.tyreAge } : null,
     rival: them && !them.retired ? { code: r, compound: them.compound, age: them.tyreAge } : null,

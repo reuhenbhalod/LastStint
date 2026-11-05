@@ -82,7 +82,8 @@ def outline_cmd(
 def incidents_cmd(
     race_ids: list[str] = typer.Argument(..., help="Registered races, e.g. abu-dhabi-2021."),  # noqa: B008
 ) -> None:
-    """Write data/incidents.json: why each safety car / VSC came out, for the race screen
+    """Write data/incidents.json (why each safety car / VSC came out) and data/retirements.json
+    (why and where each car retired), for the race screen
     (network: FastF1 results and race control messages)."""
     for race_id in race_ids:
         meta = build_mod.RACES[race_id]
@@ -90,6 +91,9 @@ def incidents_cmd(
         status, msgs = incidents.fetch(meta["year"], meta["event"])
         items = incidents.causes(model, status, msgs)
         incidents.write(race_id, items)
+        incidents.write(
+            race_id, incidents.retirements(model, status, msgs), incidents.RETIREMENTS_PATH
+        )
         typer.echo(f"{race_id}: {items}")
 
 

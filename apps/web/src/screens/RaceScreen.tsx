@@ -31,6 +31,7 @@ import { TeamRadio } from '../components/TeamRadio.js';
 import { TimingTower } from '../components/TimingTower.js';
 import { type BattleView, TrackMap } from '../components/TrackMap.js';
 import { TyreBadge } from '../components/TyreBadge.js';
+import { namedUpper, surname } from '../data/names.js';
 import {
   BATTLE_MS,
   CALL_MS,
@@ -49,7 +50,7 @@ import type { GameState } from '../state/machine.js';
 import { BRAKE_BEFORE } from '../track/battle.js';
 import { cornerPoint, overtakingCorners } from '../track/corners.js';
 import { flagOn, nearestFraction, polyline, quietCorner } from '../track/geometry.js';
-import type { MapMotion } from '../track/motion.js';
+import type { LiveStanding, MapMotion } from '../track/motion.js';
 import { outlineFor } from '../track/outlines.js';
 
 const FLAG = {
@@ -73,9 +74,12 @@ interface Battle {
   stage: BattleStage;
   chosen: string | null;
   result: { text: string; good: boolean } | null;
-  swap: { gap: number; at: number } | null;
+  swap: { at: number } | null;
   zoom: boolean;
 }
+
+/** How often the standings follow the map while the lap runs. */
+const LIVE_MS = 400;
 
 /** The race slows this far (tick progress) before the braking zone. */
 const SLOW_BEFORE = 0.05;
@@ -96,11 +100,11 @@ function battleResult(
     const good = fought.detail === 'passed' || fought.detail === 'held';
     const text =
       fought.detail === 'passed'
-        ? `PAST ${fought.other}!`
+        ? `PAST ${namedUpper(fought.other ?? '')}!`
         : fought.detail === 'held'
           ? 'HELD!'
           : fought.detail === 'lost'
-            ? `${fought.other} THROUGH`
+            ? `${namedUpper(fought.other ?? '')} THROUGH`
             : 'NO WAY BY';
     return { text, good };
   }
@@ -356,10 +360,7 @@ export function RaceScreen({
       const result = preview ? battleResult(preview.notes, userSide, o.call) : null;
       const me = preview?.race.cars[userSide];
       const them = preview?.race.cars[other];
-      const swap =
-        me && them && !me.retired && !them.retired
-          ? { gap: me.totalTime - them.totalTime, at: b.cornerP }
-          : null;
+      const swap = me && them && !me.retired && !them.retired ? { at: b.cornerP } : null;
       setBattle({
         ...b,
         chosen: id,
@@ -512,6 +513,26 @@ export function RaceScreen({
         }
       : null;
 
+  // The lap being shown, run ahead (the map moves the field toward its end, and shows a car
+  // stopping or a puncture as it happens). Again after any call: it changes the lap.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the lap, the calls and the phase are what change it.
+  const ahead = useMemo(
+    () => (state.phase === 'racing' || state.phase === 'decision' ? game.preview() : null),
+    [state.race.lap, state.decisions, state.phase],
+  );
+  // The standings as the map shows them, a few times a second while the lap runs.
+  const [live, setLive] = useState<LiveStanding[] | null>(null);
+  const running = state.phase === 'racing' && !!game.clock && game.clock.frozen === undefined;
+  const racing = state.phase === 'racing';
+  useEffect(() => {
+    if (!racing) setLive(null);
+  }, [racing]);
+  useEffect(() => {
+    if (!running) return; // frozen for a battle call: the standings hold where they are
+    const id = setInterval(() => setLive(motion.current?.standings() ?? null), LIVE_MS);
+    return () => clearInterval(id);
+  }, [running]);
+
   // A stop by your car or the rival on the lap just run, while the next lap animates.
   const latest = log.at(-1);
   const stop =
@@ -524,7 +545,7 @@ export function RaceScreen({
     panel === 'gap' ? (
       <section aria-label={`Gap to ${rival}`} className="flex flex-col gap-2">
         <div className="flex items-baseline justify-between">
-          <span className="eyebrow">Gap to {rival}</span>
+          <span className="eyebrow">Gap to {surname(rival)}</span>
           <span
             className={`mono text-[15px] font-semibold ${gap === null ? '' : gap >= 0 ? 'text-[var(--you)]' : 'text-[var(--rival)]'}`}
           >
@@ -647,6 +668,7 @@ export function RaceScreen({
               userSide={userSide}
               rival={rival}
               onPick={select}
+              live={live}
             />
           </div>
         </section>
@@ -658,10 +680,14 @@ export function RaceScreen({
         >
           {/* On a laptop the map takes all the height the calls and team radio leave. */}
           <div className="xl:flex xl:min-h-[380px] xl:flex-1 xl:flex-col">
-            <div className="grid grid-cols-[1fr_auto_1fr] items-center rounded-t-xl border border-b-0 border-[var(--rule)] bg-[var(--card)] px-3 py-2">
-              <div className="flex items-center gap-2">
-                <span className="h-7 w-1.5 rounded-sm bg-[var(--you)]" />
-                <span className="disp wide text-[20px] leading-none">{userSide}</span>
+            <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 rounded-t-xl border border-b-0 border-[var(--rule)] bg-[var(--card)] px-3 py-2">
+              <div className="flex min-w-0 items-center gap-2">
+                <span className="h-7 w-1.5 shrink-0 rounded-sm bg-[var(--you)]" />
+                <span className="disp wide min-w-0 truncate text-[20px] leading-none">
+                  {/* On a phone there's room for the code only (it heads the map). */}
+                  <span className="sm:hidden">{userSide}</span>
+                  <span className="hidden sm:inline">{surname(userSide)}</span>
+                </span>
                 {me && !me.retired && <TyreBadge compound={me.compound} age={me.tyreAge} />}
               </div>
               <div className="text-center">
@@ -673,14 +699,18 @@ export function RaceScreen({
                   {gap === null
                     ? ''
                     : gap >= 0
-                      ? `${rival} +${gap.toFixed(1)}s behind`
-                      : `${rival} ${(-gap).toFixed(1)}s ahead`}
+                      ? `${surname(rival)} +${gap.toFixed(1)}s behind`
+                      : `${surname(rival)} ${(-gap).toFixed(1)}s ahead`}
                 </div>
               </div>
-              <div className="flex items-center justify-end gap-2">
+              <div className="flex min-w-0 items-center justify-end gap-2">
                 {them && !them.retired && <TyreBadge compound={them.compound} age={them.tyreAge} />}
-                <span className="disp wide text-[20px] leading-none">{rival}</span>
-                <span className="h-7 w-1.5 rounded-sm bg-[var(--rival)]" />
+                <span className="disp wide min-w-0 truncate text-[20px] leading-none">
+                  {/* On a phone there's room for the code only (it heads the map). */}
+                  <span className="sm:hidden">{rival}</span>
+                  <span className="hidden sm:inline">{surname(rival)}</span>
+                </span>
+                <span className="h-7 w-1.5 shrink-0 rounded-sm bg-[var(--rival)]" />
               </div>
             </div>
             <div
@@ -700,6 +730,7 @@ export function RaceScreen({
                     dim={paused}
                     finishing={finishMeta}
                     battle={battleView}
+                    ahead={ahead}
                     flash={flash}
                     userBox={userBox}
                     motionRef={motion}
@@ -728,7 +759,7 @@ export function RaceScreen({
                   <output className="radio-alert absolute inset-x-2.5 bottom-12 z-10 mx-auto flex max-w-[420px] items-center justify-center gap-3 rounded-xl border-2 border-white bg-[#141716]/90 px-4 py-3 text-white shadow-2xl">
                     <ChequeredIcon size={26} />
                     <span className="disp text-[19px] leading-none">
-                      Chequered flag · {userSide} P{finishPos}
+                      Chequered flag · {surname(userSide)} P{finishPos}
                     </span>
                   </output>
                 )}
@@ -744,8 +775,8 @@ export function RaceScreen({
                       {battle.stage === 'waiting'
                         ? `Braking for T${battle.corner}: your call`
                         : battle.call.attacking
-                          ? `${userSide} on ${battle.call.other} into T${battle.corner}`
-                          : `${battle.call.other} on ${userSide} into T${battle.corner}`}
+                          ? `${surname(userSide)} on ${surname(battle.call.other ?? '')} into T${battle.corner}`
+                          : `${surname(battle.call.other ?? '')} on ${surname(userSide)} into T${battle.corner}`}
                     </span>
                   </output>
                 )}

@@ -87,3 +87,29 @@ export function neutralCause(
     .find((n) => n.kind === 'incident' && n.detail === 'crash' && n.lap < lap && n.lap >= lap - 4);
   return crash?.driver ? `${surname(crash.driver)} crashed` : null;
 }
+
+/**
+ * The car behind a neutralization that the race model doesn't run (it retired before the
+ * takeover's field was set, Giovinazzi in Abu Dhabi 21): the map parks it where it stopped
+ * while the SC or VSC is out. Null when there's none, or the model runs the car itself.
+ */
+export function neutralCar(
+  model: RaceModel,
+  lap: number,
+  flag: RaceState['flag'],
+): { driver: string; status: string; turn?: number; from: number } | null {
+  if (flag !== 'sc' && flag !== 'vsc') return null;
+  const type = flag === 'sc' ? 'SC' : 'VSC';
+  const event = model.events.find(
+    (e) => e.type === type && lap >= e.lap && lap < e.lap + (e.laps ?? 1),
+  );
+  if (!event) return null;
+  const cause = CAUSES[model.race.id]?.find((c) => c.lap === event.lap && c.type === type);
+  if (!cause?.driver || model.drivers.some((d) => d.code === cause.driver)) return null;
+  return {
+    driver: cause.driver,
+    status: cause.status ?? 'Retired',
+    ...(cause.turn ? { turn: cause.turn } : {}),
+    from: event.lap,
+  };
+}

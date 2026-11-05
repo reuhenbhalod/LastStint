@@ -1,6 +1,8 @@
 // Gap to the rival over the laps seen so far (above the line: we're ahead). A small SVG so
 // the trend reads at a glance.
 
+import { surname } from '../data/names.js';
+
 export function GapTrace({ points, rival }: { points: Array<[number, number]>; rival: string }) {
   if (points.length < 2) return null;
   const W = 320;
@@ -19,7 +21,7 @@ export function GapTrace({ points, rival }: { points: Array<[number, number]>; r
   return (
     <figure className="flex flex-col gap-1" aria-label={`Gap to ${rival} over the last laps`}>
       <svg viewBox={`0 0 ${W} ${H}`} className="h-14 w-full" role="img">
-        <title>{`Gap to ${rival}: ${last >= 0 ? '+' : ''}${last.toFixed(1)}s`}</title>
+        <title>{`Gap to ${surname(rival)}: ${last >= 0 ? '+' : ''}${last.toFixed(1)}s`}</title>
         <line
           x1="0"
           x2={W}

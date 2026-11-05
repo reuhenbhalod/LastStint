@@ -2,6 +2,7 @@
 // cost, places lost, and how the tyres now stack up against the other car in the fight.
 
 import type { RaceState } from '@boxthislap/sim';
+import { surname } from '../data/names.js';
 import { tyreName } from '../game/choices.js';
 import type { PitEvent } from '../game/raceLog.js';
 import { TyreBadge } from './TyreBadge.js';
@@ -27,7 +28,7 @@ export function PitCard({
       style={{ borderColor: you ? 'var(--you)' : 'var(--rival)' }}
     >
       <p className="m-0 disp text-[13px] leading-none">
-        {stop.code} boxes · {tyreName(stop.compound)}
+        {surname(stop.code)} boxes · {tyreName(stop.compound)}
       </p>
       <p className="m-0 mono text-[12px] text-[#cfd6d3]">
         {stop.cost !== null ? `Stop ${stop.cost.toFixed(1)}s · ` : ''}P{stop.from} → P{stop.to}

@@ -1,0 +1,247 @@
+{
+ "abu-dhabi-2020": {
+  "PER": {
+   "lap": 10,
+   "status": "Transmission"
+  }
+ },
+ "abu-dhabi-2021": {
+  "GIO": {
+   "lap": 36,
+   "status": "Gearbox"
+  },
+  "LAT": {
+   "lap": 54,
+   "status": "Accident"
+  },
+  "PER": {
+   "lap": 56,
+   "status": "Engine"
+  }
+ },
+ "abu-dhabi-2024": {
+  "COL": {
+   "lap": 28,
+   "status": "Retired"
+  },
+  "BOT": {
+   "lap": 32,
+   "status": "Retired"
+  }
+ },
+ "austria-2019": {},
+ "austria-2025": {},
+ "bahrain-2021": {
+  "ALO": {
+   "lap": 33,
+   "status": "Brakes"
+  },
+  "LAT": {
+   "lap": 53,
+   "status": "Retired"
+  },
+  "GAS": {
+   "lap": 54,
+   "status": "Retired"
+  }
+ },
+ "bahrain-2022": {
+  "GAS": {
+   "lap": 47,
+   "status": "Power Unit"
+  },
+  "VER": {
+   "lap": 55,
+   "status": "Fuel pressure"
+  }
+ },
+ "belgium-2024": {},
+ "canada-2019": {
+  "ALB": {
+   "lap": 63,
+   "status": "Collision damage"
+  }
+ },
+ "canada-2022": {
+  "MSC": {
+   "lap": 20,
+   "status": "Engine"
+  },
+  "TSU": {
+   "lap": 49,
+   "status": "Accident"
+  }
+ },
+ "china-2024": {
+  "BOT": {
+   "lap": 21,
+   "status": "Retired"
+  },
+  "TSU": {
+   "lap": 28,
+   "status": "Retired"
+  },
+  "RIC": {
+   "lap": 34,
+   "status": "Retired"
+  }
+ },
+ "china-2025": {},
+ "france-2019": {
+  "GRO": {
+   "lap": 47,
+   "status": "Retired"
+  }
+ },
+ "france-2021": {},
+ "hungary-2019": {
+  "GRO": {
+   "lap": 51,
+   "status": "Water pressure"
+  }
+ },
+ "hungary-2025": {
+  "BEA": {
+   "lap": 50,
+   "status": "Retired"
+  }
+ },
+ "italy-2019": {
+  "SAI": {
+   "lap": 28,
+   "status": "Wheel"
+  },
+  "KVY": {
+   "lap": 32,
+   "status": "Engine",
+   "turn": 2
+  },
+  "MAG": {
+   "lap": 45,
+   "status": "Hydraulics"
+  }
+ },
+ "italy-2022": {
+  "VET": {
+   "lap": 12,
+   "status": "Engine"
+  },
+  "ALO": {
+   "lap": 32,
+   "status": "Water pressure"
+  },
+  "STR": {
+   "lap": 41,
+   "status": "Engine"
+  },
+  "RIC": {
+   "lap": 48,
+   "status": "Oil leak"
+  }
+ },
+ "italy-2024": {},
+ "japan-2024": {
+  "ZHO": {
+   "lap": 13,
+   "status": "Retired"
+  }
+ },
+ "mexico-2019": {
+  "NOR": {
+   "lap": 51,
+   "status": "Withdrew"
+  },
+  "RAI": {
+   "lap": 60,
+   "status": "Overheating"
+  }
+ },
+ "mexico-2021": {},
+ "mexico-2022": {
+  "TSU": {
+   "lap": 52,
+   "status": "Collision damage"
+  },
+  "ALO": {
+   "lap": 66,
+   "status": "Engine",
+   "turn": 1
+  }
+ },
+ "mexico-2024": {},
+ "miami-2022": {
+  "NOR": {
+   "lap": 42,
+   "status": "Collision"
+  },
+  "GAS": {
+   "lap": 46,
+   "status": "Suspension"
+  },
+  "VET": {
+   "lap": 55,
+   "status": "Collision"
+  }
+ },
+ "miami-2023": {},
+ "netherlands-2022": {
+  "TSU": {
+   "lap": 46,
+   "status": "Differential"
+  },
+  "BOT": {
+   "lap": 57,
+   "status": "Engine"
+  }
+ },
+ "portugal-2020": {
+  "STR": {
+   "lap": 53,
+   "status": "Collision damage"
+  }
+ },
+ "portugal-2021": {},
+ "russia-2020": {},
+ "saudi-arabia-2025": {},
+ "spain-2020": {
+  "LEC": {
+   "lap": 40,
+   "status": "Electronics"
+  }
+ },
+ "spain-2023": {},
+ "styria-2020": {
+  "OCO": {
+   "lap": 26,
+   "status": "Overheating"
+  }
+ },
+ "united-states-2019": {
+  "KUB": {
+   "lap": 33,
+   "status": "Oil leak"
+  },
+  "MAG": {
+   "lap": 56,
+   "status": "Brakes"
+  }
+ },
+ "united-states-2023": {
+  "ALO": {
+   "lap": 50,
+   "status": "Retired"
+  }
+ },
+ "usa-2022": {
+  "BOT": {
+   "lap": 18,
+   "status": "Spun off",
+   "turn": 19
+  },
+  "STR": {
+   "lap": 23,
+   "status": "Collision",
+   "turn": 12
+  }
+ }
+}

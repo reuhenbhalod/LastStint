@@ -3,6 +3,7 @@
 // in slow motion. Number keys answer. No answer: no change, or the driver's own move.
 
 import { useEffect, useRef } from 'react';
+import { named, surname } from '../data/names.js';
 import type { QuickCall } from '../game/quickCalls.js';
 import { FlagIcon, HeadsetIcon, OvertakeIcon } from './Icons.js';
 
@@ -36,12 +37,12 @@ export function QuickCallCard({
   const battle = call.kind === 'battle';
   const accent = battle ? 'var(--box)' : 'var(--you)';
   const tag = battle
-    ? `Battle${call.other ? ` with ${call.other}` : ''} · slow motion`
+    ? `Battle${call.other ? ` with ${surname(call.other)}` : ''} · slow motion`
     : call.kind === 'trouble'
       ? 'Trouble'
       : call.kind === 'request'
-        ? `${call.from} is asking`
-        : `${call.from === 'Engineer' ? 'Engineer' : `${call.from} on the radio`} · quick call`;
+        ? `${named(call.from)} is asking`
+        : `${call.from === 'Engineer' ? 'Engineer' : `${named(call.from)} on the radio`} · quick call`;
   const TagIcon = battle ? OvertakeIcon : call.kind === 'trouble' ? FlagIcon : HeadsetIcon;
   return (
     <section
@@ -59,15 +60,17 @@ export function QuickCallCard({
         <span className="eyebrow">Lap {call.lap + 1}</span>
       </div>
       <p className="m-0 text-[15px] font-semibold leading-snug">
-        {call.from !== 'Engineer' && <span className="mr-1 text-[var(--muted)]">{call.from}:</span>}
-        {call.text}
+        {call.from !== 'Engineer' && (
+          <span className="mr-1 text-[var(--muted)]">{named(call.from)}:</span>
+        )}
+        {named(call.text)}
       </p>
       {call.stats && (
         <dl className="m-0 flex flex-wrap gap-x-4 gap-y-1 text-[12px]">
           {call.stats.map((s) => (
             <div key={s.label} className="flex items-baseline gap-1.5">
               <dt className="eyebrow">{s.label}</dt>
-              <dd className="m-0 font-semibold">{s.value}</dd>
+              <dd className="m-0 font-semibold">{named(s.value)}</dd>
             </div>
           ))}
         </dl>
@@ -94,8 +97,8 @@ export function QuickCallCard({
             >
               {i + 1}
             </span>
-            <span>{o.label}</span>
-            {o.note && <span className="text-[11px] font-medium opacity-70">{o.note}</span>}
+            <span>{named(o.label)}</span>
+            {o.note && <span className="text-[11px] font-medium opacity-70">{named(o.note)}</span>}
           </button>
         ))}
       </div>
