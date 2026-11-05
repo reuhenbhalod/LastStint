@@ -34,6 +34,11 @@ describe('team colours', () => {
     expect(mc.rival).not.toBe(TEAM_COLOR.McLaren);
   });
 
+  it('turns warnings amber beside a red team, so good and bad never look alike', () => {
+    expect(teamTheme(model('canada-2022')).box).not.toBe('#d4432f'); // Ferrari
+    expect(teamTheme(model('abu-dhabi-2021')).box).toBe('#d4432f'); // Mercedes
+  });
+
   it('picks readable text for each colour', () => {
     expect(inkOn('#ff8000')).toBe('#0b0f0e');
     expect(inkOn('#3671c6')).toBe('#ffffff');

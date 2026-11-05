@@ -121,7 +121,7 @@ export function BattleCard({
           className="rounded-lg px-3 py-2 text-center text-[18px] font-extrabold uppercase tracking-wide"
           style={{
             background: result.good ? 'var(--good)' : 'var(--box)',
-            color: result.good ? '#08231f' : '#ffffff',
+            color: result.good ? 'var(--good-ink)' : '#ffffff',
           }}
         >
           {result.text}

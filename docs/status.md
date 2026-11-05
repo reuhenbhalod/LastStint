@@ -98,7 +98,7 @@ Beta feedback round 2, part B (Nov 2, 2026):
   - **Team colours (`game/teamTheme.ts`):** each race is shown in your driver's team colour: Ferrari red, McLaren papaya, Red Bull blue and so on.
     - It covers your car, the header stripe, buttons, the home page and the timing tower.
     - The rival takes their team's colour, or a contrasting one when the two would look alike (team-mates, two reds).
-    - Good news has its own fixed colour (`--good`), so a Ferrari player never sees good news in red.
+    - Good news (trust, tyre life, battery, a pass) takes the team colour too; with a red team (Ferrari, Alfa Romeo), warnings and BOX turn amber so good and bad never look alike (Nov 5).
   - **Why the safety car is out:** `pipeline incidents` writes `data/incidents.json`, display only.
     - Each SC/VSC is put down to the car that retired as it came out, with its official result status from FastF1 ("Accident", "Gearbox") and the corner when race control gives one.
     - With no car out, race control's words are used instead: a clash just before (debris), or a yellow in a sector.

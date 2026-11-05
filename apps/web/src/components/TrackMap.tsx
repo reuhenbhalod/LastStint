@@ -902,7 +902,7 @@ export function TrackMap({
               <text
                 y={-39}
                 textAnchor="middle"
-                fill={flash.good ? '#08231f' : '#fff'}
+                fill={flash.good ? 'var(--good-ink)' : '#fff'}
                 fontSize={19}
                 fontWeight={800}
                 fontFamily="var(--display)"

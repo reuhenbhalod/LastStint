@@ -1,7 +1,8 @@
-// The race in your team's colours: your car, your accents and buttons take the team's livery
-// colour (Ferrari red, McLaren papaya...), the rival takes theirs. Where the two would look
-// alike (team-mates, or two reds), the rival falls back to a colour that stands apart. Good
-// news keeps its own colour (--good), so a red team never reads as bad news.
+// The race in your team's colours: your car, your accents, buttons and good news (trust, tyre
+// life, battery, a pass) take the team's livery colour (Ferrari red, McLaren papaya...); the
+// rival takes their own real car's colour. Where the two would look alike (team-mates, or two
+// reds), the rival falls back to a colour that stands apart. With a red team, warnings and BOX
+// turn amber, so good news and bad never look the same.
 
 import type { RaceModel } from '@boxthislap/sim';
 import { useEffect } from 'react';
@@ -65,7 +66,14 @@ export interface TeamTheme {
   youInk: string;
   rival: string;
   rivalInk: string;
+  /** Warnings and BOX: red, or amber when your team is red. */
+  box: string;
+  boxInk: string;
 }
+
+/** Warnings and BOX: the pit-wall red, or amber beside a red team. */
+const BOX_RED = { box: '#d4432f', boxInk: '#f07462' };
+const BOX_AMBER = { box: '#d9731a', boxInk: '#f2a65a' };
 
 export function teamTheme(model: RaceModel): TeamTheme {
   const team = (code: string) => model.drivers.find((d) => d.code === code)?.team ?? '';
@@ -75,8 +83,20 @@ export function teamTheme(model: RaceModel): TeamTheme {
     theirs && colourDistance(theirs, you) >= CLASH
       ? theirs
       : (FALLBACKS.find((c) => colourDistance(c, you) >= CLASH) as string);
-  return { you, youInk: inkOn(you), rival, rivalInk: inkOn(rival) };
+  const box = colourDistance(you, BOX_RED.box) < CLASH ? BOX_AMBER : BOX_RED;
+  return { you, youInk: inkOn(you), rival, rivalInk: inkOn(rival), ...box };
 }
+
+const THEMED = [
+  '--you',
+  '--you-ink',
+  '--rival',
+  '--rival-ink',
+  '--good',
+  '--good-ink',
+  '--box',
+  '--box-ink',
+];
 
 /** Put the race's team colours on the page while `model` is shown (the defaults after). */
 export function useTeamTheme(model: RaceModel | null | undefined): void {
@@ -88,8 +108,13 @@ export function useTeamTheme(model: RaceModel | null | undefined): void {
     root.setProperty('--you-ink', t.youInk);
     root.setProperty('--rival', t.rival);
     root.setProperty('--rival-ink', t.rivalInk);
+    // Good news in the team's colour too.
+    root.setProperty('--good', t.you);
+    root.setProperty('--good-ink', t.youInk);
+    root.setProperty('--box', t.box);
+    root.setProperty('--box-ink', t.boxInk);
     return () => {
-      for (const v of ['--you', '--you-ink', '--rival', '--rival-ink']) root.removeProperty(v);
+      for (const v of THEMED) root.removeProperty(v);
     };
   }, [model]);
 }

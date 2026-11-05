@@ -103,7 +103,7 @@ export function DriverProfile({
                       className="rounded-full px-2 py-0.5"
                       style={{
                         background: v > 0 ? 'var(--good)' : 'var(--box)',
-                        color: v > 0 ? '#08231f' : '#ffffff',
+                        color: v > 0 ? 'var(--good-ink)' : '#ffffff',
                       }}
                     >
                       {v > 0 ? `+${v}` : `−${-v}`} {TRUST_WHY[n.detail ?? ''] ?? n.detail}
