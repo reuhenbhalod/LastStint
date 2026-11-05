@@ -62,7 +62,7 @@ export function HowItWorks({ onClose }: { onClose: () => void }) {
           is our own; it’s an estimate, not a replay.
         </p>
       </section>
-      <Disclaimer className="!px-0 text-left" />
+      <Disclaimer compact />
     </main>
   );
 }

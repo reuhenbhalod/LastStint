@@ -442,7 +442,7 @@ export function ResultScreen({
           </button>
         )}
       </div>
-      <Disclaimer className="mt-6 !px-0" />
+      <Disclaimer compact />
     </main>
   );
 }
