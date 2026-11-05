@@ -98,8 +98,10 @@ export type {
   VerifyErrorCode,
 } from './verify.js';
 export {
+  WET_OFF_COST,
   WET_TYRES,
   wetCrash,
+  wetOff,
   forecastWetness,
   isWetTyre,
   weatherWear,

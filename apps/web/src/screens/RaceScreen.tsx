@@ -13,6 +13,7 @@ import {
   type RaceModel,
   type RaceNote,
   engineerConfig,
+  wetnessOn,
 } from '@boxthislap/sim';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BattleCard, type BattleStage } from '../components/BattleCard.js';
@@ -57,12 +58,21 @@ import { type QuickCall, quickCallLaps } from '../game/quickCalls.js';
 import { useRaceLog } from '../game/raceLog.js';
 import { radioChirp, setSoundOn, soundOn } from '../game/sound.js';
 import { type Game, LAP_MS, SLOW_MOTION, clockProgress } from '../game/useGame.js';
+import { CONDITION_WORD, conditionsOf, forecast } from '../game/weather.js';
 import type { GameState } from '../state/machine.js';
 import { BRAKE_BEFORE, cornerKind } from '../track/battle.js';
 import { cornerPoint, overtakingCorners } from '../track/corners.js';
 import { flagOn, nearestFraction, polyline, quietCorner } from '../track/geometry.js';
 import type { LiveStanding, MapMotion } from '../track/motion.js';
 import { outlineFor } from '../track/outlines.js';
+
+/** The weather chip's colour by conditions. */
+const WEATHER_BG = {
+  dry: 'rgba(0,0,0,0.55)',
+  damp: 'rgba(38,94,122,0.85)',
+  wet: 'rgba(30,72,150,0.9)',
+  soaked: 'rgba(24,46,120,0.95)',
+} as const;
 
 const FLAG = {
   green: { text: 'Green', cls: 'bg-black/55 text-white' },
@@ -166,6 +176,9 @@ export function RaceScreen({
   const drivenFlag = state.race.nextFlag ?? flagOn(model, state.race.lap + 1);
   const flag = FLAG[drivenFlag];
   const why = neutralCause(model, game.notes(), state.race.lap + 1, drivenFlag);
+  // A wet race: the conditions on the lap being driven and the engineer's radar.
+  const wetNow = model.weather ? wetnessOn(model.weather.wetness, state.race.lap + 1) : 0;
+  const radar = forecast(model, state.race.lap);
   const lapsLeft = totalLaps - state.race.lap;
   const gap = me && them && !me.retired && !them.retired ? them.totalTime - me.totalTime : null;
 
@@ -777,6 +790,14 @@ export function RaceScreen({
                     No track map for this race yet.
                   </p>
                 )}
+                {/* Rain over the track, heavier the wetter it is (weather spec W4). */}
+                {wetNow >= 0.03 && (
+                  <div
+                    aria-hidden="true"
+                    className="map-rain pointer-events-none absolute inset-0"
+                    style={{ opacity: Math.min(0.85, 0.25 + wetNow * 1.2) }}
+                  />
+                )}
                 <div className="absolute left-2.5 top-2.5 flex flex-col items-start gap-1.5">
                   <span className="rounded-md bg-black/55 px-2 py-1 text-[12px] font-semibold text-white">
                     Lap {state.race.lap} · {lapsLeft} to go
@@ -789,6 +810,21 @@ export function RaceScreen({
                   {why && (
                     <span className="max-w-[220px] rounded-md bg-black/70 px-2 py-1 text-[12px] font-semibold leading-snug text-white">
                       {why}
+                    </span>
+                  )}
+                  {radar && (
+                    <span
+                      className="max-w-[240px] rounded-md px-2 py-1 text-[12px] font-semibold leading-snug text-white"
+                      style={{ background: WEATHER_BG[conditionsOf(wetNow)] }}
+                    >
+                      <span className="uppercase tracking-wider">
+                        {CONDITION_WORD[conditionsOf(wetNow)]}
+                      </span>
+                      <span className="font-normal opacity-90">
+                        {' '}
+                        · {radar.text}
+                        {radar.sure !== null ? ` (${radar.sure}%)` : ''}
+                      </span>
                     </span>
                   )}
                 </div>

@@ -38,7 +38,13 @@ function play(model: RaceModel, seed: number) {
   const rng = mulberry32(seed);
   const said: number[] = [];
   const kinds: Record<string, number> = {};
-  const stopAsks: Array<{ lap: number; age: number; stopping: boolean; wing: boolean }> = [];
+  const stopAsks: Array<{
+    lap: number;
+    age: number;
+    stopping: boolean;
+    wing: boolean;
+    weather: boolean;
+  }> = [];
   const battleLaps: Array<{ lap: number; other: string }> = [];
   let lastInfo = -99;
   let radio = 0;
@@ -74,6 +80,7 @@ function play(model: RaceModel, seed: number) {
         wing: engine.notes.some(
           (n) => n.lap === lap && n.driver === model.userSide && n.detail === 'wing',
         ),
+        weather: !!call.weather,
       });
     }
     if (call) {
@@ -149,9 +156,9 @@ describe('the race engineer’s radio', () => {
         let last = Number.NEGATIVE_INFINITY;
         for (const a of stopAsks) {
           expect(a.stopping).toBe(false);
-          // A wing broken that lap is asked about whatever the tyres.
+          // A wing broken that lap is asked about whatever the tyres, and so is the rain.
           if (!a.wing) {
-            expect(a.age).toBeGreaterThanOrEqual(FRESH_TYRES);
+            if (!a.weather) expect(a.age).toBeGreaterThanOrEqual(FRESH_TYRES);
             expect(a.lap - last).toBeGreaterThanOrEqual(STOP_ASK_EVERY);
           }
           last = a.lap;

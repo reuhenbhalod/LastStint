@@ -24,6 +24,7 @@ import type { Daily } from '../data/types.js';
 import { GameEngine, decisionMoments } from '../engine/engine.js';
 import { type GradedMoment, type Grader, gradedFromHits, inlineGrader } from '../engine/grading.js';
 import { autoStay, boxingAt } from '../game/autoStay.js';
+import { tyreName } from '../game/choices.js';
 import { ownMove } from '../game/engineerCalls.js';
 import { engineerRadio } from '../game/engineerRadio.js';
 import { neutralCause } from '../game/neutral.js';
@@ -378,6 +379,11 @@ export class GameSession {
     const race = this.engine.state;
     const side = this.state.meta.userSide;
     for (const n of this.engine.notes) {
+      // Slicks in the wet: an off and back on (weather spec).
+      if (n.kind === 'error' && n.detail === 'aquaplane' && n.lap === lap && n.driver === side) {
+        this.say(side, 'Whoa! Aquaplaning, I went off. I can’t stay out on these!', false, lap);
+        continue;
+      }
       if (n.kind !== 'incident' || n.lap !== lap) continue;
       const mine = n.driver === side;
       const text =
@@ -522,7 +528,7 @@ export class GameSession {
       // A stop booked past this lap's pit entry is for the next one: say so.
       const copy =
         decision.kind === 'pit' && decision.lap > this.engine.lap + 1
-          ? `Copy, box next lap for ${decision.compound.toLowerCase()}s.`
+          ? `Copy, box next lap for ${tyreName(decision.compound).toLowerCase()}.`
           : acknowledge(decision);
       if (!options.quiet || no) this.say(side, no ?? copy, !!no, decision.lap);
       if (no) {

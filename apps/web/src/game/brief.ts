@@ -2,7 +2,15 @@
 // path (the gap, both cars' tyres and who leads come from the run, not from fixed copy). The
 // race's prose layer (Phase 5) can replace the headlines later; the facts stay computed.
 
-import type { DecisionMoment, RaceModel, RaceState } from '@boxthislap/sim';
+import {
+  type DecisionMoment,
+  type RaceModel,
+  type RaceState,
+  type Weather,
+  isWetTyre,
+  wetPenalty,
+  wetnessOn,
+} from '@boxthislap/sim';
 import { named } from '../data/names.js';
 
 export interface TyreFact {
@@ -25,7 +33,13 @@ export interface Brief {
   lapsLeft: number;
 }
 
-const TYRE: Record<string, string> = { SOFT: 'softs', MEDIUM: 'mediums', HARD: 'hards' };
+const TYRE: Record<string, string> = {
+  SOFT: 'softs',
+  MEDIUM: 'mediums',
+  HARD: 'hards',
+  INTERMEDIATE: 'inters',
+  WET: 'full wets',
+};
 const tyres = (compound: string) => TYRE[compound] ?? compound.toLowerCase();
 
 /** The neutralization covering the moment's lap, if any (known at the pause), and the lap
@@ -56,6 +70,27 @@ export function briefFor(moment: DecisionMoment, race: RaceState, model: RaceMod
   );
   const only = (key: 'battle' | 'pace') =>
     modesOnly && keys.has(key) && (key === 'pace' || keys.size === 1);
+
+  // A wet race (weather spec W5): a stop call while it's wet (or drying under wet tyres) is
+  // a call about the weather, whatever brought it on.
+  const weatherCall = (() => {
+    if (!model.weather || !stops || !me) return null;
+    const w = wetnessOn(model.weather.wetness, moment.lap);
+    const pct = (c: string) => Math.round(wetPenalty(model.weather as Weather, c, w) * 100);
+    if (!isWetTyre(me.compound) && (w >= 0.05 || moment.trigger === 'rain')) {
+      return {
+        kind: 'Rain',
+        headline: `It's raining. On ${tyres(me.compound)} we're ${pct(me.compound)}% off the pace; inters would be ${pct('INTERMEDIATE')}%. Box for wet tyres, or stay out on slicks?`,
+      };
+    }
+    if (isWetTyre(me.compound) && (w < 0.12 || moment.trigger === 'drying')) {
+      return {
+        kind: 'Drying',
+        headline: `The track's drying. On ${tyres(me.compound)} we're ${pct(me.compound)}% off; slicks would be ${pct('MEDIUM')}%. Back to slicks, or stay out?`,
+      };
+    }
+    return null;
+  })();
 
   let kind: string;
   let headline: string;
@@ -89,6 +124,9 @@ export function briefFor(moment: DecisionMoment, race: RaceState, model: RaceMod
   } else if (flag === 'VSC') {
     kind = 'Virtual safety car';
     headline = 'Virtual safety car. A cheap stop is on. Box, or stay out?';
+  } else if (weatherCall) {
+    kind = weatherCall.kind;
+    headline = weatherCall.headline;
   } else if (moment.trigger === 'cliff' && stops) {
     kind = 'Tyres';
     headline = `Our ${me ? tyres(me.compound) : 'tyres'} are ${me?.tyreAge ?? '?'} laps old and the lap times are starting to drop. Box under green for fresh tyres, or run them to the end?`;

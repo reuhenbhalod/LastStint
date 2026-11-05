@@ -41,11 +41,14 @@ import type {
   TrustReason,
 } from './types.js';
 import {
+  WET_OFF_COST,
+  WET_OFF_STREAM,
   forecastWetness,
   isWetTyre,
   weatherWear,
   wetCrash,
   wetFactor,
+  wetOff,
   wetnessOn,
 } from './weather.js';
 
@@ -1198,6 +1201,14 @@ export function stepLap(run: Run): RaceState {
         if (gapBehind >= 0 && gapBehind < PASS_WINDOW)
           lt += run.headset?.teamOrders?.holdUpCost ?? 0;
       }
+      // Slicks in the wet (weather spec): the player's car slides off now and then.
+      if (code === model.userSide && run.incidents && model.weather) {
+        const off = wetOff(model.weather, c.compound, wet);
+        if (off > 0 && run.rng.get(WET_OFF_STREAM, code).next() < off) {
+          lt += WET_OFF_COST;
+          run.notes.push({ lap, kind: 'error', driver: code, detail: 'aquaplane' });
+        }
+      }
       const errorRate = extraErrorRate(run, c) + (lapEng?.errorRate ?? 0);
       if (errorRate > 0 && run.headset && run.rng.get(ERROR_STREAM, code).next() < errorRate) {
         lt += run.headset.errorCost;
@@ -1660,7 +1671,14 @@ function engineerAfterLap(
     }
     let wrong: boolean;
     if (r.request === 'box') {
+      // In a wet race he's also right if he's now on the wrong tyres for the track: slicks
+      // in the wet, or wets and inters on a dry line.
+      const w = wetnessOn(run.wetness, lap);
+      const wrongTyres =
+        !!model.weather &&
+        ((!isWetTyre(user.compound) && w >= 0.15) || (isWetTyre(user.compound) && w < 0.05));
       wrong =
+        wrongTyres ||
         user.tyreWear > lifeOf(model, user.compound) ||
         run.notes.some(
           (n) =>

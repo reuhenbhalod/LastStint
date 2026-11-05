@@ -24,7 +24,13 @@ export const NO_PLAN: PlanState = {
   live: null,
 };
 
-const TYRE: Record<string, string> = { SOFT: 'softs', MEDIUM: 'mediums', HARD: 'hards' };
+const TYRE: Record<string, string> = {
+  SOFT: 'softs',
+  MEDIUM: 'mediums',
+  HARD: 'hards',
+  INTERMEDIATE: 'inters',
+  WET: 'full wets',
+};
 export const tyres = (compound: string) => TYRE[compound] ?? compound.toLowerCase();
 
 export const PACE_WORD: Record<PaceMode, string> = {

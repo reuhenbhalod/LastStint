@@ -19,16 +19,20 @@ import {
   type RaceState,
   battlesFor,
   cleanLap,
+  isWetTyre,
   lappedAhead,
   moodOf,
   passProbability,
   readMove,
   ruleSatisfied,
   tyreLife,
+  wetPenalty,
+  wetnessOn,
 } from '@boxthislap/sim';
 import { driverInfo } from '../data/drivers.js';
 import type { CornerKind } from '../track/battle.js';
 import { lapTime } from '../track/geometry.js';
+import { tyreName } from './choices.js';
 import {
   type BattleLine,
   type BattleOdds,
@@ -430,8 +434,13 @@ export function flavourBattle(call: QuickCall, kind: CornerKind): QuickCall {
 
 /** The softest tyre that lasts to the flag (or the hardest), for a box call. */
 function lastingCompound(race: RaceState, model: RaceModel): string {
+  // A wet race: the tyre for the track (inters, wets in a downpour) while it's wet.
+  const w = model.weather ? wetnessOn(model.weather.wetness, race.lap + 1) : 0;
+  if (model.weather && w >= 0.12) return w >= 0.6 && model.compounds.WET ? 'WET' : 'INTERMEDIATE';
   const left = model.race.laps - race.lap;
-  const byGrip = Object.entries(model.compounds).sort((a, b) => a[1].offset - b[1].offset);
+  const byGrip = Object.entries(model.compounds)
+    .filter(([c]) => !isWetTyre(c))
+    .sort((a, b) => a[1].offset - b[1].offset);
   const lasts = byGrip.find(([, c]) => tyreLife(c) >= left);
   return (lasts ?? byGrip.at(-1))?.[0] ?? race.cars[model.userSide]?.compound ?? 'HARD';
 }
@@ -469,11 +478,11 @@ function troubleCall(
       from: 'Engineer',
       kind: 'trouble',
       asked: false,
-      text: `We haven’t run a second tyre compound. We have to stop before the flag or we’re disqualified. Box for ${fresh.toLowerCase()}s?`,
+      text: `We haven’t run a second tyre compound. We have to stop before the flag or we’re disqualified. Box for ${tyreName(fresh).toLowerCase()}?`,
       options: [
         {
           id: 'box',
-          label: `Box, ${fresh.toLowerCase()}s`,
+          label: `Box, ${tyreName(fresh).toLowerCase()}`,
           note: 'Legal to the flag',
           call: { lap: next, kind: 'pit', compound: fresh },
         },
@@ -497,7 +506,7 @@ function troubleCall(
       from: 'Engineer',
       kind: 'trouble',
       asked: false,
-      text: `Front wing damage. We’re losing about ${eng.damage.toFixed(1)} s a lap. Box for a new nose and ${compound.toLowerCase()}s?`,
+      text: `Front wing damage. We’re losing about ${eng.damage.toFixed(1)} s a lap. Box for a new nose and ${tyreName(compound).toLowerCase()}?`,
       options: [
         {
           id: 'box',
@@ -601,11 +610,11 @@ function requestCall(
       from: us,
       kind: 'request',
       asked: true,
-      text: `These ${me.compound.toLowerCase()}s are gone, ${me.tyreAge} laps old. I want to box!`,
+      text: `These ${tyreName(me.compound).toLowerCase()} are gone, ${me.tyreAge} laps old. I want to box!`,
       options: [
         {
           id: 'yes',
-          label: `Yes, box for ${compound.toLowerCase()}s`,
+          label: `Yes, box for ${tyreName(compound).toLowerCase()}`,
           call: { lap: next, kind: 'reply', request: 'box', yes: true },
           also: [{ lap: next, kind: 'pit', compound }],
         },
@@ -762,6 +771,12 @@ export function directorCall(
     const sc = safetyCarCall(race, model, false);
     if (sc) return asked(sc);
   }
+  // No calls into a big moment's lap (the moment asks).
+  const into = race.lap + 1;
+  if (into <= model.race.laps && !model.decisionMoments.some((m) => m.lap === into)) {
+    const wx = weatherCall(race, model, mem, stopping);
+    if (wx) return asked(wx);
+  }
   const next = race.lap + 1;
   if (next > model.race.laps) return null;
   // No calls into a neutralized lap (no racing), or on a big moment's lap.
@@ -779,6 +794,92 @@ export function directorCall(
     if (battery) return battery;
   }
   return quickLap ? quickCallAt(race, model, log) : null;
+}
+
+/** The tyres' names as the radio says them. */
+const SAID: Record<string, string> = {
+  SOFT: 'softs',
+  MEDIUM: 'mediums',
+  HARD: 'hards',
+  INTERMEDIATE: 'inters',
+  WET: 'full wets',
+};
+const said = (c: string) => SAID[c] ?? `${tyreName(c).toLowerCase()}`;
+
+/** How many laps between asking about the weather again. */
+const WEATHER_ASK_EVERY = 3;
+
+/**
+ * Weather spec W5: the calls the weather brings. On slicks as the track turns wet, the driver
+ * asks for inters (wets in a downpour); on wet tyres as it dries, the engineer offers slicks.
+ * Not gated on fresh tyres: rain doesn't wait.
+ */
+function weatherCall(
+  race: RaceState,
+  model: RaceModel,
+  mem: DirectorMemory,
+  stopping: boolean,
+): QuickCall | null {
+  const weather = model.weather;
+  const me = race.cars[model.userSide];
+  if (!weather || !me || stopping) return null;
+  if (race.lap - (mem.last.weather ?? -99) < WEATHER_ASK_EVERY) return null;
+  const next = race.lap + 1;
+  if (next >= model.race.laps) return null;
+  const w = wetnessOn(weather.wetness, next);
+  const onWets = isWetTyre(me.compound);
+  const us = model.userSide;
+  if (!onWets && w >= 0.1) {
+    mem.last.weather = race.lap;
+    const want = lastingCompound(race, model);
+    const slick = Math.round(wetPenalty(weather, me.compound, w) * 100);
+    return {
+      lap: race.lap,
+      from: us,
+      kind: 'request',
+      asked: true,
+      weather: true,
+      text: `It's wet out here, I'm sliding everywhere on these ${said(me.compound)}. I need ${said(want)}!`,
+      stats: [
+        { label: 'Slicks', value: `${slick}% off the pace` },
+        { label: 'Track', value: w >= 0.45 ? 'Soaked' : 'Wet' },
+      ],
+      options: [
+        {
+          id: 'yes',
+          label: `Yes, box for ${said(want)}`,
+          call: { lap: next, kind: 'reply', request: 'box', yes: true },
+          also: [{ lap: next, kind: 'pit', compound: want }],
+        },
+        {
+          id: 'no',
+          label: 'No, stay out',
+          note: 'He’ll remember if he was right',
+          call: { lap: next, kind: 'reply', request: 'box', yes: false },
+        },
+      ],
+    };
+  }
+  if (onWets && w < 0.08 && model.race.laps - race.lap > 3) {
+    mem.last.weather = race.lap;
+    const slicks = lastingCompound(race, { ...model, weather: undefined });
+    return {
+      lap: race.lap,
+      from: 'Engineer',
+      kind: 'quick',
+      weather: true,
+      text: `The track's drying fast, there's a dry line now. ${said(me.compound)} are overheating. Slicks?`,
+      options: [
+        {
+          id: 'slicks',
+          label: `Box for ${said(slicks)}`,
+          call: { lap: next, kind: 'pit', compound: slicks },
+        },
+        { id: 'stay', label: `Stay on ${said(me.compound)}`, call: null },
+      ],
+    };
+  }
+  return null;
 }
 
 /** The driver's mood as the game shows it. */

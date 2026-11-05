@@ -65,5 +65,11 @@ export function choicesFor(moment: DecisionMoment): Choices {
   return { direct, boxes, boxIndex };
 }
 
-const NAME: Record<string, string> = { SOFT: 'Softs', MEDIUM: 'Mediums', HARD: 'Hards' };
+const NAME: Record<string, string> = {
+  SOFT: 'Softs',
+  MEDIUM: 'Mediums',
+  HARD: 'Hards',
+  INTERMEDIATE: 'Inters',
+  WET: 'Wets',
+};
 export const tyreName = (compound: string) => NAME[compound] ?? compound.toLowerCase();

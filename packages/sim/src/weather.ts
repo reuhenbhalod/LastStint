@@ -80,3 +80,18 @@ export function wetCrash(weather: Weather | undefined, compound: Compound, w: nu
   const slick = isWetTyre(compound) ? 0 : wetPenalty(weather, compound, w);
   return 1 + 3 * w + 40 * slick;
 }
+
+/** The player's car on slicks in the wet: a slide off and back on costs this (s). */
+export const WET_OFF_COST = 10;
+/** Its random stream (per car; only drawn in a wet race). */
+export const WET_OFF_STREAM = 9500;
+
+/**
+ * The chance a lap that the player's car slides off on slicks in the wet (live play only:
+ * the field's real laps already have their own slides in them). Rises with the grip the slicks
+ * have lost: one lap in three at 20% off the pace. Estimates.
+ */
+export function wetOff(weather: Weather | undefined, compound: Compound, w: number): number {
+  if (!weather || isWetTyre(compound) || w <= 0) return 0;
+  return Math.min(0.5, 1.5 * wetPenalty(weather, compound, w));
+}

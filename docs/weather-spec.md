@@ -1,6 +1,6 @@
 # Weather spec
 
-Status: decided 2026-11-05. The owner chose the recommended option for W1–W7 (W1: mixed-weather
+Status: built 2026-11-05 (see Built). Decided 2026-11-05. The owner chose the recommended option for W1–W7 (W1: mixed-weather
 races only, in the daily rotation and the Gauntlet). Built after the strategy planner.
 
 ## Goal
@@ -102,3 +102,28 @@ Germany 2018: Hamilton stays out and wins from 14th).
 4. UI: the weather chip, rain on the map, the calls (W5), inters and wets in the picker and
    in the strategy planner.
 5. e2e on one wet race; schedule them into the rotation.
+
+## Built (Nov 5 2026)
+
+- **Data (OpenF1).** FastF1 needs an F1TV subscription since Oct 2026, so the owner chose
+  OpenF1 (free, 2023 on): `pipeline/openf1.py` writes the same raw snapshot, track status and
+  a new weather file (rain by the minute). Russia 2021 came from the local FastF1 cache.
+  Checked against FastF1 on Spain and Singapore 2023 (tyres, stints, positions identical).
+- **Races (W1, revised for the data).** Germany 2018 and both Turkey races aren't on OpenF1,
+  Netherlands 2023 turns on a red flag and Brazil 2024 is wet throughout. Five races were
+  built: Russia 2021, Great Britain 2024, Canada 2024, Monaco 2023, Australia 2025.
+  Russia 2021 and Canada 2024 pass G1 and are in the daily pool. Great Britain 2024 and
+  Monaco 2023 pass on the duel but miss field checks; Australia 2025 fails (the leader's
+  last wet stint: race craft the model doesn't have). Those three are built but not played.
+- **Model.** `pipeline/wet.py`: a wetness timeline per race (0-1, fitted from the laps) and
+  three curves shared by all races (`data/wet.json`, `pipeline wet-fit`): the share of a dry
+  lap a slick, an inter and a wet lose. Fitted within 0.3-2.1% per race. Slicks barely wear
+  on a wet track, wet tyres wear fast on a drying one; drivers have a wet pace of their own.
+  The dry model is fitted on the untouched laps with a fixed fuel effect.
+- **Sims.** Both sims run the wet lap and wear identically (parity on Russia and Canada). A
+  blind playout races a forecast: the real rain shifted a lap or two and scaled ±20% (W3).
+  The two-compound rule is waived once wet tyres are used (W6). In live play slicks in the
+  wet raise crash risk, and the player's car aquaplanes off now and then (10 s).
+- **Game.** Rain and drying moments; the driver asks for inters, the engineer offers slicks
+  as it dries (W5); the weather chip with the radar forecast and rain on the map (W4);
+  plans include wet tyres; a stop far dearer than usual crawls its in-lap on the map.

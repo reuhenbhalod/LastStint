@@ -266,3 +266,28 @@ label:has(input) {
     animation: none;
   }
 }
+
+/* Rain over the track map (weather spec W4): slanted streaks drifting down. */
+.map-rain {
+  background-image: repeating-linear-gradient(
+      105deg,
+      transparent 0 9px,
+      rgba(200, 220, 255, 0.22) 9px 10px,
+      transparent 10px 23px
+    ), linear-gradient(rgba(20, 40, 80, 0.25), rgba(20, 40, 80, 0.25));
+  background-size: 46px 60px, auto;
+  animation: map-rain 0.6s linear infinite;
+}
+@keyframes map-rain {
+  from {
+    background-position: 0 0, 0 0;
+  }
+  to {
+    background-position: -16px 60px, 0 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .map-rain {
+    animation: none;
+  }
+}

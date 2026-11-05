@@ -11,6 +11,7 @@ import {
   tyreLife,
 } from '@boxthislap/sim';
 import { flagOn } from '../track/geometry.js';
+import { tyreName } from './choices.js';
 import type { LapEvents } from './raceLog.js';
 import type { LiveCall } from './refusal.js';
 
@@ -63,6 +64,8 @@ export interface QuickCall {
   stats?: Array<{ label: string; value: string }>;
   /** An answer the driver asked for is always followed; the wall's orders may be refused. */
   asked?: boolean;
+  /** A call the weather brought (asked even on fresh tyres: rain doesn't wait). */
+  weather?: boolean;
 }
 
 /**
@@ -175,7 +178,7 @@ export function quickCallAt(race: RaceState, model: RaceModel, log: LapEvents[])
     return {
       lap: race.lap,
       from: us,
-      text: `These ${me.compound.toLowerCase()}s are ${me.tyreAge} laps old and starting to go. Do I look after them?`,
+      text: `These ${tyreName(me.compound).toLowerCase()} are ${me.tyreAge} laps old and starting to go. Do I look after them?`,
       options: [
         opt('manage', 'Manage them', m, next, 'pace', 'manage'),
         opt('push', 'Keep pushing', m, next, 'pace', m.pace === 'manage' ? 'standard' : m.pace),
@@ -247,11 +250,11 @@ export function safetyCarCall(
   return {
     lap: race.lap,
     from: 'Engineer',
-    text: `${name}! The pit lane is cheap. Box for ${compound.toLowerCase()}s, or stay out?`,
+    text: `${name}! The pit lane is cheap. Box for ${tyreName(compound).toLowerCase()}, or stay out?`,
     options: [
       {
         id: 'box',
-        label: `Box, ${compound.toLowerCase()}s`,
+        label: `Box, ${tyreName(compound).toLowerCase()}`,
         call: { lap: next, kind: 'pit', compound },
       },
       { id: 'stay', label: 'Stay out', call: null },
