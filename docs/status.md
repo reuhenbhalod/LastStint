@@ -77,6 +77,7 @@ Beta feedback round 2, part B (Nov 2, 2026):
     - A big stop moment stays out for you if a stop is booked or was made in the last 5 laps ("We're boxing already").
     - A stop picked in answer to a question is never refused.
     - A team-radio BOX clears a stop question already on screen.
+- **Brand and rights (Nov 5, localhost only):** following F1's fan guidelines (formula1.com/en/information/guidelines): the official unofficial-site disclaimer, word for word, plus that no team, driver or the FIA endorses the game (`components/Disclaimer.tsx`, on the home page, results, survivor and How it works); "F1" out of our branding (the tagline is "Daily race strategy"); no logos, official fonts, photos, audio or video. Stay non-commercial: ads, payments or sponsorship would need an F1 licence (data and marks).
 - **The race as it happens (Nov 5, localhost only):**
   - **The lap read ahead:** the lap being shown is run ahead each lap (`previewLap`, an exact replay, ~0.1 ms) and again after any call.
   - **Cars move all lap:** each car moves toward its gap at the lap's end through the lap, so overtakes happen on track, not at the line.

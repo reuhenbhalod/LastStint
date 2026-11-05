@@ -6,6 +6,7 @@
 
 import type { RaceModel } from '@boxthislap/sim';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Disclaimer } from '../components/Disclaimer.js';
 import { ChequeredIcon, FlagIcon, OvertakeIcon } from '../components/Icons.js';
 import { ApiError, type SurvivorBoardEntry, type SurvivorState, survivorApi } from '../data/api.js';
 import { anonId } from '../data/player.js';
@@ -495,6 +496,7 @@ export function Survivor() {
         )}
         {view === 'over' && run && <Over run={run} finish={finish} onAgain={start} />}
       </main>
+      <Disclaimer />
     </div>
   );
 }

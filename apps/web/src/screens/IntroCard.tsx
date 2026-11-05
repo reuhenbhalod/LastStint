@@ -8,6 +8,7 @@ import type { RaceModel } from '@boxthislap/sim';
 import { useMemo, useState } from 'react';
 import type { AccountState } from '../account/useAccount.js';
 import { AccountBar } from '../components/AccountBar.js';
+import { Disclaimer } from '../components/Disclaimer.js';
 import { HeadsetIcon, OvertakeIcon, TyreIcon } from '../components/Icons.js';
 import { TyreBadge } from '../components/TyreBadge.js';
 import { TIER_LABEL, driverInfo } from '../data/drivers.js';
@@ -216,7 +217,7 @@ export function IntroCard({
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
           <a href="/" className="flex items-baseline gap-2">
             <span className="disp wide text-[20px] leading-none">Pit Wall</span>
-            <span className="eyebrow hidden sm:inline">Daily F1 strategy</span>
+            <span className="eyebrow hidden sm:inline">Daily race strategy</span>
           </a>
           <span className="flex flex-wrap items-center gap-2">
             {source !== 'survivor' && (
@@ -416,9 +417,7 @@ export function IntroCard({
         </section>
       </main>
 
-      <footer className="px-6 pb-6 text-center text-[12px] text-[var(--muted)]">
-        One race a day · Not affiliated with Formula 1.
-      </footer>
+      <Disclaimer />
     </div>
   );
 }

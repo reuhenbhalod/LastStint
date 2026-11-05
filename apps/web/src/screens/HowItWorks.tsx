@@ -1,5 +1,6 @@
 // Rules, grading, data sources and the disclaimer (product doc "How it works"; plan 6.5).
 
+import { Disclaimer } from '../components/Disclaimer.js';
 import { BandChip } from '../components/Icons.js';
 
 export function HowItWorks({ onClose }: { onClose: () => void }) {
@@ -61,10 +62,7 @@ export function HowItWorks({ onClose }: { onClose: () => void }) {
           is our own; it’s an estimate, not a replay.
         </p>
       </section>
-      <p className="text-xs text-neutral-500">
-        Not affiliated with Formula 1, the FIA or any team. No team names, logos or liveries are
-        used as trademarks.
-      </p>
+      <Disclaimer className="!px-0 text-left" />
     </main>
   );
 }

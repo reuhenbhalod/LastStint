@@ -6,6 +6,7 @@ import { type Band, type DecisionMoment, bandFor } from '@boxthislap/sim';
 import { useEffect, useState } from 'react';
 import type { AccountState } from '../account/useAccount.js';
 import { AccountBar } from '../components/AccountBar.js';
+import { Disclaimer } from '../components/Disclaimer.js';
 import { DriverDebrief } from '../components/DriverDebrief.js';
 import { BandChip } from '../components/Icons.js';
 import { ResultHero } from '../components/ResultHero.js';
@@ -441,6 +442,7 @@ export function ResultScreen({
           </button>
         )}
       </div>
+      <Disclaimer className="mt-6 !px-0" />
     </main>
   );
 }
