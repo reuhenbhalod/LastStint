@@ -3,19 +3,22 @@
 // Google ID token as a Bearer token, checked by requireAdmin (401 no or bad token, 403 not on
 // ADMIN_EMAILS). A new ticket records the admin's email as created_by.
 //
-//   GET    /api/admin/tickets         every ticket, newest first       -> { tickets }
+//   GET    /api/admin/tickets         every ticket, newest first, plus who can be assigned
+//                                    and who's asking         -> { tickets, admins, me }
 //   POST   /api/admin/tickets         { title, category, description?, status?, notes?,
-//                                    source? }: create                -> 201 { ticket }
+//                                    source?, assignee? }: create     -> 201 { ticket }
 //   PATCH  /api/admin/tickets/:id     change any of those fields       -> { ticket }
 //   DELETE /api/admin/tickets/:id     delete                           -> { ok: true }
 //
+// assignee is an admin's email (one of ADMIN_EMAILS; 400 otherwise) or '' for unassigned.
+// "Pick up" in the page is a PATCH of { assignee: me } (and in_progress if it was open).
 // completed_at is stamped when a ticket becomes done (kept while it stays done) and cleared
 // when it leaves done. Bodies are JSON (415 otherwise, 413 over 64 KB, 400 bad-json / invalid).
 // Every query is parameterised; the only SQL built at run time is an update's SET list, whose
 // column names come from a fixed list, never from the request.
 
 import type { Context, Hono } from 'hono';
-import { requireAdmin } from './admin.js';
+import { adminEmails, requireAdmin } from './admin.js';
 import type { Env } from './index.js';
 import { ApiError } from './runs.js';
 import {
@@ -40,6 +43,7 @@ interface Row {
   notes: string;
   source: string;
   created_by: string;
+  assignee: string;
   created_at: number;
   updated_at: number;
   completed_at: number | null;
@@ -55,6 +59,7 @@ function toTicket(r: Row): Ticket {
     notes: r.notes,
     source: r.source,
     createdBy: r.created_by,
+    assignee: r.assignee,
     createdAt: r.created_at,
     updatedAt: r.updated_at,
     completedAt: r.completed_at,
@@ -79,8 +84,8 @@ export async function createTicket(
   const row = await db
     .prepare(
       `INSERT INTO tickets (title, description, category, status, notes, source, created_by,
-                            created_at, updated_at, completed_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            assignee, created_at, updated_at, completed_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
        RETURNING *`,
     )
     .bind(
@@ -91,6 +96,7 @@ export async function createTicket(
       input.notes ?? '',
       input.source ?? '',
       createdBy,
+      input.assignee ?? '',
       now,
       now,
       status === 'done' ? now : null,
@@ -100,7 +106,15 @@ export async function createTicket(
   return toTicket(row);
 }
 
-const COLUMNS = ['title', 'description', 'category', 'status', 'notes', 'source'] as const;
+const COLUMNS = [
+  'title',
+  'description',
+  'category',
+  'status',
+  'notes',
+  'source',
+  'assignee',
+] as const;
 
 /**
  * Change some of a ticket's fields; null if there's no such ticket. A status change to done
@@ -166,16 +180,30 @@ function ticketId(c: Ctx): number {
   return id;
 }
 
+/** 400 unless the assignee (if given) is '' or one of the admins. */
+function checkAssignee(c: Ctx, input: Partial<TicketInput>) {
+  const a = input.assignee;
+  if (a === undefined || a === '') return;
+  if (!adminEmails(c.env).includes(a)) {
+    throw new ApiError(400, 'invalid', 'assignee must be an admin, or empty to unassign');
+  }
+}
+
 export function registerTickets(app: Hono<{ Bindings: Env }>) {
   app.get('/api/admin/tickets', async (c) => {
-    await requireAdmin(c);
-    return c.json({ tickets: await listTickets(c.env.DB) });
+    const who = await requireAdmin(c);
+    return c.json({
+      tickets: await listTickets(c.env.DB),
+      admins: adminEmails(c.env),
+      me: who.email,
+    });
   });
 
   app.post('/api/admin/tickets', async (c) => {
     const who = await requireAdmin(c);
     const parsed = parseTicketInput(await jsonBody(c), true);
     if (!parsed.ok) throw new ApiError(400, 'invalid', parsed.error);
+    checkAssignee(c, parsed.value);
     const { title, category } = parsed.value;
     if (title === undefined || category === undefined) {
       throw new ApiError(400, 'invalid', 'title and category are required');
@@ -194,6 +222,7 @@ export function registerTickets(app: Hono<{ Bindings: Env }>) {
     const id = ticketId(c);
     const parsed = parseTicketInput(await jsonBody(c), false);
     if (!parsed.ok) throw new ApiError(400, 'invalid', parsed.error);
+    checkAssignee(c, parsed.value);
     const ticket = await updateTicket(c.env.DB, id, parsed.value, Date.now());
     if (!ticket) throw new ApiError(404, 'not-found', `no ticket ${id}`);
     return c.json({ ticket });

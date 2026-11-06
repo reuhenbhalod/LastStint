@@ -1,6 +1,7 @@
 // The admin page's Tickets tab (/admin/tickets): open and in-progress tickets grouped by
-// category, then a collapsible Completed section. Filter by category, search the text, switch
-// a ticket's status in place, and add, edit or delete tickets. AdminPage only renders this for
+// category, then a collapsible Completed section. Filter by owner (everyone, mine,
+// unassigned) and category, search the text, switch a ticket's status or assignee in place,
+// pick up an unassigned ticket, and add, edit or delete tickets. AdminPage only renders this for
 // a signed-in admin; every call is checked again by the Worker (apps/worker/src/tickets.ts).
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -10,6 +11,7 @@ import {
   CATEGORIES,
   CATEGORY_LABELS,
   type Category,
+  type Owner,
   type Status,
   type Ticket,
   type TicketFields,
@@ -24,6 +26,9 @@ import { btn, field, primary } from './ui.js';
 
 export function TicketsPage() {
   const [tickets, setTickets] = useState<Ticket[] | null>(null);
+  const [admins, setAdmins] = useState<string[]>([]);
+  const [me, setMe] = useState('');
+  const [owner, setOwner] = useState<Owner>('all');
   const [loadError, setLoadError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [category, setCategory] = useState<Category | 'all'>('all');
@@ -38,7 +43,10 @@ export function TicketsPage() {
   const load = useCallback(async () => {
     setLoadError(null);
     try {
-      setTickets(await listTickets());
+      const list = await listTickets();
+      setAdmins(list.admins);
+      setMe(list.me);
+      setTickets(list.tickets);
     } catch (e) {
       setLoadError(errorText(e));
     }
@@ -71,6 +79,20 @@ export function TicketsPage() {
   const setStatus = (t: Ticket, status: Status) =>
     withTicket(t.id, async () => replace(await updateTicket(t.id, { status })));
 
+  const assign = (t: Ticket, assignee: string) =>
+    withTicket(t.id, async () => replace(await updateTicket(t.id, { assignee })));
+
+  /** Take an unassigned ticket: it's yours, and an open one is now in progress. */
+  const pickUp = (t: Ticket) =>
+    withTicket(t.id, async () =>
+      replace(
+        await updateTicket(t.id, {
+          assignee: me,
+          ...(t.status === 'open' ? { status: 'in_progress' as const } : {}),
+        }),
+      ),
+    );
+
   const remove = (t: Ticket) =>
     withTicket(t.id, async () => {
       await deleteTicket(t.id);
@@ -101,10 +123,21 @@ export function TicketsPage() {
   };
 
   const { groups, done } = useMemo(
-    () => arrange(tickets ?? [], category, query),
-    [tickets, category, query],
+    () => arrange(tickets ?? [], category, query, owner, me),
+    [tickets, category, query, owner, me],
   );
-  const filtering = category !== 'all' || query.trim() !== '';
+  const filtering = category !== 'all' || owner !== 'all' || query.trim() !== '';
+  const openTickets = (tickets ?? []).filter((t) => t.status !== 'done');
+  const ownerCounts: Record<Owner, number> = {
+    all: openTickets.length,
+    mine: openTickets.filter((t) => t.assignee === me).length,
+    unassigned: openTickets.filter((t) => !t.assignee).length,
+  };
+  const OWNER_LABELS: Record<Owner, string> = {
+    all: 'Everyone',
+    mine: 'Assigned to me',
+    unassigned: 'Unassigned',
+  };
 
   const card = (t: Ticket, showCategory: boolean) => (
     <TicketCard
@@ -112,7 +145,11 @@ export function TicketsPage() {
       ticket={t}
       showCategory={showCategory}
       busy={busy.has(t.id)}
+      admins={admins}
+      me={me}
       onStatus={(s) => setStatus(t, s)}
+      onAssign={(a) => assign(t, a)}
+      onPickUp={() => pickUp(t)}
       onEdit={() => setEditing(t)}
       onDelete={() => remove(t)}
     />
@@ -140,6 +177,34 @@ export function TicketsPage() {
         aria-label="Search tickets"
         className={field}
       />
+      <fieldset className="m-0 flex w-full overflow-hidden rounded-lg border border-[var(--rule)] p-0 sm:w-auto sm:self-start">
+        <legend className="sr-only">Whose tickets</legend>
+        {(['all', 'mine', 'unassigned'] as const).map((o) => (
+          <button
+            key={o}
+            type="button"
+            aria-pressed={owner === o}
+            onClick={() => setOwner(o)}
+            className={`flex-1 px-3 py-1.5 text-[13px] font-semibold sm:flex-none ${
+              owner === o
+                ? 'bg-[var(--card-2)] text-[var(--ink)]'
+                : 'text-[var(--muted)] hover:bg-[var(--card-2)]'
+            }`}
+          >
+            {o === 'mine' ? (
+              <>
+                <span className="sm:hidden">Mine</span>
+                <span className="hidden sm:inline">{OWNER_LABELS[o]}</span>
+              </>
+            ) : (
+              OWNER_LABELS[o]
+            )}
+            {tickets && (
+              <span className="ml-1.5 font-normal text-[var(--muted)]">{ownerCounts[o]}</span>
+            )}
+          </button>
+        ))}
+      </fieldset>
       <fieldset className="m-0 flex flex-wrap gap-1.5 border-0 p-0">
         <legend className="sr-only">Category</legend>
         {(['all', ...CATEGORIES] as const).map((c) => (
@@ -181,7 +246,11 @@ export function TicketsPage() {
         <>
           {groups.length === 0 && (
             <p className="m-0 mt-4 text-center text-[14px] text-[var(--muted)]">
-              {filtering ? 'No open tickets match.' : 'No open tickets.'}
+              {owner === 'mine' && category === 'all' && !query.trim()
+                ? 'Nothing assigned to you. Pick up a ticket from Unassigned.'
+                : filtering
+                  ? 'No open tickets match.'
+                  : 'No open tickets.'}
             </p>
           )}
           {groups.map((g) => (
@@ -223,6 +292,8 @@ export function TicketsPage() {
         <TicketEditor
           ticket={editing === 'new' ? null : editing}
           defaultCategory={category === 'all' ? 'bug' : category}
+          admins={admins}
+          me={me}
           saving={saving}
           error={editError}
           onSave={save}
