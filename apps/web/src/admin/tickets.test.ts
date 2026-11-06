@@ -2,7 +2,15 @@
 
 import { describe, expect, it } from 'vitest';
 import { ApiError } from '../api.js';
-import { type Ticket, arrange, errorText, matches } from './tickets.js';
+import {
+  type Ticket,
+  arrange,
+  assigneeLabel,
+  errorText,
+  initials,
+  matches,
+  personName,
+} from './tickets.js';
 
 let next = 1;
 function ticket(over: Partial<Ticket> = {}): Ticket {
@@ -16,6 +24,7 @@ function ticket(over: Partial<Ticket> = {}): Ticket {
     notes: '',
     source: '',
     createdBy: '',
+    assignee: '',
     createdAt: id * 1000,
     updatedAt: id * 1000,
     completedAt: null,
@@ -70,5 +79,36 @@ describe('errorText', () => {
     expect(errorText(new ApiError(401, 'bad-credential'))).toMatch(/sign in again/);
     expect(errorText(new ApiError(404, 'not-found', 'no ticket 3'))).toMatch(/gone/);
     expect(errorText(new Error('boom'))).toBe('boom');
+  });
+});
+
+describe('assignees', () => {
+  const me = 'reuhenbhalod@gmail.com';
+  const other = 'purohit.abhiram@gmail.com';
+  const mine = ticket({ title: 'Mine', assignee: me });
+  const theirs = ticket({ title: 'Theirs', assignee: other });
+  const nobody = ticket({ title: 'Nobody' });
+  const all = [mine, theirs, nobody];
+  const titles = (owner: 'all' | 'mine' | 'unassigned') =>
+    arrange(all, 'all', '', owner, me).groups.flatMap((g) => g.tickets.map((t) => t.title));
+
+  it('filters by owner', () => {
+    expect(titles('mine')).toEqual(['Mine']);
+    expect(titles('unassigned')).toEqual(['Nobody']);
+    expect(titles('all').sort()).toEqual(['Mine', 'Nobody', 'Theirs']);
+  });
+
+  it('names people from their email', () => {
+    expect(personName(other)).toBe('Purohit Abhiram');
+    expect(initials(other)).toBe('PA');
+    expect(initials(me)).toBe('RE');
+    expect(assigneeLabel(me, me)).toBe('You');
+    expect(assigneeLabel(other, me)).toBe('Purohit Abhiram');
+    expect(assigneeLabel('', me)).toBe('Unassigned');
+  });
+
+  it('finds tickets by assignee in search', () => {
+    expect(matches(theirs, 'abhiram')).toBe(true);
+    expect(matches(nobody, 'abhiram')).toBe(false);
   });
 });

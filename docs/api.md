@@ -200,12 +200,12 @@ For the people running the game (`apps/worker/src/admin.ts`, the website's `/adm
 
 ### Tickets
 
-The game-change ticket tracker (`apps/worker/src/tickets.ts`, the admin page's Tickets tab at `/admin/tickets`), on the same admin check as above. A ticket is `{ id, title, description, category, status, notes, source, createdBy, createdAt, updatedAt, completedAt }`; times are Unix milliseconds.
+The game-change ticket tracker (`apps/worker/src/tickets.ts`, the admin page's Tickets tab at `/admin/tickets`), on the same admin check as above. A ticket is `{ id, title, description, category, status, notes, source, createdBy, assignee, createdAt, updatedAt, completedAt }`; times are Unix milliseconds. `assignee` is an admin's email (one of `ADMIN_EMAILS`, 400 otherwise) or `''` for unassigned; the page's Pick up sends `{ assignee: <you>, status: 'in_progress' }` for an open ticket.
 
 | Endpoint | What it does |
 |---|---|
-| `GET /api/admin/tickets` | `{ tickets }`: every ticket, newest first |
-| `POST /api/admin/tickets` `{ title, category, description?, status?, notes?, source? }` | `201 { ticket }`. `createdBy` is the admin's email |
+| `GET /api/admin/tickets` | `{ tickets, admins, me }`: every ticket, newest first; the admins a ticket can be assigned to; the caller's email |
+| `POST /api/admin/tickets` `{ title, category, description?, status?, notes?, source?, assignee? }` | `201 { ticket }`. `createdBy` is the admin's email |
 | `PATCH /api/admin/tickets/:id` `{ any of those fields }` | `{ ticket }` |
 | `DELETE /api/admin/tickets/:id` | `{ ok: true }` |
 

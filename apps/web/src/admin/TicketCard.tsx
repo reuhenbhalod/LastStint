@@ -1,9 +1,11 @@
-// One ticket on the Tickets tab: its title, a status switch, and (opened) its description and
-// notes, with Edit and Delete. Delete asks first, in the card.
+// One ticket on the Tickets tab: its title, a status switch, who's on it (with Pick up when
+// nobody is), and (opened) its description and notes, with Edit and Delete. Delete asks
+// first, in the card.
 
 import { useState } from 'react';
+import { AssigneeSelect } from './Assignee.js';
 import { CATEGORY_LABELS, STATUSES, STATUS_LABELS, type Status, type Ticket } from './tickets.js';
-import { btn, danger } from './ui.js';
+import { btn, danger, primary } from './ui.js';
 
 function day(ms: number): string {
   return new Date(ms).toLocaleDateString(undefined, {
@@ -17,14 +19,22 @@ export function TicketCard({
   ticket,
   showCategory,
   busy,
+  admins,
+  me,
   onStatus,
+  onAssign,
+  onPickUp,
   onEdit,
   onDelete,
 }: {
   ticket: Ticket;
   showCategory: boolean;
   busy: boolean;
+  admins: readonly string[];
+  me: string;
   onStatus: (status: Status) => void;
+  onAssign: (assignee: string) => void;
+  onPickUp: () => void;
   onEdit: () => void;
   onDelete: () => void;
 }) {
@@ -78,6 +88,29 @@ export function TicketCard({
             </button>
           ))}
         </fieldset>
+      </div>
+
+      <div className="mt-2 flex flex-wrap items-center gap-2">
+        <AssigneeSelect
+          ticketId={t.id}
+          assignee={t.assignee}
+          admins={admins}
+          me={me}
+          disabled={busy}
+          onChange={onAssign}
+        />
+        {!t.assignee && t.status !== 'done' && (
+          <button
+            type="button"
+            className={`${primary} !px-2.5 !py-1 !text-[12px]`}
+            onClick={onPickUp}
+            disabled={busy}
+            aria-label={`Pick up #${t.id}${t.status === 'open' ? ' and mark it in progress' : ''}`}
+            title={t.status === 'open' ? 'Assign to you and mark in progress' : 'Assign to you'}
+          >
+            Pick up
+          </button>
+        )}
       </div>
 
       {open && (

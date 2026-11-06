@@ -12,6 +12,7 @@ import {
   type Status,
   type Ticket,
   type TicketFields,
+  assigneeLabel,
 } from './tickets.js';
 import { btn, field, primary } from './ui.js';
 
@@ -20,6 +21,8 @@ const label = 'flex flex-col gap-1 text-[12px] font-semibold text-[var(--muted)]
 export function TicketEditor({
   ticket,
   defaultCategory,
+  admins,
+  me,
   saving,
   error,
   onSave,
@@ -28,6 +31,8 @@ export function TicketEditor({
   /** The ticket to edit; null for a new one. */
   ticket: Ticket | null;
   defaultCategory: Category;
+  admins: readonly string[];
+  me: string;
   saving: boolean;
   error: string | null;
   onSave: (fields: TicketFields) => void;
@@ -38,6 +43,8 @@ export function TicketEditor({
   const [category, setCategory] = useState<Category>(ticket?.category ?? defaultCategory);
   const [status, setStatus] = useState<Status>(ticket?.status ?? 'open');
   const [notes, setNotes] = useState(ticket?.notes ?? '');
+  const [assignee, setAssignee] = useState(ticket?.assignee ?? '');
+  const people = !assignee || admins.includes(assignee) ? admins : [...admins, assignee];
 
   const dialog = useRef<HTMLDialogElement>(null);
   useEffect(() => {
@@ -49,7 +56,7 @@ export function TicketEditor({
   const submit = (e: FormEvent) => {
     e.preventDefault();
     if (!title.trim() || saving) return;
-    onSave({ title: title.trim(), description, category, status, notes });
+    onSave({ title: title.trim(), description, category, status, notes, assignee });
   };
 
   return (
@@ -109,6 +116,17 @@ export function TicketEditor({
             </select>
           </label>
         </div>
+        <label className={label}>
+          Assignee
+          <select value={assignee} onChange={(e) => setAssignee(e.target.value)} className={field}>
+            <option value="">Unassigned</option>
+            {people.map((p) => (
+              <option key={p} value={p}>
+                {assigneeLabel(p, me)}
+              </option>
+            ))}
+          </select>
+        </label>
         <label className={label}>
           Description
           <textarea
