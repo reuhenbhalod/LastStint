@@ -63,9 +63,15 @@ export function DriverDebrief({
   const contact = mine.filter((n) => n.kind === 'contact').length;
   const color = mood === 'calm' ? 'var(--good)' : mood === 'tense' ? 'var(--flag)' : 'var(--box)';
   return (
-    <section aria-label="Your driver" className="card flex flex-col gap-3">
-      <div className="flex items-baseline justify-between">
-        <span className="eyebrow">{side} after the flag</span>
+    <section
+      aria-label="Your driver"
+      className="flex flex-col gap-3 rounded-lg border border-[#1F2523] bg-[#0F1312] p-3.5"
+    >
+      <div className="flex items-baseline justify-between gap-2">
+        <span className="flex items-center gap-2">
+          <span aria-hidden="true" className="h-3.5 w-[5px] -skew-x-12 bg-[var(--you)]" />
+          <span className="disp text-[12px] tracking-[0.08em]">{side} after the flag</span>
+        </span>
         <span className="text-[14px] font-bold" style={{ color }}>
           <MoodLight color={MOOD_LABEL[mood].color} /> {MOOD_LABEL[mood].text} ·{' '}
           {Math.round(eng.trust)}% trust
