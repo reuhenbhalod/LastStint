@@ -66,13 +66,9 @@ export function PlanCard({
     selected === 'own' ? 'Go with your plan' : `Go with plan ${selected?.toUpperCase() ?? ''}`;
 
   return (
-    <section
-      aria-label="Race plan"
-      className="card flex flex-col gap-2.5 !p-3"
-      style={{ borderColor: 'var(--you)' }}
-    >
+    <section aria-label="Race plan" className="call-plate !gap-2.5">
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
-        <span className="eyebrow flex items-center gap-1.5 !text-[var(--you)]">
+        <span className="call-tag">
           <HeadsetIcon size={14} /> Race plan · lap {takeoverLap + 1} of {totalLaps}
         </span>
         <span className="text-[12px] text-[var(--muted)]">{headline}</span>
@@ -100,7 +96,7 @@ export function PlanCard({
                 type="button"
                 aria-pressed={on}
                 onClick={() => setPicked(p.id)}
-                className={`flex min-w-0 flex-col items-stretch gap-1.5 rounded-lg border-2 px-2.5 py-2 text-left transition-colors ${on ? 'border-[var(--you)] bg-[color-mix(in_srgb,var(--you)_8%,transparent)]' : 'border-[var(--rule)] hover:border-[var(--muted)]'}`}
+                className={`flex min-w-0 flex-col items-stretch gap-1.5 rounded-md border px-2.5 py-2 text-left transition-colors ${on ? 'border-[var(--you)] bg-[color-mix(in_srgb,var(--you)_14%,#181D1B)]' : 'border-[#2D3431] bg-[#181D1B] hover:border-[#6B736F]'}`}
               >
                 <span className="flex items-center justify-between gap-2">
                   <span className="flex min-w-0 items-center gap-1.5">

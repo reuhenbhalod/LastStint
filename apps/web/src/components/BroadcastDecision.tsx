@@ -1,4 +1,4 @@
-// The big call, as a TV lower third under the map: the radio line, a row of facts (gap,
+// The big call, as a dark TV graphic under the map (the call-plate style in index.css): the radio line, a row of facts (gap,
 // tyres, stop cost, laps left), then the options, each with one line on what it does
 // (game/guide.ts). Stops fold into a "Box" button per timing (this lap, next lap) that opens
 // the tyre choice in place, each compound with what it gains over the laps left. Same options
@@ -19,11 +19,6 @@ const LETTER: Record<string, string> = {
   INTERMEDIATE: 'I',
   WET: 'W',
 };
-
-const btn =
-  'flex min-h-[48px] min-w-0 flex-col items-start justify-center gap-0.5 rounded-md border-2 px-3 py-1.5 text-left hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--you)] md:min-h-[52px] md:px-4';
-const plain = `${btn} border-[#0B0E0D] bg-transparent text-[#0B0E0D] hover:bg-[#0B0E0D] hover:text-white`;
-const boxBtn = `${btn} border-[var(--box)] bg-[var(--box)] text-white`;
 
 export function BroadcastDecision({
   moment,
@@ -125,125 +120,113 @@ export function BroadcastDecision({
   facts.push(['Laps left', String(brief.lapsLeft)]);
 
   const key = (n: number) => (
-    <span aria-hidden="true" className="mono hidden text-[10px] opacity-50 md:inline">
+    <span aria-hidden="true" className="call-key hidden md:inline">
       {n}
     </span>
   );
 
   return (
-    <section
-      aria-label="Your call"
-      className="decision flex items-stretch drop-shadow-[0_12px_30px_rgba(0,0,0,0.45)]"
-    >
-      <span
-        aria-hidden="true"
-        className="w-[14px] shrink-0 bg-[var(--you)]"
-        style={{ clipPath: 'polygon(0 0, 100% 0, 60% 100%, 0 100%)' }}
-      />
-      <div className="flex min-w-0 flex-1 flex-col gap-2 bg-[#F4F6F5] px-3.5 py-3 text-[#0B0E0D] md:px-5">
-        <div className="flex flex-wrap items-baseline gap-x-5 gap-y-1">
-          <span
-            role="alert"
-            className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-[#9a3412]"
-          >
-            Engineer · {brief.kind} · Lap {moment.lap}
-          </span>
+    <section aria-label="Your call" className="decision call-plate">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-5 gap-y-1.5">
+        <span role="alert" className="call-tag">
+          Engineer · {brief.kind} · Lap {moment.lap}
+        </span>
+        <dl className="m-0 hidden flex-wrap gap-x-4 gap-y-1 md:flex">
           {facts.map(([k, v]) => (
-            <span key={k} className="hidden text-[12px] text-[#39403D] md:inline">
-              <span className="uppercase tracking-wider text-[#6B736F]">{k}</span>{' '}
-              <b className="mono">{v}</b>
-            </span>
+            <div key={k} className="flex items-baseline gap-1.5 text-[12px]">
+              <dt className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#8D9692]">
+                {k}
+              </dt>
+              <dd className="mono m-0 font-semibold text-[#D5DAD7]">{v}</dd>
+            </div>
           ))}
-        </div>
-        <span className="text-[16px] font-bold leading-snug md:text-[19px]">{brief.headline}</span>
-        {box ? (
-          <div className="flex flex-col gap-2">
-            <span className="text-[12px] font-bold uppercase tracking-wider">
-              {box.label}: which tyres?
-              {(outlooks[0]?.greenLaps ?? 0) > 0 && (
-                <span className="font-normal normal-case tracking-normal text-[#39403D]">
-                  {' '}
-                  Gain is lap time over the {outlooks[0]?.greenLaps} green laps left, against
-                  staying out.
-                </span>
-              )}
-            </span>
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-              {tyreOpts.map((t, i) => {
-                const o = outlooks[i];
-                return (
-                  <button
-                    key={t.option.id}
-                    ref={i === 0 ? first : undefined}
-                    type="button"
-                    aria-label={tyreName(t.compound)}
-                    title={o ? `Good: ${o.good}\nBad: ${o.bad}` : undefined}
-                    className={plain}
-                    onClick={() => onChoose(t.option.id)}
-                  >
-                    <span className="flex w-full items-center gap-2">
-                      <span className={`tyre ${t.compound}`}>
-                        {LETTER[t.compound] ?? t.compound[0]}
-                      </span>
-                      <span className="text-[14px] font-extrabold uppercase tracking-wide">
-                        {tyreName(t.compound)}
-                      </span>
-                      {o?.gain != null && (
-                        <span className="mono ml-auto text-[14px] font-bold">
-                          {o.gain >= 0 ? '+' : '−'}
-                          {Math.abs(o.gain).toFixed(1)}s
-                        </span>
-                      )}
-                      {key(i + 1)}
+        </dl>
+      </div>
+      <span className="text-[17px] font-bold leading-snug text-white md:text-[20px]">
+        {brief.headline}
+      </span>
+      {box ? (
+        <div className="flex flex-col gap-2">
+          <span className="text-[12px] font-bold uppercase tracking-wider text-[#D5DAD7]">
+            {box.label}: which tyres?
+            {(outlooks[0]?.greenLaps ?? 0) > 0 && (
+              <span className="font-normal normal-case tracking-normal text-[#8D9692]">
+                {' '}
+                Gain is lap time over the {outlooks[0]?.greenLaps} green laps left, against staying
+                out.
+              </span>
+            )}
+          </span>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+            {tyreOpts.map((t, i) => {
+              const o = outlooks[i];
+              return (
+                <button
+                  key={t.option.id}
+                  ref={i === 0 ? first : undefined}
+                  type="button"
+                  aria-label={tyreName(t.compound)}
+                  title={o ? `Good: ${o.good}\nBad: ${o.bad}` : undefined}
+                  className="call-opt"
+                  onClick={() => onChoose(t.option.id)}
+                >
+                  <span className="flex w-full items-center gap-2">
+                    <span className={`tyre ${t.compound}`}>
+                      {LETTER[t.compound] ?? t.compound[0]}
                     </span>
-                    {o && (
-                      <span className="text-[11.5px] font-medium opacity-75">
-                        Drops off ~{o.dropOff} laps ·{' '}
-                        {o.toFlag ? 'lasts to the flag' : `won’t last ${brief.lapsLeft} laps`}
+                    <span className="label">{tyreName(t.compound)}</span>
+                    {o?.gain != null && (
+                      <span
+                        className="mono ml-auto text-[14px] font-bold"
+                        style={{ color: o.gain >= 0 ? 'var(--good)' : 'var(--box-ink)' }}
+                      >
+                        {o.gain >= 0 ? '+' : '−'}
+                        {Math.abs(o.gain).toFixed(1)}s
                       </span>
                     )}
-                  </button>
-                );
-              })}
-            </div>
-            <button
-              type="button"
-              onClick={() => setPicking(null)}
-              className="self-start px-1 text-[13px] font-bold text-[#39403D] underline"
-            >
-              Back
-            </button>
+                    {key(i + 1)}
+                  </span>
+                  {o && (
+                    <span className="note">
+                      Drops off ~{o.dropOff} laps ·{' '}
+                      {o.toFlag ? 'lasts to the flag' : `won’t last ${brief.lapsLeft} laps`}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
-        ) : (
-          <div
-            className={`grid grid-cols-2 gap-2 ${top.length >= 4 ? 'md:grid-cols-4' : top.length === 3 ? 'md:grid-cols-3' : ''}`}
+          <button
+            type="button"
+            onClick={() => setPicking(null)}
+            className="self-start px-1 text-[13px] font-bold text-[#B7BEBA] underline hover:text-white"
           >
-            {top.map((t, i) => (
-              <button
-                key={t.id}
-                ref={i === 0 ? first : undefined}
-                type="button"
-                aria-label={t.label}
-                title={t.note}
-                className={t.box ? boxBtn : plain}
-                onClick={t.act}
-              >
-                <span className="flex w-full items-center justify-between gap-2">
-                  <span className="text-[13px] font-extrabold uppercase leading-tight tracking-wide md:text-[14px]">
-                    {t.label}
-                  </span>
-                  {key(i + 1)}
-                </span>
-                {t.note && (
-                  <span className="line-clamp-2 text-[11.5px] font-medium leading-snug opacity-75">
-                    {t.note}
-                  </span>
-                )}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+            Back
+          </button>
+        </div>
+      ) : (
+        <div
+          className={`grid grid-cols-2 gap-2 ${top.length >= 4 ? 'md:grid-cols-4' : top.length === 3 ? 'md:grid-cols-3' : ''}`}
+        >
+          {top.map((t, i) => (
+            <button
+              key={t.id}
+              ref={i === 0 ? first : undefined}
+              type="button"
+              aria-label={t.label}
+              title={t.note}
+              className={`call-opt ${t.box ? 'box' : ''}`}
+              onClick={t.act}
+            >
+              <span className="flex w-full items-center justify-between gap-2">
+                <span className="label">{t.label}</span>
+                {key(i + 1)}
+              </span>
+              {t.note && <span className="note line-clamp-2">{t.note}</span>}
+            </button>
+          ))}
+        </div>
+      )}
     </section>
   );
 }

@@ -69,21 +69,21 @@ export function BattleCard({
   return (
     <section
       aria-label="Battle call"
-      className="quick-call card flex flex-col gap-3"
-      style={{ borderColor: 'var(--box)' }}
+      className="quick-call call-plate"
+      style={{ '--accent': 'var(--box)' } as React.CSSProperties}
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="flex items-center gap-2">
-          <span className="flex items-center gap-1.5 rounded-md bg-[var(--box)] px-2 py-0.5 text-[12px] font-bold uppercase tracking-wider text-white">
+          <span className="flex -skew-x-6 items-center gap-1.5 bg-[var(--box)] px-2 py-0.5 text-[11px] font-extrabold uppercase tracking-[0.12em] text-white">
             <OvertakeIcon size={13} /> Battle · T{corner}
           </span>
-          <span className="text-[13px] font-semibold">
+          <span className="text-[13px] font-semibold text-[#D5DAD7]">
             {who} · {(call.gap ?? 0).toFixed(1)} s
           </span>
         </span>
         <span
-          className="eyebrow"
-          style={{ color: stage === 'waiting' ? 'var(--box-ink)' : undefined }}
+          className="call-tag"
+          style={{ color: stage === 'waiting' ? 'var(--box-ink)' : '#8D9692' }}
         >
           {stage === 'approach' && !chosen
             ? 'Braking zone ahead'
@@ -94,15 +94,15 @@ export function BattleCard({
                 : 'Into the corner'}
         </span>
       </div>
-      <p className="m-0 text-[15px] font-semibold leading-snug">
+      <p className="m-0 text-[16px] font-bold leading-snug text-white md:text-[18px]">
         {call.from !== 'Engineer' && (
-          <span className="mr-1 text-[var(--muted)]">{named(call.from)}:</span>
+          <span className="mr-1 font-semibold text-[#8D9692]">{named(call.from)}:</span>
         )}
         {named(call.text)}
       </p>
       {/* The approach: your car closing on the braking zone; then the wait for your call. */}
       {!chosen && (
-        <div className="h-1.5 overflow-hidden rounded-full bg-[var(--card-2)]">
+        <div className="h-1 overflow-hidden bg-[#232927]">
           {stage === 'waiting' ? (
             <div
               className="quick-timer h-full"
@@ -127,7 +127,7 @@ export function BattleCard({
           {result.text}
         </output>
       ) : picked ? (
-        <output className="flex items-center gap-2 rounded-lg bg-[var(--card-2)] px-3 py-2 text-[14px] font-bold">
+        <output className="flex items-center gap-2 rounded-md border border-[#2D3431] bg-[#181D1B] px-3 py-2 text-[14px] font-bold">
           <span
             className="h-3 w-3 rounded-full"
             style={{ background: LINE_COLOR[picked.line ?? 'wait'] }}
@@ -146,10 +146,10 @@ export function BattleCard({
                 key={o.id}
                 type="button"
                 onClick={() => onAnswer(o.id)}
-                className="flex min-h-[64px] flex-col gap-1 rounded-lg border-2 bg-[var(--ink)] px-2.5 py-2 text-left text-[var(--paper)] hover:brightness-110 focus-visible:outline-none"
-                style={{ borderColor: color }}
+                className="call-opt min-h-[64px] !justify-start !gap-1"
+                style={{ borderLeft: `3px solid ${color}` }}
               >
-                <span className="flex items-center gap-1.5 text-[14px] font-bold leading-tight">
+                <span className="label flex items-center gap-1.5">
                   <span
                     className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[12px] font-extrabold text-[#141716]"
                     style={{ background: color }}
@@ -158,7 +158,7 @@ export function BattleCard({
                   </span>
                   {o.label}
                 </span>
-                {o.note && <span className="text-[11px] opacity-70">{o.note}</span>}
+                {o.note && <span className="note">{o.note}</span>}
                 {o.odds && (
                   <span className="flex items-center gap-1.5 text-[11px] font-semibold">
                     <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/15">
@@ -182,8 +182,10 @@ export function BattleCard({
         <dl className="m-0 flex flex-wrap gap-x-4 gap-y-1 text-[12px]">
           {call.stats.map((s) => (
             <div key={s.label} className="flex items-baseline gap-1.5">
-              <dt className="eyebrow">{s.label}</dt>
-              <dd className="m-0 font-semibold">{named(s.value)}</dd>
+              <dt className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#8D9692]">
+                {s.label}
+              </dt>
+              <dd className="m-0 font-semibold text-[#D5DAD7]">{named(s.value)}</dd>
             </div>
           ))}
         </dl>
