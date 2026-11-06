@@ -38,3 +38,6 @@ playwright-report/
 
 # Moment finder output (pnpm moments): a working file, not the approved moments.
 data/moments/proposed/
+
+# Generated from apps/worker/data/tickets.json by scripts/tickets-seed.ts.
+apps/worker/data/tickets-seed.sql

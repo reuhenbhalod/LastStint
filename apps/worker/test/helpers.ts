@@ -74,3 +74,41 @@ export const ids = {
   b: '22222222-2222-4222-8222-222222222222',
   c: '33333333-3333-4333-8333-333333333333',
 };
+
+function b64url(bytes: Uint8Array | string): string {
+  const s = typeof bytes === 'string' ? bytes : String.fromCharCode(...bytes);
+  return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+/**
+ * A Google ID token signed with the test key (vitest.config.ts): admin@example.com, verified,
+ * unless `claims` say otherwise.
+ */
+export async function idToken(claims: Record<string, unknown> = {}): Promise<string> {
+  const key = await crypto.subtle.importKey(
+    'jwk',
+    JSON.parse(env.TEST_GOOGLE_PRIVATE_JWK),
+    { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
+    false,
+    ['sign'],
+  );
+  const head = b64url(JSON.stringify({ alg: 'RS256', kid: 'test-key', typ: 'JWT' }));
+  const body = b64url(
+    JSON.stringify({
+      iss: 'https://accounts.google.com',
+      aud: env.GOOGLE_CLIENT_ID,
+      sub: 'google-admin',
+      email: 'admin@example.com',
+      email_verified: true,
+      name: 'Admin',
+      exp: Math.floor(Date.now() / 1000) + 600,
+      ...claims,
+    }),
+  );
+  const sig = await crypto.subtle.sign(
+    'RSASSA-PKCS1-v1_5',
+    key,
+    new TextEncoder().encode(`${head}.${body}`),
+  );
+  return `${head}.${body}.${b64url(new Uint8Array(sig))}`;
+}
