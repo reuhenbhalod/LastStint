@@ -1,5 +1,5 @@
-// A stop, called out on the map while the car drives the pit lane: who, onto what, what it
-// cost, places lost, and how the tyres now stack up against the other car in the fight.
+// A stop, called out in the strip over the map while the car drives the pit lane, on one line:
+// who, onto what, what it cost, places lost, and the other car in the fight's tyres.
 
 import type { RaceState } from '@boxthislap/sim';
 import { surname } from '../data/names.js';
@@ -24,20 +24,20 @@ export function PitCard({
   const lost = stop.to - stop.from;
   return (
     <output
-      className="pit-card flex flex-col gap-1 rounded-lg border-l-4 bg-black/75 px-3 py-2 text-white shadow-xl"
+      className="pit-card flex min-w-0 items-center gap-2 rounded border-l-4 bg-black/75 px-2.5 py-1 text-[12px] text-white"
       style={{ borderColor: you ? 'var(--you)' : 'var(--rival)' }}
     >
-      <p className="m-0 disp text-[13px] leading-none">
+      <span className="disp shrink-0 text-[12px] leading-none">
         {surname(stop.code)} boxes · {tyreName(stop.compound)}
-      </p>
-      <p className="m-0 mono text-[12px] text-[#cfd6d3]">
-        {stop.cost !== null ? `Stop ${stop.cost.toFixed(1)}s · ` : ''}P{stop.from} → P{stop.to}
-        {lost > 0 ? ` (−${lost})` : ' (no places lost)'}
-      </p>
+      </span>
+      <span className="mono truncate text-[#cfd6d3]">
+        {stop.cost !== null ? `${stop.cost.toFixed(1)}s · ` : ''}P{stop.from} → P{stop.to}
+        {lost > 0 ? ` (−${lost})` : ''}
+      </span>
       {other && !other.retired && (
-        <p className="m-0 flex items-center gap-1.5 text-[12px] text-[#cfd6d3]">
+        <span className="hidden shrink-0 items-center gap-1.5 text-[#cfd6d3] lg:flex">
           {otherCode} on <TyreBadge compound={other.compound} age={other.tyreAge} />
-        </p>
+        </span>
       )}
     </output>
   );

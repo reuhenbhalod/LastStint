@@ -57,9 +57,9 @@ export function PlanCard({
     gap === null
       ? ''
       : gap >= 0
-        ? ` We lead ${surname(rival)} by ${gap.toFixed(1)} s.`
-        : ` ${surname(rival)} leads us by ${(-gap).toFixed(1)} s.`;
-  const headline = `You have the pit wall, ${totalLaps - takeoverLap} laps to go.${lead}${me ? ` We're on ${me.tyreAge}-lap-old ${tyres(me.compound)}.` : ''}`;
+        ? ` · +${gap.toFixed(1)}s on ${surname(rival)}`
+        : ` · ${surname(rival)} +${(-gap).toFixed(1)}s`;
+  const headline = `${totalLaps - takeoverLap} laps to go${lead}${me ? ` · ${me.tyreAge}-lap-old ${tyres(me.compound)}` : ''}`;
 
   const pickable = draft ? legal && ownChance !== null : selected !== null;
   const goLabel =
@@ -68,20 +68,15 @@ export function PlanCard({
   return (
     <section
       aria-label="Race plan"
-      className="card flex flex-col gap-4"
+      className="card flex flex-col gap-2.5 !p-3"
       style={{ borderColor: 'var(--you)' }}
     >
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
         <span className="eyebrow flex items-center gap-1.5 !text-[var(--you)]">
-          <HeadsetIcon size={14} /> Race plan
+          <HeadsetIcon size={14} /> Race plan · lap {takeoverLap + 1} of {totalLaps}
         </span>
-        <span className="eyebrow">
-          Lap {takeoverLap + 1} of {totalLaps}
-        </span>
+        <span className="text-[12px] text-[var(--muted)]">{headline}</span>
       </div>
-      <p className="m-0 text-[15px] font-semibold leading-snug">
-        {headline} Pick the plan; I’ll call it lap by lap. You can change it any time.
-      </p>
 
       {draft ? (
         <PlanEditor
@@ -93,44 +88,41 @@ export function PlanCard({
           chance={ownChance}
         />
       ) : (
-        <div className="flex flex-col gap-2">
+        <div className="grid gap-2 sm:grid-cols-3">
           {plan.offered.map((p, i) => {
             const c = chances[i] ?? null;
             const on = selected === p.id;
             const pace = paceLine(p);
+            const line = `${stopsLine(p)}${pace ? ` · ${pace}` : ''}`;
             return (
               <button
                 key={p.id}
                 type="button"
                 aria-pressed={on}
                 onClick={() => setPicked(p.id)}
-                className={`flex flex-col items-stretch gap-2 rounded-xl border-2 p-3 text-left transition-colors ${on ? 'border-[var(--you)] bg-[color-mix(in_srgb,var(--you)_8%,transparent)]' : 'border-[var(--rule)] hover:border-[var(--muted)]'}`}
+                className={`flex min-w-0 flex-col items-stretch gap-1.5 rounded-lg border-2 px-2.5 py-2 text-left transition-colors ${on ? 'border-[var(--you)] bg-[color-mix(in_srgb,var(--you)_8%,transparent)]' : 'border-[var(--rule)] hover:border-[var(--muted)]'}`}
               >
-                <span className="flex w-full items-start justify-between gap-3">
-                  <span className="flex min-w-0 flex-col gap-0.5">
-                    <span className="flex flex-wrap items-center gap-2">
-                      <span className="disp text-[16px] leading-none">
-                        {p.id.toUpperCase()} · {stopsWord(p)}
+                <span className="flex items-center justify-between gap-2">
+                  <span className="flex min-w-0 items-center gap-1.5">
+                    <span className="disp shrink-0 text-[14px] leading-none">
+                      {p.id.toUpperCase()} · {stopsWord(p)}
+                    </span>
+                    {best === p.id && (
+                      <span className="truncate rounded-full bg-[var(--you)] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[var(--you-ink)]">
+                        Engineer’s pick
                       </span>
-                      {best === p.id && (
-                        <span className="rounded-full bg-[var(--you)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[var(--you-ink)]">
-                          Engineer’s pick
-                        </span>
-                      )}
-                    </span>
-                    <span className="text-[13px] text-[var(--muted)]">
-                      {stopsLine(p)}
-                      {pace ? ` · ${pace}` : ''}
-                    </span>
+                    )}
                   </span>
-                  <span className="flex shrink-0 flex-col items-end">
-                    <span className="mono text-[20px] font-bold leading-none">
-                      {c === null ? '…' : `${Math.round(c * 100)}%`}
-                    </span>
-                    <span className="text-[10px] text-[var(--muted)]">vs {rival}</span>
+                  <span className="mono shrink-0 text-[16px] font-bold leading-none">
+                    {c === null ? '…' : `${Math.round(c * 100)}%`}
                   </span>
                 </span>
-                <PlanStrip plan={p} from={takeoverLap} laps={totalLaps} compound={car.compound} />
+                <span className="truncate text-[12px] text-[var(--muted)]" title={line}>
+                  {line}
+                </span>
+                <span className="hidden sm:block">
+                  <PlanStrip plan={p} from={takeoverLap} laps={totalLaps} compound={car.compound} />
+                </span>
               </button>
             );
           })}
@@ -138,26 +130,31 @@ export function PlanCard({
       )}
 
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <button
-          type="button"
-          onClick={() => {
-            if (draft) {
-              setDraft(null);
-              setPicked(null);
-              return;
-            }
-            const base = plan.offered.find((p) => p.id === selected) ?? plan.offered[0];
-            if (base) setDraft({ ...base, id: 'own' });
-          }}
-          className="rounded-lg border border-[var(--rule)] px-3 py-2 text-[13px] font-semibold hover:bg-[var(--card-2)]"
-        >
-          {draft ? '← The engineer’s plans' : 'Build your own'}
-        </button>
+        <span className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              if (draft) {
+                setDraft(null);
+                setPicked(null);
+                return;
+              }
+              const base = plan.offered.find((p) => p.id === selected) ?? plan.offered[0];
+              if (base) setDraft({ ...base, id: 'own' });
+            }}
+            className="rounded-lg border border-[var(--rule)] px-3 py-2 text-[13px] font-semibold hover:bg-[var(--card-2)]"
+          >
+            {draft ? '← The engineer’s plans' : 'Build your own'}
+          </button>
+          <span className="hidden text-[12px] text-[var(--muted)] md:inline">
+            % = chance to beat {rival} · change it any time
+          </span>
+        </span>
         <button
           type="button"
           disabled={!pickable}
           onClick={() => selected && onPick(selected)}
-          className="rounded-xl bg-[var(--you)] px-6 py-3 text-[15px] font-bold text-[var(--you-ink)] hover:brightness-110 disabled:opacity-50"
+          className="rounded-lg bg-[var(--you)] px-5 py-2 text-[14px] font-bold text-[var(--you-ink)] hover:brightness-110 disabled:opacity-50"
         >
           {goLabel} →
         </button>

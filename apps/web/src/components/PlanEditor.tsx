@@ -77,58 +77,36 @@ export function PlanEditor({
     });
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-2">
       <PlanStrip plan={value} from={from} laps={laps} compound={car.compound} />
-      <ol className="m-0 flex list-none flex-col gap-2 p-0">
-        <Stint
-          label={`Now to ${value.stops[0] ? `lap ${value.stops[0].lap}` : 'the flag'}, on ${tyres(car.compound)}`}
-          pace={value.pace[0] ?? 'standard'}
-          onPace={(p) => set({ pace: value.pace.map((x, k) => (k === 0 ? p : x)) })}
-        />
+      <ol className="m-0 flex list-none flex-col gap-1.5 p-0">
+        <li className="flex flex-wrap items-center gap-2 px-2.5">
+          <span className="text-[12px] text-[var(--muted)]">
+            Now to {value.stops[0] ? `lap ${value.stops[0].lap}` : 'the flag'}, on{' '}
+            {tyres(car.compound)}
+          </span>
+          <Pace
+            value={value.pace[0] ?? 'standard'}
+            onPace={(p) => set({ pace: value.pace.map((x, k) => (k === 0 ? p : x)) })}
+          />
+        </li>
         {value.stops.map((s, i) => (
           <li
             key={`${i}-${s.compound}`}
-            className="flex flex-col gap-2 rounded-lg bg-[var(--card-2)] p-2.5"
+            className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 rounded-lg bg-[var(--card-2)] px-2.5 py-1.5"
           >
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="eyebrow">Stop {i + 1}</span>
-              <span className="flex items-center gap-1">
-                <Step label="Earlier" onClick={() => moveStop(i, s.lap - 1)}>
-                  −
-                </Step>
-                <span className="mono min-w-[56px] text-center text-[14px] font-bold">
-                  lap {s.lap}
-                </span>
-                <Step label="Later" onClick={() => moveStop(i, s.lap + 1)}>
-                  +
-                </Step>
+            <span className="eyebrow">Stop {i + 1}</span>
+            <span className="flex items-center gap-1">
+              <Step label="Earlier" onClick={() => moveStop(i, s.lap - 1)}>
+                −
+              </Step>
+              <span className="mono min-w-[52px] text-center text-[13px] font-bold">
+                lap {s.lap}
               </span>
-              <span className="flex gap-1">
-                {compounds.map((c) => (
-                  <button
-                    key={c}
-                    type="button"
-                    aria-pressed={s.compound === c}
-                    aria-label={tyres(c)}
-                    onClick={() =>
-                      set({
-                        stops: value.stops.map((x, k) => (k === i ? { ...x, compound: c } : x)),
-                      })
-                    }
-                    className={`tyre ${c} cursor-pointer ${s.compound === c ? 'ring-2 ring-[var(--ink)] ring-offset-2 ring-offset-[var(--card-2)]' : 'opacity-50 hover:opacity-100'}`}
-                  >
-                    {c[0]}
-                  </button>
-                ))}
-              </span>
-              <button
-                type="button"
-                onClick={() => removeStop(i)}
-                className="ml-auto text-[12px] font-semibold text-[var(--muted)] underline-offset-2 hover:text-[var(--ink)] hover:underline"
-              >
-                Remove
-              </button>
-            </div>
+              <Step label="Later" onClick={() => moveStop(i, s.lap + 1)}>
+                +
+              </Step>
+            </span>
             <input
               type="range"
               aria-label={`Stop ${i + 1} lap`}
@@ -136,13 +114,37 @@ export function PlanEditor({
               max={laps - 1}
               value={s.lap}
               onChange={(e) => moveStop(i, Number(e.target.value))}
-              className="w-full accent-[var(--you)]"
+              className="min-w-[120px] flex-1 accent-[var(--you)]"
             />
-            <Stint
-              label={`Then to ${value.stops[i + 1] ? `lap ${value.stops[i + 1]?.lap}` : 'the flag'}, on ${tyres(s.compound)}`}
-              pace={value.pace[i + 1] ?? 'standard'}
+            <span className="flex gap-1">
+              {compounds.map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  aria-pressed={s.compound === c}
+                  aria-label={tyres(c)}
+                  onClick={() =>
+                    set({
+                      stops: value.stops.map((x, k) => (k === i ? { ...x, compound: c } : x)),
+                    })
+                  }
+                  className={`tyre ${c} cursor-pointer ${s.compound === c ? 'ring-2 ring-[var(--ink)] ring-offset-2 ring-offset-[var(--card-2)]' : 'opacity-50 hover:opacity-100'}`}
+                >
+                  {c[0]}
+                </button>
+              ))}
+            </span>
+            <Pace
+              value={value.pace[i + 1] ?? 'standard'}
               onPace={(p) => set({ pace: value.pace.map((x, k) => (k === i + 1 ? p : x)) })}
             />
+            <button
+              type="button"
+              onClick={() => removeStop(i)}
+              className="text-[12px] font-semibold text-[var(--muted)] underline-offset-2 hover:text-[var(--ink)] hover:underline"
+            >
+              Remove
+            </button>
           </li>
         ))}
       </ol>
@@ -185,32 +187,22 @@ export function twoCompounds(car: { compound: string; compoundsUsed: string[] },
   return used.size >= 2;
 }
 
-function Stint({
-  label,
-  pace,
-  onPace,
-}: {
-  label: string;
-  pace: PaceMode;
-  onPace: (p: PaceMode) => void;
-}) {
+/** A stint's pace: manage, standard or push. */
+function Pace({ value, onPace }: { value: PaceMode; onPace: (p: PaceMode) => void }) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-2">
-      <span className="text-[13px] text-[var(--muted)]">{label}</span>
-      <span className="flex overflow-hidden rounded-lg border border-[var(--rule)]">
-        {(['manage', 'standard', 'push'] as PaceMode[]).map((p) => (
-          <button
-            key={p}
-            type="button"
-            aria-pressed={pace === p}
-            onClick={() => onPace(p)}
-            className={`px-2.5 py-1 text-[12px] font-semibold ${pace === p ? 'bg-[var(--ink)] text-[var(--paper)]' : 'hover:bg-[var(--card-2)]'}`}
-          >
-            {PACE_WORD[p]}
-          </button>
-        ))}
-      </span>
-    </div>
+    <span className="flex overflow-hidden rounded-md border border-[var(--rule)]">
+      {(['manage', 'standard', 'push'] as PaceMode[]).map((p) => (
+        <button
+          key={p}
+          type="button"
+          aria-pressed={value === p}
+          onClick={() => onPace(p)}
+          className={`px-2 py-0.5 text-[12px] font-semibold ${value === p ? 'bg-[var(--ink)] text-[var(--paper)]' : 'hover:bg-[var(--card-2)]'}`}
+        >
+          {PACE_WORD[p]}
+        </button>
+      ))}
+    </span>
   );
 }
 
@@ -228,7 +220,7 @@ function Step({
       type="button"
       aria-label={label}
       onClick={onClick}
-      className="flex h-7 w-7 items-center justify-center rounded-md border border-[var(--rule)] text-[15px] font-bold hover:bg-[var(--card)]"
+      className="flex h-6 w-6 items-center justify-center rounded-md border border-[var(--rule)] text-[15px] font-bold hover:bg-[var(--card)]"
     >
       {children}
     </button>

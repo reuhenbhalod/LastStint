@@ -723,7 +723,7 @@ export function TrackMap({
       viewBox={`${view.x.toFixed(1)} ${view.y.toFixed(1)} ${view.w.toFixed(1)} ${view.h.toFixed(1)}`}
       // Phone/tablet: full width at the outline's shape. Laptop: fills its box (the rest of the
       // column), keeping the shape.
-      className="block h-auto w-full xl:absolute xl:inset-0 xl:h-full"
+      className="absolute inset-0 block h-full w-full"
       aria-labelledby="track-map-title"
     >
       <title id="track-map-title">{`Track map, lap ${race.lap}. Select a car for its details.`}</title>

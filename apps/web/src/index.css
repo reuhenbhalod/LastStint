@@ -112,18 +112,7 @@ label:has(input) {
   border-color: #3d7fe0;
 }
 
-/* A decision moment (feedback spec S2): the radio banner drops in and flashes, its dot
-   pulses, the map's frame glows, and the decision card rises. */
-@keyframes radio-in {
-  0% {
-    transform: translateY(-16px);
-    opacity: 0;
-  }
-  100% {
-    transform: none;
-    opacity: 1;
-  }
-}
+/* A decision moment (feedback spec S2): the map's frame glows and the call rises under it. */
 @keyframes radio-flash {
   0%,
   100% {
@@ -142,12 +131,6 @@ label:has(input) {
     transform: none;
     opacity: 1;
   }
-}
-.radio-alert {
-  animation: radio-in 0.25s ease-out, radio-flash 1.2s ease-in-out 0.25s 3;
-}
-.radio-dot {
-  animation: radio-flash 1s ease-in-out infinite;
 }
 .map-alert {
   box-shadow: 0 0 0 3px var(--flag);
@@ -288,6 +271,26 @@ label:has(input) {
 }
 @media (prefers-reduced-motion: reduce) {
   .map-rain {
+    animation: none;
+  }
+}
+
+/* Race graphics slide in like TV lower thirds. */
+.bc-slide {
+  animation: bc-slide 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@keyframes bc-slide {
+  from {
+    transform: translateY(18px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bc-slide {
     animation: none;
   }
 }

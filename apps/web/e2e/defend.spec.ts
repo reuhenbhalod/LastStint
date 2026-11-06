@@ -7,6 +7,8 @@ import { loadRace, mockApi } from './mock.js';
 const model = loadRace('spain-2020');
 
 test('plays a defend race end to end on a laptop screen', async ({ page }) => {
+  // 50 laps at 2× after the takeover: longer than the default.
+  test.setTimeout(480_000);
   await page.setViewportSize({ width: 1440, height: 900 });
   const submitted = await mockApi(page, model);
   await page.goto('/');
@@ -16,6 +18,7 @@ test('plays a defend race end to end on a laptop screen', async ({ page }) => {
   await page.getByRole('button', { name: /pit wall/ }).click();
   // The engineer's pick of the race plans.
   await page.getByRole('button', { name: /Go with plan/ }).click();
+  await page.getByRole('button', { name: '2×' }).click();
 
   // Answer each call with its first choice (and, after Box, the first tyre) until the flag.
   const card = page.locator('section.decision');
@@ -25,7 +28,6 @@ test('plays a defend race end to end on a laptop screen', async ({ page }) => {
     if (await card.isVisible()) {
       await card.getByRole('button').first().click();
       answered++;
-      if (answered === 1) await page.getByRole('button', { name: '2×' }).click();
     } else {
       await page.waitForTimeout(300);
     }

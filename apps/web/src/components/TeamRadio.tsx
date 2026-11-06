@@ -49,7 +49,7 @@ export function TeamRadio({
   onCall: (call: Call) => void;
 }) {
   // Open on a laptop; one bar on a phone, where the map and the calls come first.
-  const [open, setOpen] = useState(() => typeof window === 'undefined' || window.innerWidth >= 768);
+  const [open, setOpen] = useState(true);
   const me = race.cars[userSide];
   const next = race.lap + 1;
   const mate = teammateOf(model);
