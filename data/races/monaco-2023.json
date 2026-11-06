@@ -44,9 +44,9 @@
     ],
     "overtakeDifficulty": 0.9846,
     "overtakeModel": {
-      "intercept": -2.2889,
-      "paceCoef": 0.9442,
-      "gapCoef": -2.3039
+      "intercept": -2.2893,
+      "paceCoef": 0.9423,
+      "gapCoef": -2.3021
     },
     "dirtyAirPenalty": 0.1464,
     "greenLapTime": 78.947
