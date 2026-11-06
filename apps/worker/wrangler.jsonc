@@ -30,6 +30,9 @@
   "vars": {
     "WEB_ORIGIN": "https://pitwall-web.boxboxbox.workers.dev",
     "GOOGLE_CLIENT_ID": "318278030629-s860fnjjpk6ihcn4iubjqiakf8vu0pqi.apps.googleusercontent.com",
+    // Auth0 (docs/auth0-spec.md): set, sign-in takes Auth0 ID tokens instead of Google's.
+    "AUTH0_DOMAIN": "dev-umxcdh2y62l4e0gy.us.auth0.com",
+    "AUTH0_CLIENT_ID": "Pdlxz3iAqJse61VUhOGpF8wSeFgV7yxM",
     // Admins (the /admin page): Google account emails, comma-separated. Add yours here.
     "ADMIN_EMAILS": "purohit.abhiram@gmail.com,reuhenbhalod@gmail.com"
   },

@@ -19,6 +19,9 @@ export default defineConfig(async () => {
             TEST_MIGRATIONS: migrations,
             CACHE_SECONDS: '0',
             GOOGLE_CLIENT_ID: 'test-client.apps.googleusercontent.com',
+            // The Google path (tests sign their own Google tokens); Auth0 tests set their own.
+            AUTH0_DOMAIN: '',
+            AUTH0_CLIENT_ID: '',
             GOOGLE_JWKS: JSON.stringify({ keys: [pub] }),
             TEST_GOOGLE_PRIVATE_JWK: JSON.stringify(priv),
             ADMIN_EMAILS: 'Admin@Example.com, other@example.com',
