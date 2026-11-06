@@ -8,3 +8,5 @@ allowBuilds:
   esbuild: true
   sharp: true
   workerd: true
+  # Auth0's tab lock: its postinstall only prints a thank-you message.
+  browser-tabs-lock: false
