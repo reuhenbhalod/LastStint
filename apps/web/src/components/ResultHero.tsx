@@ -1,64 +1,29 @@
-// The chequered flag moment: how your race ended against the real team's. A chequered band,
-// your finishing place big, the verdict ("You beat Mercedes!"), then the three numbers that
-// decide it side by side (you, the real pit wall, the rival) and the podium. Coloured by the
-// outcome: teal when you beat the real team, white when you matched it, red when it did better.
+// The chequered flag moment, as a TV graphic: a chequered band, your finishing place big beside
+// the verdict ("You beat Mercedes!"), the three numbers that decide it (you, the real pit wall,
+// the rival) and the podium in team colours. Toned by the outcome: the good colour when you
+// beat the real team, white when you matched it, red when it did better.
 
 import { surname } from '../data/names.js';
 import type { Verdict } from '../game/verdict.js';
+import { Stat, Stats } from './Panel.js';
 
-const TONE: Record<Verdict['outcome'], { text: string; ring: string; glow: string; word: string }> =
-  {
-    beat: {
-      text: 'text-[var(--good)]',
-      ring: 'border-[var(--good)]',
-      glow: 'shadow-[0_0_80px_-20px_var(--good)]',
-      word: 'Better than the real team',
-    },
-    matched: {
-      text: 'text-[var(--ink)]',
-      ring: 'border-[var(--rule)]',
-      glow: '',
-      word: 'Level with the real team',
-    },
-    worse: {
-      text: 'text-[var(--box-ink)]',
-      ring: 'border-[var(--box)]',
-      glow: 'shadow-[0_0_80px_-30px_var(--box)]',
-      word: 'Behind the real team',
-    },
-  };
+const TONE: Record<Verdict['outcome'], { color: string; word: string }> = {
+  beat: { color: 'var(--good)', word: 'Better than the real team' },
+  matched: { color: '#EEF1EF', word: 'Level with the real team' },
+  worse: { color: 'var(--box-ink)', word: 'Behind the real team' },
+};
 
 function Chequer() {
   return (
     <div
       aria-hidden="true"
-      className="h-3 w-full opacity-80"
+      className="h-2.5 w-full opacity-90"
       style={{
         backgroundImage:
-          'conic-gradient(var(--ink) 25%, transparent 0 50%, var(--ink) 0 75%, transparent 0)',
-        backgroundSize: '12px 12px',
+          'conic-gradient(#EEF1EF 25%, transparent 0 50%, #EEF1EF 0 75%, transparent 0)',
+        backgroundSize: '10px 10px',
       }}
     />
-  );
-}
-
-function Figure({
-  label,
-  value,
-  sub,
-  tone,
-}: {
-  label: string;
-  value: string;
-  sub?: string;
-  tone?: string;
-}) {
-  return (
-    <div className="flex flex-col items-center gap-0.5 rounded-xl bg-[var(--card-2)] px-2 py-3">
-      <span className="eyebrow">{label}</span>
-      <span className={`disp wide text-[30px] leading-none ${tone ?? ''}`}>{value}</span>
-      {sub && <span className="text-[12px] text-[var(--muted)]">{sub}</span>}
-    </div>
   );
 }
 
@@ -74,6 +39,7 @@ export function ResultHero({
   team,
   gapToRival,
   podium,
+  teamOf,
 }: {
   v: Verdict;
   raceName: string;
@@ -88,56 +54,74 @@ export function ResultHero({
   /** Seconds you finished ahead of the rival (< 0: behind), if both finished. */
   gapToRival: number | null;
   podium: string[];
+  /** A driver's team colour (the podium). */
+  teamOf?: (code: string) => string;
 }) {
   const tone = TONE[v.outcome];
+  const place = pos > 0 ? `P${pos}` : dsq ? 'DSQ' : 'OUT';
   return (
     <section
-      className={`overflow-hidden rounded-2xl border-2 bg-[var(--card)] ${tone.ring} ${tone.glow}`}
+      aria-label="Result"
+      className="overflow-hidden rounded-lg border border-[#262C2A] bg-[linear-gradient(180deg,#151A18_0%,#0F1312_100%)]"
+      style={{ borderTop: `3px solid ${tone.color}` }}
     >
       <Chequer />
-      <div className="flex flex-col items-center gap-4 px-5 pb-6 pt-5 text-center">
-        <p className="eyebrow m-0">Chequered flag · {raceName.split(':')[0]}</p>
-        <div className="flex flex-col items-center gap-1">
-          <span className={`disp wide text-[72px] leading-[0.9] ${tone.text}`}>
-            {pos > 0 ? `P${pos}` : dsq ? 'DSQ' : 'OUT'}
+      <div className="flex flex-col gap-5 p-5">
+        <div className="flex items-center gap-5">
+          <span
+            className="disp wide shrink-0 text-[56px] leading-[0.85] sm:text-[76px]"
+            style={{ color: tone.color }}
+          >
+            {place}
           </span>
-          <span className="disp text-[15px] leading-none text-[var(--muted)]">
-            {surname(userSide)} · {tone.word}
+          <span className="flex min-w-0 flex-col gap-1.5">
+            <span className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-[#8D9692]">
+              Chequered flag · {raceName.split(':')[0]}
+            </span>
+            <h1 className="disp m-0 text-balance text-[26px] leading-[1.05]">{v.headline}</h1>
+            <span className="text-[13px] font-semibold" style={{ color: tone.color }}>
+              {surname(userSide)} · {tone.word}
+            </span>
           </span>
         </div>
-        <h1 className="disp m-0 text-[30px] leading-none">{v.headline}</h1>
-        <div className="grid w-full grid-cols-3 gap-2">
-          <Figure label="You" value={pos > 0 ? `P${pos}` : dsq ? 'DSQ' : 'OUT'} tone={tone.text} />
-          <Figure label={`Real ${team}`} value={realPos > 0 ? `P${realPos}` : '-'} />
-          <Figure
-            label={surname(rival)}
-            value={rivalPos > 0 ? `P${rivalPos}` : 'OUT'}
-            sub={
-              gapToRival === null
-                ? undefined
-                : gapToRival >= 0
-                  ? `you +${gapToRival.toFixed(1)}s ahead`
-                  : `${(-gapToRival).toFixed(1)}s ahead of you`
-            }
-            tone="text-[var(--rival)]"
-          />
-        </div>
+        <Stats>
+          <Stat label="You" tone={tone.color}>
+            <span className="text-[24px]">{place}</span>
+          </Stat>
+          <Stat label={`Real ${team}`}>
+            <span className="text-[24px]">{realPos > 0 ? `P${realPos}` : '-'}</span>
+          </Stat>
+          <Stat label={surname(rival)} tone="var(--rival)">
+            <span className="flex flex-col gap-1">
+              <span className="text-[24px]">{rivalPos > 0 ? `P${rivalPos}` : 'OUT'}</span>
+              {gapToRival !== null && (
+                <span className="mono text-[11px] font-semibold normal-case text-[#8D9692]">
+                  {gapToRival >= 0
+                    ? `you +${gapToRival.toFixed(1)}s ahead`
+                    : `${(-gapToRival).toFixed(1)}s ahead of you`}
+                </span>
+              )}
+            </span>
+          </Stat>
+        </Stats>
         {podium.length > 0 && (
-          <ol className="m-0 flex list-none items-end justify-center gap-2 p-0">
+          <ol className="m-0 flex list-none items-end justify-center gap-1.5 border-t border-[#232927] p-0 pt-4">
             {[1, 0, 2].map((i) => {
               const code = podium[i];
               if (!code) return null;
               const mine = code === userSide;
               const theirs = code === rival;
               return (
-                <li key={code} className="flex w-20 flex-col items-center gap-1">
+                <li key={code} className="flex w-[84px] flex-col items-center gap-1.5">
                   <span
-                    className={`disp text-[16px] leading-none ${mine ? 'text-[var(--you)]' : theirs ? 'text-[var(--rival)]' : ''}`}
+                    className="disp text-[15px] leading-none"
+                    style={{ color: mine ? 'var(--you)' : theirs ? 'var(--rival)' : undefined }}
                   >
                     {code}
                   </span>
                   <span
-                    className={`flex w-full items-start justify-center rounded-t-md bg-[var(--card-2)] pt-1.5 text-[15px] font-bold text-[var(--muted)] ${i === 0 ? 'h-20' : i === 1 ? 'h-14' : 'h-10'}`}
+                    className={`disp flex w-full items-start justify-center bg-[#1A1F1D] pt-2 text-[18px] leading-none text-[#8D9692] ${i === 0 ? 'h-[72px]' : i === 1 ? 'h-[52px]' : 'h-[38px]'}`}
+                    style={{ borderTop: `3px solid ${teamOf?.(code) ?? '#3A413E'}` }}
                   >
                     {i + 1}
                   </span>

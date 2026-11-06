@@ -137,15 +137,11 @@ export function PlanHeadsUp({
   onChange: () => void;
 }) {
   return (
-    <section
-      aria-label="Planned stop"
-      className="card flex flex-col gap-3"
-      style={{ borderColor: 'var(--you)' }}
-    >
-      <span className="eyebrow flex items-center gap-1.5 !text-[var(--you)]">
+    <section aria-label="Planned stop" className="quick-call call-plate">
+      <span className="call-tag">
         <HeadsetIcon size={14} /> Engineer · the plan
       </span>
-      <p className="m-0 text-[15px] font-semibold leading-snug">
+      <p className="m-0 text-[16px] font-bold leading-snug text-white md:text-[18px]">
         Box next lap for {tyres(stop.compound)}, as planned. Still good?
       </p>
       <div className="grid grid-cols-3 gap-2">
@@ -173,15 +169,11 @@ export function ReplanOffer({
 }) {
   const pace = paceLine(offer.plan);
   return (
-    <section
-      aria-label="New plan"
-      className="card flex flex-col gap-3"
-      style={{ borderColor: 'var(--you)' }}
-    >
-      <span className="eyebrow flex items-center gap-1.5 !text-[var(--you)]">
+    <section aria-label="New plan" className="quick-call call-plate">
+      <span className="call-tag">
         <HeadsetIcon size={14} /> Engineer · new plan
       </span>
-      <p className="m-0 text-[15px] font-semibold leading-snug">
+      <p className="m-0 text-[16px] font-bold leading-snug text-white md:text-[18px]">
         The race has moved. {stopsWord(offer.plan)}
         {offer.plan.stops.length
           ? `, ${offer.plan.stops.map((s) => `${tyres(s.compound)} on lap ${s.lap}`).join(', then ')}`
@@ -215,9 +207,9 @@ function Choice({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`min-h-[44px] rounded-lg px-3 py-2 text-[13px] font-bold leading-tight disabled:opacity-40 ${primary ? 'bg-[var(--you)] text-[var(--you-ink)] hover:brightness-110' : 'bg-[var(--ink)] text-[var(--paper)] hover:opacity-90'}`}
+      className={`call-opt items-center !text-center ${primary ? 'main' : ''}`}
     >
-      {children}
+      <span className="label">{children}</span>
     </button>
   );
 }

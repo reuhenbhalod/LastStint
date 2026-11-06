@@ -47,21 +47,18 @@ export function QuickCallCard({
   return (
     <section
       aria-label={battle ? 'Battle call' : 'Quick call'}
-      className="quick-call card flex flex-col gap-3"
-      style={{ borderColor: accent }}
+      className="quick-call call-plate"
+      style={{ '--accent': battle ? 'var(--box-ink)' : accent } as React.CSSProperties}
     >
       <div className="flex items-center justify-between gap-2">
-        <span
-          className="eyebrow flex items-center gap-1.5"
-          style={{ color: battle ? 'var(--box-ink)' : accent }}
-        >
+        <span className="call-tag">
           <TagIcon size={14} /> {tag}
         </span>
-        <span className="eyebrow">Lap {call.lap + 1}</span>
+        <span className="call-tag !text-[#8D9692]">Lap {call.lap + 1}</span>
       </div>
-      <p className="m-0 text-[15px] font-semibold leading-snug">
+      <p className="m-0 text-[16px] font-bold leading-snug text-white md:text-[18px]">
         {call.from !== 'Engineer' && (
-          <span className="mr-1 text-[var(--muted)]">{named(call.from)}:</span>
+          <span className="mr-1 font-semibold text-[#8D9692]">{named(call.from)}:</span>
         )}
         {named(call.text)}
       </p>
@@ -69,13 +66,15 @@ export function QuickCallCard({
         <dl className="m-0 flex flex-wrap gap-x-4 gap-y-1 text-[12px]">
           {call.stats.map((s) => (
             <div key={s.label} className="flex items-baseline gap-1.5">
-              <dt className="eyebrow">{s.label}</dt>
-              <dd className="m-0 font-semibold">{named(s.value)}</dd>
+              <dt className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#8D9692]">
+                {s.label}
+              </dt>
+              <dd className="m-0 font-semibold text-[#D5DAD7]">{named(s.value)}</dd>
             </div>
           ))}
         </dl>
       )}
-      <div className="h-1 overflow-hidden rounded-full bg-[var(--card-2)]">
+      <div className="h-1 overflow-hidden bg-[#232927]">
         <div
           className="quick-timer h-full"
           style={{ animationDuration: `${ms}ms`, background: accent }}
@@ -85,20 +84,14 @@ export function QuickCallCard({
         className={`grid gap-2 ${call.options.length > 2 ? 'grid-cols-2 lg:grid-cols-4' : 'grid-cols-2'}`}
       >
         {call.options.map((o, i) => (
-          <button
-            key={o.id}
-            type="button"
-            onClick={() => onAnswer(o.id)}
-            className="relative flex min-h-[48px] flex-col items-center justify-center gap-0.5 rounded-lg border-2 border-transparent bg-[var(--ink)] px-3 py-2 text-center font-bold leading-tight text-[var(--paper)] hover:border-[var(--you)] focus-visible:border-[var(--you)] focus-visible:outline-none"
-          >
-            <span
-              aria-hidden="true"
-              className="mono absolute left-2.5 top-1.5 text-[10px] opacity-60"
-            >
-              {i + 1}
+          <button key={o.id} type="button" onClick={() => onAnswer(o.id)} className="call-opt">
+            <span className="flex w-full items-center justify-between gap-2">
+              <span className="label">{named(o.label)}</span>
+              <span aria-hidden="true" className="call-key">
+                {i + 1}
+              </span>
             </span>
-            <span>{named(o.label)}</span>
-            {o.note && <span className="text-[11px] font-medium opacity-70">{named(o.note)}</span>}
+            {o.note && <span className="note">{named(o.note)}</span>}
           </button>
         ))}
       </div>
