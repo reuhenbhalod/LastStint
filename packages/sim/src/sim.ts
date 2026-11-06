@@ -102,6 +102,7 @@ export const EVENT_STREAM = 5000;
 export const INCIDENT_STREAM = 6000;
 export const CONTACT_STREAM = 7000; // the user's car: contact in a battle (race engineer spec)
 export const LIMITS_STREAM = 8000; // the user's car: track-limit strikes
+export const FUEL_STREAM = 10000; // the user's car: the fuel margin at the takeover
 // Rival policy (Implementation Plan 2.5): under green the rival covers a stop only if its own
 // next planned stop is within this many laps.
 export const COVER_WINDOW = 4;
@@ -128,6 +129,17 @@ export interface ModeEffect {
   defendLogit?: number;
   /** ERS: battery % gained (+) or spent (-) each green lap. */
   charge?: number;
+  /** Fuel load spec: multiplies the fuel burnt a lap. */
+  burnMult?: number;
+}
+
+/** The fuel load (fuel load spec; live play only). See headset.json's comment. */
+export interface FuelConfig {
+  burnPerLap: number;
+  marginMin: number;
+  marginMax: number;
+  neutralBurn: number;
+  dryLapDelta: number;
 }
 
 interface IncidentRates {
@@ -150,6 +162,7 @@ interface HeadsetEra {
   modes: { [K in keyof Modes]: Record<string, ModeEffect> };
   neutralization?: { scPerLap: number; vscPerLap: number; scLaps: number; vscLaps: number };
   ers?: { startBattery: number; scCharge: number };
+  fuel?: FuelConfig;
   incidents?: IncidentRates;
   engineer?: EngineerConfig;
   teamOrders?: {
@@ -166,6 +179,42 @@ const HEADSET = headsetConfig as unknown as Record<string, HeadsetEra>;
 /** The race engineer config for a model's era (battles, trust...), or null. */
 export function engineerConfig(model: RaceModel): EngineerConfig | null {
   return HEADSET[model.era]?.engineer ?? null;
+}
+
+/** The era's fuel load settings (null: no fuel load in this era). */
+export function fuelConfig(model: RaceModel): FuelConfig | null {
+  return HEADSET[model.era]?.fuel ?? null;
+}
+
+/**
+ * Fuel to spare at the flag (kg; negative: short) for a car with `fuel` kg after `lap`, at
+ * the standard burn. Null without a fuel load.
+ */
+export function fuelMargin(model: RaceModel, car: CarState, lap: number): number | null {
+  const f = fuelConfig(model);
+  if (!f || car.fuel === undefined) return null;
+  return car.fuel - f.burnPerLap * Math.max(0, model.race.laps - lap);
+}
+
+/** The fuel load's lap-time effect on this lap (0 without one): its weight, or an empty tank. */
+function fuelLapDelta(run: Run, car: CarState, lap: number): number {
+  const f = run.headset?.fuel;
+  if (!f || car.fuel === undefined || !run.incidents) return 0;
+  if (car.fuel <= 0) return f.dryLapDelta;
+  // Off the standard load (what the fitted fuel effect assumes), each kg moves the lap time.
+  const nominal = f.burnPerLap * (run.model.race.laps - lap + 1);
+  return (run.model.fuelEffectPerLap / f.burnPerLap) * (car.fuel - nominal);
+}
+
+/** Burn a lap's fuel: the modes' multipliers on green, a fraction under a SC or VSC. */
+function burnFuel(run: Run, car: CarState, lap: number, neutral: boolean): void {
+  const f = run.headset?.fuel;
+  if (!f || car.fuel === undefined || !run.incidents || car.fuel <= 0) return;
+  const mult = neutral
+    ? f.neutralBurn
+    : (effect(run, car, 'pace').burnMult ?? 1) * (effect(run, car, 'fuel').burnMult ?? 1);
+  car.fuel = Math.max(0, car.fuel - f.burnPerLap * mult);
+  if (car.fuel <= 0) run.notes.push({ lap, kind: 'fuel', driver: car.code, detail: 'empty' });
 }
 
 /** The headset modes' effects for a model's era (for explaining the options in the game). */
@@ -496,6 +545,15 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
     neutral: neutralMap(events),
     retireAt,
   };
+  // The fuel load: what the flag needs at the standard burn, plus the race's margin.
+  const fuel = run.headset?.fuel;
+  const user = run.state.cars[model.userSide];
+  if (run.incidents && fuel && user) {
+    const margin =
+      fuel.marginMin +
+      (fuel.marginMax - fuel.marginMin) * run.rng.get(FUEL_STREAM, model.userSide).next();
+    user.fuel = fuel.burnPerLap * (model.race.laps - model.race.takeoverLap) + margin;
+  }
   markNextFlag(run);
   return run;
 }
@@ -612,7 +670,11 @@ export function forkRun(
   }
   validateDecisions(run.model, decisions);
   const cars: Record<string, CarState> = {};
-  for (const [code, c] of Object.entries(run.state.cars)) cars[code] = cloneCar(c);
+  for (const [code, c] of Object.entries(run.state.cars)) {
+    cars[code] = cloneCar(c);
+    // The grader's playouts leave the fuel load out (fuel load spec: live play only).
+    if (options.blindAfter !== undefined) (cars[code] as CarState).fuel = undefined;
+  }
   return {
     ...run,
     seed,
@@ -1184,7 +1246,9 @@ export function stepLap(run: Run): RaceState {
     const eng = code === model.userSide && !flag ? state.engineer : undefined;
     const lapEng = eng ? engineerLap(run, lap, c, running, i, prevTime, eng) : null;
     if (lapEng) battle = lapEng;
-    const modeDelta = flag ? 0 : modeLapDelta(run, c) + (lapEng?.pace ?? 0);
+    const modeDelta = flag
+      ? 0
+      : modeLapDelta(run, c) + (lapEng?.pace ?? 0) + fuelLapDelta(run, c, lap);
     let lt: number;
     if (flag === 'sc' && scTime) lt = scTime;
     else if (flag === 'vsc' && vscTime) lt = vscTime;
@@ -1225,6 +1289,7 @@ export function stepLap(run: Run): RaceState {
       const gain = flag ? (run.headset?.ers?.scCharge ?? 0) : (effect(run, c, 'ers').charge ?? 0);
       c.battery = Math.min(100, Math.max(0, c.battery + gain));
     }
+    burnFuel(run, c, lap, !!flag);
   }
 
   if (run.incidents && !flag) incidents(run, lap, prevTime);
