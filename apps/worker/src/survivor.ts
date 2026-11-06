@@ -11,6 +11,7 @@
 
 import { GRADE_SAMPLES, type RaceModel, VerifyError, verifyRun } from '@boxthislap/sim';
 import { displayName } from './names.js';
+import { DISPLAY_NAME } from './players.js';
 import { SURVIVOR_POOL } from './pools.js';
 import { getRace } from './races.js';
 import { type StoredResult, stored } from './results.js';
@@ -277,7 +278,8 @@ export async function survivorBoard(db: D1Database, now: number) {
   const top = async (since: string | null) => {
     const { results } = await db
       .prepare(
-        `SELECT anon_id, rounds, score_sum, status, started_at FROM survivor_runs
+        `SELECT anon_id, rounds, score_sum, status, started_at,
+                ${DISPLAY_NAME('survivor_runs.anon_id')} AS name FROM survivor_runs
          WHERE rounds > 0 ${since ? 'AND started_at >= ?' : ''}
          ORDER BY rounds DESC, score_sum DESC, started_at LIMIT ${SURVIVOR_BOARD}`,
       )
@@ -288,10 +290,11 @@ export async function survivorBoard(db: D1Database, now: number) {
         score_sum: number;
         status: string;
         started_at: string;
+        name: string;
       }>();
     return results.map((r, i) => ({
       rank: i + 1,
-      name: displayName(r.anon_id),
+      name: r.name || displayName(r.anon_id),
       rounds: r.rounds,
       meanScore: r.rounds ? Math.round((r.score_sum / r.rounds) * 10) / 10 : 0,
       live: r.status === 'live',

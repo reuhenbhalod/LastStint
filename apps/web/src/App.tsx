@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAccount } from './account/useAccount.js';
 import { AdminPage } from './admin/AdminPage.js';
 import { adminToken } from './admin/session.js';
+import { ProfileSheet } from './components/ProfileSheet.js';
 import { ApiDailyProvider, RaceFileProvider } from './data/provider.js';
 import { useTeamTheme } from './game/teamTheme.js';
 import { useGame } from './game/useGame.js';
@@ -33,12 +34,14 @@ function Game() {
       : new ApiDailyProvider();
   }, []);
   const game = useGame(provider);
-  // The race in the driver's team colours (game/teamTheme.ts).
-  useTeamTheme(game.model);
   const account = useAccount(game.reload);
   const [help, setHelp] = useState(false);
   // The home page mid-race (the Pit Wall brand): the race holds until you go back to it.
   const [home, setHome] = useState(false);
+  // The race in the driver's team colours (game/teamTheme.ts); the home page in the player's
+  // favourite team's, if they have one.
+  const onHome = home || game.state?.phase === 'intro';
+  useTeamTheme(game.model, onHome ? account.player?.account?.favouriteTeam : null);
   const { setHold } = game;
   const goHome = useCallback(() => {
     setHold(true);
@@ -63,6 +66,7 @@ function Game() {
   }, [submitted, refresh]);
 
   if (help) return <HowItWorks onClose={() => setHelp(false)} />;
+  const profile = account.profileOpen && <ProfileSheet account={account} />;
 
   if (game.error) {
     return (
@@ -91,27 +95,33 @@ function Game() {
   if (home && game.state.phase !== 'intro') {
     const racing = ['planning', 'racing', 'decision'].includes(game.state.phase);
     return (
-      <IntroCard
-        state={game.state}
-        model={game.model}
-        onStart={leaveHome}
-        onHelp={() => setHelp(true)}
-        account={account}
-        resume={racing ? `Back to the race · lap ${game.state.race.lap}` : 'See your result'}
-      />
+      <>
+        <IntroCard
+          state={game.state}
+          model={game.model}
+          onStart={leaveHome}
+          onHelp={() => setHelp(true)}
+          account={account}
+          resume={racing ? `Back to the race · lap ${game.state.race.lap}` : 'See your result'}
+        />
+        {profile}
+      </>
     );
   }
 
   switch (game.state.phase) {
     case 'intro':
       return (
-        <IntroCard
-          state={game.state}
-          model={game.model}
-          onStart={game.start}
-          onHelp={() => setHelp(true)}
-          account={account}
-        />
+        <>
+          <IntroCard
+            state={game.state}
+            model={game.model}
+            onStart={game.start}
+            onHelp={() => setHelp(true)}
+            account={account}
+          />
+          {profile}
+        </>
       );
     case 'planning':
     case 'racing':
@@ -129,8 +139,18 @@ function Game() {
           />
         );
       }
-      return <ResultScreen state={game.state} game={game} account={account} onHome={goHome} />;
+      return (
+        <>
+          <ResultScreen state={game.state} game={game} account={account} onHome={goHome} />
+          {profile}
+        </>
+      );
     default:
-      return <ResultScreen state={game.state} game={game} account={account} onHome={goHome} />;
+      return (
+        <>
+          <ResultScreen state={game.state} game={game} account={account} onHome={goHome} />
+          {profile}
+        </>
+      );
   }
 }

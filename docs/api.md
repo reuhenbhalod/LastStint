@@ -177,8 +177,18 @@ How everyone played the day. It is cached for 60 seconds, and future dates retur
 The top 100, cached for 60 seconds.
 
 - The response is `{ date, size, entries: [{ rank, name, score }] }`.
-- Names are generated from the player ID, such as "Late Braker 417". The same player always gets the same name, and the ID itself is never shown.
+- A signed-in player with a display name shows by it. Everyone else gets a name generated from the player ID, such as "Late Braker 417". The same player always gets the same name, and the ID itself is never shown.
 - To mark the player's own row, compare names with `displayName(anonId)`: it's 20 lines in `apps/worker/src/names.ts`, which you can copy.
+
+### Sign-in and profile (docs/auth0-spec.md)
+
+The credential is an ID token: Auth0's when `AUTH0_DOMAIN` and `AUTH0_CLIENT_ID` are set (wrangler vars), else Google's (`GOOGLE_CLIENT_ID`). A Google sign-in through Auth0 (`google-oauth2|<id>`) finds the account made with the old Google button.
+
+| Endpoint | What it does |
+|---|---|
+| `POST /api/auth` `{ credential, anonId }` | Signs in. It links this browser's anonId to the account (made on first sign-in) and returns `{ playerId, name, email, displayName, favouriteTeam, needsProfile, created, admin }`. The browser adopts `playerId`. `/api/auth/google` is the old name. |
+| `POST /api/profile` `{ credential, displayName, favouriteTeam }` | Sets the profile and returns `{ displayName, favouriteTeam }`. The name is 3–20 letters, digits, spaces, `_`, `-` or `.`, unique ignoring case. Errors: 400 `bad-name` / `bad-team`, 409 `name-taken`, 404 `no-account` (sign in first). |
+| `GET /api/players/:anonId?today=YYYY-MM-DD` | `{ account, streak }`. `account` is null when signed out; it carries the profile fields above. |
 
 ### `GET /api/health`
 
@@ -186,7 +196,7 @@ The top 100, cached for 60 seconds.
 
 ## Admin
 
-For the people running the game (`apps/worker/src/admin.ts`, the website's `/admin` page). Every request sends the admin's Google ID token as `Authorization: Bearer <token>`. The token must verify (Google's keys, our client ID, not expired), its email must be verified by Google, and the email must be in `ADMIN_EMAILS` (`apps/worker/wrangler.jsonc` vars, comma-separated). Otherwise: 401 `sign-in-required` / `bad-credential`, or 403 `not-admin`.
+For the people running the game (`apps/worker/src/admin.ts`, the website's `/admin` page). Every request sends the admin's ID token (Auth0's, or Google's without Auth0 set up) as `Authorization: Bearer <token>`. The token must verify (the issuer's keys, our client ID, not expired), its email must be verified, and the email must be in `ADMIN_EMAILS` (`apps/worker/wrangler.jsonc` vars, comma-separated). Otherwise: 401 `sign-in-required` / `bad-credential`, or 403 `not-admin`.
 
 | Endpoint | What it does |
 |---|---|

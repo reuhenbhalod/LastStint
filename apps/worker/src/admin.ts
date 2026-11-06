@@ -14,7 +14,7 @@
 //   POST /api/admin/runs/clear         { date }: delete your own run(s) on a day, to replay it
 
 import type { Context } from 'hono';
-import { verifyGoogleToken } from './auth.js';
+import { authConfigured, verifyCredential } from './auth.js';
 import { addDays, isDate, todayUtc } from './dates.js';
 import type { Env } from './index.js';
 import { DAILY_POOL } from './pools.js';
@@ -32,12 +32,10 @@ export function adminEmails(env: Env): string[] {
 
 /** The signed-in admin, or an ApiError (401 no or bad token, 403 not an admin). */
 export async function requireAdmin(c: Ctx): Promise<{ email: string; sub: string }> {
-  const clientId = c.env.GOOGLE_CLIENT_ID;
-  if (!clientId) throw new ApiError(503, 'auth-off', 'sign-in is not set up');
+  if (!authConfigured(c.env)) throw new ApiError(503, 'auth-off', 'sign-in is not set up');
   const token = /^Bearer (.+)$/.exec(c.req.header('Authorization') ?? '')?.[1];
   if (!token || token.length > 8192) throw new ApiError(401, 'sign-in-required');
-  const keys = c.env.GOOGLE_JWKS ? JSON.parse(c.env.GOOGLE_JWKS).keys : undefined;
-  const who = await verifyGoogleToken(token, clientId, Date.now(), keys);
+  const who = await verifyCredential(c.env, token, Date.now());
   if (!who) throw new ApiError(401, 'bad-credential');
   const email = who.email.toLowerCase();
   if (!who.emailVerified || !adminEmails(c.env).includes(email)) {
@@ -187,13 +185,13 @@ export async function repin(db: D1Database, today: string) {
   return { repinned, skipped };
 }
 
-/** Delete the admin's own runs on a day (every browser linked to their Google account). */
+/** Delete the admin's own runs on a day (every browser linked to their account). */
 export async function clearOwnRuns(db: D1Database, sub: string, date: string) {
   const { results } = await db
     .prepare(
       `SELECT r.id FROM runs r JOIN player_ids p ON p.anon_id = r.anon_id
        JOIN players pl ON pl.id = p.player_id
-       WHERE pl.google_sub = ? AND r.date = ?`,
+       WHERE pl.account_sub = ? AND r.date = ?`,
     )
     .bind(sub, date)
     .all<{ id: string }>();
