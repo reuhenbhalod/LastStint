@@ -5,11 +5,12 @@
 import { describe, expect, it } from 'vitest';
 import abuJson from '../../../data/races/abu-dhabi-2021.json';
 import { forkRun, fuelConfig, fuelMargin, initRun, isFinished, stepLap } from '../src/sim.js';
-import type { Decision, RaceModel } from '../src/types.js';
+import type { FuelConfig } from '../src/sim.js';
+import type { CarState, Decision, RaceModel } from '../src/types.js';
 
 const abu = abuJson as unknown as RaceModel;
 const ham = abu.userSide;
-const cfg = fuelConfig(abu);
+const cfg = fuelConfig(abu) as FuelConfig;
 
 function race(seed: number, decisions: Decision[] = [], incidents?: boolean) {
   const run = initRun(abu, seed, { decisions, incidents });
@@ -27,11 +28,15 @@ describe('fuel load', () => {
     for (let seed = 0; seed < 40; seed++) {
       const run = initRun(abu, seed, { decisions: [] });
       const car = run.state.cars[ham];
-      const m = fuelMargin(abu, car!, run.state.lap) as number;
-      expect(m).toBeGreaterThanOrEqual(cfg!.marginMin);
-      expect(m).toBeLessThanOrEqual(cfg!.marginMax);
+      const m = fuelMargin(abu, car as CarState, run.state.lap) as number;
+      expect(m).toBeGreaterThanOrEqual(cfg.marginMin);
+      expect(m).toBeLessThanOrEqual(cfg.marginMax);
       expect(
-        fuelMargin(abu, initRun(abu, seed, { decisions: [] }).state.cars[ham]!, run.state.lap),
+        fuelMargin(
+          abu,
+          initRun(abu, seed, { decisions: [] }).state.cars[ham] as CarState,
+          run.state.lap,
+        ),
       ).toBe(m);
       margins.add(Math.round(m * 10));
     }
@@ -84,7 +89,7 @@ describe('fuel load', () => {
       expect(dry.notes.filter((n) => n.kind === 'fuel')).toHaveLength(1);
       // Lighter at first, then a dry tank's lift on every green lap after it.
       expect(dry.state.cars[ham]?.totalTime as number).toBeGreaterThan(
-        (full.state.cars[ham]?.totalTime as number) + cfg!.dryLapDelta,
+        (full.state.cars[ham]?.totalTime as number) + cfg.dryLapDelta,
       );
     }
   });
