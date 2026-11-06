@@ -71,7 +71,7 @@ const DRYING = 0.12;
 /** The real race paused just before `lap`: the user follows the real team's calls so far. */
 export function pauseAt(model: RaceModel, lap: number): Run {
   const before = realDecisions(model).filter((d) => d.lap < lap);
-  const run = initRun(model, model.race.seed, { decisions: before });
+  const run = initRun(model, model.race.seed, { decisions: before, incidents: false });
   while (run.state.lap < lap - 1) stepLap(run);
   return run;
 }

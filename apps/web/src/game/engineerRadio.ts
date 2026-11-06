@@ -113,6 +113,9 @@ export function engineerRadio(
       case 'nose':
         out.push({ from: 'Engineer', text: 'New nose on. The pace should be back.' });
         break;
+      case 'fuel':
+        out.push({ from: side, text: 'I’m out of fuel! I have to lift everywhere now.' });
+        break;
       case 'blue':
         out.push({ from: side, text: `Past ${n.other}. Finally.` });
         break;
