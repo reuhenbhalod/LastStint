@@ -10,12 +10,15 @@ import { useTeamTheme } from './game/teamTheme.js';
 import { useGame } from './game/useGame.js';
 import { HowItWorks } from './screens/HowItWorks.js';
 import { IntroCard } from './screens/IntroCard.js';
+import { Privacy, Terms } from './screens/Legal.js';
 import { RaceScreen } from './screens/RaceScreen.js';
 import { ResultScreen } from './screens/ResultScreen.js';
 import { Survivor } from './screens/Survivor.js';
 
 export function App() {
   if (location.pathname.startsWith('/admin')) return <AdminPage />;
+  if (location.pathname.startsWith('/privacy')) return <Privacy />;
+  if (location.pathname.startsWith('/terms')) return <Terms />;
   if (location.pathname.startsWith('/gauntlet') || location.pathname.startsWith('/survivor'))
     return <Survivor />;
   return <Game />;
