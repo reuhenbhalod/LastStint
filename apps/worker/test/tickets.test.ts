@@ -370,3 +370,47 @@ describe('seed SQL', () => {
     ).toThrow(/ticket 1: repeats the title/);
   });
 });
+
+describe('assignee', () => {
+  it('starts unassigned, and the list says who can be assigned and who is asking', async () => {
+    const t = await create();
+    expect(t.assignee).toBe('');
+    const res = await api('GET', '/api/admin/tickets', undefined, {
+      token: await idToken({ email: 'other@example.com' }),
+    });
+    const body = (await res.json()) as { admins: string[]; me: string };
+    expect(body.admins).toEqual(['admin@example.com', 'other@example.com']);
+    expect(body.me).toBe('other@example.com');
+  });
+
+  it('picks up, reassigns to the other admin, and unassigns', async () => {
+    const t = await create();
+    const mine = await patched(t.id, { assignee: 'Admin@Example.com', status: 'in_progress' });
+    expect(mine.assignee).toBe('admin@example.com');
+    expect(mine.status).toBe('in_progress');
+    expect((await patched(t.id, { assignee: 'other@example.com' })).assignee).toBe(
+      'other@example.com',
+    );
+    const none = await patched(t.id, { assignee: '' });
+    expect(none.assignee).toBe('');
+    expect(none.status).toBe('in_progress');
+  });
+
+  it('can be set when a ticket is created', async () => {
+    expect((await create({ assignee: 'other@example.com' })).assignee).toBe('other@example.com');
+  });
+
+  it('refuses anyone who is not an admin', async () => {
+    const t = await create();
+    for (const assignee of ['someone@example.com', 'admin@example', 42]) {
+      expect((await patch(t.id, { assignee })).status).toBe(400);
+    }
+    const res = await api('POST', '/api/admin/tickets', {
+      title: 'x',
+      category: 'bug',
+      assignee: 'someone@example.com',
+    });
+    expect(res.status).toBe(400);
+    expect((await list()).find((x) => x.id === t.id)?.assignee).toBe('');
+  });
+});

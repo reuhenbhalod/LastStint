@@ -39,16 +39,28 @@ export interface Ticket {
   notes: string;
   source: string;
   createdBy: string;
+  /** The admin working on it (their email), or '' when unassigned. */
+  assignee: string;
   createdAt: number;
   updatedAt: number;
   completedAt: number | null;
 }
 
 /** The fields the page sets (source comes from the seed file and isn't edited here). */
-export type TicketFields = Pick<Ticket, 'title' | 'description' | 'category' | 'status' | 'notes'>;
+export type TicketFields = Pick<
+  Ticket,
+  'title' | 'description' | 'category' | 'status' | 'notes' | 'assignee'
+>;
 
-export async function listTickets(): Promise<Ticket[]> {
-  return (await adminCall<{ tickets: Ticket[] }>('/api/admin/tickets')).tickets;
+/** The list, the admins a ticket can be assigned to, and the signed-in admin's email. */
+export interface TicketList {
+  tickets: Ticket[];
+  admins: string[];
+  me: string;
+}
+
+export async function listTickets(): Promise<TicketList> {
+  return adminCall<TicketList>('/api/admin/tickets');
 }
 
 export async function createTicket(fields: TicketFields): Promise<Ticket> {
@@ -74,11 +86,43 @@ export function errorText(e: unknown): string {
   return e.detail ? `${e.detail} (${e.status})` : `The server said ${e.code} (${e.status}).`;
 }
 
+/** Whose tickets to show: everyone's, the signed-in admin's, or nobody's yet. */
+export type Owner = 'all' | 'mine' | 'unassigned';
+
+/** A readable name from an email: "purohit.abhiram@…" -> "Purohit Abhiram". */
+export function personName(email: string): string {
+  const local = email.split('@')[0] ?? email;
+  return local
+    .split(/[._+-]+/)
+    .filter(Boolean)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+}
+
+/** One or two letters for an avatar. */
+export function initials(email: string): string {
+  const [first = '', second = ''] = personName(email).split(' ');
+  return (second ? first.charAt(0) + second.charAt(0) : first.slice(0, 2)).toUpperCase();
+}
+
+/** "You" for the signed-in admin, their name for anyone else, "Unassigned" for nobody. */
+export function assigneeLabel(assignee: string, me: string): string {
+  if (!assignee) return 'Unassigned';
+  return assignee === me ? 'You' : personName(assignee);
+}
+
+function ownedBy(t: Ticket, owner: Owner, me: string): boolean {
+  if (owner === 'mine') return t.assignee === me;
+  if (owner === 'unassigned') return t.assignee === '';
+  return true;
+}
+
 /** Does the ticket match the search (title, description, notes, source or #id)? */
 export function matches(t: Ticket, query: string): boolean {
   const q = query.trim().toLowerCase();
   if (!q) return true;
-  return [t.title, t.description, t.notes, t.source, `#${t.id}`].some((s) =>
+  const who = t.assignee ? [t.assignee, personName(t.assignee)] : [];
+  return [t.title, t.description, t.notes, t.source, `#${t.id}`, ...who].some((s) =>
     s.toLowerCase().includes(q),
   );
 }
@@ -86,7 +130,8 @@ export function matches(t: Ticket, query: string): boolean {
 const STATUS_ORDER: Record<Status, number> = { in_progress: 0, open: 1, done: 2 };
 
 /**
- * The tickets the page shows: those in `category` (or all) matching `query`. Open and
+ * The tickets the page shows: those in `category` (or all), owned per `owner`, matching
+ * `query`. Open and
  * in-progress ones grouped by category (in CATEGORIES order, empty groups left out; in
  * progress first, then newest), and the done ones, most recently completed first.
  */
@@ -94,9 +139,12 @@ export function arrange(
   tickets: readonly Ticket[],
   category: Category | 'all',
   query: string,
+  owner: Owner = 'all',
+  me = '',
 ): { groups: Array<{ category: Category; tickets: Ticket[] }>; done: Ticket[] } {
   const shown = tickets.filter(
-    (t) => (category === 'all' || t.category === category) && matches(t, query),
+    (t) =>
+      (category === 'all' || t.category === category) && ownedBy(t, owner, me) && matches(t, query),
   );
   const groups = CATEGORIES.map((c) => ({
     category: c,

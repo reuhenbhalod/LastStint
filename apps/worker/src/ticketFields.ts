@@ -15,6 +15,7 @@ export const LIMITS = {
   description: 10_000,
   notes: 10_000,
   source: 500,
+  assignee: 254,
 } as const;
 
 /** A ticket as the API returns it. Times are Unix milliseconds. */
@@ -27,6 +28,8 @@ export interface Ticket {
   notes: string;
   source: string;
   createdBy: string;
+  /** The admin working on it (their email), or '' when unassigned. */
+  assignee: string;
   createdAt: number;
   updatedAt: number;
   completedAt: number | null;
@@ -40,6 +43,8 @@ export interface TicketInput {
   status: Status;
   notes: string;
   source: string;
+  /** An admin's email, or '' to unassign. The API checks it against ADMIN_EMAILS. */
+  assignee: string;
 }
 
 export function isCategory(v: unknown): v is Category {
@@ -50,7 +55,15 @@ export function isStatus(v: unknown): v is Status {
   return typeof v === 'string' && (STATUSES as readonly string[]).includes(v);
 }
 
-const FIELDS = ['title', 'description', 'category', 'status', 'notes', 'source'] as const;
+const FIELDS = [
+  'title',
+  'description',
+  'category',
+  'status',
+  'notes',
+  'source',
+  'assignee',
+] as const;
 
 /**
  * Check a ticket body: an object with only known fields, each of the right type and length.
@@ -78,6 +91,14 @@ export function parseTicketInput(
       return { ok: false, error: `${field} is longer than ${LIMITS[field]} characters` };
     }
     value[field] = s;
+  }
+  if (raw.assignee !== undefined) {
+    if (typeof raw.assignee !== 'string') return { ok: false, error: 'assignee must be a string' };
+    const a = raw.assignee.trim().toLowerCase();
+    if (a.length > LIMITS.assignee) {
+      return { ok: false, error: `assignee is longer than ${LIMITS.assignee} characters` };
+    }
+    value.assignee = a;
   }
   if (value.title !== undefined && value.title === '') {
     return { ok: false, error: 'title must not be empty' };
