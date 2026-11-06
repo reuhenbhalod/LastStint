@@ -55,18 +55,21 @@
     "SOFT": {
       "offset": 0.0,
       "degPerLap": 0.05385,
-      "cliffLap": 30
+      "cliffLap": 30,
+      "provenLaps": 29
     },
     "MEDIUM": {
       "offset": 0.4744,
       "degPerLap": 0.02526,
-      "cliffLap": 54
+      "cliffLap": 54,
+      "provenLaps": 54
     },
     "HARD": {
       "offset": 0.5366,
       "degPerLap": 0.01173,
       "cliffLap": 8,
-      "cliffDegPerLap": 0.0241
+      "cliffDegPerLap": 0.0241,
+      "provenLaps": 55
     },
     "INTERMEDIATE": {
       "offset": 0.0,

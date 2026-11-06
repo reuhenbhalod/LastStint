@@ -47,12 +47,14 @@
     "MEDIUM": {
       "offset": 0.0,
       "degPerLap": 0.0,
-      "cliffLap": 29
+      "cliffLap": 29,
+      "provenLaps": 29
     },
     "HARD": {
       "offset": 0.3411,
       "degPerLap": 0.0,
-      "cliffLap": 44
+      "cliffLap": 31,
+      "provenLaps": 31
     },
     "INTERMEDIATE": {
       "offset": 0.0,

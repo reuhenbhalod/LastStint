@@ -87,7 +87,8 @@ export function tyreLife(c: CompoundModel): number {
       ? LIFE_LOSS / c.degPerLap
       : (LIFE_LOSS + extra * c.cliffLap) / (c.degPerLap + extra);
   const life = c.cliffDegPerLap === undefined ? Math.min(loss, c.cliffLap) : loss;
-  return Math.min(99, Math.floor(life));
+  // A tyre that real teams ran for N laps in this race lasts at least N (tyre-life fix 2).
+  return Math.min(99, Math.max(Math.floor(life), c.provenLaps ?? 0));
 }
 
 /** Usable life of `compound` in `model` (Infinity if the race has no model for it). */

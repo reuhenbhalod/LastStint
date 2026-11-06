@@ -172,6 +172,11 @@
             "type": "number",
             "minimum": 0,
             "description": "Extra seconds per lap of tyre age past cliffLap. Absent: no fitted cliff."
+          },
+          "provenLaps": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "The longest stint run on this compound in the real race (tyre age). Its life is at least this: real teams ran it that long."
           }
         }
       }
@@ -426,7 +431,7 @@
     },
     "userSide": {
       "type": "string",
-      "description": "Driver code the user controls \u2014 always the hard/controversial side."
+      "description": "Driver code the user controls — always the hard/controversial side."
     },
     "rival": {
       "type": "string",
