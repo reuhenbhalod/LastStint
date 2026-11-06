@@ -70,17 +70,20 @@
     "SOFT": {
       "offset": 0.0,
       "degPerLap": 0.0698,
-      "cliffLap": 28
+      "cliffLap": 28,
+      "provenLaps": 28
     },
     "MEDIUM": {
       "offset": 0.2814,
       "degPerLap": 0.05237,
-      "cliffLap": 45
+      "cliffLap": 32,
+      "provenLaps": 32
     },
     "HARD": {
       "offset": 0.4463,
       "degPerLap": 0.03625,
-      "cliffLap": 62
+      "cliffLap": 50,
+      "provenLaps": 50
     }
   },
   "drivers": [

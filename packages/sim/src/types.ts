@@ -66,6 +66,8 @@ export interface CompoundModel {
   cliffLap: number;
   /** Extra seconds per lap of tyre age past cliffLap; absent when no cliff was fitted. */
   cliffDegPerLap?: number;
+  /** The longest stint run on it in the real race: its life is at least this (tyre-life fix 2). */
+  provenLaps?: number;
 }
 
 export interface DriverModel {

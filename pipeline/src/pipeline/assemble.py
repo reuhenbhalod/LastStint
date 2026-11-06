@@ -51,6 +51,9 @@ def stint_counts(laps: pd.DataFrame) -> dict[str, int]:
 # life (Monza 24: one soft stint, 2 laps), so its life comes from the compounds that were run,
 # at these ratios of their longest stints (a soft lasts about 0.4x the longest hard stint...).
 THIN_STINTS = 3
+# A life guessed from the other compounds stops short of this share of the race (tyre-life fix
+# 2): 1.5x the longest medium stint often came out past the flag, a hard that never wore out.
+GUESS_CAP = 0.8
 LIFE_RATIO = {
     ("SOFT", "MEDIUM"): 0.55,
     ("SOFT", "HARD"): 0.4,
@@ -62,16 +65,25 @@ LIFE_RATIO = {
 
 
 def life_floor(
-    compound: str, longest: dict[str, int], stints: dict[str, int], total_laps: int
+    compound: str,
+    longest: dict[str, int],
+    stints: dict[str, int],
+    total_laps: int,
+    harder_only: bool = False,
 ) -> int | None:
     """The least life the well-run compounds suggest for `compound`, or None with none to go
-    on. (Teams that only ran a compound briefly chose to: it says nothing of its life.)"""
+    on. (Teams that only ran a compound briefly chose to: it says nothing of its life.)
+    `harder_only`: only from harder compounds (a soft's life from the hards'), never stretching
+    a harder tyre past its own evidence from a softer one's (tyre-life fix 2)."""
     floors = [
         ratio * longest[other]
         for (c, other), ratio in LIFE_RATIO.items()
-        if c == compound and stints.get(other, 0) >= THIN_STINTS and other in longest
+        if c == compound
+        and stints.get(other, 0) >= THIN_STINTS
+        and other in longest
+        and (ratio < 1 or not harder_only)
     ]
-    return min(total_laps, round(max(floors))) if floors else None
+    return min(round(GUESS_CAP * total_laps), round(max(floors))) if floors else None
 
 
 def thin_life(
@@ -117,6 +129,11 @@ def assemble_race_model(
     longest = longest_stints(laps)
     stints = stint_counts(laps)
 
+    def proven(compound: str) -> dict:
+        """The longest stint run on it (the game's life never falls short of it)."""
+        laps_run = longest.get(compound, 0)
+        return {"provenLaps": laps_run} if laps_run >= 1 else {}
+
     compounds = {}
     for compound, offset in fit.compound_offset.items():
         hinge = cliffs.get(compound)
@@ -127,22 +144,25 @@ def assemble_race_model(
                 "offset": round(offset, 4),
                 "degPerLap": round(fit.compound_wear[compound], 5),
                 "cliffLap": thin,
+                **proven(compound),
             }
             continue
         compounds[compound] = {
             "offset": round(offset, 4),
             "degPerLap": round(fit.compound_wear[compound], 5),
             # No fitted cliff -> the edge of the evidence: the longest stint seen on this
-            # compound, or the life the other compounds suggest if teams only ran it briefly
-            # (tyre-life fix). Past it the sim's fallback wear applies (spec D5), instead of
-            # assuming the tyre never falls off.
+            # compound. Past it the sim's fallback wear applies (spec D5), instead of assuming
+            # the tyre never falls off.
+            # (A softer tyre run only briefly still gets the life its harder ones suggest; a
+            # harder one is never stretched by a softer one's: tyre-life fix 2.)
             "cliffLap": int(hinge[0])
             if hinge
             else max(
                 longest.get(compound, total_laps),
-                life_floor(compound, longest, stints, total_laps) or 0,
+                life_floor(compound, longest, stints, total_laps, harder_only=True) or 0,
             ),
             **({"cliffDegPerLap": round(hinge[1], 4)} if hinge else {}),
+            **proven(compound),
         }
 
     # A wet race (weather spec): the wet tyres too (their pace is in the weather curves).

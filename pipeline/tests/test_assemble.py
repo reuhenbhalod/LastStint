@@ -99,8 +99,21 @@ def test_a_thinly_run_compound_takes_its_life_from_the_well_run_ones():
     assert assemble.thin_life("SOFT", longest, stints, 53) == 17
     # Well-run compounds keep their own fit.
     assert assemble.thin_life("HARD", longest, stints, 53) is None
-    # Never past the race distance, nor short of what was actually run.
-    assert assemble.thin_life("SOFT", {"SOFT": 30, "HARD": 200}, {"SOFT": 1, "HARD": 9}, 53) == 53
+    # A guess stops at 80% of the race (tyre-life fix 2: 42 of 53), never short of what was
+    # actually run.
+    assert assemble.thin_life("SOFT", {"SOFT": 30, "HARD": 200}, {"SOFT": 1, "HARD": 9}, 53) == 42
+    assert assemble.thin_life("SOFT", {"SOFT": 50, "HARD": 200}, {"SOFT": 1, "HARD": 9}, 53) == 50
+
+
+def test_a_harder_tyre_is_not_stretched_by_a_softer_ones_guess():
+    from pipeline import assemble
+
+    # Portugal 20: hards run 42 laps at most, mediums 55. 1.5x the mediums (82) said the hards
+    # never wore out; only harder compounds may floor a softer one now (tyre-life fix 2).
+    longest = {"SOFT": 33, "MEDIUM": 55, "HARD": 42}
+    stints = {"SOFT": 7, "MEDIUM": 17, "HARD": 13}
+    assert assemble.life_floor("HARD", longest, stints, 66, harder_only=True) is None
+    assert assemble.life_floor("SOFT", longest, stints, 66, harder_only=True) == 30
 
 
 def test_the_edge_of_the_evidence_is_not_short_of_what_the_other_compounds_suggest():
