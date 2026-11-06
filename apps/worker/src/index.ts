@@ -16,6 +16,7 @@ import { SURVIVOR_POOL } from './pools.js';
 import { getRace } from './races.js';
 import { ApiError, dailyWithModel, isAnonId, submitRun, withStanding } from './runs.js';
 import { getState, startRun, submitRound, survivorBoard } from './survivor.js';
+import { registerTickets } from './tickets.js';
 
 export interface Env {
   DB: D1Database;
@@ -62,7 +63,7 @@ app.use(
       if (c.env.WEB_ORIGIN) allowed.push(c.env.WEB_ORIGIN);
       return allowed.includes(origin) ? origin : null;
     },
-    allowMethods: ['GET', 'POST', 'OPTIONS'],
+    allowMethods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
     allowHeaders: ['Content-Type', 'Authorization'],
     maxAge: 86400,
   }),
@@ -98,6 +99,7 @@ async function cached(
 }
 
 registerAdmin(app);
+registerTickets(app);
 
 app.get('/api/health', async (c) =>
   c.json({ ok: true, queueDays: await queueDays(c.env.DB, Date.now()) }),

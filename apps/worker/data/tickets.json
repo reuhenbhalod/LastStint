@@ -1,0 +1,370 @@
+[
+  {
+    "title": "Frame the result against the real team (\"You beat Mercedes\")",
+    "description": "Instead of \"You won\", say \"You beat Mercedes\" or similar when the real driver (e.g. Hamilton) lost, because the user is trying to beat the original race's result.",
+    "category": "ui",
+    "status": "done",
+    "notes": "Crossed out. status.md, Beta feedback round 1: results say \"You beat Mercedes!\" / \"You matched Mercedes\" / \"Mercedes did better\" (game/verdict.ts).",
+    "source": "Game changes.pdf p1"
+  },
+  {
+    "title": "Add scenarios where the driver ignores your commands",
+    "description": "Include scenarios where the driver does not listen to your commands.",
+    "category": "feature",
+    "status": "done",
+    "notes": "Crossed out. status.md: drivers can refuse live calls; refusal rates per driver in data/drivers.json.",
+    "source": "Game changes.pdf p1"
+  },
+  {
+    "title": "Show pit stops on the map through the pit lane",
+    "description": "When the user boxes, show it on the map where the pit lane is, show the car going through it, and include strategy there as well.",
+    "category": "feature",
+    "status": "done",
+    "notes": "Crossed out. status.md round 1 (real pit lane, pit card) and round 2 part A (pitPosition in track/geometry.ts).",
+    "source": "Game changes.pdf p1"
+  },
+  {
+    "title": "Use the pointer hand cursor on buttons",
+    "description": "Make buttons show the pointer (hand) cursor, not the default arrow.",
+    "category": "ui",
+    "status": "done",
+    "notes": "Crossed out.",
+    "source": "Game changes.pdf p1"
+  },
+  {
+    "title": "Fix button latency",
+    "description": "Fix button latency.",
+    "category": "bug",
+    "status": "done",
+    "notes": "Crossed out. feedback-round-1-spec.md #11 / S1: instant \"booked\" feedback.",
+    "source": "Game changes.pdf p1"
+  },
+  {
+    "title": "Open a driver profile when clicking a car on the map",
+    "description": "When the user clicks any driver on the map, show their profile and details. More map interaction: clicking racers brings up stats, etc.",
+    "category": "feature",
+    "status": "done",
+    "notes": "Crossed out. Merged two bullets: \"When user clicks on any driver via map...\" and \"More map interaction, clicking racers brings up stats\". status.md round 1: driver card on tapping any car (components/DriverCard.tsx).",
+    "source": "Game changes.pdf p1"
+  },
+  {
+    "title": "Slow the race down",
+    "description": "The race needs to slow down; everything is moving too fast.",
+    "category": "ui",
+    "status": "done",
+    "notes": "Crossed out. status.md round 1: 10 s a lap at 1x, 5 s at 2x.",
+    "source": "Game changes.pdf p1"
+  },
+  {
+    "title": "Add auth so users can build a daily streak",
+    "description": "Add auth so users can build a daily streak.",
+    "category": "feature",
+    "status": "done",
+    "notes": "Crossed out. status.md: Google sign-in + streaks.",
+    "source": "Game changes.pdf p1"
+  },
+  {
+    "title": "Make decision moments more obvious",
+    "description": "Make it more obvious when a situation comes up. Right now the buttons just show up on the right and the race pauses. Something more...",
+    "category": "ui",
+    "status": "done",
+    "notes": "Crossed out. status.md round 1: decision alert (radio banner, map dim and flash, card glow, optional chirp).",
+    "source": "Game changes.pdf p1"
+  },
+  {
+    "title": "Explain tyre and decision options",
+    "description": "Add information for decisions like the different tyre options: what mediums and hards are, and when hards are good or bad.",
+    "category": "feature",
+    "status": "done",
+    "notes": "Crossed out. tyres-and-track-spec.md (Done, Nov 2): per-compound pace, drop-off, gain and good/bad line.",
+    "source": "Game changes.pdf p1"
+  },
+  {
+    "title": "Put the player in the team's role (e.g. Mercedes, Abu Dhabi 2021)",
+    "description": "The game is that you are in the team's place, for example at Abu Dhabi 2021 you are the Mercedes team manager calling the strategies.",
+    "category": "feature",
+    "status": "done",
+    "notes": "status.md round 1 (\"You're the team manager\"); since reframed as the driver's race engineer (race-engineer-spec.md).",
+    "source": "Game changes.pdf p1"
+  },
+  {
+    "title": "Add more customizable strategy choices",
+    "description": "Include more strategy so it is more customizable for the user to choose a strategy.",
+    "category": "feature",
+    "status": "done",
+    "notes": "status.md round 2 part B: race plan (lap 35), timing options (Box next lap, Push and attack), ERS and fuel on the headset.",
+    "source": "Game changes.pdf p1"
+  },
+  {
+    "title": "Improve the track map animation",
+    "description": "Improve the animation for the track map.",
+    "category": "ui",
+    "status": "done",
+    "notes": "status.md round 1 (cars glide, rings, SC), round 2 A2 (pit stop drive), Nov 4 map motion (track/motion.ts, frame-by-frame test). Nov 4 work is marked \"localhost only\" in status.md; confirm it is deployed.",
+    "source": "Game changes.pdf p1"
+  },
+  {
+    "title": "Rename survivor mode",
+    "description": "Develop \"survivor\" mode, and call it something else.",
+    "category": "feature",
+    "status": "in_progress",
+    "notes": "Mode is built (survivor-spec.md; status.md Survivor mode, /survivor, own leaderboard). Left: a new name; it is still \"Survivor\" in the UI (screens/Survivor.tsx, RaceScreen badge).",
+    "source": "Game changes.pdf p1"
+  },
+  {
+    "title": "Add races where you must defend",
+    "description": "Go beyond \"do better than the losing race\": include races where you must defend as well; the simulator needs to be accurate enough for the race.",
+    "category": "content",
+    "status": "done",
+    "notes": "status.md Races (races-batch-1-spec.md): defend races Bahrain 2022, France 2019, Portugal 2020, Spain 2020, France 2021, Austria 2019. Sim accuracy limits remain (Model limits, G1 6/15 held-out).",
+    "source": "Game changes.pdf p1"
+  },
+  {
+    "title": "Add crashes, engine failures and punctures",
+    "description": "Add crashes, engine breakdowns if the car is pushed too hard, and tyres popping. Other F1 scenarios.",
+    "category": "feature",
+    "status": "done",
+    "notes": "status.md round 2 part B, Incidents: crashes, failures and punctures across the field; a crash can bring out SC/VSC.",
+    "source": "Game changes.pdf p1"
+  },
+  {
+    "title": "Label the player's car HAM on the map and leaderboard",
+    "description": "Change it to Hamilton: show only HAM on the track and the leaderboard.",
+    "category": "ui",
+    "status": "done",
+    "notes": "feedback-round-2-spec.md #7 (A3, done). Code shows driver codes: TimingTower.tsx renders {code}; TrackMap.tsx labels cars with {c.code}; legend names HAM, VER.",
+    "source": "Game changes.pdf p1"
+  },
+  {
+    "title": "Add driver attitudes",
+    "description": "Add driver attitudes, like always listens / listens with questioning / sometimes listens.",
+    "category": "feature",
+    "status": "done",
+    "notes": "status.md round 2: data/drivers.json rates all 40 drivers High/Medium/Low from real team radio.",
+    "source": "Game changes.pdf p1"
+  },
+  {
+    "title": "Add weather and wet tyres",
+    "description": "Add weather so different tyres come into play.",
+    "category": "feature",
+    "status": "open",
+    "notes": "feedback-round-2-spec.md #9: \"Later\". No weather in the sim (sim.ts: \"No modelled race is wet\").",
+    "source": "Game changes.pdf p1"
+  },
+  {
+    "title": "Base tyre wear on track history and weather",
+    "description": "Tyre wear should adjust based on the track's historical data, weather, etc.",
+    "category": "feature",
+    "status": "in_progress",
+    "notes": "Track history done: each race file has its own fitted compounds (data/races/*.json; feedback-round-2-spec.md #10). Left: weather.",
+    "source": "Game changes.pdf p1"
+  },
+  {
+    "title": "Add a how-to-play introduction",
+    "description": "Add an introduction teaching users how to play and the objective of the game.",
+    "category": "feature",
+    "status": "done",
+    "notes": "status.md round 2 part A: five-step walkthrough (screens/HowToPlay.tsx).",
+    "source": "Game changes.pdf p1"
+  },
+  {
+    "title": "Improve auth and its UI",
+    "description": "Fix auth UI. User auth needs to be better.",
+    "category": "feature",
+    "status": "in_progress",
+    "notes": "Merged two bullets: \"Fix auth UI\" (p1) and \"User auth needs to be better\" (p2). Done: Google sign-in, streaks, Google button white box fixed (round 2 A1). Left: signed session token (status.md Risks: \"Accounts have no session token\"); username and favourite team are a separate ticket.",
+    "source": "Game changes.pdf p1"
+  },
+  {
+    "title": "Fix boxing putting the car out halfway round the lap",
+    "description": "There is a weird glitch when boxing: it puts you out halfway through the lap.",
+    "category": "bug",
+    "status": "done",
+    "notes": "feedback-round-2-spec.md #13 (A2); status.md Pit stops on the map and Nov 4 pit lane re-trace (lanes were half a lap to two laps long).",
+    "source": "Game changes.pdf p1"
+  },
+  {
+    "title": "Fix the box animation glitches on every race",
+    "description": "Fix the box animation. Fix glitches per race on the box animation.",
+    "category": "bug",
+    "status": "done",
+    "notes": "Merged two bullets: \"Need to fix box animation\" (p1) and \"Need to fix glitches per race on box animation\" (p2). status.md Nov 4: 10 tracks' pit lanes re-traced, per-stop timelines (track/motion.ts), test runs every pool race frame by frame.",
+    "source": "Game changes.pdf p1"
+  },
+  {
+    "title": "Don't ask to box again when a stop is already booked",
+    "description": "In the last few moments of Max vs Lewis it asked me to box twice and forced my car to box twice. If a box is already scheduled it should not ask again. (Screenshot: \"Lap 53 Box, softs\" and \"Lap 55 Box, softs\", both marked Big miss.)",
+    "category": "bug",
+    "status": "done",
+    "notes": "status.md round 2 part A, No double stop call (game/autoStay.ts); Nov 4 stop-question gate: none while a stop is booked or within 3 laps.",
+    "source": "Game changes.pdf p1"
+  },
+  {
+    "title": "Move the player profile to the left",
+    "description": "Put the player profile on the left or bottom.",
+    "category": "ui",
+    "status": "done",
+    "notes": "Built in round 2 part A (profile on the left, status.md). Note: Layout take 2 (Nov 2) moved HAM's profile to the right column with car stats, so it is no longer on the left; reopen if left/bottom still matters.",
+    "source": "Game changes.pdf p1"
+  },
+  {
+    "title": "Move car stats to the right",
+    "description": "Car stats on the right.",
+    "category": "ui",
+    "status": "done",
+    "notes": "status.md Layout take 2: stats (profile, car, radio) steady on the right.",
+    "source": "Game changes.pdf p1"
+  },
+  {
+    "title": "Move controls below the map",
+    "description": "Move controls below the map.",
+    "category": "ui",
+    "status": "done",
+    "notes": "status.md Layout take 2: BOX and the controls below the map.",
+    "source": "Game changes.pdf p1"
+  },
+  {
+    "title": "Move the headset to an icon on the map",
+    "description": "Move the headset to an icon at the bottom right of the map, which would... (bullet unfinished).",
+    "category": "ui",
+    "status": "done",
+    "notes": "status.md round 2 part A: the headset opens from a button on the map (under the map on a phone).",
+    "source": "Game changes.pdf p1"
+  },
+  {
+    "title": "Decide whether to add a gap-to-opponent button",
+    "description": "Gap to opponent button?",
+    "category": "question",
+    "status": "done",
+    "notes": "Built: the gap trace opens from a button on the map (status.md round 2 part A; components/GapTrace.tsx).",
+    "source": "Game changes.pdf p2"
+  },
+  {
+    "title": "Remove the wait after picking an option",
+    "description": "When clicking an option, it takes a few seconds for the race to start up, leaving an awkward time for the user; might be confusing.",
+    "category": "bug",
+    "status": "done",
+    "notes": "feedback-round-1-spec.md #1 (S1) and feedback-round-2-spec.md #20 (A1); Progress: car moving within 0.6 s of a pick (measured in the browser).",
+    "source": "Game changes.pdf p2"
+  },
+  {
+    "title": "Add a favicon / main page icon",
+    "description": "Fix the icon for the main page.",
+    "category": "ui",
+    "status": "open",
+    "notes": "apps/web/index.html has no <link rel=\"icon\"> and there is no public/ folder.",
+    "source": "Game changes.pdf p2"
+  },
+  {
+    "title": "Add username and favourite team to sign-up",
+    "description": "Username and favourite team selector when signing up.",
+    "category": "feature",
+    "status": "open",
+    "notes": "Not built: no username or team field; leaderboards use generated names (apps/worker/src/names.ts displayName).",
+    "source": "Game changes.pdf p2"
+  },
+  {
+    "title": "Add an eras mode (Senna, Schumacher, Hamilton, Verstappen)",
+    "description": "Eras mode where the user can select Schumacher, Hamilton, Verstappen or Senna (1990, 2000, 2010, 2020).",
+    "category": "feature",
+    "status": "open",
+    "notes": "Not built. Pre-2018 data sources researched (Jolpica 1996+, f1db, TUMFTM 2014-19) but nothing ingested.",
+    "source": "Game changes.pdf p2"
+  },
+  {
+    "title": "Ingest races from every decade of F1",
+    "description": "Ingest more races from every decade of F1.",
+    "category": "content",
+    "status": "open",
+    "notes": "Races exist only for 2018-2025 (55 in data/races; 38 playable per status.md). No earlier decades.",
+    "source": "Game changes.pdf p2"
+  },
+  {
+    "title": "Fix the pitting bug",
+    "description": "Fix the pitting bug.",
+    "category": "bug",
+    "status": "done",
+    "notes": "status.md Pit and map fixes (Nov 4): pit lanes re-traced, stops on their own timeline, stop-question gate. Bullet is unspecific; reopen if a different pit bug is meant.",
+    "source": "Game changes.pdf p2"
+  },
+  {
+    "title": "Fix car speed through the pit lane",
+    "description": "Fix the speed through pit lane bug.",
+    "category": "bug",
+    "status": "done",
+    "notes": "status.md Nov 4: 10 tracks had pit lanes half a lap to two laps long; pipeline outline now caps lanes, all 8-28% of the lap.",
+    "source": "Game changes.pdf p2"
+  },
+  {
+    "title": "Don't offer a stop 2 laps after pitting",
+    "description": "It doesn't make sense to ask to pit after 2 laps.",
+    "category": "bug",
+    "status": "done",
+    "notes": "status.md Nov 4 stop-question gate: none on tyres under 5 laps old, none within 3 laps of the last stop.",
+    "source": "Game changes.pdf p2"
+  },
+  {
+    "title": "Change header to \"You are {lastname}'s Race Engineer\"",
+    "description": "Change it to \"You are {full lastname} Race Engineer\".",
+    "category": "ui",
+    "status": "in_progress",
+    "notes": "Race-engineer framing exists, but the race header reads \"{team} race engineer\" (screens/RaceScreen.tsx:561) and the intro/how-to-play use the driver code (\"You're HAM's race engineer\", IntroCard.tsx, HowToPlay.tsx). Left: show the driver's full last name.",
+    "source": "Game changes.pdf p2"
+  },
+  {
+    "title": "Show the rules only when signed out or on first visit",
+    "description": "The rules should only pop up if the person is not signed in or it is their first time.",
+    "category": "ui",
+    "status": "open",
+    "notes": "screens/IntroCard.tsx opens HowToPlay whenever the intro isn't a resume (useState(!resume)); no first-visit or signed-in check.",
+    "source": "Game changes.pdf p2"
+  },
+  {
+    "title": "Decide how fast each lap should run vs a real race",
+    "description": "Think about how fast each lap should be compared to a realistic race.",
+    "category": "question",
+    "status": "open",
+    "notes": "Currently 10 s a lap at 1x, 5 s at 2x (feedback-round-1-spec.md D4); battles slow the lap.",
+    "source": "Game changes.pdf p2"
+  },
+  {
+    "title": "Show win chance per decision in Your calls",
+    "description": "Include the chance to win based on each decision, shown in the \"Your calls\" section.",
+    "category": "feature",
+    "status": "done",
+    "notes": "components/LiveGrades.tsx (\"Your calls\" section) shows each answered call's chance and the best option's chance; results screen too.",
+    "source": "Game changes.pdf p2"
+  },
+  {
+    "title": "Make hard tyres last a realistic number of laps",
+    "description": "Why do hards only last 7 laps? They need to last a realistic time, depending on the user's decisions.",
+    "category": "bug",
+    "status": "open",
+    "notes": "Not fixed. Fitted HARD cliffLap is under 11 laps in 12 races, e.g. bahrain-2018 2, bahrain-2023 5, bahrain-2022 6, japan-2023 6, canada-2022 7, miami-2025 7 (data/races/*.json). Abu Dhabi 2021 is 32.",
+    "source": "Game changes.pdf p2"
+  },
+  {
+    "title": "Decide whether every race should have a safety car",
+    "description": "Is there a safety car in every race?",
+    "category": "question",
+    "status": "open",
+    "notes": "SC/VSCs come from each race's real events (data/incidents.json explains 20 in the pool), plus live crashes (~9% of Abu Dhabi runs add an SC/VSC). Needs a design answer.",
+    "source": "Game changes.pdf p2"
+  },
+  {
+    "title": "Update the standings more than once a lap",
+    "description": "Increase the frequency of leaderboard updates (right now it only updates after every lap).",
+    "category": "feature",
+    "status": "open",
+    "notes": "Not built: TimingTower.tsx renders race.order, which changes once per lap tick.",
+    "source": "Game changes.pdf p2"
+  },
+  {
+    "title": "Add fuel load management",
+    "description": "Managing fuel load.",
+    "category": "feature",
+    "status": "in_progress",
+    "notes": "Headset fuel setting normal / lift and coast exists (status.md round 2 part B; HeadsetPanel.tsx). Left: a real fuel load (starting fuel, burn, weight effect choices).",
+    "source": "Game changes.pdf p2"
+  }
+]
