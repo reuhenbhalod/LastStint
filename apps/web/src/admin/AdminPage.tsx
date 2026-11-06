@@ -7,6 +7,7 @@
 
 import type { RaceModel } from '@boxthislap/sim';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { AUTH0_ENABLED, completeLogin, idToken, login } from '../account/auth0.js';
 import { GOOGLE_CLIENT_ID, loadGoogle } from '../account/google.js';
 import { ApiError } from '../api.js';
 import { Brand } from '../components/Brand.js';
@@ -109,6 +110,23 @@ export function AdminPage() {
   const tab = adminTab(location.pathname);
   const races = useRaces(tab === 'races');
   const [token, setToken] = useState(adminToken);
+  // Auth0: back from its login page, or already signed in to it (another tab), the ID token
+  // is the admin token (docs/auth0-spec.md).
+  useEffect(() => {
+    if (!AUTH0_ENABLED || token) return;
+    let alive = true;
+    (async () => (await completeLogin()) ?? (await idToken()))().then(
+      (t) => {
+        if (!alive || !t) return;
+        setAdminToken(t);
+        setToken(t);
+      },
+      () => {},
+    );
+    return () => {
+      alive = false;
+    };
+  }, [token]);
   const [me, setMe] = useState<{ email: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [days, setDays] = useState<Day[] | null>(null);
@@ -125,7 +143,7 @@ export function AdminPage() {
       setError(
         e instanceof ApiError
           ? e.code === 'not-admin'
-            ? 'This Google account isn’t an admin. Add its email to ADMIN_EMAILS in apps/worker/wrangler.jsonc.'
+            ? 'This account isn’t an admin. Add its email to ADMIN_EMAILS in apps/worker/wrangler.jsonc.'
             : e.status === 0
               ? 'Couldn’t reach the server. Check your connection.'
               : e.status === 404
@@ -238,13 +256,21 @@ export function AdminPage() {
             <div>
               <h1 className="disp m-0 text-[22px] leading-none">Admin sign-in</h1>
               <p className="m-0 mt-1 text-[14px] text-[var(--muted)]">
-                Sign in with a Google account on the admin list.
+                Sign in with an account on the admin list.
                 {local && tab === 'races'
                   ? ' On localhost you can play any race without signing in.'
                   : ''}
               </p>
             </div>
-            {GOOGLE_CLIENT_ID ? (
+            {AUTH0_ENABLED ? (
+              <button
+                type="button"
+                onClick={() => login()}
+                className="disp rounded-full bg-[#EEF1EF] px-5 py-2 text-[14px] text-[#0B0E0D] hover:bg-white"
+              >
+                Sign in
+              </button>
+            ) : GOOGLE_CLIENT_ID ? (
               <SignIn
                 onToken={(t) => {
                   setAdminToken(t);
@@ -252,7 +278,7 @@ export function AdminPage() {
                 }}
               />
             ) : (
-              <span className="text-[13px] text-[var(--muted)]">Google sign-in isn’t set up.</span>
+              <span className="text-[13px] text-[var(--muted)]">Sign-in isn’t set up.</span>
             )}
           </section>
         )}

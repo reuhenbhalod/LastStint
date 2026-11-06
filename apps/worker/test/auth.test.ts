@@ -3,9 +3,10 @@
 
 import { env } from 'cloudflare:test';
 import { describe, expect, it } from 'vitest';
-import { verifyGoogleToken } from '../src/auth.js';
+import { accountKey, verifyCredential, verifyGoogleToken } from '../src/auth.js';
 import { addDays } from '../src/dates.js';
-import { streakOf } from '../src/players.js';
+import type { Env } from '../src/index.js';
+import { signIn as signInDb, streakOf } from '../src/players.js';
 import { get, ids, play, schedule, submit, today } from './helpers.js';
 
 const CLIENT = env.GOOGLE_CLIENT_ID as string;
@@ -107,6 +108,9 @@ describe('POST /api/auth/google + GET /api/players/:anonId', () => {
       playerId: ids.a,
       name: 'Test Driver',
       email: 'driver@example.com',
+      displayName: '',
+      favouriteTeam: '',
+      needsProfile: true, // no display name yet: the game asks for the profile
       admin: false,
       created: true, // a new account: the game shows how to play once
     });
@@ -139,5 +143,87 @@ describe('POST /api/auth/google + GET /api/players/:anonId', () => {
     // A streak survives until the end of the next day.
     const tomorrow = await (await get(`/api/players/${ids.a}?today=${addDays(today(), 1)}`)).json();
     expect(tomorrow).toMatchObject({ streak: { current: 1 } });
+  });
+});
+
+describe('Auth0 (docs/auth0-spec.md)', () => {
+  // The test key stands in for the tenant's; Auth0's issuer and our SPA client ID.
+  const auth0 = {
+    AUTH0_DOMAIN: 'laststint.test',
+    AUTH0_CLIENT_ID: 'spa-client',
+    AUTH0_JWKS: env.GOOGLE_JWKS,
+  } as Env;
+  const auth0Claims = { iss: 'https://laststint.test/', aud: 'spa-client' };
+
+  it('takes an Auth0 ID token when Auth0 is set up, and not a Google one', async () => {
+    const who = await verifyCredential(
+      auth0,
+      await idToken({ ...auth0Claims, sub: 'auth0|abc', email_verified: true }),
+      Date.now(),
+    );
+    expect(who).toEqual({
+      sub: 'auth0|abc',
+      email: 'driver@example.com',
+      name: 'Test Driver',
+      emailVerified: true,
+    });
+    expect(await verifyCredential(auth0, await idToken({}), Date.now())).toBeNull();
+    // Our client ID only, and Auth0's issuer only.
+    const wrong = await idToken({ ...auth0Claims, aud: 'someone-else' });
+    expect(await verifyCredential(auth0, wrong, Date.now())).toBeNull();
+  });
+
+  it('finds an old Google account from a Google sign-in through Auth0', async () => {
+    expect(accountKey('google-oauth2|google-1')).toBe('google-1');
+    expect(accountKey('auth0|abc')).toBe('auth0|abc');
+    // An account made with the old Google button...
+    const old = (await (await signIn(await idToken({}), ids.a)).json()) as { playerId: string };
+    // ...is the one Google-through-Auth0 signs in to.
+    const who = await verifyCredential(
+      auth0,
+      await idToken({ ...auth0Claims, sub: 'google-oauth2|google-1' }),
+      Date.now(),
+    );
+    expect(who?.sub).toBe('google-1');
+    const again = await signInDb(env.DB, who as NonNullable<typeof who>, ids.b, Date.now());
+    expect(again.playerId).toBe(old.playerId);
+    expect(again.created).toBe(false);
+  });
+});
+
+describe('POST /api/profile (docs/auth0-spec.md A4)', () => {
+  const profile = async (credential: string, displayName: string, favouriteTeam = '') =>
+    fetchApi('/api/profile', { credential, displayName, favouriteTeam });
+
+  it('sets the display name and team, unique names only, and the leaderboard shows it', async () => {
+    const me = await idToken({});
+    await signIn(me, ids.a);
+    const res = await profile(me, '  Box Box  ', 'McLaren');
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ displayName: 'Box Box', favouriteTeam: 'McLaren' });
+    const player = await (await get(`/api/players/${ids.a}?today=${today()}`)).json();
+    expect(player).toMatchObject({
+      account: { displayName: 'Box Box', favouriteTeam: 'McLaren', needsProfile: false },
+    });
+
+    // Someone else can't take it, whatever the case.
+    const other = await idToken({ sub: 'google-2', email: 'two@example.com' });
+    await signIn(other, ids.b);
+    const taken = await profile(other, 'box BOX');
+    expect(taken.status).toBe(409);
+    expect(await taken.json()).toMatchObject({ error: 'name-taken' });
+    // Too short, odd characters, a bad token, no account.
+    expect((await profile(other, 'ab')).status).toBe(400);
+    expect((await profile(other, 'Box<script>')).status).toBe(400);
+    expect((await profile('garbage', 'Fine Name')).status).toBe(401);
+    expect((await profile(await idToken({ sub: 'nobody' }), 'Fine Name')).status).toBe(404);
+
+    // The leaderboard: the display name for a player who has one.
+    await schedule(today());
+    expect((await submit(ids.a, play('stay'))).status).toBe(201);
+    const board = (await (await get(`/api/daily/${today()}/leaderboard`)).json()) as {
+      entries: Array<{ name: string }>;
+    };
+    expect(board.entries[0]?.name).toBe('Box Box');
   });
 });

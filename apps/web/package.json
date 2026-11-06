@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:live": "VITE_API_BASE=https://pitwall.boxboxbox.workers.dev VITE_GOOGLE_CLIENT_ID=318278030629-s860fnjjpk6ihcn4iubjqiakf8vu0pqi.apps.googleusercontent.com vite",
+    "dev:live": "VITE_API_BASE=https://pitwall.boxboxbox.workers.dev VITE_AUTH0_DOMAIN=dev-umxcdh2y62l4e0gy.us.auth0.com VITE_AUTH0_CLIENT_ID=Pdlxz3iAqJse61VUhOGpF8wSeFgV7yxM vite",
+    "dev:auth0": "VITE_AUTH0_DOMAIN=dev-umxcdh2y62l4e0gy.us.auth0.com VITE_AUTH0_CLIENT_ID=Pdlxz3iAqJse61VUhOGpF8wSeFgV7yxM vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
@@ -15,6 +16,7 @@
     "deploy": "wrangler deploy"
   },
   "dependencies": {
+    "@auth0/auth0-spa-js": "^2.30.0",
     "@boxthislap/sim": "workspace:*",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"

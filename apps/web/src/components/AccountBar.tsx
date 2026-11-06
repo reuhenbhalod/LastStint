@@ -1,10 +1,12 @@
-// Streak and sign-in, on the daily card and the results (feedback spec D3). The streak shows
-// signed in or not; "Sign in with Google" keeps it across devices. Without a Google client ID
-// configured, only the streak shows. Admin accounts also get an Admin button.
+// Streak and sign-in, on the daily card and the results (feedback spec D3, docs/auth0-spec.md).
+// The streak shows signed in or not; signing in keeps it across devices. "Sign in" opens
+// Auth0's login page (or, without Auth0 set up, the Google button); with neither configured,
+// only the streak shows. Signed in: the display name, Edit profile, and for admins an Admin
+// button.
 
 import { useEffect, useRef } from 'react';
 import { GOOGLE_CLIENT_ID, loadGoogle } from '../account/google.js';
-import type { AccountState } from '../account/useAccount.js';
+import { type AccountState, SIGN_IN } from '../account/useAccount.js';
 import { StreakIcon } from './Icons.js';
 
 function GoogleButton({ onCredential }: { onCredential: (credential: string) => void }) {
@@ -31,6 +33,51 @@ function GoogleButton({ onCredential }: { onCredential: (credential: string) => 
     };
   }, []);
   return <div ref={el} className="gsi-button min-h-[32px]" />;
+}
+
+/** The way in: Auth0's "Sign in" button, the Google button, or nothing. */
+function SignInControl({ account, large = false }: { account: AccountState; large?: boolean }) {
+  if (account.busy) return <span className="text-[13px] text-[var(--muted)]">Signing in…</span>;
+  if (SIGN_IN === 'auth0') {
+    return (
+      <button
+        type="button"
+        onClick={account.startSignIn}
+        className={`disp rounded-full bg-[#EEF1EF] text-[#0B0E0D] hover:bg-white ${large ? 'px-5 py-2 text-[14px]' : 'px-4 py-1.5 text-[12px]'}`}
+      >
+        Sign in
+      </button>
+    );
+  }
+  if (SIGN_IN === 'google' && GOOGLE_CLIENT_ID)
+    return <GoogleButton onCredential={account.signIn} />;
+  return null;
+}
+
+/** The signed-in player: their name (display name first), Edit profile, Sign out. */
+function SignedIn({ account, compact }: { account: AccountState; compact: boolean }) {
+  const a = account.player?.account;
+  if (!a) return null;
+  return (
+    <span className="flex items-center gap-2 text-[13px]">
+      {a.admin && <AdminLink />}
+      <button
+        type="button"
+        onClick={() => account.setProfileOpen(true)}
+        title="Edit profile"
+        className={`max-w-[160px] truncate font-semibold text-[var(--ink)] underline-offset-2 hover:underline ${compact ? 'hidden sm:inline' : ''}`}
+      >
+        {a.displayName || a.name || a.email}
+      </button>
+      <button
+        type="button"
+        onClick={account.signOut}
+        className="rounded-full border border-[var(--rule)] px-3 py-1 text-[var(--muted)] hover:text-[var(--ink)]"
+      >
+        Sign out
+      </button>
+    </span>
+  );
 }
 
 /** Only for accounts on the admin list (the server says so; it checks every admin call too). */
@@ -69,30 +116,7 @@ export function AccountBar({
           <StreakIcon size={14} className="text-[var(--flag)]" />
           {streak ? `${streak.current}-day streak` : 'Daily streak'}
         </span>
-        {p?.account ? (
-          <span className="flex items-center gap-2 text-[13px]">
-            {p.account.admin && <AdminLink />}
-            <span
-              className="hidden max-w-[160px] truncate text-[var(--muted)] sm:inline"
-              title={p.account.email}
-            >
-              {p.account.name || p.account.email}
-            </span>
-            <button
-              type="button"
-              onClick={account.signOut}
-              className="rounded-full border border-[var(--rule)] px-3 py-1 text-[var(--muted)] hover:text-[var(--ink)]"
-            >
-              Sign out
-            </button>
-          </span>
-        ) : GOOGLE_CLIENT_ID ? (
-          account.busy ? (
-            <span className="text-[13px] text-[var(--muted)]">Signing in…</span>
-          ) : (
-            <GoogleButton onCredential={account.signIn} />
-          )
-        ) : null}
+        {p?.account ? <SignedIn account={account} compact /> : <SignInControl account={account} />}
       </div>
     );
   }
@@ -112,31 +136,15 @@ export function AccountBar({
         </span>
       </div>
       {p?.account ? (
-        <div className="flex items-center gap-2 text-[13px]">
-          {p.account.admin && <AdminLink />}
-          <span className="max-w-[160px] truncate text-[var(--muted)]" title={p.account.email}>
-            {p.account.name || p.account.email}
-          </span>
-          <button
-            type="button"
-            onClick={account.signOut}
-            className="rounded-md border border-[var(--rule)] px-2 py-1 text-[var(--muted)] hover:text-[var(--ink)]"
-          >
-            Sign out
-          </button>
-        </div>
-      ) : GOOGLE_CLIENT_ID ? (
+        <SignedIn account={account} compact={false} />
+      ) : (
         <div className="flex flex-col items-end gap-1">
-          {account.busy ? (
-            <span className="text-[13px] text-[var(--muted)]">Signing in…</span>
-          ) : (
-            <GoogleButton onCredential={account.signIn} />
-          )}
+          <SignInControl account={account} large />
           {account.error && (
             <span className="text-[12px] text-[var(--box-ink)]">{account.error}</span>
           )}
         </div>
-      ) : null}
+      )}
     </div>
   );
 }

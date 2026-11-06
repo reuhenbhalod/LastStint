@@ -98,11 +98,17 @@ const THEMED = [
   '--box-ink',
 ];
 
-/** Put the race's team colours on the page while `model` is shown (the defaults after). */
-export function useTeamTheme(model: RaceModel | null | undefined): void {
+/**
+ * Put the race's team colours on the page while `model` is shown (the defaults after).
+ * `favourite`: the player's favourite team (docs/auth0-spec.md A4), whose colour takes the
+ * accent instead (the home page).
+ */
+export function useTeamTheme(model: RaceModel | null | undefined, favourite?: string | null): void {
   useEffect(() => {
     if (!model) return;
-    const t = teamTheme(model);
+    const race = teamTheme(model);
+    const fav = favourite ? TEAM_COLOR[favourite] : undefined;
+    const t = fav ? { ...race, you: fav, youInk: inkOn(fav) } : race;
     const root = document.documentElement.style;
     root.setProperty('--you', t.you);
     root.setProperty('--you-ink', t.youInk);
@@ -116,5 +122,5 @@ export function useTeamTheme(model: RaceModel | null | undefined): void {
     return () => {
       for (const v of THEMED) root.removeProperty(v);
     };
-  }, [model]);
+  }, [model, favourite]);
 }

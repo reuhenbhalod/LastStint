@@ -89,6 +89,12 @@ export interface Account {
   playerId: string;
   name: string;
   email: string;
+  /** The leaderboard name ('' until set; docs/auth0-spec.md A4). */
+  displayName?: string;
+  /** The favourite team ('' until set): its colour themes the home page. */
+  favouriteTeam?: string;
+  /** No display name yet: the game asks for the profile. */
+  needsProfile?: boolean;
   /** On the admin list: the Admin button shows. */
   admin?: boolean;
   /** Sign-in only: the account was created just now. */
@@ -150,7 +156,13 @@ export const api = {
     apiGet<{ entries: LeaderboardEntry[] }>(`/api/daily/${date}/leaderboard`),
   stats: (date: string) => apiGet<DailyStats>(`/api/daily/${date}/stats`),
   signIn: (credential: string, anonId: string) =>
-    apiPost<Account>('/api/auth/google', { credential, anonId }),
+    apiPost<Account>('/api/auth', { credential, anonId }),
+  profile: (credential: string, displayName: string, favouriteTeam: string) =>
+    apiPost<{ displayName: string; favouriteTeam: string }>('/api/profile', {
+      credential,
+      displayName,
+      favouriteTeam,
+    }),
   player: (anonId: string, today: string) =>
     apiGet<PlayerResponse>(`/api/players/${anonId}?today=${today}`),
 };
