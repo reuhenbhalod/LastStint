@@ -1,5 +1,6 @@
--- Game-change tickets. Times are Unix milliseconds. completed_at is set when status becomes
--- 'done' and cleared when it leaves 'done' (src/worker/tickets.ts).
+-- Game-change tickets (src/tickets.ts, the admin page's Tickets tab). Times are Unix
+-- milliseconds. created_by is the admin's email (seeded tickets have ''). completed_at is set
+-- when status becomes 'done' and cleared when it leaves 'done'.
 CREATE TABLE tickets (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   title TEXT NOT NULL,

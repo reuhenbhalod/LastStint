@@ -8,11 +8,12 @@
 
 const API_BASE = import.meta.env.VITE_API_BASE ?? '';
 
-/** An API error with the server's code (`already-submitted`, `bad-grades`, …). */
+/** An API error with the server's code (`already-submitted`, `bad-grades`, …) and detail. */
 export class ApiError extends Error {
   constructor(
     readonly status: number,
     readonly code: string,
+    readonly detail?: string,
   ) {
     super(`${status} ${code}`);
   }

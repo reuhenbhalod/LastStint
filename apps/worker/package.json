@@ -15,7 +15,9 @@
     "reverify": "tsx scripts/reverify.ts",
     "predev": "tsx scripts/races.ts",
     "predeploy": "tsx scripts/races.ts",
-    "smoke": "tsx scripts/smoke.ts"
+    "smoke": "tsx scripts/smoke.ts",
+    "tickets:seed:local": "tsx scripts/tickets-seed.ts && wrangler d1 execute pitwall-db --local --file data/tickets-seed.sql",
+    "tickets:seed:remote": "tsx scripts/tickets-seed.ts && wrangler d1 execute pitwall-db --remote --file data/tickets-seed.sql"
   },
   "dependencies": {
     "@boxthislap/sim": "workspace:*",

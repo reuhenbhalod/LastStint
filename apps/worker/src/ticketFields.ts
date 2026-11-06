@@ -1,26 +1,13 @@
-// What a ticket is, shared by the Worker (src/worker), the app (src/web) and the seed script.
-// The enums match the CHECK constraints in migrations/0001_init.sql.
+// What a ticket is (the admin ticket tracker, src/tickets.ts), and the check every new or
+// changed ticket goes through: the API's and the seed script's (scripts/tickets-seed-sql.ts).
+// No Worker or Node APIs here, so both can use it. The enums match the CHECK constraints in
+// migrations/0006_tickets.sql; the web app's copy is apps/web/src/admin/tickets.ts.
 
 export const CATEGORIES = ['bug', 'feature', 'ui', 'content', 'question', 'other'] as const;
 export const STATUSES = ['open', 'in_progress', 'done'] as const;
 
 export type Category = (typeof CATEGORIES)[number];
 export type Status = (typeof STATUSES)[number];
-
-export const CATEGORY_LABELS: Record<Category, string> = {
-  bug: 'Bug',
-  feature: 'Feature',
-  ui: 'UI',
-  content: 'Content',
-  question: 'Question',
-  other: 'Other',
-};
-
-export const STATUS_LABELS: Record<Status, string> = {
-  open: 'Open',
-  in_progress: 'In progress',
-  done: 'Done',
-};
 
 /** Longest accepted value of each text field (characters). */
 export const LIMITS = {
@@ -29,8 +16,6 @@ export const LIMITS = {
   notes: 10_000,
   source: 500,
 } as const;
-
-export type TextField = keyof typeof LIMITS;
 
 /** A ticket as the API returns it. Times are Unix milliseconds. */
 export interface Ticket {

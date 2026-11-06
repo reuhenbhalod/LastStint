@@ -35,21 +35,32 @@ export function setAdminToken(token: string | null): void {
   }
 }
 
-/** An admin API call (GET without a body, POST with one). */
-export async function adminCall<T>(path: string, body?: unknown): Promise<T> {
+/**
+ * An admin API call: GET without a body, POST with one, or `method` (PATCH, DELETE). Errors
+ * carry the server's code and detail; a network failure is ApiError(0, 'offline').
+ */
+export async function adminCall<T>(path: string, body?: unknown, method?: string): Promise<T> {
   const token = adminToken();
   if (!token) throw new ApiError(401, 'sign-in-required');
-  const res = await fetch(apiUrl(path), {
-    method: body === undefined ? 'GET' : 'POST',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
+  let res: Response;
+  try {
+    res = await fetch(apiUrl(path), {
+      method: method ?? (body === undefined ? 'GET' : 'POST'),
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: body === undefined ? undefined : JSON.stringify(body),
+    });
+  } catch {
+    throw new ApiError(0, 'offline');
+  }
   if (res.ok) return res.json() as Promise<T>;
   let code = 'http-error';
+  let detail: string | undefined;
   try {
-    code = ((await res.json()) as { error?: string }).error ?? code;
+    const err = (await res.json()) as { error?: string; detail?: string };
+    code = err.error ?? code;
+    detail = err.detail;
   } catch {
     // not JSON
   }
-  throw new ApiError(res.status, code);
+  throw new ApiError(res.status, code, detail);
 }

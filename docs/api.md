@@ -188,6 +188,21 @@ For the people running the game (`apps/worker/src/admin.ts`, the website's `/adm
 | `POST /api/admin/repin` | Re-pins today's and later days to their race file's current hash; days with runs are left as they are |
 | `POST /api/admin/runs/clear` `{ date }` | Deletes the admin's own runs on that day (every browser linked to their Google account), to play it again |
 
+### Tickets
+
+The game-change ticket tracker (`apps/worker/src/tickets.ts`, the admin page's Tickets tab at `/admin/tickets`), on the same admin check as above. A ticket is `{ id, title, description, category, status, notes, source, createdBy, createdAt, updatedAt, completedAt }`; times are Unix milliseconds.
+
+| Endpoint | What it does |
+|---|---|
+| `GET /api/admin/tickets` | `{ tickets }`: every ticket, newest first |
+| `POST /api/admin/tickets` `{ title, category, description?, status?, notes?, source? }` | `201 { ticket }`. `createdBy` is the admin's email |
+| `PATCH /api/admin/tickets/:id` `{ any of those fields }` | `{ ticket }` |
+| `DELETE /api/admin/tickets/:id` | `{ ok: true }` |
+
+- **Fields.** `category` is `bug`, `feature`, `ui`, `content`, `question` or `other`; `status` is `open` (the default), `in_progress` or `done`. The title is trimmed and can't be empty. Lengths: title 200, description and notes 10,000, source 500 characters. Any other field is refused.
+- **`completedAt`** is set when a ticket becomes `done` (kept while it stays done) and cleared when it leaves `done`.
+- **Errors.** `400 invalid` (with a `detail`), `400 bad-json`, `400 bad-id` (the id must be a positive integer), `404 not-found`, `413 too-large` (over 64 KB), `415 bad-content-type` (send `application/json`). The admin check comes first, so a signed-out call always gets 401.
+
 ## Operations
 
 | Task | Command (from the repo root) |
@@ -197,6 +212,7 @@ For the people running the game (`apps/worker/src/admin.ts`, the website's `/adm
 | Schedule dailies | `pnpm --filter @boxthislap/worker schedule --local --days 7` (`--remote` for production; `--race <id>`, `--from <date>`, `--dry-run`) |
 | Play a daily against a Worker | `pnpm --filter @boxthislap/worker smoke --url http://localhost:8787` |
 | Test | `pnpm --filter @boxthislap/worker test` (runs in workerd with a local D1) |
+| Seed the ticket tracker | `pnpm --filter @boxthislap/worker tickets:seed:local` (`tickets:seed:remote` for production), after `migrate:local` / `migrate:remote`. Loads `apps/worker/data/tickets.json`; tickets whose title is already there are skipped, so it's safe to run again |
 | Rebundle races after `pipeline build` | `pnpm --filter @boxthislap/worker races` (CI fails if the bundle is stale) |
 
 **Scheduling.**

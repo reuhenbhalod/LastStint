@@ -2,13 +2,17 @@
 // the Worker's ADMIN_EMAILS list, then: play any race (practice, with any seed), and run the
 // daily schedule (see it, set a day's race, schedule the next days, re-pin stale days, clear
 // your own run to replay a day). On localhost the race list works without the admin API.
+// The Tickets tab (/admin/tickets, TicketsPage.tsx) is the game-change ticket tracker, shown
+// only once the server has confirmed the sign-in is an admin's.
 
 import type { RaceModel } from '@boxthislap/sim';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { GOOGLE_CLIENT_ID, loadGoogle } from '../account/google.js';
 import { ApiError } from '../api.js';
 import { goalOf } from '../game/goal.js';
+import { TicketsPage } from './TicketsPage.js';
 import { adminCall, adminToken, setAdminToken } from './session.js';
+import { btn, primary } from './ui.js';
 
 const RACE_FILES = import.meta.glob<{ default: RaceModel }>('../../../../data/races/*.json');
 
@@ -34,9 +38,23 @@ interface Day {
   current: boolean;
 }
 
-function useRaces(): RaceCard[] | null {
+type Tab = 'races' | 'tickets';
+
+const TABS: Array<{ id: Tab; label: string; href: string }> = [
+  { id: 'races', label: 'Races & schedule', href: '/admin' },
+  { id: 'tickets', label: 'Tickets', href: '/admin/tickets' },
+];
+
+/** The admin tab the URL asks for: /admin/tickets, or the races and schedule. */
+function adminTab(pathname: string): Tab {
+  return /^\/admin\/tickets\/?$/.test(pathname) ? 'tickets' : 'races';
+}
+
+/** The playable race files (not loaded until `enabled`: the Tickets tab doesn't need them). */
+function useRaces(enabled: boolean): RaceCard[] | null {
   const [races, setRaces] = useState<RaceCard[] | null>(null);
   useEffect(() => {
+    if (!enabled) return;
     // One file failing to load (a race file removed while the dev server ran) skips that race.
     Promise.allSettled(Object.values(RACE_FILES).map((load) => load())).then((mods) =>
       setRaces(
@@ -61,7 +79,7 @@ function useRaces(): RaceCard[] | null {
           .sort((a, b) => a.name.localeCompare(b.name)),
       ),
     );
-  }, []);
+  }, [enabled]);
   return races;
 }
 
@@ -86,13 +104,9 @@ function SignIn({ onToken }: { onToken: (t: string) => void }) {
   return <div ref={el} className="gsi-button min-h-[40px]" />;
 }
 
-const btn =
-  'rounded-lg border border-[var(--rule)] px-3 py-1.5 text-[13px] font-semibold hover:bg-[var(--card-2)] disabled:opacity-40';
-const primary =
-  'rounded-lg bg-[var(--you)] px-3 py-1.5 text-[13px] font-bold text-[var(--you-ink)] hover:brightness-110 disabled:opacity-40';
-
 export function AdminPage() {
-  const races = useRaces();
+  const tab = adminTab(location.pathname);
+  const races = useRaces(tab === 'races');
   const [token, setToken] = useState(adminToken);
   const [me, setMe] = useState<{ email: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -111,9 +125,11 @@ export function AdminPage() {
         e instanceof ApiError
           ? e.code === 'not-admin'
             ? 'This Google account isn’t an admin. Add its email to ADMIN_EMAILS in apps/worker/wrangler.jsonc.'
-            : e.status === 404
-              ? 'The admin API isn’t on this server yet (it goes live with the next deploy).'
-              : `The server said ${e.code} (${e.status}).`
+            : e.status === 0
+              ? 'Couldn’t reach the server. Check your connection.'
+              : e.status === 404
+                ? 'The admin API isn’t on this server yet (it goes live with the next deploy).'
+                : `The server said ${e.code} (${e.status}).`
           : String((e as Error)?.message ?? e),
       ),
     [],
@@ -136,7 +152,7 @@ export function AdminPage() {
     adminCall<{ email: string }>('/api/admin/me').then(
       (r) => {
         setMe(r);
-        load();
+        if (tab === 'races') load();
       },
       (e) => {
         if (e instanceof ApiError && e.status === 401) {
@@ -146,7 +162,7 @@ export function AdminPage() {
         say(e);
       },
     );
-  }, [token, load, say]);
+  }, [token, load, say, tab]);
 
   const act = async (f: () => Promise<string>) => {
     setBusy(true);
@@ -163,13 +179,13 @@ export function AdminPage() {
   };
 
   const signedIn = !!token && !!me;
-  const showRaces = signedIn || local;
+  const showRaces = tab === 'races' && (signedIn || local);
   const nameOf = (id: string) => races?.find((r) => r.id === id)?.name ?? id;
 
   return (
     <div className="min-h-screen">
       <header className="border-b border-[var(--rule)]">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-6 py-3">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
           <span className="flex items-baseline gap-2">
             <a href="/" className="disp wide text-[20px] leading-none">
               Pit Wall
@@ -197,16 +213,34 @@ export function AdminPage() {
             </a>
           </span>
         </div>
+        <nav aria-label="Admin" className="mx-auto flex max-w-6xl gap-1 px-4 sm:px-6">
+          {TABS.map((t) => (
+            <a
+              key={t.id}
+              href={t.href}
+              aria-current={tab === t.id ? 'page' : undefined}
+              className={`-mb-px border-b-2 px-3 py-2 text-[13px] font-semibold ${
+                tab === t.id
+                  ? 'border-[var(--you)] text-[var(--ink)]'
+                  : 'border-transparent text-[var(--muted)] hover:text-[var(--ink)]'
+              }`}
+            >
+              {t.label}
+            </a>
+          ))}
+        </nav>
       </header>
 
-      <main className="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-6">
+      <main className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-6 sm:px-6">
         {!token && (
           <section className="card flex flex-wrap items-center justify-between gap-4">
             <div>
               <h1 className="disp m-0 text-[22px] leading-none">Admin sign-in</h1>
               <p className="m-0 mt-1 text-[14px] text-[var(--muted)]">
                 Sign in with a Google account on the admin list.
-                {local ? ' On localhost you can play any race without signing in.' : ''}
+                {local && tab === 'races'
+                  ? ' On localhost you can play any race without signing in.'
+                  : ''}
               </p>
             </div>
             {GOOGLE_CLIENT_ID ? (
@@ -231,6 +265,11 @@ export function AdminPage() {
             {note}
           </p>
         )}
+
+        {tab === 'tickets' && token && !me && !error && (
+          <p className="m-0 text-[14px] text-[var(--muted)]">Checking your sign-in…</p>
+        )}
+        {tab === 'tickets' && signedIn && <TicketsPage />}
 
         {showRaces && (
           <section className="flex flex-col gap-3">
@@ -281,7 +320,7 @@ export function AdminPage() {
           </section>
         )}
 
-        {signedIn && (
+        {tab === 'races' && signedIn && (
           <section className="flex flex-col gap-3">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <h2 className="disp m-0 text-[20px] leading-none">Daily schedule</h2>

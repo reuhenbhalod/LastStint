@@ -1,14 +1,8 @@
-// One ticket: its title, a status switch, and (opened) its description and notes, with Edit
-// and Delete. Delete asks first, in the card.
+// One ticket on the Tickets tab: its title, a status switch, and (opened) its description and
+// notes, with Edit and Delete. Delete asks first, in the card.
 
 import { useState } from 'react';
-import {
-  CATEGORY_LABELS,
-  STATUSES,
-  STATUS_LABELS,
-  type Status,
-  type Ticket,
-} from '../shared/tickets.js';
+import { CATEGORY_LABELS, STATUSES, STATUS_LABELS, type Status, type Ticket } from './tickets.js';
 import { btn, danger } from './ui.js';
 
 function day(ms: number): string {
@@ -38,7 +32,7 @@ export function TicketCard({
   const [confirming, setConfirming] = useState(false);
   const t = ticket;
   return (
-    <li className="rounded-xl border border-[var(--rule)] bg-[var(--card)] p-3">
+    <li className="card !p-3">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <button
           type="button"
@@ -47,7 +41,7 @@ export function TicketCard({
           className="min-w-0 flex-1 text-left"
         >
           <span
-            className={`block text-[15px] font-semibold leading-snug ${t.status === 'done' ? 'text-[var(--muted)] line-through decoration-1' : ''}`}
+            className={`block break-words text-[15px] font-semibold leading-snug ${t.status === 'done' ? 'text-[var(--muted)] line-through decoration-1' : ''}`}
           >
             {t.title}
           </span>
@@ -60,22 +54,22 @@ export function TicketCard({
           </span>
         </button>
         <fieldset
-          className="flex shrink-0 overflow-hidden rounded-lg border border-[var(--rule)]"
+          className="flex shrink-0 self-start overflow-hidden rounded-lg border border-[var(--rule)]"
           disabled={busy}
         >
-          <legend className="sr-only">Status</legend>
+          <legend className="sr-only">Status of #{t.id}</legend>
           {STATUSES.map((s) => (
             <button
               key={s}
               type="button"
               aria-pressed={t.status === s}
               onClick={() => t.status !== s && onStatus(s)}
-              className={`px-2.5 py-1 text-[12px] font-semibold disabled:opacity-40 ${
+              className={`px-2.5 py-1.5 text-[12px] font-semibold disabled:opacity-40 ${
                 t.status === s
                   ? s === 'done'
                     ? 'bg-[var(--you)] text-[var(--you-ink)]'
                     : s === 'in_progress'
-                      ? 'bg-[var(--flag)] text-black'
+                      ? 'bg-[var(--flag)] text-[var(--rival-ink)]'
                       : 'bg-[var(--card-2)] text-[var(--ink)]'
                   : 'text-[var(--muted)] hover:bg-[var(--card-2)]'
               }`}
@@ -87,19 +81,20 @@ export function TicketCard({
       </div>
 
       {open && (
-        <div className="mt-3 space-y-3 border-t border-[var(--rule)] pt-3 text-[14px]">
+        <div className="mt-3 flex flex-col gap-3 border-t border-[var(--rule)] pt-3 text-[14px]">
           {t.description ? (
-            <p className="whitespace-pre-wrap break-words">{t.description}</p>
+            <p className="m-0 whitespace-pre-wrap break-words">{t.description}</p>
           ) : (
-            <p className="text-[var(--muted)]">No description.</p>
+            <p className="m-0 text-[var(--muted)]">No description.</p>
           )}
           {t.notes && (
             <div>
-              <div className="text-[11px] font-bold uppercase tracking-wide text-[var(--muted)]">
-                Notes
-              </div>
-              <p className="whitespace-pre-wrap break-words">{t.notes}</p>
+              <div className="eyebrow">Notes</div>
+              <p className="m-0 mt-1 whitespace-pre-wrap break-words">{t.notes}</p>
             </div>
+          )}
+          {t.createdBy && (
+            <p className="m-0 text-[12px] text-[var(--muted)]">Added by {t.createdBy}</p>
           )}
           {confirming ? (
             <div className="flex flex-wrap items-center gap-2 rounded-lg bg-[var(--card-2)] p-2">
