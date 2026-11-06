@@ -35,6 +35,8 @@ function run(id: string) {
   const perFrame = line.length / FRAMES;
   const out = {
     fastest: 0,
+    /** The same for cars unlapping themselves (they pass the queue, a lap back in the model). */
+    fastestUnlapping: 0,
     quick: 0,
     frames: 0,
     entries: 0,
@@ -42,6 +44,8 @@ function run(id: string) {
     offEntry: 0,
     offExit: 0,
     laneFrames: [] as number[],
+    retired: 0,
+    shownStopping: 0,
   };
   const prev = new Map<string, { x: number; y: number; lane: boolean }>();
   const inLane = new Map<string, number>();
@@ -59,6 +63,17 @@ function run(id: string) {
     const behind = (c: string) => (race.cars[c]?.totalTime ?? 0) - (leader?.totalTime ?? 0);
     const unlapping = new Set([...lastGap].filter(([c, g]) => g - behind(c) > 30).map(([c]) => c));
     lastGap = new Map(race.order.map((c) => [c, behind(c)]));
+    // The lap being shown, run ahead as the game does (an exact replay of the calls).
+    const replay = new GameEngine(model, model.race.seed, { decisions: engine.decisions });
+    while (replay.lap < race.lap + 1 && !replay.isFinished()) replay.step();
+    const ahead = replay.state;
+    // ...and cars unlapping on the lap being shown (they now pass the queue through the lap).
+    const aheadLeader = ahead.cars[ahead.order[0] ?? ''];
+    for (const c of race.order) {
+      const g = (ahead.cars[c]?.totalTime ?? 0) - (aheadLeader?.totalTime ?? 0);
+      if (behind(c) - g > 30) unlapping.add(c);
+    }
+    const stopping = new Set<string>();
     for (let f = 0; f < FRAMES; f++) {
       const places = motion.frame({
         race,
@@ -68,12 +83,15 @@ function run(id: string) {
         smooth: true,
         userSide: model.userSide,
         userBox: userBox !== null && userBox > race.lap ? userBox : null,
+        ahead,
       });
       for (const [code, p] of places) {
+        if (p.out !== undefined && !race.cars[code]?.retired) stopping.add(code);
         const q = prev.get(code);
         if (q) {
           const pace = Math.hypot(p.x - q.x, p.y - q.y) / perFrame;
-          out.fastest = Math.max(out.fastest, pace);
+          if (unlapping.has(code)) out.fastestUnlapping = Math.max(out.fastestUnlapping, pace);
+          else out.fastest = Math.max(out.fastest, pace);
           out.frames++;
           if (pace > 2.5 && !unlapping.has(code)) out.quick++;
           if (!q.lane && p.lane) {
@@ -91,7 +109,14 @@ function run(id: string) {
         prev.set(code, p);
       }
     }
+    const before = new Set(race.order.filter((c) => !race.cars[c]?.retired));
     engine.step();
+    // Every car that retires on the lap was shown stopping on track during it.
+    for (const c of before) {
+      if (!engine.state.cars[c]?.retired) continue;
+      out.retired++;
+      if (stopping.has(c)) out.shownStopping++;
+    }
     if (userBox !== null && engine.state.lap > userBox + 1) userBox = null;
   }
   return out;
@@ -105,6 +130,7 @@ describe('the map’s motion', () => {
     // after its in-lap (the rival covering you) hops into the lane. A car flying round the
     // lap would be 10x and more, frame after frame.
     expect(r.fastest).toBeLessThan(6);
+    expect(r.fastestUnlapping).toBeLessThan(8);
     expect(r.quick / r.frames).toBeLessThan(0.0005);
     expect(r.entries).toBeGreaterThan(5);
     expect(r.exits).toBeGreaterThanOrEqual(r.entries - 2); // a stop or two in the lane at the flag
@@ -116,6 +142,8 @@ describe('the map’s motion', () => {
       expect(n).toBeGreaterThan(FRAMES * 0.08);
       expect(n).toBeLessThan(FRAMES * 0.95);
     }
+    // A car that retires stops on track where it's seen (not vanishing at the line).
+    expect(r.shownStopping).toBe(r.retired);
   });
 
   it('drives the lane in, waits at the garage, then out', () => {

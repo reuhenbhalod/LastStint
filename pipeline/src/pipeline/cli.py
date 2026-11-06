@@ -49,16 +49,44 @@ def ingest_race(
     all_races: bool = typer.Option(False, "--all", help="Ingest every registered race."),
     force: bool = typer.Option(False, help="Re-download even if a snapshot exists."),
 ) -> None:
-    """Download registered races from FastF1 into data/raw/ (network; rate-limit safe)."""
+    """Download registered races into data/raw/: FastF1, or OpenF1 for races registered with
+    source "openf1" (network; rate-limit safe)."""
     for rid in _race_ids(race_id, all_races):
         if ingest.raw_snapshot_path(rid).exists() and not force:
             typer.echo(f"{rid}: snapshot exists, skipped")
             continue
         meta = build_mod.RACES[rid]
-        laps, facts = ingest.ingest_race(rid, meta["year"], meta["event"])
+        if meta.get("source") == "openf1":
+            laps, facts = ingest.ingest_openf1(rid, meta["year"], meta["event"])
+        else:
+            laps, facts = ingest.ingest_race(rid, meta["year"], meta["event"])
         problems = ingest.race_suitability(laps)
         note = f"  NOT SUITABLE: {'; '.join(problems)}" if problems else ""
         typer.echo(f"{rid}: {len(laps)} laps, {facts['totalLaps']} race laps -> data/raw/{note}")
+
+
+@app.command("wet-fit")
+def wet_fit_cmd() -> None:
+    """Fit the weather curves (data/wet.json) on every wet race at once (weather spec)."""
+    import json as json_mod
+
+    import pandas as pd
+
+    from . import wet
+
+    races = []
+    for rid, meta in build_mod.RACES.items():
+        if meta.get("split") != "wet":
+            continue
+        laps = pd.read_parquet(ingest.raw_snapshot_path(rid))
+        dry = build_mod.dry_fit(rid, laps, meta["era"])
+        obs = wet.race_observations(laps, dry.rain, dry.fitted, wet.load_curves())
+        races.append((rid, *obs))
+    curves = wet.fit_curves([r[1:] for r in races], wet.load_curves())
+    wet.WET_CURVES_PATH.write_text(json_mod.dumps(curves, indent=2) + "\n")
+    typer.echo(f"wrote {wet.WET_CURVES_PATH.name}: {curves}")
+    for rid, obs, n, rain in races:
+        typer.echo(f"{rid:22s} rms {wet.rms(obs, wet.timeline(obs, n, rain, curves), curves):.2%}")
 
 
 @app.command("outline")
@@ -82,14 +110,21 @@ def outline_cmd(
 def incidents_cmd(
     race_ids: list[str] = typer.Argument(..., help="Registered races, e.g. abu-dhabi-2021."),  # noqa: B008
 ) -> None:
-    """Write data/incidents.json: why each safety car / VSC came out, for the race screen
+    """Write data/incidents.json (why each safety car / VSC came out) and data/retirements.json
+    (why and where each car retired), for the race screen
     (network: FastF1 results and race control messages)."""
     for race_id in race_ids:
         meta = build_mod.RACES[race_id]
         model = json.loads((paths.DATA_DIR / "races" / f"{race_id}.json").read_text())
-        status, msgs = incidents.fetch(meta["year"], meta["event"])
+        if meta.get("source") == "openf1":
+            status, msgs = incidents.fetch_openf1(meta["year"], meta["event"])
+        else:
+            status, msgs = incidents.fetch(meta["year"], meta["event"])
         items = incidents.causes(model, status, msgs)
         incidents.write(race_id, items)
+        incidents.write(
+            race_id, incidents.retirements(model, status, msgs), incidents.RETIREMENTS_PATH
+        )
         typer.echo(f"{race_id}: {items}")
 
 

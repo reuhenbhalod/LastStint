@@ -411,6 +411,15 @@ def fit_track_params(
     green = times["green"]
     green_pit = pit_loss(laps)
     notes: list[str] = []
+    if green_pit is None:
+        # No green stop to measure (Australia 2025: every stop under a SC or VSC, or in the
+        # rain): back out the green loss from the neutralized ones.
+        for flag, factor in (("SC", SC_PIT_LOSS_FACTOR), ("VSC", VSC_PIT_LOSS_FACTOR)):
+            losses = [loss for _, f, loss in stop_losses(laps) if f == flag]
+            if losses:
+                green_pit = float(pd.Series(losses).median()) / factor
+                notes.append(f"pitLoss: no green stops, from {len(losses)} {flag} stops")
+                break
     sc_pit = green_pit * SC_PIT_LOSS_FACTOR if green_pit is not None else None
     notes.append(f"pitLossUnderSC estimated as {SC_PIT_LOSS_FACTOR} x green")
     vsc_pit, n_vsc = pit_loss_under_vsc(laps)

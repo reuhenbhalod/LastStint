@@ -57,7 +57,7 @@
     "HARD": {
       "offset": 0.1018,
       "degPerLap": 0.033,
-      "cliffLap": 42
+      "cliffLap": 61
     }
   },
   "drivers": [

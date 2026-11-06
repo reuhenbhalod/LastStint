@@ -6,13 +6,15 @@
 
 import { BAND_POINTS, type Band } from '@boxthislap/sim';
 import { autoStay } from '../game/autoStay.js';
+import { planGrade, stopsWord } from '../game/plans.js';
 import type { GameState } from '../state/machine.js';
+import { Panel } from './Panel.js';
 
-const BAND: Record<Band, { label: string; cls: string }> = {
-  green: { label: 'Best call', cls: 'bg-green-500/20 text-green-300' },
-  yellow: { label: 'Close', cls: 'bg-yellow-500/20 text-yellow-200' },
-  orange: { label: 'Costly', cls: 'bg-orange-500/20 text-orange-200' },
-  red: { label: 'Big miss', cls: 'bg-red-500/20 text-red-300' },
+const BAND: Record<Band, { label: string; color: string }> = {
+  green: { label: 'Best call', color: '#4ade80' },
+  yellow: { label: 'Close', color: '#facc15' },
+  orange: { label: 'Costly', color: '#fb923c' },
+  red: { label: 'Big miss', color: '#f87171' },
 };
 
 const pct = (p: number) => `${Math.round(p * 100)}%`;
@@ -35,57 +37,76 @@ export function LiveGrades({ state }: { state: GameState }) {
         best,
       };
     });
+  // The race plan picked at takeover is graded like a call (strategy planner spec D7).
+  const picked = state.plan.picked;
+  if (picked) {
+    const grade = planGrade(state.plan, state.meta.takeoverLap);
+    rows.unshift({
+      id: 'plan',
+      lap: state.meta.takeoverLap + 1,
+      label: `Plan ${picked.id === 'own' ? '(yours)' : picked.id.toUpperCase()}: ${stopsWord(picked).toLowerCase()}`,
+      auto: false,
+      mine: grade?.options.find((o) => o.id === picked.id),
+      best: grade?.options.find((o) => o.id === grade.best),
+    });
+  }
   const scored = rows.flatMap((r) => (r.mine ? [BAND_POINTS[r.mine.band]] : []));
   const score = scored.length ? scored.reduce((a, b) => a + b, 0) / scored.length : null;
 
   return (
-    <section aria-label="Your calls" className="card flex min-h-0 flex-1 flex-col gap-2">
-      <div className="flex items-baseline justify-between">
-        <span className="eyebrow">Your calls</span>
-        <span className="text-[12px] text-[var(--muted)]">
-          {score === null ? `0 of ${state.moments.length}` : `Score ${Math.round(score)}`}
+    <Panel
+      title="Your calls"
+      right={
+        <span className="mono text-[12px] font-bold text-[#B7BEBA]">
+          {score === null
+            ? `0 of ${state.moments.length + (state.plan.offered.length ? 1 : 0)}`
+            : `Score ${Math.round(score)}`}
         </span>
-      </div>
+      }
+    >
       {rows.length === 0 ? (
-        <p className="m-0 text-[13px] text-[var(--muted)]">
+        <p className="m-0 text-[12px] text-[#8D9692]">
           Each big call is graded here as you make it.
         </p>
       ) : (
-        <ul className="m-0 flex min-h-0 list-none flex-col gap-1.5 overflow-y-auto p-0">
-          {[...rows].reverse().map((r) => (
-            <li key={r.id} className="rounded-lg bg-[var(--card-2)] px-2.5 py-1.5">
-              <div className="flex items-center justify-between gap-2">
+        <ul className="m-0 flex list-none flex-col p-0">
+          {[...rows].reverse().map((r) => {
+            const band = r.mine ? BAND[r.mine.band] : null;
+            return (
+              <li
+                key={r.id}
+                className="grid grid-cols-[3px_minmax(0,1fr)_auto] items-center gap-x-2.5 border-t border-[#1B201E] py-2 first:border-t-0 first:pt-0 last:pb-0"
+              >
+                <span
+                  aria-hidden="true"
+                  className="row-span-2 h-full min-h-[30px] -skew-x-12"
+                  style={{ background: band?.color ?? '#333A37' }}
+                />
                 <span className="min-w-0 truncate text-[13px] font-semibold">
-                  <span className="mono mr-1.5 text-[11px] font-normal text-[var(--muted)]">
+                  <span className="mono mr-1.5 text-[11px] font-normal text-[#8D9692]">
                     L{r.lap}
                   </span>
                   {r.label}
                   {r.auto && (
-                    <span className="ml-1.5 text-[11px] font-normal text-[var(--muted)]">Auto</span>
+                    <span className="ml-1.5 text-[11px] font-normal text-[#8D9692]">Auto</span>
                   )}
                 </span>
-                {r.mine ? (
-                  <span
-                    className={`shrink-0 rounded px-1.5 py-0.5 text-[11px] font-bold ${BAND[r.mine.band].cls}`}
-                  >
-                    {BAND[r.mine.band].label}
-                  </span>
-                ) : (
-                  <span className="shrink-0 text-[11px] text-[var(--muted)]">Grading…</span>
-                )}
-              </div>
-              {r.mine && r.best && (
-                <p className="m-0 text-[12px] text-[var(--muted)]">
-                  {pct(r.mine.probability)} chance
-                  {r.mine.id === r.best.id
-                    ? ' · the best option'
-                    : ` · best ${pct(r.best.probability)}`}
-                </p>
-              )}
-            </li>
-          ))}
+                <span
+                  className="text-[11px] font-extrabold uppercase tracking-wider"
+                  style={{ color: band?.color ?? '#8D9692' }}
+                >
+                  {band ? band.label : 'Grading…'}
+                </span>
+                <span className="col-span-2 text-[11.5px] text-[#8D9692]">
+                  {r.mine && r.best
+                    ? `${pct(r.mine.probability)} chance${r.mine.id === r.best.id ? ' · the best option' : ` · best ${pct(r.best.probability)}`}`
+                    : ''}
+                </span>
+              </li>
+            );
+          })}
         </ul>
       )}
-    </section>
+    </Panel>
   );
 }

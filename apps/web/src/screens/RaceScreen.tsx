@@ -13,44 +13,67 @@ import {
   type RaceModel,
   type RaceNote,
   engineerConfig,
+  wetnessOn,
 } from '@boxthislap/sim';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BattleCard, type BattleStage } from '../components/BattleCard.js';
+import { Brand } from '../components/Brand.js';
+import { BroadcastDecision } from '../components/BroadcastDecision.js';
 import { CarStats } from '../components/CarStats.js';
-import { DecisionPanel } from '../components/DecisionPanel.js';
 import { DriverCard } from '../components/DriverCard.js';
 import { DriverProfile } from '../components/DriverProfile.js';
 import { GapTrace } from '../components/GapTrace.js';
 import { ChequeredIcon, OvertakeIcon, SoundOffIcon, SoundOnIcon } from '../components/Icons.js';
+import { LeadersTower } from '../components/LeadersTower.js';
 import { LiveGrades } from '../components/LiveGrades.js';
+import { Panel } from '../components/Panel.js';
 import { PitCard } from '../components/PitCard.js';
+import {
+  PlanBar,
+  PlanHeadsUp,
+  ReplanOffer,
+  betterPlan,
+  headsUpStop,
+} from '../components/PlanBar.js';
+import { PlanCard } from '../components/PlanCard.js';
 import { QuickCallCard } from '../components/QuickCallCard.js';
-import { RadioAlert } from '../components/RadioAlert.js';
 import { RadioLog } from '../components/RadioLog.js';
 import { TeamRadio } from '../components/TeamRadio.js';
 import { TimingTower } from '../components/TimingTower.js';
 import { type BattleView, TrackMap } from '../components/TrackMap.js';
 import { TyreBadge } from '../components/TyreBadge.js';
+import { namedUpper, surname } from '../data/names.js';
 import {
   BATTLE_MS,
   CALL_MS,
   directorCall,
+  flavourBattle,
   infoLine,
   newMemory,
   offersStop,
 } from '../game/engineerCalls.js';
 import { modeLine } from '../game/guide.js';
 import { neutralCause } from '../game/neutral.js';
+import { delayStop } from '../game/plans.js';
 import { type QuickCall, quickCallLaps } from '../game/quickCalls.js';
 import { useRaceLog } from '../game/raceLog.js';
 import { radioChirp, setSoundOn, soundOn } from '../game/sound.js';
 import { type Game, LAP_MS, SLOW_MOTION, clockProgress } from '../game/useGame.js';
+import { CONDITION_WORD, conditionsOf, forecast } from '../game/weather.js';
 import type { GameState } from '../state/machine.js';
-import { BRAKE_BEFORE } from '../track/battle.js';
+import { BRAKE_BEFORE, cornerKind } from '../track/battle.js';
 import { cornerPoint, overtakingCorners } from '../track/corners.js';
-import { flagOn, nearestFraction, polyline, quietCorner } from '../track/geometry.js';
-import type { MapMotion } from '../track/motion.js';
+import { flagOn, nearestFraction, polyline } from '../track/geometry.js';
+import type { LiveStanding, MapMotion } from '../track/motion.js';
 import { outlineFor } from '../track/outlines.js';
+
+/** The weather chip's colour by conditions. */
+const WEATHER_BG = {
+  dry: 'rgba(0,0,0,0.55)',
+  damp: 'rgba(38,94,122,0.85)',
+  wet: 'rgba(30,72,150,0.9)',
+  soaked: 'rgba(24,46,120,0.95)',
+} as const;
 
 const FLAG = {
   green: { text: 'Green', cls: 'bg-black/55 text-white' },
@@ -73,9 +96,12 @@ interface Battle {
   stage: BattleStage;
   chosen: string | null;
   result: { text: string; good: boolean } | null;
-  swap: { gap: number; at: number } | null;
+  swap: { at: number } | null;
   zoom: boolean;
 }
+
+/** How often the standings follow the map while the lap runs. */
+const LIVE_MS = 400;
 
 /** The race slows this far (tick progress) before the braking zone. */
 const SLOW_BEFORE = 0.05;
@@ -96,11 +122,11 @@ function battleResult(
     const good = fought.detail === 'passed' || fought.detail === 'held';
     const text =
       fought.detail === 'passed'
-        ? `PAST ${fought.other}!`
+        ? `PAST ${namedUpper(fought.other ?? '')}!`
         : fought.detail === 'held'
           ? 'HELD!'
           : fought.detail === 'lost'
-            ? `${fought.other} THROUGH`
+            ? `${namedUpper(fought.other ?? '')} THROUGH`
             : 'NO WAY BY';
     return { text, good };
   }
@@ -129,19 +155,27 @@ export function RaceScreen({
   const me = state.race.cars[userSide];
   const them = state.race.cars[rival];
   const paused = state.phase === 'decision';
+  const planning = state.phase === 'planning';
+  // The race plan: the heads-up before a planned stop (once per stop), the engineer's better
+  // plan (until you keep yours), and the plan editor.
+  const headsUp = headsUpStop(state);
+  const [headsUpSeen, setHeadsUpSeen] = useState<number | null>(null);
+  const replan = betterPlan(state);
+  const replanKey = replan ? JSON.stringify([replan.plan.stops, replan.plan.pace]) : null;
+  const [keepKey, setKeepKey] = useState<string | null>(null);
+  const [planEdit, setPlanEdit] = useState(false);
   const outline = outlineFor(model.race.id);
-  const corner = useMemo(() => (outline ? quietCorner(outline) : 'left'), [outline]);
   const [selected, setSelected] = useState<string | null>(null);
   const [sound, setSound] = useState(soundOn);
-  // The map's pop-over: the gap trace.
-  const [panel, setPanel] = useState<'gap' | null>(null);
-  const toggle = (p: 'gap') => setPanel((c) => (c === p ? null : p));
   const log = useRaceLog(state.race);
   const team = model.drivers.find((d) => d.code === userSide)?.team;
   // The flag of the lap being driven, and why it's out.
   const drivenFlag = state.race.nextFlag ?? flagOn(model, state.race.lap + 1);
   const flag = FLAG[drivenFlag];
   const why = neutralCause(model, game.notes(), state.race.lap + 1, drivenFlag);
+  // A wet race: the conditions on the lap being driven and the engineer's radar.
+  const wetNow = model.weather ? wetnessOn(model.weather.wetness, state.race.lap + 1) : 0;
+  const radar = forecast(model, state.race.lap);
   const lapsLeft = totalLaps - state.race.lap;
   const gap = me && them && !me.retired && !them.retired ? them.totalTime - me.totalTime : null;
 
@@ -180,6 +214,8 @@ export function RaceScreen({
   const quickLaps = useMemo(() => new Set(quickCallLaps(model)), [model]);
   const line = useMemo(() => (outline ? polyline(outline.points) : null), [outline]);
   const memory = useRef(newMemory());
+  // The corner each car was last fought for (the next battle with it goes elsewhere).
+  const lastCorner = useRef(new Map<string, number>());
   const asked = useRef(new Set<number>());
   const [quick, setQuick] = useState<QuickCall | null>(null);
   const [battle, setBattleState] = useState<Battle | null>(null);
@@ -199,14 +235,16 @@ export function RaceScreen({
   // Leaving the race screen never leaves the race frozen.
   useEffect(() => () => setPace('normal'), [setPace]);
 
-  /** The battle's corner: of the overtaking corners, the first your car reaches this lap with
-   * time to read the card (the map knows where it is). Null if none can be drawn. */
+  /** The battle's corner (battle variety): one of the track's best overtaking corners your
+   * car reaches this lap with time to read the card (the map knows where it is), varied lap to
+   * lap and never the one fought for last time against the same car when there's another.
+   * Null if none can be drawn. */
   const battleAt = useCallback(
     (call: QuickCall): Battle | null => {
       const m = motion.current;
       if (!m || !line || !outline || !call.other) return null;
       const p0 = clockRef.current ? clockProgress(clockRef.current) : 0;
-      const pick = (from: number, list: number[]) =>
+      const reachable = (from: number, list: number[]) =>
         list
           .map((n) => {
             const pt = cornerPoint(outline, n);
@@ -217,12 +255,15 @@ export function RaceScreen({
           .filter(
             (x): x is { n: number; f: number; p: number } => !!x && x.p >= from && x.p <= 0.96,
           )
-          .sort((a, b) => a.p - b.p)[0];
-      const best =
-        pick(p0 + 0.12, corners.slice(0, 3)) ??
-        pick(p0 + 0.12, corners) ??
-        pick(p0 + 0.04, corners);
+          .sort((a, b) => a.p - b.p);
+      let pool = reachable(p0 + 0.12, corners.slice(0, 4));
+      if (!pool.length) pool = reachable(p0 + 0.12, corners);
+      if (!pool.length) pool = reachable(p0 + 0.04, corners);
+      const fresh = pool.filter((c) => c.n !== lastCorner.current.get(call.other as string));
+      const from = fresh.length ? fresh : pool;
+      const best = from[(raceLap + (call.other as string).charCodeAt(0)) % from.length];
       if (!best) return null;
+      lastCorner.current.set(call.other, best.n);
       return {
         call,
         lap: raceLap,
@@ -270,12 +311,16 @@ export function RaceScreen({
       corners,
       memory.current,
       quickLaps.has(raceLap),
-      state.decisions.some((d) => d.kind === 'pit' && d.lap > raceLap),
+      // A stop called, or the plan's within two laps (its heads-up asks instead).
+      state.decisions.some((d) => d.kind === 'pit' && d.lap > raceLap) ||
+        !!state.plan.active?.stops.some((s) => s.lap > raceLap && s.lap <= raceLap + 2),
     );
     if (call?.kind === 'battle') {
       const fight = battleAt(call);
       if (fight) {
-        setBattle({ ...fight, call: { ...call, corner: fight.corner } });
+        // The moves in the words of the corner it's fought into (hairpin, sweeper, chicane).
+        const kind = line ? cornerKind(line, fight.at) : 'corner';
+        setBattle({ ...fight, call: flavourBattle({ ...call, corner: fight.corner }, kind) });
         return;
       }
       // No corner to draw it at: the plain card, the lap in slow motion.
@@ -356,10 +401,7 @@ export function RaceScreen({
       const result = preview ? battleResult(preview.notes, userSide, o.call) : null;
       const me = preview?.race.cars[userSide];
       const them = preview?.race.cars[other];
-      const swap =
-        me && them && !me.retired && !them.retired
-          ? { gap: me.totalTime - them.totalTime, at: b.cornerP }
-          : null;
+      const swap = me && them && !me.retired && !them.retired ? { at: b.cornerP } : null;
       setBattle({
         ...b,
         chosen: id,
@@ -428,18 +470,6 @@ export function RaceScreen({
     setPace('normal');
   }, [game, quick, state.race, userSide, setPace]);
 
-  // A phone-sized screen (cards open under the map, not on it).
-  const [narrow, setNarrow] = useState(
-    () => typeof matchMedia !== 'undefined' && matchMedia('(max-width: 767px)').matches,
-  );
-  useEffect(() => {
-    if (typeof matchMedia === 'undefined') return;
-    const q = matchMedia('(max-width: 767px)');
-    const on = () => setNarrow(q.matches);
-    q.addEventListener('change', on);
-    return () => q.removeEventListener('change', on);
-  }, []);
-
   const select = useCallback((code: string) => setSelected((c) => (c === code ? null : code)), []);
   const close = useCallback(() => setSelected(null), []);
   const driverCard = selected ? (
@@ -455,13 +485,6 @@ export function RaceScreen({
   ) : null;
 
   const momentIdFor = paused ? state.currentMoment?.id : undefined;
-  // A big call scrolls into view under the map (on a laptop it can sit below the fold).
-  const callRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (momentIdFor && typeof window !== 'undefined' && window.innerWidth >= 768)
-      callRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }, [momentIdFor]);
-
   // Chirp when the race stops for a call.
   const momentId = paused ? state.currentMoment?.id : undefined;
   useEffect(() => {
@@ -512,6 +535,26 @@ export function RaceScreen({
         }
       : null;
 
+  // The lap being shown, run ahead (the map moves the field toward its end, and shows a car
+  // stopping or a puncture as it happens). Again after any call: it changes the lap.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the lap, the calls and the phase are what change it.
+  const ahead = useMemo(
+    () => (state.phase === 'racing' || state.phase === 'decision' ? game.preview() : null),
+    [state.race.lap, state.decisions, state.phase],
+  );
+  // The standings as the map shows them, a few times a second while the lap runs.
+  const [live, setLive] = useState<LiveStanding[] | null>(null);
+  const running = state.phase === 'racing' && !!game.clock && game.clock.frozen === undefined;
+  const racing = state.phase === 'racing';
+  useEffect(() => {
+    if (!racing) setLive(null);
+  }, [racing]);
+  useEffect(() => {
+    if (!running) return; // frozen for a battle call: the standings hold where they are
+    const id = setInterval(() => setLive(motion.current?.standings() ?? null), LIVE_MS);
+    return () => clearInterval(id);
+  }, [running]);
+
   // A stop by your car or the rival on the lap just run, while the next lap animates.
   const latest = log.at(-1);
   const stop =
@@ -520,173 +563,378 @@ export function RaceScreen({
       : undefined;
 
   const gapText = gap === null ? '-' : `${gap >= 0 ? '+' : '−'}${Math.abs(gap).toFixed(1)}s`;
-  const panelBody =
-    panel === 'gap' ? (
-      <section aria-label={`Gap to ${rival}`} className="flex flex-col gap-2">
-        <div className="flex items-baseline justify-between">
-          <span className="eyebrow">Gap to {rival}</span>
+  // Focus view: the map takes the screen, the leaders beside it as on TV. Stats view: the
+  // timing tower and the stats come in at the sides and the map shrinks between them. Nothing
+  // sits on the track: the calls and the panels (team radio, the plan) open under the map,
+  // which shrinks to make room. On a phone the stats are tabs in the control bar.
+  type Panel = 'radio' | 'plan' | 'car' | 'calls' | 'log' | 'standings';
+  const [stats, setStats] = useState(false);
+  const [panelOpen, setPanelOpen] = useState<Panel | null>(null);
+  useEffect(() => {
+    if (paused || planning) setPanelOpen(null);
+  }, [paused, planning]);
+  const toggle2 = (p: Panel) => setPanelOpen((c) => (c === p ? null : p));
+  // The dock keeps the last panel's content while it slides shut.
+  const dockOpen = !!panelOpen && !planning;
+  const [shown, setShown] = useState<Panel | null>(null);
+  useEffect(() => {
+    if (panelOpen) setShown(panelOpen);
+  }, [panelOpen]);
+  const callUp =
+    planning ||
+    (paused && !!state.currentMoment) ||
+    (!!battle && racing && (battle.stage !== 'done' || battle.zoom)) ||
+    (!!headsUp && racing && headsUpSeen !== headsUp.lap) ||
+    (!!replan && racing && !quick && replanKey !== keepKey) ||
+    (!!quick && racing);
+  const planLabel = (() => {
+    const a = state.plan.active;
+    if (!a) return 'Plan';
+    const next = a.stops.find((st) => st.lap > state.race.lap);
+    return next ? `Plan · box L${next.lap}` : 'Plan · to the flag';
+  })();
+  const pill = (on: boolean) =>
+    `flex h-10 shrink-0 items-center gap-2 rounded-full border px-4 text-[13px] font-bold transition-colors disabled:opacity-40 ${
+      on
+        ? 'border-[#EEF1EF] bg-[#EEF1EF] text-[#0B0E0D]'
+        : 'border-[#333A37] bg-[#0B0E0D]/80 text-[#D5DAD7] hover:border-[#5A625F]'
+    }`;
+  const statsPanels = (
+    <>
+      <DriverProfile
+        code={userSide}
+        race={state.race}
+        model={model}
+        log={log}
+        notes={game.notes()}
+      />
+      <CarStats race={state.race} model={model} log={log} userSide={userSide} rival={rival} />
+      <Panel
+        label={`Gap to ${rival}`}
+        title={`Gap to ${surname(rival)}`}
+        right={
           <span
-            className={`mono text-[15px] font-semibold ${gap === null ? '' : gap >= 0 ? 'text-[var(--you)]' : 'text-[var(--rival)]'}`}
+            className="mono text-[15px] font-bold"
+            style={{ color: gap === null ? undefined : gap >= 0 ? 'var(--you)' : 'var(--rival)' }}
           >
             {gapText}
           </span>
-        </div>
+        }
+      >
         {points.length >= 2 ? (
           <GapTrace points={points} rival={rival} />
         ) : (
-          <p className="m-0 text-[13px] text-[var(--muted)]">The trace builds as laps go by.</p>
+          <p className="m-0 text-[12px] text-[#8D9692]">The trace builds as laps go by.</p>
         )}
-      </section>
-    ) : null;
+      </Panel>
+      <LiveGrades state={state} />
+      <Panel title="Radio">
+        {state.radio.length ? (
+          <RadioLog messages={state.radio} max={8} />
+        ) : (
+          <p className="m-0 text-[12px] text-[#8D9692]">Quiet so far.</p>
+        )}
+      </Panel>
+    </>
+  );
+  const tower = (
+    <TimingTower
+      race={state.race}
+      model={model}
+      userSide={userSide}
+      rival={rival}
+      onPick={select}
+      live={live}
+    />
+  );
 
-  const mapButton = (on: boolean) =>
-    `rounded-md border px-2 py-1 text-[12px] font-semibold ${
-      on ? 'border-white bg-white text-[#141716]' : 'border-white/20 bg-black/55 text-white'
-    }`;
+  // On a phone the leaders step aside (and the map takes the width) while anything opens under it.
+  const tight = dockOpen || callUp || !!selected;
+
+  // The call, one at a time, under the map: the plan, the big decision, a quick call. With
+  // none up, the chequered flag or the car you tapped.
+  const call = planning ? (
+    <PlanCard state={state} model={model} onBuild={game.buildPlan} onPick={game.pickPlan} />
+  ) : paused && state.currentMoment ? (
+    <BroadcastDecision
+      key={state.currentMoment.id}
+      moment={state.currentMoment}
+      race={state.race}
+      model={model}
+      onChoose={game.choose}
+    />
+  ) : battle && racing && (battle.stage !== 'done' || battle.zoom) ? (
+    <BattleCard
+      key={battle.lap}
+      call={battle.call}
+      corner={battle.corner}
+      stage={battle.stage}
+      clock={game.clock}
+      fromP={battle.fromP}
+      brakeP={battle.brakeP}
+      waitMs={BATTLE_WAIT_MS}
+      chosen={battle.chosen}
+      result={battle.stage === 'done' ? battle.result : null}
+      onAnswer={answerBattle}
+    />
+  ) : headsUp && racing && headsUpSeen !== headsUp.lap ? (
+    <PlanHeadsUp
+      key={`plan-${headsUp.lap}`}
+      stop={headsUp}
+      onBox={() => setHeadsUpSeen(headsUp.lap)}
+      canLater={!!(state.plan.active && delayStop(state.plan.active, headsUp.lap, totalLaps))}
+      onLater={() => {
+        game.delayPlannedStop(headsUp.lap);
+        setHeadsUpSeen(headsUp.lap);
+      }}
+      onChange={() => {
+        setHeadsUpSeen(headsUp.lap);
+        setPlanEdit(true);
+        setPanelOpen('plan');
+      }}
+    />
+  ) : replan && racing && !quick && replanKey !== keepKey ? (
+    <ReplanOffer
+      offer={replan}
+      onSwitch={() => game.changePlan(replan.plan)}
+      onKeep={() => setKeepKey(replanKey)}
+    />
+  ) : quick && racing ? (
+    <QuickCallCard
+      key={quick.lap}
+      call={quick}
+      ms={
+        quick.kind === 'battle'
+          ? Math.min(BATTLE_MS, LAP_MS[state.speed] * SLOW_MOTION * 0.85)
+          : Math.min(CALL_MS, LAP_MS[state.speed] * 0.9)
+      }
+      onAnswer={answerQuick}
+      onTimeout={quickTimeout}
+    />
+  ) : finishing && crossed ? (
+    <output className="flex items-center justify-center gap-3 bg-[#F4F6F5] px-5 py-3 text-[#0B0E0D]">
+      <ChequeredIcon size={24} />
+      <span className="disp text-[18px]">
+        Chequered flag · {surname(userSide)} P{finishPos}
+      </span>
+    </output>
+  ) : (
+    driverCard
+  );
+  const callKey = planning
+    ? 'plan'
+    : paused && state.currentMoment
+      ? state.currentMoment.id
+      : (battle && `battle-${battle.lap}`) || (quick && `quick-${quick.lap}`) || 'other';
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-[1360px] flex-col gap-3 px-4 pb-6 pt-3 xl:h-screen xl:pb-3">
-      <header className="flex items-center justify-between gap-3 border-b-2 border-[var(--you)] pb-2">
-        <span className="flex min-w-0 items-baseline gap-2">
-          <button
-            type="button"
-            onClick={onHome}
-            title="Home (the race waits for you)"
-            className="disp wide shrink-0 text-[18px] leading-none hover:text-[var(--you)]"
-          >
-            Pit Wall
-          </button>
+    <main className="relative flex h-[100dvh] flex-col overflow-hidden bg-[#0B0E0D] text-[#EEF1EF]">
+      {/* The top bar: brand, the duel as a scoreboard, the lap and the clock. */}
+      <header className="flex h-14 shrink-0 items-stretch border-b border-[#1F2523] md:h-16">
+        <button
+          type="button"
+          onClick={onHome}
+          title="Home (the race waits for you)"
+          className="hidden min-w-0 flex-col items-start justify-center gap-1 border-r border-[#1F2523] px-5 text-left md:flex"
+        >
+          <Brand className="text-[19px] leading-none" />
           {team && (
-            <span className="disp hidden truncate text-[18px] leading-none text-[var(--you)] sm:inline">
-              {team} race engineer
+            <span className="max-w-[260px] truncate text-[11px] font-semibold leading-none text-[#8D9692]">
+              {surname(userSide)}’s race engineer · {team}
             </span>
           )}
-        </span>
-        <span className="flex min-w-0 items-center gap-2">
+        </button>
+        <div className="flex min-w-0 flex-1 items-center justify-center gap-2 overflow-hidden px-3 md:justify-start md:gap-4 md:px-6">
+          <span className="h-8 w-1.5 shrink-0 -skew-x-12 bg-[var(--you)]" />
+          <span className="disp wide shrink-0 text-[17px] md:text-[22px]">
+            <span className="md:hidden">{userSide}</span>
+            <span className="hidden md:inline">{surname(userSide)}</span>
+          </span>
+          {me && !me.retired && (
+            <span className="hidden lg:inline-flex">
+              <TyreBadge compound={me.compound} age={me.tyreAge} />
+            </span>
+          )}
+          <span className="mono shrink-0 rounded bg-[#1A1F1D] px-2.5 py-1 text-[18px] font-bold md:text-[22px]">
+            {gap === null ? '-' : `${gap >= 0 ? '+' : '−'}${Math.abs(gap).toFixed(1)}`}
+          </span>
+          {them && !them.retired && (
+            <span className="hidden lg:inline-flex">
+              <TyreBadge compound={them.compound} age={them.tyreAge} />
+            </span>
+          )}
+          <span className="disp wide shrink-0 text-[17px] md:text-[22px]">
+            <span className="md:hidden">{rival}</span>
+            <span className="hidden md:inline">{surname(rival)}</span>
+          </span>
+          <span className="h-8 w-1.5 shrink-0 -skew-x-12 bg-[var(--rival)]" />
+        </div>
+        <div className="flex shrink-0 items-center gap-3 border-l border-[#1F2523] px-3 md:px-5">
           {source === 'survivor' && (
-            <span className="shrink-0 rounded-full bg-[var(--box)] px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-white">
-              Survivor · round {number}
+            <span className="hidden shrink-0 rounded-full bg-[var(--box)] px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-white lg:inline">
+              Gauntlet · round {number}
             </span>
           )}
           {source === 'practice' && (
             <span
-              className="shrink-0 rounded-full bg-[var(--flag)] px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-[#141716]"
+              className="hidden shrink-0 rounded-full bg-[var(--flag)] px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-[#141716] lg:inline"
               title={state.meta.practiceReason ?? 'Practice run'}
             >
-              Practice<span className="hidden sm:inline"> · not saved</span>
+              Practice · not saved
             </span>
           )}
-          <span className="eyebrow hidden min-w-0 truncate 2xl:inline">
-            {source === 'survivor'
-              ? 'Survivor'
-              : number
-                ? `Daily #${number}`
-                : (state.meta.practiceReason ?? 'Practice')}{' '}
-            · {model.race.name ?? model.race.id}
+          <span className="mono text-[18px] font-bold md:text-[22px]">
+            {state.race.lap}
+            <span className="text-[13px] text-[#8D9692] md:text-[15px]">/{totalLaps}</span>
           </span>
-          <div className="flex items-center gap-1.5">
-            {([1, 2] as const).map((s) => (
+          <span className="flex overflow-hidden rounded-full border border-[#333A37]">
+            {([1, 2] as const).map((sp) => (
               <button
-                key={s}
+                key={sp}
                 type="button"
-                aria-pressed={state.speed === s}
-                onClick={() => game.setSpeed(s)}
-                className={`h-8 rounded-md border px-2.5 text-[12px] font-semibold ${
-                  state.speed === s
-                    ? 'border-[var(--ink)] bg-[var(--ink)] text-[var(--paper)]'
-                    : 'border-[var(--rule)] text-[var(--muted)] hover:text-[var(--ink)]'
+                aria-pressed={state.speed === sp}
+                onClick={() => game.setSpeed(sp)}
+                className={`h-9 px-3 text-[13px] font-bold ${
+                  state.speed === sp ? 'bg-[#EEF1EF] text-[#0B0E0D]' : 'text-[#8D9692]'
                 }`}
               >
-                {s}×
+                {sp}×
               </button>
             ))}
+          </span>
+          <button
+            type="button"
+            aria-pressed={sound}
+            aria-label={sound ? 'Radio sound on' : 'Radio sound off'}
+            title="Radio chirp at decisions"
+            onClick={() => {
+              setSoundOn(!sound);
+              setSound(!sound);
+              if (!sound) radioChirp();
+            }}
+            className="hidden h-9 w-9 items-center justify-center rounded-full border border-[#333A37] text-[#8D9692] md:flex"
+          >
+            {sound ? <SoundOnIcon size={16} /> : <SoundOffIcon size={16} />}
+          </button>
+          {source === 'practice' && (
             <button
               type="button"
-              aria-pressed={sound}
-              aria-label={sound ? 'Radio sound on' : 'Radio sound off'}
-              title="Radio chirp at decisions"
-              onClick={() => {
-                setSoundOn(!sound);
-                setSound(!sound);
-                if (!sound) radioChirp();
-              }}
-              className="h-8 rounded-md border border-[var(--rule)] px-3 text-[14px]"
+              onClick={game.reset}
+              aria-label="Restart the race"
+              title="Restart the race"
+              className="hidden h-9 w-9 items-center justify-center rounded-full border border-[#333A37] text-[#8D9692] md:flex"
             >
-              {sound ? <SoundOnIcon size={16} /> : <SoundOffIcon size={16} />}
+              ↺
             </button>
-            {source === 'practice' && (
-              <button
-                type="button"
-                onClick={game.reset}
-                aria-label="Restart the race"
-                title="Restart the race"
-                className="h-8 rounded-md border border-[var(--rule)] px-3 text-[14px] text-[var(--muted)] hover:text-[var(--ink)]"
-              >
-                ↺
-              </button>
-            )}
-          </div>
-        </span>
+          )}
+        </div>
       </header>
 
-      {/* On a laptop the race view fits the screen: each column scrolls inside itself. */}
-      <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_300px] xl:min-h-0 xl:flex-1 xl:grid-cols-[250px_minmax(0,1fr)_320px]">
-        {/* Standings: left on wide screens, under the race otherwise. */}
+      {/* Tower | race | stats. In focus view the sides are closed and the race takes it all. */}
+      <div
+        className="grid min-h-0 flex-1 grid-cols-1 gap-0 transition-[grid-template-columns] duration-500 ease-out md:gap-3 md:p-3 md:[grid-template-columns:var(--cols)]"
+        style={
+          {
+            '--cols': stats
+              ? 'minmax(0,240px) minmax(0,1fr) minmax(0,330px)'
+              : '0px minmax(0,1fr) 0px',
+          } as React.CSSProperties
+        }
+      >
         <section
           aria-label="Standings"
-          className="order-3 flex flex-col overflow-hidden rounded-xl border border-[var(--rule)] bg-[var(--card)] md:col-span-2 xl:order-1 xl:col-span-1"
+          aria-hidden={!stats}
+          className={`hidden min-h-0 flex-col overflow-hidden rounded-lg border border-[#1F2523] bg-[#0F1312] transition-opacity duration-300 md:flex ${stats ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
         >
-          <div className="flex justify-between border-b border-[var(--rule)] px-3 py-2">
-            <span className="eyebrow">Standings</span>
-            <span className="eyebrow">Tyre · gap</span>
+          <div className="flex items-center justify-between bg-[#EEF1EF] px-3 py-2 text-[#0B0E0D]">
+            <span className="disp text-[13px]">Lap {state.race.lap}</span>
+            <span className="mono text-[11px] font-bold">{lapsLeft} to go</span>
           </div>
-          <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-            <TimingTower
-              race={state.race}
-              model={model}
-              userSide={userSide}
-              rival={rival}
-              onPick={select}
-            />
-          </div>
+          <div className="min-h-0 flex-1 overflow-y-auto">{tower}</div>
         </section>
 
-        {/* The race: scoreboard over the circuit, the controls under it. */}
-        <section
-          aria-label="Race"
-          className="order-1 flex min-w-0 flex-col gap-3 xl:order-2 xl:min-h-0 xl:overflow-y-auto"
-        >
-          {/* On a laptop the map takes all the height the calls and team radio leave. */}
-          <div className="xl:flex xl:min-h-[380px] xl:flex-1 xl:flex-col">
-            <div className="grid grid-cols-[1fr_auto_1fr] items-center rounded-t-xl border border-b-0 border-[var(--rule)] bg-[var(--card)] px-3 py-2">
-              <div className="flex items-center gap-2">
-                <span className="h-7 w-1.5 rounded-sm bg-[var(--you)]" />
-                <span className="disp wide text-[20px] leading-none">{userSide}</span>
-                {me && !me.retired && <TyreBadge compound={me.compound} age={me.tyreAge} />}
-              </div>
-              <div className="text-center">
-                <div className="disp wide text-[26px] leading-none">
-                  {state.race.lap}
-                  <span className="text-[18px] text-[var(--muted)]"> / {totalLaps}</span>
-                </div>
-                <div className="mono whitespace-nowrap text-[11px] text-[var(--muted)] sm:text-[12px]">
-                  {gap === null
-                    ? ''
-                    : gap >= 0
-                      ? `${rival} +${gap.toFixed(1)}s behind`
-                      : `${rival} ${(-gap).toFixed(1)}s ahead`}
-                </div>
-              </div>
-              <div className="flex items-center justify-end gap-2">
-                {them && !them.retired && <TyreBadge compound={them.compound} age={them.tyreAge} />}
-                <span className="disp wide text-[20px] leading-none">{rival}</span>
-                <span className="h-7 w-1.5 rounded-sm bg-[var(--rival)]" />
-              </div>
+        {/* The map (it shrinks as things open under it), the call, the dock, the control bar. */}
+        <section aria-label="Race" className="flex min-h-0 flex-col gap-2 md:gap-3">
+          <div
+            className={`relative flex min-h-[200px] flex-1 flex-col overflow-hidden bg-[var(--tarmac)] md:rounded-lg ${paused ? 'map-alert' : ''}`}
+          >
+            {wetNow >= 0.03 && (
+              <div
+                aria-hidden="true"
+                className="map-rain pointer-events-none absolute inset-0"
+                style={{ opacity: Math.min(0.85, 0.25 + wetNow * 1.2) }}
+              />
+            )}
+            {/* The strip over the circuit: flag, weather, a battle and a pit stop. */}
+            <div className="relative z-10 flex shrink-0 flex-wrap items-center gap-2 px-3 pt-3">
+              <span
+                className={`rounded px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-[0.12em] ${flag.cls}`}
+              >
+                {flag.text}
+              </span>
+              {radar && (
+                <span
+                  className="rounded px-2.5 py-1 text-[12px] font-semibold"
+                  style={{ background: WEATHER_BG[conditionsOf(wetNow)] }}
+                >
+                  <span className="font-extrabold uppercase tracking-wider">
+                    {CONDITION_WORD[conditionsOf(wetNow)]}
+                  </span>
+                  <span className="opacity-90">
+                    {' '}
+                    · {radar.text}
+                    {radar.sure !== null ? ` · ${radar.sure}%` : ''}
+                  </span>
+                </span>
+              )}
+              {why && (
+                <span className="rounded bg-black/75 px-2.5 py-1 text-[12px] font-semibold">
+                  {why}
+                </span>
+              )}
+              {battle && !paused && battle.stage !== 'done' && (
+                <output
+                  className={`flex items-center gap-1.5 rounded bg-[var(--box)] px-2.5 py-1 text-[12px] font-bold text-white ${battle.stage === 'waiting' ? 'animate-pulse' : ''}`}
+                >
+                  <OvertakeIcon size={14} />
+                  {battle.stage === 'waiting'
+                    ? `Braking for T${battle.corner}: your call`
+                    : battle.call.attacking
+                      ? `${surname(userSide)} on ${surname(battle.call.other ?? '')} · T${battle.corner}`
+                      : `${surname(battle.call.other ?? '')} on ${surname(userSide)} · T${battle.corner}`}
+                </output>
+              )}
+              {stop && (
+                <span className="ml-auto min-w-0">
+                  <PitCard
+                    key={`${stop.code}-${stop.lap}`}
+                    stop={stop}
+                    race={state.race}
+                    userSide={userSide}
+                    rival={rival}
+                  />
+                </span>
+              )}
             </div>
-            <div
-              className={`flex flex-col overflow-hidden rounded-b-xl bg-[var(--tarmac)] xl:min-h-0 xl:flex-1 ${paused ? 'map-alert' : ''}`}
-            >
-              <div className="relative xl:min-h-0 xl:flex-1">
+            <div className="relative min-h-0 flex-1">
+              {/* Focus view: the leaders, TV style (stats view has the full tower instead). */}
+              {!stats && (
+                <div
+                  className={`absolute left-3 top-2 z-10 origin-top-left scale-[0.82] md:block md:scale-100 ${tight ? 'hidden' : ''}`}
+                >
+                  <LeadersTower
+                    race={state.race}
+                    model={model}
+                    userSide={userSide}
+                    rival={rival}
+                    live={live}
+                    onPick={select}
+                  />
+                </div>
+              )}
+              <div
+                className={`absolute inset-y-2 right-2 transition-[left] duration-500 ${stats ? 'left-2' : tight ? 'left-2 md:left-[190px]' : 'left-[150px] md:left-[190px]'}`}
+              >
                 {outline ? (
                   <TrackMap
                     outline={outline}
@@ -700,6 +948,7 @@ export function RaceScreen({
                     dim={paused}
                     finishing={finishMeta}
                     battle={battleView}
+                    ahead={ahead}
                     flash={flash}
                     userBox={userBox}
                     motionRef={motion}
@@ -709,197 +958,153 @@ export function RaceScreen({
                     No track map for this race yet.
                   </p>
                 )}
-                <div className="absolute left-2.5 top-2.5 flex flex-col items-start gap-1.5">
-                  <span className="rounded-md bg-black/55 px-2 py-1 text-[12px] font-semibold text-white">
-                    Lap {state.race.lap} · {lapsLeft} to go
-                  </span>
-                  <span
-                    className={`rounded-md px-2 py-1 text-[11px] font-bold uppercase tracking-wider ${flag.cls}`}
-                  >
-                    {flag.text}
-                  </span>
-                  {why && (
-                    <span className="max-w-[220px] rounded-md bg-black/70 px-2 py-1 text-[12px] font-semibold leading-snug text-white">
-                      {why}
-                    </span>
-                  )}
-                </div>
-                {finishing && crossed && (
-                  <output className="radio-alert absolute inset-x-2.5 bottom-12 z-10 mx-auto flex max-w-[420px] items-center justify-center gap-3 rounded-xl border-2 border-white bg-[#141716]/90 px-4 py-3 text-white shadow-2xl">
-                    <ChequeredIcon size={26} />
-                    <span className="disp text-[19px] leading-none">
-                      Chequered flag · {userSide} P{finishPos}
-                    </span>
-                  </output>
+              </div>
+            </div>
+          </div>
+
+          {/* The call, under the map (never on it). */}
+          {call && (
+            <div
+              key={callKey}
+              className="bc-slide max-h-[52%] shrink-0 overflow-y-auto px-3 md:px-0"
+            >
+              {call}
+            </div>
+          )}
+
+          {/* The dock: a panel opened from the control bar slides up under the map, which
+              shrinks to make room. */}
+          <div
+            className="grid shrink-0 transition-[grid-template-rows] duration-300 ease-out"
+            style={{ gridTemplateRows: dockOpen ? '1fr' : '0fr' }}
+          >
+            <div className="min-h-0 overflow-hidden">
+              <div className="mx-3 max-h-[38vh] overflow-y-auto rounded-lg border border-[#262C2A] bg-[#131716] p-3 md:mx-0">
+                {shown === 'radio' && (
+                  <TeamRadio
+                    race={state.race}
+                    model={model}
+                    userSide={userSide}
+                    rival={rival}
+                    pending={pending}
+                    boxing={boxing}
+                    disabled={!racing}
+                    describe={(key, value) => modeLine(model, key, value)}
+                    onCall={(c) => game.call(place(c))}
+                  />
                 )}
-                {battle && !paused && battle.stage !== 'done' && (
-                  <output
-                    className={`radio-alert absolute inset-x-2.5 bottom-2.5 z-10 mx-auto flex max-w-[420px] items-center gap-2 rounded-xl border-2 px-3 py-1.5 text-white shadow-2xl ${battle.stage === 'waiting' ? 'animate-pulse' : ''}`}
-                    style={{ borderColor: 'var(--box)', background: 'rgba(20,23,22,0.9)' }}
-                  >
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--box)] text-white">
-                      <OvertakeIcon size={14} />
-                    </span>
-                    <span className="text-[14px] font-semibold leading-snug">
-                      {battle.stage === 'waiting'
-                        ? `Braking for T${battle.corner}: your call`
-                        : battle.call.attacking
-                          ? `${userSide} on ${battle.call.other} into T${battle.corner}`
-                          : `${battle.call.other} on ${userSide} into T${battle.corner}`}
-                    </span>
-                  </output>
-                )}
-                {paused && state.currentMoment && (
-                  <RadioAlert moment={state.currentMoment} race={state.race} model={model} />
-                )}
-                {stop && (
-                  <div className="absolute right-2.5 top-2.5 z-10">
-                    <PitCard
-                      key={`${stop.code}-${stop.lap}`}
-                      stop={stop}
+                {shown === 'plan' &&
+                  (state.plan.active ? (
+                    <PlanBar
+                      state={state}
+                      model={model}
+                      onChange={game.changePlan}
+                      editing={planEdit}
+                      setEditing={setPlanEdit}
+                    />
+                  ) : (
+                    <p className="m-0 text-[13px] text-[var(--muted)]">No plan yet.</p>
+                  ))}
+                {shown === 'standings' && tower}
+                {shown === 'car' && (
+                  <div className="flex flex-col gap-3">
+                    <DriverProfile
+                      code={userSide}
                       race={state.race}
+                      model={model}
+                      log={log}
+                      notes={game.notes()}
+                    />
+                    <CarStats
+                      race={state.race}
+                      model={model}
+                      log={log}
                       userSide={userSide}
                       rival={rival}
                     />
                   </div>
                 )}
-                {selected && !narrow && (
-                  <div
-                    className={`absolute bottom-2.5 z-10 ${corner === 'left' ? 'left-2.5' : 'right-2.5'}`}
-                  >
-                    {driverCard}
-                  </div>
-                )}
-                {/* The map's pop-overs (under the map on a phone). */}
-                {panel && (
-                  <div
-                    className={
-                      'absolute bottom-2.5 right-2.5 z-20 hidden w-[380px] rounded-xl border border-[var(--rule)] bg-[var(--card)]/95 p-3 shadow-2xl backdrop-blur md:block'
-                    }
-                  >
-                    {panelBody}
-                  </div>
-                )}
-              </div>
-              {/* Legend and the gap button, in a bar under the map: never on the circuit. */}
-              <div className="flex items-center justify-between gap-2 border-t border-white/10 px-2.5 py-1.5">
-                <div className="flex flex-wrap gap-3 text-[11px] font-semibold text-[#cfd6d3]">
-                  <span>
-                    <i className="mr-1 inline-block h-2 w-2 rounded-full bg-[var(--you)]" />
-                    {userSide}
-                  </span>
-                  <span>
-                    <i className="mr-1 inline-block h-2 w-2 rounded-full bg-[var(--rival)]" />
-                    {rival}
-                  </span>
-                  <span className="hidden sm:inline">
-                    <i className="mr-1 inline-block h-2 w-2 rounded-full bg-[var(--field)]" />
-                    Field
-                  </span>
-                  <span className="hidden sm:inline">
-                    <i className="mr-1 inline-block h-2 w-2 rounded-full border border-dashed border-[var(--field)]" />
-                    Lapped
-                  </span>
-                  <span className="hidden lg:inline">Ring = tyre · tap a car</span>
-                </div>
-                <button
-                  type="button"
-                  aria-pressed={panel === 'gap'}
-                  onClick={() => toggle('gap')}
-                  className={mapButton(panel === 'gap')}
-                >
-                  Gap {gap === null ? '' : `${gap >= 0 ? '+' : '−'}${Math.abs(gap).toFixed(1)}`}
-                </button>
+                {shown === 'calls' && <LiveGrades state={state} />}
+                {shown === 'log' && <RadioLog messages={state.radio} max={12} />}
               </div>
             </div>
           </div>
 
-          {panel && <div className="card md:hidden">{panelBody}</div>}
-          {/* On a phone the map is too small to hold a car's card: it opens under it. */}
-          {selected && narrow && driverCard}
-
-          {/* Your calls, under the map: the big decision, or a quick call. */}
-          {paused && state.currentMoment ? (
-            <div
-              ref={callRef}
-              className="fixed inset-x-0 bottom-0 z-30 max-h-[75vh] overflow-y-auto p-3 md:static md:max-h-none md:p-0"
+          {/* The control bar, under it all: the plan and team radio left, stats right. */}
+          <nav
+            aria-label="Controls"
+            className="flex shrink-0 items-center gap-2 overflow-x-auto px-3 pb-3 md:px-0 md:pb-0"
+          >
+            <button
+              type="button"
+              aria-pressed={panelOpen === 'radio'}
+              disabled={planning || paused}
+              onClick={() => toggle2('radio')}
+              className={pill(panelOpen === 'radio')}
             >
-              <DecisionPanel
-                key={state.currentMoment.id}
-                moment={state.currentMoment}
-                race={state.race}
-                model={model}
-                onChoose={game.choose}
-              />
-            </div>
-          ) : battle && state.phase === 'racing' && (battle.stage !== 'done' || battle.zoom) ? (
-            <BattleCard
-              key={battle.lap}
-              call={battle.call}
-              corner={battle.corner}
-              stage={battle.stage}
-              clock={game.clock}
-              fromP={battle.fromP}
-              brakeP={battle.brakeP}
-              waitMs={BATTLE_WAIT_MS}
-              chosen={battle.chosen}
-              result={battle.stage === 'done' ? battle.result : null}
-              onAnswer={answerBattle}
-            />
-          ) : quick && state.phase === 'racing' ? (
-            <QuickCallCard
-              key={quick.lap}
-              call={quick}
-              ms={
-                quick.kind === 'battle'
-                  ? Math.min(BATTLE_MS, LAP_MS[state.speed] * SLOW_MOTION * 0.85)
-                  : Math.min(CALL_MS, LAP_MS[state.speed] * 0.9)
-              }
-              onAnswer={answerQuick}
-              onTimeout={quickTimeout}
-            />
-          ) : null}
-
-          {/* Team radio: every order, any time (hidden while a big call waits). */}
-          {!paused && (
-            <TeamRadio
-              race={state.race}
-              model={model}
-              userSide={userSide}
-              rival={rival}
-              pending={pending}
-              boxing={boxing}
-              disabled={state.phase !== 'racing'}
-              describe={(key, value) => modeLine(model, key, value)}
-              onCall={(call) => game.call(place(call))}
-            />
-          )}
+              <span className="h-2 w-2 rounded-full bg-[var(--you)]" />
+              Team radio
+            </button>
+            <button
+              type="button"
+              aria-pressed={panelOpen === 'plan'}
+              disabled={planning || paused || !state.plan.active}
+              onClick={() => toggle2('plan')}
+              className={pill(panelOpen === 'plan')}
+            >
+              {planLabel}
+            </button>
+            {/* On a phone the stats are these tabs. */}
+            {(
+              [
+                ['standings', 'Standings'],
+                ['car', 'Car'],
+                ['calls', 'Calls'],
+                ['log', 'Radio'],
+              ] as Array<[Panel, string]>
+            ).map(([id, label]) => (
+              <button
+                key={id}
+                type="button"
+                aria-pressed={panelOpen === id}
+                disabled={planning || paused}
+                onClick={() => toggle2(id)}
+                className={`${pill(panelOpen === id)} md:hidden`}
+              >
+                {label}
+              </button>
+            ))}
+            <span className="min-w-[8px] flex-1" />
+            <button
+              type="button"
+              aria-pressed={stats}
+              onClick={() => setStats(!stats)}
+              className={`${pill(stats)} hidden md:flex`}
+            >
+              <svg
+                aria-hidden="true"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              >
+                <rect x="3" y="4" width="18" height="16" rx="2" />
+                <path d="M9 4v16M15 4v16" />
+              </svg>
+              {stats ? 'Focus view' : 'Show stats'}
+            </button>
+          </nav>
         </section>
 
-        {/* Stats: your driver, the car, the radio. */}
-        <aside aria-label="Stats" className="order-2 flex flex-col gap-3 xl:order-3 xl:min-h-0">
-          <DriverProfile
-            code={userSide}
-            race={state.race}
-            model={model}
-            log={log}
-            notes={game.notes()}
-          />
-          <CarStats race={state.race} model={model} log={log} userSide={userSide} rival={rival} />
-          {/* The rest of the column, in two halves: your calls graded, then the radio. */}
-          <div className="flex min-h-[260px] flex-1 basis-0 flex-col gap-3 xl:min-h-0">
-            <LiveGrades state={state} />
-            <section aria-label="Radio" className="card flex min-h-0 flex-1 flex-col gap-2">
-              <span className="eyebrow">Radio</span>
-              {state.radio.length ? (
-                <div className="min-h-0 overflow-y-auto">
-                  <RadioLog messages={state.radio} max={8} />
-                </div>
-              ) : (
-                <p className="m-0 text-[13px] text-[var(--muted)]">Quiet so far.</p>
-              )}
-            </section>
-          </div>
+        <aside
+          aria-label="Stats"
+          aria-hidden={!stats}
+          className={`hidden min-h-0 flex-col gap-3 overflow-y-auto transition-opacity duration-300 md:flex ${stats ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
+        >
+          {statsPanels}
         </aside>
       </div>
     </main>

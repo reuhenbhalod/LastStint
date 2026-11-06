@@ -82,14 +82,93 @@ export interface MotionInput {
   /** The run to the flag: laps since the leader finished (null while racing). */
   sinceFlag?: number | null;
   /**
-   * A battle's result shown at its corner (battles and trust spec): from tick progress `at`,
-   * `code` moves to `gap` seconds behind `other` (negative: ahead), its order after the lap.
+   * The lap being shown, run ahead to its end (GameSession.previewLap). With it every car
+   * moves toward its end-of-lap gap all lap long (overtakes happen through the lap, not at the
+   * line), a car that retires on it stops on track, and its stops are seen a lap early.
    */
-  swap?: { code: string; other: string; gap: number; at: number } | null;
+  ahead?: RaceState | null;
+  /**
+   * A battle (battles and trust spec): its two cars keep their order until tick progress
+   * `until` (your car at the corner), then take their places after the lap. Null `until`:
+   * held all lap (no call yet).
+   */
+  hold?: { codes: string[]; until: number | null } | null;
+  /** Where a car that retires this lap stops (a fraction of the lap), when known. */
+  stopAt?: (code: string) => number | null;
+  /** Why a car is out ("crash", "engine"...), shown where it's parked. */
+  outWhy?: (code: string) => string;
 }
 
 /** Progress over which a battle's new order slides in after the corner. */
 const SWAP_SPAN = 0.04;
+/** A car that stops on track brakes over this much of the lap. */
+const HALT_SPAN = 0.03;
+/** Laps a stopped car stays on the map before it's cleared away. */
+const PARK_LAPS = 3;
+
+/** The map's clock and each car's gap on it, at the end of a lap. */
+interface ClockState {
+  lap: number;
+  clock: number;
+  times: Map<string, number>;
+  offsets: Map<string, number>;
+  /** What the lap after takes (s). */
+  lapSec: number;
+}
+
+/** One lap on: the clock moves by the median lap of the cars that didn't stop (drifting toward
+ * the leader), each car by what it gained or lost at that lap's pace. Null `prev`, or a jump:
+ * start again at the leader. `continuous` is false after such a restart. */
+function advance(
+  prev: ClockState | null,
+  race: RaceState,
+  model: RaceModel,
+  flag: RaceState['flag'],
+): { state: ClockState; continuous: boolean } {
+  const running = race.order.filter((c) => race.cars[c] && !race.cars[c]?.retired);
+  const leader = race.cars[running[0] ?? ''];
+  const time = (c: string) => race.cars[c]?.totalTime ?? 0;
+  let med: number | null = null;
+  if (prev && race.lap === prev.lap + 1) {
+    med = median(
+      running
+        .filter((c) => !race.cars[c]?.pittedThisLap && prev.times.has(c))
+        .map((c) => time(c) - (prev.times.get(c) ?? 0)),
+    );
+    const ran = lapTime(model, race.flag);
+    if (med !== null && (med < ran * 0.5 || med > ran * 2.5)) med = null;
+  }
+  const lapSec = med !== null && race.flag === flag ? med : lapTime(model, flag);
+  const times = new Map(running.map((c) => [c, time(c)]));
+  if (prev && med !== null && leader) {
+    const t = prev.clock + med;
+    const clock = t + ANCHOR * (leader.totalTime - t);
+    const moved = clock - prev.clock;
+    const offsets = new Map(
+      running.map((c) => {
+        const before = prev.offsets.get(c);
+        const was = prev.times.get(c);
+        return [
+          c,
+          before !== undefined && was !== undefined
+            ? before + (time(c) - was - moved) / (med as number)
+            : (time(c) - clock) / lapTime(model, flag),
+        ];
+      }),
+    );
+    return { state: { lap: race.lap, clock, times, offsets, lapSec }, continuous: true };
+  }
+  const clock = leader?.totalTime ?? 0;
+  const offsets = new Map(running.map((c) => [c, (time(c) - clock) / lapTime(model, flag)]));
+  return { state: { lap: race.lap, clock, times, offsets, lapSec }, continuous: false };
+}
+
+/** A number in [0, 1) from a string (a stable spot on the lap for a car's stop). */
+function hash01(text: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < text.length; i++) h = Math.imul(h ^ text.charCodeAt(i), 16777619);
+  return ((h >>> 0) % 10000) / 10000;
+}
 
 export interface CarPlace {
   x: number;
@@ -100,6 +179,16 @@ export interface CarPlace {
   lane: boolean;
   /** At the flag: over the line. */
   finished?: boolean;
+  /** Out of the race, stopped on track: why ("crash", "engine"...). */
+  out?: string;
+}
+
+/** A car on the live standings (the map's order and gaps, between laps). */
+export interface LiveStanding {
+  code: string;
+  /** Seconds behind the leader. */
+  gap: number;
+  pit: boolean;
 }
 
 interface Timeline {
@@ -108,7 +197,13 @@ interface Timeline {
   aOut: number;
   b0: number;
   b1: number;
+  /** Laps of the stop's loss spent crawling the in-lap rather than in the lane (a real wet
+   * stop: an in-lap on slicks in a downpour). The gap grows by this over the in-lap. */
+  crawl: number;
 }
+
+/** At most this much more than a normal stop is drawn in the lane (s); the rest is in-lap. */
+const LANE_SLACK = 12;
 
 /** A stop being drawn: its out-lap, what it costs (s, taken once), and its timeline, fixed
  * once the car is in the lane (a later lap's gaps don't move a car already in it). */
@@ -134,6 +229,13 @@ export class MapMotion {
   private last = new Map<string, number>();
   /** Stops being drawn, by car. */
   private stops = new Map<string, Stop>();
+  /** The lap being shown, run ahead: each car's gap at its end. */
+  private aheadOf: RaceState | null = null;
+  private aheadOffsets = new Map<string, number>();
+  /** Cars stopped on track: where, since which lap, and why. */
+  private parked = new Map<string, { at: number; lap: number; why: string }>();
+  /** The last frame's standings. */
+  private standing: LiveStanding[] = [];
   /** Each car's drawn gap (laps behind the clock) and place round the lap. */
   private drawnOff = new Map<string, number>();
   private drawn = new Map<string, number>();
@@ -155,54 +257,34 @@ export class MapMotion {
   /** A new lap's state: move the clock on, take the cars' offsets, note the stops coming. */
   private observe(race: RaceState, model: RaceModel, flag: RaceState['flag']): void {
     if (this.lap === race.lap) return;
-    const running = race.order.filter((c) => race.cars[c] && !race.cars[c]?.retired);
-    const leader = race.cars[running[0] ?? ''];
-    let med: number | null = null;
-    if (this.lap !== null && race.lap === this.lap + 1) {
-      med = median(
-        running
-          .filter((c) => !race.cars[c]?.pittedThisLap && this.times.has(c))
-          .map((c) => (race.cars[c]?.totalTime ?? 0) - (this.times.get(c) ?? 0)),
-      );
-      const ran = lapTime(model, race.flag);
-      if (med !== null && (med < ran * 0.5 || med > ran * 2.5)) med = null;
-    }
-    const time = (c: string) => race.cars[c]?.totalTime ?? 0;
-    const was = this.offsets;
-    if (med !== null && leader) {
-      // Each car moves on by what it gained or lost on the clock this lap, at this lap's pace:
-      // a gap is a distance, so a safety car coming out doesn't squeeze the field on screen
-      // (it closes up lap by lap, as the cars do).
-      const t = this.clock + med;
-      const next = t + ANCHOR * (leader.totalTime - t);
-      const moved = next - this.clock;
-      this.clock = next;
-      this.offsets = new Map(
-        running.map((c) => {
-          const before = was.get(c);
-          const prev = this.times.get(c);
-          return [
-            c,
-            before !== undefined && prev !== undefined
-              ? before + (time(c) - prev - moved) / (med as number)
-              : (time(c) - next) / lapTime(model, flag),
-          ];
-        }),
-      );
-      this.from = new Map(this.last);
-    } else {
-      // The first lap seen (or a jump: a restart, a resume): start at the leader.
-      this.clock = leader?.totalTime ?? 0;
-      this.offsets = new Map(
-        running.map((c) => [c, (time(c) - this.clock) / lapTime(model, flag)]),
-      );
+    const prev: ClockState | null =
+      this.lap === null
+        ? null
+        : {
+            lap: this.lap,
+            clock: this.clock,
+            times: this.times,
+            offsets: this.offsets,
+            lapSec: this.lapSec,
+          };
+    const { state, continuous } = advance(prev, race, model, flag);
+    this.clock = state.clock;
+    this.offsets = state.offsets;
+    this.lapSec = state.lapSec;
+    this.times = state.times;
+    this.lap = race.lap;
+    this.aheadOf = null;
+    if (continuous) this.from = new Map(this.last);
+    else {
+      // The first lap seen (or a jump: a restart, a resume).
       this.from = new Map();
       this.stops.clear();
+      this.parked.clear();
     }
-    // What the coming lap takes (a stop's time becomes distance at this pace).
-    this.lapSec = med !== null && race.flag === flag ? med : lapTime(model, flag);
-    this.lap = race.lap;
-    this.times = new Map(running.map((c) => [c, time(c)]));
+    for (const [code, p] of [...this.parked]) {
+      if (race.lap - p.lap >= PARK_LAPS) this.parked.delete(code);
+    }
+    const running = race.order.filter((c) => race.cars[c] && !race.cars[c]?.retired);
     for (const code of [...this.stops.keys()]) if (!this.offsets.has(code)) this.stops.delete(code);
     for (const code of running) {
       const car = race.cars[code];
@@ -260,6 +342,11 @@ export class MapMotion {
   ): number {
     const stop = race.cars[code]?.strategy.find((s) => s.lap === out);
     if (stop?.loss !== undefined) return stop.loss + extra;
+    return this.normalLoss(race, out, model) + extra;
+  }
+
+  /** A stop's usual cost on its out-lap's flag (s). */
+  private normalLoss(race: RaceState, out: number, model: RaceModel | null): number {
     const f =
       out === race.lap
         ? race.flag
@@ -269,8 +356,8 @@ export class MapMotion {
             ? flagOn(model, out)
             : 'green';
     const t = model?.track;
-    if (!t) return 22 + extra;
-    return (f === 'sc' ? t.pitLossUnderSC : f === 'vsc' ? t.pitLossUnderVSC : t.pitLoss) + extra;
+    if (!t) return 22;
+    return f === 'sc' ? t.pitLossUnderSC : f === 'vsc' ? t.pitLossUnderVSC : t.pitLoss;
   }
 
   /** A stop's timeline on the map's time axis (race.lap + tick progress). */
@@ -291,9 +378,44 @@ export class MapMotion {
     const b1 = charged ? off : off + loss;
     if (!charged) stop.b0 = off;
     const span = frac(this.lane.exit - this.lane.entry) || 1e-3;
+    // A stop far dearer than usual (a real wet stop) spends the excess crawling the in-lap.
+    const lane = Math.min(stop.loss, this.normalLoss(race, out, model) + extra + LANE_SLACK);
+    const crawl = Math.max(0, stop.loss - lane) / this.lapSec;
     // The in-lap is lap `out - 1`; the car reaches the entry near the end of it.
-    const aIn = out - 2 + b0 + this.lane.entry;
-    return { out, aIn, aOut: aIn + span + Math.max(0.05, b1 - b0), b0, b1 };
+    const aIn = out - 2 + b0 + crawl + this.lane.entry;
+    return { out, aIn, aOut: aIn + span + Math.max(0.05, b1 - b0 - crawl), b0, b1, crawl };
+  }
+
+  /** The lap being shown, run ahead: each car's gap at its end, and the stops it brings (a
+   * puncture's, a stop decided on it) a lap early. */
+  private see(
+    ahead: RaceState | null | undefined,
+    model: RaceModel,
+    flag: RaceState['flag'],
+  ): void {
+    if (!ahead || this.lap === null || ahead.lap !== this.lap + 1 || ahead === this.aheadOf) return;
+    this.aheadOf = ahead;
+    const prev: ClockState = {
+      lap: this.lap,
+      clock: this.clock,
+      times: this.times,
+      offsets: this.offsets,
+      lapSec: this.lapSec,
+    };
+    this.aheadOffsets = advance(prev, ahead, model, ahead.nextFlag ?? flag).state.offsets;
+    const lap = this.lap;
+    for (const code of this.offsets.keys()) {
+      const car = ahead.cars[code];
+      if (!car || car.retired || this.stops.has(code)) continue;
+      const next = car.strategy.filter((s) => s.lap > lap).sort((a, b) => a.lap - b.lap)[0];
+      if (next && next.lap <= lap + 2) this.stops.set(code, { out: next.lap });
+    }
+  }
+
+  /** The standings as the map shows them now: order on track, gaps in seconds, who's in the
+   * pit lane (stopped cars aren't listed). */
+  standings(): LiveStanding[] {
+    return this.standing;
   }
 
   /**
@@ -345,6 +467,7 @@ export class MapMotion {
     }
 
     const jump = JUMP_PX + 2 * step;
+    this.see(input.ahead, model, input.flag);
     const userBox = input.userBox;
     if (userBox !== null && !this.stops.has(input.userSide))
       this.stops.set(input.userSide, { out: userBox + 1 });
@@ -357,6 +480,51 @@ export class MapMotion {
       const span = Math.min(1, Math.max(GLIDE, Math.abs(to - was) * 0.8));
       return was + (to - was) * (input.smooth ? ease(Math.min(1, p / span)) : 1);
     };
+    // Through the lap, toward the gap at its end (when the lap has been run ahead); a battle's
+    // two cars keep their order until the corner, then slide into their places.
+    const hold = input.hold;
+    const toward = (code: string, base: number) => {
+      const end = this.aheadOffsets.get(code);
+      if (!this.aheadOf || end === undefined) return base;
+      const off = this.offsets.get(code) ?? base;
+      if (hold?.codes.includes(code)) {
+        if (hold.until === null || p < hold.until) return base;
+        const k = input.smooth ? ease(Math.min(1, (p - hold.until) / SWAP_SPAN)) : 1;
+        return base + (end - off) * k;
+      }
+      return base + (end - off) * (input.smooth ? p : 1);
+    };
+
+    // A car that retires on this lap drives to where it stops, brakes, and stays there.
+    const halting = new Map<string, number>();
+    if (this.aheadOf) {
+      for (const code of running) {
+        const car = this.aheadOf.cars[code];
+        const off = this.offsets.get(code);
+        if (!car?.retired || off === undefined) continue;
+        const known = input.stopAt?.(code) ?? null;
+        let pStop = known === null ? null : frac(known + off);
+        if (pStop === null || pStop > 0.95 || pStop < 0.08) {
+          pStop = 0.25 + 0.6 * hash01(`${code}:${race.lap}`);
+        }
+        const stopAt = pStop - off;
+        const pB = pStop - HALT_SPAN / 2;
+        const at =
+          p < pB
+            ? p - off
+            : p < pB + HALT_SPAN
+              ? stopAt - HALT_SPAN / 2 + (p - pB) - (p - pB) ** 2 / (2 * HALT_SPAN)
+              : stopAt;
+        halting.set(code, at);
+        if (!this.parked.has(code)) {
+          this.parked.set(code, {
+            at: stopAt,
+            lap: race.lap + 1,
+            why: input.outWhy?.(code) ?? 'out',
+          });
+        }
+      }
+    }
 
     // Cars on a stop's timeline are placed exactly; the rest glide, then are spaced out.
     const exact = new Map<string, number>();
@@ -365,14 +533,23 @@ export class MapMotion {
     for (const code of running) {
       const off = this.offsets.get(code);
       if (off === undefined) continue;
+      if (halting.has(code)) continue;
       const tl = this.timeline(code, input);
       if (tl && now >= tl.aOut && race.lap >= tl.out) this.stops.delete(code);
       else if (tl && now < tl.aIn) {
-        // On its in-lap: the new gap glides in before the car reaches pit entry.
+        // On its in-lap: the new gap glides in before the car reaches pit entry; a crawling
+        // in-lap then drops back steadily until it gets there.
         const by = Math.max(0.05, Math.min(GLIDE, tl.aIn - race.lap));
         const was = this.from.get(code);
         const k = input.smooth ? ease(Math.min(1, p / by)) : 1;
-        exact.set(code, was === undefined ? tl.b0 : was + (tl.b0 - was) * k);
+        const base = was === undefined ? tl.b0 : was + (tl.b0 - was) * k;
+        const crawled =
+          tl.crawl > 0 ? tl.crawl * Math.min(1, Math.max(0, 1 - (tl.aIn - now) / 1)) : 0;
+        // Once crawling, the stop's timeline holds (the next lap's gaps don't move it), as
+        // it does once the car is in the lane.
+        const stop = this.stops.get(code);
+        if (stop && tl.crawl > 0 && now >= tl.aIn - 1) stop.fixed = tl;
+        exact.set(code, (stop?.fixed ? tl.b0 : base) + crawled);
         continue;
       } else if (tl && now >= tl.aOut) {
         exact.set(code, tl.b1);
@@ -398,14 +575,7 @@ export class MapMotion {
         inLane.set(code, { u: laneAt(raw, this.garageOf(code)), rejoin: tl.b1 });
         continue;
       }
-      free.set(code, glide(code, off));
-    }
-    const sw = input.swap;
-    if (sw && p >= sw.at && free.has(sw.code) && free.has(sw.other)) {
-      const base = free.get(sw.code) as number;
-      const target = (free.get(sw.other) as number) + sw.gap / this.lapSec;
-      const k = input.smooth ? ease(Math.min(1, (p - sw.at) / SWAP_SPAN)) : 1;
-      free.set(sw.code, base + (target - base) * k);
+      free.set(code, toward(code, glide(code, off)));
     }
     const spaced = spaceOut(free, this.minGap);
 
@@ -429,6 +599,31 @@ export class MapMotion {
       const [x, y] = this.guard(code, pointAt(this.line, at), input.smooth, jump);
       out.set(code, { x, y, at, lane: false });
     }
+    // Cars stopping on track this lap, and those already stopped.
+    for (const [code, at] of halting) {
+      this.drawn.set(code, at);
+      const [x, y] = this.guard(code, pointAt(this.line, at), input.smooth, jump);
+      const parked = this.parked.get(code);
+      const stopped = parked !== undefined && Math.abs(at - parked.at) < 1e-6;
+      out.set(code, { x, y, at, lane: false, ...(stopped ? { out: parked.why } : {}) });
+    }
+    for (const [code, parked] of this.parked) {
+      if (out.has(code) || running.includes(code)) continue;
+      const [x, y] = pointAt(this.line, parked.at);
+      this.xy.set(code, [x, y]);
+      out.set(code, { x, y, at: parked.at, lane: false, out: parked.why });
+    }
+    // The standings as drawn: order on track and gaps in seconds.
+    const offsetNow = (code: string) =>
+      inLane.has(code) ? (inLane.get(code)?.rejoin ?? 0) : (this.last.get(code) ?? 0);
+    const shownCodes = running.filter((c) => !halting.has(c) && out.has(c));
+    const sorted = shownCodes.sort((a, b) => offsetNow(a) - offsetNow(b));
+    const lead = sorted[0] ? offsetNow(sorted[0]) : 0;
+    this.standing = sorted.map((code) => ({
+      code,
+      gap: (offsetNow(code) - lead) * this.lapSec,
+      pit: inLane.has(code),
+    }));
     for (const code of [...this.xy.keys()]) if (!out.has(code)) this.xy.delete(code);
     this.wasInLane = new Set([...inLane.keys()]);
     return out;

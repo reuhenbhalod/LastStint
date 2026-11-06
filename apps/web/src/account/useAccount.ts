@@ -8,9 +8,12 @@ import { setAdminToken } from '../admin/session.js';
 import { type PlayerResponse, api } from '../data/api.js';
 import { adoptPlayerId, anonId, localDate, resetPlayerId } from '../data/player.js';
 import { loadGoogle } from './google.js';
+import { markHowToPending } from './howTo.js';
 
 export interface AccountState {
   player: PlayerResponse | null;
+  /** The account has been looked up (signed in or out), or the lookup failed. */
+  loaded: boolean;
   busy: boolean;
   error: string | null;
   signIn: (credential: string) => Promise<void>;
@@ -20,6 +23,7 @@ export interface AccountState {
 
 export function useAccount(onSwitch: () => void): AccountState {
   const [player, setPlayer] = useState<PlayerResponse | null>(null);
+  const [loaded, setLoaded] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [n, setN] = useState(0);
@@ -27,10 +31,13 @@ export function useAccount(onSwitch: () => void): AccountState {
   // biome-ignore lint/correctness/useExhaustiveDependencies: `n` re-runs the load (refresh).
   useEffect(() => {
     let alive = true;
-    api.player(anonId(), localDate()).then(
-      (p) => alive && setPlayer(p),
-      () => alive && setPlayer(null), // offline or no API: no streak shown
-    );
+    api
+      .player(anonId(), localDate())
+      .then(
+        (p) => alive && setPlayer(p),
+        () => alive && setPlayer(null), // offline or no API: no streak shown
+      )
+      .finally(() => alive && setLoaded(true));
     return () => {
       alive = false;
     };
@@ -44,6 +51,8 @@ export function useAccount(onSwitch: () => void): AccountState {
       setError(null);
       try {
         const account = await api.signIn(credential, anonId());
+        // A brand-new account sees how to play once (account/howTo.ts).
+        if (account.created) markHowToPending(account.playerId);
         // An admin's Google token also opens the admin page (for its hour).
         setAdminToken(account.admin ? credential : null);
         const switched = account.playerId !== anonId();
@@ -70,5 +79,5 @@ export function useAccount(onSwitch: () => void): AccountState {
     onSwitch();
   }, [onSwitch, refresh]);
 
-  return { player, busy, error, signIn, signOut, refresh };
+  return { player, loaded, busy, error, signIn, signOut, refresh };
 }

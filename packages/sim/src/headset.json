@@ -99,6 +99,7 @@
     },
     "engineer": {
       "battleWindow": 1.5,
+      "adapt": 1.0,
       "moves": {
         "cover-inside": {
           "defendLogit": -1.0,

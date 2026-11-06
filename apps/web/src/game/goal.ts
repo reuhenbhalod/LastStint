@@ -4,6 +4,7 @@
 // race needs no extra setting.
 
 import type { RaceModel } from '@boxthislap/sim';
+import { surname } from '../data/names.js';
 
 export interface Goal {
   kind: 'beat' | 'defend';
@@ -21,12 +22,13 @@ export function goalOf(model: RaceModel): Goal {
   const them = order.indexOf(model.rival);
   const place = me + 1;
   const defend = me >= 0 && them >= 0 && me < them;
+  const rival = surname(model.rival);
   return defend
     ? {
         kind: 'defend',
         place,
-        short: `Hold P${place} from ${model.rival}`,
-        line: `hold P${place}: stay ahead of ${model.rival}`,
+        short: `Hold P${place} from ${rival}`,
+        line: `hold P${place}: stay ahead of ${rival}`,
       }
-    : { kind: 'beat', place, short: `Beat ${model.rival}`, line: `finish ahead of ${model.rival}` };
+    : { kind: 'beat', place, short: `Beat ${rival}`, line: `finish ahead of ${rival}` };
 }

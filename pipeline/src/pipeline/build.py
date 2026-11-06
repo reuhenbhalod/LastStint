@@ -11,7 +11,7 @@ from dataclasses import dataclass, field
 
 import pandas as pd
 
-from . import assemble, clean, events, fit, ingest, scenario, track
+from . import assemble, clean, events, fit, ingest, scenario, track, wet
 from . import pace as pace_mod
 
 # Race registry: metadata that isn't derivable from the timing data. `split` is the Phase
@@ -58,7 +58,7 @@ RACES: dict[str, dict] = {
         "name": "Bahrain 2021: Verstappen vs Hamilton",
         "era": "2014-2025",
         "takeover_lap": 10,  # D3 rule
-        "seed": 53576,  # tuned: scripts/tune.ts (races batch 1)
+        "seed": 17370,  # tuned: scripts/tune.ts (strategy planner, Nov 5 2026)
         "user_side": "VER",
         "rival": "HAM",
         "score_positions": 6,
@@ -110,7 +110,7 @@ RACES: dict[str, dict] = {
         "name": "Mexico 2021: Perez vs Hamilton",
         "era": "2014-2025",
         "takeover_lap": 26,  # D3 rule
-        "seed": 21052,  # tuned: scripts/tune.ts (races batch 1)
+        "seed": 7383,  # tuned: scripts/tune.ts (strategy planner, Nov 5 2026)
         "user_side": "PER",
         "rival": "HAM",
         "score_positions": 6,
@@ -136,7 +136,7 @@ RACES: dict[str, dict] = {
         "name": "Miami 2022: Leclerc vs Verstappen",
         "era": "2014-2025",
         "takeover_lap": 21,  # D3 rule
-        "seed": 23160,  # tuned: scripts/tune.ts (races batch 1)
+        "seed": 46029,  # tuned: scripts/tune.ts (strategy planner, Nov 5 2026)
         "user_side": "LEC",
         "rival": "VER",
         "score_positions": 6,
@@ -236,7 +236,7 @@ RACES: dict[str, dict] = {
         "name": "Hungary 2019: Verstappen vs Hamilton",
         "era": "2014-2025",
         "takeover_lap": None,  # D3 rule
-        "seed": 80284,
+        "seed": 56769,  # tuned: scripts/tune.ts (strategy planner, Nov 5 2026)
         "user_side": None,  # validation race: automatic duel, runner-up vs winner
         "rival": None,
         "score_positions": 6,
@@ -308,7 +308,7 @@ RACES: dict[str, dict] = {
         "name": "Spain 2020: Verstappen vs Bottas",
         "era": "2014-2025",
         "takeover_lap": 18,  # pinned: the duel below changed (races batch 1)
-        "seed": 85579,  # tuned: scripts/tune.ts (races batch 1)
+        "seed": 27170,  # tuned: scripts/tune.ts (strategy planner, Nov 5 2026)
         "user_side": "VER",
         "rival": "BOT",  # defend race: the car behind (races batch 1)
         "score_positions": 6,
@@ -456,7 +456,7 @@ RACES: dict[str, dict] = {
         "name": "Mexico 2024: Norris vs Sainz",
         "era": "2014-2025",
         "takeover_lap": 27,  # pinned (races batch 2)
-        "seed": 59811,  # tuned: scripts/tune.ts (races batch 2)
+        "seed": 50116,  # tuned: scripts/tune.ts (strategy planner, Nov 5 2026)
         "user_side": "NOR",
         "rival": "SAI",
         "score_positions": 6,
@@ -468,7 +468,7 @@ RACES: dict[str, dict] = {
         "name": "Abu Dhabi 2024: Sainz vs Norris",
         "era": "2014-2025",
         "takeover_lap": 10,  # pinned: earlier for more calls (races batch 2)
-        "seed": 50123,  # tuned: scripts/tune.ts (races batch 2)
+        "seed": 21142,  # tuned: scripts/tune.ts (strategy planner, Nov 5 2026)
         "user_side": "SAI",
         "rival": "NOR",
         "score_positions": 6,
@@ -702,6 +702,70 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "holdout",
     },
+    "russia-2021": {  # weather spec (mixed-weather races)
+        "year": 2021,
+        "event": "Russia",
+        "name": "Russia 2021: Norris vs Hamilton",
+        "era": "2014-2025",
+        "takeover_lap": 38,
+        "seed": 75098,  # tuned: scripts/tune.ts (weather)
+        "user_side": "NOR",
+        "rival": "HAM",
+        "score_positions": 6,
+        "split": "wet",
+    },
+    "great-britain-2024": {  # weather spec (mixed-weather races)
+        "year": 2024,
+        "event": "United Kingdom",
+        "source": "openf1",  # FastF1 needs F1TV since Oct 2026 (pipeline/openf1.py)
+        "name": "Great Britain 2024: Norris vs Hamilton",
+        "era": "2014-2025",
+        "takeover_lap": 16,
+        "seed": 1,
+        "user_side": "NOR",
+        "rival": "HAM",
+        "score_positions": 6,
+        "split": "wet",
+    },
+    "canada-2024": {  # weather spec (mixed-weather races)
+        "year": 2024,
+        "event": "Canada",
+        "source": "openf1",  # FastF1 needs F1TV since Oct 2026 (pipeline/openf1.py)
+        "name": "Canada 2024: Norris vs Verstappen",
+        "era": "2014-2025",
+        "takeover_lap": 20,
+        "seed": 37410,  # tuned: scripts/tune.ts (weather)
+        "user_side": "NOR",
+        "rival": "VER",
+        "score_positions": 6,
+        "split": "wet",
+    },
+    "monaco-2023": {  # weather spec (mixed-weather races)
+        "year": 2023,
+        "event": "Monaco",
+        "source": "openf1",  # FastF1 needs F1TV since Oct 2026 (pipeline/openf1.py)
+        "name": "Monaco 2023: Alonso vs Verstappen",
+        "era": "2014-2025",
+        "takeover_lap": 45,
+        "seed": 1,
+        "user_side": "ALO",
+        "rival": "VER",
+        "score_positions": 6,
+        "split": "wet",
+    },
+    "australia-2025": {  # weather spec (mixed-weather races)
+        "year": 2025,
+        "event": "Australia",
+        "source": "openf1",  # FastF1 needs F1TV since Oct 2026 (pipeline/openf1.py)
+        "name": "Australia 2025: Verstappen vs Norris",
+        "era": "2014-2025",
+        "takeover_lap": 32,
+        "seed": 1,
+        "user_side": "VER",
+        "rival": "NOR",
+        "score_positions": 6,
+        "split": "wet",
+    },
 }
 
 
@@ -725,13 +789,33 @@ def resolved_meta(race_id: str, laps: pd.DataFrame | None = None) -> dict:
     return meta
 
 
-def build_race(race_id: str, laps: pd.DataFrame | None = None) -> BuildResult:
-    """Build a validated race-model dict for a registered race, with its build notes."""
-    if laps is None:
-        laps = pd.read_parquet(ingest.raw_snapshot_path(race_id))
-    meta = resolved_meta(race_id, laps)
+@dataclass
+class DryFit:
+    """The dry lap model of a race and the laps it was fitted on (weather spec: a wet race's
+    dry laps only)."""
 
+    clean: pd.DataFrame
+    traffic: pd.DataFrame
+    fitted: fit.LapTimeFit
+    rain: list[dict] | None
+    wet: bool
+
+
+def dry_fit(race_id: str, laps: pd.DataFrame, era: str) -> DryFit:
     clean_df, traffic_df, _ = clean.clean_laps(laps)
+    # A wet race (weather spec): the dry model is fitted on the laps the rain didn't touch,
+    # with the usual fuel effect (its dry laps can be too few to fit one); the weather block
+    # then explains the rest.
+    rain_data = ingest.load_weather(race_id)
+    wet_race = wet.is_wet_race(laps, rain_data)
+    if wet_race:
+        period = wet.wet_period(laps, rain_data)
+
+        def dry(frame: pd.DataFrame) -> pd.DataFrame:
+            slick = frame["Compound"].astype(str).map(wet.tyre_class) == "slick"
+            return frame[slick & ~frame["LapNumber"].isin(period)]
+
+        clean_df, traffic_df = dry(clean_df), dry(traffic_df)
     # Model v3 stage 6 (T1): pace from clear-air laps only; the sim adds the dirty-air
     # penalty itself when a car follows within range, so traffic laps would count it twice.
     pace_laps = pd.concat([clean_df, traffic_df])
@@ -739,7 +823,25 @@ def build_race(race_id: str, laps: pd.DataFrame | None = None) -> BuildResult:
         clean_df,
         pace_laps=clean_df if pace_mod.CLEAR_AIR else pace_laps,
         fallback_pace_laps=pace_laps,
-        era=meta["era"],
+        era=era,
+        fixed_fuel=wet.FUEL_PRIOR if wet_race else None,
+    )
+    return DryFit(clean_df, traffic_df, fitted, rain_data, wet_race)
+
+
+def build_race(race_id: str, laps: pd.DataFrame | None = None) -> BuildResult:
+    """Build a validated race-model dict for a registered race, with its build notes."""
+    if laps is None:
+        laps = pd.read_parquet(ingest.raw_snapshot_path(race_id))
+    meta = resolved_meta(race_id, laps)
+
+    dry = dry_fit(race_id, laps, meta["era"])
+    clean_df, traffic_df, fitted = dry.clean, dry.traffic, dry.fitted
+    weather = wet.weather_block(laps, dry.rain, fitted, wet.load_curves()) if dry.wet else None
+    wet_pace = (
+        wet.driver_wet_pace(laps, weather, fitted, wet.wet_period(laps, dry.rain))
+        if weather
+        else None
     )
     params = track.fit_track_params(laps, clean_df, traffic_df, fitted)
 
@@ -765,6 +867,8 @@ def build_race(race_id: str, laps: pd.DataFrame | None = None) -> BuildResult:
         rival=meta["rival"],
         track_status=ingest.load_track_status(race_id),
         sc_unlap=meta.get("sc_unlap"),
+        weather=weather,
+        wet_pace=wet_pace,
     )
     return BuildResult(model=model, laps=laps, notes=[*fitted.prior_notes, *params.notes])
 

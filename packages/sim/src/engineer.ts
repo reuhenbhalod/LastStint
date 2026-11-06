@@ -52,6 +52,8 @@ export interface MoodEffect {
 export interface EngineerConfig {
   /** A car within this gap (s) ahead or behind at the start of a lap is a battle. */
   battleWindow: number;
+  /** Logit a repeated battle move loses: the other driver reads it (sim readMove). */
+  adapt?: number;
   moves: Record<BattleMove, MoveEffect>;
   /** The next lap's attack after `wait-drs`. */
   drsLogit: number;
@@ -115,6 +117,7 @@ export function newEngineer(cfg: EngineerConfig, code: string): EngineerState {
     move: null,
     moveByDriver: false,
     drsLap: -1,
+    lastMove: null,
     blue: null,
     orders: [],
     refused: [],

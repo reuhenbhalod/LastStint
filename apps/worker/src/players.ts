@@ -7,6 +7,8 @@ export interface Account {
   playerId: string;
   name: string;
   email: string;
+  /** Sign-in only: the account was created just now (the game shows how to play once). */
+  created?: boolean;
 }
 
 export interface Streak {
@@ -33,6 +35,7 @@ export async function signIn(
     .prepare('SELECT id, name, email FROM players WHERE google_sub = ?')
     .bind(who.sub)
     .first<{ id: string; name: string; email: string }>();
+  const created = !player;
   if (!player) {
     const taken = await db
       .prepare('SELECT 1 FROM player_ids WHERE anon_id = ?')
@@ -62,7 +65,7 @@ export async function signIn(
         .bind(id, player.id, at),
     ),
   );
-  return { playerId: player.id, name: who.name, email: who.email };
+  return { playerId: player.id, name: who.name, email: who.email, created };
 }
 
 /** The account an anonId is linked to, if any. */

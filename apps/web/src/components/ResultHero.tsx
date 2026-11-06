@@ -3,6 +3,7 @@
 // decide it side by side (you, the real pit wall, the rival) and the podium. Coloured by the
 // outcome: teal when you beat the real team, white when you matched it, red when it did better.
 
+import { surname } from '../data/names.js';
 import type { Verdict } from '../game/verdict.js';
 
 const TONE: Record<Verdict['outcome'], { text: string; ring: string; glow: string; word: string }> =
@@ -101,7 +102,7 @@ export function ResultHero({
             {pos > 0 ? `P${pos}` : dsq ? 'DSQ' : 'OUT'}
           </span>
           <span className="disp text-[15px] leading-none text-[var(--muted)]">
-            {userSide} · {tone.word}
+            {surname(userSide)} · {tone.word}
           </span>
         </div>
         <h1 className="disp m-0 text-[30px] leading-none">{v.headline}</h1>
@@ -109,7 +110,7 @@ export function ResultHero({
           <Figure label="You" value={pos > 0 ? `P${pos}` : dsq ? 'DSQ' : 'OUT'} tone={tone.text} />
           <Figure label={`Real ${team}`} value={realPos > 0 ? `P${realPos}` : '-'} />
           <Figure
-            label={rival}
+            label={surname(rival)}
             value={rivalPos > 0 ? `P${rivalPos}` : 'OUT'}
             sub={
               gapToRival === null

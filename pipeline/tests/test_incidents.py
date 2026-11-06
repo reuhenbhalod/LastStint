@@ -30,3 +30,17 @@ def test_with_no_car_out_race_control_says_why():
         {"lap": 43, "type": "VSC", "status": "Debris", "cars": ["GRO", "VET"], "turn": 2},
         {"lap": 50, "type": "VSC", "status": "Hazard", "sector": 2},
     ]
+
+
+def test_each_retirement_has_its_reason_and_where_race_control_said():
+    model = {
+        "events": [
+            {"lap": 26, "type": "RETIREMENT", "driver": "RAI"},
+            {"lap": 36, "type": "RETIREMENT", "driver": "GIO"},
+        ]
+    }
+    msgs = [(26, "CAR 7 (RAI) STOPPED AT TURN 6")]
+    assert incidents.retirements(model, {"RAI": "Brakes", "GIO": "Gearbox"}, msgs) == {
+        "RAI": {"lap": 26, "status": "Brakes", "turn": 6},
+        "GIO": {"lap": 36, "status": "Gearbox"},
+    }

@@ -11,6 +11,43 @@ export type Era = '1988-1993' | '1994-2009' | '2010-2013' | '2014-2025' | '2026+
 export type FlagState = 'green' | 'sc' | 'vsc' | 'red';
 
 export type PaceMode = 'push' | 'standard' | 'manage';
+
+/** One wet-tyre curve: the share of a dry lap lost, least (`min`) at wetness `best`. */
+export interface WetCurve {
+  min: number;
+  dry: number;
+  wet: number;
+  best: number;
+}
+
+/**
+ * A wet race (docs/weather-spec.md; fitted by pipeline/wet.py). At wetness w (0 dry .. 1
+ * soaked) a slick loses a·w + b·w² of a dry lap, an inter or a wet its curve's share.
+ * `wetness[lap - 1]` is the real race's wetness on each lap.
+ */
+export interface Weather {
+  curves: { slick: { a: number; b: number }; inter: WetCurve; wet: WetCurve };
+  wetness: number[];
+}
+
+/** One planned stop: box at the end of `lap` (the in-lap) for `compound`. */
+export interface PlanStop {
+  lap: number;
+  compound: Compound;
+}
+
+/**
+ * A race plan (strategy planner spec): the stops to the flag and the pace of each stint
+ * (`pace.length === stops.length + 1`). `id` is the engineer's plan it is ('a', 'b', 'c'),
+ * or 'own' for a plan the player built.
+ */
+export interface RacePlan {
+  id: PlanId;
+  stops: PlanStop[];
+  pace: PaceMode[];
+}
+
+export type PlanId = 'a' | 'b' | 'c' | 'own';
 export type FuelMode = 'normal' | 'liftAndCoast';
 export type BattleMode = 'attack' | 'hold' | 'defend';
 /** The hybrid battery's use (feedback round 2): spending modes drain it, harvest refills it. */
@@ -36,6 +73,8 @@ export interface DriverModel {
   team: string;
   basePace: number;
   noise: number;
+  /** A wet race: the driver's extra share of a lap in the wet beyond the curves. */
+  wetPace?: number;
   stateAtTakeover: {
     position: number;
     gapAhead: number;
@@ -84,6 +123,8 @@ export interface RaceModel {
   };
   compounds: Record<Compound, CompoundModel>;
   drivers: DriverModel[];
+  /** A wet race (weather spec): the curves and the track's wetness on each lap. */
+  weather?: Weather;
   fuelEffectPerLap: number;
   /** Bonus (s, negative = faster) on a new set's first laps after the out-lap. */
   freshTyre?: { bonus: number; laps: number };
@@ -120,6 +161,8 @@ export interface CarState {
   team: string;
   basePace: number;
   noise: number;
+  /** A wet race: the driver's extra share of a lap in the wet (DriverModel.wetPace). */
+  wetPace?: number;
   compound: Compound;
   /** Laps on the current tyres (what the timing tower shows). */
   tyreAge: number;
@@ -199,6 +242,11 @@ export type Decision = (
   | { lap: number; kind: 'blue'; action: BlueAction }
   /** The wall's answer to a driver's request (a yes also logs the call it asked for). */
   | { lap: number; kind: 'reply'; request: DriverRequest; yes: boolean }
+  /**
+   * The race plan picked at takeover (strategy planner spec): graded, but it makes no calls
+   * itself; the game logs the plan's pit and pace calls as their laps come.
+   */
+  | ({ lap: number; kind: 'plan' } & RacePlan)
 ) & {
   /**
    * The last completed lap when the call was made; decide() stamps it. The server needs it to
@@ -283,6 +331,8 @@ export interface EngineerState {
   stopWatch: { lap: number; ahead: boolean } | null;
   /** The last lap anything moved trust (quiet laps after it settle him). */
   lastEvent: number;
+  /** The last battle move, against whom and when: the other driver reads a repeat of it. */
+  lastMove?: { move: BattleMove; other: string; lap: number } | null;
 }
 
 export interface RaceState {

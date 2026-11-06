@@ -7,6 +7,7 @@
 // graded decision moments, and answers to the radio's quick calls, are always followed.
 
 import type { CarState, Decision, Mood } from '@boxthislap/sim';
+import { tyreName } from './choices.js';
 
 export type LiveCall = Extract<Decision, { kind: 'pit' } | { kind: 'mode' } | { kind: 'battle' }>;
 
@@ -81,7 +82,8 @@ export function refusal(
 
 /** The radio's "copy" for a call the driver will make. */
 export function acknowledge(call: LiveCall): string {
-  if (call.kind === 'pit') return `Copy, box this lap for ${call.compound.toLowerCase()}s.`;
+  if (call.kind === 'pit')
+    return `Copy, box this lap for ${tyreName(call.compound).toLowerCase()}.`;
   if (call.kind === 'battle') return BATTLE_COPY[call.move];
   const mode = call.value === 'liftAndCoast' ? 'lift and coast' : call.value;
   return `Copy, ${mode} mode.`;

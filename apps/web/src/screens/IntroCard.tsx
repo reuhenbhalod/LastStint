@@ -5,12 +5,16 @@
 // fresh visit; coming back mid-race (the Pit Wall brand), Start becomes "Back to the race".
 
 import type { RaceModel } from '@boxthislap/sim';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { takeHowToPending } from '../account/howTo.js';
 import type { AccountState } from '../account/useAccount.js';
 import { AccountBar } from '../components/AccountBar.js';
+import { Brand } from '../components/Brand.js';
+import { Disclaimer } from '../components/Disclaimer.js';
 import { HeadsetIcon, OvertakeIcon, TyreIcon } from '../components/Icons.js';
 import { TyreBadge } from '../components/TyreBadge.js';
 import { TIER_LABEL, driverInfo } from '../data/drivers.js';
+import { surname } from '../data/names.js';
 import { goalOf } from '../game/goal.js';
 import type { GameState } from '../state/machine.js';
 import { carsOnTrack, pointAt, polyline } from '../track/geometry.js';
@@ -182,8 +186,20 @@ export function IntroCard({
   resume?: string;
 }) {
   const { userSide, rival, takeoverLap, totalLaps, number, source, practiceReason } = state.meta;
-  // The walkthrough opens with the daily card, not when coming back mid-race.
-  const [howTo, setHowTo] = useState(!resume);
+  // The walkthrough opens with the daily card on its own for a signed-out player, and for a
+  // signed-in one only the first time after the account is created (account/howTo.ts); never
+  // when coming back mid-race. It waits for the account lookup, so a signed-in player doesn't
+  // see it flash open. Without an account system (tests), it opens as before.
+  const [howTo, setHowTo] = useState(!resume && !account);
+  const signedIn = account?.player?.account?.playerId ?? null;
+  const decided = useRef<string | null>(null);
+  useEffect(() => {
+    if (resume || !account?.loaded) return;
+    const who = signedIn ?? 'signed-out';
+    if (decided.current === who) return;
+    decided.current = who;
+    if (!signedIn || takeHowToPending(signedIn)) setHowTo(true);
+  }, [account?.loaded, signedIn, resume]);
   const lapsLeft = totalLaps - takeoverLap;
   const userTeam = model.drivers.find((d) => d.code === userSide)?.team;
   const rivalTeam = model.drivers.find((d) => d.code === rival)?.team;
@@ -214,16 +230,16 @@ export function IntroCard({
       <header className="relative z-10 border-b border-[var(--rule)] bg-[var(--paper)]/80 backdrop-blur">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
           <a href="/" className="flex items-baseline gap-2">
-            <span className="disp wide text-[20px] leading-none">Pit Wall</span>
-            <span className="eyebrow hidden sm:inline">Daily F1 strategy</span>
+            <Brand className="text-[20px]" />
+            <span className="eyebrow hidden sm:inline">Daily race strategy</span>
           </a>
           <span className="flex flex-wrap items-center gap-2">
             {source !== 'survivor' && (
               <a
-                href="/survivor"
+                href="/gauntlet"
                 className="rounded-full border border-[var(--box)] px-3 py-1 text-[13px] font-semibold text-[var(--ink)] hover:bg-[color-mix(in_srgb,var(--box)_14%,transparent)]"
               >
-                Survivor
+                Gauntlet
               </a>
             )}
             {account && <AccountBar account={account} compact />}
@@ -255,7 +271,7 @@ export function IntroCard({
               <p className="eyebrow m-0 flex items-center gap-2 !text-[var(--you)]">
                 <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-[var(--you)]" />
                 {source === 'survivor'
-                  ? `Survivor · round ${number}`
+                  ? `Gauntlet · round ${number}`
                   : number
                     ? `Daily race #${number}`
                     : 'Daily race'}{' '}
@@ -276,10 +292,12 @@ export function IntroCard({
                 )}
               </h1>
               <p className="m-0 max-w-[50ch] text-[17px] leading-relaxed text-[var(--ink)]">
-                You’re {userSide}’s race engineer at {userTeam ?? 'the team'}, on the radio for the
-                last {lapsLeft} laps. Every call is yours.{' '}
+                You’re {surname(userSide)}’s race engineer at {userTeam ?? 'the team'}, on the radio
+                for the last {lapsLeft} laps. Every call is yours.{' '}
                 <span className="font-semibold">
-                  {defend ? `Keep ${rival} behind.` : `Get ${userSide} ahead of ${rival}.`}
+                  {defend
+                    ? `Keep ${surname(rival)} behind.`
+                    : `Get ${surname(userSide)} ahead of ${surname(rival)}.`}
                 </span>
               </p>
               <div className="flex flex-wrap items-center gap-2 text-[14px]">
@@ -295,7 +313,8 @@ export function IntroCard({
                   </span>
                 )}
               </div>
-              <div className="flex flex-col gap-3 pt-1 sm:flex-row sm:items-center">
+              {/* The start button, with how to play and how it works under it. */}
+              <div className="flex w-full flex-col items-stretch gap-2.5 pt-1 sm:w-fit">
                 <button
                   type="button"
                   onClick={onStart}
@@ -309,7 +328,7 @@ export function IntroCard({
                     →
                   </span>
                 </button>
-                <span className="flex gap-4 text-[13px] text-[var(--muted)]">
+                <span className="flex justify-center gap-5 text-[13px] text-[var(--muted)]">
                   <button
                     type="button"
                     onClick={() => setHowTo(true)}
@@ -359,7 +378,11 @@ export function IntroCard({
                       {gap === null ? '-' : `${Math.abs(gap).toFixed(1)}s`}
                     </span>
                     <span className="text-[11px] text-[var(--muted)]">
-                      {gap === null ? '' : gap >= 0 ? `${userSide} leads` : `${rival} leads`}
+                      {gap === null
+                        ? ''
+                        : gap >= 0
+                          ? `${surname(userSide)} leads`
+                          : `${surname(rival)} leads`}
                     </span>
                   </div>
                   <Side
@@ -381,10 +404,10 @@ export function IntroCard({
           <dl className="m-0 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {[
               ['Laps to run', String(lapsLeft)],
-              [`${userSide} really finished`, realPos ? `P${realPos}` : '-'],
-              [`${rival} really finished`, realRival ? `P${realRival}` : '-'],
+              [`${surname(userSide)} really finished`, realPos ? `P${realPos}` : '-'],
+              [`${surname(rival)} really finished`, realRival ? `P${realRival}` : '-'],
               [
-                `${userSide}'s attitude`,
+                `${surname(userSide)}'s attitude`,
                 info ? TIER_LABEL[info.tier].replace(' attitude', '') : '-',
               ],
             ].map(([label, value]) => (
@@ -408,9 +431,7 @@ export function IntroCard({
         </section>
       </main>
 
-      <footer className="px-6 pb-6 text-center text-[12px] text-[var(--muted)]">
-        One race a day · Not affiliated with Formula 1.
-      </footer>
+      <Disclaimer />
     </div>
   );
 }

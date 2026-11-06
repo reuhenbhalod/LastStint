@@ -29,6 +29,16 @@ export interface CallResult {
   matchedReal: boolean;
 }
 
+/** The race plan picked at takeover, graded (strategy planner spec D7). */
+export interface PlanResult {
+  chosen: string;
+  band: Band;
+  points: number;
+  probability: number;
+  best: string;
+  options: OptionGrade[];
+}
+
 export interface RunResponse {
   runId: string;
   date: string;
@@ -45,6 +55,8 @@ export interface RunResponse {
     gaps: Record<string, number>;
   };
   calls: CallResult[];
+  /** Absent for runs without a plan. */
+  plan?: PlanResult;
   percentile: number;
   rank: number;
   total: number;
@@ -79,6 +91,8 @@ export interface Account {
   email: string;
   /** On the admin list: the Admin button shows. */
   admin?: boolean;
+  /** Sign-in only: the account was created just now. */
+  created?: boolean;
 }
 
 export interface PlayerResponse {

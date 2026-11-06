@@ -53,7 +53,12 @@ export function lapEvents(prev: RaceState, cur: RaceState): LapEvents {
         lap: cur.lap,
         code,
         compound: car.compound,
-        cost: t !== undefined && typical !== null ? t - typical : null,
+        // Behind a safety car the field bunches up, so the median lap measures nothing (a
+        // stop came out at -4 s): the card shows places only. (A VSC slows all alike.)
+        cost:
+          t !== undefined && typical !== null && cur.flag !== 'sc' && t - typical > 0
+            ? t - typical
+            : null,
         from: prev.order.indexOf(code) + 1,
         to: cur.order.indexOf(code) + 1,
       },

@@ -23,6 +23,7 @@ import {
   scoreRun,
 } from './grade.js';
 import type { DecisionMoment } from './moments.js';
+import { PLAN_TARGET, enginePlans, planOption } from './planner.js';
 import {
   type Run,
   classify,
@@ -32,7 +33,10 @@ import {
   stepLap,
   validateDecisions,
 } from './sim.js';
-import type { Decision, RaceModel, RaceResult } from './types.js';
+import type { Decision, PlanId, RaceModel, RacePlan, RaceResult } from './types.js';
+
+/** The claimed grade of the race plan uses this id in place of a moment's. */
+export const PLAN_GRADE_ID = 'plan';
 
 /** The most calls a run may log (a 70-lap race with a call every lap fits easily). */
 export const MAX_DECISIONS = 500;
@@ -98,6 +102,28 @@ export function claimGrade(
   return claim;
 }
 
+/**
+ * The game's grade of the race plans, as POST /api/runs takes it: each plan's chance in the
+ * order graded (the engineer's plans, then the player's own if they built one).
+ */
+export function claimPlanGrade(grade: MomentGrade): ClaimedGrade {
+  return { momentId: PLAN_GRADE_ID, probabilities: grade.options.map((o) => o.probability) };
+}
+
+/** The run's logged plan, or null. A run logs at most one, at takeover. */
+function loggedPlan(model: RaceModel, decisions: Decision[]): RacePlan | null {
+  const plans = decisions.filter((d) => d.kind === 'plan');
+  if (plans.length === 0) return null;
+  const p = plans[0] as Extract<Decision, { kind: 'plan' }>;
+  if (plans.length > 1 || p.at !== model.race.takeoverLap || p.lap !== model.race.takeoverLap + 1) {
+    throw new VerifyError('bad-answer', 'a run picks one plan, at takeover');
+  }
+  return { id: p.id, stops: p.stops, pace: p.pace };
+}
+
+const samePlan = (a: RacePlan, b: RacePlan) =>
+  JSON.stringify([a.stops, a.pace]) === JSON.stringify([b.stops, b.pace]);
+
 /** The real team's call at a moment, graded against the moment's best option. */
 export interface RealCall {
   /** The moment option the real team took, or null if it took none of them. */
@@ -117,10 +143,18 @@ export interface VerifiedMoment {
   matchedReal: boolean;
 }
 
+export interface VerifiedPlan {
+  chosen: PlanId;
+  /** The plans graded at takeover, exactly as the player's game graded them. */
+  grade: MomentGrade;
+}
+
 export interface VerifiedRun {
   result: RaceResult;
   score: RunScore;
   moments: VerifiedMoment[];
+  /** The race plan's grade (strategy planner spec D7), or null for a run without a plan. */
+  plan: VerifiedPlan | null;
   /** The user's car's classified position (1-based; a disqualified car is last). */
   finishPosition: number;
   disqualified: boolean;
@@ -210,15 +244,34 @@ function claimedGrades(
   model: RaceModel,
   claimed: unknown,
   samples: number,
+  plan: RacePlan | null,
 ): Map<string, { hits: number[]; real: number | null }> {
   const bad = (why: string): never => {
     throw new VerifyError('bad-grades', why);
   };
-  if (!Array.isArray(claimed) || claimed.length !== model.decisionMoments.length) {
+  const want = model.decisionMoments.length + (plan ? 1 : 0);
+  if (!Array.isArray(claimed) || claimed.length !== want) {
     bad('grades must list every moment once');
   }
   const out = new Map<string, { hits: number[]; real: number | null }>();
   for (const c of claimed as ClaimedGrade[]) {
+    if (plan && c?.momentId === PLAN_GRADE_ID) {
+      const probs = c.probabilities;
+      // The engineer offers one to three plans; the player's own makes one more.
+      const most = plan.id === 'own' ? 4 : 3;
+      if (
+        out.has(PLAN_GRADE_ID) ||
+        !Array.isArray(probs) ||
+        probs.length < 1 ||
+        probs.length > most
+      ) {
+        return bad('the plan needs one chance per plan');
+      }
+      const hits = probs.map((p) => hitsFor(p, samples));
+      if (hits.some((h) => h === null)) return bad('the plan has an invalid chance');
+      out.set(PLAN_GRADE_ID, { hits: hits as number[], real: null });
+      continue;
+    }
     const m = model.decisionMoments.find((x) => x.id === c?.momentId);
     if (!m || out.has(m.id)) return bad('grades must list every moment once');
     const probs = c.probabilities;
@@ -255,7 +308,8 @@ export function verifyRun(
 ): VerifiedRun {
   checkLog(model, decisions);
   const chosen = answers(model, decisions);
-  const claims = claimed === undefined ? null : claimedGrades(model, claimed, samples);
+  const logged = loggedPlan(model, decisions);
+  const claims = claimed === undefined ? null : claimedGrades(model, claimed, samples, logged);
 
   const run = initRun(model, seed, { decisions });
   while (!isFinished(run)) stepLap(run);
@@ -292,13 +346,66 @@ export function verifyRun(
       };
     });
 
-  const score = scoreRun(moments.map((m) => ({ grade: m.grade, chosen: m.chosen })));
+  const plan = logged ? gradePlan(model, seed, decisions, samples, logged, claims) : null;
+  // The plan's call goes last, so score.calls[i] stays moments[i].
+  const score = scoreRun([
+    ...moments.map((m) => ({ grade: m.grade, chosen: m.chosen })),
+    ...(plan ? [{ grade: plan.grade, chosen: plan.chosen }] : []),
+  ]);
   const user = model.userSide;
   return {
     result,
     score,
     moments,
+    plan,
     finishPosition: result.order.indexOf(user) + 1,
     disqualified: result.disqualified.includes(user),
   };
+}
+
+/**
+ * Grade the run's plan at takeover. With full playouts the engineer's plans are rebuilt from
+ * the run (they're deterministic) and a picked one must match; with claimed grades the plans'
+ * ids follow from the claim (the nightly re-verify checks the plans themselves).
+ */
+function gradePlan(
+  model: RaceModel,
+  seed: number,
+  decisions: Decision[],
+  samples: number,
+  plan: RacePlan,
+  claims: Map<string, { hits: number[]; real: number | null }> | null,
+): VerifiedPlan {
+  const lap = model.race.takeoverLap;
+  const claim = claims?.get(PLAN_GRADE_ID);
+  if (claims && !claim) throw new VerifyError('bad-grades', 'the plan needs its grade');
+  if (claim) {
+    const offered = (['a', 'b', 'c'] as PlanId[]).slice(
+      0,
+      claim.hits.length - (plan.id === 'own' ? 1 : 0),
+    );
+    const ids: PlanId[] = plan.id === 'own' ? [...offered, 'own'] : offered;
+    if (!ids.includes(plan.id)) throw new VerifyError('bad-answer', `no plan ${plan.id} offered`);
+    const options = ids.map((id) => ({ id, decisions: [] }));
+    return {
+      chosen: plan.id,
+      grade: gradeFromHits(lap, options, PLAN_TARGET, samples, claim.hits),
+    };
+  }
+  const paused = pausedBefore(model, seed, decisions, lap + 1);
+  const offered = enginePlans(paused);
+  if (plan.id !== 'own') {
+    const match = offered.find((p) => p.id === plan.id);
+    if (!match || !samePlan(match, plan)) {
+      throw new VerifyError('bad-answer', `plan ${plan.id} isn't the engineer's plan`);
+    }
+  }
+  const plans = plan.id === 'own' ? [...offered, plan] : offered;
+  const grade = gradeMoment(
+    paused,
+    plans.map((p) => planOption(paused, p)),
+    PLAN_TARGET,
+    samples,
+  );
+  return { chosen: plan.id, grade };
 }

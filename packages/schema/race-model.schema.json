@@ -269,6 +269,10 @@
                 }
               }
             }
+          },
+          "wetPace": {
+            "type": "number",
+            "description": "A wet race: the driver's extra share of a lap on a wet track beyond the weather curves (negative: quicker in the wet), fading in up to wetness 0.1 (pipeline/wet.py)."
           }
         }
       }
@@ -358,7 +362,9 @@
               "rivalPit",
               "undercut",
               "cliff",
-              "takeover"
+              "takeover",
+              "rain",
+              "drying"
             ]
           },
           "target": {
@@ -429,6 +435,110 @@
     "reconstructed": {
       "type": "boolean",
       "description": "True for hand-built races without official lap timing (labelled in the UI)."
+    },
+    "weather": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "curves",
+        "wetness"
+      ],
+      "description": "A wet race (docs/weather-spec.md): the share of a dry lap each tyre class loses at wetness w (data/wet.json) and the track's wetness on each lap (index lap - 1), fitted by pipeline/wet.py.",
+      "properties": {
+        "curves": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "slick",
+            "inter",
+            "wet"
+          ],
+          "properties": {
+            "slick": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "a",
+                "b"
+              ],
+              "properties": {
+                "a": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "b": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              }
+            },
+            "inter": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "min",
+                "dry",
+                "wet",
+                "best"
+              ],
+              "properties": {
+                "min": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "dry": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "wet": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "best": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              }
+            },
+            "wet": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "min",
+                "dry",
+                "wet",
+                "best"
+              ],
+              "properties": {
+                "min": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "dry": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "wet": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "best": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        },
+        "wetness": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        }
+      }
     }
   }
 }

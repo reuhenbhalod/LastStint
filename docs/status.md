@@ -77,11 +77,29 @@ Beta feedback round 2, part B (Nov 2, 2026):
     - A big stop moment stays out for you if a stop is booked or was made in the last 5 laps ("We're boxing already").
     - A stop picked in answer to a question is never refused.
     - A team-radio BOX clears a stop question already on screen.
+- **Brand and rights (Nov 5, localhost only):** following F1's fan guidelines (formula1.com/en/information/guidelines): the official unofficial-site disclaimer, word for word, plus that no team, driver or the FIA endorses the game (`components/Disclaimer.tsx`, on the home page, results, survivor and How it works); "F1" out of our branding (the tagline is "Daily race strategy"); no logos, official fonts, photos, audio or video. Stay non-commercial: ads, payments or sponsorship would need an F1 licence (data and marks).
+- **The race as it happens (Nov 5, localhost only):**
+  - **The lap read ahead:** the lap being shown is run ahead each lap (`previewLap`, an exact replay, ~0.1 ms) and again after any call.
+  - **Cars move all lap:** each car moves toward its gap at the lap's end through the lap, so overtakes happen on track, not at the line.
+  - **The standings follow the map** 2-3 times a second: the order, the gaps and "PIT".
+  - **Retirements:** a car that retires drives to where it stopped (the corner race control gave, from `data/retirements.json`, else a fixed spot), brakes, and stays parked with a warning sign and "OUT · crash / engine / gearbox..." for 3 laps.
+  - **Out of the model:** a safety car's cause that the model doesn't run (Giovinazzi, Abu Dhabi 21) is parked at its spot while the SC or VSC is out.
+  - **Punctures:** a car with one shows "PUNCTURE" as it limps round, and its stop is drawn a lap early.
+  - **The pit card** no longer shows a stop time behind a safety car (the bunched field made it -4 s).
+  - **Names:** the map's dots, its legend and the standings keep the three-letter codes; everywhere else says the surname (`data/names.ts`): radio, calls, decision cards, the scoreboard (codes on a phone, where only they fit), team orders, the car panel, the home page and the verdict.
+- **Tyre life (Nov 5, localhost only):** a compound's life is now `tyreLife` in the sim.
+  - **Before:** the fitted cliff stood in for life, and is often a gentle bend early on (Canada 22 hards: lap 7), so the game showed "hards done in 7 laps".
+  - **The rule:** laps until the tyre is 2 s a lap slower than new (calibrated on 96 well-run compounds: the median life equals the longest real stint). With no fitted cliff, no further than the edge of the evidence.
+  - **Used for:** the display, the engineer's calls, and "worn" in the race model (pushing, punctures, the rival going long with 3 laps in hand, the driver's box request).
+  - **The data:** a compound run in under 3 stints, or only briefly, gets its life from the well-run compounds (e.g. softs at least 0.4x the longest hard stint), so Monza 24 softs go from 2 laps to 17.
+  - **Checks:** every pool race still passes G1 with unchanged gap errors; 18/19 daily seeds pass (Bahrain 22 back in band, Abu Dhabi 21 the known exception); survivor seeds re-tuned.
+  - **Styria 2021** left the survivor pool: no setup lets good play win any more. 18 survivor races.
+  - **At merge:** the race files changed, so scheduled dailies need re-pinning.
 - **Team colours and safety-car causes (Nov 4, localhost only):**
   - **Team colours (`game/teamTheme.ts`):** each race is shown in your driver's team colour: Ferrari red, McLaren papaya, Red Bull blue and so on.
     - It covers your car, the header stripe, buttons, the home page and the timing tower.
     - The rival takes their team's colour, or a contrasting one when the two would look alike (team-mates, two reds).
-    - Good news has its own fixed colour (`--good`), so a Ferrari player never sees good news in red.
+    - Good news (trust, tyre life, battery, a pass) takes the team colour too; with a red team (Ferrari, Alfa Romeo), warnings and BOX turn amber so good and bad never look alike (Nov 5).
   - **Why the safety car is out:** `pipeline incidents` writes `data/incidents.json`, display only.
     - Each SC/VSC is put down to the car that retired as it came out, with its official result status from FastF1 ("Accident", "Gearbox") and the corner when race control gives one.
     - With no car out, race control's words are used instead: a clash just before (debris), or a yellow in a sector.
@@ -188,3 +206,11 @@ With no daily scheduled, or no connection, the site plays the bundled copy of th
 | Backend API | `api.md`, `phase-4-backend-spec.md` |
 | Abu Dhabi beta plan | `beta-abu-dhabi-spec.md` |
 | Frontend | `phase-3-ui-spec.md` (Reuhen), `frontend-finish-spec.md` |
+
+- 2026-11-05: renamed to **LastStint** (wordmark LAST + STINT in the team colour, `components/Brand.tsx`); Survivor is shown as **Gauntlet** (route `/gauntlet`, `/survivor` still works; code, API and storage keep the survivor name). Favicon `public/favicon.svg`, link preview `public/og.png` (its URL in index.html is absolute: switch to laststint.com when the domain points here). Race header: "Sainz’s race engineer · Ferrari".
+
+- 2026-11-05: **strategy planner** built (docs/strategy-planner-spec.md): pick a plan at takeover (graded like a call), the car runs to it, heads-up before a planned stop, re-plan offers. The takeover `race-plan` moment is retired; 7 daily seeds and every Gauntlet seed re-tuned (build.py and pools.json). At the merge the scheduled dailies must be re-pinned (race files changed).
+
+- 2026-11-05: **weather** built (docs/weather-spec.md): OpenF1 ingest, wetness model, Russia 2021 and Canada 2024 in the daily pool (3 more wet races built, not played: G1).
+
+- 2026-11-05: **race screen redesign** (TV broadcast style): focus view (the map takes the screen, the top ten as a TV leaders tower beside it) or "Show stats" (full timing tower and stats at the sides, the map shrinks between). Nothing sits on the track: the calls, the race plan, team radio and the plan bar open under the map, which shrinks to make room; flag, weather, battle and pit-stop chips sit in a strip above it. The call is a lower third (`BroadcastDecision`, replacing DecisionPanel and RadioAlert) with one line of facts per option and the tyre gains; the race plan is three compact tiles.

@@ -19,13 +19,20 @@ import {
   type RaceState,
   battlesFor,
   cleanLap,
+  isWetTyre,
   lappedAhead,
   moodOf,
   passProbability,
+  readMove,
   ruleSatisfied,
+  tyreLife,
+  wetPenalty,
+  wetnessOn,
 } from '@boxthislap/sim';
 import { driverInfo } from '../data/drivers.js';
+import type { CornerKind } from '../track/battle.js';
 import { lapTime } from '../track/geometry.js';
+import { tyreName } from './choices.js';
 import {
   type BattleLine,
   type BattleOdds,
@@ -124,6 +131,9 @@ function battleCall(
   // No fight with a car on its out-lap: it's in the pit lane.
   if (!them || them.strategy.some((s) => s.lap === next)) return null;
   if (!battleDue(other, race.lap, mem)) return null;
+  // A long fight changes rhythm: every third lap of it is a pressure call, not a corner.
+  if ((mem.fight?.streak ?? 1) % 3 === 0)
+    return pressureCall(race, model, other, gap, pick === 'ahead');
   const us = model.userSide;
   const attacking = pick === 'ahead';
   const eng = race.engineer;
@@ -139,9 +149,13 @@ function battleCall(
   const leader = attacking ? other : us;
   const advantage = pace(leader) - pace(follower);
   const drs = attacking && eng?.drsLap === next ? cfg.drsLogit : 0;
+  // A move tried on him lap after lap, he reads (sim readMove): its odds drop.
+  const read = (move: BattleMove) => (eng ? readMove(cfg, eng, move, other, next) : 0);
   const odds = (move: BattleMove): BattleOdds => {
     const m = cfg.moves[move];
-    const shift = attacking ? (m.attackLogit ?? 0) + drs : (m.defendLogit ?? 0);
+    const shift = attacking
+      ? (m.attackLogit ?? 0) + drs - read(move)
+      : (m.defendLogit ?? 0) + read(move);
     const p = passProbability(model.track.overtakeModel, advantage, gap, shift);
     return {
       good: attacking ? p : 1 - p,
@@ -158,7 +172,7 @@ function battleCall(
   ): QuickOption => ({
     id,
     label,
-    note: what,
+    note: read(move) ? `${what} · he’s ${attacking ? 'covering' : 'expecting'} it now` : what,
     odds: odds(move),
     line,
     call: battle(next, move),
@@ -228,9 +242,7 @@ function battleCall(
       gap,
       stats,
       asked: false,
-      text: drsRange
-        ? `${other}${rival} is ${gap.toFixed(1)} s ahead. I can get him. How do I go?`
-        : `${other}${rival} is ${gap.toFixed(1)} s ahead. I have to close in first, but I can try.`,
+      text: battleLine(race.lap, other, rival, gap, drsRange, true, eng?.lastMove ?? null),
       options,
       driverChoice: battle(next, ownMove(us, true), true),
     };
@@ -245,7 +257,7 @@ function battleCall(
     gap,
     stats,
     asked: false,
-    text: `${other}${rival} is ${gap.toFixed(1)} s behind${drsRange ? ' with DRS' : ', closing'}. How do we defend?`,
+    text: battleLine(race.lap, other, rival, gap, drsRange, false, eng?.lastMove ?? null),
     options: [
       opt('cover', 'Cover the inside', 'cover-inside', 'Solid, costs a little time', 'inside'),
       opt('outside', 'Hold the outside line', 'hold-outside', 'Quicker, easier to pass', 'outside'),
@@ -256,11 +268,180 @@ function battleCall(
   };
 }
 
+/** One of a few ways to put it, picked by the lap (the same fight never reads the same). */
+const pickBy = <T>(lap: number, other: string, list: T[]): T =>
+  list[(lap * 7 + other.charCodeAt(0) + other.charCodeAt(2)) % list.length] as T;
+
+/** The battle's radio line: who and how far, said a few ways, and what he did last time. */
+function battleLine(
+  lap: number,
+  other: string,
+  rival: string,
+  gap: number,
+  drs: boolean,
+  attacking: boolean,
+  last: { move: BattleMove; other: string; lap: number } | null,
+): string {
+  const g = gap.toFixed(1);
+  const opening = attacking
+    ? drs
+      ? pickBy(lap, other, [
+          `${other}${rival} is ${g} s ahead. I can get him. How do I go?`,
+          `I’m right on ${other}’s gearbox, ${g} s. Where do I put it?`,
+          `${g} s to ${other}${rival}, DRS is open. Tell me where.`,
+          `${other} is struggling for traction, ${g} s ahead. Your call.`,
+        ])
+      : pickBy(lap, other, [
+          `${other}${rival} is ${g} s ahead. I have to close in first, but I can try.`,
+          `${g} s to ${other}. Not in DRS yet, but I’m catching.`,
+          `${other}${rival} is ${g} s up the road and slowing. Have a go?`,
+        ])
+    : pickBy(lap, other, [
+        `${other}${rival} is ${g} s behind${drs ? ' with DRS' : ', closing'}. How do we defend?`,
+        `${other} is filling my mirrors, ${g} s back. What line?`,
+        `${g} s to ${other}${rival} behind${drs ? ', and he has DRS' : ''}. Defend or let him by?`,
+      ]);
+  if (!last || last.other !== other || lap + 1 - last.lap > 2) return opening;
+  const read: Partial<Record<BattleMove, string>> = attacking
+    ? {
+        'dive-inside': ' He’s covering the inside since last time.',
+        'round-outside': ' He’s leaving less room on the outside now.',
+        'overtake-button': ' He knows the boost is coming.',
+      }
+    : {
+        'cover-inside': ' He’s seen us cover the inside: he may go round.',
+        'hold-outside': ' He’s lining up the inside now.',
+        'defend-hard': ' He’s waiting for us to block again.',
+      };
+  return opening + (read[last.move] ?? '');
+}
+
+/**
+ * Every third lap of a long fight (battle variety): no corner, a call on how to run the fight.
+ * Attacking: keep the pressure on (his tyres overheat in your dirty air) or drop back and
+ * cool your own. Defending: push on the exits, or save the tyres for the slow corners.
+ */
+function pressureCall(
+  race: RaceState,
+  model: RaceModel,
+  other: string,
+  gap: number,
+  attacking: boolean,
+): QuickCall {
+  const next = race.lap + 1;
+  const g = gap.toFixed(1);
+  const mode = (key: 'battle' | 'pace', value: string): Decision =>
+    ({ lap: next, kind: 'mode', key, value }) as Decision;
+  return attacking
+    ? {
+        lap: race.lap,
+        from: model.userSide,
+        kind: 'quick',
+        other,
+        asked: false,
+        text: pickBy(race.lap, other, [
+          `Still ${g} s behind ${other}. His tyres are going off in my dirty air, but mine are too. Keep at it?`,
+          `${other} is holding me up, ${g} s. Do I keep the pressure on or back off a lap?`,
+        ]),
+        options: [
+          {
+            id: 'press',
+            label: 'Keep the pressure on',
+            note: 'Stay in his gearbox: his tyres overheat',
+            call: mode('battle', 'attack'),
+          },
+          {
+            id: 'cool',
+            label: 'Drop back, cool the tyres',
+            note: 'Back off a second, go again fresh',
+            call: mode('pace', 'manage'),
+          },
+        ],
+      }
+    : {
+        lap: race.lap,
+        from: model.userSide,
+        kind: 'quick',
+        other,
+        asked: false,
+        text: pickBy(race.lap, other, [
+          `${other} is still ${g} s behind. My rears are getting hot defending. What do you want?`,
+          `${other} keeps trying, ${g} s back. Push to break the tow, or save the tyres?`,
+        ]),
+        options: [
+          {
+            id: 'push',
+            label: 'Push on the exits',
+            note: 'Break the tow, harder on the tyres',
+            call: mode('pace', 'push'),
+          },
+          {
+            id: 'save',
+            label: 'Save them, defend the slow corners',
+            note: 'Easier on the tyres, he stays close',
+            call: mode('battle', 'defend'),
+          },
+        ],
+      };
+}
+
+/** The moves in words that suit the corner (a hairpin, a fast sweeper, a chicane). */
+const FLAVOUR: Record<CornerKind, Partial<Record<string, { label: string; note?: string }>>> = {
+  hairpin: {
+    dive: { label: 'Late-brake up the inside', note: 'Classic hairpin lunge' },
+    outside: { label: 'Switchback on the exit', note: 'Let him turn in, cut back under him' },
+    drs: { label: 'Get a better exit, go next lap', note: 'Slingshot onto the straight next time' },
+    cover: { label: 'Cover the inside under braking', note: 'Shut the door, slower exit' },
+    outsideD: { label: 'Square it off on the exit', note: 'Normal line, watch the switchback' },
+    hard: { label: 'Brake late, make it wide', note: 'Contact and track-limits risk' },
+  },
+  sweeper: {
+    dive: { label: 'Send it up the inside', note: 'Brave through the fast one' },
+    outside: { label: 'Around the outside, flat', note: 'Full commitment, no room for error' },
+    drs: { label: 'Stay in the tow, DRS next lap', note: 'Follow him through, set it up' },
+    cover: { label: 'Hold the inside line', note: 'Cost a little speed through it' },
+    outsideD: { label: 'Keep the racing line, full speed', note: 'Quickest, easier to pass' },
+    hard: { label: 'Move once on the straight', note: 'Risky at this speed' },
+  },
+  chicane: {
+    dive: { label: 'Lunge into the first apex', note: 'Brake as late as you dare' },
+    outside: {
+      label: 'Cut back at the second apex',
+      note: 'Give him the first part, win the exit',
+    },
+    drs: { label: 'Clean exit, attack at the next', note: 'Better run out of the chicane' },
+    cover: { label: 'Protect the first apex', note: 'Solid, costs a little time' },
+    outsideD: { label: 'Defend the second apex', note: 'Watch the cutback' },
+    hard: { label: 'Block the lunge on the brakes', note: 'Contact and track-limits risk' },
+  },
+  corner: {},
+};
+
+/** A battle call in the words of the corner it's fought into (the race screen picks it). */
+export function flavourBattle(call: QuickCall, kind: CornerKind): QuickCall {
+  const words = FLAVOUR[kind];
+  return {
+    ...call,
+    options: call.options.map((o) => {
+      const key = !call.attacking && o.id === 'outside' ? 'outsideD' : o.id;
+      const w = words[key];
+      if (!w) return o;
+      const read = o.note?.includes('· he’s') ? ` · ${o.note.split(' · ').at(-1)}` : '';
+      return { ...o, label: w.label, note: (w.note ?? o.note ?? '') + read };
+    }),
+  };
+}
+
 /** The softest tyre that lasts to the flag (or the hardest), for a box call. */
 function lastingCompound(race: RaceState, model: RaceModel): string {
+  // A wet race: the tyre for the track (inters, wets in a downpour) while it's wet.
+  const w = model.weather ? wetnessOn(model.weather.wetness, race.lap + 1) : 0;
+  if (model.weather && w >= 0.12) return w >= 0.6 && model.compounds.WET ? 'WET' : 'INTERMEDIATE';
   const left = model.race.laps - race.lap;
-  const byGrip = Object.entries(model.compounds).sort((a, b) => a[1].offset - b[1].offset);
-  const lasts = byGrip.find(([, c]) => c.cliffLap >= left);
+  const byGrip = Object.entries(model.compounds)
+    .filter(([c]) => !isWetTyre(c))
+    .sort((a, b) => a[1].offset - b[1].offset);
+  const lasts = byGrip.find(([, c]) => tyreLife(c) >= left);
   return (lasts ?? byGrip.at(-1))?.[0] ?? race.cars[model.userSide]?.compound ?? 'HARD';
 }
 
@@ -297,11 +478,11 @@ function troubleCall(
       from: 'Engineer',
       kind: 'trouble',
       asked: false,
-      text: `We haven’t run a second tyre compound. We have to stop before the flag or we’re disqualified. Box for ${fresh.toLowerCase()}s?`,
+      text: `We haven’t run a second tyre compound. We have to stop before the flag or we’re disqualified. Box for ${tyreName(fresh).toLowerCase()}?`,
       options: [
         {
           id: 'box',
-          label: `Box, ${fresh.toLowerCase()}s`,
+          label: `Box, ${tyreName(fresh).toLowerCase()}`,
           note: 'Legal to the flag',
           call: { lap: next, kind: 'pit', compound: fresh },
         },
@@ -325,7 +506,7 @@ function troubleCall(
       from: 'Engineer',
       kind: 'trouble',
       asked: false,
-      text: `Front wing damage. We’re losing about ${eng.damage.toFixed(1)} s a lap. Box for a new nose and ${compound.toLowerCase()}s?`,
+      text: `Front wing damage. We’re losing about ${eng.damage.toFixed(1)} s a lap. Box for a new nose and ${tyreName(compound).toLowerCase()}?`,
       options: [
         {
           id: 'box',
@@ -429,11 +610,11 @@ function requestCall(
       from: us,
       kind: 'request',
       asked: true,
-      text: `These ${me.compound.toLowerCase()}s are gone, ${me.tyreAge} laps old. I want to box!`,
+      text: `These ${tyreName(me.compound).toLowerCase()} are gone, ${me.tyreAge} laps old. I want to box!`,
       options: [
         {
           id: 'yes',
-          label: `Yes, box for ${compound.toLowerCase()}s`,
+          label: `Yes, box for ${tyreName(compound).toLowerCase()}`,
           call: { lap: next, kind: 'reply', request: 'box', yes: true },
           also: [{ lap: next, kind: 'pit', compound }],
         },
@@ -590,6 +771,12 @@ export function directorCall(
     const sc = safetyCarCall(race, model, false);
     if (sc) return asked(sc);
   }
+  // No calls into a big moment's lap (the moment asks).
+  const into = race.lap + 1;
+  if (into <= model.race.laps && !model.decisionMoments.some((m) => m.lap === into)) {
+    const wx = weatherCall(race, model, mem, stopping);
+    if (wx) return asked(wx);
+  }
   const next = race.lap + 1;
   if (next > model.race.laps) return null;
   // No calls into a neutralized lap (no racing), or on a big moment's lap.
@@ -607,6 +794,92 @@ export function directorCall(
     if (battery) return battery;
   }
   return quickLap ? quickCallAt(race, model, log) : null;
+}
+
+/** The tyres' names as the radio says them. */
+const SAID: Record<string, string> = {
+  SOFT: 'softs',
+  MEDIUM: 'mediums',
+  HARD: 'hards',
+  INTERMEDIATE: 'inters',
+  WET: 'full wets',
+};
+const said = (c: string) => SAID[c] ?? `${tyreName(c).toLowerCase()}`;
+
+/** How many laps between asking about the weather again. */
+const WEATHER_ASK_EVERY = 3;
+
+/**
+ * Weather spec W5: the calls the weather brings. On slicks as the track turns wet, the driver
+ * asks for inters (wets in a downpour); on wet tyres as it dries, the engineer offers slicks.
+ * Not gated on fresh tyres: rain doesn't wait.
+ */
+function weatherCall(
+  race: RaceState,
+  model: RaceModel,
+  mem: DirectorMemory,
+  stopping: boolean,
+): QuickCall | null {
+  const weather = model.weather;
+  const me = race.cars[model.userSide];
+  if (!weather || !me || stopping) return null;
+  if (race.lap - (mem.last.weather ?? -99) < WEATHER_ASK_EVERY) return null;
+  const next = race.lap + 1;
+  if (next >= model.race.laps) return null;
+  const w = wetnessOn(weather.wetness, next);
+  const onWets = isWetTyre(me.compound);
+  const us = model.userSide;
+  if (!onWets && w >= 0.1) {
+    mem.last.weather = race.lap;
+    const want = lastingCompound(race, model);
+    const slick = Math.round(wetPenalty(weather, me.compound, w) * 100);
+    return {
+      lap: race.lap,
+      from: us,
+      kind: 'request',
+      asked: true,
+      weather: true,
+      text: `It's wet out here, I'm sliding everywhere on these ${said(me.compound)}. I need ${said(want)}!`,
+      stats: [
+        { label: 'Slicks', value: `${slick}% off the pace` },
+        { label: 'Track', value: w >= 0.45 ? 'Soaked' : 'Wet' },
+      ],
+      options: [
+        {
+          id: 'yes',
+          label: `Yes, box for ${said(want)}`,
+          call: { lap: next, kind: 'reply', request: 'box', yes: true },
+          also: [{ lap: next, kind: 'pit', compound: want }],
+        },
+        {
+          id: 'no',
+          label: 'No, stay out',
+          note: 'He’ll remember if he was right',
+          call: { lap: next, kind: 'reply', request: 'box', yes: false },
+        },
+      ],
+    };
+  }
+  if (onWets && w < 0.08 && model.race.laps - race.lap > 3) {
+    mem.last.weather = race.lap;
+    const slicks = lastingCompound(race, { ...model, weather: undefined });
+    return {
+      lap: race.lap,
+      from: 'Engineer',
+      kind: 'quick',
+      weather: true,
+      text: `The track's drying fast, there's a dry line now. ${said(me.compound)} are overheating. Slicks?`,
+      options: [
+        {
+          id: 'slicks',
+          label: `Box for ${said(slicks)}`,
+          call: { lap: next, kind: 'pit', compound: slicks },
+        },
+        { id: 'stay', label: `Stay on ${said(me.compound)}`, call: null },
+      ],
+    };
+  }
+  return null;
 }
 
 /** The driver's mood as the game shows it. */

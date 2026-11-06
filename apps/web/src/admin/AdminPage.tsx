@@ -9,6 +9,7 @@ import type { RaceModel } from '@boxthislap/sim';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { GOOGLE_CLIENT_ID, loadGoogle } from '../account/google.js';
 import { ApiError } from '../api.js';
+import { Brand } from '../components/Brand.js';
 import { goalOf } from '../game/goal.js';
 import { TicketsPage } from './TicketsPage.js';
 import { adminCall, adminToken, setAdminToken } from './session.js';
@@ -188,7 +189,7 @@ export function AdminPage() {
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
           <span className="flex items-baseline gap-2">
             <a href="/" className="disp wide text-[20px] leading-none">
-              Pit Wall
+              <Brand />
             </a>
             <span className="eyebrow">Admin</span>
           </span>

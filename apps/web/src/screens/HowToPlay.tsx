@@ -2,6 +2,7 @@
 // shows (Skip closes it), and "How to play" reopens it.
 
 import { useEffect, useState } from 'react';
+import { surname } from '../data/names.js';
 
 interface Step {
   title: string;
@@ -80,7 +81,7 @@ export function HowToPlay({
   goal: string;
   onClose: () => void;
 }) {
-  const all = steps(team, user, rival, realPos, laps, goal);
+  const all = steps(team, surname(user), surname(rival), realPos, laps, goal);
   const [i, setI] = useState(0);
   const step = all[i] as Step;
   const last = i === all.length - 1;

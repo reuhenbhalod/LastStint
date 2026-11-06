@@ -3,15 +3,51 @@
 // mutable sim Run, computes each action's payload (stepped race state, which moment to pause
 // at, the result), and dispatches here. Keeping it pure makes every transition unit-testable.
 //
-//   intro → racing ⇄ decision → finished → submitting → results
+//   intro → planning → racing ⇄ decision → finished → submitting → results
 //
 // (loading lives in the React layer, while the daily is being fetched.)
 
-import type { Decision, DecisionMoment, RaceResult, RaceState } from '@boxthislap/sim';
+import type {
+  Decision,
+  DecisionMoment,
+  PlanId,
+  RacePlan,
+  RaceResult,
+  RaceState,
+} from '@boxthislap/sim';
 import type { RunResponse } from '../data/api.js';
 import type { GradedMoment } from '../engine/grading.js';
 
-export type Phase = 'intro' | 'racing' | 'decision' | 'finished' | 'submitting' | 'results';
+export type Phase =
+  | 'intro'
+  | 'planning'
+  | 'racing'
+  | 'decision'
+  | 'finished'
+  | 'submitting'
+  | 'results';
+
+/** A plan's chance of beating the rival, as graded playouts: hits out of samples. */
+export interface PlanChance {
+  hits: number;
+  samples: number;
+}
+
+/** The race plan (docs/strategy-planner-spec.md). */
+export interface PlanState {
+  /** The engineer's plans at takeover. */
+  offered: RacePlan[];
+  /** Each plan's chance at takeover, by id, as grading finishes ('own': the player's plan). */
+  chances: Partial<Record<PlanId, PlanChance>>;
+  /** The player's own plan, once built. */
+  own: RacePlan | null;
+  /** The plan picked at takeover (graded; logged as the run's plan call). */
+  picked: RacePlan | null;
+  /** The plan the car runs to now: the picked one, as changed during the race (not graded). */
+  active: RacePlan | null;
+  /** The latest re-rank during the race: your plan's chance and the engineer's best now. */
+  live: { lap: number; mine: number; best: { plan: RacePlan; chance: number } | null } | null;
+}
 
 export type Speed = 1 | 2;
 
@@ -70,6 +106,7 @@ export interface GameState {
   meta: GameMeta;
   /** The driver's radio replies to live calls, newest last (not persisted). */
   radio: RadioMessage[];
+  plan: PlanState;
 }
 
 export type Action =
@@ -86,6 +123,8 @@ export type Action =
   | { type: 'SET_SPEED'; speed: Speed }
   | { type: 'RADIO'; message: RadioMessage }
   | { type: 'GRADED'; momentId: string; graded: GradedMoment }
+  /** The plan changed; `go` also starts the race (the plan was picked). */
+  | { type: 'PLAN'; plan: PlanState; go?: boolean }
   | { type: 'SUBMIT' }
   | { type: 'RESULT'; result: RaceResult; submission: Submission }
   | { type: 'ALREADY_PLAYED'; response: RunResponse }
@@ -94,7 +133,14 @@ export type Action =
 export function reducer(state: GameState, action: Action): GameState {
   switch (action.type) {
     case 'START':
-      return state.phase === 'intro' ? { ...state, phase: 'racing' } : state;
+      return state.phase === 'intro' ? { ...state, phase: 'planning' } : state;
+
+    case 'PLAN':
+      return {
+        ...state,
+        plan: action.plan,
+        ...(action.go && state.phase === 'planning' ? { phase: 'racing' as const } : {}),
+      };
 
     case 'SYNC': {
       // Only the running phases resolve to a new phase from a step.

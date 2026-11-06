@@ -4,6 +4,7 @@
 // call, and the result at the corner. Number keys answer.
 
 import { useEffect, useState } from 'react';
+import { named, surname } from '../data/names.js';
 import type { QuickCall } from '../game/quickCalls.js';
 import { type LapClock, clockProgress } from '../game/useGame.js';
 import { LINE_COLOR } from '../track/battle.js';
@@ -63,7 +64,8 @@ export function BattleCard({
   }, [call, chosen, onAnswer]);
 
   const picked = call.options.find((o) => o.id === chosen);
-  const who = call.attacking ? `Attacking ${call.other}` : `Defending from ${call.other}`;
+  const other = surname(call.other ?? '');
+  const who = call.attacking ? `Attacking ${other}` : `Defending from ${other}`;
   return (
     <section
       aria-label="Battle call"
@@ -93,8 +95,10 @@ export function BattleCard({
         </span>
       </div>
       <p className="m-0 text-[15px] font-semibold leading-snug">
-        {call.from !== 'Engineer' && <span className="mr-1 text-[var(--muted)]">{call.from}:</span>}
-        {call.text}
+        {call.from !== 'Engineer' && (
+          <span className="mr-1 text-[var(--muted)]">{named(call.from)}:</span>
+        )}
+        {named(call.text)}
       </p>
       {/* The approach: your car closing on the braking zone; then the wait for your call. */}
       {!chosen && (
@@ -117,7 +121,7 @@ export function BattleCard({
           className="rounded-lg px-3 py-2 text-center text-[18px] font-extrabold uppercase tracking-wide"
           style={{
             background: result.good ? 'var(--good)' : 'var(--box)',
-            color: result.good ? '#08231f' : '#ffffff',
+            color: result.good ? 'var(--good-ink)' : '#ffffff',
           }}
         >
           {result.text}
@@ -179,7 +183,7 @@ export function BattleCard({
           {call.stats.map((s) => (
             <div key={s.label} className="flex items-baseline gap-1.5">
               <dt className="eyebrow">{s.label}</dt>
-              <dd className="m-0 font-semibold">{s.value}</dd>
+              <dd className="m-0 font-semibold">{named(s.value)}</dd>
             </div>
           ))}
         </dl>

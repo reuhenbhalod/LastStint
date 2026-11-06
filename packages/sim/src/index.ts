@@ -19,8 +19,10 @@ export {
   passProbability,
   planRemainingStop,
   realDecisions,
+  readMove,
   rivalCover,
   ruleSatisfied,
+  tyreLife,
   simulate,
   stepLap,
   teammateOf,
@@ -76,11 +78,34 @@ export type {
   ProposedMoment,
   Verdict,
 } from './moments.js';
-export { MAX_DECISIONS, VerifyError, answerMoment, claimGrade, verifyRun } from './verify.js';
+export {
+  MAX_DECISIONS,
+  PLAN_GRADE_ID,
+  VerifyError,
+  answerMoment,
+  claimGrade,
+  claimPlanGrade,
+  verifyRun,
+} from './verify.js';
+export { MAX_PLAN_STOPS, MIN_STINT, PACES, planCalls, stintStarts, validatePlan } from './plan.js';
+export { PLAN_TARGET, enginePlans, planOption } from './planner.js';
 export type {
   ClaimedGrade,
   RealCall,
   VerifiedMoment,
+  VerifiedPlan,
   VerifiedRun,
   VerifyErrorCode,
 } from './verify.js';
+export {
+  WET_OFF_COST,
+  WET_TYRES,
+  wetCrash,
+  wetOff,
+  forecastWetness,
+  isWetTyre,
+  weatherWear,
+  wetFactor,
+  wetPenalty,
+  wetnessOn,
+} from './weather.js';

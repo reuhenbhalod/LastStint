@@ -62,7 +62,7 @@
     "MEDIUM": {
       "offset": 0.3527,
       "degPerLap": 0.09451,
-      "cliffLap": 24
+      "cliffLap": 30
     },
     "HARD": {
       "offset": 0.4894,

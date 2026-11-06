@@ -16,7 +16,8 @@ import { Survivor } from './screens/Survivor.js';
 
 export function App() {
   if (location.pathname.startsWith('/admin')) return <AdminPage />;
-  if (location.pathname.startsWith('/survivor')) return <Survivor />;
+  if (location.pathname.startsWith('/gauntlet') || location.pathname.startsWith('/survivor'))
+    return <Survivor />;
   return <Game />;
 }
 
@@ -88,7 +89,7 @@ function Game() {
   }
 
   if (home && game.state.phase !== 'intro') {
-    const racing = game.state.phase === 'racing' || game.state.phase === 'decision';
+    const racing = ['planning', 'racing', 'decision'].includes(game.state.phase);
     return (
       <IntroCard
         state={game.state}
@@ -112,6 +113,7 @@ function Game() {
           account={account}
         />
       );
+    case 'planning':
     case 'racing':
     case 'decision':
       return <RaceScreen game={game} state={game.state} model={game.model} onHome={goHome} />;

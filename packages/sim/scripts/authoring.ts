@@ -11,13 +11,15 @@ import {
   verdictFor,
 } from '../src/moments.js';
 import type { Decision, RaceModel } from '../src/types.js';
+import { wetnessOn } from '../src/weather.js';
 
 const MAX_MOMENTS = 6;
 const MIN_SPACING = 3;
 const PACE_EVERY = 4;
 
-/** The race plan and up to `max` graded calls (MAX_MOMENTS; survivor races take 2) for
- * `model` (its seed, rival and takeover as given). `log` receives a line per candidate. */
+/** Up to `max` graded calls (MAX_MOMENTS; survivor races take 2) for `model` (its seed, rival
+ * and takeover as given). `log` receives a line per candidate. The plan at takeover is the
+ * strategy planner's (docs/strategy-planner-spec.md), not a moment. */
 export function authorMoments(
   model: RaceModel,
   samples?: number,
@@ -27,7 +29,13 @@ export function authorMoments(
   const target = { kind: 'beat-rival' } as const;
   const first = model.race.takeoverLap + 1;
   const last = model.race.laps - 1;
-  const NAME: Record<string, string> = { SOFT: 'softs', MEDIUM: 'mediums', HARD: 'hards' };
+  const NAME: Record<string, string> = {
+    SOFT: 'softs',
+    MEDIUM: 'mediums',
+    HARD: 'hards',
+    INTERMEDIATE: 'inters',
+    WET: 'wets',
+  };
   const pit = (lap: number, compound: string): Decision => ({ lap, kind: 'pit', compound });
   const mode = (lap: number, key: 'pace' | 'battle', value: string): Decision =>
     ({ lap, kind: 'mode', key, value }) as Decision;
@@ -46,39 +54,6 @@ export function authorMoments(
     return ok.length ? ok : byGrip.slice(-2).map(([k]) => k);
   }
 
-  function racePlan(): DecisionMoment {
-    const lap = first;
-    const box = lasting(lap).slice(-2);
-    const real = (model.drivers.find((d) => d.code === model.userSide)?.realStrategy ?? []).find(
-      (s) => s.lap - 1 === lap,
-    );
-    const options: MomentOption[] = [
-      { id: 'plan-standard', label: 'Run to plan', decisions: [] },
-      {
-        id: 'plan-manage',
-        label: 'Manage the tyres to the flag',
-        decisions: [mode(lap, 'pace', 'manage')],
-      },
-      { id: 'plan-push', label: 'Push now, build the gap', decisions: [mode(lap, 'pace', 'push')] },
-      ...box.map((c) => ({
-        id: `plan-box-${c.toLowerCase()}`,
-        label: `Box now, ${NAME[c] ?? c.toLowerCase()}`,
-        decisions: [pit(lap, c)],
-      })),
-    ];
-    const realId = real
-      ? options.find((o) => o.id === `plan-box-${real.to.toLowerCase()}`)?.id
-      : null;
-    return {
-      id: 'race-plan',
-      lap,
-      trigger: 'takeover',
-      target,
-      options,
-      realOptionId: realId ?? (real ? null : 'plan-standard'),
-    };
-  }
-
   /** A finder stop call, re-offered the Abu Dhabi way. */
   function stopCall(m: DecisionMoment): DecisionMoment {
     const lap = m.lap;
@@ -87,7 +62,14 @@ export function authorMoments(
     // Box next lap: under a neutralization that runs another lap, or a green call (one more lap
     // on these tyres).
     const nextOk = next && (neutral.has(lap) ? neutral.has(lap + 1) : true);
-    const nextCompound = lasting(lap + 1).at(-1) as string;
+    // A wet race: the tyre for the track next lap (inters as it turns wet, wets when soaked).
+    const wetNext = model.weather ? wetnessOn(model.weather.wetness, lap + 1) : 0;
+    const nextCompound =
+      wetNext >= 0.6 && model.compounds.WET
+        ? 'WET'
+        : wetNext >= 0.05 && model.compounds.INTERMEDIATE
+          ? 'INTERMEDIATE'
+          : (lasting(lap + 1).at(-1) as string);
     const options: MomentOption[] = [
       { id: 'stay', label: 'Stay out', decisions: [] },
       ...compounds.map((c) => ({
@@ -200,8 +182,6 @@ export function authorMoments(
     const ps = grade.options.map((o) => o.probability * 100).sort((a, b) => b - a);
     return { m, grade, verdict: verdictFor(grade), spread: (ps[0] ?? 0) - (ps.at(-1) ?? 0) };
   });
-  const plan = racePlan();
-  const planGrade = gradeMoment(pauseAt(model, plan.lap), plan.options, plan.target, samples);
 
   const show = (m: DecisionMoment, g: (typeof graded)[number]['grade'], v: string) =>
     log(
@@ -212,15 +192,14 @@ export function authorMoments(
   log(
     `${model.race.id}: ${model.userSide} vs ${model.rival}, takeover lap ${model.race.takeoverLap}`,
   );
-  show(plan, planGrade, verdictFor(planGrade));
   for (const g of graded) show(g.m, g.grade, g.verdict);
 
-  // Pick, for variety like Abu Dhabi's: the race plan, then the passing stop calls, then one
-  // battle call, then pace calls (at most MAX_PACE, or one more if the race has fewer than
+  // Pick, for variety like Abu Dhabi's: the passing stop calls, then one battle call, then pace
+  // calls (at most MAX_PACE, or one more if the race has fewer than
   // MIN_CALLS calls otherwise); each group most tense first, all spaced out.
   const MAX_PACE = 2;
   const MIN_CALLS = 4;
-  const picked: DecisionMoment[] = [plan];
+  const picked: DecisionMoment[] = [];
   const keep = graded
     .filter(
       (x) =>
@@ -232,12 +211,11 @@ export function authorMoments(
       (a, b) =>
         Number(realStops.has(b.m.lap)) - Number(realStops.has(a.m.lap)) || b.spread - a.spread,
     );
-  // Calls are MIN_SPACING laps apart; the race plan only needs a lap of its own (Abu Dhabi
-  // has the plan on lap 35 and the VSC call on 36).
+  // Calls are MIN_SPACING laps apart, and none on the first lap (the plan is picked there).
   const fits = (m: DecisionMoment) =>
-    picked.length <= max &&
-    m.lap !== plan.lap &&
-    !picked.some((p) => p !== plan && Math.abs(p.lap - m.lap) < MIN_SPACING);
+    picked.length < max &&
+    m.lap !== first &&
+    !picked.some((p) => Math.abs(p.lap - m.lap) < MIN_SPACING);
   const kind = (m: DecisionMoment) =>
     m.id.startsWith('pace-') ? 'pace' : m.id.startsWith('battle-') ? 'battle' : 'stop';
   for (const g of keep.filter((x) => kind(x.m) === 'stop')) if (fits(g.m)) picked.push(g.m);
@@ -245,7 +223,7 @@ export function authorMoments(
     if (fits(g.m)) picked.push(g.m);
   let pace = 0;
   for (const g of keep.filter((x) => kind(x.m) === 'pace')) {
-    const cap = picked.length - 1 + (MAX_PACE - pace) < MIN_CALLS ? MAX_PACE + 1 : MAX_PACE;
+    const cap = picked.length + (MAX_PACE - pace) < MIN_CALLS ? MAX_PACE + 1 : MAX_PACE;
     if (pace >= cap) break;
     if (fits(g.m)) {
       picked.push(g.m);

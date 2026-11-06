@@ -1,28 +1,31 @@
 // The driver's replies to your live calls: "Copy" or a refusal (game/refusal.ts). Newest first.
 
+import { named } from '../data/names.js';
 import type { RadioMessage } from '../state/machine.js';
 
 export function RadioLog({ messages, max = 3 }: { messages: RadioMessage[]; max?: number }) {
   if (!messages.length) return null;
   return (
-    <ul aria-live="polite" className="m-0 flex list-none flex-col gap-1.5 p-0">
+    <ul aria-live="polite" className="m-0 flex list-none flex-col p-0">
       {[...messages]
         .reverse()
         .slice(0, max)
         .map((m, i) => (
           <li
             key={`${m.lap}-${m.text}-${messages.length - i}`}
-            className={`rounded-lg border-l-4 px-2.5 py-1.5 text-[13px] leading-snug ${
+            className={`flex flex-col gap-0.5 border-l-[3px] py-1.5 pl-2.5 text-[13px] leading-snug ${
               m.refused
-                ? 'border-[var(--box)] bg-[color-mix(in_srgb,var(--box)_14%,transparent)]'
-                : 'border-[var(--you)] bg-[var(--card-2)]'
-            } ${i > 0 ? 'opacity-70' : ''}`}
+                ? 'border-[var(--box)]'
+                : i === 0
+                  ? 'border-[var(--you)]'
+                  : 'border-[#2A302E]'
+            } ${i > 0 ? 'text-[#B7BEBA]' : ''}`}
           >
-            <span className="mono mr-1.5 text-[11px] text-[var(--muted)]">
-              L{m.lap} {m.from}
+            <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#8D9692]">
+              <span className="mono">L{m.lap}</span> · {named(m.from)}
+              {m.refused && <span className="text-[var(--box-ink)]"> · refused</span>}
             </span>
-            {m.refused && <strong className="mr-1 text-[var(--box-ink)]">Refused:</strong>}“{m.text}
-            ”
+            <span>“{named(m.text)}”</span>
           </li>
         ))}
     </ul>

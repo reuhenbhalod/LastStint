@@ -1,7 +1,7 @@
 // Moment author (races batch 1): builds a race's decision moments to the Abu Dhabi recipe and
 // keeps only real dilemmas.
 //   pnpm --filter @boxthislap/sim author <race-id> [--rival CODE] [--samples N] [--max N] [--write]
-// (--max caps the graded calls after the race plan: survivor races use 2.)
+// (--max caps the graded calls: survivor races use 2.)
 //
 // Candidates, all graded from the real race's state at their lap (pauseAt):
 //   - the race plan when you take over: run to plan, manage, push, box now (two compounds);
@@ -40,9 +40,7 @@ const file = JSON.parse(raw) as RaceModel;
 const model: RaceModel = { ...file, rival: flag('--rival') ?? file.rival, decisionMoments: [] };
 const max = flag('--max') ? Number(flag('--max')) : undefined;
 const picked = authorMoments(model, samples, (line) => console.log(line), max);
-console.log(
-  `picked ${picked.length - 1} moments + the race plan: ${picked.map((p) => `${p.id}@${p.lap}`).join(', ')}`,
-);
+console.log(`picked ${picked.length} moments: ${picked.map((p) => `${p.id}@${p.lap}`).join(', ')}`);
 if (write) {
   writeFileSync(
     join(repo, 'data', 'moments', `${raceId}.json`),

@@ -6,7 +6,9 @@ describe('verdict', () => {
     const v = verdict(1, 2, 'Mercedes', 'HAM', 'VER', true);
     expect(v.outcome).toBe('beat');
     expect(v.headline).toBe('You beat Mercedes!');
-    expect(v.detail).toBe('HAM P1, ahead of VER. The real Mercedes pit wall finished P2.');
+    expect(v.detail).toBe(
+      'Hamilton P1, ahead of Verstappen. The real Mercedes pit wall finished P2.',
+    );
   });
 
   it('a defend race held is "you held P2"', () => {

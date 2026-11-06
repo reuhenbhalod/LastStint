@@ -6,6 +6,8 @@
 
 import type { RaceModel } from '@boxthislap/sim';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Brand } from '../components/Brand.js';
+import { Disclaimer } from '../components/Disclaimer.js';
 import { ChequeredIcon, FlagIcon, OvertakeIcon } from '../components/Icons.js';
 import { ApiError, type SurvivorBoardEntry, type SurvivorState, survivorApi } from '../data/api.js';
 import { anonId } from '../data/player.js';
@@ -41,7 +43,7 @@ function saveRunId(id: string | null): void {
 
 function errorText(e: unknown): string {
   if (e instanceof ApiError) {
-    if (e.code === 'no-survivor-races') return 'Survivor races are on their way. Check back soon.';
+    if (e.code === 'no-survivor-races') return 'Gauntlet races are on their way. Check back soon.';
     if (e.code === 'rate-limited') return 'Too many requests. Give it a minute.';
     return `The server said ${e.code}.`;
   }
@@ -72,8 +74,8 @@ function Header({ onHome }: { onHome: () => void }) {
           onClick={onHome}
           className="flex items-baseline gap-2 hover:text-[var(--you)]"
         >
-          <span className="disp wide text-[20px] leading-none">Pit Wall</span>
-          <span className="eyebrow">Survivor</span>
+          <Brand className="text-[20px]" />
+          <span className="eyebrow">Gauntlet</span>
         </button>
         <button
           type="button"
@@ -99,7 +101,7 @@ function Board({ mine }: { mine?: string }) {
   }, []);
   const rows = board?.[tab] ?? [];
   return (
-    <section aria-label="Survivor leaderboard" className="card flex flex-col gap-3">
+    <section aria-label="Gauntlet leaderboard" className="card flex flex-col gap-3">
       <div className="flex items-center justify-between gap-2">
         <h2 className="disp m-0 text-[18px] leading-none">Leaderboard</h2>
         <div className="flex gap-1 text-[12px] font-semibold">
@@ -172,7 +174,7 @@ function Lobby({
         />
         <div className="relative flex flex-col gap-4">
           <p className="eyebrow m-0 !text-[var(--box-ink)]">Game mode</p>
-          <h1 className="disp wide m-0 text-[48px] leading-[0.9] sm:text-[68px]">Survivor</h1>
+          <h1 className="disp wide m-0 text-[48px] leading-[0.9] sm:text-[68px]">Gauntlet</h1>
           <p className="m-0 max-w-[52ch] text-[17px] leading-relaxed">
             Race after race, each one a different real race you haven’t seen in the daily. Win and
             you go on. Lose once and the run is over. How far can you go?
@@ -495,6 +497,7 @@ export function Survivor() {
         )}
         {view === 'over' && run && <Over run={run} finish={finish} onAgain={start} />}
       </main>
+      <Disclaimer />
     </div>
   );
 }

@@ -2,6 +2,8 @@
 // pit wall, so the bar is what that pit wall really achieved. Finish ahead of the real result
 // and you beat them; level, you matched them; behind, the real team did better.
 
+import { surname } from '../data/names.js';
+
 export interface Verdict {
   outcome: 'beat' | 'matched' | 'worse';
   headline: string;
@@ -18,7 +20,7 @@ export function verdict(
   /** A defend race (game/goal.ts): holding the real result is the job, so say so. */
   defend = false,
 ): Verdict {
-  const you = `${driver} P${pos}${beatRival ? `, ahead of ${rival}` : `, behind ${rival}`}.`;
+  const you = `${surname(driver)} P${pos}${beatRival ? `, ahead of ${surname(rival)}` : `, behind ${surname(rival)}`}.`;
   const real = realPos > 0 ? `The real ${team} pit wall finished P${realPos}.` : '';
   if (defend && realPos > 0 && pos === realPos) {
     return { outcome: 'matched', headline: `You held P${pos}!`, detail: `${you} ${real}`.trim() };

@@ -18,6 +18,17 @@ export interface CallResult {
   matchedReal: boolean;
 }
 
+/** The race plan picked at takeover, graded (strategy planner spec D7). */
+export interface PlanResult {
+  chosen: string;
+  band: Band;
+  points: number;
+  probability: number;
+  /** The best plan offered. */
+  best: string;
+  options: OptionGrade[];
+}
+
 /** What a stored run holds; the response adds the live standing. */
 export interface StoredResult {
   date: string;
@@ -34,6 +45,8 @@ export interface StoredResult {
     gaps: Record<string, number>;
   };
   calls: CallResult[];
+  /** Absent for runs without a plan (before the planner). */
+  plan?: PlanResult;
 }
 
 /** The daily fields a stored result carries. */
@@ -73,5 +86,20 @@ export function stored(daily: ResultDaily, v: VerifiedRun): StoredResult {
         matchedReal: m.matchedReal,
       };
     }),
+    ...(v.plan ? { plan: planResult(v) } : {}),
+  };
+}
+
+/** The plan's grade; its call is the score's last (sim verifyRun). */
+function planResult(v: VerifiedRun): PlanResult {
+  const plan = v.plan as NonNullable<VerifiedRun['plan']>;
+  const call = v.score.calls[v.score.calls.length - 1];
+  return {
+    chosen: plan.chosen,
+    band: call?.band as Band,
+    points: call?.points as number,
+    probability: call?.probability as number,
+    best: plan.grade.best,
+    options: plan.grade.options,
   };
 }

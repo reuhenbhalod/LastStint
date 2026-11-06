@@ -5,7 +5,7 @@
     "name": "Bahrain 2021: Verstappen vs Hamilton",
     "laps": 56,
     "takeoverLap": 10,
-    "seed": 53576
+    "seed": 17370
   },
   "era": "2014-2025",
   "track": {
@@ -72,7 +72,7 @@
     "MEDIUM": {
       "offset": 0.3984,
       "degPerLap": 0.08195,
-      "cliffLap": 27
+      "cliffLap": 29
     },
     "HARD": {
       "offset": 0.6687,
@@ -621,68 +621,6 @@
     }
   ],
   "decisionMoments": [
-    {
-      "id": "race-plan",
-      "lap": 11,
-      "trigger": "takeover",
-      "target": {
-        "kind": "beat-rival"
-      },
-      "options": [
-        {
-          "id": "plan-standard",
-          "label": "Run to plan",
-          "decisions": []
-        },
-        {
-          "id": "plan-manage",
-          "label": "Manage the tyres to the flag",
-          "decisions": [
-            {
-              "lap": 11,
-              "kind": "mode",
-              "key": "pace",
-              "value": "manage"
-            }
-          ]
-        },
-        {
-          "id": "plan-push",
-          "label": "Push now, build the gap",
-          "decisions": [
-            {
-              "lap": 11,
-              "kind": "mode",
-              "key": "pace",
-              "value": "push"
-            }
-          ]
-        },
-        {
-          "id": "plan-box-medium",
-          "label": "Box now, mediums",
-          "decisions": [
-            {
-              "lap": 11,
-              "kind": "pit",
-              "compound": "MEDIUM"
-            }
-          ]
-        },
-        {
-          "id": "plan-box-hard",
-          "label": "Box now, hards",
-          "decisions": [
-            {
-              "lap": 11,
-              "kind": "pit",
-              "compound": "HARD"
-            }
-          ]
-        }
-      ],
-      "realOptionId": "plan-standard"
-    },
     {
       "id": "rivalpit-13",
       "lap": 13,

@@ -4,9 +4,11 @@
 // rather than in a jump). A car that stops drives down the real pit lane. The safety car
 // leads the field while it's out. Click any car for its card.
 
-import { type RaceModel, type RaceState, engineerConfig } from '@boxthislap/sim';
+import { type RaceModel, type RaceNote, type RaceState, engineerConfig } from '@boxthislap/sim';
 import { type MutableRefObject, memo, useEffect, useMemo, useRef, useState } from 'react';
+import { neutralCar } from '../game/neutral.js';
 import type { BattleLine } from '../game/quickCalls.js';
+import { outReason, realRetirement, shortWhy } from '../game/retired.js';
 import { type LapClock, clockProgress } from '../game/useGame.js';
 import {
   BRAKE_BEFORE,
@@ -57,8 +59,8 @@ export interface BattleView {
   chosen: BattleLine | null;
   /** The camera is on the battle. */
   zoom: boolean;
-  /** The result: from tick progress `at`, your car takes its new gap to the other (s). */
-  swap: { gap: number; at: number } | null;
+  /** The result: from tick progress `at`, the two cars take their places after the lap. */
+  swap: { at: number } | null;
 }
 
 /** The battle drawn on the track: the braking zone, the corner, and a numbered, coloured line
@@ -518,6 +520,7 @@ export function TrackMap({
   finishing = null,
   battle = null,
   flash = null,
+  ahead = null,
   userBox = null,
   motionRef,
 }: {
@@ -537,6 +540,9 @@ export function TrackMap({
   finishing?: { lapMs: number; onCrossed: () => void } | null;
   /** A battle this lap (battles and trust spec): drawn on the track, the camera on it. */
   battle?: BattleView | null;
+  /** The lap being shown, run ahead (GameSession.previewLap): cars move toward its gaps all
+   * lap, a car that retires on it stops on track, a puncture shows. */
+  ahead?: { race: RaceState; notes: RaceNote[] } | null;
   /** A battle's result, shown at its corner for a moment. */
   flash?: { text: string; good: boolean; corner: number } | null;
   /** Your BOX not yet in the race model: its lap (the car turns in at the end of it). */
@@ -619,8 +625,34 @@ export function TrackMap({
     userBox,
     userExtra: (race.engineer?.damage ?? 0) > 0 ? (engineerConfig(model)?.noseCost ?? 0) : 0,
     sinceFlag: finishing ? sinceFlag : null,
-    swap: battle?.swap ? { code: userSide, other: battle.other, ...battle.swap } : null,
+    ahead: finishing ? null : (ahead?.race ?? null),
+    hold: battle ? { codes: [userSide, battle.other], until: battle.swap?.at ?? null } : null,
+    stopAt: (code) => {
+      const real = realRetirement(model.race.id, code, race.lap + 1);
+      const pt = real?.turn ? cornerPoint(outline, real.turn) : null;
+      return pt ? nearestFraction(line, pt) : null;
+    },
+    outWhy: (code) => outReason(model.race.id, code, race.lap + 1, ahead?.notes ?? []),
   });
+  // A puncture on the lap being shown: the car limps round with it.
+  const punctured = new Set(
+    (ahead?.notes ?? [])
+      .filter((n) => n.lap === race.lap + 1 && n.detail === 'puncture' && n.driver)
+      .map((n) => n.driver as string),
+  );
+  // Cars stopped on track (out of the race), drawn where they stopped; and the car behind a
+  // neutralization the model doesn't run, parked where it stopped while the SC or VSC is out.
+  const stopped: Array<[string, { x: number; y: number; out?: string }]> = [
+    ...places.entries(),
+  ].filter(([, p]) => p.out !== undefined);
+  const phantom = finishing ? null : neutralCar(model, race.lap + 1, driven);
+  if (phantom) {
+    const corner = phantom.turn ? cornerPoint(outline, phantom.turn) : null;
+    const [x, y] = corner
+      ? pointAt(line, nearestFraction(line, corner))
+      : pointAt(line, 0.2 + (0.6 * ((phantom.driver.charCodeAt(0) * 7 + phantom.from) % 97)) / 97);
+    stopped.push([phantom.driver, { x, y, out: shortWhy(phantom.status) }]);
+  }
   // Your car crossing the line ends it; if it's out of the race, the winner does.
   const youDone = finishing
     ? (places.get(userSide)?.finished ?? [...places.values()].some((c) => c.finished === true))
@@ -691,7 +723,7 @@ export function TrackMap({
       viewBox={`${view.x.toFixed(1)} ${view.y.toFixed(1)} ${view.w.toFixed(1)} ${view.h.toFixed(1)}`}
       // Phone/tablet: full width at the outline's shape. Laptop: fills its box (the rest of the
       // column), keeping the shape.
-      className="block h-auto w-full xl:absolute xl:inset-0 xl:h-full"
+      className="absolute inset-0 block h-full w-full"
       aria-labelledby="track-map-title"
     >
       <title id="track-map-title">{`Track map, lap ${race.lap}. Select a car for its details.`}</title>
@@ -723,10 +755,41 @@ export function TrackMap({
           </text>
         </g>
       )}
+      {/* Cars stopped on track: a yellow-flag glow, the car greyed, a warning sign and why. */}
+      {stopped.map(([code, p]) => (
+        <g
+          key={`out-${code}`}
+          transform={`translate(${p.x.toFixed(1)},${p.y.toFixed(1)}) scale(${glyph.toFixed(3)})`}
+          pointerEvents="none"
+        >
+          <circle r={26} fill="var(--flag)" opacity={0.22} className="battle-ring" />
+          <circle r={10} fill="var(--tarmac)" stroke="var(--box)" strokeWidth={3} />
+          <path d="M-6,5 L6,-5 M-6,-5 L6,5" stroke="var(--box)" strokeWidth={2.5} />
+          <g transform="translate(0,-24)">
+            <polygon points="0,-9 9,7 -9,7" fill="var(--flag)" stroke="#141716" strokeWidth={1.5} />
+            <text y={5} textAnchor="middle" fontSize={11} fontWeight={900} fill="#141716">
+              !
+            </text>
+          </g>
+          <g transform="translate(0,22)">
+            <rect x={-46} y={-9} width={92} height={18} rx={5} fill="#141716" opacity={0.9} />
+            <text
+              y={4}
+              textAnchor="middle"
+              fontSize={11}
+              fontWeight={800}
+              fontFamily="var(--mono)"
+              fill="#ffffff"
+            >
+              {code} OUT · {p.out}
+            </text>
+          </g>
+        </g>
+      ))}
       {drawOrder.map((c) => {
         const car = race.cars[c.code];
         const place = places.get(c.code);
-        if (!place) return null;
+        if (!place || place.out !== undefined) return null;
         const [lx, ly] = place.lane ? [0, 0] : lateral(c.code, place.at);
         const x = place.x + lx;
         const y = place.y + ly;
@@ -799,6 +862,21 @@ export function TrackMap({
                 {c.code}
               </text>
             )}
+            {punctured.has(c.code) && !inLane && (
+              <g transform={`translate(0,${key ? -44 : -22})`}>
+                <rect x={-36} y={-9} width={72} height={17} rx={5} fill="var(--box)" />
+                <text
+                  y={4}
+                  textAnchor="middle"
+                  fontSize={10.5}
+                  fontWeight={800}
+                  fontFamily="var(--mono)"
+                  fill="#ffffff"
+                >
+                  PUNCTURE
+                </text>
+              </g>
+            )}
           </g>
         );
       })}
@@ -824,7 +902,7 @@ export function TrackMap({
               <text
                 y={-39}
                 textAnchor="middle"
-                fill={flash.good ? '#08231f' : '#fff'}
+                fill={flash.good ? 'var(--good-ink)' : '#fff'}
                 fontSize={19}
                 fontWeight={800}
                 fontFamily="var(--display)"

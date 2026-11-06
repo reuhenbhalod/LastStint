@@ -31,13 +31,6 @@ describe('choicesFor', () => {
     expect(c.boxes.map((b) => b.tyres.length)).toEqual([3, 1]);
   });
 
-  it('the race plan: modes as they are, the stops under one Box', async () => {
-    const c = choicesFor(await moment('race-plan'));
-    expect(c.direct.map((o) => o.id)).toEqual(['plan-standard', 'plan-manage', 'plan-push']);
-    expect(c.boxes.map((b) => b.tyres.map((t) => t.compound))).toEqual([['MEDIUM', 'HARD']]);
-    expect(c.boxIndex).toBe(3);
-  });
-
   it('moments without stops have no Box; combined calls stay direct', async () => {
     const restart = choicesFor(await moment('restart-stance'));
     expect(restart.boxes).toEqual([]);

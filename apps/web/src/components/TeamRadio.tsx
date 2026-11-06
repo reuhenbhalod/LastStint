@@ -7,6 +7,7 @@
 import type { Decision, Modes, RaceModel, RaceState, TeamOrder } from '@boxthislap/sim';
 import { teammateOf } from '@boxthislap/sim';
 import { useState } from 'react';
+import { surname } from '../data/names.js';
 import { tyreName } from '../game/choices.js';
 import { HeadsetPanel } from './HeadsetPanel.js';
 import { HeadsetIcon } from './Icons.js';
@@ -48,7 +49,7 @@ export function TeamRadio({
   onCall: (call: Call) => void;
 }) {
   // Open on a laptop; one bar on a phone, where the map and the calls come first.
-  const [open, setOpen] = useState(() => typeof window === 'undefined' || window.innerWidth >= 768);
+  const [open, setOpen] = useState(true);
   const me = race.cars[userSide];
   const next = race.lap + 1;
   const mate = teammateOf(model);
@@ -115,35 +116,35 @@ export function TeamRadio({
               )}
             </Section>
             {mate && (
-              <Section title={`Team orders · ${mate}`}>
+              <Section title={`Team orders · ${surname(mate)}`}>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     disabled={disabled || !mateCar || mateCar.retired}
                     aria-pressed={orders.holdUp}
                     onClick={() => order(orders.holdUp ? 'release' : 'holdUp')}
-                    title={`${mate} defends against ${rival} whenever he's right ahead of him`}
+                    title={`${surname(mate)} defends against ${surname(rival)} whenever he's right ahead of him`}
                     className={`${btn} ${orders.holdUp ? 'bg-[var(--you)] text-[var(--you-ink)]' : 'bg-[var(--card)] hover:bg-[var(--rule)]'}`}
                   >
-                    {orders.holdUp ? `Release ${rival}` : `Hold up ${rival}`}
+                    {orders.holdUp ? `Release ${surname(rival)}` : `Hold up ${surname(rival)}`}
                   </button>
                   <button
                     type="button"
                     disabled={disabled || !mateCar || mateCar.retired}
                     onClick={() => order('teammateLetsYouPast')}
-                    title={`${mate} lets ${userSide} through if he's right ahead`}
+                    title={`${surname(mate)} lets ${surname(userSide)} through if he's right ahead`}
                     className={`${btn} bg-[var(--card)] hover:bg-[var(--rule)]`}
                   >
-                    {mate} lets you by
+                    {surname(mate)} lets you by
                   </button>
                   <button
                     type="button"
                     disabled={disabled || !mateCar || mateCar.retired}
                     onClick={() => order('letTeammatePast')}
-                    title={`${userSide} lets ${mate} through if he's right behind`}
+                    title={`${surname(userSide)} lets ${surname(mate)} through if he's right behind`}
                     className={`${btn} col-span-2 bg-[var(--card)] hover:bg-[var(--rule)]`}
                   >
-                    Let {mate} by
+                    Let {surname(mate)} by
                   </button>
                 </div>
                 {orders.swap && (
