@@ -6,6 +6,8 @@ import { type RaceModel, type RaceState, tyreLife } from '@boxthislap/sim';
 import { surname } from '../data/names.js';
 import { tyreName } from '../game/choices.js';
 import type { LapEvents } from '../game/raceLog.js';
+import { Bar, Panel, Stat, Stats } from './Panel.js';
+import { TyreBadge } from './TyreBadge.js';
 
 const lapClock = (s: number) => `${Math.floor(s / 60)}:${(s % 60).toFixed(1).padStart(4, '0')}`;
 const secs = (s: number) => `${Math.abs(s).toFixed(2)}s`;
@@ -27,12 +29,9 @@ export function CarStats({
   const them = race.cars[rival];
   if (!me || me.retired) {
     return (
-      <section aria-label="Car stats" className="card">
-        <span className="eyebrow">Car</span>
-        <p className="m-0 text-[14px] text-[var(--muted)]">
-          {surname(userSide)} is out of the race.
-        </p>
-      </section>
+      <Panel label="Car stats" title="Car">
+        <p className="m-0 text-[13px] text-[#8D9692]">{surname(userSide)} is out of the race.</p>
+      </Panel>
     );
   }
   const compound = model.compounds[me.compound];
@@ -55,65 +54,49 @@ export function CarStats({
   const trend = recent.length ? recent.reduce((t, [a, b]) => t + (a - b), 0) / recent.length : null;
   const gap = them && !them.retired ? them.totalTime - me.totalTime : null;
 
+  const gapTone = gap === null ? undefined : gap >= 0 ? 'var(--you)' : 'var(--rival)';
   return (
-    <section aria-label="Car stats" className="card flex flex-col gap-3">
-      <span className="eyebrow">Car · {surname(userSide)}</span>
-      <div className="flex flex-col gap-1.5">
-        <div className="flex items-baseline justify-between">
-          <span className="text-[13px] font-semibold">
-            {tyreName(me.compound)} · {me.tyreAge} laps
+    <Panel label="Car stats" title="Car">
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center justify-between gap-2">
+          <span className="flex items-center gap-2 text-[13px] font-semibold">
+            <TyreBadge compound={me.compound} age={me.tyreAge} />
+            {tyreName(me.compound)}
           </span>
-          <span className="mono text-[12px]" style={{ color: tone }}>
+          <span className="mono text-[12px] font-semibold" style={{ color: tone }}>
             {left > 0 ? `${left} laps to the drop-off` : 'Past the drop-off'}
           </span>
         </div>
-        <div className="h-2 overflow-hidden rounded-full bg-[var(--card-2)]" aria-hidden="true">
-          <div
-            className="h-full rounded-full transition-[width] duration-700"
-            style={{ width: `${Math.round(used * 100)}%`, background: tone }}
-          />
-        </div>
+        <Bar value={used} color={tone} />
       </div>
-      <dl className="m-0 grid grid-cols-3 gap-2 text-center">
-        <div>
-          <dt className="eyebrow">Last lap</dt>
-          <dd className="m-0 mono text-[14px] font-semibold">{mine ? lapClock(mine) : '-'}</dd>
-        </div>
-        <div>
-          <dt className="eyebrow">{surname(rival)} last</dt>
-          <dd className="m-0 mono text-[14px] font-semibold">{theirs ? lapClock(theirs) : '-'}</dd>
-        </div>
-        <div>
-          <dt className="eyebrow">Gap</dt>
-          <dd
-            className={`m-0 mono text-[14px] font-semibold ${gap === null ? '' : gap >= 0 ? 'text-[var(--you)]' : 'text-[var(--rival)]'}`}
-          >
+      <Stats>
+        <Stat label={`${userSide} last`}>
+          <span className="mono text-[15px]">{mine ? lapClock(mine) : '-'}</span>
+        </Stat>
+        <Stat label={`${rival} last`}>
+          <span className="mono text-[15px]">{theirs ? lapClock(theirs) : '-'}</span>
+        </Stat>
+        <Stat label="Gap" tone={gapTone}>
+          <span className="mono text-[15px]">
             {gap === null ? '-' : `${gap >= 0 ? '+' : '−'}${Math.abs(gap).toFixed(1)}s`}
-          </dd>
-        </div>
-      </dl>
-      {me.battery !== undefined && (
-        <div className="flex items-center gap-2">
-          <span className="eyebrow w-14">Battery</span>
-          <div
-            className="h-1.5 flex-1 overflow-hidden rounded-full bg-[var(--card-2)]"
-            aria-hidden="true"
-          >
-            <div
-              className="h-full rounded-full transition-[width] duration-700"
-              style={{
-                width: `${Math.round(me.battery)}%`,
-                background: me.battery <= 15 ? 'var(--box)' : 'var(--good)',
-              }}
-            />
-          </div>
-          <span className="mono whitespace-nowrap text-right text-[12px] capitalize">
-            {Math.round(me.battery)}% · {me.modes.ers}
           </span>
+        </Stat>
+      </Stats>
+      {me.battery !== undefined && (
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-baseline justify-between">
+            <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#8D9692]">
+              Battery
+            </span>
+            <span className="mono text-[12px] font-semibold capitalize">
+              {Math.round(me.battery)}% · {me.modes.ers}
+            </span>
+          </div>
+          <Bar value={me.battery / 100} color={me.battery <= 15 ? 'var(--box)' : 'var(--good)'} />
         </div>
       )}
       {trend !== null && (
-        <p className="m-0 text-center text-[13px] text-[var(--muted)]">
+        <p className="m-0 border-t border-[#232927] pt-2.5 text-[12px] text-[#B7BEBA]">
           {Math.abs(trend) < 0.05
             ? `Same pace as ${surname(rival)} over the last laps`
             : trend < 0
@@ -121,6 +104,6 @@ export function CarStats({
               : `${secs(trend)} a lap slower than ${surname(rival)} lately`}
         </p>
       )}
-    </section>
+    </Panel>
   );
 }

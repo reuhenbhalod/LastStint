@@ -26,6 +26,7 @@ import { GapTrace } from '../components/GapTrace.js';
 import { ChequeredIcon, OvertakeIcon, SoundOffIcon, SoundOnIcon } from '../components/Icons.js';
 import { LeadersTower } from '../components/LeadersTower.js';
 import { LiveGrades } from '../components/LiveGrades.js';
+import { Panel } from '../components/Panel.js';
 import { PitCard } from '../components/PitCard.js';
 import {
   PlanBar,
@@ -608,26 +609,32 @@ export function RaceScreen({
         notes={game.notes()}
       />
       <CarStats race={state.race} model={model} log={log} userSide={userSide} rival={rival} />
-      <section aria-label={`Gap to ${rival}`} className="card flex flex-col gap-2">
-        <div className="flex items-baseline justify-between">
-          <span className="eyebrow">Gap to {surname(rival)}</span>
-          <span className="mono text-[15px] font-semibold text-[var(--you)]">{gapText}</span>
-        </div>
+      <Panel
+        label={`Gap to ${rival}`}
+        title={`Gap to ${surname(rival)}`}
+        right={
+          <span
+            className="mono text-[15px] font-bold"
+            style={{ color: gap === null ? undefined : gap >= 0 ? 'var(--you)' : 'var(--rival)' }}
+          >
+            {gapText}
+          </span>
+        }
+      >
         {points.length >= 2 ? (
           <GapTrace points={points} rival={rival} />
         ) : (
-          <p className="m-0 text-[13px] text-[var(--muted)]">The trace builds as laps go by.</p>
+          <p className="m-0 text-[12px] text-[#8D9692]">The trace builds as laps go by.</p>
         )}
-      </section>
+      </Panel>
       <LiveGrades state={state} />
-      <section aria-label="Radio" className="card flex flex-col gap-2">
-        <span className="eyebrow">Radio</span>
+      <Panel title="Radio">
         {state.radio.length ? (
           <RadioLog messages={state.radio} max={8} />
         ) : (
-          <p className="m-0 text-[13px] text-[var(--muted)]">Quiet so far.</p>
+          <p className="m-0 text-[12px] text-[#8D9692]">Quiet so far.</p>
         )}
-      </section>
+      </Panel>
     </>
   );
   const tower = (

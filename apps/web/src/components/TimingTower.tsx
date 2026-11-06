@@ -4,6 +4,7 @@
 // as it happens on track, not only when the lap is done.
 
 import type { RaceModel, RaceState } from '@boxthislap/sim';
+import { TEAM_COLOR } from '../game/teamTheme.js';
 import { lapTime } from '../track/geometry.js';
 import type { LiveStanding } from '../track/motion.js';
 import { TyreBadge } from './TyreBadge.js';
@@ -57,17 +58,19 @@ export function TimingTower({
               type="button"
               onClick={() => onPick?.(code)}
               className={[
-                'grid w-full grid-cols-[22px_4px_44px_1fr_auto] items-center gap-2 rounded-md px-2 py-1 text-left hover:bg-[var(--card-2)] focus-visible:bg-[var(--card-2)] focus-visible:outline-none',
-                you ? 'bg-[color-mix(in_srgb,var(--you)_16%,transparent)]' : '',
-                isRival ? 'bg-[color-mix(in_srgb,var(--rival)_16%,transparent)]' : '',
+                'grid w-full grid-cols-[22px_4px_44px_1fr_auto] items-center gap-2 px-2 py-1 text-left hover:bg-[var(--card-2)] focus-visible:bg-[var(--card-2)] focus-visible:outline-none',
+                you ? 'bg-[color-mix(in_srgb,var(--you)_30%,#0F1312)]' : '',
+                isRival ? 'bg-[color-mix(in_srgb,var(--rival)_18%,#0F1312)]' : '',
                 out || down >= 1 ? 'opacity-55' : '',
               ].join(' ')}
             >
               <span className="mono text-right text-[12px] text-[var(--muted)]">{i + 1}</span>
               <span
-                className="h-[18px] w-1 rounded-sm"
+                className="h-[16px] w-1 -skew-x-12"
                 style={{
-                  background: you ? 'var(--you)' : isRival ? 'var(--rival)' : 'var(--rule)',
+                  background:
+                    TEAM_COLOR[model.drivers.find((d) => d.code === code)?.team ?? ''] ??
+                    'var(--rule)',
                 }}
               />
               <span className="disp text-[14px] leading-none">{code}</span>
