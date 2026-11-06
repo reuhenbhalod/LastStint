@@ -119,6 +119,9 @@ export function modeLine(model: RaceModel, key: string, value: string): string |
   const charge = e.charge ?? 0;
   if (charge > 0) parts.push(`battery +${charge}% a lap`);
   if (charge < 0) parts.push(`uses ${-charge}% of the battery a lap`);
+  const burn = e.burnMult ?? 1;
+  if (burn < 0.999) parts.push(`uses ${Math.round((1 - burn) * 100)}% less fuel`);
+  if (burn > 1.001) parts.push(`uses ${Math.round((burn - 1) * 100)}% more fuel`);
   // Failures, punctures and crashes (the sim's incidents): what provokes them.
   if (key === 'pace' && value === 'push') parts.push('more risk of a failure or puncture');
   if (key === 'battle' && (value === 'attack' || value === 'defend'))

@@ -182,6 +182,8 @@ export interface CarState {
   modes: Modes;
   /** Hybrid battery charge, 0-100 (the player's car in live play only). */
   battery?: number;
+  /** Fuel in the tank, kg (the player's car in live play only; fuel load spec). */
+  fuel?: number;
 }
 
 /**
@@ -274,7 +276,8 @@ export interface RaceNote {
     | 'nose' // a stop fixed the front wing
     | 'blue' // went round a lapped car; value: the time it gained (negative)
     | 'trust' // value: the change; detail: why (TrustReason)
-    | 'rogue'; // a furious driver picks his own battle move (detail: the move)
+    | 'rogue' // a furious driver picks his own battle move (detail: the move)
+    | 'fuel'; // fuel load spec: detail 'empty' (the tank ran dry)
   driver: string;
   /** For an incident: 'crash', 'mechanical' or 'puncture'; see the kinds above. */
   detail?: string;

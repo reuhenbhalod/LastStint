@@ -13,6 +13,8 @@ export {
   decide,
   engineerConfig,
   forkRun,
+  fuelConfig,
+  fuelMargin,
   initRun,
   isFinished,
   modeEffects,
@@ -30,6 +32,7 @@ export {
 } from './sim.js';
 export type {
   ForkOptions,
+  FuelConfig,
   ModeEffect,
   NeutralEvent,
   Run,

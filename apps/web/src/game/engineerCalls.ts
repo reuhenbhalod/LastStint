@@ -33,6 +33,7 @@ import { driverInfo } from '../data/drivers.js';
 import type { CornerKind } from '../track/battle.js';
 import { lapTime } from '../track/geometry.js';
 import { tyreName } from './choices.js';
+import { FUEL_BACK, FUEL_SHORT, fuelReading, liftText, marginText } from './fuel.js';
 import {
   type BattleLine,
   type BattleOdds,
@@ -699,6 +700,69 @@ function batteryCall(
   };
 }
 
+/**
+ * The fuel call (fuel load spec): short to the flag on the normal fuel mode, the engineer asks
+ * to lift and coast; saving with the target met, whether to go back to normal. Asked again
+ * after a few laps if the answer was no.
+ */
+function fuelCall(race: RaceState, model: RaceModel, mem: DirectorMemory): QuickCall | null {
+  const me = race.cars[model.userSide];
+  const f = fuelReading(race, model);
+  if (!me || !f || f.empty || race.lap - (mem.last.fuel ?? -99) < 6) return null;
+  const left = model.race.laps - race.lap;
+  if (left < 3) return null;
+  const next = race.lap + 1;
+  const saving = me.modes.fuel === 'liftAndCoast';
+  if (!saving && f.margin < FUEL_SHORT) {
+    mem.last.fuel = race.lap;
+    return {
+      lap: race.lap,
+      from: 'Engineer',
+      kind: 'quick',
+      asked: false,
+      text: `Fuel: we’re ${marginText(f.margin)} to the flag, ${liftText(f.liftLaps)} to make it up. Lift and coast?`,
+      stats: [
+        { label: 'Fuel', value: `${f.kg.toFixed(1)} kg` },
+        { label: 'Laps left', value: String(left) },
+      ],
+      options: [
+        {
+          id: 'lift',
+          label: 'Lift and coast',
+          note: 'A bit slower, saves fuel and tyres',
+          call: { lap: next, kind: 'mode', key: 'fuel', value: 'liftAndCoast' },
+        },
+        {
+          id: 'later',
+          label: 'Not yet',
+          note: 'Save it later; run dry and it costs seconds a lap',
+          call: null,
+        },
+      ],
+    };
+  }
+  if (saving && f.margin > FUEL_BACK) {
+    mem.last.fuel = race.lap;
+    return {
+      lap: race.lap,
+      from: 'Engineer',
+      kind: 'quick',
+      asked: false,
+      text: `Fuel’s back on target, ${marginText(f.margin)}. Back to normal?`,
+      options: [
+        {
+          id: 'normal',
+          label: 'Back to normal',
+          note: 'Full pace again',
+          call: { lap: next, kind: 'mode', key: 'fuel', value: 'normal' },
+        },
+        { id: 'keep', label: 'Keep saving', note: 'More in hand for the end', call: null },
+      ],
+    };
+  }
+  return null;
+}
+
 /** The engineer's info line on a quiet lap (no answer needed), or null. */
 export function infoLine(race: RaceState, model: RaceModel, log: LapEvents[]): string | null {
   const me = race.cars[model.userSide];
@@ -790,6 +854,8 @@ export function directorCall(
     if (trouble) return asked(trouble);
     const ask = requestCall(race, model, log, mem, canStop);
     if (ask) return asked(ask);
+    const fuel = fuelCall(race, model, mem);
+    if (fuel) return fuel;
     const battery = batteryCall(race, model, cfg, mem);
     if (battery) return battery;
   }

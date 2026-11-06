@@ -5,6 +5,7 @@
 import { type RaceModel, type RaceState, tyreLife } from '@boxthislap/sim';
 import { surname } from '../data/names.js';
 import { tyreName } from '../game/choices.js';
+import { FUEL_SHORT, fuelReading, liftText, marginText } from '../game/fuel.js';
 import type { LapEvents } from '../game/raceLog.js';
 import { Bar, Panel, Stat, Stats } from './Panel.js';
 import { TyreBadge } from './TyreBadge.js';
@@ -54,6 +55,7 @@ export function CarStats({
   const trend = recent.length ? recent.reduce((t, [a, b]) => t + (a - b), 0) / recent.length : null;
   const gap = them && !them.retired ? them.totalTime - me.totalTime : null;
 
+  const fuel = fuelReading(race, model);
   const gapTone = gap === null ? undefined : gap >= 0 ? 'var(--you)' : 'var(--rival)';
   return (
     <Panel label="Car stats" title="Car">
@@ -93,6 +95,53 @@ export function CarStats({
             </span>
           </div>
           <Bar value={me.battery / 100} color={me.battery <= 15 ? 'var(--box)' : 'var(--good)'} />
+        </div>
+      )}
+      {fuel && (
+        <div className="flex flex-col gap-1.5" aria-label="Fuel">
+          <div className="flex items-baseline justify-between gap-2">
+            <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#8D9692]">
+              Fuel
+            </span>
+            <span className="mono text-[12px] font-semibold">
+              {fuel.empty ? (
+                <span className="text-[var(--box-ink)]">Empty: lifting everywhere</span>
+              ) : (
+                <>
+                  {fuel.kg.toFixed(1)} kg ·{' '}
+                  <span
+                    style={{
+                      color:
+                        fuel.margin < FUEL_SHORT
+                          ? 'var(--box-ink)'
+                          : fuel.margin < 0
+                            ? 'var(--flag)'
+                            : 'var(--good)',
+                    }}
+                  >
+                    {marginText(fuel.margin)}
+                  </span>
+                </>
+              )}
+            </span>
+          </div>
+          <Bar
+            value={fuel.level}
+            color={
+              fuel.margin < FUEL_SHORT
+                ? 'var(--box)'
+                : fuel.margin < 0
+                  ? 'var(--flag)'
+                  : 'var(--good)'
+            }
+          />
+          {fuel.savePerLap > 0 && !fuel.empty && (
+            <span className="text-[11.5px] text-[#8D9692]">
+              {me.modes.fuel === 'liftAndCoast'
+                ? `Lifting and coasting · ${liftText(fuel.liftLaps)} to go`
+                : `To make it up: ${liftText(fuel.liftLaps)}`}
+            </span>
+          )}
         </div>
       )}
       {trend !== null && (
