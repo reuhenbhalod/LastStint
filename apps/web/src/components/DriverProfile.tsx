@@ -8,7 +8,7 @@ import {
   type RaceState,
   engineerConfig,
   moodOf,
-} from '@boxthislap/sim';
+} from '@laststint/sim';
 import { TIER_LABEL, driverInfo } from '../data/drivers.js';
 import { MOOD_LABEL } from '../game/engineerCalls.js';
 import type { LapEvents } from '../game/raceLog.js';

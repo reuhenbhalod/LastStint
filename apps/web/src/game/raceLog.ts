@@ -2,7 +2,7 @@
 // much it cost, places lost) and each car's last lap time. Feeds the pit card and the driver
 // card. Built as the screen sees laps go by, so a resumed run starts its log at the resume.
 
-import type { RaceState } from '@boxthislap/sim';
+import type { RaceState } from '@laststint/sim';
 import { useRef } from 'react';
 
 export interface PitEvent {

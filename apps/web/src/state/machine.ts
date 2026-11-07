@@ -14,7 +14,7 @@ import type {
   RacePlan,
   RaceResult,
   RaceState,
-} from '@boxthislap/sim';
+} from '@laststint/sim';
 import type { RunResponse } from '../data/api.js';
 import type { GradedMoment } from '../engine/grading.js';
 

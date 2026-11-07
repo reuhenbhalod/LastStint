@@ -1,4 +1,4 @@
-import { type RaceState, battlesFor, engineerConfig, verifyRun } from '@boxthislap/sim';
+import { type RaceState, battlesFor, engineerConfig, verifyRun } from '@laststint/sim';
 import { describe, expect, it } from 'vitest';
 import { StaticDailyProvider } from '../data/provider.js';
 import { GameSession } from './session.js';

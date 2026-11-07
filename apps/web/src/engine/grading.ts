@@ -16,7 +16,7 @@ import {
   gradeJob,
   realOption,
   runGradeJob,
-} from '@boxthislap/sim';
+} from '@laststint/sim';
 
 export interface MomentJob {
   momentId: string;

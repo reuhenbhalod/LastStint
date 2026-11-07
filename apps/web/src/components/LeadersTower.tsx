@@ -2,7 +2,7 @@
 // ten, then your car and the rival below a line if they're further back. Team sliver, code,
 // gap to the leader ("PIT" in the lane), live from the map's standings.
 
-import type { RaceModel, RaceState } from '@boxthislap/sim';
+import type { RaceModel, RaceState } from '@laststint/sim';
 import { TEAM_COLOR } from '../game/teamTheme.js';
 import type { LiveStanding } from '../track/motion.js';
 

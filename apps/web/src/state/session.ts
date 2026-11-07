@@ -17,7 +17,7 @@ import {
   planCalls,
   scoreRun,
   validatePlan,
-} from '@boxthislap/sim';
+} from '@laststint/sim';
 import type { RunResponse, RunSubmission } from '../data/api.js';
 import { ignoreRate } from '../data/drivers.js';
 import type { Daily } from '../data/types.js';

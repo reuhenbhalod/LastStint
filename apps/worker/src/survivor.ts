@@ -9,7 +9,7 @@
 //                                          and the next race or the run's summary
 //   GET  /api/survivor/leaderboard         the best runs, all time and this week
 
-import { GRADE_SAMPLES, type RaceModel, VerifyError, verifyRun } from '@boxthislap/sim';
+import { GRADE_SAMPLES, type RaceModel, VerifyError, verifyRun } from '@laststint/sim';
 import { displayName } from './names.js';
 import { DISPLAY_NAME } from './players.js';
 import { SURVIVOR_POOL } from './pools.js';

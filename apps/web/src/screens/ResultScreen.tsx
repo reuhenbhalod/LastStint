@@ -2,7 +2,7 @@
 // the server's score, rank and percentile (live dailies), the day's leaderboard and stats, and
 // a spoiler-free share line. Practice runs show the game's own grades, not submitted.
 
-import { type Band, type DecisionMoment, bandFor } from '@boxthislap/sim';
+import { type Band, type DecisionMoment, bandFor } from '@laststint/sim';
 import { useEffect, useState } from 'react';
 import type { AccountState } from '../account/useAccount.js';
 import { AccountBar } from '../components/AccountBar.js';

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://boxthislap.app/schema/race-model.schema.json",
+  "$id": "https://laststint.com/schema/race-model.schema.json",
   "title": "RaceModel",
   "description": "Compact fitted model + event timeline for one race. Written by the Python pipeline, consumed by the TypeScript simulator.",
   "type": "object",

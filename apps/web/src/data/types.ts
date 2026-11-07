@@ -1,7 +1,7 @@
 // The data the game needs to run one Daily Race. The decision moments are the race model's
 // approved moments (`model.decisionMoments`), the same ones the server grades.
 
-import type { RaceModel } from '@boxthislap/sim';
+import type { RaceModel } from '@laststint/sim';
 
 export interface Daily {
   /** The date this race is served for: the player's local date for a live daily. */

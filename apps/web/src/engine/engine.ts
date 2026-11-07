@@ -1,6 +1,6 @@
 // GameEngine: a thin, UI-facing wrapper over a sim Run. It owns the run, advances it lap by
 // lap, applies player calls, and reports the result. It holds no race physics of its own ,
-// everything delegates to @boxthislap/sim, so the browser shows exactly what the Worker will
+// everything delegates to @laststint/sim, so the browser shows exactly what the Worker will
 // later recompute from the same (model, seed, decisions).
 
 import {
@@ -24,7 +24,7 @@ import {
   isFinished,
   planOption,
   stepLap,
-} from '@boxthislap/sim';
+} from '@laststint/sim';
 import { type MomentJob, momentJob } from './grading.js';
 
 export class GameEngine {

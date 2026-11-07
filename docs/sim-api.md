@@ -1,4 +1,4 @@
-# `@boxthislap/sim` API
+# `@laststint/sim` API
 
 The race simulator, grader and scoring for the game. It is pure TypeScript with no browser or Node dependencies, so the same code runs in the page, in Web Workers and in the Cloudflare Worker that verifies scores.
 
@@ -7,7 +7,7 @@ The race simulator, grader and scoring for the game. It is pure TypeScript with 
 - **Working example:** [`packages/sim/examples/daily-race.ts`](../packages/sim/examples/daily-race.ts) plays a full daily race. CI runs it (`tests/example.test.ts`), so it always matches this document.
 
 ```ts
-import { initRun, stepLap, decide, answerMoment, gradeMoment, classify, scoreRun } from '@boxthislap/sim';
+import { initRun, stepLap, decide, answerMoment, gradeMoment, classify, scoreRun } from '@laststint/sim';
 ```
 
 ## How a daily race runs
@@ -93,7 +93,7 @@ Other useful parts of the model:
 - `options`: `{ id, label, decisions }[]`, 2–8 of them. An option's calls can be for a later lap ("Box next lap").
 - `realOptionId`: which option the real team took. Show it, graded, on the results screen.
 
-**Finding moments.** `pnpm --filter @boxthislap/sim moments <race-id>`:
+**Finding moments.** `pnpm --filter @laststint/sim moments <race-id>`:
 
 - Proposes moments from the race's triggers and grades each one from the real race's state.
 - Keeps genuine dilemmas: some option is more than 5 points behind the best, and the best doesn't lead by more than 30.
@@ -180,7 +180,7 @@ A run is fully defined by `(model, seed, decisions)`. Same inputs, same race, sa
 
 ## Versioning
 
-`@boxthislap/sim` follows semver; while it is 0.x, a breaking API change bumps the minor version (0.1 → 0.2). The race-model JSON has its own `schemaVersion`, bumped on any breaking change to the file. A breaking change to either is noted here.
+`@laststint/sim` follows semver; while it is 0.x, a breaking API change bumps the minor version (0.1 → 0.2). The race-model JSON has its own `schemaVersion`, bumped on any breaking change to the file. A breaking change to either is noted here.
 
 | Version | Schema | Notes |
 |---|---|---|

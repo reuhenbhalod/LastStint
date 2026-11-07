@@ -1,5 +1,5 @@
 // Grader benchmark (spec D7): the plan's budget case, 4 options x 300 samples x 25 laps.
-//   pnpm --filter @boxthislap/sim bench
+//   pnpm --filter @laststint/sim bench
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';

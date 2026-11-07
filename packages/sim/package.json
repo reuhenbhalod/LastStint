@@ -1,5 +1,5 @@
 {
-  "name": "@boxthislap/sim",
+  "name": "@laststint/sim",
   "version": "0.2.0",
   "private": true,
   "description": "Deterministic F1 race simulator \u2014 pure TS, runs in the browser and the Worker",

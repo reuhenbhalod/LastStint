@@ -14,7 +14,7 @@ import {
   type RaceNote,
   engineerConfig,
   wetnessOn,
-} from '@boxthislap/sim';
+} from '@laststint/sim';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BattleCard, type BattleStage } from '../components/BattleCard.js';
 import { Brand } from '../components/Brand.js';

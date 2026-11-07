@@ -1,4 +1,4 @@
-import { tyreLife } from '@boxthislap/sim';
+import { tyreLife } from '@laststint/sim';
 import { describe, expect, it } from 'vitest';
 import { StaticDailyProvider } from '../data/provider.js';
 import { GameEngine } from '../engine/engine.js';

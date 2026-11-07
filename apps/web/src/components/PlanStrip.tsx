@@ -2,8 +2,8 @@
 // a segment per stint in its tyre's colour with the stint's pace, and the in-lap of each stop.
 // During the race the laps already run are shaded and a marker shows where the race is.
 
-import type { RacePlan } from '@boxthislap/sim';
-import { stintStarts } from '@boxthislap/sim';
+import type { RacePlan } from '@laststint/sim';
+import { stintStarts } from '@laststint/sim';
 
 const LETTER: Record<string, string> = { push: 'Push', standard: '', manage: 'Manage' };
 const TYRE_VAR: Record<string, string> = {

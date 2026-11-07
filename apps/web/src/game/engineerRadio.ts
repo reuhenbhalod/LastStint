@@ -3,8 +3,8 @@
 // the wall going up or down. The driver's tone follows his mood: a calm driver says "good call",
 // a furious one asks whether anyone on the wall is watching.
 
-import type { EngineerConfig, Mood, RaceNote, RaceState, TrustReason } from '@boxthislap/sim';
-import { moodOf } from '@boxthislap/sim';
+import type { EngineerConfig, Mood, RaceNote, RaceState, TrustReason } from '@laststint/sim';
+import { moodOf } from '@laststint/sim';
 import { driverInfo } from '../data/drivers.js';
 
 export interface RadioLine {

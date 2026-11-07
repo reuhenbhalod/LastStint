@@ -3,7 +3,7 @@
 // While the lap runs, the order and gaps are the map's (`live`): an overtake or a stop shows
 // as it happens on track, not only when the lap is done.
 
-import type { RaceModel, RaceState } from '@boxthislap/sim';
+import type { RaceModel, RaceState } from '@laststint/sim';
 import { TEAM_COLOR } from '../game/teamTheme.js';
 import { lapTime } from '../track/geometry.js';
 import type { LiveStanding } from '../track/motion.js';

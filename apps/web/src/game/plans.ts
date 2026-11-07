@@ -12,7 +12,7 @@ import {
   type PlanId,
   type RacePlan,
   gradeFromHits,
-} from '@boxthislap/sim';
+} from '@laststint/sim';
 import type { PlanState } from '../state/machine.js';
 
 export const NO_PLAN: PlanState = {

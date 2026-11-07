@@ -3,7 +3,7 @@
 // from the user's car, so it shows what the sim is applying; a call booked for the coming lap
 // shows at once, outlined, until the lap ticks over.
 
-import type { Modes } from '@boxthislap/sim';
+import type { Modes } from '@laststint/sim';
 
 type ModeKey = keyof Modes;
 

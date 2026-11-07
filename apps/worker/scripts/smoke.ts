@@ -1,8 +1,8 @@
 // Smoke test against a running Worker: fetch today's daily and its model, play it as the game
 // does (taking the real team's call at every moment), submit it, and check the server's score.
-//   pnpm --filter @boxthislap/worker smoke [--url http://localhost:8787] [--date YYYY-MM-DD]
+//   pnpm --filter @laststint/worker smoke [--url http://localhost:8787] [--date YYYY-MM-DD]
 import { randomUUID } from 'node:crypto';
-import type { RaceModel } from '@boxthislap/sim';
+import type { RaceModel } from '@laststint/sim';
 import { playDailyRace } from '../../../packages/sim/examples/daily-race.js';
 import { todayUtc } from '../src/dates.js';
 

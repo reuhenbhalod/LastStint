@@ -5,7 +5,7 @@
 // the server grades (game/choices.ts); no chances shown (the grade comes after the call).
 // Number keys pick options, Escape backs out of the tyre choice.
 
-import { type DecisionMoment, type RaceModel, type RaceState, tyreLife } from '@boxthislap/sim';
+import { type DecisionMoment, type RaceModel, type RaceState, tyreLife } from '@laststint/sim';
 import { useEffect, useRef, useState } from 'react';
 import { named, surname } from '../data/names.js';
 import { briefFor } from '../game/brief.js';

@@ -3,7 +3,7 @@
 // clock while racing, persists/resumes the run, and talks to the Worker: "already played
 // today?" on load, and the run submission (calls + the game's grades) at the flag.
 
-import type { Decision, PlanId, RaceModel, RaceNote, RacePlan } from '@boxthislap/sim';
+import type { Decision, PlanId, RaceModel, RaceNote, RacePlan } from '@laststint/sim';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ApiError, type RunResponse, type RunSubmission, api } from '../data/api.js';
 import { anonId } from '../data/player.js';

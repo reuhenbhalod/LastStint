@@ -1,7 +1,7 @@
 // The Worker's response shapes (docs/api.md) and the calls the game makes. The client sends
 // calls and its grades, never a score; these are the server's numbers.
 
-import type { Band, ClaimedGrade, Decision, OptionGrade } from '@boxthislap/sim';
+import type { Band, ClaimedGrade, Decision, OptionGrade } from '@laststint/sim';
 import { apiGet, apiPost } from '../api.js';
 
 export { ApiError } from '../api.js';

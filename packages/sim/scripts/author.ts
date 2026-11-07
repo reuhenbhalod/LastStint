@@ -1,6 +1,6 @@
 // Moment author (races batch 1): builds a race's decision moments to the Abu Dhabi recipe and
 // keeps only real dilemmas.
-//   pnpm --filter @boxthislap/sim author <race-id> [--rival CODE] [--samples N] [--max N] [--write]
+//   pnpm --filter @laststint/sim author <race-id> [--rival CODE] [--samples N] [--max N] [--write]
 // (--max caps the graded calls: survivor races use 2.)
 //
 // Candidates, all graded from the real race's state at their lap (pauseAt):

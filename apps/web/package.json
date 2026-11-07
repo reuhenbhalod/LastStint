@@ -1,5 +1,5 @@
 {
-  "name": "@boxthislap/web",
+  "name": "@laststint/web",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@auth0/auth0-spa-js": "^2.30.0",
-    "@boxthislap/sim": "workspace:*",
+    "@laststint/sim": "workspace:*",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },

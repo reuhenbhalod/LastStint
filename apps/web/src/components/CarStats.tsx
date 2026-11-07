@@ -2,7 +2,7 @@
 // against the rival's, the pace trend over the last laps, and the gap. All from the race state
 // and the lap log (game/raceLog.ts); the tyre life from the race model's compound fit.
 
-import { type RaceModel, type RaceState, tyreLife } from '@boxthislap/sim';
+import { type RaceModel, type RaceState, tyreLife } from '@laststint/sim';
 import { surname } from '../data/names.js';
 import { tyreName } from '../game/choices.js';
 import { FUEL_SHORT, fuelReading, liftText, marginText } from '../game/fuel.js';

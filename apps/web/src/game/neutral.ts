@@ -3,8 +3,8 @@
 // status, the corner from race control); for a crash in live play, that crash. Display only:
 // the race model never sees it.
 
-import type { RaceModel, RaceNote, RaceState } from '@boxthislap/sim';
 import incidents from '@data/incidents.json';
+import type { RaceModel, RaceNote, RaceState } from '@laststint/sim';
 import { driverInfo } from '../data/drivers.js';
 
 export interface Cause {

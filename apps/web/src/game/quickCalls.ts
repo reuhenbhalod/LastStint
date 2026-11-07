@@ -9,7 +9,7 @@ import {
   type RaceModel,
   type RaceState,
   tyreLife,
-} from '@boxthislap/sim';
+} from '@laststint/sim';
 import { flagOn } from '../track/geometry.js';
 import { tyreName } from './choices.js';
 import type { LapEvents } from './raceLog.js';

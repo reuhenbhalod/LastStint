@@ -3,7 +3,7 @@
 // claimed grades were edited and the run gets its true score. Pure: the script
 // (scripts/reverify.ts) does the D1 reads and writes.
 
-import { GRADE_SAMPLES, type RaceModel, verifyRun } from '@boxthislap/sim';
+import { GRADE_SAMPLES, type RaceModel, verifyRun } from '@laststint/sim';
 import { type StoredResult, stored } from './results.js';
 
 /** An unverified run joined with its daily, as the script reads it from D1. */

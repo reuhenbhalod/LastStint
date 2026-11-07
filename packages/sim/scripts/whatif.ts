@@ -1,6 +1,6 @@
 // What-if check (realism): famous calls with a broad fan consensus, graded from the real race
 // state, to see whether the grader agrees.
-//   pnpm --filter @boxthislap/sim whatif
+//   pnpm --filter @laststint/sim whatif
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';

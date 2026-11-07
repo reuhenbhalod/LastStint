@@ -4,7 +4,7 @@
 // reds), the rival falls back to a colour that stands apart. With a red team, warnings and BOX
 // turn amber, so good news and bad never look the same.
 
-import type { RaceModel } from '@boxthislap/sim';
+import type { RaceModel } from '@laststint/sim';
 import { useEffect } from 'react';
 
 /** Each team's colour, picked to read on the dark pit-wall cards. */

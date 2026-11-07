@@ -1,5 +1,5 @@
 {
-  "name": "@boxthislap/schema",
+  "name": "@laststint/schema",
   "version": "0.0.0",
   "private": true,
   "description": "race-model JSON schema — single source of truth for the race model",

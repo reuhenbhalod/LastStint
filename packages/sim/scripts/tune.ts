@@ -18,8 +18,8 @@
 // Between calls, random play also uses the BOX button when the two-compound warning shows
 // (the last 5 laps). A stop a call makes takes out the planned stop it replaced.
 // The current seed is kept when it already passes.
-//   pnpm --filter @boxthislap/sim tune <race-id> [--seeds N] [--paths N] [--target 0.15] [--write]
-//   pnpm --filter @boxthislap/sim tune <race-id> --survivor N [--write]
+//   pnpm --filter @laststint/sim tune <race-id> [--seeds N] [--paths N] [--target 0.15] [--write]
+//   pnpm --filter @laststint/sim tune <race-id> --survivor N [--write]
 // --survivor collects up to N seeds that each pass (survivor deals one at random per run);
 // with --write it puts them in data/pools.json under survivor, instead of changing the file.
 

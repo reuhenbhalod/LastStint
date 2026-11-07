@@ -2,7 +2,7 @@
 // plans, each with its chance of beating the rival (blind playouts, no hindsight), and marks
 // the best. Pick one, or build your own from any of them. The pick is graded like a call.
 
-import type { PlanId, RaceModel, RacePlan } from '@boxthislap/sim';
+import type { PlanId, RaceModel, RacePlan } from '@laststint/sim';
 import { useEffect, useRef, useState } from 'react';
 import { surname } from '../data/names.js';
 import { chanceOf, paceLine, samePlan, stopsLine, stopsWord, tyres } from '../game/plans.js';

@@ -2,8 +2,8 @@
 // is re-graded here with full playouts. A run that matches is marked verified; one that doesn't
 // (its claimed grades were edited) gets its true score and is marked corrected.
 //
-//   pnpm --filter @boxthislap/worker reverify --remote            (what CI runs nightly)
-//   pnpm --filter @boxthislap/worker reverify --local --dry-run
+//   pnpm --filter @laststint/worker reverify --remote            (what CI runs nightly)
+//   pnpm --filter @laststint/worker reverify --local --dry-run
 //
 // A run whose daily's race file changed since it was scheduled can't be re-graded and is
 // reported and left unverified.
@@ -11,7 +11,7 @@
 import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import type { RaceModel } from '@boxthislap/sim';
+import type { RaceModel } from '@laststint/sim';
 import { modelHash } from '../src/hash.js';
 import { type UnverifiedRun, recheckRun, recheckSql } from '../src/reverify.js';
 import { type Target, query, repo, wrangler } from './d1.js';

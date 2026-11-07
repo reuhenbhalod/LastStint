@@ -1,4 +1,4 @@
-// @boxthislap/sim — public surface of the deterministic race simulator.
+// @laststint/sim — public surface of the deterministic race simulator.
 
 export * from './types.js';
 export { mulberry32, deriveSeed } from './rng.js';

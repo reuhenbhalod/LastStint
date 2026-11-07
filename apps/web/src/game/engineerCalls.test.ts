@@ -4,7 +4,7 @@
 
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { type RaceModel, answerMoment, engineerConfig, mulberry32 } from '@boxthislap/sim';
+import { type RaceModel, answerMoment, engineerConfig, mulberry32 } from '@laststint/sim';
 import { describe, expect, it } from 'vitest';
 import { GameEngine } from '../engine/engine.js';
 import { overtakingCorners } from '../track/corners.js';

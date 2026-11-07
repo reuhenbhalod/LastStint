@@ -1,6 +1,6 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import type { RaceModel } from '@boxthislap/sim';
+import type { RaceModel } from '@laststint/sim';
 import { describe, expect, it } from 'vitest';
 import { TEAM_COLOR, colourDistance, inkOn, teamTheme } from './teamTheme.js';
 

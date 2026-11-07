@@ -3,8 +3,8 @@
 // file's own seed, which is chosen so the race plays like the real one (Abu Dhabi 2021: HAM
 // reaches the lap-53 SC 11.9s ahead, so boxing isn't free; beta spec B1).
 //
-//   pnpm --filter @boxthislap/worker schedule --local --from 2026-11-01 --days 14
-//   pnpm --filter @boxthislap/worker schedule --remote --days 7 --race abu-dhabi-2021
+//   pnpm --filter @laststint/worker schedule --local --from 2026-11-01 --days 14
+//   pnpm --filter @laststint/worker schedule --remote --days 7 --race abu-dhabi-2021
 //
 // Options:
 //   --local | --remote     which D1 to write (one is required)

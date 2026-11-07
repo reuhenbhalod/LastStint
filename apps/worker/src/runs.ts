@@ -3,7 +3,7 @@
 // On the free plan (10 ms CPU) the run is scored from the grades the game claims, checked for
 // shape; a nightly job re-grades it with full playouts (scripts/reverify.ts, beta spec B6).
 
-import { GRADE_SAMPLES, type VerifiedRun, VerifyError, verifyRun } from '@boxthislap/sim';
+import { GRADE_SAMPLES, type VerifiedRun, VerifyError, verifyRun } from '@laststint/sim';
 import { isDate, isSubmittable } from './dates.js';
 import {
   type DailyRow,

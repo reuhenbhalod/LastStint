@@ -2,7 +2,7 @@
 // next stop, its chance now), the heads-up the lap before a planned stop (D6), and the
 // engineer's offer when another plan has pulled clear (D5).
 
-import type { RaceModel, RacePlan } from '@boxthislap/sim';
+import type { RaceModel, RacePlan } from '@laststint/sim';
 import { useEffect, useState } from 'react';
 import { surname } from '../data/names.js';
 import { chanceOf, paceLine, remainder, stopsWord, tyres } from '../game/plans.js';

@@ -4,7 +4,7 @@
 // with no stop, are offered as they are. The options themselves, which the server grades,
 // are unchanged.
 
-import type { DecisionMoment, MomentOption } from '@boxthislap/sim';
+import type { DecisionMoment, MomentOption } from '@laststint/sim';
 
 export interface BoxChoice {
   /** 'now' boxes on the moment's lap, 'next' a lap later. */

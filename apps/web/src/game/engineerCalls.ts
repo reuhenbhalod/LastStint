@@ -28,7 +28,7 @@ import {
   tyreLife,
   wetPenalty,
   wetnessOn,
-} from '@boxthislap/sim';
+} from '@laststint/sim';
 import { driverInfo } from '../data/drivers.js';
 import type { CornerKind } from '../track/battle.js';
 import { lapTime } from '../track/geometry.js';

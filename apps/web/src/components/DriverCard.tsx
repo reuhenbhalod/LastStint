@@ -2,7 +2,7 @@
 // gaps, tyres, stops this race, last lap, and (for your car) the headset modes, plus where
 // they really finished.
 
-import type { RaceModel, RaceState } from '@boxthislap/sim';
+import type { RaceModel, RaceState } from '@laststint/sim';
 import { useEffect } from 'react';
 import { driverInfo } from '../data/drivers.js';
 import type { LapEvents } from '../game/raceLog.js';

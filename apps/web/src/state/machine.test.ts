@@ -1,4 +1,4 @@
-import type { DecisionMoment, RaceResult, RaceState } from '@boxthislap/sim';
+import type { DecisionMoment, RaceResult, RaceState } from '@laststint/sim';
 import { describe, expect, it } from 'vitest';
 import { NO_PLAN } from '../game/plans.js';
 import { type GameState, type Phase, reducer } from './machine.js';

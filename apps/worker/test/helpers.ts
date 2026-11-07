@@ -1,5 +1,5 @@
 import { SELF, env } from 'cloudflare:test';
-import type { Decision, RaceModel } from '@boxthislap/sim';
+import type { Decision, RaceModel } from '@laststint/sim';
 import abuJson from '../../../data/races/abu-dhabi-2021.json';
 import { playDailyRace } from '../../../packages/sim/examples/daily-race.js';
 import { todayUtc } from '../src/dates.js';

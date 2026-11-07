@@ -4,8 +4,8 @@
 // your driver has a team-mate in the race, team orders. Every order is for the coming lap,
 // and the driver may refuse a pit or headset call (game/refusal.ts).
 
-import type { Decision, Modes, RaceModel, RaceState, TeamOrder } from '@boxthislap/sim';
-import { teammateOf } from '@boxthislap/sim';
+import type { Decision, Modes, RaceModel, RaceState, TeamOrder } from '@laststint/sim';
+import { teammateOf } from '@laststint/sim';
 import { useState } from 'react';
 import { surname } from '../data/names.js';
 import { tyreName } from '../game/choices.js';

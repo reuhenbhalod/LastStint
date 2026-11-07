@@ -1,5 +1,5 @@
 {
-  "name": "@boxthislap/worker",
+  "name": "@laststint/worker",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -20,7 +20,7 @@
     "tickets:seed:remote": "tsx scripts/tickets-seed.ts && wrangler d1 execute pitwall-db --remote --file data/tickets-seed.sql"
   },
   "dependencies": {
-    "@boxthislap/sim": "workspace:*",
+    "@laststint/sim": "workspace:*",
     "hono": "^4.6.14"
   },
   "devDependencies": {

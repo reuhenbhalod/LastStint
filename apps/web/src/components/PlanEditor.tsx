@@ -8,7 +8,7 @@ import {
   type PaceMode,
   type RaceModel,
   type RacePlan,
-} from '@boxthislap/sim';
+} from '@laststint/sim';
 import { PACE_WORD, stintsOk, tyres } from '../game/plans.js';
 import { PlanStrip } from './PlanStrip.js';
 

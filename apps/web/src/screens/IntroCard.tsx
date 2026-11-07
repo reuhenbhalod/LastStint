@@ -4,7 +4,7 @@
 // bar has the brand, your streak and sign-in. The how-to-play walkthrough opens over it on a
 // fresh visit; coming back mid-race (the Pit Wall brand), Start becomes "Back to the race".
 
-import type { RaceModel } from '@boxthislap/sim';
+import type { RaceModel } from '@laststint/sim';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { takeHowToPending } from '../account/howTo.js';
 import type { AccountState } from '../account/useAccount.js';

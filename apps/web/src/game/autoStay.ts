@@ -4,7 +4,7 @@
 // Derived from the call log alone (the calls made before the moment's pause), so the game and
 // the results screen always agree.
 
-import type { Decision, DecisionMoment } from '@boxthislap/sim';
+import type { Decision, DecisionMoment } from '@laststint/sim';
 
 export const AUTO_STAY_LAPS = 5;
 

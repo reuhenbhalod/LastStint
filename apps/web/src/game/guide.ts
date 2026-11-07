@@ -3,7 +3,7 @@
 // sim's lap-time model (cleanLap) for what fresh tyres would gain, and the headset modes'
 // effects. Lap time only: the grade still weighs the stop, traffic and passing.
 
-import { type CarState, type RaceModel, cleanLap, modeEffects, tyreLife } from '@boxthislap/sim';
+import { type CarState, type RaceModel, cleanLap, modeEffects, tyreLife } from '@laststint/sim';
 
 export interface TyreOutlook {
   compound: string;

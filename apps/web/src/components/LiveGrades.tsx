@@ -4,7 +4,7 @@
 // whose grade is still running says so. The running score is the same average the results
 // screen shows.
 
-import { BAND_POINTS, type Band } from '@boxthislap/sim';
+import { BAND_POINTS, type Band } from '@laststint/sim';
 import { autoStay } from '../game/autoStay.js';
 import { planGrade, stopsWord } from '../game/plans.js';
 import type { GameState } from '../state/machine.js';
