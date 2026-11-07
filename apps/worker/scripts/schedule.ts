@@ -10,7 +10,7 @@
 //   --local | --remote     which D1 to write (one is required)
 //   --from YYYY-MM-DD      first date (default: today, UTC)
 //   --days N               how many dates (default 1)
-//   --race ID              schedule this race on every date (default: rotate eligible races)
+//   --race ID              schedule this race on every date (default: shuffle eligible races)
 //   --allow-ineligible     allow races that aren't eligible (local only, for testing)
 //   --dry-run              print the plan without writing
 //
@@ -22,11 +22,13 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { addDays, isDate, todayUtc } from '../src/dates.js';
 import { modelHash } from '../src/hash.js';
+import { pickRaces } from '../src/shuffle.js';
 import { type Target, wrangler as d1, query as d1Query, repo, sqlString } from './d1.js';
 
 interface Model {
   race: { id: string; seed: number };
   userSide: string;
+  rival?: string;
   decisionMoments: unknown[];
 }
 
@@ -149,21 +151,23 @@ async function main() {
     'SELECT date, number, race_id FROM daily ORDER BY number',
   );
   const taken = new Set(existing.map((r) => r.date));
-  let number = existing.reduce((n, r) => Math.max(n, r.number), 0);
-  // Rotate from the race after the last one scheduled.
-  const lastRace = existing.at(-1)?.race_id;
-  let next = lastRace && pool.includes(lastRace) ? pool.indexOf(lastRace) + 1 : 0;
-
-  const rows: string[] = [];
   const plan: string[] = [];
-  const now = new Date().toISOString();
+  let number = existing.reduce((n, r) => Math.max(n, r.number), 0);
+  const open: string[] = [];
   for (let i = 0; i < args.days; i++) {
     const date = addDays(args.from, i);
-    if (taken.has(date)) {
-      plan.push(`${date}  already scheduled, skipped`);
-      continue;
-    }
-    const id = pool[next++ % pool.length] as string;
+    if (taken.has(date)) plan.push(`${date}  already scheduled, skipped`);
+    else open.push(date);
+  }
+  const facts = pool.map((id) => {
+    const m = models.get(id) as Model;
+    return { id, userSide: m.userSide, rival: m.rival };
+  });
+  const existingDays = existing.map((r) => ({ date: r.date, raceId: r.race_id }));
+
+  const rows: string[] = [];
+  const now = new Date().toISOString();
+  for (const { date, raceId: id } of pickRaces(facts, existingDays, open)) {
     const model = models.get(id) as Model;
     const seed = model.race.seed;
     number++;
@@ -182,7 +186,7 @@ async function main() {
     plan.push(`${date}  #${number}  ${id}  seed ${seed}  ${model.userSide}  ${hash.slice(0, 12)}`);
   }
 
-  console.log(plan.join('\n'));
+  console.log(plan.sort().join('\n'));
   if (args.dryRun || rows.length === 0) {
     console.log(args.dryRun ? '(dry run: nothing written)' : 'nothing to write');
     return;
