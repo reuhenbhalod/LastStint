@@ -10,7 +10,7 @@ import { useState } from 'react';
 import { surname } from '../data/names.js';
 import { tyreName } from '../game/choices.js';
 import { HeadsetPanel } from './HeadsetPanel.js';
-import { HeadsetIcon } from './Icons.js';
+import { RadioMark } from './Marks.js';
 
 const LETTER: Record<string, string> = { SOFT: 'S', MEDIUM: 'M', HARD: 'H' };
 
@@ -70,7 +70,7 @@ export function TeamRadio({
         className="flex w-full flex-wrap items-center gap-x-3 gap-y-1 text-left"
       >
         <span className="disp flex items-center gap-2 text-[17px] leading-none">
-          <HeadsetIcon size={18} className="text-[var(--you)]" /> Team radio
+          <RadioMark size={20} className="text-[var(--you)]" /> Team radio
         </span>
         <span className="text-[12px] text-[var(--muted)]">Orders for next lap</span>
         <span className="ml-auto flex flex-wrap items-center gap-1.5 text-[12px] capitalize">

@@ -5,6 +5,7 @@
 import type { RaceModel, RaceState } from '@laststint/sim';
 import { TEAM_COLOR } from '../game/teamTheme.js';
 import type { LiveStanding } from '../track/motion.js';
+import { TimingMark } from './Marks.js';
 
 const TOP = 10;
 
@@ -83,7 +84,10 @@ export function LeadersTower({
       className="w-[168px] overflow-hidden rounded bg-[#0B0E0D]/88 shadow-xl backdrop-blur-sm"
     >
       <div className="flex items-center justify-between bg-[#EEF1EF] px-2.5 py-1 text-[#0B0E0D]">
-        <span className="disp text-[11px]">Lap {race.lap}</span>
+        <span className="disp flex items-center gap-1 text-[11px]">
+          <TimingMark size={11} className="text-[var(--you)]" />
+          Lap {race.lap}
+        </span>
         <span className="mono text-[10px] font-bold">/{model.race.laps}</span>
       </div>
       <ol className="m-0 list-none p-0">{top.map((r, i) => row(r, i + 1))}</ol>
