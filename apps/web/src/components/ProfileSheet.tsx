@@ -1,5 +1,5 @@
 // The player's profile (docs/auth0-spec.md A4): a display name for the leaderboards and a
-// favourite team, whose colour themes the home page. Asked after a first sign-in, and from
+// favourite team, whose colour the top bar's buttons take. Asked after a first sign-in, and from
 // "Edit profile" in the account bar.
 
 import { useEffect, useRef, useState } from 'react';

@@ -7,7 +7,7 @@ import { AdminPage } from './admin/AdminPage.js';
 import { adminToken } from './admin/session.js';
 import { ProfileSheet } from './components/ProfileSheet.js';
 import { ApiDailyProvider, RaceFileProvider } from './data/provider.js';
-import { useTeamTheme } from './game/teamTheme.js';
+import { useFavouriteColour, useTeamTheme } from './game/teamTheme.js';
 import { useGame } from './game/useGame.js';
 import { HowItWorks } from './screens/HowItWorks.js';
 import { IntroCard } from './screens/IntroCard.js';
@@ -41,10 +41,10 @@ function Game() {
   const [help, setHelp] = useState(false);
   // The home page mid-race (the Pit Wall brand): the race holds until you go back to it.
   const [home, setHome] = useState(false);
-  // The race in the driver's team colours (game/teamTheme.ts); the home page in the player's
-  // favourite team's, if they have one.
-  const onHome = home || game.state?.phase === 'intro';
-  useTeamTheme(game.model, onHome ? account.player?.account?.favouriteTeam : null);
+  // The race, and its card on the home page, in the colours of the team you race for
+  // (game/teamTheme.ts); only the top bar's buttons take the player's favourite team's.
+  useTeamTheme(game.model);
+  useFavouriteColour(account.player?.account?.favouriteTeam);
   const { setHold } = game;
   const goHome = useCallback(() => {
     setHold(true);

@@ -99,16 +99,13 @@ const THEMED = [
 ];
 
 /**
- * Put the race's team colours on the page while `model` is shown (the defaults after).
- * `favourite`: the player's favourite team (docs/auth0-spec.md A4), whose colour takes the
- * accent instead (the home page).
+ * Put the race's team colours on the page while `model` is shown (the defaults after): the
+ * colours of the team you race for, everywhere, the home page's race card included.
  */
-export function useTeamTheme(model: RaceModel | null | undefined, favourite?: string | null): void {
+export function useTeamTheme(model: RaceModel | null | undefined): void {
   useEffect(() => {
     if (!model) return;
-    const race = teamTheme(model);
-    const fav = favourite ? TEAM_COLOR[favourite] : undefined;
-    const t = fav ? { ...race, you: fav, youInk: inkOn(fav) } : race;
+    const t = teamTheme(model);
     const root = document.documentElement.style;
     root.setProperty('--you', t.you);
     root.setProperty('--you-ink', t.youInk);
@@ -122,5 +119,21 @@ export function useTeamTheme(model: RaceModel | null | undefined, favourite?: st
     return () => {
       for (const v of THEMED) root.removeProperty(v);
     };
-  }, [model, favourite]);
+  }, [model]);
+}
+
+/**
+ * The player's favourite team (docs/auth0-spec.md A4) as `--fav`: only the top bar's buttons
+ * use it, each falling back to its usual colour when there is no favourite.
+ */
+export function useFavouriteColour(favourite: string | null | undefined): void {
+  useEffect(() => {
+    const fav = favourite ? TEAM_COLOR[favourite] : undefined;
+    if (!fav) return;
+    const root = document.documentElement.style;
+    root.setProperty('--fav', fav);
+    return () => {
+      root.removeProperty('--fav');
+    };
+  }, [favourite]);
 }

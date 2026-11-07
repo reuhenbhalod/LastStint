@@ -237,7 +237,7 @@ export function IntroCard({
             {source !== 'survivor' && (
               <a
                 href="/gauntlet"
-                className="rounded-full border border-[var(--box)] px-3 py-1 text-[13px] font-semibold text-[var(--ink)] hover:bg-[color-mix(in_srgb,var(--box)_14%,transparent)]"
+                className="rounded-full border border-[var(--fav,var(--box))] bg-[color-mix(in_srgb,var(--fav,transparent)_12%,transparent)] px-3 py-1 text-[13px] font-semibold text-[var(--ink)] hover:bg-[color-mix(in_srgb,var(--fav,var(--box))_22%,transparent)]"
               >
                 Gauntlet
               </a>

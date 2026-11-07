@@ -91,7 +91,7 @@ export interface Account {
   email: string;
   /** The leaderboard name ('' until set; docs/auth0-spec.md A4). */
   displayName?: string;
-  /** The favourite team ('' until set): its colour themes the home page. */
+  /** The favourite team ('' until set): its colour is the top bar's buttons'. */
   favouriteTeam?: string;
   /** No display name yet: the game asks for the profile. */
   needsProfile?: boolean;
