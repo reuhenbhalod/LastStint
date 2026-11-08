@@ -141,3 +141,26 @@ def test_monaco_1984_places_the_disqualified_bellof_on_the_road():
 @pytest.mark.parametrize("race_id", [r for r in RACES if r != "monaco-1984"])
 def test_no_other_race_places_a_car_on_the_road(race_id):
     assert not rc.load_facts(race_id).get("roadPositions")
+
+
+@pytest.mark.parametrize("race_id", RACES)
+def test_lap_leaders_cover_the_race_from_lap_one(race_id):
+    """Every race has its sourced lap-leader chart, lap 1 to the end with no gap."""
+    spans = sorted(rc.load_facts(race_id)["lapLeaders"], key=lambda s: s["fromLap"])
+    assert spans and spans[0]["fromLap"] == 1
+    for a, b in zip(spans, spans[1:], strict=False):
+        assert b["fromLap"] == a["toLap"] + 1
+    assert all("wikipedia.org" in s["source"] for s in spans)
+
+
+@pytest.mark.parametrize("race_id", RACES)
+def test_running_order_names_cars_and_laps_in_the_race(race_id):
+    dump = _dump()
+    if dump is None:
+        pytest.skip("no Jolpica dump cached")
+    anchors = rc.load_anchors(race_id, dump_dir=dump, **LOOKUP.get(race_id, {}))
+    facts = rc.load_facts(race_id)
+    assert anchors.leaders[-1].end == anchors.laps
+    assert sum(s.end - s.start + 1 for s in anchors.leaders) == anchors.laps
+    assert len(anchors.snapshots) == len(facts.get("runningOrder") or [])
+    assert not [n for n in anchors.notes if "lapLeaders" in n or "runningOrder" in n]

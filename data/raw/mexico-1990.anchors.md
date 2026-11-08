@@ -13,19 +13,22 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 | laps down | 10 | 10 |
 | stop | 3 | 3 |
 | safety car | 1 | 1 |
+| leader | 2 | 2 |
+| running order | 11 | 11 |
+| lap gap | 3 | 3 |
 
 | Anchor | Subject | Target | Achieved | Pass |
 |---|---|---|---|---|
-| grid | lap-1 order is the grid order | 26 cars: BER PAT SENA MAN BOUT ALE MAR PIQN NAKS MOD WAR DON PRO NAN DEC BARP ALBM PIR SUZ GROO BRA ALL FOI LAR BEN JAR | 26 cars: BER PAT SENA MAN BOUT ALE MAR PIQN NAKS MOD WAR DON PRO NAN DEC BARP ALBM PIR SUZ GROO BRA ALL FOI LAR BEN JAR | pass |
+| grid | lap-1 order is the grid order (the sourced lap-1 order at the front) | 26 cars: SENA BER PAT MAN BOUT ALE MAR PIQN NAKS MOD WAR DON PRO NAN DEC BARP ALBM PIR SUZ GROO BRA ALL FOI LAR BEN JAR | 26 cars: SENA BER PAT MAN BOUT ALE MAR PIQN NAKS MOD WAR DON PRO NAN DEC BARP ALBM PIR SUZ GROO BRA ALL FOI LAR BEN JAR | pass |
 | order | classification | 20 cars: PRO MAN BER NAN BOUT PIQN ALE DON PAT WAR MOD MAR DEC BARP FOI LAR ALBM ALL GROO SENA | 20 cars: PRO MAN BER NAN BOUT PIQN ALE DON PAT WAR MOD MAR DEC BARP FOI LAR ALBM ALL GROO SENA | pass |
-| gap | MAN | 25.351 | 25.35 | pass |
-| gap | BER | 25.53 | 25.532 | pass |
+| gap | MAN | 25.351 | 25.344 | pass |
+| gap | BER | 25.53 | 25.529 | pass |
 | gap | NAN | 41.099 | 41.098 | pass |
-| gap | BOUT | 46.669 | 46.668 | pass |
-| gap | PIQN | 46.943 | 46.938 | pass |
-| gap | ALE | 49.077 | 49.073 | pass |
-| gap | DON | 66.142 | 66.138 | pass |
-| gap | PAT | 69.918 | 69.918 | pass |
+| gap | BOUT | 46.669 | 46.665 | pass |
+| gap | PIQN | 46.943 | 46.939 | pass |
+| gap | ALE | 49.077 | 49.076 | pass |
+| gap | DON | 66.142 | 66.137 | pass |
+| gap | PAT | 69.918 | 69.915 | pass |
 | fastest | PRO | [77.958, 58] | [77.958, 58] | pass |
 | fastest | MAN | [78.487, 62] | [78.487, 62] | pass |
 | fastest | BER | [78.223, 65] | [78.223, 65] | pass |
@@ -80,12 +83,28 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 | stop | PIQN | 44 | 44 | pass |
 | stop | ALL | 12 | 12 | pass |
 | safety car | leader's SC laps, sourced | [] | [] | pass |
+| leader | SENA laps 1-60 | 60 laps | 60 of 60 laps | pass |
+| leader | PRO laps 61-69 | 9 laps | 9 of 9 laps | pass |
+| running order | lap 12 | ["SENA", "BER"] | ["SENA", "BER"] | pass |
+| running order | lap 20 | ["SENA", "PIQN"] | ["SENA", "PIQN"] | pass |
+| lap gap | PIQN at lap 20 (+/-1.5s) | 15.0 | 14.397 | pass |
+| running order | lap 14 | ["SENA", "PIQN"] | ["SENA", "PIQN"] | pass |
+| running order | lap 30 | ["SENA", "PIQN"] | ["SENA", "PIQN"] | pass |
+| running order | lap 35 | ["SENA", "PIQN", "MAN", "PRO"] | ["SENA", "PIQN", "MAN", "PRO"] | pass |
+| running order | lap 36 | ["SENA", "PIQN", "MAN", "PRO"] | ["SENA", "PIQN", "MAN", "PRO"] | pass |
+| running order | lap 37 | ["SENA", "MAN", "PIQN", "PRO"] | ["SENA", "MAN", "PIQN", "PRO"] | pass |
+| running order | lap 42 | ["SENA", "MAN", "PRO", "PIQN"] | ["SENA", "MAN", "PRO", "PIQN"] | pass |
+| running order | lap 48 | ["SENA", "MAN"] | ["SENA", "MAN"] | pass |
+| lap gap | MAN at lap 48 (+/-1s) | 12.2 | 12.598 | pass |
+| running order | lap 55 | ["SENA", "PRO", "MAN"] | ["SENA", "PRO", "MAN"] | pass |
+| running order | lap 62 | ["PRO"] | ["PRO"] | pass |
+| lap gap | SENA at lap 62 (+/-1.5s) | 8.0 | 7.397 | pass |
 
 ## Estimated
 
 - Every lap time and lap-end Time is synthetic: solved to the anchors, not measured
-- Position each lap follows from the synthetic times; the lap-1 order is the grid order
-- Lap times in between the anchors: pace + tyre wear + fuel + seeded noise
+- Position each lap follows from the synthetic times; the lap-1 order is the grid order, with the sourced lap-1 order at the front; each lap's leader and the sourced snapshots of the order and gaps are anchors, the rest of the order is estimated
+- Lap times in between the anchors: pace + tyre wear + fuel + seeded noise, the pace moved by a constant between the laps the sourced order marks
 - Fuel: 0.06s per lap of fuel on board; full tank at the start
 - Stop loss: pit-lane time - 5.0s, 35% on the in-lap
 - PitInTime is the in-lap's end; PitOutTime adds the out-lap's share of the lane time
@@ -96,3 +115,6 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 ## Notes
 
 - MOE: disqualified without a lap (Disqualified); left out
+- PRO: target 5555.8s not reachable
+- MAN: target 5581.1s not reachable
+- BER: target 5581.3s not reachable

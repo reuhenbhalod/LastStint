@@ -23,5 +23,54 @@
     "stops": false,
     "safetyCars": true
   },
+  "lapLeaders": [
+    {
+      "driver": "PAT",
+      "name": "Riccardo Patrese",
+      "fromLap": 1,
+      "toLap": 38,
+      "source": "https://en.wikipedia.org/wiki/1992_Hungarian_Grand_Prix (lap-leader chart, Template:F1Laps1992 'HUN')"
+    },
+    {
+      "driver": "SENA",
+      "name": "Ayrton Senna",
+      "fromLap": 39,
+      "toLap": 77,
+      "source": "https://en.wikipedia.org/wiki/1992_Hungarian_Grand_Prix (lap-leader chart, Template:F1Laps1992 'HUN')"
+    }
+  ],
+  "runningOrder": [
+    {
+      "lap": 8,
+      "order": [
+        "PAT",
+        "SENA",
+        "MAN",
+        "BER"
+      ],
+      "source": "https://en.wikipedia.org/wiki/1992_Hungarian_Grand_Prix: 'Mansell passed Berger on lap 8 and set off after Senna'",
+      "note": "Patrese leads laps 1-38 (lap chart); Senna second ahead of Mansell from the same sentence"
+    },
+    {
+      "lap": 31,
+      "order": [
+        "PAT",
+        "SENA",
+        "BER",
+        "MAN"
+      ],
+      "source": "https://en.wikipedia.org/wiki/1992_Hungarian_Grand_Prix: 'On lap 31, Mansell made a mistake and went wide and rejoined behind Berger'"
+    },
+    {
+      "lap": 33,
+      "order": [
+        "PAT",
+        "SENA",
+        "MAN",
+        "BER"
+      ],
+      "source": "https://en.wikipedia.org/wiki/1992_Hungarian_Grand_Prix: 'Two laps later, Mansell passed Berger to get back third.'"
+    }
+  ],
   "notes": "Everyone planned to run non-stop on the resurfaced track (Motor Sport). The lap-14 multi-car crash showed the SC board but no safety car ran (Wikipedia); before 1993 none can be entered anyway."
 }

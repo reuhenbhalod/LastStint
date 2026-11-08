@@ -13,8 +13,8 @@
  },
  "estimates": [
   "Every lap time and lap-end Time is synthetic: solved to the anchors, not measured",
-  "Position each lap follows from the synthetic times; the lap-1 order is the grid order",
-  "Lap times in between the anchors: pace + tyre wear + fuel + seeded noise",
+  "Position each lap follows from the synthetic times; the lap-1 order is the grid order, with the sourced lap-1 order at the front; each lap's leader and the sourced snapshots of the order and gaps are anchors, the rest of the order is estimated",
+  "Lap times in between the anchors: pace + tyre wear + fuel + seeded noise, the pace moved by a constant between the laps the sourced order marks",
   "Fuel: 0.06s per lap of fuel on board; full tank at the start",
   "Stop loss: pit-lane time - 5.0s, 35% on the in-lap",
   "PitInTime is the in-lap's end; PitOutTime adds the out-lap's share of the lane time",
@@ -42,6 +42,7 @@
   "GHI"
  ],
  "roadPositions": [],
+ "lastLapStops": [],
  "stopsComplete": false,
  "safetyCarsComplete": true,
  "params": {
@@ -60,6 +61,11 @@
   "sc_gap": 0.8,
   "sc_iterations": 12,
   "order_gap": 0.5,
+  "lead_margin": 1.0,
+  "lap_gap_tolerance": 1.0,
+  "order_iterations": 6,
+  "pace_weight": 0.05,
+  "pack_weight": 1.0,
   "gap_tolerance": 2.0,
   "attempts": 6,
   "refuel": null
@@ -89,10 +95,10 @@
    "target": 7228.506
   },
   "DEA": {
-   "pace": 80.005,
+   "pace": 80.596,
    "wear": 0.0,
    "noise": 0.175,
-   "target": 7255.365
+   "target": 7305.713
   },
   "MAN": {
    "pace": 80.971,
@@ -131,94 +137,94 @@
    "target": 7228.506
   },
   "LAU": {
-   "pace": 81.187,
+   "pace": 81.844,
    "wear": 0.0,
    "noise": 0.175,
-   "target": 5441.592
+   "target": 5482.168
   },
   "CHE": {
-   "pace": 82.15,
+   "pace": 82.282,
    "wear": 0.0,
    "noise": 0.175,
-   "target": 4002.277
+   "target": 4008.059
   },
   "PRO": {
-   "pace": 79.379,
-   "wear": 0.025,
-   "noise": 0.175,
-   "target": 3209.566
+   "pace": 80.181,
+   "wear": 0.05,
+   "noise": 0.262,
+   "target": 3251.544
   },
   "DEC": {
-   "pace": 83.349,
-   "wear": 0.025,
+   "pace": 83.101,
+   "wear": 0.05,
    "noise": 0.175,
-   "target": 3238.668
+   "target": 3243.037
   },
   "PIQN": {
-   "pace": 84.758,
+   "pace": 84.819,
    "wear": 0.05,
    "noise": 0.175,
-   "target": 3186.707
+   "target": 3188.707
   },
   "BOUT": {
-   "pace": 83.059,
+   "pace": 83.185,
    "wear": 0.05,
    "noise": 0.175,
-   "target": 3126.38
+   "target": 3130.509
   },
   "BRU": {
-   "pace": 82.511,
+   "pace": 82.692,
    "wear": 0.05,
    "noise": 0.175,
-   "target": 2235.699
+   "target": 2239.794
   },
   "BAL": {
-   "pace": 87.519,
+   "pace": 87.566,
    "wear": 0.05,
    "noise": 0.175,
-   "target": 2241.128
+   "target": 2242.128
   },
   "ROSK": {
-   "pace": 80.262,
-   "wear": 0.075,
-   "noise": 0.175,
-   "target": 1750.349
+   "pace": 82.399,
+   "wear": 0.0,
+   "noise": 0.7,
+   "target": 1773.766
   },
   "LAF": {
-   "pace": 83.982,
-   "wear": 0.075,
-   "noise": 0.175,
-   "target": 1720.418
+   "pace": 84.357,
+   "wear": 0.05,
+   "noise": 0.262,
+   "target": 1723.42
   },
   "BER": {
-   "pace": 82.48,
-   "wear": 0.075,
-   "noise": 0.175,
-   "target": 1366.965
+   "pace": 82.946,
+   "wear": 0.05,
+   "noise": 0.35,
+   "target": 1371.109
   },
   "MAR": {
-   "pace": 88.535,
+   "pace": 88.615,
    "wear": 0.05,
    "noise": 0.175,
-   "target": 1453.434
+   "target": 1454.434
   },
   "PAT": {
-   "pace": 85.061,
+   "pace": 85.512,
    "wear": 0.05,
-   "noise": 0.35,
-   "target": 505.34
+   "noise": 0.7,
+   "target": 506.831
   },
   "ALL": {
-   "pace": 84.301,
-   "wear": 0.05,
-   "noise": 0.35,
-   "target": 395.643
+   "pace": 85.19,
+   "wear": 0.0,
+   "noise": 1.05,
+   "target": 396.958
   },
   "HES": {
-   "pace": 86.926,
-   "wear": 0.075,
-   "noise": 0.175,
-   "target": 401.494
+   "pace": 87.914,
+   "wear": 0.0,
+   "noise": 0.525,
+   "target": 402.494
   },
   "PALJ": {
    "pace": 136.515,
@@ -261,6 +267,18 @@
    "total": 1
   },
   "safety car": {
+   "pass": 1,
+   "total": 1
+  },
+  "leader": {
+   "pass": 1,
+   "total": 1
+  },
+  "running order": {
+   "pass": 1,
+   "total": 1
+  },
+  "lap gap": {
    "pass": 1,
    "total": 1
   }
@@ -358,7 +376,7 @@
    "anchor": "gap",
    "subject": "ALBM",
    "target": 62.978,
-   "achieved": 62.976,
+   "achieved": 62.985,
    "pass": true
   },
   {
@@ -993,6 +1011,33 @@
    "subject": "leader's SC laps, sourced",
    "target": [],
    "achieved": [],
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "SENA laps 1-67",
+   "target": "67 laps",
+   "achieved": "67 of 67 laps",
+   "pass": true
+  },
+  {
+   "anchor": "running order",
+   "subject": "lap 20",
+   "target": [
+    "SENA",
+    "DEA"
+   ],
+   "achieved": [
+    "SENA",
+    "DEA"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "lap gap",
+   "subject": "DEA at lap 20 (+/-3s)",
+   "target": 30.0,
+   "achieved": 28.802,
    "pass": true
   }
  ],

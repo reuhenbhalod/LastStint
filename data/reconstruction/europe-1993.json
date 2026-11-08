@@ -122,7 +122,6 @@
     "stops": false,
     "safetyCars": false
   },
-  "notes": "Stop counts: Senna 5 pit calls incl. the drive-through (Motor Sport; Wikipedia says four stops), Hill 6, Prost 7, Herbert 1 (slicks after about lap 10), Barrichello at least 4. Missing laps: Senna's late wet stop and one more, Hill's other 4, Prost's other 3, Herbert's one, Barrichello's later ones. No safety car is mentioned in Wikipedia, Motor Sport or GrandPrix.com (https://www.grandprix.com/gpe/rr535.html), but no source states there was none: safetyCars left incomplete for the owner to confirm. Weather: Senna's wet stop between his lap-18 and lap-34 slick stops (GPE: 'Senna stayed out for four more laps' after Hill's lap-24 wet stop, so about lap 28) and his closing-laps wet stop ('10 laps to go') have no exact lap, so he runs slicks through those showers; Prost's lap-48/53 stops and Hill's later stops have no tyre, so those stints are estimated.",
   "weather": {
     "timeline": [
       {
@@ -196,5 +195,91 @@
         "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked (Lehto started from the pit lane on slicks)"
       }
     ]
-  }
+  },
+  "lapLeaders": [
+    {
+      "driver": "SENA",
+      "name": "Ayrton Senna",
+      "fromLap": 1,
+      "toLap": 18,
+      "source": "https://en.wikipedia.org/wiki/1993_European_Grand_Prix (lap-leader chart, Template:F1Laps1993 'EUR')"
+    },
+    {
+      "driver": "PRO",
+      "name": "Alain Prost",
+      "fromLap": 19,
+      "toLap": 19,
+      "source": "https://en.wikipedia.org/wiki/1993_European_Grand_Prix (lap-leader chart, Template:F1Laps1993 'EUR')"
+    },
+    {
+      "driver": "SENA",
+      "name": "Ayrton Senna",
+      "fromLap": 20,
+      "toLap": 34,
+      "source": "https://en.wikipedia.org/wiki/1993_European_Grand_Prix (lap-leader chart, Template:F1Laps1993 'EUR')"
+    },
+    {
+      "driver": "PRO",
+      "name": "Alain Prost",
+      "fromLap": 35,
+      "toLap": 38,
+      "source": "https://en.wikipedia.org/wiki/1993_European_Grand_Prix (lap-leader chart, Template:F1Laps1993 'EUR')"
+    },
+    {
+      "driver": "SENA",
+      "name": "Ayrton Senna",
+      "fromLap": 39,
+      "toLap": 76,
+      "source": "https://en.wikipedia.org/wiki/1993_European_Grand_Prix (lap-leader chart, Template:F1Laps1993 'EUR')"
+    }
+  ],
+  "runningOrder": [
+    {
+      "lap": 5,
+      "order": [
+        "SENA",
+        "PRO",
+        "HIL",
+        "BAR"
+      ],
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked: 'Hill moved to within a second and a half of him' ... 'for the first 18 laps that was how the front of the field remained.'; 'Barrichello thus settled down in fourth place at the end of the first lap.' ... 'though he dropped to fifth behind Alesi after his own slick call on lap 19'",
+      "note": "the front of the field Senna, Prost, Hill through lap 18 (Hill stopped at the end of lap 17); Barrichello fourth from lap 1 until his lap-19 stop"
+    },
+    {
+      "lap": 10,
+      "order": [
+        "SENA",
+        "PRO",
+        "HIL",
+        "BAR"
+      ],
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked: 'Hill moved to within a second and a half of him' ... 'for the first 18 laps that was how the front of the field remained.'; 'Barrichello thus settled down in fourth place at the end of the first lap.' ... 'though he dropped to fifth behind Alesi after his own slick call on lap 19'",
+      "note": "the front of the field Senna, Prost, Hill through lap 18 (Hill stopped at the end of lap 17); Barrichello fourth from lap 1 until his lap-19 stop"
+    },
+    {
+      "lap": 15,
+      "order": [
+        "SENA",
+        "PRO",
+        "HIL",
+        "BAR"
+      ],
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked: 'Hill moved to within a second and a half of him' ... 'for the first 18 laps that was how the front of the field remained.'; 'Barrichello thus settled down in fourth place at the end of the first lap.' ... 'though he dropped to fifth behind Alesi after his own slick call on lap 19'",
+      "note": "the front of the field Senna, Prost, Hill through lap 18 (Hill stopped at the end of lap 17); Barrichello fourth from lap 1 until his lap-19 stop"
+    },
+    {
+      "lap": 1,
+      "order": [
+        "SENA",
+        "PRO",
+        "HIL",
+        "BAR",
+        "ALE",
+        "MSCM",
+        "JAR"
+      ],
+      "source": "https://en.wikipedia.org/wiki/1993_European_Grand_Prix: 'Going into the second lap, Senna led Prost, Hill, Rubens Barrichello (who had started 12th), Jean Alesi, Schumacher and JJ Lehto.'"
+    }
+  ],
+  "notes": "Stop counts: Senna 5 pit calls incl. the drive-through (Motor Sport; Wikipedia says four stops), Hill 6, Prost 7, Herbert 1 (slicks after about lap 10), Barrichello at least 4. Missing laps: Senna's late wet stop and one more, Hill's other 4, Prost's other 3, Herbert's one, Barrichello's later ones. No safety car is mentioned in Wikipedia, Motor Sport or GrandPrix.com (https://www.grandprix.com/gpe/rr535.html), but no source states there was none: safetyCars left incomplete for the owner to confirm. Weather: Senna's wet stop between his lap-18 and lap-34 slick stops (GPE: 'Senna stayed out for four more laps' after Hill's lap-24 wet stop, so about lap 28) and his closing-laps wet stop ('10 laps to go') have no exact lap, so he runs slicks through those showers; Prost's lap-48/53 stops and Hill's later stops have no tyre, so those stints are estimated."
 }

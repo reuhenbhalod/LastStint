@@ -13,14 +13,15 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 | laps down | 5 | 5 |
 | stop | 7 | 7 |
 | safety car | 1 | 1 |
+| leader | 8 | 8 |
 
 | Anchor | Subject | Target | Achieved | Pass |
 |---|---|---|---|---|
-| grid | lap-1 order is the grid order | 25 cars: ROSK PRO SENA BER PIQN MAN PAT ARN ALBM JOH DUM TAM ALL BRU PALJ DAN STRP JON WAR BOUT NAN DEC ROT GHI BEG | 25 cars: ROSK PRO SENA BER PIQN MAN PAT ARN ALBM JOH DUM TAM ALL BRU PALJ DAN STRP JON WAR BOUT NAN DEC ROT GHI BEG | pass |
+| grid | lap-1 order is the grid order (the sourced lap-1 order at the front) | 25 cars: SENA ROSK PRO BER PIQN MAN PAT ARN ALBM JOH DUM TAM ALL BRU PALJ DAN STRP JON WAR BOUT NAN DEC ROT GHI BEG | 25 cars: SENA ROSK PRO BER PIQN MAN PAT ARN ALBM JOH DUM TAM ALL BRU PALJ DAN STRP JON WAR BOUT NAN DEC ROT GHI BEG | pass |
 | order | classification | 12 cars: PIQN SENA MAN ARN ROSK PRO WAR TAM JON BER JOH BEG | 12 cars: PIQN SENA MAN ARN ROSK PRO WAR TAM JON BER JOH BEG | pass |
-| gap | SENA | 15.437 | 15.436 | pass |
-| gap | MAN | 44.58 | 44.578 | pass |
-| gap | ARN | 75.176 | 75.18 | pass |
+| gap | SENA | 15.437 | 15.437 | pass |
+| gap | MAN | 44.58 | 44.581 | pass |
+| gap | ARN | 75.176 | 75.172 | pass |
 | fastest | PIQN | [107.721, 34] | [107.721, 34] | pass |
 | fastest | SENA | [109.424, 39] | [109.424, 39] | pass |
 | fastest | MAN | [107.899, 37] | [107.899, 37] | pass |
@@ -93,12 +94,20 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 | stop | PRO | 20 | 20 | pass |
 | stop | BER | 5 | 5 | pass |
 | safety car | leader's SC laps, sourced | [] | [] | pass |
+| leader | SENA laps 1-1 | 1 laps | 1 of 1 laps | pass |
+| leader | ROSK laps 2-5 | 4 laps | 4 of 4 laps | pass |
+| leader | PIQN laps 6-14 | 9 laps | 9 of 9 laps | pass |
+| leader | ROSK laps 15-19 | 5 laps | 5 of 5 laps | pass |
+| leader | PRO laps 20-20 | 1 laps | 1 of 1 laps | pass |
+| leader | PIQN laps 21-26 | 6 laps | 6 of 6 laps | pass |
+| leader | ROSK laps 27-38 | 12 laps | 12 of 12 laps | pass |
+| leader | PIQN laps 39-44 | 6 laps | 6 of 6 laps | pass |
 
 ## Estimated
 
 - Every lap time and lap-end Time is synthetic: solved to the anchors, not measured
-- Position each lap follows from the synthetic times; the lap-1 order is the grid order
-- Lap times in between the anchors: pace + tyre wear + fuel + seeded noise
+- Position each lap follows from the synthetic times; the lap-1 order is the grid order, with the sourced lap-1 order at the front; each lap's leader and the sourced snapshots of the order and gaps are anchors, the rest of the order is estimated
+- Lap times in between the anchors: pace + tyre wear + fuel + seeded noise, the pace moved by a constant between the laps the sourced order marks
 - Fuel: 0.06s per lap of fuel on board; full tank at the start
 - Stop loss: pit-lane time - 5.0s, 35% on the in-lap
 - PitInTime is the in-lap's end; PitOutTime adds the out-lap's share of the lane time

@@ -9,16 +9,19 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 | gap | 1 | 1 |
 | fastest | 25 | 25 |
 | retirement | 15 | 15 |
-| retirement event | 15 | 15 |
+| retirement event | 14 | 15 |
 | laps down | 9 | 9 |
 | stop | 1 | 1 |
 | safety car | 1 | 1 |
+| leader | 4 | 4 |
+| running order | 5 | 5 |
+| lap gap | 1 | 1 |
 
 | Anchor | Subject | Target | Achieved | Pass |
 |---|---|---|---|---|
-| grid | lap-1 order is the grid order | 25 cars: MAN PIQN SENA PRO ARN BER ROSK ALL STRP DEC JOH FAB DUM JON BRU TAM NAN PAT WAR PALJ BOUT ROT DAN GHI BEG | 25 cars: MAN PIQN SENA PRO ARN BER ROSK ALL STRP DEC JOH FAB DUM JON BRU TAM NAN PAT WAR PALJ BOUT ROT DAN GHI BEG | pass |
+| grid | lap-1 order is the grid order (the sourced lap-1 order at the front) | 25 cars: PIQN SENA ROSK MAN PRO ARN BER ALL STRP DEC JOH FAB DUM JON BRU TAM NAN PAT WAR PALJ BOUT ROT DAN GHI BEG | 25 cars: PIQN SENA ROSK MAN PRO ARN BER ALL STRP DEC JOH FAB DUM JON BRU TAM NAN PAT WAR PALJ BOUT ROT DAN GHI BEG | pass |
 | order | classification | 10 cars: PRO PIQN JOH BRU STRP DUM ARN ALL PALJ FAB | 10 cars: PRO PIQN JOH BRU STRP DUM ARN ALL PALJ FAB | pass |
-| gap | PIQN | 4.205 | 4.204 | pass |
+| gap | PIQN | 4.205 | 4.206 | pass |
 | fastest | PRO | [80.979, 69] | [80.979, 69] | pass |
 | fastest | PIQN | [80.787, 82] | [80.787, 82] | pass |
 | fastest | JOH | [82.136, 74] | [82.136, 74] | pass |
@@ -45,7 +48,7 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 | fastest | NAN | [87.821, 9] | [87.821, 9] | pass |
 | fastest | GHI | [94.172, 2] | [94.172, 2] | pass |
 | retirement | STRP | 80 | 80 | pass |
-| retirement event | STRP | true | true | pass |
+| retirement event | STRP | true | false | FAIL |
 | retirement | MAN | 63 | 63 | pass |
 | retirement event | MAN | true | true | pass |
 | retirement | PAT | 63 | 63 | pass |
@@ -85,12 +88,22 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 | laps down | BEG | 21 | 21 | pass |
 | stop | PRO | 32 | 32 | pass |
 | safety car | leader's SC laps, sourced | [] | [] | pass |
+| leader | PIQN laps 1-6 | 6 laps | 6 of 6 laps | pass |
+| leader | ROSK laps 7-62 | 56 laps | 56 of 56 laps | pass |
+| leader | PIQN laps 63-64 | 2 laps | 2 of 2 laps | pass |
+| leader | PRO laps 65-82 | 18 laps | 18 of 18 laps | pass |
+| running order | lap 1 | ["PIQN", "SENA", "ROSK"] | ["PIQN", "SENA", "ROSK"] | pass |
+| running order | lap 44 | ["ROSK", "PIQN", "MAN"] | ["ROSK", "PIQN", "MAN"] | pass |
+| running order | lap 57 | ["ROSK", "PIQN", "MAN", "PRO"] | ["ROSK", "PIQN", "MAN", "PRO"] | pass |
+| running order | lap 62 | ["ROSK", "PIQN", "PRO", "MAN"] | ["ROSK", "PIQN", "PRO", "MAN"] | pass |
+| running order | lap 80 | ["PRO", "PIQN"] | ["PRO", "PIQN"] | pass |
+| lap gap | PIQN at lap 80 (+/-1s) | 15.484 | 15.085 | pass |
 
 ## Estimated
 
 - Every lap time and lap-end Time is synthetic: solved to the anchors, not measured
-- Position each lap follows from the synthetic times; the lap-1 order is the grid order
-- Lap times in between the anchors: pace + tyre wear + fuel + seeded noise
+- Position each lap follows from the synthetic times; the lap-1 order is the grid order, with the sourced lap-1 order at the front; each lap's leader and the sourced snapshots of the order and gaps are anchors, the rest of the order is estimated
+- Lap times in between the anchors: pace + tyre wear + fuel + seeded noise, the pace moved by a constant between the laps the sourced order marks
 - Fuel: 0.06s per lap of fuel on board; full tank at the start
 - Stop loss: pit-lane time - 5.0s, 35% on the in-lap
 - PitInTime is the in-lap's end; PitOutTime adds the out-lap's share of the lane time
@@ -102,3 +115,4 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 
 - incident (not modelled): lap 63 FAULT ROSK: Right-rear tyre failure, retired
 - incident (not modelled): lap 64 FAULT MAN: Left-rear tyre exploded on the Brabham Straight, retired
+- STRP: classified retirement stopped at its natural time, after the point a retirement is seen

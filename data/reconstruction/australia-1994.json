@@ -5,5 +5,45 @@
   "complete": {
     "safetyCars": false
   },
+  "lapLeaders": [
+    {
+      "driver": "MSCM",
+      "name": "Michael Schumacher",
+      "fromLap": 1,
+      "toLap": 35,
+      "source": "https://en.wikipedia.org/wiki/1994_Australian_Grand_Prix (lap-leader chart, Template:F1Laps1994 'AUS')"
+    },
+    {
+      "driver": "MAN",
+      "name": "Nigel Mansell",
+      "fromLap": 36,
+      "toLap": 53,
+      "source": "https://en.wikipedia.org/wiki/1994_Australian_Grand_Prix (lap-leader chart, Template:F1Laps1994 'AUS')"
+    },
+    {
+      "driver": "BER",
+      "name": "Gerhard Berger",
+      "fromLap": 54,
+      "toLap": 63,
+      "source": "https://en.wikipedia.org/wiki/1994_Australian_Grand_Prix (lap-leader chart, Template:F1Laps1994 'AUS')"
+    },
+    {
+      "driver": "MAN",
+      "name": "Nigel Mansell",
+      "fromLap": 64,
+      "toLap": 81,
+      "source": "https://en.wikipedia.org/wiki/1994_Australian_Grand_Prix (lap-leader chart, Template:F1Laps1994 'AUS')"
+    }
+  ],
+  "runningOrder": [
+    {
+      "lap": 1,
+      "order": [
+        "MSCM",
+        "HIL"
+      ],
+      "source": "https://en.wikipedia.org/wiki/1994_Australian_Grand_Prix: 'Schumacher took the lead at the start, with Hill second behind him. The order between the two remained the same until lap 36.'"
+    }
+  ],
   "notes": "Stops come from F1DB. Motor Sport Dec 1994 (https://www.motorsportmagazine.com/archive/article/december-1994/18/game) agrees with F1DB on Schumacher/Hill 18, Alesi 17, Mansell 26 and 54, Hakkinen 28 and 54, Barrichello 28, Brundle 52, Berger 57. Hill (#0) crawled to the pits on lap 36 and retired. Barrichello and Hakkinen served 10 s stop-and-go penalties on laps 58 and 61 (pit-lane speeding); F1DB lists Barrichello lap 58 and Hakkinen lap 62 at about 14 s, which look like those penalties. No safety car mentioned in Wikipedia, Motor Sport or GrandPrix.com (https://www.grandprix.com/gpe/rr564.html); not confirmed absent."
 }

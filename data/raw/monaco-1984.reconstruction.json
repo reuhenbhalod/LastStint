@@ -13,8 +13,8 @@
  },
  "estimates": [
   "Every lap time and lap-end Time is synthetic: solved to the anchors, not measured",
-  "Position each lap follows from the synthetic times; the lap-1 order is the grid order",
-  "Lap times in between the anchors: pace + tyre wear + fuel + seeded noise",
+  "Position each lap follows from the synthetic times; the lap-1 order is the grid order, with the sourced lap-1 order at the front; each lap's leader and the sourced snapshots of the order and gaps are anchors, the rest of the order is estimated",
+  "Lap times in between the anchors: pace + tyre wear + fuel + seeded noise, the pace moved by a constant between the laps the sourced order marks",
   "Fuel: 0.06s per lap of fuel on board; full tank at the start",
   "Stop loss: pit-lane time - 5.0s, 35% on the in-lap",
   "PitInTime is the in-lap's end; PitOutTime adds the out-lap's share of the lane time",
@@ -50,6 +50,7 @@
    "source": "https://www.motorsportmagazine.com/archive/article/july-1984/84/reflections-in-the-monte-carlo-puddles/ (results: '1st : Alain Prost ... 1 hr 01 min 07.740 sec', '2nd : Ayrton Senna ... 1 hr 01 min 15.186 sec', '3rd : Stefan Bellof ... (Tyrrell 012/4) ... 1 hr 01 min 28.881 sec', '4th : Rene Arnoux ... 1 hr 01 min 36.817 sec'; 'Rene Arnoux started and finished in the same position after Bellof's disqualification'); https://en.wikipedia.org/wiki/1984_Monaco_Grand_Prix (classification: DSQ, 4, Stefan Bellof, Tyrrell-Ford, 31 laps, 'Underweight car (+21.141)', grid 20; 'Stefan Bellof ... finished third'; 'The Tyrrell team's results were erased later in the season due to weight infringements')"
   }
  ],
+ "lastLapStops": [],
  "stopsComplete": false,
  "safetyCarsComplete": true,
  "params": {
@@ -68,6 +69,11 @@
   "sc_gap": 0.8,
   "sc_iterations": 12,
   "order_gap": 0.5,
+  "lead_margin": 1.0,
+  "lap_gap_tolerance": 1.0,
+  "order_iterations": 6,
+  "pace_weight": 0.05,
+  "pack_weight": 1.0,
   "gap_tolerance": 2.0,
   "attempts": 6,
   "refuel": null
@@ -133,46 +139,46 @@
    "target": 3688.881
   },
   "PAT": {
-   "pace": 87.549,
+   "pace": 87.49,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 2966.122
+   "target": 2964.329
   },
   "LAU": {
-   "pace": 86.33,
+   "pace": 86.436,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 2808.741
+   "target": 2811.831
   },
   "WINM": {
-   "pace": 85.492,
+   "pace": 85.632,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 2662.652
+   "target": 2666.503
   },
   "MAN": {
-   "pace": 84.822,
+   "pace": 83.745,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 1817.441
+   "target": 1798.098
   },
   "PIQN": {
-   "pace": 87.953,
+   "pace": 87.863,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 1746.595
+   "target": 1745.112
   },
   "HES": {
-   "pace": 88.037,
+   "pace": 87.771,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 1517.475
+   "target": 1513.809
   },
   "FABC": {
-   "pace": 91.8,
+   "pace": 91.55,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 1181.156
+   "target": 1178.732
   },
   "CEC": {
    "pace": 155.136,
@@ -213,6 +219,10 @@
   "safety car": {
    "pass": 1,
    "total": 1
+  },
+  "leader": {
+   "pass": 3,
+   "total": 3
   }
  },
  "anchors": [
@@ -290,7 +300,7 @@
    "anchor": "gap",
    "subject": "SENA",
    "target": 7.446,
-   "achieved": 7.443,
+   "achieved": 7.445,
    "pass": true
   },
   {
@@ -311,14 +321,14 @@
    "anchor": "gap",
    "subject": "ROSK",
    "target": 35.246,
-   "achieved": 35.244,
+   "achieved": 35.247,
    "pass": true
   },
   {
    "anchor": "gap",
    "subject": "DEA",
    "target": 44.439,
-   "achieved": 44.435,
+   "achieved": 44.44,
    "pass": true
   },
   {
@@ -709,6 +719,27 @@
    "subject": "leader's SC laps, sourced",
    "target": [],
    "achieved": [],
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "PRO laps 1-10",
+   "target": "10 laps",
+   "achieved": "10 of 10 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "MAN laps 11-15",
+   "target": "5 laps",
+   "achieved": "5 of 5 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "PRO laps 16-31",
+   "target": "16 laps",
+   "achieved": "16 of 16 laps",
    "pass": true
   }
  ],

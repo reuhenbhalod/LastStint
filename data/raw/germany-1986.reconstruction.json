@@ -13,8 +13,8 @@
  },
  "estimates": [
   "Every lap time and lap-end Time is synthetic: solved to the anchors, not measured",
-  "Position each lap follows from the synthetic times; the lap-1 order is the grid order",
-  "Lap times in between the anchors: pace + tyre wear + fuel + seeded noise",
+  "Position each lap follows from the synthetic times; the lap-1 order is the grid order, with the sourced lap-1 order at the front; each lap's leader and the sourced snapshots of the order and gaps are anchors, the rest of the order is estimated",
+  "Lap times in between the anchors: pace + tyre wear + fuel + seeded noise, the pace moved by a constant between the laps the sourced order marks",
   "Fuel: 0.06s per lap of fuel on board; full tank at the start",
   "Stop loss: pit-lane time - 5.0s, 35% on the in-lap",
   "PitInTime is the in-lap's end; PitOutTime adds the out-lap's share of the lane time",
@@ -76,6 +76,11 @@
   "sc_gap": 0.8,
   "sc_iterations": 12,
   "order_gap": 0.5,
+  "lead_margin": 1.0,
+  "lap_gap_tolerance": 1.0,
+  "order_iterations": 6,
+  "pace_weight": 0.05,
+  "pack_weight": 1.0,
   "gap_tolerance": 2.0,
   "attempts": 6,
   "refuel": null
@@ -93,7 +98,7 @@
    "target": 4928.263
   },
   "SENA": {
-   "pace": 110.567,
+   "pace": 110.595,
    "wear": 0.0,
    "noise": 0.7,
    "target": 4943.7
@@ -111,28 +116,28 @@
    "target": 5003.439
   },
   "ROSK": {
-   "pace": 108.539,
+   "pace": 108.524,
    "wear": 0.15,
    "noise": 0.525,
-   "target": 4821.568
+   "target": 4819.856
   },
   "PRO": {
-   "pace": 109.326,
+   "pace": 109.226,
    "wear": 0.2,
    "noise": 0.7,
-   "target": 4872.3
+   "target": 4868.801
   },
   "WAR": {
-   "pace": 114.779,
+   "pace": 114.83,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 5001.676
+   "target": 5003.774
   },
   "TAM": {
-   "pace": 114.978,
+   "pace": 115.029,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 5002.176
+   "target": 5004.274
   },
   "JON": {
    "pace": 110.395,
@@ -147,10 +152,10 @@
    "target": 4929.263
   },
   "JOH": {
-   "pace": 112.752,
+   "pace": 112.777,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 4685.644
+   "target": 4686.602
   },
   "BEG": {
    "pace": 121.654,
@@ -159,82 +164,82 @@
    "target": 4928.763
   },
   "DAN": {
-   "pace": 116.73,
+   "pace": 116.729,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 4500.821
+   "target": 4500.785
   },
   "ROT": {
-   "pace": 115.755,
+   "pace": 115.633,
    "wear": 0.125,
    "noise": 1.05,
-   "target": 4556.919
+   "target": 4552.513
   },
   "PALJ": {
-   "pace": 117.838,
+   "pace": 117.86,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 4425.911
+   "target": 4426.667
   },
   "BRU": {
-   "pace": 115.46,
+   "pace": 115.499,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 3986.935
+   "target": 3988.174
   },
   "PAT": {
-   "pace": 111.888,
-   "wear": 0.25,
-   "noise": 1.05,
-   "target": 2565.657
-  },
-  "DEC": {
-   "pace": 116.738,
-   "wear": 0.0,
-   "noise": 1.05,
-   "target": 2380.434
-  },
-  "NAN": {
-   "pace": 116.463,
+   "pace": 111.882,
    "wear": 0.2,
    "noise": 1.05,
-   "target": 2296.58
+   "target": 2554.487
+  },
+  "DEC": {
+   "pace": 116.752,
+   "wear": 0.0,
+   "noise": 1.05,
+   "target": 2380.694
+  },
+  "NAN": {
+   "pace": 116.586,
+   "wear": 0.175,
+   "noise": 1.05,
+   "target": 2294.454
   },
   "DUM": {
-   "pace": 112.837,
+   "pace": 112.47,
    "wear": 0.25,
    "noise": 1.05,
-   "target": 2006.704
+   "target": 2001.201
   },
   "BOUT": {
-   "pace": 118.259,
+   "pace": 118.291,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 1577.417
+   "target": 1577.776
   },
   "ALL": {
-   "pace": 115.763,
+   "pace": 115.884,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 1304.157
+   "target": 1305.242
   },
   "GHI": {
-   "pace": 122.417,
+   "pace": 122.616,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 1248.575
+   "target": 1250.161
   },
   "STRP": {
-   "pace": 115.267,
+   "pace": 115.343,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 834.115
+   "target": 834.497
   },
   "ALBM": {
-   "pace": 114.514,
+   "pace": 114.941,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 702.132
+   "target": 703.84
   }
  },
  "summary": {
@@ -273,16 +278,20 @@
   "safety car": {
    "pass": 1,
    "total": 1
+  },
+  "leader": {
+   "pass": 8,
+   "total": 8
   }
  },
  "anchors": [
   {
    "anchor": "grid",
-   "subject": "lap-1 order is the grid order",
+   "subject": "lap-1 order is the grid order (the sourced lap-1 order at the front)",
    "target": [
+    "SENA",
     "ROSK",
     "PRO",
-    "SENA",
     "BER",
     "PIQN",
     "MAN",
@@ -307,9 +316,9 @@
     "BEG"
    ],
    "achieved": [
+    "SENA",
     "ROSK",
     "PRO",
-    "SENA",
     "BER",
     "PIQN",
     "MAN",
@@ -372,21 +381,21 @@
    "anchor": "gap",
    "subject": "SENA",
    "target": 15.437,
-   "achieved": 15.436,
+   "achieved": 15.437,
    "pass": true
   },
   {
    "anchor": "gap",
    "subject": "MAN",
    "target": 44.58,
-   "achieved": 44.578,
+   "achieved": 44.581,
    "pass": true
   },
   {
    "anchor": "gap",
    "subject": "ARN",
    "target": 75.176,
-   "achieved": 75.18,
+   "achieved": 75.172,
    "pass": true
   },
   {
@@ -1041,6 +1050,62 @@
    "subject": "leader's SC laps, sourced",
    "target": [],
    "achieved": [],
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "SENA laps 1-1",
+   "target": "1 laps",
+   "achieved": "1 of 1 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "ROSK laps 2-5",
+   "target": "4 laps",
+   "achieved": "4 of 4 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "PIQN laps 6-14",
+   "target": "9 laps",
+   "achieved": "9 of 9 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "ROSK laps 15-19",
+   "target": "5 laps",
+   "achieved": "5 of 5 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "PRO laps 20-20",
+   "target": "1 laps",
+   "achieved": "1 of 1 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "PIQN laps 21-26",
+   "target": "6 laps",
+   "achieved": "6 of 6 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "ROSK laps 27-38",
+   "target": "12 laps",
+   "achieved": "12 of 12 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "PIQN laps 39-44",
+   "target": "6 laps",
+   "achieved": "6 of 6 laps",
    "pass": true
   }
  ],

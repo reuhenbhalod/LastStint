@@ -175,7 +175,6 @@
     "stops": false,
     "safetyCars": true
   },
-  "notes": "Senna also served a 10 s stop-and-go before the rain (penalty issued on lap 25 per Wikipedia; lap served not given). Schumacher's slick stop, Alesi's two stop-and-gos (20 s and 10 s), Katayama's and Suzuki's early stops, and most slick stops: no laps. Prost (#2) stayed out and crashed on lap 29. Weather: Schumacher's lap-41 stop is a stop-and-go (no tyre change) and his slick stop has no lap, so his stint from lap 42 is estimated (slicks). Cars with no sourced wet stop run their start slicks through the rain: the snapshot invents no stops.",
   "weather": {
     "timeline": [
       {
@@ -230,5 +229,40 @@
       "tyre": "slick",
       "source": "https://en.wikipedia.org/wiki/1993_Brazilian_Grand_Prix ('many drivers pitted for wet tyres', Prost 'stayed out on slick tyres'); https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna (the wet-tyre stops on laps 27-30 after a dry start)"
     }
-  }
+  },
+  "lapLeaders": [
+    {
+      "driver": "PRO",
+      "name": "Alain Prost",
+      "fromLap": 1,
+      "toLap": 29,
+      "source": "https://en.wikipedia.org/wiki/1993_Brazilian_Grand_Prix (lap-leader chart, Template:F1Laps1993 'BRA')"
+    },
+    {
+      "driver": "HIL",
+      "name": "Damon Hill",
+      "fromLap": 30,
+      "toLap": 41,
+      "source": "https://en.wikipedia.org/wiki/1993_Brazilian_Grand_Prix (lap-leader chart, Template:F1Laps1993 'BRA')"
+    },
+    {
+      "driver": "SENA",
+      "name": "Ayrton Senna",
+      "fromLap": 42,
+      "toLap": 71,
+      "source": "https://en.wikipedia.org/wiki/1993_Brazilian_Grand_Prix (lap-leader chart, Template:F1Laps1993 'BRA')"
+    }
+  ],
+  "runningOrder": [
+    {
+      "lap": 11,
+      "order": [
+        "PRO",
+        "HIL",
+        "SENA"
+      ],
+      "source": "https://en.wikipedia.org/wiki/1993_Brazilian_Grand_Prix: 'While Prost built up a substantial lead, Senna was under pressure from Hill who took second on lap 11'"
+    }
+  ],
+  "notes": "Senna also served a 10 s stop-and-go before the rain (penalty issued on lap 25 per Wikipedia; lap served not given). Schumacher's slick stop, Alesi's two stop-and-gos (20 s and 10 s), Katayama's and Suzuki's early stops, and most slick stops: no laps. Prost (#2) stayed out and crashed on lap 29. Weather: Schumacher's lap-41 stop is a stop-and-go (no tyre change) and his slick stop has no lap, so his stint from lap 42 is estimated (slicks). Cars with no sourced wet stop run their start slicks through the rain: the snapshot invents no stops."
 }

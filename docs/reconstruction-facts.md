@@ -65,10 +65,89 @@ folder).
   Nov 8 2026; monaco-1984's Bellof). See below.
 - `lastLapStops[]`: optional, a classified car a source says stopped on the last lap (out of
   fuel; germany-1986's Rosberg and Prost). See below.
+- `lapLeaders[]`, `runningOrder[]`: optional, who led which laps and the order (and gaps) at
+  the end of a lap, where a source gives them. See "The running order" below.
 
 The loader rejects a file whose stop or safety car has no source, a stop with no lap or car,
-bad safety-car laps, a `weather` block that breaks the rules below, or a road position with
-no source, no car, a place that isn't 1, 2, ... or a negative gap.
+bad safety-car laps, a `weather` block that breaks the rules below, a road position with no
+source, no car, a place that isn't 1, 2, ... or a negative gap, or a running order that breaks
+the rules below.
+
+## The running order (`lapLeaders`, `runningOrder`)
+
+```json
+"lapLeaders": [
+  {"driver": "SENA", "fromLap": 1, "toLap": 60, "source": "https://en.wikipedia.org/wiki/..."},
+  {"driver": "PRO", "fromLap": 61, "toLap": 69, "source": "..."}
+],
+"runningOrder": [
+  {"lap": 35, "order": ["SENA", "PIQN", "MAN", "PRO"], "source": "Motor Sport, Aug 1990: ..."},
+  {"lap": 48, "order": ["SENA", "MAN"], "gaps": {"MAN": 12.2}, "gapTolerance": 1.0,
+   "source": "...", "note": "..."}
+]
+```
+
+Without these the solver anchors the grid, the result, gaps, fastest laps, retirements and
+stops, and the order in between is whatever the cars' fitted paces give: a fast car from the
+back of the grid can lead by lap 30 when it really led from lap 60 (mexico-1990). With them:
+
+- `lapLeaders[]`: one entry per run of laps one car led (a lap-leader chart: Wikipedia's
+  `Template:F1Laps<year>` charts give every lap of every 1983-95 race).
+  - `driver` or `number`: the car;
+  - `fromLap`, `toLap`: the laps it was first across the line at the end of, official
+    numbering, `1 <= fromLap <= toLap`; no lap may be in two entries;
+  - `source`: required.
+  A lap past the winner's laps is cut (noted); a car listed as leading laps it didn't complete
+  (Jolpica's laps) conflicts with the result, and those laps are left out (noted).
+- `runningOrder[]`: a snapshot of the order at the end of one lap.
+  - `lap`: official numbering;
+  - `order`: the cars in places 1, 2, ... from the front (driver codes, or car numbers as
+    integers); every car not listed is behind them. Only list places the source gives:
+    `["SENA", "MAN"]` says Senna first and Mansell second, nothing about third;
+  - `gaps`: optional, `{car: seconds}` behind the car listed first (so not for it) at the end
+    of that lap; a gap may name a car not in `order`;
+  - `gapTolerance`: optional, seconds either way the gap may miss by (default 1.0 s,
+    `Params.lap_gap_tolerance`); widen it for "some 50 seconds";
+  - `source`: required; `note` for how a lap was worked out from the source's words ("with 25
+    laps to go" = after lap 57).
+  A snapshot's first car must be the lap's leader in `lapLeaders`, if that lap has one (an
+  error otherwise). A listed car that didn't complete the lap cuts the order before it
+  (noted); so does a gap for one.
+
+The loader rejects an entry with no source, no car, bad laps, a lap led twice, a car listed
+twice, a gap that isn't seconds or is for the first car, or a tolerance that isn't positive.
+
+### What the reconstruction does with it
+
+- **Lap 1** is the grid ladder (the standing start, grid_gap per slot) in the **lap-1 order**:
+  the grid order with the cars a source puts at the front at the end of lap 1 (the lap-1
+  leader, a lap-1 snapshot) moved there. The `grid` anchor checks that order and says so.
+- **Every other sourced lap** is held by marking cars' times (s from the start) at the end of
+  it: `fit_car`'s `marks` cut a car's race into segments, each segment's free laps are
+  projected to its time on their own (the car's pace moves by a constant per segment, never
+  faster than its fastest lap + margin, pins and pit losses kept), and the lead-lap times,
+  classification windows and fastest laps still hold exactly.
+- **The marks** come from one convex QP over every sourced lap at once (`order_marks`,
+  solved by OSQP-style ADMM on scipy's sparse LU): the unknowns are the times at the end of
+  each sourced lap of the cars near the front (listed, or within a window of the last listed
+  car, widened each round). Constraints: the listed cars first, in order, `lead_margin` (1 s)
+  apart, every other car behind them; sourced gaps within 40% of their tolerance; no segment
+  faster than the car's floor laps; a finisher still makes its race time. Cost: the change in
+  each car's per-lap pace (lightly, `pace_weight`) and the step in that change from one
+  segment to the next (strongly), so a car moved at a sourced lap takes a smooth change of
+  pace over the laps around it; and (`pack_weight`) the change in gap between road neighbours
+  behind the listed cars, so a pack pushed behind a sourced leader keeps its spacing (cars a
+  source places within 10 laps are left out of it). Each round is solved from the unmarked
+  laps; rounds repeat with a wider window until every sourced lap holds (with a safety car
+  the SC laps are re-pinned between rounds).
+- A retirement's last lap can be marked (its natural time then ends there). A classified
+  retirement that would have to run faster than its own pace to be seen stopped before the
+  flag (australia-1986's Streiff, out of fuel two laps down) stops at its natural time, before
+  the flag, when the race has a sourced order (its `retirement event` may go unseen; that row
+  is reported, not required).
+- **Anchor report**: a `leader` row per `lapLeaders` entry (the laps it led of the laps it
+  should have, and who led the others), a `running order` row per snapshot (its places), a
+  `lap gap` row per sourced gap; all three are core anchors (`reconstruct.failures`).
 
 ## A disqualified car on the road (`roadPositions`)
 

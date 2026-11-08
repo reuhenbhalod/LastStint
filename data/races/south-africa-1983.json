@@ -10,25 +10,25 @@
   },
   "era": "1988-1993",
   "track": {
-    "pitLoss": 19.131,
-    "pitLossUnderSC": 10.522,
-    "pitLossUnderVSC": 13.2,
+    "pitLoss": 20.916,
+    "pitLossUnderSC": 11.504,
+    "pitLossUnderVSC": 14.432,
     "pitLossDeviations": [
       0.0
     ],
-    "overtakeDifficulty": 0.7875,
+    "overtakeDifficulty": 0.7846,
     "overtakeModel": {
-      "intercept": 0.1527,
-      "paceCoef": 0.5355,
-      "gapCoef": -1.755
+      "intercept": -0.2768,
+      "paceCoef": 0.5113,
+      "gapCoef": -1.3989
     },
-    "dirtyAirPenalty": 0.0939,
-    "greenLapTime": 74.706
+    "dirtyAirPenalty": 0.264,
+    "greenLapTime": 74.899
   },
   "compounds": {
     "MEDIUM": {
       "offset": 0.0,
-      "degPerLap": 0.02788,
+      "degPerLap": 0.03939,
       "cliffLap": 77,
       "provenLaps": 77
     }
@@ -37,11 +37,11 @@
     {
       "code": "ACH",
       "team": "RAM",
-      "basePace": 79.2356,
-      "noise": 0.9732,
+      "basePace": 79.374,
+      "noise": 1.0356,
       "stateAtTakeover": {
         "position": 16,
-        "gapAhead": 45.876,
+        "gapAhead": 50.431,
         "compound": "MEDIUM",
         "tyreAge": 25,
         "compoundsUsed": [
@@ -53,11 +53,11 @@
     {
       "code": "ALBM",
       "team": "Tyrrell",
-      "basePace": 74.3144,
-      "noise": 1.5975,
+      "basePace": 74.624,
+      "noise": 1.2794,
       "stateAtTakeover": {
         "position": 15,
-        "gapAhead": 8.825,
+        "gapAhead": 6.445,
         "compound": "MEDIUM",
         "tyreAge": 25,
         "compoundsUsed": [
@@ -69,11 +69,11 @@
     {
       "code": "BOE",
       "team": "Ligier",
-      "basePace": 86.4168,
-      "noise": 4.2391,
+      "basePace": 86.5343,
+      "noise": 4.3358,
       "stateAtTakeover": {
         "position": 18,
-        "gapAhead": 49.446,
+        "gapAhead": 49.155,
         "compound": "MEDIUM",
         "tyreAge": 25,
         "compoundsUsed": [
@@ -85,11 +85,11 @@
     {
       "code": "BOUT",
       "team": "Arrows",
-      "basePace": 75.0499,
-      "noise": 0.7626,
+      "basePace": 75.3369,
+      "noise": 0.6633,
       "stateAtTakeover": {
         "position": 14,
-        "gapAhead": 4.483,
+        "gapAhead": 1.889,
         "compound": "MEDIUM",
         "tyreAge": 25,
         "compoundsUsed": [
@@ -101,11 +101,11 @@
     {
       "code": "CHE",
       "team": "Renault",
-      "basePace": 73.7371,
-      "noise": 0.5493,
+      "basePace": 73.9759,
+      "noise": 0.5576,
       "stateAtTakeover": {
         "position": 8,
-        "gapAhead": 4.439,
+        "gapAhead": 7.233,
         "compound": "MEDIUM",
         "tyreAge": 25,
         "compoundsUsed": [
@@ -117,11 +117,11 @@
     {
       "code": "DEC",
       "team": "Alfa Romeo",
-      "basePace": 72.124,
-      "noise": 0.4662,
+      "basePace": 72.0794,
+      "noise": 0.5824,
       "stateAtTakeover": {
-        "position": 4,
-        "gapAhead": 1.625,
+        "position": 5,
+        "gapAhead": 1.635,
         "compound": "MEDIUM",
         "tyreAge": 25,
         "compoundsUsed": [
@@ -133,11 +133,11 @@
     {
       "code": "FABC",
       "team": "Osella",
-      "basePace": 78.5629,
-      "noise": 0.7394,
+      "basePace": 78.5676,
+      "noise": 0.4099,
       "stateAtTakeover": {
         "position": 17,
-        "gapAhead": 1.543,
+        "gapAhead": 2.166,
         "compound": "MEDIUM",
         "tyreAge": 25,
         "compoundsUsed": [
@@ -149,11 +149,11 @@
     {
       "code": "GIA",
       "team": "Toleman",
-      "basePace": 72.8728,
-      "noise": 1.5389,
+      "basePace": 73.2282,
+      "noise": 1.3062,
       "stateAtTakeover": {
-        "position": 9,
-        "gapAhead": 48.878,
+        "position": 10,
+        "gapAhead": 1.251,
         "compound": "MEDIUM",
         "tyreAge": 25,
         "compoundsUsed": [
@@ -165,11 +165,11 @@
     {
       "code": "JARJ",
       "team": "Ligier",
-      "basePace": 76.6652,
-      "noise": 0.5945,
+      "basePace": 76.7957,
+      "noise": 0.6245,
       "stateAtTakeover": {
         "position": 13,
-        "gapAhead": 17.102,
+        "gapAhead": 13.436,
         "compound": "MEDIUM",
         "tyreAge": 25,
         "compoundsUsed": [
@@ -181,11 +181,11 @@
     {
       "code": "LAU",
       "team": "McLaren",
-      "basePace": 72.5487,
-      "noise": 0.8291,
+      "basePace": 72.5361,
+      "noise": 0.9469,
       "stateAtTakeover": {
-        "position": 2,
-        "gapAhead": 13.338,
+        "position": 3,
+        "gapAhead": 13.799,
         "compound": "MEDIUM",
         "tyreAge": 25,
         "compoundsUsed": [
@@ -197,11 +197,11 @@
     {
       "code": "MAN",
       "team": "Team Lotus",
-      "basePace": 81.0361,
-      "noise": 1.9221,
+      "basePace": 81.1908,
+      "noise": 1.9414,
       "stateAtTakeover": {
         "position": 19,
-        "gapAhead": 70.4,
+        "gapAhead": 68.776,
         "compound": "MEDIUM",
         "tyreAge": 25,
         "compoundsUsed": [
@@ -213,11 +213,11 @@
     {
       "code": "PAT",
       "team": "Brabham",
-      "basePace": 72.3773,
-      "noise": 0.5594,
+      "basePace": 72.3394,
+      "noise": 0.3307,
       "stateAtTakeover": {
-        "position": 1,
-        "gapAhead": 0.0,
+        "position": 2,
+        "gapAhead": 21.433,
         "compound": "MEDIUM",
         "tyreAge": 25,
         "compoundsUsed": [
@@ -229,11 +229,11 @@
     {
       "code": "PIQN",
       "team": "Brabham",
-      "basePace": 72.5683,
-      "noise": 1.1617,
+      "basePace": 73.8371,
+      "noise": 0.8628,
       "stateAtTakeover": {
-        "position": 7,
-        "gapAhead": 2.81,
+        "position": 1,
+        "gapAhead": 0.0,
         "compound": "MEDIUM",
         "tyreAge": 25,
         "compoundsUsed": [
@@ -244,18 +244,18 @@
         {
           "lap": 29,
           "to": "MEDIUM",
-          "loss": 20.286
+          "loss": 19.463
         }
       ]
     },
     {
       "code": "PRO",
       "team": "Renault",
-      "basePace": 72.9589,
-      "noise": 0.526,
+      "basePace": 73.1865,
+      "noise": 0.586,
       "stateAtTakeover": {
-        "position": 3,
-        "gapAhead": 9.451,
+        "position": 4,
+        "gapAhead": 9.44,
         "compound": "MEDIUM",
         "tyreAge": 25,
         "compoundsUsed": [
@@ -267,11 +267,11 @@
     {
       "code": "ROSK",
       "team": "Williams",
-      "basePace": 72.5628,
-      "noise": 2.0168,
+      "basePace": 73.0508,
+      "noise": 2.0891,
       "stateAtTakeover": {
         "position": 11,
-        "gapAhead": 4.039,
+        "gapAhead": 9.803,
         "compound": "MEDIUM",
         "tyreAge": 25,
         "compoundsUsed": [
@@ -283,11 +283,11 @@
     {
       "code": "SUL",
       "team": "Tyrrell",
-      "basePace": 73.92,
-      "noise": 0.7386,
+      "basePace": 74.0715,
+      "noise": 0.5979,
       "stateAtTakeover": {
-        "position": 10,
-        "gapAhead": 2.272,
+        "position": 9,
+        "gapAhead": 40.141,
         "compound": "MEDIUM",
         "tyreAge": 25,
         "compoundsUsed": [
@@ -299,11 +299,11 @@
     {
       "code": "SUR",
       "team": "Arrows",
-      "basePace": 74.1181,
-      "noise": 0.7286,
+      "basePace": 74.6629,
+      "noise": 0.4875,
       "stateAtTakeover": {
         "position": 12,
-        "gapAhead": 3.889,
+        "gapAhead": 1.397,
         "compound": "MEDIUM",
         "tyreAge": 25,
         "compoundsUsed": [
@@ -315,11 +315,11 @@
     {
       "code": "TAM",
       "team": "Ferrari",
-      "basePace": 73.0296,
-      "noise": 0.5845,
+      "basePace": 73.0656,
+      "noise": 0.7071,
       "stateAtTakeover": {
-        "position": 5,
-        "gapAhead": 3.097,
+        "position": 6,
+        "gapAhead": 4.279,
         "compound": "MEDIUM",
         "tyreAge": 25,
         "compoundsUsed": [
@@ -331,11 +331,11 @@
     {
       "code": "WAR",
       "team": "Toleman",
-      "basePace": 73.5333,
-      "noise": 0.6432,
+      "basePace": 74.0205,
+      "noise": 0.6961,
       "stateAtTakeover": {
-        "position": 6,
-        "gapAhead": 5.787,
+        "position": 7,
+        "gapAhead": 4.587,
         "compound": "MEDIUM",
         "tyreAge": 25,
         "compoundsUsed": [
@@ -345,9 +345,9 @@
       "realStrategy": []
     }
   ],
-  "fuelEffectPerLap": 0.01127,
+  "fuelEffectPerLap": 0.02588,
   "freshTyre": {
-    "bonus": -0.2563,
+    "bonus": -0.2028,
     "laps": 3
   },
   "events": [

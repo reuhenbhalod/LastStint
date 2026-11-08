@@ -31,5 +31,52 @@
     "stops": false,
     "safetyCars": true
   },
+  "lapLeaders": [
+    {
+      "driver": "SENA",
+      "name": "Ayrton Senna",
+      "fromLap": 1,
+      "toLap": 71,
+      "source": "https://en.wikipedia.org/wiki/1991_Brazilian_Grand_Prix (lap-leader chart, Template:F1Laps1991 'BRA')"
+    }
+  ],
+  "runningOrder": [
+    {
+      "lap": 1,
+      "order": [
+        "SENA",
+        "MAN",
+        "PAT",
+        "ALE",
+        "BER",
+        "PRO"
+      ],
+      "source": "https://en.wikipedia.org/wiki/1991_Brazilian_Grand_Prix: 'Ayrton Senna made a perfect start to lead from Nigel Mansell, Riccardo Patrese, Jean Alesi, Gerhard Berger and Alain Prost'"
+    },
+    {
+      "lap": 8,
+      "order": [
+        "SENA",
+        "MAN"
+      ],
+      "gaps": {
+        "MAN": 3.0
+      },
+      "gapTolerance": 1.0,
+      "source": "https://en.wikipedia.org/wiki/1991_Brazilian_Grand_Prix: 'building up a lead of three seconds by lap eight'"
+    },
+    {
+      "lap": 20,
+      "order": [
+        "SENA",
+        "MAN"
+      ],
+      "gaps": {
+        "MAN": 0.7
+      },
+      "gapTolerance": 0.7,
+      "source": "https://en.wikipedia.org/wiki/1991_Brazilian_Grand_Prix: 'Mansell was closing and by lap 20 the gap was down to 0.7s'"
+    }
+  ],
   "notes": "Senna (#1) and Patrese (#6) made tyre stops ('After Senna and Patrese had made their stops', Wikipedia), laps not given. Piquet (#20) and Moreno (#19) 'elected to make stops' (Motor Sport), laps not given. Senna had gearbox trouble late on (Motor Sport)."
 }

@@ -15,5 +15,53 @@
     "stops": false,
     "safetyCars": true
   },
+  "lapLeaders": [
+    {
+      "driver": "ALE",
+      "name": "Jean Alesi",
+      "fromLap": 1,
+      "toLap": 34,
+      "source": "https://en.wikipedia.org/wiki/1990_United_States_Grand_Prix (lap-leader chart, Template:F1Laps1990 'USA')"
+    },
+    {
+      "driver": "SENA",
+      "name": "Ayrton Senna",
+      "fromLap": 35,
+      "toLap": 72,
+      "source": "https://en.wikipedia.org/wiki/1990_United_States_Grand_Prix (lap-leader chart, Template:F1Laps1990 'USA')"
+    }
+  ],
+  "runningOrder": [
+    {
+      "lap": 1,
+      "order": [
+        "ALE",
+        "BER"
+      ],
+      "source": "https://en.wikipedia.org/wiki/1990_United_States_Grand_Prix: 'Alesi ... passed them both and outbraked Berger into the first corner. He immediately began pulling away, and led by 2.4 seconds after one lap.'"
+    },
+    {
+      "lap": 9,
+      "order": [
+        "ALE",
+        "SENA"
+      ],
+      "gaps": {
+        "SENA": 8.2
+      },
+      "gapTolerance": 1.5,
+      "source": "https://en.wikipedia.org/wiki/1990_United_States_Grand_Prix: 'The Brazilian got by his team-mate when, on lap 9, Berger hit a bump under braking ... When Berger spun, Senna was 8.2 seconds behind Alesi.'"
+    },
+    {
+      "lap": 17,
+      "order": [
+        "ALE",
+        "SENA",
+        "PIQN",
+        "PRO"
+      ],
+      "source": "https://en.wikipedia.org/wiki/1990_United_States_Grand_Prix: 'Nelson Piquet had progressed from sixth on the grid to third by lap 17' ... Prost 'advanced to fourth place by lap 17'"
+    }
+  ],
   "notes": "Alesi (#4) and Senna (#27) ran non-stop (implied, not stated outright). Berger (#28) pitted for a new nose/wing after hitting the tyres; Wikipedia puts the hit on lap 9, Motor Sport has him 'rejoining the race on lap 15': in-lap unclear, not entered. Patrese (#6), Nannini (#19, two nose stops), Schneider (#10), Martini (#23) and Moreno all stopped (no laps)."
 }

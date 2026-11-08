@@ -13,12 +13,15 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 | laps down | 8 | 8 |
 | tyre | 1 | 1 |
 | safety car | 1 | 1 |
+| leader | 1 | 1 |
+| running order | 1 | 1 |
+| lap gap | 1 | 1 |
 
 | Anchor | Subject | Target | Achieved | Pass |
 |---|---|---|---|---|
 | grid | lap-1 order is the grid order | 26 cars: SENA PRO ROSK DEA ALBM WAR LAU DEC MAN BOUT JOH TAM PAT CHE WINM PIQN BER LAF HES ALL BEL BRU PALJ MAR GHI BAL | 26 cars: SENA PRO ROSK DEA ALBM WAR LAU DEC MAN BOUT JOH TAM PAT CHE WINM PIQN BER LAF HES ALL BEL BRU PALJ MAR GHI BAL | pass |
 | order | classification | 9 cars: SENA ALBM TAM DEA MAN BEL WAR JOH GHI | 9 cars: SENA ALBM TAM DEA MAN BEL WAR JOH GHI | pass |
-| gap | ALBM | 62.978 | 62.976 | pass |
+| gap | ALBM | 62.978 | 62.985 | pass |
 | fastest | SENA | [104.121, 15] | [104.121, 15] | pass |
 | fastest | ALBM | [104.864, 5] | [104.864, 5] | pass |
 | fastest | TAM | [106.29, 52] | [106.29, 52] | pass |
@@ -87,12 +90,15 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 | laps down | WINM | 17 | 17 | pass |
 | tyre | PIQN stint 1 | wet | ["WET"] | pass |
 | safety car | leader's SC laps, sourced | [] | [] | pass |
+| leader | SENA laps 1-67 | 67 laps | 67 of 67 laps | pass |
+| running order | lap 20 | ["SENA", "DEA"] | ["SENA", "DEA"] | pass |
+| lap gap | DEA at lap 20 (+/-3s) | 30.0 | 28.802 | pass |
 
 ## Estimated
 
 - Every lap time and lap-end Time is synthetic: solved to the anchors, not measured
-- Position each lap follows from the synthetic times; the lap-1 order is the grid order
-- Lap times in between the anchors: pace + tyre wear + fuel + seeded noise
+- Position each lap follows from the synthetic times; the lap-1 order is the grid order, with the sourced lap-1 order at the front; each lap's leader and the sourced snapshots of the order and gaps are anchors, the rest of the order is estimated
+- Lap times in between the anchors: pace + tyre wear + fuel + seeded noise, the pace moved by a constant between the laps the sourced order marks
 - Fuel: 0.06s per lap of fuel on board; full tank at the start
 - Stop loss: pit-lane time - 5.0s, 35% on the in-lap
 - PitInTime is the in-lap's end; PitOutTime adds the out-lap's share of the lane time

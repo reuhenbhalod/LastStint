@@ -13,8 +13,8 @@
  },
  "estimates": [
   "Every lap time and lap-end Time is synthetic: solved to the anchors, not measured",
-  "Position each lap follows from the synthetic times; the lap-1 order is the grid order",
-  "Lap times in between the anchors: pace + tyre wear + fuel + seeded noise",
+  "Position each lap follows from the synthetic times; the lap-1 order is the grid order, with the sourced lap-1 order at the front; each lap's leader and the sourced snapshots of the order and gaps are anchors, the rest of the order is estimated",
+  "Lap times in between the anchors: pace + tyre wear + fuel + seeded noise, the pace moved by a constant between the laps the sourced order marks",
   "Fuel: 0.06s per lap of fuel on board; full tank at the start",
   "Stop loss: pit-lane time - 5.0s, 35% on the in-lap",
   "PitInTime is the in-lap's end; PitOutTime adds the out-lap's share of the lane time",
@@ -29,6 +29,20 @@
   "jolpicaRound": 16,
   "eventName": "Australian Grand Prix"
  },
+ "classified": [
+  "PRO",
+  "PIQN",
+  "JOH",
+  "BRU",
+  "STRP",
+  "DUM",
+  "ARN",
+  "ALL",
+  "PALJ",
+  "FAB"
+ ],
+ "roadPositions": [],
+ "lastLapStops": [],
  "stopsComplete": false,
  "safetyCarsComplete": true,
  "params": {
@@ -47,6 +61,11 @@
   "sc_gap": 0.8,
   "sc_iterations": 12,
   "order_gap": 0.5,
+  "lead_margin": 1.0,
+  "lap_gap_tolerance": 1.0,
+  "order_iterations": 6,
+  "pace_weight": 0.05,
+  "pack_weight": 1.0,
   "gap_tolerance": 2.0,
   "attempts": 6,
   "refuel": null
@@ -58,34 +77,34 @@
  },
  "fitted": {
   "PRO": {
-   "pace": 80.319,
+   "pace": 80.312,
    "wear": 0.025,
    "noise": 0.525,
    "target": 6860.388
   },
   "PIQN": {
-   "pace": 81.176,
+   "pace": 81.183,
    "wear": 0.0,
    "noise": 0.175,
    "target": 6864.593
   },
   "JOH": {
-   "pace": 82.566,
+   "pace": 82.591,
    "wear": 0.0,
    "noise": 0.35,
-   "target": 6901.367
+   "target": 6903.327
   },
   "BRU": {
-   "pace": 81.735,
+   "pace": 81.731,
    "wear": 0.025,
    "noise": 0.525,
-   "target": 6912.88
+   "target": 6912.549
   },
   "STRP": {
-   "pace": 79.323,
-   "wear": 0.05,
-   "noise": 0.35,
-   "target": 6711.953
+   "pace": 83.21,
+   "wear": 0.0,
+   "noise": 0.7,
+   "target": 6855.073
   },
   "DUM": {
    "pace": 83.095,
@@ -94,7 +113,7 @@
    "target": 6860.888
   },
   "ARN": {
-   "pace": 84.278,
+   "pace": 84.27,
    "wear": 0.0,
    "noise": 0.7,
    "target": 6860.888
@@ -124,22 +143,22 @@
    "target": 6860.888
   },
   "MAN": {
-   "pace": 81.439,
-   "wear": 0.0,
-   "noise": 0.7,
-   "target": 5333.91
-  },
-  "PAT": {
-   "pace": 83.419,
-   "wear": 0.0,
-   "noise": 0.7,
-   "target": 5457.057
-  },
-  "ROSK": {
-   "pace": 82.192,
+   "pace": 80.744,
    "wear": 0.0,
    "noise": 0.525,
-   "target": 5295.464
+   "target": 5291.116
+  },
+  "PAT": {
+   "pace": 83.493,
+   "wear": 0.0,
+   "noise": 0.7,
+   "target": 5461.547
+  },
+  "ROSK": {
+   "pace": 79.94,
+   "wear": 0.025,
+   "noise": 0.35,
+   "target": 5202.59
   },
   "BEG": {
    "pace": 102.167,
@@ -148,58 +167,58 @@
    "target": 6861.388
   },
   "WAR": {
-   "pace": 83.832,
+   "pace": 83.919,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 4984.222
+   "target": 4989.012
   },
   "DAN": {
-   "pace": 85.843,
+   "pace": 85.87,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 4653.13
+   "target": 4654.473
   },
   "BOUT": {
    "pace": 85.558,
    "wear": 0.0,
-   "noise": 0.7,
-   "target": 4462.129
+   "noise": 1.05,
+   "target": 4463.549
   },
   "SENA": {
-   "pace": 79.362,
-   "wear": 0.225,
+   "pace": 79.406,
+   "wear": 0.175,
    "noise": 0.525,
-   "target": 3786.43
+   "target": 3742.732
   },
   "DEC": {
-   "pace": 86.666,
+   "pace": 86.736,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 3622.579
+   "target": 3625.245
   },
   "BER": {
-   "pace": 85.045,
+   "pace": 85.198,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 3547.592
+   "target": 3554.017
   },
   "ROT": {
-   "pace": 86.626,
+   "pace": 86.654,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 2636.133
+   "target": 2636.886
   },
   "JON": {
-   "pace": 84.775,
+   "pace": 84.989,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 1427.998
+   "target": 1430.998
   },
   "NAN": {
-   "pace": 87.583,
+   "pace": 87.512,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 927.656
+   "target": 927.088
   },
   "GHI": {
    "pace": 94.172,
@@ -230,7 +249,7 @@
    "total": 15
   },
   "retirement event": {
-   "pass": 15,
+   "pass": 14,
    "total": 15
   },
   "laps down": {
@@ -244,20 +263,32 @@
   "safety car": {
    "pass": 1,
    "total": 1
+  },
+  "leader": {
+   "pass": 4,
+   "total": 4
+  },
+  "running order": {
+   "pass": 5,
+   "total": 5
+  },
+  "lap gap": {
+   "pass": 1,
+   "total": 1
   }
  },
  "anchors": [
   {
    "anchor": "grid",
-   "subject": "lap-1 order is the grid order",
+   "subject": "lap-1 order is the grid order (the sourced lap-1 order at the front)",
    "target": [
-    "MAN",
     "PIQN",
     "SENA",
+    "ROSK",
+    "MAN",
     "PRO",
     "ARN",
     "BER",
-    "ROSK",
     "ALL",
     "STRP",
     "DEC",
@@ -278,13 +309,13 @@
     "BEG"
    ],
    "achieved": [
-    "MAN",
     "PIQN",
     "SENA",
+    "ROSK",
+    "MAN",
     "PRO",
     "ARN",
     "BER",
-    "ROSK",
     "ALL",
     "STRP",
     "DEC",
@@ -339,7 +370,7 @@
    "anchor": "gap",
    "subject": "PIQN",
    "target": 4.205,
-   "achieved": 4.204,
+   "achieved": 4.206,
    "pass": true
   },
   {
@@ -678,8 +709,8 @@
    "anchor": "retirement event",
    "subject": "STRP",
    "target": true,
-   "achieved": true,
-   "pass": true
+   "achieved": false,
+   "pass": false
   },
   {
    "anchor": "retirement",
@@ -953,10 +984,123 @@
    "target": [],
    "achieved": [],
    "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "PIQN laps 1-6",
+   "target": "6 laps",
+   "achieved": "6 of 6 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "ROSK laps 7-62",
+   "target": "56 laps",
+   "achieved": "56 of 56 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "PIQN laps 63-64",
+   "target": "2 laps",
+   "achieved": "2 of 2 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "PRO laps 65-82",
+   "target": "18 laps",
+   "achieved": "18 of 18 laps",
+   "pass": true
+  },
+  {
+   "anchor": "running order",
+   "subject": "lap 1",
+   "target": [
+    "PIQN",
+    "SENA",
+    "ROSK"
+   ],
+   "achieved": [
+    "PIQN",
+    "SENA",
+    "ROSK"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "running order",
+   "subject": "lap 44",
+   "target": [
+    "ROSK",
+    "PIQN",
+    "MAN"
+   ],
+   "achieved": [
+    "ROSK",
+    "PIQN",
+    "MAN"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "running order",
+   "subject": "lap 57",
+   "target": [
+    "ROSK",
+    "PIQN",
+    "MAN",
+    "PRO"
+   ],
+   "achieved": [
+    "ROSK",
+    "PIQN",
+    "MAN",
+    "PRO"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "running order",
+   "subject": "lap 62",
+   "target": [
+    "ROSK",
+    "PIQN",
+    "PRO",
+    "MAN"
+   ],
+   "achieved": [
+    "ROSK",
+    "PIQN",
+    "PRO",
+    "MAN"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "running order",
+   "subject": "lap 80",
+   "target": [
+    "PRO",
+    "PIQN"
+   ],
+   "achieved": [
+    "PRO",
+    "PIQN"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "lap gap",
+   "subject": "PIQN at lap 80 (+/-1s)",
+   "target": 15.484,
+   "achieved": 15.085,
+   "pass": true
   }
  ],
  "notes": [
   "incident (not modelled): lap 63 FAULT ROSK: Right-rear tyre failure, retired",
-  "incident (not modelled): lap 64 FAULT MAN: Left-rear tyre exploded on the Brabham Straight, retired"
+  "incident (not modelled): lap 64 FAULT MAN: Left-rear tyre exploded on the Brabham Straight, retired",
+  "STRP: classified retirement stopped at its natural time, after the point a retirement is seen"
  ]
 }

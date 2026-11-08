@@ -15,5 +15,44 @@
     "stops": false,
     "safetyCars": true
   },
+  "lapLeaders": [
+    {
+      "driver": "PIQN",
+      "name": "Nelson Piquet",
+      "fromLap": 1,
+      "toLap": 62,
+      "source": "https://en.wikipedia.org/wiki/1987_British_Grand_Prix (lap-leader chart, Template:F1Laps1987 'GBR')"
+    },
+    {
+      "driver": "MAN",
+      "name": "Nigel Mansell",
+      "fromLap": 63,
+      "toLap": 65,
+      "source": "https://en.wikipedia.org/wiki/1987_British_Grand_Prix (lap-leader chart, Template:F1Laps1987 'GBR')"
+    }
+  ],
+  "runningOrder": [
+    {
+      "lap": 1,
+      "order": [
+        "PIQN",
+        "MAN"
+      ],
+      "source": "https://en.wikipedia.org/wiki/1987_British_Grand_Prix: 'Prost ... took the lead, only to be passed by Piquet at Maggotts; Mansell soon followed his teammate'; https://www.motorsportmagazine.com/archive/article/august-1987/57/sunrise-over-silverstone: 'going into Maggots Piquet passed him, and Mansell went through before Stowe'"
+    },
+    {
+      "lap": 34,
+      "order": [
+        "PIQN",
+        "MAN"
+      ],
+      "gaps": {
+        "MAN": 2.0
+      },
+      "gapTolerance": 1.5,
+      "source": "https://en.wikipedia.org/wiki/1987_British_Grand_Prix: 'On lap 35, Mansell was around two seconds behind his teammate.'",
+      "note": "entered at the end of lap 34: lap 35 is Mansell's in-lap (he stopped at its end), whose synthetic time carries part of the stop loss; the source's gap is before the stop"
+    }
+  ],
   "notes": "Piquet (#6) ran non-stop (Motor Sport). Prost (#1) stopped for tyres while third (no lap) and later retired with clutch failure (Jolpica: 53 laps)."
 }

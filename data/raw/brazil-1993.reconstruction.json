@@ -13,8 +13,8 @@
  },
  "estimates": [
   "Every lap time and lap-end Time is synthetic: solved to the anchors, not measured",
-  "Position each lap follows from the synthetic times; the lap-1 order is the grid order",
-  "Lap times in between the anchors: pace + tyre wear + fuel + seeded noise",
+  "Position each lap follows from the synthetic times; the lap-1 order is the grid order, with the sourced lap-1 order at the front; each lap's leader and the sourced snapshots of the order and gaps are anchors, the rest of the order is estimated",
+  "Lap times in between the anchors: pace + tyre wear + fuel + seeded noise, the pace moved by a constant between the laps the sourced order marks",
   "Fuel: 0.06s per lap of fuel on board; full tank at the start",
   "Stop loss: pit-lane time - 5.0s, 35% on the in-lap",
   "PitInTime is the in-lap's end; PitOutTime adds the out-lap's share of the lane time",
@@ -45,6 +45,7 @@
   "BAD"
  ],
  "roadPositions": [],
+ "lastLapStops": [],
  "stopsComplete": false,
  "safetyCarsComplete": true,
  "params": {
@@ -63,6 +64,11 @@
   "sc_gap": 0.8,
   "sc_iterations": 12,
   "order_gap": 0.5,
+  "lead_margin": 1.0,
+  "lap_gap_tolerance": 1.0,
+  "order_iterations": 6,
+  "pace_weight": 0.05,
+  "pack_weight": 1.0,
   "gap_tolerance": 2.0,
   "attempts": 6,
   "refuel": null
@@ -74,130 +80,130 @@
  },
  "fitted": {
   "SENA": {
-   "pace": 89.896,
+   "pace": 89.768,
    "wear": 0.0,
    "noise": 1.05,
    "target": 6675.485
   },
   "HIL": {
-   "pace": 86.51,
+   "pace": 85.752,
    "wear": 0.25,
    "noise": 1.05,
    "target": 6692.11
   },
   "MSCM": {
-   "pace": 89.965,
+   "pace": 89.659,
    "wear": 0.0,
    "noise": 1.05,
    "target": 6720.921
   },
   "HER": {
-   "pace": 90.039,
+   "pace": 90.31,
    "wear": 0.0,
    "noise": 1.05,
    "target": 6722.042
   },
   "BLU": {
-   "pace": 80.429,
+   "pace": 80.371,
    "wear": 0.0,
    "noise": 1.05,
    "target": 6727.612
   },
   "ZAN": {
-   "pace": 81.115,
+   "pace": 80.864,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 6675.985
+   "target": 6679.132
   },
   "ALL": {
-   "pace": 81.114,
+   "pace": 81.067,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 6676.485
+   "target": 6679.632
   },
   "ALE": {
-   "pace": 80.77,
+   "pace": 80.602,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 6676.985
+   "target": 6680.132
   },
   "WAR": {
-   "pace": 82.391,
+   "pace": 82.384,
    "wear": 0.0,
    "noise": 1.05,
    "target": 6675.985
   },
   "COM": {
-   "pace": 82.155,
+   "pace": 82.169,
    "wear": 0.0,
    "noise": 1.05,
    "target": 6676.485
   },
   "ALBM": {
-   "pace": 84.108,
+   "pace": 83.938,
    "wear": 0.0,
    "noise": 1.05,
    "target": 6675.985
   },
   "BAD": {
-   "pace": 84.084,
+   "pace": 83.903,
    "wear": 0.0,
    "noise": 1.05,
    "target": 6676.485
   },
   "WEN": {
-   "pace": 88.529,
+   "pace": 90.582,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 5671.678
+   "target": 5829.411
   },
   "JAR": {
-   "pace": 72.119,
-   "wear": 0.0,
-   "noise": 0.175,
-   "target": 4391.018
-  },
-  "DEC": {
-   "pace": 75.214,
+   "pace": 77.926,
    "wear": 0.0,
    "noise": 0.7,
-   "target": 4171.217
+   "target": 4679.913
+  },
+  "DEC": {
+   "pace": 81.324,
+   "wear": 0.0,
+   "noise": 1.05,
+   "target": 4435.629
   },
   "PRO": {
-   "pace": 87.588,
+   "pace": 81.889,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 2700.955
+   "target": 2616.601
   },
   "FITC": {
-   "pace": 89.775,
+   "pace": 85.504,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 2700.155
+   "target": 2590.868
   },
   "SUZ": {
-   "pace": 91.47,
+   "pace": 89.679,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 2607.964
+   "target": 2562.131
   },
   "KAT": {
-   "pace": 89.092,
+   "pace": 88.213,
    "wear": 0.25,
    "noise": 1.05,
-   "target": 2505.921
+   "target": 2484.776
   },
   "BAR": {
-   "pace": 90.219,
+   "pace": 91.002,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 1225.75
+   "target": 1234.364
   },
   "PAT": {
-   "pace": 91.72,
+   "pace": 93.689,
    "wear": 0.25,
    "noise": 1.05,
-   "target": 279.695
+   "target": 281.664
   }
  },
  "summary": {
@@ -238,6 +244,14 @@
    "total": 38
   },
   "safety car": {
+   "pass": 1,
+   "total": 1
+  },
+  "leader": {
+   "pass": 3,
+   "total": 3
+  },
+  "running order": {
    "pass": 1,
    "total": 1
   }
@@ -331,28 +345,28 @@
    "anchor": "gap",
    "subject": "HIL",
    "target": 16.625,
-   "achieved": 16.623,
+   "achieved": 16.629,
    "pass": true
   },
   {
    "anchor": "gap",
    "subject": "MSCM",
    "target": 45.436,
-   "achieved": 45.436,
+   "achieved": 45.439,
    "pass": true
   },
   {
    "anchor": "gap",
    "subject": "HER",
    "target": 46.557,
-   "achieved": 46.558,
+   "achieved": 46.555,
    "pass": true
   },
   {
    "anchor": "gap",
    "subject": "BLU",
    "target": 52.127,
-   "achieved": 52.126,
+   "achieved": 52.133,
    "pass": true
   },
   {
@@ -1349,10 +1363,65 @@
     36
    ],
    "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "PRO laps 1-29",
+   "target": "29 laps",
+   "achieved": "29 of 29 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "HIL laps 30-41",
+   "target": "12 laps",
+   "achieved": "12 of 12 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "SENA laps 42-71",
+   "target": "30 laps",
+   "achieved": "30 of 30 laps",
+   "pass": true
+  },
+  {
+   "anchor": "running order",
+   "subject": "lap 11",
+   "target": [
+    "PRO",
+    "HIL",
+    "SENA"
+   ],
+   "achieved": [
+    "PRO",
+    "HIL",
+    "SENA"
+   ],
+   "pass": true
   }
  ],
  "notes": [
-  "the laps behind the safety car did not settle"
+  "the laps behind the safety car did not settle",
+  "HIL: target 6692.1s not reachable",
+  "SENA: target 6675.5s not reachable",
+  "MSCM: target 6720.9s not reachable",
+  "HER: target 6722.0s not reachable",
+  "BLU: target 6727.6s not reachable",
+  "ZAN: target 6692.0s not reachable",
+  "ALL: target 6708.0s not reachable",
+  "ALE: target 6724.0s not reachable",
+  "WAR: target 6697.5s not reachable",
+  "COM: target 6719.0s not reachable",
+  "ALBM: target 6697.6s not reachable",
+  "BAD: target 6719.2s not reachable",
+  "ZAN: target 6676.0s not reachable",
+  "ALL: target 6676.5s not reachable",
+  "ALE: target 6677.0s not reachable",
+  "WAR: target 6676.0s not reachable",
+  "COM: target 6676.5s not reachable",
+  "ALBM: target 6676.0s not reachable",
+  "BAD: target 6676.5s not reachable"
  ],
  "weather": {
   "source": "reconstruction-facts",
