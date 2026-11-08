@@ -8,7 +8,10 @@
 // stop by your car or the rival is called out while it drives the pit lane.
 // An Eras race (`eras`, build plan 8.6) adds its difficulty: a timer on every big call (the
 // default option when it runs out, unless the player turned the timer off: then the attempt is
-// marked untimed) and the information level. Without it, nothing here changes.
+// marked untimed), the same timer on quick calls and battles (the race holds while one waits;
+// out of time, the same outcome as no answer), and the information level, passed to every
+// place a gap or a tyre age shows and to the engineer's radio. Without it, nothing here
+// changes.
 
 import {
   type Decision,
@@ -49,6 +52,7 @@ import { TyreBadge } from '../components/TyreBadge.js';
 import { namedUpper, surname } from '../data/names.js';
 import { DecisionTimer } from '../eras/difficulty/DecisionTimer.js';
 import { NeighbourGaps } from '../eras/difficulty/NeighbourGaps.js';
+import { erasCallTimer, holdsForQuickCall } from '../eras/difficulty/callTimer.js';
 import type { ErasRace } from '../eras/difficulty/erasRace.js';
 import { gapShown, gapText, informationView } from '../eras/difficulty/information.js';
 import { setTimerOn, timerOn } from '../eras/difficulty/settings.js';
@@ -333,6 +337,7 @@ export function RaceScreen({
       // A stop called, or the plan's within two laps (its heads-up asks instead).
       state.decisions.some((d) => d.kind === 'pit' && d.lap > raceLap) ||
         !!state.plan.active?.stops.some((s) => s.lap > raceLap && s.lap <= raceLap + 2),
+      info,
     );
     if (call?.kind === 'battle') {
       const fight = battleAt(call);
@@ -353,7 +358,7 @@ export function RaceScreen({
     const last = memory.current.last.info ?? -99;
     const neutral = state.race.nextFlag !== 'green' || state.race.flag !== 'green';
     if (raceLap - last >= (neutral ? 1 : 2)) {
-      const line = infoLine(state.race, model, log);
+      const line = infoLine(state.race, model, log, info);
       if (line) {
         memory.current.last.info = raceLap;
         game.radio(line);
@@ -433,21 +438,22 @@ export function RaceScreen({
     [game, state.race.lap, userSide, setPace, setBattle],
   );
   // No call while the race waits at the braking zone: the driver makes his own move.
+  const driverMoves = useCallback(() => {
+    const b = battleRef.current;
+    const own = b?.call.driverChoice;
+    if (!b || !own || own.kind !== 'battle') return;
+    game.radio(`No call from the wall: ${userSide} makes his own move.`);
+    game.call({ ...own, lap: state.race.lap + 1 }, { quiet: true });
+    const match = b.call.options.find((x) => x.call?.kind === 'battle' && x.call.move === own.move);
+    if (match) answerBattle(match.id, true);
+  }, [game, userSide, state.race.lap, answerBattle]);
+  // (In Eras the era's decision timer on the card does this instead.)
+  const erasRace = !!eras;
   useEffect(() => {
-    if (stage !== 'waiting') return;
-    const id = setTimeout(() => {
-      const b = battleRef.current;
-      const own = b?.call.driverChoice;
-      if (!b || !own || own.kind !== 'battle') return;
-      game.radio(`No call from the wall: ${userSide} makes his own move.`);
-      game.call({ ...own, lap: state.race.lap + 1 }, { quiet: true });
-      const match = b.call.options.find(
-        (x) => x.call?.kind === 'battle' && x.call.move === own.move,
-      );
-      if (match) answerBattle(match.id, true);
-    }, BATTLE_WAIT_MS);
+    if (stage !== 'waiting' || erasRace) return;
+    const id = setTimeout(driverMoves, BATTLE_WAIT_MS);
     return () => clearTimeout(id);
-  }, [stage, game, userSide, state.race.lap, answerBattle]);
+  }, [stage, erasRace, driverMoves]);
 
   // The lap a BOX call turns in at (pit fix): the end of the lap being shown, if your car can
   // still reach pit entry on it (the map knows where it is); otherwise the end of the next one.
@@ -500,6 +506,7 @@ export function RaceScreen({
       userSide={userSide}
       rival={rival}
       onClose={close}
+      info={info}
     />
   ) : null;
 
@@ -517,12 +524,31 @@ export function RaceScreen({
   const attemptId = eras?.attemptId;
   const onUntimed = eras?.onUntimed;
   const [untimed, setUntimed] = useState(() => !!attemptId && attemptUntimed(attemptId));
+  // The call waiting for an answer: the big call, a quick call, or a battle at the braking zone.
+  const waitingFor =
+    momentId ??
+    (quick && state.phase === 'racing'
+      ? `quick-${quick.lap}`
+      : battle?.stage === 'waiting'
+        ? `battle-${battle.lap}`
+        : undefined);
   useEffect(() => {
-    if (!attemptId || !momentId || !noteDecisionShown(attemptId, timed)) return;
+    if (!attemptId || !waitingFor || !noteDecisionShown(attemptId, timed)) return;
     setUntimed(true);
     onUntimed?.();
-  }, [attemptId, momentId, timed, onUntimed]);
+  }, [attemptId, waitingFor, timed, onUntimed]);
   const timerSeconds = eras && timed ? eras.difficulty.decisionTimerSeconds : null;
+  // Quick calls and battles in Eras: the era's timer, not the cards' own (callTimer.tsx).
+  const erasTimer = (key: string, onExpire: () => void) =>
+    erasCallTimer(eras, timed, key, onExpire);
+  // In Eras a quick call waits for its timer (or, with the timer off, for the call): the race
+  // holds while it's up, and runs on once it's answered or out of time.
+  const holdForCall = holdsForQuickCall(eras, !!quick, state.phase === 'racing');
+  useEffect(() => {
+    if (!holdForCall) return;
+    setPace('frozen');
+    return () => setPace('normal');
+  }, [holdForCall, setPace]);
   // Out of time: the wall takes the default (stay out, or keep the current mode).
   const expire = useCallback(() => {
     if (state.currentMoment) takeDefault(game, state.currentMoment, me?.modes);
@@ -648,7 +674,14 @@ export function RaceScreen({
         log={log}
         notes={game.notes()}
       />
-      <CarStats race={state.race} model={model} log={log} userSide={userSide} rival={rival} />
+      <CarStats
+        race={state.race}
+        model={model}
+        log={log}
+        userSide={userSide}
+        rival={rival}
+        info={info}
+      />
       <Panel
         label={`Gap to ${rival}`}
         title={`Gap to ${surname(rival)}`}
@@ -696,6 +729,7 @@ export function RaceScreen({
       rival={rival}
       onPick={select}
       live={live}
+      info={info}
     />
   );
 
@@ -742,6 +776,7 @@ export function RaceScreen({
       chosen={battle.chosen}
       result={battle.stage === 'done' ? battle.result : null}
       onAnswer={answerBattle}
+      eras={erasTimer(`battle-${battle.lap}`, driverMoves)}
     />
   ) : headsUp && racing && headsUpSeen !== headsUp.lap ? (
     <PlanHeadsUp
@@ -776,6 +811,7 @@ export function RaceScreen({
       }
       onAnswer={answerQuick}
       onTimeout={quickTimeout}
+      eras={erasTimer(`quick-${quick.lap}`, quickTimeout)}
     />
   ) : finishing && crossed ? (
     <output className="flex items-center justify-center gap-3 bg-[#F4F6F5] px-5 py-3 text-[#0B0E0D]">
@@ -1022,6 +1058,7 @@ export function RaceScreen({
                     rival={rival}
                     live={live}
                     onPick={select}
+                    info={info}
                   />
                 </div>
               )}
@@ -1119,6 +1156,7 @@ export function RaceScreen({
                       log={log}
                       userSide={userSide}
                       rival={rival}
+                      info={info}
                     />
                   </div>
                 )}

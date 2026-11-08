@@ -1,0 +1,249 @@
+// Without an Eras difficulty, the standings, the leaders, the driver card, the car stats, the
+// quick-call and battle cards, the big call and the engineer's radio are exactly what they were
+// before the information levels reached them (build plan 8.6). Each digest below was taken
+// from the code as it stood before that change, over real races and sessions; any change to
+// what these render outside Eras changes a digest.
+
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { type RaceModel, engineerConfig } from '@laststint/sim';
+import { createElement } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
+import { beforeAll, describe, expect, it } from 'vitest';
+import { BattleCard } from '../../components/BattleCard.js';
+import { BroadcastDecision } from '../../components/BroadcastDecision.js';
+import { CarStats } from '../../components/CarStats.js';
+import { DriverCard } from '../../components/DriverCard.js';
+import { LeadersTower } from '../../components/LeadersTower.js';
+import { QuickCallCard } from '../../components/QuickCallCard.js';
+import { TimingTower } from '../../components/TimingTower.js';
+import { StaticDailyProvider } from '../../data/provider.js';
+import type { Daily } from '../../data/types.js';
+import { GameEngine } from '../../engine/engine.js';
+import { directorCall, infoLine, newMemory } from '../../game/engineerCalls.js';
+import { quickCallLaps } from '../../game/quickCalls.js';
+import { RaceLog } from '../../game/raceLog.js';
+import type { Game } from '../../game/useGame.js';
+import { RaceScreen } from '../../screens/RaceScreen.js';
+import { GameSession } from '../../state/session.js';
+import { overtakingCorners } from '../../track/corners.js';
+import { outlineFor } from '../../track/outlines.js';
+
+const digest = (parts: string[]) =>
+  createHash('sha256').update(parts.join('\n---\n')).digest('hex').slice(0, 16);
+
+let daily: Daily;
+beforeAll(async () => {
+  daily = await new StaticDailyProvider().today();
+});
+
+/** The Daily's race state at its takeover, a few laps on, and at its first big call. */
+function sessions(): GameSession[] {
+  const out: GameSession[] = [];
+  for (const laps of [0, 4, 300]) {
+    const s = new GameSession(daily);
+    s.start();
+    s.pickPlan('a');
+    for (let i = 0; i < laps && s.state.phase === 'racing'; i++) s.tick();
+    out.push(s);
+  }
+  return out;
+}
+
+const raceFile = (id: string) =>
+  JSON.parse(
+    readFileSync(
+      join(__dirname, '..', '..', '..', '..', '..', 'data', 'races', `${id}.json`),
+      'utf8',
+    ),
+  ) as RaceModel;
+
+/** Every call the director makes and every info line, over a whole race with no answers. */
+function radio(model: RaceModel): string[] {
+  const engine = new GameEngine(model, model.race.seed, { decisions: [] });
+  const cfg = engineerConfig(model);
+  const corners = overtakingCorners(outlineFor(model.race.id));
+  const quick = new Set(quickCallLaps(model));
+  const memory = newMemory();
+  const log = new RaceLog();
+  log.see(engine.state);
+  const out: string[] = [];
+  while (!engine.isFinished()) {
+    engine.step();
+    const events = log.see(engine.state);
+    const lap = engine.lap;
+    const call = directorCall(
+      engine.state,
+      model,
+      cfg,
+      events,
+      engine.notes,
+      corners,
+      memory,
+      quick.has(lap),
+    );
+    out.push(JSON.stringify(call));
+    out.push(String(infoLine(engine.state, model, events)));
+  }
+  return out;
+}
+
+const RADIO_RACES = ['abu-dhabi-2021', 'bahrain-2021', 'austria-2019'];
+
+describe('outside Eras, byte-identical to before the information levels', () => {
+  it('the standings, leaders, driver card and car stats', () => {
+    const towers: string[] = [];
+    const leaders: string[] = [];
+    const cards: string[] = [];
+    const stats: string[] = [];
+    for (const s of sessions()) {
+      const race = s.state.race;
+      const { userSide, rival } = s.state.meta;
+      const log = new RaceLog().see(race);
+      const base = { race, model: daily.model, userSide, rival };
+      towers.push(renderToStaticMarkup(createElement(TimingTower, base)));
+      leaders.push(
+        renderToStaticMarkup(
+          createElement(LeadersTower, { ...base, live: null, onPick: () => {} }),
+        ),
+      );
+      for (const code of race.order)
+        cards.push(
+          renderToStaticMarkup(
+            createElement(DriverCard, { ...base, code, log, onClose: () => {} }),
+          ),
+        );
+      stats.push(renderToStaticMarkup(createElement(CarStats, { ...base, log })));
+    }
+    expect({
+      towers: digest(towers),
+      leaders: digest(leaders),
+      cards: digest(cards),
+      stats: digest(stats),
+    }).toEqual(TODAY.components);
+  });
+
+  it('the race screen', () => {
+    const html = sessions().map((s) => {
+      const game = {
+        state: s.state,
+        model: daily.model,
+        clock: null,
+        notes: () => s.notes,
+        preview: () => s.previewLap(),
+        setPace: () => {},
+      } as unknown as Game;
+      return renderToStaticMarkup(
+        createElement(RaceScreen, { game, state: s.state, model: daily.model }),
+      );
+    });
+    expect(digest(html)).toBe(TODAY.screen);
+  });
+
+  it('the big call', () => {
+    const s = sessions()[2] as GameSession;
+    const moment = s.state.currentMoment;
+    if (!moment) throw new Error('no moment');
+    const html = renderToStaticMarkup(
+      createElement(BroadcastDecision, {
+        moment,
+        race: s.state.race,
+        model: daily.model,
+        onChoose: () => {},
+      }),
+    );
+    expect(digest([html])).toBe(TODAY.decision);
+  });
+
+  it('the quick-call and battle cards', () => {
+    const s = sessions()[1] as GameSession;
+    const { userSide, rival } = s.state.meta;
+    const quick = {
+      lap: 12,
+      from: 'Engineer',
+      kind: 'quick' as const,
+      text: `Gap to ${rival} is 1.4 s. Push?`,
+      stats: [{ label: 'Gap', value: '1.4 s ahead' }],
+      options: [
+        { id: 'push', label: 'Push', note: 'Harder on the tyres', call: null },
+        { id: 'stay', label: 'Stay steady', call: null },
+      ],
+    };
+    const battle = {
+      ...quick,
+      from: userSide,
+      kind: 'battle' as const,
+      other: rival,
+      attacking: true,
+      gap: 0.8,
+      options: [
+        { id: 'dive', label: 'Dive up the inside', line: 'inside' as const, call: null },
+        {
+          id: 'drs',
+          label: 'Wait for DRS',
+          line: 'wait' as const,
+          odds: { good: 0.4, label: 'pass' as const, contact: 0.02 },
+          call: null,
+        },
+      ],
+    };
+    const html = [
+      renderToStaticMarkup(
+        createElement(QuickCallCard, {
+          call: quick,
+          ms: 8000,
+          onAnswer: () => {},
+          onTimeout: () => {},
+        }),
+      ),
+      renderToStaticMarkup(
+        createElement(QuickCallCard, {
+          call: battle,
+          ms: 12000,
+          onAnswer: () => {},
+          onTimeout: () => {},
+        }),
+      ),
+      ...(['approach', 'waiting', 'move', 'done'] as const).map((stage) =>
+        renderToStaticMarkup(
+          createElement(BattleCard, {
+            call: battle,
+            corner: 4,
+            stage,
+            clock: null,
+            fromP: 0.2,
+            brakeP: 0.5,
+            waitMs: 8000,
+            chosen: stage === 'move' ? 'dive' : null,
+            result: stage === 'done' ? { text: 'HELD!', good: true } : null,
+            onAnswer: () => {},
+          }),
+        ),
+      ),
+    ];
+    expect(digest(html)).toBe(TODAY.cards);
+  });
+
+  it.each(RADIO_RACES)('the engineer’s radio over %s', (id) => {
+    expect(digest(radio(raceFile(id)))).toBe(TODAY.radio[id]);
+  });
+});
+
+/** Taken from the code before the information levels reached these components. */
+const TODAY = {
+  components: {
+    towers: 'a449f21e721bd551',
+    leaders: '54c52f9a97e88bc8',
+    cards: 'efcfeeeb0a03435b',
+    stats: '99026aee5f173aca',
+  },
+  screen: 'a3ff5c603c39a2f9',
+  decision: '83c43706f3ac536e',
+  cards: 'f99d02a3023043c8',
+  radio: {
+    'abu-dhabi-2021': 'a55e7569522eda73',
+    'bahrain-2021': '0de38febb3d20a64',
+    'austria-2019': '76eb6270fef0185e',
+  } as Record<string, string>,
+};

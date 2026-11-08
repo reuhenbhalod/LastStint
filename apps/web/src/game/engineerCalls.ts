@@ -9,6 +9,10 @@
 //   5. the battery running low with a car close;
 //   6. the engineer's own questions on the quick-call laps (quickCalls.ts).
 // Every answer is a call the race model plays, logged for the server's replay.
+// In Eras (`info`, eras spec §7) what the radio says follows the information level: gaps
+// rounded at Limited, at Minimal only the gaps to the cars directly ahead and behind, and the
+// other car's tyre age as a range from Reduced down. The calls themselves are picked from the
+// race as it is. Without it, exactly as before.
 
 import {
   type BattleMove,
@@ -30,6 +34,14 @@ import {
   wetnessOn,
 } from '@laststint/sim';
 import { driverInfo } from '../data/drivers.js';
+import {
+  FULL_INFORMATION,
+  type InformationView,
+  gapShown,
+  gapText,
+  shownGap,
+  tyreAgeText,
+} from '../eras/difficulty/information.js';
 import type { CornerKind } from '../track/battle.js';
 import { lapTime } from '../track/geometry.js';
 import { tyreName } from './choices.js';
@@ -48,6 +60,9 @@ import type { LapEvents } from './raceLog.js';
 /** Seconds to answer: a battle is now or never; the rest can wait a little longer. */
 export const BATTLE_MS = 12000;
 export const CALL_MS = 8000;
+
+/** A gap in seconds as the radio says it ("1.4"), rounded as the information level says. */
+const secs = (info: InformationView, gap: number) => shownGap(info, gap).toFixed(1);
 
 /** Laps between two stop questions (a "stay out" answer stands for a while). */
 export const STOP_ASK_EVERY = 3;
@@ -113,6 +128,7 @@ function battleCall(
   corners: number[],
   mem: DirectorMemory,
   log: LapEvents[],
+  info: InformationView,
 ): QuickCall | null {
   const b = battlesFor(race, model, cfg);
   const me = race.cars[model.userSide];
@@ -134,7 +150,7 @@ function battleCall(
   if (!battleDue(other, race.lap, mem)) return null;
   // A long fight changes rhythm: every third lap of it is a pressure call, not a corner.
   if ((mem.fight?.streak ?? 1) % 3 === 0)
-    return pressureCall(race, model, other, gap, pick === 'ahead');
+    return pressureCall(race, model, other, gap, pick === 'ahead', info);
   const us = model.userSide;
   const attacking = pick === 'ahead';
   const eng = race.engineer;
@@ -180,16 +196,16 @@ function battleCall(
   });
 
   const quicker = paceGap(log, us, other);
-  const tyre = (c: { compound: string; tyreAge: number }) =>
-    `${c.compound[0]}${c.compound.slice(1).toLowerCase()} ${c.tyreAge}`;
+  const tyre = (c: { compound: string; tyreAge: number }, own: boolean) =>
+    `${c.compound[0]}${c.compound.slice(1).toLowerCase()} ${tyreAgeText(info, c.tyreAge, own)}`;
   const battery = Math.round(me.battery ?? 0);
   const stats = [
-    { label: 'Gap', value: `${gap.toFixed(1)} s ${attacking ? 'ahead' : 'behind'}` },
+    { label: 'Gap', value: `${secs(info, gap)} s ${attacking ? 'ahead' : 'behind'}` },
     {
       label: 'DRS',
       value: drsRange ? `${attacking ? 'You' : other} ${attacking ? 'have' : 'has'} it` : 'No',
     },
-    { label: 'Tyres', value: `${us} ${tyre(me)} · ${other} ${tyre(them)}` },
+    { label: 'Tyres', value: `${us} ${tyre(me, true)} · ${other} ${tyre(them, false)}` },
     {
       label: 'Pace',
       value:
@@ -240,10 +256,18 @@ function battleCall(
       other,
       corner,
       attacking: true,
-      gap,
+      gap: shownGap(info, gap),
       stats,
       asked: false,
-      text: battleLine(race.lap, other, rival, gap, drsRange, true, eng?.lastMove ?? null),
+      text: battleLine(
+        race.lap,
+        other,
+        rival,
+        secs(info, gap),
+        drsRange,
+        true,
+        eng?.lastMove ?? null,
+      ),
       options,
       driverChoice: battle(next, ownMove(us, true), true),
     };
@@ -255,10 +279,18 @@ function battleCall(
     other,
     corner,
     attacking: false,
-    gap,
+    gap: shownGap(info, gap),
     stats,
     asked: false,
-    text: battleLine(race.lap, other, rival, gap, drsRange, false, eng?.lastMove ?? null),
+    text: battleLine(
+      race.lap,
+      other,
+      rival,
+      secs(info, gap),
+      drsRange,
+      false,
+      eng?.lastMove ?? null,
+    ),
     options: [
       opt('cover', 'Cover the inside', 'cover-inside', 'Solid, costs a little time', 'inside'),
       opt('outside', 'Hold the outside line', 'hold-outside', 'Quicker, easier to pass', 'outside'),
@@ -273,17 +305,17 @@ function battleCall(
 const pickBy = <T>(lap: number, other: string, list: T[]): T =>
   list[(lap * 7 + other.charCodeAt(0) + other.charCodeAt(2)) % list.length] as T;
 
-/** The battle's radio line: who and how far, said a few ways, and what he did last time. */
+/** The battle's radio line: who and how far (`g`, the gap as said), said a few ways, and what
+ * he did last time. */
 function battleLine(
   lap: number,
   other: string,
   rival: string,
-  gap: number,
+  g: string,
   drs: boolean,
   attacking: boolean,
   last: { move: BattleMove; other: string; lap: number } | null,
 ): string {
-  const g = gap.toFixed(1);
   const opening = attacking
     ? drs
       ? pickBy(lap, other, [
@@ -328,9 +360,10 @@ function pressureCall(
   other: string,
   gap: number,
   attacking: boolean,
+  info: InformationView,
 ): QuickCall {
   const next = race.lap + 1;
-  const g = gap.toFixed(1);
+  const g = secs(info, gap);
   const mode = (key: 'battle' | 'pace', value: string): Decision =>
     ({ lap: next, kind: 'mode', key, value }) as Decision;
   return attacking
@@ -763,8 +796,14 @@ function fuelCall(race: RaceState, model: RaceModel, mem: DirectorMemory): Quick
   return null;
 }
 
-/** The engineer's info line on a quiet lap (no answer needed), or null. */
-export function infoLine(race: RaceState, model: RaceModel, log: LapEvents[]): string | null {
+/** The engineer's info line on a quiet lap (no answer needed), or null. At Minimal, with the
+ * rival not directly ahead or behind, it's the cars around us (as with the rival out). */
+export function infoLine(
+  race: RaceState,
+  model: RaceModel,
+  log: LapEvents[],
+  info: InformationView = FULL_INFORMATION,
+): string | null {
   const me = race.cars[model.userSide];
   const them = race.cars[model.rival];
   if (!me || me.retired) return null;
@@ -778,16 +817,17 @@ export function infoLine(race: RaceState, model: RaceModel, log: LapEvents[]): s
   }
   if (race.flag === 'sc')
     return 'Safety car in this lap. Get ready for the restart, it’s your call when to go.';
-  if (!them || them.retired) {
-    // The rival is out: the cars around us.
+  const timed = gapShown(info, race.order, model.userSide, model.rival);
+  if (!them || them.retired || !timed) {
+    // The rival is out (or can't be timed): the cars around us.
     const order = race.order.filter((c) => !race.cars[c]?.retired);
     const i = order.indexOf(model.userSide);
     const ahead = order[i - 1];
     const behind = order[i + 1];
     const t = (c: string) => race.cars[c]?.totalTime ?? 0;
     const parts = [`P${i + 1}`];
-    if (ahead) parts.push(`${ahead} ${(me.totalTime - t(ahead)).toFixed(1)} s ahead`);
-    if (behind) parts.push(`${behind} ${(t(behind) - me.totalTime).toFixed(1)} s behind`);
+    if (ahead) parts.push(`${ahead} ${secs(info, me.totalTime - t(ahead))} s ahead`);
+    if (behind) parts.push(`${behind} ${secs(info, t(behind) - me.totalTime)} s behind`);
     return `${parts.join(', ')}. ${model.race.laps - race.lap} to go.`;
   }
   const gap = them.totalTime - me.totalTime;
@@ -799,9 +839,9 @@ export function infoLine(race: RaceState, model: RaceModel, log: LapEvents[]): s
   const stopped = last?.pits.some((p) => p.code === model.userSide || p.code === model.rival);
   if (ours && theirs && !stopped && Math.abs(ours - theirs) > 0.25) {
     const quicker = theirs < ours;
-    return `${model.rival} ${quicker ? 'was' : 'lost'} ${Math.abs(ours - theirs).toFixed(1)} ${quicker ? 's quicker' : 's to us'} that lap. Gap ${gap >= 0 ? '+' : '−'}${Math.abs(gap).toFixed(1)}.`;
+    return `${model.rival} ${quicker ? 'was' : 'lost'} ${Math.abs(ours - theirs).toFixed(1)} ${quicker ? 's quicker' : 's to us'} that lap. Gap ${gapText(info, gap, false)}.`;
   }
-  return `Gap to ${model.rival} ${gap >= 0 ? '+' : '−'}${Math.abs(gap).toFixed(1)} s, ${left} to go. ${gap >= 0 ? 'Keep it up.' : 'Keep chipping away.'}`;
+  return `Gap to ${model.rival} ${gapText(info, gap, false)} s, ${left} to go. ${gap >= 0 ? 'Keep it up.' : 'Keep chipping away.'}`;
 }
 
 /**
@@ -819,6 +859,8 @@ export function directorCall(
   quickLap: boolean,
   /** A BOX is called and not yet in the race model. */
   pendingPit = false,
+  /** What the Eras information level lets the radio say (everything, otherwise). */
+  info: InformationView = FULL_INFORMATION,
 ): QuickCall | null {
   const me = race.cars[model.userSide];
   if (!me || me.retired) return null;
@@ -848,7 +890,7 @@ export function directorCall(
   if (cfg && race.engineer) {
     // No battle with a stop booked (your car is about to box), or on its in-lap or out-lap.
     const pitLap = pendingPit || me.strategy.some((s) => s.lap === next || s.lap === next + 1);
-    const fight = pitLap ? null : battleCall(race, model, cfg, corners, mem, log);
+    const fight = pitLap ? null : battleCall(race, model, cfg, corners, mem, log, info);
     if (fight) return fight;
     const trouble = troubleCall(race, model, cfg, notes, mem, stopping, canStop);
     if (trouble) return asked(trouble);
@@ -859,7 +901,7 @@ export function directorCall(
     const battery = batteryCall(race, model, cfg, mem);
     if (battery) return battery;
   }
-  return quickLap ? quickCallAt(race, model, log) : null;
+  return quickLap ? quickCallAt(race, model, log, info) : null;
 }
 
 /** The tyres' names as the radio says them. */

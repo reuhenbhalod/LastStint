@@ -10,6 +10,13 @@ import {
   type RaceState,
   tyreLife,
 } from '@laststint/sim';
+import {
+  FULL_INFORMATION,
+  type InformationView,
+  gapShown,
+  gapText,
+  shownGap,
+} from '../eras/difficulty/information.js';
 import { flagOn } from '../track/geometry.js';
 import { tyreName } from './choices.js';
 import type { LapEvents } from './raceLog.js';
@@ -125,8 +132,15 @@ function paceDiff(log: LapEvents[], us: string, them: string, n = 3): number | n
   );
 }
 
-/** The quick call for the lap just completed, from the race as it stands. */
-export function quickCallAt(race: RaceState, model: RaceModel, log: LapEvents[]): QuickCall | null {
+/** The quick call for the lap just completed, from the race as it stands. In Eras (`info`) the
+ * gaps it says are rounded as the information level says, and at Minimal, with the rival not
+ * directly ahead or behind, it can't time him: no call about the gap. */
+export function quickCallAt(
+  race: RaceState,
+  model: RaceModel,
+  log: LapEvents[],
+  info: InformationView = FULL_INFORMATION,
+): QuickCall | null {
   const us = model.userSide;
   const r = model.rival;
   const me = race.cars[us];
@@ -134,7 +148,12 @@ export function quickCallAt(race: RaceState, model: RaceModel, log: LapEvents[])
   if (!me || me.retired) return null;
   const next = race.lap + 1;
   const m = me.modes;
-  const gap = them && !them.retired ? them.totalTime - me.totalTime : null; // > 0: we lead
+  // > 0: we lead
+  const gap =
+    them && !them.retired && gapShown(info, race.order, us, r)
+      ? them.totalTime - me.totalTime
+      : null;
+  const g = (x: number) => shownGap(info, x).toFixed(1);
   // Its usable life (sim tyreLife), not the fitted cliff (often a gentle bend early on).
   const tyre = model.compounds[me.compound as keyof typeof model.compounds];
   const cliff = tyre ? tyreLife(tyre) : 99;
@@ -145,7 +164,7 @@ export function quickCallAt(race: RaceState, model: RaceModel, log: LapEvents[])
     return {
       lap: race.lap,
       from: us,
-      text: `${r} is right with me, ${gap.toFixed(1)} s behind. What do you want?`,
+      text: `${r} is right with me, ${g(gap)} s behind. What do you want?`,
       options: [
         opt('defend', 'Defend', m, next, 'battle', 'defend'),
         opt('hold', 'Race him normally', m, next, 'battle', 'hold'),
@@ -156,7 +175,7 @@ export function quickCallAt(race: RaceState, model: RaceModel, log: LapEvents[])
     return {
       lap: race.lap,
       from: us,
-      text: `I’m ${(-gap).toFixed(1)} s behind ${r}. Can I go for it?`,
+      text: `I’m ${g(-gap)} s behind ${r}. Can I go for it?`,
       options: [
         opt('attack', 'Go for it', m, next, 'battle', 'attack'),
         opt('hold', 'Be patient', m, next, 'battle', 'hold'),
@@ -167,7 +186,7 @@ export function quickCallAt(race: RaceState, model: RaceModel, log: LapEvents[])
     return {
       lap: race.lap,
       from: 'Engineer',
-      text: `${r} is ${quicker.toFixed(1)} s a lap quicker over the last laps. Gap ${Math.abs(gap).toFixed(1)} s. Push to answer?`,
+      text: `${r} is ${quicker.toFixed(1)} s a lap quicker over the last laps. Gap ${g(Math.abs(gap))} s. Push to answer?`,
       options: [
         opt('push', 'Push', m, next, 'pace', 'push'),
         opt('plan', 'Stay on plan', m, next, 'pace', m.pace === 'push' ? 'standard' : m.pace),
@@ -189,7 +208,7 @@ export function quickCallAt(race: RaceState, model: RaceModel, log: LapEvents[])
     return {
       lap: race.lap,
       from: 'Engineer',
-      text: `Gap to ${r} is ${gap.toFixed(1)} s with ${lapsLeft} to go. Turn it down and save the tyres?`,
+      text: `Gap to ${r} is ${g(gap)} s with ${lapsLeft} to go. Turn it down and save the tyres?`,
       options: [
         opt('manage', 'Manage', m, next, 'pace', 'manage'),
         opt('keep', 'Keep the pace', m, next, 'pace', m.pace === 'manage' ? 'standard' : m.pace),
@@ -200,7 +219,7 @@ export function quickCallAt(race: RaceState, model: RaceModel, log: LapEvents[])
     return {
       lap: race.lap,
       from: 'Engineer',
-      text: `${r} is ${(-gap).toFixed(1)} s up the road with ${lapsLeft} to go. Flat out to close it?`,
+      text: `${r} is ${g(-gap)} s up the road with ${lapsLeft} to go. Flat out to close it?`,
       options: [
         opt('push', 'Flat out', m, next, 'pace', 'push'),
         opt('plan', 'Save it for later', m, next, 'pace', 'standard'),
@@ -213,7 +232,7 @@ export function quickCallAt(race: RaceState, model: RaceModel, log: LapEvents[])
     text:
       gap === null
         ? `${lapsLeft} laps to go. How do we run it?`
-        : `Gap to ${r}: ${gap >= 0 ? '+' : '−'}${Math.abs(gap).toFixed(1)} s, ${lapsLeft} to go. Steady, or push for a few laps?`,
+        : `Gap to ${r}: ${gapText(info, gap, false)} s, ${lapsLeft} to go. Steady, or push for a few laps?`,
     options: [
       opt('push', 'Push', m, next, 'pace', 'push'),
       opt('steady', 'Steady', m, next, 'pace', 'standard'),

@@ -2,8 +2,19 @@
 // user's car and the rival are tinted; tapping a driver calls them out on the track map.
 // While the lap runs, the order and gaps are the map's (`live`): an overtake or a stop shows
 // as it happens on track, not only when the lap is done.
+// In Eras (`info`, eras spec §7) the gaps and the other cars' tyre ages follow the information
+// level: gaps rounded at Limited; at Minimal only your interval to the car ahead and the car
+// behind's to you, from the last lap (the race screen stops the live standings); tyre ages as
+// ranges from Reduced down. Without it, exactly as before.
 
 import type { RaceModel, RaceState } from '@laststint/sim';
+import {
+  FULL_INFORMATION,
+  type InformationView,
+  intervalToYou,
+  shownGap,
+  tyreAgeText,
+} from '../eras/difficulty/information.js';
 import { TEAM_COLOR } from '../game/teamTheme.js';
 import { lapTime } from '../track/geometry.js';
 import type { LiveStanding } from '../track/motion.js';
@@ -16,6 +27,7 @@ export function TimingTower({
   rival,
   onPick,
   live = null,
+  info = FULL_INFORMATION,
 }: {
   race: RaceState;
   model: RaceModel;
@@ -24,6 +36,8 @@ export function TimingTower({
   onPick?: (code: string) => void;
   /** The map's standings while the lap runs (null: the last lap's). */
   live?: LiveStanding[] | null;
+  /** What the Eras information level shows (everything, otherwise). */
+  info?: InformationView;
 }) {
   const leader = race.cars[race.order.find((c) => !race.cars[c]?.retired) ?? ''];
   const lap = lapTime(model, race.flag);
@@ -32,6 +46,16 @@ export function TimingTower({
   const order = now
     ? [...(live ?? []).map((s) => s.code), ...race.order.filter((c) => !now.has(c))]
     : race.order;
+  // Minimal: the one interval a row shows, if any (from the last lap's times).
+  const time = (c: string) => {
+    const x = race.cars[c];
+    return x && !x.retired ? x.totalTime : null;
+  };
+  const gapLabel = (code: string, gap: number) => {
+    if (!info.adjacentGapsOnly) return `+${shownGap(info, gap).toFixed(1)}`;
+    const interval = intervalToYou(order, userSide, code, time);
+    return interval === null ? '' : `+${shownGap(info, interval).toFixed(1)}`;
+  };
   return (
     <ol className="m-0 flex min-h-full list-none flex-col justify-around p-1">
       {order.map((code, i) => {
@@ -49,7 +73,7 @@ export function TimingTower({
               ? 'LEADER'
               : down >= 1
                 ? `+${down} LAP${down > 1 ? 'S' : ''}`
-                : `+${gap.toFixed(1)}`;
+                : gapLabel(code, gap);
         const you = code === userSide;
         const isRival = code === rival;
         return (
@@ -74,7 +98,15 @@ export function TimingTower({
                 }}
               />
               <span className="disp text-[14px] leading-none">{code}</span>
-              <span>{!out && <TyreBadge compound={car.compound} age={car.tyreAge} />}</span>
+              <span>
+                {!out && (
+                  <TyreBadge
+                    compound={car.compound}
+                    age={car.tyreAge}
+                    ageText={tyreAgeText(info, car.tyreAge, you)}
+                  />
+                )}
+              </span>
               <span className="mono text-right text-[12px] text-[var(--muted)]">{text}</span>
             </button>
           </li>

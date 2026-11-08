@@ -4,7 +4,8 @@
 // the tyre choice in place, each compound with what it gains over the laps left. Same options
 // the server grades (game/choices.ts); no chances shown (the grade comes after the call).
 // Number keys pick options, Escape backs out of the tyre choice. In Eras mode (build plan 8.6)
-// the gap follows the difficulty's information level and the decision timer sits by the tag.
+// the gap and the rival's tyre age follow the difficulty's information level and the decision
+// timer sits by the tag.
 
 import { type DecisionMoment, type RaceModel, type RaceState, tyreLife } from '@laststint/sim';
 import { type ReactNode, useEffect, useRef, useState } from 'react';
@@ -15,6 +16,7 @@ import {
   gapShown,
   gapText,
   shownGap,
+  tyreAgeText,
 } from '../eras/difficulty/information.js';
 import { briefFor } from '../game/brief.js';
 import { choicesFor, tyreName } from '../game/choices.js';
@@ -128,7 +130,7 @@ export function BroadcastDecision({
   if (brief.rival)
     facts.push([
       surname(brief.rival.code),
-      `${tyreName(brief.rival.compound)} · ${brief.rival.age}`,
+      `${tyreName(brief.rival.compound)} · ${tyreAgeText(info, brief.rival.age, false)}`,
     ]);
   if (brief.stop) facts.push(['Stop costs', `${Math.round(brief.stop.now)}s`]);
   facts.push(['Laps left', String(brief.lapsLeft)]);

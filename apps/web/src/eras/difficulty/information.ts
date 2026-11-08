@@ -1,20 +1,21 @@
 // What the race screen shows at each Eras information level (eras spec §7, "Information
 // levels"). Full is the race screen as it is for every other mode; each level below it takes
-// something away:
+// something away, and each keeps everything the level above it hides:
 //
 // - Full: exact gaps, the gap trend graph, exact tyre ages for all cars, the rival's compound.
-// - Reduced: no gap trend graph. TODO(eras 8.6): the rival's tyre age as a range ("15–20
-//   laps") isn't built: the spec doesn't give the range's width or say which cars it covers,
-//   and the width is a tunable that belongs in the eras config (packages/sim).
+// - Reduced: no gap trend graph, and every other car's tyre age as a range on multiples of the
+//   eras config's `tyreAgeRangeLaps` (5: "15–20 laps"; decided Nov 7).
 // - Limited: as Reduced, plus the rival's fuel load hidden in refuelling eras, and gaps
 //   rounded to 0.5 s.
-// - Minimal: gaps to the cars directly ahead and behind only, updated once per lap. Taken as
-//   Limited plus that (the spec doesn't say "as Limited"; difficulty only rises with play
-//   order, so nothing Limited hides comes back).
+// - Minimal: as Limited (decided Nov 7), plus gaps to the cars directly ahead and behind only,
+//   updated once per lap.
 //
-// No level hides your own car's facts, the rival's compound, or the order.
+// No level hides your own car's facts (its tyre age stays exact), the compounds, or the order.
+// The race screen passes the view to every place a gap or a tyre age shows: the standings,
+// the leaders, the driver card, the car stats, the big call and the engineer's radio. Without
+// one (every mode but Eras) each shows exactly what it always has.
 
-import type { InformationLevel } from '@laststint/sim';
+import { type InformationLevel, TYRE_AGE_RANGE_LAPS } from '@laststint/sim';
 
 /** Limited and Minimal round gaps to this many seconds. */
 export const GAP_STEP_SECONDS = 0.5;
@@ -31,6 +32,8 @@ export interface InformationView {
   liveStandings: boolean;
   /** The rival's fuel load (refuelling eras; the fuel gauge comes in build plan 8.5). */
   rivalFuel: boolean;
+  /** Other cars' tyre ages show as ranges this many laps wide, or exact (null). */
+  tyreAgeRange: number | null;
 }
 
 const VIEWS: Record<InformationLevel, InformationView> = {
@@ -41,6 +44,7 @@ const VIEWS: Record<InformationLevel, InformationView> = {
     adjacentGapsOnly: false,
     liveStandings: true,
     rivalFuel: true,
+    tyreAgeRange: null,
   },
   reduced: {
     level: 'reduced',
@@ -49,6 +53,7 @@ const VIEWS: Record<InformationLevel, InformationView> = {
     adjacentGapsOnly: false,
     liveStandings: true,
     rivalFuel: true,
+    tyreAgeRange: TYRE_AGE_RANGE_LAPS,
   },
   limited: {
     level: 'limited',
@@ -57,6 +62,7 @@ const VIEWS: Record<InformationLevel, InformationView> = {
     adjacentGapsOnly: false,
     liveStandings: true,
     rivalFuel: false,
+    tyreAgeRange: TYRE_AGE_RANGE_LAPS,
   },
   minimal: {
     level: 'minimal',
@@ -65,6 +71,7 @@ const VIEWS: Record<InformationLevel, InformationView> = {
     adjacentGapsOnly: true,
     liveStandings: false,
     rivalFuel: false,
+    tyreAgeRange: TYRE_AGE_RANGE_LAPS,
   },
 };
 
@@ -110,4 +117,33 @@ export function gapText(view: InformationView, gap: number | null, unit = true):
   if (gap === null) return '-';
   const g = shownGap(view, gap);
   return `${g >= 0 ? '+' : '−'}${Math.abs(g).toFixed(1)}${unit ? 's' : ''}`;
+}
+
+/** A tyre age as the level shows it: exact for your own car (`own`) and at Full; otherwise
+ * the range it falls in, on multiples of the range's width (5: 17 laps is "15–20"). */
+export function tyreAgeText(view: InformationView, age: number, own: boolean): string {
+  const w = view.tyreAgeRange;
+  if (own || !w) return String(age);
+  const lo = Math.floor(Math.max(0, age) / w) * w;
+  return `${lo}–${lo + w}`;
+}
+
+/**
+ * At Minimal, the one gap a car's row in the standings shows: your row, the gap to the car
+ * directly ahead of you; the car directly behind, its gap to you (both as intervals, ≥ 0);
+ * every other row none (null). Null too when either car's time isn't known (out of the race).
+ */
+export function intervalToYou(
+  order: readonly string[],
+  userSide: string,
+  code: string,
+  time: (code: string) => number | null,
+): number | null {
+  const { ahead, behind } = neighbours(order, userSide);
+  const pair =
+    code === userSide && ahead ? [ahead, userSide] : code === behind ? [userSide, code] : null;
+  if (!pair) return null;
+  const a = time(pair[0] as string);
+  const b = time(pair[1] as string);
+  return a === null || b === null ? null : b - a;
 }

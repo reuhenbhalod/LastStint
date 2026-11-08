@@ -10,6 +10,7 @@ import {
   ERAS_CONFIG,
   ERA_UNLOCK_SHARE,
   HARD_CALL_EDGE,
+  TYRE_AGE_RANGE_LAPS,
   decisionAccuracy,
   difficultyFor,
   difficultyForEra,
@@ -34,6 +35,11 @@ describe('eras config: shipped values (eras spec §4–§8)', () => {
     expect(ERAS_CONFIG.hardCallEdge).toBe('yellow');
     expect(HARD_CALL_EDGE).toBe(BAND_EDGES.yellow);
     expect(HARD_CALL_EDGE).toBe(5);
+  });
+
+  it('holds the tyre-age range width: 5 laps ("15–20 laps", decided Nov 7; §7)', () => {
+    expect(ERAS_CONFIG.tyreAgeRangeLaps).toBe(5);
+    expect(TYRE_AGE_RANGE_LAPS).toBe(5);
   });
 
   // Eras spec §7, row for row: play order, era, ★2 threshold, information, rival, timer.
@@ -185,6 +191,13 @@ describe('eras config: changing a value changes the behaviour, with no code edit
     expect(meetsAccuracyThreshold(80, difficultyFor(5, config))).toBe(false);
   });
 
+  it('tyre-age range width', () => {
+    const json = editedJson();
+    json.tyreAgeRangeLaps = 3;
+    expect(parseErasConfig(json).tyreAgeRangeLaps).toBe(3);
+    expect(ERAS_CONFIG.tyreAgeRangeLaps).toBe(5);
+  });
+
   it('Legend settings', () => {
     const json = editedJson();
     json.legend.decisionTimerSeconds = 15;
@@ -216,6 +229,17 @@ describe('eras config: validation', () => {
     ],
     ['unknown band key', (j) => Object.assign(j, { hardCallEdge: 'purple' }), /hardCallEdge/],
     ['negative edge', (j) => Object.assign(j, { hardCallEdge: -1 }), /hardCallEdge/],
+    [
+      'missing tyre-age range',
+      (j) => Object.assign(j, { tyreAgeRangeLaps: undefined }),
+      /tyreAgeRangeLaps/,
+    ],
+    ['zero tyre-age range', (j) => Object.assign(j, { tyreAgeRangeLaps: 0 }), /tyreAgeRangeLaps/],
+    [
+      'fractional tyre-age range',
+      (j) => Object.assign(j, { tyreAgeRangeLaps: 2.5 }),
+      /tyreAgeRangeLaps/,
+    ],
     ['empty table', (j) => Object.assign(j, { difficulty: [] }), /difficulty/],
     [
       'rows out of play order',

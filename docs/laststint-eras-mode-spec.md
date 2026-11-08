@@ -296,9 +296,11 @@ Difficulty rises with play order, so every era completed makes the next one hard
 
 **Information levels**
 - **Full:** exact gaps, gap trend graph, exact tyre ages for all cars, rival's compound.
-- **Reduced:** no gap trend graph; rival tyre age shown as a range (for example, "15–20 laps").
+- **Reduced:** no gap trend graph; every other car's tyre age shown as a 5-lap range on multiples of 5 (for example, "15–20 laps"). Your own car's tyre age stays exact. The width is `tyreAgeRangeLaps` in the era difficulty config (decided Nov 7).
 - **Limited:** as Reduced, plus rival fuel load hidden in refuelling eras, and gaps rounded to 0.5 s.
-- **Minimal:** gaps to the cars directly ahead and behind only, updated once per lap.
+- **Minimal:** as Limited (each level hides everything the level above hides; decided Nov 7), plus gaps to the cars directly ahead and behind only, updated once per lap.
+
+The levels apply everywhere a gap or a tyre age shows: the standings, the leaders beside the map, the driver card, the car stats, the decision card, and the engineer's radio and quick calls (decided Nov 7). At Minimal the standings show only your interval to the car ahead and the car behind's interval to you, and the radio talks about the gap to the rival only when he is directly ahead or behind. Outside Eras nothing changes.
 
 **Era presentation (not difficulty):** prompts follow the era's style. In Eras 1–2, decisions appear as short pit-board messages, since team radio was limited then; from Era 3 on, they appear as team radio. This changes how prompts look, not what information the player gets.
 
@@ -315,6 +317,8 @@ Difficulty rises with play order, so every era completed makes the next one hard
   - **Server check:** the client submits the rival's chosen option at each point; the server checks it's a legal option and replays the race with it, and the nightly job re-grades in full (the claimed-grades pattern).
 
 **Decision timer:** every decision in every era is timed (decided Nov 7); the length follows the table. When it runs out, the default option is chosen: stay out, or keep the current mode. The timer is an accessibility risk, so include a setting to turn it off; doing so marks that attempt's stars as "untimed" but still awards them.
+
+Quick calls and battles use the same timer in Eras, not their own short ones (decided Nov 7). The race holds while a quick call waits, as it already does for a battle at the braking zone. When the timer runs out, the outcome is the same as no answer today: the driver makes his own move, or nothing changes. With the timer turned off, these calls wait too. Outside Eras their timers are unchanged.
 
 All values in this table live in an era difficulty config, not in code.
 
