@@ -3099,3 +3099,53 @@ them (schema: optional). `python -m pipeline.dirty_air --cache DIR` refits the t
 **Fixtures.** New: `packages/sim/tests/fixtures/eras-dirty-air.json` (spain-2021 with its bands;
 the same with heldGap 0.79 and rollOnly; brazil-2006 refuelling with its bands and rollOnly; 20
 seeds each; `tests/make_dirty_air_fixture.py`). No existing fixture went stale.
+
+## Eras model fix 1.6: cars with no dry laps
+
+Nov 8 2026, by hand. A car that ran only wet laps before it retired (or up to the takeover) had
+no dry lap for `build.dry_fit` to fit, so `assemble` dropped it (`set(takeover_state) &
+set(fit.driver_pace)`). That blocked china-2007 (the user's car, HAM; SCH and SUT too) and lost
+running cars in hungary-2006 and malaysia-2001 (5.1 above).
+
+**Method** (`wet.estimated_dry_pace`, `build.with_estimated_pace`; Eras builds of real-timing
+races only, so Daily/Gauntlet files are untouched). Each car running at the takeover with no
+dry pace gets one, estimated after the weather timeline is fitted without it:
+1. *Its wet laps against the wet model.* On each racing lap (accurate, green, no pit, clear air
+   where it has 3 such laps), dry = lap time / (1 + the curve's penalty + the field's offset).
+   The field's offset is the median share beyond the curves of the cars with a dry pace on the
+   same lap and tyre class. A car's own wet offset can't be told from its dry pace, so it is
+   shrunk all the way to the field's. The estimate is the median over its laps.
+2. *Blended with the car's pace*: 0.4 x (1) + 0.6 x its team-mate's dry pace. The weight is a
+   leave-one-out over the 27 wet Eras races (391 cars with a fitted dry pace and a team-mate,
+   each re-estimated from its wet-period laps with its own pace removed): rms error 1.29 s from
+   its wet laps alone, 1.18 s from its team-mate alone, 0.95 s blended at 0.4 (0.3-0.5 within
+   0.03 s; the two errors correlate 0.17).
+3. With fewer than 3 laps, the team-mate's pace alone; with no team-mate either, the field's
+   median. Noise is the field's median.
+The car's `wetPace` / `dampPace` (M1) then come from its wet laps against that pace, so its
+wet laps still replay as it ran them. Provenance lists `driverPace` (new schema enum value,
+additive), and the build report names each car, its laps and its blend. An Eras build now fails
+if a car running at the takeover is missing from the model. Not for a reconstructed race (its
+laps are the solver's): belgium-1992 still drops BOUT (reported, not fixed). The nearest dry
+race of the season wasn't used (not needed: every estimated car had wet laps or a team-mate).
+
+**Robust G1, before / after** (1,000 runs on each of two seed sets; rebuilt to a scratch
+directory, committed files not changed):
+
+| Race | Cars | Status | Mean gap error | Failing checks after |
+|---|---|---|---|---|
+| hungary-2006 | 15 -> 19 (FIS, LIU, RAI, ROS) | fail -> fail | 15.15 -> 15.07 s | duel BUT vs DLR 21.54 / 20.72 [3.00]; podium DLR 21.54 / 20.72, HEI 24.62 / 25.40 [5.00]; field BAR 8.31 / 7.90 [5.00] |
+| malaysia-2001 | 14 -> 15 (FIS) | fail -> fail | 9.92 -> 9.23 s | duel MSCM vs BAR 16.89 / 16.55 [3.00]; podium BAR 16.89 / 16.55, COU 9.01 / 9.30 [5.00]; field FRE 11.52 / 11.60, HAK 6.28 / 6.25 [5.00]. the podium order rate (0.50 / 0.50 [0.50] before) now passes |
+| china-2007 | 18 -> 21 (HAM, SCH, SUT) | fail -> fail | 7.30 -> 7.51 s | field VET 24.64 / 24.61 [5.35], BUT 16.11 / 16.37 [6.87]; duel not scored (HAM DNF) |
+
+The two rebuilt races still fail on wet pace (5.1's diagnoses: Button's inter pace and de la
+Rosa's dry-labelled stint; Ferrari's inters against the full wets), not on the dropped cars.
+china-2007's estimated dry paces: HAM 100.84 s (his 27 laps 100.60, ALO 101.00), SCH 102.67,
+SUT 104.89. Its race and golden files are committed; `live-replay.test.ts` (the real calls)
+and `parity.test.ts` pass on it.
+
+**Other Eras race files the fix changes once rebuilt** (not rebuilt here): australia-2025 (ALO),
+monaco-2016 (MAG, VER), germany-2019 (HUL, LEC, NOR, RIC), canada-2011 (ALO, KOV, SUT),
+netherlands-2023 (SAR), monaco-2022 (MAG, MSC; MAG on the field median), monaco-2008 (FIS, PIQ),
+europe-2007 (WIN), great-britain-2016 (GRO), with hungary-2006 and malaysia-2001. No
+Daily/Gauntlet file or golden changes.

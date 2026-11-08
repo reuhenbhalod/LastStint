@@ -946,13 +946,14 @@
           "type": "array",
           "uniqueItems": true,
           "default": [],
-          "description": "Fields estimated rather than measured (eras build plan 2.4): stint compounds, safety-car laps, fuel loads (and a refuelling race's fill rate), the wetness timeline.",
+          "description": "Fields estimated rather than measured (eras build plan 2.4): stint compounds, safety-car laps, fuel loads (and a refuelling race's fill rate), the wetness timeline, and the dry pace of a car that ran only wet laps (model fix 1.6: from its wet laps against the field, or its team-mate's).",
           "items": {
             "enum": [
               "compounds",
               "safetyCars",
               "fuelLoads",
-              "weather"
+              "weather",
+              "driverPace"
             ]
           }
         }

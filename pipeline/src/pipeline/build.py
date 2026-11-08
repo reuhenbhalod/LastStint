@@ -2312,6 +2312,41 @@ def solver_dry_fit(recon: dict, laps: pd.DataFrame | None = None) -> fit.LapTime
     )
 
 
+def running_at(laps: pd.DataFrame, takeover: int) -> set[str]:
+    """The cars running at the takeover (a position and a tyre on the takeover lap): the race
+    model's cars."""
+    state = scenario.state_at_takeover(laps, takeover)
+    return {c for c, s in state.items() if s["position"] is not None and s["compound"] is not None}
+
+
+def with_estimated_pace(
+    laps: pd.DataFrame, weather: dict | None, fitted: fit.LapTimeFit, takeover: int
+) -> tuple[fit.LapTimeFit, list[str]]:
+    """Model fix 1.6 (Eras builds): `fitted` with a dry pace for each car running at the
+    takeover that has none (it ran only wet laps: dry_fit fits on the dry ones), estimated by
+    wet.estimated_dry_pace, and the build report's lines (provenance: driverPace). A car with
+    no pace would be dropped from the model (assemble)."""
+    missing = sorted(running_at(laps, takeover) - set(fitted.driver_pace))
+    if not missing:
+        return fitted, []
+    est = wet.estimated_dry_pace(laps, weather, fitted, missing)
+    lines = [
+        f"estimated: driverPace ({', '.join(missing)}: no dry lap to fit; model fix 1.6)",
+        *(
+            f"  dry pace {d} {p:.3f} s (noise {n:.3f}): {how}"
+            for d, (p, n, how) in sorted(est.items())
+        ),
+    ]
+    return (
+        replace(
+            fitted,
+            driver_pace={**fitted.driver_pace, **{d: p for d, (p, _, _) in est.items()}},
+            driver_noise={**fitted.driver_noise, **{d: n for d, (_, n, _) in est.items()}},
+        ),
+        lines,
+    )
+
+
 def dry_fit(
     race_id: str,
     laps: pd.DataFrame,
@@ -2546,6 +2581,14 @@ def build_race(
     # the race's full wets against its inters; real lap timing only).
     eras_build = overlay is not None and not shared
     damp_pace = None
+    takeover = meta["takeover_lap"]
+    if takeover is None:
+        takeover = scenario.default_takeover_lap(
+            laps,
+            events.extract_events(laps),
+            [meta["user_side"], meta["rival"]],
+        )
+    pace_lines: list[str] = []
     # Not a reconstructed race: its laps are solved to the anchors, so a driver's pace against
     # the field on a lap would read back the solver's noise (as with its faults, above).
     if weather and eras_build and recon is None:
@@ -2554,6 +2597,13 @@ def build_race(
             weather = wet.weather_block(
                 laps, dry.rain, fitted, wet.shifted_curves(weather["curves"], shift)
             )
+    if eras_build and recon is None:
+        # Model fix 1.6: a car still running at the takeover with no dry lap (wet laps only)
+        # takes an estimated dry pace, after the weather is fitted (without it) and before
+        # the wet pace (its own then measured against it). Not a reconstructed race: its laps
+        # against the field would read back the solver's (belgium-1992's BOUT, reported).
+        fitted, pace_lines = with_estimated_pace(laps, weather, fitted, takeover)
+    if weather and eras_build and recon is None:
         wet_pace, damp_pace = wet.driver_band_pace(laps, weather, fitted)
     elif weather:
         wet_pace = wet.driver_wet_pace(laps, weather, fitted, wet.wet_period(laps, dry.rain))
@@ -2591,13 +2641,6 @@ def build_race(
             params = replace(params, overtake_model={**params.overtake_model, "heldGap": held})
         params = replace(params, notes=[*params.notes, da_note])
 
-    takeover = meta["takeover_lap"]
-    if takeover is None:
-        takeover = scenario.default_takeover_lap(
-            laps,
-            events.extract_events(laps),
-            [meta["user_side"], meta["rival"]],
-        )
     model = assemble.assemble_race_model(
         race_id=race_id,
         laps=laps,
@@ -2629,6 +2672,10 @@ def build_race(
         stint_pace=eras_build and recon is None,
         dirty_air=dirty,
     )
+    if eras_build and recon is None:
+        missing = sorted(running_at(laps, takeover) - {d["code"] for d in model["drivers"]})
+        if missing:
+            raise ValueError(f"{race_id}: cars running at the takeover not in the model: {missing}")
     official_lines: list[str] = []
     if recon is not None and recon.get("roadPositions"):
         model, official_lines = official_result(model, recon)
@@ -2641,6 +2688,8 @@ def build_race(
     fitted_weather = lap_time_weather(dry.rain)
     if fitted_weather:
         estimated.append("weather")  # step 4.5: the wetness is fitted from the lap times
+    if pace_lines:
+        estimated.append("driverPace")  # model fix 1.6: a wet-only car's dry pace
     if shared:
         # The Worker's merge replaces the provenance block outright (as with_eras_fields
         # does), so it can't also carry this build's estimated fields.
@@ -2670,6 +2719,7 @@ def build_race(
         *overlay_lines,
         *scripted_lines,
         *red_notes,
+        *pace_lines,
     ]
     if recon is not None:
         report.append(

@@ -335,7 +335,14 @@ export interface RestartModel {
 }
 
 /** Fields estimated rather than measured (eras build plan 2.4). */
-export const ESTIMATED_FIELDS = ['compounds', 'safetyCars', 'fuelLoads', 'weather'] as const;
+export const ESTIMATED_FIELDS = [
+  'compounds',
+  'safetyCars',
+  'fuelLoads',
+  'weather',
+  // A car that ran only wet laps: its dry pace from its wet laps (or its team-mate's).
+  'driverPace',
+] as const;
 export type EstimatedField = (typeof ESTIMATED_FIELDS)[number];
 
 /** Where the race's data came from. Absent: real, nothing estimated. */

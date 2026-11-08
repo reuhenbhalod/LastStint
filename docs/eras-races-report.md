@@ -115,7 +115,7 @@ the eras branch.
 | 2 | japan-2005 | Jolpica laps + F1DB stops | compounds, safetyCars, fuelLoads | yes | G1 | **fail** | 4.48 s | duel RAI vs FIS order rate 0.15 / 0.16 [0.60] (+5 more) | Räikkönen's last stint: the duel order RAI vs FIS 0.15 [0.60]; 6.18 -> 4.48 s |
 | 3 | hungary-2006 | Jolpica laps + F1DB stops | compounds, safetyCars, fuelLoads, weather | yes | G1 | **fail** | 15.15 s | duel BUT vs DLR gap error 21.85 / 21 [3.00] (+3 more) | de la Rosa's dry-labelled wet stint (BUT vs DLR 21 s); RAI and LIU dropped; 22.00 -> 15.15 s with M1 |
 | 4 | brazil-2006 | Jolpica laps + F1DB stops | compounds, safetyCars, fuelLoads | yes | G1 | **fail** | 6.99 s | duel ALO vs MSCM gap error 17.38 / 17.06 [3.00] (+1 more) | Schumacher's charge: ALO vs MSCM 17 s; 8.23 -> 6.99 s |
-| 5 | china-2007 | Jolpica laps + F1DB stops | none | no: user's car (HAM) isn't in the model: he ran only wet laps, so `build.dry_fit` has no dry pace for him and `assemble` drops him | G1 | **not built** |  |  |  |
+| 5 | china-2007 | Jolpica laps + F1DB stops | compounds, safetyCars, fuelLoads, weather, driverPace | yes | G1 | **fail** | 7.51 s | field VET gap error 24.64 / 24.61 [5.35] (+1 more) | built with model fix 1.6 (HAM, SCH, SUT ran only wet laps: dry pace estimated); the leaders' drying stints (VET, BUT 16-25 s); duel not scored (HAM DNF) |
 | 6 | europe-2007 | Jolpica laps + F1DB stops | compounds, safetyCars, fuelLoads, weather | yes | G1 | **fail** | 2.23 s | duel ALO vs MAS gap error 6.12 / 6 [3.00] (+2 more) | pace in the late rain: ALO vs MAS 6.1 s; 4.93 -> 2.23 s with M1 |
 | 7 | brazil-2007 | Jolpica laps + F1DB stops | compounds, safetyCars, fuelLoads | yes | G1 | **fail** | 2.00 s | field ROS gap error 7.02 / 6.9 [6.28] | race mechanics: the second-stop swap and Rosberg's train |
 | 8 | monaco-2008 | Jolpica laps + F1DB stops | compounds, safetyCars, fuelLoads, weather | yes | G1 | **fail** | 4.53 s | podium order rate 0.18 / 0.19 [0.50] (+5 more) | the long stints on old inters (podium order 0.18); 3.28 -> 4.53 s |
@@ -224,7 +224,7 @@ wear; not the cause), and the reconstructed running order at europe-1993 and aus
 5. **Team orders and let-bys: scripted since M4 (TEAM_ORDER facts), but the sim's cars around the swap don't end where the real ones did.** 4 failing: hungary-2024, russia-2018, europe-1997, malaysia-1999.
 6. **One-off losses and car problems: unsourced (not in data/incidents.json), or a sourced fault's fitted constant loss that doesn't settle a near-tie.** 3 failing: canada-2014, united-states-2015, great-britain-2016.
 7. **Reconstruction solver anchor conflicts (lap-1 grid vs fastest-lap-pinned retirements; disqualified cars in the road order).** 3 failing: france-1990, monaco-1992, south-africa-1983.
-8. **Dropped cars with no dry laps (a car that ran only wet laps has no pace fit).** 2 failing: hungary-2006, malaysia-2001; 1 not built: china-2007.
+8. **Dropped cars with no dry laps (a car that ran only wet laps has no pace fit).** Fixed in Eras builds by model fix 1.6 (an estimated dry pace, provenance `driverPace`; docs/g1-report.md): china-2007 built; hungary-2006 (FIS, LIU, RAI, ROS) and malaysia-2001 (FIS) keep their cars once rebuilt (still failing on wet pace, gap 2). The reconstructed belgium-1992 still drops BOUT.
 9. **No unlapping decided from the sim's own gaps (a car the sim has a lap down stays there).** 1 failing: monaco-2011 (HAM 69 s, WEB 26 s).
 10. **Estimated dry compounds (step 2.4's SOFT/HARD split).** 1 failing: brazil-2008.
 11. **Tyre wear on long stints (flat HARD wear, last-stint wear).** 1 failing: hungary-2014.
@@ -354,9 +354,6 @@ pick HIL): not changed, owner to confirm.
 
 ## Not built
 
-- **china-2007** (Era 5): the user's car, Hamilton, isn't in the race model. He ran only wet
-  laps (retired on lap 31), so `build.dry_fit` has no dry pace for him and `assemble` drops him.
-  Needs a pace for a car with only wet laps (gap 'dropped cars').
 - **brazil-1993** (Era 2): registered with `data_issue`, raw reconstruction only. Anchors pass
   (108/108 with W2's lap leaders), but no source gives the field's slick stops (laps 40-43), so
   the synthetic race isn't the real one. Needs the slick stops sourced, or a solver rule for
