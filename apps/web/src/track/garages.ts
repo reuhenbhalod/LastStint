@@ -201,6 +201,22 @@ const STANDINGS: Record<number, string[]> = {
     'Larrousse',
     'Sauber',
   ],
+  // 2000 (Eras): the 1999 final standings from the Jolpica dump (2026-10-24,
+  // formula_one_teamchampionship), under 2000's names (Stewart is Jaguar). BAR, no points in
+  // 1999, has no standing and goes last.
+  2000: [
+    'Ferrari',
+    'McLaren',
+    'Jordan',
+    'Jaguar',
+    'Williams',
+    'Benetton',
+    'Prost',
+    'Sauber',
+    'Arrows',
+    'Minardi',
+    'BAR',
+  ],
   // 2005-2009 (Eras): the 2004-2008 final standings from the Jolpica dump (2026-10-24,
   // formula_one_teamchampionship), under each season's names (2005: Jaguar is Red Bull; 2006:
   // BAR is Honda, Sauber is BMW Sauber, Jordan is MF1, Spyker MF1 by Brazil, Minardi is Toro

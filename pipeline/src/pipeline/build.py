@@ -1599,6 +1599,20 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
+    # Era 4 (2000-04), refuelling as above: one dry compound, new tyres at a stop.
+    "japan-2000": {
+        "year": 2000,
+        "event": "Japan",
+        "source": "jolpica",
+        "name": "Japan 2000: Schumacher vs Häkkinen",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "MSCM",
+        "rival": "HAK",  # beat-rival: Schumacher ahead of Häkkinen
+        "score_positions": 6,
+        "split": "eras",
+    },
 }
 
 

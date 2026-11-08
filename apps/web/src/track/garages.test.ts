@@ -48,6 +48,14 @@ describe('garages', () => {
     expect(g).toHaveLength(10);
   });
 
+  it('2000: Ferrari, the 1999 champions, nearest the exit; Stewart as Jaguar; BAR at the entry', () => {
+    const g = garagesFor(2000);
+    expect(g.at(-1)).toEqual(['Ferrari', 'FER']);
+    expect(g).toContainEqual(['Jaguar', 'JAG']);
+    expect(g[0]).toEqual(['BAR', 'BAR']);
+    expect(g).toHaveLength(11);
+  });
+
   it('2006: MF1 under its Brazil name when the race uses it; Super Aguri, new, at the entry', () => {
     const g = garagesFor(2006, ['Spyker MF1']);
     expect(g).toContainEqual(['Spyker MF1', 'MF1']);
