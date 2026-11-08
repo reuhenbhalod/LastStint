@@ -4,7 +4,13 @@
 
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { type RaceModel, answerMoment, engineerConfig, mulberry32 } from '@laststint/sim';
+import {
+  type RaceModel,
+  answerMoment,
+  engineerConfig,
+  mulberry32,
+  refuelling,
+} from '@laststint/sim';
 import { describe, expect, it } from 'vitest';
 import { GameEngine } from '../engine/engine.js';
 import { overtakingCorners } from '../track/corners.js';
@@ -95,7 +101,10 @@ function play(model: RaceModel, seed: number) {
       const next = lap + 1;
       // No answer (pick past the options): the driver's own move, if he has one.
       const calls = o ? [o.call, ...(o.also ?? [])] : [call.driverChoice];
-      for (const c of calls) if (c) engine.apply({ ...c, lap: next });
+      // A refuelling race: the card adds the player's fuel fill to a box answer (QuickCallCard).
+      const fill = refuelling(model) ? { fill: 'standard' as const } : {};
+      for (const c of calls)
+        if (c) engine.apply({ ...c, lap: next, ...(c.kind === 'pit' ? fill : {}) });
     } else if (
       lap - lastInfo >=
         (engine.state.nextFlag !== 'green' || engine.state.flag !== 'green' ? 1 : 2) &&

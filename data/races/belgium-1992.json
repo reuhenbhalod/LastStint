@@ -2,7 +2,7 @@
   "schemaVersion": 11,
   "race": {
     "id": "belgium-1992",
-    "name": "Belgium 1992: Schumacher vs Mansell",
+    "name": "Belgium 1992: Schumacher vs Patrese",
     "laps": 44,
     "takeoverLap": 27,
     "seed": 1,
@@ -419,7 +419,128 @@
       "driver": "GAC"
     }
   ],
-  "decisionMoments": [],
+  "decisionMoments": [
+    {
+      "id": "stop-30",
+      "lap": 30,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "Stay out",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "Box, slicks",
+          "decisions": [
+            {
+              "lap": 30,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "box-intermediate",
+          "label": "Box, inters",
+          "decisions": [
+            {
+              "lap": 30,
+              "kind": "pit",
+              "compound": "INTERMEDIATE"
+            }
+          ]
+        },
+        {
+          "id": "box-wet",
+          "label": "Box, wets",
+          "decisions": [
+            {
+              "lap": 30,
+              "kind": "pit",
+              "compound": "WET"
+            }
+          ]
+        },
+        {
+          "id": "box-next-intermediate",
+          "label": "Box next lap, inters",
+          "decisions": [
+            {
+              "lap": 31,
+              "kind": "pit",
+              "compound": "INTERMEDIATE"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "box-medium"
+    },
+    {
+      "id": "cliff-34",
+      "lap": 34,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "Stay out",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "Box, slicks",
+          "decisions": [
+            {
+              "lap": 34,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "box-intermediate",
+          "label": "Box, inters",
+          "decisions": [
+            {
+              "lap": 34,
+              "kind": "pit",
+              "compound": "INTERMEDIATE"
+            }
+          ]
+        },
+        {
+          "id": "box-wet",
+          "label": "Box, wets",
+          "decisions": [
+            {
+              "lap": 34,
+              "kind": "pit",
+              "compound": "WET"
+            }
+          ]
+        },
+        {
+          "id": "box-next-intermediate",
+          "label": "Box next lap, inters",
+          "decisions": [
+            {
+              "lap": 35,
+              "kind": "pit",
+              "compound": "INTERMEDIATE"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "stay"
+    }
+  ],
   "candidateMomentLaps": [
     29,
     31,
@@ -455,7 +576,7 @@
     "GROO"
   ],
   "userSide": "MSCM",
-  "rival": "MAN",
+  "rival": "PAT",
   "weather": {
     "curves": {
       "slick": {
@@ -521,6 +642,38 @@
       0.0,
       0.0
     ]
+  },
+  "eras": {
+    "eraId": 2,
+    "order": 6,
+    "userSide": "MSCM",
+    "hardCalls": {
+      "MSCM": 2,
+      "PAT": 0
+    },
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Schumacher wins his first Grand Prix: wets on lap 4, slicks on lap 30 after going off at Stavelot, 36.6 seconds ahead of the new champion Mansell",
+      "rewriteCondition": {
+        "type": "deny",
+        "rival": "MAN",
+        "position": 3
+      },
+      "headline": "Schumacher's first win, and Mansell off the podium"
+    },
+    "mastery": {
+      "type": "margin",
+      "seconds": 15,
+      "label": "Win by more than 15 seconds"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 37,
+      "label": "Win by more than Schumacher's real 36.6 seconds"
+    },
+    "briefing": "Spa, 1992. Rain arrived just before the start and everyone has stopped for wets. Now a dry line is appearing. Schumacher's Benetton started third. Pit board only: call the slicks. Reconstructed race: no lap timing survives, so the laps are rebuilt to fit the result, the fastest laps and the sourced stops (Jolpica, F1DB, Motor Sport, Wikipedia). The lap-by-lap gaps and running order are synthetic, not history."
   },
   "provenance": {
     "kind": "reconstructed",

@@ -7,5 +7,37 @@
     "drs": false,
     "ers": "none",
     "refuelling": false
+  },
+  "eras": {
+    "eraId": 2,
+    "order": 9,
+    "userSide": "SENA",
+    "hardCalls": {
+      "SENA": 1,
+      "PRO": 1
+    },
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Senna takes the lead on the first lap from fourth on the grid and wins through the wet-dry calls; he laps everyone but Hill, who finishes 1:23.2 behind",
+      "rewriteCondition": {
+        "type": "deny",
+        "rival": "HIL",
+        "position": 3
+      },
+      "headline": "Donington belongs to Senna, and Hill leaves empty-handed"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "max": 3,
+      "label": "Win with three stops or fewer"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 60,
+      "label": "Win by more than a minute"
+    },
+    "briefing": "Donington, 1993. Damp at the start, then it dries, rains, dries and rains again. Senna made four stops; Prost made seven. Pit board only: every tyre call counts. Reconstructed race: no lap timing survives, so the laps are rebuilt to fit the result, the fastest laps and the sourced stops (Jolpica, F1DB, Motor Sport, Wikipedia). The lap-by-lap gaps and running order are synthetic, not history."
   }
 }

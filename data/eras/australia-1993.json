@@ -7,5 +7,37 @@
     "drs": false,
     "ers": "none",
     "refuelling": false
+  },
+  "eras": {
+    "eraId": 2,
+    "order": 10,
+    "userSide": "SENA",
+    "hardCalls": {
+      "SENA": 2,
+      "PRO": 0
+    },
+    "target": {
+      "type": "defend"
+    },
+    "storyline": {
+      "real": "Senna leads from pole except during the stops and wins by nine seconds from Prost, in Prost's last Grand Prix; it is Senna's 41st and last win",
+      "rewriteCondition": {
+        "type": "deny",
+        "rival": "PRO",
+        "position": 3
+      },
+      "headline": "Senna's farewell to McLaren, with Prost off the podium"
+    },
+    "mastery": {
+      "type": "margin",
+      "seconds": 10,
+      "label": "Win by more than 10 seconds"
+    },
+    "hidden": {
+      "type": "stop_count",
+      "max": 1,
+      "label": "Win on one stop"
+    },
+    "briefing": "Adelaide, 1993. Senna's last race for McLaren and Prost's last race of all. Senna starts from pole; Prost is already champion. Pit board only: hold the lead to the flag. Reconstructed race: no lap timing survives, so the laps are rebuilt to fit the result, the fastest laps and the sourced stops (Jolpica, F1DB, Motor Sport, Wikipedia). The lap-by-lap gaps and running order are synthetic, not history."
   }
 }

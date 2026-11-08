@@ -918,7 +918,9 @@ export function directorCall(
   // No calls into a big moment's lap (the moment asks).
   const into = race.lap + 1;
   if (into <= model.race.laps && !model.decisionMoments.some((m) => m.lap === into)) {
-    const wx = weatherCall(race, model, mem, stopping);
+    // A weather call asks about a stop too: not within a few laps of the last stop question.
+    const recent = race.lap - (mem.last.stop ?? -99) < STOP_ASK_EVERY;
+    const wx = weatherCall(race, model, mem, stopping || recent);
     if (wx) return asked(wx);
   }
   const next = race.lap + 1;
