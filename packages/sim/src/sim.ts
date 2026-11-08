@@ -24,6 +24,7 @@ import {
 } from './engineer.js';
 import type { RivalPolicy } from './eras/config.js';
 import headsetConfig from './headset.json';
+import { legendEvents } from './legend.js';
 import { validatePlan } from './plan.js';
 import { resolveRivalPolicy } from './rivals/policy.js';
 import { type Rng, deriveSeed, mulberry32 } from './rng.js';
@@ -127,6 +128,11 @@ export interface RunOptions {
    * rival. Throws on a policy the sim can't run yet.
    */
   rivalPolicy?: RivalPolicy;
+  /**
+   * Legend difficulty (eras spec 8; legend.ts): the real non-storyline SC/VSC periods after
+   * the takeover are replaced by ones drawn from `seed` at the track's historical rate.
+   */
+  legend?: boolean;
 }
 
 export interface ModeEffect {
@@ -259,6 +265,8 @@ export interface Run {
   live: boolean;
   /** How the rival reacts in live play (RunOptions.rivalPolicy). Forks keep the parent's. */
   rivalPolicy: RivalPolicy;
+  /** Legend difficulty (RunOptions.legend): the evaluator and server read it off the run. */
+  legend: boolean;
   notes: RaceNote[];
   headset: HeadsetEra | undefined;
   /** Per-car random streams, created on first use (see Streams). */
@@ -508,7 +516,7 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
   if (live) validateDecisions(model, options.decisions ?? []);
   const events: NeutralEvent[] = [];
   const retireAt = new Map<number, string[]>();
-  for (const e of model.events) {
+  for (const e of options.legend ? legendEvents(model, seed) : model.events) {
     if (e.type === 'SC' || e.type === 'VSC' || e.type === 'RED') {
       events.push({ lap: e.lap, laps: e.laps ?? 1, flag: FLAG_OF[e.type] });
     } else if (e.type === 'RETIREMENT' && e.driver) {
@@ -558,6 +566,7 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
     decisions: [...(options.decisions ?? [])],
     live,
     rivalPolicy: resolveRivalPolicy(options.rivalPolicy),
+    legend: options.legend === true,
     notes: [],
     headset: HEADSET[model.era],
     passedBy: new Map(),

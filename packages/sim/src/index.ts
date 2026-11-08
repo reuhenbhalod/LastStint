@@ -115,3 +115,12 @@ export {
 export * from './eras/config.js';
 export * from './eras/evaluate.js';
 export * from './eras/race-log.js';
+export {
+  LEGEND_STREAM,
+  circuitFor,
+  isKept,
+  legendEvents,
+  legendRates,
+  parseRaceId,
+} from './legend.js';
+export type { LegendRates, ScRates } from './legend.js';
