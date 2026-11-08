@@ -1,0 +1,436 @@
+[
+ {
+  "lap": 1,
+  "time": 0.0,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 2,
+  "time": 168.19,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 3,
+  "time": 250.169,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 4,
+  "time": 333.037,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 5,
+  "time": 416.58,
+  "rain": false,
+  "source": "lap-times",
+  "ambiguous": "borderline slowing: drizzle, or tyre wear"
+ },
+ {
+  "lap": 6,
+  "time": 501.994,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 7,
+  "time": 587.879,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 8,
+  "time": 674.756,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 9,
+  "time": 762.551,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 10,
+  "time": 852.393,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 11,
+  "time": 941.639,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 12,
+  "time": 1028.881,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 13,
+  "time": 1116.764,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 14,
+  "time": 1207.711,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 15,
+  "time": 1299.146,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 16,
+  "time": 1387.876,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 17,
+  "time": 1473.842,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 18,
+  "time": 1558.379,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 19,
+  "time": 1640.816,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 20,
+  "time": 1722.51,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 21,
+  "time": 1803.685,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 22,
+  "time": 1883.623,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 23,
+  "time": 1977.75,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 24,
+  "time": 2099.216,
+  "rain": true,
+  "source": "lap-times",
+  "ambiguous": "lap before a neutralisation (it may have started during it)"
+ },
+ {
+  "lap": 25,
+  "time": 2224.204,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 26,
+  "time": 2342.399,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 27,
+  "time": 2469.014,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 28,
+  "time": 2586.895,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 29,
+  "time": 2708.444,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 30,
+  "time": 2793.509,
+  "rain": true,
+  "source": "lap-times",
+  "ambiguous": "first green lap after a neutralisation (cold tyres)"
+ },
+ {
+  "lap": 31,
+  "time": 2875.195,
+  "rain": false,
+  "source": "lap-times",
+  "ambiguous": "borderline slowing: drizzle, or tyre wear"
+ },
+ {
+  "lap": 32,
+  "time": 2955.896,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 33,
+  "time": 3035.429,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 34,
+  "time": 3114.252,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 35,
+  "time": 3192.776,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 36,
+  "time": 3271.172,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 37,
+  "time": 3349.422,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 38,
+  "time": 3427.632,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 39,
+  "time": 3505.964,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 40,
+  "time": 3584.267,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 41,
+  "time": 3663.036,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 42,
+  "time": 3741.95,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 43,
+  "time": 3822.747,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 44,
+  "time": 3902.931,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 45,
+  "time": 3983.507,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 46,
+  "time": 4062.93,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 47,
+  "time": 4142.858,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 48,
+  "time": 4224.221,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 49,
+  "time": 4304.019,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 50,
+  "time": 4384.451,
+  "rain": false,
+  "source": "lap-times",
+  "ambiguous": "borderline slowing: drizzle, or tyre wear"
+ },
+ {
+  "lap": 51,
+  "time": 4464.768,
+  "rain": false,
+  "source": "lap-times",
+  "ambiguous": "borderline slowing: drizzle, or tyre wear"
+ },
+ {
+  "lap": 52,
+  "time": 4544.687,
+  "rain": false,
+  "source": "lap-times",
+  "ambiguous": "borderline slowing: drizzle, or tyre wear"
+ },
+ {
+  "lap": 53,
+  "time": 4626.626,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 54,
+  "time": 4712.363,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 55,
+  "time": 4807.781,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 56,
+  "time": 4897.721,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 57,
+  "time": 4997.776,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 58,
+  "time": 5099.778,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 59,
+  "time": 5187.681,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 60,
+  "time": 5274.541,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 61,
+  "time": 5362.669,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 62,
+  "time": 5450.36,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 63,
+  "time": 5538.707,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 64,
+  "time": 5626.556,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 65,
+  "time": 5715.801,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 66,
+  "time": 5804.274,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 67,
+  "time": 5892.472,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 68,
+  "time": 5981.262,
+  "rain": true,
+  "source": "lap-times",
+  "ambiguous": "lap before a neutralisation (it may have started during it)"
+ },
+ {
+  "lap": 69,
+  "time": 6072.002,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 70,
+  "time": 6172.186,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 71,
+  "time": 6322.656,
+  "rain": true,
+  "source": "lap-times"
+ }
+]

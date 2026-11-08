@@ -5,11 +5,11 @@
 /** Previous season's constructors' standings, champions first, in this season's names. */
 const STANDINGS: Record<number, string[]> = {
   // 2010-2013 (Eras): the 2009-2012 final standings from the Jolpica dump (2026-10-24,
-  // formula_one_teamchampionship), under each team's name that season: Brawn became
-  // Mercedes, BMW Sauber Sauber, Renault Lotus F1 (2012), Lotus Caterham and Virgin Marussia
-  // (2012). Toyota left after 2009 and HRT after 2012. Teams new that season (Lotus, HRT and
-  // Virgin in 2010) have no standing and go last, in entry order. The Jolpica races spell
-  // Red Bull without "Racing".
+  // formula_one_teamchampionship), under each season's names (2010: Brawn is Mercedes, BMW
+  // Sauber is Sauber; 2012: Renault is Lotus F1, Lotus is Caterham, Virgin is Marussia). A
+  // team that left (Toyota after 2009, HRT after 2012) is dropped. Teams new that season have
+  // no standing and go last, in car-number order (2010: Lotus, HRT, Virgin). The Jolpica races
+  // spell Red Bull without "Racing".
   2010: [
     'Mercedes',
     'Red Bull',

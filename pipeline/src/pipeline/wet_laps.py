@@ -389,12 +389,14 @@ def estimate(
 
 def estimated_dry_labels(sidecar: dict | None) -> dict[tuple[str, int], str] | None:
     """Step 2.4's dry compound per (driver, stint) from a Jolpica sidecar, if the race's
-    compounds were estimated; None for a source with real compounds (TUM, FastF1)."""
+    compounds were estimated; None for a source with real compounds (TUM, FastF1). A stint
+    an earlier run relabelled wet (update_sidecar) gives its 2.4 label back (`dry`), so a
+    re-run fits from the same labels."""
     block = (sidecar or {}).get("estimates") or {}
     if "compounds" not in block.get("estimated", []):
         return None
     return {
-        (str(s["driver"]), int(s["stint"])): str(s["compound"])
+        (str(s["driver"]), int(s["stint"])): str(s.get("dry", s["compound"]))
         for s in block.get("compounds", {}).get("stints", [])
     }
 
@@ -447,22 +449,6 @@ def report_path(race_id: str, raw_dir: Path) -> Path:
     return raw_dir / f"{race_id}.wet-laps.json"
 
 
-SIDECAR_NOTE = "wet tyre classes refitted from the lap times by `pipeline wet-laps` (step 4.5)"
-
-
-def note_sidecar(race_id: str, est: Estimate, sidecar: dict, raw_dir: Path) -> None:
-    """Record in the Jolpica sidecar's compound estimate that the wet stints were relabelled
-    (its stint list keeps 2.4's dry labels; the raw snapshot has the final compounds)."""
-    notes = sidecar["estimates"]["compounds"].setdefault("notes", [])
-    notes[:] = [n for n in notes if not n.startswith(SIDECAR_NOTE)]
-    wet_stints = sum(cls != "slick" for cls in est.classes.values())
-    notes.append(
-        f"{SIDECAR_NOTE}: {wet_stints} stints on INTERMEDIATE / WET (the snapshot's Compound"
-        " is final; the stints above are 2.4's dry labels)"
-    )
-    (raw_dir / f"{race_id}.jolpica.json").write_text(json.dumps(sidecar, indent=1) + "\n")
-
-
 def write(race_id: str, est: Estimate, raw_dir: Path, wetness: list[float] | None = None) -> None:
     """Write the lap-time weather records and the report next to the raw snapshot, and the
     snapshot itself where fields were filled."""
@@ -474,3 +460,41 @@ def write(race_id: str, est: Estimate, raw_dir: Path, wetness: list[float] | Non
     report_path(race_id, raw_dir).write_text(
         json.dumps(report(est, race_id, wetness), indent=1) + "\n"
     )
+
+
+# --- a Jolpica race ingested with step 2.4's estimates ---------------------------------------
+
+SIDECAR_NOTE = "wet tyre classes refitted from the lap times by `pipeline wet-laps` (step 4.5)"
+
+
+def update_sidecar(sidecar: dict, est: Estimate) -> dict:
+    """The Jolpica sidecar after a wet-laps fit (`estimate` with its dry labels): each wet
+    stint's tyre in the stint list (its 2.4 label kept as `dry`), "weather" listed as estimated
+    (the race file's provenance lists it), and one note on the relabelling (a re-run starts
+    from the 2.4 labels and replaces the note). The raw snapshot has the final compounds."""
+    block = sidecar["estimates"]
+    compounds = block.setdefault("compounds", {})
+    for s in compounds.get("stints", []):
+        if "dry" in s:  # relabelled by an earlier run: start again from 2.4's label
+            s["compound"] = s.pop("dry")
+            if "dryBy" in s:
+                s["by"] = s.pop("dryBy")
+        cls = est.classes.get((str(s["driver"]), int(s["stint"])), "slick")
+        if cls != "slick":
+            s["dry"] = s["compound"]
+            if "by" in s:
+                s["dryBy"] = s["by"]
+            s["compound"], s["by"] = CLASS_COMPOUND[cls], "wet-laps"
+    from . import estimates
+
+    est_fields = set(block.get("estimated", [])) | {"weather"}
+    block["estimated"] = [f for f in estimates.FIELDS if f in est_fields]
+    block["weather"] = {"method": f"wet laps from the lap times ({SOURCE}, step 4.5)"}
+    notes = compounds.setdefault("notes", [])
+    notes[:] = [n for n in notes if not n.startswith(SIDECAR_NOTE)]
+    wet_stints = sum(cls != "slick" for cls in est.classes.values())
+    notes.append(
+        f"{SIDECAR_NOTE}: {wet_stints} stints on INTERMEDIATE / WET (the snapshot's Compound is"
+        " final; a relabelled stint keeps 2.4's dry label as `dry`)"
+    )
+    return sidecar
