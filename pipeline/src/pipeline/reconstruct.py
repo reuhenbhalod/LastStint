@@ -26,7 +26,8 @@ with z a seeded normal draw per car (deterministic: sha256 of race, seed and dri
 cars decouple once each has a target for its time at its last lap:
 - lead-lap finishers: their official race time;
 - lapped finishers: just after the winner, in classification order, inside the window where
-  they are exactly their laps down; classified retirements in classification order;
+  they are exactly their laps down (cars running at the flag but not classified too, after
+  them); classified retirements in classification order;
 - retirements: their natural time at the field's pace (F1DB fastest lap + the lead-lap
   finishers' median pace offset), early enough to be seen as a retirement.
 Then per car: the noise's lowest draw is moved onto the fastest-lap lap; the wear w and the
@@ -638,6 +639,18 @@ def targets(
             if car.time is None and not a - 1e-9 <= v <= b + 1e-9:
                 notes.append(f"{car.driver}: no time fits both its classification and its window")
             out[car.driver] = v
+    # Running at the flag but not classified (too few laps for the rules of the day, e.g.
+    # australia-1986's Tambay and Berg): still lapped finishers, so they cross the line
+    # after the winner's flag, exactly their laps down, and aren't seen as retirements.
+    running = sorted(
+        (c for c in anchors.cars if c.driver not in out and c.finished and c.laps >= 1),
+        key=lambda c: (-c.laps, c.position or 999),
+    )
+    prev = -math.inf
+    for car in running:
+        lo, hi = t_win + p.order_gap, t_win + 0.75 * est_lap[car.driver]
+        v = min(max(natural[car.driver], lo, prev + p.order_gap), hi)
+        out[car.driver] = prev = v
     for car in anchors.cars:
         if car.driver not in out and car.laps >= 1:
             out[car.driver] = min(natural[car.driver], seen)
@@ -890,7 +903,9 @@ def check_anchors(anchors: Anchors, df: pd.DataFrame, p: Params) -> list[dict]:
     classified = [
         c.driver for c in sorted(anchors.cars, key=lambda c: c.position or 999) if c.classified
     ]
-    order = [d for d in finishing_order(df) if d in set(classified)]
+    # The classified cars head the road order (the race file's realResult): no unclassified
+    # car (a disqualified one, say) ahead of them.
+    order = finishing_order(df)[: len(classified)]
     out.append(_row("order", "classification", classified, order, order == classified))
 
     lead = sorted((c for c in anchors.cars if c.time is not None), key=lambda c: c.time)

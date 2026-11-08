@@ -127,6 +127,42 @@ def test_lapped_cars_are_their_laps_down(solved):
         assert t[-2] < t_win < t[-1], code  # still racing at the flag, then finishes
 
 
+def test_unclassified_cars_running_at_the_flag_are_lapped_not_retired():
+    # As australia-1986's Tambay (70 of 82 laps) and Berg: running at the end, too few laps
+    # to be classified. They must cross the line after the winner, not look retired.
+    anchors = toy()
+    for code, grid, laps in (("JJJ", 9, 40), ("KKK", 10, 31)):
+        anchors.cars.append(
+            rc.Car(code, f"T{code}", None, grid, None, False, "lapped", laps, None, 93.0, 20)
+        )
+    res = rc.reconstruct(anchors)
+    assert rc.failures(res.sidecar["anchors"]) == []
+    df = res.laps
+    t_win = float(df[(df["Driver"] == "AAA") & (df["LapNumber"] == 50)]["Time"].iloc[0])
+    for code, laps in (("JJJ", 40), ("KKK", 31)):
+        t = df[df["Driver"] == code].sort_values("LapNumber")["Time"].to_numpy()
+        assert len(t) == laps
+        assert t[-2] < t_win < t[-1], code
+    down = {r["subject"]: r for r in res.sidecar["anchors"] if r["anchor"] == "laps down"}
+    assert down["JJJ"]["achieved"] == 10 and down["KKK"]["achieved"] == 19
+    retired = {e["driver"] for e in events.retirement_events(df, 50)}
+    assert not retired & {"JJJ", "KKK"}
+
+
+def test_a_disqualified_car_ahead_on_the_road_fails_the_order_anchor():
+    # As san-marino-1985's Prost: the full distance, no time, out of the classification. To
+    # look retired with every lap done he'd be first on the road, heading the race file's
+    # realResult, so the order anchor (the classified cars head the road order) fails.
+    anchors = toy()
+    anchors.cars.append(
+        rc.Car("DQQ", "TDQQ", None, 9, None, False, "disqualified", 50, None, None, None)
+    )
+    res = rc.reconstruct(anchors)
+    (order,) = [r for r in res.sidecar["anchors"] if r["anchor"] == "order"]
+    assert order["pass"] is False and order["achieved"][0] == "DQQ"
+    assert finishing_order(res.laps)[0] == "DQQ"
+
+
 def test_grid_order_on_lap_one(solved):
     lap1 = solved.laps[solved.laps["LapNumber"] == 1].dropna(subset=["LapTime"])
     order = lap1.sort_values("Time")["Driver"].tolist()

@@ -208,7 +208,7 @@
    "total": 1
   },
   "order": {
-   "pass": 1,
+   "pass": 0,
    "total": 1
   },
   "gap": {
@@ -314,6 +314,7 @@
     "DEC"
    ],
    "achieved": [
+    "SENA",
     "NAN",
     "PAT",
     "BOUT",
@@ -322,10 +323,9 @@
     "WAR",
     "GUG",
     "CHE",
-    "CAF",
-    "DEC"
+    "CAF"
    ],
-   "pass": true
+   "pass": false
   },
   {
    "anchor": "gap",

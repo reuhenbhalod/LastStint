@@ -8,7 +8,7 @@ the tests, the golden-file generator, and the CLI so they never drift.
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 
 import pandas as pd
@@ -1253,6 +1253,107 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
+    # Eras wave B (build plan 5.1): reconstructed races, 1984-1988 (`pipeline reconstruct`,
+    # step 4.6: synthetic laps solved to Jolpica's results, F1DB's fastest laps and the
+    # sourced stops of data/reconstruction/<id>.json). No safety cars before 1993, no
+    # refuelling; the fuel limit is the overlay's rules. Checked on their anchors, not G1
+    # (data/raw/<id>.anchors.md). Duels, seeds and split as for wave A.
+    "portugal-1984": {
+        "year": 1984,
+        "event": "Portuguese",
+        "source": "reconstruct",
+        "name": "Portugal 1984: Lauda vs Prost",
+        "era": "1988-1993",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "LAU",
+        "rival": "PRO",  # Lauda P2 or better for the title, by half a point over Prost
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "san-marino-1985": {
+        "year": 1985,
+        "event": "San Marino",
+        "source": "reconstruct",
+        "name": "San Marino 1985: Senna vs De Angelis",
+        "era": "1988-1993",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "SENA",
+        "rival": "DEA",  # make the fuel last (real: Senna dry 3 laps out, De Angelis wins)
+        "score_positions": 6,
+        "split": "eras",
+        # Prost finished first on the road and was disqualified (Jolpica: 60 laps, no time).
+        # The reconstruction can't place a disqualified car that ran the full distance: it
+        # has him 172 s ahead of De Angelis, heading the realResult (order anchor FAIL,
+        # data/raw/san-marino-1985.anchors.md). An owner decision; not counted in G1.
+        "data_issue": "disqualified finisher (PRO) heads the reconstructed road order",
+    },
+    "mexico-1986": {
+        "year": 1986,
+        "event": "Mexican",
+        "source": "reconstruct",
+        "name": "Mexico 1986: Berger vs Prost",
+        "era": "1988-1993",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "BER",
+        "rival": "PRO",  # Berger wins with no tyre stop; Prost the car behind at the flag
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "hungary-1986": {
+        "year": 1986,
+        "event": "Hungarian",
+        "source": "reconstruct",
+        "name": "Hungary 1986: Piquet vs Senna",
+        "era": "1988-1993",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "PIQN",
+        "rival": "SENA",  # beat-rival: Piquet ahead of Senna
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "australia-1986": {
+        "year": 1986,
+        "event": "Australian",
+        "source": "reconstruct",
+        "name": "Australia 1986: Mansell vs Prost",
+        "era": "1988-1993",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "MAN",
+        "rival": "PRO",  # Mansell P3 or better for the title (real: tyre failure, Prost wins)
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "great-britain-1987": {
+        "year": 1987,
+        "event": "British",  # `pipeline reconstruct great-britain-1987 --event British`
+        "source": "reconstruct",
+        "name": "Britain 1987: Mansell vs Piquet",
+        "era": "1988-1993",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "MAN",
+        "rival": "PIQN",  # win: Mansell pits for fresh tyres and chases Piquet down
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "monaco-1988": {
+        "year": 1988,
+        "event": "Monaco",
+        "source": "reconstruct",
+        "name": "Monaco 1988: Senna vs Prost",
+        "era": "1988-1993",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "SENA",
+        "rival": "PRO",  # defend: Senna holds the lead to the flag (real: crashed on lap 67)
+        "score_positions": 6,
+        "split": "eras",
+    },
 }
 
 
@@ -1283,6 +1384,27 @@ def reconstructed_laps(laps: pd.DataFrame, year: int) -> pd.DataFrame:
     era = estimates.era_for_year(year)
     refuelling = year in estimates.REFUELLING
     return estimates.estimate_compounds(laps, year, estimates.burn_per_lap(era), refuelling).laps
+
+
+def reconstructed_pit_loss(params: track.TrackParams, recon: dict) -> track.TrackParams:
+    """A reconstructed race with no stop to measure (none sourced) takes the pit loss its
+    reconstruction assumes for a stop with no sourced lane time (lane time less the track it
+    bypasses, reconstruct.Params): the loss a stop in its synthetic laps would show."""
+    if params.pit_loss is not None:
+        return params
+    p = recon["params"]
+    loss = round(max(float(p["default_lane_time"]) - float(p["pit_bypass"]), 0.0), 3)
+    note = (
+        f"pitLoss: no stop in the reconstruction, its assumed {loss}s (lane time"
+        f" {p['default_lane_time']}s less the {p['pit_bypass']}s bypassed; no source has one)"
+    )
+    return replace(
+        params,
+        pit_loss=loss,
+        pit_loss_under_sc=loss * track.SC_PIT_LOSS_FACTOR,
+        pit_loss_under_vsc=loss * track.VSC_PIT_LOSS_FACTOR,
+        notes=[*params.notes, note],
+    )
 
 
 def eras_meta(race_id: str, sidecar: dict) -> dict:
@@ -1480,6 +1602,8 @@ def build_race(
         else None
     )
     params = track.fit_track_params(laps, clean_df, traffic_df, fitted)
+    if recon is not None:
+        params = reconstructed_pit_loss(params, recon)
 
     takeover = meta["takeover_lap"]
     if takeover is None:

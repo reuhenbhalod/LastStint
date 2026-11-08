@@ -5,7 +5,7 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: False.
 | Anchor | Pass | Total |
 |---|---|---|
 | grid | 0 | 1 |
-| order | 1 | 1 |
+| order | 0 | 1 |
 | gap | 3 | 3 |
 | fastest | 23 | 23 |
 | retirement | 16 | 16 |
@@ -17,7 +17,7 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: False.
 | Anchor | Subject | Target | Achieved | Pass |
 |---|---|---|---|---|
 | grid | lap-1 order is the grid order | 24 cars: SENA PRO BER MAN PAT NAN BOUT ALL MOD LAR PIQN NAKS BRU CAF DEC CAP ALE GUG SCHB PIR GROO CHE WAR PALJ | 24 cars: SENA PRO BER MAN PAT NAN BOUT ALL MOD LAR PIQN NAKS BRU CAF DEC CAP ALE GUG PIR GROO CHE WAR PALJ SCHB | FAIL |
-| order | classification | 10 cars: NAN PAT BOUT PIQN BRU WAR GUG CHE CAF DEC | 10 cars: NAN PAT BOUT PIQN BRU WAR GUG CHE CAF DEC | pass |
+| order | classification | 10 cars: NAN PAT BOUT PIQN BRU WAR GUG CHE CAF DEC | 10 cars: SENA NAN PAT BOUT PIQN BRU WAR GUG CHE CAF | FAIL |
 | gap | PAT | 11.904 | 11.902 | pass |
 | gap | BOUT | 13.446 | 13.448 | pass |
 | gap | PIQN | 104.225 | 104.224 | pass |
