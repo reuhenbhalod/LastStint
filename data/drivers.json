@@ -683,7 +683,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "ACH",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "acheson"
     },
     "AIT": {
@@ -719,7 +719,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "ALB",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "alboreto"
     },
     "ALE": {
@@ -731,7 +731,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "ALE",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "alesi"
     },
     "ALG": {
@@ -755,7 +755,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "ALL",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "alliot"
     },
     "AND": {
@@ -779,8 +779,20 @@
       "confidence": "low",
       "evidence": [],
       "code": "ARN",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "arnoux"
+    },
+    "BAB": {
+      "name": "Fabrizio Barbazza",
+      "number": 24,
+      "tier": "low",
+      "ignores": 0,
+      "pushback": 0,
+      "confidence": "low",
+      "evidence": [],
+      "code": "BAB",
+      "codeSource": "f1db",
+      "jolpicaId": "barbazza"
     },
     "BAD": {
       "name": "Luca Badoer",
@@ -803,7 +815,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "BAL",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "baldi"
     },
     "BAR": {
@@ -823,18 +835,6 @@
       "codeSource": "jolpica",
       "jolpicaId": "barrichello"
     },
-    "BARF": {
-      "name": "Fabrizio Barbazza",
-      "number": 24,
-      "tier": "low",
-      "ignores": 0,
-      "pushback": 0,
-      "confidence": "low",
-      "evidence": [],
-      "code": "BAR",
-      "codeSource": "formula1.com",
-      "jolpicaId": "barbazza"
-    },
     "BARP": {
       "name": "Paolo Barilla",
       "number": 24,
@@ -844,7 +844,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "BAR",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "barilla"
     },
     "BAU": {
@@ -856,8 +856,32 @@
       "confidence": "low",
       "evidence": [],
       "code": "BAU",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "baumgartner"
+    },
+    "BEE": {
+      "name": "Olivier Beretta",
+      "number": 19,
+      "tier": "low",
+      "ignores": 0,
+      "pushback": 0,
+      "confidence": "low",
+      "evidence": [],
+      "code": "BEE",
+      "codeSource": "f1db",
+      "jolpicaId": "beretta"
+    },
+    "BEG": {
+      "name": "Allen Berg",
+      "number": 22,
+      "tier": "low",
+      "ignores": 0,
+      "pushback": 0,
+      "confidence": "low",
+      "evidence": [],
+      "code": "BEG",
+      "codeSource": "f1db",
+      "jolpicaId": "berg"
     },
     "BEL": {
       "name": "Stefan Bellof",
@@ -868,7 +892,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "BEL",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "bellof"
     },
     "BELP": {
@@ -880,8 +904,20 @@
       "confidence": "low",
       "evidence": [],
       "code": "BEL",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "belmondo"
+    },
+    "BEN": {
+      "name": "Éric Bernard",
+      "number": 25,
+      "tier": "low",
+      "ignores": 0,
+      "pushback": 0,
+      "confidence": "low",
+      "evidence": [],
+      "code": "BEN",
+      "codeSource": "f1db",
+      "jolpicaId": "bernard"
     },
     "BER": {
       "name": "Gerhard Berger",
@@ -892,32 +928,8 @@
       "confidence": "low",
       "evidence": [],
       "code": "BER",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "berger"
-    },
-    "BERA": {
-      "name": "Allen Berg",
-      "number": 22,
-      "tier": "low",
-      "ignores": 0,
-      "pushback": 0,
-      "confidence": "low",
-      "evidence": [],
-      "code": "BER",
-      "codeSource": "formula1.com",
-      "jolpicaId": "berg"
-    },
-    "BERE": {
-      "name": "Éric Bernard",
-      "number": 25,
-      "tier": "low",
-      "ignores": 0,
-      "pushback": 0,
-      "confidence": "low",
-      "evidence": [],
-      "code": "BER",
-      "codeSource": "formula1.com",
-      "jolpicaId": "bernard"
     },
     "BERN": {
       "name": "Enrique Bernoldi",
@@ -928,20 +940,8 @@
       "confidence": "low",
       "evidence": [],
       "code": "BER",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "bernoldi"
-    },
-    "BERO": {
-      "name": "Olivier Beretta",
-      "number": 19,
-      "tier": "low",
-      "ignores": 0,
-      "pushback": 0,
-      "confidence": "low",
-      "evidence": [],
-      "code": "BER",
-      "codeSource": "formula1.com",
-      "jolpicaId": "beretta"
     },
     "BIA": {
       "name": "Jules Bianchi",
@@ -964,7 +964,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "BLU",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "blundell"
     },
     "BOE": {
@@ -976,7 +976,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "BOE",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "boesel"
     },
     "BOU": {
@@ -1000,7 +1000,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "BOU",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "boullion"
     },
     "BOUT": {
@@ -1012,7 +1012,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "BOU",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "boutsen"
     },
     "BRA": {
@@ -1024,7 +1024,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "BRA",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "brabham"
     },
     "BRU": {
@@ -1036,7 +1036,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "BRU",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "brundle"
     },
     "BRUG": {
@@ -1048,7 +1048,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "BRU",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "bruni"
     },
     "BUE": {
@@ -1072,7 +1072,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "BUR",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "burti"
     },
     "BUT": {
@@ -1096,7 +1096,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "CAF",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "caffi"
     },
     "CAM": {
@@ -1108,7 +1108,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "CAM",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "campos"
     },
     "CAP": {
@@ -1120,7 +1120,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "CAP",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "capelli"
     },
     "CEC": {
@@ -1132,7 +1132,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "CEC",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "cecotto"
     },
     "CHA": {
@@ -1156,7 +1156,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "CHE",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "cheever"
     },
     "CHI": {
@@ -1180,7 +1180,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "COM",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "comas"
     },
     "COU": {
@@ -1209,7 +1209,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "DAL",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "dalmas"
     },
     "DAM": {
@@ -1233,7 +1233,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "DAM",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "matta"
     },
     "DAN": {
@@ -1245,7 +1245,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "DAN",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "danner"
     },
     "DAV": {
@@ -1269,7 +1269,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "DEA",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "angelis"
     },
     "DEC": {
@@ -1281,7 +1281,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "DEC",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "cesaris"
     },
     "DEL": {
@@ -1293,7 +1293,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "DEL",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "deletraz"
     },
     "DIG": {
@@ -1317,7 +1317,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "DIN",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "diniz"
     },
     "DIR": {
@@ -1353,7 +1353,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "DON",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "donnelly"
     },
     "DOOR": {
@@ -1377,7 +1377,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "DUM",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "dumfries"
     },
     "FAB": {
@@ -1389,7 +1389,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "FAB",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "fabi"
     },
     "FABC": {
@@ -1401,10 +1401,10 @@
       "confidence": "low",
       "evidence": [],
       "code": "FAB",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "corrado_fabi"
     },
-    "FABP": {
+    "FAR": {
       "name": "Pascal Fabre",
       "number": 14,
       "tier": "low",
@@ -1412,8 +1412,8 @@
       "pushback": 0,
       "confidence": "low",
       "evidence": [],
-      "code": "FAB",
-      "codeSource": "formula1.com",
+      "code": "FAR",
+      "codeSource": "f1db",
       "jolpicaId": "fabre"
     },
     "FIR": {
@@ -1425,7 +1425,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "FIR",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "firman"
     },
     "FIS": {
@@ -1449,7 +1449,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "FIT",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "fittipaldi"
     },
     "FOI": {
@@ -1461,7 +1461,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "FOI",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "foitek"
     },
     "FON": {
@@ -1473,7 +1473,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "FON",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "fontana"
     },
     "FRE": {
@@ -1485,7 +1485,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "FRE",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "frentzen"
     },
     "FRI": {
@@ -1509,7 +1509,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "GAC",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "gachot"
     },
     "GAR": {
@@ -1521,7 +1521,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "GAR",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "gartner"
     },
     "GEN": {
@@ -1533,7 +1533,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "GEN",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "gene"
     },
     "GHI": {
@@ -1545,7 +1545,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "GHI",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "ghinzani"
     },
     "GIA": {
@@ -1557,7 +1557,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "GIA",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "giacomelli"
     },
     "GLO": {
@@ -1581,7 +1581,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "GOU",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "gounon"
     },
     "GROO": {
@@ -1593,7 +1593,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "GRO",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "grouillard"
     },
     "GUG": {
@@ -1605,7 +1605,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "GUG",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "gugelmin"
     },
     "GUT": {
@@ -1629,7 +1629,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "HAK",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "hakkinen"
     },
     "HARR": {
@@ -1665,7 +1665,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "HER",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "herbert"
     },
     "HES": {
@@ -1677,7 +1677,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "HES",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "hesnault"
     },
     "HIL": {
@@ -1689,7 +1689,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "HIL",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "damon_hill"
     },
     "INO": {
@@ -1701,7 +1701,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "INO",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "inoue"
     },
     "IRV": {
@@ -1713,7 +1713,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "IRV",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "irvine"
     },
     "JAR": {
@@ -1725,7 +1725,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "JAR",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "lehto"
     },
     "JARJ": {
@@ -1737,7 +1737,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "JAR",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "jarier"
     },
     "JOH": {
@@ -1749,7 +1749,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "JOH",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "johansson"
     },
     "JON": {
@@ -1761,7 +1761,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "JON",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "jones"
     },
     "KAR": {
@@ -1785,7 +1785,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "KAT",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "katayama"
     },
     "KIE": {
@@ -1797,7 +1797,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "KIE",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "kiesa"
     },
     "KLI": {
@@ -1836,6 +1836,18 @@
       "codeSource": "jolpica",
       "jolpicaId": "kovalainen"
     },
+    "LAA": {
+      "name": "Oscar Larrauri",
+      "number": 32,
+      "tier": "low",
+      "ignores": 0,
+      "pushback": 0,
+      "confidence": "low",
+      "evidence": [],
+      "code": "LAA",
+      "codeSource": "f1db",
+      "jolpicaId": "larrauri"
+    },
     "LAF": {
       "name": "Jacques Laffite",
       "number": 26,
@@ -1845,7 +1857,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "LAF",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "laffite"
     },
     "LAG": {
@@ -1857,7 +1869,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "LAG",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "lagorce"
     },
     "LAM": {
@@ -1869,7 +1881,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "LAM",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "lamy"
     },
     "LAR": {
@@ -1881,20 +1893,8 @@
       "confidence": "low",
       "evidence": [],
       "code": "LAR",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "larini"
-    },
-    "LARO": {
-      "name": "Oscar Larrauri",
-      "number": 32,
-      "tier": "low",
-      "ignores": 0,
-      "pushback": 0,
-      "confidence": "low",
-      "evidence": [],
-      "code": "LAR",
-      "codeSource": "formula1.com",
-      "jolpicaId": "larrauri"
     },
     "LAU": {
       "name": "Niki Lauda",
@@ -1905,7 +1905,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "LAU",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "lauda"
     },
     "LAV": {
@@ -1917,7 +1917,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "LAV",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "lavaggi"
     },
     "LIU": {
@@ -1965,7 +1965,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "MAN",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "mansell"
     },
     "MAR": {
@@ -1977,7 +1977,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "MAR",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "martini"
     },
     "MART": {
@@ -1989,7 +1989,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "MAR",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "marques"
     },
     "MAS": {
@@ -2018,7 +2018,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "MAZ",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "mazzacane"
     },
     "MCN": {
@@ -2030,7 +2030,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "MCN",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "mcnish"
     },
     "MER": {
@@ -2054,8 +2054,20 @@
       "confidence": "low",
       "evidence": [],
       "code": "MOD",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "modena"
+    },
+    "MOE": {
+      "name": "Roberto Moreno",
+      "number": 22,
+      "tier": "low",
+      "ignores": 0,
+      "pushback": 0,
+      "confidence": "low",
+      "evidence": [],
+      "code": "MOE",
+      "codeSource": "f1db",
+      "jolpicaId": "moreno"
     },
     "MON": {
       "name": "Juan Pablo Montoya",
@@ -2078,7 +2090,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "MON",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "montermini"
     },
     "MOR": {
@@ -2090,20 +2102,8 @@
       "confidence": "low",
       "evidence": [],
       "code": "MOR",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "morbidelli"
-    },
-    "MORR": {
-      "name": "Roberto Moreno",
-      "number": 22,
-      "tier": "low",
-      "ignores": 0,
-      "pushback": 0,
-      "confidence": "low",
-      "evidence": [],
-      "code": "MOR",
-      "codeSource": "formula1.com",
-      "jolpicaId": "moreno"
     },
     "MSCM": {
       "name": "Michael Schumacher",
@@ -2138,7 +2138,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "NAK",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "nakano"
     },
     "NAKS": {
@@ -2150,7 +2150,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "NAK",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "satoru_nakajima"
     },
     "NAN": {
@@ -2162,7 +2162,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "NAN",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "nannini"
     },
     "NAS": {
@@ -2186,7 +2186,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "NAS",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "naspetti"
     },
     "NOD": {
@@ -2198,7 +2198,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "NOD",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "noda"
     },
     "PAL": {
@@ -2222,7 +2222,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "PAL",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "palmer"
     },
     "PAN": {
@@ -2234,20 +2234,8 @@
       "confidence": "low",
       "evidence": [],
       "code": "PAN",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "panis"
-    },
-    "PANG": {
-      "name": "Giorgio Pantano",
-      "number": 19,
-      "tier": "low",
-      "ignores": 0,
-      "pushback": 0,
-      "confidence": "low",
-      "evidence": [],
-      "code": "PAN",
-      "codeSource": "formula1.com",
-      "jolpicaId": "pantano"
     },
     "PAP": {
       "name": "Massimiliano Papis",
@@ -2258,7 +2246,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "PAP",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "papis"
     },
     "PAT": {
@@ -2270,8 +2258,20 @@
       "confidence": "low",
       "evidence": [],
       "code": "PAT",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "patrese"
+    },
+    "PATG": {
+      "name": "Giorgio Pantano",
+      "number": 19,
+      "tier": "low",
+      "ignores": 0,
+      "pushback": 0,
+      "confidence": "low",
+      "evidence": [],
+      "code": "PAT",
+      "codeSource": "f1db",
+      "jolpicaId": "pantano"
     },
     "PERL": {
       "name": "Luis Pérez-Sala",
@@ -2282,7 +2282,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "PER",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "sala"
     },
     "PET": {
@@ -2330,7 +2330,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "PIQ",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "piquet"
     },
     "PIR": {
@@ -2342,7 +2342,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "PIR",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "pirro"
     },
     "PIZ": {
@@ -2366,7 +2366,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "PRO",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "prost"
     },
     "ROS": {
@@ -2390,7 +2390,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "ROS",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "keke_rosberg"
     },
     "ROSR": {
@@ -2402,7 +2402,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "ROS",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "rosset"
     },
     "ROT": {
@@ -2414,7 +2414,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "ROT",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "rothengatter"
     },
     "RSS": {
@@ -2438,7 +2438,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "SAL",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "salo"
     },
     "SAT": {
@@ -2474,7 +2474,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "SCH",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "schneider"
     },
     "SCHD": {
@@ -2486,7 +2486,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "SCH",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "schiattarella"
     },
     "SEN": {
@@ -2510,7 +2510,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "SEN",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "senna"
     },
     "SPE": {
@@ -2546,7 +2546,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "STR",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "streiff"
     },
     "SUL": {
@@ -2558,7 +2558,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "SUL",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "sullivan"
     },
     "SUR": {
@@ -2570,7 +2570,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "SUR",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "surer"
     },
     "SUT": {
@@ -2585,6 +2585,18 @@
       "codeSource": "jolpica",
       "jolpicaId": "sutil"
     },
+    "SUU": {
+      "name": "Toshio Suzuki",
+      "number": 19,
+      "tier": "low",
+      "ignores": 0,
+      "pushback": 0,
+      "confidence": "low",
+      "evidence": [],
+      "code": "SUU",
+      "codeSource": "f1db",
+      "jolpicaId": "toshio_suzuki"
+    },
     "SUZ": {
       "name": "Aguri Suzuki",
       "number": 10,
@@ -2594,20 +2606,8 @@
       "confidence": "low",
       "evidence": [],
       "code": "SUZ",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "suzuki"
-    },
-    "SUZT": {
-      "name": "Toshio Suzuki",
-      "number": 19,
-      "tier": "low",
-      "ignores": 0,
-      "pushback": 0,
-      "confidence": "low",
-      "evidence": [],
-      "code": "SUZ",
-      "codeSource": "formula1.com",
-      "jolpicaId": "toshio_suzuki"
     },
     "TAK": {
       "name": "Toranosuke Takagi",
@@ -2618,7 +2618,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "TAK",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "takagi"
     },
     "TAM": {
@@ -2630,7 +2630,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "TAM",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "tambay"
     },
     "TAR": {
@@ -2642,7 +2642,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "TAR",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "tarquini"
     },
     "TMO": {
@@ -2678,7 +2678,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "TUE",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "tuero"
     },
     "VANE": {
@@ -2690,7 +2690,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "VAN",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "poele"
     },
     "VDG": {
@@ -2726,7 +2726,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "VER",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "verstappen"
     },
     "VIL": {
@@ -2750,7 +2750,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "WAR",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "warwick"
     },
     "WAT": {
@@ -2803,7 +2803,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "WEN",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "wendlinger"
     },
     "WIL": {
@@ -2815,7 +2815,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "WIL",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "wilson"
     },
     "WIN": {
@@ -2839,7 +2839,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "WIN",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "manfred_winkelhock"
     },
     "WUR": {
@@ -2875,7 +2875,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "YOO",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "yoong"
     },
     "ZAN": {
@@ -2887,7 +2887,7 @@
       "confidence": "low",
       "evidence": [],
       "code": "ZAN",
-      "codeSource": "formula1.com",
+      "codeSource": "f1db",
       "jolpicaId": "zanardi"
     },
     "ZON": {

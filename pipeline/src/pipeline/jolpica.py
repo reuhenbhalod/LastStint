@@ -495,7 +495,7 @@ def load(
     drivers_path: Path = DRIVERS_PATH,
 ) -> Ingested:
     """Read a race from the dump (no writes). `stops` overrides Jolpica's own (for races
-    before 2011, from formula1.com or f1db): [Driver, Lap (in-lap), Duration (s)]."""
+    before 2011, from f1db): [Driver, Lap (in-lap), Duration (s)]."""
     dump_dir = Path(dump_dir) if dump_dir else latest_dump()
     dump = Dump(dump_dir)
     race = find_race(dump, year, event, round_number)
