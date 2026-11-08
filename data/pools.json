@@ -1,5 +1,5 @@
 {
-  "_comment": "Which races each game mode plays (survivor spec D3). A race is in one pool, never both. daily: the scheduler and the admin page rotate these (each plays on its race file's tuned seed). survivor: race id -> the seeds survivor deals from (each passes scripts/tune.ts: the real way gives the real result, good play wins, random play mostly loses); a run picks one at random per race.",
+  "_comment": "Which races each game mode plays (survivor spec D3). A race is in at most one of daily and survivor (Gauntlet), and may also be in eras (Eras spec §5). daily: the scheduler and the admin page rotate these (each plays on its race file's tuned seed). survivor: race id -> the seeds survivor deals from (each passes scripts/tune.ts: the real way gives the real result, good play wins, random play mostly loses); a run picks one at random per race. eras: era number -> its ten race ids in position order (Eras spec §4; seeded in D1 by apps/worker/migrations/0010_eras.sql).",
   "daily": [
     "abu-dhabi-2021",
     "abu-dhabi-2024",
@@ -140,6 +140,128 @@
       72098,
       38021,
       66122
+    ]
+  },
+  "eras": {
+    "1": [
+      "south-africa-1983",
+      "monaco-1984",
+      "portugal-1984",
+      "san-marino-1985",
+      "portugal-1985",
+      "mexico-1986",
+      "hungary-1986",
+      "australia-1986",
+      "great-britain-1987",
+      "monaco-1988"
+    ],
+    "2": [
+      "japan-1989",
+      "united-states-1990",
+      "mexico-1990",
+      "brazil-1991",
+      "monaco-1992",
+      "belgium-1992",
+      "hungary-1992",
+      "brazil-1993",
+      "europe-1993",
+      "australia-1993"
+    ],
+    "3": [
+      "spain-1994",
+      "australia-1994",
+      "belgium-1995",
+      "spain-1996",
+      "hungary-1997",
+      "europe-1997",
+      "hungary-1998",
+      "belgium-1998",
+      "malaysia-1999",
+      "europe-1999"
+    ],
+    "4": [
+      "germany-2000",
+      "japan-2000",
+      "malaysia-2001",
+      "austria-2002",
+      "brazil-2003",
+      "hungary-2003",
+      "united-states-2003",
+      "japan-2003",
+      "france-2004",
+      "monaco-2004"
+    ],
+    "5": [
+      "san-marino-2005",
+      "japan-2005",
+      "hungary-2006",
+      "brazil-2006",
+      "china-2007",
+      "europe-2007",
+      "brazil-2007",
+      "monaco-2008",
+      "brazil-2008",
+      "brazil-2009"
+    ],
+    "6": [
+      "australia-2010",
+      "abu-dhabi-2010",
+      "china-2011",
+      "monaco-2011",
+      "canada-2011",
+      "europe-2012",
+      "abu-dhabi-2012",
+      "brazil-2012",
+      "malaysia-2013",
+      "spain-2013"
+    ],
+    "7": [
+      "bahrain-2014",
+      "canada-2014",
+      "hungary-2014",
+      "monaco-2015",
+      "hungary-2015",
+      "united-states-2015",
+      "spain-2016",
+      "monaco-2016",
+      "brazil-2016",
+      "abu-dhabi-2016"
+    ],
+    "8": [
+      "monaco-2017",
+      "azerbaijan-2017",
+      "germany-2018",
+      "russia-2018",
+      "germany-2019",
+      "hungary-2019",
+      "brazil-2019",
+      "italy-2020",
+      "turkey-2020",
+      "sakhir-2020"
+    ],
+    "9": [
+      "bahrain-2021",
+      "spain-2021",
+      "azerbaijan-2021",
+      "france-2021",
+      "hungary-2021",
+      "russia-2021",
+      "turkey-2021",
+      "brazil-2021",
+      "saudi-arabia-2021",
+      "abu-dhabi-2021"
+    ],
+    "10": [
+      "monaco-2022",
+      "great-britain-2022",
+      "hungary-2022",
+      "singapore-2023",
+      "netherlands-2023",
+      "miami-2024",
+      "hungary-2024",
+      "brazil-2024",
+      "australia-2025",
+      "monaco-2025"
     ]
   }
 }
