@@ -123,12 +123,16 @@ def test_committed_rates_add_up():
 
 
 def test_committed_rates_match_the_raw_timelines():
-    """Every data/raw status timeline is counted, with the counts the file records."""
+    """Every real data/raw status timeline is counted, with the counts the file records.
+    Reconstructed races (synthetic laps) are left out of the rates."""
     counted = {
         line.split(" ")[0]: line for c in RATES["circuits"].values() for line in c["counted"]
     }
     for path in sorted(RAW_DIR.glob("*.status.json")):
         race_id = path.name.removesuffix(".status.json")
+        if (RAW_DIR / f"{race_id}.reconstruction.json").exists():
+            assert race_id not in counted, race_id
+            continue
         timeline = json.loads(path.read_text())
         if not timeline:
             continue
@@ -140,6 +144,8 @@ def test_every_race_file_finds_its_circuit():
     from pipeline.legend import circuit_for
 
     for path in sorted(RACES_DIR.glob("*.json")):
+        if json.loads(path.read_text()).get("reconstructed"):
+            continue  # its circuit may have no real timing; Legend uses the all-track rate
         assert circuit_for(path.stem, RATES) in RATES["circuits"], path.stem
 
 

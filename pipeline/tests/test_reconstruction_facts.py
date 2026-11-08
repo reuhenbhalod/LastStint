@@ -60,9 +60,9 @@ def test_loads(race_id):
     assert facts.get("raceId") == race_id
     assert str(facts.get("notes") or "").strip(), "say what was searched and what is missing"
     for s in facts["stops"]:
-        assert 1 <= int(s["lap"])
+        assert int(s["lap"]) >= 1
         assert s["laneTime"] is None or float(s["laneTime"]) > 0
-    for sc in facts["safetyCars"]:
+    for _sc in facts["safetyCars"]:
         assert rc.race_year(race_id) >= rc.FIRST_SC_YEAR
 
 
