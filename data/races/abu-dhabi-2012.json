@@ -4,7 +4,7 @@
     "id": "abu-dhabi-2012",
     "name": "Abu Dhabi 2012: Vettel vs Button",
     "laps": 55,
-    "takeoverLap": 8,
+    "takeoverLap": 10,
     "seed": 1
   },
   "era": "2010-2013",
@@ -65,9 +65,9 @@
       "noise": 0.5166,
       "stateAtTakeover": {
         "position": 4,
-        "gapAhead": 1.603,
+        "gapAhead": 0.53,
         "compound": "HARD",
-        "tyreAge": 8,
+        "tyreAge": 10,
         "compoundsUsed": [
           "HARD"
         ]
@@ -87,9 +87,9 @@
       "noise": 0.4488,
       "stateAtTakeover": {
         "position": 6,
-        "gapAhead": 1.49,
+        "gapAhead": 0.961,
         "compound": "HARD",
-        "tyreAge": 8,
+        "tyreAge": 10,
         "compoundsUsed": [
           "HARD"
         ]
@@ -109,9 +109,9 @@
       "noise": 0.258,
       "stateAtTakeover": {
         "position": 21,
-        "gapAhead": 36.587,
-        "compound": "SOFT",
-        "tyreAge": 7,
+        "gapAhead": 37.218,
+        "compound": "HARD",
+        "tyreAge": 1,
         "compoundsUsed": [
           "HARD",
           "SOFT"
@@ -135,9 +135,9 @@
       "noise": 0.3256,
       "stateAtTakeover": {
         "position": 19,
-        "gapAhead": 10.808,
+        "gapAhead": 0.67,
         "compound": "HARD",
-        "tyreAge": 8,
+        "tyreAge": 10,
         "compoundsUsed": [
           "HARD"
         ]
@@ -157,9 +157,9 @@
       "noise": 0.4198,
       "stateAtTakeover": {
         "position": 16,
-        "gapAhead": 4.414,
+        "gapAhead": 2.564,
         "compound": "HARD",
-        "tyreAge": 8,
+        "tyreAge": 10,
         "compoundsUsed": [
           "HARD"
         ]
@@ -179,9 +179,9 @@
       "noise": 0.3461,
       "stateAtTakeover": {
         "position": 20,
-        "gapAhead": 16.847,
-        "compound": "SOFT",
-        "tyreAge": 7,
+        "gapAhead": 19.529,
+        "compound": "HARD",
+        "tyreAge": 1,
         "compoundsUsed": [
           "HARD",
           "SOFT"
@@ -203,7 +203,7 @@
         "position": 1,
         "gapAhead": 0.0,
         "compound": "SOFT",
-        "tyreAge": 8,
+        "tyreAge": 10,
         "compoundsUsed": [
           "SOFT"
         ]
@@ -217,9 +217,9 @@
       "noise": 0.278,
       "stateAtTakeover": {
         "position": 9,
-        "gapAhead": 3.908,
+        "gapAhead": 0.96,
         "compound": "SOFT",
-        "tyreAge": 8,
+        "tyreAge": 10,
         "compoundsUsed": [
           "SOFT"
         ]
@@ -238,10 +238,10 @@
       "basePace": 111.6195,
       "noise": 0.4152,
       "stateAtTakeover": {
-        "position": 14,
-        "gapAhead": 3.595,
+        "position": 13,
+        "gapAhead": 1.809,
         "compound": "HARD",
-        "tyreAge": 8,
+        "tyreAge": 10,
         "compoundsUsed": [
           "HARD"
         ]
@@ -261,9 +261,9 @@
       "noise": 0.7218,
       "stateAtTakeover": {
         "position": 3,
-        "gapAhead": 2.083,
+        "gapAhead": 0.811,
         "compound": "HARD",
-        "tyreAge": 8,
+        "tyreAge": 10,
         "compoundsUsed": [
           "HARD"
         ]
@@ -283,9 +283,9 @@
       "noise": 0.4191,
       "stateAtTakeover": {
         "position": 7,
-        "gapAhead": 1.49,
+        "gapAhead": 0.516,
         "compound": "SOFT",
-        "tyreAge": 8,
+        "tyreAge": 10,
         "compoundsUsed": [
           "SOFT"
         ]
@@ -305,9 +305,9 @@
       "noise": 0.4472,
       "stateAtTakeover": {
         "position": 10,
-        "gapAhead": 1.477,
+        "gapAhead": 1.435,
         "compound": "HARD",
-        "tyreAge": 8,
+        "tyreAge": 10,
         "compoundsUsed": [
           "HARD"
         ]
@@ -331,9 +331,9 @@
       "noise": 0.976,
       "stateAtTakeover": {
         "position": 8,
-        "gapAhead": 0.809,
+        "gapAhead": 1.059,
         "compound": "HARD",
-        "tyreAge": 8,
+        "tyreAge": 10,
         "compoundsUsed": [
           "HARD"
         ]
@@ -362,9 +362,9 @@
       "noise": 0.3894,
       "stateAtTakeover": {
         "position": 17,
-        "gapAhead": 0.902,
+        "gapAhead": 0.404,
         "compound": "SOFT",
-        "tyreAge": 8,
+        "tyreAge": 10,
         "compoundsUsed": [
           "SOFT"
         ]
@@ -384,9 +384,9 @@
       "noise": 0.2771,
       "stateAtTakeover": {
         "position": 18,
-        "gapAhead": 0.757,
+        "gapAhead": 1.445,
         "compound": "HARD",
-        "tyreAge": 8,
+        "tyreAge": 10,
         "compoundsUsed": [
           "HARD"
         ]
@@ -406,9 +406,9 @@
       "noise": 0.2989,
       "stateAtTakeover": {
         "position": 2,
-        "gapAhead": 3.839,
+        "gapAhead": 0.772,
         "compound": "HARD",
-        "tyreAge": 8,
+        "tyreAge": 10,
         "compoundsUsed": [
           "HARD"
         ]
@@ -428,9 +428,9 @@
       "noise": 0.4789,
       "stateAtTakeover": {
         "position": 11,
-        "gapAhead": 2.171,
+        "gapAhead": 1.038,
         "compound": "HARD",
-        "tyreAge": 8,
+        "tyreAge": 10,
         "compoundsUsed": [
           "HARD"
         ]
@@ -453,10 +453,10 @@
       "basePace": 110.3622,
       "noise": 0.6044,
       "stateAtTakeover": {
-        "position": 15,
-        "gapAhead": 6.367,
+        "position": 14,
+        "gapAhead": 1.279,
         "compound": "HARD",
-        "tyreAge": 8,
+        "tyreAge": 10,
         "compoundsUsed": [
           "HARD"
         ]
@@ -475,11 +475,12 @@
       "basePace": 110.8485,
       "noise": 0.5133,
       "stateAtTakeover": {
-        "position": 12,
-        "gapAhead": 1.616,
-        "compound": "SOFT",
-        "tyreAge": 8,
+        "position": 15,
+        "gapAhead": 1.442,
+        "compound": "HARD",
+        "tyreAge": 1,
         "compoundsUsed": [
+          "HARD",
           "SOFT"
         ]
       },
@@ -501,10 +502,10 @@
       "basePace": 109.431,
       "noise": 0.4534,
       "stateAtTakeover": {
-        "position": 13,
-        "gapAhead": 2.479,
+        "position": 12,
+        "gapAhead": 0.777,
         "compound": "SOFT",
-        "tyreAge": 8,
+        "tyreAge": 10,
         "compoundsUsed": [
           "SOFT"
         ]
@@ -527,9 +528,9 @@
       "noise": 0.9247,
       "stateAtTakeover": {
         "position": 5,
-        "gapAhead": 0.79,
+        "gapAhead": 0.866,
         "compound": "HARD",
-        "tyreAge": 8,
+        "tyreAge": 10,
         "compoundsUsed": [
           "HARD"
         ]
@@ -550,19 +551,9 @@
   },
   "events": [
     {
-      "lap": 8,
-      "type": "RETIREMENT",
-      "driver": "KAR"
-    },
-    {
-      "lap": 8,
-      "type": "RETIREMENT",
-      "driver": "ROS"
-    },
-    {
-      "lap": 9,
+      "lap": 10,
       "type": "SC",
-      "laps": 6
+      "laps": 5
     },
     {
       "lap": 19,
@@ -592,7 +583,6 @@
   ],
   "decisionMoments": [],
   "candidateMomentLaps": [
-    9,
     10,
     14,
     26,

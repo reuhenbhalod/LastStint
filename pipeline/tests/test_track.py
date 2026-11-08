@@ -120,8 +120,62 @@ def test_overtake_model_falls_back_on_thin_data(abu):
     laps, _, _, fitted, _ = abu
     few = laps[laps["LapNumber"] <= 4]  # opening laps only: too few passes to fit
     model, note = track.fit_overtake_model(few, fitted)
+    assert note is not None and "pass rate" in note
+    # The default's slopes, with the intercept from the race's own pass rate.
+    assert model["paceCoef"] == track.DEFAULT_OVERTAKE_MODEL["paceCoef"]
+    assert model["gapCoef"] == track.DEFAULT_OVERTAKE_MODEL["gapCoef"]
+    assert model["intercept"] != track.DEFAULT_OVERTAKE_MODEL["intercept"]
+
+
+def _mean_p(model: dict, advs: list[float], gaps: list[float]) -> float:
+    ps = [
+        track._sigmoid(model["intercept"] + model["paceCoef"] * a + model["gapCoef"] * g)
+        for a, g in zip(advs, gaps, strict=True)
+    ]
+    return sum(ps) / len(ps)
+
+
+def test_fallback_intercept_matches_the_races_pass_rate():
+    # 2 passes in 200 close follower-laps: the model's mean P(pass) over those same laps is
+    # the (smoothed) measured rate, (2 + 0.5) / (200 + 1).
+    advs = [(-0.5 + i / 100) for i in range(200)]
+    gaps = [0.2 + (i % 10) * 0.18 for i in range(200)]
+    events = pd.DataFrame(
+        {"adv": advs, "gap": gaps, "passed": [i in (150, 190) for i in range(200)]}
+    )
+    model, rate = track.rate_matched_fallback(events)
+    assert rate == pytest.approx(2.5 / 201)
+    assert _mean_p(model, advs, gaps) == pytest.approx(rate, abs=1e-9)
+    assert model["intercept"] < track.DEFAULT_OVERTAKE_MODEL["intercept"]  # rarer than default
+
+
+def test_fallback_with_no_pass_at_all_is_finite_and_rare():
+    events = pd.DataFrame({"adv": [0.1] * 50, "gap": [1.0] * 50, "passed": [False] * 50})
+    model, rate = track.rate_matched_fallback(events)
+    assert 0 < rate < 0.02
+    lo, hi = track.INTERCEPT_RANGE
+    assert lo < model["intercept"] < hi
+    assert _mean_p(model, [0.1], [1.0]) == pytest.approx(rate)
+
+
+def test_fallback_intercept_rises_with_the_pass_rate():
+    advs, gaps = [0.0, 0.3, -0.2], [0.5, 1.0, 1.5]
+    b = [track.rate_matched_intercept(advs, gaps, r, 2.0, -5.0) for r in (0.01, 0.05, 0.2)]
+    assert b[0] < b[1] < b[2]
+
+
+def test_fallback_intercept_rejects_bad_input():
+    with pytest.raises(ValueError):
+        track.rate_matched_intercept([], [], 0.1, 2.0, -5.0)
+    with pytest.raises(ValueError):
+        track.rate_matched_intercept([0.0], [1.0], 0.0, 2.0, -5.0)
+
+
+def test_no_pass_opportunities_keeps_the_fixed_default(abu):
+    laps, _, _, fitted, _ = abu
+    model, note = track.fit_overtake_model(laps.iloc[0:0], fitted)
     assert model == track.DEFAULT_OVERTAKE_MODEL
-    assert note is not None
+    assert note is not None and "no pass opportunities" in note
 
 
 def test_stop_losses_are_pace_corrected(abu):

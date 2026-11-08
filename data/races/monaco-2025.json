@@ -51,7 +51,7 @@
     ],
     "overtakeDifficulty": 0.9969,
     "overtakeModel": {
-      "intercept": 0.5,
+      "intercept": -2.5284,
       "paceCoef": 2.0,
       "gapCoef": -5.0
     },
@@ -632,5 +632,14 @@
     "GAS"
   ],
   "userSide": "NOR",
-  "rival": "LEC"
+  "rival": "LEC",
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": true,
+    "drs": true,
+    "ers": "hybrid",
+    "refuelling": false
+  }
 }

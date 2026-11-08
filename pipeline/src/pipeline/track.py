@@ -12,6 +12,7 @@ Fits the track-level constants the simulator needs:
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field
 
 import pandas as pd
@@ -347,10 +348,60 @@ def overtake_difficulty(laps: pd.DataFrame, close_gap: float = 2.0) -> tuple[flo
     return 1.0 - passes / n, n, passes
 
 
-# Overtake model fallback: between the Abu Dhabi and Spain 2021 fits. Used when a race has
-# too few passes to fit, or the fit has the wrong signs.
+# Overtake model fallback: between the Abu Dhabi and Spain 2021 fits. Used as is when a race
+# has no pass opportunities, a failed fit or a wrong-signed one. A race with too few passes to
+# fit keeps its slopes but gets an intercept from its own pass rate (rate_matched_fallback).
 DEFAULT_OVERTAKE_MODEL = {"intercept": 0.5, "paceCoef": 2.0, "gapCoef": -5.0}
 MIN_PASSES = 8
+# The rate the fallback is matched to: (passes + PASS_RATE_PRIOR) / (opportunities +
+# 2 * PASS_RATE_PRIOR), so a race with no pass at all still gets a small, finite rate.
+PASS_RATE_PRIOR = 0.5
+INTERCEPT_RANGE = (-30.0, 30.0)  # bisection bracket for the matched intercept
+
+
+def _sigmoid(x: float) -> float:
+    return 1.0 / (1.0 + math.exp(-x)) if x >= 0 else math.exp(x) / (1.0 + math.exp(x))
+
+
+def rate_matched_intercept(
+    advs: list[float], gaps: list[float], rate: float, pace_coef: float, gap_coef: float
+) -> float:
+    """The intercept b at which the mean over the opportunities of
+    sigmoid(b + pace_coef*adv + gap_coef*gap) equals `rate` (0 < rate < 1), by bisection (the
+    mean rises with b)."""
+    if not advs or len(advs) != len(gaps):
+        raise ValueError("need one adv and one gap per pass opportunity")
+    if not 0.0 < rate < 1.0:
+        raise ValueError(f"pass rate must be in (0, 1), got {rate}")
+    terms = [pace_coef * a + gap_coef * g for a, g in zip(advs, gaps, strict=True)]
+    lo, hi = INTERCEPT_RANGE
+    for _ in range(100):
+        mid = (lo + hi) / 2
+        if sum(_sigmoid(mid + t) for t in terms) / len(terms) < rate:
+            lo = mid
+        else:
+            hi = mid
+    return (lo + hi) / 2
+
+
+def rate_matched_fallback(events: pd.DataFrame) -> tuple[dict[str, float], float]:
+    """The fallback overtake model for a race with too few passes to fit: the default's slopes,
+    with the intercept set so the model's mean predicted P(pass) over the race's own pass
+    opportunities (`events`: adv, gap, passed; one row per close follower-lap with a model
+    pace advantage) equals the race's measured pass rate (smoothed by PASS_RATE_PRIOR).
+    Returns (model, the matched rate)."""
+    n, passes = len(events), int(events["passed"].sum())
+    rate = (passes + PASS_RATE_PRIOR) / (n + 2 * PASS_RATE_PRIOR)
+    pace_coef = DEFAULT_OVERTAKE_MODEL["paceCoef"]
+    gap_coef = DEFAULT_OVERTAKE_MODEL["gapCoef"]
+    intercept = rate_matched_intercept(
+        events["adv"].astype(float).tolist(),
+        events["gap"].astype(float).tolist(),
+        rate,
+        pace_coef,
+        gap_coef,
+    )
+    return {"intercept": intercept, "paceCoef": pace_coef, "gapCoef": gap_coef}, rate
 
 
 def fit_overtake_model(
@@ -361,7 +412,8 @@ def fit_overtake_model(
     `adv` is the follower's MODEL pace advantage (leader's predicted lap minus follower's,
     from the fitted lap-time model), the same quantity the simulator compares, rather than
     the observed lap delta (which the pass itself distorts). Returns (model, note); the note
-    is set when the default model was used.
+    is set when the default model was used. With fewer than MIN_PASSES passes the default's
+    slopes are kept and its intercept matched to the race's pass rate (rate_matched_fallback).
     """
     import statsmodels.api as sm
 
@@ -384,8 +436,14 @@ def fit_overtake_model(
         adv=[predicted(e.leader, e.lap) - predicted(e.follower, e.lap) for e in events.itertuples()]
     ).dropna(subset=["adv"])
     n_passes = int(events["passed"].sum())
+    if events.empty:
+        return dict(DEFAULT_OVERTAKE_MODEL), "overtakeModel: no pass opportunities, default"
     if n_passes < MIN_PASSES:
-        return dict(DEFAULT_OVERTAKE_MODEL), f"overtakeModel: {n_passes} passes, default"
+        model, rate = rate_matched_fallback(events)
+        return model, (
+            f"overtakeModel: {n_passes} passes in {len(events)} opportunities, default slopes"
+            f" with intercept {model['intercept']:.2f} matching the pass rate {rate:.4f}"
+        )
     x = sm.add_constant(events[["adv", "gap"]].astype(float))
     try:
         params = sm.Logit(events["passed"].astype(float), x).fit(disp=0).params
