@@ -4,6 +4,7 @@ pipeline list                 registered races and whether each has a snapshot /
 pipeline ingest <race-id>     download a race from FastF1 into data/raw/ (network)
 pipeline build <race-id>      build data/races/<id>.json and data/golden/<id>.json
 pipeline validate <race-id>   run the Gate G1 report; exits 1 if the race fails
+pipeline tum-ingest <race-id> read a 2014-2019 race from the TUM database into data/raw/
 """
 
 from __future__ import annotations
@@ -63,6 +64,37 @@ def ingest_race(
         problems = ingest.race_suitability(laps)
         note = f"  NOT SUITABLE: {'; '.join(problems)}" if problems else ""
         typer.echo(f"{rid}: {len(laps)} laps, {facts['totalLaps']} race laps -> data/raw/{note}")
+
+
+@app.command("tum-ingest")
+def tum_ingest_cmd(
+    race_id: str = typer.Argument(..., help="A 2014-2019 race, e.g. abu-dhabi-2018."),
+    db: str = typer.Option(None, help="TUM SQLite path (default: the pipeline cache)."),
+    out: str = typer.Option(None, help="Directory to write to (default: data/raw/)."),
+    location: str = typer.Option(None, help="TUM location, if the race id's slug has none."),
+    force: bool = typer.Option(False, help="Overwrite an existing snapshot."),
+    verify: bool = typer.Option(True, help="Require the pinned TUM version (sha256)."),
+) -> None:
+    """Read a 2014-2019 race from the TUM f1-timing-database (CC BY-NC-SA 3.0) into the
+    raw snapshot, status timeline and provenance (offline; see pipeline/tum.py)."""
+    from pathlib import Path
+
+    from . import tum
+
+    raw_dir = Path(out) if out else paths.RAW_DIR
+    if ingest.raw_snapshot_path(race_id, raw_dir).exists() and not force:
+        typer.echo(f"{race_id}: snapshot exists in {raw_dir}, skipped (--force to overwrite)")
+        return
+    try:
+        laps, facts = tum.ingest_tum(
+            race_id, Path(db) if db else tum.DEFAULT_DB, raw_dir, location=location, verify=verify
+        )
+    except (ValueError, FileNotFoundError, RuntimeError) as e:
+        raise typer.BadParameter(str(e)) from e
+    problems = [*facts["notes"], *ingest.race_suitability(laps)]
+    note = f"  NOT SUITABLE: {'; '.join(problems)}" if problems else ""
+    typer.echo(f"{race_id}: {len(laps)} laps, {facts['totalLaps']} race laps -> {raw_dir}{note}")
+    typer.echo(f"  {facts['credit']}")
 
 
 @app.command("wet-fit")
