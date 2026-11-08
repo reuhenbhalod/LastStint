@@ -766,6 +766,62 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "wet",
     },
+    # Eras wave A (build plan 3.1). Held out: never used to choose a model change. The duel
+    # is the Eras storyline's (eras spec §3); `pipeline hard-calls` sets the Eras userSide.
+    # TUM races are read with `pipeline tum-ingest`, and carry its CC BY-NC-SA 3.0 licence
+    # and credit (data/raw/<id>.provenance.json).
+    "monaco-2017": {
+        "year": 2017,
+        "event": "Monaco",
+        "source": "tum",
+        "name": "Monaco 2017: Räikkönen vs Vettel",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "RAI",
+        "rival": "VET",
+        "score_positions": 6,
+        "split": "holdout",
+    },
+    "russia-2018": {
+        "year": 2018,
+        "event": "Russia",
+        "source": "tum",
+        "name": "Russia 2018: Bottas vs Hamilton",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "BOT",
+        "rival": "HAM",
+        "score_positions": 6,
+        "split": "holdout",
+    },
+    "brazil-2019": {
+        "year": 2019,
+        "event": "Brazil",
+        "source": "tum",
+        "name": "Brazil 2019: Gasly vs Hamilton",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "GAS",
+        "rival": "HAM",
+        "score_positions": 6,
+        "split": "holdout",
+    },
+    "monaco-2025": {
+        "year": 2025,
+        "event": "Monaco",
+        "source": "openf1",  # FastF1 needs F1TV since Oct 2026 (pipeline/openf1.py)
+        "name": "Monaco 2025: Norris vs Leclerc",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "NOR",
+        "rival": "LEC",
+        "score_positions": 6,
+        "split": "holdout",
+    },
 }
 
 

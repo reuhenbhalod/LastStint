@@ -72,3 +72,41 @@ v3 spec C2); the status without that rule is shown alongside.
 | hungary-2019 | VER vs HAM | pass | pass | 0.96s |  |  |
 | mexico-2019 | VET vs HAM | pass | pass | 1.45s |  |  |
 | miami-2024 | VER vs NOR | fail | fail | 2.88s | duel VER vs NOR gap error | race mechanics (passes, traffic, SC bunching and SC stops) (pace 8%, rest 92%) |
+
+## Eras wave A, step 3.1b (TUM 2017-19, OpenF1 2025): 1 pass, 0 borderline, 3 fail
+
+Built Nov 7, 2026 with `pipeline tum-ingest` (TUM f1-timing-database @ 9eaad9c, CC BY-NC-SA 3.0;
+the credit and licence are in `data/raw/<id>.provenance.json`) or `pipeline ingest` (OpenF1),
+then `pipeline build` and `pipeline validate <id> --robust`. All four are registered as
+held-out races with the Eras storyline's duel (eras spec §3). Values are seed set 10000 /
+seed set 20000; limits in brackets. Not yet counted in the held-out totals above (the full
+report is regenerated with `--all`).
+
+| Race | Source | Duel | Status | Without near-tie rule | Mean gap error | Failing checks | Diagnosis |
+|---|---|---|---|---|---|---|---|
+| monaco-2017 | TUM | RAI vs VET | fail | fail | 3.83s | duel RAI vs VET gap error 4.81 / 5.11 [3.00]; podium RAI gap error 4.81 / 5.11 [5.00]; field BOT gap error 8.76 / 8.98 [5.00] | overtakes: 2 passes in the data, so the build falls back to `DEFAULT_OVERTAKE_MODEL` (about 20% a lap for a follower 0.5s behind and 0.3s a lap faster; Monaco's measured rate is 0.4%, overtakeDifficulty 0.996), and cars pass in the sim that couldn't at Monaco (BOT finishes P7 on average, real P4). Race mechanics: after the lap 60-66 SC the real top six ran as a train 0.6-1.8s apart (slow restart laps 67-69); the sim spreads them by base pace. |
+| russia-2018 | TUM | BOT vs HAM | fail | fail | 1.74s | duel BOT vs HAM order rate 0.55 / 0.55 [0.60]; podium order rate 0.40 / 0.41 [0.50] | a real team order: Mercedes swapped BOT and HAM on lap 25. The G1 replay has no real team-order event, so with takeover on lap 9 (D3 rule) BOT keeps P2 ahead of HAM about half the time. Pace and gaps are good (all gap checks pass, mean 1.74s). With takeover after the swap (lap 27) the race passes (mean gap error 0.91s), which confirms the cause, but that would take the storyline's call out of the race, so it isn't applied. |
+| brazil-2019 | TUM | GAS vs HAM | pass | fail | 1.76s |  | Strict status fails only on the GAS vs HAM order rate: they really finished 0.06s apart (near-tie rule). Note: TUM, like every source here, gives the order on the road. `realResult` has HAM P3; his 5s penalty for the Albon collision made him P7 officially (SAI P3). The pipeline has no penalty mechanism, and the facts aren't hand-edited. |
+| monaco-2025 | OpenF1 | NOR vs LEC | fail | fail | 2.66s | duel NOR vs LEC gap error 2.23 / 3.13 [3.00]; duel NOR vs LEC order rate 0.52 / 0.49 [0.60]; podium order rate 0.44 / 0.41 [0.50]; field HAM gap error 9.33 / 9.77 [5.14] | overtakes, as at monaco-2017 (2 passes, the default model; overtakeDifficulty 0.997): along with large fitted lap noise (1.0-1.6s a lap at the front, from managed pace), the leaders swap places freely, so the duel and podium order are a coin flip. Race mechanics for HAM: his pace residual is about 0 on clean laps, but in the sim the lead group loses about 5s behind VER (who stayed out until lap 78) while HAM gains about 5s, so his gap comes out about 10s short. Not modelled: the mandatory two-stop rule (see below). |
+
+**Overtake fallback (monaco-2017, monaco-2025), proposed fix, not applied.** A race with fewer than
+`MIN_PASSES` (8) passes gets the fixed `DEFAULT_OVERTAKE_MODEL` (`track.py`). The fix would be to
+recalibrate the fallback's intercept to the race's own measured pass rate. That is a change to
+the pipeline's fitting, not a per-race knob, and both races are held out, so it isn't applied
+here. It goes to the owner. As a test (the model edited in memory, not committed): with
+intercept -2.5, monaco-2017's duel and podium checks pass and only BOT is left at 6.1-6.5s.
+monaco-2025's duel and podium checks pass and only HAM is left at 10.8-11.1s.
+
+**Monaco 2025's mandatory two-stop rule isn't supported.** `RaceRules` (schema v11) has
+`twoCompound` but no minimum stop count, and neither sim enforces one. G1 isn't affected: the
+replay uses the real strategies, and every 2025 finisher made two or more stops. In play,
+though, the player's car could finish on one stop. This needs a new rule (for example
+`rules.minStops`) in both sims plus the evaluator. That's a sim change, reported, not faked.
+
+**Server-match check:** each race's 20 golden seeds (`data/golden/<id>.json`, Python reference)
+match the TS sim exactly (order, finishers, and times / gaps to 3 decimals): 20/20 on all four.
+**Seed tuning (`scripts/tune.ts`) doesn't apply yet:** the races have no approved decision
+moments (`data/moments/`; authored in 6.2), so the tuner has 0 calls to play (brazil-2019:
+"0 calls ... no seed passes"). Eras attempts also play on a fresh server seed (eras spec §9),
+so a tuned `race.seed` isn't used in Eras. `seed` stays 1, as for the other untuned held-out
+races.

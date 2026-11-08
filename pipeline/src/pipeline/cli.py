@@ -61,6 +61,9 @@ def ingest_race(
             typer.echo(f"{rid}: snapshot exists, skipped")
             continue
         meta = build_mod.RACES[rid]
+        if meta.get("source") == "tum":
+            typer.echo(f"{rid}: a TUM race, skipped (read it with `pipeline tum-ingest {rid}`)")
+            continue
         if meta.get("source") == "openf1":
             laps, facts = ingest.ingest_openf1(rid, meta["year"], meta["event"])
         else:
