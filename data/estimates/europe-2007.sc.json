@@ -1,0 +1,35 @@
+{
+ "race": "europe-2007",
+ "how": "docs/eras-checks/2.4-estimates.md: check each period against a race report; set status to confirmed or rejected (edit startLap/endLap if they're off), then re-run `pipeline jolpica <race-id> --force`.",
+ "periods": [
+  {
+   "startLap": 3,
+   "endLap": 8,
+   "laps": 6,
+   "kind": "SC",
+   "confidence": "ambiguous",
+   "peakRatio": 14.088,
+   "gapBefore": null,
+   "gapAfter": 2.0,
+   "reasons": [
+    "a 14.1x lap: a red flag?"
+   ],
+   "status": "unchecked"
+  },
+  {
+   "startLap": 55,
+   "endLap": 59,
+   "laps": 5,
+   "kind": "SC",
+   "confidence": "ambiguous",
+   "peakRatio": 1.144,
+   "gapBefore": null,
+   "gapAfter": 79.0,
+   "reasons": [
+    "only 1.14x slower: rain, yellow flags or a short SC?",
+    "no gap before it to show bunching"
+   ],
+   "status": "unchecked"
+  }
+ ]
+}

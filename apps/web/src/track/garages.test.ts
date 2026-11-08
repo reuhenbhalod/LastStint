@@ -48,12 +48,47 @@ describe('garages', () => {
     expect(g).toHaveLength(10);
   });
 
+  it('2000: Ferrari, the 1999 champions, nearest the exit; Stewart as Jaguar; BAR at the entry', () => {
+    const g = garagesFor(2000);
+    expect(g.at(-1)).toEqual(['Ferrari', 'FER']);
+    expect(g).toContainEqual(['Jaguar', 'JAG']);
+    expect(g[0]).toEqual(['BAR', 'BAR']);
+    expect(g).toHaveLength(11);
+  });
+
+  it('1998 and 2003: the previous champions nearest the exit; unranked Minardi at the entry', () => {
+    const g98 = garagesFor(1998);
+    expect(g98.at(-1)).toEqual(['Williams', 'WIL']);
+    expect(g98[0]).toEqual(['Minardi', 'MIN']);
+    expect(g98).toHaveLength(11);
+    const g03 = garagesFor(2003);
+    expect(g03.at(-1)).toEqual(['Ferrari', 'FER']);
+    expect(g03[0]).toEqual(['Toyota', 'TOY']);
+    expect(g03).not.toContainEqual(['Arrows', 'ARR']); // gone after 2002
+    expect(g03).toHaveLength(10);
+  });
+
   it('2006: MF1 under its Brazil name when the race uses it; Super Aguri, new, at the entry', () => {
     const g = garagesFor(2006, ['Spyker MF1']);
     expect(g).toContainEqual(['Spyker MF1', 'MF1']);
     expect(garagesFor(2006)).toContainEqual(['MF1', 'MF1']);
     expect(g[0]).toEqual(['Super Aguri', 'SA']);
     expect(g.at(-1)).toEqual(['Renault', 'REN']);
+  });
+
+  it('2002-2004: Ferrari nearest the exit; the unranked teams at the entry', () => {
+    const g = garagesFor(2002);
+    expect(g.at(-1)).toEqual(['Ferrari', 'FER']);
+    expect(g.slice(0, 2)).toEqual([
+      ['Toyota', 'TOY'], // new in 2002, after Minardi in car-number order
+      ['Minardi', 'MIN'],
+    ]);
+    expect(g).toContainEqual(['Renault', 'REN']); // 2001's Benetton
+    expect(g).toHaveLength(11);
+    expect(garagesFor(2003)).not.toContainEqual(['Arrows', 'ARR']); // gone after 2002
+    expect(garagesFor(2003)).toHaveLength(10);
+    expect(garagesFor(2004).at(-2)).toEqual(['Williams', 'WIL']);
+    expect(garagesFor(2004)[0]).toEqual(['Minardi', 'MIN']);
   });
 
   it('2020: Red Bull and Alfa Romeo under the Jolpica spelling when the race uses it', () => {
@@ -81,6 +116,20 @@ describe('garages', () => {
     expect(garagesFor(1991, ['Lola'])).toContainEqual(['Lola', 'LOL']);
     expect(garagesFor(1991, ['Larrousse'])).toContainEqual(['Larrousse', 'LAR']);
     expect(garagesFor(1992).find(([t]) => t === 'Team Lotus')).toEqual(['Team Lotus', 'LOT']);
+  });
+
+  it('1983 and 1994-1999: the previous champions nearest the exit; renamed teams keep their place', () => {
+    expect(garagesFor(1983).at(-1)).toEqual(['Ferrari', 'FER']);
+    expect(garagesFor(1983)[0]).toEqual(['Spirit', 'SPI']); // new in 1983, highest car number
+    expect(garagesFor(1983)).not.toContainEqual(['Fittipaldi', 'FIT']); // left after 1982
+    expect(garagesFor(1994).at(-1)).toEqual(['Williams', 'WIL']);
+    expect(garagesFor(1994)[0]).toEqual(['Pacific', 'PAC']);
+    expect(garagesFor(1996).at(-1)).toEqual(['Benetton', 'BEN']);
+    // Ligier (1996 6th) races as Prost in 1997, Footwork (9th) as Arrows.
+    expect(garagesFor(1997).findIndex(([t]) => t === 'Prost')).toBe(11 - 6);
+    expect(garagesFor(1997).findIndex(([t]) => t === 'Arrows')).toBe(11 - 9);
+    expect(garagesFor(1999).at(-1)).toEqual(['McLaren', 'MCL']);
+    expect(garagesFor(1999)[0]).toEqual(['BAR', 'BAR']); // new in 1999
   });
 
   it("has a garage for every team in every race, under the race's own team names", () => {

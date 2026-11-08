@@ -1,0 +1,33 @@
+{
+ "race": "belgium-1998",
+ "how": "docs/eras-checks/2.4-estimates.md: check each period against a race report; set status to confirmed or rejected (edit startLap/endLap if they're off), then re-run `pipeline jolpica <race-id> --force`.",
+ "periods": [
+  {
+   "startLap": 2,
+   "endLap": 2,
+   "laps": 1,
+   "kind": "SC",
+   "confidence": "ambiguous",
+   "peakRatio": 1.424,
+   "gapBefore": 6.4,
+   "gapAfter": 4.2,
+   "reasons": [
+    "the field didn't bunch up (P1-P6 6.4s -> 4.2s): rain?",
+    "a single slow lap"
+   ],
+   "status": "unchecked"
+  },
+  {
+   "startLap": 30,
+   "endLap": 32,
+   "laps": 3,
+   "kind": "SC",
+   "confidence": "likely",
+   "peakRatio": 1.521,
+   "gapBefore": null,
+   "gapAfter": 160.2,
+   "reasons": [],
+   "status": "unchecked"
+  }
+ ]
+}

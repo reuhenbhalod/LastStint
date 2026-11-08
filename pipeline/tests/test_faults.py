@@ -105,17 +105,19 @@ def test_writing_sc_causes_keeps_a_races_fault_facts(tmp_path):
 
 def test_only_the_eras_fault_races_have_fault_facts():
     # data/incidents.json: the races built before step 4.4 build exactly as before; only an
-    # Eras race registered for its faults (5.1: canada-2014, azerbaijan-2021, monaco-2008) has
-    # any. The reconstructed brazil-1991, hungary-1992 and australia-1986 have facts too,
-    # reported but not fitted (synthetic laps).
+    # Eras race registered for its faults (5.1: canada-2014, azerbaijan-2021, monaco-2008,
+    # hungary-1997) has any. The reconstructed brazil-1991, hungary-1992, australia-1986 and
+    # spain-1994 have facts too, reported but not fitted (synthetic laps).
     with_faults = {race for race in build.RACES if incidents.fault_facts(race)}
     assert with_faults == {
         "canada-2014",
         "azerbaijan-2021",
         "monaco-2008",
+        "hungary-1997",
         "brazil-1991",
         "hungary-1992",
         "australia-1986",
+        "spain-1994",
     }
 
 
@@ -449,3 +451,27 @@ def test_the_schema_rejects_bad_fault_events(bad):
     model["events"].append({"lap": 40, "type": "FAULT", "driver": "SAI", **bad})
     with pytest.raises(jsonschema.ValidationError):
         export.validate_model(model)
+
+
+# --- hungary-1997: Hill's hydraulic failure (Jolpica laps, committed raw ingest) ------------
+
+
+def test_hungary_1997_fits_hills_last_laps_hydraulic_failure():
+    # data/incidents.json: the pump failed on lap 74 with three laps left, stuck in third (a
+    # sourced fact). The loss is fitted from his real laps 74-77 (83.96, 91.43, 100.92, 99.23 s
+    # against ~82 s before it), and it lasts to the flag.
+    result = build.build_race("hungary-1997")
+    got = [e for e in result.model["events"] if e["type"] == "FAULT"]
+    assert [(e["lap"], e["driver"], e["fault"]) for e in got] == [(74, "HIL", "gear-stuck")]
+    (fault,) = got
+    assert fault["storylineEvent"] is True
+    assert "laps" not in fault and "untilStop" not in fault and "slowLap" not in fault
+    assert 9.0 < fault["paceLoss"] < 15.0
+    committed = json.loads((RACES_DIR / "hungary-1997.json").read_text())
+    assert [e for e in committed["events"] if e["type"] == "FAULT"] == got
+    # Real Hill lost the lead on the last lap: so does the noise-free replay.
+    model = copy.deepcopy(result.model)
+    for d in model["drivers"]:
+        d["noise"] = 0.0
+    times = sim_reference.simulate(model, 1)["times"]
+    assert times["VIL"] < times["HIL"]

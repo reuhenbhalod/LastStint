@@ -1552,6 +1552,231 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
+    # Era 4 (2000-04), refuelling as above: one dry compound, new tyres at a stop.
+    "japan-2000": {
+        "year": 2000,
+        "event": "Japan",
+        "source": "jolpica",
+        "name": "Japan 2000: Schumacher vs Häkkinen",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "MSCM",
+        "rival": "HAK",  # beat-rival: Schumacher ahead of Häkkinen
+        "score_positions": 6,
+        "split": "eras",
+    },
+    # Eras wave B (build plan 5.1): refuelling races 2002-04 (dry), as the 2005-09 races
+    # above: Jolpica with F1DB stops, one estimated dry compound, estimated SC laps and fuel
+    # loads, the fill model fitted from the F1DB stops.
+    "austria-2002": {
+        "year": 2002,
+        "event": "Austria",
+        "source": "jolpica",
+        "name": "Austria 2002: Barrichello vs Schumacher",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "BAR",
+        "rival": "MSCM",  # team: Ferrari 1-2; Barrichello, told to let Schumacher by
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "hungary-2003": {
+        "year": 2003,
+        "event": "Hungary",
+        "source": "jolpica",
+        "name": "Hungary 2003: Alonso vs Räikkönen",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "ALO",
+        "rival": "RAI",  # defend: Alonso holds P1; the car behind at the flag
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "japan-2003": {
+        "year": 2003,
+        "event": "Japan",
+        "source": "jolpica",
+        "name": "Japan 2003: Schumacher vs Räikkönen",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "MSCM",
+        "rival": "RAI",  # Schumacher P8 or better for the title: Räikkönen, his title rival
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "france-2004": {
+        "year": 2004,
+        "event": "France",
+        "source": "jolpica",
+        "name": "France 2004: Schumacher vs Alonso",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "MSCM",
+        "rival": "ALO",  # win: Schumacher beats Alonso on four stops
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "monaco-2004": {
+        "year": 2004,
+        "event": "Monaco",
+        "source": "jolpica",
+        "name": "Monaco 2004: Trulli vs Button",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "TRU",
+        "rival": "BUT",  # defend: Trulli holds P1; the car behind at the flag
+        "score_positions": 6,
+        "split": "eras",
+    },
+    # Eras wave B (build plan 5.1): refuelling races 1994-99 and 1983. 1996-99 from Jolpica
+    # (`pipeline jolpica`, F1DB stops) with step 2.4's estimated compounds, SC laps
+    # (data/estimates/<id>.sc.json) and fuel loads; Hill's lap-74 hydraulic failure at
+    # hungary-1997 is a FAULT (data/incidents.json). 1994 and 1983 are reconstructed from
+    # their anchors (`pipeline reconstruct`, step 4.6; 1994's stops from F1DB, 1983's from
+    # data/reconstruction/<id>.json) and checked on them. The fill model is fitted from the
+    # F1DB stops (refuel.race_fill_model). Duels from the Eras spec's race table (§4), the
+    # user's driver first; seeds and split as for wave A.
+    "hungary-1997": {
+        "year": 1997,
+        "event": "Hungary",
+        "source": "jolpica",
+        "name": "Hungary 1997: Hill vs Villeneuve",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "HIL",
+        "rival": "VIL",  # defend: Hill holds P1 (real: hydraulics on lap 74, Villeneuve wins)
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "europe-1997": {
+        "year": 1997,
+        "event": "European",
+        "source": "jolpica",
+        "name": "Europe 1997: Villeneuve vs Schumacher",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "VIL",
+        "rival": "MSCM",  # beat-rival: Villeneuve ahead of Schumacher, the title decider
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "hungary-1998": {
+        "year": 1998,
+        "event": "Hungary",
+        "source": "jolpica",
+        "name": "Hungary 1998: Schumacher vs Coulthard",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "MSCM",
+        "rival": "COU",  # win on three stops: Coulthard the car behind at the flag
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "malaysia-1999": {
+        "year": 1999,
+        "event": "Malaysia",
+        "source": "jolpica",
+        "name": "Malaysia 1999: Irvine vs Häkkinen",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "IRV",
+        "rival": "HAK",  # deny: Irvine wins, Häkkinen (title rival) kept P3 or lower
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "spain-1994": {
+        "year": 1994,
+        "event": "Spanish",  # `pipeline reconstruct spain-1994 --event Spanish`
+        "source": "reconstruct",
+        "name": "Spain 1994: Schumacher vs Hill",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "MSCM",
+        "rival": "HIL",  # position: Schumacher P2 stuck in fifth gear; Hill the car ahead
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "australia-1994": {
+        "year": 1994,
+        "event": "Australia",
+        "source": "reconstruct",
+        "name": "Australia 1994: Schumacher vs Hill",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "MSCM",
+        "rival": "HIL",  # beat-rival: Schumacher ahead of Hill (real: they collide, both out)
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "south-africa-1983": {
+        "year": 1983,
+        "event": "South Africa",
+        "source": "reconstruct",
+        "name": "South Africa 1983: Piquet vs Prost",
+        "era": "1988-1993",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "PIQN",
+        "rival": "PRO",  # Piquet high enough for the title: Prost, his title rival
+        "score_positions": 6,
+        "split": "eras",
+    },
+    # Eras wave B (build plan 5.1): refuelling races with a red flag, wet, from Jolpica with
+    # F1DB stops as above, then `pipeline wet-laps`. The red flags are R1's
+    # (data/redflags/<id>.json): europe-2007 is suspended on laps 4-5 and resumed behind the SC;
+    # brazil-2003 ended under red and is classified at lap 54 (redflag.cut_at_results);
+    # belgium-1998's start was voided and the race rerun (redflag.is_voided_start).
+    "europe-2007": {
+        "year": 2007,
+        "event": "Europe",
+        "source": "jolpica",
+        "name": "Europe 2007: Alonso vs Massa",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "ALO",
+        "rival": "MAS",  # win: Alonso chases Massa (real: passes him in the rain on lap 56)
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "brazil-2003": {
+        "year": 2003,
+        "event": "Brazil",
+        "source": "jolpica",
+        "name": "Brazil 2003: Fisichella vs Räikkönen",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "FIS",
+        "rival": "RAI",  # win in the chaos: Räikkönen, the car behind at the results lap
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "belgium-1998": {
+        "year": 1998,
+        "event": "Belgium",
+        "source": "jolpica",
+        "name": "Belgium 1998: Hill vs Ralf Schumacher",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "HIL",
+        "rival": "SCH",  # team: Jordan 1-2; Ralf Schumacher, the team-mate next to Hill
+        "score_positions": 6,
+        "split": "eras",
+    },
 }
 
 
