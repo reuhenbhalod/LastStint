@@ -1,0 +1,307 @@
+{
+  "schemaVersion": 11,
+  "race": {
+    "id": "hungary-1992",
+    "name": "Hungary 1992: Mansell vs Berger",
+    "laps": 77,
+    "takeoverLap": 58,
+    "seed": 1
+  },
+  "era": "1988-1993",
+  "track": {
+    "pitLoss": 17.861,
+    "pitLossUnderSC": 9.823,
+    "pitLossUnderVSC": 12.324,
+    "pitLossDeviations": [
+      -0.718,
+      0.718
+    ],
+    "overtakeDifficulty": 0.7464,
+    "overtakeModel": {
+      "intercept": 0.1772,
+      "paceCoef": 0.5957,
+      "gapCoef": -1.485
+    },
+    "dirtyAirPenalty": 0.0119,
+    "greenLapTime": 84.935
+  },
+  "compounds": {
+    "MEDIUM": {
+      "offset": 0.0,
+      "degPerLap": 0.03798,
+      "cliffLap": 77,
+      "provenLaps": 77
+    }
+  },
+  "drivers": [
+    {
+      "code": "ALBM",
+      "team": "Footwork",
+      "basePace": 86.9388,
+      "noise": 1.3561,
+      "stateAtTakeover": {
+        "position": 8,
+        "gapAhead": 24.396,
+        "compound": "MEDIUM",
+        "tyreAge": 58,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BELP",
+      "team": "March",
+      "basePace": 87.1888,
+      "noise": 0.9591,
+      "stateAtTakeover": {
+        "position": 10,
+        "gapAhead": 50.683,
+        "compound": "MEDIUM",
+        "tyreAge": 58,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BER",
+      "team": "McLaren",
+      "basePace": 84.5843,
+      "noise": 0.7595,
+      "stateAtTakeover": {
+        "position": 2,
+        "gapAhead": 29.598,
+        "compound": "MEDIUM",
+        "tyreAge": 58,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BRU",
+      "team": "Benetton",
+      "basePace": 83.7166,
+      "noise": 1.2675,
+      "stateAtTakeover": {
+        "position": 5,
+        "gapAhead": 4.835,
+        "compound": "MEDIUM",
+        "tyreAge": 58,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "CAP",
+      "team": "Ferrari",
+      "basePace": 85.8756,
+      "noise": 0.85,
+      "stateAtTakeover": {
+        "position": 6,
+        "gapAhead": 10.784,
+        "compound": "MEDIUM",
+        "tyreAge": 58,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "DEC",
+      "team": "Tyrrell",
+      "basePace": 85.7734,
+      "noise": 1.3125,
+      "stateAtTakeover": {
+        "position": 9,
+        "gapAhead": 46.645,
+        "compound": "MEDIUM",
+        "tyreAge": 58,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "GUG",
+      "team": "Jordan",
+      "basePace": 90.7818,
+      "noise": 2.1236,
+      "stateAtTakeover": {
+        "position": 11,
+        "gapAhead": 51.886,
+        "compound": "MEDIUM",
+        "tyreAge": 58,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "HAK",
+      "team": "Team Lotus",
+      "basePace": 84.5102,
+      "noise": 1.1054,
+      "stateAtTakeover": {
+        "position": 3,
+        "gapAhead": 5.823,
+        "compound": "MEDIUM",
+        "tyreAge": 58,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "HIL",
+      "team": "Brabham",
+      "basePace": 87.6402,
+      "noise": 1.4567,
+      "stateAtTakeover": {
+        "position": 12,
+        "gapAhead": 63.864,
+        "compound": "MEDIUM",
+        "tyreAge": 58,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "MAN",
+      "team": "Williams",
+      "basePace": 83.8492,
+      "noise": 1.2842,
+      "stateAtTakeover": {
+        "position": 4,
+        "gapAhead": 16.597,
+        "compound": "MEDIUM",
+        "tyreAge": 58,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 62,
+          "to": "MEDIUM",
+          "loss": 21.538
+        }
+      ]
+    },
+    {
+      "code": "MSCM",
+      "team": "Benetton",
+      "basePace": 84.6861,
+      "noise": 1.0119,
+      "stateAtTakeover": {
+        "position": 7,
+        "gapAhead": 31.501,
+        "compound": "MEDIUM",
+        "tyreAge": 58,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "SENA",
+      "team": "McLaren",
+      "basePace": 83.7822,
+      "noise": 0.907,
+      "stateAtTakeover": {
+        "position": 1,
+        "gapAhead": 0.0,
+        "compound": "MEDIUM",
+        "tyreAge": 58,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 68,
+          "to": "MEDIUM",
+          "loss": 20.002
+        }
+      ]
+    }
+  ],
+  "fuelEffectPerLap": 0.05952,
+  "freshTyre": {
+    "bonus": -0.0948,
+    "laps": 3
+  },
+  "events": [
+    {
+      "lap": 65,
+      "type": "RETIREMENT",
+      "driver": "MSCM"
+    }
+  ],
+  "decisionMoments": [],
+  "candidateMomentLaps": [
+    62,
+    68
+  ],
+  "realResult": [
+    "SENA",
+    "MAN",
+    "BER",
+    "HAK",
+    "BRU",
+    "CAP",
+    "ALBM",
+    "DEC",
+    "BELP",
+    "GUG",
+    "HIL",
+    "MSCM",
+    "PAT",
+    "MAR",
+    "KAT",
+    "ALE",
+    "SUZ",
+    "GAC",
+    "WEN",
+    "GROO",
+    "MOD",
+    "VANE",
+    "BOUT",
+    "COM",
+    "HER",
+    "TAR"
+  ],
+  "userSide": "MAN",
+  "rival": "BER",
+  "provenance": {
+    "kind": "reconstructed",
+    "estimated": [
+      "compounds",
+      "fuelLoads",
+      "weather"
+    ]
+  },
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": false
+  },
+  "reconstructed": true
+}

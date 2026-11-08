@@ -105,9 +105,10 @@ def test_writing_sc_causes_keeps_a_races_fault_facts(tmp_path):
 
 def test_only_the_eras_fault_races_have_fault_facts():
     # data/incidents.json: the races built before step 4.4 build exactly as before; only an
-    # Eras race registered for its faults (5.1: canada-2014) has any.
+    # Eras race registered for its faults (5.1: canada-2014) has any. The reconstructed
+    # brazil-1991 and hungary-1992 have facts too, reported but not fitted (synthetic laps).
     with_faults = {race for race in build.RACES if incidents.fault_facts(race)}
-    assert with_faults == {"canada-2014"}
+    assert with_faults == {"canada-2014", "brazil-1991", "hungary-1992"}
 
 
 # --- the fit ---------------------------------------------------------------------------------

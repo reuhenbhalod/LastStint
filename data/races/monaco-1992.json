@@ -1,0 +1,294 @@
+{
+  "schemaVersion": 11,
+  "race": {
+    "id": "monaco-1992",
+    "name": "Monaco 1992: Mansell vs Senna",
+    "laps": 78,
+    "takeoverLap": 68,
+    "seed": 1
+  },
+  "era": "1988-1993",
+  "track": {
+    "pitLoss": 19.407,
+    "pitLossUnderSC": 10.674,
+    "pitLossUnderVSC": 13.391,
+    "pitLossDeviations": [
+      -1.823,
+      1.823
+    ],
+    "overtakeDifficulty": 0.7822,
+    "overtakeModel": {
+      "intercept": -0.5215,
+      "paceCoef": 0.9135,
+      "gapCoef": -0.935
+    },
+    "dirtyAirPenalty": 0.0,
+    "greenLapTime": 86.876
+  },
+  "compounds": {
+    "MEDIUM": {
+      "offset": 0.0,
+      "degPerLap": 0.03774,
+      "cliffLap": 78,
+      "provenLaps": 78
+    }
+  },
+  "drivers": [
+    {
+      "code": "ALBM",
+      "team": "Footwork",
+      "basePace": 87.3218,
+      "noise": 0.5794,
+      "stateAtTakeover": {
+        "position": 7,
+        "gapAhead": 5.369,
+        "compound": "MEDIUM",
+        "tyreAge": 68,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BOUT",
+      "team": "Ligier",
+      "basePace": 90.0477,
+      "noise": 1.615,
+      "stateAtTakeover": {
+        "position": 12,
+        "gapAhead": 19.025,
+        "compound": "MEDIUM",
+        "tyreAge": 68,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BRU",
+      "team": "Benetton",
+      "basePace": 86.6601,
+      "noise": 1.1786,
+      "stateAtTakeover": {
+        "position": 5,
+        "gapAhead": 54.443,
+        "compound": "MEDIUM",
+        "tyreAge": 49,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "COM",
+      "team": "Ligier",
+      "basePace": 88.3347,
+      "noise": 0.6891,
+      "stateAtTakeover": {
+        "position": 10,
+        "gapAhead": 30.911,
+        "compound": "MEDIUM",
+        "tyreAge": 68,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "FITC",
+      "team": "Minardi",
+      "basePace": 87.5642,
+      "noise": 0.7594,
+      "stateAtTakeover": {
+        "position": 8,
+        "gapAhead": 5.666,
+        "compound": "MEDIUM",
+        "tyreAge": 68,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "GAC",
+      "team": "Larrousse",
+      "basePace": 87.0642,
+      "noise": 0.7844,
+      "stateAtTakeover": {
+        "position": 6,
+        "gapAhead": 31.192,
+        "compound": "MEDIUM",
+        "tyreAge": 68,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "JAR",
+      "team": "Dallara",
+      "basePace": 87.264,
+      "noise": 0.9373,
+      "stateAtTakeover": {
+        "position": 9,
+        "gapAhead": 37.229,
+        "compound": "MEDIUM",
+        "tyreAge": 68,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "MAN",
+      "team": "Williams",
+      "basePace": 85.5747,
+      "noise": 0.5798,
+      "stateAtTakeover": {
+        "position": 2,
+        "gapAhead": 1.545,
+        "compound": "MEDIUM",
+        "tyreAge": 68,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 72,
+          "to": "MEDIUM",
+          "loss": 20.019
+        }
+      ]
+    },
+    {
+      "code": "MSCM",
+      "team": "Benetton",
+      "basePace": 86.746,
+      "noise": 0.9452,
+      "stateAtTakeover": {
+        "position": 4,
+        "gapAhead": 8.046,
+        "compound": "MEDIUM",
+        "tyreAge": 68,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "PAT",
+      "team": "Williams",
+      "basePace": 86.7628,
+      "noise": 0.7716,
+      "stateAtTakeover": {
+        "position": 3,
+        "gapAhead": 17.028,
+        "compound": "MEDIUM",
+        "tyreAge": 68,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "SENA",
+      "team": "McLaren",
+      "basePace": 85.7198,
+      "noise": 0.6531,
+      "stateAtTakeover": {
+        "position": 1,
+        "gapAhead": 0.0,
+        "compound": "MEDIUM",
+        "tyreAge": 68,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "SUZ",
+      "team": "Footwork",
+      "basePace": 87.687,
+      "noise": 1.4859,
+      "stateAtTakeover": {
+        "position": 11,
+        "gapAhead": 10.293,
+        "compound": "MEDIUM",
+        "tyreAge": 68,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    }
+  ],
+  "fuelEffectPerLap": 0.04809,
+  "freshTyre": {
+    "bonus": -0.1758,
+    "laps": 3
+  },
+  "events": [],
+  "decisionMoments": [],
+  "candidateMomentLaps": [
+    72
+  ],
+  "realResult": [
+    "SENA",
+    "MAN",
+    "PAT",
+    "MSCM",
+    "BRU",
+    "GAC",
+    "ALBM",
+    "FITC",
+    "JAR",
+    "COM",
+    "SUZ",
+    "BOUT",
+    "CAP",
+    "BER",
+    "HAK",
+    "ALE",
+    "GUG",
+    "HER",
+    "MOE",
+    "DEC",
+    "TAR",
+    "MOD",
+    "GROO",
+    "MAR",
+    "WEN",
+    "MOR"
+  ],
+  "userSide": "MAN",
+  "rival": "SENA",
+  "provenance": {
+    "kind": "reconstructed",
+    "estimated": [
+      "compounds",
+      "fuelLoads",
+      "weather"
+    ]
+  },
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": false
+  },
+  "reconstructed": true
+}
