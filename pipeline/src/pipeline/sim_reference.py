@@ -178,8 +178,17 @@ def _classify(order, cars) -> dict:
     return {"order": finishers + retirees, "gaps": gaps, "times": times, "finishers": finishers}
 
 
-def simulate(model: dict, seed: int, strategies: dict | None = None) -> dict:
-    """Run one seeded simulation to the flag. Returns finishing order and gaps to winner."""
+def simulate(
+    model: dict, seed: int, strategies: dict | None = None, rival_policy: str | None = None
+) -> dict:
+    """Run one seeded simulation to the flag. Returns finishing order and gaps to winner.
+
+    `rival_policy` (rival_policy.py; default "standard") is validated so both sims accept the
+    same names; with no player-controlled car the rival never reacts, so it can't change the
+    result."""
+    from .rival_policy import resolve_rival_policy  # here, not at the top: it imports this module
+
+    resolve_rival_policy(rival_policy)
     track = model["track"]
     compounds = model["compounds"]
     fuel = model["fuelEffectPerLap"]

@@ -22,8 +22,10 @@ import {
   newEngineer,
   validEngineerCall,
 } from './engineer.js';
+import type { RivalPolicy } from './eras/config.js';
 import headsetConfig from './headset.json';
 import { validatePlan } from './plan.js';
+import { resolveRivalPolicy } from './rivals/policy.js';
 import { type Rng, deriveSeed, mulberry32 } from './rng.js';
 import type {
   BattleMove,
@@ -120,6 +122,11 @@ export interface RunOptions {
    * On by default; off reproduces the real race exactly from the real calls.
    */
   incidents?: boolean;
+  /**
+   * Live play: the rival's policy (eras spec §7; rivals/policy.ts). Default `standard`, today's
+   * rival. Throws on a policy the sim can't run yet.
+   */
+  rivalPolicy?: RivalPolicy;
 }
 
 export interface ModeEffect {
@@ -250,6 +257,8 @@ export interface Run {
   decisions: Decision[];
   /** True when the user's car is player-controlled and the rival reacts. */
   live: boolean;
+  /** How the rival reacts in live play (RunOptions.rivalPolicy). Forks keep the parent's. */
+  rivalPolicy: RivalPolicy;
   notes: RaceNote[];
   headset: HeadsetEra | undefined;
   /** Per-car random streams, created on first use (see Streams). */
@@ -548,6 +557,7 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
     ...makeStreams(model, seed),
     decisions: [...(options.decisions ?? [])],
     live,
+    rivalPolicy: resolveRivalPolicy(options.rivalPolicy),
     notes: [],
     headset: HEADSET[model.era],
     passedBy: new Map(),
