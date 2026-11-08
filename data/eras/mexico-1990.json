@@ -7,5 +7,37 @@
     "drs": false,
     "ers": "none",
     "refuelling": false
+  },
+  "eras": {
+    "eraId": 2,
+    "order": 3,
+    "userSide": "PRO",
+    "hardCalls": {
+      "PRO": 0,
+      "MAN": 0
+    },
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Prost wins from 13th on the grid: he passes Senna on lap 60, Senna's rear tyre fails three laps later, and Mansell passes Berger at the Peraltada for a Ferrari one-two",
+      "rewriteCondition": {
+        "type": "deny",
+        "rival": "BER",
+        "position": 4
+      },
+      "headline": "Ferrari's day, and the polesitter left off the podium"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "max": 0,
+      "label": "Win without a tyre stop"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 26,
+      "label": "Win by more than 26 seconds"
+    },
+    "briefing": "Mexico City, 1990. Prost started 13th in the Ferrari. Senna is gambling that his tyres will last without a stop. Pit board only: manage the tyres and the charge. Reconstructed race: no lap timing survives, so the laps are rebuilt to fit the result, the fastest laps and the sourced stops (Jolpica, F1DB, Motor Sport, Wikipedia). The lap-by-lap gaps and running order are synthetic, not history."
   }
 }

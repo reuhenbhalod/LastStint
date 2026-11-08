@@ -1375,12 +1375,16 @@ RACES: dict[str, dict] = {
         "year": 1992,
         "event": "Belgian",
         "source": "reconstruct",
-        "name": "Belgium 1992: Schumacher vs Mansell",
+        "name": "Belgium 1992: Schumacher vs Patrese",
         "era": "1988-1993",
         "takeover_lap": None,  # D3 rule
         "seed": 1,
         "user_side": "MSCM",
-        "rival": "MAN",  # win: Schumacher times the slicks; Mansell the car behind at the flag
+        # 6.2: Patrese, not Mansell. Eras 2-3 run the rival as Expert, which takes the slicks
+        # on the crossover; as Mansell (real slick in-lap 33, Motor Sport) it wins every
+        # checked path, so the storyline's late Williams call could not happen. Mansell runs
+        # his real strategy instead.
+        "rival": "PAT",  # win: Schumacher times the slicks; Patrese the other Williams
         "score_positions": 6,
         "split": "eras",
     },
@@ -1408,12 +1412,15 @@ RACES: dict[str, dict] = {
         "year": 1993,
         "event": "European",
         "source": "reconstruct",
-        "name": "Europe 1993: Senna vs Hill",
+        "name": "Europe 1993: Senna vs Prost",
         "era": "1988-1993",
         "takeover_lap": None,  # D3 rule
         "seed": 1,
         "user_side": "SENA",
-        "rival": "HIL",  # win: Senna through the wet-dry calls; Hill P2
+        # 6.2: Prost, not Hill. As the Expert rival Hill fixes his real calls and wins every
+        # checked path by over a minute; Hill now runs his real strategy. Prost made seven
+        # pit calls to Senna's four (Wikipedia).
+        "rival": "PRO",  # win: Senna through the wet-dry calls; Prost P3
         "score_positions": 6,
         "split": "eras",
     },
@@ -1421,12 +1428,14 @@ RACES: dict[str, dict] = {
         "year": 1995,
         "event": "Belgian",
         "source": "reconstruct",
-        "name": "Belgium 1995: Schumacher vs Hill",
+        "name": "Belgium 1995: Hill vs Schumacher",
         "era": "1994-2009",
         "takeover_lap": None,  # D3 rule
         "seed": 1,
-        "user_side": "MSCM",
-        "rival": "HIL",  # win: Schumacher from P16 on slicks in the wet; Hill P2
+        # Eras plays the side with more hard calls (6.2, `pipeline hard-calls`: 2-2, the tie
+        # to HIL on chance given up, 89.0 pts against 0.3).
+        "user_side": "HIL",
+        "rival": "MSCM",  # win: Hill beats Schumacher, who won from P16 on slicks in the wet
         "score_positions": 6,
         "split": "eras",
     },
@@ -1809,12 +1818,13 @@ RACES: dict[str, dict] = {
         "year": 1994,
         "event": "Spanish",  # `pipeline reconstruct spain-1994 --event Spanish`
         "source": "reconstruct",
-        "name": "Spain 1994: Schumacher vs Hill",
+        "name": "Spain 1994: Hill vs Schumacher",
         "era": "1994-2009",
         "takeover_lap": None,  # D3 rule
         "seed": 1,
-        "user_side": "MSCM",
-        "rival": "HIL",  # position: Schumacher P2 stuck in fifth gear; Hill the car ahead
+        # Eras plays the side with more hard calls (6.2, `pipeline hard-calls`: HIL 1, MSCM 0).
+        "user_side": "HIL",
+        "rival": "MSCM",  # win: Hill beats Schumacher, who is stuck in fifth gear
         "score_positions": 6,
         "split": "eras",
     },

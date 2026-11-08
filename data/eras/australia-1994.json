@@ -2,6 +2,34 @@
   "eras": {
     "eraId": 3,
     "order": 2,
+    "userSide": "MSCM",
+    "hardCalls": {
+      "MSCM": 0,
+      "HIL": 0
+    },
+    "target": {
+      "type": "beat-rival",
+      "rival": "HIL"
+    },
+    "storyline": {
+      "real": "Schumacher hits the wall and the two collide on lap 36; both retire and Schumacher takes the title by one point",
+      "rewriteCondition": {
+        "type": "beat-rival",
+        "rival": "HIL"
+      },
+      "headline": "Schumacher's first title, settled at the flag"
+    },
+    "mastery": {
+      "type": "finish_position",
+      "position": 2,
+      "label": "Finish in the top two"
+    },
+    "hidden": {
+      "type": "finish_position",
+      "position": 1,
+      "label": "Win the race"
+    },
+    "briefing": "Adelaide, 1994, the final round. Schumacher leads the championship on 92 points, Hill is one behind on 91. One point between them, one race left. Mansell started from pole. Reconstructed race: no lap timing survives, so the laps are rebuilt to fit the result, the fastest laps and the sourced stops (Jolpica, F1DB, Motor Sport, Wikipedia). The lap-by-lap gaps and running order are synthetic, not history.",
     "storylineRetirements": [
       {
         "driver": "MSCM",

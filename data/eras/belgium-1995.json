@@ -7,5 +7,42 @@
     "drs": false,
     "ers": "none",
     "refuelling": true
-  }
+  },
+  "eras": {
+    "eraId": 3,
+    "order": 3,
+    "userSide": "HIL",
+    "hardCalls": {
+      "HIL": 2,
+      "MSCM": 2
+    },
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Schumacher wins from 16th on the grid, staying out on slicks in the rain; Hill, from eighth, finishes second after a stop-go for pit-lane speeding",
+      "rewriteCondition": {
+        "type": "beat-rival",
+        "rival": "MSCM"
+      },
+      "headline": "Hill out-thinks the rain and beats Schumacher at Spa"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "max": 3,
+      "label": "Win with three stops or fewer"
+    },
+    "hidden": {
+      "type": "compound_rule",
+      "mustAvoid": "WET",
+      "label": "Win without fitting full wets"
+    },
+    "briefing": "Spa, 1995. A wet-dry qualifying left Hill eighth and Schumacher 16th, and the rain comes and goes. Schumacher leads the championship, 56 points to Hill's 45. Slicks, inters or wets: every lap it's your call. Reconstructed race: no lap timing survives, so the laps are rebuilt to fit the result, the fastest laps and the sourced stops (Jolpica, F1DB, Motor Sport, Wikipedia). The lap-by-lap gaps and running order are synthetic, not history."
+  },
+  "storylineEvents": [
+    [
+      29,
+      "SC"
+    ]
+  ]
 }

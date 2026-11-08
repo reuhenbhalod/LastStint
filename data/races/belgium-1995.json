@@ -2,7 +2,7 @@
   "schemaVersion": 11,
   "race": {
     "id": "belgium-1995",
-    "name": "Belgium 1995: Schumacher vs Hill",
+    "name": "Belgium 1995: Hill vs Schumacher",
     "laps": 44,
     "takeoverLap": 12,
     "seed": 1,
@@ -712,10 +712,332 @@
     {
       "lap": 29,
       "type": "SC",
-      "laps": 3
+      "laps": 3,
+      "storylineEvent": true
     }
   ],
-  "decisionMoments": [],
+  "decisionMoments": [
+    {
+      "id": "stop-15",
+      "lap": 15,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "Stay out",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "Box, slicks",
+          "decisions": [
+            {
+              "lap": 15,
+              "kind": "pit",
+              "compound": "MEDIUM",
+              "fill": "standard"
+            }
+          ]
+        },
+        {
+          "id": "box-intermediate",
+          "label": "Box, inters",
+          "decisions": [
+            {
+              "lap": 15,
+              "kind": "pit",
+              "compound": "INTERMEDIATE",
+              "fill": "standard"
+            }
+          ]
+        },
+        {
+          "id": "box-wet",
+          "label": "Box, wets",
+          "decisions": [
+            {
+              "lap": 15,
+              "kind": "pit",
+              "compound": "WET",
+              "fill": "standard"
+            }
+          ]
+        },
+        {
+          "id": "box-next-wet",
+          "label": "Box next lap, wets",
+          "decisions": [
+            {
+              "lap": 16,
+              "kind": "pit",
+              "compound": "WET",
+              "fill": "standard"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "box-medium"
+    },
+    {
+      "id": "stop-21",
+      "lap": 21,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "Stay out",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "Box, slicks",
+          "decisions": [
+            {
+              "lap": 21,
+              "kind": "pit",
+              "compound": "MEDIUM",
+              "fill": "standard"
+            }
+          ]
+        },
+        {
+          "id": "box-intermediate",
+          "label": "Box, inters",
+          "decisions": [
+            {
+              "lap": 21,
+              "kind": "pit",
+              "compound": "INTERMEDIATE",
+              "fill": "standard"
+            }
+          ]
+        },
+        {
+          "id": "box-wet",
+          "label": "Box, wets",
+          "decisions": [
+            {
+              "lap": 21,
+              "kind": "pit",
+              "compound": "WET",
+              "fill": "standard"
+            }
+          ]
+        },
+        {
+          "id": "box-next-intermediate",
+          "label": "Box next lap, inters",
+          "decisions": [
+            {
+              "lap": 22,
+              "kind": "pit",
+              "compound": "INTERMEDIATE",
+              "fill": "standard"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "box-wet"
+    },
+    {
+      "id": "cliff-26",
+      "lap": 26,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "Stay out",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "Box, slicks",
+          "decisions": [
+            {
+              "lap": 26,
+              "kind": "pit",
+              "compound": "MEDIUM",
+              "fill": "standard"
+            }
+          ]
+        },
+        {
+          "id": "box-intermediate",
+          "label": "Box, inters",
+          "decisions": [
+            {
+              "lap": 26,
+              "kind": "pit",
+              "compound": "INTERMEDIATE",
+              "fill": "standard"
+            }
+          ]
+        },
+        {
+          "id": "box-wet",
+          "label": "Box, wets",
+          "decisions": [
+            {
+              "lap": 26,
+              "kind": "pit",
+              "compound": "WET",
+              "fill": "standard"
+            }
+          ]
+        },
+        {
+          "id": "box-next-intermediate",
+          "label": "Box next lap, inters",
+          "decisions": [
+            {
+              "lap": 27,
+              "kind": "pit",
+              "compound": "INTERMEDIATE",
+              "fill": "standard"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "box-medium"
+    },
+    {
+      "id": "stop-30",
+      "lap": 30,
+      "trigger": "SC",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "Stay out",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "Box, slicks",
+          "decisions": [
+            {
+              "lap": 30,
+              "kind": "pit",
+              "compound": "MEDIUM",
+              "fill": "standard"
+            }
+          ]
+        },
+        {
+          "id": "box-intermediate",
+          "label": "Box, inters",
+          "decisions": [
+            {
+              "lap": 30,
+              "kind": "pit",
+              "compound": "INTERMEDIATE",
+              "fill": "standard"
+            }
+          ]
+        },
+        {
+          "id": "box-wet",
+          "label": "Box, wets",
+          "decisions": [
+            {
+              "lap": 30,
+              "kind": "pit",
+              "compound": "WET",
+              "fill": "standard"
+            }
+          ]
+        },
+        {
+          "id": "box-next-wet",
+          "label": "Box next lap, wets",
+          "decisions": [
+            {
+              "lap": 31,
+              "kind": "pit",
+              "compound": "WET",
+              "fill": "standard"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "box-wet"
+    },
+    {
+      "id": "stop-33",
+      "lap": 33,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "Stay out",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "Box, slicks",
+          "decisions": [
+            {
+              "lap": 33,
+              "kind": "pit",
+              "compound": "MEDIUM",
+              "fill": "standard"
+            }
+          ]
+        },
+        {
+          "id": "box-intermediate",
+          "label": "Box, inters",
+          "decisions": [
+            {
+              "lap": 33,
+              "kind": "pit",
+              "compound": "INTERMEDIATE",
+              "fill": "standard"
+            }
+          ]
+        },
+        {
+          "id": "box-wet",
+          "label": "Box, wets",
+          "decisions": [
+            {
+              "lap": 33,
+              "kind": "pit",
+              "compound": "WET",
+              "fill": "standard"
+            }
+          ]
+        },
+        {
+          "id": "box-next-intermediate",
+          "label": "Box next lap, inters",
+          "decisions": [
+            {
+              "lap": 34,
+              "kind": "pit",
+              "compound": "INTERMEDIATE",
+              "fill": "standard"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "box-wet"
+    }
+  ],
   "candidateMomentLaps": [
     14,
     15,
@@ -760,8 +1082,8 @@
     "ALE",
     "HAK"
   ],
-  "userSide": "MSCM",
-  "rival": "HIL",
+  "userSide": "HIL",
+  "rival": "MSCM",
   "weather": {
     "curves": {
       "slick": {
@@ -827,6 +1149,37 @@
       0.45,
       0.45
     ]
+  },
+  "eras": {
+    "eraId": 3,
+    "order": 3,
+    "userSide": "HIL",
+    "hardCalls": {
+      "HIL": 2,
+      "MSCM": 2
+    },
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Schumacher wins from 16th on the grid, staying out on slicks in the rain; Hill, from eighth, finishes second after a stop-go for pit-lane speeding",
+      "rewriteCondition": {
+        "type": "beat-rival",
+        "rival": "MSCM"
+      },
+      "headline": "Hill out-thinks the rain and beats Schumacher at Spa"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "max": 3,
+      "label": "Win with three stops or fewer"
+    },
+    "hidden": {
+      "type": "compound_rule",
+      "mustAvoid": "WET",
+      "label": "Win without fitting full wets"
+    },
+    "briefing": "Spa, 1995. A wet-dry qualifying left Hill eighth and Schumacher 16th, and the rain comes and goes. Schumacher leads the championship, 56 points to Hill's 45. Slicks, inters or wets: every lap it's your call. Reconstructed race: no lap timing survives, so the laps are rebuilt to fit the result, the fastest laps and the sourced stops (Jolpica, F1DB, Motor Sport, Wikipedia). The lap-by-lap gaps and running order are synthetic, not history."
   },
   "provenance": {
     "kind": "reconstructed",

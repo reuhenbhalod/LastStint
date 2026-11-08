@@ -7,5 +7,37 @@
     "drs": false,
     "ers": "none",
     "refuelling": false
+  },
+  "eras": {
+    "eraId": 2,
+    "order": 2,
+    "userSide": "ALE",
+    "hardCalls": {
+      "ALE": 0,
+      "SENA": 0
+    },
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Alesi's Tyrrell leads the first 33 laps; Senna passes on lap 34, Alesi takes it back, Senna passes again a lap later and wins by 8.7 seconds",
+      "rewriteCondition": {
+        "type": "beat-rival",
+        "rival": "SENA"
+      },
+      "headline": "The Tyrrell beat the McLaren on the streets of Phoenix"
+    },
+    "mastery": {
+      "type": "mode_rule",
+      "mode": "push",
+      "maxLaps": 10,
+      "label": "Push for no more than 10 laps"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 3,
+      "label": "Win by more than 3 seconds"
+    },
+    "briefing": "Phoenix, 1990, the season opener. Alesi started fourth in the Tyrrell and led from the first corner, with Senna's McLaren behind. Pit board only: tell him when to push. Reconstructed race: no lap timing survives, so the laps are rebuilt to fit the result, the fastest laps and the sourced stops (Jolpica, F1DB, Motor Sport, Wikipedia). The lap-by-lap gaps and running order are synthetic, not history."
   }
 }
