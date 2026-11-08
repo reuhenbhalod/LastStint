@@ -8,6 +8,8 @@ import {
   type Era,
   type RaceModel,
   type RaceRules,
+  initRun,
+  stepLap,
   validateDecisions,
 } from '@laststint/sim';
 import { describe, expect, it } from 'vitest';
@@ -191,9 +193,28 @@ describe('refuelReading', () => {
     expect(refuelReading(race, abu, () => reading)).toBeNull();
   });
 
-  it('is null in a refuelling race until the refuelling model is connected', () => {
+  it('is null in a refuelling race without a refuelling model', () => {
     const model = raced('1994-2009', { refuelling: true });
-    expect(refuelReading(race, model)).toBeNull();
+    expect(refuelReading(race, model, null)).toBeNull();
     expect(refuelReading(race, model, () => reading)).toBe(reading);
+  });
+
+  it("reads the sim's tank and fills by default (build plan 4.2), and the fill goes on the call", () => {
+    const model = raced('1994-2009', { refuelling: true });
+    const run = initRun(model, model.race.seed, { decisions: [] });
+    while (run.state.lap < model.race.takeoverLap + 3) stepLap(run);
+    const got = refuelReading(run.state, model);
+    const car = run.state.cars[model.userSide];
+    expect(got?.lapsOfFuel).toBe(car?.tank);
+    expect(got?.fills.map((f) => f.fill)).toEqual(['short', 'standard', 'long']);
+    const laps = got?.fills.map((f) => f.laps) ?? [];
+    expect(laps).toEqual([...laps].sort((a, b) => a - b));
+    for (const f of got?.fills ?? []) expect(f.seconds).toBeGreaterThanOrEqual(0);
+    expect(got?.level).toBeGreaterThan(0);
+    expect(got?.level).toBeLessThanOrEqual(1);
+    expect(refuelReading(run.state, abu)).toBeNull(); // no refuelling: nothing shown
+    const box: Decision = { lap: run.state.lap + 1, kind: 'pit', compound: 'HARD', fill: 'long' };
+    expect(simTakes(model, box)).toBe(true);
+    expect(simTakes(abu, box)).toBe(false);
   });
 });

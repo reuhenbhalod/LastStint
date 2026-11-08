@@ -136,7 +136,14 @@ export function TeamRadio({
                               ? `Pit lane closed: stop-go, +${Math.round(closedPitCost(model))}s`
                               : undefined
                           }
-                          onClick={() => onCall({ lap: next, kind: 'pit', compound: c })}
+                          onClick={() =>
+                            onCall({
+                              lap: next,
+                              kind: 'pit',
+                              compound: c,
+                              ...(fuel ? { fill } : {}),
+                            })
+                          }
                           className={`${btn} flex items-center justify-center gap-1 whitespace-nowrap !px-1 !text-[12px] bg-[var(--box)] text-white hover:brightness-110`}
                         >
                           {era.tyres === 'single-dry' && !isWetTyre(c) ? (

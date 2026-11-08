@@ -1,14 +1,11 @@
 // Refuelling on the race screen (eras build plan 8.5, roadmap R4): the fill choice on the pit
 // stop (short / standard / long) and the gauge of fuel to the next stop, in races whose rules
-// refuel (`rules.refuelling`). The refuelling model itself is build plan 4.2, built in
-// parallel: this file is the small interface the screen needs from it. Until a source is
-// connected (`REFUEL_SOURCE` is null on this branch) the reading is null and the refuelling UI
-// is hidden, so a refuelling race shows exactly today's pit section.
-//
-// TODO(4.2): set REFUEL_SOURCE to the sim's refuelling reading, and carry the chosen fill on
-// the pit call once the sim's Decision has it.
+// refuel (`rules.refuelling`). The reading comes from the sim's refuelling model (build plan
+// 4.2, packages/sim refuel.ts: `tankReading`, `fillOptions`), and the chosen fill rides on the
+// pit call (`Decision.fill`; TeamRadio). A race that doesn't refuel shows none of it.
 
 import type { RaceModel, RaceState } from '@laststint/sim';
+import { RESERVE_LAPS, fillOptions, refuelModel, tankReading } from '@laststint/sim';
 import { raceScreenEra } from './raceRules.js';
 
 /** The fill a stop takes (roadmap R4): less fuel is a shorter stop and a lighter car. */
@@ -37,8 +34,35 @@ export interface RefuelReading {
 /** What the refuelling model gives the screen for the user's car (4.2 implements it). */
 export type RefuelSource = (race: RaceState, model: RaceModel) => RefuelReading | null;
 
-/** The connected refuelling model: none yet on this branch (see the TODO above). */
-export const REFUEL_SOURCE: RefuelSource | null = null;
+/**
+ * The sim's refuelling model for the user's car (packages/sim refuel.ts). A pit call now (for
+ * the coming lap, `race.lap + 1`) boxes at the end of that lap, so its fill fuels from the
+ * out-lap `race.lap + 2`: each choice's laps are `fillOptions` there, and its seconds are the
+ * race's fill rate times what goes in (the stint plus the reserve, less the fuel left after the
+ * in-lap). The gauge is the fuel on board over a full tank (the longest stint plus reserve).
+ */
+export const simRefuelSource: RefuelSource = (race, model) => {
+  const car = race.cars[model.userSide];
+  if (!car || car.retired) return null;
+  const tank = tankReading(model, car, race.lap);
+  if (!tank) return null;
+  const rm = refuelModel(model);
+  const left = Math.max(0, tank.laps - 1);
+  const options = fillOptions(model, race.lap + 2);
+  return {
+    lapsOfFuel: tank.laps,
+    nextStopLap: tank.toFlag ? null : tank.boxBy,
+    level: Math.min(1, Math.max(0, tank.laps / (rm.tankLaps + RESERVE_LAPS))),
+    fills: FUEL_FILLS.map((fill) => ({
+      fill,
+      laps: options[fill],
+      seconds: rm.secondsPerLap * Math.max(0, options[fill] + RESERVE_LAPS - left),
+    })),
+  };
+};
+
+/** The connected refuelling model: the sim's (4.2). */
+export const REFUEL_SOURCE: RefuelSource | null = simRefuelSource;
 
 /**
  * The refuelling reading to show, or null to show none: the race doesn't refuel, there's no
