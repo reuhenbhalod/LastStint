@@ -9,7 +9,7 @@
     "options": [
       {
         "id": "push",
-        "label": "Push now",
+        "label": "PUSH",
         "decisions": [
           {
             "lap": 36,
@@ -21,7 +21,7 @@
       },
       {
         "id": "standard",
-        "label": "Standard pace",
+        "label": "STEADY - standard pace",
         "decisions": [
           {
             "lap": 36,
@@ -33,7 +33,7 @@
       },
       {
         "id": "manage",
-        "label": "Manage the tyres",
+        "label": "EASY - save the tyres",
         "decisions": [
           {
             "lap": 36,
@@ -45,7 +45,7 @@
       },
       {
         "id": "push-attack",
-        "label": "Push and attack",
+        "label": "PUSH - attack",
         "decisions": [
           {
             "lap": 36,
@@ -74,7 +74,7 @@
     "options": [
       {
         "id": "push",
-        "label": "Push now",
+        "label": "PUSH",
         "decisions": [
           {
             "lap": 60,
@@ -86,7 +86,7 @@
       },
       {
         "id": "standard",
-        "label": "Standard pace",
+        "label": "STEADY - standard pace",
         "decisions": [
           {
             "lap": 60,
@@ -98,7 +98,7 @@
       },
       {
         "id": "manage",
-        "label": "Manage the tyres",
+        "label": "EASY - save the tyres",
         "decisions": [
           {
             "lap": 60,
@@ -110,7 +110,7 @@
       },
       {
         "id": "push-attack",
-        "label": "Push and attack",
+        "label": "PUSH - attack",
         "decisions": [
           {
             "lap": 60,
@@ -139,7 +139,7 @@
     "options": [
       {
         "id": "defend",
-        "label": "Defend hard",
+        "label": "DEFEND",
         "decisions": [
           {
             "lap": 65,
@@ -151,7 +151,7 @@
       },
       {
         "id": "hold",
-        "label": "Hold the line",
+        "label": "Hold position",
         "decisions": [
           {
             "lap": 65,
@@ -163,7 +163,7 @@
       },
       {
         "id": "attack",
-        "label": "Attack",
+        "label": "ATTACK",
         "decisions": [
           {
             "lap": 65,
@@ -186,7 +186,7 @@
     "options": [
       {
         "id": "push",
-        "label": "Push now",
+        "label": "PUSH",
         "decisions": [
           {
             "lap": 68,
@@ -198,7 +198,7 @@
       },
       {
         "id": "standard",
-        "label": "Standard pace",
+        "label": "STEADY - standard pace",
         "decisions": [
           {
             "lap": 68,
@@ -210,7 +210,7 @@
       },
       {
         "id": "manage",
-        "label": "Manage the tyres",
+        "label": "EASY - save the tyres",
         "decisions": [
           {
             "lap": 68,
@@ -222,7 +222,7 @@
       },
       {
         "id": "push-attack",
-        "label": "Push and attack",
+        "label": "PUSH - attack",
         "decisions": [
           {
             "lap": 68,

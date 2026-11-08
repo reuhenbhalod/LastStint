@@ -1,21 +1,20 @@
 [
   {
-    "id": "stop-61",
+    "id": "rivalpit-61",
     "lap": 61,
-    "trigger": "cliff",
+    "trigger": "rivalPit",
     "target": {
-      "kind": "position",
-      "atBest": 2
+      "kind": "beat-rival"
     },
     "options": [
       {
         "id": "stay",
-        "label": "Stay out",
+        "label": "STAY OUT",
         "decisions": []
       },
       {
         "id": "box-medium",
-        "label": "Box, slicks",
+        "label": "IN - fresh tyres",
         "decisions": [
           {
             "lap": 61,
@@ -26,7 +25,7 @@
       },
       {
         "id": "box-next-medium",
-        "label": "Box next lap, slicks",
+        "label": "IN NEXT LAP - fresh tyres",
         "decisions": [
           {
             "lap": 62,
@@ -36,20 +35,19 @@
         ]
       }
     ],
-    "realOptionId": "box-medium"
+    "realOptionId": "stay"
   },
   {
     "id": "pace-66",
     "lap": 66,
     "trigger": "cliff",
     "target": {
-      "kind": "position",
-      "atBest": 2
+      "kind": "beat-rival"
     },
     "options": [
       {
         "id": "push",
-        "label": "Push now",
+        "label": "PUSH",
         "decisions": [
           {
             "lap": 66,
@@ -61,7 +59,7 @@
       },
       {
         "id": "standard",
-        "label": "Standard pace",
+        "label": "STEADY - standard pace",
         "decisions": [
           {
             "lap": 66,
@@ -73,7 +71,7 @@
       },
       {
         "id": "manage",
-        "label": "Manage the tyres",
+        "label": "EASY - save the tyres",
         "decisions": [
           {
             "lap": 66,
@@ -85,7 +83,7 @@
       },
       {
         "id": "push-attack",
-        "label": "Push and attack",
+        "label": "PUSH - attack",
         "decisions": [
           {
             "lap": 66,
@@ -109,13 +107,12 @@
     "lap": 70,
     "trigger": "cliff",
     "target": {
-      "kind": "position",
-      "atBest": 2
+      "kind": "beat-rival"
     },
     "options": [
       {
         "id": "push",
-        "label": "Push now",
+        "label": "PUSH",
         "decisions": [
           {
             "lap": 70,
@@ -127,7 +124,7 @@
       },
       {
         "id": "standard",
-        "label": "Standard pace",
+        "label": "STEADY - standard pace",
         "decisions": [
           {
             "lap": 70,
@@ -139,7 +136,7 @@
       },
       {
         "id": "manage",
-        "label": "Manage the tyres",
+        "label": "EASY - save the tyres",
         "decisions": [
           {
             "lap": 70,
@@ -151,7 +148,7 @@
       },
       {
         "id": "push-attack",
-        "label": "Push and attack",
+        "label": "PUSH - attack",
         "decisions": [
           {
             "lap": 70,
@@ -161,6 +158,71 @@
           },
           {
             "lap": 70,
+            "kind": "mode",
+            "key": "battle",
+            "value": "attack"
+          }
+        ]
+      }
+    ],
+    "realOptionId": null
+  },
+  {
+    "id": "pace-74",
+    "lap": 74,
+    "trigger": "cliff",
+    "target": {
+      "kind": "beat-rival"
+    },
+    "options": [
+      {
+        "id": "push",
+        "label": "PUSH",
+        "decisions": [
+          {
+            "lap": 74,
+            "kind": "mode",
+            "key": "pace",
+            "value": "push"
+          }
+        ]
+      },
+      {
+        "id": "standard",
+        "label": "STEADY - standard pace",
+        "decisions": [
+          {
+            "lap": 74,
+            "kind": "mode",
+            "key": "pace",
+            "value": "standard"
+          }
+        ]
+      },
+      {
+        "id": "manage",
+        "label": "EASY - save the tyres",
+        "decisions": [
+          {
+            "lap": 74,
+            "kind": "mode",
+            "key": "pace",
+            "value": "manage"
+          }
+        ]
+      },
+      {
+        "id": "push-attack",
+        "label": "PUSH - attack",
+        "decisions": [
+          {
+            "lap": 74,
+            "kind": "mode",
+            "key": "pace",
+            "value": "push"
+          },
+          {
+            "lap": 74,
             "kind": "mode",
             "key": "battle",
             "value": "attack"

@@ -2,7 +2,7 @@
   "schemaVersion": 11,
   "race": {
     "id": "australia-1994",
-    "name": "Australia 1994: Schumacher vs Hill",
+    "name": "Australia 1994: Hill vs Schumacher",
     "laps": 81,
     "takeoverLap": 15,
     "seed": 1,
@@ -904,71 +904,6 @@
       "realOptionId": null
     },
     {
-      "id": "pace-27",
-      "lap": 27,
-      "trigger": "cliff",
-      "target": {
-        "kind": "beat-rival"
-      },
-      "options": [
-        {
-          "id": "push",
-          "label": "Push now",
-          "decisions": [
-            {
-              "lap": 27,
-              "kind": "mode",
-              "key": "pace",
-              "value": "push"
-            }
-          ]
-        },
-        {
-          "id": "standard",
-          "label": "Standard pace",
-          "decisions": [
-            {
-              "lap": 27,
-              "kind": "mode",
-              "key": "pace",
-              "value": "standard"
-            }
-          ]
-        },
-        {
-          "id": "manage",
-          "label": "Manage the tyres",
-          "decisions": [
-            {
-              "lap": 27,
-              "kind": "mode",
-              "key": "pace",
-              "value": "manage"
-            }
-          ]
-        },
-        {
-          "id": "push-attack",
-          "label": "Push and attack",
-          "decisions": [
-            {
-              "lap": 27,
-              "kind": "mode",
-              "key": "pace",
-              "value": "push"
-            },
-            {
-              "lap": 27,
-              "kind": "mode",
-              "key": "battle",
-              "value": "attack"
-            }
-          ]
-        }
-      ],
-      "realOptionId": null
-    },
-    {
       "id": "pace-31",
       "lap": 31,
       "trigger": "cliff",
@@ -1032,6 +967,46 @@
         }
       ],
       "realOptionId": null
+    },
+    {
+      "id": "cliff-39",
+      "lap": 39,
+      "trigger": "cliff",
+      "target": {
+        "kind": "beat-rival"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "Stay out",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "Box, slicks",
+          "decisions": [
+            {
+              "lap": 39,
+              "kind": "pit",
+              "compound": "MEDIUM",
+              "fill": "standard"
+            }
+          ]
+        },
+        {
+          "id": "box-next-medium",
+          "label": "Box next lap, slicks",
+          "decisions": [
+            {
+              "lap": 40,
+              "kind": "pit",
+              "compound": "MEDIUM",
+              "fill": "standard"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "stay"
     }
   ],
   "candidateMomentLaps": [
@@ -1095,27 +1070,27 @@
     "IRV",
     "HER"
   ],
-  "userSide": "MSCM",
-  "rival": "HIL",
+  "userSide": "HIL",
+  "rival": "MSCM",
   "eras": {
     "eraId": 3,
     "order": 2,
-    "userSide": "MSCM",
+    "userSide": "HIL",
     "hardCalls": {
       "MSCM": 0,
-      "HIL": 0
+      "HIL": 1
     },
     "target": {
       "type": "beat-rival",
-      "rival": "HIL"
+      "rival": "MSCM"
     },
     "storyline": {
-      "real": "Schumacher hits the wall and the two collide on lap 36; both retire and Schumacher takes the title by one point",
+      "real": "Schumacher hits the wall and the two collide on lap 36 as Hill tries to pass; both retire and Schumacher takes the title by one point",
       "rewriteCondition": {
         "type": "beat-rival",
-        "rival": "HIL"
+        "rival": "MSCM"
       },
-      "headline": "Schumacher's first title, settled at the flag"
+      "headline": "Hill beats Schumacher to the Adelaide flag"
     },
     "mastery": {
       "type": "finish_position",
@@ -1127,17 +1102,18 @@
       "position": 1,
       "label": "Win the race"
     },
-    "briefing": "Adelaide, 1994, the final round. Schumacher leads the championship on 92 points, Hill is one behind on 91. One point between them, one race left. Mansell started from pole. Reconstructed race: no lap timing survives, so the laps are rebuilt to fit the result, the fastest laps and the sourced stops (Jolpica, F1DB, Motor Sport, Wikipedia). The lap-by-lap gaps and running order are synthetic, not history.",
+    "briefing": "Adelaide, 1994, the final round. Schumacher leads the championship on 92 points, Hill is one behind on 91. One point between them, one race left, and Schumacher's Benetton is the car ahead. Mansell started from pole. Reconstructed race: no lap timing survives, so the laps are rebuilt to fit the result, the fastest laps, the sourced stops and who led each lap (Jolpica, F1DB, Motor Sport, Wikipedia). Who led each lap is sourced, and so is the order at a few laps; the lap times, and the rest of the order, are reconstructed.",
     "storylineRetirements": [
       {
-        "driver": "MSCM",
+        "driver": "HIL",
         "condition": {
-          "type": "pressure",
-          "driver": "HIL",
-          "seconds": 2.0
+          "type": "mode",
+          "key": "battle",
+          "value": "attack",
+          "fromLap": 34
         },
         "alsoRetires": [
-          "HIL"
+          "MSCM"
         ],
         "real": "Hill was catching Schumacher when the Benetton went off at East Terrace and hit the wall; Schumacher pulled back across the track, Hill tried to pass at the next corner and they collided as Schumacher turned in: Schumacher out on the spot, Hill retired with front-left suspension damage",
         "source": "https://en.wikipedia.org/wiki/1994_Australian_Grand_Prix"

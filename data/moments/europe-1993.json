@@ -9,12 +9,12 @@
     "options": [
       {
         "id": "stay",
-        "label": "Stay out",
+        "label": "STAY OUT",
         "decisions": []
       },
       {
         "id": "box-medium",
-        "label": "Box, slicks",
+        "label": "IN - slicks",
         "decisions": [
           {
             "lap": 18,
@@ -25,7 +25,7 @@
       },
       {
         "id": "box-wet",
-        "label": "Box, wets",
+        "label": "IN - wets",
         "decisions": [
           {
             "lap": 18,
@@ -36,7 +36,7 @@
       },
       {
         "id": "box-intermediate",
-        "label": "Box, inters",
+        "label": "IN - inters",
         "decisions": [
           {
             "lap": 18,
@@ -47,7 +47,7 @@
       },
       {
         "id": "box-next-intermediate",
-        "label": "Box next lap, inters",
+        "label": "IN NEXT LAP - inters",
         "decisions": [
           {
             "lap": 19,
@@ -69,12 +69,12 @@
     "options": [
       {
         "id": "stay",
-        "label": "Stay out",
+        "label": "STAY OUT",
         "decisions": []
       },
       {
         "id": "box-medium",
-        "label": "Box, slicks",
+        "label": "IN - slicks",
         "decisions": [
           {
             "lap": 24,
@@ -85,7 +85,7 @@
       },
       {
         "id": "box-wet",
-        "label": "Box, wets",
+        "label": "IN - wets",
         "decisions": [
           {
             "lap": 24,
@@ -96,7 +96,7 @@
       },
       {
         "id": "box-intermediate",
-        "label": "Box, inters",
+        "label": "IN - inters",
         "decisions": [
           {
             "lap": 24,
@@ -107,7 +107,7 @@
       },
       {
         "id": "box-next-intermediate",
-        "label": "Box next lap, inters",
+        "label": "IN NEXT LAP - inters",
         "decisions": [
           {
             "lap": 25,
@@ -129,12 +129,12 @@
     "options": [
       {
         "id": "stay",
-        "label": "Stay out",
+        "label": "STAY OUT",
         "decisions": []
       },
       {
         "id": "box-medium",
-        "label": "Box, slicks",
+        "label": "IN - slicks",
         "decisions": [
           {
             "lap": 34,
@@ -145,7 +145,7 @@
       },
       {
         "id": "box-wet",
-        "label": "Box, wets",
+        "label": "IN - wets",
         "decisions": [
           {
             "lap": 34,
@@ -156,7 +156,7 @@
       },
       {
         "id": "box-intermediate",
-        "label": "Box, inters",
+        "label": "IN - inters",
         "decisions": [
           {
             "lap": 34,
@@ -167,7 +167,7 @@
       },
       {
         "id": "box-next-intermediate",
-        "label": "Box next lap, inters",
+        "label": "IN NEXT LAP - inters",
         "decisions": [
           {
             "lap": 35,
@@ -189,12 +189,12 @@
     "options": [
       {
         "id": "stay",
-        "label": "Stay out",
+        "label": "STAY OUT",
         "decisions": []
       },
       {
         "id": "box-medium",
-        "label": "Box, slicks",
+        "label": "IN - slicks",
         "decisions": [
           {
             "lap": 54,
@@ -205,7 +205,7 @@
       },
       {
         "id": "box-wet",
-        "label": "Box, wets",
+        "label": "IN - wets",
         "decisions": [
           {
             "lap": 54,
@@ -216,7 +216,7 @@
       },
       {
         "id": "box-intermediate",
-        "label": "Box, inters",
+        "label": "IN - inters",
         "decisions": [
           {
             "lap": 54,
@@ -227,7 +227,7 @@
       },
       {
         "id": "box-next-intermediate",
-        "label": "Box next lap, inters",
+        "label": "IN NEXT LAP - inters",
         "decisions": [
           {
             "lap": 55,
@@ -249,12 +249,12 @@
     "options": [
       {
         "id": "stay",
-        "label": "Stay out",
+        "label": "STAY OUT",
         "decisions": []
       },
       {
         "id": "box-medium",
-        "label": "Box, slicks",
+        "label": "IN - slicks",
         "decisions": [
           {
             "lap": 57,
@@ -265,7 +265,7 @@
       },
       {
         "id": "box-wet",
-        "label": "Box, wets",
+        "label": "IN - wets",
         "decisions": [
           {
             "lap": 57,
@@ -276,7 +276,7 @@
       },
       {
         "id": "box-intermediate",
-        "label": "Box, inters",
+        "label": "IN - inters",
         "decisions": [
           {
             "lap": 57,
@@ -287,7 +287,7 @@
       },
       {
         "id": "box-next-intermediate",
-        "label": "Box next lap, inters",
+        "label": "IN NEXT LAP - inters",
         "decisions": [
           {
             "lap": 58,
@@ -309,7 +309,7 @@
     "options": [
       {
         "id": "push",
-        "label": "Push now",
+        "label": "PUSH",
         "decisions": [
           {
             "lap": 70,
@@ -321,7 +321,7 @@
       },
       {
         "id": "standard",
-        "label": "Standard pace",
+        "label": "STEADY - standard pace",
         "decisions": [
           {
             "lap": 70,
@@ -333,7 +333,7 @@
       },
       {
         "id": "manage",
-        "label": "Manage the tyres",
+        "label": "EASY - save the tyres",
         "decisions": [
           {
             "lap": 70,
@@ -345,7 +345,7 @@
       },
       {
         "id": "push-attack",
-        "label": "Push and attack",
+        "label": "PUSH - attack",
         "decisions": [
           {
             "lap": 70,

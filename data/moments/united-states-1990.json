@@ -9,7 +9,7 @@
     "options": [
       {
         "id": "push",
-        "label": "Push now",
+        "label": "PUSH",
         "decisions": [
           {
             "lap": 45,
@@ -21,7 +21,7 @@
       },
       {
         "id": "standard",
-        "label": "Standard pace",
+        "label": "STEADY - standard pace",
         "decisions": [
           {
             "lap": 45,
@@ -33,7 +33,7 @@
       },
       {
         "id": "manage",
-        "label": "Manage the tyres",
+        "label": "EASY - save the tyres",
         "decisions": [
           {
             "lap": 45,
@@ -45,7 +45,7 @@
       },
       {
         "id": "push-attack",
-        "label": "Push and attack",
+        "label": "PUSH - attack",
         "decisions": [
           {
             "lap": 45,
@@ -74,7 +74,7 @@
     "options": [
       {
         "id": "push",
-        "label": "Push now",
+        "label": "PUSH",
         "decisions": [
           {
             "lap": 49,
@@ -86,7 +86,7 @@
       },
       {
         "id": "standard",
-        "label": "Standard pace",
+        "label": "STEADY - standard pace",
         "decisions": [
           {
             "lap": 49,
@@ -98,7 +98,7 @@
       },
       {
         "id": "manage",
-        "label": "Manage the tyres",
+        "label": "EASY - save the tyres",
         "decisions": [
           {
             "lap": 49,
@@ -110,7 +110,7 @@
       },
       {
         "id": "push-attack",
-        "label": "Push and attack",
+        "label": "PUSH - attack",
         "decisions": [
           {
             "lap": 49,
@@ -139,7 +139,7 @@
     "options": [
       {
         "id": "push",
-        "label": "Push now",
+        "label": "PUSH",
         "decisions": [
           {
             "lap": 53,
@@ -151,7 +151,7 @@
       },
       {
         "id": "standard",
-        "label": "Standard pace",
+        "label": "STEADY - standard pace",
         "decisions": [
           {
             "lap": 53,
@@ -163,7 +163,7 @@
       },
       {
         "id": "manage",
-        "label": "Manage the tyres",
+        "label": "EASY - save the tyres",
         "decisions": [
           {
             "lap": 53,
@@ -175,7 +175,7 @@
       },
       {
         "id": "push-attack",
-        "label": "Push and attack",
+        "label": "PUSH - attack",
         "decisions": [
           {
             "lap": 53,

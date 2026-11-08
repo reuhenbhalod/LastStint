@@ -11,8 +11,8 @@
     },
     "mastery": {
       "type": "margin",
-      "seconds": 63,
-      "label": "Win by more than Senna's real 63 seconds"
+      "seconds": 70,
+      "label": "Win by more than 70 seconds (Senna won by 63)"
     },
     "hidden": {
       "type": "mode_rule",
@@ -20,7 +20,7 @@
       "maxLaps": 0,
       "label": "Win without a lap at PUSH in the rain"
     },
-    "briefing": "Estoril, April 1985. Rain from the start, and it gets heavier. Senna started on pole in the Lotus and leads. The race will be cut short at the two-hour limit. Turbo cars have 220 litres for the race. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports.",
+    "briefing": "Estoril, April 1985. Rain from the start, and it gets heavier. Senna started on pole in the Lotus and leads. The race will be cut short at the two-hour limit. Turbo cars have 220 litres for the race. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports. Who led each lap is sourced; the lap times are reconstructed.",
     "hardCalls": {
       "SENA": 0,
       "ALBM": 0
