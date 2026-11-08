@@ -122,24 +122,14 @@ function RaceCardView({ card, legend }: { card: RaceCard; legend: boolean }) {
   );
 }
 
-/** The era's briefing, or a marked empty slot until one is written (no invented copy). */
+/** The era's briefing (catalog.ts `briefing`). */
 function Briefing({ era }: { era: EraInfo }) {
   return (
     <section aria-labelledby="era-briefing" className="flex max-w-2xl flex-col gap-1">
       <h2 id="era-briefing" className="eyebrow m-0">
         Briefing
       </h2>
-      {era.briefing ? (
-        <p className="m-0 text-[15px]">{era.briefing}</p>
-      ) : (
-        // TODO(content): the era briefing (catalog.ts `briefing`).
-        <p
-          data-todo="era-briefing"
-          className="m-0 rounded-lg border border-dashed border-[var(--rule)] px-3 py-2 text-[14px] text-[var(--muted)]"
-        >
-          Briefing not written yet.
-        </p>
-      )}
+      <p className="m-0 text-[15px]">{era.briefing}</p>
     </section>
   );
 }

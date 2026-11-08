@@ -14,25 +14,95 @@ export interface EraInfo {
   /** 1..10, newest first: Era 10 is play order 1. */
   playOrder: number;
   /**
-   * The era's short briefing (spec §14), shown above its race cards. None is written yet.
-   * TODO(content): add each era's briefing once it's written and checked (spec §19: no
-   * invented facts). Until then the era detail shows a marked empty slot.
+   * The era's short briefing (spec §14), shown above its race cards: what shaped its strategy,
+   * then one line on what to expect at its difficulty (eras-config.json; catalog.test.ts checks
+   * the numbers). Facts and sources: docs/eras-checks/s11-era-briefings.md (spec §19).
    */
-  briefing?: string;
+  briefing: string;
 }
 
 /** In play order (newest first). */
 export const ERAS: readonly EraInfo[] = [
-  { id: 10, name: 'Ground-effect era', years: '2022–2025', playOrder: 1 },
-  { id: 9, name: 'The 2021 title fight', years: '2021', playOrder: 2 },
-  { id: 8, name: 'Mercedes vs Ferrari', years: '2017–2020', playOrder: 3 },
-  { id: 7, name: 'Hybrid turbo', years: '2014–2016', playOrder: 4 },
-  { id: 6, name: 'Fast-wearing tyres', years: '2010–2013', playOrder: 5 },
-  { id: 5, name: 'Alonso, Räikkönen, Hamilton', years: '2005–2009', playOrder: 6 },
-  { id: 4, name: 'Ferrari dynasty', years: '2000–2004', playOrder: 7 },
-  { id: 3, name: 'Refuelling returns', years: '1994–1999', playOrder: 8 },
-  { id: 2, name: 'Senna vs Prost', years: '1989–1993', playOrder: 9 },
-  { id: 1, name: 'Turbo era', years: '1983–1988', playOrder: 10 },
+  {
+    id: 10,
+    name: 'Ground-effect era',
+    years: '2022–2025',
+    playOrder: 1,
+    briefing:
+      "Ground effect came back in 2022 for the first time since 1983: the cars make most of their grip under the floor, so they can follow each other more closely, and they run on 18-inch wheels. There's no refuelling, DRS opens in the zones and the hybrid battery is yours to spend, so races turn on tyre choice, stop timing and the safety car or VSC. Verstappen won the titles from 2022 to 2024, and Norris took 2025 by two points from him. Expect the gentlest settings in Eras: full information, Standard rivals, a 45-second decision timer and 70% accuracy for the Strategist star.",
+  },
+  {
+    id: 9,
+    name: 'The 2021 title fight',
+    years: '2021',
+    playOrder: 2,
+    briefing:
+      "The 2021 cars carried over from 2020 with a cut-back floor, while the new rules waited until 2022. Hamilton's Mercedes and Verstappen's Red Bull fought all year and reached the Abu Dhabi finale level on points; Verstappen won it with a last-lap pass after a late safety car restart. The calls are about the undercut, the safety car and VSC, and track position against one rival. Expect full information, Standard rivals, a 45-second decision timer and 72% accuracy for the Strategist star.",
+  },
+  {
+    id: 8,
+    name: 'Mercedes vs Ferrari',
+    years: '2017–2020',
+    playOrder: 3,
+    briefing:
+      "From 2017 the cars were wider, on tyres a quarter wider, and built to lap four to five seconds faster than in 2016. Hamilton and Mercedes won all four titles, with Vettel's Ferrari second in 2017 and 2018 and Bottas second in 2019 and 2020. There's no refuelling, so the game is DRS, the hybrid battery, the safety car and VSC, and how the rival answers your stop. Expect full information, Standard+ rivals that cover an undercut from further out, a 45-second decision timer and 75% accuracy for the Strategist star.",
+  },
+  {
+    id: 7,
+    name: 'Hybrid turbo',
+    years: '2014–2016',
+    playOrder: 4,
+    briefing:
+      "In 2014 the engines became 1.6-litre turbo V6 hybrids with energy recovery, run under a fuel-flow limit. Mercedes drivers finished first and second in all three seasons: Hamilton beat Rosberg in 2014 and 2015, and Rosberg won in 2016 by five points. The virtual safety car arrived in 2015, a second kind of neutralised lap to stop under. Expect reduced information (no gap trend, other cars' tyre ages as ranges), Standard+ rivals, a 45-second decision timer and 78% accuracy for the Strategist star.",
+  },
+  {
+    id: 6,
+    name: 'Fast-wearing tyres',
+    years: '2010–2013',
+    playOrder: 5,
+    briefing:
+      "Refuelling was banned from 2010, so every car starts with the fuel for the whole race. From 2011 Pirelli supplied tyres made to wear quickly, with testing pointing to three stops at most races, and the same year DRS arrived and KERS returned. Vettel won four titles in a row for Red Bull; Alonso's Ferrari was second in 2010, 2012 and 2013, four points short in 2010 and three in 2012. Expect reduced information, Smart rivals that try the overcut and switch to wet tyres on the crossover, a 30-second decision timer and 80% accuracy for the Strategist star.",
+  },
+  {
+    id: 5,
+    name: 'Alonso, Räikkönen, Hamilton',
+    years: '2005–2009',
+    playOrder: 6,
+    briefing:
+      'Refuelling shapes every stop: the fuel you take sets how long the next stint can run. In 2005 a car raced on one set of dry tyres, changed only if damaged or when the weather turned; from 2007 Bridgestone was the only supplier and each driver had to use both dry compounds, and slicks and KERS arrived in 2009. Alonso won in 2005 and 2006, Räikkönen beat Hamilton by a point in 2007, Hamilton beat Massa by a point in 2008, and Button won for Brawn in 2009. Expect reduced information, Smart rivals, a 30-second decision timer and 82% accuracy for the Strategist star.',
+  },
+  {
+    id: 4,
+    name: 'Ferrari dynasty',
+    years: '2000–2004',
+    playOrder: 7,
+    briefing:
+      "Refuelling makes every race a fuel race: a light car is quick but has to stop sooner, so the plan is when to stop and how much to take. Michelin joined Bridgestone in 2001 and their tyre war ran through the era, on grooved tyres. Schumacher and Ferrari won all five titles; the closest was 2003, when Räikkönen finished two points behind. Expect limited information (gaps rounded to 0.5 s, the rival's fuel load hidden), Smart rivals, a 30-second decision timer and 84% accuracy for the Strategist star.",
+  },
+  {
+    id: 3,
+    name: 'Refuelling returns',
+    years: '1994–1999',
+    playOrder: 8,
+    briefing:
+      'Refuelling returned in 1994 after ten seasons banned, and the safety car had been official in F1 since 1993. Schumacher beat Hill by one point in 1994 and won again in 1995; Hill, Villeneuve and Häkkinen, twice, took the titles after him. Bridgestone joined Goodyear in 1997 for a two-year tyre war, and grooved tyres arrived in 1998. Expect limited information, Expert rivals that react on the lap you stop and grade their own calls, a 20-second decision timer and 86% accuracy for the Strategist star.',
+  },
+  {
+    id: 2,
+    name: 'Senna vs Prost',
+    years: '1989–1993',
+    playOrder: 9,
+    briefing:
+      "Turbos were banned from 1989, leaving 3.5-litre engines without boost, and with refuelling still banned a stop was for tyres alone. Senna and Prost were McLaren teammates in 1989, when the title was settled at Suzuka; Senna won in 1990 and 1991, Mansell in 1992 and Prost in 1993. The safety car only became official in 1993, so before then none comes out that didn't really happen. Expect minimal information (only the gaps to the cars just ahead and behind, once a lap), Expert rivals, a 20-second decision timer and 88% accuracy for the Strategist star; calls come on a pit board, and every lap is reconstructed from race reports.",
+  },
+  {
+    id: 1,
+    name: 'Turbo era',
+    years: '1983–1988',
+    playOrder: 10,
+    briefing:
+      "Turbo power and fuel decide this era. Refuelling was allowed in 1983 and banned from 1984, when the turbo cars got 220 litres for the race, cut to 195 litres in 1986 and 150 in 1988, and a car that ran dry was out. Piquet won in 1983 and 1987, Lauda beat Prost by half a point in 1984, Prost won in 1985 and 1986, and Senna in 1988. Expect the hardest settings in Eras: minimal information, Expert rivals, a 20-second decision timer and 90% accuracy for the Strategist star; calls come on a pit board, every lap is reconstructed, and no safety car comes out that didn't really happen.",
+  },
 ];
 
 export function eraById(id: number): EraInfo | undefined {

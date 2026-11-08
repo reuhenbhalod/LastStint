@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { difficultyForEra } from '@laststint/sim';
 import { describe, expect, it } from 'vitest';
 import {
   ERAS,
@@ -13,6 +14,7 @@ import {
   raceName,
   racesOfEra,
 } from './catalog.js';
+import { RIVAL_POLICY_NAME } from './raceIntro.js';
 
 const repo = join(__dirname, '..', '..', '..', '..');
 
@@ -42,6 +44,25 @@ describe('ERAS', () => {
     expect(eraById(10)).toMatchObject({ name: 'Ground-effect era', years: '2022–2025' });
     expect(eraById(1)).toMatchObject({ name: 'Turbo era', years: '1983–1988' });
     expect(eraById(11)).toBeUndefined();
+  });
+
+  it('gives every era a briefing whose expect line matches its difficulty config', () => {
+    for (const era of ERAS) {
+      const { briefing } = era;
+      expect(briefing.trim(), `era ${era.id}`).not.toBe('');
+      // 2-4 sentences on the era, then the one expect line.
+      const sentences = briefing.split(/(?<=[.;])\s+(?=[A-Z])/).filter((x) => x.endsWith('.'));
+      expect(sentences.length, `era ${era.id}`).toBeGreaterThanOrEqual(3);
+      expect(sentences.length, `era ${era.id}`).toBeLessThanOrEqual(5);
+      const expectLine = briefing.slice(briefing.lastIndexOf('Expect '));
+      const d = difficultyForEra(era.id);
+      expect(expectLine, `era ${era.id}`).toContain(`${d.accuracyThreshold}% accuracy`);
+      expect(expectLine.toLowerCase(), `era ${era.id}`).toContain(`${d.information} information`);
+      expect(expectLine, `era ${era.id}`).toContain(`${RIVAL_POLICY_NAME[d.rivalPolicy]} rivals`);
+      expect(expectLine, `era ${era.id}`).toContain(
+        `${d.decisionTimerSeconds}-second decision timer`,
+      );
+    }
   });
 });
 
