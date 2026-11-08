@@ -5,7 +5,8 @@
     "name": "France 1990: Capelli vs Prost",
     "laps": 80,
     "takeoverLap": 24,
-    "seed": 1
+    "seed": 1,
+    "scUnlap": "none"
   },
   "era": "1988-1993",
   "track": {

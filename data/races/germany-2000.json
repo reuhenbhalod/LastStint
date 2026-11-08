@@ -157,7 +157,7 @@
         {
           "lap": 35,
           "to": "INTERMEDIATE",
-          "loss": 16.743
+          "loss": 15.607
         }
       ]
     },
@@ -185,7 +185,7 @@
         {
           "lap": 39,
           "to": "INTERMEDIATE",
-          "loss": 39.285
+          "loss": 25.398
         }
       ]
     },
@@ -236,7 +236,7 @@
         {
           "lap": 36,
           "to": "INTERMEDIATE",
-          "loss": 32.558
+          "loss": 21.97
         }
       ]
     },
@@ -315,7 +315,7 @@
         {
           "lap": 36,
           "to": "INTERMEDIATE",
-          "loss": 31.292
+          "loss": 20.87
         }
       ]
     },
@@ -371,7 +371,7 @@
         {
           "lap": 36,
           "to": "INTERMEDIATE",
-          "loss": 49.287
+          "loss": 39.282
         }
       ]
     },
@@ -399,7 +399,7 @@
         {
           "lap": 36,
           "to": "INTERMEDIATE",
-          "loss": 48.151
+          "loss": 38.038
         }
       ]
     },
@@ -427,7 +427,7 @@
         {
           "lap": 36,
           "to": "INTERMEDIATE",
-          "loss": 30.644
+          "loss": 19.726
         }
       ]
     },
@@ -460,7 +460,7 @@
         {
           "lap": 37,
           "to": "INTERMEDIATE",
-          "loss": 32.995
+          "loss": 19.886
         }
       ]
     },
@@ -488,12 +488,12 @@
         {
           "lap": 36,
           "to": "MEDIUM",
-          "loss": 35.941
+          "loss": 21.881
         },
         {
           "lap": 38,
           "to": "INTERMEDIATE",
-          "loss": 44.435
+          "loss": 28.751
         }
       ]
     },
@@ -521,7 +521,7 @@
         {
           "lap": 36,
           "to": "INTERMEDIATE",
-          "loss": 33.541
+          "loss": 23.328
         }
       ]
     },
@@ -549,7 +549,7 @@
         {
           "lap": 36,
           "to": "INTERMEDIATE",
-          "loss": 47.23
+          "loss": 35.995
         }
       ]
     },

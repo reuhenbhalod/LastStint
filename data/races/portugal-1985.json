@@ -5,7 +5,8 @@
     "name": "Portugal 1985: Senna vs Alboreto",
     "laps": 67,
     "takeoverLap": 30,
-    "seed": 1
+    "seed": 1,
+    "scUnlap": "none"
   },
   "era": "1988-1993",
   "track": {

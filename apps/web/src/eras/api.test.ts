@@ -13,15 +13,15 @@ describe('which Eras API the app uses', () => {
   });
 
   it('can start any race on the Worker (it refuses what it must), bundled ones on the mock', () => {
-    // portugal-1985: an Eras race with no race file yet (a wet reconstructed race, not built).
+    // china-2007: an Eras race with no race file (its user car has no pace fit: not built).
     const real = erasClient(false);
     expect(real.api).toBe(httpErasApi);
-    expect(real.canStart('portugal-1985')).toBe(true);
+    expect(real.canStart('china-2007')).toBe(true);
     const mock = erasClient(true);
     expect(mock.api).toBe(mockErasApi);
     expect(mock.canStart).toBe(mockCanStart);
-    expect(mock.canStart('portugal-1985')).toBe(false);
-    expect(canStartWith(httpErasApi)('portugal-1985')).toBe(true);
+    expect(mock.canStart('china-2007')).toBe(false);
+    expect(canStartWith(httpErasApi)('china-2007')).toBe(true);
     expect(canStartWith(mockErasApi)).toBe(mockCanStart);
   });
 });

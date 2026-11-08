@@ -5,25 +5,24 @@
     "name": "Belgium 1992: Schumacher vs Mansell",
     "laps": 44,
     "takeoverLap": 27,
-    "seed": 1
+    "seed": 1,
+    "scUnlap": "none"
   },
   "era": "1988-1993",
   "track": {
-    "pitLoss": 23.346,
-    "pitLossUnderSC": 12.84,
-    "pitLossUnderVSC": 16.109,
+    "pitLoss": 21.817,
+    "pitLossUnderSC": 11.999,
+    "pitLossUnderVSC": 15.054,
     "pitLossDeviations": [
-      -7.031,
-      -3.476,
-      -2.152,
-      -1.94,
-      -1.529,
-      -1.112,
-      -0.652,
-      0.652,
-      2.29,
-      13.724,
-      14.05
+      -5.502,
+      -1.947,
+      -0.623,
+      -0.411,
+      0.0,
+      0.417,
+      0.878,
+      2.181,
+      3.819
     ],
     "overtakeDifficulty": 0.7263,
     "overtakeModel": {

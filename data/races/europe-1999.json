@@ -119,7 +119,7 @@
         {
           "lap": 36,
           "to": "INTERMEDIATE",
-          "loss": 73.984
+          "loss": 44.797
         }
       ]
     },
@@ -142,7 +142,7 @@
         {
           "lap": 38,
           "to": "MEDIUM",
-          "loss": 53.902
+          "loss": 33.313
         }
       ]
     },
@@ -297,7 +297,7 @@
         {
           "lap": 36,
           "to": "INTERMEDIATE",
-          "loss": 41.609
+          "loss": 14.313
         },
         {
           "lap": 48,
@@ -325,7 +325,7 @@
         {
           "lap": 41,
           "to": "INTERMEDIATE",
-          "loss": 36.039
+          "loss": 19.91
         },
         {
           "lap": 50,
@@ -448,7 +448,7 @@
         {
           "lap": 36,
           "to": "INTERMEDIATE",
-          "loss": 38.054
+          "loss": 10.824
         },
         {
           "lap": 49,
