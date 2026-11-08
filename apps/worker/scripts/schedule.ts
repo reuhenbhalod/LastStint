@@ -5,13 +5,17 @@
 //
 //   pnpm --filter @laststint/worker schedule --local --from 2026-11-01 --days 14
 //   pnpm --filter @laststint/worker schedule --remote --days 7 --race abu-dhabi-2021
+//   pnpm --filter @laststint/worker schedule --staging --days 7
 //
 // Options:
-//   --local | --remote     which D1 to write (one is required)
+//   --local | --remote | --staging
+//                          which D1 to write (one is required): --local and --remote are
+//                          production's pitwall-db; --staging is pitwall-staging-db (remote,
+//                          docs/staging.md)
 //   --from YYYY-MM-DD      first date (default: today, UTC)
 //   --days N               how many dates (default 1)
 //   --race ID              schedule this race on every date (default: shuffle eligible races)
-//   --allow-ineligible     allow races that aren't eligible (local only, for testing)
+//   --allow-ineligible     allow races that aren't eligible (local or staging, for testing)
 //   --dry-run              print the plan without writing
 //
 // A race is eligible when it's in the daily pool (data/pools.json), has approved decision
@@ -39,7 +43,7 @@ function fail(message: string): never {
 
 function parseArgs(argv: string[]) {
   const args = {
-    target: '' as '' | 'local' | 'remote',
+    target: '' as '' | Target,
     from: todayUtc(Date.now()),
     days: 1,
     race: undefined as string | undefined,
@@ -49,9 +53,9 @@ function parseArgs(argv: string[]) {
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     const value = () => argv[++i] ?? fail(`${a} needs a value`);
-    if (a === '--local' || a === '--remote') {
-      if (args.target) fail('pass only one of --local and --remote');
-      args.target = a === '--local' ? 'local' : 'remote';
+    if (a === '--local' || a === '--remote' || a === '--staging') {
+      if (args.target) fail('pass only one of --local, --remote and --staging');
+      args.target = a.slice(2) as Target;
     } else if (a === '--from') args.from = value();
     else if (a === '--days') args.days = Number(value());
     else if (a === '--race') args.race = value();
@@ -59,15 +63,15 @@ function parseArgs(argv: string[]) {
     else if (a === '--dry-run') args.dryRun = true;
     else fail(`unknown option ${a}`);
   }
-  if (!args.target) fail('pass --local or --remote');
+  if (!args.target) fail('pass --local, --remote or --staging');
   if (!isDate(args.from)) fail('--from must be YYYY-MM-DD');
   if (!Number.isInteger(args.days) || args.days < 1 || args.days > 366) {
     fail('--days must be 1-366');
   }
   if (args.allowIneligible && args.target === 'remote') {
-    fail('--allow-ineligible is for local testing only');
+    fail('--allow-ineligible is for local or staging testing only');
   }
-  return args;
+  return args as typeof args & { target: Target };
 }
 
 /** Gate G1 status per race, from the generated report's tables. */
@@ -95,17 +99,17 @@ function loadModels(): Map<string, Model> {
   return models;
 }
 
-function wrangler(target: string, ...args: string[]): string {
+function wrangler(target: Target, ...args: string[]): string {
   try {
-    return d1(target as Target, ...args);
+    return d1(target, ...args);
   } catch (e) {
     return fail((e as Error).message);
   }
 }
 
-function query<T>(target: string, sql: string): T[] {
+function query<T>(target: Target, sql: string): T[] {
   try {
-    return d1Query<T>(target as Target, sql);
+    return d1Query<T>(target, sql);
   } catch (e) {
     return fail((e as Error).message);
   }
@@ -193,8 +197,9 @@ async function main() {
   }
   const file = join(mkdtempSync(join(tmpdir(), 'schedule-')), 'daily.sql');
   writeFileSync(file, rows.join('\n'));
-  wrangler(args.target, '--file', file, ...(args.target === 'remote' ? ['--yes'] : []));
-  console.log(`wrote ${rows.length} dailies to the ${args.target} D1`);
+  wrangler(args.target, '--file', file, ...(args.target === 'local' ? [] : ['--yes']));
+  const db = args.target === 'staging' ? 'staging (pitwall-staging-db)' : args.target;
+  console.log(`wrote ${rows.length} dailies to the ${db} D1`);
 }
 
 await main();
