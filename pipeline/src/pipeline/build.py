@@ -766,6 +766,89 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "wet",
     },
+    # Eras wave A (Eras build plan 3.1): Era 7 races from the TUM f1-timing-database
+    # (`pipeline tum-ingest`; CC BY-NC-SA 3.0, credit in data/raw/<id>.provenance.json). The
+    # duel is the storyline pair of the Eras spec's race table (§4), the user's driver first.
+    # split "eras": outside the model's tune / held-out sets. Seeds are untuned: the races
+    # have no decision moments until step 6.2, and scripts/tune.ts plays those.
+    "bahrain-2014": {
+        "year": 2014,
+        "event": "Bahrain",
+        "source": "tum",
+        "name": "Bahrain 2014: Hamilton vs Rosberg",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "HAM",
+        "rival": "ROS",  # defend: Hamilton holds off Rosberg
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "monaco-2015": {
+        "year": 2015,
+        "event": "Monaco",
+        "source": "tum",
+        "name": "Monaco 2015: Hamilton vs Rosberg",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "HAM",
+        "rival": "ROS",  # Hamilton holds P1 (real: the late stop drops him behind Rosberg)
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "hungary-2015": {
+        "year": 2015,
+        "event": "Hungary",
+        "source": "tum",
+        "name": "Hungary 2015: Vettel vs Kvyat",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "VET",
+        "rival": "KVY",  # Vettel wins; defend race: the car behind
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "spain-2016": {
+        "year": 2016,
+        "event": "Spain",
+        "source": "tum",
+        "name": "Spain 2016: Verstappen vs Räikkönen",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "VER",
+        "rival": "RAI",  # defend: Verstappen holds off Räikkönen
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "monaco-2016": {
+        "year": 2016,
+        "event": "Monaco",
+        "source": "tum",
+        "name": "Monaco 2016: Ricciardo vs Hamilton",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "RIC",
+        "rival": "HAM",  # Ricciardo holds P1 (real: the slow stop hands Hamilton the win)
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "abu-dhabi-2016": {
+        "year": 2016,
+        "event": "Abu Dhabi",
+        "source": "tum",
+        "name": "Abu Dhabi 2016: Hamilton vs Rosberg",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "HAM",
+        "rival": "ROS",  # Hamilton backs Rosberg into the pack
+        "score_positions": 6,
+        "split": "eras",
+    },
 }
 
 
