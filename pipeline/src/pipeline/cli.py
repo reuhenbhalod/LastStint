@@ -114,12 +114,22 @@ def jolpica_cmd(
     dump: str = typer.Option(None, help="An extracted Jolpica CSV dump (default: newest cached)."),
     raw_dir: str = typer.Option(None, help="Where to write (default: data/raw/)."),
     force: bool = typer.Option(False, help="Overwrite an existing snapshot."),
+    estimate: bool = typer.Option(
+        True, help="Estimate compounds, SC laps and fuel loads (step 2.4)."
+    ),
+    estimates_dir: str = typer.Option(
+        None, help="Where the SC hand-check file goes (default: data/estimates/)."
+    ),
+    f1db_dir: str = typer.Option(
+        None, help="F1DB stops for races before 2011 (default: data/raw/f1db/)."
+    ),
 ) -> None:
     """Read a race from the Jolpica CSV dump into the raw parquet, status JSON and a
-    <race-id>.jolpica.json sidecar (results, standings, gaps), offline."""
+    <race-id>.jolpica.json sidecar (results, standings, gaps), offline. Before 2011 the stops
+    come from F1DB (`pipeline f1db`); the estimated fields are filled and listed."""
     from pathlib import Path
 
-    from . import jolpica
+    from . import estimates, jolpica
 
     match = re.fullmatch(r"(.+)-(\d{4})", race_id)
     if year is None and not match:
@@ -133,11 +143,30 @@ def jolpica_cmd(
     if ingest.raw_snapshot_path(race_id, out).exists() and not force:
         typer.echo(f"{race_id}: snapshot exists, skipped (--force to overwrite)")
         return
+    stops, stops_source = None, "given"
+    if year < jolpica.STOPS_FROM:
+        stops = jolpica.f1db_stops(race_id, Path(f1db_dir) if f1db_dir else jolpica.F1DB_DIR)
+        stops_source = "f1db"
+        if stops is None:
+            typer.echo(
+                f"  WARNING: no F1DB stops for {race_id} (run `pipeline f1db {race_id}`):"
+                " stints, tyre ages and pit times stay unknown",
+                err=True,
+            )
     try:
         got = jolpica.ingest_jolpica(
-            race_id, year, event, round_number, Path(dump) if dump else None, out
+            race_id,
+            year,
+            event,
+            round_number,
+            Path(dump) if dump else None,
+            out,
+            stops=stops,
+            stops_source=stops_source,
+            estimate=estimate,
+            estimates_dir=Path(estimates_dir) if estimates_dir else None,
         )
-    except (LookupError, FileNotFoundError, ingest.IncompleteDataError) as e:
+    except (LookupError, FileNotFoundError, ValueError, ingest.IncompleteDataError) as e:
         typer.echo(f"{race_id}: {e}", err=True)
         raise typer.Exit(code=1) from e
     side = got.sidecar
@@ -156,6 +185,12 @@ def jolpica_cmd(
     for gap in side["timingGaps"]:
         typer.echo(f"  timing gap: {gap}")
     typer.echo(f"  not supplied: {', '.join(side['missing'])}")
+    if "estimates" in side:
+        for line in estimates.report_lines(side["estimates"]):
+            typer.echo(f"  {line}")
+        hand = side["estimates"].get("safetyCars", {}).get("handCheck")
+        if hand:
+            typer.echo(f"  SC hand-check: {hand} (docs/eras-checks/2.4-estimates.md)")
 
 
 @app.command("wet-fit")
@@ -225,15 +260,44 @@ def incidents_cmd(
 def build(
     race_id: str = typer.Argument(None),
     all_races: bool = typer.Option(False, "--all", help="Build every registered race."),
+    raw_dir: str = typer.Option(None, help="Read the raw snapshot here (default: data/raw/)."),
+    out: str = typer.Option(
+        None, help="Write the race file and golden file here (default: data/races/, data/golden/)."
+    ),
+    eras_dir: str = typer.Option(None, help="Eras overlay files (default: data/eras/)."),
 ) -> None:
-    """Build data/races/<race-id>.json (schema-validated) and its golden file."""
-    for rid in _race_ids(race_id, all_races):
-        result = build_mod.build_race(rid)
-        out = export.write_race(result.model, races_dir=paths.RACES_DIR)
-        sim_reference.write_golden(result.model, sim_reference.GOLDEN_SEEDS)
-        typer.echo(f"{rid}: wrote {out.relative_to(paths.REPO_ROOT)} + golden")
+    """Build data/races/<race-id>.json (schema-validated) and its golden file. A race with an
+    Eras overlay (data/eras/<race-id>.json) gets its eras, provenance, rules and
+    storylineEvents keys; an ingested Jolpica race need not be registered. The report lists
+    each race's estimated fields and data quirks."""
+    from pathlib import Path
+
+    raw = Path(raw_dir) if raw_dir else paths.RAW_DIR
+    dirs = {"raw_dir": raw, "eras_dir": Path(eras_dir) if eras_dir else build_mod.ERAS_DIR}
+    if race_id is not None and not all_races and race_id not in build_mod.RACES:
+        if build_mod.load_sidecar(race_id, raw) is None:
+            _race_ids(race_id, all_races)  # raises: unknown, and no Jolpica ingest to build
+        ids = [race_id]
+    else:
+        ids = _race_ids(race_id, all_races)
+    races_dir = Path(out) if out else paths.RACES_DIR
+    golden_dir = Path(out) / "golden" if out else None
+    for rid in ids:
+        try:
+            result = build_mod.build_race(rid, **dirs)
+        except ValueError as e:  # a bad overlay or estimate: say which race, no traceback
+            typer.echo(f"{rid}: {e}", err=True)
+            raise typer.Exit(code=1) from e
+        written = export.write_race(result.model, races_dir=races_dir)
+        sim_reference.write_golden(result.model, sim_reference.GOLDEN_SEEDS, golden_dir)
+        shown = written.resolve()
+        if shown.is_relative_to(paths.REPO_ROOT):
+            shown = shown.relative_to(paths.REPO_ROOT)
+        typer.echo(f"{rid}: wrote {shown} + golden")
         for note in result.notes:
             typer.echo(f"  note: {note}")
+        for line in result.estimates:
+            typer.echo(f"  {line}")
 
 
 @app.command()

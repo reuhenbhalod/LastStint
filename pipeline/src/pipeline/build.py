@@ -7,14 +7,33 @@ the tests, the golden-file generator, and the CLI so they never drift.
 
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass, field
 from pathlib import Path
 
 import pandas as pd
 
-from . import assemble, clean, events, faults, fit, incidents, ingest, scenario, track, wet
+from . import (
+    assemble,
+    clean,
+    estimates,
+    events,
+    export,
+    faults,
+    fit,
+    incidents,
+    ingest,
+    scenario,
+    track,
+    wet,
+)
 from . import pace as pace_mod
-from .paths import RAW_DIR
+from .paths import DATA_DIR, RAW_DIR
+
+# Authored Eras content (eras build plan, "Eras overlay files"): data/eras/<race-id>.json,
+# with up to four keys, applied over the built model by export.with_eras_fields.
+ERAS_DIR = DATA_DIR / "eras"
+OVERLAY_KEYS = ("eras", "provenance", "rules", "storylineEvents")
 
 # Race registry: metadata that isn't derivable from the timing data. `split` is the Phase
 # 1-2 perfection spec's fixed tune / held-out assignment (A1): held-out races are never used
@@ -776,16 +795,45 @@ class BuildResult:
     model: dict
     laps: pd.DataFrame
     notes: list[str] = field(default_factory=list)  # priors/fallbacks the build relied on
+    estimates: list[str] = field(default_factory=list)  # estimated fields and quirks (2.4)
 
 
-def resolved_meta(race_id: str, laps: pd.DataFrame | None = None) -> dict:
-    """Registry entry with the automatic duel filled in (runner-up vs winner) where unset."""
-    if race_id not in RACES:
+def load_sidecar(race_id: str, raw_dir: Path = RAW_DIR) -> dict | None:
+    """The race's Jolpica sidecar (<race-id>.jolpica.json), if it was ingested from Jolpica."""
+    path = Path(raw_dir) / f"{race_id}.jolpica.json"
+    return json.loads(path.read_text()) if path.exists() else None
+
+
+def eras_meta(race_id: str, sidecar: dict) -> dict:
+    """A registry entry for a Jolpica race not in RACES (the Eras races until Phase 3 registers
+    them): its season's era, the automatic duel and the D3 takeover, seed 1."""
+    year = int(sidecar["year"])
+    return {
+        "year": year,
+        "event": sidecar.get("eventName"),
+        "name": f"{race_id} (Eras, unregistered)",
+        "era": estimates.era_for_year(year),
+        "takeover_lap": None,
+        "seed": 1,
+        "user_side": None,
+        "rival": None,
+        "score_positions": 6,
+        "split": "eras",
+    }
+
+
+def resolved_meta(race_id: str, laps: pd.DataFrame | None = None, raw_dir: Path = RAW_DIR) -> dict:
+    """Registry entry with the automatic duel filled in (runner-up vs winner) where unset. A
+    race not in RACES with a Jolpica sidecar in raw_dir gets eras_meta."""
+    if race_id in RACES:
+        meta = dict(RACES[race_id])
+    elif (sidecar := load_sidecar(race_id, raw_dir)) is not None:
+        meta = eras_meta(race_id, sidecar)
+    else:
         raise KeyError(f"unknown race '{race_id}'; known: {sorted(RACES)}")
-    meta = dict(RACES[race_id])
     if meta["user_side"] is None or meta["rival"] is None:
         if laps is None:
-            laps = pd.read_parquet(ingest.raw_snapshot_path(race_id))
+            laps = pd.read_parquet(ingest.raw_snapshot_path(race_id, raw_dir))
         winner, runner_up = assemble.finishing_order(laps)[:2]
         meta["user_side"], meta["rival"] = runner_up, winner
     return meta
@@ -808,12 +856,25 @@ def _from_raw(load, race_id: str, raw_dir: Path):
     return load(race_id) if raw_dir == RAW_DIR else load(race_id, raw_dir)
 
 
+# A refuelling race's fuel effect (s/lap) until eras build plan 4.2: the fit's fuel term is a
+# slope on the race lap, which refuelling breaks (the car is refilled at each stop, so the
+# weight saws up and down), and it can come out negative. 0 = no race-long weight trend.
+REFUELLING_FUEL = 0.0
+
+
+def _dir_arg(raw_dir: Path) -> tuple[Path, ...]:
+    """raw_dir as an extra argument only when it isn't the default, so the one-argument
+    loaders existing tests patch in (test_tum.py) keep working."""
+    return () if Path(raw_dir) == RAW_DIR else (Path(raw_dir),)
+
+
 def dry_fit(
     race_id: str,
     laps: pd.DataFrame,
     era: str,
     fault_facts: list[dict] | None = None,
     raw_dir: Path = RAW_DIR,
+    refuelling: bool = False,
 ) -> DryFit:
     clean_df, traffic_df, _ = clean.clean_laps(laps)
     # A faulted car's laps while the fault lasts aren't its pace (faults.py fits the loss).
@@ -840,9 +901,42 @@ def dry_fit(
         pace_laps=clean_df if pace_mod.CLEAR_AIR else pace_laps,
         fallback_pace_laps=pace_laps,
         era=era,
-        fixed_fuel=wet.FUEL_PRIOR if wet_race else None,
+        fixed_fuel=REFUELLING_FUEL if refuelling else wet.FUEL_PRIOR if wet_race else None,
     )
     return DryFit(clean_df, traffic_df, fitted, rain_data, wet_race)
+
+
+def load_overlay(race_id: str, eras_dir: Path = ERAS_DIR) -> dict | None:
+    """data/eras/<race-id>.json, the race's authored Eras keys; None without one. A key that
+    isn't one of OVERLAY_KEYS is an error (a typo would otherwise be dropped silently)."""
+    path = Path(eras_dir) / f"{race_id}.json"
+    if not path.exists():
+        return None
+    overlay = json.loads(path.read_text())
+    unknown = sorted(set(overlay) - set(OVERLAY_KEYS))
+    if unknown:
+        raise ValueError(f"{path}: unknown keys {unknown} (allowed: {list(OVERLAY_KEYS)})")
+    return overlay
+
+
+def apply_eras(model: dict, estimated: list[str], overlay: dict | None) -> tuple[dict, list[str]]:
+    """The model with its provenance (the estimated fields, merged with the overlay's) and the
+    overlay's eras / rules / storylineEvents, via export.with_eras_fields. Unchanged (the same
+    dict) when there's nothing to apply. Returns the model and report lines."""
+    prov = estimates.provenance(estimated, (overlay or {}).get("provenance"))
+    if prov is None and not overlay:
+        return model, []
+    overlay = overlay or {}
+    storyline = [(int(lap), str(kind)) for lap, kind in overlay.get("storylineEvents", [])]
+    out = export.with_eras_fields(
+        model,
+        eras=overlay.get("eras"),
+        provenance=prov,
+        rules=overlay.get("rules"),
+        storyline_events=storyline or None,
+    )
+    lines = [f"overlay: {', '.join(k for k in OVERLAY_KEYS if k in overlay)}"] if overlay else []
+    return out, lines
 
 
 def build_race(
@@ -850,17 +944,22 @@ def build_race(
     laps: pd.DataFrame | None = None,
     raw_dir: Path = RAW_DIR,
     fault_facts: list[dict] | None = None,
+    *,
+    eras_dir: Path = ERAS_DIR,
 ) -> BuildResult:
-    """Build a validated race-model dict for a registered race, with its build notes.
+    """Build a validated race-model dict for a registered race (or an ingested Jolpica one),
+    with its build notes, its estimates applied as provenance and its Eras overlay.
     `raw_dir`: where its snapshot lives; `fault_facts`: its car faults (default: its FAULT
     items in data/incidents.json)."""
     if laps is None:
         laps = pd.read_parquet(ingest.raw_snapshot_path(race_id, raw_dir))
-    meta = resolved_meta(race_id, laps)
+    meta = resolved_meta(race_id, laps, raw_dir)
     if fault_facts is None:
         fault_facts = incidents.fault_facts(race_id)
+    block = (load_sidecar(race_id, raw_dir) or {}).get("estimates")
+    refuelling = "fuelLoads" in (block or {}).get("estimated", [])
 
-    dry = dry_fit(race_id, laps, meta["era"], fault_facts, raw_dir)
+    dry = dry_fit(race_id, laps, meta["era"], fault_facts, raw_dir, refuelling)
     clean_df, traffic_df, fitted = dry.clean, dry.traffic, dry.fitted
     weather = wet.weather_block(laps, dry.rain, fitted, wet.load_curves()) if dry.wet else None
     wet_pace = (
@@ -896,10 +995,26 @@ def build_race(
         wet_pace=wet_pace,
         fault_facts=fault_facts,
     )
-    return BuildResult(model=model, laps=laps, notes=[*fitted.prior_notes, *params.notes])
+    model, overlay_lines = apply_eras(
+        model, (block or {}).get("estimated", []), load_overlay(race_id, eras_dir)
+    )
+    report = [*(estimates.report_lines(block) if block else []), *overlay_lines]
+    if refuelling:
+        report.append(
+            f"  fuel effect fixed at {REFUELLING_FUEL} s/lap: a refuelling race (step 4.2)"
+        )
+    return BuildResult(
+        model=model,
+        laps=laps,
+        notes=[*fitted.prior_notes, *params.notes],
+        estimates=report,
+    )
 
 
-def build_race_model(race_id: str, laps: pd.DataFrame | None = None) -> tuple[dict, pd.DataFrame]:
-    """Build a validated race-model dict for a registered race. Returns (model, laps)."""
-    result = build_race(race_id, laps)
+def build_race_model(
+    race_id: str, laps: pd.DataFrame | None = None, **dirs: Path
+) -> tuple[dict, pd.DataFrame]:
+    """Build a validated race-model dict for a registered race. Returns (model, laps).
+    `dirs`: build_race's raw_dir / eras_dir."""
+    result = build_race(race_id, laps, **dirs)
     return result.model, result.laps
