@@ -25,6 +25,14 @@ describe('Eras screens', () => {
     expect(html).toContain('href="/eras/history"');
   });
 
+  it('links the data credits from every Eras screen', () => {
+    for (const path of ['/eras', '/eras/2', '/eras/history', '/eras/12']) {
+      const html = render(path);
+      expect(html, path).toContain('href="/credits"');
+      expect(html, path).toContain('data credits</a>');
+    }
+  });
+
   it("starts an era's detail loading, under its name", () => {
     const html = render('/eras/2');
     expect(html).toContain('Senna vs Prost</h1>');
