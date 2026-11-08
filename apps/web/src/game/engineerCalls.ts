@@ -37,6 +37,7 @@ import { FUEL_BACK, FUEL_SHORT, fuelReading, liftText, marginText } from './fuel
 import {
   type BattleLine,
   type BattleOdds,
+  type BattleTag,
   FRESH_TYRES,
   type QuickCall,
   type QuickOption,
@@ -164,6 +165,15 @@ function battleCall(
       contact: cfg.contactBase * (m.contact ?? 1),
     };
   };
+  // How the fight stands with no special move (DRS counts): the meter (round 3 R2).
+  const still = passProbability(model.track.overtakeModel, advantage, gap, drs);
+  const meter = attacking ? still : 1 - still;
+  // Each move's risk instead of its odds: by its contact chance.
+  const tag = (move: BattleMove): BattleTag => {
+    if (move === 'let-go') return 'Gives way';
+    const contact = cfg.moves[move].contact ?? 1;
+    return contact < 1 ? 'Safer' : contact <= 2 ? 'Balanced' : 'Risky';
+  };
   const opt = (
     id: string,
     label: string,
@@ -175,6 +185,7 @@ function battleCall(
     label,
     note: read(move) ? `${what} · he’s ${attacking ? 'covering' : 'expecting'} it now` : what,
     odds: odds(move),
+    tag: tag(move),
     line,
     call: battle(next, move),
   });
@@ -241,6 +252,7 @@ function battleCall(
       corner,
       attacking: true,
       gap,
+      meter,
       stats,
       asked: false,
       text: battleLine(race.lap, other, rival, gap, drsRange, true, eng?.lastMove ?? null),
@@ -256,6 +268,7 @@ function battleCall(
     corner,
     attacking: false,
     gap,
+    meter,
     stats,
     asked: false,
     text: battleLine(race.lap, other, rival, gap, drsRange, false, eng?.lastMove ?? null),

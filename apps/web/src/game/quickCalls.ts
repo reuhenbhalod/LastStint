@@ -18,6 +18,9 @@ import type { LiveCall } from './refusal.js';
 /** Where a battle option is drawn on the track (battles and trust spec D1). */
 export type BattleLine = 'inside' | 'outside' | 'wait' | 'boost' | 'hard' | 'let';
 
+/** How risky a battle move is, from its contact chance (shown instead of the odds). */
+export type BattleTag = 'Safer' | 'Balanced' | 'Risky' | 'Gives way';
+
 /** A battle option's odds: the good outcome (a pass, or holding him off) and contact. */
 export interface BattleOdds {
   good: number;
@@ -30,8 +33,11 @@ export interface QuickOption {
   label: string;
   /** A short line under the label: what it does (race engineer calls). */
   note?: string;
-  /** A battle option: its odds and where it's drawn. */
+  /** A battle option: its odds (the race rolls them; not shown, round 3 R2) and where it's
+   * drawn. */
   odds?: BattleOdds;
+  /** A battle option's risk, shown instead of its odds (round 3 R2). */
+  tag?: BattleTag;
   line?: BattleLine;
   /** The order this answer gives (null: no change). */
   call: Decision | null;
@@ -59,6 +65,9 @@ export interface QuickCall {
   corner?: number;
   /** A battle: you're the attacker (else defending), and the gap. */
   attacking?: boolean;
+  /** A battle: the chance of the good outcome (a pass, or holding him off) with no special move:
+   * how the fight stands (round 3 R2). */
+  meter?: number;
   gap?: number;
   /** The facts for the call (gap, DRS, tyres, pace, battery). */
   stats?: Array<{ label: string; value: string }>;
