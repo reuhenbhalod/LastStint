@@ -116,10 +116,13 @@ export type FaultKind = 'gear-stuck' | 'power-loss' | 'puncture' | 'tyre-failure
 
 export interface RaceEvent {
   lap: number;
-  type: 'SC' | 'VSC' | 'RED' | 'RAIN' | 'RETIREMENT' | 'FAULT';
+  type: 'SC' | 'VSC' | 'RED' | 'RAIN' | 'RETIREMENT' | 'FAULT' | 'TEAM_ORDER';
   /** How long it lasts. A FAULT without it lasts to the flag (or its car's next stop). */
   laps?: number;
+  /** A TEAM_ORDER: the car told to let `other` by (scripted.ts). */
   driver?: string;
+  /** A TEAM_ORDER (Eras builds; sourced in data/incidents.json): the car let by. */
+  other?: string;
   /** A RED event: how the race resumed (eras build plan 4.3, redflag.ts). Absent: it didn't. */
   restart?: 'standing' | 'rolling';
   /** Defines the storyline: Legend difficulty always runs it on its real lap (eras spec 8). */
@@ -234,6 +237,47 @@ export interface ErasBlock {
   hardCalls?: Record<string, number>;
   /** The short era-appropriate intro shown before the race. */
   briefing?: string;
+  /**
+   * Avoidable storyline retirements (owner decision, Nov 8 2026; scripted.ts): the player's
+   * car retires on its real lap only if the player repeats the real call. Scripted cars keep
+   * their real retirements.
+   */
+  storylineRetirements?: StorylineRetirement[];
+}
+
+/**
+ * The real call behind a storyline retirement (scripted.ts conditionMet). `mode`: the
+ * standing mode `key` was `value` on every lap from `fromLap` to the retirement lap (Monaco
+ * 1988: still pushing). `tyre_age`: the car started the retirement lap on tyres at least
+ * `minLaps` old (Australia 1986: the original set). `pressure`: `driver` started the lap behind
+ * the player's car, within `seconds` (Australia 1994: Hill catching). `fuel`: the fuel model
+ * decides (the frozen retirement is dropped; the car stops if its tank runs dry).
+ */
+export type StorylineCondition =
+  | { type: 'mode'; key: keyof Modes; value: ModeValue; fromLap: number }
+  | { type: 'tyre_age'; minLaps: number }
+  | { type: 'pressure'; driver: string; seconds: number }
+  | { type: 'fuel' };
+
+export interface StorylineRetirement {
+  /** The storyline driver: conditional only when he is the player's car. */
+  driver: string;
+  condition: StorylineCondition;
+  /** Other cars whose real retirement is the same incident (a collision): they retire with
+   * the player's car, or not at all. */
+  alsoRetires?: string[];
+  /** What really happened, in words. */
+  real: string;
+  /** Where the fact and the call were checked (http(s) URLs, '; '-separated). */
+  source: string;
+}
+
+/** The SC restart (track.restart; pipeline restart.py): the restart lap's extra time for the
+ * car k places behind the leader is jump + spread x min(k, places). */
+export interface RestartModel {
+  jump: number;
+  spread: number;
+  places: number;
 }
 
 /** Fields estimated rather than measured (eras build plan 2.4). */
@@ -307,6 +351,9 @@ export interface RaceModel {
     /** A refuelling race's fill model, fitted from the real stops (eras build plan 4.2;
      * refuel.ts). Absent: the physical prior (0.25 s per lap of fuel). */
     refuel?: RefuelModel;
+    /** The SC restart's leader jump and field spread (Eras builds; scripted.ts). Absent: a
+     * restart lap is an ordinary green lap. */
+    restart?: RestartModel;
   };
   compounds: Record<Compound, CompoundModel>;
   drivers: DriverModel[];
@@ -432,7 +479,13 @@ export interface CarState {
  * yielding car is directly ahead within the swap window. `holdUp`: the teammate defends
  * against the rival whenever directly ahead of it, until `release`.
  */
-export type TeamOrder = 'letTeammatePast' | 'teammateLetsYouPast' | 'holdUp' | 'release';
+export type TeamOrder =
+  | 'letTeammatePast'
+  | 'teammateLetsYouPast'
+  | 'holdUp'
+  | 'release'
+  /** Obey a scripted team order telling the player's car to let a car by (TEAM_ORDER). */
+  | 'comply';
 
 /**
  * Race engineer spec: a battle call for one lap, against the car directly behind (the defending
@@ -502,6 +555,11 @@ export interface RaceNote {
     | 'rival-stays-out'
     | 'error'
     | 'team-swap'
+    // A scripted team order or let-by (TEAM_ORDER): driver the car let by, detail the yielder.
+    | 'team-order'
+    // An avoidable storyline retirement (eras.storylineRetirements): detail 'retired' (the
+    // player repeated the real call) or 'avoided'.
+    | 'storyline'
     | 'incident'
     // Race engineer spec (the user's car, live play):
     | 'battle' // detail: 'passed' | 'held' | 'lost' | 'stuck' (other: the car fought)

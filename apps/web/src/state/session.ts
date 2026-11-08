@@ -144,6 +144,7 @@ const ORDER_COPY: Record<Extract<Decision, { kind: 'teamOrder' }>['order'], stri
   release: 'Team-mate released: race your own race.',
   teammateLetsYouPast: 'Team-mate told to let you through.',
   letTeammatePast: 'Let your team-mate through, please.',
+  comply: 'Let him through, please.',
 };
 
 export class GameSession {

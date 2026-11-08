@@ -1,4 +1,18 @@
 {
+  "eras": {
+    "eraId": 1,
+    "order": 4,
+    "storylineRetirements": [
+      {
+        "driver": "ROSK",
+        "condition": {
+          "type": "fuel"
+        },
+        "real": "Rosberg ran minimum boost all race on the 195-litre limit, his gauge 'exactly on schedule to cross the line with a zero reading'; second, about two seconds behind Piquet at the start of the last lap, he ran dry at the first chicane and pulled off (classified fifth, a lap down)",
+        "source": "https://www.autosport.com/f1/feature/3783/grand-prix-gold-german-gp-1986; https://en.wikipedia.org/wiki/1986_German_Grand_Prix"
+      }
+    ]
+  },
   "rules": {
     "twoCompound": false,
     "tyreChanges": true,

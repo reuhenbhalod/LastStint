@@ -1,4 +1,23 @@
 {
+  "eras": {
+    "eraId": 3,
+    "order": 2,
+    "storylineRetirements": [
+      {
+        "driver": "MSCM",
+        "condition": {
+          "type": "pressure",
+          "driver": "HIL",
+          "seconds": 2.0
+        },
+        "alsoRetires": [
+          "HIL"
+        ],
+        "real": "Hill was catching Schumacher when the Benetton went off at East Terrace and hit the wall; Schumacher pulled back across the track, Hill tried to pass at the next corner and they collided as Schumacher turned in: Schumacher out on the spot, Hill retired with front-left suspension damage",
+        "source": "https://en.wikipedia.org/wiki/1994_Australian_Grand_Prix"
+      }
+    ]
+  },
   "rules": {
     "twoCompound": false,
     "tyreChanges": true,

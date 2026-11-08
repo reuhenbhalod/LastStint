@@ -57,6 +57,16 @@ const FULL_ERAS: ErasBlock = {
   hidden: { type: 'margin', seconds: 3, label: 'Win by more than 3 seconds' },
   hardCalls: { VER: 6, HAM: 4 },
   briefing: 'Short era-appropriate intro shown before the race.',
+  // Live play only (scripted.ts): a replay keeps every real retirement.
+  storylineRetirements: [
+    {
+      driver: 'LAT',
+      condition: { type: 'pressure', driver: 'PER', seconds: 2 },
+      alsoRetires: ['PER'],
+      real: 'A collision',
+      source: 'https://en.wikipedia.org/wiki/2021_Abu_Dhabi_Grand_Prix',
+    },
+  ],
 };
 
 describe('schema v11', () => {

@@ -1,0 +1,710 @@
+{
+ "_comment": "Eras model fixes M4 parity vectors: data/races/abu-dhabi-2021.json with track.restart and these TEAM_ORDER events, run by the Python reference sim, and the storyline conditions (storyline.condition_met). Checked by pipeline/tests/test_scripted.py and packages/sim/tests/scripted.test.ts. Regenerate with SCRIPTED_PARITY_WRITE=1.",
+ "race": "abu-dhabi-2021",
+ "restart": {
+  "jump": 0.15,
+  "spread": 0.44,
+  "places": 8
+ },
+ "orders": [
+  {
+   "lap": 45,
+   "type": "TEAM_ORDER",
+   "driver": "SAI",
+   "other": "BOT"
+  },
+  {
+   "lap": 58,
+   "type": "TEAM_ORDER",
+   "driver": "HAM",
+   "other": "VER"
+  }
+ ],
+ "results": {
+  "1": {
+   "order": [
+    "VER",
+    "HAM",
+    "BOT",
+    "SAI",
+    "TSU",
+    "GAS",
+    "NOR",
+    "OCO",
+    "ALO",
+    "LEC",
+    "VET",
+    "RIC",
+    "STR",
+    "MSC",
+    "PER",
+    "LAT"
+   ],
+   "gaps": {
+    "VER": 0.0,
+    "HAM": 0.05,
+    "BOT": 2.253,
+    "SAI": 4.051,
+    "TSU": 4.351,
+    "GAS": 4.651,
+    "NOR": 6.523,
+    "OCO": 7.904,
+    "ALO": 104.913,
+    "LEC": 104.963,
+    "VET": 111.528,
+    "RIC": 116.124,
+    "STR": 132.024,
+    "MSC": 167.073
+   },
+   "times": {
+    "VER": 2373.338,
+    "HAM": 2373.388,
+    "BOT": 2375.592,
+    "SAI": 2377.389,
+    "TSU": 2377.689,
+    "GAS": 2377.989,
+    "NOR": 2379.862,
+    "OCO": 2381.242,
+    "ALO": 2478.251,
+    "LEC": 2478.301,
+    "VET": 2484.866,
+    "RIC": 2489.462,
+    "STR": 2505.362,
+    "MSC": 2540.411
+   },
+   "finishers": [
+    "VER",
+    "HAM",
+    "BOT",
+    "SAI",
+    "TSU",
+    "GAS",
+    "NOR",
+    "OCO",
+    "ALO",
+    "LEC",
+    "VET",
+    "RIC",
+    "STR",
+    "MSC"
+   ]
+  },
+  "2": {
+   "order": [
+    "VER",
+    "HAM",
+    "BOT",
+    "TSU",
+    "SAI",
+    "GAS",
+    "NOR",
+    "OCO",
+    "ALO",
+    "LEC",
+    "VET",
+    "RIC",
+    "STR",
+    "MSC",
+    "PER",
+    "LAT"
+   ],
+   "gaps": {
+    "VER": 0.0,
+    "HAM": 0.05,
+    "BOT": 2.73,
+    "TSU": 4.161,
+    "SAI": 4.211,
+    "GAS": 5.287,
+    "NOR": 94.396,
+    "OCO": 100.669,
+    "ALO": 105.389,
+    "LEC": 105.689,
+    "VET": 111.08,
+    "RIC": 113.861,
+    "STR": 132.97,
+    "MSC": 170.821
+   },
+   "times": {
+    "VER": 2373.02,
+    "HAM": 2373.07,
+    "BOT": 2375.751,
+    "TSU": 2377.181,
+    "SAI": 2377.231,
+    "GAS": 2378.308,
+    "NOR": 2467.416,
+    "OCO": 2473.689,
+    "ALO": 2478.409,
+    "LEC": 2478.709,
+    "VET": 2484.1,
+    "RIC": 2486.881,
+    "STR": 2505.991,
+    "MSC": 2543.841
+   },
+   "finishers": [
+    "VER",
+    "HAM",
+    "BOT",
+    "TSU",
+    "SAI",
+    "GAS",
+    "NOR",
+    "OCO",
+    "ALO",
+    "LEC",
+    "VET",
+    "RIC",
+    "STR",
+    "MSC"
+   ]
+  },
+  "3": {
+   "order": [
+    "VER",
+    "HAM",
+    "BOT",
+    "SAI",
+    "TSU",
+    "GAS",
+    "NOR",
+    "OCO",
+    "LEC",
+    "ALO",
+    "RIC",
+    "VET",
+    "STR",
+    "MSC",
+    "PER",
+    "LAT"
+   ],
+   "gaps": {
+    "VER": 0.0,
+    "HAM": 0.449,
+    "BOT": 2.93,
+    "SAI": 3.895,
+    "TSU": 4.195,
+    "GAS": 4.495,
+    "NOR": 94.821,
+    "OCO": 98.744,
+    "LEC": 99.044,
+    "ALO": 102.975,
+    "RIC": 109.292,
+    "VET": 110.608,
+    "STR": 132.503,
+    "MSC": 164.698
+   },
+   "times": {
+    "VER": 2375.391,
+    "HAM": 2375.84,
+    "BOT": 2378.32,
+    "SAI": 2379.286,
+    "TSU": 2379.586,
+    "GAS": 2379.886,
+    "NOR": 2470.212,
+    "OCO": 2474.135,
+    "LEC": 2474.435,
+    "ALO": 2478.366,
+    "RIC": 2484.683,
+    "VET": 2485.999,
+    "STR": 2507.894,
+    "MSC": 2540.089
+   },
+   "finishers": [
+    "VER",
+    "HAM",
+    "BOT",
+    "SAI",
+    "TSU",
+    "GAS",
+    "NOR",
+    "OCO",
+    "LEC",
+    "ALO",
+    "RIC",
+    "VET",
+    "STR",
+    "MSC"
+   ]
+  },
+  "4": {
+   "order": [
+    "VER",
+    "HAM",
+    "BOT",
+    "TSU",
+    "GAS",
+    "SAI",
+    "NOR",
+    "OCO",
+    "LEC",
+    "ALO",
+    "VET",
+    "RIC",
+    "STR",
+    "MSC",
+    "PER",
+    "LAT"
+   ],
+   "gaps": {
+    "VER": 0.0,
+    "HAM": 0.05,
+    "BOT": 2.519,
+    "TSU": 3.959,
+    "GAS": 4.453,
+    "SAI": 5.012,
+    "NOR": 94.347,
+    "OCO": 100.084,
+    "LEC": 101.7,
+    "ALO": 106.364,
+    "VET": 112.795,
+    "RIC": 113.68,
+    "STR": 132.083,
+    "MSC": 165.631
+   },
+   "times": {
+    "VER": 2373.672,
+    "HAM": 2373.722,
+    "BOT": 2376.191,
+    "TSU": 2377.631,
+    "GAS": 2378.125,
+    "SAI": 2378.684,
+    "NOR": 2468.019,
+    "OCO": 2473.756,
+    "LEC": 2475.372,
+    "ALO": 2480.036,
+    "VET": 2486.467,
+    "RIC": 2487.352,
+    "STR": 2505.755,
+    "MSC": 2539.303
+   },
+   "finishers": [
+    "VER",
+    "HAM",
+    "BOT",
+    "TSU",
+    "GAS",
+    "SAI",
+    "NOR",
+    "OCO",
+    "LEC",
+    "ALO",
+    "VET",
+    "RIC",
+    "STR",
+    "MSC"
+   ]
+  },
+  "5": {
+   "order": [
+    "VER",
+    "HAM",
+    "BOT",
+    "TSU",
+    "SAI",
+    "GAS",
+    "NOR",
+    "OCO",
+    "LEC",
+    "ALO",
+    "VET",
+    "RIC",
+    "STR",
+    "MSC",
+    "PER",
+    "LAT"
+   ],
+   "gaps": {
+    "VER": 0.0,
+    "HAM": 0.5,
+    "BOT": 2.594,
+    "TSU": 3.394,
+    "SAI": 3.702,
+    "GAS": 4.117,
+    "NOR": 93.849,
+    "OCO": 98.662,
+    "LEC": 106.345,
+    "ALO": 107.41,
+    "VET": 112.627,
+    "RIC": 117.471,
+    "STR": 130.991,
+    "MSC": 168.528
+   },
+   "times": {
+    "VER": 2373.17,
+    "HAM": 2373.67,
+    "BOT": 2375.764,
+    "TSU": 2376.564,
+    "SAI": 2376.871,
+    "GAS": 2377.287,
+    "NOR": 2467.019,
+    "OCO": 2471.832,
+    "LEC": 2479.515,
+    "ALO": 2480.58,
+    "VET": 2485.797,
+    "RIC": 2490.64,
+    "STR": 2504.161,
+    "MSC": 2541.698
+   },
+   "finishers": [
+    "VER",
+    "HAM",
+    "BOT",
+    "TSU",
+    "SAI",
+    "GAS",
+    "NOR",
+    "OCO",
+    "LEC",
+    "ALO",
+    "VET",
+    "RIC",
+    "STR",
+    "MSC"
+   ]
+  },
+  "6": {
+   "order": [
+    "VER",
+    "HAM",
+    "BOT",
+    "SAI",
+    "TSU",
+    "NOR",
+    "OCO",
+    "LEC",
+    "ALO",
+    "GAS",
+    "VET",
+    "RIC",
+    "STR",
+    "MSC",
+    "PER",
+    "LAT"
+   ],
+   "gaps": {
+    "VER": 0.0,
+    "HAM": 0.597,
+    "BOT": 2.531,
+    "SAI": 4.429,
+    "TSU": 4.729,
+    "NOR": 5.34,
+    "OCO": 98.169,
+    "LEC": 103.132,
+    "ALO": 104.777,
+    "GAS": 108.19,
+    "VET": 109.917,
+    "RIC": 114.618,
+    "STR": 133.522,
+    "MSC": 170.948
+   },
+   "times": {
+    "VER": 2373.233,
+    "HAM": 2373.83,
+    "BOT": 2375.764,
+    "SAI": 2377.662,
+    "TSU": 2377.962,
+    "NOR": 2378.573,
+    "OCO": 2471.401,
+    "LEC": 2476.365,
+    "ALO": 2478.01,
+    "GAS": 2481.422,
+    "VET": 2483.15,
+    "RIC": 2487.851,
+    "STR": 2506.754,
+    "MSC": 2544.181
+   },
+   "finishers": [
+    "VER",
+    "HAM",
+    "BOT",
+    "SAI",
+    "TSU",
+    "NOR",
+    "OCO",
+    "LEC",
+    "ALO",
+    "GAS",
+    "VET",
+    "RIC",
+    "STR",
+    "MSC"
+   ]
+  },
+  "7": {
+   "order": [
+    "VER",
+    "HAM",
+    "BOT",
+    "TSU",
+    "SAI",
+    "GAS",
+    "NOR",
+    "OCO",
+    "ALO",
+    "LEC",
+    "VET",
+    "RIC",
+    "STR",
+    "MSC",
+    "PER",
+    "LAT"
+   ],
+   "gaps": {
+    "VER": 0.0,
+    "HAM": 0.623,
+    "BOT": 2.269,
+    "TSU": 4.15,
+    "SAI": 4.2,
+    "GAS": 4.989,
+    "NOR": 94.328,
+    "OCO": 100.139,
+    "ALO": 100.439,
+    "LEC": 103.458,
+    "VET": 109.553,
+    "RIC": 113.182,
+    "STR": 132.278,
+    "MSC": 164.225
+   },
+   "times": {
+    "VER": 2375.026,
+    "HAM": 2375.649,
+    "BOT": 2377.295,
+    "TSU": 2379.176,
+    "SAI": 2379.226,
+    "GAS": 2380.014,
+    "NOR": 2469.353,
+    "OCO": 2475.165,
+    "ALO": 2475.465,
+    "LEC": 2478.484,
+    "VET": 2484.579,
+    "RIC": 2488.207,
+    "STR": 2507.304,
+    "MSC": 2539.251
+   },
+   "finishers": [
+    "VER",
+    "HAM",
+    "BOT",
+    "TSU",
+    "SAI",
+    "GAS",
+    "NOR",
+    "OCO",
+    "ALO",
+    "LEC",
+    "VET",
+    "RIC",
+    "STR",
+    "MSC"
+   ]
+  },
+  "8": {
+   "order": [
+    "VER",
+    "HAM",
+    "BOT",
+    "SAI",
+    "GAS",
+    "TSU",
+    "NOR",
+    "OCO",
+    "ALO",
+    "LEC",
+    "VET",
+    "RIC",
+    "STR",
+    "MSC",
+    "PER",
+    "LAT"
+   ],
+   "gaps": {
+    "VER": 0.0,
+    "HAM": 0.629,
+    "BOT": 2.776,
+    "SAI": 4.478,
+    "GAS": 4.728,
+    "TSU": 4.778,
+    "NOR": 97.266,
+    "OCO": 100.961,
+    "ALO": 101.261,
+    "LEC": 104.132,
+    "VET": 110.455,
+    "RIC": 116.312,
+    "STR": 133.085,
+    "MSC": 165.538
+   },
+   "times": {
+    "VER": 2374.574,
+    "HAM": 2375.203,
+    "BOT": 2377.351,
+    "SAI": 2379.052,
+    "GAS": 2379.302,
+    "TSU": 2379.352,
+    "NOR": 2471.84,
+    "OCO": 2475.535,
+    "ALO": 2475.835,
+    "LEC": 2478.707,
+    "VET": 2485.029,
+    "RIC": 2490.887,
+    "STR": 2507.659,
+    "MSC": 2540.112
+   },
+   "finishers": [
+    "VER",
+    "HAM",
+    "BOT",
+    "SAI",
+    "GAS",
+    "TSU",
+    "NOR",
+    "OCO",
+    "ALO",
+    "LEC",
+    "VET",
+    "RIC",
+    "STR",
+    "MSC"
+   ]
+  }
+ },
+ "storylineLaps": [
+  {
+   "lap": 40,
+   "modes": {
+    "pace": "standard"
+   },
+   "tyreAge": 40,
+   "gaps": {
+    "HIL": 1.5
+   }
+  },
+  {
+   "lap": 41,
+   "modes": {
+    "pace": "push"
+   },
+   "tyreAge": 41,
+   "gaps": {
+    "HIL": 0.8
+   }
+  },
+  {
+   "lap": 42,
+   "modes": {
+    "pace": "push"
+   },
+   "tyreAge": 0,
+   "gaps": {
+    "HIL": -2.0
+   }
+  }
+ ],
+ "conditions": [
+  {
+   "condition": {
+    "type": "mode",
+    "key": "pace",
+    "value": "push",
+    "fromLap": 41
+   },
+   "lap": 42,
+   "met": true
+  },
+  {
+   "condition": {
+    "type": "mode",
+    "key": "pace",
+    "value": "push",
+    "fromLap": 40
+   },
+   "lap": 42,
+   "met": false
+  },
+  {
+   "condition": {
+    "type": "mode",
+    "key": "pace",
+    "value": "push",
+    "fromLap": 30
+   },
+   "lap": 41,
+   "met": false
+  },
+  {
+   "condition": {
+    "type": "mode",
+    "key": "pace",
+    "value": "push",
+    "fromLap": 43
+   },
+   "lap": 43,
+   "met": false
+  },
+  {
+   "condition": {
+    "type": "tyre_age",
+    "minLaps": 41
+   },
+   "lap": 41,
+   "met": true
+  },
+  {
+   "condition": {
+    "type": "tyre_age",
+    "minLaps": 41
+   },
+   "lap": 42,
+   "met": false
+  },
+  {
+   "condition": {
+    "type": "tyre_age",
+    "minLaps": 41
+   },
+   "lap": 45,
+   "met": false
+  },
+  {
+   "condition": {
+    "type": "pressure",
+    "driver": "HIL",
+    "seconds": 1.0
+   },
+   "lap": 41,
+   "met": true
+  },
+  {
+   "condition": {
+    "type": "pressure",
+    "driver": "HIL",
+    "seconds": 1.0
+   },
+   "lap": 40,
+   "met": false
+  },
+  {
+   "condition": {
+    "type": "pressure",
+    "driver": "HIL",
+    "seconds": 1.0
+   },
+   "lap": 42,
+   "met": false
+  },
+  {
+   "condition": {
+    "type": "pressure",
+    "driver": "XXX",
+    "seconds": 1.0
+   },
+   "lap": 41,
+   "met": false
+  },
+  {
+   "condition": {
+    "type": "fuel"
+   },
+   "lap": 41,
+   "met": false
+  }
+ ]
+}

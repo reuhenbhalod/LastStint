@@ -181,6 +181,29 @@
               "description": "Real stops in the fit."
             }
           }
+        },
+        "restart": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "jump",
+            "spread",
+            "places"
+          ],
+          "description": "The SC restart (Eras builds; pipeline restart.py, fitted on the 2018+ timed races' restarts): on a green lap straight after an SC lap the car k places behind the leader loses jump + spread x min(k, places) s. Absent: a restart lap is an ordinary green lap.",
+          "properties": {
+            "jump": {
+              "type": "number"
+            },
+            "spread": {
+              "type": "number",
+              "minimum": 0
+            },
+            "places": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
         }
       }
     },
@@ -388,7 +411,8 @@
               "RED",
               "RAIN",
               "RETIREMENT",
-              "FAULT"
+              "FAULT",
+              "TEAM_ORDER"
             ]
           },
           "laps": {
@@ -397,7 +421,8 @@
             "description": "How many laps the event lasts. A FAULT without it lasts to the flag (or to the car's next stop with untilStop)."
           },
           "driver": {
-            "type": "string"
+            "type": "string",
+            "description": "The car the event is about; a TEAM_ORDER's car told to let `other` by."
           },
           "restart": {
             "enum": [
@@ -433,22 +458,45 @@
           "untilStop": {
             "type": "boolean",
             "description": "A FAULT that lasts until the car's next stop (a puncture or failed tyre is fixed by new tyres)."
+          },
+          "other": {
+            "type": "string",
+            "description": "A TEAM_ORDER (Eras builds, sourced in data/incidents.json): the car let by. Both sims swap the two on the order's lap (packages/sim scripted.ts)."
           }
         },
-        "if": {
-          "properties": {
-            "type": {
-              "const": "FAULT"
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "FAULT"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "driver",
+                "fault",
+                "paceLoss"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "TEAM_ORDER"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "driver",
+                "other"
+              ]
             }
           }
-        },
-        "then": {
-          "required": [
-            "driver",
-            "fault",
-            "paceLoss"
-          ]
-        }
+        ]
       }
     },
     "decisionMoments": {
@@ -737,6 +785,46 @@
           "type": "string",
           "minLength": 1,
           "description": "The short era-appropriate intro shown before the race."
+        },
+        "storylineRetirements": {
+          "type": "array",
+          "description": "Avoidable storyline retirements (owner decision, Nov 8 2026): in live play the player's car retires on its real retirement lap only if the player repeats the real call (the condition). Scripted cars keep their real retirements.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "driver",
+              "condition",
+              "real",
+              "source"
+            ],
+            "properties": {
+              "driver": {
+                "$ref": "#/$defs/driverCode",
+                "description": "The storyline driver: conditional only when he is the player's car. His RETIREMENT event gives the lap."
+              },
+              "condition": {
+                "$ref": "#/$defs/storylineCondition"
+              },
+              "alsoRetires": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/driverCode"
+                },
+                "description": "Cars whose real retirement is the same incident (a collision): they retire with the player's car, or not at all."
+              },
+              "real": {
+                "type": "string",
+                "minLength": 1,
+                "description": "What really happened."
+              },
+              "source": {
+                "type": "string",
+                "pattern": "^https?://",
+                "description": "Where the fact and the call were checked (URLs, '; '-separated)."
+              }
+            }
+          }
         }
       }
     },
@@ -1171,6 +1259,95 @@
               "description": "The player's car then its teammate, each at or better."
             }
           }
+        }
+      ]
+    },
+    "storylineCondition": {
+      "description": "The real call (packages/sim scripted.ts conditionMet, pipeline storyline.py).",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "key",
+            "value",
+            "fromLap"
+          ],
+          "properties": {
+            "type": {
+              "const": "mode"
+            },
+            "key": {
+              "enum": [
+                "pace",
+                "fuel",
+                "battle",
+                "ers"
+              ]
+            },
+            "value": {
+              "type": "string"
+            },
+            "fromLap": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "description": "The standing mode `key` was `value` on every lap from fromLap to the retirement lap."
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "minLaps"
+          ],
+          "properties": {
+            "type": {
+              "const": "tyre_age"
+            },
+            "minLaps": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "description": "The car started the retirement lap on tyres at least minLaps laps old."
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "driver",
+            "seconds"
+          ],
+          "properties": {
+            "type": {
+              "const": "pressure"
+            },
+            "driver": {
+              "$ref": "#/$defs/driverCode"
+            },
+            "seconds": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          },
+          "description": "`driver` started the retirement lap behind the player's car, within `seconds`."
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "const": "fuel"
+            }
+          },
+          "description": "The fuel model decides: the frozen retirement is dropped, and the car stops if its tank runs dry (a fuel-limit race)."
         }
       ]
     }

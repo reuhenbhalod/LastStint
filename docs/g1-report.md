@@ -2475,3 +2475,127 @@ from 1993 SCs run (the real ones and made-up crashes').
 
 **Not regenerated here:** `apps/worker/src/races.gen.ts`, `data/sc_rates.json` and the parity
 fixtures.
+
+## Eras model fixes M4 (Nov 8 2026): SC restarts, scripted team orders, avoidable storyline retirements
+
+Written by hand. Robust status (1,000 runs on each of two seed sets, one race per call), each
+race built fresh from its raw snapshot on this branch. "Before" is the same build with the
+new fields taken out (`track.restart` and the TEAM_ORDER events: the sims run exactly the old
+code without them); germany-1986's "before" is its committed reconstruction. Nothing in
+data/races or data/golden is committed: every Daily and Gauntlet race file and golden file is
+unchanged, and so is every committed Eras file until it is rebuilt (the sims only act on the
+new fields, which only an Eras build writes).
+
+**The fixes.**
+1. *The SC restart* (`pipeline/restart.py`, `track.restart`). On a green lap straight after an
+   SC lap (an SC's restart, or a red flag's rolling restart behind it; not a standing restart,
+   which has its own spread) the car k places behind the leader loses 0.15 + 0.44 x min(k, 8)
+   s. That is fitted on the 31 SC restarts of 26 timed 2018+ races (310 car-laps, the first ten
+   cars of the lead-lap queue), against the sims' nose-to-tail queue plus dirty air, by Huber
+   loss: 2.53 against 4.99 for today's rule. The median gap error at the end of the restart lap
+   goes from -2.17 s (the sims' queue comes out about 2 s too tight by P10) to +0.09 s. Both
+   sims (`sim_reference.is_restart_lap`, `scripted.ts restartExtra`). One switch,
+   `restart.IN_ERAS_BUILDS`.
+2. *Team orders and let-bys* (`data/incidents.json` `TEAM_ORDER` facts, event `TEAM_ORDER`
+   with `driver` (yielder) and `other` (passer)). On the order's lap, or one of the next two
+   green laps, a yielder still ahead and within 10 s of its passer drops 0.5 s behind it and
+   doesn't pass back. Both sims. In live play an order to the player's own car waits for the
+   player's call (`teamOrder: comply`), offered at a `teamOrder` decision moment (comply, the
+   real option, or ignore). Facts (docs/eras-checks/m4-scripted-events.md): hungary-2024 lap 68
+   NOR->PIA, russia-2018 lap 25 BOT->HAM, europe-1997 lap 69 VIL->HAK and VIL->COU,
+   malaysia-1999 lap 53 MSCM->IRV, austria-2002 lap 71 BAR->MSCM.
+3. *Avoidable storyline retirements* (`eras.storylineRetirements`, live play only, TS). Replays,
+   G1 and goldens keep every real retirement. Authored for monaco-1988 (Senna: push from lap
+   55), australia-1986 (Mansell: still on the original set), germany-1986 (Rosberg: the fuel
+   model decides) and australia-1994 (Schumacher: Hill within 2.0 s behind; Hill's retirement
+   linked). The reconstruction solver's new `lastLapStops` facts keep a car that ran dry on the
+   last lap at its road place to the last lap: germany-1986's Rosberg is now 2.0 s behind
+   Piquet at the end of lap 43, where he had been put ahead of the leader. He retires on lap 44,
+   and his frozen lap-43 retirement is gone.
+
+**Team orders.**
+
+| Race | Before | After | What changed |
+|---|---|---|---|
+| hungary-2024 | fail, 2.32s | fail, 2.34s | Duel order now passes (was 0.48 / 0.52). Still fails on SAI's field gap, 5.23 / 5.05 [5.00] |
+| russia-2018 | fail, 1.74s | fail, 2.03s | Duel and podium order now pass. The duel gap fails: 4.29 / 4.28 [3.00]. The sim's BOT drops away at his fitted pace (0.12 s a lap slower) after the swap; really the pair held station (2.5 s at the flag) |
+| europe-1997 | fail, 2.53s | fail, 1.79s | VIL's podium gap passes (was 9.40). Podium order 0.10 -> 0.39 / 0.38 [0.50] |
+| malaysia-1999 | fail, 3.41s | fail, 3.78s | No check moves across its line. FRE 7.66 -> 7.82, BAR 6.81 -> 6.97 (the leader's pace management, as before) |
+| austria-2002 | pass (strict fail), 1.54s | **pass (strict pass)**, 1.63s | The last-corner swap now plays: the strict duel order passes |
+
+**Restart mechanics** (gap 4 of docs/eras-races-report.md).
+
+| Race | Before | After |
+|---|---|---|
+| great-britain-2022 | fail, 2.96s | fail, 2.78s |
+| miami-2024 | fail, 4.74s | fail, 5.20s (duel VER vs NOR 5.79 -> 7.13) |
+| azerbaijan-2021 | fail, 2.66s | fail, 2.67s |
+| saudi-arabia-2021 | fail, 13.96s | fail, 13.96s (no restart lap after the takeover moves it) |
+| azerbaijan-2017 | fail, 6.86s | fail, 6.86s |
+| italy-2020 | fail, 3.69s | fail, 3.65s |
+| sakhir-2020 | fail, 1.30s | fail, 2.37s (duel RUS vs PER 5.31 -> 8.18) |
+| bahrain-2014 | fail, 2.16s | fail, 1.93s (HUL's field gap passes; duel order 0.41 [0.60] and podium order still fail) |
+| monaco-2015 | fail, 4.52s | fail, 4.13s |
+
+No race changes status. The restart fit is right on the restart lap, but G1 at the flag moves
+both ways. As a check, ten of the fit's own timed races were run with the block added. These
+are Daily races, so this is measurement only and changes no file:
+
+| Race | Before | After |
+|---|---|---|
+| abu-dhabi-2021 | pass, 2.27s | pass, 2.28s |
+| canada-2024 | pass, 2.36s | **fail**, 2.19s (HAM field gap 5.23 [5.00]) |
+| spain-2021 | fail, 5.90s | fail, 5.90s |
+| bahrain-2022 | pass, 1.08s | pass, 1.40s |
+| mexico-2024 | pass, 1.52s | pass, 1.52s |
+| netherlands-2023 | fail, 3.79s | fail, 3.23s |
+| canada-2022 | pass, 1.40s | **fail**, 1.35s (LEC field gap 6.67 [5.00]) |
+| united-states-2022 | pass, 0.52s | pass, 1.20s |
+| miami-2022 | pass, 1.41s | pass, 1.39s |
+| japan-2023 | pass, 2.62s | pass, 2.62s |
+
+The spread costs the cars recovering from the back of a restart queue (canada-2022 LEC,
+sakhir-2020 PER) more than they really lost. The real field's spread seems to come partly from
+later passing, which a per-place loss on one lap can't separate. **Owner's call** whether Eras
+builds keep it (`restart.IN_ERAS_BUILDS`).
+
+**Storyline races.** germany-1986, reconstructed with `lastLapStops`: anchors 60/60 (was
+60/60), G1 sanity pass, 0.85 -> 1.03 s. australia-1986, monaco-1988 and australia-1994 rebuild
+identically except for the new `eras` block (their reconstructions are unchanged, and none has
+an SC). Live play, 200 seeds each (incidents off / on), from the race files built into a
+scratch directory:
+
+| Race | Calls | Player's car retires | Finishes, mean place |
+|---|---|---|---|
+| monaco-1988 | push from lap 55 (the real call) | 200 / 200 | - |
+| monaco-1988 | push laps 55-60, then standard | 0 / 162 (156 out of fuel) | P1.00 |
+| monaco-1988 | no push | 0 / 126 (120 out of fuel) | P1.00 |
+| australia-1986 | no stop (the real call) | 200 / 200 | - |
+| australia-1986 | box on lap 55 | 0 / 128 (120 out of fuel) | P2.89 / P2.85 |
+| germany-1986 | standard modes | 0 / 125 (121 out of fuel) | P1.54 |
+| germany-1986 | push from lap 30 | 0 / 200 (197 out of fuel) | P1.45 (incidents off) |
+| germany-1986 | lift and coast from lap 30 | 0 / 4 | P1.75 / P1.78 |
+| australia-1994 | the real calls | 54 / 65 | P1.10 / P1.18 |
+| australia-1994 | real calls, push from lap 20 | 36 / 163 (118 out of fuel) | P1.10 / P1.62 |
+
+So each storyline race can now be finished (and won) when the player avoids the real call.
+Two cautions for the owner:
+- In every fuel-limit race, about 60% of live runs on standard modes run out of fuel. The
+  takeover margin is drawn from -1.5..+1.0 kg (headset `fuel`). Managing fuel is part of these
+  races, but it's an existing tuning question, not this change.
+- australia-1994's real calls bring the collision in only 27% of runs. The reconstruction has
+  Hill ahead of Schumacher until about lap 33 (really Schumacher led throughout), so at the
+  start of lap 35 the sim's Hill is ahead in 39% of runs and within 2 s behind in 27%. The 2.0 s
+  is the sims' fighting range, not a sourced figure.
+
+**Tests.** `pipeline/tests/test_scripted.py` (the restart refit, facts checks, the sims' rules,
+the storyline conditions, the build, and the parity vectors in
+`pipeline/tests/fixtures/scripted_parity.json`, new) and `packages/sim/tests/scripted.test.ts`
+(parity, conditions, the player's comply call, the `teamOrder` moment, retire / avoid / replay /
+fuel).
+
+**Stale until the rebuild (expected).** `test_race_files_current.py` fails for the four
+storyline races: their overlays gained an `eras` block their committed files don't carry yet.
+Rebuilding every Eras race also writes `track.restart` (and the TEAM_ORDER events for the five
+team-order races) into its file and golden. No parity fixture was regenerated except the new
+one.

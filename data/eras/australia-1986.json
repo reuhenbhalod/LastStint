@@ -1,4 +1,19 @@
 {
+  "eras": {
+    "eraId": 1,
+    "order": 8,
+    "storylineRetirements": [
+      {
+        "driver": "MAN",
+        "condition": {
+          "type": "tyre_age",
+          "minLaps": 63
+        },
+        "real": "Mansell, third and set for the title, ran on his original set; on lap 64 his left-rear tyre exploded on the Brabham Straight (Rosberg's right rear had failed on lap 63), and Williams then called Piquet in for a precautionary tyre change",
+        "source": "https://en.wikipedia.org/wiki/1986_Australian_Grand_Prix"
+      }
+    ]
+  },
   "rules": {
     "twoCompound": false,
     "tyreChanges": true,

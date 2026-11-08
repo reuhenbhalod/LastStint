@@ -59,6 +59,19 @@
     }
   ],
   "safetyCars": [],
+  "lastLapStops": [
+    {
+      "driver": "ROSK",
+      "gap": 2.0,
+      "source": "https://www.autosport.com/f1/feature/3783/grand-prix-gold-german-gp-1986",
+      "note": "At the start of the last lap 'Piquet led Rosberg by around two seconds'; Rosberg slowed at the first chicane, took the escape road and pulled off (out of fuel). Jolpica: 43 laps, 'Out of fuel', classified 5th"
+    },
+    {
+      "driver": "PRO",
+      "source": "https://www.autosport.com/f1/feature/3783/grand-prix-gold-german-gp-1986; https://en.wikipedia.org/wiki/1986_German_Grand_Prix",
+      "note": "Senna had just passed him at the start of the last lap; he lost power in the last two corners and pushed the car (out of fuel). Jolpica: 43 laps, 'Out of fuel', classified 6th. No gap sourced"
+    }
+  ],
   "complete": {
     "stops": false,
     "safetyCars": true
