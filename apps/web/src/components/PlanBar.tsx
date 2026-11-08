@@ -70,7 +70,7 @@ export function PlanBar({
   const pace = paceLine(rest);
   // Editing from the lap after the coming one (its calls are made).
   const editFrom = lap + 1;
-  const legal = draft ? twoCompounds(me, draft) : false;
+  const legal = draft ? twoCompounds(me, draft, model.rules) : false;
   return (
     <section aria-label="Race plan" className="card flex flex-col gap-2">
       <div className="flex flex-wrap items-center justify-between gap-2">

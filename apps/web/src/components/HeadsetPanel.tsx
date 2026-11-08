@@ -1,7 +1,8 @@
 // Standing headset modes, always live: pace, battle, ERS (the hybrid battery, with its charge)
 // and fuel. Flipping one books a `mode` call for the next lap. The current setting is read
 // from the user's car, so it shows what the sim is applying; a call booked for the coming lap
-// shows at once, outlined, until the lap ticks over.
+// shows at once, outlined, until the lap ticks over. A race without a battery (eras build
+// plan 8.5: `ers` false, from the race's rules and era) has no ERS row and no charge.
 
 import type { Modes } from '@laststint/sim';
 
@@ -25,6 +26,7 @@ export function HeadsetPanel({
   describe,
   disabled,
   onFlip,
+  ers = true,
 }: {
   /** The hybrid battery's charge, 0-100, if the car has one. */
   battery?: number;
@@ -35,10 +37,13 @@ export function HeadsetPanel({
   pending?: Partial<Modes>;
   disabled: boolean;
   onFlip: (key: ModeKey, value: string) => void;
+  /** The race has ERS modes (a battery): false hides the row (raceRules.ts). */
+  ers?: boolean;
 }) {
+  const rows = ers ? ROWS : ROWS.filter((r) => r.key !== 'ers');
   return (
     <div className="flex flex-col gap-1.5">
-      {ROWS.map((row) => (
+      {rows.map((row) => (
         <div key={row.key} className="grid grid-cols-[58px_1fr] items-center gap-2">
           <span className="eyebrow">{row.label}</span>
           <fieldset
@@ -74,7 +79,7 @@ export function HeadsetPanel({
           </fieldset>
         </div>
       ))}
-      {battery !== undefined && (
+      {ers && battery !== undefined && (
         <div className="grid grid-cols-[58px_1fr_auto] items-center gap-2">
           <span className="eyebrow">Battery</span>
           <div

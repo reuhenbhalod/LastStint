@@ -1,14 +1,19 @@
 // Build your own race plan (strategy planner spec): up to three stops, each a lap and a tyre,
 // and a pace for every stint. The strip shows it as you go; the chance comes from the game's
-// grading (null while it's worked out). A plan that breaks the two-compound rule says so.
+// grading (null while it's worked out). A plan that breaks the two-compound rule says so, in a
+// race that has the rule; a race without tyre changes offers only the tyres a stop may fit
+// (eras build plan 8.5, eras/raceRules.ts).
 
 import {
+  type CarState,
   MAX_PLAN_STOPS,
   MIN_STINT,
   type PaceMode,
   type RaceModel,
   type RacePlan,
+  ruleSatisfied,
 } from '@laststint/sim';
+import { pitCompounds } from '../eras/raceRules.js';
 import { PACE_WORD, stintsOk, tyres } from '../game/plans.js';
 import { PlanStrip } from './PlanStrip.js';
 
@@ -34,9 +39,9 @@ export function PlanEditor({
 }) {
   const laps = model.race.laps;
   const first = from + 1;
-  const compounds = Object.keys(model.compounds);
+  const compounds = pitCompounds(model);
   const set = (plan: Partial<RacePlan>) => onChange({ ...value, ...plan });
-  const legal = twoCompounds(car, value);
+  const legal = twoCompounds(car, value, model.rules);
 
   const moveStop = (i: number, lap: number) => {
     const prev = i === 0 ? first - 1 : (value.stops[i - 1]?.lap as number) + MIN_STINT - 1;
@@ -177,14 +182,21 @@ export function PlanEditor({
   );
 }
 
-/** True if the plan runs two dry compounds by the flag (or the car already has). */
-export function twoCompounds(car: { compound: string; compoundsUsed: string[] }, plan: RacePlan) {
-  const used = new Set(
-    [...car.compoundsUsed, car.compound, ...plan.stops.map((s) => s.compound)].filter((c) =>
-      DRY.includes(c),
-    ),
+/**
+ * True if the plan runs two dry compounds by the flag (or the car already has), or the race
+ * has no such rule (`rules.twoCompound` false: before 2007). The sim's `ruleSatisfied` on the
+ * dry compounds the plan runs (a dry placeholder as the car's tyre, so a wet tyre fitted now
+ * doesn't waive it here, as before).
+ */
+export function twoCompounds(
+  car: { compound: string; compoundsUsed: string[] },
+  plan: RacePlan,
+  rules?: RaceModel['rules'],
+) {
+  const used = [...car.compoundsUsed, car.compound, ...plan.stops.map((s) => s.compound)].filter(
+    (c) => DRY.includes(c),
   );
-  return used.size >= 2;
+  return ruleSatisfied({ compound: DRY[0], compoundsUsed: used } as CarState, rules);
 }
 
 /** A stint's pace: manage, standard or push. */

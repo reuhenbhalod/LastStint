@@ -8,7 +8,10 @@
 //   4. the driver asking: "the tyres are gone, can I box?", "let me push";
 //   5. the battery running low with a car close;
 //   6. the engineer's own questions on the quick-call laps (quickCalls.ts).
-// Every answer is a call the race model plays, logged for the server's replay.
+// Every answer is a call the race model plays, logged for the server's replay. Every offer
+// follows the race's rules (eras build plan 8.5, eras/raceRules.ts): no DRS or battery moves
+// the race doesn't have, the two-compound warning only where the rule applies, and only tyres
+// a stop may fit.
 // In Eras (`info`, eras spec §7) what the radio says follows the information level: gaps
 // rounded at Limited, at Minimal only the gaps to the cars directly ahead and behind, and the
 // other car's tyre age as a range from Reduced down. The calls themselves are picked from the
@@ -42,6 +45,7 @@ import {
   shownGap,
   tyreAgeText,
 } from '../eras/difficulty/information.js';
+import { moveAllowed, pitCompoundFor, raceScreenEra } from '../eras/raceRules.js';
 import type { CornerKind } from '../track/battle.js';
 import { lapTime } from '../track/geometry.js';
 import { tyreName } from './choices.js';
@@ -103,11 +107,18 @@ function battleDue(other: string, lap: number, mem: DirectorMemory): boolean {
 const battle = (lap: number, move: BattleMove, driver?: boolean): Decision =>
   driver ? { lap, kind: 'battle', move, driver: true } : { lap, kind: 'battle', move };
 
-/** The move a driver makes himself, by attitude: the high-attitude ones go for it. */
-export function ownMove(code: string, attacking: boolean): BattleMove {
+/**
+ * The move a driver makes himself, by attitude: the high-attitude ones go for it. Without DRS
+ * (`drs` false: the race's rules) the cautious one waits round the outside instead.
+ */
+export function ownMove(code: string, attacking: boolean, drs = true): BattleMove {
   const tier = driverInfo(code)?.tier ?? 'medium';
   if (attacking)
-    return tier === 'high' ? 'dive-inside' : tier === 'medium' ? 'round-outside' : 'wait-drs';
+    return tier === 'high'
+      ? 'dive-inside'
+      : tier === 'medium' || !drs
+        ? 'round-outside'
+        : 'wait-drs';
   return tier === 'high' ? 'defend-hard' : tier === 'medium' ? 'cover-inside' : 'hold-outside';
 }
 
@@ -154,7 +165,9 @@ function battleCall(
   const us = model.userSide;
   const attacking = pick === 'ahead';
   const eng = race.engineer;
-  // Outside DRS range he has to close in first (battles and trust spec D4).
+  // Outside DRS range he has to close in first (battles and trust spec D4). A race without
+  // DRS (its rules) has no DRS line, no wait-for-DRS move and none in the radio.
+  const hasDrs = moveAllowed(model, 'wait-drs');
   const drsRange = gap < 1;
 
   // The odds the race model will roll this lap (race engineer spec): the track's overtaking
@@ -216,7 +229,7 @@ function battleCall(
             : `${other} ${(-quicker).toFixed(1)} s/lap quicker`,
     },
     ...(me.battery !== undefined ? [{ label: 'Battery', value: `${battery}%` }] : []),
-  ];
+  ].filter((s) => hasDrs || s.label !== 'DRS');
   const corner = corners[0] ?? 1;
   const rival = other === model.rival ? ' (the rival)' : '';
 
@@ -237,8 +250,11 @@ function battleCall(
         'No risk now, a better shot next lap',
         'wait',
       ),
-    ];
-    if (battery >= -(cfg.moves['overtake-button'].battery ?? -25)) {
+    ].filter((o) => hasDrs || o.id !== 'drs');
+    if (
+      moveAllowed(model, 'overtake-button') &&
+      battery >= -(cfg.moves['overtake-button'].battery ?? -25)
+    ) {
       options.push(
         opt(
           'button',
@@ -267,9 +283,10 @@ function battleCall(
         drsRange,
         true,
         eng?.lastMove ?? null,
+        hasDrs,
       ),
       options,
-      driverChoice: battle(next, ownMove(us, true), true),
+      driverChoice: battle(next, ownMove(us, true, hasDrs), true),
     };
   }
   return {
@@ -290,6 +307,7 @@ function battleCall(
       drsRange,
       false,
       eng?.lastMove ?? null,
+      hasDrs,
     ),
     options: [
       opt('cover', 'Cover the inside', 'cover-inside', 'Solid, costs a little time', 'inside'),
@@ -315,8 +333,9 @@ function battleLine(
   drs: boolean,
   attacking: boolean,
   last: { move: BattleMove; other: string; lap: number } | null,
+  hasDrs = true,
 ): string {
-  const opening = attacking
+  const drsOpening = attacking
     ? drs
       ? pickBy(lap, other, [
           `${other}${rival} is ${g} s ahead. I can get him. How do I go?`,
@@ -334,6 +353,7 @@ function battleLine(
         `${other} is filling my mirrors, ${g} s back. What line?`,
         `${g} s to ${other}${rival} behind${drs ? ', and he has DRS' : ''}. Defend or let him by?`,
       ]);
+  const opening = hasDrs ? drsOpening : noDrsLine(lap, other, rival, g, attacking);
   if (!last || last.other !== other || lap + 1 - last.lap > 2) return opening;
   const read: Partial<Record<BattleMove, string>> = attacking
     ? {
@@ -347,6 +367,21 @@ function battleLine(
         'defend-hard': ' He’s waiting for us to block again.',
       };
   return opening + (read[last.move] ?? '');
+}
+
+/** The battle's opening line in a race without DRS: the same facts, no DRS. */
+function noDrsLine(lap: number, other: string, rival: string, g: string, attacking: boolean) {
+  return attacking
+    ? pickBy(lap, other, [
+        `${other}${rival} is ${g} s ahead. I can get him. How do I go?`,
+        `I’m right with ${other}, ${g} s. Where do I put it?`,
+        `${other}${rival} is ${g} s up the road. Have a go?`,
+      ])
+    : pickBy(lap, other, [
+        `${other}${rival} is ${g} s behind, closing. How do we defend?`,
+        `${other} is filling my mirrors, ${g} s back. What line?`,
+        `${g} s to ${other}${rival} behind. Defend or let him by?`,
+      ]);
 }
 
 /**
@@ -476,7 +511,9 @@ function lastingCompound(race: RaceState, model: RaceModel): string {
     .filter(([c]) => !isWetTyre(c))
     .sort((a, b) => a[1].offset - b[1].offset);
   const lasts = byGrip.find(([, c]) => tyreLife(c) >= left);
-  return (lasts ?? byGrip.at(-1))?.[0] ?? race.cars[model.userSide]?.compound ?? 'HARD';
+  const pick = (lasts ?? byGrip.at(-1))?.[0] ?? race.cars[model.userSide]?.compound ?? 'HARD';
+  // No tyre changes (2005): the stop keeps the dry set.
+  return pitCompoundFor(model, pick);
 }
 
 function troubleCall(
@@ -497,7 +534,7 @@ function troubleCall(
 
   // The two-compound rule: no second dry compound yet and no stop booked, late on.
   if (
-    !ruleSatisfied(me) &&
+    !ruleSatisfied(me, model.rules) &&
     canStop &&
     left <= 8 &&
     left > 1 &&
@@ -701,7 +738,8 @@ function batteryCall(
   mem: DirectorMemory,
 ): QuickCall | null {
   const me = race.cars[model.userSide];
-  if (!me || me.battery === undefined || me.battery > 20) return null;
+  if (!me || !raceScreenEra(model).battery || me.battery === undefined || me.battery > 20)
+    return null;
   if (me.modes.ers === 'harvest' || race.lap - (mem.last.battery ?? -99) < 5) return null;
   const b = battlesFor(race, model, { ...cfg, battleWindow: 2 });
   const near = b.behind ?? b.ahead;

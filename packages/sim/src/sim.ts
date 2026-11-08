@@ -28,6 +28,16 @@ import headsetConfig from './headset.json';
 import { legendEvents, legendLoss } from './legend.js';
 import { validatePlan } from './plan.js';
 import { type RedFlagPlan, lineUp, redFlagPlan } from './redflag.js';
+import {
+  FILL_CHOICES,
+  burnTank,
+  fuelLimit,
+  initTanks,
+  refuelAtStop,
+  refuelling,
+  tankPlanDelta,
+  tankWeightDelta,
+} from './refuel.js';
 import { coverWindow, playoutPolicy, resolveRivalPolicy } from './rivals/policy.js';
 import {
   type RivalChoice,
@@ -39,16 +49,6 @@ import {
   rivalAfterLap,
   rivalPlanBefore,
 } from './rivals/react.js';
-import {
-  FILL_CHOICES,
-  burnTank,
-  fuelLimit,
-  initTanks,
-  refuelAtStop,
-  refuelling,
-  tankPlanDelta,
-  tankWeightDelta,
-} from './refuel.js';
 import { type Rng, deriveSeed, mulberry32 } from './rng.js';
 import {
   hasMove,

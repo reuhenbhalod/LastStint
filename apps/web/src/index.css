@@ -111,6 +111,10 @@ label:has(input) {
 .tyre.WET {
   border-color: #3d7fe0;
 }
+/* One dry tyre, no compound choice (eras build plan 8.5: races before the 2007 compound rule). */
+.tyre.DRY {
+  border-color: var(--ink);
+}
 
 /* A decision moment (feedback spec S2): the map's frame glows and the call rises under it. */
 @keyframes radio-flash {
@@ -309,6 +313,21 @@ label:has(input) {
   background: linear-gradient(180deg, #151a18 0%, #0f1312 100%);
   padding: 0.875rem 1rem;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+}
+/* Eras 1-2 (eras build plan 8.5): a decision as a pit-board message, not team radio. The
+   same words and options; a black board, its lines in yellow block capitals. */
+.call-plate.pit-board {
+  --accent: #f2c94c;
+  border: 3px solid #3a3a3a;
+  border-left: 6px solid var(--accent);
+  border-radius: 0.25rem;
+  background: #050505;
+}
+.pit-board .board-line {
+  font-family: var(--mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #f2c94c;
 }
 .call-tag {
   display: inline-flex;
