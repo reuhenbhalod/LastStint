@@ -367,8 +367,9 @@ describe('verifyRun', () => {
 });
 
 describe('Legend', () => {
-  // Seed 4242: Legend removes the real VSC, SC and restart moments and draws a VSC on lap 35,
-  // so the player is asked legend-vsc-35, then the two green-flag calls.
+  // Seed 4242: Legend removes the real VSC, SC and restart moments and draws a SC on lap 35
+  // (Yas Marina's rates with abu-dhabi-2010 and -2012 in data/sc_rates.json), so the player is
+  // asked legend-sc-35, then the two green-flag calls.
   const seed = 4242;
   const moments = legendMoments(fullAbu, seed);
   const run = initRun(fullAbu, seed, { decisions: [], legend: true });
@@ -384,7 +385,7 @@ describe('Legend', () => {
   }
 
   it('checks and grades the moments the Legend attempt was asked', () => {
-    expect(moments.map((m) => m.id)).toContain('legend-vsc-35');
+    expect(moments.map((m) => m.id)).toContain('legend-sc-35');
     expect(moments.map((m) => m.id)).not.toEqual(fullAbu.decisionMoments.map((m) => m.id));
     const claimed = verifyRun(fullAbu, seed, run.decisions, SAMPLES, grades, { legend: true });
     expect(claimed.moments.map((m) => m.momentId)).toEqual(moments.map((m) => m.id));

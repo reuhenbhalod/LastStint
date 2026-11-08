@@ -651,6 +651,7 @@
     "pitLaneClosedUnderSC": false,
     "vsc": false,
     "drs": true,
-    "ers": "kers"
+    "ers": "kers",
+    "refuelling": false
   }
 }

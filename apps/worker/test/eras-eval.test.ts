@@ -329,9 +329,10 @@ describe('POST /api/eras/attempts/:id: Legend', () => {
 
   it('a Legend attempt (Expert rival) is replayed from its claims and evaluated', async () => {
     expect(legendDifficulty().rivalPolicy).toBe('expert');
-    // Legend asks the drawn VSC's call, not the real race's SC calls.
+    // Legend asks the drawn SC's call (lap 35 with data/sc_rates.json's Yas Marina rates), not
+    // the real race's SC calls.
     const momentIds = legendHonest.moments.map((m) => m.id);
-    expect(momentIds).toContain('legend-vsc-35');
+    expect(momentIds).toContain('legend-sc-35');
     expect(momentIds).not.toContain('sc-stop');
     expect(legendHonest.rivalClaims.length).toBeGreaterThan(0);
     const id = await begin(true);

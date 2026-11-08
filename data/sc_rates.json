@@ -3,6 +3,7 @@
   "sources": {
     "counted": [
       "fastf1",
+      "jolpica-estimate",
       "tum"
     ],
     "fastf1": "data/raw/<race>.status.json (FastF1 / OpenF1 track status, 2018+)",
@@ -14,29 +15,30 @@
   "lengths": {
     "scLaps": 5,
     "vscLaps": 2,
-    "scPeriodsMeasured": 116,
+    "scPeriodsMeasured": 125,
     "vscPeriodsMeasured": 72
   },
   "allTracks": {
-    "races": 170,
-    "vscRaces": 151,
-    "scPeriods": 118,
+    "races": 181,
+    "vscRaces": 154,
+    "scPeriods": 127,
     "vscPeriods": 76,
-    "scPerRace": 0.6941,
-    "vscPerRace": 0.5033
+    "scPerRace": 0.7017,
+    "vscPerRace": 0.4935
   },
   "circuits": {
     "albert_park": {
       "name": "Albert Park Grand Prix Circuit",
-      "races": 7,
+      "races": 8,
       "vscRaces": 6,
-      "scPeriods": 7,
+      "scPeriods": 8,
       "vscPeriods": 1,
       "scPerRace": 1.0,
       "vscPerRace": 0.1667,
       "scFallback": false,
       "vscFallback": false,
       "counted": [
+        "australia-2010 (jolpica-estimate): 1 SC, 0 VSC",
         "australia-2014 (tum): 1 SC, 0 VSC",
         "australia-2015 (tum): 1 SC, 0 VSC",
         "australia-2016 (tum): 1 SC, 0 VSC",
@@ -70,12 +72,12 @@
     },
     "bahrain": {
       "name": "Bahrain International Circuit",
-      "races": 9,
-      "vscRaces": 8,
-      "scPeriods": 5,
+      "races": 10,
+      "vscRaces": 9,
+      "scPeriods": 7,
       "vscPeriods": 4,
-      "scPerRace": 0.5556,
-      "vscPerRace": 0.5,
+      "scPerRace": 0.7,
+      "vscPerRace": 0.4444,
       "scFallback": false,
       "vscFallback": false,
       "counted": [
@@ -87,7 +89,8 @@
         "bahrain-2019 (tum): 1 SC, 0 VSC",
         "bahrain-2021 (fastf1): 1 SC, 1 VSC",
         "bahrain-2022 (fastf1): 1 SC, 1 VSC",
-        "bahrain-2023 (fastf1): 0 SC, 1 VSC"
+        "bahrain-2023 (fastf1): 0 SC, 1 VSC",
+        "sakhir-2020 (jolpica-estimate): 2 SC, 0 VSC"
       ]
     },
     "baku": {
@@ -109,15 +112,16 @@
     },
     "catalunya": {
       "name": "Circuit de Barcelona-Catalunya",
-      "races": 9,
+      "races": 10,
       "vscRaces": 8,
       "scPeriods": 4,
       "vscPeriods": 2,
-      "scPerRace": 0.4444,
+      "scPerRace": 0.4,
       "vscPerRace": 0.25,
       "scFallback": false,
       "vscFallback": false,
       "counted": [
+        "spain-2013 (jolpica-estimate): 0 SC, 0 VSC",
         "spain-2014 (tum): 0 SC, 0 VSC",
         "spain-2015 (tum): 0 SC, 0 VSC",
         "spain-2016 (tum): 1 SC, 0 VSC",
@@ -170,15 +174,16 @@
     },
     "interlagos": {
       "name": "Autódromo José Carlos Pace",
-      "races": 7,
+      "races": 8,
       "vscRaces": 6,
-      "scPeriods": 8,
+      "scPeriods": 10,
       "vscPeriods": 2,
-      "scPerRace": 1.1429,
+      "scPerRace": 1.25,
       "vscPerRace": 0.3333,
       "scFallback": false,
       "vscFallback": false,
       "counted": [
+        "brazil-2012 (jolpica-estimate): 2 SC, 0 VSC",
         "brazil-2014 (tum): 0 SC, 0 VSC",
         "brazil-2015 (tum): 0 SC, 0 VSC",
         "brazil-2016 (tum): 4 SC, 0 VSC",
@@ -188,14 +193,29 @@
         "brazil-2021 (fastf1): 1 SC, 2 VSC"
       ]
     },
+    "istanbul": {
+      "name": "Istanbul Park",
+      "races": 2,
+      "vscRaces": 2,
+      "scPeriods": 0,
+      "vscPeriods": 0,
+      "scPerRace": 0.7017,
+      "vscPerRace": 0.4935,
+      "scFallback": true,
+      "vscFallback": true,
+      "counted": [
+        "turkey-2020 (jolpica-estimate): 0 SC, 0 VSC",
+        "turkey-2021 (jolpica-estimate): 0 SC, 0 VSC"
+      ]
+    },
     "jeddah": {
       "name": "Jeddah Corniche Circuit",
       "races": 2,
       "vscRaces": 2,
       "scPeriods": 2,
       "vscPeriods": 2,
-      "scPerRace": 0.6941,
-      "vscPerRace": 0.5033,
+      "scPerRace": 0.7017,
+      "vscPerRace": 0.4935,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -288,8 +308,8 @@
       "vscRaces": 2,
       "scPeriods": 1,
       "vscPeriods": 0,
-      "scPerRace": 0.6941,
-      "vscPerRace": 0.5033,
+      "scPerRace": 0.7017,
+      "vscPerRace": 0.4935,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -358,15 +378,16 @@
     },
     "sepang": {
       "name": "Sepang International Circuit",
-      "races": 4,
+      "races": 5,
       "vscRaces": 3,
       "scPeriods": 1,
       "vscPeriods": 3,
-      "scPerRace": 0.25,
+      "scPerRace": 0.2,
       "vscPerRace": 1.0,
       "scFallback": false,
       "vscFallback": false,
       "counted": [
+        "malaysia-2013 (jolpica-estimate): 0 SC, 0 VSC",
         "malaysia-2014 (tum): 0 SC, 0 VSC",
         "malaysia-2015 (tum): 1 SC, 0 VSC",
         "malaysia-2016 (tum): 0 SC, 3 VSC",
@@ -375,15 +396,16 @@
     },
     "shanghai": {
       "name": "Shanghai International Circuit",
-      "races": 8,
+      "races": 9,
       "vscRaces": 7,
       "scPeriods": 6,
       "vscPeriods": 3,
-      "scPerRace": 0.75,
+      "scPerRace": 0.6667,
       "vscPerRace": 0.4286,
       "scFallback": false,
       "vscFallback": false,
       "counted": [
+        "china-2011 (jolpica-estimate): 0 SC, 0 VSC",
         "china-2014 (tum): 0 SC, 0 VSC",
         "china-2015 (tum): 1 SC, 0 VSC",
         "china-2016 (tum): 1 SC, 0 VSC",
@@ -477,6 +499,20 @@
         "japan-2024 (fastf1): 0 SC, 0 VSC"
       ]
     },
+    "valencia": {
+      "name": "Valencia Street Circuit",
+      "races": 1,
+      "vscRaces": 0,
+      "scPeriods": 1,
+      "vscPeriods": 0,
+      "scPerRace": 0.7017,
+      "vscPerRace": 0.4935,
+      "scFallback": true,
+      "vscFallback": true,
+      "counted": [
+        "europe-2012 (jolpica-estimate): 1 SC, 0 VSC"
+      ]
+    },
     "villeneuve": {
       "name": "Circuit Gilles Villeneuve",
       "races": 8,
@@ -500,15 +536,17 @@
     },
     "yas_marina": {
       "name": "Yas Marina Circuit",
-      "races": 9,
+      "races": 11,
       "vscRaces": 8,
-      "scPeriods": 3,
+      "scPeriods": 6,
       "vscPeriods": 4,
-      "scPerRace": 0.3333,
+      "scPerRace": 0.5455,
       "vscPerRace": 0.5,
       "scFallback": false,
       "vscFallback": false,
       "counted": [
+        "abu-dhabi-2010 (jolpica-estimate): 1 SC, 0 VSC",
+        "abu-dhabi-2012 (jolpica-estimate): 2 SC, 0 VSC",
         "abu-dhabi-2014 (tum): 0 SC, 0 VSC",
         "abu-dhabi-2015 (tum): 0 SC, 0 VSC",
         "abu-dhabi-2016 (tum): 0 SC, 0 VSC",
@@ -526,8 +564,8 @@
       "vscRaces": 1,
       "scPeriods": 1,
       "vscPeriods": 1,
-      "scPerRace": 0.6941,
-      "vscPerRace": 0.5033,
+      "scPerRace": 0.7017,
+      "vscPerRace": 0.4935,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
