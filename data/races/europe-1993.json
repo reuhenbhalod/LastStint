@@ -67,7 +67,9 @@
         "gapAhead": 0.835,
         "compound": "WET",
         "tyreAge": 14,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "WET"
+        ]
       },
       "realStrategy": []
     },
@@ -82,7 +84,9 @@
         "gapAhead": 3.035,
         "compound": "WET",
         "tyreAge": 14,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "WET"
+        ]
       },
       "realStrategy": []
     },
@@ -97,7 +101,9 @@
         "gapAhead": 7.332,
         "compound": "WET",
         "tyreAge": 14,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "WET"
+        ]
       },
       "realStrategy": []
     },
@@ -112,7 +118,9 @@
         "gapAhead": 1.159,
         "compound": "WET",
         "tyreAge": 14,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "WET"
+        ]
       },
       "realStrategy": []
     },
@@ -127,7 +135,9 @@
         "gapAhead": 0.0,
         "compound": "WET",
         "tyreAge": 14,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "WET"
+        ]
       },
       "realStrategy": [
         {
@@ -153,7 +163,9 @@
         "gapAhead": 2.612,
         "compound": "WET",
         "tyreAge": 14,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "WET"
+        ]
       },
       "realStrategy": []
     },
@@ -168,7 +180,9 @@
         "gapAhead": 2.863,
         "compound": "WET",
         "tyreAge": 14,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "WET"
+        ]
       },
       "realStrategy": []
     },
@@ -183,7 +197,9 @@
         "gapAhead": 2.397,
         "compound": "WET",
         "tyreAge": 14,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "WET"
+        ]
       },
       "realStrategy": []
     },
@@ -198,7 +214,9 @@
         "gapAhead": 12.491,
         "compound": "WET",
         "tyreAge": 14,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "WET"
+        ]
       },
       "realStrategy": []
     },
@@ -213,7 +231,9 @@
         "gapAhead": 0.278,
         "compound": "WET",
         "tyreAge": 14,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "WET"
+        ]
       },
       "realStrategy": []
     },
@@ -228,7 +248,9 @@
         "gapAhead": 4.169,
         "compound": "WET",
         "tyreAge": 14,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "WET"
+        ]
       },
       "realStrategy": []
     },
@@ -244,7 +266,8 @@
         "compound": "MEDIUM",
         "tyreAge": 4,
         "compoundsUsed": [
-          "MEDIUM"
+          "MEDIUM",
+          "WET"
         ]
       },
       "realStrategy": []
@@ -260,7 +283,9 @@
         "gapAhead": 3.757,
         "compound": "WET",
         "tyreAge": 14,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "WET"
+        ]
       },
       "realStrategy": [
         {
@@ -286,7 +311,9 @@
         "gapAhead": 3.735,
         "compound": "WET",
         "tyreAge": 14,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "WET"
+        ]
       },
       "realStrategy": []
     },
@@ -301,7 +328,9 @@
         "gapAhead": 6.721,
         "compound": "WET",
         "tyreAge": 14,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "WET"
+        ]
       },
       "realStrategy": []
     },
@@ -316,7 +345,9 @@
         "gapAhead": 10.614,
         "compound": "WET",
         "tyreAge": 14,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "WET"
+        ]
       },
       "realStrategy": [
         {
@@ -352,7 +383,9 @@
         "gapAhead": 2.672,
         "compound": "WET",
         "tyreAge": 14,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "WET"
+        ]
       },
       "realStrategy": [
         {
@@ -383,7 +416,9 @@
         "gapAhead": 30.316,
         "compound": "WET",
         "tyreAge": 14,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "WET"
+        ]
       },
       "realStrategy": []
     },
@@ -398,7 +433,9 @@
         "gapAhead": 1.754,
         "compound": "WET",
         "tyreAge": 14,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "WET"
+        ]
       },
       "realStrategy": []
     },
@@ -413,7 +450,9 @@
         "gapAhead": 2.235,
         "compound": "WET",
         "tyreAge": 14,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "WET"
+        ]
       },
       "realStrategy": []
     }

@@ -64,6 +64,7 @@ import {
   stopGoCost,
   stopsBeforeTakeover,
   stopsOwed,
+  takeoverCompoundsUsed,
   twoCompoundRule,
 } from './rules.js';
 import type {
@@ -629,7 +630,7 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
       compound: s.compound,
       tyreAge: s.tyreAge,
       tyreWear: s.tyreAge,
-      compoundsUsed: [...(s.compoundsUsed ?? [])],
+      compoundsUsed: takeoverCompoundsUsed(s),
       totalTime: cum,
       // A player-controlled car pits only when the player calls it.
       strategy:
@@ -2302,8 +2303,9 @@ function resolveOrder(
 export const DRY_COMPOUNDS = ['SOFT', 'MEDIUM', 'HARD'] as const;
 
 /**
- * Two-compound rule: in a dry race every car must run at least two different dry compounds.
- * (No modelled race is wet; wet tyres would waive it.)
+ * Two-compound rule: a car that hasn't run a wet tyre (intermediates or wets, at any point:
+ * before the takeover, on it at the takeover, or after) must run at least two different dry
+ * compounds. A car that has run one is free of it.
  */
 export function ruleSatisfied(car: CarState, rules?: RaceModel['rules']): boolean {
   if (!twoCompoundRule(rules)) return true; // era rules: no such rule before 2007

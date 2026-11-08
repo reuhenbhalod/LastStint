@@ -239,9 +239,36 @@ describe('the two-compound warning', () => {
     expect(warning(tagged('1994-2009', RULES_2007))).toBe(true);
   });
 
+  it('is off once the car has run a wet tyre (a wet takeover, then slicks)', () => {
+    const { race, model: m } = lateOnOneCompound(abu);
+    const me = race.cars[m.userSide];
+    if (!me) throw new Error('no car');
+    me.compoundsUsed = ['INTERMEDIATE', me.compound];
+    const call = directorCall(race, m, engineerConfig(m), [], [], [1], newMemory(), false);
+    expect(call?.text.includes('second tyre compound') ?? false).toBe(false);
+  });
+
   it('is off before 2007 (no rule in the race)', () => {
     expect(warning(MODEL_2005)).toBe(false);
     expect(warning(tagged('1994-2009', { twoCompound: false }))).toBe(false);
+  });
+
+  it('a wet tyre at any point waives it in the plan editor', () => {
+    const dry = { id: 'own' as const, stops: [{ lap: 40, compound: 'MEDIUM' }], pace: [] };
+    // Took over on intermediates, then one dry compound to the flag: legal.
+    const onInters = { compound: 'INTERMEDIATE', compoundsUsed: ['INTERMEDIATE'] };
+    expect(twoCompounds(onInters, dry as never, abu.rules)).toBe(true);
+    // An older race file lists dry compounds only: the tyre the car is on counts as well.
+    expect(twoCompounds({ ...onInters, compoundsUsed: [] }, dry as never, abu.rules)).toBe(true);
+    // Ran intermediates earlier, on slicks now.
+    const after = { compound: 'MEDIUM', compoundsUsed: ['INTERMEDIATE', 'MEDIUM'] };
+    expect(twoCompounds(after, { ...dry, stops: [] } as never, abu.rules)).toBe(true);
+    // A planned wet stop waives it too.
+    const wetStop = { ...dry, stops: [{ lap: 40, compound: 'WET' }] };
+    const onMedium = { compound: 'MEDIUM', compoundsUsed: ['MEDIUM'] };
+    expect(twoCompounds(onMedium, wetStop as never, abu.rules)).toBe(true);
+    // A dry car on one compound still needs a second.
+    expect(twoCompounds(onMedium, dry as never, abu.rules)).toBe(false);
   });
 
   it('is off in the plan editor too', () => {

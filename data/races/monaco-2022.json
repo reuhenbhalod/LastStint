@@ -230,6 +230,7 @@
         "tyreAge": 11,
         "compoundsUsed": [
           "HARD",
+          "INTERMEDIATE",
           "SOFT"
         ]
       },
@@ -472,6 +473,7 @@
         "tyreAge": 11,
         "compoundsUsed": [
           "HARD",
+          "INTERMEDIATE",
           "SOFT"
         ]
       },
@@ -566,7 +568,8 @@
         "compound": "INTERMEDIATE",
         "tyreAge": 7,
         "compoundsUsed": [
-          "HARD"
+          "HARD",
+          "INTERMEDIATE"
         ]
       },
       "realStrategy": [

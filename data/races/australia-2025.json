@@ -67,7 +67,9 @@
         "gapAhead": 1.147,
         "compound": "INTERMEDIATE",
         "tyreAge": 31,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "INTERMEDIATE"
+        ]
       },
       "realStrategy": [
         {
@@ -92,7 +94,9 @@
         "gapAhead": 2.232,
         "compound": "INTERMEDIATE",
         "tyreAge": 33,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "INTERMEDIATE"
+        ]
       },
       "realStrategy": [
         {
@@ -118,6 +122,7 @@
         "compound": "MEDIUM",
         "tyreAge": 29,
         "compoundsUsed": [
+          "INTERMEDIATE",
           "MEDIUM"
         ]
       },
@@ -141,6 +146,7 @@
         "compound": "MEDIUM",
         "tyreAge": 29,
         "compoundsUsed": [
+          "INTERMEDIATE",
           "MEDIUM"
         ]
       },
@@ -163,7 +169,9 @@
         "gapAhead": 2.223,
         "compound": "INTERMEDIATE",
         "tyreAge": 33,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "INTERMEDIATE"
+        ]
       },
       "realStrategy": [
         {
@@ -188,7 +196,9 @@
         "gapAhead": 1.317,
         "compound": "INTERMEDIATE",
         "tyreAge": 33,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "INTERMEDIATE"
+        ]
       },
       "realStrategy": [
         {
@@ -212,7 +222,9 @@
         "gapAhead": 7.536,
         "compound": "INTERMEDIATE",
         "tyreAge": 33,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "INTERMEDIATE"
+        ]
       },
       "realStrategy": [
         {
@@ -237,7 +249,9 @@
         "gapAhead": 9.255,
         "compound": "INTERMEDIATE",
         "tyreAge": 29,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "INTERMEDIATE"
+        ]
       },
       "realStrategy": [
         {
@@ -257,7 +271,9 @@
         "gapAhead": 6.214,
         "compound": "INTERMEDIATE",
         "tyreAge": 33,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "INTERMEDIATE"
+        ]
       },
       "realStrategy": [
         {
@@ -281,7 +297,9 @@
         "gapAhead": 0.0,
         "compound": "INTERMEDIATE",
         "tyreAge": 33,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "INTERMEDIATE"
+        ]
       },
       "realStrategy": [
         {
@@ -306,7 +324,9 @@
         "gapAhead": 10.135,
         "compound": "INTERMEDIATE",
         "tyreAge": 29,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "INTERMEDIATE"
+        ]
       },
       "realStrategy": [
         {
@@ -330,7 +350,9 @@
         "gapAhead": 2.675,
         "compound": "INTERMEDIATE",
         "tyreAge": 33,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "INTERMEDIATE"
+        ]
       },
       "realStrategy": [
         {
@@ -355,7 +377,9 @@
         "gapAhead": 12.486,
         "compound": "INTERMEDIATE",
         "tyreAge": 33,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "INTERMEDIATE"
+        ]
       },
       "realStrategy": [
         {
@@ -380,7 +404,9 @@
         "gapAhead": 11.655,
         "compound": "INTERMEDIATE",
         "tyreAge": 29,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "INTERMEDIATE"
+        ]
       },
       "realStrategy": [
         {
@@ -405,7 +431,9 @@
         "gapAhead": 16.339,
         "compound": "INTERMEDIATE",
         "tyreAge": 33,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "INTERMEDIATE"
+        ]
       },
       "realStrategy": [
         {
@@ -429,7 +457,9 @@
         "gapAhead": 15.075,
         "compound": "INTERMEDIATE",
         "tyreAge": 33,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "INTERMEDIATE"
+        ]
       },
       "realStrategy": [
         {

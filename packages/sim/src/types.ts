@@ -91,7 +91,10 @@ export interface DriverModel {
     gapAhead: number;
     compound: Compound;
     tyreAge: number;
-    /** Dry compounds run up to the takeover lap (two-compound rule). */
+    /**
+     * Compounds run up to the takeover lap (two-compound rule), wet tyres included since the
+     * wet-tyre fix; an older file lists dry ones only (rules.ts takeoverCompoundsUsed).
+     */
     compoundsUsed: Compound[];
   };
   realStrategy: PitStop[];
@@ -396,7 +399,7 @@ export interface CarState {
   tyreAge: number;
   /** Effective wear in laps: advances by the headset wear multiplier each green lap. */
   tyreWear: number;
-  /** Dry compounds run so far, including the takeover state (two-compound rule). */
+  /** Compounds run so far, wet tyres and the takeover tyre included (two-compound rule). */
   compoundsUsed: Compound[];
   /** Cumulative race time (s) since the takeover snapshot; order is by this. */
   totalTime: number;

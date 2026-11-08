@@ -150,6 +150,7 @@ export {
   stopGoCost,
   stopsBeforeTakeover,
   stopsOwed,
+  takeoverCompoundsUsed,
   twoCompoundRule,
 } from './rules.js';
 export type { ResolvedRules } from './rules.js';
