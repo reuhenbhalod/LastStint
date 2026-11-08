@@ -24,7 +24,7 @@
     "schemaVersion": {
       "type": "integer",
       "minimum": 1,
-      "description": "Bumped on any breaking change to this schema."
+      "description": "The schema version the file was written with. Every change so far is additive (new fields are optional, with defaults matching the older behaviour), so a reader accepts any version up to the current one (v11: eras, provenance, rules, events[].storylineEvent, scUnlap none)."
     },
     "race": {
       "type": "object",
@@ -58,9 +58,10 @@
           "type": "string",
           "enum": [
             "all",
-            "duel"
+            "duel",
+            "none"
           ],
-          "description": "Which lapped cars unlap before a safety-car restart: all of them (the rule, default), or only those between userSide and rival (Abu Dhabi 2021's race-control call)."
+          "description": "Which lapped cars unlap before a safety-car restart: all of them (the rule since 2012, default), only those between userSide and rival (Abu Dhabi 2021's race-control call), or none (before 2012, roadmap R5; the sim treats it as all until eras build plan 4.1)."
         }
       }
     },
@@ -334,6 +335,11 @@
           },
           "driver": {
             "type": "string"
+          },
+          "storylineEvent": {
+            "type": "boolean",
+            "default": false,
+            "description": "The event defines the race's storyline: Legend difficulty always runs it on its real lap instead of re-rolling it (eras spec section 8)."
           }
         }
       }
@@ -439,7 +445,7 @@
     },
     "reconstructed": {
       "type": "boolean",
-      "description": "True for hand-built races without official lap timing (labelled in the UI)."
+      "description": "True for hand-built races without official lap timing (labelled in the UI). Must agree with provenance.kind when both are set."
     },
     "weather": {
       "type": "object",
@@ -544,6 +550,564 @@
           }
         }
       }
+    },
+    "eras": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "eraId",
+        "order"
+      ],
+      "description": "Eras mode (eras spec section 11). Daily and Gauntlet ignore it. Only eraId and order are required so a race can join an era before its content is written; the content checklist (spec section 15) requires the rest before it is published.",
+      "properties": {
+        "eraId": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10,
+          "description": "The era (1 = turbo era ... 10 = ground-effect era), not the play order."
+        },
+        "order": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10,
+          "description": "The race's number within its era."
+        },
+        "userSide": {
+          "$ref": "#/$defs/driverCode",
+          "description": "The driver the player runs in Eras (the one with more hard calls, eras spec section 4). Absent: the top-level userSide. It may differ from the Daily side of a race in both pools."
+        },
+        "target": {
+          "$ref": "#/$defs/erasTarget",
+          "description": "The star 1 target."
+        },
+        "storyline": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "real",
+            "rewriteCondition",
+            "headline"
+          ],
+          "properties": {
+            "real": {
+              "type": "string",
+              "minLength": 1,
+              "description": "What really happened."
+            },
+            "rewriteCondition": {
+              "$ref": "#/$defs/erasTarget",
+              "description": "The result that rewrites the storyline, from the player's side."
+            },
+            "headline": {
+              "type": "string",
+              "minLength": 1,
+              "description": "An original history-book headline (never quoted team radio)."
+            }
+          }
+        },
+        "mastery": {
+          "$ref": "#/$defs/erasObjective"
+        },
+        "hidden": {
+          "$ref": "#/$defs/erasObjective"
+        },
+        "hardCalls": {
+          "type": "object",
+          "description": "Hard calls per storyline driver (driver code -> count), written by `pipeline hard-calls`.",
+          "propertyNames": {
+            "minLength": 2,
+            "maxLength": 4
+          },
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "briefing": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The short era-appropriate intro shown before the race."
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind"
+      ],
+      "description": "Where the race's data came from. Absent: real, nothing estimated.",
+      "properties": {
+        "kind": {
+          "enum": [
+            "real",
+            "reconstructed"
+          ],
+          "description": "real: built from lap timing; reconstructed: fitted to results and race reports (labelled in the UI)."
+        },
+        "estimated": {
+          "type": "array",
+          "uniqueItems": true,
+          "default": [],
+          "description": "Fields estimated rather than measured (eras build plan 2.4): stint compounds, safety-car laps, fuel loads, the wetness timeline.",
+          "items": {
+            "enum": [
+              "compounds",
+              "safetyCars",
+              "fuelLoads",
+              "weather"
+            ]
+          }
+        }
+      }
+    },
+    "rules": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "The race's sporting rules (roadmap R5). Each absent field keeps today's behaviour; drs and ers default to the era's headset.json block. Behaviour lands in eras build plan 4.1 / 4.2.",
+      "properties": {
+        "twoCompound": {
+          "type": "boolean",
+          "default": true,
+          "description": "A dry race must use two dry compounds (2007+)."
+        },
+        "tyreChanges": {
+          "type": "boolean",
+          "default": true,
+          "description": "False: a stop only refuels (2005)."
+        },
+        "refuelling": {
+          "type": "boolean",
+          "default": false,
+          "description": "Stops refuel (1994-2009, and 1983)."
+        },
+        "fuelLimit": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "The fixed race fuel allowance in kg (1984-88). Absent: no cap."
+        },
+        "pitLaneClosedUnderSC": {
+          "type": "boolean",
+          "default": false,
+          "description": "The pit lane closes when the SC is called; a stop takes a penalty (2007-09)."
+        },
+        "vsc": {
+          "type": "boolean",
+          "default": true,
+          "description": "A virtual safety car exists (2015+)."
+        },
+        "drs": {
+          "type": "boolean",
+          "description": "DRS and the wait-drs move. Absent: the era block's drs."
+        },
+        "ers": {
+          "enum": [
+            "none",
+            "kers",
+            "hybrid"
+          ],
+          "description": "The battery: none, KERS (2009, 2011-13) or the hybrid ERS (2014+). Absent: the era block's (an ers mode means hybrid)."
+        }
+      },
+      "if": {
+        "required": [
+          "fuelLimit"
+        ]
+      },
+      "then": {
+        "properties": {
+          "refuelling": {
+            "const": false
+          }
+        }
+      }
     }
-  }
+  },
+  "$defs": {
+    "driverCode": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 4
+    },
+    "erasTarget": {
+      "description": "A result condition from the player's side (eras spec section 6 targets). position/deny count from P1: position N means P N or better; deny N means the rival finishes P N or worse (or doesn't finish). team: positions[0] is the player's car and positions[1] its teammate, each at or better.",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "const": "win"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "const": "defend"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "position"
+          ],
+          "properties": {
+            "type": {
+              "const": "position"
+            },
+            "position": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "rival"
+          ],
+          "properties": {
+            "type": {
+              "const": "beat-rival"
+            },
+            "rival": {
+              "$ref": "#/$defs/driverCode"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "positions"
+          ],
+          "properties": {
+            "type": {
+              "const": "team"
+            },
+            "positions": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "minItems": 2,
+              "maxItems": 2
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "rival",
+            "position"
+          ],
+          "properties": {
+            "type": {
+              "const": "deny"
+            },
+            "rival": {
+              "$ref": "#/$defs/driverCode"
+            },
+            "position": {
+              "type": "integer",
+              "minimum": 2
+            }
+          }
+        }
+      ]
+    },
+    "erasObjective": {
+      "description": "A mastery or hidden objective (eras spec section 6): one of the 8 types with its parameters, and the label the UI shows.",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "label"
+          ],
+          "properties": {
+            "type": {
+              "const": "stop_count"
+            },
+            "label": {
+              "type": "string",
+              "minLength": 1
+            },
+            "max": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "exact": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "oneOf": [
+            {
+              "required": [
+                "max"
+              ]
+            },
+            {
+              "required": [
+                "exact"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "label"
+          ],
+          "properties": {
+            "type": {
+              "const": "beat_real_call"
+            },
+            "label": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "label",
+            "position"
+          ],
+          "properties": {
+            "type": {
+              "const": "finish_position"
+            },
+            "label": {
+              "type": "string",
+              "minLength": 1
+            },
+            "position": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "label",
+            "seconds"
+          ],
+          "properties": {
+            "type": {
+              "const": "margin"
+            },
+            "label": {
+              "type": "string",
+              "minLength": 1
+            },
+            "seconds": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "label"
+          ],
+          "properties": {
+            "type": {
+              "const": "compound_rule"
+            },
+            "label": {
+              "type": "string",
+              "minLength": 1
+            },
+            "mustUse": {
+              "type": "string",
+              "minLength": 1
+            },
+            "mustAvoid": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "anyOf": [
+            {
+              "required": [
+                "mustUse"
+              ]
+            },
+            {
+              "required": [
+                "mustAvoid"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "label",
+            "mode",
+            "maxLaps"
+          ],
+          "properties": {
+            "type": {
+              "const": "mode_rule"
+            },
+            "label": {
+              "type": "string",
+              "minLength": 1
+            },
+            "mode": {
+              "enum": [
+                "push",
+                "standard",
+                "manage",
+                "normal",
+                "liftAndCoast",
+                "attack",
+                "hold",
+                "defend",
+                "harvest",
+                "balanced",
+                "deploy",
+                "overtake"
+              ],
+              "description": "A mode value (Modes in packages/sim/src/types.ts); each names its key."
+            },
+            "maxLaps": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "label"
+          ],
+          "properties": {
+            "type": {
+              "const": "no_neutralized_stop"
+            },
+            "label": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "label",
+            "positions"
+          ],
+          "properties": {
+            "type": {
+              "const": "team_result"
+            },
+            "label": {
+              "type": "string",
+              "minLength": 1
+            },
+            "positions": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "minItems": 2,
+              "maxItems": 2,
+              "description": "The player's car then its teammate, each at or better."
+            }
+          }
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "required": [
+          "reconstructed",
+          "provenance"
+        ],
+        "properties": {
+          "reconstructed": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "provenance": {
+            "properties": {
+              "kind": {
+                "const": "reconstructed"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "reconstructed",
+          "provenance"
+        ],
+        "properties": {
+          "reconstructed": {
+            "const": false
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "provenance": {
+            "properties": {
+              "kind": {
+                "const": "real"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
 }
