@@ -322,6 +322,29 @@
             "type": "number",
             "description": "An Eras build's wet race: the driver's extra share of a lap on a damp track (wetness under 0.15), where wetPace is its pace on a wet one; fades in up to wetness 0.1 the same way (pipeline wet.driver_band_pace). Absent: wetPace at any wetness."
           },
+          "stintPace": {
+            "type": "array",
+            "description": "Pace by stint (Eras model fix M2; pipeline pace.stint_offsets): the car's pace offset (s/lap, added to basePace) in each real stint after the takeover, fitted from its clean laps in that stint and shrunk toward 0. Keyed by the lap the stint began: a real stop's out-lap, or 0 for the stint the car is on at the takeover. A car runs an offset while its current stint began on that lap; a stint begun on any other lap runs at 0, and so does the player's car in live play (its effort is the pace modes'). Eras builds only; absent: none.",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "lap",
+                "offset"
+              ],
+              "properties": {
+                "lap": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "The out-lap the stint began on (a realStrategy lap), or 0 for the takeover stint."
+                },
+                "offset": {
+                  "type": "number",
+                  "description": "Seconds per lap added to basePace in this stint (negative: quicker)."
+                }
+              }
+            }
+          },
           "serviceStops": {
             "type": "array",
             "description": "Real stops after the takeover that changed no tyres (a repair, a penalty stop-go, a drive-through; pipeline track.service_stops): the car pays each one's measured loss on its out-lap whatever its strategy, and keeps its set. Eras builds only; absent: none.",

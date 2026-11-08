@@ -131,6 +131,7 @@ def assemble_race_model(
     refuel: dict | None = None,
     service_stops: bool = False,
     eras_stops: bool = False,
+    stint_pace: bool = False,
 ) -> dict:
     """Build the race-model dict (validate + write it with export.write_race). `fault_facts`:
     the race's hand-checked car faults (incidents.fault_facts), fitted into FAULT events.
@@ -142,7 +143,9 @@ def assemble_race_model(
     stop-go, a drive-through: track.service_stops) after the takeover, as drivers[].serviceStops
     at their measured loss in the sim frame. `eras_stops` (Eras builds): back-to-back stops
     count their shared lap once, and stops on laps partly under a local yellow are priced in the
-    sim frame (track.stop_records, pace.sim_frame_losses)."""
+    sim frame (track.stop_records, pace.sim_frame_losses). `stint_pace` (Eras builds, model fix
+    M2): each car's pace offset by real stint (pace.stint_offsets), as drivers[].stintPace; the
+    faults' and the stops' sim-frame fits then carry it too."""
     total_laps = int(laps["LapNumber"].max())
     cliffs = fit.compound_cliff
     longest = longest_stints(laps)
@@ -247,6 +250,22 @@ def assemble_race_model(
         weather,
         wear,
     )
+    # Pace by stint (Eras model fix M2, pace.stint_offsets): fitted against the file's basePace.
+    stint_table = (
+        pace_mod.stint_offsets(
+            faults_mod.without_fault_laps(laps, facts),
+            {c: round(p + race_pace.get(c, 0.0), 4) for c, p in fit.driver_pace.items()},
+            compounds,
+            round(fit.fuel_per_lap, 5),
+            fresh,
+            takeover_lap,
+            pace_mod.real_stops(strategy, takeover_lap),
+            weather,
+            wear,
+        )
+        if stint_pace
+        else None
+    )
     # Car faults (faults.py): fitted from the car's own laps against its sim pace; one that
     # struck before the takeover and still lasts is kept too (the sim runs it from then on).
     fault_events = faults_mod.fault_events(
@@ -257,6 +276,7 @@ def assemble_race_model(
         round(fit.fuel_per_lap, 5),
         fresh,
         weather,
+        stint_table,
     )
     future_events = events_mod.with_faults(
         future_events,
@@ -280,6 +300,7 @@ def assemble_race_model(
             wet_pace,
             eras_stops=eras_stops,
             damp_pace=damp_pace,
+            stint=stint_table,
         )
         # A stop made with a fault: the sim adds the fault's cost to its laps itself.
         measured.update(faults_mod.adjust_stop_losses(frame, fault_events, laps))
@@ -326,6 +347,7 @@ def assemble_race_model(
             service=True,
             eras_stops=eras_stops,
             damp_pace=damp_pace,
+            stint=stint_table,
         )
         for (code, out_lap), loss in sorted(frame.items()):
             if out_lap > takeover_lap:
@@ -365,6 +387,11 @@ def assemble_race_model(
                     if st["lap"] >= takeover_lap
                 ],
                 **({"serviceStops": service[code]} if code in service else {}),
+                **(
+                    {"stintPace": stint_table.entries(code)}
+                    if stint_table and stint_table.entries(code)
+                    else {}
+                ),
             }
         )
 

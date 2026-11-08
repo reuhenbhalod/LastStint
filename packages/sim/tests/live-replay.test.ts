@@ -10,6 +10,10 @@
 // carry the real fills (realDecisions, refuel.ts realFill), so they replay the real race there
 // too, with no car running dry. No race file on this branch refuels, so every race is
 // re-tagged in memory (rules.refuelling, with a fitted fill model and with the prior).
+//
+// Pace by stint (Eras model fix M2, DriverModel.stintPace): the player's car runs at 0 in live
+// play (its effort is the pace modes'), while a replay runs it at its real stints' offsets. So
+// live play with the real calls is compared with the replay of the race less the user's offsets.
 
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
@@ -22,9 +26,20 @@ const races = readdirSync(dir).filter((f) => f.endsWith('.json'));
 
 const load = (file: string) => JSON.parse(readFileSync(join(dir, file), 'utf8')) as RaceModel;
 
+/** The race with the user's stint offsets removed (live play runs the player's car at 0). */
+function withoutUserStintPace(model: RaceModel): RaceModel {
+  return {
+    ...model,
+    drivers: model.drivers.map((d) =>
+      d.code === model.userSide && d.stintPace ? { ...d, stintPace: [] } : d,
+    ),
+  };
+}
+
 /** Replay `model`, then play it live with the real calls: every car's time must match. */
 function realCallsReplay(model: RaceModel): { live: Run; replay: Run } {
-  const replay = initRun(model, model.race.seed);
+  const replayed = withoutUserStintPace(model);
+  const replay = initRun(replayed, model.race.seed);
   while (!isFinished(replay)) stepLap(replay);
   const user = model.drivers.find((d) => d.code === model.userSide);
   const skipped = new Set(
@@ -41,7 +56,7 @@ function realCallsReplay(model: RaceModel): { live: Run; replay: Run } {
   const rival = model.drivers.find((d) => d.code === model.rival);
   let expected = replay;
   if (live.state.cars[model.rival]?.tyreAge !== replay.state.cars[model.rival]?.tyreAge) {
-    expected = initRun(model, model.race.seed, {
+    expected = initRun(replayed, model.race.seed, {
       strategies: { [model.rival]: (rival?.realStrategy ?? []).filter((s) => !s.optional) },
     });
     while (!isFinished(expected)) stepLap(expected);

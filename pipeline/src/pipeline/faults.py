@@ -63,10 +63,12 @@ def residuals(
     fuel_per_lap: float,
     fresh_tyre: dict | None,
     weather: dict | None = None,
+    stint=None,
 ) -> pd.DataFrame:
     """Every timed lap of a car in `base_pace` on a modelled compound: Driver, LapNumber,
     residual (real minus the sim's clean lap for the car), green, usable (green, not an in- or
-    out-lap) and in_lap."""
+    out-lap) and in_lap. `stint` (a pace.StintTable; Eras builds): the clean lap carries the
+    offset of the real stint the lap is in, as the sim runs it."""
     rows = []
     timed = laps[laps["LapTime"].notna() & laps["TyreLife"].notna()]
     for r in timed.itertuples():
@@ -80,6 +82,7 @@ def residuals(
             compound=compound,
             tyre_age=max(0, int(r.TyreLife) - 1),  # the sim's age while running this lap
             total_time=0.0,
+            stint_pace=stint.on(str(r.Driver), int(r.LapNumber)) if stint else 0.0,
             **car_fuel(r),  # a refuelling race: the tank on board, as the sim carries it
         )
         lap = int(r.LapNumber)
@@ -224,11 +227,13 @@ def fault_events(
     fuel_per_lap: float,
     fresh_tyre: dict | None,
     weather: dict | None = None,
+    stint=None,
 ) -> list[dict]:
-    """The FAULT events for a race's facts (incidents.fault_facts), sorted by lap."""
+    """The FAULT events for a race's facts (incidents.fault_facts), sorted by lap. `stint`: a
+    pace.StintTable (pace by stint, Eras builds), or None."""
     if not facts:
         return []
-    res = residuals(laps, base_pace, compounds, fuel_per_lap, fresh_tyre, weather)
+    res = residuals(laps, base_pace, compounds, fuel_per_lap, fresh_tyre, weather, stint)
     out = [
         fit_fault(laps, f, base_pace, compounds, fuel_per_lap, fresh_tyre, weather, res)
         for f in facts

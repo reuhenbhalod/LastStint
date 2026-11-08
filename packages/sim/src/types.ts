@@ -106,6 +106,22 @@ export interface DriverModel {
    * out-lap whatever its strategy, and keeps its set. Eras builds only.
    */
   serviceStops?: ServiceStop[];
+  /**
+   * Pace by stint (Eras model fix M2; pipeline pace.stint_offsets): the car's offset to
+   * basePace in each real stint after the takeover, keyed by the lap the stint began (a real
+   * stop's out-lap, or 0 for the takeover stint). A car runs an offset while its current stint
+   * began on that lap; any other stint runs at 0, and so does the player's car in live play.
+   * Eras builds only.
+   */
+  stintPace?: StintPace[];
+}
+
+/** One stint's pace offset (DriverModel.stintPace). */
+export interface StintPace {
+  /** The out-lap the stint began on, or 0 for the stint the car is on at the takeover. */
+  lap: number;
+  /** Seconds per lap added to basePace in the stint (negative: quicker). */
+  offset: number;
 }
 
 /** A stop with no tyre change (DriverModel.serviceStops). */
@@ -398,6 +414,8 @@ export interface CarState {
   wetPace?: number;
   /** An Eras build: its share on a damp track (DriverModel.dampPace). */
   dampPace?: number;
+  /** Pace by stint: the offset of the stint the car is on (DriverModel.stintPace; 0 if none). */
+  stintPace?: number;
   compound: Compound;
   /** Laps on the current tyres (what the timing tower shows). */
   tyreAge: number;
