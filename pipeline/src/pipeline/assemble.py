@@ -127,11 +127,14 @@ def assemble_race_model(
     fault_facts: list[dict] | None = None,
     year: int | None = None,
     red_flags: list[dict] | None = None,
+    refuel: dict | None = None,
 ) -> dict:
     """Build the race-model dict (validate + write it with export.write_race). `fault_facts`:
     the race's hand-checked car faults (incidents.fault_facts), fitted into FAULT events.
     `year` and `red_flags` (the race's red-flag file entries, redflag.load_entries) give each
-    red flag its restart; races without one ignore them."""
+    red flag its restart; races without one ignore them. `refuel`: a refuelling race's fill
+    model (refuel.race_fill_model), stored as track.refuel; its laps carry the Tank and
+    FuelLap columns (refuel.with_fuel_columns), so every fuel term below is the sim's."""
     total_laps = int(laps["LapNumber"].max())
     cliffs = fit.compound_cliff
     longest = longest_stints(laps)
@@ -369,6 +372,9 @@ def assemble_race_model(
                 if track_params.vsc_lap_time is not None
                 else {}
             ),
+            # A refuelling race's fill model: a new stop pays the pit loss (which holds a
+            # typical fill, refFill) plus secondsPerLap x (its fill - refFill).
+            **({"refuel": refuel} if refuel else {}),
         },
         "compounds": compounds,
         "drivers": drivers,

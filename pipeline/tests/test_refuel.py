@@ -324,6 +324,43 @@ def test_effective_lap_is_the_sims_sawtooth():
         assert e == pytest.approx(lap - (t - (6 - lap + 1)))
 
 
+def test_fuel_columns_give_the_build_the_sims_fuel_term():
+    laps = pd.DataFrame({"Driver": ["A"] * 6 + ["B"] * 6, "LapNumber": [1, 2, 3, 4, 5, 6] * 2})
+    ins = refuel.stop_in_laps({"A": [{"lap": 4, "to": "SOFT"}], "B": []})
+    assert ins == {"A": [3], "B": []}
+    out = refuel.with_fuel_columns(laps, ins, 6)
+    assert "Tank" not in laps.columns  # a copy
+    assert out["FuelLap"].tolist() == refuel.effective_lap(laps, ins, 6).tolist()
+    assert out["Tank"].tolist()[:6] == [4, 3, 2, 4, 3, 2]
+    # B never stops: a single tank plus the reserve, today's fuel term one lap later.
+    assert out["FuelLap"].tolist()[6:] == [0.0, 1.0, 2.0, 3.0, 4.0, 5.0]
+    assert refuel.fuel_laps(out).tolist() == out["FuelLap"].tolist()
+    assert refuel.fuel_laps(laps).tolist() == [float(x) for x in laps["LapNumber"]]
+    # A build-side Car on a lap row runs the sim's clean lap: -fuel x FuelLap.
+    compounds = {"SOFT": {"offset": 0.0, "degPerLap": 0.0, "cliffLap": 99}}
+    for r in out.itertuples():
+        car = sim_reference.Car(
+            code="A", base_pace=90.0, noise=0.0, compound="SOFT", tyre_age=0, total_time=0.0,
+            **refuel.car_fuel(r),
+        )  # fmt: skip
+        lap = sim_reference._clean_lap(car, compounds, 0.1, int(r.LapNumber))
+        assert lap == pytest.approx(90.0 - 0.1 * r.FuelLap)
+        assert refuel.fuel_lap_of(r) == r.FuelLap
+    assert refuel.car_fuel(next(laps.itertuples())) == {}
+
+
+def test_the_race_fill_model_reads_the_f1db_stops(tmp_path):
+    results = [
+        {"number": 3, "laps": 77, "status": "finished"},
+        {"number": 8, "laps": 76, "status": "lapped"},
+        {"number": 12, "laps": 28, "status": "retired"},
+    ]
+    assert refuel.finished_laps(results) == {3: 77, 8: 76}
+    fit, slope = refuel.race_fill_model("hungary-1998", results)
+    assert fit["tankLaps"] >= 18 and slope["stops"] == fit["stops"]
+    assert refuel.race_fill_model("hungary-1998", results, tmp_path) == (None, None)
+
+
 # --- The rules by year and the overlays -------------------------------------------------------
 
 

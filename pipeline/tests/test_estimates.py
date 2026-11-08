@@ -25,6 +25,7 @@ from pipeline import (
     jolpica,
     paths,
     refuel,
+    sim_reference,
 )
 
 FIXTURE = Path(__file__).parent / "fixtures" / "jolpica" / "csv-2026-10-24"
@@ -596,6 +597,13 @@ def test_existing_races_build_unchanged_without_an_overlay(tmp_path):
 def built(tmp_path_factory, drivers_json) -> dict:
     root = tmp_path_factory.mktemp("eras-build")
     raw_dir, checks = root / "raw", root / "estimates"
+    # japan-2005 refuels: its overlay's rules (as committed) and its F1DB stops for the fill fit.
+    (root / "eras").mkdir()
+    for name in ("japan-2005.json",):
+        (root / "eras" / name).write_text((paths.DATA_DIR / "eras" / name).read_text())
+    (raw_dir / "f1db").mkdir(parents=True)
+    stops = paths.RAW_DIR / "f1db" / "japan-2005.stops.csv"
+    (raw_dir / "f1db" / stops.name).write_text(stops.read_text())
     out = {}
     for rid, year, event in (("japan-2005", 2005, "japan"), ("abu-dhabi-2012", 2012, "abu dhabi")):
         stops = jolpica.f1db_stops(rid) if year < jolpica.STOPS_FROM else None
@@ -624,7 +632,15 @@ def test_e2e_japan_2005(built):
         "kind": "real",
         "estimated": ["compounds", "safetyCars", "fuelLoads"],
     }
-    assert model["fuelEffectPerLap"] == build.REFUELLING_FUEL
+    # Refuelling (eras build plan 4.2): the fuel term is fitted on the sim's sawtooth and the
+    # fill rate on the F1DB stops, near the 0.25 s/lap physical prior.
+    assert model["rules"]["refuelling"] is True and model["rules"]["tyreChanges"] is False
+    assert 0.0 < model["fuelEffectPerLap"] < 0.2
+    fill = model["track"]["refuel"]
+    assert fill["secondsPerLap"] == pytest.approx(refuel.PRIOR_SECONDS_PER_LAP, abs=0.03)
+    assert fill["stops"] >= 20 and 10 < fill["refFill"] < 30 and fill["tankLaps"] <= 53
+    assert any(line.startswith("  fill rate 0.2") for line in result.estimates)
+    assert any("fitted on the refuelling sawtooth" in line for line in result.estimates)
     assert result.estimates[0] == "estimated: compounds, safetyCars, fuelLoads"
     assert any("laps 2-7 SC likely, unchecked" in line for line in result.estimates)
     assert any("fuel loads: 56 stints" in line for line in result.estimates)
@@ -633,6 +649,54 @@ def test_e2e_japan_2005(built):
     checks_path = estimates.sc_check_path("japan-2005", built["root"] / "estimates")
     checks = json.loads(checks_path.read_text())
     assert [p["status"] for p in checks["periods"]] == ["unchecked"]
+
+
+def test_e2e_japan_2005_fuel_terms_are_the_sims(built):
+    """Every lap's Tank column is the tank the reference sim carries on it (the takeover load,
+    each real stop's fill, a lap's burn), so the fit's fuel term is the sim's."""
+    from types import SimpleNamespace
+
+    result = built["results"]["japan-2005"]
+    model, laps = result.model, result.laps
+    total, takeover = model["race"]["laps"], model["race"]["takeoverLap"]
+    for d in model["drivers"]:
+        own = laps[laps["Driver"] == d["code"]].set_index("LapNumber")
+        strategy = [dict(s) for s in d["realStrategy"]]
+        car = SimpleNamespace(code=d["code"], strategy=strategy, race_laps=total)
+        car.tank = float(refuel.takeover_tank(strategy, takeover, total))
+        for lap in range(takeover + 1, int(own.index.max()) + 1):
+            pit = next((s for s in car.strategy if s["lap"] == lap), None)
+            if pit:
+                car.strategy.remove(pit)
+                assert refuel.refuel_at_stop(model, car, pit, lap) == 0.0  # measured loss
+            assert car.tank == own.at[lap, refuel.TANK_COLUMN], (d["code"], lap)
+            # The sim's fuel term at 1 s/lap: -lap plus the tank's weight over a single tank.
+            sim_term = -lap + refuel.tank_weight_delta(car, 1.0, lap)
+            assert -own.at[lap, refuel.FUEL_LAP_COLUMN] == pytest.approx(sim_term)
+            car.tank -= 1.0
+    # A new stop pays the fit: secondsPerLap x (its fill - refFill) over the pit loss.
+    fill = model["track"]["refuel"]
+    car = SimpleNamespace(code="X", strategy=[], tank=1.0, race_laps=total)
+    cost = refuel.refuel_at_stop(model, car, {"lap": 30, "to": "MEDIUM"}, 30)
+    assert cost == pytest.approx(fill["secondsPerLap"] * (total - 30 + 1 - fill["refFill"]))
+
+
+def test_e2e_japan_2005_replays_to_the_flag(built):
+    model = built["results"]["japan-2005"].model
+    res = sim_reference.simulate(model, 1)
+    assert set(res["order"]) == {d["code"] for d in model["drivers"]}
+    assert set(model["realResult"][:3]) <= set(res["finishers"])
+
+
+def test_a_refuelling_race_needs_its_rule(tmp_path):
+    block = {"estimated": ["compounds", "fuelLoads"]}
+    on = {"rules": {"refuelling": True}}
+    assert build.refuelling_race("x-2005", block, on) is True
+    assert build.refuelling_race("x-2012", {"estimated": ["compounds"]}, None) is False
+    with pytest.raises(ValueError, match="rules.refuelling"):
+        build.refuelling_race("x-2005", block, None)
+    with pytest.raises(ValueError, match="rules.refuelling"):
+        build.refuelling_race("x-2005", block, on, shared=True)  # its file has no rules
 
 
 def test_e2e_abu_dhabi_2012(built):

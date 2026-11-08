@@ -16,6 +16,7 @@ from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 
+from .refuel import car_fuel
 from .sim_reference import Car, _clean_lap, simulate
 from .validate import real_finishing_gaps
 
@@ -66,6 +67,7 @@ def diagnose(model: dict, laps: pd.DataFrame, score_positions: int, runs: int = 
             compound=compound,
             tyre_age=int(r.TyreLife),
             total_time=0,
+            **car_fuel(r),
         )
         predicted = _clean_lap(
             car,

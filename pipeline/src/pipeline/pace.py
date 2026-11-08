@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import pandas as pd
 
+from .refuel import car_fuel
 from .sim_reference import Car, _clean_lap
 
 SHRINK_LAPS = 5.0
@@ -69,6 +70,7 @@ def post_takeover_offsets(
             tyre_age=max(0, int(r.TyreLife) - 1),  # the sim's age while running this lap
             total_time=0.0,
             tyre_wear=tyre_wear,
+            **car_fuel(r),  # a refuelling race: the tank on board, as the sim carries it
         )
         predicted = _clean_lap(car, compounds, fuel_per_lap, int(r.LapNumber), fresh_tyre, weather)
         residuals.setdefault(str(r.Driver), []).append(float(r.LapTime) - predicted)
@@ -106,7 +108,7 @@ def sim_frame_losses(
 
     fitted = fitted_compound(laps)
 
-    def clean(code: str, compound: str, age: int, lap: int, tyre_wear=None) -> float:
+    def clean(code: str, compound: str, age: int, row: pd.Series, tyre_wear=None) -> float:
         car = Car(
             code=code,
             base_pace=base_pace[code],
@@ -116,8 +118,9 @@ def sim_frame_losses(
             total_time=0.0,
             tyre_wear=tyre_wear,
             wet_pace=(wet_pace or {}).get(code, 0.0),
+            **car_fuel(row),  # a refuelling race: the tank on board, as the sim carries it
         )
-        return _clean_lap(car, compounds, fuel_per_lap, lap, fresh_tyre, weather)
+        return _clean_lap(car, compounds, fuel_per_lap, int(row["LapNumber"]), fresh_tyre, weather)
 
     out: dict[tuple[str, int], float] = {}
     for code, in_lap, out_lap in pit_stops(laps):
@@ -131,12 +134,12 @@ def sim_frame_losses(
         new = str(fitted.loc[out_lap.name])
         if new not in compounds or str(in_lap["Compound"]) not in compounds:
             continue
-        loss = float(out_lap["LapTime"]) - clean(code, new, 0, n_out)
+        loss = float(out_lap["LapTime"]) - clean(code, new, 0, out_lap)
         if n_in > takeover_lap:
             age = max(0, int(in_lap["TyreLife"]) - 1)
             in_wear = None if wear is None else float(wear.loc[in_lap.name])
             loss += float(in_lap["LapTime"]) - clean(
-                code, str(in_lap["Compound"]), age, n_in, in_wear
+                code, str(in_lap["Compound"]), age, in_lap, in_wear
             )
         out[(code, n_out)] = loss
     return out

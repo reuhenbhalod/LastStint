@@ -25,6 +25,7 @@ import numpy as np
 import pandas as pd
 
 from .paths import REPO_ROOT
+from .refuel import fuel_lap_of
 
 WET_CURVES_PATH = REPO_ROOT / "data" / "wet.json"
 WET_COMPOUNDS = ("INTERMEDIATE", "WET")
@@ -139,9 +140,9 @@ def observations(
     for idx, r in laps[ok].iterrows():
         cls = tyre_class(str(r.Compound))
         dry = (
-            predict(r.Driver, str(r.Compound), float(eff.loc[idx]), float(r.LapNumber))
+            predict(r.Driver, str(r.Compound), float(eff.loc[idx]), fuel_lap_of(r))
             if cls == "slick"
-            else predict(r.Driver, None, 0.0, float(r.LapNumber))
+            else predict(r.Driver, None, 0.0, fuel_lap_of(r))
         )
         if dry is None:
             continue
@@ -356,7 +357,7 @@ def driver_wet_pace(
             d,
             comp if slick else fitted.reference_compound,
             float(eff.loc[idx]) if slick else 0.0,
-            float(r.LapNumber),
+            fuel_lap_of(r),
         )
         share = float(r.LapTime) / dry - 1 - float(penalty(weather["curves"], comp, w))
         if abs(share) < 0.3:

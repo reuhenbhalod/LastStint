@@ -24,6 +24,7 @@ from . import (
     incidents,
     ingest,
     redflag,
+    refuel,
     scenario,
     track,
     wet,
@@ -1226,12 +1227,6 @@ def _from_raw(load, race_id: str, raw_dir: Path):
     return load(race_id) if raw_dir == RAW_DIR else load(race_id, raw_dir)
 
 
-# A refuelling race's fuel effect (s/lap) until eras build plan 4.2: the fit's fuel term is a
-# slope on the race lap, which refuelling breaks (the car is refilled at each stop, so the
-# weight saws up and down), and it can come out negative. 0 = no race-long weight trend.
-REFUELLING_FUEL = 0.0
-
-
 def _dir_arg(raw_dir: Path) -> tuple[Path, ...]:
     """raw_dir as an extra argument only when it isn't the default, so the one-argument
     loaders existing tests patch in (test_tum.py) keep working."""
@@ -1244,8 +1239,9 @@ def dry_fit(
     era: str,
     fault_facts: list[dict] | None = None,
     raw_dir: Path = RAW_DIR,
-    refuelling: bool = False,
 ) -> DryFit:
+    """The dry lap model. A refuelling race's `laps` carry the Tank and FuelLap columns
+    (refuel.with_fuel_columns): the fuel term is fitted on the sim's sawtooth."""
     clean_df, traffic_df, _ = clean.clean_laps(laps)
     # A faulted car's laps while the fault lasts aren't its pace (faults.py fits the loss).
     clean_df = faults.without_fault_laps(clean_df, fault_facts or [], laps)
@@ -1271,9 +1267,52 @@ def dry_fit(
         pace_laps=clean_df if pace_mod.CLEAR_AIR else pace_laps,
         fallback_pace_laps=pace_laps,
         era=era,
-        fixed_fuel=REFUELLING_FUEL if refuelling else wet.FUEL_PRIOR if wet_race else None,
+        fixed_fuel=wet.FUEL_PRIOR if wet_race else None,
     )
     return DryFit(clean_df, traffic_df, fitted, rain_data, wet_race)
+
+
+def refuelling_race(
+    race_id: str, block: dict | None, overlay: dict | None, shared: bool = False
+) -> bool:
+    """Whether the race file refuels: its overlay's rules.refuelling (the switch the sims read),
+    on a race whose file takes its overlay. A race whose stops refuelled (the sidecar lists
+    fuelLoads) but whose file wouldn't is an error: the fit and the sims would disagree."""
+    rules = (overlay or {}).get("rules") or {}
+    on = rules.get("refuelling") is True and not shared
+    if not on and "fuelLoads" in (block or {}).get("estimated", []):
+        raise ValueError(
+            f"{race_id}: its stops refuelled (the sidecar lists fuelLoads) but its race file"
+            " has no rules.refuelling: set it in data/eras/<id>.json (python -m pipeline.refuel"
+            " overlays)"
+        )
+    return on
+
+
+def refuel_report(model: dict, fill: dict | None, slope: dict | None, wet_race: bool) -> list[str]:
+    """The build report's lines on a refuelling race's fuel effect and fill rate."""
+    fuel = model["fuelEffectPerLap"]
+    lines = [
+        f"  fuel effect {fuel:.4f} s per lap of fuel on board"
+        + (" (the wet races' fixed prior)" if wet_race else ", fitted on the refuelling sawtooth")
+        + " (refuel.with_fuel_columns)"
+    ]
+    if fill is None:
+        lines.append(
+            "  NO FILL FIT: no F1DB stops (data/raw/f1db/<id>.stops.csv); a new stop pays the"
+            f" {refuel.PRIOR_SECONDS_PER_LAP} s/lap prior on its whole fill"
+        )
+        return lines
+    own = (
+        f"its own slope {slope['slope']:+.3f} s, se {slope['se']:.3f}"
+        if slope and slope["slope"] == slope["slope"]
+        else "no slope of its own"
+    )
+    lines.append(
+        f"  fill rate {fill['secondsPerLap']:.4f} s per lap of fuel ({own}; {fill['stops']} stops),"
+        f" refFill {fill['refFill']:.1f} laps, tank {fill['tankLaps']} laps (track.refuel)"
+    )
+    return lines
 
 
 def lap_time_weather(records: list[dict] | None) -> bool:
@@ -1346,10 +1385,23 @@ def build_race(
     laps = redflag.mark_hand_entries(laps, red_flags)
     if fault_facts is None:
         fault_facts = incidents.fault_facts(race_id)
-    block = (load_sidecar(race_id, raw_dir) or {}).get("estimates")
-    refuelling = "fuelLoads" in (block or {}).get("estimated", [])
+    sidecar = load_sidecar(race_id, raw_dir) or {}
+    block = sidecar.get("estimates")
+    overlay = load_overlay(race_id, eras_dir)
+    shared = overlay is not None and race_id in shared_races(pools_path)
+    refuelling = refuelling_race(race_id, block, overlay, shared)
+    refuel_fit = refuel_slope = None
+    if refuelling:
+        # Eras build plan 4.2: every fuel term reads the tank the sim carries (to the next
+        # real stop, plus the reserve), and the fill rate is fitted from the F1DB stops.
+        total = int(laps["LapNumber"].max())
+        ins = refuel.stop_in_laps(scenario.real_strategy(laps))
+        laps = refuel.with_fuel_columns(laps, ins, total)
+        refuel_fit, refuel_slope = refuel.race_fill_model(
+            race_id, sidecar.get("results"), Path(raw_dir) / "f1db"
+        )
 
-    dry = dry_fit(race_id, laps, meta["era"], fault_facts, raw_dir, refuelling)
+    dry = dry_fit(race_id, laps, meta["era"], fault_facts, raw_dir)
     clean_df, traffic_df, fitted = dry.clean, dry.traffic, dry.fitted
     weather = wet.weather_block(laps, dry.rain, fitted, wet.load_curves()) if dry.wet else None
     wet_pace = (
@@ -1386,12 +1438,11 @@ def build_race(
         fault_facts=fault_facts,
         year=meta.get("year"),
         red_flags=red_flags,
+        refuel=refuel_fit,
     )
     estimated = list((block or {}).get("estimated", []))
     if lap_time_weather(dry.rain):
         estimated.append("weather")  # step 4.5: the wetness is fitted from the lap times
-    overlay = load_overlay(race_id, eras_dir)
-    shared = overlay is not None and race_id in shared_races(pools_path)
     if shared:
         # The Worker's merge replaces the provenance block outright (as with_eras_fields
         # does), so it can't also carry this build's estimated fields.
@@ -1412,9 +1463,7 @@ def build_race(
     if "weather" in estimated:
         report.append("estimated: weather (wet laps from the lap times, `pipeline wet-laps`)")
     if refuelling:
-        report.append(
-            f"  fuel effect fixed at {REFUELLING_FUEL} s/lap: a refuelling race (step 4.2)"
-        )
+        report.extend(refuel_report(model, refuel_fit, refuel_slope, dry.wet))
     return BuildResult(
         model=model,
         laps=laps,

@@ -5,7 +5,9 @@
 Least squares with an explicit design matrix: one absolute pace term per driver, a
 compound offset relative to the softest compound, a wear rate per compound
 (compound x tyre age), and one fuel term (slope on lap number). Fitting across every stint
-separates fuel (monotonic in lap number) from wear (resets to zero each stop).
+separates fuel (monotonic in lap number) from wear (resets to zero each stop). In a refuelling
+race the fuel term's lap is the FuelLap column (refuel.with_fuel_columns), so the weight saws
+up at each stop as the sim's tank does.
 
 Dry compounds are ordered and shrunk toward a physical baseline. In a single race each
 compound tends to run in one phase (opening stints on heavy fuel and a green track, or a
@@ -28,6 +30,7 @@ import numpy as np
 import pandas as pd
 
 from .paths import COMPOUND_PRIORS_PATH
+from .refuel import fuel_laps
 
 _FIT_COLUMNS = ["LapTime", "TyreLife", "LapNumber", "Compound", "Driver"]
 _COLLAPSED = 1e-6  # a data-only step at or below this is "no separation in the data"
@@ -103,7 +106,7 @@ def _driver_pace_from(
         - df["Compound"].map(compound_wear).astype(float) * df["TyreLife"].astype(float)
         - _cliff_term(df, compound_cliff)
         - fresh[0] * fresh_weight(df["TyreLife"], fresh[1])
-        + fuel_per_lap * df["LapNumber"].astype(float)
+        + fuel_per_lap * fuel_laps(df)
     )
     df = df.assign(_base=base)
     pace, noise = {}, {}
@@ -164,12 +167,12 @@ def _fit_core(df, drivers, ordered, free, reference, prior, cliff_ages, fixed_fu
         scale = float(np.sqrt(fresh["pseudoLaps"] / prior["pseudoLaps"]))
         add(fresh_weight(age, fresh["laps"]), "fresh", -np.inf, fresh["bonus"], scale)
     if fixed_fuel is None:
-        add(-df["LapNumber"].astype(float).to_numpy(), "fuel")
+        add(-fuel_laps(df).to_numpy(), "fuel")
 
     x = np.column_stack(cols)
     y = df["LapTime"].astype(float).to_numpy()
     if fixed_fuel is not None:
-        y = y + fixed_fuel * df["LapNumber"].astype(float).to_numpy()
+        y = y + fixed_fuel * fuel_laps(df).to_numpy()
     lower = np.array([s[1] for s in specs])
     names = [s[0] for s in specs]
 

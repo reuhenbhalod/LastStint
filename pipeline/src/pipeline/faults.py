@@ -33,6 +33,7 @@ from __future__ import annotations
 
 import pandas as pd
 
+from .refuel import car_fuel
 from .sim_reference import Car, _clean_lap
 
 FAULT_KINDS = ("gear-stuck", "power-loss", "puncture", "tyre-failure")
@@ -79,6 +80,7 @@ def residuals(
             compound=compound,
             tyre_age=max(0, int(r.TyreLife) - 1),  # the sim's age while running this lap
             total_time=0.0,
+            **car_fuel(r),  # a refuelling race: the tank on board, as the sim carries it
         )
         lap = int(r.LapNumber)
         predicted = _clean_lap(car, compounds, fuel_per_lap, lap, fresh_tyre, weather)
