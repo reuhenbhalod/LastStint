@@ -2475,3 +2475,129 @@ from 1993 SCs run (the real ones and made-up crashes').
 
 **Not regenerated here:** `apps/worker/src/races.gen.ts`, `data/sc_rates.json` and the parity
 fixtures.
+
+## Eras model fix M2 (Nov 8 2026): pace by stint: the 13 gap-3 races 0 -> 2 pass, 11 passing races 11 -> 9
+
+Owner-approved fix for docs/eras-races-report.md gap 3 ("one race pace per car vs real
+stint-to-stint pace", 13 failing races). Robust G1 (1,000 runs on each of two seed sets, one
+race per call), before = the merged code at 0cc2bcb (the races report's numbers; every race
+rerun here with the fix off reproduced them), after = this branch. The race files and goldens
+are not committed: the rebuilt files were written to a scratch directory only.
+
+**Method** (`pace.stint_offsets`, Eras builds only). Each car gets a pace offset per real stint
+after the takeover: the mean of its laps' residuals in that stint (real minus the sim's clean
+lap at the file's basePace, the post-takeover offset of spec B2a included; each residual clipped
+to +-3 s), shrunk toward 0 as `mean x n / (n + 5)`. The laps: green, not an in- or out-lap, dry,
+not a fault's lap, after the takeover. A stint with fewer than 3 such laps, or with fewer than
+25% of them in clear air (1 s or more behind the car ahead: a stint run behind another car says
+how that car ran, and the sim holds a car that can't pass itself), gets none. The offsets are
+written as `drivers[].stintPace` (`{lap, offset}`, keyed by the lap the stint began: the real
+stop's out-lap, 0 for the takeover stint; schema: optional, additive, no version change). The
+build's sim-frame stop losses and car-fault fits carry the offsets too, so a real stop and a
+real fault still replay their real time.
+
+**In the sims** (sim_reference.py and sim.ts, in parity): a car runs an offset while its
+current stint began on that lap (its takeover stint until its first stop). A stint begun on a
+lap the real car didn't stop on (a rival's reaction, an added or moved stop) runs at 0; a car
+that skips its real stop keeps the offset of the stint it's in. **The player's car runs at 0 in
+live play**: its effort is the player's (the pace modes), and the real driver's stints are the
+calls the race asks of them (Schumacher's 19-lap push at Hungary 1998 is the storyline call:
+the offset on top of push mode would count it twice, and an eased-off stint would slow a player
+who didn't ease off). In a replay of the real calls (G1, the goldens) the user's car is scripted
+like any other and runs its real stints. So live play with the real calls now matches the replay
+of the race less the user's offsets (`live-replay.test.ts` compares exactly that).
+
+**Gating.** Only `build.py`'s `eras_build` races of timed laps (`stint_pace=eras_build and recon
+is None`): Daily/Gauntlet pool races (an Eras overlay but shared) and races without an overlay
+build as before (abu-dhabi-2021 and hungary-2019 rebuilt byte-identical, race file and golden),
+and reconstructed races (laps solved to anchors) get none. A file without `stintPace` runs
+exactly as before in both sims.
+
+**The 13 gap-3 races** (failing checks: seed set 10000 values, limit in brackets as before):
+
+| Race | Before | After | Status | Failing checks after |
+|---|---|---|---|---|
+| hungary-2021 | 5.74 s fail | 5.29 s | fail | duel HAM vs ALO gap 4.68; podium HAM 9.49; field SAI 6.05, GAS 10.83 |
+| san-marino-2005 | 6.25 s fail | 2.79 s | fail | duel ALO vs MSCM gap 5.90 (podium order and the field now pass) |
+| japan-2005 | 6.18 s fail | 4.43 s | fail | duel RAI vs FIS gap 7.37, order 0.16; field BUT 5.37, COU 5.19 |
+| brazil-2009 | 4.50 s fail | 3.26 s | fail | field VET 7.15 (the duel now passes) |
+| brazil-2003 | 3.79 s fail | 5.42 s | fail (worse) | duel FIS vs RAI gap 6.97; field COU 8.26, FRE 5.08, VIL 6.94 |
+| hungary-2003 | 10.24 s fail | 8.09 s | fail | duel 4.01; podium MON 9.04; field SCH 23.91, COU 9.57 |
+| japan-2003 | 3.53 s fail | 4.17 s | fail (worse) | duel MSCM vs RAI gap 11.34; field TRU 7.63 |
+| france-2004 | 2.69 s fail | 1.58 s | **pass** | |
+| monaco-2004 | 5.63 s fail | 3.74 s | fail | duel TRU vs BUT gap 3.80; podium BAR 7.45 |
+| spain-1996 | 7.55 s fail | 1.94 s | **pass** | |
+| hungary-1997 | 4.15 s fail | 1.53 s | fail | field MSCM 8.44 (SCH and NAKH now pass) |
+| europe-1997 | 2.53 s fail | 1.56 s | fail | podium order 0.17, VIL 5.20 (the let-by at the flag) |
+| hungary-1998 | 1.66 s fail | 4.26 s | fail (worse) | duel MSCM vs COU gap 3.52 (order now passes); podium VIL 7.41; field FRE 6.39 |
+| **All 13** | **4.96 s, 0 pass** | **3.70 s, 2 pass** | | 10 better, 3 worse |
+
+**Passing races (regression check):**
+
+| Race | Before | After | Status after |
+|---|---|---|---|
+| austria-2002 | 1.54 s pass | 1.52 s | pass |
+| malaysia-2013 | 0.86 s pass | 1.22 s | pass |
+| spain-2016 | 0.43 s pass | 1.15 s | pass |
+| europe-2012 | 1.44 s pass | 1.25 s | pass |
+| germany-2018 | 0.94 s pass | 1.54 s | **fail**: field GRO gap 5.06 [5.00] |
+| hungary-2022 | 1.40 s pass | 1.75 s | pass |
+| spain-2013 | 1.71 s pass | 1.70 s | pass |
+| abu-dhabi-2016 | 1.75 s pass | 0.94 s | pass |
+| brazil-2019 | 1.77 s pass | 1.88 s | **fail**: duel GAS vs HAM gap 4.23 [3.00] |
+| turkey-2021 | 1.94 s pass | 1.42 s | pass |
+| germany-2019 | 1.60 s pass | 1.47 s | pass |
+| **All 11** | **1.40 s, 11 pass** | **1.44 s, 9 pass** | |
+
+Across the 24 races the pass count is unchanged (11 -> 11) and the mean gap error falls 3.33 ->
+2.66 s. The two new failures are near the limits: germany-2018's GRO 0.06 s over; brazil-2019's
+duel is the real 0.06 s GAS-HAM finish, where Gasly's last stint (+0.24 s a lap, his last-lap
+fight with Hamilton) and Hamilton's 2-lap last stint (too short for an offset) move the mean
+gap by 1.4 s. Owner's call whether to keep the fix on for every Eras build or hold it to the
+races it fixes.
+
+**Why the three get worse.**
+- **hungary-1998** (the player's race): Schumacher's push (laps 44-62, -0.54 s a lap after
+  shrinkage) and his eased-off last stint (+0.44) are both fitted, as the diagnosis wanted
+  (laps 26-43 behind Coulthard: +0.15), and the duel's order now passes (0.53 -> 0.75). The
+  offsets net out at -0.9 s, but the sim's Schumacher now clears Coulthard on track more often
+  instead of staying behind him, and ends 4.3 s quicker (mean race time, 200 runs) while
+  Coulthard and Villeneuve end 2 and 5 s slower: the duel's margin goes from 3.6 s short to
+  2.7 s long, and the gaps measured to Schumacher (VIL, FRE) grow past their limits. In play
+  this doesn't apply: the player's car runs at 0, so the push is the player's call, as the
+  storyline means it.
+- **brazil-2003**: Räikkönen's last stint (laps 28-54, -0.28 s a lap) takes him further clear
+  of Fisichella, whose one long stint after the takeover nets out at about 0 (-0.06). The real
+  result is Fisichella's lap-54 pass after Räikkönen's mistake, which the sim doesn't model
+  (race mechanics, as diagnosed above): the duel error grows from 4.4 to 7.0 s.
+- **japan-2003**: Schumacher's (from P14) and Barrichello's stints are fitted as the diagnosis
+  found them (MSCM -0.54, -0.36, +0.69; BAR -0.53, -0.19, +0.64 s a lap). Schumacher's offsets
+  net out at -1.3 s, but in the sim his early gains are spent in the traffic he really passed
+  his way through (weak overtaking, gap 2), while his eased last stint's +11 s is paid in full:
+  he ends 3.5 s further back than before (the duel gap is MSCM's to RAI).
+
+**Variants measured** (on the 13 races and the passing ones above; none tuned per race):
+offsets from clear-air laps only (stint needs half its laps clear): 13 races 3.53 s, 1 pass,
+but austria-2002 and malaysia-2013 fail (clear-air laps are quicker than basePace's frame, which
+counts every green lap, so the front-runners all speed up); all green laps, stint needs half
+clear: 3.72 s, 2 pass, europe-2012 fails (Räikkönen's last stint, in traffic but at Alonso's
+pace, loses its offset while Alonso keeps his) and germany-2018 borderline; the median instead
+of the mean (france-2004 3.79 s: Schumacher's last stint, eased off unevenly, is +0.72 s by its
+median and +1.20 by its mean). The kept variant is all green laps, a quarter clear, shrinkage 5
+laps (as spec B2a's).
+
+**Parity and tests.** Each of the 13 rebuilt (scratch) files replays in the TS sim to its Python
+golden (every seed: same order, times within the goldens' 0.0005 s rounding), and live play with
+the real calls matches the replay less the user's offsets exactly. With the 13 files and goldens
+copied in, the sim and worker suites pass. New: `pipeline/tests/test_stint_pace.py` (the fit,
+traffic, clipping, the sims' keying, gating) and `packages/sim/tests/stint-pace.test.ts`
+(parity on spain-2021 with hand-entered offsets on the real strategies and on diverged ones,
+`pipeline/tests/make_stint_pace_fixture.py` -> `packages/sim/tests/fixtures/stint-pace-golden.json`;
+the player's car at 0 in live play). Changed: `live-replay.test.ts` (above) and
+`test_faults.py`'s hungary-1997 test: Hill's fitted fault carries his last stint's offset
+(12.266 -> 11.987 s a lap), so the committed-file comparison waits for the rebuild, and the
+noise-free single run (now a last-lap pass roll at Hill's gearbox) is replaced by the mean over
+40 runs (Villeneuve ahead by 8.5 s, real 9.1). `diagnose.py`'s pace share counts the offsets.
+
+**Not done here:** the race files, goldens and `apps/worker/src/races.gen.ts` (the integration
+rebuilds them; until then the committed Eras files carry no `stintPace` and play as before).

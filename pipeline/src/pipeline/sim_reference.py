@@ -73,6 +73,10 @@ class Car:
     race_laps: int = 0
     # Stops with no tyre change (a repair, a stop-go, a drive-through): {lap, loss} each.
     service: list = field(default_factory=list)
+    # Pace by stint (pace.stint_offsets; Eras builds): the offset of the stint the car is on,
+    # and its offsets by the lap each real stint began (0: the takeover stint).
+    stint_pace: float = 0.0
+    stint_table: dict = field(default_factory=dict)
 
     def __post_init__(self):
         if self.tyre_wear is None:
@@ -122,7 +126,7 @@ def _clean_lap(
 ) -> float:
     c = compounds[car.compound]
     wear = car.tyre_wear
-    t = car.base_pace + c["offset"] + c["degPerLap"] * wear - fuel_per_lap * lap
+    t = car.base_pace + car.stint_pace + c["offset"] + c["degPerLap"] * wear - fuel_per_lap * lap
     if fresh:
         t += fresh["bonus"] * fresh_weight_sim(car.tyre_age, fresh["laps"])
     if wear > c["cliffLap"]:  # past the cliff: wear accelerates
@@ -257,7 +261,9 @@ def simulate(
             laps_done=takeover,
             wet_pace=d.get("wetPace", 0.0),
             service=list(d.get("serviceStops", [])),
+            stint_table={int(e["lap"]): float(e["offset"]) for e in d.get("stintPace", [])},
         )
+        cars[d["code"]].stint_pace = cars[d["code"]].stint_table.get(0, 0.0)
 
     refuel.init_tanks(model, cars)  # refuelling (refuel.py): every car's takeover tank
     order = [d["code"] for d in ordered]
@@ -289,6 +295,9 @@ def simulate(
             if pit:
                 pitted.add(code)
                 car.strategy.remove(pit)
+                # Pace by stint: the stint begun on this lap runs at its real offset, if the
+                # real car began one here (else 0).
+                car.stint_pace = car.stint_table.get(lap, 0.0)
                 # Era rules: with no tyre changes (2005) the stop keeps the set.
                 if race_rules.stop_changes_tyres(model, car.compound, pit):
                     car.compound = pit["to"]

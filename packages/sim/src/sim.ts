@@ -435,7 +435,7 @@ export function passProbability(
  */
 export function cleanLap(model: RaceModel, car: CarState, lap: number, w?: number): number {
   const dry =
-    tyreLapTime(model, car.basePace, car.compound, car.tyreWear, lap) +
+    tyreLapTime(model, car.basePace + (car.stintPace ?? 0), car.compound, car.tyreWear, lap) +
     freshTyreDelta(model, car.tyreAge) +
     tankWeightDelta(model, car, lap); // refuelling: the weight resets at each stop (refuel.ts)
   if (!model.weather) return dry;
@@ -626,6 +626,10 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
       basePace: d.basePace,
       noise: d.noise,
       ...(d.wetPace ? { wetPace: d.wetPace } : {}),
+      // Pace by stint: the takeover stint's offset; never the player's car in live play.
+      ...(stintOffset(model, d.code, 0) !== 0 && !(live && d.code === model.userSide)
+        ? { stintPace: stintOffset(model, d.code, 0) }
+        : {}),
       compound: s.compound,
       tyreAge: s.tyreAge,
       tyreWear: s.tyreAge,
@@ -706,6 +710,27 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
 export function redFlagFree(run: Run, lap: number): boolean {
   const redLap = run.red.free.get(lap);
   return redLap !== undefined && run.neutral.get(redLap) === 'red';
+}
+
+/** Each car's stint offsets, the lap its stint began (0: the takeover stint) -> s/lap. */
+const STINTS = new WeakMap<RaceModel, Map<string, Map<number, number>>>();
+
+/**
+ * Pace by stint (DriverModel.stintPace; Eras model fix M2): the offset of the car's stint begun
+ * on `lap` (0: the takeover stint), or 0 if the real car began no stint there. Mirrors
+ * sim_reference.py's stint_table.
+ */
+export function stintOffset(model: RaceModel, code: string, lap: number): number {
+  let table = STINTS.get(model);
+  if (!table) {
+    table = new Map();
+    for (const d of model.drivers) {
+      if (d.stintPace?.length)
+        table.set(d.code, new Map(d.stintPace.map((e) => [e.lap, e.offset])));
+    }
+    STINTS.set(model, table);
+  }
+  return table.get(code)?.get(lap) ?? 0;
 }
 
 /** Each car's stops with no tyre change, out-lap -> loss (DriverModel.serviceStops). */
@@ -1600,6 +1625,12 @@ export function stepLap(run: Run): RaceState {
       pitted.add(code);
       c.pittedThisLap = true;
       if (c.stops !== undefined) c.stops++; // era rules: minStops
+      // Pace by stint: the stint begun on this lap runs at the real one's offset if the real car
+      // began one here, else 0. The player's car in live play has none (its pace is the modes').
+      if (!(run.live && code === model.userSide)) {
+        const offset = stintOffset(model, code, lap);
+        if (offset !== 0 || c.stintPace !== undefined) c.stintPace = offset;
+      }
       // Era rules (rules.ts): with no tyre changes (2005) a stop keeps the set.
       if (stopChangesTyres(model.rules, c.compound, stop)) {
         c.compound = stop.to;

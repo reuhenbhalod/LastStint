@@ -2508,6 +2508,9 @@ def build_race(
         # A refuelling race's stop that kept its tyres may be a fuel-only stop: not one.
         service_stops=eras_build and not refuelling,
         eras_stops=eras_build,
+        # Pace by stint (Eras model fix M2): timed races only (a reconstruction's laps are
+        # solved to its anchors, so their stint residuals are the solver's, not the drivers').
+        stint_pace=eras_build and recon is None,
     )
     official_lines: list[str] = []
     if recon is not None and recon.get("roadPositions"):

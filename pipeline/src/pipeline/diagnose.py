@@ -55,6 +55,16 @@ def diagnose(model: dict, laps: pd.DataFrame, score_positions: int, runs: int = 
         & laps["PitOutTime"].isna()
         & laps["LapTime"].notna()
     ]
+    # Pace by stint (pace.stint_offsets): each lap's clean lap carries its real stint's offset.
+    from .pace import stint_key
+
+    stint = {
+        code: (
+            {int(e["lap"]): float(e["offset"]) for e in d.get("stintPace", [])},
+            sorted(int(st["lap"]) for st in d["realStrategy"] if int(st["lap"]) > takeover),
+        )
+        for code, d in drivers.items()
+    }
     pace: dict[str, float] = {}
     for r in post.itertuples():
         compound = None if pd.isna(r.Compound) else str(r.Compound)
@@ -67,6 +77,7 @@ def diagnose(model: dict, laps: pd.DataFrame, score_positions: int, runs: int = 
             compound=compound,
             tyre_age=int(r.TyreLife),
             total_time=0,
+            stint_pace=stint[r.Driver][0].get(stint_key(stint[r.Driver][1], int(r.LapNumber)), 0.0),
             **car_fuel(r),
         )
         predicted = _clean_lap(
