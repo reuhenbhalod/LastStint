@@ -29,9 +29,9 @@ async function dailyPool(): Promise<RaceFacts[]> {
 describe('daily shuffle', () => {
   it('names circuits across id spellings', () => {
     expect(circuitOf('mexico-2021')).toBe('mexico');
-    expect(circuitOf('united-states-2019')).toBe(circuitOf('usa-2022'));
+    expect(circuitOf('united-states-2019')).toBe(circuitOf('united-states-2022'));
     expect(circuitOf('styria-2021')).toBe(circuitOf('austria-2019'));
-    expect(circuitOf('saudi-arabia-2025')).toBe(circuitOf('saudi-2022'));
+    expect(circuitOf('saudi-arabia-2025')).toBe(circuitOf('saudi-arabia-2022'));
   });
 
   it('plays every race once before any repeats', async () => {

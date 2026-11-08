@@ -37,8 +37,8 @@ import r33 from '../../../data/races/spain-2020.json';
 import r34 from '../../../data/races/spain-2023.json';
 import r35 from '../../../data/races/styria-2020.json';
 import r36 from '../../../data/races/united-states-2019.json';
-import r37 from '../../../data/races/united-states-2023.json';
-import r38 from '../../../data/races/usa-2022.json';
+import r37 from '../../../data/races/united-states-2022.json';
+import r38 from '../../../data/races/united-states-2023.json';
 
 export const RACE_FILES: Record<string, unknown> = {
   'abu-dhabi-2020': r0,
@@ -78,6 +78,6 @@ export const RACE_FILES: Record<string, unknown> = {
   'spain-2023': r34,
   'styria-2020': r35,
   'united-states-2019': r36,
-  'united-states-2023': r37,
-  'usa-2022': r38,
+  'united-states-2022': r37,
+  'united-states-2023': r38,
 };

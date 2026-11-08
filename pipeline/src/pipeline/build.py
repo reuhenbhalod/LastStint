@@ -78,7 +78,7 @@ RACES: dict[str, dict] = {
         "split": "tune",
         "dilemma": "Cover Red Bull's second stop or stay on one stop",
     },
-    "usa-2021": {
+    "united-states-2021": {
         "year": 2021,
         "event": "United States",
         "name": "USA 2021: Hamilton vs Verstappen",
@@ -117,7 +117,7 @@ RACES: dict[str, dict] = {
         "split": "tune",
         "dilemma": "Fight for P2 on different strategies",
     },
-    "saudi-2022": {
+    "saudi-arabia-2022": {
         "year": 2022,
         "event": "Saudi Arabia",
         "name": "Saudi Arabia 2022: Leclerc vs Verstappen",
@@ -194,7 +194,7 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "holdout",
     },
-    "usa-2018": {
+    "united-states-2018": {
         "year": 2018,
         "event": "United States",
         "name": "United States 2018",
@@ -438,7 +438,7 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "holdout",
     },
-    "usa-2022": {  # races batch 2
+    "united-states-2022": {  # races batch 2
         "year": 2022,
         "event": "United States",
         "name": "USA 2022: Hamilton vs Verstappen",
