@@ -34,7 +34,7 @@ SESSIONS: dict[str, tuple[int, str]] = {
     "netherlands-2023": (2023, "Netherlands"),
     "miami-2024": (2024, "Miami"),
     "hungary-2024": (2024, "Hungary"),
-    "brazil-2024": (2024, "São Paulo"),
+    "belgium-2023": (2023, "Belgium"),
     "australia-2025": (2025, "Australia"),
     "monaco-2025": (2025, "Monaco"),
     "spain-2021": (2021, "Spain"),

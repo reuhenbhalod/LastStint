@@ -1,0 +1,59 @@
+{
+  "raceId": "france-1990",
+  "stops": [
+    {
+      "number": 20,
+      "name": "Nelson Piquet",
+      "lap": 20,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/august-1990/16/a-touch-of-the-sun/",
+      "note": "derived: 'As the front half of the field started lap 21 Piquet peeled off into the pit lane' (he ran in the leading train), so in-lap 20; rejoined 15th"
+    },
+    {
+      "number": 1,
+      "name": "Alain Prost",
+      "lap": 27,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/august-1990/16/a-touch-of-the-sun/",
+      "note": "derived: 'at the start of lap 28 Prost swooped into the Ferrari pits', so in-lap 27; rejoined 8th. His stop lap was 1:26.712 against 1:10 laps"
+    },
+    {
+      "number": 28,
+      "name": "Gerhard Berger",
+      "lap": 28,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/august-1990/16/a-touch-of-the-sun/; https://en.wikipedia.org/wiki/1990_French_Grand_Prix (lap-leader chart, Template:F1Laps1990)",
+      "note": "derived: Motor Sport has Berger stopping after Prost, 'relinquishing the lead to Senna for a brief two laps'; Wikipedia's chart has Berger leading laps 1-27 and Senna 28-29. Stop lap 1:35.188. A second stop later (Wikipedia), no lap"
+    },
+    {
+      "number": 27,
+      "name": "Ayrton Senna",
+      "lap": 30,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/august-1990/16/a-touch-of-the-sun/; https://en.wikipedia.org/wiki/1990_French_Grand_Prix (lap-leader chart, Template:F1Laps1990)",
+      "note": "derived: led two laps (chart: 28-29) 'and then the Brazilian was in, handing the lead to Mansell' (chart: Mansell 30-31). A rear wheel baulked: stop lap 1:37.672"
+    },
+    {
+      "number": 2,
+      "name": "Nigel Mansell",
+      "lap": 32,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/august-1990/16/a-touch-of-the-sun/; https://en.wikipedia.org/wiki/1990_French_Grand_Prix (lap-leader chart, Template:F1Laps1990)",
+      "note": "derived: 'Mansell gave the lead to Patrese when he went into the pits for tyres' (chart: Patrese leads lap 32). A second stop later ('made a second stop for tyres', Motor Sport), no lap"
+    },
+    {
+      "number": 6,
+      "name": "Riccardo Patrese",
+      "lap": 33,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/august-1990/16/a-touch-of-the-sun/; https://en.wikipedia.org/wiki/1990_French_Grand_Prix (lap-leader chart, Template:F1Laps1990); https://www.autosport.com/f1/news/archive-when-the-french-gp-almost-produced-f1s-greatest-shock/6578642/",
+      "note": "derived: 'after one lap in the lead Patrese came in for tyres and it was Capelli's turn to lead'; Capelli 'took the lead at the end of lap 33' (Autosport archive)"
+    }
+  ],
+  "safetyCars": [],
+  "complete": {
+    "stops": false,
+    "safetyCars": true
+  },
+  "notes": "Motor Sport Aug 1990 ('A Touch of the Sun', DSJ); Wikipedia's lap-leader chart; GrandPrix.com GPE rr491; Autosport archive feature. Capelli (#16) and Gugelmin (#15) ran non-stop: 'they did not come in for tyres ... still they stayed out on the same tyres' (Motor Sport); Leyton House was 'the only team to attempt to race without stopping for fresh tyres' (Wikipedia). Gugelmin's engine lost oil pressure a few laps after Prost passed him on lap 54 (Jolpica: 58 laps); Wikipedia's 'Gugelmin stopped late in the race' reads as that retirement, not a tyre stop. Prost passed Capelli for the lead on lap 78 (Motor Sport; Wikipedia's chart: Prost leads 78-80; Wikipedia's text says 'lap 77 of 80'); Capelli's Judd was hesitating out of slow corners (Motor Sport), an oil light and dropping fuel pressure (Capelli, Autosport archive). Missing: Alesi's (#4) tyre stop (his final drive failed leaving the pits; Jolpica 23 laps, no lap in any source), Nannini's (#19) stop, Berger's and Mansell's second stops, every midfield stop. Stop laps for Berger, Senna, Mansell and Patrese are worked out from the leader chart and Motor Sport's order, not quoted."
+}

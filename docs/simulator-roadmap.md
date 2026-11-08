@@ -16,8 +16,8 @@ building (eras spec §19).
   restart.
 - **Pipeline:** `race_suitability()` stops turning red-flag races down; the race-status
   timeline gains a red-flag code.
-- **Unblocks (draft list):** monaco-2022, great-britain-2022, netherlands-2023, brazil-2024,
-  azerbaijan-2021, hungary-2021, saudi-arabia-2021, azerbaijan-2017, italy-2020, brazil-2016,
+- **Unblocks (draft list):** monaco-2022, great-britain-2022, netherlands-2023,
+  azerbaijan-2021, hungary-2021, saudi-arabia-2021, azerbaijan-2017, italy-2020,
   monaco-2011, canada-2011, europe-2007, brazil-2003, belgium-1998, monaco-1984.
 
 ### R2. Car faults
@@ -33,12 +33,13 @@ building (eras spec §19).
   weather and each lap's tyre, which only exist from 2018 (FastF1/OpenF1). Before 2018 the
   wetness timeline has to be fitted from lap times alone (the whole field slowing), checked
   against race reports, with the tyre changes taken from the pit stops.
-- **Unblocks (draft list):** brazil-2016, united-states-2015, hungary-2014, malaysia-2013, brazil-2012,
+- **Unblocks (draft list):** great-britain-2016, united-states-2015, hungary-2014, malaysia-2013, brazil-2012,
   canada-2011, australia-2010, brazil-2008, europe-2007, china-2007, hungary-2006, united-states-2003,
   brazil-2003, malaysia-2001, germany-2000, europe-1999, belgium-1998, spain-1996,
   belgium-1995, europe-1993, brazil-1993, belgium-1992, portugal-1985, monaco-1984.
 - **2018+ wet races** (germany-2018, germany-2019, turkey-2020, russia-2021, turkey-2021,
-  monaco-2022, netherlands-2023, australia-2025) use today's model. Each must still pass G1;
+  monaco-2022, netherlands-2023, belgium-2023 (a mid-race shower, no wet-tyre stops),
+  australia-2025) use today's model. Each must still pass G1;
   Australia 2025 failed it so far.
 
 ### R4. Refuelling (1994–2009) and fuel limits (1983–88)

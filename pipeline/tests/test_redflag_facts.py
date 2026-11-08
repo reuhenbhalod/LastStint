@@ -19,7 +19,6 @@ RACES = {
     "saudi-arabia-2021": 2,
     "italy-2020": 1,
     "azerbaijan-2017": 1,
-    "brazil-2016": 2,
     "monaco-2011": 1,
     "canada-2011": 1,
     "europe-2007": 1,
@@ -30,7 +29,7 @@ RACES = {
 # Sources with no red-flag timing: the stoppage lap must be hand-entered (resumeLap), unless
 # the race never resumed or the data holds only the restarted race (belgium-1998).
 UNTIMED_NO_STOPPAGE = {"brazil-2003", "monaco-1984", "belgium-1998"}
-UNTIMED = {"azerbaijan-2017", "brazil-2016", "monaco-2011", "canada-2011", "europe-2007"}
+UNTIMED = {"azerbaijan-2017", "monaco-2011", "canada-2011", "europe-2007"}
 # 2020-22 races R1 took for FastF1 but built from Jolpica (FastF1 needs an F1TV login since
 # Oct 2026; step 5.1): their stoppage lap is entered too, from Jolpica's lap times.
 JOLPICA = {

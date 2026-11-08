@@ -1163,19 +1163,6 @@ RACES: dict[str, dict] = {
     # reconstruct`, step 4.6: Jolpica results, F1DB fastest laps, sourced stops in
     # data/reconstruction/<id>.json). Checked on their anchors instead of G1; the build marks
     # them reconstructed (reconstruct.mark_model). Duels from the Eras spec's race table (§4).
-    "japan-1989": {
-        "year": 1989,
-        "event": "Japan",
-        "source": "reconstruct",
-        "name": "Japan 1989: Senna vs Prost",
-        "era": "1988-1993",
-        "takeover_lap": None,  # D3 rule
-        "seed": 1,
-        "user_side": "SENA",
-        "rival": "PRO",  # the title collision on lap 47 (real: Prost out, Senna disqualified)
-        "score_positions": 6,
-        "split": "eras",
-    },
     "united-states-1990": {
         "year": 1990,
         "event": "United States",
@@ -1272,24 +1259,6 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
-    "san-marino-1985": {
-        "year": 1985,
-        "event": "San Marino",
-        "source": "reconstruct",
-        "name": "San Marino 1985: Senna vs De Angelis",
-        "era": "1988-1993",
-        "takeover_lap": None,  # D3 rule
-        "seed": 1,
-        "user_side": "SENA",
-        "rival": "DEA",  # make the fuel last (real: Senna dry 3 laps out, De Angelis wins)
-        "score_positions": 6,
-        "split": "eras",
-        # Prost finished first on the road and was disqualified (Jolpica: 60 laps, no time).
-        # The reconstruction can't place a disqualified car that ran the full distance: it
-        # has him 172 s ahead of De Angelis, heading the realResult (order anchor FAIL,
-        # data/raw/san-marino-1985.anchors.md). An owner decision; not counted in G1.
-        "data_issue": "disqualified finisher (PRO) heads the reconstructed road order",
-    },
     "mexico-1986": {
         "year": 1986,
         "event": "Mexican",
@@ -1372,9 +1341,6 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
-    # brazil-2016 (TUM, two red flags) is ingested (data/raw, with `pipeline wet-laps`) but not
-    # registered: every lap was run on wets or inters, so there's no dry lap to fit the dry
-    # model on and the build stops (dry_fit). See docs/g1-report.md, step 5.1c.
     "monaco-2011": {
         "year": 2011,
         "event": "Monaco",
@@ -1418,19 +1384,6 @@ RACES: dict[str, dict] = {
         "seed": 1,
         "user_side": "ALO",
         "rival": "VER",  # position: P2 or better; the car ahead (as step 4.3's fixture)
-        "score_positions": 6,
-        "split": "eras",
-    },
-    "brazil-2024": {
-        "year": 2024,
-        "event": "Brazil",
-        "source": "openf1",
-        "name": "Brazil 2024: Verstappen vs Ocon",
-        "era": "2014-2025",
-        "takeover_lap": None,  # D3 rule
-        "seed": 1,
-        "user_side": "VER",
-        "rival": "OCO",  # win from P17: the car behind at the flag
         "score_positions": 6,
         "split": "eras",
     },

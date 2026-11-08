@@ -15,16 +15,16 @@
   "lengths": {
     "scLaps": 5,
     "vscLaps": 2,
-    "scPeriodsMeasured": 140,
-    "vscPeriodsMeasured": 73
+    "scPeriodsMeasured": 139,
+    "vscPeriodsMeasured": 72
   },
   "allTracks": {
     "races": 197,
     "vscRaces": 162,
-    "scPeriods": 144,
-    "vscPeriods": 78,
-    "scPerRace": 0.731,
-    "vscPerRace": 0.4815
+    "scPeriods": 142,
+    "vscPeriods": 77,
+    "scPerRace": 0.7208,
+    "vscPerRace": 0.4753
   },
   "circuits": {
     "albert_park": {
@@ -180,8 +180,8 @@
       "vscRaces": 0,
       "scPeriods": 0,
       "vscPeriods": 0,
-      "scPerRace": 0.731,
-      "vscPerRace": 0.4815,
+      "scPerRace": 0.7208,
+      "vscPerRace": 0.4753,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -190,12 +190,12 @@
     },
     "interlagos": {
       "name": "Autódromo José Carlos Pace",
-      "races": 12,
-      "vscRaces": 7,
-      "scPeriods": 13,
-      "vscPeriods": 3,
-      "scPerRace": 1.0833,
-      "vscPerRace": 0.4286,
+      "races": 11,
+      "vscRaces": 6,
+      "scPeriods": 11,
+      "vscPeriods": 2,
+      "scPerRace": 1.0,
+      "vscPerRace": 0.3333,
       "scFallback": false,
       "vscFallback": false,
       "counted": [
@@ -209,8 +209,7 @@
         "brazil-2017 (tum): 1 SC, 0 VSC",
         "brazil-2018 (tum): 0 SC, 0 VSC",
         "brazil-2019 (tum): 2 SC, 0 VSC",
-        "brazil-2021 (fastf1): 1 SC, 2 VSC",
-        "brazil-2024 (fastf1): 2 SC, 1 VSC"
+        "brazil-2021 (fastf1): 1 SC, 2 VSC"
       ]
     },
     "istanbul": {
@@ -219,8 +218,8 @@
       "vscRaces": 2,
       "scPeriods": 0,
       "vscPeriods": 0,
-      "scPerRace": 0.731,
-      "vscPerRace": 0.4815,
+      "scPerRace": 0.7208,
+      "vscPerRace": 0.4753,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -333,8 +332,8 @@
       "vscRaces": 2,
       "scPeriods": 1,
       "vscPeriods": 0,
-      "scPerRace": 0.731,
-      "vscPerRace": 0.4815,
+      "scPerRace": 0.7208,
+      "vscPerRace": 0.4753,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -486,12 +485,12 @@
     },
     "spa": {
       "name": "Circuit de Spa-Francorchamps",
-      "races": 7,
-      "vscRaces": 6,
+      "races": 8,
+      "vscRaces": 7,
       "scPeriods": 4,
       "vscPeriods": 2,
-      "scPerRace": 0.5714,
-      "vscPerRace": 0.3333,
+      "scPerRace": 0.5,
+      "vscPerRace": 0.2857,
       "scFallback": false,
       "vscFallback": false,
       "counted": [
@@ -501,6 +500,7 @@
         "belgium-2017 (tum): 1 SC, 0 VSC",
         "belgium-2018 (tum): 1 SC, 0 VSC",
         "belgium-2019 (tum): 1 SC, 0 VSC",
+        "belgium-2023 (fastf1): 0 SC, 0 VSC",
         "belgium-2024 (fastf1): 0 SC, 0 VSC"
       ]
     },
@@ -532,8 +532,8 @@
       "vscRaces": 0,
       "scPeriods": 1,
       "vscPeriods": 0,
-      "scPerRace": 0.731,
-      "vscPerRace": 0.4815,
+      "scPerRace": 0.7208,
+      "vscPerRace": 0.4753,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -592,8 +592,8 @@
       "vscRaces": 2,
       "scPeriods": 2,
       "vscPeriods": 2,
-      "scPerRace": 0.731,
-      "vscPerRace": 0.4815,
+      "scPerRace": 0.7208,
+      "vscPerRace": 0.4753,
       "scFallback": true,
       "vscFallback": true,
       "counted": [

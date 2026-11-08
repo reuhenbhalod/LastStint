@@ -17,7 +17,6 @@ from pipeline import build, cli, ingest, paths
 from pipeline import reconstruct as rc
 
 ERA_2 = [
-    "japan-1989",
     "united-states-1990",
     "mexico-1990",
     "brazil-1991",
@@ -25,8 +24,8 @@ ERA_2 = [
     "hungary-1992",
     "australia-1993",
 ]
-# Era 1 (step 5.2a). san-marino-1985 is registered but has no race file: its disqualified
-# Prost fails the order anchor (a data issue, docs/g1-report.md).
+# Era 1 (step 5.2a). san-marino-1985 was replaced by germany-1986 (its winner on the road was
+# disqualified; owner decision Nov 7).
 ERA_1 = [
     "portugal-1984",
     "mexico-1986",
@@ -101,7 +100,7 @@ def test_ingest_skips_reconstructed_races(monkeypatch):
 
     monkeypatch.setattr(cli.ingest, "ingest_race", no_network)
     monkeypatch.setattr(cli.ingest, "ingest_openf1", no_network)
-    result = CliRunner().invoke(cli.app, ["ingest", "japan-1989", "--force"])
+    result = CliRunner().invoke(cli.app, ["ingest", "mexico-1990", "--force"])
     assert result.exit_code == 0, result.output
     assert "reconstructed race, skipped" in result.output
 
@@ -111,13 +110,6 @@ def test_era_1_races_carry_their_fuel_limit_and_no_safety_car():
         model = json.loads((paths.RACES_DIR / f"{race_id}.json").read_text())
         assert model["rules"]["fuelLimit"] > 0 and model["rules"]["refuelling"] is False
         assert not [e for e in model["events"] if e["type"] in ("SC", "VSC")], race_id
-
-
-def test_san_marino_1985_is_a_data_issue_with_no_race_file():
-    assert build.RACES["san-marino-1985"]["data_issue"]
-    assert not (paths.RACES_DIR / "san-marino-1985.json").exists()
-    side = build.load_reconstruction("san-marino-1985")
-    assert [r["anchor"] for r in rc.failures(side["anchors"])] == ["order"]
 
 
 def test_a_race_with_no_sourced_stop_takes_the_reconstructions_pit_loss():

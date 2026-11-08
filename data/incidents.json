@@ -242,15 +242,7 @@
   }
  ],
  "hungary-2024": [],
- "brazil-2024": [
-  {
-   "lap": 39,
-   "type": "SC",
-   "driver": "SAI",
-   "status": "Accident",
-   "source": "https://en.wikipedia.org/wiki/2024_S%C3%A3o_Paulo_Grand_Prix"
-  }
- ],
+ "belgium-2023": [],
  "australia-2025": [
   {
    "lap": 34,
@@ -539,15 +531,6 @@
    "source": "https://en.wikipedia.org/wiki/2016_Monaco_Grand_Prix"
   }
  ],
- "brazil-2016": [
-  {
-   "lap": 13,
-   "type": "SC",
-   "driver": "ERI",
-   "status": "Collision",
-   "source": "https://en.wikipedia.org/wiki/2016_Brazilian_Grand_Prix"
-  }
- ],
  "australia-2010": [
   {
    "lap": 1,
@@ -691,7 +674,7 @@
    "source": "https://en.wikipedia.org/wiki/1994_Spanish_Grand_Prix"
   }
  ],
- "japan-1989": [],
+ "france-1990": [],
  "united-states-1990": [],
  "mexico-1990": [],
  "brazil-1991": [
@@ -718,7 +701,7 @@
  "south-africa-1983": [],
  "monaco-1984": [],
  "portugal-1984": [],
- "san-marino-1985": [],
+ "germany-1986": [],
  "portugal-1985": [],
  "mexico-1986": [],
  "hungary-1986": [],
