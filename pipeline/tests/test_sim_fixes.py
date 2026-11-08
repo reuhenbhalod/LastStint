@@ -203,8 +203,8 @@ def test_sim_frame_charges_a_back_to_back_stop_its_out_lap_only():
 
 
 def test_partly_yellow_stops_are_priced_in_the_sim_frame():
-    """Stops whose in- or out-lap ran under local yellows only ("12", "21") were left to the
-    field-median figure; an Eras build prices them in the sim frame, like green ones."""
+    """Stops whose in- or out-lap was partly under a local yellow ("12", "21") were left to
+    the field-median figure; an Eras build prices them in the sim frame, like green ones."""
     laps = _raw("canada-2011")
     yellow = {
         (d, int(o["LapNumber"]))
@@ -231,7 +231,7 @@ def test_racing_status():
         True,
         True,
         True,
-        True,
+        False,
         False,
         False,
         False,

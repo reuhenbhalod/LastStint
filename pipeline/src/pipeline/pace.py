@@ -109,7 +109,7 @@ def sim_frame_losses(
 
     `eras_stops` (Eras builds): a back-to-back stop (its in-lap the previous stop's out-lap,
     track.chained_in_laps) is charged its out-lap only too, so the shared lap counts once;
-    and laps under local yellows only ("12", "21": track.racing_status) count as green, so
+    and laps partly under a local yellow ("12", "21": track.racing_status) count as green, so
     such a stop is priced here rather than at the field-median figure."""
     from .clean import fitted_compound
     from .track import chained_in_laps, pit_stops, racing_status, service_stops

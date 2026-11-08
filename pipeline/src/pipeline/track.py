@@ -50,10 +50,13 @@ def _is_neutralized(status_value: object) -> bool:
 
 
 def racing_status(status_value: object) -> bool:
-    """A lap run green or under local yellows only (codes 1 and 2, e.g. "12", "21"): racing
-    went on, so a stop on it is priced like a green one (Eras builds, `eras_stops`)."""
+    """A lap run green, or partly green and partly under a local yellow ("12", "21"): racing
+    went on, so a stop on it is priced like a green one (Eras builds, `eras_stops`). A lap
+    under yellow throughout ("2") isn't: in a source with no status timing it is step 2.4's
+    ambiguous slow period (rain, or a SC the estimate couldn't call: Valencia 2012's laps
+    28-29 lead into the SC), where the sim frame's clean lap isn't the field's pace."""
     s = "" if status_value is None or pd.isna(status_value) else str(status_value)
-    return s != "" and set(s) <= {"1", "2"}
+    return s != "" and set(s) <= {"1", "2"} and "1" in s
 
 
 def chained_in_laps(laps: pd.DataFrame) -> set[tuple[str, int]]:
@@ -93,7 +96,7 @@ def service_stops(
     Only green stops (both laps green throughout, both timed) count: a pit-lane pass under a
     SC or a red flag (Hungary 2015 laps 45-46, Brazil 2021) keeps its set too, but isn't a
     stop. Timing that never shows a set change (estimated compounds) has none. `eras_stops`:
-    laps under local yellows only (racing_status) count as green too."""
+    laps partly under a local yellow (racing_status) count as green too."""
     green = racing_status if eras_stops else (lambda st: str(st) == "1")
     stops: list[tuple[str, pd.Series, pd.Series]] = []
     changed = tyre_change_out_laps(laps)

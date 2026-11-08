@@ -140,7 +140,7 @@ def assemble_race_model(
     `service_stops` (Eras builds): each driver's stops that changed no tyres (a repair, a
     stop-go, a drive-through: track.service_stops) after the takeover, as drivers[].serviceStops
     at their measured loss in the sim frame. `eras_stops` (Eras builds): back-to-back stops
-    count their shared lap once, and stops on laps under local yellows only are priced in the
+    count their shared lap once, and stops on laps partly under a local yellow are priced in the
     sim frame (track.stop_records, pace.sim_frame_losses)."""
     total_laps = int(laps["LapNumber"].max())
     cliffs = fit.compound_cliff
