@@ -1,0 +1,27 @@
+{
+  "raceId": "hungary-1992",
+  "stops": [
+    {
+      "number": 5,
+      "name": "Nigel Mansell",
+      "lap": 61,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/september-1992/16/mansell-is-finally-crowned/ ('at the end of the 61st Mansell had come speeding into the pits'); Wikipedia https://en.wikipedia.org/wiki/1992_Hungarian_Grand_Prix ('On lap 61, Mansell had to go to the pits')",
+      "note": "puncture warned by telemetry; rejoined sixth"
+    },
+    {
+      "number": 1,
+      "name": "Ayrton Senna",
+      "lap": 67,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/september-1992/16/mansell-is-finally-crowned/ ('on lap 67 Senna suddenly dived into the pits, for a precautionary tyre change'); https://www.grandprix.com/gpe/rr527.html",
+      "note": "precautionary, about a minute ahead"
+    }
+  ],
+  "safetyCars": [],
+  "complete": {
+    "stops": false,
+    "safetyCars": true
+  },
+  "notes": "Everyone planned to run non-stop on the resurfaced track (Motor Sport). The lap-14 multi-car crash showed the SC board but no safety car ran (Wikipedia); before 1993 none can be entered anyway."
+}

@@ -1,0 +1,35 @@
+{
+  "raceId": "mexico-1990",
+  "stops": [
+    {
+      "number": 28,
+      "name": "Gerhard Berger",
+      "lap": 13,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/august-1990/6/mexican-magic (Berger: 'I came in on lap 13'); https://www.grandprix.com/gpe/rr490.html ('pitted on lap 13'); Wikipedia https://en.wikipedia.org/wiki/1990_Mexican_Grand_Prix",
+      "note": "blistered left-front; rejoined 12th on Bs left / Cs right"
+    },
+    {
+      "number": 26,
+      "name": "Philippe Alliot",
+      "lap": 12,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/august-1990/6/mexican-magic",
+      "note": "'a quick stop for tyres on lap 12'"
+    },
+    {
+      "number": 20,
+      "name": "Nelson Piquet",
+      "lap": 44,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/august-1990/6/mexican-magic",
+      "note": "'Prost duplicated Mansell's move on lap 42. Two laps later Nelson dived into the pits' for a set of Cs (vibration)"
+    }
+  ],
+  "safetyCars": [],
+  "complete": {
+    "stops": false,
+    "safetyCars": true
+  },
+  "notes": "Senna (#27) gambled on no stop and retired with a right-rear tyre failure (Wikipedia: three laps after Prost passed him on lap 60; GrandPrix.com: lap 63; Jolpica: 63 laps). Prost (#1) and Mansell (#2): no stop reported in Motor Sport, GrandPrix.com or Wikipedia, but none states they ran non-stop. Larini (#25) 'had also stopped early for fresh rubber' (no lap)."
+}

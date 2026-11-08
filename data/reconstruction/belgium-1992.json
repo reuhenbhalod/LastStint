@@ -1,0 +1,123 @@
+{
+  "raceId": "belgium-1992",
+  "stops": [
+    {
+      "number": 5,
+      "name": "Nigel Mansell",
+      "lap": 3,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement",
+      "note": "wets ('Mansell and Alesi at the end of lap three')"
+    },
+    {
+      "number": 27,
+      "name": "Jean Alesi",
+      "lap": 3,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement",
+      "note": "wets"
+    },
+    {
+      "number": 19,
+      "name": "Michael Schumacher",
+      "lap": 4,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement",
+      "note": "wets"
+    },
+    {
+      "number": 20,
+      "name": "Martin Brundle",
+      "lap": 5,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement",
+      "note": "wets"
+    },
+    {
+      "number": 6,
+      "name": "Riccardo Patrese",
+      "lap": 6,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement",
+      "note": "wets"
+    },
+    {
+      "number": 12,
+      "name": "Johnny Herbert",
+      "lap": 8,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement",
+      "note": "wets"
+    },
+    {
+      "number": 1,
+      "name": "Ayrton Senna",
+      "lap": 16,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement",
+      "note": "wets ('On lap 16 Senna finally yielded')"
+    },
+    {
+      "number": 1,
+      "name": "Ayrton Senna",
+      "lap": 28,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement",
+      "note": "slicks"
+    },
+    {
+      "number": 12,
+      "name": "Johnny Herbert",
+      "lap": 30,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement",
+      "note": "slicks"
+    },
+    {
+      "number": 19,
+      "name": "Michael Schumacher",
+      "lap": 30,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement; https://www.grandprix.com/gpe/rr528.html ('On lap 30 Schumacher went off at Stavelot and decided to stop immediately')",
+      "note": "slicks, the race-winning call"
+    },
+    {
+      "number": 20,
+      "name": "Martin Brundle",
+      "lap": 31,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement",
+      "note": "slicks, 'next time round' after Schumacher; slow stop"
+    },
+    {
+      "number": 6,
+      "name": "Riccardo Patrese",
+      "lap": 31,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement",
+      "note": "slicks ('Hakkinen (who would stop on lap 31, with Patrese)')"
+    },
+    {
+      "number": 11,
+      "name": "Mika Hakkinen",
+      "lap": 31,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement",
+      "note": "slicks"
+    },
+    {
+      "number": 5,
+      "name": "Nigel Mansell",
+      "lap": 33,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement",
+      "note": "slicks, 'at the end of lap 33', stationary 6.37 s"
+    }
+  ],
+  "safetyCars": [],
+  "complete": {
+    "stops": false,
+    "safetyCars": true
+  },
+  "notes": "Rain from lap 2, drying from about lap 27. Missing: Hakkinen's wet-tyre stop, Alesi's puncture stop after the La Source contact (Jolpica: 7 laps), every midfield car. Safety cars: none before 1993."
+}

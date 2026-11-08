@@ -1,0 +1,9 @@
+{
+  "raceId": "australia-1994",
+  "stops": [],
+  "safetyCars": [],
+  "complete": {
+    "safetyCars": false
+  },
+  "notes": "Stops come from F1DB. Motor Sport Dec 1994 (https://www.motorsportmagazine.com/archive/article/december-1994/18/game) agrees with F1DB on Schumacher/Hill 18, Alesi 17, Mansell 26 and 54, Hakkinen 28 and 54, Barrichello 28, Brundle 52, Berger 57. Hill (#0) crawled to the pits on lap 36 and retired. Barrichello and Hakkinen served 10 s stop-and-go penalties on laps 58 and 61 (pit-lane speeding); F1DB lists Barrichello lap 58 and Hakkinen lap 62 at about 14 s, which look like those penalties. No safety car mentioned in Wikipedia, Motor Sport or GrandPrix.com (https://www.grandprix.com/gpe/rr564.html); not confirmed absent."
+}

@@ -1,0 +1,19 @@
+{
+  "raceId": "great-britain-1987",
+  "stops": [
+    {
+      "number": 5,
+      "name": "Nigel Mansell",
+      "lap": 35,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/august-1987/57/sunrise-over-silverstone ('This added only 20 seconds to lap 36'); Wikipedia https://en.wikipedia.org/wiki/1987_British_Grand_Prix ('On lap 35, Mansell was around two seconds behind his team-mate')",
+      "note": "unscheduled tyre stop for a vibration; the timing line is at the start of the pit lane, so the stop counts in lap 36's time and the in-lap is 35. The 20 s is time lost, not lane time"
+    }
+  ],
+  "safetyCars": [],
+  "complete": {
+    "stops": false,
+    "safetyCars": true
+  },
+  "notes": "Piquet (#6) ran non-stop (Motor Sport). Prost (#1) stopped for tyres while third (no lap) and later retired with clutch failure (Jolpica: 53 laps)."
+}

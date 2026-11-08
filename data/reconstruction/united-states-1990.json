@@ -1,0 +1,19 @@
+{
+  "raceId": "united-states-1990",
+  "stops": [
+    {
+      "number": 20,
+      "name": "Nelson Piquet",
+      "lap": 28,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/april-1990/5/phoenix-revivial ('elected to stop for fresh Goodyears on lap 28'); Wikipedia https://en.wikipedia.org/wiki/1990_United_States_Grand_Prix ('on lap 28 he pitted for new ones')",
+      "note": "'Of the Goodyear drivers, only Piquet stopped specifically for tyres' (Motor Sport)"
+    }
+  ],
+  "safetyCars": [],
+  "complete": {
+    "stops": false,
+    "safetyCars": true
+  },
+  "notes": "Alesi (#4) and Senna (#27) ran non-stop (implied, not stated outright). Berger (#28) pitted for a new nose/wing after hitting the tyres; Wikipedia puts the hit on lap 9, Motor Sport has him 'rejoining the race on lap 15': in-lap unclear, not entered. Patrese (#6), Nannini (#19, two nose stops), Schneider (#10), Martini (#23) and Moreno all stopped (no laps)."
+}
