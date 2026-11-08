@@ -199,7 +199,7 @@ describe('refuelReading', () => {
     expect(refuelReading(race, model, () => reading)).toBe(reading);
   });
 
-  it("reads the sim's tank and fills by default (build plan 4.2), and the fill goes on the call", () => {
+  it("reads the sim's tank and its fills (build plan 4.2), and the fill goes on the call", () => {
     const model = raced('1994-2009', { refuelling: true });
     const run = initRun(model, model.race.seed, { decisions: [] });
     while (run.state.lap < model.race.takeoverLap + 3) stepLap(run);
@@ -216,5 +216,25 @@ describe('refuelReading', () => {
     const box: Decision = { lap: run.state.lap + 1, kind: 'pit', compound: 'HARD', fill: 'long' };
     expect(simTakes(model, box)).toBe(true);
     expect(simTakes(abu, box)).toBe(false);
+  });
+
+  it('blocks a box call without its fill in a refuelling race, as the sim refuses it', () => {
+    const model = raced('1994-2009', { refuelling: true });
+    const box: Decision = { lap, kind: 'pit', compound: 'HARD' };
+    const fills: Decision[] = [
+      box,
+      { ...box, fill: 'short' },
+      { ...box, fill: { laps: 12 } },
+      { ...box, fill: { laps: 0 } },
+      { ...box, fill: { laps: 1000 } },
+    ];
+    for (const m of [model, abu]) {
+      for (const d of fills) {
+        expect(callBlocked(m, d) === null, JSON.stringify(d)).toBe(simTakes(m, d));
+      }
+    }
+    expect(callBlocked(model, box)).toBe('pick a fuel fill first');
+    expect(callBlocked(model, { ...box, fill: 'long' })).toBeNull();
+    expect(callBlocked(abu, box)).toBeNull();
   });
 });

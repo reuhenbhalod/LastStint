@@ -5,7 +5,15 @@
 import type { PlanId, RaceModel, RacePlan } from '@laststint/sim';
 import { useEffect, useRef, useState } from 'react';
 import { surname } from '../data/names.js';
-import { chanceOf, paceLine, samePlan, stopsLine, stopsWord, tyres } from '../game/plans.js';
+import {
+  chanceOf,
+  fillsMissing,
+  paceLine,
+  samePlan,
+  stopsLine,
+  stopsWord,
+  tyres,
+} from '../game/plans.js';
 import type { GameState } from '../state/machine.js';
 import { HeadsetIcon } from './Icons.js';
 import { PlanEditor, twoCompounds } from './PlanEditor.js';
@@ -44,7 +52,8 @@ export function PlanCard({
   const build = useRef(onBuild);
   build.current = onBuild;
   const own = plan.own;
-  const legal = !!draft && twoCompounds(car, draft, model.rules);
+  // A refuelling race: every stop's fuel fill picked too (the sim refuses a plan without).
+  const legal = !!draft && twoCompounds(car, draft, model.rules) && !fillsMissing(model, draft);
   useEffect(() => {
     if (!draft || !legal || (own && samePlan(own, draft))) return;
     const id = setTimeout(() => build.current(draft), 350);

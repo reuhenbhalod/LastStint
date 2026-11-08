@@ -5,13 +5,23 @@
 // short one: the race screen holds the race while the card is up, and the timer running out
 // answers it (the same no-answer outcome). Without it, exactly as before. In Eras 1-2 (the
 // race's era, eras/PitBoard.ts) the call reads as a pit-board message.
+// A refuelling race (`fuel`, a refuelling reading): an answer that boxes needs a fuel fill
+// (owner decision, Nov 7 2026). The card shows the fills with none picked, and its box answers
+// wait until one is; the timer running out still answers "no change" (stay out).
 
-import { type ReactNode, useEffect, useRef } from 'react';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { named, surname } from '../data/names.js';
 import { BOARD_ACCENT, PIT_BOARD_CLASS, boardTag } from '../eras/PitBoard.js';
 import { useRaceEra } from '../eras/RaceEraContext.js';
-import type { QuickCall } from '../game/quickCalls.js';
+import { FuelFillChoice } from '../eras/RefuelControls.js';
+import type { FuelFill, RefuelReading } from '../eras/refuel.js';
+import type { QuickCall, QuickOption } from '../game/quickCalls.js';
 import { FlagIcon, HeadsetIcon, OvertakeIcon } from './Icons.js';
+
+/** True if the answer boxes (its order, or one of the orders it also gives). */
+export function answerBoxes(o: QuickOption): boolean {
+  return [o.call, ...(o.also ?? [])].some((d) => d?.kind === 'pit');
+}
 
 export function QuickCallCard({
   call,
@@ -19,16 +29,30 @@ export function QuickCallCard({
   onAnswer,
   onTimeout,
   eras,
+  fuel,
 }: {
   call: QuickCall;
   /** How long there is to answer. */
   ms: number;
-  onAnswer: (optionId: string) => void;
+  /** `fill`: the fuel fill picked for an answer that boxes (a refuelling race). */
+  onAnswer: (optionId: string, fill?: FuelFill) => void;
   onTimeout: () => void;
   /** An Eras race: the era's decision timer (null with the timer turned off: the card waits).
    * The card's own countdown (`ms`) then doesn't run. */
   eras?: { timer: ReactNode };
+  /** A refuelling race's reading: an answer that boxes waits for a fill. */
+  fuel?: RefuelReading | null;
 }) {
+  const [fill, setFill] = useState<FuelFill | null>(null);
+  const needsFill = !!fuel && call.options.some(answerBoxes);
+  const waiting = (o: QuickOption) => needsFill && !fill && answerBoxes(o);
+  const answer = (o: QuickOption) => {
+    if (waiting(o)) return;
+    if (needsFill && fill && answerBoxes(o)) onAnswer(o.id, fill);
+    else onAnswer(o.id);
+  };
+  const answerRef = useRef(answer);
+  answerRef.current = answer;
   const timeout = useRef(onTimeout);
   timeout.current = onTimeout;
   const ownTimer = !eras;
@@ -40,11 +64,11 @@ export function QuickCallCard({
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const o = call.options[Number(e.key) - 1];
-      if (o) onAnswer(o.id);
+      if (o) answerRef.current(o);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [call, onAnswer]);
+  }, [call]);
 
   const board = useRaceEra().prompts === 'board';
   const battle = call.kind === 'battle';
@@ -108,11 +132,21 @@ export function QuickCallCard({
           />
         </div>
       )}
+      {needsFill && fuel && (
+        <FuelFillChoice reading={fuel} value={fill} disabled={false} onPick={setFill} />
+      )}
       <div
         className={`grid gap-2 ${call.options.length > 2 ? 'grid-cols-2 lg:grid-cols-4' : 'grid-cols-2'}`}
       >
         {call.options.map((o, i) => (
-          <button key={o.id} type="button" onClick={() => onAnswer(o.id)} className="call-opt">
+          <button
+            key={o.id}
+            type="button"
+            disabled={waiting(o)}
+            title={waiting(o) ? 'Pick a fuel fill first' : undefined}
+            onClick={() => answer(o)}
+            className={needsFill ? 'call-opt disabled:opacity-40' : 'call-opt'}
+          >
             <span className="flex w-full items-center justify-between gap-2">
               <span className="label">{named(o.label)}</span>
               <span aria-hidden="true" className="call-key">

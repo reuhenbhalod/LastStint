@@ -53,6 +53,12 @@ def _abu_strategies(m: dict) -> dict:
         ],
         "VER": [{**_real(m, "VER")[0], "fill": "long"}, *_real(m, "VER")[1:]],
         "PER": [{"lap": 45, "to": "HARD", "fill": "standard"}],
+        # Exact fills (the real team's calls, the engineer's plans): 9 laps, to the lap-48
+        # in-lap, then 30 laps, past the flag, held to it (10).
+        "LEC": [
+            {"lap": 40, "to": "HARD", "fill": {"laps": 9}},
+            {"lap": 49, "to": "SOFT", "fill": {"laps": 30}},
+        ],
     }
 
 
@@ -107,7 +113,12 @@ def _functions() -> dict:
     plans = [[], [{"lap": 40}], [{"lap": 52}, {"lap": 38}], [{"lap": 35}]]
     tanks = [[p, refuel.takeover_tank(p, 34, 58)] for p in plans]
     limits = {str(y): refuel.fuel_limit_kg(y) for y in range(1982, 1991)}
-    return {"fills": fills, "tanks": tanks, "limits": limits}
+    exact = [
+        [fill, remaining, refuel.fill_laps(fill, remaining, 30)]
+        for fill in ({"laps": 1}, {"laps": 12}, {"laps": 30}, "short", "long")
+        for remaining in (0, 5, 12, 22)
+    ]
+    return {"fills": fills, "tanks": tanks, "limits": limits, "exact": exact}
 
 
 def build_vectors() -> dict:
@@ -217,6 +228,21 @@ def test_a_real_stop_keeps_its_measured_loss_but_prices_a_fill_choice():
 )
 def test_fill_choices(choice, remaining, cap, want):
     assert refuel.fill_stint(choice, remaining, cap) == want
+
+
+def test_an_exact_fill_fuels_its_laps_never_past_the_flag():
+    assert refuel.fill_laps({"laps": 12}, 22, 30) == 12
+    assert refuel.fill_laps({"laps": 30}, 22, 30) == 22
+    assert refuel.fill_laps({"laps": 5}, 0, 30) == 0
+    assert refuel.fill_laps("short", 22, 30) == refuel.fill_stint("short", 22, 30)
+
+
+def test_an_exact_real_fill_at_a_real_stop_prices_at_nothing():
+    m = apply_case(_cases()[1])
+    real = _real(m, "VER")[0]  # out on 37, the next real stop out on 54: 17 laps
+    car = _Car("VER", [], 1.0)
+    assert refuel.refuel_at_stop(m, car, {**real, "fill": {"laps": 17}}, 37) == 0.0
+    assert car.tank == 17 + refuel.RESERVE_LAPS
 
 
 # --- The fill-rate fit ----------------------------------------------------------------------

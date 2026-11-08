@@ -5,47 +5,93 @@
 // is always a stop, so the user's real fastest-lap stop (optional for scripted cars) is
 // called only when the replay took it. The rival's own optional stop is taken in live play only
 // if the gap behind covers it (sim.ts); when it's skipped, the replay is compared without it.
+//
+// Refuelling (owner decision, Nov 7 2026: every pit call states its fill): the real calls
+// carry the real fills (realDecisions, refuel.ts realFill), so they replay the real race there
+// too, with no car running dry. No race file on this branch refuels, so every race is
+// re-tagged in memory (rules.refuelling, with a fitted fill model and with the prior).
 
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { initRun, isFinished, realDecisions, stepLap } from '../src/sim.js';
-import type { RaceModel } from '../src/types.js';
+import { type Run, initRun, isFinished, realDecisions, stepLap } from '../src/sim.js';
+import type { RaceModel, RefuelModel } from '../src/types.js';
 
 const dir = join(__dirname, '..', '..', '..', 'data', 'races');
 const races = readdirSync(dir).filter((f) => f.endsWith('.json'));
 
+const load = (file: string) => JSON.parse(readFileSync(join(dir, file), 'utf8')) as RaceModel;
+
+/** Replay `model`, then play it live with the real calls: every car's time must match. */
+function realCallsReplay(model: RaceModel): { live: Run; replay: Run } {
+  const replay = initRun(model, model.race.seed);
+  while (!isFinished(replay)) stepLap(replay);
+  const user = model.drivers.find((d) => d.code === model.userSide);
+  const skipped = new Set(
+    (user?.realStrategy ?? [])
+      .filter((s) => s.optional)
+      .filter(
+        (s) => (replay.state.cars[model.userSide]?.tyreAge ?? 0) > model.race.laps - s.lap + 1,
+      )
+      .map((s) => s.lap - 1),
+  );
+  const calls = realDecisions(model).filter((d) => !skipped.has(d.lap));
+  const live = initRun(model, model.race.seed, { decisions: calls, incidents: false });
+  while (!isFinished(live)) stepLap(live);
+  const rival = model.drivers.find((d) => d.code === model.rival);
+  let expected = replay;
+  if (live.state.cars[model.rival]?.tyreAge !== replay.state.cars[model.rival]?.tyreAge) {
+    expected = initRun(model, model.race.seed, {
+      strategies: { [model.rival]: (rival?.realStrategy ?? []).filter((s) => !s.optional) },
+    });
+    while (!isFinished(expected)) stepLap(expected);
+  }
+  for (const [code, car] of Object.entries(expected.state.cars)) {
+    expect(live.state.cars[code]?.totalTime).toBeCloseTo(car.totalTime, 9);
+  }
+  // A real car fault (step 4.4) is a frozen event: its note comes in the replay too.
+  const frozen = (run: typeof live) => run.notes.filter((n) => n.kind === 'fault');
+  expect(frozen(live)).toEqual(frozen(replay));
+  expect(live.notes.filter((n) => n.kind !== 'fault')).toEqual([]);
+  return { live, replay };
+}
+
 describe('live play with the real calls', () => {
   it.each(races)('%s matches the replay exactly', (file) => {
-    const model = JSON.parse(readFileSync(join(dir, file), 'utf8')) as RaceModel;
-    const replay = initRun(model, model.race.seed);
-    while (!isFinished(replay)) stepLap(replay);
-    const user = model.drivers.find((d) => d.code === model.userSide);
-    const skipped = new Set(
-      (user?.realStrategy ?? [])
-        .filter((s) => s.optional)
-        .filter(
-          (s) => (replay.state.cars[model.userSide]?.tyreAge ?? 0) > model.race.laps - s.lap + 1,
-        )
-        .map((s) => s.lap - 1),
-    );
-    const calls = realDecisions(model).filter((d) => !skipped.has(d.lap));
-    const live = initRun(model, model.race.seed, { decisions: calls, incidents: false });
-    while (!isFinished(live)) stepLap(live);
-    const rival = model.drivers.find((d) => d.code === model.rival);
-    let expected = replay;
-    if (live.state.cars[model.rival]?.tyreAge !== replay.state.cars[model.rival]?.tyreAge) {
-      expected = initRun(model, model.race.seed, {
-        strategies: { [model.rival]: (rival?.realStrategy ?? []).filter((s) => !s.optional) },
-      });
-      while (!isFinished(expected)) stepLap(expected);
+    realCallsReplay(load(file));
+  });
+});
+
+// A fill model steep enough that a wrong fill shows in the times (refuel.test.ts's).
+const FIT: RefuelModel = { secondsPerLap: 0.3, laneBase: 18, refFill: 15, tankLaps: 30, stops: 20 };
+
+describe('live play with the real calls in a refuelling race', () => {
+  const retag = (model: RaceModel, refuel?: RefuelModel): RaceModel => ({
+    ...model,
+    rules: { ...model.rules, refuelling: true },
+    track: { ...model.track, ...(refuel ? { refuel } : {}) },
+  });
+  it.each(races)('%s matches the replay exactly, with no car running dry', (file) => {
+    for (const model of [retag(load(file), FIT), retag(load(file))]) {
+      const calls = realDecisions(model);
+      // Every real call states its fill: the real next stint.
+      for (const d of calls) expect(d.kind === 'pit' && d.fill).toBeTruthy();
+      // The low point of every car's tank, lap by lap, in the live run (which matches the
+      // replay's times exactly, checked inside).
+      const live = initRun(model, model.race.seed, { decisions: calls, incidents: false });
+      let low = Number.POSITIVE_INFINITY;
+      while (!isFinished(live)) {
+        stepLap(live);
+        for (const c of Object.values(live.state.cars)) {
+          if (!c.retired && c.tank !== undefined) low = Math.min(low, c.tank);
+        }
+      }
+      expect(low).toBeGreaterThanOrEqual(0);
+      realCallsReplay(model);
+      // With live play's chaos on, the player's tank burns live: the real fills still reach.
+      const chaos = initRun(model, model.race.seed, { decisions: calls });
+      while (!isFinished(chaos)) stepLap(chaos);
+      expect(chaos.notes.filter((n) => n.kind === 'fuel' && n.detail === 'out')).toEqual([]);
     }
-    for (const [code, car] of Object.entries(expected.state.cars)) {
-      expect(live.state.cars[code]?.totalTime).toBeCloseTo(car.totalTime, 9);
-    }
-    // A real car fault (step 4.4) is a frozen event: its note comes in the replay too.
-    const frozen = (run: typeof live) => run.notes.filter((n) => n.kind === 'fault');
-    expect(frozen(live)).toEqual(frozen(replay));
-    expect(live.notes.filter((n) => n.kind !== 'fault')).toEqual([]);
   });
 });

@@ -1,12 +1,15 @@
 // The refuelling controls (eras build plan 8.5): the fill choice on the pit stop and the gauge
 // of fuel to the next stop. Shown only with a refuelling reading (refuel.ts), so only in a
-// race that refuels, once the refuelling model is connected.
+// race that refuels, once the refuelling model is connected. The fill is required (owner
+// decision, Nov 7 2026): nothing is chosen until the player picks, and no box call goes
+// without one.
 
 import { FUEL_FILLS, type FuelFill, type RefuelReading } from './refuel.js';
 
 const FILL_NAME: Record<FuelFill, string> = { short: 'Short', standard: 'Standard', long: 'Long' };
 
-/** The fill a stop takes: each with the laps it lasts and the seconds it costs. */
+/** The fill a stop takes: each with the laps it lasts and the seconds it costs. `value`
+ * null: none picked yet (the box call waits for one). */
 export function FuelFillChoice({
   reading,
   value,
@@ -14,7 +17,7 @@ export function FuelFillChoice({
   onPick,
 }: {
   reading: RefuelReading;
-  value: FuelFill;
+  value: FuelFill | null;
   disabled: boolean;
   onPick: (fill: FuelFill) => void;
 }) {

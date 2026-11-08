@@ -5,13 +5,20 @@
 // real team took. proposeMoments() finds candidates from the race's triggers, grades every
 // option from the real race's state at that lap, and keeps only genuine dilemmas. A human
 // still picks the final 2-4 (plan 1.5); approved moments go in data/moments/<race>.json.
+//
+// A refuelling race (refuel.ts): every box call carries an explicit fill, so an option is still
+// one call per compound. The box call the real team made (its lap and compound) carries the
+// real fill (realFill), so it is the real call; every other box call fills 'standard' (the
+// fewest stops from there, split evenly). The fill is a choice on the race screen's pit card;
+// at a moment the option names it.
 
 import { faultsOf } from './faults.js';
 import { type GradeOption, type MomentGrade, type Target, gradeMoment } from './grade.js';
 import { drawnEvents, legendEvents, removedEvents } from './legend.js';
+import { realFill, refuelling } from './refuel.js';
 import { illegalPitCompound } from './rules.js';
 import { type Run, cleanLap, initRun, realDecisions, stepLap, tyreLife } from './sim.js';
-import type { CarState, Decision, RaceModel } from './types.js';
+import type { CarState, Decision, Fill, RaceModel } from './types.js';
 import { isWetTyre, wetnessOn } from './weather.js';
 
 /** What brought a moment on (the race plan at takeover is the strategy planner's, not a
@@ -98,7 +105,12 @@ export function pauseAt(model: RaceModel, lap: number): Run {
   const first = model.drivers
     .find((d) => d.code === model.userSide)
     ?.realStrategy.find((s) => s.lap === takeoverLap + 1);
-  if (user && first) user.strategy.push({ ...first });
+  // Refuelling: it fills as the real team did, to the next real stop (refuel.ts realFill).
+  if (user && first) {
+    user.strategy.push(
+      refuelling(model) ? { ...first, fill: realFill(model, model.userSide, first.lap) } : first,
+    );
+  }
   while (run.state.lap < lap - 1) stepLap(run);
   return run;
 }
@@ -127,15 +139,38 @@ function boxOptions(
   const keeps = model.rules?.tyreChanges === false;
   return compounds
     .filter((compound) => legal.has(compound))
-    .map((compound) => ({
-      id: `box-${compound.toLowerCase()}`,
+    .map((compound) => {
+      const call = boxCall(model, lap, compound);
       // No tyre changes: a dry stop keeps the set it's on.
-      label:
+      const tyres =
         keeps && !isWetTyre(compound)
           ? `Box, keep the ${compound.toLowerCase()}s`
-          : label(compound.toLowerCase()),
-      decisions: [{ lap, kind: 'pit', compound } as Decision],
-    }));
+          : label(compound.toLowerCase());
+      return {
+        id: `box-${compound.toLowerCase()}`,
+        label: call.kind === 'pit' && call.fill ? `${tyres}, ${fillWords(call.fill)}` : tyres,
+        decisions: [call],
+      };
+    });
+}
+
+/** A box option's fill, in its label: "a standard fill", "fuel for 17 laps". */
+function fillWords(fill: Fill): string {
+  return typeof fill === 'string' ? `a ${fill} fill` : `fuel for ${fill.laps} laps`;
+}
+
+/**
+ * A grading option's box call on in-lap `lap` (the moment finder, the authoring recipe). A
+ * refuelling race: the real call's fill if this is the real call (its lap and compound), else
+ * 'standard'.
+ */
+export function boxCall(model: RaceModel, lap: number, compound: string): Decision {
+  if (!refuelling(model)) return { lap, kind: 'pit', compound };
+  const real = realDecisions(model).find(
+    (d) => d.lap === lap && d.kind === 'pit' && d.compound === compound,
+  );
+  const fill = real?.kind === 'pit' ? real.fill : undefined;
+  return { lap, kind: 'pit', compound, fill: fill ?? 'standard' };
 }
 
 /**
@@ -227,9 +262,14 @@ function faultOptions(model: RaceModel, lap: number, untilStop: boolean): Moment
 function realOptionId(model: RaceModel, lap: number, options: MomentOption[]): string | null {
   const call = realDecisions(model).find((d) => d.lap === lap);
   if (!call) return options.some((o) => o.id === 'stay-out') ? 'stay-out' : null;
+  // A refuelling race: the real call's fill too (an option filling otherwise isn't it).
   const match = options.find((o) =>
     o.decisions.some(
-      (d) => d.kind === 'pit' && call.kind === 'pit' && d.compound === call.compound,
+      (d) =>
+        d.kind === 'pit' &&
+        call.kind === 'pit' &&
+        d.compound === call.compound &&
+        JSON.stringify(d.fill) === JSON.stringify(call.fill),
     ),
   );
   return match?.id ?? null;

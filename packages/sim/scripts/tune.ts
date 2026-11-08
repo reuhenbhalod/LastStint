@@ -33,6 +33,7 @@ import {
   type RacePlan,
   type Run,
   answerMoment,
+  boxCall,
   classify,
   decide,
   enginePlans,
@@ -108,9 +109,10 @@ type Box = (run: Run) => void;
 const stopAhead = (run: Run) =>
   !!run.state.cars[run.model.userSide]?.strategy.some((s) => s.lap > run.state.lap);
 
-/** Box next lap (the in-lap; the stop is charged on the lap after). */
+/** Box next lap (the in-lap; the stop is charged on the lap after). A refuelling race: the
+ * real fill on the real stop, else 'standard' (moments.ts boxCall). */
 const boxNext = (run: Run, compound: string) =>
-  decide(run, { lap: run.state.lap + 1, kind: 'pit', compound });
+  decide(run, boxCall(run.model, run.state.lap + 1, compound));
 
 /** The real way: the real team's stops after the takeover, on their laps. */
 const realBox: Box = (run) => {

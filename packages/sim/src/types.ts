@@ -41,6 +41,8 @@ export interface Weather {
 export interface PlanStop {
   lap: number;
   compound: Compound;
+  /** A refuelling race: the stop's fill, required there (refuel.ts); the call carries it. */
+  fill?: Fill;
 }
 
 /**
@@ -338,6 +340,14 @@ export interface RefuelModel {
 /** The player's fill at a refuelling stop (refuel.ts fillStint has the definitions). */
 export type FillChoice = 'short' | 'standard' | 'long';
 
+/**
+ * A stop's fill in a refuelling race (refuel.ts): one of the player's three choices, or an
+ * exact number of laps of fuel from the out-lap (the reserve goes on top). The real team's
+ * calls (realDecisions) and the engineer's plans carry exact laps: the real next stint, or the
+ * plan's. In a refuelling race every pit call must carry one (owner decision, Nov 7 2026).
+ */
+export type Fill = FillChoice | { laps: number };
+
 export interface PitStop {
   /** The out-lap: the first lap run on the new tyres (pit loss is charged on this lap). */
   lap: number;
@@ -355,9 +365,9 @@ export interface PitStop {
   /** A stop forced by a damaged tyre (a puncture): it fits new tyres even when a race allows
    * no tyre changes (rules.tyreChanges false, eras build plan 4.1). */
   damaged?: boolean;
-  /** A refuelling race: the player's fill (refuel.ts). Absent: fuel for the next planned
-   * stint, as every scripted car. */
-  fill?: FillChoice;
+  /** A refuelling race: the stop's fill (refuel.ts; every pit call's carries one). Absent:
+   * fuel for the next planned stint, as every scripted car (the real fill, for a real stop). */
+  fill?: Fill;
 }
 
 export interface CarState {
@@ -445,7 +455,7 @@ export type DriverRequest = 'box' | 'push';
 export type BlueAction = 'complain' | 'go-round';
 
 export type Decision = (
-  | { lap: number; kind: 'pit'; compound: Compound; fill?: FillChoice }
+  | { lap: number; kind: 'pit'; compound: Compound; fill?: Fill }
   | { lap: number; kind: 'mode'; key: keyof Modes; value: string }
   | { lap: number; kind: 'teamOrder'; order: TeamOrder }
   | { lap: number; kind: 'radio'; momentId: string; optionId: string }

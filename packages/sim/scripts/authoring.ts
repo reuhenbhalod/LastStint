@@ -6,6 +6,7 @@ import { gradeMoment } from '../src/grade.js';
 import {
   type DecisionMoment,
   type MomentOption,
+  boxCall,
   candidateMoments,
   pauseAt,
   pitCompounds,
@@ -37,7 +38,8 @@ export function authorMoments(
     INTERMEDIATE: 'inters',
     WET: 'wets',
   };
-  const pit = (lap: number, compound: string): Decision => ({ lap, kind: 'pit', compound });
+  // A refuelling race: the real call's fill, else 'standard' (moments.ts boxCall).
+  const pit = (lap: number, compound: string): Decision => boxCall(model, lap, compound);
   const mode = (lap: number, key: 'pace' | 'battle', value: string): Decision =>
     ({ lap, kind: 'mode', key, value }) as Decision;
 

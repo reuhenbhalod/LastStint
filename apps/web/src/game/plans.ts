@@ -10,8 +10,10 @@ import {
   PLAN_TARGET,
   type PaceMode,
   type PlanId,
+  type RaceModel,
   type RacePlan,
   gradeFromHits,
+  refuelling,
 } from '@laststint/sim';
 import type { PlanState } from '../state/machine.js';
 
@@ -148,4 +150,13 @@ export function stintsOk(plan: RacePlan, first: number, laps: number): boolean {
   const starts = [first, ...plan.stops.map((s) => s.lap + 1)];
   const ends = [...plan.stops.map((s) => s.lap), laps - 1];
   return starts.some((st, i) => (ends[i] as number) - st >= 2 * MIN_STINT);
+}
+
+/**
+ * True if the plan has a stop without its fuel fill in a refuelling race: the plan can't be
+ * built or run until the player picks one for each (owner decision, Nov 7 2026; the sim's
+ * validatePlan refuses it). The engineer's plans come with theirs.
+ */
+export function fillsMissing(model: RaceModel, plan: RacePlan): boolean {
+  return refuelling(model) && plan.stops.some((s) => s.fill === undefined);
 }

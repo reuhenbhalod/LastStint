@@ -8,7 +8,9 @@
 //   flag) plus RESERVE_LAPS.
 // - A stop fills the tank to the next stint plus the reserve: a scripted car's next stint runs
 //   to its next planned stop's in-lap (or the flag); the player's comes from the fill choice
-//   (fillStint). The weight resets with it.
+//   (fillLaps: a named choice, fillStint, or an exact number of laps). The weight resets
+//   with it. In a refuelling race every pit call carries a fill (owner decision, Nov 7 2026:
+//   no default); the real team's calls carry the real one (realFill).
 // - The weight: the race's fitted fuel effect is per lap of fuel on board, so a lap costs
 //   fuelEffectPerLap x (tank - the single-tank load, laps - lap + 1) over today's model. A
 //   single-tank car's tank is that load, so the term is 0 and the model is today's.
@@ -27,7 +29,7 @@
 // among them) instead of costing dryLapDelta. Refuelling races have no fuel load: the tank
 // replaces it. The allowances by year and their sources are in refuel.py.
 
-import type { CarState, FillChoice, PitStop, RaceModel, RefuelModel } from './types.js';
+import type { CarState, Fill, FillChoice, PitStop, RaceModel, RefuelModel } from './types.js';
 
 /** Laps of fuel every fill (and the takeover load) carries over the stint: a team's margin. */
 export const RESERVE_LAPS = 1;
@@ -81,6 +83,78 @@ export function fillStint(choice: FillChoice, remaining: number, tankLaps: numbe
   if (choice === 'long') return Math.min(r, cap);
   if (choice === 'standard') return Math.ceil(r / n);
   return Math.ceil(r / (n + 1));
+}
+
+/**
+ * The laps a stop's fill fuels from the out-lap, with `remaining` laps to the flag (out-lap
+ * included): a named choice by fillStint; an exact fill (`{ laps }`) as it says, but never
+ * past the flag.
+ */
+export function fillLaps(fill: Fill, remaining: number, tankLaps: number): number {
+  if (typeof fill === 'string') return fillStint(fill, remaining, tankLaps);
+  return Math.min(Math.max(0, remaining), fill.laps);
+}
+
+/**
+ * The most laps an exact fill may name: the tank (`tankLaps`, the longest real stint of the
+ * race's fit), or the longest real stint after a stop in the race file if that is longer (a
+ * real fill is never refused, even where the file and the fit's source differ).
+ */
+export function fillCap(model: RaceModel): number {
+  const { laps } = model.race;
+  let cap = Math.max(1, Math.floor(refuelModel(model).tankLaps));
+  for (const d of model.drivers) {
+    for (const s of d.realStrategy) {
+      const others = d.realStrategy.filter((o) => o !== s);
+      cap = Math.max(cap, stintToNextStop(others, s.lap, laps));
+    }
+  }
+  return cap;
+}
+
+/** True if `fill` is a fill this race takes: a named choice, or 1 to fillCap whole laps. */
+export function validFill(model: RaceModel, fill: unknown): fill is Fill {
+  if (typeof fill === 'string') return (FILL_CHOICES as readonly string[]).includes(fill);
+  if (typeof fill !== 'object' || fill === null) return false;
+  const keys = Object.keys(fill);
+  const n = (fill as { laps?: unknown }).laps;
+  return (
+    keys.length === 1 &&
+    keys[0] === 'laps' &&
+    typeof n === 'number' &&
+    Number.isInteger(n) &&
+    n >= 1 &&
+    n <= fillCap(model)
+  );
+}
+
+/**
+ * A pit call's fill (this file): required in a refuelling race (owner decision, Nov 7 2026:
+ * no default), a named choice or 1 to fillCap laps; none in any other race. Plans' stops too.
+ */
+export function checkFill(model: RaceModel, fill: unknown): void {
+  if (!refuelling(model)) {
+    if (fill !== undefined) throw new Error(`no fill ${JSON.stringify(fill)} in this race`);
+    return;
+  }
+  if (fill === undefined) throw new Error('a pit call in a refuelling race needs a fill');
+  if (!validFill(model, fill)) throw new Error(`no fill ${JSON.stringify(fill)} in this race`);
+}
+
+/**
+ * The fuel the real team put in at `code`'s real stop with out-lap `outLap`: its next real
+ * stint, to the in-lap of its next real stop or to the flag (the reserve goes on top). What
+ * the real team's calls carry (sim.ts realDecisions), so they replay the real race.
+ */
+export function realFill(model: RaceModel, code: string, outLap: number): { laps: number } {
+  const real = model.drivers.find((d) => d.code === code)?.realStrategy ?? [];
+  return {
+    laps: stintToNextStop(
+      real.filter((s) => s.lap !== outLap),
+      outLap,
+      model.race.laps,
+    ),
+  };
 }
 
 /** Laps of fuel a car fills for at a stop on `outLap`: to the in-lap of its next stop in
@@ -138,13 +212,15 @@ export function refuelAtStop(
   const rm = refuelModel(model);
   const { laps } = model.race;
   const stint = stop.fill
-    ? fillStint(stop.fill, laps - outLap + 1, rm.tankLaps)
+    ? fillLaps(stop.fill, laps - outLap + 1, rm.tankLaps)
     : stintToNextStop(car.strategy, outLap, laps);
   const target = stint + RESERVE_LAPS;
   const fill = Math.max(0, target - car.tank);
   car.tank = Math.max(car.tank, target);
   if (stop.loss !== undefined) {
-    if (!stop.fill) return 0; // a real stop: its real fill is in the measured loss
+    // A real stop: its real fill is in the measured loss; another fill there is priced
+    // against it (the real fill, realFill, prices at 0).
+    if (!stop.fill) return 0;
     const real = stintToNextStop(
       realStrategy.filter((s) => s.lap !== outLap),
       outLap,
@@ -187,7 +263,7 @@ export function tankPlanDelta(
   for (let lap = fromLap + 1; lap <= laps; lap++) {
     if (stop && lap === stop.lap) {
       const target =
-        (stop.fill ? fillStint(stop.fill, laps - lap + 1, rm.tankLaps) : laps - lap + 1) +
+        (stop.fill ? fillLaps(stop.fill, laps - lap + 1, rm.tankLaps) : laps - lap + 1) +
         RESERVE_LAPS;
       total += rm.secondsPerLap * (Math.max(0, target - tank) - rm.refFill);
       tank = Math.max(tank, target);

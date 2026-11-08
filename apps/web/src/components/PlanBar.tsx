@@ -5,7 +5,7 @@
 import type { RaceModel, RacePlan } from '@laststint/sim';
 import { useEffect, useState } from 'react';
 import { surname } from '../data/names.js';
-import { chanceOf, paceLine, remainder, stopsWord, tyres } from '../game/plans.js';
+import { chanceOf, fillsMissing, paceLine, remainder, stopsWord, tyres } from '../game/plans.js';
 import type { GameState } from '../state/machine.js';
 import { HeadsetIcon } from './Icons.js';
 import { PlanEditor, twoCompounds } from './PlanEditor.js';
@@ -70,7 +70,8 @@ export function PlanBar({
   const pace = paceLine(rest);
   // Editing from the lap after the coming one (its calls are made).
   const editFrom = lap + 1;
-  const legal = draft ? twoCompounds(me, draft, model.rules) : false;
+  // A refuelling race: every stop's fuel fill picked too (the sim refuses a plan without).
+  const legal = draft ? twoCompounds(me, draft, model.rules) && !fillsMissing(model, draft) : false;
   return (
     <section aria-label="Race plan" className="card flex flex-col gap-2">
       <div className="flex flex-wrap items-center justify-between gap-2">

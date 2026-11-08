@@ -71,6 +71,7 @@ export type {
 export { BAND_POINTS, scoreRun } from './grade.js';
 export {
   QUALITY,
+  boxCall,
   candidateMoments,
   legendMoments,
   pauseAt,
@@ -94,7 +95,7 @@ export {
   verifyRun,
 } from './verify.js';
 export { MAX_PLAN_STOPS, MIN_STINT, PACES, planCalls, stintStarts, validatePlan } from './plan.js';
-export { PLAN_TARGET, enginePlans, planOption } from './planner.js';
+export { PLAN_TARGET, enginePlans, fuelled, planOption } from './planner.js';
 export type {
   ClaimedGrade,
   RealCall,
@@ -213,16 +214,22 @@ export type { RivalClaimReplay, RivalRegrade } from './rivals/claims.js';
 export { RESTART_QUEUE_GAP, STANDING_RESTART_GAP, redFlagPlan } from './redflag.js';
 export type { RedFlagPlan } from './redflag.js';
 // Refuelling and fuel limits (eras build plan 4.2): the fill choice and the tank reading for
-// the fuel UI (build plan 8.5). FillChoice and RefuelModel are in types.ts.
+// the fuel UI (build plan 8.5), and the fill every pit call in a refuelling race carries.
+// Fill, FillChoice and RefuelModel are in types.ts.
 export {
   FILL_CHOICES,
   RESERVE_LAPS,
+  checkFill,
+  fillCap,
+  fillLaps,
   fillOptions,
   fillStint,
   fuelLimit,
   limitBurnPerLap,
   refuelModel,
+  realFill,
   refuelling,
   tankReading,
+  validFill,
 } from './refuel.js';
 export type { TankReading } from './refuel.js';
