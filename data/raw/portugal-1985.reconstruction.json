@@ -1,0 +1,1279 @@
+{
+ "raceId": "portugal-1985",
+ "year": 1985,
+ "laps": 67,
+ "reconstructed": true,
+ "provenance": {
+  "kind": "reconstructed",
+  "estimated": [
+   "compounds",
+   "fuelLoads",
+   "weather"
+  ]
+ },
+ "estimates": [
+  "Every lap time and lap-end Time is synthetic: solved to the anchors, not measured",
+  "Position each lap follows from the synthetic times; the lap-1 order is the grid order",
+  "Lap times in between the anchors: pace + tyre wear + fuel + seeded noise",
+  "Fuel: 0.06s per lap of fuel on board; full tank at the start",
+  "Stop loss: pit-lane time - 5.0s, 35% on the in-lap",
+  "PitInTime is the in-lap's end; PitOutTime adds the out-lap's share of the lane time",
+  "Weather: each lap's wetness from the facts file's sourced timeline (track states as wetness: {'dry': 0.0, 'damp': 0.15, 'wet': 0.45, 'heavy': 0.65}; ramps between sourced points are linear)",
+  "Wet laps: the dry lap x (1 + the stint tyre's penalty at that wetness), the weather model's curves (data/wet.json); tyre wear at wet.wear_mult",
+  "Compound: WET / INTERMEDIATE on wet-tyre stints, slick stints left empty (step 2.4's dry compound); a stint no source names gets the tyre that loses least over its laps",
+  "Stops: only the sourced ones; cars may have stopped more (unknown)"
+ ],
+ "sources": {
+  "jolpica": "Jolpica-F1 dump 2026-10-24T01:04:07.015299Z (CC BY-NC-SA 4.0)",
+  "f1db": "F1DB v2026.19.0 (CC BY 4.0), f1db/portugal-1985.*.csv",
+  "facts": "portugal-1985.json",
+  "jolpicaRound": 2,
+  "eventName": "Portuguese Grand Prix"
+ },
+ "classified": [
+  "SENA",
+  "ALBM",
+  "TAM",
+  "DEA",
+  "MAN",
+  "BEL",
+  "WAR",
+  "JOH",
+  "GHI"
+ ],
+ "roadPositions": [],
+ "stopsComplete": false,
+ "safetyCarsComplete": true,
+ "params": {
+  "seed": 0,
+  "sigma": 0.35,
+  "fuel_per_lap": 0.06,
+  "wear_prior": 0.04,
+  "wear_max": 0.25,
+  "start_loss": 4.0,
+  "grid_gap": 0.6,
+  "fastest_margin": 0.05,
+  "pit_bypass": 5.0,
+  "pit_in_share": 0.35,
+  "default_lane_time": 25.0,
+  "sc_factor": 1.4,
+  "sc_gap": 0.8,
+  "sc_iterations": 12,
+  "order_gap": 0.5,
+  "gap_tolerance": 2.0,
+  "attempts": 6,
+  "refuel": null
+ },
+ "solver": {
+  "attempts": 1,
+  "sigma": 0.35,
+  "passed": true
+ },
+ "fitted": {
+  "SENA": {
+   "pace": 78.383,
+   "wear": 0.0,
+   "noise": 0.175,
+   "target": 7228.006
+  },
+  "ALBM": {
+   "pace": 79.15,
+   "wear": 0.0,
+   "noise": 0.262,
+   "target": 7290.984
+  },
+  "TAM": {
+   "pace": 79.693,
+   "wear": 0.0,
+   "noise": 0.175,
+   "target": 7228.506
+  },
+  "DEA": {
+   "pace": 80.005,
+   "wear": 0.0,
+   "noise": 0.175,
+   "target": 7255.365
+  },
+  "MAN": {
+   "pace": 80.971,
+   "wear": 0.0,
+   "noise": 0.525,
+   "target": 7228.506
+  },
+  "BEL": {
+   "pace": 81.352,
+   "wear": 0.0,
+   "noise": 0.175,
+   "target": 7270.176
+  },
+  "WAR": {
+   "pace": 81.496,
+   "wear": 0.0,
+   "noise": 1.05,
+   "target": 7270.676
+  },
+  "JOH": {
+   "pace": 81.169,
+   "wear": 0.125,
+   "noise": 0.525,
+   "target": 7228.506
+  },
+  "GHI": {
+   "pace": 85.689,
+   "wear": 0.025,
+   "noise": 0.175,
+   "target": 7228.506
+  },
+  "WINM": {
+   "pace": 101.14,
+   "wear": 0.25,
+   "noise": 1.05,
+   "target": 7228.506
+  },
+  "LAU": {
+   "pace": 81.187,
+   "wear": 0.0,
+   "noise": 0.175,
+   "target": 5441.592
+  },
+  "CHE": {
+   "pace": 82.15,
+   "wear": 0.0,
+   "noise": 0.175,
+   "target": 4002.277
+  },
+  "PRO": {
+   "pace": 79.379,
+   "wear": 0.025,
+   "noise": 0.175,
+   "target": 3209.566
+  },
+  "DEC": {
+   "pace": 83.349,
+   "wear": 0.025,
+   "noise": 0.175,
+   "target": 3238.668
+  },
+  "PIQN": {
+   "pace": 84.758,
+   "wear": 0.05,
+   "noise": 0.175,
+   "target": 3186.707
+  },
+  "BOUT": {
+   "pace": 83.059,
+   "wear": 0.05,
+   "noise": 0.175,
+   "target": 3126.38
+  },
+  "BRU": {
+   "pace": 82.511,
+   "wear": 0.05,
+   "noise": 0.175,
+   "target": 2235.699
+  },
+  "BAL": {
+   "pace": 87.519,
+   "wear": 0.05,
+   "noise": 0.175,
+   "target": 2241.128
+  },
+  "ROSK": {
+   "pace": 80.262,
+   "wear": 0.075,
+   "noise": 0.175,
+   "target": 1750.349
+  },
+  "LAF": {
+   "pace": 83.982,
+   "wear": 0.075,
+   "noise": 0.175,
+   "target": 1720.418
+  },
+  "BER": {
+   "pace": 82.48,
+   "wear": 0.075,
+   "noise": 0.175,
+   "target": 1366.965
+  },
+  "MAR": {
+   "pace": 88.535,
+   "wear": 0.05,
+   "noise": 0.175,
+   "target": 1453.434
+  },
+  "PAT": {
+   "pace": 85.061,
+   "wear": 0.05,
+   "noise": 0.35,
+   "target": 505.34
+  },
+  "ALL": {
+   "pace": 84.301,
+   "wear": 0.05,
+   "noise": 0.35,
+   "target": 395.643
+  },
+  "HES": {
+   "pace": 86.926,
+   "wear": 0.075,
+   "noise": 0.175,
+   "target": 401.494
+  },
+  "PALJ": {
+   "pace": 136.515,
+   "wear": 0.025,
+   "noise": 0.262,
+   "target": 352.766
+  }
+ },
+ "summary": {
+  "grid": {
+   "pass": 1,
+   "total": 1
+  },
+  "order": {
+   "pass": 1,
+   "total": 1
+  },
+  "gap": {
+   "pass": 1,
+   "total": 1
+  },
+  "fastest": {
+   "pass": 26,
+   "total": 26
+  },
+  "retirement": {
+   "pass": 16,
+   "total": 16
+  },
+  "retirement event": {
+   "pass": 16,
+   "total": 16
+  },
+  "laps down": {
+   "pass": 8,
+   "total": 8
+  },
+  "tyre": {
+   "pass": 1,
+   "total": 1
+  },
+  "safety car": {
+   "pass": 1,
+   "total": 1
+  }
+ },
+ "anchors": [
+  {
+   "anchor": "grid",
+   "subject": "lap-1 order is the grid order",
+   "target": [
+    "SENA",
+    "PRO",
+    "ROSK",
+    "DEA",
+    "ALBM",
+    "WAR",
+    "LAU",
+    "DEC",
+    "MAN",
+    "BOUT",
+    "JOH",
+    "TAM",
+    "PAT",
+    "CHE",
+    "WINM",
+    "PIQN",
+    "BER",
+    "LAF",
+    "HES",
+    "ALL",
+    "BEL",
+    "BRU",
+    "PALJ",
+    "MAR",
+    "GHI",
+    "BAL"
+   ],
+   "achieved": [
+    "SENA",
+    "PRO",
+    "ROSK",
+    "DEA",
+    "ALBM",
+    "WAR",
+    "LAU",
+    "DEC",
+    "MAN",
+    "BOUT",
+    "JOH",
+    "TAM",
+    "PAT",
+    "CHE",
+    "WINM",
+    "PIQN",
+    "BER",
+    "LAF",
+    "HES",
+    "ALL",
+    "BEL",
+    "BRU",
+    "PALJ",
+    "MAR",
+    "GHI",
+    "BAL"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "order",
+   "subject": "classification",
+   "target": [
+    "SENA",
+    "ALBM",
+    "TAM",
+    "DEA",
+    "MAN",
+    "BEL",
+    "WAR",
+    "JOH",
+    "GHI"
+   ],
+   "achieved": [
+    "SENA",
+    "ALBM",
+    "TAM",
+    "DEA",
+    "MAN",
+    "BEL",
+    "WAR",
+    "JOH",
+    "GHI"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "gap",
+   "subject": "ALBM",
+   "target": 62.978,
+   "achieved": 62.976,
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "SENA",
+   "target": [
+    104.121,
+    15
+   ],
+   "achieved": [
+    104.121,
+    15
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "ALBM",
+   "target": [
+    104.864,
+    5
+   ],
+   "achieved": [
+    104.864,
+    5
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "TAM",
+   "target": [
+    106.29,
+    52
+   ],
+   "achieved": [
+    106.29,
+    52
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "DEA",
+   "target": [
+    105.212,
+    13
+   ],
+   "achieved": [
+    105.212,
+    13
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "MAN",
+   "target": [
+    106.697,
+    62
+   ],
+   "achieved": [
+    106.697,
+    62
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "BEL",
+   "target": [
+    107.861,
+    11
+   ],
+   "achieved": [
+    107.861,
+    11
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "WAR",
+   "target": [
+    105.985,
+    63
+   ],
+   "achieved": [
+    105.985,
+    63
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "JOH",
+   "target": [
+    106.297,
+    11
+   ],
+   "achieved": [
+    106.297,
+    11
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "GHI",
+   "target": [
+    111.747,
+    3
+   ],
+   "achieved": [
+    111.747,
+    3
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "WINM",
+   "target": [
+    110.48,
+    3
+   ],
+   "achieved": [
+    110.48,
+    3
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "LAU",
+   "target": [
+    106.633,
+    4
+   ],
+   "achieved": [
+    106.633,
+    4
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "CHE",
+   "target": [
+    107.908,
+    14
+   ],
+   "achieved": [
+    107.908,
+    14
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "PRO",
+   "target": [
+    104.901,
+    8
+   ],
+   "achieved": [
+    104.901,
+    8
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "DEC",
+   "target": [
+    109.658,
+    3
+   ],
+   "achieved": [
+    109.658,
+    3
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "PIQN",
+   "target": [
+    111.619,
+    5
+   ],
+   "achieved": [
+    111.619,
+    5
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "BOUT",
+   "target": [
+    109.518,
+    13
+   ],
+   "achieved": [
+    109.518,
+    13
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "BRU",
+   "target": [
+    108.395,
+    14
+   ],
+   "achieved": [
+    108.395,
+    14
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "BAL",
+   "target": [
+    114.588,
+    3
+   ],
+   "achieved": [
+    114.588,
+    3
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "ROSK",
+   "target": [
+    105.717,
+    14
+   ],
+   "achieved": [
+    105.717,
+    14
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "LAF",
+   "target": [
+    110.491,
+    5
+   ],
+   "achieved": [
+    110.491,
+    5
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "BER",
+   "target": [
+    108.561,
+    11
+   ],
+   "achieved": [
+    108.561,
+    11
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "MAR",
+   "target": [
+    116.04,
+    3
+   ],
+   "achieved": [
+    116.04,
+    3
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "PAT",
+   "target": [
+    111.658,
+    3
+   ],
+   "achieved": [
+    111.658,
+    3
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "ALL",
+   "target": [
+    110.643,
+    3
+   ],
+   "achieved": [
+    110.643,
+    3
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "HES",
+   "target": [
+    113.975,
+    3
+   ],
+   "achieved": [
+    113.975,
+    3
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "PALJ",
+   "target": [
+    175.894,
+    1
+   ],
+   "achieved": [
+    175.894,
+    1
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "LAU",
+   "target": 49,
+   "achieved": 49,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "LAU",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "CHE",
+   "target": 36,
+   "achieved": 36,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "CHE",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "PRO",
+   "target": 30,
+   "achieved": 30,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "PRO",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "DEC",
+   "target": 29,
+   "achieved": 29,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "DEC",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "PIQN",
+   "target": 28,
+   "achieved": 28,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "PIQN",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "BOUT",
+   "target": 28,
+   "achieved": 28,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "BOUT",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "BRU",
+   "target": 20,
+   "achieved": 20,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "BRU",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "BAL",
+   "target": 19,
+   "achieved": 19,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "BAL",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "ROSK",
+   "target": 16,
+   "achieved": 16,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "ROSK",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "LAF",
+   "target": 15,
+   "achieved": 15,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "LAF",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "BER",
+   "target": 12,
+   "achieved": 12,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "BER",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "MAR",
+   "target": 12,
+   "achieved": 12,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "MAR",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "PAT",
+   "target": 4,
+   "achieved": 4,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "PAT",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "ALL",
+   "target": 3,
+   "achieved": 3,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "ALL",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "HES",
+   "target": 3,
+   "achieved": 3,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "HES",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "PALJ",
+   "target": 2,
+   "achieved": 2,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "PALJ",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "laps down",
+   "subject": "TAM",
+   "target": 1,
+   "achieved": 1,
+   "pass": true
+  },
+  {
+   "anchor": "laps down",
+   "subject": "DEA",
+   "target": 1,
+   "achieved": 1,
+   "pass": true
+  },
+  {
+   "anchor": "laps down",
+   "subject": "MAN",
+   "target": 2,
+   "achieved": 2,
+   "pass": true
+  },
+  {
+   "anchor": "laps down",
+   "subject": "BEL",
+   "target": 2,
+   "achieved": 2,
+   "pass": true
+  },
+  {
+   "anchor": "laps down",
+   "subject": "WAR",
+   "target": 2,
+   "achieved": 2,
+   "pass": true
+  },
+  {
+   "anchor": "laps down",
+   "subject": "JOH",
+   "target": 5,
+   "achieved": 5,
+   "pass": true
+  },
+  {
+   "anchor": "laps down",
+   "subject": "GHI",
+   "target": 6,
+   "achieved": 6,
+   "pass": true
+  },
+  {
+   "anchor": "laps down",
+   "subject": "WINM",
+   "target": 17,
+   "achieved": 17,
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "PIQN stint 1",
+   "target": "wet",
+   "achieved": [
+    "WET"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "safety car",
+   "subject": "leader's SC laps, sourced",
+   "target": [],
+   "achieved": [],
+   "pass": true
+  }
+ ],
+ "notes": [
+  "PALJ: fastest lap on lap 1, its lap-1 time is the fastest lap's"
+ ],
+ "weather": {
+  "source": "reconstruction-facts",
+  "states": {
+   "dry": 0.0,
+   "damp": 0.15,
+   "wet": 0.45,
+   "heavy": 0.65
+  },
+  "timeline": [
+   {
+    "fromLap": 1,
+    "toLap": 24,
+    "state": "wet",
+    "source": "https://www.motorsportmagazine.com/archive/article/june-1985/22/portuguese-grand-prix-2/ ('with rain falling steadily'; 'the treacherous track surface'); https://en.wikipedia.org/wiki/1985_Portuguese_Grand_Prix ('Rain, which was already falling at the start of the race'; 'Wet weather caused spinouts frequently early in the race')"
+   },
+   {
+    "fromLap": 25,
+    "toLap": 30,
+    "state": "wet",
+    "toState": "heavy",
+    "source": "https://en.wikipedia.org/wiki/1985_Portuguese_Grand_Prix ('Rain, which was already falling at the start of the race, continued and got heavier', placed after the lap-25 stops and before Baldi's spin 'near lap 30')",
+    "note": "The lap the rain got heavier isn't given; ramped over laps 25-30."
+   },
+   {
+    "fromLap": 31,
+    "toLap": 67,
+    "state": "heavy",
+    "source": "https://www.motorsportmagazine.com/archive/article/june-1985/22/portuguese-grand-prix-2/ ('the rain intensified to the point where huge lakes were forming on the start, finish straight'; Prost spun 'on the standing water in front of the pits' (Jolpica: Prost spun off with 30 laps); 'the sodden chequered flag came out after 67 laps')",
+    "note": "No source says the rain eased before the flag."
+   }
+  ],
+  "wetness": [
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.49,
+   0.53,
+   0.57,
+   0.61,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65
+  ],
+  "curves": {
+   "slick": {
+    "a": 0.1855,
+    "b": 0.9993
+   },
+   "inter": {
+    "min": 0.0345,
+    "dry": 1.0187,
+    "wet": 0.789,
+    "best": 0.18
+   },
+   "wet": {
+    "min": 0.1486,
+    "dry": 0.4006,
+    "wet": 0.6344,
+    "best": 0.2833
+   }
+  },
+  "tyres": [
+   {
+    "driver": "SENA",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "ALBM",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "TAM",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "DEA",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "MAN",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "BEL",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "WAR",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "JOH",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "GHI",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "WINM",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "LAU",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "CHE",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "PRO",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "DEC",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "PIQN",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "source"
+   },
+   {
+    "driver": "BOUT",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "BRU",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "BAL",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "ROSK",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "LAF",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "BER",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "MAR",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "PAT",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "ALL",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "HES",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "PALJ",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   }
+  ]
+ }
+}

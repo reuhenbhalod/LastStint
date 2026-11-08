@@ -1,0 +1,892 @@
+{
+ "raceId": "monaco-1984",
+ "year": 1984,
+ "laps": 31,
+ "reconstructed": true,
+ "provenance": {
+  "kind": "reconstructed",
+  "estimated": [
+   "compounds",
+   "fuelLoads",
+   "weather"
+  ]
+ },
+ "estimates": [
+  "Every lap time and lap-end Time is synthetic: solved to the anchors, not measured",
+  "Position each lap follows from the synthetic times; the lap-1 order is the grid order",
+  "Lap times in between the anchors: pace + tyre wear + fuel + seeded noise",
+  "Fuel: 0.06s per lap of fuel on board; full tank at the start",
+  "Stop loss: pit-lane time - 5.0s, 35% on the in-lap",
+  "PitInTime is the in-lap's end; PitOutTime adds the out-lap's share of the lane time",
+  "Weather: each lap's wetness from the facts file's sourced timeline (track states as wetness: {'dry': 0.0, 'damp': 0.15, 'wet': 0.45, 'heavy': 0.65}; ramps between sourced points are linear)",
+  "Wet laps: the dry lap x (1 + the stint tyre's penalty at that wetness), the weather model's curves (data/wet.json); tyre wear at wet.wear_mult",
+  "Compound: WET / INTERMEDIATE on wet-tyre stints, slick stints left empty (step 2.4's dry compound); a stint no source names gets the tyre that loses least over its laps",
+  "BEL: disqualified, run to the flag P3 on the road at its sourced gap, +21.141s; the official result keeps it excluded",
+  "Stops: only the sourced ones; cars may have stopped more (unknown)"
+ ],
+ "sources": {
+  "jolpica": "Jolpica-F1 dump 2026-10-24T01:04:07.015299Z (CC BY-NC-SA 4.0)",
+  "f1db": "F1DB v2026.19.0 (CC BY 4.0), f1db/monaco-1984.*.csv",
+  "facts": "monaco-1984.json",
+  "jolpicaRound": 6,
+  "eventName": "Monaco Grand Prix"
+ },
+ "classified": [
+  "PRO",
+  "SENA",
+  "ARN",
+  "ROSK",
+  "DEA",
+  "ALBM",
+  "GHI",
+  "LAF"
+ ],
+ "roadPositions": [
+  {
+   "driver": "BEL",
+   "position": 3,
+   "gap": 21.141,
+   "gapSourced": true,
+   "source": "https://www.motorsportmagazine.com/archive/article/july-1984/84/reflections-in-the-monte-carlo-puddles/ (results: '1st : Alain Prost ... 1 hr 01 min 07.740 sec', '2nd : Ayrton Senna ... 1 hr 01 min 15.186 sec', '3rd : Stefan Bellof ... (Tyrrell 012/4) ... 1 hr 01 min 28.881 sec', '4th : Rene Arnoux ... 1 hr 01 min 36.817 sec'; 'Rene Arnoux started and finished in the same position after Bellof's disqualification'); https://en.wikipedia.org/wiki/1984_Monaco_Grand_Prix (classification: DSQ, 4, Stefan Bellof, Tyrrell-Ford, 31 laps, 'Underweight car (+21.141)', grid 20; 'Stefan Bellof ... finished third'; 'The Tyrrell team's results were erased later in the season due to weight infringements')"
+  }
+ ],
+ "stopsComplete": false,
+ "safetyCarsComplete": true,
+ "params": {
+  "seed": 0,
+  "sigma": 0.35,
+  "fuel_per_lap": 0.06,
+  "wear_prior": 0.04,
+  "wear_max": 0.25,
+  "start_loss": 4.0,
+  "grid_gap": 0.6,
+  "fastest_margin": 0.05,
+  "pit_bypass": 5.0,
+  "pit_in_share": 0.35,
+  "default_lane_time": 25.0,
+  "sc_factor": 1.4,
+  "sc_gap": 0.8,
+  "sc_iterations": 12,
+  "order_gap": 0.5,
+  "gap_tolerance": 2.0,
+  "attempts": 6,
+  "refuel": null
+ },
+ "solver": {
+  "attempts": 1,
+  "sigma": 0.35,
+  "passed": true
+ },
+ "fitted": {
+  "PRO": {
+   "pace": 83.618,
+   "wear": 0.025,
+   "noise": 0.7,
+   "target": 3667.74
+  },
+  "SENA": {
+   "pace": 83.668,
+   "wear": 0.025,
+   "noise": 1.05,
+   "target": 3675.186
+  },
+  "ARN": {
+   "pace": 84.612,
+   "wear": 0.0,
+   "noise": 0.7,
+   "target": 3696.817
+  },
+  "ROSK": {
+   "pace": 84.821,
+   "wear": 0.0,
+   "noise": 0.7,
+   "target": 3702.986
+  },
+  "DEA": {
+   "pace": 84.846,
+   "wear": 0.0,
+   "noise": 1.05,
+   "target": 3712.179
+  },
+  "ALBM": {
+   "pace": 86.901,
+   "wear": 0.0,
+   "noise": 1.05,
+   "target": 3668.24
+  },
+  "GHI": {
+   "pace": 84.096,
+   "wear": 0.175,
+   "noise": 1.05,
+   "target": 3668.74
+  },
+  "LAF": {
+   "pace": 87.103,
+   "wear": 0.0,
+   "noise": 1.05,
+   "target": 3669.24
+  },
+  "BEL": {
+   "pace": 83.57,
+   "wear": 0.05,
+   "noise": 0.35,
+   "target": 3688.881
+  },
+  "PAT": {
+   "pace": 87.549,
+   "wear": 0.0,
+   "noise": 1.05,
+   "target": 2966.122
+  },
+  "LAU": {
+   "pace": 86.33,
+   "wear": 0.0,
+   "noise": 1.05,
+   "target": 2808.741
+  },
+  "WINM": {
+   "pace": 85.492,
+   "wear": 0.0,
+   "noise": 1.05,
+   "target": 2662.652
+  },
+  "MAN": {
+   "pace": 84.822,
+   "wear": 0.0,
+   "noise": 1.05,
+   "target": 1817.441
+  },
+  "PIQN": {
+   "pace": 87.953,
+   "wear": 0.0,
+   "noise": 1.05,
+   "target": 1746.595
+  },
+  "HES": {
+   "pace": 88.037,
+   "wear": 0.0,
+   "noise": 1.05,
+   "target": 1517.475
+  },
+  "FABC": {
+   "pace": 91.8,
+   "wear": 0.0,
+   "noise": 1.05,
+   "target": 1181.156
+  },
+  "CEC": {
+   "pace": 155.136,
+   "wear": 0.04,
+   "noise": 0.35,
+   "target": 155.136
+  }
+ },
+ "summary": {
+  "grid": {
+   "pass": 1,
+   "total": 1
+  },
+  "order": {
+   "pass": 1,
+   "total": 1
+  },
+  "gap": {
+   "pass": 5,
+   "total": 5
+  },
+  "fastest": {
+   "pass": 16,
+   "total": 16
+  },
+  "retirement": {
+   "pass": 11,
+   "total": 11
+  },
+  "retirement event": {
+   "pass": 11,
+   "total": 11
+  },
+  "laps down": {
+   "pass": 3,
+   "total": 3
+  },
+  "safety car": {
+   "pass": 1,
+   "total": 1
+  }
+ },
+ "anchors": [
+  {
+   "anchor": "grid",
+   "subject": "lap-1 order is the grid order",
+   "target": [
+    "PRO",
+    "MAN",
+    "ARN",
+    "ALBM",
+    "LAU",
+    "PIQN",
+    "ROSK",
+    "DEA",
+    "WINM",
+    "SENA",
+    "PAT",
+    "FABC",
+    "LAF",
+    "HES",
+    "CEC",
+    "GHI",
+    "BEL"
+   ],
+   "achieved": [
+    "PRO",
+    "MAN",
+    "ARN",
+    "ALBM",
+    "LAU",
+    "PIQN",
+    "ROSK",
+    "DEA",
+    "WINM",
+    "SENA",
+    "PAT",
+    "FABC",
+    "LAF",
+    "HES",
+    "CEC",
+    "GHI",
+    "BEL"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "order",
+   "subject": "classification (road order: BEL disqualified, at the sourced road place)",
+   "target": [
+    "PRO",
+    "SENA",
+    "BEL",
+    "ARN",
+    "ROSK",
+    "DEA",
+    "ALBM",
+    "GHI",
+    "LAF"
+   ],
+   "achieved": [
+    "PRO",
+    "SENA",
+    "BEL",
+    "ARN",
+    "ROSK",
+    "DEA",
+    "ALBM",
+    "GHI",
+    "LAF"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "gap",
+   "subject": "SENA",
+   "target": 7.446,
+   "achieved": 7.443,
+   "pass": true
+  },
+  {
+   "anchor": "gap",
+   "subject": "BEL",
+   "target": 21.141,
+   "achieved": 21.14,
+   "pass": true
+  },
+  {
+   "anchor": "gap",
+   "subject": "ARN",
+   "target": 29.077,
+   "achieved": 29.075,
+   "pass": true
+  },
+  {
+   "anchor": "gap",
+   "subject": "ROSK",
+   "target": 35.246,
+   "achieved": 35.244,
+   "pass": true
+  },
+  {
+   "anchor": "gap",
+   "subject": "DEA",
+   "target": 44.439,
+   "achieved": 44.435,
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "PRO",
+   "target": [
+    115.596,
+    19
+   ],
+   "achieved": [
+    115.596,
+    19
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "SENA",
+   "target": [
+    114.334,
+    24
+   ],
+   "achieved": [
+    114.334,
+    24
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "ARN",
+   "target": [
+    115.541,
+    26
+   ],
+   "achieved": [
+    115.541,
+    26
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "ROSK",
+   "target": [
+    115.775,
+    25
+   ],
+   "achieved": [
+    115.775,
+    25
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "DEA",
+   "target": [
+    115.026,
+    26
+   ],
+   "achieved": [
+    115.026,
+    26
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "ALBM",
+   "target": [
+    115.437,
+    22
+   ],
+   "achieved": [
+    115.437,
+    22
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "GHI",
+   "target": [
+    117.439,
+    10
+   ],
+   "achieved": [
+    117.439,
+    10
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "LAF",
+   "target": [
+    116.946,
+    25
+   ],
+   "achieved": [
+    116.946,
+    25
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "PAT",
+   "target": [
+    118.527,
+    24
+   ],
+   "achieved": [
+    118.527,
+    24
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "LAU",
+   "target": [
+    116.996,
+    22
+   ],
+   "achieved": [
+    116.996,
+    22
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "WINM",
+   "target": [
+    115.712,
+    21
+   ],
+   "achieved": [
+    115.712,
+    21
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "MAN",
+   "target": [
+    115.112,
+    13
+   ],
+   "achieved": [
+    115.112,
+    13
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "PIQN",
+   "target": [
+    118.897,
+    11
+   ],
+   "achieved": [
+    118.897,
+    11
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "HES",
+   "target": [
+    119.644,
+    12
+   ],
+   "achieved": [
+    119.644,
+    12
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "FABC",
+   "target": [
+    124.465,
+    6
+   ],
+   "achieved": [
+    124.465,
+    6
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "CEC",
+   "target": [
+    155.136,
+    1
+   ],
+   "achieved": [
+    155.136,
+    1
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "PAT",
+   "target": 24,
+   "achieved": 24,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "PAT",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "LAU",
+   "target": 23,
+   "achieved": 23,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "LAU",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "WINM",
+   "target": 22,
+   "achieved": 22,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "WINM",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "MAN",
+   "target": 15,
+   "achieved": 15,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "MAN",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "PIQN",
+   "target": 14,
+   "achieved": 14,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "PIQN",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "HES",
+   "target": 12,
+   "achieved": 12,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "HES",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "FABC",
+   "target": 9,
+   "achieved": 9,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "FABC",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "CEC",
+   "target": 1,
+   "achieved": 1,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "CEC",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "WAR",
+   "target": 0,
+   "achieved": 0,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "WAR",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "TAM",
+   "target": 0,
+   "achieved": 0,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "TAM",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "DEC",
+   "target": 0,
+   "achieved": 0,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "DEC",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "laps down",
+   "subject": "ALBM",
+   "target": 1,
+   "achieved": 1,
+   "pass": true
+  },
+  {
+   "anchor": "laps down",
+   "subject": "GHI",
+   "target": 1,
+   "achieved": 1,
+   "pass": true
+  },
+  {
+   "anchor": "laps down",
+   "subject": "LAF",
+   "target": 1,
+   "achieved": 1,
+   "pass": true
+  },
+  {
+   "anchor": "safety car",
+   "subject": "leader's SC laps, sourced",
+   "target": [],
+   "achieved": [],
+   "pass": true
+  }
+ ],
+ "notes": [
+  "BEL: disqualified, placed P3 on the road at +21.141s (sourced)",
+  "CEC: fastest lap on lap 1, its lap-1 time is the fastest lap's"
+ ],
+ "weather": {
+  "source": "reconstruction-facts",
+  "states": {
+   "dry": 0.0,
+   "damp": 0.15,
+   "wet": 0.45,
+   "heavy": 0.65
+  },
+  "timeline": [
+   {
+    "fromLap": 1,
+    "toLap": 32,
+    "state": "heavy",
+    "source": "https://en.wikipedia.org/wiki/1984_Monaco_Grand_Prix ('The race start was delayed by 45 minutes due to the heavy rain'; 'The race, held amidst heavy rain'; infobox 'Heavy rain and spray'); https://www.motorsportmagazine.com/archive/article/july-1984/84/reflections-in-the-monte-carlo-puddles/ (results header: 'Torrential rain'); https://www.autosport.com/f1/news/when-senna-and-bellof-starred-in-monaco-as-prost-prevailed/6530051/ ('as a monsoon soaked the French riviera'; 'the rain intensified at this point' around Senna's laps 23-24; 'The race conditions also got progressively worse, as laptimes dropped by up to 5s')",
+    "note": "Heavy throughout. Autosport has the rain heavier from about lap 23 and 'even harder' before the stop; Motor Sport's 'arrival of Senna' feature (https://motorsportmagazine.com/articles/single-seaters/f1/1984-monaco-grand-prix-the-arrival-of-senna) says 'the rain was actually easing off' (no lap). The sources conflict, so no change is modelled. The timeline runs to lap 32, the red-flag lap; the reconstruction uses laps 1-31."
+   }
+  ],
+  "wetness": [
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65,
+   0.65
+  ],
+  "curves": {
+   "slick": {
+    "a": 0.1855,
+    "b": 0.9993
+   },
+   "inter": {
+    "min": 0.0345,
+    "dry": 1.0187,
+    "wet": 0.789,
+    "best": 0.18
+   },
+   "wet": {
+    "min": 0.1486,
+    "dry": 0.4006,
+    "wet": 0.6344,
+    "best": 0.2833
+   }
+  },
+  "tyres": [
+   {
+    "driver": "PRO",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "SENA",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "ARN",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "ROSK",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "DEA",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "ALBM",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "GHI",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "LAF",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "BEL",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "PAT",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "LAU",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "WINM",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "MAN",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "PIQN",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "HES",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "FABC",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   },
+   {
+    "driver": "CEC",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "estimate"
+   }
+  ]
+ }
+}

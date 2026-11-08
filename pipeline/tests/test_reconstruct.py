@@ -562,3 +562,97 @@ def test_tyre_changes_label_f1db_stops(tmp_path, empty_drivers):
     assert [s.tyre for s in car.stops if s.lap == int(first["lap"])] == ["wet"]
     assert any("no stop on lap 3" in n for n in a.notes)
     assert a.wetness == [0.0] * a.laps
+
+
+# --- A disqualified car placed on the road (facts roadPositions) ---------------------------
+
+
+def _dsq_toy(position: int, gap: float | None) -> rc.Anchors:
+    """toy() plus a car that ran the full distance and was disqualified (no time, out of the
+    classification, as monaco-1984's Bellof), placed on the road by a source."""
+    anchors = toy()
+    anchors.cars.append(
+        rc.Car("DQQ", "TDQQ", None, 9, None, False, "disqualified", 50, None, 88.6, 30)
+    )
+    winner = anchors.car("AAA")
+    item = {"driver": "DQQ", "position": position, "gap": gap, "source": SRC}
+    anchors.notes += rc.apply_road_positions(anchors.cars, [item], winner)
+    return anchors
+
+
+def test_a_disqualified_car_with_a_sourced_gap_runs_at_its_road_place():
+    anchors = _dsq_toy(2, 5.0)
+    dqq = anchors.car("DQQ")
+    assert dqq.finished and not dqq.classified and dqq.time == pytest.approx(4505.0)
+    assert rc.road_order(anchors)[:4] == ["AAA", "DQQ", "BBB", "CCC"]
+    res = rc.reconstruct(anchors)
+    assert rc.failures(res.sidecar["anchors"]) == []
+    assert finishing_order(res.laps)[:4] == ["AAA", "DQQ", "BBB", "CCC"]
+    rows = {(r["anchor"], r["subject"]): r for r in res.sidecar["anchors"]}
+    assert rows[("gap", "DQQ")]["target"] == 5.0 and rows[("gap", "DQQ")]["pass"]
+    assert not [
+        r for r in res.sidecar["anchors"] if r["subject"] == "DQQ" and "retire" in r["anchor"]
+    ]
+    assert "DQQ" not in {e["driver"] for e in events.retirement_events(res.laps, 50)}
+    # The official result keeps it out: the sidecar says so for the build.
+    assert "DQQ" not in res.sidecar["classified"]
+    (placed,) = res.sidecar["roadPositions"]
+    assert placed == {
+        "driver": "DQQ",
+        "position": 2,
+        "gap": 5.0,
+        "gapSourced": True,
+        "source": SRC,
+    }
+    assert any("DQQ: disqualified, run to the flag P2" in e for e in res.sidecar["estimates"])
+
+
+def test_a_disqualified_car_with_no_gap_sits_between_its_road_neighbours():
+    anchors = _dsq_toy(3, None)  # between BBB (+12.345) and CCC (+40.1)
+    res = rc.reconstruct(anchors)
+    assert rc.failures(res.sidecar["anchors"]) == []
+    end = res.laps[res.laps["LapNumber"] == 50].set_index("Driver")["Time"]
+    assert end["BBB"] < end["DQQ"] < end["CCC"]
+    assert end["DQQ"] - end["AAA"] == pytest.approx((12.345 + 40.1) / 2, abs=0.5)
+    assert finishing_order(res.laps)[:4] == ["AAA", "BBB", "DQQ", "CCC"]
+    (placed,) = res.sidecar["roadPositions"]
+    assert placed["gap"] is None and placed["gapSourced"] is False
+    assert any("no gap sourced: an estimate" in n for n in res.sidecar["notes"])
+
+
+def test_a_road_place_is_only_for_a_disqualified_car():
+    anchors = toy()
+    winner = anchors.car("AAA")
+    src = {"source": SRC, "position": 2}
+    with pytest.raises(ValueError, match="not disqualified"):
+        rc.apply_road_positions(anchors.cars, [{**src, "driver": "BBB"}], winner)
+    with pytest.raises(ValueError, match="no car"):
+        rc.apply_road_positions(anchors.cars, [{**src, "driver": "ZZZ"}], winner)
+    anchors.cars.append(rc.Car("DQQ", "T", None, 9, None, False, "disqualified", 48, None))
+    with pytest.raises(ValueError, match="lead lap"):
+        rc.apply_road_positions(anchors.cars, [{**src, "driver": "DQQ", "gap": 3.0}], winner)
+
+
+@pytest.mark.parametrize(
+    ("item", "why"),
+    [
+        ({"driver": "X", "position": 3, "gap": 1.0, "source": ""}, "no source"),
+        ({"position": 3, "source": SRC}, "driver or number"),
+        ({"driver": "X", "position": 0, "source": SRC}, "road place"),
+        ({"driver": "X", "position": "3", "source": SRC}, "road place"),
+        ({"driver": "X", "position": 3, "gap": -1.0, "source": SRC}, "seconds behind"),
+    ],
+)
+def test_road_positions_are_checked(tmp_path, item, why):
+    d = _facts(tmp_path, "monaco-1984", {"roadPositions": [item]})
+    with pytest.raises(ValueError, match=why):
+        rc.load_facts("monaco-1984", d)
+
+
+def test_a_wet_race_car_out_on_lap_one_keeps_its_start_tyre():
+    # Its untimed lap would otherwise be filled with the dry compound (a one-lap dry stint).
+    a = wet_toy()
+    a.car("III").start_tyre = "wet"
+    df = rc.reconstruct(a).laps
+    (row,) = df[df["Driver"] == "III"].itertuples()
+    assert row.Compound == "WET" and pd.isna(row.LapTime)

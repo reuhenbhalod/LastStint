@@ -142,3 +142,159 @@ def test_reconstructed_wet_stints_keep_their_tyres():
     assert list(out["Compound"].iloc[2:]) == ["WET", "WET"]
     assert out["Compound"].iloc[:2].notna().all()
     assert "WET" not in set(out["Compound"].iloc[:2])
+
+
+# Eras build plan 5.5: the wet reconstructed races (facts-file weather). brazil-1993 is
+# registered with a data issue and has no race file (docs/g1-report.md, 5.5).
+WET_BUILT = ["monaco-1984", "portugal-1985", "belgium-1992", "europe-1993", "belgium-1995"]
+ALL_WET = [*WET_BUILT[:3], "brazil-1993", *WET_BUILT[3:]]
+WET_EVERY_LAP = ["monaco-1984", "portugal-1985", "europe-1993"]
+
+
+@pytest.mark.parametrize("race_id", ALL_WET)
+def test_wet_reconstructions_are_registered_and_pass_their_anchors(race_id):
+    meta = build.RACES[race_id]
+    assert meta["source"] == "reconstruct" and meta["split"] == "eras" and meta["seed"] == 1
+    assert meta["score_positions"] == 6
+    side = build.load_reconstruction(race_id)
+    assert side["solver"]["passed"] and rc.failures(side["anchors"]) == []
+    assert "weather" in side and (paths.RAW_DIR / f"{race_id}.weather.json").exists()
+    built = (paths.RACES_DIR / f"{race_id}.json").exists()
+    assert built == (race_id in WET_BUILT) == (not meta.get("data_issue"))
+
+
+@pytest.mark.parametrize("race_id", WET_BUILT)
+def test_wet_race_files_carry_weather_rules_and_the_duel(race_id):
+    model = json.loads((paths.RACES_DIR / f"{race_id}.json").read_text())
+    meta = build.RACES[race_id]
+    assert model["reconstructed"] is True and model["provenance"]["kind"] == "reconstructed"
+    assert "weather" in model["provenance"]["estimated"]
+    assert len(model["weather"]["wetness"]) == model["race"]["laps"]
+    assert {meta["user_side"], meta["rival"]} <= {d["code"] for d in model["drivers"]}
+    year = meta["year"]
+    assert model["rules"]["refuelling"] is (year >= 1994)
+    assert ("fuelLimit" in model["rules"]) is (year <= 1985)
+    if year < 1993:
+        assert not [e for e in model["events"] if e["type"] in ("SC", "VSC")]
+
+
+@pytest.fixture(scope="module")
+def monaco() -> build.BuildResult:
+    return build.build_race("monaco-1984")
+
+
+def test_a_race_wet_on_every_lap_takes_the_solvers_dry_pace(monaco):
+    side = build.load_reconstruction("monaco-1984")
+    fuel, laps = side["params"]["fuel_per_lap"], side["laps"]
+    model = monaco.model
+    assert model["fuelEffectPerLap"] == fuel
+    # basePace is the solver's pace in the sims' terms plus the shrunk post-takeover offset.
+    for d in model["drivers"]:
+        assert d["basePace"] == pytest.approx(
+            side["fitted"][d["code"]]["pace"] + fuel * (laps + 1), abs=1.0
+        )
+        assert d["noise"] == pytest.approx(side["fitted"][d["code"]]["noise"], abs=1e-4)
+    assert any(line.startswith("  dry pace: wet on every lap") for line in monaco.estimates)
+    assert any(n.startswith("dry pace: wet on every lap") for n in monaco.notes)
+
+
+@pytest.mark.parametrize("race_id", WET_EVERY_LAP)
+def test_wet_on_every_lap_and_solver_paced(race_id):
+    side = build.load_reconstruction(race_id)
+    assert min(side["weather"]["wetness"]) >= rc.RAIN_FROM  # no dry lap anywhere
+    model = json.loads((paths.RACES_DIR / f"{race_id}.json").read_text())
+    wear = sorted(f["wear"] for f in side["fitted"].values())[len(side["fitted"]) // 2]
+    assert model["compounds"]["MEDIUM"]["degPerLap"] == pytest.approx(wear, abs=0.02)
+    assert model["compounds"]["WET"]["degPerLap"] == model["compounds"]["MEDIUM"]["degPerLap"]
+
+
+def test_solver_dry_fit_reads_the_sidecar():
+    side = {
+        "raceId": "toy-1990",
+        "year": 1990,
+        "laps": 50,
+        "params": {"fuel_per_lap": 0.06, "refuel": None},
+        "fitted": {
+            "AAA": {"pace": 85.0, "wear": 0.02, "noise": 0.35},
+            "BBB": {"pace": 86.0, "wear": 0.04, "noise": 0.7},
+            "CCC": {"pace": 87.0, "wear": 0.0, "noise": 1.05},
+        },
+    }
+    laps = pd.DataFrame({"Compound": ["WET", "MEDIUM", None]})
+    got = build.solver_dry_fit(side, laps)
+    assert got.driver_pace == pytest.approx({"AAA": 88.06, "BBB": 89.06, "CCC": 90.06})
+    assert got.driver_noise == {"AAA": 0.35, "BBB": 0.7, "CCC": 1.05}
+    assert got.reference_compound == "MEDIUM" and got.fuel_per_lap == 0.06
+    assert got.compound_wear == {"MEDIUM": 0.02, "WET": 0.02}  # the field's median
+    assert got.compound_offset == {"MEDIUM": 0.0, "WET": 0.0}
+    with pytest.raises(ValueError, match="refuelling"):
+        build.solver_dry_fit({**side, "year": 1995}, laps)
+    with pytest.raises(ValueError, match="no solved pace"):
+        build.solver_dry_fit({**side, "fitted": {}}, laps)
+
+
+def test_real_timing_wet_on_every_lap_still_cannot_be_built(tmp_path):
+    rows = []
+    for d in ("AAA", "BBB"):
+        t = 0.0
+        for lap in range(1, 9):
+            t += 100.0 + lap * 0.1
+            rows.append(
+                {
+                    **dict.fromkeys(ingest.LAP_COLUMNS),
+                    "Driver": d,
+                    "Team": "T",
+                    "LapNumber": float(lap),
+                    "LapTime": 100.0 + lap * 0.1,
+                    "Time": t,
+                    "Compound": "WET",
+                    "TyreLife": float(lap),
+                    "Stint": 1.0,
+                    "TrackStatus": "1",
+                    "IsAccurate": True,
+                    "Position": 1.0 if d == "AAA" else 2.0,
+                }
+            )
+    laps = pd.DataFrame(rows, columns=ingest.LAP_COLUMNS)
+    with pytest.raises(ValueError, match="no dry lap"):
+        build.dry_fit("toy-2016", laps, "2014-2025", raw_dir=tmp_path)
+
+
+def test_a_disqualified_car_on_the_road_stays_out_of_the_official_result(monaco):
+    side = build.load_reconstruction("monaco-1984")
+    (bel,) = side["roadPositions"]
+    assert bel["driver"] == "BEL" and bel["position"] == 3 and bel["gap"] == 21.141
+    assert bel["gapSourced"] and "motorsportmagazine.com" in bel["source"]
+    raw = pd.read_parquet(ingest.raw_snapshot_path("monaco-1984"))
+    road = build.assemble.finishing_order(raw)
+    assert road[:4] == ["PRO", "SENA", "BEL", "ARN"]  # run third on the road
+    real = monaco.model["realResult"]
+    classified = side["classified"]
+    assert real[: len(classified)] == classified and real[len(classified)] == "BEL"
+    assert "BEL" in {d["code"] for d in monaco.model["drivers"]}  # it still races
+    assert any("realResult: BEL disqualified, P3 on the road" in x for x in monaco.estimates)
+
+
+def test_official_result_moves_road_placed_cars_behind_the_classified():
+    model = {"realResult": ["A", "D", "B", "C", "E", "R"]}
+    recon = {
+        "classified": ["A", "B", "C", "E"],
+        "roadPositions": [{"driver": "D", "position": 2, "gap": 3.0, "gapSourced": True}],
+    }
+    out, lines = build.official_result(model, recon)
+    assert out["realResult"] == ["A", "B", "C", "E", "D", "R"]
+    assert lines == [
+        "  realResult: D disqualified, P2 on the road at +3.000s; listed P5, behind the"
+        " classified cars"
+    ]
+
+
+def test_monaco_1984_ends_at_its_results_lap(monaco):
+    assert monaco.model["race"]["laps"] == 31  # red flag on lap 32, results from lap 31
+    assert not [e for e in monaco.model["events"] if e["type"] == "RED"]
+
+
+@pytest.mark.parametrize("race_id", WET_BUILT)
+def test_wet_builds_match_the_committed_race_files(race_id):
+    committed = json.loads((paths.RACES_DIR / f"{race_id}.json").read_text())
+    assert json.loads(json.dumps(build.build_race(race_id).model)) == committed

@@ -1325,6 +1325,97 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
+    # Eras build plan 5.5: the wet reconstructed races, 1984-1995 (`pipeline reconstruct`,
+    # with the sourced weather of data/reconstruction/<id>.json: wetness per lap, wet tyres).
+    # monaco-1984, portugal-1985 and europe-1993 are wet on every lap, so their dry pace is
+    # the solver's (build.solver_dry_fit). monaco-1984 ends at its results lap (31, red flag)
+    # with the disqualified Bellof run third on the road (facts roadPositions). Checked on
+    # their anchors, not G1. Duels from the Eras spec's race tables (§4).
+    "monaco-1984": {
+        "year": 1984,
+        "event": "Monaco",
+        "source": "reconstruct",
+        "name": "Monaco 1984: Prost vs Senna",
+        "era": "1988-1993",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "PRO",
+        "rival": "SENA",  # defend: Prost holds off Senna to the results lap
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "portugal-1985": {
+        "year": 1985,
+        "event": "Portuguese",
+        "source": "reconstruct",
+        "name": "Portugal 1985: Senna vs Alboreto",
+        "era": "1988-1993",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "SENA",
+        "rival": "ALBM",  # defend: Senna holds P1 in the rain; Alboreto P2
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "belgium-1992": {
+        "year": 1992,
+        "event": "Belgian",
+        "source": "reconstruct",
+        "name": "Belgium 1992: Schumacher vs Mansell",
+        "era": "1988-1993",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "MSCM",
+        "rival": "MAN",  # win: Schumacher times the slicks; Mansell the car behind at the flag
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "brazil-1993": {
+        "year": 1993,
+        "event": "Brazilian",
+        "source": "reconstruct",
+        "name": "Brazil 1993: Senna vs Hill",
+        "era": "1988-1993",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "SENA",
+        "rival": "HIL",  # win: Senna in the rain; Hill the car behind at the flag
+        "score_positions": 6,
+        "split": "eras",
+        # Anchors pass, but the synthetic race isn't the real one (docs/g1-report.md, 5.5): no
+        # source gives the field's slick stops, so eight cars run wets on a dry track for the
+        # last 30 laps and the solver gives them dry pace up to 9.5 s a lap quicker than
+        # Senna's, who is P14 at the takeover; with his real calls he wins 0 of 20 live runs.
+        # No race file is committed until the stops are sourced or the solver changes (owner).
+        "data_issue": "synthetic race unlike the real one (unsourced slick stops; Senna P14 at"
+        " the takeover, can't win with his real calls)",
+    },
+    "europe-1993": {
+        "year": 1993,
+        "event": "European",
+        "source": "reconstruct",
+        "name": "Europe 1993: Senna vs Hill",
+        "era": "1988-1993",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "SENA",
+        "rival": "HIL",  # win: Senna through the wet-dry calls; Hill P2
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "belgium-1995": {
+        "year": 1995,
+        "event": "Belgian",
+        "source": "reconstruct",
+        "name": "Belgium 1995: Schumacher vs Hill",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "MSCM",
+        "rival": "HIL",  # win: Schumacher from P16 on slicks in the wet; Hill P2
+        "score_positions": 6,
+        "split": "eras",
+    },
     # Eras wave B (build plan 5.1): red-flag races of the 2010s. No source has red-flag timing,
     # so each red flag's stoppage lap and restart SC laps come from its hand-entered file
     # (data/redflags/<id>.json, R1). TUM races via `pipeline tum-ingest`, Jolpica ones via
@@ -2003,6 +2094,26 @@ def reconstructed_pit_loss(params: track.TrackParams, recon: dict) -> track.Trac
     )
 
 
+def official_result(model: dict, recon: dict) -> tuple[dict, list[str]]:
+    """The race file's realResult for a reconstruction with disqualified cars placed on the
+    road (facts `roadPositions`, owner decision Nov 8): the cars still run to the flag at their
+    road place, but the official result keeps them excluded, listed behind the classified cars
+    (as Jolpica's order has them). Returns the model and report lines."""
+    placed = [r["driver"] for r in sorted(recon["roadPositions"], key=lambda r: r["position"])]
+    classified = set(recon.get("classified") or [])
+    order = [c for c in model["realResult"] if c not in placed]
+    after = max((i for i, c in enumerate(order) if c in classified), default=-1) + 1
+    order[after:after] = [d for d in placed if d in model["realResult"]]
+    lines = [
+        f"  realResult: {r['driver']} disqualified, P{r['position']} on the road"
+        + (f" at +{r['gap']:.3f}s" if r["gapSourced"] else " (gap estimated)")
+        + f"; listed P{order.index(r['driver']) + 1}, behind the classified cars"
+        for r in recon["roadPositions"]
+        if r["driver"] in order
+    ]
+    return {**model, "realResult": order}, lines
+
+
 def eras_meta(race_id: str, sidecar: dict) -> dict:
     """A registry entry for a Jolpica race not in RACES (the Eras races until Phase 3 registers
     them): its season's era, the automatic duel and the D3 takeover, seed 1."""
@@ -2048,6 +2159,9 @@ class DryFit:
     fitted: fit.LapTimeFit
     rain: list[dict] | None
     wet: bool
+    # "fitted" from the race's dry laps; "reconstruction": a reconstructed race wet on every
+    # lap takes its reconstruction's solved dry pace (solver_dry_fit), an estimate.
+    dry_pace: str = "fitted"
 
 
 def _from_raw(load, race_id: str, raw_dir: Path):
@@ -2061,15 +2175,73 @@ def _dir_arg(raw_dir: Path) -> tuple[Path, ...]:
     return () if Path(raw_dir) == RAW_DIR else (Path(raw_dir),)
 
 
+def solver_dry_fit(recon: dict, laps: pd.DataFrame | None = None) -> fit.LapTimeFit:
+    """A reconstructed race's dry lap model from its reconstruction (owner decision, Nov 8):
+    for a race wet on every lap, which has no dry lap to fit one on. The solver knows each
+    car's dry pace: its synthetic laps are (b + w x wear + fuel x laps of fuel on board) x
+    (1 + the tyre's wet penalty) + noise (reconstruct.py), so in the sims' terms (basePace +
+    degPerLap x wear - fuelEffectPerLap x lap, sim_reference._clean_lap) a car's base pace is
+    b + fuel x (laps + 1), the dry compound's wear the field's median w, the fuel effect the
+    solver's own, the noise each car's solved noise. The era's one dry compound is the
+    reference (before 2007). The wet tyres `laps` run wear as the solver ran them (the car's
+    one wear rate, at wet.wear_mult: reconstruct.features), so they take the same wear and no
+    offset (their pace is the weather curves'), in place of wet.WET_TYRES' defaults. Every
+    number is the solver's estimate, not a measurement."""
+    year = int(recon["year"])
+    p = recon["params"]
+    refuels = p.get("refuel")
+    refuels = year >= reconstruct.REFUEL_FROM if refuels is None else bool(refuels)
+    if refuels:
+        # A refuelling reconstruction's fuel term resets at each stop: no single slope.
+        raise ValueError(
+            f"{recon['raceId']}: a refuelling reconstruction wet on every lap: its solver's fuel"
+            " term resets at each stop, so it gives no single dry pace to build on"
+        )
+    if year >= estimates.TWO_COMPOUNDS_FROM:
+        raise ValueError(f"{recon['raceId']}: solver dry pace is for one dry compound (pre-2007)")
+    solved = recon.get("fitted") or {}
+    if not solved:
+        raise ValueError(f"{recon['raceId']}: its reconstruction has no solved pace (fitted)")
+    fuel = float(p["fuel_per_lap"])
+    total = int(recon["laps"])
+    ref = estimates.SINGLE
+    wear = float(pd.Series([float(f["wear"]) for f in solved.values()]).median())
+    used = set() if laps is None else set(laps["Compound"].dropna().astype(str))
+    tyres = [ref, *[c for c in wet.WET_COMPOUNDS if c in used]]
+    fresh_laps = int(
+        fit.load_compound_priors(estimates.era_for_year(year)).get("freshTyre", {}).get("laps", 3)
+    )
+    return fit.LapTimeFit(
+        driver_pace={d: float(f["pace"]) + fuel * (total + 1) for d, f in solved.items()},
+        driver_noise={d: float(f["noise"]) for d, f in solved.items()},
+        compound_offset=dict.fromkeys(tyres, 0.0),
+        compound_wear=dict.fromkeys(tyres, wear),
+        fuel_per_lap=fuel,
+        reference_compound=ref,
+        r_squared=float("nan"),
+        n_obs=0,
+        compound_cliff=dict.fromkeys(tyres),
+        fresh_tyre_bonus=0.0,
+        fresh_tyre_laps=fresh_laps,
+        prior_notes=[
+            "dry pace: wet on every lap, so each car's dry pace, the dry wear and the fuel"
+            " effect are its reconstruction's solved ones (estimated, not fitted)"
+        ],
+    )
+
+
 def dry_fit(
     race_id: str,
     laps: pd.DataFrame,
     era: str,
     fault_facts: list[dict] | None = None,
     raw_dir: Path = RAW_DIR,
+    recon: dict | None = None,
 ) -> DryFit:
     """The dry lap model. A refuelling race's `laps` carry the Tank and FuelLap columns
-    (refuel.with_fuel_columns): the fuel term is fitted on the sim's sawtooth."""
+    (refuel.with_fuel_columns): the fuel term is fitted on the sim's sawtooth. `recon`: a
+    reconstructed race's sidecar (load_reconstruction); wet on every lap, it gives the dry
+    pace instead (solver_dry_fit). A real-timing race wet on every lap can't be built."""
     clean_df, traffic_df, _ = clean.clean_laps(laps)
     # A faulted car's laps while the fault lasts aren't its pace (faults.py fits the loss).
     clean_df = faults.without_fault_laps(clean_df, fault_facts or [], laps)
@@ -2087,6 +2259,11 @@ def dry_fit(
             return frame[slick & ~frame["LapNumber"].isin(period)]
 
         clean_df, traffic_df = dry(clean_df), dry(traffic_df)
+        if clean_df.empty and recon is not None:
+            # Owner decision (Nov 8): a reconstructed race wet on every lap (monaco-1984,
+            # portugal-1985, europe-1993) takes its solver's dry pace. Real timing never does.
+            fitted = solver_dry_fit(recon, laps)
+            return DryFit(clean_df, traffic_df, fitted, rain_data, wet_race, "reconstruction")
         if clean_df.empty:
             # Wet all race (Brazil 2016, Interlagos 2024: every lap on inters or wets): the
             # wet model is a correction on a dry lap model this race can't give, and the build
@@ -2274,7 +2451,7 @@ def build_race(
             race_id, sidecar.get("results"), Path(raw_dir) / "f1db"
         )
 
-    dry = dry_fit(race_id, laps, meta["era"], fault_facts, raw_dir)
+    dry = dry_fit(race_id, laps, meta["era"], fault_facts, raw_dir, recon)
     clean_df, traffic_df, fitted = dry.clean, dry.traffic, dry.fitted
     weather = wet.weather_block(laps, dry.rain, fitted, wet.load_curves()) if dry.wet else None
     wet_pace = (
@@ -2332,6 +2509,9 @@ def build_race(
         service_stops=eras_build and not refuelling,
         eras_stops=eras_build,
     )
+    official_lines: list[str] = []
+    if recon is not None and recon.get("roadPositions"):
+        model, official_lines = official_result(model, recon)
     estimated = list((block or {}).get("estimated", []))
     if recon is not None:
         estimated += [f for f in recon["provenance"].get("estimated", []) if f not in estimated]
@@ -2365,6 +2545,13 @@ def build_race(
             f"reconstructed (step 4.6): all anchors pass: {recon['solver']['passed']};"
             f" estimated {', '.join(model['provenance'].get('estimated', []))}"
         )
+        if dry.dry_pace == "reconstruction":
+            report.append(
+                "  dry pace: wet on every lap (no dry lap to fit): each car's dry pace, the dry"
+                " wear and the fuel effect from the reconstruction's solver (estimated;"
+                " provenance: weather)"
+            )
+        report.extend(official_lines)
         for f in unfitted:
             report.append(
                 f"  fault not modelled: lap {f['lap']} {f['driver']} {f['fault']} (synthetic"

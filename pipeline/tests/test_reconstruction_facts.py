@@ -119,3 +119,25 @@ def test_weather_covers_the_race_and_its_tyres_find_their_stops(race_id):
     assert anchors.wetness is not None and len(anchors.wetness) == anchors.laps
     assert max(anchors.wetness) >= rc.STATE_WETNESS["wet"]
     assert not [n for n in anchors.notes if n.startswith("weather ")]
+
+
+def test_monaco_1984_places_the_disqualified_bellof_on_the_road():
+    """Owner decision (Nov 8): Bellof (#4, Tyrrell excluded from the 1984 season) ran third on
+    the road, 21.141 s behind Prost (Motor Sport, Wikipedia); Jolpica has him disqualified."""
+    (item,) = rc.load_facts("monaco-1984")["roadPositions"]
+    assert item["number"] == 4 and item["position"] == 3 and item["gap"] == 21.141
+    assert "motorsportmagazine.com" in item["source"] and "wikipedia.org" in item["source"]
+    dump = _dump()
+    if dump is None:
+        pytest.skip("no Jolpica dump cached")
+    anchors = rc.load_anchors("monaco-1984", dump_dir=dump)
+    bel = next(c for c in anchors.cars if c.number == 4)
+    assert bel.status == "disqualified" and not bel.classified and bel.road_position == 3
+    winner = next(c for c in anchors.cars if c.position == 1)
+    assert bel.time == pytest.approx(winner.time + 21.141)
+    assert rc.road_order(anchors)[:4] == [winner.driver, "SENA", bel.driver, "ARN"]
+
+
+@pytest.mark.parametrize("race_id", [r for r in RACES if r != "monaco-1984"])
+def test_no_other_race_places_a_car_on_the_road(race_id):
+    assert not rc.load_facts(race_id).get("roadPositions")

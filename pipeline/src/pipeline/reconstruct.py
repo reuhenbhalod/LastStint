@@ -116,10 +116,16 @@ class Car:
     fastest_lap: int | None = None
     stops: list[Stop] = field(default_factory=list)
     start_tyre: str | None = None  # the tyre class it started on, where a source names it
+    # A disqualified car a source places on the road (facts `roadPositions`): its place at the
+    # flag (1 = first on the road) and the source. It runs to the flag there; its race time is
+    # its sourced gap to the winner, else it sits between its road neighbours (an estimate).
+    road_position: int | None = None
+    road_source: str | None = None
 
     @property
     def finished(self) -> bool:
-        return self.status in FINISHED
+        """Ran to the flag: a finisher, or a disqualified car placed on the road."""
+        return self.status in FINISHED or self.road_position is not None
 
 
 @dataclass(frozen=True)
@@ -214,6 +220,21 @@ def load_facts(race_id: str, facts_dir: Path = FACTS_DIR) -> dict | None:
             raise ValueError(f"{path}: stops[{i}] tyre {s['tyre']!r} is not one of {TYRES}")
     if facts.get("weather") is not None:
         check_weather(facts["weather"], str(path))
+    for i, r in enumerate(facts.get("roadPositions") or []):
+        at = f"{path}: roadPositions[{i}]"
+        if not str(r.get("source") or "").strip():
+            raise ValueError(f"{at} has no source")
+        if not ("driver" in r or "number" in r):
+            raise ValueError(f"{at} needs a driver or number")
+        if not isinstance(r.get("position"), int) or r["position"] < 1:
+            raise ValueError(
+                f"{at}: position {r.get('position')!r} is not a road place (1, 2, ...)"
+            )
+        gap = r.get("gap")
+        if gap is not None and (
+            isinstance(gap, bool) or not isinstance(gap, int | float) or gap < 0
+        ):
+            raise ValueError(f"{at}: gap {gap!r} is not seconds behind the winner (or null)")
     return facts
 
 
@@ -448,6 +469,7 @@ def load_anchors(
         wetness = timeline_wetness(timeline, winner.laps)
         curves = wet.load_curves()
         notes += apply_tyres(cars, weather)
+    notes += apply_road_positions(cars, (facts or {}).get("roadPositions") or [], winner)
     incidents = DATA_DIR / "incidents.json"
     if incidents.exists():
         for item in json.loads(incidents.read_text()).get(race_id) or []:
@@ -512,6 +534,63 @@ def apply_tyres(cars: list[Car], weather: dict) -> list[str]:
             continue
         car.stops[k] = replace(car.stops[k], tyre=t["tyre"])
     return notes
+
+
+def apply_road_positions(cars: list[Car], items: list[dict], winner: Car) -> list[str]:
+    """The facts file's `roadPositions` onto their cars: a disqualified car a source places on
+    the road (san-marino-1985's Prost, monaco-1984's Bellof: excluded after the flag) runs to
+    the flag at that place. With a sourced gap (lead lap only) its race time is the winner's
+    plus the gap, a lead-lap anchor like any other; without one it is placed between its road
+    neighbours (`targets`), an estimate. Its official result stays excluded (`classified`
+    false). Returns notes; a road place for no car, or for a car that wasn't disqualified, is
+    an error."""
+    notes = []
+    for i, item in enumerate(items):
+        who = item.get("driver", item.get("number"))
+        car = _car_for(cars, item)
+        if car is None:
+            raise ValueError(f"facts roadPositions[{i}]: no car {who}")
+        if car.status != "disqualified":
+            raise ValueError(
+                f"facts roadPositions[{i}]: {car.driver} is {car.status}, not disqualified (a road"
+                " place is for a car excluded from the result)"
+            )
+        car.road_position = int(item["position"])
+        car.road_source = str(item["source"])
+        gap = item.get("gap")
+        if gap is not None:
+            if car.laps != winner.laps:
+                raise ValueError(
+                    f"facts roadPositions[{i}]: {car.driver} has {car.laps} laps, the winner"
+                    f" {winner.laps}: a gap to the winner is for a car on the lead lap"
+                )
+            car.time = float(winner.time) + float(gap)
+            notes.append(
+                f"{car.driver}: disqualified, placed P{car.road_position} on the road at"
+                f" +{float(gap):.3f}s (sourced)"
+            )
+        else:
+            notes.append(
+                f"{car.driver}: disqualified, placed P{car.road_position} on the road between"
+                " its road neighbours (no gap sourced: an estimate)"
+            )
+    return notes
+
+
+def road_order(anchors: Anchors) -> list[str]:
+    """The order on the road at the flag as the sources give it: the classification, with
+    each disqualified car placed on the road (`roadPositions`) at its road place."""
+    order = [
+        c.driver
+        for c in sorted(anchors.cars, key=lambda c: c.position or 999)
+        if c.classified and c.road_position is None
+    ]
+    placed = sorted(
+        (c for c in anchors.cars if c.road_position is not None), key=lambda c: c.road_position
+    )
+    for c in placed:
+        order.insert(min(c.road_position - 1, len(order)), c.driver)
+    return order
 
 
 def stint_tyres(car: Car, wetness: list[float], curves: dict) -> list[tuple[str, bool]]:
@@ -846,6 +925,37 @@ def targets(
             if car.time is None and not a - 1e-9 <= v <= b + 1e-9:
                 notes.append(f"{car.driver}: no time fits both its classification and its window")
             out[car.driver] = v
+    # A disqualified car placed on the road: its sourced race time, else between its road
+    # neighbours on its lap (the midpoint of the room between them: an estimate).
+    road = road_order(anchors)
+    for car in sorted(anchors.cars, key=lambda c: c.road_position or 0):
+        if car.road_position is None or car.laps < 1:
+            continue
+        if car.time is not None:
+            out[car.driver] = car.time
+            continue
+        k = road.index(car.driver)
+        same = [d for d in road if anchors.car(d).laps == car.laps and d in out]
+        ahead = [d for d in road[:k] if d in same]
+        behind = [d for d in road[k + 1 :] if d in same]
+        lapped = car.laps < anchors.laps
+        lo = (
+            out[ahead[-1]] + p.order_gap
+            if ahead
+            else (t_win + p.order_gap if lapped else -math.inf)
+        )
+        hi = (
+            out[behind[0]] - p.order_gap
+            if behind
+            else (t_win + 0.75 * est_lap[car.driver] if lapped else math.inf)
+        )
+        if math.isfinite(lo) and math.isfinite(hi):
+            v = (lo + hi) / 2
+        else:
+            v = min(max(natural[car.driver], lo), hi)
+        if lo > hi:
+            notes.append(f"{car.driver}: no room on the road between its road neighbours")
+        out[car.driver] = v
     # Running at the flag but not classified (too few laps for the rules of the day, e.g.
     # australia-1986's Tambay and Berg): still lapped finishers, so they cross the line
     # after the winner's flag, exactly their laps down, and aren't seen as retirements.
@@ -1054,6 +1164,13 @@ def laps_frame(anchors: Anchors, sol: Solution) -> pd.DataFrame:
     rows = []
     for car in anchors.cars:
         if car.laps < 1:
+            # On a wet race, the tyre it started on (as a car that ran a lap), so its untimed
+            # lap doesn't read as a one-lap stint on the dry compound.
+            start = (
+                TYRE_COMPOUND[stint_tyres(car, anchors.wetness, anchors.curves)[0][0]]
+                if anchors.wetness is not None
+                else None
+            )
             rows.append(
                 {
                     **dict.fromkeys(LAP_COLUMNS),
@@ -1061,6 +1178,7 @@ def laps_frame(anchors: Anchors, sol: Solution) -> pd.DataFrame:
                     "Team": car.team,
                     "LapNumber": 1.0,
                     "Time": 0.0,
+                    "Compound": start,
                     "Stint": 1.0,
                     "TyreLife": 1.0,
                     "TrackStatus": GREEN,
@@ -1191,13 +1309,18 @@ def check_anchors(anchors: Anchors, df: pd.DataFrame, p: Params) -> list[dict]:
     lap1 = timed[timed["LapNumber"] == 1].sort_values("Time")["Driver"].tolist()
     out.append(_row("grid", "lap-1 order is the grid order", starters, lap1, lap1 == starters))
 
-    classified = [
-        c.driver for c in sorted(anchors.cars, key=lambda c: c.position or 999) if c.classified
-    ]
-    # The classified cars head the road order (the race file's realResult): no unclassified
-    # car (a disqualified one, say) ahead of them.
-    order = finishing_order(df)[: len(classified)]
-    out.append(_row("order", "classification", classified, order, order == classified))
+    # The classified cars head the road order (assemble.finishing_order): no unclassified car
+    # (a disqualified one, say) ahead of them, except a disqualified car a source places on the
+    # road, at its road place.
+    road = road_order(anchors)
+    order = finishing_order(df)[: len(road)]
+    placed = [c.driver for c in anchors.cars if c.road_position is not None]
+    subject = "classification" + (
+        f" (road order: {', '.join(placed)} disqualified, at the sourced road place)"
+        if placed
+        else ""
+    )
+    out.append(_row("order", subject, road, order, order == road))
 
     lead = sorted((c for c in anchors.cars if c.time is not None), key=lambda c: c.time)
     total = anchors.laps
@@ -1335,11 +1458,39 @@ def estimates_in_words(anchors: Anchors, p: Params) -> list[str]:
             " 2.4's dry compound); a stint no source names gets the tyre that loses least"
             " over its laps",
         ]
+    for r in road_positions(anchors):
+        where = (
+            f"at its sourced gap, +{r['gap']:.3f}s"
+            if r["gapSourced"]
+            else "between its road neighbours (no gap sourced: its time is an estimate)"
+        )
+        words.append(
+            f"{r['driver']}: disqualified, run to the flag P{r['position']} on the road {where};"
+            " the official result keeps it excluded"
+        )
     if not anchors.stops_complete:
         words.append("Stops: only the sourced ones; cars may have stopped more (unknown)")
     if not anchors.safety_cars_complete:
         words.append("Safety cars: only the sourced ones (none found is not none run)")
     return words
+
+
+def road_positions(anchors: Anchors) -> list[dict]:
+    """The sidecar's disqualified cars placed on the road: each one's road place, race time
+    gap to the winner on the road (sourced or estimated) and source. The build keeps them out
+    of the race file's official result (`build.official_result`)."""
+    winner = next(c for c in anchors.cars if c.position == 1)
+    return [
+        {
+            "driver": c.driver,
+            "position": c.road_position,
+            "gap": None if c.time is None else round(c.time - float(winner.time), 3),
+            "gapSourced": c.time is not None,
+            "source": c.road_source,
+        }
+        for c in sorted(anchors.cars, key=lambda c: c.road_position or 0)
+        if c.road_position is not None
+    ]
 
 
 def model_blocks(sidecar: dict) -> dict:
@@ -1393,6 +1544,10 @@ def reconstruct(anchors: Anchors, p: Params | None = None) -> Result:
         "provenance": {"kind": "reconstructed", "estimated": estimated(anchors)},
         "estimates": estimates_in_words(anchors, p),
         "sources": anchors.sources,
+        "classified": [
+            c.driver for c in sorted(anchors.cars, key=lambda c: c.position or 999) if c.classified
+        ],
+        "roadPositions": road_positions(anchors),
         "stopsComplete": anchors.stops_complete,
         "safetyCarsComplete": anchors.safety_cars_complete,
         "params": asdict(replace(p, sigma=sol.sigma)),

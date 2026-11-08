@@ -61,9 +61,41 @@ folder).
   `"wet"`, where the source says it. A stop without one (a penalty, a repair, a source that
   doesn't say) leaves its stint's tyre to the estimate below.
 - `weather`: optional, only for a race run (partly) in the wet. See below.
+- `roadPositions[]`: optional, a disqualified car a source places on the road (owner decision,
+  Nov 8 2026; monaco-1984's Bellof). See below.
 
 The loader rejects a file whose stop or safety car has no source, a stop with no lap or car,
-bad safety-car laps, or a `weather` block that breaks the rules below.
+bad safety-car laps, a `weather` block that breaks the rules below, or a road position with
+no source, no car, a place that isn't 1, 2, ... or a negative gap.
+
+## A disqualified car on the road (`roadPositions`)
+
+```json
+"roadPositions": [
+  {"number": 4, "position": 3, "gap": 21.141, "source": "Motor Sport, Jul 1984: ..."}
+]
+```
+
+Jolpica lists a car excluded after the flag (Tyrrell's whole 1984 season, an underweight
+car) as `disqualified`, with its laps and no time. Without a road position the solver treats
+it like a retirement, so to look retired with every lap done it runs ahead of the winner (the
+order anchor fails). With one:
+
+- `driver` or `number`: the car; it must be one Jolpica has `disqualified` (anything else is
+  an error);
+- `position`: its place on the road at the flag (1 = first across the line);
+- `gap`: seconds behind the winner on the road, where a source gives one, else `null`. A gap
+  is only for a car on the winner's lap;
+- `source`: required.
+
+The car runs to the flag at that place. With a gap its race time (the winner's plus the gap)
+is a lead-lap anchor like any other (a `gap` row in the report). Without one it is placed
+midway between its road neighbours on its lap, and the sidecar and notes mark the time as an
+estimate. The order anchor checks the road order: the classification with each road-placed
+car at its place. The car stays out of the official result: it isn't classified, and the
+build lists it behind the classified cars in the race file's `realResult` (as Jolpica's order
+has it; `build.official_result`). The sidecar's `roadPositions` and `classified` carry this to
+the build.
 
 ## Weather (wet races)
 
@@ -141,9 +173,15 @@ provenance lists `weather`).
 - **Anchor report**: a `tyre` row for every sourced stint (the snapshot's Compound on its
   laps).
 
-A race wet from start to finish (no slick lap outside the rain) can't be built yet: the
-build's dry lap model needs dry laps (`build.dry_fit`). monaco-1984, portugal-1985 and
-europe-1993 are such races.
+A race wet from start to finish (no slick lap outside the rain: monaco-1984, portugal-1985,
+europe-1993, where damp laps count as wet) gives the build no dry laps to fit its dry lap
+model on. For a reconstructed race the build takes the solver's instead (owner decision, Nov
+8 2026; `build.solver_dry_fit`): each car's dry pace from the sidecar's `fitted` pace in the
+sims' terms (pace + fuel x (laps + 1)), its noise, the field's median wear for the dry
+compound and the wet tyres (the solver ran one wear rate on every tyre, at `wet.wear_mult`),
+and the solver's fuel effect. The build report says so ("dry pace: wet on every lap"); the
+race file's provenance lists `weather` (the schema has no value of its own for it). A
+real-timing race wet on every lap still can't be built.
 
 ## What the reconstruction writes
 
