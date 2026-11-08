@@ -1,7 +1,7 @@
-// Test fixtures: `GET /api/eras` and `GET /api/eras/:eraId` responses for the Eras screens'
-// tests.
+// Test fixtures: `GET /api/eras`, `GET /api/eras/:eraId` and `POST /api/eras/attempts/:id`
+// responses for the Eras screens' tests.
 
-import type { EraDetail, EraRaceSummary, EraSummary, ErasResponse } from './api.js';
+import type { AttemptResult, EraDetail, EraRaceSummary, EraSummary, ErasResponse } from './api.js';
 import { ERAS, eraById, racesOfEra } from './catalog.js';
 
 /** All ten eras, released, no stars; `edit` changes eras by id. */
@@ -79,4 +79,35 @@ export function starredRaces(n: number): Record<number, Partial<EraRaceSummary>>
   return Object.fromEntries(
     Array.from({ length: n }, (_, i) => [i + 1, { stars: { ...NONE, result: true } }]),
   );
+}
+
+/** An evaluated attempt on Abu Dhabi 2021 (HAM P2, no calls): `edit` changes any field. */
+export function attemptResult(edit: Partial<AttemptResult> = {}): AttemptResult {
+  return {
+    attemptId: 'att-1',
+    raceId: 'abu-dhabi-2021',
+    legend: false,
+    untimed: false,
+    accuracy: 82.4,
+    stars: { result: true, strategist: true, mastery: false },
+    masteryObjective: false,
+    cleanCalls: true,
+    hidden: null,
+    rewrite: false,
+    decisionAccuracies: [],
+    finishPosition: 2,
+    disqualified: false,
+    result: { order: ['VER', 'HAM'], finishers: ['VER', 'HAM'], disqualified: [], gaps: {} },
+    calls: [],
+    newStars: { ...NONE, strategist: true },
+    historyEntry: false,
+    progress: {
+      stars: { result: true, strategist: true, mastery: false },
+      hiddenDone: false,
+      bestAccuracy: 82.4,
+    },
+    rank: 3,
+    total: 41,
+    ...edit,
+  };
 }

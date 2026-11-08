@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { ApiError } from '../api.js';
 import type { AttemptResponse, EraDetail } from './api.js';
 import type { ErasResponse } from './api.js';
+import { attemptResult } from './erasFixture.js';
 import { createHttpErasApi } from './httpErasApi.js';
 
 const PLAYER = '11111111-1111-4111-8111-111111111111';
@@ -84,5 +85,37 @@ describe('httpErasApi', () => {
     await expect(
       createHttpErasApi(r.deps).startAttempt({ raceId: 'x', legend: false }),
     ).rejects.toMatchObject({ status: 404, code: 'not-found' });
+  });
+
+  it('POST /api/eras/attempts/:id with the player and the finished attempt', async () => {
+    const result = attemptResult();
+    const r = recorder({ '/api/eras/attempts/att-1': result });
+    const body = {
+      decisions: [],
+      grades: [],
+      untimed: true,
+      rivalClaims: [{ lap: 40, option: 'smart' as const }],
+      modelHash: 'h',
+    };
+    expect(await createHttpErasApi(r.deps).submitAttempt('att-1', body)).toBe(result);
+    expect(r.calls).toEqual([
+      { method: 'POST', path: '/api/eras/attempts/att-1', body: { anonId: PLAYER, ...body } },
+    ]);
+  });
+
+  it('refuses to submit without an attempt id', async () => {
+    const r = recorder({});
+    await expect(
+      createHttpErasApi(r.deps).submitAttempt('', { decisions: [], grades: [], untimed: false }),
+    ).rejects.toThrow(RangeError);
+    expect(r.calls).toEqual([]);
+  });
+
+  it('GET /api/eras/races/:raceId/stats, and refuses a bad race id', async () => {
+    const r = recorder({ '/api/eras/races/abu-dhabi-2021/stats': { rewriteShare: 0.1 } });
+    const api = createHttpErasApi(r.deps);
+    expect(await api.raceStats('abu-dhabi-2021')).toEqual({ rewriteShare: 0.1 });
+    await expect(api.raceStats('../x')).rejects.toThrow(RangeError);
+    expect(r.calls).toHaveLength(1);
   });
 });

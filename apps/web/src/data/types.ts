@@ -1,7 +1,7 @@
 // The data the game needs to run one Daily Race. The decision moments are the race model's
 // approved moments (`model.decisionMoments`), the same ones the server grades.
 
-import type { RaceModel } from '@laststint/sim';
+import type { RaceModel, RivalPolicy } from '@laststint/sim';
 
 /** Where a race comes from, which decides how its run is submitted (state/machine.ts). */
 export type RaceSource = 'live' | 'practice' | 'survivor' | 'eras';
@@ -25,6 +25,17 @@ export interface Daily {
   source: RaceSource;
   /** Why the game fell back to practice, for the banner. */
   practiceReason?: string;
+  /**
+   * How the live run is played, as the server replays it (Eras attempts: the era's rival
+   * policy and Legend, eras spec §7, §8). Absent: today's rival, the real race's events.
+   */
+  run?: LiveRules;
+}
+
+/** The rules a live run is played to (sim RunOptions `rivalPolicy`, `legend`). */
+export interface LiveRules {
+  rivalPolicy?: RivalPolicy;
+  legend?: boolean;
 }
 
 /** Source of today's race. */

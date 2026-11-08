@@ -9,6 +9,9 @@ import { ApiError, type RunResponse, type RunSubmission, api } from '../data/api
 import { anonId } from '../data/player.js';
 import type { Daily, DailyProvider } from '../data/types.js';
 import { type Grader, browserGrader } from '../engine/grading.js';
+import { eraDailyOf } from '../eras/EraProvider.js';
+import { type ErasApi, erasApi } from '../eras/api.js';
+import { submitAttempt } from '../eras/submit.js';
 import { type GameState, type Speed, submitRoute } from '../state/machine.js';
 import { GameSession } from '../state/session.js';
 import { RUN_KEY, clearRun, loadRun, saveRun } from '../state/storage.js';
@@ -89,6 +92,8 @@ export function useGame(
   grader?: Grader,
   /** Where the in-progress race is saved (survivor keeps its own, apart from the daily's). */
   storageKey = RUN_KEY,
+  /** Where an Eras attempt is submitted (tests pass their own). */
+  eras: ErasApi = erasApi,
 ): Game {
   const session = useRef<GameSession | null>(null);
   const [daily, setDaily] = useState<Daily | null>(null);
@@ -219,11 +224,13 @@ export function useGame(
         return;
       }
       if (route === 'eras') {
-        // TODO(8.7): submit the Eras attempt here (the race log and grades for its stars,
-        // eras spec §6, §13) once its endpoint is up. Until then it's graded on this device
-        // only, and never posted as a daily run.
-        await s.allGraded();
-        s.finish({ status: 'eras' });
+        // The attempt's calls, claims, untimed mark and Expert rival choices (eras/submit.ts).
+        const attempt = eraDailyOf(daily);
+        if (!attempt) {
+          s.finish({ status: 'error', retry: false, error: 'This race has no Eras attempt.' });
+          return;
+        }
+        s.finish(await submitAttempt(s, attempt, eras));
         return;
       }
       try {
@@ -241,7 +248,7 @@ export function useGame(
     })()
       .catch(() => s.finish({ status: 'error', error: 'Can’t reach the server.' }))
       .finally(sync);
-  }, [sync]);
+  }, [sync, daily, eras]);
 
   // Clear the saved run and start a fresh session back at the daily card (practice only:
   // a submitted daily can't be replayed).
