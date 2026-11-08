@@ -43,6 +43,8 @@ export interface Env {
   ADMIN_EMAILS?: string;
   /** A survivor pool to use instead of data/pools.json's (JSON; tests only). */
   SURVIVOR_POOL?: string;
+  /** "true" on staging only (eras spec §5): every era and race open, Draft races shown. */
+  ERAS_TEST_MODE?: string;
 }
 
 /** The survivor races and their seeds (data/pools.json, or the tests' own). */
