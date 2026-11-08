@@ -33,10 +33,11 @@ import type { CarState, FillChoice, PitStop, RaceModel, RefuelModel } from './ty
 export const RESERVE_LAPS = 1;
 
 /**
- * The pooled prior for a race without its own fit (refuel.py pooled_prior, over the F1DB
- * stops of the 1994-2009 races in data/raw/f1db): s per lap of fuel.
+ * The fill rate's physical prior for a race without its own fit (refuel.py
+ * PRIOR_SECONDS_PER_LAP): ~3 L a lap of fuel through a ~12 L/s rig, 3 / 12 = 0.25 s per lap
+ * of fuel. An estimate (the race's provenance lists fuelLoads); the sources are in refuel.py.
  */
-export const PRIOR_SECONDS_PER_LAP = 0.0648;
+export const PRIOR_SECONDS_PER_LAP = 0.25;
 
 export const FILL_CHOICES: readonly FillChoice[] = ['short', 'standard', 'long'];
 
@@ -50,7 +51,7 @@ export function fuelLimit(model: RaceModel): number | null {
   return model.rules?.fuelLimit ?? null;
 }
 
-/** The race's fill model: its fit, or the pooled prior with the tank holding the race. */
+/** The race's fill model: its fit, or the physical prior with the tank holding the race. */
 export function refuelModel(model: RaceModel): RefuelModel {
   return (
     model.track.refuel ?? {

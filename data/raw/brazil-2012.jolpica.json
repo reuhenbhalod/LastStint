@@ -645,6 +645,48 @@
    }
   ]
  },
+ "q3": [
+  {
+   "driver": "HAM",
+   "position": 1
+  },
+  {
+   "driver": "BUT",
+   "position": 2
+  },
+  {
+   "driver": "WEB",
+   "position": 3
+  },
+  {
+   "driver": "VET",
+   "position": 4
+  },
+  {
+   "driver": "MAS",
+   "position": 5
+  },
+  {
+   "driver": "MAL",
+   "position": 6
+  },
+  {
+   "driver": "HUL",
+   "position": 7
+  },
+  {
+   "driver": "ALO",
+   "position": 8
+  },
+  {
+   "driver": "RAI",
+   "position": 9
+  },
+  {
+   "driver": "ROS",
+   "position": 10
+  }
+ ],
  "raceTimeCheck": [
   {
    "driver": "BUT",
@@ -759,7 +801,7 @@
    "handCheck": "data/estimates/brazil-2012.sc.json"
   },
   "compounds": {
-   "method": "two compounds (SOFT option, HARD prime) from each stint's pace step and wear (tyre life), with the both-compounds rule",
+   "method": "two compounds (SOFT option, HARD prime) from each stint's pace step and wear (tyre life), with the both-compounds rule; the top ten start on the SOFT (the Q3 tyre rule, 2012)",
    "stints": [
     {
      "driver": "ALO",
@@ -767,7 +809,7 @@
      "fromLap": 1,
      "toLap": 10,
      "compound": "SOFT",
-     "by": "pace",
+     "by": "q3",
      "cleanLaps": 8,
      "paceStep": 0.231,
      "softness": 0.862
@@ -781,7 +823,9 @@
      "by": "wet-laps",
      "cleanLaps": 5,
      "paceStep": 0.392,
-     "softness": 0.996
+     "softness": 0.996,
+     "dry": "SOFT",
+     "dryBy": "pace"
     },
     {
      "driver": "ALO",
@@ -803,15 +847,17 @@
      "by": "wet-laps",
      "cleanLaps": 11,
      "paceStep": 0.325,
-     "softness": 0.33
+     "softness": 0.33,
+     "dry": "SOFT",
+     "dryBy": "pace"
     },
     {
      "driver": "BUT",
      "stint": 1,
      "fromLap": 1,
      "toLap": 23,
-     "compound": "HARD",
-     "by": "pace",
+     "compound": "SOFT",
+     "by": "q3",
      "cleanLaps": 16,
      "paceStep": -0.241,
      "softness": -0.237
@@ -836,7 +882,9 @@
      "by": "wet-laps",
      "cleanLaps": 9,
      "paceStep": 0.441,
-     "softness": 0.383
+     "softness": 0.383,
+     "dry": "SOFT",
+     "dryBy": "pace"
     },
     {
      "driver": "DIR",
@@ -858,7 +906,9 @@
      "by": "wet-laps",
      "cleanLaps": 4,
      "paceStep": 0.108,
-     "softness": 1.108
+     "softness": 1.108,
+     "dry": "SOFT",
+     "dryBy": "pace"
     },
     {
      "driver": "DIR",
@@ -880,7 +930,9 @@
      "by": "wet-laps",
      "cleanLaps": 10,
      "paceStep": -0.688,
-     "softness": 1.128
+     "softness": 1.128,
+     "dry": "SOFT",
+     "dryBy": "pace"
     },
     {
      "driver": "DLR",
@@ -902,7 +954,9 @@
      "by": "wet-laps",
      "cleanLaps": 3,
      "paceStep": null,
-     "softness": null
+     "softness": null,
+     "dry": "SOFT",
+     "dryBy": "default"
     },
     {
      "driver": "DLR",
@@ -920,7 +974,7 @@
      "stint": 4,
      "fromLap": 51,
      "toLap": 55,
-     "compound": "HARD",
+     "compound": "SOFT",
      "by": "default",
      "cleanLaps": 1,
      "paceStep": null,
@@ -935,7 +989,9 @@
      "by": "wet-laps",
      "cleanLaps": 9,
      "paceStep": 0.482,
-     "softness": 0.367
+     "softness": 0.367,
+     "dry": "SOFT",
+     "dryBy": "pace"
     },
     {
      "driver": "GLO",
@@ -957,14 +1013,16 @@
      "by": "wet-laps",
      "cleanLaps": 3,
      "paceStep": null,
-     "softness": null
+     "softness": null,
+     "dry": "SOFT",
+     "dryBy": "default"
     },
     {
      "driver": "GLO",
      "stint": 3,
      "fromLap": 20,
      "toLap": 31,
-     "compound": "HARD",
+     "compound": "SOFT",
      "by": "default",
      "cleanLaps": 1,
      "paceStep": null,
@@ -990,7 +1048,9 @@
      "by": "wet-laps",
      "cleanLaps": 4,
      "paceStep": 2.294,
-     "softness": -0.353
+     "softness": -0.353,
+     "dry": "HARD",
+     "dryBy": "pace"
     },
     {
      "driver": "GRO",
@@ -1009,7 +1069,7 @@
      "fromLap": 1,
      "toLap": 10,
      "compound": "SOFT",
-     "by": "pace",
+     "by": "q3",
      "cleanLaps": 6,
      "paceStep": 0.465,
      "softness": 0.769
@@ -1023,7 +1083,9 @@
      "by": "wet-laps",
      "cleanLaps": 1,
      "paceStep": null,
-     "softness": null
+     "softness": null,
+     "dry": "SOFT",
+     "dryBy": "default"
     },
     {
      "driver": "HAM",
@@ -1041,8 +1103,8 @@
      "stint": 1,
      "fromLap": 1,
      "toLap": 23,
-     "compound": "HARD",
-     "by": "pace",
+     "compound": "SOFT",
+     "by": "q3",
      "cleanLaps": 18,
      "paceStep": -0.08,
      "softness": -0.301
@@ -1063,7 +1125,7 @@
      "stint": 3,
      "fromLap": 58,
      "toLap": 58,
-     "compound": "HARD",
+     "compound": "SOFT",
      "by": "default",
      "cleanLaps": 0,
      "paceStep": null,
@@ -1078,7 +1140,9 @@
      "by": "wet-laps",
      "cleanLaps": 8,
      "paceStep": 0.56,
-     "softness": 0.434
+     "softness": 0.434,
+     "dry": "SOFT",
+     "dryBy": "pace"
     },
     {
      "driver": "KAR",
@@ -1100,7 +1164,9 @@
      "by": "wet-laps",
      "cleanLaps": 4,
      "paceStep": 0.541,
-     "softness": 1.036
+     "softness": 1.036,
+     "dry": "SOFT",
+     "dryBy": "pace"
     },
     {
      "driver": "KAR",
@@ -1118,7 +1184,7 @@
      "stint": 4,
      "fromLap": 52,
      "toLap": 55,
-     "compound": "HARD",
+     "compound": "SOFT",
      "by": "default",
      "cleanLaps": 0,
      "paceStep": null,
@@ -1133,7 +1199,9 @@
      "by": "wet-laps",
      "cleanLaps": 7,
      "paceStep": 0.554,
-     "softness": 0.338
+     "softness": 0.338,
+     "dry": "SOFT",
+     "dryBy": "pace"
     },
     {
      "driver": "KOB",
@@ -1155,7 +1223,9 @@
      "by": "wet-laps",
      "cleanLaps": 4,
      "paceStep": -0.559,
-     "softness": 1.176
+     "softness": 1.176,
+     "dry": "SOFT",
+     "dryBy": "pace"
     },
     {
      "driver": "KOB",
@@ -1177,7 +1247,9 @@
      "by": "wet-laps",
      "cleanLaps": 13,
      "paceStep": 0.06,
-     "softness": 0.237
+     "softness": 0.237,
+     "dry": "HARD",
+     "dryBy": "pace"
     },
     {
      "driver": "KOV",
@@ -1199,7 +1271,9 @@
      "by": "wet-laps",
      "cleanLaps": 2,
      "paceStep": null,
-     "softness": null
+     "softness": null,
+     "dry": "SOFT",
+     "dryBy": "default"
     },
     {
      "driver": "KOV",
@@ -1228,7 +1302,7 @@
      "stint": 5,
      "fromLap": 57,
      "toLap": 59,
-     "compound": "HARD",
+     "compound": "SOFT",
      "by": "default",
      "cleanLaps": 1,
      "paceStep": null,
@@ -1243,14 +1317,16 @@
      "by": "wet-laps",
      "cleanLaps": 4,
      "paceStep": 1.832,
-     "softness": 0.128
+     "softness": 0.128,
+     "dry": "HARD",
+     "dryBy": "pace"
     },
     {
      "driver": "MAL",
      "stint": 1,
      "fromLap": 1,
      "toLap": 1,
-     "compound": "HARD",
+     "compound": "SOFT",
      "by": "default",
      "cleanLaps": 0,
      "paceStep": null,
@@ -1261,8 +1337,8 @@
      "stint": 1,
      "fromLap": 1,
      "toLap": 15,
-     "compound": "HARD",
-     "by": "pace",
+     "compound": "SOFT",
+     "by": "q3",
      "cleanLaps": 8,
      "paceStep": 1.056,
      "softness": 0.04
@@ -1276,7 +1352,9 @@
      "by": "wet-laps",
      "cleanLaps": 2,
      "paceStep": null,
-     "softness": null
+     "softness": null,
+     "dry": "SOFT",
+     "dryBy": "default"
     },
     {
      "driver": "MAS",
@@ -1298,14 +1376,16 @@
      "by": "wet-laps",
      "cleanLaps": 10,
      "paceStep": 0.747,
-     "softness": 0.064
+     "softness": 0.064,
+     "dry": "HARD",
+     "dryBy": "pace"
     },
     {
      "driver": "MSCM",
      "stint": 1,
      "fromLap": 1,
      "toLap": 5,
-     "compound": "HARD",
+     "compound": "SOFT",
      "by": "default",
      "cleanLaps": 3,
      "paceStep": null,
@@ -1316,7 +1396,7 @@
      "stint": 2,
      "fromLap": 6,
      "toLap": 8,
-     "compound": "HARD",
+     "compound": "SOFT",
      "by": "default",
      "cleanLaps": 0,
      "paceStep": null,
@@ -1331,7 +1411,9 @@
      "by": "wet-laps",
      "cleanLaps": 2,
      "paceStep": null,
-     "softness": null
+     "softness": null,
+     "dry": "SOFT",
+     "dryBy": "default"
     },
     {
      "driver": "MSCM",
@@ -1353,14 +1435,16 @@
      "by": "wet-laps",
      "cleanLaps": 6,
      "paceStep": -0.128,
-     "softness": 0.312
+     "softness": 0.312,
+     "dry": "SOFT",
+     "dryBy": "pace"
     },
     {
      "driver": "PER",
      "stint": 1,
      "fromLap": 1,
      "toLap": 1,
-     "compound": "HARD",
+     "compound": "SOFT",
      "by": "default",
      "cleanLaps": 0,
      "paceStep": null,
@@ -1386,7 +1470,9 @@
      "by": "wet-laps",
      "cleanLaps": 3,
      "paceStep": null,
-     "softness": null
+     "softness": null,
+     "dry": "SOFT",
+     "dryBy": "default"
     },
     {
      "driver": "PET",
@@ -1408,7 +1494,9 @@
      "by": "wet-laps",
      "cleanLaps": 11,
      "paceStep": 0.82,
-     "softness": 0.035
+     "softness": 0.035,
+     "dry": "HARD",
+     "dryBy": "pace"
     },
     {
      "driver": "PIC",
@@ -1430,7 +1518,9 @@
      "by": "wet-laps",
      "cleanLaps": 5,
      "paceStep": -0.288,
-     "softness": 1.365
+     "softness": 1.365,
+     "dry": "SOFT",
+     "dryBy": "pace"
     },
     {
      "driver": "PIC",
@@ -1452,7 +1542,9 @@
      "by": "wet-laps",
      "cleanLaps": 5,
      "paceStep": 1.318,
-     "softness": -0.064
+     "softness": -0.064,
+     "dry": "HARD",
+     "dryBy": "pace"
     },
     {
      "driver": "RAI",
@@ -1460,7 +1552,7 @@
      "fromLap": 1,
      "toLap": 5,
      "compound": "SOFT",
-     "by": "default",
+     "by": "q3",
      "cleanLaps": 3,
      "paceStep": null,
      "softness": null
@@ -1474,7 +1566,9 @@
      "by": "wet-laps",
      "cleanLaps": 10,
      "paceStep": 0.807,
-     "softness": 0.238
+     "softness": 0.238,
+     "dry": "HARD",
+     "dryBy": "pace"
     },
     {
      "driver": "RAI",
@@ -1496,7 +1590,9 @@
      "by": "wet-laps",
      "cleanLaps": 13,
      "paceStep": -0.07,
-     "softness": 0.289
+     "softness": 0.289,
+     "dry": "HARD",
+     "dryBy": "pace"
     },
     {
      "driver": "RIC",
@@ -1518,7 +1614,9 @@
      "by": "wet-laps",
      "cleanLaps": 3,
      "paceStep": null,
-     "softness": null
+     "softness": null,
+     "dry": "SOFT",
+     "dryBy": "default"
     },
     {
      "driver": "RIC",
@@ -1536,7 +1634,7 @@
      "stint": 4,
      "fromLap": 52,
      "toLap": 56,
-     "compound": "HARD",
+     "compound": "SOFT",
      "by": "default",
      "cleanLaps": 1,
      "paceStep": null,
@@ -1547,7 +1645,7 @@
      "stint": 5,
      "fromLap": 57,
      "toLap": 61,
-     "compound": "HARD",
+     "compound": "SOFT",
      "by": "default",
      "cleanLaps": 3,
      "paceStep": null,
@@ -1562,7 +1660,9 @@
      "by": "wet-laps",
      "cleanLaps": 0,
      "paceStep": null,
-     "softness": null
+     "softness": null,
+     "dry": "SOFT",
+     "dryBy": "default"
     },
     {
      "driver": "ROS",
@@ -1570,7 +1670,7 @@
      "fromLap": 1,
      "toLap": 9,
      "compound": "SOFT",
-     "by": "pace",
+     "by": "q3",
      "cleanLaps": 7,
      "paceStep": -0.66,
      "softness": 1.314
@@ -1584,14 +1684,16 @@
      "by": "wet-laps",
      "cleanLaps": 6,
      "paceStep": -0.291,
-     "softness": 1.168
+     "softness": 1.168,
+     "dry": "SOFT",
+     "dryBy": "pace"
     },
     {
      "driver": "ROS",
      "stint": 3,
      "fromLap": 19,
      "toLap": 20,
-     "compound": "HARD",
+     "compound": "SOFT",
      "by": "default",
      "cleanLaps": 0,
      "paceStep": null,
@@ -1617,14 +1719,16 @@
      "by": "wet-laps",
      "cleanLaps": 7,
      "paceStep": 2.298,
-     "softness": -0.947
+     "softness": -0.947,
+     "dry": "HARD",
+     "dryBy": "pace"
     },
     {
      "driver": "SEN",
      "stint": 1,
      "fromLap": 1,
      "toLap": 1,
-     "compound": "HARD",
+     "compound": "SOFT",
      "by": "default",
      "cleanLaps": 0,
      "paceStep": null,
@@ -1650,14 +1754,16 @@
      "by": "wet-laps",
      "cleanLaps": 3,
      "paceStep": null,
-     "softness": null
+     "softness": null,
+     "dry": "SOFT",
+     "dryBy": "default"
     },
     {
      "driver": "VERJ",
      "stint": 3,
      "fromLap": 21,
      "toLap": 29,
-     "compound": "HARD",
+     "compound": "SOFT",
      "by": "default",
      "cleanLaps": 0,
      "paceStep": null,
@@ -1683,7 +1789,9 @@
      "by": "wet-laps",
      "cleanLaps": 11,
      "paceStep": -0.071,
-     "softness": 0.487
+     "softness": 0.487,
+     "dry": "SOFT",
+     "dryBy": "pace"
     },
     {
      "driver": "VET",
@@ -1691,7 +1799,7 @@
      "fromLap": 1,
      "toLap": 10,
      "compound": "SOFT",
-     "by": "pace",
+     "by": "q3",
      "cleanLaps": 7,
      "paceStep": -0.251,
      "softness": 1.053
@@ -1705,7 +1813,9 @@
      "by": "wet-laps",
      "cleanLaps": 7,
      "paceStep": -0.135,
-     "softness": 1.106
+     "softness": 1.106,
+     "dry": "SOFT",
+     "dryBy": "pace"
     },
     {
      "driver": "VET",
@@ -1723,7 +1833,7 @@
      "stint": 4,
      "fromLap": 53,
      "toLap": 54,
-     "compound": "HARD",
+     "compound": "SOFT",
      "by": "default",
      "cleanLaps": 0,
      "paceStep": null,
@@ -1738,7 +1848,9 @@
      "by": "wet-laps",
      "cleanLaps": 13,
      "paceStep": -0.574,
-     "softness": 0.489
+     "softness": 0.489,
+     "dry": "SOFT",
+     "dryBy": "pace"
     },
     {
      "driver": "WEB",
@@ -1746,7 +1858,7 @@
      "fromLap": 1,
      "toLap": 9,
      "compound": "SOFT",
-     "by": "pace",
+     "by": "q3",
      "cleanLaps": 6,
      "paceStep": 0.678,
      "softness": 0.784
@@ -1760,7 +1872,9 @@
      "by": "wet-laps",
      "cleanLaps": 7,
      "paceStep": 0.143,
-     "softness": 0.897
+     "softness": 0.897,
+     "dry": "SOFT",
+     "dryBy": "pace"
     },
     {
      "driver": "WEB",
@@ -1782,11 +1896,15 @@
      "by": "wet-laps",
      "cleanLaps": 12,
      "paceStep": -0.601,
-     "softness": 0.599
+     "softness": 0.599,
+     "dry": "SOFT",
+     "dryBy": "pace"
     }
    ],
    "notes": [
-    "26 stints too short to score"
+    "9 top-ten first stints set to SOFT by the Q3 tyre rule (3 the fit alone labelled HARD)",
+    "25 stints too short to score",
+    "wet tyre classes refitted from the lap times by `pipeline wet-laps` (step 4.5): 37 stints on INTERMEDIATE / WET (the snapshot's Compound is final; a relabelled stint keeps 2.4's dry label as `dry`)"
    ]
   },
   "estimated": [

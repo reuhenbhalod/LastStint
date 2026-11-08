@@ -6,7 +6,7 @@
 
 import { legendDifficulty } from '@laststint/sim';
 import { LockLine, StarIcon } from './EraMap.js';
-import { type EraInfo, eraRace, eraRacePath } from './catalog.js';
+import { type EraInfo, eraLeaderboardPath, eraRace, eraRacePath } from './catalog.js';
 import type { EraDetailState, EraDetailView, RaceCard, RaceProgress } from './eraDetailState.js';
 
 const STARS = [
@@ -95,11 +95,23 @@ function RaceCardView({ card, legend }: { card: RaceCard; legend: boolean }) {
         <div className="mt-auto flex flex-col gap-1.5 pt-1">
           {legend && <span className="eyebrow !text-[var(--box-ink)]">Legend</span>}
           <StarList stars={progress.stars} />
-          <p className="m-0 text-[13px] text-[var(--muted)]">
-            Best accuracy{' '}
-            <span className="font-mono font-semibold text-[var(--ink)]">
-              {accuracyText(progress.bestAccuracy)}
+          <p className="m-0 flex flex-wrap items-baseline justify-between gap-x-3 text-[13px] text-[var(--muted)]">
+            <span>
+              Best accuracy{' '}
+              <span className="font-mono font-semibold text-[var(--ink)]">
+                {accuracyText(progress.bestAccuracy)}
+              </span>
             </span>
+            {/* Above the card's covering link, so it's its own tab stop and tap target. */}
+            {race && (
+              <a
+                href={eraLeaderboardPath(race, legend)}
+                className="relative z-10 underline hover:text-[var(--ink)]"
+              >
+                {legend ? 'Legend leaderboard' : 'Leaderboard'}
+                <span className="sr-only"> for {card.name}</span>
+              </a>
+            )}
           </p>
           {card.blocked && (
             <p className="m-0 text-[13px] font-semibold text-[var(--rival)]">{card.blocked}</p>

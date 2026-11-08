@@ -1,0 +1,15 @@
+{
+ "race": "monaco-1984",
+ "scheduledLaps": 76,
+ "completedLaps": 31,
+ "timing": "none (Jolpica has no 1984 lap times)",
+ "redFlags": [
+  {
+   "lap": 32,
+   "restart": "none",
+   "resultsLap": 31,
+   "source": "Wikipedia, 1984 Monaco Grand Prix: 'The red flag to stop the race was shown at the end of the 32nd lap', positions counted 'from the last lap completed by every driver' (lap 31; citing Autocourse 1984-85 p.141), scheduled 76 laps, 31 laps classified (https://en.wikipedia.org/wiki/1984_Monaco_Grand_Prix); C. Bradley, 'When Senna and Bellof starred in Monaco, as Prost prevailed', Autosport (edited 3 Jun 2023): 'red-flagged halfway through lap 32', 'the race result was backdated to lap 31' (https://www.autosport.com/f1/news/when-senna-and-bellof-starred-in-monaco-as-prost-prevailed/6530051/)",
+   "note": "Not resumed; half points (Prost 4.5). Sources differ on when in lap 32 the flag came: Wikipedia 'at the end of the 32nd lap', Autosport 'halfway through lap 32'; both put it on lap 32. The Wikipedia list's 'lap 31' is the classification lap, not the flag lap."
+  }
+ ]
+}

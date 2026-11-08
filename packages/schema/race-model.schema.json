@@ -147,7 +147,7 @@
         "refuel": {
           "type": "object",
           "additionalProperties": false,
-          "description": "A refuelling race's fill model, fitted from the real stops (eras build plan 4.2, pipeline refuel.py): lane time = laneBase + secondsPerLap x laps of fuel added. Absent: the pooled prior.",
+          "description": "A refuelling race's fill model, fitted from the real stops (eras build plan 4.2, pipeline refuel.py): lane time = laneBase + secondsPerLap x laps of fuel added, the slope shrunk toward a physical prior of 0.25 s per lap of fuel (an estimate: provenance lists fuelLoads). Absent: that prior.",
           "required": [
             "secondsPerLap",
             "laneBase",
@@ -736,7 +736,7 @@
           "type": "array",
           "uniqueItems": true,
           "default": [],
-          "description": "Fields estimated rather than measured (eras build plan 2.4): stint compounds, safety-car laps, fuel loads, the wetness timeline.",
+          "description": "Fields estimated rather than measured (eras build plan 2.4): stint compounds, safety-car laps, fuel loads (and a refuelling race's fill rate), the wetness timeline.",
           "items": {
             "enum": [
               "compounds",
@@ -762,6 +762,11 @@
           "type": "boolean",
           "default": true,
           "description": "False: a stop only refuels (2005)."
+        },
+        "minStops": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "The fewest pit stops a car must make in the race (Monaco 2025: 2); a car reaching the flag with fewer is disqualified, as by the two-compound rule (wet tyres waive it). Absent: no minimum."
         },
         "refuelling": {
           "type": "boolean",

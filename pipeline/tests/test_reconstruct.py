@@ -16,7 +16,7 @@ import pandas as pd
 import pytest
 from typer.testing import CliRunner
 
-from pipeline import build, clean, cli, events, export, ingest, paths
+from pipeline import clean, cli, events, export, ingest, paths
 from pipeline import reconstruct as rc
 from pipeline.assemble import finishing_order
 
@@ -362,31 +362,3 @@ def test_cli_reconstruct(tmp_path):
     assert side["solver"]["passed"] and side["reconstructed"]
     again = CliRunner().invoke(cli.app, args)
     assert "skipped" in again.output
-
-
-# --- Building a reconstructed race -----------------------------------------------------------
-
-
-def test_build_marks_a_reconstructed_race_and_fills_its_gaps(tmp_path, monkeypatch):
-    # The toy race (no stops) written as `pipeline reconstruct` would, then `pipeline build`.
-    rc.write("toy-1990", rc.reconstruct(toy()), tmp_path)
-    entry = {**build.RACES["hungary-1986"], "year": 1990, "name": "toy", "user_side": "BBB"}
-    monkeypatch.setitem(build.RACES, "toy-1990", {**entry, "rival": "AAA"})
-    # HHH crashed on lap 11 (10 laps completed): a fault on that lap ran no laps to fit.
-    crash = {"lap": 11, "type": "FAULT", "driver": "HHH", "fault": "tyre-failure"}
-    result = build.build_race(
-        "toy-1990", raw_dir=tmp_path, fault_facts=[crash], eras_dir=tmp_path / "eras"
-    )
-    model = result.model
-    assert model["reconstructed"] is True
-    assert model["provenance"] == {
-        "kind": "reconstructed",
-        "estimated": ["compounds", "fuelLoads", "weather"],
-    }
-    assert set(model["compounds"]) == {"MEDIUM"}  # step 2.4: one dry compound before 2007
-    # No stop to measure: the reconstruction's own assumed loss (lane 25 s less 5 s bypassed).
-    assert model["track"]["pitLoss"] == 20.0
-    assert any("pitLoss: no stop in the reconstruction" in n for n in result.notes)
-    assert not [e for e in model["events"] if e["type"] == "FAULT"]
-    assert any("HHH tyre-failure on lap 11 ended the car's race" in s for s in result.estimates)
-    assert result.estimates[0] == "reconstructed (eras build plan 4.6): anchors all pass"

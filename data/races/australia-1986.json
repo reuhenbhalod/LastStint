@@ -488,6 +488,14 @@
   ],
   "userSide": "MAN",
   "rival": "PRO",
+  "provenance": {
+    "kind": "reconstructed",
+    "estimated": [
+      "compounds",
+      "fuelLoads",
+      "weather"
+    ]
+  },
   "rules": {
     "twoCompound": false,
     "tyreChanges": true,
@@ -497,14 +505,6 @@
     "ers": "none",
     "refuelling": false,
     "fuelLimit": 165.75
-  },
-  "provenance": {
-    "kind": "reconstructed",
-    "estimated": [
-      "compounds",
-      "fuelLoads",
-      "weather"
-    ]
   },
   "reconstructed": true
 }

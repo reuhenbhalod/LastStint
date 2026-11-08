@@ -201,6 +201,9 @@ def _lengths_from_parquet(race_id: str, raw_dir: Path) -> tuple[list[int], list[
 def raw_counts(circuit_of: dict[tuple[str, int], str], raw_dir: Path = RAW_DIR) -> list[RaceCount]:
     out = []
     for path in sorted(raw_dir.glob("*.status.json")):
+        # A reconstructed race's laps are synthetic (reconstruct.py): not evidence of a rate.
+        if (raw_dir / path.name.replace(".status.json", ".reconstruction.json")).exists():
+            continue
         race_id = path.name.removesuffix(".status.json")
         timeline = json.loads(path.read_text())
         if not timeline:

@@ -1,0 +1,15 @@
+{
+ "race": "hungary-2021",
+ "scheduledLaps": 70,
+ "completedLaps": 70,
+ "timing": "FastF1",
+ "redFlags": [
+  {
+   "lap": 2,
+   "restart": "standing",
+   "restartScLaps": 0,
+   "source": "FastF1 timing in the project cache (cache/2021/2021-08-01_Hungarian_Grand_Prix): leader HAM's lap 2 TrackStatus '45' (SC then red; 'Red' at session time 01:06:15); Wikipedia, 'List of red-flagged Formula One races' (https://en.wikipedia.org/wiki/List_of_red-flagged_Formula_One_races): lap 2 (citing L. Smith, motorsport.com, 1 Aug 2021); H. Southwell, RaceFans, 1 Aug 2021: 'Hamilton was set to lead the grid on the standing restart' (https://www.racefans.net/?p=458971); D. Tobin, Motor Sport, 1 Aug 2021: 'a lone Mercedes taking the start on lap four' (https://www.motorsportmagazine.com/articles/single-seaters/f1/esteban-ocon-dodges-chaotic-start-to-win-the-2021-hungarian-gp-as-it-happened/)",
+   "note": "Conflict: L. Smith, Autosport, 1 Aug 2021 says 'red flagged on lap 3' (https://www.autosport.com/f1/news/hungarian-gp-red-flagged-as-bottas-takes-out-norris-verstappen/6640466/); Wikipedia's race article: 'After following two laps under the safety car, the race was red-flagged'. Lap 2 taken: the race's own timing shows the red status on the leader's lap 2. Jolpica: leader's lap 3 holds the stoppage (1591s); standing restart on lap 4, every car but Hamilton started from the pit lane after pitting for slicks at the end of the formation lap."
+  }
+ ]
+}

@@ -1158,6 +1158,101 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
+    # Eras wave B (build plan 5.1): Era 2 races reconstructed from their anchors (`pipeline
+    # reconstruct`, step 4.6: Jolpica results, F1DB fastest laps, sourced stops in
+    # data/reconstruction/<id>.json). Checked on their anchors instead of G1; the build marks
+    # them reconstructed (reconstruct.mark_model). Duels from the Eras spec's race table (§4).
+    "japan-1989": {
+        "year": 1989,
+        "event": "Japan",
+        "source": "reconstruct",
+        "name": "Japan 1989: Senna vs Prost",
+        "era": "1988-1993",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "SENA",
+        "rival": "PRO",  # the title collision on lap 47 (real: Prost out, Senna disqualified)
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "united-states-1990": {
+        "year": 1990,
+        "event": "United States",
+        "source": "reconstruct",
+        "name": "United States 1990: Alesi vs Senna",
+        "era": "1988-1993",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "ALE",
+        "rival": "SENA",  # Alesi holds off Senna (real: Senna passes, wins)
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "mexico-1990": {
+        "year": 1990,
+        "event": "Mexico",
+        "source": "reconstruct",
+        "name": "Mexico 1990: Prost vs Mansell",
+        "era": "1988-1993",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "PRO",
+        "rival": "MAN",  # Prost from P13 to the win; Mansell the car behind at the flag
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "brazil-1991": {
+        "year": 1991,
+        "event": "Brazil",
+        "source": "reconstruct",
+        "name": "Brazil 1991: Senna vs Patrese",
+        "era": "1988-1993",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "SENA",
+        "rival": "PAT",  # Senna holds P1 (real: stuck in sixth late on, wins); Patrese P2
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "monaco-1992": {
+        "year": 1992,
+        "event": "Monaco",
+        "source": "reconstruct",
+        "name": "Monaco 1992: Mansell vs Senna",
+        "era": "1988-1993",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "MAN",
+        "rival": "SENA",  # Mansell pits on lap 71 and chases Senna (real: P2 by 0.2 s)
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "hungary-1992": {
+        "year": 1992,
+        "event": "Hungary",
+        "source": "reconstruct",
+        "name": "Hungary 1992: Mansell vs Berger",
+        "era": "1988-1993",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "MAN",
+        "rival": "BER",  # Mansell P2 or better for the title after his lap-61 stop; Berger P3
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "australia-1993": {
+        "year": 1993,
+        "event": "Australia",
+        "source": "reconstruct",
+        "name": "Australia 1993: Senna vs Prost",
+        "era": "1988-1993",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "SENA",
+        "rival": "PRO",  # Senna holds P1 in his last win; Prost P2
+        "score_positions": 6,
+        "split": "eras",
+    },
     # Eras wave B (build plan 5.1): reconstructed races, 1984-1988 (`pipeline reconstruct`,
     # step 4.6: synthetic laps solved to Jolpica's results, F1DB's fastest laps and the
     # sourced stops of data/reconstruction/<id>.json). No safety cars before 1993, no
@@ -1166,7 +1261,7 @@ RACES: dict[str, dict] = {
     "portugal-1984": {
         "year": 1984,
         "event": "Portuguese",
-        "source": "reconstructed",
+        "source": "reconstruct",
         "name": "Portugal 1984: Lauda vs Prost",
         "era": "1988-1993",
         "takeover_lap": None,  # D3 rule
@@ -1179,7 +1274,7 @@ RACES: dict[str, dict] = {
     "san-marino-1985": {
         "year": 1985,
         "event": "San Marino",
-        "source": "reconstructed",
+        "source": "reconstruct",
         "name": "San Marino 1985: Senna vs De Angelis",
         "era": "1988-1993",
         "takeover_lap": None,  # D3 rule
@@ -1197,7 +1292,7 @@ RACES: dict[str, dict] = {
     "mexico-1986": {
         "year": 1986,
         "event": "Mexican",
-        "source": "reconstructed",
+        "source": "reconstruct",
         "name": "Mexico 1986: Berger vs Prost",
         "era": "1988-1993",
         "takeover_lap": None,  # D3 rule
@@ -1210,7 +1305,7 @@ RACES: dict[str, dict] = {
     "hungary-1986": {
         "year": 1986,
         "event": "Hungarian",
-        "source": "reconstructed",
+        "source": "reconstruct",
         "name": "Hungary 1986: Piquet vs Senna",
         "era": "1988-1993",
         "takeover_lap": None,  # D3 rule
@@ -1223,7 +1318,7 @@ RACES: dict[str, dict] = {
     "australia-1986": {
         "year": 1986,
         "event": "Australian",
-        "source": "reconstructed",
+        "source": "reconstruct",
         "name": "Australia 1986: Mansell vs Prost",
         "era": "1988-1993",
         "takeover_lap": None,  # D3 rule
@@ -1236,7 +1331,7 @@ RACES: dict[str, dict] = {
     "great-britain-1987": {
         "year": 1987,
         "event": "British",  # `pipeline reconstruct great-britain-1987 --event British`
-        "source": "reconstructed",
+        "source": "reconstruct",
         "name": "Britain 1987: Mansell vs Piquet",
         "era": "1988-1993",
         "takeover_lap": None,  # D3 rule
@@ -1249,7 +1344,7 @@ RACES: dict[str, dict] = {
     "monaco-1988": {
         "year": 1988,
         "event": "Monaco",
-        "source": "reconstructed",
+        "source": "reconstruct",
         "name": "Monaco 1988: Senna vs Prost",
         "era": "1988-1993",
         "takeover_lap": None,  # D3 rule
@@ -1278,28 +1373,17 @@ def load_sidecar(race_id: str, raw_dir: Path = RAW_DIR) -> dict | None:
 
 def load_reconstruction(race_id: str, raw_dir: Path = RAW_DIR) -> dict | None:
     """The race's reconstruction sidecar (<race-id>.reconstruction.json, `pipeline
-    reconstruct`, eras build plan 4.6), if its laps are reconstructed."""
+    reconstruct`), if it was rebuilt from its anchors (a 1983-1995 race)."""
     path = reconstruct.sidecar_path(race_id, Path(raw_dir))
     return json.loads(path.read_text()) if path.exists() else None
 
 
-def reconstructed_laps(laps: pd.DataFrame, recon: dict) -> tuple[pd.DataFrame, list[str]]:
-    """A reconstructed race's laps with step 2.4's compound estimate filled in (the
-    reconstruction leaves Compound empty for it; the SC laps are the sourced ones, so they
-    aren't estimated), and the report lines: the anchors' pass/fail and the estimate."""
-    year = int(recon["year"])
+def reconstructed_laps(laps: pd.DataFrame, year: int) -> pd.DataFrame:
+    """A reconstructed race's synthetic laps with their compounds filled as step 2.4 does
+    (one dry compound before 2007): the reconstruction leaves Compound empty."""
     era = estimates.era_for_year(year)
-    refuelling = year >= reconstruct.REFUEL_FROM
-    comp = estimates.estimate_compounds(laps, year, estimates.burn_per_lap(era), refuelling)
-    passed = recon["solver"]["passed"]
-    failed = [f"{r['anchor']} {r['subject']}" for r in reconstruct.failures(recon["anchors"])]
-    lines = [
-        "reconstructed (eras build plan 4.6): anchors "
-        + ("all pass" if passed else f"FAIL: {'; '.join(failed)}"),
-        f"  compounds: {comp.method}",
-        *[f"    {n}" for n in comp.notes],
-    ]
-    return comp.laps, lines
+    refuelling = year in estimates.REFUELLING
+    return estimates.estimate_compounds(laps, year, estimates.burn_per_lap(era), refuelling).laps
 
 
 def reconstructed_pit_loss(params: track.TrackParams, recon: dict) -> track.TrackParams:
@@ -1483,9 +1567,7 @@ def build_race(
 ) -> BuildResult:
     """Build a validated race-model dict for a registered race (or an ingested Jolpica one),
     with its build notes, its estimates applied as provenance and its Eras overlay, unless it
-    is a Daily or Gauntlet race (`shared_races`): its overlay stays out of its file. A
-    reconstructed race (a <race-id>.reconstruction.json beside its snapshot) gets its compounds
-    estimated (step 2.4) and is marked reconstructed (`reconstruct.mark_model`).
+    is a Daily or Gauntlet race (`shared_races`): its overlay stays out of its file.
     `raw_dir`: where its snapshot lives; `fault_facts`: its car faults (default: its FAULT
     items in data/incidents.json); `pools_path`: the pools file naming the shared races."""
     if laps is None:
@@ -1495,20 +1577,21 @@ def build_race(
     # red-flag timing (TUM, Jolpica) can't show.
     red_flags = redflag.load_entries(race_id, raw_dir)
     laps = redflag.mark_hand_entries(laps, red_flags)
-    recon = load_reconstruction(race_id, raw_dir)
-    recon_lines: list[str] = []
-    if recon is not None:
-        laps, recon_lines = reconstructed_laps(laps, recon)
     if fault_facts is None:
         fault_facts = incidents.fault_facts(race_id)
-    # A fault that ended its car's race on its own lap ran no laps to fit a magnitude from:
-    # the model replays it as the car's retirement (faults.ends_race).
-    ended = [f for f in fault_facts if faults.ends_race(f, laps)]
-    fault_facts = [f for f in fault_facts if f not in ended]
+    # A race rebuilt from its anchors (step 4.6): its compounds are filled here, and its file
+    # is marked reconstructed with the sidecar's provenance (eras build plan 5.1).
+    recon = load_reconstruction(race_id, raw_dir)
+    unfitted: list[dict] = []
+    if recon is not None:
+        laps = reconstructed_laps(laps, int(recon["year"]))
+        # A fault's magnitude is fitted from the car's real laps (faults.py); a reconstructed
+        # race's laps are synthetic, solved to the anchors with no fault in them, so a fit
+        # would only read back the solver's noise. Its faults stay out until a sourced loss is
+        # built into the faulted car's laps (reported, never guessed).
+        unfitted, fault_facts = fault_facts, []
     block = (load_sidecar(race_id, raw_dir) or {}).get("estimates")
-    refuelling = "fuelLoads" in (block or {}).get("estimated", []) or (
-        recon is not None and int(recon["year"]) >= reconstruct.REFUEL_FROM
-    )
+    refuelling = "fuelLoads" in (block or {}).get("estimated", [])
 
     dry = dry_fit(race_id, laps, meta["era"], fault_facts, raw_dir, refuelling)
     clean_df, traffic_df, fitted = dry.clean, dry.traffic, dry.fitted
@@ -1551,7 +1634,10 @@ def build_race(
         red_flags=red_flags,
     )
     estimated = list((block or {}).get("estimated", []))
-    if lap_time_weather(dry.rain):
+    if recon is not None:
+        estimated += [f for f in recon["provenance"].get("estimated", []) if f not in estimated]
+    fitted_weather = lap_time_weather(dry.rain)
+    if fitted_weather:
         estimated.append("weather")  # step 4.5: the wetness is fitted from the lap times
     overlay = load_overlay(race_id, eras_dir)
     shared = overlay is not None and race_id in shared_races(pools_path)
@@ -1572,23 +1658,22 @@ def build_race(
     else:
         model, overlay_lines = apply_eras(model, estimated, overlay)
     if recon is not None:
-        # Kind "reconstructed", with the reconstruction's estimated fields merged in.
-        prov = estimates.provenance(
-            [*model.get("provenance", {}).get("estimated", []), *recon["provenance"]["estimated"]],
-            {"kind": "reconstructed"},
-        )
+        # The sidecar's estimated fields merged with the overlay's (apply_eras), kind
+        # reconstructed.
+        prov = {**model["provenance"], "kind": "reconstructed"}
         model = reconstruct.mark_model(model, {"provenance": prov})
-    report = [
-        *recon_lines,
-        *(estimates.report_lines(block) if block else []),
-        *overlay_lines,
-        *[
-            f"fault: {f['driver']} {f['fault']} on lap {f['lap']} ended the car's race on that"
-            " lap: replayed as its retirement (no laps run with it to fit)"
-            for f in ended
-        ],
-    ]
-    if "weather" in estimated:
+    report = [*(estimates.report_lines(block) if block else []), *overlay_lines]
+    if recon is not None:
+        report.append(
+            f"reconstructed (step 4.6): all anchors pass: {recon['solver']['passed']};"
+            f" estimated {', '.join(model['provenance'].get('estimated', []))}"
+        )
+        for f in unfitted:
+            report.append(
+                f"  fault not modelled: lap {f['lap']} {f['driver']} {f['fault']} (synthetic"
+                " laps can't fit its loss; no sourced magnitude)"
+            )
+    if fitted_weather:
         report.append("estimated: weather (wet laps from the lap times, `pipeline wet-laps`)")
     if refuelling:
         report.append(

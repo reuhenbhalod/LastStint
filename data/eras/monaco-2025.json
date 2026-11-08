@@ -6,6 +6,7 @@
     "vsc": true,
     "drs": true,
     "ers": "hybrid",
+    "minStops": 2,
     "refuelling": false
   }
 }

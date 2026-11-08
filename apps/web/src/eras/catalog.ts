@@ -211,15 +211,18 @@ export function raceName(raceId: string): string {
 }
 
 /**
- * The Eras route a path is on: the era map (`/eras`), an era's detail (`/eras/<eraId>`), one
- * of its races (`/eras/<eraId>/<raceId>`, or `…/legend` at Legend difficulty), or `null` when
- * the path isn't an Eras path. An era or race that isn't known gives `{ kind: 'unknown' }` so
- * the screen can say so.
+ * The Eras route a path is on: the era map (`/eras`), the history book (`/eras/history`), an
+ * era's detail (`/eras/<eraId>`), one of its races (`/eras/<eraId>/<raceId>`, or `…/legend` at
+ * Legend difficulty), a race's leaderboard (`…/<raceId>/leaderboard`, or
+ * `…/leaderboard/legend` for its Legend board), or `null` when the path isn't an Eras path. An
+ * era or race that isn't known gives `{ kind: 'unknown' }` so the screen can say so.
  */
 export type ErasRoute =
   | { kind: 'map' }
+  | { kind: 'history' }
   | { kind: 'era'; era: EraInfo }
   | { kind: 'race'; era: EraInfo; race: EraRaceInfo; legend: boolean }
+  | { kind: 'leaderboard'; era: EraInfo; race: EraRaceInfo; legend: boolean }
   | { kind: 'unknown'; segment: string };
 
 /** The path a race card links to: the race, at the era's difficulty or at Legend. */
@@ -227,16 +230,24 @@ export function eraRacePath(race: EraRaceInfo, legend: boolean): string {
   return `/eras/${race.eraId}/${race.raceId}${legend ? '/legend' : ''}`;
 }
 
+/** The history book's path. */
+export const HISTORY_PATH = '/eras/history';
+
+/** A race's leaderboard: the normal board, or the Legend one. */
+export function eraLeaderboardPath(race: Pick<EraRaceInfo, 'eraId' | 'raceId'>, legend: boolean) {
+  return `/eras/${race.eraId}/${race.raceId}/leaderboard${legend ? '/legend' : ''}`;
+}
+
 export function erasRoute(pathname: string): ErasRoute | null {
-  const m = /^\/eras(?:\/([^/]+)(?:\/([^/]+)(\/legend)?)?)?\/?$/.exec(pathname);
+  if (/^\/eras\/history\/?$/.test(pathname)) return { kind: 'history' };
+  const m = /^\/eras(?:\/([^/]+)(?:\/([^/]+)(\/leaderboard)?(\/legend)?)?)?\/?$/.exec(pathname);
   if (!m) return null;
-  const [, segment, raceSegment, legend] = m;
+  const [, segment, raceSegment, board, legend] = m;
   if (segment === undefined) return { kind: 'map' };
   const era = /^\d+$/.test(segment) ? eraById(Number(segment)) : undefined;
   if (!era) return { kind: 'unknown', segment };
   if (raceSegment === undefined) return { kind: 'era', era };
   const race = racesOfEra(era.id).find((r) => r.raceId === raceSegment);
-  return race
-    ? { kind: 'race', era, race, legend: legend !== undefined }
-    : { kind: 'unknown', segment: `${segment}/${raceSegment}` };
+  if (!race) return { kind: 'unknown', segment: `${segment}/${raceSegment}` };
+  return { kind: board ? 'leaderboard' : 'race', era, race, legend: legend !== undefined };
 }

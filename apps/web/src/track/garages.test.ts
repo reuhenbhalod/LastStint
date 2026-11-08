@@ -56,6 +56,18 @@ describe('garages', () => {
     expect(garagesFor(2021).at(-2)).toEqual(['Red Bull Racing', 'RBR']);
   });
 
+  it('1989-1993: the previous champions nearest the exit; renamed teams keep their place', () => {
+    expect(garagesFor(1989).at(-1)).toEqual(['McLaren', 'MCL']);
+    expect(garagesFor(1993).at(-1)).toEqual(['Williams', 'WIL']);
+    expect(garagesFor(1993)[0]).toEqual(['Sauber', 'SAU']); // new in 1993
+    // March (1989 12th) races as Leyton House in 1990, in March's place.
+    expect(garagesFor(1990).findIndex(([t]) => t === 'Leyton House')).toBe(17 - 12);
+    // 1991's Larrousse, under whichever name the race uses.
+    expect(garagesFor(1991, ['Lola'])).toContainEqual(['Lola', 'LOL']);
+    expect(garagesFor(1991, ['Larrousse'])).toContainEqual(['Larrousse', 'LAR']);
+    expect(garagesFor(1992).find(([t]) => t === 'Team Lotus')).toEqual(['Team Lotus', 'LOT']);
+  });
+
   it("has a garage for every team in every race, under the race's own team names", () => {
     for (const file of readdirSync(races).filter((f) => f.endsWith('.json'))) {
       const model = JSON.parse(readFileSync(join(races, file), 'utf8')) as {

@@ -12,6 +12,7 @@ import copy
 import json
 import os
 from pathlib import Path
+from types import SimpleNamespace
 
 import pandas as pd
 import pytest
@@ -79,7 +80,7 @@ def _cases() -> list[dict]:
             "strategies": _abu_strategies(abu),
         },
         {
-            "name": "canada-2024 refuelling, no fit (the pooled prior), wet stops",
+            "name": "canada-2024 refuelling, no fit (the physical prior), wet stops",
             "race": "canada-2024",
             "rules": {"refuelling": True},
         },
@@ -238,15 +239,73 @@ def test_hungary_1998_fill_rate():
     fit = refuel.fit_fill_rate(_hungary_1998())
     own = refuel.race_slope(_hungary_1998())
     lo, hi = sorted((own["slope"], refuel.PRIOR_SECONDS_PER_LAP))
-    assert lo <= fit["secondsPerLap"] <= hi  # shrunk between the race and the pool
+    assert lo <= fit["secondsPerLap"] <= hi  # shrunk between the race and the prior
+    assert fit["secondsPerLap"] == pytest.approx(refuel.PRIOR_SECONDS_PER_LAP, abs=0.015)
     assert fit["tankLaps"] == 33 and fit["stops"] >= 30
-    assert 25 < fit["laneBase"] < 32
+    # mean lane ~30.5 s less 0.24 s x a 23.6-lap mean fill
+    assert 23 < fit["laneBase"] < 27
 
 
-def test_the_pooled_prior_is_current():
+def test_the_prior_is_the_physical_fill_rate():
+    # ~3 L a lap of fuel through a ~12 L/s rig.
+    assert refuel.PRIOR_SECONDS_PER_LAP == pytest.approx(3.0 / 12.0) == 0.25
+    assert refuel.PRIOR_SD == 0.01
+    assert "an estimate" in refuel.FILL_RATE_METHOD and "0.25 s" in refuel.FILL_RATE_METHOD
+
+
+def test_the_stops_pooled_slope_is_current():
+    """For the record: what the stops alone say, a quarter of the physical rate."""
     mu, tau = refuel.pooled_prior()
-    assert mu == pytest.approx(refuel.PRIOR_SECONDS_PER_LAP, abs=5e-5)
-    assert tau == pytest.approx(refuel.PRIOR_TAU, abs=5e-5)
+    assert mu == pytest.approx(refuel.POOLED_SLOPE, abs=5e-5)
+    assert tau == pytest.approx(refuel.POOLED_TAU, abs=5e-5)
+    assert mu < refuel.PRIOR_SECONDS_PER_LAP / 3
+
+
+def test_no_single_race_pulls_the_rate_back_toward_the_pooled_slope():
+    """Every refuelling race in data/raw/f1db keeps its rate within 0.06 s of the prior (the
+    most precise, europe-2007, has a negative slope: 0.20), and a precise race at the
+    stops' pooled slope (0.0648, se 0.025) stays above 0.22."""
+    rates = {}
+    for path in sorted(refuel.F1DB_DIR.glob("*.stops.csv")):
+        race = path.name.split(".")[0]
+        if int(race.rsplit("-", 1)[1]) not in refuel.REFUEL_YEARS:
+            continue
+        rates[race] = refuel.fit_fill_rate(refuel.stints_from_stops(pd.read_csv(path)))[
+            "secondsPerLap"
+        ]
+    assert len(rates) >= 25
+    assert min(rates.values()) > 0.19 and max(rates.values()) < 0.27
+    assert sorted(rates.values())[len(rates) // 2] == pytest.approx(0.25, abs=0.005)
+    # A synthetic race whose 40 stops sit exactly on the pooled slope, se ~0.025.
+    stints = pd.DataFrame({"number": range(40), "lap": 20, "stint": [10, 30] * 20})
+    noise = [1.6, -1.6, -1.6, 1.6] * 10
+    stints["lane"] = [
+        25 + refuel.POOLED_SLOPE * n + e for n, e in zip(stints["stint"], noise, strict=True)
+    ]
+    assert 0.02 < refuel.race_slope(stints)["se"] < 0.03
+    assert refuel.fit_fill_rate(stints)["secondsPerLap"] > 0.22
+
+
+def test_a_long_fill_costs_4_to_5_s_more_than_a_short_one_at_a_typical_stop():
+    """Hungary 1998 (77 laps, a 33-lap tank, its own fit): a first stop out on lap 30 has 48
+    laps to go. Long brims the tank (33 laps), short splits the 48 over three stints (16): 17
+    laps more fuel at ~0.25 s a lap."""
+    fit = refuel.fit_fill_rate(_hungary_1998())
+    model = {
+        "rules": {"refuelling": True},
+        "race": {"laps": 77, "takeoverLap": 1},
+        "track": {"refuel": fit},
+        "drivers": [],
+    }
+    cost = {}
+    for choice in ("short", "long"):
+        # The car comes in with the reserve lap left.
+        car = SimpleNamespace(code="AAA", strategy=[], tank=1.0, race_laps=77)
+        cost[choice] = refuel.refuel_at_stop(model, car, {"lap": 29, "fill": choice}, 30)
+        assert car.tank == refuel.fill_stint(choice, 48, 33) + refuel.RESERVE_LAPS
+    assert 4.0 <= cost["long"] - cost["short"] <= 5.0
+    # Before (the stops' pooled slope) the same choice cost about 1 s.
+    assert refuel.POOLED_SLOPE * 17 < 1.2
 
 
 def test_a_race_without_a_slope_takes_the_prior():

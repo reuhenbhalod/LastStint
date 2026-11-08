@@ -3,7 +3,7 @@
  "source": "lap-times",
  "neutralSource": "status",
  "filled": [
-  "Compound: each stint's tyre class fitted from the lap times; slick stints keep step 2.4's dry compound"
+  "Compound: each stint's tyre class fitted from the lap times; dry stints keep step 2.4's estimated compound"
  ],
  "wetSpells": [
   "1-9"

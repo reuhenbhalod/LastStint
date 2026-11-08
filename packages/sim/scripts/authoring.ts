@@ -8,10 +8,11 @@ import {
   type MomentOption,
   candidateMoments,
   pauseAt,
+  pitCompounds,
   verdictFor,
 } from '../src/moments.js';
 import type { Decision, RaceModel } from '../src/types.js';
-import { wetnessOn } from '../src/weather.js';
+import { isWetTyre, wetnessOn } from '../src/weather.js';
 
 const MAX_MOMENTS = 6;
 const MIN_SPACING = 3;
@@ -57,19 +58,23 @@ export function authorMoments(
   /** A finder stop call, re-offered the Abu Dhabi way. */
   function stopCall(m: DecisionMoment): DecisionMoment {
     const lap = m.lap;
-    const compounds = Object.keys(model.compounds);
+    // Era rules: only the tyres a pit call may name (no tyre changes: the set it's on, or wets).
+    const compounds = pitCompounds(model);
     const next = lap + 1 < model.race.laps;
     // Box next lap: under a neutralization that runs another lap, or a green call (one more lap
     // on these tyres).
     const nextOk = next && (neutral.has(lap) ? neutral.has(lap + 1) : true);
     // A wet race: the tyre for the track next lap (inters as it turns wet, wets when soaked).
     const wetNext = model.weather ? wetnessOn(model.weather.wetness, lap + 1) : 0;
-    const nextCompound =
+    const wanted =
       wetNext >= 0.6 && model.compounds.WET
         ? 'WET'
         : wetNext >= 0.05 && model.compounds.INTERMEDIATE
           ? 'INTERMEDIATE'
           : (lasting(lap + 1).at(-1) as string);
+    const nextCompound = compounds.includes(wanted)
+      ? wanted
+      : ((compounds.find((c) => !isWetTyre(c)) ?? compounds[0]) as string);
     const options: MomentOption[] = [
       { id: 'stay', label: 'Stay out', decisions: [] },
       ...compounds.map((c) => ({

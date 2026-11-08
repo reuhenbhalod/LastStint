@@ -67,7 +67,16 @@ test('plays an Eras race and shows its stars, rewrite and the way on', async ({ 
       });
     }
     if (url.pathname === '/api/eras/races/abu-dhabi-2021/stats') {
-      return route.fulfill({ json: { rewriteShare: 0.09 } });
+      // The Worker's RaceStats (step 7.4): 9 of 100 players rewrote it.
+      const rates = { players: 100, result: 0, strategist: 0, mastery: 0, hidden: 0 };
+      return route.fulfill({
+        json: {
+          raceId: 'abu-dhabi-2021',
+          rewrite: { players: 100, rewrites: 9, share: 0.09 },
+          stars: rates,
+          legendStars: rates,
+        },
+      });
     }
     return route.fulfill({ status: 404, json: { error: 'not-found' } });
   });

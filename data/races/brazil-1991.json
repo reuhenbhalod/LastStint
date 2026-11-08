@@ -1,0 +1,422 @@
+{
+  "schemaVersion": 11,
+  "race": {
+    "id": "brazil-1991",
+    "name": "Brazil 1991: Senna vs Patrese",
+    "laps": 71,
+    "takeoverLap": 32,
+    "seed": 1
+  },
+  "era": "1988-1993",
+  "track": {
+    "pitLoss": 19.574,
+    "pitLossUnderSC": 10.766,
+    "pitLossUnderVSC": 13.506,
+    "pitLossDeviations": [
+      -1.784,
+      0.0,
+      0.347
+    ],
+    "overtakeDifficulty": 0.7474,
+    "overtakeModel": {
+      "intercept": -0.1508,
+      "paceCoef": 0.456,
+      "gapCoef": -1.1851
+    },
+    "dirtyAirPenalty": 0.0515,
+    "greenLapTime": 85.009
+  },
+  "compounds": {
+    "MEDIUM": {
+      "offset": 0.0,
+      "degPerLap": 0.03457,
+      "cliffLap": 71,
+      "provenLaps": 71
+    }
+  },
+  "drivers": [
+    {
+      "code": "ALE",
+      "team": "Ferrari",
+      "basePace": 83.7161,
+      "noise": 1.128,
+      "stateAtTakeover": {
+        "position": 6,
+        "gapAhead": 11.709,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BEN",
+      "team": "Larrousse",
+      "basePace": 86.1533,
+      "noise": 0.6839,
+      "stateAtTakeover": {
+        "position": 13,
+        "gapAhead": 0.914,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BER",
+      "team": "McLaren",
+      "basePace": 83.7861,
+      "noise": 0.4538,
+      "stateAtTakeover": {
+        "position": 4,
+        "gapAhead": 3.943,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BLU",
+      "team": "Brabham",
+      "basePace": 90.0217,
+      "noise": 1.8094,
+      "stateAtTakeover": {
+        "position": 17,
+        "gapAhead": 36.147,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BOUT",
+      "team": "Ligier",
+      "basePace": 88.5651,
+      "noise": 2.084,
+      "stateAtTakeover": {
+        "position": 11,
+        "gapAhead": 12.164,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BRU",
+      "team": "Brabham",
+      "basePace": 88.2111,
+      "noise": 1.3414,
+      "stateAtTakeover": {
+        "position": 18,
+        "gapAhead": 6.36,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "COM",
+      "team": "Ligier",
+      "basePace": 86.2347,
+      "noise": 0.796,
+      "stateAtTakeover": {
+        "position": 15,
+        "gapAhead": 10.629,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "GAC",
+      "team": "Jordan",
+      "basePace": 86.9356,
+      "noise": 1.5558,
+      "stateAtTakeover": {
+        "position": 7,
+        "gapAhead": 3.117,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "HAK",
+      "team": "Team Lotus",
+      "basePace": 88.8566,
+      "noise": 2.3502,
+      "stateAtTakeover": {
+        "position": 10,
+        "gapAhead": 1.96,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "MAN",
+      "team": "Williams",
+      "basePace": 83.5885,
+      "noise": 0.551,
+      "stateAtTakeover": {
+        "position": 3,
+        "gapAhead": 2.897,
+        "compound": "MEDIUM",
+        "tyreAge": 7,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 51,
+          "to": "MEDIUM",
+          "loss": 18.621
+        }
+      ]
+    },
+    {
+      "code": "MAR",
+      "team": "Minardi",
+      "basePace": 85.4844,
+      "noise": 0.7242,
+      "stateAtTakeover": {
+        "position": 12,
+        "gapAhead": 4.067,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "MOE",
+      "team": "Benetton",
+      "basePace": 85.3238,
+      "noise": 0.5731,
+      "stateAtTakeover": {
+        "position": 9,
+        "gapAhead": 19.557,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "MOR",
+      "team": "Minardi",
+      "basePace": 85.8842,
+      "noise": 0.7688,
+      "stateAtTakeover": {
+        "position": 14,
+        "gapAhead": 14.441,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "PAT",
+      "team": "Williams",
+      "basePace": 83.8823,
+      "noise": 0.8052,
+      "stateAtTakeover": {
+        "position": 2,
+        "gapAhead": 11.305,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "PIQN",
+      "team": "Benetton",
+      "basePace": 83.9355,
+      "noise": 0.7488,
+      "stateAtTakeover": {
+        "position": 5,
+        "gapAhead": 10.815,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "PIR",
+      "team": "Dallara",
+      "basePace": 87.0367,
+      "noise": 1.0307,
+      "stateAtTakeover": {
+        "position": 16,
+        "gapAhead": 34.892,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "PRO",
+      "team": "Ferrari",
+      "basePace": 83.9805,
+      "noise": 0.6923,
+      "stateAtTakeover": {
+        "position": 8,
+        "gapAhead": 3.842,
+        "compound": "MEDIUM",
+        "tyreAge": 15,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "SENA",
+      "team": "McLaren",
+      "basePace": 84.0643,
+      "noise": 0.9652,
+      "stateAtTakeover": {
+        "position": 1,
+        "gapAhead": 0.0,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    }
+  ],
+  "fuelEffectPerLap": 0.056,
+  "freshTyre": {
+    "bonus": -0.1241,
+    "laps": 3
+  },
+  "events": [
+    {
+      "lap": 35,
+      "type": "RETIREMENT",
+      "driver": "BEN"
+    },
+    {
+      "lap": 37,
+      "type": "RETIREMENT",
+      "driver": "BLU"
+    },
+    {
+      "lap": 49,
+      "type": "RETIREMENT",
+      "driver": "MAR"
+    },
+    {
+      "lap": 52,
+      "type": "RETIREMENT",
+      "driver": "COM"
+    },
+    {
+      "lap": 59,
+      "type": "RETIREMENT",
+      "driver": "MAN"
+    },
+    {
+      "lap": 65,
+      "type": "RETIREMENT",
+      "driver": "GAC"
+    }
+  ],
+  "decisionMoments": [],
+  "candidateMomentLaps": [
+    51
+  ],
+  "realResult": [
+    "SENA",
+    "PAT",
+    "BER",
+    "PRO",
+    "PIQN",
+    "ALE",
+    "MOE",
+    "MOR",
+    "HAK",
+    "BOUT",
+    "PIR",
+    "BRU",
+    "GAC",
+    "MAN",
+    "COM",
+    "MAR",
+    "BLU",
+    "BEN",
+    "JAR",
+    "DEC",
+    "MOD",
+    "CAP",
+    "NAKS",
+    "GUG",
+    "SUZ",
+    "TAR"
+  ],
+  "userSide": "SENA",
+  "rival": "PAT",
+  "provenance": {
+    "kind": "reconstructed",
+    "estimated": [
+      "compounds",
+      "fuelLoads",
+      "weather"
+    ]
+  },
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": false
+  },
+  "reconstructed": true
+}

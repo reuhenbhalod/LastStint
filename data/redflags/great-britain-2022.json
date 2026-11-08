@@ -1,0 +1,14 @@
+{
+ "race": "great-britain-2022",
+ "scheduledLaps": 52,
+ "completedLaps": 52,
+ "timing": "FastF1",
+ "redFlags": [
+  {
+   "lap": 1,
+   "restart": "standing",
+   "source": "Crash.net live, British GP race day, 3 July 2022: 15:56 'Race control confirm it will be a standing start', 16:03 'LAP 3/52 RACE RESTART', restart on the original grid because 'Not all cars had passed the SC2 line before the red flag' (https://www.crash.net/f1/live/live-updates-f1-british-grand-prix-race-day-silverstone?page=3); A. Kalinauckas, 'F1 British GP: Sainz takes maiden win...', Autosport, 3 July 2022: restart order 'the same as the initial grid' (https://www.autosport.com/f1/news/f1-british-gp-sainz-takes-maiden-win-in-dramatic-race-as-title-challengers-struggle/10332505/); Wikipedia, 2022 British Grand Prix: 'race suspension on lap 1' (https://en.wikipedia.org/wiki/2022_British_Grand_Prix); Wikipedia, 'List of red-flagged Formula One races' (https://en.wikipedia.org/wiki/List_of_red-flagged_Formula_One_races): lap 1",
+   "note": "Jolpica: leader's lap 2 holds the stoppage (3191s); racing restarted on lap 3 (Crash.net). The restart grid was the original starting grid, not the lap-1 order."
+  }
+ ]
+}

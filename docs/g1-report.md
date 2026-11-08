@@ -561,3 +561,385 @@ in what the build already wrote but their committed files didn't have yet: the `
 from their `data/eras` overlays (monaco-2017, monaco-2025) and `schemaVersion` 11 (miami-2025).
 Many other committed race files differ from a fresh build in the same way (schemaVersion 10, no
 `rules`); those weren't rebuilt here, since this change doesn't affect them.
+
+## Eras fix D2b: top ten on the option (2010-13) and the physical fill rate: 3 pass, 0 borderline, 5 fail
+
+Owner decisions of Nov 7 2026. Written by hand, as the sections above. Robust mode: 1,000 runs on
+each of two seed sets, values seed set 10000 / seed set 20000, limits in brackets.
+
+**1. The top ten start on the option (2010-2013).** The rule: "At the start of the race each car
+which took part in Q3 must be fitted with the tyres with which the driver set his grid time.
+This will only be necessary if dry-weather tyres were used to set the grid time and if
+dry-weather are used at the start of the race". That is FIA F1 Sporting Regulations 2010, art.
+25.4(d), and 2013, art. 25.4(e), with the same words; both texts were read from the FIA PDFs
+via web.archive.org, and 2011-12 weren't fetched. From 2014 the rule bound a Q3 car to the
+tyres of its fastest **Q2** time (2014 regulations, art. 25.4(e)). It was scrapped from 2022
+(Wikipedia, "2022 Formula One World Championship"; Motorsport.com, Feb 19 2022). So the Q3 tyre
+rule ran 2010-2013 (`estimates.Q3_TYRE_RULE`).
+
+How it's estimated:
+- `pipeline jolpica` now reads each round's Q3 classification into the sidecar (`q3`). Jolpica
+  lists a Q3 car only if it set a time there.
+- `estimates.option_starters` takes the Q3 cars that also started in the top ten.
+  - A Q3 car starting further back is left to the fit. A grid penalty kept the rule, but an
+    exclusion or a pit-lane start freed the choice (abu-dhabi-2012 VET, grid 24), and the grid
+    can't tell them apart.
+  - A 2010-13 sidecar without `q3` gets a note, not a silent skip.
+- Each of those cars' first stint is labelled SOFT (`by: "q3"`), never flipped. The rest are
+  fitted as before: the median threshold over every scored stint, then the both-compounds rule.
+
+All eight Jolpica 2010-13 races were re-ingested (`pipeline jolpica <id> --force`; `pipeline
+wet-laps <id> --force` for the three wet ones) and rebuilt. Their SC laps, status timelines,
+weather and hand-check files are unchanged. spain-2013's labels didn't change (the fit already
+had the top ten on SOFT), so its race file is the same.
+
+| Race | Top-ten first stints forced (fit alone said HARD) | Before | After | Mean gap error before -> after | Failing checks after |
+|---|---|---|---|---|---|
+| abu-dhabi-2010 | 10 (2) | fail | fail | 2.89s -> 2.93s | field ROS gap error 6.81 / 6.67 [5.00] (was 7.16 / 7.18); field KUB 7.28 / 7.18 [5.00] (was 7.33 / 7.42) |
+| china-2011 | 9 (1) | fail | fail | 3.01s -> 3.07s | duel HAM vs VET gap error 4.34 / 4.42 [3.00] and order rate 0.49 / 0.48 [0.60]; podium order rate 0.41 / 0.38 [0.50]; field MAS gap error 5.85 / 5.74 [5.00] |
+| europe-2012 | 10 (4) | pass | pass | 1.70s -> 1.45s |  |
+| abu-dhabi-2012 | 9 (7) | fail | fail | 2.61s -> 2.80s | duel VET vs BUT gap error 3.59 / 3.51 [3.00] and order rate 0.52 / 0.53 [0.60] (ALO's podium error 5.21 / 5.16 now passes) |
+| spain-2013 | 10 (0) | pass | pass | 1.71s -> 1.71s |  |
+| australia-2010 (wet) | 10 (3) | fail | fail | 3.35s -> 3.35s | field ROS gap error 11.44 / 11.03 [5.00]; field HAM 4.74 / 5.05 [5.00] (was within) |
+| brazil-2012 (wet) | 9 (3) | fail | fail | 3.32s -> 3.30s | duel VET vs ALO gap error 4.74 / 4.77 [3.00]; field VET 6.77 / 6.81 [5.00] |
+| malaysia-2013 (wet) | 10 (1) | pass | pass | 0.83s -> 0.86s |  |
+
+What changed:
+- **abu-dhabi-2012: the swapped labels are fixed.** WEB, MAL, RAI, BUT and ALO now run
+  SOFT then HARD (their second stints are now HARD), not HARD then
+  SOFT.
+  - The refitted curves: HARD offset 0.56 -> 0.61 s, SOFT wear 0.043 -> 0.048 s a lap.
+  - ALO's podium gap now passes (sim mean 5.25 s behind RAI, was 6.12; real 0.85), and BUT
+    moves closer to his real gap (8.88 s, was 9.63; real 7.79).
+  - VET's labels didn't change (his pit-lane start isn't forced: SOFT 1-13, HARD 14-37, SOFT
+    38-55). The refit costs his long hard stint, so he finishes 8.79 s back (was 8.01; real
+    4.16), level with BUT (real gap 3.6 s). The duel order is a coin flip and the duel fails.
+  - The diagnosis is still race mechanics (pace 5%, rest 95%). Whether VET really started on
+    the option isn't in the data: no knob is applied.
+- **china-2011:** HAM's first stint is now SOFT, as the 3.1c section asked. The duel barely
+  moves (4.17 -> 4.34 s), as that section's in-memory flip predicted: the late-catch timing is
+  the cause.
+- **australia-2010:** the start was wet (wet laps 1-10), so the rule didn't bind (the
+  regulation's own exception). `wet-laps` relabels the inter first stints anyway, but the
+  both-compounds rule has already run on the forced SOFT.
+  - VET's laps 10-25 went SOFT -> HARD, and WEB's last two laps likewise. WEB's laps 1-10
+    (which `wet-laps` fits as slick) went HARD -> SOFT.
+  - The refit curves put HAM's gap over the limit on one seed set (5.05).
+  - malaysia-2013 (also a wet start, wet laps 1-9) changed one stint (WEB's laps 44-56, SOFT
+    -> HARD) and moved by 0.03 s.
+  - The estimator can't see a wet start (it runs before `wet-laps`). A wet-start exemption
+    needs the wet-laps fit first, so it's reported, not built.
+- **sakhir-2020** (not rebuilt): the 2010-13 rule doesn't apply in 2020. That year's rule bound
+  the top ten to their Q2 tyre, which needn't be the softest. As a check, the rule was forced
+  in memory: the race still passes, but the mean gap error goes 0.96 -> 1.10 s. So it doesn't
+  help.
+  - The race used all three compounds (C2-C4; the race report has Bottas "on his worn hard
+    tyres" against the field's "fresher mediums" and Russell's late softs). The estimator
+    gives two, and the real fix is a three-compound estimate. **Reported, not built.**
+
+**2. The fill rate is pinned to the physical figure.** The prior is 0.25 s per lap of fuel:
+about 3 L a lap through a rig of "more than 12 litres per second" (Wikipedia, "Pit stop"),
+3 / 12 = 0.25.
+- **The prior sd is 0.01 s.** That is half the 0.22-0.27 s spread the two figures allow, and
+  it's enough that no single race's stops move it far. Fitted on each of the 30 refuelling
+  races in data/raw/f1db, the rates run from 0.199 to 0.252 s, with a median of 0.247.
+  - The most precise race (europe-2007, se 0.025, a negative slope) gives 0.20.
+  - A precise race sitting exactly on the stops' old pooled slope (0.0648) stays above 0.22
+    (tested).
+- **Both sims are updated** (refuel.py, refuel.ts) and the parity fixture is regenerated. Only
+  its no-fit case (canada-2024 on the prior) changed.
+- **A long fill costs more.** At a typical stop a long fill now costs about 4 s more than a
+  short one: Hungary 1998, out on lap 30 with 48 laps to go, fills 33 laps long and 16 short.
+  That's 4.09 s on the race's own fit (0.2405 s a lap; Python test) and 4.25 s at the prior
+  (TS test). At the old prior it was 1.1 s.
+- **It's labelled an estimate.** Provenance lists `fuelLoads` for every refuelling race; the
+  sidecar's `fuelLoads.fillRate` and the build report name the rate.
+- **G1 doesn't move:** no race file in data/races is a refuelling race yet.
+- **Reported, not fixed:** `refuel.fit_fill_rate` isn't called by the build yet, so a
+  refuelling race file built today has no `track.refuel`. It would take the prior with
+  `refFill` 0, charging the whole fill (about 5 s for 20 laps) on top of a pit loss that
+  already holds a typical fill. It must be wired in (assemble.py, another agent's file)
+  before Eras 3-5 ship.
+
+Daily and Gauntlet race files and goldens are unchanged. The seven changed race files are
+all `eras` races. Their goldens are regenerated, and the TS sim matches them (`pnpm test`).
+
+## Eras wave B, step 5.1 reconstructed (Era 2, 1989-1993): anchors 5 pass, 2 fail; G1 sanity 3 pass, 0 borderline, 4 fail
+
+Eras build plan 5.1, Nov 7 2026. Written by hand. These races have no lap timing, so they
+are rebuilt from their anchors (`pipeline reconstruct <id>`, step 4.6: the Jolpica dump of
+2026-10-24 for grid, classification, laps and lead-lap times; F1DB v2026.19.0 fastest laps;
+the sourced stops in `data/reconstruction/<id>.json`, docs/eras-checks/r2-reconstruction-facts.md)
+and **checked on their anchors instead of G1**. G1 is run only as a sanity check: its "real"
+gaps are the synthetic laps, so it measures how well the race model replays the
+reconstruction, not the real race. Registry split `eras`, duel from the Eras spec's Era 2
+table (§4, the user's driver first), `score_positions` 6, seed 1, D3 takeover, source
+`reconstruct`. All seven are dry and before refuelling; each file carries its `rules` overlay
+(no VSC, no DRS, no ERS, no refuelling) and is marked `reconstructed: true` with provenance
+`{"kind": "reconstructed", "estimated": [...]}`. G1 values are seed set 10000 / seed set
+20000, limits in brackets.
+
+| Race | Duel | Takeover | Anchors (core) | G1 sanity | Mean gap error | Failing G1 checks | Diagnosis |
+|---|---|---|---|---|---|---|---|
+| japan-1989 | SENA vs PRO | 18 | **fail** 53/54 (grid) | fail | n/a (inf) | podium order 0.00; every gap inf | Senna's disqualification: see below. Not playable as authored |
+| united-states-1990 | ALE vs SENA | 33 | pass 54/54 | pass | 1.56s | | |
+| mexico-1990 | PRO vs MAN | 31 | pass 57/57 | fail | 2.00s | duel PRO vs MAN gap error 3.63 / 3.65 [3.00] | race mechanics (pace 32%, rest 68%) |
+| brazil-1991 | SENA vs PAT | 32 | pass 55/55 | fail | 2.37s | podium order rate 0.40 / 0.40 [0.50]; field PRO gap error 5.56 / 5.55 [5.00] | lap pace (pace 85%, rest 15%): synthetic noise |
+| monaco-1992 | MAN vs SENA | 68 | **fail** 54/55 (grid) | pass | 1.38s | | |
+| hungary-1992 | MAN vs BER | 58 | pass 52/52 | fail | 2.55s | duel MAN vs BER gap error 5.45 / 5.44 [3.00]; podium MAN gap error 5.43 / 5.43 [5.00] | lap pace (pace 83%, rest 17%): Mansell's fresh-tyre pace |
+| australia-1993 | SENA vs PRO | 21 | pass 57/57 | pass | 0.34s | | |
+
+"Anchors (core)" counts the anchors `reconstruct.failures` requires (grid, order, gaps,
+fastest laps, retirements, laps down, stops, safety cars); every race also passes all its
+retirement-event checks. The full tables are `data/raw/<id>.anchors.md`. The solver settled on
+its first attempt for every race (noise sigma 0.35 s).
+
+**Anchor failures.** Both are the lap-1 grid-order anchor, and both come from the same
+conflict: a car that retired on lap 1 has its F1DB fastest lap on lap 1, so its lap-1 time is
+pinned to that real time, and it is slower than the lap-1 times the solver gives the cars
+behind it on the grid.
+- japan-1989: Schneider (grid 21) lapped 131.97 s and crossed the line last, behind the cars
+  from grid 22-26.
+- monaco-1992: Moreno (grid 12, 334.5 s) and Wendlinger (grid 16, 104.613 s) crossed behind
+  the cars from grid 13-26.
+
+The measured lap time is the real fact. The grid-order anchor is the solver's rule of not
+inventing first-lap passes, and these cars really did lose places on lap 1. Neither car runs
+past lap 1, so the race files and play are unaffected. A fix belongs in `reconstruct.py`
+(exempt a car whose lap 1 is pinned by its fastest lap from the grid-order check). That isn't
+done here, since the 1984-88 races share the solver. Owner's call.
+
+**japan-1989: not playable as authored (owner).** Jolpica has Senna disqualified with 53 laps
+and no race time. The solver treats a disqualified car like a retirement, so his target is
+"early enough to be seen as a retirement": 5614.3 s against Nannini's winning 5706.3 s. That
+makes his synthetic race 92 s faster than the winner's, and his fitted pace is out of line
+(solver pace 102.9 s against Prost's 104.2 s). The anchors pass, because the order anchor
+checks classified cars only (since step 5.2a it reads the road order, and fails here: see the Era 1
+section). But:
+- the race file's `realResult` has SENA first (`assemble.finishing_order` reads the road
+  order), when the official winner is Nannini;
+- the race file has a RETIREMENT for SENA on lap 53, so in live play the user's car never
+  finishes (0 of 600 runs);
+- Prost's lap-47 retirement (the collision) is frozen too, so the duel always ends with both
+  cars out;
+- G1's real gaps put SENA first, and the sim retires him, so every gap is infinite.
+
+The source has no road gap for Senna at the flag (the Jolpica row has no time), so no honest
+target exists. This needs a design decision: how a disqualified car that ran the full
+distance is reconstructed, and how the game treats the disqualification (the spec's target is
+"title to whoever is ahead"). san-marino-1985 (Prost disqualified after finishing first) has
+the same problem.
+
+**Faults on reconstructed races (decision).** `faults.py` fits a fault's loss from the car's
+real laps. A reconstructed race's laps are synthetic, solved to the anchors with no fault in
+them, so a fit only reads back the solver's noise. As a check, the fit gave Mansell's
+brazil-1991 puncture 0.0 / 0.0 s and his hungary-1992 tyre fault 4.12 / 4.12 s (pace loss /
+slow lap): the second number is the gap between his synthetic in-lap and Senna's. So
+`pipeline build` leaves a reconstructed race's FAULT facts out of the race file and lists
+each one in the build report as "fault not modelled". The facts stay in data/incidents.json,
+and the reconstruction's own sidecar already notes them as "incident (not modelled)". The
+honest route is to build a sourced loss into the faulted car's synthetic laps. No source read
+gives one: R2 has only stationary times (Mansell 9.5 s in Brazil), not the time lost limping.
+So:
+- brazil-1991: Mansell's lap-50 puncture is not modelled. His lap-50 stop is a sourced stop
+  and is replayed. **Senna's gearbox, the race's storyline ("stuck in sixth"), isn't in
+  data/incidents.json at all** (2.6: the source gives no lap for each lost gear). The user's
+  car has no fault, so the dilemma isn't there.
+- hungary-1992: Mansell's lap-61 tyre fault, the storyline, is not modelled. His lap-61 stop
+  is a sourced stop after the lap-58 takeover, so as the user he chooses when to stop; nothing
+  forces it. The storyline needs a sourced loss (a lap chart or timing sheet), or the owner
+  stating the magnitude.
+
+**Stops not sourced (not invented).** A stop with no source isn't run. Its time is in the car's
+anchored race time, so the solver spreads it over the car's laps as slower pace.
+- japan-1989: only Prost's and Senna's stops (laps 21, 23, 48); the field's other tyre stops
+  have no laps.
+- united-states-1990: only Piquet's lap 28. Berger's nose stop, Patrese's, Nannini's two
+  nose stops, Schneider's, Martini's and Moreno's have no laps.
+- mexico-1990: Berger 13, Alliot 12, Piquet 44. Prost and Mansell have no stop reported (none
+  of the sources says they ran non-stop), so both run non-stop. "Prost from 13th on tyre
+  strategy" is then a non-stop race.
+- brazil-1991: Prost 17, Mansell 25 and 50. **Senna's and Patrese's single stops, Prost's
+  second and Piquet's and Moreno's have no laps**, so the duel pair run non-stop in the
+  reconstruction. This is part of PRO's 5.6 s G1 error.
+- monaco-1992 and hungary-1992: close to complete (Senna one set at Monaco; at Hungary
+  everyone else planned no stop).
+- australia-1993: eight stops entered; Alesi's 1, Berger's 2 and Suzuki's 1 have no laps.
+
+**G1 sanity diagnoses** (synthetic laps minus the model's clean laps after the takeover,
+relative to the winner, against the sim's error):
+- mexico-1990: MAN 28.7 s behind in the sim against 25.4 s synthetic, and BER 30.6 against
+  25.5 s. Their synthetic laps after lap 31 beat the model by 1.5 s in total, a third of the
+  error. The rest is the sim's race mechanics: MAN and BER run together behind the non-stop
+  leaders. No per-race knob applies.
+- brazil-1991: every scored car loses 1.4-5.6 s too much (PRO -3.07 s, ALE -3.44 s, PIQN
+  -1.97 s of pace residual). The solver gives each car its own wear (0-0.05 s/lap) and a
+  seeded noise draw. Over 40 laps a car's mean noise is worth a few seconds, and one race
+  wear rate can't capture it. G1 is grading the synthetic noise, not the sim.
+- hungary-1992: Mansell finished 40.1 s behind Senna (synthetic) and the sim has 45.5 s. His
+  F1DB fastest lap is lap 63, just after his lap-61 stop, 0.84 s faster than anyone's. To hit
+  it the solver gave him tyre wear of 0.10 s/lap against the race model's 0.038, so his
+  synthetic fresh tyres are much faster than the model's (residual -3.06 s after the
+  takeover). This is a real anchor the race model's single wear rate can't match.
+
+**Server match and play (TS sim).** For all seven, the TS sim matches each race's 20 golden
+seeds (order, finishers, times and gaps within 0.0005 s): 140/140. Live play from the takeover
+to the flag (the user stops once, incidents on, 300 seeds, normal and Legend) reaches the flag
+in 600/600 runs for every race. The user is classified in 573-596 runs (0 for japan-1989,
+above). `resolveRules` gives `vsc` false, `drs` false, `ers` none and `refuelling` false for
+all seven. `safetyCar` is false before 1993 and true for australia-1993.
+- **Sim gap (owner / sim, not fixed here: sim code is out of scope).** Live play still makes up
+  safety cars before 1993: in the six pre-1993 races, 1.1-4.7% of live laps ran under a SC
+  (japan-1989 348 of 10,500 laps, mexico-1990 539 of 11,400), in normal play and in Legend
+  alike. `rules.allowedFlag`, which turns a made-up SC or VSC into
+  none before 1993, is exported but never called. The crash incident in `sim.ts`
+  (`if (kind === 'crash' && run.incidentFlags ...)`, about line 1590) adds a SC (every crash
+  is a SC, since `vsc: false` sets `scShare` 1). The grader playouts' `sampledEvents` (about
+  line 779) draw SCs at the era's `scPerLap` whatever the year. Only Legend's own random
+  periods (`legend.ts`, `rules.safetyCar`) apply the rule: Legend added no SC laps beyond the
+  crash SCs. Both calls should go through `allowedFlag`. That changes the playout streams of live runs and
+  grades for pre-1993 races only.
+
+**Pipeline changes in this step.**
+- `pipeline build` on a reconstructed race (a `<id>.reconstruction.json` in data/raw):
+  - it fills the empty Compound as step 2.4 does (`estimates.estimate_compounds`: one dry
+    compound, MEDIUM, before 2007);
+  - it merges the sidecar's estimated fields into the provenance;
+  - it marks the file with `reconstruct.mark_model` (`reconstructed: true`, kind
+    `reconstructed`);
+  - it leaves its faults out, as above, and its report says so;
+  - helpers `build.load_reconstruction` and `build.reconstructed_laps`.
+- `pipeline ingest` skips a race registered with source `reconstruct` and points to
+  `pipeline reconstruct`.
+- The build report's "estimated: weather (wet laps from the lap times)" line now shows only
+  when the weather really is the lap-time fit (it keyed on `weather` being estimated, which a
+  reconstruction always lists).
+- Tests: `test_build_reconstructed.py`, and `test_faults.py`'s list of registered races with
+  fault facts (adds brazil-1991 and hungary-1992).
+- Garages: 1989-1993 tables (`apps/web/src/track/garages.ts`, from the 1988-1992 Jolpica
+  constructors' standings, method as above). The web needs them, because each race's teams
+  must have a garage (`garages.test.ts`) and these seasons would otherwise get 2010's.
+
+**Not regenerated here:** `data/sc_rates.json`. Two `test_sc_rates.py` tests fail until it is
+regenerated: `test_committed_rates_match_the_raw_timelines`, because there are new status
+timelines in data/raw, and `test_every_race_file_finds_its_circuit`, because phoenix
+(united-states-1990) and adelaide (australia-1993) are new circuits. Before regenerating,
+decide whether a reconstructed race's timeline should count. Its SC laps are only the sourced
+ones (none here), so counting them would add zero-SC races to Monaco's, Suzuka's and the other
+circuits' rates. `apps/worker/src/races.gen.ts` and the parity fixtures are also not
+regenerated.
+
+## Eras wave B, step 5.1 reconstructed (Era 1, 1984-1988): anchors 6 pass, 1 fail; G1 sanity 4 pass, 0 borderline, 2 fail, 1 data issue
+
+Eras build plan 5.1 (batch 5.2a), Nov 7 2026. Written by hand. Built as the Era 2 races above
+(`pipeline reconstruct <id>`, same sources; great-britain-1987 needs `--event British`, since
+the round is the "British Grand Prix"), and **checked on their anchors, not G1**. Registry split
+`eras`, duel from the Eras spec's Era 1 table (§4, user's driver first), `score_positions` 6,
+seed 1, D3 takeover, source `reconstruct`. All seven are dry, with no refuelling, and run under
+a fuel limit: each file carries its overlay's `rules` (no VSC, no DRS, no ERS, `fuelLimit` 187 kg
+in 1984-85, 165.75 kg in 1986-87, 127.5 kg in 1988). No safety car is sourced or run before 1993.
+Compounds are step 2.4's single dry MEDIUM. G1 values are seed set 10000 / seed set 20000,
+limits in brackets.
+
+| Race | Duel | Takeover | Anchors (core) | G1 sanity | Mean gap error | Failing G1 checks | Diagnosis |
+|---|---|---|---|---|---|---|---|
+| portugal-1984 | LAU vs PRO | 32 | pass 56/56 | fail | 2.49s | duel LAU vs PRO gap error 4.09 / 3.70 [3.00] | race mechanics (pace 32%, rest 68%): see below |
+| san-marino-1985 | SENA vs DEA | 27 | **fail** 51/52 (order) | data issue | n/a (inf) | podium order 0.00; PRO, DEA gaps inf | Prost's disqualification: see below. No race file |
+| mexico-1986 | BER vs PRO | 31 | pass 51/51 | pass | 2.47s | | duel error 2.87 / 2.71 s |
+| hungary-1986 | PIQN vs SENA | 32 | pass 62/62 | pass | 0.03s | | |
+| australia-1986 | MAN vs PRO | 29 | pass 54/54 | pass | 0.78s | | no duel checks: Mansell retires (podium PRO, PIQN only) |
+| great-britain-1987 | MAN vs PIQN | 32 | pass 53/53 | pass | 1.07s | | duel order 0.81 / 0.79 |
+| monaco-1988 | SENA vs PRO | 36 | pass 51/51 | fail | 6.92s | podium BER gap error 8.58 / 8.61, ALBM 12.20 / 12.12 [5.00] | race mechanics (pace 39%, rest 61%): see below |
+
+The solver settled on its first attempt for every race (noise sigma 0.35 s). Full tables:
+`data/raw/<id>.anchors.md`.
+
+**Solver fixes (reconstruct.py, tested in test_reconstruct.py).**
+- *Running at the flag, not classified.* Four cars ran to the flag with too few laps to be
+  classified (Jolpica `lapped`, `classified` false): san-marino-1985 Ghinzani (46 of 60),
+  australia-1986 Tambay (70 of 82) and Berg (61), great-britain-1987 Brundle (54 of 65). The
+  solver gave every unclassified car a retirement's target, so each crossed its last line
+  before the winner's flag and failed its laps-down anchor. They now get a lapped finisher's
+  window after the winner's flag (after the classified cars, most laps first). The
+  Era 2 parquets don't change.
+- *The order anchor reads the road order.* It used to check only the classified cars'
+  relative order. Now the classified cars must head `finishing_order` (the race file's
+  `realResult`), so a disqualified car ahead of them fails. This catches san-marino-1985 and
+  japan-1989 (Senna). japan-1989's anchor report is rewritten to match (it now fails grid and
+  order). Its laps and race file are unchanged.
+
+**san-marino-1985: owner decision (disqualified finisher).** Prost finished first on the road
+and was disqualified (underweight). Jolpica has him `disqualified` with 60 laps and no time.
+The solver treats him like a retirement, so to make him "look retired" with every lap done it
+has him 172 s ahead of De Angelis (synthetic median lap 91.5 s against 94.7 s). The road order,
+and so `realResult`, then has PRO first. G1 can't run (the sim retires PRO, so every gap is
+infinite, and `diagnose` raises KeyError). No source gives Prost's road gap, so no time is
+made up. The race is registered with `data_issue` (G1 lists it, doesn't count it) and its raw
+reconstruction is committed with the FAIL, but **no race file or golden file is committed**,
+so a disqualified driver can't ship as the winner. Options for the owner: run a disqualified
+car to the flag and drop it from `realResult` in the build, or leave it out of the
+reconstructed field. Either is a solver or schema decision shared with japan-1989.
+
+**australia-1986: faults (owner decision).** `data/incidents.json` has two FAULT facts: Rosberg's
+right-rear tyre on lap 63 and Mansell's left-rear explosion on lap 64. As for every reconstructed
+race, the build leaves them out ("fault not modelled": synthetic laps can't fit a loss, and no
+source gives one). Here the outcome is the same either way, because each car retired on the
+fault's own lap (62 and 63 laps completed). No lap was run with the fault, so even a timed race
+would have nothing to fit. The model replays both as RETIREMENTs on lap 64.
+
+**Pit loss with no sourced stop.** portugal-1984, mexico-1986 and monaco-1988 have no stop with
+a sourced lap (docs/eras-checks/r2-reconstruction-facts.md), so their synthetic laps have no
+stops and `track.fit_track_params` measures no pit loss (the build used to raise). The build
+now takes the loss the reconstruction itself assumes for a stop with no sourced lane time:
+lane 25 s less the 5 s of track it bypasses = 20.0 s (`build.reconstructed_pit_loss`, noted
+in the build report). The races with stops measure about the same, because their stops use the
+same assumption (hungary-1986 19.7 s, great-britain-1987 21.1 s, australia-1986 17.6 s). No
+source gives a lane time.
+
+**Storyline gaps (no sourced lap, so not invented).**
+- mexico-1986: Piquet's three stops, Mansell's two and Prost's one have no laps (MS), so every
+  car runs non-stop in the reconstruction. Berger's advantage of not stopping isn't there: the
+  stoppers' lost time is spread over their laps as slower pace (Piquet set the race's fastest
+  lap, 79.36 s, but finishes a lap down on a uniform pace). The duel still passes.
+- australia-1986: Piquet's precautionary stop after Mansell's failure has no lap, so it isn't
+  run. Piquet finishes 4.2 s behind Prost on the official time with no stop, so the dilemma
+  (pit him or not) has no real call to compare against.
+- portugal-1984: Johansson's and Warwick's stops have no laps. They are midfield cars, so the
+  storyline isn't affected.
+- monaco-1988: Patrese's repair stop has no lap. Not a storyline car.
+
+**G1 diagnoses (sanity only: the "real" gaps are synthetic).**
+- portugal-1984: the noise-free replay ends with Lauda 14.4 s behind Prost (real 13.4 s). The
+  1,000-run mean is 17.0 s (sd 9.6). Lauda starts the replay in traffic and must pass Senna and
+  Mansell (Mansell retires on lap 53). The fitted per-car noise (about 1.1 s a lap for both
+  McLarens, from the synthetic laps) and the passing model add about 3 s on average.
+- monaco-1988: Prost is behind Berger at the takeover (lap 36) in the synthetic laps (21-25 s at
+  lap 41) and passes him by lap 61 (the real pass was lap 54). The sim's Monaco overtake model
+  (paceCoef 0.17) rarely lets him by, so Berger and Alboreto finish 9-12 s closer to Prost
+  than in the reconstruction (sd 12-13 s). That is the real race's dilemma (stuck behind
+  Berger) showing in the sim. It's a mismatch with the synthetic laps, which the solver builds
+  car by car with no traffic, not a fault of the model.
+
+**Playability (TS sim, takeover to flag).** Checked with a throwaway vitest file, not committed.
+Each race's 20 golden seeds match the TS sim (order, finishers, times within 0.0005 s): 20/20 on
+all six built races. Every race plays to the flag with no calls, with "push" from the takeover,
+with lift and coast, and with an added stop five laps after the takeover, on 20 seeds each, with
+no errors. Every lap ran green on all 120 live runs per race (no SC/VSC before 1993; D1 merged).
+The fuel limit is live for the player's car:
+- With no calls, the player runs dry in 11-13 of 20 seeds in portugal-1984, mexico-1986,
+  hungary-1986 and great-britain-1987 (the takeover fuel margin is drawn around zero, so about
+  half the runs are short). Push runs dry in 18-19 of 20 and lift and coast never does. The fuel
+  call is a real dilemma here, as the fuel-limit spec intends. The owner may want to look at
+  how often doing nothing fails.
+- In australia-1986 and monaco-1988 (and san-marino-1985, if built), the player's car retires on
+  its real lap whatever the calls: Mansell on lap 64, Senna on lap 66 (at Imola, Senna on lap 59).
+  The RETIREMENT events are frozen, so these three storylines ("make the fuel last", "avoid the
+  tyre failure", "tell Senna to slow down") can't be won as the models stand. That needs a sim
+  or authoring decision (step 6.2): a retirement the player's calls could have prevented.
+
+**Garages:** 1984-1988 tables added (`apps/web/src/track/garages.ts`, from the 1983-1987 final
+Jolpica constructors' standings; method in the comment). The Eras API test's example of a race
+with no race file moved from monaco-1988 (now built) to south-africa-1983.
+
+**Not regenerated here:** `apps/worker/src/races.gen.ts`, `data/sc_rates.json` (it ignores
+reconstructed races) and the parity fixtures.

@@ -213,14 +213,6 @@ def fault_events(
     return sorted(out, key=lambda e: (e["lap"], e["driver"]))
 
 
-def ends_race(fact: dict, laps: pd.DataFrame) -> bool:
-    """True if the car never completed the fault's lap: the fault ended its race there (a tyre
-    that exploded, australia-1986's Mansell). No lap was run with it, so there is no magnitude
-    to fit; the race model already replays it as the car's retirement (events.py)."""
-    own = laps[(laps["Driver"] == fact["driver"]) & laps["LapTime"].notna()]
-    return own.empty or int(own["LapNumber"].max()) < int(fact["lap"])
-
-
 def lasts_past(fact: dict, laps: pd.DataFrame, lap: int) -> bool:
     """True if the fault is still on after race lap `lap` in the real race (a game taking
     over then still needs it)."""
