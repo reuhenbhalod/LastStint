@@ -6,13 +6,15 @@
 // option from the real race's state at that lap, and keeps only genuine dilemmas. A human
 // still picks the final 2-4 (plan 1.5); approved moments go in data/moments/<race>.json.
 
+import { faultsOf } from './faults.js';
 import { type GradeOption, type MomentGrade, type Target, gradeMoment } from './grade.js';
 import { type Run, cleanLap, initRun, realDecisions, stepLap, tyreLife } from './sim.js';
 import type { CarState, Decision, RaceModel } from './types.js';
 import { wetnessOn } from './weather.js';
 
 /** What brought a moment on (the race plan at takeover is the strategy planner's, not a
- * moment). `rain` / `drying`: the track turning wet or drying out (weather spec). Red flags
+ * moment). `rain` / `drying`: the track turning wet or drying out (weather spec). `fault`: a
+ * fault struck the user's car (faults.ts): nurse it or push, pit now or limp on. Red flags
  * (eras build plan 4.3): `RED`, the tyres to fit in the stoppage for the restart (free);
  * `preRed`, the lap before it, boxing now (paid) or staying out. */
 export type MomentTrigger =
@@ -24,7 +26,8 @@ export type MomentTrigger =
   | 'undercut'
   | 'cliff'
   | 'rain'
-  | 'drying';
+  | 'drying'
+  | 'fault';
 
 export interface MomentOption extends GradeOption {
   /** Short label for the UI; radio copy is written in Phase 5. */
@@ -66,6 +69,7 @@ const PRIORITY: Record<MomentTrigger, number> = {
   preRed: -1,
   rain: 0,
   drying: 0,
+  fault: 0,
   SC: 0,
   VSC: 1,
   rivalPit: 2,
@@ -83,8 +87,16 @@ const DRYING = 0.12;
 
 /** The real race paused just before `lap`: the user follows the real team's calls so far. */
 export function pauseAt(model: RaceModel, lap: number): Run {
-  const before = realDecisions(model).filter((d) => d.lap < lap);
+  const { takeoverLap } = model.race;
+  // A real stop with its out-lap on takeover + 1 was called on the takeover lap, before the
+  // player's car went live: not a call the player could make, so it stays the real stop.
+  const before = realDecisions(model).filter((d) => d.lap < lap && d.lap > takeoverLap);
   const run = initRun(model, model.race.seed, { decisions: before, incidents: false });
+  const user = run.state.cars[model.userSide];
+  const first = model.drivers
+    .find((d) => d.code === model.userSide)
+    ?.realStrategy.find((s) => s.lap === takeoverLap + 1);
+  if (user && first) user.strategy.push({ ...first });
   while (run.state.lap < lap - 1) stepLap(run);
   return run;
 }
@@ -169,6 +181,29 @@ function modeOption(lap: number, value: 'push' | 'manage'): MomentOption {
   };
 }
 
+/**
+ * A fault on the user's car (eras build plan 4.4), the lap after it struck. A tyre fault
+ * (until the next stop): pit now or limp on (or limp on nursing it). A gear or power fault:
+ * nurse the car or push it, or box for tyres.
+ */
+function faultOptions(model: RaceModel, lap: number, untilStop: boolean): MomentOption[] {
+  const nurse: MomentOption = {
+    id: 'nurse',
+    label: untilStop ? 'Limp on and nurse it' : 'Nurse the car',
+    decisions: [{ lap, kind: 'mode', key: 'pace', value: 'manage' }],
+  };
+  const box = boxOptions(model, lap);
+  if (untilStop) {
+    return [{ ...stayOut(), label: 'Limp on' }, ...box.slice(0, 2), nurse];
+  }
+  const push: MomentOption = {
+    id: 'push',
+    label: 'Push on',
+    decisions: [{ lap, kind: 'mode', key: 'pace', value: 'push' }],
+  };
+  return [stayOut(), nurse, push, ...box.slice(0, 1)];
+}
+
 function realOptionId(model: RaceModel, lap: number, options: MomentOption[]): string | null {
   const call = realDecisions(model).find((d) => d.lap === lap);
   if (!call) return options.some((o) => o.id === 'stay-out') ? 'stay-out' : null;
@@ -190,6 +225,12 @@ export function candidateMoments(model: RaceModel, target = DEFAULT_TARGET): Dec
     if ((e.type === 'SC' || e.type === 'VSC') && e.lap >= first) {
       found.push({ lap: e.lap, trigger: e.type });
     }
+  }
+  // A fault on the user's car: the call comes on the lap after it struck.
+  const untilStop = new Map<number, boolean>();
+  for (const e of faultsOf(model.events, model.userSide)) {
+    found.push({ lap: e.lap + 1, trigger: 'fault' });
+    untilStop.set(e.lap + 1, e.untilStop === true);
   }
   const rival = model.drivers.find((d) => d.code === model.rival);
   for (const stop of rival?.realStrategy ?? []) {
@@ -231,6 +272,18 @@ export function candidateMoments(model: RaceModel, target = DEFAULT_TARGET): Dec
       Math.abs(m.lap - lap) < MIN_SPACING &&
       !(RED_TRIGGERS.has(m.trigger) && RED_TRIGGERS.has(trigger));
     if (moments.some(near)) continue;
+    if (trigger === 'fault') {
+      const options = faultOptions(model, lap, untilStop.get(lap) ?? false);
+      moments.push({
+        id: `fault-${lap}`,
+        lap,
+        trigger,
+        target,
+        options,
+        realOptionId: realOptionId(model, lap, options),
+      });
+      continue;
+    }
     const red = RED_TRIGGERS.has(trigger);
     const box =
       trigger === 'RED'

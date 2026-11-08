@@ -1,0 +1,199 @@
+"""Wet races before 2018 (wet_laps.py): the wet laps, safety cars and tyre classes from the
+lap times, and the weather records wet.py reads.
+
+Fixtures (tests/fixtures/wet_laps/): Hungary 2014 from the TUM f1-timing-database (CC BY-NC-SA
+3.0, Institute of Automotive Technology, TU Munich, commit 9eaad9c; `pipeline tum-ingest`) and
+Brazil 2012 from the Jolpica-F1 CSV dump of 2026-10-24 (CC BY-NC-SA 4.0; `pipeline jolpica`),
+as their raw snapshots.
+"""
+
+import json
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+import pytest
+from typer.testing import CliRunner
+
+from pipeline import ingest, wet, wet_laps
+from pipeline.cli import app
+
+FIX = Path(__file__).parent / "fixtures" / "wet_laps"
+CURVES = wet.load_curves()
+
+
+def synthetic(rain=range(20, 31), sc=range(36, 40), n_laps=50, drivers=16, status=False):
+    """A dry race with a rain spell (slicks ~8% off) and a safety car (30-45% off, the field
+    bunched up), no compounds; TrackStatus only with `status`."""
+    rng = np.random.default_rng(1)
+    rows, t, sc_lap = [], {d: 0.0 for d in range(drivers)}, 0.0
+    for lap in range(1, n_laps + 1):
+        lead = None
+        for d in range(drivers):
+            lt = 90 + 0.3 * d + 0.056 * (n_laps - lap) + rng.normal(0, 0.15)
+            if lap in rain:
+                lt *= 1.08
+            if lap == 1:
+                lt += 6
+            if lap in sc:
+                # The leader behind the SC; the rest close up on it, at no less than 90% of
+                # its lap.
+                lt = lt * 1.45 if d == 0 else max(lead + 0.8 * d - t[d], 0.9 * sc_lap)
+            t[d] += lt
+            if d == 0:
+                lead, sc_lap = t[d], lt
+            rows.append(
+                {
+                    "Driver": f"D{d:02d}",
+                    "Team": "T",
+                    "LapNumber": float(lap),
+                    "LapTime": lt,
+                    "Time": t[d],
+                    "Compound": None,
+                    "TyreLife": None,
+                    "Stint": 1.0,
+                    "PitInTime": np.nan,
+                    "PitOutTime": np.nan,
+                    "TrackStatus": ("4" if lap in sc else "1") if status else None,
+                    "Position": float(d + 1),
+                    "IsAccurate": lap > 1,
+                }
+            )
+    return pd.DataFrame(rows)
+
+
+def calls_of(est):
+    return {c.lap: c for c in est.calls}
+
+
+def test_rain_and_a_safety_car_are_told_apart_from_the_lap_times():
+    est = wet_laps.estimate(synthetic())
+    assert est.neutral_source == "lap-times"
+    c = calls_of(est)
+    neutral = {lap for lap, x in c.items() if x.neutral}
+    assert neutral == set(range(36, 40)) or neutral == set(range(37, 40))
+    assert est.wet_laps == set(range(20, 31))
+    # The safety car between dry laps isn't rain; its edges are flagged.
+    assert not any(c[lap].wet for lap in range(36, 40))
+    assert c[40].ambiguous and "after a neutralisation" in c[40].ambiguous
+    # Filled for the build: the SC laps' status and a class for every stint.
+    assert set(est.laps.loc[est.laps.LapNumber.isin(neutral), "TrackStatus"]) == {"4"}
+    assert set(est.laps["Compound"]) == {wet_laps.DRY_PLACEHOLDER}
+    assert len(est.filled) == 2
+
+
+def test_the_status_timeline_wins_where_the_source_has_one():
+    est = wet_laps.estimate(synthetic(status=True))
+    assert est.neutral_source == "status"
+    assert {c.lap for c in est.calls if c.neutral} == set(range(36, 40))
+    assert len(est.filled) == 1  # compounds only
+    assert list(est.laps["TrackStatus"]) == list(synthetic(status=True)["TrackStatus"])
+
+
+def test_a_dry_race_has_no_wet_laps():
+    est = wet_laps.estimate(synthetic(rain=(), sc=()))
+    assert est.wet_laps == set()
+    assert not wet.rain_laps(est.laps, est.records())
+
+
+def test_a_neutralisation_inside_a_wet_spell_is_wet():
+    est = wet_laps.estimate(synthetic(rain=range(15, 45), sc=range(25, 29)))
+    c = calls_of(est)
+    assert all(c[lap].wet for lap in range(25, 29))
+    assert not any(c[lap].ambiguous and "between a wet and a dry" in c[lap].ambiguous for lap in c)
+
+
+def test_records_are_what_wet_py_reads():
+    est = wet_laps.estimate(synthetic())
+    rec = est.records()
+    assert [r["lap"] for r in rec] == list(range(1, 51))
+    assert all(r["source"] == "lap-times" for r in rec)
+    assert wet.rain_laps(est.laps, rec) == est.wet_laps
+    dry = wet.dry_laps(rec)
+    assert not dry & est.wet_laps
+    assert not dry & {c.lap for c in est.calls if c.ambiguous}
+    assert wet.is_wet_race(est.laps, rec)
+
+
+def test_rain_gauge_records_behave_as_before():
+    laps = pd.DataFrame({"LapNumber": [1.0, 2.0, 3.0], "Time": [100.0, 200.0, 300.0]})
+    gauge = [{"time": 150.0, "rain": True, "track": 30.0, "air": 20.0}]
+    assert wet.rain_laps(laps, gauge) == {2, 3}
+    assert wet.dry_laps(gauge) == set()
+    assert wet.dry_laps(None) == set()
+
+
+def test_the_timeline_is_unchanged_without_dry_laps():
+    rows = [(lap, "slick", 0.01 * (lap > 5), 10) for lap in range(1, 12)]
+    obs = pd.DataFrame(rows, columns=["lap", "cls", "median", "count"])
+    base = wet.timeline(obs, 11, set(), CURVES)
+    assert wet.timeline(obs, 11, set(), CURVES, set()) == base
+    assert wet.timeline(obs, 11, set(), CURVES, None) == base
+    firm = wet.timeline(obs, 11, set(), CURVES, set(range(1, 12)))
+    assert max(firm) <= max(base)
+
+
+@pytest.fixture(scope="module")
+def hungary():
+    return pd.read_parquet(FIX / "hungary-2014.tum.parquet")
+
+
+def test_hungary_2014_starts_wet_and_dries_by_lap_17(hungary):
+    est = wet_laps.estimate(hungary)
+    assert est.neutral_source == "status" and est.filled == []
+    spells = wet_laps.runs(est.wet_laps)
+    # Wikipedia: wet at the start (all on inters), dry tyres from the lap-9 SC, "the track
+    # was drying" by Button's lap-16 stop; SCs from lap 9 (ERI) and lap 23 (PER).
+    assert spells[0][0] == 1 and 15 <= spells[0][1] <= 18
+    assert all(a > 40 for a, _ in spells[1:])  # nothing wet mid-race
+    neutral = wet_laps.runs({c.lap for c in est.calls if c.neutral})
+    assert neutral == [(8, 13), (23, 26)]
+
+
+def test_hungary_2014_without_its_status_and_compounds(hungary):
+    """TUM's own SC laps and compounds, hidden: the lap-time estimate recovers them."""
+    blank = hungary.assign(Compound=None, TrackStatus=None)
+    est = wet_laps.estimate(blank)
+    neutral = {c.lap for c in est.calls if c.neutral}
+    assert set(range(9, 14)) <= neutral <= set(range(8, 14)) | set(range(23, 27))
+    assert set(range(23, 27)) <= neutral
+    cls = {"INTERMEDIATE": "inter", "WET": "wet"}
+    truth = hungary["Compound"].map(lambda c: cls.get(c, "slick"))
+    got = est.laps["Compound"].map(lambda c: cls.get(c, "slick"))
+    assert (truth == got).mean() > 0.97
+    # Everyone started on inters; Button's second set of inters (lap 9-15) is the miss.
+    assert all(est.classes[(d, 1)] == "inter" for d in hungary["Driver"].unique())
+
+
+def test_brazil_2012_rain_comes_and_goes_and_the_race_ends_under_the_sc():
+    laps = pd.read_parquet(FIX / "brazil-2012.jolpica.parquet")
+    est = wet_laps.estimate(laps)
+    assert est.neutral_source == "lap-times"
+    spells = wet_laps.runs(est.wet_laps)
+    # Reports: slicks at the start in drizzle, inters by lap 9, back to slicks ~lap 18-19;
+    # SC from lap 23 (debris) to the lap-29 restart; heavier drizzle from ~lap 48, inters
+    # for the final stint; di Resta's crash on lap 69/70 ends it under the SC.
+    assert 4 <= spells[0][0] <= 8 and 17 <= spells[0][1] <= 21
+    assert 48 <= spells[-1][0] <= 56 and spells[-1][1] == 71
+    assert not est.wet_laps & set(range(33, 43))
+    neutral = wet_laps.runs({c.lap for c in est.calls if c.neutral})
+    assert (25, 29) in neutral and neutral[-1][1] == 71
+    # Button and Hulkenberg stayed out on slicks early; Alonso and Hamilton took inters.
+    assert est.classes[("BUT", 1)] == "slick" and est.classes[("HUL", 1)] == "slick"
+    assert est.classes[("ALO", 2)] == "inter" and est.classes[("HAM", 2)] == "inter"
+
+
+def test_cli_writes_the_records_report_and_filled_snapshot(tmp_path):
+    rid = "brazil-2012"
+    synthetic().to_parquet(ingest.raw_snapshot_path(rid, tmp_path))
+    run = CliRunner().invoke(app, ["wet-laps", rid, "--raw-dir", str(tmp_path)])
+    assert run.exit_code == 0, run.output
+    assert "wet laps 20-30" in run.output
+    rec = ingest.load_weather(rid, tmp_path)
+    assert wet.rain_laps(pd.read_parquet(tmp_path / f"{rid}.parquet"), rec) == set(range(20, 31))
+    report = json.loads(wet_laps.report_path(rid, tmp_path).read_text())
+    assert report["wetSpells"] == ["20-30"] and report["filled"]
+    filled = pd.read_parquet(tmp_path / f"{rid}.parquet")
+    assert filled["Compound"].notna().all() and filled["TrackStatus"].notna().all()
+    again = CliRunner().invoke(app, ["wet-laps", rid, "--raw-dir", str(tmp_path)])
+    assert "skipped" in again.output

@@ -9,6 +9,7 @@ import { adminEmails, registerAdmin } from './admin.js';
 import { authConfigured, verifyCredential } from './auth.js';
 import { isDate, isPlayable, playableDates } from './dates.js';
 import { LEADERBOARD_SIZE, dailyStats, getDaily, getRun, leaderboard } from './db.js';
+import { registerEras } from './eras.js';
 import { displayName } from './names.js';
 import { checkQueue, queueDays } from './ops.js';
 import { accountOf, playedDates, setProfile, signIn, streakOf } from './players.js';
@@ -107,6 +108,7 @@ async function cached(
 
 registerAdmin(app);
 registerTickets(app);
+registerEras(app);
 
 app.get('/api/health', async (c) =>
   c.json({ ok: true, queueDays: await queueDays(c.env.DB, Date.now()) }),

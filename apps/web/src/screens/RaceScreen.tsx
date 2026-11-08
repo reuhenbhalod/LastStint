@@ -6,6 +6,9 @@
 // rises as a bottom sheet. When the race stops for a call, a radio banner drops over the map
 // (and chirps, if sound is on). Tap any car, on the map or in the standings, for its card; a
 // stop by your car or the rival is called out while it drives the pit lane.
+// An Eras race (`eras`, build plan 8.6) adds its difficulty: a timer on every big call (the
+// default option when it runs out, unless the player turned the timer off: then the attempt is
+// marked untimed) and the information level. Without it, nothing here changes.
 
 import {
   type Decision,
@@ -44,6 +47,13 @@ import { TimingTower } from '../components/TimingTower.js';
 import { type BattleView, TrackMap } from '../components/TrackMap.js';
 import { TyreBadge } from '../components/TyreBadge.js';
 import { namedUpper, surname } from '../data/names.js';
+import { DecisionTimer } from '../eras/difficulty/DecisionTimer.js';
+import { NeighbourGaps } from '../eras/difficulty/NeighbourGaps.js';
+import type { ErasRace } from '../eras/difficulty/erasRace.js';
+import { gapShown, gapText, informationView } from '../eras/difficulty/information.js';
+import { setTimerOn, timerOn } from '../eras/difficulty/settings.js';
+import { takeDefault } from '../eras/difficulty/timeout.js';
+import { attemptUntimed, noteDecisionShown } from '../eras/difficulty/untimed.js';
 import {
   BATTLE_MS,
   CALL_MS,
@@ -143,10 +153,13 @@ export function RaceScreen({
   model,
   onFinished,
   onHome,
+  eras,
 }: {
   game: Game;
   state: GameState;
   model: RaceModel;
+  /** An Eras race: its difficulty (timer, information level) and attempt. Absent elsewhere. */
+  eras?: ErasRace;
   /** The run to the flag is over (your car crossed the line): show the results. */
   onFinished?: () => void;
   /** The Pit Wall brand: the home page (the race holds). */
@@ -179,6 +192,11 @@ export function RaceScreen({
   const radar = forecast(model, state.race.lap);
   const lapsLeft = totalLaps - state.race.lap;
   const gap = me && them && !me.retired && !them.retired ? them.totalTime - me.totalTime : null;
+  // The Eras information level (everything, outside Eras): at Minimal the rival's gap shows
+  // only when he's the car directly ahead or behind.
+  const info = informationView(eras?.difficulty.information);
+  const rivalGapShown = gapShown(info, state.race.order, userSide, rival);
+  const shownRivalGap = rivalGapShown ? gap : null;
 
   // Gap history for the trace (> 0: we're ahead), from the laps this screen has seen.
   const trace = useRef(new Map<number, number>());
@@ -492,6 +510,24 @@ export function RaceScreen({
     if (momentId && soundOn()) radioChirp();
   }, [momentId]);
 
+  // The Eras decision timer (eras spec §7). Off by the player's accessibility setting: then
+  // every call waits, and an attempt that shows a call that way is marked untimed (kept, and
+  // never cleared by turning the timer back on).
+  const [timed, setTimed] = useState(timerOn);
+  const attemptId = eras?.attemptId;
+  const onUntimed = eras?.onUntimed;
+  const [untimed, setUntimed] = useState(() => !!attemptId && attemptUntimed(attemptId));
+  useEffect(() => {
+    if (!attemptId || !momentId || !noteDecisionShown(attemptId, timed)) return;
+    setUntimed(true);
+    onUntimed?.();
+  }, [attemptId, momentId, timed, onUntimed]);
+  const timerSeconds = eras && timed ? eras.difficulty.decisionTimerSeconds : null;
+  // Out of time: the wall takes the default (stay out, or keep the current mode).
+  const expire = useCallback(() => {
+    if (state.currentMoment) takeDefault(game, state.currentMoment, me?.modes);
+  }, [game, state.currentMoment, me?.modes]);
+
   // Calls booked for the coming lap show at once (they act when it's run).
   const next = state.race.lap + 1;
   const pending: Partial<Modes> = {};
@@ -550,11 +586,14 @@ export function RaceScreen({
   useEffect(() => {
     if (!racing) setLive(null);
   }, [racing]);
+  const liveStandings = info.liveStandings;
   useEffect(() => {
-    if (!running) return; // frozen for a battle call: the standings hold where they are
+    // Frozen for a battle call: the standings hold where they are. At Minimal they change
+    // once per lap.
+    if (!running || !liveStandings) return;
     const id = setInterval(() => setLive(motion.current?.standings() ?? null), LIVE_MS);
     return () => clearInterval(id);
-  }, [running]);
+  }, [running, liveStandings]);
 
   // A stop by your car or the rival on the lap just run, while the next lap animates.
   const latest = log.at(-1);
@@ -563,7 +602,7 @@ export function RaceScreen({
       ? latest.pits.find((p) => p.code === userSide || p.code === rival)
       : undefined;
 
-  const gapText = gap === null ? '-' : `${gap >= 0 ? '+' : '−'}${Math.abs(gap).toFixed(1)}s`;
+  const rivalGapText = gapText(info, shownRivalGap);
   // Focus view: the map takes the screen, the leaders beside it as on TV. Stats view: the
   // timing tower and the stats come in at the sides and the map shrinks between them. Nothing
   // sits on the track: the calls and the panels (team radio, the plan) open under the map,
@@ -616,13 +655,24 @@ export function RaceScreen({
         right={
           <span
             className="mono text-[15px] font-bold"
-            style={{ color: gap === null ? undefined : gap >= 0 ? 'var(--you)' : 'var(--rival)' }}
+            style={{
+              color:
+                shownRivalGap === null
+                  ? undefined
+                  : shownRivalGap >= 0
+                    ? 'var(--you)'
+                    : 'var(--rival)',
+            }}
           >
-            {gapText}
+            {rivalGapText}
           </span>
         }
       >
-        {points.length >= 2 ? (
+        {info.adjacentGapsOnly ? (
+          <NeighbourGaps race={state.race} userSide={userSide} info={info} />
+        ) : !info.gapTrace ? (
+          <p className="m-0 text-[12px] text-[#8D9692]">No gap trace at this difficulty.</p>
+        ) : points.length >= 2 ? (
           <GapTrace points={points} rival={rival} />
         ) : (
           <p className="m-0 text-[12px] text-[#8D9692]">The trace builds as laps go by.</p>
@@ -649,11 +699,16 @@ export function RaceScreen({
     />
   );
 
-  // On a phone the leaders step aside (and the map takes the width) while anything opens under it.
-  const tight = dockOpen || callUp || !!selected;
+  // The car you tapped: its card floats over the map's bottom-left corner (the map keeps its
+  // size). A call under the map, or the chequered flag, comes first: the card waits for it.
+  const cardShown = !!driverCard && !callUp && !(finishing && crossed);
+
+  // On a phone the leaders step aside (and the map takes the width) while anything opens under
+  // it, or the driver card is over it.
+  const tight = dockOpen || callUp || cardShown;
 
   // The call, one at a time, under the map: the plan, the big decision, a quick call. With
-  // none up, the chequered flag or the car you tapped.
+  // none up, the chequered flag.
   const call = planning ? (
     <PlanCard state={state} model={model} onBuild={game.buildPlan} onPick={game.pickPlan} />
   ) : paused && state.currentMoment ? (
@@ -663,6 +718,16 @@ export function RaceScreen({
       race={state.race}
       model={model}
       onChoose={game.choose}
+      info={info}
+      timer={
+        timerSeconds !== null && attemptId ? (
+          <DecisionTimer
+            momentKey={`${attemptId}:${state.currentMoment.id}`}
+            seconds={timerSeconds}
+            onExpire={expire}
+          />
+        ) : undefined
+      }
     />
   ) : battle && racing && (battle.stage !== 'done' || battle.zoom) ? (
     <BattleCard
@@ -719,9 +784,7 @@ export function RaceScreen({
         Chequered flag · {surname(userSide)} P{finishPos}
       </span>
     </output>
-  ) : (
-    driverCard
-  );
+  ) : null;
   const callKey = planning
     ? 'plan'
     : paused && state.currentMoment
@@ -757,7 +820,7 @@ export function RaceScreen({
             </span>
           )}
           <span className="mono shrink-0 rounded bg-[#1A1F1D] px-2.5 py-1 text-[18px] font-bold md:text-[22px]">
-            {gap === null ? '-' : `${gap >= 0 ? '+' : '−'}${Math.abs(gap).toFixed(1)}`}
+            {gapText(info, shownRivalGap, false)}
           </span>
           {them && !them.retired && (
             <span className="hidden lg:inline-flex">
@@ -782,6 +845,14 @@ export function RaceScreen({
               title={state.meta.practiceReason ?? 'Practice run'}
             >
               Practice · not saved
+            </span>
+          )}
+          {eras && untimed && (
+            <span
+              className="hidden shrink-0 rounded-full border border-[#5A625F] px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-[#D5DAD7] lg:inline"
+              title="The decision timer was off: this attempt’s stars are marked untimed"
+            >
+              Untimed
             </span>
           )}
           <span className="mono text-[18px] font-bold md:text-[22px]">
@@ -817,6 +888,24 @@ export function RaceScreen({
           >
             {sound ? <SoundOnIcon size={16} /> : <SoundOffIcon size={16} />}
           </button>
+          {eras && (
+            <button
+              type="button"
+              aria-pressed={timed}
+              title={
+                timed
+                  ? 'Turn the decision timer off (this attempt’s stars are marked untimed)'
+                  : 'Turn the decision timer on'
+              }
+              onClick={() => {
+                setTimerOn(!timed);
+                setTimed(!timed);
+              }}
+              className="flex h-9 shrink-0 items-center rounded-full border border-[#333A37] px-3 text-[12px] font-bold text-[#8D9692]"
+            >
+              {timed ? 'Timer on' : 'Timer off'}
+            </button>
+          )}
           {source === 'practice' && (
             <button
               type="button"
@@ -963,6 +1052,11 @@ export function RaceScreen({
                   </p>
                 )}
               </div>
+              {cardShown && (
+                <div className="bc-slide absolute bottom-2 left-2 z-20 md:bottom-3 md:left-3">
+                  {driverCard}
+                </div>
+              )}
             </div>
           </div>
 

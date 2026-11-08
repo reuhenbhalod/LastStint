@@ -191,5 +191,555 @@
    "status": "Spun off",
    "turn": 19
   }
- ]
+ ],
+ "great-britain-2022": [
+  {
+   "lap": 39,
+   "type": "SC",
+   "driver": "OCO",
+   "status": "Fuel pump",
+   "source": "https://en.wikipedia.org/wiki/2022_British_Grand_Prix"
+  }
+ ],
+ "hungary-2022": [
+  {
+   "lap": 68,
+   "type": "VSC",
+   "driver": "BOT",
+   "status": "Power Unit",
+   "source": "FastF1 (F1 live timing: race control messages and result status), via pipeline/incidents.py causes()"
+  }
+ ],
+ "singapore-2023": [
+  {
+   "lap": 20,
+   "type": "SC",
+   "status": "Debris",
+   "source": "https://en.wikipedia.org/wiki/2023_Singapore_Grand_Prix"
+  },
+  {
+   "lap": 44,
+   "type": "VSC",
+   "driver": "OCO",
+   "status": "Gearbox",
+   "source": "https://en.wikipedia.org/wiki/2023_Singapore_Grand_Prix"
+  }
+ ],
+ "miami-2024": [
+  {
+   "lap": 23,
+   "type": "VSC",
+   "status": "Debris",
+   "turn": 16,
+   "source": "https://en.wikipedia.org/wiki/2024_Miami_Grand_Prix"
+  },
+  {
+   "lap": 28,
+   "type": "SC",
+   "driver": "SAR",
+   "status": "Collision",
+   "source": "https://en.wikipedia.org/wiki/2024_Miami_Grand_Prix"
+  }
+ ],
+ "hungary-2024": [],
+ "brazil-2024": [
+  {
+   "lap": 39,
+   "type": "SC",
+   "driver": "SAI",
+   "status": "Accident",
+   "source": "https://en.wikipedia.org/wiki/2024_S%C3%A3o_Paulo_Grand_Prix"
+  }
+ ],
+ "australia-2025": [
+  {
+   "lap": 34,
+   "type": "SC",
+   "driver": "ALO",
+   "status": "Accident",
+   "source": "OpenF1 race control messages, via pipeline/incidents.py causes(); status from the Jolpica result"
+  },
+  {
+   "lap": 47,
+   "type": "SC",
+   "driver": "LAW",
+   "status": "Accident",
+   "source": "OpenF1 race control messages, via pipeline/incidents.py causes(); status from the Jolpica result"
+  }
+ ],
+ "spain-2021": [],
+ "azerbaijan-2021": [
+  {
+   "lap": 30,
+   "type": "SC",
+   "driver": "STR",
+   "status": "Accident",
+   "source": "https://en.wikipedia.org/wiki/2021_Azerbaijan_Grand_Prix"
+  },
+  {
+   "lap": 46,
+   "type": "SC",
+   "driver": "VER",
+   "status": "Accident",
+   "source": "https://en.wikipedia.org/wiki/2021_Azerbaijan_Grand_Prix"
+  },
+  {
+   "lap": 30,
+   "type": "FAULT",
+   "driver": "STR",
+   "status": "Tyre",
+   "detail": "Left-rear tyre failure on the exit of turn 20",
+   "source": "https://en.wikipedia.org/wiki/2021_Azerbaijan_Grand_Prix"
+  },
+  {
+   "lap": 46,
+   "type": "FAULT",
+   "driver": "VER",
+   "status": "Tyre",
+   "detail": "Left-rear tyre failure on the main straight",
+   "source": "https://en.wikipedia.org/wiki/2021_Azerbaijan_Grand_Prix"
+  }
+ ],
+ "brazil-2021": [
+  {
+   "lap": 12,
+   "type": "VSC",
+   "status": "Debris",
+   "turn": 1,
+   "cars": [
+    "TSU",
+    "STR"
+   ],
+   "source": "FastF1 (F1 live timing: race control messages and result status), via pipeline/incidents.py causes()"
+  },
+  {
+   "lap": 30,
+   "type": "VSC",
+   "status": "Hazard",
+   "sector": 16,
+   "source": "FastF1 (F1 live timing: race control messages and result status), via pipeline/incidents.py causes()"
+  }
+ ],
+ "saudi-arabia-2021": [
+  {
+   "lap": 10,
+   "type": "SC",
+   "driver": "MSC",
+   "status": "Accident",
+   "turn": 22,
+   "source": "https://en.wikipedia.org/wiki/2021_Saudi_Arabian_Grand_Prix"
+  },
+  {
+   "lap": 23,
+   "type": "VSC",
+   "status": "Debris",
+   "turn": 2,
+   "cars": [
+    "VET",
+    "TSU"
+   ],
+   "source": "https://en.wikipedia.org/wiki/2021_Saudi_Arabian_Grand_Prix"
+  },
+  {
+   "lap": 28,
+   "type": "VSC",
+   "status": "Debris",
+   "turn": 4,
+   "cars": [
+    "VET",
+    "RAI"
+   ],
+   "source": "https://en.wikipedia.org/wiki/2021_Saudi_Arabian_Grand_Prix"
+  },
+  {
+   "lap": 29,
+   "type": "VSC",
+   "status": "Debris",
+   "turn": 4,
+   "cars": [
+    "VET",
+    "RAI"
+   ],
+   "source": "https://en.wikipedia.org/wiki/2021_Saudi_Arabian_Grand_Prix"
+  },
+  {
+   "lap": 36,
+   "type": "VSC",
+   "status": "Debris",
+   "turn": 14,
+   "source": "https://en.wikipedia.org/wiki/2021_Saudi_Arabian_Grand_Prix"
+  }
+ ],
+ "azerbaijan-2017": [
+  {
+   "lap": 12,
+   "type": "SC",
+   "driver": "KVY",
+   "status": "Battery",
+   "source": "https://en.wikipedia.org/wiki/2017_Azerbaijan_Grand_Prix"
+  },
+  {
+   "lap": 17,
+   "type": "SC",
+   "status": "Debris",
+   "source": "https://en.wikipedia.org/wiki/2017_Azerbaijan_Grand_Prix"
+  }
+ ],
+ "germany-2018": [
+  {
+   "lap": 52,
+   "type": "SC",
+   "driver": "VET",
+   "status": "Accident",
+   "turn": 12,
+   "source": "https://en.wikipedia.org/wiki/2018_German_Grand_Prix"
+  }
+ ],
+ "germany-2019": [
+  {
+   "lap": 2,
+   "type": "SC",
+   "driver": "PER",
+   "status": "Spun off",
+   "turn": 10,
+   "source": "https://en.wikipedia.org/wiki/2019_German_Grand_Prix"
+  },
+  {
+   "lap": 14,
+   "type": "VSC",
+   "driver": "RIC",
+   "status": "Exhaust",
+   "source": "https://en.wikipedia.org/wiki/2019_German_Grand_Prix"
+  },
+  {
+   "lap": 26,
+   "type": "VSC",
+   "driver": "NOR",
+   "status": "Power loss",
+   "source": "https://en.wikipedia.org/wiki/2019_German_Grand_Prix"
+  }
+ ],
+ "sakhir-2020": [
+  {
+   "lap": 1,
+   "type": "SC",
+   "driver": "VER",
+   "status": "Accident",
+   "source": "https://en.wikipedia.org/wiki/2020_Sakhir_Grand_Prix"
+  },
+  {
+   "lap": 54,
+   "type": "VSC",
+   "driver": "LAT",
+   "status": "Engine",
+   "turn": 8,
+   "source": "https://en.wikipedia.org/wiki/2020_Sakhir_Grand_Prix"
+  },
+  {
+   "lap": 63,
+   "type": "SC",
+   "status": "Debris",
+   "source": "https://en.wikipedia.org/wiki/2020_Sakhir_Grand_Prix"
+  }
+ ],
+ "canada-2014": [
+  {
+   "lap": 1,
+   "type": "SC",
+   "driver": "CHI",
+   "status": "Collision",
+   "source": "https://en.wikipedia.org/wiki/2014_Canadian_Grand_Prix"
+  },
+  {
+   "lap": 70,
+   "type": "SC",
+   "driver": "MAS",
+   "status": "Collision",
+   "source": "https://en.wikipedia.org/wiki/2014_Canadian_Grand_Prix"
+  },
+  {
+   "lap": 36,
+   "type": "FAULT",
+   "driver": "HAM",
+   "status": "Power Unit",
+   "detail": "MGU-K failed into turn 10: no electrical boost, brakes overworked",
+   "turn": 10,
+   "source": "https://en.wikipedia.org/wiki/2014_Canadian_Grand_Prix"
+  },
+  {
+   "lap": 37,
+   "type": "FAULT",
+   "driver": "ROS",
+   "status": "Power Unit",
+   "detail": "MGU-K shut down approaching turn 1: no electrical boost",
+   "turn": 1,
+   "source": "https://en.wikipedia.org/wiki/2014_Canadian_Grand_Prix"
+  }
+ ],
+ "hungary-2014": [
+  {
+   "lap": 9,
+   "type": "SC",
+   "driver": "ERI",
+   "status": "Accident",
+   "source": "https://en.wikipedia.org/wiki/2014_Hungarian_Grand_Prix"
+  }
+ ],
+ "united-states-2015": [
+  {
+   "lap": 5,
+   "type": "VSC",
+   "status": "Debris",
+   "turn": 1,
+   "source": "https://en.wikipedia.org/wiki/2015_United_States_Grand_Prix"
+  },
+  {
+   "lap": 27,
+   "type": "SC",
+   "driver": "ERI",
+   "status": "Retired",
+   "source": "https://en.wikipedia.org/wiki/2015_United_States_Grand_Prix"
+  },
+  {
+   "lap": 36,
+   "type": "VSC",
+   "driver": "HUL",
+   "status": "Accident",
+   "source": "https://en.wikipedia.org/wiki/2015_United_States_Grand_Prix"
+  },
+  {
+   "lap": 43,
+   "type": "SC",
+   "driver": "KVY",
+   "status": "Accident",
+   "source": "https://en.wikipedia.org/wiki/2015_United_States_Grand_Prix"
+  }
+ ],
+ "spain-2016": [
+  {
+   "lap": 1,
+   "type": "SC",
+   "driver": "HAM",
+   "status": "Collision",
+   "source": "https://en.wikipedia.org/wiki/2016_Spanish_Grand_Prix"
+  }
+ ],
+ "monaco-2016": [
+  {
+   "lap": 35,
+   "type": "VSC",
+   "driver": "VER",
+   "status": "Accident",
+   "source": "https://en.wikipedia.org/wiki/2016_Monaco_Grand_Prix"
+  },
+  {
+   "lap": 68,
+   "type": "VSC",
+   "status": "Debris",
+   "source": "https://en.wikipedia.org/wiki/2016_Monaco_Grand_Prix"
+  }
+ ],
+ "brazil-2016": [
+  {
+   "lap": 13,
+   "type": "SC",
+   "driver": "ERI",
+   "status": "Collision",
+   "source": "https://en.wikipedia.org/wiki/2016_Brazilian_Grand_Prix"
+  }
+ ],
+ "australia-2010": [
+  {
+   "lap": 1,
+   "type": "SC",
+   "driver": "KOB",
+   "status": "Collision",
+   "turn": 6,
+   "source": "https://en.wikipedia.org/wiki/2010_Australian_Grand_Prix"
+  }
+ ],
+ "abu-dhabi-2010": [
+  {
+   "lap": 1,
+   "type": "SC",
+   "driver": "MSCM",
+   "status": "Collision",
+   "turn": 6,
+   "source": "https://en.wikipedia.org/wiki/2010_Abu_Dhabi_Grand_Prix"
+  }
+ ],
+ "canada-2011": [
+  {
+   "lap": 8,
+   "type": "SC",
+   "driver": "HAM",
+   "status": "Collision",
+   "source": "https://en.wikipedia.org/wiki/2011_Canadian_Grand_Prix"
+  },
+  {
+   "lap": 37,
+   "type": "SC",
+   "driver": "ALO",
+   "status": "Collision",
+   "turn": 3,
+   "source": "https://en.wikipedia.org/wiki/2011_Canadian_Grand_Prix"
+  }
+ ],
+ "europe-2012": [
+  {
+   "lap": 27,
+   "type": "SC",
+   "status": "Debris",
+   "turn": 12,
+   "cars": [
+    "VERJ",
+    "KOV"
+   ],
+   "source": "https://en.wikipedia.org/wiki/2012_European_Grand_Prix"
+  }
+ ],
+ "abu-dhabi-2012": [
+  {
+   "lap": 9,
+   "type": "SC",
+   "driver": "ROS",
+   "status": "Collision",
+   "source": "https://en.wikipedia.org/wiki/2012_Abu_Dhabi_Grand_Prix"
+  },
+  {
+   "lap": 39,
+   "type": "SC",
+   "driver": "GRO",
+   "status": "Collision",
+   "source": "https://en.wikipedia.org/wiki/2012_Abu_Dhabi_Grand_Prix"
+  }
+ ],
+ "monaco-2008": [
+  {
+   "lap": 8,
+   "type": "SC",
+   "driver": "COU",
+   "status": "Accident",
+   "source": "https://en.wikipedia.org/wiki/2008_Monaco_Grand_Prix"
+  },
+  {
+   "lap": 62,
+   "type": "SC",
+   "driver": "ROS",
+   "status": "Accident",
+   "source": "https://en.wikipedia.org/wiki/2008_Monaco_Grand_Prix"
+  },
+  {
+   "lap": 6,
+   "type": "FAULT",
+   "driver": "HAM",
+   "status": "Puncture",
+   "detail": "Hit the barrier at Tabac: right-rear puncture, pitted for new tyres",
+   "source": "https://en.wikipedia.org/wiki/2008_Monaco_Grand_Prix"
+  }
+ ],
+ "brazil-2008": [
+  {
+   "lap": 1,
+   "type": "SC",
+   "driver": "COU",
+   "status": "Collision",
+   "source": "https://en.wikipedia.org/wiki/2008_Brazilian_Grand_Prix"
+  }
+ ],
+ "brazil-2009": [
+  {
+   "lap": 1,
+   "type": "SC",
+   "driver": "TRU",
+   "status": "Accident",
+   "source": "https://en.wikipedia.org/wiki/2009_Brazilian_Grand_Prix"
+  }
+ ],
+ "austria-2002": [
+  {
+   "lap": 24,
+   "type": "SC",
+   "driver": "PAN",
+   "status": "Engine",
+   "source": "https://en.wikipedia.org/wiki/2002_Austrian_Grand_Prix"
+  },
+  {
+   "lap": 28,
+   "type": "SC",
+   "driver": "SAT",
+   "status": "Collision",
+   "source": "https://en.wikipedia.org/wiki/2002_Austrian_Grand_Prix"
+  }
+ ],
+ "brazil-2003": [
+  {
+   "lap": 27,
+   "type": "SC",
+   "driver": "MSCM",
+   "status": "Accident",
+   "source": "https://en.wikipedia.org/wiki/2003_Brazilian_Grand_Prix"
+  }
+ ],
+ "spain-1994": [
+  {
+   "lap": 22,
+   "type": "FAULT",
+   "driver": "MSCM",
+   "status": "Gearbox",
+   "detail": "Stuck in fifth gear from his first pit stop to the finish",
+   "source": "https://en.wikipedia.org/wiki/1994_Spanish_Grand_Prix"
+  }
+ ],
+ "japan-1989": [],
+ "united-states-1990": [],
+ "mexico-1990": [],
+ "brazil-1991": [
+  {
+   "lap": 50,
+   "type": "FAULT",
+   "driver": "MAN",
+   "status": "Puncture",
+   "detail": "Puncture from debris, stopped for new tyres",
+   "source": "https://en.wikipedia.org/wiki/1991_Brazilian_Grand_Prix"
+  }
+ ],
+ "monaco-1992": [],
+ "hungary-1992": [
+  {
+   "lap": 61,
+   "type": "FAULT",
+   "driver": "MAN",
+   "status": "Tyre",
+   "detail": "Pitted with tyre trouble and rejoined sixth",
+   "source": "https://en.wikipedia.org/wiki/1992_Hungarian_Grand_Prix"
+  }
+ ],
+ "south-africa-1983": [],
+ "monaco-1984": [],
+ "portugal-1984": [],
+ "san-marino-1985": [],
+ "portugal-1985": [],
+ "mexico-1986": [],
+ "hungary-1986": [],
+ "australia-1986": [
+  {
+   "lap": 63,
+   "type": "FAULT",
+   "driver": "ROSK",
+   "status": "Tyre",
+   "detail": "Right-rear tyre failure, retired",
+   "source": "https://en.wikipedia.org/wiki/1986_Australian_Grand_Prix"
+  },
+  {
+   "lap": 64,
+   "type": "FAULT",
+   "driver": "MAN",
+   "status": "Tyre",
+   "detail": "Left-rear tyre exploded on the Brabham Straight, retired",
+   "source": "https://en.wikipedia.org/wiki/1986_Australian_Grand_Prix"
+  }
+ ],
+ "great-britain-1987": [],
+ "monaco-1988": []
 }

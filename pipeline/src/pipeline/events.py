@@ -6,6 +6,9 @@ events are replayed unchanged by the simulator.
 
 Rain is not derivable from the lap snapshot (it needs weather/race-control data) and is
 added later for wet races; both Gate G1 races are dry.
+
+Car faults (FAULT events) aren't derivable from timing either: they come from hand-checked
+facts (incidents.fault_facts), fitted by pipeline/faults.py and merged in by with_faults.
 """
 
 from __future__ import annotations
@@ -165,3 +168,10 @@ def extract_events(laps: pd.DataFrame, total_laps: int | None = None) -> list[di
 
     events = refine_events(laps, neutralization_events(laps)) + retirement_events(laps, total_laps)
     return sorted(events, key=lambda e: (e["lap"], e["type"]))
+
+
+def with_faults(events: list[dict], faults: list[dict]) -> list[dict]:
+    """The timeline with the race's FAULT events (faults.fault_events) merged in, by lap."""
+    if not faults:
+        return events
+    return sorted([*events, *faults], key=lambda e: (e["lap"], e["type"]))

@@ -13,6 +13,7 @@ import pandas as pd
 
 from . import SCHEMA_VERSION
 from . import events as events_mod
+from . import faults as faults_mod
 from . import pace as pace_mod
 from . import redflag as redflag_mod
 from . import scenario as scenario_mod
@@ -123,12 +124,14 @@ def assemble_race_model(
     sc_unlap: str | None = None,
     weather: dict | None = None,
     wet_pace: dict[str, float] | None = None,
+    fault_facts: list[dict] | None = None,
     year: int | None = None,
     red_flags: list[dict] | None = None,
 ) -> dict:
-    """Build the race-model dict (validate + write it with export.write_race). `year` and
-    `red_flags` (the race's red-flag file entries, redflag.load_entries) give each red flag
-    its restart; races without one ignore them."""
+    """Build the race-model dict (validate + write it with export.write_race). `fault_facts`:
+    the race's hand-checked car faults (incidents.fault_facts), fitted into FAULT events.
+    `year` and `red_flags` (the race's red-flag file entries, redflag.load_entries) give each
+    red flag its restart; races without one ignore them."""
     total_laps = int(laps["LapNumber"].max())
     cliffs = fit.compound_cliff
     longest = longest_stints(laps)
@@ -213,6 +216,7 @@ def assemble_race_model(
             redflag_mod.apply_hand_spans(all_events, red_flags or []), red_flags or [], year
         )
     future_events = [e for e in all_events if e["lap"] >= takeover_lap]
+    facts = fault_facts or []
     takeover_state = scenario_mod.state_at_takeover(laps, takeover_lap)
     strategy = scenario_mod.real_strategy(laps)
     teams = _team_map(laps)
@@ -221,7 +225,7 @@ def assemble_race_model(
     # Model v3 (spec B2a): each driver's pace over the laps the game replays.
     fresh = {"bonus": round(fit.fresh_tyre_bonus, 4), "laps": fit.fresh_tyre_laps}
     race_pace = pace_mod.post_takeover_offsets(
-        laps,
+        faults_mod.without_fault_laps(laps, facts),  # a faulted car's normal pace
         fit.driver_pace,
         compounds,
         round(fit.fuel_per_lap, 5),
@@ -231,21 +235,40 @@ def assemble_race_model(
         weather,
         wear,
     )
+    # Car faults (faults.py): fitted from the car's own laps against its sim pace; one that
+    # struck before the takeover and still lasts is kept too (the sim runs it from then on).
+    fault_events = faults_mod.fault_events(
+        laps,
+        facts,
+        {c: round(p + race_pace.get(c, 0.0), 4) for c, p in fit.driver_pace.items()},
+        compounds,
+        round(fit.fuel_per_lap, 5),
+        fresh,
+        weather,
+    )
+    future_events = events_mod.with_faults(
+        future_events,
+        [
+            e
+            for e in fault_events
+            if e["lap"] >= takeover_lap or faults_mod.lasts_past(e, laps, takeover_lap)
+        ],
+    )
     if pace_mod.SIM_FRAME_LOSS:
         v3_pace = {c: p + race_pace.get(c, 0.0) for c, p in fit.driver_pace.items()}
-        measured.update(
-            pace_mod.sim_frame_losses(
-                laps,
-                v3_pace,
-                compounds,
-                round(fit.fuel_per_lap, 5),
-                fresh,
-                takeover_lap,
-                weather,
-                wear,
-                wet_pace,
-            )
+        frame = pace_mod.sim_frame_losses(
+            laps,
+            v3_pace,
+            compounds,
+            round(fit.fuel_per_lap, 5),
+            fresh,
+            takeover_lap,
+            weather,
+            wear,
+            wet_pace,
         )
+        # A stop made with a fault: the sim adds the fault's cost to its laps itself.
+        measured.update(faults_mod.adjust_stop_losses(frame, fault_events, laps))
 
     # Model v3 stage 9: a stop entered before an SC/VSC was deployed is a green-flag stop,
     # though its out-lap is neutralized (the sim prices a stop by its out-lap's flag).

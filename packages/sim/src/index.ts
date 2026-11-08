@@ -114,5 +114,87 @@ export {
   wetnessOn,
 } from './weather.js';
 export * from './eras/config.js';
+export * from './eras/evaluate.js';
+export * from './eras/race-log.js';
+export {
+  LEGEND_STREAM,
+  circuitFor,
+  isKept,
+  legendEvents,
+  legendRates,
+  parseRaceId,
+} from './legend.js';
+export type { LegendRates, ScRates } from './legend.js';
+export {
+  PIT_CLOSED_SC_LAPS,
+  STOP_GO_SECONDS,
+  allowedFlag,
+  hasMove,
+  pitLaneClosed,
+  resolveRules,
+  scQueue,
+  stopChangesTyres,
+  stopGoCost,
+  twoCompoundRule,
+} from './rules.js';
+export type { ResolvedRules } from './rules.js';
+export { FAULT_KINDS, faultCost, faultTable, faultsOf } from './faults.js';
+export type { FaultCost, FaultEntry, FaultTable } from './faults.js';
+export {
+  COVER_WINDOWS,
+  DEFAULT_RIVAL_POLICY,
+  EXPERT_SAMPLES,
+  RIVAL_POLICY_NAMES,
+  RivalPolicyError,
+  coverWindow,
+  hasSmartRules,
+  playoutPolicy,
+  resolveRivalPolicy,
+} from './rivals/policy.js';
+export {
+  RIVAL_OPTION_IDS,
+  boxNowCompound,
+  decisionReasons,
+  latestStop,
+  overcutLap,
+  planTime,
+  rivalOptions,
+  sameLapCover,
+  wetSwitch,
+} from './rivals/rules.js';
+export type {
+  KnownFlags,
+  RivalDecisionReason,
+  RivalOptionId,
+  RivalPlanOption,
+} from './rivals/rules.js';
+export { wetCrossover } from './rivals/wet.js';
+export {
+  RivalClaimError,
+  parseRivalChoices,
+  resolveRivalDecision,
+  rivalChoices,
+} from './rivals/react.js';
+export type {
+  RivalChoice,
+  RivalClaimErrorCode,
+  RivalGrading,
+  RivalPoint,
+  RivalRunState,
+} from './rivals/react.js';
+export {
+  RIVAL_GRADE_STREAM,
+  countRivalHits,
+  gradeRivalMoment,
+  mergeRivalGradeJobs,
+  rivalAhead,
+  rivalGradeJob,
+  rivalPlayout,
+  rivalSampleSeed,
+  runRivalGradeJob,
+} from './rivals/expert.js';
+export type { RivalGrade, RivalGradeJob, RivalOption } from './rivals/expert.js';
+export { regradeRivalPoints, replayWithRivalClaims } from './rivals/claims.js';
+export type { RivalClaimReplay, RivalRegrade } from './rivals/claims.js';
 export { RESTART_QUEUE_GAP, STANDING_RESTART_GAP, redFlagPlan } from './redflag.js';
 export type { RedFlagPlan } from './redflag.js';

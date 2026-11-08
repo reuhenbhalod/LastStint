@@ -32,6 +32,8 @@ from pathlib import Path
 
 import pandas as pd
 
+from .f1db import OUT_DIR as F1DB_DIR
+from .f1db import eras_cache_dir
 from .ingest import LAP_COLUMNS, IncompleteDataError, raw_snapshot_path, track_status_path
 from .paths import DATA_DIR, RAW_DIR, REPO_ROOT
 
@@ -72,8 +74,12 @@ WITH_STOPS = {
 }
 
 
-def latest_dump(root: Path = DUMP_ROOT) -> Path:
-    """The newest extracted dump (csv-YYYY-MM-DD) under the cache."""
+def latest_dump(root: Path | None = None) -> Path:
+    """The newest extracted dump (csv-YYYY-MM-DD) under the cache: by default the shared Eras
+    cache (f1db.eras_cache_dir, so a git worktree reads the main checkout's), else DUMP_ROOT."""
+    if root is None:
+        shared = eras_cache_dir() / "jolpica"
+        root = shared if shared.is_dir() else DUMP_ROOT
     dumps = sorted(p for p in root.glob("csv-*") if p.is_dir())
     if not dumps:
         raise FileNotFoundError(
@@ -268,6 +274,42 @@ def jolpica_stops(dump: Dump, ents: pd.DataFrame, codes: Codes) -> pd.DataFrame:
             "Number": stops["number"].astype(int),
             "Duration": _seconds(stops["duration"]),
         }
+    ).reset_index(drop=True)
+
+
+def f1db_stops(race_id: str, f1db_dir: Path = F1DB_DIR) -> pd.DataFrame | None:
+    """A race's F1DB stops (data/raw/f1db/<race-id>.stops.csv, step 2.3) as the `stops` load
+    takes: [Number (car number), Lap (in-lap), Duration (pit-lane s)]. None without a file.
+
+    Keyed by car number, not by code: F1DB's codes (BAR for Barrichello) aren't the repo's.
+    """
+    path = Path(f1db_dir) / f"{race_id}.stops.csv"
+    if not path.exists():
+        return None
+    raw = pd.read_csv(path, dtype={"number": str})
+    return pd.DataFrame(
+        {
+            "Number": raw["number"].astype(str),
+            "Lap": raw["lap"].astype(int),
+            "Duration": raw["lane_time"].astype(float),
+        }
+    )
+
+
+def stops_by_code(stops: pd.DataFrame, ents: pd.DataFrame, codes: Codes) -> pd.DataFrame:
+    """Stops keyed by car number ([Number, Lap, Duration]) re-keyed to the race's driver codes
+    ([Driver, Lap, Duration]). A number no entry carries is an error, never dropped."""
+    by_number = {
+        str(int(n)) if isinstance(n, float) else str(n): codes.by_entry[e]
+        for n, e in zip(ents["number"], ents["entry_id"], strict=True)
+        if pd.notna(n)
+    }
+    numbers = stops["Number"].astype(str)
+    unknown = sorted(set(numbers) - set(by_number))
+    if unknown:
+        raise IncompleteDataError(f"stops for car numbers no entry has: {unknown}")
+    return pd.DataFrame(
+        {"Driver": numbers.map(by_number), "Lap": stops["Lap"], "Duration": stops["Duration"]}
     ).reset_index(drop=True)
 
 
@@ -493,15 +535,19 @@ def load(
     dump_dir: Path | None = None,
     stops: pd.DataFrame | None = None,
     drivers_path: Path = DRIVERS_PATH,
+    stops_source: str = "given",
 ) -> Ingested:
     """Read a race from the dump (no writes). `stops` overrides Jolpica's own (for races
-    before 2011, from formula1.com or f1db): [Driver, Lap (in-lap), Duration (s)]."""
+    before 2011, from F1DB: f1db_stops): [Driver or Number (car number), Lap (in-lap),
+    Duration (s)]. `stops_source` names where they came from in the sidecar."""
     dump_dir = Path(dump_dir) if dump_dir else latest_dump()
     dump = Dump(dump_dir)
     race = find_race(dump, year, event, round_number)
     ents = entries(dump, race.session_id)
     codes = driver_codes(ents, repo_codes(drivers_path))
-    stop_source = "given"
+    stop_source = stops_source
+    if stops is not None and "Driver" not in stops and "Number" in stops:
+        stops = stops_by_code(stops, ents, codes)
     if stops is None and year >= STOPS_FROM:
         stops = jolpica_stops(dump, ents, codes)
         stop_source = SOURCE
@@ -555,13 +601,40 @@ def ingest_jolpica(
     raw_dir: Path = RAW_DIR,
     stops: pd.DataFrame | None = None,
     drivers_path: Path = DRIVERS_PATH,
+    stops_source: str = "given",
+    estimate: bool = False,
+    estimates_dir: Path | None = None,
 ) -> Ingested:
-    """Read a race from the dump and write its raw parquet, status JSON (empty: Jolpica has
-    no track status) and sidecar into raw_dir."""
-    got = load(year, event, round_number, dump_dir, stops, drivers_path)
+    """Read a race from the dump and write its raw parquet, status JSON and sidecar into
+    raw_dir. Without `estimate` the status JSON is empty (Jolpica has no track status) and
+    Compound / TrackStatus stay empty. With it (step 2.4, estimates.py) they're estimated,
+    the status timeline is the estimated SC periods, the sidecar gets an "estimates" block,
+    and the SC hand-check file is written (and its checked periods honoured) in
+    estimates_dir (default data/estimates/)."""
+    from . import estimates
+
+    got = load(year, event, round_number, dump_dir, stops, drivers_path, stops_source)
+    status: list[dict] = []
+    if estimate:
+        checks_dir = Path(estimates_dir) if estimates_dir else estimates.ESTIMATES_DIR
+        est = estimates.estimate_race(
+            race_id,
+            got.laps,
+            year,
+            sidecar=got.sidecar,
+            hand_checks=estimates.load_hand_checks(race_id, checks_dir),
+        )
+        got.laps, status = est.laps, est.status or []
+        got.sidecar["estimates"] = est.block
+        if "safetyCars" in est.block["estimated"]:
+            path = estimates.write_hand_checks(race_id, est.periods, checks_dir)
+            shown = path.resolve()
+            est.block["safetyCars"]["handCheck"] = str(
+                shown.relative_to(REPO_ROOT) if shown.is_relative_to(REPO_ROOT) else shown
+            )
     path = raw_snapshot_path(race_id, raw_dir)
     path.parent.mkdir(parents=True, exist_ok=True)
     got.laps.to_parquet(path)
-    track_status_path(race_id, raw_dir).write_text("[]\n")
+    track_status_path(race_id, raw_dir).write_text(json.dumps(status, indent=1) + "\n")
     sidecar_path(race_id, raw_dir).write_text(json.dumps(got.sidecar, indent=1) + "\n")
     return got

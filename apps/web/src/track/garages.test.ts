@@ -12,6 +12,13 @@ describe('garages', () => {
     expect(g[0]).toEqual(['Williams', 'WIL']);
   });
 
+  it('2014: the 2013 champions (Red Bull) nearest the exit, Caterham nearest the entry', () => {
+    const g = garagesFor(2014);
+    expect(g.at(-1)).toEqual(['Red Bull Racing', 'RBR']);
+    expect(g[0]).toEqual(['Caterham', 'CAT']);
+    expect(g).toHaveLength(11);
+  });
+
   it("has a garage for every team in every race, under the race's own team names", () => {
     for (const file of readdirSync(races).filter((f) => f.endsWith('.json'))) {
       const model = JSON.parse(readFileSync(join(races, file), 'utf8')) as {

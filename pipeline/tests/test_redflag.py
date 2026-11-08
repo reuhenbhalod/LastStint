@@ -255,3 +255,33 @@ def test_a_stop_in_the_stoppage_is_free():
     extra = v["standing-free-stop"]
     res = sim_reference.simulate({**extra, "race": {**extra["race"], **cut}}, 3)
     assert res["order"] == base["order"] and res["gaps"] == base["gaps"]
+
+
+# --- with Legend and car faults ---------------------------------------------------------------
+
+
+def test_legend_keeps_the_red_flag_and_its_restart_sc():
+    from pipeline.legend import legend_events
+
+    model = json.loads(MODEL.read_text())
+    for seed in range(1, 21):
+        evs = legend_events(model, seed)
+        assert {"lap": 64, "type": "RED", "laps": 2, "restart": "rolling"} in evs
+        assert {"lap": 66, "type": "SC", "laps": 1} in evs
+        # Nothing drawn inside or straight after the red flag.
+        drawn = [e for e in evs if e["type"] in ("SC", "VSC") and e["lap"] != 66]
+        assert all(not (63 <= e["lap"] <= 67) for e in drawn)
+
+
+def test_faults_cost_nothing_on_red_laps():
+    v = variants(json.loads(MODEL.read_text()))
+
+    def ver_time(model: dict, laps: int) -> float:
+        return sim_reference.simulate({**model, "race": {**model["race"], "laps": laps}}, 1)[
+            "times"
+        ]["VER"]
+
+    # VER leads by far: his 1.5s/lap power loss shows on green laps 62-63 only, not on the
+    # red lap 64.
+    assert ver_time(v["faults"], 63) - ver_time(v["rolling"], 63) == pytest.approx(3.0)
+    assert ver_time(v["faults"], 64) - ver_time(v["rolling"], 64) == pytest.approx(3.0)

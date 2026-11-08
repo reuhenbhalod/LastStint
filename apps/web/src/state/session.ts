@@ -48,6 +48,7 @@ import {
   type PlanState,
   type Speed,
   type Submission,
+  initialSubmission,
   reducer,
 } from './machine.js';
 
@@ -132,7 +133,7 @@ export class GameSession {
       decisions: this.engine.decisions,
       result: null,
       grades: {},
-      submission: { status: daily.source === 'live' ? 'none' : 'practice' },
+      submission: initialSubmission(daily.source),
       meta: metaOf(daily),
       radio: [],
       plan: NO_PLAN,
@@ -669,7 +670,7 @@ export class GameSession {
       submission:
         saved.submission && saved.submission.status !== 'sending'
           ? saved.submission
-          : { status: daily.source === 'live' ? 'none' : 'practice' },
+          : initialSubmission(daily.source),
       meta: metaOf(daily),
       radio: [],
       plan: saved.plan ?? NO_PLAN,

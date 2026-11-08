@@ -16,6 +16,8 @@
 // The spec doesn't define the continuation; this choice is recorded in the implementation
 // plan (2.7).
 
+import type { RivalPolicy } from './eras/config.js';
+import type { RivalChoice } from './rivals/react.js';
 import { deriveSeed } from './rng.js';
 import {
   type Run,
@@ -26,6 +28,7 @@ import {
   planRemainingStop,
   realDecisions,
   stepLap,
+  teammateOf,
 } from './sim.js';
 import type { Decision, RaceModel, RaceResult } from './types.js';
 
@@ -36,10 +39,18 @@ export const GRADE_STREAM = 3000;
 export const BAND_EDGES = { green: 0.5, yellow: 5, orange: 15 } as const;
 export type Band = 'green' | 'yellow' | 'orange' | 'red';
 
+/**
+ * The result a call is graded against, from the player's side. `beat-rival`: ahead of
+ * `rival` (default: the race's rival). `deny` (eras spec 6): `rival` finishes P`position`
+ * or worse, or doesn't finish, whatever the player's car does. `team`: the player's car at
+ * P`positions[0]` or better and its teammate at P`positions[1]` or better, both classified.
+ */
 export type Target =
   | { kind: 'win' }
-  | { kind: 'beat-rival' }
-  | { kind: 'position'; atBest: number };
+  | { kind: 'beat-rival'; rival?: string }
+  | { kind: 'position'; atBest: number }
+  | { kind: 'deny'; rival: string; position: number }
+  | { kind: 'team'; positions: [number, number] };
 
 export interface GradeOption {
   id: string;
@@ -76,13 +87,33 @@ export function bandFor(behindBest: number): Band {
   return 'red';
 }
 
-export function reachedTarget(run: Run, result: RaceResult, target: Target): boolean {
+export function reachedTarget(
+  run: Pick<Run, 'model'>,
+  result: RaceResult,
+  target: Target,
+): boolean {
   const user = run.model.userSide;
   const pos = result.order.indexOf(user);
   if (target.kind === 'win') return pos === 0 && result.finishers.includes(user);
   if (target.kind === 'position')
     return result.finishers.includes(user) && pos + 1 <= target.atBest;
-  const rivalPos = result.order.indexOf(run.model.rival);
+  if (target.kind === 'deny') {
+    // A rival that retired or was disqualified isn't a finisher: denied.
+    if (!result.finishers.includes(target.rival)) return true;
+    return result.order.indexOf(target.rival) + 1 >= target.position;
+  }
+  if (target.kind === 'team') {
+    const mate = teammateOf(run.model);
+    if (!mate) throw new Error(`team target: ${user} has no teammate in this race`);
+    const [userAtBest, mateAtBest] = target.positions;
+    return (
+      result.finishers.includes(user) &&
+      result.finishers.includes(mate) &&
+      pos + 1 <= userAtBest &&
+      result.order.indexOf(mate) + 1 <= mateAtBest
+    );
+  }
+  const rivalPos = result.order.indexOf(target.rival ?? run.model.rival);
   return result.finishers.includes(user) && pos < rivalPos;
 }
 
@@ -206,6 +237,10 @@ export interface GradeJob {
   options: GradeOption[];
   target: Target;
   samples?: number;
+  /** The run's rival policy (Run.rivalPolicy; absent: standard). */
+  rivalPolicy?: RivalPolicy;
+  /** Expert: the rival's choices so far (rivals/react.ts rivalChoices), replayed, not re-graded. */
+  rivalChoices?: RivalChoice[];
 }
 
 export interface GradeJobResult {
@@ -229,12 +264,32 @@ export function gradeJob(
     options,
     target,
     samples,
+    ...(run.rivalPolicy === 'standard' ? {} : { rivalPolicy: run.rivalPolicy }),
+    ...(run.rival
+      ? { rivalChoices: run.rival.points.map((p) => ({ lap: p.lap, option: p.chosen })) }
+      : {}),
   };
 }
 
-/** Rebuild the paused run from a job (deterministic replay). */
-export function runFromJob(job: GradeJob): Run {
-  const run = initRun(job.model, job.seed, { decisions: job.decisions });
+/**
+ * Rebuild the paused run from a job (deterministic replay), with the job's rival. An Expert
+ * rival replays its recorded choices and never grades here: a decision point without one
+ * waits (a decision at the paused lap stays pending for the rival's own grade job; an earlier
+ * one throws).
+ */
+export function runFromJob(
+  job: Pick<
+    GradeJob,
+    'model' | 'seed' | 'decisions' | 'pausedAtLap' | 'rivalPolicy' | 'rivalChoices'
+  >,
+): Run {
+  const run = initRun(job.model, job.seed, {
+    decisions: job.decisions,
+    ...(job.rivalPolicy ? { rivalPolicy: job.rivalPolicy } : {}),
+    ...(job.rivalPolicy === 'expert'
+      ? { rivalChoices: job.rivalChoices ?? [], rivalGrading: 'deferred' as const }
+      : {}),
+  });
   while (run.state.lap < job.pausedAtLap) stepLap(run);
   return run;
 }

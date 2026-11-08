@@ -95,15 +95,27 @@ export interface DriverModel {
   realStrategy: PitStop[];
 }
 
+/** A car fault's kind (simulator roadmap R2; faults.ts). */
+export type FaultKind = 'gear-stuck' | 'power-loss' | 'puncture' | 'tyre-failure';
+
 export interface RaceEvent {
   lap: number;
-  type: 'SC' | 'VSC' | 'RED' | 'RAIN' | 'RETIREMENT';
+  type: 'SC' | 'VSC' | 'RED' | 'RAIN' | 'RETIREMENT' | 'FAULT';
+  /** How long it lasts. A FAULT without it lasts to the flag (or its car's next stop). */
   laps?: number;
   driver?: string;
   /** A RED event: how the race resumed (eras build plan 4.3, redflag.ts). Absent: it didn't. */
   restart?: 'standing' | 'rolling';
   /** Defines the storyline: Legend difficulty always runs it on its real lap (eras spec 8). */
   storylineEvent?: boolean;
+  /** A FAULT (driver required): its kind. */
+  fault?: FaultKind;
+  /** A FAULT: seconds a green lap the car loses while it lasts (fitted from its real laps). */
+  paceLoss?: number;
+  /** A FAULT: extra seconds on the fault's own lap (a puncture's forced slow lap). */
+  slowLap?: number;
+  /** A FAULT that lasts until the car's next stop (new tyres fix a puncture). */
+  untilStop?: boolean;
 }
 
 // Eras mode (eras spec sections 6, 8 and 11; schema v11). Types and validation only: the
@@ -252,8 +264,8 @@ export interface RaceModel {
     takeoverLap: number;
     seed: number;
     /** Which lapped cars unlap before a SC restart: all (the rule, default), only those
-     * between userSide and rival (Abu Dhabi 2021's race-control call), or none (before 2012;
-     * treated as all until eras build plan 4.1). */
+     * between userSide and rival (Abu Dhabi 2021's race-control call), or none (lapped cars
+     * stay a lap down: before 2007 and 2010-11; rules.ts scQueue). */
     scUnlap?: 'all' | 'duel' | 'none';
   };
   era: Era;
@@ -309,6 +321,9 @@ export interface PitStop {
    * the stop's cost; replays and every other car keep it.
    */
   optional?: boolean;
+  /** A stop forced by a damaged tyre (a puncture): it fits new tyres even when a race allows
+   * no tyre changes (rules.tyreChanges false, eras build plan 4.1). */
+  damaged?: boolean;
 }
 
 export interface CarState {
@@ -337,6 +352,8 @@ export interface CarState {
   battery?: number;
   /** Fuel in the tank, kg (the player's car in live play only; fuel load spec). */
   fuel?: number;
+  /** A stop-go penalty owed (s), for entering a closed pit lane (rules.pitLaneClosedUnderSC). */
+  stopGo?: number;
 }
 
 /**
@@ -430,7 +447,9 @@ export interface RaceNote {
     | 'blue' // went round a lapped car; value: the time it gained (negative)
     | 'trust' // value: the change; detail: why (TrustReason)
     | 'rogue' // a furious driver picks his own battle move (detail: the move)
-    | 'fuel'; // fuel load spec: detail 'empty' (the tank ran dry)
+    | 'fuel' // fuel load spec: detail 'empty' (the tank ran dry)
+    | 'stop-go' // era rules: a closed pit lane's penalty; detail 'owed' | 'served', value: s
+    | 'fault'; // a car fault struck (faults.ts); detail: its kind
   driver: string;
   /** For an incident: 'crash', 'mechanical' or 'puncture'; see the kinds above. */
   detail?: string;

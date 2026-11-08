@@ -1,8 +1,12 @@
 import type { RaceModel } from '@laststint/sim';
 import { describe, expect, it } from 'vitest';
-import { EraProvider } from './EraProvider.js';
+import { EraProvider, eraDailyOf } from './EraProvider.js';
 import type { AttemptRequest, ErasApi } from './api.js';
-import { MOCK_RACE_ID, mockErasApi } from './mockErasApi.js';
+import { ERAS, racesOfEra } from './catalog.js';
+import { mockCanStart, mockErasApi } from './mockErasApi.js';
+
+/** A race the mock can start: it has a bundled race file. */
+const MOCK_RACE_ID = 'abu-dhabi-2021';
 
 /** The mock, recording the attempts asked for. */
 function recording(overrides: Partial<ErasApi> = {}) {
@@ -34,7 +38,8 @@ describe('EraProvider', () => {
       date: 'eras:a1',
       attemptId: 'a1',
       legend: false,
-      source: 'practice',
+      source: 'eras',
+      draft: true,
     });
     expect(daily.model.race.id).toBe(MOCK_RACE_ID);
     expect(daily.difficulty).toMatchObject({ information: 'full', decisionTimerSeconds: 45 });
@@ -54,6 +59,24 @@ describe('EraProvider', () => {
     expect(a.legend).toBe(true);
   });
 
+  it('is an Eras race, not practice, and Draft only when the attempt says so', async () => {
+    const { api } = recording({
+      startAttempt: async (req) => {
+        const { draft: _draft, ...rest } = await mockErasApi.startAttempt(req);
+        return rest;
+      },
+    });
+    const daily = await new EraProvider(MOCK_RACE_ID, false, api).today();
+    expect(daily.source).toBe('eras');
+    expect(daily.practiceReason).toBeUndefined();
+    expect(daily.draft).toBe(false);
+    expect(eraDailyOf(daily)).toBe(daily);
+    expect(eraDailyOf(null)).toBeNull();
+    expect(eraDailyOf({ ...daily, source: 'practice' })).toBeNull();
+    const { attemptId: _id, ...noAttempt } = daily;
+    expect(eraDailyOf(noAttempt)).toBeNull();
+  });
+
   it('fails when the attempt pins a different race', async () => {
     const other = { race: { id: 'bahrain-2021' } } as unknown as RaceModel;
     const { api } = recording({ loadModel: async () => other });
@@ -64,7 +87,10 @@ describe('EraProvider', () => {
 
   it('passes on a refused attempt', async () => {
     await expect(new EraProvider('monaco-2022', false, mockErasApi).today()).rejects.toThrow(
-      /only serves/,
+      'no race file for monaco-2022 in this build yet',
+    );
+    await expect(new EraProvider('abu-dhabi-2024', false, mockErasApi).today()).rejects.toThrow(
+      /not an Eras race/,
     );
     await expect(new EraProvider('', false, mockErasApi).today()).rejects.toThrow(/no race/);
   });
@@ -79,10 +105,51 @@ describe('mockErasApi', () => {
     expect(eras.every((e) => e.maxStars === 30 && e.stars === 0)).toBe(true);
   });
 
-  it('serves its one race in Era 9', async () => {
-    expect((await mockErasApi.era(9)).races.map((r) => r.raceId)).toEqual([MOCK_RACE_ID]);
-    expect((await mockErasApi.era(10)).races).toEqual([]);
+  it("lists every era's ten races in position order, all Draft", async () => {
+    for (const era of ERAS) {
+      const detail = await mockErasApi.era(era.id);
+      expect(detail.eraId).toBe(era.id);
+      expect(detail.races.map((r) => r.raceId)).toEqual(racesOfEra(era.id).map((r) => r.raceId));
+      expect(detail.races.map((r) => r.position)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+      expect(detail.races.every((r) => r.draft && r.bestAccuracy === null)).toBe(true);
+    }
+    // Reconstructed: the 1983–1995 races (spec §4 data table).
+    const reconstructed = async (id: number) =>
+      (await mockErasApi.era(id)).races.filter((r) => r.reconstructed).map((r) => r.raceId);
+    expect(await reconstructed(1)).toHaveLength(10);
+    expect(await reconstructed(3)).toEqual(['spain-1994', 'australia-1994', 'belgium-1995']);
+    expect(await reconstructed(9)).toEqual([]);
     await expect(mockErasApi.era(42)).rejects.toThrow(/no era/);
     await expect(mockErasApi.loadModel('https://x/y')).rejects.toThrow(/no model/);
+    await expect(mockErasApi.loadModel('mock://races/monaco-2022')).rejects.toThrow(/no model/);
+  });
+
+  it('starts attempts only on races with a bundled race file, each loading its own race', async () => {
+    const startable = ERAS.flatMap((e) => racesOfEra(e.id))
+      .map((r) => r.raceId)
+      .filter(mockCanStart);
+    expect(startable).toContain(MOCK_RACE_ID);
+    expect(startable).not.toContain('monaco-2022');
+    for (const raceId of startable) {
+      const daily = await new EraProvider(raceId, false, mockErasApi).today();
+      expect(daily.model.race.id).toBe(raceId);
+    }
+  });
+
+  it("gives the era's difficulty, or Legend's", async () => {
+    const era10 = await mockErasApi.startAttempt({ raceId: 'hungary-2022', legend: false });
+    expect(era10.difficulty).toEqual({
+      accuracyThreshold: 70,
+      information: 'full',
+      rivalPolicy: 'standard',
+      decisionTimerSeconds: 45,
+    });
+    const legend = await mockErasApi.startAttempt({ raceId: 'hungary-2022', legend: true });
+    expect(legend.difficulty).toEqual({
+      accuracyThreshold: 90,
+      information: 'minimal',
+      rivalPolicy: 'expert',
+      decisionTimerSeconds: 20,
+    });
   });
 });

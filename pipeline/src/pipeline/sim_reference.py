@@ -13,8 +13,10 @@ from __future__ import annotations
 import json
 import math
 from dataclasses import dataclass, field
+from pathlib import Path
 
-from . import redflag
+from . import race_rules, redflag
+from .legend import legend_events
 from .paths import GOLDEN_DIR
 from .rng import Mulberry32, derive_seed
 
@@ -59,6 +61,8 @@ class Car:
     tyre_wear: float | None = None
     # A wet race: the driver's extra share of a lap in the wet (wet.driver_wet_pace).
     wet_pace: float = 0.0
+    # A stop-go owed for entering a closed pit lane (race_rules; 2007-08).
+    stop_go: float = 0.0
 
     def __post_init__(self):
         if self.tyre_wear is None:
@@ -180,14 +184,19 @@ def _classify(order, cars) -> dict:
 
 
 def simulate(
-    model: dict, seed: int, strategies: dict | None = None, rival_policy: str | None = None
+    model: dict,
+    seed: int,
+    strategies: dict | None = None,
+    rival_policy: str | None = None,
+    legend: bool = False,
 ) -> dict:
     """Run one seeded simulation to the flag. Returns finishing order and gaps to winner.
 
     `rival_policy` (rival_policy.py; default "standard") is validated so both sims accept the
     same names; with no player-controlled car the rival never reacts, so it can't change the
-    result."""
-    from .rival_policy import resolve_rival_policy  # here, not at the top: it imports this module
+    result. `legend`: Legend difficulty's random SC/VSC periods (legend.py)."""
+    from .faults import FaultState  # here, not at the top: they import this module
+    from .rival_policy import resolve_rival_policy
 
     resolve_rival_policy(rival_policy)
     track = model["track"]
@@ -208,13 +217,15 @@ def simulate(
 
     neutral: dict[int, str] = {}
     retire_at: dict[int, set[str]] = {}
-    for e in model["events"]:
+    events = legend_events(model, seed) if legend else model["events"]
+    for e in events:
         if e["type"] in ("SC", "VSC", "RED"):
             for lap in range(e["lap"], e["lap"] + int(e.get("laps", 1))):
                 neutral[lap] = e["type"]
         elif e["type"] == "RETIREMENT":
             retire_at.setdefault(e["lap"], set()).add(e["driver"])
-    red = redflag.plan(model["events"])  # free stops in the stoppage, gaps wiped at restart
+    faults = FaultState(model["events"])  # car faults (faults.py): frozen on their real laps
+    red = redflag.plan(events)  # free stops in the stoppage, gaps wiped at the restart
 
     ordered = sorted(model["drivers"], key=lambda d: d["stateAtTakeover"]["position"])
     cars: dict[str, Car] = {}
@@ -255,14 +266,29 @@ def simulate(
             car = cars[code]
             pit = next((st for st in car.strategy if st["lap"] == lap), None)
             pit_cost = 0.0
+            # Era rules (race_rules): an owed stop-go is served on a green lap.
+            if car.stop_go:
+                served = race_rules.serve_stop_go(car, flag, lap, total_laps)
+                if served:
+                    pit_cost += served
+                    pitted.add(code)
             if pit:
                 pitted.add(code)
                 car.strategy.remove(pit)
-                car.compound = pit["to"]
-                car.tyre_age = 0
-                car.tyre_wear = 0.0
+                # Era rules: with no tyre changes (2005) the stop keeps the set.
+                if race_rules.stop_changes_tyres(model, car.compound, pit):
+                    car.compound = pit["to"]
+                    car.tyre_age = 0
+                    car.tyre_wear = 0.0
                 default = {"SC": pit_loss_sc, "VSC": pit_loss_vsc}.get(flag, pit_loss)
-                pit_cost = 0.0 if lap in red["free"] else pit.get("loss", default)
+                # A red flag's stoppage: the tyre change there is free (redflag.py).
+                pit_cost += 0.0 if lap in red["free"] else pit.get("loss", default)
+                # Era rules: an added stop into a closed pit lane (2007-08) owes a stop-go.
+                if pit.get("added") and race_rules.pit_lane_closed(model, neutral, lap, pit["to"]):
+                    car.stop_go += race_rules.stop_go_cost(model)
+                    if lap >= total_laps:
+                        pit_cost += race_rules.serve_stop_go(car, flag, lap, total_laps)
+            fault_pace, fault_extra = faults.cost(code, lap, bool(pit), flag is None)
 
             if flag == "SC" and sc_time:
                 lt = sc_time
@@ -278,7 +304,8 @@ def simulate(
                 ahead_gap = car.total_time - prev_time.get(ahead, car.total_time)
                 if 0 < ahead_gap < DIRTY_AIR_RANGE:
                     lt += dirty_air
-            clean[code] = _clean_lap(car, compounds, fuel, lap, fresh_tyre, weather)
+            lt += fault_pace + fault_extra
+            clean[code] = _clean_lap(car, compounds, fuel, lap, fresh_tyre, weather) + fault_pace
             car.total_time += lt + pit_cost
             car.tyre_age += 1
             car.tyre_wear += weather_wear(weather, car.compound, lap)
@@ -300,14 +327,7 @@ def simulate(
                 # Deployment lap: gaps kept (delta time). Middle laps: each gap keeps
                 # SC_GAP_KEEP of its excess. Last lap before the restart: nose-to-tail.
                 keep = 0.0 if neutral.get(lap + 1) != "SC" else SC_GAP_KEEP
-                duel = (model["userSide"], model["rival"])
-                _bunch(
-                    live,
-                    cars,
-                    green,
-                    keep,
-                    duel if model["race"].get("scUnlap") == "duel" else None,
-                )
+                _bunch(live, cars, green, keep, race_rules.sc_queue(model))
                 live = sorted(live, key=lambda c: cars[c].total_time)
                 order[:] = live + [c for c in order if cars[c].retired]
         else:
@@ -324,7 +344,7 @@ def _bunch(
     cars: dict[str, Car],
     lap_time: float | None,
     keep: float,
-    duel: tuple[str, str] | None,
+    duel: tuple[str, str] | str | None,
 ) -> None:
     """Close the SC queue: each gap keeps `keep` of its excess over BUNCH_GAP (nose-to-tail on
     the last lap). By the rules every lapped car unlaps and joins the back of the queue, so
@@ -345,8 +365,9 @@ def _bunch(
     on_track = {c: cars[c].total_time - lead - down[c] * (lap_time or 0.0) for c in live}
     lead_lap = [c for c in live if down[c] == 0]
     waved: list[str] = []
-    a, b = duel
-    if keep == 0.0 and a in lead_lap and b in lead_lap:
+    # scUnlap "none" (race_rules.sc_queue): the lead lap closes up, nobody is waved through.
+    a, b = ("", "") if duel == "none" else duel
+    if duel != "none" and keep == 0.0 and a in lead_lap and b in lead_lap:
         lo, hi = sorted((on_track[a], on_track[b]))
         waved = sorted(
             (c for c in live if down[c] >= 1 and lo < on_track[c] < hi),
@@ -362,9 +383,11 @@ def _bunch(
         cars[c].total_time = last
 
 
-def write_golden(model: dict, seeds: list[int]) -> None:
-    """Write reference outputs for fixed seeds to data/golden/ for TS parity tests."""
-    GOLDEN_DIR.mkdir(parents=True, exist_ok=True)
+def write_golden(model: dict, seeds: list[int], golden_dir: Path | None = None) -> None:
+    """Write reference outputs for fixed seeds to data/golden/ (or golden_dir) for TS parity
+    tests."""
+    golden_dir = Path(golden_dir) if golden_dir is not None else GOLDEN_DIR
+    golden_dir.mkdir(parents=True, exist_ok=True)
     out = {str(s): simulate(model, s) for s in seeds}
-    path = GOLDEN_DIR / f"{model['race']['id']}.json"
+    path = golden_dir / f"{model['race']['id']}.json"
     path.write_text(json.dumps(out, indent=2))

@@ -4,6 +4,47 @@
 
 /** Previous season's constructors' standings, champions first, in this season's names. */
 const STANDINGS: Record<number, string[]> = {
+  // 2014-2016 (Eras): the 2013-2015 final standings from the Jolpica dump (2026-10-24,
+  // formula_one_teamchampionship). A team new that season has no standing and goes last:
+  // Renault takes Lotus F1's 2015 place, Haas comes in after Manor.
+  2014: [
+    'Red Bull Racing',
+    'Mercedes',
+    'Ferrari',
+    'Lotus F1',
+    'McLaren',
+    'Force India',
+    'Sauber',
+    'Toro Rosso',
+    'Williams',
+    'Marussia',
+    'Caterham',
+  ],
+  2015: [
+    'Mercedes',
+    'Red Bull Racing',
+    'Williams',
+    'Ferrari',
+    'McLaren',
+    'Force India',
+    'Toro Rosso',
+    'Lotus F1',
+    'Manor Marussia',
+    'Sauber',
+  ],
+  2016: [
+    'Mercedes',
+    'Ferrari',
+    'Williams',
+    'Red Bull Racing',
+    'Force India',
+    'Renault',
+    'Toro Rosso',
+    'Sauber',
+    'McLaren',
+    'Manor Marussia',
+    'Haas F1 Team',
+  ],
   2018: [
     'Mercedes',
     'Ferrari',

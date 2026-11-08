@@ -82,7 +82,7 @@ in code:
 
 ## Data pipeline
 
-All sources below were tested Nov 4–5, 2026, unless marked.
+All sources below were tested Nov 4–5, 2026, unless marked. **LastStint is non-commercial (owner, Nov 7, 2026).** That is what lets us use the TUM and Jolpica data (both CC BY-NC-SA): no ads, payments or sponsorship while they're used. The credits must name TUM, Jolpica (CC BY-NC-SA) and F1DB (CC BY 4.0).
 
 | Source | Covers | Gives | Notes |
 |---|---|---|---|

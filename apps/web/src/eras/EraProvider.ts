@@ -10,6 +10,8 @@ export interface EraDaily extends Daily {
   attemptId: string;
   legend: boolean;
   difficulty: AttemptResponse['difficulty'];
+  /** The race isn't published: playable on test only (spec §5), shown with a Draft badge. */
+  draft: boolean;
 }
 
 export class EraProvider implements DailyProvider {
@@ -32,14 +34,20 @@ export class EraProvider implements DailyProvider {
       raceId: this.raceId,
       seed: attempt.seed,
       model,
-      // TODO(8.4/8.7): an 'eras' source (data/types.ts, state/machine.ts) so the race and
-      // result screens label and submit an attempt. Until then it plays like practice: graded
-      // locally, never posted as a daily run.
-      source: 'practice',
-      practiceReason: 'Eras attempt',
+      // Graded on this device and never posted as a daily run; the attempt's own submission
+      // is build plan 8.7 (useGame's `submit`).
+      source: 'eras',
       attemptId: attempt.attemptId,
       legend: this.legend,
       difficulty: attempt.difficulty,
+      draft: attempt.draft === true,
     };
   }
+}
+
+/** The Eras attempt a loaded race belongs to, or null if it isn't one. */
+export function eraDailyOf(daily: Daily | null): EraDaily | null {
+  if (!daily || daily.source !== 'eras') return null;
+  const d = daily as Partial<EraDaily>;
+  return typeof d.attemptId === 'string' && d.difficulty ? (daily as EraDaily) : null;
 }

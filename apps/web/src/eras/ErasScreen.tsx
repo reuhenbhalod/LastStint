@@ -1,14 +1,17 @@
 // Eras mode's screens (docs/laststint-eras-mode-spec.md §14), routed from App.tsx: the era map
-// at /eras (build-plan 8.2) and an era's detail at /eras/<eraId>. The detail is a placeholder
-// with the era's name; step 8.3 replaces it with the briefing and race cards.
+// at /eras (build-plan 8.2), an era's detail at /eras/<eraId> (8.3), and one of its races at
+// /eras/<eraId>/<raceId>, or …/legend (EraRace.tsx).
 
 import { ERA_UNLOCK_SHARE } from '@laststint/sim';
 import { type ReactNode, useCallback, useEffect, useState } from 'react';
 import { Brand } from '../components/Brand.js';
 import { Disclaimer } from '../components/Disclaimer.js';
+import { EraDetailBody } from './EraDetail.js';
 import { EraMapBody } from './EraMap.js';
+import { EraRace } from './EraRace.js';
 import { type ErasApi, erasApi } from './api.js';
 import type { EraInfo, ErasRoute } from './catalog.js';
+import { type EraDetailState, loadEraDetail } from './eraDetailState.js';
 import { type EraMapState, loadEraMap } from './eraMapState.js';
 
 function Header() {
@@ -81,8 +84,38 @@ export function EraMap({
   );
 }
 
-/** An era's detail (placeholder): its name and years. */
-export function EraDetailScreen({ era }: { era: EraInfo }) {
+/** An era's detail: its briefing, lock, stars and Legend, and its ten race cards. */
+export function EraDetailScreen({
+  era,
+  api = erasApi,
+  initial = { kind: 'loading' },
+  initialLegend = false,
+}: {
+  era: EraInfo;
+  api?: ErasApi;
+  /** The state before the first load finishes (tests render a given state). */
+  initial?: EraDetailState;
+  /** Legend on at first (tests). */
+  initialLegend?: boolean;
+}) {
+  const [state, setState] = useState<EraDetailState>(initial);
+  const [legend, setLegend] = useState(initialLegend);
+  const [attempt, setAttempt] = useState(0);
+  const retry = useCallback(() => setAttempt((n) => n + 1), []);
+
+  useEffect(() => {
+    // `attempt` re-runs the load on Try again.
+    void attempt;
+    let live = true;
+    setState({ kind: 'loading' });
+    loadEraDetail(api, era.id).then((next) => {
+      if (live) setState(next);
+    });
+    return () => {
+      live = false;
+    };
+  }, [api, era.id, attempt]);
+
   return (
     <Shell>
       <a href="/eras" className="text-[13px] text-[var(--muted)] underline hover:text-[var(--ink)]">
@@ -91,7 +124,10 @@ export function EraDetailScreen({ era }: { era: EraInfo }) {
       <p className="eyebrow m-0 !text-[var(--box-ink)]">
         Era {era.id} · {era.years}
       </p>
-      <h1 className="disp wide m-0 text-[40px] leading-[0.95] sm:text-[60px]">{era.name}</h1>
+      <h1 className="disp wide m-0 break-words text-[40px] leading-[0.95] sm:text-[60px]">
+        {era.name}
+      </h1>
+      <EraDetailBody era={era} state={state} legend={legend} onLegend={setLegend} onRetry={retry} />
     </Shell>
   );
 }
@@ -103,11 +139,13 @@ export function Eras({ route }: { route: ErasRoute }) {
       return <EraMap />;
     case 'era':
       return <EraDetailScreen era={route.era} />;
+    case 'race':
+      return <EraRace era={route.era} race={route.race} legend={route.legend} />;
     case 'unknown':
       return (
         <Shell>
           <h1 className="disp m-0 text-[32px]">No such era</h1>
-          <p className="m-0 text-[var(--muted)]">There’s no era “{route.segment}”.</p>
+          <p className="m-0 text-[var(--muted)]">There’s no era or race “{route.segment}”.</p>
           <a href="/eras" className="underline">
             See all eras
           </a>

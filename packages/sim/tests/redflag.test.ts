@@ -5,7 +5,8 @@
 // pipeline/tests/make_redflag_fixture.py.
 
 import { describe, expect, it } from 'vitest';
-import { candidateMoments } from '../src/moments.js';
+import { legendEvents } from '../src/legend.js';
+import { candidateMoments, pauseAt } from '../src/moments.js';
 import { RESTART_QUEUE_GAP, STANDING_RESTART_GAP, redFlagPlan } from '../src/redflag.js';
 import {
   BUNCH_GAP,
@@ -37,7 +38,21 @@ function variants(): Record<string, RaceModel> {
   for (const e of standing.events) if (e.type === 'RED') e.restart = 'standing';
   const extra = structuredClone(standing);
   extra.drivers.find((d) => d.code === 'ALO')?.realStrategy.push({ lap: 65, to: 'INTERMEDIATE' });
-  return { rolling: zandvoort, standing, 'standing-free-stop': extra };
+  const faults = structuredClone(zandvoort);
+  faults.events = [
+    ...faults.events,
+    { lap: 62, type: 'FAULT', driver: 'VER', fault: 'power-loss', paceLoss: 1.5 },
+    {
+      lap: 63,
+      type: 'FAULT',
+      driver: 'PER',
+      fault: 'puncture',
+      paceLoss: 3.0,
+      untilStop: true,
+      slowLap: 5.0,
+    },
+  ].sort((a, b) => a.lap - b.lap || a.type.localeCompare(b.type)) as RaceModel['events'];
+  return { rolling: zandvoort, standing, 'standing-free-stop': extra, faults };
 }
 
 const upTo = (model: RaceModel, laps: number): RaceModel => ({
@@ -62,7 +77,32 @@ describe.each(Object.entries(variants()))('%s matches the Python reference sim',
   });
 });
 
+describe('Legend: the red flag stays real', () => {
+  const expected = golden.legend ?? {};
+  it.each(Object.keys(expected))('seed %s matches the Python reference sim', (seed) => {
+    const want = expected[seed];
+    if (!want) throw new Error(`missing golden seed ${seed}`);
+    const n = Number(seed);
+    const events = legendEvents(zandvoort, n);
+    expect(events).toContainEqual({ lap: 64, type: 'RED', laps: 2, restart: 'rolling' });
+    expect(events).toContainEqual({ lap: 66, type: 'SC', laps: 1 });
+    const got = simulate(zandvoort, n, { legend: true });
+    expect(got.order).toEqual(want.order);
+    for (const code of want.finishers) {
+      expect(got.times[code]).toBeCloseTo(want.times[code] as number, 3);
+    }
+  });
+});
+
 describe('the red flag model', () => {
+  it("a car fault's pace loss counts on green laps only, not red ones", () => {
+    const time = (m: RaceModel, laps: number) => simulate(upTo(m, laps), 1).times.VER as number;
+    const v = variants();
+    const faults = v.faults as RaceModel;
+    expect(time(faults, 63) - time(zandvoort, 63)).toBeCloseTo(3, 9);
+    expect(time(faults, 64) - time(zandvoort, 64)).toBeCloseTo(3, 9);
+  });
+
   it('the fixture red flag: lap 64, stoppage on 65, one SC lap, rolling', () => {
     expect(zandvoort.events.filter((e) => e.type !== 'RETIREMENT')).toEqual([
       { lap: 64, type: 'RED', laps: 2, restart: 'rolling' },
@@ -119,6 +159,19 @@ describe('the red flag model', () => {
     expect(redFlagFree(fork, 65)).toBe(false);
     const known = forkRun(run, 9, [], { blindAfter: 64 });
     expect(redFlagFree(known, 65)).toBe(true);
+  });
+});
+
+describe('pauseAt with a real stop on the lap after the takeover', () => {
+  it('keeps that stop (called before the car went live) instead of throwing', () => {
+    // ALO really boxed at the end of lap 61: from a lap-61 takeover that call was made before
+    // the player took over.
+    const late = { ...zandvoort, race: { ...zandvoort.race, takeoverLap: 61 } };
+    const run = pauseAt(late, 64);
+    expect(run.state.lap).toBe(63);
+    expect(run.state.cars.ALO?.compound).toBe('INTERMEDIATE');
+    expect(run.state.cars.ALO?.tyreAge).toBe(2);
+    expect(() => candidateMoments(late)).not.toThrow();
   });
 });
 
