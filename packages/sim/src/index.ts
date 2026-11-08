@@ -112,3 +112,4 @@ export {
   wetPenalty,
   wetnessOn,
 } from './weather.js';
+export * from './eras/config.js';
