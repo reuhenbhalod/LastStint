@@ -206,6 +206,14 @@ Rename `usa-2018`, `usa-2021` and `usa-2022` to `united-states-<year>`, and `sau
 - **Done when:** it runs on `abu-dhabi-2021`, and a test checks the counts and the tie rule
   on a fixture.
 
+**Eras overlay files (decided Nov 7).** `pipeline build` writes each race file fresh from the
+timing data, so authored Eras content can't live in `data/races/<id>.json`. Instead it lives in
+`data/eras/<race-id>.json`, one file per race, with up to four top-level keys: `eras`,
+`provenance`, `rules` and `storylineEvents` (a list of `[lap, eventType]`). `pipeline build`
+applies the overlay with `export.with_eras_fields` (step 2.4 adds this). Each step writes only
+its own keys: 1.5 writes `eras.hardCalls` and `eras.userSide`, 2.4 writes `provenance`, 4.1
+writes `rules`, 6.2 writes the rest of `eras` and `storylineEvents`.
+
 ## Phase 2: Data pipeline (11%)
 
 Each adapter writes the same raw parquet (`LAP_COLUMNS`) and status JSON as `ingest.py`, so
