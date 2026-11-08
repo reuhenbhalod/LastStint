@@ -5,7 +5,8 @@
     "name": "Spain 1996: Schumacher vs Alesi",
     "laps": 65,
     "takeoverLap": 21,
-    "seed": 1
+    "seed": 1,
+    "scUnlap": "none"
   },
   "era": "1994-2009",
   "track": {
@@ -16,7 +17,7 @@
       -9.527,
       -4.298,
       -2.132,
-      -0.688,
+      -0.689,
       -0.432,
       0.432,
       1.553,

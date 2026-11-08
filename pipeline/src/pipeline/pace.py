@@ -101,14 +101,22 @@ def sim_frame_losses(
     wear: pd.Series | None = None,
     wet_pace: dict[str, float] | None = None,
     service: bool = False,
+    eras_stops: bool = False,
 ) -> dict[tuple[str, int], float]:
     """(driver, out-lap) -> loss for each green-flag stop after the takeover, in the sim frame.
     A stop whose in-lap is the takeover lap is charged its out-lap only. `service`: the stops
-    that changed no tyres instead (track.service_stops), on the set the car kept."""
+    that changed no tyres instead (track.service_stops), on the set the car kept.
+
+    `eras_stops` (Eras builds): a back-to-back stop (its in-lap the previous stop's out-lap,
+    track.chained_in_laps) is charged its out-lap only too, so the shared lap counts once;
+    and laps under local yellows only ("12", "21": track.racing_status) count as green, so
+    such a stop is priced here rather than at the field-median figure."""
     from .clean import fitted_compound
-    from .track import pit_stops, service_stops
+    from .track import chained_in_laps, pit_stops, racing_status, service_stops
 
     fitted = fitted_compound(laps)
+    chained = chained_in_laps(laps) if eras_stops else set()
+    green = racing_status if eras_stops else (lambda st: str(st) == "1")
 
     def clean(code: str, compound: str, age: int, row: pd.Series, tyre_wear=None) -> float:
         car = Car(
@@ -127,7 +135,7 @@ def sim_frame_losses(
     out: dict[tuple[str, int], float] = {}
     if service:
         # Stops with no tyre change (track.service_stops): the set runs on through the out-lap.
-        for code, in_lap, out_lap in service_stops(laps):
+        for code, in_lap, out_lap in service_stops(laps, eras_stops):
             n_in, n_out = int(in_lap["LapNumber"]), int(out_lap["LapNumber"])
             if n_in < takeover_lap or code not in base_pace:
                 continue
@@ -137,7 +145,7 @@ def sim_frame_losses(
             out_wear = None if wear is None else float(wear.loc[out_lap.name])
             age = max(0, int(out_lap["TyreLife"]) - 1)
             loss = float(out_lap["LapTime"]) - clean(code, compound, age, out_lap, out_wear)
-            if n_in > takeover_lap:
+            if n_in > takeover_lap and (code, n_in) not in chained:
                 in_wear = None if wear is None else float(wear.loc[in_lap.name])
                 age = max(0, int(in_lap["TyreLife"]) - 1)
                 loss += float(in_lap["LapTime"]) - clean(code, compound, age, in_lap, in_wear)
@@ -147,15 +155,20 @@ def sim_frame_losses(
         n_in, n_out = int(in_lap["LapNumber"]), int(out_lap["LapNumber"])
         if n_in < takeover_lap or code not in base_pace:
             continue
-        if any(str(r["TrackStatus"]) != "1" for r in (in_lap, out_lap)):
+        own_in = n_in > takeover_lap and (code, n_in) not in chained
+        # The in-lap is checked unless it is the previous stop's out-lap (Eras builds).
+        check_in = (code, n_in) not in chained
+        if not all(
+            green(r["TrackStatus"]) for r in ((in_lap, out_lap) if check_in else (out_lap,))
+        ):
             continue
-        if pd.isna(in_lap["LapTime"]) or pd.isna(out_lap["LapTime"]):
+        if pd.isna(out_lap["LapTime"]) or (check_in and pd.isna(in_lap["LapTime"])):
             continue
         new = str(fitted.loc[out_lap.name])
-        if new not in compounds or str(in_lap["Compound"]) not in compounds:
+        if new not in compounds or (check_in and str(in_lap["Compound"]) not in compounds):
             continue
         loss = float(out_lap["LapTime"]) - clean(code, new, 0, out_lap)
-        if n_in > takeover_lap:
+        if own_in:
             age = max(0, int(in_lap["TyreLife"]) - 1)
             in_wear = None if wear is None else float(wear.loc[in_lap.name])
             loss += float(in_lap["LapTime"]) - clean(

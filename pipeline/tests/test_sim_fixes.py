@@ -153,3 +153,87 @@ def test_saudi_2021_pit_loss_leaves_out_the_damage_stops():
     assert track.pit_loss(laps) == pytest.approx(48.916, abs=0.01)
     assert track.pit_loss(laps, guard=True) == pytest.approx(23.935, abs=0.01)
     assert {("RAI", 27), ("TSU", 24)} <= track.damage_stops(laps)
+
+
+# --- stop-loss fixes (integration 5) ----------------------------------------------------------
+
+
+def test_back_to_back_stops_count_their_shared_lap_once():
+    """canada-2011 MAS: in on 52 (out 53) and in on 53 (out 54). Lap 53 is the first stop's
+    out-lap; an Eras build measures the second on lap 54 alone."""
+    laps = _raw("canada-2011")
+    assert ("MAS", 53) in track.chained_in_laps(laps)
+    old = {r["out_lap"]: r for r in track.stop_records(laps) if r["driver"] == "MAS"}
+    new = {r["out_lap"]: r for r in track.stop_records(laps, True) if r["driver"] == "MAS"}
+    assert new[53]["loss"] == pytest.approx(old[53]["loss"])
+    assert new[54]["in_loss"] == 0.0
+    assert new[54]["loss"] == pytest.approx(old[54]["loss"] - old[54]["in_loss"])
+    assert new[54]["loss"] < 15.0 < old[54]["loss"]
+    # Stops that aren't back to back measure as before.
+    assert new[22]["loss"] == pytest.approx(old[22]["loss"])
+
+
+def _frame(race_id: str, eras_stops: bool) -> dict:
+    laps = _raw(race_id)
+    model = _model(race_id)
+    pace_of = {d["code"]: d["basePace"] for d in model["drivers"]}
+    return pace.sim_frame_losses(
+        laps,
+        pace_of,
+        model["compounds"],
+        model["fuelEffectPerLap"],
+        model["freshTyre"],
+        model["race"]["takeoverLap"],
+        model.get("weather"),
+        None,
+        {d["code"]: d["wetPace"] for d in model["drivers"] if "wetPace" in d},
+        eras_stops=eras_stops,
+    )
+
+
+def test_sim_frame_charges_a_back_to_back_stop_its_out_lap_only():
+    laps = _raw("canada-2011")
+    old, new = _frame("canada-2011", False), _frame("canada-2011", True)
+    lap = laps[(laps["Driver"] == "MAS")].set_index("LapNumber")
+    assert new[("MAS", 53)] == pytest.approx(old[("MAS", 53)])
+    # Old: lap 53 (already in the first stop's loss) plus lap 54; new: lap 54's excess only.
+    assert new[("MAS", 54)] < old[("MAS", 54)]
+    assert new[("MAS", 54)] < float(lap.loc[54, "LapTime"]) - float(lap.loc[56, "LapTime"]) + 10.0
+    assert new[("MAS", 53)] + new[("MAS", 54)] < 75.0 < old[("MAS", 53)] + old[("MAS", 54)]
+
+
+def test_partly_yellow_stops_are_priced_in_the_sim_frame():
+    """Stops whose in- or out-lap ran under local yellows only ("12", "21") were left to the
+    field-median figure; an Eras build prices them in the sim frame, like green ones."""
+    laps = _raw("canada-2011")
+    yellow = {
+        (d, int(o["LapNumber"]))
+        for d, i, o in track.pit_stops(laps)
+        if {str(i["TrackStatus"]), str(o["TrackStatus"])} - {"1"}
+        and all(track.racing_status(r["TrackStatus"]) for r in (i, o))
+    }
+    old, new = _frame("canada-2011", False), _frame("canada-2011", True)
+    model = _model("canada-2011")
+    running = {d["code"] for d in model["drivers"]}
+    after = {k for k in yellow if k[1] > model["race"]["takeoverLap"] + 1 and k[0] in running}
+    assert after
+    assert not after & set(old)
+    assert after <= set(new)
+    # Green stops price as before (back-to-back ones aside).
+    chained = track.chained_in_laps(laps)
+    for key, loss in old.items():
+        if (key[0], key[1] - 1) not in chained:
+            assert new[key] == pytest.approx(loss)
+
+
+def test_racing_status():
+    assert [track.racing_status(s) for s in ("1", "12", "21", "2", "124", "4", "", None)] == [
+        True,
+        True,
+        True,
+        True,
+        False,
+        False,
+        False,
+        False,
+    ]

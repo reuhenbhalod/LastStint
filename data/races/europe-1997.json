@@ -5,7 +5,8 @@
     "name": "Europe 1997: Villeneuve vs Schumacher",
     "laps": 69,
     "takeoverLap": 19,
-    "seed": 1
+    "seed": 1,
+    "scUnlap": "none"
   },
   "era": "1994-2009",
   "track": {
@@ -50,7 +51,7 @@
       2.463,
       2.654,
       2.882,
-      3.101,
+      3.1,
       3.655,
       4.245,
       5.456,

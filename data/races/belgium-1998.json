@@ -5,26 +5,27 @@
     "name": "Belgium 1998: Hill vs Ralf Schumacher",
     "laps": 44,
     "takeoverLap": 8,
-    "seed": 1
+    "seed": 1,
+    "scUnlap": "none"
   },
   "era": "1994-2009",
   "track": {
-    "pitLoss": 26.64,
-    "pitLossUnderSC": 14.652,
-    "pitLossUnderVSC": 18.382,
+    "pitLoss": 26.481,
+    "pitLossUnderSC": 14.565,
+    "pitLossUnderVSC": 18.272,
     "pitLossDeviations": [
-      -9.155,
-      -2.597,
-      -2.346,
-      -2.069,
-      -1.53,
-      -0.317,
-      0.0,
-      1.354,
-      7.554,
-      8.361,
-      9.014,
-      9.859
+      -8.996,
+      -2.438,
+      -2.188,
+      -1.911,
+      -1.371,
+      -0.159,
+      0.159,
+      1.512,
+      7.713,
+      8.52,
+      9.173,
+      10.017
     ],
     "overtakeDifficulty": 0.9111,
     "overtakeModel": {

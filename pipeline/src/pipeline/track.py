@@ -49,6 +49,25 @@ def _is_neutralized(status_value: object) -> bool:
     return any(code in s for code in ("4", "6", "7"))
 
 
+def racing_status(status_value: object) -> bool:
+    """A lap run green or under local yellows only (codes 1 and 2, e.g. "12", "21"): racing
+    went on, so a stop on it is priced like a green one (Eras builds, `eras_stops`)."""
+    s = "" if status_value is None or pd.isna(status_value) else str(status_value)
+    return s != "" and set(s) <= {"1", "2"}
+
+
+def chained_in_laps(laps: pd.DataFrame) -> set[tuple[str, int]]:
+    """(driver, lap) of the laps that are a stop's out-lap and another stop's in-lap: the car
+    pitted on the lap before too (back-to-back stops, canada-2011 MAS out-laps 53 and 54). The
+    lap's time belongs to the first stop; measured again for the second it counts twice."""
+    entered = laps[laps["PitInTime"].notna()]
+    return {
+        (str(d), int(n) + 1)
+        for d, n in zip(entered["Driver"], entered["LapNumber"], strict=True)
+        if not pd.isna(n)
+    }
+
+
 def pit_stops(laps: pd.DataFrame) -> list[tuple[str, pd.Series, pd.Series]]:
     """Return (driver, in_lap, out_lap) for each pit stop (in-lap paired with next out-lap).
 
@@ -65,13 +84,17 @@ def pit_stops(laps: pd.DataFrame) -> list[tuple[str, pd.Series, pd.Series]]:
     return stops
 
 
-def service_stops(laps: pd.DataFrame) -> list[tuple[str, pd.Series, pd.Series]]:
+def service_stops(
+    laps: pd.DataFrame, eras_stops: bool = False
+) -> list[tuple[str, pd.Series, pd.Series]]:
     """(driver, in_lap, out_lap) for each stop that changed no tyres (a repair, a penalty
     stop-go, a drive-through: Baku 2017 HAM's headrest and VET's stop-go, Hungary 2015's
     drive-throughs), the same set on and after its out-lap (clean.tyre_change_out_laps).
     Only green stops (both laps green throughout, both timed) count: a pit-lane pass under a
     SC or a red flag (Hungary 2015 laps 45-46, Brazil 2021) keeps its set too, but isn't a
-    stop. Timing that never shows a set change (estimated compounds) has none."""
+    stop. Timing that never shows a set change (estimated compounds) has none. `eras_stops`:
+    laps under local yellows only (racing_status) count as green too."""
+    green = racing_status if eras_stops else (lambda st: str(st) == "1")
     stops: list[tuple[str, pd.Series, pd.Series]] = []
     changed = tyre_change_out_laps(laps)
     for driver, grp in laps.groupby("Driver"):
@@ -83,7 +106,7 @@ def service_stops(laps: pd.DataFrame) -> list[tuple[str, pd.Series, pd.Series]]:
             out_lap = out.iloc[0]
             if bool(changed.loc[out_lap.name]) or pd.isna(out_lap["PitOutTime"]):
                 continue
-            if any(str(r["TrackStatus"]) != "1" for r in (in_lap, out_lap)):
+            if not all(green(r["TrackStatus"]) for r in (in_lap, out_lap)):
                 continue
             if pd.isna(in_lap["LapTime"]) or pd.isna(out_lap["LapTime"]):
                 continue
@@ -124,7 +147,7 @@ def _has_vsc(status_value: object) -> bool:
     return "6" in s or "7" in s
 
 
-def stop_records(laps: pd.DataFrame) -> list[dict]:
+def stop_records(laps: pd.DataFrame, eras_stops: bool = False) -> list[dict]:
     """Per measurable pit stop: {driver, out_lap, flag, loss, in_loss}.
 
     Loss = in-lap + out-lap minus the median lap time
@@ -132,6 +155,11 @@ def stop_records(laps: pd.DataFrame) -> list[dict]:
     pace cancel out, minus twice the driver's own green-lap pace offset to that field median,
     so a slow car's slow in/out laps aren't counted as pit time. Flag is "SC" if either lap
     touched a safety car, "VSC" if either touched a virtual safety car, else "green".
+
+    `eras_stops` (Eras builds): a stop whose in-lap is the previous stop's out-lap
+    (chained_in_laps) is measured on its out-lap only, its in_loss 0, its flag from the
+    out-lap, and a VSC one's gap change from the end of its in-lap, so the shared lap isn't
+    counted in both stops.
     """
     stops = pit_stops(laps)
     pitting = set()
@@ -162,6 +190,7 @@ def stop_records(laps: pd.DataFrame) -> list[dict]:
             {int(in_lap["LapNumber"]), int(out_lap["LapNumber"])}
         )
 
+    chained = chained_in_laps(laps) if eras_stops else set()
     out: list[dict] = []
     for driver, in_lap, out_lap in stops:
         if pd.isna(in_lap["LapTime"]) or pd.isna(out_lap["LapTime"]):
@@ -172,6 +201,10 @@ def stop_records(laps: pd.DataFrame) -> list[dict]:
         statuses = (in_lap["TrackStatus"], out_lap["TrackStatus"])
         if any("5" in str(st) for st in statuses):
             continue  # a red flag's stoppage: unmeasurable (redflag.stop_losses prices it)
+        if (driver, int(in_lap["LapNumber"])) in chained:
+            # Back-to-back: the in-lap is the previous stop's out-lap, already in its loss.
+            laps_used = (out_lap["LapNumber"],)
+            statuses = (out_lap["TrackStatus"],)
         if any(_has_sc(st) for st in statuses):
             flag = "SC"
         elif any(_has_vsc(st) for st in statuses):
@@ -180,17 +213,27 @@ def stop_records(laps: pd.DataFrame) -> list[dict]:
             flag = "green"
         # The in-lap's share of the stop, by the same pace-corrected comparison (it is already
         # in the takeover state when the in-lap is the takeover lap).
+        own = len(laps_used) == 2  # the in-lap is this stop's own
         in_loss = float(in_lap["LapTime"]) - float(field_median[in_lap["LapNumber"]])
         in_loss -= float(pace_offset.get(driver, 0.0))
+        in_loss = in_loss if own else 0.0
         if flag == "VSC":
             n = int(out_lap["LapNumber"])
-            loss = vsc_gap_change_loss(driver, n, end_time, stop_laps, settle_lap(green_laps, n))
+            loss = vsc_gap_change_loss(
+                driver,
+                n,
+                end_time,
+                stop_laps,
+                settle_lap(green_laps, n),
+                start_lap=None if own else n - 1,
+            )
             if loss is None:
                 continue
         else:
             reference = sum(float(field_median[lap]) for lap in laps_used)
-            reference += 2 * float(pace_offset.get(driver, 0.0))
-            loss = float(in_lap["LapTime"]) + float(out_lap["LapTime"]) - reference
+            reference += len(laps_used) * float(pace_offset.get(driver, 0.0))
+            loss = float(out_lap["LapTime"]) - reference
+            loss += float(in_lap["LapTime"]) if own else 0.0
         out.append(
             {
                 "driver": driver,
@@ -218,13 +261,15 @@ def vsc_gap_change_loss(
     end_time: dict[tuple[str, int], float],
     stop_laps: dict[str, set[int]],
     end_lap: int | None = None,
+    start_lap: int | None = None,
 ) -> float | None:
-    """A VSC stop's cost: the median change in gap, from the end of the lap before the in-lap
-    to the end of `end_lap` (default the out-lap; see settle_lap), to nearby cars that didn't
-    stop around then. None without a usable reference car."""
+    """A VSC stop's cost: the median change in gap, from the end of `start_lap` (default the
+    lap before the in-lap) to the end of `end_lap` (default the out-lap; see settle_lap), to
+    nearby cars that didn't stop around then. None without a usable reference car."""
     in_lap = out_lap - 1
     end_lap = out_lap if end_lap is None else end_lap
-    a0, a1 = end_time.get((driver, in_lap - 1)), end_time.get((driver, end_lap))
+    start_lap = in_lap - 1 if start_lap is None else start_lap
+    a0, a1 = end_time.get((driver, start_lap)), end_time.get((driver, end_lap))
     if a0 is None or a1 is None:
         return None
     window = range(in_lap - VSC_REF_CLEAR_LAPS, end_lap + VSC_REF_CLEAR_LAPS + 1)
@@ -232,16 +277,16 @@ def vsc_gap_change_loss(
     for other, laps_stopped in {**{d: set() for d, _ in end_time}, **stop_laps}.items():
         if other == driver or any(lap in laps_stopped for lap in window):
             continue
-        b0, b1 = end_time.get((other, in_lap - 1)), end_time.get((other, end_lap))
+        b0, b1 = end_time.get((other, start_lap)), end_time.get((other, end_lap))
         if b0 is None or b1 is None or abs(a0 - b0) > VSC_REF_WINDOW:
             continue
         changes.append((a1 - b1) - (a0 - b0))
     return float(pd.Series(changes).median()) if changes else None
 
 
-def stop_losses(laps: pd.DataFrame) -> list[tuple[str, str, float]]:
+def stop_losses(laps: pd.DataFrame, eras_stops: bool = False) -> list[tuple[str, str, float]]:
     """(driver, flag, loss) for every measurable stop (see stop_records)."""
-    return [(r["driver"], r["flag"], r["loss"]) for r in stop_records(laps)]
+    return [(r["driver"], r["flag"], r["loss"]) for r in stop_records(laps, eras_stops)]
 
 
 # Stops slower than this beyond the median are penalties or damage, not pit-stop variance.
@@ -249,7 +294,7 @@ MAX_STOP_DEVIATION = 15.0
 
 
 def measured_stop_losses(
-    laps: pd.DataFrame, takeover_lap: int | None = None
+    laps: pd.DataFrame, takeover_lap: int | None = None, eras_stops: bool = False
 ) -> dict[tuple[str, int], float]:
     """(driver, out-lap) -> measured loss for every green-flag or VSC stop (VSC by gap
     change). Stops touching a SC can't be measured and keep the track's SC figure.
@@ -258,7 +303,7 @@ def measured_stop_losses(
     in the takeover gaps, so only the rest of the loss is left to charge (at some tracks the
     timing line puts most of the stop in the in-lap, e.g. France 2019: ~20 of 25s)."""
     out = {}
-    for r in stop_records(laps):
+    for r in stop_records(laps, eras_stops):
         if r["flag"] == "SC":
             continue
         loss = r["loss"]
@@ -268,11 +313,13 @@ def measured_stop_losses(
     return out
 
 
-def pit_loss_deviations(laps: pd.DataFrame, median: float | None) -> list[float]:
+def pit_loss_deviations(
+    laps: pd.DataFrame, median: float | None, eras_stops: bool = False
+) -> list[float]:
     """Green-stop losses minus the median, excluding penalty-sized outliers."""
     if median is None:
         return []
-    devs = [loss - median for _, flag, loss in stop_losses(laps) if flag == "green"]
+    devs = [loss - median for _, flag, loss in stop_losses(laps, eras_stops) if flag == "green"]
     return sorted(round(d, 3) for d in devs if abs(d) <= MAX_STOP_DEVIATION)
 
 
@@ -299,11 +346,13 @@ def lane_times(laps: pd.DataFrame) -> dict[tuple[str, int], float]:
     return out
 
 
-def damage_stops(laps: pd.DataFrame, lane: bool = True) -> set[tuple[str, int]]:
+def damage_stops(
+    laps: pd.DataFrame, lane: bool = True, eras_stops: bool = False
+) -> set[tuple[str, int]]:
     """(driver, out-lap) of the stops the guard calls damage or repair stops: pit-lane time
     over DAMAGE_LANE_EXCESS above the race's median (not with `lane` False: a refuelling
     race's lane time holds its fill), or in-lap loss over DAMAGE_IN_LAP_EXCESS above it."""
-    records = stop_records(laps)
+    records = stop_records(laps, eras_stops)
     out: set[tuple[str, int]] = set()
     if not records:
         return out
@@ -318,23 +367,25 @@ def damage_stops(laps: pd.DataFrame, lane: bool = True) -> set[tuple[str, int]]:
     return out
 
 
-def pit_loss(laps: pd.DataFrame, guard: bool = False, lane: bool = True) -> float | None:
+def pit_loss(
+    laps: pd.DataFrame, guard: bool = False, lane: bool = True, eras_stops: bool = False
+) -> float | None:
     """Green-flag pit loss: median over green stops of `stop_losses`. None if no stops.
     `guard` (Eras builds): damage and repair stops (damage_stops; `lane` as there) are left
     out, unless that would leave none. Saudi Arabia 2021: three green stops, two of them
     damage stops (48.9 and 65.1 s), so the median was 48.9 s against ALO's normal 23.9 s."""
-    records = [r for r in stop_records(laps) if r["flag"] == "green"]
+    records = [r for r in stop_records(laps, eras_stops) if r["flag"] == "green"]
     if guard:
-        bad = damage_stops(laps, lane)
+        bad = damage_stops(laps, lane, eras_stops)
         kept = [r for r in records if (r["driver"], r["out_lap"]) not in bad]
         records = kept or records
     losses = [r["loss"] for r in records]
     return float(pd.Series(losses).median()) if losses else None
 
 
-def pit_loss_under_vsc(laps: pd.DataFrame) -> tuple[float | None, int]:
+def pit_loss_under_vsc(laps: pd.DataFrame, eras_stops: bool = False) -> tuple[float | None, int]:
     """Median VSC-stop loss and how many VSC stops it rests on (None if none measured)."""
-    losses = [loss for _, flag, loss in stop_losses(laps) if flag == "VSC"]
+    losses = [loss for _, flag, loss in stop_losses(laps, eras_stops) if flag == "VSC"]
     return (float(pd.Series(losses).median()) if losses else None), len(losses)
 
 
@@ -543,17 +594,19 @@ def fit_track_params(
     fit: LapTimeFit,
     pit_loss_guard: bool = False,
     refuelling: bool = False,
+    eras_stops: bool = False,
 ) -> TrackParams:
     """Fit every track-level parameter from one race. `pit_loss_guard` (Eras builds): the
     green pit loss leaves out damage and repair stops (pit_loss; `refuelling`: by in-lap
-    only, since the lane time holds the fill)."""
+    only, since the lane time holds the fill). `eras_stops` (Eras builds): back-to-back stops
+    count their shared lap once (stop_records)."""
     times = sc_vsc_lap_times(laps)
     difficulty, n_opp, n_pass = overtake_difficulty(laps)
     green = times["green"]
-    green_pit = pit_loss(laps, guard=pit_loss_guard, lane=not refuelling)
+    green_pit = pit_loss(laps, guard=pit_loss_guard, lane=not refuelling, eras_stops=eras_stops)
     notes: list[str] = []
     if pit_loss_guard and green_pit is not None:
-        raw = pit_loss(laps)
+        raw = pit_loss(laps, eras_stops=eras_stops)
         if raw is not None and abs(raw - green_pit) >= 0.0005:
             notes.append(
                 f"pitLoss {green_pit:.3f}s without damage/repair stops (median of all green"
@@ -563,14 +616,14 @@ def fit_track_params(
         # No green stop to measure (Australia 2025: every stop under a SC or VSC, or in the
         # rain): back out the green loss from the neutralized ones.
         for flag, factor in (("SC", SC_PIT_LOSS_FACTOR), ("VSC", VSC_PIT_LOSS_FACTOR)):
-            losses = [loss for _, f, loss in stop_losses(laps) if f == flag]
+            losses = [loss for _, f, loss in stop_losses(laps, eras_stops) if f == flag]
             if losses:
                 green_pit = float(pd.Series(losses).median()) / factor
                 notes.append(f"pitLoss: no green stops, from {len(losses)} {flag} stops")
                 break
     sc_pit = green_pit * SC_PIT_LOSS_FACTOR if green_pit is not None else None
     notes.append(f"pitLossUnderSC estimated as {SC_PIT_LOSS_FACTOR} x green")
-    vsc_pit, n_vsc = pit_loss_under_vsc(laps)
+    vsc_pit, n_vsc = pit_loss_under_vsc(laps, eras_stops)
     if n_vsc < MIN_VSC_STOPS:
         vsc_pit = green_pit * VSC_PIT_LOSS_FACTOR if green_pit is not None else None
         notes.append(
@@ -587,7 +640,7 @@ def fit_track_params(
         notes.append(overtake_note)
     return TrackParams(
         overtake_model=overtake,
-        pit_loss_deviations=pit_loss_deviations(laps, green_pit),
+        pit_loss_deviations=pit_loss_deviations(laps, green_pit, eras_stops),
         pit_loss=green_pit,
         pit_loss_under_sc=sc_pit,
         pit_loss_under_vsc=vsc_pit,

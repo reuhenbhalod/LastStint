@@ -13,7 +13,7 @@
     "pitLossUnderSC": 13.617,
     "pitLossUnderVSC": 17.083,
     "pitLossDeviations": [
-      -14.367,
+      -14.368,
       -11.351,
       -10.477,
       -9.487,
@@ -24,7 +24,7 @@
       -6.065,
       -4.519,
       -4.224,
-      -3.392,
+      -3.393,
       -2.621,
       -0.284,
       0.284,
@@ -44,9 +44,9 @@
     ],
     "overtakeDifficulty": 0.9846,
     "overtakeModel": {
-      "intercept": -2.2893,
-      "paceCoef": 0.9423,
-      "gapCoef": -2.3021
+      "intercept": -2.2889,
+      "paceCoef": 0.9442,
+      "gapCoef": -2.3039
     },
     "dirtyAirPenalty": 0.1464,
     "greenLapTime": 78.947

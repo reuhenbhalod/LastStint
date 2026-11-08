@@ -11,9 +11,9 @@
   "track": {
     "pitLoss": 27.713,
     "pitLossUnderSC": 15.242,
-    "pitLossUnderVSC": 19.024,
+    "pitLossUnderVSC": 18.155,
     "pitLossDeviations": [
-      -8.804,
+      -8.805,
       -5.633,
       -5.373,
       -4.44,
@@ -30,6 +30,7 @@
       1.224,
       1.375,
       2.005,
+      5.83,
       7.292
     ],
     "overtakeDifficulty": 0.8746,
@@ -352,7 +353,7 @@
         {
           "lap": 21,
           "to": "SOFT",
-          "loss": 103.026
+          "loss": 32.483
         }
       ]
     },

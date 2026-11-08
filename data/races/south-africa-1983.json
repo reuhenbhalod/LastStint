@@ -5,7 +5,8 @@
     "name": "South Africa 1983: Piquet vs Prost",
     "laps": 77,
     "takeoverLap": 25,
-    "seed": 1
+    "seed": 1,
+    "scUnlap": "none"
   },
   "era": "1988-1993",
   "track": {

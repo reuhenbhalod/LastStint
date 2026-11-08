@@ -129,6 +129,7 @@ def assemble_race_model(
     red_flags: list[dict] | None = None,
     refuel: dict | None = None,
     service_stops: bool = False,
+    eras_stops: bool = False,
 ) -> dict:
     """Build the race-model dict (validate + write it with export.write_race). `fault_facts`:
     the race's hand-checked car faults (incidents.fault_facts), fitted into FAULT events.
@@ -138,7 +139,9 @@ def assemble_race_model(
     FuelLap columns (refuel.with_fuel_columns), so every fuel term below is the sim's.
     `service_stops` (Eras builds): each driver's stops that changed no tyres (a repair, a
     stop-go, a drive-through: track.service_stops) after the takeover, as drivers[].serviceStops
-    at their measured loss in the sim frame."""
+    at their measured loss in the sim frame. `eras_stops` (Eras builds): back-to-back stops
+    count their shared lap once, and stops on laps under local yellows only are priced in the
+    sim frame (track.stop_records, pace.sim_frame_losses)."""
     total_laps = int(laps["LapNumber"].max())
     cliffs = fit.compound_cliff
     longest = longest_stints(laps)
@@ -229,7 +232,7 @@ def assemble_race_model(
     strategy = scenario_mod.real_strategy(laps)
     teams = _team_map(laps)
     # Real stops keep their measured time (spec B1): a slow or quick stop is a real event.
-    measured = track_mod.measured_stop_losses(laps, takeover_lap)
+    measured = track_mod.measured_stop_losses(laps, takeover_lap, eras_stops)
     # Model v3 (spec B2a): each driver's pace over the laps the game replays.
     fresh = {"bonus": round(fit.fresh_tyre_bonus, 4), "laps": fit.fresh_tyre_laps}
     race_pace = pace_mod.post_takeover_offsets(
@@ -274,6 +277,7 @@ def assemble_race_model(
             weather,
             wear,
             wet_pace,
+            eras_stops=eras_stops,
         )
         # A stop made with a fault: the sim adds the fault's cost to its laps itself.
         measured.update(faults_mod.adjust_stop_losses(frame, fault_events, laps))
@@ -318,6 +322,7 @@ def assemble_race_model(
             wear,
             wet_pace,
             service=True,
+            eras_stops=eras_stops,
         )
         for (code, out_lap), loss in sorted(frame.items()):
             if out_lap > takeover_lap:

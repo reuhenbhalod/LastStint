@@ -2227,11 +2227,18 @@ def build_race(
         else None
     )
     # Eras sim fixes (a race whose file takes its Eras overlay; never a Daily/Gauntlet race,
-    # whose file must replay as it is): the robust pit loss, stops with no tyre change, and
-    # the year's no-unlapping rule.
+    # whose file must replay as it is): the robust pit loss, stops with no tyre change, the
+    # year's no-unlapping rule, and the stop-loss fixes (a back-to-back stop's shared lap
+    # counted once; stops on partly yellow laps priced in the sim frame).
     eras_build = overlay is not None and not shared
     params = track.fit_track_params(
-        laps, clean_df, traffic_df, fitted, pit_loss_guard=eras_build, refuelling=refuelling
+        laps,
+        clean_df,
+        traffic_df,
+        fitted,
+        pit_loss_guard=eras_build,
+        refuelling=refuelling,
+        eras_stops=eras_build,
     )
     if recon is not None:
         params = reconstructed_pit_loss(params, recon)
@@ -2267,6 +2274,7 @@ def build_race(
         refuel=refuel_fit,
         # A refuelling race's stop that kept its tyres may be a fuel-only stop: not one.
         service_stops=eras_build and not refuelling,
+        eras_stops=eras_build,
     )
     estimated = list((block or {}).get("estimated", []))
     if recon is not None:

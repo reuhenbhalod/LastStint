@@ -5,7 +5,8 @@
     "name": "Brazil 2003: Fisichella vs R\u00e4ikk\u00f6nen",
     "laps": 54,
     "takeoverLap": 17,
-    "seed": 1
+    "seed": 1,
+    "scUnlap": "none"
   },
   "era": "1994-2009",
   "track": {
