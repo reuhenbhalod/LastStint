@@ -2,6 +2,7 @@
 
 import type { Identity } from './auth.js';
 import { addDays } from './dates.js';
+import { erasMergeStatements } from './erasMerge.js';
 import { ApiError } from './runs.js';
 
 export interface Account {
@@ -72,15 +73,17 @@ export async function signIn(
       .run();
   }
   // Link both the browser's ID and the account's own, so the account's first device counts.
-  await db.batch(
-    [anonId, player.id].map((id) =>
+  // The browser's anonymous Eras progress moves to the account in the same transaction.
+  await db.batch([
+    ...erasMergeStatements(db, anonId, player.id),
+    ...[anonId, player.id].map((id) =>
       db
         .prepare(
           'INSERT OR IGNORE INTO player_ids (anon_id, player_id, linked_at) VALUES (?, ?, ?)',
         )
         .bind(id, player.id, at),
     ),
-  );
+  ]);
   return {
     playerId: player.id,
     name: who.name,
