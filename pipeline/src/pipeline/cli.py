@@ -8,6 +8,7 @@ pipeline validate <race-id>   run the Gate G1 report; exits 1 if the race fails
 pipeline f1db [race-id ...]   F1DB stops and fastest laps -> data/raw/f1db/ (Eras races)
 pipeline tum-ingest <race-id> read a 2014-2019 race from the TUM database into data/raw/
 pipeline hard-calls <race-id> count each storyline driver's hard calls -> data/eras/<id>.json
+pipeline reconstruct <race-id> rebuild a 1983-1995 race lap by lap from its anchors (data/raw/)
 """
 
 from __future__ import annotations
@@ -156,6 +157,60 @@ def jolpica_cmd(
     for gap in side["timingGaps"]:
         typer.echo(f"  timing gap: {gap}")
     typer.echo(f"  not supplied: {', '.join(side['missing'])}")
+
+
+@app.command("reconstruct")
+def reconstruct_cmd(
+    race_id: str = typer.Argument(..., help="A 1983-1995 race, e.g. australia-1994."),
+    event: str = typer.Option(None, help="Jolpica round name, country or town, if the id's isn't."),
+    round_number: int = typer.Option(None, "--round", help="The round, if the event is ambiguous."),
+    dump: str = typer.Option(None, help="An extracted Jolpica CSV dump (default: newest cached)."),
+    facts_dir: str = typer.Option(None, help="Facts files (default: data/reconstruction/)."),
+    raw_dir: str = typer.Option(None, help="Where to write (default: data/raw/)."),
+    seed: int = typer.Option(0, help="Noise seed (the output is deterministic per seed)."),
+    force: bool = typer.Option(False, help="Overwrite an existing snapshot."),
+) -> None:
+    """Reconstruct a 1983-1995 race lap by lap from its anchors (Jolpica results, F1DB fastest
+    laps and stops, sourced facts) into a synthetic raw parquet, status JSON, provenance
+    sidecar and anchor report (offline; see pipeline/reconstruct.py). Exits 1 if an anchor
+    fails."""
+    from pathlib import Path
+
+    from . import reconstruct
+
+    out = Path(raw_dir) if raw_dir else paths.RAW_DIR
+    if ingest.raw_snapshot_path(race_id, out).exists() and not force:
+        typer.echo(f"{race_id}: snapshot exists in {out}, skipped (--force to overwrite)")
+        return
+    try:
+        anchors = reconstruct.load_anchors(
+            race_id,
+            dump_dir=Path(dump) if dump else None,
+            facts_dir=Path(facts_dir) if facts_dir else reconstruct.FACTS_DIR,
+            event=event,
+            round_number=round_number,
+        )
+    except (LookupError, FileNotFoundError, ValueError, ingest.IncompleteDataError) as e:
+        typer.echo(f"{race_id}: {e}", err=True)
+        raise typer.Exit(code=1) from e
+    result = reconstruct.reconstruct(anchors, reconstruct.Params(seed=seed))
+    written = reconstruct.write(race_id, result, out)
+    side = result.sidecar
+    typer.echo(
+        f"{race_id}: {len(result.laps)} laps, {side['laps']} race laps, reconstructed"
+        f" ({side['solver']['attempts']} attempt(s), sigma {side['solver']['sigma']}s) -> {out}"
+    )
+    for name, s in side["summary"].items():
+        typer.echo(f"  {name:17s} {s['pass']:3d}/{s['total']:<3d}")
+    for r in reconstruct.failures(side["anchors"]):
+        typer.echo(
+            f"  FAIL {r['anchor']} {r['subject']}: target {r['target']}, got {r['achieved']}"
+        )
+    for note in side["notes"]:
+        typer.echo(f"  note: {note}")
+    typer.echo(f"  report: {written[-1]}")
+    if not side["solver"]["passed"]:
+        raise typer.Exit(code=1)
 
 
 @app.command("wet-fit")

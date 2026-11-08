@@ -1,0 +1,29 @@
+{
+  "source": "F1DB",
+  "version": "v2026.19.0",
+  "asset": "f1db-csv.zip",
+  "url": "https://github.com/f1db/f1db/releases/download/v2026.19.0/f1db-csv.zip",
+  "sha256": "69038edcee2cd27d61b41e9d83f31f4c8910b6f1a7c7cc9a94ca13864af8a77c",
+  "licence": "CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)",
+  "attribution": "F1DB (https://github.com/f1db/f1db), CC BY 4.0. Columns renamed and filtered.",
+  "columns": {
+    "stops": [
+      "race_id",
+      "driver",
+      "driver_id",
+      "number",
+      "stop",
+      "lap",
+      "lane_time"
+    ],
+    "fastest-laps": [
+      "race_id",
+      "driver",
+      "driver_id",
+      "number",
+      "rank",
+      "lap",
+      "time"
+    ]
+  }
+}
