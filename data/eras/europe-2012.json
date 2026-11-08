@@ -4,8 +4,8 @@
     "order": 6,
     "userSide": "RAI",
     "target": {
-      "type": "beat-rival",
-      "rival": "ALO"
+      "type": "position",
+      "position": 3
     },
     "storyline": {
       "real": "Alonso wins from 11th on the grid; Vettel retires from the lead and R\u00e4ikk\u00f6nen, from 5th, finishes second, 6.4 s behind Alonso.",
@@ -17,19 +17,20 @@
     },
     "mastery": {
       "type": "stop_count",
-      "max": 2,
-      "label": "Beat Alonso on two stops or fewer"
+      "exact": 2,
+      "label": "Reach the podium on two stops"
     },
     "hidden": {
-      "type": "margin",
-      "seconds": 5,
-      "label": "Win by more than 5 seconds"
+      "type": "mode_rule",
+      "mode": "push",
+      "maxLaps": 0,
+      "label": "Reach the podium without a single push lap"
     },
     "hardCalls": {
-      "RAI": 2,
-      "ALO": 0
+      "RAI": 1,
+      "ALO": 1
     },
-    "briefing": "Valencia, 2012. Vettel leads from pole and you run R\u00e4ikk\u00f6nen, sixth after starting fifth. Alonso started 11th and is coming through the field. Finish ahead of him."
+    "briefing": "Valencia, 2012. Vettel leads from pole and you run R\u00e4ikk\u00f6nen, sixth after starting fifth. Alonso started 11th and is coming through the field. A safety car comes out on lap 28. Get R\u00e4ikk\u00f6nen on the podium."
   },
   "rules": {
     "twoCompound": true,

@@ -39,13 +39,15 @@ const DAILY_HASHES: Record<string, string> = {
 };
 // Their Eras models' hashes (race file + the overlay as authored in step 6.2, Nov 8 2026):
 // change only with the overlay. abu-dhabi-2021's moved when its rewrite condition was taken out
-// (the Eras side really won; Eras grader fixes, Nov 8 2026).
+// (the Eras side really won; Eras grader fixes, Nov 8 2026); abu-dhabi-2021's, france-2021's,
+// hungary-2019's and russia-2021's moved with the 6.2 re-author (hard calls recounted on the
+// Eras grader; the first three now play Hamilton).
 const ERAS_HASHES: Record<string, string> = {
-  'abu-dhabi-2021': '627c17d9d67987892ffd61f6549c09c2e589e249f59028f78a6c0310a0af5bcf',
+  'abu-dhabi-2021': 'dd3c65a9cb71b0c9395de425e78aab405e561040e50cc616085d254edb8e65d5',
   'bahrain-2021': '3fc5e332a9dde5d1f108c5006fcc963f0be1b80bb6ab902b2be9355c91ddd82e',
-  'france-2021': '3eb876094b718d969f3e1d2ace907a7618b3e7e33347d1069c416960598511c4',
-  'hungary-2019': '084731e29cfbaffbad2da4e2f6af3634dbb2f9dc66a41bc52d33ee4ccd0d925e',
-  'russia-2021': 'dab705886d335ca3156ed5e362b482d4876771391687bec0c4159917a7898c7b',
+  'france-2021': '690eb948006f21d9036c2dd90f457f39c43989216b7eff5f7958b5cce4e6ca54',
+  'hungary-2019': 'ec1f25684f6af44532acb16cb235c301eb6f5f87e8db018bf540658fb578fdce',
+  'russia-2021': 'b5e389cff73b5572b052884927f2aba8703bd3abda6f0d90e636aa5190568003',
 };
 
 describe('withErasOverlay: parity with the pipeline merge (export.with_eras_fields)', () => {

@@ -590,14 +590,17 @@ def hard_calls_cmd(
     out: str = typer.Option(None, help="Overlay directory to write to (default: data/eras/)."),
 ) -> None:
     """Count the hard calls from each storyline driver's side (moment finder + grader on the
-    real race) and write eras.hardCalls and eras.userSide into the race's Eras overlay."""
+    real race) and write eras.hardCalls and eras.userSide into the race's Eras overlay. A
+    Daily/Gauntlet race is counted on its file merged with its overlay (the Eras grader)."""
+    import tempfile
     from pathlib import Path
 
     from . import hard_calls
 
-    race_file = paths.RACES_DIR / f"{race_id}.json"
     try:
-        result = hard_calls.run_counter(race_file, samples)
+        with tempfile.TemporaryDirectory() as tmp:
+            race_file = hard_calls.eras_race_file(race_id, Path(tmp))
+            result = hard_calls.run_counter(race_file, samples)
         written = hard_calls.write_overlay(
             race_id, result, Path(out) if out else hard_calls.ERAS_DIR
         )

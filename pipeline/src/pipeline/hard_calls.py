@@ -5,6 +5,11 @@ the grader live there), through `pnpm --filter @laststint/sim hard-calls <race-f
 prints one JSON line. This module runs it and writes the result into the race's Eras overlay,
 data/eras/<race-id>.json, touching only `eras.hardCalls` and `eras.userSide` (every other key
 is preserved; the file is created if missing).
+
+A Daily or Gauntlet pool race (a shared race) keeps its Daily file, which has no `eras` or
+`rules` block, so the sim would grade it as Daily does. `eras_race_file` gives the counter the
+model the Eras API serves instead (the file merged with its overlay, as `build.apply_eras` and
+the Worker's withErasOverlay merge it), so its count uses the Eras grader (docs/eras-grader.md).
 """
 
 from __future__ import annotations
@@ -17,6 +22,29 @@ from pathlib import Path
 from . import paths
 
 ERAS_DIR = paths.DATA_DIR / "eras"  # authored Eras overlays, one per race
+
+
+def eras_race_file(
+    race_id: str,
+    tmp_dir: Path,
+    races_dir: Path = paths.RACES_DIR,
+    eras_dir: Path = ERAS_DIR,
+    pools_path: Path | None = None,
+) -> Path:
+    """The race file the counter grades for `race_id`: its data/races file, or, for a shared
+    race with an overlay, that file merged with the overlay, written into `tmp_dir`."""
+    from . import build
+
+    race_file = Path(races_dir) / f"{race_id}.json"
+    shared = build.shared_races(pools_path) if pools_path else build.shared_races()
+    overlay = build.load_overlay(race_id, eras_dir) if race_id in shared else None
+    if not overlay or not race_file.is_file():
+        return race_file
+    model = json.loads(race_file.read_text())
+    merged, _ = build.apply_eras(model, [], overlay)
+    out = Path(tmp_dir) / f"{race_id}.json"
+    out.write_text(json.dumps(merged))
+    return out
 
 
 def run_counter(race_file: Path, samples: int | None = None) -> dict:

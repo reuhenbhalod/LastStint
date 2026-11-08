@@ -841,29 +841,34 @@
      "eras": {
       "eraId": 9,
       "order": 10,
-      "userSide": "VER",
+      "userSide": "HAM",
       "target": {
        "type": "beat-rival",
-       "rival": "HAM"
+       "rival": "VER"
       },
       "storyline": {
-       "real": "Hamilton leads until a late safety car; Verstappen pits for soft tyres, passes him on the final lap and takes the race and the title."
+       "real": "Hamilton leads until a late safety car; Verstappen pits for soft tyres, passes him on the final lap and takes the race and the title.",
+       "rewriteCondition": {
+        "type": "beat-rival",
+        "rival": "VER"
+       },
+       "headline": "Hamilton holds on in Abu Dhabi for an eighth title"
       },
       "mastery": {
        "type": "stop_count",
-       "max": 2,
-       "label": "Beat Hamilton on no more than two stops"
+       "exact": 1,
+       "label": "Beat Verstappen with one more stop"
       },
       "hidden": {
        "type": "compound_rule",
-       "mustAvoid": "MEDIUM",
-       "label": "Never fit the medium tyre"
+       "mustAvoid": "SOFT",
+       "label": "Never fit the soft tyre"
       },
       "hardCalls": {
-       "HAM": 1,
-       "VER": 2
+       "VER": 1,
+       "HAM": 1
       },
-      "briefing": "Abu Dhabi, 2021. The final race, and Verstappen and Hamilton arrive level on 369.5 points. Verstappen starts from pole, Hamilton beside him."
+      "briefing": "Abu Dhabi, 2021. The final race, and Verstappen and Hamilton arrive level on 369.5 points. Verstappen starts from pole, Hamilton beside him. You run Hamilton, 5.5 s clear of Verstappen after 34 laps. Finish ahead of him and the title is yours."
      },
      "rules": {
       "twoCompound": true,
@@ -879,305 +884,6 @@
        53,
        "SC"
       ]
-     ],
-     "decisionMoments": [
-      {
-       "id": "vsc-36",
-       "lap": 36,
-       "trigger": "VSC",
-       "target": {
-        "kind": "beat-rival"
-       },
-       "options": [
-        {
-         "id": "stay",
-         "label": "Stay out",
-         "decisions": []
-        },
-        {
-         "id": "box-soft",
-         "label": "Box, softs",
-         "decisions": [
-          {
-           "lap": 36,
-           "kind": "pit",
-           "compound": "SOFT"
-          }
-         ]
-        },
-        {
-         "id": "box-medium",
-         "label": "Box, mediums",
-         "decisions": [
-          {
-           "lap": 36,
-           "kind": "pit",
-           "compound": "MEDIUM"
-          }
-         ]
-        },
-        {
-         "id": "box-hard",
-         "label": "Box, hards",
-         "decisions": [
-          {
-           "lap": 36,
-           "kind": "pit",
-           "compound": "HARD"
-          }
-         ]
-        },
-        {
-         "id": "box-next-hard",
-         "label": "Box next lap, hards",
-         "decisions": [
-          {
-           "lap": 37,
-           "kind": "pit",
-           "compound": "HARD"
-          }
-         ]
-        }
-       ],
-       "realOptionId": "box-hard"
-      },
-      {
-       "id": "pace-42",
-       "lap": 42,
-       "trigger": "cliff",
-       "target": {
-        "kind": "beat-rival"
-       },
-       "options": [
-        {
-         "id": "push",
-         "label": "Push now",
-         "decisions": [
-          {
-           "lap": 42,
-           "kind": "mode",
-           "key": "pace",
-           "value": "push"
-          }
-         ]
-        },
-        {
-         "id": "standard",
-         "label": "Standard pace",
-         "decisions": [
-          {
-           "lap": 42,
-           "kind": "mode",
-           "key": "pace",
-           "value": "standard"
-          }
-         ]
-        },
-        {
-         "id": "manage",
-         "label": "Manage the tyres",
-         "decisions": [
-          {
-           "lap": 42,
-           "kind": "mode",
-           "key": "pace",
-           "value": "manage"
-          }
-         ]
-        },
-        {
-         "id": "push-attack",
-         "label": "Push and attack",
-         "decisions": [
-          {
-           "lap": 42,
-           "kind": "mode",
-           "key": "pace",
-           "value": "push"
-          },
-          {
-           "lap": 42,
-           "kind": "mode",
-           "key": "battle",
-           "value": "attack"
-          }
-         ]
-        }
-       ],
-       "realOptionId": null
-      },
-      {
-       "id": "pace-46",
-       "lap": 46,
-       "trigger": "cliff",
-       "target": {
-        "kind": "beat-rival"
-       },
-       "options": [
-        {
-         "id": "push",
-         "label": "Push now",
-         "decisions": [
-          {
-           "lap": 46,
-           "kind": "mode",
-           "key": "pace",
-           "value": "push"
-          }
-         ]
-        },
-        {
-         "id": "standard",
-         "label": "Standard pace",
-         "decisions": [
-          {
-           "lap": 46,
-           "kind": "mode",
-           "key": "pace",
-           "value": "standard"
-          }
-         ]
-        },
-        {
-         "id": "manage",
-         "label": "Manage the tyres",
-         "decisions": [
-          {
-           "lap": 46,
-           "kind": "mode",
-           "key": "pace",
-           "value": "manage"
-          }
-         ]
-        },
-        {
-         "id": "push-attack",
-         "label": "Push and attack",
-         "decisions": [
-          {
-           "lap": 46,
-           "kind": "mode",
-           "key": "pace",
-           "value": "push"
-          },
-          {
-           "lap": 46,
-           "kind": "mode",
-           "key": "battle",
-           "value": "attack"
-          }
-         ]
-        }
-       ],
-       "realOptionId": null
-      },
-      {
-       "id": "sc-53",
-       "lap": 53,
-       "trigger": "SC",
-       "target": {
-        "kind": "beat-rival"
-       },
-       "options": [
-        {
-         "id": "stay",
-         "label": "Stay out",
-         "decisions": []
-        },
-        {
-         "id": "box-soft",
-         "label": "Box, softs",
-         "decisions": [
-          {
-           "lap": 53,
-           "kind": "pit",
-           "compound": "SOFT"
-          }
-         ]
-        },
-        {
-         "id": "box-medium",
-         "label": "Box, mediums",
-         "decisions": [
-          {
-           "lap": 53,
-           "kind": "pit",
-           "compound": "MEDIUM"
-          }
-         ]
-        },
-        {
-         "id": "box-hard",
-         "label": "Box, hards",
-         "decisions": [
-          {
-           "lap": 53,
-           "kind": "pit",
-           "compound": "HARD"
-          }
-         ]
-        },
-        {
-         "id": "box-next-hard",
-         "label": "Box next lap, hards",
-         "decisions": [
-          {
-           "lap": 54,
-           "kind": "pit",
-           "compound": "HARD"
-          }
-         ]
-        }
-       ],
-       "realOptionId": "box-soft"
-      },
-      {
-       "id": "battle-57",
-       "lap": 57,
-       "trigger": "SC",
-       "target": {
-        "kind": "beat-rival"
-       },
-       "options": [
-        {
-         "id": "defend",
-         "label": "Defend hard",
-         "decisions": [
-          {
-           "lap": 57,
-           "kind": "mode",
-           "key": "battle",
-           "value": "defend"
-          }
-         ]
-        },
-        {
-         "id": "hold",
-         "label": "Hold the line",
-         "decisions": [
-          {
-           "lap": 57,
-           "kind": "mode",
-           "key": "battle",
-           "value": "hold"
-          }
-         ]
-        },
-        {
-         "id": "attack",
-         "label": "Attack",
-         "decisions": [
-          {
-           "lap": 57,
-           "kind": "mode",
-           "key": "battle",
-           "value": "attack"
-          }
-         ]
-        }
-       ],
-       "realOptionId": null
-      }
      ]
     }
    ],
@@ -1203,29 +909,34 @@
     "eras": {
      "eraId": 9,
      "order": 10,
-     "userSide": "VER",
+     "userSide": "HAM",
      "target": {
       "type": "beat-rival",
-      "rival": "HAM"
+      "rival": "VER"
      },
      "storyline": {
-      "real": "Hamilton leads until a late safety car; Verstappen pits for soft tyres, passes him on the final lap and takes the race and the title."
+      "real": "Hamilton leads until a late safety car; Verstappen pits for soft tyres, passes him on the final lap and takes the race and the title.",
+      "rewriteCondition": {
+       "type": "beat-rival",
+       "rival": "VER"
+      },
+      "headline": "Hamilton holds on in Abu Dhabi for an eighth title"
      },
      "mastery": {
       "type": "stop_count",
-      "max": 2,
-      "label": "Beat Hamilton on no more than two stops"
+      "exact": 1,
+      "label": "Beat Verstappen with one more stop"
      },
      "hidden": {
       "type": "compound_rule",
-      "mustAvoid": "MEDIUM",
-      "label": "Never fit the medium tyre"
+      "mustAvoid": "SOFT",
+      "label": "Never fit the soft tyre"
      },
      "hardCalls": {
-      "HAM": 1,
-      "VER": 2
+      "VER": 1,
+      "HAM": 1
      },
-     "briefing": "Abu Dhabi, 2021. The final race, and Verstappen and Hamilton arrive level on 369.5 points. Verstappen starts from pole, Hamilton beside him."
+     "briefing": "Abu Dhabi, 2021. The final race, and Verstappen and Hamilton arrive level on 369.5 points. Verstappen starts from pole, Hamilton beside him. You run Hamilton, 5.5 s clear of Verstappen after 34 laps. Finish ahead of him and the title is yours."
     },
     "rules": {
      "twoCompound": true,
@@ -1238,7 +949,7 @@
     },
     "decisionMoments": [
      {
-      "id": "vsc-36",
+      "id": "vsc-cover",
       "lap": 36,
       "trigger": "VSC",
       "target": {
@@ -1247,7 +958,56 @@
       "options": [
        {
         "id": "stay",
-        "label": "Stay out",
+        "label": "Stay out, keep the lead",
+        "decisions": []
+       },
+       {
+        "id": "cover-medium",
+        "label": "Box, fresh mediums",
+        "decisions": [
+         {
+          "lap": 36,
+          "kind": "pit",
+          "compound": "MEDIUM"
+         }
+        ]
+       },
+       {
+        "id": "cover-hard",
+        "label": "Box, fresh hards",
+        "decisions": [
+         {
+          "lap": 36,
+          "kind": "pit",
+          "compound": "HARD"
+         }
+        ]
+       },
+       {
+        "id": "cover-next-medium",
+        "label": "Box next lap, mediums",
+        "decisions": [
+         {
+          "lap": 37,
+          "kind": "pit",
+          "compound": "MEDIUM"
+         }
+        ]
+       }
+      ],
+      "realOptionId": "stay"
+     },
+     {
+      "id": "tyres-going",
+      "lap": 44,
+      "trigger": "cliff",
+      "target": {
+       "kind": "beat-rival"
+      },
+      "options": [
+       {
+        "id": "stay",
+        "label": "Stay out, run to the end",
         "decisions": []
        },
        {
@@ -1255,7 +1015,7 @@
         "label": "Box, softs",
         "decisions": [
          {
-          "lap": 36,
+          "lap": 44,
           "kind": "pit",
           "compound": "SOFT"
          }
@@ -1266,7 +1026,7 @@
         "label": "Box, mediums",
         "decisions": [
          {
-          "lap": 36,
+          "lap": 44,
           "kind": "pit",
           "compound": "MEDIUM"
          }
@@ -1277,9 +1037,20 @@
         "label": "Box, hards",
         "decisions": [
          {
-          "lap": 36,
+          "lap": 44,
           "kind": "pit",
           "compound": "HARD"
+         }
+        ]
+       },
+       {
+        "id": "box-next-medium",
+        "label": "Box next lap, mediums",
+        "decisions": [
+         {
+          "lap": 45,
+          "kind": "pit",
+          "compound": "MEDIUM"
          }
         ]
        },
@@ -1288,18 +1059,18 @@
         "label": "Box next lap, hards",
         "decisions": [
          {
-          "lap": 37,
+          "lap": 45,
           "kind": "pit",
           "compound": "HARD"
          }
         ]
        }
       ],
-      "realOptionId": "box-hard"
+      "realOptionId": "stay"
      },
      {
-      "id": "pace-42",
-      "lap": 42,
+      "id": "manage-or-push",
+      "lap": 49,
       "trigger": "cliff",
       "target": {
        "kind": "beat-rival"
@@ -1310,7 +1081,7 @@
         "label": "Push now",
         "decisions": [
          {
-          "lap": 42,
+          "lap": 49,
           "kind": "mode",
           "key": "pace",
           "value": "push"
@@ -1322,7 +1093,7 @@
         "label": "Standard pace",
         "decisions": [
          {
-          "lap": 42,
+          "lap": 49,
           "kind": "mode",
           "key": "pace",
           "value": "standard"
@@ -1334,7 +1105,7 @@
         "label": "Manage the tyres",
         "decisions": [
          {
-          "lap": 42,
+          "lap": 49,
           "kind": "mode",
           "key": "pace",
           "value": "manage"
@@ -1346,13 +1117,13 @@
         "label": "Push and attack",
         "decisions": [
          {
-          "lap": 42,
+          "lap": 49,
           "kind": "mode",
           "key": "pace",
           "value": "push"
          },
          {
-          "lap": 42,
+          "lap": 49,
           "kind": "mode",
           "key": "battle",
           "value": "attack"
@@ -1363,72 +1134,7 @@
       "realOptionId": null
      },
      {
-      "id": "pace-46",
-      "lap": 46,
-      "trigger": "cliff",
-      "target": {
-       "kind": "beat-rival"
-      },
-      "options": [
-       {
-        "id": "push",
-        "label": "Push now",
-        "decisions": [
-         {
-          "lap": 46,
-          "kind": "mode",
-          "key": "pace",
-          "value": "push"
-         }
-        ]
-       },
-       {
-        "id": "standard",
-        "label": "Standard pace",
-        "decisions": [
-         {
-          "lap": 46,
-          "kind": "mode",
-          "key": "pace",
-          "value": "standard"
-         }
-        ]
-       },
-       {
-        "id": "manage",
-        "label": "Manage the tyres",
-        "decisions": [
-         {
-          "lap": 46,
-          "kind": "mode",
-          "key": "pace",
-          "value": "manage"
-         }
-        ]
-       },
-       {
-        "id": "push-attack",
-        "label": "Push and attack",
-        "decisions": [
-         {
-          "lap": 46,
-          "kind": "mode",
-          "key": "pace",
-          "value": "push"
-         },
-         {
-          "lap": 46,
-          "kind": "mode",
-          "key": "battle",
-          "value": "attack"
-         }
-        ]
-       }
-      ],
-      "realOptionId": null
-     },
-     {
-      "id": "sc-53",
+      "id": "sc-stop",
       "lap": 53,
       "trigger": "SC",
       "target": {
@@ -1437,7 +1143,7 @@
       "options": [
        {
         "id": "stay",
-        "label": "Stay out",
+        "label": "Stay out, keep the lead",
         "decisions": []
        },
        {
@@ -1474,21 +1180,59 @@
         ]
        },
        {
-        "id": "box-next-hard",
-        "label": "Box next lap, hards",
+        "id": "box-next-soft",
+        "label": "Box next lap, softs",
         "decisions": [
          {
           "lap": 54,
           "kind": "pit",
-          "compound": "HARD"
+          "compound": "SOFT"
          }
         ]
        }
       ],
-      "realOptionId": "box-soft"
+      "realOptionId": "stay"
      },
      {
-      "id": "battle-57",
+      "id": "sc-last-chance",
+      "lap": 55,
+      "trigger": "SC",
+      "target": {
+       "kind": "beat-rival"
+      },
+      "options": [
+       {
+        "id": "stay",
+        "label": "Stay out, keep the lead",
+        "decisions": []
+       },
+       {
+        "id": "box-soft",
+        "label": "Box, softs",
+        "decisions": [
+         {
+          "lap": 55,
+          "kind": "pit",
+          "compound": "SOFT"
+         }
+        ]
+       },
+       {
+        "id": "box-medium",
+        "label": "Box, mediums",
+        "decisions": [
+         {
+          "lap": 55,
+          "kind": "pit",
+          "compound": "MEDIUM"
+         }
+        ]
+       }
+      ],
+      "realOptionId": "stay"
+     },
+     {
+      "id": "restart-stance",
       "lap": 57,
       "trigger": "SC",
       "target": {
@@ -1535,8 +1279,8 @@
       "realOptionId": null
      }
     ],
-    "userSide": "VER",
-    "rival": "HAM"
+    "userSide": "HAM",
+    "rival": "VER"
    },
    "events": [
     {
@@ -2012,24 +1756,22 @@
      "eras": {
       "eraId": 9,
       "order": 4,
-      "userSide": "PER",
+      "userSide": "HAM",
       "target": {
        "type": "position",
-       "position": 3
+       "position": 2
       },
       "storyline": {
-       "real": "Red Bull put Verstappen on a second stop and he catches and passes Hamilton for the win; P\u00e9rez, on one stop, passes Bottas late but finishes third, behind Hamilton.",
+       "real": "Red Bull put Verstappen on a second stop; on fresh tyres he catches Hamilton, who stopped once, and passes him on the penultimate lap. Hamilton finishes second, 2.9 s behind.",
        "rewriteCondition": {
-        "type": "beat-rival",
-        "rival": "HAM"
+        "type": "win"
        },
-       "headline": "P\u00e9rez completes Red Bull's ambush of Mercedes at Paul Ricard"
+       "headline": "Hamilton makes one stop last at Paul Ricard"
       },
       "mastery": {
-       "type": "mode_rule",
-       "mode": "push",
-       "maxLaps": 12,
-       "label": "Reach the podium pushing for no more than 12 laps"
+       "type": "stop_count",
+       "exact": 1,
+       "label": "Finish second or better on one stop"
       },
       "hidden": {
        "type": "compound_rule",
@@ -2037,10 +1779,10 @@
        "label": "Never fit the soft tyre"
       },
       "hardCalls": {
-       "HAM": 1,
-       "PER": 1
+       "PER": 0,
+       "HAM": 1
       },
-      "briefing": "Paul Ricard, 2021. Verstappen starts from pole with Hamilton alongside; P\u00e9rez lines up fourth, behind Bottas."
+      "briefing": "Paul Ricard, 2021. Verstappen starts from pole with Hamilton alongside. You run Hamilton, leading Verstappen by 3.0 s after 15 laps. Hold on to second at least, and take the win if you can."
      },
      "rules": {
       "twoCompound": true,
@@ -2053,12 +1795,73 @@
      },
      "decisionMoments": [
       {
-       "id": "rivalpit-19",
-       "lap": 19,
-       "trigger": "rivalPit",
+       "id": "stop-17",
+       "lap": 17,
+       "trigger": "cliff",
        "target": {
         "kind": "position",
-        "atBest": 3
+        "atBest": 2
+       },
+       "options": [
+        {
+         "id": "stay",
+         "label": "Stay out",
+         "decisions": []
+        },
+        {
+         "id": "box-soft",
+         "label": "Box, softs",
+         "decisions": [
+          {
+           "lap": 17,
+           "kind": "pit",
+           "compound": "SOFT"
+          }
+         ]
+        },
+        {
+         "id": "box-medium",
+         "label": "Box, mediums",
+         "decisions": [
+          {
+           "lap": 17,
+           "kind": "pit",
+           "compound": "MEDIUM"
+          }
+         ]
+        },
+        {
+         "id": "box-hard",
+         "label": "Box, hards",
+         "decisions": [
+          {
+           "lap": 17,
+           "kind": "pit",
+           "compound": "HARD"
+          }
+         ]
+        },
+        {
+         "id": "box-next-soft",
+         "label": "Box next lap, softs",
+         "decisions": [
+          {
+           "lap": 18,
+           "kind": "pit",
+           "compound": "SOFT"
+          }
+         ]
+        }
+       ],
+       "realOptionId": "stay"
+      },
+      {
+       "id": "stop-19",
+       "lap": 19,
+       "trigger": "cliff",
+       "target": {
+        "kind": "position",
+        "atBest": 2
        },
        "options": [
         {
@@ -2111,15 +1914,15 @@
          ]
         }
        ],
-       "realOptionId": "stay"
+       "realOptionId": "box-hard"
       },
       {
-       "id": "stop-24",
-       "lap": 24,
+       "id": "stop-22",
+       "lap": 22,
        "trigger": "cliff",
        "target": {
         "kind": "position",
-        "atBest": 3
+        "atBest": 2
        },
        "options": [
         {
@@ -2132,7 +1935,7 @@
          "label": "Box, softs",
          "decisions": [
           {
-           "lap": 24,
+           "lap": 22,
            "kind": "pit",
            "compound": "SOFT"
           }
@@ -2143,7 +1946,7 @@
          "label": "Box, mediums",
          "decisions": [
           {
-           "lap": 24,
+           "lap": 22,
            "kind": "pit",
            "compound": "MEDIUM"
           }
@@ -2154,41 +1957,42 @@
          "label": "Box, hards",
          "decisions": [
           {
-           "lap": 24,
+           "lap": 22,
            "kind": "pit",
            "compound": "HARD"
           }
          ]
         },
         {
-         "id": "box-next-hard",
-         "label": "Box next lap, hards",
+         "id": "box-next-soft",
+         "label": "Box next lap, softs",
          "decisions": [
           {
-           "lap": 25,
+           "lap": 23,
            "kind": "pit",
-           "compound": "HARD"
+           "compound": "SOFT"
           }
          ]
         }
        ],
-       "realOptionId": "box-hard"
+       "realOptionId": "stay"
       },
       {
-       "id": "pace-27",
-       "lap": 27,
+       "id": "pace-31",
+       "lap": 31,
        "trigger": "cliff",
        "target": {
         "kind": "position",
-        "atBest": 3
+        "atBest": 2
        },
+       "realOptionId": null,
        "options": [
         {
          "id": "push",
          "label": "Push now",
          "decisions": [
           {
-           "lap": 27,
+           "lap": 31,
            "kind": "mode",
            "key": "pace",
            "value": "push"
@@ -2200,7 +2004,7 @@
          "label": "Standard pace",
          "decisions": [
           {
-           "lap": 27,
+           "lap": 31,
            "kind": "mode",
            "key": "pace",
            "value": "standard"
@@ -2212,7 +2016,7 @@
          "label": "Manage the tyres",
          "decisions": [
           {
-           "lap": 27,
+           "lap": 31,
            "kind": "mode",
            "key": "pace",
            "value": "manage"
@@ -2224,37 +2028,37 @@
          "label": "Push and attack",
          "decisions": [
           {
-           "lap": 27,
+           "lap": 31,
            "kind": "mode",
            "key": "pace",
            "value": "push"
           },
           {
-           "lap": 27,
+           "lap": 31,
            "kind": "mode",
            "key": "battle",
            "value": "attack"
           }
          ]
         }
-       ],
-       "realOptionId": null
+       ]
       },
       {
-       "id": "pace-35",
-       "lap": 35,
+       "id": "pace-39",
+       "lap": 39,
        "trigger": "cliff",
        "target": {
         "kind": "position",
-        "atBest": 3
+        "atBest": 2
        },
+       "realOptionId": null,
        "options": [
         {
          "id": "push",
          "label": "Push now",
          "decisions": [
           {
-           "lap": 35,
+           "lap": 39,
            "kind": "mode",
            "key": "pace",
            "value": "push"
@@ -2266,7 +2070,7 @@
          "label": "Standard pace",
          "decisions": [
           {
-           "lap": 35,
+           "lap": 39,
            "kind": "mode",
            "key": "pace",
            "value": "standard"
@@ -2278,7 +2082,7 @@
          "label": "Manage the tyres",
          "decisions": [
           {
-           "lap": 35,
+           "lap": 39,
            "kind": "mode",
            "key": "pace",
            "value": "manage"
@@ -2290,21 +2094,68 @@
          "label": "Push and attack",
          "decisions": [
           {
-           "lap": 35,
+           "lap": 39,
            "kind": "mode",
            "key": "pace",
            "value": "push"
           },
           {
-           "lap": 35,
+           "lap": 39,
            "kind": "mode",
            "key": "battle",
            "value": "attack"
           }
          ]
         }
-       ],
-       "realOptionId": null
+       ]
+      },
+      {
+       "id": "battle-47",
+       "lap": 47,
+       "trigger": "cliff",
+       "target": {
+        "kind": "position",
+        "atBest": 2
+       },
+       "realOptionId": null,
+       "options": [
+        {
+         "id": "defend",
+         "label": "Defend hard",
+         "decisions": [
+          {
+           "lap": 47,
+           "kind": "mode",
+           "key": "battle",
+           "value": "defend"
+          }
+         ]
+        },
+        {
+         "id": "hold",
+         "label": "Hold the line",
+         "decisions": [
+          {
+           "lap": 47,
+           "kind": "mode",
+           "key": "battle",
+           "value": "hold"
+          }
+         ]
+        },
+        {
+         "id": "attack",
+         "label": "Attack",
+         "decisions": [
+          {
+           "lap": 47,
+           "kind": "mode",
+           "key": "battle",
+           "value": "attack"
+          }
+         ]
+        }
+       ]
       }
      ]
     }
@@ -2331,24 +2182,22 @@
     "eras": {
      "eraId": 9,
      "order": 4,
-     "userSide": "PER",
+     "userSide": "HAM",
      "target": {
       "type": "position",
-      "position": 3
+      "position": 2
      },
      "storyline": {
-      "real": "Red Bull put Verstappen on a second stop and he catches and passes Hamilton for the win; P\u00e9rez, on one stop, passes Bottas late but finishes third, behind Hamilton.",
+      "real": "Red Bull put Verstappen on a second stop; on fresh tyres he catches Hamilton, who stopped once, and passes him on the penultimate lap. Hamilton finishes second, 2.9 s behind.",
       "rewriteCondition": {
-       "type": "beat-rival",
-       "rival": "HAM"
+       "type": "win"
       },
-      "headline": "P\u00e9rez completes Red Bull's ambush of Mercedes at Paul Ricard"
+      "headline": "Hamilton makes one stop last at Paul Ricard"
      },
      "mastery": {
-      "type": "mode_rule",
-      "mode": "push",
-      "maxLaps": 12,
-      "label": "Reach the podium pushing for no more than 12 laps"
+      "type": "stop_count",
+      "exact": 1,
+      "label": "Finish second or better on one stop"
      },
      "hidden": {
       "type": "compound_rule",
@@ -2356,10 +2205,10 @@
       "label": "Never fit the soft tyre"
      },
      "hardCalls": {
-      "HAM": 1,
-      "PER": 1
+      "PER": 0,
+      "HAM": 1
      },
-     "briefing": "Paul Ricard, 2021. Verstappen starts from pole with Hamilton alongside; P\u00e9rez lines up fourth, behind Bottas."
+     "briefing": "Paul Ricard, 2021. Verstappen starts from pole with Hamilton alongside. You run Hamilton, leading Verstappen by 3.0 s after 15 laps. Hold on to second at least, and take the win if you can."
     },
     "rules": {
      "twoCompound": true,
@@ -2372,12 +2221,73 @@
     },
     "decisionMoments": [
      {
-      "id": "rivalpit-19",
-      "lap": 19,
-      "trigger": "rivalPit",
+      "id": "stop-17",
+      "lap": 17,
+      "trigger": "cliff",
       "target": {
        "kind": "position",
-       "atBest": 3
+       "atBest": 2
+      },
+      "options": [
+       {
+        "id": "stay",
+        "label": "Stay out",
+        "decisions": []
+       },
+       {
+        "id": "box-soft",
+        "label": "Box, softs",
+        "decisions": [
+         {
+          "lap": 17,
+          "kind": "pit",
+          "compound": "SOFT"
+         }
+        ]
+       },
+       {
+        "id": "box-medium",
+        "label": "Box, mediums",
+        "decisions": [
+         {
+          "lap": 17,
+          "kind": "pit",
+          "compound": "MEDIUM"
+         }
+        ]
+       },
+       {
+        "id": "box-hard",
+        "label": "Box, hards",
+        "decisions": [
+         {
+          "lap": 17,
+          "kind": "pit",
+          "compound": "HARD"
+         }
+        ]
+       },
+       {
+        "id": "box-next-soft",
+        "label": "Box next lap, softs",
+        "decisions": [
+         {
+          "lap": 18,
+          "kind": "pit",
+          "compound": "SOFT"
+         }
+        ]
+       }
+      ],
+      "realOptionId": "stay"
+     },
+     {
+      "id": "stop-19",
+      "lap": 19,
+      "trigger": "cliff",
+      "target": {
+       "kind": "position",
+       "atBest": 2
       },
       "options": [
        {
@@ -2430,15 +2340,15 @@
         ]
        }
       ],
-      "realOptionId": "stay"
+      "realOptionId": "box-hard"
      },
      {
-      "id": "stop-24",
-      "lap": 24,
+      "id": "stop-22",
+      "lap": 22,
       "trigger": "cliff",
       "target": {
        "kind": "position",
-       "atBest": 3
+       "atBest": 2
       },
       "options": [
        {
@@ -2451,7 +2361,7 @@
         "label": "Box, softs",
         "decisions": [
          {
-          "lap": 24,
+          "lap": 22,
           "kind": "pit",
           "compound": "SOFT"
          }
@@ -2462,7 +2372,7 @@
         "label": "Box, mediums",
         "decisions": [
          {
-          "lap": 24,
+          "lap": 22,
           "kind": "pit",
           "compound": "MEDIUM"
          }
@@ -2473,41 +2383,42 @@
         "label": "Box, hards",
         "decisions": [
          {
-          "lap": 24,
+          "lap": 22,
           "kind": "pit",
           "compound": "HARD"
          }
         ]
        },
        {
-        "id": "box-next-hard",
-        "label": "Box next lap, hards",
+        "id": "box-next-soft",
+        "label": "Box next lap, softs",
         "decisions": [
          {
-          "lap": 25,
+          "lap": 23,
           "kind": "pit",
-          "compound": "HARD"
+          "compound": "SOFT"
          }
         ]
        }
       ],
-      "realOptionId": "box-hard"
+      "realOptionId": "stay"
      },
      {
-      "id": "pace-27",
-      "lap": 27,
+      "id": "pace-31",
+      "lap": 31,
       "trigger": "cliff",
       "target": {
        "kind": "position",
-       "atBest": 3
+       "atBest": 2
       },
+      "realOptionId": null,
       "options": [
        {
         "id": "push",
         "label": "Push now",
         "decisions": [
          {
-          "lap": 27,
+          "lap": 31,
           "kind": "mode",
           "key": "pace",
           "value": "push"
@@ -2519,7 +2430,7 @@
         "label": "Standard pace",
         "decisions": [
          {
-          "lap": 27,
+          "lap": 31,
           "kind": "mode",
           "key": "pace",
           "value": "standard"
@@ -2531,7 +2442,7 @@
         "label": "Manage the tyres",
         "decisions": [
          {
-          "lap": 27,
+          "lap": 31,
           "kind": "mode",
           "key": "pace",
           "value": "manage"
@@ -2543,37 +2454,37 @@
         "label": "Push and attack",
         "decisions": [
          {
-          "lap": 27,
+          "lap": 31,
           "kind": "mode",
           "key": "pace",
           "value": "push"
          },
          {
-          "lap": 27,
+          "lap": 31,
           "kind": "mode",
           "key": "battle",
           "value": "attack"
          }
         ]
        }
-      ],
-      "realOptionId": null
+      ]
      },
      {
-      "id": "pace-35",
-      "lap": 35,
+      "id": "pace-39",
+      "lap": 39,
       "trigger": "cliff",
       "target": {
        "kind": "position",
-       "atBest": 3
+       "atBest": 2
       },
+      "realOptionId": null,
       "options": [
        {
         "id": "push",
         "label": "Push now",
         "decisions": [
          {
-          "lap": 35,
+          "lap": 39,
           "kind": "mode",
           "key": "pace",
           "value": "push"
@@ -2585,7 +2496,7 @@
         "label": "Standard pace",
         "decisions": [
          {
-          "lap": 35,
+          "lap": 39,
           "kind": "mode",
           "key": "pace",
           "value": "standard"
@@ -2597,7 +2508,7 @@
         "label": "Manage the tyres",
         "decisions": [
          {
-          "lap": 35,
+          "lap": 39,
           "kind": "mode",
           "key": "pace",
           "value": "manage"
@@ -2609,25 +2520,72 @@
         "label": "Push and attack",
         "decisions": [
          {
-          "lap": 35,
+          "lap": 39,
           "kind": "mode",
           "key": "pace",
           "value": "push"
          },
          {
-          "lap": 35,
+          "lap": 39,
           "kind": "mode",
           "key": "battle",
           "value": "attack"
          }
         ]
        }
-      ],
-      "realOptionId": null
+      ]
+     },
+     {
+      "id": "battle-47",
+      "lap": 47,
+      "trigger": "cliff",
+      "target": {
+       "kind": "position",
+       "atBest": 2
+      },
+      "realOptionId": null,
+      "options": [
+       {
+        "id": "defend",
+        "label": "Defend hard",
+        "decisions": [
+         {
+          "lap": 47,
+          "kind": "mode",
+          "key": "battle",
+          "value": "defend"
+         }
+        ]
+       },
+       {
+        "id": "hold",
+        "label": "Hold the line",
+        "decisions": [
+         {
+          "lap": 47,
+          "kind": "mode",
+          "key": "battle",
+          "value": "hold"
+         }
+        ]
+       },
+       {
+        "id": "attack",
+        "label": "Attack",
+        "decisions": [
+         {
+          "lap": 47,
+          "kind": "mode",
+          "key": "battle",
+          "value": "attack"
+         }
+        ]
+       }
+      ]
      }
     ],
-    "userSide": "PER",
-    "rival": "HAM"
+    "userSide": "HAM",
+    "rival": "PER"
    },
    "events": []
   },
@@ -2639,32 +2597,28 @@
      "eras": {
       "eraId": 8,
       "order": 6,
-      "userSide": "VER",
+      "userSide": "HAM",
       "target": {
-       "type": "defend"
+       "type": "win"
       },
       "storyline": {
-       "real": "Mercedes switch Hamilton to a second stop; on fresh mediums he catches Verstappen and passes him with four laps to go.",
-       "rewriteCondition": {
-        "type": "defend"
-       },
-       "headline": "Verstappen holds on at the Hungaroring"
+       "real": "Mercedes switch Hamilton to a second stop; on fresh mediums he catches Verstappen and passes him with four laps to go, and wins by 17.8 s."
       },
       "mastery": {
        "type": "stop_count",
-       "max": 1,
-       "label": "Win on a single stop"
+       "exact": 2,
+       "label": "Win on two more stops"
       },
       "hidden": {
-       "type": "compound_rule",
-       "mustAvoid": "HARD",
-       "label": "Win without fitting the hard tyre"
+       "type": "margin",
+       "seconds": 5,
+       "label": "Win by more than 5 seconds"
       },
       "hardCalls": {
-       "VER": 2,
-       "HAM": 0
+       "VER": 0,
+       "HAM": 1
       },
-      "briefing": "Hungary, 2019. Verstappen starts from the first pole position of his career, with Bottas and Hamilton behind him."
+      "briefing": "Hungary, 2019. Verstappen starts from the first pole position of his career, with Bottas and Hamilton behind him. You run Hamilton, second and 1.4 s behind Verstappen after 22 laps. Find a way past and win."
      },
      "rules": {
       "twoCompound": true,
@@ -2674,7 +2628,319 @@
       "drs": true,
       "ers": "hybrid",
       "refuelling": false
-     }
+     },
+     "decisionMoments": [
+      {
+       "id": "rivalpit-25",
+       "lap": 25,
+       "trigger": "rivalPit",
+       "target": {
+        "kind": "win"
+       },
+       "options": [
+        {
+         "id": "stay",
+         "label": "Stay out",
+         "decisions": []
+        },
+        {
+         "id": "box-soft",
+         "label": "Box, softs",
+         "decisions": [
+          {
+           "lap": 25,
+           "kind": "pit",
+           "compound": "SOFT"
+          }
+         ]
+        },
+        {
+         "id": "box-medium",
+         "label": "Box, mediums",
+         "decisions": [
+          {
+           "lap": 25,
+           "kind": "pit",
+           "compound": "MEDIUM"
+          }
+         ]
+        },
+        {
+         "id": "box-hard",
+         "label": "Box, hards",
+         "decisions": [
+          {
+           "lap": 25,
+           "kind": "pit",
+           "compound": "HARD"
+          }
+         ]
+        },
+        {
+         "id": "box-next-hard",
+         "label": "Box next lap, hards",
+         "decisions": [
+          {
+           "lap": 26,
+           "kind": "pit",
+           "compound": "HARD"
+          }
+         ]
+        }
+       ],
+       "realOptionId": "stay"
+      },
+      {
+       "id": "stop-31",
+       "lap": 31,
+       "trigger": "cliff",
+       "target": {
+        "kind": "win"
+       },
+       "options": [
+        {
+         "id": "stay",
+         "label": "Stay out",
+         "decisions": []
+        },
+        {
+         "id": "box-soft",
+         "label": "Box, softs",
+         "decisions": [
+          {
+           "lap": 31,
+           "kind": "pit",
+           "compound": "SOFT"
+          }
+         ]
+        },
+        {
+         "id": "box-medium",
+         "label": "Box, mediums",
+         "decisions": [
+          {
+           "lap": 31,
+           "kind": "pit",
+           "compound": "MEDIUM"
+          }
+         ]
+        },
+        {
+         "id": "box-hard",
+         "label": "Box, hards",
+         "decisions": [
+          {
+           "lap": 31,
+           "kind": "pit",
+           "compound": "HARD"
+          }
+         ]
+        },
+        {
+         "id": "box-next-hard",
+         "label": "Box next lap, hards",
+         "decisions": [
+          {
+           "lap": 32,
+           "kind": "pit",
+           "compound": "HARD"
+          }
+         ]
+        }
+       ],
+       "realOptionId": "box-hard"
+      },
+      {
+       "id": "pace-34",
+       "lap": 34,
+       "trigger": "cliff",
+       "target": {
+        "kind": "win"
+       },
+       "options": [
+        {
+         "id": "push",
+         "label": "Push now",
+         "decisions": [
+          {
+           "lap": 34,
+           "kind": "mode",
+           "key": "pace",
+           "value": "push"
+          }
+         ]
+        },
+        {
+         "id": "standard",
+         "label": "Standard pace",
+         "decisions": [
+          {
+           "lap": 34,
+           "kind": "mode",
+           "key": "pace",
+           "value": "standard"
+          }
+         ]
+        },
+        {
+         "id": "manage",
+         "label": "Manage the tyres",
+         "decisions": [
+          {
+           "lap": 34,
+           "kind": "mode",
+           "key": "pace",
+           "value": "manage"
+          }
+         ]
+        },
+        {
+         "id": "push-attack",
+         "label": "Push and attack",
+         "decisions": [
+          {
+           "lap": 34,
+           "kind": "mode",
+           "key": "pace",
+           "value": "push"
+          },
+          {
+           "lap": 34,
+           "kind": "mode",
+           "key": "battle",
+           "value": "attack"
+          }
+         ]
+        }
+       ],
+       "realOptionId": null
+      },
+      {
+       "id": "pace-38",
+       "lap": 38,
+       "trigger": "cliff",
+       "target": {
+        "kind": "win"
+       },
+       "options": [
+        {
+         "id": "push",
+         "label": "Push now",
+         "decisions": [
+          {
+           "lap": 38,
+           "kind": "mode",
+           "key": "pace",
+           "value": "push"
+          }
+         ]
+        },
+        {
+         "id": "standard",
+         "label": "Standard pace",
+         "decisions": [
+          {
+           "lap": 38,
+           "kind": "mode",
+           "key": "pace",
+           "value": "standard"
+          }
+         ]
+        },
+        {
+         "id": "manage",
+         "label": "Manage the tyres",
+         "decisions": [
+          {
+           "lap": 38,
+           "kind": "mode",
+           "key": "pace",
+           "value": "manage"
+          }
+         ]
+        },
+        {
+         "id": "push-attack",
+         "label": "Push and attack",
+         "decisions": [
+          {
+           "lap": 38,
+           "kind": "mode",
+           "key": "pace",
+           "value": "push"
+          },
+          {
+           "lap": 38,
+           "kind": "mode",
+           "key": "battle",
+           "value": "attack"
+          }
+         ]
+        }
+       ],
+       "realOptionId": null
+      },
+      {
+       "id": "stop-48",
+       "lap": 48,
+       "trigger": "cliff",
+       "target": {
+        "kind": "win"
+       },
+       "options": [
+        {
+         "id": "stay",
+         "label": "Stay out",
+         "decisions": []
+        },
+        {
+         "id": "box-soft",
+         "label": "Box, softs",
+         "decisions": [
+          {
+           "lap": 48,
+           "kind": "pit",
+           "compound": "SOFT"
+          }
+         ]
+        },
+        {
+         "id": "box-medium",
+         "label": "Box, mediums",
+         "decisions": [
+          {
+           "lap": 48,
+           "kind": "pit",
+           "compound": "MEDIUM"
+          }
+         ]
+        },
+        {
+         "id": "box-hard",
+         "label": "Box, hards",
+         "decisions": [
+          {
+           "lap": 48,
+           "kind": "pit",
+           "compound": "HARD"
+          }
+         ]
+        },
+        {
+         "id": "box-next-hard",
+         "label": "Box next lap, hards",
+         "decisions": [
+          {
+           "lap": 49,
+           "kind": "pit",
+           "compound": "HARD"
+          }
+         ]
+        }
+       ],
+       "realOptionId": "box-medium"
+      }
+     ]
     }
    ],
    "keys": [
@@ -2699,32 +2965,28 @@
     "eras": {
      "eraId": 8,
      "order": 6,
-     "userSide": "VER",
+     "userSide": "HAM",
      "target": {
-      "type": "defend"
+      "type": "win"
      },
      "storyline": {
-      "real": "Mercedes switch Hamilton to a second stop; on fresh mediums he catches Verstappen and passes him with four laps to go.",
-      "rewriteCondition": {
-       "type": "defend"
-      },
-      "headline": "Verstappen holds on at the Hungaroring"
+      "real": "Mercedes switch Hamilton to a second stop; on fresh mediums he catches Verstappen and passes him with four laps to go, and wins by 17.8 s."
      },
      "mastery": {
       "type": "stop_count",
-      "max": 1,
-      "label": "Win on a single stop"
+      "exact": 2,
+      "label": "Win on two more stops"
      },
      "hidden": {
-      "type": "compound_rule",
-      "mustAvoid": "HARD",
-      "label": "Win without fitting the hard tyre"
+      "type": "margin",
+      "seconds": 5,
+      "label": "Win by more than 5 seconds"
      },
      "hardCalls": {
-      "VER": 2,
-      "HAM": 0
+      "VER": 0,
+      "HAM": 1
      },
-     "briefing": "Hungary, 2019. Verstappen starts from the first pole position of his career, with Bottas and Hamilton behind him."
+     "briefing": "Hungary, 2019. Verstappen starts from the first pole position of his career, with Bottas and Hamilton behind him. You run Hamilton, second and 1.4 s behind Verstappen after 22 laps. Find a way past and win."
     },
     "rules": {
      "twoCompound": true,
@@ -2737,11 +2999,11 @@
     },
     "decisionMoments": [
      {
-      "id": "stop-25",
+      "id": "rivalpit-25",
       "lap": 25,
-      "trigger": "cliff",
+      "trigger": "rivalPit",
       "target": {
-       "kind": "beat-rival"
+       "kind": "win"
       },
       "options": [
        {
@@ -2794,14 +3056,14 @@
         ]
        }
       ],
-      "realOptionId": "box-hard"
+      "realOptionId": "stay"
      },
      {
-      "id": "cliff-38",
-      "lap": 38,
+      "id": "stop-31",
+      "lap": 31,
       "trigger": "cliff",
       "target": {
-       "kind": "beat-rival"
+       "kind": "win"
       },
       "options": [
        {
@@ -2814,7 +3076,7 @@
         "label": "Box, softs",
         "decisions": [
          {
-          "lap": 38,
+          "lap": 31,
           "kind": "pit",
           "compound": "SOFT"
          }
@@ -2825,7 +3087,7 @@
         "label": "Box, mediums",
         "decisions": [
          {
-          "lap": 38,
+          "lap": 31,
           "kind": "pit",
           "compound": "MEDIUM"
          }
@@ -2836,7 +3098,7 @@
         "label": "Box, hards",
         "decisions": [
          {
-          "lap": 38,
+          "lap": 31,
           "kind": "pit",
           "compound": "HARD"
          }
@@ -2847,21 +3109,151 @@
         "label": "Box next lap, hards",
         "decisions": [
          {
-          "lap": 39,
+          "lap": 32,
           "kind": "pit",
           "compound": "HARD"
          }
         ]
        }
       ],
-      "realOptionId": "stay"
+      "realOptionId": "box-hard"
      },
      {
-      "id": "rivalpit-48",
-      "lap": 48,
-      "trigger": "rivalPit",
+      "id": "pace-34",
+      "lap": 34,
+      "trigger": "cliff",
       "target": {
-       "kind": "beat-rival"
+       "kind": "win"
+      },
+      "options": [
+       {
+        "id": "push",
+        "label": "Push now",
+        "decisions": [
+         {
+          "lap": 34,
+          "kind": "mode",
+          "key": "pace",
+          "value": "push"
+         }
+        ]
+       },
+       {
+        "id": "standard",
+        "label": "Standard pace",
+        "decisions": [
+         {
+          "lap": 34,
+          "kind": "mode",
+          "key": "pace",
+          "value": "standard"
+         }
+        ]
+       },
+       {
+        "id": "manage",
+        "label": "Manage the tyres",
+        "decisions": [
+         {
+          "lap": 34,
+          "kind": "mode",
+          "key": "pace",
+          "value": "manage"
+         }
+        ]
+       },
+       {
+        "id": "push-attack",
+        "label": "Push and attack",
+        "decisions": [
+         {
+          "lap": 34,
+          "kind": "mode",
+          "key": "pace",
+          "value": "push"
+         },
+         {
+          "lap": 34,
+          "kind": "mode",
+          "key": "battle",
+          "value": "attack"
+         }
+        ]
+       }
+      ],
+      "realOptionId": null
+     },
+     {
+      "id": "pace-38",
+      "lap": 38,
+      "trigger": "cliff",
+      "target": {
+       "kind": "win"
+      },
+      "options": [
+       {
+        "id": "push",
+        "label": "Push now",
+        "decisions": [
+         {
+          "lap": 38,
+          "kind": "mode",
+          "key": "pace",
+          "value": "push"
+         }
+        ]
+       },
+       {
+        "id": "standard",
+        "label": "Standard pace",
+        "decisions": [
+         {
+          "lap": 38,
+          "kind": "mode",
+          "key": "pace",
+          "value": "standard"
+         }
+        ]
+       },
+       {
+        "id": "manage",
+        "label": "Manage the tyres",
+        "decisions": [
+         {
+          "lap": 38,
+          "kind": "mode",
+          "key": "pace",
+          "value": "manage"
+         }
+        ]
+       },
+       {
+        "id": "push-attack",
+        "label": "Push and attack",
+        "decisions": [
+         {
+          "lap": 38,
+          "kind": "mode",
+          "key": "pace",
+          "value": "push"
+         },
+         {
+          "lap": 38,
+          "kind": "mode",
+          "key": "battle",
+          "value": "attack"
+         }
+        ]
+       }
+      ],
+      "realOptionId": null
+     },
+     {
+      "id": "stop-48",
+      "lap": 48,
+      "trigger": "cliff",
+      "target": {
+       "kind": "win"
       },
       "options": [
        {
@@ -2914,201 +3306,11 @@
         ]
        }
       ],
-      "realOptionId": "stay"
-     },
-     {
-      "id": "pace-54",
-      "lap": 54,
-      "trigger": "cliff",
-      "target": {
-       "kind": "beat-rival"
-      },
-      "options": [
-       {
-        "id": "push",
-        "label": "Push now",
-        "decisions": [
-         {
-          "lap": 54,
-          "kind": "mode",
-          "key": "pace",
-          "value": "push"
-         }
-        ]
-       },
-       {
-        "id": "standard",
-        "label": "Standard pace",
-        "decisions": [
-         {
-          "lap": 54,
-          "kind": "mode",
-          "key": "pace",
-          "value": "standard"
-         }
-        ]
-       },
-       {
-        "id": "manage",
-        "label": "Manage the tyres",
-        "decisions": [
-         {
-          "lap": 54,
-          "kind": "mode",
-          "key": "pace",
-          "value": "manage"
-         }
-        ]
-       },
-       {
-        "id": "push-attack",
-        "label": "Push and attack",
-        "decisions": [
-         {
-          "lap": 54,
-          "kind": "mode",
-          "key": "pace",
-          "value": "push"
-         },
-         {
-          "lap": 54,
-          "kind": "mode",
-          "key": "battle",
-          "value": "attack"
-         }
-        ]
-       }
-      ],
-      "realOptionId": null
-     },
-     {
-      "id": "pace-58",
-      "lap": 58,
-      "trigger": "cliff",
-      "target": {
-       "kind": "beat-rival"
-      },
-      "options": [
-       {
-        "id": "push",
-        "label": "Push now",
-        "decisions": [
-         {
-          "lap": 58,
-          "kind": "mode",
-          "key": "pace",
-          "value": "push"
-         }
-        ]
-       },
-       {
-        "id": "standard",
-        "label": "Standard pace",
-        "decisions": [
-         {
-          "lap": 58,
-          "kind": "mode",
-          "key": "pace",
-          "value": "standard"
-         }
-        ]
-       },
-       {
-        "id": "manage",
-        "label": "Manage the tyres",
-        "decisions": [
-         {
-          "lap": 58,
-          "kind": "mode",
-          "key": "pace",
-          "value": "manage"
-         }
-        ]
-       },
-       {
-        "id": "push-attack",
-        "label": "Push and attack",
-        "decisions": [
-         {
-          "lap": 58,
-          "kind": "mode",
-          "key": "pace",
-          "value": "push"
-         },
-         {
-          "lap": 58,
-          "kind": "mode",
-          "key": "battle",
-          "value": "attack"
-         }
-        ]
-       }
-      ],
-      "realOptionId": null
-     },
-     {
-      "id": "stop-67",
-      "lap": 67,
-      "trigger": "cliff",
-      "target": {
-       "kind": "beat-rival"
-      },
-      "options": [
-       {
-        "id": "stay",
-        "label": "Stay out",
-        "decisions": []
-       },
-       {
-        "id": "box-soft",
-        "label": "Box, softs",
-        "decisions": [
-         {
-          "lap": 67,
-          "kind": "pit",
-          "compound": "SOFT"
-         }
-        ]
-       },
-       {
-        "id": "box-medium",
-        "label": "Box, mediums",
-        "decisions": [
-         {
-          "lap": 67,
-          "kind": "pit",
-          "compound": "MEDIUM"
-         }
-        ]
-       },
-       {
-        "id": "box-hard",
-        "label": "Box, hards",
-        "decisions": [
-         {
-          "lap": 67,
-          "kind": "pit",
-          "compound": "HARD"
-         }
-        ]
-       },
-       {
-        "id": "box-next-hard",
-        "label": "Box next lap, hards",
-        "decisions": [
-         {
-          "lap": 68,
-          "kind": "pit",
-          "compound": "HARD"
-         }
-        ]
-       }
-      ],
-      "realOptionId": "box-soft"
+      "realOptionId": "box-medium"
      }
     ],
-    "userSide": "VER",
-    "rival": "HAM"
+    "userSide": "HAM",
+    "rival": "VER"
    },
    "events": [
     {
@@ -3148,7 +3350,7 @@
        "label": "Win by more than 3 seconds"
       },
       "hardCalls": {
-       "NOR": 2,
+       "NOR": 1,
        "HAM": 1
       },
       "briefing": "Sochi, 2021. Norris starts from his first pole position and leads Hamilton into the second half of the race. Rain is coming."
@@ -3209,7 +3411,7 @@
       "label": "Win by more than 3 seconds"
      },
      "hardCalls": {
-      "NOR": 2,
+      "NOR": 1,
       "HAM": 1
      },
      "briefing": "Sochi, 2021. Norris starts from his first pole position and leads Hamilton into the second half of the race. Rain is coming."

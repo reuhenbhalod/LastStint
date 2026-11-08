@@ -2,36 +2,32 @@
   "eras": {
     "eraId": 6,
     "order": 9,
-    "userSide": "VET",
+    "userSide": "WEB",
     "target": {
       "type": "win"
     },
     "storyline": {
       "real": "After the last stops Red Bull tell both drivers to hold position, Webber ahead. Vettel passes Webber on lap 46 anyway and wins by 4.3 s.",
       "rewriteCondition": {
-        "type": "team",
-        "positions": [
-          2,
-          1
-        ]
+        "type": "win"
       },
-      "headline": "Red Bull hold formation and Webber wins in Sepang"
+      "headline": "Webber keeps Vettel behind and wins in Sepang"
     },
     "mastery": {
       "type": "stop_count",
-      "exact": 2,
-      "label": "Win on two more stops, one fewer than Vettel made"
+      "exact": 3,
+      "label": "Win on three more stops"
     },
     "hidden": {
-      "type": "margin",
-      "seconds": 5,
-      "label": "Win by more than 5 seconds"
+      "type": "compound_rule",
+      "mustUse": "HARD",
+      "label": "Win with a stint on the hard tyre"
     },
     "hardCalls": {
-      "VET": 3,
-      "WEB": 0
+      "VET": 1,
+      "WEB": 1
     },
-    "briefing": "Sepang, 2013. The race started wet on intermediates and the track has dried. Vettel started on pole, but Webber leads him by 2.4 s. You run Vettel. Get ahead on strategy, before the team has to settle the order."
+    "briefing": "Sepang, 2013. The race started wet on intermediates and the track has dried. Vettel started on pole, Webber fifth, but Webber now leads him by 2.4 s. You run Webber. Stay ahead of Vettel to the flag."
   },
   "rules": {
     "twoCompound": true,

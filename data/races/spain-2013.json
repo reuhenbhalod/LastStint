@@ -2,7 +2,7 @@
   "schemaVersion": 11,
   "race": {
     "id": "spain-2013",
-    "name": "Spain 2013: Alonso vs R\u00e4ikk\u00f6nen",
+    "name": "Spain 2013: R\u00e4ikk\u00f6nen vs Alonso",
     "laps": 66,
     "takeoverLap": 18,
     "seed": 1
@@ -1080,9 +1080,9 @@
   ],
   "decisionMoments": [
     {
-      "id": "stop-21",
+      "id": "rivalpit-21",
       "lap": 21,
-      "trigger": "cliff",
+      "trigger": "rivalPit",
       "target": {
         "kind": "win"
       },
@@ -1126,12 +1126,12 @@
           ]
         }
       ],
-      "realOptionId": "box-soft"
+      "realOptionId": "stay"
     },
     {
-      "id": "rivalpit-26",
+      "id": "stop-26",
       "lap": 26,
-      "trigger": "rivalPit",
+      "trigger": "cliff",
       "target": {
         "kind": "win"
       },
@@ -1175,77 +1175,61 @@
           ]
         }
       ],
-      "realOptionId": "stay"
+      "realOptionId": "box-hard"
     },
     {
-      "id": "pace-30",
-      "lap": 30,
+      "id": "cliff-33",
+      "lap": 33,
       "trigger": "cliff",
       "target": {
         "kind": "win"
       },
       "options": [
         {
-          "id": "push",
-          "label": "Push now",
+          "id": "stay",
+          "label": "Stay out",
+          "decisions": []
+        },
+        {
+          "id": "box-soft",
+          "label": "Box, softs",
           "decisions": [
             {
-              "lap": 30,
-              "kind": "mode",
-              "key": "pace",
-              "value": "push"
+              "lap": 33,
+              "kind": "pit",
+              "compound": "SOFT"
             }
           ]
         },
         {
-          "id": "standard",
-          "label": "Standard pace",
+          "id": "box-hard",
+          "label": "Box, hards",
           "decisions": [
             {
-              "lap": 30,
-              "kind": "mode",
-              "key": "pace",
-              "value": "standard"
+              "lap": 33,
+              "kind": "pit",
+              "compound": "HARD"
             }
           ]
         },
         {
-          "id": "manage",
-          "label": "Manage the tyres",
+          "id": "box-next-hard",
+          "label": "Box next lap, hards",
           "decisions": [
             {
-              "lap": 30,
-              "kind": "mode",
-              "key": "pace",
-              "value": "manage"
-            }
-          ]
-        },
-        {
-          "id": "push-attack",
-          "label": "Push and attack",
-          "decisions": [
-            {
-              "lap": 30,
-              "kind": "mode",
-              "key": "pace",
-              "value": "push"
-            },
-            {
-              "lap": 30,
-              "kind": "mode",
-              "key": "battle",
-              "value": "attack"
+              "lap": 34,
+              "kind": "pit",
+              "compound": "HARD"
             }
           ]
         }
       ],
-      "realOptionId": null
+      "realOptionId": "stay"
     },
     {
-      "id": "stop-36",
+      "id": "rivalpit-36",
       "lap": 36,
-      "trigger": "cliff",
+      "trigger": "rivalPit",
       "target": {
         "kind": "win"
       },
@@ -1289,12 +1273,12 @@
           ]
         }
       ],
-      "realOptionId": "box-soft"
+      "realOptionId": "stay"
     },
     {
-      "id": "rivalpit-45",
+      "id": "stop-45",
       "lap": 45,
-      "trigger": "rivalPit",
+      "trigger": "cliff",
       "target": {
         "kind": "win"
       },
@@ -1338,12 +1322,12 @@
           ]
         }
       ],
-      "realOptionId": "stay"
+      "realOptionId": "box-hard"
     },
     {
-      "id": "stop-49",
+      "id": "rivalpit-49",
       "lap": 49,
-      "trigger": "cliff",
+      "trigger": "rivalPit",
       "target": {
         "kind": "win"
       },
@@ -1387,7 +1371,7 @@
           ]
         }
       ],
-      "realOptionId": "box-hard"
+      "realOptionId": "stay"
     }
   ],
   "candidateMomentLaps": [
@@ -1445,41 +1429,37 @@
     "VDG",
     "GRO"
   ],
-  "userSide": "ALO",
-  "rival": "RAI",
+  "userSide": "RAI",
+  "rival": "ALO",
   "eras": {
     "eraId": 6,
     "order": 10,
-    "userSide": "ALO",
+    "userSide": "RAI",
     "target": {
       "type": "win"
     },
     "storyline": {
       "real": "Alonso wins his home race from 5th on the grid on four stops; R\u00e4ikk\u00f6nen, on three, finishes second, 9.3 s behind. Massa is third.",
       "rewriteCondition": {
-        "type": "team",
-        "positions": [
-          1,
-          2
-        ]
+        "type": "win"
       },
-      "headline": "Alonso and Massa give Ferrari a one-two in Barcelona"
+      "headline": "R\u00e4ikk\u00f6nen's three stops beat Alonso's four in Barcelona"
     },
     "mastery": {
       "type": "stop_count",
-      "exact": 3,
-      "label": "Win on four stops (three more from here)"
+      "exact": 2,
+      "label": "Win on two more stops, as R\u00e4ikk\u00f6nen made"
     },
     "hidden": {
       "type": "margin",
-      "seconds": 10,
-      "label": "Win by more than 10 seconds"
+      "seconds": 5,
+      "label": "Win by more than 5 seconds"
     },
     "hardCalls": {
       "ALO": 1,
-      "RAI": 0
+      "RAI": 3
     },
-    "briefing": "Barcelona, 2013. The tyres wear fast. Alonso started 5th, has already stopped once and now leads. R\u00e4ikk\u00f6nen, fourth, will try to make one stop fewer work. You run Alonso. Win at home."
+    "briefing": "Barcelona, 2013. The tyres wear fast. Alonso started fifth, has already stopped once and leads. You run R\u00e4ikk\u00f6nen, fourth, on a plan with one stop fewer than Alonso's. Make it work and win."
   },
   "provenance": {
     "kind": "real",

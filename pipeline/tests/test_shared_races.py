@@ -193,23 +193,23 @@ def test_eras_side_swaps_the_storyline_drivers_in_place():
 
 def test_overlay_moments_replace_the_files_and_a_pool_build_ignores_them(tmp_path):
     """decisionMoments is applied by `pipeline build` to a non-pool race only."""
-    moments = build.load_overlay("abu-dhabi-2021")["decisionMoments"]
+    moments = build.load_overlay("hungary-2019")["decisionMoments"]
     overlay = {
-        "eras": {"eraId": 9, "order": 10, "userSide": "VER"},
+        "eras": {"eraId": 8, "order": 6, "userSide": "HAM"},
         "decisionMoments": moments,
     }
-    merged = merge(_race("abu-dhabi-2021"), overlay)
+    merged = merge(_race("hungary-2019"), overlay)
     assert merged["decisionMoments"] == moments
-    assert (merged["userSide"], merged["rival"]) == ("VER", "HAM")
-    (tmp_path / "abu-dhabi-2021.json").write_text(json.dumps(overlay))
-    plain = build.build_race("abu-dhabi-2021", eras_dir=tmp_path / "none")
-    shared = build.build_race("abu-dhabi-2021", eras_dir=tmp_path)
+    assert (merged["userSide"], merged["rival"]) == ("HAM", "VER")
+    (tmp_path / "hungary-2019.json").write_text(json.dumps(overlay))
+    plain = build.build_race("hungary-2019", eras_dir=tmp_path / "none")
+    shared = build.build_race("hungary-2019", eras_dir=tmp_path)
     assert json.dumps(shared.model) == json.dumps(plain.model)
     pools = tmp_path / "pools.json"
     pools.write_text(json.dumps({"daily": [], "survivor": {}, "eras": {}}))
-    alone = build.build_race("abu-dhabi-2021", eras_dir=tmp_path, pools_path=pools)
+    alone = build.build_race("hungary-2019", eras_dir=tmp_path, pools_path=pools)
     assert alone.model["decisionMoments"] == moments
-    assert alone.model["userSide"] == "VER"
+    assert alone.model["userSide"] == "HAM"
     # The overlay line first; an Eras build may add the SC restart line (restart.py).
     assert alone.estimates[0] == "overlay: eras, decisionMoments"
 

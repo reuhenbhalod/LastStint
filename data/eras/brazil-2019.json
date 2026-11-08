@@ -26,8 +26,8 @@
     },
     "mastery": {
       "type": "stop_count",
-      "max": 2,
-      "label": "Beat Gasly on no more than two stops"
+      "exact": 3,
+      "label": "Beat Gasly on three more stops, as Hamilton made"
     },
     "hidden": {
       "type": "compound_rule",
@@ -35,8 +35,8 @@
       "label": "Never fit the hard tyre"
     },
     "hardCalls": {
-      "HAM": 0,
-      "GAS": 0
+      "HAM": 4,
+      "GAS": 1
     },
     "briefing": "Interlagos, 2019. Verstappen starts from pole with Hamilton third; Gasly's Toro Rosso is sixth on the grid."
   },

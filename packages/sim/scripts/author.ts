@@ -69,7 +69,16 @@ const file = JSON.parse(raw) as RaceModel;
 const overlay =
   eras && existsSync(overlayPath) ? JSON.parse(readFileSync(overlayPath, 'utf8')) : {};
 const side: string | undefined = overlay.eras?.userSide;
-const seen = eras && side ? fromSide(file, side) : file;
+// A shared race's file has no eras or rules block, so it would grade as Daily does: with
+// --eras it is graded with its overlay's blocks, as the Eras API serves it (the Eras grader).
+const withBlocks: RaceModel = eras
+  ? {
+      ...file,
+      ...(overlay.eras && !file.eras ? { eras: overlay.eras } : {}),
+      ...(overlay.rules && !file.rules ? { rules: overlay.rules } : {}),
+    }
+  : file;
+const seen = eras && side ? fromSide(withBlocks, side) : withBlocks;
 const model: RaceModel = { ...seen, rival: flag('--rival') ?? seen.rival, decisionMoments: [] };
 const max = flag('--max') ? Number(flag('--max')) : undefined;
 const picked = authorMoments(model, samples, (line) => console.log(line), max, target);
