@@ -5,7 +5,7 @@
 
 import type { EraMapState, EraNode } from './eraMapState.js';
 
-function LockIcon({ open }: { open: boolean }) {
+export function LockIcon({ open }: { open: boolean }) {
   return (
     <svg
       width={14}
@@ -25,13 +25,17 @@ function LockIcon({ open }: { open: boolean }) {
   );
 }
 
-function StarIcon() {
+/** A star: filled, or an outline (`hollow`) for one not earned. */
+export function StarIcon({ hollow = false }: { hollow?: boolean }) {
   return (
     <svg
       width={14}
       height={14}
       viewBox="0 0 24 24"
-      fill="currentColor"
+      fill={hollow ? 'none' : 'currentColor'}
+      stroke="currentColor"
+      strokeWidth={hollow ? 2 : 0}
+      strokeLinejoin="round"
       aria-hidden="true"
       className="inline-block shrink-0 align-[-0.15em]"
     >
@@ -41,7 +45,7 @@ function StarIcon() {
 }
 
 /** The lock line: Unlocked, Locked (with what unlocks it) or Coming soon. */
-function LockLine({ node, testMode }: { node: EraNode; testMode: boolean }) {
+export function LockLine({ node, testMode }: { node: EraNode; testMode: boolean }) {
   if (node.comingSoon) {
     return (
       <p className="m-0 text-[13px] font-semibold text-[var(--muted)]">

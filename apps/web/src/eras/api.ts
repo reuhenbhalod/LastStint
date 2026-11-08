@@ -52,6 +52,15 @@ export interface EraRaceSummary {
   reconstructed: boolean;
   /** Unpublished: playable on test only, with a Draft badge. */
   draft: boolean;
+  /**
+   * The player's Legend progress on the race: its own three stars and best accuracy, tracked
+   * apart from the ones above (spec §8; `era_progress` rows with `legend = 1`). Absent: no
+   * Legend progress yet.
+   *
+   * NOTE for step 7.2: optional, added by step 8.3 so the era detail can show Legend progress
+   * separately; send it once the Worker serves Legend progress.
+   */
+  legend?: { stars: EraRaceSummary['stars']; bestAccuracy: number | null };
 }
 
 export interface EraDetail extends EraSummary {
