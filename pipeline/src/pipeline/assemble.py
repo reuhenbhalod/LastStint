@@ -215,7 +215,8 @@ def assemble_race_model(
         all_events = redflag_mod.annotate_restarts(
             redflag_mod.apply_hand_spans(all_events, red_flags or []), red_flags or [], year
         )
-    future_events = [e for e in all_events if e["lap"] >= takeover_lap]
+    # An SC/VSC already running at the takeover is kept from the takeover lap to its end.
+    future_events = events_mod.from_takeover(all_events, takeover_lap)
     facts = fault_facts or []
     takeover_state = scenario_mod.state_at_takeover(laps, takeover_lap)
     strategy = scenario_mod.real_strategy(laps)

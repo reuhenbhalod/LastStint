@@ -477,3 +477,87 @@ the 2009 / 2011 / 2012 Jolpica constructors' standings, as for 2014-2016).
 test_committed_rates_match_the_raw_timelines` fails until it's regenerated: the three Jolpica
 races' estimated SC timelines are new in data/raw), `apps/worker/src/races.gen.ts` and the
 parity fixtures.
+
+## Pipeline fixes D2a (Nov 7 2026): overtake fallback from the race's pass rate, SC running at the takeover
+
+Owner decisions of Nov 7, applied to every race. Written by hand. Robust status as above:
+1,000 runs on each of two seed sets, values seed set 10000 / seed set 20000, limits in brackets.
+"Before" is the same build with the old behaviour patched back in, so both columns use the
+same code otherwise.
+
+**Fix 1: the overtake fallback's intercept comes from the race's own pass rate**
+(`track.rate_matched_fallback`). A race with fewer than `MIN_PASSES` (8) passes keeps
+`DEFAULT_OVERTAKE_MODEL`'s slopes (paceCoef 2.0, gapCoef -5.0), and its intercept b is set so
+the model's mean predicted P(pass) over the race's own pass opportunities equals its measured
+pass rate: mean over the opportunities of sigmoid(b + 2.0 * adv - 5.0 * gap) = (passes + 0.5)
+/ (opportunities + 1). The opportunities are the ones the fit would use (`extract_pass_events`:
+a car within 2 s of the car ahead, no pit stop by either car on that lap or the next, and a
+model pace advantage `adv` for both). The 0.5 smoothing gives a race with no pass at all a
+small, finite rate. b is found by bisection (the mean rises with b). The fixed default is
+still used with no opportunities, a failed fit or a wrong-signed fit (none of the 86 races hits
+those). The build note says which rate was matched. Tests: `test_track.py`.
+
+Three races use the fallback (every race was rebuilt, and only these three race files and
+golden files changed). None is in the Daily or Gauntlet pool, so no scheduled D1 row pins
+their hashes and no migration is needed. monaco-2017 and monaco-2025 are Eras races: an Eras
+attempt started on the old file is refused at submit (`model-changed`, by design in 0011).
+
+| Race | Passes / opportunities | Intercept | Status before / after | Mean gap error before / after | Failing checks after |
+|---|---|---|---|---|---|
+| monaco-2017 | 2 / 525 | 0.5 -> -2.41 | fail / fail | 3.83s / 3.20s | field BOT gap error 6.19 / 6.39 [5.00] |
+| monaco-2025 | 2 / 636 | 0.5 -> -2.53 | fail / fail | 2.66s / 2.63s | duel NOR vs LEC order rate 0.60 / 0.61 [0.60]; podium order rate 0.50 / 0.51 [0.50]; field HAM gap error 10.82 / 10.94 [5.14] |
+| miami-2025 | 7 / 124 | 0.5 -> 0.70 | fail / fail (data issue) | 3.15s / 3.17s | field ANT gap error 7.65 / 7.62 [5.55] |
+
+- **monaco-2017.** The duel and podium checks now pass: duel RAI vs VET gap error 4.81 / 5.11 ->
+  2.38 / 2.43 s, duel order 0.97 / 0.97 -> 0.82 / 0.83, podium order 0.91 / 0.92 -> 0.81 / 0.83.
+  Only BOT's gap still fails (8.76 / 8.98 -> 6.19 / 6.39 s): the after-SC train (see wave A).
+- **monaco-2025.** The duel gap error passes (2.23 / 3.13 -> 0.35 / 0.36 s). The duel order
+  rate (0.52 / 0.49 -> 0.60 / 0.61) and podium order rate (0.44 / 0.41 -> 0.50 / 0.51) are now
+  right at their limits but fail on at least one seed set, so the race still fails: with the
+  leaders' large fitted lap noise the order is still close to a coin flip. HAM's gap is worse
+  (9.33 / 9.77 -> 10.82 / 10.94 s, race mechanics, see wave A).
+- **miami-2025.** The race's measured rate (7 in 124) is above what the old default predicted,
+  so its intercept goes up a little. G1 barely changes. It stays a data issue (tyre timing).
+
+**Fix 2: an SC or VSC already running at the takeover is kept** (`events.from_takeover`, used
+by `assemble.py`). A period that started before the takeover lap and lasts past it is put in
+the race file from the takeover lap to its end (`lap` = takeover, `laps` = the laps left,
+counting the takeover lap). Marking the takeover lap matters: both sims then run the first lap
+as a running SC (its bunching; in live play an added stop pays the SC price, not the
+green-entry price) rather than as a new deployment. A period that ends on the takeover lap is dropped, since the
+sim's first lap is green. Red flags aren't cut (their restart and free stops belong to their
+real start); car faults keep their own `lasts_past` rule. Neither sim needed a code change:
+both read events as lap spans (`neutralMap`, `sim_reference`), and Legend already keeps every
+event at or before the takeover. The web's SC cause (`apps/web/src/game/neutral.ts`) matched a
+cause by the period's start lap, so a cut period would have shown no cause: a period starting
+on the takeover lap now takes the latest cause of its type at or before it. Tests:
+`test_events.py`, `test_assemble.py`, `test_estimates.py`, `packages/sim/tests/sc-at-takeover.test.ts`,
+`apps/web/src/game/neutral.test.ts`.
+
+At every race's current takeover, only one neutralization spans the takeover lap: brazil-2021's
+lap 6-9 SC, with the takeover on lap 9. It ends on the takeover lap, so it's dropped as before
+and the race file is unchanged. No Daily or Gauntlet race file or golden file changes, so no
+migration is needed.
+
+**abu-dhabi-2012: `takeover_lap: 8` pin removed.** The D3 rule gives lap 10, inside the lap
+9-14 SC, which the race file now keeps as `{"lap": 10, "type": "SC", "laps": 5}`. Vettel's stop
+under it (lap 14 out-lap) is still played. Results:
+
+| Takeover | Status | Mean gap error | Duel VET vs BUT gap error / order rate | Failing checks |
+|---|---|---|---|---|
+| lap 8 (pinned, before) | fail | 2.61s | 1.96 / 1.86 s, 0.66 / 0.71 | podium ALO gap error 5.21 / 5.16 [5.00] |
+| lap 10, SC dropped (old D3) | fail | 3.35s | 5.08 / 4.96 s, 0.33 / 0.32 | duel gap error, duel order rate, podium VET gap error 6.62 / 6.55 |
+| lap 10, SC kept (new D3) | fail | 2.64s | 2.14 / 1.97 s, 0.64 / 0.68 | podium ALO gap error 5.15 / 5.19 [5.00] |
+
+With the SC kept, the D3 rule gives the same result as the pin (the same single check fails,
+by 0.15-0.19 s; Alonso's late charge, see step 3.1c), so the pin is removed. The race file
+changes (takeover state at lap 10). It isn't in the Daily or Gauntlet pool, and Eras attempts
+on the old file are refused at submit, as above.
+
+**Server-match check:** the 20 golden seeds of all four rebuilt races (monaco-2017,
+monaco-2025, miami-2025, abu-dhabi-2012) match the TS sim (order, finishers, and times / gaps
+within 0.0005 s): 20/20 on each. Rebuilding monaco-2017, monaco-2025 and miami-2025 also brought
+in what the build already wrote but their committed files didn't have yet: the `rules` block
+from their `data/eras` overlays (monaco-2017, monaco-2025) and `schemaVersion` 11 (miami-2025).
+Many other committed race files differ from a fresh build in the same way (schemaVersion 10, no
+`rules`); those weren't rebuilt here, since this change doesn't affect them.

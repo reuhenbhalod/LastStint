@@ -977,10 +977,10 @@ RACES: dict[str, dict] = {
         "source": "jolpica",
         "name": "Abu Dhabi 2012: Vettel vs Button",
         "era": "2010-2013",
-        # pinned: the D3 rule gives lap 10, inside the lap 9-14 SC, and an SC that started
-        # before the takeover isn't in the race file, so the sim ran those laps green. Lap 8
-        # is the last green lap: the SC and Vettel's stop under it are played.
-        "takeover_lap": 8,
+        # D3 rule: lap 10, inside the lap 9-14 SC, which the race file keeps from lap 10 on
+        # (events.from_takeover), so Vettel's stop under it is still played. (It was pinned to
+        # lap 8 while an SC running at the takeover was dropped.)
+        "takeover_lap": None,
         "seed": 1,
         "user_side": "VET",
         "rival": "BUT",  # Vettel from the pit lane to the podium; Button the car he beat to P3

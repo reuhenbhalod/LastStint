@@ -519,11 +519,11 @@ def test_e2e_abu_dhabi_2012(built):
     assert model["era"] == "2010-2013"
     assert model["provenance"] == {"kind": "real", "estimated": ["compounds", "safetyCars"]}
     assert {c for c in model["compounds"]} == {"SOFT", "HARD"}
-    # Registered (step 3.1c) with the takeover pinned to lap 8, before the lap-9 SC, so both
-    # estimated SCs are played.
-    assert model["race"]["takeoverLap"] == 8
+    # Registered (step 3.1c); the D3 rule takes over on lap 10, inside the lap 9-14 SC, which
+    # is kept from the takeover lap on, so both estimated SCs are played.
+    assert model["race"]["takeoverLap"] == 10
     assert [e for e in model["events"] if e["type"] == "SC"] == [
-        {"lap": 9, "type": "SC", "laps": 6},
+        {"lap": 10, "type": "SC", "laps": 5},
         {"lap": 39, "type": "SC", "laps": 4},
     ]
     assert model["fuelEffectPerLap"] > 0
