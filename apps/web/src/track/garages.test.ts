@@ -30,6 +30,17 @@ describe('garages', () => {
     expect(g).toHaveLength(12);
   });
 
+  it('1986: the 1985 champions (McLaren) nearest the exit; Toleman as Benetton, unranked', () => {
+    const g = garagesFor(1986);
+    expect(g.at(-1)).toEqual(['McLaren', 'MCL']);
+    expect(g.at(-3)).toEqual(['Williams', 'WIL']);
+    expect(g[0]).toEqual(['AGS', 'AGS']); // new in 1986, highest car number
+    expect(g).toContainEqual(['Benetton', 'BEN']);
+    expect(g).toHaveLength(14);
+    expect(garagesFor(1984).at(-1)).toEqual(['Ferrari', 'FER']);
+    expect(garagesFor(1988)).not.toContainEqual(['Brabham', 'BRA']); // sat out 1988
+  });
+
   it('2020: Red Bull and Alfa Romeo under the Jolpica spelling when the race uses it', () => {
     const g = garagesFor(2020, ['Red Bull', 'Alfa Romeo', 'Mercedes']);
     expect(g).toContainEqual(['Red Bull', 'RBR']);

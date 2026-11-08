@@ -69,6 +69,10 @@ def ingest_race(
             # estimates, options (Eras 5.1) and the owner's SC hand-check file.
             typer.echo(f"{rid}: a Jolpica race, skipped (run `pipeline jolpica {rid} --force`)")
             continue
+        if meta.get("source") == "reconstructed":
+            # No lap timing before 1996: rebuilt from its anchors (eras build plan 4.6).
+            typer.echo(f"{rid}: a reconstructed race, skipped (run `pipeline reconstruct {rid}`)")
+            continue
         if meta.get("source") == "tum":
             from . import tum
 

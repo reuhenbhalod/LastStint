@@ -105,9 +105,9 @@ def test_writing_sc_causes_keeps_a_races_fault_facts(tmp_path):
 
 def test_only_the_eras_fault_races_have_fault_facts():
     # data/incidents.json: the races built before step 4.4 build exactly as before; only an
-    # Eras race registered for its faults (5.1: canada-2014) has any.
+    # Eras race registered for its faults (5.1: canada-2014, australia-1986) has any.
     with_faults = {race for race in build.RACES if incidents.fault_facts(race)}
-    assert with_faults == {"canada-2014"}
+    assert with_faults == {"canada-2014", "australia-1986"}
 
 
 # --- the fit ---------------------------------------------------------------------------------
@@ -203,6 +203,16 @@ def test_too_few_laps_to_fit_raises():
         _fit(laps, _fact(lap=30, fault="power-loss", slowLap=True))  # no lap after it
     with pytest.raises(FaultFitError, match="no modelled laps"):
         _fit(laps, _fact(driver="ZZZ", fault="power-loss"))
+
+
+def test_a_fault_that_ends_the_cars_race_on_its_lap_is_its_retirement():
+    # australia-1986's Mansell: the tyre exploded on lap 64, 63 laps completed. No lap was
+    # run with it, so the build drops it (the model's RETIREMENT is the fault) rather than fit.
+    laps = _laps({}, {})
+    laps = laps[~((laps["Driver"] == "AAA") & (laps["LapNumber"] > 20))]
+    assert faults.ends_race(_fact(lap=21, fault="tyre-failure"), laps)
+    assert not faults.ends_race(_fact(lap=20, fault="tyre-failure"), laps)  # lap 20 was run
+    assert faults.ends_race(_fact(driver="ZZZ", fault="tyre-failure"), laps)  # no laps at all
 
 
 def test_fault_laps_are_left_out_of_the_cars_normal_pace():

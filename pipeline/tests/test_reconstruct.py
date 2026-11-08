@@ -16,7 +16,7 @@ import pandas as pd
 import pytest
 from typer.testing import CliRunner
 
-from pipeline import clean, cli, events, export, ingest, paths
+from pipeline import build, clean, cli, events, export, ingest, paths
 from pipeline import reconstruct as rc
 from pipeline.assemble import finishing_order
 
@@ -125,6 +125,42 @@ def test_lapped_cars_are_their_laps_down(solved):
         t = df[df["Driver"] == code].sort_values("LapNumber")["Time"].to_numpy()
         assert len(t) == laps
         assert t[-2] < t_win < t[-1], code  # still racing at the flag, then finishes
+
+
+def test_unclassified_cars_running_at_the_flag_are_lapped_not_retired():
+    # As australia-1986's Tambay (70 of 82 laps) and Berg: running at the end, too few laps
+    # to be classified. They must cross the line after the winner, not look retired.
+    anchors = toy()
+    for code, grid, laps in (("JJJ", 9, 40), ("KKK", 10, 31)):
+        anchors.cars.append(
+            rc.Car(code, f"T{code}", None, grid, None, False, "lapped", laps, None, 93.0, 20)
+        )
+    res = rc.reconstruct(anchors)
+    assert rc.failures(res.sidecar["anchors"]) == []
+    df = res.laps
+    t_win = float(df[(df["Driver"] == "AAA") & (df["LapNumber"] == 50)]["Time"].iloc[0])
+    for code, laps in (("JJJ", 40), ("KKK", 31)):
+        t = df[df["Driver"] == code].sort_values("LapNumber")["Time"].to_numpy()
+        assert len(t) == laps
+        assert t[-2] < t_win < t[-1], code
+    down = {r["subject"]: r for r in res.sidecar["anchors"] if r["anchor"] == "laps down"}
+    assert down["JJJ"]["achieved"] == 10 and down["KKK"]["achieved"] == 19
+    retired = {e["driver"] for e in events.retirement_events(df, 50)}
+    assert not retired & {"JJJ", "KKK"}
+
+
+def test_a_disqualified_car_ahead_on_the_road_fails_the_order_anchor():
+    # As san-marino-1985's Prost: the full distance, no time, out of the classification. To
+    # look retired with every lap done he'd be first on the road, heading the race file's
+    # realResult, so the order anchor (the classified cars head the road order) fails.
+    anchors = toy()
+    anchors.cars.append(
+        rc.Car("DQQ", "TDQQ", None, 9, None, False, "disqualified", 50, None, None, None)
+    )
+    res = rc.reconstruct(anchors)
+    (order,) = [r for r in res.sidecar["anchors"] if r["anchor"] == "order"]
+    assert order["pass"] is False and order["achieved"][0] == "DQQ"
+    assert finishing_order(res.laps)[0] == "DQQ"
 
 
 def test_grid_order_on_lap_one(solved):
@@ -326,3 +362,31 @@ def test_cli_reconstruct(tmp_path):
     assert side["solver"]["passed"] and side["reconstructed"]
     again = CliRunner().invoke(cli.app, args)
     assert "skipped" in again.output
+
+
+# --- Building a reconstructed race -----------------------------------------------------------
+
+
+def test_build_marks_a_reconstructed_race_and_fills_its_gaps(tmp_path, monkeypatch):
+    # The toy race (no stops) written as `pipeline reconstruct` would, then `pipeline build`.
+    rc.write("toy-1990", rc.reconstruct(toy()), tmp_path)
+    entry = {**build.RACES["hungary-1986"], "year": 1990, "name": "toy", "user_side": "BBB"}
+    monkeypatch.setitem(build.RACES, "toy-1990", {**entry, "rival": "AAA"})
+    # HHH crashed on lap 11 (10 laps completed): a fault on that lap ran no laps to fit.
+    crash = {"lap": 11, "type": "FAULT", "driver": "HHH", "fault": "tyre-failure"}
+    result = build.build_race(
+        "toy-1990", raw_dir=tmp_path, fault_facts=[crash], eras_dir=tmp_path / "eras"
+    )
+    model = result.model
+    assert model["reconstructed"] is True
+    assert model["provenance"] == {
+        "kind": "reconstructed",
+        "estimated": ["compounds", "fuelLoads", "weather"],
+    }
+    assert set(model["compounds"]) == {"MEDIUM"}  # step 2.4: one dry compound before 2007
+    # No stop to measure: the reconstruction's own assumed loss (lane 25 s less 5 s bypassed).
+    assert model["track"]["pitLoss"] == 20.0
+    assert any("pitLoss: no stop in the reconstruction" in n for n in result.notes)
+    assert not [e for e in model["events"] if e["type"] == "FAULT"]
+    assert any("HHH tyre-failure on lap 11 ended the car's race" in s for s in result.estimates)
+    assert result.estimates[0] == "reconstructed (eras build plan 4.6): anchors all pass"
