@@ -5,6 +5,7 @@
 // after every stepLap, or rebuild the log of a finished run with raceLog (a deterministic
 // replay). Nothing in sim.ts changes.
 
+import { rivalChoices } from '../rivals/react.js';
 import { type Run, classify, initRun, isFinished, stepLap } from '../sim.js';
 import type { Compound, FlagState, Modes } from '../types.js';
 
@@ -60,9 +61,11 @@ export function recordLap(log: ErasRaceLog, run: Run): void {
 }
 
 /**
- * The log of a finished run, rebuilt by replaying it from its model, seed, calls and rival
- * policy (replays are deterministic). Throws if the replay doesn't reproduce the run, e.g.
- * a run built with scripted strategy overrides, which a Run doesn't keep.
+ * The log of a finished run, rebuilt by replaying it from its model, seed, calls, rival
+ * policy and Legend (replays are deterministic). An Expert rival replays the choices it made
+ * (rivals/react.ts rivalChoices) rather than grading its decision points again. Throws if the
+ * replay doesn't reproduce the run, e.g. a run built with scripted strategy overrides, which a
+ * Run doesn't keep.
  */
 export function raceLog(run: Run): ErasRaceLog {
   if (!isFinished(run)) throw new Error('race log: the run has not reached the flag');
@@ -71,6 +74,8 @@ export function raceLog(run: Run): ErasRaceLog {
   const replay = initRun(run.model, run.seed, {
     ...(run.live ? { decisions: run.decisions } : {}),
     rivalPolicy: run.rivalPolicy,
+    legend: run.legend,
+    ...(run.rival ? { rivalChoices: rivalChoices(run), rivalGrading: 'claims' as const } : {}),
     incidents: run.incidents || run.state.engineer !== undefined,
   });
   const log = emptyLog(replay);

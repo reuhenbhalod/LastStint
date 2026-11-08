@@ -21,7 +21,10 @@
 //
 // A submit is replayed and evaluated on the server (erasEval.ts, build plan 7.3) from the race
 // file the attempt pinned at its start (era_attempts.model_hash), graded from the game's
-// claimed grades as a Daily run is, and re-graded in full nightly (reverify.ts).
+// claimed grades as a Daily run is, and re-graded in full nightly (reverify.ts). An Expert
+// rival (play orders 8-10 and every Legend attempt) is replayed from the rival's claimed
+// choices (`rivalClaims`, checked by the sim); claims that don't replay are refused with 400
+// bad-rival-claims and the sim's `code`, and the nightly job re-grades the rest.
 
 import { type RaceModel, STARS_PER_RACE, VerifyError, unlocksNextEra } from '@laststint/sim';
 import type { Context, Hono } from 'hono';
@@ -31,7 +34,6 @@ import {
   EraRaceNotReadyError,
   HISTORY_INSERT,
   PROGRESS_UPSERT,
-  RivalUnavailableError,
   attemptDifficulty,
   evaluateAttempt,
 } from './erasEval.js';
@@ -398,7 +400,10 @@ async function submitAttempt(c: Ctx, attemptId: string, now: number) {
   if (typeof untimed !== 'boolean') throw new ApiError(400, 'bad-request', 'untimed is a boolean');
   const rivalClaims = body.rivalClaims ?? null;
   if (rivalClaims !== null && !Array.isArray(rivalClaims)) {
-    throw new ApiError(400, 'bad-rival-claims', 'rivalClaims must be a list');
+    return c.json(
+      { error: 'bad-rival-claims', code: 'bad-claim', detail: 'rivalClaims must be a list' },
+      400,
+    );
   }
 
   // The race file the attempt pinned at its start (server-side; a client's echo of the hash
@@ -439,35 +444,11 @@ async function submitAttempt(c: Ctx, attemptId: string, now: number) {
     });
   } catch (e) {
     if (e instanceof VerifyError) throw new ApiError(400, e.code, e.message);
-    if (e instanceof BadRivalClaimsError) throw new ApiError(400, e.code, e.message);
-    if (e instanceof EraRaceNotReadyError) throw new ApiError(503, 'race-not-ready', e.message);
-    if (e instanceof RivalUnavailableError) {
-      // Stored for the nightly job to evaluate once the server can replay this rival.
-      const write = await db
-        .prepare(
-          `UPDATE era_attempts SET decisions = ?, grades = ?, rival_claims = ?, untimed = ?,
-             submitted_at = ? WHERE id = ? AND submitted_at IS NULL`,
-        )
-        .bind(
-          JSON.stringify(body.decisions),
-          JSON.stringify(grades),
-          rivalClaims === null ? null : JSON.stringify(rivalClaims),
-          untimed ? 1 : 0,
-          nowIso,
-          attemptId,
-        )
-        .run();
-      if (!write.meta.changes) throw new ApiError(409, 'already-submitted');
-      return c.json(
-        {
-          error: 'rival-unavailable',
-          detail: `decisions stored; a ${e.policy} rival can't be evaluated on the server yet`,
-          rivalPolicy: e.policy,
-          attemptId,
-        },
-        501,
-      );
+    if (e instanceof BadRivalClaimsError) {
+      // The sim's claim code (illegal-option, missing-claim, ...) says which check failed.
+      return c.json({ error: e.code, code: e.claimCode, detail: e.message }, 400);
     }
+    if (e instanceof EraRaceNotReadyError) throw new ApiError(503, 'race-not-ready', e.message);
     throw e;
   }
 

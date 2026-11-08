@@ -31,14 +31,15 @@ export interface RivalClaimReplay {
  * malformed or duplicated ('bad-claim', 'duplicate-claim'), names an option that isn't legal
  * at its point ('illegal-option'), is for a lap that isn't one of the rival's decision points
  * ('not-a-decision-point'), or a decision point has no claim ('missing-claim'). Errors in the
- * player's calls throw as initRun does. `incidents`: as RunOptions.incidents.
+ * player's calls throw as initRun does. `incidents`, `legend`: as RunOptions (a Legend attempt
+ * replays with Legend's safety cars).
  */
 export function replayWithRivalClaims(
   model: RaceModel,
   seed: number,
   decisions: Decision[],
   claims: RivalChoice[],
-  options: { incidents?: boolean } = {},
+  options: { incidents?: boolean; legend?: boolean } = {},
 ): RivalClaimReplay {
   const run = initRun(model, seed, {
     decisions,
@@ -46,6 +47,7 @@ export function replayWithRivalClaims(
     rivalChoices: claims,
     rivalGrading: 'claims',
     ...(options.incidents === undefined ? {} : { incidents: options.incidents }),
+    ...(options.legend === undefined ? {} : { legend: options.legend }),
   });
   while (!isFinished(run)) stepLap(run);
   const state = run.rival as RivalRunState;
@@ -75,7 +77,7 @@ export function regradeRivalPoints(
   seed: number,
   decisions: Decision[],
   claims: RivalChoice[],
-  options: { incidents?: boolean; samples?: number } = {},
+  options: { incidents?: boolean; legend?: boolean; samples?: number } = {},
 ): RivalRegrade[] {
   const replay = replayWithRivalClaims(model, seed, decisions, claims, options);
   const claimed = new Map(replay.points.map((p) => [p.lap, p.chosen]));
@@ -84,6 +86,7 @@ export function regradeRivalPoints(
     rivalPolicy: 'expert',
     rivalGrading: 'deferred',
     ...(options.incidents === undefined ? {} : { incidents: options.incidents }),
+    ...(options.legend === undefined ? {} : { legend: options.legend }),
   });
   const samples = options.samples ?? (run.rival as RivalRunState).samples;
   const out: RivalRegrade[] = [];
