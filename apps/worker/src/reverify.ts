@@ -4,6 +4,12 @@
 // (scripts/reverify.ts) does the D1 reads and writes.
 
 import { GRADE_SAMPLES, type RaceModel, verifyRun } from '@laststint/sim';
+import {
+  type EraAttemptResult,
+  RivalUnavailableError,
+  attemptDifficulty,
+  evaluateAttempt,
+} from './erasEval.js';
 import { type StoredResult, stored } from './results.js';
 
 /** An unverified run joined with its daily, as the script reads it from D1. */
@@ -49,5 +55,116 @@ export function recheckSql(r: Recheck): string[] {
           r.id,
         )} AND moment_id = ${sql(c.momentId)};`,
     ),
+  ];
+}
+
+// ---- Eras attempts (eras build plan 7.3) ------------------------------------------------------
+//
+// The same re-grade for Eras: each submitted, unverified attempt is evaluated again with full
+// playouts (erasEval.ts evaluateAttempt without claimed grades). A match is marked verified. A
+// mismatch means the claimed grades were edited: the attempt gets its true result, and the
+// player's progress on the race is rebuilt from all of their attempts there, so a star earned
+// legitimately on another attempt is never lowered. An attempt the Worker stored unevaluated
+// (a rival it can't replay yet, erasEval.ts RivalUnavailableError) is evaluated here once it
+// can be, and left for a later night until then.
+
+/** A submitted, unverified Eras attempt with its era's play order, as the script reads it. */
+export interface UnverifiedAttempt {
+  id: string;
+  player_id: string;
+  race_id: string;
+  legend: number;
+  seed: number;
+  play_order: number;
+  decisions: string;
+  rival_claims: string | null;
+  untimed: number;
+  /** Null for an attempt stored unevaluated. */
+  result: string | null;
+}
+
+export interface AttemptRecheck {
+  id: string;
+  /** The stored result matched the full re-grade. */
+  correct: boolean;
+  /** The attempt had no stored result (it is evaluated for the first time). */
+  pending: boolean;
+  result: EraAttemptResult;
+}
+
+/**
+ * Re-grade one attempt in full. Null if its rival still can't be replayed on the server. A
+ * stored log that no longer verifies (it did on submit, so only an edited row) throws.
+ */
+export function recheckAttempt(
+  model: RaceModel,
+  a: UnverifiedAttempt,
+  samples = GRADE_SAMPLES,
+): AttemptRecheck | null {
+  const legend = a.legend === 1;
+  let result: EraAttemptResult;
+  try {
+    result = evaluateAttempt({
+      model,
+      seed: a.seed,
+      legend,
+      difficulty: attemptDifficulty(a.play_order, legend),
+      decisions: JSON.parse(a.decisions),
+      grades: undefined,
+      rivalClaims: a.rival_claims === null ? null : JSON.parse(a.rival_claims),
+      untimed: a.untimed === 1,
+      samples,
+    });
+  } catch (e) {
+    if (e instanceof RivalUnavailableError) return null;
+    throw e;
+  }
+  return {
+    id: a.id,
+    correct: a.result !== null && JSON.stringify(result) === a.result,
+    pending: a.result === null,
+    result,
+  };
+}
+
+/**
+ * The statements that record an Eras re-check. A correct attempt is marked verified. Otherwise
+ * the attempt takes its true result, then the race's progress (normal or Legend, as the
+ * attempt) is rebuilt from every attempt of the player's there, and its history book entry
+ * follows the player's first attempt that really rewrote the race.
+ */
+export function recheckAttemptSql(
+  r: AttemptRecheck,
+  a: UnverifiedAttempt,
+  now = new Date().toISOString(),
+): string[] {
+  if (r.correct) return [`UPDATE era_attempts SET verified = 1 WHERE id = ${sql(r.id)};`];
+  const res = r.result;
+  const mine = `player_id = ${sql(a.player_id)} AND race_id = ${sql(a.race_id)}`;
+  const same = `${mine} AND legend = ${a.legend} AND result IS NOT NULL`;
+  const best = (path: string) =>
+    `coalesce((SELECT max(json_extract(result, '${path}')) FROM era_attempts WHERE ${same}), 0)`;
+  return [
+    `UPDATE era_attempts SET verified = 1, corrected = ${r.pending ? 0 : 1}, accuracy = ${
+      res.accuracy
+    }, result = ${sql(JSON.stringify(res))} WHERE id = ${sql(r.id)};`,
+    `INSERT INTO era_progress (player_id, race_id, legend, updated_at) VALUES (${sql(
+      a.player_id,
+    )}, ${sql(a.race_id)}, ${a.legend}, ${sql(now)}) ON CONFLICT DO NOTHING;`,
+    `UPDATE era_progress SET star_result = ${best('$.stars.result')}, star_strategist = ${best(
+      '$.stars.strategist',
+    )}, star_mastery = ${best('$.stars.mastery')}, best_accuracy = (SELECT max(accuracy) FROM era_attempts WHERE ${same}), updated_at = ${sql(
+      now,
+    )} WHERE ${mine} AND legend = ${a.legend};`,
+    // The hidden objective counts with all three stars (erasEval.ts PROGRESS_UPSERT): it stays
+    // done while some attempt met it, and this attempt's true result can complete it.
+    `UPDATE era_progress SET hidden_done = CASE WHEN star_result = 1 AND star_strategist = 1 AND star_mastery = 1 AND (hidden_done = 1 OR ${
+      res.hidden ? 1 : 0
+    } = 1) AND ${best('$.hidden')} = 1 THEN 1 ELSE 0 END WHERE ${mine} AND legend = ${a.legend};`,
+    ...(res.rewrite ? [] : [`DELETE FROM history_entries WHERE attempt_id = ${sql(r.id)};`]),
+    `INSERT OR IGNORE INTO history_entries (player_id, race_id, attempt_id, achieved_at)
+     SELECT player_id, race_id, id, submitted_at FROM era_attempts
+     WHERE ${mine} AND result IS NOT NULL AND json_extract(result, '$.rewrite') = 1
+     ORDER BY submitted_at, id LIMIT 1;`,
   ];
 }

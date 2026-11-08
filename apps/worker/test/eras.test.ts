@@ -16,10 +16,23 @@ import abuJson from '../../../data/races/abu-dhabi-2021.json';
 import hungary2022Json from '../../../data/races/hungary-2022.json';
 import { ATTEMPT_TTL_MS, attemptDifficulty, erasTestMode } from '../src/eras.js';
 import worker from '../src/index.js';
+import { ERAS_RACE_FILES } from '../src/races.gen.js';
 import { modelHash } from '../src/races.js';
 import { ids } from './helpers.js';
 
 type Mode = 'production' | 'test';
+
+// No bundled race has an Eras block yet (phase 6 content): Hungary 2022 gets one in this test
+// isolate's bundle so its attempts can be submitted (evaluation itself: eras-eval.test.ts).
+ERAS_RACE_FILES['hungary-2022'] = {
+  ...(hungary2022Json as unknown as RaceModel),
+  eras: {
+    eraId: 10,
+    order: 3,
+    target: { type: 'win' },
+    mastery: { type: 'finish_position', position: 1, label: 'Win' },
+  },
+};
 
 /** A request to the Worker with ERAS_TEST_MODE set for this call. */
 async function call(mode: Mode, path: string, body?: unknown): Promise<Response> {
@@ -467,18 +480,19 @@ describe('GET /api/eras/races/:raceId/model', () => {
 });
 
 describe('POST /api/eras/attempts/:id', () => {
-  const decisions = [{ lap: 12, kind: 'pit', compound: 'HARD' }];
+  // Hungary 2022 has no decision moments: an empty call log and no grades is a whole attempt.
+  const decisions: unknown[] = [];
   const submit = (id: string, body: Record<string, unknown>) =>
-    call('test', `/api/eras/attempts/${id}`, body);
+    call('test', `/api/eras/attempts/${id}`, { grades: [], ...body });
   const begin = async () => json<Attempt>(await start('test', 'hungary-2022'));
 
-  it('stores the decisions; evaluation is step 7.3 (501)', async () => {
+  it('stores the decisions and answers with the evaluated attempt', async () => {
     const a = await begin();
     const res = await submit(a.attemptId, { anonId: ids.a, decisions, modelHash: a.modelHash });
-    expect(res.status).toBe(501);
-    expect(await json<{ error: string; attemptId: string }>(res)).toMatchObject({
-      error: 'not-implemented',
+    expect(res.status).toBe(200);
+    expect(await json<{ attemptId: string; raceId: string }>(res)).toMatchObject({
       attemptId: a.attemptId,
+      raceId: 'hungary-2022',
     });
     const row = await env.DB.prepare(
       'SELECT decisions, submitted_at FROM era_attempts WHERE id = ?',
@@ -491,7 +505,7 @@ describe('POST /api/eras/attempts/:id', () => {
 
   it('refuses a double submit', async () => {
     const a = await begin();
-    expect((await submit(a.attemptId, { anonId: ids.a, decisions })).status).toBe(501);
+    expect((await submit(a.attemptId, { anonId: ids.a, decisions })).status).toBe(200);
     const again = await submit(a.attemptId, { anonId: ids.a, decisions });
     expect(again.status).toBe(409);
     expect((await json<{ error: string }>(again)).error).toBe('already-submitted');
@@ -509,7 +523,7 @@ describe('POST /api/eras/attempts/:id', () => {
       expect((await json<{ error: string }>(res)).error).toBe('no-attempt');
     }
     // The owner can still submit it.
-    expect((await submit(a.attemptId, { anonId: ids.a, decisions })).status).toBe(501);
+    expect((await submit(a.attemptId, { anonId: ids.a, decisions })).status).toBe(200);
   });
 
   it('refuses an attempt older than 24 hours', async () => {
@@ -529,7 +543,7 @@ describe('POST /api/eras/attempts/:id', () => {
     await env.DB.prepare('UPDATE era_attempts SET created_at = ? WHERE id = ?')
       .bind(recent, a.attemptId)
       .run();
-    expect((await submit(a.attemptId, { anonId: ids.a, decisions })).status).toBe(501);
+    expect((await submit(a.attemptId, { anonId: ids.a, decisions })).status).toBe(200);
   });
 
   it('refuses a race file that changed since the start, and malformed decisions', async () => {
@@ -542,6 +556,17 @@ describe('POST /api/eras/attempts/:id', () => {
     }
     expect((await submit(a.attemptId, { anonId: 'x', decisions })).status).toBe(400);
     // None of those stored anything.
+    const row = await env.DB.prepare('SELECT submitted_at FROM era_attempts WHERE id = ?')
+      .bind(a.attemptId)
+      .first<{ submitted_at: string | null }>();
+    expect(row?.submitted_at).toBeNull();
+  });
+
+  it('refuses a race whose file has no Eras target yet (503), storing nothing', async () => {
+    const a = await json<Attempt>(await start('test', 'singapore-2023'));
+    const res = await submit(a.attemptId, { anonId: ids.a, decisions });
+    expect(res.status).toBe(503);
+    expect((await json<{ error: string }>(res)).error).toBe('race-not-ready');
     const row = await env.DB.prepare('SELECT submitted_at FROM era_attempts WHERE id = ?')
       .bind(a.attemptId)
       .first<{ submitted_at: string | null }>();

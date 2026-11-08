@@ -26,6 +26,7 @@ import type { DecisionMoment } from './moments.js';
 import { PLAN_TARGET, enginePlans, planOption } from './planner.js';
 import {
   type Run,
+  type RunOptions,
   classify,
   decide,
   initRun,
@@ -34,6 +35,12 @@ import {
   validateDecisions,
 } from './sim.js';
 import type { Decision, PlanId, RaceModel, RacePlan, RaceResult } from './types.js';
+
+/**
+ * How an Eras attempt's race runs (eras build plan 7.3): Legend's moved safety cars and the
+ * era's rival policy. Daily and Survivor pass neither, so their replays are unchanged.
+ */
+export type ReplayOptions = Pick<RunOptions, 'legend' | 'rivalPolicy'>;
 
 /** The claimed grade of the race plan uses this id in place of a moment's. */
 export const PLAN_GRADE_ID = 'plan';
@@ -225,9 +232,15 @@ function answers(model: RaceModel, decisions: Decision[]): Map<string, string> {
 }
 
 /** The run paused before a moment, holding only the calls the player had made by then. */
-function pausedBefore(model: RaceModel, seed: number, decisions: Decision[], lap: number): Run {
+function pausedBefore(
+  model: RaceModel,
+  seed: number,
+  decisions: Decision[],
+  lap: number,
+  replay: ReplayOptions,
+): Run {
   const known = decisions.filter((d) => (d.at as number) < lap - 1);
-  const run = initRun(model, seed, { decisions: known });
+  const run = initRun(model, seed, { ...replay, decisions: known });
   while (run.state.lap < lap - 1) stepLap(run);
   return run;
 }
@@ -297,7 +310,8 @@ function claimedGrades(
  * Verify a finished run: check the call log, replay the race to the flag, grade every moment
  * from the pause the player saw, and score it. Without `claimed`, each moment is re-graded
  * with full playouts; with it (the game's grades, see ClaimedGrade), the claimed chances are
- * checked for shape and used instead. Throws VerifyError on a bad log or bad grades.
+ * checked for shape and used instead. `replay` runs the race as an Eras attempt played it
+ * (Legend, the rival policy). Throws VerifyError on a bad log or bad grades.
  */
 export function verifyRun(
   model: RaceModel,
@@ -305,13 +319,14 @@ export function verifyRun(
   decisions: unknown,
   samples = GRADE_SAMPLES,
   claimed?: unknown,
+  replay: ReplayOptions = {},
 ): VerifiedRun {
   checkLog(model, decisions);
   const chosen = answers(model, decisions);
   const logged = loggedPlan(model, decisions);
   const claims = claimed === undefined ? null : claimedGrades(model, claimed, samples, logged);
 
-  const run = initRun(model, seed, { decisions });
+  const run = initRun(model, seed, { ...replay, decisions });
   while (!isFinished(run)) stepLap(run);
   const result = classify(run);
 
@@ -319,7 +334,7 @@ export function verifyRun(
     .sort((a, b) => a.lap - b.lap)
     .map((m): VerifiedMoment => {
       const claim = claims?.get(m.id);
-      const paused = claim ? null : pausedBefore(model, seed, decisions, m.lap);
+      const paused = claim ? null : pausedBefore(model, seed, decisions, m.lap, replay);
       const grade = claim
         ? gradeFromHits(m.lap - 1, m.options, m.target, samples, claim.hits)
         : gradeMoment(paused as Run, m.options, m.target, samples);
@@ -346,7 +361,7 @@ export function verifyRun(
       };
     });
 
-  const plan = logged ? gradePlan(model, seed, decisions, samples, logged, claims) : null;
+  const plan = logged ? gradePlan(model, seed, decisions, samples, logged, claims, replay) : null;
   // The plan's call goes last, so score.calls[i] stays moments[i].
   const score = scoreRun([
     ...moments.map((m) => ({ grade: m.grade, chosen: m.chosen })),
@@ -375,6 +390,7 @@ function gradePlan(
   samples: number,
   plan: RacePlan,
   claims: Map<string, { hits: number[]; real: number | null }> | null,
+  replay: ReplayOptions,
 ): VerifiedPlan {
   const lap = model.race.takeoverLap;
   const claim = claims?.get(PLAN_GRADE_ID);
@@ -392,7 +408,7 @@ function gradePlan(
       grade: gradeFromHits(lap, options, PLAN_TARGET, samples, claim.hits),
     };
   }
-  const paused = pausedBefore(model, seed, decisions, lap + 1);
+  const paused = pausedBefore(model, seed, decisions, lap + 1, replay);
   const offered = enginePlans(paused);
   if (plan.id !== 'own') {
     const match = offered.find((p) => p.id === plan.id);

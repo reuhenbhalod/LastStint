@@ -7,13 +7,25 @@
 //
 // A run whose daily's race file changed since it was scheduled can't be re-graded and is
 // reported and left unverified.
+//
+// Eras attempts (eras build plan 7.3) get the same re-grade: a corrected attempt's race
+// progress is rebuilt from all of the player's attempts there (src/reverify.ts
+// recheckAttemptSql), so it never loses a star earned on another attempt. An attempt whose race
+// file changed since it started, or whose rival the server can't replay yet, is left for later.
 
 import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { RaceModel } from '@laststint/sim';
 import { modelHash } from '../src/hash.js';
-import { type UnverifiedRun, recheckRun, recheckSql } from '../src/reverify.js';
+import {
+  type UnverifiedAttempt,
+  type UnverifiedRun,
+  recheckAttempt,
+  recheckAttemptSql,
+  recheckRun,
+  recheckSql,
+} from '../src/reverify.js';
 import { type Target, query, repo, wrangler } from './d1.js';
 
 const args = process.argv.slice(2);
@@ -131,6 +143,46 @@ for (const r of rounds) {
   }
 }
 console.log(`${rounds.length} survivor rounds: ${roundsOk} verified, ${roundsFixed} corrected`);
+
+// Eras attempts, oldest first, so a progress rebuild sees every earlier correction.
+const attempts = query<UnverifiedAttempt & { model_hash: string | null }>(
+  target,
+  `SELECT a.id, a.player_id, a.race_id, a.legend, a.seed, e.play_order, a.model_hash,
+     a.decisions, a.rival_claims, a.untimed, a.result
+   FROM era_attempts a JOIN era_races r ON r.race_id = a.race_id JOIN eras e ON e.id = r.era_id
+   WHERE a.verified = 0 AND a.submitted_at IS NOT NULL AND a.decisions IS NOT NULL
+   ORDER BY a.submitted_at, a.id`,
+);
+let attemptsOk = 0;
+let attemptsFixed = 0;
+let attemptsLeft = 0;
+for (const a of attempts) {
+  const model = a.model_hash ? await modelFor(a.race_id, a.model_hash) : null;
+  if (!model) {
+    console.warn(`eras attempt ${a.id}: ${a.race_id} changed since it started, skipped`);
+    attemptsLeft++;
+    continue;
+  }
+  const check = recheckAttempt(model, a);
+  if (!check) {
+    attemptsLeft++;
+    continue;
+  }
+  if (check.correct) attemptsOk++;
+  else {
+    attemptsFixed++;
+    const before = a.result === null ? 'none' : (JSON.parse(a.result) as { stars: unknown }).stars;
+    console.warn(
+      `eras attempt ${a.id} (${a.race_id}): stored stars ${JSON.stringify(before)}, true ${JSON.stringify(
+        check.result.stars,
+      )}`,
+    );
+  }
+  statements.push(...recheckAttemptSql(check, a));
+}
+console.log(
+  `${attempts.length} eras attempts: ${attemptsOk} verified, ${attemptsFixed} corrected or evaluated, ${attemptsLeft} left for later`,
+);
 if (dryRun || statements.length === 0) {
   console.log(dryRun ? '(dry run: nothing written)' : 'nothing to write');
 } else {
