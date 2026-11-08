@@ -13,8 +13,6 @@ export interface RaceFacts {
 
 // Race ids that name the same circuit differently.
 const SAME_CIRCUIT: Record<string, string> = {
-  'united-states': 'usa',
-  'saudi-arabia': 'saudi',
   styria: 'austria', // Red Bull Ring
   '70th-anniversary': 'britain', // Silverstone
 };

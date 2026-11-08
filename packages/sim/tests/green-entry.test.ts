@@ -4,7 +4,7 @@
 // pitted under it for half the cost.
 
 import { describe, expect, it } from 'vitest';
-import saudiJson from '../../../data/races/saudi-2022.json';
+import saudiJson from '../../../data/races/saudi-arabia-2022.json';
 import { initRun, stepLap } from '../src/sim.js';
 import type { Decision, RaceModel } from '../src/types.js';
 

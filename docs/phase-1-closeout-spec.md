@@ -71,10 +71,10 @@ The user side is the hard or controversial call (product doc rule). The dilemma 
 |---|---|---|---|
 | 1 | bahrain-2021 | VER vs HAM | Chase on fresher tyres vs Mercedes' undercut (0.7s finish) |
 | 2 | france-2021 | HAM vs VER | Cover Red Bull's second stop or stay on one stop (2.9s) |
-| 3 | usa-2021 | HAM vs VER | Undercut war; Mercedes went long (1.3s) |
+| 3 | united-states-2021 | HAM vs VER | Undercut war; Mercedes went long (1.3s) |
 | 4 | brazil-2021 | VER vs HAM | SC/VSC stop timing while defending (10.5s) |
 | 5 | mexico-2021 | PER vs HAM | Fight for P2 on different strategies (target P2) |
-| 6 | saudi-2022 | LEC vs VER | Late VSC with no stop, DRS duel (0.5s) |
+| 6 | saudi-arabia-2022 | LEC vs VER | Late VSC with no stop, DRS duel (0.5s) |
 | 7 | miami-2022 | LEC vs VER | Late SC with fresh tyres (3.8s) |
 | 8 | canada-2022 | SAI vs VER | VSC/SC stop timing, 1.0s finish |
 | 9 | bahrain-2022 | LEC vs VER | Late SC; VER's retirement is a frozen event |

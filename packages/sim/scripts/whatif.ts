@@ -158,7 +158,7 @@ const CASES: Case[] = [
   },
   {
     name: 'Saudi 22, SC lap 16: LEC boxes?',
-    race: 'saudi-2022',
+    race: 'saudi-arabia-2022',
     user: 'LEC',
     rival: 'VER',
     lap: 16,

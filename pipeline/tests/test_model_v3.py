@@ -80,8 +80,8 @@ def test_deployment_times_start_each_neutralization_once():
 def test_saudi_2022_perez_pitted_before_the_safety_car():
     """PER boxed at the end of lap 15; the SC came out during lap 16, so his stop was a
     green-flag stop while LEC, VER and SAI pitted under the SC a lap later."""
-    model, laps = build.build_race_model("saudi-2022")
-    status = ingest.load_track_status("saudi-2022")
+    model, laps = build.build_race_model("saudi-arabia-2022")
+    status = ingest.load_track_status("saudi-arabia-2022")
     green = events.green_entry_stops(laps, events.extract_events(laps), status)
     assert ("PER", 16) in green
     assert not {("LEC", 17), ("VER", 17), ("SAI", 17)} & green
