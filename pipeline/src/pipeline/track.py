@@ -590,6 +590,47 @@ def fit_overtake_model(
     return model, None
 
 
+def pass_opportunities(laps: pd.DataFrame, fit: LapTimeFit, close_gap: float = 2.0) -> pd.DataFrame:
+    """The race's pass opportunities (extract_pass_events) with what the Eras overtake model
+    (overtaking.py) is fitted on: `adv`, the follower's model pace advantage (as in
+    fit_overtake_model), `leader_gap`, the car ahead's own gap to the car ahead of it (a
+    train: both in DRS / dirty-air range), and `gap_next`, the follower's gap on the next lap
+    when it is still directly behind (NaN otherwise). Rows without a model pace are dropped."""
+    events = extract_pass_events(laps, close_gap=close_gap)
+    if events.empty:
+        return events
+    state = {
+        (int(r.LapNumber), str(r.Driver)): r
+        for r in laps.itertuples()
+        if not pd.isna(r.Compound) and not pd.isna(r.TyreLife)
+    }
+
+    def predicted(driver: str, lap: int) -> float:
+        r = state.get((lap, driver))
+        if r is None or driver not in fit.driver_pace:
+            return float("nan")
+        return predict(fit, driver, str(r.Compound), float(r.TyreLife), fuel_lap_of(r))
+
+    gap = gap_to_car_ahead(laps)
+    keys = list(zip(laps["LapNumber"].astype(int), laps["Driver"].astype(str), strict=True))
+    gaps = dict(zip(keys, gap, strict=True))
+    pos = dict(zip(keys, laps["Position"], strict=True))
+
+    def next_gap(e) -> float:
+        pf, pl = pos.get((e.lap + 1, e.follower)), pos.get((e.lap + 1, e.leader))
+        if pf is None or pl is None or pd.isna(pf) or pd.isna(pl) or pf != pl + 1:
+            return float("nan")
+        return float(gaps.get((e.lap + 1, e.follower), float("nan")))
+
+    rows = list(events.itertuples())
+    events = events.assign(
+        adv=[predicted(e.leader, e.lap) - predicted(e.follower, e.lap) for e in rows],
+        leader_gap=[float(gaps.get((e.lap, e.leader), float("nan"))) for e in rows],
+        gap_next=[next_gap(e) for e in rows],
+    )
+    return events.dropna(subset=["adv"]).reset_index(drop=True)
+
+
 def fit_track_params(
     laps: pd.DataFrame,
     clean_laps: pd.DataFrame,

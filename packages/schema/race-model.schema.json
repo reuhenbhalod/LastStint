@@ -110,7 +110,7 @@
         },
         "overtakeModel": {
           "type": "object",
-          "description": "P(pass) = sigmoid(intercept + paceCoef*paceAdvantage + gapCoef*gap), rolled once per lap for a follower within 2s.",
+          "description": "P(pass) = sigmoid(intercept + paceCoef*paceAdvantage + gapCoef*gap), rolled once per lap for a follower within 2s. An Eras build's model (pipeline overtaking.py: slopes pooled per era group, intercept per track layout) adds trainCoef when the car ahead started the lap within 1 s of its own car ahead.",
           "additionalProperties": false,
           "required": [
             "intercept",
@@ -128,6 +128,10 @@
             "gapCoef": {
               "type": "number",
               "exclusiveMaximum": 0
+            },
+            "trainCoef": {
+              "type": "number",
+              "description": "Eras builds only: logit shift when the car ahead is itself within 1 s of the car ahead of it (a DRS train). Absent: no train term."
             }
           }
         },

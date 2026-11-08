@@ -2585,6 +2585,7 @@ turkey-2020 doesn't move: its fit calls it dry from lap 18 (gap 11), before the 
 
 **Not regenerated here:** data/races, data/golden, `apps/worker/src/races.gen.ts` and the
 parity fixtures (the integrator rebuilds every non-pool race after all model fixes merge).
+
 ## Eras model fix M2 (Nov 8 2026): pace by stint: the 13 gap-3 races 0 -> 2 pass, 11 passing races 11 -> 9
 
 Owner-approved fix for docs/eras-races-report.md gap 3 ("one race pace per car vs real
@@ -2710,3 +2711,130 @@ noise-free single run (now a last-lap pass roll at Hill's gearbox) is replaced b
 
 **Not done here:** the race files, goldens and `apps/worker/src/races.gen.ts` (the integration
 rebuilds them; until then the committed Eras files carry no `stintPace` and play as before).
+
+## Eras sim fix M3 (Nov 8 2026): the pooled overtake model (races report gap 2, weak overtaking)
+
+Owner-approved fix for the 17 races of the races report's gap 2 ("weak overtaking: trains,
+a faster car can't pass, Monaco queues"). Code: `pipeline/src/pipeline/overtaking.py` (fit and
+method), `config/overtaking.json` (the fitted table), `track.pass_opportunities`, the Eras
+branch in `build.py`, the train term in `sim_reference._resolve_order` and `sim.ts
+resolveOrder` (parity: `packages/sim/tests/eras-overtaking.test.ts`).
+
+**Diagnosis: the sim passes too often, and the wrong cars pass.** Real passes are counted from
+the laps after the takeover (a pair of running cars whose order swaps across a green lap,
+neither pitting on it); the sim's the same way from its lap-by-lap order (200 runs). In all 17
+races, and in all 11 passing races checked, the sim passes 1.1-3.8x as often as the real race
+(Monaco 2025: 41 against 11; Hungary 2015: 85 against 32). Three causes, measured:
+1. A follower that fails its roll is held FOLLOW_GAP (0.3 s) behind, the 5th percentile of the
+   real gap of a held-up follower (median 0.79 s, `heldGap`, over 92 races). The gap term is
+   strongest there: the sim's close followers are under 0.5 s on 35-52% of their tries, the
+   real ones on 7-23%.
+2. Lap noise passes cars without a roll: a car more than 2 s back, or one that lost its roll
+   against the car ahead of the car it beat, comes out ahead on time. Monaco 2025 (lap noise
+   1-1.7 s from its two-stop tactics): 22 such passes a race; the real races: 3.4% of passes
+   from more than 2 s back.
+3. One race's fit is thin: paceCoef 0.18-2.8 and gapCoef -1.0 to -9.2 across the 17, and the
+   default slopes for a race with under 8 passes (Monaco 2015, 2017, 2025, San Marino 2005). So
+   who passes is off: Schumacher at Interlagos 2006 passes 3.7 cars a race against his real 7,
+   Sato 2.2 against 0; at Monza 2020 the sim's midfield passes 3-4 times each.
+
+The races' G1 failures are mostly not the count itself: their diagnoses stand (Singapore 2023
+and Spain 2021 the leader's managed pace, Hungary 2015 the SC queue, Monza 2020 the red-flag
+restart, San Marino 2005 and Interlagos 2006 the stint pace, Interlagos 2008 the estimated
+compounds).
+
+**The model** (Eras builds of races with real timing only; the module docstring has the
+method). Fitted on 92 dry timed race snapshots (35,155 pass opportunities, 2,419 passes):
+
+    P(pass) = sigmoid(intercept + paceCoef*adv + gapCoef*gap + trainCoef*train)
+
+| group | paceCoef | gapCoef | trainCoef | tries | passes |
+|---|---|---|---|---|---|
+| drs (2011-2025) | 1.837 | -3.873 | -0.901 | 29,905 | 2,217 |
+| noDrs (before 2011: refuelling, and 2010) | 0.809 | -4.113 | -0.053 | 5,250 | 202 |
+
+- Train: the car ahead is itself within 1.0 s of its own car ahead (`TRAIN_GAP`). With DRS a car
+  in a train is much harder to pass (5.3% of real tries against 8.4%; it has DRS too); before
+  DRS it barely matters (3.7% against 3.9%).
+- Era: pre-DRS passing hangs on pace less than half as much; the refuelling era's lower pass
+  rate is in its intercepts (passing was done in the pits).
+- Track: the intercept per track layout and era group, matched to the pass rate of every fitted
+  race there (pooled across years; `LAYOUT_CHANGES` splits Yas Marina 2021, Catalunya 2007 and
+  2023, Marina Bay 2023, Albert Park 2022, the Hungaroring 2003, the Nurburgring and Hockenheim
+  2002, Spa 2007; Sakhir's outer loop apart), partly pooled with the race's own rate:
+  weight passes / (passes + 13.4), 13.4 = 1 / the true within-layout variance (the spread of
+  a race's own intercept within a layout is 0.34 logit against 0.65-0.77 across all races).
+  Monaco 2017 (2 passes) now leans on Monaco's DRS layout (4 races, 26 passes): intercept -2.51.
+- Reconstructed races (1983-1995) keep their own fit: their laps are solved to their anchors.
+
+**Measured and not adopted.** Rules that bring the pass counts to the real ones all made robust
+G1 worse on most of the 28 races (300-run screens): holding a failed follower 0.79 s behind
+(Singapore 3.9 -> 9.8 s, Hungary 2015 5.7 -> 9.1 s), no pass without a roll (held behind every
+car that started the lap ahead; with several rolls a lap for a much faster car: Valencia 2012
+1.3 -> 6.4 s), the roll priced at the real held gap (Interlagos 2006 8.2 -> 12.8 s), a gap-free
+roll within 1 s. Why: the sim's followers in dirty-air range lose 0.52-0.62 s a lap (China
+2011, Valencia 2012) against the real 0.30-0.36 s median, so its trains cost more than real
+ones, and the extra passing is what keeps the finishing gaps right. **Owner/sim:** realistic
+counts need the train's time cost fixed first (a held car's lap taken as the car ahead's
+pace, not its noise); the fitted `heldGap` is in the table for that step.
+
+**Results.** Robust G1 (two seed sets of 1,000 runs, one race per process) on a fresh build of
+each race into a scratch directory; before = docs/eras-races-report.md (the same code without
+this fix). Passes: on-track passes after the takeover, real and the sim's mean over 200 runs;
+"close" = passes by a follower that started the lap within 2 s of the car it passed (the
+rolls).
+
+| Race | G1 before | G1 after | Main failing check after (set 10000 / 20000) | Real passes | Sim before | Sim after | Real close | Sim close before | Sim close after |
+|---|---|---|---|---|---|---|---|---|---|
+| singapore-2023 | fail 3.76 s | fail 4.08 s | duel NOR vs SAI gap error 6.52/6.92 [3.00] | 43 | 82.1 | 72.4 | 26 | 45.0 | 42.5 |
+| monaco-2025 | fail 2.63 s | fail 2.54 s | duel NOR vs LEC order rate 0.60/0.60 [0.60] | 11 | 41.4 | 41.4 | 2 | 9.4 | 9.9 |
+| spain-2021 | fail 5.90 s | fail 6.02 s | duel VER vs HAM gap error 6.96/6.93 [3.00] | 32 | 53.1 | 49.6 | 27 | 37.4 | 34.0 |
+| brazil-2021 | fail 1.82 s | borderline 1.75 s | duel VER vs HAM gap error 3.05/2.96 [3.00] | 30 | 75.2 | 64.2 | 24 | 47.7 | 42.0 |
+| monaco-2017 | fail 3.19 s | fail 3.27 s | field BOT gap error 6.27/6.39 [5.00] | 3 | 8.9 | 7.4 | 2 | 5.1 | 4.6 |
+| italy-2020 | fail 3.69 s | fail 3.03 s | duel GAS vs SAI gap error 6.11/6.24 [3.00] | 24 | 41.9 | 25.6 | 22 | 29.6 | 19.2 |
+| bahrain-2014 | fail 2.16 s | fail 2.21 s | duel HAM vs ROS order rate 0.37/0.36 [0.60] | 35 | 48.1 | 48.0 | 25 | 34.8 | 35.3 |
+| monaco-2015 | fail 4.52 s | fail 4.66 s | duel HAM vs ROS gap error 5.19/5.06 [3.00] | 5 | 7.3 | 8.6 | 2 | 3.1 | 4.2 |
+| hungary-2015 | fail 5.76 s | fail 6.59 s | duel VET vs KVY gap error 5.92/6.07 [3.00] | 32 | 84.6 | 57.0 | 22 | 54.4 | 37.6 |
+| australia-2010 | fail 3.35 s | fail 3.12 s | field ROS gap error 9.81/9.75 [5.00] | 6 | 10.4 | 12.0 | 4 | 6.5 | 8.0 |
+| abu-dhabi-2010 | fail 2.93 s | fail 2.12 s | field ROS gap error 4.95/5.02 [5.00] | 3 | 10.1 | 17.0 | 3 | 9.2 | 15.5 |
+| china-2011 | fail 3.07 s | fail 2.10 s | podium order rate 0.49/0.48 [0.50] | 42 | 60.1 | 65.0 | 39 | 38.4 | 43.5 |
+| abu-dhabi-2012 | fail 2.89 s | fail 2.83 s | duel VET vs BUT gap error 3.85/3.78 [3.00] | 35 | 58.0 | 54.9 | 25 | 37.1 | 35.5 |
+| san-marino-2005 | fail 6.25 s | fail 6.78 s | duel ALO vs MSCM gap error 12.98/13.14 [3.00] | 7 | 9.6 | 8.5 | 5 | 7.5 | 6.6 |
+| brazil-2006 | fail 8.23 s | fail 6.93 s | duel ALO vs MSCM gap error 16.89/16.24 [3.00] | 9 | 11.0 | 11.9 | 9 | 9.1 | 10.1 |
+| brazil-2007 | fail 2.24 s | fail 2.35 s | podium order rate 0.48/0.48 [0.50] | 12 | 15.5 | 14.1 | 6 | 12.2 | 10.9 |
+| brazil-2008 | fail 7.26 s | fail 4.37 s | duel HAM vs MAS gap error 3.73/4.07 [3.00] | 20 | 27.7 | 27.9 | 10 | 17.1 | 19.4 |
+| hungary-2022 | pass 1.40 s | pass 1.52 s | - | 31 | 56.0 | 47.6 | 30 | 48.5 | 41.1 |
+| turkey-2021 | pass 1.94 s | pass 1.19 s | - | 5 | 6.8 | 6.9 | 4 | 5.3 | 5.5 |
+| germany-2018 | pass 0.94 s | pass 1.11 s | - | 20 | 49.0 | 54.3 | 18 | 34.2 | 39.5 |
+| germany-2019 | pass 1.60 s | pass 1.62 s | - | 32 | 54.6 | 56.9 | 22 | 32.5 | 35.9 |
+| brazil-2019 | pass 1.77 s | fail 1.96 s | duel GAS vs HAM gap error 3.37/3.37 [3.00] | 42 | 47.4 | 43.2 | 20 | 30.0 | 29.9 |
+| spain-2016 | pass 0.43 s | pass 0.47 s | - | 35 | 52.5 | 54.1 | 29 | 35.2 | 36.3 |
+| abu-dhabi-2016 | pass 1.75 s | pass 1.70 s | - | 11 | 19.9 | 20.2 | 10 | 16.5 | 16.9 |
+| europe-2012 | pass 1.44 s | pass 1.75 s | - | 61 | 89.0 | 92.3 | 36 | 48.9 | 52.7 |
+| malaysia-2013 | pass 0.86 s | pass 0.85 s | - | 12 | 21.8 | 22.1 | 12 | 17.0 | 17.4 |
+| spain-2013 | pass 1.71 s | pass 1.62 s | - | 25 | 50.8 | 51.1 | 22 | 33.2 | 33.8 |
+| austria-2002 | pass 1.54 s | pass 1.51 s | - | 7 | 9.9 | 13.1 | 6 | 8.0 | 10.9 |
+
+- The 17 races: mean gap error 4.10 -> 3.81 s; 9 better, 7 worse (by more than 0.05 s), 1 the
+  same. brazil-2021 fail -> borderline (duel 3.05 / 2.96 s, limit 3.00). Better: Interlagos
+  2008 7.26 -> 4.37, Interlagos 2006 8.23 -> 6.93, China 2011 3.07 -> 2.10 (only the podium
+  order rate, 0.49 / 0.48, fails), Abu Dhabi 2010 2.93 -> 2.12, Monza 2020 3.69 -> 3.03,
+  Melbourne 2010 3.35 -> 3.12, Monaco 2025 2.63 -> 2.54, brazil-2021, Abu Dhabi 2012 2.89 ->
+  2.83. Worse: Hungary 2015 5.76 -> 6.59 (VER and ALO, the SC queue), Singapore 2023 3.76 ->
+  4.08, San Marino 2005 6.25 -> 6.78, Spain 2021, Monaco 2015, Brazil 2007, Monaco 2017 (3.19 ->
+  3.27).
+- Passing races: 10 of 11 still pass. **brazil-2019 pass -> fail**: the GAS vs HAM duel gap
+  error 3.37 / 3.37 s (limit 3.00; before 1.77 s mean, now 1.96 s): Interlagos's layout
+  intercept (2019 and 2021) is below 2019's own rate (40 passes) even partly pooled, so
+  Hamilton's late charge on Gasly passes less.
+- Pass counts: the sim still passes more than the real races (the not-adopted rules above);
+  the pooled slopes move the passes toward the faster cars (Schumacher at Interlagos 2006 3.7
+  -> 4.2 of his real 7, Monza 2020's midfield 3-4 -> 2-3 each, Verstappen at Hungary 2015
+  10.4 -> 7.3 against his real 2) and cut Hungary 2015 85 -> 57, Monza 2020 42 -> 26,
+  Singapore 82 -> 72; the Monaco races stay at 1.5-4x (their lap noise passes, cause 2).
+
+**Data not committed.** Every Eras race file with real timing and its golden change with a
+rebuild (a fresh `trainCoef` and intercept); this branch commits neither data/races nor
+data/golden, so the committed files replay as before until the integration rebuild. Daily and
+Gauntlet races are untouched (they never take the Eras model; `test_overtaking.py` checks a
+pool race still builds to its committed file byte for byte), as are reconstructed races.
