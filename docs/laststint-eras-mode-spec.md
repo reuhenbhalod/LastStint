@@ -302,11 +302,17 @@ Difficulty rises with play order, so every era completed makes the next one hard
 
 **Era presentation (not difficulty):** prompts follow the era's style. In Eras 1–2, decisions appear as short pit-board messages, since team radio was limited then; from Era 3 on, they appear as team radio. This changes how prompts look, not what information the player gets.
 
-**Rival policies**
-- **Standard:** covers stops under the safety car or VSC; otherwise follows its real strategy.
-- **Standard+:** also covers undercuts within 3 laps.
-- **Smart:** also extends its stint to overcut when the player pits early, and switches to wet tyres at the sim's crossover lap.
-- **Expert:** also reacts one lap earlier than Smart and takes the best option for itself at each of its own decision points, using the grader.
+**Rival policies** (definitions decided Nov 7)
+- **Standard:** today's rival, unchanged, so Daily and Gauntlet are unaffected. It covers stops under the safety car or VSC, and covers a green-flag undercut when its own planned stop is within 4 laps (`COVER_WINDOW`); otherwise it follows its real strategy.
+- **Standard+:** Standard, and it also covers a green-flag undercut when its own planned stop is within 7 laps (4 + 3).
+- **Smart:** Standard+, plus:
+  - **Overcut:** when the player pits under green and the rival doesn't cover, the rival moves its next planned stop to the lap the sim predicts gives it the lowest remaining race time, never later than tyre life minus `GO_LONG_MARGIN`.
+  - **Wet tyres:** it switches on the crossover lap, the first lap a fresh set of inters or wets is faster than its slicks (pit loss excluded; a tie keeps the slicks).
+- **Expert:** Smart, plus:
+  - **Earlier reactions:** under green it covers on the same lap the player stops, and it switches to wet tyres one lap before the crossover.
+  - **Its own grader:** at each decision point it runs the grader for itself and takes the best option. Its decision points are the player's stops, each safety car or VSC that starts next lap, the lap before its own planned stop, and the wet crossover. Its options are Smart's move, stay out, or box now. Its target is finishing ahead of the player.
+  - **Cost:** 100 samples per decision, run in the background grading workers. Playouts inside an Expert race use Smart rivals (no grading inside grading).
+  - **Server check:** the client submits the rival's chosen option at each point; the server checks it's a legal option and replays the race with it, and the nightly job re-grades in full (the claimed-grades pattern).
 
 **Decision timer:** every decision in every era is timed (decided Nov 7); the length follows the table. When it runs out, the default option is chosen: stay out, or keep the current mode. The timer is an accessibility risk, so include a setting to turn it off; doing so marks that attempt's stars as "untimed" but still awards them.
 
