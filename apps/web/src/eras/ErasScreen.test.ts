@@ -21,7 +21,8 @@ describe('Eras screens', () => {
     expect(html).toContain('>Eras</h1>');
     expect(html).toContain('<output');
     expect(html).toContain('Loading the eras');
-    expect(html).not.toContain('href="/eras/');
+    expect(html).not.toMatch(/href="\/eras\/\d/);
+    expect(html).toContain('href="/eras/history"');
   });
 
   it("starts an era's detail loading, under its name", () => {
@@ -127,7 +128,13 @@ const detailReady = (
 
 /** The race paths the detail links to, in page order. */
 const raceLinks = (html: string) =>
-  [...html.matchAll(/href="(\/eras\/\d+\/[^"]+)"/g)].map((m) => m[1]);
+  [...html.matchAll(/href="(\/eras\/\d+\/[^"]+)"/g)]
+    .map((m) => m[1])
+    .filter((l) => !l?.includes('/leaderboard'));
+
+/** The leaderboard paths the detail links to, in page order. */
+const boardLinks = (html: string) =>
+  [...html.matchAll(/href="(\/eras\/\d+\/[^"]+\/leaderboard[^"]*)"/g)].map((m) => m[1]);
 
 describe('Era detail', () => {
   it('shows a loading state, and an error with a way to try again', () => {
@@ -229,6 +236,21 @@ describe('Era detail', () => {
     // The cards show Legend's stars: one earned on race 1, none elsewhere.
     expect(on.match(/: earned/g)).toHaveLength(1);
     expect(on).toContain('64%');
+  });
+
+  it('links each race card to its leaderboard, Legend’s with Legend on, even when not playable', () => {
+    const html = renderDetail(ERA9, detailReady(erasResponse(false), eraDetail(9)));
+    expect(boardLinks(html)).toHaveLength(10);
+    expect(boardLinks(html)[9]).toBe('/eras/9/abu-dhabi-2021/leaderboard');
+    expect(html).toContain('Leaderboard<span class="sr-only"> for Abu Dhabi 2021</span>');
+    // Over the card's covering link, so it can be reached and tapped on its own.
+    expect(html).toMatch(/class="relative z-10[^"]*">Leaderboard/);
+
+    const cleared = eraDetail(10, { races: starredRaces(10) });
+    const on = renderDetail(ERA10, detailReady(erasResponse(true), cleared), true);
+    expect(boardLinks(on)).toHaveLength(10);
+    expect(boardLinks(on).every((l) => l?.endsWith('/leaderboard/legend'))).toBe(true);
+    expect(on).toContain('Legend leaderboard<span class="sr-only"> for Monaco 2022</span>');
   });
 
   it('ignores Legend on for an era that is not Cleared', () => {

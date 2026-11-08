@@ -850,7 +850,8 @@ function RaceScreenBody({
 
   return (
     <main className="relative flex h-[100dvh] flex-col overflow-hidden bg-[#0B0E0D] text-[#EEF1EF]">
-      {/* The top bar: brand, the duel as a scoreboard, the lap and the clock. */}
+      {/* The top bar: brand, the duel as a scoreboard, the lap and the clock. Tighter spacing
+          below md so the duel fits a 390 px phone next to the Eras timer toggle. */}
       <header className="flex h-14 shrink-0 items-stretch border-b border-[#1F2523] md:h-16">
         <button
           type="button"
@@ -865,9 +866,9 @@ function RaceScreenBody({
             </span>
           )}
         </button>
-        <div className="flex min-w-0 flex-1 items-center justify-center gap-2 overflow-hidden px-3 md:justify-start md:gap-4 md:px-6">
+        <div className="flex min-w-0 flex-1 items-center justify-center-safe gap-1 overflow-hidden px-2 md:justify-start md:gap-4 md:px-6">
           <span className="h-8 w-1.5 shrink-0 -skew-x-12 bg-[var(--you)]" />
-          <span className="disp wide shrink-0 text-[17px] md:text-[22px]">
+          <span className="disp wide shrink-0 text-[15px] md:text-[22px]">
             <span className="md:hidden">{userSide}</span>
             <span className="hidden md:inline">{surname(userSide)}</span>
           </span>
@@ -876,7 +877,7 @@ function RaceScreenBody({
               <TyreBadge compound={me.compound} age={me.tyreAge} />
             </span>
           )}
-          <span className="mono shrink-0 rounded bg-[#1A1F1D] px-2.5 py-1 text-[18px] font-bold md:text-[22px]">
+          <span className="mono shrink-0 rounded bg-[#1A1F1D] px-2 py-1 text-[16px] font-bold md:px-2.5 md:text-[22px]">
             {gapText(info, shownRivalGap, false)}
           </span>
           {them && !them.retired && (
@@ -884,13 +885,13 @@ function RaceScreenBody({
               <TyreBadge compound={them.compound} age={them.tyreAge} />
             </span>
           )}
-          <span className="disp wide shrink-0 text-[17px] md:text-[22px]">
+          <span className="disp wide shrink-0 text-[15px] md:text-[22px]">
             <span className="md:hidden">{rival}</span>
             <span className="hidden md:inline">{surname(rival)}</span>
           </span>
           <span className="h-8 w-1.5 shrink-0 -skew-x-12 bg-[var(--rival)]" />
         </div>
-        <div className="flex shrink-0 items-center gap-3 border-l border-[#1F2523] px-3 md:px-5">
+        <div className="flex shrink-0 items-center gap-1.5 border-l border-[#1F2523] px-2 md:gap-3 md:px-5">
           {source === 'survivor' && (
             <span className="hidden shrink-0 rounded-full bg-[var(--box)] px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-white lg:inline">
               Gauntlet · round {number}
@@ -912,7 +913,7 @@ function RaceScreenBody({
               Untimed
             </span>
           )}
-          <span className="mono text-[18px] font-bold md:text-[22px]">
+          <span className="mono text-[16px] font-bold md:text-[22px]">
             {state.race.lap}
             <span className="text-[13px] text-[#8D9692] md:text-[15px]">/{totalLaps}</span>
           </span>
@@ -923,7 +924,7 @@ function RaceScreenBody({
                 type="button"
                 aria-pressed={state.speed === sp}
                 onClick={() => game.setSpeed(sp)}
-                className={`h-9 px-3 text-[13px] font-bold ${
+                className={`h-9 px-2 text-[13px] font-bold md:px-3 ${
                   state.speed === sp ? 'bg-[#EEF1EF] text-[#0B0E0D]' : 'text-[#8D9692]'
                 }`}
               >
@@ -958,7 +959,7 @@ function RaceScreenBody({
                 setTimerOn(!timed);
                 setTimed(!timed);
               }}
-              className="flex h-9 shrink-0 items-center rounded-full border border-[#333A37] px-3 text-[12px] font-bold text-[#8D9692]"
+              className="flex h-9 shrink-0 items-center rounded-full border border-[#333A37] px-1.5 text-[11px] font-bold text-[#8D9692] md:px-3 md:text-[12px]"
             >
               {timed ? 'Timer on' : 'Timer off'}
             </button>
