@@ -9,7 +9,7 @@ import { ApiError, type RunResponse, type RunSubmission, api } from '../data/api
 import { anonId } from '../data/player.js';
 import type { Daily, DailyProvider } from '../data/types.js';
 import { type Grader, browserGrader } from '../engine/grading.js';
-import type { GameState, Speed } from '../state/machine.js';
+import { type GameState, type Speed, submitRoute } from '../state/machine.js';
 import { GameSession } from '../state/session.js';
 import { RUN_KEY, clearRun, loadRun, saveRun } from '../state/storage.js';
 
@@ -212,9 +212,18 @@ export function useGame(
     s.beginSubmit();
     sync();
     (async () => {
-      if (s.state.meta.source === 'practice') {
+      const route = submitRoute(s.state.meta.source);
+      if (route === 'practice') {
         await s.allGraded();
         s.finish({ status: 'practice' });
+        return;
+      }
+      if (route === 'eras') {
+        // TODO(8.7): submit the Eras attempt here (the race log and grades for its stars,
+        // eras spec §6, §13) once its endpoint is up. Until then it's graded on this device
+        // only, and never posted as a daily run.
+        await s.allGraded();
+        s.finish({ status: 'eras' });
         return;
       }
       try {

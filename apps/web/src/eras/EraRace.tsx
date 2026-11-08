@@ -1,19 +1,22 @@
 // An Eras race (build-plan 8.3; spec §9): a race card links here (`/eras/<eraId>/<raceId>`, or
-// `…/legend`), which starts a fresh attempt through EraProvider and plays it on the existing
-// screens: the race card, the race, then the review. Leaving goes back to the era.
-// TODO(8.4): the Eras race intro (dilemma, objectives, difficulty) replaces the daily's card.
-// TODO(8.7): submit the attempt and show its stars; until then it's graded locally only.
+// `…/legend`), which starts a fresh attempt through EraProvider and plays it: the Eras race
+// intro (8.4: dilemma, objectives, difficulty), the race at the attempt's difficulty (the
+// race screen's `eras` prop, 8.6), then the review. Leaving goes back to the era.
+// TODO(8.7): submit the attempt and show its stars; until then it's graded locally only
+// (useGame's `submit` hook for the 'eras' source).
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTeamTheme } from '../game/teamTheme.js';
 import { useGame } from '../game/useGame.js';
 import { HowItWorks } from '../screens/HowItWorks.js';
-import { IntroCard } from '../screens/IntroCard.js';
 import { RaceScreen } from '../screens/RaceScreen.js';
 import { ResultScreen } from '../screens/ResultScreen.js';
-import { EraProvider } from './EraProvider.js';
+import { EraIntro } from './EraIntro.js';
+import { EraProvider, eraDailyOf } from './EraProvider.js';
 import { type ErasApi, erasApi } from './api.js';
 import { type EraInfo, type EraRaceInfo, raceName } from './catalog.js';
+import type { ErasRace } from './difficulty/erasRace.js';
+import { timerOn } from './difficulty/settings.js';
 
 /** Where an Eras race in progress is saved, apart from the daily's and the Gauntlet's. */
 export const ERAS_RUN_KEY = 'pitwall:eras-race';
@@ -83,12 +86,28 @@ export function EraRace({
   useEffect(() => {
     if (phase === 'intro' || phase === 'racing') setFlagDone(false);
   }, [phase]);
+  // The attempt's difficulty, for the race screen's timer and information level (8.6).
+  const attempt = eraDailyOf(game.daily);
+  const eras = useMemo<ErasRace | undefined>(
+    () => (attempt ? { difficulty: attempt.difficulty, attemptId: attempt.attemptId } : undefined),
+    [attempt],
+  );
 
   if (help) return <HowItWorks onClose={() => setHelp(false)} />;
   if (game.error) {
     return <RaceStartError era={era} race={race} message={game.error} onRetry={game.reload} />;
   }
-  if (!game.state || !game.model) {
+  if (game.state && !attempt) {
+    return (
+      <RaceStartError
+        era={era}
+        race={race}
+        message="The race loaded without its Eras attempt."
+        onRetry={game.reload}
+      />
+    );
+  }
+  if (!game.state || !game.model || !attempt) {
     return (
       <main className="flex min-h-screen items-center justify-center" aria-busy="true">
         <output className="font-mono text-sm text-[var(--muted)]">
@@ -101,18 +120,24 @@ export function EraRace({
   switch (game.state.phase) {
     case 'intro':
       return (
-        <IntroCard
-          state={game.state}
+        <EraIntro
+          era={era}
+          race={race}
           model={game.model}
+          difficulty={attempt.difficulty}
+          legend={attempt.legend}
+          draft={attempt.draft}
+          timed={timerOn()}
           onStart={game.start}
           onHelp={() => setHelp(true)}
-          resume={legend ? 'Start the race · Legend' : 'Start the race'}
         />
       );
     case 'planning':
     case 'racing':
     case 'decision':
-      return <RaceScreen game={game} state={game.state} model={game.model} onHome={back} />;
+      return (
+        <RaceScreen game={game} state={game.state} model={game.model} eras={eras} onHome={back} />
+      );
     default:
       if (game.state.phase === 'finished' && !flagDone) {
         return (
@@ -120,6 +145,7 @@ export function EraRace({
             game={game}
             state={game.state}
             model={game.model}
+            eras={eras}
             onFinished={() => setFlagDone(true)}
             onHome={back}
           />

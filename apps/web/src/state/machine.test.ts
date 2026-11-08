@@ -1,7 +1,7 @@
 import type { DecisionMoment, RaceResult, RaceState } from '@laststint/sim';
 import { describe, expect, it } from 'vitest';
 import { NO_PLAN } from '../game/plans.js';
-import { type GameState, type Phase, reducer } from './machine.js';
+import { type GameState, type Phase, initialSubmission, reducer, submitRoute } from './machine.js';
 
 const race: RaceState = {
   lap: 34,
@@ -153,5 +153,21 @@ describe('reducer', () => {
   it('HYDRATE replaces the whole state', () => {
     const target = base('decision');
     expect(reducer(base('intro'), { type: 'HYDRATE', state: target })).toBe(target);
+  });
+});
+
+describe('race sources', () => {
+  it('starts a live daily unsent, practice and survivor as before, Eras as an attempt', () => {
+    expect(initialSubmission('live')).toEqual({ status: 'none' });
+    expect(initialSubmission('practice')).toEqual({ status: 'practice' });
+    expect(initialSubmission('survivor')).toEqual({ status: 'practice' });
+    expect(initialSubmission('eras')).toEqual({ status: 'eras' });
+  });
+
+  it('posts live and survivor runs, keeps practice local, hands Eras to its attempt', () => {
+    expect(submitRoute('live')).toBe('post');
+    expect(submitRoute('survivor')).toBe('post');
+    expect(submitRoute('practice')).toBe('practice');
+    expect(submitRoute('eras')).toBe('eras');
   });
 });

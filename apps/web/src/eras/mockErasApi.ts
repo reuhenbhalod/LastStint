@@ -98,6 +98,8 @@ export const mockErasApi: ErasApi = {
       modelUrl: `mock://races/${raceId}`,
       // The era's settings from the Eras config, or Legend's (spec §7, §8).
       difficulty: settings(legend ? legendDifficulty() : difficultyForEra(race.eraId)),
+      // Nothing is published yet, as on the era cards.
+      draft: true,
     };
   },
 

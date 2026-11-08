@@ -3,6 +3,9 @@
 
 import type { RaceModel } from '@laststint/sim';
 
+/** Where a race comes from, which decides how its run is submitted (state/machine.ts). */
+export type RaceSource = 'live' | 'practice' | 'survivor' | 'eras';
+
 export interface Daily {
   /** The date this race is served for: the player's local date for a live daily. */
   date: string;
@@ -15,9 +18,11 @@ export interface Daily {
   /**
    * `live`: today's daily from the Worker, submitted and ranked. `practice`: the bundled race,
    * played locally when there's no daily (or no connection); not submitted. `survivor`: a race
-   * of a survivor run (`number` is its round), submitted by the survivor screen.
+   * of a survivor run (`number` is its round), submitted by the survivor screen. `eras`: an
+   * Eras attempt (eras/EraProvider.ts), graded on this device and submitted as an attempt
+   * (build plan 8.7), never as a daily run.
    */
-  source: 'live' | 'practice' | 'survivor';
+  source: RaceSource;
   /** Why the game fell back to practice, for the banner. */
   practiceReason?: string;
 }

@@ -44,7 +44,8 @@ export function accuracyText(accuracy: number | null): string {
   return accuracy === null ? 'not played yet' : `${Number(accuracy.toFixed(1))}%`;
 }
 
-function Badge({ children, tone }: { children: string; tone: 'muted' | 'flag' }) {
+/** A small outlined label: Reconstructed (muted), Draft (flag). */
+export function Badge({ children, tone }: { children: string; tone: 'muted' | 'flag' }) {
   return (
     <span
       className={`rounded border px-1.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${
