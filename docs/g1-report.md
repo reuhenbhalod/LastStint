@@ -1976,3 +1976,140 @@ fixtures. Until sc_rates.json is regenerated, `test_sc_rates.py` fails two tests
 periods are ambiguous), brazil-2003 at interlagos (4 SC) and belgium-1998 at spa (1 SC). The
 `restartScLaps` laps aren't in the status timeline, so they aren't counted. With those, both
 tests pass.
+
+## Eras 5.1: wet refuelling races (1996-2008): 0 pass, 0 borderline, 8 fail
+
+Eras build plan 5.1, Nov 8 2026. Written by hand, as the sections above. Sources: `pipeline
+jolpica <id>` (Jolpica CSV dump 2026-10-24, F1DB stops, step 2.4's estimated compounds, SC laps
+and fuel loads), then `pipeline wet-laps <id>` (wetness and tyre classes from the lap times),
+then `pipeline build`. The fill model is fitted from each race's F1DB stops; wet races take the
+fixed fuel prior (0.0560 s per lap of fuel). Registry split `eras`, the storyline duel of the
+Eras spec's race table (§4, the user's driver first), `score_positions` 6, seed 1, D3 takeover.
+Robust mode, values seed set 10000 / 20000, limits in brackets. Strict status (no near-tie rule)
+is the same as the status for all eight. The rain timelines against the race reports are in
+docs/eras-checks/4.5-wet-races.md. No knob was applied (none fits a cause below).
+
+| Race | Duel | Takeover | Mean gap error | Failing checks | Diagnosis |
+|---|---|---|---|---|---|
+| spain-1996 | MSCM vs ALE | 21 | 7.55s | duel gap 9.96 / 9.92 [3.00] (order 1.00 passes); podium ALE 9.96 / 9.92, VIL 10.39 / 10.25 [5.00] | data: wet all race, built dry; then Schumacher's pace by stint (pace 100%) |
+| europe-1999 | HER vs TRU | 25 | 16.59s | duel gap 10.25 / 10.46 [3.00]; podium TRU 10.25 / 10.46, BAR 17.94 / 17.83 [5.00]; field SCH 16.85 / 16.74 [5.00], HAK 52.17 / 51.80 [6.29], GEN 8.79 / 8.63 [6.52] | wet model: slicks in the second shower (rest 80%) |
+| germany-2000 | BAR vs HAK | 14 | 20.64s | duel gap 9.13 / 9.25 [3.00], order 0.41 / 0.41 [0.60]; podium order 0.41 / 0.41 [0.50]; podium HAK 9.13 / 9.25, COU 14.06 / 13.97; field BUT 46.06 / 46.06, SAL 45.80 / 45.54, DLR 20.27 / 20.37 [5.00] | data: both SCs missed by the 2.4 estimate (rest 82%) |
+| malaysia-2001 | MSCM vs BAR | 18 | 10.22s | duel gap 15.56 / 15.61 [3.00] (order 0.80 passes); podium order 0.45 / 0.44 [0.50]; podium BAR 15.56 / 15.61, COU 16.53 / 16.15; field FRE 9.98 / 9.89, SCH 10.22 / 9.81 [5.00] | lap pace: Ferrari's inters against the field's full wets (pace 54%) |
+| united-states-2003 | MSCM vs RAI | 16 | 48.32s | duel gap 67.39 / 67.02 [3.00], order 0.00 / 0.00; podium order 0.00 / 0.00; podium RAI 67.39 / 67.02, FRE 43.11 / 43.07; field TRU 68.56 / 68.53 [5.00], HEI 43.88 / 43.85 [5.64] | pipeline: Schumacher's back-to-back stops over-charged (rest 83%); then Bridgestone wet pace |
+| hungary-2006 | BUT vs DLR | 13 | 20.42s | duel gap 38.63 / 38.43 [3.00], order 0.34 / 0.34; podium order 0.31 / 0.30; podium DLR 38.63 / 38.43, HEI 7.93 / 8.39; field BAR 17.01 / 16.76 [5.00] | lap pace: Button's inter pace, de la Rosa's dry-labelled wet stint (pace 56%) |
+| china-2007 | HAM vs ALO | 12 | 8.24s | field VET 12.01 / 12.14 [5.35], BUT 20.17 / 19.94 [6.87], LIU 14.07 / 14.04 [7.37] (podium passes: order 0.66, gaps within 2.4 s; duel not scored, HAM DNF) | lap pace: the leaders' drying stints (pace 71%). **Blocker: the user's car (HAM) isn't in the model** |
+| brazil-2008 | HAM vs MAS | 8 | 7.26s | duel gap 6.46 / 6.64 [3.00] (order 1.00 passes); podium ALO 8.34 / 8.73 [5.00]; field HAM 6.46 / 6.64, GLO 26.21 / 25.40 [5.00] | race mechanics: the estimated SOFT/HARD split and Trulli's train (rest 78%) |
+
+Diagnoses: the sim's mean gaps to the winner against the real ones lap by lap (100 runs), and
+each car's real laps minus the sim's clean lap for it (tank and wetness included), by stint.
+- **spain-1996.** The rain fell all race, so `wet-laps` has no dry laps to measure against and
+  finds the track wet on laps 1-2 and 63 only (4.5 known limit, as turkey-2021). The race builds
+  as a dry race on MEDIUM. The pace then fails by stint: real Schumacher ran 1.0 s a lap under
+  his whole-race fit on laps 26-41 and 0.8 s over it on laps 44-65 (easing off 45-60 s ahead);
+  ALE and VIL ran 1.1-1.2 s over their fit in their first stints and 0.6-0.9 s under it after.
+  The sim's ALE is 20 s behind on lap 27 where he really was 32 s, and finishes 54 s back (real
+  45.3). A race that never dries can't be fitted; it needs a dry-pace reference from outside
+  the race (wet_laps design). **Flag to the owner before it's used.**
+- **europe-1999.** Herbert wins in every run, the podium order passes (0.87-0.89). The cars that
+  stayed on slicks through the second shower lose too little: on laps 37-42 the slick runners
+  (HAK, BAR, GEN) lapped 104-108 s against the inter runners' (HER, TRU) 96-99 s, about 8%, while
+  the fixed wet curves at the fitted wetness (0.25-0.37) put slicks only ~2% behind inters. One
+  wetness a lap is fitted to the whole mixed field. So real HAK was 118.7 s behind on lap 46,
+  the sim's 57.8 s; real BAR 51.5 s, the sim's 32.5 s. The slick-vs-inter gap at a wetness
+  (data/wet.json, not fitted per race) is wet model work, not a per-race knob.
+- **germany-2000.** Step 2.4 missed both safety cars (laps 25-28, the track intruder, and 30-31,
+  Alesi's crash: report quoted in the 4.5 check). It flagged only laps 28 and 31 as single slow
+  laps, applied as yellows, so the build has no SC: the field doesn't bunch (lap 28: real COU
+  1.4 s behind BAR, sim 28.0 s) and the SC stops carry huge field-median losses (HAK 71.6 s,
+  COU 98.5 s). Check, not committed: with the SC hand-check set to the report's laps (25-28 and
+  30-31 confirmed) and re-ingested in a scratch directory, the duel passes (gap 0.40 / 0.43 s,
+  order 0.98 / 0.97), the podium order passes (0.61 / 0.60) and the mean gap error is 8.16 s.
+  What still fails there is COU 13.8, BUT 19.7, SAL 16.6 and DLR 6.2 s, from the inter stops on
+  laps 34-36: at the fitted wetness 0.10-0.14 the model's inters are ~6% slower than slicks, so
+  the early switchers lose 10-13 s too much, where the real track was wet in the stadium and dry
+  in the chicanes (one wetness a lap can't hold that). The SC fix is the owner's hand check
+  (data/estimates/germany-2000.sc.json, step 2.4's procedure), not done here.
+- **malaysia-2001.** From the lap-11 restart to his lap-30 stop, real Schumacher on rain tyres ran
+  2.9 s a lap faster than the model, even with his fitted wet pace (-3.9%, about -4 s a lap at
+  this wetness); BAR -4.2 and COU -2.4 s a lap in their shorter rain stints. Real MSCM gained 57 s
+  on Barrichello's slicks by lap 27, the sim's 32 s. The report's story is the tyre: Ferrari on
+  intermediates, McLaren and others on full wets "dealing with high degregation". The lap-time
+  fit can't split a full wet from an inter, so every rain stint is INTERMEDIATE. All the gaps are
+  to Schumacher, so they all come out 10-16 s short. No per-race knob applies.
+- **united-states-2003.** Two pipeline issues, both reported, not fixed (they touch every race
+  file's stop losses):
+  1. *A back-to-back stop charges the shared lap twice.* Schumacher's two stops (out-laps 21 and
+     22: dries, then inters) are measured as in-lap + out-lap each, so lap 21 (129.7 s, the
+     out-lap of one and in-lap of the other) is in both (losses 71.9 and 49.6 s). The same
+     pattern is in `pace.sim_frame_losses` and `track.stop_records`, and in 16 other race files
+     (FIR, MON and KIE here; e.g. abu-dhabi-2024 MAG, canada-2011 MAS, united-states-2015 RAI).
+  2. *A stop on a partly yellow lap ("12", "21") isn't in the sim frame*, so it takes the
+     field-median loss (tyres ignored) and the sim adds the wet penalty again. Laps 20-23 are
+     2.4's ambiguous yellows (laps 21 and 23, which the report has as rain).
+  Check, not committed (both patched in memory): mean gap error 48.32 -> 14.64 s, duel 67.4 ->
+  25.4 s, HEI passes. Either fix alone doesn't help (the frame fix alone: 57.6 s). What's left is
+  wet pace: on laps 24-48 the Bridgestone runners ran far under the model on inters (MSCM -1.60,
+  FRE -1.46, HEI -1.83 s a lap), the Michelins hardly (RAI -0.18, TRU -0.29). The report:
+  "the Bridgestone tyres outperformed the Michelins in the wet". The fitted per-driver wet
+  pace is small (MSCM -0.9%, RAI -0.1%), averaged over both showers.
+- **hungary-2006.** From lap 37 Button pulls away from de la Rosa in reality (11.4 s on lap 37,
+  25.0 s on lap 45) while the sim's DLR catches him and finishes ahead in 66% of runs. Button's
+  long inter stint (laps 19-45) ran 1.4 s a lap under the model. DLR's third stint (laps 32-50,
+  wetness 0.15-0.30) is fitted dry and ran 1.2 s a lap over the model's slick there. That is
+  about 60 s of swing. Heidfeld and Barrichello are 8-17 s short the same way. Per-driver,
+  per-stint wet pace and the tyre class of the drying stints (wet model / wet_laps), no knob.
+- **china-2007.** Hamilton, the user's car, **isn't in the race model**: `build.dry_fit` fits the
+  dry pace on laps outside the wet period, and Hamilton (retired on lap 31) ran only wet laps
+  1-30, so he has no pace fit and `assemble` drops him (`set(takeover_state) &
+  set(fit.driver_pace)`). SCH, SUT and DAV are dropped the same way. So the race plays with no
+  user car, and the duel isn't scored (Hamilton has no finish either). This is a design
+  problem: a driver who only raced in the wet needs a pace from his wet laps (or a team-mate /
+  field reference); it isn't a per-race knob. The race and golden files aren't committed (as
+  5.4a's blocked races); its raw ingest, hand-check file and registry entry are. The G1 fails
+  are field gaps: VET, BUT and LIU end 12-20 s too far back. On laps 27-33 the leaders (RAI,
+  ALO), on stints fitted dry, lapped 107-119 s while VET and BUT ran 100-105 s on dries; the
+  model gives the leaders' slicks little loss at wetness 0.1-0.3 and puts the rest into their
+  second stops (RAI 54.7, ALO 50.3 s against 26-30 s for their first), and the gaps to the
+  winner (RAI) then come out long. The same drying-stint tyre question as hungary-2006.
+- **brazil-2008.** Hamilton finishes 5th ahead of Glock in every run, but 6.5 s too far back. On
+  laps 12-38 the sim's Massa (2.4's SOFT) gains 0.4-0.8 s a lap on ALO, RAI and GLO (2.4's
+  HARD): the model's SOFT is ~0.75 s a lap faster than its HARD, where real Massa and Alonso ran
+  within 0.3 s (ALO 2.4 s behind on lap 38, the sim's 22.8 s). On laps 12-18 the sim's MAS also
+  runs 1-2 s a lap under his real laps on the drying track. Glock is also stuck in a train behind
+  Trulli (sim lap 25: TRU, HAM, GLO within 0.6 s), who really fell back. The compounds are 2.4
+  estimates (pace step and wear), not a per-race knob. Glock's last-lap loss on dries in the
+  rain is in the model: he gains 13 s on Massa over laps 63-68 in the sim (real 22 s).
+
+**Also found: a car with only wet laps is dropped from the model.** Beyond china-2007's HAM,
+cars running at the takeover but retiring before the track dried have no dry pace fit and aren't
+modelled: hungary-2006's RAI and LIU (out on lap 26) and malaysia-2001's FIS (lap 32). Their
+real retirement is lost from the replay. Reported, not fixed.
+
+**TS sim checks** (a scratch vitest in packages/sim, not committed; 60 seeds of live play with
+incidents, the user making the real calls): every race reaches the flag in 60/60 runs; no
+`fuel out` note; the user's tank never falls below the 1-lap reserve; the real calls carry the
+real fills (e.g. hungary-2006 BUT `{laps: 29}`, `{laps: 8}`, `{laps: 16}`; united-states-2003
+MSCM `{laps: 1}`, `{laps: 27}`, `{laps: 25}`, the 1-lap fill being his back-to-back stop).
+china-2007 has no real calls (no user car, above). `live-replay.test.ts` (every race file, as a
+refuelling race with a fit and with the prior: the real calls match the replay with no tank
+below empty) and `parity.test.ts` (the goldens) pass for all of them.
+
+**The estimates for the owner** (`data/estimates/<id>.sc.json`, all `unchecked`):
+- **spain-1996:** none (none reported).
+- **europe-1999:** laps 2-6 SC (likely; the report's lap-1 SC for Diniz); laps 36-43 ambiguous
+  (rain by the report: reject).
+- **germany-2000:** laps 28, 31 (single laps), 35-42 and 45 ambiguous. The report has SCs on laps
+  25-28 and 30-31 (add them, confirmed) and rain from lap 32 (reject the later two).
+- **malaysia-2001:** laps 5-10 SC (likely); the report has it from lap 4 to the end of lap 10.
+- **united-states-2003:** laps 21 and 23 ambiguous single laps (rain by the report: reject).
+- **hungary-2006:** laps 29-31 SC (likely); RAI and LIU's crash is on lap 26 by their last laps.
+- **china-2007:** none.
+- **brazil-2008:** laps 1-4 SC (likely; the report: out at the end of lap 1, racing from lap 5).
+
+Garages: 1996, 1999, 2000, 2001 and 2003 tables added (`apps/web/src/track/garages.ts`, the
+1995, 1998-2000 and 2002 final standings from the Jolpica dump, the 1984-93 / 2005-09 method).
+Not regenerated here: `apps/worker/src/races.gen.ts`, `data/sc_rates.json` (so
+`test_sc_rates.py::test_committed_rates_match_the_raw_timelines` and
+`test_every_race_file_finds_its_circuit` fail until integration regenerates it, as on earlier
+race branches: the raw SC timelines are new, and the Nürburgring, europe-1999's circuit, has no
+entry yet) and the parity fixtures.

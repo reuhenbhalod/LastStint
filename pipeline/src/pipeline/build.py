@@ -1777,6 +1777,115 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
+    # Eras wave B (build plan 5.1): wet refuelling races 1996-2008 from Jolpica (`pipeline
+    # jolpica`, F1DB stops, the 2.4 estimates), then `pipeline wet-laps` (wetness and tyre
+    # classes from the lap times, step 4.5; docs/eras-checks/4.5-wet-races.md), with the fill
+    # model fitted from the F1DB stops. The duel is the storyline pair of the Eras spec's race
+    # table (§4), the user's driver first; split and seeds as above.
+    "spain-1996": {
+        "year": 1996,
+        "event": "Spain",
+        "source": "jolpica",
+        "name": "Spain 1996: Schumacher vs Alesi",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "MSCM",
+        "rival": "ALE",  # Schumacher wins in the rain: Alesi, the car behind at the flag
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "europe-1999": {
+        "year": 1999,
+        "event": "European",
+        "source": "jolpica",
+        "name": "Europe 1999: Herbert vs Trulli",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "HER",
+        "rival": "TRU",  # Herbert wins from P14: Trulli, the car behind at the flag
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "germany-2000": {
+        "year": 2000,
+        "event": "German",
+        "source": "jolpica",
+        "name": "Germany 2000: Barrichello vs Häkkinen",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "BAR",
+        "rival": "HAK",  # Barrichello wins from P18 on slicks: Häkkinen, the car behind
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "malaysia-2001": {
+        "year": 2001,
+        "event": "Malaysia",
+        "source": "jolpica",
+        "name": "Malaysia 2001: Schumacher vs Barrichello",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "MSCM",
+        "rival": "BAR",  # Schumacher recovers the lead: Barrichello, the car behind at the flag
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "united-states-2003": {
+        "year": 2003,
+        "event": "United States",
+        "source": "jolpica",
+        "name": "United States 2003: Schumacher vs Räikkönen",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "MSCM",
+        "rival": "RAI",  # Schumacher on the right tyre: Räikkönen, the car behind at the flag
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "hungary-2006": {
+        "year": 2006,
+        "event": "Hungary",
+        "source": "jolpica",
+        "name": "Hungary 2006: Button vs de la Rosa",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "BUT",
+        "rival": "DLR",  # Button wins from P14: de la Rosa, the car behind at the flag
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "china-2007": {
+        "year": 2007,
+        "event": "China",
+        "source": "jolpica",
+        "name": "China 2007: Hamilton vs Alonso",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "HAM",
+        "rival": "ALO",  # Hamilton high enough to clinch: Alonso, his nearest title rival
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "brazil-2008": {
+        "year": 2008,
+        "event": "Brazil",
+        "source": "jolpica",
+        "name": "Brazil 2008: Hamilton vs Massa",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "HAM",
+        "rival": "MAS",  # Hamilton P5 or better for the title: Massa, his title rival
+        "score_positions": 6,
+        "split": "eras",
+    },
 }
 
 

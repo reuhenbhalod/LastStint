@@ -329,6 +329,22 @@ const STANDINGS: Record<number, string[]> = {
     'Minardi',
     'BAR',
   ],
+  // 2001 (Eras): the 2000 final standings from the Jolpica dump (2026-10-24,
+  // formula_one_teamchampionship). Teams with no standing (Minardi and Prost, no points in
+  // 2000) go last, in car-number order (formula_one_roundentry).
+  2001: [
+    'Ferrari',
+    'McLaren',
+    'Williams',
+    'Benetton',
+    'BAR',
+    'Jordan',
+    'Arrows',
+    'Sauber',
+    'Jaguar',
+    'Minardi',
+    'Prost',
+  ],
   // 2002-2004 (Eras): the 2001-2003 final standings from the Jolpica dump (2026-10-24,
   // formula_one_teamchampionship), under each season's names (2002: Benetton is Renault). A
   // team that left is dropped (Prost after 2001, Arrows after 2002). A team with no standing

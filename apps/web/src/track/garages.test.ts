@@ -132,6 +132,21 @@ describe('garages', () => {
     expect(garagesFor(1999)[0]).toEqual(['BAR', 'BAR']); // new in 1999
   });
 
+  it('1996-2003: the previous champions at the exit; unranked teams at the entry', () => {
+    expect(garagesFor(1996).at(-1)).toEqual(['Benetton', 'BEN']);
+    expect(garagesFor(1996)[0]).toEqual(['Forti', 'FOR']);
+    expect(garagesFor(1999).at(-1)).toEqual(['McLaren', 'MCL']);
+    expect(garagesFor(1999).slice(0, 2)).toEqual([
+      ['BAR', 'BAR'],
+      ['Minardi', 'MIN'],
+    ]);
+    // Stewart (1999 4th) races as Jaguar in 2000, in Stewart's place.
+    expect(garagesFor(2000).findIndex(([t]) => t === 'Jaguar')).toBe(11 - 4);
+    expect(garagesFor(2001)[0]).toEqual(['Prost', 'PRO']);
+    expect(garagesFor(2003)).toHaveLength(10);
+    expect(garagesFor(2003)).not.toContainEqual(['Arrows', 'ARR']);
+  });
+
   it("has a garage for every team in every race, under the race's own team names", () => {
     for (const file of readdirSync(races).filter((f) => f.endsWith('.json'))) {
       const model = JSON.parse(readFileSync(join(races, file), 'utf8')) as {

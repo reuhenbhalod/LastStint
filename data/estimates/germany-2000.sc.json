@@ -1,0 +1,65 @@
+{
+ "race": "germany-2000",
+ "how": "docs/eras-checks/2.4-estimates.md: check each period against a race report; set status to confirmed or rejected (edit startLap/endLap if they're off), then re-run `pipeline jolpica <race-id> --force`.",
+ "periods": [
+  {
+   "startLap": 28,
+   "endLap": 28,
+   "laps": 1,
+   "kind": "SC",
+   "confidence": "ambiguous",
+   "peakRatio": 1.532,
+   "gapBefore": 6.4,
+   "gapAfter": 3.1,
+   "reasons": [
+    "a single slow lap"
+   ],
+   "status": "unchecked"
+  },
+  {
+   "startLap": 31,
+   "endLap": 31,
+   "laps": 1,
+   "kind": "SC",
+   "confidence": "ambiguous",
+   "peakRatio": 1.547,
+   "gapBefore": 5.7,
+   "gapAfter": 2.8,
+   "reasons": [
+    "a single slow lap"
+   ],
+   "status": "unchecked"
+  },
+  {
+   "startLap": 35,
+   "endLap": 42,
+   "laps": 8,
+   "kind": "SC",
+   "confidence": "ambiguous",
+   "peakRatio": 1.124,
+   "gapBefore": 6.8,
+   "gapAfter": 6.9,
+   "reasons": [
+    "only 1.12x slower: rain, yellow flags or a short SC?",
+    "the field didn't bunch up (P1-P6 6.8s -> 6.9s): rain?"
+   ],
+   "status": "unchecked"
+  },
+  {
+   "startLap": 45,
+   "endLap": 45,
+   "laps": 1,
+   "kind": "SC",
+   "confidence": "ambiguous",
+   "peakRatio": 1.107,
+   "gapBefore": 33.7,
+   "gapAfter": 29.1,
+   "reasons": [
+    "only 1.11x slower: rain, yellow flags or a short SC?",
+    "the field didn't bunch up (P1-P6 33.7s -> 29.1s): rain?",
+    "a single slow lap"
+   ],
+   "status": "unchecked"
+  }
+ ]
+}

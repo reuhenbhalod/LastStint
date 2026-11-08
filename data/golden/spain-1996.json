@@ -1,0 +1,742 @@
+{
+  "1": {
+    "order": [
+      "MSCM",
+      "VIL",
+      "ALE",
+      "FRE",
+      "HAK",
+      "DIN",
+      "VERO",
+      "BAR",
+      "BER"
+    ],
+    "gaps": {
+      "MSCM": 0.0,
+      "VIL": 38.958,
+      "ALE": 44.083,
+      "FRE": 122.401,
+      "HAK": 176.116,
+      "DIN": 264.448
+    },
+    "times": {
+      "MSCM": 4885.79,
+      "VIL": 4924.748,
+      "ALE": 4929.873,
+      "FRE": 5008.191,
+      "HAK": 5061.906,
+      "DIN": 5150.238
+    },
+    "finishers": [
+      "MSCM",
+      "VIL",
+      "ALE",
+      "FRE",
+      "HAK",
+      "DIN"
+    ]
+  },
+  "2": {
+    "order": [
+      "MSCM",
+      "ALE",
+      "VIL",
+      "FRE",
+      "HAK",
+      "DIN",
+      "VERO",
+      "BAR",
+      "BER"
+    ],
+    "gaps": {
+      "MSCM": 0.0,
+      "ALE": 57.938,
+      "VIL": 61.351,
+      "FRE": 136.259,
+      "HAK": 184.005,
+      "DIN": 253.999
+    },
+    "times": {
+      "MSCM": 4880.953,
+      "ALE": 4938.891,
+      "VIL": 4942.303,
+      "FRE": 5017.212,
+      "HAK": 5064.958,
+      "DIN": 5134.952
+    },
+    "finishers": [
+      "MSCM",
+      "ALE",
+      "VIL",
+      "FRE",
+      "HAK",
+      "DIN"
+    ]
+  },
+  "3": {
+    "order": [
+      "MSCM",
+      "ALE",
+      "VIL",
+      "FRE",
+      "HAK",
+      "DIN",
+      "VERO",
+      "BAR",
+      "BER"
+    ],
+    "gaps": {
+      "MSCM": 0.0,
+      "ALE": 45.503,
+      "VIL": 59.354,
+      "FRE": 132.238,
+      "HAK": 186.876,
+      "DIN": 271.562
+    },
+    "times": {
+      "MSCM": 4880.154,
+      "ALE": 4925.657,
+      "VIL": 4939.508,
+      "FRE": 5012.392,
+      "HAK": 5067.031,
+      "DIN": 5151.717
+    },
+    "finishers": [
+      "MSCM",
+      "ALE",
+      "VIL",
+      "FRE",
+      "HAK",
+      "DIN"
+    ]
+  },
+  "4": {
+    "order": [
+      "MSCM",
+      "VIL",
+      "ALE",
+      "FRE",
+      "HAK",
+      "DIN",
+      "VERO",
+      "BAR",
+      "BER"
+    ],
+    "gaps": {
+      "MSCM": 0.0,
+      "VIL": 53.527,
+      "ALE": 56.323,
+      "FRE": 126.86,
+      "HAK": 167.73,
+      "DIN": 273.461
+    },
+    "times": {
+      "MSCM": 4880.554,
+      "VIL": 4934.081,
+      "ALE": 4936.877,
+      "FRE": 5007.414,
+      "HAK": 5048.284,
+      "DIN": 5154.014
+    },
+    "finishers": [
+      "MSCM",
+      "VIL",
+      "ALE",
+      "FRE",
+      "HAK",
+      "DIN"
+    ]
+  },
+  "5": {
+    "order": [
+      "MSCM",
+      "ALE",
+      "VIL",
+      "FRE",
+      "HAK",
+      "DIN",
+      "VERO",
+      "BAR",
+      "BER"
+    ],
+    "gaps": {
+      "MSCM": 0.0,
+      "ALE": 67.918,
+      "VIL": 71.876,
+      "FRE": 120.951,
+      "HAK": 194.293,
+      "DIN": 287.729
+    },
+    "times": {
+      "MSCM": 4868.655,
+      "ALE": 4936.573,
+      "VIL": 4940.532,
+      "FRE": 4989.607,
+      "HAK": 5062.948,
+      "DIN": 5156.385
+    },
+    "finishers": [
+      "MSCM",
+      "ALE",
+      "VIL",
+      "FRE",
+      "HAK",
+      "DIN"
+    ]
+  },
+  "6": {
+    "order": [
+      "MSCM",
+      "ALE",
+      "VIL",
+      "FRE",
+      "HAK",
+      "DIN",
+      "VERO",
+      "BAR",
+      "BER"
+    ],
+    "gaps": {
+      "MSCM": 0.0,
+      "ALE": 55.208,
+      "VIL": 58.514,
+      "FRE": 128.675,
+      "HAK": 171.545,
+      "DIN": 267.346
+    },
+    "times": {
+      "MSCM": 4882.604,
+      "ALE": 4937.812,
+      "VIL": 4941.118,
+      "FRE": 5011.279,
+      "HAK": 5054.149,
+      "DIN": 5149.95
+    },
+    "finishers": [
+      "MSCM",
+      "ALE",
+      "VIL",
+      "FRE",
+      "HAK",
+      "DIN"
+    ]
+  },
+  "7": {
+    "order": [
+      "MSCM",
+      "ALE",
+      "VIL",
+      "FRE",
+      "HAK",
+      "DIN",
+      "VERO",
+      "BAR",
+      "BER"
+    ],
+    "gaps": {
+      "MSCM": 0.0,
+      "ALE": 80.272,
+      "VIL": 91.016,
+      "FRE": 136.819,
+      "HAK": 202.295,
+      "DIN": 291.166
+    },
+    "times": {
+      "MSCM": 4859.359,
+      "ALE": 4939.632,
+      "VIL": 4950.375,
+      "FRE": 4996.178,
+      "HAK": 5061.655,
+      "DIN": 5150.526
+    },
+    "finishers": [
+      "MSCM",
+      "ALE",
+      "VIL",
+      "FRE",
+      "HAK",
+      "DIN"
+    ]
+  },
+  "8": {
+    "order": [
+      "MSCM",
+      "ALE",
+      "VIL",
+      "FRE",
+      "HAK",
+      "DIN",
+      "VERO",
+      "BAR",
+      "BER"
+    ],
+    "gaps": {
+      "MSCM": 0.0,
+      "ALE": 49.486,
+      "VIL": 56.486,
+      "FRE": 110.001,
+      "HAK": 173.104,
+      "DIN": 266.519
+    },
+    "times": {
+      "MSCM": 4884.137,
+      "ALE": 4933.624,
+      "VIL": 4940.623,
+      "FRE": 4994.139,
+      "HAK": 5057.241,
+      "DIN": 5150.657
+    },
+    "finishers": [
+      "MSCM",
+      "ALE",
+      "VIL",
+      "FRE",
+      "HAK",
+      "DIN"
+    ]
+  },
+  "9": {
+    "order": [
+      "MSCM",
+      "VIL",
+      "ALE",
+      "FRE",
+      "HAK",
+      "DIN",
+      "VERO",
+      "BAR",
+      "BER"
+    ],
+    "gaps": {
+      "MSCM": 0.0,
+      "VIL": 26.573,
+      "ALE": 32.842,
+      "FRE": 109.856,
+      "HAK": 157.696,
+      "DIN": 251.908
+    },
+    "times": {
+      "MSCM": 4894.855,
+      "VIL": 4921.428,
+      "ALE": 4927.697,
+      "FRE": 5004.711,
+      "HAK": 5052.551,
+      "DIN": 5146.763
+    },
+    "finishers": [
+      "MSCM",
+      "VIL",
+      "ALE",
+      "FRE",
+      "HAK",
+      "DIN"
+    ]
+  },
+  "10": {
+    "order": [
+      "MSCM",
+      "VIL",
+      "ALE",
+      "FRE",
+      "HAK",
+      "DIN",
+      "VERO",
+      "BAR",
+      "BER"
+    ],
+    "gaps": {
+      "MSCM": 0.0,
+      "VIL": 72.925,
+      "ALE": 76.892,
+      "FRE": 145.069,
+      "HAK": 204.553,
+      "DIN": 265.645
+    },
+    "times": {
+      "MSCM": 4866.124,
+      "VIL": 4939.049,
+      "ALE": 4943.015,
+      "FRE": 5011.193,
+      "HAK": 5070.676,
+      "DIN": 5131.769
+    },
+    "finishers": [
+      "MSCM",
+      "VIL",
+      "ALE",
+      "FRE",
+      "HAK",
+      "DIN"
+    ]
+  },
+  "11": {
+    "order": [
+      "MSCM",
+      "VIL",
+      "ALE",
+      "FRE",
+      "HAK",
+      "DIN",
+      "VERO",
+      "BAR",
+      "BER"
+    ],
+    "gaps": {
+      "MSCM": 0.0,
+      "VIL": 54.415,
+      "ALE": 62.267,
+      "FRE": 145.559,
+      "HAK": 190.358,
+      "DIN": 275.651
+    },
+    "times": {
+      "MSCM": 4873.557,
+      "VIL": 4927.972,
+      "ALE": 4935.825,
+      "FRE": 5019.116,
+      "HAK": 5063.915,
+      "DIN": 5149.209
+    },
+    "finishers": [
+      "MSCM",
+      "VIL",
+      "ALE",
+      "FRE",
+      "HAK",
+      "DIN"
+    ]
+  },
+  "12": {
+    "order": [
+      "MSCM",
+      "ALE",
+      "VIL",
+      "FRE",
+      "HAK",
+      "DIN",
+      "VERO",
+      "BAR",
+      "BER"
+    ],
+    "gaps": {
+      "MSCM": 0.0,
+      "ALE": 48.752,
+      "VIL": 61.811,
+      "FRE": 133.845,
+      "HAK": 169.764,
+      "DIN": 284.817
+    },
+    "times": {
+      "MSCM": 4875.735,
+      "ALE": 4924.488,
+      "VIL": 4937.547,
+      "FRE": 5009.581,
+      "HAK": 5045.5,
+      "DIN": 5160.552
+    },
+    "finishers": [
+      "MSCM",
+      "ALE",
+      "VIL",
+      "FRE",
+      "HAK",
+      "DIN"
+    ]
+  },
+  "13": {
+    "order": [
+      "MSCM",
+      "ALE",
+      "VIL",
+      "FRE",
+      "HAK",
+      "DIN",
+      "VERO",
+      "BAR",
+      "BER"
+    ],
+    "gaps": {
+      "MSCM": 0.0,
+      "ALE": 47.186,
+      "VIL": 61.057,
+      "FRE": 104.917,
+      "HAK": 179.62,
+      "DIN": 271.688
+    },
+    "times": {
+      "MSCM": 4881.134,
+      "ALE": 4928.32,
+      "VIL": 4942.192,
+      "FRE": 4986.051,
+      "HAK": 5060.754,
+      "DIN": 5152.822
+    },
+    "finishers": [
+      "MSCM",
+      "ALE",
+      "VIL",
+      "FRE",
+      "HAK",
+      "DIN"
+    ]
+  },
+  "14": {
+    "order": [
+      "MSCM",
+      "ALE",
+      "VIL",
+      "FRE",
+      "HAK",
+      "DIN",
+      "VERO",
+      "BAR",
+      "BER"
+    ],
+    "gaps": {
+      "MSCM": 0.0,
+      "ALE": 55.615,
+      "VIL": 66.89,
+      "FRE": 126.563,
+      "HAK": 182.894,
+      "DIN": 266.065
+    },
+    "times": {
+      "MSCM": 4879.127,
+      "ALE": 4934.741,
+      "VIL": 4946.016,
+      "FRE": 5005.689,
+      "HAK": 5062.021,
+      "DIN": 5145.192
+    },
+    "finishers": [
+      "MSCM",
+      "ALE",
+      "VIL",
+      "FRE",
+      "HAK",
+      "DIN"
+    ]
+  },
+  "15": {
+    "order": [
+      "MSCM",
+      "VIL",
+      "ALE",
+      "FRE",
+      "HAK",
+      "DIN",
+      "VERO",
+      "BAR",
+      "BER"
+    ],
+    "gaps": {
+      "MSCM": 0.0,
+      "VIL": 85.09,
+      "ALE": 86.452,
+      "FRE": 152.201,
+      "HAK": 203.669,
+      "DIN": 284.885
+    },
+    "times": {
+      "MSCM": 4854.946,
+      "VIL": 4940.036,
+      "ALE": 4941.398,
+      "FRE": 5007.147,
+      "HAK": 5058.615,
+      "DIN": 5139.831
+    },
+    "finishers": [
+      "MSCM",
+      "VIL",
+      "ALE",
+      "FRE",
+      "HAK",
+      "DIN"
+    ]
+  },
+  "16": {
+    "order": [
+      "MSCM",
+      "VIL",
+      "ALE",
+      "FRE",
+      "HAK",
+      "DIN",
+      "VERO",
+      "BAR",
+      "BER"
+    ],
+    "gaps": {
+      "MSCM": 0.0,
+      "VIL": 46.945,
+      "ALE": 75.206,
+      "FRE": 115.49,
+      "HAK": 187.929,
+      "DIN": 276.262
+    },
+    "times": {
+      "MSCM": 4877.175,
+      "VIL": 4924.119,
+      "ALE": 4952.38,
+      "FRE": 4992.665,
+      "HAK": 5065.103,
+      "DIN": 5153.436
+    },
+    "finishers": [
+      "MSCM",
+      "VIL",
+      "ALE",
+      "FRE",
+      "HAK",
+      "DIN"
+    ]
+  },
+  "17": {
+    "order": [
+      "MSCM",
+      "ALE",
+      "VIL",
+      "FRE",
+      "HAK",
+      "DIN",
+      "VERO",
+      "BAR",
+      "BER"
+    ],
+    "gaps": {
+      "MSCM": 0.0,
+      "ALE": 29.622,
+      "VIL": 40.277,
+      "FRE": 118.366,
+      "HAK": 157.046,
+      "DIN": 250.166
+    },
+    "times": {
+      "MSCM": 4893.634,
+      "ALE": 4923.255,
+      "VIL": 4933.91,
+      "FRE": 5012.0,
+      "HAK": 5050.679,
+      "DIN": 5143.799
+    },
+    "finishers": [
+      "MSCM",
+      "ALE",
+      "VIL",
+      "FRE",
+      "HAK",
+      "DIN"
+    ]
+  },
+  "18": {
+    "order": [
+      "MSCM",
+      "ALE",
+      "VIL",
+      "FRE",
+      "HAK",
+      "DIN",
+      "VERO",
+      "BAR",
+      "BER"
+    ],
+    "gaps": {
+      "MSCM": 0.0,
+      "ALE": 64.746,
+      "VIL": 90.704,
+      "FRE": 145.065,
+      "HAK": 206.75,
+      "DIN": 276.308
+    },
+    "times": {
+      "MSCM": 4863.156,
+      "ALE": 4927.902,
+      "VIL": 4953.86,
+      "FRE": 5008.221,
+      "HAK": 5069.906,
+      "DIN": 5139.464
+    },
+    "finishers": [
+      "MSCM",
+      "ALE",
+      "VIL",
+      "FRE",
+      "HAK",
+      "DIN"
+    ]
+  },
+  "19": {
+    "order": [
+      "MSCM",
+      "ALE",
+      "VIL",
+      "FRE",
+      "HAK",
+      "DIN",
+      "VERO",
+      "BAR",
+      "BER"
+    ],
+    "gaps": {
+      "MSCM": 0.0,
+      "ALE": 49.255,
+      "VIL": 56.644,
+      "FRE": 135.014,
+      "HAK": 173.502,
+      "DIN": 287.298
+    },
+    "times": {
+      "MSCM": 4886.02,
+      "ALE": 4935.276,
+      "VIL": 4942.665,
+      "FRE": 5021.035,
+      "HAK": 5059.523,
+      "DIN": 5173.319
+    },
+    "finishers": [
+      "MSCM",
+      "ALE",
+      "VIL",
+      "FRE",
+      "HAK",
+      "DIN"
+    ]
+  },
+  "20": {
+    "order": [
+      "MSCM",
+      "ALE",
+      "VIL",
+      "FRE",
+      "HAK",
+      "DIN",
+      "VERO",
+      "BAR",
+      "BER"
+    ],
+    "gaps": {
+      "MSCM": 0.0,
+      "ALE": 52.866,
+      "VIL": 70.841,
+      "FRE": 159.915,
+      "HAK": 180.604,
+      "DIN": 288.045
+    },
+    "times": {
+      "MSCM": 4871.627,
+      "ALE": 4924.493,
+      "VIL": 4942.467,
+      "FRE": 5031.541,
+      "HAK": 5052.231,
+      "DIN": 5159.672
+    },
+    "finishers": [
+      "MSCM",
+      "ALE",
+      "VIL",
+      "FRE",
+      "HAK",
+      "DIN"
+    ]
+  }
+}

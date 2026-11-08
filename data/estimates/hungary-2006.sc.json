@@ -1,0 +1,18 @@
+{
+ "race": "hungary-2006",
+ "how": "docs/eras-checks/2.4-estimates.md: check each period against a race report; set status to confirmed or rejected (edit startLap/endLap if they're off), then re-run `pipeline jolpica <race-id> --force`.",
+ "periods": [
+  {
+   "startLap": 29,
+   "endLap": 31,
+   "laps": 3,
+   "kind": "SC",
+   "confidence": "likely",
+   "peakRatio": 1.585,
+   "gapBefore": 84.7,
+   "gapAfter": 8.7,
+   "reasons": [],
+   "status": "unchecked"
+  }
+ ]
+}
