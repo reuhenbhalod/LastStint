@@ -1,0 +1,15 @@
+{
+ "race": "italy-2020",
+ "scheduledLaps": 53,
+ "completedLaps": 53,
+ "timing": "FastF1",
+ "redFlags": [
+  {
+   "lap": 26,
+   "restart": "standing",
+   "restartScLaps": 0,
+   "source": "GrandPrix.com, Italian GP 2020 race analysis: 'The race was red flagged at the end of lap 26', 'the drivers did a formation lap and lined up for a standing start' (https://www.grandprix.com/races/italian-gp-2020-race-analysis.html); A. Kalinauckas, Autosport, 6 Sep 2020: Leclerc crashed at the end of 'the 24th tour', 'a second standing start at the beginning of lap 28' (https://www.autosport.com/f1/news/151934/gasly-holds-off-sainz-to-win-topsyturvy-italian-gp); Wikipedia, 2020 Italian Grand Prix: 'resumed later with a standing restart on lap 28' (https://en.wikipedia.org/wiki/2020_Italian_Grand_Prix)",
+   "note": "Conflict: the Wikipedia list gives lap 27 (citing formula1.com, not read). Jolpica: leader's lap 26 took 160s (slower than the SC lap 25 at 120s) and lap 27 holds the stoppage (1683s); 26 taken from GrandPrix.com. If the build's timing puts the red status on lap 27, the build will refuse this entry: check against the timing. The standing restart (lap 28) was the first in F1 under the 2018 rule."
+  }
+ ]
+}

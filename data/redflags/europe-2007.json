@@ -1,0 +1,16 @@
+{
+ "race": "europe-2007",
+ "scheduledLaps": 60,
+ "completedLaps": 60,
+ "timing": "Jolpica (no red-flag timing)",
+ "redFlags": [
+  {
+   "lap": 4,
+   "resumeLap": 5,
+   "restart": "rolling",
+   "restartScLaps": 2,
+   "source": "GrandPrix.com, European GP 2007 race notes: 'On lap 3 the Safety Car is deployed', 'On lap 4 the red flag comes out', 'the field rolled off again behind the Safety Car for three laps', 'The race restarted on lap 7' (https://www.grandprix.com/races/european-gp-2007-race-notes-alonso-wins-wild-european-gp.html); Wikipedia, 2007 European Grand Prix: 'The race restarted under safety car conditions' (https://en.wikipedia.org/wiki/2007_European_Grand_Prix); Jolpica lap times (api.jolpi.ca/ergast/f1/2007/10/laps), leader's lap 5 took 1438s (the stoppage), laps 6-7 behind the SC (163s, 155s), lap 8 green (108s)",
+   "note": "Conflict on the flag lap: the Wikipedia list gives lap 5 (citing BBC Sport); Wikipedia's race article ties the red flag to the lap-3 aquaplaning at turn one; GrandPrix.com gives lap 4. Lap 4 taken: its leader time (227s) is far slower than the SC laps after the restart, consistent with the crawl back to the grid; lap 5 holds the stoppage either way. GrandPrix.com's 'three laps' behind the SC counts the SC lap inside the stoppage lap 5; racing from the end of lap 7 per the timing."
+  }
+ ]
+}

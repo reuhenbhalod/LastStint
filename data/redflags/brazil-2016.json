@@ -1,0 +1,24 @@
+{
+ "race": "brazil-2016",
+ "scheduledLaps": 71,
+ "completedLaps": 71,
+ "timing": "TUM (no red-flag timing)",
+ "redFlags": [
+  {
+   "lap": 20,
+   "resumeLap": 21,
+   "restart": "rolling",
+   "restartScLaps": 6,
+   "source": "Wikipedia, 'List of red-flagged Formula One races' (https://en.wikipedia.org/wiki/List_of_red-flagged_Formula_One_races): first red flag lap 20 (citing BBC Sport live, 13 Nov 2016); M. Hughes, '2016 Brazilian Grand Prix', Motor Sport, 14 Nov 2016: SC 'stayed out until the end of lap 19', Raikkonen's crash 'brought out the first red flag', after it 'They circulated like this for seven laps' (https://www.motorsportmagazine.com/articles/single-seaters/f1/2016-brazilian-grand-prix/); Wikipedia, 2016 Brazilian Grand Prix: 35-minute delay, 'restarted behind the safety car' (https://en.wikipedia.org/wiki/2016_Brazilian_Grand_Prix); Jolpica lap times (api.jolpi.ca/ergast/f1/2016/20/laps), leader's lap 21 took 2127s (the stoppage), laps 22-27 behind the SC (120-122s)",
+   "note": "The race never went green between the two red flags: laps 22-27 behind the SC, then the second red flag on lap 28. Motor Sport's 'seven laps' counts lap 28 too. Raikkonen classified with 19 laps (crashed on lap 20)."
+  },
+  {
+   "lap": 28,
+   "resumeLap": 29,
+   "restart": "rolling",
+   "restartScLaps": 2,
+   "source": "Wikipedia, 'List of red-flagged Formula One races' (https://en.wikipedia.org/wiki/List_of_red-flagged_Formula_One_races): second red flag lap 28; FIA, 'Hamilton wins incident-packed Brazil GP...', 13 Nov 2016: 'suspend the race on lap 29', resumed 'again under the safety car', which 'left the track at the end of lap 31' (https://api.fia.com/news/f1-hamilton-wins-incident-packed-brazil-gp-ahead-rosberg-verstappen-thrills-interlagos); Motor Sport (M. Hughes): 'they circulated for only two laps' (https://www.motorsportmagazine.com/articles/single-seaters/f1/2016-brazilian-grand-prix/); Jolpica lap times (api.jolpi.ca/ergast/f1/2016/20/laps), leader's lap 29 took 1598s (the stoppage), laps 30-31 behind the SC, lap 32 green (87s)",
+   "note": "Conflict: the FIA report says the race was suspended 'on lap 29'; the Wikipedia list says 28. Jolpica: lap 28 took 136s (slower than the SC laps around it) and lap 29 holds the stoppage, so the flag was shown on 28 and 29 is the stoppage lap (the FIA's 29). Motor Sport says 'unfettered at the end of lap 32'; the FIA's 'end of lap 31' matches the timing, taken."
+  }
+ ]
+}
