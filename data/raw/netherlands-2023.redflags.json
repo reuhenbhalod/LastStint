@@ -1,0 +1,10 @@
+{
+ "race": "netherlands-2023",
+ "redFlags": [
+  {
+   "lap": 64,
+   "restart": "rolling",
+   "source": "OpenF1 race control: RED FLAG at 2023-08-27T14:31:16+00:00; 'RACE WILL RESUME AT 17:14 - ROLLING START PROCEDURE' at 2023-08-27T15:07:08+00:00"
+  }
+ ]
+}

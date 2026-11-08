@@ -663,3 +663,216 @@ about 3 L a lap through a rig of "more than 12 litres per second" (Wikipedia, "P
 
 Daily and Gauntlet race files and goldens are unchanged. The seven changed race files are
 all `eras` races. Their goldens are regenerated, and the TS sim matches them (`pnpm test`).
+
+## Eras wave B, step 5.1 (red-flag races 2020-2024): 0 pass, 0 borderline, 7 fail, 1 can't build
+
+Eras build plan 5.1, Nov 7 2026. Written by hand, like the wave A and B sections. Registry split
+`eras`, the duel is the storyline pair of the Eras spec's race table (§4, user's driver first;
+for a position target, the car the user finished next to), `score_positions` 6, seed 1,
+takeover by the D3 rule except saudi-arabia-2021 (see below). Robust status: 1,000 runs on
+each of two seed sets, values seed set 10000 / seed set 20000, limits in brackets. The red-flag
+facts are step R1's (`data/redflags/<id>.json`, docs/eras-checks/r1-red-flags.md).
+
+Sources:
+- **OpenF1** (`pipeline ingest`): netherlands-2023, brazil-2024. Race control gives both races'
+  red flags and rolling restarts (`data/raw/<id>.redflags.json`); the weather is OpenF1's.
+- **The project's FastF1 cache** (`pipeline ingest hungary-2021 --offline`, new): hungary-2021.
+  The cache holds the timing and track status but not race control or the weather, and FastF1
+  needs an F1TV login since Oct 2026, so `--offline` reads the cache only (FastF1's offline
+  mode: no request is made) and skips what it lacks. The red flag is in the timing (leader's
+  lap 2, status `45`), its restart in the R1 file. Wetness from `pipeline wet-laps`.
+- **Jolpica** (`pipeline jolpica`, CSV dump of 2026-10-24, CC BY-NC-SA 4.0; credit in
+  `data/raw/<id>.jolpica.json`): monaco-2022 (then `pipeline wet-laps`), great-britain-2022,
+  azerbaijan-2021, saudi-arabia-2021, italy-2020. Compounds and SC laps are step 2.4
+  estimates; their hand-check files `data/estimates/<id>.sc.json` are committed, all
+  `unchecked`.
+
+**Stoppage laps for the Jolpica races.** R1 took these five races for FastF1 timing, which
+would have given the stoppage lap. Jolpica has no red-flag timing, so each R1 entry now has
+its `resumeLap`, found as R1 did for the TUM races: the leader's first lap from the flag lap on
+that took over `redflag.STOPPAGE_FACTOR` (3x) the race's median lap (`redflag.stoppage_lap`).
+Each entry's `source` now ends with that derivation, and `test_redflag_facts.py` checks it
+against the committed snapshots.
+
+| Race | Flag lap | resumeLap | Leader's stoppage lap / race median |
+|---|---|---|---|
+| monaco-2022 | 30 | 30 | 1283.2 / 82.2 s |
+| great-britain-2022 | 1 | 2 | 3193.0 / 93.1 s |
+| azerbaijan-2021 | 48 | 49 | 2185.3 / 106.8 s |
+| saudi-arabia-2021 | 13, 15 | 14, 16 | 1190.2, 1297.1 / 93.4 s |
+| italy-2020 | 26 | 27 | 1682.5 / 84.8 s |
+
+All five agree with the stoppage laps R1 read from Jolpica in its notes. A Jolpica restart
+lap holds the formation lap too (Monza lap 28: 143 s against 85 s), so step 2.4 flags it as an
+ambiguous one-lap SC (italy 28, britain 3, azerbaijan 50, saudi 17). The red-flag span drops
+an SC that starts on the lap after the stoppage (`redflag.apply_hand_spans`), so none of
+those reaches a race file.
+
+| Race | Source | Duel | Status | Without near-tie rule | Mean gap error | Failing checks | Diagnosis |
+|---|---|---|---|---|---|---|---|
+| netherlands-2023 | OpenF1, wet | ALO vs VER | fail | fail | 4.13s | podium order rate 0.00 / 0.00 [0.50]; podium PER gap error 6.49 / 6.39 [5.00]; field SAI 7.10 / 7.01, HAM 11.85 / 11.82 [5.00] | lap pace (pace 62%, rest 38%): VER's dry pace, then the stops before the red flag. See below |
+| brazil-2024 | OpenF1, wet | VER vs OCO | can't build | | | | wet from start to finish: no dry lap to fit. See below |
+| hungary-2021 | FastF1 cache, wet start | HAM vs ALO | fail | fail | 5.74s | duel HAM vs ALO gap error 6.77 / 6.37 [3.00]; podium HAM gap error 11.76 / 11.61 [5.00]; field SAI 5.44 / 5.63, ALO 4.99 / 5.24 [5.00], GAS 10.47 / 10.42 [6.36] | race mechanics (pace 4%, rest 96%): Hamilton's charge on hards. See below |
+| monaco-2022 | Jolpica, wet | LEC vs PER | fail | fail | 4.00s | duel LEC vs PER gap error 5.07 / 5.32 [3.00]; podium order rate 0.46 / 0.44 [0.50]; field LEC 5.07 / 5.32, RUS 7.67 / 7.35, NOR 5.52 / 4.98 [5.00] | data: the lap 1-18 SC estimate is the wet track, and the tyre classes are a stint off. See below |
+| great-britain-2022 | Jolpica | LEC vs SAI | fail | fail | 2.96s | duel LEC vs SAI gap error 5.83 / 5.87 [3.00]; podium order rate 0.09 / 0.08 [0.50]; podium HAM gap error 6.01 / 6.13 [5.00]; field LEC 5.83 / 5.87 [5.00] | race mechanics (pace 2%, rest 98%): the 10-lap sprint after the SC. See below |
+| azerbaijan-2021 | Jolpica, faults | PER vs VET | fail | fail | 2.61s | field ALO gap error 7.12 / 7.13 [5.00] | race mechanics (pace 2%, rest 98%): Alonso's restart, and a recorded pit-lane pass. See below |
+| saudi-arabia-2021 | Jolpica | HAM vs VER | fail | fail | 22.65s | duel HAM vs VER gap error 11.60 / 11.47 [3.00] and order rate 0.23 / 0.25 [0.60]; podium order rate 0.10 / 0.09 [0.50]; podium VER 11.60 / 11.47, BOT 29.79 / 29.81 [5.00]; field OCO 35.53 / 35.26, RIC 30.86 / 30.63, GAS 39.60 / 39.52 [5.00] | data: the pit loss comes from two damage stops, and the neutralised laps 23-35 are estimated. See below |
+| italy-2020 | Jolpica | GAS vs SAI | fail | fail | 6.36s | duel GAS vs SAI gap error 8.84 / 8.88 [3.00]; podium order rate 0.40 / 0.41 [0.50]; podium SAI 8.84 / 8.88 [5.00]; field NOR 8.69 / 8.56, BOT 5.67 / 5.88, RIC 7.61 / 7.62 [5.00] | race mechanics (pace 0%, rest 100%): the SC queue before the pit lane reopened. See below |
+
+azerbaijan-2021 is the nearest to a pass: its duel, podium and four of the five field gaps pass,
+and only ALO is 2.1 s over.
+
+Diagnoses. Gaps are real / sim, to the real winner at each lap's end (sim: the mean of 100 runs
+with the race cut at that lap). Pace residuals are each car's real green laps minus the
+model's clean lap for it. The in-memory checks below changed the built model or the registry
+in memory only; none is committed.
+
+- **netherlands-2023** (takeover lap 8). The duel passes (0.48 / 0.50 s, order 0.90). Two things
+  go wrong.
+  - *VER's dry pace.* On laps 22-58 VER's real laps beat the model's clean lap by 0.34 s a lap
+    more than ALO's, and by 0.5 s more than PER's. So the sim's field stays close: at lap 63,
+    ALO is 18.9 s behind VER (real 33.2) and PER 9.7 s (real 37.6).
+  - *The stops either side of the red flag.* VER boxed for wets at the end of lap 63, before the
+    lap-64 red flag, and pays his measured 18.3 s. PER and the cars that came in after the flag
+    change tyres for free in the stoppage. With the sim's small gaps, PER lines up ahead of VER
+    at the wipe (lap 65: -1.7 s, real +1.6). PER then "wins" most runs, so the podium order rate
+    is 0.00.
+  - *Check.* With step 4.3's fixture takeover (lap 58) the gaps pass (mean 2.34 s). The podium
+    order still fails (0.05): the sim puts PER ahead of ALO (real 1.4 s apart). That is the
+    final-shower result 4.3 saw. No per-race knob applies: moving the takeover to lap 58 would
+    drop the rain at the start from the storyline.
+- **brazil-2024** doesn't build. All 1,137 laps are on inters (1,119) or wets (18), and OpenF1
+  has rain in 117 of its 201 weather records. The weather spec fits the wet model as a
+  correction on a dry lap model, fitted on the race's slick laps outside the wet period. This
+  race has none, so `fit_lap_model` had nothing to fit. It used to fail with an `IndexError`;
+  `build.dry_fit` now stops with a message saying why. The fix is a dry-pace reference from
+  outside the race (qualifying, or the drivers' dry pace at a nearby race): a design change
+  (the same gap as turkey-2020 in step 5.1a). **Reported to the owner, not faked.** The raw
+  snapshot is committed.
+- **hungary-2021** (takeover lap 16). The D3 takeover is after the red flag (laps 2-3) and
+  Hamilton's lone restart on inters, so this race file never plays its red flag, and the
+  storyline's call comes before the takeover. Step 6.2 should pin an earlier takeover when it
+  authors the restart decision; pinning it here wouldn't fix G1.
+  - *Where HAM's error comes from.* It builds before his second stop. At lap 48 the sim's HAM
+    is 33.3 s behind OCO (real 22.7). Between laps 20 and 40 he gains 33 s against a real 40 s:
+    on hards from lap 20 he ran 0.2 s a lap faster than the model, and he came through the
+    midfield faster. He then gains the same 20 s as in reality on his late mediums, and
+    finishes 13.4 s back (real 2.7).
+  - *SAI and ALO.* The model has them 0.5-0.6 s a lap slow on laps 21-47 and 0.4-0.6 s a lap
+    fast on laps 49-70 (ALO defending from HAM). So their mean pace is right but their race
+    shape isn't: about 5 s off at the flag.
+  - *The rest.* HARD and MEDIUM share their fitted offset and wear ("no separation in data,
+    prior used"). The classification still lists VET second, but he was disqualified after the race.
+- **monaco-2022** (takeover lap 13). The data, not the sim:
+  1. *The SC estimate.* Step 2.4 estimates an SC on laps 1-18 ("likely"). The leader's laps
+     are 155 and 143 s on laps 1-2, then fall steadily from 104 s to 92 s by lap 15: a drying
+     track, with the race started behind the SC. `wet-laps` keeps 2.4's SC laps, so laps 3-18
+     are neutralised and their stops priced as SC stops.
+  2. *The tyre classes.* They come out a stint off. The inter stints that started on laps
+     16-19 (HAM, PER, NOR, LEC, VER) are labelled `HARD`, and the slick stints from laps 21-24
+     are labelled `INTERMEDIATE`. Wetness stays 0.2-0.3 until lap 24.
+  3. *Haas.* MAG and MSC drop out of the race file's drivers. MAG's laps are all labelled
+     inters, and MSC's slick-labelled laps 1-17 all fall in the estimated SC, so neither has a
+     clean slick lap for a base pace. Their retirements stay.
+  4. *Compounds after the restart.* PER's post-restart stint is labelled SOFT and SAI's,
+     VER's and LEC's HARD (offset 0.8 s), so the sim's PER pulls away from the train he really
+     held (at the flag: SAI 5.0, VER 7.3, LEC 8.7 s, against 1.2, 1.5, 2.9 s real).
+  - *Check.* In a scratch raw directory, with the hand-check's first period set to laps 1-2
+    `confirmed`, mean gap error falls to 3.78 s and LEC, RUS and NOR pass. SAI (4.76 / 5.79)
+    and VER (6.79 / 6.83) don't, and the tyre classes stay a stint off.
+  - *Owner.* Check the SC periods and the stint classes against a race report. The tyre-class
+    shift may be a `wet_laps` limit on a race that starts on full wets behind the SC.
+- **great-britain-2022** (takeover lap 17). The race is decided after the lap 39-42 SC.
+  Everyone but LEC stopped for softs under it (LEC stayed out on hards that were 17 laps old at
+  the restart and 26 at the flag), and the race restarted on lap 43. Over laps 43-52:
+  - LEC's real laps are 0.5 s slower than the model's for his old hards (+0.48 mean residual).
+    The sim's LEC loses 2.7 s to SAI where the real one lost 7.2 s.
+  - HAM's are 0.6 s slower than the model (+0.62): HAM, PER and LEC fought for P2-P4 on laps
+    43-48. The sim's HAM finishes 0.1 s behind SAI (real 6.2 s) and ahead of PER (real behind),
+    so the podium order rate is 0.09.
+  - The two-compound estimate gives the hards and softs one curve each (soft wear 0.053, hard
+    offset 0.66 s), and the sim has no cost for a wheel-to-wheel fight beyond dirty air. No
+    per-race knob applies.
+- **azerbaijan-2021** (takeover lap 10). The two fault facts in data/incidents.json (STR lap
+  30, VER lap 46, both tyre failures) are tyre failures into the wall. Neither car completed
+  its fault lap (their last laps are 29 and 45), so there is nothing to fit, and the build used
+  to stop with "the fault lap isn't a timed green lap".
+  - *Build change.* `faults.split_retired` now sets such a fact aside with a build note. Its
+    RETIREMENT event already takes the car out on that lap, and no magnitude is guessed. The
+    fact itself is unchanged.
+  - *ALO.* Real ALO went from P10 to P6 on the two laps after the standing restart (lap 49:
+    19.0 s behind PER; at the flag 6.4 s). The sim has no first-lap passing at a restart.
+  - *The recorded pit-lane pass.* Under the lap 46-47 SC, Jolpica has every car but LAT going
+    through the pit lane (in on lap 47 at about 5,381-5,410 s, out 15 s later on lap 48).
+    Step 2.4 missed that SC (it found laps 31-35, and the restart lap 50). Lap 48 is the red
+    flag's first lap, so those "stops" pay the green pit loss (21.9 s, priced by the 4.3 rule
+    for a stop on the first red lap). LAT doesn't pay, and lines up about P10 instead of near
+    the back.
+  - *Check.* With the lap-48 records dropped in memory, ALO's error is 5.78 / 5.76 s.
+  - *Owner.* Is that a real pit-lane pass under the SC? Add the lap 46-47 SC to the hand-check.
+- **saudi-arabia-2021**. Two data problems, then the race itself.
+  1. *The pit loss.* The race has three green stops: ALO 23.9 s, RAI 48.9 s and TSU 65.1 s
+     (the last two with damage). The green pit loss is their median, 48.9 s, so the lap-11 SC
+     stops cost 26.9 s (0.55 x). The measured SC losses were 10-28 s, median about 19 s (HAM
+     20.9). In the sim HAM,
+     BOT and LEC drop behind the cars that didn't stop (lap 12: HAM P4, real P2 3.2 s behind
+     VER). As a check, with the pit loss set to ALO's 23.9 s in memory, the duel passes
+     (1.59 / 1.52 s, order 0.67) and the field still fails by 23-33 s. `track.pit_loss` takes
+     no outlier guard on the median (the deviations do): a pipeline fix for the owner, since
+     it would change other races when they're rebuilt.
+  2. *The field's deficit.* Real HAM and VER pull 25 s clear of the field on laps 23-35, mostly
+     on the neutralised laps. On lap 29 BOT lost 9.9 s to HAM, and laps 30-32 ran at 125-128 s.
+     data/incidents.json has VSCs on laps 23, 28, 29 and 36. Step 2.4 estimates those laps as
+     ambiguous SC periods (23-24, 27, 29-32, 35), applied as yellows, so the sim races them
+     at green pace and the field stays within about 5 s of VER. Those laps also skew the pace
+     fit: HAM's and VER's median residuals on laps 17-50 are -1.35 and -0.48 s, against
+     -0.06 to -0.45 s for the field.
+  - *The race itself.* VER's real laps 42-48 are 1-2 s a lap slower than HAM's (92.3-93.1 s
+    against 90.7-92.0 s), and his official time carries a 5 s penalty (step 2.4's quirk note).
+    The sim has neither.
+  - *Takeover pinned to lap 7.* The D3 rule ignores events up to lap 10, so it lands on lap 10.
+    That is HAM's in-lap for his stop under the lap-10 SC, and live play can't take that call
+    at the takeover (`packages/sim` live-replay test: "decision lap 10 outside 11-50"). Lap 7
+    is the rule's three laps before that SC. At lap 10 the G1 numbers were 19.75 s mean gap
+    error and duel 7.53 / 6.95 s, also a fail.
+  - *Owner.* Check the SC/VSC hand-check against a race report.
+- **italy-2020** (takeover lap 16). Race mechanics: the SC queue at the pit-lane closure.
+  - *What happened.* The SC came out on lap 20 and the pit lane was closed. By the end of lap
+    22 the real field was queued within 17.4 s (19 cars). The cars that stopped when it
+    reopened (out-lap 23: SAI, NOR, PER, RIC, BOT and others) fell behind the ones that had
+    stopped earlier: GAS (out-lap 20), RAI, and HAM and GIO (penalised).
+  - *The sim.* Its queue closes by `SC_GAP_KEEP` (0.34) a lap and is still 41 s long at lap 22
+    (GAS 21.1 s back, real 13.5), so the 17.1 s SC stops cost SAI and the others no places. The
+    sim restarts on lap 28 with GAS sixth or seventh on average (mean place 6.4), not third
+    (behind HAM and STR), and SAI ahead of him. The standing restart wipes the gaps but keeps that order, so SAI finishes
+    8.4 s ahead of GAS (real 0.4 s behind).
+  - *Check.* With `SC_GAP_KEEP` 0 in memory, every gap check passes (duel 1.33 / 1.24 s, NOR
+    1.51, BOT 1.87, RIC 0.22). The podium order rate still fails at 0.36 / 0.38 (GAS and SAI
+    0.4 s apart are a near tie; STR 3.0 s behind).
+  - *Owner.* The fix is a sim change: the queue closing up under a long SC, or a race's pit-lane
+    closure as an event. Not a per-race knob.
+  - *Also unchecked.* Step 2.4 calls the lap-25 SC after Leclerc's crash ambiguous, so it runs
+    as a yellow.
+
+**Pipeline changes in this step.**
+- `pipeline ingest --offline` (`ingest.load_race` / `ingest_race`, `ingest.loaded`): builds a
+  FastF1 race from the on-disk cache with FastF1's offline mode; race control or weather the
+  cache lacks is skipped instead of raising `DataNotLoadedError`. Test: `test_ingest.py`.
+- `faults.split_retired` (used by `build.build_race`): a fault fact whose car retired on its
+  fault lap gets no FAULT event and a build note. Test: `test_faults.py`.
+- `build.dry_fit` raises a `ValueError` naming the reason when a wet race has no clean slick lap
+  (brazil-2024). Test: `test_wet.py`.
+- The red-flag files of the five Jolpica races carry `resumeLap` and `"timing": "Jolpica"`.
+  `test_redflag_facts.py` treats them as untimed and checks each `resumeLap` against the
+  snapshot.
+- `apps/web/src/track/garages.ts`: 2022 gains the Jolpica names `Red Bull` and `Alpine F1
+  Team`.
+- Four Eras web tests named monaco-2022 or azerbaijan-2021 as "a race with no race file"; they
+  now look one up (`EraProvider.test.ts`, `eraDetailState.test.ts`, `ErasScreen.test.ts`).
+
+**Server-match check:** each built race's 20 golden seeds match the TS sim (order, finishers,
+times within 0.0005 s): 140 / 140 over the seven races. Seeds stay at 1, untuned.
+
+**Not regenerated here:** `data/sc_rates.json` (so `test_sc_rates.py::
+test_committed_rates_match_the_raw_timelines` fails until it's regenerated: these races' raw
+status timelines are new), `apps/worker/src/races.gen.ts` and the parity fixtures.

@@ -1,0 +1,93 @@
+{
+ "race": "saudi-arabia-2021",
+ "how": "docs/eras-checks/2.4-estimates.md: check each period against a race report; set status to confirmed or rejected (edit startLap/endLap if they're off), then re-run `pipeline jolpica <race-id> --force`.",
+ "periods": [
+  {
+   "startLap": 10,
+   "endLap": 12,
+   "laps": 3,
+   "kind": "SC",
+   "confidence": "likely",
+   "peakRatio": 1.745,
+   "gapBefore": 20.8,
+   "gapAfter": 8.9,
+   "reasons": [],
+   "status": "unchecked"
+  },
+  {
+   "startLap": 17,
+   "endLap": 17,
+   "laps": 1,
+   "kind": "SC",
+   "confidence": "ambiguous",
+   "peakRatio": 1.502,
+   "gapBefore": null,
+   "gapAfter": 4.6,
+   "reasons": [
+    "a single slow lap"
+   ],
+   "status": "unchecked"
+  },
+  {
+   "startLap": 23,
+   "endLap": 24,
+   "laps": 2,
+   "kind": "SC",
+   "confidence": "ambiguous",
+   "peakRatio": 1.201,
+   "gapBefore": 13.7,
+   "gapAfter": 14.9,
+   "reasons": [
+    "only 1.20x slower: rain, yellow flags or a short SC?",
+    "the field didn't bunch up (P1-P6 13.7s -> 14.9s): rain?"
+   ],
+   "status": "unchecked"
+  },
+  {
+   "startLap": 27,
+   "endLap": 27,
+   "laps": 1,
+   "kind": "SC",
+   "confidence": "ambiguous",
+   "peakRatio": 1.136,
+   "gapBefore": 19.1,
+   "gapAfter": 23.6,
+   "reasons": [
+    "only 1.14x slower: rain, yellow flags or a short SC?",
+    "the field didn't bunch up (P1-P6 19.1s -> 23.6s): rain?",
+    "a single slow lap"
+   ],
+   "status": "unchecked"
+  },
+  {
+   "startLap": 29,
+   "endLap": 32,
+   "laps": 4,
+   "kind": "SC",
+   "confidence": "ambiguous",
+   "peakRatio": 1.353,
+   "gapBefore": 23.6,
+   "gapAfter": 31.2,
+   "reasons": [
+    "the field didn't bunch up (P1-P6 23.6s -> 31.2s): rain?"
+   ],
+   "status": "unchecked"
+  },
+  {
+   "startLap": 35,
+   "endLap": 35,
+   "laps": 1,
+   "kind": "SC",
+   "confidence": "ambiguous",
+   "peakRatio": 1.127,
+   "gapBefore": 33.2,
+   "gapAfter": 36.5,
+   "reasons": [
+    "only 1.13x slower: rain, yellow flags or a short SC?",
+    "the field didn't bunch up (P1-P6 33.2s -> 36.5s): rain?",
+    "a single slow lap"
+   ],
+   "status": "unchecked"
+  }
+ ]
+}

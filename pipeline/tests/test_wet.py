@@ -51,3 +51,13 @@ def test_python_sim_wet_lap_and_wear_match_the_pipeline():
     assert _clean_lap(car, compounds, 0.05, 2, None, weather) == dry * (
         1 + wet_penalty(weather, "MEDIUM", 2)
     )
+
+
+def test_a_race_wet_from_start_to_finish_says_why_it_cant_build():
+    # Interlagos 2024 (OpenF1): every lap on inters or wets, so no dry lap model to correct.
+    import pytest
+
+    from pipeline import build
+
+    with pytest.raises(ValueError, match="no clean slick lap outside the wet period"):
+        build.build_race("brazil-2024")

@@ -1,0 +1,32 @@
+{
+ "race": "azerbaijan-2021",
+ "how": "docs/eras-checks/2.4-estimates.md: check each period against a race report; set status to confirmed or rejected (edit startLap/endLap if they're off), then re-run `pipeline jolpica <race-id> --force`.",
+ "periods": [
+  {
+   "startLap": 31,
+   "endLap": 35,
+   "laps": 5,
+   "kind": "SC",
+   "confidence": "likely",
+   "peakRatio": 1.654,
+   "gapBefore": 29.8,
+   "gapAfter": 1.2,
+   "reasons": [],
+   "status": "unchecked"
+  },
+  {
+   "startLap": 50,
+   "endLap": 50,
+   "laps": 1,
+   "kind": "SC",
+   "confidence": "ambiguous",
+   "peakRatio": 1.405,
+   "gapBefore": null,
+   "gapAfter": 5.4,
+   "reasons": [
+    "a single slow lap"
+   ],
+   "status": "unchecked"
+  }
+ ]
+}

@@ -1,0 +1,517 @@
+{
+ "race": "hungary-2021",
+ "source": "lap-times",
+ "neutralSource": "status",
+ "filled": [],
+ "wetSpells": [],
+ "neutralLaps": [
+  "1-2"
+ ],
+ "ambiguous": [
+  {
+   "lap": 3,
+   "why": "first green lap after a neutralisation (cold tyres)"
+  },
+  {
+   "lap": 5,
+   "why": "borderline slowing: drizzle, or tyre wear"
+  },
+  {
+   "lap": 70,
+   "why": "borderline slowing: drizzle, or tyre wear"
+  }
+ ],
+ "stintClasses": [],
+ "laps": [
+  {
+   "lap": 1,
+   "slowing": null,
+   "gap": 1.218,
+   "neutral": true,
+   "wet": false
+  },
+  {
+   "lap": 2,
+   "slowing": null,
+   "gap": 3.124,
+   "neutral": true,
+   "wet": false
+  },
+  {
+   "lap": 3,
+   "slowing": null,
+   "gap": 0.804,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 4,
+   "slowing": null,
+   "gap": 0.817,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 5,
+   "slowing": 0.0277,
+   "gap": 0.936,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 6,
+   "slowing": 0.0191,
+   "gap": 1.08,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 7,
+   "slowing": 0.0186,
+   "gap": 1.146,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 8,
+   "slowing": 0.0153,
+   "gap": 1.369,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 9,
+   "slowing": 0.013,
+   "gap": 1.599,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 10,
+   "slowing": 0.0153,
+   "gap": 1.427,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 11,
+   "slowing": 0.0126,
+   "gap": 1.433,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 12,
+   "slowing": 0.0092,
+   "gap": 1.579,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 13,
+   "slowing": 0.0125,
+   "gap": 1.658,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 14,
+   "slowing": 0.0146,
+   "gap": 1.809,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 15,
+   "slowing": 0.0081,
+   "gap": 1.76,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 16,
+   "slowing": 0.0069,
+   "gap": 2.339,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 17,
+   "slowing": 0.0061,
+   "gap": 1.782,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 18,
+   "slowing": 0.008,
+   "gap": 1.928,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 19,
+   "slowing": 0.0095,
+   "gap": 1.686,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 20,
+   "slowing": 0.0089,
+   "gap": 1.631,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 21,
+   "slowing": 0.0038,
+   "gap": 2.031,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 22,
+   "slowing": 0.006,
+   "gap": 2.23,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 23,
+   "slowing": 0.0007,
+   "gap": 3.402,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 24,
+   "slowing": 0.0016,
+   "gap": 3.031,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 25,
+   "slowing": 0.0002,
+   "gap": 3.487,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 26,
+   "slowing": -0.0001,
+   "gap": 2.656,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 27,
+   "slowing": 0.0027,
+   "gap": 3.116,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 28,
+   "slowing": 0.0022,
+   "gap": 3.434,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 29,
+   "slowing": 0.0043,
+   "gap": 3.71,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 30,
+   "slowing": 0.007,
+   "gap": 4.269,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 31,
+   "slowing": 0.0038,
+   "gap": 4.727,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 32,
+   "slowing": 0.0077,
+   "gap": 3.986,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 33,
+   "slowing": 0.0072,
+   "gap": 4.331,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 34,
+   "slowing": 0.0043,
+   "gap": 4.041,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 35,
+   "slowing": 0.0033,
+   "gap": 4.208,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 36,
+   "slowing": 0.0021,
+   "gap": 5.177,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 37,
+   "slowing": 0.0051,
+   "gap": 6.596,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 38,
+   "slowing": 0.0038,
+   "gap": 4.851,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 39,
+   "slowing": 0.0049,
+   "gap": 1.437,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 40,
+   "slowing": 0.0042,
+   "gap": 4.466,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 41,
+   "slowing": 0.0048,
+   "gap": 3.756,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 42,
+   "slowing": 0.0028,
+   "gap": 4.239,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 43,
+   "slowing": 0.0029,
+   "gap": 4.839,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 44,
+   "slowing": 0.0034,
+   "gap": 4.669,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 45,
+   "slowing": 0.0059,
+   "gap": 4.521,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 46,
+   "slowing": 0.0077,
+   "gap": 4.003,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 47,
+   "slowing": 0.0064,
+   "gap": 3.281,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 48,
+   "slowing": 0.0067,
+   "gap": 4.084,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 49,
+   "slowing": 0.0095,
+   "gap": 3.978,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 50,
+   "slowing": 0.0072,
+   "gap": 3.989,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 51,
+   "slowing": 0.0067,
+   "gap": 5.275,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 52,
+   "slowing": 0.0095,
+   "gap": 3.611,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 53,
+   "slowing": 0.0093,
+   "gap": 2.304,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 54,
+   "slowing": 0.0065,
+   "gap": 3.412,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 55,
+   "slowing": 0.009,
+   "gap": 3.688,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 56,
+   "slowing": 0.0101,
+   "gap": 4.007,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 57,
+   "slowing": 0.0096,
+   "gap": 4.598,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 58,
+   "slowing": 0.0091,
+   "gap": 5.355,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 59,
+   "slowing": 0.0085,
+   "gap": 6.197,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 60,
+   "slowing": 0.011,
+   "gap": 6.36,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 61,
+   "slowing": 0.0117,
+   "gap": 6.676,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 62,
+   "slowing": 0.0098,
+   "gap": 6.859,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 63,
+   "slowing": 0.015,
+   "gap": 4.06,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 64,
+   "slowing": 0.016,
+   "gap": 3.841,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 65,
+   "slowing": 0.0161,
+   "gap": 3.704,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 66,
+   "slowing": 0.0166,
+   "gap": 3.671,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 67,
+   "slowing": 0.0173,
+   "gap": 3.658,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 68,
+   "slowing": 0.0172,
+   "gap": 3.372,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 69,
+   "slowing": 0.0194,
+   "gap": 2.315,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 70,
+   "slowing": 0.0243,
+   "gap": 1.859,
+   "neutral": false,
+   "wet": false
+  }
+ ]
+}

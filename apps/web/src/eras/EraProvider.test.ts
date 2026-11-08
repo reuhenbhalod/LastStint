@@ -5,6 +5,12 @@ import type { AttemptRequest, ErasApi } from './api.js';
 import { ERAS, racesOfEra } from './catalog.js';
 import { mockCanStart, mockErasApi } from './mockErasApi.js';
 
+// An Eras race with no race file in this build (the races get files as they're built, so
+// the example is looked up, not named).
+const NO_FILE = ERAS.flatMap((e) => racesOfEra(e.id))
+  .map((r) => r.raceId)
+  .find((id) => !mockCanStart(id)) as string;
+
 /** A race the mock can start: it has a bundled race file. */
 const MOCK_RACE_ID = 'abu-dhabi-2021';
 
@@ -101,8 +107,8 @@ describe('EraProvider', () => {
   });
 
   it('passes on a refused attempt', async () => {
-    await expect(new EraProvider('monaco-2022', false, mockErasApi).today()).rejects.toThrow(
-      'no race file for monaco-2022 in this build yet',
+    await expect(new EraProvider(NO_FILE, false, mockErasApi).today()).rejects.toThrow(
+      `no race file for ${NO_FILE} in this build yet`,
     );
     await expect(new EraProvider('abu-dhabi-2024', false, mockErasApi).today()).rejects.toThrow(
       /not an Eras race/,
@@ -136,7 +142,7 @@ describe('mockErasApi', () => {
     expect(await reconstructed(9)).toEqual([]);
     await expect(mockErasApi.era(42)).rejects.toThrow(/no era/);
     await expect(mockErasApi.loadModel('https://x/y')).rejects.toThrow(/no model/);
-    await expect(mockErasApi.loadModel('mock://races/monaco-2022')).rejects.toThrow(/no model/);
+    await expect(mockErasApi.loadModel(`mock://races/${NO_FILE}`)).rejects.toThrow(/no model/);
   });
 
   it('starts attempts only on races with a bundled race file, each loading its own race', async () => {
@@ -144,7 +150,7 @@ describe('mockErasApi', () => {
       .map((r) => r.raceId)
       .filter(mockCanStart);
     expect(startable).toContain(MOCK_RACE_ID);
-    expect(startable).not.toContain('monaco-2022');
+    expect(startable).not.toContain(NO_FILE);
     for (const raceId of startable) {
       const daily = await new EraProvider(raceId, false, mockErasApi).today();
       expect(daily.model.race.id).toBe(raceId);

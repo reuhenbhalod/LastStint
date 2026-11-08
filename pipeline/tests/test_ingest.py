@@ -104,6 +104,42 @@ def test_ingest_backs_off_on_rate_limit(monkeypatch, tmp_path):
     ]
 
 
+def test_offline_ingest_reads_the_cache_only_and_skips_what_it_lacks(monkeypatch, tmp_path):
+    # Hungary 2021's FastF1 cache holds the timing but not race control or the weather: an
+    # offline ingest writes the snapshot and status, and no red-flag or weather file.
+    from fastf1.exceptions import DataNotLoadedError
+
+    good = _snapshot("abu-dhabi-2021").copy()
+    # A red flag, so the ingest looks for race control.
+    good.loc[good.index[0], "TrackStatus"] = ingest.RED_FLAG
+    seen = {}
+
+    class CachedSession:
+        laps = good
+        track_status = pd.DataFrame({"Time": pd.to_timedelta([0.0], unit="s"), "Status": ["1"]})
+
+        def __getattr__(self, name):
+            if name in ("race_control_messages", "weather_data"):
+                raise DataNotLoadedError(name)
+            raise AttributeError(name)
+
+    def fake_load(year, event, cache_dir, offline=False):
+        seen["offline"] = offline
+        return CachedSession()
+
+    monkeypatch.setattr(ingest, "load_race", fake_load)
+    monkeypatch.setattr(ingest, "project_laps", lambda laps: laps)
+    monkeypatch.setattr(ingest, "race_facts", lambda s: {"totalLaps": 58})
+    ingest.ingest_race("x-2021", 2021, "X", raw_dir=tmp_path, offline=True)
+    assert seen == {"offline": True}
+    assert (tmp_path / "x-2021.parquet").exists()
+    assert ingest.load_track_status("x-2021", tmp_path) == [{"time": 0.0, "status": "1"}]
+    assert not (tmp_path / "x-2021.weather.json").exists()
+    assert not (tmp_path / "x-2021.redflags.json").exists()
+    assert ingest.loaded(CachedSession(), "weather_data") is None
+    assert ingest.loaded(CachedSession(), "laps") is good
+
+
 def test_load_credentials_reads_env_file_without_overriding(tmp_path, monkeypatch):
     env = tmp_path / ".env"
     env.write_text("F1_USERNAME=someone@example.com\nF1_PASSWORD='p#ss'\n")
