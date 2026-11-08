@@ -758,6 +758,15 @@
  "monaco-1988": [],
  "europe-1997": [
   {
+   "lap": 67,
+   "type": "TEAM_ORDER",
+   "driver": "COU",
+   "passer": "HAK",
+   "detail": "McLaren's order: Coulthard gave second place back to Häkkinen, who then took the win when Villeneuve let both McLarens by on the last lap",
+   "source": "https://en.wikipedia.org/wiki/1997_European_Grand_Prix",
+   "note": "The article gives no lap: on the last lap Villeneuve 'had been caught by both McLarens, Häkkinen having regained second place from Coulthard under team orders'. The timing (Jolpica) has COU ahead of HAK at every lap end from 48 to 66 and HAK ahead from the end of lap 67"
+  },
+  {
    "lap": 69,
    "type": "TEAM_ORDER",
    "driver": "VIL",

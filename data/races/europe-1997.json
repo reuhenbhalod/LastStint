@@ -898,6 +898,12 @@
       "driver": "HIL"
     },
     {
+      "lap": 67,
+      "type": "TEAM_ORDER",
+      "driver": "COU",
+      "other": "HAK"
+    },
+    {
       "lap": 69,
       "type": "TEAM_ORDER",
       "driver": "VIL",
