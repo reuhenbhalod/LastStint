@@ -205,19 +205,17 @@ export function PlanEditor({
 }
 
 /**
- * True if the plan runs two dry compounds by the flag (or the car already has), or the race
- * has no such rule (`rules.twoCompound` false: before 2007). The sim's `ruleSatisfied` on the
- * dry compounds the plan runs (a dry placeholder as the car's tyre, so a wet tyre fitted now
- * doesn't waive it here, as before).
+ * True if the plan runs two dry compounds by the flag (or the car already has), the car runs a
+ * wet tyre at any point (already, on it now, or in the plan: wet tyres waive the rule), or the
+ * race has no such rule (`rules.twoCompound` false: before 2007). The sim's `ruleSatisfied` on
+ * every compound the car runs to the flag (a dry placeholder as its tyre: `used` holds it).
  */
 export function twoCompounds(
   car: { compound: string; compoundsUsed: string[] },
   plan: RacePlan,
   rules?: RaceModel['rules'],
 ) {
-  const used = [...car.compoundsUsed, car.compound, ...plan.stops.map((s) => s.compound)].filter(
-    (c) => DRY.includes(c),
-  );
+  const used = [...car.compoundsUsed, car.compound, ...plan.stops.map((s) => s.compound)];
   return ruleSatisfied({ compound: DRY[0], compoundsUsed: used } as CarState, rules);
 }
 

@@ -79,7 +79,7 @@ def min_stops(model: dict) -> int:
 
 
 def stops_before_takeover(driver: dict) -> int:
-    """Stops a car made before the takeover: one per dry compound beyond its first (a lower
+    """Stops a car made before the takeover: one per compound beyond its first (a lower
     bound, exact when each early stop changed compound). Mirrors rules.ts stopsBeforeTakeover."""
     return max(0, len(driver["stateAtTakeover"].get("compoundsUsed") or []) - 1)
 

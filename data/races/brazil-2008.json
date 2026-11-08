@@ -117,7 +117,9 @@
         "gapAhead": 0.897,
         "compound": "INTERMEDIATE",
         "tyreAge": 8,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "INTERMEDIATE"
+        ]
       },
       "realStrategy": [
         {
@@ -148,7 +150,9 @@
         "gapAhead": 0.636,
         "compound": "INTERMEDIATE",
         "tyreAge": 8,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "INTERMEDIATE"
+        ]
       },
       "realStrategy": [
         {
@@ -184,7 +188,9 @@
         "gapAhead": 2.637,
         "compound": "INTERMEDIATE",
         "tyreAge": 8,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "INTERMEDIATE"
+        ]
       },
       "realStrategy": [
         {
@@ -216,7 +222,8 @@
         "compound": "HARD",
         "tyreAge": 1,
         "compoundsUsed": [
-          "HARD"
+          "HARD",
+          "INTERMEDIATE"
         ]
       },
       "realStrategy": [
@@ -282,7 +289,9 @@
         "gapAhead": 1.689,
         "compound": "INTERMEDIATE",
         "tyreAge": 8,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "INTERMEDIATE"
+        ]
       },
       "realStrategy": [
         {
@@ -308,7 +317,9 @@
         "gapAhead": 1.375,
         "compound": "INTERMEDIATE",
         "tyreAge": 8,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "INTERMEDIATE"
+        ]
       },
       "realStrategy": [
         {
@@ -339,7 +350,9 @@
         "gapAhead": 2.442,
         "compound": "INTERMEDIATE",
         "tyreAge": 8,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "INTERMEDIATE"
+        ]
       },
       "realStrategy": [
         {
@@ -370,7 +383,9 @@
         "gapAhead": 2.795,
         "compound": "INTERMEDIATE",
         "tyreAge": 8,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "INTERMEDIATE"
+        ]
       },
       "realStrategy": [
         {
@@ -401,7 +416,9 @@
         "gapAhead": 6.141,
         "compound": "INTERMEDIATE",
         "tyreAge": 8,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "INTERMEDIATE"
+        ]
       },
       "realStrategy": [
         {
@@ -432,7 +449,9 @@
         "gapAhead": 0.0,
         "compound": "INTERMEDIATE",
         "tyreAge": 8,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "INTERMEDIATE"
+        ]
       },
       "realStrategy": [
         {
@@ -463,7 +482,9 @@
         "gapAhead": 2.039,
         "compound": "INTERMEDIATE",
         "tyreAge": 8,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "INTERMEDIATE"
+        ]
       },
       "realStrategy": [
         {
@@ -494,7 +515,9 @@
         "gapAhead": 0.252,
         "compound": "INTERMEDIATE",
         "tyreAge": 8,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "INTERMEDIATE"
+        ]
       },
       "realStrategy": [
         {
@@ -526,7 +549,8 @@
         "compound": "HARD",
         "tyreAge": 1,
         "compoundsUsed": [
-          "HARD"
+          "HARD",
+          "INTERMEDIATE"
         ]
       },
       "realStrategy": [
@@ -558,7 +582,9 @@
         "gapAhead": 2.2,
         "compound": "INTERMEDIATE",
         "tyreAge": 8,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "INTERMEDIATE"
+        ]
       },
       "realStrategy": [
         {
@@ -589,7 +615,9 @@
         "gapAhead": 2.192,
         "compound": "INTERMEDIATE",
         "tyreAge": 8,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "INTERMEDIATE"
+        ]
       },
       "realStrategy": [
         {
@@ -615,7 +643,9 @@
         "gapAhead": 1.301,
         "compound": "INTERMEDIATE",
         "tyreAge": 8,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "INTERMEDIATE"
+        ]
       },
       "realStrategy": [
         {
@@ -651,7 +681,9 @@
         "gapAhead": 1.266,
         "compound": "INTERMEDIATE",
         "tyreAge": 8,
-        "compoundsUsed": []
+        "compoundsUsed": [
+          "INTERMEDIATE"
+        ]
       },
       "realStrategy": [
         {

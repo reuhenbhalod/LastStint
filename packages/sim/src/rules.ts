@@ -202,6 +202,23 @@ export function twoCompoundRule(rules: RaceRules | undefined): boolean {
   return rules?.twoCompound !== false;
 }
 
+const KNOWN_TYRES: readonly Compound[] = ['SOFT', 'MEDIUM', 'HARD', 'INTERMEDIATE', 'WET'];
+
+/**
+ * A car's compounds used at the takeover (CarState.compoundsUsed's start): the race file's
+ * `compoundsUsed` plus the tyre the car is on. A car on intermediates or wets at the takeover
+ * has run a wet tyre, which waives the two-compound rule (sim.ts ruleSatisfied) after it
+ * switches to slicks; a race file built before the pipeline listed wet tyres
+ * (scenario.state_at_takeover) has only the dry ones.
+ */
+export function takeoverCompoundsUsed(state: DriverModel['stateAtTakeover']): Compound[] {
+  const used = [...(state.compoundsUsed ?? [])];
+  if (KNOWN_TYRES.includes(state.compound) && !used.includes(state.compound)) {
+    used.push(state.compound);
+  }
+  return used;
+}
+
 /**
  * True if a stop from `from` onto `stop.to` fits new tyres. With `tyreChanges: false` (2005) a
  * stop keeps the set unless the set is damaged (a puncture's stop) or the change is for the
@@ -236,7 +253,7 @@ export function minStopsRule(rules: RaceRules | undefined): number {
 }
 
 /**
- * Stops a car made before the takeover: one per dry compound it ran beyond its first (the race
+ * Stops a car made before the takeover: one per compound it ran beyond its first (the race
  * file keeps the compounds, not the stops). A lower bound, exact when every early stop changed
  * compound: Monaco 2025's (checked against its FastF1 stints).
  */

@@ -65,7 +65,8 @@
         "compound": "WET",
         "tyreAge": 22,
         "compoundsUsed": [
-          "MEDIUM"
+          "MEDIUM",
+          "WET"
         ]
       },
       "realStrategy": [
@@ -162,7 +163,8 @@
         "compound": "WET",
         "tyreAge": 19,
         "compoundsUsed": [
-          "MEDIUM"
+          "MEDIUM",
+          "WET"
         ]
       },
       "realStrategy": [
@@ -219,7 +221,8 @@
         "compound": "WET",
         "tyreAge": 24,
         "compoundsUsed": [
-          "MEDIUM"
+          "MEDIUM",
+          "WET"
         ]
       },
       "realStrategy": [
@@ -276,7 +279,8 @@
         "compound": "WET",
         "tyreAge": 23,
         "compoundsUsed": [
-          "MEDIUM"
+          "MEDIUM",
+          "WET"
         ]
       },
       "realStrategy": [
@@ -316,7 +320,8 @@
         "compound": "WET",
         "tyreAge": 21,
         "compoundsUsed": [
-          "MEDIUM"
+          "MEDIUM",
+          "WET"
         ]
       },
       "realStrategy": [
@@ -339,7 +344,8 @@
         "compound": "WET",
         "tyreAge": 11,
         "compoundsUsed": [
-          "MEDIUM"
+          "MEDIUM",
+          "WET"
         ]
       },
       "realStrategy": [

@@ -419,6 +419,7 @@
         "compound": "MEDIUM",
         "tyreAge": 3,
         "compoundsUsed": [
+          "INTERMEDIATE",
           "MEDIUM"
         ]
       },

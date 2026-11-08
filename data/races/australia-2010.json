@@ -87,6 +87,7 @@
         "compound": "SOFT",
         "tyreAge": 17,
         "compoundsUsed": [
+          "INTERMEDIATE",
           "SOFT"
         ]
       },
@@ -110,7 +111,8 @@
         "compound": "HARD",
         "tyreAge": 18,
         "compoundsUsed": [
-          "HARD"
+          "HARD",
+          "INTERMEDIATE"
         ]
       },
       "realStrategy": []
@@ -127,7 +129,8 @@
         "compound": "HARD",
         "tyreAge": 18,
         "compoundsUsed": [
-          "HARD"
+          "HARD",
+          "INTERMEDIATE"
         ]
       },
       "realStrategy": [
@@ -150,7 +153,8 @@
         "compound": "HARD",
         "tyreAge": 20,
         "compoundsUsed": [
-          "HARD"
+          "HARD",
+          "INTERMEDIATE"
         ]
       },
       "realStrategy": []
@@ -167,7 +171,8 @@
         "compound": "HARD",
         "tyreAge": 18,
         "compoundsUsed": [
-          "HARD"
+          "HARD",
+          "INTERMEDIATE"
         ]
       },
       "realStrategy": [
@@ -214,7 +219,8 @@
         "compound": "HARD",
         "tyreAge": 18,
         "compoundsUsed": [
-          "HARD"
+          "HARD",
+          "INTERMEDIATE"
         ]
       },
       "realStrategy": []
@@ -231,7 +237,8 @@
         "compound": "HARD",
         "tyreAge": 17,
         "compoundsUsed": [
-          "HARD"
+          "HARD",
+          "INTERMEDIATE"
         ]
       },
       "realStrategy": []
@@ -248,6 +255,7 @@
         "compound": "SOFT",
         "tyreAge": 18,
         "compoundsUsed": [
+          "INTERMEDIATE",
           "SOFT"
         ]
       },
@@ -271,7 +279,8 @@
         "compound": "HARD",
         "tyreAge": 18,
         "compoundsUsed": [
-          "HARD"
+          "HARD",
+          "INTERMEDIATE"
         ]
       },
       "realStrategy": []
@@ -288,7 +297,8 @@
         "compound": "HARD",
         "tyreAge": 18,
         "compoundsUsed": [
-          "HARD"
+          "HARD",
+          "INTERMEDIATE"
         ]
       },
       "realStrategy": []
@@ -305,7 +315,8 @@
         "compound": "HARD",
         "tyreAge": 17,
         "compoundsUsed": [
-          "HARD"
+          "HARD",
+          "INTERMEDIATE"
         ]
       },
       "realStrategy": []
@@ -322,7 +333,8 @@
         "compound": "HARD",
         "tyreAge": 18,
         "compoundsUsed": [
-          "HARD"
+          "HARD",
+          "INTERMEDIATE"
         ]
       },
       "realStrategy": []
@@ -339,6 +351,7 @@
         "compound": "SOFT",
         "tyreAge": 18,
         "compoundsUsed": [
+          "INTERMEDIATE",
           "SOFT"
         ]
       },
@@ -362,7 +375,8 @@
         "compound": "HARD",
         "tyreAge": 18,
         "compoundsUsed": [
-          "HARD"
+          "HARD",
+          "INTERMEDIATE"
         ]
       },
       "realStrategy": [
