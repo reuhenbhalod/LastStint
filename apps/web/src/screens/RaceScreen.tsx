@@ -649,11 +649,16 @@ export function RaceScreen({
     />
   );
 
-  // On a phone the leaders step aside (and the map takes the width) while anything opens under it.
-  const tight = dockOpen || callUp || !!selected;
+  // The car you tapped: its card floats over the map's bottom-left corner (the map keeps its
+  // size). A call under the map, or the chequered flag, comes first: the card waits for it.
+  const cardShown = !!driverCard && !callUp && !(finishing && crossed);
+
+  // On a phone the leaders step aside (and the map takes the width) while anything opens under
+  // it, or the driver card is over it.
+  const tight = dockOpen || callUp || cardShown;
 
   // The call, one at a time, under the map: the plan, the big decision, a quick call. With
-  // none up, the chequered flag or the car you tapped.
+  // none up, the chequered flag.
   const call = planning ? (
     <PlanCard state={state} model={model} onBuild={game.buildPlan} onPick={game.pickPlan} />
   ) : paused && state.currentMoment ? (
@@ -719,9 +724,7 @@ export function RaceScreen({
         Chequered flag · {surname(userSide)} P{finishPos}
       </span>
     </output>
-  ) : (
-    driverCard
-  );
+  ) : null;
   const callKey = planning
     ? 'plan'
     : paused && state.currentMoment
@@ -963,6 +966,11 @@ export function RaceScreen({
                   </p>
                 )}
               </div>
+              {cardShown && (
+                <div className="bc-slide absolute bottom-2 left-2 z-20 md:bottom-3 md:left-3">
+                  {driverCard}
+                </div>
+              )}
             </div>
           </div>
 
