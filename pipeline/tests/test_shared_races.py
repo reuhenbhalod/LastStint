@@ -15,7 +15,7 @@ from pathlib import Path
 
 import pytest
 
-from pipeline import build, export, paths
+from pipeline import build, export, paths, restart
 
 VECTORS = Path(__file__).parent / "fixtures" / "eras_overlay_parity.json"
 # The races in both Eras and a Daily/Gauntlet pool (data/pools.json, Nov 7 2026).
@@ -70,8 +70,9 @@ def test_a_shared_race_builds_without_its_overlay(tmp_path):
     alone = build.build_race("abu-dhabi-2021", eras_dir=tmp_path, pools_path=pools)
     assert alone.model["rules"] == {"vsc": True} and alone.model["eras"]["eraId"] == 1
     assert alone.estimates[0] == "overlay: eras, provenance, rules, storylineEvents"
-    # An Eras build: the SC restart block too (Eras model fixes M4).
-    assert alone.estimates[1:] == ["SC restart: jump 0.15s, spread 0.44s a place (to P9)"]
+    # An Eras build: the SC restart block too, while its switch is on (Eras model fixes M4).
+    restart_line = ["SC restart: jump 0.15s, spread 0.44s a place (to P9)"]
+    assert alone.estimates[1:] == (restart_line if restart.IN_ERAS_BUILDS else [])
 
 
 def test_a_shared_race_with_estimates_refuses_an_overlay_provenance(tmp_path, monkeypatch):
@@ -209,7 +210,8 @@ def test_overlay_moments_replace_the_files_and_a_pool_build_ignores_them(tmp_pat
     alone = build.build_race("abu-dhabi-2021", eras_dir=tmp_path, pools_path=pools)
     assert alone.model["decisionMoments"] == moments
     assert alone.model["userSide"] == "VER"
-    assert alone.estimates == ["overlay: eras, decisionMoments"]
+    # The overlay line first; an Eras build may add the SC restart line (restart.py).
+    assert alone.estimates[0] == "overlay: eras, decisionMoments"
 
 
 def test_merge_leaves_the_race_file_and_other_keys_alone():

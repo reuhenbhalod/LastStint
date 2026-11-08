@@ -80,11 +80,6 @@
       "refFill": 19.824,
       "tankLaps": 43,
       "stops": 51
-    },
-    "restart": {
-      "jump": 0.15,
-      "spread": 0.44,
-      "places": 8
     }
   },
   "compounds": {

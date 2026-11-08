@@ -14,17 +14,44 @@
 // Pace by stint (Eras model fix M2, DriverModel.stintPace): the player's car runs at 0 in live
 // play (its effort is the pace modes'), while a replay runs it at its real stints' offsets. So
 // live play with the real calls is compared with the replay of the race less the user's offsets.
+//
+// Scripted events (Eras model fixes M4): the real calls include complying with a TEAM_ORDER to
+// the player's car (a `team-order` note, as the replay's swap). A storyline retirement on a
+// passive condition (tyre age, pressure) comes back on its lap with the real calls (a
+// `storyline` note); one whose real call is a standing mode (it changes the car's pace) or the
+// fuel model's can't replay exactly, so those races are left to tests/scripted.test.ts.
 
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { type Run, initRun, isFinished, realDecisions, stepLap } from '../src/sim.js';
-import type { RaceModel, RefuelModel } from '../src/types.js';
+import type { Decision, RaceModel, RefuelModel } from '../src/types.js';
 
 const dir = join(__dirname, '..', '..', '..', 'data', 'races');
 const races = readdirSync(dir).filter((f) => f.endsWith('.json'));
 
 const load = (file: string) => JSON.parse(readFileSync(join(dir, file), 'utf8')) as RaceModel;
+
+/** A race whose player's storyline retirement needs a call that changes the car's pace (a
+ * standing mode) or is left to the fuel model: live play can't replay it exactly. */
+const activeStoryline = (model: RaceModel) =>
+  (model.eras?.storylineRetirements ?? []).some(
+    (r) =>
+      r.driver === model.userSide && (r.condition.type === 'fuel' || r.condition.type === 'mode'),
+  );
+const replayable = races.filter((f) => !activeStoryline(load(f)));
+
+/** The real calls: the real stops, plus complying with each team order to the player's car. */
+function realCalls(model: RaceModel): Decision[] {
+  const calls: Decision[] = [...realDecisions(model)];
+  const orderLaps = new Set(
+    model.events
+      .filter((e) => e.type === 'TEAM_ORDER' && e.driver === model.userSide)
+      .map((e) => e.lap),
+  );
+  for (const lap of orderLaps) calls.push({ lap, kind: 'teamOrder', order: 'comply' });
+  return calls.sort((a, b) => a.lap - b.lap);
+}
 
 /** The race with the user's stint offsets removed (live play runs the player's car at 0). */
 function withoutUserStintPace(model: RaceModel): RaceModel {
@@ -50,7 +77,7 @@ function realCallsReplay(model: RaceModel): { live: Run; replay: Run } {
       )
       .map((s) => s.lap - 1),
   );
-  const calls = realDecisions(model).filter((d) => !skipped.has(d.lap));
+  const calls = realCalls(model).filter((d) => d.kind !== 'pit' || !skipped.has(d.lap));
   const live = initRun(model, model.race.seed, { decisions: calls, incidents: false });
   while (!isFinished(live)) stepLap(live);
   const rival = model.drivers.find((d) => d.code === model.rival);
@@ -67,12 +94,15 @@ function realCallsReplay(model: RaceModel): { live: Run; replay: Run } {
   // A real car fault (step 4.4) is a frozen event: its note comes in the replay too.
   const frozen = (run: typeof live) => run.notes.filter((n) => n.kind === 'fault');
   expect(frozen(live)).toEqual(frozen(replay));
-  expect(live.notes.filter((n) => n.kind !== 'fault')).toEqual([]);
+  // A storyline retirement on the real call, and a complied team order, as in the replay.
+  const retired = (n: (typeof live.notes)[number]) =>
+    (n.kind === 'storyline' && n.detail === 'retired') || n.kind === 'team-order';
+  expect(live.notes.filter((n) => n.kind !== 'fault' && !retired(n))).toEqual([]);
   return { live, replay };
 }
 
 describe('live play with the real calls', () => {
-  it.each(races)('%s matches the replay exactly', (file) => {
+  it.each(replayable)('%s matches the replay exactly', (file) => {
     realCallsReplay(load(file));
   });
 });
@@ -86,11 +116,11 @@ describe('live play with the real calls in a refuelling race', () => {
     rules: { ...model.rules, refuelling: true },
     track: { ...model.track, ...(refuel ? { refuel } : {}) },
   });
-  it.each(races)('%s matches the replay exactly, with no car running dry', (file) => {
+  it.each(replayable)('%s matches the replay exactly, with no car running dry', (file) => {
     for (const model of [retag(load(file), FIT), retag(load(file))]) {
-      const calls = realDecisions(model);
+      const calls = realCalls(model);
       // Every real call states its fill: the real next stint.
-      for (const d of calls) expect(d.kind === 'pit' && d.fill).toBeTruthy();
+      for (const d of calls) if (d.kind === 'pit') expect(d.fill).toBeTruthy();
       // The low point of every car's tank, lap by lap, in the live run (which matches the
       // replay's times exactly, checked inside).
       const live = initRun(model, model.race.seed, { decisions: calls, incidents: false });

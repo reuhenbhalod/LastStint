@@ -15,6 +15,7 @@
     "races": "tsx scripts/races.ts",
     "schedule": "tsx scripts/schedule.ts",
     "reverify": "tsx scripts/reverify.ts",
+    "reachability:shared": "tsx scripts/reachability-shared.ts",
     "predev": "tsx scripts/races.ts",
     "predeploy": "tsx scripts/races.ts",
     "smoke": "tsx scripts/smoke.ts",

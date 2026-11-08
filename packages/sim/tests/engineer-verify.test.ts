@@ -30,8 +30,7 @@ describe('race engineer runs verify on every race', () => {
     // race whose eras rules turn DRS off).
     const headset = headsetFor(headsetConfig as unknown as Record<string, RuleSwitchable>, model);
     const attack = ATTACK.filter(
-      (m) =>
-        (!headset || hasMove(headset, m)) && !(m === 'wait-drs' && model.rules?.drs === false),
+      (m) => (!headset || hasMove(headset, m)) && !(m === 'wait-drs' && model.rules?.drs === false),
     );
     let k = 0;
     const between = (run: Run) => {

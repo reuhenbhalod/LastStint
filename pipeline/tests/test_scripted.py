@@ -210,18 +210,23 @@ def test_storyline_check():
 # --- the build ------------------------------------------------------------------------------
 
 
-def test_scripted_blocks():
+@pytest.mark.parametrize("switch", [True, False])
+def test_scripted_blocks(switch, monkeypatch):
+    monkeypatch.setattr(restart, "IN_ERAS_BUILDS", switch)
     model = _abu()
     facts = [{"lap": 45, "type": "TEAM_ORDER", "driver": "BOT", "passer": "HAM", "source": SOURCE}]
     recon = {"lastLapStops": [{"driver": "VER"}, {"driver": "LAT"}]}
     out, lines = build.scripted_blocks(model, "abu-dhabi-2021", recon, facts)
-    assert out["track"]["restart"] == restart.track_block()
+    if switch:
+        assert out["track"]["restart"] == restart.track_block()
+    else:
+        assert "restart" not in out["track"]
     assert {"lap": 45, "type": "TEAM_ORDER", "driver": "BOT", "other": "HAM"} in out["events"]
     # VER gets a last-lap retirement; LAT already has his.
     assert {"lap": 58, "type": "RETIREMENT", "driver": "VER"} in out["events"]
     assert sum(e.get("driver") == "LAT" for e in out["events"]) == 1
     assert out["events"] == sorted(out["events"], key=lambda e: (e["lap"], e["type"]))
-    assert len(lines) == 3
+    assert len(lines) == (3 if switch else 2)
     export.validate_model(out)
     assert "restart" not in model["track"]  # the input is left alone
 

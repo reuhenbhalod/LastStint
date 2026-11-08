@@ -76,11 +76,6 @@
       "refFill": 12.947,
       "tankLaps": 30,
       "stops": 57
-    },
-    "restart": {
-      "jump": 0.15,
-      "spread": 0.44,
-      "places": 8
     }
   },
   "compounds": {

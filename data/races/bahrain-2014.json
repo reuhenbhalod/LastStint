@@ -65,12 +65,7 @@
     },
     "dirtyAirPenalty": 0.1472,
     "greenLapTime": 101.828,
-    "scLapTime": 123.587,
-    "restart": {
-      "jump": 0.15,
-      "spread": 0.44,
-      "places": 8
-    }
+    "scLapTime": 123.587
   },
   "compounds": {
     "SOFT": {

@@ -19,6 +19,11 @@ type Golden = Record<
 >;
 const golden = goldenJson as unknown as Golden;
 const spain = spainJson as unknown as RaceModel;
+/** Spain 2021 with no pace by stint (the rebuilt file carries its own fitted offsets). */
+const bare: RaceModel = {
+  ...spain,
+  drivers: spain.drivers.map(({ stintPace: _, ...d }) => d),
+};
 
 /** make_stint_pace_fixture.py STINT_PACE and DIVERGED. */
 const STINT_PACE: Record<string, StintPace[]> = {
@@ -78,12 +83,12 @@ describe('pace by stint', () => {
     expect(stintOffset(model, 'VER', 25)).toBe(-0.2);
     expect(stintOffset(model, 'VER', 26)).toBe(0);
     expect(stintOffset(model, 'OCO', 0)).toBe(0);
-    expect(stintOffset(spain, 'VER', 0)).toBe(0);
+    expect(stintOffset(bare, 'VER', 0)).toBe(0);
   });
 
   it('a race with no stintPace replays exactly as before', () => {
-    const zero = withStintPace(spain, { VER: [], HAM: [] });
-    for (const seed of [1, 2, 3]) expect(simulate(zero, seed)).toEqual(simulate(spain, seed));
+    const zero = withStintPace(bare, { VER: [], HAM: [] });
+    for (const seed of [1, 2, 3]) expect(simulate(zero, seed)).toEqual(simulate(bare, seed));
   });
 
   it('an offset runs only while its stint does: a stint begun on another lap runs at 0', () => {

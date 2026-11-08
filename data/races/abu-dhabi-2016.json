@@ -59,12 +59,7 @@
       "trainCoef": -0.9007
     },
     "dirtyAirPenalty": 0.4256,
-    "greenLapTime": 107.135,
-    "restart": {
-      "jump": 0.15,
-      "spread": 0.44,
-      "places": 8
-    }
+    "greenLapTime": 107.135
   },
   "compounds": {
     "SOFT": {

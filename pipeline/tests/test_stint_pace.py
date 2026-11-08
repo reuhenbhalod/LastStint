@@ -101,11 +101,13 @@ def _model() -> dict:
 
 def test_no_stint_pace_replays_as_before():
     model = _model()
-    zero = copy.deepcopy(model)
+    none, zero = copy.deepcopy(model), copy.deepcopy(model)
+    for d in none["drivers"]:
+        d.pop("stintPace", None)
     for d in zero["drivers"]:
         d["stintPace"] = []
     for seed in (1, 2, 3):
-        assert sim_reference.simulate(zero, seed) == sim_reference.simulate(model, seed)
+        assert sim_reference.simulate(zero, seed) == sim_reference.simulate(none, seed)
 
 
 def test_an_offset_applies_only_while_its_stint_runs():

@@ -30,12 +30,7 @@
       "gapCoef": -1.1948
     },
     "dirtyAirPenalty": 0.0,
-    "greenLapTime": 80.618,
-    "restart": {
-      "jump": 0.15,
-      "spread": 0.44,
-      "places": 8
-    }
+    "greenLapTime": 80.618
   },
   "compounds": {
     "MEDIUM": {

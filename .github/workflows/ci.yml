@@ -54,6 +54,10 @@ jobs:
       # hidden objective (era difficulty and Legend), and staying out every time can't earn ★3.
       - name: Eras reachability
         run: pnpm --filter @laststint/sim reachability
+      # The shared races' eras blocks live in their overlays (their Daily files are pinned):
+      # check them on the merged model the Eras API serves.
+      - name: Eras reachability (shared races)
+        run: pnpm --filter @laststint/worker reachability:shared
 
   # Parity (Gate G2): the committed race models and golden files must be exactly what the
   # Python pipeline produces from the committed snapshots, and the TS sim must reproduce them.

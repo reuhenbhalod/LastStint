@@ -55,7 +55,9 @@ SPREAD = 0.44
 PLACES = 8
 # Eras builds write `track.restart` (build.scripted_blocks). One switch, since G1 at the flag
 # moves both ways under it (docs/g1-report.md, Eras model fixes M4): False builds without it.
-IN_ERAS_BUILDS = True
+# Off since integration 6 (docs/eras-races-report.md): robust G1 over the 71 timed non-pool
+# Eras races gives 17 passes and 346.5 s of mean gap error with it off, 16 and 354.4 s on.
+IN_ERAS_BUILDS = False
 FIT_PLACES = 10
 HUBER_DELTA = 2.0
 MIN_CARS = 6
