@@ -33,15 +33,16 @@ const RACE_FILES = import.meta.glob<{ default: RaceModel }>('../../../../data/ra
 const raceFile = (raceId: string) => RACE_FILES[`../../../../data/races/${raceId}.json`];
 const MODEL_URL = /^mock:\/\/races\/([a-z0-9-]+)$/;
 
-// The authored Eras blocks (data/eras overlays), for which races have a rewrite to collect.
-const ERAS_BLOCKS = import.meta.glob<RaceModel['eras']>('../../../../data/eras/*.json', {
+// The data/eras overlays, for which races have a rewrite to collect. Whole files: a rules-only
+// overlay has no `eras` key, and a named `eras` import of it fails the production build.
+const OVERLAYS = import.meta.glob<{ eras?: RaceModel['eras'] }>('../../../../data/eras/*.json', {
   eager: true,
-  import: 'eras',
+  import: 'default',
 });
 
 /** As the Worker's hasRewrite: a storyline without a rewrite condition has none to collect. */
 function hasRewrite(raceId: string): boolean {
-  const storyline = ERAS_BLOCKS[`../../../../data/eras/${raceId}.json`]?.storyline;
+  const storyline = OVERLAYS[`../../../../data/eras/${raceId}.json`]?.eras?.storyline;
   return !storyline || storyline.rewriteCondition !== undefined;
 }
 
