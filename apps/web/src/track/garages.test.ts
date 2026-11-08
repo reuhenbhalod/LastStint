@@ -56,6 +56,21 @@ describe('garages', () => {
     expect(g.at(-1)).toEqual(['Renault', 'REN']);
   });
 
+  it('2002-2004: Ferrari nearest the exit; the unranked teams at the entry', () => {
+    const g = garagesFor(2002);
+    expect(g.at(-1)).toEqual(['Ferrari', 'FER']);
+    expect(g.slice(0, 2)).toEqual([
+      ['Toyota', 'TOY'], // new in 2002, after Minardi in car-number order
+      ['Minardi', 'MIN'],
+    ]);
+    expect(g).toContainEqual(['Renault', 'REN']); // 2001's Benetton
+    expect(g).toHaveLength(11);
+    expect(garagesFor(2003)).not.toContainEqual(['Arrows', 'ARR']); // gone after 2002
+    expect(garagesFor(2003)).toHaveLength(10);
+    expect(garagesFor(2004).at(-2)).toEqual(['Williams', 'WIL']);
+    expect(garagesFor(2004)[0]).toEqual(['Minardi', 'MIN']);
+  });
+
   it('2020: Red Bull and Alfa Romeo under the Jolpica spelling when the race uses it', () => {
     const g = garagesFor(2020, ['Red Bull', 'Alfa Romeo', 'Mercedes']);
     expect(g).toContainEqual(['Red Bull', 'RBR']);
