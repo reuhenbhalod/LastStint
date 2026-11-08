@@ -926,6 +926,91 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
+    # Eras wave A (Eras build plan 3.1c): Era 6 races and sakhir-2020 from the Jolpica dump
+    # (`pipeline jolpica`; CC BY-NC-SA, credit in data/raw/<id>.jolpica.json), with F1DB stops
+    # before 2011 and estimated compounds and SC laps (data/estimates/<id>.sc.json, for the
+    # owner to check). Duels, split and seeds as for the TUM races above.
+    "abu-dhabi-2010": {
+        "year": 2010,
+        "event": "Abu Dhabi",
+        "source": "jolpica",
+        "name": "Abu Dhabi 2010: Alonso vs Petrov",
+        "era": "2010-2013",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "ALO",
+        "rival": "PET",  # Alonso P4 or better for the title (real: stuck behind Petrov, P7)
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "china-2011": {
+        "year": 2011,
+        "event": "China",
+        "source": "jolpica",
+        "name": "China 2011: Hamilton vs Vettel",
+        "era": "2010-2013",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "HAM",
+        "rival": "VET",  # Hamilton's three stops beat Vettel's two
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "europe-2012": {
+        "year": 2012,
+        "event": "Europe",
+        "source": "jolpica",
+        "name": "Europe 2012: Alonso vs Räikkönen",
+        "era": "2010-2013",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "ALO",
+        "rival": "RAI",  # Alonso wins from P11; Räikkönen the car behind at the flag
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "abu-dhabi-2012": {
+        "year": 2012,
+        "event": "Abu Dhabi",
+        "source": "jolpica",
+        "name": "Abu Dhabi 2012: Vettel vs Button",
+        "era": "2010-2013",
+        # pinned: the D3 rule gives lap 10, inside the lap 9-14 SC, and an SC that started
+        # before the takeover isn't in the race file, so the sim ran those laps green. Lap 8
+        # is the last green lap: the SC and Vettel's stop under it are played.
+        "takeover_lap": 8,
+        "seed": 1,
+        "user_side": "VET",
+        "rival": "BUT",  # Vettel from the pit lane to the podium; Button the car he beat to P3
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "spain-2013": {
+        "year": 2013,
+        "event": "Spain",
+        "source": "jolpica",
+        "name": "Spain 2013: Alonso vs Räikkönen",
+        "era": "2010-2013",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "ALO",
+        "rival": "RAI",  # Alonso wins on four stops; Räikkönen's three put him P2
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "sakhir-2020": {
+        "year": 2020,
+        "event": "Sakhir",
+        "source": "jolpica",
+        "name": "Sakhir 2020: Russell vs Pérez",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "RUS",
+        "rival": "PER",  # Russell holds P1 (real: the stop mix-up and a puncture, P9)
+        "score_positions": 6,
+        "split": "eras",
+    },
 }
 
 

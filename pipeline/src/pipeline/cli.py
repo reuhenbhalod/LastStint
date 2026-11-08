@@ -62,6 +62,10 @@ def ingest_race(
             typer.echo(f"{rid}: snapshot exists, skipped")
             continue
         meta = build_mod.RACES[rid]
+        if meta.get("source") == "jolpica":
+            # Its own command: F1DB stops, estimates and the owner's SC hand-check file.
+            typer.echo(f"{rid}: a Jolpica race, skipped (run `pipeline jolpica {rid} --force`)")
+            continue
         if meta.get("source") == "tum":
             from . import tum
 

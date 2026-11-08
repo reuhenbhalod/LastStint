@@ -281,3 +281,10 @@ def test_cli_jolpica_reports_an_ambiguous_event_without_a_traceback(tmp_path):
     assert result.exit_code == 1
     assert "2 1997 rounds match" in result.output
     assert not ingest.raw_snapshot_path("spain-1997", tmp_path).exists()
+
+
+def test_cli_ingest_leaves_registered_jolpica_races_to_their_own_command():
+    # --force: even with a snapshot, `ingest` never tries FastF1 for a Jolpica race.
+    result = CliRunner().invoke(cli.app, ["ingest", "china-2011", "--force"])
+    assert result.exit_code == 0, result.output
+    assert "a Jolpica race, skipped (run `pipeline jolpica china-2011 --force`)" in result.output

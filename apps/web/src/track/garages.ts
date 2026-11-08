@@ -4,6 +4,67 @@
 
 /** Previous season's constructors' standings, champions first, in this season's names. */
 const STANDINGS: Record<number, string[]> = {
+  // 2010-2013 (Eras): the 2009-2012 final standings from the Jolpica dump (2026-10-24,
+  // formula_one_teamchampionship), under each team's name that season: Brawn became
+  // Mercedes, BMW Sauber Sauber, Renault Lotus F1 (2012), Lotus Caterham and Virgin Marussia
+  // (2012). Toyota left after 2009 and HRT after 2012. Teams new that season (Lotus, HRT and
+  // Virgin in 2010) have no standing and go last, in entry order. The Jolpica races spell
+  // Red Bull without "Racing".
+  2010: [
+    'Mercedes',
+    'Red Bull',
+    'McLaren',
+    'Ferrari',
+    'Sauber',
+    'Williams',
+    'Renault',
+    'Force India',
+    'Toro Rosso',
+    'Lotus',
+    'HRT',
+    'Virgin',
+  ],
+  2011: [
+    'Red Bull',
+    'McLaren',
+    'Ferrari',
+    'Mercedes',
+    'Renault',
+    'Williams',
+    'Force India',
+    'Sauber',
+    'Toro Rosso',
+    'Lotus',
+    'HRT',
+    'Virgin',
+  ],
+  2012: [
+    'Red Bull',
+    'McLaren',
+    'Ferrari',
+    'Mercedes',
+    'Lotus F1',
+    'Force India',
+    'Sauber',
+    'Toro Rosso',
+    'Williams',
+    'Caterham',
+    'HRT',
+    'Marussia',
+  ],
+  2013: [
+    'Red Bull',
+    'Ferrari',
+    'McLaren',
+    'Lotus F1',
+    'Mercedes',
+    'Sauber',
+    'Force India',
+    'Williams',
+    'Toro Rosso',
+    'Caterham',
+    'Marussia',
+  ],
   // 2014-2016 (Eras): the 2013-2015 final standings from the Jolpica dump (2026-10-24,
   // formula_one_teamchampionship). A team new that season has no standing and goes last:
   // Renault takes Lotus F1's 2015 place, Haas comes in after Manor.
@@ -72,12 +133,12 @@ const STANDINGS: Record<number, string[]> = {
   2020: [
     'Mercedes',
     'Ferrari',
-    'Red Bull Racing',
+    'Red Bull Racing|Red Bull', // sakhir-2020 (Jolpica) spells both without the suffix
     'McLaren',
     'Renault',
     'AlphaTauri',
     'Racing Point',
-    'Alfa Romeo Racing',
+    'Alfa Romeo Racing|Alfa Romeo',
     'Haas F1 Team',
     'Williams',
   ],
@@ -147,6 +208,7 @@ const SHORT: Record<string, string> = {
   Mercedes: 'MER',
   Ferrari: 'FER',
   'Red Bull Racing': 'RBR',
+  'Red Bull': 'RBR',
   McLaren: 'MCL',
   Renault: 'REN',
   Alpine: 'ALP',
@@ -163,6 +225,12 @@ const SHORT: Record<string, string> = {
   'Kick Sauber': 'SAU',
   'Haas F1 Team': 'HAA',
   Williams: 'WIL',
+  Virgin: 'VIR',
+  Marussia: 'MAR',
+  Caterham: 'CAT',
+  'Lotus F1': 'LOT',
+  Lotus: 'LOT',
+  HRT: 'HRT',
 };
 
 /**

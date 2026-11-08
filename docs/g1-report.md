@@ -185,3 +185,100 @@ These races have none until step 6.2 authors them (tune on spain-2016: "0 calls,
 so the random-play share is 0% or 100% and no seed can pass). Their seeds stay at 1, untuned,
 and must be tuned after 6.2. `data/pools.json` is untouched. TS sim parity checked on all 20
 golden seeds of each race: 0 order mismatches, times within 0.0005 s.
+
+## Eras wave A, step 3.1c (Jolpica 2010-2013 and sakhir-2020): 3 pass, 0 borderline, 3 fail
+
+Eras build plan 3.1, Nov 7 2026. Written by hand, as the section above (`--report` writes only
+the tune and holdout splits). Source: `pipeline jolpica <id>` from the Jolpica CSV dump
+(2026-10-24; CC BY-NC-SA, non-commercial; credit Jolpica, in `data/raw/<id>.jolpica.json`),
+with F1DB stops for abu-dhabi-2010 (before 2011). No tyre or race-control data: compounds and
+SC laps are estimated (step 2.4) and every SC period is in `data/estimates/<id>.sc.json`,
+status `unchecked`, for the owner to check against race reports. `pipeline build` applies
+the estimates and the `data/eras/<id>.json` rules. Registry split `eras`, source `jolpica`
+(`pipeline ingest` skips these races: re-ingest with `pipeline jolpica <id> --force`).
+Duel = the storyline pair of the Eras spec's race table, the user's driver first; for a
+position target the rival is the car the user really finished next to. Robust status: 1,000
+runs on each of two seed sets, values seed set 10000 / seed set 20000, limits in brackets.
+
+| Race | Duel | Status | Without near-tie rule | Mean gap error | Failing checks | Diagnosis |
+|---|---|---|---|---|---|---|
+| abu-dhabi-2010 | ALO vs PET | fail | fail | 2.89s | field ROS gap error 7.16 / 7.18 [5.00]; field KUB gap error 7.33 / 7.42 [5.00] | race mechanics (pace 1%, rest 99%): the leader's pace profile. See below |
+| china-2011 | HAM vs VET | fail | fail | 3.01s | duel HAM vs VET gap error 4.17 / 4.23 [3.00] and order rate 0.52 / 0.50 [0.60]; podium order rate 0.43 / 0.41 [0.50]; field MAS gap error 5.76 / 5.67 [5.00] | race mechanics (pace 2%, rest 98%): the late catch comes 2 laps late. See below |
+| europe-2012 | ALO vs RAI | pass | pass | 1.70s |  |  |
+| abu-dhabi-2012 | VET vs BUT | fail | fail | 2.61s | podium ALO gap error 5.21 / 5.16 [5.00] | race mechanics (pace 3%, rest 97%): Alonso's late charge. See below |
+| spain-2013 | ALO vs RAI | pass | pass | 1.71s |  |  |
+| sakhir-2020 | RUS vs PER | pass | pass | 0.96s |  |  |
+
+Passing races: europe-2012 has duel error 0.42 / 0.53 s, duel order 0.84, podium order 0.78 / 0.77
+and every gap within 4.07 s (MSCM). spain-2013 has duel error 2.63 / 2.69 s, duel order 0.94 /
+0.93, podium order 0.93 and its largest field error is WEB's, 2.82 / 2.86 s. sakhir-2020 has duel
+error 1.91 / 1.83 s (Russell really finished P9; the sim replays his real stops), duel order 1.00,
+podium order 0.70 / 0.71 and every gap within 3.70 s (ALB). abu-dhabi-2010's duel passes too
+(error 0.76 / 0.59 s; ALO and PET finished 0.28 s apart, a near-tie, strict order rate 0.72).
+
+**Knob applied: abu-dhabi-2012 `takeover_lap` pinned to 8.** The D3 rule gave lap 10 (3 laps
+before Vettel's lap-13 in-lap; the lap-9 SC is ignored as an opening-laps event). Lap 10 is
+inside the lap 9-14 SC, and the race file keeps only events from the takeover on, so the SC
+was dropped and the sim ran laps 10-14 green: Vettel's stop under it cost a full green stop
+and the field stayed spread (VET 34.6 s behind RAI at lap 14 in the sim, 12.1 s real). With
+the takeover on lap 8, the last green lap, both SCs are played and the duel passes (it failed
+before: gap error 5.08 / 4.96 s, order 0.33 / 0.32). Mean gap error 3.35 s -> 2.61 s. It also
+gives the storyline its first call: Vettel can stop under the SC. **Pipeline issue, reported
+not fixed:** an SC (or VSC) running at the takeover lap is dropped from `events`
+(`assemble.py` keeps `e["lap"] >= takeover_lap`; car faults have `lasts_past`, SCs don't). None of
+the other five races here is affected (their takeovers are clear of their SC laps); other
+races weren't checked, and the D3 rule can land in an SC again.
+
+Diagnoses of the failures, from the sim's mean gaps compared with the real gaps lap by lap
+(100 runs truncated at each lap).
+
+- **abu-dhabi-2010.** The podium and the duel are good. ROS and KUB finish 7 s too far back.
+  Real VET pulled away fast on new hards after his lap-25 stop (ROS lost 20 s on him from lap
+  26 to 40, partly stuck behind the unstopped BUT and KUB) and then managed a 10 s lead: from
+  lap 40 ROS lost nothing to him and HAM took 3.2 s back from lap 45. The sim spreads ROS's
+  0.75 s a lap pace deficit evenly to the flag, so it's short early and 7 s long at the end.
+  KUB ran 46 laps on his first set of hards and lost about 0.3 s a lap less to VET than the
+  sim's fit gives. No pipeline knob applies (no SC after the takeover, nothing race control
+  decided). It needs the leader's pace management at the end of a race, which the sim doesn't
+  model.
+- **china-2011.** The real story is reproduced: HAM on three stops catches VET on two, 11 s in
+  the last 16 laps, and the sim's catch is about as fast (10.2 s). But it starts 3-4 s further
+  back. After the first stops (laps 14-16) real HAM came out in P5 in traffic and lost about
+  7 s to VET by lap 24, which the sim misses. Then on new softs (laps 27-37) he gained 10 s
+  more than the sim's soft/hard step and wear give him. Net, the sim has HAM pass VET about
+  lap 54 instead of 52, so VET finishes 1.4 s behind (5.2 s real) and the order is a coin flip.
+  The compounds are estimated: HAM's first stint is labelled HARD, though the 2011 top ten
+  started on their Q3 tyre (the option). Flipped to SOFT in memory (not committed) the duel
+  barely moves (mean gap 1.4 -> 1.6 s), so it isn't the cause. No pipeline knob applies.
+- **abu-dhabi-2012.** After the pin above only ALO's gap fails, by 0.2 s. After the lap 39-42
+  SC, real ALO closed on RAI by 0.3-0.6 s a lap and finished 0.85 s behind. Real RAI was
+  managing his lead, and ALO's softs were 3 laps older than RAI's. In the sim ALO loses 0.2 s
+  a lap (his fitted pace) and finishes 6.2 s back. The same pace-management gap as
+  abu-dhabi-2010. No pipeline knob applies.
+
+**Estimates for the owner** (`data/estimates/<id>.sc.json`, all `unchecked`; SC laps against
+docs/eras-checks/2.6-drivers-incidents.md):
+
+| Race | Compounds (two, from pace and wear) | SC periods estimated | Against the race reports |
+|---|---|---|---|
+| abu-dhabi-2010 | HARD 24 / SOFT 22 stints; 3 set by the both-compounds rule, 9 too short to score | laps 2-5 SC (likely) | lap-1 SC (Schumacher / Liuzzi): matches, before the takeover |
+| china-2011 | SOFT 41 / HARD 40; 4 by the rule, 2 too short | none | none expected |
+| europe-2012 | SOFT 36 / HARD 36; 4 by the rule, 5 too short | laps 28-29 (ambiguous, applied as a yellow), laps 31-33 SC (likely) | one SC from lap 27-28 (Vergne / Kovalainen debris): probably one period, 28-33. Quirk: MAL +20 s post-race penalty (P12, outside the scored six) |
+| abu-dhabi-2012 | SOFT 29 / HARD 25; 9 by the rule, 5 too short | laps 9-14 SC, laps 39-42 SC (both likely) | laps 9 and 39: match |
+| spain-2013 | HARD 53 / SOFT 48; 1 by the rule, 6 too short | none | none expected |
+| sakhir-2020 | HARD 31 / SOFT 28; 2 by the rule, 8 too short | laps 1-6 SC, lap 55 (ambiguous, a yellow), laps 61-68 SC | lap-1 SC: matches. Lap 54 was a VSC (Latifi): the estimator has no VSC kind. Lap 63 SC after a VSC from lap 62: the 61-68 period includes the VSC laps |
+
+Compound labels to check: from 2010 to 2013 the top ten started on their Q3 tyre (the option),
+but some top-ten first stints are labelled HARD: HAM at china-2011; VET, GRO, ROS and KOB at
+europe-2012; and at abu-dhabi-2012 six of the top ten (WEB, MAL, RAI, BUT, ALO, plus ROS / GRO /
+HUL on lap 1), which looks like the two labels swapped for most of that field. At sakhir-2020
+(three compounds really, C2-C4) the estimator has only two. A top-ten-start rule in
+`estimates.estimate_compounds` would fix the 2010-2013 cases; that's an estimator change, not a
+per-race knob, so it goes to the owner.
+
+Seeds stay at 1, untuned, as for the other Eras races (no decision moments until step 6.2). TS
+sim parity checked on all 20 golden seeds of each race: 0 order mismatches, times within
+0.0006 s. `apps/worker/src/races.gen.ts`, `data/sc_rates.json` and the parity fixtures aren't
+regenerated here: until the coordinator does, `test_sc_rates.py` fails on these six races
+(`test_committed_rates_match_the_raw_timelines`, `test_every_race_file_finds_its_circuit`:
+Valencia isn't in the file yet).

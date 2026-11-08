@@ -137,12 +137,13 @@ def test_each_rule_changes_its_replay():
 
 
 def test_no_rules_block_replays_the_golden_files():
+    """Races without a rules block replay their golden files, and so do the Eras races built
+    with their data/eras rules (step 3.1): their goldens were written with the rules on."""
     for path in sorted(GOLDEN_DIR.glob("*.json")):
         race = RACES_DIR / path.name
         if not race.exists():
             continue
         model = json.loads(race.read_text())
-        assert "rules" not in model
         golden = json.loads(path.read_text())
         for seed in list(golden)[:3]:
             got = sim_reference.simulate(model, int(seed))
