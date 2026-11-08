@@ -1834,3 +1834,145 @@ committed. For each of the seven races:
 fixtures. Two `test_sc_rates.py` tests fail until integration regenerates the rates:
 `test_committed_rates_match_the_raw_timelines` (seven new raw status timelines) and
 `test_every_race_file_finds_its_circuit` (europe-1997 is at Jerez, a new circuit).
+
+## Eras 5.1: refuelling races with a red flag (1998, 2003, 2007): 0 pass, 0 borderline, 3 fail
+
+Eras build plan 5.1, Nov 7 2026. Written by hand, like the sections above. All three are from
+`pipeline jolpica <id>` (Jolpica CSV dump 2026-10-24, F1DB stops; step 2.4's estimated
+compounds, SC laps and fuel loads; the fill model fitted from the F1DB stops), then `pipeline
+wet-laps <id>` (docs/eras-checks/4.5-wet-races.md). Registry split `eras`, the storyline duel
+of the Eras spec's race table (§4, user's driver first), `score_positions` 6, seed 1, D3
+takeover. Robust mode: 1,000 runs on each of two seed sets, values seed set 10000 / seed set
+20000, limits in brackets. No knob was applied. The SC hand-check files
+(`data/estimates/<id>.sc.json`) are committed, all `unchecked`.
+
+**The red flags** (step R1's files, `data/redflags/<id>.json`, and step 5.1c's loader rules):
+- **europe-2007:** suspended on lap 4, the stoppage on lap 5, a rolling restart behind the SC
+  (laps 6-7). It's all before the lap-9 takeover, so the race file has no RED or SC event.
+- **brazil-2003:** ended under red (`cut_at_results`). Jolpica already stops at lap 54, the
+  results lap, so the cut changes nothing. The race file is 54 laps, the classification the
+  order at the end of lap 54, with no RED event. Build note: "red flag on lap 56, never
+  resumed: the race ends at its results lap 54 (no RED event)".
+- **belgium-1998:** a voided start (`is_voided_start`): Jolpica holds only the rerun, a fresh
+  race with no RED event. **`restartScLaps: 2` is now in its R1 file.** It's sourced: the file
+  already quoted Wikipedia, "The safety car was withdrawn at the end of the second lap", and R1's
+  table gave "2 (laps 1-2 of the restarted race)". The timing agrees: the leader's laps 1-2
+  took 145.2 s and 190.1 s, against 129.2 s on lap 3 and 126-127 s once green. The source now
+  cites the lap times too. Step 2.4's estimate alone finds only lap 2, as ambiguous (a yellow):
+  "the field didn't bunch up", "a single slow lap". So without the entry, lap 1 wouldn't be an
+  SC lap and lap 2 would be a yellow. Build note: "start voided, the race rerun over the full
+  distance (a fresh race, no RED event; laps 1-2 of the rerun behind the SC)". Laps 1-2 are
+  before the lap-8 takeover, so G1 doesn't see them.
+
+**Refuelling:**
+
+| Race | Fuel effect (s per lap of fuel) | Fill rate (race's own slope, se) | refFill / tank (laps) |
+|---|---|---|---|
+| europe-2007 | 0.0560 (wet prior) | 0.2175 (-0.048, 0.029; 57 stops) | 12.9 / 30 |
+| brazil-2003 | 0.0560 (wet prior) | 0.2480 (+0.041, 0.102; 12 stops) | 17.4 / 47 |
+| belgium-1998 | 0.0560 (wet prior) | 0.2454 (+0.003, 0.072; 12 stops) | 14.8 / 23 |
+
+| Race | Duel | Status | Without near-tie rule | Mean gap error | Failing checks | Diagnosis |
+|---|---|---|---|---|---|---|
+| europe-2007 | ALO vs MAS | fail | fail | 4.17s | duel ALO vs MAS gap error 3.95 / 3.77 [3.00]; podium WEB 6.80 / 6.74 [5.00]; field COU 8.97 / 8.96 [7.37] | race mechanics (pace 33%, rest 67%), but really the pace in the late rain. See below |
+| brazil-2003 | FIS vs RAI | fail | fail | 3.79s | duel FIS vs RAI gap error 4.36 / 3.76 [3.00]; field COU 7.03 / 6.52, FRE 5.07 / (4.61 passes), VIL 6.37 / 5.67 [5.00] | race mechanics (pace 29%, rest 71%): Fisichella's last-lap pass, and the field's pace in the last laps. See below |
+| belgium-1998 | HIL vs SCH | fail | fail | 5.00s | podium order rate 0.47 / 0.50 [0.50]; podium ALE 5.42 / 5.33 [5.00]; field FRE 11.31 / 10.93 [5.00], DIN 9.36 / 9.20 [5.17] | lap pace (pace 56%, rest 44%): the rain getting heavier on old tyres, and an SC estimated a lap late. See below |
+
+What passes: europe-2007's duel order (0.81 / 0.83), podium order (0.81 / 0.83), WUR and HEI.
+brazil-2003's podium order (0.64 / 0.66) and ALO. belgium-1998's duel gap (2.24 / 1.96 s);
+its duel order isn't scored, since HIL and SCH finished 0.9 s apart (a near tie).
+
+Diagnoses. Gaps are sim / real, to the user's car at each lap's end (sim: the mean of 100 runs
+with the race cut at that lap). Pace residuals are each car's real laps minus the model's clean
+lap for it (its tank and the fitted wetness included), mean per lap. The diagnosis script
+counts only green laps (status 1), so a race's yellow laps (an ambiguous SC applied as a
+yellow) are left out of its "pace" share. The residuals below count them.
+- **europe-2007** (takeover lap 9). The sim follows the race closely to lap 53 (MAS -4.6 /
+  -3.5 s, WEB 48.0 / 49.3, COU 86.0 / 88.3). The failures all come from the rain over the last
+  seven laps, after the lap 52-54 stops to inters.
+  - Laps 57-60, on inters: MAS +2.65 s a lap over the model, WEB +2.37, ALO +0.69, COU -0.03,
+    HEI -0.44. Real Alonso passed Massa on lap 56 and won by 8.2 s. The sim's ALO comes out of
+    the stops 5.6 s ahead and wins by 4.6 s. From lap 53 real COU gained 14.6 s on ALO (the
+    sim's 3.4 s) and real HEI lost 6.3 s (the sim's 15.4 s).
+  - The wet curves give each driver one wet pace (fitted `wetPace` within ±0.005 for these
+    seven), so how each one coped with the late rain isn't in the model.
+  - Laps 55-59 are step 2.4's ambiguous SC (only 1.14x slower), applied as yellows. Their
+    status is 2, so the diagnosis script skips them, and its "race mechanics 67%" is mostly
+    this pace.
+  - No per-race knob applies: this is after any takeover.
+  - The SC hand-check (laps 3-8 ambiguous, "a red flag?") is before the takeover. Per R1 it's
+    an SC on lap 3, the red flag on laps 4-5, then SC laps 6-7. The owner should check it.
+- **brazil-2003** (takeover lap 17, before the SCs on laps 20-22, 28-29 and 34-36, which are
+  all `likely` and applied).
+  - *The duel.* Real FIS closed from 7.3 s behind RAI (lap 44) and passed him on the results
+    lap, 54 (P2 -> P1). The sim's FIS runs closer mid-race (lap 46: 1.6 s behind, real 5.7). At
+    the flag he's 2.6 s behind (real 0.9 s ahead), and he rarely passes. The pass came from
+    Räikkönen's mistake (a driver error the sim doesn't model, like VET at canada-2011).
+  - *Mid-race.* On laps 23-27, FIS in traffic (P10-12) ran +1.91 s a lap over the model and RAI
+    (leading) +0.11, so real FIS dropped 9 s more than the sim's before the lap-28 SC.
+  - *The field* (COU, VIL, FRE). The last laps (51-54) are a sprint: FIS -1.05 s a lap, FRE
+    -1.82, ALO -0.81, against COU +1.19. Real COU lost 29.4 s to FIS over laps 51-54 with his
+    lap-53 stop (measured 26.9 s); the sim's loses 19.3 s. VIL's error is built after the
+    lap-34 SC: lap 37, 0.7 / 5.3 s behind FIS.
+  - *Checks.* `sc_unlap: "none"` (the 2003 rule, `race_rules.sc_unlap_for_year`): identical
+    numbers (3.79 s). No per-race knob applies. A takeover after the last SC (lap 37) would drop
+    the SC chaos from the storyline, so it wasn't tried.
+  - *A limit of a race ended under red.* Each car's last stint is fuelled "to the flag", now lap
+    54. The real cars were fuelled for stops that never came, and how much they carried is
+    unknown. So the last-stint tank (and FIS's 47-lap stint from lap 7, the race's `tankLaps`)
+    is a floor. The fuel effect is the wet prior here, so the fit isn't affected beyond that.
+- **belgium-1998** (takeover lap 8). Two things.
+  1. *The SC estimate starts a lap late.* The status timeline (and step 2.4's estimate, 30-32
+     `likely`) puts the SC from the leader's lap-29 end. But the leaders' lap 29 took 186-230 s,
+     against about 135 s green, and HIL, SCH, ALE and FRE all finished it within 2.4 s. So the
+     SC was out during lap 29 (the known limit in 4.5-wet-races.md). Hill stopped at the end of
+     lap 28 (out-lap 29). That stop is priced as a green stop with a measured loss of 98.7 s,
+     because its out-lap is really an SC lap. So the sim drops HIL about 48 s behind SCH, ALE and
+     FRE on lap 30 (real: 0.5-1.8 s ahead of them). The lap 30-32 SC closes most of it up, but
+     HIL restarts behind SCH and ALE.
+     - *Check.* A scratch raw dir, with the hand-check's second period set to laps 29-32
+       `confirmed` and the race re-ingested (`pipeline jolpica --force`, `wet-laps --force`):
+       mean gap error 3.74 s. ALE (1.11 / 1.08) and FRE (4.82 / 4.80) pass. The duel gap fails
+       (5.02 / 5.11) and DIN still fails (6.39 / 6.48), so the race still fails. **For the
+       owner:** set that period's `startLap` to 29 in data/estimates/belgium-1998.sc.json if a
+       race report agrees. It isn't changed here: that's the owner's check.
+  2. *The rain getting heavier on old tyres.* On laps 13-16 (wetness up from lap 15), the cars
+     still on their first set ran well over the model: FRE +5.44 s a lap, HIL +2.41, ALE +1.58.
+     SCH (in on lap 11) and DIN were under it (-0.59, -0.77). Then SCH stayed 1.2 s a lap under
+     it to lap 24. So real SCH closed from 56.0 to 10.2 s behind HIL by lap 24, and the sim's
+     only to 34.8.
+     - Every stint is labelled MEDIUM but 5 (no dry lap to measure against: laps 4-14 count as
+       dry, the turkey-2020 limit). So the sim has no tyre-type difference, and one wet pace
+       for every car.
+     - DIN ran 3-4 s a lap over the model on laps 18-28. He was a lap down at lap 28 (160 s
+       back), then on the lead lap by lap 30, 6.4 s back. Real DIN lost 15 s to HIL in the SC
+       queue (lap 33: 19.2 s, sim 3.9), and the sim keeps him close.
+     - FRE ran 0.6 s a lap slower than HIL after the restart (laps 33-44: +0.65 against +0.03).
+  - *Checks.* `sc_unlap: "none"` (the 1998 rule): identical numbers as built (5.00 s), and 3.69
+    s with the lap-29 SC. No per-race knob passes it.
+
+**The TS sim: playability** (scratch vitests, not committed):
+- `live-replay.test.ts` passes for all three. The real calls carry the real fills
+  (europe-2007 ALO: 25, 16 and 7 laps; belgium-1998 HIL: 12 and 16 laps; brazil-2003 FIS has no
+  stop after the takeover: his lap-7 fill took him to the flag). They match the replay exactly
+  with no tank below empty, with the fitted fill model and with the prior.
+- 60 seeds of live play with incidents and the real calls: every run reaches the flag
+  (60 / 60 each) and no car runs dry (no `fuel` note). The user's lowest tank is 1 lap
+  (europe-2007, belgium-1998) and 4.2 laps (brazil-2003). Crashes bring SCs, and no red flag
+  is drawn.
+- **Server-match check:** each race's 20 golden seeds match the TS sim (order, finishers, times
+  and gaps to 3 decimals): 60 / 60.
+
+**Also changed:** `apps/web/src/track/garages.ts` gains 1998 and 2003, from the 1997 and 2002
+final standings in the Jolpica dump. Without them belgium-1998 and brazil-2003 took the
+nearest season's garages, which have no Prost, Stewart, Tyrrell, Arrows or Jaguar.
+`garages.test.ts` failed on belgium-1998 until then.
+
+**Not regenerated here:** `data/sc_rates.json`, `apps/worker/src/races.gen.ts` and the parity
+fixtures. Until sc_rates.json is regenerated, `test_sc_rates.py` fails two tests:
+`test_committed_rates_match_the_raw_timelines` (three new raw status timelines) and
+`test_every_race_file_finds_its_circuit` (no `nurburgring` circuit yet). An in-memory
+`sc_rates.build()` from the shared cache counts europe-2007 at nurburgring (0 SC: both its
+periods are ambiguous), brazil-2003 at interlagos (4 SC) and belgium-1998 at spa (1 SC). The
+`restartScLaps` laps aren't in the status timeline, so they aren't counted. With those, both
+tests pass.

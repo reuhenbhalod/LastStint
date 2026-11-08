@@ -56,6 +56,18 @@ describe('garages', () => {
     expect(g).toHaveLength(11);
   });
 
+  it('1998 and 2003: the previous champions nearest the exit; unranked Minardi at the entry', () => {
+    const g98 = garagesFor(1998);
+    expect(g98.at(-1)).toEqual(['Williams', 'WIL']);
+    expect(g98[0]).toEqual(['Minardi', 'MIN']);
+    expect(g98).toHaveLength(11);
+    const g03 = garagesFor(2003);
+    expect(g03.at(-1)).toEqual(['Ferrari', 'FER']);
+    expect(g03[0]).toEqual(['Toyota', 'TOY']);
+    expect(g03).not.toContainEqual(['Arrows', 'ARR']); // gone after 2002
+    expect(g03).toHaveLength(10);
+  });
+
   it('2006: MF1 under its Brazil name when the race uses it; Super Aguri, new, at the entry', () => {
     const g = garagesFor(2006, ['Spyker MF1']);
     expect(g).toContainEqual(['Spyker MF1', 'MF1']);

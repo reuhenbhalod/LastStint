@@ -1733,6 +1733,50 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
+    # Eras wave B (build plan 5.1): refuelling races with a red flag, wet, from Jolpica with
+    # F1DB stops as above, then `pipeline wet-laps`. The red flags are R1's
+    # (data/redflags/<id>.json): europe-2007 is suspended on laps 4-5 and resumed behind the SC;
+    # brazil-2003 ended under red and is classified at lap 54 (redflag.cut_at_results);
+    # belgium-1998's start was voided and the race rerun (redflag.is_voided_start).
+    "europe-2007": {
+        "year": 2007,
+        "event": "Europe",
+        "source": "jolpica",
+        "name": "Europe 2007: Alonso vs Massa",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "ALO",
+        "rival": "MAS",  # win: Alonso chases Massa (real: passes him in the rain on lap 56)
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "brazil-2003": {
+        "year": 2003,
+        "event": "Brazil",
+        "source": "jolpica",
+        "name": "Brazil 2003: Fisichella vs Räikkönen",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "FIS",
+        "rival": "RAI",  # win in the chaos: Räikkönen, the car behind at the results lap
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "belgium-1998": {
+        "year": 1998,
+        "event": "Belgium",
+        "source": "jolpica",
+        "name": "Belgium 1998: Hill vs Ralf Schumacher",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "HIL",
+        "rival": "SCH",  # team: Jordan 1-2; Ralf Schumacher, the team-mate next to Hill
+        "score_positions": 6,
+        "split": "eras",
+    },
 }
 
 
