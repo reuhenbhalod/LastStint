@@ -27,6 +27,7 @@ import { type FaultTable, cloneFaults, faultCost, faultTable } from './faults.js
 import headsetConfig from './headset.json';
 import { legendEvents, legendLoss } from './legend.js';
 import { validatePlan } from './plan.js';
+import { type RedFlagPlan, lineUp, redFlagPlan } from './redflag.js';
 import { coverWindow, playoutPolicy, resolveRivalPolicy } from './rivals/policy.js';
 import {
   type RivalChoice,
@@ -305,6 +306,8 @@ export interface Run {
   scratch: { prevTime: Record<string, number>; clean: Record<string, number>; pitted: Set<string> };
   /** Neutralizations (start lap, length, flag): the real ones, or a grader fork's view. */
   events: NeutralEvent[];
+  /** Red flags: free stops in the stoppage, gaps wiped at the restart (redflag.ts). */
+  red: RedFlagPlan;
   /** Neutralization flag per lap, and retirements per lap, precomputed from events. */
   neutral: Map<number, Exclude<FlagState, 'green'>>;
   retireAt: Map<number, string[]>;
@@ -548,7 +551,9 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
   if (live) validateDecisions(model, options.decisions ?? []);
   const events: NeutralEvent[] = [];
   const retireAt = new Map<number, string[]>();
-  for (const e of options.legend ? legendEvents(model, seed) : model.events) {
+  // Legend: random SC/VSC periods; red flags stay real (legend.ts isKept).
+  const timeline = options.legend ? legendEvents(model, seed) : model.events;
+  for (const e of timeline) {
     if (e.type === 'SC' || e.type === 'VSC' || e.type === 'RED') {
       events.push({ lap: e.lap, laps: e.laps ?? 1, flag: FLAG_OF[e.type] });
     } else if (e.type === 'RETIREMENT' && e.driver) {
@@ -619,6 +624,7 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
     },
     events,
     neutral: neutralMap(events),
+    red: redFlagPlan(timeline),
     retireAt,
     faults: faultTable(model.events),
   };
@@ -633,6 +639,11 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
   }
   markNextFlag(run);
   return run;
+}
+
+/** A stop with its out-lap on `lap` is the tyre change in a red flag's stoppage: free. */
+export function redFlagFree(run: Run, lap: number): boolean {
+  return run.red.free.has(lap) && run.neutral.get(lap) === 'red';
 }
 
 /** Set the flag the next lap will run under, from the neutralizations known so far. */
@@ -1158,8 +1169,9 @@ function predictedRemaining(
         age = 0;
       }
       const { track } = model;
-      total +=
-        flag === 'sc'
+      total += redFlagFree(run, lap)
+        ? 0
+        : flag === 'sc'
           ? track.pitLossUnderSC
           : flag === 'vsc'
             ? track.pitLossUnderVSC
@@ -1343,7 +1355,10 @@ export function stepLap(run: Run): RaceState {
         c.tyreAge = 0;
         c.tyreWear = 0;
       }
-      pitCost += stopLoss(run, stop, lap) ?? stopCost(run, code, flag, stop.added === true, lap);
+      // A red flag's stoppage: the tyre change there is free (redflag.ts).
+      pitCost += redFlagFree(run, lap)
+        ? 0
+        : (stopLoss(run, stop, lap) ?? stopCost(run, code, flag, stop.added === true, lap));
       // Era rules: an added stop into a closed pit lane (2007-08) owes a stop-go.
       if (stop.added && pitLaneClosed(model, run.neutral, lap, stop.to)) {
         const cost = stopGoCost(model);
@@ -1440,6 +1455,8 @@ export function stepLap(run: Run): RaceState {
     resolveOrder(run, lap, clean, prevTime, pitted);
     applySwap(run, lap, prevTime);
   }
+  const wipe = run.red.wipes.get(lap);
+  if (wipe && run.neutral.get(wipe.redLap) === 'red') lineUp(live(run), cars, wipe.gap);
   if (state.engineer) engineerAfterLap(run, lap, battle, prevTime, pitted);
   const rivalBefore = rivalPlanBefore(run);
   rivalReacts(run, lap, flag, prevTime);

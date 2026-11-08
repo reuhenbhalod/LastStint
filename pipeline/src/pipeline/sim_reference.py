@@ -15,7 +15,7 @@ import math
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from . import race_rules
+from . import race_rules, redflag
 from .legend import legend_events, legend_loss, real_flags
 from .paths import GOLDEN_DIR
 from .rng import Mulberry32, derive_seed
@@ -218,13 +218,15 @@ def simulate(
     neutral: dict[int, str] = {}
     retire_at: dict[int, set[str]] = {}
     real = real_flags(model) if legend else None  # Legend: stops pay the lap's conditions
-    for e in legend_events(model, seed) if legend else model["events"]:
+    events = legend_events(model, seed) if legend else model["events"]
+    for e in events:
         if e["type"] in ("SC", "VSC", "RED"):
             for lap in range(e["lap"], e["lap"] + int(e.get("laps", 1))):
                 neutral[lap] = e["type"]
         elif e["type"] == "RETIREMENT":
             retire_at.setdefault(e["lap"], set()).add(e["driver"])
     faults = FaultState(model["events"])  # car faults (faults.py): frozen on their real laps
+    red = redflag.plan(events)  # free stops in the stoppage, gaps wiped at the restart
 
     ordered = sorted(model["drivers"], key=lambda d: d["stateAtTakeover"]["position"])
     cars: dict[str, Car] = {}
@@ -281,7 +283,9 @@ def simulate(
                     car.tyre_wear = 0.0
                 default = {"SC": pit_loss_sc, "VSC": pit_loss_vsc}.get(flag, pit_loss)
                 loss = legend_loss(pit, lap, flag, real) if real is not None else pit.get("loss")
-                pit_cost += default if loss is None else loss
+                # A red flag's stoppage: the tyre change there is free (redflag.py).
+                if lap not in red["free"]:
+                    pit_cost += default if loss is None else loss
                 # Era rules: an added stop into a closed pit lane (2007-08) owes a stop-go.
                 if pit.get("added") and race_rules.pit_lane_closed(model, neutral, lap, pit["to"]):
                     car.stop_go += race_rules.stop_go_cost(model)
@@ -331,6 +335,9 @@ def simulate(
                 order[:] = live + [c for c in order if cars[c].retired]
         else:
             _resolve_order(order, cars, clean, pass_rngs, overtake, prev_time, pitted, recent, lap)
+        wipe = red["wipes"].get(lap)
+        if wipe and neutral.get(wipe[1]) == "RED":
+            redflag.line_up(active_codes(), cars, wipe[0])
 
     return _classify(order, cars)
 

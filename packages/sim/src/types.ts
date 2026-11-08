@@ -104,6 +104,8 @@ export interface RaceEvent {
   /** How long it lasts. A FAULT without it lasts to the flag (or its car's next stop). */
   laps?: number;
   driver?: string;
+  /** A RED event: how the race resumed (eras build plan 4.3, redflag.ts). Absent: it didn't. */
+  restart?: 'standing' | 'rolling';
   /** Defines the storyline: Legend difficulty always runs it on its real lap (eras spec 8). */
   storylineEvent?: boolean;
   /** A FAULT (driver required): its kind. */

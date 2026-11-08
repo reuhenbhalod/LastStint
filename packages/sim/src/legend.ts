@@ -88,10 +88,18 @@ export function legendRates(model: RaceModel, rates: ScRates = SC_RATES): Legend
   };
 }
 
-/** A real event Legend leaves alone: anything but a non-storyline SC/VSC after the takeover. */
-export function isKept(event: RaceEvent, takeoverLap: number): boolean {
+/**
+ * A real event Legend leaves alone: anything but a non-storyline SC/VSC after the takeover. The
+ * SC laps of a red flag's resumption (an SC straight after a RED, in `events`) are part of the
+ * red flag, which is real: kept too (eras build plan 4.3).
+ */
+export function isKept(event: RaceEvent, takeoverLap: number, events: RaceEvent[] = []): boolean {
   if (event.type !== 'SC' && event.type !== 'VSC') return true;
-  return !!event.storylineEvent || event.lap <= takeoverLap;
+  if (event.storylineEvent || event.lap <= takeoverLap) return true;
+  return (
+    event.type === 'SC' &&
+    events.some((e) => e.type === 'RED' && e.lap + (e.laps ?? 1) === event.lap)
+  );
 }
 
 /** The race's events as a Legend attempt with `seed` runs them (sorted by lap). */
@@ -105,7 +113,7 @@ export function legendEvents(
   const rules = resolveRules(model);
   const scOk = rules.safetyCar; // no SC (so no VSC) before 1993
   const vscOk = scOk && rules.vsc;
-  const kept = model.events.filter((e) => isKept(e, takeoverLap));
+  const kept = model.events.filter((e) => isKept(e, takeoverLap, model.events));
   const busy = new Set<number>();
   for (const e of kept) {
     if (e.type === 'SC' || e.type === 'VSC' || e.type === 'RED') {
@@ -132,7 +140,7 @@ export function legendEvents(
 
 /** The real SC/VSC periods every Legend run of the race drops (isKept false). */
 export function removedEvents(model: RaceModel): RaceEvent[] {
-  return model.events.filter((e) => !isKept(e, model.race.takeoverLap));
+  return model.events.filter((e) => !isKept(e, model.race.takeoverLap, model.events));
 }
 
 /** The SC/VSC periods a Legend run drew (those not in the race's events), by lap. */

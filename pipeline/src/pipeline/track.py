@@ -142,6 +142,8 @@ def stop_records(laps: pd.DataFrame) -> list[dict]:
         if any(lap not in field_median.index for lap in laps_used):
             continue
         statuses = (in_lap["TrackStatus"], out_lap["TrackStatus"])
+        if any("5" in str(st) for st in statuses):
+            continue  # a red flag's stoppage: unmeasurable (redflag.stop_losses prices it)
         if any(_has_sc(st) for st in statuses):
             flag = "SC"
         elif any(_has_vsc(st) for st in statuses):

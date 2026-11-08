@@ -3,7 +3,8 @@
 In Legend the race's real SC/VSC periods after the takeover are replaced by ones drawn from the
 attempt's seed at the track's historical rate (data/sc_rates.json, sc_rates.py), so memorizing
 the race doesn't help. Kept exactly as real: periods flagged `storylineEvent`, periods that
-started on or before the takeover lap (already on screen), red flags and retirements.
+started on or before the takeover lap (already on screen), red flags (with the SC laps of
+their resumption) and retirements.
 
 The draw (bit-identical to packages/sim/src/legend.ts):
 - One stream, derive_seed(seed, LEGEND_STREAM); one draw per lap from takeover + 1 to the flag,
@@ -77,12 +78,18 @@ def legend_rates(model: dict, rates: dict | None = None) -> dict:
     }
 
 
-def is_kept(event: dict, takeover: int) -> bool:
+def is_kept(event: dict, takeover: int, events: list[dict] | None = None) -> bool:
     """A real event Legend leaves alone: anything but an SC/VSC after the takeover that isn't a
-    storyline event."""
+    storyline event. The SC laps of a red flag's resumption (an SC straight after a RED in
+    `events`) are part of the red flag, which is real: kept too (eras build plan 4.3)."""
     if event["type"] not in ("SC", "VSC"):
         return True
-    return bool(event.get("storylineEvent")) or event["lap"] <= takeover
+    if event.get("storylineEvent") or event["lap"] <= takeover:
+        return True
+    return event["type"] == "SC" and any(
+        e["type"] == "RED" and e["lap"] + int(e.get("laps", 1)) == event["lap"]
+        for e in events or []
+    )
 
 
 def legend_events(model: dict, seed: int, rates: dict | None = None) -> list[dict]:
@@ -92,7 +99,7 @@ def legend_events(model: dict, seed: int, rates: dict | None = None) -> list[dic
     r = legend_rates(model, rates)
     sc_ok = race_rules.safety_car(model)  # no SC (so no VSC) before 1993
     vsc_ok = sc_ok and (model.get("rules") or {}).get("vsc") is not False
-    kept = [e for e in model["events"] if is_kept(e, takeover)]
+    kept = [e for e in model["events"] if is_kept(e, takeover, model["events"])]
     busy: set[int] = set()
     for e in kept:
         if e["type"] in NEUTRAL:

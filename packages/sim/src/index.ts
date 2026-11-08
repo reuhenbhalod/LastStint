@@ -22,6 +22,7 @@ export {
   planRemainingStop,
   realDecisions,
   readMove,
+  redFlagFree,
   rivalCover,
   ruleSatisfied,
   tyreLife,
@@ -203,3 +204,5 @@ export {
 export type { RivalGrade, RivalGradeJob, RivalOption } from './rivals/expert.js';
 export { regradeRivalPoints, replayWithRivalClaims } from './rivals/claims.js';
 export type { RivalClaimReplay, RivalRegrade } from './rivals/claims.js';
+export { RESTART_QUEUE_GAP, STANDING_RESTART_GAP, redFlagPlan } from './redflag.js';
+export type { RedFlagPlan } from './redflag.js';

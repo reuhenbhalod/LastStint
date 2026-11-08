@@ -23,6 +23,7 @@ from . import (
     fit,
     incidents,
     ingest,
+    redflag,
     scenario,
     track,
     wet,
@@ -1093,6 +1094,10 @@ def build_race(
     if laps is None:
         laps = pd.read_parquet(ingest.raw_snapshot_path(race_id, raw_dir))
     meta = resolved_meta(race_id, laps, raw_dir)
+    # Red flags (eras build plan 4.3): a hand-entered file marks the red laps a source without
+    # red-flag timing (TUM, Jolpica) can't show.
+    red_flags = redflag.load_entries(race_id, raw_dir)
+    laps = redflag.mark_hand_entries(laps, red_flags)
     if fault_facts is None:
         fault_facts = incidents.fault_facts(race_id)
     block = (load_sidecar(race_id, raw_dir) or {}).get("estimates")
@@ -1133,6 +1138,8 @@ def build_race(
         weather=weather,
         wet_pace=wet_pace,
         fault_facts=fault_facts,
+        year=meta.get("year"),
+        red_flags=red_flags,
     )
     model, overlay_lines = apply_eras(
         model, (block or {}).get("estimated", []), load_overlay(race_id, eras_dir)

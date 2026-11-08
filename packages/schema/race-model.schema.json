@@ -338,6 +338,13 @@
           "driver": {
             "type": "string"
           },
+          "restart": {
+            "enum": [
+              "standing",
+              "rolling"
+            ],
+            "description": "A RED event: how the race resumed (eras build plan 4.3): from a standing start on the grid, or rolling behind the safety car. Absent: it wasn't resumed."
+          },
           "storylineEvent": {
             "type": "boolean",
             "default": false,
@@ -415,7 +422,9 @@
               "takeover",
               "rain",
               "drying",
-              "fault"
+              "fault",
+              "RED",
+              "preRed"
             ]
           },
           "target": {

@@ -134,11 +134,13 @@ def test_relabel_2018_two_compounds_map_to_soft_medium():
     assert ingest.relabel_2018_compounds(laps)["Compound"].tolist() == ["SOFT", "MEDIUM"]
 
 
-def test_race_suitability_flags_red_not_wet():
+def test_race_suitability_accepts_red_and_wet():
     dry = _snapshot("abu-dhabi-2021")
     assert ingest.race_suitability(dry) == []
     # Wet races are modelled since the weather spec.
     wet = dry.assign(Compound=["INTERMEDIATE"] + list(dry["Compound"][1:]))
     red = dry.assign(TrackStatus=["15"] + list(dry["TrackStatus"][1:]))
     assert ingest.race_suitability(wet) == []
-    assert ingest.race_suitability(red) == ["red flag"]
+    # Red flags are modelled since eras build plan 4.3 (redflag.py).
+    assert ingest.race_suitability(red) == []
+    assert ingest.has_red_flag(red) and not ingest.has_red_flag(dry)

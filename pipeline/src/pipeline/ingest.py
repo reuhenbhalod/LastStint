@@ -171,13 +171,32 @@ def relabel_2018_compounds(df: pd.DataFrame) -> pd.DataFrame:
     return df.assign(Compound=df["Compound"].map(lambda c: mapping.get(c, c)))
 
 
+# The red-flag code in the track-status timeline and the per-lap TrackStatus (FastF1's; OpenF1
+# race control is mapped onto the same codes). Red-flag races are modelled since eras build
+# plan 4.3 (redflag.py).
+RED_FLAG = "5"
+
+
 def race_suitability(df: pd.DataFrame) -> list[str]:
-    """Reasons a race can't be modelled yet (spec D8): a red flag. (Wet races are, since the
-    weather spec.)"""
-    reasons = []
-    if df["TrackStatus"].astype(str).str.contains("5").any():
-        reasons.append("red flag")
-    return reasons
+    """Reasons a race can't be modelled yet (spec D8). None today: wet races are modelled
+    since the weather spec, red flags since eras build plan 4.3 (redflag.py)."""
+    return []
+
+
+def has_red_flag(df: pd.DataFrame) -> bool:
+    """True if any lap ran under a red flag."""
+    return bool(df["TrackStatus"].astype(str).str.contains(RED_FLAG).any())
+
+
+def save_red_flags(
+    race_id: str, messages: list[dict], origin: str, raw_dir: Path = RAW_DIR
+) -> Path | None:
+    """Write data/raw/<race-id>.redflags.json: each red flag's restart, from race control's
+    messages (redflag.py). Nothing for a race without a red flag or a word on its restart."""
+    from . import redflag
+
+    entries = redflag.restarts_from_messages(messages, origin)
+    return redflag.write_entries(race_id, entries, raw_dir) if entries else None
 
 
 def race_facts(session) -> dict:
@@ -252,6 +271,11 @@ def ingest_race(
     path.parent.mkdir(parents=True, exist_ok=True)
     df.to_parquet(path)
     save_track_status(race_id, session, raw_dir)
+    messages = getattr(session, "race_control_messages", None)
+    if has_red_flag(df) and messages is not None and len(messages):
+        from .redflag import fastf1_messages
+
+        save_red_flags(race_id, fastf1_messages(messages), "FastF1", raw_dir)
     if getattr(session, "weather_data", None) is not None and len(session.weather_data):
         save_weather(race_id, project_weather(session.weather_data), raw_dir)
     return df, facts
@@ -281,4 +305,6 @@ def ingest_openf1(
     status = track_status_path(race_id, raw_dir)
     status.write_text(json.dumps(openf1.track_status(raw), indent=1) + "\n")
     save_weather(race_id, openf1.weather(raw), raw_dir)
+    if has_red_flag(df):
+        save_red_flags(race_id, raw["race_control"], "OpenF1", raw_dir)
     return df, openf1.race_facts(raw, df)
