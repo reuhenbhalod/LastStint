@@ -1445,3 +1445,177 @@ Counting TyreLife from the start in 2005 would let the fit see it. That's an est
 the_raw_timelines` fails on the six new raw status timelines until integration regenerates it,
 as on earlier race branches. races.gen.ts and the parity fixtures are unchanged. Garages for
 2005-2009 are added (the 2004-2008 standings from the Jolpica dump).
+
+## Eras 5.1: refuelling races 1994-99 and 1983: Jolpica 0 pass, 0 borderline, 4 fail; reconstructed anchors 2 pass, 1 fail, G1 sanity 2 pass, 1 fail
+
+Eras build plan 5.1 (batch 5.4d), Nov 7 2026. Written by hand, as the sections above. Robust
+mode: 1,000 runs on each of two seed sets, values seed set 10000 / seed set 20000, limits in
+brackets. Every race is registered with split `eras`, the storyline duel from the Eras spec's
+Era 3 and Era 1 tables (§4, the user's driver first), `score_positions` 6, seed 1 and the D3
+takeover. Each file carries its overlay's `rules` (refuelling, no VSC, no DRS, no ERS; no
+safety car in 1983). The fill model is fitted from each race's F1DB stops
+(`refuel.race_fill_model`). No per-race knob was applied: none of these races has a safety car
+after its takeover, so `sc_unlap` doesn't bite, and the takeover stays the D3 rule's.
+
+**1. Jolpica races** (`pipeline jolpica <id>`: Jolpica laps, F1DB stops, step 2.4's estimated
+compounds, SC laps and fuel loads). All four are dry, with one dry compound (MEDIUM) and no SC
+period estimated. The SC hand-check files (`data/estimates/<id>.sc.json`) list no periods; the
+2.6 check file has "no SC in the source text" for all four.
+
+| Race | Duel | Takeover | Status | Mean gap error | Failing checks | Diagnosis |
+|---|---|---|---|---|---|---|
+| hungary-1997 | HIL vs VIL | 21 | fail | 4.15s | field MSCM 9.40 / 9.74, SCH 7.14 / 6.79, NAKH 9.37 / 9.44 [5.00] | pace 50%, rest 50%: stint pace behind the leaders. See below |
+| europe-1997 | VIL vs MSCM | 19 | fail | 2.53s | podium order rate 0.10 / 0.10 [0.50]; podium VIL 9.40 / 9.39 [5.00] | pace 27%, rest 73%: Villeneuve's last stint and the let-by. See below |
+| hungary-1998 | MSCM vs COU | 22 | fail | 1.66s | duel gap error 3.75 / 3.62 [3.00], order rate 0.53 / 0.52 [0.60] | pace 7%, rest 93%: Schumacher's 19-lap push. See below |
+| malaysia-1999 | IRV vs HAK | 22 | fail | 3.41s | duel gap error 3.34 / 3.33 [3.00] (order 0.99 passes); field BAR 6.81 / 6.81, FRE 7.56 / 7.66 [5.00] | pace 46%, rest 54%: Ferrari's team orders and Irvine's last laps. See below |
+
+| Race | Fuel effect (s per lap of fuel) | Fill rate (race's own slope, se) | refFill / tank (laps) |
+|---|---|---|---|
+| hungary-1997 | 0.0112 | 0.2491 (+0.144, 0.108; 30 stops) | 24.0 / 32 |
+| europe-1997 | 0.0544 | 0.2442 (+0.076, 0.054; 39 stops) | 21.0 / 26 |
+| hungary-1998 | 0.0422 | 0.2405 (+0.055, 0.044; 31 stops) | 23.6 / 33 |
+| malaysia-1999 | 0.1373 | 0.2468 (+0.193, 0.041; 20 stops) | 18.4 / 28 |
+
+**Hill's hydraulic failure is modelled (hungary-1997).** It is sourced: "On lap 74, with three
+laps left, the hydraulic pump failed on Hill's car, causing it to become stuck in third gear and
+have an intermittent throttle" (https://en.wikipedia.org/wiki/1997_Hungarian_Grand_Prix, citing
+ESPN's "The Broken Arrow", 2012). It is now a FAULT fact in data/incidents.json (status
+Hydraulics, kind `gear-stuck`, to the flag; row added to docs/eras-checks/2.6-drivers-incidents.md).
+As for every Jolpica race, the magnitude is fitted from his real laps (faults.py), not written
+down: laps 74-77 ran 83.96, 91.43, 100.92 and 99.23 s against about 82 s before, so the fit
+gives a pace loss of 12.27 s a lap. The duel now passes: HIL vs VIL gap error 1.26 / 1.18 s,
+order rate 0.77 / 0.79. A noise-free replay has Villeneuve win, as he did (a test in
+test_faults.py checks the fit and the replay).
+
+The diagnoses compare the sim's mean gaps (200 runs) with the real ones lap by lap, and each
+car's real laps with the sim's clean lap for it (its tank included), by stint.
+- **hungary-1997.** The duel and podium pass. The three failing cars are 7-10 s too far back
+  at the flag, each from one stint run faster than his race pace: Schumacher 0.93 s a lap under
+  his fit on laps 22-32 (the sim has him 14.6 s behind Villeneuve on lap 31, really 3.4 s; his
+  Goodyears blistered later, and he made three stops), Ralf Schumacher 0.52 s a lap under on
+  laps 27-50 and Nakano 0.61 s a lap under on laps 29-46. The model has one race pace per car.
+  It needs pace by stint (as san-marino-2005). No per-race knob applies.
+- **europe-1997.** The duel isn't scored: Schumacher retired from the lap-48 collision (a
+  frozen RETIREMENT on lap 47). Laps 20-43 are close (COU within 2 s of real). After the
+  collision Villeneuve ran 0.73 s a lap over his fit (laps 46-69), and on the last lap he let
+  both McLarens by ("It was better to let them through and win the World Championship",
+  Wikipedia, 1997 European Grand Prix; it also gives "the slower pace of Villeneuve's car").
+  The sim keeps him 7.7 s ahead of Häkkinen at the flag (real: 1.8 s behind), so the podium
+  order fails (0.10). The slower pace has a source but no cause the sim can model (no fault
+  kind for body damage, and the let-by is a driver's choice), so it isn't entered as a FAULT.
+  Owner's call whether a damage fault kind should exist.
+- **hungary-1998.** The race's storyline. After his lap-43 stop Ferrari asked Schumacher for
+  19 laps at qualifying pace, and he ran laps 45-61 0.66 s a lap under his fit (sum 11.3 s),
+  then eased off after his third stop (laps 64-77, 0.53 s a lap over). The sim's one race pace
+  gives him 7 s less over the push, so on lap 67 Coulthard is ahead in the sim (by 1.3 s; real
+  11.2 s behind) and the order is a coin flip (0.53). The gap at the flag is 3.7 s short. This
+  is exactly the call the player makes (push the stint), so it shouldn't be fitted away. Pace by
+  stint, or the push mode, is the model's answer; no per-race knob applies. Jolpica's winner
+  time is rounded to 0.1 s (the known quirk): every lead-lap gap carries at most 0.05 s of it.
+  Häkkinen (lapped, P6) isn't scored.
+- **malaysia-1999.** Ferrari's team orders: Schumacher let Irvine by (laps 52-53 ran 104.9 and
+  108.3 s) and held Häkkinen up. Irvine then eased off over the last laps while Barrichello and
+  Frentzen pushed (1.0-1.5 s a lap faster than him on laps 52-55), so BAR and FRE closed 4-7 s
+  and Häkkinen 4 s that the sim doesn't. BAR and FRE are also 4-5 s too far back by lap 25
+  (behind other cars in the sim's traffic). The duel's order is right (Irvine ahead in 99% of
+  runs); its gap is 3.3 s long. The leader's pace management again (as brazil-2009); no
+  per-race knob applies.
+
+**2. Reconstructed races** (`pipeline reconstruct <id>`: Jolpica results, F1DB fastest laps,
+F1DB stops for 1994, the sourced stop in data/reconstruction/south-africa-1983.json). Checked on
+their anchors; G1 is a sanity check only (its "real" gaps are the synthetic laps). spain-1994
+needs `--event Spanish` (two 1994 rounds match "spain").
+
+| Race | Duel | Takeover | Anchors (core) | G1 sanity | Mean gap error | Failing G1 checks | Diagnosis |
+|---|---|---|---|---|---|---|---|
+| spain-1994 | MSCM vs HIL | 19 | pass 88/88 | pass | 0.11s | | duel order 0.99 / 0.99 |
+| australia-1994 | MSCM vs HIL | 15 | pass 99/99 | pass | 0.26s | | no duel checks: both retire (laps 35, 36) |
+| south-africa-1983 | PIQN vs PRO | 25 | **fail** 54/55 (grid) | fail | 3.93s | podium PIQN 8.20 / 8.31 [5.00] | lap pace (pace 57%, rest 43%). See below |
+
+| Race | Fuel effect (s per lap of fuel) | Fill rate (race's own slope, se) | refFill / tank (laps) |
+|---|---|---|---|
+| spain-1994 | 0.0372 | 0.2488 (+0.074, 0.121; 15 stops) | 19.0 / 24 |
+| australia-1994 | 0.0195 | 0.2476 (+0.103, 0.078; 21 stops) | 21.7 / 34 |
+| south-africa-1983 | 0.0113 | none: no F1DB stops (see below) | – |
+
+The solver settled on its first attempt for every race (noise sigma 0.35 s). Full tables:
+`data/raw/<id>.anchors.md`.
+- **south-africa-1983's grid anchor** fails the known way (Era 2 section): Winkelhock, Laffite
+  and Ghinzani retired on lap 1 with their F1DB fastest lap on lap 1, so their lap-1 times are
+  pinned to it and they cross behind cars from lower on the grid. None runs past lap 1. The
+  fix belongs in reconstruct.py and is still the owner's call, so it isn't made here.
+- **Spain 1994's fault is not modelled.** "Schumacher stuck in fifth gear" (lap 22, sourced in
+  data/incidents.json) is a reconstructed race's fault, so the build leaves it out and reports
+  it ("fault not modelled"). The owner's rule is to model it from a sourced time loss where one
+  exists. None was found: Motor Sport (July 1994, "A timely triumph") quotes Schumacher ("In the
+  beginning I was doing lap times of 1m 32s ... I found a way to use fifth gear differently which
+  meant I could do 1m 26s again") and McLaren's after-race simulation ("without losing more than
+  a couple of seconds a lap"). Neither gives laps or a loss against his normal pace, and the
+  build has no path yet for building a sourced loss into a car's synthetic laps. His fastest lap
+  (85.155 s, lap 18) is before the fault, so his synthetic laps after lap 22 already average the
+  time he lost (his anchored race time). As the user he therefore races a healthy car at the
+  pace he really had while stuck in fifth: the storyline's car is there, its fault isn't.
+- **australia-1994: the duel can't be won as authored.** Schumacher and Hill collided: Jolpica
+  has Schumacher out after 35 laps and Hill after 36. Both are frozen RETIREMENTs, so the user's
+  car retires in every run (0 of 60 classified) whatever the calls, like australia-1986 and
+  monaco-1988 (Era 1 section). It needs the step 6.2 decision on a retirement the player's calls
+  could have prevented. The two stop-go penalties (Barrichello lap 58, Häkkinen lap 62) are
+  F1DB stops, run as stops.
+- **south-africa-1983's G1.** Only Piquet's stop is sourced (lap 28); Patrese's, Lauda's,
+  Tambay's and the other planned refuelling stops have no laps (the facts file), so they aren't
+  run and every other car runs non-stop, its stop time spread over its laps. That changes the
+  storyline: really Piquet "stopped without losing the lead", but the reconstruction has him 58 s
+  behind the non-stopping Patrese on lap 30, closing to 22 s at the flag. The sim gains 0.5 s a
+  lap of that back, not 0.8, so Piquet finishes 7.7 s too far back. The reconstruction's own fuel
+  effect (0.06 s per lap of fuel, its Params) is much larger than the race model's fit (0.0113:
+  one refuelled car can't pin it), so Piquet's lighter car after his stop is slower in the sim
+  than in the synthetic laps. Prost retires on lap 36 (frozen), so the duel isn't scored. The
+  real race isn't measured here either way.
+- **south-africa-1983 has no fill fit (owner).** No F1DB stops exist for 1983, so the file has
+  no `track.refuel`: a new stop takes the 0.25 s per lap prior with `refFill` 0 and pays its
+  whole fill on top of the pit loss (20 s, the reconstruction's assumed loss, which already holds
+  a fill). The fuel-load spec names this overcharge. Measured in the TS sim (incidents off, the
+  real calls otherwise): moving Piquet's one stop a lap earlier or later, fuelled to the flag,
+  costs him 7.0 / 7.5 s. At spain-1994, which has a fit, the same move costs +1.2 / -0.6 s.
+  So in South Africa any stop but the real one is about 7 s dearer than it should be, which tilts
+  the race's own dilemma (the refuelling stop). Fitting a fill model from the facts file's
+  stops, or a `refFill` for races without F1DB stops, is a design change, not made here.
+
+**3. The TS sim: real calls and playability.** Checked with a throwaway vitest file, not
+committed. For each of the seven races:
+- **The real calls replay the real race with no car running dry.** `realDecisions` gives every
+  pit call its real fill (e.g. hungary-1998 Schumacher `{laps: 18}`, `{laps: 19}`, `{laps: 15}`);
+  played live with incidents off, every car's time matches the replay exactly (max difference 0)
+  and no tank goes below 1 lap (the reserve). The committed `live-replay.test.ts` also covers
+  all seven, with the file's own fit, a steep test fit and the prior.
+- **With incidents on, the real calls never run the player dry:** 0 of 60 runs, normal and
+  Legend. Every run reaches the flag (60/60). The user is classified in 55-60 of 60 (0 in
+  australia-1994, above). Hill's fault note comes on lap 74 in 59 of 60 hungary-1997 runs (the
+  60th retired before it).
+- **Rules:** `resolveRules` gives `refuelling` true, `vsc` false, `drs` false, `ers` none and
+  `twoCompound` false for all seven; `safetyCar` true for 1994-99 and false for 1983. No VSC was
+  ever drawn. Live crashes bring SCs in 1994-99 (44-104 SC laps over 60 runs; 84-290 in Legend);
+  south-africa-1983 ran every lap green (0 SC laps, normal and Legend).
+- **Fills:** at the user's first real stop, the three choices fill what `fillOptions` says, and
+  the tank after the out-lap is the fill (e.g. hungary-1997 lap 26: short 18, standard 26, long
+  32 laps).
+- **With no calls at all, the player's car always runs dry** (60 of 60, every race): in a
+  refuelling race the takeover tank reaches only the next real stop plus the reserve, so staying
+  out is never a path to the flag. That's the model as designed (fuel-load spec), noted for the
+  reachability checker (6.1).
+- **Golden parity:** the TS sim matches each race's 20 golden seeds (order, finishers, times
+  and gaps within 0.0005 s): 140/140 (a scratch check; parity.test.ts covers its four races).
+
+**4. Other changes.**
+- Garages for 1983 and 1994-1999 (`apps/web/src/track/garages.ts`, from the 1982 and 1993-1998
+  final Jolpica constructors' standings, method in the comment; 1995 and 1996 too, for the Era 3
+  races still to come). A test checks each season's ends and the renamed teams' places.
+- The Eras API tests' race with no race file moved from south-africa-1983 (now built) to
+  san-marino-1985 (no file: its disqualified winner, owner decision), in apps/web and
+  apps/worker.
+- `test_faults.py`'s list of registered races with fault facts adds hungary-1997 and spain-1994.
+
+**Not regenerated here:** `apps/worker/src/races.gen.ts`, `data/sc_rates.json` and the parity
+fixtures. Two `test_sc_rates.py` tests fail until integration regenerates the rates:
+`test_committed_rates_match_the_raw_timelines` (seven new raw status timelines) and
+`test_every_race_file_finds_its_circuit` (europe-1997 is at Jerez, a new circuit).

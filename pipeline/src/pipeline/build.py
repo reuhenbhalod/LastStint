@@ -1599,6 +1599,105 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
+    # Eras wave B (build plan 5.1): refuelling races 1994-99 and 1983. 1996-99 from Jolpica
+    # (`pipeline jolpica`, F1DB stops) with step 2.4's estimated compounds, SC laps
+    # (data/estimates/<id>.sc.json) and fuel loads; Hill's lap-74 hydraulic failure at
+    # hungary-1997 is a FAULT (data/incidents.json). 1994 and 1983 are reconstructed from
+    # their anchors (`pipeline reconstruct`, step 4.6; 1994's stops from F1DB, 1983's from
+    # data/reconstruction/<id>.json) and checked on them. The fill model is fitted from the
+    # F1DB stops (refuel.race_fill_model). Duels from the Eras spec's race table (§4), the
+    # user's driver first; seeds and split as for wave A.
+    "hungary-1997": {
+        "year": 1997,
+        "event": "Hungary",
+        "source": "jolpica",
+        "name": "Hungary 1997: Hill vs Villeneuve",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "HIL",
+        "rival": "VIL",  # defend: Hill holds P1 (real: hydraulics on lap 74, Villeneuve wins)
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "europe-1997": {
+        "year": 1997,
+        "event": "European",
+        "source": "jolpica",
+        "name": "Europe 1997: Villeneuve vs Schumacher",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "VIL",
+        "rival": "MSCM",  # beat-rival: Villeneuve ahead of Schumacher, the title decider
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "hungary-1998": {
+        "year": 1998,
+        "event": "Hungary",
+        "source": "jolpica",
+        "name": "Hungary 1998: Schumacher vs Coulthard",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "MSCM",
+        "rival": "COU",  # win on three stops: Coulthard the car behind at the flag
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "malaysia-1999": {
+        "year": 1999,
+        "event": "Malaysia",
+        "source": "jolpica",
+        "name": "Malaysia 1999: Irvine vs Häkkinen",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "IRV",
+        "rival": "HAK",  # deny: Irvine wins, Häkkinen (title rival) kept P3 or lower
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "spain-1994": {
+        "year": 1994,
+        "event": "Spanish",  # `pipeline reconstruct spain-1994 --event Spanish`
+        "source": "reconstruct",
+        "name": "Spain 1994: Schumacher vs Hill",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "MSCM",
+        "rival": "HIL",  # position: Schumacher P2 stuck in fifth gear; Hill the car ahead
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "australia-1994": {
+        "year": 1994,
+        "event": "Australia",
+        "source": "reconstruct",
+        "name": "Australia 1994: Schumacher vs Hill",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "MSCM",
+        "rival": "HIL",  # beat-rival: Schumacher ahead of Hill (real: they collide, both out)
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "south-africa-1983": {
+        "year": 1983,
+        "event": "South Africa",
+        "source": "reconstruct",
+        "name": "South Africa 1983: Piquet vs Prost",
+        "era": "1988-1993",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "PIQN",
+        "rival": "PRO",  # Piquet high enough for the title: Prost, his title rival
+        "score_positions": 6,
+        "split": "eras",
+    },
 }
 
 

@@ -440,10 +440,10 @@ describe('POST /api/eras/attempts', () => {
   });
 
   it('refuses a race with no race file yet, an unknown race and a bad body', async () => {
-    expect(await json<{ error: string }>(await start('test', 'south-africa-1983'))).toMatchObject({
+    expect(await json<{ error: string }>(await start('test', 'san-marino-1985'))).toMatchObject({
       error: 'model-missing',
     });
-    expect((await start('test', 'south-africa-1983')).status).toBe(503);
+    expect((await start('test', 'san-marino-1985')).status).toBe(503);
     expect((await start('test', 'spain-2020')).status).toBe(404); // a Daily race, not Eras
     expect((await call('test', '/api/eras/attempts', { anonId: 'x', raceId: 'x' })).status).toBe(
       400,
@@ -472,7 +472,7 @@ describe('GET /api/eras/races/:raceId/model', () => {
 
   it('test serves every built Eras race; never one with no file or not in Eras', async () => {
     expect((await model('test', 'hungary-2022')).status).toBe(200);
-    expect((await model('test', 'south-africa-1983')).status).toBe(404);
+    expect((await model('test', 'san-marino-1985')).status).toBe(404);
     expect((await model('test', 'spain-2020')).status).toBe(404);
   });
 

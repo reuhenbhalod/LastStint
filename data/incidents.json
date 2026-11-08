@@ -691,6 +691,18 @@
    "source": "https://en.wikipedia.org/wiki/1994_Spanish_Grand_Prix"
   }
  ],
+ "hungary-1997": [
+  {
+   "lap": 74,
+   "type": "FAULT",
+   "driver": "HIL",
+   "status": "Hydraulics",
+   "fault": "gear-stuck",
+   "detail": "Hydraulic pump failed with three laps left: stuck in third gear with an intermittent throttle; Villeneuve passed him on the last lap",
+   "source": "https://en.wikipedia.org/wiki/1997_Hungarian_Grand_Prix",
+   "note": "'On lap 74, with three laps left, the hydraulic pump failed on Hill's car, causing it to become stuck in third gear and have an intermittent throttle' (Wikipedia, citing ESPN, 'The Broken Arrow', 20 Aug 2012)"
+  }
+ ],
  "japan-1989": [],
  "united-states-1990": [],
  "mexico-1990": [],
