@@ -9,7 +9,7 @@ import { Disclaimer } from '../components/Disclaimer.js';
 import { EraDetailBody } from './EraDetail.js';
 import { EraMapBody } from './EraMap.js';
 import { EraRace } from './EraRace.js';
-import { type ErasApi, erasApi } from './api.js';
+import { type ErasApi, canStartWith, erasApi } from './api.js';
 import type { EraInfo, ErasRoute } from './catalog.js';
 import { type EraDetailState, loadEraDetail } from './eraDetailState.js';
 import { type EraMapState, loadEraMap } from './eraMapState.js';
@@ -108,7 +108,7 @@ export function EraDetailScreen({
     void attempt;
     let live = true;
     setState({ kind: 'loading' });
-    loadEraDetail(api, era.id).then((next) => {
+    loadEraDetail(api, era.id, canStartWith(api)).then((next) => {
       if (live) setState(next);
     });
     return () => {

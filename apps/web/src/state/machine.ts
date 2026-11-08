@@ -18,6 +18,7 @@ import type {
 import type { RunResponse } from '../data/api.js';
 import type { RaceSource } from '../data/types.js';
 import type { GradedMoment } from '../engine/grading.js';
+import type { AttemptResult } from '../eras/api.js';
 
 export type Phase =
   | 'intro'
@@ -54,9 +55,10 @@ export type Speed = 1 | 2;
 
 /**
  * The run's submission: `practice` (not submitted), `sending`, `done` (the server's numbers),
- * `already` (this player already played today; `response` is that run), or `error`. `eras`:
- * an Eras attempt, graded on this device and not posted as a daily run; the attempt's own
- * submission is build plan 8.7.
+ * `already` (this player already played today; `response` is that run), or `error` (`retry`
+ * false: submitting again can't help). An Eras attempt (eras/submit.ts) starts `eras` (not
+ * sent yet), and ends `eras-done` (the server's stars and accuracy) or `eras-held` (the server
+ * kept the calls but can't evaluate them now: `message` says why).
  */
 export type Submission =
   | { status: 'none' }
@@ -64,7 +66,9 @@ export type Submission =
   | { status: 'eras' }
   | { status: 'sending' }
   | { status: 'done' | 'already'; response: RunResponse }
-  | { status: 'error'; error: string };
+  | { status: 'eras-done'; result: AttemptResult }
+  | { status: 'eras-held'; message: string }
+  | { status: 'error'; error: string; retry?: boolean };
 
 /** A new run's submission: a live daily waits to be sent; an Eras attempt is its own. */
 export function initialSubmission(source: RaceSource): Submission {
@@ -207,7 +211,9 @@ export function reducer(state: GameState, action: Action): GameState {
 
     case 'SUBMIT':
       return state.phase === 'finished' ||
-        (state.phase === 'results' && state.submission.status === 'error')
+        (state.phase === 'results' &&
+          state.submission.status === 'error' &&
+          state.submission.retry !== false)
         ? { ...state, phase: 'submitting', submission: { status: 'sending' } }
         : state;
 

@@ -1,10 +1,12 @@
-import type { DifficultySettings } from '@laststint/sim';
-// The Eras API as the client sees it (docs/laststint-eras-mode-spec.md §13). The Worker
-// endpoints are build-plan step 7.2 and don't exist yet, so the app runs on the mock in
-// mockErasApi.ts; swap `erasApi` for an HTTP client once the endpoints are up.
+import type { Decision, DifficultySettings, RivalChoice } from '@laststint/sim';
+// The Eras API as the client sees it (docs/laststint-eras-mode-spec.md §13). The app talks to
+// the Worker (httpErasApi.ts); `VITE_ERAS_MOCK=1` runs it on the in-browser mock instead
+// (mockErasApi.ts), for working on the screens without a Worker.
 
 import type { RaceModel } from '@laststint/sim';
-import { mockErasApi } from './mockErasApi.js';
+import type { CallResult, PlanResult, RunSubmission } from '../data/api.js';
+import { httpErasApi } from './httpErasApi.js';
+import { mockCanStart, mockErasApi } from './mockErasApi.js';
 
 /** An era on the map: `GET /api/eras`. */
 export interface EraSummary {
@@ -93,6 +95,65 @@ export interface AttemptResponse {
    * loading the whole era; send it from `era_races` with the attempt.
    */
   draft?: boolean;
+  /** The pinned race file's hash (the Worker's), echoed on submit so a rebuilt race is caught. */
+  modelHash?: string;
+}
+
+/** The three stars of a race (eras spec §6). */
+export interface Stars {
+  result: boolean;
+  strategist: boolean;
+  mastery: boolean;
+}
+
+/** `POST /api/eras/attempts/:id`: the finished attempt (apps/worker/src/eras.ts submitAttempt). */
+export interface AttemptSubmission {
+  decisions: Decision[];
+  /** The game's claimed grades, as a Daily run's (POST /api/runs `grades`). */
+  grades: RunSubmission['grades'];
+  /** A decision was shown with the timer off (eras spec §7): the stars are marked untimed. */
+  untimed: boolean;
+  /** Expert: the rival's choice at each of its decision points (eras spec §7). */
+  rivalClaims?: RivalChoice[];
+  modelHash?: string;
+}
+
+/** The evaluated attempt (the Worker's SubmitResponse: erasEval.ts EraAttemptResult and more). */
+export interface AttemptResult {
+  attemptId: string;
+  raceId: string;
+  legend: boolean;
+  untimed: boolean;
+  /** Race accuracy, 0-100 (eras spec §6). */
+  accuracy: number;
+  /** The stars this attempt earned. */
+  stars: Stars;
+  masteryObjective: boolean;
+  cleanCalls: boolean;
+  /** The hidden objective was met (null: the race has none). */
+  hidden: boolean | null;
+  /** The storyline's rewrite condition was met (null: the race has no storyline). */
+  rewrite: boolean | null;
+  decisionAccuracies: number[];
+  finishPosition: number;
+  disqualified: boolean;
+  result: {
+    order: string[];
+    finishers: string[];
+    disqualified: string[];
+    gaps: Record<string, number>;
+  };
+  calls: CallResult[];
+  plan?: PlanResult;
+  /** Stars earned on this attempt that the player didn't have on the race before. */
+  newStars: Stars;
+  /** This attempt wrote the race's history book entry (the first rewrite). */
+  historyEntry: boolean;
+  /** The player's best per star on the race, this attempt included. */
+  progress: { stars: Stars; hiddenDone: boolean; bestAccuracy: number | null };
+  /** The player's place on the race's board by best accuracy, of `total`. */
+  rank: number;
+  total: number;
 }
 
 export interface ErasApi {
@@ -104,10 +165,41 @@ export interface ErasApi {
   startAttempt(req: AttemptRequest): Promise<AttemptResponse>;
   /** Load the race file an attempt pinned (`modelUrl`). */
   loadModel(modelUrl: string): Promise<RaceModel>;
+  /** `POST /api/eras/attempts/:id`: submit a finished attempt; the server evaluates it. */
+  submitAttempt(attemptId: string, body: AttemptSubmission): Promise<AttemptResult>;
+  /**
+   * `GET /api/eras/races/:raceId/stats`: community stats (step 7.4). The results screen reads
+   * `rewrite.share` and shows nothing when the call fails or there is no community (null: the
+   * mock).
+   */
+  raceStats(raceId: string): Promise<RaceStats | null>;
 }
 
-/** The client the app uses. MOCK until build-plan step 7.2 ships the endpoints. */
-export const erasApi: ErasApi = mockErasApi;
+/** The dev flag: run Eras on the in-browser mock (`VITE_ERAS_MOCK=1`). */
+export function erasMockOn(env: { VITE_ERAS_MOCK?: string } = import.meta.env): boolean {
+  return env.VITE_ERAS_MOCK === '1';
+}
+
+/** The client and which races it can start: the Worker (every race: it refuses what it must), or
+ * the mock (only races with a bundled race file). */
+export function erasClient(mock: boolean): {
+  api: ErasApi;
+  canStart: (raceId: string) => boolean;
+} {
+  return mock
+    ? { api: mockErasApi, canStart: mockCanStart }
+    : { api: httpErasApi, canStart: () => true };
+}
+
+const client = erasClient(erasMockOn());
+
+/** The client the app uses: the Worker, or the mock with `VITE_ERAS_MOCK=1`. */
+export const erasApi: ErasApi = client.api;
+
+/** Which races a given client can start (the mock: bundled race files only). */
+export function canStartWith(api: ErasApi): (raceId: string) => boolean {
+  return api === mockErasApi ? mockCanStart : () => true;
+}
 
 // ---- history book, community stats, leaderboards (spec §8, §13; build plan 7.4) -----------
 // The Worker's shapes (apps/worker/src/erasHistory.ts). A separate interface from `ErasApi`

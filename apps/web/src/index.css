@@ -279,6 +279,39 @@ label:has(input) {
   }
 }
 
+/* A star new on an Eras race (results screen, eras/EraResults.tsx): pops in with a glow.
+   Reduced motion: shown as earned, no animation (the "New star" label says it). */
+@keyframes star-new {
+  0% {
+    transform: scale(0.4) rotate(-12deg);
+    opacity: 0;
+  }
+  55% {
+    transform: scale(1.12) rotate(3deg);
+    opacity: 1;
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--flag) 35%, transparent);
+  }
+  100% {
+    transform: none;
+    opacity: 1;
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+.star-new {
+  animation: star-new 700ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.star-new:nth-child(2) {
+  animation-delay: 150ms;
+}
+.star-new:nth-child(3) {
+  animation-delay: 300ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  .star-new {
+    animation: none;
+  }
+}
+
 /* Race graphics slide in like TV lower thirds. */
 .bc-slide {
   animation: bc-slide 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);

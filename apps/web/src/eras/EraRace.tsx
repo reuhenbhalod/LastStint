@@ -1,9 +1,9 @@
 // An Eras race (build-plan 8.3; spec §9): a race card links here (`/eras/<eraId>/<raceId>`, or
 // `…/legend`), which starts a fresh attempt through EraProvider and plays it: the Eras race
 // intro (8.4: dilemma, objectives, difficulty), the race at the attempt's difficulty (the
-// race screen's `eras` prop, 8.6), then the review. Leaving goes back to the era.
-// TODO(8.7): submit the attempt and show its stars; until then it's graded locally only
-// (useGame's `submit` hook for the 'eras' source).
+// race screen's `eras` prop, 8.6), then the review with the attempt's stars (8.7: submitted
+// by useGame's `submit`, eras/submit.ts). Leaving goes back to the era; "New attempt" starts a
+// fresh one (a new seed) on the same race.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTeamTheme } from '../game/teamTheme.js';
@@ -11,9 +11,11 @@ import { useGame } from '../game/useGame.js';
 import { HowItWorks } from '../screens/HowItWorks.js';
 import { RaceScreen } from '../screens/RaceScreen.js';
 import { ResultScreen } from '../screens/ResultScreen.js';
+import { clearRun } from '../state/storage.js';
 import { EraIntro } from './EraIntro.js';
 import { EraProvider, eraDailyOf } from './EraProvider.js';
-import { type ErasApi, erasApi } from './api.js';
+import type { ErasResultInfo } from './EraResults.js';
+import { type ErasApi, type RaceStats, erasApi } from './api.js';
 import { type EraInfo, type EraRaceInfo, raceName } from './catalog.js';
 import type { ErasRace } from './difficulty/erasRace.js';
 import { timerOn } from './difficulty/settings.js';
@@ -75,7 +77,7 @@ export function EraRace({
     () => new EraProvider(race.raceId, legend, api),
     [race.raceId, legend, api],
   );
-  const game = useGame(provider, undefined, ERAS_RUN_KEY);
+  const game = useGame(provider, undefined, ERAS_RUN_KEY, api);
   // The race in the driver's team colours (game/teamTheme.ts).
   useTeamTheme(game.model);
   const [help, setHelp] = useState(false);
@@ -92,6 +94,41 @@ export function EraRace({
     () => (attempt ? { difficulty: attempt.difficulty, attemptId: attempt.attemptId } : undefined),
     [attempt],
   );
+  // "New attempt": the attempt being replaced, until the fresh one has loaded.
+  const [leaving, setLeaving] = useState<string | null>(null);
+  const newAttempt = useCallback(() => {
+    if (!attempt) return;
+    setLeaving(attempt.attemptId);
+    clearRun(ERAS_RUN_KEY);
+    game.reload();
+  }, [attempt, game.reload]);
+  // The race's community stats for the results (step 7.4); nothing shown if not served.
+  const [stats, setStats] = useState<RaceStats | null>(null);
+  const atResults = game.state?.phase === 'results';
+  useEffect(() => {
+    if (!atResults) return;
+    let live = true;
+    api.raceStats(race.raceId).then(
+      (s) => live && setStats(s),
+      () => live && setStats(null),
+    );
+    return () => {
+      live = false;
+    };
+  }, [api, race.raceId, atResults]);
+  const results = useMemo<ErasResultInfo | null>(
+    () =>
+      attempt
+        ? {
+            era,
+            legend: attempt.legend,
+            difficulty: attempt.difficulty,
+            stats,
+            onNewAttempt: newAttempt,
+          }
+        : null,
+    [attempt, era, stats, newAttempt],
+  );
 
   if (help) return <HowItWorks onClose={() => setHelp(false)} />;
   if (game.error) {
@@ -107,7 +144,8 @@ export function EraRace({
       />
     );
   }
-  if (!game.state || !game.model || !attempt) {
+  const restarting = leaving !== null && attempt?.attemptId === leaving;
+  if (!game.state || !game.model || !attempt || !results || restarting) {
     return (
       <main className="flex min-h-screen items-center justify-center" aria-busy="true">
         <output className="font-mono text-sm text-[var(--muted)]">
@@ -151,6 +189,6 @@ export function EraRace({
           />
         );
       }
-      return <ResultScreen state={game.state} game={game} onHome={back} />;
+      return <ResultScreen state={game.state} game={game} onHome={back} eras={results} />;
   }
 }

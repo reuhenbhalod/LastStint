@@ -43,6 +43,21 @@ describe('EraProvider', () => {
     });
     expect(daily.model.race.id).toBe(MOCK_RACE_ID);
     expect(daily.difficulty).toMatchObject({ information: 'full', decisionTimerSeconds: 45 });
+    // Played as the server replays it: the era's rival, and Legend's safety cars.
+    expect(daily.run).toEqual({ rivalPolicy: daily.difficulty.rivalPolicy, legend: false });
+    expect(daily.modelHash).toBeUndefined();
+  });
+
+  it('carries the attempt’s Legend flag, rival and model hash into the run', async () => {
+    const { api } = recording({
+      startAttempt: async (req) => ({
+        ...(await mockErasApi.startAttempt(req)),
+        modelHash: 'h1',
+      }),
+    });
+    const daily = await new EraProvider(MOCK_RACE_ID, true, api).today();
+    expect(daily.run).toEqual({ rivalPolicy: 'expert', legend: true });
+    expect(daily.modelHash).toBe('h1');
   });
 
   it('starts a fresh attempt on every load, with Legend passed through', async () => {

@@ -1,5 +1,5 @@
 // The Eras API over HTTP: the Worker's endpoints (apps/worker/src/eras.ts; eras spec §13,
-// build plan 7.2). Not switched on yet: the app still uses the mock (api.ts `erasApi`).
+// build plans 7.2-7.4). The app's client (api.ts `erasApi`) unless `VITE_ERAS_MOCK=1`.
 //
 // Every call names the player by the browser's player ID (data/player.ts `anonId`), which a
 // signed-in browser swaps for its account's ID; the Worker resolves a linked ID to its account.
@@ -10,6 +10,8 @@ import { anonId as browserPlayerId } from '../data/player.js';
 import type {
   AttemptRequest,
   AttemptResponse,
+  AttemptResult,
+  AttemptSubmission,
   EraDetail,
   EraLeaderboard,
   ErasApi,
@@ -18,6 +20,9 @@ import type {
   HistoryBook,
   RaceStats,
 } from './api.js';
+
+const RACE_ID = /^[a-z0-9-]+$/;
+const badRace = (raceId: string) => Promise.reject(new RangeError(`bad race ${raceId}`));
 
 export interface HttpErasApiDeps {
   /** The player making the calls (default: this browser's player ID). */
@@ -47,15 +52,27 @@ export function createHttpErasApi(deps: HttpErasApiDeps = {}): ErasApi & ErasHis
     /** The race file an attempt pinned: `modelUrl` is absolute, from the Worker. */
     loadModel: (modelUrl: string): Promise<RaceModel> => get<RaceModel>(modelUrl),
 
+    submitAttempt: (attemptId: string, body: AttemptSubmission): Promise<AttemptResult> => {
+      if (!attemptId) return Promise.reject(new RangeError('no attempt to submit'));
+      return post<AttemptResult>(`/api/eras/attempts/${encodeURIComponent(attemptId)}`, {
+        anonId: playerId(),
+        ...body,
+      });
+    },
+
     history: (): Promise<HistoryBook> => get<HistoryBook>(`/api/history?anonId=${who()}`),
 
-    raceStats: (raceId: string): Promise<RaceStats> =>
-      get<RaceStats>(`/api/eras/races/${encodeURIComponent(raceId)}/stats`),
+    raceStats: (raceId: string): Promise<RaceStats> => {
+      if (!RACE_ID.test(raceId)) return badRace(raceId);
+      return get<RaceStats>(`/api/eras/races/${raceId}/stats`);
+    },
 
-    leaderboard: (raceId: string, legend: boolean): Promise<EraLeaderboard> =>
-      get<EraLeaderboard>(
-        `/api/eras/races/${encodeURIComponent(raceId)}/leaderboard?legend=${legend}&anonId=${who()}`,
-      ),
+    leaderboard: (raceId: string, legend: boolean): Promise<EraLeaderboard> => {
+      if (!RACE_ID.test(raceId)) return badRace(raceId);
+      return get<EraLeaderboard>(
+        `/api/eras/races/${raceId}/leaderboard?legend=${legend}&anonId=${who()}`,
+      );
+    },
   };
 }
 

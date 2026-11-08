@@ -12,6 +12,8 @@ export interface EraDaily extends Daily {
   difficulty: AttemptResponse['difficulty'];
   /** The race isn't published: playable on test only (spec §5), shown with a Draft badge. */
   draft: boolean;
+  /** The pinned race file's hash, echoed on submit (absent from the mock). */
+  modelHash?: string;
 }
 
 export class EraProvider implements DailyProvider {
@@ -34,13 +36,15 @@ export class EraProvider implements DailyProvider {
       raceId: this.raceId,
       seed: attempt.seed,
       model,
-      // Graded on this device and never posted as a daily run; the attempt's own submission
-      // is build plan 8.7 (useGame's `submit`).
+      // Never posted as a daily run: submitted as the attempt (eras/submit.ts).
       source: 'eras',
+      // Played as the server replays it: the era's rival and Legend's safety cars.
+      run: { rivalPolicy: attempt.difficulty.rivalPolicy, legend: this.legend },
       attemptId: attempt.attemptId,
       legend: this.legend,
       difficulty: attempt.difficulty,
       draft: attempt.draft === true,
+      ...(attempt.modelHash ? { modelHash: attempt.modelHash } : {}),
     };
   }
 }

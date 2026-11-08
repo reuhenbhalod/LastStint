@@ -6,15 +6,19 @@ import { type DifficultySettings, difficultyForEra, legendDifficulty } from '@la
 // test mode (`testMode: true`), as the staging server will. Remove once the endpoints are up.
 
 import type { RaceModel } from '@laststint/sim';
+import { ApiError } from '../api.js';
 import type {
   AttemptRequest,
   AttemptResponse,
+  AttemptResult,
   EraDetail,
   EraRaceSummary,
   EraSummary,
   ErasApi,
+  Stars,
 } from './api.js';
 import { ERAS, eraById, eraRace, racesOfEra } from './catalog.js';
+import { mockEvaluate } from './mockEvaluate.js';
 
 // The race files bundled with the app, loaded on demand (as data/provider.ts does).
 const RACE_FILES = import.meta.glob<{ default: RaceModel }>('../../../../data/races/*.json');
@@ -64,6 +68,14 @@ function reconstructed(raceId: string): boolean {
 
 let attempts = 0;
 
+/** The mock's attempts and the player's best per race (this page only). */
+const started = new Map<
+  string,
+  { raceId: string; legend: boolean; seed: number; difficulty: DifficultySettings; done: boolean }
+>();
+const best = new Map<string, AttemptResult['progress']>();
+const NO_STARS: Stars = { result: false, strategist: false, mastery: false };
+
 export const mockErasApi: ErasApi = {
   async eras() {
     return { testMode: true, eras: ERAS.map((e) => summary(e.id)) };
@@ -91,16 +103,64 @@ export const mockErasApi: ErasApi = {
     if (!race) throw new Error(`${raceId} is not an Eras race`);
     if (!mockCanStart(raceId)) throw new Error(`no race file for ${raceId} in this build yet`);
     attempts += 1;
+    const attemptId = `mock-attempt-${attempts}`;
+    // A fresh seed per attempt, as the server will give (spec §9).
+    const seed = Math.floor(Math.random() * 2 ** 31);
+    // The era's settings from the Eras config, or Legend's (spec §7, §8).
+    const difficulty = settings(legend ? legendDifficulty() : difficultyForEra(race.eraId));
+    started.set(attemptId, { raceId, legend, seed, difficulty, done: false });
     return {
-      attemptId: `mock-attempt-${attempts}`,
-      // A fresh seed per attempt, as the server will give (spec §9).
-      seed: Math.floor(Math.random() * 2 ** 31),
+      attemptId,
+      seed,
       modelUrl: `mock://races/${raceId}`,
-      // The era's settings from the Eras config, or Legend's (spec §7, §8).
-      difficulty: settings(legend ? legendDifficulty() : difficultyForEra(race.eraId)),
+      difficulty,
       // Nothing is published yet, as on the era cards.
       draft: true,
     };
+  },
+
+  async submitAttempt(attemptId, body) {
+    const attempt = started.get(attemptId);
+    if (!attempt) throw new ApiError(404, 'no-attempt');
+    if (attempt.done) throw new ApiError(409, 'already-submitted');
+    const model = await this.loadModel(`mock://races/${attempt.raceId}`);
+    const evaluated = mockEvaluate(model, attempt, body);
+    attempt.done = true;
+    const key = `${attempt.raceId}:${attempt.legend}`;
+    const had = best.get(key) ?? { stars: NO_STARS, hiddenDone: false, bestAccuracy: null };
+    const s = evaluated.stars;
+    const stars: Stars = {
+      result: had.stars.result || s.result,
+      strategist: had.stars.strategist || s.strategist,
+      mastery: had.stars.mastery || s.mastery,
+    };
+    const progress = {
+      stars,
+      hiddenDone:
+        had.hiddenDone ||
+        (evaluated.hidden === true && stars.result && stars.strategist && stars.mastery),
+      bestAccuracy: Math.max(had.bestAccuracy ?? 0, evaluated.accuracy),
+    };
+    best.set(key, progress);
+    return {
+      attemptId,
+      ...evaluated,
+      newStars: {
+        result: stars.result && !had.stars.result,
+        strategist: stars.strategist && !had.stars.strategist,
+        mastery: stars.mastery && !had.stars.mastery,
+      },
+      historyEntry: evaluated.rewrite === true,
+      progress,
+      // The mock has one player.
+      rank: 1,
+      total: 1,
+    };
+  },
+
+  async raceStats() {
+    // No community in the mock: nothing to show.
+    return null;
   },
 
   async loadModel(modelUrl) {
