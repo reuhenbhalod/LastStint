@@ -13,7 +13,8 @@
 //                                             rivalClaims?, modelHash? } -> the evaluated
 //                                             attempt (erasEval.ts EraAttemptResult) with the
 //                                             player's progress on the race and rank (7.3)
-//   GET  /api/eras/races/:raceId/model?h=     the race file an attempt pinned (immutable by hash)
+//   GET  /api/eras/races/:raceId/model?h=     the race model an attempt pinned (immutable by
+//                                             hash): a shared race's file with its overlay
 //
 // The player is the account an anonId is linked to (player_ids), else the anonId itself: a
 // signed-in browser plays as its account's player ID (players.ts, erasMerge.ts). Unlocks,
@@ -37,9 +38,10 @@ import {
   attemptDifficulty,
   evaluateAttempt,
 } from './erasEval.js';
+import { withErasOverlay } from './erasOverlay.js';
 import { modelHash } from './hash.js';
 import type { Env } from './index.js';
-import { ERAS_RACE_FILES } from './races.gen.js';
+import { ERAS_OVERLAYS, ERAS_RACE_FILES } from './races.gen.js';
 import { type BundledRace, getRace } from './races.js';
 import { ApiError, isAnonId } from './runs.js';
 
@@ -136,20 +138,34 @@ interface EraState {
 
 // ---- race files ---------------------------------------------------------------------------
 
-const erasHashes = new Map<string, Promise<string>>();
+// Keyed by the bundled source file, so each is merged and hashed once.
+const erasModels = new WeakMap<object, Promise<BundledRace>>();
 
-/** An Eras race's bundled file: a Daily or Gauntlet one, or an Eras-only one. Null: not built. */
+function bundled(source: RaceModel, make: () => RaceModel): Promise<BundledRace> {
+  let race = erasModels.get(source);
+  if (!race) {
+    const model = make();
+    race = modelHash(model).then((hash) => ({ model, hash }));
+    erasModels.set(source, race);
+  }
+  return race;
+}
+
+/**
+ * An Eras race's model, as the Eras API serves, pins and evaluates it: a shared race's (Daily
+ * or Gauntlet) file merged with its Eras overlay, with the merged model's own hash (the Daily
+ * file and hash are untouched; eras build plan, "Shared races"); any other Daily or Gauntlet
+ * race's file; or an Eras-only race's file. Null: not built.
+ */
 export async function getErasRace(id: string): Promise<BundledRace | null> {
-  const shared = await getRace(id);
-  if (shared) return shared;
+  const daily = await getRace(id);
+  if (daily) {
+    if (!Object.hasOwn(ERAS_OVERLAYS, id)) return daily;
+    return bundled(daily.model, () => withErasOverlay(daily.model, ERAS_OVERLAYS[id]));
+  }
   if (!Object.hasOwn(ERAS_RACE_FILES, id)) return null;
   const model = ERAS_RACE_FILES[id] as RaceModel;
-  let hash = erasHashes.get(id);
-  if (!hash) {
-    hash = modelHash(model);
-    erasHashes.set(id, hash);
-  }
-  return { model, hash: await hash };
+  return bundled(model, () => model);
 }
 
 // ---- campaign state ----------------------------------------------------------------------
@@ -578,7 +594,7 @@ export function registerEras(app: Hono<{ Bindings: Env }>) {
     return submitAttempt(c, c.req.param('id'), Date.now());
   });
 
-  // The race file an attempt pinned. Production serves published races of released eras only
+  // The race model an attempt pinned (getErasRace). Production serves published races of released eras only
   // (anything else reads as no race); test serves every built Eras race.
   app.get('/api/eras/races/:raceId/model', async (c) => {
     const raceId = c.req.param('raceId');

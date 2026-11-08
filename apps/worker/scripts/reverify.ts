@@ -12,13 +12,16 @@
 // progress is rebuilt from all of the player's attempts there (src/reverify.ts
 // recheckAttemptSql), so it never loses a star earned on another attempt. An Expert rival's
 // claimed choices are re-graded too, and wrong ones corrected. An attempt whose race file
-// changed since it started is left for later.
+// changed since it started is left for later. A shared race's attempt is re-graded from the
+// race file merged with its Eras overlay, the model it pinned.
 
 import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { RaceModel } from '@laststint/sim';
+import { withErasOverlay } from '../src/erasOverlay.js';
 import { modelHash } from '../src/hash.js';
+import { ERAS_OVERLAYS } from '../src/races.gen.js';
 import {
   type UnverifiedAttempt,
   type UnverifiedRun,
@@ -48,11 +51,17 @@ const runs = query<UnverifiedRun & { model_hash: string }>(
 );
 
 const models = new Map<string, RaceModel | null>();
-async function modelFor(raceId: string, hash: string): Promise<RaceModel | null> {
-  const key = `${raceId}:${hash}`;
+async function modelFor(raceId: string, hash: string, eras = false): Promise<RaceModel | null> {
+  const key = `${raceId}:${hash}:${eras}`;
   if (!models.has(key)) {
     const file = join(repo, 'data', 'races', `${raceId}.json`);
-    const model = JSON.parse(readFileSync(file, 'utf8')) as RaceModel;
+    let model = JSON.parse(readFileSync(file, 'utf8')) as RaceModel;
+    // A shared race's Eras attempt pinned its file merged with its overlay (src/erasOverlay.ts;
+    // eras build plan, "Shared races"), which only races.gen.ts's ERAS_OVERLAYS lists.
+    if (eras && Object.hasOwn(ERAS_OVERLAYS, raceId)) {
+      const overlay = join(repo, 'data', 'eras', `${raceId}.json`);
+      model = withErasOverlay(model, JSON.parse(readFileSync(overlay, 'utf8')));
+    }
     models.set(key, (await modelHash(model)) === hash ? model : null);
   }
   return models.get(key) ?? null;
@@ -158,7 +167,7 @@ let attemptsOk = 0;
 let attemptsFixed = 0;
 let attemptsLeft = 0;
 for (const a of attempts) {
-  const model = a.model_hash ? await modelFor(a.race_id, a.model_hash) : null;
+  const model = a.model_hash ? await modelFor(a.race_id, a.model_hash, true) : null;
   if (!model) {
     console.warn(`eras attempt ${a.id}: ${a.race_id} changed since it started, skipped`);
     attemptsLeft++;

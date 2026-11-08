@@ -36,6 +36,9 @@ from .paths import DATA_DIR, RAW_DIR
 # with up to four keys, applied over the built model by export.with_eras_fields.
 ERAS_DIR = DATA_DIR / "eras"
 OVERLAY_KEYS = ("eras", "provenance", "rules", "storylineEvents")
+# The game modes' race pools. A Daily or Gauntlet race's file is never given its overlay
+# (eras build plan, "Shared races"): the Worker serves the overlay beside it to Eras only.
+POOLS_PATH = DATA_DIR / "pools.json"
 
 # Race registry: metadata that isn't derivable from the timing data. `split` is the Phase
 # 1-2 perfection spec's fixed tune / held-out assignment (A1): held-out races are never used
@@ -1292,6 +1295,14 @@ def load_overlay(race_id: str, eras_dir: Path = ERAS_DIR) -> dict | None:
     return overlay
 
 
+def shared_races(pools_path: Path = POOLS_PATH) -> frozenset[str]:
+    """The Daily and Gauntlet (survivor) races of data/pools.json. Their race files keep their
+    Daily content and hash, so `build_race` leaves their Eras overlay out (the Worker merges it
+    in for Eras: apps/worker/src/erasOverlay.ts)."""
+    pools = json.loads(Path(pools_path).read_text())
+    return frozenset([*pools.get("daily", []), *pools.get("survivor", {})])
+
+
 def apply_eras(model: dict, estimated: list[str], overlay: dict | None) -> tuple[dict, list[str]]:
     """The model with its provenance (the estimated fields, merged with the overlay's) and the
     overlay's eras / rules / storylineEvents, via export.with_eras_fields. Unchanged (the same
@@ -1319,11 +1330,13 @@ def build_race(
     fault_facts: list[dict] | None = None,
     *,
     eras_dir: Path = ERAS_DIR,
+    pools_path: Path = POOLS_PATH,
 ) -> BuildResult:
     """Build a validated race-model dict for a registered race (or an ingested Jolpica one),
-    with its build notes, its estimates applied as provenance and its Eras overlay.
+    with its build notes, its estimates applied as provenance and its Eras overlay, unless it
+    is a Daily or Gauntlet race (`shared_races`): its overlay stays out of its file.
     `raw_dir`: where its snapshot lives; `fault_facts`: its car faults (default: its FAULT
-    items in data/incidents.json)."""
+    items in data/incidents.json); `pools_path`: the pools file naming the shared races."""
     if laps is None:
         laps = pd.read_parquet(ingest.raw_snapshot_path(race_id, raw_dir))
     meta = resolved_meta(race_id, laps, raw_dir)
@@ -1377,7 +1390,24 @@ def build_race(
     estimated = list((block or {}).get("estimated", []))
     if lap_time_weather(dry.rain):
         estimated.append("weather")  # step 4.5: the wetness is fitted from the lap times
-    model, overlay_lines = apply_eras(model, estimated, load_overlay(race_id, eras_dir))
+    overlay = load_overlay(race_id, eras_dir)
+    shared = overlay is not None and race_id in shared_races(pools_path)
+    if shared:
+        # The Worker's merge replaces the provenance block outright (as with_eras_fields
+        # does), so it can't also carry this build's estimated fields.
+        if estimated and "provenance" in overlay:
+            raise ValueError(
+                f"{race_id}: a Daily/Gauntlet race with estimated fields {estimated} can't "
+                "take an overlay provenance (the Worker's merge would drop them)"
+            )
+        model, overlay_lines = apply_eras(model, estimated, None)
+        overlay_lines = [
+            *overlay_lines,
+            f"overlay: {', '.join(k for k in OVERLAY_KEYS if k in overlay)} "
+            "(a Daily/Gauntlet race: served beside the race file, not in it)",
+        ]
+    else:
+        model, overlay_lines = apply_eras(model, estimated, overlay)
     report = [*(estimates.report_lines(block) if block else []), *overlay_lines]
     if "weather" in estimated:
         report.append("estimated: weather (wet laps from the lap times, `pipeline wet-laps`)")

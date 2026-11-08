@@ -12,13 +12,15 @@ import {
   unlocksNextEra,
 } from '@laststint/sim';
 import { describe, expect, it } from 'vitest';
+import abuOverlay from '../../../data/eras/abu-dhabi-2021.json';
 import abuJson from '../../../data/races/abu-dhabi-2021.json';
 import hungary2022Json from '../../../data/races/hungary-2022.json';
 import { ATTEMPT_TTL_MS, attemptDifficulty, erasTestMode } from '../src/eras.js';
+import { withErasOverlay } from '../src/erasOverlay.js';
 import worker from '../src/index.js';
 import { ERAS_RACE_FILES } from '../src/races.gen.js';
 import { modelHash } from '../src/races.js';
-import { ids } from './helpers.js';
+import { abu, ids } from './helpers.js';
 
 type Mode = 'production' | 'test';
 
@@ -321,8 +323,10 @@ describe('POST /api/eras/attempts', () => {
     const res = await start('production', 'abu-dhabi-2021');
     expect(res.status).toBe(201);
     const a = await json<Attempt>(res);
-    const hash = await modelHash(abuJson);
+    // A shared race pins its Eras model (the race file with its overlay), not the Daily file.
+    const hash = await modelHash(withErasOverlay(abu, abuOverlay));
     expect(a.modelHash).toBe(hash);
+    expect(a.modelHash).not.toBe(await modelHash(abuJson));
     expect(a.modelUrl).toBe(`https://api.test/api/eras/races/abu-dhabi-2021/model?h=${hash}`);
     expect(a.difficulty).toEqual(attemptDifficulty(2, false));
     const { playOrder, era: _era, ...row } = difficultyFor(2);
