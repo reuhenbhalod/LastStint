@@ -24,6 +24,17 @@ How a red flag looks in the race file:
   start); a rolling one goes green from the queue.
 - No `restart`: the race was never resumed (results taken from before the red flag).
 
+Two red flags put no RED event in the race file (`race_entries`, `cut_at_results`):
+- A race that ended under the red flag, with its results taken from an earlier lap
+  (`"restart": "none"` and a `resultsLap`; Brazil 2003, Monaco 1984): the race simply ends at
+  the results lap. Laps after it are cut from the lap frame, so the race's distance is the
+  results lap and its classification is the order at the end of it (most laps, then the
+  earlier lap-end time, as for any race). The red flag itself is after the cut: no RED event.
+- A start voided and rerun over the full distance (VOIDED_START_RULE; Belgium 1998): before
+  2005 a race stopped within the first VOIDED_START_LAPS laps was restarted from scratch, and
+  the data holds only the rerun. It's a fresh race: no RED event, and the entry's
+  `restartScLaps` are laps 1..n of the rerun behind the safety car.
+
 Restart rules by year, from the regulations (see RESTART_RULES for the sources): from 2005
 to 2017 a suspended race resumed behind the safety car (rolling); standing restarts came in
 mid-2018 and were first used at Monza 2020, with a rolling restart when the race director
@@ -46,6 +57,9 @@ data/raw/<race-id>.redflags.json (written by the ingest from race control):
                                   #   lap..resumeLap are marked red in the lap frame
           "restart": "rolling",   # standing | rolling | none (never resumed)
           "restartScLaps": <int>, # optional (hand entries): race laps behind the SC after S
+                                  #   (a voided start: laps 1..n of the rerun)
+          "resultsLap": <int>,    # optional, with "restart": "none": the lap the results were
+                                  #   taken from (the race ends there)
           "source": "<where each fact comes from: the FIA document, race report, ...>"
         }
       ]
@@ -102,6 +116,17 @@ FIA_2005 = (
     " / 'resuming', every race resuming behind the safety car"
 )
 
+# A start voided (not suspended): stopped within this many laps before 2005, the race was
+# rerun from scratch over its full distance.
+VOIDED_START_LAPS = 2
+VOIDED_START_BEFORE = 2005
+VOIDED_START_RULE = (
+    "Wikipedia, 1998 Belgian Grand Prix: the race was stopped within the first two laps, so"
+    " 'a full restart over the original distance would take place'"
+    " (https://en.wikipedia.org/wiki/1998_Belgian_Grand_Prix); from 2005 a stopped race is"
+    f" suspended and resumed instead ({FIA_2005})"
+)
+
 # (first year, last year, restart, sources). A year in no row has no default.
 RESTART_RULES: list[tuple[int, int | None, str, str]] = [
     (2019, None, "standing", f"{FIA_2022}; {RACEFANS_2023}"),
@@ -147,6 +172,16 @@ def validate_entries(entries: list[dict]) -> list[dict]:
         sc = e.get("restartScLaps", 0)
         if not isinstance(sc, int) or sc < 0:
             raise RedFlagError(f"{where}: 'restartScLaps' must be a whole number of laps")
+        if "resultsLap" in e:
+            if e["restart"] != "none":
+                raise RedFlagError(f"{where}: 'resultsLap' is for a race never resumed")
+            if not isinstance(e["resultsLap"], int) or not 1 <= e["resultsLap"] < e["lap"]:
+                raise RedFlagError(f"{where}: 'resultsLap' must be a lap before 'lap'")
+            if "resumeLap" in e:
+                raise RedFlagError(f"{where}: a race never resumed has no 'resumeLap'")
+    ended = [i for i, e in enumerate(entries) if "resultsLap" in e]
+    if ended and ended != [len(entries) - 1]:
+        raise RedFlagError("only the last red flag can end the race ('resultsLap')")
     return entries
 
 
@@ -219,6 +254,76 @@ def fastf1_messages(race_control: pd.DataFrame) -> list[dict]:
     ]
 
 
+# --- red flags that leave no red lap ---------------------------------------------------
+
+
+def results_lap(entries: list[dict]) -> int | None:
+    """The lap a race ended under the red flag took its results from, or None."""
+    return next((int(e["resultsLap"]) for e in entries if "resultsLap" in e), None)
+
+
+def is_voided_start(entry: dict, year: int | None) -> bool:
+    """A start voided and rerun over the full distance (VOIDED_START_RULE): a red flag in the
+    first VOIDED_START_LAPS laps before 2005, resumed, with no stoppage lap in the data."""
+    return (
+        year is not None
+        and year < VOIDED_START_BEFORE
+        and entry["lap"] <= VOIDED_START_LAPS
+        and entry["restart"] in ("standing", "rolling")
+        and "resumeLap" not in entry
+    )
+
+
+def cut_at_results(laps: pd.DataFrame, entries: list[dict]) -> pd.DataFrame:
+    """A race ended under the red flag ends at its results lap: laps after it are cut (they
+    don't count, and the classification is the order at the end of the results lap). Other
+    races come back unchanged. A lap frame that stops before the results lap is an error."""
+    last = results_lap(entries)
+    if last is None:
+        return laps
+    have = int(laps["LapNumber"].max())
+    if have < last:
+        raise RedFlagError(f"results taken from lap {last}, but the lap data stops on lap {have}")
+    return laps if have == last else laps[laps["LapNumber"] <= last].copy()
+
+
+def race_entries(
+    laps: pd.DataFrame, entries: list[dict], year: int | None
+) -> tuple[pd.DataFrame, list[dict], list[str]]:
+    """The red flags that are RED events in the race file, with the lap frame they apply to
+    and build notes. A race ended under the red flag (`resultsLap`, see `cut_at_results`) and
+    a voided start (`is_voided_start`) leave no RED event, so their entries are taken out; a
+    voided start's `restartScLaps` mark laps 1..n of the rerun as SC laps. Red flags with a
+    `resumeLap` have their laps marked red (`mark_hand_entries`)."""
+    kept, notes = [], []
+    for e in entries:
+        if "resultsLap" in e:
+            notes.append(
+                f"red flag on lap {e['lap']}, never resumed: the race ends at its results lap"
+                f" {e['resultsLap']} (no RED event)"
+            )
+        elif is_voided_start(e, year):
+            sc = int(e.get("restartScLaps", 0))
+            if sc:
+                laps = _mark(laps, 1, sc, "4")
+            notes.append(
+                f"red flag on lap {e['lap']}: start voided, the race rerun over the full"
+                f" distance (a fresh race, no RED event"
+                + (f"; laps 1-{sc} of the rerun behind the SC)" if sc else ")")
+            )
+        else:
+            kept.append(e)
+    return mark_hand_entries(laps, kept), kept, notes
+
+
+def _mark(laps: pd.DataFrame, first: int, last: int, code: str) -> pd.DataFrame:
+    """Laps first..last of the frame with `code` added to their TrackStatus."""
+    status = laps["TrackStatus"].astype("string").fillna("1")
+    on = laps["LapNumber"].between(first, last) & ~status.str.contains(code)
+    status = status.where(~on, status.where(status != "1", "") + code)
+    return laps.assign(TrackStatus=status.astype(object))
+
+
 # --- timing ---------------------------------------------------------------------------
 
 
@@ -229,11 +334,9 @@ def mark_hand_entries(laps: pd.DataFrame, entries: list[dict]) -> pd.DataFrame:
     hand = [e for e in entries if "resumeLap" in e]
     if not hand:
         return laps
-    status = laps["TrackStatus"].astype("string").fillna("1")
     for e in hand:
-        on = laps["LapNumber"].between(e["lap"], e["resumeLap"]) & ~status.str.contains(RED)
-        status = status.where(~on, status.where(status != "1", "") + RED)
-    return laps.assign(TrackStatus=status.astype(object))
+        laps = _mark(laps, e["lap"], e["resumeLap"], RED)
+    return laps
 
 
 def _lead_times(laps: pd.DataFrame) -> pd.Series:

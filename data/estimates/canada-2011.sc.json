@@ -1,0 +1,68 @@
+{
+ "race": "canada-2011",
+ "how": "docs/eras-checks/2.4-estimates.md: check each period against a race report; set status to confirmed or rejected (edit startLap/endLap if they're off), then re-run `pipeline jolpica <race-id> --force`.",
+ "periods": [
+  {
+   "startLap": 1,
+   "endLap": 4,
+   "laps": 4,
+   "kind": "SC",
+   "confidence": "likely",
+   "peakRatio": 1.503,
+   "gapBefore": null,
+   "gapAfter": 2.6,
+   "reasons": [],
+   "status": "unchecked"
+  },
+  {
+   "startLap": 9,
+   "endLap": 12,
+   "laps": 4,
+   "kind": "SC",
+   "confidence": "likely",
+   "peakRatio": 1.326,
+   "gapBefore": 21.1,
+   "gapAfter": 3.1,
+   "reasons": [],
+   "status": "unchecked"
+  },
+  {
+   "startLap": 19,
+   "endLap": 34,
+   "laps": 16,
+   "kind": "SC",
+   "confidence": "ambiguous",
+   "peakRatio": 77.71,
+   "gapBefore": 23.2,
+   "gapAfter": 3.1,
+   "reasons": [
+    "a 77.7x lap: a red flag?"
+   ],
+   "status": "unchecked"
+  },
+  {
+   "startLap": 37,
+   "endLap": 40,
+   "laps": 4,
+   "kind": "SC",
+   "confidence": "likely",
+   "peakRatio": 1.326,
+   "gapBefore": 22.2,
+   "gapAfter": 2.5,
+   "reasons": [],
+   "status": "unchecked"
+  },
+  {
+   "startLap": 57,
+   "endLap": 60,
+   "laps": 4,
+   "kind": "SC",
+   "confidence": "likely",
+   "peakRatio": 1.379,
+   "gapBefore": 31.1,
+   "gapAfter": 5.8,
+   "reasons": [],
+   "status": "unchecked"
+  }
+ ]
+}

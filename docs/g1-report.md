@@ -663,3 +663,139 @@ about 3 L a lap through a rig of "more than 12 litres per second" (Wikipedia, "P
 
 Daily and Gauntlet race files and goldens are unchanged. The seven changed race files are
 all `eras` races. Their goldens are regenerated, and the TS sim matches them (`pnpm test`).
+
+## Eras wave B, step 5.1c (red-flag races of the 2010s): 0 pass, 0 borderline, 3 fail, 1 not built
+
+Eras build plan 5.1, Nov 7 2026. Written by hand, like the sections above (`--report` drops the
+`eras` split). Sources: `pipeline tum-ingest` (TUM f1-timing-database @ 9eaad9c, CC BY-NC-SA
+3.0) for azerbaijan-2017 and brazil-2016 (then `pipeline wet-laps`), and `pipeline jolpica`
+(Jolpica CSV dump 2026-10-24) for monaco-2011 and canada-2011 (then `pipeline wet-laps` for
+Canada). No source has red-flag timing, so every red flag's span and restart SC laps come from
+its R1 file (`data/redflags/<id>.json`, `resumeLap` / `restartScLaps`). Registry split `eras`,
+the duel is the storyline pair of the Eras spec's race table (§4, user's driver first),
+`score_positions` 6, seed 1, D3 takeover. Values are seed set 10000 / seed set 20000; limits in
+brackets. The SC hand-check files (`data/estimates/monaco-2011.sc.json`,
+`canada-2011.sc.json`) are committed, all `unchecked`.
+
+| Race | Source | Duel | Status | Without near-tie rule | Mean gap error | Failing checks | Diagnosis |
+|---|---|---|---|---|---|---|---|
+| azerbaijan-2017 | TUM, red flag 22-23 | RIC vs BOT | fail | fail | 12.25s | podium order rate 0.22 / 0.21 [0.50]; podium STR gap error 8.29 / 8.00 [5.00]; field VET 37.49 / 37.02, HAM 39.48 / 38.93 [5.00] | data: HAM's headrest stop and VET's stop-go penalty are pit stops with no tyre change, which the replay drops (diagnose: race mechanics, pace 0%, rest 100%). See below |
+| brazil-2016 | TUM, wet, red flags 20-21 and 28-29 | VER vs PER | not built | | | | every lap was run on wets or inters: no dry lap to fit the dry model on. See below |
+| monaco-2011 | Jolpica, red flag 72 | VET vs ALO | fail | fail | 11.44s | duel VET vs ALO gap error 5.06 / 5.10 [3.00] and order rate 0.03 / 0.03 [0.60]; podium order rate 0.00 / 0.00 [0.50]; podium ALO 5.06 / 5.10, BUT 9.46 / 9.54 [5.00]; field WEB 17.68 / 17.65, KOB 22.16 / 22.10, HAM 20.57 / 20.68 [5.00] | race mechanics and lap pace (diagnose: pace 6%, rest 94%): the order at the red flag, and the queue it restarts from. See below |
+| canada-2011 | Jolpica, wet, red flag 25 | BUT vs VET | fail | fail | 2.96s | duel BUT vs VET order rate 0.50 / 0.54 [0.60]; podium order rate 0.33 / 0.36 [0.50]; field MSCM 5.13 / 4.40, PET 9.08 / 8.19 [5.00] | lap pace on the drying last stint (diagnose: pace 57%, rest 43%). See below |
+
+The race files' red flags: azerbaijan-2017 `RED` lap 22, 2 laps, rolling (lap 23 holds the
+stoppage, so a stop with its out-lap there is free); monaco-2011 `RED` lap 72, 1 lap, rolling,
+then 1 SC lap; canada-2011 `RED` lap 25, 1 lap, rolling, then 9 SC laps (26-34). The duel gap
+passes at azerbaijan-2017 (0.29 / 0.57 s, order 0.71 / 0.72) and at canada-2011 (1.85 / 0.67 s).
+
+Diagnoses, from the sim's mean gaps (100 runs truncated at each lap) against the real ones.
+Experiments were run on in-memory copies of the race files, never committed.
+
+- **azerbaijan-2017** (takeover lap 8). VET and HAM finish 37-39 s too far up. Both made a
+  stop that changed no tyres: HAM in on lap 31 for his loose headrest, VET's 10 s stop-go on
+  lap 33. TUM has them (PitInTime, a new stint, the tyre age running on). But the replay's
+  strategy (`scenario.real_strategy`) keeps only stops that change tyres, so in the sim
+  neither car stops (about 27 s each). As a check, those two stops were added as tyre stops at
+  the green pit loss: VET 4.19 / 4.01 s, HAM 4.45 / 4.39 s, mean gap error 12.25 -> 2.69 s.
+  That leaves STR (8.5 s) and the podium order (0.22). The sim's STR lines up ahead of RIC at
+  the red-flag restart, as really happened (lap 23: 0.2 s ahead), but really RIC passed him
+  on the restart laps (RIC led STR by 0.4 s at lap 25, 4.0 s at the flag). In the sim RIC
+  stays behind, since their fitted paces are 0.08 s apart. The podium order also needs BOT
+  ahead of STR, who finished 0.1 s apart at the line (a near-tie). No per-race knob: a stop
+  without a tyre change (a repair, a stop-go, a drive-through) needs a new kind of strategy
+  entry in both sims, or a sourced incident kind, and neither exists. A takeover after the
+  restart passes would take the red flag out of the storyline, so it isn't applied.
+- **brazil-2016**. TUM gives every stint as WET or INTERMEDIATE. The build fits a dry model on
+  the dry slick laps, then the weather curves on top (weather spec), so with no slick lap it
+  has nothing to fit and stops. `dry_fit` now says so ("no dry lap on slicks to fit the dry
+  model on"), instead of an IndexError inside the fit. The wet-laps fit has the same blind
+  spot: with no dry reference it calls only laps 32 and 56 wet (the 4.5 known limit, as at
+  turkey-2020). The race is ingested (`data/raw/brazil-2016.*`, with its wet-laps report) but
+  **not registered**, so `pipeline build --all` and `validate --all` keep working. It needs a
+  dry-pace reference from outside the race (another session, or the circuit's other races):
+  a design change, for the owner. The same fix as turkey-2020.
+- **monaco-2011** (takeover lap 13). The rolling restart on lap 72 erases every gap. So the
+  result comes from the order at the red flag, the queue it restarts from, and laps 74-78.
+  1. *The order at the red flag.* The sim's BUT leads at lap 71 in 94% of runs, and ALO is
+     ahead of VET (real: VET, ALO 0.7 s, BUT 1.8 s). VET ran laps 17-78 on one set. His
+     real laps got slower with age, but the fitted HARD wear is flat (0.002 s a lap), so
+     the loss goes into his base pace: 80.98 s, against BUT's 79.94 and ALO's 80.30. Really,
+     ALO and BUT sat behind him for laps 55-71 and couldn't pass at Monaco. In the sim they
+     pass and pull away (BUT 51 s ahead of VET by lap 71).
+  2. *The restart queue.* At the real restart WEB was 9.9 s behind VET (lap 73), with lapped
+     cars between them, because in 2010-11 lapped cars weren't allowed to unlap. Real WEB
+     finished +23.1, KOB +26.9, HAM +27.2 s. The sim's restart (`redflag.line_up`) puts every
+     running car 0.5 s apart, lapped or not, so WEB, KOB and HAM finish about 5-7 s back.
+     `sc_unlap: "none"` (the 2011 rule, `race_rules.sc_unlap_for_year`) was tried. It doesn't
+     touch the red-flag line-up and changes nothing (11.44 s).
+  3. *Tyres.* "During the red flag period, teams were allowed to change tyres" (Wikipedia),
+     but Jolpica's stops don't list those changes. As a check, a free change to new softs
+     for every car on the stoppage lap moves the mean gap error only 11.44 -> 11.39 s.
+  4. *SC laps.* Step 2.4 left laps 34-35 (Massa's crash) and 69-73 (the Sutil / Alguersuari /
+     Petrov crash) ambiguous, so they're applied as yellows, and BUT's lap-34 stop, measured
+     under the real SC (0.79 s), runs green in the sim. Confirmed in a temporary copy of the
+     hand-check file, both SCs are played (laps 34-35 and 69-71), but the race still fails
+     (mean 11.04 s, duel order 0.08).
+  So no per-race knob passes it. The takeover was tried at lap 30 (still before the lap-33 SC
+  call): mean 12.62 s, so it's worse. Points 1 and 2 need model work: a wear fit that sees a
+  leader's tyre age when the cars behind are in dirty air, and a restart queue that keeps the
+  lapped cars where they were in a no-unlapping year.
+- **canada-2011** (takeover lap 10, inside the lap 9-12 SC, which is kept). BUT's win is
+  reproduced (he leads 45% of runs at the flag; VET 29%) with a good duel gap. But the order
+  is close to a coin flip: BUT's fitted lap noise is 2.4 s, from his laps in the changing
+  wet. Really VET led to the last lap and lost 2.7 s with a slide on lap 70, a driver error
+  the sim doesn't model (like ROS at united-states-2015). MSCM and PET finish 6-9 s too close
+  to BUT. On the drying track from lap 52, real BUT on new softs pulled 1.5-3 s a lap away
+  from WEB, MSCM and PET (laps 61-70: PET 7.0 -> 20.4 s behind). The sim's gain is half that
+  (PET 1.4 -> 11.1 s). The track got faster by about 0.75 s a lap as it dried (lead lap 84.8 s
+  on lap 55, 77.2 s on lap 69), and the dry model has one pace for those laps. No per-race
+  knob applies. Also: step 2.4 left laps 19-34 ambiguous (a yellow), so the SC before the red
+  flag (laps 20-24, R1 note) isn't in the race file. It's before the red flag wipes the gaps,
+  so it doesn't move G1. The owner should check it in `data/estimates/canada-2011.sc.json`.
+
+**The red-flag loader rule (Task 1 of this step).** `redflag.py` now loads the three R1 files
+that had no red lap (`brazil-2003`, `monaco-1984`, `belgium-1998`; those races aren't built
+here):
+- *A race that ended under the red flag* (`"restart": "none"` and a `resultsLap`) ends at its
+  results lap. `cut_at_results` drops the laps after it before the build reads the laps, so
+  the race's distance is the results lap. The classification (`realResult`) is then the order
+  at the end of that lap: most laps, then the earlier lap-end time. The race file gets no RED
+  event (the flag came after the results lap). Lap data that stops before the results lap is
+  an error. `validate_entries` checks that a `resultsLap` comes with "none", falls before the
+  flag lap, has no `resumeLap`, and is on the last red flag only.
+- *A voided start* (`is_voided_start`) is a resumed red flag with no `resumeLap`, in the
+  first two laps, before 2005. The rule comes from the belgium-1998 file's source: stopped
+  within the first two laps, "a full restart over the original distance". From 2005 a stopped
+  race is suspended and resumed instead. Such a race is a fresh race: no RED event and no
+  restart. An entry's `restartScLaps` would mark laps 1..n of the rerun as SC laps (on top of
+  any estimated SC there, never doubled). belgium-1998's file has none yet; its note says laps
+  1-2 ran behind the SC, so whoever builds it should check that the SC estimate finds them.
+- A lap-1 red flag from 2005 on with no RED lap in the timing is still an error (it's a
+  suspension, and an untimed one needs its `resumeLap`).
+- `build_race` reports each one (e.g. "red flag on lap 56, never resumed: the race ends at
+  its results lap 54 (no RED event)").
+
+Tests: `test_redflag.py` (synthetic Jolpica-style laps: the cut and the classification, a
+timed race's red laps after the cut, the voided start with and without SC laps, the year
+rule, the validation; the three R1 files; and a `build_race` of abu-dhabi-2021 with a made-up
+results-lap entry); `test_wet.py` (brazil-2016's missing dry laps).
+
+**Found while building, reported (sim behaviour, not changed here):**
+- When the cars stopped on the grid on the flag lap (`resumeLap` = `lap`: monaco-2011,
+  canada-2011, every 2007-2011 race), `redflag.plan` gives no free lap:
+  `range(lap + 1, resumeLap + 1)` is empty. So in live play a tyre change in the stoppage
+  can't be free, though it was (Monaco 2011: "teams were allowed to change tyres"). G1 isn't
+  affected (no real stop is on those laps). It needs a rule for that case in both sims
+  (`redflag.py` and `packages/sim/src/redflag.ts`): for example, the first lap after the
+  stoppage counts as free.
+- Garages: `apps/web/src/track/garages.ts` has no 2017 table (it uses 2016's, the nearest),
+  for azerbaijan-2017 as for monaco-2017 and the other 2017 races. Not changed here.
+
+**Server-match check:** the 20 golden seeds of each built race (azerbaijan-2017, monaco-2011,
+canada-2011) match the TS sim (order, finishers, times and gaps to 3 decimals): 60 / 60.
+
+**Not regenerated here:** `data/sc_rates.json`. `test_sc_rates.py::
+test_committed_rates_match_the_raw_timelines` fails until it is, since the new raw status
+timelines aren't counted yet. `apps/worker/src/races.gen.ts` and the parity fixtures aren't
+regenerated either.
