@@ -201,6 +201,34 @@ const STANDINGS: Record<number, string[]> = {
     'Larrousse',
     'Sauber',
   ],
+  // 1998 and 2003 (Eras): the 1997 and 2002 final standings from the Jolpica dump (2026-10-24,
+  // formula_one_teamchampionship). Minardi scored no points in 1997, so it has no standing and
+  // goes last; Arrows, gone after 2002, is dropped from 2003.
+  1998: [
+    'Williams',
+    'Ferrari',
+    'Benetton',
+    'McLaren',
+    'Jordan',
+    'Prost',
+    'Sauber',
+    'Arrows',
+    'Stewart',
+    'Tyrrell',
+    'Minardi',
+  ],
+  2003: [
+    'Ferrari',
+    'Williams',
+    'McLaren',
+    'Renault',
+    'Sauber',
+    'Jordan',
+    'Jaguar',
+    'BAR',
+    'Minardi',
+    'Toyota',
+  ],
   // 2005-2009 (Eras): the 2004-2008 final standings from the Jolpica dump (2026-10-24,
   // formula_one_teamchampionship), under each season's names (2005: Jaguar is Red Bull; 2006:
   // BAR is Honda, Sauber is BMW Sauber, Jordan is MF1, Spyker MF1 by Brazil, Minardi is Toro
