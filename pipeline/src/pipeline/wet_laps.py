@@ -22,7 +22,10 @@ sims run unchanged:
    the stops) gets the class that was fastest over that stint's laps at the fitted wetness
    (teams fit the tyre that suits the stint), and the wetness is refitted with those classes,
    until neither changes. Dry stints get DRY_PLACEHOLDER: which dry compound is estimated in
-   step 2.4, not here.
+   step 2.4, not here. A stint whose tyre a race report gives (a sourced tyre fact in
+   `data/estimates/<id>.tyres.json`, load_tyre_facts) keeps that class in every round (a
+   report that says only "wets" fixes it to a rain tyre, and the fit picks inter or wet): the
+   wetness is fitted around it.
 
 Output: per-lap weather records `{"lap", "time", "rain", "source": "lap-times", ...}` in the
 race's `<id>.weather.json`; wet.rain_laps reads a record with a `lap` as that lap's rain flag
@@ -299,11 +302,16 @@ def driver_classes(costs: list[dict[str, float]]) -> list[str]:
 
 
 def fit_classes(
-    laps: pd.DataFrame, calls: list[LapCall], curves: dict
+    laps: pd.DataFrame,
+    calls: list[LapCall],
+    curves: dict,
+    known: dict[tuple[str, int], str] | None = None,
 ) -> tuple[dict[tuple[str, int], str], list[float]]:
     """Each stint's tyre class (no compounds in the source) and the wetness they imply:
     alternately the wetness from the classes (wet.timeline) and the classes from the
-    wetness, from all slicks, until neither changes."""
+    wetness, from all slicks, until neither changes. `known`: sourced classes (tyre facts),
+    held in every round."""
+    known = known or {}
     total = int(laps["LapNumber"].max())
     neutral = {c.lap for c in calls if c.neutral}
     rain = {c.lap for c in calls if c.wet}
@@ -311,7 +319,8 @@ def fit_classes(
     key = list(zip(laps["Driver"].astype(str), stints(laps), strict=True))
     lap_no = laps["LapNumber"].astype(int)
     ok = share.notna() & ~lap_no.isin(neutral) & (share < 0.6)
-    classes = {k: "slick" for k in dict.fromkeys(key)}
+    classes = {k: RAIN_CLASSES.get(known.get(k, "slick"), (known.get(k, "slick"),))[0]
+               for k in dict.fromkeys(key)}  # fmt: skip
     grid_pen = {
         cls: wet.penalty(curves, comp, wet.GRID)
         for cls, comp in (("slick", "SOFT"), ("inter", "INTERMEDIATE"), ("wet", "WET"))
@@ -335,7 +344,12 @@ def fit_classes(
         new = {}
         for ks in by_driver.values():
             costs = [
-                {cls: stint_cost(*mine[k], pen, at, neutral) for cls, pen in grid_pen.items()}
+                {
+                    cls: np.inf
+                    if k in known and cls not in RAIN_CLASSES.get(known[k], (known[k],))
+                    else stint_cost(*mine[k], pen, at, neutral)
+                    for cls, pen in grid_pen.items()
+                }
                 for k in ks
             ]
             new.update(zip(ks, driver_classes(costs), strict=True))
@@ -349,12 +363,14 @@ def estimate(
     laps: pd.DataFrame,
     curves: dict | None = None,
     dry_labels: dict[tuple[str, int], str] | None = None,
+    known: dict[tuple[str, int], str] | None = None,
 ) -> Estimate:
     """The lap-time weather of a race with no weather data (and its tyre classes and SC laps
     where the source has none). `dry_labels`: step 2.4's estimated dry compound per (driver,
     stint) when the snapshot's compounds are that estimate rather than the source's (a
     Jolpica race ingested with estimates, which never labels a wet tyre): the classes are
-    refitted, and a stint fitted as slick keeps its 2.4 label instead of DRY_PLACEHOLDER."""
+    refitted, and a stint fitted as slick keeps its 2.4 label instead of DRY_PLACEHOLDER.
+    `known`: sourced tyre classes per (driver, stint) (load_tyre_facts), kept as given."""
     curves = curves or wet.load_curves()
     calls, source = call_laps(laps)
     out, filled = laps.copy(), []
@@ -365,7 +381,9 @@ def estimate(
         filled.append("TrackStatus: '4' on the safety-car laps found from the lap times, else '1'")
     classes: dict[tuple[str, int], str] = {}
     if dry_labels is not None or not has_compounds(laps):
-        classes, _ = fit_classes(out, calls, curves)
+        held = {k: v for k, v in (known or {}).items() if k in set(zip(
+            out["Driver"].astype(str), stints(out), strict=True))}  # fmt: skip
+        classes, _ = fit_classes(out, calls, curves, held)
         labels = dry_labels or {}
         key = zip(out["Driver"].astype(str), stints(out), strict=True)
         out["Compound"] = pd.Series(
@@ -384,7 +402,54 @@ def estimate(
             else f"dry stints are '{DRY_PLACEHOLDER}' until step 2.4 estimates the dry compounds"
         )
         filled.append(f"Compound: each stint's tyre class fitted from the lap times; {dry}")
+        if held:
+            filled.append(
+                f"Compound: {len(held)} stints' tyre class from sourced tyre facts"
+                " (data/estimates/<id>.tyres.json), held through the fit"
+            )
     return Estimate(out, calls, source, classes, filled)
+
+
+# A tyre fact's class: slick, inter or wet, or "rain" when the report says only that the car
+# went to rain tyres ("wets", "wet tyres" without saying which): the fit picks inter or wet.
+RAIN_CLASSES = {"rain": ("inter", "wet")}
+TYRE_FACT_KEYS = {"driver", "stint", "class", "fromLap", "toLap", "fact", "source", "note"}
+
+
+def tyre_facts_path(race_id: str, estimates_dir: Path | None = None) -> Path:
+    from . import estimates
+
+    return Path(estimates_dir or estimates.ESTIMATES_DIR) / f"{race_id}.tyres.json"
+
+
+def load_tyre_facts(race_id: str, estimates_dir: Path | None = None) -> dict[tuple[str, int], str]:
+    """A race's sourced tyre classes, {(driver, stint): class}, from
+    `data/estimates/<id>.tyres.json` ({"race", "stints": [{"driver", "stint", "class", "source",
+    ...}]}: class is slick, inter, wet or rain (RAIN_CLASSES), source an http(s) URL); {} when
+    there is none."""
+    path = tyre_facts_path(race_id, estimates_dir)
+    if not path.exists():
+        return {}
+    out: dict[tuple[str, int], str] = {}
+    for i, item in enumerate(json.loads(path.read_text()).get("stints", [])):
+        where = f"{path.name}: stints[{i}]"
+        bad = sorted(set(item) - TYRE_FACT_KEYS)
+        if bad:
+            raise ValueError(f"{where}: unknown fields {bad}")
+        if item.get("class") not in {*CLASS_COMPOUND, *RAIN_CLASSES}:
+            raise ValueError(
+                f"{where}: class must be one of {sorted({*CLASS_COMPOUND, *RAIN_CLASSES})}"
+            )
+        if not isinstance(item.get("driver"), str) or not isinstance(item.get("stint"), int):
+            raise ValueError(f"{where}: needs a driver code and a stint number")
+        src = item.get("source")
+        if not isinstance(src, str) or not src.startswith(("http://", "https://")):
+            raise ValueError(f"{where}: a tyre fact needs its source URL")
+        key = (item["driver"], item["stint"])
+        if key in out:
+            raise ValueError(f"{where}: {key} given twice")
+        out[key] = item["class"]
+    return out
 
 
 def estimated_dry_labels(sidecar: dict | None) -> dict[tuple[str, int], str] | None:

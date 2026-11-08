@@ -3,9 +3,9 @@
  "how": "docs/eras-checks/2.4-estimates.md: check each period against a race report; set status to confirmed or rejected (edit startLap/endLap if they're off), then re-run `pipeline jolpica <race-id> --force`.",
  "periods": [
   {
-   "startLap": 2,
+   "startLap": 1,
    "endLap": 2,
-   "laps": 1,
+   "laps": 2,
    "kind": "SC",
    "confidence": "ambiguous",
    "peakRatio": 1.424,
@@ -15,19 +15,21 @@
     "the field didn't bunch up (P1-P6 6.4s -> 4.2s): rain?",
     "a single slow lap"
    ],
-   "status": "unchecked"
+   "status": "confirmed",
+   "source": "https://en.wikipedia.org/wiki/1998_Belgian_Grand_Prix: after the restart's first-lap crashes 'The safety car was deployed ... The safety car was withdrawn at the end of the second lap' (laps 1-2 of the rerun; also data/redflags restartScLaps)"
   },
   {
-   "startLap": 30,
+   "startLap": 29,
    "endLap": 32,
-   "laps": 3,
+   "laps": 4,
    "kind": "SC",
    "confidence": "likely",
    "peakRatio": 1.521,
    "gapBefore": null,
    "gapAfter": 160.2,
    "reasons": [],
-   "status": "unchecked"
+   "status": "confirmed",
+   "source": "https://en.wikipedia.org/wiki/1998_Belgian_Grand_Prix: Fisichella hit Nakano, 'the safety car again being deployed, and Hill immediately made his second pitstop' (Hill in at the end of lap 28, F1DB); https://www.autosport.com/f1/news/1998-belgian-gp-when-the-schumachers-went-to-war/10744117/: 'The restart came with 12 laps to go' (green from lap 33 of 44). Lap 29 from the timing: the leaders' lap 29 took 186-230 s, finished within 2.4 s"
   }
  ]
 }

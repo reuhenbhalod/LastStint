@@ -10,34 +10,34 @@
   },
   "era": "2010-2013",
   "track": {
-    "pitLoss": 28.428,
-    "pitLossUnderSC": 15.636,
-    "pitLossUnderVSC": 19.616,
+    "pitLoss": 28.41,
+    "pitLossUnderSC": 15.625,
+    "pitLossUnderVSC": 19.603,
     "pitLossDeviations": [
-      -6.36,
-      -6.249,
-      -5.056,
-      -4.362,
-      -4.305,
-      -3.538,
-      -2.603,
-      -2.428,
-      -1.727,
-      -1.603,
-      -1.027,
-      -0.171,
-      0.171,
-      0.342,
-      0.435,
-      0.96,
-      1.182,
-      2.429,
-      2.438,
-      2.783,
-      3.115,
-      3.778,
-      4.835,
-      9.438
+      -6.369,
+      -6.234,
+      -5.038,
+      -4.348,
+      -4.287,
+      -3.525,
+      -2.547,
+      -2.376,
+      -1.741,
+      -1.712,
+      -1.074,
+      -0.153,
+      0.153,
+      0.278,
+      0.356,
+      0.978,
+      1.197,
+      2.292,
+      2.419,
+      2.85,
+      3.619,
+      3.817,
+      4.923,
+      9.391
     ],
     "overtakeDifficulty": 0.9362,
     "overtakeModel": {
@@ -47,8 +47,8 @@
       "trainCoef": -0.0531
     },
     "dirtyAirPenalty": 0.4371,
-    "greenLapTime": 92.031,
-    "scLapTime": 148.496
+    "greenLapTime": 92.149,
+    "scLapTime": 152.584
   },
   "compounds": {
     "SOFT": {
@@ -112,8 +112,8 @@
       "team": "Ferrari",
       "basePace": 92.2475,
       "noise": 0.7592,
-      "wetPace": -0.0068,
-      "dampPace": -0.0045,
+      "wetPace": 0.0029,
+      "dampPace": 0.0021,
       "stateAtTakeover": {
         "position": 7,
         "gapAhead": 0.283,
@@ -193,8 +193,8 @@
       "team": "HRT",
       "basePace": 100.6296,
       "noise": 1.9066,
-      "wetPace": -0.016,
-      "dampPace": -0.0078,
+      "wetPace": -0.0238,
+      "dampPace": -0.0111,
       "stateAtTakeover": {
         "position": 15,
         "gapAhead": 89.512,
@@ -242,7 +242,7 @@
         {
           "lap": 26,
           "to": "SOFT",
-          "loss": 1014.723
+          "loss": 1014.683
         }
       ]
     },
@@ -276,8 +276,8 @@
       "team": "Virgin",
       "basePace": 96.817,
       "noise": 1.149,
-      "wetPace": -0.01,
-      "dampPace": -0.0059,
+      "wetPace": -0.0122,
+      "dampPace": -0.0074,
       "stateAtTakeover": {
         "position": 14,
         "gapAhead": 18.607,
@@ -332,8 +332,8 @@
       "team": "Lotus",
       "basePace": 97.1017,
       "noise": 1.195,
-      "wetPace": 0.0085,
-      "dampPace": 0.0122,
+      "wetPace": 0.0031,
+      "dampPace": 0.0104,
       "stateAtTakeover": {
         "position": 13,
         "gapAhead": 52.29,
@@ -603,11 +603,11 @@
       }
     },
     "wetness": [
-      0.28,
-      0.28,
-      0.28,
-      0.28,
-      0.28,
+      0.31,
+      0.31,
+      0.31,
+      0.31,
+      0.31,
       0.28,
       0.29,
       0.27,

@@ -2,13 +2,13 @@
  {
   "lap": 1,
   "time": 0.0,
-  "rain": true,
+  "rain": false,
   "source": "lap-times"
  },
  {
   "lap": 2,
   "time": 335.282,
-  "rain": true,
+  "rain": false,
   "source": "lap-times"
  },
  {
@@ -155,7 +155,8 @@
   "lap": 26,
   "time": 3508.926,
   "rain": true,
-  "source": "lap-times"
+  "source": "lap-times",
+  "ambiguous": "lap before a neutralisation (it may have started during it)"
  },
  {
   "lap": 27,
@@ -167,8 +168,7 @@
   "lap": 28,
   "time": 3785.558,
   "rain": true,
-  "source": "lap-times",
-  "ambiguous": "lap before a neutralisation (it may have started during it)"
+  "source": "lap-times"
  },
  {
   "lap": 29,

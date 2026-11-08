@@ -638,7 +638,8 @@
       "the field didn't bunch up (P1-P6 9.4s -> 27.6s): rain?",
       "a single slow lap"
      ],
-     "status": "unchecked"
+     "status": "rejected",
+     "source": "https://en.wikipedia.org/wiki/2003_United_States_Grand_Prix: rain, not an SC: 'On lap 18, light rain returned to the circuit before intensifying on the next lap'; 'On lap 21, Button lost control of his car on the wet track ... as drivers began stopping for rain tyres'. The article has no safety car"
     },
     {
      "startLap": 23,
@@ -654,7 +655,8 @@
       "no gap before it to show bunching",
       "a single slow lap"
      ],
-     "status": "unchecked"
+     "status": "rejected",
+     "source": "https://en.wikipedia.org/wiki/2003_United_States_Grand_Prix: rain, not an SC: 'On lap 18, light rain returned to the circuit before intensifying on the next lap'; 'On lap 21, Button lost control of his car on the wet track ... as drivers began stopping for rain tyres'. The article has no safety car"
     }
    ],
    "handCheck": "data/estimates/united-states-2003.sc.json"

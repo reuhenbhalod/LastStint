@@ -9,12 +9,16 @@
   "11-32"
  ],
  "neutralLaps": [
-  "4-10"
+  "3-10"
  ],
  "ambiguous": [
   {
+   "lap": 2,
+   "why": "lap before a neutralisation (it may have started during it)"
+  },
+  {
    "lap": 3,
-   "why": "borderline slowing: drizzle, or tyre wear"
+   "why": "neutralised between a wet and a dry spell: when it changed is unseen"
   },
   {
    "lap": 4,
@@ -154,16 +158,16 @@
   },
   {
    "lap": 2,
-   "slowing": -0.0192,
+   "slowing": -0.0188,
    "gap": 1.586,
    "neutral": false,
    "wet": false
   },
   {
    "lap": 3,
-   "slowing": 0.0314,
+   "slowing": 0.032,
    "gap": 1.133,
-   "neutral": false,
+   "neutral": true,
    "wet": false
   },
   {
@@ -175,140 +179,140 @@
   },
   {
    "lap": 5,
-   "slowing": 0.8615,
+   "slowing": 0.8622,
    "gap": 9.684,
    "neutral": true,
    "wet": false
   },
   {
    "lap": 6,
-   "slowing": 0.3786,
+   "slowing": 0.379,
    "gap": 7.286,
    "neutral": true,
    "wet": false
   },
   {
    "lap": 7,
-   "slowing": 0.4575,
+   "slowing": 0.4577,
    "gap": 1.242,
    "neutral": true,
    "wet": false
   },
   {
    "lap": 8,
-   "slowing": 0.7493,
+   "slowing": 0.7496,
    "gap": 0.747,
    "neutral": true,
    "wet": false
   },
   {
    "lap": 9,
-   "slowing": 0.675,
+   "slowing": 0.6755,
    "gap": 0.769,
    "neutral": true,
    "wet": false
   },
   {
    "lap": 10,
-   "slowing": 0.6212,
+   "slowing": 0.6217,
    "gap": 0.815,
    "neutral": true,
    "wet": false
   },
   {
    "lap": 11,
-   "slowing": 0.1353,
+   "slowing": 0.1356,
    "gap": 0.63,
    "neutral": false,
    "wet": true
   },
   {
    "lap": 12,
-   "slowing": 0.1201,
+   "slowing": 0.1206,
    "gap": 2.03,
    "neutral": false,
    "wet": true
   },
   {
    "lap": 13,
-   "slowing": 0.1351,
+   "slowing": 0.1355,
    "gap": 1.912,
    "neutral": false,
    "wet": true
   },
   {
    "lap": 14,
-   "slowing": 0.1292,
+   "slowing": 0.1295,
    "gap": 2.185,
    "neutral": false,
    "wet": true
   },
   {
    "lap": 15,
-   "slowing": 0.128,
+   "slowing": 0.1282,
    "gap": 1.681,
    "neutral": false,
    "wet": true
   },
   {
    "lap": 16,
-   "slowing": 0.1325,
+   "slowing": 0.1331,
    "gap": 3.325,
    "neutral": false,
    "wet": true
   },
   {
    "lap": 17,
-   "slowing": 0.1316,
+   "slowing": 0.1322,
    "gap": 4.674,
    "neutral": false,
    "wet": true
   },
   {
    "lap": 18,
-   "slowing": 0.1144,
+   "slowing": 0.1145,
    "gap": 6.974,
    "neutral": false,
    "wet": true
   },
   {
    "lap": 19,
-   "slowing": 0.1108,
+   "slowing": 0.1112,
    "gap": 6.811,
    "neutral": false,
    "wet": true
   },
   {
    "lap": 20,
-   "slowing": 0.1173,
+   "slowing": 0.1177,
    "gap": 7.494,
    "neutral": false,
    "wet": true
   },
   {
    "lap": 21,
-   "slowing": 0.12,
+   "slowing": 0.1201,
    "gap": 10.979,
    "neutral": false,
    "wet": true
   },
   {
    "lap": 22,
-   "slowing": 0.1178,
+   "slowing": 0.1179,
    "gap": 10.835,
    "neutral": false,
    "wet": true
   },
   {
    "lap": 23,
-   "slowing": 0.0727,
+   "slowing": 0.073,
    "gap": 9.303,
    "neutral": false,
    "wet": true
   },
   {
    "lap": 24,
-   "slowing": 0.0782,
+   "slowing": 0.0784,
    "gap": 11.911,
    "neutral": false,
    "wet": true
@@ -322,84 +326,84 @@
   },
   {
    "lap": 26,
-   "slowing": 0.0743,
+   "slowing": 0.0747,
    "gap": 14.596,
    "neutral": false,
    "wet": true
   },
   {
    "lap": 27,
-   "slowing": 0.0823,
+   "slowing": 0.0824,
    "gap": 15.826,
    "neutral": false,
    "wet": true
   },
   {
    "lap": 28,
-   "slowing": 0.0746,
+   "slowing": 0.0751,
    "gap": 16.206,
    "neutral": false,
    "wet": true
   },
   {
    "lap": 29,
-   "slowing": 0.0662,
+   "slowing": 0.0666,
    "gap": 16.27,
    "neutral": false,
    "wet": true
   },
   {
    "lap": 30,
-   "slowing": 0.0642,
+   "slowing": 0.0645,
    "gap": 17.125,
    "neutral": false,
    "wet": true
   },
   {
    "lap": 31,
-   "slowing": 0.0503,
+   "slowing": 0.0507,
    "gap": 17.658,
    "neutral": false,
    "wet": true
   },
   {
    "lap": 32,
-   "slowing": 0.0482,
+   "slowing": 0.0484,
    "gap": 18.452,
    "neutral": false,
    "wet": true
   },
   {
    "lap": 33,
-   "slowing": 0.0335,
+   "slowing": 0.0336,
    "gap": 19.097,
    "neutral": false,
    "wet": false
   },
   {
    "lap": 34,
-   "slowing": 0.0272,
+   "slowing": 0.0274,
    "gap": 18.97,
    "neutral": false,
    "wet": false
   },
   {
    "lap": 35,
-   "slowing": 0.0209,
+   "slowing": 0.0212,
    "gap": 19.114,
    "neutral": false,
    "wet": false
   },
   {
    "lap": 36,
-   "slowing": 0.0221,
+   "slowing": 0.0223,
    "gap": 17.922,
    "neutral": false,
    "wet": false
   },
   {
    "lap": 37,
-   "slowing": 0.0211,
+   "slowing": 0.0212,
    "gap": 18.401,
    "neutral": false,
    "wet": false
@@ -413,84 +417,84 @@
   },
   {
    "lap": 39,
-   "slowing": 0.0168,
+   "slowing": 0.017,
    "gap": 17.759,
    "neutral": false,
    "wet": false
   },
   {
    "lap": 40,
-   "slowing": 0.0154,
+   "slowing": 0.016,
    "gap": 17.821,
    "neutral": false,
    "wet": false
   },
   {
    "lap": 41,
-   "slowing": 0.0093,
+   "slowing": 0.0095,
    "gap": 18.433,
    "neutral": false,
    "wet": false
   },
   {
    "lap": 42,
-   "slowing": 0.0069,
+   "slowing": 0.0072,
    "gap": 17.61,
    "neutral": false,
    "wet": false
   },
   {
    "lap": 43,
-   "slowing": 0.0122,
+   "slowing": 0.0123,
    "gap": 18.561,
    "neutral": false,
    "wet": false
   },
   {
    "lap": 44,
-   "slowing": 0.0064,
+   "slowing": 0.0067,
    "gap": 18.845,
    "neutral": false,
    "wet": false
   },
   {
    "lap": 45,
-   "slowing": 0.0037,
+   "slowing": 0.0039,
    "gap": 18.799,
    "neutral": false,
    "wet": false
   },
   {
    "lap": 46,
-   "slowing": 0.0073,
+   "slowing": 0.0076,
    "gap": 19.044,
    "neutral": false,
    "wet": false
   },
   {
    "lap": 47,
-   "slowing": 0.0036,
+   "slowing": 0.0037,
    "gap": 19.192,
    "neutral": false,
    "wet": false
   },
   {
    "lap": 48,
-   "slowing": 0.0006,
+   "slowing": 0.0007,
    "gap": 19.333,
    "neutral": false,
    "wet": false
   },
   {
    "lap": 49,
-   "slowing": -0.0002,
+   "slowing": -0.0001,
    "gap": 19.931,
    "neutral": false,
    "wet": false
   },
   {
    "lap": 50,
-   "slowing": -0.0021,
+   "slowing": -0.002,
    "gap": 18.196,
    "neutral": false,
    "wet": false
@@ -504,28 +508,28 @@
   },
   {
    "lap": 52,
-   "slowing": 0.0002,
+   "slowing": 0.0001,
    "gap": 17.025,
    "neutral": false,
    "wet": false
   },
   {
    "lap": 53,
-   "slowing": -0.0006,
+   "slowing": -0.0004,
    "gap": 17.802,
    "neutral": false,
    "wet": false
   },
   {
    "lap": 54,
-   "slowing": 0.0095,
+   "slowing": 0.0096,
    "gap": 18.938,
    "neutral": false,
    "wet": false
   },
   {
    "lap": 55,
-   "slowing": 0.0078,
+   "slowing": 0.0077,
    "gap": 11.441,
    "neutral": false,
    "wet": false

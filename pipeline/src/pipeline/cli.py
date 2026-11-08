@@ -220,6 +220,9 @@ def wet_laps_cmd(
     race_id: str = typer.Argument(..., help="A race before 2018, e.g. hungary-2014."),
     raw_dir: str = typer.Option(None, help="Where its raw snapshot is (default: data/raw/)."),
     force: bool = typer.Option(False, help="Overwrite an existing weather file."),
+    estimates_dir: str = typer.Option(
+        None, help="Where the sourced tyre facts are (default: data/estimates/)."
+    ),
 ) -> None:
     """Fit when the track was wet from the lap times (no weather data before 2018) and write
     it as the race's weather records, plus a <race-id>.wet-laps.json report for the hand
@@ -242,7 +245,8 @@ def wet_laps_cmd(
     # (TrackStatus, with the owner's hand checks) are kept.
     sidecar = build_mod.load_sidecar(race_id, raw)
     dry_labels = wet_laps.estimated_dry_labels(sidecar)
-    est = wet_laps.estimate(pd.read_parquet(snapshot), dry_labels=dry_labels)
+    known = wet_laps.load_tyre_facts(race_id, Path(estimates_dir) if estimates_dir else None)
+    est = wet_laps.estimate(pd.read_parquet(snapshot), dry_labels=dry_labels, known=known)
     if dry_labels is not None:
         from . import jolpica
 

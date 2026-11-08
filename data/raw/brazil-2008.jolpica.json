@@ -660,7 +660,8 @@
      "gapBefore": null,
      "gapAfter": 3.0,
      "reasons": [],
-     "status": "unchecked"
+     "status": "confirmed",
+     "source": "https://en.wikipedia.org/wiki/2008_Brazilian_Grand_Prix: 'The accidents of Coulthard and Piquet prompted the deployment of the safety car at the end of the first lap'; 'Racing resumed on lap five when the safety car pulled into the pit-lane'"
     }
    ],
    "handCheck": "data/estimates/brazil-2008.sc.json"

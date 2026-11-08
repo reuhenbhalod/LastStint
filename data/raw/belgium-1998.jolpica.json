@@ -665,9 +665,9 @@
    "method": "field-wide slow laps (>= 1.1x the green baseline); likely SC when >= 1.25x and the field bunches up, else ambiguous (applied as yellow)",
    "periods": [
     {
-     "startLap": 2,
+     "startLap": 1,
      "endLap": 2,
-     "laps": 1,
+     "laps": 2,
      "kind": "SC",
      "confidence": "ambiguous",
      "peakRatio": 1.424,
@@ -677,19 +677,21 @@
       "the field didn't bunch up (P1-P6 6.4s -> 4.2s): rain?",
       "a single slow lap"
      ],
-     "status": "unchecked"
+     "status": "confirmed",
+     "source": "https://en.wikipedia.org/wiki/1998_Belgian_Grand_Prix: after the restart's first-lap crashes 'The safety car was deployed ... The safety car was withdrawn at the end of the second lap' (laps 1-2 of the rerun; also data/redflags restartScLaps)"
     },
     {
-     "startLap": 30,
+     "startLap": 29,
      "endLap": 32,
-     "laps": 3,
+     "laps": 4,
      "kind": "SC",
      "confidence": "likely",
      "peakRatio": 1.521,
      "gapBefore": null,
      "gapAfter": 160.2,
      "reasons": [],
-     "status": "unchecked"
+     "status": "confirmed",
+     "source": "https://en.wikipedia.org/wiki/1998_Belgian_Grand_Prix: Fisichella hit Nakano, 'the safety car again being deployed, and Hill immediately made his second pitstop' (Hill in at the end of lap 28, F1DB); https://www.autosport.com/f1/news/1998-belgian-gp-when-the-schumachers-went-to-war/10744117/: 'The restart came with 12 laps to go' (green from lap 33 of 44). Lap 29 from the timing: the leaders' lap 29 took 186-230 s, finished within 2.4 s"
     }
    ],
    "handCheck": "data/estimates/belgium-1998.sc.json"
@@ -699,7 +701,7 @@
    "stints": [],
    "notes": [
     "wet tyres aren't estimated: a wet race needs its weather block",
-    "wet tyre classes refitted from the lap times by `pipeline wet-laps` (step 4.5): 5 stints on INTERMEDIATE / WET (the snapshot's Compound is final; a relabelled stint keeps 2.4's dry label as `dry`)"
+    "wet tyre classes refitted from the lap times by `pipeline wet-laps` (step 4.5): 2 stints on INTERMEDIATE / WET (the snapshot's Compound is final; a relabelled stint keeps 2.4's dry label as `dry`)"
    ]
   },
   "fuelLoads": {

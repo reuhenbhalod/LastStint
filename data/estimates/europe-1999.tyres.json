@@ -1,0 +1,120 @@
+{
+ "race": "europe-1999",
+ "how": "Sourced tyre classes (wet_laps.load_tyre_facts): each stint's class from a race report, held by `pipeline wet-laps`; stints not listed are fitted. docs/eras-checks/w4-corrections.md.",
+ "stints": [
+  {
+   "driver": "HAK",
+   "stint": 2,
+   "fromLap": 21,
+   "toLap": 24,
+   "class": "rain",
+   "source": "https://en.wikipedia.org/wiki/1999_European_Grand_Prix",
+   "fact": "'At the end of lap 20, Häkkinen pitted for wet tyres'; AS 10:52 'McLaren has decided to put Hakkinen on the wets'"
+  },
+  {
+   "driver": "HAK",
+   "stint": 3,
+   "fromLap": 25,
+   "toLap": 66,
+   "class": "slick",
+   "source": "https://en.wikipedia.org/wiki/1999_European_Grand_Prix",
+   "fact": "'Häkkinen pitted again to change back to dry tyres'; AS 10:59 'returns to the pits for a set of slicks'"
+  },
+  {
+   "driver": "SAL",
+   "stint": 2,
+   "fromLap": 21,
+   "toLap": 23,
+   "class": "rain",
+   "source": "https://www.autosport.com/historics/live-text/1999-european-grand-prix-19660/19660/?dir=asc&p=2",
+   "fact": "10:53 'Salo is also going onto the wets'",
+   "note": "The live text gives clock times, not laps: each entry is matched to the F1DB stop at that point (10:52 HAK end of lap 20, 11:02 SCH lap 27, 11:09 FRE/COU lap 32, 11:14-11:15 HER/TRU lap 35, 11:24 IRV lap 40, 11:28 SCH lap 44, 11:32 HER lap 47)"
+  },
+  {
+   "driver": "IRV",
+   "stint": 2,
+   "fromLap": 22,
+   "toLap": 40,
+   "class": "slick",
+   "source": "https://en.wikipedia.org/wiki/1999_European_Grand_Prix",
+   "fact": "'The following lap Irvine pitted for dry tyres'"
+  },
+  {
+   "driver": "IRV",
+   "stint": 3,
+   "fromLap": 41,
+   "toLap": 49,
+   "class": "rain",
+   "source": "https://www.autosport.com/historics/live-text/1999-european-grand-prix-19660/19660/?dir=asc&p=3",
+   "fact": "11:24 'it's Irvine - he's putting wets on and heading back out'",
+   "note": "The live text gives clock times, not laps: each entry is matched to the F1DB stop at that point (10:52 HAK end of lap 20, 11:02 SCH lap 27, 11:09 FRE/COU lap 32, 11:14-11:15 HER/TRU lap 35, 11:24 IRV lap 40, 11:28 SCH lap 44, 11:32 HER lap 47)"
+  },
+  {
+   "driver": "COU",
+   "stint": 2,
+   "fromLap": 33,
+   "toLap": 37,
+   "class": "slick",
+   "source": "https://en.wikipedia.org/wiki/1999_European_Grand_Prix",
+   "fact": "'Coulthard chose to stay out on dry tyres while most pitted for wets ... slid off the road and out of the race on the 38th lap'"
+  },
+  {
+   "driver": "FIS",
+   "stint": 2,
+   "fromLap": 33,
+   "toLap": 48,
+   "class": "slick",
+   "source": "https://en.wikipedia.org/wiki/1999_European_Grand_Prix",
+   "fact": "'Fisichella, also on dry tyres, to take the lead'"
+  },
+  {
+   "driver": "SCH",
+   "stint": 2,
+   "fromLap": 28,
+   "toLap": 44,
+   "class": "slick",
+   "source": "https://en.wikipedia.org/wiki/1999_European_Grand_Prix",
+   "fact": "'Schumacher, still on dry tyres, then inherited the lead which he held until his pitstop six laps later'"
+  },
+  {
+   "driver": "SCH",
+   "stint": 3,
+   "fromLap": 45,
+   "toLap": 50,
+   "class": "slick",
+   "source": "https://www.autosport.com/historics/live-text/1999-european-grand-prix-19660/19660/?dir=asc&p=3",
+   "fact": "11:28 'Schumacher pits from the lead'; 11:30 'Herbert's still on wets, Schumacher's on slicks'",
+   "note": "The live text gives clock times, not laps: each entry is matched to the F1DB stop at that point (10:52 HAK end of lap 20, 11:02 SCH lap 27, 11:09 FRE/COU lap 32, 11:14-11:15 HER/TRU lap 35, 11:24 IRV lap 40, 11:28 SCH lap 44, 11:32 HER lap 47)"
+  },
+  {
+   "driver": "HER",
+   "stint": 2,
+   "fromLap": 36,
+   "toLap": 47,
+   "class": "rain",
+   "source": "https://www.autosport.com/historics/live-text/1999-european-grand-prix-19660/19660/?dir=asc&p=2",
+   "fact": "11:14 'Herbert comes in to stop from fifth, taking a gamble on wet tyres'; WP 'Herbert ... changing to wet tyres just at the right time'",
+   "note": "The live text gives clock times, not laps: each entry is matched to the F1DB stop at that point (10:52 HAK end of lap 20, 11:02 SCH lap 27, 11:09 FRE/COU lap 32, 11:14-11:15 HER/TRU lap 35, 11:24 IRV lap 40, 11:28 SCH lap 44, 11:32 HER lap 47)"
+  },
+  {
+   "driver": "HER",
+   "stint": 3,
+   "fromLap": 48,
+   "toLap": 66,
+   "class": "slick",
+   "source": "https://www.autosport.com/historics/live-text/1999-european-grand-prix-19660/19660/?dir=asc&p=3",
+   "fact": "11:32 'Herbert pits from second, opting for the slicks to presumably go to the end'",
+   "note": "The live text gives clock times, not laps: each entry is matched to the F1DB stop at that point (10:52 HAK end of lap 20, 11:02 SCH lap 27, 11:09 FRE/COU lap 32, 11:14-11:15 HER/TRU lap 35, 11:24 IRV lap 40, 11:28 SCH lap 44, 11:32 HER lap 47)"
+  },
+  {
+   "driver": "TRU",
+   "stint": 3,
+   "fromLap": 36,
+   "toLap": 48,
+   "class": "rain",
+   "source": "https://www.autosport.com/historics/live-text/1999-european-grand-prix-19660/19660/?dir=asc&p=3",
+   "fact": "11:15 (p2) 'Trulli also stops'; 11:33 'A second downpour shook up the order - here's Trulli bearing wet tyres'",
+   "note": "The live text gives clock times, not laps: each entry is matched to the F1DB stop at that point (10:52 HAK end of lap 20, 11:02 SCH lap 27, 11:09 FRE/COU lap 32, 11:14-11:15 HER/TRU lap 35, 11:24 IRV lap 40, 11:28 SCH lap 44, 11:32 HER lap 47)"
+  }
+ ]
+}

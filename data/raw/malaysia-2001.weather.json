@@ -9,14 +9,15 @@
   "lap": 2,
   "time": 207.894,
   "rain": false,
-  "source": "lap-times"
+  "source": "lap-times",
+  "ambiguous": "lap before a neutralisation (it may have started during it)"
  },
  {
   "lap": 3,
   "time": 319.745,
   "rain": false,
   "source": "lap-times",
-  "ambiguous": "borderline slowing: drizzle, or tyre wear"
+  "ambiguous": "neutralised between a wet and a dry spell: when it changed is unseen"
  },
  {
   "lap": 4,

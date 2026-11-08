@@ -4,15 +4,16 @@
  "periods": [
   {
    "startLap": 1,
-   "endLap": 5,
-   "laps": 5,
+   "endLap": 4,
+   "laps": 4,
    "kind": "SC",
    "confidence": "likely",
    "peakRatio": 1.74,
    "gapBefore": null,
    "gapAfter": 4.0,
    "reasons": [],
-   "status": "unchecked"
+   "status": "confirmed",
+   "source": "https://en.wikipedia.org/wiki/2010_Australian_Grand_Prix: first-lap incident, 'The incident prompted the deployment of the safety car'; 'Racing resumed at the end of lap four when the safety car pulled into the pit-lane'"
   },
   {
    "startLap": 8,

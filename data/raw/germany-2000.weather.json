@@ -135,7 +135,8 @@
   "lap": 23,
   "time": 2430.029,
   "rain": false,
-  "source": "lap-times"
+  "source": "lap-times",
+  "ambiguous": "lap before a neutralisation (it may have started during it)"
  },
  {
   "lap": 24,
@@ -158,40 +159,39 @@
  {
   "lap": 27,
   "time": 2922.847,
-  "rain": true,
+  "rain": false,
   "source": "lap-times"
  },
  {
   "lap": 28,
   "time": 3114.865,
-  "rain": true,
+  "rain": false,
   "source": "lap-times"
  },
  {
   "lap": 29,
   "time": 3220.952,
   "rain": false,
-  "source": "lap-times",
-  "ambiguous": "borderline slowing: drizzle, or tyre wear"
+  "source": "lap-times"
  },
  {
   "lap": 30,
   "time": 3326.59,
   "rain": false,
-  "source": "lap-times",
-  "ambiguous": "borderline slowing: drizzle, or tyre wear"
+  "source": "lap-times"
  },
  {
   "lap": 31,
   "time": 3501.56,
-  "rain": true,
+  "rain": false,
   "source": "lap-times"
  },
  {
   "lap": 32,
   "time": 3608.001,
   "rain": false,
-  "source": "lap-times"
+  "source": "lap-times",
+  "ambiguous": "first green lap after a neutralisation (cold tyres)"
  },
  {
   "lap": 33,

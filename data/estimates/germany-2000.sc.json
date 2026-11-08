@@ -3,9 +3,9 @@
  "how": "docs/eras-checks/2.4-estimates.md: check each period against a race report; set status to confirmed or rejected (edit startLap/endLap if they're off), then re-run `pipeline jolpica <race-id> --force`.",
  "periods": [
   {
-   "startLap": 28,
+   "startLap": 25,
    "endLap": 28,
-   "laps": 1,
+   "laps": 4,
    "kind": "SC",
    "confidence": "ambiguous",
    "peakRatio": 1.532,
@@ -14,12 +14,13 @@
    "reasons": [
     "a single slow lap"
    ],
-   "status": "unchecked"
+   "status": "confirmed",
+   "source": "https://en.wikipedia.org/wiki/2000_German_Grand_Prix: 'until lap 25 when an intruder breached circuit limits ... The incident prompted race officials to deploy the safety car'; 'Racing resumed on lap 29 when the safety car entered the pit lane'"
   },
   {
-   "startLap": 31,
+   "startLap": 30,
    "endLap": 31,
-   "laps": 1,
+   "laps": 2,
    "kind": "SC",
    "confidence": "ambiguous",
    "peakRatio": 1.547,
@@ -28,7 +29,8 @@
    "reasons": [
     "a single slow lap"
    ],
-   "status": "unchecked"
+   "status": "confirmed",
+   "source": "https://en.wikipedia.org/wiki/2000_German_Grand_Prix: 'On lap 30 ... Diniz ... went across [Alesi] at high speed ... Officials again deployed the safety car'; 'The safety car was withdrawn at the end of the 31st lap'"
   },
   {
    "startLap": 35,
@@ -43,7 +45,8 @@
     "only 1.12x slower: rain, yellow flags or a short SC?",
     "the field didn't bunch up (P1-P6 6.8s -> 6.9s): rain?"
    ],
-   "status": "unchecked"
+   "status": "rejected",
+   "source": "https://en.wikipedia.org/wiki/2000_German_Grand_Prix: rain, not an SC: 'Light rain began to fall in the stadium on lap 32 ... became a downpour in the stadium section on lap 35'; 'racing continued without the need for a third safety car period'"
   },
   {
    "startLap": 45,
@@ -59,7 +62,8 @@
     "the field didn't bunch up (P1-P6 33.7s -> 29.1s): rain?",
     "a single slow lap"
    ],
-   "status": "unchecked"
+   "status": "rejected",
+   "source": "https://en.wikipedia.org/wiki/2000_German_Grand_Prix: rain, not an SC: 'By lap 44, it began raining more heavily'; no third safety car ('without the need for a third safety car period')"
   }
  ]
 }
