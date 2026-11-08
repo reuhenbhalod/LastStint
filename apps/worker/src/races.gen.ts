@@ -3,11 +3,13 @@
 import r0 from '../../../data/races/abu-dhabi-2020.json';
 import r1 from '../../../data/races/abu-dhabi-2021.json';
 import r2 from '../../../data/races/abu-dhabi-2024.json';
+import e0 from '../../../data/races/australia-2025.json';
 import r3 from '../../../data/races/austria-2019.json';
 import r4 from '../../../data/races/austria-2025.json';
 import r5 from '../../../data/races/bahrain-2021.json';
 import r6 from '../../../data/races/bahrain-2022.json';
 import r7 from '../../../data/races/belgium-2024.json';
+import e1 from '../../../data/races/brazil-2021.json';
 import r8 from '../../../data/races/canada-2019.json';
 import r9 from '../../../data/races/canada-2022.json';
 import r10 from '../../../data/races/canada-2024.json';
@@ -16,6 +18,8 @@ import r12 from '../../../data/races/china-2025.json';
 import r13 from '../../../data/races/france-2019.json';
 import r14 from '../../../data/races/france-2021.json';
 import r15 from '../../../data/races/hungary-2019.json';
+import e2 from '../../../data/races/hungary-2022.json';
+import e3 from '../../../data/races/hungary-2024.json';
 import r16 from '../../../data/races/hungary-2025.json';
 import r17 from '../../../data/races/italy-2019.json';
 import r18 from '../../../data/races/italy-2022.json';
@@ -27,13 +31,16 @@ import r23 from '../../../data/races/mexico-2022.json';
 import r24 from '../../../data/races/mexico-2024.json';
 import r25 from '../../../data/races/miami-2022.json';
 import r26 from '../../../data/races/miami-2023.json';
+import e4 from '../../../data/races/miami-2024.json';
 import r27 from '../../../data/races/netherlands-2022.json';
 import r28 from '../../../data/races/portugal-2020.json';
 import r29 from '../../../data/races/portugal-2021.json';
 import r30 from '../../../data/races/russia-2020.json';
 import r31 from '../../../data/races/russia-2021.json';
 import r32 from '../../../data/races/saudi-arabia-2025.json';
+import e5 from '../../../data/races/singapore-2023.json';
 import r33 from '../../../data/races/spain-2020.json';
+import e6 from '../../../data/races/spain-2021.json';
 import r34 from '../../../data/races/spain-2023.json';
 import r35 from '../../../data/races/styria-2020.json';
 import r36 from '../../../data/races/united-states-2019.json';
@@ -80,4 +87,15 @@ export const RACE_FILES: Record<string, unknown> = {
   'united-states-2019': r36,
   'united-states-2022': r37,
   'united-states-2023': r38,
+};
+
+/** Eras races in no Daily or Gauntlet pool that have a race file (served by the Eras API). */
+export const ERAS_RACE_FILES: Record<string, unknown> = {
+  'australia-2025': e0,
+  'brazil-2021': e1,
+  'hungary-2022': e2,
+  'hungary-2024': e3,
+  'miami-2024': e4,
+  'singapore-2023': e5,
+  'spain-2021': e6,
 };
