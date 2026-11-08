@@ -137,3 +137,5 @@ export {
   twoCompoundRule,
 } from './rules.js';
 export type { ResolvedRules } from './rules.js';
+export { FAULT_KINDS, faultCost, faultTable, faultsOf } from './faults.js';
+export type { FaultCost, FaultEntry, FaultTable } from './faults.js';

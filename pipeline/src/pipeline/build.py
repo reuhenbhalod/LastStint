@@ -8,11 +8,13 @@ the tests, the golden-file generator, and the CLI so they never drift.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from pathlib import Path
 
 import pandas as pd
 
-from . import assemble, clean, events, fit, ingest, scenario, track, wet
+from . import assemble, clean, events, faults, fit, incidents, ingest, scenario, track, wet
 from . import pace as pace_mod
+from .paths import RAW_DIR
 
 # Race registry: metadata that isn't derivable from the timing data. `split` is the Phase
 # 1-2 perfection spec's fixed tune / held-out assignment (A1): held-out races are never used
@@ -801,12 +803,26 @@ class DryFit:
     wet: bool
 
 
-def dry_fit(race_id: str, laps: pd.DataFrame, era: str) -> DryFit:
+def _from_raw(load, race_id: str, raw_dir: Path):
+    """`load(race_id)` from data/raw, or from another raw directory."""
+    return load(race_id) if raw_dir == RAW_DIR else load(race_id, raw_dir)
+
+
+def dry_fit(
+    race_id: str,
+    laps: pd.DataFrame,
+    era: str,
+    fault_facts: list[dict] | None = None,
+    raw_dir: Path = RAW_DIR,
+) -> DryFit:
     clean_df, traffic_df, _ = clean.clean_laps(laps)
+    # A faulted car's laps while the fault lasts aren't its pace (faults.py fits the loss).
+    clean_df = faults.without_fault_laps(clean_df, fault_facts or [], laps)
+    traffic_df = faults.without_fault_laps(traffic_df, fault_facts or [], laps)
     # A wet race (weather spec): the dry model is fitted on the laps the rain didn't touch,
     # with the usual fuel effect (its dry laps can be too few to fit one); the weather block
     # then explains the rest.
-    rain_data = ingest.load_weather(race_id)
+    rain_data = _from_raw(ingest.load_weather, race_id, raw_dir)
     wet_race = wet.is_wet_race(laps, rain_data)
     if wet_race:
         period = wet.wet_period(laps, rain_data)
@@ -829,13 +845,22 @@ def dry_fit(race_id: str, laps: pd.DataFrame, era: str) -> DryFit:
     return DryFit(clean_df, traffic_df, fitted, rain_data, wet_race)
 
 
-def build_race(race_id: str, laps: pd.DataFrame | None = None) -> BuildResult:
-    """Build a validated race-model dict for a registered race, with its build notes."""
+def build_race(
+    race_id: str,
+    laps: pd.DataFrame | None = None,
+    raw_dir: Path = RAW_DIR,
+    fault_facts: list[dict] | None = None,
+) -> BuildResult:
+    """Build a validated race-model dict for a registered race, with its build notes.
+    `raw_dir`: where its snapshot lives; `fault_facts`: its car faults (default: its FAULT
+    items in data/incidents.json)."""
     if laps is None:
-        laps = pd.read_parquet(ingest.raw_snapshot_path(race_id))
+        laps = pd.read_parquet(ingest.raw_snapshot_path(race_id, raw_dir))
     meta = resolved_meta(race_id, laps)
+    if fault_facts is None:
+        fault_facts = incidents.fault_facts(race_id)
 
-    dry = dry_fit(race_id, laps, meta["era"])
+    dry = dry_fit(race_id, laps, meta["era"], fault_facts, raw_dir)
     clean_df, traffic_df, fitted = dry.clean, dry.traffic, dry.fitted
     weather = wet.weather_block(laps, dry.rain, fitted, wet.load_curves()) if dry.wet else None
     wet_pace = (
@@ -865,10 +890,11 @@ def build_race(race_id: str, laps: pd.DataFrame | None = None) -> BuildResult:
         user_side=meta["user_side"],
         fastest_lap_point=meta["year"] in scenario.FASTEST_LAP_POINT_YEARS,
         rival=meta["rival"],
-        track_status=ingest.load_track_status(race_id),
+        track_status=_from_raw(ingest.load_track_status, race_id, raw_dir),
         sc_unlap=meta.get("sc_unlap"),
         weather=weather,
         wet_pace=wet_pace,
+        fault_facts=fault_facts,
     )
     return BuildResult(model=model, laps=laps, notes=[*fitted.prior_notes, *params.notes])
 

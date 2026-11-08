@@ -23,6 +23,7 @@ import {
   validEngineerCall,
 } from './engineer.js';
 import type { RivalPolicy } from './eras/config.js';
+import { type FaultTable, cloneFaults, faultCost, faultTable } from './faults.js';
 import headsetConfig from './headset.json';
 import { legendEvents } from './legend.js';
 import { validatePlan } from './plan.js';
@@ -300,6 +301,8 @@ export interface Run {
    * forecast (weather spec W3). Empty in a dry race.
    */
   wetness: number[];
+  /** Car faults by car (faults.ts): frozen on their real laps; forks end their own. */
+  faults: FaultTable;
 }
 
 export interface NeutralEvent {
@@ -591,6 +594,7 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
     events,
     neutral: neutralMap(events),
     retireAt,
+    faults: faultTable(model.events),
   };
   // The fuel load: what the flag needs at the standard burn, plus the race's margin.
   const fuel = run.headset?.fuel;
@@ -740,6 +744,7 @@ export function forkRun(
     decisions: [...run.decisions.filter((d) => d.lap > run.state.lap), ...decisions],
     notes: [],
     ...blindView(run, seed, options.blindAfter),
+    faults: cloneFaults(run.faults, options.blindAfter),
     // Blind playouts already draw neutralizations at the base rates, crashes included.
     incidentFlags: options.blindAfter === undefined ? run.incidentFlags : false,
     // Blind: the weather after the decision is the forecast's, not the real race's (W3).
@@ -1317,6 +1322,9 @@ export function stepLap(run: Run): RaceState {
       }
     }
 
+    // A car fault (faults.ts): its pace loss on green laps, its slow lap on its own lap.
+    const fault = faultCost(run.faults, code, lap, c.pittedThisLap, !flag);
+    if (fault.struck) run.notes.push({ lap, kind: 'fault', driver: code, detail: fault.struck });
     const wet = wetnessOn(run.wetness, lap);
     const base = cleanLap(model, c, lap, wet);
     const eng = code === model.userSide && !flag ? state.engineer : undefined;
@@ -1355,7 +1363,8 @@ export function stepLap(run: Run): RaceState {
         run.notes.push({ lap, kind: 'error', driver: code });
       }
     }
-    clean[code] = base + modeDelta;
+    lt += fault.pace + fault.extra;
+    clean[code] = base + modeDelta + fault.pace;
     c.totalTime += lt + pitCost;
     c.tyreAge += 1;
     c.tyreWear +=

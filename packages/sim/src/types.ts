@@ -95,13 +95,25 @@ export interface DriverModel {
   realStrategy: PitStop[];
 }
 
+/** A car fault's kind (simulator roadmap R2; faults.ts). */
+export type FaultKind = 'gear-stuck' | 'power-loss' | 'puncture' | 'tyre-failure';
+
 export interface RaceEvent {
   lap: number;
-  type: 'SC' | 'VSC' | 'RED' | 'RAIN' | 'RETIREMENT';
+  type: 'SC' | 'VSC' | 'RED' | 'RAIN' | 'RETIREMENT' | 'FAULT';
+  /** How long it lasts. A FAULT without it lasts to the flag (or its car's next stop). */
   laps?: number;
   driver?: string;
   /** Defines the storyline: Legend difficulty always runs it on its real lap (eras spec 8). */
   storylineEvent?: boolean;
+  /** A FAULT (driver required): its kind. */
+  fault?: FaultKind;
+  /** A FAULT: seconds a green lap the car loses while it lasts (fitted from its real laps). */
+  paceLoss?: number;
+  /** A FAULT: extra seconds on the fault's own lap (a puncture's forced slow lap). */
+  slowLap?: number;
+  /** A FAULT that lasts until the car's next stop (new tyres fix a puncture). */
+  untilStop?: boolean;
 }
 
 // Eras mode (eras spec sections 6, 8 and 11; schema v11). Types and validation only: the
@@ -434,7 +446,8 @@ export interface RaceNote {
     | 'trust' // value: the change; detail: why (TrustReason)
     | 'rogue' // a furious driver picks his own battle move (detail: the move)
     | 'fuel' // fuel load spec: detail 'empty' (the tank ran dry)
-    | 'stop-go'; // era rules: a closed pit lane's penalty; detail 'owed' | 'served', value: s
+    | 'stop-go' // era rules: a closed pit lane's penalty; detail 'owed' | 'served', value: s
+    | 'fault'; // a car fault struck (faults.ts); detail: its kind
   driver: string;
   /** For an incident: 'crash', 'mechanical' or 'puncture'; see the kinds above. */
   detail?: string;
