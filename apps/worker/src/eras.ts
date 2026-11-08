@@ -9,23 +9,32 @@
 //                                             hidden objective state and best accuracy
 //   POST /api/eras/attempts                   { anonId, raceId, legend } -> { attemptId, seed,
 //                                             modelUrl, modelHash, difficulty, expiresAt }
-//   POST /api/eras/attempts/:id               { anonId, decisions, modelHash? }: stores the
-//                                             decisions; evaluation is step 7.3 (501 until then)
+//   POST /api/eras/attempts/:id               { anonId, decisions, grades, untimed?,
+//                                             rivalClaims?, modelHash? } -> the evaluated
+//                                             attempt (erasEval.ts EraAttemptResult) with the
+//                                             player's progress on the race and rank (7.3)
 //   GET  /api/eras/races/:raceId/model?h=     the race file an attempt pinned (immutable by hash)
 //
 // The player is the account an anonId is linked to (player_ids), else the anonId itself: a
 // signed-in browser plays as its account's player ID (players.ts, erasMerge.ts). Unlocks,
 // Cleared and stars are derived from era_progress, never stored (spec §12). The history book, community stats and leaderboards are step 7.4.
+//
+// A submit is replayed and evaluated on the server (erasEval.ts, build plan 7.3) from the race
+// file the attempt pinned at its start (era_attempts.model_hash), graded from the game's
+// claimed grades as a Daily run is, and re-graded in full nightly (reverify.ts).
 
-import {
-  type DifficultySettings,
-  type RaceModel,
-  STARS_PER_RACE,
-  difficultyFor,
-  legendDifficulty,
-  unlocksNextEra,
-} from '@laststint/sim';
+import { type RaceModel, STARS_PER_RACE, VerifyError, unlocksNextEra } from '@laststint/sim';
 import type { Context, Hono } from 'hono';
+import {
+  BadRivalClaimsError,
+  type EraAttemptResult,
+  EraRaceNotReadyError,
+  HISTORY_INSERT,
+  PROGRESS_UPSERT,
+  RivalUnavailableError,
+  attemptDifficulty,
+  evaluateAttempt,
+} from './erasEval.js';
 import { modelHash } from './hash.js';
 import type { Env } from './index.js';
 import { ERAS_RACE_FILES } from './races.gen.js';
@@ -33,6 +42,8 @@ import { type BundledRace, getRace } from './races.js';
 import { ApiError, isAnonId } from './runs.js';
 
 type Ctx = Context<{ Bindings: Env }>;
+
+export { attemptDifficulty };
 
 /** An attempt left unsubmitted this long is abandoned and can't be submitted (spec §9). */
 export const ATTEMPT_TTL_MS = 24 * 3600 * 1000;
@@ -77,6 +88,7 @@ interface AttemptRow {
   legend: number;
   seed: number;
   decisions: string | null;
+  model_hash: string | null;
   created_at: string;
   submitted_at: string | null;
 }
@@ -242,14 +254,6 @@ async function limit(c: Ctx, key: string): Promise<void> {
   if (!success) throw new ApiError(429, 'rate-limited');
 }
 
-/** The settings an attempt plays at: its era's row of the difficulty table, or Legend's. */
-export function attemptDifficulty(playOrder: number, legend: boolean): DifficultySettings {
-  const { accuracyThreshold, information, rivalPolicy, decisionTimerSeconds } = legend
-    ? legendDifficulty()
-    : difficultyFor(playOrder);
-  return { accuracyThreshold, information, rivalPolicy, decisionTimerSeconds };
-}
-
 function randomSeed(): number {
   const a = new Uint32Array(1);
   crypto.getRandomValues(a);
@@ -308,10 +312,10 @@ async function startAttempt(c: Ctx, now: number) {
   const seed = randomSeed();
   const createdAt = new Date(now).toISOString();
   await c.env.DB.prepare(
-    `INSERT INTO era_attempts (id, player_id, race_id, legend, seed, created_at)
-     VALUES (?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO era_attempts (id, player_id, race_id, legend, seed, model_hash, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
   )
-    .bind(attemptId, playerId, raceId, legend ? 1 : 0, seed, createdAt)
+    .bind(attemptId, playerId, raceId, legend ? 1 : 0, seed, bundled.hash, createdAt)
     .run();
 
   const origin = new URL(c.req.url).origin;
@@ -325,12 +329,59 @@ async function startAttempt(c: Ctx, now: number) {
   };
 }
 
-/** POST /api/eras/attempts/:id: checks the attempt and stores its decisions. */
+/** The player's standing on a race after a submit (normal or Legend, as the attempt). */
+export interface RaceProgress {
+  stars: { result: boolean; strategist: boolean; mastery: boolean };
+  hiddenDone: boolean;
+  bestAccuracy: number | null;
+}
+
+/** POST /api/eras/attempts/:id's answer: the evaluated attempt and where it leaves the player. */
+export interface SubmitResponse extends EraAttemptResult {
+  attemptId: string;
+  /** Stars this attempt earned that the player didn't have on the race before. */
+  newStars: { result: boolean; strategist: boolean; mastery: boolean };
+  /** This attempt wrote the race's history book entry (the player's first rewrite of it). */
+  historyEntry: boolean;
+  /** The player's best per star on the race, this attempt included (a worse one lowers nothing). */
+  progress: RaceProgress;
+  /** The player's place on the race's board by best accuracy (Legend's own board for Legend). */
+  rank: number;
+  total: number;
+}
+
+const toProgress = (p: ProgressRow | null): RaceProgress => ({
+  stars: {
+    result: !!p?.star_result,
+    strategist: !!p?.star_strategist,
+    mastery: !!p?.star_mastery,
+  },
+  hiddenDone: !!p?.hidden_done,
+  bestAccuracy: p?.best_accuracy ?? null,
+});
+
+function progressRow(db: D1Database, playerId: string, raceId: string, legend: number) {
+  return db
+    .prepare(
+      `SELECT race_id, star_result, star_strategist, star_mastery, hidden_done, best_accuracy
+       FROM era_progress WHERE player_id = ? AND race_id = ? AND legend = ?`,
+    )
+    .bind(playerId, raceId, legend);
+}
+
+/**
+ * POST /api/eras/attempts/:id: replays and evaluates the attempt (erasEval.ts) from the race
+ * file it pinned, then keeps the best result per star and writes the history book entry on a
+ * first rewrite. A tampered or malformed submission is refused (400) and nothing is stored, as
+ * a Daily run's; the nightly re-grade corrects edited claimed grades.
+ */
 async function submitAttempt(c: Ctx, attemptId: string, now: number) {
+  const db = c.env.DB;
   const body = await jsonBody(c);
-  const playerId = await playerOf(c.env.DB, body.anonId);
+  const playerId = await playerOf(db, body.anonId);
   const attempt = isAnonId(attemptId)
-    ? await c.env.DB.prepare('SELECT * FROM era_attempts WHERE id = ?')
+    ? await db
+        .prepare('SELECT * FROM era_attempts WHERE id = ?')
         .bind(attemptId)
         .first<AttemptRow>()
     : null;
@@ -343,35 +394,155 @@ async function submitAttempt(c: Ctx, attemptId: string, now: number) {
   if (!isDecisionList(body.decisions)) {
     throw new ApiError(400, 'bad-request', 'decisions must be a list of { lap, kind, ... }');
   }
-  // era_attempts has no model_hash column, so the attempt's pinned hash comes back from the
-  // client (it was in the start response); a race file rebuilt since the start is refused.
-  if (body.modelHash !== undefined) {
-    const bundled = await getErasRace(attempt.race_id);
-    if (!bundled || body.modelHash !== bundled.hash) {
-      throw new ApiError(409, 'model-changed', 'this race changed since the attempt started');
+  const untimed = body.untimed ?? false;
+  if (typeof untimed !== 'boolean') throw new ApiError(400, 'bad-request', 'untimed is a boolean');
+  const rivalClaims = body.rivalClaims ?? null;
+  if (rivalClaims !== null && !Array.isArray(rivalClaims)) {
+    throw new ApiError(400, 'bad-rival-claims', 'rivalClaims must be a list');
+  }
+
+  // The race file the attempt pinned at its start (server-side; a client's echo of the hash
+  // must agree with it). An attempt from before the pin, or a file rebuilt since, is refused.
+  const bundled = await getErasRace(attempt.race_id);
+  if (
+    !attempt.model_hash ||
+    !bundled ||
+    bundled.hash !== attempt.model_hash ||
+    (body.modelHash !== undefined && body.modelHash !== attempt.model_hash)
+  ) {
+    throw new ApiError(409, 'model-changed', 'this race changed since the attempt started');
+  }
+  const era = await db
+    .prepare(
+      'SELECT e.play_order FROM era_races r JOIN eras e ON e.id = r.era_id WHERE r.race_id = ?',
+    )
+    .bind(attempt.race_id)
+    .first<{ play_order: number }>();
+  if (!era) throw new ApiError(404, 'no-race', `${attempt.race_id} is not an Eras race`);
+  const legend = attempt.legend === 1;
+  const difficulty = attemptDifficulty(era.play_order, legend);
+
+  const nowIso = new Date(now).toISOString();
+  const grades = body.grades ?? null;
+  let evaluated: EraAttemptResult;
+  try {
+    evaluated = evaluateAttempt({
+      model: bundled.model,
+      seed: attempt.seed,
+      legend,
+      difficulty,
+      decisions: body.decisions,
+      // Always a claim on submit (undefined would mean a full re-grade); null fails its check.
+      grades,
+      rivalClaims,
+      untimed,
+    });
+  } catch (e) {
+    if (e instanceof VerifyError) throw new ApiError(400, e.code, e.message);
+    if (e instanceof BadRivalClaimsError) throw new ApiError(400, e.code, e.message);
+    if (e instanceof EraRaceNotReadyError) throw new ApiError(503, 'race-not-ready', e.message);
+    if (e instanceof RivalUnavailableError) {
+      // Stored for the nightly job to evaluate once the server can replay this rival.
+      const write = await db
+        .prepare(
+          `UPDATE era_attempts SET decisions = ?, grades = ?, rival_claims = ?, untimed = ?,
+             submitted_at = ? WHERE id = ? AND submitted_at IS NULL`,
+        )
+        .bind(
+          JSON.stringify(body.decisions),
+          JSON.stringify(grades),
+          rivalClaims === null ? null : JSON.stringify(rivalClaims),
+          untimed ? 1 : 0,
+          nowIso,
+          attemptId,
+        )
+        .run();
+      if (!write.meta.changes) throw new ApiError(409, 'already-submitted');
+      return c.json(
+        {
+          error: 'rival-unavailable',
+          detail: `decisions stored; a ${e.policy} rival can't be evaluated on the server yet`,
+          rivalPolicy: e.policy,
+          attemptId,
+        },
+        501,
+      );
     }
+    throw e;
   }
 
   // Only an unsubmitted attempt is written: a second submit finds it submitted.
-  const write = await c.env.DB.prepare(
-    'UPDATE era_attempts SET decisions = ?, submitted_at = ? WHERE id = ? AND submitted_at IS NULL',
-  )
-    .bind(JSON.stringify(body.decisions), new Date(now).toISOString(), attemptId)
+  const write = await db
+    .prepare(
+      `UPDATE era_attempts SET decisions = ?, grades = ?, rival_claims = ?, untimed = ?,
+         accuracy = ?, result = ?, submitted_at = ? WHERE id = ? AND submitted_at IS NULL`,
+    )
+    .bind(
+      JSON.stringify(body.decisions),
+      JSON.stringify(grades),
+      rivalClaims === null ? null : JSON.stringify(rivalClaims),
+      untimed ? 1 : 0,
+      evaluated.accuracy,
+      JSON.stringify(evaluated),
+      nowIso,
+      attemptId,
+    )
     .run();
   if (!write.meta.changes) throw new ApiError(409, 'already-submitted');
 
-  // TODO(eras build plan 7.3): replay the decisions with attempt.seed, run the evaluator (1.4),
-  // write the best result per star to era_progress and the history entry on a rewrite, and
-  // return stars, objectives, accuracy, rewrite and rank (spec §13). Until then the decisions
-  // are stored and the evaluation is reported as not implemented.
-  return c.json(
-    {
-      error: 'not-implemented',
-      detail: 'decisions stored; evaluation is Eras build plan step 7.3',
-      attemptId,
-    },
-    501,
+  const before = await progressRow(
+    db,
+    playerId,
+    attempt.race_id,
+    attempt.legend,
+  ).first<ProgressRow>();
+  const s = evaluated.stars;
+  const writes = [
+    db
+      .prepare(PROGRESS_UPSERT)
+      .bind(
+        playerId,
+        attempt.race_id,
+        attempt.legend,
+        s.result ? 1 : 0,
+        s.strategist ? 1 : 0,
+        s.mastery ? 1 : 0,
+        evaluated.hidden ? 1 : 0,
+        evaluated.accuracy,
+        nowIso,
+      ),
+  ];
+  if (evaluated.rewrite) {
+    writes.push(db.prepare(HISTORY_INSERT).bind(playerId, attempt.race_id, attemptId, nowIso));
+  }
+  const done = await db.batch(writes);
+  const after = toProgress(
+    await progressRow(db, playerId, attempt.race_id, attempt.legend).first<ProgressRow>(),
   );
+  const had = toProgress(before);
+  const standing = await db
+    .prepare(
+      `SELECT count(*) AS total,
+         sum(CASE WHEN best_accuracy > ?3 THEN 1 ELSE 0 END) AS ahead
+       FROM era_progress WHERE race_id = ?1 AND legend = ?2 AND best_accuracy IS NOT NULL`,
+    )
+    .bind(attempt.race_id, attempt.legend, after.bestAccuracy)
+    .first<{ total: number; ahead: number | null }>();
+
+  const response: SubmitResponse = {
+    attemptId,
+    ...evaluated,
+    newStars: {
+      result: after.stars.result && !had.stars.result,
+      strategist: after.stars.strategist && !had.stars.strategist,
+      mastery: after.stars.mastery && !had.stars.mastery,
+    },
+    historyEntry: !!done[1]?.meta.changes,
+    progress: after,
+    rank: (standing?.ahead ?? 0) + 1,
+    total: standing?.total ?? 0,
+  };
+  return c.json(response);
 }
 
 export function registerEras(app: Hono<{ Bindings: Env }>) {

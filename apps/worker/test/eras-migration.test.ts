@@ -15,7 +15,7 @@ async function all<T>(sql: string): Promise<T[]> {
 
 describe('migration 0010: eras', () => {
   it('applies after 0001-0009', () => {
-    expect(env.TEST_MIGRATIONS.map((m) => m.name).slice(-2)).toEqual([
+    expect(env.TEST_MIGRATIONS.map((m) => m.name).slice(-3, -1)).toEqual([
       '0009_rename_race_ids.sql',
       '0010_eras.sql',
     ]);
@@ -91,5 +91,30 @@ describe('migration 0010: eras', () => {
       .run();
     const row = await env.DB.prepare('SELECT legend, untimed, decisions FROM era_attempts').first();
     expect(row).toEqual({ legend: 0, untimed: 0, decisions: null });
+  });
+});
+
+describe('migration 0011: the pinned hash and nightly columns on era_attempts', () => {
+  it('applies last, after 0010', () => {
+    expect(env.TEST_MIGRATIONS.map((m) => m.name).at(-1)).toBe('0011_era_attempt_hash.sql');
+  });
+
+  it('adds model_hash, grades, rival_claims, verified and corrected', async () => {
+    await env.DB.prepare(
+      `INSERT INTO era_attempts (id, player_id, race_id, seed, created_at)
+       VALUES ('a1', 'p1', 'abu-dhabi-2021', 1, ?)`,
+    )
+      .bind(new Date().toISOString())
+      .run();
+    const row = await env.DB.prepare(
+      'SELECT model_hash, grades, rival_claims, verified, corrected FROM era_attempts',
+    ).first();
+    expect(row).toEqual({
+      model_hash: null,
+      grades: null,
+      rival_claims: null,
+      verified: 0,
+      corrected: 0,
+    });
   });
 });
