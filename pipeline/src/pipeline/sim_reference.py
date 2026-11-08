@@ -15,7 +15,7 @@ import math
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from . import race_rules, redflag, refuel, sc_queue
+from . import race_rules, redflag, refuel, restart, sc_queue
 from .legend import legend_events, legend_loss, real_flags
 from .paths import GOLDEN_DIR
 from .rng import Mulberry32, derive_seed
@@ -52,6 +52,13 @@ GOLDEN_SEEDS = list(range(1, 21))  # fixed seeds for the TS parity golden files
 # common random numbers across a decision's options).
 OVERTAKE_STREAM = 1000
 CLIFF_FALLBACK = 2.0  # extra wear past the cliff = this x degPerLap if not fitted
+# Scripted team orders and let-bys (TEAM_ORDER events, Eras builds: data/incidents.json): on a
+# green lap from the event's lap, for up to TEAM_ORDER_LAPS laps, a yielder still ahead of its
+# passer and no more than TEAM_ORDER_WINDOW s clear of it lifts and drops TEAM_ORDER_GAP s
+# behind it, and doesn't pass it back for the rest of the race. Same rule in packages/sim.
+TEAM_ORDER_LAPS = 3
+TEAM_ORDER_WINDOW = 10.0
+TEAM_ORDER_GAP = 0.5
 
 
 @dataclass
@@ -267,6 +274,8 @@ def simulate(
         elif e["type"] == "RETIREMENT":
             retire_at.setdefault(e["lap"], set()).add(e["driver"])
     faults = FaultState(model["events"])  # car faults (faults.py): frozen on their real laps
+    orders = team_orders(model["events"])  # scripted team orders and let-bys (TEAM_ORDER)
+    restart_block = track.get("restart")  # the SC restart's jump and spread (restart.py)
     red = redflag.plan(events)  # free stops in the stoppage, gaps wiped at the restart
 
     ordered = sorted(model["drivers"], key=lambda d: d["stateAtTakeover"]["position"])
@@ -308,6 +317,8 @@ def simulate(
         prev_time = {c: cars[c].total_time for c in active_codes()}
         clean: dict[str, float] = {}
         pitted: set[str] = set()
+        queue = active_codes()
+        restarting = restart_block is not None and is_restart_lap(neutral, red, lap)
 
         for code in active_codes():
             car = cars[code]
@@ -370,6 +381,9 @@ def simulate(
                 ahead_gap = car.total_time - prev_time.get(ahead, car.total_time)
                 if 0 < ahead_gap < DIRTY_AIR_RANGE:
                     lt += dirty_air
+                if restarting:
+                    # The restart lap (restart.py): the leader's jump, the queue's spread.
+                    lt += restart.extra(restart_block, queue.index(code))
             lt += fault_pace + fault_extra
             clean[code] = _clean_lap(car, compounds, fuel, lap, fresh_tyre, weather) + fault_pace
             car.total_time += lt + pit_cost
@@ -399,12 +413,65 @@ def simulate(
                 order[:] = live + [c for c in order if cars[c].retired]
         else:
             _resolve_order(order, cars, clean, pass_rngs, overtake, prev_time, pitted, recent, lap)
+            apply_team_orders(orders, order, cars, lap, total_laps, recent)
         wipe = red["wipes"].get(lap)
         if wipe and neutral.get(wipe[1]) == "RED":
             unlap = race_rules.sc_queue(model) != "none"
             redflag.line_up(active_codes(), cars, wipe[0], None if unlap else green)
 
     return _classify(order, cars)
+
+
+def is_restart_lap(neutral: dict[int, str], red: dict, lap: int) -> bool:
+    """A green lap straight after an SC lap: a safety car's restart (also a red flag's rolling
+    restart behind it), not a standing restart's first lap (its own spread)."""
+    if neutral.get(lap) or neutral.get(lap - 1) != "SC":
+        return False
+    wipe = red["wipes"].get(lap - 1)
+    standing = (
+        wipe is not None
+        and wipe[0] == redflag.STANDING_RESTART_GAP
+        and neutral.get(wipe[1]) == "RED"
+    )
+    return not standing
+
+
+def team_orders(events: list[dict]) -> list[dict]:
+    """The race's scripted team orders (TEAM_ORDER events: `driver` lets `other` by), in lap
+    order, each with the last lap it stays open."""
+    return [
+        {"lap": int(e["lap"]), "yielder": e["driver"], "passer": e["other"],
+         "until": int(e["lap"]) + TEAM_ORDER_LAPS - 1}
+        for e in sorted(events, key=lambda e: e["lap"])
+        if e["type"] == "TEAM_ORDER"
+    ]  # fmt: skip
+
+
+def apply_team_orders(
+    orders: list[dict], order: list[str], cars: dict, lap: int, total: int, recent: dict
+) -> None:
+    """A green lap's scripted team orders (TEAM_ORDER_* above), after the lap's passes. An
+    order is done once the passer is ahead, or either car is out; it lapses after its laps."""
+    swapped = False
+    for o in list(orders):
+        if lap < o["lap"]:
+            continue
+        y, p = cars.get(o["yielder"]), cars.get(o["passer"])
+        if lap > o["until"] or y is None or p is None or y.retired or p.retired:
+            orders.remove(o)
+            continue
+        if p.total_time < y.total_time:
+            orders.remove(o)
+            continue
+        if p.total_time - y.total_time > TEAM_ORDER_WINDOW:
+            continue
+        y.total_time = p.total_time + TEAM_ORDER_GAP
+        recent[(y.code, p.code)] = total  # no pass back for the rest of the race
+        orders.remove(o)
+        swapped = True
+    if swapped:
+        live = sorted((c for c in order if not cars[c].retired), key=lambda c: cars[c].total_time)
+        order[:] = live + [c for c in order if cars[c].retired]
 
 
 def _bunch(

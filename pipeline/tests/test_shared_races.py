@@ -63,7 +63,9 @@ def test_a_shared_race_builds_without_its_overlay(tmp_path):
     pools.write_text(json.dumps({"daily": [], "survivor": {}, "eras": {}}))
     alone = build.build_race("abu-dhabi-2021", eras_dir=tmp_path, pools_path=pools)
     assert alone.model["rules"] == {"vsc": True} and alone.model["eras"]["eraId"] == 1
-    assert alone.estimates == ["overlay: eras, provenance, rules, storylineEvents"]
+    assert alone.estimates[0] == "overlay: eras, provenance, rules, storylineEvents"
+    # An Eras build: the SC restart block too (Eras model fixes M4).
+    assert alone.estimates[1:] == ["SC restart: jump 0.15s, spread 0.44s a place (to P9)"]
 
 
 def test_a_shared_race_with_estimates_refuses_an_overlay_provenance(tmp_path, monkeypatch):

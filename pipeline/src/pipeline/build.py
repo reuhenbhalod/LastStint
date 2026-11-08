@@ -28,7 +28,9 @@ from . import (
     reconstruct,
     redflag,
     refuel,
+    restart,
     scenario,
+    storyline,
     track,
     wet,
     wet_laps,
@@ -2117,6 +2119,37 @@ def official_result(model: dict, recon: dict) -> tuple[dict, list[str]]:
     return {**model, "realResult": order}, lines
 
 
+def scripted_blocks(
+    model: dict, race_id: str, recon: dict | None, team_orders: list[dict] | None = None
+) -> tuple[dict, list[str]]:
+    """Eras model fixes M4 (Eras builds only): the SC restart's jump and spread
+    (`track.restart`, restart.py), the race's sourced team orders and let-bys as TEAM_ORDER
+    events (data/incidents.json), and a reconstruction's last-lap stops (`lastLapStops`: a car
+    that ran dry on the last lap) as RETIREMENT events on the last lap where the timing doesn't
+    already show one. Returns the model and report lines."""
+    out, lines = {**model}, []
+    if restart.IN_ERAS_BUILDS:
+        out = {**model, "track": {**model["track"], "restart": restart.track_block()}}
+        lines.append(
+            f"SC restart: jump {restart.JUMP}s, spread {restart.SPREAD}s a place"
+            f" (to P{restart.PLACES + 1})"
+        )
+    facts = incidents.team_order_facts(race_id) if team_orders is None else team_orders
+    added = incidents.team_order_events(facts, out)
+    total = int(out["race"]["laps"])
+    retired = {e["driver"] for e in out["events"] if e["type"] == "RETIREMENT"}
+    for s in (recon or {}).get("lastLapStops") or []:
+        if s["driver"] not in retired:
+            added.append({"lap": total, "type": "RETIREMENT", "driver": s["driver"]})
+            lines.append(f"  last-lap stop: {s['driver']} retires on lap {total} (sourced)")
+    for e in added:
+        if e["type"] == "TEAM_ORDER":
+            lines.append(f"  team order: lap {e['lap']} {e['driver']} lets {e['other']} by")
+    if added:
+        out["events"] = sorted([*out["events"], *added], key=lambda e: (e["lap"], e["type"]))
+    return out, lines
+
+
 def eras_meta(race_id: str, sidecar: dict) -> dict:
     """A registry entry for a Jolpica race not in RACES (the Eras races until Phase 3 registers
     them): its season's era, the automatic duel and the D3 takeover, seed 1."""
@@ -2538,6 +2571,9 @@ def build_race(
     official_lines: list[str] = []
     if recon is not None and recon.get("roadPositions"):
         model, official_lines = official_result(model, recon)
+    scripted_lines: list[str] = []
+    if eras_build:
+        model, scripted_lines = scripted_blocks(model, race_id, recon)
     estimated = list((block or {}).get("estimated", []))
     if recon is not None:
         estimated += [f for f in recon["provenance"].get("estimated", []) if f not in estimated]
@@ -2560,12 +2596,20 @@ def build_race(
         ]
     else:
         model, overlay_lines = apply_eras(model, estimated, overlay)
+        overlay_lines += storyline.check(
+            model, ((overlay or {}).get("eras") or {}).get("storylineRetirements")
+        )
     if recon is not None:
         # The sidecar's estimated fields merged with the overlay's (apply_eras), kind
         # reconstructed.
         prov = {**model["provenance"], "kind": "reconstructed"}
         model = reconstruct.mark_model(model, {"provenance": prov})
-    report = [*(estimates.report_lines(block) if block else []), *overlay_lines, *red_notes]
+    report = [
+        *(estimates.report_lines(block) if block else []),
+        *overlay_lines,
+        *scripted_lines,
+        *red_notes,
+    ]
     if recon is not None:
         report.append(
             f"reconstructed (step 4.6): all anchors pass: {recon['solver']['passed']};"

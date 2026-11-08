@@ -67,6 +67,17 @@ import {
   takeoverCompoundsUsed,
   twoCompoundRule,
 } from './rules.js';
+import {
+  type StorylineLap,
+  type TeamOrderState,
+  applyTeamOrders,
+  conditionMet,
+  isRestartLap,
+  restartExtra,
+  storylineFor,
+  teamOrdersOf,
+  userOrdersOn,
+} from './scripted.js';
 import type {
   BattleMove,
   CarState,
@@ -369,6 +380,23 @@ export interface Run {
   wetness: number[];
   /** Car faults by car (faults.ts): frozen on their real laps; forks end their own. */
   faults: FaultTable;
+  /** Scripted team orders and let-bys still open (TEAM_ORDER events; scripted.ts). */
+  orders: TeamOrderState[];
+  /** Live play: the player's avoidable storyline retirements still to come (scripted.ts). */
+  storyline: StorylinePending[];
+  /** Live play with storyline retirements: the player's car at the start of each lap run. */
+  storylineLaps: StorylineLap[];
+}
+
+/** An avoidable storyline retirement waiting for its lap (scripted.ts conditionMet). */
+export interface StorylinePending {
+  /** The player's car's real retirement lap: judged at its start, retired at its end. */
+  lap: number;
+  condition: import('./types.js').StorylineCondition;
+  /** Linked cars' real retirements (alsoRetires): code -> lap. */
+  linked: Array<[string, number]>;
+  /** Judged: true (retires), false (avoided); undefined until its lap. */
+  met?: boolean;
 }
 
 export interface NeutralEvent {
@@ -557,9 +585,14 @@ export function validateDecisions(model: RaceModel, decisions: Decision[]): void
     } else if (d.kind === 'mode') {
       if (!headset?.modes[d.key]?.[d.value]) throw new Error(`unknown mode ${d.key}=${d.value}`);
     } else if (d.kind === 'teamOrder') {
-      const orders = ['letTeammatePast', 'teammateLetsYouPast', 'holdUp', 'release'];
+      const orders = ['letTeammatePast', 'teammateLetsYouPast', 'holdUp', 'release', 'comply'];
       if (!orders.includes(d.order)) throw new Error('unknown team order');
-      if (!teammateOf(model)) throw new Error(`${model.userSide} has no teammate in this race`);
+      if (d.order === 'comply') {
+        // A scripted order to the player's car (TEAM_ORDER), open on this lap (scripted.ts).
+        if (!userOrdersOn(model.events, model.userSide, d.lap).length)
+          throw new Error(`no team order for ${model.userSide} on lap ${d.lap}`);
+      } else if (!teammateOf(model))
+        throw new Error(`${model.userSide} has no teammate in this race`);
     } else if (
       d.kind === 'battle' ||
       d.kind === 'limits' ||
@@ -615,6 +648,30 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
       events.push({ lap: e.lap, laps: e.laps ?? 1, flag: FLAG_OF[e.type] });
     } else if (e.type === 'RETIREMENT' && e.driver) {
       retireAt.set(e.lap, [...(retireAt.get(e.lap) ?? []), e.driver]);
+    }
+  }
+
+  // Live play: the player's avoidable storyline retirements (scripted.ts) leave the frozen
+  // timeline; each comes back on its lap only if the player repeated the real call.
+  const storyline: StorylinePending[] = [];
+  if (live) {
+    const lapOf = (code: string) =>
+      model.events.find((e) => e.type === 'RETIREMENT' && e.driver === code)?.lap;
+    for (const item of storylineFor(model.eras?.storylineRetirements, model.userSide)) {
+      const lap = lapOf(item.driver);
+      if (lap === undefined) continue;
+      const linked: Array<[string, number]> = [];
+      for (const code of [item.driver, ...(item.alsoRetires ?? [])]) {
+        const at = lapOf(code);
+        if (at === undefined) continue;
+        const rest = (retireAt.get(at) ?? []).filter((c) => c !== code);
+        if (rest.length) retireAt.set(at, rest);
+        else retireAt.delete(at);
+        if (code !== item.driver) linked.push([code, at]);
+      }
+      if (item.condition.type !== 'fuel') {
+        storyline.push({ lap, condition: item.condition, linked });
+      }
     }
   }
 
@@ -699,6 +756,9 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
     red: redFlagPlan(timeline),
     retireAt,
     faults: faultTable(model.events),
+    orders: teamOrdersOf(model.events, live ? model.userSide : undefined),
+    storyline,
+    storylineLaps: [],
   };
   // The fuel load: what the flag needs at the standard burn, plus the race's margin.
   const fuel = run.headset?.fuel;
@@ -903,6 +963,12 @@ export function forkRun(
     notes: [],
     ...blindView(run, seed, options.blindAfter),
     faults: cloneFaults(run.faults, options.blindAfter),
+    orders: run.orders.map((o) => ({ ...o })),
+    // A blind playout doesn't know a storyline retirement still to come (like the others).
+    storyline: run.storyline
+      .filter((p) => options.blindAfter === undefined || p.lap <= options.blindAfter)
+      .map((p) => ({ ...p, linked: [...p.linked] })),
+    storylineLaps: [...run.storylineLaps],
     // Blind playouts already draw neutralizations at the base rates, crashes included.
     incidentFlags: options.blindAfter === undefined ? run.incidentFlags : false,
     // Blind: the weather after the decision is the forecast's, not the real race's (W3).
@@ -1041,6 +1107,10 @@ function applyDecisions(run: Run, lap: number): void {
       user.strategy.push(d.fill !== undefined ? { ...stop, fill: d.fill } : stop);
     } else if (d.kind === 'teamOrder') {
       const orders = run.state.teamOrders;
+      if (d.order === 'comply') {
+        // Obey the scripted order(s) telling the player's car to let a car by (scripted.ts).
+        for (const o of run.orders) if (o.call && lap >= o.lap && lap <= o.until) o.armed = true;
+      }
       if (d.order === 'holdUp') orders.holdUp = true;
       if (d.order === 'release') orders.holdUp = false;
       if (d.order === 'letTeammatePast' || d.order === 'teammateLetsYouPast') {
@@ -1586,6 +1656,9 @@ export function stepLap(run: Run): RaceState {
   pitted.clear();
   let battle: EngineerLap | null = null;
   for (const code of running) prevTime[code] = (cars[code] as CarState).totalTime;
+  if (run.storyline.length) storylineBeforeLap(run, lap, running, prevTime);
+  // The SC restart's jump and spread (scripted.ts; Eras race files carry track.restart).
+  const restart = track.restart && isRestartLap(run.neutral, run.red, lap) ? track.restart : null;
 
   for (let i = 0; i < running.length; i++) {
     const code = running[i] as string;
@@ -1700,6 +1773,7 @@ export function stepLap(run: Run): RaceState {
       const ahead = i > 0 ? (running[i - 1] as string) : code;
       const aheadGap = c.totalTime - (prevTime[ahead] ?? c.totalTime);
       if (aheadGap > 0 && aheadGap < DIRTY_AIR_RANGE) lt += track.dirtyAirPenalty;
+      if (restart) lt += restartExtra(restart, i);
       lt += modeDelta + (lapEng?.extra ?? 0);
       const behind = running[i + 1];
       if (behind && holdingUp(run, code, behind)) {
@@ -1745,6 +1819,7 @@ export function stepLap(run: Run): RaceState {
       c.retiredLap = lap;
     }
   }
+  if (run.storyline.length) storylineAfterLap(run, lap);
 
   if (flag) {
     // No overtaking under neutralization: sorting by total time moves only cars that pitted.
@@ -1760,6 +1835,7 @@ export function stepLap(run: Run): RaceState {
   } else {
     resolveOrder(run, lap, clean, prevTime, pitted);
     applySwap(run, lap, prevTime);
+    if (run.orders.length) scriptedOrders(run, lap);
   }
   const wipe = run.red.wipes.get(lap);
   if (wipe && run.neutral.get(wipe.redLap) === 'red') {
@@ -1776,6 +1852,63 @@ export function stepLap(run: Run): RaceState {
   markNextFlag(run);
   rivalAfterLap(run, lap, rivalBefore);
   return state;
+}
+
+/** A green lap's scripted team orders and let-bys (scripted.ts), after its passes. */
+function scriptedOrders(run: Run, lap: number): void {
+  const swaps = applyTeamOrders(run.orders, run.state.cars, lap, run.model.race.laps, run.passedBy);
+  if (!swaps.length) return;
+  for (const [yielder, passer] of swaps) {
+    run.notes.push({ lap, kind: 'team-order', driver: passer, detail: yielder });
+  }
+  run.state.order = withRetired(run, sortByTime(live(run), run.state.cars));
+}
+
+/** Live play: the player's car at the start of the lap, and any storyline call judged now. */
+function storylineBeforeLap(
+  run: Run,
+  lap: number,
+  running: string[],
+  prevTime: Record<string, number>,
+): void {
+  const user = run.state.cars[run.model.userSide];
+  if (!user || user.retired) return;
+  const me = prevTime[user.code] as number;
+  const gaps: Record<string, number> = {};
+  for (const code of running) if (code !== user.code) gaps[code] = (prevTime[code] as number) - me;
+  run.storylineLaps.push({ lap, modes: { ...user.modes }, tyreAge: user.tyreAge, gaps });
+  for (const p of run.storyline) {
+    if (p.lap === lap && p.met === undefined) {
+      p.met = conditionMet(p.condition, run.storylineLaps, lap);
+    }
+  }
+}
+
+/** Live play: a storyline retirement on its lap, if the player repeated the real call. */
+function storylineAfterLap(run: Run, lap: number): void {
+  const retire = (code: string) => {
+    const c = run.state.cars[code];
+    if (c && !c.retired) {
+      c.retired = true;
+      c.retiredLap = lap;
+    }
+  };
+  for (const p of run.storyline) {
+    if (p.lap === lap) {
+      const user = run.state.cars[run.model.userSide];
+      if (user && !user.retired) {
+        if (p.met) retire(user.code);
+        run.notes.push({
+          lap,
+          kind: 'storyline',
+          driver: run.model.userSide,
+          detail: p.met ? 'retired' : 'avoided',
+        });
+      }
+    }
+    if (!p.met) continue;
+    for (const [code, at] of p.linked) if (at === lap) retire(code);
+  }
 }
 
 /**

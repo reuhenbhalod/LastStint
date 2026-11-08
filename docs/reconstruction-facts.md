@@ -63,6 +63,8 @@ folder).
 - `weather`: optional, only for a race run (partly) in the wet. See below.
 - `roadPositions[]`: optional, a disqualified car a source places on the road (owner decision,
   Nov 8 2026; monaco-1984's Bellof). See below.
+- `lastLapStops[]`: optional, a classified car a source says stopped on the last lap (out of
+  fuel; germany-1986's Rosberg and Prost). See below.
 
 The loader rejects a file whose stop or safety car has no source, a stop with no lap or car,
 bad safety-car laps, a `weather` block that breaks the rules below, or a road position with
@@ -96,6 +98,31 @@ car at its place. The car stays out of the official result: it isn't classified,
 build lists it behind the classified cars in the race file's `realResult` (as Jolpica's order
 has it; `build.official_result`). The sidecar's `roadPositions` and `classified` carry this to
 the build.
+
+## A car that stopped on the last lap (`lastLapStops`)
+
+```json
+"lastLapStops": [
+  {"driver": "ROSK", "gap": 2.0, "source": "https://www.autosport.com/...", "note": "..."}
+]
+```
+
+Jolpica classifies a car that ran dry on the last lap a lap down ("Out of fuel", one lap fewer
+than the winner). Without this entry the solver treats it like any retirement and ends its last
+completed lap early enough to read as one, which puts it well ahead of where it really was (at
+Hockenheim 1986, ahead of the leader). With it:
+
+- `driver` or `number`: the car; it must be classified, not a finisher in Jolpica's words, and
+  exactly one lap down (anything else is an error);
+- `gap`: optional, seconds behind the leader at the start of the last lap, where a source gives
+  one;
+- `source`: required.
+
+The car's last completed lap ends after the leader's (the leader's last lap is taken as its
+estimated lap) and before the flag: at the sourced gap, else at its natural time inside that
+window. The sidecar's `lastLapStops` carries it to the build, which writes its RETIREMENT event
+on the race's last lap (Eras builds); the anchor report checks it was running when the leader
+started the last lap and stopped before the flag.
 
 ## Weather (wet races)
 

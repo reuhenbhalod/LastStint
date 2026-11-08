@@ -25,7 +25,9 @@ import { isWetTyre, wetnessOn } from './weather.js';
  * moment). `rain` / `drying`: the track turning wet or drying out (weather spec). `fault`: a
  * fault struck the user's car (faults.ts): nurse it or push, pit now or limp on. Red flags
  * (eras build plan 4.3): `RED`, the tyres to fit in the stoppage for the restart (free);
- * `preRed`, the lap before it, boxing now (paid) or staying out. */
+ * `preRed`, the lap before it, boxing now (paid) or staying out. `teamOrder` (Eras model fixes
+ * M4): a sourced team order or let-by tells the player's car to let a car by (a TEAM_ORDER
+ * event, scripted.ts): comply, or ignore it. */
 export type MomentTrigger =
   | 'SC'
   | 'VSC'
@@ -36,7 +38,8 @@ export type MomentTrigger =
   | 'cliff'
   | 'rain'
   | 'drying'
-  | 'fault';
+  | 'fault'
+  | 'teamOrder';
 
 export interface MomentOption extends GradeOption {
   /** Short label for the UI; radio copy is written in Phase 5. */
@@ -79,6 +82,7 @@ const PRIORITY: Record<MomentTrigger, number> = {
   rain: 0,
   drying: 0,
   fault: 0,
+  teamOrder: 0,
   SC: 0,
   VSC: 1,
   rivalPit: 2,
@@ -301,6 +305,36 @@ function triggerOptions(
   return [stay, ...box.slice(0, extra ? 2 : 3), ...(extra ? [extra] : [])];
 }
 
+/**
+ * A team order to the player's car (TEAM_ORDER, scripted.ts): let the car by as the real driver
+ * did (the real option), or ignore it. Offered on the order's lap, the last lap included.
+ */
+function teamOrderMoments(model: RaceModel, first: number, target: Target): DecisionMoment[] {
+  return model.events
+    .filter(
+      (e) =>
+        e.type === 'TEAM_ORDER' &&
+        e.driver === model.userSide &&
+        e.lap >= first &&
+        e.lap <= model.race.laps,
+    )
+    .map((e) => ({
+      id: `teamorder-${e.lap}-${(e.other ?? '').toLowerCase()}`,
+      lap: e.lap,
+      trigger: 'teamOrder' as const,
+      target,
+      options: [
+        {
+          id: 'comply',
+          label: `Let ${e.other} through`,
+          decisions: [{ lap: e.lap, kind: 'teamOrder', order: 'comply' }],
+        },
+        { id: 'ignore', label: 'Ignore the order', decisions: [] },
+      ],
+      realOptionId: 'comply',
+    }));
+}
+
 /** Candidate moments from the race's triggers, with 3-4 options each (ungraded). */
 export function candidateMoments(model: RaceModel, target = DEFAULT_TARGET): DecisionMoment[] {
   const first = model.race.takeoverLap + 1;
@@ -349,7 +383,11 @@ export function candidateMoments(model: RaceModel, target = DEFAULT_TARGET): Dec
     }
   }
 
+  // Team orders to the player's car: always offered (an order isn't merged away).
   const moments: DecisionMoment[] = [];
+  for (const m of teamOrderMoments(model, first, target)) {
+    if (!moments.some((x) => x.lap === m.lap)) moments.push(m);
+  }
   for (const { lap, trigger, tyres } of found
     .filter((f) => f.lap >= first && f.lap <= last)
     .sort((a, b) => PRIORITY[a.trigger] - PRIORITY[b.trigger] || a.lap - b.lap)) {

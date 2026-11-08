@@ -234,3 +234,18 @@ export {
   validFill,
 } from './refuel.js';
 export type { TankReading } from './refuel.js';
+// Eras model fixes M4 (scripted.ts): the SC restart, scripted team orders and let-bys, and
+// avoidable storyline retirements. RestartModel, StorylineCondition and StorylineRetirement are
+// in types.ts.
+export {
+  TEAM_ORDER_GAP,
+  TEAM_ORDER_LAPS,
+  TEAM_ORDER_WINDOW,
+  conditionMet,
+  isRestartLap,
+  restartExtra,
+  storylineFor,
+  teamOrdersOf,
+  userOrdersOn,
+} from './scripted.js';
+export type { StorylineLap, TeamOrderState } from './scripted.js';

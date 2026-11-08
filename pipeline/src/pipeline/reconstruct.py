@@ -121,6 +121,12 @@ class Car:
     # its sourced gap to the winner, else it sits between its road neighbours (an estimate).
     road_position: int | None = None
     road_source: str | None = None
+    # A classified car that stopped on the last lap (facts `lastLapStops`: out of fuel), a lap
+    # down in the result: it runs its last completed lap at its real road place (after the
+    # leader's, before the flag), not as an early retirement. Its source; its sourced gap to the
+    # leader at the start of the last lap, if one is given.
+    last_lap_source: str | None = None
+    last_lap_gap: float | None = None
 
     @property
     def finished(self) -> bool:
@@ -220,6 +226,14 @@ def load_facts(race_id: str, facts_dir: Path = FACTS_DIR) -> dict | None:
             raise ValueError(f"{path}: stops[{i}] tyre {s['tyre']!r} is not one of {TYRES}")
     if facts.get("weather") is not None:
         check_weather(facts["weather"], str(path))
+    for i, r in enumerate(facts.get("lastLapStops") or []):
+        at = f"{path}: lastLapStops[{i}]"
+        if not str(r.get("source") or "").strip():
+            raise ValueError(f"{at} has no source")
+        if not ("driver" in r or "number" in r):
+            raise ValueError(f"{at} needs a driver or number")
+        if r.get("gap") is not None and not (isinstance(r["gap"], int | float) and r["gap"] >= 0):
+            raise ValueError(f"{at}: gap {r['gap']!r} is not seconds behind the leader")
     for i, r in enumerate(facts.get("roadPositions") or []):
         at = f"{path}: roadPositions[{i}]"
         if not str(r.get("source") or "").strip():
@@ -470,6 +484,7 @@ def load_anchors(
         curves = wet.load_curves()
         notes += apply_tyres(cars, weather)
     notes += apply_road_positions(cars, (facts or {}).get("roadPositions") or [], winner)
+    notes += apply_last_lap_stops(cars, (facts or {}).get("lastLapStops") or [], winner)
     incidents = DATA_DIR / "incidents.json"
     if incidents.exists():
         for item in json.loads(incidents.read_text()).get(race_id) or []:
@@ -575,6 +590,45 @@ def apply_road_positions(cars: list[Car], items: list[dict], winner: Car) -> lis
                 " its road neighbours (no gap sourced: an estimate)"
             )
     return notes
+
+
+def apply_last_lap_stops(cars: list[Car], items: list[dict], winner: Car) -> list[str]:
+    """The facts file's `lastLapStops` onto their cars: a classified car a source says stopped
+    on the last lap (germany-1986's Rosberg and Prost, out of fuel). It must be classified,
+    not a finisher in Jolpica's words, and exactly one lap down (it never crossed the line on
+    the last lap). `targets` puts its last completed lap at its road place, after the leader's
+    and before the flag, instead of early enough to read as an early retirement; the build
+    writes its RETIREMENT event on the last lap. Returns notes; a malformed item is an error."""
+    notes = []
+    for i, item in enumerate(items):
+        who = item.get("driver", item.get("number"))
+        car = _car_for(cars, item)
+        if car is None:
+            raise ValueError(f"facts lastLapStops[{i}]: no car {who}")
+        if not car.classified or car.status in FINISHED or car.laps != winner.laps - 1:
+            raise ValueError(
+                f"facts lastLapStops[{i}]: {car.driver} is {car.status} with {car.laps} laps"
+                f" (classified {car.classified}): a last-lap stop is a classified car that"
+                f" stopped on lap {winner.laps}, {winner.laps - 1} laps completed"
+            )
+        car.last_lap_source = str(item["source"])
+        gap = item.get("gap")
+        car.last_lap_gap = None if gap is None else float(gap)
+        notes.append(
+            f"{car.driver}: stopped on the last lap (sourced), its lap {car.laps} at its road"
+            + (f" place, {float(gap):.1f}s behind the leader (sourced)" if gap is not None else
+               " place, after the leader's and before the flag")
+        )  # fmt: skip
+    return notes
+
+
+def last_lap_stops(anchors: Anchors) -> list[dict]:
+    """The sidecar's last-lap stops (the build writes each one's RETIREMENT on the last lap)."""
+    return [
+        {"driver": c.driver, "laps": c.laps, "gap": c.last_lap_gap, "source": c.last_lap_source}
+        for c in anchors.cars
+        if c.last_lap_source is not None
+    ]
 
 
 def road_order(anchors: Anchors) -> list[str]:
@@ -871,6 +925,7 @@ def targets(
     retirement's ends early enough for events.retirement_events to see it."""
     lead = [c for c in anchors.cars if c.time is not None]
     t_win = min(c.time for c in lead)
+    winner_code = min(lead, key=lambda c: c.time).driver
     t_last = max(c.time for c in lead)
     typical = float(np.median([c.time / c.laps for c in lead]))
     # retirement_events sees a car stopped 1.5 median laps before the flag; the median over
@@ -893,13 +948,22 @@ def targets(
         for car in group:
             if car.time is not None:
                 lo.append(car.time), hi.append(car.time)
+            elif car.last_lap_source is not None:
+                # Stopped on the last lap: its last completed lap after the leader's, before
+                # the flag (the leader's last lap taken as its estimated lap).
+                lead_end = t_win - est_lap[winner_code]
+                lo.append(lead_end + p.order_gap)
+                hi.append(t_win - p.order_gap)
             elif car.finished:
                 lapped = car.laps < anchors.laps
                 lo.append(t_win + p.order_gap)
                 hi.append(t_win + 0.75 * est_lap[car.driver] if lapped else math.inf)
             else:
                 lo.append(-math.inf), hi.append(seen)
-            want.append(car.time if car.time is not None else natural[car.driver])
+            if car.last_lap_gap is not None:
+                want.append(t_win - est_lap[winner_code] + car.last_lap_gap)
+            else:
+                want.append(car.time if car.time is not None else natural[car.driver])
         s = [min(max(w, a), b) for w, a, b in zip(want, lo, hi, strict=True)]
         # Cars slower than their window allows are spread over its rest, not piled at its end.
         capped = [
@@ -1131,6 +1195,11 @@ def solve(anchors: Anchors, p: Params, sigma: float | None = None) -> Solution:
     fitted: dict[str, dict] = {}
     goal = goals(grid_pins)
     laps = run(grid_pins, goal)
+    current = {"pins": grid_pins}
+
+    def pins_now() -> dict[str, dict[int, float]]:
+        return current["pins"]
+
     under: dict[str, set[int]] = {c.driver: set() for c in running}
     # Safety cars: pin the laps behind it, re-solve, until the laps behind it settle (the
     # laps pinned are the laps the final times put behind it).
@@ -1144,6 +1213,7 @@ def solve(anchors: Anchors, p: Params, sigma: float | None = None) -> Solution:
     for _ in range(p.sc_iterations if anchors.safety_cars else 0):
         sc, under = sc_pins(anchors, laps, feats, b_med, p)
         pins = {d: {**grid_pins[d], **sc[d]} for d in grid_pins}
+        current["pins"] = pins
         goal = goals(pins)
         laps = run(pins, goal)
         if sc_pins(anchors, laps, feats, b_med, p)[1] == under:
@@ -1151,8 +1221,47 @@ def solve(anchors: Anchors, p: Params, sigma: float | None = None) -> Solution:
     else:
         if anchors.safety_cars:
             notes.append("the laps behind the safety car did not settle")
+    laps = _last_lap_stops(anchors, p, sigma, laps, goal, feats, zs, pins_now(), fitted)
     notes = sorted(set(notes), key=notes.index)
     return Solution(laps, feats, under, goal, sigma, notes, fitted)
+
+
+def _last_lap_stops(
+    anchors: Anchors,
+    p: Params,
+    sigma: float,
+    laps: dict[str, np.ndarray],
+    goal: dict[str, float],
+    feats: dict[str, Features],
+    zs: dict[str, np.ndarray],
+    pins: dict[str, dict[int, float]],
+    fitted: dict[str, dict],
+) -> dict[str, np.ndarray]:
+    """Refit each last-lap stop (facts `lastLapStops`) against the leader's solved laps: its
+    last completed lap ends its sourced gap behind the leader's (else its target, kept after the
+    leader's and before the flag), in classification order. `targets` could only estimate the
+    leader's last lap."""
+    stops = sorted(
+        (c for c in anchors.cars if c.last_lap_source is not None and c.driver in laps),
+        key=lambda c: c.position or 999,
+    )
+    if not stops:
+        return laps
+    lead = min((c for c in anchors.cars if c.time is not None), key=lambda c: c.time)
+    lead_laps = laps[lead.driver]
+    lead_end = float(lead_laps[: anchors.laps - 1].sum())
+    t_win = float(lead_laps.sum())
+    prev = lead_end
+    out = dict(laps)
+    for c in stops:
+        want = lead_end + c.last_lap_gap if c.last_lap_gap is not None else goal[c.driver]
+        want = min(max(want, prev + p.order_gap), t_win - p.order_gap)
+        fit = fit_car(c, feats[c.driver], zs[c.driver], p, sigma, want, pins[c.driver])
+        out[c.driver] = fit.laps
+        goal[c.driver] = want
+        fitted[c.driver] = {**fitted.get(c.driver, {}), "target": round(want, 3)}
+        prev = want
+    return out
 
 
 # --- The raw snapshot --------------------------------------------------------------------
@@ -1348,6 +1457,13 @@ def check_anchors(anchors: Anchors, df: pd.DataFrame, p: Params) -> list[dict]:
         out.append(_row("fastest", c.driver, [c.fastest_time, c.fastest_lap], got, bool(ok)))
 
     seen = {e["driver"] for e in events.retirement_events(df, total)}
+    # A last-lap stop's RETIREMENT is written by the build on the last lap: it must be running
+    # when the leader starts it and stopped before the flag (no time over the line after it).
+    for c in anchors.cars:
+        if c.last_lap_source is not None and c.driver in end:
+            leader_start = float(by_car[lead[0].driver]["Time"].iloc[-2])
+            if leader_start < end[c.driver] < t_win:
+                seen.add(c.driver)
     for c in anchors.cars:
         if c.finished:
             continue
@@ -1548,6 +1664,7 @@ def reconstruct(anchors: Anchors, p: Params | None = None) -> Result:
             c.driver for c in sorted(anchors.cars, key=lambda c: c.position or 999) if c.classified
         ],
         "roadPositions": road_positions(anchors),
+        "lastLapStops": last_lap_stops(anchors),
         "stopsComplete": anchors.stops_complete,
         "safetyCarsComplete": anchors.safety_cars_complete,
         "params": asdict(replace(p, sigma=sol.sigma)),

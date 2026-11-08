@@ -241,7 +241,17 @@
    "source": "https://en.wikipedia.org/wiki/2024_Miami_Grand_Prix"
   }
  ],
- "hungary-2024": [],
+ "hungary-2024": [
+  {
+   "lap": 68,
+   "type": "TEAM_ORDER",
+   "driver": "NOR",
+   "passer": "PIA",
+   "detail": "McLaren told Norris to give the lead back to Piastri; he slowed on the start-finish straight on lap 68",
+   "source": "https://en.wikipedia.org/wiki/2024_Hungarian_Grand_Prix",
+   "note": "Lap 68 in the article and in the timing (PIA ahead at the end of lap 68)"
+  }
+ ],
  "belgium-2023": [],
  "australia-2025": [
   {
@@ -653,6 +663,15 @@
    "driver": "SAT",
    "status": "Collision",
    "source": "https://en.wikipedia.org/wiki/2002_Austrian_Grand_Prix"
+  },
+  {
+   "lap": 71,
+   "type": "TEAM_ORDER",
+   "driver": "BAR",
+   "passer": "MSCM",
+   "detail": "Ferrari's order: Barrichello yielded to Schumacher in the last 100 yards of the last lap and finished 0.182 s behind",
+   "source": "https://en.wikipedia.org/wiki/2002_Austrian_Grand_Prix",
+   "note": "Lap 71 of 71 (article; Jolpica has MSCM ahead at the end of lap 71)"
   }
  ],
  "brazil-2003": [
@@ -736,5 +755,47 @@
   }
  ],
  "great-britain-1987": [],
- "monaco-1988": []
+ "monaco-1988": [],
+ "europe-1997": [
+  {
+   "lap": 69,
+   "type": "TEAM_ORDER",
+   "driver": "VIL",
+   "passer": "HAK",
+   "detail": "On the last lap Villeneuve, caught by both McLarens, let them through to take the title",
+   "source": "https://en.wikipedia.org/wiki/1997_European_Grand_Prix",
+   "note": "Lap 69 of 69; the timing (Jolpica) has HAK and COU ahead at the end of it"
+  },
+  {
+   "lap": 69,
+   "type": "TEAM_ORDER",
+   "driver": "VIL",
+   "passer": "COU",
+   "detail": "On the last lap Villeneuve, caught by both McLarens, let them through to take the title",
+   "source": "https://en.wikipedia.org/wiki/1997_European_Grand_Prix",
+   "note": "Lap 69 of 69; the timing (Jolpica) has HAK and COU ahead at the end of it"
+  }
+ ],
+ "malaysia-1999": [
+  {
+   "lap": 53,
+   "type": "TEAM_ORDER",
+   "driver": "MSCM",
+   "passer": "IRV",
+   "detail": "After the second stops Schumacher slowed once again to let Irvine retake the lead",
+   "source": "https://en.wikipedia.org/wiki/1999_Malaysian_Grand_Prix",
+   "note": "The article gives no lap (its lap-4 let-by is before the takeover); lap 53 from the timing (Jolpica): IRV retakes the lead from MSCM at the end of lap 53"
+  }
+ ],
+ "russia-2018": [
+  {
+   "lap": 25,
+   "type": "TEAM_ORDER",
+   "driver": "BOT",
+   "passer": "HAM",
+   "detail": "Mercedes asked Bottas to let Hamilton through into second at turn 13",
+   "source": "https://en.wikipedia.org/wiki/2018_Russian_Grand_Prix",
+   "note": "The article gives lap 26; the timing (FastF1) has HAM ahead of BOT from the end of lap 25, kept as the sims' lap"
+  }
+ ]
 }

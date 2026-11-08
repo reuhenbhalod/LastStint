@@ -28,7 +28,20 @@ them): a race's list may also hold items with "type": "FAULT", which the build r
   slow lap; default true for a puncture or tyre failure).
 
 No magnitudes: the seconds lost are fitted from the car's real laps, never written here.
-The SC causes written by `pipeline incidents` keep a race's FAULT items (write).
+
+Team orders and let-bys (Eras model fixes M4) are hand-checked facts too, items with
+"type": "TEAM_ORDER", which an Eras build turns into TEAM_ORDER events (team_order_events)
+that both sims replay as a forced swap (sim_reference.apply_team_orders):
+
+    {"lap": 68, "type": "TEAM_ORDER", "driver": "NOR", "passer": "PIA",
+     "detail": "Norris slowed on the start-finish straight and gave Piastri the lead",
+     "source": "https://en.wikipedia.org/wiki/2024_Hungarian_Grand_Prix"}
+
+- lap: the race lap at whose end the passer is ahead (the timing's lap where it has one);
+- driver: the car told to let the other by; passer: the car let by;
+- source: where the fact was checked (http(s) URLs; required); detail, note: display only.
+
+The SC causes written by `pipeline incidents` keep a race's FAULT and TEAM_ORDER items (write).
 """
 
 from __future__ import annotations
@@ -189,6 +202,60 @@ def check_fault_fact(item: dict, where: str) -> dict:
     return {**item, "fault": kind}
 
 
+TEAM_ORDER_KEYS = {"lap", "type", "driver", "passer", "detail", "source", "note"}
+
+
+def check_team_order(item: dict, where: str) -> dict:
+    """The team-order fact, checked (the module docstring); ValueError unless well formed."""
+    bad = sorted(set(item) - TEAM_ORDER_KEYS)
+    if bad:
+        raise ValueError(f"{where}: unknown team-order fields {bad}")
+    lap = item.get("lap")
+    if not isinstance(lap, int) or isinstance(lap, bool) or lap < 1:
+        raise ValueError(f"{where}: lap must be a race lap (int >= 1), got {lap!r}")
+    for key in ("driver", "passer"):
+        if not isinstance(item.get(key), str) or not item[key]:
+            raise ValueError(f"{where}: {key} must be a driver code")
+    if item["driver"] == item["passer"]:
+        raise ValueError(f"{where}: a car can't let itself by")
+    src = item.get("source")
+    if not isinstance(src, str) or not src.startswith(("http://", "https://")):
+        raise ValueError(f"{where}: a team-order fact needs its source URL")
+    return dict(item)
+
+
+def team_order_facts(race_id: str, path: Path = INCIDENTS_PATH) -> list[dict]:
+    """A race's team orders and let-bys (its TEAM_ORDER items), checked; [] for none."""
+    if not path.exists():
+        return []
+    entry = json.loads(path.read_text()).get(race_id) or []
+    if not isinstance(entry, list):
+        raise ValueError(f"{path.name}: {race_id} must be a list")
+    return [
+        check_team_order(item, f"{path.name}: {race_id}[{i}]")
+        for i, item in enumerate(entry)
+        if isinstance(item, dict) and item.get("type") == "TEAM_ORDER"
+    ]
+
+
+def team_order_events(facts: list[dict], model: dict) -> list[dict]:
+    """The race model's TEAM_ORDER events: the facts on the laps the game replays (after the
+    takeover), for cars in the race. Raises on a fact naming a car the race doesn't have."""
+    codes = {d["code"] for d in model["drivers"]}
+    takeover = int(model["race"]["takeoverLap"])
+    out = []
+    for f in facts:
+        for key in ("driver", "passer"):
+            if f[key] not in codes:
+                raise ValueError(
+                    f"{model['race']['id']}: team order lap {f['lap']}: no car {f[key]}"
+                )
+        if f["lap"] > takeover:
+            out.append({"lap": f["lap"], "type": "TEAM_ORDER", "driver": f["driver"],
+                        "other": f["passer"]})  # fmt: skip
+    return out
+
+
 def fault_facts(race_id: str, path: Path = INCIDENTS_PATH) -> list[dict]:
     """A race's fault facts (its FAULT items in data/incidents.json), checked; [] for none."""
     if not path.exists():
@@ -209,8 +276,9 @@ def write(race_id: str, items: list[dict] | dict, path: Path = INCIDENTS_PATH) -
     data = json.loads(path.read_text()) if path.exists() else {}
     old = data.get(race_id)
     if isinstance(items, list) and isinstance(old, list):
-        kept = [i for i in old if isinstance(i, dict) and i.get("type") == "FAULT"]
-        items = [*[i for i in items if i.get("type") != "FAULT"], *kept]
+        hand = ("FAULT", "TEAM_ORDER")  # hand-checked facts
+        kept = [i for i in old if isinstance(i, dict) and i.get("type") in hand]
+        items = [*[i for i in items if i.get("type") not in hand], *kept]
     data[race_id] = items
     path.write_text(json.dumps(dict(sorted(data.items())), indent=1) + "\n")
     return path
