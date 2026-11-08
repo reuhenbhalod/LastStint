@@ -1,6 +1,102 @@
 {
-  "_comment": "Physical baseline for the dry-compound fit (fit.py). Offsets are seconds vs the softest compound; wear is seconds per lap of tyre age. The fit enforces the ordering (softer = faster and wears faster) and shrinks each adjacent-compound step toward the difference of these priors with the weight of `pseudoLaps` laps of evidence. Wet compounds are unordered and unshrunk. freshTyre: a bonus (s, negative = faster) on the first clean laps of a new set, at full weight on the first and fading linearly over `laps` laps; its prior is the lap-weighted pooled estimate from the tuning races only (-0.21s), shrunk with `pseudoLaps`.",
+  "_comment": "Physical baseline for the dry-compound fit (fit.py). Offsets are seconds vs the softest compound; wear is seconds per lap of tyre age. The fit enforces the ordering (softer = faster and wears faster) and shrinks each adjacent-compound step toward the difference of these priors with the weight of `pseudoLaps` laps of evidence. Wet compounds are unordered and unshrunk. freshTyre: a bonus (s, negative = faster) on the first clean laps of a new set, at full weight on the first and fading linearly over `laps` laps; its prior is the lap-weighted pooled estimate from the tuning races only (-0.21s), shrunk with `pseudoLaps`. Eras (eras build plan 1.2): a block for each schema era; _copiedFrom marks a block copied from that era's until it's tuned.",
+  "1988-1993": {
+    "_copiedFrom": "2014-2025",
+    "order": [
+      "SOFT",
+      "MEDIUM",
+      "HARD"
+    ],
+    "offset": {
+      "SOFT": 0.0,
+      "MEDIUM": 0.4,
+      "HARD": 0.8
+    },
+    "wear": {
+      "SOFT": 0.06,
+      "MEDIUM": 0.035,
+      "HARD": 0.02
+    },
+    "pseudoLaps": 40,
+    "freshTyre": {
+      "bonus": -0.2,
+      "laps": 3,
+      "pseudoLaps": 40
+    }
+  },
+  "1994-2009": {
+    "_copiedFrom": "2014-2025",
+    "order": [
+      "SOFT",
+      "MEDIUM",
+      "HARD"
+    ],
+    "offset": {
+      "SOFT": 0.0,
+      "MEDIUM": 0.4,
+      "HARD": 0.8
+    },
+    "wear": {
+      "SOFT": 0.06,
+      "MEDIUM": 0.035,
+      "HARD": 0.02
+    },
+    "pseudoLaps": 40,
+    "freshTyre": {
+      "bonus": -0.2,
+      "laps": 3,
+      "pseudoLaps": 40
+    }
+  },
+  "2010-2013": {
+    "_copiedFrom": "2014-2025",
+    "order": [
+      "SOFT",
+      "MEDIUM",
+      "HARD"
+    ],
+    "offset": {
+      "SOFT": 0.0,
+      "MEDIUM": 0.4,
+      "HARD": 0.8
+    },
+    "wear": {
+      "SOFT": 0.06,
+      "MEDIUM": 0.035,
+      "HARD": 0.02
+    },
+    "pseudoLaps": 40,
+    "freshTyre": {
+      "bonus": -0.2,
+      "laps": 3,
+      "pseudoLaps": 40
+    }
+  },
   "2014-2025": {
+    "order": [
+      "SOFT",
+      "MEDIUM",
+      "HARD"
+    ],
+    "offset": {
+      "SOFT": 0.0,
+      "MEDIUM": 0.4,
+      "HARD": 0.8
+    },
+    "wear": {
+      "SOFT": 0.06,
+      "MEDIUM": 0.035,
+      "HARD": 0.02
+    },
+    "pseudoLaps": 40,
+    "freshTyre": {
+      "bonus": -0.2,
+      "laps": 3,
+      "pseudoLaps": 40
+    }
+  },
+  "2026+": {
+    "_copiedFrom": "2014-2025",
     "order": [
       "SOFT",
       "MEDIUM",
