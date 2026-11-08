@@ -2,7 +2,7 @@
   "schemaVersion": 11,
   "race": {
     "id": "belgium-1995",
-    "name": "Belgium 1995: Hill vs Schumacher",
+    "name": "Belgium 1995: Schumacher vs Hill",
     "laps": 44,
     "takeoverLap": 12,
     "seed": 1,
@@ -715,9 +715,9 @@
   ],
   "decisionMoments": [
     {
-      "id": "stop-15",
+      "id": "rivalpit-15",
       "lap": 15,
-      "trigger": "cliff",
+      "trigger": "rivalPit",
       "target": {
         "kind": "win"
       },
@@ -776,11 +776,11 @@
           ]
         }
       ],
-      "realOptionId": "box-medium"
+      "realOptionId": "stay"
     },
     {
-      "id": "stop-21",
-      "lap": 21,
+      "id": "stop-18",
+      "lap": 18,
       "trigger": "cliff",
       "target": {
         "kind": "win"
@@ -796,10 +796,12 @@
           "label": "Box, slicks",
           "decisions": [
             {
-              "lap": 21,
+              "lap": 18,
               "kind": "pit",
               "compound": "MEDIUM",
-              "fill": "standard"
+              "fill": {
+                "laps": 12
+              }
             }
           ]
         },
@@ -808,7 +810,7 @@
           "label": "Box, inters",
           "decisions": [
             {
-              "lap": 21,
+              "lap": 18,
               "kind": "pit",
               "compound": "INTERMEDIATE",
               "fill": "standard"
@@ -820,7 +822,7 @@
           "label": "Box, wets",
           "decisions": [
             {
-              "lap": 21,
+              "lap": 18,
               "kind": "pit",
               "compound": "WET",
               "fill": "standard"
@@ -828,24 +830,24 @@
           ]
         },
         {
-          "id": "box-next-intermediate",
-          "label": "Box next lap, inters",
+          "id": "box-next-wet",
+          "label": "Box next lap, wets",
           "decisions": [
             {
-              "lap": 22,
+              "lap": 19,
               "kind": "pit",
-              "compound": "INTERMEDIATE",
+              "compound": "WET",
               "fill": "standard"
             }
           ]
         }
       ],
-      "realOptionId": "box-wet"
+      "realOptionId": "box-medium"
     },
     {
-      "id": "cliff-26",
+      "id": "rivalpit-26",
       "lap": 26,
-      "trigger": "cliff",
+      "trigger": "rivalPit",
       "target": {
         "kind": "win"
       },
@@ -904,7 +906,7 @@
           ]
         }
       ],
-      "realOptionId": "box-medium"
+      "realOptionId": "stay"
     },
     {
       "id": "stop-30",
@@ -951,7 +953,9 @@
               "lap": 30,
               "kind": "pit",
               "compound": "WET",
-              "fill": "standard"
+              "fill": {
+                "laps": 14
+              }
             }
           ]
         },
@@ -963,70 +967,6 @@
               "lap": 31,
               "kind": "pit",
               "compound": "WET",
-              "fill": "standard"
-            }
-          ]
-        }
-      ],
-      "realOptionId": "box-wet"
-    },
-    {
-      "id": "stop-33",
-      "lap": 33,
-      "trigger": "cliff",
-      "target": {
-        "kind": "win"
-      },
-      "options": [
-        {
-          "id": "stay",
-          "label": "Stay out",
-          "decisions": []
-        },
-        {
-          "id": "box-medium",
-          "label": "Box, slicks",
-          "decisions": [
-            {
-              "lap": 33,
-              "kind": "pit",
-              "compound": "MEDIUM",
-              "fill": "standard"
-            }
-          ]
-        },
-        {
-          "id": "box-intermediate",
-          "label": "Box, inters",
-          "decisions": [
-            {
-              "lap": 33,
-              "kind": "pit",
-              "compound": "INTERMEDIATE",
-              "fill": "standard"
-            }
-          ]
-        },
-        {
-          "id": "box-wet",
-          "label": "Box, wets",
-          "decisions": [
-            {
-              "lap": 33,
-              "kind": "pit",
-              "compound": "WET",
-              "fill": "standard"
-            }
-          ]
-        },
-        {
-          "id": "box-next-intermediate",
-          "label": "Box next lap, inters",
-          "decisions": [
-            {
-              "lap": 34,
-              "kind": "pit",
-              "compound": "INTERMEDIATE",
               "fill": "standard"
             }
           ]
@@ -1079,8 +1019,8 @@
     "ALE",
     "HAK"
   ],
-  "userSide": "HIL",
-  "rival": "MSCM",
+  "userSide": "MSCM",
+  "rival": "HIL",
   "weather": {
     "curves": {
       "slick": {
@@ -1150,33 +1090,55 @@
   "eras": {
     "eraId": 3,
     "order": 3,
-    "userSide": "HIL",
+    "userSide": "MSCM",
     "hardCalls": {
-      "HIL": 2,
-      "MSCM": 2
+      "HIL": 1,
+      "MSCM": 5
     },
     "target": {
       "type": "win"
     },
     "storyline": {
-      "real": "Schumacher wins from 16th on the grid, staying out on slicks in the rain; Hill, from eighth, finishes second after a stop-go for pit-lane speeding",
-      "rewriteCondition": {
-        "type": "beat-rival",
-        "rival": "MSCM"
-      },
-      "headline": "Hill out-thinks the rain and beats Schumacher at Spa"
+      "real": "Schumacher wins from 16th on the grid, staying out on slicks in the rain; Hill, from eighth, finishes second after a stop-go for pit-lane speeding"
     },
     "mastery": {
       "type": "stop_count",
-      "max": 3,
-      "label": "Win with three stops or fewer"
+      "max": 2,
+      "label": "Win on two stops or fewer, as Schumacher did"
     },
     "hidden": {
-      "type": "compound_rule",
-      "mustAvoid": "WET",
-      "label": "Win without fitting full wets"
+      "type": "margin",
+      "seconds": 9,
+      "label": "Win by more than nine seconds"
     },
-    "briefing": "Spa, 1995. A wet-dry qualifying left Hill eighth and Schumacher 16th, and the rain comes and goes. Schumacher leads the championship, 56 points to Hill's 45. Slicks, inters or wets: every lap it's your call. Reconstructed race: no lap timing survives, so the laps are rebuilt to fit the result, the fastest laps and the sourced stops (Jolpica, F1DB, Motor Sport, Wikipedia). The lap-by-lap gaps and running order are synthetic, not history."
+    "briefing": "Spa, 1995. A wet-dry qualifying left Schumacher 16th and Hill eighth, and the rain comes and goes. Schumacher leads the championship, 56 points to Hill's 45. Slicks, inters or wets: every lap it's your call. Reconstructed race: no lap timing survives, so the laps are rebuilt to fit the result, the fastest laps, the sourced stops and who led each lap (Jolpica, F1DB, Motor Sport, Wikipedia). Who led each lap is sourced; the lap times, and the order behind the leader, are reconstructed.",
+    "storylineCalls": [
+      {
+        "driver": "HIL",
+        "lap": 22,
+        "real": "Hill pits for wets at the end of lap 21 as the drizzle becomes rain",
+        "source": "https://www.motorsportmagazine.com/archive/article/october-1995/14/belgian-grand-prix-9/"
+      },
+      {
+        "driver": "HIL",
+        "lap": 27,
+        "real": "His wets tail off as the rain stops on lap 25, and Hill pits again for slicks at the end of lap 26",
+        "source": "https://www.grandprix.com/gpe/rr575.html; https://en.wikipedia.org/wiki/1995_Belgian_Grand_Prix; https://www.motorsportmagazine.com/archive/article/october-1995/14/belgian-grand-prix-9/"
+      },
+      {
+        "driver": "HIL",
+        "lap": 31,
+        "real": "Hill goes back onto wets at the end of lap 30, in the safety car, as Schumacher does",
+        "source": "https://www.grandprix.com/gpe/rr575.html; https://www.motorsportmagazine.com/archive/article/october-1995/14/belgian-grand-prix-9/"
+      },
+      {
+        "driver": "HIL",
+        "lap": 34,
+        "real": "Hill serves a stop-go for speeding in the pit lane at the end of lap 33 and finishes second, 19.5 s behind",
+        "source": "https://www.grandprix.com/gpe/rr575.html; https://www.motorsportmagazine.com/archive/article/october-1995/14/belgian-grand-prix-9/",
+        "untilFlag": true
+      }
+    ]
   },
   "provenance": {
     "kind": "reconstructed",

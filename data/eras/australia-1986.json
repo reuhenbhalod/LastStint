@@ -24,7 +24,7 @@
       "type": "beat_real_call",
       "label": "Beat the real result: get the Williams to the flag"
     },
-    "briefing": "Adelaide, October 1986, the title decider. Mansell has 70 points, Prost 64, Piquet 63: third place makes Mansell champion. Fuel is limited to 195 litres. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports.",
+    "briefing": "Adelaide, October 1986, the title decider. Mansell has 70 points, Prost 64, Piquet 63: third place makes Mansell champion. Fuel is limited to 195 litres. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports. Who led each lap is sourced; the lap times are reconstructed.",
     "hardCalls": {
       "MAN": 0,
       "PRO": 0

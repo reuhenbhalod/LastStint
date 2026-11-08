@@ -660,7 +660,7 @@
       "seconds": 50,
       "label": "Win by more than 50 seconds"
     },
-    "briefing": "Monaco, May 1988. Senna started on pole in the McLaren-Honda and leads; Prost spent the first half of the race stuck behind Berger's Ferrari. Turbo fuel is down to 150 litres this year. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports.",
+    "briefing": "Monaco, May 1988. Senna started on pole in the McLaren-Honda and leads; Prost spent the first half of the race stuck behind Berger's Ferrari. Turbo fuel is down to 150 litres this year. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports. Who led each lap is sourced; the lap times are reconstructed.",
     "hardCalls": {
       "SENA": 0,
       "PRO": 0

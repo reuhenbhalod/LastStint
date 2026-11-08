@@ -23,7 +23,7 @@
       "seconds": 1.9,
       "label": "Win by more than Mansell's real 1.9 seconds"
     },
-    "briefing": "Silverstone, July 1987. Piquet started on pole, Mansell beside him; both Williams-Hondas were meant to run without a tyre change. Fuel is limited to 195 litres. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports.",
+    "briefing": "Silverstone, July 1987. Piquet started on pole, Mansell beside him; both Williams-Hondas were meant to run without a tyre change. Fuel is limited to 195 litres. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports. Who led each lap is sourced; the lap times are reconstructed.",
     "hardCalls": {
       "PIQN": 0,
       "MAN": 0

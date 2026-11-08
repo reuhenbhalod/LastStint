@@ -33,11 +33,11 @@ async function play(raceId: string, legend: boolean, edit: Partial<MockEvaluatio
 }
 
 describe('the mock’s history book and leaderboards', () => {
-  // 830 less the eight races the Eras side really won (no rewrite condition: the Worker's
+  // 830 less the fifteen races the Eras side really won (no rewrite condition: the Worker's
   // hasRewrite), one rewrite each.
-  it('starts empty: 822 to collect, nothing on any board', async () => {
+  it('starts empty: 815 to collect, nothing on any board', async () => {
     const book = await mockErasApi.history();
-    expect(book.completion).toEqual({ collected: 0, total: 822, percent: 0 });
+    expect(book.completion).toEqual({ collected: 0, total: 815, percent: 0 });
     expect(book.eras.map((e) => e.eraId)).toEqual([10, 9, 8, 7, 6, 5, 4, 3, 2, 1]);
     expect(book.entries).toEqual([]);
     expect(await mockErasApi.leaderboard('abu-dhabi-2021', false)).toEqual({

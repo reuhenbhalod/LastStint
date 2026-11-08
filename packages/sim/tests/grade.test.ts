@@ -6,6 +6,7 @@ import abuJson from '../../../data/races/abu-dhabi-2021.json';
 import germany1986Json from '../../../data/races/germany-1986.json';
 import hungary1992Json from '../../../data/races/hungary-1992.json';
 import spainJson from '../../../data/races/spain-2021.json';
+import { fromSide } from '../src/eras/hard-calls.js';
 import { erasModel } from '../src/eras/reachability.js';
 import { type GradeOption, bandFor, gradeMoment, playOption, realOption } from '../src/grade.js';
 import {
@@ -163,7 +164,8 @@ describe('the Eras continuation (sim.ts erasContinuation)', () => {
   });
 
   it("'stay out' where the real team boxed skips that stop (hungary-1992 lap 61)", () => {
-    const m = erasModel(hungary1992);
+    // From Mansell's side (the Eras side is Berger since the 6.2 re-author's hard-call recount).
+    const m = fromSide(hungary1992, 'MAN');
     const run = pausedAt(m, 60);
     // The real stop is out-lap 62, the moment's box-now: staying out makes no later stop.
     expect(real(m)).toEqual([62]);

@@ -622,10 +622,10 @@
     },
     "hidden": {
       "type": "margin",
-      "seconds": 17.7,
-      "label": "Win by more than Piquet's real 17.7 seconds"
+      "seconds": 14,
+      "label": "Win by more than 14 seconds"
     },
-    "briefing": "Hungaroring, August 1986, the first Hungarian Grand Prix since 1936. Senna started on pole in the Lotus, Piquet second in the Williams. Tyres or track position? Fuel is limited to 195 litres. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports.",
+    "briefing": "Hungaroring, August 1986, the first Hungarian Grand Prix since 1936. Senna started on pole in the Lotus, Piquet second in the Williams. Tyres or track position? Fuel is limited to 195 litres. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports. Who led each lap is sourced; the lap times are reconstructed.",
     "hardCalls": {
       "PIQN": 2,
       "SENA": 0

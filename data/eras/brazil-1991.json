@@ -20,13 +20,7 @@
       "type": "defend"
     },
     "storyline": {
-      "real": "Senna leads from pole with a failing gearbox, holds off Patrese and wins his home race for the first time, by 2.9 seconds",
-      "rewriteCondition": {
-        "type": "deny",
-        "rival": "PAT",
-        "position": 3
-      },
-      "headline": "Senna's home win, with Patrese off the podium"
+      "real": "Senna leads from pole with a failing gearbox, holds off Patrese and wins his home race for the first time, by 2.9 seconds"
     },
     "mastery": {
       "type": "mode_rule",
@@ -39,6 +33,6 @@
       "seconds": 3,
       "label": "Win by more than 3 seconds"
     },
-    "briefing": "Interlagos, 1991. Senna has never won at home. He started from pole, but the McLaren's gearbox is losing gears, and Patrese's Williams is closing. Pit board only: hold him in front. Reconstructed race: no lap timing survives, so the laps are rebuilt to fit the result, the fastest laps and the sourced stops (Jolpica, F1DB, Motor Sport, Wikipedia). The lap-by-lap gaps and running order are synthetic, not history."
+    "briefing": "Interlagos, 1991. Senna has never won at home. He started from pole, but the McLaren's gearbox is losing gears, and Patrese's Williams is closing. Pit board only: hold him in front. Reconstructed race: no lap timing survives, so the laps are rebuilt to fit the result, the fastest laps, the sourced stops and who led each lap (Jolpica, F1DB, Motor Sport, Wikipedia). Who led each lap is sourced, and so is the order at a few laps; the lap times, and the rest of the order, are reconstructed."
   }
 }

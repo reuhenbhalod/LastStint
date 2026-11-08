@@ -1237,12 +1237,14 @@ RACES: dict[str, dict] = {
         "year": 1992,
         "event": "Hungary",
         "source": "reconstruct",
-        "name": "Hungary 1992: Mansell vs Berger",
+        "name": "Hungary 1992: Berger vs Mansell",
         "era": "1988-1993",
         "takeover_lap": None,  # D3 rule
         "seed": 1,
-        "user_side": "MAN",
-        "rival": "BER",  # Mansell P2 or better for the title after his lap-61 stop; Berger P3
+        # Eras plays the side with more hard calls (6.2 re-author, `pipeline hard-calls` on
+        # the sourced lap leaders: 0-0, the tie to BER on chance given up, 47.7 pts to 0.0).
+        "user_side": "BER",
+        "rival": "MAN",  # beat-rival: Berger, non-stop, keeps Mansell behind (real: P3, MAN P2)
         "score_positions": 6,
         "split": "eras",
     },
@@ -1435,14 +1437,14 @@ RACES: dict[str, dict] = {
         "year": 1995,
         "event": "Belgian",
         "source": "reconstruct",
-        "name": "Belgium 1995: Hill vs Schumacher",
+        "name": "Belgium 1995: Schumacher vs Hill",
         "era": "1994-2009",
         "takeover_lap": None,  # D3 rule
         "seed": 1,
-        # Eras plays the side with more hard calls (6.2, `pipeline hard-calls`: 2-2, the tie
-        # to HIL on chance given up, 89.0 pts against 0.3).
-        "user_side": "HIL",
-        "rival": "MSCM",  # win: Hill beats Schumacher, who won from P16 on slicks in the wet
+        # Eras plays the side with more hard calls (6.2 re-author, `pipeline hard-calls` on
+        # the sourced lap leaders: MSCM 5, HIL 1; was HIL on a 2-2 tie).
+        "user_side": "MSCM",
+        "rival": "HIL",  # win: Schumacher from P16 on slicks in the wet; Hill second
         "score_positions": 6,
         "split": "eras",
     },
@@ -1839,12 +1841,14 @@ RACES: dict[str, dict] = {
         "year": 1994,
         "event": "Australia",
         "source": "reconstruct",
-        "name": "Australia 1994: Schumacher vs Hill",
+        "name": "Australia 1994: Hill vs Schumacher",
         "era": "1994-2009",
         "takeover_lap": None,  # D3 rule
         "seed": 1,
-        "user_side": "MSCM",
-        "rival": "HIL",  # beat-rival: Schumacher ahead of Hill (real: they collide, both out)
+        # Eras plays the side with more hard calls (6.2 re-author, `pipeline hard-calls` on
+        # the sourced lap leaders: HIL 1, MSCM 0).
+        "user_side": "HIL",
+        "rival": "MSCM",  # beat-rival: Hill ahead of Schumacher (real: they collide, both out)
         "score_positions": 6,
         "split": "eras",
     },

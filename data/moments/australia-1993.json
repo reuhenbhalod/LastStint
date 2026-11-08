@@ -9,12 +9,12 @@
     "options": [
       {
         "id": "stay",
-        "label": "Stay out",
+        "label": "STAY OUT",
         "decisions": []
       },
       {
         "id": "box-medium",
-        "label": "Box, slicks",
+        "label": "IN - fresh tyres",
         "decisions": [
           {
             "lap": 24,
@@ -25,7 +25,7 @@
       },
       {
         "id": "box-next-medium",
-        "label": "Box next lap, slicks",
+        "label": "IN NEXT LAP - fresh tyres",
         "decisions": [
           {
             "lap": 25,
@@ -47,7 +47,7 @@
     "options": [
       {
         "id": "push",
-        "label": "Push now",
+        "label": "PUSH",
         "decisions": [
           {
             "lap": 37,
@@ -59,7 +59,7 @@
       },
       {
         "id": "standard",
-        "label": "Standard pace",
+        "label": "STEADY - standard pace",
         "decisions": [
           {
             "lap": 37,
@@ -71,7 +71,7 @@
       },
       {
         "id": "manage",
-        "label": "Manage the tyres",
+        "label": "EASY - save the tyres",
         "decisions": [
           {
             "lap": 37,
@@ -83,7 +83,7 @@
       },
       {
         "id": "push-attack",
-        "label": "Push and attack",
+        "label": "PUSH - attack",
         "decisions": [
           {
             "lap": 37,
@@ -112,7 +112,7 @@
     "options": [
       {
         "id": "push",
-        "label": "Push now",
+        "label": "PUSH",
         "decisions": [
           {
             "lap": 41,
@@ -124,7 +124,7 @@
       },
       {
         "id": "standard",
-        "label": "Standard pace",
+        "label": "STEADY - standard pace",
         "decisions": [
           {
             "lap": 41,
@@ -136,7 +136,7 @@
       },
       {
         "id": "manage",
-        "label": "Manage the tyres",
+        "label": "EASY - save the tyres",
         "decisions": [
           {
             "lap": 41,
@@ -148,7 +148,7 @@
       },
       {
         "id": "push-attack",
-        "label": "Push and attack",
+        "label": "PUSH - attack",
         "decisions": [
           {
             "lap": 41,
@@ -177,12 +177,12 @@
     "options": [
       {
         "id": "stay",
-        "label": "Stay out",
+        "label": "STAY OUT",
         "decisions": []
       },
       {
         "id": "box-medium",
-        "label": "Box, slicks",
+        "label": "IN - fresh tyres",
         "decisions": [
           {
             "lap": 48,
@@ -193,7 +193,7 @@
       },
       {
         "id": "box-next-medium",
-        "label": "Box next lap, slicks",
+        "label": "IN NEXT LAP - fresh tyres",
         "decisions": [
           {
             "lap": 49,

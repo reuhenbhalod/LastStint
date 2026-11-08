@@ -182,6 +182,31 @@ describe('avoidable storyline retirements (live play)', () => {
     });
   });
 
+  it('a linked car that retired earlier: judged on its lap, each retires on its own', () => {
+    // From PER's side (lap 56) with LAT (lap 54) linked: Australia 1994 from Hill's side.
+    const per: RaceModel = {
+      ...ABU,
+      userSide: 'PER',
+      rival: 'MSC',
+      eras: {
+        eraId: 9,
+        order: 10,
+        storylineRetirements: [{ ...item, driver: 'PER', alsoRetires: ['LAT'] }],
+      },
+    };
+    const play = (decisions: Decision[]) => {
+      const run = initRun(per, 1, { decisions, incidents: false });
+      while (!isFinished(run)) stepLap(run);
+      return run;
+    };
+    const real = play([{ lap: 49, kind: 'mode', key: 'pace', value: 'push' }]);
+    expect(real.state.cars.LAT).toMatchObject({ retired: true, retiredLap: 54 });
+    expect(real.state.cars.PER).toMatchObject({ retired: true, retiredLap: 56 });
+    const avoided = play([]);
+    expect(avoided.state.cars.LAT?.retired).toBe(false);
+    expect(avoided.state.cars.PER?.retired).toBe(false);
+  });
+
   it('replays keep every real retirement', () => {
     const run = initRun(model, 1);
     while (!isFinished(run)) stepLap(run);

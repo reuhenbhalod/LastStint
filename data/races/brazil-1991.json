@@ -380,7 +380,7 @@
       "options": [
         {
           "id": "push",
-          "label": "Push now",
+          "label": "PUSH",
           "decisions": [
             {
               "lap": 36,
@@ -392,7 +392,7 @@
         },
         {
           "id": "standard",
-          "label": "Standard pace",
+          "label": "STEADY - standard pace",
           "decisions": [
             {
               "lap": 36,
@@ -404,7 +404,7 @@
         },
         {
           "id": "manage",
-          "label": "Manage the tyres",
+          "label": "EASY - save the tyres",
           "decisions": [
             {
               "lap": 36,
@@ -416,7 +416,7 @@
         },
         {
           "id": "push-attack",
-          "label": "Push and attack",
+          "label": "PUSH - attack",
           "decisions": [
             {
               "lap": 36,
@@ -445,7 +445,7 @@
       "options": [
         {
           "id": "push",
-          "label": "Push now",
+          "label": "PUSH",
           "decisions": [
             {
               "lap": 60,
@@ -457,7 +457,7 @@
         },
         {
           "id": "standard",
-          "label": "Standard pace",
+          "label": "STEADY - standard pace",
           "decisions": [
             {
               "lap": 60,
@@ -469,7 +469,7 @@
         },
         {
           "id": "manage",
-          "label": "Manage the tyres",
+          "label": "EASY - save the tyres",
           "decisions": [
             {
               "lap": 60,
@@ -481,7 +481,7 @@
         },
         {
           "id": "push-attack",
-          "label": "Push and attack",
+          "label": "PUSH - attack",
           "decisions": [
             {
               "lap": 60,
@@ -510,7 +510,7 @@
       "options": [
         {
           "id": "defend",
-          "label": "Defend hard",
+          "label": "DEFEND",
           "decisions": [
             {
               "lap": 65,
@@ -522,7 +522,7 @@
         },
         {
           "id": "hold",
-          "label": "Hold the line",
+          "label": "Hold position",
           "decisions": [
             {
               "lap": 65,
@@ -534,7 +534,7 @@
         },
         {
           "id": "attack",
-          "label": "Attack",
+          "label": "ATTACK",
           "decisions": [
             {
               "lap": 65,
@@ -557,7 +557,7 @@
       "options": [
         {
           "id": "push",
-          "label": "Push now",
+          "label": "PUSH",
           "decisions": [
             {
               "lap": 68,
@@ -569,7 +569,7 @@
         },
         {
           "id": "standard",
-          "label": "Standard pace",
+          "label": "STEADY - standard pace",
           "decisions": [
             {
               "lap": 68,
@@ -581,7 +581,7 @@
         },
         {
           "id": "manage",
-          "label": "Manage the tyres",
+          "label": "EASY - save the tyres",
           "decisions": [
             {
               "lap": 68,
@@ -593,7 +593,7 @@
         },
         {
           "id": "push-attack",
-          "label": "Push and attack",
+          "label": "PUSH - attack",
           "decisions": [
             {
               "lap": 68,
@@ -658,13 +658,7 @@
       "type": "defend"
     },
     "storyline": {
-      "real": "Senna leads from pole with a failing gearbox, holds off Patrese and wins his home race for the first time, by 2.9 seconds",
-      "rewriteCondition": {
-        "type": "deny",
-        "rival": "PAT",
-        "position": 3
-      },
-      "headline": "Senna's home win, with Patrese off the podium"
+      "real": "Senna leads from pole with a failing gearbox, holds off Patrese and wins his home race for the first time, by 2.9 seconds"
     },
     "mastery": {
       "type": "mode_rule",
@@ -677,7 +671,7 @@
       "seconds": 3,
       "label": "Win by more than 3 seconds"
     },
-    "briefing": "Interlagos, 1991. Senna has never won at home. He started from pole, but the McLaren's gearbox is losing gears, and Patrese's Williams is closing. Pit board only: hold him in front. Reconstructed race: no lap timing survives, so the laps are rebuilt to fit the result, the fastest laps and the sourced stops (Jolpica, F1DB, Motor Sport, Wikipedia). The lap-by-lap gaps and running order are synthetic, not history."
+    "briefing": "Interlagos, 1991. Senna has never won at home. He started from pole, but the McLaren's gearbox is losing gears, and Patrese's Williams is closing. Pit board only: hold him in front. Reconstructed race: no lap timing survives, so the laps are rebuilt to fit the result, the fastest laps, the sourced stops and who led each lap (Jolpica, F1DB, Motor Sport, Wikipedia). Who led each lap is sourced, and so is the order at a few laps; the lap times, and the rest of the order, are reconstructed."
   },
   "provenance": {
     "kind": "reconstructed",

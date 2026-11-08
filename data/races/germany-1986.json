@@ -749,9 +749,9 @@
       "maxLaps": 0,
       "label": "Never turn the boost up: no laps at PUSH"
     },
-    "briefing": "Hockenheim, July 1986. Rosberg started on pole in the McLaren. Fuel is cut to 195 litres this year, and on this fast track it may not last to the flag. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports.",
+    "briefing": "Hockenheim, July 1986. Rosberg started on pole in the McLaren. Fuel is cut to 195 litres this year, and on this fast track it may not last to the flag. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports. Who led each lap is sourced; the lap times are reconstructed.",
     "hardCalls": {
-      "ROSK": 0,
+      "ROSK": 1,
       "SENA": 0
     },
     "storylineRetirements": [

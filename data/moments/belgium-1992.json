@@ -9,12 +9,12 @@
     "options": [
       {
         "id": "stay",
-        "label": "Stay out",
+        "label": "STAY OUT",
         "decisions": []
       },
       {
         "id": "box-medium",
-        "label": "Box, slicks",
+        "label": "IN - slicks",
         "decisions": [
           {
             "lap": 30,
@@ -25,7 +25,7 @@
       },
       {
         "id": "box-intermediate",
-        "label": "Box, inters",
+        "label": "IN - inters",
         "decisions": [
           {
             "lap": 30,
@@ -36,7 +36,7 @@
       },
       {
         "id": "box-wet",
-        "label": "Box, wets",
+        "label": "IN - wets",
         "decisions": [
           {
             "lap": 30,
@@ -47,7 +47,7 @@
       },
       {
         "id": "box-next-intermediate",
-        "label": "Box next lap, inters",
+        "label": "IN NEXT LAP - inters",
         "decisions": [
           {
             "lap": 31,
@@ -69,12 +69,12 @@
     "options": [
       {
         "id": "stay",
-        "label": "Stay out",
+        "label": "STAY OUT",
         "decisions": []
       },
       {
         "id": "box-medium",
-        "label": "Box, slicks",
+        "label": "IN - slicks",
         "decisions": [
           {
             "lap": 34,
@@ -85,7 +85,7 @@
       },
       {
         "id": "box-intermediate",
-        "label": "Box, inters",
+        "label": "IN - inters",
         "decisions": [
           {
             "lap": 34,
@@ -96,7 +96,7 @@
       },
       {
         "id": "box-wet",
-        "label": "Box, wets",
+        "label": "IN - wets",
         "decisions": [
           {
             "lap": 34,
@@ -107,7 +107,7 @@
       },
       {
         "id": "box-next-intermediate",
-        "label": "Box next lap, inters",
+        "label": "IN NEXT LAP - inters",
         "decisions": [
           {
             "lap": 35,

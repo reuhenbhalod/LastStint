@@ -2,7 +2,7 @@
   "schemaVersion": 11,
   "race": {
     "id": "hungary-1992",
-    "name": "Hungary 1992: Mansell vs Berger",
+    "name": "Hungary 1992: Berger vs Mansell",
     "laps": 77,
     "takeoverLap": 58,
     "seed": 1,
@@ -254,22 +254,21 @@
   ],
   "decisionMoments": [
     {
-      "id": "stop-61",
+      "id": "rivalpit-61",
       "lap": 61,
-      "trigger": "cliff",
+      "trigger": "rivalPit",
       "target": {
-        "kind": "position",
-        "atBest": 2
+        "kind": "beat-rival"
       },
       "options": [
         {
           "id": "stay",
-          "label": "Stay out",
+          "label": "STAY OUT",
           "decisions": []
         },
         {
           "id": "box-medium",
-          "label": "Box, slicks",
+          "label": "IN - fresh tyres",
           "decisions": [
             {
               "lap": 61,
@@ -280,7 +279,7 @@
         },
         {
           "id": "box-next-medium",
-          "label": "Box next lap, slicks",
+          "label": "IN NEXT LAP - fresh tyres",
           "decisions": [
             {
               "lap": 62,
@@ -290,20 +289,19 @@
           ]
         }
       ],
-      "realOptionId": "box-medium"
+      "realOptionId": "stay"
     },
     {
       "id": "pace-66",
       "lap": 66,
       "trigger": "cliff",
       "target": {
-        "kind": "position",
-        "atBest": 2
+        "kind": "beat-rival"
       },
       "options": [
         {
           "id": "push",
-          "label": "Push now",
+          "label": "PUSH",
           "decisions": [
             {
               "lap": 66,
@@ -315,7 +313,7 @@
         },
         {
           "id": "standard",
-          "label": "Standard pace",
+          "label": "STEADY - standard pace",
           "decisions": [
             {
               "lap": 66,
@@ -327,7 +325,7 @@
         },
         {
           "id": "manage",
-          "label": "Manage the tyres",
+          "label": "EASY - save the tyres",
           "decisions": [
             {
               "lap": 66,
@@ -339,7 +337,7 @@
         },
         {
           "id": "push-attack",
-          "label": "Push and attack",
+          "label": "PUSH - attack",
           "decisions": [
             {
               "lap": 66,
@@ -363,13 +361,12 @@
       "lap": 70,
       "trigger": "cliff",
       "target": {
-        "kind": "position",
-        "atBest": 2
+        "kind": "beat-rival"
       },
       "options": [
         {
           "id": "push",
-          "label": "Push now",
+          "label": "PUSH",
           "decisions": [
             {
               "lap": 70,
@@ -381,7 +378,7 @@
         },
         {
           "id": "standard",
-          "label": "Standard pace",
+          "label": "STEADY - standard pace",
           "decisions": [
             {
               "lap": 70,
@@ -393,7 +390,7 @@
         },
         {
           "id": "manage",
-          "label": "Manage the tyres",
+          "label": "EASY - save the tyres",
           "decisions": [
             {
               "lap": 70,
@@ -405,7 +402,7 @@
         },
         {
           "id": "push-attack",
-          "label": "Push and attack",
+          "label": "PUSH - attack",
           "decisions": [
             {
               "lap": 70,
@@ -415,6 +412,71 @@
             },
             {
               "lap": 70,
+              "kind": "mode",
+              "key": "battle",
+              "value": "attack"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "pace-74",
+      "lap": 74,
+      "trigger": "cliff",
+      "target": {
+        "kind": "beat-rival"
+      },
+      "options": [
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 74,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "standard",
+          "label": "STEADY - standard pace",
+          "decisions": [
+            {
+              "lap": 74,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "manage",
+          "label": "EASY - save the tyres",
+          "decisions": [
+            {
+              "lap": 74,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "push-attack",
+          "label": "PUSH - attack",
+          "decisions": [
+            {
+              "lap": 74,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            },
+            {
+              "lap": 74,
               "kind": "mode",
               "key": "battle",
               "value": "attack"
@@ -457,37 +519,39 @@
     "HER",
     "TAR"
   ],
-  "userSide": "MAN",
-  "rival": "BER",
+  "userSide": "BER",
+  "rival": "MAN",
   "eras": {
     "eraId": 2,
     "order": 7,
-    "userSide": "MAN",
+    "userSide": "BER",
     "hardCalls": {
       "MAN": 0,
       "BER": 0
     },
     "target": {
-      "type": "position",
-      "position": 2
+      "type": "beat-rival",
+      "rival": "MAN"
     },
     "storyline": {
-      "real": "Mansell pits on lap 61 with tyre trouble, rejoins sixth, recovers to second behind Senna and clinches the title with five races left",
+      "real": "Mansell stops for tyres on lap 61, rejoins sixth and passes Berger for second, clinching the title with five races left; Berger finishes third",
       "rewriteCondition": {
-        "type": "win"
+        "type": "beat-rival",
+        "rival": "MAN"
       },
-      "headline": "Mansell clinches his crown with a win"
+      "headline": "Berger keeps the Williams behind him at the Hungaroring"
     },
     "mastery": {
       "type": "stop_count",
       "exact": 1,
-      "label": "Make exactly one stop, as Mansell did"
+      "label": "Answer the Williams: make exactly one tyre stop"
     },
     "hidden": {
-      "type": "beat_real_call",
-      "label": "Do better than Mansell's real second place"
+      "type": "finish_position",
+      "position": 2,
+      "label": "Finish second"
     },
-    "briefing": "Hungaroring, 1992. Mansell leads the championship on 86 points; Patrese is second on 40. A good result here can make Mansell champion with five races to spare. Pit board only. Reconstructed race: no lap timing survives, so the laps are rebuilt to fit the result, the fastest laps and the sourced stops (Jolpica, F1DB, Motor Sport, Wikipedia). The lap-by-lap gaps and running order are synthetic, not history."
+    "briefing": "Hungaroring, 1992. Mansell leads the championship on 86 points to Patrese's 40, and a good result here can make him champion with five races to spare. You run Berger's McLaren. Pit board only: keep the Williams behind. Reconstructed race: no lap timing survives, so the laps are rebuilt to fit the result, the fastest laps, the sourced stops and who led each lap (Jolpica, F1DB, Motor Sport, Wikipedia). Who led each lap is sourced, and so is the order at a few laps; the lap times, and the rest of the order, are reconstructed."
   },
   "provenance": {
     "kind": "reconstructed",

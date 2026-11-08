@@ -390,8 +390,14 @@ export interface Run {
 
 /** An avoidable storyline retirement waiting for its lap (scripted.ts conditionMet). */
 export interface StorylinePending {
-  /** The player's car's real retirement lap: judged at its start, retired at its end. */
+  /** The player's car's real retirement lap: retired at its end. */
   lap: number;
+  /**
+   * The lap the call is judged at the start of: the retirement lap, or a linked car's earlier
+   * one (a collision whose other car retired a lap before the player's: Australia 1994 from
+   * Hill's side), so the linked car can retire on its own lap.
+   */
+  judgeLap: number;
   condition: import('./types.js').StorylineCondition;
   /** Linked cars' real retirements (alsoRetires): code -> lap. */
   linked: Array<[string, number]>;
@@ -670,7 +676,8 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
         if (code !== item.driver) linked.push([code, at]);
       }
       if (item.condition.type !== 'fuel') {
-        storyline.push({ lap, condition: item.condition, linked });
+        const judgeLap = Math.min(lap, ...linked.map(([, at]) => at));
+        storyline.push({ lap, judgeLap, condition: item.condition, linked });
       }
     }
   }
@@ -1966,7 +1973,7 @@ function storylineBeforeLap(
   for (const code of running) if (code !== user.code) gaps[code] = (prevTime[code] as number) - me;
   run.storylineLaps.push({ lap, modes: { ...user.modes }, tyreAge: user.tyreAge, gaps });
   for (const p of run.storyline) {
-    if (p.lap === lap && p.met === undefined) {
+    if (p.judgeLap === lap && p.met === undefined) {
       p.met = conditionMet(p.condition, run.storylineLaps, lap);
     }
   }
