@@ -287,7 +287,7 @@ pinned version; tests run on cached fixtures only.
 
 ## Phase 3: Races, wave A (10%)
 
-The 32 races in the appendix that need **no new sim model** (Needs column: "none", "wet model
+The 33 races in the appendix that need **no new sim model** (Needs column: "none", "wet model
 (exists)" or "P4 map" only).
 
 **3.1 Build and validate (8%)**
@@ -326,7 +326,7 @@ for every existing race.
 
 ## Phase 5: Races, wave B (13%)
 
-**5.1 Build and validate the other 68 races (11%)**
+**5.1 Build and validate the other 67 races (11%)**
 - As in 3.1, as each race's models from phase 4 land.
 - Reconstructed races are checked on their anchors (eras spec §4) instead of G1.
 - **Done when:** every race in the appendix is pass, or flagged to the owner with a diagnosis.
@@ -486,7 +486,7 @@ The **Needs** column is from race history and must be checked against the data f
 | 10 | `netherlands-2023` | OpenF1 | R1 red flag, wet model (exists) |  |
 | 10 | `miami-2024` | built | none |  |
 | 10 | `hungary-2024` | built | none |  |
-| 10 | `brazil-2024` | OpenF1 | R1 red flag, wet model (exists) |  |
+| 10 | `belgium-2023` | OpenF1 | wet model (exists) |  |
 | 10 | `australia-2025` | built | wet model (exists) |  |
 | 10 | `monaco-2025` | OpenF1 | none |  |
 | 9 | `bahrain-2021` | built (Daily) | none |  |
@@ -517,7 +517,7 @@ The **Needs** column is from race history and must be checked against the data f
 | 7 | `united-states-2015` | TUM | R3 wet pre-2018, P4 map |  |
 | 7 | `spain-2016` | TUM | P4 map |  |
 | 7 | `monaco-2016` | TUM | P4 map |  |
-| 7 | `brazil-2016` | TUM | R1 red flag, R3 wet pre-2018, P4 map |  |
+| 7 | `great-britain-2016` | TUM | R3 wet pre-2018, P4 map |  |
 | 7 | `abu-dhabi-2016` | TUM | P4 map |  |
 | 6 | `australia-2010` | Jolpica + F1DB stops (est. compounds) | R3 wet pre-2018, P4 map |  |
 | 6 | `abu-dhabi-2010` | Jolpica + F1DB stops (est. compounds) | P4 map |  |
@@ -559,7 +559,7 @@ The **Needs** column is from race history and must be checked against the data f
 | 3 | `belgium-1998` | Jolpica + F1DB stops (est. fuel) | R1 red flag, R3 wet pre-2018, R4 refuel, P4 map |  |
 | 3 | `malaysia-1999` | Jolpica + F1DB stops (est. fuel) | R4 refuel, P4 map |  |
 | 3 | `europe-1999` | Jolpica + F1DB stops (est. fuel) | R3 wet pre-2018, R4 refuel, P4 map |  |
-| 2 | `japan-1989` | Reconstruct | P3 solver, P4 map |  |
+| 2 | `france-1990` | Reconstruct | P3 solver, P4 map |  |
 | 2 | `united-states-1990` | Reconstruct | P3 solver, P4 map |  |
 | 2 | `mexico-1990` | Reconstruct | P3 solver, P4 map |  |
 | 2 | `brazil-1991` | Reconstruct | R2 fault, P3 solver, P4 map |  |
@@ -572,7 +572,7 @@ The **Needs** column is from race history and must be checked against the data f
 | 1 | `south-africa-1983` | Reconstruct | R4 refuel, P3 solver, P4 map |  |
 | 1 | `monaco-1984` | Reconstruct | R1 red flag, R3 wet pre-2018, R4 fuel limit, P3 solver, P4 map |  |
 | 1 | `portugal-1984` | Reconstruct | R4 fuel limit, P3 solver, P4 map |  |
-| 1 | `san-marino-1985` | Reconstruct | R4 fuel limit, P3 solver, P4 map |  |
+| 1 | `germany-1986` | Reconstruct | R4 fuel limit, P3 solver, P4 map |  |
 | 1 | `portugal-1985` | Reconstruct | R3 wet pre-2018, R4 fuel limit, P3 solver, P4 map |  |
 | 1 | `mexico-1986` | Reconstruct | R4 fuel limit, P3 solver, P4 map |  |
 | 1 | `hungary-1986` | Reconstruct | R4 fuel limit, P3 solver, P4 map |  |

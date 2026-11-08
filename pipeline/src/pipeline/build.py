@@ -1162,19 +1162,6 @@ RACES: dict[str, dict] = {
     # reconstruct`, step 4.6: Jolpica results, F1DB fastest laps, sourced stops in
     # data/reconstruction/<id>.json). Checked on their anchors instead of G1; the build marks
     # them reconstructed (reconstruct.mark_model). Duels from the Eras spec's race table (§4).
-    "japan-1989": {
-        "year": 1989,
-        "event": "Japan",
-        "source": "reconstruct",
-        "name": "Japan 1989: Senna vs Prost",
-        "era": "1988-1993",
-        "takeover_lap": None,  # D3 rule
-        "seed": 1,
-        "user_side": "SENA",
-        "rival": "PRO",  # the title collision on lap 47 (real: Prost out, Senna disqualified)
-        "score_positions": 6,
-        "split": "eras",
-    },
     "united-states-1990": {
         "year": 1990,
         "event": "United States",

@@ -1,0 +1,67 @@
+{
+  "raceId": "germany-1986",
+  "stops": [
+    {
+      "number": 20,
+      "name": "Gerhard Berger",
+      "lap": 5,
+      "laneTime": null,
+      "source": "https://www.autosport.com/f1/feature/3783/grand-prix-gold-german-gp-1986",
+      "note": "'at the end of the fifth was into the pits': tyres plus a split intercooler-to-engine crossover tract changed; 'Two laps down'. Lane time far above a tyre stop. His second tyre stop: no lap"
+    },
+    {
+      "number": 6,
+      "name": "Nelson Piquet",
+      "lap": 15,
+      "laneTime": null,
+      "source": "https://www.autosport.com/f1/feature/3783/grand-prix-gold-german-gp-1986; https://en.wikipedia.org/wiki/1986_German_Grand_Prix (lap-leader chart, Template:F1Laps1986); https://www.motorsportmagazine.com/archive/article/september-1986/35/formula-one-german-grand-prix-2",
+      "note": "'On lap 15, though, Piquet headed into pit lane' (Autosport; Wikipedia's chart has Rosberg leading from lap 15). Motor Sport says 'he stopped on lap 16': Autosport kept. Wheels changed in 'around eight seconds' (Motor Sport, stationary)"
+    },
+    {
+      "number": 6,
+      "name": "Nelson Piquet",
+      "lap": 27,
+      "laneTime": null,
+      "source": "https://www.autosport.com/f1/feature/3783/grand-prix-gold-german-gp-1986; https://en.wikipedia.org/wiki/1986_German_Grand_Prix (lap-leader chart, Template:F1Laps1986); https://www.motorsportmagazine.com/archive/article/september-1986/35/formula-one-german-grand-prix-2",
+      "note": "'at the end of lap 27 the McLaren was in front once more, for the Williams was coming in again' (Autosport; Wikipedia's chart: Rosberg leads laps 27-38). Motor Sport says 'He stopped again on lap 28': Autosport kept"
+    },
+    {
+      "number": 5,
+      "name": "Nigel Mansell",
+      "lap": 17,
+      "laneTime": null,
+      "source": "https://www.autosport.com/f1/feature/3783/grand-prix-gold-german-gp-1986",
+      "note": "'He came in at the end of lap 17' (Piquet took the tyres readied for him on lap 15)"
+    },
+    {
+      "number": 2,
+      "name": "Keke Rosberg",
+      "lap": 19,
+      "laneTime": null,
+      "source": "https://www.autosport.com/f1/feature/3783/grand-prix-gold-german-gp-1986; https://en.wikipedia.org/wiki/1986_German_Grand_Prix (lap-leader chart, Template:F1Laps1986)",
+      "note": "'Rosberg duly came in after 19 laps' (Wikipedia's chart: Prost leads lap 20)"
+    },
+    {
+      "number": 1,
+      "name": "Alain Prost",
+      "lap": 20,
+      "laneTime": null,
+      "source": "https://www.autosport.com/f1/feature/3783/grand-prix-gold-german-gp-1986",
+      "note": "'Prost after 20'"
+    },
+    {
+      "number": 12,
+      "name": "Ayrton Senna",
+      "lap": 21,
+      "laneTime": null,
+      "source": "https://www.autosport.com/f1/feature/3783/grand-prix-gold-german-gp-1986",
+      "note": "'Senna 21'"
+    }
+  ],
+  "safetyCars": [],
+  "complete": {
+    "stops": false,
+    "safetyCars": true
+  },
+  "notes": "Autosport 'Grand Prix Gold: German GP 1986' (its contemporary report) and Motor Sport Sep 1986 (DSJ). Missing: Berger's second tyre stop, Tambay's (#16) early stop for lost wheel weights, Brundle's (#3) stop for a new black box (no laps), every other midfield stop. Storyline is fuel: the 195-litre limit; Rosberg and Prost ran minimum boost all race and both ran dry on the last lap (Rosberg second at the start of it, at the first chicane; Prost, fourth after Senna passed him late on, in the stadium's last two corners). Both classified a lap down (43 laps, Jolpica 'Out of fuel'). Senna also ran out just past the line. Wikipedia's text says 45 laps; its infobox, Motor Sport, Autosport and Jolpica say 44."
+}

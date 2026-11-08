@@ -60,7 +60,7 @@ Players start at Era 10 and move back through the timeline to Era 1. The eras be
 | 5 | netherlands-2023 | Rain at the start and the finish | position: Alonso P2 or better |
 | 6 | miami-2024 | Norris' first win, timed with the safety car | win: Norris chases the win |
 | 7 | hungary-2024 | McLaren team orders | team: McLaren 1–2 |
-| 8 | brazil-2024 | Red flag timing, Verstappen from 17th | win: Verstappen from the back |
+| 8 | belgium-2023 | Verstappen wins from sixth after a gearbox penalty | win: Verstappen from P6 |
 | 9 | australia-2025 | Wet-dry chaos | defend: Norris holds P1 |
 | 10 | monaco-2025 | The mandatory two-stop race | defend: Norris holds P1 |
 
@@ -103,7 +103,7 @@ Players start at Era 10 and move back through the timeline to Era 1. The eras be
 | 6 | united-states-2015 | Hamilton clinches the title in mixed conditions | beat-rival: Hamilton ahead of Rosberg and Vettel for the title |
 | 7 | spain-2016 | Mercedes cars collide; Red Bull's split strategy | defend: Verstappen holds off Räikkönen |
 | 8 | monaco-2016 | The tyres aren't ready at Ricciardo's stop | defend: Ricciardo holds P1 |
-| 9 | brazil-2016 | Heavy rain, Verstappen's charge | position: Verstappen on the podium |
+| 9 | great-britain-2016 | A wet start that dries: when to switch tyres, Verstappen vs Rosberg | position: Verstappen on the podium |
 | 10 | abu-dhabi-2016 | Hamilton backs Rosberg into the pack | deny: Hamilton keeps Rosberg P4 or lower |
 
 ### Era 6: Fast-wearing tyres (2010–2013) · play order 5
@@ -165,7 +165,7 @@ Players start at Era 10 and move back through the timeline to Era 1. The eras be
 ### Era 2: Senna vs Prost (1989–1993) · play order 9
 | # | Race ID | Dilemma | Target (draft) |
 |---|---|---|---|
-| 1 | japan-1989 | Senna and Prost collide with the title at stake | beat-rival: Senna or Prost, title to whoever is ahead |
+| 1 | france-1990 | Capelli's Leyton House runs non-stop and leads; Prost closes in | win: Capelli from P7, with no tyre stop |
 | 2 | united-states-1990 | Alesi in the Tyrrell vs Senna | defend: Alesi holds off Senna |
 | 3 | mexico-1990 | Prost from 13th to the win on tyre strategy | win: Prost from P13 |
 | 4 | brazil-1991 | Senna stuck in sixth gear | defend: Senna holds P1 stuck in sixth |
@@ -182,7 +182,7 @@ Players start at Era 10 and move back through the timeline to Era 1. The eras be
 | 1 | south-africa-1983 | Brabham's planned refuelling stops decide the title | position: Piquet high enough for the title |
 | 2 | monaco-1984 | Rain, Prost leads, Senna closing | defend: Prost holds off Senna |
 | 3 | portugal-1984 | Lauda needs second place to win the title by half a point | position: Lauda P2 or better for the title |
-| 4 | san-marino-1985 | Leaders run out of fuel | win: make the fuel last to the flag |
+| 4 | germany-1986 | The McLarens save fuel to the 195-litre limit and run dry on the last lap | position: Rosberg makes the fuel last, P2 or better |
 | 5 | portugal-1985 | Senna's first win, in heavy rain | defend: Senna holds P1 in the rain |
 | 6 | mexico-1986 | Berger wins without a tyre stop | win: Berger with no tyre stop |
 | 7 | hungary-1986 | Piquet vs Senna, tyres vs track position | beat-rival: Piquet ahead of Senna |
@@ -243,8 +243,8 @@ Every race has one target, set in `eras.target`. Each race's draft target is in 
 |---|---|---|---|
 | `win` | Chase down the win from behind | `win` | 37 |
 | `defend` | Start in the lead and keep it to the flag | `win`, starting from P1 | 28 |
-| `position` | Reach a set position, such as P3 to win the title | `position` | 18 |
-| `beat-rival` | Finish ahead of a named car, wherever that is | `beat-rival` | 10 |
+| `position` | Reach a set position, such as P3 to win the title | `position` | 19 |
+| `beat-rival` | Finish ahead of a named car, wherever that is | `beat-rival` | 9 |
 | `team` | A team result, such as a 1–2 in a set order | `team` (new) | 4 |
 | `deny` | Keep a rival at or below a set position, such as out of the top 3 to stop their title | `deny` (new) | 3 |
 

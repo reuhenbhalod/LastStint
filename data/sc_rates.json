@@ -19,12 +19,12 @@
     "vscPeriodsMeasured": 72
   },
   "allTracks": {
-    "races": 181,
-    "vscRaces": 154,
+    "races": 182,
+    "vscRaces": 155,
     "scPeriods": 127,
     "vscPeriods": 76,
-    "scPerRace": 0.7017,
-    "vscPerRace": 0.4935
+    "scPerRace": 0.6978,
+    "vscPerRace": 0.4903
   },
   "circuits": {
     "albert_park": {
@@ -199,8 +199,8 @@
       "vscRaces": 2,
       "scPeriods": 0,
       "vscPeriods": 0,
-      "scPerRace": 0.7017,
-      "vscPerRace": 0.4935,
+      "scPerRace": 0.6978,
+      "vscPerRace": 0.4903,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -214,8 +214,8 @@
       "vscRaces": 2,
       "scPeriods": 2,
       "vscPeriods": 2,
-      "scPerRace": 0.7017,
-      "vscPerRace": 0.4935,
+      "scPerRace": 0.6978,
+      "vscPerRace": 0.4903,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -308,8 +308,8 @@
       "vscRaces": 2,
       "scPeriods": 1,
       "vscPeriods": 0,
-      "scPerRace": 0.7017,
-      "vscPerRace": 0.4935,
+      "scPerRace": 0.6978,
+      "vscPerRace": 0.4903,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -460,12 +460,12 @@
     },
     "spa": {
       "name": "Circuit de Spa-Francorchamps",
-      "races": 7,
-      "vscRaces": 6,
+      "races": 8,
+      "vscRaces": 7,
       "scPeriods": 4,
       "vscPeriods": 2,
-      "scPerRace": 0.5714,
-      "vscPerRace": 0.3333,
+      "scPerRace": 0.5,
+      "vscPerRace": 0.2857,
       "scFallback": false,
       "vscFallback": false,
       "counted": [
@@ -475,6 +475,7 @@
         "belgium-2017 (tum): 1 SC, 0 VSC",
         "belgium-2018 (tum): 1 SC, 0 VSC",
         "belgium-2019 (tum): 1 SC, 0 VSC",
+        "belgium-2023 (fastf1): 0 SC, 0 VSC",
         "belgium-2024 (fastf1): 0 SC, 0 VSC"
       ]
     },
@@ -505,8 +506,8 @@
       "vscRaces": 0,
       "scPeriods": 1,
       "vscPeriods": 0,
-      "scPerRace": 0.7017,
-      "vscPerRace": 0.4935,
+      "scPerRace": 0.6978,
+      "vscPerRace": 0.4903,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -564,8 +565,8 @@
       "vscRaces": 1,
       "scPeriods": 1,
       "vscPeriods": 1,
-      "scPerRace": 0.7017,
-      "vscPerRace": 0.4935,
+      "scPerRace": 0.6978,
+      "vscPerRace": 0.4903,
       "scFallback": true,
       "vscFallback": true,
       "counted": [

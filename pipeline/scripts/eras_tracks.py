@@ -75,6 +75,8 @@ REUSE: dict[str, tuple[str, str]] = {
     "hungary-2006": ("hungary-2019", "hungaroring-3"),
     "hungary-2003": ("hungary-2019", "hungaroring-3"),
     "netherlands-2023": ("netherlands-2022", "zandvoort-5"),
+    "belgium-2023": ("belgium-2024", "spa-francorchamps-4"),
+    "great-britain-2016": ("great-britain-2022", "silverstone-8"),
     "miami-2024": ("miami-2023", "miami-1"),
     "saudi-arabia-2021": ("saudi-arabia-2025", "jeddah-1"),
     "russia-2018": ("russia-2020", "sirius-1"),
@@ -86,8 +88,6 @@ REUSE: dict[str, tuple[str, str]] = {
     "united-states-2015": ("united-states-2019", "austin-1"),
     "spain-2016": ("spain-2020", "catalunya-4"),
     "spain-2013": ("spain-2020", "catalunya-4"),
-    "brazil-2024": ("brazil-2021", "interlagos-2"),
-    "brazil-2016": ("brazil-2019", "interlagos-2"),
     "brazil-2012": ("brazil-2019", "interlagos-2"),
     "brazil-2009": ("brazil-2019", "interlagos-2"),
     "brazil-2008": ("brazil-2019", "interlagos-2"),
@@ -126,9 +126,14 @@ LAYOUT_SPECS: dict[str, dict] = {
     },
     "sepang-1": {"clockwise": True, "start": 0.50, "pit": (-0.045, 0.08), "turns": 15},
     "valencia-1": {"clockwise": True, "start": 0.355, "pit": (-0.035, 0.085), "turns": 25},
-    "imola-1": {"clockwise": False, "start": 0.985, "pit": (-0.06, 0.06), "turns": 22},
     "imola-2": {"clockwise": False, "start": 0.985, "pit": (-0.06, 0.06), "turns": 22},
     "hockenheimring-3": {"clockwise": True, "start": 0.99, "pit": (-0.03, 0.06), "turns": 16},
+    # The long pre-2002 layout: f1db draws -2 (1986) like -3 (the chicanes moved), so it takes
+    # -3's start line and pits, in the stadium.
+    "hockenheimring-2": {"clockwise": True, "start": 0.99, "pit": (-0.03, 0.06), "turns": 16},
+    # The short 1986-90 layout (the Mistral straight cut in half): line on the pit straight
+    # between Pont and the Verrerie esses, placed by judgement.
+    "paul-ricard-2": {"clockwise": True, "start": 0.88, "pit": (-0.06, 0.06), "turns": 9},
     "suzuka-1": {
         "clockwise": True,
         "reverse": False,
@@ -177,10 +182,10 @@ F1DB: dict[str, str] = {
     "malaysia-2001": "sepang-1",
     "malaysia-2013": "sepang-1",
     "europe-2012": "valencia-1",
-    "san-marino-1985": "imola-1",
     "san-marino-2005": "imola-2",
     "germany-2000": "hockenheimring-3",
-    "japan-1989": "suzuka-1",
+    "germany-1986": "hockenheimring-2",
+    "france-1990": "paul-ricard-2",
     "japan-2000": "suzuka-1",
     "united-states-2003": "indianapolis-2",
     "france-2004": "magny-cours-3",

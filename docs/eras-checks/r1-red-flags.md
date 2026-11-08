@@ -33,8 +33,6 @@ conflicts below come from.
 | saudi-arabia-2021 | 2 | 15 | (timed; Jolpica 16) | standing, lap 17 | 0 | | [Wikipedia list](https://en.wikipedia.org/wiki/List_of_red-flagged_Formula_One_races), [Wikipedia](https://en.wikipedia.org/wiki/2021_Saudi_Arabian_Grand_Prix), [Motor Sport](https://motorsportmagazine.com/articles/single-seaters/f1/hamilton-emerges-from-chaos-to-win-2021-saudi-arabian-gp-lap-by-lap) | Motor Sport says 16 | |
 | italy-2020 | 1 | 26 | (timed; Jolpica 27) | standing, lap 28 | 0 | 53 / 53 | [GrandPrix.com analysis](https://www.grandprix.com/races/italian-gp-2020-race-analysis.html), [Autosport](https://www.autosport.com/f1/news/151934/gasly-holds-off-sainz-to-win-topsyturvy-italian-gp), [Wikipedia](https://en.wikipedia.org/wiki/2020_Italian_Grand_Prix) | Wikipedia list says 27. **Check against the timing** | |
 | azerbaijan-2017 | 1 | 22 | 23 | rolling | 0 | 51 / 51 | [Wikipedia](https://en.wikipedia.org/wiki/2017_Azerbaijan_Grand_Prix), [GTspirit](https://gtspirit.com/?p=205699), Jolpica | No | |
-| brazil-2016 | 1 | 20 | 21 | rolling | 6 (22-27) | 71 / 71 | [Wikipedia list](https://en.wikipedia.org/wiki/List_of_red-flagged_Formula_One_races), [Motor Sport](https://www.motorsportmagazine.com/articles/single-seaters/f1/2016-brazilian-grand-prix/), Jolpica | No | |
-| brazil-2016 | 2 | 28 | 29 | rolling | 2 (30-31) | | [FIA](https://api.fia.com/news/f1-hamilton-wins-incident-packed-brazil-gp-ahead-rosberg-verstappen-thrills-interlagos), [Motor Sport](https://www.motorsportmagazine.com/articles/single-seaters/f1/2016-brazilian-grand-prix/), Jolpica | The FIA's report says "on lap 29" (the stoppage lap) | |
 | monaco-2011 | 1 | 72 | 72 | rolling | 1 (73) | 78 / 78 | [Wikipedia](https://en.wikipedia.org/wiki/2011_Monaco_Grand_Prix), Jolpica | No | |
 | canada-2011 | 1 | 25 | 25 | rolling | 9 (26-34) | 70 / 70 | [The Checkered Flag](https://www.thecheckeredflag.co.uk/2011/06/button-steals-last-minute-victory-in-an-epic-rain-interrupted-canadian-grand-prix/), [Autosport](https://www.autosport.com/f1/news/149951/is-buttonEURTMs-mostfamous-f1-win-overhyped), Jolpica | Wikipedia: "by lap 26", SC in "on lap 35" | |
 | europe-2007 | 1 | 4 | 5 | rolling | 2 (6-7) | 60 / 60 | [GrandPrix.com notes](https://www.grandprix.com/races/european-gp-2007-race-notes-alonso-wins-wild-european-gp.html), [Wikipedia](https://en.wikipedia.org/wiki/2007_European_Grand_Prix), Jolpica | Wikipedia list: 5; race article: lap 3 | |
@@ -42,8 +40,8 @@ conflicts below come from.
 | belgium-1998 | 1 | 1 | n/a (start voided) | standing (full restart, 44 laps) | 2 (laps 1-2 of the restarted race) | 44 / 44 | [Wikipedia](https://en.wikipedia.org/wiki/1998_Belgian_Grand_Prix), [Autosport](https://www.autosport.com/f1/news/1998-belgian-gp-when-the-schumachers-went-to-war/10744117/) | "standing" is not stated in so many words | |
 | monaco-1984 | 1 | 32 | n/a | none (results from lap 31) | n/a | 76 / 31 | [Wikipedia](https://en.wikipedia.org/wiki/1984_Monaco_Grand_Prix), [Autosport](https://www.autosport.com/f1/news/when-senna-and-bellof-starred-in-monaco-as-prost-prevailed/6530051/) | Wikipedia "end of" vs Autosport "halfway through" lap 32; the list's 31 is the results lap | |
 
-netherlands-2023 and brazil-2024 have no file: OpenF1's race control gives their restarts, and
-nothing read here says those need correcting.
+netherlands-2023 has no file: OpenF1's race control gives its restart, and
+nothing read here says it needs correcting.
 
 ## For the build (not facts, things to check)
 

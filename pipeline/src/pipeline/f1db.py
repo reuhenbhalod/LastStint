@@ -64,9 +64,9 @@ FASTEST_COLUMNS = ["race_id", "driver", "driver_id", "number", "rank", "lap", "t
 # Appendix races F1DB covers: stops for every race from 1994 to 2010 (Jolpica has stops from
 # 2011), fastest laps for every race before 2011 (later years come with full laps).
 APPENDIX_RACES = [
-    *("south-africa-1983", "monaco-1984", "portugal-1984", "san-marino-1985", "portugal-1985"),
+    *("south-africa-1983", "monaco-1984", "portugal-1984", "germany-1986", "portugal-1985"),
     *("mexico-1986", "hungary-1986", "australia-1986", "great-britain-1987", "monaco-1988"),
-    *("japan-1989", "united-states-1990", "mexico-1990", "brazil-1991", "monaco-1992"),
+    *("france-1990", "united-states-1990", "mexico-1990", "brazil-1991", "monaco-1992"),
     *("belgium-1992", "hungary-1992", "brazil-1993", "europe-1993", "australia-1993"),
     *("spain-1994", "australia-1994", "belgium-1995", "spain-1996", "hungary-1997"),
     *("europe-1997", "hungary-1998", "belgium-1998", "malaysia-1999", "europe-1999"),

@@ -17,7 +17,6 @@ from pipeline import build, cli, ingest, paths
 from pipeline import reconstruct as rc
 
 ERA_2 = [
-    "japan-1989",
     "united-states-1990",
     "mexico-1990",
     "brazil-1991",
@@ -91,6 +90,6 @@ def test_ingest_skips_reconstructed_races(monkeypatch):
 
     monkeypatch.setattr(cli.ingest, "ingest_race", no_network)
     monkeypatch.setattr(cli.ingest, "ingest_openf1", no_network)
-    result = CliRunner().invoke(cli.app, ["ingest", "japan-1989", "--force"])
+    result = CliRunner().invoke(cli.app, ["ingest", "mexico-1990", "--force"])
     assert result.exit_code == 0, result.output
     assert "reconstructed race, skipped" in result.output
