@@ -132,6 +132,7 @@ def assemble_race_model(
     service_stops: bool = False,
     eras_stops: bool = False,
     stint_pace: bool = False,
+    dirty_air: dict | None = None,
 ) -> dict:
     """Build the race-model dict (validate + write it with export.write_race). `fault_facts`:
     the race's hand-checked car faults (incidents.fault_facts), fitted into FAULT events.
@@ -145,7 +146,10 @@ def assemble_race_model(
     count their shared lap once, and stops on laps partly under a local yellow are priced in the
     sim frame (track.stop_records, pace.sim_frame_losses). `stint_pace` (Eras builds, model fix
     M2): each car's pace offset by real stint (pace.stint_offsets), as drivers[].stintPace; the
-    faults' and the stops' sim-frame fits then carry it too."""
+    faults' and the stops' sim-frame fits then carry it too. `dirty_air` (Eras builds of timed
+    races, dirty_air.eras_dirty_air): {"real": the race's real dirty-air loss by start-of-lap
+    gap band, taken off each lap of the pace offsets above; "bands": the sims' banded cost,
+    written as track.dirtyAirBands}."""
     total_laps = int(laps["LapNumber"].max())
     cliffs = fit.compound_cliff
     longest = longest_stints(laps)
@@ -249,6 +253,7 @@ def assemble_race_model(
         pace_mod.SHRINK_LAPS,
         weather,
         wear,
+        traffic=(dirty_air or {}).get("real"),
     )
     # Pace by stint (Eras model fix M2, pace.stint_offsets): fitted against the file's basePace.
     stint_table = (
@@ -262,6 +267,7 @@ def assemble_race_model(
             pace_mod.real_stops(strategy, takeover_lap),
             weather,
             wear,
+            traffic=(dirty_air or {}).get("real"),
         )
         if stint_pace
         else None
@@ -418,6 +424,7 @@ def assemble_race_model(
             "overtakeDifficulty": round(track_params.overtake_difficulty, 4),
             "overtakeModel": {k: round(v, 4) for k, v in track_params.overtake_model.items()},
             "dirtyAirPenalty": round(track_params.dirty_air_penalty, 4),
+            **({"dirtyAirBands": dirty_air["bands"]} if dirty_air else {}),
             # Neutralized-lap pace for the simulator; omitted when a race had none.
             **(
                 {"greenLapTime": round(track_params.green_lap_time, 3)}

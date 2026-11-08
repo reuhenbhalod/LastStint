@@ -16,6 +16,7 @@ import pandas as pd
 from . import (
     assemble,
     clean,
+    dirty_air,
     estimates,
     events,
     export,
@@ -2563,6 +2564,18 @@ def build_race(
         own = track.pass_opportunities(laps, fitted)
         model_ot, ot_note = overtaking.eras_model(race_id, own)
         params = replace(params, overtake_model=model_ot, notes=[*params.notes, ot_note])
+    dirty = None
+    if eras_build and recon is None and dirty_air.IN_ERAS_BUILDS:
+        # Eras sim fix W3 (dirty_air.py): the dirty-air loss by start-of-lap gap band, the
+        # race's real loss (pooled by era group and track layout) taken off the pace offsets'
+        # laps, the sims' banded cost and held gap. A wet race's laps (against its dry model)
+        # don't measure it: it takes its layout's.
+        rows = None if dry.wet else dirty_air.real_laps(laps, fitted)
+        dirty, da_note = dirty_air.eras_dirty_air(race_id, rows)
+        held = dirty_air.held_gap()
+        if held is not None:
+            params = replace(params, overtake_model={**params.overtake_model, "heldGap": held})
+        params = replace(params, notes=[*params.notes, da_note])
 
     takeover = meta["takeover_lap"]
     if takeover is None:
@@ -2600,6 +2613,7 @@ def build_race(
         # Pace by stint (Eras model fix M2): timed races only (a reconstruction's laps are
         # solved to its anchors, so their stint residuals are the solver's, not the drivers').
         stint_pace=eras_build and recon is None,
+        dirty_air=dirty,
     )
     official_lines: list[str] = []
     if recon is not None and recon.get("roadPositions"):

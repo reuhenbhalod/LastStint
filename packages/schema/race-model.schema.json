@@ -132,12 +132,35 @@
             "trainCoef": {
               "type": "number",
               "description": "Eras builds only: logit shift when the car ahead is itself within 1 s of the car ahead of it (a DRS train). Absent: no train term."
+            },
+            "heldGap": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "description": "Eras builds of timed races only (pipeline dirty_air.py): a follower that fails its pass roll is held this far (s) behind. Absent: 0.3 s."
+            },
+            "rollOnly": {
+              "type": "boolean",
+              "description": "Eras switch (pipeline dirty_air.py): no pass without a won roll; a car that would end a lap ahead of one that started it ahead, without beating it on a roll, is held behind it. Absent: off."
             }
           }
         },
         "dirtyAirPenalty": {
           "type": "number",
           "minimum": 0
+        },
+        "dirtyAirBands": {
+          "type": "array",
+          "description": "Eras builds of timed races only (pipeline dirty_air.py): the dirty-air loss (s) by start-of-lap gap to the car ahead; a gap under upTo (bands ascending) pays penalty, a gap past the last band none. Absent: dirtyAirPenalty within 1 s.",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["upTo", "penalty"],
+            "properties": {
+              "upTo": { "type": "number", "exclusiveMinimum": 0 },
+              "penalty": { "type": "number", "minimum": 0 }
+            }
+          }
         },
         "greenLapTime": {
           "type": "number"

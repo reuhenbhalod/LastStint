@@ -1772,7 +1772,7 @@ export function stepLap(run: Run): RaceState {
       lt = base + run.rng.get(NOISE_STREAM, code).normal(c.noise);
       const ahead = i > 0 ? (running[i - 1] as string) : code;
       const aheadGap = c.totalTime - (prevTime[ahead] ?? c.totalTime);
-      if (aheadGap > 0 && aheadGap < DIRTY_AIR_RANGE) lt += track.dirtyAirPenalty;
+      lt += dirtyAirCost(track, aheadGap);
       if (restart) lt += restartExtra(restart, i);
       lt += modeDelta + (lapEng?.extra ?? 0);
       const behind = running[i + 1];
@@ -2440,6 +2440,19 @@ function passShift(run: Run, lap: number, a: CarState, b: CarState): number {
   );
 }
 
+/**
+ * Seconds a car loses on a green lap it starts `gap` s behind the car ahead: by the file's
+ * dirtyAirBands (Eras builds of timed races), else dirtyAirPenalty within DIRTY_AIR_RANGE.
+ * Mirrors sim_reference.dirty_air_cost.
+ */
+export function dirtyAirCost(track: RaceModel['track'], gap: number): number {
+  if (!(gap > 0)) return 0;
+  const bands = track.dirtyAirBands;
+  if (bands === undefined) return gap < DIRTY_AIR_RANGE ? track.dirtyAirPenalty : 0;
+  for (const band of bands) if (gap < band.upTo) return band.penalty;
+  return 0;
+}
+
 function resolveOrder(
   run: Run,
   lap: number,
@@ -2449,14 +2462,24 @@ function resolveOrder(
 ): void {
   const overtake = run.model.track.overtakeModel;
   const trainCoef = overtake.trainCoef;
+  // An Eras build (pipeline dirty_air.py) may hold a failed follower at its fitted heldGap.
+  const follow = overtake.heldGap ?? FOLLOW_GAP;
+  const rollOnly = overtake.rollOnly === true;
+  const won = new Set<string>();
   const cars = run.state.cars;
   const order = live(run);
+  const start = [...order];
   for (let i = 1; i < order.length; i++) {
     const a = cars[order[i - 1] as string] as CarState;
     const b = cars[order[i] as string] as CarState;
     if (pitted.has(a.code) || pitted.has(b.code)) continue;
     const gap = (prevTime[b.code] as number) - (prevTime[a.code] as number);
-    if (!(gap >= 0 && gap < PASS_WINDOW)) continue;
+    if (!(gap >= 0 && gap < PASS_WINDOW)) {
+      // rollOnly: from further back no roll, so no pass this lap.
+      if (rollOnly && gap >= PASS_WINDOW && b.totalTime < a.totalTime + follow)
+        b.totalTime = a.totalTime + follow;
+      continue;
+    }
     const advantage = (clean[a.code] as number) - (clean[b.code] as number);
     // An Eras model (trainCoef): the car ahead is harder to pass in a train (TRAIN_GAP).
     const aheadGap =
@@ -2470,13 +2493,50 @@ function resolveOrder(
       run.rng.get(OVERTAKE_STREAM, b.code).next() < passProbability(overtake, advantage, gap, shift)
     ) {
       run.passedBy.set(`${a.code}>${b.code}`, lap);
+      won.add(`${a.code}>${b.code}`);
       if (b.totalTime >= a.totalTime) b.totalTime = a.totalTime - PASS_MARGIN;
-    } else if (b.totalTime < a.totalTime + FOLLOW_GAP) {
-      b.totalTime = a.totalTime + FOLLOW_GAP;
+    } else if (b.totalTime < a.totalTime + follow) {
+      b.totalTime = a.totalTime + follow;
     }
   }
+  if (rollOnly) noPassWithoutRoll(start, cars, pitted, won, follow);
   sortByTime(order, cars);
   run.state.order = withRetired(run, order);
+}
+
+/**
+ * rollOnly: a car that ends the lap ahead of one that started it ahead of it (neither pitting)
+ * without winning its roll against that car is held `follow` behind it, until no such pair is
+ * left. `start`: the start-of-lap order. Mirrors sim_reference._no_pass_without_roll.
+ */
+function noPassWithoutRoll(
+  start: string[],
+  cars: Record<string, CarState>,
+  pitted: Set<string>,
+  won: Set<string>,
+  follow: number,
+): void {
+  const idx = new Map(start.map((c, i) => [c, i]));
+  const time = (c: string) => (cars[c] as CarState).totalTime;
+  for (let n = 0; n < start.length * start.length; n++) {
+    const now = [...start].sort((p, q) => time(p) - time(q));
+    let moved = false;
+    for (let j = 1; j < now.length; j++) {
+      const y = now[j - 1] as string;
+      const x = now[j] as string;
+      if (
+        (idx.get(y) as number) > (idx.get(x) as number) &&
+        !pitted.has(x) &&
+        !pitted.has(y) &&
+        !won.has(`${x}>${y}`)
+      ) {
+        (cars[y] as CarState).totalTime = time(x) + follow;
+        moved = true;
+        break;
+      }
+    }
+    if (!moved) return;
+  }
 }
 
 /** Classification: finishers by time, then retirees (latest retirement first). */

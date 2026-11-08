@@ -368,8 +368,23 @@ export interface RaceModel {
      * model (pipeline overtaking.py: pooled slopes per era group, intercept per track layout)
      * adds trainCoef when the car ahead started the lap within TRAIN_GAP of its own car ahead.
      */
-    overtakeModel: { intercept: number; paceCoef: number; gapCoef: number; trainCoef?: number };
+    overtakeModel: {
+      intercept: number;
+      paceCoef: number;
+      gapCoef: number;
+      trainCoef?: number;
+      /** Eras builds of timed races (pipeline dirty_air.py): a follower that fails its roll is
+       * held this far (s) behind instead of FOLLOW_GAP. */
+      heldGap?: number;
+      /** Eras switch (pipeline dirty_air.py): no pass without a won roll; a car that would end
+       * a lap ahead of one that started it ahead, without beating it on a roll, is held. */
+      rollOnly?: boolean;
+    };
     dirtyAirPenalty: number;
+    /** Eras builds of timed races (pipeline dirty_air.py): the dirty-air loss by start-of-lap
+     * gap to the car ahead, ascending bands (gap < upTo pays penalty). Absent: dirtyAirPenalty
+     * within DIRTY_AIR_RANGE. */
+    dirtyAirBands?: { upTo: number; penalty: number }[];
     greenLapTime?: number;
     scLapTime?: number;
     vscLapTime?: number;
