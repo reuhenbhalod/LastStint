@@ -1,8 +1,9 @@
 // The home page (the daily card). A full-width hero: the day's circuit drawn large behind the
 // race's name and the duel, with your driver and the rival placed where they are when you take
 // over; the goal and Start. Under it, the duel in numbers and what your job is tonight. The top
-// bar has the brand, your streak and sign-in. The how-to-play walkthrough opens over it on a
-// fresh visit; coming back mid-race (the Pit Wall brand), Start becomes "Back to the race".
+// bar has the brand, the Gauntlet and Eras pills, your streak and sign-in. The how-to-play
+// walkthrough opens over it on a fresh visit; coming back mid-race (the Pit Wall brand), Start
+// becomes "Back to the race".
 
 import type { RaceModel } from '@laststint/sim';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -20,6 +21,23 @@ import type { GameState } from '../state/machine.js';
 import { carsOnTrack, pointAt, polyline } from '../track/geometry.js';
 import { outlineFor } from '../track/outlines.js';
 import { HowToPlay } from './HowToPlay.js';
+
+const PILL =
+  'rounded-full border border-[var(--fav,var(--box))] bg-[color-mix(in_srgb,var(--fav,transparent)_12%,transparent)] px-3 py-1 text-[13px] font-semibold text-[var(--ink)] hover:bg-[color-mix(in_srgb,var(--fav,var(--box))_22%,transparent)]';
+
+/** The top bar's links to the other game modes: the Gauntlet and Eras. */
+export function ModePills() {
+  return (
+    <>
+      <a href="/gauntlet" className={PILL}>
+        Gauntlet
+      </a>
+      <a href="/eras" className={PILL}>
+        Eras
+      </a>
+    </>
+  );
+}
 
 /** The circuit as a glowing line, with the two cars where they are at the takeover. */
 function Circuit({ state, model }: { state: GameState; model: RaceModel }) {
@@ -234,14 +252,7 @@ export function IntroCard({
             <span className="eyebrow hidden sm:inline">Daily race strategy</span>
           </a>
           <span className="flex flex-wrap items-center gap-2">
-            {source !== 'survivor' && (
-              <a
-                href="/gauntlet"
-                className="rounded-full border border-[var(--fav,var(--box))] bg-[color-mix(in_srgb,var(--fav,transparent)_12%,transparent)] px-3 py-1 text-[13px] font-semibold text-[var(--ink)] hover:bg-[color-mix(in_srgb,var(--fav,var(--box))_22%,transparent)]"
-              >
-                Gauntlet
-              </a>
-            )}
+            {source !== 'survivor' && <ModePills />}
             {account && <AccountBar account={account} compact />}
           </span>
         </div>
