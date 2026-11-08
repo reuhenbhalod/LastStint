@@ -124,3 +124,16 @@ export {
   parseRaceId,
 } from './legend.js';
 export type { LegendRates, ScRates } from './legend.js';
+export {
+  PIT_CLOSED_SC_LAPS,
+  STOP_GO_SECONDS,
+  allowedFlag,
+  hasMove,
+  pitLaneClosed,
+  resolveRules,
+  scQueue,
+  stopChangesTyres,
+  stopGoCost,
+  twoCompoundRule,
+} from './rules.js';
+export type { ResolvedRules } from './rules.js';

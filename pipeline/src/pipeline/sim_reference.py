@@ -14,6 +14,7 @@ import json
 import math
 from dataclasses import dataclass, field
 
+from . import race_rules
 from .legend import legend_events
 from .paths import GOLDEN_DIR
 from .rng import Mulberry32, derive_seed
@@ -59,6 +60,8 @@ class Car:
     tyre_wear: float | None = None
     # A wet race: the driver's extra share of a lap in the wet (wet.driver_wet_pace).
     wet_pace: float = 0.0
+    # A stop-go owed for entering a closed pit lane (race_rules; 2007-08).
+    stop_go: float = 0.0
 
     def __post_init__(self):
         if self.tyre_wear is None:
@@ -258,14 +261,27 @@ def simulate(
             car = cars[code]
             pit = next((st for st in car.strategy if st["lap"] == lap), None)
             pit_cost = 0.0
+            # Era rules (race_rules): an owed stop-go is served on a green lap.
+            if car.stop_go:
+                served = race_rules.serve_stop_go(car, flag, lap, total_laps)
+                if served:
+                    pit_cost += served
+                    pitted.add(code)
             if pit:
                 pitted.add(code)
                 car.strategy.remove(pit)
-                car.compound = pit["to"]
-                car.tyre_age = 0
-                car.tyre_wear = 0.0
+                # Era rules: with no tyre changes (2005) the stop keeps the set.
+                if race_rules.stop_changes_tyres(model, car.compound, pit):
+                    car.compound = pit["to"]
+                    car.tyre_age = 0
+                    car.tyre_wear = 0.0
                 default = {"SC": pit_loss_sc, "VSC": pit_loss_vsc}.get(flag, pit_loss)
-                pit_cost = pit.get("loss", default)
+                pit_cost += pit.get("loss", default)
+                # Era rules: an added stop into a closed pit lane (2007-08) owes a stop-go.
+                if pit.get("added") and race_rules.pit_lane_closed(model, neutral, lap, pit["to"]):
+                    car.stop_go += race_rules.stop_go_cost(model)
+                    if lap >= total_laps:
+                        pit_cost += race_rules.serve_stop_go(car, flag, lap, total_laps)
 
             if flag == "SC" and sc_time:
                 lt = sc_time
@@ -303,14 +319,7 @@ def simulate(
                 # Deployment lap: gaps kept (delta time). Middle laps: each gap keeps
                 # SC_GAP_KEEP of its excess. Last lap before the restart: nose-to-tail.
                 keep = 0.0 if neutral.get(lap + 1) != "SC" else SC_GAP_KEEP
-                duel = (model["userSide"], model["rival"])
-                _bunch(
-                    live,
-                    cars,
-                    green,
-                    keep,
-                    duel if model["race"].get("scUnlap") == "duel" else None,
-                )
+                _bunch(live, cars, green, keep, race_rules.sc_queue(model))
                 live = sorted(live, key=lambda c: cars[c].total_time)
                 order[:] = live + [c for c in order if cars[c].retired]
         else:
@@ -324,7 +333,7 @@ def _bunch(
     cars: dict[str, Car],
     lap_time: float | None,
     keep: float,
-    duel: tuple[str, str] | None,
+    duel: tuple[str, str] | str | None,
 ) -> None:
     """Close the SC queue: each gap keeps `keep` of its excess over BUNCH_GAP (nose-to-tail on
     the last lap). By the rules every lapped car unlaps and joins the back of the queue, so
@@ -345,8 +354,9 @@ def _bunch(
     on_track = {c: cars[c].total_time - lead - down[c] * (lap_time or 0.0) for c in live}
     lead_lap = [c for c in live if down[c] == 0]
     waved: list[str] = []
-    a, b = duel
-    if keep == 0.0 and a in lead_lap and b in lead_lap:
+    # scUnlap "none" (race_rules.sc_queue): the lead lap closes up, nobody is waved through.
+    a, b = ("", "") if duel == "none" else duel
+    if duel != "none" and keep == 0.0 and a in lead_lap and b in lead_lap:
         lo, hi = sorted((on_track[a], on_track[b]))
         waved = sorted(
             (c for c in live if down[c] >= 1 and lo < on_track[c] < hi),

@@ -28,6 +28,17 @@ import { legendEvents } from './legend.js';
 import { validatePlan } from './plan.js';
 import { resolveRivalPolicy } from './rivals/policy.js';
 import { type Rng, deriveSeed, mulberry32 } from './rng.js';
+import {
+  hasMove,
+  headsetFor,
+  illegalPitCompound,
+  pitLaneClosed,
+  scQueue,
+  serveStopGo,
+  stopChangesTyres,
+  stopGoCost,
+  twoCompoundRule,
+} from './rules.js';
 import type {
   BattleMove,
   CarState,
@@ -202,12 +213,12 @@ const HEADSET = headsetConfig as unknown as Record<string, HeadsetEra>;
 
 /** The race engineer config for a model's era (battles, trust...), or null. */
 export function engineerConfig(model: RaceModel): EngineerConfig | null {
-  return HEADSET[model.era]?.engineer ?? null;
+  return headsetFor(HEADSET, model)?.engineer ?? null;
 }
 
 /** The era's fuel load settings (null: no fuel load in this era). */
 export function fuelConfig(model: RaceModel): FuelConfig | null {
-  return HEADSET[model.era]?.fuel ?? null;
+  return headsetFor(HEADSET, model)?.fuel ?? null;
 }
 
 /**
@@ -243,7 +254,7 @@ function burnFuel(run: Run, car: CarState, lap: number, neutral: boolean): void 
 
 /** The headset modes' effects for a model's era (for explaining the options in the game). */
 export function modeEffects(model: RaceModel): HeadsetEra['modes'] | null {
-  return HEADSET[model.era]?.modes ?? null;
+  return headsetFor(HEADSET, model)?.modes ?? null;
 }
 
 export const DEFAULT_MODES: Modes = {
@@ -448,7 +459,7 @@ function extraErrorRate(run: Run, car: CarState): number {
  * player's window, compounds the race doesn't have, or a stop with no lap left to run.
  */
 export function validateDecisions(model: RaceModel, decisions: Decision[]): void {
-  const headset = HEADSET[model.era];
+  const headset = headsetFor(HEADSET, model);
   for (const d of decisions) {
     if (!Number.isInteger(d.lap) || d.lap <= model.race.takeoverLap || d.lap > model.race.laps) {
       throw new Error(
@@ -464,6 +475,8 @@ export function validateDecisions(model: RaceModel, decisions: Decision[]): void
     if (d.kind === 'pit') {
       if (!model.compounds[d.compound]) throw new Error(`unknown compound ${d.compound}`);
       if (d.lap >= model.race.laps) throw new Error('no stop on the final lap');
+      const illegal = illegalPitCompound(model, d.compound); // era rules (rules.ts)
+      if (illegal) throw new Error(illegal);
     } else if (d.kind === 'mode') {
       if (!headset?.modes[d.key]?.[d.value]) throw new Error(`unknown mode ${d.key}=${d.value}`);
     } else if (d.kind === 'teamOrder') {
@@ -477,7 +490,7 @@ export function validateDecisions(model: RaceModel, decisions: Decision[]): void
       d.kind === 'reply'
     ) {
       if (!headset?.engineer || !validEngineerCall(d)) throw new Error(`bad ${d.kind} call`);
-      if (d.kind === 'battle' && !eraHasMove(headset, d.move)) {
+      if (d.kind === 'battle' && !hasMove(headset, d.move)) {
         throw new Error(`no ${d.move} in the ${model.era} era`);
       }
     } else if (d.kind === 'plan') {
@@ -486,13 +499,6 @@ export function validateDecisions(model: RaceModel, decisions: Decision[]): void
       throw new Error('unknown decision kind');
     }
   }
-}
-
-/** Roadmap R5: no `wait-drs` without DRS, no `overtake-button` without a battery. */
-function eraHasMove(headset: HeadsetEra, move: BattleMove): boolean {
-  if (move === 'wait-drs') return headset.drs !== false;
-  if (move === 'overtake-button') return !!headset.ers;
-  return true;
 }
 
 /** The user's teammate (same team), if one is in the race. */
@@ -552,12 +558,13 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
       modes: { ...DEFAULT_MODES },
     };
   }
-  const ers = HEADSET[model.era]?.ers;
+  const ers = headsetFor(HEADSET, model)?.ers;
   const userCar = cars[model.userSide];
   if (live && ers && userCar) userCar.battery = ers.startBattery;
   // The race engineer side comes with live play's chaos (incidents): without it the real
   // calls replay the real race exactly.
-  const engineer = live && options.incidents !== false ? HEADSET[model.era]?.engineer : undefined;
+  const engineer =
+    live && options.incidents !== false ? headsetFor(HEADSET, model)?.engineer : undefined;
 
   const run: Run = {
     model,
@@ -568,9 +575,9 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
     rivalPolicy: resolveRivalPolicy(options.rivalPolicy),
     legend: options.legend === true,
     notes: [],
-    headset: HEADSET[model.era],
+    headset: headsetFor(HEADSET, model),
     passedBy: new Map(),
-    incidents: live && options.incidents !== false && !!HEADSET[model.era]?.incidents,
+    incidents: live && options.incidents !== false && !!headsetFor(HEADSET, model)?.incidents,
     incidentFlags: true,
     wetness: [...(model.weather?.wetness ?? [])],
     state: {
@@ -988,6 +995,7 @@ function rivalReacts(
     userCompound: user.compound,
   });
   if (!to) return;
+  if (pitLaneClosed(model, run.neutral, lap + 1, to)) return; // era rules: no stop-go cover
   const nextStop = rival.strategy.filter((s) => s.lap > lap).sort((a, b) => a.lap - b.lap)[0];
   rival.strategy = rival.strategy.filter((s) => s !== nextStop);
   rival.strategy.push({ lap: lap + 1, to, added: true });
@@ -1014,6 +1022,8 @@ export function rivalCover(
   },
 ): string | null {
   const { lap, flag, nextFlag } = at;
+  // Era rules: with no tyre changes there's no fresh set to cover with (4.2: refuel stops).
+  if (model.rules?.tyreChanges === false) return null;
   // The real stop: the rival's real answer to it is already its real strategy.
   const real = model.drivers
     .find((d) => d.code === model.userSide)
@@ -1049,6 +1059,8 @@ function rivalGoesLong(run: Run, lap: number): void {
   const user = state.cars[model.userSide];
   const rival = state.cars[model.rival];
   if (!run.live || !user || !rival || user.retired || rival.retired) return;
+  // Era rules: a no-tyre-change race's stops refuel, so none is skipped (eras build plan 4.2).
+  if (model.rules?.tyreChanges === false) return;
   const stopLap = lap + 1;
   const userStop = user.strategy.find((s) => s.lap === stopLap);
   if (!userStop || isRealStop(run, stopLap, userStop.to)) return;
@@ -1070,7 +1082,7 @@ function rivalGoesLong(run: Run, lap: number): void {
   const others = rival.strategy.filter((s) => s !== planned);
   // Two-compound rule: going long may not drop the stop that would make the rival comply.
   const needsThisStop =
-    !ruleSatisfied(rival) && !others.some((s) => !rival.compoundsUsed.includes(s.to));
+    !ruleSatisfied(rival, model.rules) && !others.some((s) => !rival.compoundsUsed.includes(s.to));
   if (needsThisStop) return;
   rival.strategy = others;
   run.notes.push({ lap, kind: 'rival-stays-out', driver: rival.code, detail: 'no stop' });
@@ -1098,9 +1110,11 @@ function predictedRemaining(
   for (let lap = fromLap + 1; lap <= model.race.laps; lap++) {
     const flag = known.get(lap);
     if (stop && lap === stop.lap) {
-      compound = stop.to;
-      wear = 0;
-      age = 0;
+      if (stopChangesTyres(model.rules, compound, stop)) {
+        compound = stop.to;
+        wear = 0;
+        age = 0;
+      }
       const { track } = model;
       total +=
         flag === 'sc'
@@ -1108,6 +1122,7 @@ function predictedRemaining(
           : flag === 'vsc'
             ? track.pitLossUnderVSC
             : track.pitLoss;
+      if (pitLaneClosed(model, known, lap, stop.to)) total += stopGoCost(model); // era rules
     }
     const wet = wetnessOn(run.wetness, lap);
     if (!flag) {
@@ -1132,8 +1147,10 @@ export function planRemainingStop(run: Run, options: { exact?: boolean } = {}): 
   const { model, state } = run;
   const user = state.cars[model.userSide];
   if (!user || user.retired) return null;
+  // Era rules: with no tyre changes a dry stop only costs time until 4.2 adds refuelling.
+  if (model.rules?.tyreChanges === false && !model.weather) return null;
   // Two-compound rule: a car that hasn't yet run two dry compounds must stop for a new one.
-  const mustChange = !ruleSatisfied(user);
+  const mustChange = !ruleSatisfied(user, model.rules);
   let best: PitStop | null = null;
   // Plan only on what is known now: neutralizations that have started by the next lap.
   const known = neutralMap(run.events.filter((e) => e.lap <= state.lap + 1));
@@ -1262,16 +1279,35 @@ export function stepLap(run: Run): RaceState {
         stopIdx = -1;
       }
     }
+    // Era rules (rules.ts): a stop-go owed for a closed pit lane is served on a green lap.
+    if (c.stopGo) {
+      const served = serveStopGo(c, flag, lap, model.race.laps);
+      if (served) {
+        pitCost += served;
+        pitted.add(code);
+        run.notes.push({ lap, kind: 'stop-go', driver: code, detail: 'served', value: served });
+      }
+    }
     if (stopIdx >= 0) {
       const stop = c.strategy[stopIdx] as PitStop;
       c.strategy.splice(stopIdx, 1);
       pitted.add(code);
       c.pittedThisLap = true;
-      c.compound = stop.to;
-      if (!c.compoundsUsed.includes(stop.to)) c.compoundsUsed.push(stop.to);
-      c.tyreAge = 0;
-      c.tyreWear = 0;
-      pitCost = stop.loss ?? stopCost(run, code, flag, stop.added === true, lap);
+      // Era rules (rules.ts): with no tyre changes (2005) a stop keeps the set.
+      if (stopChangesTyres(model.rules, c.compound, stop)) {
+        c.compound = stop.to;
+        if (!c.compoundsUsed.includes(stop.to)) c.compoundsUsed.push(stop.to);
+        c.tyreAge = 0;
+        c.tyreWear = 0;
+      }
+      pitCost += stop.loss ?? stopCost(run, code, flag, stop.added === true, lap);
+      // Era rules: an added stop into a closed pit lane (2007-08) owes a stop-go.
+      if (stop.added && pitLaneClosed(model, run.neutral, lap, stop.to)) {
+        const cost = stopGoCost(model);
+        c.stopGo = (c.stopGo ?? 0) + cost;
+        run.notes.push({ lap, kind: 'stop-go', driver: code, detail: 'owed', value: cost });
+        if (lap >= model.race.laps) pitCost += serveStopGo(c, flag, lap, model.race.laps);
+      }
       const eng = code === model.userSide ? state.engineer : undefined;
       if (eng && eng.damage > 0) {
         // A new nose on the stop: slower than a tyre change alone.
@@ -1350,13 +1386,7 @@ export function stepLap(run: Run): RaceState {
     if (flag === 'sc' && run.neutral.get(lap - 1) === 'sc') {
       // Deployment lap: gaps kept. Middle laps: SC_GAP_KEEP of the excess. Last lap: bunched.
       const keep = run.neutral.get(lap + 1) === 'sc' ? SC_GAP_KEEP : 0;
-      bunch(
-        order,
-        cars,
-        green,
-        keep,
-        model.race.scUnlap === 'duel' ? [model.userSide, model.rival] : null,
-      );
+      bunch(order, cars, green, keep, scQueue(model));
       state.order = [...sortByTime(order, cars), ...retiredInOrder(run)];
     }
   } else {
@@ -1423,7 +1453,7 @@ function incidents(run: Run, lap: number, prevTime: Record<string, number>): voi
       const next = c.strategy.filter((st) => st.lap > lap).sort((a, b) => a.lap - b.lap)[0];
       const to = next?.to ?? forcedCompound(model, c, wetnessOn(run.wetness, lap));
       c.strategy = c.strategy.filter((st) => st !== next && st.lap !== lap + 1);
-      c.strategy.push({ lap: lap + 1, to, added: true });
+      c.strategy.push({ lap: lap + 1, to, added: true, damaged: true });
       continue;
     }
     c.retired = true;
@@ -1452,7 +1482,7 @@ function forcedCompound(model: RaceModel, c: CarState, w = 0): string {
   // In the wet, the tyre for the track.
   if (model.weather && w >= 0.15) return w >= 0.6 && model.compounds.WET ? 'WET' : 'INTERMEDIATE';
   const prefs = ['MEDIUM', 'HARD', 'SOFT'].filter((x) => model.compounds[x]);
-  if (!ruleSatisfied(c)) {
+  if (!ruleSatisfied(c, model.rules)) {
     const fresh = prefs.find((x) => !c.compoundsUsed.includes(x));
     if (fresh) return fresh;
   }
@@ -1473,7 +1503,7 @@ function bunch(
   cars: Record<string, CarState>,
   lapTime: number | undefined,
   keep: number,
-  duel: [string, string] | null,
+  duel: [string, string] | 'none' | null,
 ): void {
   if (!live.length) return;
   if (!duel) {
@@ -1492,8 +1522,9 @@ function bunch(
   const onTrack = new Map(live.map((c) => [c, time(c) - lead - (down.get(c) as number) * len]));
   const leadLap = live.filter((c) => down.get(c) === 0);
   let waved: string[] = [];
-  const [a, b] = duel;
-  if (keep === 0 && leadLap.includes(a) && leadLap.includes(b)) {
+  // scUnlap 'none' (rules.ts scQueue): the lead lap closes up and nobody is waved through.
+  const [a, b] = duel === 'none' ? ['', ''] : duel;
+  if (duel !== 'none' && keep === 0 && leadLap.includes(a) && leadLap.includes(b)) {
     const lo = Math.min(onTrack.get(a) as number, onTrack.get(b) as number);
     const hi = Math.max(onTrack.get(a) as number, onTrack.get(b) as number);
     waved = live
@@ -1875,7 +1906,8 @@ export const DRY_COMPOUNDS = ['SOFT', 'MEDIUM', 'HARD'] as const;
  * Two-compound rule: in a dry race every car must run at least two different dry compounds.
  * (No modelled race is wet; wet tyres would waive it.)
  */
-export function ruleSatisfied(car: CarState): boolean {
+export function ruleSatisfied(car: CarState, rules?: RaceModel['rules']): boolean {
+  if (!twoCompoundRule(rules)) return true; // era rules: no such rule before 2007
   // Running wet tyres waives the rule (weather spec W6).
   if (isWetTyre(car.compound) || car.compoundsUsed.some(isWetTyre)) return true;
   const dry = new Set(
@@ -1898,7 +1930,7 @@ export function classify(run: Run): RaceResult {
   const running = live(run).sort((a, b) => time(a) - time(b));
   const finished = isFinished(run);
   const disqualified =
-    run.live && finished ? running.filter((c) => !ruleSatisfied(car(run, c))) : [];
+    run.live && finished ? running.filter((c) => !ruleSatisfied(car(run, c), run.model.rules)) : [];
   const finishers = running.filter((c) => !disqualified.includes(c));
   const retirees = retiredInOrder(run).sort(
     (a, b) => (car(run, b).retiredLap ?? 0) - (car(run, a).retiredLap ?? 0),

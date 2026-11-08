@@ -15,7 +15,7 @@ import {
   ruleSatisfied,
   tyreLapTime,
 } from './sim.js';
-import type { CarState, PaceMode, PlanId, RacePlan } from './types.js';
+import type { CarState, PaceMode, PlanId, RaceModel, RacePlan } from './types.js';
 import { isWetTyre, weatherWear, wetFactor, wetnessOn } from './weather.js';
 
 /** Plans are graded on beating the rival (or holding them off in a defend race). */
@@ -173,8 +173,8 @@ function stintTimes(
 
 /** True if the car ends the race with two dry compounds used (or doesn't need to): wet tyres
  * anywhere in the plan waive the rule. */
-function legal(car: CarState, stops: RacePlan['stops']): boolean {
-  if (ruleSatisfied(car) || stops.some((s) => isWetTyre(s.compound))) return true;
+function legal(car: CarState, stops: RacePlan['stops'], rules?: RaceModel['rules']): boolean {
+  if (ruleSatisfied(car, rules) || stops.some((s) => isWetTyre(s.compound))) return true;
   const dry = new Set(
     [...car.compoundsUsed, car.compound, ...stops.map((s) => s.compound)].filter((c) =>
       (DRY_COMPOUNDS as readonly string[]).includes(c),
@@ -207,12 +207,12 @@ export function enginePlans(run: Run): RacePlan[] {
   const compounds = Object.keys(model.compounds);
 
   const stints = new Stints(run, car, known);
-  const none = legal(car, []) ? stints.cost([]) : null;
+  const none = legal(car, [], model.rules) ? stints.cost([]) : null;
   const ones: Costed[] = [];
   for (let lap = first; lap <= last; lap++) {
     for (const c of compounds) {
       const stops = [{ lap, compound: c }];
-      if (legal(car, stops)) ones.push(stints.cost(stops));
+      if (legal(car, stops, model.rules)) ones.push(stints.cost(stops));
     }
   }
   ones.sort((a, b) => a.time - b.time);
@@ -226,7 +226,7 @@ export function enginePlans(run: Run): RacePlan[] {
               { lap: l1, compound: c1 },
               { lap: l2, compound: c2 },
             ];
-            if (!legal(car, stops)) continue;
+            if (!legal(car, stops, model.rules)) continue;
             const p = stints.cost(stops);
             if (!two || p.time < two.time - 1e-9) two = p;
           }
