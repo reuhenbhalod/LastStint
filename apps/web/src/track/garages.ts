@@ -4,6 +4,52 @@
 
 /** Previous season's constructors' standings, champions first, in this season's names. */
 const STANDINGS: Record<number, string[]> = {
+  // 2010, 2012, 2013 (Eras): the 2009, 2011 and 2012 final standings from the Jolpica dump
+  // (2026-10-24, formula_one_teamchampionship), under the season's names (2010: Brawn is
+  // Mercedes, BMW Sauber is Sauber; 2012: Renault is Lotus F1, Lotus is Caterham, Virgin is
+  // Marussia). A team that left (Toyota after 2009, HRT after 2012) is dropped. Teams new that
+  // season have no standing and go last, in car-number order (2010: Lotus, HRT, Virgin).
+  2010: [
+    'Mercedes',
+    'Red Bull',
+    'McLaren',
+    'Ferrari',
+    'Sauber',
+    'Williams',
+    'Renault',
+    'Force India',
+    'Toro Rosso',
+    'Lotus',
+    'HRT',
+    'Virgin',
+  ],
+  2012: [
+    'Red Bull',
+    'McLaren',
+    'Ferrari',
+    'Mercedes',
+    'Lotus F1',
+    'Force India',
+    'Sauber',
+    'Toro Rosso',
+    'Williams',
+    'Caterham',
+    'HRT',
+    'Marussia',
+  ],
+  2013: [
+    'Red Bull',
+    'Ferrari',
+    'McLaren',
+    'Lotus F1',
+    'Mercedes',
+    'Sauber',
+    'Force India',
+    'Williams',
+    'Toro Rosso',
+    'Caterham',
+    'Marussia',
+  ],
   // 2014-2016 (Eras): the 2013-2015 final standings from the Jolpica dump (2026-10-24,
   // formula_one_teamchampionship). A team new that season has no standing and goes last:
   // Renault takes Lotus F1's 2015 place, Haas comes in after Manor.
@@ -147,6 +193,7 @@ const SHORT: Record<string, string> = {
   Mercedes: 'MER',
   Ferrari: 'FER',
   'Red Bull Racing': 'RBR',
+  'Red Bull': 'RBR',
   McLaren: 'MCL',
   Renault: 'REN',
   Alpine: 'ALP',

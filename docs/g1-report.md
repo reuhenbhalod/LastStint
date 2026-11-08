@@ -185,3 +185,92 @@ These races have none until step 6.2 authors them (tune on spain-2016: "0 calls,
 so the random-play share is 0% or 100% and no seed can pass). Their seeds stay at 1, untuned,
 and must be tuned after 6.2. `data/pools.json` is untouched. TS sim parity checked on all 20
 golden seeds of each race: 0 order mismatches, times within 0.0005 s.
+
+## Eras wave B, step 5.1b (wet Jolpica races, canada-2014's faults): 1 pass, 0 borderline, 3 fail
+
+Eras build plan 5.1, Nov 7 2026. Written by hand, like the wave A sections. Sources: `pipeline
+jolpica` (Jolpica CSV dump 2026-10-24; F1DB stops for australia-2010) then `pipeline wet-laps`
+(wetness from the lap times, step 4.5) for the three wet races, and `pipeline tum-ingest` (TUM
+@ 9eaad9c, CC BY-NC-SA 3.0) for canada-2014, with both Mercedes' MGU-K faults from
+`data/incidents.json` (step 4.4). Registry split `eras`, the duel is the storyline pair of the
+Eras spec's race table (§4, user's driver first), `score_positions` 6, seed 1, takeover by the
+D3 rule. Values are seed set 10000 / seed set 20000; limits in brackets. The rain timelines are
+checked against race reports in `docs/eras-checks/4.5-wet-races.md`.
+
+| Race | Source | Duel | Status | Without near-tie rule | Mean gap error | Failing checks | Diagnosis |
+|---|---|---|---|---|---|---|---|
+| australia-2010 | Jolpica + F1DB stops, wet | BUT vs KUB | fail | fail | 3.35s | field ROS gap error 11.57 / 10.96 [5.00] | race mechanics (pace 21%, rest 79%): the two-stoppers stuck in the one-stop train. See below |
+| brazil-2012 | Jolpica, wet | VET vs ALO | fail | fail | 3.32s | duel VET vs ALO gap error 4.77 / 4.82 [3.00]; field VET gap error 6.69 / 6.72 [5.00] | race mechanics (pace 47%, rest 53%): Vettel's last wet stint. See below |
+| malaysia-2013 | Jolpica, wet | WEB vs VET | pass | pass | 0.83s |  |  |
+| canada-2014 | TUM, R2 faults | ROS vs RIC | fail | fail | 6.53s | duel ROS vs RIC gap error 15.06 / 15.17 [3.00] and order rate 0.01 / 0.02 [0.60]; podium order rate 0.01 / 0.02 [0.50]; podium ROS gap error 15.06 / 15.17, PER 5.18 / 5.01 [5.00]; field VET gap error 5.64 / 5.94 [5.00] | lap pace (pace 61%, rest 39%): the field's pace before the faults, and the fault's constant loss. See below |
+
+malaysia-2013 passes: duel error 1.31 / 1.17 s, duel order 0.66 / 0.65 (Webber ahead of Vettel
+in a third of runs: the sim has no team order, and Multi 21 was one), podium order 0.55 / 0.53,
+and every gap within 1.31 s. The wet start (laps 1-9 on inters) is before the lap-16 takeover.
+
+Diagnoses, from the sim's gaps against the real ones lap by lap (noise-free replay from the
+takeover) and each car's real laps minus the model's clean lap on green laps:
+
+- **australia-2010** (takeover lap 26). The podium and duel are right (duel error 0.02 / 0.13 s,
+  order 0.99). Only ROS fails. He and HAM made a second stop (laps 33-34) and came back on fresh
+  tyres behind the one-stop cars (KUB, MAS, ALO). Really, they lapped faster than the model
+  says (laps 40-50: HAM 1.3 s a lap, ROS 0.4 s), and ROS finished 0.4 s behind ALO. In the sim
+  they sit in the train's dirty air: from lap 43 to 55 ROS loses 0.6-1.3 s a lap against his
+  real laps and ends 9.9 s short (HAM 2 s, after WEB's last-lap hit on him). Causes: the fresh
+  dry tyre's pace (the compounds are 2.4 estimates: two dry labels from the pace step, which
+  can't see a set's age) and passing a train. No per-race knob: dropping ROS with
+  `score_positions` 4 would hide, not fix, it, so it isn't applied.
+- **brazil-2012** (takeover lap 15). Button wins and the podium order is exact (1.00); ALO and
+  MAS gaps are within 2.2 s. VET finishes 6.7 s too far back. The cause is the last wet stint
+  (laps 53-71, inters): every car lapped faster than the wet model says (residual -0.8 to
+  -1.8 s a lap), VET, WEB and BUT the most (-1.7 to -1.8 s), ALO less (-0.8) and MAS hardly
+  (-0.1). One wetness a lap for the whole field can't give Vettel his pace edge in those laps:
+  he loses 1.5-3.5 s a lap to his real laps from lap 62 to the lap-69 SC. Then the race
+  finishes under the SC (2.4's estimate: laps 70-71), which closes the field up. The
+  per-driver wet pace (`wet.driver_wet_pace`) is fitted over the whole wet period, so it
+  averages the early drizzle and the late rain. No per-race knob applies.
+- **canada-2014** (takeover lap 10). The fault facts check out against the cited report
+  (Wikipedia, [2014 Canadian Grand Prix](https://en.wikipedia.org/wiki/2014_Canadian_Grand_Prix)):
+  "Hamilton's failed into turn 10 on lap 36 and Rosberg's shut down on the approach to turn one
+  on lap 37", "losing their engines 160 hp (120 kW) of electrical boost"; HAM "was retired in
+  the pit lane at the start of lap 48"; "at lap 68, Ricciardo used DRS to pass Rosberg for the
+  lead"; the SCs are lap 1 ("withdrawn at the end of lap seven") and the final lap. The fitted
+  losses are HAM 2.42 and ROS 2.29 s a lap (the report: "four seconds a lap slower", against
+  their pre-fault pace; the fit is against the sim's lap for the car). Two separate errors:
+  1. *Before the faults* (laps 10-36), the field behind the Mercedes runs 0.4-1.1 s a lap
+     slower than its real laps. Its real laps are faster than the model's by 0.35-0.6 s a lap
+     on laps 20-36 (RIC -0.35 / -0.53, PER -0.62 / -0.46, MAS -0.29 / -0.74), and PER's
+     one-stop (in on lap 34) leads a train the sim holds together. By lap 36 RIC is 15.7 s
+     behind his real place, PER 8.8 s, MAS 12.6 s, while ROS and HAM are within 1.3 s. This is
+     the "RIC/VET/PER 4-7 s slow" step 4.4 saw, and it's the field's pace fit, not the fault.
+  2. *After the faults*, ROS's real loss tapers: 2.82 s a lap on laps 37-46, 2.55 on 47-55 and
+     1.81 on 56-70 (he managed the car; the field was stuck behind him from lap 50). The
+     model's loss is one constant, so the sim's ROS is 8.8 s ahead of his real race at lap 50
+     and only gets back to it by lap 65. The real race had RIC, VET and PER within 2 s of ROS
+     from lap 50; the sim's field is 13-26 s behind him then and never reaches him.
+  As a check (the registry edited in memory, not committed), a takeover after the faults
+  still fails: lap 30 duel error 8.8 s, lap 36 5.1 s, lap 37 4.6 s (order 0.41), so the
+  second cause alone fails G1, and moving the takeover isn't a fix. Fixes need model work:
+  a fault whose loss can change over its laps (step 4.4's model is one constant by design),
+  and the field's stint pace. Reported to the owner, not faked.
+
+**How the wet Jolpica races were built.** Step 2.4 (`pipeline jolpica`) labels every stint with
+a dry compound and estimates the SC laps; step 4.5's `wet-laps` fitted tyre classes only on a
+source with no compounds at all, so it would have kept those dry labels on the inter stints.
+`pipeline wet-laps` now sets 2.4's labels aside for a Jolpica race ingested with estimates,
+fits the tyre classes, gives the slick stints their 2.4 label back, keeps 2.4's SC laps (and
+so the owner's hand checks), and adds `weather` to the estimated fields, so the race file's
+provenance lists `compounds`, `safetyCars` and `weather` (`wet_laps.estimated_dry_labels` /
+`apply_dry_labels` / `update_sidecar`, tested in `test_wet_laps.py`). The SC hand-check files
+are committed (`data/estimates/<id>.sc.json`, all unchecked): australia-2010's SC is one lap
+long, and malaysia-2013's laps 2-6 are the wet track, not an SC (4.5-wet-races.md).
+
+**Server-match check:** each race's 20 golden seeds match the TS sim (order, and times within
+0.0005 s): 20/20 on all four. Seeds stay at 1, untuned: the races have no decision moments
+until step 6.2. Garages: 2010, 2012 and 2013 tables added (`apps/web/src/track/garages.ts`,
+the 2009 / 2011 / 2012 Jolpica constructors' standings, as for 2014-2016).
+
+**Not regenerated here:** `data/sc_rates.json` (so `test_sc_rates.py::
+test_committed_rates_match_the_raw_timelines` fails until it's regenerated: the three Jolpica
+races' estimated SC timelines are new in data/raw), `apps/worker/src/races.gen.ts` and the
+parity fixtures.

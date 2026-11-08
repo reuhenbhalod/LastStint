@@ -197,3 +197,57 @@ def test_cli_writes_the_records_report_and_filled_snapshot(tmp_path):
     assert filled["Compound"].notna().all() and filled["TrackStatus"].notna().all()
     again = CliRunner().invoke(app, ["wet-laps", rid, "--raw-dir", str(tmp_path)])
     assert "skipped" in again.output
+
+
+def test_a_jolpica_race_with_step_2_4_estimates_refits_the_classes_and_keeps_its_labels(
+    tmp_path,
+):
+    """Step 2.4 labels every Jolpica stint dry: wet-laps sets the labels aside to fit the tyre
+    classes, gives the slick stints their 2.4 label back, keeps 2.4's SC laps, and lists the
+    weather as estimated in the sidecar (the race file's provenance)."""
+    rid = "brazil-2012"
+    laps = synthetic(status=True).assign(Compound="SOFT")
+    laps.to_parquet(ingest.raw_snapshot_path(rid, tmp_path))
+    drivers = sorted(laps["Driver"].unique())
+    sidecar = {
+        "year": 2012,
+        "estimates": {
+            "estimated": ["compounds", "safetyCars"],
+            "compounds": {
+                "stints": [{"driver": d, "stint": 1, "compound": "HARD"} for d in drivers]
+            },
+        },
+    }
+    (tmp_path / f"{rid}.jolpica.json").write_text(json.dumps(sidecar))
+    run = CliRunner().invoke(app, ["wet-laps", rid, "--raw-dir", str(tmp_path)])
+    assert run.exit_code == 0, run.output
+    filled = pd.read_parquet(tmp_path / f"{rid}.parquet")
+    assert set(filled["Compound"]) == {"HARD"}  # all slick here: 2.4's label, not SOFT/MEDIUM
+    assert filled["TrackStatus"].tolist() == laps["TrackStatus"].tolist()
+    side = json.loads((tmp_path / f"{rid}.jolpica.json").read_text())["estimates"]
+    assert side["estimated"] == ["compounds", "safetyCars", "weather"]
+
+
+def test_wet_stints_replace_their_dry_label_in_the_sidecar():
+    est = wet_laps.Estimate(
+        pd.DataFrame(), [], "status", {("AAA", 1): "inter", ("AAA", 2): "slick"}
+    )
+    side = {
+        "estimates": {
+            "estimated": ["compounds"],
+            "compounds": {
+                "stints": [
+                    {"driver": "AAA", "stint": 1, "compound": "SOFT", "by": "pace"},
+                    {"driver": "AAA", "stint": 2, "compound": "HARD", "by": "pace"},
+                ]
+            },
+        }
+    }
+    out = wet_laps.update_sidecar(side, est)["estimates"]
+    assert [(s["compound"], s["by"]) for s in out["compounds"]["stints"]] == [
+        ("INTERMEDIATE", "wet-laps"),
+        ("HARD", "pace"),
+    ]
+    assert out["estimated"] == ["compounds", "weather"]
+    assert wet_laps.estimated_dry_labels(None) is None
+    assert wet_laps.estimated_dry_labels({"estimates": {"estimated": ["safetyCars"]}}) is None

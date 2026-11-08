@@ -429,3 +429,52 @@ def write(race_id: str, est: Estimate, raw_dir: Path, wetness: list[float] | Non
     report_path(race_id, raw_dir).write_text(
         json.dumps(report(est, race_id, wetness), indent=1) + "\n"
     )
+
+
+# --- a Jolpica race ingested with step 2.4's estimates ---------------------------------------
+
+
+def estimated_dry_labels(sidecar: dict | None) -> dict[tuple[str, int], str] | None:
+    """Step 2.4's dry compound for each (driver, stint), when the race's compounds are that
+    estimate (a Jolpica race ingested with estimates); None otherwise. Step 2.4 labels every
+    stint dry (it doesn't estimate wet tyres), so a wet race refits the classes here with those
+    labels set aside, and its slick stints get them back (apply_dry_labels)."""
+    block = (sidecar or {}).get("estimates") or {}
+    if "compounds" not in block.get("estimated", []):
+        return None
+    return {
+        (str(s["driver"]), int(s["stint"])): str(s["compound"])
+        for s in block.get("compounds", {}).get("stints", [])
+    }
+
+
+def apply_dry_labels(est: Estimate, labels: dict[tuple[str, int], str]) -> None:
+    """Give each stint fitted slick its step-2.4 dry compound in place of DRY_PLACEHOLDER."""
+    key = list(zip(est.laps["Driver"].astype(str), stints(est.laps), strict=True))
+    slick = est.laps["Compound"] == DRY_PLACEHOLDER
+    est.laps.loc[slick, "Compound"] = [
+        labels.get(k, DRY_PLACEHOLDER) for k, s in zip(key, slick, strict=True) if s
+    ]
+    est.filled = [
+        "Compound: each stint's tyre class fitted from the lap times; slick stints keep step"
+        " 2.4's dry compound"
+        if f.startswith("Compound:")
+        else f
+        for f in est.filled
+    ]
+
+
+def update_sidecar(sidecar: dict, est: Estimate) -> dict:
+    """The sidecar's estimates block with the wet stints' tyres and "weather" estimated (the
+    race file's provenance lists it)."""
+    block = sidecar["estimates"]
+    for s in block.get("compounds", {}).get("stints", []):
+        cls = est.classes.get((str(s["driver"]), int(s["stint"])), "slick")
+        if cls != "slick":
+            s["compound"], s["by"] = CLASS_COMPOUND[cls], "wet-laps"
+    from . import estimates
+
+    est_fields = set(block.get("estimated", [])) | {"weather"}
+    block["estimated"] = [f for f in estimates.FIELDS if f in est_fields]
+    block["weather"] = {"method": f"wet laps from the lap times ({SOURCE}, step 4.5)"}
+    return sidecar

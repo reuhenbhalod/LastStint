@@ -103,10 +103,11 @@ def test_writing_sc_causes_keeps_a_races_fault_facts(tmp_path):
     assert json.loads(path.read_text())["r"] == [{"lap": 2, "type": "SC", "driver": "AAA"}, fact]
 
 
-def test_no_existing_race_has_fault_facts_yet():
-    # data/incidents.json in this branch: every race builds exactly as before.
-    for race in build.RACES:
-        assert incidents.fault_facts(race) == []
+def test_only_the_eras_fault_races_have_fault_facts():
+    # data/incidents.json: the races built before step 4.4 build exactly as before; only an
+    # Eras race registered for its faults (5.1: canada-2014) has any.
+    with_faults = {race for race in build.RACES if incidents.fault_facts(race)}
+    assert with_faults == {"canada-2014"}
 
 
 # --- the fit ---------------------------------------------------------------------------------

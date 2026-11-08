@@ -43,6 +43,9 @@ describe('live play with the real calls', () => {
     for (const [code, car] of Object.entries(expected.state.cars)) {
       expect(live.state.cars[code]?.totalTime).toBeCloseTo(car.totalTime, 9);
     }
-    expect(live.notes).toEqual([]);
+    // A real car fault (step 4.4) is a frozen event: its note comes in the replay too.
+    const frozen = (run: typeof live) => run.notes.filter((n) => n.kind === 'fault');
+    expect(frozen(live)).toEqual(frozen(replay));
+    expect(live.notes.filter((n) => n.kind !== 'fault')).toEqual([]);
   });
 });

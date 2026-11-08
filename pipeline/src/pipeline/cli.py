@@ -220,7 +220,22 @@ def wet_laps_cmd(
     if ingest.weather_path(race_id, raw).exists() and not force:
         typer.echo(f"{race_id}: weather file exists in {raw}, skipped (--force to overwrite)")
         return
-    est = wet_laps.estimate(pd.read_parquet(snapshot))
+    laps = pd.read_parquet(snapshot)
+    # A Jolpica race ingested with step 2.4's estimates: its compounds are all dry labels, so
+    # the tyre classes are refitted here and the slick stints keep 2.4's labels. Its SC laps
+    # (TrackStatus, with the owner's hand checks) are kept.
+    sidecar = build_mod.load_sidecar(race_id, raw)
+    labels = wet_laps.estimated_dry_labels(sidecar)
+    if labels is not None:
+        laps = laps.assign(Compound=None)
+    est = wet_laps.estimate(laps)
+    if labels is not None:
+        from . import jolpica
+
+        wet_laps.apply_dry_labels(est, labels)
+        jolpica.sidecar_path(race_id, raw).write_text(
+            json.dumps(wet_laps.update_sidecar(sidecar, est), indent=1) + "\n"
+        )
     wet_laps.write(race_id, est, raw)
     rep = wet_laps.report(est, race_id)
     typer.echo(

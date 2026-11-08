@@ -19,6 +19,13 @@ describe('garages', () => {
     expect(g).toHaveLength(11);
   });
 
+  it('2010: the 2009 champions (Brawn, now Mercedes) nearest the exit, the new teams at the entry', () => {
+    const g = garagesFor(2010);
+    expect(g.at(-1)).toEqual(['Mercedes', 'MER']);
+    expect(g.slice(0, 3).map(([t]) => t)).toEqual(['Virgin', 'HRT', 'Lotus']);
+    expect(g).toHaveLength(12);
+  });
+
   it("has a garage for every team in every race, under the race's own team names", () => {
     for (const file of readdirSync(races).filter((f) => f.endsWith('.json'))) {
       const model = JSON.parse(readFileSync(join(races, file), 'utf8')) as {

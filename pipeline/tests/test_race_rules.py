@@ -137,12 +137,17 @@ def test_each_rule_changes_its_replay():
 
 
 def test_no_rules_block_replays_the_golden_files():
+    # Only an Eras race (registry split "eras", built with its data/eras rules overlay) has a
+    # rules block; every race replays its golden file either way.
+    from pipeline.build import RACES
+
     for path in sorted(GOLDEN_DIR.glob("*.json")):
         race = RACES_DIR / path.name
         if not race.exists():
             continue
         model = json.loads(race.read_text())
-        assert "rules" not in model
+        if "rules" in model:
+            assert RACES.get(path.stem, {}).get("split") == "eras", path.name
         golden = json.loads(path.read_text())
         for seed in list(golden)[:3]:
             got = sim_reference.simulate(model, int(seed))

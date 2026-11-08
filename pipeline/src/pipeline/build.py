@@ -926,6 +926,62 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
+    # Eras wave B (build plan 5.1): wet races before 2018 from Jolpica (`pipeline jolpica`,
+    # then `pipeline wet-laps`: wetness from the lap times, step 4.5) and canada-2014 from TUM
+    # with both Mercedes' power losses (step 4.4; facts in data/incidents.json). The duel is
+    # the storyline pair of the Eras spec's race table (§4), the user's driver first.
+    "australia-2010": {
+        "year": 2010,
+        "event": "Australia",
+        "source": "jolpica",
+        "name": "Australia 2010: Button vs Kubica",
+        "era": "2010-2013",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "BUT",
+        "rival": "KUB",  # Button chases the win: the car behind at the flag
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "brazil-2012": {
+        "year": 2012,
+        "event": "Brazil",
+        "source": "jolpica",
+        "name": "Brazil 2012: Vettel vs Alonso",
+        "era": "2010-2013",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "VET",
+        "rival": "ALO",  # Vettel high enough for the title: Alonso, his title rival
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "malaysia-2013": {
+        "year": 2013,
+        "event": "Malaysia",
+        "source": "jolpica",
+        "name": "Malaysia 2013: Webber vs Vettel",
+        "era": "2010-2013",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "WEB",
+        "rival": "VET",  # Webber holds P1 (real: Multi 21, Vettel passes him)
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "canada-2014": {
+        "year": 2014,
+        "event": "Canada",
+        "source": "tum",
+        "name": "Canada 2014: Rosberg vs Ricciardo",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "ROS",
+        "rival": "RIC",  # Rosberg nurses a failing car to the win (real: Ricciardo passes)
+        "score_positions": 6,
+        "split": "eras",
+    },
 }
 
 
