@@ -5,7 +5,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { type GradeOption, type Target, gradeMoment } from '../src/grade.js';
-import { pauseAt } from '../src/moments.js';
+import { boxCall, pauseAt } from '../src/moments.js';
 import type { RaceModel } from '../src/types.js';
 
 const repo = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
@@ -196,7 +196,7 @@ for (const c of CASES) {
   const run = pauseAt(model, c.lap);
   const options: GradeOption[] = c.options.map(([id, compound]) => ({
     id,
-    decisions: compound ? [{ lap: c.lap, kind: 'pit', compound }] : [],
+    decisions: compound ? [boxCall(model, c.lap, compound)] : [],
   }));
   const g = gradeMoment(run, options, target, SAMPLES);
   const top = Math.max(...g.options.map((o) => o.probability));

@@ -8,12 +8,19 @@ import { describe, expect, it } from 'vitest';
 import abuJson from '../../../data/races/abu-dhabi-2021.json';
 import canadaJson from '../../../data/races/canada-2024.json';
 import vectors from '../../../pipeline/tests/fixtures/refuel_parity.json';
+import { gradeMoment } from '../src/grade.js';
+import { type DecisionMoment, boxCall, candidateMoments, pauseAt } from '../src/moments.js';
+import { planCalls, validatePlan } from '../src/plan.js';
+import { enginePlans } from '../src/planner.js';
 import {
   PRIOR_SECONDS_PER_LAP,
   RESERVE_LAPS,
+  fillCap,
+  fillLaps,
   fillOptions,
   fillStint,
   limitBurnPerLap,
+  realFill,
   refuelAtStop,
   refuelModel,
   takeoverTank,
@@ -21,11 +28,13 @@ import {
 } from '../src/refuel.js';
 import {
   type Run,
+  decide,
   forkRun,
   fuelConfig,
   initRun,
   isFinished,
   planRemainingStop,
+  realDecisions,
   simulate,
   stepLap,
   validateDecisions,
@@ -33,9 +42,11 @@ import {
 import type {
   CarState,
   Decision,
+  Fill,
   FillChoice,
   PitStop,
   RaceModel,
+  RacePlan,
   RaceRules,
   RefuelModel,
 } from '../src/types.js';
@@ -69,6 +80,8 @@ interface Vector {
 }
 interface Functions {
   fills: [FillChoice, number, number, number][];
+  /** fill_laps(fill, remaining, 30): exact fills and named ones. */
+  exact: [Fill, number, number][];
   tanks: [PitStop[], number][];
   limits: Record<string, number | null>;
 }
@@ -99,6 +112,12 @@ describe('parity: the shared functions', () => {
   it('fill choices', () => {
     for (const [choice, remaining, cap, want] of V.functions.fills) {
       expect(fillStint(choice, remaining, cap), `${choice} ${remaining} ${cap}`).toBe(want);
+    }
+  });
+  it('exact fills (and named ones) through fillLaps', () => {
+    expect(V.functions.exact.length).toBeGreaterThan(0);
+    for (const [fill, remaining, want] of V.functions.exact) {
+      expect(fillLaps(fill, remaining, 30), `${JSON.stringify(fill)} ${remaining}`).toBe(want);
     }
   });
   it('takeover tanks', () => {
@@ -200,6 +219,139 @@ describe('the player in a refuelling race', () => {
     expect(() =>
       validateDecisions(refuelRace, [{ ...d, fill: 'brim' as unknown as FillChoice }]),
     ).toThrow(/fill/);
+  });
+
+  it('every pit call in a refuelling race states its fill: there is no default', () => {
+    const bare: Decision = { lap: 36, kind: 'pit', compound: 'HARD' };
+    expect(() => validateDecisions(refuelRace, [bare])).toThrow(/needs a fill/);
+    expect(() => initRun(refuelRace, 1, { decisions: [bare] })).toThrow(/needs a fill/);
+    const run = initRun(refuelRace, 1, { decisions: [] });
+    expect(() => decide(run, bare)).toThrow(/needs a fill/);
+    expect(() => forkRun(run, 3, [bare])).toThrow(/needs a fill/);
+    // Without refuelling a call takes no fill, as before.
+    expect(() => validateDecisions(abu, [bare])).not.toThrow();
+    expect(() => validateDecisions(abu, [{ ...bare, fill: { laps: 10 } }])).toThrow(/fill/);
+  });
+
+  it('an exact fill is 1 to fillCap whole laps, and nothing else', () => {
+    const at = (fill: unknown) =>
+      validateDecisions(refuelRace, [
+        { lap: 36, kind: 'pit', compound: 'HARD', fill: fill as Fill },
+      ]);
+    // The tank is 30 laps; no real stint after a stop is longer (VER's is 17).
+    expect(fillCap(refuelRace)).toBe(30);
+    for (const ok of [{ laps: 1 }, { laps: 17 }, { laps: 30 }]) expect(() => at(ok)).not.toThrow();
+    for (const bad of [
+      { laps: 0 },
+      { laps: 31 },
+      { laps: 2.5 },
+      { laps: '5' },
+      { laps: 5, extra: 1 },
+      {},
+      null,
+      5,
+    ]) {
+      expect(() => at(bad), JSON.stringify(bad)).toThrow(/fill/);
+    }
+    // A real stint longer than the fit's tank still fits: a real fill is never refused.
+    const small = tagged(refuelRace, { refuelling: true }, { ...FILL, tankLaps: 10 });
+    expect(fillCap({ ...small, userSide: 'VER' })).toBeGreaterThanOrEqual(17);
+  });
+
+  it('an exact fill fuels its laps, never past the flag', () => {
+    expect(fillLaps({ laps: 12 }, 22, 30)).toBe(12);
+    expect(fillLaps({ laps: 30 }, 22, 30)).toBe(22);
+    expect(fillLaps('short', 22, 30)).toBe(fillStint('short', 22, 30));
+    const run = initRun(refuelRace, 1, {
+      decisions: [{ lap: 36, kind: 'pit', compound: 'HARD', fill: { laps: 9 } }],
+    });
+    while (run.state.lap < 37) stepLap(run);
+    expect(user(run).tank).toBeCloseTo(9 + RESERVE_LAPS - 0.6, 6); // lap 37 is a VSC lap
+  });
+
+  it('the real calls carry the real fill: the next real stint, to the next stop or the flag', () => {
+    const real = realDecisions(refuelRace);
+    // VER's real stops: out on 37 (to the lap-53 in-lap: 17 laps) and 54 (to the flag: 5).
+    expect(real).toEqual([
+      { lap: 36, kind: 'pit', compound: expect.any(String), fill: { laps: 17 } },
+      { lap: 53, kind: 'pit', compound: expect.any(String), fill: { laps: 5 } },
+    ]);
+    expect(realFill(refuelRace, 'VER', 37)).toEqual({ laps: 17 });
+    // At a real stop (a measured loss) the real fill prices at nothing over it.
+    const car = { tank: 1, strategy: [] as PitStop[] } as unknown as CarState;
+    const stop = refuelRace.drivers.find((d) => d.code === 'VER')?.realStrategy[0] as PitStop;
+    const realStrategy = refuelRace.drivers.find((d) => d.code === 'VER')?.realStrategy ?? [];
+    expect(refuelAtStop(refuelRace, car, { ...stop, fill: { laps: 17 } }, 37, realStrategy)).toBe(
+      0,
+    );
+    expect(car.tank).toBe(17 + RESERVE_LAPS);
+    // Outside a refuelling race the calls are as before.
+    expect(realDecisions(abu).every((d) => d.kind !== 'pit' || d.fill === undefined)).toBe(true);
+  });
+
+  it("the engineer's plans fill exactly to the plan's next stop or the flag", () => {
+    const run = initRun(refuelRace, 1, { decisions: [] });
+    const plans = enginePlans(run);
+    expect(plans.length).toBeGreaterThan(0);
+    for (const p of plans) {
+      p.stops.forEach((s, i) => {
+        const next = p.stops[i + 1]?.lap ?? refuelRace.race.laps;
+        expect(s.fill).toEqual({ laps: next - s.lap });
+      });
+      expect(() => validatePlan(refuelRace, p, run.state.lap)).not.toThrow();
+      for (const c of planCalls(p, run.state.lap, 'standard')) {
+        if (c.kind === 'pit') expect(c.fill).toBeDefined();
+      }
+    }
+    // A plan's stop without a fill is refused in a refuelling race, and its fill elsewhere.
+    const bare: RacePlan = {
+      id: 'own',
+      stops: [{ lap: 40, compound: 'HARD' }],
+      pace: ['standard', 'standard'],
+    };
+    expect(() => validatePlan(refuelRace, bare, 34)).toThrow(/needs a fill/);
+    const filled: RacePlan = { ...bare, stops: [{ lap: 40, compound: 'HARD', fill: 'long' }] };
+    expect(() => validatePlan(refuelRace, filled, 34)).not.toThrow();
+    expect(() => validatePlan(abu, filled, 34)).toThrow(/fill/);
+    expect(
+      enginePlans(initRun(abu, 1, { decisions: [] })).every((p) =>
+        p.stops.every((s) => s.fill === undefined),
+      ),
+    ).toBe(true);
+  });
+
+  it('every box option at a moment states its fill; the real call is the real option', () => {
+    const moments = candidateMoments(refuelRace);
+    const boxes = moments.flatMap((m) => m.options.flatMap((o) => o.decisions));
+    expect(boxes.some((d) => d.kind === 'pit')).toBe(true);
+    for (const d of boxes) if (d.kind === 'pit') expect(d.fill).toBeDefined();
+    const real = realDecisions(refuelRace);
+    for (const m of moments) {
+      const call = real.find((d) => d.lap === m.lap);
+      const option = m.options.find((o) => o.id === m.realOptionId);
+      if (call && option) expect(option.decisions).toContainEqual(call);
+    }
+    // Every other box call fills 'standard'.
+    const others = boxes.filter(
+      (d) => d.kind === 'pit' && !real.some((r) => JSON.stringify(r) === JSON.stringify(d)),
+    );
+    for (const d of others) if (d.kind === 'pit') expect(d.fill).toBe('standard');
+    // The real call (VER's lap-36 in-lap) carries the real fill; another tyre fills standard.
+    const first = real[0] as Extract<Decision, { kind: 'pit' }>;
+    expect(boxCall(refuelRace, 36, first.compound)).toEqual(first);
+    const other = Object.keys(refuelRace.compounds).find((c) => c !== first.compound) as string;
+    expect(boxCall(refuelRace, 36, other)).toMatchObject({ fill: 'standard' });
+    expect(boxCall(abu, 36, 'SOFT')).toEqual({ lap: 36, kind: 'pit', compound: 'SOFT' });
+    // The moments grade (no option throws for want of a fill).
+    const m = moments.find((x) => x.options.some((o) => o.decisions.some((d) => d.kind === 'pit')));
+    expect(m).toBeDefined();
+    const g = gradeMoment(
+      pauseAt(refuelRace, (m as DecisionMoment).lap),
+      (m as DecisionMoment).options,
+      (m as DecisionMoment).target,
+      4,
+    );
+    expect(g.options).toHaveLength((m as DecisionMoment).options.length);
   });
 
   it("the grader's playouts keep the tank but never stop the car dry", () => {

@@ -13,6 +13,7 @@ import {
   type RaceModel,
   type RaceState,
   type ResolvedRules,
+  checkFill,
   hasMove,
   isWetTyre,
   modeEffects,
@@ -110,8 +111,8 @@ export function pitCompoundFor(model: RaceModel, wanted: Compound): Compound {
 
 /**
  * Why the sim would reject a call the screen is about to make, or null if it's legal under
- * the race's rules: a battle move the race doesn't have, an ERS mode without a battery, or a
- * stop onto a tyre it can't fit. Every offer is checked here before it reaches the sim.
+ * the race's rules: a battle move the race doesn't have, an ERS mode without a battery, a
+ * stop onto a tyre it can't fit, or a stop without its fuel fill in a refuelling race. Every offer is checked here before it reaches the sim.
  */
 export function callBlocked(model: RaceModel, d: Decision): string | null {
   if (d.kind === 'battle' && !moveAllowed(model, d.move)) return `no ${d.move} in this race`;
@@ -120,6 +121,17 @@ export function callBlocked(model: RaceModel, d: Decision): string | null {
   }
   if (d.kind === 'pit' && !pitCompoundAllowed(model, d.compound)) {
     return `no tyre changes in this race: ${d.compound}`;
+  }
+  // A refuelling race: every stop states its fill (the sim's checkFill; no default).
+  if (d.kind === 'pit') {
+    if (raceScreenEra(model).rules.refuelling && d.fill === undefined) {
+      return 'pick a fuel fill first';
+    }
+    try {
+      checkFill(model, d.fill);
+    } catch {
+      return 'that fuel fill';
+    }
   }
   return null;
 }

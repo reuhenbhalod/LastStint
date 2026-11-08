@@ -40,7 +40,7 @@ All calls go through `decide(run, call)`.
 
 | Call | Shape | Effect |
 |---|---|---|
-| Pit | `{ lap, kind: 'pit', compound }` | Box at the end of `lap`. The stop is charged on `lap + 1`, the out-lap. `compound` is a key of `model.compounds`. |
+| Pit | `{ lap, kind: 'pit', compound, fill? }` | Box at the end of `lap`. The stop is charged on `lap + 1`, the out-lap. `compound` is a key of `model.compounds`. `fill`: required in a refuelling race (`rules.refuelling`) and refused in any other: `'short'`, `'standard'`, `'long'` or `{ laps: n }` (docs/fuel-load-spec.md). |
 | Headset mode | `{ lap, kind: 'mode', key, value }` | Standing mode from `lap` on (green laps only). `key`: `pace` (`push` / `standard` / `manage`), `fuel` (`normal` / `liftAndCoast`), `battle` (`attack` / `hold` / `defend`), `ers` (`harvest` / `balanced` / `deploy` / `overtake`). |
 | Team order | `{ lap, kind: 'teamOrder', order }` | `letTeammatePast` or `teammateLetsYouPast`: the yielding car lifts if it starts a green lap directly ahead within 1s (open for 3 laps). `holdUp` / `release`: the teammate defends against the rival while directly ahead of it. Requires a teammate (`teammateOf(model)`). |
 | Radio answer | `{ lap, kind: 'radio', momentId, optionId }` | Records the option chosen at a moment; `answerMoment()` logs it with the option's calls. Every moment needs exactly one. |
@@ -81,7 +81,7 @@ Other useful parts of the model:
 
 - **Race-level:** `race` (`id`, `name`, `laps`, `takeoverLap`, `seed`), `userSide`, `rival`, `drivers`, `events`, `compounds`.
 - **Real result:** `realResult`.
-- **The real team's calls:** `realDecisions(model)`.
+- **The real team's calls:** `realDecisions(model)`. In a refuelling race each carries the real fill, `{ laps: n }` (the next real stint).
 
 ## Decision moments
 

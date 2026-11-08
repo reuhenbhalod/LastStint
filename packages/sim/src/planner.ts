@@ -7,10 +7,12 @@
 // Era rules (rules.ts): every plan is one the player could call. With no tyre changes (2005) a
 // stop names only the set the car is on or a wet tyre (illegalPitCompound), and a dry stop
 // keeps its set (it only refuels), so the next stint goes on with the same tyres. A race with a
-// minimum of stops (rules.minStops) offers only plans that reach it.
+// minimum of stops (rules.minStops) offers only plans that reach it. A refuelling race's plans
+// state each stop's fill (required there): exactly to the plan's next stop or the flag.
 
 import type { GradeOption, Target } from './grade.js';
 import { MIN_STINT, planCalls, stintStarts } from './plan.js';
+import { refuelling } from './refuel.js';
 import { illegalPitCompound, minStopsRule, stopChangesTyres, stopsOwed } from './rules.js';
 import {
   DRY_COMPOUNDS,
@@ -323,7 +325,20 @@ export function enginePlans(run: Run): RacePlan[] {
         a.plan.stops.length - b.plan.stops.length ||
         (a.plan.stops[0]?.lap ?? 0) - (b.plan.stops[0]?.lap ?? 0),
     )
-    .map((p, i) => ({ id: ids[i] as PlanId, ...p.plan }));
+    .map((p, i) => ({ id: ids[i] as PlanId, ...p.plan, stops: fuelled(model, p.plan.stops) }));
+}
+
+/**
+ * A refuelling race: each planned stop fills exactly to the plan's next stop or the flag
+ * (refuel.ts: `{ laps }` from the out-lap, the reserve on top), as a team planning those stops
+ * would. Any other race: the stops as they are.
+ */
+export function fuelled(model: RaceModel, stops: RacePlan['stops']): RacePlan['stops'] {
+  if (!refuelling(model)) return stops;
+  return stops.map((s, i) => ({
+    ...s,
+    fill: { laps: (stops[i + 1]?.lap ?? model.race.laps) - s.lap },
+  }));
 }
 
 /** A plan as a grading option: its own calls, played to the flag with nothing added. */

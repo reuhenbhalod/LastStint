@@ -162,6 +162,15 @@ def fill_stint(choice: str, remaining: int, tank_laps: float) -> int:
     return math.ceil(r / (n + 1))
 
 
+def fill_laps(fill, remaining: int, tank_laps: float) -> int:
+    """The laps a stop's fill fuels from the out-lap (refuel.ts fillLaps): a named choice by
+    fill_stint; an exact fill ({"laps": n}, what the real team's calls and the engineer's plans
+    carry) as it says, but never past the flag."""
+    if isinstance(fill, str):
+        return fill_stint(fill, remaining, tank_laps)
+    return min(max(0, remaining), int(fill["laps"]))
+
+
 def stint_to_next_stop(strategy: list[dict], out_lap: int, laps: int) -> int:
     """Laps from `out_lap` to the in-lap of the next stop in `strategy`, or to the flag."""
     nxt = laps + 1
@@ -194,7 +203,7 @@ def refuel_at_stop(model: dict, car, stop: dict, out_lap: int) -> float:
     rm = refuel_model(model)
     laps = int(model["race"]["laps"])
     if stop.get("fill"):
-        stint = fill_stint(stop["fill"], laps - out_lap + 1, rm["tankLaps"])
+        stint = fill_laps(stop["fill"], laps - out_lap + 1, rm["tankLaps"])
     else:
         stint = stint_to_next_stop(car.strategy, out_lap, laps)
     target = stint + RESERVE_LAPS

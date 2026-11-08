@@ -2,7 +2,9 @@
 // stop (short / standard / long) and the gauge of fuel to the next stop, in races whose rules
 // refuel (`rules.refuelling`). The reading comes from the sim's refuelling model (build plan
 // 4.2, packages/sim refuel.ts: `tankReading`, `fillOptions`), and the chosen fill rides on the
-// pit call (`Decision.fill`; TeamRadio). A race that doesn't refuel shows none of it.
+// pit call (`Decision.fill`; TeamRadio, QuickCallCard, PlanEditor). The fill is required: no
+// box call goes without one, and none is preselected (owner decision, Nov 7 2026). A race
+// that doesn't refuel shows none of it.
 
 import type { RaceModel, RaceState } from '@laststint/sim';
 import { RESERVE_LAPS, fillOptions, refuelModel, tankReading } from '@laststint/sim';

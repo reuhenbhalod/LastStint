@@ -29,10 +29,11 @@ import { legendEvents, legendLoss } from './legend.js';
 import { validatePlan } from './plan.js';
 import { type RedFlagPlan, lineUp, redFlagPlan } from './redflag.js';
 import {
-  FILL_CHOICES,
   burnTank,
+  checkFill,
   fuelLimit,
   initTanks,
+  realFill,
   refuelAtStop,
   refuelling,
   tankPlanDelta,
@@ -541,9 +542,7 @@ export function validateDecisions(model: RaceModel, decisions: Decision[]): void
       if (d.lap >= model.race.laps) throw new Error('no stop on the final lap');
       const illegal = illegalPitCompound(model, d.compound); // era rules (rules.ts)
       if (illegal) throw new Error(illegal);
-      if (d.fill !== undefined && (!refuelling(model) || !FILL_CHOICES.includes(d.fill))) {
-        throw new Error(`no fill ${d.fill} in this race`); // refuel.ts
-      }
+      checkFill(model, d.fill); // refuel.ts
     } else if (d.kind === 'mode') {
       if (!headset?.modes[d.key]?.[d.value]) throw new Error(`unknown mode ${d.key}=${d.value}`);
     } else if (d.kind === 'teamOrder') {
@@ -574,10 +573,19 @@ export function teammateOf(model: RaceModel): string | undefined {
   return model.drivers.find((d) => d.team === team && d.code !== model.userSide)?.code;
 }
 
-/** The user's real calls as pit decisions (in-lap = real out-lap - 1), for comparison. */
+/**
+ * The user's real calls as pit decisions (in-lap = real out-lap - 1), for comparison. In a
+ * refuelling race each carries the real fill (refuel.ts realFill: the next real stint).
+ */
 export function realDecisions(model: RaceModel): Decision[] {
   const user = model.drivers.find((d) => d.code === model.userSide);
-  return (user?.realStrategy ?? []).map((s) => ({ lap: s.lap - 1, kind: 'pit', compound: s.to }));
+  const fuel = refuelling(model);
+  return (user?.realStrategy ?? []).map((s) => ({
+    lap: s.lap - 1,
+    kind: 'pit',
+    compound: s.to,
+    ...(fuel ? { fill: realFill(model, model.userSide, s.lap) } : {}),
+  }));
 }
 
 const FLAG_OF = { SC: 'sc', VSC: 'vsc', RED: 'red' } as const;
@@ -973,7 +981,8 @@ function applyDecisions(run: Run, lap: number): void {
     } else if (d.kind === 'pit') {
       user.strategy = user.strategy.filter((s) => s.lap !== lap + 1);
       const stop = playerStop(run, lap + 1, d.compound);
-      user.strategy.push(refuelling(run.model) ? { ...stop, fill: d.fill ?? 'standard' } : stop);
+      // A refuelling race's call always carries its fill (validateDecisions).
+      user.strategy.push(d.fill !== undefined ? { ...stop, fill: d.fill } : stop);
     } else if (d.kind === 'teamOrder') {
       const orders = run.state.teamOrders;
       if (d.order === 'holdUp') orders.holdUp = true;

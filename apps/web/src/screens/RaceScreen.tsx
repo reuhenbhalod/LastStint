@@ -60,6 +60,7 @@ import { setTimerOn, timerOn } from '../eras/difficulty/settings.js';
 import { takeDefault } from '../eras/difficulty/timeout.js';
 import { attemptUntimed, noteDecisionShown } from '../eras/difficulty/untimed.js';
 import { raceScreenEra } from '../eras/raceRules.js';
+import { type FuelFill, refuelReading } from '../eras/refuel.js';
 import {
   BATTLE_MS,
   CALL_MS,
@@ -494,13 +495,15 @@ function RaceScreenBody({
     [boxLap, state.race.lap],
   );
   const answerQuick = useCallback(
-    (id: string) => {
+    (id: string, fill?: FuelFill) => {
       const o = quick?.options.find((x) => x.id === id);
       // A stop the wall picks in answer to a question is made (the driver doesn't argue it).
       const asked = (quick?.asked ?? true) || o?.call?.kind === 'pit';
-      if (o?.call) game.call(place(o.call), { asked });
+      // A refuelling race: the fill the player picked on the card goes on the stop.
+      const fuelled = (c: Decision): Decision => (c.kind === 'pit' && fill ? { ...c, fill } : c);
+      if (o?.call) game.call(place(fuelled(o.call)), { asked });
       else game.radio('Copy. No change.');
-      for (const c of o?.also ?? []) game.call(place(c), { asked: true });
+      for (const c of o?.also ?? []) game.call(place(fuelled(c)), { asked: true });
       setQuick(null);
       setPace('normal');
     },
@@ -833,6 +836,7 @@ function RaceScreenBody({
       onAnswer={answerQuick}
       onTimeout={quickTimeout}
       eras={erasTimer(`quick-${quick.lap}`, quickTimeout)}
+      fuel={refuelReading(state.race, model)}
     />
   ) : finishing && crossed ? (
     <output className="flex items-center justify-center gap-3 bg-[#F4F6F5] px-5 py-3 text-[#0B0E0D]">

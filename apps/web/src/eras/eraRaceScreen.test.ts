@@ -7,6 +7,7 @@
 import {
   type Decision,
   type Era,
+  type PlanStop,
   type RaceModel,
   type RaceRules,
   type RaceState,
@@ -27,6 +28,7 @@ import { TyreBadge } from '../components/TyreBadge.js';
 import type { Daily } from '../data/types.js';
 import type { Grader } from '../engine/grading.js';
 import { directorCall, newMemory } from '../game/engineerCalls.js';
+import { fillsMissing } from '../game/plans.js';
 import { type QuickCall, safetyCarCall } from '../game/quickCalls.js';
 import type { Game } from '../game/useGame.js';
 import { RaceScreen } from '../screens/RaceScreen.js';
@@ -35,7 +37,7 @@ import { RaceEraContext, TODAY_LOOK } from './RaceEraContext.js';
 import { FuelFillChoice, FuelGauge } from './RefuelControls.js';
 import { memoryStorage } from './difficulty/memoryStorage.test-util.js';
 import { closedPitCost, raceScreenEra } from './raceRules.js';
-import type { RefuelReading } from './refuel.js';
+import { type RefuelReading, refuelReading } from './refuel.js';
 
 const abu = abuJson as unknown as RaceModel;
 const RULES_2005 = japan2005.rules as RaceRules;
@@ -138,7 +140,10 @@ describe('a 2005-tagged race', () => {
       const call = directorCall(race, MODEL_2005, cfg, [], s.notes, [1], mem, race.lap % 2 === 0);
       if (call) {
         if (call.kind === 'battle') battles++;
-        for (const d of callsOf(call)) {
+        // A refuelling race: a box offer goes with the fill the player picks on the card.
+        const fuelled = (d: Decision): Decision =>
+          d.kind === 'pit' ? { ...d, fill: d.fill ?? 'standard' } : d;
+        for (const d of callsOf(call).map(fuelled)) {
           offered++;
           expect(d.kind === 'battle' && ['wait-drs', 'overtake-button'].includes(d.move)).toBe(
             false,
@@ -149,7 +154,9 @@ describe('a 2005-tagged race', () => {
           expect(JSON.stringify(call)).not.toContain('DRS');
         }
         const first = call.options[0]?.call;
-        if (first) expect(() => s.call(first, { asked: true, quiet: true })).not.toThrow();
+        if (first) {
+          expect(() => s.call(fuelled(first), { asked: true, quiet: true })).not.toThrow();
+        }
       }
       expect(() => s.tick()).not.toThrow();
     }
@@ -312,9 +319,11 @@ describe('the 2005 tyre lock', () => {
     const s = session(MODEL_2005);
     const lap = s.state.race.lap + 1;
     const other = Object.keys(MODEL_2005.compounds).find((c) => c !== locked) as string;
-    expect(() => s.call({ lap, kind: 'pit', compound: other }, { asked: true })).not.toThrow();
+    // 2005 refuels: the call states its fill (owner decision, Nov 7 2026).
+    const call: Decision = { lap, kind: 'pit', compound: other, fill: 'standard' };
+    expect(() => s.call(call, { asked: true })).not.toThrow();
     const pit = s.state.decisions.find((d) => d.kind === 'pit' && d.lap === lap);
-    expect(pit).toMatchObject({ kind: 'pit', compound: locked });
+    expect(pit).toMatchObject({ kind: 'pit', compound: locked, fill: 'standard' });
   });
 
   it('lets the plan editor pick only the locked set', () => {
@@ -454,6 +463,14 @@ describe('the refuelling controls', () => {
     expect(html).toMatch(/aria-pressed="true"[^>]*><span>Standard/);
   });
 
+  it('presses nothing until a fill is picked (no preselection)', () => {
+    const html = renderToStaticMarkup(
+      createElement(FuelFillChoice, { reading, value: null, disabled: false, onPick: () => {} }),
+    );
+    expect(html).toContain('aria-label="Fuel fill"');
+    expect(html).not.toContain('aria-pressed="true"');
+  });
+
   it('draws nothing without fills', () => {
     const html = renderToStaticMarkup(
       createElement(FuelFillChoice, {
@@ -482,6 +499,141 @@ describe('the refuelling controls', () => {
     const race = session(abu).state.race;
     expect(teamRadio(race, refuels)).toBe(teamRadio(race, abu));
     expect(teamRadio(race, refuels)).not.toContain('Fuel fill');
+  });
+});
+
+// A refuelling race (owner decision, Nov 7 2026): every box call states its fill, and the
+// screen sends none without one: the team radio's pit card, the quick calls, the plans.
+describe('the fill is required in a refuelling race', () => {
+  const REFUEL = tagged('1994-2009', { refuelling: true });
+  const tyreButtons = (html: string) =>
+    [...html.matchAll(/<button type="button"( disabled="")?[^>]*bg-\[var\(--box\)\][^>]*>/g)].map(
+      (m) => m[1] !== undefined,
+    );
+
+  it('the pit card picks no fill, and its tyres wait for one', () => {
+    const s = session(REFUEL);
+    const html = teamRadio(s.state.race, REFUEL);
+    expect(html).toContain('aria-label="Fuel fill"');
+    const fills = html.slice(html.indexOf('aria-label="Fuel fill"'));
+    expect(fills.slice(0, fills.indexOf('</fieldset>'))).not.toContain('aria-pressed="true"');
+    expect(html).toContain('Pick a fuel fill, then the tyres.');
+    const tyres = tyreButtons(html);
+    expect(tyres.length).toBeGreaterThan(0);
+    expect(tyres.every((disabled) => disabled)).toBe(true);
+    // Today's race: no fill, and the tyres are live.
+    const today = teamRadio(session(abu).state.race, abu);
+    expect(today).not.toContain('Fuel fill');
+    expect(tyreButtons(today).some((disabled) => disabled)).toBe(false);
+  });
+
+  it('a box call without a fill is not sent: the wall says so; with one it is booked', () => {
+    const s = session(REFUEL);
+    const lap = s.state.race.lap + 1;
+    const compound = Object.keys(REFUEL.compounds).find((c) => c !== 'WET') as string;
+    s.call({ lap, kind: 'pit', compound }, { asked: true });
+    expect(s.state.decisions.some((d) => d.kind === 'pit')).toBe(false);
+    expect(s.state.radio.at(-1)?.text).toBe('We can’t make that call: pick a fuel fill first.');
+    s.call({ lap, kind: 'pit', compound, fill: 'short' }, { asked: true });
+    expect(s.state.decisions.find((d) => d.kind === 'pit')).toMatchObject({ fill: 'short' });
+  });
+
+  it("the engineer's plans come with their fills, so picking one runs", () => {
+    const s = session(REFUEL);
+    const stops = s.state.plan.offered.flatMap((p) => p.stops);
+    expect(stops.length).toBeGreaterThan(0);
+    for (const stop of stops) expect(stop.fill).toEqual({ laps: expect.any(Number) });
+    expect(s.state.plan.picked).not.toBeNull();
+  });
+
+  it('a quick call that boxes waits for a fill; staying out does not', () => {
+    const s = session(REFUEL);
+    const lap = s.state.race.lap;
+    const compound = Object.keys(REFUEL.compounds)[0] as string;
+    const call: QuickCall = {
+      lap,
+      from: 'Engineer',
+      text: 'Safety car! Box, or stay out?',
+      options: [
+        { id: 'box', label: 'Box', call: { lap: lap + 1, kind: 'pit', compound } },
+        { id: 'stay', label: 'Stay out', call: null },
+      ],
+    };
+    const fuel = refuelReading(s.state.race, REFUEL);
+    expect(fuel).not.toBeNull();
+    const card = (f: RefuelReading | null) =>
+      renderToStaticMarkup(
+        createElement(QuickCallCard, {
+          call,
+          ms: 8000,
+          onAnswer: () => {},
+          onTimeout: () => {},
+          fuel: f,
+        }),
+      );
+    const html = card(fuel);
+    expect(html).toContain('aria-label="Fuel fill"');
+    expect(html).not.toMatch(/aria-label="Fuel fill"[\s\S]*aria-pressed="true"[\s\S]*<\/fieldset>/);
+    const opts = [
+      ...html.matchAll(/<button type="button"( disabled="")?[^>]*class="call-opt[^"]*"/g),
+    ];
+    expect(opts.map((m) => m[1] !== undefined)).toEqual([true, false]);
+    // No refuelling: the card as before.
+    expect(card(null)).not.toContain('Fuel fill');
+    expect(card(null)).not.toContain('disabled');
+  });
+
+  it('the plan editor asks each stop its fill, none picked, and the plan waits for it', () => {
+    const editor = (stops: PlanStop[]) =>
+      renderToStaticMarkup(
+        createElement(PlanEditor, {
+          model: REFUEL,
+          from: 34,
+          car: { compound: 'MEDIUM', compoundsUsed: ['MEDIUM'] },
+          value: {
+            id: 'own',
+            stops,
+            pace: stops.map(() => 'standard' as const).concat('standard'),
+          },
+          onChange: () => {},
+          chance: 0.5,
+        }),
+      );
+    const bare = editor([{ lap: 40, compound: 'HARD' }]);
+    expect(bare).toContain('aria-label="Stop 1 fuel fill"');
+    const group = bare.slice(bare.indexOf('aria-label="Stop 1 fuel fill"'));
+    expect(group.slice(0, group.indexOf('</fieldset>'))).not.toContain('aria-pressed="true"');
+    expect(bare).toContain('Pick a fuel fill for every stop.');
+    expect(bare).not.toContain('Chance vs');
+    const picked = editor([{ lap: 40, compound: 'HARD', fill: 'long' }]);
+    expect(picked).not.toContain('Pick a fuel fill');
+    expect(picked).toContain('Chance vs');
+    // An engineer's plan's exact fill shows as its laps.
+    expect(editor([{ lap: 40, compound: 'HARD', fill: { laps: 18 } }])).toMatch(
+      /Fuel <span[^>]*>18</,
+    );
+    // Today's race asks no fill.
+    expect(
+      renderToStaticMarkup(
+        createElement(PlanEditor, {
+          model: abu,
+          from: 34,
+          car: { compound: 'MEDIUM', compoundsUsed: ['MEDIUM'] },
+          value: {
+            id: 'own',
+            stops: [{ lap: 40, compound: 'HARD' }],
+            pace: ['standard', 'standard'],
+          },
+          onChange: () => {},
+        }),
+      ),
+    ).not.toContain('fuel fill');
+    expect(
+      fillsMissing(REFUEL, { id: 'own', stops: [{ lap: 40, compound: 'HARD' }], pace: [] }),
+    ).toBe(true);
+    expect(fillsMissing(abu, { id: 'own', stops: [{ lap: 40, compound: 'HARD' }], pace: [] })).toBe(
+      false,
+    );
   });
 });
 

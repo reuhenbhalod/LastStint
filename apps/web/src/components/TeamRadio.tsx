@@ -5,7 +5,8 @@
 // and the driver may refuse a pit or headset call (game/refusal.ts). By the race's rules
 // (eras build plan 8.5, eras/raceRules.ts): no ERS without a battery, only the tyres a stop
 // may fit (the 2005 lock), the pit-lane-closed notice and stop-go cost under a 2007-08 SC,
-// and the fuel fill in a refuelling race.
+// and the fuel fill in a refuelling race: required there (no fill is preselected, and the
+// tyre buttons wait until one is picked; owner decision, Nov 7 2026).
 
 import type { Decision, Modes, RaceModel, RaceState, TeamOrder } from '@laststint/sim';
 import { isWetTyre, teammateOf } from '@laststint/sim';
@@ -70,12 +71,16 @@ export function TeamRadio({
   const mateCar = mate ? race.cars[mate] : undefined;
   const orders = race.teamOrders;
   const order = (o: TeamOrder) => onCall({ lap: next, kind: 'teamOrder', order: o });
-  const [fill, setFill] = useState<FuelFill>('standard');
+  // No preselection: a refuelling race's box call waits for the player's fill.
+  const [fill, setFill] = useState<FuelFill | null>(null);
   if (!me) return null;
   const era = raceScreenEra(model);
   const tyresOffered = pitCompounds(model);
   const closed = tyresOffered.some((c) => pitLaneClosedNow(race, model, c));
   const fuel = refuelReading(race, model);
+  // A refuelling race: the box call needs a fill (the sim refuses one without; with no
+  // reading to pick from, the wall says so: callBlocked).
+  const noFill = !!fuel && !fill;
 
   const btn =
     'rounded-lg px-2 py-1.5 text-[13px] font-semibold disabled:opacity-40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--you)]';
@@ -130,20 +135,21 @@ export function TeamRadio({
                         <button
                           key={c}
                           type="button"
-                          disabled={disabled || me.retired}
+                          disabled={disabled || me.retired || noFill}
                           title={
                             stopGo
                               ? `Pit lane closed: stop-go, +${Math.round(closedPitCost(model))}s`
                               : undefined
                           }
-                          onClick={() =>
+                          onClick={() => {
                             onCall({
                               lap: next,
                               kind: 'pit',
                               compound: c,
-                              ...(fuel ? { fill } : {}),
-                            })
-                          }
+                              ...(fuel && fill ? { fill } : {}),
+                            });
+                            setFill(null); // the next stop's fill is picked afresh
+                          }}
                           className={`${btn} flex items-center justify-center gap-1 whitespace-nowrap !px-1 !text-[12px] bg-[var(--box)] text-white hover:brightness-110`}
                         >
                           {era.tyres === 'single-dry' && !isWetTyre(c) ? (
@@ -170,6 +176,11 @@ export function TeamRadio({
                       disabled={disabled || me.retired}
                       onPick={setFill}
                     />
+                  )}
+                  {noFill && (
+                    <p className="m-0 text-[12px] text-[var(--muted)]">
+                      Pick a fuel fill, then the tyres.
+                    </p>
                   )}
                 </>
               )}
