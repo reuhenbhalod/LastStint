@@ -157,11 +157,21 @@ interface IncidentRates {
   scShare: number;
 }
 
+/**
+ * One era's block in headset.json (eras build plan 1.2: one for each schema era). Rule
+ * switches by era (roadmap R5): `drs` false drops the `wait-drs` move; an era without `ers`
+ * has no battery, so no `ers` modes and no `overtake-button`.
+ */
 interface HeadsetEra {
   baseErrorRate: number;
   errorCost: number;
-  modes: { [K in keyof Modes]: Record<string, ModeEffect> };
+  /** The `wait-drs` battle move exists (DRS, 2011-2025). Absent means true. */
+  drs?: boolean;
+  modes: { [K in Exclude<keyof Modes, 'ers'>]: Record<string, ModeEffect> } & {
+    ers?: Record<string, ModeEffect>;
+  };
   neutralization?: { scPerLap: number; vscPerLap: number; scLaps: number; vscLaps: number };
+  /** The battery (KERS / hybrid ERS); absent in eras without one. */
   ers?: { startBattery: number; scCharge: number };
   fuel?: FuelConfig;
   incidents?: IncidentRates;
@@ -450,12 +460,22 @@ export function validateDecisions(model: RaceModel, decisions: Decision[]): void
       d.kind === 'reply'
     ) {
       if (!headset?.engineer || !validEngineerCall(d)) throw new Error(`bad ${d.kind} call`);
+      if (d.kind === 'battle' && !eraHasMove(headset, d.move)) {
+        throw new Error(`no ${d.move} in the ${model.era} era`);
+      }
     } else if (d.kind === 'plan') {
       validatePlan(model, d, model.race.takeoverLap);
     } else if (d.kind !== 'radio') {
       throw new Error('unknown decision kind');
     }
   }
+}
+
+/** Roadmap R5: no `wait-drs` without DRS, no `overtake-button` without a battery. */
+function eraHasMove(headset: HeadsetEra, move: BattleMove): boolean {
+  if (move === 'wait-drs') return headset.drs !== false;
+  if (move === 'overtake-button') return !!headset.ers;
+  return true;
 }
 
 /** The user's teammate (same team), if one is in the race. */
