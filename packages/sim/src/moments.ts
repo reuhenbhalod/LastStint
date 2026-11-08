@@ -7,13 +7,24 @@
 // still picks the final 2-4 (plan 1.5); approved moments go in data/moments/<race>.json.
 
 import { type GradeOption, type MomentGrade, type Target, gradeMoment } from './grade.js';
-import { type Run, initRun, realDecisions, stepLap, tyreLife } from './sim.js';
-import type { Decision, RaceModel } from './types.js';
+import { type Run, cleanLap, initRun, realDecisions, stepLap, tyreLife } from './sim.js';
+import type { CarState, Decision, RaceModel } from './types.js';
 import { wetnessOn } from './weather.js';
 
 /** What brought a moment on (the race plan at takeover is the strategy planner's, not a
- * moment). `rain` / `drying`: the track turning wet or drying out (weather spec). */
-export type MomentTrigger = 'SC' | 'VSC' | 'rivalPit' | 'undercut' | 'cliff' | 'rain' | 'drying';
+ * moment). `rain` / `drying`: the track turning wet or drying out (weather spec). Red flags
+ * (eras build plan 4.3): `RED`, the tyres to fit in the stoppage for the restart (free);
+ * `preRed`, the lap before it, boxing now (paid) or staying out. */
+export type MomentTrigger =
+  | 'SC'
+  | 'VSC'
+  | 'RED'
+  | 'preRed'
+  | 'rivalPit'
+  | 'undercut'
+  | 'cliff'
+  | 'rain'
+  | 'drying';
 
 export interface MomentOption extends GradeOption {
   /** Short label for the UI; radio copy is written in Phase 5. */
@@ -51,6 +62,8 @@ const DEFAULT_TARGET: Target = { kind: 'beat-rival' };
 const MIN_SPACING = 3;
 /** Merge priority: the events that make a call unavoidable come first. */
 const PRIORITY: Record<MomentTrigger, number> = {
+  RED: -1,
+  preRed: -1,
   rain: 0,
   drying: 0,
   SC: 0,
@@ -80,13 +93,73 @@ function stayOut(): MomentOption {
   return { id: 'stay-out', label: 'Stay out', decisions: [] };
 }
 
-function boxOptions(model: RaceModel, lap: number): MomentOption[] {
-  return Object.keys(model.compounds).map((compound) => ({
+function boxOptions(
+  model: RaceModel,
+  lap: number,
+  compounds = Object.keys(model.compounds),
+  label = (tyre: string) => `Box for ${tyre}s`,
+): MomentOption[] {
+  return compounds.map((compound) => ({
     id: `box-${compound.toLowerCase()}`,
-    label: `Box for ${compound.toLowerCase()}s`,
+    label: label(compound.toLowerCase()),
     decisions: [{ lap, kind: 'pit', compound } as Decision],
   }));
 }
+
+/**
+ * The race's compounds for a red flag's calls: the ones the field really fitted around it
+ * (laps `from`..`to`, most fitted first: a wet restart's intermediates), then the rest
+ * quickest first on a new set on lap `to` + 1 for the user's car (the sim's lap model).
+ */
+function tyresFor(model: RaceModel, from: number, to: number): string[] {
+  const fitted = new Map<string, number>();
+  for (const d of model.drivers) {
+    for (const s of d.realStrategy) {
+      if (s.lap >= from && s.lap <= to) fitted.set(s.to, (fitted.get(s.to) ?? 0) + 1);
+    }
+  }
+  const user = model.drivers.find((d) => d.code === model.userSide);
+  const pace = (compound: string) =>
+    cleanLap(
+      model,
+      {
+        basePace: user?.basePace ?? 0,
+        compound,
+        tyreWear: 0,
+        tyreAge: 1,
+        ...(user?.wetPace ? { wetPace: user.wetPace } : {}),
+      } as CarState,
+      to + 1,
+    );
+  return Object.keys(model.compounds).sort(
+    (a, b) => (fitted.get(b) ?? 0) - (fitted.get(a) ?? 0) || pace(a) - pace(b),
+  );
+}
+
+/**
+ * Red flags (eras build plan 4.3). `RED` on the red flag's first lap: boxing then is the tyre
+ * change in the stoppage, free (redflag.ts), so the call is which tyre to restart on. `preRed`
+ * the lap before: box now and pay for it, or stay out (the stop the red flag would give free).
+ */
+function redFlagMoments(model: RaceModel): Found[] {
+  const out: Found[] = [];
+  for (const e of model.events) {
+    if (e.type !== 'RED' || !e.restart) continue;
+    const tyres = tyresFor(model, e.lap - 1, e.lap + (e.laps ?? 1) - 1);
+    out.push({ lap: e.lap, trigger: 'RED', tyres });
+    out.push({ lap: e.lap - 1, trigger: 'preRed', tyres });
+  }
+  return out;
+}
+
+/** A candidate moment: its lap, trigger and (red flags) the tyres to offer, in order. */
+interface Found {
+  lap: number;
+  trigger: MomentTrigger;
+  tyres?: string[];
+}
+
+const RED_TRIGGERS: ReadonlySet<MomentTrigger> = new Set(['RED', 'preRed']);
 
 function modeOption(lap: number, value: 'push' | 'manage'): MomentOption {
   return {
@@ -111,7 +184,7 @@ function realOptionId(model: RaceModel, lap: number, options: MomentOption[]): s
 export function candidateMoments(model: RaceModel, target = DEFAULT_TARGET): DecisionMoment[] {
   const first = model.race.takeoverLap + 1;
   const last = model.race.laps - 1;
-  const found: Array<{ lap: number; trigger: MomentTrigger }> = [];
+  const found: Found[] = [...redFlagMoments(model)];
 
   for (const e of model.events) {
     if ((e.type === 'SC' || e.type === 'VSC') && e.lap >= first) {
@@ -150,18 +223,27 @@ export function candidateMoments(model: RaceModel, target = DEFAULT_TARGET): Dec
   }
 
   const moments: DecisionMoment[] = [];
-  for (const { lap, trigger } of found
+  for (const { lap, trigger, tyres } of found
     .filter((f) => f.lap >= first && f.lap <= last)
     .sort((a, b) => PRIORITY[a.trigger] - PRIORITY[b.trigger] || a.lap - b.lap)) {
-    if (moments.some((m) => Math.abs(m.lap - lap) < MIN_SPACING)) continue;
-    const box = boxOptions(model, lap);
+    // The two red-flag calls are different calls a lap apart: both are kept.
+    const near = (m: DecisionMoment) =>
+      Math.abs(m.lap - lap) < MIN_SPACING &&
+      !(RED_TRIGGERS.has(m.trigger) && RED_TRIGGERS.has(trigger));
+    if (moments.some(near)) continue;
+    const red = RED_TRIGGERS.has(trigger);
+    const box =
+      trigger === 'RED'
+        ? boxOptions(model, lap, tyres, (t) => `Fit ${t}s in the stoppage`)
+        : boxOptions(model, lap, tyres);
     const extra =
       trigger === 'cliff'
         ? modeOption(lap, 'manage')
-        : trigger === 'SC' || trigger === 'VSC'
+        : trigger === 'SC' || trigger === 'VSC' || red
           ? null
           : modeOption(lap, 'push');
-    const options = [stayOut(), ...box.slice(0, extra ? 2 : 3), ...(extra ? [extra] : [])];
+    const stay = trigger === 'RED' ? { ...stayOut(), label: 'Keep this set' } : stayOut();
+    const options = [stay, ...box.slice(0, extra ? 2 : 3), ...(extra ? [extra] : [])];
     moments.push({
       id: `${trigger.toLowerCase()}-${lap}`,
       lap,

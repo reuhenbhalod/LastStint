@@ -100,6 +100,8 @@ export interface RaceEvent {
   type: 'SC' | 'VSC' | 'RED' | 'RAIN' | 'RETIREMENT';
   laps?: number;
   driver?: string;
+  /** A RED event: how the race resumed (eras build plan 4.3, redflag.ts). Absent: it didn't. */
+  restart?: 'standing' | 'rolling';
   /** Defines the storyline: Legend difficulty always runs it on its real lap (eras spec 8). */
   storylineEvent?: boolean;
 }

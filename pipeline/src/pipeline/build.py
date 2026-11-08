@@ -11,7 +11,7 @@ from dataclasses import dataclass, field
 
 import pandas as pd
 
-from . import assemble, clean, events, fit, ingest, scenario, track, wet
+from . import assemble, clean, events, fit, ingest, redflag, scenario, track, wet
 from . import pace as pace_mod
 
 # Race registry: metadata that isn't derivable from the timing data. `split` is the Phase
@@ -834,6 +834,10 @@ def build_race(race_id: str, laps: pd.DataFrame | None = None) -> BuildResult:
     if laps is None:
         laps = pd.read_parquet(ingest.raw_snapshot_path(race_id))
     meta = resolved_meta(race_id, laps)
+    # Red flags (eras build plan 4.3): a hand-entered file marks the red laps a source without
+    # red-flag timing (TUM, Jolpica) can't show.
+    red_flags = redflag.load_entries(race_id)
+    laps = redflag.mark_hand_entries(laps, red_flags)
 
     dry = dry_fit(race_id, laps, meta["era"])
     clean_df, traffic_df, fitted = dry.clean, dry.traffic, dry.fitted
@@ -869,6 +873,8 @@ def build_race(race_id: str, laps: pd.DataFrame | None = None) -> BuildResult:
         sc_unlap=meta.get("sc_unlap"),
         weather=weather,
         wet_pace=wet_pace,
+        year=meta["year"],
+        red_flags=red_flags,
     )
     return BuildResult(model=model, laps=laps, notes=[*fitted.prior_notes, *params.notes])
 

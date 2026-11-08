@@ -14,6 +14,7 @@ import json
 import math
 from dataclasses import dataclass, field
 
+from . import redflag
 from .paths import GOLDEN_DIR
 from .rng import Mulberry32, derive_seed
 
@@ -213,6 +214,7 @@ def simulate(
                 neutral[lap] = e["type"]
         elif e["type"] == "RETIREMENT":
             retire_at.setdefault(e["lap"], set()).add(e["driver"])
+    red = redflag.plan(model["events"])  # free stops in the stoppage, gaps wiped at restart
 
     ordered = sorted(model["drivers"], key=lambda d: d["stateAtTakeover"]["position"])
     cars: dict[str, Car] = {}
@@ -260,7 +262,7 @@ def simulate(
                 car.tyre_age = 0
                 car.tyre_wear = 0.0
                 default = {"SC": pit_loss_sc, "VSC": pit_loss_vsc}.get(flag, pit_loss)
-                pit_cost = pit.get("loss", default)
+                pit_cost = 0.0 if lap in red["free"] else pit.get("loss", default)
 
             if flag == "SC" and sc_time:
                 lt = sc_time
@@ -310,6 +312,9 @@ def simulate(
                 order[:] = live + [c for c in order if cars[c].retired]
         else:
             _resolve_order(order, cars, clean, pass_rngs, overtake, prev_time, pitted, recent, lap)
+        wipe = red["wipes"].get(lap)
+        if wipe and neutral.get(wipe[1]) == "RED":
+            redflag.line_up(active_codes(), cars, wipe[0])
 
     return _classify(order, cars)
 

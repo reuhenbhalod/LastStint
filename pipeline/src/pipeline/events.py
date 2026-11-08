@@ -158,6 +158,10 @@ def retirement_events(laps: pd.DataFrame, total_laps: int | None = None) -> list
 
 
 def extract_events(laps: pd.DataFrame, total_laps: int | None = None) -> list[dict]:
-    """All frozen events (neutralizations + retirements), sorted by lap."""
-    events = neutralization_events(laps) + retirement_events(laps, total_laps)
+    """All frozen events (neutralizations + retirements), sorted by lap. A red flag runs to
+    the lap holding its stoppage, and the safety-car laps of its resumption follow it as an SC
+    event (redflag.refine_events; its `restart` is added at assembly)."""
+    from .redflag import refine_events
+
+    events = refine_events(laps, neutralization_events(laps)) + retirement_events(laps, total_laps)
     return sorted(events, key=lambda e: (e["lap"], e["type"]))

@@ -25,6 +25,7 @@ import {
 import type { RivalPolicy } from './eras/config.js';
 import headsetConfig from './headset.json';
 import { validatePlan } from './plan.js';
+import { type RedFlagPlan, lineUp, redFlagPlan } from './redflag.js';
 import { resolveRivalPolicy } from './rivals/policy.js';
 import { type Rng, deriveSeed, mulberry32 } from './rng.js';
 import type {
@@ -267,6 +268,8 @@ export interface Run {
   scratch: { prevTime: Record<string, number>; clean: Record<string, number>; pitted: Set<string> };
   /** Neutralizations (start lap, length, flag): the real ones, or a grader fork's view. */
   events: NeutralEvent[];
+  /** Red flags: free stops in the stoppage, gaps wiped at the restart (redflag.ts). */
+  red: RedFlagPlan;
   /** Neutralization flag per lap, and retirements per lap, precomputed from events. */
   neutral: Map<number, Exclude<FlagState, 'green'>>;
   retireAt: Map<number, string[]>;
@@ -574,6 +577,7 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
     },
     events,
     neutral: neutralMap(events),
+    red: redFlagPlan(model.events),
     retireAt,
   };
   // The fuel load: what the flag needs at the standard burn, plus the race's margin.
@@ -587,6 +591,11 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
   }
   markNextFlag(run);
   return run;
+}
+
+/** A stop with its out-lap on `lap` is the tyre change in a red flag's stoppage: free. */
+export function redFlagFree(run: Run, lap: number): boolean {
+  return run.red.free.has(lap) && run.neutral.get(lap) === 'red';
 }
 
 /** Set the flag the next lap will run under, from the neutralizations known so far. */
@@ -1093,8 +1102,9 @@ function predictedRemaining(
       wear = 0;
       age = 0;
       const { track } = model;
-      total +=
-        flag === 'sc'
+      total += redFlagFree(run, lap)
+        ? 0
+        : flag === 'sc'
           ? track.pitLossUnderSC
           : flag === 'vsc'
             ? track.pitLossUnderVSC
@@ -1262,7 +1272,9 @@ export function stepLap(run: Run): RaceState {
       if (!c.compoundsUsed.includes(stop.to)) c.compoundsUsed.push(stop.to);
       c.tyreAge = 0;
       c.tyreWear = 0;
-      pitCost = stop.loss ?? stopCost(run, code, flag, stop.added === true, lap);
+      pitCost = redFlagFree(run, lap)
+        ? 0
+        : (stop.loss ?? stopCost(run, code, flag, stop.added === true, lap));
       const eng = code === model.userSide ? state.engineer : undefined;
       if (eng && eng.damage > 0) {
         // A new nose on the stop: slower than a tyre change alone.
@@ -1354,6 +1366,8 @@ export function stepLap(run: Run): RaceState {
     resolveOrder(run, lap, clean, prevTime, pitted);
     applySwap(run, lap, prevTime);
   }
+  const wipe = run.red.wipes.get(lap);
+  if (wipe && run.neutral.get(wipe.redLap) === 'red') lineUp(live(run), cars, wipe.gap);
   if (state.engineer) engineerAfterLap(run, lap, battle, prevTime, pitted);
   rivalReacts(run, lap, flag, prevTime);
   rivalGoesLong(run, lap);

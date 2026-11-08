@@ -22,6 +22,7 @@ export {
   planRemainingStop,
   realDecisions,
   readMove,
+  redFlagFree,
   rivalCover,
   ruleSatisfied,
   tyreLife,
@@ -113,3 +114,5 @@ export {
   wetnessOn,
 } from './weather.js';
 export * from './eras/config.js';
+export { RESTART_QUEUE_GAP, STANDING_RESTART_GAP, redFlagPlan } from './redflag.js';
+export type { RedFlagPlan } from './redflag.js';

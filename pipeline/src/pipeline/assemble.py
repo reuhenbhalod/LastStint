@@ -14,6 +14,7 @@ import pandas as pd
 from . import SCHEMA_VERSION
 from . import events as events_mod
 from . import pace as pace_mod
+from . import redflag as redflag_mod
 from . import scenario as scenario_mod
 from . import track as track_mod
 from .fit import LapTimeFit
@@ -122,8 +123,12 @@ def assemble_race_model(
     sc_unlap: str | None = None,
     weather: dict | None = None,
     wet_pace: dict[str, float] | None = None,
+    year: int | None = None,
+    red_flags: list[dict] | None = None,
 ) -> dict:
-    """Build the race-model dict (validate + write it with export.write_race)."""
+    """Build the race-model dict (validate + write it with export.write_race). `year` and
+    `red_flags` (the race's red-flag file entries, redflag.load_entries) give each red flag
+    its restart; races without one ignore them."""
     total_laps = int(laps["LapNumber"].max())
     cliffs = fit.compound_cliff
     longest = longest_stints(laps)
@@ -200,9 +205,14 @@ def assemble_race_model(
 
     # Events and remaining strategy from the takeover lap onward; earlier history is already
     # baked into stateAtTakeover.
-    future_events = [
-        e for e in events_mod.extract_events(laps, total_laps) if e["lap"] >= takeover_lap
-    ]
+    all_events = events_mod.extract_events(laps, total_laps)
+    if any(e["type"] == "RED" for e in all_events) or red_flags:
+        # Eras build plan 4.3: each red flag's span (hand-entered for untimed sources) and
+        # restart (standing / rolling).
+        all_events = redflag_mod.annotate_restarts(
+            redflag_mod.apply_hand_spans(all_events, red_flags or []), red_flags or [], year
+        )
+    future_events = [e for e in all_events if e["lap"] >= takeover_lap]
     takeover_state = scenario_mod.state_at_takeover(laps, takeover_lap)
     strategy = scenario_mod.real_strategy(laps)
     teams = _team_map(laps)
@@ -240,9 +250,20 @@ def assemble_race_model(
     # Model v3 stage 9: a stop entered before an SC/VSC was deployed is a green-flag stop,
     # though its out-lap is neutralized (the sim prices a stop by its out-lap's flag).
     if track_status and track_params.pit_loss is not None:
-        all_events = events_mod.extract_events(laps, total_laps)
         for key in events_mod.green_entry_stops(laps, all_events, track_status):
             measured.setdefault(key, track_params.pit_loss)
+    # Red flags: a stop made in the stoppage is free; one entered before it pays its flag's
+    # figure (the stoppage makes both unmeasurable).
+    measured.update(
+        redflag_mod.stop_losses(
+            laps,
+            all_events,
+            track_status,
+            track_params.pit_loss,
+            track_params.pit_loss_under_sc,
+            track_params.pit_loss_under_vsc,
+        )
+    )
 
     optional = (
         scenario_mod.fastest_lap_stops(laps, measured, track_params.pit_loss)
