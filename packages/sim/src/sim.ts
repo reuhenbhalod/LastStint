@@ -25,7 +25,7 @@ import {
 import type { RivalPolicy } from './eras/config.js';
 import { type FaultTable, cloneFaults, faultCost, faultTable } from './faults.js';
 import headsetConfig from './headset.json';
-import { legendEvents } from './legend.js';
+import { legendEvents, legendLoss } from './legend.js';
 import { validatePlan } from './plan.js';
 import { coverWindow, playoutPolicy, resolveRivalPolicy } from './rivals/policy.js';
 import {
@@ -364,6 +364,11 @@ function stopCost(
   if (!added || devs.length === 0) return base;
   const pick = Math.floor(run.rng.get(STOP_STREAM, code).next() * devs.length);
   return base + (devs[pick] as number);
+}
+
+/** A stop's measured loss, if it applies: in Legend only under the flag it was measured under. */
+function stopLoss(run: Run, stop: PitStop, lap: number): number | undefined {
+  return run.legend ? legendLoss(run.model, run.neutral, stop, lap) : stop.loss;
 }
 
 /**
@@ -1312,7 +1317,7 @@ export function stepLap(run: Run): RaceState {
         behind !== undefined
           ? (prevTime[behind] as number) - (prevTime[code] as number)
           : Number.POSITIVE_INFINITY;
-      if (gapBehind <= (stop.loss ?? stopCost(run, code, flag, false, lap))) {
+      if (gapBehind <= (stopLoss(run, stop, lap) ?? stopCost(run, code, flag, false, lap))) {
         c.strategy.splice(stopIdx, 1);
         stopIdx = -1;
       }
@@ -1338,7 +1343,7 @@ export function stepLap(run: Run): RaceState {
         c.tyreAge = 0;
         c.tyreWear = 0;
       }
-      pitCost += stop.loss ?? stopCost(run, code, flag, stop.added === true, lap);
+      pitCost += stopLoss(run, stop, lap) ?? stopCost(run, code, flag, stop.added === true, lap);
       // Era rules: an added stop into a closed pit lane (2007-08) owes a stop-go.
       if (stop.added && pitLaneClosed(model, run.neutral, lap, stop.to)) {
         const cost = stopGoCost(model);

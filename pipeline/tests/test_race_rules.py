@@ -363,3 +363,21 @@ def test_write_rules_overlays_keeps_other_keys(tmp_path):
     got = json.loads((tmp_path / "japan-2005.json").read_text())
     assert got["eras"] == {"eraId": 5, "order": 2}
     assert got["rules"]["tyreChanges"] is False
+
+
+# --- the safety car: from 1993 (owner, Nov 7, 2026) -------------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("race_id", "year", "sc"),
+    [
+        ("brazil-1992", 1992, False),
+        ("brazil-1993", 1993, True),
+        ("spain-1994-pits", 1994, True),
+        ("abu-dhabi-2021", 2021, True),
+        ("fixture", None, True),  # no year: modern
+    ],
+)
+def test_safety_car_from_1993(race_id, year, sc):
+    assert race_rules.year_of(race_id) == year
+    assert race_rules.safety_car({"race": {"id": race_id}}) is sc

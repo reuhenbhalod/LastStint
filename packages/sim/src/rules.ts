@@ -23,6 +23,9 @@
 // - Lapped cars unlap before the restart: new in 2007 ("a substantial departure from prior
 //   practice", RaceFans, as above); banned from 2010; allowed again from 2012 (Wikipedia,
 //   "Safety car"). So scUnlap is `none` before 2007 and in 2010-11.
+// - The safety car: routine in F1 from 1993 (owner's decision, Nov 7, 2026: no random safety
+//   car before 1993). Before then nothing the sim makes up neutralizes the race; a race's real
+//   events are its data and are kept.
 
 import type { BattleMove, Compound, FlagState, PitStop, RaceModel, RaceRules } from './types.js';
 import { isWetTyre } from './weather.js';
@@ -36,6 +39,25 @@ export const PIT_CLOSED_SC_LAPS = 1;
 /** The penalty's stationary time (s): the ten-second stop-go. */
 export const STOP_GO_SECONDS = 10;
 
+/** The first season with the safety car as routine: from here the sim may make one up. */
+export const SAFETY_CAR_FROM = 1993;
+const RACE_YEAR = /^.+?-(\d{4})(?:-.*)?$/;
+
+/** The season of a race id ('spain-1994-pits' -> 1994), or null when the id has none. */
+export function raceYear(raceId: string): number | null {
+  const m = RACE_YEAR.exec(raceId);
+  return m ? Number(m[1]) : null;
+}
+
+/**
+ * True if the race runs with a safety car (from SAFETY_CAR_FROM). A race id without a year
+ * (a test fixture) counts as modern.
+ */
+export function safetyCarRule(model: RaceModel): boolean {
+  const year = raceYear(model.race.id);
+  return year === null || year >= SAFETY_CAR_FROM;
+}
+
 /**
  * The race's era rules, with defaults filled in (`drs` and `ers` stay as given: absent means
  * the era's headset.json block).
@@ -47,6 +69,8 @@ export interface ResolvedRules {
   fuelLimit?: number;
   pitLaneClosedUnderSC: boolean;
   vsc: boolean;
+  /** A safety car exists (from 1993, by the race's year: safetyCarRule). No SC, no VSC. */
+  safetyCar: boolean;
   drs?: boolean;
   ers?: RaceRules['ers'];
 }
@@ -60,6 +84,7 @@ export function resolveRules(model: RaceModel): ResolvedRules {
     ...(r.fuelLimit !== undefined ? { fuelLimit: r.fuelLimit } : {}),
     pitLaneClosedUnderSC: r.pitLaneClosedUnderSC === true,
     vsc: r.vsc !== false,
+    safetyCar: safetyCarRule(model),
     ...(r.drs !== undefined ? { drs: r.drs } : {}),
     ...(r.ers !== undefined ? { ers: r.ers } : {}),
   };
@@ -124,12 +149,14 @@ export function hasMove(headset: RuleSwitchable, move: BattleMove): boolean {
 
 /**
  * The flag a neutralization the sim makes up (a crash, a grader or Legend draw) may take: a
- * VSC becomes a SC in a race without one. Real events are the race's data and are kept.
+ * VSC becomes a SC in a race without one, and a SC or VSC is null (none) before the safety car
+ * (safetyCarRule). Real events are the race's data and are kept.
  */
 export function allowedFlag<F extends Exclude<FlagState, 'green'>>(
   model: RaceModel,
   flag: F,
-): F | 'sc' {
+): F | 'sc' | null {
+  if ((flag === 'sc' || flag === 'vsc') && !safetyCarRule(model)) return null;
   return flag === 'vsc' && model.rules?.vsc === false ? 'sc' : flag;
 }
 

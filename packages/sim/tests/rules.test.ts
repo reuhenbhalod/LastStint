@@ -12,7 +12,9 @@ import {
   allowedFlag,
   headsetFor,
   pitLaneClosed,
+  raceYear,
   resolveRules,
+  safetyCarRule,
   scQueue,
   stopChangesTyres,
   stopGoCost,
@@ -102,6 +104,7 @@ describe('no rules block', () => {
       refuelling: false,
       pitLaneClosedUnderSC: false,
       vsc: true,
+      safetyCar: true,
     });
     const blocks = headset as unknown as Record<string, { drs?: boolean; modes: object }>;
     expect(headsetFor(blocks as never, abu)).toBe(blocks[abu.era]);
@@ -369,5 +372,31 @@ describe('every rule combination plays without crashing', () => {
       planRemainingStop(fork, { exact: true });
       while (!isFinished(fork)) stepLap(fork);
     }
+  });
+});
+
+describe('the safety car: from 1993', () => {
+  const at = (id: string) => ({ ...abu, race: { ...abu.race, id } });
+
+  it('reads the year off the race id', () => {
+    expect(raceYear('abu-dhabi-2021')).toBe(2021);
+    expect(raceYear('spain-1994-pits')).toBe(1994);
+    expect(raceYear('fixture')).toBeNull();
+  });
+
+  it('exists from 1993 (and for an id without a year), not before', () => {
+    expect(safetyCarRule(at('brazil-1992'))).toBe(false);
+    expect(safetyCarRule(at('brazil-1993'))).toBe(true);
+    expect(safetyCarRule(at('fixture'))).toBe(true);
+    expect(resolveRules(at('japan-1990')).safetyCar).toBe(false);
+    expect(resolveRules(abu).safetyCar).toBe(true);
+  });
+
+  it('a made-up SC or VSC has no flag before 1993; a red flag still does', () => {
+    const m = at('japan-1990');
+    expect(allowedFlag(m, 'sc')).toBeNull();
+    expect(allowedFlag(m, 'vsc')).toBeNull();
+    expect(allowedFlag(m, 'red')).toBe('red');
+    expect(allowedFlag(at('japan-1993'), 'sc')).toBe('sc');
   });
 });
