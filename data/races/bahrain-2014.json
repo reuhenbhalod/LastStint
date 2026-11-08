@@ -728,5 +728,14 @@
     "SUT"
   ],
   "userSide": "HAM",
-  "rival": "ROS"
+  "rival": "ROS",
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": true,
+    "ers": "hybrid",
+    "refuelling": false
+  }
 }

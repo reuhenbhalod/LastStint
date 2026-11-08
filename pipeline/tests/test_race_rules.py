@@ -139,16 +139,17 @@ def test_each_rule_changes_its_replay():
 def test_no_rules_block_replays_the_golden_files():
     """Races without a rules block replay their golden files, and so do the Eras races built
     with their data/eras rules (step 3.1): their goldens were written with the rules on.
-    Daily / Gauntlet races carry no rules block; an Eras race (split "eras") may, and `pipeline
-    build` applies its data/eras overlay, so its block is exactly the overlay's."""
-    from pipeline.build import RACES
+    Daily / Gauntlet races carry no rules block (their files are pinned); any other race may,
+    and `pipeline build` applies its data/eras overlay, so its block is exactly the overlay's."""
+    from pipeline.build import shared_races
 
+    pool = shared_races()
     for path in sorted(GOLDEN_DIR.glob("*.json")):
         race = RACES_DIR / path.name
         if not race.exists():
             continue
         model = json.loads(race.read_text())
-        if RACES.get(path.stem, {}).get("split") == "eras" and "rules" in model:
+        if path.stem not in pool and "rules" in model:
             overlay = json.loads((DATA_DIR / "eras" / path.name).read_text())
             assert model["rules"] == overlay["rules"], path.name
         else:

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 10,
+  "schemaVersion": 11,
   "race": {
     "id": "brazil-2021",
     "name": "Brazil 2021: Verstappen vs Hamilton",
@@ -652,5 +652,14 @@
     "STR"
   ],
   "userSide": "VER",
-  "rival": "HAM"
+  "rival": "HAM",
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": true,
+    "drs": true,
+    "ers": "hybrid",
+    "refuelling": false
+  }
 }

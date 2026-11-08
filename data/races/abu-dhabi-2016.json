@@ -538,5 +538,14 @@
     "MAG"
   ],
   "userSide": "HAM",
-  "rival": "ROS"
+  "rival": "ROS",
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": true,
+    "drs": true,
+    "ers": "hybrid",
+    "refuelling": false
+  }
 }

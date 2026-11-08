@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 10,
+  "schemaVersion": 11,
   "race": {
     "id": "hungary-2022",
     "name": "Hungary 2022: Leclerc vs Verstappen",
@@ -696,5 +696,14 @@
     "BOT"
   ],
   "userSide": "LEC",
-  "rival": "VER"
+  "rival": "VER",
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": true,
+    "drs": true,
+    "ers": "hybrid",
+    "refuelling": false
+  }
 }

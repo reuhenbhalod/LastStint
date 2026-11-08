@@ -746,5 +746,14 @@
     "ROS"
   ],
   "userSide": "VER",
-  "rival": "RAI"
+  "rival": "RAI",
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": true,
+    "drs": true,
+    "ers": "hybrid",
+    "refuelling": false
+  }
 }
