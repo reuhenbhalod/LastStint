@@ -5,6 +5,8 @@
     "pitLaneClosedUnderSC": false,
     "vsc": false,
     "drs": false,
-    "ers": "none"
+    "ers": "none",
+    "refuelling": false,
+    "fuelLimit": 127.5
   }
 }

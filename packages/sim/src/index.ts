@@ -137,3 +137,17 @@ export {
   twoCompoundRule,
 } from './rules.js';
 export type { ResolvedRules } from './rules.js';
+// Refuelling and fuel limits (eras build plan 4.2): the fill choice and the tank reading for
+// the fuel UI (build plan 8.5). FillChoice and RefuelModel are in types.ts.
+export {
+  FILL_CHOICES,
+  RESERVE_LAPS,
+  fillOptions,
+  fillStint,
+  fuelLimit,
+  limitBurnPerLap,
+  refuelModel,
+  refuelling,
+  tankReading,
+} from './refuel.js';
+export type { TankReading } from './refuel.js';

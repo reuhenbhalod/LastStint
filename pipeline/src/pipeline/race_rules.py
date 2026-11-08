@@ -128,13 +128,16 @@ def race_year(race_id: str) -> int:
 
 def write_rules_overlays(race_ids: list[str], out_dir: Path = ERAS_OVERLAY_DIR) -> list[Path]:
     """Set the `rules` key of data/eras/<id>.json from each race's year, keeping every other
-    key as it is."""
+    key (and rules.refuelling / rules.fuelLimit) as it is."""
     out_dir.mkdir(parents=True, exist_ok=True)
     written = []
     for race_id in race_ids:
         path = out_dir / f"{race_id}.json"
         overlay = json.loads(path.read_text()) if path.exists() else {}
-        overlay["rules"] = rules_for_year(race_year(race_id))
+        # refuelling / fuelLimit are eras build plan 4.2's (refuel.py): kept as they are.
+        old = overlay.get("rules") or {}
+        kept = {k: old[k] for k in ("refuelling", "fuelLimit") if k in old}
+        overlay["rules"] = {**rules_for_year(race_year(race_id)), **kept}
         path.write_text(json.dumps(overlay, indent=2) + "\n")
         written.append(path)
     return written

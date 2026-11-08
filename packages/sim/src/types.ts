@@ -268,6 +268,9 @@ export interface RaceModel {
     greenLapTime?: number;
     scLapTime?: number;
     vscLapTime?: number;
+    /** A refuelling race's fill model, fitted from the real stops (eras build plan 4.2;
+     * refuel.ts). Absent: the pooled prior. */
+    refuel?: RefuelModel;
   };
   compounds: Record<Compound, CompoundModel>;
   drivers: DriverModel[];
@@ -293,6 +296,28 @@ export interface RaceModel {
   rules?: RaceRules;
 }
 
+/**
+ * A refuelling race's fill model (eras build plan 4.2), fitted per race by
+ * pipeline/src/pipeline/refuel.py from the real stops: pit-lane time = laneBase +
+ * secondsPerLap x the laps of fuel put in (the next stint's length). Fuel is counted in laps
+ * at the standard burn.
+ */
+export interface RefuelModel {
+  /** Fill time per lap of fuel added (s). */
+  secondsPerLap: number;
+  /** The fitted pit-lane time of a stop that adds no fuel (s); informative. */
+  laneBase: number;
+  /** The mean fill of the real stops (laps): what the track's pitLoss figures already hold. */
+  refFill: number;
+  /** The longest real stint (laps): the tank's capacity, less the reserve. */
+  tankLaps: number;
+  /** Real stops in the fit. */
+  stops: number;
+}
+
+/** The player's fill at a refuelling stop (refuel.ts fillStint has the definitions). */
+export type FillChoice = 'short' | 'standard' | 'long';
+
 export interface PitStop {
   /** The out-lap: the first lap run on the new tyres (pit loss is charged on this lap). */
   lap: number;
@@ -310,6 +335,9 @@ export interface PitStop {
   /** A stop forced by a damaged tyre (a puncture): it fits new tyres even when a race allows
    * no tyre changes (rules.tyreChanges false, eras build plan 4.1). */
   damaged?: boolean;
+  /** A refuelling race: the player's fill (refuel.ts). Absent: fuel for the next planned
+   * stint, as every scripted car. */
+  fill?: FillChoice;
 }
 
 export interface CarState {
@@ -340,6 +368,11 @@ export interface CarState {
   fuel?: number;
   /** A stop-go penalty owed (s), for entering a closed pit lane (rules.pitLaneClosedUnderSC). */
   stopGo?: number;
+  /** A refuelling race (refuel.ts): fuel on board, in laps at the standard burn (every car). */
+  tank?: number;
+  /** The tank burns by the modes and an empty one stops the car: the player's car in live
+   * play with incidents (off in replays and the grader's playouts). */
+  tankLive?: boolean;
 }
 
 /**
@@ -390,7 +423,7 @@ export type DriverRequest = 'box' | 'push';
 export type BlueAction = 'complain' | 'go-round';
 
 export type Decision = (
-  | { lap: number; kind: 'pit'; compound: Compound }
+  | { lap: number; kind: 'pit'; compound: Compound; fill?: FillChoice }
   | { lap: number; kind: 'mode'; key: keyof Modes; value: string }
   | { lap: number; kind: 'teamOrder'; order: TeamOrder }
   | { lap: number; kind: 'radio'; momentId: string; optionId: string }
@@ -433,7 +466,8 @@ export interface RaceNote {
     | 'blue' // went round a lapped car; value: the time it gained (negative)
     | 'trust' // value: the change; detail: why (TrustReason)
     | 'rogue' // a furious driver picks his own battle move (detail: the move)
-    | 'fuel' // fuel load spec: detail 'empty' (the tank ran dry)
+    | 'fuel' // fuel load spec: detail 'empty' (the tank ran dry); 'out' (the car stopped:
+    // a refuelling or fuel-limit race, eras build plan 4.2); 'fill' (value: laps put in)
     | 'stop-go'; // era rules: a closed pit lane's penalty; detail 'owed' | 'served', value: s
   driver: string;
   /** For an incident: 'crash', 'mechanical' or 'puncture'; see the kinds above. */

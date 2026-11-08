@@ -26,6 +26,16 @@ import type { RivalPolicy } from './eras/config.js';
 import headsetConfig from './headset.json';
 import { legendEvents } from './legend.js';
 import { validatePlan } from './plan.js';
+import {
+  FILL_CHOICES,
+  burnTank,
+  fuelLimit,
+  initTanks,
+  refuelAtStop,
+  refuelling,
+  tankPlanDelta,
+  tankWeightDelta,
+} from './refuel.js';
 import { resolveRivalPolicy } from './rivals/policy.js';
 import { type Rng, deriveSeed, mulberry32 } from './rng.js';
 import {
@@ -250,6 +260,26 @@ function burnFuel(run: Run, car: CarState, lap: number, neutral: boolean): void 
     : (effect(run, car, 'pace').burnMult ?? 1) * (effect(run, car, 'fuel').burnMult ?? 1);
   car.fuel = Math.max(0, car.fuel - f.burnPerLap * mult);
   if (car.fuel <= 0) run.notes.push({ lap, kind: 'fuel', driver: car.code, detail: 'empty' });
+  // A fuel-limit race (eras build plan 4.2): an empty tank stops the car.
+  if (car.fuel <= 0 && fuelLimit(run.model) !== null) outOfFuel(run, car, lap);
+}
+
+/** Eras build plan 4.2: the car ran out of fuel and stops (retires on this lap). */
+function outOfFuel(run: Run, car: CarState, lap: number): void {
+  car.retired = true;
+  car.retiredLap = lap;
+  run.notes.push({ lap, kind: 'fuel', driver: car.code, detail: 'out' });
+}
+
+/** A refuelling race: burn a lap from the tank (refuel.ts); a live tank burns by the modes
+ * and the era's neutral share, and stops the car when it runs dry. */
+function burnRefuelTank(run: Run, car: CarState, lap: number, neutral: boolean): void {
+  const mult = !car.tankLive
+    ? 1
+    : neutral
+      ? (HEADSET[run.model.era]?.fuel?.neutralBurn ?? 1)
+      : (effect(run, car, 'pace').burnMult ?? 1) * (effect(run, car, 'fuel').burnMult ?? 1);
+  if (burnTank(car, mult)) outOfFuel(run, car, lap);
 }
 
 /** The headset modes' effects for a model's era (for explaining the options in the game). */
@@ -367,7 +397,8 @@ export function passProbability(
 export function cleanLap(model: RaceModel, car: CarState, lap: number, w?: number): number {
   const dry =
     tyreLapTime(model, car.basePace, car.compound, car.tyreWear, lap) +
-    freshTyreDelta(model, car.tyreAge);
+    freshTyreDelta(model, car.tyreAge) +
+    tankWeightDelta(model, car, lap); // refuelling: the weight resets at each stop (refuel.ts)
   if (!model.weather) return dry;
   const wet = w ?? wetnessOn(model.weather.wetness, lap);
   return dry * wetFactor(model.weather, car.compound, wet, car.wetPace ?? 0);
@@ -477,6 +508,9 @@ export function validateDecisions(model: RaceModel, decisions: Decision[]): void
       if (d.lap >= model.race.laps) throw new Error('no stop on the final lap');
       const illegal = illegalPitCompound(model, d.compound); // era rules (rules.ts)
       if (illegal) throw new Error(illegal);
+      if (d.fill !== undefined && (!refuelling(model) || !FILL_CHOICES.includes(d.fill))) {
+        throw new Error(`no fill ${d.fill} in this race`); // refuel.ts
+      }
     } else if (d.kind === 'mode') {
       if (!headset?.modes[d.key]?.[d.value]) throw new Error(`unknown mode ${d.key}=${d.value}`);
     } else if (d.kind === 'teamOrder') {
@@ -558,6 +592,14 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
       modes: { ...DEFAULT_MODES },
     };
   }
+  // Refuelling (refuel.ts): every car's takeover tank; the player's burns live with incidents.
+  initTanks(
+    model,
+    cars,
+    (code) => realOf(model, code),
+    live ? model.userSide : undefined,
+    live && options.incidents !== false,
+  );
   const ers = headsetFor(HEADSET, model)?.ers;
   const userCar = cars[model.userSide];
   if (live && ers && userCar) userCar.battery = ers.startBattery;
@@ -720,7 +762,10 @@ export function forkRun(
   for (const [code, c] of Object.entries(run.state.cars)) {
     cars[code] = cloneCar(c);
     // The grader's playouts leave the fuel load out (fuel load spec: live play only).
-    if (options.blindAfter !== undefined) (cars[code] as CarState).fuel = undefined;
+    if (options.blindAfter !== undefined) {
+      (cars[code] as CarState).fuel = undefined;
+      (cars[code] as CarState).tankLive = undefined; // refuel.ts: no dry stop in playouts
+    }
   }
   return {
     ...run,
@@ -835,6 +880,11 @@ function playerStop(run: Run, outLap: number, compound: string): PitStop {
     : { lap: outLap, to: compound };
 }
 
+/** A car's real strategy (refuel.ts prices a fill choice at a real stop against it). */
+function realOf(model: RaceModel, code: string): readonly PitStop[] {
+  return model.drivers.find((d) => d.code === code)?.realStrategy ?? [];
+}
+
 /** True if the user's real strategy has this stop (out-lap and compound). */
 function isRealStop(run: Run, outLap: number, compound: string): boolean {
   return !!run.model.drivers
@@ -868,7 +918,8 @@ function applyDecisions(run: Run, lap: number): void {
       (user.modes as unknown as Record<string, string>)[d.key] = d.value;
     } else if (d.kind === 'pit') {
       user.strategy = user.strategy.filter((s) => s.lap !== lap + 1);
-      user.strategy.push(playerStop(run, lap + 1, d.compound));
+      const stop = playerStop(run, lap + 1, d.compound);
+      user.strategy.push(refuelling(run.model) ? { ...stop, fill: d.fill ?? 'standard' } : stop);
     } else if (d.kind === 'teamOrder') {
       const orders = run.state.teamOrders;
       if (d.order === 'holdUp') orders.holdUp = true;
@@ -1061,6 +1112,8 @@ function rivalGoesLong(run: Run, lap: number): void {
   if (!run.live || !user || !rival || user.retired || rival.retired) return;
   // Era rules: a no-tyre-change race's stops refuel, so none is skipped (eras build plan 4.2).
   if (model.rules?.tyreChanges === false) return;
+  // Refuelling: a rival whose fuel doesn't reach the flag can't skip a stop.
+  if (rival.tank !== undefined && rival.tank - 1 < model.race.laps - lap) return;
   const stopLap = lap + 1;
   const userStop = user.strategy.find((s) => s.lap === stopLap);
   if (!userStop || isRealStop(run, stopLap, userStop.to)) return;
@@ -1133,6 +1186,8 @@ function predictedRemaining(
     wear += (flag ? 1 : wearMult) * weatherWear(model.weather, compound, wet);
     age += 1;
   }
+  // Refuelling (refuel.ts): the fill time and the tank's weight; Infinity if it runs dry.
+  if (car.tank !== undefined) total += tankPlanDelta(model, car, fromLap, stop, known);
   return total;
 }
 
@@ -1147,17 +1202,18 @@ export function planRemainingStop(run: Run, options: { exact?: boolean } = {}): 
   const { model, state } = run;
   const user = state.cars[model.userSide];
   if (!user || user.retired) return null;
-  // Era rules: with no tyre changes a dry stop only costs time until 4.2 adds refuelling.
-  if (model.rules?.tyreChanges === false && !model.weather) return null;
+  // Era rules: with no tyre changes a dry stop only costs time, unless it refuels (refuel.ts).
+  if (model.rules?.tyreChanges === false && !model.weather && !refuelling(model)) return null;
   // Two-compound rule: a car that hasn't yet run two dry compounds must stop for a new one.
   const mustChange = !ruleSatisfied(user, model.rules);
+  // Refuelling: the planner prices the tank (exact path); one stop at most, as ever.
   let best: PitStop | null = null;
   // Plan only on what is known now: neutralizations that have started by the next lap.
   const known = neutralMap(run.events.filter((e) => e.lap <= state.lap + 1));
   let knownAhead = false;
   for (const lap of known.keys()) if (lap > state.lap) knownAhead = true;
   // The fast path assumes a dry race (a lap's time splits into a lap term and a tyre term).
-  if (!knownAhead && !options.exact && !model.weather)
+  if (!knownAhead && !options.exact && !model.weather && user.tank === undefined)
     return planGreenToFlag(run, user, mustChange);
   let bestTime = mustChange
     ? Number.POSITIVE_INFINITY
@@ -1301,6 +1357,8 @@ export function stepLap(run: Run): RaceState {
         c.tyreWear = 0;
       }
       pitCost += stop.loss ?? stopCost(run, code, flag, stop.added === true, lap);
+      // Refuelling (refuel.ts): fill for the next stint; the fill time over the base cost.
+      if (c.tank !== undefined) pitCost += refuelAtStop(model, c, stop, lap, realOf(model, code));
       // Era rules: an added stop into a closed pit lane (2007-08) owes a stop-go.
       if (stop.added && pitLaneClosed(model, run.neutral, lap, stop.to)) {
         const cost = stopGoCost(model);
@@ -1366,6 +1424,7 @@ export function stepLap(run: Run): RaceState {
       c.battery = Math.min(100, Math.max(0, c.battery + gain));
     }
     burnFuel(run, c, lap, !!flag);
+    if (c.tank !== undefined) burnRefuelTank(run, c, lap, !!flag);
   }
 
   if (run.incidents && !flag) incidents(run, lap, prevTime);
