@@ -274,12 +274,11 @@
  "anchors": [
   {
    "anchor": "grid",
-   "subject": "lap-1 order is the grid order (the sourced lap-1 order at the front)",
+   "subject": "lap-1 order is the grid order (the sourced lap-1 order at the front) (out after lap 1, at its sourced time: HAK)",
    "target": [
     "HER",
     "BER",
     "ALE",
-    "HAK",
     "COU",
     "BLU",
     "IRV",
@@ -305,7 +304,6 @@
     "HER",
     "BER",
     "ALE",
-    "HAK",
     "COU",
     "BLU",
     "IRV",
@@ -1582,6 +1580,7 @@
  "notes": [
   "ALE: stop on lap 5, the lap it retired on; not run",
   "HAK: fastest lap on lap 1, its lap-1 time is the fastest lap's",
+  "HAK: out after lap 1, its lap-1 place is its sourced time's",
   "HIL: target 5827.4s not reachable",
   "the laps behind the safety car did not settle"
  ],

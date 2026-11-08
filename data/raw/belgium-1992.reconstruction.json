@@ -279,7 +279,7 @@
  "anchors": [
   {
    "anchor": "grid",
-   "subject": "lap-1 order is the grid order (the sourced lap-1 order at the front)",
+   "subject": "lap-1 order is the grid order (the sourced lap-1 order at the front) (out after lap 1, at its sourced time: GROO)",
    "target": [
     "SENA",
     "MAN",
@@ -300,7 +300,6 @@
     "WEN",
     "GAC",
     "NASE",
-    "GROO",
     "MOR",
     "GUG",
     "SUZ",
@@ -326,7 +325,6 @@
     "WEN",
     "GAC",
     "NASE",
-    "GROO",
     "MOR",
     "GUG",
     "SUZ",
@@ -1429,6 +1427,7 @@
  "notes": [
   "ALE: fastest lap on lap 1, its lap-1 time is the fastest lap's",
   "GROO: fastest lap on lap 1, its lap-1 time is the fastest lap's",
+  "GROO: out after lap 1, its lap-1 place is its sourced time's",
   "HER: classified retirement stopped at its natural time, after the point a retirement is seen",
   "HER: no time fits both its classification and its window"
  ],

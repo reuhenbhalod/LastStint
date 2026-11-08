@@ -1,16 +1,16 @@
 # Anchor report: france-1990 (reconstructed)
 
-Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: False.
+Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 
 | Anchor | Pass | Total |
 |---|---|---|
 | grid | 1 | 1 |
-| order | 0 | 1 |
+| order | 1 | 1 |
 | gap | 5 | 5 |
 | fastest | 26 | 26 |
-| retirement | 10 | 10 |
-| retirement event | 10 | 10 |
-| laps down | 10 | 10 |
+| retirement | 9 | 9 |
+| retirement event | 9 | 9 |
+| laps down | 11 | 11 |
 | stop | 6 | 6 |
 | safety car | 1 | 1 |
 | leader | 6 | 6 |
@@ -19,12 +19,12 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: False.
 | Anchor | Subject | Target | Achieved | Pass |
 |---|---|---|---|---|
 | grid | lap-1 order is the grid order (the sourced lap-1 order at the front) | 26 cars: BER MAN SENA NAN PAT PRO BOUT PIQN ALE CAP GUG BEN ALL SUZ NAKS WAR DON ALBM LAR MOD DEC CAF MAR PIR BRA DAL | 26 cars: BER MAN SENA NAN PAT PRO BOUT PIQN ALE CAP GUG BEN ALL SUZ NAKS WAR DON ALBM LAR MOD DEC CAF MAR PIR BRA DAL | pass |
-| order | classification | 18 cars: PRO CAP SENA PIQN BER PAT SUZ BEN ALL ALBM WAR DON MOD LAR BRA NAN DAL MAN | 18 cars: PRO CAP SENA PIQN BER PAT SUZ BEN ALL ALBM WAR DON DEC MOD LAR BRA NAN DAL | FAIL |
-| gap | CAP | 8.626 | 8.633 | pass |
-| gap | SENA | 11.606 | 11.604 | pass |
-| gap | PIQN | 41.207 | 41.204 | pass |
-| gap | BER | 42.219 | 42.208 | pass |
-| gap | PAT | 69.351 | 69.351 | pass |
+| order | classification (road order: DEC disqualified, at the sourced road place) | 19 cars: PRO CAP SENA PIQN BER PAT SUZ BEN ALL ALBM WAR DON MOD LAR DEC BRA NAN DAL MAN | 19 cars: PRO CAP SENA PIQN BER PAT SUZ BEN ALL ALBM WAR DON MOD LAR DEC BRA NAN DAL MAN | pass |
+| gap | CAP | 8.626 | 8.624 | pass |
+| gap | SENA | 11.606 | 11.601 | pass |
+| gap | PIQN | 41.207 | 41.207 | pass |
+| gap | BER | 42.219 | 42.213 | pass |
+| gap | PAT | 69.351 | 69.344 | pass |
 | fastest | PRO | [68.212, 72] | [68.212, 72] | pass |
 | fastest | CAP | [68.373, 62] | [68.373, 62] | pass |
 | fastest | SENA | [68.573, 59] | [68.573, 59] | pass |
@@ -55,8 +55,6 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: False.
 | retirement event | NAN | true | true | pass |
 | retirement | MAN | 72 | 72 | pass |
 | retirement event | MAN | true | true | pass |
-| retirement | DEC | 78 | 78 | pass |
-| retirement event | DEC | true | true | pass |
 | retirement | NAKS | 63 | 63 | pass |
 | retirement event | NAKS | true | true | pass |
 | retirement | GUG | 58 | 58 | pass |
@@ -81,6 +79,7 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: False.
 | laps down | LAR | 2 | 2 | pass |
 | laps down | BRA | 3 | 3 | pass |
 | laps down | DAL | 5 | 5 | pass |
+| laps down | DEC | 2 | 2 | pass |
 | stop | PRO | 27 | 27 | pass |
 | stop | SENA | 30 | 30 | pass |
 | stop | PIQN | 20 | 20 | pass |
@@ -107,15 +106,19 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: False.
 - PitInTime is the in-lap's end; PitOutTime adds the out-lap's share of the lane time
 - Compound is left empty (one dry compound per race, estimated in step 2.4)
 - No weather timeline: the race is assumed dry
+- DEC: disqualified, run to the flag P15 on the road between its road neighbours (no gap sourced: its time is an estimate); the official result keeps it excluded
 - Stops: only the sourced ones; cars may have stopped more (unknown)
 
 ## Notes
 
+- DEC: disqualified, placed P15 on the road between its road neighbours (no gap sourced: an estimate)
+- CAP: target 5618.2s not reachable
 - SENA: target 5621.2s not reachable
 - BER: target 5651.8s not reachable
-- BEN: target 5634.7s not reachable
-- MAN: target 5047.7s not reachable
+- BEN: target 5636.0s not reachable
+- MAN: target 5047.8s not reachable
 - PRO: target 5609.6s not reachable
-- BEN: target 5629.8s not reachable
-- ALL: target 5641.2s not reachable
+- SUZ: target 5620.5s not reachable
+- BEN: target 5629.7s not reachable
+- ALL: target 5641.1s not reachable
 - MAN: target 5051.9s not reachable

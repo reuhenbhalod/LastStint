@@ -16,7 +16,7 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 
 | Anchor | Subject | Target | Achieved | Pass |
 |---|---|---|---|---|
-| grid | lap-1 order is the grid order | 17 cars: PRO MAN ARN ALBM LAU PIQN ROSK DEA WINM SENA PAT FABC LAF HES CEC GHI BEL | 17 cars: PRO MAN ARN ALBM LAU PIQN ROSK DEA WINM SENA PAT FABC LAF HES CEC GHI BEL | pass |
+| grid | lap-1 order is the grid order (out after lap 1, at its sourced time: CEC) | 16 cars: PRO MAN ARN ALBM LAU PIQN ROSK DEA WINM SENA PAT FABC LAF HES GHI BEL | 16 cars: PRO MAN ARN ALBM LAU PIQN ROSK DEA WINM SENA PAT FABC LAF HES GHI BEL | pass |
 | order | classification (road order: BEL disqualified, at the sourced road place) | 9 cars: PRO SENA BEL ARN ROSK DEA ALBM GHI LAF | 9 cars: PRO SENA BEL ARN ROSK DEA ALBM GHI LAF | pass |
 | gap | SENA | 7.446 | 7.445 | pass |
 | gap | BEL | 21.141 | 21.14 | pass |
@@ -87,3 +87,4 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 
 - BEL: disqualified, placed P3 on the road at +21.141s (sourced)
 - CEC: fastest lap on lap 1, its lap-1 time is the fastest lap's
+- CEC: out after lap 1, its lap-1 place is its sourced time's

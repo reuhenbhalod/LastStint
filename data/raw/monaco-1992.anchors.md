@@ -1,10 +1,10 @@
 # Anchor report: monaco-1992 (reconstructed)
 
-Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: False.
+Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 
 | Anchor | Pass | Total |
 |---|---|---|
-| grid | 0 | 1 |
+| grid | 1 | 1 |
 | order | 1 | 1 |
 | gap | 4 | 4 |
 | fastest | 25 | 25 |
@@ -18,7 +18,7 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: False.
 
 | Anchor | Subject | Target | Achieved | Pass |
 |---|---|---|---|---|
-| grid | lap-1 order is the grid order (the sourced lap-1 order at the front) | 25 cars: MAN SENA PAT ALE MSCM BER BRU CAP HER DEC ALBM MOR GUG HAK GAC WEN FITC SUZ JAR MOD BOUT COM GROO TAR MOE | 25 cars: MAN SENA PAT ALE MSCM BER BRU CAP HER DEC ALBM GUG HAK GAC FITC SUZ JAR MOD BOUT COM GROO TAR MOE WEN MOR | FAIL |
+| grid | lap-1 order is the grid order (the sourced lap-1 order at the front) (out after lap 1, at its sourced time: MOR WEN) | 23 cars: MAN SENA PAT ALE MSCM BER BRU CAP HER DEC ALBM GUG HAK GAC FITC SUZ JAR MOD BOUT COM GROO TAR MOE | 23 cars: MAN SENA PAT ALE MSCM BER BRU CAP HER DEC ALBM GUG HAK GAC FITC SUZ JAR MOD BOUT COM GROO TAR MOE | pass |
 | order | classification | 12 cars: SENA MAN PAT MSCM BRU GAC ALBM FITC JAR COM SUZ BOUT | 12 cars: SENA MAN PAT MSCM BRU GAC ALBM FITC JAR COM SUZ BOUT | pass |
 | gap | MAN | 0.215 | 0.211 | pass |
 | gap | PAT | 31.843 | 31.835 | pass |
@@ -106,4 +106,6 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: False.
 ## Notes
 
 - MOR: fastest lap on lap 1, its lap-1 time is the fastest lap's
+- MOR: out after lap 1, its lap-1 place is its sourced time's
 - WEN: fastest lap on lap 1, its lap-1 time is the fastest lap's
+- WEN: out after lap 1, its lap-1 place is its sourced time's

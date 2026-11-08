@@ -122,6 +122,14 @@ twice, a gap that isn't seconds or is for the first car, or a tolerance that isn
 - **Lap 1** is the grid ladder (the standing start, grid_gap per slot) in the **lap-1 order**:
   the grid order with the cars a source puts at the front at the end of lap 1 (the lap-1
   leader, a lap-1 snapshot) moved there. The `grid` anchor checks that order and says so.
+  A car out after lap 1 whose one lap is its F1DB fastest lap (`reconstruct.lap1_retirement`)
+  stands outside the ladder, dry or wet: its lap-1 time is the source's (often a crawl to
+  the pits: monaco-1992's Moreno, 5:34.5), it pushes no car behind it back, and the `grid`
+  anchor checks the others' order without it (the row names it). On a wet race its fastest
+  lap still sets the ladder's level, as any lap-1 fastest lap does (below: belgium-1995's
+  Hakkinen). Before Nov 8 2026 such a car
+  failed the grid anchor in south-africa-1983 and monaco-1992; pushing the cars behind it back
+  instead (the wet rule below) would have put monaco-1992's field four minutes late.
 - **Every other sourced lap** is held by marking cars' times (s from the start) at the end of
   it: `fit_car`'s `marks` cut a car's race into segments, each segment's free laps are
   projected to its time on their own (the car's pace moves by a constant per segment, never
@@ -216,7 +224,8 @@ started the last lap and stopped before the flag.
   ],
   "startTyre": {"tyre": "slick", "source": "..."},
   "startTyres": [{"number": 30, "tyre": "slick", "source": "..."}],
-  "tyreChanges": [{"number": 5, "lap": 21, "tyre": "wet", "source": "..."}]
+  "tyreChanges": [{"number": 5, "lap": 21, "tyre": "wet", "source": "..."}],
+  "slickChange": {"fromLap": 37, "toLap": 43, "source": "...", "note": "..."}
 }
 ```
 
@@ -237,6 +246,10 @@ started the last lap and stopped before the flag.
   empty), this is how a stop gets its tyre: it is matched to the F1DB stop on that in-lap
   (one that matches no stop is noted in the sidecar and not used). It works on facts-file
   stops too.
+- `slickChange`: optional, where a source says **the field** changed back to slicks in laps
+  `fromLap`..`toLap` but gives only some cars' laps (brazil-1993: "everyone stopped for dry
+  tyres", Wikipedia; "When everyone else had stopped Herbert was third", GPE). `source`
+  required; `note` optional. See "Unsourced slick stops" below.
 
 The states stand for these wetness values (`reconstruct.STATE_WETNESS`), on the weather
 model's scale (0 dry, 1 standing water; docs/weather-spec.md):
@@ -259,7 +272,19 @@ provenance lists `weather`).
   names gets the class, slick or wet, that loses the least time over its laps at their
   wetness (teams fit the tyre that suits the stint; wet_laps.py's rule), and the sidecar's
   `weather.tyres` marks it `estimate`. An inter is used only where a source names one. **No
-  stop is invented**: a car whose wet-tyre stop no source gives stays on its start tyre.
+  stop is invented**: a car whose wet-tyre stop no source gives stays on its start tyre. The
+  one exception is `slickChange`, below.
+- **Unsourced slick stops** (`slickChange`, `reconstruct.apply_slick_change`, Nov 8 2026): a
+  car on sourced wet tyres at `fromLap`, with no stop in the window, that runs past the
+  estimated lap gets a slick stop on it. The estimated in-lap is the median of the race's
+  sourced slick in-laps inside the window (brazil-1993: Herbert 37, Senna 40, Hill 41, so 40),
+  else the window's middle. A car with a stop in the window whose tyre no source names
+  (brazil-1993's Schumacher: a stop-and-go) is left to the stint estimate; a car out before
+  the estimated lap stays on wets. The stop is marked estimated: its anchor row says
+  "(estimated lap)", its stint is `estimate` in `weather.tyres` (no `tyre` anchor row), its
+  source starts "estimate (weather.slickChange ...)", and the sidecar's estimates and notes
+  name the cars. Without it, brazil-1993's eight wet-stop cars ran wets on a dry track for 30
+  laps and the solver gave them dry pace up to 9.5 s a lap quicker than Senna's.
 - **Wet pace**: the weather model's own relationship, as both sims run it
   (`wet.penalty`, `sim_reference`, `packages/sim/src/weather.ts`): a lap's time is the car's
   dry lap (pace + wear + fuel) x (1 + its tyre's penalty at the lap's wetness), plus pit loss

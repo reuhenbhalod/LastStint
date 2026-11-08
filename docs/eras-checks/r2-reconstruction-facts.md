@@ -122,7 +122,8 @@ Every core anchor passes on every race, the new `leader`, `running order` and `l
 included, except three failures that predate this pass and don't involve the order:
 france-1990's classification (de Cesaris, #22, disqualified with 78 laps and no road place,
 runs ahead of Modena) and the lap-1 grid order of monaco-1992 and south-africa-1983 (a slow
-car's fastest lap, pinned on its ladder lap, breaks the grid order behind it).
+car's fastest lap, pinned on its ladder lap, breaks the grid order behind it). All three pass
+from S7 (below).
 
 | Race | Lap leaders (chart) | Snapshots | Doubts / conflicts | Owner checked |
 |---|---|---|---|---|
@@ -132,7 +133,7 @@ car's fastest lap, pinned on its ladder lap, breaks the grid order behind it).
 | belgium-1992 | SENA 1-1 MAN 2-3 PAT 4-6 SENA 7-10 MAN 11-33 MSCM 34-44 ([WP](https://en.wikipedia.org/wiki/1992_Belgian_Grand_Prix) chart) | none found | WP's text has Mansell passing Senna 'at the end of the second lap'; the chart has Mansell leading laps 2-3 (chart kept). Boutsen's place before his lap-28 spin isn't sourced. | |
 | belgium-1995 | HER 1-1 ALE 2-3 HER 4-5 COU 6-13 HIL 14-15 MSCM 16-18 HIL 19-21 MSCM 22-23 HIL 24-24 MSCM 25-44 ([WP](https://en.wikipedia.org/wiki/1995_Belgian_Grand_Prix) chart) | none found |  | |
 | brazil-1991 | SENA 1-71 ([WP](https://en.wikipedia.org/wiki/1991_Brazilian_Grand_Prix) chart) | lap 1: SENA MAN PAT ALE BER PRO ([WP](https://en.wikipedia.org/wiki/1991_Brazilian_Grand_Prix)); lap 8: SENA MAN (MAN +3 s ±1) ([WP](https://en.wikipedia.org/wiki/1991_Brazilian_Grand_Prix)); lap 20: SENA MAN (MAN +0.7 s ±0.7) ([WP](https://en.wikipedia.org/wiki/1991_Brazilian_Grand_Prix)) | Lap 1 is WP's 'made a perfect start to lead from ...'. | |
-| brazil-1993 | PRO 1-29 HIL 30-41 SENA 42-71 ([WP](https://en.wikipedia.org/wiki/1993_Brazilian_Grand_Prix) chart) | lap 11: PRO HIL SENA ([WP](https://en.wikipedia.org/wiki/1993_Brazilian_Grand_Prix)) | Not built (registered `data_issue`, races report). With the order Senna is P14 at the takeover (lap 24) as before: the stop-go and the field's rain stops, not the running order, put him there. | |
+| brazil-1993 | PRO 1-29 HIL 30-41 SENA 42-71 ([WP](https://en.wikipedia.org/wiki/1993_Brazilian_Grand_Prix) chart) | lap 11: PRO HIL SENA ([WP](https://en.wikipedia.org/wiki/1993_Brazilian_Grand_Prix)) | Built from S7 (below): with the estimated slick stops and the lap-39/43/47 snapshots Senna is P3 at the takeover (lap 24), as the lap-11 snapshot has him. | |
 | europe-1993 | SENA 1-18 PRO 19-19 SENA 20-34 PRO 35-38 SENA 39-76 ([WP](https://en.wikipedia.org/wiki/1993_European_Grand_Prix) chart) | lap 5: SENA PRO HIL BAR ([MS](https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked)); lap 10: SENA PRO HIL BAR ([MS](https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked)); lap 15: SENA PRO HIL BAR ([MS](https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked)); lap 1: SENA PRO HIL BAR ALE MSCM JAR ([WP](https://en.wikipedia.org/wiki/1993_European_Grand_Prix)) | WP's 'Schumacher stayed out and was leading but spun out on lap 23' disagrees with the chart (Senna 20-34); chart kept. Laps 5-15 from MS's 'for the first 18 laps that was how the front of the field remained'. | |
 | france-1990 | BER 1-27 SENA 28-29 MAN 30-31 PAT 32-32 CAP 33-77 PRO 78-80 ([WP](https://en.wikipedia.org/wiki/1990_French_Grand_Prix) chart) | lap 1: BER MAN SENA NAN PAT PRO BOUT PIQN ALE ([WP](https://en.wikipedia.org/wiki/1990_French_Grand_Prix)); lap 54: CAP PRO GUG ([WP](https://en.wikipedia.org/wiki/1990_French_Grand_Prix)) | The lap-1 order is WP's 'took the lead at the start followed by ...', read as the end of lap 1. | |
 | germany-1986 | SENA 1-1 ROSK 2-5 PIQN 6-14 ROSK 15-19 PRO 20-20 PIQN 21-26 ROSK 27-38 PIQN 39-44 ([WP](https://en.wikipedia.org/wiki/1986_German_Grand_Prix) chart) | none found |  | |
@@ -149,6 +150,58 @@ car's fastest lap, pinned on its ladder lap, breaks the grid order behind it).
 | south-africa-1983 | PIQN 1-59 PAT 60-77 ([WP](https://en.wikipedia.org/wiki/1983_South_African_Grand_Prix) chart) | lap 1: PIQN PAT ([WP](https://en.wikipedia.org/wiki/1983_South_African_Grand_Prix)) |  | |
 | spain-1994 | MSCM 1-22 HAK 23-30 HIL 31-40 MSCM 41-45 HIL 46-65 ([WP](https://en.wikipedia.org/wiki/1994_Spanish_Grand_Prix) chart) | none found |  | |
 | united-states-1990 | ALE 1-34 SENA 35-72 ([WP](https://en.wikipedia.org/wiki/1990_United_States_Grand_Prix) chart) | lap 1: ALE BER ([WP](https://en.wikipedia.org/wiki/1990_United_States_Grand_Prix)); lap 9: ALE SENA (SENA +8.2 s ±1.5) ([WP](https://en.wikipedia.org/wiki/1990_United_States_Grand_Prix)); lap 17: ALE SENA PIQN PRO ([WP](https://en.wikipedia.org/wiki/1990_United_States_Grand_Prix)) | Lap 9's 8.2 s is 'when Berger spun' (lap 9) with a 1.5 s tolerance. 'Led by 2.4 seconds after one lap' is not entered (lap-1 gaps aren't modelled; the grid ladder sets lap 1). | |
+
+## S7 (Nov 8 2026): lap-1 retirements, de Cesaris, Brazil 1993's slick stops
+
+**south-africa-1983, monaco-1992 (solver, no new facts).** The cars that failed the lap-1 grid
+anchor were out after lap 1 with that lap as their F1DB fastest lap: south-africa-1983's
+Winkelhock (83.427 s), Laffite (84.689 s) and Ghinzani (89.776 s); monaco-1992's Moreno
+(334.5 s) and Wendlinger (104.613 s). Those times are the source's (a car crawling back to
+retire), so the car really crossed the line behind the cars it started ahead of. Such a car
+now stands outside the grid ladder (`reconstruct.lap1_retirement`): it keeps its sourced time,
+pushes nobody back, and the grid anchor checks the others' order (the row names it). Pushing
+the field back behind it (the wet rule) would have put monaco-1992's field four minutes late.
+Wet races are unchanged (their lap-1 retirements, belgium-1992's Grouillard, belgium-1995's
+Hakkinen, monaco-1984's Cecotto, never pushed a car back). Neither race file changed.
+
+**france-1990, #22 de Cesaris (Dallara), `roadPositions`.** P15 on the road, no gap.
+
+| Source | What it says |
+|---|---|
+| [GrandPrix.com GPE](https://www.grandprix.com/gpe/rr491.html), [GrandPrix.com results](https://www.grandprix.com/races/french-gp-1990.html) | Results in road order: '13 \| 8 \| Stefano Modena \| Brabham-Judd \| 78', '14 \| 25 \| Nicola Larini \| Ligier-Cosworth \| 78', 'dq \| 22 \| Andrea de Cesaris \| Dallara-Cosworth \| 78 \| Car Under Weight \| 21', '15 \| 7 \| David Brabham \| Brabham-Judd \| 77' |
+| [Wikipedia](https://en.wikipedia.org/wiki/1990_French_Grand_Prix) | DSQ, 78 laps, 'Underweight', grid 21 (listed after the classified cars, no place) |
+| ESPN (race 3560), flyinglap.com.br, Motor Sport Aug 1990 | ESPN and flyinglap list him apart (no place); Motor Sport doesn't mention him |
+
+The place is read from GrandPrix.com's table order, not stated in words: he is two laps down
+like Modena and Larini and listed after them, ahead of Brabham (three down). No source read
+gives a time, so he sits midway between Larini and Brabham's lap (an estimate). Not found:
+statsf1 (404), racing-reference (403), Motor Sport's database page (results not rendered).
+
+**brazil-1993, the field's slick stops (`weather.slickChange`, new runningOrder snapshots).**
+
+| Source | What it says |
+|---|---|
+| [GrandPrix.com GPE rr534](https://www.grandprix.com/gpe/rr534.html) | 'The track was drying and with the cars on wet tires it was time to pit and switch to dry ones. The man to stop first was Johnny Herbert'; 'When everyone else had stopped Herbert was third behind Senna and Hill, the Brazilian having taken the lead after the stop' |
+| [Wikipedia](https://en.wikipedia.org/wiki/1993_Brazilian_Grand_Prix) | 'The sun then came out, it began to dry rapidly and everyone stopped for dry tyres' (no laps) |
+| [Motor Sport May 1993](https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna) | at the restart Hill 'leaped ahead of Senna and stretched his lead again'; 'The gap was 2.9s by lap 39'; 'By lap 43, nevertheless, he [Herbert] had climbed to an excellent and genuine third as his rivals made their slick stops'; 'Hill began a counter attack that took him to a tantalising 0.199s on lap 47'; Wendlinger 'retired with rising engine temperatures on lap 62' |
+| formulaonehistory.com, flyinglap.com.br | no slick-stop laps |
+
+So every car on wets changed back to slicks between Herbert's stop (lap 37) and lap 43, but
+only Herbert's (37), Senna's (40) and Hill's (41) laps are sourced. The facts file's
+`weather.slickChange` (laps 37-43) gives the other cars still on sourced wets a slick stop on
+the median sourced in-lap, **lap 40, an estimate** (format doc), for ten cars: #26 Blundell,
+#11 Zanardi, #19 Alliot, #27 Alesi, #9 Warwick, #20 Comas, #21 Alboreto, #22 Badoer, #30 Lehto
+(`JAR`, Järvilehto) and #4 de Cesaris (the sidecar's notes name them). Schumacher's lap-41 stop-and-go stays his only stop in the
+window (his stint after it is estimated slicks, as before). New snapshots: lap 39 HIL SENA
+(SENA +2.9 s, ±1), lap 43 SENA HIL HER, lap 47 SENA HIL (HIL +0.199 s, ±0.5). Cars with no
+sourced wet stop (Wendlinger among them) still run slicks through the rain. Anchors 123/123;
+Senna P3 at the takeover (was P14); built and registered without `data_issue`.
+
+| Race | Owner checked |
+|---|---|
+| south-africa-1983, monaco-1992 (rule) | |
+| france-1990 (de Cesaris P15) | |
+| brazil-1993 (slickChange, snapshots) | |
 
 ## Not found anywhere read
 

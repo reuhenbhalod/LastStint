@@ -228,7 +228,7 @@
  "anchors": [
   {
    "anchor": "grid",
-   "subject": "lap-1 order is the grid order",
+   "subject": "lap-1 order is the grid order (out after lap 1, at its sourced time: CEC)",
    "target": [
     "PRO",
     "MAN",
@@ -244,7 +244,6 @@
     "FABC",
     "LAF",
     "HES",
-    "CEC",
     "GHI",
     "BEL"
    ],
@@ -263,7 +262,6 @@
     "FABC",
     "LAF",
     "HES",
-    "CEC",
     "GHI",
     "BEL"
    ],
@@ -745,7 +743,8 @@
  ],
  "notes": [
   "BEL: disqualified, placed P3 on the road at +21.141s (sourced)",
-  "CEC: fastest lap on lap 1, its lap-1 time is the fastest lap's"
+  "CEC: fastest lap on lap 1, its lap-1 time is the fastest lap's",
+  "CEC: out after lap 1, its lap-1 place is its sourced time's"
  ],
  "weather": {
   "source": "reconstruction-facts",

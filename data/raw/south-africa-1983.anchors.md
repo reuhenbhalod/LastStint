@@ -1,10 +1,10 @@
 # Anchor report: south-africa-1983 (reconstructed)
 
-Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: False.
+Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 
 | Anchor | Pass | Total |
 |---|---|---|
-| grid | 0 | 1 |
+| grid | 1 | 1 |
 | order | 1 | 1 |
 | gap | 2 | 2 |
 | fastest | 26 | 26 |
@@ -18,7 +18,7 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: False.
 
 | Anchor | Subject | Target | Achieved | Pass |
 |---|---|---|---|---|
-| grid | lap-1 order is the grid order (the sourced lap-1 order at the front) | 26 cars: PIQN PAT TAM ARN PRO ROSK MAN WINM DEC LAF DEA LAU WAR CHE WAT GIA BAL ALBM SUL BOUT JARJ SUR BOE ACH FABC GHI | 26 cars: PIQN PAT TAM ARN PRO ROSK MAN DEC DEA LAU WINM WAR CHE WAT LAF GIA BAL ALBM SUL BOUT JARJ SUR BOE GHI ACH FABC | FAIL |
+| grid | lap-1 order is the grid order (the sourced lap-1 order at the front) (out after lap 1, at its sourced time: GHI LAF WINM) | 23 cars: PIQN PAT TAM ARN PRO ROSK MAN DEC DEA LAU WAR CHE WAT GIA BAL ALBM SUL BOUT JARJ SUR BOE ACH FABC | 23 cars: PIQN PAT TAM ARN PRO ROSK MAN DEC DEA LAU WAR CHE WAT GIA BAL ALBM SUL BOUT JARJ SUR BOE ACH FABC | pass |
 | order | classification | 12 cars: PAT DEC PIQN WAR ROSK CHE SUL SUR BOUT JARJ LAU ACH | 12 cars: PAT DEC PIQN WAR ROSK CHE SUL SUR BOUT JARJ LAU ACH | pass |
 | gap | DEC | 9.319 | 9.319 | pass |
 | gap | PIQN | 21.969 | 21.972 | pass |
@@ -105,7 +105,10 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: False.
 ## Notes
 
 - WINM: fastest lap on lap 1, its lap-1 time is the fastest lap's
+- WINM: out after lap 1, its lap-1 place is its sourced time's
 - LAF: fastest lap on lap 1, its lap-1 time is the fastest lap's
+- LAF: out after lap 1, its lap-1 place is its sourced time's
 - GHI: fastest lap on lap 1, its lap-1 time is the fastest lap's
+- GHI: out after lap 1, its lap-1 place is its sourced time's
 - SUR: target 5641.9s not reachable
 - BOUT: target 5633.6s not reachable
