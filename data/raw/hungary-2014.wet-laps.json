@@ -1,0 +1,540 @@
+{
+ "race": "hungary-2014",
+ "source": "lap-times",
+ "neutralSource": "status",
+ "filled": [],
+ "wetSpells": [
+  "1-16"
+ ],
+ "neutralLaps": [
+  "8-13",
+  "23-26"
+ ],
+ "ambiguous": [
+  {
+   "lap": 7,
+   "why": "lap before a neutralisation (it may have started during it)"
+  },
+  {
+   "lap": 14,
+   "why": "first green lap after a neutralisation (cold tyres)"
+  },
+  {
+   "lap": 17,
+   "why": "borderline slowing: drizzle, or tyre wear"
+  },
+  {
+   "lap": 22,
+   "why": "lap before a neutralisation (it may have started during it)"
+  },
+  {
+   "lap": 27,
+   "why": "first green lap after a neutralisation (cold tyres)"
+  },
+  {
+   "lap": 68,
+   "why": "borderline slowing: drizzle, or tyre wear"
+  },
+  {
+   "lap": 69,
+   "why": "borderline slowing: drizzle, or tyre wear"
+  },
+  {
+   "lap": 70,
+   "why": "borderline slowing: drizzle, or tyre wear"
+  }
+ ],
+ "stintClasses": [],
+ "laps": [
+  {
+   "lap": 1,
+   "slowing": null,
+   "gap": 0.851,
+   "neutral": false,
+   "wet": true
+  },
+  {
+   "lap": 2,
+   "slowing": 0.2001,
+   "gap": 1.029,
+   "neutral": false,
+   "wet": true
+  },
+  {
+   "lap": 3,
+   "slowing": 0.1896,
+   "gap": 1.841,
+   "neutral": false,
+   "wet": true
+  },
+  {
+   "lap": 4,
+   "slowing": 0.1803,
+   "gap": 1.792,
+   "neutral": false,
+   "wet": true
+  },
+  {
+   "lap": 5,
+   "slowing": 0.173,
+   "gap": 2.414,
+   "neutral": false,
+   "wet": true
+  },
+  {
+   "lap": 6,
+   "slowing": 0.1671,
+   "gap": 2.496,
+   "neutral": false,
+   "wet": true
+  },
+  {
+   "lap": 7,
+   "slowing": 0.1647,
+   "gap": 2.752,
+   "neutral": false,
+   "wet": true
+  },
+  {
+   "lap": 8,
+   "slowing": 0.1655,
+   "gap": 2.991,
+   "neutral": true,
+   "wet": true
+  },
+  {
+   "lap": 9,
+   "slowing": 0.2833,
+   "gap": 1.578,
+   "neutral": true,
+   "wet": true
+  },
+  {
+   "lap": 10,
+   "slowing": 0.3461,
+   "gap": 0.804,
+   "neutral": true,
+   "wet": true
+  },
+  {
+   "lap": 11,
+   "slowing": 0.5144,
+   "gap": 0.964,
+   "neutral": true,
+   "wet": true
+  },
+  {
+   "lap": 12,
+   "slowing": 0.5539,
+   "gap": 1.059,
+   "neutral": true,
+   "wet": true
+  },
+  {
+   "lap": 13,
+   "slowing": 0.4683,
+   "gap": 0.397,
+   "neutral": true,
+   "wet": true
+  },
+  {
+   "lap": 14,
+   "slowing": 0.1025,
+   "gap": 0.464,
+   "neutral": false,
+   "wet": true
+  },
+  {
+   "lap": 15,
+   "slowing": 0.083,
+   "gap": 0.537,
+   "neutral": false,
+   "wet": true
+  },
+  {
+   "lap": 16,
+   "slowing": 0.0495,
+   "gap": 1.128,
+   "neutral": false,
+   "wet": true
+  },
+  {
+   "lap": 17,
+   "slowing": 0.0338,
+   "gap": 1.665,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 18,
+   "slowing": 0.0175,
+   "gap": 1.356,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 19,
+   "slowing": 0.0161,
+   "gap": 1.739,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 20,
+   "slowing": 0.0093,
+   "gap": 2.021,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 21,
+   "slowing": 0.0057,
+   "gap": 2.816,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 22,
+   "slowing": 0.0142,
+   "gap": 2.408,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 23,
+   "slowing": 0.2535,
+   "gap": 2.145,
+   "neutral": true,
+   "wet": false
+  },
+  {
+   "lap": 24,
+   "slowing": 0.262,
+   "gap": 1.207,
+   "neutral": true,
+   "wet": false
+  },
+  {
+   "lap": 25,
+   "slowing": 0.4388,
+   "gap": 0.941,
+   "neutral": true,
+   "wet": false
+  },
+  {
+   "lap": 26,
+   "slowing": 0.4148,
+   "gap": 0.448,
+   "neutral": true,
+   "wet": false
+  },
+  {
+   "lap": 27,
+   "slowing": 0.0225,
+   "gap": 0.702,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 28,
+   "slowing": 0.0129,
+   "gap": 0.796,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 29,
+   "slowing": 0.0086,
+   "gap": 0.862,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 30,
+   "slowing": 0.0081,
+   "gap": 0.844,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 31,
+   "slowing": 0.0048,
+   "gap": 1.772,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 32,
+   "slowing": 0.0053,
+   "gap": 2.013,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 33,
+   "slowing": 0.0014,
+   "gap": 1.827,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 34,
+   "slowing": 0.0041,
+   "gap": 2.413,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 35,
+   "slowing": 0.0002,
+   "gap": 2.844,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 36,
+   "slowing": 0.0012,
+   "gap": 2.402,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 37,
+   "slowing": 0.0021,
+   "gap": 2.19,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 38,
+   "slowing": 0.0039,
+   "gap": 2.603,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 39,
+   "slowing": 0.0062,
+   "gap": 2.815,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 40,
+   "slowing": 0.006,
+   "gap": 2.939,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 41,
+   "slowing": 0.0027,
+   "gap": 3.198,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 42,
+   "slowing": 0.0062,
+   "gap": 2.959,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 43,
+   "slowing": 0.0074,
+   "gap": 2.434,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 44,
+   "slowing": 0.0056,
+   "gap": 2.568,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 45,
+   "slowing": 0.0043,
+   "gap": 3.159,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 46,
+   "slowing": 0.005,
+   "gap": 3.349,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 47,
+   "slowing": 0.0044,
+   "gap": 3.691,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 48,
+   "slowing": 0.0075,
+   "gap": 3.419,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 49,
+   "slowing": 0.0078,
+   "gap": 3.116,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 50,
+   "slowing": 0.0047,
+   "gap": 3.118,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 51,
+   "slowing": 0.0045,
+   "gap": 3.179,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 52,
+   "slowing": 0.0081,
+   "gap": 3.054,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 53,
+   "slowing": 0.0126,
+   "gap": 2.904,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 54,
+   "slowing": 0.0113,
+   "gap": 2.852,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 55,
+   "slowing": 0.0133,
+   "gap": 3.878,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 56,
+   "slowing": 0.0135,
+   "gap": 3.913,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 57,
+   "slowing": 0.013,
+   "gap": 3.315,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 58,
+   "slowing": 0.0136,
+   "gap": 2.413,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 59,
+   "slowing": 0.013,
+   "gap": 1.675,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 60,
+   "slowing": 0.0168,
+   "gap": 1.882,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 61,
+   "slowing": 0.0169,
+   "gap": 2.992,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 62,
+   "slowing": 0.0169,
+   "gap": 4.785,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 63,
+   "slowing": 0.0186,
+   "gap": 6.352,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 64,
+   "slowing": 0.02,
+   "gap": 4.402,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 65,
+   "slowing": 0.0194,
+   "gap": 3.337,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 66,
+   "slowing": 0.0197,
+   "gap": 3.773,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 67,
+   "slowing": 0.024,
+   "gap": 4.531,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 68,
+   "slowing": 0.0259,
+   "gap": 3.479,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 69,
+   "slowing": 0.0284,
+   "gap": 4.763,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 70,
+   "slowing": 0.0334,
+   "gap": 5.225,
+   "neutral": false,
+   "wet": false
+  }
+ ]
+}

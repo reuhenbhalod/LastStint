@@ -412,6 +412,13 @@ def test_provenance_merges_the_overlay():
         estimates.provenance(["tyres"])
 
 
+def test_lap_time_weather_is_listed_as_estimated_but_a_rain_gauge_is_not():
+    assert build.lap_time_weather([{"lap": 1, "time": 90.0, "rain": True, "source": "lap-times"}])
+    assert not build.lap_time_weather([{"time": 150.0, "rain": True, "track": 30.0}])
+    assert not build.lap_time_weather(None)
+    assert not build.lap_time_weather([])
+
+
 @pytest.fixture(scope="module")
 def base_model() -> dict:
     return json.loads((paths.RACES_DIR / "abu-dhabi-2021.json").read_text())

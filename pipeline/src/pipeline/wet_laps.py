@@ -345,9 +345,16 @@ def fit_classes(
     return classes, w
 
 
-def estimate(laps: pd.DataFrame, curves: dict | None = None) -> Estimate:
+def estimate(
+    laps: pd.DataFrame,
+    curves: dict | None = None,
+    dry_labels: dict[tuple[str, int], str] | None = None,
+) -> Estimate:
     """The lap-time weather of a race with no weather data (and its tyre classes and SC laps
-    where the source has none)."""
+    where the source has none). `dry_labels`: step 2.4's estimated dry compound per (driver,
+    stint) when the snapshot's compounds are that estimate rather than the source's (a
+    Jolpica race ingested with estimates, which never labels a wet tyre): the classes are
+    refitted, and a stint fitted as slick keeps its 2.4 label instead of DRY_PLACEHOLDER."""
     curves = curves or wet.load_curves()
     calls, source = call_laps(laps)
     out, filled = laps.copy(), []
@@ -357,17 +364,39 @@ def estimate(laps: pd.DataFrame, curves: dict | None = None) -> Estimate:
         out["TrackStatus"] = np.where(lap_no.isin(neutral), "4", "1").astype(object)
         filled.append("TrackStatus: '4' on the safety-car laps found from the lap times, else '1'")
     classes: dict[tuple[str, int], str] = {}
-    if not has_compounds(laps):
+    if dry_labels is not None or not has_compounds(laps):
         classes, _ = fit_classes(out, calls, curves)
+        labels = dry_labels or {}
         key = zip(out["Driver"].astype(str), stints(out), strict=True)
         out["Compound"] = pd.Series(
-            [CLASS_COMPOUND[classes[k]] for k in key], index=out.index, dtype=object
+            [
+                labels.get(k, DRY_PLACEHOLDER)
+                if classes[k] == "slick"
+                else CLASS_COMPOUND[classes[k]]
+                for k in key
+            ],
+            index=out.index,
+            dtype=object,
         )
-        filled.append(
-            f"Compound: each stint's tyre class fitted from the lap times; dry stints are"
-            f" '{DRY_PLACEHOLDER}' until step 2.4 estimates the dry compounds"
+        dry = (
+            "dry stints keep step 2.4's estimated compound"
+            if dry_labels is not None
+            else f"dry stints are '{DRY_PLACEHOLDER}' until step 2.4 estimates the dry compounds"
         )
+        filled.append(f"Compound: each stint's tyre class fitted from the lap times; {dry}")
     return Estimate(out, calls, source, classes, filled)
+
+
+def estimated_dry_labels(sidecar: dict | None) -> dict[tuple[str, int], str] | None:
+    """Step 2.4's dry compound per (driver, stint) from a Jolpica sidecar, if the race's
+    compounds were estimated; None for a source with real compounds (TUM, FastF1)."""
+    block = (sidecar or {}).get("estimates") or {}
+    if "compounds" not in block.get("estimated", []):
+        return None
+    return {
+        (str(s["driver"]), int(s["stint"])): str(s["compound"])
+        for s in block.get("compounds", {}).get("stints", [])
+    }
 
 
 def report(est: Estimate, race_id: str, wetness: list[float] | None = None) -> dict:
@@ -416,6 +445,22 @@ def runs(laps: set[int]) -> list[tuple[int, int]]:
 
 def report_path(race_id: str, raw_dir: Path) -> Path:
     return raw_dir / f"{race_id}.wet-laps.json"
+
+
+SIDECAR_NOTE = "wet tyre classes refitted from the lap times by `pipeline wet-laps` (step 4.5)"
+
+
+def note_sidecar(race_id: str, est: Estimate, sidecar: dict, raw_dir: Path) -> None:
+    """Record in the Jolpica sidecar's compound estimate that the wet stints were relabelled
+    (its stint list keeps 2.4's dry labels; the raw snapshot has the final compounds)."""
+    notes = sidecar["estimates"]["compounds"].setdefault("notes", [])
+    notes[:] = [n for n in notes if not n.startswith(SIDECAR_NOTE)]
+    wet_stints = sum(cls != "slick" for cls in est.classes.values())
+    notes.append(
+        f"{SIDECAR_NOTE}: {wet_stints} stints on INTERMEDIATE / WET (the snapshot's Compound"
+        " is final; the stints above are 2.4's dry labels)"
+    )
+    (raw_dir / f"{race_id}.jolpica.json").write_text(json.dumps(sidecar, indent=1) + "\n")
 
 
 def write(race_id: str, est: Estimate, raw_dir: Path, wetness: list[float] | None = None) -> None:

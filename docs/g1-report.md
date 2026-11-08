@@ -282,3 +282,109 @@ sim parity checked on all 20 golden seeds of each race: 0 order mismatches, time
 regenerated here: until the coordinator does, `test_sc_rates.py` fails on these six races
 (`test_committed_rates_match_the_raw_timelines`, `test_every_race_file_finds_its_circuit`:
 Valencia isn't in the file yet).
+
+## Eras wave B, step 5.1a (wet races with no weather data): 2 pass, 0 borderline, 4 fail
+
+Eras build plan 5.1, Nov 7 2026. Written by hand, as above (`--report` drops the `eras`
+split). FastF1's weather now needs an F1TV login and TUM / Jolpica have none, so each race's
+wetness is fitted from its lap times (`pipeline wet-laps`, step 4.5). The fitted and
+reported rain timelines are in docs/eras-checks/4.5-wet-races.md. Sources: `pipeline
+tum-ingest` (TUM f1-timing-database @ 9eaad9c, CC BY-NC-SA 3.0) for the 2014-2019 races, and
+`pipeline jolpica` (Jolpica-F1 CSV dump of 2026-10-24, CC BY-NC-SA 4.0; credit in
+`data/raw/<id>.jolpica.json`) with the step 2.4 estimates for the Turkey races. Their SC
+hand-check files (`data/estimates/turkey-202x.sc.json`) are unchecked. Registry split
+`eras`, duel from the Eras spec's race table (user's driver first), `score_positions` 6,
+seed 1, D3 takeover. Robust status: 1,000 runs on each of two seed sets, values seed set 10000
+/ 20000.
+
+| Race | Source | Duel | Status | Without near-tie rule | Mean gap error | Failing checks | Diagnosis |
+|---|---|---|---|---|---|---|---|
+| hungary-2014 | TUM | HAM vs ROS | fail | fail | 4.16s | duel HAM vs ROS gap error 4.58 / 4.90 [3.00]; podium order rate 0.50 / 0.51 [0.50; set 1 passes, set 0 is just under]; field ROS gap error 7.65 / 8.46, RAI 6.69 / 7.13 [5.00] | tyre wear on long last stints (pace model). See below |
+| united-states-2015 | TUM | HAM vs ROS | fail | fail | 3.36s | duel HAM vs ROS gap error 4.30 / 4.18 [3.00] and order rate 0.44 / 0.42 [0.60]; podium order rate 0.41 / 0.39 [0.50]; podium VET gap error 5.26 / 5.00 [5.00]; field VER gap error 7.60 / 7.85 [5.00] | ROS's one-lap loss on lap 48, which decides the duel, isn't modelled. See below |
+| germany-2018 | TUM | HAM vs BOT | fail | fail | 1.34s | field GRO gap error 5.93 / 5.75 [5.00] | SC queue at the lap-58 restart (race mechanics). See below |
+| germany-2019 | TUM | VER vs VET | pass | pass | 1.59s |  |  |
+| turkey-2020 | Jolpica | HAM vs PER | fail | fail | 3.25s | duel HAM vs PER gap error 4.06 / 3.83 [3.00]; field SAI gap error 7.11 / 6.99, LEC 4.84 / 5.17 [5.00] | data: wet throughout? The lap-time fit calls the track dry from lap 18, so stints after the first are on 2.4's dry labels. See below |
+| turkey-2021 | Jolpica | HAM vs LEC | pass | pass | 1.94s |  |  |
+
+Passing races: germany-2019 has duel error 2.38 / 2.28 s, duel and podium order 0.98, and every
+field gap within 2.3 s. turkey-2021 has duel error 2.42 / 2.38 s, duel order 0.97, podium order
+1.00 and every gap within 3.9 s (LEC). **But turkey-2021 builds as a dry race** (see below), so
+its pass says only that the lap pace and stops reproduce the result.
+
+Diagnoses. Gaps below are real / sim (mean of 100-200 runs, truncated at each lap), to the
+leader. `diagnose.py`'s pace/rest split is given, but on these races it counts the wet laps
+as green laps against the dry model, so its "pace" share isn't reliable.
+
+- **hungary-2014** (diagnose: pace 21%, rest 79%). ROS made a third stop (laps 56-57) and
+  then lapped 85.7-86.8 s on new softs. HAM, on mediums from lap 40, ran 88.5-89.7 s, and ALO
+  and RAI, on 30-lap-old softs, ran 88.6-91.0 s. Real ROS gained 17.5 s on the leader over
+  laps 60-70 and finished 0.5 s behind HAM. The sim's ROS gains 2.3 s (lap 60 15.4, lap 70
+  13.1 s; real 23.9 and 6.4 s). ALO's and HAM's real drop-off on the last laps is bigger than
+  the sim's as well (ALO lost 6.3 s to RIC on laps 65-70, the sim 1.9 s). This is the lap-time
+  fit's "borderline slowing" on laps 68-70 (4.5 check). The wear fit fell back to its prior
+  ("wear MEDIUM->SOFT: no separation in data"). No per-race knob changes tyre wear: it needs
+  a wear model with a stronger old-tyre fall-off (pace model work). RAI's 6.7-7.1 s is
+  already there from lap 50 (real 37.2 s, sim 42.0 s), during his long last stint.
+- **united-states-2015** (diagnose: pace 24%, rest 76%). At the lap-47 restart ROS led HAM
+  by 1.6 s. On lap 48 ROS lapped 105.0 s against HAM's 100.7 s with no stop, and lost the
+  lead. The sim has no such one-lap loss, so its ROS keeps the lead in most runs (mean -1.2 s
+  against +2.85 s real; order rate 0.42-0.44). It isn't a car fault in data/incidents.json,
+  and none of the fault kinds (step 4.4) is a driver error. VER, on softs from lap 29, lost
+  2-3 s a lap to HAM after the restart (real 4.5 s behind on lap 47, 22.4 s at the flag). The
+  sim loses less (0.7 s, then 16.0 s): the same old-tyre fall-off as at Hungary. VET closed
+  2.7 s on the last three laps while HAM slowed (102.1, 102.9, 104.3 s). The sim's HAM doesn't
+  back off, so VET is 5.0-5.3 s long. No per-race knob applies. The duel needs a frozen
+  driver-error event, as faults are, with a cited fact (owner).
+- **germany-2018** (diagnose: pace 60%, rest 40%; see the caveat above). Everything passes
+  except GRO, P6, whose gap is 5.75-5.93 s short against a 5.0 s limit. The error comes in
+  under the lap 51-57 SC. GRO stopped twice under it (inters on lap 52, slicks on lap 56) and
+  restarted P10 on the road, 11.7 s behind HAM, behind PER, OCO, ERI and HAR. He passed them
+  by the flag and lost 17.2 s to HAM after the restart (the sim 16.4 s). The sim has him 6.6 s
+  behind at the restart: its SC stops (`pitLossUnderSC` estimated at 0.55 x green) and SC
+  queue put him higher up. It's the same SC-queue mechanism as hungary-2015. Dropping GRO with
+  `score_positions` 5 would pass the race, but that would hide a real error rather than a
+  race-control call, so it isn't applied.
+- **turkey-2020** (diagnose: pace 21%, rest 79%). The lap-time fit finds the track wet on
+  laps 1-16 only. After that the field's slowing stays at 1-2% against each driver's own
+  10th-percentile lap, which is the fit's dry reference. A race that never dried has no dry
+  laps, so the fit can't tell (4.5 known limit). So every stint after the first keeps step
+  2.4's dry label: HAM and PER (one stop) on "HARD" from laps 9-11, LEC and SAI (two stops)
+  "SOFT" then "HARD". The pace fit groups the stints by those labels ("wear HARD->SOFT: no
+  separation in data, prior used"). The sim's two-stoppers then lose 5-7 s too much (SAI 41.5
+  s against 34.4 s real), and PER finishes 27.7 s behind HAM against 31.6 s real. Whether the
+  later stints were on wet tyres is a race fact to check against a report (TODO in the 4.5
+  check). If they were, the fix is a dry-pace reference for a race that stays wet (for example
+  from another session or race): a wet_laps design change, not a per-race knob. It goes to the
+  owner.
+- **turkey-2021** passes G1, but the lap-time fit finds no wet laps at all (the field's laps
+  vary by under 3%), so it has no weather block and every stint is a 2.4 dry label. G1 can't
+  see that: the replay uses the real stops, and the pace is fitted to the real laps whatever
+  the tyre is called. If the race was wet (owner to check, 4.5 TODO), its Eras play would
+  offer the wrong tyre calls. Same limit and fix as turkey-2020. **Flag to the owner before
+  it's used.**
+
+**Pipeline changes in this step.**
+- `pipeline wet-laps` on a Jolpica race ingested with the 2.4 estimates. Before, it took 2.4's
+  dry-only compounds as real and fitted no wet tyres. Now it refits the tyre classes, and a
+  stint fitted dry keeps its 2.4 label instead of the MEDIUM placeholder. It also notes the
+  relabelling in the sidecar's compound estimate.
+- `pipeline ingest` skips a race registered with source `jolpica` and points to `pipeline
+  jolpica`, instead of trying FastF1.
+- `pipeline build` lists `weather` in `provenance.estimated` when the weather records are the
+  lap-time fit (schema field already there; previously never set).
+- **Rules overlays.** These six races are the first built with the step 2.4 overlay hook in
+  place, so their race files carry the `rules` block from `data/eras/<id>.json`. The wave A
+  races were built before the hook and have none (owner: rebuild them so they get theirs).
+  `test_no_rules_block_replays_the_golden_files` now allows a rules block on `eras`-split
+  races only, and it must equal the overlay's.
+
+**Not done here (owner / integration).**
+- `data/sc_rates.json` isn't regenerated (as instructed). The two Turkey races add a new
+  circuit, Istanbul, so three `test_sc_rates.py` tests fail until it's rebuilt
+  (`uv run python -m pipeline.sc_rates`). The rebuild changes only `istanbul` (new, 0 SC and 0
+  VSC in both races) and the all-tracks averages.
+- Garages: 2014, 2015 and 2018-2021 were already listed. 2020 and 2021 gained aliases for the
+  Jolpica team names (`Red Bull`, `Alfa Romeo`, `Alpine F1 Team`).
+- Seeds stay at 1, untuned (no decision moments until 6.2), and `data/pools.json`,
+  `races.gen.ts` and the parity fixtures are untouched. The TS sim matches each race's 20
+  golden seeds exactly (120 / 120: order and finishers, times to 3 decimals).

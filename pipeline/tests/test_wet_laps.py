@@ -197,3 +197,55 @@ def test_cli_writes_the_records_report_and_filled_snapshot(tmp_path):
     assert filled["Compound"].notna().all() and filled["TrackStatus"].notna().all()
     again = CliRunner().invoke(app, ["wet-laps", rid, "--raw-dir", str(tmp_path)])
     assert "skipped" in again.output
+
+
+def test_estimated_dry_labels_are_refitted_and_kept_on_slick_stints(hungary):
+    """A Jolpica race ingested with step 2.4's estimates: every stint carries a dry label (2.4
+    never labels a wet tyre). With the labels given, the wet classes are refitted anyway and
+    the slick stints keep 2.4's label instead of the placeholder."""
+    stint = wet_laps.stints(hungary)
+    labels = {
+        (d, s): "HARD" if s % 2 else "SOFT"
+        for d, s in zip(hungary["Driver"].astype(str), stint, strict=True)
+    }
+    as_24 = hungary.assign(Compound=[labels[k] for k in zip(hungary["Driver"], stint, strict=True)])
+    assert wet_laps.estimate(as_24).classes == {}  # without the labels: taken as real
+    est = wet_laps.estimate(as_24, dry_labels=labels)
+    assert all(est.classes[(d, 1)] == "inter" for d in hungary["Driver"].unique())
+    pairs = zip(est.laps["Driver"], stint, strict=True)
+    got = dict(zip(pairs, est.laps["Compound"], strict=True))
+    for k, cls in est.classes.items():
+        assert got[k] == (labels[k] if cls == "slick" else wet_laps.CLASS_COMPOUND[cls])
+    assert any("2.4" in f for f in est.filled)
+
+
+def test_estimated_dry_labels_come_from_a_sidecar_that_estimated_compounds():
+    stints = [
+        {"driver": "HAM", "stint": 1, "compound": "SOFT"},
+        {"driver": "HAM", "stint": 2, "compound": "HARD"},
+    ]
+    side = {"estimates": {"estimated": ["compounds"], "compounds": {"stints": stints}}}
+    assert wet_laps.estimated_dry_labels(side) == {("HAM", 1): "SOFT", ("HAM", 2): "HARD"}
+    real = {"estimates": {"estimated": ["safetyCars"], "compounds": {"stints": []}}}
+    assert wet_laps.estimated_dry_labels(real) is None
+    assert wet_laps.estimated_dry_labels(None) is None
+
+
+def test_cli_refits_a_jolpica_race_with_estimated_compounds(tmp_path):
+    rid = "turkey-2020"
+    laps = synthetic(rain=range(1, 16), sc=())
+    laps["Compound"] = "HARD"  # what step 2.4 wrote: dry labels only
+    laps.to_parquet(ingest.raw_snapshot_path(rid, tmp_path))
+    stints = [{"driver": d, "stint": 1, "compound": "HARD"} for d in laps["Driver"].unique()]
+    side = {"estimates": {"estimated": ["compounds"], "compounds": {"stints": stints}}}
+    (tmp_path / f"{rid}.jolpica.json").write_text(json.dumps(side))
+    for _ in range(2):  # a forced re-run replaces its note, it doesn't add another
+        run = CliRunner().invoke(app, ["wet-laps", rid, "--raw-dir", str(tmp_path), "--force"])
+        assert run.exit_code == 0, run.output
+    notes = json.loads((tmp_path / f"{rid}.jolpica.json").read_text())["estimates"]["compounds"]
+    assert sum(n.startswith(wet_laps.SIDECAR_NOTE) for n in notes["notes"]) == 1
+    assert not set(pd.read_parquet(tmp_path / f"{rid}.parquet")["Compound"]) - {
+        "HARD",
+        "INTERMEDIATE",
+        "WET",
+    }

@@ -130,10 +130,12 @@ const STANDINGS: Record<number, string[]> = {
     'Toro Rosso',
     'Williams',
   ],
+  // 2020-2021: also under the Jolpica dump's names (sakhir-2020, turkey-2020, turkey-2021):
+  // Red Bull, Alfa Romeo, Alpine F1 Team.
   2020: [
     'Mercedes',
     'Ferrari',
-    'Red Bull Racing|Red Bull', // sakhir-2020 (Jolpica) spells both without the suffix
+    'Red Bull Racing|Red Bull',
     'McLaren',
     'Renault',
     'AlphaTauri',
@@ -144,13 +146,13 @@ const STANDINGS: Record<number, string[]> = {
   ],
   2021: [
     'Mercedes',
-    'Red Bull Racing',
+    'Red Bull Racing|Red Bull',
     'McLaren',
     'Aston Martin',
-    'Alpine',
+    'Alpine|Alpine F1 Team',
     'Ferrari',
     'AlphaTauri',
-    'Alfa Romeo Racing',
+    'Alfa Romeo Racing|Alfa Romeo',
     'Haas F1 Team',
     'Williams',
   ],
@@ -212,6 +214,7 @@ const SHORT: Record<string, string> = {
   McLaren: 'MCL',
   Renault: 'REN',
   Alpine: 'ALP',
+  'Alpine F1 Team': 'ALP',
   'Racing Point': 'RP',
   'Force India': 'FI',
   'Aston Martin': 'AM',
