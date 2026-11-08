@@ -1,6 +1,5 @@
-// Smart's wet-tyre rule (eras spec §7). A pure rule piece: no policy uses it until Smart is
-// defined (policy.ts RIVAL_POLICY_GAPS). Mirrored by rival_policy.wet_crossover in the
-// pipeline; tests/rival-policy.test.ts and pipeline/tests/test_rival_policy.py check both
+// Smart's wet-tyre crossover (eras spec §7), the rule piece rules.ts wetSwitch builds Smart's
+// and Expert's wet switch on. Mirrored by rival_policy.wet_crossover in the pipeline; tests/rival-policy.test.ts and pipeline/tests/test_rival_policy.py check both
 // against the same vectors.
 
 import { cleanLap } from '../sim.js';
@@ -8,7 +7,8 @@ import type { CarState, Compound, RaceModel } from '../types.js';
 import { WET_TYRES, isWetTyre, wetnessOn } from '../weather.js';
 
 /**
- * Smart's wet-tyre rule (eras spec §7, "switches to wet tyres at the sim's crossover lap"):
+ * Smart's wet-tyre crossover (eras spec §7, "the first lap a fresh set of inters or wets is
+ * faster than its slicks"):
  * the wet tyre a car on slicks should switch to on `lap`, or null to stay on slicks. The
  * crossover is the first lap on which a fresh set of a wet tyre (inters, or full wets where
  * the race has them) has a faster model lap than the car's slicks as they are, at that lap's

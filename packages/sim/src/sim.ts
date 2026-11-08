@@ -27,7 +27,17 @@ import { type FaultTable, cloneFaults, faultCost, faultTable } from './faults.js
 import headsetConfig from './headset.json';
 import { legendEvents } from './legend.js';
 import { validatePlan } from './plan.js';
-import { resolveRivalPolicy } from './rivals/policy.js';
+import { coverWindow, playoutPolicy, resolveRivalPolicy } from './rivals/policy.js';
+import {
+  type RivalChoice,
+  type RivalGrading,
+  type RivalRunState,
+  assertRivalReady,
+  forkRivalState,
+  initRivalState,
+  rivalAfterLap,
+  rivalPlanBefore,
+} from './rivals/react.js';
 import { type Rng, deriveSeed, mulberry32 } from './rng.js';
 import {
   hasMove,
@@ -85,7 +95,7 @@ export const CLIFF_FALLBACK = 2.0; // extra wear past the cliff = this x degPerL
 /** A tyre is worn out once it's this much slower than new (s/lap): its usable life. */
 export const LIFE_LOSS = 2.0;
 /** Laps of life a rival keeps in hand when it skips a stop to go long. */
-const GO_LONG_MARGIN = 3;
+export const GO_LONG_MARGIN = 3;
 
 /**
  * A compound's usable life (tyre-life fix): the tyre age at which its wear and its cliff make it
@@ -137,7 +147,7 @@ export interface RunOptions {
   incidents?: boolean;
   /**
    * Live play: the rival's policy (eras spec §7; rivals/policy.ts). Default `standard`, today's
-   * rival. Throws on a policy the sim can't run yet.
+   * rival. Throws RivalPolicyError on an unknown name.
    */
   rivalPolicy?: RivalPolicy;
   /**
@@ -145,6 +155,12 @@ export interface RunOptions {
    * the takeover are replaced by ones drawn from `seed` at the track's historical rate.
    */
   legend?: boolean;
+  /** Expert: the rival's claimed choices to replay (rivals/react.ts). */
+  rivalChoices?: RivalChoice[];
+  /** Expert: how its decisions are graded without a claim (default 'inline'; rivals/react.ts). */
+  rivalGrading?: RivalGrading;
+  /** Expert: samples per decision (default EXPERT_SAMPLES). */
+  rivalSamples?: number;
 }
 
 export interface ModeEffect {
@@ -279,6 +295,8 @@ export interface Run {
   rivalPolicy: RivalPolicy;
   /** Legend difficulty (RunOptions.legend): the evaluator and server read it off the run. */
   legend: boolean;
+  /** Expert's decision state (rivals/react.ts); undefined for every other policy. */
+  rival?: RivalRunState;
   notes: RaceNote[];
   headset: HeadsetEra | undefined;
   /** Per-car random streams, created on first use (see Streams). */
@@ -569,14 +587,17 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
   const engineer =
     live && options.incidents !== false ? headsetFor(HEADSET, model)?.engineer : undefined;
 
+  const rivalPolicy = resolveRivalPolicy(options.rivalPolicy);
+  const rival = live ? initRivalState(rivalPolicy, options) : undefined;
   const run: Run = {
     model,
     seed,
     ...makeStreams(model, seed),
     decisions: [...(options.decisions ?? [])],
     live,
-    rivalPolicy: resolveRivalPolicy(options.rivalPolicy),
+    rivalPolicy,
     legend: options.legend === true,
+    ...(rival ? { rival } : {}),
     notes: [],
     headset: headsetFor(HEADSET, model),
     passedBy: new Map(),
@@ -742,6 +763,10 @@ export function forkRun(
       ...(run.state.engineer ? { engineer: cloneEngineer(run.state.engineer) } : {}),
     },
     decisions: [...run.decisions.filter((d) => d.lap > run.state.lap), ...decisions],
+    // Playouts in an Expert race have Smart rivals (eras spec §7: no grading inside grading).
+    rivalPolicy:
+      options.blindAfter === undefined ? run.rivalPolicy : playoutPolicy(run.rivalPolicy),
+    rival: forkRivalState(run.rival, options.blindAfter !== undefined),
     notes: [],
     ...blindView(run, seed, options.blindAfter),
     faults: cloneFaults(run.faults, options.blindAfter),
@@ -991,6 +1016,8 @@ function rivalReacts(
   const rival = state.cars[model.rival];
   if (!run.live || !user || !rival || !user.pittedThisLap) return;
   if (rival.retired || rival.pittedThisLap || lap >= model.race.laps) return;
+  // Expert covers green-flag stops on the player's in-lap instead (rivals/react.ts).
+  if (run.rivalPolicy === 'expert' && flag !== 'sc' && flag !== 'vsc') return;
   const to = rivalCover(model, rival, {
     lap,
     flag,
@@ -998,6 +1025,7 @@ function rivalReacts(
     startGap: Math.abs((prevTime[user.code] ?? 0) - (prevTime[rival.code] ?? 0)),
     userBehind: user.totalTime - rival.totalTime,
     userCompound: user.compound,
+    window: coverWindow(run.rivalPolicy),
   });
   if (!to) return;
   if (pitLaneClosed(model, run.neutral, lap + 1, to)) return; // era rules: no stop-go cover
@@ -1024,6 +1052,8 @@ export function rivalCover(
     startGap: number;
     userBehind: number;
     userCompound: string;
+    /** The green-flag cover window (default COVER_WINDOW; rivals/policy.ts coverWindow). */
+    window?: number;
   },
 ): string | null {
   const { lap, flag, nextFlag } = at;
@@ -1043,7 +1073,9 @@ export function rivalCover(
     }
   } else {
     cover =
-      at.startGap < model.track.pitLoss && !!nextStop && nextStop.lap - (lap + 1) <= COVER_WINDOW;
+      at.startGap < model.track.pitLoss &&
+      !!nextStop &&
+      nextStop.lap - (lap + 1) <= (at.window ?? COVER_WINDOW);
   }
   return cover ? (nextStop?.to ?? at.userCompound) : null;
 }
@@ -1243,6 +1275,7 @@ export function isFinished(run: Run): boolean {
 export function stepLap(run: Run): RaceState {
   const { model, state } = run;
   if (isFinished(run)) return state;
+  assertRivalReady(run);
   const lap = state.lap + 1;
   const flag = run.neutral.get(lap);
   applyDecisions(run, lap);
@@ -1403,12 +1436,14 @@ export function stepLap(run: Run): RaceState {
     applySwap(run, lap, prevTime);
   }
   if (state.engineer) engineerAfterLap(run, lap, battle, prevTime, pitted);
+  const rivalBefore = rivalPlanBefore(run);
   rivalReacts(run, lap, flag, prevTime);
   rivalGoesLong(run, lap);
 
   state.lap = lap;
   state.flag = flag ?? 'green';
   markNextFlag(run);
+  rivalAfterLap(run, lap, rivalBefore);
   return state;
 }
 

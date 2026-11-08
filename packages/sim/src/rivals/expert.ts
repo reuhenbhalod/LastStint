@@ -1,22 +1,24 @@
-// The grader turned round for the rival (eras spec §7, Expert: "takes the best option for
-// itself at each of its own decision points, using the grader"). The mechanism only: given
-// the rival's options at a paused live run, the share of playouts each one finishes ahead of
-// the user. No policy calls it yet (policy.ts RIVAL_POLICY_GAPS: Expert's decision points,
-// options and target are undefined); scripts/bench-rival.ts measures what it would cost.
+// The grader turned round for the rival (eras spec §7, Expert: "at each decision point it runs
+// the grader for itself and takes the best option"; its target is finishing ahead of the
+// player). react.ts calls it at Expert's decision points with rules.ts rivalOptions; the
+// RivalGradeJob below runs the same count in the background grading Web Workers.
 //
 // It follows the player's grader (grade.ts) so the two are comparable:
 // - common random numbers: sample i of every option forks with the same seed, derived from
 //   the run's seed and the lap (on its own stream), so a server replay reproduces it;
-// - blind playouts: events after the decision lap are sampled, not the real ones;
+// - blind playouts: events after the decision lap are sampled, not the real ones, and the
+//   rival in them is Smart (sim.ts forkRun, policy.ts playoutPolicy: no grading inside grading);
 // - the user's car runs only what the rival can see (its calls already charged or under way)
 //   and then the sensible-strategist continuation (planRemainingStop). The player's later calls
 //   are dropped: live, the client doesn't have them yet, and a server replay has them all, so
 //   reading them would both cheat and make the client and server disagree.
 
-import { GRADE_SAMPLES } from '../grade.js';
+import { GRADE_SAMPLES, type GradeJob, type GradeJobResult, runFromJob } from '../grade.js';
 import { deriveSeed } from '../rng.js';
 import { type Run, classify, forkRun, isFinished, planRemainingStop, stepLap } from '../sim.js';
 import type { PitStop, RaceResult } from '../types.js';
+import { EXPERT_SAMPLES, RivalPolicyError } from './policy.js';
+import type { RivalChoice } from './react.js';
 
 /** The rival's grader seeds: its own stream, so they never equal a player's grade's. */
 export const RIVAL_GRADE_STREAM = 3500;
@@ -53,7 +55,7 @@ export function rivalAhead(run: Run, result: RaceResult): boolean {
 export function rivalPlayout(run: Run, seed: number, option: RivalOption): Run {
   if (!run.live) throw new Error('the rival grades only a live run');
   for (const s of option.stops) {
-    if (!Number.isInteger(s.lap) || s.lap <= run.state.lap || s.lap >= run.model.race.laps)
+    if (!Number.isInteger(s.lap) || s.lap <= run.state.lap || s.lap > run.model.race.laps)
       throw new Error(`rival option ${option.id}: stop on lap ${s.lap}`);
     if (!run.model.compounds[s.to]) throw new Error(`rival option ${option.id}: no ${s.to}`);
   }
@@ -97,12 +99,84 @@ export function gradeRivalMoment(
   if (options.length === 0) throw new Error('no rival options to grade');
   if (!Number.isInteger(samples) || samples < 1)
     throw new Error(`samples must be a positive integer, got ${samples}`);
-  const hits = countRivalHits(run, options, 0, samples);
+  return gradeFromHits(run.state.lap, options, samples, countRivalHits(run, options, 0, samples));
+}
+
+/**
+ * Expert's decision as plain JSON, for a background grading Web Worker (as grade.ts GradeJob):
+ * the worker rebuilds the run paused at the decision (runFromJob, replaying the rival's earlier
+ * choices), recomputes the point's options (deterministic) and counts a range of samples.
+ */
+export interface RivalGradeJob {
+  model: GradeJob['model'];
+  seed: number;
+  /** All the player's calls so far (Run.decisions). */
+  decisions: GradeJob['decisions'];
+  /** The decision lap (Run.state.lap, with the decision pending). */
+  pausedAtLap: number;
+  /** The rival's choices before this one (react.ts rivalChoices). */
+  rivalChoices: RivalChoice[];
+  samples: number;
+}
+
+/** Describe a run's pending Expert decision (rivalGrading 'deferred') as a RivalGradeJob. */
+export function rivalGradeJob(
+  run: Run,
+  samples = run.rival?.samples ?? EXPERT_SAMPLES,
+): RivalGradeJob {
+  const pending = run.rival?.pending;
+  if (!pending || pending.lap !== run.state.lap)
+    throw new RivalPolicyError('no rival decision is waiting at this lap');
+  return {
+    model: run.model,
+    seed: run.seed,
+    decisions: [...run.decisions],
+    pausedAtLap: run.state.lap,
+    rivalChoices: (run.rival?.points ?? []).map((p) => ({ lap: p.lap, option: p.chosen })),
+    samples,
+  };
+}
+
+/** The pending decision's run and options, rebuilt from a job. */
+function pendingFromJob(job: RivalGradeJob) {
+  const run = runFromJob({ ...job, rivalPolicy: 'expert' });
+  const pending = run.rival?.pending;
+  if (!pending || pending.lap !== job.pausedAtLap)
+    throw new RivalPolicyError(`no rival decision after lap ${job.pausedAtLap} in this job`);
+  return { run, options: pending.options };
+}
+
+/** Worker entry point: the rival's hits per option for samples [from, to) (plain JSON). */
+export function runRivalGradeJob(job: RivalGradeJob, from = 0, to = job.samples): GradeJobResult {
+  const { run, options } = pendingFromJob(job);
+  return { from, to, hits: countRivalHits(run, options, from, to) };
+}
+
+/** Merge workers' ranges (which must tile 0..samples) into the rival's grade. */
+export function mergeRivalGradeJobs(job: RivalGradeJob, results: GradeJobResult[]): RivalGrade {
+  const { options } = pendingFromJob(job);
+  const ranges = [...results].sort((a, b) => a.from - b.from);
+  let next = 0;
+  for (const r of ranges) {
+    if (r.from !== next) throw new Error(`sample ranges must tile 0..${job.samples}`);
+    next = r.to;
+  }
+  if (next !== job.samples) throw new Error(`sample ranges must tile 0..${job.samples}`);
+  const hits = options.map((_, k) => ranges.reduce((sum, r) => sum + (r.hits[k] ?? 0), 0));
+  return gradeFromHits(job.pausedAtLap, options, job.samples, hits);
+}
+
+function gradeFromHits(
+  lap: number,
+  options: RivalOption[],
+  samples: number,
+  hits: number[],
+): RivalGrade {
   const probabilities: Record<string, number> = {};
   let best = 0;
   hits.forEach((h, k) => {
     probabilities[(options[k] as RivalOption).id] = h / samples;
     if (h > (hits[best] as number)) best = k;
   });
-  return { lap: run.state.lap, samples, best: (options[best] as RivalOption).id, probabilities };
+  return { lap, samples, best: (options[best] as RivalOption).id, probabilities };
 }

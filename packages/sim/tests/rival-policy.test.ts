@@ -1,6 +1,7 @@
-// Rival policies (eras build plan 9.1): the policy selector and its hook in the sim, Standard
-// replaying today's behaviour exactly, Smart's wet-crossover rule against the vectors the
-// Python reference sim checks too (parity), and the rival's grader (Expert's mechanism).
+// Rival policies (eras build plan 9.1, eras spec §7): the policy selector and its hook in the
+// sim, Standard replaying today's behaviour exactly, Smart's wet-crossover rule against the
+// vectors the Python reference sim checks too (parity), and the rival's grader (Expert's
+// mechanism). The Nov 7 policies themselves are in rival-policies.test.ts.
 
 import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -19,9 +20,7 @@ import {
 import {
   DEFAULT_RIVAL_POLICY,
   IMPLEMENTED_RIVAL_POLICIES,
-  RIVAL_POLICY_GAPS,
   RIVAL_POLICY_NAMES,
-  RivalPolicyError,
   resolveRivalPolicy,
 } from '../src/rivals/policy.js';
 import { wetCrossover } from '../src/rivals/wet.js';
@@ -56,22 +55,19 @@ describe('rival policy selector', () => {
     expect(() => resolveRivalPolicy(bad)).toThrow(/unknown rival policy/);
   });
 
-  it.each(['standard-plus', 'smart', 'expert'])('fails loudly on %s, with its spec gap', (p) => {
-    expect(IMPLEMENTED_RIVAL_POLICIES).not.toContain(p);
-    expect(RIVAL_POLICY_GAPS[p as keyof typeof RIVAL_POLICY_GAPS]).toBeTruthy();
-    expect(() => resolveRivalPolicy(p)).toThrow(RivalPolicyError);
-    expect(() => resolveRivalPolicy(p)).toThrow(`${p} is not implemented`);
+  it.each(['standard-plus', 'smart', 'expert'] as const)('resolves %s', (p) => {
+    expect(IMPLEMENTED_RIVAL_POLICIES).toContain(p);
+    expect(resolveRivalPolicy(p)).toBe(p);
   });
 
-  it('initRun takes the policy, keeps it in forks, and refuses an undefined one', () => {
+  it('initRun takes the policy, keeps it in forks, and refuses an unknown one', () => {
     const model = race('abu-dhabi-2021');
     expect(initRun(model, 1).rivalPolicy).toBe('standard');
     const run = initRun(model, 1, { decisions: [], rivalPolicy: 'standard' });
     stepLap(run);
     expect(forkRun(run, 2).rivalPolicy).toBe('standard');
-    expect(() => initRun(model, 1, { decisions: [], rivalPolicy: 'expert' })).toThrow(
-      RivalPolicyError,
-    );
+    for (const p of ['standard-plus', 'smart', 'expert'] as const)
+      expect(initRun(model, 1, { decisions: [], rivalPolicy: p }).rivalPolicy).toBe(p);
     expect(() =>
       initRun(model, 1, { decisions: [], rivalPolicy: 'hard' as unknown as 'standard' }),
     ).toThrow(/unknown rival policy/);

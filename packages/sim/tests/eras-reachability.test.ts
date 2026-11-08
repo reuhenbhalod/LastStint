@@ -164,19 +164,17 @@ describe('checkRace', () => {
     expect(r.errors).toEqual(['moment only-stay has no stay-out option']);
   });
 
-  it('falls back to the standard rival, with a warning, when the era asks for another', () => {
-    // Era 8 is Standard+; Legend is Expert. Neither is in the sim on this branch.
+  it("plays the era's rival policy, and Legend's Expert with random safety cars", () => {
+    // Era 8 is Standard+; Legend is Expert. Both are in the sim (step 9.1), so no fallback.
     const r = checkRace(withEras({ ...REACHABLE, eraId: 8 }, { decisionMoments: [ONLY_STAY] }), {
       samples: 10,
       seeds: [1],
     });
     expect(r.era?.settings.rivalPolicy).toBe('standard-plus');
-    expect(r.era?.rivalPolicy).toBe('standard');
-    expect(r.era?.warnings.some((w) => w.startsWith('rival policy standard-plus'))).toBe(true);
-    expect(r.legend?.rivalPolicy).toBe('standard');
-    expect(r.legend?.warnings.some((w) => w.startsWith('rival policy expert'))).toBe(true);
-    if (!LEGEND_SAFETY_CARS_SUPPORTED)
-      expect(r.legend?.warnings.some((w) => w.includes('real SCs'))).toBe(true);
+    expect(r.era?.rivalPolicy).toBe('standard-plus');
+    expect(r.era?.warnings.some((w) => w.startsWith('rival policy'))).toBe(false);
+    expect(r.legend?.rivalPolicy).toBe('expert');
+    expect(r.legend?.warnings.some((w) => w.includes('real SCs'))).toBe(false);
   });
 
   it('rejects bad options', () => {
@@ -221,7 +219,7 @@ describe('helpers', () => {
 
   it('keeps an implemented rival policy and replaces the rest', () => {
     expect(effectiveRivalPolicy('standard')).toEqual({ policy: 'standard', warning: null });
-    expect(effectiveRivalPolicy('smart').policy).toBe('standard');
+    expect(effectiveRivalPolicy('smart')).toEqual({ policy: 'smart', warning: null });
   });
 
   it('plays from eras.userSide', () => {

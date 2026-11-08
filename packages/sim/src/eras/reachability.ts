@@ -55,12 +55,8 @@ export const REACH_SEEDS: readonly number[] = [1, 2, 3];
 /** Prefixes kept per moment (the beam). */
 export const REACH_BEAM = 4;
 
-/**
- * Legend's random safety cars (eras spec §8) aren't in the sim on this branch, so Legend runs
- * with the race's real SCs and VSCs. When they land, pass the sim's Legend run option as
- * `legendRunOptions` and set this to true.
- */
-export const LEGEND_SAFETY_CARS_SUPPORTED = false;
+/** Legend's random safety cars (eras spec §8; legend.ts) are in the sim: Legend runs use them. */
+export const LEGEND_SAFETY_CARS_SUPPORTED = true;
 
 export interface ReachabilityOptions {
   /** The seeds tried, in order. Default REACH_SEEDS. */
@@ -430,7 +426,7 @@ export function checkRace(model: RaceModel, opts: ReachabilityOptions = {}): Rac
     seeds: opts.seeds ?? REACH_SEEDS,
     samples: opts.samples ?? GRADE_SAMPLES,
     beamWidth: opts.beamWidth ?? REACH_BEAM,
-    legendRunOptions: opts.legendRunOptions ?? {},
+    legendRunOptions: opts.legendRunOptions ?? { legend: true },
     config: opts.config ?? ERAS_CONFIG,
     now: opts.now ?? Date.now,
   };
