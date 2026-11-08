@@ -29,6 +29,35 @@
   "jolpicaRound": 10,
   "eventName": "German Grand Prix"
  },
+ "classified": [
+  "PIQN",
+  "SENA",
+  "MAN",
+  "ARN",
+  "ROSK",
+  "PRO",
+  "WAR",
+  "TAM",
+  "JON",
+  "BER",
+  "JOH",
+  "BEG"
+ ],
+ "roadPositions": [],
+ "lastLapStops": [
+  {
+   "driver": "ROSK",
+   "laps": 43,
+   "gap": 2.0,
+   "source": "https://www.autosport.com/f1/feature/3783/grand-prix-gold-german-gp-1986"
+  },
+  {
+   "driver": "PRO",
+   "laps": 43,
+   "gap": null,
+   "source": "https://www.autosport.com/f1/feature/3783/grand-prix-gold-german-gp-1986; https://en.wikipedia.org/wiki/1986_German_Grand_Prix"
+  }
+ ],
  "stopsComplete": false,
  "safetyCarsComplete": true,
  "params": {
@@ -82,16 +111,16 @@
    "target": 5003.439
   },
   "ROSK": {
-   "pace": 108.828,
-   "wear": 0.075,
+   "pace": 108.539,
+   "wear": 0.15,
    "noise": 0.525,
-   "target": 4798.101
+   "target": 4821.568
   },
   "PRO": {
-   "pace": 108.85,
-   "wear": 0.075,
-   "noise": 0.35,
-   "target": 4798.601
+   "pace": 109.326,
+   "wear": 0.2,
+   "noise": 0.7,
+   "target": 4872.3
   },
   "WAR": {
    "pace": 114.779,
@@ -1015,5 +1044,8 @@
    "pass": true
   }
  ],
- "notes": []
+ "notes": [
+  "ROSK: stopped on the last lap (sourced), its lap 43 at its road place, 2.0s behind the leader (sourced)",
+  "PRO: stopped on the last lap (sourced), its lap 43 at its road place, after the leader's and before the flag"
+ ]
 }

@@ -23,9 +23,10 @@
     ],
     "overtakeDifficulty": 0.9484,
     "overtakeModel": {
-      "intercept": -1.1836,
-      "paceCoef": 1.5618,
-      "gapCoef": -3.3889
+      "intercept": -0.2793,
+      "paceCoef": 0.8092,
+      "gapCoef": -4.1132,
+      "trainCoef": -0.0531
     },
     "dirtyAirPenalty": 0.1506,
     "greenLapTime": 72.733,
@@ -36,6 +37,11 @@
       "refFill": 24.143,
       "tankLaps": 43,
       "stops": 14
+    },
+    "restart": {
+      "jump": 0.15,
+      "spread": 0.44,
+      "places": 8
     }
   },
   "compounds": {
@@ -66,7 +72,17 @@
         {
           "lap": 62,
           "to": "MEDIUM",
-          "loss": 24.046
+          "loss": 23.891
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.128
+        },
+        {
+          "lap": 62,
+          "offset": 0.283
         }
       ]
     },
@@ -110,6 +126,12 @@
           "lap": 29,
           "to": "MEDIUM"
         }
+      ],
+      "stintPace": [
+        {
+          "lap": 29,
+          "offset": -0.02
+        }
       ]
     },
     {
@@ -131,6 +153,12 @@
           "lap": 29,
           "to": "MEDIUM"
         }
+      ],
+      "stintPace": [
+        {
+          "lap": 29,
+          "offset": -0.015
+        }
       ]
     },
     {
@@ -151,6 +179,12 @@
         {
           "lap": 33,
           "to": "MEDIUM"
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 33,
+          "offset": -0.026
         }
       ]
     },
@@ -214,6 +248,12 @@
           "lap": 34,
           "to": "MEDIUM"
         }
+      ],
+      "stintPace": [
+        {
+          "lap": 34,
+          "offset": -0.013
+        }
       ]
     },
     {
@@ -234,7 +274,17 @@
         {
           "lap": 52,
           "to": "MEDIUM",
-          "loss": 23.624
+          "loss": 23.534
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": 0.24
+        },
+        {
+          "lap": 52,
+          "offset": -0.15
         }
       ]
     },
@@ -256,7 +306,17 @@
         {
           "lap": 63,
           "to": "MEDIUM",
-          "loss": 23.961
+          "loss": 23.921
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.016
+        },
+        {
+          "lap": 63,
+          "offset": 0.056
         }
       ]
     },
@@ -278,6 +338,12 @@
         {
           "lap": 33,
           "to": "MEDIUM"
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 33,
+          "offset": -0.014
         }
       ]
     },
@@ -315,7 +381,17 @@
         {
           "lap": 48,
           "to": "MEDIUM",
-          "loss": 27.232
+          "loss": 27.045
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": 0.314
+        },
+        {
+          "lap": 48,
+          "offset": -0.127
         }
       ]
     },
@@ -337,6 +413,12 @@
         {
           "lap": 30,
           "to": "MEDIUM"
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 30,
+          "offset": -0.287
         }
       ]
     },
@@ -362,7 +444,17 @@
         {
           "lap": 54,
           "to": "MEDIUM",
-          "loss": 25.51
+          "loss": 25.562
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 30,
+          "offset": 0.032
+        },
+        {
+          "lap": 54,
+          "offset": -0.084
         }
       ]
     },
@@ -388,7 +480,17 @@
         {
           "lap": 46,
           "to": "MEDIUM",
-          "loss": 21.295
+          "loss": 20.95
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 30,
+          "offset": 0.804
+        },
+        {
+          "lap": 46,
+          "offset": -0.459
         }
       ]
     },
@@ -410,6 +512,12 @@
         {
           "lap": 29,
           "to": "MEDIUM"
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 29,
+          "offset": -0.119
         }
       ]
     }
@@ -450,6 +558,12 @@
       "lap": 45,
       "type": "RETIREMENT",
       "driver": "TRU"
+    },
+    {
+      "lap": 71,
+      "type": "TEAM_ORDER",
+      "driver": "BAR",
+      "other": "MSCM"
     }
   ],
   "decisionMoments": [

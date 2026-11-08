@@ -20,13 +20,19 @@
     ],
     "overtakeDifficulty": 0.8656,
     "overtakeModel": {
-      "intercept": -0.6621,
-      "paceCoef": 1.1359,
-      "gapCoef": -2.3069
+      "intercept": -0.0968,
+      "paceCoef": 1.8366,
+      "gapCoef": -3.8725,
+      "trainCoef": -0.9007
     },
     "dirtyAirPenalty": 0.6222,
     "greenLapTime": 107.62,
-    "scLapTime": 156.647
+    "scLapTime": 156.647,
+    "restart": {
+      "jump": 0.15,
+      "spread": 0.44,
+      "places": 8
+    }
   },
   "compounds": {
     "SOFT": {
@@ -68,6 +74,16 @@
           "to": "SOFT",
           "loss": 0.0
         }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": 0.018
+        },
+        {
+          "lap": 23,
+          "offset": -0.049
+        }
       ]
     },
     {
@@ -95,6 +111,12 @@
           "to": "SOFT",
           "loss": 0.0
         }
+      ],
+      "stintPace": [
+        {
+          "lap": 23,
+          "offset": -0.082
+        }
       ]
     },
     {
@@ -120,6 +142,16 @@
           "lap": 23,
           "to": "SOFT",
           "loss": 0.0
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": 0.292
+        },
+        {
+          "lap": 23,
+          "offset": -0.075
         }
       ]
     },
@@ -151,7 +183,21 @@
         {
           "lap": 37,
           "to": "SOFT",
-          "loss": 41.307
+          "loss": 41.512
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": 0.266
+        },
+        {
+          "lap": 23,
+          "offset": -0.015
+        },
+        {
+          "lap": 37,
+          "offset": -0.19
         }
       ]
     },
@@ -183,7 +229,17 @@
       "serviceStops": [
         {
           "lap": 32,
-          "loss": 30.275
+          "loss": 30.179
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.129
+        },
+        {
+          "lap": 23,
+          "offset": 0.048
         }
       ]
     },
@@ -210,6 +266,12 @@
           "lap": 23,
           "to": "SOFT",
           "loss": 0.0
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.177
         }
       ]
     },
@@ -253,6 +315,16 @@
           "to": "SOFT",
           "loss": 0.0
         }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.048
+        },
+        {
+          "lap": 23,
+          "offset": 0.043
+        }
       ]
     },
     {
@@ -278,6 +350,12 @@
           "lap": 23,
           "to": "SOFT",
           "loss": 0.0
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -1.034
         }
       ]
     },
@@ -309,6 +387,16 @@
           "to": "SOFT",
           "loss": 0.0
         }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.393
+        },
+        {
+          "lap": 23,
+          "offset": 0.042
+        }
       ]
     },
     {
@@ -338,7 +426,17 @@
       "serviceStops": [
         {
           "lap": 34,
-          "loss": 15.202
+          "loss": 15.18
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.443
+        },
+        {
+          "lap": 21,
+          "offset": 0.011
         }
       ]
     },
@@ -369,7 +467,17 @@
       "serviceStops": [
         {
           "lap": 34,
-          "loss": 14.747
+          "loss": 14.513
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.593
+        },
+        {
+          "lap": 21,
+          "offset": 0.117
         }
       ]
     },
@@ -398,6 +506,16 @@
           "to": "SOFT",
           "loss": 0.0
         }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": 0.136
+        },
+        {
+          "lap": 23,
+          "offset": -0.018
+        }
       ]
     },
     {
@@ -423,6 +541,16 @@
           "lap": 23,
           "to": "SOFT",
           "loss": 0.0
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": 0.134
+        },
+        {
+          "lap": 23,
+          "offset": -0.103
         }
       ]
     },
@@ -450,6 +578,16 @@
           "to": "SOFT",
           "loss": 0.0
         }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.074
+        },
+        {
+          "lap": 23,
+          "offset": 0.04
+        }
       ]
     },
     {
@@ -476,7 +614,21 @@
         {
           "lap": 34,
           "to": "SOFT",
-          "loss": 23.183
+          "loss": 22.983
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.238
+        },
+        {
+          "lap": 23,
+          "offset": 0.471
+        },
+        {
+          "lap": 34,
+          "offset": -0.271
         }
       ]
     },
@@ -524,7 +676,17 @@
       "serviceStops": [
         {
           "lap": 34,
-          "loss": 28.951
+          "loss": 28.853
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.183
+        },
+        {
+          "lap": 23,
+          "offset": 0.049
         }
       ]
     },
@@ -560,6 +722,16 @@
           "lap": 23,
           "to": "SOFT",
           "loss": 0.0
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.177
+        },
+        {
+          "lap": 23,
+          "offset": -0.05
         }
       ]
     }

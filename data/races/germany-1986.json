@@ -10,31 +10,36 @@
   },
   "era": "1988-1993",
   "track": {
-    "pitLoss": 19.072,
-    "pitLossUnderSC": 10.49,
-    "pitLossUnderVSC": 13.16,
+    "pitLoss": 18.866,
+    "pitLossUnderSC": 10.376,
+    "pitLossUnderVSC": 13.018,
     "pitLossDeviations": [
-      -0.972,
-      -0.829,
-      -0.206,
+      -0.766,
+      -0.601,
+      -0.047,
       0.0,
-      0.299,
-      1.506,
-      3.289
+      0.505,
+      1.933,
+      3.494
     ],
-    "overtakeDifficulty": 0.7384,
+    "overtakeDifficulty": 0.7439,
     "overtakeModel": {
-      "intercept": -0.1495,
-      "paceCoef": 0.5629,
-      "gapCoef": -1.2885
+      "intercept": -0.1227,
+      "paceCoef": 0.5906,
+      "gapCoef": -1.2675
     },
     "dirtyAirPenalty": 0.0,
-    "greenLapTime": 116.262
+    "greenLapTime": 116.262,
+    "restart": {
+      "jump": 0.15,
+      "spread": 0.44,
+      "places": 8
+    }
   },
   "compounds": {
     "MEDIUM": {
       "offset": 0.0,
-      "degPerLap": 0.03881,
+      "degPerLap": 0.03928,
       "cliffLap": 44,
       "provenLaps": 44
     }
@@ -43,8 +48,8 @@
     {
       "code": "ARN",
       "team": "Ligier",
-      "basePace": 114.0352,
-      "noise": 1.2794,
+      "basePace": 113.9348,
+      "noise": 1.3063,
       "stateAtTakeover": {
         "position": 6,
         "gapAhead": 11.808,
@@ -59,8 +64,8 @@
     {
       "code": "BEG",
       "team": "Osella",
-      "basePace": 123.5477,
-      "noise": 1.1502,
+      "basePace": 123.4601,
+      "noise": 1.0919,
       "stateAtTakeover": {
         "position": 20,
         "gapAhead": 51.953,
@@ -75,8 +80,8 @@
     {
       "code": "BER",
       "team": "Benetton",
-      "basePace": 117.1326,
-      "noise": 1.4452,
+      "basePace": 117.0422,
+      "noise": 1.5129,
       "stateAtTakeover": {
         "position": 17,
         "gapAhead": 3.783,
@@ -91,8 +96,8 @@
     {
       "code": "BRU",
       "team": "Tyrrell",
-      "basePace": 117.3157,
-      "noise": 0.7073,
+      "basePace": 117.2379,
+      "noise": 0.7767,
       "stateAtTakeover": {
         "position": 13,
         "gapAhead": 0.223,
@@ -107,8 +112,8 @@
     {
       "code": "DAN",
       "team": "Arrows",
-      "basePace": 118.583,
-      "noise": 0.9009,
+      "basePace": 118.4964,
+      "noise": 0.9182,
       "stateAtTakeover": {
         "position": 15,
         "gapAhead": 2.013,
@@ -123,8 +128,8 @@
     {
       "code": "DEC",
       "team": "Minardi",
-      "basePace": 118.3539,
-      "noise": 0.9857,
+      "basePace": 118.304,
+      "noise": 1.0054,
       "stateAtTakeover": {
         "position": 16,
         "gapAhead": 0.81,
@@ -139,8 +144,8 @@
     {
       "code": "DUM",
       "team": "Team Lotus",
-      "basePace": 118.5555,
-      "noise": 1.8487,
+      "basePace": 118.5165,
+      "noise": 1.8299,
       "stateAtTakeover": {
         "position": 12,
         "gapAhead": 5.28,
@@ -155,8 +160,8 @@
     {
       "code": "JOH",
       "team": "Ferrari",
-      "basePace": 114.4521,
-      "noise": 1.4012,
+      "basePace": 114.346,
+      "noise": 1.3811,
       "stateAtTakeover": {
         "position": 7,
         "gapAhead": 11.431,
@@ -171,8 +176,8 @@
     {
       "code": "JON",
       "team": "Lola",
-      "basePace": 119.01,
-      "noise": 3.3496,
+      "basePace": 118.908,
+      "noise": 3.2832,
       "stateAtTakeover": {
         "position": 8,
         "gapAhead": 3.289,
@@ -187,8 +192,8 @@
     {
       "code": "MAN",
       "team": "Williams",
-      "basePace": 113.2809,
-      "noise": 1.1998,
+      "basePace": 113.1788,
+      "noise": 1.2853,
       "stateAtTakeover": {
         "position": 5,
         "gapAhead": 7.858,
@@ -202,15 +207,15 @@
         {
           "lap": 18,
           "to": "MEDIUM",
-          "loss": 20.147
+          "loss": 20.233
         }
       ]
     },
     {
       "code": "NAN",
       "team": "Minardi",
-      "basePace": 121.5645,
-      "noise": 1.5026,
+      "basePace": 121.5129,
+      "noise": 1.4703,
       "stateAtTakeover": {
         "position": 18,
         "gapAhead": 16.328,
@@ -225,8 +230,8 @@
     {
       "code": "PALJ",
       "team": "Zakspeed",
-      "basePace": 119.5986,
-      "noise": 1.4156,
+      "basePace": 119.514,
+      "noise": 1.4453,
       "stateAtTakeover": {
         "position": 19,
         "gapAhead": 1.797,
@@ -241,8 +246,8 @@
     {
       "code": "PAT",
       "team": "Brabham",
-      "basePace": 117.5151,
-      "noise": 1.6302,
+      "basePace": 117.4452,
+      "noise": 1.6356,
       "stateAtTakeover": {
         "position": 9,
         "gapAhead": 10.436,
@@ -257,11 +262,11 @@
     {
       "code": "PIQN",
       "team": "Williams",
-      "basePace": 112.1959,
-      "noise": 0.7155,
+      "basePace": 112.1101,
+      "noise": 0.7619,
       "stateAtTakeover": {
         "position": 4,
-        "gapAhead": 9.51,
+        "gapAhead": 6.312,
         "compound": "MEDIUM",
         "tyreAge": 1,
         "compoundsUsed": [
@@ -277,15 +282,37 @@
         {
           "lap": 28,
           "to": "MEDIUM",
-          "loss": 19.162
+          "loss": 19.154
         }
       ]
     },
     {
       "code": "PRO",
       "team": "McLaren",
-      "basePace": 112.1945,
-      "noise": 0.4553,
+      "basePace": 114.022,
+      "noise": 1.0535,
+      "stateAtTakeover": {
+        "position": 3,
+        "gapAhead": 3.198,
+        "compound": "MEDIUM",
+        "tyreAge": 16,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 21,
+          "to": "MEDIUM",
+          "loss": 20.158
+        }
+      ]
+    },
+    {
+      "code": "ROSK",
+      "team": "McLaren",
+      "basePace": 112.7065,
+      "noise": 0.647,
       "stateAtTakeover": {
         "position": 1,
         "gapAhead": 0.0,
@@ -297,39 +324,17 @@
       },
       "realStrategy": [
         {
-          "lap": 21,
-          "to": "MEDIUM",
-          "loss": 20.16
-        }
-      ]
-    },
-    {
-      "code": "ROSK",
-      "team": "McLaren",
-      "basePace": 112.1778,
-      "noise": 0.612,
-      "stateAtTakeover": {
-        "position": 2,
-        "gapAhead": 0.434,
-        "compound": "MEDIUM",
-        "tyreAge": 16,
-        "compoundsUsed": [
-          "MEDIUM"
-        ]
-      },
-      "realStrategy": [
-        {
           "lap": 20,
           "to": "MEDIUM",
-          "loss": 19.456
+          "loss": 19.168
         }
       ]
     },
     {
       "code": "ROT",
       "team": "Zakspeed",
-      "basePace": 121.0503,
-      "noise": 1.617,
+      "basePace": 120.9517,
+      "noise": 1.6601,
       "stateAtTakeover": {
         "position": 14,
         "gapAhead": 19.945,
@@ -344,11 +349,11 @@
     {
       "code": "SENA",
       "team": "Team Lotus",
-      "basePace": 112.8667,
-      "noise": 0.4532,
+      "basePace": 112.7657,
+      "noise": 0.5365,
       "stateAtTakeover": {
-        "position": 3,
-        "gapAhead": 16.712,
+        "position": 2,
+        "gapAhead": 10.393,
         "compound": "MEDIUM",
         "tyreAge": 16,
         "compoundsUsed": [
@@ -359,15 +364,15 @@
         {
           "lap": 22,
           "to": "MEDIUM",
-          "loss": 19.883
+          "loss": 19.94
         }
       ]
     },
     {
       "code": "TAM",
       "team": "Lola",
-      "basePace": 116.6415,
-      "noise": 1.0507,
+      "basePace": 116.5314,
+      "noise": 1.0614,
       "stateAtTakeover": {
         "position": 10,
         "gapAhead": 16.498,
@@ -382,8 +387,8 @@
     {
       "code": "WAR",
       "team": "Brabham",
-      "basePace": 116.4459,
-      "noise": 1.378,
+      "basePace": 116.3448,
+      "noise": 1.3402,
       "stateAtTakeover": {
         "position": 11,
         "gapAhead": 4.645,
@@ -396,9 +401,9 @@
       "realStrategy": []
     }
   ],
-  "fuelEffectPerLap": 0.06723,
+  "fuelEffectPerLap": 0.06406,
   "freshTyre": {
-    "bonus": -0.0612,
+    "bonus": -0.0758,
     "laps": 3
   },
   "events": [
@@ -448,7 +453,7 @@
       "driver": "JOH"
     },
     {
-      "lap": 43,
+      "lap": 44,
       "type": "RETIREMENT",
       "driver": "ROSK",
       "storylineEvent": true
@@ -456,7 +461,8 @@
     {
       "lap": 44,
       "type": "RETIREMENT",
-      "driver": "PRO"
+      "driver": "PRO",
+      "storylineEvent": true
     }
   ],
   "decisionMoments": [
@@ -752,7 +758,17 @@
     "hardCalls": {
       "ROSK": 0,
       "SENA": 0
-    }
+    },
+    "storylineRetirements": [
+      {
+        "driver": "ROSK",
+        "condition": {
+          "type": "fuel"
+        },
+        "real": "Rosberg ran minimum boost all race on the 195-litre limit, his gauge 'exactly on schedule to cross the line with a zero reading'; second, about two seconds behind Piquet at the start of the last lap, he ran dry at the first chicane and pulled off (classified fifth, a lap down)",
+        "source": "https://www.autosport.com/f1/feature/3783/grand-prix-gold-german-gp-1986; https://en.wikipedia.org/wiki/1986_German_Grand_Prix"
+      }
+    ]
   },
   "provenance": {
     "kind": "reconstructed",

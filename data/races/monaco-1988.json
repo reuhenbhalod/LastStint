@@ -21,7 +21,12 @@
       "gapCoef": -1.0688
     },
     "dirtyAirPenalty": 0.0,
-    "greenLapTime": 91.661
+    "greenLapTime": 91.661,
+    "restart": {
+      "jump": 0.15,
+      "spread": 0.44,
+      "places": 8
+    }
   },
   "compounds": {
     "MEDIUM": {
@@ -664,7 +669,20 @@
     "hardCalls": {
       "SENA": 0,
       "PRO": 0
-    }
+    },
+    "storylineRetirements": [
+      {
+        "driver": "SENA",
+        "condition": {
+          "type": "mode",
+          "key": "pace",
+          "value": "push",
+          "fromLap": 55
+        },
+        "real": "Prost passed Berger for second on lap 54 and started trading fastest laps with Senna, who answered (his fastest lap on lap 59); on lap 67, as McLaren radioed him to slow down, Senna lost concentration at Portier and crashed out of the lead",
+        "source": "https://en.wikipedia.org/wiki/1988_Monaco_Grand_Prix"
+      }
+    ]
   },
   "provenance": {
     "kind": "reconstructed",

@@ -17,13 +17,19 @@
     ],
     "overtakeDifficulty": 0.9293,
     "overtakeModel": {
-      "intercept": 0.1671,
-      "paceCoef": 0.6738,
-      "gapCoef": -4.1184
+      "intercept": -0.2054,
+      "paceCoef": 1.8366,
+      "gapCoef": -3.8725,
+      "trainCoef": -0.9007
     },
     "dirtyAirPenalty": 0.5371,
     "greenLapTime": 94.075,
-    "scLapTime": 146.74
+    "scLapTime": 146.74,
+    "restart": {
+      "jump": 0.15,
+      "spread": 0.44,
+      "places": 8
+    }
   },
   "compounds": {
     "SOFT": {
@@ -73,7 +79,17 @@
         {
           "lap": 45,
           "to": "SOFT",
-          "loss": 22.542
+          "loss": 22.736
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 16,
+          "offset": -0.375
+        },
+        {
+          "lap": 45,
+          "offset": 0.181
         }
       ]
     },
@@ -106,6 +122,12 @@
           "to": "HARD",
           "loss": 0.0
         }
+      ],
+      "stintPace": [
+        {
+          "lap": 16,
+          "offset": 0.082
+        }
       ]
     },
     {
@@ -133,6 +155,12 @@
           "to": "HARD",
           "loss": 0.0
         }
+      ],
+      "stintPace": [
+        {
+          "lap": 16,
+          "offset": -0.004
+        }
       ]
     },
     {
@@ -159,6 +187,12 @@
           "lap": 16,
           "to": "HARD",
           "loss": 0.0
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 16,
+          "offset": 0.005
         }
       ]
     },
@@ -191,6 +225,12 @@
           "to": "HARD",
           "loss": 0.0
         }
+      ],
+      "stintPace": [
+        {
+          "lap": 16,
+          "offset": -0.259
+        }
       ]
     },
     {
@@ -222,6 +262,12 @@
           "to": "HARD",
           "loss": 0.0
         }
+      ],
+      "stintPace": [
+        {
+          "lap": 16,
+          "offset": 0.034
+        }
       ]
     },
     {
@@ -252,6 +298,12 @@
           "lap": 16,
           "to": "HARD",
           "loss": 0.0
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 16,
+          "offset": 0.073
         }
       ]
     },
@@ -322,6 +374,12 @@
           "to": "HARD",
           "loss": 0.0
         }
+      ],
+      "stintPace": [
+        {
+          "lap": 16,
+          "offset": 0.013
+        }
       ]
     },
     {
@@ -348,6 +406,12 @@
           "lap": 16,
           "to": "HARD",
           "loss": 0.0
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 16,
+          "offset": -0.05
         }
       ]
     },
@@ -405,7 +469,13 @@
         {
           "lap": 27,
           "to": "HARD",
-          "loss": 59.239
+          "loss": 59.388
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 27,
+          "offset": -0.149
         }
       ]
     },
@@ -433,6 +503,12 @@
           "lap": 16,
           "to": "HARD",
           "loss": 0.0
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 16,
+          "offset": 0.001
         }
       ]
     },
@@ -487,6 +563,12 @@
           "to": "HARD",
           "loss": 0.0
         }
+      ],
+      "stintPace": [
+        {
+          "lap": 16,
+          "offset": 0.026
+        }
       ]
     },
     {
@@ -517,6 +599,12 @@
           "lap": 16,
           "to": "HARD",
           "loss": 0.0
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 16,
+          "offset": -0.007
         }
       ]
     },
@@ -550,6 +638,12 @@
           "to": "HARD",
           "loss": 65.066
         }
+      ],
+      "stintPace": [
+        {
+          "lap": 24,
+          "offset": -0.278
+        }
       ]
     },
     {
@@ -577,6 +671,12 @@
           "to": "HARD",
           "loss": 0.0
         }
+      ],
+      "stintPace": [
+        {
+          "lap": 16,
+          "offset": -0.271
+        }
       ]
     },
     {
@@ -603,6 +703,12 @@
           "lap": 16,
           "to": "HARD",
           "loss": 0.0
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 16,
+          "offset": -0.103
         }
       ]
     }

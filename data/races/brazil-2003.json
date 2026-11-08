@@ -21,9 +21,10 @@
     ],
     "overtakeDifficulty": 0.8819,
     "overtakeModel": {
-      "intercept": 1.1496,
-      "paceCoef": 0.3487,
-      "gapCoef": -5.1932
+      "intercept": 0.108,
+      "paceCoef": 0.8092,
+      "gapCoef": -4.1132,
+      "trainCoef": -0.0531
     },
     "dirtyAirPenalty": 0.4045,
     "greenLapTime": 87.496,
@@ -34,6 +35,11 @@
       "refFill": 17.417,
       "tankLaps": 47,
       "stops": 12
+    },
+    "restart": {
+      "jump": 0.15,
+      "spread": 0.44,
+      "places": 8
     }
   },
   "compounds": {
@@ -60,7 +66,8 @@
       "team": "Renault",
       "basePace": 87.9668,
       "noise": 1.7569,
-      "wetPace": 0.0058,
+      "wetPace": -0.0074,
+      "dampPace": -0.0049,
       "stateAtTakeover": {
         "position": 7,
         "gapAhead": 2.608,
@@ -82,7 +89,13 @@
         {
           "lap": 43,
           "to": "MEDIUM",
-          "loss": 13.69
+          "loss": 14.25
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 43,
+          "offset": -0.56
         }
       ]
     },
@@ -91,7 +104,8 @@
       "team": "Ferrari",
       "basePace": 86.0018,
       "noise": 1.6175,
-      "wetPace": 0.0254,
+      "wetPace": 0.0295,
+      "dampPace": 0.0364,
       "stateAtTakeover": {
         "position": 6,
         "gapAhead": 1.054,
@@ -106,6 +120,12 @@
           "lap": 20,
           "to": "MEDIUM"
         }
+      ],
+      "stintPace": [
+        {
+          "lap": 20,
+          "offset": -0.139
+        }
       ]
     },
     {
@@ -113,7 +133,8 @@
       "team": "BAR",
       "basePace": 89.2369,
       "noise": 1.2378,
-      "wetPace": -0.0027,
+      "wetPace": -0.0138,
+      "dampPace": -0.0093,
       "stateAtTakeover": {
         "position": 8,
         "gapAhead": 2.87,
@@ -128,6 +149,12 @@
           "lap": 20,
           "to": "MEDIUM"
         }
+      ],
+      "stintPace": [
+        {
+          "lap": 20,
+          "offset": -0.076
+        }
       ]
     },
     {
@@ -135,7 +162,8 @@
       "team": "McLaren",
       "basePace": 87.0594,
       "noise": 1.6146,
-      "wetPace": 0.0017,
+      "wetPace": 0.0077,
+      "dampPace": 0.0055,
       "stateAtTakeover": {
         "position": 2,
         "gapAhead": 1.487,
@@ -153,7 +181,13 @@
         {
           "lap": 53,
           "to": "MEDIUM",
-          "loss": 26.917
+          "loss": 27.089
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 20,
+          "offset": -0.172
         }
       ]
     },
@@ -162,7 +196,8 @@
       "team": "Toyota",
       "basePace": 93.0537,
       "noise": 1.633,
-      "wetPace": -0.013,
+      "wetPace": -0.0257,
+      "dampPace": -0.0231,
       "stateAtTakeover": {
         "position": 12,
         "gapAhead": 7.917,
@@ -184,7 +219,21 @@
         {
           "lap": 46,
           "to": "MEDIUM",
-          "loss": 29.595
+          "loss": 29.333
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.751
+        },
+        {
+          "lap": 36,
+          "offset": 0.125
+        },
+        {
+          "lap": 46,
+          "offset": 0.137
         }
       ]
     },
@@ -193,7 +242,8 @@
       "team": "Jordan",
       "basePace": 91.0175,
       "noise": 0.6509,
-      "wetPace": -0.0216,
+      "wetPace": -0.0442,
+      "dampPace": -0.0372,
       "stateAtTakeover": {
         "position": 18,
         "gapAhead": 0.396,
@@ -210,7 +260,8 @@
       "team": "Jordan",
       "basePace": 87.9935,
       "noise": 1.5456,
-      "wetPace": 0.0182,
+      "wetPace": 0.0173,
+      "dampPace": 0.0155,
       "stateAtTakeover": {
         "position": 17,
         "gapAhead": 0.427,
@@ -220,14 +271,21 @@
           "MEDIUM"
         ]
       },
-      "realStrategy": []
+      "realStrategy": [],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.061
+        }
+      ]
     },
     {
       "code": "FRE",
       "team": "Sauber",
       "basePace": 88.2935,
       "noise": 1.3425,
-      "wetPace": 0.0058,
+      "wetPace": 0.0038,
+      "dampPace": 0.0047,
       "stateAtTakeover": {
         "position": 14,
         "gapAhead": 8.55,
@@ -237,14 +295,21 @@
           "MEDIUM"
         ]
       },
-      "realStrategy": []
+      "realStrategy": [],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.084
+        }
+      ]
     },
     {
       "code": "MON",
       "team": "Williams",
       "basePace": 90.7195,
       "noise": 0.5115,
-      "wetPace": -0.029,
+      "wetPace": -0.0126,
+      "dampPace": -0.0186,
       "stateAtTakeover": {
         "position": 4,
         "gapAhead": 5.808,
@@ -266,7 +331,8 @@
       "team": "Ferrari",
       "basePace": 87.2776,
       "noise": 1.9776,
-      "wetPace": 0.0037,
+      "wetPace": 0.0094,
+      "dampPace": 0.0038,
       "stateAtTakeover": {
         "position": 3,
         "gapAhead": 6.396,
@@ -281,6 +347,12 @@
           "lap": 20,
           "to": "MEDIUM"
         }
+      ],
+      "stintPace": [
+        {
+          "lap": 20,
+          "offset": -0.287
+        }
       ]
     },
     {
@@ -288,7 +360,8 @@
       "team": "Toyota",
       "basePace": 92.4735,
       "noise": 1.4092,
-      "wetPace": -0.0086,
+      "wetPace": 0.0007,
+      "dampPace": 0.0012,
       "stateAtTakeover": {
         "position": 16,
         "gapAhead": 13.968,
@@ -305,7 +378,8 @@
       "team": "Jaguar",
       "basePace": 89.3513,
       "noise": 0.1305,
-      "wetPace": -0.0076,
+      "wetPace": -0.0243,
+      "dampPace": -0.0188,
       "stateAtTakeover": {
         "position": 13,
         "gapAhead": 1.892,
@@ -322,7 +396,8 @@
       "team": "McLaren",
       "basePace": 88.0301,
       "noise": 1.0882,
-      "wetPace": -0.0147,
+      "wetPace": -0.02,
+      "dampPace": -0.0115,
       "stateAtTakeover": {
         "position": 1,
         "gapAhead": 0.0,
@@ -337,6 +412,16 @@
           "lap": 28,
           "to": "MEDIUM"
         }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": 0.372
+        },
+        {
+          "lap": 28,
+          "offset": -0.277
+        }
       ]
     },
     {
@@ -344,7 +429,8 @@
       "team": "Williams",
       "basePace": 88.6998,
       "noise": 1.3165,
-      "wetPace": 0.0,
+      "wetPace": 0.005,
+      "dampPace": 0.0074,
       "stateAtTakeover": {
         "position": 10,
         "gapAhead": 5.021,
@@ -362,7 +448,17 @@
         {
           "lap": 49,
           "to": "MEDIUM",
-          "loss": 27.156
+          "loss": 27.117
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 20,
+          "offset": -0.237
+        },
+        {
+          "lap": 49,
+          "offset": 0.276
         }
       ]
     },
@@ -371,7 +467,8 @@
       "team": "Renault",
       "basePace": 89.8359,
       "noise": 1.3825,
-      "wetPace": 0.0007,
+      "wetPace": 0.0295,
+      "dampPace": 0.0186,
       "stateAtTakeover": {
         "position": 9,
         "gapAhead": 2.377,
@@ -386,6 +483,12 @@
           "lap": 20,
           "to": "MEDIUM"
         }
+      ],
+      "stintPace": [
+        {
+          "lap": 20,
+          "offset": -0.605
+        }
       ]
     },
     {
@@ -393,7 +496,8 @@
       "team": "Minardi",
       "basePace": 89.5503,
       "noise": 0.2654,
-      "wetPace": 0.0025,
+      "wetPace": 0.0021,
+      "dampPace": 0.0038,
       "stateAtTakeover": {
         "position": 15,
         "gapAhead": 2.807,
@@ -403,14 +507,21 @@
           "MEDIUM"
         ]
       },
-      "realStrategy": []
+      "realStrategy": [],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.017
+        }
+      ]
     },
     {
       "code": "VIL",
       "team": "BAR",
       "basePace": 88.6253,
       "noise": 1.9837,
-      "wetPace": 0.0071,
+      "wetPace": 0.0063,
+      "dampPace": 0.0145,
       "stateAtTakeover": {
         "position": 11,
         "gapAhead": 1.017,
@@ -425,6 +536,12 @@
           "lap": 20,
           "to": "MEDIUM"
         }
+      ],
+      "stintPace": [
+        {
+          "lap": 20,
+          "offset": -0.125
+        }
       ]
     },
     {
@@ -432,7 +549,8 @@
       "team": "Jaguar",
       "basePace": 88.8585,
       "noise": 1.2558,
-      "wetPace": -0.0013,
+      "wetPace": -0.0044,
+      "dampPace": -0.0044,
       "stateAtTakeover": {
         "position": 5,
         "gapAhead": 0.477,
@@ -450,6 +568,16 @@
         {
           "lap": 34,
           "to": "MEDIUM"
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 20,
+          "offset": 0.583
+        },
+        {
+          "lap": 34,
+          "offset": -0.418
         }
       ]
     }

@@ -105,3 +105,8 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 - Compound is left empty (one dry compound per race, estimated in step 2.4)
 - No weather timeline: the race is assumed dry
 - Stops: only the sourced ones; cars may have stopped more (unknown)
+
+## Notes
+
+- ROSK: stopped on the last lap (sourced), its lap 43 at its road place, 2.0s behind the leader (sourced)
+- PRO: stopped on the last lap (sourced), its lap 43 at its road place, after the leader's and before the flag

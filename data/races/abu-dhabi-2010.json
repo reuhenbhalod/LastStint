@@ -32,13 +32,19 @@
     ],
     "overtakeDifficulty": 0.9775,
     "overtakeModel": {
-      "intercept": -2.3932,
-      "paceCoef": 2.8258,
-      "gapCoef": -3.3377
+      "intercept": -0.7442,
+      "paceCoef": 0.8092,
+      "gapCoef": -4.1132,
+      "trainCoef": -0.0531
     },
     "dirtyAirPenalty": 0.1005,
     "greenLapTime": 105.617,
-    "scLapTime": 158.055
+    "scLapTime": 158.055,
+    "restart": {
+      "jump": 0.15,
+      "spread": 0.44,
+      "places": 8
+    }
   },
   "compounds": {
     "SOFT": {
@@ -70,7 +76,13 @@
           "SOFT"
         ]
       },
-      "realStrategy": []
+      "realStrategy": [],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.002
+        }
+      ]
     },
     {
       "code": "ALO",
@@ -112,7 +124,17 @@
         {
           "lap": 19,
           "to": "HARD",
-          "loss": 22.705
+          "loss": 22.621
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": 0.106
+        },
+        {
+          "lap": 19,
+          "offset": -0.022
         }
       ]
     },
@@ -134,7 +156,17 @@
         {
           "lap": 38,
           "to": "SOFT",
-          "loss": 23.35
+          "loss": 23.391
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": 0.098
+        },
+        {
+          "lap": 38,
+          "offset": -0.139
         }
       ]
     },
@@ -156,7 +188,17 @@
         {
           "lap": 40,
           "to": "HARD",
-          "loss": 21.675
+          "loss": 21.692
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": 0.065
+        },
+        {
+          "lap": 40,
+          "offset": -0.082
         }
       ]
     },
@@ -175,7 +217,13 @@
           "SOFT"
         ]
       },
-      "realStrategy": []
+      "realStrategy": [],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.008
+        }
+      ]
     },
     {
       "code": "GLO",
@@ -195,7 +243,13 @@
         {
           "lap": 41,
           "to": "SOFT",
-          "loss": 27.413
+          "loss": 27.462
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.049
         }
       ]
     },
@@ -217,7 +271,17 @@
         {
           "lap": 24,
           "to": "HARD",
-          "loss": 21.555
+          "loss": 21.452
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": 0.161
+        },
+        {
+          "lap": 24,
+          "offset": -0.058
         }
       ]
     },
@@ -239,7 +303,13 @@
         {
           "lap": 16,
           "to": "HARD",
-          "loss": 21.818
+          "loss": 21.83
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 16,
+          "offset": -0.012
         }
       ]
     },
@@ -261,7 +331,17 @@
         {
           "lap": 37,
           "to": "SOFT",
-          "loss": 21.816
+          "loss": 21.853
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": 0.085
+        },
+        {
+          "lap": 37,
+          "offset": -0.122
         }
       ]
     },
@@ -280,7 +360,13 @@
           "SOFT"
         ]
       },
-      "realStrategy": []
+      "realStrategy": [],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.032
+        }
+      ]
     },
     {
       "code": "KOB",
@@ -300,7 +386,17 @@
         {
           "lap": 34,
           "to": "SOFT",
-          "loss": 21.669
+          "loss": 21.64
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": 0.137
+        },
+        {
+          "lap": 34,
+          "offset": -0.108
         }
       ]
     },
@@ -322,7 +418,17 @@
         {
           "lap": 42,
           "to": "SOFT",
-          "loss": 24.115
+          "loss": 23.768
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.427
+        },
+        {
+          "lap": 42,
+          "offset": 0.774
         }
       ]
     },
@@ -344,7 +450,17 @@
         {
           "lap": 47,
           "to": "SOFT",
-          "loss": 20.687
+          "loss": 20.74
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.069
+        },
+        {
+          "lap": 47,
+          "offset": 0.016
         }
       ]
     },
@@ -385,7 +501,13 @@
           "SOFT"
         ]
       },
-      "realStrategy": []
+      "realStrategy": [],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.002
+        }
+      ]
     },
     {
       "code": "ROS",
@@ -402,7 +524,13 @@
           "SOFT"
         ]
       },
-      "realStrategy": []
+      "realStrategy": [],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.029
+        }
+      ]
     },
     {
       "code": "SEN",
@@ -419,7 +547,13 @@
           "SOFT"
         ]
       },
-      "realStrategy": []
+      "realStrategy": [],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.035
+        }
+      ]
     },
     {
       "code": "SUT",
@@ -439,7 +573,13 @@
         {
           "lap": 48,
           "to": "SOFT",
-          "loss": 22.784
+          "loss": 22.812
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.028
         }
       ]
     },
@@ -461,7 +601,17 @@
         {
           "lap": 29,
           "to": "HARD",
-          "loss": 53.635
+          "loss": 55.782
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -1.521
+        },
+        {
+          "lap": 29,
+          "offset": -0.626
         }
       ]
     },
@@ -483,7 +633,17 @@
         {
           "lap": 25,
           "to": "HARD",
-          "loss": 21.22
+          "loss": 21.107
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": 0.215
+        },
+        {
+          "lap": 25,
+          "offset": -0.102
         }
       ]
     },
@@ -507,6 +667,12 @@
           "lap": 12,
           "to": "HARD",
           "loss": 20.255
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": 0.002
         }
       ]
     }

@@ -42,9 +42,10 @@
     ],
     "overtakeDifficulty": 0.939,
     "overtakeModel": {
-      "intercept": -0.0125,
-      "paceCoef": 0.2618,
-      "gapCoef": -4.1807
+      "intercept": -0.3687,
+      "paceCoef": 0.8092,
+      "gapCoef": -4.1132,
+      "trainCoef": -0.0531
     },
     "dirtyAirPenalty": 0.5077,
     "greenLapTime": 103.474,
@@ -54,6 +55,11 @@
       "refFill": 18.35,
       "tankLaps": 28,
       "stops": 20
+    },
+    "restart": {
+      "jump": 0.15,
+      "spread": 0.44,
+      "places": 8
     }
   },
   "compounds": {
@@ -89,7 +95,17 @@
         {
           "lap": 42,
           "to": "MEDIUM",
-          "loss": 22.12
+          "loss": 22.105
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.098
+        },
+        {
+          "lap": 42,
+          "offset": 0.113
         }
       ]
     },
@@ -111,7 +127,17 @@
         {
           "lap": 40,
           "to": "MEDIUM",
-          "loss": 24.635
+          "loss": 24.681
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.071
+        },
+        {
+          "lap": 40,
+          "offset": 0.025
         }
       ]
     },
@@ -133,12 +159,22 @@
         {
           "lap": 23,
           "to": "MEDIUM",
-          "loss": 19.056
+          "loss": 18.962
         },
         {
           "lap": 40,
           "to": "MEDIUM",
-          "loss": 20.475
+          "loss": 20.735
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 23,
+          "offset": 0.094
+        },
+        {
+          "lap": 40,
+          "offset": -0.354
         }
       ]
     },
@@ -160,7 +196,13 @@
         {
           "lap": 25,
           "to": "MEDIUM",
-          "loss": 23.463
+          "loss": 24.06
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 25,
+          "offset": -0.597
         }
       ]
     },
@@ -182,7 +224,17 @@
         {
           "lap": 38,
           "to": "MEDIUM",
-          "loss": 20.719
+          "loss": 21.026
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.042
+        },
+        {
+          "lap": 38,
+          "offset": -0.265
         }
       ]
     },
@@ -204,7 +256,17 @@
         {
           "lap": 31,
           "to": "MEDIUM",
-          "loss": 24.796
+          "loss": 24.593
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": 0.385
+        },
+        {
+          "lap": 31,
+          "offset": -0.182
         }
       ]
     },
@@ -226,7 +288,17 @@
         {
           "lap": 28,
           "to": "MEDIUM",
-          "loss": 26.288
+          "loss": 25.646
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": 1.022
+        },
+        {
+          "lap": 28,
+          "offset": -0.38
         }
       ]
     },
@@ -248,12 +320,22 @@
         {
           "lap": 28,
           "to": "MEDIUM",
-          "loss": 19.205
+          "loss": 19.32
         },
         {
           "lap": 48,
           "to": "MEDIUM",
-          "loss": 20.529
+          "loss": 20.508
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.115
+        },
+        {
+          "lap": 48,
+          "offset": 0.021
         }
       ]
     },
@@ -275,7 +357,17 @@
         {
           "lap": 29,
           "to": "MEDIUM",
-          "loss": 25.779
+          "loss": 25.772
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": 0.02
+        },
+        {
+          "lap": 29,
+          "offset": -0.013
         }
       ]
     },
@@ -297,12 +389,22 @@
         {
           "lap": 26,
           "to": "MEDIUM",
-          "loss": 22.387
+          "loss": 22.458
         },
         {
           "lap": 42,
           "to": "MEDIUM",
-          "loss": 21.338
+          "loss": 21.339
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 26,
+          "offset": -0.071
+        },
+        {
+          "lap": 42,
+          "offset": 0.07
         }
       ]
     },
@@ -324,7 +426,17 @@
         {
           "lap": 29,
           "to": "MEDIUM",
-          "loss": 24.038
+          "loss": 24.522
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.503
+        },
+        {
+          "lap": 29,
+          "offset": 0.019
         }
       ]
     },
@@ -346,12 +458,22 @@
         {
           "lap": 23,
           "to": "MEDIUM",
-          "loss": 20.027
+          "loss": 20.186
         },
         {
           "lap": 39,
           "to": "MEDIUM",
-          "loss": 29.55
+          "loss": 29.518
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 23,
+          "offset": -0.159
+        },
+        {
+          "lap": 39,
+          "offset": 0.191
         }
       ]
     },
@@ -373,7 +495,17 @@
         {
           "lap": 39,
           "to": "MEDIUM",
-          "loss": 26.732
+          "loss": 26.809
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.002
+        },
+        {
+          "lap": 39,
+          "offset": -0.075
         }
       ]
     },
@@ -395,12 +527,26 @@
         {
           "lap": 29,
           "to": "MEDIUM",
-          "loss": 25.654
+          "loss": 26.057
         },
         {
           "lap": 49,
           "to": "MEDIUM",
-          "loss": 20.268
+          "loss": 20.477
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.513
+        },
+        {
+          "lap": 29,
+          "offset": 0.11
+        },
+        {
+          "lap": 49,
+          "offset": -0.319
         }
       ]
     }
@@ -425,6 +571,12 @@
       "lap": 49,
       "type": "RETIREMENT",
       "driver": "VIL"
+    },
+    {
+      "lap": 53,
+      "type": "TEAM_ORDER",
+      "driver": "MSCM",
+      "other": "IRV"
     }
   ],
   "decisionMoments": [],

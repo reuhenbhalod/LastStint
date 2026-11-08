@@ -75,9 +75,10 @@
     ],
     "overtakeDifficulty": 0.9679,
     "overtakeModel": {
-      "intercept": 0.5622,
-      "paceCoef": 1.6996,
-      "gapCoef": -7.8735
+      "intercept": -0.5557,
+      "paceCoef": 0.8092,
+      "gapCoef": -4.1132,
+      "trainCoef": -0.0531
     },
     "dirtyAirPenalty": 0.4244,
     "greenLapTime": 77.543,
@@ -87,6 +88,11 @@
       "refFill": 17.786,
       "tankLaps": 24,
       "stops": 56
+    },
+    "restart": {
+      "jump": 0.15,
+      "spread": 0.44,
+      "places": 8
     }
   },
   "compounds": {
@@ -116,17 +122,35 @@
         {
           "lap": 15,
           "to": "MEDIUM",
-          "loss": 18.148
+          "loss": 18.247
         },
         {
           "lap": 33,
           "to": "MEDIUM",
-          "loss": 16.559
+          "loss": 16.756
         },
         {
           "lap": 47,
           "to": "MEDIUM",
-          "loss": 19.726
+          "loss": 19.767
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.119
+        },
+        {
+          "lap": 15,
+          "offset": 0.02
+        },
+        {
+          "lap": 33,
+          "offset": -0.217
+        },
+        {
+          "lap": 47,
+          "offset": 0.176
         }
       ]
     },
@@ -148,17 +172,31 @@
         {
           "lap": 13,
           "to": "MEDIUM",
-          "loss": 18.885
+          "loss": 19.039
         },
         {
           "lap": 32,
           "to": "MEDIUM",
-          "loss": 16.235
+          "loss": 16.599
         },
         {
           "lap": 52,
           "to": "MEDIUM",
-          "loss": 17.603
+          "loss": 17.742
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": 0.071
+        },
+        {
+          "lap": 13,
+          "offset": -0.225
+        },
+        {
+          "lap": 32,
+          "offset": -0.139
         }
       ]
     },
@@ -180,12 +218,18 @@
         {
           "lap": 12,
           "to": "MEDIUM",
-          "loss": 20.389
+          "loss": 20.415
         },
         {
           "lap": 31,
           "to": "MEDIUM",
-          "loss": 21.583
+          "loss": 21.609
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 12,
+          "offset": -0.026
         }
       ]
     },
@@ -207,17 +251,35 @@
         {
           "lap": 14,
           "to": "MEDIUM",
-          "loss": 18.478
+          "loss": 18.447
         },
         {
           "lap": 33,
           "to": "MEDIUM",
-          "loss": 21.186
+          "loss": 20.929
         },
         {
           "lap": 51,
           "to": "MEDIUM",
-          "loss": 27.313
+          "loss": 27.438
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.123
+        },
+        {
+          "lap": 14,
+          "offset": 0.154
+        },
+        {
+          "lap": 33,
+          "offset": 0.103
+        },
+        {
+          "lap": 51,
+          "offset": -0.228
         }
       ]
     },
@@ -239,17 +301,31 @@
         {
           "lap": 15,
           "to": "MEDIUM",
-          "loss": 17.573
+          "loss": 17.653
         },
         {
           "lap": 31,
           "to": "MEDIUM",
-          "loss": 17.044
+          "loss": 17.215
         },
         {
           "lap": 53,
           "to": "MEDIUM",
-          "loss": 19.938
+          "loss": 20.183
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.154
+        },
+        {
+          "lap": 15,
+          "offset": 0.074
+        },
+        {
+          "lap": 31,
+          "offset": -0.245
         }
       ]
     },
@@ -271,17 +347,35 @@
         {
           "lap": 13,
           "to": "MEDIUM",
-          "loss": 17.312
+          "loss": 17.301
         },
         {
           "lap": 30,
           "to": "MEDIUM",
-          "loss": 18.83
+          "loss": 18.753
         },
         {
           "lap": 49,
           "to": "MEDIUM",
-          "loss": 18.292
+          "loss": 18.317
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.067
+        },
+        {
+          "lap": 13,
+          "offset": 0.078
+        },
+        {
+          "lap": 30,
+          "offset": -0.001
+        },
+        {
+          "lap": 49,
+          "offset": -0.024
         }
       ]
     },
@@ -303,17 +397,31 @@
         {
           "lap": 12,
           "to": "MEDIUM",
-          "loss": 18.689
+          "loss": 18.7
         },
         {
           "lap": 31,
           "to": "MEDIUM",
-          "loss": 16.689
+          "loss": 16.721
         },
         {
           "lap": 48,
           "to": "MEDIUM",
-          "loss": 16.735
+          "loss": 16.642
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 12,
+          "offset": -0.011
+        },
+        {
+          "lap": 31,
+          "offset": -0.021
+        },
+        {
+          "lap": 48,
+          "offset": 0.114
         }
       ]
     },
@@ -335,17 +443,35 @@
         {
           "lap": 21,
           "to": "MEDIUM",
-          "loss": 16.8
+          "loss": 16.546
         },
         {
           "lap": 38,
           "to": "MEDIUM",
-          "loss": 18.73
+          "loss": 18.855
         },
         {
           "lap": 53,
           "to": "MEDIUM",
-          "loss": 18.352
+          "loss": 18.569
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": 0.175
+        },
+        {
+          "lap": 21,
+          "offset": 0.079
+        },
+        {
+          "lap": 38,
+          "offset": -0.204
+        },
+        {
+          "lap": 53,
+          "offset": -0.013
         }
       ]
     },
@@ -367,17 +493,31 @@
         {
           "lap": 12,
           "to": "MEDIUM",
-          "loss": 22.611
+          "loss": 22.628
         },
         {
           "lap": 34,
           "to": "MEDIUM",
-          "loss": 18.731
+          "loss": 18.824
         },
         {
           "lap": 55,
           "to": "MEDIUM",
-          "loss": 17.776
+          "loss": 17.79
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 12,
+          "offset": -0.017
+        },
+        {
+          "lap": 34,
+          "offset": -0.076
+        },
+        {
+          "lap": 55,
+          "offset": 0.062
         }
       ]
     },
@@ -399,22 +539,40 @@
         {
           "lap": 19,
           "to": "MEDIUM",
-          "loss": 18.634
+          "loss": 18.76
         },
         {
           "lap": 36,
           "to": "MEDIUM",
-          "loss": 11.004
+          "loss": 10.956
         },
         {
           "lap": 37,
           "to": "MEDIUM",
-          "loss": 18.905
+          "loss": 18.84
         },
         {
           "lap": 51,
           "to": "MEDIUM",
-          "loss": 18.258
+          "loss": 18.108
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.174
+        },
+        {
+          "lap": 19,
+          "offset": 0.048
+        },
+        {
+          "lap": 37,
+          "offset": 0.065
+        },
+        {
+          "lap": 51,
+          "offset": 0.085
         }
       ]
     },
@@ -436,17 +594,35 @@
         {
           "lap": 17,
           "to": "MEDIUM",
-          "loss": 18.35
+          "loss": 18.473
         },
         {
           "lap": 36,
           "to": "MEDIUM",
-          "loss": 17.713
+          "loss": 17.77
         },
         {
           "lap": 54,
           "to": "MEDIUM",
-          "loss": 18.62
+          "loss": 18.503
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.076
+        },
+        {
+          "lap": 17,
+          "offset": -0.047
+        },
+        {
+          "lap": 36,
+          "offset": -0.01
+        },
+        {
+          "lap": 54,
+          "offset": 0.127
         }
       ]
     },
@@ -468,12 +644,26 @@
         {
           "lap": 22,
           "to": "MEDIUM",
-          "loss": 20.555
+          "loss": 20.669
         },
         {
           "lap": 46,
           "to": "MEDIUM",
-          "loss": 19.984
+          "loss": 19.865
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.142
+        },
+        {
+          "lap": 22,
+          "offset": 0.028
+        },
+        {
+          "lap": 46,
+          "offset": 0.091
         }
       ]
     },
@@ -495,17 +685,35 @@
         {
           "lap": 14,
           "to": "MEDIUM",
-          "loss": 17.094
+          "loss": 16.88
         },
         {
           "lap": 32,
           "to": "MEDIUM",
-          "loss": 18.247
+          "loss": 18.357
         },
         {
           "lap": 51,
           "to": "MEDIUM",
-          "loss": 17.77
+          "loss": 18.237
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.041
+        },
+        {
+          "lap": 14,
+          "offset": 0.255
+        },
+        {
+          "lap": 32,
+          "offset": -0.365
+        },
+        {
+          "lap": 51,
+          "offset": -0.102
         }
       ]
     },
@@ -527,22 +735,40 @@
         {
           "lap": 12,
           "to": "MEDIUM",
-          "loss": 18.581
+          "loss": 18.487
         },
         {
           "lap": 30,
           "to": "MEDIUM",
-          "loss": 16.772
+          "loss": 17.026
         },
         {
           "lap": 43,
           "to": "MEDIUM",
-          "loss": 16.249
+          "loss": 17.056
         },
         {
           "lap": 59,
           "to": "MEDIUM",
-          "loss": 16.017
+          "loss": 15.753
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 12,
+          "offset": 0.094
+        },
+        {
+          "lap": 30,
+          "offset": -0.348
+        },
+        {
+          "lap": 43,
+          "offset": -0.459
+        },
+        {
+          "lap": 59,
+          "offset": 0.723
         }
       ]
     },
@@ -564,17 +790,31 @@
         {
           "lap": 14,
           "to": "MEDIUM",
-          "loss": 21.724
+          "loss": 21.898
         },
         {
           "lap": 33,
           "to": "MEDIUM",
-          "loss": 17.008
+          "loss": 17.279
         },
         {
           "lap": 52,
           "to": "MEDIUM",
-          "loss": 21.114
+          "loss": 21.455
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 14,
+          "offset": -0.174
+        },
+        {
+          "lap": 33,
+          "offset": -0.097
+        },
+        {
+          "lap": 52,
+          "offset": -0.244
         }
       ]
     },
@@ -596,22 +836,40 @@
         {
           "lap": 14,
           "to": "MEDIUM",
-          "loss": 20.635
+          "loss": 20.959
         },
         {
           "lap": 32,
           "to": "MEDIUM",
-          "loss": 19.765
+          "loss": 20.123
         },
         {
           "lap": 49,
           "to": "MEDIUM",
-          "loss": 23.359
+          "loss": 23.681
         },
         {
           "lap": 53,
           "to": "MEDIUM",
-          "loss": 10.67
+          "loss": 10.336
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.288
+        },
+        {
+          "lap": 14,
+          "offset": -0.036
+        },
+        {
+          "lap": 32,
+          "offset": -0.322
+        },
+        {
+          "lap": 53,
+          "offset": 0.334
         }
       ]
     },
@@ -633,17 +891,31 @@
         {
           "lap": 12,
           "to": "MEDIUM",
-          "loss": 18.654
+          "loss": 18.373
         },
         {
           "lap": 29,
           "to": "MEDIUM",
-          "loss": 17.441
+          "loss": 17.396
         },
         {
           "lap": 48,
           "to": "MEDIUM",
-          "loss": 17.905
+          "loss": 18.151
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 12,
+          "offset": 0.281
+        },
+        {
+          "lap": 29,
+          "offset": -0.236
+        },
+        {
+          "lap": 48,
+          "offset": -0.01
         }
       ]
     },
@@ -661,7 +933,13 @@
           "MEDIUM"
         ]
       },
-      "realStrategy": []
+      "realStrategy": [],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.044
+        }
+      ]
     },
     {
       "code": "TRU",
@@ -681,17 +959,35 @@
         {
           "lap": 14,
           "to": "MEDIUM",
-          "loss": 17.811
+          "loss": 17.997
         },
         {
           "lap": 32,
           "to": "MEDIUM",
-          "loss": 17.708
+          "loss": 17.846
         },
         {
           "lap": 50,
           "to": "MEDIUM",
-          "loss": 17.176
+          "loss": 17.067
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.117
+        },
+        {
+          "lap": 14,
+          "offset": -0.069
+        },
+        {
+          "lap": 32,
+          "offset": -0.069
+        },
+        {
+          "lap": 50,
+          "offset": 0.178
         }
       ]
     },
@@ -713,17 +1009,35 @@
         {
           "lap": 16,
           "to": "MEDIUM",
-          "loss": 18.851
+          "loss": 18.619
         },
         {
           "lap": 34,
           "to": "MEDIUM",
-          "loss": 17.677
+          "loss": 17.684
         },
         {
           "lap": 52,
           "to": "MEDIUM",
-          "loss": 16.676
+          "loss": 16.834
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": 0.105
+        },
+        {
+          "lap": 16,
+          "offset": 0.127
+        },
+        {
+          "lap": 34,
+          "offset": -0.134
+        },
+        {
+          "lap": 52,
+          "offset": -0.024
         }
       ]
     }

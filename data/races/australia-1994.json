@@ -71,6 +71,11 @@
       "refFill": 21.667,
       "tankLaps": 34,
       "stops": 21
+    },
+    "restart": {
+      "jump": 0.15,
+      "spread": 0.44,
+      "places": 8
     }
   },
   "compounds": {
@@ -1127,7 +1132,22 @@
       "position": 1,
       "label": "Win the race"
     },
-    "briefing": "Adelaide, 1994, the final round. Schumacher leads the championship on 92 points, Hill is one behind on 91. One point between them, one race left. Mansell started from pole. Reconstructed race: no lap timing survives, so the laps are rebuilt to fit the result, the fastest laps and the sourced stops (Jolpica, F1DB, Motor Sport, Wikipedia). The lap-by-lap gaps and running order are synthetic, not history."
+    "briefing": "Adelaide, 1994, the final round. Schumacher leads the championship on 92 points, Hill is one behind on 91. One point between them, one race left. Mansell started from pole. Reconstructed race: no lap timing survives, so the laps are rebuilt to fit the result, the fastest laps and the sourced stops (Jolpica, F1DB, Motor Sport, Wikipedia). The lap-by-lap gaps and running order are synthetic, not history.",
+    "storylineRetirements": [
+      {
+        "driver": "MSCM",
+        "condition": {
+          "type": "pressure",
+          "driver": "HIL",
+          "seconds": 2.0
+        },
+        "alsoRetires": [
+          "HIL"
+        ],
+        "real": "Hill was catching Schumacher when the Benetton went off at East Terrace and hit the wall; Schumacher pulled back across the track, Hill tried to pass at the next corner and they collided as Schumacher turned in: Schumacher out on the spot, Hill retired with front-left suspension damage",
+        "source": "https://en.wikipedia.org/wiki/1994_Australian_Grand_Prix"
+      }
+    ]
   },
   "provenance": {
     "kind": "reconstructed",
