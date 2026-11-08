@@ -8,6 +8,7 @@ import {
   type PaceMode,
   type RaceModel,
   type RacePlan,
+  isWetTyre,
 } from '@boxthislap/sim';
 import { PACE_WORD, stintsOk, tyres } from '../game/plans.js';
 import { PlanStrip } from './PlanStrip.js';
@@ -177,14 +178,15 @@ export function PlanEditor({
   );
 }
 
-/** True if the plan runs two dry compounds by the flag (or the car already has). */
+/**
+ * True if the plan runs two dry compounds by the flag (or the car already has), or the car runs
+ * a wet tyre at any point (already, on it now, or in the plan): wet tyres waive the rule, as in
+ * the sim's `ruleSatisfied`. Counts every compound the car runs to the flag.
+ */
 export function twoCompounds(car: { compound: string; compoundsUsed: string[] }, plan: RacePlan) {
-  const used = new Set(
-    [...car.compoundsUsed, car.compound, ...plan.stops.map((s) => s.compound)].filter((c) =>
-      DRY.includes(c),
-    ),
-  );
-  return used.size >= 2;
+  const used = [...car.compoundsUsed, car.compound, ...plan.stops.map((s) => s.compound)];
+  if (used.some(isWetTyre)) return true;
+  return new Set(used.filter((c) => DRY.includes(c))).size >= 2;
 }
 
 /** A stint's pace: manage, standard or push. */

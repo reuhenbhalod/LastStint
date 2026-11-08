@@ -28,8 +28,10 @@ import { type Rng, deriveSeed, mulberry32 } from './rng.js';
 import type {
   BattleMove,
   CarState,
+  Compound,
   CompoundModel,
   Decision,
+  DriverModel,
   EngineerState,
   FlagState,
   Modes,
@@ -504,7 +506,7 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
       compound: s.compound,
       tyreAge: s.tyreAge,
       tyreWear: s.tyreAge,
-      compoundsUsed: [...(s.compoundsUsed ?? [])],
+      compoundsUsed: takeoverCompoundsUsed(s),
       totalTime: cum,
       // A player-controlled car pits only when the player calls it.
       strategy:
@@ -1833,8 +1835,23 @@ function resolveOrder(
 export const DRY_COMPOUNDS = ['SOFT', 'MEDIUM', 'HARD'] as const;
 
 /**
- * Two-compound rule: in a dry race every car must run at least two different dry compounds.
- * (No modelled race is wet; wet tyres would waive it.)
+ * A car's compounds used at the takeover (CarState.compoundsUsed's start): the race file's
+ * `compoundsUsed` plus the tyre the car is on. A race file may list dry tyres only (canada-2024
+ * does), so without this a car that takes over on intermediates or wets and later switches to
+ * one dry compound would lose the wet tyre's waiver of the two-compound rule. A dry car's list
+ * already holds its takeover tyre, so it is unchanged.
+ */
+export function takeoverCompoundsUsed(state: DriverModel['stateAtTakeover']): Compound[] {
+  const used = [...(state.compoundsUsed ?? [])];
+  if (typeof state.compound === 'string' && state.compound && !used.includes(state.compound)) {
+    used.push(state.compound);
+  }
+  return used;
+}
+
+/**
+ * Two-compound rule: a car that has run a wet tyre (intermediates or wets, at any point: on it
+ * at the takeover or after) is free of it; otherwise it must run two different dry compounds.
  */
 export function ruleSatisfied(car: CarState): boolean {
   // Running wet tyres waives the rule (weather spec W6).
