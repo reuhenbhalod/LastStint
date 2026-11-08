@@ -7,6 +7,8 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { playDailyRace } from '../examples/daily-race.js';
 import { battlesFor } from '../src/engineer.js';
+import headsetConfig from '../src/headset.json';
+import { type RuleSwitchable, hasMove, headsetFor } from '../src/rules.js';
 import { type Run, decide, engineerConfig } from '../src/sim.js';
 import type { BattleMove, RaceModel } from '../src/types.js';
 import { verifyRun } from '../src/verify.js';
@@ -24,8 +26,13 @@ describe('race engineer runs verify on every race', () => {
   it.each(races.map((m) => [m.race.id, m] as const))('%s', (_id, model) => {
     const cfg = engineerConfig(model);
     if (!cfg) throw new Error('no engineer config');
-    // A race without DRS (eras rules, roadmap R5) has no wait-drs move.
-    const attack = model.rules?.drs === false ? ATTACK.filter((m) => m !== 'wait-drs') : ATTACK;
+    // The era's moves only (roadmap R5: no wait-drs before DRS, e.g. a refuelling race, or a
+    // race whose eras rules turn DRS off).
+    const headset = headsetFor(headsetConfig as unknown as Record<string, RuleSwitchable>, model);
+    const attack = ATTACK.filter(
+      (m) =>
+        (!headset || hasMove(headset, m)) && !(m === 'wait-drs' && model.rules?.drs === false),
+    );
     let k = 0;
     const between = (run: Run) => {
       const next = run.state.lap + 1;

@@ -2,7 +2,7 @@
   "schemaVersion": 11,
   "race": {
     "id": "europe-2012",
-    "name": "Europe 2012: Alonso vs R\u00e4ikk\u00f6nen",
+    "name": "Europe 2012: R\u00e4ikk\u00f6nen vs Alonso",
     "laps": 57,
     "takeoverLap": 11,
     "seed": 1
@@ -730,7 +730,8 @@
     {
       "lap": 31,
       "type": "SC",
-      "laps": 3
+      "laps": 3,
+      "storylineEvent": true
     },
     {
       "lap": 33,
@@ -753,7 +754,274 @@
       "driver": "HAM"
     }
   ],
-  "decisionMoments": [],
+  "decisionMoments": [
+    {
+      "id": "stop-14",
+      "lap": 14,
+      "trigger": "cliff",
+      "target": {
+        "kind": "beat-rival",
+        "rival": "ALO"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "Stay out",
+          "decisions": []
+        },
+        {
+          "id": "box-soft",
+          "label": "Box, softs",
+          "decisions": [
+            {
+              "lap": 14,
+              "kind": "pit",
+              "compound": "SOFT"
+            }
+          ]
+        },
+        {
+          "id": "box-hard",
+          "label": "Box, hards",
+          "decisions": [
+            {
+              "lap": 14,
+              "kind": "pit",
+              "compound": "HARD"
+            }
+          ]
+        },
+        {
+          "id": "box-next-hard",
+          "label": "Box next lap, hards",
+          "decisions": [
+            {
+              "lap": 15,
+              "kind": "pit",
+              "compound": "HARD"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "box-soft"
+    },
+    {
+      "id": "stop-28",
+      "lap": 28,
+      "trigger": "cliff",
+      "target": {
+        "kind": "beat-rival",
+        "rival": "ALO"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "Stay out",
+          "decisions": []
+        },
+        {
+          "id": "box-soft",
+          "label": "Box, softs",
+          "decisions": [
+            {
+              "lap": 28,
+              "kind": "pit",
+              "compound": "SOFT"
+            }
+          ]
+        },
+        {
+          "id": "box-hard",
+          "label": "Box, hards",
+          "decisions": [
+            {
+              "lap": 28,
+              "kind": "pit",
+              "compound": "HARD"
+            }
+          ]
+        },
+        {
+          "id": "box-next-hard",
+          "label": "Box next lap, hards",
+          "decisions": [
+            {
+              "lap": 29,
+              "kind": "pit",
+              "compound": "HARD"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "box-hard"
+    },
+    {
+      "id": "sc-32",
+      "lap": 32,
+      "trigger": "SC",
+      "target": {
+        "kind": "beat-rival",
+        "rival": "ALO"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "Stay out",
+          "decisions": []
+        },
+        {
+          "id": "box-soft",
+          "label": "Box, softs",
+          "decisions": [
+            {
+              "lap": 32,
+              "kind": "pit",
+              "compound": "SOFT"
+            }
+          ]
+        },
+        {
+          "id": "box-hard",
+          "label": "Box, hards",
+          "decisions": [
+            {
+              "lap": 32,
+              "kind": "pit",
+              "compound": "HARD"
+            }
+          ]
+        },
+        {
+          "id": "box-next-hard",
+          "label": "Box next lap, hards",
+          "decisions": [
+            {
+              "lap": 33,
+              "kind": "pit",
+              "compound": "HARD"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "stay"
+    },
+    {
+      "id": "stop-38",
+      "lap": 38,
+      "trigger": "cliff",
+      "target": {
+        "kind": "beat-rival",
+        "rival": "ALO"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "Stay out",
+          "decisions": []
+        },
+        {
+          "id": "box-soft",
+          "label": "Box, softs",
+          "decisions": [
+            {
+              "lap": 38,
+              "kind": "pit",
+              "compound": "SOFT"
+            }
+          ]
+        },
+        {
+          "id": "box-hard",
+          "label": "Box, hards",
+          "decisions": [
+            {
+              "lap": 38,
+              "kind": "pit",
+              "compound": "HARD"
+            }
+          ]
+        },
+        {
+          "id": "box-next-hard",
+          "label": "Box next lap, hards",
+          "decisions": [
+            {
+              "lap": 39,
+              "kind": "pit",
+              "compound": "HARD"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "stay"
+    },
+    {
+      "id": "pace-47",
+      "lap": 47,
+      "trigger": "cliff",
+      "target": {
+        "kind": "beat-rival",
+        "rival": "ALO"
+      },
+      "options": [
+        {
+          "id": "push",
+          "label": "Push now",
+          "decisions": [
+            {
+              "lap": 47,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "standard",
+          "label": "Standard pace",
+          "decisions": [
+            {
+              "lap": 47,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "manage",
+          "label": "Manage the tyres",
+          "decisions": [
+            {
+              "lap": 47,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "push-attack",
+          "label": "Push and attack",
+          "decisions": [
+            {
+              "lap": 47,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            },
+            {
+              "lap": 47,
+              "kind": "mode",
+              "key": "battle",
+              "value": "attack"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    }
+  ],
   "candidateMomentLaps": [
     11,
     12,
@@ -807,8 +1075,40 @@
     "KOB",
     "VERJ"
   ],
-  "userSide": "ALO",
-  "rival": "RAI",
+  "userSide": "RAI",
+  "rival": "ALO",
+  "eras": {
+    "eraId": 6,
+    "order": 6,
+    "userSide": "RAI",
+    "target": {
+      "type": "beat-rival",
+      "rival": "ALO"
+    },
+    "storyline": {
+      "real": "Alonso wins from 11th on the grid; Vettel retires from the lead and R\u00e4ikk\u00f6nen, from 5th, finishes second, 6.4 s behind Alonso.",
+      "rewriteCondition": {
+        "type": "beat-rival",
+        "rival": "ALO"
+      },
+      "headline": "R\u00e4ikk\u00f6nen takes Valencia away from Alonso"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "max": 2,
+      "label": "Beat Alonso on two stops or fewer"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 5,
+      "label": "Win by more than 5 seconds"
+    },
+    "hardCalls": {
+      "RAI": 2,
+      "ALO": 0
+    },
+    "briefing": "Valencia, 2012. Vettel leads from pole and you run R\u00e4ikk\u00f6nen, sixth after starting fifth. Alonso started 11th and is coming through the field. Finish ahead of him."
+  },
   "provenance": {
     "kind": "real",
     "estimated": [

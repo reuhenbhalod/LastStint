@@ -1,4 +1,35 @@
 {
+  "eras": {
+    "eraId": 7,
+    "order": 7,
+    "userSide": "RAI",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Hamilton and Rosberg collide on the opening lap and both retire. Verstappen, 18, in his first race for Red Bull, wins on two stops; R\u00e4ikk\u00f6nen, also on two stops, finishes second, 0.6 s behind.",
+      "rewriteCondition": {
+        "type": "beat-rival",
+        "rival": "VER"
+      },
+      "headline": "R\u00e4ikk\u00f6nen spoils the teenager's party in Barcelona"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 2,
+      "label": "Win on two stops"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 5,
+      "label": "Win by more than 5 seconds"
+    },
+    "hardCalls": {
+      "RAI": 1,
+      "VER": 1
+    },
+    "briefing": "Barcelona, 2016. Both Mercedes went out on the first lap, so this race is Red Bull against Ferrari. Ricciardo and Verstappen, in his first race for Red Bull, run first and second. You run R\u00e4ikk\u00f6nen, fifth on worn softs. Pick your stops and take the win."
+  },
   "rules": {
     "twoCompound": true,
     "tyreChanges": true,

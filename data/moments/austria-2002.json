@@ -1,0 +1,379 @@
+[
+  {
+    "id": "battle-37",
+    "lap": 37,
+    "trigger": "cliff",
+    "target": {
+      "kind": "team",
+      "positions": [
+        2,
+        2
+      ]
+    },
+    "options": [
+      {
+        "id": "defend",
+        "label": "Defend hard",
+        "decisions": [
+          {
+            "lap": 37,
+            "kind": "mode",
+            "key": "battle",
+            "value": "defend"
+          }
+        ]
+      },
+      {
+        "id": "hold",
+        "label": "Hold the line",
+        "decisions": [
+          {
+            "lap": 37,
+            "kind": "mode",
+            "key": "battle",
+            "value": "hold"
+          }
+        ]
+      },
+      {
+        "id": "attack",
+        "label": "Attack",
+        "decisions": [
+          {
+            "lap": 37,
+            "kind": "mode",
+            "key": "battle",
+            "value": "attack"
+          }
+        ]
+      }
+    ],
+    "realOptionId": null
+  },
+  {
+    "id": "pace-45",
+    "lap": 45,
+    "trigger": "cliff",
+    "target": {
+      "kind": "team",
+      "positions": [
+        2,
+        2
+      ]
+    },
+    "options": [
+      {
+        "id": "push",
+        "label": "Push now",
+        "decisions": [
+          {
+            "lap": 45,
+            "kind": "mode",
+            "key": "pace",
+            "value": "push"
+          }
+        ]
+      },
+      {
+        "id": "standard",
+        "label": "Standard pace",
+        "decisions": [
+          {
+            "lap": 45,
+            "kind": "mode",
+            "key": "pace",
+            "value": "standard"
+          }
+        ]
+      },
+      {
+        "id": "manage",
+        "label": "Manage the tyres",
+        "decisions": [
+          {
+            "lap": 45,
+            "kind": "mode",
+            "key": "pace",
+            "value": "manage"
+          }
+        ]
+      },
+      {
+        "id": "push-attack",
+        "label": "Push and attack",
+        "decisions": [
+          {
+            "lap": 45,
+            "kind": "mode",
+            "key": "pace",
+            "value": "push"
+          },
+          {
+            "lap": 45,
+            "kind": "mode",
+            "key": "battle",
+            "value": "attack"
+          }
+        ]
+      }
+    ],
+    "realOptionId": null
+  },
+  {
+    "id": "stop-57",
+    "lap": 57,
+    "trigger": "cliff",
+    "target": {
+      "kind": "team",
+      "positions": [
+        2,
+        2
+      ]
+    },
+    "options": [
+      {
+        "id": "stay",
+        "label": "Stay out",
+        "decisions": []
+      },
+      {
+        "id": "box-medium",
+        "label": "Box, mediums",
+        "decisions": [
+          {
+            "lap": 57,
+            "kind": "pit",
+            "compound": "MEDIUM",
+            "fill": "standard"
+          }
+        ]
+      },
+      {
+        "id": "box-medium-short",
+        "label": "Box, mediums, a short fill",
+        "decisions": [
+          {
+            "lap": 57,
+            "kind": "pit",
+            "compound": "MEDIUM",
+            "fill": "short"
+          }
+        ]
+      },
+      {
+        "id": "box-medium-long",
+        "label": "Box, mediums, a long fill",
+        "decisions": [
+          {
+            "lap": 57,
+            "kind": "pit",
+            "compound": "MEDIUM",
+            "fill": "long"
+          }
+        ]
+      },
+      {
+        "id": "box-next-medium",
+        "label": "Box next lap, mediums",
+        "decisions": [
+          {
+            "lap": 58,
+            "kind": "pit",
+            "compound": "MEDIUM",
+            "fill": "standard"
+          }
+        ]
+      }
+    ],
+    "realOptionId": "stay"
+  },
+  {
+    "id": "stop-61",
+    "lap": 61,
+    "trigger": "cliff",
+    "target": {
+      "kind": "team",
+      "positions": [
+        2,
+        2
+      ]
+    },
+    "options": [
+      {
+        "id": "stay",
+        "label": "Stay out",
+        "decisions": []
+      },
+      {
+        "id": "box-medium",
+        "label": "Box, mediums",
+        "decisions": [
+          {
+            "lap": 61,
+            "kind": "pit",
+            "compound": "MEDIUM",
+            "fill": {
+              "laps": 10
+            }
+          }
+        ]
+      },
+      {
+        "id": "box-medium-short",
+        "label": "Box, mediums, a short fill",
+        "decisions": [
+          {
+            "lap": 61,
+            "kind": "pit",
+            "compound": "MEDIUM",
+            "fill": "short"
+          }
+        ]
+      },
+      {
+        "id": "box-medium-long",
+        "label": "Box, mediums, a long fill",
+        "decisions": [
+          {
+            "lap": 61,
+            "kind": "pit",
+            "compound": "MEDIUM",
+            "fill": "long"
+          }
+        ]
+      },
+      {
+        "id": "box-next-medium",
+        "label": "Box next lap, mediums",
+        "decisions": [
+          {
+            "lap": 62,
+            "kind": "pit",
+            "compound": "MEDIUM",
+            "fill": "standard"
+          }
+        ]
+      }
+    ],
+    "realOptionId": "box-medium"
+  },
+  {
+    "id": "stop-63",
+    "lap": 63,
+    "trigger": "cliff",
+    "target": {
+      "kind": "team",
+      "positions": [
+        2,
+        2
+      ]
+    },
+    "options": [
+      {
+        "id": "stay",
+        "label": "Stay out",
+        "decisions": []
+      },
+      {
+        "id": "box-medium",
+        "label": "Box, mediums",
+        "decisions": [
+          {
+            "lap": 63,
+            "kind": "pit",
+            "compound": "MEDIUM",
+            "fill": "standard"
+          }
+        ]
+      },
+      {
+        "id": "box-medium-short",
+        "label": "Box, mediums, a short fill",
+        "decisions": [
+          {
+            "lap": 63,
+            "kind": "pit",
+            "compound": "MEDIUM",
+            "fill": "short"
+          }
+        ]
+      },
+      {
+        "id": "box-medium-long",
+        "label": "Box, mediums, a long fill",
+        "decisions": [
+          {
+            "lap": 63,
+            "kind": "pit",
+            "compound": "MEDIUM",
+            "fill": "long"
+          }
+        ]
+      },
+      {
+        "id": "box-next-medium",
+        "label": "Box next lap, mediums",
+        "decisions": [
+          {
+            "lap": 64,
+            "kind": "pit",
+            "compound": "MEDIUM",
+            "fill": "standard"
+          }
+        ]
+      }
+    ],
+    "realOptionId": "stay"
+  },
+  {
+    "id": "battle-68",
+    "lap": 68,
+    "trigger": "cliff",
+    "target": {
+      "kind": "team",
+      "positions": [
+        2,
+        2
+      ]
+    },
+    "options": [
+      {
+        "id": "defend",
+        "label": "Defend hard",
+        "decisions": [
+          {
+            "lap": 68,
+            "kind": "mode",
+            "key": "battle",
+            "value": "defend"
+          }
+        ]
+      },
+      {
+        "id": "hold",
+        "label": "Hold the line",
+        "decisions": [
+          {
+            "lap": 68,
+            "kind": "mode",
+            "key": "battle",
+            "value": "hold"
+          }
+        ]
+      },
+      {
+        "id": "attack",
+        "label": "Attack",
+        "decisions": [
+          {
+            "lap": 68,
+            "kind": "mode",
+            "key": "battle",
+            "value": "attack"
+          }
+        ]
+      }
+    ],
+    "realOptionId": null
+  }
+]

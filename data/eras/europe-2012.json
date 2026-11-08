@@ -1,4 +1,36 @@
 {
+  "eras": {
+    "eraId": 6,
+    "order": 6,
+    "userSide": "RAI",
+    "target": {
+      "type": "beat-rival",
+      "rival": "ALO"
+    },
+    "storyline": {
+      "real": "Alonso wins from 11th on the grid; Vettel retires from the lead and R\u00e4ikk\u00f6nen, from 5th, finishes second, 6.4 s behind Alonso.",
+      "rewriteCondition": {
+        "type": "beat-rival",
+        "rival": "ALO"
+      },
+      "headline": "R\u00e4ikk\u00f6nen takes Valencia away from Alonso"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "max": 2,
+      "label": "Beat Alonso on two stops or fewer"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 5,
+      "label": "Win by more than 5 seconds"
+    },
+    "hardCalls": {
+      "RAI": 2,
+      "ALO": 0
+    },
+    "briefing": "Valencia, 2012. Vettel leads from pole and you run R\u00e4ikk\u00f6nen, sixth after starting fifth. Alonso started 11th and is coming through the field. Finish ahead of him."
+  },
   "rules": {
     "twoCompound": true,
     "tyreChanges": true,
@@ -7,5 +39,11 @@
     "drs": true,
     "ers": "kers",
     "refuelling": false
-  }
+  },
+  "storylineEvents": [
+    [
+      31,
+      "SC"
+    ]
+  ]
 }
