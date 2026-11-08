@@ -70,6 +70,7 @@ export { BAND_POINTS, scoreRun } from './grade.js';
 export {
   QUALITY,
   candidateMoments,
+  legendMoments,
   pauseAt,
   proposeMoments,
   verdictFor,
@@ -118,19 +119,26 @@ export * from './eras/race-log.js';
 export {
   LEGEND_STREAM,
   circuitFor,
+  drawnEvents,
   isKept,
   legendEvents,
+  legendLoss,
   legendRates,
   parseRaceId,
+  realFlags,
+  removedEvents,
 } from './legend.js';
 export type { LegendRates, ScRates } from './legend.js';
 export {
   PIT_CLOSED_SC_LAPS,
+  SAFETY_CAR_FROM,
   STOP_GO_SECONDS,
   allowedFlag,
   hasMove,
   pitLaneClosed,
+  raceYear,
   resolveRules,
+  safetyCarRule,
   scQueue,
   stopChangesTyres,
   stopGoCost,

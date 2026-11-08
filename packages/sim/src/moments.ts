@@ -7,6 +7,7 @@
 // still picks the final 2-4 (plan 1.5); approved moments go in data/moments/<race>.json.
 
 import { type GradeOption, type MomentGrade, type Target, gradeMoment } from './grade.js';
+import { drawnEvents, legendEvents, removedEvents } from './legend.js';
 import { type Run, initRun, realDecisions, stepLap, tyreLife } from './sim.js';
 import type { Decision, RaceModel } from './types.js';
 import { wetnessOn } from './weather.js';
@@ -107,6 +108,18 @@ function realOptionId(model: RaceModel, lap: number, options: MomentOption[]): s
   return match?.id ?? null;
 }
 
+/** A trigger's 3-4 options: stay out, a box call per compound, and a pace call off a SC/VSC. */
+function triggerOptions(model: RaceModel, lap: number, trigger: MomentTrigger): MomentOption[] {
+  const box = boxOptions(model, lap);
+  const extra =
+    trigger === 'cliff'
+      ? modeOption(lap, 'manage')
+      : trigger === 'SC' || trigger === 'VSC'
+        ? null
+        : modeOption(lap, 'push');
+  return [stayOut(), ...box.slice(0, extra ? 2 : 3), ...(extra ? [extra] : [])];
+}
+
 /** Candidate moments from the race's triggers, with 3-4 options each (ungraded). */
 export function candidateMoments(model: RaceModel, target = DEFAULT_TARGET): DecisionMoment[] {
   const first = model.race.takeoverLap + 1;
@@ -154,14 +167,7 @@ export function candidateMoments(model: RaceModel, target = DEFAULT_TARGET): Dec
     .filter((f) => f.lap >= first && f.lap <= last)
     .sort((a, b) => PRIORITY[a.trigger] - PRIORITY[b.trigger] || a.lap - b.lap)) {
     if (moments.some((m) => Math.abs(m.lap - lap) < MIN_SPACING)) continue;
-    const box = boxOptions(model, lap);
-    const extra =
-      trigger === 'cliff'
-        ? modeOption(lap, 'manage')
-        : trigger === 'SC' || trigger === 'VSC'
-          ? null
-          : modeOption(lap, 'push');
-    const options = [stayOut(), ...box.slice(0, extra ? 2 : 3), ...(extra ? [extra] : [])];
+    const options = triggerOptions(model, lap, trigger);
     moments.push({
       id: `${trigger.toLowerCase()}-${lap}`,
       lap,
@@ -169,6 +175,43 @@ export function candidateMoments(model: RaceModel, target = DEFAULT_TARGET): Dec
       target,
       options,
       realOptionId: realOptionId(model, lap, options),
+    });
+  }
+  return moments.sort((a, b) => a.lap - b.lap);
+}
+
+/**
+ * The decision moments of a Legend attempt with `seed` (eras spec 8: calls follow the safety
+ * cars). The race's approved moments, minus each SC/VSC moment whose lap falls in a real
+ * SC/VSC period Legend removed; plus, at each drawn SC/VSC, the call the moment finder makes
+ * at a real one (trigger, lap and options as candidateMoments). A drawn moment is skipped
+ * outside the finder's laps (after the takeover, before the last lap) or within MIN_SPACING
+ * laps of a moment already kept, like the finder's merge (the approved moment wins). Its
+ * realOptionId is null: the real team never faced it. Every other moment is unchanged.
+ * Deterministic from the seed; in lap order.
+ */
+export function legendMoments(model: RaceModel, seed: number): DecisionMoment[] {
+  const removed = removedEvents(model);
+  const inRemoved = (lap: number) =>
+    removed.some((e) => e.lap <= lap && lap < e.lap + (e.laps ?? 1));
+  const moments = model.decisionMoments.filter(
+    (m) => !((m.trigger === 'SC' || m.trigger === 'VSC') && inRemoved(m.lap)),
+  );
+  const first = model.race.takeoverLap + 1;
+  const last = model.race.laps - 1;
+  for (const e of drawnEvents(model, legendEvents(model, seed))) {
+    if (e.type !== 'SC' && e.type !== 'VSC') continue;
+    const lap = e.lap;
+    if (lap < first || lap > last || moments.some((m) => Math.abs(m.lap - lap) < MIN_SPACING)) {
+      continue;
+    }
+    moments.push({
+      id: `legend-${e.type.toLowerCase()}-${lap}`,
+      lap,
+      trigger: e.type,
+      target: model.decisionMoments[0]?.target ?? DEFAULT_TARGET,
+      options: triggerOptions(model, lap, e.type),
+      realOptionId: null,
     });
   }
   return moments.sort((a, b) => a.lap - b.lap);

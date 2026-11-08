@@ -13,11 +13,17 @@
 // u < (scPerRace + vscPerRace) / laps a VSC (no VSC when rules.vsc is false; absent =
 // allowed). A drawn period starts only after a green lap, runs the all-track mean length,
 // stops at the flag and ends a lap before the next kept period; one that can't get a lap is
-// dropped.
+// dropped. A race before the safety car (rules.ts safetyCarRule: before 1993) draws none.
+//
+// Scripted stops pay the lap's Legend conditions (legendLoss): a real stop's measured loss was
+// taken under the real flag, so on a lap whose flag Legend changed (a real SC now green, a
+// green lap now under a drawn SC/VSC) it pays the track's figure for the flag it now runs
+// under. Calls follow the safety cars too: moments.ts legendMoments.
 
 import scRatesJson from '../../../data/sc_rates.json';
 import { deriveSeed, mulberry32 } from './rng.js';
-import type { RaceEvent, RaceModel } from './types.js';
+import { resolveRules } from './rules.js';
+import type { FlagState, PitStop, RaceEvent, RaceModel } from './types.js';
 
 export const LEGEND_STREAM = 15000;
 
@@ -96,7 +102,9 @@ export function legendEvents(
 ): RaceEvent[] {
   const { laps, takeoverLap } = model.race;
   const r = legendRates(model, rates);
-  const vscOk = model.rules?.vsc !== false;
+  const rules = resolveRules(model);
+  const scOk = rules.safetyCar; // no SC (so no VSC) before 1993
+  const vscOk = scOk && rules.vsc;
   const kept = model.events.filter((e) => isKept(e, takeoverLap));
   const busy = new Set<number>();
   for (const e of kept) {
@@ -104,7 +112,7 @@ export function legendEvents(
       for (let lap = e.lap; lap < e.lap + (e.laps ?? 1); lap++) busy.add(lap);
     }
   }
-  const pSc = r.scPerRace / laps;
+  const pSc = scOk ? r.scPerRace / laps : 0;
   const pAny = pSc + (vscOk ? r.vscPerRace / laps : 0);
   const rng = mulberry32(deriveSeed(seed, LEGEND_STREAM));
   const drawn: RaceEvent[] = [];
@@ -120,4 +128,47 @@ export function legendEvents(
     for (let l = lap; l < lap + n; l++) busy.add(l);
   }
   return [...kept, ...drawn].sort((a, b) => a.lap - b.lap);
+}
+
+/** The real SC/VSC periods every Legend run of the race drops (isKept false). */
+export function removedEvents(model: RaceModel): RaceEvent[] {
+  return model.events.filter((e) => !isKept(e, model.race.takeoverLap));
+}
+
+/** The SC/VSC periods a Legend run drew (those not in the race's events), by lap. */
+export function drawnEvents(model: RaceModel, events: readonly RaceEvent[]): RaceEvent[] {
+  const real = new Set(model.events);
+  return events.filter((e) => !real.has(e));
+}
+
+const FLAG_OF = { SC: 'sc', VSC: 'vsc', RED: 'red' } as const;
+const realFlagCache = new WeakMap<RaceModel, Map<number, Exclude<FlagState, 'green'>>>();
+
+/** The real race's flag per lap (SC, VSC and red-flag laps; absent: green). */
+export function realFlags(model: RaceModel): ReadonlyMap<number, Exclude<FlagState, 'green'>> {
+  let map = realFlagCache.get(model);
+  if (!map) {
+    map = new Map();
+    for (const e of model.events) {
+      if (e.type !== 'SC' && e.type !== 'VSC' && e.type !== 'RED') continue;
+      for (let lap = e.lap; lap < e.lap + (e.laps ?? 1); lap++) map.set(lap, FLAG_OF[e.type]);
+    }
+    realFlagCache.set(model, map);
+  }
+  return map;
+}
+
+/**
+ * A stop's loss in a Legend run whose flags are `neutral`: its measured loss while the lap runs
+ * under the flag it was measured under, else undefined (the track's figure for the lap's flag:
+ * green, SC or VSC). A stop with no measured loss is unchanged.
+ */
+export function legendLoss(
+  model: RaceModel,
+  neutral: ReadonlyMap<number, FlagState>,
+  stop: Pick<PitStop, 'loss'>,
+  lap: number,
+): number | undefined {
+  if (stop.loss === undefined) return undefined;
+  return realFlags(model).get(lap) === neutral.get(lap) ? stop.loss : undefined;
 }

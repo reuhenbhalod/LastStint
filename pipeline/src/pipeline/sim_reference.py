@@ -15,7 +15,7 @@ import math
 from dataclasses import dataclass, field
 
 from . import race_rules
-from .legend import legend_events
+from .legend import legend_events, legend_loss, real_flags
 from .paths import GOLDEN_DIR
 from .rng import Mulberry32, derive_seed
 
@@ -215,6 +215,7 @@ def simulate(
 
     neutral: dict[int, str] = {}
     retire_at: dict[int, set[str]] = {}
+    real = real_flags(model) if legend else None  # Legend: stops pay the lap's conditions
     for e in legend_events(model, seed) if legend else model["events"]:
         if e["type"] in ("SC", "VSC", "RED"):
             for lap in range(e["lap"], e["lap"] + int(e.get("laps", 1))):
@@ -276,7 +277,8 @@ def simulate(
                     car.tyre_age = 0
                     car.tyre_wear = 0.0
                 default = {"SC": pit_loss_sc, "VSC": pit_loss_vsc}.get(flag, pit_loss)
-                pit_cost += pit.get("loss", default)
+                loss = legend_loss(pit, lap, flag, real) if real is not None else pit.get("loss")
+                pit_cost += default if loss is None else loss
                 # Era rules: an added stop into a closed pit lane (2007-08) owes a stop-go.
                 if pit.get("added") and race_rules.pit_lane_closed(model, neutral, lap, pit["to"]):
                     car.stop_go += race_rules.stop_go_cost(model)

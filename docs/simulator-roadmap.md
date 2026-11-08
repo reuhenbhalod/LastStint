@@ -61,6 +61,7 @@ in code:
 
 | Rule | Years | Notes |
 |---|---|---|
+| Safety car (`safetyCar`, from the race's year) | 1993+ | Before 1993 Legend draws no SC or VSC (storyline events stay) and `allowedFlag` gives none. Live crashes and grader playouts don't read it yet (owner, Nov 7) |
 | VSC | 2015+ | Earlier eras have none |
 | DRS (`wait-drs` move) | 2011–2025 | |
 | Battery / ERS | KERS 2009, 2011–13; hybrid 2014+ | Earlier eras: none |

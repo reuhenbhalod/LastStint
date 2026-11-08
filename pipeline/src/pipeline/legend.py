@@ -13,6 +13,11 @@ The draw (bit-identical to packages/sim/src/legend.ts):
 - A drawn period starts only if the lap before is green (no merging into a kept period), runs
   the all-track mean length, stops at the flag, and ends a lap before the next kept period (a
   green lap in between); a period that can't get one lap is dropped.
+- A race before the safety car (race_rules.safety_car: before 1993) draws none.
+
+Scripted stops pay the lap's Legend conditions (legend_loss): a real stop's measured loss was
+taken under the real flag, so on a lap whose flag Legend changed it pays the track's figure for
+the flag it now runs under (green, SC or VSC).
 """
 
 from __future__ import annotations
@@ -21,6 +26,7 @@ import json
 import re
 from functools import cache
 
+from . import race_rules
 from .paths import DATA_DIR
 from .rng import Mulberry32, derive_seed
 
@@ -84,13 +90,14 @@ def legend_events(model: dict, seed: int, rates: dict | None = None) -> list[dic
     laps = int(model["race"]["laps"])
     takeover = int(model["race"]["takeoverLap"])
     r = legend_rates(model, rates)
-    vsc_ok = (model.get("rules") or {}).get("vsc") is not False
+    sc_ok = race_rules.safety_car(model)  # no SC (so no VSC) before 1993
+    vsc_ok = sc_ok and (model.get("rules") or {}).get("vsc") is not False
     kept = [e for e in model["events"] if is_kept(e, takeover)]
     busy: set[int] = set()
     for e in kept:
         if e["type"] in NEUTRAL:
             busy.update(range(e["lap"], e["lap"] + int(e.get("laps", 1))))
-    p_sc = r["scPerRace"] / laps
+    p_sc = r["scPerRace"] / laps if sc_ok else 0.0
     p_any = p_sc + (r["vscPerRace"] / laps if vsc_ok else 0.0)
     rng = Mulberry32(derive_seed(seed, LEGEND_STREAM))
     drawn: list[dict] = []
@@ -110,10 +117,27 @@ def legend_events(model: dict, seed: int, rates: dict | None = None) -> list[dic
     return sorted(kept + drawn, key=lambda e: e["lap"])
 
 
+def real_flags(model: dict) -> dict[int, str]:
+    """The real race's flag per lap ("SC", "VSC", "RED"; absent: green)."""
+    flags: dict[int, str] = {}
+    for e in model["events"]:
+        if e["type"] in NEUTRAL:
+            for lap in range(e["lap"], e["lap"] + int(e.get("laps", 1))):
+                flags[lap] = e["type"]
+    return flags
+
+
+def legend_loss(stop: dict, lap: int, flag: str | None, real: dict[int, str]) -> float | None:
+    """A stop's loss in a Legend run: its measured loss while lap `lap` runs under the flag it
+    was measured under (`real`), else None (the track's figure for `flag`)."""
+    loss = stop.get("loss")
+    return loss if loss is not None and real.get(lap) == flag else None
+
+
 # Parity vectors (pipeline/tests/fixtures/legend_parity.json, read by packages/sim's
 # tests/legend.test.ts): (case name, race file, variant). Variants patch the model the same way
 # on both sides: "storyline" flags every real SC/VSC as a storyline event, "no-vsc" sets
-# rules.vsc false.
+# rules.vsc false, "1990" moves the race to 1990 (before the safety car: no draws).
 PARITY_CASES = [
     ("abu-dhabi-2021", "abu-dhabi-2021", None),
     ("abu-dhabi-2021+storyline", "abu-dhabi-2021", "storyline"),
@@ -122,6 +146,8 @@ PARITY_CASES = [
     ("russia-2021", "russia-2021", None),
     ("canada-2024", "canada-2024", None),
     ("monaco-2023", "monaco-2023", None),
+    ("bahrain-2023", "bahrain-2023", None),
+    ("abu-dhabi-2021+1990", "abu-dhabi-2021", "1990"),
 ]
 PARITY_SEEDS = list(range(1, 21))
 
@@ -135,6 +161,9 @@ def variant(model: dict, name: str | None) -> dict:
                 e["storylineEvent"] = True
     elif name == "no-vsc":
         out["rules"] = {**(out.get("rules") or {}), "vsc": False}
+    elif name == "1990":
+        slug, _ = parse_race_id(out["race"]["id"])
+        out["race"]["id"] = f"{slug}-1990"
     elif name is not None:
         raise ValueError(f"unknown parity variant '{name}'")
     return out

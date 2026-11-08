@@ -20,6 +20,9 @@ Sources (checked Nov 7, 2026); rules.ts has the same list:
   Autosport, "FIA confirms new safety car rules" (Jan 27 2009).
 - Lapped cars unlap before the restart: new in 2007 (RaceFans, as above), banned 2010-11,
   allowed again from 2012 (Wikipedia, "Safety car").
+- The safety car: routine from 1993 (owner's decision, Nov 7, 2026: no random safety car
+  before 1993). Before then nothing the sim makes up neutralizes the race; real events are
+  kept. Derived from the race's year (safety_car), not an overlay key.
 """
 
 from __future__ import annotations
@@ -36,10 +39,29 @@ BUILD_PLAN = REPO_ROOT / "docs" / "eras-build-plan.md"
 WET_TYRES = ("INTERMEDIATE", "WET")
 PIT_CLOSED_SC_LAPS = 1  # SC laps from the deployment whose end the pit entry is closed on
 STOP_GO_SECONDS = 10.0  # the stop-go's stationary time
+SAFETY_CAR_FROM = 1993  # the first season the sim may make up a SC (or VSC)
+_RACE_YEAR = re.compile(r"^.+?-(\d{4})(?:-.*)?$")
 
 
 def _rules(model: dict) -> dict:
     return model.get("rules") or {}
+
+
+def year_of(race_id: str) -> int | None:
+    """The season of a race id ('spain-1994-pits' -> 1994), or None when it has none."""
+    m = _RACE_YEAR.match(race_id)
+    return int(m.group(1)) if m else None
+
+
+def safety_car_for_year(year: int) -> bool:
+    return year >= SAFETY_CAR_FROM
+
+
+def safety_car(model: dict) -> bool:
+    """True if the race runs with a safety car (from 1993). A race id without a year counts as
+    modern. No SC, no VSC either."""
+    year = year_of(model["race"]["id"])
+    return year is None or safety_car_for_year(year)
 
 
 def stop_changes_tyres(model: dict, from_compound: str, stop: dict) -> bool:

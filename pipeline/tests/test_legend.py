@@ -219,3 +219,86 @@ def test_parity_vectors_cover_moves_and_keeps():
     assert all((53, "SC", 5) in _neutral(v["events"]) for v in story.values())
     no_vsc = cases["abu-dhabi-2021+no-vsc"]["seeds"]
     assert all(e["type"] != "VSC" for v in no_vsc.values() for e in v["events"])
+
+
+# --- no safety car before 1993 ---------------------------------------------------------------
+
+
+def test_no_draws_before_1993():
+    model = legend.variant(_model("abu-dhabi-2021"), "1990")
+    for seed in SEEDS:
+        assert _neutral(legend.legend_events(model, seed)) == [], seed
+    model["race"]["id"] = "abu-dhabi-1993"
+    assert any(_neutral(legend.legend_events(model, s)) for s in SEEDS)
+
+
+def test_before_1993_storyline_events_stay():
+    model = legend.variant(legend.variant(_model("abu-dhabi-2021"), "storyline"), "1990")
+    real = _neutral(model["events"])
+    for seed in SEEDS:
+        assert _neutral(legend.legend_events(model, seed)) == real
+
+
+# --- stops pay the lap's real conditions -----------------------------------------------------
+
+
+def _legend_flags(model: dict, seed: int) -> dict[int, str]:
+    flags: dict[int, str] = {}
+    for e in legend.legend_events(model, seed):
+        if e["type"] in legend.NEUTRAL:
+            flags.update(dict.fromkeys(range(e["lap"], e["lap"] + e.get("laps", 1)), e["type"]))
+    return flags
+
+
+def test_legend_loss():
+    real = {37: "VSC"}
+    assert legend.legend_loss({"loss": 10.0}, 37, "VSC", real) == 10.0
+    assert legend.legend_loss({"loss": 10.0}, 37, None, real) is None  # now green
+    assert legend.legend_loss({"loss": 10.0}, 37, "SC", real) is None  # now a SC
+    assert legend.legend_loss({}, 37, "VSC", real) is None
+    assert legend.legend_loss({"loss": 22.0}, 20, None, real) == 22.0  # green, still green
+    assert legend.real_flags(_model("abu-dhabi-2021"))[37] == "VSC"
+
+
+def test_vsc_stop_on_a_now_green_lap_pays_the_green_loss():
+    # As if the real race had been green on laps 36-38: no VSC, those stops unmeasured (the
+    # track's green figure). Legend draws the same periods (the VSC is never kept).
+    model = _model("abu-dhabi-2021")
+    vsc_laps = (36, 37, 38)
+    green = json.loads(json.dumps(model))
+    green["events"] = [e for e in green["events"] if e["type"] != "VSC"]
+    for d in green["drivers"]:
+        for st in d["realStrategy"]:
+            if st["lap"] in vsc_laps:
+                st.pop("loss", None)
+    seeds = [s for s in SEEDS if not set(vsc_laps) & set(_legend_flags(model, s))]
+    assert len(seeds) > 50
+    for s in seeds[:20]:
+        assert legend.legend_events(green, s) == legend.legend_events(model, s)
+        assert sim_reference.simulate(model, s, legend=True) == sim_reference.simulate(
+            green, s, legend=True
+        )
+    assert sim_reference.simulate(model, 1) != sim_reference.simulate(green, 1)  # not Legend
+
+
+def test_green_stop_under_a_drawn_period_pays_its_loss():
+    model = _model("abu-dhabi-2021")  # NOR's lap-49 stop is a measured green stop
+    unmeasured = json.loads(json.dumps(model))
+    for d in unmeasured["drivers"]:
+        if d["code"] == "NOR":
+            for st in d["realStrategy"]:
+                st.pop("loss", None)
+    under = next(s for s in SEEDS if 49 in _legend_flags(model, s))
+    assert sim_reference.simulate(model, under, legend=True) == sim_reference.simulate(
+        unmeasured, under, legend=True
+    )
+    green = next(s for s in SEEDS if 49 not in _legend_flags(model, s))
+    assert sim_reference.simulate(model, green, legend=True) != sim_reference.simulate(
+        unmeasured, green, legend=True
+    )
+
+
+def test_parity_vectors_cover_the_rules():
+    cases = json.loads(VECTORS.read_text())["cases"]
+    assert all(v["events"] == [e for e in v["events"] if e["type"] not in ("SC", "VSC")]
+               for v in cases["abu-dhabi-2021+1990"]["seeds"].values())  # fmt: skip

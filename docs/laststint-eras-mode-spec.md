@@ -348,6 +348,9 @@ A page showing the player's progress across everything collectible.
 - Unlocks for an era once it's Cleared.
 - Uses the hardest settings regardless of era: accuracy threshold 90, Minimal information, Expert rival, 20 s timer.
 - Safety cars and VSCs happen at random laps at the track's historical rate, instead of on their real laps, so memorizing the race doesn't help. Events that define the storyline (for example, the Abu Dhabi 2021 late safety car) are flagged `storylineEvent: true` and always happen on their real lap.
+- No random safety cars before 1993. In a race before 1993, Legend draws no safety car or VSC; storyline events still happen (decided Nov 7).
+- Calls follow the safety cars. A decision moment tied to a real safety car or VSC that Legend removed is dropped, and each drawn safety car or VSC brings the same call a real one would (stay out, or box for each compound). Other moments don't change. Like the draws, the calls come from the attempt's seed (decided Nov 7).
+- Stops pay the real conditions. A scripted car's real stop costs what a stop costs on that lap in this Legend race: a stop that was under a real safety car but is now on a green lap costs a green stop's time, and a stop that now falls under a drawn safety car or VSC costs that stop's time (decided Nov 7).
 - Legend has its own three stars per race, tracked separately.
 
 ### Leaderboards
