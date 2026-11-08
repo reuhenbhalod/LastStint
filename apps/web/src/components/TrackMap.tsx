@@ -820,7 +820,11 @@ export function TrackMap({
             aria-label={`${c.code}: details`}
             aria-pressed={lit}
             className="cursor-pointer outline-none [&:focus-visible>circle:first-of-type]:stroke-[var(--ink)]"
-            onClick={() => onSelect(c.code)}
+            // On press, not click: a click needs the press and the release on the same element,
+            // and the car has moved away from under the pointer by the time the finger lifts.
+            onPointerDown={(e) => {
+              if (e.button === 0) onSelect(c.code);
+            }}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
