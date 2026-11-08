@@ -28,6 +28,10 @@ PASS_MARGIN = 0.05  # a completed pass puts the follower this far (s) ahead
 # many laps (real races: ~4% of passes are undone within 3 laps; without it the sim undid
 # 25-60%). 0 = off. Model v3 spec stage 7 (E1). Same rule in packages/sim (parity).
 REPASS_COOLDOWN = 3
+# Eras overtake model (overtaking.py; a race file whose overtakeModel has trainCoef): the car
+# ahead is in a train when it started the lap within this gap (s) of its own car ahead, and the
+# roll's logit takes trainCoef. Same constant in packages/sim (TRAIN_GAP).
+TRAIN_GAP = 1.0
 BUNCH_GAP = 0.5  # SC train spacing per car (measured on the final SC lap, 2021 races)
 # SC bunching (measured on the tuning races' SCs, 259 gaps): gaps are kept on the deployment
 # lap (everyone runs the same delta), each middle SC lap keeps SC_GAP_KEEP of a gap's excess
@@ -141,9 +145,12 @@ def _car_ahead(order: list[str], code: str, cars: dict[str, Car]) -> str:
     return live[i - 1] if i > 0 else code
 
 
-def pass_probability(overtake: dict, advantage: float, gap: float) -> float:
-    """Fitted logistic P(follower passes this lap) from pace advantage (s/lap) and gap (s)."""
+def pass_probability(overtake: dict, advantage: float, gap: float, train: bool = False) -> float:
+    """Fitted logistic P(follower passes this lap) from pace advantage (s/lap) and gap (s).
+    An Eras model (overtaking.py) adds trainCoef when the car ahead is in a train."""
     z = overtake["intercept"] + overtake["paceCoef"] * advantage + overtake["gapCoef"] * gap
+    if train and "trainCoef" in overtake:
+        z += overtake["trainCoef"]
     return 1.0 / (1.0 + math.exp(-z))
 
 
@@ -155,8 +162,11 @@ def _resolve_order(order, cars, clean, pass_rngs, overtake, prev_time, pitted, r
     puts it ahead; failure holds it FOLLOW_GAP behind even if its lap was faster (it was
     stuck in traffic). Pairs involving a car that pitted this lap, or that started further
     apart, are left to the natural time order (pit-driven moves, or a gap closed in one lap).
+    An Eras model (trainCoef set; overtaking.py) makes the car ahead harder to pass when it
+    started the lap within TRAIN_GAP of its own car ahead (a DRS train).
     """
     live = [c for c in order if not cars[c].retired]
+    trains = "trainCoef" in overtake
     for i in range(1, len(live)):
         a, b = cars[live[i - 1]], cars[live[i]]
         if a.code in pitted or b.code in pitted:
@@ -170,7 +180,9 @@ def _resolve_order(order, cars, clean, pass_rngs, overtake, prev_time, pitted, r
             and REPASS_COOLDOWN > 0
             and lap - recent.get((b.code, a.code), -(10**6)) <= REPASS_COOLDOWN
         )
-        if not cooling and pass_rngs[b.code].next() < pass_probability(overtake, advantage, gap):
+        train = trains and i > 1 and 0 <= prev_time[a.code] - prev_time[live[i - 2]] < TRAIN_GAP
+        p = pass_probability(overtake, advantage, gap, train)
+        if not cooling and pass_rngs[b.code].next() < p:
             if recent is not None:
                 recent[(a.code, b.code)] = lap  # a was passed by b on this lap
             if b.total_time >= a.total_time:

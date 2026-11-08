@@ -100,6 +100,10 @@ export const PASS_MARGIN = 0.05; // a completed pass puts the follower this far 
 // A car that has just been passed gets no pass roll against the car that passed it for this
 // many laps (real races undo ~4% of passes within 3 laps; without it the sim undid 25-60%).
 export const REPASS_COOLDOWN = 3;
+// Eras overtake model (pipeline overtaking.py; an overtakeModel with trainCoef): the car ahead
+// is in a train when it started the lap within this gap (s) of its own car ahead, and the
+// roll's logit takes trainCoef. Mirrors sim_reference.TRAIN_GAP.
+export const TRAIN_GAP = 1.0;
 export const BUNCH_GAP = 0.5; // SC train spacing per car (measured on the final SC lap)
 // SC bunching (measured on the tuning races' SCs, 259 gaps): gaps are kept on the deployment
 // lap, each middle SC lap keeps SC_GAP_KEEP of a gap's excess over BUNCH_GAP, and the last lap
@@ -417,6 +421,7 @@ function stopLoss(run: Run, stop: PitStop, lap: number): number | undefined {
 /**
  * Fitted logistic P(follower passes this lap) from pace advantage (s/lap) and gap (s), plus
  * any battle-stance shift to the logit (attacker's attackLogit + defender's defendLogit).
+ * An Eras model's trainCoef (the car ahead in a train) is passed in by the caller's shift.
  */
 export function passProbability(
   overtake: RaceModel['track']['overtakeModel'],
@@ -2257,6 +2262,17 @@ function engineerAfterLap(
  * against the car that passed it. Pairs involving a car that pitted this lap, or that
  * started further apart, are left to the natural time order.
  */
+function passShift(run: Run, lap: number, a: CarState, b: CarState): number {
+  return (
+    (effect(run, b, 'battle').attackLogit ?? 0) +
+    (effect(run, a, 'battle').defendLogit ?? 0) +
+    (effect(run, b, 'ers').attackLogit ?? 0) +
+    (effect(run, a, 'ers').defendLogit ?? 0) +
+    (holdingUp(run, a.code, b.code) ? (run.headset?.teamOrders?.holdUpLogit ?? 0) : 0) +
+    engineerShift(run, lap, a.code, b.code)
+  );
+}
+
 function resolveOrder(
   run: Run,
   lap: number,
@@ -2265,6 +2281,7 @@ function resolveOrder(
   pitted: Set<string>,
 ): void {
   const overtake = run.model.track.overtakeModel;
+  const trainCoef = overtake.trainCoef;
   const cars = run.state.cars;
   const order = live(run);
   for (let i = 1; i < order.length; i++) {
@@ -2274,13 +2291,11 @@ function resolveOrder(
     const gap = (prevTime[b.code] as number) - (prevTime[a.code] as number);
     if (!(gap >= 0 && gap < PASS_WINDOW)) continue;
     const advantage = (clean[a.code] as number) - (clean[b.code] as number);
-    const shift =
-      (effect(run, b, 'battle').attackLogit ?? 0) +
-      (effect(run, a, 'battle').defendLogit ?? 0) +
-      (effect(run, b, 'ers').attackLogit ?? 0) +
-      (effect(run, a, 'ers').defendLogit ?? 0) +
-      (holdingUp(run, a.code, b.code) ? (run.headset?.teamOrders?.holdUpLogit ?? 0) : 0) +
-      engineerShift(run, lap, a.code, b.code);
+    // An Eras model (trainCoef): the car ahead is harder to pass in a train (TRAIN_GAP).
+    const aheadGap =
+      i > 1 ? (prevTime[a.code] as number) - (prevTime[order[i - 2] as string] as number) : -1;
+    const train = trainCoef !== undefined && aheadGap >= 0 && aheadGap < TRAIN_GAP;
+    const shift = passShift(run, lap, a, b) + (train ? (trainCoef as number) : 0);
     // No roll (and no draw) while b is in its cooldown after being passed by a.
     const cooling = lap - (run.passedBy.get(`${b.code}>${a.code}`) ?? -1e9) <= REPASS_COOLDOWN;
     if (

@@ -23,6 +23,7 @@ from . import (
     fit,
     incidents,
     ingest,
+    overtaking,
     race_rules,
     reconstruct,
     redflag,
@@ -2043,6 +2044,8 @@ class BuildResult:
     laps: pd.DataFrame
     notes: list[str] = field(default_factory=list)  # priors/fallbacks the build relied on
     estimates: list[str] = field(default_factory=list)  # estimated fields and quirks (2.4)
+    fit: object | None = None  # the dry lap model (fit.LapTimeFit; overtaking.py reads it)
+    wet: bool = False  # a wet race (wet.is_wet_race)
 
 
 def load_sidecar(race_id: str, raw_dir: Path = RAW_DIR) -> dict | None:
@@ -2475,6 +2478,14 @@ def build_race(
     )
     if recon is not None:
         params = reconstructed_pit_loss(params, recon)
+    if eras_build and recon is None:
+        # Eras sim fix M3 (overtaking.py): the pooled overtake model (slopes per era group,
+        # intercept per track layout, partly pooled with the race's own rate) and the train
+        # term the sims apply when the file has trainCoef. Not a reconstructed race: its laps
+        # (and so its passes) are solved to the anchors, which its replay is checked against.
+        own = track.pass_opportunities(laps, fitted)
+        model_ot, ot_note = overtaking.eras_model(race_id, own)
+        params = replace(params, overtake_model=model_ot, notes=[*params.notes, ot_note])
 
     takeover = meta["takeover_lap"]
     if takeover is None:
@@ -2567,6 +2578,8 @@ def build_race(
         laps=laps,
         notes=[*fitted.prior_notes, *params.notes, *fault_notes],
         estimates=report,
+        fit=fitted,
+        wet=dry.wet,
     )
 
 

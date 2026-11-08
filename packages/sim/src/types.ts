@@ -298,8 +298,12 @@ export interface RaceModel {
     /** Measured green-stop losses minus pitLoss: new stops sample from these (spec B1). */
     pitLossDeviations?: number[];
     overtakeDifficulty: number;
-    /** P(pass) = sigmoid(intercept + paceCoef * paceAdvantage + gapCoef * gap). */
-    overtakeModel: { intercept: number; paceCoef: number; gapCoef: number };
+    /**
+     * P(pass) = sigmoid(intercept + paceCoef * paceAdvantage + gapCoef * gap). An Eras build's
+     * model (pipeline overtaking.py: pooled slopes per era group, intercept per track layout)
+     * adds trainCoef when the car ahead started the lap within TRAIN_GAP of its own car ahead.
+     */
+    overtakeModel: { intercept: number; paceCoef: number; gapCoef: number; trainCoef?: number };
     dirtyAirPenalty: number;
     greenLapTime?: number;
     scLapTime?: number;
