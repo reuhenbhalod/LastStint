@@ -214,6 +214,26 @@ applies the overlay with `export.with_eras_fields` (step 2.4 adds this). Each st
 its own keys: 1.5 writes `eras.hardCalls` and `eras.userSide`, 2.4 writes `provenance`, 4.1
 writes `rules`, 6.2 writes the rest of `eras` and `storylineEvents`.
 
+**Shared races (decided Nov 7).** A race in Eras and in the Daily or Gauntlet pool
+(`data/pools.json`: today abu-dhabi-2021, bahrain-2021, france-2021, hungary-2019 and
+russia-2021) keeps its Daily race file and hash unchanged forever. Its Eras content stays in its
+overlay, which is never baked into `data/races/<id>.json`:
+- `pipeline build` leaves a pool race's overlay out of its race file (`build.shared_races`; the
+  report says so). A pool race with estimated fields can't take an overlay `provenance`, since
+  the Worker's merge replaces the block. Eras races in no Daily or Gauntlet pool still take
+  their overlay into the file.
+- The Worker generator bundles the shared races' overlays (`races.gen.ts` `ERAS_OVERLAYS`).
+  The Eras API (`getErasRace`: the attempt pin, `GET /api/eras/races/:raceId/model?h=`, server
+  evaluation, the history book) uses the race file merged with its overlay
+  (`apps/worker/src/erasOverlay.ts`, the same merge as `export.with_eras_fields`), pinned by the
+  merged model's own hash. The nightly re-grade (`scripts/reverify.ts`) merges the same way.
+  `GET /api/races/:id` and the Daily hash use the race file alone.
+- Parity vectors keep the two merges equal (`pipeline/tests/fixtures/eras_overlay_parity.json`,
+  regenerated with `REGEN_OVERLAY_VECTORS=1`). `apps/worker/test/eras-shared.test.ts` replays
+  them and pins the five Daily hashes and their Eras hashes.
+- Editing a shared race's overlay changes its Eras hash only. Attempts started before the edit
+  are refused at submit (409 `model-changed`), as for a rebuilt Eras-only race.
+
 ## Phase 2: Data pipeline (11%)
 
 Each adapter writes the same raw parquet (`LAP_COLUMNS`) and status JSON as `ingest.py`, so

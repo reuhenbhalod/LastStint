@@ -1,0 +1,454 @@
+{
+ "cases": [
+  {
+   "name": "abu-dhabi-2021 all four keys",
+   "race": "abu-dhabi-2021",
+   "overlays": [
+    {
+     "eras": {
+      "eraId": 1,
+      "order": 1,
+      "userSide": "HAM"
+     },
+     "provenance": {
+      "kind": "real",
+      "estimated": [
+       "weather"
+      ]
+     },
+     "rules": {
+      "vsc": true
+     },
+     "storylineEvents": [
+      [
+       53,
+       "SC"
+      ]
+     ]
+    }
+   ],
+   "keys": [
+    "schemaVersion",
+    "race",
+    "era",
+    "track",
+    "compounds",
+    "drivers",
+    "fuelEffectPerLap",
+    "freshTyre",
+    "events",
+    "decisionMoments",
+    "candidateMomentLaps",
+    "realResult",
+    "userSide",
+    "rival",
+    "eras",
+    "provenance",
+    "rules"
+   ],
+   "blocks": {
+    "eras": {
+     "eraId": 1,
+     "order": 1,
+     "userSide": "HAM"
+    },
+    "provenance": {
+     "kind": "real",
+     "estimated": [
+      "weather"
+     ]
+    },
+    "rules": {
+     "vsc": true
+    }
+   },
+   "events": [
+    {
+     "lap": 36,
+     "type": "RETIREMENT",
+     "driver": "GIO"
+    },
+    {
+     "lap": 36,
+     "type": "VSC",
+     "laps": 3
+    },
+    {
+     "lap": 53,
+     "type": "SC",
+     "laps": 5,
+     "storylineEvent": true
+    },
+    {
+     "lap": 54,
+     "type": "RETIREMENT",
+     "driver": "LAT"
+    },
+    {
+     "lap": 56,
+     "type": "RETIREMENT",
+     "driver": "PER"
+    }
+   ]
+  },
+  {
+   "name": "abu-dhabi-2021 rules then eras",
+   "race": "abu-dhabi-2021",
+   "overlays": [
+    {
+     "rules": {
+      "vsc": true
+     }
+    },
+    {
+     "eras": {
+      "eraId": 9,
+      "order": 10
+     },
+     "rules": {
+      "drs": false
+     }
+    }
+   ],
+   "keys": [
+    "schemaVersion",
+    "race",
+    "era",
+    "track",
+    "compounds",
+    "drivers",
+    "fuelEffectPerLap",
+    "freshTyre",
+    "events",
+    "decisionMoments",
+    "candidateMomentLaps",
+    "realResult",
+    "userSide",
+    "rival",
+    "rules",
+    "eras"
+   ],
+   "blocks": {
+    "eras": {
+     "eraId": 9,
+     "order": 10
+    },
+    "rules": {
+     "drs": false
+    }
+   },
+   "events": [
+    {
+     "lap": 36,
+     "type": "RETIREMENT",
+     "driver": "GIO"
+    },
+    {
+     "lap": 36,
+     "type": "VSC",
+     "laps": 3
+    },
+    {
+     "lap": 53,
+     "type": "SC",
+     "laps": 5
+    },
+    {
+     "lap": 54,
+     "type": "RETIREMENT",
+     "driver": "LAT"
+    },
+    {
+     "lap": 56,
+     "type": "RETIREMENT",
+     "driver": "PER"
+    }
+   ]
+  },
+  {
+   "name": "abu-dhabi-2021 overlay",
+   "race": "abu-dhabi-2021",
+   "overlays": [
+    {
+     "rules": {
+      "twoCompound": true,
+      "tyreChanges": true,
+      "pitLaneClosedUnderSC": false,
+      "vsc": true,
+      "drs": true,
+      "ers": "hybrid",
+      "refuelling": false
+     }
+    }
+   ],
+   "keys": [
+    "schemaVersion",
+    "race",
+    "era",
+    "track",
+    "compounds",
+    "drivers",
+    "fuelEffectPerLap",
+    "freshTyre",
+    "events",
+    "decisionMoments",
+    "candidateMomentLaps",
+    "realResult",
+    "userSide",
+    "rival",
+    "rules"
+   ],
+   "blocks": {
+    "rules": {
+     "twoCompound": true,
+     "tyreChanges": true,
+     "pitLaneClosedUnderSC": false,
+     "vsc": true,
+     "drs": true,
+     "ers": "hybrid",
+     "refuelling": false
+    }
+   },
+   "events": [
+    {
+     "lap": 36,
+     "type": "RETIREMENT",
+     "driver": "GIO"
+    },
+    {
+     "lap": 36,
+     "type": "VSC",
+     "laps": 3
+    },
+    {
+     "lap": 53,
+     "type": "SC",
+     "laps": 5
+    },
+    {
+     "lap": 54,
+     "type": "RETIREMENT",
+     "driver": "LAT"
+    },
+    {
+     "lap": 56,
+     "type": "RETIREMENT",
+     "driver": "PER"
+    }
+   ]
+  },
+  {
+   "name": "bahrain-2021 overlay",
+   "race": "bahrain-2021",
+   "overlays": [
+    {
+     "rules": {
+      "twoCompound": true,
+      "tyreChanges": true,
+      "pitLaneClosedUnderSC": false,
+      "vsc": true,
+      "drs": true,
+      "ers": "hybrid",
+      "refuelling": false
+     }
+    }
+   ],
+   "keys": [
+    "schemaVersion",
+    "race",
+    "era",
+    "track",
+    "compounds",
+    "drivers",
+    "fuelEffectPerLap",
+    "freshTyre",
+    "events",
+    "decisionMoments",
+    "candidateMomentLaps",
+    "realResult",
+    "userSide",
+    "rival",
+    "rules"
+   ],
+   "blocks": {
+    "rules": {
+     "twoCompound": true,
+     "tyreChanges": true,
+     "pitLaneClosedUnderSC": false,
+     "vsc": true,
+     "drs": true,
+     "ers": "hybrid",
+     "refuelling": false
+    }
+   },
+   "events": [
+    {
+     "lap": 33,
+     "type": "RETIREMENT",
+     "driver": "ALO"
+    },
+    {
+     "lap": 53,
+     "type": "RETIREMENT",
+     "driver": "LAT"
+    },
+    {
+     "lap": 54,
+     "type": "RETIREMENT",
+     "driver": "GAS"
+    }
+   ]
+  },
+  {
+   "name": "france-2021 overlay",
+   "race": "france-2021",
+   "overlays": [
+    {
+     "rules": {
+      "twoCompound": true,
+      "tyreChanges": true,
+      "pitLaneClosedUnderSC": false,
+      "vsc": true,
+      "drs": true,
+      "ers": "hybrid",
+      "refuelling": false
+     }
+    }
+   ],
+   "keys": [
+    "schemaVersion",
+    "race",
+    "era",
+    "track",
+    "compounds",
+    "drivers",
+    "fuelEffectPerLap",
+    "freshTyre",
+    "events",
+    "decisionMoments",
+    "candidateMomentLaps",
+    "realResult",
+    "userSide",
+    "rival",
+    "rules"
+   ],
+   "blocks": {
+    "rules": {
+     "twoCompound": true,
+     "tyreChanges": true,
+     "pitLaneClosedUnderSC": false,
+     "vsc": true,
+     "drs": true,
+     "ers": "hybrid",
+     "refuelling": false
+    }
+   },
+   "events": []
+  },
+  {
+   "name": "hungary-2019 overlay",
+   "race": "hungary-2019",
+   "overlays": [
+    {
+     "rules": {
+      "twoCompound": true,
+      "tyreChanges": true,
+      "pitLaneClosedUnderSC": false,
+      "vsc": true,
+      "drs": true,
+      "ers": "hybrid",
+      "refuelling": false
+     }
+    }
+   ],
+   "keys": [
+    "schemaVersion",
+    "race",
+    "era",
+    "track",
+    "compounds",
+    "drivers",
+    "fuelEffectPerLap",
+    "freshTyre",
+    "events",
+    "decisionMoments",
+    "candidateMomentLaps",
+    "realResult",
+    "userSide",
+    "rival",
+    "rules"
+   ],
+   "blocks": {
+    "rules": {
+     "twoCompound": true,
+     "tyreChanges": true,
+     "pitLaneClosedUnderSC": false,
+     "vsc": true,
+     "drs": true,
+     "ers": "hybrid",
+     "refuelling": false
+    }
+   },
+   "events": [
+    {
+     "lap": 51,
+     "type": "RETIREMENT",
+     "driver": "GRO"
+    }
+   ]
+  },
+  {
+   "name": "russia-2021 overlay",
+   "race": "russia-2021",
+   "overlays": [
+    {
+     "rules": {
+      "twoCompound": true,
+      "tyreChanges": true,
+      "pitLaneClosedUnderSC": false,
+      "vsc": true,
+      "drs": true,
+      "ers": "hybrid",
+      "refuelling": false
+     }
+    }
+   ],
+   "keys": [
+    "schemaVersion",
+    "race",
+    "era",
+    "track",
+    "compounds",
+    "drivers",
+    "fuelEffectPerLap",
+    "freshTyre",
+    "events",
+    "decisionMoments",
+    "candidateMomentLaps",
+    "realResult",
+    "userSide",
+    "rival",
+    "weather",
+    "rules"
+   ],
+   "blocks": {
+    "rules": {
+     "twoCompound": true,
+     "tyreChanges": true,
+     "pitLaneClosedUnderSC": false,
+     "vsc": true,
+     "drs": true,
+     "ers": "hybrid",
+     "refuelling": false
+    }
+   },
+   "events": [
+    {
+     "lap": 49,
+     "type": "RETIREMENT",
+     "driver": "LAT"
+    }
+   ]
+  }
+ ]
+}
