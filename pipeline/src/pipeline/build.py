@@ -1303,12 +1303,15 @@ RACES: dict[str, dict] = {
         "year": 1987,
         "event": "British",  # `pipeline reconstruct great-britain-1987 --event British`
         "source": "reconstruct",
-        "name": "Britain 1987: Mansell vs Piquet",
+        "name": "Britain 1987: Piquet vs Mansell",
         "era": "1988-1993",
         "takeover_lap": None,  # D3 rule
         "seed": 1,
-        "user_side": "MAN",
-        "rival": "PIQN",  # win: Mansell pits for fresh tyres and chases Piquet down
+        # Eras plays the side with more hard calls (owner decision, step 6.2): 0-0, and the
+        # tie goes to Piquet, whose real call (no stop) gave up more chance (`pipeline
+        # hard-calls`). defend: Piquet holds off Mansell, who pits and chases him down.
+        "user_side": "PIQN",
+        "rival": "MAN",
         "score_positions": 6,
         "split": "eras",
     },

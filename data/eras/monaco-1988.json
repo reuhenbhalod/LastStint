@@ -1,4 +1,35 @@
 {
+  "eras": {
+    "eraId": 1,
+    "order": 10,
+    "userSide": "SENA",
+    "target": {
+      "type": "defend"
+    },
+    "storyline": {
+      "real": "Senna, far ahead of Prost, crashes at Portier on lap 67; Prost wins",
+      "rewriteCondition": {
+        "type": "defend"
+      },
+      "headline": "Senna keeps his concentration and wins in Monte Carlo"
+    },
+    "mastery": {
+      "type": "mode_rule",
+      "mode": "push",
+      "maxLaps": 0,
+      "label": "Bring it home: no laps at PUSH"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 50,
+      "label": "Win by more than 50 seconds"
+    },
+    "briefing": "Monaco, May 1988. Senna started on pole in the McLaren-Honda and leads; Prost spent the first half of the race stuck behind Berger's Ferrari. Turbo fuel is down to 150 litres this year. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports.",
+    "hardCalls": {
+      "SENA": 0,
+      "PRO": 0
+    }
+  },
   "rules": {
     "twoCompound": false,
     "tyreChanges": true,
@@ -8,5 +39,11 @@
     "ers": "none",
     "refuelling": false,
     "fuelLimit": 127.5
-  }
+  },
+  "storylineEvents": [
+    [
+      66,
+      "RETIREMENT"
+    ]
+  ]
 }

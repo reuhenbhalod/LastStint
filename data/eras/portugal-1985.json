@@ -1,4 +1,35 @@
 {
+  "eras": {
+    "eraId": 1,
+    "order": 5,
+    "userSide": "SENA",
+    "target": {
+      "type": "defend"
+    },
+    "storyline": {
+      "real": "Senna wins his first Grand Prix in heavy rain, more than a minute clear of Alboreto",
+      "rewriteCondition": {
+        "type": "defend"
+      },
+      "headline": "Senna's first win, from the front, through the Estoril floods"
+    },
+    "mastery": {
+      "type": "margin",
+      "seconds": 63,
+      "label": "Win by more than Senna's real 63 seconds"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "push",
+      "maxLaps": 0,
+      "label": "Win without a lap at PUSH in the rain"
+    },
+    "briefing": "Estoril, April 1985. Rain from the start, and it gets heavier. Senna started on pole in the Lotus and leads. The race will be cut short at the two-hour limit. Turbo cars have 220 litres for the race. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports.",
+    "hardCalls": {
+      "SENA": 0,
+      "ALBM": 0
+    }
+  },
   "rules": {
     "twoCompound": false,
     "tyreChanges": true,

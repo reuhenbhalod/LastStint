@@ -1,4 +1,34 @@
 {
+  "eras": {
+    "eraId": 1,
+    "order": 6,
+    "userSide": "BER",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Berger wins without a tyre stop on Pirellis, his and Benetton's first win; Prost second",
+      "rewriteCondition": {
+        "type": "win"
+      },
+      "headline": "Berger runs non-stop to Benetton's first victory"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "max": 0,
+      "label": "Win without a tyre stop, as Berger did"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 25.4,
+      "label": "Win by more than Berger's real 25.4 seconds"
+    },
+    "briefing": "Mexico City, October 1986. Berger started fourth in the Benetton on Pirelli tyres; the Goodyear runners expect to stop. Fuel is limited to 195 litres. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports.",
+    "hardCalls": {
+      "BER": 0,
+      "PRO": 0
+    }
+  },
   "rules": {
     "twoCompound": false,
     "tyreChanges": true,

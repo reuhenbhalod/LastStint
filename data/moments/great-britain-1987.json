@@ -1,0 +1,143 @@
+[
+  {
+    "id": "stop-34",
+    "lap": 34,
+    "trigger": "cliff",
+    "target": {
+      "kind": "win"
+    },
+    "options": [
+      {
+        "id": "stay",
+        "label": "STAY OUT",
+        "decisions": []
+      },
+      {
+        "id": "box-medium",
+        "label": "IN - fresh tyres",
+        "decisions": [
+          {
+            "lap": 34,
+            "kind": "pit",
+            "compound": "MEDIUM"
+          }
+        ]
+      }
+    ],
+    "realOptionId": "stay"
+  },
+  {
+    "id": "pace-38",
+    "lap": 38,
+    "trigger": "cliff",
+    "target": {
+      "kind": "win"
+    },
+    "options": [
+      {
+        "id": "keep",
+        "label": "Hold the pace",
+        "decisions": []
+      },
+      {
+        "id": "easy",
+        "label": "EASY - save the car",
+        "decisions": [
+          {
+            "lap": 38,
+            "kind": "mode",
+            "key": "pace",
+            "value": "manage"
+          }
+        ]
+      },
+      {
+        "id": "lift",
+        "label": "FUEL - lift and coast",
+        "decisions": [
+          {
+            "lap": 38,
+            "kind": "mode",
+            "key": "fuel",
+            "value": "liftAndCoast"
+          }
+        ]
+      }
+    ],
+    "realOptionId": null
+  },
+  {
+    "id": "pace-45",
+    "lap": 45,
+    "trigger": "cliff",
+    "target": {
+      "kind": "win"
+    },
+    "options": [
+      {
+        "id": "keep",
+        "label": "Hold the pace",
+        "decisions": []
+      },
+      {
+        "id": "easy",
+        "label": "EASY - save the car",
+        "decisions": [
+          {
+            "lap": 45,
+            "kind": "mode",
+            "key": "pace",
+            "value": "manage"
+          }
+        ]
+      },
+      {
+        "id": "lift",
+        "label": "FUEL - lift and coast",
+        "decisions": [
+          {
+            "lap": 45,
+            "kind": "mode",
+            "key": "fuel",
+            "value": "liftAndCoast"
+          }
+        ]
+      }
+    ],
+    "realOptionId": null
+  },
+  {
+    "id": "fuel-63",
+    "lap": 63,
+    "trigger": "cliff",
+    "target": {
+      "kind": "win"
+    },
+    "options": [
+      {
+        "id": "keep",
+        "label": "Hold the pace",
+        "decisions": []
+      },
+      {
+        "id": "lift",
+        "label": "FUEL - lift and coast to the flag",
+        "decisions": [
+          {
+            "lap": 63,
+            "kind": "mode",
+            "key": "fuel",
+            "value": "liftAndCoast"
+          },
+          {
+            "lap": 63,
+            "kind": "mode",
+            "key": "pace",
+            "value": "standard"
+          }
+        ]
+      }
+    ],
+    "realOptionId": null
+  }
+]
