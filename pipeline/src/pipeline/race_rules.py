@@ -3,8 +3,10 @@ and the rules each year raced under (written to the data/eras overlay files).
 
 Mirrors packages/sim/src/rules.ts. The reference sim runs real strategies only, so of the
 rules it runs the ones that change a replay: no tyre changes (2005), the pit lane closed under
-the SC (2007-08, for added stops) and scUnlap "none". DRS, the battery, the VSC's base rate and
-the two-compound disqualification only act in live play (TS). A race without a `rules` block
+the SC (2007-08, for added stops) and scUnlap "none". DRS, the battery, the VSC's base rate,
+the two-compound and minimum-stops (minStops) disqualifications, and no SC before 1993 for
+crashes and grader playouts, only act in live play (TS: the reference sim makes no crashes,
+draws no playout neutralizations and disqualifies no car). A race without a `rules` block
 runs exactly as before.
 
 Sources (checked Nov 7, 2026); rules.ts has the same list:
@@ -21,8 +23,13 @@ Sources (checked Nov 7, 2026); rules.ts has the same list:
 - Lapped cars unlap before the restart: new in 2007 (RaceFans, as above), banned 2010-11,
   allowed again from 2012 (Wikipedia, "Safety car").
 - The safety car: routine from 1993 (owner's decision, Nov 7, 2026: no random safety car
-  before 1993). Before then nothing the sim makes up neutralizes the race; real events are
-  kept. Derived from the race's year (safety_car), not an overlay key.
+  before 1993). Before then nothing the sim makes up neutralizes the race (Legend's draws, a
+  live crash's SC or VSC, grader playout draws); real events are kept. Derived from the race's
+  year (safety_car), not an overlay key.
+- Minimum stops: Monaco 2025, at least two pit stops (three sets of tyres) unless intermediate
+  or wet tyres are used: the 2025 FIA F1 Sporting Regulations' Monaco tyre rule, agreed by the
+  F1 Commission in 2024 and approved by the FIA World Motor Sport Council for 2025 (owner's
+  decision, Nov 7, 2026, to model it). A race's rule, not a year's (MIN_STOPS).
 """
 
 from __future__ import annotations
@@ -40,6 +47,8 @@ WET_TYRES = ("INTERMEDIATE", "WET")
 PIT_CLOSED_SC_LAPS = 1  # SC laps from the deployment whose end the pit entry is closed on
 STOP_GO_SECONDS = 10.0  # the stop-go's stationary time
 SAFETY_CAR_FROM = 1993  # the first season the sim may make up a SC (or VSC)
+# rules.minStops by race: the fewest stops a car must make (a car with fewer is disqualified).
+MIN_STOPS = {"monaco-2025": 2}
 _RACE_YEAR = re.compile(r"^.+?-(\d{4})(?:-.*)?$")
 
 
@@ -62,6 +71,17 @@ def safety_car(model: dict) -> bool:
     modern. No SC, no VSC either."""
     year = year_of(model["race"]["id"])
     return year is None or safety_car_for_year(year)
+
+
+def min_stops(model: dict) -> int:
+    """The fewest stops the race requires (rules.minStops; 0: no minimum)."""
+    return int(_rules(model).get("minStops") or 0)
+
+
+def stops_before_takeover(driver: dict) -> int:
+    """Stops a car made before the takeover: one per dry compound beyond its first (a lower
+    bound, exact when each early stop changed compound). Mirrors rules.ts stopsBeforeTakeover."""
+    return max(0, len(driver["stateAtTakeover"].get("compoundsUsed") or []) - 1)
 
 
 def stop_changes_tyres(model: dict, from_compound: str, stop: dict) -> bool:
@@ -131,6 +151,15 @@ def rules_for_year(year: int) -> dict:
     }
 
 
+def rules_for_race(race_id: str) -> dict:
+    """The `rules` keys this step owns for a race: its year's (rules_for_year) and any rule of
+    the race's own (MIN_STOPS)."""
+    rules = rules_for_year(race_year(race_id))
+    if race_id in MIN_STOPS:
+        rules["minStops"] = MIN_STOPS[race_id]
+    return rules
+
+
 def sc_unlap_for_year(year: int) -> str:
     """race.scUnlap for `year`: lapped cars unlapped in 2007-09 and from 2012. Not an overlay
     key (the overlay holds eras, provenance, rules, storylineEvents), so it's reported, not
@@ -149,8 +178,9 @@ def race_year(race_id: str) -> int:
 
 
 def write_rules_overlays(race_ids: list[str], out_dir: Path = ERAS_OVERLAY_DIR) -> list[Path]:
-    """Set the `rules` key of data/eras/<id>.json from each race's year, keeping every other
-    key (and rules.refuelling / rules.fuelLimit) as it is."""
+    """Set the `rules` key of data/eras/<id>.json from each race's year and own rules
+    (rules_for_race), keeping every other key (and rules.refuelling / rules.fuelLimit) as it
+    is."""
     out_dir.mkdir(parents=True, exist_ok=True)
     written = []
     for race_id in race_ids:
@@ -159,7 +189,7 @@ def write_rules_overlays(race_ids: list[str], out_dir: Path = ERAS_OVERLAY_DIR) 
         # refuelling / fuelLimit are eras build plan 4.2's (refuel.py): kept as they are.
         old = overlay.get("rules") or {}
         kept = {k: old[k] for k in ("refuelling", "fuelLimit") if k in old}
-        overlay["rules"] = {**rules_for_year(race_year(race_id)), **kept}
+        overlay["rules"] = {**rules_for_race(race_id), **kept}
         path.write_text(json.dumps(overlay, indent=2) + "\n")
         written.append(path)
     return written

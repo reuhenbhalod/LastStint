@@ -51,14 +51,18 @@ import {
 } from './rivals/react.js';
 import { type Rng, deriveSeed, mulberry32 } from './rng.js';
 import {
+  allowedFlag,
   hasMove,
   headsetFor,
   illegalPitCompound,
+  minStopsRule,
   pitLaneClosed,
   scQueue,
   serveStopGo,
   stopChangesTyres,
   stopGoCost,
+  stopsBeforeTakeover,
+  stopsOwed,
   twoCompoundRule,
 } from './rules.js';
 import type {
@@ -621,6 +625,8 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
       retired: false,
       retiredLap: null,
       modes: { ...DEFAULT_MODES },
+      // Era rules (rules.ts minStops): the stops count only where the race has a minimum.
+      ...(minStopsRule(model.rules) > 0 ? { stops: stopsBeforeTakeover(d) } : {}),
     };
   }
   // Refuelling (refuel.ts): every car's takeover tank; the player's burns live with incidents.
@@ -776,7 +782,9 @@ function sampledEvents(
   for (let lap = from + 1; lap <= run.model.race.laps; lap++) {
     const u = rng.next(); // one draw per lap, so the stream doesn't depend on the outcome
     if (busy.has(lap)) continue;
-    const flag = u < rates.scPerLap ? 'sc' : u < rates.scPerLap + rates.vscPerLap ? 'vsc' : null;
+    const drawn = u < rates.scPerLap ? 'sc' : u < rates.scPerLap + rates.vscPerLap ? 'vsc' : null;
+    // Era rules (rules.ts allowedFlag): no made-up SC or VSC before 1993.
+    const flag = drawn && allowedFlag(run.model, drawn);
     if (!flag) continue;
     const laps = Math.min(
       flag === 'sc' ? rates.scLaps : rates.vscLaps,
@@ -1190,6 +1198,8 @@ function rivalGoesLong(run: Run, lap: number): void {
   const needsThisStop =
     !ruleSatisfied(rival, model.rules) && !others.some((s) => !rival.compoundsUsed.includes(s.to));
   if (needsThisStop) return;
+  // Era rules (minStops): nor the stop that the rival needs for the minimum.
+  if (stopsOwed(model.rules, rival) > others.length) return;
   rival.strategy = others;
   run.notes.push({ lap, kind: 'rival-stays-out', driver: rival.code, detail: 'no stop' });
 }
@@ -1260,16 +1270,18 @@ export function planRemainingStop(run: Run, options: { exact?: boolean } = {}): 
   if (model.rules?.tyreChanges === false && !model.weather && !refuelling(model)) return null;
   // Two-compound rule: a car that hasn't yet run two dry compounds must stop for a new one.
   const mustChange = !ruleSatisfied(user, model.rules);
+  // Minimum stops (rules.minStops): a car still owing one must stop.
+  const mustStop = mustChange || owedAfterPlan(model, user, state.lap) > 0;
   // Refuelling: the planner prices the tank (exact path); one stop at most, as ever.
   let best: PitStop | null = null;
   // Plan only on what is known now: neutralizations that have started by the next lap.
-  const known = neutralMap(run.events.filter((e) => e.lap <= state.lap + 1));
+  const known = knownNow(run);
   let knownAhead = false;
   for (const lap of known.keys()) if (lap > state.lap) knownAhead = true;
   // The fast path assumes a dry race (a lap's time splits into a lap term and a tyre term).
   if (!knownAhead && !options.exact && !model.weather && user.tank === undefined)
-    return planGreenToFlag(run, user, mustChange);
-  let bestTime = mustChange
+    return planGreenToFlag(run, user, mustChange, mustStop);
+  let bestTime = mustStop
     ? Number.POSITIVE_INFINITY
     : predictedRemaining(run, user, state.lap, null, known);
   for (let lap = state.lap + 1; lap <= model.race.laps; lap++) {
@@ -1293,7 +1305,12 @@ export function planRemainingStop(run: Run, options: { exact?: boolean } = {}): 
  * compound cumulative sum over tyre age. Same choices as the full loop (sums differ only in
  * floating-point order).
  */
-function planGreenToFlag(run: Run, user: CarState, mustChange: boolean): PitStop | null {
+function planGreenToFlag(
+  run: Run,
+  user: CarState,
+  mustChange: boolean,
+  mustStop: boolean,
+): PitStop | null {
   const { model, state } = run;
   const first = state.lap + 1;
   const last = model.race.laps;
@@ -1318,7 +1335,7 @@ function planGreenToFlag(run: Run, user: CarState, mustChange: boolean): PitStop
   for (let i = n - 1; i >= 0; i--) suffix[i] = (suffix[i + 1] as number) + lapTerm(first + i);
 
   let best: PitStop | null = null;
-  let bestTime = mustChange ? Number.POSITIVE_INFINITY : (pre[n] as number);
+  let bestTime = mustStop ? Number.POSITIVE_INFINITY : (pre[n] as number);
   for (const to of Object.keys(model.compounds)) {
     if (mustChange && user.compoundsUsed.includes(to)) continue;
     // ageSum[a]: tyre-age terms for ages 0..a-1 on a fresh set of `to`.
@@ -1337,6 +1354,146 @@ function planGreenToFlag(run: Run, user: CarState, mustChange: boolean): PitStop
     }
   }
   return best;
+}
+
+/** Neutralizations the run knows of now: those that have started by the next lap. */
+function knownNow(run: Run): Map<number, Exclude<FlagState, 'green'>> {
+  return neutralMap(run.events.filter((e) => e.lap <= run.state.lap + 1));
+}
+
+/** Stops the car still owes the race's minimum beyond those it has planned after `lap`. */
+function owedAfterPlan(model: RaceModel, car: CarState, lap: number): number {
+  const owed = stopsOwed(model.rules, car);
+  return owed && Math.max(0, owed - car.strategy.filter((s) => s.lap > lap).length);
+}
+
+/**
+ * The grader's sensible-strategist continuation as a list of stops: planRemainingStop's one
+ * stop (or none), unless the car owes more than one stop for the race's minimum
+ * (rules.minStops), when it is the fastest plan of exactly that many stops
+ * (planOwedStops). Without the rule, exactly planRemainingStop.
+ */
+export function planRemainingStops(run: Run): PitStop[] {
+  const user = run.state.cars[run.model.userSide];
+  if (!user || user.retired) return [];
+  const owed = owedAfterPlan(run.model, user, run.state.lap);
+  if (owed > 1) return planOwedStops(run, user, owed);
+  const stop = planRemainingStop(run);
+  return stop ? [stop] : [];
+}
+
+/**
+ * The fastest plan of exactly `k` more stops for `car` by the lap-time model (as
+ * predictedRemaining: no noise, traffic or rivals; known neutralizations skipped; the pit loss
+ * for each stop's flag), with the two-compound rule kept: a dynamic programme over (stops
+ * left, out-lap, rule met), O(k x laps^2 x compounds). The tank is left out: no race with a
+ * minimum refuels. Each stop fits new tyres. The earliest stops win a tie. Empty if no plan
+ * of `k` stops fits.
+ */
+function planOwedStops(run: Run, car: CarState, k: number): PitStop[] {
+  const { model, state } = run;
+  const known = knownNow(run);
+  const first = state.lap + 1;
+  const last = model.race.laps;
+  const n = last - first + 1;
+  if (n < k) return [];
+  const compounds = Object.keys(model.compounds).filter((c) => !illegalPitCompound(model, c));
+  const wearMult = modeWearMult(run, car);
+  const lapCost = (compound: string, wear: number, age: number, lap: number) => {
+    if (known.get(lap)) return 0;
+    const dry = tyreLapTime(model, car.basePace, compound, wear, lap) + freshTyreDelta(model, age);
+    return dry * wetFactor(model.weather, compound, wetnessOn(run.wetness, lap), car.wetPace ?? 0);
+  };
+  const wearStep = (compound: string, lap: number) =>
+    (known.get(lap) ? 1 : wearMult) *
+    weatherWear(model.weather, compound, wetnessOn(run.wetness, lap));
+  // cur[i]: laps first..first+i-1 on the current set.
+  const cur = new Float64Array(n + 1);
+  {
+    let wear = car.tyreWear;
+    for (let i = 0; i < n; i++) {
+      const lap = first + i;
+      cur[i + 1] = (cur[i] as number) + lapCost(car.compound, wear, car.tyreAge + i, lap);
+      wear += wearStep(car.compound, lap);
+    }
+  }
+  // fresh[c][a][j]: laps a..a+j-1 on a new set of c fitted at out-lap a (index a - first).
+  const fresh = compounds.map((c) =>
+    Array.from({ length: n }, (_, ai) => {
+      const a = first + ai;
+      const t = new Float64Array(last - a + 2);
+      let wear = 0;
+      for (let j = 0; a + j <= last; j++) {
+        t[j + 1] = (t[j] as number) + lapCost(c, wear, j, a + j);
+        wear += wearStep(c, a + j);
+      }
+      return t;
+    }),
+  );
+  const loss = (outLap: number, to: string) => {
+    if (redFlagFree(run, outLap)) return 0;
+    const flag = known.get(outLap);
+    const { track } = model;
+    const base =
+      flag === 'sc' ? track.pitLossUnderSC : flag === 'vsc' ? track.pitLossUnderVSC : track.pitLoss;
+    return base + (pitLaneClosed(model, known, outLap, to) ? stopGoCost(model) : 0);
+  };
+  const meets = (met: boolean, c: string) =>
+    met ||
+    isWetTyre(c) ||
+    ((DRY_COMPOUNDS as readonly string[]).includes(c) && !car.compoundsUsed.includes(c));
+  // best[at(left, met, ai)]: the time from a stop at out-lap first+ai (its pit loss included)
+  // to the flag, with `left` more stops after it and the two-compound rule met (1) or not (0)
+  // before it; fit / next: that stop's compound index and the next stop's out-lap index.
+  const INF = Number.POSITIVE_INFINITY;
+  const at = (left: number, met: number, ai: number) => (left * 2 + met) * n + ai;
+  const best = new Float64Array(2 * k * n).fill(INF);
+  const fit = new Int32Array(2 * k * n).fill(-1);
+  const next = new Int32Array(2 * k * n).fill(-1);
+  for (let left = 0; left < k; left++) {
+    for (let ai = n - 1; ai >= 0; ai--) {
+      const a = first + ai;
+      for (let met = 0; met <= 1; met++) {
+        const i = at(left, met, ai);
+        compounds.forEach((c, ci) => {
+          const t = fresh[ci]?.[ai] as Float64Array;
+          const met2 = meets(met === 1, c) ? 1 : 0;
+          const pit = loss(a, c);
+          // The last stop runs to the flag; it must leave the two-compound rule met.
+          const ends = left === 0 ? [n] : Array.from({ length: n - ai - 1 }, (_, j) => ai + 1 + j);
+          for (const bi of ends) {
+            const rest = left === 0 ? (met2 ? 0 : INF) : (best[at(left - 1, met2, bi)] as number);
+            const total = pit + (t[bi - ai] as number) + rest;
+            if (total < (best[i] as number)) {
+              best[i] = total;
+              fit[i] = ci;
+              next[i] = bi;
+            }
+          }
+        });
+      }
+    }
+  }
+  // The first stop, after a stint on the current set.
+  let met = ruleSatisfied(car, model.rules) ? 1 : 0;
+  let ai = -1;
+  let bestT = INF;
+  for (let s = 0; s < n; s++) {
+    const total = (cur[s] as number) + (best[at(k - 1, met, s)] as number);
+    if (total < bestT) {
+      bestT = total;
+      ai = s;
+    }
+  }
+  const stops: PitStop[] = [];
+  for (let left = k - 1; left >= 0 && ai >= 0 && bestT < INF; left--) {
+    const i = at(left, met, ai);
+    const c = compounds[fit[i] as number] as string;
+    stops.push({ lap: first + ai, to: c });
+    met = meets(met === 1, c) ? 1 : 0;
+    ai = next[i] as number;
+  }
+  return stops;
 }
 
 /** True once the chequered flag has fallen. */
@@ -1385,7 +1542,12 @@ export function stepLap(run: Run): RaceState {
         behind !== undefined
           ? (prevTime[behind] as number) - (prevTime[code] as number)
           : Number.POSITIVE_INFINITY;
-      if (gapBehind <= (stopLoss(run, stop, lap) ?? stopCost(run, code, flag, false, lap))) {
+      // Era rules (minStops): never skipped when the rival needs it for the minimum.
+      const needed = stopsOwed(model.rules, c) > c.strategy.length - 1;
+      if (
+        !needed &&
+        gapBehind <= (stopLoss(run, stop, lap) ?? stopCost(run, code, flag, false, lap))
+      ) {
         c.strategy.splice(stopIdx, 1);
         stopIdx = -1;
       }
@@ -1404,6 +1566,7 @@ export function stepLap(run: Run): RaceState {
       c.strategy.splice(stopIdx, 1);
       pitted.add(code);
       c.pittedThisLap = true;
+      if (c.stops !== undefined) c.stops++; // era rules: minStops
       // Era rules (rules.ts): with no tyre changes (2005) a stop keeps the set.
       if (stopChangesTyres(model.rules, c.compound, stop)) {
         c.compound = stop.to;
@@ -1538,7 +1701,7 @@ export function stepLap(run: Run): RaceState {
  * shifts another's. The chance of each grows with what provokes it: pushing (failures,
  * punctures), tyres past their cliff (punctures), attacking or defending in a fight
  * (crashes). A crash or a failure retires the car; a crash also brings out a SC or VSC from
- * the next lap (not in grader playouts, which sample those). A puncture costs a slow lap and
+ * the next lap (not in grader playouts, which sample those; none before 1993: allowedFlag). A puncture costs a slow lap and
  * forces a stop next lap onto the next planned compound (or mediums, or hards).
  */
 function incidents(run: Run, lap: number, prevTime: Record<string, number>): void {
@@ -1591,10 +1754,13 @@ function incidents(run: Run, lap: number, prevTime: Record<string, number>): voi
       const cfg = run.headset?.neutralization;
       const sc = rng.next() < rates.scShare;
       const from = lap + 1;
-      if (cfg && !run.neutral.has(from)) {
-        const laps = Math.min(sc ? cfg.scLaps : cfg.vscLaps, model.race.laps - from + 1);
+      // Era rules (rules.ts allowedFlag): before 1993 a crash brings out no SC or VSC (the draw
+      // above is still taken, so the streams don't move).
+      const flag = allowedFlag(model, sc ? 'sc' : 'vsc');
+      if (cfg && flag && !run.neutral.has(from)) {
+        const laps = Math.min(flag === 'sc' ? cfg.scLaps : cfg.vscLaps, model.race.laps - from + 1);
         // New arrays: forks share the parent's events until they change them.
-        run.events = [...run.events, { lap: from, laps, flag: sc ? 'sc' : 'vsc' }];
+        run.events = [...run.events, { lap: from, laps, flag }];
         run.neutral = neutralMap(run.events);
       }
     }
@@ -2047,8 +2213,8 @@ export function ruleSatisfied(car: CarState, rules?: RaceModel['rules']): boolea
 
 /**
  * Classification: finishers by time, then retirees (latest retirement first). In a live run
- * a car that reaches the flag without satisfying the two-compound rule is disqualified and
- * listed last, as in the real rules. Scripted real strategies always comply, so replays
+ * a car that reaches the flag without satisfying the two-compound rule, or short of the
+ * race's minimum stops (rules.minStops), is disqualified and listed last, as in the real rules. Scripted real strategies always comply, so replays
  * (and Python parity) are unaffected.
  */
 export function classify(run: Run): RaceResult {
@@ -2058,8 +2224,9 @@ export function classify(run: Run): RaceResult {
     car(run, c).totalTime + (penalty && c === run.model.userSide ? penalty : 0);
   const running = live(run).sort((a, b) => time(a) - time(b));
   const finished = isFinished(run);
-  const disqualified =
-    run.live && finished ? running.filter((c) => !ruleSatisfied(car(run, c), run.model.rules)) : [];
+  const legalFinish = (c: string) =>
+    ruleSatisfied(car(run, c), run.model.rules) && stopsOwed(run.model.rules, car(run, c)) === 0;
+  const disqualified = run.live && finished ? running.filter((c) => !legalFinish(c)) : [];
   const finishers = running.filter((c) => !disqualified.includes(c));
   const retirees = retiredInOrder(run).sort(
     (a, b) => (car(run, b).retiredLap ?? 0) - (car(run, a).retiredLap ?? 0),

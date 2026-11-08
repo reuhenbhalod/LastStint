@@ -96,6 +96,7 @@ describe('schema v11', () => {
     const rules: Required<RaceRules> = {
       twoCompound: true,
       tyreChanges: true,
+      minStops: 2,
       refuelling: false,
       fuelLimit: 150,
       pitLaneClosedUnderSC: false,

@@ -3,9 +3,15 @@
 // the lap-time model alone (no noise, traffic or rivals), so the offer is deterministic and the
 // server rebuilds it from the run. How good each plan really is comes from blind playouts
 // (grade.ts, with `final` options: the plan's own calls to the flag, nothing added).
+//
+// Era rules (rules.ts): every plan is one the player could call. With no tyre changes (2005) a
+// stop names only the set the car is on or a wet tyre (illegalPitCompound), and a dry stop
+// keeps its set (it only refuels), so the next stint goes on with the same tyres. A race with a
+// minimum of stops (rules.minStops) offers only plans that reach it.
 
 import type { GradeOption, Target } from './grade.js';
 import { MIN_STINT, planCalls, stintStarts } from './plan.js';
+import { illegalPitCompound, minStopsRule, stopChangesTyres, stopsOwed } from './rules.js';
 import {
   DRY_COMPOUNDS,
   type Run,
@@ -44,6 +50,7 @@ interface StintTable {
  */
 class Stints {
   private readonly fresh = new Map<string, { mid: StintTable; last: StintTable }>();
+  private readonly kept = new Map<string, { mid: StintTable; last: StintTable }>();
   private readonly current: { mid: StintTable; last: StintTable };
 
   constructor(
@@ -97,6 +104,17 @@ class Stints {
     return t;
   }
 
+  /** A set run on after a stop that kept it (no tyre changes): its wear and age carry on. */
+  private keptFrom(compound: string, wear0: number, age0: number, from: number) {
+    const key = `${compound}@${from}@${wear0}@${age0}`;
+    let t = this.kept.get(key);
+    if (!t) {
+      t = this.table(compound, wear0, age0, from);
+      this.kept.set(key, t);
+    }
+    return t;
+  }
+
   /** The pit loss of a stop whose out-lap is `outLap`. */
   private loss(outLap: number): number {
     const { track } = this.run.model;
@@ -114,14 +132,34 @@ class Stints {
     const starts = stintStarts({ id: 'own', stops, pace: [] }, run.state.lap);
     const pace: PaceMode[] = [];
     let time = 0;
+    // The set on the car, followed only while a stop may keep it (rules.tyreChanges false).
+    const keeps = run.model.rules?.tyreChanges === false;
+    let set = { compound: this.car.compound, wear: this.car.tyreWear, age: this.car.tyreAge };
     for (let i = 0; i <= stops.length; i++) {
       const from = starts[i] as number;
       const to = i < stops.length ? (stops[i]?.lap as number) : laps;
-      const t = i === 0 ? this.current : this.freshFrom(stops[i - 1]?.compound as string, from);
+      let t = this.current;
+      if (i > 0) {
+        const fit = stops[i - 1]?.compound as string;
+        if (!keeps || stopChangesTyres(run.model.rules, set.compound, { to: fit })) {
+          t = this.freshFrom(fit, from);
+          set = { compound: fit, wear: 0, age: 0 };
+        } else {
+          t = this.keptFrom(set.compound, set.wear, set.age, from);
+        }
+      }
       const table = i === stops.length ? t.last : t.mid;
+      const p = table.pace[to - from] as PaceMode;
       time += table.time[to - from] as number;
-      pace.push(table.pace[to - from] as PaceMode);
+      pace.push(p);
       if (i > 0) time += this.loss(from);
+      if (keeps) {
+        set = {
+          ...set,
+          wear: stintWear(run, set.compound, set.wear, from, to, p, this.known),
+          age: set.age + to - from + 1,
+        };
+      }
     }
     return { plan: { stops, pace }, time };
   }
@@ -171,10 +209,35 @@ function stintTimes(
   return out;
 }
 
-/** True if the car ends the race with two dry compounds used (or doesn't need to): wet tyres
- * anywhere in the plan waive the rule. */
+/** The wear of a set after laps [from, to] at `pace`, as stintTimes wears it. */
+function stintWear(
+  run: Run,
+  compound: string,
+  wear0: number,
+  from: number,
+  to: number,
+  pace: PaceMode,
+  known: Map<number, unknown>,
+): number {
+  const e = pace === 'standard' ? null : run.headset?.modes.pace?.[pace];
+  const wearMult = e?.wearMult ?? 1;
+  let wear = wear0;
+  for (let lap = from; lap <= to; lap++) {
+    const wet = wetnessOn(run.wetness, lap);
+    wear += (known.has(lap) ? 1 : wearMult) * weatherWear(run.model.weather, compound, wet);
+  }
+  return wear;
+}
+
+/**
+ * True if the plan is legal at the flag: the car ends with two dry compounds used (or doesn't
+ * need to) and with the race's minimum of stops (rules.minStops). Wet tyres anywhere in the
+ * plan waive both rules.
+ */
 function legal(car: CarState, stops: RacePlan['stops'], rules?: RaceModel['rules']): boolean {
-  if (ruleSatisfied(car, rules) || stops.some((s) => isWetTyre(s.compound))) return true;
+  if (stops.some((s) => isWetTyre(s.compound))) return true;
+  if (stops.length < stopsOwed(rules, car)) return false;
+  if (ruleSatisfied(car, rules)) return true;
   const dry = new Set(
     [...car.compoundsUsed, car.compound, ...stops.map((s) => s.compound)].filter((c) =>
       (DRY_COMPOUNDS as readonly string[]).includes(c),
@@ -193,9 +256,12 @@ function differs(a: Omit<RacePlan, 'id'>, b: Omit<RacePlan, 'id'>): boolean {
 
 /**
  * The engineer's plans from the run's current lap: the fastest no-stop, one-stop and two-stop
- * plans by the lap-time model, legal under the two-compound rule. Where a kind is missing (no
- * legal no-stop, or too few laps for two stops), the next-best one-stop plan that really
- * differs takes its place. Ids 'a', 'b', 'c' in order of stops, then of the first stop's lap.
+ * plans by the lap-time model, legal under the two-compound rule and the race's minimum of
+ * stops, and naming only the tyres a pit call may (illegalPitCompound). Where a kind is missing
+ * (no legal no-stop, or too few laps for two stops), the next-best one-stop plan that really
+ * differs takes its place; in a race with a minimum of stops, then the next-best two-stop plans
+ * (Monaco 2025: two stops owed at takeover, so only two-stop plans are legal). Ids 'a', 'b',
+ * 'c' in order of stops, then of the first stop's lap.
  */
 export function enginePlans(run: Run): RacePlan[] {
   const { model, state } = run;
@@ -204,7 +270,9 @@ export function enginePlans(run: Run): RacePlan[] {
   const known = neutralMap(run.events.filter((e) => e.lap <= state.lap + 1));
   const first = state.lap + 1;
   const last = model.race.laps - 1; // no stop on the final lap
-  const compounds = Object.keys(model.compounds);
+  // Era rules: only the tyres a pit call may name (no tyre changes: the set it's on, or wets).
+  const compounds = Object.keys(model.compounds).filter((c) => !illegalPitCompound(model, c));
+  const minimum = minStopsRule(model.rules) > 0;
 
   const stints = new Stints(run, car, known);
   const none = legal(car, [], model.rules) ? stints.cost([]) : null;
@@ -217,7 +285,9 @@ export function enginePlans(run: Run): RacePlan[] {
   }
   ones.sort((a, b) => a.time - b.time);
   let two: Costed | null = null;
-  if (model.race.laps - state.lap >= TWO_STOP_MIN_LAPS) {
+  // A race with a minimum of stops keeps every legal two-stop plan, to fill the offer with.
+  const twos: Costed[] = [];
+  if (model.race.laps - state.lap >= TWO_STOP_MIN_LAPS || (minimum && !ones.length)) {
     for (let l1 = first; l1 <= last; l1++) {
       for (let l2 = l1 + MIN_STINT; l2 <= last; l2++) {
         for (const c1 of compounds) {
@@ -228,6 +298,7 @@ export function enginePlans(run: Run): RacePlan[] {
             ];
             if (!legal(car, stops, model.rules)) continue;
             const p = stints.cost(stops);
+            if (minimum) twos.push(p);
             if (!two || p.time < two.time - 1e-9) two = p;
           }
         }
@@ -239,7 +310,9 @@ export function enginePlans(run: Run): RacePlan[] {
   if (none) picked.push(none);
   if (ones[0]) picked.push(ones[0]);
   if (two) picked.push(two);
-  for (const p of ones) {
+  // Stable sort: equal times keep the enumeration order, as the strict `<` above does.
+  const fill = minimum ? [...ones, ...twos.sort((a, b) => a.time - b.time)] : ones;
+  for (const p of fill) {
     if (picked.length >= 3) break;
     if (picked.every((q) => differs(p.plan, q.plan))) picked.push(p);
   }

@@ -15,8 +15,13 @@
 // be classified at the flag (not retired, not disqualified): a car out of the race has no
 // result to master. Stops, compounds and modes count from the takeover, the part of the race
 // the player runs.
+//
+// Era rules: a car the rules disqualify (the two-compound rule, a race's minimum of stops,
+// rules.minStops) isn't classified, so it meets no target or objective. A stop_count objective
+// the minimum makes impossible in a dry race is an authoring error and throws.
 
 import { type MomentGrade, type Target, reachedTarget } from '../grade.js';
+import { minStopsRule, stopsBeforeTakeover } from '../rules.js';
 import { teammateOf } from '../sim.js';
 import type {
   ErasBlock,
@@ -204,6 +209,14 @@ function checkObjective(model: RaceModel, objective: ErasObjective, where: strin
   if (objective.type === 'team_result' && !teammateOf(model))
     throw new Error(`${where}: ${model.userSide} has no teammate in this race`);
   if (objective.type === 'beat_real_call') realPosition(model);
+  if (objective.type === 'stop_count' && !model.weather) {
+    // Stops count from the takeover; the minimum counts the whole race.
+    const driver = model.drivers.find((d) => d.code === model.userSide);
+    const need = minStopsRule(model.rules) - (driver ? stopsBeforeTakeover(driver) : 0);
+    const most = objective.exact ?? objective.max;
+    if (most < need)
+      throw new Error(`${where}: ${most} stops from the takeover can't meet the race's minimum`);
+  }
 }
 
 /** Whether the finished race meets a mastery or hidden objective (eras spec §6). */
