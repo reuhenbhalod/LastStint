@@ -1,4 +1,34 @@
 {
+  "eras": {
+    "eraId": 1,
+    "order": 9,
+    "userSide": "PIQN",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Piquet runs non-stop; Mansell pits for fresh tyres on lap 35, catches him and passes on lap 63 to win by 1.9 seconds",
+      "rewriteCondition": {
+        "type": "win"
+      },
+      "headline": "Piquet holds off the charging Mansell at Silverstone"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 1,
+      "label": "Beat Mansell at his own game: win with one tyre stop"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 1.9,
+      "label": "Win by more than Mansell's real 1.9 seconds"
+    },
+    "briefing": "Silverstone, July 1987. Piquet started on pole, Mansell beside him; both Williams-Hondas were meant to run without a tyre change. Fuel is limited to 195 litres. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports.",
+    "hardCalls": {
+      "PIQN": 0,
+      "MAN": 0
+    }
+  },
   "rules": {
     "twoCompound": false,
     "tyreChanges": true,

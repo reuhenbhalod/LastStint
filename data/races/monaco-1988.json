@@ -323,10 +323,287 @@
     {
       "lap": 66,
       "type": "RETIREMENT",
-      "driver": "SENA"
+      "driver": "SENA",
+      "storylineEvent": true
     }
   ],
-  "decisionMoments": [],
+  "decisionMoments": [
+    {
+      "id": "pace-40",
+      "lap": 40,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 40,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "easy",
+          "label": "EASY - save the car",
+          "decisions": [
+            {
+              "lap": 40,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "lift",
+          "label": "FUEL - lift and coast",
+          "decisions": [
+            {
+              "lap": 40,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "liftAndCoast"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "stop-48",
+      "lap": 48,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "STAY OUT",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "IN - fresh tyres",
+          "decisions": [
+            {
+              "lap": 48,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "pace-56",
+      "lap": 56,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 56,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "easy",
+          "label": "EASY - save the car",
+          "decisions": [
+            {
+              "lap": 56,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "lift",
+          "label": "FUEL - lift and coast",
+          "decisions": [
+            {
+              "lap": 56,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "liftAndCoast"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "pace-64",
+      "lap": 64,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 64,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "easy",
+          "label": "EASY - save the car",
+          "decisions": [
+            {
+              "lap": 64,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "lift",
+          "label": "FUEL - lift and coast",
+          "decisions": [
+            {
+              "lap": 64,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "liftAndCoast"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "fuel-70",
+      "lap": 70,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "lift",
+          "label": "FUEL - lift and coast to the flag",
+          "decisions": [
+            {
+              "lap": 70,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "liftAndCoast"
+            },
+            {
+              "lap": 70,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "full",
+          "label": "FUEL OK - full mixture",
+          "decisions": [
+            {
+              "lap": 70,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "normal"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "fuel-74",
+      "lap": 74,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "lift",
+          "label": "FUEL - lift and coast to the flag",
+          "decisions": [
+            {
+              "lap": 74,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "liftAndCoast"
+            },
+            {
+              "lap": 74,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "full",
+          "label": "FUEL OK - full mixture",
+          "decisions": [
+            {
+              "lap": 74,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "normal"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    }
+  ],
   "candidateMomentLaps": [],
   "realResult": [
     "PRO",
@@ -358,6 +635,37 @@
   ],
   "userSide": "SENA",
   "rival": "PRO",
+  "eras": {
+    "eraId": 1,
+    "order": 10,
+    "userSide": "SENA",
+    "target": {
+      "type": "defend"
+    },
+    "storyline": {
+      "real": "Senna, far ahead of Prost, crashes at Portier on lap 67; Prost wins",
+      "rewriteCondition": {
+        "type": "defend"
+      },
+      "headline": "Senna keeps his concentration and wins in Monte Carlo"
+    },
+    "mastery": {
+      "type": "mode_rule",
+      "mode": "push",
+      "maxLaps": 0,
+      "label": "Bring it home: no laps at PUSH"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 50,
+      "label": "Win by more than 50 seconds"
+    },
+    "briefing": "Monaco, May 1988. Senna started on pole in the McLaren-Honda and leads; Prost spent the first half of the race stuck behind Berger's Ferrari. Turbo fuel is down to 150 litres this year. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports.",
+    "hardCalls": {
+      "SENA": 0,
+      "PRO": 0
+    }
+  },
   "provenance": {
     "kind": "reconstructed",
     "estimated": [

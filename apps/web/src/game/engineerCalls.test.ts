@@ -118,6 +118,10 @@ function engineRadioLines(
   return engineerRadio(engine.notes, lap, model.userSide, engine.state, cfg, corner).length;
 }
 
+// Races where the player's car is never in a battle: monaco-1988 (Senna leads by over a minute
+// at the takeover, and his lap-66 retirement is frozen), so no car ever comes within reach.
+const NO_BATTLES = new Set(['monaco-1988']);
+
 describe('the race engineer’s radio', () => {
   it.each(races.map((m) => [m.race.id, m] as const))(
     '%s: valid calls, never quiet for long, battles come up',
@@ -144,7 +148,7 @@ describe('the race engineer’s radio', () => {
         }
         expect(longest).toBeLessThanOrEqual(2);
       }
-      expect(battles).toBeGreaterThan(0);
+      if (!NO_BATTLES.has(model.race.id)) expect(battles).toBeGreaterThan(0);
     },
   );
 

@@ -2,6 +2,33 @@
   "eras": {
     "eraId": 1,
     "order": 8,
+    "userSide": "MAN",
+    "target": {
+      "type": "position",
+      "position": 3
+    },
+    "storyline": {
+      "real": "Mansell's left-rear tyre explodes on lap 64; Prost wins the race and the title",
+      "rewriteCondition": {
+        "type": "position",
+        "position": 3
+      },
+      "headline": "Mansell makes it to the Adelaide flag and is world champion"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 1,
+      "label": "Take the title with a precautionary tyre stop"
+    },
+    "hidden": {
+      "type": "beat_real_call",
+      "label": "Beat the real result: get the Williams to the flag"
+    },
+    "briefing": "Adelaide, October 1986, the title decider. Mansell has 70 points, Prost 64, Piquet 63: third place makes Mansell champion. Fuel is limited to 195 litres. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports.",
+    "hardCalls": {
+      "MAN": 0,
+      "PRO": 0
+    },
     "storylineRetirements": [
       {
         "driver": "MAN",
@@ -23,5 +50,11 @@
     "ers": "none",
     "refuelling": false,
     "fuelLimit": 165.75
-  }
+  },
+  "storylineEvents": [
+    [
+      64,
+      "RETIREMENT"
+    ]
+  ]
 }

@@ -1,0 +1,224 @@
+[
+  {
+    "id": "stop-19",
+    "lap": 19,
+    "trigger": "cliff",
+    "target": {
+      "kind": "position",
+      "atBest": 2
+    },
+    "options": [
+      {
+        "id": "stay",
+        "label": "STAY OUT",
+        "decisions": []
+      },
+      {
+        "id": "box-medium",
+        "label": "IN - fresh tyres",
+        "decisions": [
+          {
+            "lap": 19,
+            "kind": "pit",
+            "compound": "MEDIUM"
+          }
+        ]
+      }
+    ],
+    "realOptionId": "box-medium"
+  },
+  {
+    "id": "pace-24",
+    "lap": 24,
+    "trigger": "cliff",
+    "target": {
+      "kind": "position",
+      "atBest": 2
+    },
+    "options": [
+      {
+        "id": "keep",
+        "label": "Hold the pace",
+        "decisions": []
+      },
+      {
+        "id": "push",
+        "label": "PUSH",
+        "decisions": [
+          {
+            "lap": 24,
+            "kind": "mode",
+            "key": "pace",
+            "value": "push"
+          }
+        ]
+      },
+      {
+        "id": "easy",
+        "label": "EASY - save the car",
+        "decisions": [
+          {
+            "lap": 24,
+            "kind": "mode",
+            "key": "pace",
+            "value": "manage"
+          }
+        ]
+      },
+      {
+        "id": "lift",
+        "label": "FUEL - lift and coast",
+        "decisions": [
+          {
+            "lap": 24,
+            "kind": "mode",
+            "key": "fuel",
+            "value": "liftAndCoast"
+          }
+        ]
+      }
+    ],
+    "realOptionId": null
+  },
+  {
+    "id": "fuel-31",
+    "lap": 31,
+    "trigger": "cliff",
+    "target": {
+      "kind": "position",
+      "atBest": 2
+    },
+    "options": [
+      {
+        "id": "keep",
+        "label": "Hold the pace",
+        "decisions": []
+      },
+      {
+        "id": "lift",
+        "label": "FUEL - lift and coast to the flag",
+        "decisions": [
+          {
+            "lap": 31,
+            "kind": "mode",
+            "key": "fuel",
+            "value": "liftAndCoast"
+          },
+          {
+            "lap": 31,
+            "kind": "mode",
+            "key": "pace",
+            "value": "standard"
+          }
+        ]
+      },
+      {
+        "id": "full",
+        "label": "FUEL OK - full mixture",
+        "decisions": [
+          {
+            "lap": 31,
+            "kind": "mode",
+            "key": "fuel",
+            "value": "normal"
+          }
+        ]
+      }
+    ],
+    "realOptionId": null
+  },
+  {
+    "id": "fuel-38",
+    "lap": 38,
+    "trigger": "cliff",
+    "target": {
+      "kind": "position",
+      "atBest": 2
+    },
+    "options": [
+      {
+        "id": "keep",
+        "label": "Hold the pace",
+        "decisions": []
+      },
+      {
+        "id": "lift",
+        "label": "FUEL - lift and coast to the flag",
+        "decisions": [
+          {
+            "lap": 38,
+            "kind": "mode",
+            "key": "fuel",
+            "value": "liftAndCoast"
+          },
+          {
+            "lap": 38,
+            "kind": "mode",
+            "key": "pace",
+            "value": "standard"
+          }
+        ]
+      },
+      {
+        "id": "full",
+        "label": "FUEL OK - full mixture",
+        "decisions": [
+          {
+            "lap": 38,
+            "kind": "mode",
+            "key": "fuel",
+            "value": "normal"
+          }
+        ]
+      }
+    ],
+    "realOptionId": null
+  },
+  {
+    "id": "fuel-42",
+    "lap": 42,
+    "trigger": "cliff",
+    "target": {
+      "kind": "position",
+      "atBest": 2
+    },
+    "options": [
+      {
+        "id": "keep",
+        "label": "Hold the pace",
+        "decisions": []
+      },
+      {
+        "id": "lift",
+        "label": "FUEL - lift and coast to the flag",
+        "decisions": [
+          {
+            "lap": 42,
+            "kind": "mode",
+            "key": "fuel",
+            "value": "liftAndCoast"
+          },
+          {
+            "lap": 42,
+            "kind": "mode",
+            "key": "pace",
+            "value": "standard"
+          }
+        ]
+      },
+      {
+        "id": "full",
+        "label": "FUEL OK - full mixture",
+        "decisions": [
+          {
+            "lap": 42,
+            "kind": "mode",
+            "key": "fuel",
+            "value": "normal"
+          }
+        ]
+      }
+    ],
+    "realOptionId": null
+  }
+]

@@ -437,12 +437,14 @@
     {
       "lap": 64,
       "type": "RETIREMENT",
-      "driver": "MAN"
+      "driver": "MAN",
+      "storylineEvent": true
     },
     {
       "lap": 64,
       "type": "RETIREMENT",
-      "driver": "ROSK"
+      "driver": "ROSK",
+      "storylineEvent": true
     },
     {
       "lap": 65,
@@ -455,7 +457,264 @@
       "driver": "STRP"
     }
   ],
-  "decisionMoments": [],
+  "decisionMoments": [
+    {
+      "id": "pace-32",
+      "lap": 32,
+      "trigger": "cliff",
+      "target": {
+        "kind": "position",
+        "atBest": 3
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 32,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "easy",
+          "label": "EASY - save the car",
+          "decisions": [
+            {
+              "lap": 32,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "lift",
+          "label": "FUEL - lift and coast",
+          "decisions": [
+            {
+              "lap": 32,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "liftAndCoast"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "stop-40",
+      "lap": 40,
+      "trigger": "cliff",
+      "target": {
+        "kind": "position",
+        "atBest": 3
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "STAY OUT",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "IN - fresh tyres",
+          "decisions": [
+            {
+              "lap": 40,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "pace-48",
+      "lap": 48,
+      "trigger": "cliff",
+      "target": {
+        "kind": "position",
+        "atBest": 3
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 48,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "easy",
+          "label": "EASY - save the car",
+          "decisions": [
+            {
+              "lap": 48,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "lift",
+          "label": "FUEL - lift and coast",
+          "decisions": [
+            {
+              "lap": 48,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "liftAndCoast"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "stop-58",
+      "lap": 58,
+      "trigger": "cliff",
+      "target": {
+        "kind": "position",
+        "atBest": 3
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "STAY OUT",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "IN - fresh tyres",
+          "decisions": [
+            {
+              "lap": 58,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "fuel-70",
+      "lap": 70,
+      "trigger": "cliff",
+      "target": {
+        "kind": "position",
+        "atBest": 3
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "lift",
+          "label": "FUEL - lift and coast to the flag",
+          "decisions": [
+            {
+              "lap": 70,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "liftAndCoast"
+            },
+            {
+              "lap": 70,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "full",
+          "label": "FUEL OK - full mixture",
+          "decisions": [
+            {
+              "lap": 70,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "normal"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "fuel-76",
+      "lap": 76,
+      "trigger": "cliff",
+      "target": {
+        "kind": "position",
+        "atBest": 3
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "lift",
+          "label": "FUEL - lift and coast to the flag",
+          "decisions": [
+            {
+              "lap": 76,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "liftAndCoast"
+            },
+            {
+              "lap": 76,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "full",
+          "label": "FUEL OK - full mixture",
+          "decisions": [
+            {
+              "lap": 76,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "normal"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    }
+  ],
   "candidateMomentLaps": [
     33
   ],
@@ -489,6 +748,37 @@
   ],
   "userSide": "MAN",
   "rival": "PRO",
+  "eras": {
+    "eraId": 1,
+    "order": 8,
+    "userSide": "MAN",
+    "target": {
+      "type": "position",
+      "position": 3
+    },
+    "storyline": {
+      "real": "Mansell's left-rear tyre explodes on lap 64; Prost wins the race and the title",
+      "rewriteCondition": {
+        "type": "position",
+        "position": 3
+      },
+      "headline": "Mansell makes it to the Adelaide flag and is world champion"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 1,
+      "label": "Take the title with a precautionary tyre stop"
+    },
+    "hidden": {
+      "type": "beat_real_call",
+      "label": "Beat the real result: get the Williams to the flag"
+    },
+    "briefing": "Adelaide, October 1986, the title decider. Mansell has 70 points, Prost 64, Piquet 63: third place makes Mansell champion. Fuel is limited to 195 litres. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports.",
+    "hardCalls": {
+      "MAN": 0,
+      "PRO": 0
+    }
+  },
   "provenance": {
     "kind": "reconstructed",
     "estimated": [

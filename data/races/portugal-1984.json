@@ -427,7 +427,111 @@
       "driver": "GAR"
     }
   ],
-  "decisionMoments": [],
+  "decisionMoments": [
+    {
+      "id": "fuel-41",
+      "lap": 41,
+      "trigger": "cliff",
+      "target": {
+        "kind": "position",
+        "atBest": 2
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "lift",
+          "label": "FUEL - lift and coast to the flag",
+          "decisions": [
+            {
+              "lap": 41,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "liftAndCoast"
+            },
+            {
+              "lap": 41,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "full",
+          "label": "FUEL OK - full mixture",
+          "decisions": [
+            {
+              "lap": 41,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "normal"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "stop-49",
+      "lap": 49,
+      "trigger": "cliff",
+      "target": {
+        "kind": "position",
+        "atBest": 2
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "STAY OUT",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "IN - fresh tyres",
+          "decisions": [
+            {
+              "lap": 49,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "stop-65",
+      "lap": 65,
+      "trigger": "cliff",
+      "target": {
+        "kind": "position",
+        "atBest": 2
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "STAY OUT",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "IN - fresh tyres",
+          "decisions": [
+            {
+              "lap": 65,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    }
+  ],
   "candidateMomentLaps": [],
   "realResult": [
     "PRO",
@@ -460,6 +564,38 @@
   ],
   "userSide": "LAU",
   "rival": "PRO",
+  "eras": {
+    "eraId": 1,
+    "order": 3,
+    "userSide": "LAU",
+    "target": {
+      "type": "position",
+      "position": 2
+    },
+    "storyline": {
+      "real": "Prost wins; Lauda, from 11th on the grid, takes second and the title by half a point",
+      "rewriteCondition": {
+        "type": "win"
+      },
+      "headline": "Lauda wins at Estoril and leaves no half-points in doubt"
+    },
+    "mastery": {
+      "type": "mode_rule",
+      "mode": "normal",
+      "maxLaps": 10,
+      "label": "Make the 220 litres last: no more than 10 laps on full mixture"
+    },
+    "hidden": {
+      "type": "stop_count",
+      "max": 0,
+      "label": "Take second without a tyre stop"
+    },
+    "briefing": "Estoril, October 1984, the last race. Lauda leads the championship by 3.5 points from his McLaren team-mate Prost and needs second place if Prost wins. He started 11th. Turbo cars have 220 litres for the race. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports.",
+    "hardCalls": {
+      "LAU": 0,
+      "PRO": 0
+    }
+  },
   "provenance": {
     "kind": "reconstructed",
     "estimated": [

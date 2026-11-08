@@ -1,0 +1,105 @@
+[
+  {
+    "id": "fuel-41",
+    "lap": 41,
+    "trigger": "cliff",
+    "target": {
+      "kind": "position",
+      "atBest": 2
+    },
+    "options": [
+      {
+        "id": "keep",
+        "label": "Hold the pace",
+        "decisions": []
+      },
+      {
+        "id": "lift",
+        "label": "FUEL - lift and coast to the flag",
+        "decisions": [
+          {
+            "lap": 41,
+            "kind": "mode",
+            "key": "fuel",
+            "value": "liftAndCoast"
+          },
+          {
+            "lap": 41,
+            "kind": "mode",
+            "key": "pace",
+            "value": "standard"
+          }
+        ]
+      },
+      {
+        "id": "full",
+        "label": "FUEL OK - full mixture",
+        "decisions": [
+          {
+            "lap": 41,
+            "kind": "mode",
+            "key": "fuel",
+            "value": "normal"
+          }
+        ]
+      }
+    ],
+    "realOptionId": null
+  },
+  {
+    "id": "stop-49",
+    "lap": 49,
+    "trigger": "cliff",
+    "target": {
+      "kind": "position",
+      "atBest": 2
+    },
+    "options": [
+      {
+        "id": "stay",
+        "label": "STAY OUT",
+        "decisions": []
+      },
+      {
+        "id": "box-medium",
+        "label": "IN - fresh tyres",
+        "decisions": [
+          {
+            "lap": 49,
+            "kind": "pit",
+            "compound": "MEDIUM"
+          }
+        ]
+      }
+    ],
+    "realOptionId": null
+  },
+  {
+    "id": "stop-65",
+    "lap": 65,
+    "trigger": "cliff",
+    "target": {
+      "kind": "position",
+      "atBest": 2
+    },
+    "options": [
+      {
+        "id": "stay",
+        "label": "STAY OUT",
+        "decisions": []
+      },
+      {
+        "id": "box-medium",
+        "label": "IN - fresh tyres",
+        "decisions": [
+          {
+            "lap": 65,
+            "kind": "pit",
+            "compound": "MEDIUM"
+          }
+        ]
+      }
+    ],
+    "realOptionId": null
+  }
+]

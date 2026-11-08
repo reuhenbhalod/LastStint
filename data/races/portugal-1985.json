@@ -301,7 +301,196 @@
       "driver": "LAU"
     }
   ],
-  "decisionMoments": [],
+  "decisionMoments": [
+    {
+      "id": "stop-34",
+      "lap": 34,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "box-wet",
+          "label": "IN - fresh wets",
+          "decisions": [
+            {
+              "lap": 34,
+              "kind": "pit",
+              "compound": "WET"
+            }
+          ]
+        },
+        {
+          "id": "stay",
+          "label": "STAY OUT",
+          "decisions": []
+        },
+        {
+          "id": "box-intermediate",
+          "label": "IN - intermediates",
+          "decisions": [
+            {
+              "lap": 34,
+              "kind": "pit",
+              "compound": "INTERMEDIATE"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "pace-40",
+      "lap": 40,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 40,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "easy",
+          "label": "EASY - save the car",
+          "decisions": [
+            {
+              "lap": 40,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "lift",
+          "label": "FUEL - lift and coast",
+          "decisions": [
+            {
+              "lap": 40,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "liftAndCoast"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "pace-48",
+      "lap": 48,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 48,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "easy",
+          "label": "EASY - save the car",
+          "decisions": [
+            {
+              "lap": 48,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "lift",
+          "label": "FUEL - lift and coast",
+          "decisions": [
+            {
+              "lap": 48,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "liftAndCoast"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "fuel-58",
+      "lap": 58,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "lift",
+          "label": "FUEL - lift and coast to the flag",
+          "decisions": [
+            {
+              "lap": 58,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "liftAndCoast"
+            },
+            {
+              "lap": 58,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "full",
+          "label": "FUEL OK - full mixture",
+          "decisions": [
+            {
+              "lap": 58,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "normal"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    }
+  ],
   "candidateMomentLaps": [],
   "realResult": [
     "SENA",
@@ -421,6 +610,37 @@
       0.63,
       0.63
     ]
+  },
+  "eras": {
+    "eraId": 1,
+    "order": 5,
+    "userSide": "SENA",
+    "target": {
+      "type": "defend"
+    },
+    "storyline": {
+      "real": "Senna wins his first Grand Prix in heavy rain, more than a minute clear of Alboreto",
+      "rewriteCondition": {
+        "type": "defend"
+      },
+      "headline": "Senna's first win, from the front, through the Estoril floods"
+    },
+    "mastery": {
+      "type": "margin",
+      "seconds": 63,
+      "label": "Win by more than Senna's real 63 seconds"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "push",
+      "maxLaps": 0,
+      "label": "Win without a lap at PUSH in the rain"
+    },
+    "briefing": "Estoril, April 1985. Rain from the start, and it gets heavier. Senna started on pole in the Lotus and leads. The race will be cut short at the two-hour limit. Turbo cars have 220 litres for the race. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports.",
+    "hardCalls": {
+      "SENA": 0,
+      "ALBM": 0
+    }
   },
   "provenance": {
     "kind": "reconstructed",

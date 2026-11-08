@@ -2,6 +2,35 @@
   "eras": {
     "eraId": 1,
     "order": 4,
+    "userSide": "ROSK",
+    "target": {
+      "type": "position",
+      "position": 2
+    },
+    "storyline": {
+      "real": "Rosberg, second at the start of the last lap, runs out of fuel and is classified fifth; Piquet wins",
+      "rewriteCondition": {
+        "type": "position",
+        "position": 2
+      },
+      "headline": "Rosberg's McLaren reaches the flag with fuel to spare"
+    },
+    "mastery": {
+      "type": "finish_position",
+      "position": 1,
+      "label": "Win the race on 195 litres"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "push",
+      "maxLaps": 0,
+      "label": "Never turn the boost up: no laps at PUSH"
+    },
+    "briefing": "Hockenheim, July 1986. Rosberg started on pole in the McLaren. Fuel is cut to 195 litres this year, and on this fast track it may not last to the flag. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports.",
+    "hardCalls": {
+      "ROSK": 0,
+      "SENA": 0
+    },
     "storylineRetirements": [
       {
         "driver": "ROSK",
@@ -22,5 +51,11 @@
     "ers": "none",
     "refuelling": false,
     "fuelLimit": 165.75
-  }
+  },
+  "storylineEvents": [
+    [
+      43,
+      "RETIREMENT"
+    ]
+  ]
 }

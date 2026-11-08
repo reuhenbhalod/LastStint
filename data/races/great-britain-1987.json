@@ -2,7 +2,7 @@
   "schemaVersion": 11,
   "race": {
     "id": "great-britain-1987",
-    "name": "Britain 1987: Mansell vs Piquet",
+    "name": "Britain 1987: Piquet vs Mansell",
     "laps": 65,
     "takeoverLap": 32,
     "seed": 1,
@@ -355,7 +355,149 @@
       "driver": "STRP"
     }
   ],
-  "decisionMoments": [],
+  "decisionMoments": [
+    {
+      "id": "stop-34",
+      "lap": 34,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "STAY OUT",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "IN - fresh tyres",
+          "decisions": [
+            {
+              "lap": 34,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "stay"
+    },
+    {
+      "id": "pace-38",
+      "lap": 38,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "easy",
+          "label": "EASY - save the car",
+          "decisions": [
+            {
+              "lap": 38,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "lift",
+          "label": "FUEL - lift and coast",
+          "decisions": [
+            {
+              "lap": 38,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "liftAndCoast"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "pace-45",
+      "lap": 45,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "easy",
+          "label": "EASY - save the car",
+          "decisions": [
+            {
+              "lap": 45,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "lift",
+          "label": "FUEL - lift and coast",
+          "decisions": [
+            {
+              "lap": 45,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "liftAndCoast"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "fuel-63",
+      "lap": 63,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "lift",
+          "label": "FUEL - lift and coast to the flag",
+          "decisions": [
+            {
+              "lap": 63,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "liftAndCoast"
+            },
+            {
+              "lap": 63,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    }
+  ],
   "candidateMomentLaps": [
     36
   ],
@@ -386,8 +528,38 @@
     "ARN",
     "CAP"
   ],
-  "userSide": "MAN",
-  "rival": "PIQN",
+  "userSide": "PIQN",
+  "rival": "MAN",
+  "eras": {
+    "eraId": 1,
+    "order": 9,
+    "userSide": "PIQN",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Piquet runs non-stop; Mansell pits for fresh tyres on lap 35, catches him and passes on lap 63 to win by 1.9 seconds",
+      "rewriteCondition": {
+        "type": "win"
+      },
+      "headline": "Piquet holds off the charging Mansell at Silverstone"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 1,
+      "label": "Beat Mansell at his own game: win with one tyre stop"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 1.9,
+      "label": "Win by more than Mansell's real 1.9 seconds"
+    },
+    "briefing": "Silverstone, July 1987. Piquet started on pole, Mansell beside him; both Williams-Hondas were meant to run without a tyre change. Fuel is limited to 195 litres. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports.",
+    "hardCalls": {
+      "PIQN": 0,
+      "MAN": 0
+    }
+  },
   "provenance": {
     "kind": "reconstructed",
     "estimated": [

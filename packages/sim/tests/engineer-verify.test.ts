@@ -24,12 +24,15 @@ describe('race engineer runs verify on every race', () => {
   it.each(races.map((m) => [m.race.id, m] as const))('%s', (_id, model) => {
     const cfg = engineerConfig(model);
     if (!cfg) throw new Error('no engineer config');
+    // A race without DRS (eras rules, roadmap R5) has no wait-drs move.
+    const attack = model.rules?.drs === false ? ATTACK.filter((m) => m !== 'wait-drs') : ATTACK;
     let k = 0;
     const between = (run: Run) => {
       const next = run.state.lap + 1;
       const b = battlesFor(run.state, model, cfg);
       k++;
-      if (b.ahead) decide(run, { lap: next, kind: 'battle', move: ATTACK[k % 3] as BattleMove });
+      if (b.ahead)
+        decide(run, { lap: next, kind: 'battle', move: attack[k % attack.length] as BattleMove });
       else if (b.behind)
         decide(run, { lap: next, kind: 'battle', move: DEFEND[k % 4] as BattleMove });
       if (k % 7 === 0) decide(run, { lap: next, kind: 'blue', action: 'go-round' });

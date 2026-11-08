@@ -450,7 +450,8 @@
     {
       "lap": 43,
       "type": "RETIREMENT",
-      "driver": "ROSK"
+      "driver": "ROSK",
+      "storylineEvent": true
     },
     {
       "lap": 44,
@@ -458,7 +459,230 @@
       "driver": "PRO"
     }
   ],
-  "decisionMoments": [],
+  "decisionMoments": [
+    {
+      "id": "stop-19",
+      "lap": 19,
+      "trigger": "cliff",
+      "target": {
+        "kind": "position",
+        "atBest": 2
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "STAY OUT",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "IN - fresh tyres",
+          "decisions": [
+            {
+              "lap": 19,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "box-medium"
+    },
+    {
+      "id": "pace-24",
+      "lap": 24,
+      "trigger": "cliff",
+      "target": {
+        "kind": "position",
+        "atBest": 2
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 24,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "easy",
+          "label": "EASY - save the car",
+          "decisions": [
+            {
+              "lap": 24,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "lift",
+          "label": "FUEL - lift and coast",
+          "decisions": [
+            {
+              "lap": 24,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "liftAndCoast"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "fuel-31",
+      "lap": 31,
+      "trigger": "cliff",
+      "target": {
+        "kind": "position",
+        "atBest": 2
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "lift",
+          "label": "FUEL - lift and coast to the flag",
+          "decisions": [
+            {
+              "lap": 31,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "liftAndCoast"
+            },
+            {
+              "lap": 31,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "full",
+          "label": "FUEL OK - full mixture",
+          "decisions": [
+            {
+              "lap": 31,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "normal"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "fuel-38",
+      "lap": 38,
+      "trigger": "cliff",
+      "target": {
+        "kind": "position",
+        "atBest": 2
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "lift",
+          "label": "FUEL - lift and coast to the flag",
+          "decisions": [
+            {
+              "lap": 38,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "liftAndCoast"
+            },
+            {
+              "lap": 38,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "full",
+          "label": "FUEL OK - full mixture",
+          "decisions": [
+            {
+              "lap": 38,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "normal"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "fuel-42",
+      "lap": 42,
+      "trigger": "cliff",
+      "target": {
+        "kind": "position",
+        "atBest": 2
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "lift",
+          "label": "FUEL - lift and coast to the flag",
+          "decisions": [
+            {
+              "lap": 42,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "liftAndCoast"
+            },
+            {
+              "lap": 42,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "full",
+          "label": "FUEL OK - full mixture",
+          "decisions": [
+            {
+              "lap": 42,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "normal"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    }
+  ],
   "candidateMomentLaps": [
     16,
     18,
@@ -497,6 +721,39 @@
   ],
   "userSide": "ROSK",
   "rival": "SENA",
+  "eras": {
+    "eraId": 1,
+    "order": 4,
+    "userSide": "ROSK",
+    "target": {
+      "type": "position",
+      "position": 2
+    },
+    "storyline": {
+      "real": "Rosberg, second at the start of the last lap, runs out of fuel and is classified fifth; Piquet wins",
+      "rewriteCondition": {
+        "type": "position",
+        "position": 2
+      },
+      "headline": "Rosberg's McLaren reaches the flag with fuel to spare"
+    },
+    "mastery": {
+      "type": "finish_position",
+      "position": 1,
+      "label": "Win the race on 195 litres"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "push",
+      "maxLaps": 0,
+      "label": "Never turn the boost up: no laps at PUSH"
+    },
+    "briefing": "Hockenheim, July 1986. Rosberg started on pole in the McLaren. Fuel is cut to 195 litres this year, and on this fast track it may not last to the flag. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports.",
+    "hardCalls": {
+      "ROSK": 0,
+      "SENA": 0
+    }
+  },
   "provenance": {
     "kind": "reconstructed",
     "estimated": [

@@ -335,7 +335,190 @@
       "driver": "PAT"
     }
   ],
-  "decisionMoments": [],
+  "decisionMoments": [
+    {
+      "id": "pace-14",
+      "lap": 14,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 14,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "easy",
+          "label": "EASY - save the car",
+          "decisions": [
+            {
+              "lap": 14,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "lift",
+          "label": "FUEL - lift and coast",
+          "decisions": [
+            {
+              "lap": 14,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "liftAndCoast"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "stop-18",
+      "lap": 18,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "STAY OUT",
+          "decisions": []
+        },
+        {
+          "id": "box-wet",
+          "label": "IN - fresh wets",
+          "decisions": [
+            {
+              "lap": 18,
+              "kind": "pit",
+              "compound": "WET"
+            }
+          ]
+        },
+        {
+          "id": "box-intermediate",
+          "label": "IN - intermediates",
+          "decisions": [
+            {
+              "lap": 18,
+              "kind": "pit",
+              "compound": "INTERMEDIATE"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "battle-23",
+      "lap": 23,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "hold",
+          "label": "Hold position",
+          "decisions": []
+        },
+        {
+          "id": "defend",
+          "label": "DEFEND",
+          "decisions": [
+            {
+              "lap": 23,
+              "kind": "mode",
+              "key": "battle",
+              "value": "defend"
+            }
+          ]
+        },
+        {
+          "id": "attack",
+          "label": "ATTACK",
+          "decisions": [
+            {
+              "lap": 23,
+              "kind": "mode",
+              "key": "battle",
+              "value": "attack"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "pace-27",
+      "lap": 27,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 27,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "easy",
+          "label": "EASY - save the car",
+          "decisions": [
+            {
+              "lap": 27,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "lift",
+          "label": "FUEL - lift and coast",
+          "decisions": [
+            {
+              "lap": 27,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "liftAndCoast"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    }
+  ],
   "candidateMomentLaps": [],
   "realResult": [
     "PRO",
@@ -413,6 +596,37 @@
       0.65,
       0.66
     ]
+  },
+  "eras": {
+    "eraId": 1,
+    "order": 2,
+    "userSide": "PRO",
+    "target": {
+      "type": "defend"
+    },
+    "storyline": {
+      "real": "Prost leads in heavy rain; the race is stopped and the result taken from lap 31, Senna 7.4 s behind and closing",
+      "rewriteCondition": {
+        "type": "defend"
+      },
+      "headline": "Prost keeps the Toleman behind him in the Monte Carlo downpour"
+    },
+    "mastery": {
+      "type": "mode_rule",
+      "mode": "standard",
+      "maxLaps": 14,
+      "label": "Ease off in the spray: no more than 14 laps at standard pace"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 7.4,
+      "label": "Win by more than the real 7.4 seconds"
+    },
+    "briefing": "Monaco, June 1984. The start was delayed by heavy rain. Prost started on pole in the McLaren and leads; Senna started 13th in the Toleman and is closing fast. Turbo cars have 220 litres for the race. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports.",
+    "hardCalls": {
+      "PRO": 0,
+      "SENA": 0
+    }
   },
   "provenance": {
     "kind": "reconstructed",
