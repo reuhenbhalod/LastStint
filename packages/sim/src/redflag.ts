@@ -62,18 +62,48 @@ export function redFlagPlan(events: RaceEvent[]): RedFlagPlan {
 }
 
 /**
+ * Lap -> car -> laps down: each SC or RED event's real laps down (`lapsDown`, written by an Eras
+ * build of a no-unlapping race: pipeline restart.with_laps_down) on every lap of the event, for
+ * the scripted cars (not `overridden`: a car whose strategy the run changes, or the player's car
+ * in live play, decides from its own gaps). redflag.py real_laps_down.
+ */
+export function realLapsDown(
+  events: RaceEvent[],
+  overridden: (code: string) => boolean,
+): Map<number, Map<string, number>> {
+  const out = new Map<number, Map<string, number>>();
+  for (const e of events) {
+    if ((e.type !== 'SC' && e.type !== 'RED') || !e.lapsDown) continue;
+    const down = new Map(Object.entries(e.lapsDown).filter(([c]) => !overridden(c)));
+    for (let lap = e.lap; lap < e.lap + (e.laps ?? 1); lap++) out.set(lap, down);
+  }
+  return out;
+}
+
+/**
  * The running cars in the order they are on the road behind the leader, with each car's laps
- * down and its time behind the leader on the road (redflag.py road_order).
+ * down and its time behind the leader on the road (redflag.py road_order). `known`
+ * (realLapsDown): a car's real laps down, which wins over its gap. A car really on a lap the sim
+ * has it behind sits at the back of the road queue (it unlapped); a car really a lap down that
+ * the sim has closer keeps its place on the road and loses the lap.
  */
 export function roadOrder(
   order: string[],
   cars: Record<string, CarState>,
   lapTime: number,
+  known?: Map<string, number>,
 ): { road: string[]; down: Map<string, number>; onRoad: Map<string, number> } {
   const time = (c: string) => (cars[c] as CarState).totalTime;
   const lead = time(order[0] as string);
-  const down = new Map(order.map((c) => [c, Math.floor((time(c) - lead) / lapTime)]));
-  const onRoad = new Map(order.map((c) => [c, time(c) - lead - (down.get(c) as number) * lapTime]));
+  const down = new Map<string, number>();
+  const onRoad = new Map<string, number>();
+  for (const c of order) {
+    const gap = time(c) - lead;
+    const own = Math.floor(gap / lapTime);
+    const n = known?.get(c) ?? own;
+    down.set(c, n);
+    onRoad.set(c, gap - Math.min(n, own) * lapTime);
+  }
   const road = [...order].sort((a, b) => (onRoad.get(a) as number) - (onRoad.get(b) as number));
   return { road, down, onRoad };
 }
@@ -81,19 +111,21 @@ export function roadOrder(
 /**
  * Wipe the gaps: the running cars, in order, `gap` apart behind the leader. With `lapTime` (no
  * unlapping, scUnlap 'none': before 2007 and 2010-11) the lapped cars line up where they are on
- * the road, each keeping its laps down (Monaco 2011's restart).
+ * the road, each keeping its laps down (roadOrder, with the real laps down `known`; Monaco
+ * 2011's restart).
  */
 export function lineUp(
   order: string[],
   cars: Record<string, CarState>,
   gap: number,
   lapTime?: number,
+  known?: Map<string, number>,
 ): void {
   const lead = order[0] === undefined ? undefined : cars[order[0]];
   if (!lead) return;
   if (lapTime) {
     const base = lead.totalTime;
-    const { road, down } = roadOrder(order, cars, lapTime);
+    const { road, down } = roadOrder(order, cars, lapTime, known);
     road.forEach((c, i) => {
       (cars[c] as CarState).totalTime = base + i * gap + (down.get(c) as number) * lapTime;
     });

@@ -68,8 +68,9 @@ def test_the_restart_spreads_the_queue_only_where_the_file_has_it():
     base = sim_reference.simulate(model, 3)
     spread = sim_reference.simulate(with_block, 3)
     assert sim_reference.simulate(model, 3) == base  # no block: today's replay
+    # The refit (job 1.5): the back of the queue loses JUMP + SPREAD x PLACES (1.15 s) more.
     last = base["finishers"][-1]
-    assert spread["gaps"][last] > base["gaps"][last] + 2.0
+    assert spread["gaps"][last] > base["gaps"][last] + 0.5
 
 
 # --- 2. team orders ---------------------------------------------------------------------------

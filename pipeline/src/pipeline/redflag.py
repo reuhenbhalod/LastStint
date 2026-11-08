@@ -560,25 +560,53 @@ def is_free(red_plan: dict, neutral: dict[int, str], lap: int) -> bool:
     return first is not None and neutral.get(first) == "RED"
 
 
+def real_laps_down(events: list[dict], overridden=()) -> dict[int, dict[str, int]]:
+    """{lap: {car: laps down}}: each SC or RED event's real laps down (`lapsDown`, written by
+    an Eras build of a no-unlapping race: restart.with_laps_down) on every lap of the event,
+    for the scripted cars (not `overridden`: a car whose strategy the run changed decides from
+    its own gaps)."""
+    out: dict[int, dict[str, int]] = {}
+    for e in events:
+        if e["type"] not in ("SC", "RED") or not e.get("lapsDown"):
+            continue
+        down = {c: int(n) for c, n in e["lapsDown"].items() if c not in overridden}
+        for lap in range(int(e["lap"]), int(e["lap"]) + int(e.get("laps", 1))):
+            out[lap] = down
+    return out
+
+
 def road_order(
-    live: list[str], cars: dict, lap_time: float
+    live: list[str], cars: dict, lap_time: float, known: dict[str, int] | None = None
 ) -> tuple[list[str], dict[str, int], dict[str, float]]:
     """The running cars in the order they are on the road behind the leader, with each car's
-    laps down and its time behind the leader on the road (both from `lap_time`)."""
+    laps down and its time behind the leader on the road (both from `lap_time`). `known`
+    (real_laps_down): a car's real laps down, which wins over its gap. A car really on a lap
+    the sim has it behind sits at the back of the road queue (it unlapped); a car really a lap
+    down that the sim has closer keeps its place on the road and loses the lap."""
     lead = cars[live[0]].total_time
-    down = {c: math.floor((cars[c].total_time - lead) / lap_time) for c in live}
-    on_road = {c: cars[c].total_time - lead - down[c] * lap_time for c in live}
+    down, on_road = {}, {}
+    for c in live:
+        gap = cars[c].total_time - lead
+        own = math.floor(gap / lap_time)
+        down[c] = (known or {}).get(c, own)
+        on_road[c] = gap - min(down[c], own) * lap_time
     return sorted(live, key=lambda c: on_road[c]), down, on_road
 
 
-def line_up(live: list[str], cars: dict, gap: float, lap_time: float | None = None) -> None:
+def line_up(
+    live: list[str],
+    cars: dict,
+    gap: float,
+    lap_time: float | None = None,
+    known: dict[str, int] | None = None,
+) -> None:
     """Wipe the gaps: the running cars (in order) `gap` apart behind the leader. With
     `lap_time` (no unlapping, scUnlap "none": before 2007 and 2010-11) the lapped cars line up
-    where they are on the road, each keeping its laps down (road_order); Monaco
-    2011's restart had lapped cars between the leader and the fourth car."""
+    where they are on the road, each keeping its laps down (road_order, with the real laps
+    down `known`); Monaco 2011's restart had lapped cars between the leader and the fourth car."""
     if lap_time:
         lead = cars[live[0]].total_time
-        road, down, _ = road_order(live, cars, lap_time)
+        road, down, _ = road_order(live, cars, lap_time, known)
         for i, c in enumerate(road):
             cars[c].total_time = lead + i * gap + down[c] * lap_time
         return

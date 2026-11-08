@@ -3099,3 +3099,139 @@ them (schema: optional). `python -m pipeline.dirty_air --cache DIR` refits the t
 **Fixtures.** New: `packages/sim/tests/fixtures/eras-dirty-air.json` (spain-2021 with its bands;
 the same with heldGap 0.79 and rollOnly; brazil-2006 refuelling with its bands and rollOnly; 20
 seeds each; `tests/make_dirty_air_fixture.py`). No existing fixture went stale.
+
+## Eras job 1.5 (Nov 8 2026): real laps down in no-unlapping SC queues; the restart refitted, still off
+
+Written by hand. Robust status (1,000 runs on each of two seed sets, one race per call;
+`pipeline/experiments/restart_ab.py RACE VARIANT`), every race built fresh from its raw snapshot
+on this branch. Nothing in data/races or data/golden is committed. Every Daily and Gauntlet race
+file and golden is byte-identical: both changes are written only by an Eras build, and the sims
+act only on the new field or block.
+
+**1. Lapped status from the real lap counts** (`restart.laps_down`, `restart.with_laps_down`,
+events' `lapsDown`; `redflag.real_laps_down` / `road_order(known)` in the reference sim,
+`realLapsDown` / `roadOrder(known)` in packages/sim/src/redflag.ts). Both sims decided who is a
+lap down in a no-unlapping race's SC queue and red-flag line-up (scUnlap "none": before 2007
+and 2010-11) as `floor(gap / green lap)` on their own gaps. At Monaco 2011, Hamilton was 82.9 s
+behind at the end of lap 68 but on the lead lap (Vettel's next lap was an SC lap). So in most
+runs the sim had him a lap down, and he finished a lap behind. Now an Eras build of such a race
+writes, on each SC and RED event after the takeover, every running car's real laps down, counted
+from lap counts and not gaps. When the leader finished each of the event's laps, a car that had
+completed lap - 2 laps was a lap down. The field keeps the most over the event's laps:
+- A car lapped as the queue formed stays lapped (Monaco 2011's first SC: Heidfeld and Buemi,
+  lapped on its second lap).
+- A car lapped by a leader who then stopped also stays lapped (Monaco 2004: Montoya, lapped by
+  Schumacher, is 0 laps down to Trulli only on the SC's last lap).
+
+The sims take a scripted car's laps down from the field. Excluded are a car whose strategy the
+run overrides and the player's car in live play; a blind grader playout keeps only the events it
+knows. Where the real count is fewer laps than the sim's gap, the car joins the back of the road
+queue (it was really on that lap). Where it is more, the car keeps its road place and loses the
+lap. Switch: `restart.LAPS_DOWN_IN_ERAS_BUILDS = True`.
+
+**2. The restart, diagnosed and refitted** (`restart.fit(baseline="sim")`). M4's fit assumed
+that the sims' restart lap, with no restart term, is the nose-to-tail queue plus dirty air. It
+isn't. The sims' lap noise sorted into a running order, the 0.3 s hold of a failed pass and the
+dirty air already spread the queue. Over the 45 SC restarts after the takeover in the 30 Eras
+races that have one (60 seeds), gap to the leader at the end of the restart lap less that at the
+end of the last SC lap, by place:
+
+| | P2 | P3 | P4 | P5 | P6 | P8 | P11 | P15 |
+|---|---|---|---|---|---|---|---|---|
+| real | 0.98 | 1.58 | 2.37 | 3.14 | 3.21 | 4.47 | 4.19 | 5.32 |
+| sims, no term | 0.82 | 1.25 | 1.69 | 1.97 | 2.18 | 2.48 | 3.04 | 4.54 |
+| sims, M4's term | 1.28 | 2.09 | 2.98 | 3.62 | 4.26 | 5.36 | 6.58 | 8.16 |
+
+So M4's term roughly doubled the spread from P5 back. The car that pays most is one restarting
+from the back of the queue, and so worse placed than it really was. That is the sakhir-2020
+regression: the stop costs put Russell P9 in the sim's queue where he really restarted P5, so he
+paid 3.7 s against the leader (duel RUS vs PER 5.3 -> 8.2). miami-2024 is the same mechanism,
+smaller. Refitted on the same 31 FIT_RACES restarts against the sims' own spread
+(`SIM_RESTART_SPREAD`), the term becomes JUMP -0.25 s, SPREAD 0.14 s a place, PLACES 10:
+-0.11 s for P2, +0.45 s for P6, +1.15 s from P11. Huber loss is 2.60 against 2.77 with no term,
+and the median error +0.07 s against -0.35 s. M4's fit stays as `fit(baseline="analytic")`
+(`M4_JUMP` / `M4_SPREAD` / `M4_PLACES`).
+
+**Results.** Every timed Eras race that either change touches: 30 with an SC restart after the
+takeover, plus saudi-arabia-2021 and azerbaijan-2017, the stop-pricing races, which neither
+change touches (their restarts are standing, or before the takeover). The other timed Eras races
+have no restart lap after the takeover and no `lapsDown`, so they replay exactly as before.
+"Unlap": the race's rule (none = no unlapping, gets `lapsDown`). "=": the column before (no
+`lapsDown` in that race).
+
+| Race | Unlap | Before (both off) | M4 restart | Real laps down | Laps down + refitted restart |
+|---|---|---|---|---|---|
+| abu-dhabi-2012 | all | fail, 1.72s | fail, 2.56s | = | fail, 1.77s |
+| australia-2025 | all | fail, 3.66s | fail, 5.30s | = | fail, 3.83s |
+| austria-2002 | none | pass, 0.63s | pass, 0.60s | pass, 0.63s | pass, 0.59s |
+| azerbaijan-2017 | all | fail, 5.85s | fail, 5.85s | = | fail, 5.85s |
+| azerbaijan-2021 | all | fail, 2.90s | fail, 2.74s | = | fail, 2.81s |
+| bahrain-2014 | all | fail, 1.17s | fail, 1.58s | = | fail, 1.23s |
+| belgium-1998 | none | fail, 5.25s | fail, 4.62s | fail, 5.28s | fail, 5.23s |
+| brazil-2003 | none | fail, 5.75s | fail, 6.66s | fail, 5.75s | fail, 5.68s |
+| brazil-2012 | all | fail, 3.44s | fail, 3.45s | = | fail, 3.45s |
+| brazil-2019 | all | fail, 1.97s | fail, 2.08s | = | fail, 2.00s |
+| canada-2011 | none | fail, 3.02s | fail, 3.52s | fail, 2.90s | fail, 3.14s |
+| europe-2012 | all | fail, 1.46s | fail, 2.35s | = | fail, 1.62s |
+| germany-2000 | none | fail, 2.85s | fail, 2.98s | fail, 2.85s | fail, 2.82s |
+| germany-2018 | all | pass, 1.59s | fail, 1.88s | = | pass, 1.48s |
+| germany-2019 | all | pass, 1.38s | pass, 0.94s | = | pass, 1.32s |
+| great-britain-2022 | all | fail, 2.03s | fail, 2.27s | = | fail, 2.01s |
+| hungary-2006 | none | fail, 15.15s | fail, 15.30s | fail, 14.86s | fail, 14.94s |
+| hungary-2014 | all | fail, 2.73s | fail, 2.92s | = | fail, 2.74s |
+| hungary-2015 | all | fail, 6.90s | fail, 7.23s | = | fail, 6.96s |
+| italy-2020 | all | fail, 2.23s | fail, 2.40s | = | fail, 2.28s |
+| miami-2024 | all | fail, 4.71s | fail, 4.94s | = | fail, 4.77s |
+| monaco-2004 | none | fail, 3.64s | fail, 3.48s | fail, 4.61s | fail, 4.58s |
+| monaco-2008 | all | fail, 4.53s | fail, 4.25s | = | fail, 4.51s |
+| monaco-2011 | none | fail, 15.16s | fail, 18.20s | fail, 5.74s | fail, 5.67s |
+| monaco-2015 | all | fail, 4.71s | fail, 4.33s | = | fail, 4.71s |
+| monaco-2017 | all | fail, 2.98s | fail, 3.45s | = | fail, 2.95s |
+| monaco-2022 | all | fail, 7.49s | fail, 7.26s | = | fail, 7.53s |
+| netherlands-2023 | all | fail, 6.69s | fail, 6.05s | = | fail, 6.55s |
+| sakhir-2020 | all | fail, 2.51s | fail, 3.73s | = | fail, 2.73s |
+| saudi-arabia-2021 | all | fail, 8.56s | fail, 8.56s | = | fail, 8.56s |
+| singapore-2023 | all | fail, 4.00s | fail, 4.50s | = | fail, 4.17s |
+| united-states-2015 | all | fail, 2.31s | fail, 2.17s | = | fail, 2.21s |
+| total (32 races) | | 3 pass, 139.0 s | 2 pass, 148.2 s | 3 pass, 130.1 s | 3 pass, 130.7 s |
+
+- **Real laps down: on.** monaco-2011 goes from 15.16 to 5.74 s. HAM 70 -> 14 s and WEB 27 ->
+  10 s; no run has either a lap down. What is left is KOB, WEB and HAM about 13 s behind the
+  podium against the real 23-27 s. Four lapped cars (SUT, HEI, BAR, BUE) were between BUT and
+  KOB in the real restart queue and held them up. The sims race lapped cars in total-time order,
+  not road order, so a lapped car can't hold up the lead-lap cars behind it on the road. Smaller
+  gains: hungary-2006 -0.29 s, canada-2011 -0.12 s. monaco-2004 goes 3.64 -> 4.61 s (BAR's
+  podium gap 7.6 -> 11.5 s). That is a better replay, not a worse one: before, the sim had
+  Barrichello a lap down in 57% of runs (P4/P5), and the lap made up the time his pace loses.
+  Now he is P3 in every run (really P3, on the lead lap), and the gap error is his pace after
+  the restart (sim 65 s, real 76 s). Sum over the 8 no-unlapping races: 51.5 -> 42.6 s. One
+  reconstructed race also gets `lapsDown`, belgium-1995 (G1 sanity only, anchors unaffected):
+  fail 5.76 -> 6.00 s.
+- **Restart: off** (`restart.IN_ERAS_BUILDS = False`, unchanged). The refit is close to neutral
+  and still slightly worse: 130.7 against 130.1 s, better on 8 races and worse on 10 by more than
+  0.05 s. sakhir-2020 is 2.73 s against 2.51 off (M4's term: 3.73), miami-2024 4.77 against 4.71
+  (4.94). germany-2018 keeps its pass (M4's term failed it). The reason any spread hurts is at
+  the flag. With the term off, the sims' finishing gaps in these races are already too wide
+  behind the leader: the median signed error is +1.2 / +2.0 / +2.4 s at P2 / P3 / P4 and about
+  0 from P6. So a term that matches the restart lap better still widens the finish. That comes
+  from the sims' post-restart pace spread and the stop pricing (sakhir's Russell), not from the
+  restart lap. The refit is committed so that turning the switch on gives the measured term once
+  those are fixed.
+- Not changed: the queue at the end of the last SC lap is wider in the real races than the sims'
+  nose-to-tail 0.5 s a car (P2 1.16 s, P10 7.25 s against 0.52 s and 4.56 s). Widening it would
+  widen the finish too, for the same reason.
+
+**Tests.** `pipeline/tests/test_laps_down.py` (new: the count, the most over the event, the road
+order and line-up with known laps down, the overridden cars, monaco-2011's Hamilton, and the
+parity vectors `pipeline/tests/fixtures/laps_down_parity.json`, new: monaco-2011 with its
+`lapsDown`, 8 seeds, plus 8 with HAM's strategy passed in) and
+`packages/sim/tests/laps-down.test.ts` (new: parity, roadOrder / lineUp / realLapsDown). The
+committed restart fit test now refits on the sim baseline.
+
+**Stale fixtures and files.** `pipeline/tests/fixtures/scripted_parity.json` was regenerated
+(`SCRIPTED_PARITY_WRITE=1`): it carries `restart.track_block()`, whose numbers the refit changed.
+`test_build_reconstructed.py::test_wet_builds_match_the_committed_race_files[belgium-1995]`
+fails until the rebuild (expected): its fresh build gains `lapsDown` on its SC event, and the
+only difference from the committed file is that field. Rebuilding the eight no-unlapping timed
+Eras races (monaco-2004, germany-2000, hungary-2006, monaco-2011, canada-2011, austria-2002,
+brazil-2003, belgium-1998) and belgium-1995 writes `lapsDown` into their files and goldens.
