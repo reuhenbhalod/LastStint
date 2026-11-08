@@ -13,13 +13,15 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: False.
 | laps down | 10 | 10 |
 | stop | 1 | 1 |
 | safety car | 1 | 1 |
+| leader | 2 | 2 |
+| running order | 1 | 1 |
 
 | Anchor | Subject | Target | Achieved | Pass |
 |---|---|---|---|---|
-| grid | lap-1 order is the grid order | 26 cars: TAM PIQN PAT ARN PRO ROSK MAN WINM DEC LAF DEA LAU WAR CHE WAT GIA BAL ALBM SUL BOUT JARJ SUR BOE ACH FABC GHI | 26 cars: TAM PIQN PAT ARN PRO ROSK MAN DEC DEA LAU WINM WAR CHE WAT LAF GIA BAL ALBM SUL BOUT JARJ SUR BOE GHI ACH FABC | FAIL |
+| grid | lap-1 order is the grid order (the sourced lap-1 order at the front) | 26 cars: PIQN PAT TAM ARN PRO ROSK MAN WINM DEC LAF DEA LAU WAR CHE WAT GIA BAL ALBM SUL BOUT JARJ SUR BOE ACH FABC GHI | 26 cars: PIQN PAT TAM ARN PRO ROSK MAN DEC DEA LAU WINM WAR CHE WAT LAF GIA BAL ALBM SUL BOUT JARJ SUR BOE GHI ACH FABC | FAIL |
 | order | classification | 12 cars: PAT DEC PIQN WAR ROSK CHE SUL SUR BOUT JARJ LAU ACH | 12 cars: PAT DEC PIQN WAR ROSK CHE SUL SUR BOUT JARJ LAU ACH | pass |
-| gap | DEC | 9.319 | 9.32 | pass |
-| gap | PIQN | 21.969 | 21.968 | pass |
+| gap | DEC | 9.319 | 9.319 | pass |
+| gap | PIQN | 21.969 | 21.972 | pass |
 | fastest | PAT | [70.848, 8] | [70.848, 8] | pass |
 | fastest | DEC | [71.401, 5] | [71.401, 5] | pass |
 | fastest | PIQN | [69.948, 6] | [69.948, 6] | pass |
@@ -84,12 +86,15 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: False.
 | laps down | BOE | 11 | 11 | pass |
 | stop | PIQN | 28 | 28 | pass |
 | safety car | leader's SC laps, sourced | [] | [] | pass |
+| leader | PIQN laps 1-59 | 59 laps | 59 of 59 laps | pass |
+| leader | PAT laps 60-77 | 18 laps | 18 of 18 laps | pass |
+| running order | lap 1 | ["PIQN", "PAT"] | ["PIQN", "PAT"] | pass |
 
 ## Estimated
 
 - Every lap time and lap-end Time is synthetic: solved to the anchors, not measured
-- Position each lap follows from the synthetic times; the lap-1 order is the grid order
-- Lap times in between the anchors: pace + tyre wear + fuel + seeded noise
+- Position each lap follows from the synthetic times; the lap-1 order is the grid order, with the sourced lap-1 order at the front; each lap's leader and the sourced snapshots of the order and gaps are anchors, the rest of the order is estimated
+- Lap times in between the anchors: pace + tyre wear + fuel + seeded noise, the pace moved by a constant between the laps the sourced order marks
 - Fuel: 0.06s per lap of fuel on board; full tank at the start
 - Stop loss: pit-lane time - 5.0s, 35% on the in-lap
 - PitInTime is the in-lap's end; PitOutTime adds the out-lap's share of the lane time
@@ -102,3 +107,5 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: False.
 - WINM: fastest lap on lap 1, its lap-1 time is the fastest lap's
 - LAF: fastest lap on lap 1, its lap-1 time is the fastest lap's
 - GHI: fastest lap on lap 1, its lap-1 time is the fastest lap's
+- SUR: target 5641.9s not reachable
+- BOUT: target 5633.6s not reachable

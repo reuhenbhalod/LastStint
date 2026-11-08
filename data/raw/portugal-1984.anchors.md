@@ -12,15 +12,16 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 | retirement event | 11 | 11 |
 | laps down | 11 | 11 |
 | safety car | 1 | 1 |
+| leader | 2 | 2 |
 
 | Anchor | Subject | Target | Achieved | Pass |
 |---|---|---|---|---|
-| grid | lap-1 order is the grid order | 27 cars: PIQN PRO SENA ROSK DEA MAN TAM ALBM WAR JOH LAU PAT STRP CHE LAF SUR ARN BOUT WINM DEC HES GHI BER GAR BAL PALJ ALL | 27 cars: PIQN PRO SENA ROSK DEA MAN TAM ALBM WAR JOH LAU PAT STRP CHE LAF SUR ARN BOUT WINM DEC HES GHI BER GAR BAL PALJ ALL | pass |
+| grid | lap-1 order is the grid order (the sourced lap-1 order at the front) | 27 cars: ROSK PIQN PRO SENA DEA MAN TAM ALBM WAR JOH LAU PAT STRP CHE LAF SUR ARN BOUT WINM DEC HES GHI BER GAR BAL PALJ ALL | 27 cars: ROSK PIQN PRO SENA DEA MAN TAM ALBM WAR JOH LAU PAT STRP CHE LAF SUR ARN BOUT WINM DEC HES GHI BER GAR BAL PALJ ALL | pass |
 | order | classification | 17 cars: PRO LAU SENA ALBM DEA PIQN TAM PAT ARN WINM JOH DEC BER LAF BAL GAR CHE | 17 cars: PRO LAU SENA ALBM DEA PIQN TAM PAT ARN WINM JOH DEC BER LAF BAL GAR CHE | pass |
-| gap | LAU | 13.425 | 13.432 | pass |
-| gap | SENA | 20.042 | 20.044 | pass |
-| gap | ALBM | 20.317 | 20.325 | pass |
-| gap | DEA | 92.169 | 92.172 | pass |
+| gap | LAU | 13.425 | 13.421 | pass |
+| gap | SENA | 20.042 | 20.035 | pass |
+| gap | ALBM | 20.317 | 20.316 | pass |
+| gap | DEA | 92.169 | 92.166 | pass |
 | fastest | PRO | [83.452, 39] | [83.452, 39] | pass |
 | fastest | LAU | [82.996, 51] | [82.996, 51] | pass |
 | fastest | SENA | [84.373, 46] | [84.373, 46] | pass |
@@ -82,12 +83,14 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 | laps down | BAL | 4 | 4 | pass |
 | laps down | CHE | 6 | 6 | pass |
 | safety car | leader's SC laps, sourced | [] | [] | pass |
+| leader | ROSK laps 1-8 | 8 laps | 8 of 8 laps | pass |
+| leader | PRO laps 9-70 | 62 laps | 62 of 62 laps | pass |
 
 ## Estimated
 
 - Every lap time and lap-end Time is synthetic: solved to the anchors, not measured
-- Position each lap follows from the synthetic times; the lap-1 order is the grid order
-- Lap times in between the anchors: pace + tyre wear + fuel + seeded noise
+- Position each lap follows from the synthetic times; the lap-1 order is the grid order, with the sourced lap-1 order at the front; each lap's leader and the sourced snapshots of the order and gaps are anchors, the rest of the order is estimated
+- Lap times in between the anchors: pace + tyre wear + fuel + seeded noise, the pace moved by a constant between the laps the sourced order marks
 - Fuel: 0.06s per lap of fuel on board; full tank at the start
 - Stop loss: pit-lane time - 5.0s, 35% on the in-lap
 - PitInTime is the in-lap's end; PitOutTime adds the out-lap's share of the lane time

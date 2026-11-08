@@ -14,8 +14,8 @@
  },
  "estimates": [
   "Every lap time and lap-end Time is synthetic: solved to the anchors, not measured",
-  "Position each lap follows from the synthetic times; the lap-1 order is the grid order",
-  "Lap times in between the anchors: pace + tyre wear + fuel + seeded noise",
+  "Position each lap follows from the synthetic times; the lap-1 order is the grid order, with the sourced lap-1 order at the front; each lap's leader and the sourced snapshots of the order and gaps are anchors, the rest of the order is estimated",
+  "Lap times in between the anchors: pace + tyre wear + fuel + seeded noise, the pace moved by a constant between the laps the sourced order marks",
   "Fuel: 0.06s per lap of fuel on board; each stop refuels to the next stop",
   "Stop loss: pit-lane time - 5.0s, 35% on the in-lap",
   "PitInTime is the in-lap's end; PitOutTime adds the out-lap's share of the lane time",
@@ -30,6 +30,22 @@
   "jolpicaRound": 16,
   "eventName": "Australian Grand Prix"
  },
+ "classified": [
+  "MAN",
+  "BER",
+  "BRU",
+  "BAR",
+  "PAN",
+  "ALE",
+  "FRE",
+  "FITC",
+  "MAR",
+  "JAR",
+  "LAG",
+  "HAK"
+ ],
+ "roadPositions": [],
+ "lastLapStops": [],
  "stopsComplete": true,
  "safetyCarsComplete": false,
  "params": {
@@ -48,6 +64,11 @@
   "sc_gap": 0.8,
   "sc_iterations": 12,
   "order_gap": 0.5,
+  "lead_margin": 1.0,
+  "lap_gap_tolerance": 1.0,
+  "order_iterations": 6,
+  "pace_weight": 0.05,
+  "pack_weight": 1.0,
   "gap_tolerance": 2.0,
   "attempts": 6,
   "refuel": null
@@ -59,7 +80,7 @@
  },
  "fitted": {
   "MAN": {
-   "pace": 78.194,
+   "pace": 78.179,
    "wear": 0.025,
    "noise": 0.35,
    "target": 6471.4
@@ -95,124 +116,124 @@
    "target": 6472.4
   },
   "FRE": {
-   "pace": 79.258,
+   "pace": 79.249,
    "wear": 0.05,
    "noise": 0.525,
-   "target": 6512.223
+   "target": 6511.519
   },
   "FITC": {
-   "pace": 79.407,
+   "pace": 79.423,
    "wear": 0.05,
    "noise": 0.35,
-   "target": 6523.097
+   "target": 6524.289
   },
   "MAR": {
-   "pace": 80.83,
+   "pace": 80.847,
    "wear": 0.0,
-   "noise": 0.262,
-   "target": 6509.792
+   "noise": 0.35,
+   "target": 6512.562
   },
   "JAR": {
-   "pace": 79.676,
+   "pace": 79.678,
    "wear": 0.075,
    "noise": 0.525,
-   "target": 6514.017
+   "target": 6514.165
   },
   "LAG": {
-   "pace": 80.284,
+   "pace": 80.296,
    "wear": 0.05,
    "noise": 0.7,
-   "target": 6525.498
+   "target": 6526.433
   },
   "HAK": {
-   "pace": 78.884,
+   "pace": 78.896,
    "wear": 0.025,
    "noise": 0.525,
-   "target": 6119.351
+   "target": 6120.26
   },
   "ALBM": {
-   "pace": 81.004,
+   "pace": 81.062,
    "wear": 0.0,
    "noise": 0.35,
-   "target": 5718.911
+   "target": 5722.795
   },
   "BLU": {
-   "pace": 79.108,
+   "pace": 79.14,
    "wear": 0.025,
    "noise": 0.525,
-   "target": 5355.072
+   "target": 5357.118
   },
   "DEL": {
-   "pace": 83.885,
+   "pace": 83.905,
    "wear": 0.05,
    "noise": 0.525,
-   "target": 4962.91
+   "target": 4963.974
   },
   "SAL": {
-   "pace": 80.076,
+   "pace": 80.097,
    "wear": 0.05,
    "noise": 0.525,
-   "target": 4038.648
+   "target": 4039.635
   },
   "BRA": {
-   "pace": 81.115,
-   "wear": 0.0,
-   "noise": 0.35,
-   "target": 4081.133
+   "pace": 80.608,
+   "wear": 0.05,
+   "noise": 0.525,
+   "target": 4083.699
   },
   "ZAN": {
-   "pace": 79.974,
+   "pace": 80.043,
    "wear": 0.025,
    "noise": 0.35,
-   "target": 3283.535
+   "target": 3286.142
   },
   "HIL": {
-   "pace": 76.828,
+   "pace": 76.832,
    "wear": 0.1,
    "noise": 0.35,
-   "target": 2766.951
+   "target": 2766.494
   },
   "MSCM": {
-   "pace": 77.253,
+   "pace": 77.247,
    "wear": 0.025,
    "noise": 0.7,
-   "target": 2766.016
+   "target": 2765.23
   },
   "SCHD": {
-   "pace": 82.925,
-   "wear": 0.0,
+   "pace": 82.89,
+   "wear": 0.025,
    "noise": 0.525,
-   "target": 2355.612
+   "target": 2357.357
   },
   "KAT": {
-   "pace": 79.391,
+   "pace": 79.563,
    "wear": 0.05,
    "noise": 0.7,
-   "target": 1551.105
+   "target": 1554.018
   },
   "NOD": {
-   "pace": 82.36,
+   "pace": 82.488,
    "wear": 0.0,
    "noise": 0.7,
-   "target": 1512.942
+   "target": 1514.995
   },
   "MOR": {
-   "pace": 80.79,
-   "wear": 0.025,
+   "pace": 81.126,
+   "wear": 0.0,
    "noise": 0.7,
-   "target": 1411.783
+   "target": 1413.693
   },
   "IRV": {
-   "pace": 79.301,
+   "pace": 79.358,
    "wear": 0.0,
    "noise": 0.7,
-   "target": 1210.362
+   "target": 1211.106
   },
   "HER": {
-   "pace": 79.834,
+   "pace": 80.133,
    "wear": 0.0,
    "noise": 0.7,
-   "target": 1060.94
+   "target": 1064.232
   }
  },
  "summary": {
@@ -251,16 +272,24 @@
   "safety car": {
    "pass": 1,
    "total": 1
+  },
+  "leader": {
+   "pass": 4,
+   "total": 4
+  },
+  "running order": {
+   "pass": 1,
+   "total": 1
   }
  },
  "anchors": [
   {
    "anchor": "grid",
-   "subject": "lap-1 order is the grid order",
+   "subject": "lap-1 order is the grid order (the sourced lap-1 order at the front)",
    "target": [
-    "MAN",
     "MSCM",
     "HIL",
+    "MAN",
     "HAK",
     "BAR",
     "IRV",
@@ -286,9 +315,9 @@
     "SCHD"
    ],
    "achieved": [
-    "MAN",
     "MSCM",
     "HIL",
+    "MAN",
     "HAK",
     "BAR",
     "IRV",
@@ -352,7 +381,7 @@
    "anchor": "gap",
    "subject": "BER",
    "target": 2.511,
-   "achieved": 2.513,
+   "achieved": 2.51,
    "pass": true
   },
   {
@@ -366,7 +395,7 @@
    "anchor": "gap",
    "subject": "BAR",
    "target": 70.53,
-   "achieved": 70.531,
+   "achieved": 70.537,
    "pass": true
   },
   {
@@ -1287,7 +1316,50 @@
    "target": [],
    "achieved": [],
    "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "MSCM laps 1-35",
+   "target": "35 laps",
+   "achieved": "35 of 35 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "MAN laps 36-53",
+   "target": "18 laps",
+   "achieved": "18 of 18 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "BER laps 54-63",
+   "target": "10 laps",
+   "achieved": "10 of 10 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "MAN laps 64-81",
+   "target": "18 laps",
+   "achieved": "18 of 18 laps",
+   "pass": true
+  },
+  {
+   "anchor": "running order",
+   "subject": "lap 1",
+   "target": [
+    "MSCM",
+    "HIL"
+   ],
+   "achieved": [
+    "MSCM",
+    "HIL"
+   ],
+   "pass": true
   }
  ],
- "notes": []
+ "notes": [
+  "BER: target 6473.9s not reachable"
+ ]
 }

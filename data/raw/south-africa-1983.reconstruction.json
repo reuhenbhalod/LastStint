@@ -13,8 +13,8 @@
  },
  "estimates": [
   "Every lap time and lap-end Time is synthetic: solved to the anchors, not measured",
-  "Position each lap follows from the synthetic times; the lap-1 order is the grid order",
-  "Lap times in between the anchors: pace + tyre wear + fuel + seeded noise",
+  "Position each lap follows from the synthetic times; the lap-1 order is the grid order, with the sourced lap-1 order at the front; each lap's leader and the sourced snapshots of the order and gaps are anchors, the rest of the order is estimated",
+  "Lap times in between the anchors: pace + tyre wear + fuel + seeded noise, the pace moved by a constant between the laps the sourced order marks",
   "Fuel: 0.06s per lap of fuel on board; full tank at the start",
   "Stop loss: pit-lane time - 5.0s, 35% on the in-lap",
   "PitInTime is the in-lap's end; PitOutTime adds the out-lap's share of the lane time",
@@ -29,6 +29,22 @@
   "jolpicaRound": 15,
   "eventName": "South African Grand Prix"
  },
+ "classified": [
+  "PAT",
+  "DEC",
+  "PIQN",
+  "WAR",
+  "ROSK",
+  "CHE",
+  "SUL",
+  "SUR",
+  "BOUT",
+  "JARJ",
+  "LAU",
+  "ACH"
+ ],
+ "roadPositions": [],
+ "lastLapStops": [],
  "stopsComplete": false,
  "safetyCarsComplete": true,
  "params": {
@@ -47,6 +63,11 @@
   "sc_gap": 0.8,
   "sc_iterations": 12,
   "order_gap": 0.5,
+  "lead_margin": 1.0,
+  "lap_gap_tolerance": 1.0,
+  "order_iterations": 6,
+  "pace_weight": 0.05,
+  "pack_weight": 1.0,
   "gap_tolerance": 2.0,
   "attempts": 6,
   "refuel": null
@@ -58,7 +79,7 @@
  },
  "fitted": {
   "PAT": {
-   "pace": 66.601,
+   "pace": 66.609,
    "wear": 0.1,
    "noise": 0.262,
    "target": 5605.708
@@ -70,28 +91,28 @@
    "target": 5615.027
   },
   "PIQN": {
-   "pace": 67.564,
+   "pace": 67.572,
    "wear": 0.15,
    "noise": 0.7,
    "target": 5627.677
   },
   "WAR": {
-   "pace": 67.708,
+   "pace": 68.08,
    "wear": 0.1,
-   "noise": 0.262,
-   "target": 5623.685
+   "noise": 0.525,
+   "target": 5653.533
   },
   "ROSK": {
-   "pace": 71.795,
+   "pace": 72.156,
    "wear": 0.0,
-   "noise": 0.7,
-   "target": 5631.396
+   "noise": 1.05,
+   "target": 5654.955
   },
   "CHE": {
-   "pace": 67.997,
+   "pace": 68.223,
    "wear": 0.1,
-   "noise": 0.35,
-   "target": 5641.163
+   "noise": 0.525,
+   "target": 5656.798
   },
   "SUL": {
    "pace": 70.571,
@@ -118,16 +139,16 @@
    "target": 5633.621
   },
   "LAU": {
-   "pace": 67.024,
+   "pace": 67.068,
    "wear": 0.1,
    "noise": 0.7,
-   "target": 5185.089
+   "target": 5188.115
   },
   "ACH": {
-   "pace": 73.547,
+   "pace": 73.552,
    "wear": 0.1,
    "noise": 0.525,
-   "target": 5655.51
+   "target": 5655.893
   },
   "MAN": {
    "pace": 80.002,
@@ -142,58 +163,58 @@
    "target": 5606.708
   },
   "ALBM": {
-   "pace": 72.788,
+   "pace": 72.832,
    "wear": 0.0,
    "noise": 0.35,
-   "target": 4548.106
+   "target": 4550.687
   },
   "TAM": {
-   "pace": 67.56,
-   "wear": 0.1,
-   "noise": 0.525,
-   "target": 4109.86
+   "pace": 67.002,
+   "wear": 0.125,
+   "noise": 0.35,
+   "target": 4118.203
   },
   "GIA": {
-   "pace": 71.131,
+   "pace": 71.361,
    "wear": 0.0,
    "noise": 0.35,
-   "target": 4161.788
+   "target": 4174.243
   },
   "PRO": {
-   "pace": 66.975,
-   "wear": 0.125,
+   "pace": 66.87,
+   "wear": 0.15,
    "noise": 0.525,
-   "target": 2556.53
+   "target": 2567.749
   },
   "FABC": {
-   "pace": 73.128,
+   "pace": 73.157,
    "wear": 0.125,
    "noise": 0.7,
-   "target": 2212.415
+   "target": 2213.179
   },
   "DEA": {
-   "pace": 69.523,
-   "wear": 0.05,
-   "noise": 0.525,
-   "target": 1487.009
+   "pace": 70.338,
+   "wear": 0.025,
+   "noise": 0.7,
+   "target": 1497.056
   },
   "WAT": {
-   "pace": 70.09,
-   "wear": 0.025,
-   "noise": 0.525,
-   "target": 1351.268
+   "pace": 70.768,
+   "wear": 0.0,
+   "noise": 0.7,
+   "target": 1359.644
   },
   "ARN": {
-   "pace": 68.826,
+   "pace": 69.615,
    "wear": 0.025,
-   "noise": 0.525,
-   "target": 663.326
+   "noise": 1.05,
+   "target": 668.901
   },
   "BAL": {
-   "pace": 68.992,
+   "pace": 68.931,
    "wear": 0.025,
    "noise": 0.525,
-   "target": 380.775
+   "target": 380.593
   },
   "WINM": {
    "pace": 83.427,
@@ -250,16 +271,24 @@
   "safety car": {
    "pass": 1,
    "total": 1
+  },
+  "leader": {
+   "pass": 2,
+   "total": 2
+  },
+  "running order": {
+   "pass": 1,
+   "total": 1
   }
  },
  "anchors": [
   {
    "anchor": "grid",
-   "subject": "lap-1 order is the grid order",
+   "subject": "lap-1 order is the grid order (the sourced lap-1 order at the front)",
    "target": [
-    "TAM",
     "PIQN",
     "PAT",
+    "TAM",
     "ARN",
     "PRO",
     "ROSK",
@@ -285,9 +314,9 @@
     "GHI"
    ],
    "achieved": [
-    "TAM",
     "PIQN",
     "PAT",
+    "TAM",
     "ARN",
     "PRO",
     "ROSK",
@@ -351,14 +380,14 @@
    "anchor": "gap",
    "subject": "DEC",
    "target": 9.319,
-   "achieved": 9.32,
+   "achieved": 9.319,
    "pass": true
   },
   {
    "anchor": "gap",
    "subject": "PIQN",
    "target": 21.969,
-   "achieved": 21.968,
+   "achieved": 21.972,
    "pass": true
   },
   {
@@ -964,11 +993,40 @@
    "target": [],
    "achieved": [],
    "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "PIQN laps 1-59",
+   "target": "59 laps",
+   "achieved": "59 of 59 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "PAT laps 60-77",
+   "target": "18 laps",
+   "achieved": "18 of 18 laps",
+   "pass": true
+  },
+  {
+   "anchor": "running order",
+   "subject": "lap 1",
+   "target": [
+    "PIQN",
+    "PAT"
+   ],
+   "achieved": [
+    "PIQN",
+    "PAT"
+   ],
+   "pass": true
   }
  ],
  "notes": [
   "WINM: fastest lap on lap 1, its lap-1 time is the fastest lap's",
   "LAF: fastest lap on lap 1, its lap-1 time is the fastest lap's",
-  "GHI: fastest lap on lap 1, its lap-1 time is the fastest lap's"
+  "GHI: fastest lap on lap 1, its lap-1 time is the fastest lap's",
+  "SUR: target 5641.9s not reachable",
+  "BOUT: target 5633.6s not reachable"
  ]
 }

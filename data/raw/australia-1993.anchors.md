@@ -9,17 +9,18 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 | gap | 2 | 2 |
 | fastest | 23 | 23 |
 | retirement | 11 | 11 |
-| retirement event | 11 | 11 |
+| retirement event | 10 | 11 |
 | laps down | 10 | 10 |
 | stop | 8 | 8 |
 | safety car | 1 | 1 |
+| leader | 3 | 3 |
 
 | Anchor | Subject | Target | Achieved | Pass |
 |---|---|---|---|---|
 | grid | lap-1 order is the grid order | 23 cars: SENA PRO HIL MSCM HAK BER ALE BRU PAT SUZ WEN JAR BAR BLU DEC MAR WAR KAT IRV HER COM GOU SUU | 23 cars: SENA PRO HIL MSCM HAK BER ALE BRU PAT SUZ WEN JAR BAR BLU DEC MAR WAR KAT IRV HER COM GOU SUU | pass |
 | order | classification | 15 cars: SENA PRO HIL ALE BER BRU SUZ PAT BLU WAR BAR COM DEC SUU WEN | 15 cars: SENA PRO HIL ALE BER BRU SUZ PAT BLU WAR BAR COM DEC SUU WEN | pass |
-| gap | PRO | 9.259 | 9.261 | pass |
-| gap | HIL | 33.902 | 33.903 | pass |
+| gap | PRO | 9.259 | 9.256 | pass |
+| gap | HIL | 33.902 | 33.899 | pass |
 | fastest | SENA | [76.128, 70] | [76.128, 70] | pass |
 | fastest | PRO | [75.434, 66] | [75.434, 66] | pass |
 | fastest | HIL | [75.381, 64] | [75.381, 64] | pass |
@@ -44,7 +45,7 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 | fastest | HER | [80.502, 8] | [80.502, 8] | pass |
 | fastest | MAR | [81.175, 5] | [81.175, 5] | pass |
 | retirement | PAT | 77 | 77 | pass |
-| retirement event | PAT | true | true | pass |
+| retirement event | PAT | true | false | FAIL |
 | retirement | WEN | 73 | 73 | pass |
 | retirement event | WEN | true | true | pass |
 | retirement | JAR | 56 | 56 | pass |
@@ -84,12 +85,15 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 | stop | HAK | 26 | 26 | pass |
 | stop | MSCM | 15 | 15 | pass |
 | safety car | leader's SC laps, sourced (others unknown) | [] | [] | pass |
+| leader | SENA laps 1-23 | 23 laps | 23 of 23 laps | pass |
+| leader | PRO laps 24-28 | 5 laps | 5 of 5 laps | pass |
+| leader | SENA laps 29-79 | 51 laps | 51 of 51 laps | pass |
 
 ## Estimated
 
 - Every lap time and lap-end Time is synthetic: solved to the anchors, not measured
-- Position each lap follows from the synthetic times; the lap-1 order is the grid order
-- Lap times in between the anchors: pace + tyre wear + fuel + seeded noise
+- Position each lap follows from the synthetic times; the lap-1 order is the grid order, with the sourced lap-1 order at the front; each lap's leader and the sourced snapshots of the order and gaps are anchors, the rest of the order is estimated
+- Lap times in between the anchors: pace + tyre wear + fuel + seeded noise, the pace moved by a constant between the laps the sourced order marks
 - Fuel: 0.06s per lap of fuel on board; full tank at the start
 - Stop loss: pit-lane time - 5.0s, 35% on the in-lap
 - PitInTime is the in-lap's end; PitOutTime adds the out-lap's share of the lane time
@@ -97,3 +101,7 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 - No weather timeline: the race is assumed dry
 - Stops: only the sourced ones; cars may have stopped more (unknown)
 - Safety cars: only the sourced ones (none found is not none run)
+
+## Notes
+
+- PAT: classified retirement stopped at its natural time, after the point a retirement is seen

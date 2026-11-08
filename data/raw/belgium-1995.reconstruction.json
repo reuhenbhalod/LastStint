@@ -13,8 +13,8 @@
  },
  "estimates": [
   "Every lap time and lap-end Time is synthetic: solved to the anchors, not measured",
-  "Position each lap follows from the synthetic times; the lap-1 order is the grid order",
-  "Lap times in between the anchors: pace + tyre wear + fuel + seeded noise",
+  "Position each lap follows from the synthetic times; the lap-1 order is the grid order, with the sourced lap-1 order at the front; each lap's leader and the sourced snapshots of the order and gaps are anchors, the rest of the order is estimated",
+  "Lap times in between the anchors: pace + tyre wear + fuel + seeded noise, the pace moved by a constant between the laps the sourced order marks",
   "Fuel: 0.06s per lap of fuel on board; each stop refuels to the next stop",
   "Stop loss: pit-lane time - 5.0s, 35% on the in-lap",
   "PitInTime is the in-lap's end; PitOutTime adds the out-lap's share of the lane time",
@@ -46,6 +46,7 @@
   "MOE"
  ],
  "roadPositions": [],
+ "lastLapStops": [],
  "stopsComplete": true,
  "safetyCarsComplete": true,
  "params": {
@@ -64,6 +65,11 @@
   "sc_gap": 0.8,
   "sc_iterations": 12,
   "order_gap": 0.5,
+  "lead_margin": 1.0,
+  "lap_gap_tolerance": 1.0,
+  "order_iterations": 6,
+  "pace_weight": 0.05,
+  "pack_weight": 1.0,
   "gap_tolerance": 2.0,
   "attempts": 6,
   "refuel": null
@@ -75,142 +81,142 @@
  },
  "fitted": {
   "MSCM": {
-   "pace": 113.244,
+   "pace": 113.258,
    "wear": 0.05,
    "noise": 0.262,
    "target": 5807.875
   },
   "HIL": {
-   "pace": 112.246,
-   "wear": 0.125,
+   "pace": 113.283,
+   "wear": 0.075,
    "noise": 0.175,
    "target": 5827.368
   },
   "BRU": {
-   "pace": 115.205,
-   "wear": 0.0,
-   "noise": 0.175,
+   "pace": 116.062,
+   "wear": 0.05,
+   "noise": 0.35,
    "target": 5832.873
   },
   "FRE": {
-   "pace": 114.663,
-   "wear": 0.025,
+   "pace": 115.059,
+   "wear": 0.05,
    "noise": 0.175,
    "target": 5834.847
   },
   "BLU": {
-   "pace": 114.919,
-   "wear": 0.05,
-   "noise": 0.175,
+   "pace": 116.206,
+   "wear": 0.025,
+   "noise": 0.262,
    "target": 5841.647
   },
   "BAR": {
-   "pace": 115.736,
+   "pace": 116.268,
    "wear": 0.0,
    "noise": 0.175,
    "target": 5847.549
   },
   "HER": {
-   "pace": 115.841,
-   "wear": 0.025,
-   "noise": 0.35,
+   "pace": 116.265,
+   "wear": 0.05,
+   "noise": 0.525,
    "target": 5861.918
   },
   "SAL": {
-   "pace": 116.334,
-   "wear": 0.025,
+   "pace": 116.728,
+   "wear": 0.05,
    "noise": 0.175,
    "target": 5862.423
   },
   "PAN": {
-   "pace": 116.051,
-   "wear": 0.05,
-   "noise": 0.262,
+   "pace": 116.518,
+   "wear": 0.025,
+   "noise": 0.35,
    "target": 5874.045
   },
   "LAM": {
-   "pace": 116.964,
+   "pace": 117.095,
    "wear": 0.05,
    "noise": 0.175,
    "target": 5887.664
   },
   "BOUJ": {
-   "pace": 118.903,
+   "pace": 118.917,
    "wear": 0.0,
    "noise": 0.7,
    "target": 5808.375
   },
   "INO": {
-   "pace": 119.224,
+   "pace": 119.239,
    "wear": 0.025,
    "noise": 0.35,
    "target": 5808.875
   },
   "DIN": {
-   "pace": 121.265,
-   "wear": 0.025,
+   "pace": 121.569,
+   "wear": 0.05,
    "noise": 0.175,
    "target": 5808.375
   },
   "MOE": {
-   "pace": 121.553,
+   "pace": 121.326,
    "wear": 0.0,
    "noise": 0.175,
    "target": 5808.875
   },
   "KAT": {
-   "pace": 113.411,
-   "wear": 0.15,
-   "noise": 0.175,
-   "target": 3468.784
-  },
-  "LAV": {
-   "pace": 119.866,
-   "wear": 0.25,
-   "noise": 0.35,
-   "target": 3579.264
-  },
-  "BAD": {
-   "pace": 114.801,
-   "wear": 0.075,
-   "noise": 0.175,
-   "target": 2831.105
-  },
-  "BER": {
-   "pace": 111.964,
+   "pace": 114.887,
    "wear": 0.1,
    "noise": 0.175,
-   "target": 2844.644
+   "target": 3500.966
+  },
+  "LAV": {
+   "pace": 120.238,
+   "wear": 0.225,
+   "noise": 0.35,
+   "target": 3584.847
+  },
+  "BAD": {
+   "pace": 115.348,
+   "wear": 0.075,
+   "noise": 0.175,
+   "target": 2842.461
+  },
+  "BER": {
+   "pace": 115.849,
+   "wear": 0.05,
+   "noise": 0.35,
+   "target": 2919.058
   },
   "IRV": {
-   "pace": 112.163,
-   "wear": 0.15,
+   "pace": 114.566,
+   "wear": 0.075,
    "noise": 0.175,
-   "target": 2474.776
+   "target": 2512.558
   },
   "PAP": {
-   "pace": 116.654,
+   "pace": 116.942,
    "wear": 0.05,
    "noise": 0.175,
-   "target": 2377.636
+   "target": 2382.239
   },
   "MONA": {
-   "pace": 119.091,
-   "wear": 0.075,
-   "noise": 0.175,
-   "target": 2180.994
+   "pace": 119.541,
+   "wear": 0.05,
+   "noise": 0.262,
+   "target": 2184.509
   },
   "COU": {
-   "pace": 112.528,
-   "wear": 0.075,
-   "noise": 0.175,
-   "target": 1489.776
+   "pace": 115.489,
+   "wear": 0.0,
+   "noise": 1.05,
+   "target": 1513.411
   },
   "ALE": {
-   "pace": 115.95,
+   "pace": 117.653,
    "wear": 0.05,
-   "noise": 0.175,
-   "target": 477.141
+   "noise": 0.7,
+   "target": 480.988
   },
   "HAK": {
    "pace": 127.082,
@@ -259,17 +265,21 @@
   "safety car": {
    "pass": 1,
    "total": 1
+  },
+  "leader": {
+   "pass": 10,
+   "total": 10
   }
  },
  "anchors": [
   {
    "anchor": "grid",
-   "subject": "lap-1 order is the grid order",
+   "subject": "lap-1 order is the grid order (the sourced lap-1 order at the front)",
    "target": [
+    "HER",
     "BER",
     "ALE",
     "HAK",
-    "HER",
     "COU",
     "BLU",
     "IRV",
@@ -292,10 +302,10 @@
     "DIN"
    ],
    "achieved": [
+    "HER",
     "BER",
     "ALE",
     "HAK",
-    "HER",
     "COU",
     "BLU",
     "IRV",
@@ -360,14 +370,14 @@
    "anchor": "gap",
    "subject": "HIL",
    "target": 19.493,
-   "achieved": 19.494,
+   "achieved": 19.491,
    "pass": true
   },
   {
    "anchor": "gap",
    "subject": "BRU",
    "target": 24.998,
-   "achieved": 24.998,
+   "achieved": 24.999,
    "pass": true
   },
   {
@@ -381,42 +391,42 @@
    "anchor": "gap",
    "subject": "BLU",
    "target": 33.772,
-   "achieved": 33.773,
+   "achieved": 33.768,
    "pass": true
   },
   {
    "anchor": "gap",
    "subject": "BAR",
    "target": 39.674,
-   "achieved": 39.677,
+   "achieved": 39.675,
    "pass": true
   },
   {
    "anchor": "gap",
    "subject": "HER",
    "target": 54.043,
-   "achieved": 54.044,
+   "achieved": 54.039,
    "pass": true
   },
   {
    "anchor": "gap",
    "subject": "SAL",
    "target": 54.548,
-   "achieved": 54.546,
+   "achieved": 54.545,
    "pass": true
   },
   {
    "anchor": "gap",
    "subject": "PAN",
    "target": 66.17,
-   "achieved": 66.169,
+   "achieved": 66.167,
    "pass": true
   },
   {
    "anchor": "gap",
    "subject": "LAM",
    "target": 79.789,
-   "achieved": 79.788,
+   "achieved": 79.782,
    "pass": true
   },
   {
@@ -1497,11 +1507,83 @@
     31
    ],
    "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "HER laps 1-1",
+   "target": "1 laps",
+   "achieved": "1 of 1 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "ALE laps 2-3",
+   "target": "2 laps",
+   "achieved": "2 of 2 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "HER laps 4-5",
+   "target": "2 laps",
+   "achieved": "2 of 2 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "COU laps 6-13",
+   "target": "8 laps",
+   "achieved": "8 of 8 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "HIL laps 14-15",
+   "target": "2 laps",
+   "achieved": "2 of 2 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "MSCM laps 16-18",
+   "target": "3 laps",
+   "achieved": "3 of 3 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "HIL laps 19-21",
+   "target": "3 laps",
+   "achieved": "3 of 3 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "MSCM laps 22-23",
+   "target": "2 laps",
+   "achieved": "2 of 2 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "HIL laps 24-24",
+   "target": "1 laps",
+   "achieved": "1 of 1 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "MSCM laps 25-44",
+   "target": "20 laps",
+   "achieved": "20 of 20 laps",
+   "pass": true
   }
  ],
  "notes": [
   "ALE: stop on lap 5, the lap it retired on; not run",
-  "HAK: fastest lap on lap 1, its lap-1 time is the fastest lap's"
+  "HAK: fastest lap on lap 1, its lap-1 time is the fastest lap's",
+  "HIL: target 5827.4s not reachable",
+  "the laps behind the safety car did not settle"
  ],
  "weather": {
   "source": "reconstruction-facts",

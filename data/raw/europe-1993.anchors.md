@@ -14,12 +14,14 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 | stop | 13 | 13 |
 | tyre | 34 | 34 |
 | safety car | 1 | 1 |
+| leader | 5 | 5 |
+| running order | 4 | 4 |
 
 | Anchor | Subject | Target | Achieved | Pass |
 |---|---|---|---|---|
-| grid | lap-1 order is the grid order | 23 cars: PRO HIL MSCM SENA JAR BER ALE PAT HER BAR ZAN WAR ALL FITC COM KAT BOUT BAB BLU BRU SUZ ALBM DEC | 23 cars: PRO HIL MSCM SENA JAR BER ALE PAT HER BAR ZAN WAR ALL FITC COM KAT BOUT BAB BLU BRU SUZ ALBM DEC | pass |
+| grid | lap-1 order is the grid order (the sourced lap-1 order at the front) | 23 cars: SENA PRO HIL BAR ALE MSCM JAR BER PAT HER ZAN WAR ALL FITC COM KAT BOUT BAB BLU BRU SUZ ALBM DEC | 23 cars: SENA PRO HIL BAR ALE MSCM JAR BER PAT HER ZAN WAR ALL FITC COM KAT BOUT BAB BLU BRU SUZ ALBM DEC | pass |
 | order | classification | 11 cars: SENA HIL PRO HER PAT BAB FITC ZAN COM BAR ALBM | 11 cars: SENA HIL PRO HER PAT BAB FITC ZAN COM BAR ALBM | pass |
-| gap | HIL | 83.199 | 83.199 | pass |
+| gap | HIL | 83.199 | 83.198 | pass |
 | fastest | SENA | [78.029, 57] | [78.029, 57] | pass |
 | fastest | HIL | [79.379, 55] | [79.379, 55] | pass |
 | fastest | PRO | [79.756, 55] | [79.756, 55] | pass |
@@ -129,12 +131,21 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 | tyre | BRU stint 1 | wet | ["WET"] | pass |
 | tyre | BRU stint 2 | slick | ["None"] | pass |
 | safety car | leader's SC laps, sourced (others unknown) | [] | [] | pass |
+| leader | SENA laps 1-18 | 18 laps | 18 of 18 laps | pass |
+| leader | PRO laps 19-19 | 1 laps | 1 of 1 laps | pass |
+| leader | SENA laps 20-34 | 15 laps | 15 of 15 laps | pass |
+| leader | PRO laps 35-38 | 4 laps | 4 of 4 laps | pass |
+| leader | SENA laps 39-76 | 38 laps | 38 of 38 laps | pass |
+| running order | lap 5 | ["SENA", "PRO", "HIL", "BAR"] | ["SENA", "PRO", "HIL", "BAR"] | pass |
+| running order | lap 10 | ["SENA", "PRO", "HIL", "BAR"] | ["SENA", "PRO", "HIL", "BAR"] | pass |
+| running order | lap 15 | ["SENA", "PRO", "HIL", "BAR"] | ["SENA", "PRO", "HIL", "BAR"] | pass |
+| running order | lap 1 | 7 cars: SENA PRO HIL BAR ALE MSCM JAR | 7 cars: SENA PRO HIL BAR ALE MSCM JAR | pass |
 
 ## Estimated
 
 - Every lap time and lap-end Time is synthetic: solved to the anchors, not measured
-- Position each lap follows from the synthetic times; the lap-1 order is the grid order
-- Lap times in between the anchors: pace + tyre wear + fuel + seeded noise
+- Position each lap follows from the synthetic times; the lap-1 order is the grid order, with the sourced lap-1 order at the front; each lap's leader and the sourced snapshots of the order and gaps are anchors, the rest of the order is estimated
+- Lap times in between the anchors: pace + tyre wear + fuel + seeded noise, the pace moved by a constant between the laps the sourced order marks
 - Fuel: 0.06s per lap of fuel on board; full tank at the start
 - Stop loss: pit-lane time - 5.0s, 35% on the in-lap
 - PitInTime is the in-lap's end; PitOutTime adds the out-lap's share of the lane time

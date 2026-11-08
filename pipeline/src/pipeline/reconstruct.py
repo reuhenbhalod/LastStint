@@ -12,6 +12,8 @@ hits every fact the sources do give:
 - each lapped car's laps behind (it crosses the line after the winner on its last lap);
 - real stops: F1DB's (1994-95) or a sourced facts file (docs/reconstruction-facts.md);
 - safety cars only where a facts file sources them (none before 1993);
+- the sourced running order (facts `lapLeaders`, `runningOrder`): who led each lap, and the
+  order and gaps at the end of a lap, where a source gives them (see `order_marks`);
 - a wet race's weather: the facts file's sourced timeline (track state per lap range) gives
   each lap's wetness, and each stint's tyre class (slick / inter / wet) is the sourced one
   where a stop or the start names it. Wet laps take wet pace by the weather model's own
@@ -49,8 +51,11 @@ SC laps).
 A projection then finds the closest laps (least squares) that keep the total exactly, every
 other lap at least FASTEST_MARGIN slower than the fastest lap, and pit losses in place
 (x = max(model + lambda, floor), lambda by bisection). Safety cars are iterated: SC laps are
-pinned at SC pace and the queue closes up, then the green laps are re-solved. An outer loop
-checks the anchors on the written frame and shrinks the noise until they hold.
+pinned at SC pace and the queue closes up, then the green laps are re-solved. A sourced
+running order is then held by marking the cars' times at the end of its laps (one convex QP
+over every sourced lap, `order_marks`) and re-solving each car's pace per segment between its
+marks. An outer loop checks the anchors on the written frame and shrinks the noise until they
+hold.
 """
 
 from __future__ import annotations
@@ -64,6 +69,8 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from scipy import sparse
+from scipy.sparse import linalg as splinalg
 
 from . import events, jolpica, wet
 from .ingest import LAP_COLUMNS, raw_snapshot_path, save_weather, track_status_path, weather_path
@@ -141,6 +148,30 @@ class SafetyCar:
     source: str
 
 
+@dataclass(frozen=True)
+class LeaderSpan:
+    """A sourced run of laps one car led (facts `lapLeaders`): it is first across the line at
+    the end of each lap start..end (official numbering)."""
+
+    driver: str
+    start: int
+    end: int
+    source: str
+
+
+@dataclass(frozen=True)
+class Snapshot:
+    """A sourced running order at the end of one lap (facts `runningOrder`): `order` holds
+    places 1, 2, ... from the front; `gaps` (driver -> s behind the car in first place at the
+    end of that lap) where the source gives them, within `tolerance` s."""
+
+    lap: int
+    order: tuple[str, ...]
+    source: str
+    gaps: tuple[tuple[str, float], ...] = ()
+    tolerance: float | None = None
+
+
 @dataclass
 class Anchors:
     race_id: str
@@ -157,6 +188,10 @@ class Anchors:
     wetness: list[float] | None = None
     weather_timeline: list[dict] = field(default_factory=list)
     curves: dict | None = None
+    # Sourced running order (facts `lapLeaders`, `runningOrder`): who led which laps, and
+    # snapshots of the order (and gaps) at the end of a lap.
+    leaders: list[LeaderSpan] = field(default_factory=list)
+    snapshots: list[Snapshot] = field(default_factory=list)
 
     def car(self, driver: str) -> Car:
         return next(c for c in self.cars if c.driver == driver)
@@ -181,6 +216,11 @@ class Params:
     sc_gap: float = 0.8  # s between cars in the SC queue
     sc_iterations: int = 12
     order_gap: float = 0.5  # s between classified cars on the same lap at the flag
+    lead_margin: float = 1.0  # s a sourced running order is held by, at the end of its lap
+    lap_gap_tolerance: float = 1.0  # a sourced gap at a lap, where the source sets none
+    order_iterations: int = 6  # rounds of `order_marks` (each a QP over the sourced laps)
+    pace_weight: float = 0.05  # `order_marks`: a segment's per-lap pace change, squared
+    pack_weight: float = 1.0  # `order_marks`: keeping the cars behind at their spacing
     gap_tolerance: float = 2.0  # lead-lap gap anchor
     attempts: int = 6  # outer loop: noise x0.7 per failed attempt
     refuel: bool | None = None  # None: by year (REFUEL_FROM)
@@ -234,6 +274,7 @@ def load_facts(race_id: str, facts_dir: Path = FACTS_DIR) -> dict | None:
             raise ValueError(f"{at} needs a driver or number")
         if r.get("gap") is not None and not (isinstance(r["gap"], int | float) and r["gap"] >= 0):
             raise ValueError(f"{at}: gap {r['gap']!r} is not seconds behind the leader")
+    check_running_order(facts, str(path))
     for i, r in enumerate(facts.get("roadPositions") or []):
         at = f"{path}: roadPositions[{i}]"
         if not str(r.get("source") or "").strip():
@@ -250,6 +291,54 @@ def load_facts(race_id: str, facts_dir: Path = FACTS_DIR) -> dict | None:
         ):
             raise ValueError(f"{at}: gap {gap!r} is not seconds behind the winner (or null)")
     return facts
+
+
+def _is_car(ref) -> bool:
+    """A car reference in a running order: a driver code (str) or a car number (int)."""
+    return (isinstance(ref, str) and bool(ref.strip())) or (
+        isinstance(ref, int) and not isinstance(ref, bool)
+    )
+
+
+def check_running_order(facts: dict, where: str) -> None:
+    """`lapLeaders` and `runningOrder` (docs/reconstruction-facts.md): every entry sourced,
+    laps 1, 2, ..., no lap led by two cars, an order of distinct cars, gaps in seconds (to
+    the car listed first, so not for it)."""
+    spans = facts.get("lapLeaders") or []
+    led: dict[int, int] = {}
+    for i, r in enumerate(spans):
+        at = f"{where}: lapLeaders[{i}]"
+        if not str(r.get("source") or "").strip():
+            raise ValueError(f"{at} has no source")
+        if not ("driver" in r or "number" in r):
+            raise ValueError(f"{at} needs a driver or number")
+        a, b = r.get("fromLap"), r.get("toLap")
+        if not (isinstance(a, int) and isinstance(b, int) and 1 <= a <= b):
+            raise ValueError(f"{at}: laps {a!r}-{b!r}")
+        for lap in range(a, b + 1):
+            if lap in led:
+                raise ValueError(f"{at}: lap {lap} is already led in lapLeaders[{led[lap]}]")
+            led[lap] = i
+    for i, r in enumerate(facts.get("runningOrder") or []):
+        at = f"{where}: runningOrder[{i}]"
+        if not str(r.get("source") or "").strip():
+            raise ValueError(f"{at} has no source")
+        if not (isinstance(r.get("lap"), int) and r["lap"] >= 1):
+            raise ValueError(f"{at}: lap {r.get('lap')!r}")
+        order = r.get("order")
+        if not (isinstance(order, list) and order and all(_is_car(x) for x in order)):
+            raise ValueError(f"{at}: order must list cars (driver codes or numbers)")
+        if len(set(map(str, order))) != len(order):
+            raise ValueError(f"{at}: a car twice in the order")
+        for key, gap in (r.get("gaps") or {}).items():
+            if key == str(order[0]):
+                raise ValueError(f"{at}: a gap for {key!r}, the car the gaps are to")
+            if isinstance(gap, bool) or not isinstance(gap, int | float) or gap < 0:
+                raise ValueError(f"{at}: gap {gap!r} for {key!r} is not seconds behind")
+        tol = r.get("gapTolerance")
+        bad = isinstance(tol, bool) or not isinstance(tol, int | float) or tol <= 0
+        if tol is not None and bad:
+            raise ValueError(f"{at}: gapTolerance {tol!r}")
 
 
 def _state_wetness(entry: dict, key: str, where: str) -> float | None:
@@ -483,6 +572,8 @@ def load_anchors(
         wetness = timeline_wetness(timeline, winner.laps)
         curves = wet.load_curves()
         notes += apply_tyres(cars, weather)
+    leaders, snapshots, why = running_order(cars, facts or {}, winner.laps)
+    notes += why
     notes += apply_road_positions(cars, (facts or {}).get("roadPositions") or [], winner)
     notes += apply_last_lap_stops(cars, (facts or {}).get("lastLapStops") or [], winner)
     incidents = DATA_DIR / "incidents.json"
@@ -503,6 +594,8 @@ def load_anchors(
         wetness=wetness,
         weather_timeline=timeline,
         curves=curves,
+        leaders=leaders,
+        snapshots=snapshots,
         sources={
             "jolpica": f"Jolpica-F1 dump {jolpica.dump_version(dump_dir)} (CC BY-NC-SA 4.0)",
             "f1db": f"F1DB {f1db_version} (CC BY 4.0), {f1db_dir.name}/{race_id}.*.csv",
@@ -519,6 +612,95 @@ def _car_for(cars: list[Car], item: dict) -> Car | None:
         return next((c for c in cars if c.driver == item["driver"]), None)
     hits = [c for c in cars if c.number == int(item["number"])]
     return hits[0] if len(hits) == 1 else None
+
+
+def _ref_car(cars: list[Car], ref) -> Car | None:
+    """A running order's car: a driver code, or a car number (int, or its digits)."""
+    if isinstance(ref, str) and not ref.isdigit():
+        return next((c for c in cars if c.driver == ref), None)
+    hits = [c for c in cars if c.number == int(ref)]
+    return hits[0] if len(hits) == 1 else None
+
+
+def running_order(
+    cars: list[Car], facts: dict, laps: int
+) -> tuple[list[LeaderSpan], list[Snapshot], list[str]]:
+    """The facts file's `lapLeaders` and `runningOrder` on the race's cars. A span or
+    snapshot past the winner's laps is cut there; a car listed on a lap it didn't complete
+    (Jolpica's laps) is a conflict between the sources, noted and left out."""
+    notes: list[str] = []
+    spans: list[LeaderSpan] = []
+    for i, r in enumerate(facts.get("lapLeaders") or []):
+        car = _car_for(cars, r)
+        if car is None:
+            raise ValueError(f"facts lapLeaders[{i}]: no car {r.get('driver', r.get('number'))}")
+        a, b = int(r["fromLap"]), min(int(r["toLap"]), laps)
+        if b < int(r["toLap"]):
+            notes.append(f"lapLeaders[{i}]: laps past the winner's {laps} cut")
+        if car.laps < b:
+            notes.append(
+                f"lapLeaders[{i}]: {car.driver} led to lap {b} but completed {car.laps} laps"
+                f" (Jolpica); laps {max(a, car.laps + 1)}-{b} left out"
+            )
+            b = car.laps
+        if a <= b:
+            spans.append(LeaderSpan(car.driver, a, b, r["source"]))
+    led = {lap: s.driver for s in spans for lap in range(s.start, s.end + 1)}
+    snaps: list[Snapshot] = []
+    for i, r in enumerate(facts.get("runningOrder") or []):
+        lap = int(r["lap"])
+        if lap > laps:
+            notes.append(f"runningOrder[{i}]: lap {lap} is past the winner's {laps}; left out")
+            continue
+        order, gaps = [], []
+        given = {str(k): float(v) for k, v in (r.get("gaps") or {}).items()}
+        for ref in r["order"]:
+            car = _ref_car(cars, ref)
+            if car is None:
+                raise ValueError(f"facts runningOrder[{i}]: no car {ref!r}")
+            if car.laps < lap:
+                notes.append(
+                    f"runningOrder[{i}]: {car.driver} listed on lap {lap} but completed"
+                    f" {car.laps} laps (Jolpica); the order is cut before it"
+                )
+                break
+            order.append(car.driver)
+        if not order:
+            continue
+        for ref, gap in given.items():
+            car = _ref_car(cars, ref)
+            if car is None:
+                raise ValueError(f"facts runningOrder[{i}]: gap for no car {ref!r}")
+            if car.laps < lap:
+                notes.append(f"runningOrder[{i}]: gap for {car.driver}, out by lap {lap}; left out")
+                continue
+            gaps.append((car.driver, gap))
+        if lap in led and led[lap] != order[0]:
+            raise ValueError(
+                f"facts runningOrder[{i}]: {order[0]} first on lap {lap}, but lapLeaders has"
+                f" {led[lap]} leading it"
+            )
+        tol = r.get("gapTolerance")
+        tol = None if tol is None else float(tol)
+        snaps.append(Snapshot(lap, tuple(order), r["source"], tuple(gaps), tol))
+    return spans, snaps, notes
+
+
+def order_rules(anchors: Anchors) -> dict[int, tuple[list[str], dict[str, float], float | None]]:
+    """Each lap with a sourced order: (the cars in places 1, 2, ... from the front, their
+    gaps to the first, the gap tolerance). A snapshot extends its lap's leader."""
+    rules: dict[int, tuple[list[str], dict[str, float], float | None]] = {}
+    for s in anchors.leaders:
+        for lap in range(s.start, s.end + 1):
+            rules[lap] = ([s.driver], {}, None)
+    for snap in anchors.snapshots:
+        prev = rules.get(snap.lap)
+        order = list(snap.order)
+        if prev and len(prev[0]) > len(order):
+            order = prev[0]
+        gaps = {**(prev[1] if prev else {}), **dict(snap.gaps)}
+        rules[snap.lap] = (order, gaps, snap.tolerance)
+    return dict(sorted(rules.items()))
 
 
 def apply_tyres(cars: list[Car], weather: dict) -> list[str]:
@@ -784,6 +966,7 @@ def noise(race_id: str, seed: int, driver: str, n: int) -> np.ndarray:
 
 
 SEARCH = (0.5, 0.75, 1.0, 1.5, 2.0, 3.0)  # noise scales tried, x the race's sigma
+PACK_LAPS = 10  # `order_marks`: a car listed this near a lap isn't held to the pack there
 
 
 @dataclass
@@ -826,12 +1009,19 @@ def fit_car(
     total: float | None,
     pins: dict[int, float],
     pace: tuple[float, float] | None = None,
+    marks: dict[int, float] | None = None,
 ) -> Fit:
     """One car's laps. With `total`, the car's pace b, wear w and noise scale are solved from
     the total and the fastest lap (a grid search over w and the noise scale, b from the
     total; see SEARCH); without, `pace` (b, w) and `sigma` give the natural laps. Pinned laps
     (lap -> s) are kept; the rest are projected to the total, never faster than the fastest
-    lap + margin."""
+    lap + margin.
+
+    `marks` (lap -> s from the start at the end of that lap) are the car's times where the
+    sourced running order puts it (`order_marks`). They cut its race into segments, and each
+    segment's free laps are projected to the segment's time on their own: the car's pace
+    moves by a constant per segment (x = max(model + lambda_k, floor)). Without a total, the
+    laps after the last mark are its natural laps."""
     n = car.laps
     z = z.copy()
     f_time, f_lap = car.fastest_time, car.fastest_lap
@@ -877,15 +1067,42 @@ def fit_car(
     x = model.copy()
     for lap, value in fixed.items():
         x[lap - 1] = value
-    if total is None:
-        total = float(x.sum())
     if not math.isfinite(floor_base):
         floor_base = 0.5 * b
-    floor = floor_base + feat.pit[free]
-    xf, ok = project(model[free], floor, total - pinned_sum)
-    x[free] = xf
-    if not len(free):
-        ok = abs(x.sum() - total) < 1e-6
+    if total is None and marks and n in marks:
+        total = float(marks[n])  # a retirement marked on its last lap (`order_marks`)
+    cuts = sorted(lap for lap in (marks or {}) if 1 <= lap < n)
+    if not cuts:
+        if total is None:
+            total = float(x.sum())
+        floor = floor_base + feat.pit[free]
+        xf, ok = project(model[free], floor, total - pinned_sum)
+        x[free] = xf
+        if not len(free):
+            ok = abs(x.sum() - total) < 1e-6
+        return Fit(x, float(b), float(w), ok, float(sigma))
+    ok = True
+    is_free = np.zeros(n, bool)
+    is_free[free] = True
+    bounds = [0, *cuts, n]
+    times = [0.0, *(float(marks[lap]) for lap in cuts)]
+    for k in range(len(bounds) - 1):
+        a, e = bounds[k], bounds[k + 1]
+        idx = np.arange(a, e)
+        fr = idx[is_free[idx]]
+        pinned_k = float(x[idx[~is_free[idx]]].sum())
+        if k < len(cuts):
+            want = times[k + 1] - times[k]
+        elif total is not None:
+            want = total - times[k]
+        else:
+            want = float(x[idx].sum())  # natural laps after the last mark
+        if not len(fr):
+            ok = ok and abs(pinned_k - want) < 1e-6
+            continue
+        xf, good = project(model[fr], floor_base + feat.pit[fr], want - pinned_k)
+        x[fr] = xf
+        ok = ok and good
     return Fit(x, float(b), float(w), ok, float(sigma))
 
 
@@ -907,6 +1124,18 @@ def grid_order(cars: list[Car]) -> list[Car]:
     """Starters in grid order, pit-lane starters (grid 0 or none) last."""
     starters = [c for c in cars if c.laps >= 1]
     return sorted(starters, key=lambda c: (not c.grid, c.grid or 0, c.position or 99))
+
+
+def lap1_order(anchors: Anchors, cars: list[Car]) -> list[Car]:
+    """The lap-1 order: the grid order, with the cars a source puts at the front at the end of
+    lap 1 (the lap-1 leader of `lapLeaders`, a lap-1 `runningOrder`) moved there."""
+    order = grid_order(cars)
+    rule = order_rules(anchors).get(1)
+    if not rule:
+        return order
+    by = {c.driver: c for c in order}
+    front = [by[d] for d in rule[0] if d in by]
+    return front + [c for c in order if c not in front]
 
 
 def _cum(x: np.ndarray) -> np.ndarray:
@@ -958,6 +1187,16 @@ def targets(
                 lapped = car.laps < anchors.laps
                 lo.append(t_win + p.order_gap)
                 hi.append(t_win + 0.75 * est_lap[car.driver] if lapped else math.inf)
+            elif natural[car.driver] > seen and anchors.leaders:
+                # A classified retirement (out of fuel near the end, say) that could only be
+                # seen stopped by running faster than its own pace, which puts it among the
+                # leaders: with a sourced running order it stops at its natural time, before
+                # the flag (its retirement event may then go unseen; reported, not core).
+                lo.append(-math.inf), hi.append(t_win - p.order_gap)
+                notes.append(
+                    f"{car.driver}: classified retirement stopped at its natural time, after"
+                    " the point a retirement is seen"
+                )
             else:
                 lo.append(-math.inf), hi.append(seen)
             if car.last_lap_gap is not None:
@@ -1126,7 +1365,7 @@ def solve(anchors: Anchors, p: Params, sigma: float | None = None) -> Solution:
     # winner's lap-1 wet multiplier on a wet race).
     first = feats[lead[0].driver]
     lap1 = (b_med + p.fuel_per_lap * first.fuel[0]) * float(first.mult[0]) + p.start_loss
-    order = grid_order(running)
+    order = lap1_order(anchors, running)
     is_wet = anchors.wetness is not None
     if is_wet:
         # A wet race: a fastest lap set on lap 1 is lap 1's real pace (the track's state on
@@ -1162,6 +1401,8 @@ def solve(anchors: Anchors, p: Params, sigma: float | None = None) -> Solution:
         for c in running
     }
 
+    marks: dict[str, dict[int, float]] = {c.driver: {} for c in running}
+
     def goals(pins: dict[str, dict[int, float]]) -> dict[str, float]:
         natural = {}
         for c in running:
@@ -1169,7 +1410,17 @@ def solve(anchors: Anchors, p: Params, sigma: float | None = None) -> Solution:
                 natural[c.driver] = c.time
                 continue
             pace = ((dry_fastest(c) or f_med) + b_off, w_med)
-            nat = fit_car(c, feats[c.driver], zs[c.driver], p, sigma, None, pins[c.driver], pace)
+            nat = fit_car(
+                c,
+                feats[c.driver],
+                zs[c.driver],
+                p,
+                sigma,
+                None,
+                pins[c.driver],
+                pace,
+                marks[c.driver],
+            )
             natural[c.driver] = float(nat.laps.sum())
         goal, why = targets(anchors, natural, est_lap, p)
         notes.extend(why)
@@ -1179,7 +1430,14 @@ def solve(anchors: Anchors, p: Params, sigma: float | None = None) -> Solution:
         out = {}
         for c in running:
             fit = fit_car(
-                c, feats[c.driver], zs[c.driver], p, sigma, goal[c.driver], pins[c.driver]
+                c,
+                feats[c.driver],
+                zs[c.driver],
+                p,
+                sigma,
+                goal[c.driver],
+                pins[c.driver],
+                marks=marks[c.driver],
             )
             if not fit.feasible and (c.time is not None or c.classified):
                 notes.append(f"{c.driver}: target {goal[c.driver]:.1f}s not reachable")
@@ -1210,20 +1468,311 @@ def solve(anchors: Anchors, p: Params, sigma: float | None = None) -> Solution:
                     f"{c.driver}: fastest lap (lap {c.fastest_lap}) in the safety car's laps"
                     f" {sc.start}-{sc.end}; kept at racing speed"
                 )
-    for _ in range(p.sc_iterations if anchors.safety_cars else 0):
-        sc, under = sc_pins(anchors, laps, feats, b_med, p)
-        pins = {d: {**grid_pins[d], **sc[d]} for d in grid_pins}
-        current["pins"] = pins
-        goal = goals(pins)
-        laps = run(pins, goal)
-        if sc_pins(anchors, laps, feats, b_med, p)[1] == under:
-            break
-    else:
+
+    def settle_sc() -> None:
+        nonlocal laps, goal, under
+        for _ in range(p.sc_iterations if anchors.safety_cars else 0):
+            sc, under = sc_pins(anchors, laps, feats, b_med, p)
+            pins = {d: {**grid_pins[d], **sc[d]} for d in grid_pins}
+            current["pins"] = pins
+            goal = goals(pins)
+            laps = run(pins, goal)
+            if sc_pins(anchors, laps, feats, b_med, p)[1] == under:
+                return
         if anchors.safety_cars:
             notes.append("the laps behind the safety car did not settle")
-    laps = _last_lap_stops(anchors, p, sigma, laps, goal, feats, zs, pins_now(), fitted)
+
+    settle_sc()
+    # The sourced running order (facts `lapLeaders`, `runningOrder`): repair the worst
+    # breach of each run of laps by marking the cars' times there, re-solve, repeat. With a
+    # safety car the SC laps are re-pinned after each round of repairs.
+    rules = {lap: r for lap, r in order_rules(anchors).items() if lap >= 2}
+    for round_ in range(3 if anchors.safety_cars else 1):
+        if not rules:
+            break
+        if round_:
+            settle_sc()  # the SC laps re-pinned on the marked laps, then the order again
+        # Each round solves from the unmarked laps (`base`), with the cars and laps of the
+        # rounds before as unknowns too and a wider window, until the order holds.
+        for d in marks:
+            marks[d] = {}
+        base_goal = goals(pins_now())
+        base = run(pins_now(), base_goal)
+        laps, goal = base, base_goal
+        for k in range(p.order_iterations):
+            if not order_breaks(rules, laps, p):
+                break
+            window = (30.0, 90.0, 300.0, math.inf)[min(k, 3)]
+            new = order_marks(anchors, base, rules, p, marks, base_goal, pins_now(), feats, window)
+            for d in marks:
+                marks[d] = new.get(d, {})
+            goal = goals(pins_now())
+            laps = run(pins_now(), goal)
+        if not anchors.safety_cars:
+            break
+    if rules and order_breaks(rules, laps, p):
+        notes.append("the sourced running order could not be held on every lap (see the report)")
+    laps = _last_lap_stops(anchors, p, sigma, laps, goal, feats, zs, pins_now(), fitted, marks)
     notes = sorted(set(notes), key=notes.index)
     return Solution(laps, feats, under, goal, sigma, notes, fitted)
+
+
+def _min_laps(car: Car, feat: Features, pins: dict[int, float], p: Params) -> np.ndarray:
+    """The fastest each of the car's laps can be in the solver: its pinned time, else the
+    fastest-lap floor plus the lap's pit loss (fit_car's floor), plus lead_margin of room."""
+    base = (car.fastest_time or 0.0) + p.fastest_margin + p.lead_margin
+    x = base + feat.pit
+    for lap, v in pins.items():
+        if 1 <= lap <= car.laps:
+            x[lap - 1] = v
+    if car.fastest_lap and 1 <= car.fastest_lap <= car.laps and car.fastest_time:
+        x[car.fastest_lap - 1] = car.fastest_time
+    return x
+
+
+def order_breaks(
+    rules: dict[int, tuple[list[str], dict[str, float], float | None]],
+    laps: dict[str, np.ndarray],
+    p: Params,
+) -> list[int]:
+    """The laps where the solved times break their sourced order (the listed cars not first,
+    in order, at the end of the lap) or a sourced gap (beyond its tolerance)."""
+    times = {d: _cum(x) for d, x in laps.items()}
+    out = []
+    for lap, (order, gaps, tol) in rules.items():
+        t = {d: float(x[lap]) for d, x in times.items() if len(x) > lap}
+        ranked = sorted(t, key=t.get)
+        have = [d for d in order if d in t]
+        bad = ranked[: len(have)] != have
+        tol = tol or p.lap_gap_tolerance
+        if have and not bad:
+            bad = any(abs(t[d] - t[have[0]] - g) > tol for d, g in gaps.items() if d in t)
+        if bad:
+            out.append(lap)
+    return out
+
+
+def _admm_qp(
+    P: sparse.csc_matrix,
+    A: sparse.csc_matrix,
+    lo: np.ndarray,
+    hi: np.ndarray,
+    iterations: int = 4000,
+) -> np.ndarray:
+    """min 1/2 x'Px s.t. lo <= Ax <= hi, by the ADMM splitting OSQP uses (one sparse LU,
+    fixed step; equality rows take a stiffer step). Converges to the least-squares point of
+    the constraints when they conflict, so a conflict shows in the anchor report."""
+    n = P.shape[0]
+    eq = np.isclose(lo, hi)
+    rho = np.where(eq, 1e3, 1.0) * 0.5
+    sigma, alpha = 1e-6, 1.6
+    K = (P + sigma * sparse.identity(n) + A.T @ sparse.diags(rho) @ A).tocsc()
+    solve_k = splinalg.factorized(K)
+    x = np.zeros(n)
+    z = np.clip(np.zeros(A.shape[0]), lo, hi)
+    y = np.zeros(A.shape[0])
+    for _ in range(iterations):
+        xt = solve_k(sigma * x + A.T @ (rho * z - y))
+        zt = A @ xt
+        x = alpha * xt + (1 - alpha) * x
+        zr = alpha * zt + (1 - alpha) * z
+        z_new = np.clip(zr + y / rho, lo, hi)
+        y = y + rho * (zr - z_new)
+        if (
+            np.max(np.abs(z_new - z), initial=0.0) < 1e-7
+            and np.max(np.abs(A @ x - z_new), initial=0.0) < 1e-6
+        ):
+            z = z_new
+            break
+        z = z_new
+    return x
+
+
+def order_marks(
+    anchors: Anchors,
+    laps: dict[str, np.ndarray],
+    rules: dict[int, tuple[list[str], dict[str, float], float | None]],
+    p: Params,
+    marks: dict[str, dict[int, float]],
+    goal: dict[str, float],
+    pins: dict[str, dict[int, float]],
+    feats: dict[str, Features],
+    window: float,
+) -> dict[str, dict[int, float]]:
+    """The cars' times at the sourced laps that hold the sourced running order, as close to
+    the current solution as least squares allows (a convex QP).
+
+    The unknowns are the times (s from the start) at the end of each sourced lap of every
+    car near the front then (listed, or within `window` s of the last car listed), plus the
+    laps the car is already marked at. The cost is the change of pace each implies: per
+    segment between two of a car's marks, (change of the segment's time)^2 / its free laps,
+    which is the sum of squares of the per-lap change fit_car makes (a constant per segment).
+    The constraints: the listed cars first, in order, lead_margin apart, every other car
+    behind them; sourced gaps within 40% of their tolerance; each segment no faster than the
+    car's floor laps (`_min_laps`); a finisher still makes its target. Returns the marks
+    (driver -> lap -> s), old ones moved where solved."""
+    times = {d: _cum(x) for d, x in laps.items()}
+    m = p.lead_margin
+    keys: dict[tuple[str, int], int] = {}
+
+    def has_target(car: Car) -> bool:
+        return car.time is not None or car.finished
+
+    def var(d: str, lap: int) -> int | None:
+        car = anchors.car(d)
+        # A finisher's last lap ends at its target, but a retirement's (whose target is its
+        # natural time inside its window, `targets`) can be marked there too.
+        if lap > car.laps or (lap == car.laps and has_target(car)):
+            return None
+        return keys.setdefault((d, lap), len(keys))
+
+    for lap, (order, _, _) in rules.items():
+        t = {d: float(x[lap]) for d, x in times.items() if len(x) > lap}
+        have = [d for d in order if d in t]
+        if not have:
+            continue
+        edge = max(t[d] for d in have) + window
+        for d in have:
+            var(d, lap)
+        for d, v in t.items():
+            if v <= edge:
+                var(d, lap)
+    for d, ms in marks.items():
+        for lap in ms:
+            if len(times.get(d, ())) > lap:
+                var(d, lap)
+    if not keys:
+        return marks
+    n = len(keys)
+    rows, cols, vals, lo, hi = [], [], [], [], []
+
+    def row(coef: dict[int, float], a: float, b: float) -> None:
+        r = len(lo)
+        for j, v in coef.items():
+            rows.append(r), cols.append(j), vals.append(v)
+        lo.append(a), hi.append(b)
+
+    def cur(d: str, lap: int) -> float:
+        return float(times[d][lap])
+
+    # The cost, as weighted squares of linear terms (cost rows): per car, each segment's
+    # per-lap pace change lambda (its change of time over its free laps), lightly, and the
+    # step in lambda from one segment to the next, strongly, so a car moved at a sourced lap
+    # takes a smooth change of pace that spreads over the laps around it.
+    cost_rows: list[tuple[dict[int, float], float]] = []
+    per_car: dict[str, list[int]] = {}
+    for d, lap in keys:
+        per_car.setdefault(d, []).append(lap)
+    for d, laps_d in per_car.items():
+        car = anchors.car(d)
+        laps_d.sort()
+        floor = _cum(_min_laps(car, feats[d], pins.get(d, {}), p))
+        fixed = sorted(pins.get(d, {}))
+        if car.fastest_lap:
+            fixed.append(car.fastest_lap)
+
+        def free(a: int, b: int, fixed=fixed) -> int:
+            return (b - a) - sum(1 for f in set(fixed) if a < f <= b)
+
+        lambdas: list[dict[int, float]] = []
+        prev = 0
+        for lap in laps_d:
+            j = keys[(d, lap)]
+            k = free(prev, lap)
+            span_floor = float(floor[lap] - floor[prev])
+            span_now = cur(d, lap) - (cur(d, prev) if prev else 0.0)
+            coef = {j: 1.0}
+            if prev:
+                coef[keys[(d, prev)]] = -1.0
+            if k == 0:
+                row(coef, 0.0, 0.0)
+            else:
+                row(coef, span_floor - span_now, math.inf)
+                lam = {i: v / k for i, v in coef.items()}
+                cost_rows.append((lam, p.pace_weight * k))
+                lambdas.append(lam)
+            prev = lap
+        if has_target(car) and d in goal and prev < car.laps:
+            j = keys[(d, prev)]
+            k = free(prev, car.laps)
+            room = goal[d] - cur(d, prev) - float(floor[car.laps] - floor[prev])
+            if k == 0:
+                row({j: 1.0}, 0.0, 0.0)
+            else:
+                row({j: 1.0}, -math.inf, room)
+                lam = {j: -1.0 / k}
+                cost_rows.append((lam, p.pace_weight * k))
+                lambdas.append(lam)
+        for l0, l1 in zip(lambdas, lambdas[1:], strict=False):
+            step = dict(l1)
+            for i, v in l0.items():
+                step[i] = step.get(i, 0.0) - v
+            cost_rows.append((step, 1.0))
+    listed = {lap: set(r[0][1:]) | set(r[1]) for lap, r in rules.items()}
+    for lap, (order, gaps, tol) in rules.items():
+        t = {d: cur(d, lap) for d in times if len(times[d]) > lap}
+        have = [d for d in order if d in t]
+        if not have:
+            continue
+
+        def before(a: str, b: str, gap: float, lap=lap, t=t) -> None:
+            ja, jb = keys.get((a, lap)), keys.get((b, lap))
+            if ja is None and jb is None:
+                return
+            coef = {}
+            if ja is not None:
+                coef[ja] = 1.0
+            if jb is not None:
+                coef[jb] = coef.get(jb, 0.0) - 1.0
+            row(coef, -math.inf, t[b] - t[a] - gap)
+
+        for a, b in zip(have, have[1:], strict=False):
+            before(a, b, m)
+        # The cars behind the listed ones keep their spacing: moving one back moves the cars
+        # behind it too (pack_weight on each change of gap between road neighbours), so a pack
+        # pushed behind a sourced leader isn't squeezed onto its tail.
+        # (Only cars no sourced order lists within PACK_LAPS laps: a car the sources place
+        # nearby follows them, not the pack.)
+        near = {
+            d for lap2 in range(lap - PACK_LAPS, lap + PACK_LAPS + 1) for d in listed.get(lap2, ())
+        }
+        pack = sorted(
+            (d for d in t if d not in have and d not in near and (d, lap) in keys), key=t.get
+        )
+        for a, b in zip(pack, pack[1:], strict=False):
+            cost_rows.append(({keys[(a, lap)]: 1.0, keys[(b, lap)]: -1.0}, p.pack_weight))
+        last = have[-1]
+        for d in t:
+            if d not in have and (d, lap) in keys:
+                before(last, d, m)
+        h = 0.4 * (tol or p.lap_gap_tolerance)
+        lead = have[0]
+        for d, g in gaps.items():
+            if d not in t or d == lead:
+                continue
+            jd, jl = keys.get((d, lap)), keys.get((lead, lap))
+            coef = {}
+            if jd is not None:
+                coef[jd] = 1.0
+            if jl is not None:
+                coef[jl] = coef.get(jl, 0.0) - 1.0
+            if coef:
+                base = t[d] - t[lead]
+                row(coef, g - h - base, g + h - base)
+    A = sparse.csc_matrix((vals, (rows, cols)), shape=(len(lo), n))
+    lr, lc, lv, lw = [], [], [], []
+    for r, (coef, w) in enumerate(cost_rows):
+        for j, v in coef.items():
+            lr.append(r), lc.append(j), lv.append(v)
+        lw.append(w)
+    L = sparse.csc_matrix((lv, (lr, lc)), shape=(len(cost_rows), n))
+    P = (2.0 * L.T @ sparse.diags(lw) @ L).tocsc()
+    P = P + 1e-4 * sparse.identity(n, format="csc")  # keeps P definite
+    dx = _admm_qp(P, A, np.array(lo, float), np.array(hi, float))
+    out: dict[str, dict[int, float]] = {d: {} for d in marks}
+    for (d, lap), j in keys.items():
+        out.setdefault(d, {})[lap] = cur(d, lap) + float(dx[j])
+    return out
 
 
 def _last_lap_stops(
@@ -1236,6 +1785,7 @@ def _last_lap_stops(
     zs: dict[str, np.ndarray],
     pins: dict[str, dict[int, float]],
     fitted: dict[str, dict],
+    marks: dict[str, dict[int, float]] | None = None,
 ) -> dict[str, np.ndarray]:
     """Refit each last-lap stop (facts `lastLapStops`) against the leader's solved laps: its
     last completed lap ends its sourced gap behind the leader's (else its target, kept after the
@@ -1256,7 +1806,16 @@ def _last_lap_stops(
     for c in stops:
         want = lead_end + c.last_lap_gap if c.last_lap_gap is not None else goal[c.driver]
         want = min(max(want, prev + p.order_gap), t_win - p.order_gap)
-        fit = fit_car(c, feats[c.driver], zs[c.driver], p, sigma, want, pins[c.driver])
+        fit = fit_car(
+            c,
+            feats[c.driver],
+            zs[c.driver],
+            p,
+            sigma,
+            want,
+            pins[c.driver],
+            marks=(marks or {}).get(c.driver),
+        )
         out[c.driver] = fit.laps
         goal[c.driver] = want
         fitted[c.driver] = {**fitted.get(c.driver, {}), "target": round(want, 3)}
@@ -1414,9 +1973,13 @@ def check_anchors(anchors: Anchors, df: pd.DataFrame, p: Params) -> list[dict]:
     timed = df[df["LapTime"].notna()]
     by_car = {d: g.sort_values("LapNumber") for d, g in timed.groupby("Driver")}
 
-    starters = [c.driver for c in grid_order(anchors.cars)]
+    starters = [c.driver for c in lap1_order(anchors, anchors.cars)]
     lap1 = timed[timed["LapNumber"] == 1].sort_values("Time")["Driver"].tolist()
-    out.append(_row("grid", "lap-1 order is the grid order", starters, lap1, lap1 == starters))
+    moved = starters != [c.driver for c in grid_order(anchors.cars)]
+    subject = "lap-1 order is the grid order" + (
+        " (the sourced lap-1 order at the front)" if moved else ""
+    )
+    out.append(_row("grid", subject, starters, lap1, lap1 == starters))
 
     # The classified cars head the road order (assemble.finishing_order): no unclassified car
     # (a disqualified one, say) ahead of them, except a disqualified car a source places on the
@@ -1516,6 +2079,46 @@ def check_anchors(anchors: Anchors, df: pd.DataFrame, p: Params) -> list[dict]:
     want_sc = sorted({n for sc in anchors.safety_cars for n in range(sc.start, sc.end + 1)})
     note = "sourced" if anchors.safety_cars_complete else "sourced (others unknown)"
     out.append(_row("safety car", f"leader's SC laps, {note}", want_sc, got_sc, got_sc == want_sc))
+    out += order_report(anchors, timed, p)
+    return out
+
+
+def order_report(anchors: Anchors, timed: pd.DataFrame, p: Params) -> list[dict]:
+    """The sourced running order on the written frame: a `leader` row per lapLeaders span
+    (the car first across the line at the end of each of its laps), a `running order` row
+    per snapshot (its places from the front) and a `lap gap` row per sourced gap."""
+    out: list[dict] = []
+    if not anchors.leaders and not anchors.snapshots:
+        return out
+    ranked = {int(lap): g.sort_values("Time") for lap, g in timed.groupby("LapNumber")}
+    first = {lap: str(g["Driver"].iloc[0]) for lap, g in ranked.items()}
+    for s in anchors.leaders:
+        want = s.end - s.start + 1
+        off = [lap for lap in range(s.start, s.end + 1) if first.get(lap) != s.driver]
+        got = f"{want - len(off)} of {want} laps" + (
+            f"; not on {', '.join(map(str, off[:8]))}{' ...' if len(off) > 8 else ''}"
+            f" ({', '.join(sorted({first.get(lap, '-') for lap in off}))} led)"
+            if off
+            else ""
+        )
+        out.append(
+            _row("leader", f"{s.driver} laps {s.start}-{s.end}", f"{want} laps", got, not off)
+        )
+    for snap in anchors.snapshots:
+        g = ranked.get(snap.lap)
+        got = [] if g is None else g["Driver"].tolist()[: len(snap.order)]
+        out.append(
+            _row("running order", f"lap {snap.lap}", list(snap.order), got, got == list(snap.order))
+        )
+        if g is None:
+            continue
+        t = dict(zip(g["Driver"], g["Time"], strict=True))
+        t0 = float(g["Time"].iloc[0])
+        tol = snap.tolerance or p.lap_gap_tolerance
+        for d, gap in snap.gaps:
+            achieved = round(float(t[d]) - t0, 3) if d in t else None
+            ok = achieved is not None and abs(achieved - gap) <= tol
+            out.append(_row("lap gap", f"{d} at lap {snap.lap} (+/-{tol:g}s)", gap, achieved, ok))
     return out
 
 
@@ -1528,7 +2131,20 @@ def summary(report: list[dict]) -> dict[str, dict[str, int]]:
     return out
 
 
-CORE = ("grid", "order", "gap", "fastest", "retirement", "laps down", "stop", "safety car", "tyre")
+CORE = (
+    "grid",
+    "order",
+    "gap",
+    "fastest",
+    "retirement",
+    "laps down",
+    "stop",
+    "safety car",
+    "tyre",
+    "leader",
+    "running order",
+    "lap gap",
+)
 
 
 def failures(report: list[dict]) -> list[dict]:
@@ -1552,8 +2168,19 @@ def estimates_in_words(anchors: Anchors, p: Params) -> list[str]:
     refuel = p.refuel if p.refuel is not None else anchors.year >= REFUEL_FROM
     words = [
         "Every lap time and lap-end Time is synthetic: solved to the anchors, not measured",
-        "Position each lap follows from the synthetic times; the lap-1 order is the grid order",
-        "Lap times in between the anchors: pace + tyre wear + fuel + seeded noise",
+        "Position each lap follows from the synthetic times; the lap-1 order is the grid order"
+        + (
+            ", with the sourced lap-1 order at the front; each lap's leader and the sourced"
+            " snapshots of the order and gaps are anchors, the rest of the order is estimated"
+            if anchors.leaders or anchors.snapshots
+            else ""
+        ),
+        "Lap times in between the anchors: pace + tyre wear + fuel + seeded noise"
+        + (
+            ", the pace moved by a constant between the laps the sourced order marks"
+            if anchors.leaders or anchors.snapshots
+            else ""
+        ),
         f"Fuel: {p.fuel_per_lap}s per lap of fuel on board;"
         + (" each stop refuels to the next stop" if refuel else " full tank at the start"),
         f"Stop loss: pit-lane time - {p.pit_bypass}s, {p.pit_in_share:.0%} on the in-lap",

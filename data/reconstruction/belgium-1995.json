@@ -12,7 +12,6 @@
   "complete": {
     "safetyCars": true
   },
-  "notes": "Stops come from F1DB (Hill's five include the lap-33 stop-and-go for pit-lane speeding). Only safety car of the race per Motor Sport's lap-by-lap and Wikipedia. Weather: tyres for F1DB's stops in weather.tyreChanges (matched by in-lap). Hill's lap-33 stop is the stop-and-go (tyres not given); the other cars' stops have no sourced tyre and are estimated.",
   "weather": {
     "timeline": [
       {
@@ -135,5 +134,78 @@
         "note": "derived: F1DB's lap-29 stop is the only one between"
       }
     ]
-  }
+  },
+  "lapLeaders": [
+    {
+      "driver": "HER",
+      "name": "Johnny Herbert",
+      "fromLap": 1,
+      "toLap": 1,
+      "source": "https://en.wikipedia.org/wiki/1995_Belgian_Grand_Prix (lap-leader chart, Template:F1Laps1995 'BEL')"
+    },
+    {
+      "driver": "ALE",
+      "name": "Jean Alesi",
+      "fromLap": 2,
+      "toLap": 3,
+      "source": "https://en.wikipedia.org/wiki/1995_Belgian_Grand_Prix (lap-leader chart, Template:F1Laps1995 'BEL')"
+    },
+    {
+      "driver": "HER",
+      "name": "Johnny Herbert",
+      "fromLap": 4,
+      "toLap": 5,
+      "source": "https://en.wikipedia.org/wiki/1995_Belgian_Grand_Prix (lap-leader chart, Template:F1Laps1995 'BEL')"
+    },
+    {
+      "driver": "COU",
+      "name": "David Coulthard",
+      "fromLap": 6,
+      "toLap": 13,
+      "source": "https://en.wikipedia.org/wiki/1995_Belgian_Grand_Prix (lap-leader chart, Template:F1Laps1995 'BEL')"
+    },
+    {
+      "driver": "HIL",
+      "name": "Damon Hill",
+      "fromLap": 14,
+      "toLap": 15,
+      "source": "https://en.wikipedia.org/wiki/1995_Belgian_Grand_Prix (lap-leader chart, Template:F1Laps1995 'BEL')"
+    },
+    {
+      "driver": "MSCM",
+      "name": "Michael Schumacher",
+      "fromLap": 16,
+      "toLap": 18,
+      "source": "https://en.wikipedia.org/wiki/1995_Belgian_Grand_Prix (lap-leader chart, Template:F1Laps1995 'BEL')"
+    },
+    {
+      "driver": "HIL",
+      "name": "Damon Hill",
+      "fromLap": 19,
+      "toLap": 21,
+      "source": "https://en.wikipedia.org/wiki/1995_Belgian_Grand_Prix (lap-leader chart, Template:F1Laps1995 'BEL')"
+    },
+    {
+      "driver": "MSCM",
+      "name": "Michael Schumacher",
+      "fromLap": 22,
+      "toLap": 23,
+      "source": "https://en.wikipedia.org/wiki/1995_Belgian_Grand_Prix (lap-leader chart, Template:F1Laps1995 'BEL')"
+    },
+    {
+      "driver": "HIL",
+      "name": "Damon Hill",
+      "fromLap": 24,
+      "toLap": 24,
+      "source": "https://en.wikipedia.org/wiki/1995_Belgian_Grand_Prix (lap-leader chart, Template:F1Laps1995 'BEL')"
+    },
+    {
+      "driver": "MSCM",
+      "name": "Michael Schumacher",
+      "fromLap": 25,
+      "toLap": 44,
+      "source": "https://en.wikipedia.org/wiki/1995_Belgian_Grand_Prix (lap-leader chart, Template:F1Laps1995 'BEL')"
+    }
+  ],
+  "notes": "Stops come from F1DB (Hill's five include the lap-33 stop-and-go for pit-lane speeding). Only safety car of the race per Motor Sport's lap-by-lap and Wikipedia. Weather: tyres for F1DB's stops in weather.tyreChanges (matched by in-lap). Hill's lap-33 stop is the stop-and-go (tyres not given); the other cars' stops have no sourced tyre and are estimated."
 }

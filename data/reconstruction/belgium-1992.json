@@ -133,7 +133,6 @@
     "stops": false,
     "safetyCars": true
   },
-  "notes": "Rain from lap 2, drying from about lap 27. Missing: Hakkinen's wet-tyre stop, Alesi's puncture stop after the La Source contact (Jolpica: 7 laps), every midfield car. Safety cars: none before 1993. Weather (step 5.x wet reconstruction): timeline and stop tyres from Motor Sport and Wikipedia; Hakkinen's wet-tyre stop (before lap 8, no lap) is still missing, so his first stint is estimated.",
   "weather": {
     "timeline": [
       {
@@ -176,5 +175,50 @@
       "tyre": "slick",
       "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement ('one by one all of the drivers pitted for wets within laps'); https://www.pitdebrief.com/?p=66602 ('all drivers deciding to start on the dry tyres')"
     }
-  }
+  },
+  "lapLeaders": [
+    {
+      "driver": "SENA",
+      "name": "Ayrton Senna",
+      "fromLap": 1,
+      "toLap": 1,
+      "source": "https://en.wikipedia.org/wiki/1992_Belgian_Grand_Prix (lap-leader chart, Template:F1Laps1992 'BEL')"
+    },
+    {
+      "driver": "MAN",
+      "name": "Nigel Mansell",
+      "fromLap": 2,
+      "toLap": 3,
+      "source": "https://en.wikipedia.org/wiki/1992_Belgian_Grand_Prix (lap-leader chart, Template:F1Laps1992 'BEL')"
+    },
+    {
+      "driver": "PAT",
+      "name": "Riccardo Patrese",
+      "fromLap": 4,
+      "toLap": 6,
+      "source": "https://en.wikipedia.org/wiki/1992_Belgian_Grand_Prix (lap-leader chart, Template:F1Laps1992 'BEL')"
+    },
+    {
+      "driver": "SENA",
+      "name": "Ayrton Senna",
+      "fromLap": 7,
+      "toLap": 10,
+      "source": "https://en.wikipedia.org/wiki/1992_Belgian_Grand_Prix (lap-leader chart, Template:F1Laps1992 'BEL')"
+    },
+    {
+      "driver": "MAN",
+      "name": "Nigel Mansell",
+      "fromLap": 11,
+      "toLap": 33,
+      "source": "https://en.wikipedia.org/wiki/1992_Belgian_Grand_Prix (lap-leader chart, Template:F1Laps1992 'BEL')"
+    },
+    {
+      "driver": "MSCM",
+      "name": "Michael Schumacher",
+      "fromLap": 34,
+      "toLap": 44,
+      "source": "https://en.wikipedia.org/wiki/1992_Belgian_Grand_Prix (lap-leader chart, Template:F1Laps1992 'BEL')"
+    }
+  ],
+  "notes": "Rain from lap 2, drying from about lap 27. Missing: Hakkinen's wet-tyre stop, Alesi's puncture stop after the La Source contact (Jolpica: 7 laps), every midfield car. Safety cars: none before 1993. Weather (step 5.x wet reconstruction): timeline and stop tyres from Motor Sport and Wikipedia; Hakkinen's wet-tyre stop (before lap 8, no lap) is still missing, so his first stint is estimated."
 }

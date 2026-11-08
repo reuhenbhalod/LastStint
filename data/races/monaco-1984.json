@@ -14,14 +14,14 @@
     "pitLossUnderSC": 11.0,
     "pitLossUnderVSC": 13.8,
     "pitLossDeviations": [],
-    "overtakeDifficulty": 0.625,
+    "overtakeDifficulty": 0.6162,
     "overtakeModel": {
-      "intercept": 0.3733,
-      "paceCoef": 1.0914,
-      "gapCoef": -1.3775
+      "intercept": 0.8012,
+      "paceCoef": 0.7576,
+      "gapCoef": -1.8695
     },
     "dirtyAirPenalty": 0.0,
-    "greenLapTime": 119.589
+    "greenLapTime": 119.861
   },
   "compounds": {
     "MEDIUM": {
@@ -47,10 +47,10 @@
       "team": "Ferrari",
       "basePace": 88.821,
       "noise": 1.05,
-      "wetPace": -0.0034,
+      "wetPace": -0.0036,
       "stateAtTakeover": {
         "position": 11,
-        "gapAhead": 3.185,
+        "gapAhead": 2.723,
         "compound": "WET",
         "tyreAge": 12,
         "compoundsUsed": [
@@ -64,10 +64,10 @@
       "team": "Ferrari",
       "basePace": 86.532,
       "noise": 0.7,
-      "wetPace": -0.0011,
+      "wetPace": 0.0008,
       "stateAtTakeover": {
-        "position": 4,
-        "gapAhead": 2.893,
+        "position": 5,
+        "gapAhead": 0.926,
         "compound": "WET",
         "tyreAge": 12,
         "compoundsUsed": [
@@ -81,10 +81,10 @@
       "team": "Tyrrell",
       "basePace": 85.49,
       "noise": 0.35,
-      "wetPace": 0.0071,
+      "wetPace": 0.0073,
       "stateAtTakeover": {
-        "position": 3,
-        "gapAhead": 3.777,
+        "position": 4,
+        "gapAhead": 1.167,
         "compound": "WET",
         "tyreAge": 12,
         "compoundsUsed": [
@@ -98,10 +98,10 @@
       "team": "Team Lotus",
       "basePace": 86.766,
       "noise": 1.05,
-      "wetPace": -0.0006,
+      "wetPace": 0.0002,
       "stateAtTakeover": {
         "position": 7,
-        "gapAhead": 0.96,
+        "gapAhead": 0.495,
         "compound": "WET",
         "tyreAge": 12,
         "compoundsUsed": [
@@ -115,10 +115,10 @@
       "team": "Osella",
       "basePace": 86.016,
       "noise": 1.05,
-      "wetPace": 0.035,
+      "wetPace": 0.0346,
       "stateAtTakeover": {
         "position": 9,
-        "gapAhead": 0.848,
+        "gapAhead": 0.718,
         "compound": "WET",
         "tyreAge": 12,
         "compoundsUsed": [
@@ -130,12 +130,12 @@
     {
       "code": "HES",
       "team": "Ligier",
-      "basePace": 89.957,
+      "basePace": 89.691,
       "noise": 1.05,
-      "wetPace": 0.0007,
+      "wetPace": 0.0021,
       "stateAtTakeover": {
         "position": 15,
-        "gapAhead": 8.979,
+        "gapAhead": 7.726,
         "compound": "WET",
         "tyreAge": 12,
         "compoundsUsed": [
@@ -149,10 +149,10 @@
       "team": "Williams",
       "basePace": 89.023,
       "noise": 1.05,
-      "wetPace": -0.007,
+      "wetPace": -0.0054,
       "stateAtTakeover": {
         "position": 12,
-        "gapAhead": 9.054,
+        "gapAhead": 7.602,
         "compound": "WET",
         "tyreAge": 12,
         "compoundsUsed": [
@@ -164,12 +164,12 @@
     {
       "code": "LAU",
       "team": "McLaren",
-      "basePace": 88.25,
+      "basePace": 88.356,
       "noise": 1.05,
-      "wetPace": -0.0016,
+      "wetPace": -0.0017,
       "stateAtTakeover": {
         "position": 10,
-        "gapAhead": 11.912,
+        "gapAhead": 11.732,
         "compound": "WET",
         "tyreAge": 12,
         "compoundsUsed": [
@@ -181,12 +181,12 @@
     {
       "code": "MAN",
       "team": "Team Lotus",
-      "basePace": 86.742,
+      "basePace": 85.665,
       "noise": 1.05,
-      "wetPace": 0.0002,
+      "wetPace": -0.0017,
       "stateAtTakeover": {
-        "position": 5,
-        "gapAhead": 7.816,
+        "position": 1,
+        "gapAhead": 0.0,
         "compound": "WET",
         "tyreAge": 12,
         "compoundsUsed": [
@@ -198,12 +198,12 @@
     {
       "code": "PAT",
       "team": "Alfa Romeo",
-      "basePace": 89.469,
+      "basePace": 89.41,
       "noise": 1.05,
-      "wetPace": -0.0036,
+      "wetPace": -0.0037,
       "stateAtTakeover": {
         "position": 14,
-        "gapAhead": 7.128,
+        "gapAhead": 6.733,
         "compound": "WET",
         "tyreAge": 12,
         "compoundsUsed": [
@@ -215,12 +215,12 @@
     {
       "code": "PIQN",
       "team": "Brabham",
-      "basePace": 89.873,
+      "basePace": 89.783,
       "noise": 1.05,
-      "wetPace": -0.0092,
+      "wetPace": -0.0085,
       "stateAtTakeover": {
         "position": 13,
-        "gapAhead": 2.862,
+        "gapAhead": 3.351,
         "compound": "WET",
         "tyreAge": 12,
         "compoundsUsed": [
@@ -234,10 +234,10 @@
       "team": "McLaren",
       "basePace": 85.538,
       "noise": 0.7,
-      "wetPace": 0.0029,
+      "wetPace": 0.0022,
       "stateAtTakeover": {
-        "position": 1,
-        "gapAhead": 0.0,
+        "position": 2,
+        "gapAhead": 0.998,
         "compound": "WET",
         "tyreAge": 12,
         "compoundsUsed": [
@@ -251,10 +251,10 @@
       "team": "Williams",
       "basePace": 86.741,
       "noise": 0.7,
-      "wetPace": -0.0032,
+      "wetPace": -0.0044,
       "stateAtTakeover": {
         "position": 6,
-        "gapAhead": 0.999,
+        "gapAhead": 7.633,
         "compound": "WET",
         "tyreAge": 12,
         "compoundsUsed": [
@@ -268,10 +268,10 @@
       "team": "Toleman",
       "basePace": 85.588,
       "noise": 1.05,
-      "wetPace": 0.0036,
+      "wetPace": 0.0024,
       "stateAtTakeover": {
-        "position": 2,
-        "gapAhead": 9.324,
+        "position": 3,
+        "gapAhead": 6.088,
         "compound": "WET",
         "tyreAge": 12,
         "compoundsUsed": [
@@ -283,12 +283,12 @@
     {
       "code": "WINM",
       "team": "ATS",
-      "basePace": 87.412,
+      "basePace": 87.552,
       "noise": 1.05,
-      "wetPace": -0.0032,
+      "wetPace": -0.0017,
       "stateAtTakeover": {
         "position": 8,
-        "gapAhead": 6.694,
+        "gapAhead": 6.46,
         "compound": "WET",
         "tyreAge": 12,
         "compoundsUsed": [
@@ -312,12 +312,12 @@
     {
       "lap": 15,
       "type": "RETIREMENT",
-      "driver": "PIQN"
+      "driver": "MAN"
     },
     {
-      "lap": 16,
+      "lap": 15,
       "type": "RETIREMENT",
-      "driver": "MAN"
+      "driver": "PIQN"
     },
     {
       "lap": 23,
@@ -330,7 +330,7 @@
       "driver": "LAU"
     },
     {
-      "lap": 26,
+      "lap": 25,
       "type": "RETIREMENT",
       "driver": "PAT"
     }
@@ -564,36 +564,36 @@
       }
     },
     "wetness": [
-      0.65,
-      0.65,
-      0.65,
-      0.66,
-      0.65,
-      0.66,
-      0.65,
-      0.66,
-      0.66,
-      0.65,
-      0.65,
-      0.65,
-      0.66,
-      0.66,
-      0.66,
-      0.65,
-      0.66,
-      0.66,
-      0.65,
-      0.66,
-      0.66,
+      0.64,
+      0.64,
+      0.64,
       0.64,
       0.65,
       0.65,
       0.65,
       0.66,
       0.66,
+      0.66,
+      0.68,
+      0.68,
+      0.67,
       0.67,
       0.66,
       0.65,
+      0.66,
+      0.66,
+      0.64,
+      0.66,
+      0.65,
+      0.64,
+      0.66,
+      0.64,
+      0.64,
+      0.66,
+      0.65,
+      0.67,
+      0.66,
+      0.64,
       0.66
     ]
   },

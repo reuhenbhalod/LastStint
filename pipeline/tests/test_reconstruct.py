@@ -656,3 +656,148 @@ def test_a_wet_race_car_out_on_lap_one_keeps_its_start_tyre():
     df = rc.reconstruct(a).laps
     (row,) = df[df["Driver"] == "III"].itertuples()
     assert row.Compound == "WET" and pd.isna(row.LapTime)
+
+
+# --- The sourced running order (facts lapLeaders, runningOrder) ------------------------------
+
+
+def _with_order(leaders=(), snaps=()) -> rc.Anchors:
+    """The toy race with a sourced running order: leaders (driver, from, to), snapshots
+    (lap, order, gaps, tolerance)."""
+    a = toy()
+    a.leaders = [rc.LeaderSpan(d, s, e, SRC) for d, s, e in leaders]
+    a.snapshots = [
+        rc.Snapshot(lap, tuple(order), SRC, tuple(gaps.items()), tol)
+        for lap, order, gaps, tol in snaps
+    ]
+    return a
+
+
+def _leader_by_lap(res: rc.Result) -> dict[int, str]:
+    timed = res.laps[res.laps["LapTime"].notna()]
+    lead = timed[timed["Position"] == 1]
+    return {int(n): str(d) for n, d in zip(lead["LapNumber"], lead["Driver"], strict=True)}
+
+
+def test_sourced_lap_leaders_hold_against_the_natural_pace():
+    """CCC, third at the flag 40 s down, leads laps 2-5; BBB (second) to lap 30, then AAA."""
+    spans = [("BBB", 1, 1), ("CCC", 2, 5), ("BBB", 6, 30), ("AAA", 31, 50)]
+    res = rc.reconstruct(_with_order(leaders=spans))
+    assert rc.failures(res.sidecar["anchors"]) == []
+    lead = _leader_by_lap(res)
+    for d, a, b in spans:
+        assert {lead[n] for n in range(a, b + 1)} == {d}
+    rows = [r for r in res.sidecar["anchors"] if r["anchor"] == "leader"]
+    assert [r["subject"] for r in rows] == [
+        "BBB laps 1-1",
+        "CCC laps 2-5",
+        "BBB laps 6-30",
+        "AAA laps 31-50",
+    ]
+    assert all(r["pass"] for r in rows)
+    # The lead-lap anchors still hold exactly (the order is held by pace per segment).
+    assert all(r["pass"] for r in res.sidecar["anchors"] if r["anchor"] in ("gap", "order"))
+
+
+def test_a_running_order_snapshot_and_its_gap_hold():
+    snaps = [(30, ["CCC", "AAA", "BBB"], {"AAA": 3.0}, 1.0)]
+    res = rc.reconstruct(_with_order(snaps=snaps))
+    assert rc.failures(res.sidecar["anchors"]) == []
+    timed = res.laps[res.laps["LapTime"].notna()]
+    at = timed[timed["LapNumber"] == 30].sort_values("Time")
+    assert at["Driver"].tolist()[:3] == ["CCC", "AAA", "BBB"]
+    gap = float(at["Time"].iloc[1] - at["Time"].iloc[0])
+    assert gap == pytest.approx(3.0, abs=1.0)
+    (row,) = [r for r in res.sidecar["anchors"] if r["anchor"] == "lap gap"]
+    assert row["subject"].startswith("AAA at lap 30") and row["pass"]
+
+
+def test_a_sourced_lap_one_leader_moves_to_the_front_of_the_grid_order():
+    res = rc.reconstruct(_with_order(leaders=[("CCC", 1, 1)]))
+    (grid,) = [r for r in res.sidecar["anchors"] if r["anchor"] == "grid"]
+    assert grid["pass"] and "sourced lap-1 order" in grid["subject"]
+    assert grid["target"][:4] == ["CCC", "BBB", "AAA", "DDD"]
+
+
+def test_no_sourced_order_leaves_the_solution_alone(solved):
+    """A race with no lapLeaders or runningOrder has no order rows and the same laps."""
+    assert not [r for r in solved.sidecar["anchors"] if r["anchor"] in ("leader", "lap gap")]
+    again = rc.reconstruct(_with_order())
+    pd.testing.assert_frame_equal(solved.laps, again.laps)
+
+
+def test_segment_marks_keep_the_total_and_floors():
+    car = toy().car("AAA")
+    feat = rc.features(car, 50, False, 24.0, rc.Params())
+    z = rc.noise("toy", 0, "AAA", car.laps)
+    fit = rc.fit_car(car, feat, z, rc.Params(), 0.35, car.time, {1: 95.0}, marks={20: 1810.0})
+    assert fit.laps.sum() == pytest.approx(car.time)
+    assert fit.feasible and fit.laps[:20].sum() == pytest.approx(1810.0)
+    assert fit.laps[0] == pytest.approx(95.0)
+    others = np.delete(fit.laps, [0, car.fastest_lap - 1])
+    assert (others >= car.fastest_time + rc.Params().fastest_margin - 1e-9).all()
+
+
+@pytest.mark.parametrize(
+    "facts, why",
+    [
+        ({"lapLeaders": [{"driver": "X", "fromLap": 1, "toLap": 3}]}, "no source"),
+        (
+            {
+                "lapLeaders": [
+                    {"driver": "X", "fromLap": 1, "toLap": 3, "source": "s"},
+                    {"driver": "Y", "fromLap": 3, "toLap": 5, "source": "s"},
+                ]
+            },
+            "already led",
+        ),
+        ({"lapLeaders": [{"driver": "X", "fromLap": 4, "toLap": 3, "source": "s"}]}, "laps"),
+        ({"lapLeaders": [{"fromLap": 1, "toLap": 3, "source": "s"}]}, "driver or number"),
+        ({"runningOrder": [{"lap": 3, "order": ["X", "X"], "source": "s"}]}, "twice"),
+        ({"runningOrder": [{"lap": 0, "order": ["X"], "source": "s"}]}, "lap 0"),
+        ({"runningOrder": [{"lap": 3, "order": [], "source": "s"}]}, "must list cars"),
+        ({"runningOrder": [{"lap": 3, "order": ["X"]}]}, "no source"),
+        (
+            {"runningOrder": [{"lap": 3, "order": ["X", "Y"], "gaps": {"X": 1.0}, "source": "s"}]},
+            "the car the gaps are to",
+        ),
+        (
+            {"runningOrder": [{"lap": 3, "order": ["X"], "gaps": {"Y": -1}, "source": "s"}]},
+            "not seconds",
+        ),
+        (
+            {"runningOrder": [{"lap": 3, "order": ["X"], "gapTolerance": 0, "source": "s"}]},
+            "gapTolerance",
+        ),
+    ],
+)
+def test_running_order_facts_are_checked(tmp_path, facts, why):
+    with pytest.raises(ValueError, match=why):
+        rc.load_facts("monaco-1988", _facts(tmp_path, "monaco-1988", facts))
+
+
+def test_running_order_on_the_cars():
+    cars = toy().cars
+    facts = {
+        "lapLeaders": [
+            {"driver": "BBB", "fromLap": 1, "toLap": 30, "source": "a"},
+            {"driver": "HHH", "fromLap": 31, "toLap": 60, "source": "b"},
+        ],
+        "runningOrder": [
+            {"lap": 5, "order": ["BBB", "AAA", "HHH"], "gaps": {"AAA": 1.5}, "source": "c"},
+            {"lap": 12, "order": ["BBB", "HHH", "AAA"], "source": "d"},
+        ],
+    }
+    spans, snaps, notes = rc.running_order(cars, facts, 50)
+    # HHH completed 10 laps: its span is a conflict with Jolpica, left out (and noted).
+    assert spans == [rc.LeaderSpan("BBB", 1, 30, "a")]
+    assert snaps[0] == rc.Snapshot(5, ("BBB", "AAA", "HHH"), "c", (("AAA", 1.5),), None)
+    assert snaps[1].order == ("BBB",)  # cut before HHH, out by lap 12
+    assert any("laps past the winner" in n for n in notes)
+    assert any("HHH led to lap 50 but completed 10" in n for n in notes)
+    bad = {
+        "lapLeaders": facts["lapLeaders"][:1],
+        "runningOrder": [{"lap": 5, "order": ["AAA"], "source": "e"}],
+    }
+    with pytest.raises(ValueError, match="lapLeaders has BBB leading it"):
+        rc.running_order(cars, bad, 50)

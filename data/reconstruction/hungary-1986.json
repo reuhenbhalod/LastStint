@@ -71,5 +71,76 @@
     "stops": false,
     "safetyCars": true
   },
+  "lapLeaders": [
+    {
+      "driver": "SENA",
+      "name": "Ayrton Senna",
+      "fromLap": 1,
+      "toLap": 11,
+      "source": "https://en.wikipedia.org/wiki/1986_Hungarian_Grand_Prix (lap-leader chart, Template:F1Laps1986 'HUN')"
+    },
+    {
+      "driver": "PIQN",
+      "name": "Nelson Piquet",
+      "fromLap": 12,
+      "toLap": 35,
+      "source": "https://en.wikipedia.org/wiki/1986_Hungarian_Grand_Prix (lap-leader chart, Template:F1Laps1986 'HUN')"
+    },
+    {
+      "driver": "SENA",
+      "name": "Ayrton Senna",
+      "fromLap": 36,
+      "toLap": 56,
+      "source": "https://en.wikipedia.org/wiki/1986_Hungarian_Grand_Prix (lap-leader chart, Template:F1Laps1986 'HUN')"
+    },
+    {
+      "driver": "PIQN",
+      "name": "Nelson Piquet",
+      "fromLap": 57,
+      "toLap": 76,
+      "source": "https://en.wikipedia.org/wiki/1986_Hungarian_Grand_Prix (lap-leader chart, Template:F1Laps1986 'HUN')"
+    }
+  ],
+  "runningOrder": [
+    {
+      "lap": 2,
+      "order": [
+        "SENA",
+        "MAN"
+      ],
+      "source": "https://www.motorsportmagazine.com/archive/article/september-1986/61/formula-one-hungarian-grand-prix-2/: 'Mansell held second place for the first couple of laps, but Piquet went by on lap three'"
+    },
+    {
+      "lap": 3,
+      "order": [
+        "SENA",
+        "PIQN",
+        "MAN"
+      ],
+      "source": "https://www.motorsportmagazine.com/archive/article/september-1986/61/formula-one-hungarian-grand-prix-2/: 'Mansell held second place for the first couple of laps, but Piquet went by on lap three'"
+    },
+    {
+      "lap": 29,
+      "order": [
+        "PIQN",
+        "SENA",
+        "MAN"
+      ],
+      "source": "https://www.motorsportmagazine.com/archive/article/september-1986/61/formula-one-hungarian-grand-prix-2/: Mansell 'made the first of two tyre stops at the end of lap 28, resuming in third place but over a minute behind the leading duo'",
+      "note": "third on his out-lap, lap 29; Piquet leads laps 12-35 (lap chart)"
+    },
+    {
+      "lap": 53,
+      "order": [
+        "SENA",
+        "PIQN"
+      ],
+      "gaps": {
+        "PIQN": 1.1
+      },
+      "gapTolerance": 0.7,
+      "source": "https://www.motorsportmagazine.com/archive/article/september-1986/61/formula-one-hungarian-grand-prix-2/: Piquet 'reduced the margin to a mere 1.1 secs by lap 53'"
+    }
+  ],
   "notes": "Motor Sport Sep 1986 race report ('By the banks of the Danube'). Missing: Rosberg's second stop, Johansson's other stop, every midfield stop. Race ended at 76 laps on the two-hour limit."
 }

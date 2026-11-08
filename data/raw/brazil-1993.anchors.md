@@ -14,15 +14,17 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 | stop | 18 | 18 |
 | tyre | 38 | 38 |
 | safety car | 1 | 1 |
+| leader | 3 | 3 |
+| running order | 1 | 1 |
 
 | Anchor | Subject | Target | Achieved | Pass |
 |---|---|---|---|---|
 | grid | lap-1 order is the grid order | 21 cars: PRO HIL SENA MSCM PAT JAR WEN ALE BLU ALL HER BAR ZAN COM WAR SUZ FITC BAD KAT DEC ALBM | 21 cars: PRO HIL SENA MSCM PAT JAR WEN ALE BLU ALL HER BAR ZAN COM WAR SUZ FITC BAD KAT DEC ALBM | pass |
 | order | classification | 12 cars: SENA HIL MSCM HER BLU ZAN ALL ALE WAR COM ALBM BAD | 12 cars: SENA HIL MSCM HER BLU ZAN ALL ALE WAR COM ALBM BAD | pass |
-| gap | HIL | 16.625 | 16.623 | pass |
-| gap | MSCM | 45.436 | 45.436 | pass |
-| gap | HER | 46.557 | 46.558 | pass |
-| gap | BLU | 52.127 | 52.126 | pass |
+| gap | HIL | 16.625 | 16.629 | pass |
+| gap | MSCM | 45.436 | 45.439 | pass |
+| gap | HER | 46.557 | 46.555 | pass |
+| gap | BLU | 52.127 | 52.133 | pass |
 | fastest | SENA | [80.187, 59] | [80.187, 59] | pass |
 | fastest | HIL | [80.794, 53] | [80.794, 53] | pass |
 | fastest | MSCM | [80.024, 61] | [80.024, 61] | pass |
@@ -134,12 +136,16 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 | tyre | BAR stint 1 | slick | ["None"] | pass |
 | tyre | PAT stint 1 | slick | ["None"] | pass |
 | safety car | leader's SC laps, sourced | 7 cars: 30 31 32 33 34 35 36 | 7 cars: 30 31 32 33 34 35 36 | pass |
+| leader | PRO laps 1-29 | 29 laps | 29 of 29 laps | pass |
+| leader | HIL laps 30-41 | 12 laps | 12 of 12 laps | pass |
+| leader | SENA laps 42-71 | 30 laps | 30 of 30 laps | pass |
+| running order | lap 11 | ["PRO", "HIL", "SENA"] | ["PRO", "HIL", "SENA"] | pass |
 
 ## Estimated
 
 - Every lap time and lap-end Time is synthetic: solved to the anchors, not measured
-- Position each lap follows from the synthetic times; the lap-1 order is the grid order
-- Lap times in between the anchors: pace + tyre wear + fuel + seeded noise
+- Position each lap follows from the synthetic times; the lap-1 order is the grid order, with the sourced lap-1 order at the front; each lap's leader and the sourced snapshots of the order and gaps are anchors, the rest of the order is estimated
+- Lap times in between the anchors: pace + tyre wear + fuel + seeded noise, the pace moved by a constant between the laps the sourced order marks
 - Fuel: 0.06s per lap of fuel on board; full tank at the start
 - Stop loss: pit-lane time - 5.0s, 35% on the in-lap
 - PitInTime is the in-lap's end; PitOutTime adds the out-lap's share of the lane time
@@ -151,3 +157,22 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 ## Notes
 
 - the laps behind the safety car did not settle
+- HIL: target 6692.1s not reachable
+- SENA: target 6675.5s not reachable
+- MSCM: target 6720.9s not reachable
+- HER: target 6722.0s not reachable
+- BLU: target 6727.6s not reachable
+- ZAN: target 6692.0s not reachable
+- ALL: target 6708.0s not reachable
+- ALE: target 6724.0s not reachable
+- WAR: target 6697.5s not reachable
+- COM: target 6719.0s not reachable
+- ALBM: target 6697.6s not reachable
+- BAD: target 6719.2s not reachable
+- ZAN: target 6676.0s not reachable
+- ALL: target 6676.5s not reachable
+- ALE: target 6677.0s not reachable
+- WAR: target 6676.0s not reachable
+- COM: target 6676.5s not reachable
+- ALBM: target 6676.0s not reachable
+- BAD: target 6676.5s not reachable

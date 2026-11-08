@@ -13,8 +13,8 @@
  },
  "estimates": [
   "Every lap time and lap-end Time is synthetic: solved to the anchors, not measured",
-  "Position each lap follows from the synthetic times; the lap-1 order is the grid order",
-  "Lap times in between the anchors: pace + tyre wear + fuel + seeded noise",
+  "Position each lap follows from the synthetic times; the lap-1 order is the grid order, with the sourced lap-1 order at the front; each lap's leader and the sourced snapshots of the order and gaps are anchors, the rest of the order is estimated",
+  "Lap times in between the anchors: pace + tyre wear + fuel + seeded noise, the pace moved by a constant between the laps the sourced order marks",
   "Fuel: 0.06s per lap of fuel on board; full tank at the start",
   "Stop loss: pit-lane time - 5.0s, 35% on the in-lap",
   "PitInTime is the in-lap's end; PitOutTime adds the out-lap's share of the lane time",
@@ -51,6 +51,7 @@
   "GAC"
  ],
  "roadPositions": [],
+ "lastLapStops": [],
  "stopsComplete": false,
  "safetyCarsComplete": true,
  "params": {
@@ -69,6 +70,11 @@
   "sc_gap": 0.8,
   "sc_iterations": 12,
   "order_gap": 0.5,
+  "lead_margin": 1.0,
+  "lap_gap_tolerance": 1.0,
+  "order_iterations": 6,
+  "pace_weight": 0.05,
+  "pack_weight": 1.0,
   "gap_tolerance": 2.0,
   "attempts": 6,
   "refuel": null
@@ -86,7 +92,7 @@
    "target": 5770.721
   },
   "MAN": {
-   "pace": 109.716,
+   "pace": 109.704,
    "wear": 0.0,
    "noise": 0.175,
    "target": 5807.316
@@ -104,7 +110,7 @@
    "target": 5816.78
   },
   "SENA": {
-   "pace": 110.309,
+   "pace": 110.321,
    "wear": 0.25,
    "noise": 0.175,
    "target": 5839.09
@@ -122,100 +128,100 @@
    "target": 5868.958
   },
   "DEC": {
-   "pace": 112.643,
+   "pace": 112.374,
    "wear": 0.25,
    "noise": 1.05,
-   "target": 5864.738
+   "target": 5851.595
   },
   "SUZ": {
-   "pace": 112.489,
+   "pace": 112.376,
    "wear": 0.25,
-   "noise": 0.35,
-   "target": 5867.366
+   "noise": 0.525,
+   "target": 5862.169
   },
   "VANE": {
-   "pace": 112.646,
+   "pace": 112.539,
    "wear": 0.25,
    "noise": 0.175,
-   "target": 5867.866
+   "target": 5862.669
   },
   "WEN": {
-   "pace": 112.644,
+   "pace": 112.538,
    "wear": 0.25,
    "noise": 0.175,
-   "target": 5868.366
+   "target": 5863.169
   },
   "NASE": {
-   "pace": 112.541,
+   "pace": 112.411,
    "wear": 0.25,
    "noise": 0.175,
-   "target": 5869.994
+   "target": 5863.669
   },
   "HER": {
-   "pace": 114.002,
+   "pace": 113.871,
    "wear": 0.0,
    "noise": 0.175,
-   "target": 5870.494
+   "target": 5864.169
   },
   "GUG": {
-   "pace": 114.359,
+   "pace": 114.259,
    "wear": 0.25,
    "noise": 0.175,
-   "target": 5841.282
+   "target": 5836.529
   },
   "MOD": {
-   "pace": 114.777,
+   "pace": 114.727,
    "wear": 0.25,
    "noise": 0.175,
-   "target": 5858.973
+   "target": 5856.596
   },
   "MOR": {
-   "pace": 114.597,
+   "pace": 114.547,
    "wear": 0.25,
    "noise": 0.7,
-   "target": 5859.473
+   "target": 5857.096
   },
   "KAT": {
-   "pace": 114.723,
+   "pace": 114.674,
    "wear": 0.25,
    "noise": 0.35,
-   "target": 5859.973
+   "target": 5857.596
   },
   "GAC": {
-   "pace": 111.303,
+   "pace": 111.002,
    "wear": 0.25,
    "noise": 0.175,
-   "target": 5459.961
+   "target": 5446.218
   },
   "BOUT": {
-   "pace": 105.299,
+   "pace": 106.226,
    "wear": 0.0,
-   "noise": 0.175,
-   "target": 3693.515
+   "noise": 0.525,
+   "target": 3724.52
   },
   "CAP": {
-   "pace": 105.474,
+   "pace": 106.479,
    "wear": 0.0,
    "noise": 0.175,
-   "target": 3426.636
+   "target": 3456.11
   },
   "TAR": {
-   "pace": 105.433,
+   "pace": 106.457,
    "wear": 0.0,
    "noise": 0.175,
-   "target": 3425.076
+   "target": 3455.111
   },
   "ALBM": {
-   "pace": 105.706,
+   "pace": 106.814,
    "wear": 0.0,
    "noise": 0.175,
-   "target": 2744.935
+   "target": 2770.317
   },
   "ALE": {
-   "pace": 123.419,
+   "pace": 124.021,
    "wear": 0.0,
    "noise": 0.175,
-   "target": 1081.568
+   "target": 1085.995
   },
   "GROO": {
    "pace": 143.952,
@@ -264,15 +270,19 @@
   "safety car": {
    "pass": 1,
    "total": 1
+  },
+  "leader": {
+   "pass": 6,
+   "total": 6
   }
  },
  "anchors": [
   {
    "anchor": "grid",
-   "subject": "lap-1 order is the grid order",
+   "subject": "lap-1 order is the grid order (the sourced lap-1 order at the front)",
    "target": [
-    "MAN",
     "SENA",
+    "MAN",
     "MSCM",
     "PAT",
     "ALE",
@@ -297,8 +307,8 @@
     "KAT"
    ],
    "achieved": [
-    "MAN",
     "SENA",
+    "MAN",
     "MSCM",
     "PAT",
     "ALE",
@@ -373,14 +383,14 @@
    "anchor": "gap",
    "subject": "MAN",
    "target": 36.595,
-   "achieved": 36.594,
+   "achieved": 36.592,
    "pass": true
   },
   {
    "anchor": "gap",
    "subject": "PAT",
    "target": 43.897,
-   "achieved": 43.893,
+   "achieved": 43.897,
    "pass": true
   },
   {
@@ -401,7 +411,7 @@
    "anchor": "gap",
    "subject": "HAK",
    "target": 70.03,
-   "achieved": 70.028,
+   "achieved": 70.029,
    "pass": true
   },
   {
@@ -1372,11 +1382,54 @@
    "target": [],
    "achieved": [],
    "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "SENA laps 1-1",
+   "target": "1 laps",
+   "achieved": "1 of 1 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "MAN laps 2-3",
+   "target": "2 laps",
+   "achieved": "2 of 2 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "PAT laps 4-6",
+   "target": "3 laps",
+   "achieved": "3 of 3 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "SENA laps 7-10",
+   "target": "4 laps",
+   "achieved": "4 of 4 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "MAN laps 11-33",
+   "target": "23 laps",
+   "achieved": "23 of 23 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "MSCM laps 34-44",
+   "target": "11 laps",
+   "achieved": "11 of 11 laps",
+   "pass": true
   }
  ],
  "notes": [
   "ALE: fastest lap on lap 1, its lap-1 time is the fastest lap's",
   "GROO: fastest lap on lap 1, its lap-1 time is the fastest lap's",
+  "HER: classified retirement stopped at its natural time, after the point a retirement is seen",
   "HER: no time fits both its classification and its window"
  ],
  "weather": {

@@ -13,8 +13,8 @@
  },
  "estimates": [
   "Every lap time and lap-end Time is synthetic: solved to the anchors, not measured",
-  "Position each lap follows from the synthetic times; the lap-1 order is the grid order",
-  "Lap times in between the anchors: pace + tyre wear + fuel + seeded noise",
+  "Position each lap follows from the synthetic times; the lap-1 order is the grid order, with the sourced lap-1 order at the front; each lap's leader and the sourced snapshots of the order and gaps are anchors, the rest of the order is estimated",
+  "Lap times in between the anchors: pace + tyre wear + fuel + seeded noise, the pace moved by a constant between the laps the sourced order marks",
   "Fuel: 0.06s per lap of fuel on board; full tank at the start",
   "Stop loss: pit-lane time - 5.0s, 35% on the in-lap",
   "PitInTime is the in-lap's end; PitOutTime adds the out-lap's share of the lane time",
@@ -29,6 +29,27 @@
   "jolpicaRound": 16,
   "eventName": "Portuguese Grand Prix"
  },
+ "classified": [
+  "PRO",
+  "LAU",
+  "SENA",
+  "ALBM",
+  "DEA",
+  "PIQN",
+  "TAM",
+  "PAT",
+  "ARN",
+  "WINM",
+  "JOH",
+  "DEC",
+  "BER",
+  "LAF",
+  "BAL",
+  "GAR",
+  "CHE"
+ ],
+ "roadPositions": [],
+ "lastLapStops": [],
  "stopsComplete": false,
  "safetyCarsComplete": true,
  "params": {
@@ -47,6 +68,11 @@
   "sc_gap": 0.8,
   "sc_iterations": 12,
   "order_gap": 0.5,
+  "lead_margin": 1.0,
+  "lap_gap_tolerance": 1.0,
+  "order_iterations": 6,
+  "pace_weight": 0.05,
+  "pack_weight": 1.0,
   "gap_tolerance": 2.0,
   "attempts": 6,
   "refuel": null
@@ -58,7 +84,7 @@
  },
  "fitted": {
   "PRO": {
-   "pace": 83.858,
+   "pace": 83.849,
    "wear": 0.025,
    "noise": 1.05,
    "target": 6071.753
@@ -70,7 +96,7 @@
    "target": 6085.178
   },
   "SENA": {
-   "pace": 84.85,
+   "pace": 84.842,
    "wear": 0.0,
    "noise": 0.7,
    "target": 6091.795
@@ -88,52 +114,52 @@
    "target": 6163.922
   },
   "PIQN": {
-   "pace": 85.799,
+   "pace": 85.79,
    "wear": 0.0,
    "noise": 1.05,
    "target": 6072.253
   },
   "TAM": {
-   "pace": 85.112,
+   "pace": 85.045,
    "wear": 0.025,
    "noise": 1.05,
-   "target": 6092.808
+   "target": 6088.316
   },
   "PAT": {
-   "pace": 86.688,
-   "wear": 0.0,
+   "pace": 85.314,
+   "wear": 0.025,
    "noise": 0.7,
-   "target": 6135.275
+   "target": 6100.829
   },
   "ARN": {
-   "pace": 86.677,
+   "pace": 86.358,
    "wear": 0.0,
    "noise": 0.7,
-   "target": 6135.775
+   "target": 6114.452
   },
   "WINM": {
-   "pace": 86.569,
-   "wear": 0.0,
-   "noise": 0.262,
-   "target": 6136.275
+   "pace": 85.391,
+   "wear": 0.025,
+   "noise": 0.35,
+   "target": 6114.952
   },
   "JOH": {
-   "pace": 86.539,
+   "pace": 86.221,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 6136.775
+   "target": 6115.452
   },
   "DEC": {
-   "pace": 84.908,
-   "wear": 0.05,
+   "pace": 83.833,
+   "wear": 0.075,
    "noise": 0.7,
-   "target": 6140.076
+   "target": 6125.853
   },
   "BER": {
-   "pace": 87.111,
+   "pace": 87.127,
    "wear": 0.0,
    "noise": 0.525,
-   "target": 6092.735
+   "target": 6093.772
   },
   "LAF": {
    "pace": 88.239,
@@ -148,10 +174,10 @@
    "target": 6072.253
   },
   "GAR": {
-   "pace": 87.725,
+   "pace": 87.74,
    "wear": 0.0,
    "noise": 0.525,
-   "target": 5861.497
+   "target": 5862.453
   },
   "CHE": {
    "pace": 90.971,
@@ -160,58 +186,58 @@
    "target": 6072.253
   },
   "GHI": {
-   "pace": 88.929,
+   "pace": 88.945,
    "wear": 0.0,
    "noise": 0.7,
-   "target": 5494.631
+   "target": 5495.549
   },
   "MAN": {
-   "pace": 84.876,
+   "pace": 84.742,
    "wear": 0.0,
    "noise": 0.7,
-   "target": 4550.757
+   "target": 4544.023
   },
   "WAR": {
-   "pace": 82.545,
-   "wear": 0.125,
+   "pace": 82.379,
+   "wear": 0.1,
    "noise": 1.05,
-   "target": 4522.923
+   "target": 4483.386
   },
   "STRP": {
-   "pace": 87.359,
+   "pace": 87.372,
    "wear": 0.0,
    "noise": 0.7,
-   "target": 4339.071
+   "target": 4339.677
   },
   "ROSK": {
-   "pace": 85.995,
+   "pace": 85.975,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 3487.412
+   "target": 3484.862
   },
   "HES": {
-   "pace": 89.583,
+   "pace": 89.651,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 2894.99
+   "target": 2896.962
   },
   "BOUT": {
-   "pace": 88.276,
+   "pace": 88.343,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 2210.055
+   "target": 2211.541
   },
   "PALJ": {
-   "pace": 88.579,
+   "pace": 88.17,
    "wear": 0.25,
    "noise": 1.05,
-   "target": 1813.556
+   "target": 1806.612
   },
   "SUR": {
-   "pace": 88.992,
+   "pace": 89.109,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 750.234
+   "target": 750.933
   },
   "ALL": {
    "pace": 95.542,
@@ -252,17 +278,21 @@
   "safety car": {
    "pass": 1,
    "total": 1
+  },
+  "leader": {
+   "pass": 2,
+   "total": 2
   }
  },
  "anchors": [
   {
    "anchor": "grid",
-   "subject": "lap-1 order is the grid order",
+   "subject": "lap-1 order is the grid order (the sourced lap-1 order at the front)",
    "target": [
+    "ROSK",
     "PIQN",
     "PRO",
     "SENA",
-    "ROSK",
     "DEA",
     "MAN",
     "TAM",
@@ -288,10 +318,10 @@
     "ALL"
    ],
    "achieved": [
+    "ROSK",
     "PIQN",
     "PRO",
     "SENA",
-    "ROSK",
     "DEA",
     "MAN",
     "TAM",
@@ -365,28 +395,28 @@
    "anchor": "gap",
    "subject": "LAU",
    "target": 13.425,
-   "achieved": 13.432,
+   "achieved": 13.421,
    "pass": true
   },
   {
    "anchor": "gap",
    "subject": "SENA",
    "target": 20.042,
-   "achieved": 20.044,
+   "achieved": 20.035,
    "pass": true
   },
   {
    "anchor": "gap",
    "subject": "ALBM",
    "target": 20.317,
-   "achieved": 20.325,
+   "achieved": 20.316,
    "pass": true
   },
   {
    "anchor": "gap",
    "subject": "DEA",
    "target": 92.169,
-   "achieved": 92.172,
+   "achieved": 92.166,
    "pass": true
   },
   {
@@ -976,6 +1006,20 @@
    "subject": "leader's SC laps, sourced",
    "target": [],
    "achieved": [],
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "ROSK laps 1-8",
+   "target": "8 laps",
+   "achieved": "8 of 8 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "PRO laps 9-70",
+   "target": "62 laps",
+   "achieved": "62 of 62 laps",
    "pass": true
   }
  ],

@@ -13,16 +13,18 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: False.
 | laps down | 10 | 10 |
 | stop | 6 | 6 |
 | safety car | 1 | 1 |
+| leader | 6 | 6 |
+| running order | 2 | 2 |
 
 | Anchor | Subject | Target | Achieved | Pass |
 |---|---|---|---|---|
-| grid | lap-1 order is the grid order | 26 cars: MAN BER SENA PRO NAN PAT CAP BOUT PIQN GUG BEN ALL ALE SUZ NAKS WAR DON ALBM LAR MOD DEC CAF MAR PIR BRA DAL | 26 cars: MAN BER SENA PRO NAN PAT CAP BOUT PIQN GUG BEN ALL ALE SUZ NAKS WAR DON ALBM LAR MOD DEC CAF MAR PIR BRA DAL | pass |
+| grid | lap-1 order is the grid order (the sourced lap-1 order at the front) | 26 cars: BER MAN SENA NAN PAT PRO BOUT PIQN ALE CAP GUG BEN ALL SUZ NAKS WAR DON ALBM LAR MOD DEC CAF MAR PIR BRA DAL | 26 cars: BER MAN SENA NAN PAT PRO BOUT PIQN ALE CAP GUG BEN ALL SUZ NAKS WAR DON ALBM LAR MOD DEC CAF MAR PIR BRA DAL | pass |
 | order | classification | 18 cars: PRO CAP SENA PIQN BER PAT SUZ BEN ALL ALBM WAR DON MOD LAR BRA NAN DAL MAN | 18 cars: PRO CAP SENA PIQN BER PAT SUZ BEN ALL ALBM WAR DON DEC MOD LAR BRA NAN DAL | FAIL |
-| gap | CAP | 8.626 | 8.631 | pass |
-| gap | SENA | 11.606 | 11.612 | pass |
-| gap | PIQN | 41.207 | 41.21 | pass |
-| gap | BER | 42.219 | 42.228 | pass |
-| gap | PAT | 69.351 | 69.353 | pass |
+| gap | CAP | 8.626 | 8.633 | pass |
+| gap | SENA | 11.606 | 11.604 | pass |
+| gap | PIQN | 41.207 | 41.204 | pass |
+| gap | BER | 42.219 | 42.208 | pass |
+| gap | PAT | 69.351 | 69.351 | pass |
 | fastest | PRO | [68.212, 72] | [68.212, 72] | pass |
 | fastest | CAP | [68.373, 62] | [68.373, 62] | pass |
 | fastest | SENA | [68.573, 59] | [68.573, 59] | pass |
@@ -86,15 +88,34 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: False.
 | stop | PAT | 33 | 33 | pass |
 | stop | MAN | 32 | 32 | pass |
 | safety car | leader's SC laps, sourced | [] | [] | pass |
+| leader | BER laps 1-27 | 27 laps | 27 of 27 laps | pass |
+| leader | SENA laps 28-29 | 2 laps | 2 of 2 laps | pass |
+| leader | MAN laps 30-31 | 2 laps | 2 of 2 laps | pass |
+| leader | PAT laps 32-32 | 1 laps | 1 of 1 laps | pass |
+| leader | CAP laps 33-77 | 45 laps | 45 of 45 laps | pass |
+| leader | PRO laps 78-80 | 3 laps | 3 of 3 laps | pass |
+| running order | lap 1 | 9 cars: BER MAN SENA NAN PAT PRO BOUT PIQN ALE | 9 cars: BER MAN SENA NAN PAT PRO BOUT PIQN ALE | pass |
+| running order | lap 54 | ["CAP", "PRO", "GUG"] | ["CAP", "PRO", "GUG"] | pass |
 
 ## Estimated
 
 - Every lap time and lap-end Time is synthetic: solved to the anchors, not measured
-- Position each lap follows from the synthetic times; the lap-1 order is the grid order
-- Lap times in between the anchors: pace + tyre wear + fuel + seeded noise
+- Position each lap follows from the synthetic times; the lap-1 order is the grid order, with the sourced lap-1 order at the front; each lap's leader and the sourced snapshots of the order and gaps are anchors, the rest of the order is estimated
+- Lap times in between the anchors: pace + tyre wear + fuel + seeded noise, the pace moved by a constant between the laps the sourced order marks
 - Fuel: 0.06s per lap of fuel on board; full tank at the start
 - Stop loss: pit-lane time - 5.0s, 35% on the in-lap
 - PitInTime is the in-lap's end; PitOutTime adds the out-lap's share of the lane time
 - Compound is left empty (one dry compound per race, estimated in step 2.4)
 - No weather timeline: the race is assumed dry
 - Stops: only the sourced ones; cars may have stopped more (unknown)
+
+## Notes
+
+- SENA: target 5621.2s not reachable
+- BER: target 5651.8s not reachable
+- BEN: target 5634.7s not reachable
+- MAN: target 5047.7s not reachable
+- PRO: target 5609.6s not reachable
+- BEN: target 5629.8s not reachable
+- ALL: target 5641.2s not reachable
+- MAN: target 5051.9s not reachable

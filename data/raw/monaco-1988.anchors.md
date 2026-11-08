@@ -12,13 +12,16 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 | retirement event | 16 | 16 |
 | laps down | 7 | 7 |
 | safety car | 1 | 1 |
+| leader | 2 | 2 |
+| running order | 7 | 7 |
+| lap gap | 1 | 1 |
 
 | Anchor | Subject | Target | Achieved | Pass |
 |---|---|---|---|---|
-| grid | lap-1 order is the grid order | 24 cars: SENA PRO BER ALBM MAN NAN WAR PAT CHE PALJ PIQN ALL GUG PERL BOUT LAA DEC ARN DAL CAP GHI TAR LAR JOH | 24 cars: SENA PRO BER ALBM MAN NAN WAR PAT CHE PALJ PIQN ALL GUG PERL BOUT LAA DEC ARN DAL CAP GHI TAR LAR JOH | pass |
+| grid | lap-1 order is the grid order (the sourced lap-1 order at the front) | 24 cars: SENA BER PRO MAN ALBM NAN WAR PAT CHE PALJ PIQN ALL GUG PERL BOUT LAA DEC ARN DAL CAP GHI TAR LAR JOH | 24 cars: SENA BER PRO MAN ALBM NAN WAR PAT CHE PALJ PIQN ALL GUG PERL BOUT LAA DEC ARN DAL CAP GHI TAR LAR JOH | pass |
 | order | classification | 10 cars: PRO BER ALBM WAR PALJ PAT DAL BOUT LAR CAP | 10 cars: PRO BER ALBM WAR PALJ PAT DAL BOUT LAR CAP | pass |
-| gap | BER | 20.453 | 20.451 | pass |
-| gap | ALBM | 41.229 | 41.232 | pass |
+| gap | BER | 20.453 | 20.454 | pass |
+| gap | ALBM | 41.229 | 41.23 | pass |
 | fastest | PRO | [86.714, 57] | [86.714, 57] | pass |
 | fastest | BER | [88.899, 56] | [88.899, 56] | pass |
 | fastest | ALBM | [88.931, 36] | [88.931, 36] | pass |
@@ -82,12 +85,22 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 | laps down | LAR | 3 | 3 | pass |
 | laps down | CAP | 6 | 6 | pass |
 | safety car | leader's SC laps, sourced | [] | [] | pass |
+| leader | SENA laps 1-66 | 66 laps | 66 of 66 laps | pass |
+| leader | PRO laps 67-78 | 12 laps | 12 of 12 laps | pass |
+| running order | lap 1 | ["SENA", "BER", "PRO", "MAN", "ALBM", "NAN"] | ["SENA", "BER", "PRO", "MAN", "ALBM", "NAN"] | pass |
+| running order | lap 16 | ["SENA", "BER", "PRO", "MAN", "ALBM", "NAN"] | ["SENA", "BER", "PRO", "MAN", "ALBM", "NAN"] | pass |
+| running order | lap 32 | ["SENA", "BER", "PRO", "MAN", "ALBM", "NAN"] | ["SENA", "BER", "PRO", "MAN", "ALBM", "NAN"] | pass |
+| running order | lap 36 | ["SENA", "BER", "PRO", "ALBM"] | ["SENA", "BER", "PRO", "ALBM"] | pass |
+| running order | lap 45 | ["SENA", "BER", "PRO", "ALBM"] | ["SENA", "BER", "PRO", "ALBM"] | pass |
+| running order | lap 53 | ["SENA", "BER", "PRO", "ALBM"] | ["SENA", "BER", "PRO", "ALBM"] | pass |
+| running order | lap 54 | ["SENA", "PRO", "BER"] | ["SENA", "PRO", "BER"] | pass |
+| lap gap | PRO at lap 54 (+/-5s) | 50.0 | 51.998 | pass |
 
 ## Estimated
 
 - Every lap time and lap-end Time is synthetic: solved to the anchors, not measured
-- Position each lap follows from the synthetic times; the lap-1 order is the grid order
-- Lap times in between the anchors: pace + tyre wear + fuel + seeded noise
+- Position each lap follows from the synthetic times; the lap-1 order is the grid order, with the sourced lap-1 order at the front; each lap's leader and the sourced snapshots of the order and gaps are anchors, the rest of the order is estimated
+- Lap times in between the anchors: pace + tyre wear + fuel + seeded noise, the pace moved by a constant between the laps the sourced order marks
 - Fuel: 0.06s per lap of fuel on board; full tank at the start
 - Stop loss: pit-lane time - 5.0s, 35% on the in-lap
 - PitInTime is the in-lap's end; PitOutTime adds the out-lap's share of the lane time

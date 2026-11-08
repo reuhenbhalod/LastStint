@@ -14,8 +14,8 @@
  },
  "estimates": [
   "Every lap time and lap-end Time is synthetic: solved to the anchors, not measured",
-  "Position each lap follows from the synthetic times; the lap-1 order is the grid order",
-  "Lap times in between the anchors: pace + tyre wear + fuel + seeded noise",
+  "Position each lap follows from the synthetic times; the lap-1 order is the grid order, with the sourced lap-1 order at the front; each lap's leader and the sourced snapshots of the order and gaps are anchors, the rest of the order is estimated",
+  "Lap times in between the anchors: pace + tyre wear + fuel + seeded noise, the pace moved by a constant between the laps the sourced order marks",
   "Fuel: 0.06s per lap of fuel on board; full tank at the start",
   "Stop loss: pit-lane time - 5.0s, 35% on the in-lap",
   "PitInTime is the in-lap's end; PitOutTime adds the out-lap's share of the lane time",
@@ -31,6 +31,25 @@
   "jolpicaRound": 16,
   "eventName": "Australian Grand Prix"
  },
+ "classified": [
+  "SENA",
+  "PRO",
+  "HIL",
+  "ALE",
+  "BER",
+  "BRU",
+  "SUZ",
+  "PAT",
+  "BLU",
+  "WAR",
+  "BAR",
+  "COM",
+  "DEC",
+  "SUU",
+  "WEN"
+ ],
+ "roadPositions": [],
+ "lastLapStops": [],
  "stopsComplete": false,
  "safetyCarsComplete": false,
  "params": {
@@ -49,6 +68,11 @@
   "sc_gap": 0.8,
   "sc_iterations": 12,
   "order_gap": 0.5,
+  "lead_margin": 1.0,
+  "lap_gap_tolerance": 1.0,
+  "order_iterations": 6,
+  "pace_weight": 0.05,
+  "pack_weight": 1.0,
   "gap_tolerance": 2.0,
   "attempts": 6,
   "refuel": null
@@ -78,34 +102,34 @@
    "target": 6241.378
   },
   "ALE": {
-   "pace": 75.36,
+   "pace": 75.888,
    "wear": 0.05,
-   "noise": 0.7,
-   "target": 6219.674
+   "noise": 1.05,
+   "target": 6258.032
   },
   "BER": {
-   "pace": 77.443,
+   "pace": 77.821,
    "wear": 0.0,
    "noise": 0.525,
-   "target": 6231.371
+   "target": 6260.14
   },
   "BRU": {
-   "pace": 76.556,
+   "pace": 76.8,
    "wear": 0.025,
-   "noise": 0.525,
-   "target": 6243.069
+   "noise": 0.7,
+   "target": 6262.248
   },
   "SUZ": {
-   "pace": 75.692,
+   "pace": 75.819,
    "wear": 0.05,
    "noise": 0.7,
-   "target": 6254.766
+   "target": 6264.356
   },
   "PAT": {
-   "pace": 75.646,
-   "wear": 0.025,
-   "noise": 0.262,
-   "target": 6097.731
+   "pace": 77.993,
+   "wear": 0.0,
+   "noise": 0.7,
+   "target": 6206.976
   },
   "BLU": {
    "pace": 77.372,
@@ -144,58 +168,58 @@
    "target": 6239.336
   },
   "WEN": {
-   "pace": 79.498,
+   "pace": 79.615,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 5995.467
+   "target": 6003.758
   },
   "JAR": {
-   "pace": 79.335,
+   "pace": 79.452,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 4625.062
+   "target": 4631.345
   },
   "GOU": {
-   "pace": 81.96,
+   "pace": 81.968,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 2927.364
+   "target": 2927.63
   },
   "HAK": {
-   "pace": 79.32,
+   "pace": 79.431,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 2342.369
+   "target": 2345.271
   },
   "MSCM": {
-   "pace": 75.56,
-   "wear": 0.225,
+   "pace": 75.684,
+   "wear": 0.2,
    "noise": 1.05,
-   "target": 1562.461
+   "target": 1561.831
   },
   "KAT": {
-   "pace": 80.585,
+   "pace": 80.227,
    "wear": 0.25,
    "noise": 1.05,
-   "target": 953.993
+   "target": 950.766
   },
   "IRV": {
-   "pace": 81.428,
+   "pace": 81.303,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 865.121
+   "target": 864.121
   },
   "HER": {
-   "pace": 80.2,
+   "pace": 80.27,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 769.609
+   "target": 770.096
   },
   "MAR": {
-   "pace": 80.308,
+   "pace": 80.349,
    "wear": 0.0,
    "noise": 1.05,
-   "target": 431.266
+   "target": 431.39
   }
  },
  "summary": {
@@ -220,7 +244,7 @@
    "total": 11
   },
   "retirement event": {
-   "pass": 11,
+   "pass": 10,
    "total": 11
   },
   "laps down": {
@@ -234,6 +258,10 @@
   "safety car": {
    "pass": 1,
    "total": 1
+  },
+  "leader": {
+   "pass": 3,
+   "total": 3
   }
  },
  "anchors": [
@@ -335,14 +363,14 @@
    "anchor": "gap",
    "subject": "PRO",
    "target": 9.259,
-   "achieved": 9.261,
+   "achieved": 9.256,
    "pass": true
   },
   {
    "anchor": "gap",
    "subject": "HIL",
    "target": 33.902,
-   "achieved": 33.903,
+   "achieved": 33.899,
    "pass": true
   },
   {
@@ -655,8 +683,8 @@
    "anchor": "retirement event",
    "subject": "PAT",
    "target": true,
-   "achieved": true,
-   "pass": true
+   "achieved": false,
+   "pass": false
   },
   {
    "anchor": "retirement",
@@ -930,7 +958,30 @@
    "target": [],
    "achieved": [],
    "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "SENA laps 1-23",
+   "target": "23 laps",
+   "achieved": "23 of 23 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "PRO laps 24-28",
+   "target": "5 laps",
+   "achieved": "5 of 5 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "SENA laps 29-79",
+   "target": "51 laps",
+   "achieved": "51 of 51 laps",
+   "pass": true
   }
  ],
- "notes": []
+ "notes": [
+  "PAT: classified retirement stopped at its natural time, after the point a retirement is seen"
+ ]
 }

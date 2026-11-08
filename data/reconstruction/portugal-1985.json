@@ -6,7 +6,6 @@
     "stops": false,
     "safetyCars": true
   },
-  "notes": "Heavy-rain race ended by the two-hour limit at 67 laps. Wikipedia (https://en.wikipedia.org/wiki/1985_Portuguese_Grand_Prix): 'Nelson Piquet pitted repeatedly around lap 25, finally retiring with a tyre issue' (#7; no exact laps, so not entered). No leader's stop reported (Senna led from start to finish). Weather: no source read names the start tyres of the field (only Piquet's Pirelli wets), so the other stints' tyres are estimated (wets, in rain all race).",
   "weather": {
     "timeline": [
       {
@@ -38,5 +37,29 @@
         "source": "https://www.motorsportmagazine.com/archive/article/june-1985/22/portuguese-grand-prix-2/ (Piquet's Brabham: 'Pirelli's wet weather rubber was totally ineffectual')"
       }
     ]
-  }
+  },
+  "lapLeaders": [
+    {
+      "driver": "SENA",
+      "name": "Ayrton Senna",
+      "fromLap": 1,
+      "toLap": 67,
+      "source": "https://en.wikipedia.org/wiki/1985_Portuguese_Grand_Prix (lap-leader chart, Template:F1Laps1985 'POR')"
+    }
+  ],
+  "runningOrder": [
+    {
+      "lap": 20,
+      "order": [
+        "SENA",
+        "DEA"
+      ],
+      "gaps": {
+        "DEA": 30.0
+      },
+      "gapTolerance": 3.0,
+      "source": "https://en.wikipedia.org/wiki/1985_Portuguese_Grand_Prix: 'At 20 laps, Senna had extended his lead on his teammate de Angelis to 30 seconds'"
+    }
+  ],
+  "notes": "Heavy-rain race ended by the two-hour limit at 67 laps. Wikipedia (https://en.wikipedia.org/wiki/1985_Portuguese_Grand_Prix): 'Nelson Piquet pitted repeatedly around lap 25, finally retiring with a tyre issue' (#7; no exact laps, so not entered). No leader's stop reported (Senna led from start to finish). Weather: no source read names the start tyres of the field (only Piquet's Pirelli wets), so the other stints' tyres are estimated (wets, in rain all race)."
 }

@@ -70,5 +70,28 @@
     "stops": false,
     "safetyCars": false
   },
+  "lapLeaders": [
+    {
+      "driver": "SENA",
+      "name": "Ayrton Senna",
+      "fromLap": 1,
+      "toLap": 23,
+      "source": "https://en.wikipedia.org/wiki/1993_Australian_Grand_Prix (lap-leader chart, Template:F1Laps1993 'AUS')"
+    },
+    {
+      "driver": "PRO",
+      "name": "Alain Prost",
+      "fromLap": 24,
+      "toLap": 28,
+      "source": "https://en.wikipedia.org/wiki/1993_Australian_Grand_Prix (lap-leader chart, Template:F1Laps1993 'AUS')"
+    },
+    {
+      "driver": "SENA",
+      "name": "Ayrton Senna",
+      "fromLap": 29,
+      "toLap": 79,
+      "source": "https://en.wikipedia.org/wiki/1993_Australian_Grand_Prix (lap-leader chart, Template:F1Laps1993 'AUS')"
+    }
+  ],
   "notes": "Alesi (#27) one stop, Berger (#28) two, Suzuki (#10) one (Motor Sport, no laps). Last race without refuelling until 2010. No safety car mentioned in any source read; not confirmed absent."
 }

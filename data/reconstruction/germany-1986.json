@@ -76,5 +76,63 @@
     "stops": false,
     "safetyCars": true
   },
+  "lapLeaders": [
+    {
+      "driver": "SENA",
+      "name": "Ayrton Senna",
+      "fromLap": 1,
+      "toLap": 1,
+      "source": "https://en.wikipedia.org/wiki/1986_German_Grand_Prix (lap-leader chart, Template:F1Laps1986 'GER')"
+    },
+    {
+      "driver": "ROSK",
+      "name": "Keke Rosberg",
+      "fromLap": 2,
+      "toLap": 5,
+      "source": "https://en.wikipedia.org/wiki/1986_German_Grand_Prix (lap-leader chart, Template:F1Laps1986 'GER')"
+    },
+    {
+      "driver": "PIQN",
+      "name": "Nelson Piquet",
+      "fromLap": 6,
+      "toLap": 14,
+      "source": "https://en.wikipedia.org/wiki/1986_German_Grand_Prix (lap-leader chart, Template:F1Laps1986 'GER')"
+    },
+    {
+      "driver": "ROSK",
+      "name": "Keke Rosberg",
+      "fromLap": 15,
+      "toLap": 19,
+      "source": "https://en.wikipedia.org/wiki/1986_German_Grand_Prix (lap-leader chart, Template:F1Laps1986 'GER')"
+    },
+    {
+      "driver": "PRO",
+      "name": "Alain Prost",
+      "fromLap": 20,
+      "toLap": 20,
+      "source": "https://en.wikipedia.org/wiki/1986_German_Grand_Prix (lap-leader chart, Template:F1Laps1986 'GER')"
+    },
+    {
+      "driver": "PIQN",
+      "name": "Nelson Piquet",
+      "fromLap": 21,
+      "toLap": 26,
+      "source": "https://en.wikipedia.org/wiki/1986_German_Grand_Prix (lap-leader chart, Template:F1Laps1986 'GER')"
+    },
+    {
+      "driver": "ROSK",
+      "name": "Keke Rosberg",
+      "fromLap": 27,
+      "toLap": 38,
+      "source": "https://en.wikipedia.org/wiki/1986_German_Grand_Prix (lap-leader chart, Template:F1Laps1986 'GER')"
+    },
+    {
+      "driver": "PIQN",
+      "name": "Nelson Piquet",
+      "fromLap": 39,
+      "toLap": 44,
+      "source": "https://en.wikipedia.org/wiki/1986_German_Grand_Prix (lap-leader chart, Template:F1Laps1986 'GER')"
+    }
+  ],
   "notes": "Autosport 'Grand Prix Gold: German GP 1986' (its contemporary report) and Motor Sport Sep 1986 (DSJ). Missing: Berger's second tyre stop, Tambay's (#16) early stop for lost wheel weights, Brundle's (#3) stop for a new black box (no laps), every other midfield stop. Storyline is fuel: the 195-litre limit; Rosberg and Prost ran minimum boost all race and both ran dry on the last lap (Rosberg second at the start of it, at the first chicane; Prost, fourth after Senna passed him late on, in the stadium's last two corners). Both classified a lap down (43 laps, Jolpica 'Out of fuel'). Senna also ran out just past the line. Wikipedia's text says 45 laps; its infobox, Motor Sport, Autosport and Jolpica say 44."
 }

@@ -10,47 +10,44 @@
   },
   "era": "1994-2009",
   "track": {
-    "pitLoss": 33.357,
-    "pitLossUnderSC": 18.346,
-    "pitLossUnderVSC": 23.016,
+    "pitLoss": 33.766,
+    "pitLossUnderSC": 18.571,
+    "pitLossUnderVSC": 23.298,
     "pitLossDeviations": [
-      -12.875,
-      -10.921,
-      -8.438,
-      -7.884,
-      -6.24,
-      -5.492,
-      -3.585,
-      -3.116,
-      -2.355,
-      -2.324,
-      -2.111,
-      -1.976,
-      -1.594,
-      -0.182,
-      0.182,
-      0.783,
-      1.221,
-      1.376,
-      3.055,
-      3.875,
-      5.176,
-      7.101,
-      8.536,
-      10.114,
-      10.918,
-      11.702,
-      13.924
+      -13.764,
+      -7.6,
+      -7.345,
+      -5.114,
+      -4.803,
+      -4.328,
+      -3.471,
+      -2.033,
+      -0.798,
+      -0.615,
+      -0.496,
+      -0.217,
+      -0.064,
+      0.064,
+      0.096,
+      0.293,
+      2.39,
+      3.727,
+      4.337,
+      4.51,
+      5.515,
+      7.686,
+      10.459,
+      12.342
     ],
-    "overtakeDifficulty": 0.8141,
+    "overtakeDifficulty": 0.7401,
     "overtakeModel": {
-      "intercept": -0.0257,
-      "paceCoef": 3.3012,
-      "gapCoef": -4.6571
+      "intercept": -0.2791,
+      "paceCoef": 1.4826,
+      "gapCoef": -1.5336
     },
-    "dirtyAirPenalty": 0.0,
-    "greenLapTime": 121.717,
-    "scLapTime": 127.774,
+    "dirtyAirPenalty": 0.0246,
+    "greenLapTime": 122.596,
+    "scLapTime": 125.73,
     "refuel": {
       "secondsPerLap": 0.2502,
       "laneBase": 35.529,
@@ -62,7 +59,7 @@
   "compounds": {
     "MEDIUM": {
       "offset": 0.0,
-      "degPerLap": 0.03791,
+      "degPerLap": 0.0172,
       "cliffLap": 22,
       "provenLaps": 22
     },
@@ -81,12 +78,12 @@
     {
       "code": "BAD",
       "team": "Minardi",
-      "basePace": 119.9419,
-      "noise": 0.067,
-      "wetPace": -0.0231,
+      "basePace": 120.2529,
+      "noise": 0.2301,
+      "wetPace": -0.0195,
       "stateAtTakeover": {
-        "position": 16,
-        "gapAhead": 2.111,
+        "position": 14,
+        "gapAhead": 2.371,
         "compound": "MEDIUM",
         "tyreAge": 12,
         "compoundsUsed": [
@@ -97,19 +94,19 @@
         {
           "lap": 22,
           "to": "WET",
-          "loss": 16.369
+          "loss": 22.941
         }
       ]
     },
     {
       "code": "BAR",
       "team": "Jordan",
-      "basePace": 119.0398,
-      "noise": 0.0524,
-      "wetPace": -0.0095,
+      "basePace": 119.954,
+      "noise": 0.5293,
+      "wetPace": -0.0014,
       "stateAtTakeover": {
-        "position": 10,
-        "gapAhead": 4.465,
+        "position": 8,
+        "gapAhead": 2.206,
         "compound": "MEDIUM",
         "tyreAge": 12,
         "compoundsUsed": [
@@ -120,12 +117,12 @@
         {
           "lap": 14,
           "to": "MEDIUM",
-          "loss": 34.222
+          "loss": 33.854
         },
         {
           "lap": 19,
           "to": "MEDIUM",
-          "loss": 38.068
+          "loss": 37.75
         },
         {
           "lap": 30,
@@ -136,12 +133,12 @@
     {
       "code": "BER",
       "team": "Ferrari",
-      "basePace": 117.4446,
-      "noise": 0.067,
-      "wetPace": -0.0332,
+      "basePace": 119.2678,
+      "noise": 1.2262,
+      "wetPace": -0.0055,
       "stateAtTakeover": {
         "position": 4,
-        "gapAhead": 4.496,
+        "gapAhead": 5.884,
         "compound": "MEDIUM",
         "tyreAge": 12,
         "compoundsUsed": [
@@ -152,24 +149,24 @@
         {
           "lap": 16,
           "to": "MEDIUM",
-          "loss": 32.63
+          "loss": 33.461
         },
         {
           "lap": 21,
           "to": "WET",
-          "loss": 227.521
+          "loss": 240.455
         }
       ]
     },
     {
       "code": "BLU",
       "team": "McLaren",
-      "basePace": 117.8684,
-      "noise": 0.067,
-      "wetPace": 0.0003,
+      "basePace": 120.0644,
+      "noise": 0.41,
+      "wetPace": -0.0046,
       "stateAtTakeover": {
-        "position": 6,
-        "gapAhead": 3.921,
+        "position": 10,
+        "gapAhead": 2.863,
         "compound": "MEDIUM",
         "tyreAge": 12,
         "compoundsUsed": [
@@ -180,17 +177,17 @@
         {
           "lap": 17,
           "to": "MEDIUM",
-          "loss": 32.233
+          "loss": 29.942
         },
         {
           "lap": 22,
           "to": "MEDIUM",
-          "loss": 35.178
+          "loss": 38.884
         },
         {
           "lap": 28,
           "to": "WET",
-          "loss": 24.741
+          "loss": 28.117
         },
         {
           "lap": 29,
@@ -201,12 +198,12 @@
     {
       "code": "BOUJ",
       "team": "Sauber",
-      "basePace": 120.5999,
-      "noise": 0.8164,
-      "wetPace": 0.0047,
+      "basePace": 120.8021,
+      "noise": 1.0131,
+      "wetPace": 0.0224,
       "stateAtTakeover": {
         "position": 17,
-        "gapAhead": 8.779,
+        "gapAhead": 0.927,
         "compound": "MEDIUM",
         "tyreAge": 12,
         "compoundsUsed": [
@@ -217,12 +214,12 @@
         {
           "lap": 22,
           "to": "MEDIUM",
-          "loss": 74.239
+          "loss": 73.553
         },
         {
           "lap": 26,
           "to": "MEDIUM",
-          "loss": 29.783
+          "loss": 26.052
         },
         {
           "lap": 28,
@@ -233,12 +230,12 @@
     {
       "code": "BRU",
       "team": "Ligier",
-      "basePace": 117.9929,
-      "noise": 0.067,
-      "wetPace": -0.0049,
+      "basePace": 120.634,
+      "noise": 0.6602,
+      "wetPace": -0.0036,
       "stateAtTakeover": {
-        "position": 9,
-        "gapAhead": 4.451,
+        "position": 13,
+        "gapAhead": 2.199,
         "compound": "MEDIUM",
         "tyreAge": 12,
         "compoundsUsed": [
@@ -249,15 +246,15 @@
         {
           "lap": 23,
           "to": "WET",
-          "loss": 38.989
+          "loss": 38.897
         }
       ]
     },
     {
       "code": "COU",
       "team": "Williams",
-      "basePace": 113.5801,
-      "noise": 0.0422,
+      "basePace": 115.0071,
+      "noise": 0.3964,
       "stateAtTakeover": {
         "position": 1,
         "gapAhead": 0.0,
@@ -272,12 +269,12 @@
     {
       "code": "DIN",
       "team": "Forti",
-      "basePace": 124.1489,
-      "noise": 0.0805,
-      "wetPace": -0.0008,
+      "basePace": 124.5364,
+      "noise": 0.2522,
+      "wetPace": 0.0208,
       "stateAtTakeover": {
         "position": 21,
-        "gapAhead": 0.573,
+        "gapAhead": 1.327,
         "compound": "MEDIUM",
         "tyreAge": 12,
         "compoundsUsed": [
@@ -288,19 +285,19 @@
         {
           "lap": 21,
           "to": "WET",
-          "loss": 45.872
+          "loss": 42.528
         }
       ]
     },
     {
       "code": "FRE",
       "team": "Sauber",
-      "basePace": 117.8639,
-      "noise": 0.0805,
-      "wetPace": -0.0043,
+      "basePace": 119.863,
+      "noise": 0.5236,
+      "wetPace": -0.0041,
       "stateAtTakeover": {
-        "position": 8,
-        "gapAhead": 1.163,
+        "position": 6,
+        "gapAhead": 9.156,
         "compound": "MEDIUM",
         "tyreAge": 12,
         "compoundsUsed": [
@@ -311,24 +308,24 @@
         {
           "lap": 21,
           "to": "WET",
-          "loss": 54.813
+          "loss": 55.238
         },
         {
           "lap": 22,
           "to": "WET",
-          "loss": 34.864
+          "loss": 34.269
         }
       ]
     },
     {
       "code": "HER",
       "team": "Benetton",
-      "basePace": 118.2997,
-      "noise": 0.517,
-      "wetPace": 0.0017,
+      "basePace": 119.6788,
+      "noise": 1.7519,
+      "wetPace": 0.0033,
       "stateAtTakeover": {
         "position": 7,
-        "gapAhead": 4.416,
+        "gapAhead": 0.095,
         "compound": "MEDIUM",
         "tyreAge": 12,
         "compoundsUsed": [
@@ -339,29 +336,29 @@
         {
           "lap": 15,
           "to": "MEDIUM",
-          "loss": 29.927
+          "loss": 30.6
         },
         {
           "lap": 22,
           "to": "MEDIUM",
-          "loss": 44.195
+          "loss": 46.603
         },
         {
           "lap": 28,
           "to": "WET",
-          "loss": 35.561
+          "loss": 38.013
         }
       ]
     },
     {
       "code": "HIL",
       "team": "Williams",
-      "basePace": 116.4388,
-      "noise": 0.0568,
-      "wetPace": -0.0117,
+      "basePace": 117.5318,
+      "noise": 0.253,
+      "wetPace": -0.0065,
       "stateAtTakeover": {
         "position": 2,
-        "gapAhead": 13.521,
+        "gapAhead": 7.654,
         "compound": "MEDIUM",
         "tyreAge": 12,
         "compoundsUsed": [
@@ -372,17 +369,17 @@
         {
           "lap": 16,
           "to": "MEDIUM",
-          "loss": 31.257
+          "loss": 31.477
         },
         {
           "lap": 22,
           "to": "WET",
-          "loss": 29.329
+          "loss": 22.264
         },
         {
           "lap": 27,
           "to": "MEDIUM",
-          "loss": 31.919
+          "loss": 43.709
         },
         {
           "lap": 31,
@@ -391,19 +388,19 @@
         {
           "lap": 34,
           "to": "WET",
-          "loss": 34.684
+          "loss": 36.721
         }
       ]
     },
     {
       "code": "INO",
       "team": "Footwork",
-      "basePace": 121.5953,
-      "noise": 0.5494,
-      "wetPace": 0.0053,
+      "basePace": 121.8886,
+      "noise": 0.8405,
+      "wetPace": 0.0223,
       "stateAtTakeover": {
         "position": 18,
-        "gapAhead": 10.663,
+        "gapAhead": 10.547,
         "compound": "MEDIUM",
         "tyreAge": 12,
         "compoundsUsed": [
@@ -414,19 +411,19 @@
         {
           "lap": 21,
           "to": "WET",
-          "loss": 62.856
+          "loss": 59.068
         }
       ]
     },
     {
       "code": "IRV",
       "team": "Jordan",
-      "basePace": 117.135,
-      "noise": 0.0548,
-      "wetPace": -0.0478,
+      "basePace": 118.9205,
+      "noise": 0.3492,
+      "wetPace": -0.043,
       "stateAtTakeover": {
         "position": 5,
-        "gapAhead": 4.689,
+        "gapAhead": 4.729,
         "compound": "MEDIUM",
         "tyreAge": 12,
         "compoundsUsed": [
@@ -437,19 +434,19 @@
         {
           "lap": 16,
           "to": "MEDIUM",
-          "loss": 32.793
+          "loss": 33.86
         }
       ]
     },
     {
       "code": "KAT",
       "team": "Tyrrell",
-      "basePace": 118.8678,
-      "noise": 0.067,
-      "wetPace": -0.0427,
+      "basePace": 119.1334,
+      "noise": 0.3452,
+      "wetPace": -0.0204,
       "stateAtTakeover": {
-        "position": 13,
-        "gapAhead": 0.299,
+        "position": 9,
+        "gapAhead": 0.45,
         "compound": "MEDIUM",
         "tyreAge": 12,
         "compoundsUsed": [
@@ -460,19 +457,19 @@
         {
           "lap": 17,
           "to": "MEDIUM",
-          "loss": 33.543
+          "loss": 33.322
         }
       ]
     },
     {
       "code": "LAM",
       "team": "Minardi",
-      "basePace": 119.8061,
-      "noise": 0.0805,
-      "wetPace": 0.0039,
+      "basePace": 121.0814,
+      "noise": 0.1069,
+      "wetPace": 0.0021,
       "stateAtTakeover": {
-        "position": 15,
-        "gapAhead": 3.108,
+        "position": 16,
+        "gapAhead": 5.085,
         "compound": "MEDIUM",
         "tyreAge": 12,
         "compoundsUsed": [
@@ -483,19 +480,19 @@
         {
           "lap": 23,
           "to": "WET",
-          "loss": 39.492
+          "loss": 43.359
         }
       ]
     },
     {
       "code": "LAV",
       "team": "Pacific",
-      "basePace": 125.8894,
-      "noise": 0.067,
-      "wetPace": -0.0378,
+      "basePace": 126.1637,
+      "noise": 0.2301,
+      "wetPace": -0.0283,
       "stateAtTakeover": {
         "position": 22,
-        "gapAhead": 17.55,
+        "gapAhead": 15.764,
         "compound": "MEDIUM",
         "tyreAge": 12,
         "compoundsUsed": [
@@ -506,24 +503,24 @@
         {
           "lap": 19,
           "to": "MEDIUM",
-          "loss": 54.082
+          "loss": 53.885
         },
         {
           "lap": 20,
           "to": "MEDIUM",
-          "loss": 22.442
+          "loss": 20.978
         }
       ]
     },
     {
       "code": "MOE",
       "team": "Forti",
-      "basePace": 124.2964,
-      "noise": 0.067,
-      "wetPace": -0.0051,
+      "basePace": 124.5901,
+      "noise": 0.2301,
+      "wetPace": 0.0071,
       "stateAtTakeover": {
         "position": 20,
-        "gapAhead": 27.737,
+        "gapAhead": 26.654,
         "compound": "MEDIUM",
         "tyreAge": 12,
         "compoundsUsed": [
@@ -534,23 +531,23 @@
         {
           "lap": 19,
           "to": "MEDIUM",
-          "loss": 45.822
+          "loss": 45.586
         },
         {
           "lap": 21,
           "to": "WET",
-          "loss": 40.712
+          "loss": 36.493
         }
       ]
     },
     {
       "code": "MONA",
       "team": "Pacific",
-      "basePace": 120.3843,
-      "noise": 0.0738,
+      "basePace": 120.701,
+      "noise": 0.2301,
       "stateAtTakeover": {
         "position": 19,
-        "gapAhead": 0.909,
+        "gapAhead": 1.792,
         "compound": "MEDIUM",
         "tyreAge": 12,
         "compoundsUsed": [
@@ -562,12 +559,12 @@
     {
       "code": "MSCM",
       "team": "Benetton",
-      "basePace": 115.7914,
-      "noise": 0.2762,
-      "wetPace": 0.0039,
+      "basePace": 118.2224,
+      "noise": 0.4651,
+      "wetPace": -0.0017,
       "stateAtTakeover": {
         "position": 3,
-        "gapAhead": 2.183,
+        "gapAhead": 3.361,
         "compound": "MEDIUM",
         "tyreAge": 12,
         "compoundsUsed": [
@@ -578,7 +575,7 @@
         {
           "lap": 19,
           "to": "MEDIUM",
-          "loss": 30.44
+          "loss": 27.411
         },
         {
           "lap": 31,
@@ -589,12 +586,12 @@
     {
       "code": "PAN",
       "team": "Ligier",
-      "basePace": 118.5966,
-      "noise": 0.3069,
-      "wetPace": 0.0028,
+      "basePace": 120.7758,
+      "noise": 0.5099,
+      "wetPace": -0.006,
       "stateAtTakeover": {
-        "position": 11,
-        "gapAhead": 2.459,
+        "position": 15,
+        "gapAhead": 1.562,
         "compound": "MEDIUM",
         "tyreAge": 12,
         "compoundsUsed": [
@@ -605,12 +602,12 @@
         {
           "lap": 22,
           "to": "MEDIUM",
-          "loss": 42.062
+          "loss": 42.686
         },
         {
           "lap": 27,
           "to": "MEDIUM",
-          "loss": 30.209
+          "loss": 30.765
         },
         {
           "lap": 30,
@@ -621,12 +618,12 @@
     {
       "code": "PAP",
       "team": "Footwork",
-      "basePace": 118.1249,
-      "noise": 0.0805,
-      "wetPace": -0.0073,
+      "basePace": 118.4463,
+      "noise": 0.2301,
+      "wetPace": -0.0072,
       "stateAtTakeover": {
-        "position": 14,
-        "gapAhead": 10.007,
+        "position": 12,
+        "gapAhead": 0.416,
         "compound": "MEDIUM",
         "tyreAge": 12,
         "compoundsUsed": [
@@ -638,12 +635,12 @@
     {
       "code": "SAL",
       "team": "Tyrrell",
-      "basePace": 119.242,
-      "noise": 0.0524,
-      "wetPace": -0.0042,
+      "basePace": 120.4343,
+      "noise": 0.2549,
+      "wetPace": 0.0013,
       "stateAtTakeover": {
-        "position": 12,
-        "gapAhead": 1.974,
+        "position": 11,
+        "gapAhead": 3.197,
         "compound": "MEDIUM",
         "tyreAge": 12,
         "compoundsUsed": [
@@ -654,7 +651,7 @@
         {
           "lap": 15,
           "to": "MEDIUM",
-          "loss": 34.459
+          "loss": 34.353
         },
         {
           "lap": 30,
@@ -665,7 +662,7 @@
   ],
   "fuelEffectPerLap": 0.056,
   "freshTyre": {
-    "bonus": -0.1579,
+    "bonus": -0.0573,
     "laps": 3
   },
   "events": [
@@ -682,12 +679,12 @@
     {
       "lap": 21,
       "type": "RETIREMENT",
-      "driver": "IRV"
+      "driver": "PAP"
     },
     {
-      "lap": 21,
+      "lap": 22,
       "type": "RETIREMENT",
-      "driver": "PAP"
+      "driver": "IRV"
     },
     {
       "lap": 24,
@@ -1124,30 +1121,30 @@
       0.0,
       0.0,
       0.14,
-      0.44,
-      0.44,
-      0.44,
-      0.44,
-      0.15,
-      0.15,
-      0.29,
-      0.44,
-      0.5,
-      0.56,
-      0.63,
-      0.45,
-      0.45,
-      0.45,
-      0.45,
-      0.45,
-      0.45,
-      0.45,
-      0.45,
-      0.45,
-      0.45,
-      0.45,
-      0.45,
-      0.45
+      0.43,
+      0.42,
+      0.43,
+      0.43,
+      0.14,
+      0.14,
+      0.26,
+      0.43,
+      0.49,
+      0.55,
+      0.62,
+      0.43,
+      0.42,
+      0.41,
+      0.4,
+      0.4,
+      0.4,
+      0.4,
+      0.4,
+      0.4,
+      0.4,
+      0.4,
+      0.4,
+      0.39
     ]
   },
   "eras": {

@@ -14,20 +14,21 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 | stop | 41 | 41 |
 | tyre | 33 | 33 |
 | safety car | 1 | 1 |
+| leader | 10 | 10 |
 
 | Anchor | Subject | Target | Achieved | Pass |
 |---|---|---|---|---|
-| grid | lap-1 order is the grid order | 24 cars: BER ALE HAK HER COU BLU IRV HIL PAN FRE SAL BAR BRU BOUJ KAT MSCM LAM INO BAD PAP MONA MOE LAV DIN | 24 cars: BER ALE HAK HER COU BLU IRV HIL PAN FRE SAL BAR BRU BOUJ KAT MSCM LAM INO BAD PAP MONA MOE LAV DIN | pass |
+| grid | lap-1 order is the grid order (the sourced lap-1 order at the front) | 24 cars: HER BER ALE HAK COU BLU IRV HIL PAN FRE SAL BAR BRU BOUJ KAT MSCM LAM INO BAD PAP MONA MOE LAV DIN | 24 cars: HER BER ALE HAK COU BLU IRV HIL PAN FRE SAL BAR BRU BOUJ KAT MSCM LAM INO BAD PAP MONA MOE LAV DIN | pass |
 | order | classification | 14 cars: MSCM HIL BRU FRE BLU BAR HER SAL PAN LAM BOUJ INO DIN MOE | 14 cars: MSCM HIL BRU FRE BLU BAR HER SAL PAN LAM BOUJ INO DIN MOE | pass |
-| gap | HIL | 19.493 | 19.494 | pass |
-| gap | BRU | 24.998 | 24.998 | pass |
+| gap | HIL | 19.493 | 19.491 | pass |
+| gap | BRU | 24.998 | 24.999 | pass |
 | gap | FRE | 26.972 | 26.972 | pass |
-| gap | BLU | 33.772 | 33.773 | pass |
-| gap | BAR | 39.674 | 39.677 | pass |
-| gap | HER | 54.043 | 54.044 | pass |
-| gap | SAL | 54.548 | 54.546 | pass |
-| gap | PAN | 66.17 | 66.169 | pass |
-| gap | LAM | 79.789 | 79.788 | pass |
+| gap | BLU | 33.772 | 33.768 | pass |
+| gap | BAR | 39.674 | 39.675 | pass |
+| gap | HER | 54.043 | 54.039 | pass |
+| gap | SAL | 54.548 | 54.545 | pass |
+| gap | PAN | 66.17 | 66.167 | pass |
+| gap | LAM | 79.789 | 79.782 | pass |
 | fastest | MSCM | [113.613, 17] | [113.613, 17] | pass |
 | fastest | HIL | [114.473, 14] | [114.473, 14] | pass |
 | fastest | BRU | [116.502, 15] | [116.502, 15] | pass |
@@ -151,12 +152,22 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 | tyre | ALE stint 1 | slick | ["None"] | pass |
 | tyre | HAK stint 1 | slick | ["None"] | pass |
 | safety car | leader's SC laps, sourced | [29, 30, 31] | [29, 30, 31] | pass |
+| leader | HER laps 1-1 | 1 laps | 1 of 1 laps | pass |
+| leader | ALE laps 2-3 | 2 laps | 2 of 2 laps | pass |
+| leader | HER laps 4-5 | 2 laps | 2 of 2 laps | pass |
+| leader | COU laps 6-13 | 8 laps | 8 of 8 laps | pass |
+| leader | HIL laps 14-15 | 2 laps | 2 of 2 laps | pass |
+| leader | MSCM laps 16-18 | 3 laps | 3 of 3 laps | pass |
+| leader | HIL laps 19-21 | 3 laps | 3 of 3 laps | pass |
+| leader | MSCM laps 22-23 | 2 laps | 2 of 2 laps | pass |
+| leader | HIL laps 24-24 | 1 laps | 1 of 1 laps | pass |
+| leader | MSCM laps 25-44 | 20 laps | 20 of 20 laps | pass |
 
 ## Estimated
 
 - Every lap time and lap-end Time is synthetic: solved to the anchors, not measured
-- Position each lap follows from the synthetic times; the lap-1 order is the grid order
-- Lap times in between the anchors: pace + tyre wear + fuel + seeded noise
+- Position each lap follows from the synthetic times; the lap-1 order is the grid order, with the sourced lap-1 order at the front; each lap's leader and the sourced snapshots of the order and gaps are anchors, the rest of the order is estimated
+- Lap times in between the anchors: pace + tyre wear + fuel + seeded noise, the pace moved by a constant between the laps the sourced order marks
 - Fuel: 0.06s per lap of fuel on board; each stop refuels to the next stop
 - Stop loss: pit-lane time - 5.0s, 35% on the in-lap
 - PitInTime is the in-lap's end; PitOutTime adds the out-lap's share of the lane time
@@ -168,3 +179,5 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 
 - ALE: stop on lap 5, the lap it retired on; not run
 - HAK: fastest lap on lap 1, its lap-1 time is the fastest lap's
+- HIL: target 5827.4s not reachable
+- the laps behind the safety car did not settle

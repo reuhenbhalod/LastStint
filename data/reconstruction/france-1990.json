@@ -55,5 +55,76 @@
     "stops": false,
     "safetyCars": true
   },
+  "lapLeaders": [
+    {
+      "driver": "BER",
+      "name": "Gerhard Berger",
+      "fromLap": 1,
+      "toLap": 27,
+      "source": "https://en.wikipedia.org/wiki/1990_French_Grand_Prix (lap-leader chart, Template:F1Laps1990 'FRA')"
+    },
+    {
+      "driver": "SENA",
+      "name": "Ayrton Senna",
+      "fromLap": 28,
+      "toLap": 29,
+      "source": "https://en.wikipedia.org/wiki/1990_French_Grand_Prix (lap-leader chart, Template:F1Laps1990 'FRA')"
+    },
+    {
+      "driver": "MAN",
+      "name": "Nigel Mansell",
+      "fromLap": 30,
+      "toLap": 31,
+      "source": "https://en.wikipedia.org/wiki/1990_French_Grand_Prix (lap-leader chart, Template:F1Laps1990 'FRA')"
+    },
+    {
+      "driver": "PAT",
+      "name": "Riccardo Patrese",
+      "fromLap": 32,
+      "toLap": 32,
+      "source": "https://en.wikipedia.org/wiki/1990_French_Grand_Prix (lap-leader chart, Template:F1Laps1990 'FRA')"
+    },
+    {
+      "driver": "CAP",
+      "name": "Ivan Capelli",
+      "fromLap": 33,
+      "toLap": 77,
+      "source": "https://en.wikipedia.org/wiki/1990_French_Grand_Prix (lap-leader chart, Template:F1Laps1990 'FRA')"
+    },
+    {
+      "driver": "PRO",
+      "name": "Alain Prost",
+      "fromLap": 78,
+      "toLap": 80,
+      "source": "https://en.wikipedia.org/wiki/1990_French_Grand_Prix (lap-leader chart, Template:F1Laps1990 'FRA')"
+    }
+  ],
+  "runningOrder": [
+    {
+      "lap": 1,
+      "order": [
+        "BER",
+        "MAN",
+        "SENA",
+        "NAN",
+        "PAT",
+        "PRO",
+        "BOUT",
+        "PIQN",
+        "ALE"
+      ],
+      "source": "https://en.wikipedia.org/wiki/1990_French_Grand_Prix: 'Berger took the lead at the start followed by pole sitter Mansell, Senna, Nannini, Patrese, Prost, Boutsen, Piquet and Jean Alesi'",
+      "note": "read as the order at the end of lap 1"
+    },
+    {
+      "lap": 54,
+      "order": [
+        "CAP",
+        "PRO",
+        "GUG"
+      ],
+      "source": "https://en.wikipedia.org/wiki/1990_French_Grand_Prix: 'Capelli took the lead being followed by teammate Gugelmin. Prost overtook Gugelmin on lap 54'"
+    }
+  ],
   "notes": "Motor Sport Aug 1990 ('A Touch of the Sun', DSJ); Wikipedia's lap-leader chart; GrandPrix.com GPE rr491; Autosport archive feature. Capelli (#16) and Gugelmin (#15) ran non-stop: 'they did not come in for tyres ... still they stayed out on the same tyres' (Motor Sport); Leyton House was 'the only team to attempt to race without stopping for fresh tyres' (Wikipedia). Gugelmin's engine lost oil pressure a few laps after Prost passed him on lap 54 (Jolpica: 58 laps); Wikipedia's 'Gugelmin stopped late in the race' reads as that retirement, not a tyre stop. Prost passed Capelli for the lead on lap 78 (Motor Sport; Wikipedia's chart: Prost leads 78-80; Wikipedia's text says 'lap 77 of 80'); Capelli's Judd was hesitating out of slow corners (Motor Sport), an oil light and dropping fuel pressure (Capelli, Autosport archive). Missing: Alesi's (#4) tyre stop (his final drive failed leaving the pits; Jolpica 23 laps, no lap in any source), Nannini's (#19) stop, Berger's and Mansell's second stops, every midfield stop. Stop laps for Berger, Senna, Mansell and Patrese are worked out from the leader chart and Motor Sport's order, not quoted."
 }

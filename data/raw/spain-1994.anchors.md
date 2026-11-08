@@ -13,6 +13,7 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 | laps down | 7 | 7 |
 | stop | 35 | 35 |
 | safety car | 1 | 1 |
+| leader | 5 | 5 |
 
 | Anchor | Subject | Target | Achieved | Pass |
 |---|---|---|---|---|
@@ -120,12 +121,17 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 | stop | BER | 17 | 17 | pass |
 | stop | COM | 18 | 18 | pass |
 | safety car | leader's SC laps, sourced (others unknown) | [] | [] | pass |
+| leader | MSCM laps 1-22 | 22 laps | 22 of 22 laps | pass |
+| leader | HAK laps 23-30 | 8 laps | 8 of 8 laps | pass |
+| leader | HIL laps 31-40 | 10 laps | 10 of 10 laps | pass |
+| leader | MSCM laps 41-45 | 5 laps | 5 of 5 laps | pass |
+| leader | HIL laps 46-65 | 20 laps | 20 of 20 laps | pass |
 
 ## Estimated
 
 - Every lap time and lap-end Time is synthetic: solved to the anchors, not measured
-- Position each lap follows from the synthetic times; the lap-1 order is the grid order
-- Lap times in between the anchors: pace + tyre wear + fuel + seeded noise
+- Position each lap follows from the synthetic times; the lap-1 order is the grid order, with the sourced lap-1 order at the front; each lap's leader and the sourced snapshots of the order and gaps are anchors, the rest of the order is estimated
+- Lap times in between the anchors: pace + tyre wear + fuel + seeded noise, the pace moved by a constant between the laps the sourced order marks
 - Fuel: 0.06s per lap of fuel on board; each stop refuels to the next stop
 - Stop loss: pit-lane time - 5.0s, 35% on the in-lap
 - PitInTime is the in-lap's end; PitOutTime adds the out-lap's share of the lane time
@@ -137,3 +143,4 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 
 - HER: stop on lap 42, the lap it retired on; not run
 - incident (not modelled): lap 22 FAULT MSCM: Stuck in fifth gear from his first pit stop to the finish
+- IRV: no time fits both its classification and its window
