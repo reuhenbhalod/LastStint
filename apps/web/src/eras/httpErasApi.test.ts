@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ApiError } from '../api.js';
-import type { AttemptResponse, EraDetail } from './api.js';
+import type { AttemptResponse, EraDetail, EraLeaderboard, HistoryBook, RaceStats } from './api.js';
 import type { ErasResponse } from './api.js';
 import { createHttpErasApi } from './httpErasApi.js';
 
@@ -84,5 +84,29 @@ describe('httpErasApi', () => {
     await expect(
       createHttpErasApi(r.deps).startAttempt({ raceId: 'x', legend: false }),
     ).rejects.toMatchObject({ status: 404, code: 'not-found' });
+  });
+  it('GET /api/history for the player', async () => {
+    const book = { completion: { collected: 0, total: 830, percent: 0 } } as unknown as HistoryBook;
+    const r = recorder({ [`/api/history?anonId=${PLAYER}`]: book });
+    expect(await createHttpErasApi(r.deps).history()).toBe(book);
+    expect(r.calls).toEqual([{ method: 'GET', path: `/api/history?anonId=${PLAYER}` }]);
+  });
+
+  it("GET a race's community stats", async () => {
+    const stats = { raceId: 'abu-dhabi-2021' } as unknown as RaceStats;
+    const r = recorder({ '/api/eras/races/abu-dhabi-2021/stats': stats });
+    expect(await createHttpErasApi(r.deps).raceStats('abu-dhabi-2021')).toBe(stats);
+  });
+
+  it('GET the normal and Legend leaderboards with the player, for their rank', async () => {
+    const normal = { legend: false } as unknown as EraLeaderboard;
+    const legend = { legend: true } as unknown as EraLeaderboard;
+    const path = (l: boolean) =>
+      `/api/eras/races/abu-dhabi-2021/leaderboard?legend=${l}&anonId=${PLAYER}`;
+    const r = recorder({ [path(false)]: normal, [path(true)]: legend });
+    const api = createHttpErasApi(r.deps);
+    expect(await api.leaderboard('abu-dhabi-2021', false)).toBe(normal);
+    expect(await api.leaderboard('abu-dhabi-2021', true)).toBe(legend);
+    expect(r.calls.map((c) => c.path)).toEqual([path(false), path(true)]);
   });
 });

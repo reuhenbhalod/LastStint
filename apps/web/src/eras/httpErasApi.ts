@@ -7,7 +7,17 @@
 import type { RaceModel } from '@laststint/sim';
 import { apiGet, apiPost } from '../api.js';
 import { anonId as browserPlayerId } from '../data/player.js';
-import type { AttemptRequest, AttemptResponse, EraDetail, ErasApi, ErasResponse } from './api.js';
+import type {
+  AttemptRequest,
+  AttemptResponse,
+  EraDetail,
+  EraLeaderboard,
+  ErasApi,
+  ErasHistoryApi,
+  ErasResponse,
+  HistoryBook,
+  RaceStats,
+} from './api.js';
 
 export interface HttpErasApiDeps {
   /** The player making the calls (default: this browser's player ID). */
@@ -17,7 +27,7 @@ export interface HttpErasApiDeps {
 }
 
 /** An Eras API client on the Worker. Errors are the server's (`ApiError` with its code). */
-export function createHttpErasApi(deps: HttpErasApiDeps = {}): ErasApi {
+export function createHttpErasApi(deps: HttpErasApiDeps = {}): ErasApi & ErasHistoryApi {
   const playerId = deps.playerId ?? browserPlayerId;
   const get = deps.get ?? apiGet;
   const post = deps.post ?? apiPost;
@@ -36,6 +46,16 @@ export function createHttpErasApi(deps: HttpErasApiDeps = {}): ErasApi {
 
     /** The race file an attempt pinned: `modelUrl` is absolute, from the Worker. */
     loadModel: (modelUrl: string): Promise<RaceModel> => get<RaceModel>(modelUrl),
+
+    history: (): Promise<HistoryBook> => get<HistoryBook>(`/api/history?anonId=${who()}`),
+
+    raceStats: (raceId: string): Promise<RaceStats> =>
+      get<RaceStats>(`/api/eras/races/${encodeURIComponent(raceId)}/stats`),
+
+    leaderboard: (raceId: string, legend: boolean): Promise<EraLeaderboard> =>
+      get<EraLeaderboard>(
+        `/api/eras/races/${encodeURIComponent(raceId)}/leaderboard?legend=${legend}&anonId=${who()}`,
+      ),
   };
 }
 

@@ -108,3 +108,134 @@ export interface ErasApi {
 
 /** The client the app uses. MOCK until build-plan step 7.2 ships the endpoints. */
 export const erasApi: ErasApi = mockErasApi;
+
+// ---- history book, community stats, leaderboards (spec §8, §13; build plan 7.4) -----------
+// The Worker's shapes (apps/worker/src/erasHistory.ts). A separate interface from `ErasApi`
+// so the mock needn't grow until the history screen (step 8.8) uses it.
+
+/** Collected of collectible. */
+export interface Tally {
+  have: number;
+  total: number;
+}
+
+/** An era's badges (spec §8): derived from progress, never stored. */
+export interface EraBadges {
+  /** At least one star on every race of the era. */
+  cleared: boolean;
+  /** Every star of the era. */
+  mastered: boolean;
+  /** Every Legend star of the era. */
+  legend: boolean;
+}
+
+/** One era's page of the history book. */
+export interface HistoryEra {
+  eraId: number;
+  name: string;
+  years: string;
+  playOrder: number;
+  races: number;
+  stars: Tally;
+  legendStars: Tally;
+  rewrites: Tally;
+  /** One hidden objective per race, met in either mode. */
+  hidden: Tally;
+  badges: EraBadges;
+  /** Collected over collectible in this era, 0-100 (unrounded). */
+  percent: number;
+}
+
+/** "Only 9% of strategists rewrote this race" (spec §8). */
+export interface RewriteShare {
+  /** Players with an evaluated attempt on the race (normal or Legend). */
+  players: number;
+  /** Of them, players who rewrote it (have its history book entry). */
+  rewrites: number;
+  /** rewrites / players, 0-1 (0 with no players). */
+  share: number;
+}
+
+/** One rewrite in the history book: the attempt that first rewrote the race. */
+export interface HistoryEntry {
+  raceId: string;
+  eraId: number;
+  /** 1..10 within the era. */
+  position: number;
+  attemptId: string;
+  achievedAt: string;
+  legend: boolean;
+  accuracy: number | null;
+  stars: { result: boolean; strategist: boolean; mastery: boolean };
+  /** The race's authored headline and what really happened; null until the race has them. */
+  headline: string | null;
+  real: string | null;
+  community: RewriteShare;
+}
+
+/** `GET /api/history`: the player's history book. */
+export interface HistoryBook {
+  /** Every collectible: 830 with the full campaign (spec §8). `percent` is 0-100, unrounded. */
+  completion: { collected: number; total: number; percent: number };
+  collectibles: {
+    stars: Tally;
+    legendStars: Tally;
+    rewrites: Tally;
+    hidden: Tally;
+    badges: Tally;
+  };
+  /** Every era, in play order. */
+  eras: HistoryEra[];
+  /** The player's rewrites, oldest first. */
+  entries: HistoryEntry[];
+}
+
+/** Shares (0-1) of a race's players holding each star and the hidden objective. */
+export interface StarRates {
+  /** Players with progress on the race in this mode. */
+  players: number;
+  result: number;
+  strategist: number;
+  mastery: number;
+  hidden: number;
+}
+
+/** `GET /api/eras/races/:raceId/stats`: community stats (cached briefly on the server). */
+export interface RaceStats {
+  raceId: string;
+  rewrite: RewriteShare;
+  stars: StarRates;
+  legendStars: StarRates;
+}
+
+export interface EraLeaderboardEntry {
+  rank: number;
+  /** The display name, or the generated one (as the Daily leaderboard). */
+  name: string;
+  accuracy: number;
+}
+
+/**
+ * `GET /api/eras/races/:raceId/leaderboard?legend=`: the top 100 by best accuracy (ties to
+ * whoever reached it first). Legend has its own board; neither ever resets.
+ */
+export interface EraLeaderboard {
+  raceId: string;
+  legend: boolean;
+  /** Most entries shown (100). */
+  size: number;
+  /** Players on the board. */
+  total: number;
+  entries: EraLeaderboardEntry[];
+  /** The player's place; null without an evaluated attempt on this board. */
+  me: { rank: number; accuracy: number } | null;
+}
+
+export interface ErasHistoryApi {
+  /** `GET /api/history`: the player's history book. */
+  history(): Promise<HistoryBook>;
+  /** `GET /api/eras/races/:raceId/stats`: community rewrite share and star rates. */
+  raceStats(raceId: string): Promise<RaceStats>;
+  /** `GET /api/eras/races/:raceId/leaderboard`: the normal or Legend board and the player's rank. */
+  leaderboard(raceId: string, legend: boolean): Promise<EraLeaderboard>;
+}
