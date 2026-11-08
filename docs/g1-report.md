@@ -2195,3 +2195,139 @@ as they are.
   grows to 13.9 s.
 - *sakhir-2020* (fix 2 alone: its race file is unchanged, only the golden): the SC queue of laps 61-68 now keeps its front gaps near 1.7 s, so the
   SC stops cost different places; the duel gap (RUS vs PER) goes 5.65 s over its limit.
+
+## Eras 5.6: the four replacement races: G1 0 pass, 0 borderline, 2 fail; reconstructed anchors 1 pass, 1 fail, G1 sanity 2 pass
+
+Eras build plan 5.6, Nov 8 2026. Written by hand. These are the four races swapped in on Nov 7
+(docs/eras-checks/swap-races.md), each in its old race's era and slot. Registry split `eras`,
+duel from the Eras spec's race table (§4, the user's driver first), `score_positions` 6, seed 1,
+D3 takeover. Sources: belgium-2023 from OpenF1 (raw data committed with the swap; its weather
+records show rain), great-britain-2016 from TUM (@ 9eaad9c, CC BY-NC-SA 3.0) then `pipeline
+wet-laps` (hand check: docs/eras-checks/4.5-wet-races.md), france-1990 and germany-1986 from
+`pipeline reconstruct` (the Jolpica dump of 2026-10-24, F1DB fastest laps, the sourced stops in
+data/reconstruction/<id>.json; full anchor tables in data/raw/<id>.anchors.md). Values are seed
+set 10000 / seed set 20000, limits in brackets.
+
+| Race | Duel | Takeover | Anchors (core) | Status | Without near-tie rule | Mean gap error | Failing checks | Diagnosis |
+|---|---|---|---|---|---|---|---|---|
+| belgium-2023 | VER vs PER | 10 | n/a | fail | fail | 4.80s | duel VER vs PER gap error 5.91 / 5.84 [3.00]; podium PER 5.91 / 5.84, LEC 8.06 / 8.00 [5.00]; field RUS 9.44 / 9.58 [6.31] | diagnose: race mechanics (pace 3%, rest 97%); really the wet pace fit, see below |
+| great-britain-2016 | VER vs ROS | 14 | n/a | fail | fail | 0.74s | duel VER vs ROS order rate 0.56 / 0.60 [0.60]; podium order rate 0.44 / 0.48 [0.50] | lap pace (pace 61%, rest 39%): a 1.34 s duel with Rosberg's gearbox loss not modelled. See below |
+| france-1990 | CAP vs PRO | 24 | **fail** 59/60 (order) | pass (sanity) | pass | 0.52s | | De Cesaris's disqualification puts him in the road order. See below |
+| germany-1986 | ROSK vs SENA | 16 | pass 60/60 | pass (sanity) | pass | 0.85s | | no duel checks: Rosberg's out-of-fuel stop is frozen. **Not playable as authored**, see below |
+
+Passing checks: belgium-2023's duel order is 1.00 and podium order 0.99; HAM and ALO are within
+2.3 s. great-britain-2016's gaps all pass (duel error 0.24 / 0.42 s, VER 0.55 / 0.70 s, RIC
+0.61 / 0.67 s). france-1990: duel error 0.42 / 0.40 s, duel order 0.95, podium order 0.78 /
+0.77, every gap within 1.61 s. germany-1986: podium order 1.00, every gap within 2.05 s (MAN).
+The solver settled on its first attempt for both reconstructed races (noise sigma 0.35 s).
+
+**Diagnoses.** Gaps are real / sim (mean of 60-100 runs, truncated at each lap), to the winner.
+
+- **belgium-2023.** The order is right and the late gaps grow at about the real rate. The error
+  comes on laps 16-25, the shower. Real VER gained 7.4 s on PER from lap 16 to lap 25
+  (-0.5 to 6.9 s), the sim 2.2 s (0.9 to 3.1 s). Against the lap model with the weather on
+  (the clean lap times the wetness curve), real PER lost 5.0 s more to VER than the model over
+  laps 16-25, LEC 5.1 s and HAM 3.9 s. The model has the opposite edge in the wet: VER's fitted
+  `wetPace` is -0.006 and PER's -0.014 (PER better). `wet.driver_wet_pace` takes every clean
+  lap with wetness 0.05 or more, so the opening laps 1-6 (0.06-0.17, the track drying from the
+  rain before the start) count as much as the shower, and those are the laps VER spent coming
+  through from 6th. (`diagnose.py` reads this as race mechanics, because its pace residual
+  leaves the weather out.) About a quarter of runs also keep VER behind PER after the stops
+  until lap 19-22 (real pass: lap 17). RUS's 9.5 s comes on laps 22-28, around his stop in the
+  shower (lap 22 in-lap, out on softs): the sim loses 23.3 s to VER over laps 22-25 against
+  15.4 s real, and holds the rest. Real RUS then lapped 110.6-111.8 s, faster than the
+  cars around him on old mediums; the sim likely keeps him in their traffic (not checked run
+  by run). No per-race knob applies: the takeover is the D3 lap (VER's lap-14 stop is the
+  first call), there is no SC, and nothing was race control's. The fix is in the wet pace
+  fit (leave out the opening laps, or the laps a car spent in traffic). Pace model work.
+- **great-britain-2016.** The gaps are right (ROS 7.2 s, VER 8.9 s against 6.9 and 8.25 s
+  real) but the order isn't. VER really finished 1.34 s behind ROS on the road, just over the
+  1.0 s near-tie line, so the order check applies. The sim's mean margin is 1.7 s and its noise
+  (ROS 0.81 s, VER 0.46 s a lap) makes it a coin flip (VER ahead in 40-44%). The real margin was
+  set by Rosberg's gearbox problem: he lost about 4 s on laps 46-47 (99.2 and 98.5 s against
+  96 s) and was told to avoid seventh gear. It isn't in data/incidents.json, so the build fits
+  it into his pace. With a sourced FAULT fact (step 4.4) the sim would carry it; that is a race
+  fact for the owner to enter, not a knob. The podium order fails for the same pair.
+  `realResult` is the road order HAM, ROS, VER. Rosberg's 10 s post-race penalty (3rd officially)
+  isn't applied, as for the other post-race penalties. The target (VER on the podium) holds
+  either way.
+- **france-1990: anchor failure (order), owner / solver.** Jolpica has de Cesaris (DEC)
+  disqualified (underweight, WP) with 78 laps and no time. The solver gives a disqualified car a
+  retirement's window. His 78th lap ends before the flag, so the road order puts him 13th,
+  ahead of Modena and Larini (13th and 14th, also 78 laps), and Mansell drops off the end of the
+  classified list. The race file has a RETIREMENT for DEC on lap 80. He is outside the scored
+  six, so G1 and play are unaffected. The fix belongs in `reconstruct.py`: give a disqualified
+  car that ran to the flag a lapped finisher's window after the classified cars, as the Era 1
+  fix does for cars that ran to the flag unclassified. Not changed here (the solver is shared,
+  and this step's fixes are per-race knobs only). No race fact was edited.
+- **germany-1986: not playable as authored (owner / solver and sim).** Rosberg (ROSK) and Prost
+  are in Jolpica as classified 5th and 6th, 43 laps, "Out of fuel". Two problems follow from that.
+  1. *The player's car always retires.* The build freezes a RETIREMENT for ROSK on lap 43 and
+     PRO on lap 44, so in live play the user's car stops on lap 43 whatever the calls (0 of 200
+     runs classified, in each of no calls, push, lift and coast, manage, the real calls, and
+     Legend). The same frozen-retirement limit as australia-1986 and monaco-1988 (Era 1 section).
+  2. *The synthetic laps make him faster than he was.* The solver gives every classified car
+     that didn't finish a retirement's window, ending about 1.8 laps before the last lead-lap
+     finisher (`reconstruct.targets`, `seen`). For a car that stopped on the last lap,
+     that can only be met by putting him ahead of the winner. In the synthetic laps ROSK leads
+     PIQN by 21.5 s at lap 43 and PRO is 21.0 s ahead. Really, Piquet led from lap 39 and Rosberg
+     began the last lap 2nd (AS, MS; Wikipedia's lap chart). The anchors pass because the
+     retirement-event anchor isn't core and no anchor checks the lap-leader chart.
+
+  *The fuel limit itself works* (in memory, with ROSK's RETIREMENT removed, 200 seeds,
+  incidents on; not committed). With no calls, ROSK runs dry on lap 44, the last lap, in 121 of
+  200 runs (the takeover margin is drawn around zero) and reaches the flag in 75. Push from
+  the takeover runs dry on lap 43 in 195 of 200. Lift and coast or manage reaches the flag in
+  196 of 200 (the other 4 are incidents) and never runs dry. So "run dry if it pushes, reach the
+  flag if it saves" holds. But because of problem 2 a car that saves wins in 192-195 of 196,
+  where really Piquet was 15 s clear. Fixing it needs (a) the solver to let a car that stopped
+  on the last lap end its lap in its real place (behind the leader), and (b) a fuel-limit
+  race's "Out of fuel" stop for the player's car (and the rival's) left to the fuel model
+  rather than frozen. That is a design decision (spec §4 / step 6.2) and sim work. The race
+  file is committed so the race is built and its facts kept; it shouldn't be played until then.
+
+**Hard calls / storyline side.** The swap note leaves germany-1986's side to the hard-call
+counter. It isn't run here (`pipeline hard-calls` writes data/eras/, out of scope). The duel is
+Rosberg's, as the drafted target is.
+
+**The TS sim: live replay and play.** `live-replay.test.ts` passes for all four (8 tests: the
+real calls match the replay exactly, also re-tagged as a refuelling race). Server match: each
+race's 20 golden seeds match the TS sim (order, finishers, times and gaps within 0.0005 s),
+80 / 80. Every race plays to the flag in all runs and scenarios below with no errors (200 seeds
+each, incidents on: no calls, push, lift and coast, manage, an extra stop five laps after the
+takeover, the real calls with and without push / lift and coast, and Legend). Rules: belgium-2023 and
+great-britain-2016 run with VSC, DRS and the two-compound rule. france-1990 and germany-1986 run
+with no SC or VSC laps at all (0 of 11,200 and 5,600 laps, Legend included), one compound, and
+germany-1986 under its 165.75 kg limit.
+- belgium-2023: the real calls (stops on laps 14 and 30, MEDIUM then SOFT) win in 170 of 191
+  classified runs (the other 9 are incidents), 151 in Legend. Calls that never change compound
+  are disqualified under the two-compound rule (188 of 200 with no calls), as they should be.
+- **great-britain-2016: the real calls are disqualified (sim bug, owner / sim).** VER takes over
+  on inters and his real call is slicks on lap 18 (MEDIUM). The run is disqualified under the
+  two-compound rule in 191 of 200 runs (50 of 50 with incidents off). `stateAtTakeover.compoundsUsed`
+  lists dry compounds only (`scenario.state_at_takeover`). The wet tyres the car is on at the
+  takeover are never added to `compoundsUsed` when it changes to slicks. So `ruleSatisfied`
+  (sim.ts, "wet tyres waive it") doesn't see that the car ran on inters. The same happens in
+  monaco-2008 and united-states-2015, which take over on inters and go to slicks (50 / 50 each
+  with the real calls). canada-2024 and monaco-2016 escape only because a later wet stop adds a
+  wet tyre. `live-replay.test.ts` compares times, not disqualifications, so it doesn't catch
+  this. The fix is in the sim (count the takeover compound when the car changes) or in
+  `state_at_takeover`. Sim code is out of scope here. Staying on inters to the flag (no calls)
+  finishes P3 in 139 of 200 runs.
+- france-1990: the real calls (no stop) reproduce the race: P2 in 139 of 191 classified runs,
+  P1 in 23. But a tyre stop anywhere from lap 29 to 59 wins in 172-187 of 191. CAP's fitted
+  `basePace` (71.30 s) is 0.32 s a lap quicker than Prost's, because his synthetic laps all ran
+  on one set and the race has one wear rate (0.028 s a lap per lap of age), so the fit gives his
+  car the pace to offset it. A stop then gives that car fresh tyres. The non-stop call (the
+  storyline) is playable, but the sim makes stopping the clear answer. Owner: whether that's
+  acceptable or the dilemma needs a per-car wear rate (the solver fits one per car; the race
+  model has one). Pace model, not a knob.
+- germany-1986: above.
+
+**Also changed:** `apps/web/src/eras/ErasScreen.test.ts`. The "links only races an attempt can
+start on" test used Era 10 as its era with a missing race file (belgium-2023). Era 10 is now
+complete, so the test picks the newest era that still has one.
+
+**Not regenerated here:** `apps/worker/src/races.gen.ts`, `data/sc_rates.json` and the parity
+fixtures. `test_sc_rates.py` passes as committed: great-britain-2016's and belgium-2023's status
+timelines came with the swap's recount, and reconstructed races aren't counted.

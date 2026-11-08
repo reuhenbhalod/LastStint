@@ -1887,6 +1887,62 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
+    # Eras build plan 5.6: the four replacement races (owner, Nov 7;
+    # docs/eras-checks/swap-races.md). belgium-2023 from OpenF1 (its shower is in the weather
+    # data), great-britain-2016 from TUM then `pipeline wet-laps`, france-1990 and germany-1986
+    # reconstructed (`pipeline reconstruct`). Duels, seeds and split as for wave A.
+    "belgium-2023": {
+        "year": 2023,
+        "event": "Belgium",
+        "source": "openf1",
+        "name": "Belgium 2023: Verstappen vs Pérez",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "VER",
+        "rival": "PER",  # win from P6 after the gearbox penalty: Pérez, the car behind
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "great-britain-2016": {
+        "year": 2016,
+        "event": "Great Britain",
+        "source": "tum",
+        "name": "Britain 2016: Verstappen vs Rosberg",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "VER",
+        "rival": "ROS",  # position: the podium; Rosberg, his fight for P2 on the road
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "france-1990": {
+        "year": 1990,
+        "event": "French",
+        "source": "reconstruct",
+        "name": "France 1990: Capelli vs Prost",
+        "era": "1988-1993",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "CAP",
+        "rival": "PRO",  # win from P7 with no tyre stop; Prost, who caught and passed him
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "germany-1986": {
+        "year": 1986,
+        "event": "German",
+        "source": "reconstruct",
+        "name": "Germany 1986: Rosberg vs Senna",
+        "era": "1988-1993",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "ROSK",
+        "rival": "SENA",  # position: P2 or better on the fuel; Senna, who took the P2 he lost
+        "score_positions": 6,
+        "split": "eras",
+    },
 }
 
 

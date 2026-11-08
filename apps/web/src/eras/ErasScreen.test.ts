@@ -260,13 +260,21 @@ describe('Era detail', () => {
   });
 
   it('links only races an attempt can start on, saying why the others cannot', () => {
-    // Era 10: it has a race with no race file yet (belgium-2023 isn't built yet).
-    const html = renderDetail(ERA10, detailReady(erasResponse(true), eraDetail(10), mockCanStart));
-    const playable = eraDetail(10)
+    // The newest era that still has a race with no race file in this build (Era 10 is
+    // complete since belgium-2023 was built).
+    const eraId = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1].find((id) =>
+      eraDetail(id).races.some((r) => !mockCanStart(r.raceId)),
+    ) as number;
+    expect(eraId).toBeDefined();
+    const html = renderDetail(
+      eraById(eraId) as EraInfo,
+      detailReady(erasResponse(true), eraDetail(eraId), mockCanStart),
+    );
+    const playable = eraDetail(eraId)
       .races.map((r) => r.raceId)
       .filter(mockCanStart);
     expect(playable.length).toBeLessThan(10);
-    expect(raceLinks(html)).toEqual(playable.map((id) => `/eras/10/${id}`));
+    expect(raceLinks(html)).toEqual(playable.map((id) => `/eras/${eraId}/${id}`));
     expect(html.match(/no race file in this build/g)).toHaveLength(10 - playable.length);
     expect(html.match(/aria-disabled="true"/g)).toHaveLength(10 - playable.length);
   });
