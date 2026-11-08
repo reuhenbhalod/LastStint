@@ -1,11 +1,14 @@
 """Validate and write the race-model JSON (Implementation Plan 1.6).
 
 Validates the assembled race model against packages/schema/race-model.schema.json before
-writing data/races/<race-id>.json.
+writing data/races/<race-id>.json. The schema checks each field's shape; `check_references`
+adds the cross-field checks JSON Schema can't express (the drivers the Eras block names must
+be in the race).
 """
 
 from __future__ import annotations
 
+import copy
 import json
 from pathlib import Path
 
@@ -17,11 +20,68 @@ def load_schema(schema_path: Path = SCHEMA_PATH) -> dict:
     return json.loads(schema_path.read_text())
 
 
+def check_references(model: dict) -> None:
+    """Raise ValueError if the Eras block names a driver who isn't in the race.
+
+    Covers eras.userSide, the hardCalls keys and the rival of a beat-rival / deny target or
+    rewrite condition. A race without an Eras block always passes.
+    """
+    eras = model.get("eras")
+    if not eras:
+        return
+    codes = {d["code"] for d in model["drivers"]}
+    named: list[tuple[str, str]] = []
+    if "userSide" in eras:
+        named.append(("eras.userSide", eras["userSide"]))
+    named += [(f"eras.hardCalls.{code}", code) for code in eras.get("hardCalls", {})]
+    conditions = [("eras.target", eras.get("target"))]
+    if "storyline" in eras:
+        conditions.append(
+            ("eras.storyline.rewriteCondition", eras["storyline"]["rewriteCondition"])
+        )
+    named += [
+        (f"{where}.rival", cond["rival"]) for where, cond in conditions if cond and "rival" in cond
+    ]
+    unknown = [f"{where}={code}" for where, code in named if code not in codes]
+    if unknown:
+        raise ValueError(f"{model['race']['id']}: drivers not in the race: {', '.join(unknown)}")
+
+
 def validate_model(model: dict, schema_path: Path = SCHEMA_PATH) -> None:
-    """Raise jsonschema.ValidationError if the model does not match the schema."""
+    """Raise jsonschema.ValidationError if the model does not match the schema, or ValueError
+    if the Eras block names a driver who isn't in the race (check_references)."""
     import jsonschema
 
     jsonschema.validate(instance=model, schema=load_schema(schema_path))
+    check_references(model)
+
+
+def with_eras_fields(
+    model: dict,
+    *,
+    eras: dict | None = None,
+    provenance: dict | None = None,
+    rules: dict | None = None,
+    storyline_events: list[tuple[int, str]] | None = None,
+) -> dict:
+    """Return a validated copy of an assembled model with the schema v11 blocks set.
+
+    None leaves a block as it is (absent keeps today's behaviour). `storyline_events` lists
+    (lap, type) pairs, such as (53, "SC"), to flag `storylineEvent: true`; each must match an
+    event in the model. Write the result with `write_race`.
+    """
+    out = copy.deepcopy(model)
+    for key, block in (("eras", eras), ("provenance", provenance), ("rules", rules)):
+        if block is not None:
+            out[key] = copy.deepcopy(block)
+    for lap, kind in storyline_events or []:
+        hits = [e for e in out["events"] if e["lap"] == lap and e["type"] == kind]
+        if not hits:
+            raise ValueError(f"{out['race']['id']}: no {kind} event on lap {lap} to flag")
+        for event in hits:
+            event["storylineEvent"] = True
+    validate_model(out)
+    return out
 
 
 def write_race(model: dict, races_dir: Path = RACES_DIR) -> Path:

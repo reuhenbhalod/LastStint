@@ -4,6 +4,13 @@ import type { DecisionMoment } from './moments.js';
 // A run is fully defined by (race model, seed, list of decisions) — that is what the
 // Worker replays to verify a score.
 
+/**
+ * The race-model schema version the pipeline writes (pipeline.SCHEMA_VERSION). v11 added
+ * eras, provenance, rules, events[].storylineEvent and scUnlap 'none', all optional: files
+ * at any earlier version still load unchanged.
+ */
+export const SCHEMA_VERSION = 11;
+
 export type Compound = string; // e.g. 'SOFT' | 'MEDIUM' | 'HARD'; era-dependent set
 
 export type Era = '1988-1993' | '1994-2009' | '2010-2013' | '2014-2025' | '2026+';
@@ -93,10 +100,148 @@ export interface RaceEvent {
   type: 'SC' | 'VSC' | 'RED' | 'RAIN' | 'RETIREMENT';
   laps?: number;
   driver?: string;
+  /** Defines the storyline: Legend difficulty always runs it on its real lap (eras spec 8). */
+  storylineEvent?: boolean;
+}
+
+// Eras mode (eras spec sections 6, 8 and 11; schema v11). Types and validation only: the
+// evaluator is eras build plan 1.4, the rules' behaviour 4.1 / 4.2.
+
+/** The six star 1 target types (eras spec 6). */
+export const ERAS_TARGET_TYPES = [
+  'win',
+  'defend',
+  'position',
+  'beat-rival',
+  'team',
+  'deny',
+] as const;
+export type ErasTargetType = (typeof ERAS_TARGET_TYPES)[number];
+
+/**
+ * A result condition from the player's side: the star 1 target, and the storyline's rewrite
+ * condition. `position`: P`position` or better. `deny`: the rival finishes P`position` or worse
+ * (or doesn't finish). `team`: positions[0] is the player's car, positions[1] its teammate,
+ * each at or better. `defend` is `win` from P1, framed as a defence.
+ */
+export type ErasTarget =
+  | { type: 'win' }
+  | { type: 'defend' }
+  | { type: 'position'; position: number }
+  | { type: 'beat-rival'; rival: string }
+  | { type: 'team'; positions: [number, number] }
+  | { type: 'deny'; rival: string; position: number };
+
+/** The eight mastery / hidden objective types (eras spec 6). */
+export const ERAS_OBJECTIVE_TYPES = [
+  'stop_count',
+  'beat_real_call',
+  'finish_position',
+  'margin',
+  'compound_rule',
+  'mode_rule',
+  'no_neutralized_stop',
+  'team_result',
+] as const;
+export type ErasObjectiveType = (typeof ERAS_OBJECTIVE_TYPES)[number];
+
+/** Every mode value (each names its Modes key): what a `mode_rule` limits. */
+export type ModeValue = Modes[keyof Modes];
+export const MODE_VALUES: readonly ModeValue[] = [
+  'push',
+  'standard',
+  'manage',
+  'normal',
+  'liftAndCoast',
+  'attack',
+  'hold',
+  'defend',
+  'harvest',
+  'balanced',
+  'deploy',
+  'overtake',
+];
+
+/** A mastery or hidden objective, with the label the UI shows. */
+export type ErasObjective = { label: string } & (
+  | { type: 'stop_count'; max: number; exact?: never }
+  | { type: 'stop_count'; exact: number; max?: never }
+  | { type: 'beat_real_call' }
+  | { type: 'finish_position'; position: number }
+  | { type: 'margin'; seconds: number }
+  | { type: 'compound_rule'; mustUse: Compound; mustAvoid?: Compound }
+  | { type: 'compound_rule'; mustUse?: Compound; mustAvoid: Compound }
+  | { type: 'mode_rule'; mode: ModeValue; maxLaps: number }
+  | { type: 'no_neutralized_stop' }
+  | { type: 'team_result'; positions: [number, number] }
+);
+
+export interface ErasStoryline {
+  /** What really happened. */
+  real: string;
+  /** The result that rewrites the storyline, from the player's side. */
+  rewriteCondition: ErasTarget;
+  /** An original history-book headline (never quoted team radio). */
+  headline: string;
+}
+
+/**
+ * The race's Eras block. Only `eraId` and `order` are required, so a race can join an era
+ * before its content is written; the content checklist (spec 15) requires the rest.
+ */
+export interface ErasBlock {
+  /** The era, 1 (turbo era) to 10 (ground effect): not the play order. */
+  eraId: number;
+  /** The race's number within its era, 1-10. */
+  order: number;
+  /** The driver the player runs in Eras (more hard calls). Absent: the top-level userSide. */
+  userSide?: string;
+  target?: ErasTarget;
+  storyline?: ErasStoryline;
+  mastery?: ErasObjective;
+  hidden?: ErasObjective;
+  /** Hard calls per storyline driver (driver code -> count; `pipeline hard-calls`). */
+  hardCalls?: Record<string, number>;
+  /** The short era-appropriate intro shown before the race. */
+  briefing?: string;
+}
+
+/** Fields estimated rather than measured (eras build plan 2.4). */
+export const ESTIMATED_FIELDS = ['compounds', 'safetyCars', 'fuelLoads', 'weather'] as const;
+export type EstimatedField = (typeof ESTIMATED_FIELDS)[number];
+
+/** Where the race's data came from. Absent: real, nothing estimated. */
+export interface Provenance {
+  kind: 'real' | 'reconstructed';
+  estimated?: EstimatedField[];
+}
+
+/**
+ * The race's sporting rules (roadmap R5). An absent field keeps today's behaviour (the
+ * defaults below); `drs` and `ers` default to the era's headset.json block.
+ */
+export interface RaceRules {
+  /** A dry race must use two dry compounds (2007+). Default true. */
+  twoCompound?: boolean;
+  /** False: a stop only refuels (2005). Default true. */
+  tyreChanges?: boolean;
+  /** Stops refuel (1994-2009, 1983). Default false. */
+  refuelling?: boolean;
+  /** The fixed race fuel allowance in kg (1984-88); not with refuelling. Absent: no cap. */
+  fuelLimit?: number;
+  /** The pit lane closes when the SC is called; a stop takes a penalty (2007-09). Default false. */
+  pitLaneClosedUnderSC?: boolean;
+  /** A virtual safety car exists (2015+). Default true. */
+  vsc?: boolean;
+  /** DRS and the wait-drs move. Absent: the era block's `drs`. */
+  drs?: boolean;
+  /** The battery: none, KERS (2009, 2011-13) or hybrid ERS (2014+). Absent: the era block's. */
+  ers?: 'none' | 'kers' | 'hybrid';
 }
 
 // Parsed + validated race JSON (validated at load time with zod or ajv).
 export interface RaceModel {
+  /** The version written; every version is additive, so any up to SCHEMA_VERSION loads. */
   schemaVersion: number;
   race: {
     id: string;
@@ -104,9 +249,10 @@ export interface RaceModel {
     laps: number;
     takeoverLap: number;
     seed: number;
-    /** Which lapped cars unlap before a SC restart: all (the rule, default), or only those
-     * between userSide and rival (Abu Dhabi 2021's race-control call). */
-    scUnlap?: 'all' | 'duel';
+    /** Which lapped cars unlap before a SC restart: all (the rule, default), only those
+     * between userSide and rival (Abu Dhabi 2021's race-control call), or none (before 2012;
+     * treated as all until eras build plan 4.1). */
+    scUnlap?: 'all' | 'duel' | 'none';
   };
   era: Era;
   track: {
@@ -139,7 +285,12 @@ export interface RaceModel {
   userSide: string;
   /** The direct rival: reacts to the user's calls (rival policy); everyone else is scripted. */
   rival: string;
+  /** Hand-built without official lap timing; agrees with `provenance.kind` when both are set. */
   reconstructed?: boolean;
+  /** Eras mode (eras spec 11); Daily and Gauntlet ignore it. */
+  eras?: ErasBlock;
+  provenance?: Provenance;
+  rules?: RaceRules;
 }
 
 export interface PitStop {
