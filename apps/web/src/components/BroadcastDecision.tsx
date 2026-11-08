@@ -3,11 +3,19 @@
 // (game/guide.ts). Stops fold into a "Box" button per timing (this lap, next lap) that opens
 // the tyre choice in place, each compound with what it gains over the laps left. Same options
 // the server grades (game/choices.ts); no chances shown (the grade comes after the call).
-// Number keys pick options, Escape backs out of the tyre choice.
+// Number keys pick options, Escape backs out of the tyre choice. In Eras mode (build plan 8.6)
+// the gap follows the difficulty's information level and the decision timer sits by the tag.
 
 import { type DecisionMoment, type RaceModel, type RaceState, tyreLife } from '@laststint/sim';
-import { useEffect, useRef, useState } from 'react';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { named, surname } from '../data/names.js';
+import {
+  FULL_INFORMATION,
+  type InformationView,
+  gapShown,
+  gapText,
+  shownGap,
+} from '../eras/difficulty/information.js';
 import { briefFor } from '../game/brief.js';
 import { choicesFor, tyreName } from '../game/choices.js';
 import { type Fact, modeFacts, tyreOutlooks } from '../game/guide.js';
@@ -25,11 +33,17 @@ export function BroadcastDecision({
   race,
   model,
   onChoose,
+  info = FULL_INFORMATION,
+  timer,
 }: {
   moment: DecisionMoment;
   race: RaceState;
   model: RaceModel;
   onChoose: (optionId: string) => void;
+  /** What the Eras information level shows (everything, otherwise). */
+  info?: InformationView;
+  /** The Eras decision timer, shown by the tag. */
+  timer?: ReactNode;
 }) {
   const brief = briefFor(moment, race, model);
   const c = choicesFor(moment);
@@ -105,10 +119,10 @@ export function BroadcastDecision({
   });
 
   const facts: Array<[string, string]> = [];
-  if (brief.gap !== null)
+  if (brief.gap !== null && gapShown(info, race.order, model.userSide, model.rival))
     facts.push([
       'Gap',
-      `${brief.gap >= 0 ? '+' : '−'}${Math.abs(brief.gap).toFixed(1)}s ${brief.gap >= 0 ? `on ${surname(model.rival)}` : `to ${surname(model.rival)}`}`,
+      `${gapText(info, brief.gap)} ${shownGap(info, brief.gap) >= 0 ? `on ${surname(model.rival)}` : `to ${surname(model.rival)}`}`,
     ]);
   if (brief.us) facts.push(['Tyres', `${tyreName(brief.us.compound)} · ${brief.us.age}`]);
   if (brief.rival)
@@ -131,6 +145,7 @@ export function BroadcastDecision({
         <span role="alert" className="call-tag">
           Engineer · {brief.kind} · Lap {moment.lap}
         </span>
+        {timer}
         <dl className="m-0 hidden flex-wrap gap-x-4 gap-y-1 md:flex">
           {facts.map(([k, v]) => (
             <div key={k} className="flex items-baseline gap-1.5 text-[12px]">
