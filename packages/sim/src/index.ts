@@ -113,3 +113,59 @@ export {
   wetnessOn,
 } from './weather.js';
 export * from './eras/config.js';
+export {
+  COVER_WINDOWS,
+  DEFAULT_RIVAL_POLICY,
+  EXPERT_SAMPLES,
+  RIVAL_POLICY_NAMES,
+  RivalPolicyError,
+  coverWindow,
+  hasSmartRules,
+  playoutPolicy,
+  resolveRivalPolicy,
+} from './rivals/policy.js';
+export {
+  RIVAL_OPTION_IDS,
+  boxNowCompound,
+  decisionReasons,
+  latestStop,
+  overcutLap,
+  planTime,
+  rivalOptions,
+  sameLapCover,
+  wetSwitch,
+} from './rivals/rules.js';
+export type {
+  KnownFlags,
+  RivalDecisionReason,
+  RivalOptionId,
+  RivalPlanOption,
+} from './rivals/rules.js';
+export { wetCrossover } from './rivals/wet.js';
+export {
+  RivalClaimError,
+  parseRivalChoices,
+  resolveRivalDecision,
+  rivalChoices,
+} from './rivals/react.js';
+export type {
+  RivalChoice,
+  RivalClaimErrorCode,
+  RivalGrading,
+  RivalPoint,
+  RivalRunState,
+} from './rivals/react.js';
+export {
+  RIVAL_GRADE_STREAM,
+  countRivalHits,
+  gradeRivalMoment,
+  mergeRivalGradeJobs,
+  rivalAhead,
+  rivalGradeJob,
+  rivalPlayout,
+  rivalSampleSeed,
+  runRivalGradeJob,
+} from './rivals/expert.js';
+export type { RivalGrade, RivalGradeJob, RivalOption } from './rivals/expert.js';
+export { regradeRivalPoints, replayWithRivalClaims } from './rivals/claims.js';
+export type { RivalClaimReplay, RivalRegrade } from './rivals/claims.js';

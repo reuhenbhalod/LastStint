@@ -16,6 +16,8 @@
 // The spec doesn't define the continuation; this choice is recorded in the implementation
 // plan (2.7).
 
+import type { RivalPolicy } from './eras/config.js';
+import type { RivalChoice } from './rivals/react.js';
 import { deriveSeed } from './rng.js';
 import {
   type Run,
@@ -206,6 +208,10 @@ export interface GradeJob {
   options: GradeOption[];
   target: Target;
   samples?: number;
+  /** The run's rival policy (Run.rivalPolicy; absent: standard). */
+  rivalPolicy?: RivalPolicy;
+  /** Expert: the rival's choices so far (rivals/react.ts rivalChoices), replayed, not re-graded. */
+  rivalChoices?: RivalChoice[];
 }
 
 export interface GradeJobResult {
@@ -229,12 +235,32 @@ export function gradeJob(
     options,
     target,
     samples,
+    ...(run.rivalPolicy === 'standard' ? {} : { rivalPolicy: run.rivalPolicy }),
+    ...(run.rival
+      ? { rivalChoices: run.rival.points.map((p) => ({ lap: p.lap, option: p.chosen })) }
+      : {}),
   };
 }
 
-/** Rebuild the paused run from a job (deterministic replay). */
-export function runFromJob(job: GradeJob): Run {
-  const run = initRun(job.model, job.seed, { decisions: job.decisions });
+/**
+ * Rebuild the paused run from a job (deterministic replay), with the job's rival. An Expert
+ * rival replays its recorded choices and never grades here: a decision point without one
+ * waits (a decision at the paused lap stays pending for the rival's own grade job; an earlier
+ * one throws).
+ */
+export function runFromJob(
+  job: Pick<
+    GradeJob,
+    'model' | 'seed' | 'decisions' | 'pausedAtLap' | 'rivalPolicy' | 'rivalChoices'
+  >,
+): Run {
+  const run = initRun(job.model, job.seed, {
+    decisions: job.decisions,
+    ...(job.rivalPolicy ? { rivalPolicy: job.rivalPolicy } : {}),
+    ...(job.rivalPolicy === 'expert'
+      ? { rivalChoices: job.rivalChoices ?? [], rivalGrading: 'deferred' as const }
+      : {}),
+  });
   while (run.state.lap < job.pausedAtLap) stepLap(run);
   return run;
 }
