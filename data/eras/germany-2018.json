@@ -7,5 +7,45 @@
     "drs": true,
     "ers": "hybrid",
     "refuelling": false
-  }
+  },
+  "eras": {
+    "eraId": 8,
+    "order": 3,
+    "userSide": "HAM",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Hamilton wins from 14th on the grid: rain arrives late, the leader Vettel slides into the barriers, and Hamilton stays out under the safety car.",
+      "rewriteCondition": {
+        "type": "win"
+      },
+      "headline": "From fourteenth to the top step at Hockenheim"
+    },
+    "mastery": {
+      "type": "compound_rule",
+      "mustUse": "SOFT",
+      "label": "Win with a stint on the soft tyre"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 5,
+      "label": "Win by more than 5 seconds"
+    },
+    "hardCalls": {
+      "HAM": 3,
+      "BOT": 0
+    },
+    "briefing": "Hockenheim, 2018. A hydraulics failure in qualifying leaves Hamilton 14th on the grid, while Vettel starts from pole. Rain will come in the second half of the race."
+  },
+  "storylineEvents": [
+    [
+      52,
+      "SC"
+    ],
+    [
+      52,
+      "RETIREMENT"
+    ]
+  ]
 }

@@ -1,4 +1,34 @@
 {
+  "eras": {
+    "eraId": 9,
+    "order": 1,
+    "userSide": "VER",
+    "target": {
+      "type": "defend"
+    },
+    "storyline": {
+      "real": "Mercedes undercut Verstappen with an early stop for Hamilton; Verstappen catches him late, passes him off the track at Turn 4, is told to give the place back and finishes second, 0.745 seconds behind.",
+      "rewriteCondition": {
+        "type": "defend"
+      },
+      "headline": "No track limits needed: Verstappen wins the season opener in Bahrain"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "max": 2,
+      "label": "Win on no more than two stops"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 2,
+      "label": "Win by more than 2 seconds"
+    },
+    "hardCalls": {
+      "VER": 1,
+      "HAM": 0
+    },
+    "briefing": "Bahrain, 2021. The season opener: Verstappen starts from pole, Hamilton alongside him in second."
+  },
   "rules": {
     "twoCompound": true,
     "tyreChanges": true,

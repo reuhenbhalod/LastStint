@@ -1,4 +1,34 @@
 {
+  "eras": {
+    "eraId": 8,
+    "order": 6,
+    "userSide": "VER",
+    "target": {
+      "type": "defend"
+    },
+    "storyline": {
+      "real": "Mercedes switch Hamilton to a second stop; on fresh mediums he catches Verstappen and passes him with four laps to go.",
+      "rewriteCondition": {
+        "type": "defend"
+      },
+      "headline": "Verstappen holds on at the Hungaroring"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "max": 1,
+      "label": "Win on a single stop"
+    },
+    "hidden": {
+      "type": "compound_rule",
+      "mustAvoid": "HARD",
+      "label": "Win without fitting the hard tyre"
+    },
+    "hardCalls": {
+      "VER": 2,
+      "HAM": 0
+    },
+    "briefing": "Hungary, 2019. Verstappen starts from the first pole position of his career, with Bottas and Hamilton behind him."
+  },
   "rules": {
     "twoCompound": true,
     "tyreChanges": true,

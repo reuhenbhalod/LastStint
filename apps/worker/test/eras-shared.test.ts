@@ -4,7 +4,7 @@
 // (pipeline/tests/fixtures/eras_overlay_parity.json; pipeline/tests/test_shared_races.py).
 
 import { SELF, createExecutionContext, env, waitOnExecutionContext } from 'cloudflare:test';
-import type { RaceModel } from '@laststint/sim';
+import { type RaceModel, initRun } from '@laststint/sim';
 import { describe, expect, it } from 'vitest';
 import abuOverlay from '../../../data/eras/abu-dhabi-2021.json';
 import abuJson from '../../../data/races/abu-dhabi-2021.json';
@@ -37,13 +37,14 @@ const DAILY_HASHES: Record<string, string> = {
   'hungary-2019': '500a886adc23c5c7f014bbacbcfe929757aa13165ef52e9cf759df50ff94032d',
   'russia-2021': '038a27369e37f828e0f66081ba284c99ebf6af2e9f2e30ec0943928daedf06fa',
 };
-// Their Eras models' hashes (race file + today's overlay): change only with the overlay.
+// Their Eras models' hashes (race file + the overlay as authored in step 6.2, Nov 8 2026):
+// change only with the overlay.
 const ERAS_HASHES: Record<string, string> = {
-  'abu-dhabi-2021': 'f4c2f601dda9b527089d50c0c70f01896a7044ff5dc79b770d5270fd5c1fe691',
-  'bahrain-2021': 'e0990e60435782cf1778e9bbe60be842c4e980abf33196a1048a268f992caa4e',
-  'france-2021': '3e6478d42806bcd1c08d903ee3efe565bc773c7e6c4f61d3f5b7cfee31682d5d',
-  'hungary-2019': 'd72f31adfe1d55bdc014df3282ed5492fbc9c44ee225aa2c58686debbd94dc66',
-  'russia-2021': 'db2aee13911ac285b1d60cc9a423b9cf64fd829014918e43d130d2cca2665d0b',
+  'abu-dhabi-2021': 'b3bfaf94b20bca54c2f8539d5dced3e15d2106eb036715b6bfe4992021513b4a',
+  'bahrain-2021': '3fc5e332a9dde5d1f108c5006fcc963f0be1b80bb6ab902b2be9355c91ddd82e',
+  'france-2021': '3eb876094b718d969f3e1d2ace907a7618b3e7e33347d1069c416960598511c4',
+  'hungary-2019': '084731e29cfbaffbad2da4e2f6af3634dbb2f9dc66a41bc52d33ee4ccd0d925e',
+  'russia-2021': 'dab705886d335ca3156ed5e362b482d4876771391687bec0c4159917a7898c7b',
 };
 
 describe('withErasOverlay: parity with the pipeline merge (export.with_eras_fields)', () => {
@@ -74,6 +75,12 @@ describe('withErasOverlay: parity with the pipeline merge (export.with_eras_fiel
 
   it('refuses what the pipeline refuses', () => {
     const abu = FILES['abu-dhabi-2021'] as RaceModel;
+    expect(() => withErasOverlay(abu, { decisionMoments: {} })).toThrow(
+      /decisionMoments must be a list/,
+    );
+    expect(() => withErasOverlay(abu, { eras: { eraId: 9, order: 10, userSide: 'BOT' } })).toThrow(
+      /eras.userSide BOT is neither the userSide HAM nor the rival VER/,
+    );
     expect(() => withErasOverlay(abu, { rule: {} })).toThrow(/unknown Eras overlay keys rule/);
     expect(() => withErasOverlay(abu, [])).toThrow(/must be an object/);
     expect(() => withErasOverlay(abu, { rules: [1] })).toThrow(/rules must be an object/);
@@ -119,6 +126,35 @@ describe('shared races', () => {
     expect(await getErasRace(id)).toBe(eras);
     // The Daily view is unaffected by the merge.
     expect((await getRace(id))?.model.rules).toBeUndefined();
+  });
+
+  // Owner decision (Nov 8): the hard-call side wins, also on a shared race. The Eras model is
+  // the other car's when the hard calls say so, with moments authored from that side, while
+  // the Daily file keeps its side and moments.
+  it.each(SHARED)('%s: the Eras model plays the hard-call side', async (id) => {
+    const file = FILES[id] as RaceModel;
+    const overlay = ERAS_OVERLAYS[id] as {
+      eras: { userSide: string; hardCalls: Record<string, number> };
+      decisionMoments?: unknown[];
+    };
+    const eras = (await getErasRace(id))?.model as RaceModel;
+    const side = overlay.eras.userSide;
+    expect(Object.keys(overlay.eras.hardCalls).sort()).toEqual([file.userSide, file.rival].sort());
+    expect(eras.userSide).toBe(side);
+    expect(eras.rival).toBe(side === file.userSide ? file.rival : file.userSide);
+    expect(eras.decisionMoments).toEqual(overlay.decisionMoments ?? file.decisionMoments);
+    if (side !== file.userSide) {
+      expect(overlay.decisionMoments).toBeDefined();
+      expect(eras.decisionMoments).not.toEqual(file.decisionMoments);
+    }
+    // The run's player car is the Eras side's, from its own takeover state.
+    const run = initRun(eras, eras.race.seed, { decisions: [] });
+    expect(run.state.cars[side]?.strategy).toEqual([]);
+    const takeover = file.drivers.find((d) => d.code === side)?.stateAtTakeover;
+    expect(eras.drivers.find((d) => d.code === eras.userSide)?.stateAtTakeover).toEqual(takeover);
+    // The Daily view still plays its own side.
+    const daily = (await getRace(id))?.model as RaceModel;
+    expect([daily.userSide, daily.rival]).toEqual([file.userSide, file.rival]);
   });
 
   it('the Eras model route serves the merged model, pinned by its hash', async () => {
