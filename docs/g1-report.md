@@ -1445,3 +1445,115 @@ Counting TyreLife from the start in 2005 would let the fit see it. That's an est
 the_raw_timelines` fails on the six new raw status timelines until integration regenerates it,
 as on earlier race branches. races.gen.ts and the parity fixtures are unchanged. Garages for
 2005-2009 are added (the 2004-2008 standings from the Jolpica dump).
+
+## Eras 5.1 refuel, part 2 (5.4b): the five held races and japan-2000: 0 pass, 0 borderline, 6 fail
+
+Eras build plan 5.1, Nov 7 2026. Written by hand, as the sections above. Robust mode: 1,000
+runs on each of two seed sets, values seed set 10000 / seed set 20000, limits in brackets.
+
+**1. The five held races are built.** san-marino-2005, japan-2005, brazil-2006, brazil-2007
+and brazil-2009 were held in the section above because their real calls had no fill. Now every
+pit call in a refuelling race carries a fill, and `realDecisions` carries the real one (the
+next real stint, docs/fuel-load-spec.md). So their race and golden files are committed
+(`pipeline build <id>`, the registry entries, raw ingests and SC hand-check files as
+committed). The build is unchanged, so their G1 numbers are the same as above to the
+hundredth, and so are the diagnoses (no per-race knob applies). The fill doesn't touch the
+Python replay or the G1 runs: they replay the real stops.
+
+**2. japan-2000 is new.** `pipeline jolpica japan-2000` (F1DB stops, Jolpica CSV dump of
+2026-10-24, CC BY-NC-SA 4.0; credit in the raw sidecar), with the step 2.4 estimates: one dry
+compound (MEDIUM), new tyres at each stop, no SC (`data/estimates/japan-2000.sc.json`, no
+periods, unchecked), and 60 stints of fuel loads. Registered with split `eras`, the storyline
+duel from the Eras spec §4 (beat-rival: MSCM ahead of HAK), `score_positions` 6, seed 1 and the
+D3 takeover (lap 19). Its overlay (data/eras/japan-2000.json) already sets `refuelling` and
+`tyreChanges: true`.
+- **As a dry race it doesn't build.** The fit's fuel effect comes out at -0.0097 s a lap,
+  below the schema's minimum of 0. The field slowed 2-4 s a lap in the drizzle from about lap
+  30, which the fuel term reads as the car getting slower as it gets lighter.
+- **So it's a wet race,** via the standard path for a race without weather data (`pipeline
+  wet-laps japan-2000`, step 4.5, as monaco-2008). The fit calls laps 37-39 and 45-53 wet,
+  with laps 30-36 and 40-44 ambiguous ("borderline slowing: drizzle, or tyre wear"). Nobody
+  changed off slicks, and no stint is on a wet tyre class. The fitted wetness is 0 to lap 29,
+  then 0.03-0.08 to lap 44 and 0.10-0.15 from lap 45. The fuel effect is the wet races' fixed
+  prior (0.056). The rain timeline is in docs/eras-checks/4.5-wet-races.md for the owner to
+  check.
+- **Fill model:** 0.2452 s per lap of fuel (its own slope +0.117, se 0.052; 31 stops), refFill
+  16.4 laps, tank 33 laps.
+- **The overtake fit is wrong-signed,** so the default model is used (build note).
+
+| Race | Duel | Status | Mean gap error | Failing checks | Diagnosis |
+|---|---|---|---|---|---|
+| san-marino-2005 | ALO vs MSCM | fail | 6.25s | duel gap error 11.47 / 11.48 [3.00]; podium order rate 0.39 / 0.41 [0.50]; podium MSCM 11.47 / 11.48 [5.00]; field WUR 7.09 / 7.07, SAT 6.28 / 6.32 [5.00], VIL 6.83 / 6.66 [6.44] | as above: Schumacher's middle stint, Alonso's last (pace 41%, rest 59%) |
+| japan-2005 | RAI vs FIS | fail | 6.18s | duel gap error 10.12 / 10.11 [3.00], order rate 0.10 / 0.11 [0.60]; podium order rate 0.10 / 0.11 [0.50]; podium FIS 10.12 / 10.11; field WEB 5.99 / 6.01, BUT 8.18 / 8.07, COU 8.23 / 8.23 [5.00] | as above: Räikkönen's last stint (pace 9%, rest 91%) |
+| brazil-2006 | ALO vs MSCM | fail | 8.23s | duel gap error 21.01 / 20.94 [3.00] (order 1.00 passes); podium BUT 7.32 / 7.13 [5.00]; field MSCM 22.45 / 22.40 [5.00] | as above: Schumacher can't pass (pace 1%, rest 99%) |
+| brazil-2007 | RAI vs HAM | fail | 2.24s | podium order rate 0.49 / 0.48 [0.50]; field ROS 7.42 / 7.39 [6.28] | as above: the second-stop swap and Rosberg's train (pace 2%, rest 98%) |
+| brazil-2009 | BUT vs BAR | fail | 4.50s | duel gap error 5.16 / 5.13 [3.00] (order 1.00 / 0.99 passes); field VET 7.70 / 7.93, BUT 5.74 / 5.71 [5.00] | as above: Webber's last stint (pace 1%, rest 99%) |
+| japan-2000 | MSCM vs HAK | fail | 4.51s | podium COU 16.21 / 16.20 [5.00]; field BUT 8.65 / 8.73 [8.57] | pace 80%, rest 20%: Coulthard and Button in the drizzle. See below |
+
+**japan-2000 passes on the storyline.** The duel's gap error is 0.69 / 0.76 s and its order
+rate 0.84 / 0.85, and the podium order rate is 0.84 / 0.85. Häkkinen pitted on lap 37 and
+Schumacher three laps later (in-lap 40), and he came out ahead. The sim reproduces that: HAK
+is 0.9 s ahead on lap 42 and MSCM 2.8 s ahead at the flag (real 4.2 s and 1.8 s). BAR is 0.70 /
+0.75 s.
+
+**Diagnosis of the two failures** (100-200 runs; each car's real green laps against the sim's
+clean lap, tank and wetness included, by stint, relative to MSCM):
+- **COU** is 16 s too close at the flag (sim 53.8 s, real 69.9 s). The sim is within 2 s of
+  real to lap 35.
+- From lap 30 real Coulthard ran slower than his fit, relative to Schumacher: +0.5 s a lap on
+  laps 30-36, +1.2 on 37-39, +1.4 on 40-44 and +0.5 on 45-53. That adds up to about 16 s.
+- Most of it is on the ambiguous laps (30-36, 40-44). The sim's wetness there is 0.03-0.04,
+  so the track is nearly dry and his fitted wet pace (+0.67% of a lap) barely bites.
+- Real Schumacher ran 0.4-0.5 s a lap under his fit over the same laps. So it's driver pace in
+  light drizzle on laps the fit calls neither wet nor dry.
+- **BUT** misses by 0.08-0.16 s over the limit. He ran +1.4 s a lap against Schumacher on laps
+  40-44, the same cause.
+- **No per-race knob applies.** There is no SC, the takeover is before the first stop, and the
+  wet-laps fit has no override for its ambiguous laps (it flags them and never guesses). Fixing
+  it needs damp-track pace by driver on the borderline laps: wet model work (wet.py,
+  wet_laps.py).
+
+**3. The TS sim: replay and playability** (a scratch vitest, not committed; the live-replay and
+parity suites are committed and pass with all six in data/races):
+- **The real calls replay the real race** (`live-replay.test.ts`, both describes). With no
+  incidents, live play with the real calls (real fills) matches the replay exactly. No car's
+  tank goes below empty, with the race's own fill model and with the prior. With incidents on,
+  the real fills still reach the next real stop.
+- **The real fills:**
+
+  | Race | In-lap and fill |
+  |---|---|
+  | san-marino-2005 | lap 23: 19 laps; lap 42: 20 |
+  | japan-2005 | lap 26: 19 laps; lap 45: 8 |
+  | brazil-2006 | lap 26: 28 laps; lap 54: 17 |
+  | brazil-2007 | lap 21: 32 laps; lap 53: 18 |
+  | brazil-2009 | lap 29: 26 laps; lap 55: 16 |
+  | japan-2000 | lap 23: 17 laps; lap 40: 13 |
+
+- **Live play to the flag:** 60 seeds of live play with incidents and the real calls reach the
+  flag in every race. No car runs dry, and no VSC is ever drawn. Crashes bring 11-24 SCs over
+  the 60 runs (japan-2000: 24).
+- **The fills:** at the user's first real stop, each of the three fills puts in what
+  `fillOptions` says. The tank after a green out-lap is exactly fill + reserve - 1.
+
+  | Race | short / standard / long (laps) |
+  |---|---|
+  | san-marino-2005 | 13 / 20 / 25 |
+  | japan-2005 | 14 / 27 / 27 |
+  | brazil-2006 | 15 / 23 / 38 |
+  | brazil-2007 | 17 / 25 / 32 |
+  | brazil-2009 | 21 / 42 / 42 |
+  | japan-2000 | 15 / 30 / 30 |
+
+- **The 2005 tyre lock:** at both 2005 races a stop keeps the set, so the sim tyre age carries
+  on (23 -> 24, 26 -> 27). In 2000, 2006, 2007 and 2009 a stop fits a new set (age 1).
+- **Pit lane closed under SC (2007-08):** brazil-2007 has no real SC after its takeover. So
+  the check takes a drawn SC: in 5 of 5 seeds, a stop added on its deployment lap owed a
+  stop-go.
+
+**4. Not regenerated here.** `data/sc_rates.json`, races.gen.ts and the parity fixtures are
+unchanged. `test_sc_rates.py::test_committed_rates_match_the_raw_timelines` fails on
+japan-2000's new raw status timeline (KeyError) until integration regenerates the rates, as on
+earlier race branches. A 2000 garage list is added to apps/web/src/track/garages.ts (the 1999
+standings from the Jolpica dump, Stewart as Jaguar, BAR last with no standing): the web's
+every-race garage test needs it.

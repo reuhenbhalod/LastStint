@@ -1,0 +1,437 @@
+{
+ "race": "japan-2000",
+ "source": "lap-times",
+ "neutralSource": "status",
+ "filled": [
+  "Compound: each stint's tyre class fitted from the lap times; dry stints keep step 2.4's estimated compound"
+ ],
+ "wetSpells": [
+  "37-39",
+  "45-53"
+ ],
+ "neutralLaps": [],
+ "ambiguous": [
+  {
+   "lap": 30,
+   "why": "borderline slowing: drizzle, or tyre wear"
+  },
+  {
+   "lap": 31,
+   "why": "borderline slowing: drizzle, or tyre wear"
+  },
+  {
+   "lap": 32,
+   "why": "borderline slowing: drizzle, or tyre wear"
+  },
+  {
+   "lap": 33,
+   "why": "borderline slowing: drizzle, or tyre wear"
+  },
+  {
+   "lap": 34,
+   "why": "borderline slowing: drizzle, or tyre wear"
+  },
+  {
+   "lap": 35,
+   "why": "borderline slowing: drizzle, or tyre wear"
+  },
+  {
+   "lap": 36,
+   "why": "borderline slowing: drizzle, or tyre wear"
+  },
+  {
+   "lap": 40,
+   "why": "borderline slowing: drizzle, or tyre wear"
+  },
+  {
+   "lap": 41,
+   "why": "borderline slowing: drizzle, or tyre wear"
+  },
+  {
+   "lap": 42,
+   "why": "borderline slowing: drizzle, or tyre wear"
+  },
+  {
+   "lap": 43,
+   "why": "borderline slowing: drizzle, or tyre wear"
+  },
+  {
+   "lap": 44,
+   "why": "borderline slowing: drizzle, or tyre wear"
+  }
+ ],
+ "stintClasses": [],
+ "laps": [
+  {
+   "lap": 1,
+   "slowing": null,
+   "gap": 0.835,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 2,
+   "slowing": 0.0074,
+   "gap": 1.093,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 3,
+   "slowing": 0.0009,
+   "gap": 1.271,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 4,
+   "slowing": 0.0034,
+   "gap": 1.872,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 5,
+   "slowing": 0.0027,
+   "gap": 2.74,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 6,
+   "slowing": 0.0019,
+   "gap": 2.739,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 7,
+   "slowing": 0.0016,
+   "gap": 2.592,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 8,
+   "slowing": 0.0006,
+   "gap": 1.968,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 9,
+   "slowing": 0.001,
+   "gap": 2.038,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 10,
+   "slowing": 0.0004,
+   "gap": 3.011,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 11,
+   "slowing": 0.0023,
+   "gap": 3.612,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 12,
+   "slowing": 0.0018,
+   "gap": 2.524,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 13,
+   "slowing": 0.0016,
+   "gap": 2.34,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 14,
+   "slowing": 0.0014,
+   "gap": 2.444,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 15,
+   "slowing": 0.0017,
+   "gap": 4.999,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 16,
+   "slowing": 0.004,
+   "gap": 5.27,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 17,
+   "slowing": 0.0032,
+   "gap": 5.894,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 18,
+   "slowing": 0.0034,
+   "gap": 3.644,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 19,
+   "slowing": 0.0027,
+   "gap": 7.835,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 20,
+   "slowing": 0.0176,
+   "gap": 6.34,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 21,
+   "slowing": 0.0198,
+   "gap": 2.535,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 22,
+   "slowing": 0.0092,
+   "gap": 3.424,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 23,
+   "slowing": 0.0069,
+   "gap": 5.24,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 24,
+   "slowing": 0.0103,
+   "gap": 2.666,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 25,
+   "slowing": 0.0084,
+   "gap": 3.941,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 26,
+   "slowing": 0.0064,
+   "gap": 4.232,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 27,
+   "slowing": 0.0095,
+   "gap": 4.717,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 28,
+   "slowing": 0.0101,
+   "gap": 4.819,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 29,
+   "slowing": 0.0121,
+   "gap": 4.28,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 30,
+   "slowing": 0.0238,
+   "gap": 4.585,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 31,
+   "slowing": 0.0229,
+   "gap": 4.596,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 32,
+   "slowing": 0.0243,
+   "gap": 4.71,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 33,
+   "slowing": 0.0231,
+   "gap": 5.106,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 34,
+   "slowing": 0.0244,
+   "gap": 7.865,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 35,
+   "slowing": 0.0233,
+   "gap": 11.194,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 36,
+   "slowing": 0.0299,
+   "gap": 10.823,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 37,
+   "slowing": 0.0418,
+   "gap": 7.852,
+   "neutral": false,
+   "wet": true
+  },
+  {
+   "lap": 38,
+   "slowing": 0.0409,
+   "gap": 9.345,
+   "neutral": false,
+   "wet": true
+  },
+  {
+   "lap": 39,
+   "slowing": 0.0394,
+   "gap": 8.289,
+   "neutral": false,
+   "wet": true
+  },
+  {
+   "lap": 40,
+   "slowing": 0.0302,
+   "gap": 9.092,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 41,
+   "slowing": 0.0289,
+   "gap": 8.954,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 42,
+   "slowing": 0.0282,
+   "gap": 10.522,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 43,
+   "slowing": 0.0301,
+   "gap": 9.539,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 44,
+   "slowing": 0.0283,
+   "gap": 8.965,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 45,
+   "slowing": 0.0464,
+   "gap": 8.16,
+   "neutral": false,
+   "wet": true
+  },
+  {
+   "lap": 46,
+   "slowing": 0.0763,
+   "gap": 10.014,
+   "neutral": false,
+   "wet": true
+  },
+  {
+   "lap": 47,
+   "slowing": 0.067,
+   "gap": 10.674,
+   "neutral": false,
+   "wet": true
+  },
+  {
+   "lap": 48,
+   "slowing": 0.0696,
+   "gap": 12.22,
+   "neutral": false,
+   "wet": true
+  },
+  {
+   "lap": 49,
+   "slowing": 0.0685,
+   "gap": 12.805,
+   "neutral": false,
+   "wet": true
+  },
+  {
+   "lap": 50,
+   "slowing": 0.0632,
+   "gap": 11.204,
+   "neutral": false,
+   "wet": true
+  },
+  {
+   "lap": 51,
+   "slowing": 0.0547,
+   "gap": 10.254,
+   "neutral": false,
+   "wet": true
+  },
+  {
+   "lap": 52,
+   "slowing": 0.0451,
+   "gap": 8.761,
+   "neutral": false,
+   "wet": true
+  },
+  {
+   "lap": 53,
+   "slowing": 0.0486,
+   "gap": 7.89,
+   "neutral": false,
+   "wet": true
+  }
+ ]
+}
