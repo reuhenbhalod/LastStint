@@ -113,3 +113,5 @@ export {
   wetnessOn,
 } from './weather.js';
 export * from './eras/config.js';
+export * from './eras/evaluate.js';
+export * from './eras/race-log.js';
