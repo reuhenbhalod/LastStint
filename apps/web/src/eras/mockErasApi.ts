@@ -2,7 +2,8 @@ import { difficultyForEra } from '@laststint/sim';
 // MOCK Eras API, for building the Eras screens before the Worker endpoints exist (build-plan
 // step 7.2). Not the real thing: no player progress, no gating, and every attempt is on the
 // one bundled race file (Abu Dhabi 2021, Era 9 race 10); an attempt on any other race is
-// refused. Remove once the endpoints are up.
+// refused. It reports test mode (`testMode: true`), as the staging server will. Remove once
+// the endpoints are up.
 
 import abuDhabi2021 from '@data/races/abu-dhabi-2021.json';
 import type { RaceModel } from '@laststint/sim';
@@ -56,7 +57,7 @@ let attempts = 0;
 
 export const mockErasApi: ErasApi = {
   async eras() {
-    return ERAS.map((e) => summary(e.id));
+    return { testMode: true, eras: ERAS.map((e) => summary(e.id)) };
   },
 
   async era(eraId) {

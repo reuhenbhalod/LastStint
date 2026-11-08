@@ -14,11 +14,31 @@ export interface EraSummary {
   playOrder: number;
   /** Released in production (`released_at` set); always true on test. */
   released: boolean;
-  /** Reached 70% of the stars of the era before it in play order (spec §5). */
+  /**
+   * Reached 70% of the stars of the era before it in play order (spec §5). The server works
+   * it out with the sim's `unlocksNextEra`; the era map recomputes it from `stars` with the
+   * same helper (eraMapState.ts), so the two agree by construction.
+   */
   unlocked: boolean;
   /** The player's stars in this era, out of `maxStars` (3 per race). */
   stars: number;
   maxStars: number;
+}
+
+/** `GET /api/eras`: the eras, and which mode the server is in. */
+export interface ErasResponse {
+  /**
+   * The server runs with `ERAS_TEST_MODE` (spec §13, §16): every era is open, whatever its
+   * release or lock state, and locks are still shown so they can be tested. In production
+   * (false) unreleased eras are "Coming soon" and locked eras can't be entered.
+   *
+   * NOTE for step 7.2: the Worker must send this field on `GET /api/eras`, set from its
+   * `ERAS_TEST_MODE` config, so the web app knows which mode it is in (it has no other way
+   * to tell test from production).
+   */
+  testMode: boolean;
+  /** Every era, in play order. */
+  eras: EraSummary[];
 }
 
 /** One race card of an era: `GET /api/eras/:eraId`. */
@@ -60,8 +80,8 @@ export interface AttemptResponse {
 }
 
 export interface ErasApi {
-  /** `GET /api/eras`: every era, in play order. */
-  eras(): Promise<EraSummary[]>;
+  /** `GET /api/eras`: every era, in play order, and the server's mode. */
+  eras(): Promise<ErasResponse>;
   /** `GET /api/eras/:eraId`: the era and its race cards. */
   era(eraId: number): Promise<EraDetail>;
   /** `POST /api/eras/attempts`: start an attempt on a race. */
