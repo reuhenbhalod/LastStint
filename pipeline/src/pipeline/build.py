@@ -1400,6 +1400,119 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
+    # Eras wave B (build plan 5.1): red-flag races of 2020-2024 (step 4.3; the facts are in
+    # data/redflags/<id>.json, step R1). OpenF1 for 2023-24 (race control gives the restarts),
+    # the project's FastF1 cache for hungary-2021 (`pipeline ingest --offline`), and Jolpica
+    # for the rest (`pipeline jolpica`, with step 2.4's estimated compounds and SC laps, and
+    # the stoppage lap entered in the red-flag file as resumeLap). Wet races get `pipeline
+    # wet-laps`. The duel is the storyline pair of the Eras spec's race table (§4), the user's
+    # driver first. Seeds and split as for wave A.
+    "netherlands-2023": {
+        "year": 2023,
+        "event": "Netherlands",
+        "source": "openf1",
+        "name": "Netherlands 2023: Alonso vs Verstappen",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "ALO",
+        "rival": "VER",  # position: P2 or better; the car ahead (as step 4.3's fixture)
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "brazil-2024": {
+        "year": 2024,
+        "event": "Brazil",
+        "source": "openf1",
+        "name": "Brazil 2024: Verstappen vs Ocon",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "VER",
+        "rival": "OCO",  # win from P17: the car behind at the flag
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "hungary-2021": {
+        "year": 2021,
+        "event": "Hungary",
+        "name": "Hungary 2021: Hamilton vs Alonso",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "HAM",
+        "rival": "ALO",  # position: the podium; Alonso, the car he passed for it
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "monaco-2022": {
+        "year": 2022,
+        "event": "Monaco",
+        "source": "jolpica",
+        "name": "Monaco 2022: Leclerc vs Pérez",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "LEC",
+        "rival": "PER",  # Leclerc holds the lead (real: Pérez wins, Leclerc P4)
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "great-britain-2022": {
+        "year": 2022,
+        "event": "Great Britain",
+        "source": "jolpica",
+        "name": "Britain 2022: Leclerc vs Sainz",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "LEC",
+        "rival": "SAI",  # Leclerc holds the lead after the SC (real: Sainz wins, Leclerc P4)
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "azerbaijan-2021": {
+        "year": 2021,
+        "event": "Azerbaijan",
+        "source": "jolpica",
+        "name": "Azerbaijan 2021: Pérez vs Vettel",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "PER",
+        "rival": "VET",  # Pérez holds the lead at the restart; defend race: the car behind
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "saudi-arabia-2021": {
+        "year": 2021,
+        "event": "Saudi Arabia",
+        "source": "jolpica",
+        "name": "Saudi Arabia 2021: Hamilton vs Verstappen",
+        "era": "2014-2025",
+        # The D3 rule skips events up to lap 10, so it lands on lap 10: Hamilton's in-lap for
+        # his stop under the lap-10 SC (the storyline's first call), which live play can't
+        # take at the takeover. Lap 7 is the rule's three laps of play before that SC.
+        "takeover_lap": 7,
+        "seed": 1,
+        "user_side": "HAM",
+        "rival": "VER",  # beat-rival: Hamilton ahead of Verstappen
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "italy-2020": {
+        "year": 2020,
+        "event": "Italy",
+        "source": "jolpica",
+        "name": "Italy 2020: Gasly vs Sainz",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "GAS",
+        "rival": "SAI",  # Gasly holds the lead to the flag; defend race: the car behind
+        "score_positions": 6,
+        "split": "eras",
+    },
 }
 
 
@@ -1542,11 +1655,14 @@ def dry_fit(
             return frame[slick & ~frame["LapNumber"].isin(period)]
 
         clean_df, traffic_df = dry(clean_df), dry(traffic_df)
-        if clean_df.empty and traffic_df.empty:
+        if clean_df.empty:
+            # Wet all race (Brazil 2016, Interlagos 2024: every lap on inters or wets): the
+            # wet model is a correction on a dry lap model this race can't give, and the build
+            # says so instead of failing inside the fit.
             raise ValueError(
-                "no dry lap on slicks to fit the dry model on (every lap on wet-weather tyres"
-                " or in the wet period): a race run wet throughout needs a dry-pace reference"
-                " from elsewhere"
+                f"{race_id}: no dry lap to fit the dry model on (no clean slick lap outside the"
+                " wet period: every lap on wet-weather tyres or in the wet period); a race wet"
+                " from start to finish needs a dry-pace reference from elsewhere"
             )
     # Model v3 stage 6 (T1): pace from clear-air laps only; the sim adds the dirty-air
     # penalty itself when a car follows within range, so traffic laps would count it twice.
@@ -1644,6 +1760,7 @@ def build_race(
         # would only read back the solver's noise. Its faults stay out until a sourced loss is
         # built into the faulted car's laps (reported, never guessed).
         unfitted, fault_facts = fault_facts, []
+    fault_facts, fault_notes = faults.split_retired(laps, fault_facts)
     block = (load_sidecar(race_id, raw_dir) or {}).get("estimates")
     refuelling = "fuelLoads" in (block or {}).get("estimated", [])
 
@@ -1736,7 +1853,7 @@ def build_race(
     return BuildResult(
         model=model,
         laps=laps,
-        notes=[*fitted.prior_notes, *params.notes],
+        notes=[*fitted.prior_notes, *params.notes, *fault_notes],
         estimates=report,
     )
 

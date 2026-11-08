@@ -25,13 +25,13 @@ conflicts below come from.
 
 | Race | # | Flag lap | Stoppage lap | Restart | SC after | Laps sched. / done | Main sources | Conflict? | Owner checked |
 |---|---|---|---|---|---|---|---|---|---|
-| monaco-2022 | 1 | 30 | (timed; Jolpica 30) | rolling | 2 (31-32) | 77 / 64 (time limit) | [Autosport live](https://www.autosport.com/f1/live-text/f1-monaco-gp-live-commentary-and-updates-race-day-1114912/1114912/?p=2), [The Race](https://www.the-race.com/formula-1/massive-schumacher-crash-causes-another-monaco-gp-stoppage) | Scheduled 77 (The Race) vs 78 (Wikipedia) | |
-| great-britain-2022 | 1 | 1 | (timed; Jolpica 2) | standing, lap 3 | 0 | 52 / 52 | [Crash.net live](https://www.crash.net/f1/live/live-updates-f1-british-grand-prix-race-day-silverstone?page=3), [Autosport](https://www.autosport.com/f1/news/f1-british-gp-sainz-takes-maiden-win-in-dramatic-race-as-title-challengers-struggle/10332505/) | No | |
-| azerbaijan-2021 | 1 | 48 | (timed; Jolpica 49) | standing, lap 50 | 0 | 51 / 51 | [GrandPrix.com notes](https://www.grandprix.com/races/azerbaijan-gp-2021-race-notes.html), [Wikipedia](https://en.wikipedia.org/wiki/2021_Azerbaijan_Grand_Prix) | GrandPrix.com summary says 49 | |
+| monaco-2022 | 1 | 30 | 30 (Jolpica, 5.1) | rolling | 2 (31-32) | 77 / 64 (time limit) | [Autosport live](https://www.autosport.com/f1/live-text/f1-monaco-gp-live-commentary-and-updates-race-day-1114912/1114912/?p=2), [The Race](https://www.the-race.com/formula-1/massive-schumacher-crash-causes-another-monaco-gp-stoppage) | Scheduled 77 (The Race) vs 78 (Wikipedia) | |
+| great-britain-2022 | 1 | 1 | 2 (Jolpica, 5.1) | standing, lap 3 | 0 | 52 / 52 | [Crash.net live](https://www.crash.net/f1/live/live-updates-f1-british-grand-prix-race-day-silverstone?page=3), [Autosport](https://www.autosport.com/f1/news/f1-british-gp-sainz-takes-maiden-win-in-dramatic-race-as-title-challengers-struggle/10332505/) | No | |
+| azerbaijan-2021 | 1 | 48 | 49 (Jolpica, 5.1) | standing, lap 50 | 0 | 51 / 51 | [GrandPrix.com notes](https://www.grandprix.com/races/azerbaijan-gp-2021-race-notes.html), [Wikipedia](https://en.wikipedia.org/wiki/2021_Azerbaijan_Grand_Prix) | GrandPrix.com summary says 49 | |
 | hungary-2021 | 1 | 2 | (timed; Jolpica 3) | standing, lap 4 | 0 | 70 / 70 | FastF1 timing (project cache), [Wikipedia list](https://en.wikipedia.org/wiki/List_of_red-flagged_Formula_One_races), [RaceFans](https://www.racefans.net/?p=458971), [Motor Sport](https://www.motorsportmagazine.com/articles/single-seaters/f1/esteban-ocon-dodges-chaotic-start-to-win-the-2021-hungarian-gp-as-it-happened/) | Autosport says lap 3 | |
-| saudi-arabia-2021 | 1 | 13 | (timed; Jolpica 14) | standing, lap 15 | 0 | 50 / 50 | [Wikipedia](https://en.wikipedia.org/wiki/2021_Saudi_Arabian_Grand_Prix), [Motor Sport lap by lap](https://motorsportmagazine.com/articles/single-seaters/f1/hamilton-emerges-from-chaos-to-win-2021-saudi-arabian-gp-lap-by-lap), [Speedcafe](https://speedcafe.com/second-red-flag-amid-championship-drama/) | RaceFans and Speedcafe say 14 (the stoppage lap) | |
-| saudi-arabia-2021 | 2 | 15 | (timed; Jolpica 16) | standing, lap 17 | 0 | | [Wikipedia list](https://en.wikipedia.org/wiki/List_of_red-flagged_Formula_One_races), [Wikipedia](https://en.wikipedia.org/wiki/2021_Saudi_Arabian_Grand_Prix), [Motor Sport](https://motorsportmagazine.com/articles/single-seaters/f1/hamilton-emerges-from-chaos-to-win-2021-saudi-arabian-gp-lap-by-lap) | Motor Sport says 16 | |
-| italy-2020 | 1 | 26 | (timed; Jolpica 27) | standing, lap 28 | 0 | 53 / 53 | [GrandPrix.com analysis](https://www.grandprix.com/races/italian-gp-2020-race-analysis.html), [Autosport](https://www.autosport.com/f1/news/151934/gasly-holds-off-sainz-to-win-topsyturvy-italian-gp), [Wikipedia](https://en.wikipedia.org/wiki/2020_Italian_Grand_Prix) | Wikipedia list says 27. **Check against the timing** | |
+| saudi-arabia-2021 | 1 | 13 | 14 (Jolpica, 5.1) | standing, lap 15 | 0 | 50 / 50 | [Wikipedia](https://en.wikipedia.org/wiki/2021_Saudi_Arabian_Grand_Prix), [Motor Sport lap by lap](https://motorsportmagazine.com/articles/single-seaters/f1/hamilton-emerges-from-chaos-to-win-2021-saudi-arabian-gp-lap-by-lap), [Speedcafe](https://speedcafe.com/second-red-flag-amid-championship-drama/) | RaceFans and Speedcafe say 14 (the stoppage lap) | |
+| saudi-arabia-2021 | 2 | 15 | 16 (Jolpica, 5.1) | standing, lap 17 | 0 | | [Wikipedia list](https://en.wikipedia.org/wiki/List_of_red-flagged_Formula_One_races), [Wikipedia](https://en.wikipedia.org/wiki/2021_Saudi_Arabian_Grand_Prix), [Motor Sport](https://motorsportmagazine.com/articles/single-seaters/f1/hamilton-emerges-from-chaos-to-win-2021-saudi-arabian-gp-lap-by-lap) | Motor Sport says 16 | |
+| italy-2020 | 1 | 26 | 27 (Jolpica, 5.1) | standing, lap 28 | 0 | 53 / 53 | [GrandPrix.com analysis](https://www.grandprix.com/races/italian-gp-2020-race-analysis.html), [Autosport](https://www.autosport.com/f1/news/151934/gasly-holds-off-sainz-to-win-topsyturvy-italian-gp), [Wikipedia](https://en.wikipedia.org/wiki/2020_Italian_Grand_Prix) | Wikipedia list says 27. **Check against the timing** | |
 | azerbaijan-2017 | 1 | 22 | 23 | rolling | 0 | 51 / 51 | [Wikipedia](https://en.wikipedia.org/wiki/2017_Azerbaijan_Grand_Prix), [GTspirit](https://gtspirit.com/?p=205699), Jolpica | No | |
 | brazil-2016 | 1 | 20 | 21 | rolling | 6 (22-27) | 71 / 71 | [Wikipedia list](https://en.wikipedia.org/wiki/List_of_red-flagged_Formula_One_races), [Motor Sport](https://www.motorsportmagazine.com/articles/single-seaters/f1/2016-brazilian-grand-prix/), Jolpica | No | |
 | brazil-2016 | 2 | 28 | 29 | rolling | 2 (30-31) | | [FIA](https://api.fia.com/news/f1-hamilton-wins-incident-packed-brazil-gp-ahead-rosberg-verstappen-thrills-interlagos), [Motor Sport](https://www.motorsportmagazine.com/articles/single-seaters/f1/2016-brazilian-grand-prix/), Jolpica | The FIA's report says "on lap 29" (the stoppage lap) | |
@@ -46,6 +46,17 @@ netherlands-2023 and brazil-2024 have no file: OpenF1's race control gives their
 nothing read here says those need correcting.
 
 ## For the build (not facts, things to check)
+
+- **Step 5.1 (Nov 7 2026): the 2020-22 races came from Jolpica, not FastF1.** FastF1 now needs
+  an F1TV login, so monaco-2022, great-britain-2022, azerbaijan-2021, saudi-arabia-2021 and
+  italy-2020 were built from the Jolpica dump, which has no red-flag timing. Each of their
+  entries now has a `resumeLap` (the table's stoppage lap): the leader's first lap from the
+  flag lap on that took over 3x the race's median lap (`redflag.stoppage_lap`), the same rule as
+  the TUM races and the same laps these notes already read from Jolpica. Each entry's `source`
+  ends with the lap time behind it, and the files' `timing` says Jolpica.
+  `test_redflag_facts.py` checks every `resumeLap` against the committed snapshot. Only
+  hungary-2021 is still timed (the project's FastF1 cache, `pipeline ingest --offline`). G1
+  results: docs/g1-report.md, step 5.1 red-flag races.
 
 - **Timed races (FastF1):** `annotate_restarts` refuses an entry whose `lap` matches no RED
   event in the timing. Only Hungary 2021 could be checked against FastF1 here (the project

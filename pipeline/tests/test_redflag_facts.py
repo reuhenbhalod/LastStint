@@ -31,6 +31,16 @@ RACES = {
 # the race never resumed or the data holds only the restarted race (belgium-1998).
 UNTIMED_NO_STOPPAGE = {"brazil-2003", "monaco-1984", "belgium-1998"}
 UNTIMED = {"azerbaijan-2017", "brazil-2016", "monaco-2011", "canada-2011", "europe-2007"}
+# 2020-22 races R1 took for FastF1 but built from Jolpica (FastF1 needs an F1TV login since
+# Oct 2026; step 5.1): their stoppage lap is entered too, from Jolpica's lap times.
+JOLPICA = {
+    "monaco-2022",
+    "great-britain-2022",
+    "azerbaijan-2021",
+    "saudi-arabia-2021",
+    "italy-2020",
+}
+UNTIMED |= JOLPICA
 
 FILES = sorted(redflag.REDFLAGS_DIR.glob("*.json"))
 
@@ -93,3 +103,19 @@ def test_restart_types_follow_the_rules_where_they_apply():
                 assert e["restart"] == rule, (race_id, e["lap"])
     # Monaco 2022 resumed with a rolling start (Autosport live text; see its file).
     assert _file("monaco-2022")["redFlags"][0]["restart"] == "rolling"
+
+
+@pytest.mark.parametrize("race_id", sorted(JOLPICA))
+def test_jolpica_stoppage_laps_are_the_leaders_stoppage_in_the_lap_times(race_id):
+    """Each resumeLap is the leader's first lap from the flag lap on that took over
+    redflag.STOPPAGE_FACTOR x the race's median lap (redflag.stoppage_lap) in the committed
+    Jolpica snapshot, and its source says so."""
+    import pandas as pd
+
+    from pipeline import ingest
+
+    laps = pd.read_parquet(ingest.raw_snapshot_path(race_id))
+    lead = redflag._lead_times(laps)
+    for e in _file(race_id)["redFlags"]:
+        assert e["resumeLap"] == redflag.stoppage_lap(lead, e["lap"])
+        assert f"resumeLap {e['resumeLap']}: Jolpica" in e["source"]

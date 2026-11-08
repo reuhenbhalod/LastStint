@@ -2,13 +2,14 @@
  "race": "azerbaijan-2021",
  "scheduledLaps": 51,
  "completedLaps": 51,
- "timing": "FastF1",
+ "timing": "Jolpica (no red-flag timing; FastF1 needs an F1TV login since Oct 2026)",
  "redFlags": [
   {
    "lap": 48,
+   "resumeLap": 49,
    "restart": "standing",
    "restartScLaps": 0,
-   "source": "GrandPrix.com, Azerbaijan GP 2021 race notes: 'On lap 46 Verstappen's left rear tyre fails ... The safety car is deployed', 'On lap 48 the red flag comes out and the race is stopped', 'The FIA announces that they will restart with a standing start' (https://www.grandprix.com/races/azerbaijan-gp-2021-race-notes.html); Wikipedia, 2021 Azerbaijan Grand Prix: 'the race was restarted on lap 50 with a standing start', 'two laps remaining' (https://en.wikipedia.org/wiki/2021_Azerbaijan_Grand_Prix); Wikipedia, 'List of red-flagged Formula One races' (https://en.wikipedia.org/wiki/List_of_red-flagged_Formula_One_races): lap 48",
+   "source": "GrandPrix.com, Azerbaijan GP 2021 race notes: 'On lap 46 Verstappen's left rear tyre fails ... The safety car is deployed', 'On lap 48 the red flag comes out and the race is stopped', 'The FIA announces that they will restart with a standing start' (https://www.grandprix.com/races/azerbaijan-gp-2021-race-notes.html); Wikipedia, 2021 Azerbaijan Grand Prix: 'the race was restarted on lap 50 with a standing start', 'two laps remaining' (https://en.wikipedia.org/wiki/2021_Azerbaijan_Grand_Prix); Wikipedia, 'List of red-flagged Formula One races' (https://en.wikipedia.org/wiki/List_of_red-flagged_Formula_One_races): lap 48; resumeLap 49: Jolpica-F1 CSV dump of 2026-10-24 (formula_one_lap.csv, CC BY-NC-SA 4.0; data/raw/azerbaijan-2021.jolpica.json), the leader's lap 49 took 2185.3s against the race's median lap of 106.8s (over 3x: redflag.stoppage_lap, the first such leader lap from the flag lap on)",
    "note": "Conflict: the same GrandPrix.com page's summary says 'After a red flag at lap 49'; its lap-by-lap text and the Wikipedia list say 48, taken. Jolpica: leader's lap 49 holds the stoppage (2185s); standing restart on lap 50, two racing laps."
   }
  ]

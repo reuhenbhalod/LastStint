@@ -129,14 +129,29 @@ def load_weather(race_id: str, raw_dir: Path = RAW_DIR) -> list[dict] | None:
     return json.loads(path.read_text()) if path.exists() else None
 
 
-def load_race(year: int, event: str, cache_dir: Path = CACHE_DIR):
-    """Load a race session (laps + weather + messages, no telemetry)."""
+def load_race(year: int, event: str, cache_dir: Path = CACHE_DIR, offline: bool = False):
+    """Load a race session (laps + weather + messages, no telemetry). `offline`: from the
+    on-disk cache only, never the network (FastF1's archive needs an F1TV login since Oct
+    2026); weather or race control the cache doesn't hold stay unloaded (`loaded`)."""
     import fastf1
 
     enable_cache(cache_dir)
+    if offline:
+        fastf1.Cache.offline_mode(True)
     session = fastf1.get_session(year, event, "R")
     session.load(laps=True, telemetry=False, weather=True, messages=True)
     return session
+
+
+def loaded(session, name: str):
+    """A session's `name` data (race_control_messages, weather_data), or None if FastF1
+    didn't load it (an offline cache without it), rather than FastF1's DataNotLoadedError."""
+    from fastf1.exceptions import DataNotLoadedError
+
+    try:
+        return getattr(session, name, None)
+    except DataNotLoadedError:
+        return None
 
 
 def project_laps(laps: pd.DataFrame) -> pd.DataFrame:
@@ -245,17 +260,25 @@ def ingest_race(
     cache_dir: Path = CACHE_DIR,
     raw_dir: Path = RAW_DIR,
     sleep=time.sleep,
+    offline: bool = False,
 ) -> tuple[pd.DataFrame, dict]:
     """Load a race, project laps, save the raw parquet snapshot. Returns (laps, facts).
 
     Retries with backoff when FastF1 rate-limits (RATE_LIMIT_WAITS); the on-disk cache means
     a retry only fetches what is still missing. Refuses to write an incomplete snapshot.
+    `offline`: read the FastF1 cache only (load_race); a race whose cache has no race control
+    or weather is written without its red-flag or weather file (a hand-entered red-flag file
+    and `pipeline wet-laps` cover those).
     """
     from fastf1.req import RateLimitExceededError
 
     for attempt in range(len(RATE_LIMIT_WAITS) + 1):
         try:
-            session = load_race(year, event, cache_dir)
+            session = (
+                load_race(year, event, cache_dir, offline=True)
+                if offline
+                else load_race(year, event, cache_dir)
+            )
             break
         except RateLimitExceededError:
             if attempt == len(RATE_LIMIT_WAITS):
@@ -271,13 +294,14 @@ def ingest_race(
     path.parent.mkdir(parents=True, exist_ok=True)
     df.to_parquet(path)
     save_track_status(race_id, session, raw_dir)
-    messages = getattr(session, "race_control_messages", None)
+    messages = loaded(session, "race_control_messages")
     if has_red_flag(df) and messages is not None and len(messages):
         from .redflag import fastf1_messages
 
         save_red_flags(race_id, fastf1_messages(messages), "FastF1", raw_dir)
-    if getattr(session, "weather_data", None) is not None and len(session.weather_data):
-        save_weather(race_id, project_weather(session.weather_data), raw_dir)
+    weather = loaded(session, "weather_data")
+    if weather is not None and len(weather):
+        save_weather(race_id, project_weather(weather), raw_dir)
     return df, facts
 
 

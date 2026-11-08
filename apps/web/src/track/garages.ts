@@ -327,8 +327,8 @@ const STANDINGS: Record<number, string[]> = {
     'Toro Rosso',
     'Williams',
   ],
-  // 2020-2021: also under the Jolpica dump's names (sakhir-2020, turkey-2020, turkey-2021):
-  // Red Bull, Alfa Romeo, Alpine F1 Team.
+  // 2020-2022: also under the Jolpica dump's names (sakhir-2020, turkey-2020, turkey-2021,
+  // and the 2020-22 red-flag races): Red Bull, Alfa Romeo, Alpine F1 Team.
   2020: [
     'Mercedes',
     'Ferrari',
@@ -355,10 +355,10 @@ const STANDINGS: Record<number, string[]> = {
   ],
   2022: [
     'Mercedes',
-    'Red Bull Racing',
+    'Red Bull Racing|Red Bull',
     'Ferrari',
     'McLaren',
-    'Alpine',
+    'Alpine|Alpine F1 Team',
     'AlphaTauri',
     'Aston Martin',
     'Williams',

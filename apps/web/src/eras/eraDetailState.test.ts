@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { EraDetail, ErasApi } from './api.js';
-import { racesOfEra } from './catalog.js';
+import { ERAS, racesOfEra } from './catalog.js';
 import { eraDetailView, isCleared, loadEraDetail, starCount } from './eraDetailState.js';
 import { eraDetail, erasResponse, starredRaces } from './erasFixture.js';
 import { mockCanStart, mockErasApi } from './mockErasApi.js';
@@ -115,12 +115,16 @@ describe('eraDetailView', () => {
   });
 
   it('blocks races an attempt can’t start on, saying why', () => {
-    const view = eraDetailView(erasResponse(true), eraDetail(9), mockCanStart);
+    // An era with a race that has no race file yet (looked up: races get files as they're built).
+    const era = ERAS.find((e) => racesOfEra(e.id).some((r) => !mockCanStart(r.raceId)));
+    if (!era) throw new Error('every Eras race has a race file');
+    const view = eraDetailView(erasResponse(true), eraDetail(era.id), mockCanStart);
     const byId = Object.fromEntries(view.cards.map((c) => [c.raceId, c.blocked]));
-    expect(byId['abu-dhabi-2021']).toBeNull();
-    expect(byId['azerbaijan-2021']).toBe(
-      'Not playable yet: this race has no race file in this build.',
-    );
+    for (const { raceId } of racesOfEra(era.id)) {
+      expect(byId[raceId]).toBe(
+        mockCanStart(raceId) ? null : 'Not playable yet: this race has no race file in this build.',
+      );
+    }
 
     const detail = eraDetail(9);
     detail.races[0] = { ...(detail.races[0] as EraDetail['races'][number]), raceId: 'spa-2099' };

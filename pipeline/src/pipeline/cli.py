@@ -55,10 +55,14 @@ def ingest_race(
     race_id: str = typer.Argument(None),
     all_races: bool = typer.Option(False, "--all", help="Ingest every registered race."),
     force: bool = typer.Option(False, help="Re-download even if a snapshot exists."),
+    offline: bool = typer.Option(
+        False, help="FastF1 races: read the on-disk FastF1 cache only, never the network."
+    ),
 ) -> None:
     """Download registered races into data/raw/: FastF1, OpenF1 for races registered with
     source "openf1" (network; rate-limit safe), or the cached TUM database for source "tum".
-    Source "jolpica" races are skipped: `pipeline jolpica` reads them."""
+    Source "jolpica" races are skipped: `pipeline jolpica` reads them. `--offline` builds a
+    FastF1 race from the project cache alone (FastF1 needs an F1TV login since Oct 2026)."""
     for rid in _race_ids(race_id, all_races):
         if ingest.raw_snapshot_path(rid).exists() and not force:
             typer.echo(f"{rid}: snapshot exists, skipped")
@@ -79,6 +83,8 @@ def ingest_race(
             laps, facts = tum.ingest_tum(rid)  # offline: the pinned TUM SQLite in the cache
         elif meta.get("source") == "openf1":
             laps, facts = ingest.ingest_openf1(rid, meta["year"], meta["event"])
+        elif offline:
+            laps, facts = ingest.ingest_race(rid, meta["year"], meta["event"], offline=True)
         else:
             laps, facts = ingest.ingest_race(rid, meta["year"], meta["event"])
         problems = ingest.race_suitability(laps)

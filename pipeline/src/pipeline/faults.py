@@ -193,6 +193,27 @@ def fit_fault(
     return event
 
 
+def split_retired(laps: pd.DataFrame, facts: list[dict]) -> tuple[list[dict], list[str]]:
+    """(the facts to fit, a note for each one set aside). A fault whose car never completed
+    its fault lap (its last lap in the data is before it: it retired there, e.g. a tyre
+    failure into the wall) has no laps to fit and nothing to add to the race, since the car's
+    RETIREMENT event on that lap already takes it out. Such a fact is kept out of the FAULT
+    events, never given a guessed magnitude."""
+    kept: list[dict] = []
+    notes: list[str] = []
+    for f in facts:
+        own = laps.loc[laps["Driver"] == f["driver"], "LapNumber"]
+        if not own.empty and int(own.max()) < int(f["lap"]):
+            notes.append(
+                f"{f['driver']} {f['fault']} on lap {f['lap']}: the car retired on its fault"
+                f" lap (last lap {int(own.max())}), so its RETIREMENT event carries it;"
+                " no FAULT event"
+            )
+            continue
+        kept.append(f)
+    return kept, notes
+
+
 def fault_events(
     laps: pd.DataFrame,
     facts: list[dict],

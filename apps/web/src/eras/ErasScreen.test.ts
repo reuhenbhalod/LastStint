@@ -260,11 +260,13 @@ describe('Era detail', () => {
   });
 
   it('links only races an attempt can start on, saying why the others cannot', () => {
-    const html = renderDetail(ERA9, detailReady(erasResponse(true), eraDetail(9), mockCanStart));
-    const playable = eraDetail(9)
+    // Era 10: it has a race with no race file yet (brazil-2024 can't build: wet all race).
+    const html = renderDetail(ERA10, detailReady(erasResponse(true), eraDetail(10), mockCanStart));
+    const playable = eraDetail(10)
       .races.map((r) => r.raceId)
       .filter(mockCanStart);
-    expect(raceLinks(html)).toEqual(playable.map((id) => `/eras/9/${id}`));
+    expect(playable.length).toBeLessThan(10);
+    expect(raceLinks(html)).toEqual(playable.map((id) => `/eras/10/${id}`));
     expect(html.match(/no race file in this build/g)).toHaveLength(10 - playable.length);
     expect(html.match(/aria-disabled="true"/g)).toHaveLength(10 - playable.length);
   });

@@ -63,3 +63,13 @@ def test_a_race_with_no_dry_lap_cant_be_fitted():
     assert set(laps["Compound"].dropna()) <= set(wet.WET_COMPOUNDS)
     with pytest.raises(ValueError, match="no dry lap"):
         build.dry_fit("brazil-2016", laps, "2014-2025")
+
+
+def test_a_race_wet_from_start_to_finish_says_why_it_cant_build():
+    # Interlagos 2024 (OpenF1): every lap on inters or wets, so no dry lap model to correct.
+    import pytest
+
+    from pipeline import build
+
+    with pytest.raises(ValueError, match="no clean slick lap outside the wet period"):
+        build.build_race("brazil-2024")
