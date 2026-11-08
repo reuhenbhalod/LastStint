@@ -763,6 +763,11 @@
           "default": true,
           "description": "False: a stop only refuels (2005)."
         },
+        "minStops": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "The fewest pit stops a car must make in the race (Monaco 2025: 2); a car reaching the flag with fewer is disqualified, as by the two-compound rule (wet tyres waive it). Absent: no minimum."
+        },
         "refuelling": {
           "type": "boolean",
           "default": false,

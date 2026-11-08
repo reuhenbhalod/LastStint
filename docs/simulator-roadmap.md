@@ -61,12 +61,13 @@ in code:
 
 | Rule | Years | Notes |
 |---|---|---|
-| Safety car (`safetyCar`, from the race's year) | 1993+ | Before 1993 Legend draws no SC or VSC (storyline events stay) and `allowedFlag` gives none. Live crashes and grader playouts don't read it yet (owner, Nov 7) |
+| Safety car (`safetyCar`, from the race's year) | 1993+ | Before 1993 nothing the sim makes up neutralizes the race: Legend draws no SC or VSC, a live crash brings out none and grader playouts draw none (`allowedFlag`). Real events, storyline events included, stay (owner, Nov 7) |
 | VSC | 2015+ | Earlier eras have none |
 | DRS (`wait-drs` move) | 2011–2025 | |
 | Battery / ERS | KERS 2009, 2011–13; hybrid 2014+ | Earlier eras: none |
 | Two-compound rule | 2007+ | Off before |
-| No tyre changes in the race | 2005 | A stop only refuels |
+| No tyre changes in the race | 2005 | A stop only refuels. The engineer's plans and every moment option name only the set the car is on (or a wet tyre) |
+| Minimum stops (`minStops`) | Monaco 2025: 2 | A car finishing with fewer stops is disqualified, like the two-compound rule; wet tyres waive it. The grader's continuation, the plans and the rivals keep to it. Source: the 2025 FIA F1 Sporting Regulations' Monaco tyre rule (at least three sets, so two stops), agreed by the F1 Commission in 2024 and approved by the WMSC for 2025; recheck the article number against the published regulations (owner, Nov 7) |
 | Pit lane closed when the SC is called | 2007–09 | A stop takes a penalty |
 | Lapped cars unlap under the SC | 2012+ (`scUnlap`) | `none` before |
 

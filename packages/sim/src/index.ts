@@ -20,6 +20,7 @@ export {
   modeEffects,
   passProbability,
   planRemainingStop,
+  planRemainingStops,
   realDecisions,
   readMove,
   redFlagFree,
@@ -137,6 +138,8 @@ export {
   STOP_GO_SECONDS,
   allowedFlag,
   hasMove,
+  illegalPitCompound,
+  minStopsRule,
   pitLaneClosed,
   raceYear,
   resolveRules,
@@ -144,6 +147,8 @@ export {
   scQueue,
   stopChangesTyres,
   stopGoCost,
+  stopsBeforeTakeover,
+  stopsOwed,
   twoCompoundRule,
 } from './rules.js';
 export type { ResolvedRules } from './rules.js';

@@ -9,9 +9,10 @@
 import { faultsOf } from './faults.js';
 import { type GradeOption, type MomentGrade, type Target, gradeMoment } from './grade.js';
 import { drawnEvents, legendEvents, removedEvents } from './legend.js';
+import { illegalPitCompound } from './rules.js';
 import { type Run, cleanLap, initRun, realDecisions, stepLap, tyreLife } from './sim.js';
 import type { CarState, Decision, RaceModel } from './types.js';
-import { wetnessOn } from './weather.js';
+import { isWetTyre, wetnessOn } from './weather.js';
 
 /** What brought a moment on (the race plan at takeover is the strategy planner's, not a
  * moment). `rain` / `drying`: the track turning wet or drying out (weather spec). `fault`: a
@@ -106,17 +107,35 @@ function stayOut(): MomentOption {
   return { id: 'stay-out', label: 'Stay out', decisions: [] };
 }
 
+/**
+ * The race's compounds a pit call may name, in the model's order (era rules, rules.ts
+ * illegalPitCompound): every one, except with no tyre changes (2005), when only the dry set the
+ * car is on (the stop refuels and keeps it) and the wet tyres. Every moment option's box call
+ * names one of these, so grading one never throws.
+ */
+export function pitCompounds(model: RaceModel): string[] {
+  return Object.keys(model.compounds).filter((c) => !illegalPitCompound(model, c));
+}
+
 function boxOptions(
   model: RaceModel,
   lap: number,
-  compounds = Object.keys(model.compounds),
+  compounds = pitCompounds(model),
   label = (tyre: string) => `Box for ${tyre}s`,
 ): MomentOption[] {
-  return compounds.map((compound) => ({
-    id: `box-${compound.toLowerCase()}`,
-    label: label(compound.toLowerCase()),
-    decisions: [{ lap, kind: 'pit', compound } as Decision],
-  }));
+  const legal = new Set(pitCompounds(model));
+  const keeps = model.rules?.tyreChanges === false;
+  return compounds
+    .filter((compound) => legal.has(compound))
+    .map((compound) => ({
+      id: `box-${compound.toLowerCase()}`,
+      // No tyre changes: a dry stop keeps the set it's on.
+      label:
+        keeps && !isWetTyre(compound)
+          ? `Box, keep the ${compound.toLowerCase()}s`
+          : label(compound.toLowerCase()),
+      decisions: [{ lap, kind: 'pit', compound } as Decision],
+    }));
 }
 
 /**

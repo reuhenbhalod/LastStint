@@ -9,13 +9,13 @@
 // - blind playouts: events after the decision lap are sampled, not the real ones, and the
 //   rival in them is Smart (sim.ts forkRun, policy.ts playoutPolicy: no grading inside grading);
 // - the user's car runs only what the rival can see (its calls already charged or under way)
-//   and then the sensible-strategist continuation (planRemainingStop). The player's later calls
+//   and then the sensible-strategist continuation (planRemainingStops). The player's later calls
 //   are dropped: live, the client doesn't have them yet, and a server replay has them all, so
 //   reading them would both cheat and make the client and server disagree.
 
 import { GRADE_SAMPLES, type GradeJob, type GradeJobResult, runFromJob } from '../grade.js';
 import { deriveSeed } from '../rng.js';
-import { type Run, classify, forkRun, isFinished, planRemainingStop, stepLap } from '../sim.js';
+import { type Run, classify, forkRun, isFinished, planRemainingStops, stepLap } from '../sim.js';
 import type { PitStop, RaceResult } from '../types.js';
 import { EXPERT_SAMPLES, RivalPolicyError } from './policy.js';
 import type { RivalChoice } from './react.js';
@@ -63,8 +63,7 @@ export function rivalPlayout(run: Run, seed: number, option: RivalOption): Run {
   fork.decisions = [];
   const user = fork.state.cars[fork.model.userSide];
   if (user && !user.retired && !user.strategy.some((s) => s.lap > fork.state.lap)) {
-    const stop = planRemainingStop(fork);
-    if (stop) user.strategy.push({ ...stop, added: true });
+    for (const stop of planRemainingStops(fork)) user.strategy.push({ ...stop, added: true });
   }
   const rival = fork.state.cars[fork.model.rival];
   if (rival) rival.strategy = option.stops.map((s) => ({ ...s }));
@@ -117,6 +116,8 @@ export interface RivalGradeJob {
   /** The rival's choices before this one (react.ts rivalChoices). */
   rivalChoices: RivalChoice[];
   samples: number;
+  /** Legend difficulty (Run.legend): the run replays with Legend's safety cars. */
+  legend?: boolean;
 }
 
 /** Describe a run's pending Expert decision (rivalGrading 'deferred') as a RivalGradeJob. */
@@ -134,6 +135,7 @@ export function rivalGradeJob(
     pausedAtLap: run.state.lap,
     rivalChoices: (run.rival?.points ?? []).map((p) => ({ lap: p.lap, option: p.chosen })),
     samples,
+    ...(run.legend ? { legend: true } : {}),
   };
 }
 

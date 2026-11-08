@@ -12,7 +12,9 @@
 // blindAfter). The race the player sees still has every real event.
 //
 // After an option's calls, the player's car follows a "sensible strategist" continuation in
-// every playout: the model-planned best of no more stops or one stop (planRemainingStop).
+// every playout: the model-planned best of no more stops or one stop (planRemainingStop), or,
+// a car owing the race's minimum stops more than one (rules.minStops), the best plan of that
+// many (planRemainingStops).
 // The spec doesn't define the continuation; this choice is recorded in the implementation
 // plan (2.7).
 
@@ -25,7 +27,7 @@ import {
   forkRun,
   initRun,
   isFinished,
-  planRemainingStop,
+  planRemainingStops,
   realDecisions,
   stepLap,
   teammateOf,
@@ -134,7 +136,7 @@ export function sampleSeed(run: Run, i: number): number {
 /**
  * Fork the run for one sample of one option: apply the option's calls, run until the last of
  * them has taken effect (a pit call is charged the lap after it), then hand the player's car
- * to the sensible-strategist continuation (planRemainingStop) for the rest of the race.
+ * to the sensible-strategist continuation (planRemainingStops) for the rest of the race.
  */
 export function playOption(run: Run, seed: number, option: GradeOption): Run {
   // The decision lap's own events (e.g. the SC that prompted the call) are known; the rest of
@@ -152,8 +154,7 @@ export function playOption(run: Run, seed: number, option: GradeOption): Run {
     !isFinished(fork) &&
     !user.strategy.some((s) => s.lap > fork.state.lap)
   ) {
-    const stop = planRemainingStop(fork);
-    if (stop) user.strategy.push({ ...stop, added: true });
+    for (const stop of planRemainingStops(fork)) user.strategy.push({ ...stop, added: true });
   }
   return fork;
 }
@@ -241,6 +242,8 @@ export interface GradeJob {
   rivalPolicy?: RivalPolicy;
   /** Expert: the rival's choices so far (rivals/react.ts rivalChoices), replayed, not re-graded. */
   rivalChoices?: RivalChoice[];
+  /** Legend difficulty (Run.legend): the run replays with Legend's safety cars. */
+  legend?: boolean;
 }
 
 export interface GradeJobResult {
@@ -265,6 +268,7 @@ export function gradeJob(
     target,
     samples,
     ...(run.rivalPolicy === 'standard' ? {} : { rivalPolicy: run.rivalPolicy }),
+    ...(run.legend ? { legend: true } : {}),
     ...(run.rival
       ? { rivalChoices: run.rival.points.map((p) => ({ lap: p.lap, option: p.chosen })) }
       : {}),
@@ -272,7 +276,8 @@ export function gradeJob(
 }
 
 /**
- * Rebuild the paused run from a job (deterministic replay), with the job's rival. An Expert
+ * Rebuild the paused run from a job (deterministic replay), with the job's rival and, for a
+ * Legend run, Legend's safety cars. An Expert
  * rival replays its recorded choices and never grades here: a decision point without one
  * waits (a decision at the paused lap stays pending for the rival's own grade job; an earlier
  * one throws).
@@ -280,12 +285,13 @@ export function gradeJob(
 export function runFromJob(
   job: Pick<
     GradeJob,
-    'model' | 'seed' | 'decisions' | 'pausedAtLap' | 'rivalPolicy' | 'rivalChoices'
+    'model' | 'seed' | 'decisions' | 'pausedAtLap' | 'rivalPolicy' | 'rivalChoices' | 'legend'
   >,
 ): Run {
   const run = initRun(job.model, job.seed, {
     decisions: job.decisions,
     ...(job.rivalPolicy ? { rivalPolicy: job.rivalPolicy } : {}),
+    ...(job.legend ? { legend: true } : {}),
     ...(job.rivalPolicy === 'expert'
       ? { rivalChoices: job.rivalChoices ?? [], rivalGrading: 'deferred' as const }
       : {}),

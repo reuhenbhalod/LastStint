@@ -239,6 +239,12 @@ export interface RaceRules {
   twoCompound?: boolean;
   /** False: a stop only refuels (2005). Default true. */
   tyreChanges?: boolean;
+  /**
+   * The fewest pit stops a car must make in the race (Monaco 2025: 2); a car that reaches the
+   * flag with fewer is disqualified, like the two-compound rule (wet tyres waive it). Absent:
+   * no minimum.
+   */
+  minStops?: number;
   /** Stops refuel (1994-2009, 1983). Default false. */
   refuelling?: boolean;
   /** The fixed race fuel allowance in kg (1984-88); not with refuelling. Absent: no cap. */
@@ -382,6 +388,8 @@ export interface CarState {
   fuel?: number;
   /** A stop-go penalty owed (s), for entering a closed pit lane (rules.pitLaneClosedUnderSC). */
   stopGo?: number;
+  /** Pit stops made so far, takeover included (rules.minStops; set only in a race with it). */
+  stops?: number;
   /** A refuelling race (refuel.ts): fuel on board, in laps at the standard burn (every car). */
   tank?: number;
   /** The tank burns by the modes and an empty one stops the car: the player's car in live

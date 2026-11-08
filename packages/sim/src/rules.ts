@@ -24,10 +24,25 @@
 //   practice", RaceFans, as above); banned from 2010; allowed again from 2012 (Wikipedia,
 //   "Safety car"). So scUnlap is `none` before 2007 and in 2010-11.
 // - The safety car: routine in F1 from 1993 (owner's decision, Nov 7, 2026: no random safety
-//   car before 1993). Before then nothing the sim makes up neutralizes the race; a race's real
+//   car before 1993). Before then nothing the sim makes up neutralizes the race (Legend's
+//   draws, a live crash's SC or VSC, the grader's playout draws: allowedFlag); a race's real
 //   events are its data and are kept.
+// - Minimum stops (minStops): Monaco 2025 only, at least two pit stops (at least three sets
+//   of tyres) in the race, waived if intermediate or wet tyres are used: the 2025 FIA Formula
+//   1 Sporting Regulations' Monaco Grand Prix tyre rule, agreed by the F1 Commission in 2024
+//   and approved by the FIA World Motor Sport Council for 2025 (owner's decision, Nov 7, 2026,
+//   to model it). Recheck the article number against the FIA's published 2025 regulations.
 
-import type { BattleMove, Compound, FlagState, PitStop, RaceModel, RaceRules } from './types.js';
+import type {
+  BattleMove,
+  CarState,
+  Compound,
+  DriverModel,
+  FlagState,
+  PitStop,
+  RaceModel,
+  RaceRules,
+} from './types.js';
 import { isWetTyre } from './weather.js';
 
 /**
@@ -65,6 +80,8 @@ export function safetyCarRule(model: RaceModel): boolean {
 export interface ResolvedRules {
   twoCompound: boolean;
   tyreChanges: boolean;
+  /** The fewest stops a car must make (absent: no minimum). */
+  minStops?: number;
   refuelling: boolean;
   fuelLimit?: number;
   pitLaneClosedUnderSC: boolean;
@@ -80,6 +97,7 @@ export function resolveRules(model: RaceModel): ResolvedRules {
   return {
     twoCompound: r.twoCompound !== false,
     tyreChanges: r.tyreChanges !== false,
+    ...(r.minStops ? { minStops: r.minStops } : {}),
     refuelling: r.refuelling === true,
     ...(r.fuelLimit !== undefined ? { fuelLimit: r.fuelLimit } : {}),
     pitLaneClosedUnderSC: r.pitLaneClosedUnderSC === true,
@@ -208,6 +226,37 @@ export function illegalPitCompound(model: RaceModel, compound: Compound): string
   const on = model.drivers.find((d) => d.code === model.userSide)?.stateAtTakeover.compound;
   if (!on || isWetTyre(on) || on === compound) return null;
   return `no tyre changes in this race: ${compound} for ${on}`;
+}
+
+// --- Minimum stops (Monaco 2025) ----------------------------------------------------------------
+
+/** The fewest stops the race requires (0: no minimum). */
+export function minStopsRule(rules: RaceRules | undefined): number {
+  return rules?.minStops ?? 0;
+}
+
+/**
+ * Stops a car made before the takeover: one per dry compound it ran beyond its first (the race
+ * file keeps the compounds, not the stops). A lower bound, exact when every early stop changed
+ * compound: Monaco 2025's (checked against its FastF1 stints).
+ */
+export function stopsBeforeTakeover(driver: Pick<DriverModel, 'stateAtTakeover'>): number {
+  return Math.max(0, (driver.stateAtTakeover.compoundsUsed ?? []).length - 1);
+}
+
+/**
+ * Stops the car still owes the minimum (rules.minStops), not counting any it has planned: 0
+ * without the rule, or once it has run a wet tyre (wet tyres waive it, like the two-compound
+ * rule). `stops` is CarState.stops, which the sim sets in a race with the rule.
+ */
+export function stopsOwed(
+  rules: RaceRules | undefined,
+  car: Pick<CarState, 'compound' | 'compoundsUsed' | 'stops'>,
+): number {
+  const min = minStopsRule(rules);
+  if (min <= 0) return 0;
+  if (isWetTyre(car.compound) || car.compoundsUsed.some(isWetTyre)) return 0;
+  return Math.max(0, min - (car.stops ?? 0));
 }
 
 // --- The pit lane closed under the SC (2007-08) -----------------------------------------------

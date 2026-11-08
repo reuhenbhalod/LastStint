@@ -362,9 +362,10 @@ def test_every_appendix_race_has_its_rules_overlay():
     for race_id in ids:
         overlay = json.loads((DATA_DIR / "eras" / f"{race_id}.json").read_text())
         rules = overlay["rules"]
-        # 4.1's keys, plus refuelling / fuelLimit (eras build plan 4.2, refuel.py).
+        # 4.1's keys (and a race's own minStops), plus refuelling / fuelLimit (eras build plan
+        # 4.2, refuel.py).
         want = {
-            **race_rules.rules_for_year(race_rules.race_year(race_id)),
+            **race_rules.rules_for_race(race_id),
             **refuel.r4_rules_for_year(race_rules.race_year(race_id)),
         }
         assert rules == want, race_id
@@ -378,6 +379,48 @@ def test_write_rules_overlays_keeps_other_keys(tmp_path):
     got = json.loads((tmp_path / "japan-2005.json").read_text())
     assert got["eras"] == {"eraId": 5, "order": 2}
     assert got["rules"]["tyreChanges"] is False
+
+
+# --- minimum stops (Monaco 2025; owner, Nov 7, 2026) ------------------------------------------
+
+
+def test_monaco_2025_requires_two_stops():
+    import jsonschema
+
+    assert race_rules.rules_for_race("monaco-2025")["minStops"] == 2
+    assert "minStops" not in race_rules.rules_for_race("monaco-2023")
+    overlay = json.loads((DATA_DIR / "eras" / "monaco-2025.json").read_text())
+    assert overlay["rules"]["minStops"] == 2
+    assert race_rules.min_stops(overlay) == 2
+    assert race_rules.min_stops({}) == 0
+    # The block validates; zero, a fraction or a string doesn't.
+    base = _model("abu-dhabi-2021")
+    export.validate_model({**base, "rules": overlay["rules"]})
+    for bad in (0, 1.5, "2"):
+        with pytest.raises(jsonschema.ValidationError):
+            export.validate_model({**base, "rules": {"minStops": bad}})
+
+
+def test_write_rules_overlays_writes_monaco_2025s_minimum(tmp_path):
+    (tmp_path / "monaco-2025.json").write_text(json.dumps({"rules": {"refuelling": False}}))
+    race_rules.write_rules_overlays(["monaco-2025"], tmp_path)
+    got = json.loads((tmp_path / "monaco-2025.json").read_text())["rules"]
+    assert got["minStops"] == 2 and got["refuelling"] is False
+
+
+def test_stops_before_takeover_counts_compound_changes():
+    """Monaco 2025: the cars that pitted before the lap-16 takeover show two compounds (their
+    FastF1 stints agree: one early stop each), and every car that finished the real race made
+    at least two stops in all."""
+    model = _model("monaco-2025")
+    early = {d["code"] for d in model["drivers"] if race_rules.stops_before_takeover(d) == 1}
+    assert early == {"BEA", "BOR", "COL", "HAD", "HUL", "TSU"}
+    assert all(race_rules.stops_before_takeover(d) <= 1 for d in model["drivers"])
+    retired = {e["driver"] for e in model["events"] if e["type"] == "RETIREMENT"}
+    for d in model["drivers"]:
+        if d["code"] not in retired:
+            total = race_rules.stops_before_takeover(d) + len(d["realStrategy"])
+            assert total >= 2, d["code"]
 
 
 # --- the safety car: from 1993 (owner, Nov 7, 2026) -------------------------------------------
