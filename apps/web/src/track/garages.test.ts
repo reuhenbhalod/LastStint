@@ -83,6 +83,14 @@ describe('garages', () => {
     expect(garagesFor(1992).find(([t]) => t === 'Team Lotus')).toEqual(['Team Lotus', 'LOT']);
   });
 
+  it('1995: the 1994 champions (Williams) nearest the exit; Forti, new, nearest the entry', () => {
+    const g = garagesFor(1995);
+    expect(g.at(-1)).toEqual(['Williams', 'WIL']);
+    expect(g[0]).toEqual(['Forti', 'FOR']);
+    expect(g).toHaveLength(13);
+    expect(g).not.toContainEqual(['Larrousse', 'LAR']); // left after 1994
+  });
+
   it("has a garage for every team in every race, under the race's own team names", () => {
     for (const file of readdirSync(races).filter((f) => f.endsWith('.json'))) {
       const model = JSON.parse(readFileSync(join(races, file), 'utf8')) as {

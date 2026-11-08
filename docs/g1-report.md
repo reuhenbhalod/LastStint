@@ -1445,3 +1445,147 @@ Counting TyreLife from the start in 2005 would let the fit see it. That's an est
 the_raw_timelines` fails on the six new raw status timelines until integration regenerates it,
 as on earlier race branches. races.gen.ts and the parity fixtures are unchanged. Garages for
 2005-2009 are added (the 2004-2008 standings from the Jolpica dump).
+
+## Eras 5.5: wet reconstructed races (1984-1995): anchors 6 pass, 0 fail; G1 sanity 2 pass, 0 borderline, 3 fail, 1 data issue
+
+Eras build plan 5.5, Nov 8 2026. Written by hand. Built as the reconstructed races above
+(`pipeline reconstruct <id>`: the Jolpica dump of 2026-10-24, F1DB v2026.19.0, the stops and
+the sourced weather of `data/reconstruction/<id>.json`, docs/reconstruction-facts.md and
+docs/eras-checks/r2-reconstruction-facts.md), and **checked on their anchors, not G1**. G1 is a
+sanity check of how well the race model replays the synthetic laps. Registry split `eras`, duel
+from the Eras spec's race tables (§4, the user's driver first), `score_positions` 6, seed 1,
+D3 takeover, source `reconstruct`. Each file carries its overlay's `rules` (no VSC, DRS or
+ERS; `fuelLimit` 187 kg in 1984-85; refuelling in 1995) and is marked `reconstructed: true`.
+The race files' weather is fitted from the synthetic laps, as for any wet race; it lands on
+the sourced timeline within 0.01-0.05 wetness (rms) everywhere but brazil-1993's safety-car
+laps (excluded from the fit). G1 values are seed set 10000 / seed set 20000, limits in brackets.
+
+| Race | Duel | Takeover | Anchors (core) | G1 sanity | Mean gap error | Failing G1 checks | Diagnosis |
+|---|---|---|---|---|---|---|---|
+| monaco-1984 | PRO vs SENA | 12 | pass 38/38 | fail | 5.54s | duel PRO vs SENA gap error 4.59 / 4.58 [3.00]; podium ARN 6.64 / 6.63, field ROSK 12.37 / 12.46, DEA 7.86 / 7.81 [5.00] | lap pace (pace 84%, rest 16%): see below |
+| portugal-1985 | SENA vs ALBM | 30 | pass 55/55 | pass | 0.29s | | |
+| belgium-1992 | MSCM vs MAN | 27 | pass 104/104 | fail | 7.66s | duel MSCM vs MAN gap error 19.22 / 19.22 [3.00]; podium order rate 0.00 / 0.00 [0.50]; podium MAN 19.22 / 19.22 [5.00] | race mechanics (pace 38%, rest 62%): see below |
+| brazil-1993 | SENA vs HIL | 24 | pass 104/104 | data issue | 46.25s | duel 6.95 / 7.06 [3.00]; podium order rate 0.25 / 0.24; MSCM 29.37, HER 48.65, BLU 184.75 [5.00] | **the synthetic race isn't the real one: no race file** (below) |
+| europe-1993 | SENA vs HIL | 14 | pass 97/97 | pass | 1.07s | | Senna P12 at the takeover (below) |
+| belgium-1995 | MSCM vs HIL | 12 | pass 124/124 | fail | 2.60s | podium BRU gap error 5.71 / 5.68, field FRE 7.47 / 7.36 [5.00] | lap pace (pace 50%, rest 50%) |
+
+"Anchors (core)" counts the anchors `reconstruct.failures` requires, now including a `tyre`
+row per sourced stint (14-38 a race). Every race also passes its retirement-event checks but
+belgium-1992's Herbert (classified, out on lap 43 of 44: a last-lap stop can't be told from a
+finisher; reported, not required). The solver settled on its first attempt for every race
+(noise sigma 0.35 s). Full tables: `data/raw/<id>.anchors.md`.
+
+**Fully-wet races: the solver's dry pace (owner decision 1, Nov 8).** monaco-1984,
+portugal-1985 and europe-1993 are wet on every lap (europe-1993's driest laps are damp, w
+0.15), so `build.dry_fit` has no dry lap to fit on. For a reconstructed race it now takes the
+reconstruction's own (`build.solver_dry_fit`, from the sidecar's `fitted` block): each car's
+base pace is its solved pace in the sims' terms (pace + fuel x (laps + 1): the solver counts
+fuel on board, the sims fuel burnt), its noise is its solved noise, the fuel effect is the
+solver's 0.06 s a lap, and the dry compound (MEDIUM, one before 2007) and the wet tyres take
+the field's median solved wear with no offset (the solver ran one wear rate on every tyre, at
+`wet.wear_mult`; their pace is in the weather curves). The build report and notes say "dry
+pace: wet on every lap ... from the reconstruction's solver (estimated)". The race file's
+provenance lists `weather`; the schema's `provenance.estimated` has no value for a dry pace and
+adding one means the sim's `ESTIMATED_FIELDS` too, so that is left to the owner. A real-timing
+race wet on every lap still raises "no dry lap" (tested). The solved dry paces are in line with
+the races' poles: Prost 83.6 s at Monaco (pole 1:22.661), Senna 78.4 s at Estoril (1:21.007),
+71.9 s at Donington (1:10.458), all before fuel. The solved wear is 0 for most cars, so the
+three files have a dry and wet `degPerLap` of 0.0, 0.0375 and 0.0 s a lap; with the wet tyres
+on `wet.WET_TYRES`' defaults instead, europe-1993's G1 was 100.3 s (Hill's 52-lap wet stint
+ran past the default cliff).
+
+**monaco-1984: Bellof on the road (owner decision 2, Nov 8).** Bellof finished third on the
+road, 21.141 s behind Prost (Motor Sport, July 1984: 1 hr 01 min 28.881 sec against 1 hr 01 min
+07.740; Wikipedia: "Underweight car (+21.141)"); Tyrrell was excluded from the 1984 season, so
+Jolpica has him disqualified with no time. A new facts-file field, `roadPositions` (a
+disqualified car, its road place, its gap where sourced, and a source), runs such a car to the
+flag at its place: with a gap its time is a lead-lap anchor (gap row: target 21.141, achieved
+21.14), without one it sits midway between its road neighbours, marked as an estimate. The
+order anchor checks the road order (PRO SENA BEL ARN ROSK DEA ALBM GHI LAF: pass). The race file
+keeps the official result: `realResult` lists BEL ninth, behind the eight classified cars
+(`build.official_result`), while the sim runs him third on the road. The source is recorded in
+docs/eras-checks/r2-reconstruction-facts.md. Only monaco-1984 uses the field. The race ends at
+its results lap: the reconstruction has 31 laps, the race file's `race.laps` is 31 and there is
+no RED event ("red flag on lap 32, never resumed: the race ends at its results lap 31").
+
+**brazil-1993: data issue, no race file (owner).** Every anchor passes, but the synthetic race
+isn't the real race:
+- No source gives the field's slick stops (laps 40-43 in Motor Sport), so eight cars that
+  stopped for wets on laps 27-30 and ran to the flag (Blundell, Zanardi, Alliot, Alesi, Warwick,
+  Comas, Alboreto, Badoer) stay on wets for the 28-30 dry laps to the end (no stop is invented). Their race times are anchored, so the solver gives them dry pace up to 9.5 s a lap
+  quicker than the winner's (Blundell 80.4 s, Zanardi 81.1 s against Senna 89.9 s; Senna's own
+  fastest lap is 80.187 s). The leaders' pace is too slow for a second reason: their 6,675 s
+  only fits if the rain and safety-car laps (27-36) were much slower than the solver's 1.4x a
+  dry lap; the extra time goes onto their dry laps ("the laps behind the safety car did not
+  settle").
+- At the lap-24 takeover Senna is P14 and Blundell P2 (Senna ran second or third before the
+  rain). Live play with Senna's real calls wins 0 of 20 runs; with incidents off, Herbert wins 14
+  of 20. In G1 the WET defaults add 185 s to Blundell's long wet stint (61.8 s with the wet wear
+  off).
+- So it is registered with `data_issue` (G1 lists it, doesn't count it), its raw reconstruction
+  is committed, and **no race file or golden file is committed**. To fix: source the slick
+  stops (Motor Sport's lap-by-lap, or a lap chart), or a solver rule for unsourced tyre changes
+  and for the safety car's pace. Owner's call.
+
+**europe-1993: playable, but not the real running order.** G1 passes and Senna wins every
+replay with his real calls (20 of 20, incidents off; 4 of 20 with incidents on, when made-up
+safety cars wipe out his 83 s lead). But no source gives about 11 front-runners' stops (Hill's
+other 4, Prost's other 3, Senna's two wet stops), so the solver's pace absorbs them, and at the
+lap-14 takeover Senna is P12, 39.5 s down on Barrichello. In the real race Senna led from lap 1.
+The reconstruction has no running-order anchor beyond lap 1. A lap-leader anchor (Wikipedia's
+lap-leader charts) would need a facts field and a solver change; not done here. The same
+shows on a smaller scale in belgium-1992, where Boutsen (out after 27 laps) leads at the lap-27
+takeover, 38 s clear of Mansell: a retirement takes its natural pace from its fastest lap.
+
+**G1 diagnoses (sanity only).**
+- belgium-1992: its dry model is fitted on laps 36-44 only (at most 9 dry laps a car: the
+  sourced timeline has rain to lap 35), so Mansell's base pace is 1.6 s a lap slower than
+  Schumacher's where the solver has them level, and the MEDIUM's fitted cliff is at 6 laps.
+  Mansell finishes 55.8 s behind in the sim against 36.6 s synthetic. As a check, the solver's
+  dry pace on this race (not the owner's decision, which covers fully-wet races only) made it
+  worse (mean gap error 16.4 s), so it stays on its fitted dry model.
+- monaco-1984: the solver gives Prost, Senna and Bellof wear (0.025-0.05 s a lap) and the
+  rest none; the race file has one wear rate for all (the median, 0). Over 19 laps after the
+  takeover that is worth 4-12 s against the cars behind.
+- belgium-1995: Brundle and Frentzen finish 5.7 and 7.5 s off their synthetic gaps; their
+  unsourced stint tyres are estimated.
+
+**Play (TS sim, takeover to flag).** Checked with a throwaway vitest file, not committed. Each
+built race's 20 golden seeds match the TS sim (order, finishers, times within 0.0005 s): 20/20
+on all five (and on brazil-1993's uncommitted build). `pnpm test`'s live-replay test (the real
+calls replay the real race exactly) passes on all five. Each race played to its flag on 20 seeds
+(incidents on) with the real calls, real calls plus push, no calls, push, lift and coast, and an
+added stop for wets and for slicks five laps after the takeover: no errors, every run reached
+the last lap (monaco-1984's 31st). `resolveRules` gives `safetyCar` false for monaco-1984,
+portugal-1985 and belgium-1992, and no lap of their 10,220 live laps ran under a SC or VSC;
+from 1993 SCs run (the real ones and made-up crashes').
+- monaco-1984 and portugal-1985, the fuel limit: with the real calls (no stop) the player runs
+  dry in 10 of 20 runs, with push in 19, with lift and coast in none. Prost wins 9 of 20 with
+  the real calls and 14 with lift and coast; Senna at Estoril 9 and 19. **Owner/sim:** the
+  takeover fuel margin is drawn around zero for the distance run, but in the rain the cars
+  burned far less than in the dry, and Monaco was stopped after 31 of 76 scheduled laps: no car
+  was short of fuel. Making the fuel call bite in a wet race is a sim decision (sim code is out
+  of scope here).
+- belgium-1995 (refuelling): the real calls (with their real fills) finish 18 of 20 and win 14
+  of 20. With no calls the car runs dry in every run, as any refuelling race does: its fuel
+  only reaches its next stop.
+- belgium-1992: the real calls win 20 of 20 for Schumacher.
+
+**Pipeline changes in this step.**
+- `reconstruct.py`: the facts file's `roadPositions` (`apply_road_positions`, `road_order`,
+  targets and the order anchor read the road order; the sidecar's `classified` and
+  `roadPositions`); a wet race's car out on lap 1 keeps its start tyre on its untimed lap (it
+  was a one-lap MEDIUM stint, which set monaco-1984's MEDIUM cliff at 1 lap). Dry races'
+  reconstructions are unchanged (hungary-1992's parquet comes out identical).
+- `build.py`: `solver_dry_fit` and `dry_fit(..., recon)` (above); `official_result`; the six
+  races registered (brazil-1993 with `data_issue`).
+- `apps/web/src/track/garages.ts`: a 1995 table (the 1994 Jolpica constructors' standings;
+  Simtek, Pacific and Forti unranked, last, in car-number order), so belgium-1995's teams have
+  garages.
+- Tests: `test_reconstruct.py` (road positions, their facts checks, the out-on-lap-1 tyre),
+  `test_build_reconstructed.py` (registration, anchors, solver dry pace, a real-timing race wet
+  on every lap still raises, the official result, monaco-1984's results lap, the five files
+  match a fresh build), `test_reconstruction_facts.py` (Bellof's road place), `garages.test.ts`.
+
+**Not regenerated here:** `apps/worker/src/races.gen.ts`, `data/sc_rates.json` and the parity
+fixtures.

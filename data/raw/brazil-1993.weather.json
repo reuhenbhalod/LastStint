@@ -1,0 +1,499 @@
+[
+ {
+  "lap": 1,
+  "time": 94.013,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 2,
+  "time": 180.818,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 3,
+  "time": 264.623,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 4,
+  "time": 348.428,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 5,
+  "time": 432.233,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 6,
+  "time": 516.038,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 7,
+  "time": 599.843,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 8,
+  "time": 683.648,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 9,
+  "time": 767.453,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 10,
+  "time": 851.258,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 11,
+  "time": 935.063,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 12,
+  "time": 1018.868,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 13,
+  "time": 1102.673,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 14,
+  "time": 1186.478,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 15,
+  "time": 1270.283,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 16,
+  "time": 1354.088,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 17,
+  "time": 1437.893,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 18,
+  "time": 1521.698,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 19,
+  "time": 1605.503,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 20,
+  "time": 1689.308,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 21,
+  "time": 1773.113,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 22,
+  "time": 1856.918,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 23,
+  "time": 1940.723,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 24,
+  "time": 2024.528,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 25,
+  "time": 2108.333,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 26,
+  "time": 2192.138,
+  "rain": true,
+  "source": "reconstruction-facts",
+  "wetness": 0.15
+ },
+ {
+  "lap": 27,
+  "time": 2275.943,
+  "rain": true,
+  "source": "reconstruction-facts",
+  "wetness": 0.65
+ },
+ {
+  "lap": 28,
+  "time": 2366.748,
+  "rain": true,
+  "source": "reconstruction-facts",
+  "wetness": 0.65
+ },
+ {
+  "lap": 29,
+  "time": 2463.553,
+  "rain": true,
+  "source": "reconstruction-facts",
+  "wetness": 0.65
+ },
+ {
+  "lap": 30,
+  "time": 2547.358,
+  "rain": true,
+  "source": "reconstruction-facts",
+  "wetness": 0.65
+ },
+ {
+  "lap": 31,
+  "time": 2631.163,
+  "rain": true,
+  "source": "reconstruction-facts",
+  "wetness": 0.617
+ },
+ {
+  "lap": 32,
+  "time": 2714.968,
+  "rain": true,
+  "source": "reconstruction-facts",
+  "wetness": 0.583
+ },
+ {
+  "lap": 33,
+  "time": 2798.773,
+  "rain": true,
+  "source": "reconstruction-facts",
+  "wetness": 0.55
+ },
+ {
+  "lap": 34,
+  "time": 2882.578,
+  "rain": true,
+  "source": "reconstruction-facts",
+  "wetness": 0.517
+ },
+ {
+  "lap": 35,
+  "time": 2966.383,
+  "rain": true,
+  "source": "reconstruction-facts",
+  "wetness": 0.483
+ },
+ {
+  "lap": 36,
+  "time": 3050.188,
+  "rain": true,
+  "source": "reconstruction-facts",
+  "wetness": 0.45
+ },
+ {
+  "lap": 37,
+  "time": 3133.993,
+  "rain": true,
+  "source": "reconstruction-facts",
+  "wetness": 0.45
+ },
+ {
+  "lap": 38,
+  "time": 3217.798,
+  "rain": true,
+  "source": "reconstruction-facts",
+  "wetness": 0.3
+ },
+ {
+  "lap": 39,
+  "time": 3301.603,
+  "rain": true,
+  "source": "reconstruction-facts",
+  "wetness": 0.15
+ },
+ {
+  "lap": 40,
+  "time": 3385.408,
+  "rain": true,
+  "source": "reconstruction-facts",
+  "wetness": 0.15
+ },
+ {
+  "lap": 41,
+  "time": 3469.213,
+  "rain": true,
+  "source": "reconstruction-facts",
+  "wetness": 0.1
+ },
+ {
+  "lap": 42,
+  "time": 3553.018,
+  "rain": true,
+  "source": "reconstruction-facts",
+  "wetness": 0.05
+ },
+ {
+  "lap": 43,
+  "time": 3636.823,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 44,
+  "time": 3720.628,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 45,
+  "time": 3804.433,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 46,
+  "time": 3888.238,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 47,
+  "time": 3972.043,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 48,
+  "time": 4055.848,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 49,
+  "time": 4139.653,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 50,
+  "time": 4223.458,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 51,
+  "time": 4307.263,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 52,
+  "time": 4391.018,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 53,
+  "time": 4906.026,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 54,
+  "time": 5007.74,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 55,
+  "time": 5109.632,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 56,
+  "time": 5190.867,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 57,
+  "time": 5293.729,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 58,
+  "time": 5396.335,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 59,
+  "time": 5498.239,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 60,
+  "time": 5588.815,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 61,
+  "time": 5671.674,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 62,
+  "time": 5810.282,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 63,
+  "time": 5910.962,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 64,
+  "time": 6013.599,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 65,
+  "time": 6116.459,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 66,
+  "time": 6217.426,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 67,
+  "time": 6316.402,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 68,
+  "time": 6405.392,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 69,
+  "time": 6494.614,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 70,
+  "time": 6585.286,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ },
+ {
+  "lap": 71,
+  "time": 6675.488,
+  "rain": false,
+  "source": "reconstruction-facts",
+  "wetness": 0.0
+ }
+]

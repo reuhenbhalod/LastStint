@@ -1,0 +1,1722 @@
+{
+ "raceId": "belgium-1992",
+ "year": 1992,
+ "laps": 44,
+ "reconstructed": true,
+ "provenance": {
+  "kind": "reconstructed",
+  "estimated": [
+   "compounds",
+   "fuelLoads",
+   "weather"
+  ]
+ },
+ "estimates": [
+  "Every lap time and lap-end Time is synthetic: solved to the anchors, not measured",
+  "Position each lap follows from the synthetic times; the lap-1 order is the grid order",
+  "Lap times in between the anchors: pace + tyre wear + fuel + seeded noise",
+  "Fuel: 0.06s per lap of fuel on board; full tank at the start",
+  "Stop loss: pit-lane time - 5.0s, 35% on the in-lap",
+  "PitInTime is the in-lap's end; PitOutTime adds the out-lap's share of the lane time",
+  "Weather: each lap's wetness from the facts file's sourced timeline (track states as wetness: {'dry': 0.0, 'damp': 0.15, 'wet': 0.45, 'heavy': 0.65}; ramps between sourced points are linear)",
+  "Wet laps: the dry lap x (1 + the stint tyre's penalty at that wetness), the weather model's curves (data/wet.json); tyre wear at wet.wear_mult",
+  "Compound: WET / INTERMEDIATE on wet-tyre stints, slick stints left empty (step 2.4's dry compound); a stint no source names gets the tyre that loses least over its laps",
+  "Stops: only the sourced ones; cars may have stopped more (unknown)"
+ ],
+ "sources": {
+  "jolpica": "Jolpica-F1 dump 2026-10-24T01:04:07.015299Z (CC BY-NC-SA 4.0)",
+  "f1db": "F1DB v2026.19.0 (CC BY 4.0), f1db/belgium-1992.*.csv",
+  "facts": "belgium-1992.json",
+  "jolpicaRound": 12,
+  "eventName": "Belgian Grand Prix"
+ },
+ "classified": [
+  "MSCM",
+  "MAN",
+  "PAT",
+  "BRU",
+  "SENA",
+  "HAK",
+  "JAR",
+  "DEC",
+  "SUZ",
+  "VANE",
+  "WEN",
+  "NASE",
+  "HER",
+  "GUG",
+  "MOD",
+  "MOR",
+  "KAT",
+  "GAC"
+ ],
+ "roadPositions": [],
+ "stopsComplete": false,
+ "safetyCarsComplete": true,
+ "params": {
+  "seed": 0,
+  "sigma": 0.35,
+  "fuel_per_lap": 0.06,
+  "wear_prior": 0.04,
+  "wear_max": 0.25,
+  "start_loss": 4.0,
+  "grid_gap": 0.6,
+  "fastest_margin": 0.05,
+  "pit_bypass": 5.0,
+  "pit_in_share": 0.35,
+  "default_lane_time": 25.0,
+  "sc_factor": 1.4,
+  "sc_gap": 0.8,
+  "sc_iterations": 12,
+  "order_gap": 0.5,
+  "gap_tolerance": 2.0,
+  "attempts": 6,
+  "refuel": null
+ },
+ "solver": {
+  "attempts": 1,
+  "sigma": 0.35,
+  "passed": true
+ },
+ "fitted": {
+  "MSCM": {
+   "pace": 110.07,
+   "wear": 0.0,
+   "noise": 0.175,
+   "target": 5770.721
+  },
+  "MAN": {
+   "pace": 109.716,
+   "wear": 0.0,
+   "noise": 0.175,
+   "target": 5807.316
+  },
+  "PAT": {
+   "pace": 110.393,
+   "wear": 0.0,
+   "noise": 0.175,
+   "target": 5814.618
+  },
+  "BRU": {
+   "pace": 110.419,
+   "wear": 0.0,
+   "noise": 0.7,
+   "target": 5816.78
+  },
+  "SENA": {
+   "pace": 110.309,
+   "wear": 0.25,
+   "noise": 0.175,
+   "target": 5839.09
+  },
+  "HAK": {
+   "pace": 109.883,
+   "wear": 0.25,
+   "noise": 0.175,
+   "target": 5840.751
+  },
+  "JAR": {
+   "pace": 110.297,
+   "wear": 0.25,
+   "noise": 0.175,
+   "target": 5868.958
+  },
+  "DEC": {
+   "pace": 112.643,
+   "wear": 0.25,
+   "noise": 1.05,
+   "target": 5864.738
+  },
+  "SUZ": {
+   "pace": 112.489,
+   "wear": 0.25,
+   "noise": 0.35,
+   "target": 5867.366
+  },
+  "VANE": {
+   "pace": 112.646,
+   "wear": 0.25,
+   "noise": 0.175,
+   "target": 5867.866
+  },
+  "WEN": {
+   "pace": 112.644,
+   "wear": 0.25,
+   "noise": 0.175,
+   "target": 5868.366
+  },
+  "NASE": {
+   "pace": 112.541,
+   "wear": 0.25,
+   "noise": 0.175,
+   "target": 5869.994
+  },
+  "HER": {
+   "pace": 114.002,
+   "wear": 0.0,
+   "noise": 0.175,
+   "target": 5870.494
+  },
+  "GUG": {
+   "pace": 114.359,
+   "wear": 0.25,
+   "noise": 0.175,
+   "target": 5841.282
+  },
+  "MOD": {
+   "pace": 114.777,
+   "wear": 0.25,
+   "noise": 0.175,
+   "target": 5858.973
+  },
+  "MOR": {
+   "pace": 114.597,
+   "wear": 0.25,
+   "noise": 0.7,
+   "target": 5859.473
+  },
+  "KAT": {
+   "pace": 114.723,
+   "wear": 0.25,
+   "noise": 0.35,
+   "target": 5859.973
+  },
+  "GAC": {
+   "pace": 111.303,
+   "wear": 0.25,
+   "noise": 0.175,
+   "target": 5459.961
+  },
+  "BOUT": {
+   "pace": 105.299,
+   "wear": 0.0,
+   "noise": 0.175,
+   "target": 3693.515
+  },
+  "CAP": {
+   "pace": 105.474,
+   "wear": 0.0,
+   "noise": 0.175,
+   "target": 3426.636
+  },
+  "TAR": {
+   "pace": 105.433,
+   "wear": 0.0,
+   "noise": 0.175,
+   "target": 3425.076
+  },
+  "ALBM": {
+   "pace": 105.706,
+   "wear": 0.0,
+   "noise": 0.175,
+   "target": 2744.935
+  },
+  "ALE": {
+   "pace": 123.419,
+   "wear": 0.0,
+   "noise": 0.175,
+   "target": 1081.568
+  },
+  "GROO": {
+   "pace": 143.952,
+   "wear": 0.04,
+   "noise": 0.35,
+   "target": 143.952
+  }
+ },
+ "summary": {
+  "grid": {
+   "pass": 1,
+   "total": 1
+  },
+  "order": {
+   "pass": 1,
+   "total": 1
+  },
+  "gap": {
+   "pass": 6,
+   "total": 6
+  },
+  "fastest": {
+   "pass": 24,
+   "total": 24
+  },
+  "retirement": {
+   "pass": 10,
+   "total": 10
+  },
+  "retirement event": {
+   "pass": 9,
+   "total": 10
+  },
+  "laps down": {
+   "pass": 9,
+   "total": 9
+  },
+  "stop": {
+   "pass": 14,
+   "total": 14
+  },
+  "tyre": {
+   "pass": 38,
+   "total": 38
+  },
+  "safety car": {
+   "pass": 1,
+   "total": 1
+  }
+ },
+ "anchors": [
+  {
+   "anchor": "grid",
+   "subject": "lap-1 order is the grid order",
+   "target": [
+    "MAN",
+    "SENA",
+    "MSCM",
+    "PAT",
+    "ALE",
+    "BOUT",
+    "HAK",
+    "BRU",
+    "HER",
+    "TAR",
+    "CAP",
+    "DEC",
+    "ALBM",
+    "VANE",
+    "JAR",
+    "MOD",
+    "WEN",
+    "GAC",
+    "NASE",
+    "GROO",
+    "MOR",
+    "GUG",
+    "SUZ",
+    "KAT"
+   ],
+   "achieved": [
+    "MAN",
+    "SENA",
+    "MSCM",
+    "PAT",
+    "ALE",
+    "BOUT",
+    "HAK",
+    "BRU",
+    "HER",
+    "TAR",
+    "CAP",
+    "DEC",
+    "ALBM",
+    "VANE",
+    "JAR",
+    "MOD",
+    "WEN",
+    "GAC",
+    "NASE",
+    "GROO",
+    "MOR",
+    "GUG",
+    "SUZ",
+    "KAT"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "order",
+   "subject": "classification",
+   "target": [
+    "MSCM",
+    "MAN",
+    "PAT",
+    "BRU",
+    "SENA",
+    "HAK",
+    "JAR",
+    "DEC",
+    "SUZ",
+    "VANE",
+    "WEN",
+    "NASE",
+    "HER",
+    "GUG",
+    "MOD",
+    "MOR",
+    "KAT",
+    "GAC"
+   ],
+   "achieved": [
+    "MSCM",
+    "MAN",
+    "PAT",
+    "BRU",
+    "SENA",
+    "HAK",
+    "JAR",
+    "DEC",
+    "SUZ",
+    "VANE",
+    "WEN",
+    "NASE",
+    "HER",
+    "GUG",
+    "MOD",
+    "MOR",
+    "KAT",
+    "GAC"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "gap",
+   "subject": "MAN",
+   "target": 36.595,
+   "achieved": 36.594,
+   "pass": true
+  },
+  {
+   "anchor": "gap",
+   "subject": "PAT",
+   "target": 43.897,
+   "achieved": 43.893,
+   "pass": true
+  },
+  {
+   "anchor": "gap",
+   "subject": "BRU",
+   "target": 46.059,
+   "achieved": 46.057,
+   "pass": true
+  },
+  {
+   "anchor": "gap",
+   "subject": "SENA",
+   "target": 68.369,
+   "achieved": 68.367,
+   "pass": true
+  },
+  {
+   "anchor": "gap",
+   "subject": "HAK",
+   "target": 70.03,
+   "achieved": 70.028,
+   "pass": true
+  },
+  {
+   "anchor": "gap",
+   "subject": "JAR",
+   "target": 98.237,
+   "achieved": 98.237,
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "MSCM",
+   "target": [
+    113.791,
+    39
+   ],
+   "achieved": [
+    113.791,
+    39
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "MAN",
+   "target": [
+    115.294,
+    38
+   ],
+   "achieved": [
+    115.294,
+    38
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "PAT",
+   "target": [
+    117.387,
+    39
+   ],
+   "achieved": [
+    117.387,
+    39
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "BRU",
+   "target": [
+    117.398,
+    41
+   ],
+   "achieved": [
+    117.398,
+    41
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "SENA",
+   "target": [
+    114.088,
+    42
+   ],
+   "achieved": [
+    114.088,
+    42
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "HAK",
+   "target": [
+    115.929,
+    42
+   ],
+   "achieved": [
+    115.929,
+    42
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "JAR",
+   "target": [
+    116.676,
+    40
+   ],
+   "achieved": [
+    116.676,
+    40
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "DEC",
+   "target": [
+    119.376,
+    39
+   ],
+   "achieved": [
+    119.376,
+    39
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "SUZ",
+   "target": [
+    119.482,
+    39
+   ],
+   "achieved": [
+    119.482,
+    39
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "VANE",
+   "target": [
+    119.097,
+    42
+   ],
+   "achieved": [
+    119.097,
+    42
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "WEN",
+   "target": [
+    117.817,
+    39
+   ],
+   "achieved": [
+    117.817,
+    39
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "NASE",
+   "target": [
+    121.032,
+    38
+   ],
+   "achieved": [
+    121.032,
+    38
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "HER",
+   "target": [
+    116.254,
+    42
+   ],
+   "achieved": [
+    116.254,
+    42
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "GUG",
+   "target": [
+    121.067,
+    40
+   ],
+   "achieved": [
+    121.067,
+    40
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "MOD",
+   "target": [
+    123.615,
+    39
+   ],
+   "achieved": [
+    123.615,
+    39
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "MOR",
+   "target": [
+    120.755,
+    39
+   ],
+   "achieved": [
+    120.755,
+    39
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "KAT",
+   "target": [
+    119.914,
+    40
+   ],
+   "achieved": [
+    119.914,
+    40
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "GAC",
+   "target": [
+    117.954,
+    39
+   ],
+   "achieved": [
+    117.954,
+    39
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "BOUT",
+   "target": [
+    136.745,
+    25
+   ],
+   "achieved": [
+    136.745,
+    25
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "CAP",
+   "target": [
+    136.933,
+    25
+   ],
+   "achieved": [
+    136.933,
+    25
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "TAR",
+   "target": [
+    136.893,
+    19
+   ],
+   "achieved": [
+    136.893,
+    19
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "ALBM",
+   "target": [
+    137.039,
+    19
+   ],
+   "achieved": [
+    137.039,
+    19
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "ALE",
+   "target": [
+    135.494,
+    1
+   ],
+   "achieved": [
+    135.494,
+    1
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "GROO",
+   "target": [
+    143.952,
+    1
+   ],
+   "achieved": [
+    143.952,
+    1
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "HER",
+   "target": 43,
+   "achieved": 43,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "HER",
+   "target": true,
+   "achieved": false,
+   "pass": false
+  },
+  {
+   "anchor": "retirement",
+   "subject": "GAC",
+   "target": 40,
+   "achieved": 40,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "GAC",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "BOUT",
+   "target": 27,
+   "achieved": 27,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "BOUT",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "CAP",
+   "target": 25,
+   "achieved": 25,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "CAP",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "TAR",
+   "target": 25,
+   "achieved": 25,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "TAR",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "ALBM",
+   "target": 20,
+   "achieved": 20,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "ALBM",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "ALE",
+   "target": 7,
+   "achieved": 7,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "ALE",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "GROO",
+   "target": 1,
+   "achieved": 1,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "GROO",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "BER",
+   "target": 0,
+   "achieved": 0,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "BER",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "MAR",
+   "target": 0,
+   "achieved": 0,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "MAR",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "laps down",
+   "subject": "DEC",
+   "target": 1,
+   "achieved": 1,
+   "pass": true
+  },
+  {
+   "anchor": "laps down",
+   "subject": "SUZ",
+   "target": 1,
+   "achieved": 1,
+   "pass": true
+  },
+  {
+   "anchor": "laps down",
+   "subject": "VANE",
+   "target": 1,
+   "achieved": 1,
+   "pass": true
+  },
+  {
+   "anchor": "laps down",
+   "subject": "WEN",
+   "target": 1,
+   "achieved": 1,
+   "pass": true
+  },
+  {
+   "anchor": "laps down",
+   "subject": "NASE",
+   "target": 1,
+   "achieved": 1,
+   "pass": true
+  },
+  {
+   "anchor": "laps down",
+   "subject": "GUG",
+   "target": 2,
+   "achieved": 2,
+   "pass": true
+  },
+  {
+   "anchor": "laps down",
+   "subject": "MOD",
+   "target": 2,
+   "achieved": 2,
+   "pass": true
+  },
+  {
+   "anchor": "laps down",
+   "subject": "MOR",
+   "target": 2,
+   "achieved": 2,
+   "pass": true
+  },
+  {
+   "anchor": "laps down",
+   "subject": "KAT",
+   "target": 2,
+   "achieved": 2,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "MSCM",
+   "target": 4,
+   "achieved": 4,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "MSCM",
+   "target": 30,
+   "achieved": 30,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "MAN",
+   "target": 3,
+   "achieved": 3,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "MAN",
+   "target": 33,
+   "achieved": 33,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "PAT",
+   "target": 6,
+   "achieved": 6,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "PAT",
+   "target": 31,
+   "achieved": 31,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "BRU",
+   "target": 5,
+   "achieved": 5,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "BRU",
+   "target": 31,
+   "achieved": 31,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "SENA",
+   "target": 16,
+   "achieved": 16,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "SENA",
+   "target": 28,
+   "achieved": 28,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "HAK",
+   "target": 31,
+   "achieved": 31,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "HER",
+   "target": 8,
+   "achieved": 8,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "HER",
+   "target": 30,
+   "achieved": 30,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "ALE",
+   "target": 3,
+   "achieved": 3,
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "MSCM stint 1",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "MSCM stint 2",
+   "target": "wet",
+   "achieved": [
+    "WET"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "MSCM stint 3",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "MAN stint 1",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "MAN stint 2",
+   "target": "wet",
+   "achieved": [
+    "WET"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "MAN stint 3",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "PAT stint 1",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "PAT stint 2",
+   "target": "wet",
+   "achieved": [
+    "WET"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "PAT stint 3",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "BRU stint 1",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "BRU stint 2",
+   "target": "wet",
+   "achieved": [
+    "WET"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "BRU stint 3",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "SENA stint 1",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "SENA stint 2",
+   "target": "wet",
+   "achieved": [
+    "WET"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "SENA stint 3",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "HAK stint 1",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "HAK stint 2",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "JAR stint 1",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "DEC stint 1",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "SUZ stint 1",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "VANE stint 1",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "WEN stint 1",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "NASE stint 1",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "HER stint 1",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "HER stint 2",
+   "target": "wet",
+   "achieved": [
+    "WET"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "HER stint 3",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "GUG stint 1",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "MOD stint 1",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "MOR stint 1",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "KAT stint 1",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "GAC stint 1",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "BOUT stint 1",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "CAP stint 1",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "TAR stint 1",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "ALBM stint 1",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "ALE stint 1",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "ALE stint 2",
+   "target": "wet",
+   "achieved": [
+    "WET"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "GROO stint 1",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "safety car",
+   "subject": "leader's SC laps, sourced",
+   "target": [],
+   "achieved": [],
+   "pass": true
+  }
+ ],
+ "notes": [
+  "ALE: fastest lap on lap 1, its lap-1 time is the fastest lap's",
+  "GROO: fastest lap on lap 1, its lap-1 time is the fastest lap's",
+  "HER: no time fits both its classification and its window"
+ ],
+ "weather": {
+  "source": "reconstruction-facts",
+  "states": {
+   "dry": 0.0,
+   "damp": 0.15,
+   "wet": 0.45,
+   "heavy": 0.65
+  },
+  "timeline": [
+   {
+    "fromLap": 1,
+    "toLap": 2,
+    "state": "damp",
+    "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement ('It started on a track made so greasy by drizzle just before the start'; the first wet-tyre stops came at the end of lap 3)"
+   },
+   {
+    "fromLap": 3,
+    "toLap": 26,
+    "state": "wet",
+    "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement ('It was raining quite hard now, however, and gradually the leaders were all obliged to come in for wets'; 'the rain continued and Ayrton's advantage shrank'; Senna gave in on lap 16)",
+    "note": "No source describes laps 17-26; held at wet until the drying the sources put just before lap 28."
+   },
+   {
+    "fromLap": 27,
+    "toLap": 30,
+    "state": "wet",
+    "toState": "damp",
+    "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement ('It was also beginning to dry out, and a line was appearing faintly all round the circuit', before Senna's lap-28 slick stop); https://en.wikipedia.org/wiki/1992_Belgian_Grand_Prix ('By the time Thierry Boutsen spun off on lap 28, the track was beginning to dry'); https://www.autosport.com/f1/news/how-schumacher-joined-f1s-elite-5109906/5109906/ (Schumacher's lap-30 'early change to slicks just as the rain stopped')"
+   },
+   {
+    "fromLap": 31,
+    "toLap": 37,
+    "state": "damp",
+    "toState": "dry",
+    "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement (slick stops to lap 33); http://motorsportretro.com/2014/04/michael-schumachers-first-win/ ('On a drying track, he ran wide'; 'Schumacher didn't slow, lapping faster and faster')",
+    "note": "No source gives the lap the track was dry; ramped from the last slick stops to the first of the race's fastest laps (F1DB: laps 38-42)."
+   },
+   {
+    "fromLap": 38,
+    "toLap": 44,
+    "state": "dry",
+    "source": "http://motorsportretro.com/2014/04/michael-schumachers-first-win/ ('On the penultimate lap he set a time that would have put him fifth on the grid'); F1DB: every finisher's fastest lap on laps 38-42 (Schumacher 1:53.791, lap 39)",
+    "note": "Dry pace, not a statement that the track was dry: an owner check."
+   }
+  ],
+  "wetness": [
+   0.15,
+   0.15,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.35,
+   0.25,
+   0.15,
+   0.15,
+   0.125,
+   0.1,
+   0.075,
+   0.05,
+   0.025,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0
+  ],
+  "curves": {
+   "slick": {
+    "a": 0.1855,
+    "b": 0.9993
+   },
+   "inter": {
+    "min": 0.0345,
+    "dry": 1.0187,
+    "wet": 0.789,
+    "best": 0.18
+   },
+   "wet": {
+    "min": 0.1486,
+    "dry": 0.4006,
+    "wet": 0.6344,
+    "best": 0.2833
+   }
+  },
+  "tyres": [
+   {
+    "driver": "MSCM",
+    "stint": 1,
+    "tyre": "slick",
+    "by": "source"
+   },
+   {
+    "driver": "MSCM",
+    "stint": 2,
+    "tyre": "wet",
+    "by": "source"
+   },
+   {
+    "driver": "MSCM",
+    "stint": 3,
+    "tyre": "slick",
+    "by": "source"
+   },
+   {
+    "driver": "MAN",
+    "stint": 1,
+    "tyre": "slick",
+    "by": "source"
+   },
+   {
+    "driver": "MAN",
+    "stint": 2,
+    "tyre": "wet",
+    "by": "source"
+   },
+   {
+    "driver": "MAN",
+    "stint": 3,
+    "tyre": "slick",
+    "by": "source"
+   },
+   {
+    "driver": "PAT",
+    "stint": 1,
+    "tyre": "slick",
+    "by": "source"
+   },
+   {
+    "driver": "PAT",
+    "stint": 2,
+    "tyre": "wet",
+    "by": "source"
+   },
+   {
+    "driver": "PAT",
+    "stint": 3,
+    "tyre": "slick",
+    "by": "source"
+   },
+   {
+    "driver": "BRU",
+    "stint": 1,
+    "tyre": "slick",
+    "by": "source"
+   },
+   {
+    "driver": "BRU",
+    "stint": 2,
+    "tyre": "wet",
+    "by": "source"
+   },
+   {
+    "driver": "BRU",
+    "stint": 3,
+    "tyre": "slick",
+    "by": "source"
+   },
+   {
+    "driver": "SENA",
+    "stint": 1,
+    "tyre": "slick",
+    "by": "source"
+   },
+   {
+    "driver": "SENA",
+    "stint": 2,
+    "tyre": "wet",
+    "by": "source"
+   },
+   {
+    "driver": "SENA",
+    "stint": 3,
+    "tyre": "slick",
+    "by": "source"
+   },
+   {
+    "driver": "HAK",
+    "stint": 1,
+    "tyre": "slick",
+    "by": "source"
+   },
+   {
+    "driver": "HAK",
+    "stint": 2,
+    "tyre": "slick",
+    "by": "source"
+   },
+   {
+    "driver": "JAR",
+    "stint": 1,
+    "tyre": "slick",
+    "by": "source"
+   },
+   {
+    "driver": "DEC",
+    "stint": 1,
+    "tyre": "slick",
+    "by": "source"
+   },
+   {
+    "driver": "SUZ",
+    "stint": 1,
+    "tyre": "slick",
+    "by": "source"
+   },
+   {
+    "driver": "VANE",
+    "stint": 1,
+    "tyre": "slick",
+    "by": "source"
+   },
+   {
+    "driver": "WEN",
+    "stint": 1,
+    "tyre": "slick",
+    "by": "source"
+   },
+   {
+    "driver": "NASE",
+    "stint": 1,
+    "tyre": "slick",
+    "by": "source"
+   },
+   {
+    "driver": "HER",
+    "stint": 1,
+    "tyre": "slick",
+    "by": "source"
+   },
+   {
+    "driver": "HER",
+    "stint": 2,
+    "tyre": "wet",
+    "by": "source"
+   },
+   {
+    "driver": "HER",
+    "stint": 3,
+    "tyre": "slick",
+    "by": "source"
+   },
+   {
+    "driver": "GUG",
+    "stint": 1,
+    "tyre": "slick",
+    "by": "source"
+   },
+   {
+    "driver": "MOD",
+    "stint": 1,
+    "tyre": "slick",
+    "by": "source"
+   },
+   {
+    "driver": "MOR",
+    "stint": 1,
+    "tyre": "slick",
+    "by": "source"
+   },
+   {
+    "driver": "KAT",
+    "stint": 1,
+    "tyre": "slick",
+    "by": "source"
+   },
+   {
+    "driver": "GAC",
+    "stint": 1,
+    "tyre": "slick",
+    "by": "source"
+   },
+   {
+    "driver": "BOUT",
+    "stint": 1,
+    "tyre": "slick",
+    "by": "source"
+   },
+   {
+    "driver": "CAP",
+    "stint": 1,
+    "tyre": "slick",
+    "by": "source"
+   },
+   {
+    "driver": "TAR",
+    "stint": 1,
+    "tyre": "slick",
+    "by": "source"
+   },
+   {
+    "driver": "ALBM",
+    "stint": 1,
+    "tyre": "slick",
+    "by": "source"
+   },
+   {
+    "driver": "ALE",
+    "stint": 1,
+    "tyre": "slick",
+    "by": "source"
+   },
+   {
+    "driver": "ALE",
+    "stint": 2,
+    "tyre": "wet",
+    "by": "source"
+   },
+   {
+    "driver": "GROO",
+    "stint": 1,
+    "tyre": "slick",
+    "by": "source"
+   }
+  ]
+ }
+}

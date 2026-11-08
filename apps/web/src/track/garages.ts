@@ -201,6 +201,25 @@ const STANDINGS: Record<number, string[]> = {
     'Larrousse',
     'Sauber',
   ],
+  // 1995 (Eras, reconstructed races): the 1994 final standings from the Jolpica dump
+  // (2026-10-24, formula_one_teamchampionship). Larrousse and Team Lotus left after 1994.
+  // Simtek and Pacific (entered, unranked on 0 points) and Forti (new) have no standing and go
+  // last, in car-number order (formula_one_roundentry: 11, 16, 21).
+  1995: [
+    'Williams',
+    'Benetton',
+    'Ferrari',
+    'McLaren',
+    'Jordan',
+    'Ligier',
+    'Tyrrell',
+    'Sauber',
+    'Footwork',
+    'Minardi',
+    'Simtek',
+    'Pacific',
+    'Forti',
+  ],
   // 2005-2009 (Eras): the 2004-2008 final standings from the Jolpica dump (2026-10-24,
   // formula_one_teamchampionship), under each season's names (2005: Jaguar is Red Bull; 2006:
   // BAR is Honda, Sauber is BMW Sauber, Jordan is MF1, Spyker MF1 by Brazil, Minardi is Toro

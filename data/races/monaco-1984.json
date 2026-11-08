@@ -1,0 +1,405 @@
+{
+  "schemaVersion": 11,
+  "race": {
+    "id": "monaco-1984",
+    "name": "Monaco 1984: Prost vs Senna",
+    "laps": 31,
+    "takeoverLap": 12,
+    "seed": 1
+  },
+  "era": "1988-1993",
+  "track": {
+    "pitLoss": 20.0,
+    "pitLossUnderSC": 11.0,
+    "pitLossUnderVSC": 13.8,
+    "pitLossDeviations": [],
+    "overtakeDifficulty": 0.625,
+    "overtakeModel": {
+      "intercept": 0.3733,
+      "paceCoef": 1.0914,
+      "gapCoef": -1.3775
+    },
+    "dirtyAirPenalty": 0.0,
+    "greenLapTime": 119.589
+  },
+  "compounds": {
+    "MEDIUM": {
+      "offset": 0.0,
+      "degPerLap": 0.0,
+      "cliffLap": 31
+    },
+    "WET": {
+      "offset": 0.0,
+      "degPerLap": 0.0,
+      "cliffLap": 31,
+      "provenLaps": 31
+    },
+    "INTERMEDIATE": {
+      "offset": 0.0,
+      "degPerLap": 0.05,
+      "cliffLap": 30
+    }
+  },
+  "drivers": [
+    {
+      "code": "ALBM",
+      "team": "Ferrari",
+      "basePace": 88.821,
+      "noise": 1.05,
+      "wetPace": -0.0034,
+      "stateAtTakeover": {
+        "position": 11,
+        "gapAhead": 3.185,
+        "compound": "WET",
+        "tyreAge": 12,
+        "compoundsUsed": []
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "ARN",
+      "team": "Ferrari",
+      "basePace": 86.532,
+      "noise": 0.7,
+      "wetPace": -0.0011,
+      "stateAtTakeover": {
+        "position": 4,
+        "gapAhead": 2.893,
+        "compound": "WET",
+        "tyreAge": 12,
+        "compoundsUsed": []
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BEL",
+      "team": "Tyrrell",
+      "basePace": 85.49,
+      "noise": 0.35,
+      "wetPace": 0.0071,
+      "stateAtTakeover": {
+        "position": 3,
+        "gapAhead": 3.777,
+        "compound": "WET",
+        "tyreAge": 12,
+        "compoundsUsed": []
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "DEA",
+      "team": "Team Lotus",
+      "basePace": 86.766,
+      "noise": 1.05,
+      "wetPace": -0.0006,
+      "stateAtTakeover": {
+        "position": 7,
+        "gapAhead": 0.96,
+        "compound": "WET",
+        "tyreAge": 12,
+        "compoundsUsed": []
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "GHI",
+      "team": "Osella",
+      "basePace": 86.016,
+      "noise": 1.05,
+      "wetPace": 0.035,
+      "stateAtTakeover": {
+        "position": 9,
+        "gapAhead": 0.848,
+        "compound": "WET",
+        "tyreAge": 12,
+        "compoundsUsed": []
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "HES",
+      "team": "Ligier",
+      "basePace": 89.957,
+      "noise": 1.05,
+      "wetPace": 0.0007,
+      "stateAtTakeover": {
+        "position": 15,
+        "gapAhead": 8.979,
+        "compound": "WET",
+        "tyreAge": 12,
+        "compoundsUsed": []
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "LAF",
+      "team": "Williams",
+      "basePace": 89.023,
+      "noise": 1.05,
+      "wetPace": -0.007,
+      "stateAtTakeover": {
+        "position": 12,
+        "gapAhead": 9.054,
+        "compound": "WET",
+        "tyreAge": 12,
+        "compoundsUsed": []
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "LAU",
+      "team": "McLaren",
+      "basePace": 88.25,
+      "noise": 1.05,
+      "wetPace": -0.0016,
+      "stateAtTakeover": {
+        "position": 10,
+        "gapAhead": 11.912,
+        "compound": "WET",
+        "tyreAge": 12,
+        "compoundsUsed": []
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "MAN",
+      "team": "Team Lotus",
+      "basePace": 86.742,
+      "noise": 1.05,
+      "wetPace": 0.0002,
+      "stateAtTakeover": {
+        "position": 5,
+        "gapAhead": 7.816,
+        "compound": "WET",
+        "tyreAge": 12,
+        "compoundsUsed": []
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "PAT",
+      "team": "Alfa Romeo",
+      "basePace": 89.469,
+      "noise": 1.05,
+      "wetPace": -0.0036,
+      "stateAtTakeover": {
+        "position": 14,
+        "gapAhead": 7.128,
+        "compound": "WET",
+        "tyreAge": 12,
+        "compoundsUsed": []
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "PIQN",
+      "team": "Brabham",
+      "basePace": 89.873,
+      "noise": 1.05,
+      "wetPace": -0.0092,
+      "stateAtTakeover": {
+        "position": 13,
+        "gapAhead": 2.862,
+        "compound": "WET",
+        "tyreAge": 12,
+        "compoundsUsed": []
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "PRO",
+      "team": "McLaren",
+      "basePace": 85.538,
+      "noise": 0.7,
+      "wetPace": 0.0029,
+      "stateAtTakeover": {
+        "position": 1,
+        "gapAhead": 0.0,
+        "compound": "WET",
+        "tyreAge": 12,
+        "compoundsUsed": []
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "ROSK",
+      "team": "Williams",
+      "basePace": 86.741,
+      "noise": 0.7,
+      "wetPace": -0.0032,
+      "stateAtTakeover": {
+        "position": 6,
+        "gapAhead": 0.999,
+        "compound": "WET",
+        "tyreAge": 12,
+        "compoundsUsed": []
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "SENA",
+      "team": "Toleman",
+      "basePace": 85.588,
+      "noise": 1.05,
+      "wetPace": 0.0036,
+      "stateAtTakeover": {
+        "position": 2,
+        "gapAhead": 9.324,
+        "compound": "WET",
+        "tyreAge": 12,
+        "compoundsUsed": []
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "WINM",
+      "team": "ATS",
+      "basePace": 87.412,
+      "noise": 1.05,
+      "wetPace": -0.0032,
+      "stateAtTakeover": {
+        "position": 8,
+        "gapAhead": 6.694,
+        "compound": "WET",
+        "tyreAge": 12,
+        "compoundsUsed": []
+      },
+      "realStrategy": []
+    }
+  ],
+  "fuelEffectPerLap": 0.06,
+  "freshTyre": {
+    "bonus": 0.0,
+    "laps": 3
+  },
+  "events": [
+    {
+      "lap": 13,
+      "type": "RETIREMENT",
+      "driver": "HES"
+    },
+    {
+      "lap": 15,
+      "type": "RETIREMENT",
+      "driver": "PIQN"
+    },
+    {
+      "lap": 16,
+      "type": "RETIREMENT",
+      "driver": "MAN"
+    },
+    {
+      "lap": 23,
+      "type": "RETIREMENT",
+      "driver": "WINM"
+    },
+    {
+      "lap": 24,
+      "type": "RETIREMENT",
+      "driver": "LAU"
+    },
+    {
+      "lap": 26,
+      "type": "RETIREMENT",
+      "driver": "PAT"
+    }
+  ],
+  "decisionMoments": [],
+  "candidateMomentLaps": [],
+  "realResult": [
+    "PRO",
+    "SENA",
+    "ARN",
+    "ROSK",
+    "DEA",
+    "ALBM",
+    "GHI",
+    "LAF",
+    "BEL",
+    "PAT",
+    "LAU",
+    "WINM",
+    "MAN",
+    "PIQN",
+    "HES",
+    "FABC",
+    "DEC",
+    "TAM",
+    "WAR",
+    "CEC"
+  ],
+  "userSide": "PRO",
+  "rival": "SENA",
+  "weather": {
+    "curves": {
+      "slick": {
+        "a": 0.1855,
+        "b": 0.9993
+      },
+      "inter": {
+        "min": 0.0345,
+        "dry": 1.0187,
+        "wet": 0.789,
+        "best": 0.18
+      },
+      "wet": {
+        "min": 0.1486,
+        "dry": 0.4006,
+        "wet": 0.6344,
+        "best": 0.2833
+      }
+    },
+    "wetness": [
+      0.65,
+      0.65,
+      0.65,
+      0.66,
+      0.65,
+      0.66,
+      0.65,
+      0.66,
+      0.66,
+      0.65,
+      0.65,
+      0.65,
+      0.66,
+      0.66,
+      0.66,
+      0.65,
+      0.66,
+      0.66,
+      0.65,
+      0.66,
+      0.66,
+      0.64,
+      0.65,
+      0.65,
+      0.65,
+      0.66,
+      0.66,
+      0.67,
+      0.66,
+      0.65,
+      0.66
+    ]
+  },
+  "provenance": {
+    "kind": "reconstructed",
+    "estimated": [
+      "compounds",
+      "fuelLoads",
+      "weather"
+    ]
+  },
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": false,
+    "fuelLimit": 187.0
+  },
+  "reconstructed": true
+}

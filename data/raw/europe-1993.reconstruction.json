@@ -1,0 +1,1707 @@
+{
+ "raceId": "europe-1993",
+ "year": 1993,
+ "laps": 76,
+ "reconstructed": true,
+ "provenance": {
+  "kind": "reconstructed",
+  "estimated": [
+   "compounds",
+   "safetyCars",
+   "fuelLoads",
+   "weather"
+  ]
+ },
+ "estimates": [
+  "Every lap time and lap-end Time is synthetic: solved to the anchors, not measured",
+  "Position each lap follows from the synthetic times; the lap-1 order is the grid order",
+  "Lap times in between the anchors: pace + tyre wear + fuel + seeded noise",
+  "Fuel: 0.06s per lap of fuel on board; full tank at the start",
+  "Stop loss: pit-lane time - 5.0s, 35% on the in-lap",
+  "PitInTime is the in-lap's end; PitOutTime adds the out-lap's share of the lane time",
+  "Weather: each lap's wetness from the facts file's sourced timeline (track states as wetness: {'dry': 0.0, 'damp': 0.15, 'wet': 0.45, 'heavy': 0.65}; ramps between sourced points are linear)",
+  "Wet laps: the dry lap x (1 + the stint tyre's penalty at that wetness), the weather model's curves (data/wet.json); tyre wear at wet.wear_mult",
+  "Compound: WET / INTERMEDIATE on wet-tyre stints, slick stints left empty (step 2.4's dry compound); a stint no source names gets the tyre that loses least over its laps",
+  "Stops: only the sourced ones; cars may have stopped more (unknown)",
+  "Safety cars: only the sourced ones (none found is not none run)"
+ ],
+ "sources": {
+  "jolpica": "Jolpica-F1 dump 2026-10-24T01:04:07.015299Z (CC BY-NC-SA 4.0)",
+  "f1db": "F1DB v2026.19.0 (CC BY 4.0), f1db/europe-1993.*.csv",
+  "facts": "europe-1993.json",
+  "jolpicaRound": 3,
+  "eventName": "European Grand Prix"
+ },
+ "classified": [
+  "SENA",
+  "HIL",
+  "PRO",
+  "HER",
+  "PAT",
+  "BAB",
+  "FITC",
+  "ZAN",
+  "COM",
+  "BAR",
+  "ALBM"
+ ],
+ "roadPositions": [],
+ "stopsComplete": false,
+ "safetyCarsComplete": false,
+ "params": {
+  "seed": 0,
+  "sigma": 0.35,
+  "fuel_per_lap": 0.06,
+  "wear_prior": 0.04,
+  "wear_max": 0.25,
+  "start_loss": 4.0,
+  "grid_gap": 0.6,
+  "fastest_margin": 0.05,
+  "pit_bypass": 5.0,
+  "pit_in_share": 0.35,
+  "default_lane_time": 25.0,
+  "sc_factor": 1.4,
+  "sc_gap": 0.8,
+  "sc_iterations": 12,
+  "order_gap": 0.5,
+  "gap_tolerance": 2.0,
+  "attempts": 6,
+  "refuel": null
+ },
+ "solver": {
+  "attempts": 1,
+  "sigma": 0.35,
+  "passed": true
+ },
+ "fitted": {
+  "SENA": {
+   "pace": 71.896,
+   "wear": 0.0,
+   "noise": 0.525,
+   "target": 6646.57
+  },
+  "HIL": {
+   "pace": 70.226,
+   "wear": 0.0,
+   "noise": 1.05,
+   "target": 6729.769
+  },
+  "PRO": {
+   "pace": 71.771,
+   "wear": 0.0,
+   "noise": 0.175,
+   "target": 6670.293
+  },
+  "HER": {
+   "pace": 73.483,
+   "wear": 0.25,
+   "noise": 0.175,
+   "target": 6693.516
+  },
+  "PAT": {
+   "pace": 71.22,
+   "wear": 0.0,
+   "noise": 1.05,
+   "target": 6647.07
+  },
+  "BAB": {
+   "pace": 68.709,
+   "wear": 0.05,
+   "noise": 1.05,
+   "target": 6667.118
+  },
+  "FITC": {
+   "pace": 72.182,
+   "wear": 0.0,
+   "noise": 1.05,
+   "target": 6647.07
+  },
+  "ZAN": {
+   "pace": 73.403,
+   "wear": 0.0,
+   "noise": 1.05,
+   "target": 6647.07
+  },
+  "COM": {
+   "pace": 73.14,
+   "wear": 0.0,
+   "noise": 1.05,
+   "target": 6647.57
+  },
+  "BAR": {
+   "pace": 69.416,
+   "wear": 0.0,
+   "noise": 0.175,
+   "target": 6150.515
+  },
+  "ALBM": {
+   "pace": 68.743,
+   "wear": 0.125,
+   "noise": 1.05,
+   "target": 6647.07
+  },
+  "WAR": {
+   "pace": 69.284,
+   "wear": 0.0,
+   "noise": 1.05,
+   "target": 5774.191
+  },
+  "BOUT": {
+   "pace": 67.673,
+   "wear": 0.1,
+   "noise": 1.05,
+   "target": 5564.339
+  },
+  "DEC": {
+   "pace": 72.959,
+   "wear": 0.0,
+   "noise": 1.05,
+   "target": 5089.856
+  },
+  "ALE": {
+   "pace": 69.662,
+   "wear": 0.0,
+   "noise": 1.05,
+   "target": 3221.363
+  },
+  "SUZ": {
+   "pace": 74.896,
+   "wear": 0.0,
+   "noise": 1.05,
+   "target": 2800.871
+  },
+  "ALL": {
+   "pace": 71.592,
+   "wear": 0.0,
+   "noise": 1.05,
+   "target": 2500.421
+  },
+  "MSCM": {
+   "pace": 69.41,
+   "wear": 0.0,
+   "noise": 1.05,
+   "target": 1971.948
+  },
+  "BLU": {
+   "pace": 70.934,
+   "wear": 0.0,
+   "noise": 1.05,
+   "target": 1828.943
+  },
+  "BER": {
+   "pace": 72.297,
+   "wear": 0.0,
+   "noise": 1.05,
+   "target": 1770.613
+  },
+  "JAR": {
+   "pace": 79.695,
+   "wear": 0.25,
+   "noise": 1.05,
+   "target": 1274.87
+  },
+  "KAT": {
+   "pace": 73.606,
+   "wear": 0.25,
+   "noise": 1.05,
+   "target": 1077.909
+  },
+  "BRU": {
+   "pace": 75.289,
+   "wear": 0.0,
+   "noise": 1.05,
+   "target": 718.587
+  }
+ },
+ "summary": {
+  "grid": {
+   "pass": 1,
+   "total": 1
+  },
+  "order": {
+   "pass": 1,
+   "total": 1
+  },
+  "gap": {
+   "pass": 1,
+   "total": 1
+  },
+  "fastest": {
+   "pass": 23,
+   "total": 23
+  },
+  "retirement": {
+   "pass": 15,
+   "total": 15
+  },
+  "retirement event": {
+   "pass": 15,
+   "total": 15
+  },
+  "laps down": {
+   "pass": 8,
+   "total": 8
+  },
+  "stop": {
+   "pass": 13,
+   "total": 13
+  },
+  "tyre": {
+   "pass": 34,
+   "total": 34
+  },
+  "safety car": {
+   "pass": 1,
+   "total": 1
+  }
+ },
+ "anchors": [
+  {
+   "anchor": "grid",
+   "subject": "lap-1 order is the grid order",
+   "target": [
+    "PRO",
+    "HIL",
+    "MSCM",
+    "SENA",
+    "JAR",
+    "BER",
+    "ALE",
+    "PAT",
+    "HER",
+    "BAR",
+    "ZAN",
+    "WAR",
+    "ALL",
+    "FITC",
+    "COM",
+    "KAT",
+    "BOUT",
+    "BAB",
+    "BLU",
+    "BRU",
+    "SUZ",
+    "ALBM",
+    "DEC"
+   ],
+   "achieved": [
+    "PRO",
+    "HIL",
+    "MSCM",
+    "SENA",
+    "JAR",
+    "BER",
+    "ALE",
+    "PAT",
+    "HER",
+    "BAR",
+    "ZAN",
+    "WAR",
+    "ALL",
+    "FITC",
+    "COM",
+    "KAT",
+    "BOUT",
+    "BAB",
+    "BLU",
+    "BRU",
+    "SUZ",
+    "ALBM",
+    "DEC"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "order",
+   "subject": "classification",
+   "target": [
+    "SENA",
+    "HIL",
+    "PRO",
+    "HER",
+    "PAT",
+    "BAB",
+    "FITC",
+    "ZAN",
+    "COM",
+    "BAR",
+    "ALBM"
+   ],
+   "achieved": [
+    "SENA",
+    "HIL",
+    "PRO",
+    "HER",
+    "PAT",
+    "BAB",
+    "FITC",
+    "ZAN",
+    "COM",
+    "BAR",
+    "ALBM"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "gap",
+   "subject": "HIL",
+   "target": 83.199,
+   "achieved": 83.199,
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "SENA",
+   "target": [
+    78.029,
+    57
+   ],
+   "achieved": [
+    78.029,
+    57
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "HIL",
+   "target": [
+    79.379,
+    55
+   ],
+   "achieved": [
+    79.379,
+    55
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "PRO",
+   "target": [
+    79.756,
+    55
+   ],
+   "achieved": [
+    79.756,
+    55
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "HER",
+   "target": [
+    82.15,
+    55
+   ],
+   "achieved": [
+    82.15,
+    55
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "PAT",
+   "target": [
+    82.279,
+    54
+   ],
+   "achieved": [
+    82.279,
+    54
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "BAB",
+   "target": [
+    84.703,
+    21
+   ],
+   "achieved": [
+    84.703,
+    21
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "FITC",
+   "target": [
+    81.022,
+    52
+   ],
+   "achieved": [
+    81.022,
+    52
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "ZAN",
+   "target": [
+    80.801,
+    51
+   ],
+   "achieved": [
+    80.801,
+    51
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "COM",
+   "target": [
+    82.2,
+    52
+   ],
+   "achieved": [
+    82.2,
+    52
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "BAR",
+   "target": [
+    82.307,
+    55
+   ],
+   "achieved": [
+    82.307,
+    55
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "ALBM",
+   "target": [
+    88.023,
+    19
+   ],
+   "achieved": [
+    88.023,
+    19
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "WAR",
+   "target": [
+    82.061,
+    54
+   ],
+   "achieved": [
+    82.061,
+    54
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "BOUT",
+   "target": [
+    85.532,
+    19
+   ],
+   "achieved": [
+    85.532,
+    19
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "DEC",
+   "target": [
+    86.419,
+    51
+   ],
+   "achieved": [
+    86.419,
+    51
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "ALE",
+   "target": [
+    82.55,
+    21
+   ],
+   "achieved": [
+    82.55,
+    21
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "SUZ",
+   "target": [
+    88.929,
+    20
+   ],
+   "achieved": [
+    88.929,
+    20
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "ALL",
+   "target": [
+    85.078,
+    19
+   ],
+   "achieved": [
+    85.078,
+    19
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "MSCM",
+   "target": [
+    82.549,
+    21
+   ],
+   "achieved": [
+    82.549,
+    21
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "BLU",
+   "target": [
+    84.093,
+    20
+   ],
+   "achieved": [
+    84.093,
+    20
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "BER",
+   "target": [
+    86.078,
+    17
+   ],
+   "achieved": [
+    86.078,
+    17
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "JAR",
+   "target": [
+    97.749,
+    2
+   ],
+   "achieved": [
+    97.749,
+    2
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "KAT",
+   "target": [
+    93.528,
+    5
+   ],
+   "achieved": [
+    93.528,
+    5
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "BRU",
+   "target": [
+    93.123,
+    5
+   ],
+   "achieved": [
+    93.123,
+    5
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "BAR",
+   "target": 70,
+   "achieved": 70,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "BAR",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "WAR",
+   "target": 66,
+   "achieved": 66,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "WAR",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "BOUT",
+   "target": 61,
+   "achieved": 61,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "BOUT",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "DEC",
+   "target": 55,
+   "achieved": 55,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "DEC",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "ALE",
+   "target": 36,
+   "achieved": 36,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "ALE",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "SUZ",
+   "target": 29,
+   "achieved": 29,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "SUZ",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "ALL",
+   "target": 27,
+   "achieved": 27,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "ALL",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "MSCM",
+   "target": 22,
+   "achieved": 22,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "MSCM",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "BLU",
+   "target": 20,
+   "achieved": 20,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "BLU",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "BER",
+   "target": 19,
+   "achieved": 19,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "BER",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "JAR",
+   "target": 13,
+   "achieved": 13,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "JAR",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "KAT",
+   "target": 11,
+   "achieved": 11,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "KAT",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "BRU",
+   "target": 7,
+   "achieved": 7,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "BRU",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "WEN",
+   "target": 0,
+   "achieved": 0,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "WEN",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "AND",
+   "target": 0,
+   "achieved": 0,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "AND",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "laps down",
+   "subject": "PRO",
+   "target": 1,
+   "achieved": 1,
+   "pass": true
+  },
+  {
+   "anchor": "laps down",
+   "subject": "HER",
+   "target": 1,
+   "achieved": 1,
+   "pass": true
+  },
+  {
+   "anchor": "laps down",
+   "subject": "PAT",
+   "target": 2,
+   "achieved": 2,
+   "pass": true
+  },
+  {
+   "anchor": "laps down",
+   "subject": "BAB",
+   "target": 2,
+   "achieved": 2,
+   "pass": true
+  },
+  {
+   "anchor": "laps down",
+   "subject": "FITC",
+   "target": 3,
+   "achieved": 3,
+   "pass": true
+  },
+  {
+   "anchor": "laps down",
+   "subject": "ZAN",
+   "target": 4,
+   "achieved": 4,
+   "pass": true
+  },
+  {
+   "anchor": "laps down",
+   "subject": "COM",
+   "target": 4,
+   "achieved": 4,
+   "pass": true
+  },
+  {
+   "anchor": "laps down",
+   "subject": "ALBM",
+   "target": 6,
+   "achieved": 6,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "SENA",
+   "target": 18,
+   "achieved": 18,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "SENA",
+   "target": 34,
+   "achieved": 34,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "SENA",
+   "target": 57,
+   "achieved": 57,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "HIL",
+   "target": 17,
+   "achieved": 17,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "HIL",
+   "target": 24,
+   "achieved": 24,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "PRO",
+   "target": 19,
+   "achieved": 19,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "PRO",
+   "target": 22,
+   "achieved": 22,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "PRO",
+   "target": 48,
+   "achieved": 48,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "PRO",
+   "target": 53,
+   "achieved": 53,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "HER",
+   "target": 10,
+   "achieved": 10,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "BAR",
+   "target": 19,
+   "achieved": 19,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "BAR",
+   "target": 39,
+   "achieved": 39,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "BRU",
+   "target": 6,
+   "achieved": 6,
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "SENA stint 1",
+   "target": "wet",
+   "achieved": [
+    "WET"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "SENA stint 2",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "SENA stint 3",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "SENA stint 4",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "HIL stint 1",
+   "target": "wet",
+   "achieved": [
+    "WET"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "HIL stint 2",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "HIL stint 3",
+   "target": "wet",
+   "achieved": [
+    "WET"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "PRO stint 1",
+   "target": "wet",
+   "achieved": [
+    "WET"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "PRO stint 2",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "PRO stint 3",
+   "target": "wet",
+   "achieved": [
+    "WET"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "HER stint 1",
+   "target": "wet",
+   "achieved": [
+    "WET"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "HER stint 2",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "PAT stint 1",
+   "target": "wet",
+   "achieved": [
+    "WET"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "BAB stint 1",
+   "target": "wet",
+   "achieved": [
+    "WET"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "FITC stint 1",
+   "target": "wet",
+   "achieved": [
+    "WET"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "ZAN stint 1",
+   "target": "wet",
+   "achieved": [
+    "WET"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "COM stint 1",
+   "target": "wet",
+   "achieved": [
+    "WET"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "BAR stint 1",
+   "target": "wet",
+   "achieved": [
+    "WET"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "BAR stint 2",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "BAR stint 3",
+   "target": "wet",
+   "achieved": [
+    "WET"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "ALBM stint 1",
+   "target": "wet",
+   "achieved": [
+    "WET"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "WAR stint 1",
+   "target": "wet",
+   "achieved": [
+    "WET"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "BOUT stint 1",
+   "target": "wet",
+   "achieved": [
+    "WET"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "DEC stint 1",
+   "target": "wet",
+   "achieved": [
+    "WET"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "ALE stint 1",
+   "target": "wet",
+   "achieved": [
+    "WET"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "SUZ stint 1",
+   "target": "wet",
+   "achieved": [
+    "WET"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "ALL stint 1",
+   "target": "wet",
+   "achieved": [
+    "WET"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "MSCM stint 1",
+   "target": "wet",
+   "achieved": [
+    "WET"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "BLU stint 1",
+   "target": "wet",
+   "achieved": [
+    "WET"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "BER stint 1",
+   "target": "wet",
+   "achieved": [
+    "WET"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "JAR stint 1",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "KAT stint 1",
+   "target": "wet",
+   "achieved": [
+    "WET"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "BRU stint 1",
+   "target": "wet",
+   "achieved": [
+    "WET"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "tyre",
+   "subject": "BRU stint 2",
+   "target": "slick",
+   "achieved": [
+    "None"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "safety car",
+   "subject": "leader's SC laps, sourced (others unknown)",
+   "target": [],
+   "achieved": [],
+   "pass": true
+  }
+ ],
+ "notes": [],
+ "weather": {
+  "source": "reconstruction-facts",
+  "states": {
+   "dry": 0.0,
+   "damp": 0.15,
+   "wet": 0.45,
+   "heavy": 0.65
+  },
+  "timeline": [
+   {
+    "fromLap": 1,
+    "toLap": 5,
+    "state": "wet",
+    "source": "https://www.grandprix.com/gpe/rr535.html ('It was raining at the start as Prost and Hill led away'); https://en.wikipedia.org/wiki/1993_European_Grand_Prix ('At the start, it was damp'); https://sidepodcast.com/post/races-to-remember-europe-1993 ('The track was soaking on Sunday morning, although the rain had eased when the pack got going')"
+   },
+   {
+    "fromLap": 6,
+    "toLap": 10,
+    "state": "wet",
+    "toState": "damp",
+    "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked (the racing line drying while rain came and went; Brundle to slicks 'on his sixth lap'); https://motorsportmagazine.com/special-article/the-75-greatest-grands-prix/104/19-1993-gp-of-europe-sennas-lap-of-the-gods (Herbert to slicks at the end of lap 10)"
+   },
+   {
+    "fromLap": 11,
+    "toLap": 21,
+    "state": "damp",
+    "source": "https://www.grandprix.com/gpe/rr535.html ('The track was now beginning to dry and the first drivers came in for slicks'); https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked (slick stops: Hill end of lap 17, Senna 18, Prost and Barrichello 19)"
+   },
+   {
+    "fromLap": 22,
+    "toLap": 30,
+    "state": "wet",
+    "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked ('as it rained again on lap 22', Prost back to wets, Hill two laps later); https://www.grandprix.com/gpe/rr535.html ('It began to rain again and Prost decided to return to the pits for wet tyres'); https://sidepodcast.com/post/races-to-remember-europe-1993 ('20 laps in ... the rain returned')"
+   },
+   {
+    "fromLap": 31,
+    "toLap": 34,
+    "state": "wet",
+    "toState": "damp",
+    "source": "https://www.grandprix.com/gpe/rr535.html ('The rain then stopped again'; 'Prost returned to the pits for slicks to be followed by Senna and Hill'); https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked (Senna's slick stop on lap 34)",
+    "note": "When the rain stopped isn't given; drying ramped to Senna's lap-34 slick stop."
+   },
+   {
+    "fromLap": 35,
+    "toLap": 36,
+    "state": "damp",
+    "source": "https://www.grandprix.com/gpe/rr535.html (on slicks after the second round of slick stops)"
+   },
+   {
+    "fromLap": 37,
+    "toLap": 40,
+    "state": "wet",
+    "source": "https://sidepodcast.com/post/races-to-remember-europe-1993 ('on the 37th lap, whilst the others were hurrying to fit wets'); https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked (Barrichello 'changed to wets again on his 39th lap'); https://www.grandprix.com/gpe/rr535.html ('Just as he rejoined the rain began to fall heavily')",
+    "note": "The shower's end isn't given; held to lap 40."
+   },
+   {
+    "fromLap": 41,
+    "toLap": 66,
+    "state": "damp",
+    "source": "https://www.grandprix.com/gpe/rr535.html ('as the track began to dry again the two Williams-Renaults could not catch him'; 'They had to stop again for slicks'); https://en.wikipedia.org/wiki/1993_European_Grand_Prix (Senna's fastest lap, 1:18.029 on lap 57, against a 1:10.458 pole: the track never fully dried)",
+    "note": "WP's 'it rained and then stopped again' (Barrichello second, laps 49-54 in Motor Sport) and Senna's call for wets before lap 57 are short showers with no laps; not modelled (Senna's fastest lap came on lap 57)."
+   },
+   {
+    "fromLap": 67,
+    "toLap": 76,
+    "state": "wet",
+    "source": "https://sidepodcast.com/post/races-to-remember-europe-1993 ('With just 10 laps to go, wet tyres were the name of the game, and Senna bolted into the pit lane'); https://www.grandprix.com/gpe/rr535.html ('The rain came again in the closing laps and Senna decided that this time he had to stop'); https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked (rain again toward the end)"
+   }
+  ],
+  "wetness": [
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.375,
+   0.3,
+   0.225,
+   0.15,
+   0.15,
+   0.15,
+   0.15,
+   0.15,
+   0.15,
+   0.15,
+   0.15,
+   0.15,
+   0.15,
+   0.15,
+   0.15,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.35,
+   0.25,
+   0.15,
+   0.15,
+   0.15,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.15,
+   0.15,
+   0.15,
+   0.15,
+   0.15,
+   0.15,
+   0.15,
+   0.15,
+   0.15,
+   0.15,
+   0.15,
+   0.15,
+   0.15,
+   0.15,
+   0.15,
+   0.15,
+   0.15,
+   0.15,
+   0.15,
+   0.15,
+   0.15,
+   0.15,
+   0.15,
+   0.15,
+   0.15,
+   0.15,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45,
+   0.45
+  ],
+  "curves": {
+   "slick": {
+    "a": 0.1855,
+    "b": 0.9993
+   },
+   "inter": {
+    "min": 0.0345,
+    "dry": 1.0187,
+    "wet": 0.789,
+    "best": 0.18
+   },
+   "wet": {
+    "min": 0.1486,
+    "dry": 0.4006,
+    "wet": 0.6344,
+    "best": 0.2833
+   }
+  },
+  "tyres": [
+   {
+    "driver": "SENA",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "source"
+   },
+   {
+    "driver": "SENA",
+    "stint": 2,
+    "tyre": "slick",
+    "by": "source"
+   },
+   {
+    "driver": "SENA",
+    "stint": 3,
+    "tyre": "slick",
+    "by": "source"
+   },
+   {
+    "driver": "SENA",
+    "stint": 4,
+    "tyre": "slick",
+    "by": "source"
+   },
+   {
+    "driver": "HIL",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "source"
+   },
+   {
+    "driver": "HIL",
+    "stint": 2,
+    "tyre": "slick",
+    "by": "source"
+   },
+   {
+    "driver": "HIL",
+    "stint": 3,
+    "tyre": "wet",
+    "by": "source"
+   },
+   {
+    "driver": "PRO",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "source"
+   },
+   {
+    "driver": "PRO",
+    "stint": 2,
+    "tyre": "slick",
+    "by": "source"
+   },
+   {
+    "driver": "PRO",
+    "stint": 3,
+    "tyre": "wet",
+    "by": "source"
+   },
+   {
+    "driver": "PRO",
+    "stint": 4,
+    "tyre": "slick",
+    "by": "estimate"
+   },
+   {
+    "driver": "PRO",
+    "stint": 5,
+    "tyre": "slick",
+    "by": "estimate"
+   },
+   {
+    "driver": "HER",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "source"
+   },
+   {
+    "driver": "HER",
+    "stint": 2,
+    "tyre": "slick",
+    "by": "source"
+   },
+   {
+    "driver": "PAT",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "source"
+   },
+   {
+    "driver": "BAB",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "source"
+   },
+   {
+    "driver": "FITC",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "source"
+   },
+   {
+    "driver": "ZAN",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "source"
+   },
+   {
+    "driver": "COM",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "source"
+   },
+   {
+    "driver": "BAR",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "source"
+   },
+   {
+    "driver": "BAR",
+    "stint": 2,
+    "tyre": "slick",
+    "by": "source"
+   },
+   {
+    "driver": "BAR",
+    "stint": 3,
+    "tyre": "wet",
+    "by": "source"
+   },
+   {
+    "driver": "ALBM",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "source"
+   },
+   {
+    "driver": "WAR",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "source"
+   },
+   {
+    "driver": "BOUT",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "source"
+   },
+   {
+    "driver": "DEC",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "source"
+   },
+   {
+    "driver": "ALE",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "source"
+   },
+   {
+    "driver": "SUZ",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "source"
+   },
+   {
+    "driver": "ALL",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "source"
+   },
+   {
+    "driver": "MSCM",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "source"
+   },
+   {
+    "driver": "BLU",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "source"
+   },
+   {
+    "driver": "BER",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "source"
+   },
+   {
+    "driver": "JAR",
+    "stint": 1,
+    "tyre": "slick",
+    "by": "source"
+   },
+   {
+    "driver": "KAT",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "source"
+   },
+   {
+    "driver": "BRU",
+    "stint": 1,
+    "tyre": "wet",
+    "by": "source"
+   },
+   {
+    "driver": "BRU",
+    "stint": 2,
+    "tyre": "slick",
+    "by": "source"
+   }
+  ]
+ }
+}
