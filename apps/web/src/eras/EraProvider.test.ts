@@ -71,8 +71,9 @@ describe('EraProvider', () => {
 });
 
 describe('mockErasApi', () => {
-  it('lists the ten eras in play order with only Era 10 unlocked', async () => {
-    const eras = await mockErasApi.eras();
+  it('lists the ten eras in play order with only Era 10 unlocked, in test mode', async () => {
+    const { testMode, eras } = await mockErasApi.eras();
+    expect(testMode).toBe(true);
     expect(eras.map((e) => e.eraId)).toEqual([10, 9, 8, 7, 6, 5, 4, 3, 2, 1]);
     expect(eras.filter((e) => e.unlocked).map((e) => e.eraId)).toEqual([10]);
     expect(eras.every((e) => e.maxStars === 30 && e.stars === 0)).toBe(true);

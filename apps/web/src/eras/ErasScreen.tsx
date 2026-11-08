@@ -1,11 +1,15 @@
 // Eras mode's screens (docs/laststint-eras-mode-spec.md §14), routed from App.tsx: the era map
-// at /eras and an era's detail at /eras/<eraId>. Placeholders for now: the era list and the
-// era's name. The map (build-plan 8.2) and the detail with its race cards (8.3) replace them.
+// at /eras (build-plan 8.2) and an era's detail at /eras/<eraId>. The detail is a placeholder
+// with the era's name; step 8.3 replaces it with the briefing and race cards.
 
-import type { ReactNode } from 'react';
+import { ERA_UNLOCK_SHARE } from '@laststint/sim';
+import { type ReactNode, useCallback, useEffect, useState } from 'react';
 import { Brand } from '../components/Brand.js';
 import { Disclaimer } from '../components/Disclaimer.js';
-import { ERAS, type EraInfo, type ErasRoute } from './catalog.js';
+import { EraMapBody } from './EraMap.js';
+import { type ErasApi, erasApi } from './api.js';
+import type { EraInfo, ErasRoute } from './catalog.js';
+import { type EraMapState, loadEraMap } from './eraMapState.js';
 
 function Header() {
   return (
@@ -38,27 +42,41 @@ function Shell({ children }: { children: ReactNode }) {
   );
 }
 
-/** The era map (placeholder): every era in play order, newest first. */
-export function EraMap() {
+/** The era map: every era in play order, newest first, with its stars and lock. */
+export function EraMap({
+  api = erasApi,
+  initial = { kind: 'loading' },
+}: {
+  api?: ErasApi;
+  /** The state before the first load finishes (tests render a given state). */
+  initial?: EraMapState;
+}) {
+  const [state, setState] = useState<EraMapState>(initial);
+  const [attempt, setAttempt] = useState(0);
+  const retry = useCallback(() => setAttempt((n) => n + 1), []);
+
+  useEffect(() => {
+    // `attempt` re-runs the load on Try again.
+    void attempt;
+    let live = true;
+    setState({ kind: 'loading' });
+    loadEraMap(api).then((next) => {
+      if (live) setState(next);
+    });
+    return () => {
+      live = false;
+    };
+  }, [api, attempt]);
+
   return (
     <Shell>
       <p className="eyebrow m-0 !text-[var(--box-ink)]">Game mode</p>
       <h1 className="disp wide m-0 text-[48px] leading-[0.9] sm:text-[68px]">Eras</h1>
-      <ol aria-label="Eras" className="m-0 flex list-none flex-col gap-2 p-0">
-        {ERAS.map((era) => (
-          <li key={era.id}>
-            <a
-              href={`/eras/${era.id}`}
-              className="card flex flex-wrap items-baseline justify-between gap-2 hover:bg-[var(--card-2)]"
-            >
-              <span className="font-semibold">
-                Era {era.id}: {era.name}
-              </span>
-              <span className="font-mono text-[13px] text-[var(--muted)]">{era.years}</span>
-            </a>
-          </li>
-        ))}
-      </ol>
+      <p className="m-0 max-w-2xl text-[15px] text-[var(--muted)]">
+        Start in 2025 and work back to 1983. Earn {Math.round(ERA_UNLOCK_SHARE * 100)}% of an era’s
+        stars to unlock the one before it.
+      </p>
+      <EraMapBody state={state} onRetry={retry} />
     </Shell>
   );
 }
