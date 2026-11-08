@@ -25,7 +25,7 @@
 //   no claim (the server's replay, claims.ts replayWithRivalClaims).
 
 import type { RivalPolicy } from '../eras/config.js';
-import { type Run, neutralMap } from '../sim.js';
+import { type Run, neutralMap, rivalHeld } from '../sim.js';
 import type { CarState, Compound, PitStop } from '../types.js';
 import { isWetTyre } from '../weather.js';
 import { gradeRivalMoment } from './expert.js';
@@ -221,6 +221,8 @@ function wetRule(run: Run, lap: number, rival: CarState, lead: 0 | 1): Compound 
 export function rivalAfterLap(run: Run, lap: number, before: PitStop[] | null): void {
   const { model, state } = run;
   if (!run.live || !hasSmartRules(run.rivalPolicy)) return;
+  // A storyline call still to come (eras.storylineCalls): the rival keeps its real plan.
+  if (rivalHeld(run, lap)) return;
   const rival = state.cars[model.rival];
   const user = state.cars[model.userSide];
   if (!rival || rival.retired || !user) return;

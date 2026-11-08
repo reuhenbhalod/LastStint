@@ -613,12 +613,7 @@
       "rival": "SENA"
     },
     "storyline": {
-      "real": "Piquet passes Senna around the outside into the first corner and wins by 17.7 seconds",
-      "rewriteCondition": {
-        "type": "beat-rival",
-        "rival": "SENA"
-      },
-      "headline": "Piquet beats Senna in the first Hungarian Grand Prix since 1936"
+      "real": "Piquet passes Senna around the outside into the first corner and wins by 17.7 seconds"
     },
     "mastery": {
       "type": "stop_count",

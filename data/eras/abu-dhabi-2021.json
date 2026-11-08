@@ -8,12 +8,7 @@
       "rival": "HAM"
     },
     "storyline": {
-      "real": "Hamilton leads until a late safety car; Verstappen pits for soft tyres, passes him on the final lap and takes the race and the title.",
-      "rewriteCondition": {
-        "type": "beat-rival",
-        "rival": "HAM"
-      },
-      "headline": "Verstappen's first title, settled on the strategy sheet in Abu Dhabi"
+      "real": "Hamilton leads until a late safety car; Verstappen pits for soft tyres, passes him on the final lap and takes the race and the title."
     },
     "mastery": {
       "type": "stop_count",

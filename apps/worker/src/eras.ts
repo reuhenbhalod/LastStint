@@ -168,6 +168,25 @@ export async function getErasRace(id: string): Promise<BundledRace | null> {
   return bundled(model, () => model);
 }
 
+/**
+ * True if the race has a history-book rewrite to collect (spec §8): its storyline has a
+ * rewrite condition, or it has no storyline yet (an unwritten race counts as the spec's one
+ * rewrite per race). A storyline without one is a race the Eras side really won (owner
+ * decision, Nov 8 2026): no result rewrites it. Read from the bundled files (no merge or hash).
+ */
+export function hasRewrite(id: string): boolean {
+  const overlay = Object.hasOwn(ERAS_OVERLAYS, id)
+    ? (ERAS_OVERLAYS[id] as { eras?: RaceModel['eras'] })
+    : undefined;
+  const eras = overlay
+    ? overlay.eras
+    : Object.hasOwn(ERAS_RACE_FILES, id)
+      ? (ERAS_RACE_FILES[id] as RaceModel).eras
+      : undefined;
+  const storyline = eras?.storyline;
+  return !storyline || storyline.rewriteCondition !== undefined;
+}
+
 // ---- campaign state ----------------------------------------------------------------------
 
 function starCount(p: ProgressRow | undefined): number {

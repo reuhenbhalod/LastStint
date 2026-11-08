@@ -932,10 +932,16 @@ export function forkRun(
   }
   validateDecisions(run.model, decisions);
   const cars: Record<string, CarState> = {};
+  // An Eras race with a fuel rule (refuelling, or a 1984-88 fuel limit) keeps the tank in its
+  // playouts (erasRace): a car runs dry in them and stops, as in live play, so pushing or
+  // staying out on an empty tank grades as what it is. Every other race's playouts leave the
+  // fuel load out, as before (fuel load spec: there an empty tank only costs lap time, which
+  // the player is shown and can lift for). Daily and Gauntlet races have no rules block.
+  const keepFuel = erasRace(run.model) && (refuelling(run.model) || fuelLimit(run.model) !== null);
   for (const [code, c] of Object.entries(run.state.cars)) {
     cars[code] = cloneCar(c);
     // The grader's playouts leave the fuel load out (fuel load spec: live play only).
-    if (options.blindAfter !== undefined) {
+    if (options.blindAfter !== undefined && !keepFuel) {
       (cars[code] as CarState).fuel = undefined;
       (cars[code] as CarState).tankLive = undefined; // refuel.ts: no dry stop in playouts
     }
@@ -1215,6 +1221,19 @@ function applySwap(run: Run, lap: number, prevTime: Record<string, number>): voi
  * next lap if its own next planned stop is within COVER_WINDOW laps. Otherwise it keeps its
  * real strategy. A cover replaces the rival's next planned stop (taking its compound).
  */
+/**
+ * True while the rival still has a storyline call to make after `lap` (eras.storylineCalls,
+ * the race's rival only), or for the rest of the race after a call marked `untilFlag`: its plan
+ * stays its real one until then, whatever its policy, so no
+ * rival rule or decision point runs (rivalReacts, rivalGoesLong, rivals/react.ts
+ * rivalAfterLap). False in every race without storyline calls (every Daily and Gauntlet race).
+ */
+export function rivalHeld(run: Pick<Run, 'model'>, lap: number): boolean {
+  const calls = run.model.eras?.storylineCalls;
+  if (!calls) return false;
+  return calls.some((c) => c.driver === run.model.rival && (c.untilFlag === true || c.lap > lap));
+}
+
 function rivalReacts(
   run: Run,
   lap: number,
@@ -1225,6 +1244,7 @@ function rivalReacts(
   const user = state.cars[model.userSide];
   const rival = state.cars[model.rival];
   if (!run.live || !user || !rival || !user.pittedThisLap) return;
+  if (rivalHeld(run, lap)) return; // a storyline call still to come: the real plan stands
   if (rival.retired || rival.pittedThisLap || lap >= model.race.laps) return;
   // Expert covers green-flag stops on the player's in-lap instead (rivals/react.ts).
   if (run.rivalPolicy === 'expert' && flag !== 'sc' && flag !== 'vsc') return;
@@ -1306,6 +1326,7 @@ function rivalGoesLong(run: Run, lap: number): void {
   const user = state.cars[model.userSide];
   const rival = state.cars[model.rival];
   if (!run.live || !user || !rival || user.retired || rival.retired) return;
+  if (rivalHeld(run, lap)) return; // a storyline call still to come: the real plan stands
   // Era rules: a no-tyre-change race's stops refuel, so none is skipped (eras build plan 4.2).
   if (model.rules?.tyreChanges === false) return;
   // Refuelling: a rival whose fuel doesn't reach the flag can't skip a stop.
@@ -1500,6 +1521,73 @@ function knownNow(run: Run): Map<number, Exclude<FlagState, 'green'>> {
 function owedAfterPlan(model: RaceModel, car: CarState, lap: number): number {
   const owed = stopsOwed(model.rules, car);
   return owed && Math.max(0, owed - car.strategy.filter((s) => s.lap > lap).length);
+}
+
+/**
+ * True for an Eras race: a race file with a `rules` or an `eras` block (an Eras-only race, or a
+ * shared race merged with its Eras overlay). No Daily or Gauntlet race file has either, so the
+ * grader changes gated on this (fuel in playouts, the real-plan continuation) leave every Daily
+ * and Gauntlet grade as it was.
+ */
+export function erasRace(model: RaceModel): boolean {
+  return model.eras !== undefined || model.rules !== undefined;
+}
+
+/**
+ * The Eras continuation (grade.ts playOption, rivals/expert.ts rivalPlayout): after a graded
+ * option, the player's car keeps to the real team's plan, as a player following the real race
+ * would, instead of the planner's best stop from wherever the option left it (a best-case
+ * oracle: hungary-1992's "stay out" graded on a later perfect stop that live play never makes).
+ *
+ * - `answered`: the last out-lap the option's question covers (the moment's box-now or
+ *   box-next stop). Real stops up to it are behind the car or answered by the option: one
+ *   skipped there (stay out where the real team boxed) is not made later.
+ * - The car makes the real stops after `answered` (their real laps, compounds and fills), less
+ *   the first few if it has already stopped more often than the real car had by then
+ *   (`playerStops`, counted from the takeover): an early stop stands in for the real one.
+ * - The race's rules come first, as a player is told them: if those stops leave the car short of
+ *   the two-compound rule or the minimum stops, the planner's legal plan (planRemainingStops)
+ *   is used instead. Fuel doesn't: a car that skipped a fill runs dry, as in live play.
+ *
+ * Deterministic, and the same for every sample of an option.
+ */
+export function erasContinuation(run: Run, answered: number, playerStops: number): PitStop[] {
+  const { model, state } = run;
+  const user = state.cars[model.userSide];
+  if (!user || user.retired) return [];
+  const real = [...realOf(model, model.userSide)].sort((a, b) => a.lap - b.lap);
+  const { takeoverLap } = model.race;
+  const realMade = real.filter((s) => s.lap > takeoverLap && s.lap <= answered).length;
+  const extra = Math.max(0, playerStops - realMade);
+  const stops = real
+    .filter((s) => s.lap > Math.max(answered, state.lap))
+    .slice(extra)
+    .map((s) => ({ ...s }));
+  // The rules: the car must end the race legal (two compounds, the minimum stops).
+  let compound = user.compound;
+  const used = [...user.compoundsUsed];
+  for (const s of stops) {
+    if (stopChangesTyres(model.rules, compound, s)) compound = s.to;
+    if (!used.includes(s.to)) used.push(s.to);
+  }
+  const after = {
+    compound,
+    compoundsUsed: used,
+    ...(user.stops !== undefined ? { stops: user.stops + stops.length } : {}),
+  };
+  const legal =
+    ruleSatisfied(after as CarState, model.rules) && stopsOwed(model.rules, after) === 0;
+  return legal ? stops : planRemainingStops(run);
+}
+
+/**
+ * The player's stops from the takeover to the end of lap `lap`, from the calls (one per pit
+ * call's out-lap; a forced stop, such as a puncture's, isn't counted).
+ */
+export function playerStopsBy(decisions: readonly Decision[], lap: number): number {
+  const outLaps = new Set<number>();
+  for (const d of decisions) if (d.kind === 'pit' && d.lap + 1 <= lap) outLaps.add(d.lap + 1);
+  return outLaps.size;
 }
 
 /**

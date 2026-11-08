@@ -15,6 +15,7 @@ import {
   NEUTRAL_REWRITE,
   communityLine,
   erasShareLine,
+  raceHasRewrite,
   rewriteHeadline,
 } from './EraResults.js';
 import type { RaceStats } from './api.js';
@@ -139,6 +140,19 @@ describe('the Eras results panel', () => {
     expect(communityLine(stats(0, 0))).toBeNull(); // no players yet
     expect(panel(done(), { stats: stats(0.09) })).toContain('Only 9% of strategists');
     expect(panel(done(), { stats: null })).not.toContain('strategists rewrote');
+  });
+
+  it('a race the Eras side really won (no rewrite condition) shows no rewrite stat', () => {
+    const won = {
+      ...model,
+      eras: { eraId: 9, order: 10, storyline: { real: 'Verstappen wins' } },
+    } as RaceModel;
+    expect(raceHasRewrite(won)).toBe(false);
+    expect(raceHasRewrite(model)).toBe(true);
+    expect(raceHasRewrite(null)).toBe(true);
+    expect(panel(done({ rewrite: null }), { stats: stats(0.09) }, won)).not.toContain(
+      'strategists rewrote',
+    );
   });
 
   it('reveals the hidden objective once the race has all three stars', () => {

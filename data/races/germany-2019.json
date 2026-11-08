@@ -1350,11 +1350,7 @@
       "type": "win"
     },
     "storyline": {
-      "real": "Verstappen wins a wet race at Hockenheim, through a spin and several safety cars; Vettel climbs from last on the grid to second.",
-      "rewriteCondition": {
-        "type": "win"
-      },
-      "headline": "Every tyre call right on a wild Hockenheim afternoon"
+      "real": "Verstappen wins a wet race at Hockenheim, through a spin and several safety cars; Vettel climbs from last on the grid to second."
     },
     "mastery": {
       "type": "stop_count",

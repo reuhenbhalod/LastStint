@@ -14,7 +14,7 @@
     "userSide": "SENA",
     "hardCalls": {
       "SENA": 1,
-      "PRO": 1
+      "HIL": 0
     },
     "target": {
       "type": "win"
@@ -38,6 +38,21 @@
       "seconds": 60,
       "label": "Win by more than a minute"
     },
-    "briefing": "Donington, 1993. Damp at the start, then it dries, rains, dries and rains again. Senna made four stops; Prost made seven. Pit board only: every tyre call counts. Reconstructed race: no lap timing survives, so the laps are rebuilt to fit the result, the fastest laps and the sourced stops (Jolpica, F1DB, Motor Sport, Wikipedia). The lap-by-lap gaps and running order are synthetic, not history."
+    "briefing": "Donington, 1993. Damp at the start, then it dries, rains, dries and rains again. Senna made four stops; Prost made seven. Pit board only: every tyre call counts. Reconstructed race: no lap timing survives, so the laps are rebuilt to fit the result, the fastest laps and the sourced stops (Jolpica, F1DB, Motor Sport, Wikipedia). The lap-by-lap gaps and running order are synthetic, not history.",
+    "storylineCalls": [
+      {
+        "driver": "HIL",
+        "lap": 18,
+        "real": "Hill changes to slicks at the end of lap 17, a lap before Senna",
+        "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked"
+      },
+      {
+        "driver": "HIL",
+        "lap": 25,
+        "real": "Hill goes back to wets two laps after Prost, as it rains again; his four later stops aren't sourced (the reconstruction absorbs them), so he keeps his real plan to the flag and finishes second, 1:23 behind",
+        "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked",
+        "untilFlag": true
+      }
+    ]
   }
 }

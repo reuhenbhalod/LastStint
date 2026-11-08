@@ -325,9 +325,10 @@ All values in this table live in an era difficulty config, not in code.
 ## 8. Rewrite history and the history book
 
 ### Rewrites
-- Each race defines a `storyline`: what really happened (for example, "Verstappen wins the race and the title") and a `rewriteCondition` (for example, "user's driver finishes ahead of the rival").
+- Each race defines a `storyline`: what really happened (for example, "Verstappen wins the race and the title") and, usually, a `rewriteCondition` (for example, "user's driver finishes ahead of the rival").
+- A race the Eras side really won has no `rewriteCondition` (owner decision, Nov 8 2026): no result rewrites history there, so the race has no rewrite to collect, no rewrite headline and no rewrite stat. Its storyline keeps `real` only.
 - When a verified attempt meets the rewrite condition, the server records a history book entry with the date, accuracy and stars of that attempt.
-- Each entry has an authored, original headline, for example: "You won Lewis his eighth title." Never quote real team radio.
+- Each entry has an authored, original headline, for example: "You won Lewis his eighth title." Never quote real team radio. The headline is required with a rewrite condition and left out without one.
 
 ### The history book
 A page showing the player's progress across everything collectible.
@@ -336,10 +337,12 @@ A page showing the player's progress across everything collectible.
 |---|---|
 | Stars | 300 (10 eras × 10 races × 3) |
 | Legend stars | 300 |
-| Rewrites | 100 |
+| Rewrites | 100, less one for each race without a rewrite condition |
 | Hidden objectives | 100 |
 | Era badges | 30 (Cleared, Mastered, Legend for each era) |
-| **Total** | **830** |
+| **Total** | **830**, less the races without a rewrite condition |
+
+The rewrites total counts the races that have a rewrite condition. A race whose storyline isn't written yet still counts as one (its rewrite is still to come); one authored without a rewrite condition doesn't.
 
 - Show an overall completion percentage and per-era progress.
 - Each rewrite shows a community stat: "Only 9% of strategists rewrote this race." Compute it from verified attempts and cache it.
@@ -486,7 +489,7 @@ In production, reject attempts on locked or unreleased eras, unpublished (Draft)
 
 Add these to the existing race checklist for any race in Eras:
 - [ ] `eras` block filled in, validated against the schema.
-- [ ] Storyline and rewrite condition written; headline is original.
+- [ ] Storyline written; a rewrite condition and an original headline unless the Eras side really won (then neither).
 - [ ] Mastery and hidden objectives chosen and parameters set.
 - [ ] **Reachability check:** an automated run confirms at least one decision path earns all three stars and the hidden objective at that era's difficulty, and at Legend.
 - [ ] **Difficulty check:** ★3 is not reachable with the "stay out every time" path.

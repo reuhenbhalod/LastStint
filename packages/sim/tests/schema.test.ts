@@ -58,6 +58,14 @@ const FULL_ERAS: ErasBlock = {
   hardCalls: { VER: 6, HAM: 4 },
   briefing: 'Short era-appropriate intro shown before the race.',
   // Live play only (scripted.ts): a replay keeps every real retirement.
+  storylineCalls: [
+    {
+      driver: 'VER',
+      lap: 37,
+      real: 'A real stop',
+      source: 'https://en.wikipedia.org/wiki/2021_Abu_Dhabi_Grand_Prix',
+    },
+  ],
   storylineRetirements: [
     {
       driver: 'LAT',

@@ -49,6 +49,15 @@ export function rewriteHeadline(model: RaceModel | null): string {
   return authored ? authored : NEUTRAL_REWRITE;
 }
 
+/**
+ * False for a race the Eras side really won: its storyline has no rewrite condition, so it has
+ * no rewrite to earn and no rewrite stat (owner decision, Nov 8 2026). True without a model.
+ */
+export function raceHasRewrite(model: RaceModel | null): boolean {
+  const storyline = model?.eras?.storyline;
+  return !storyline || storyline.rewriteCondition !== undefined;
+}
+
 /** The community stat's line, or null when the API sent none (no players, or nonsense). */
 export function communityLine(stats: RaceStats | null): string | null {
   return rewriteShareLine(stats?.rewrite);
@@ -185,7 +194,7 @@ export function EraResultsPanel({
   const result = sub.status === 'eras-done' ? sub.result : null;
   const threshold = info.difficulty.accuracyThreshold;
   const hidden = model?.eras?.hidden;
-  const community = communityLine(info.stats);
+  const community = raceHasRewrite(model) ? communityLine(info.stats) : null;
   return (
     <section
       aria-label="Stars"

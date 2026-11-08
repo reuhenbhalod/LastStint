@@ -233,10 +233,15 @@ export type ErasObjective = { label: string } & (
 export interface ErasStoryline {
   /** What really happened. */
   real: string;
-  /** The result that rewrites the storyline, from the player's side. */
-  rewriteCondition: ErasTarget;
-  /** An original history-book headline (never quoted team radio). */
-  headline: string;
+  /**
+   * The result that rewrites the storyline, from the player's side. Absent: the Eras side
+   * really won, so no result rewrites history and the race has no history-book rewrite (owner
+   * decision, Nov 8 2026).
+   */
+  rewriteCondition?: ErasTarget;
+  /** An original history-book headline (never quoted team radio): with a rewrite condition,
+   * and only with one. */
+  headline?: string;
 }
 
 /**
@@ -264,6 +269,34 @@ export interface ErasBlock {
    * their real retirements.
    */
   storylineRetirements?: StorylineRetirement[];
+  /**
+   * The rival's real stops the storyline turns on (Eras grader fixes, Nov 8 2026; sim.ts
+   * rivalHeld): in live play the rival makes them on their real laps whatever its policy, so an
+   * Expert rival can't undo the real rival's mistake (belgium-1992: Mansell's late slicks).
+   */
+  storylineCalls?: StorylineCall[];
+}
+
+/**
+ * A real stop of a storyline driver that the storyline turns on. When `driver` is the race's
+ * rival (from the Eras side), its plan up to and including this stop is its real one: no rival
+ * rule or decision point changes it before then (Standard's cover and going long, Smart's
+ * overcut and wet switch, Expert's grader). After its last such stop the policy runs as usual.
+ */
+export interface StorylineCall {
+  /** The storyline driver. */
+  driver: string;
+  /** The stop's out-lap: one of the driver's real stops. */
+  lap: number;
+  /** What really happened, in words. */
+  real: string;
+  /** Where the fact was checked (http(s) URLs, '; '-separated). */
+  source: string;
+  /**
+   * The rival keeps its real plan after this stop too, to the flag (europe-1993: Hill's later
+   * stops aren't sourced, so his real race after the lap-24 wets is the reconstruction's).
+   */
+  untilFlag?: boolean;
 }
 
 /**

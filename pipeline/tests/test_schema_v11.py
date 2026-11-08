@@ -52,6 +52,14 @@ FULL_ERAS = {
     "hidden": {"type": "margin", "seconds": 3, "label": "Win by more than 3 seconds"},
     "hardCalls": {"VER": 6, "HAM": 4},
     "briefing": "Short era-appropriate intro shown before the race.",
+    "storylineCalls": [
+        {
+            "driver": "VER",
+            "lap": 37,
+            "real": "A real stop",
+            "source": "https://en.wikipedia.org/wiki/2021_Abu_Dhabi_Grand_Prix",
+        }
+    ],
 }
 
 
@@ -156,6 +164,25 @@ def test_invalid_targets_and_rewrite_conditions(base, target):
 )
 def test_invalid_storylines(base, storyline):
     assert_invalid(with_(base, eras={"eraId": 9, "order": 1, "storyline": storyline}))
+
+
+def test_a_storyline_the_eras_side_really_won_has_no_rewrite(base):
+    # Owner decision, Nov 8 2026: no rewrite condition, and so no headline.
+    assert_valid(with_(base, eras={"eraId": 9, "order": 1, "storyline": {"real": "r"}}))
+
+
+def test_storyline_calls(base):
+    # A storyline call is one of its driver's real stops (out-laps; VER's first here).
+    lap = next(d for d in base["drivers"] if d["code"] == "VER")["realStrategy"][0]["lap"]
+    call = {"driver": "VER", "lap": lap, "real": "r", "source": "https://example.org/a"}
+    assert_valid(with_(base, eras={"eraId": 9, "order": 1, "storylineCalls": [call]}))
+    for bad in (
+        {**call, "lap": lap + 1},  # not a real stop of VER's
+        {**call, "driver": "XXX"},  # not in the race
+        {**call, "source": "a book"},  # not a URL
+        {k: v for k, v in call.items() if k != "real"},
+    ):
+        assert_invalid(with_(base, eras={"eraId": 9, "order": 1, "storylineCalls": [bad]}))
 
 
 VALID_OBJECTIVES = [

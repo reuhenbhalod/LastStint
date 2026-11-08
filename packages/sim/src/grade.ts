@@ -17,6 +17,20 @@
 // many (planRemainingStops).
 // The spec doesn't define the continuation; this choice is recorded in the implementation
 // plan (2.7).
+//
+// Eras races (sim.ts erasRace: a race with a `rules` or `eras` block; never a Daily or
+// Gauntlet file, so their grades are unchanged) differ in three ways (Eras grader fixes, Nov 8
+// 2026; docs/eras-grader.md):
+// - the continuation is the real team's plan (sim.ts erasContinuation), not the planner's best
+//   stop: a "stay out" where the real team boxed doesn't get a perfect later stop for free;
+//   the planner steps in only to keep the car legal (two compounds, minimum stops), and a
+//   player's own logged plan is followed as called;
+// - in a race with a fuel rule (refuelling, a 1984-88 fuel limit) playouts carry the fuel
+//   load and the live tank (sim.ts forkRun), so a car can run dry and stop;
+// - as everywhere, a playout's result is classified as live play's: a car short of the
+//   two-compound rule or the minimum stops is disqualified (classify), and the live incident
+//   draws (crashes, failures, punctures) run in playouts too. Storyline retirements and faults
+//   still to come are left out (playouts don't know the future).
 
 import type { RivalPolicy } from './eras/config.js';
 import type { RivalChoice } from './rivals/react.js';
@@ -24,10 +38,13 @@ import { deriveSeed } from './rng.js';
 import {
   type Run,
   classify,
+  erasContinuation,
+  erasRace,
   forkRun,
   initRun,
   isFinished,
   planRemainingStops,
+  playerStopsBy,
   realDecisions,
   stepLap,
   teammateOf,
@@ -133,12 +150,22 @@ export function sampleSeed(run: Run, i: number): number {
   return deriveSeed(deriveSeed(run.seed, GRADE_STREAM + run.state.lap), i);
 }
 
+/** True if some option makes a pit call: the moment asks whether to stop. */
+export function asksStop(options: readonly GradeOption[]): boolean {
+  return options.some((o) => !o.final && o.decisions.some((d) => d.kind === 'pit'));
+}
+
 /**
  * Fork the run for one sample of one option: apply the option's calls, run until the last of
  * them has taken effect (a pit call is charged the lap after it), then hand the player's car
  * to the sensible-strategist continuation (planRemainingStops) for the rest of the race.
  */
-export function playOption(run: Run, seed: number, option: GradeOption): Run {
+export function playOption(
+  run: Run,
+  seed: number,
+  option: GradeOption,
+  stopQuestion = asksStop([option]),
+): Run {
   // The decision lap's own events (e.g. the SC that prompted the call) are known; the rest of
   // the race's future isn't (spec decision Oct 26 2026: grade against the sim, not hindsight).
   const fork = forkRun(run, seed, option.decisions, { blindAfter: run.state.lap + 1 });
@@ -154,7 +181,17 @@ export function playOption(run: Run, seed: number, option: GradeOption): Run {
     !isFinished(fork) &&
     !user.strategy.some((s) => s.lap > fork.state.lap)
   ) {
-    for (const stop of planRemainingStops(fork)) user.strategy.push({ ...stop, added: true });
+    if (!erasRace(run.model)) {
+      for (const stop of planRemainingStops(fork)) user.strategy.push({ ...stop, added: true });
+    } else if (!fork.decisions.some((d) => d.kind === 'pit' && d.lap > fork.state.lap)) {
+      // Eras: the real team's plan (erasContinuation), unless the player has logged a plan of
+      // their own (its later pit calls are in the run and play out as called).
+      // A stop question (some option boxes) answers the moment's box-now stop too: staying out
+      // there skips it (the real team's stop on that lap isn't made later).
+      const answered = stopQuestion ? Math.max(settled, run.state.lap + 2) : settled;
+      const made = playerStopsBy([...run.decisions, ...option.decisions], fork.state.lap);
+      for (const stop of erasContinuation(fork, answered, made)) user.strategy.push(stop);
+    }
   }
   return fork;
 }
@@ -171,10 +208,11 @@ export function countHits(
   to: number,
 ): number[] {
   const hits = new Array<number>(options.length).fill(0);
+  const stopQuestion = asksStop(options);
   for (let i = from; i < to; i++) {
     const seed = sampleSeed(run, i);
     for (let k = 0; k < options.length; k++) {
-      const fork = playOption(run, seed, options[k] as GradeOption);
+      const fork = playOption(run, seed, options[k] as GradeOption, stopQuestion);
       while (!isFinished(fork)) stepLap(fork);
       if (reachedTarget(fork, classify(fork), target)) hits[k] = (hits[k] ?? 0) + 1;
     }
