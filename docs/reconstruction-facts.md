@@ -10,6 +10,7 @@ their anchors. Most anchors come from the data sources:
 | Each driver's fastest lap and the lap it came on | F1DB (`data/raw/f1db/<race-id>.fastest-laps.csv`) |
 | Pit stops, 1994-95 | F1DB (`data/raw/f1db/<race-id>.stops.csv`) |
 | Pit stops before 1994, safety cars | **a facts file, entered and checked by a person** |
+| A wet race's weather and wet-tyre stints | **the facts file's `weather` block** |
 
 Nothing is filled in from memory (eras spec §4, §19). A race with no facts file is rebuilt
 with no stops before 1994 and no safety cars, and its sidecar says that both are unknown.
@@ -56,8 +57,93 @@ folder).
   `provenance.estimated` includes `safetyCars`, and the sidecar notes that stops may be
   missing.
 
+- `stops[].tyre`: optional, the tyre class fitted at the stop, `"slick"`, `"inter"` or
+  `"wet"`, where the source says it. A stop without one (a penalty, a repair, a source that
+  doesn't say) leaves its stint's tyre to the estimate below.
+- `weather`: optional, only for a race run (partly) in the wet. See below.
+
 The loader rejects a file whose stop or safety car has no source, a stop with no lap or car,
-or bad safety-car laps.
+bad safety-car laps, or a `weather` block that breaks the rules below.
+
+## Weather (wet races)
+
+```json
+"weather": {
+  "timeline": [
+    {"fromLap": 1, "toLap": 25, "state": "dry", "source": "https://..."},
+    {"fromLap": 26, "toLap": 29, "state": "heavy", "source": "Motor Sport, May 1993: ..."},
+    {"fromLap": 30, "toLap": 36, "state": "heavy", "toState": "wet", "source": "...",
+     "note": "behind the safety car; no source describes these laps"},
+    {"fromLap": 37, "toLap": 71, "wetness": 0.0, "source": "..."}
+  ],
+  "startTyre": {"tyre": "slick", "source": "..."},
+  "startTyres": [{"number": 30, "tyre": "slick", "source": "..."}],
+  "tyreChanges": [{"number": 5, "lap": 21, "tyre": "wet", "source": "..."}]
+}
+```
+
+- `timeline[]`: the track's state per lap range, **every entry with a `source`**.
+  - `fromLap`, `toLap`: official laps; the entries run from lap 1 with no gap or overlap
+    and must reach the winner's last lap (an entry past it, e.g. a red-flag race's flag
+    lap, is cut);
+  - `state`: `dry`, `damp`, `wet` or `heavy`, or `wetness` (0..1) for a value worked out from
+    a source (say how in `note`);
+  - `toState` / `toWetness`: optional; the state at `toLap`, ramped linearly from the entry's
+    state at `fromLap` (drying, or rain building). A ramp between two sourced points is an
+    interpolation, and its `note` should say so;
+  - `note`: optional, for the checker.
+- `startTyre`: the tyre class the field started on, with its source. `startTyres[]`: a car's
+  own start tyre where it differs (by `driver` or `number`).
+- `tyreChanges[]`: the tyre fitted at a stop, by `driver` or `number`, the stop's in-`lap`,
+  `tyre` and `source`. For 1994-95 races, whose stops come from F1DB (so `stops[]` stays
+  empty), this is how a stop gets its tyre: it is matched to the F1DB stop on that in-lap
+  (one that matches no stop is noted in the sidecar and not used). It works on facts-file
+  stops too.
+
+The states stand for these wetness values (`reconstruct.STATE_WETNESS`), on the weather
+model's scale (0 dry, 1 standing water; docs/weather-spec.md):
+
+| State | Wetness | Why |
+|---|---|---|
+| `dry` | 0.0 | |
+| `damp` | 0.15 | clearly slick weather: slicks lose ~5% of a dry lap, wets ~20% |
+| `wet` | 0.45 | wets weather: wets lose ~25%, slicks ~29% |
+| `heavy` | 0.65 | standing water: wets ~38%, slicks ~54%; the wettest the fitted modern races reach (Brazil 2012, Monaco 2023: 0.64-0.65) |
+
+The percentages are the fitted curves of data/wet.json, which put the slick/wet crossover at
+w ~ 0.36; the values are chosen around it, not fitted, so they are estimates (the race file's
+provenance lists `weather`).
+
+### What the reconstruction does with it
+
+- **Wetness**: each lap's from the timeline.
+- **Tyre per stint**: the start tyre and each stop's tyre where sourced. A stint no source
+  names gets the class, slick or wet, that loses the least time over its laps at their
+  wetness (teams fit the tyre that suits the stint; wet_laps.py's rule), and the sidecar's
+  `weather.tyres` marks it `estimate`. An inter is used only where a source names one. **No
+  stop is invented**: a car whose wet-tyre stop no source gives stays on its start tyre.
+- **Wet pace**: the weather model's own relationship, as both sims run it
+  (`wet.penalty`, `sim_reference`, `packages/sim/src/weather.ts`): a lap's time is the car's
+  dry lap (pace + wear + fuel) x (1 + its tyre's penalty at the lap's wetness), plus pit loss
+  and noise. Tyre wear counts at `wet.wear_mult` (slicks barely wear on a wet track, wets
+  wear fast on a dry one). The solver still hits every anchor: the car's dry pace is solved
+  from its total with the multipliers in, and its fastest lap is pinned where F1DB has it.
+  On a wet race the lap-1 ladder also goes through any fastest lap set on lap 1, and a
+  car pushed back by a slow wet fastest lap pushes the cars behind it back too, so the lap-1
+  order stays the grid order.
+- **Snapshot**: Compound is `WET` (or `INTERMEDIATE`) on wet-tyre stints and empty on slick
+  stints, which the build fills with step 2.4's dry compound (`build.reconstructed_laps`).
+- **Weather records**: `<race-id>.weather.json`, one record a lap at the leader's lap end,
+  `{"lap", "time", "rain", "source": "reconstruction-facts", "wetness"}`, `rain` from wetness
+  0.05. That is the form `wet.py` reads for a wet race with lap records (as `pipeline
+  wet-laps` writes them), so the build fits the race's `weather` block from the synthetic
+  laps like any other wet race's, and the file lists `weather` in `provenance.estimated`.
+- **Anchor report**: a `tyre` row for every sourced stint (the snapshot's Compound on its
+  laps).
+
+A race wet from start to finish (no slick lap outside the rain) can't be built yet: the
+build's dry lap model needs dry laps (`build.dry_fit`). monaco-1984, portugal-1985 and
+europe-1993 are such races.
 
 ## What the reconstruction writes
 
@@ -65,12 +151,14 @@ Into `data/raw/` (or `--raw-dir`):
 
 - `<race-id>.parquet`: the synthetic laps, in the raw snapshot's columns
   (`ingest.LAP_COLUMNS`), as `jolpica.py` writes them (Time in seconds from the start;
-  a car out on lap 1 has lap 1 untimed at 0). Compound is left empty for step 2.4.
+  a car out on lap 1 has lap 1 untimed at 0). Compound is left empty for step 2.4 (a wet
+  race's wet-tyre stints excepted).
 - `<race-id>.status.json`: green from the start, plus each sourced safety car.
 - `<race-id>.reconstruction.json`: `reconstructed: true` and `provenance`
   (`{"kind": "reconstructed", "estimated": [...]}`) for the race file
   (`reconstruct.mark_model` sets both on an assembled model), the estimates in words, the
   sources, the solver's parameters and seed, and the anchor report.
+- `<race-id>.weather.json`: a wet race's weather records (above).
 - `<race-id>.anchors.md`: the anchor report as a table: each anchor's target, what was
   achieved, pass or fail. Reconstructed races are checked on these instead of Gate G1
   (eras build plan 5.1).

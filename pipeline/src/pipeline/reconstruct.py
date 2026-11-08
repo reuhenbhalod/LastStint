@@ -11,7 +11,13 @@ hits every fact the sources do give:
 - each retirement's laps completed (Jolpica), on a lap events.retirement_events can see;
 - each lapped car's laps behind (it crosses the line after the winner on its last lap);
 - real stops: F1DB's (1994-95) or a sourced facts file (docs/reconstruction-facts.md);
-- safety cars only where a facts file sources them (none before 1993).
+- safety cars only where a facts file sources them (none before 1993);
+- a wet race's weather: the facts file's sourced timeline (track state per lap range) gives
+  each lap's wetness, and each stint's tyre class (slick / inter / wet) is the sourced one
+  where a stop or the start names it. Wet laps take wet pace by the weather model's own
+  relationship (wet.penalty, data/wet.json: a dry lap x (1 + the tyre's penalty at that
+  wetness), as both sims run it), and tyre wear runs at wet.wear_mult. The weather is written
+  as the per-lap records the build reads for a wet race (<race-id>.weather.json).
 
 Anything else is estimated and marked: the sidecar <race-id>.reconstruction.json carries the
 race file's `reconstructed: true` and `provenance` (kind "reconstructed", `estimated`), the
@@ -20,7 +26,11 @@ what was achieved, pass or fail). <race-id>.anchors.md is the same report for pe
 
 The solver. Each car's lap time is
 
-    lap(l) = b + w * (tyre age - 1) + FUEL * fuel laps on board + pit loss + sigma * z(l)
+    lap(l) = (b + w * wear(l) + FUEL * fuel laps on board) * (1 + wet(l)) + pit loss
+             + sigma * z(l)
+
+(wear(l): tyre age - 1, counted at wet.wear_mult on a wet race's laps; wet(l): the car's tyre
+class's penalty at lap l's wetness, 0 on a dry race)
 
 with z a seeded normal draw per car (deterministic: sha256 of race, seed and driver). The
 cars decouple once each has a target for its time at its last lap:
@@ -55,8 +65,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from . import events, jolpica
-from .ingest import LAP_COLUMNS, raw_snapshot_path, track_status_path
+from . import events, jolpica, wet
+from .ingest import LAP_COLUMNS, raw_snapshot_path, save_weather, track_status_path, weather_path
 from .paths import DATA_DIR, RAW_DIR
 
 FIRST_YEAR, LAST_YEAR = 1983, 1995
@@ -66,6 +76,18 @@ FACTS_DIR = DATA_DIR / "reconstruction"
 F1DB_DIR = RAW_DIR / "f1db"
 GREEN, SC = "1", "4"  # FastF1 track status codes
 FINISHED = ("finished", "lapped")
+# A facts file's track states and the wetness each stands for (docs/reconstruction-facts.md).
+# Chosen from the weather model's own curves (data/wet.json) for the era's two tyres, slicks
+# and wets, which cross over at w ~ 0.36: damp is clearly slick weather (slicks lose ~5%,
+# wets ~20%), wet is wets weather (wets ~25%, slicks ~29%), heavy is standing water (wets
+# ~38%, slicks ~54%), at the wettest the fitted modern races reach (0.64-0.65: Brazil 2012,
+# Monaco 2023).
+STATE_WETNESS = {"dry": 0.0, "damp": 0.15, "wet": 0.45, "heavy": 0.65}
+TYRES = ("slick", "inter", "wet")
+TYRE_COMPOUND = {"slick": None, "inter": "INTERMEDIATE", "wet": "WET"}  # slick: step 2.4's
+# A lap counts as raining (wet.rain_laps) in the weather records from this wetness.
+RAIN_FROM = 0.05
+WEATHER_SOURCE = "reconstruction-facts"
 
 
 # --- Anchors -----------------------------------------------------------------------------
@@ -76,6 +98,7 @@ class Stop:
     lap: int  # the in-lap (official numbering)
     lane_time: float | None  # pit-lane seconds, None where the source has none
     source: str
+    tyre: str | None = None  # the tyre class fitted (TYRES), where a source names it
 
 
 @dataclass
@@ -92,6 +115,7 @@ class Car:
     fastest_time: float | None = None
     fastest_lap: int | None = None
     stops: list[Stop] = field(default_factory=list)
+    start_tyre: str | None = None  # the tyre class it started on, where a source names it
 
     @property
     def finished(self) -> bool:
@@ -116,6 +140,11 @@ class Anchors:
     safety_cars_complete: bool = False  # every safety car is known
     sources: dict = field(default_factory=dict)
     notes: list[str] = field(default_factory=list)
+    # A wet race (facts file `weather`): the wetness on each lap 1..laps, the timeline it
+    # came from (as entered) and the weather model's curves; None for a dry race.
+    wetness: list[float] | None = None
+    weather_timeline: list[dict] = field(default_factory=list)
+    curves: dict | None = None
 
     def car(self, driver: str) -> Car:
         return next(c for c in self.cars if c.driver == driver)
@@ -180,7 +209,83 @@ def load_facts(race_id: str, facts_dir: Path = FACTS_DIR) -> dict | None:
             raise ValueError(f"{path}: safetyCars[{i}] laps {sc['startLap']}-{sc['endLap']}")
     if facts.get("safetyCars") and race_year(race_id) < FIRST_SC_YEAR:
         raise ValueError(f"{path}: safety cars sourced before {FIRST_SC_YEAR}")
+    for i, s in enumerate(facts.get("stops", [])):
+        if s.get("tyre") is not None and s["tyre"] not in TYRES:
+            raise ValueError(f"{path}: stops[{i}] tyre {s['tyre']!r} is not one of {TYRES}")
+    if facts.get("weather") is not None:
+        check_weather(facts["weather"], str(path))
     return facts
+
+
+def _state_wetness(entry: dict, key: str, where: str) -> float | None:
+    """An entry's wetness at one end: `wetness` / `toWetness`, else its `state` / `toState`."""
+    num, state = ("wetness", "state") if key == "from" else ("toWetness", "toState")
+    if entry.get(num) is not None:
+        w = float(entry[num])
+        if not 0.0 <= w <= 1.0:
+            raise ValueError(f"{where}: {num} {w} is not in 0..1")
+        return w
+    if entry.get(state) is not None:
+        if entry[state] not in STATE_WETNESS:
+            raise ValueError(
+                f"{where}: {state} {entry[state]!r} is not one of {list(STATE_WETNESS)}"
+            )
+        return STATE_WETNESS[entry[state]]
+    return None
+
+
+def check_weather(weather: dict, where: str) -> None:
+    """A facts file's `weather` block: a timeline of sourced, non-overlapping lap ranges from
+    lap 1, each with a state (or wetness); sourced start tyres and tyre changes."""
+    timeline = weather.get("timeline") or []
+    if not timeline:
+        raise ValueError(f"{where}: weather.timeline is empty")
+    last = 0
+    for i, e in enumerate(sorted(timeline, key=lambda e: int(e["fromLap"]))):
+        at = f"{where}: weather.timeline (from lap {e.get('fromLap')})"
+        if not str(e.get("source") or "").strip():
+            raise ValueError(f"{at} has no source")
+        lo, hi = int(e["fromLap"]), int(e["toLap"])
+        if not 1 <= lo <= hi:
+            raise ValueError(f"{at}: laps {lo}-{hi}")
+        if lo != last + 1:
+            raise ValueError(f"{at}: laps {last + 1}-{lo - 1} missing or overlapping (entry {i})")
+        last = hi
+        if _state_wetness(e, "from", at) is None:
+            raise ValueError(f"{at}: needs a state or a wetness")
+        _state_wetness(e, "to", at)
+    st = weather.get("startTyre")
+    if st is not None and (st.get("tyre") not in TYRES or not str(st.get("source") or "").strip()):
+        raise ValueError(f"{where}: weather.startTyre needs a tyre in {TYRES} and a source")
+    for kind in ("startTyres", "tyreChanges"):
+        for i, t in enumerate(weather.get(kind) or []):
+            if t.get("tyre") not in TYRES:
+                raise ValueError(f"{where}: weather.{kind}[{i}] tyre {t.get('tyre')!r}")
+            if not str(t.get("source") or "").strip():
+                raise ValueError(f"{where}: weather.{kind}[{i}] has no source")
+            if not ("driver" in t or "number" in t):
+                raise ValueError(f"{where}: weather.{kind}[{i}] needs a driver or number")
+            if kind == "tyreChanges" and "lap" not in t:
+                raise ValueError(f"{where}: weather.{kind}[{i}] needs the stop's in-lap")
+
+
+def timeline_wetness(timeline: list[dict], laps: int) -> list[float]:
+    """The wetness on each lap 1..laps: each entry's state (or wetness) over its laps, ramped
+    linearly to its toState (toWetness) on its last lap where it has one. The timeline must
+    reach the race's last lap; entries past it are cut."""
+    out: list[float | None] = [None] * laps
+    for e in timeline:
+        lo, hi = int(e["fromLap"]), int(e["toLap"])
+        a = _state_wetness(e, "from", "weather.timeline")
+        b = _state_wetness(e, "to", "weather.timeline")
+        b = a if b is None else b
+        for lap in range(lo, min(hi, laps) + 1):
+            f = 0.0 if hi == lo else (lap - lo) / (hi - lo)
+            out[lap - 1] = round(a + (b - a) * f, 3)
+    missing = [i + 1 for i, w in enumerate(out) if w is None]
+    if missing:
+        raise ValueError(f"weather.timeline doesn't cover laps {missing[0]}-{missing[-1]}")
+    return [float(w) for w in out]
 
 
 def _norm(text: str) -> str:
@@ -313,7 +418,12 @@ def load_anchors(
                 raise ValueError(f"facts stops[{i}]: no car {s.get('driver', s.get('number'))}")
             lane = s.get("laneTime")
             car.stops.append(
-                Stop(int(s["lap"]), None if lane is None else float(lane), s["source"])
+                Stop(
+                    int(s["lap"]),
+                    None if lane is None else float(lane),
+                    s["source"],
+                    s.get("tyre"),
+                )
             )
         for car in cars:
             car.stops.sort(key=lambda s: s.lap)
@@ -331,6 +441,13 @@ def load_anchors(
             if s.lap > car.laps:
                 notes.append(f"{car.driver}: stop on lap {s.lap}, the lap it retired on; not run")
         car.stops = kept
+    wetness, timeline, curves = None, [], None
+    if facts and facts.get("weather"):
+        weather = facts["weather"]
+        timeline = list(weather["timeline"])
+        wetness = timeline_wetness(timeline, winner.laps)
+        curves = wet.load_curves()
+        notes += apply_tyres(cars, weather)
     incidents = DATA_DIR / "incidents.json"
     if incidents.exists():
         for item in json.loads(incidents.read_text()).get(race_id) or []:
@@ -346,6 +463,9 @@ def load_anchors(
         safety_cars=safety_cars,
         stops_complete=stops_complete,
         safety_cars_complete=sc_complete,
+        wetness=wetness,
+        weather_timeline=timeline,
+        curves=curves,
         sources={
             "jolpica": f"Jolpica-F1 dump {jolpica.dump_version(dump_dir)} (CC BY-NC-SA 4.0)",
             "f1db": f"F1DB {f1db_version} (CC BY 4.0), {f1db_dir.name}/{race_id}.*.csv",
@@ -355,6 +475,64 @@ def load_anchors(
         },
         notes=notes,
     )
+
+
+def _car_for(cars: list[Car], item: dict) -> Car | None:
+    if "driver" in item:
+        return next((c for c in cars if c.driver == item["driver"]), None)
+    hits = [c for c in cars if c.number == int(item["number"])]
+    return hits[0] if len(hits) == 1 else None
+
+
+def apply_tyres(cars: list[Car], weather: dict) -> list[str]:
+    """The facts file's sourced tyres onto the cars: the race's start tyre and each car's own,
+    and `tyreChanges` onto the car's stop on that in-lap (an F1DB stop, 1994-95, or a facts
+    stop). Returns notes on any that match no car or stop."""
+    notes = []
+    start = (weather.get("startTyre") or {}).get("tyre")
+    for c in cars:
+        c.start_tyre = start
+    for t in weather.get("startTyres") or []:
+        car = _car_for(cars, t)
+        if car is None:
+            notes.append(f"weather start tyre for {t.get('driver', t.get('number'))}: no such car")
+            continue
+        car.start_tyre = t["tyre"]
+    for t in weather.get("tyreChanges") or []:
+        car = _car_for(cars, t)
+        who = t.get("driver", t.get("number"))
+        if car is None:
+            notes.append(f"weather tyre change for {who}: no such car")
+            continue
+        k = next((i for i, s in enumerate(car.stops) if s.lap == int(t["lap"])), None)
+        if k is None:
+            notes.append(
+                f"weather tyre change: {car.driver} has no stop on lap {t['lap']}; not used"
+            )
+            continue
+        car.stops[k] = replace(car.stops[k], tyre=t["tyre"])
+    return notes
+
+
+def stint_tyres(car: Car, wetness: list[float], curves: dict) -> list[tuple[str, bool]]:
+    """Each stint's tyre class and whether a source names it. A stint no source names (the
+    start where no source gives it, a stop whose tyre isn't given) gets the class that loses
+    the least time over its laps at their wetness: teams fit the tyre that suits the stint
+    (wet_laps.py's rule), an estimate."""
+    ends = [0, *[s.lap for s in car.stops], car.laps]
+    named = [car.start_tyre, *[s.tyre for s in car.stops]]
+    out = []
+    for k, (a, b) in enumerate(zip(ends, ends[1:], strict=False)):
+        if named[k] is not None:
+            out.append((named[k], True))
+            continue
+        ws = np.array(wetness[a:b] or [wetness[min(a, len(wetness) - 1)]])
+        lost = {
+            t: float(np.sum(wet.penalty(curves, TYRE_COMPOUND[t] or "SOFT", ws))) for t in TYRES
+        }
+        # The era's tyres are slicks and wets: an inter only where a source names one.
+        out.append((min(("slick", "wet"), key=lambda t: lost[t]), False))
+    return out
 
 
 # --- The per-car lap model -----------------------------------------------------------------
@@ -371,6 +549,17 @@ class Features:
     in_lap: np.ndarray  # bool
     out_lap: np.ndarray  # bool
     out_share: dict[int, float]  # out-lap number -> s from PitInTime to PitOutTime
+    # A wet race: each lap's dry lap multiplier (1 + the tyre's penalty at the lap's wetness)
+    # and tyre wear in dry-lap units (wet.wear_mult along the stint). Dry: 1 and age - 1.
+    mult: np.ndarray | None = None
+    wear: np.ndarray | None = None
+    tyre: list[str] | None = None  # the stint's tyre class on each lap (wet race only)
+
+    def __post_init__(self) -> None:
+        if self.mult is None:
+            self.mult = np.ones(len(self.age))
+        if self.wear is None:
+            self.wear = self.age - 1
 
 
 def lane_times(anchors: Anchors, p: Params) -> float:
@@ -387,9 +576,12 @@ def features(
     typical_lane: float,
     p: Params,
     typical_stint: int | None = None,
+    wetness: list[float] | None = None,
+    curves: dict | None = None,
 ) -> Features:
     """The car's lap features. With refuelling, each stint carries the fuel to the next stop;
-    a retired car's last stint the fuel for a typical stint (its plan is unknown)."""
+    a retired car's last stint the fuel for a typical stint (its plan is unknown). With a
+    wetness timeline, each lap's wet multiplier and wear at its stint's tyre class."""
     n = car.laps
     stop_at = {s.lap: s for s in car.stops}
     age, stint, fuel, pit = (np.zeros(n) for _ in range(4))
@@ -423,7 +615,22 @@ def features(
             fuel[i] = max(nxt - lap + 1, 1)
         else:
             fuel[i] = total - lap + 1
-    return Features(age, stint, fuel, pit, in_lap, out_lap, out_share)
+    if wetness is None or curves is None:
+        return Features(age, stint, fuel, pit, in_lap, out_lap, out_share)
+    classes = [t for t, _ in stint_tyres(car, wetness, curves)]
+    mult, wear, tyre = np.ones(n), np.zeros(n), []
+    worn = 0.0
+    for i in range(n):
+        cls = classes[int(stint[i]) - 1]
+        comp = TYRE_COMPOUND[cls] or "SOFT"
+        w = wetness[min(i, len(wetness) - 1)]
+        if age[i] == 1:
+            worn = 0.0
+        mult[i] = 1.0 + float(wet.penalty(curves, comp, w))
+        wear[i] = worn  # as the sims count it: the wear before this lap (wet.sim_wear)
+        worn += wet.wear_mult(comp, w)
+        tyre.append(cls)
+    return Features(age, stint, fuel, pit, in_lap, out_lap, out_share, mult, wear, tyre)
 
 
 def typical_stint(anchors: Anchors) -> int | None:
@@ -499,25 +706,26 @@ def fit_car(
     if has_f:
         j = int(np.argmin(z))
         z[j], z[f_lap - 1] = z[f_lap - 1], z[j]
-    a = feat.age - 1
+    a = feat.wear
+    mult = feat.mult
     fixed = dict(pins)
     if has_f:
         fixed[f_lap] = f_time
     free = np.array([i for i in range(n) if i + 1 not in fixed], int)
     pinned_sum = sum(fixed.values())
     floor_base = f_time + p.fastest_margin if f_time is not None else -math.inf
-    base_c = p.fuel_per_lap * feat.fuel + feat.pit
+    dry_c = p.fuel_per_lap * feat.fuel
     if pace is not None:
         b, w = pace
     elif total is not None and len(free):
-        rest, nf = total - pinned_sum, len(free)
+        rest, m_sum = total - pinned_sum, mult[free].sum()
         best = None
         for w_try in np.linspace(0.0, p.wear_max, 11):
             for scale in SEARCH:
                 s_try = sigma * scale
-                c_try = base_c + s_try * z
-                b_try = (rest - w_try * a[free].sum() - c_try[free].sum()) / nf
-                m = b_try + w_try * a + c_try
+                c_try = (w_try * a + dry_c) * mult + feat.pit + s_try * z
+                b_try = (rest - c_try[free].sum()) / m_sum
+                m = b_try * mult + c_try
                 cost = float((np.maximum(floor_base + feat.pit[free] - m[free], 0) ** 2).sum())
                 if has_f:
                     cost += (m[f_lap - 1] - f_time) ** 2
@@ -527,8 +735,7 @@ def fit_car(
         _, b, w, sigma = best
     else:
         b, w = (f_time or 90.0), p.wear_prior
-    c = base_c + sigma * z
-    model = b + w * a + c
+    model = (b + w * a + dry_c) * mult + feat.pit + sigma * z
     if f_time is not None and not has_f and len(free):
         k = int(free[np.argmin(model[free] - feat.pit[free])])
         fixed[k + 1] = f_time
@@ -716,35 +923,69 @@ def solve(anchors: Anchors, p: Params, sigma: float | None = None) -> Solution:
     lane = lane_times(anchors, p)
     running = [c for c in anchors.cars if c.laps >= 1]
     stint = typical_stint(anchors)
-    feats = {c.driver: features(c, total, refuel, lane, p, stint) for c in running}
+    feats = {
+        c.driver: features(c, total, refuel, lane, p, stint, anchors.wetness, anchors.curves)
+        for c in running
+    }
+
+    def dry_fastest(c: Car) -> float | None:
+        """The car's fastest lap as a dry lap (its time over the lap's wet multiplier)."""
+        if c.fastest_time is None:
+            return None
+        if c.fastest_lap is None or not 1 <= c.fastest_lap <= c.laps:
+            return c.fastest_time
+        return c.fastest_time / float(feats[c.driver].mult[c.fastest_lap - 1])
+
     zs = {c.driver: noise(anchors.race_id, p.seed, c.driver, c.laps) for c in running}
     notes: list[str] = []
 
     # Pass 1: the lead-lap finishers' pace from their race times and fastest laps.
     lead = [c for c in running if c.time is not None]
     fits = {c.driver: fit_car(c, feats[c.driver], zs[c.driver], p, sigma, c.time, {}) for c in lead}
-    offsets = [f.b - c.fastest_time for c in lead if (f := fits[c.driver]) and c.fastest_time]
+    offsets = [f.b - dry_fastest(c) for c in lead if (f := fits[c.driver]) and c.fastest_time]
     b_off = float(np.median(offsets)) if offsets else 2.0
     w_med = float(np.median([f.w for f in fits.values()]))
     b_med = float(np.median([f.b for f in fits.values()]))
-    f_med = float(np.median([c.fastest_time for c in running if c.fastest_time] or [b_med]))
+    f_med = float(np.median([dry_fastest(c) for c in running if c.fastest_time] or [b_med]))
 
-    # Lap 1 from the grid: the pole sitter's standing start, then grid_gap per slot.
-    lap1 = b_med + p.fuel_per_lap * feats[lead[0].driver].fuel[0] + p.start_loss
+    # Lap 1 from the grid: the pole sitter's standing start, then grid_gap per slot (at the
+    # winner's lap-1 wet multiplier on a wet race).
+    first = feats[lead[0].driver]
+    lap1 = (b_med + p.fuel_per_lap * first.fuel[0]) * float(first.mult[0]) + p.start_loss
+    order = grid_order(running)
+    is_wet = anchors.wetness is not None
+    if is_wet:
+        # A wet race: a fastest lap set on lap 1 is lap 1's real pace (the track's state on
+        # the first lap is the timeline's coarsest guess), so the grid ladder goes through it.
+        on_one = [lap1] + [
+            c.fastest_time - rank * p.grid_gap
+            for rank, c in enumerate(order)
+            if c.fastest_lap == 1 and c.fastest_time is not None
+        ]
+        lap1 = max(on_one)
     grid_pins: dict[str, dict[int, float]] = {}
-    for rank, c in enumerate(grid_order(running)):
+    prev = -math.inf
+    for rank, c in enumerate(order):
         if c.fastest_lap == 1:
             notes.append(f"{c.driver}: fastest lap on lap 1, its lap-1 time is the fastest lap's")
             grid_pins[c.driver] = {}
+            prev = max(prev, c.fastest_time or prev)
             continue
         pin = lap1 + rank * p.grid_gap
         if c.fastest_time is not None and pin < c.fastest_time + p.fastest_margin:
             pin = c.fastest_time + p.fastest_margin + 0.1  # may break the grid order (checked)
+        if is_wet:
+            # A wet fastest lap (slower than the ladder) pushes the cars behind it back
+            # with it, so the lap-1 order stays the grid order.
+            pin = max(pin, prev + 0.1)
+        prev = pin
         grid_pins[c.driver] = {1: pin + feats[c.driver].pit[0]}
 
     # Natural times for everyone else (with the laps pinned so far), then the targets.
     est_lap = {
-        c.driver: (c.fastest_time or f_med) + b_off + p.fuel_per_lap * (total / 2) for c in running
+        c.driver: ((dry_fastest(c) or f_med) + b_off + p.fuel_per_lap * (total / 2))
+        * float(np.mean(feats[c.driver].mult))
+        for c in running
     }
 
     def goals(pins: dict[str, dict[int, float]]) -> dict[str, float]:
@@ -753,7 +994,7 @@ def solve(anchors: Anchors, p: Params, sigma: float | None = None) -> Solution:
             if c.time is not None:
                 natural[c.driver] = c.time
                 continue
-            pace = ((c.fastest_time or f_med) + b_off, w_med)
+            pace = ((dry_fastest(c) or f_med) + b_off, w_med)
             nat = fit_car(c, feats[c.driver], zs[c.driver], p, sigma, None, pins[c.driver], pace)
             natural[c.driver] = float(nat.laps.sum())
         goal, why = targets(anchors, natural, est_lap, p)
@@ -842,7 +1083,7 @@ def laps_frame(anchors: Anchors, sol: Solution) -> pd.DataFrame:
                     "LapNumber": float(lap),
                     "LapTime": float(x[i]),
                     "Time": float(t[lap]),
-                    "Compound": None,
+                    "Compound": TYRE_COMPOUND[feat.tyre[i]] if feat.tyre else None,
                     "TyreLife": float(feat.age[i]),
                     "Stint": float(feat.stint[i]),
                     "PitInTime": pit_in,
@@ -873,6 +1114,56 @@ def track_status(anchors: Anchors, df: pd.DataFrame) -> list[dict]:
         end = float(lead.get(float(min(sc.end, anchors.laps)), lead.max()))
         out += [{"time": round(start, 3), "status": SC}, {"time": round(end, 3), "status": GREEN}]
     return out
+
+
+def weather_records(anchors: Anchors, df: pd.DataFrame) -> list[dict] | None:
+    """A wet race's weather as the build reads it (wet.rain_laps, wet.dry_laps): one record a
+    lap at the leader's lap end, `rain` where the track is wet (wetness >= RAIN_FROM), with the
+    sourced wetness and its source; None for a dry race."""
+    if anchors.wetness is None:
+        return None
+    lead = df[df["Position"] == 1].set_index("LapNumber")["Time"]
+    out = []
+    for lap, w in enumerate(anchors.wetness, 1):
+        t = lead.get(float(lap))
+        out.append(
+            {
+                "lap": lap,
+                "time": None if t is None or t != t else round(float(t), 3),
+                "rain": w >= RAIN_FROM,
+                "source": WEATHER_SOURCE,
+                "wetness": w,
+            }
+        )
+    return out
+
+
+def weather_summary(anchors: Anchors) -> dict | None:
+    """The sidecar's weather: the sourced timeline, the wetness per lap and each car's stint
+    tyres (sourced or estimated)."""
+    if anchors.wetness is None:
+        return None
+    tyres = []
+    for c in anchors.cars:
+        if c.laps < 1:
+            continue
+        for k, (cls, sourced) in enumerate(stint_tyres(c, anchors.wetness, anchors.curves), 1):
+            tyres.append(
+                {
+                    "driver": c.driver,
+                    "stint": k,
+                    "tyre": cls,
+                    "by": "source" if sourced else "estimate",
+                }
+            )
+    return {
+        "source": WEATHER_SOURCE,
+        "states": STATE_WETNESS,
+        "timeline": anchors.weather_timeline,
+        "wetness": anchors.wetness,
+        "curves": anchors.curves,
+        "tyres": tyres,
+    }
 
 
 # --- The anchor report ----------------------------------------------------------------------
@@ -963,6 +1254,24 @@ def check_anchors(anchors: Anchors, df: pd.DataFrame, p: Params) -> list[dict]:
                 ok = ok and float(nxt["Stint"].iloc[0]) == float(row["Stint"].iloc[0]) + 1
             out.append(_row("stop", c.driver, s.lap, s.lap if ok else None, bool(ok)))
 
+    if anchors.wetness is not None:
+        # Each sourced stint tyre on its laps (the snapshot's Compound).
+        for c in anchors.cars:
+            g = by_car.get(c.driver)
+            if g is None:
+                continue
+            for k, (cls, sourced) in enumerate(stint_tyres(c, anchors.wetness, anchors.curves), 1):
+                if not sourced:
+                    continue
+                laps_k = g[g["Stint"] == float(k)]
+                if laps_k.empty:
+                    continue
+                want = TYRE_COMPOUND[cls]
+                got = {None if v != v or v is None else str(v) for v in laps_k["Compound"]}
+                out.append(
+                    _row("tyre", f"{c.driver} stint {k}", cls, sorted(map(str, got)), got == {want})
+                )
+
     leader = timed[timed["Position"] == 1]
     got_sc = sorted(int(n) for n in leader[leader["TrackStatus"] == SC]["LapNumber"])
     want_sc = sorted({n for sc in anchors.safety_cars for n in range(sc.start, sc.end + 1)})
@@ -980,7 +1289,7 @@ def summary(report: list[dict]) -> dict[str, dict[str, int]]:
     return out
 
 
-CORE = ("grid", "order", "gap", "fastest", "retirement", "laps down", "stop", "safety car")
+CORE = ("grid", "order", "gap", "fastest", "retirement", "laps down", "stop", "safety car", "tyre")
 
 
 def failures(report: list[dict]) -> list[dict]:
@@ -1010,9 +1319,22 @@ def estimates_in_words(anchors: Anchors, p: Params) -> list[str]:
         + (" each stop refuels to the next stop" if refuel else " full tank at the start"),
         f"Stop loss: pit-lane time - {p.pit_bypass}s, {p.pit_in_share:.0%} on the in-lap",
         "PitInTime is the in-lap's end; PitOutTime adds the out-lap's share of the lane time",
-        "Compound is left empty (one dry compound per race, estimated in step 2.4)",
-        "No weather timeline: the race is assumed dry",
     ]
+    if anchors.wetness is None:
+        words += [
+            "Compound is left empty (one dry compound per race, estimated in step 2.4)",
+            "No weather timeline: the race is assumed dry",
+        ]
+    else:
+        words += [
+            "Weather: each lap's wetness from the facts file's sourced timeline (track states"
+            f" as wetness: {STATE_WETNESS}; ramps between sourced points are linear)",
+            "Wet laps: the dry lap x (1 + the stint tyre's penalty at that wetness), the"
+            " weather model's curves (data/wet.json); tyre wear at wet.wear_mult",
+            "Compound: WET / INTERMEDIATE on wet-tyre stints, slick stints left empty (step"
+            " 2.4's dry compound); a stint no source names gets the tyre that loses least"
+            " over its laps",
+        ]
     if not anchors.stops_complete:
         words.append("Stops: only the sourced ones; cars may have stopped more (unknown)")
     if not anchors.safety_cars_complete:
@@ -1044,6 +1366,7 @@ class Result:
     laps: pd.DataFrame
     status: list[dict]
     sidecar: dict
+    weather: list[dict] | None = None  # a wet race's per-lap records (<race-id>.weather.json)
 
 
 def reconstruct(anchors: Anchors, p: Params | None = None) -> Result:
@@ -1079,7 +1402,10 @@ def reconstruct(anchors: Anchors, p: Params | None = None) -> Result:
         "anchors": report,
         "notes": anchors.notes + sol.notes,
     }
-    return Result(df, track_status(anchors, df), sidecar)
+    weather = weather_summary(anchors)
+    if weather is not None:
+        sidecar["weather"] = weather
+    return Result(df, track_status(anchors, df), sidecar, weather_records(anchors, df))
 
 
 def sidecar_path(race_id: str, raw_dir: Path = RAW_DIR) -> Path:
@@ -1121,7 +1447,8 @@ def report_markdown(sidecar: dict) -> str:
 
 
 def write(race_id: str, result: Result, raw_dir: Path = RAW_DIR) -> list[Path]:
-    """raw/<id>.parquet, .status.json, .reconstruction.json and .anchors.md."""
+    """raw/<id>.parquet, .status.json, .reconstruction.json and .anchors.md, and a wet race's
+    .weather.json (the per-lap records the build reads)."""
     raw_dir.mkdir(parents=True, exist_ok=True)
     paths = [
         raw_snapshot_path(race_id, raw_dir),
@@ -1133,4 +1460,14 @@ def write(race_id: str, result: Result, raw_dir: Path = RAW_DIR) -> list[Path]:
     paths[1].write_text(json.dumps(result.status, indent=1) + "\n")
     paths[2].write_text(json.dumps(result.sidecar, indent=1) + "\n")
     paths[3].write_text(report_markdown(result.sidecar))
+    if result.weather is not None:
+        paths.append(save_weather(race_id, result.weather, raw_dir))
+    else:
+        # A rerun of a race whose facts no longer have weather leaves no stale records of
+        # its own (records from anywhere else are left alone).
+        old = weather_path(race_id, raw_dir)
+        if old.exists() and any(
+            r.get("source") == WEATHER_SOURCE for r in json.loads(old.read_text())
+        ):
+            old.unlink()
     return paths

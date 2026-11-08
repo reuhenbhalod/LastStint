@@ -6,5 +6,37 @@
     "stops": false,
     "safetyCars": true
   },
-  "notes": "Heavy-rain race ended by the two-hour limit at 67 laps. Wikipedia (https://en.wikipedia.org/wiki/1985_Portuguese_Grand_Prix): 'Nelson Piquet pitted repeatedly around lap 25, finally retiring with a tyre issue' (#7; no exact laps, so not entered). No leader's stop reported (Senna led from start to finish)."
+  "notes": "Heavy-rain race ended by the two-hour limit at 67 laps. Wikipedia (https://en.wikipedia.org/wiki/1985_Portuguese_Grand_Prix): 'Nelson Piquet pitted repeatedly around lap 25, finally retiring with a tyre issue' (#7; no exact laps, so not entered). No leader's stop reported (Senna led from start to finish). Weather: no source read names the start tyres of the field (only Piquet's Pirelli wets), so the other stints' tyres are estimated (wets, in rain all race).",
+  "weather": {
+    "timeline": [
+      {
+        "fromLap": 1,
+        "toLap": 24,
+        "state": "wet",
+        "source": "https://www.motorsportmagazine.com/archive/article/june-1985/22/portuguese-grand-prix-2/ ('with rain falling steadily'; 'the treacherous track surface'); https://en.wikipedia.org/wiki/1985_Portuguese_Grand_Prix ('Rain, which was already falling at the start of the race'; 'Wet weather caused spinouts frequently early in the race')"
+      },
+      {
+        "fromLap": 25,
+        "toLap": 30,
+        "state": "wet",
+        "toState": "heavy",
+        "source": "https://en.wikipedia.org/wiki/1985_Portuguese_Grand_Prix ('Rain, which was already falling at the start of the race, continued and got heavier', placed after the lap-25 stops and before Baldi's spin 'near lap 30')",
+        "note": "The lap the rain got heavier isn't given; ramped over laps 25-30."
+      },
+      {
+        "fromLap": 31,
+        "toLap": 67,
+        "state": "heavy",
+        "source": "https://www.motorsportmagazine.com/archive/article/june-1985/22/portuguese-grand-prix-2/ ('the rain intensified to the point where huge lakes were forming on the start, finish straight'; Prost spun 'on the standing water in front of the pits' (Jolpica: Prost spun off with 30 laps); 'the sodden chequered flag came out after 67 laps')",
+        "note": "No source says the rain eased before the flag."
+      }
+    ],
+    "startTyres": [
+      {
+        "number": 7,
+        "tyre": "wet",
+        "source": "https://www.motorsportmagazine.com/archive/article/june-1985/22/portuguese-grand-prix-2/ (Piquet's Brabham: 'Pirelli's wet weather rubber was totally ineffectual')"
+      }
+    ]
+  }
 }

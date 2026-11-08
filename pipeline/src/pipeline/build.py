@@ -1625,10 +1625,17 @@ def load_reconstruction(race_id: str, raw_dir: Path = RAW_DIR) -> dict | None:
 
 def reconstructed_laps(laps: pd.DataFrame, year: int) -> pd.DataFrame:
     """A reconstructed race's synthetic laps with their compounds filled as step 2.4 does
-    (one dry compound before 2007): the reconstruction leaves Compound empty."""
+    (one dry compound before 2007): the reconstruction leaves Compound empty on its slick
+    stints. A wet race's wet-tyre stints (from its facts file's weather) keep their
+    INTERMEDIATE / WET."""
     era = estimates.era_for_year(year)
     refuelling = year in estimates.REFUELLING
-    return estimates.estimate_compounds(laps, year, estimates.burn_per_lap(era), refuelling).laps
+    wet_tyre = laps["Compound"].astype(str).isin(wet.WET_COMPOUNDS)
+    dry = laps.copy()
+    dry.loc[wet_tyre, "Compound"] = None
+    out = estimates.estimate_compounds(dry, year, estimates.burn_per_lap(era), refuelling).laps
+    out.loc[wet_tyre, "Compound"] = laps.loc[wet_tyre, "Compound"]
+    return out
 
 
 def reconstructed_pit_loss(params: track.TrackParams, recon: dict) -> track.TrackParams:

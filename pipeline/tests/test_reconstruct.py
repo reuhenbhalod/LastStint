@@ -362,3 +362,203 @@ def test_cli_reconstruct(tmp_path):
     assert side["solver"]["passed"] and side["reconstructed"]
     again = CliRunner().invoke(cli.app, args)
     assert "skipped" in again.output
+
+
+# --- Weather: a wet race's sourced timeline (docs/reconstruction-facts.md) --------------------
+
+
+def test_timeline_states_ramps_and_cover():
+    timeline = [
+        {"fromLap": 1, "toLap": 2, "state": "dry", "source": SRC},
+        {"fromLap": 3, "toLap": 5, "state": "wet", "toState": "damp", "source": SRC},
+        {"fromLap": 6, "toLap": 9, "wetness": 0.7, "source": SRC},
+    ]
+    w = rc.timeline_wetness(timeline, 8)  # entries past the race's laps are cut
+    assert w == [0.0, 0.0, 0.45, 0.3, 0.15, 0.7, 0.7, 0.7]
+    with pytest.raises(ValueError, match="doesn't cover"):
+        rc.timeline_wetness(timeline, 10)
+
+
+@pytest.mark.parametrize(
+    "weather, why",
+    [
+        ({"timeline": []}, "empty"),
+        ({"timeline": [{"fromLap": 1, "toLap": 3, "state": "wet", "source": ""}]}, "no source"),
+        ({"timeline": [{"fromLap": 1, "toLap": 3, "state": "soggy", "source": SRC}]}, "state"),
+        ({"timeline": [{"fromLap": 2, "toLap": 3, "state": "wet", "source": SRC}]}, "missing"),
+        (
+            {
+                "timeline": [
+                    {"fromLap": 1, "toLap": 3, "state": "wet", "source": SRC},
+                    {"fromLap": 3, "toLap": 5, "state": "dry", "source": SRC},
+                ]
+            },
+            "overlapping",
+        ),
+        (
+            {
+                "timeline": [{"fromLap": 1, "toLap": 3, "state": "wet", "source": SRC}],
+                "startTyre": {"tyre": "wet"},
+            },
+            "startTyre",
+        ),
+        (
+            {
+                "timeline": [{"fromLap": 1, "toLap": 3, "state": "wet", "source": SRC}],
+                "tyreChanges": [{"number": 5, "tyre": "wet", "source": SRC}],
+            },
+            "in-lap",
+        ),
+    ],
+)
+def test_weather_facts_are_checked(tmp_path, weather, why):
+    d = _facts(tmp_path, "brazil-1993", {"weather": weather})
+    with pytest.raises(ValueError, match=why):
+        rc.load_facts("brazil-1993", d)
+
+
+def test_stop_tyre_must_be_a_class(tmp_path):
+    stop = {"driver": "X", "lap": 3, "source": SRC, "tyre": "full wet"}
+    with pytest.raises(ValueError, match="tyre"):
+        rc.load_facts("brazil-1993", _facts(tmp_path, "brazil-1993", {"stops": [stop]}))
+
+
+def wet_toy() -> rc.Anchors:
+    """toy() with rain on laps 16-30 (wet, drying to damp), every car starting on slicks and
+    AAA, BBB changing to wets at their first stop (BBB back to slicks at its second)."""
+    a = toy(stops=True)
+    a.weather_timeline = [
+        {"fromLap": 1, "toLap": 15, "state": "dry", "source": SRC},
+        {"fromLap": 16, "toLap": 25, "state": "wet", "source": SRC},
+        {"fromLap": 26, "toLap": 30, "state": "wet", "toState": "damp", "source": SRC},
+        {"fromLap": 31, "toLap": 50, "state": "dry", "source": SRC},
+    ]
+    a.wetness = rc.timeline_wetness(a.weather_timeline, a.laps)
+    a.curves = rc.wet.load_curves()
+    for c in a.cars:
+        c.start_tyre = "slick"
+    aaa, bbb = a.car("AAA"), a.car("BBB")
+    aaa.stops = [rc.replace(aaa.stops[0], tyre="wet")]
+    bbb.stops = [rc.replace(bbb.stops[0], tyre="wet"), rc.replace(bbb.stops[1], tyre="slick")]
+    # The lead-lap times grow by what the rain costs the worst-shod of them (toy()'s are dry;
+    # the gaps are kept).
+    lead = [c for c in a.cars if c.time is not None]
+    extra = max(
+        float(
+            (
+                rc.features(c, a.laps, False, 24.0, rc.Params(), None, a.wetness, a.curves).mult - 1
+            ).sum()
+        )
+        for c in lead
+    )
+    for c in lead:
+        c.time += extra * 89.0
+    return a
+
+
+@pytest.fixture(scope="module")
+def wet_solved() -> rc.Result:
+    return rc.reconstruct(wet_toy())
+
+
+def test_wet_race_meets_its_anchors(wet_solved):
+    assert rc.failures(wet_solved.sidecar["anchors"]) == []
+    tyre = [r for r in wet_solved.sidecar["anchors"] if r["anchor"] == "tyre"]
+    assert tyre and all(r["pass"] for r in tyre)
+
+
+def test_wet_laps_take_the_weather_models_pace(wet_solved):
+    """A wet lap is the car's dry lap x (1 + its tyre's penalty at the lap's wetness)."""
+    a = wet_toy()
+    df = wet_solved.laps
+    ccc = df[df["Driver"] == "CCC"].set_index("LapNumber")["LapTime"]  # slicks all race
+    pace = wet_solved.sidecar["fitted"]["CCC"]["pace"]
+    slick_wet = float(rc.wet.penalty(a.curves, "SOFT", 0.45))
+    # Mid-rain against mid-dry green laps (the fastest lap, 12, aside): the rain costs the
+    # dry lap x the penalty, give or take the noise, fuel and wear (the projection to the
+    # total adds the same to every lap, so it cancels).
+    rain, dry = ccc.loc[17.0:24.0].mean(), ccc.loc[[5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0]].mean()
+    assert rain - dry == pytest.approx(pace * slick_wet, abs=2.0)
+    f = rc.features(a.car("CCC"), a.laps, False, 24.0, rc.Params(), None, a.wetness, a.curves)
+    assert f.mult[17] == pytest.approx(1 + slick_wet) and f.mult[5] == 1.0
+    # Slicks barely wear in the rain (wet.wear_mult): wear before lap 25 is 15 dry laps + 9 x 0.2.
+    assert f.wear[24] == pytest.approx(15 + 9 * 0.2)
+
+
+def test_wet_stints_carry_their_compounds(wet_solved):
+    df = wet_solved.laps
+    bbb = df[df["Driver"] == "BBB"].set_index("LapNumber")["Compound"]
+    assert bbb.loc[10.0] is None and bbb.loc[25.0] == "WET" and bbb.loc[40.0] is None
+    aaa = df[df["Driver"] == "AAA"].set_index("LapNumber")["Compound"]
+    assert set(aaa.loc[21.0:]) == {"WET"}
+    tyres = wet_solved.sidecar["weather"]["tyres"]
+    assert {"driver": "BBB", "stint": 2, "tyre": "wet", "by": "source"} in tyres
+
+
+def test_unsourced_stint_takes_the_tyre_that_suits_it():
+    a = wet_toy()
+    car = a.car("DDD")  # one stop at lap 22, no tyre named: stint 2 is laps 23-49
+    car.stops = [rc.replace(car.stops[0], lap=17)]
+    a2 = rc.Anchors(**{**a.__dict__})
+    tyres = rc.stint_tyres(car, a2.wetness, a2.curves)
+    assert tyres[0] == ("slick", True)
+    assert tyres[1] == ("slick", False)  # laps 18-49: mostly dry
+    wet_only = [0.45] * 50
+    car.stops = [rc.replace(car.stops[0], lap=17)]
+    car.start_tyre = None
+    assert rc.stint_tyres(car, wet_only, a2.curves) == [("wet", False), ("wet", False)]
+
+
+def test_wet_race_weather_records_and_sidecar(wet_solved, tmp_path):
+    rec = wet_solved.weather
+    assert [r["lap"] for r in rec] == list(range(1, 51))
+    assert {r["lap"] for r in rec if r["rain"]} == set(range(16, 31))
+    assert all(r["source"] == rc.WEATHER_SOURCE and r["time"] for r in rec)
+    side = wet_solved.sidecar
+    assert "weather" in side["provenance"]["estimated"]
+    assert side["weather"]["wetness"][17] == 0.45
+    assert any("Wet laps" in e for e in side["estimates"])
+    paths = rc.write("toy-1990", wet_solved, tmp_path)
+    assert ingest.weather_path("toy-1990", tmp_path) in paths
+    # The build reads the records as a wet race's rain laps.
+    loaded = ingest.load_weather("toy-1990", tmp_path)
+    from pipeline import wet
+
+    assert wet.rain_laps(wet_solved.laps, loaded) == set(range(16, 31))
+    assert wet.is_wet_race(wet_solved.laps, loaded)
+    # A dry rerun removes the reconstruction's own records.
+    rc.write("toy-1990", rc.reconstruct(toy()), tmp_path)
+    assert not ingest.weather_path("toy-1990", tmp_path).exists()
+
+
+def test_dry_race_is_unchanged_by_the_weather_terms(solved):
+    assert solved.weather is None and "weather" not in solved.sidecar
+    assert solved.laps["Compound"].isna().all()
+    assert not any(r["anchor"] == "tyre" for r in solved.sidecar["anchors"])
+
+
+def test_tyre_changes_label_f1db_stops(tmp_path, empty_drivers):
+    first = pd.read_csv(F1DB / "australia-1994.stops.csv").iloc[1]  # Blundell, lap 14
+    facts = {
+        "weather": {
+            "timeline": [{"fromLap": 1, "toLap": 81, "state": "dry", "source": SRC}],
+            "startTyre": {"tyre": "slick", "source": SRC},
+            "tyreChanges": [
+                {
+                    "number": int(first["number"]),
+                    "lap": int(first["lap"]),
+                    "tyre": "wet",
+                    "source": SRC,
+                },
+                {"number": int(first["number"]), "lap": 3, "tyre": "wet", "source": SRC},
+            ],
+        }
+    }
+    d = _facts(tmp_path, "australia-1994", facts)
+    a = rc.load_anchors(
+        "australia-1994", dump_dir=DUMP, f1db_dir=F1DB, facts_dir=d, drivers_path=empty_drivers
+    )
+    car = next(c for c in a.cars if c.number == int(first["number"]))
+    assert [s.tyre for s in car.stops if s.lap == int(first["lap"])] == ["wet"]
+    assert any("no stop on lap 3" in n for n in a.notes)
+    assert a.wetness == [0.0] * a.laps
