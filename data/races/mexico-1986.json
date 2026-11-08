@@ -663,11 +663,7 @@
       "type": "win"
     },
     "storyline": {
-      "real": "Berger wins without a tyre stop on Pirellis, his and Benetton's first win; Prost second",
-      "rewriteCondition": {
-        "type": "win"
-      },
-      "headline": "Berger runs non-stop to Benetton's first victory"
+      "real": "Berger wins without a tyre stop on Pirellis, his and Benetton's first win; Prost second"
     },
     "mastery": {
       "type": "stop_count",

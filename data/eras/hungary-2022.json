@@ -16,11 +16,7 @@
       "type": "win"
     },
     "storyline": {
-      "real": "Verstappen wins from tenth on the grid, through a mid-race spin, after Ferrari moves Leclerc onto the hard tyres.",
-      "rewriteCondition": {
-        "type": "win"
-      },
-      "headline": "Tenth on the grid, first at the flag: the Hungaroring falls to Red Bull's tyre calls"
+      "real": "Verstappen wins from tenth on the grid, through a mid-race spin, after Ferrari moves Leclerc onto the hard tyres."
     },
     "mastery": {
       "type": "compound_rule",

@@ -8,7 +8,7 @@ import { describe, expect, it } from 'vitest';
 import abuJson from '../../../data/races/abu-dhabi-2021.json';
 import canadaJson from '../../../data/races/canada-2024.json';
 import vectors from '../../../pipeline/tests/fixtures/refuel_parity.json';
-import { gradeMoment } from '../src/grade.js';
+import { gradeMoment, playOption } from '../src/grade.js';
 import { type DecisionMoment, boxCall, candidateMoments, pauseAt } from '../src/moments.js';
 import { planCalls, validatePlan } from '../src/plan.js';
 import { enginePlans } from '../src/planner.js';
@@ -354,13 +354,18 @@ describe('the player in a refuelling race', () => {
     expect(g.options).toHaveLength((m as DecisionMoment).options.length);
   });
 
-  it("the grader's playouts keep the tank but never stop the car dry", () => {
+  it("an Eras race's playouts keep the live tank: a car that doesn't stop runs dry", () => {
+    // refuelRace has a rules block, so it is an Eras race (sim.ts erasRace).
     const run = initRun(refuelRace, 1, { decisions: [] });
     const fork = forkRun(run, 7, [], { blindAfter: 35 });
     expect(user(fork).tank).toBe(user(run).tank);
-    expect(user(fork).tankLive).toBeUndefined();
+    expect(user(fork).tankLive).toBe(true);
     while (!isFinished(fork)) stepLap(fork);
-    expect(user(fork).retired).toBe(false);
+    expect(user(fork).retired).toBe(true);
+    // The grader's continuation (the real team's plan) refuels it, as the real team did.
+    const graded = playOption(run, 7, { id: 'stay', decisions: [] });
+    while (!isFinished(graded)) stepLap(graded);
+    expect(user(graded).retired).toBe(false);
   });
 
   it('the planner stops a car that is short of the flag, before it runs dry', () => {

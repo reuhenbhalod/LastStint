@@ -14,7 +14,7 @@
     "userSide": "MSCM",
     "hardCalls": {
       "MSCM": 2,
-      "PAT": 0
+      "MAN": 0
     },
     "target": {
       "type": "win"
@@ -38,6 +38,14 @@
       "seconds": 37,
       "label": "Win by more than Schumacher's real 36.6 seconds"
     },
-    "briefing": "Spa, 1992. Rain arrived just before the start and everyone has stopped for wets. Now a dry line is appearing. Schumacher's Benetton started third. Pit board only: call the slicks. Reconstructed race: no lap timing survives, so the laps are rebuilt to fit the result, the fastest laps and the sourced stops (Jolpica, F1DB, Motor Sport, Wikipedia). The lap-by-lap gaps and running order are synthetic, not history."
+    "briefing": "Spa, 1992. Rain arrived just before the start and everyone has stopped for wets. Now a dry line is appearing. Schumacher's Benetton started third. Pit board only: call the slicks. Reconstructed race: no lap timing survives, so the laps are rebuilt to fit the result, the fastest laps and the sourced stops (Jolpica, F1DB, Motor Sport, Wikipedia). The lap-by-lap gaps and running order are synthetic, not history.",
+    "storylineCalls": [
+      {
+        "driver": "MAN",
+        "lap": 34,
+        "real": "Mansell stays out on wets until the end of lap 33, three laps after Schumacher's slick stop at the end of lap 30, and finishes second",
+        "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement"
+      }
+    ]
   }
 }

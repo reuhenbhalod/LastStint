@@ -7,11 +7,7 @@
       "type": "defend"
     },
     "storyline": {
-      "real": "Prost leads in heavy rain; the race is stopped and the result taken from lap 31, Senna 7.4 s behind and closing",
-      "rewriteCondition": {
-        "type": "defend"
-      },
-      "headline": "Prost keeps the Toleman behind him in the Monte Carlo downpour"
+      "real": "Prost leads in heavy rain; the race is stopped and the result taken from lap 31, Senna 7.4 s behind and closing"
     },
     "mastery": {
       "type": "mode_rule",

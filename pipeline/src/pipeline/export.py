@@ -23,8 +23,9 @@ def load_schema(schema_path: Path = SCHEMA_PATH) -> dict:
 def check_references(model: dict) -> None:
     """Raise ValueError if the Eras block names a driver who isn't in the race.
 
-    Covers eras.userSide, the hardCalls keys and the rival of a beat-rival / deny target or
-    rewrite condition. A race without an Eras block always passes.
+    Covers eras.userSide, the hardCalls keys, the rival of a beat-rival / deny target or
+    rewrite condition, and the storyline calls' drivers (each call must be one of its driver's
+    real stops). A race without an Eras block always passes.
     """
     eras = model.get("eras")
     if not eras:
@@ -35,16 +36,27 @@ def check_references(model: dict) -> None:
         named.append(("eras.userSide", eras["userSide"]))
     named += [(f"eras.hardCalls.{code}", code) for code in eras.get("hardCalls", {})]
     conditions = [("eras.target", eras.get("target"))]
-    if "storyline" in eras:
-        conditions.append(
-            ("eras.storyline.rewriteCondition", eras["storyline"]["rewriteCondition"])
-        )
+    # A race the Eras side really won has no rewrite condition (owner decision, Nov 8 2026).
+    rewrite = (eras.get("storyline") or {}).get("rewriteCondition")
+    if rewrite:
+        conditions.append(("eras.storyline.rewriteCondition", rewrite))
     named += [
         (f"{where}.rival", cond["rival"]) for where, cond in conditions if cond and "rival" in cond
     ]
+    calls = eras.get("storylineCalls") or []
+    named += [(f"eras.storylineCalls[{i}].driver", c["driver"]) for i, c in enumerate(calls)]
     unknown = [f"{where}={code}" for where, code in named if code not in codes]
     if unknown:
         raise ValueError(f"{model['race']['id']}: drivers not in the race: {', '.join(unknown)}")
+    # A storyline call is one of its driver's real stops (its out-lap).
+    real = {d["code"]: {s["lap"] for s in d["realStrategy"]} for d in model["drivers"]}
+    stray = [
+        f"eras.storylineCalls[{i}] ({c['driver']} lap {c['lap']})"
+        for i, c in enumerate(calls)
+        if c["lap"] not in real[c["driver"]]
+    ]
+    if stray:
+        raise ValueError(f"{model['race']['id']}: not a real stop: {', '.join(stray)}")
 
 
 def validate_model(model: dict, schema_path: Path = SCHEMA_PATH) -> None:

@@ -349,6 +349,32 @@ germany-2018, germany-2019, brazil-2019) and the five shared races.
 - germany-1986, australia-1986 and monaco-1988 failed in 6.2-era1 on their frozen storyline
   retirements and now pass (M4).
 
+## Reachability after the Eras grader fixes (Nov 8 2026)
+
+docs/eras-grader.md has the changes (fuel in fuel-rule playouts, the real-plan continuation,
+storyline calls, no rewrite where the Eras side really won). Re-run on the same 30 race files
+and the five shared races: **25 pass, 10 fail of 35** (was 31 / 4). Daily and Gauntlet grades are
+unchanged (all 256 pool moments graded byte-identically before and after).
+
+| Race | Before | After | Why it moved |
+|---|---|---|---|
+| australia-1994 | fail | **pass** | under the new grades a path (rivalpit-18 box-medium, then standard pace) earns every goal on seed 2 |
+| europe-1993 | pass (rival Prost) | pass (rival **Hill** again) | Hill's sourced stops are storyline calls, the second `untilFlag` |
+| belgium-1992 | pass (rival Patrese) | pass (rival **Mansell** again) | Mansell's slick stop (in-lap 33) is a storyline call |
+| germany-1986, mexico-1986, great-britain-1987, portugal-1984 | pass | **fail** | fuel now in playouts: with the takeover margin short, "keep" at the early pace calls grades as running dry (red) and lifting early grades best; the ★3 / hidden objectives that need full pace (germany-1986 win, mexico-1986 25.4 s margin, great-britain-1987 one stop, portugal-1984 no stop with lift) aren't met on any searched path. Content to re-author (owner) |
+| belgium-1995 | pass | **fail** | hidden (no full wets): the real-plan continuation grades box-wet best at stop-30 |
+| brazil-2019 | pass | **fail** | mastery (two stops at most): the real three-stop plan now grades best at stop-20 and stop-43 |
+| hungary-2019 (shared) | pass | **fail** | stay-out earns ★3 on seed 3 (mastery `stop_count` max 1 is met by no stop; the label says "Win on a single stop"); Legend: hidden (no hards) not met |
+| hungary-1992 | fail | fail | now ★1 ★2 ★3 (stay out no longer grades above the stop); only the hidden objective (win) is missed |
+| europe-2012, mexico-1990 | fail | fail | unchanged causes (Legend path; no decision moments) |
+
+austria-2002's takeover stays at lap 26. From lap 21 the grader now prices the lap-24 SC call
+right (stay out runs dry on lap 27 and grades red; box with the real fill grades best), and with a
+lap-24 stop moment and a two-stop mastery both levels pass. But the hard-call counter from lap 21
+gives MSCM 1, BAR 0, which would move the Eras side to Schumacher: an owner decision, not done.
+The stored `hardCalls` were counted with the old grader; europe-1993's from the rebuilt file with
+the new one is SENA 2, HIL 2 (the gave-up rule would pick HIL): not changed, owner to confirm.
+
 ## Not built
 
 - **china-2007** (Era 5): the user's car, Hamilton, isn't in the race model. He ran only wet

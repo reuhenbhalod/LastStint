@@ -38,9 +38,10 @@ const DAILY_HASHES: Record<string, string> = {
   'russia-2021': '038a27369e37f828e0f66081ba284c99ebf6af2e9f2e30ec0943928daedf06fa',
 };
 // Their Eras models' hashes (race file + the overlay as authored in step 6.2, Nov 8 2026):
-// change only with the overlay.
+// change only with the overlay. abu-dhabi-2021's moved when its rewrite condition was taken out
+// (the Eras side really won; Eras grader fixes, Nov 8 2026).
 const ERAS_HASHES: Record<string, string> = {
-  'abu-dhabi-2021': 'b3bfaf94b20bca54c2f8539d5dced3e15d2106eb036715b6bfe4992021513b4a',
+  'abu-dhabi-2021': '627c17d9d67987892ffd61f6549c09c2e589e249f59028f78a6c0310a0af5bcf',
   'bahrain-2021': '3fc5e332a9dde5d1f108c5006fcc963f0be1b80bb6ab902b2be9355c91ddd82e',
   'france-2021': '3eb876094b718d969f3e1d2ace907a7618b3e7e33347d1069c416960598511c4',
   'hungary-2019': '084731e29cfbaffbad2da4e2f6af3634dbb2f9dc66a41bc52d33ee4ccd0d925e',

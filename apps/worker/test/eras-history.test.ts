@@ -201,15 +201,18 @@ describe('GET /api/history', () => {
 
     const book = await json<HistoryBook>(`/api/history?anonId=${ids.a}`);
 
-    // By hand: 49 stars (30 + 9 + 10), 30 Legend stars, 3 rewrites, 3 hidden, 4 badges.
+    // By hand: 49 stars (30 + 9 + 10), 30 Legend stars, 3 rewrites, 3 hidden, 4 badges. The
+    // rewrites total leaves out the seven races the Eras side really won (no rewrite condition:
+    // germany-2018, germany-2019, abu-dhabi-2021, hungary-1986, mexico-1986, monaco-1984,
+    // portugal-1985; hungary-2022 has one in this isolate's bundle, above).
     expect(book.collectibles).toEqual({
       stars: { have: 49, total: 300 },
       legendStars: { have: 30, total: 300 },
-      rewrites: { have: 3, total: 100 },
+      rewrites: { have: 3, total: 93 },
       hidden: { have: 3, total: 100 },
       badges: { have: 4, total: 30 },
     });
-    expect(book.completion).toEqual({ collected: 89, total: 830, percent: (89 / 830) * 100 });
+    expect(book.completion).toEqual({ collected: 89, total: 823, percent: (89 / 823) * 100 });
 
     // And the same from D1 directly.
     const mine = 'FROM era_progress WHERE player_id = ?';
@@ -250,16 +253,16 @@ describe('GET /api/history', () => {
     });
     expect(e9).toMatchObject({
       stars: { have: 9, total: 30 },
-      rewrites: { have: 0, total: 10 },
+      rewrites: { have: 0, total: 9 }, // abu-dhabi-2021 has no rewrite
       hidden: { have: 0, total: 10 },
       badges: { cleared: false, mastered: false, legend: false },
-      percent: (9 / 83) * 100,
+      percent: (9 / 82) * 100,
     });
     expect(e8).toMatchObject({
       stars: { have: 10, total: 30 },
-      rewrites: { have: 1, total: 10 },
+      rewrites: { have: 1, total: 8 }, // nor germany-2018 and germany-2019
       badges: { cleared: true, mastered: false, legend: false },
-      percent: (12 / 83) * 100,
+      percent: (12 / 81) * 100,
     });
     expect(e7).toMatchObject({ stars: { have: 0, total: 30 }, percent: 0 });
 
@@ -295,7 +298,7 @@ describe('GET /api/history', () => {
 
   it('a new player: nothing collected, every era listed', async () => {
     const book = await json<HistoryBook>(`/api/history?anonId=${ids.c}`);
-    expect(book.completion).toEqual({ collected: 0, total: 830, percent: 0 });
+    expect(book.completion).toEqual({ collected: 0, total: 823, percent: 0 });
     expect(book.eras).toHaveLength(10);
     expect(book.entries).toEqual([]);
   });

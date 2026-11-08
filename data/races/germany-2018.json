@@ -1419,11 +1419,7 @@
       "type": "win"
     },
     "storyline": {
-      "real": "Hamilton wins from 14th on the grid: rain arrives late, the leader Vettel slides into the barriers, and Hamilton stays out under the safety car.",
-      "rewriteCondition": {
-        "type": "win"
-      },
-      "headline": "From fourteenth to the top step at Hockenheim"
+      "real": "Hamilton wins from 14th on the grid: rain arrives late, the leader Vettel slides into the barriers, and Hamilton stays out under the safety car."
     },
     "mastery": {
       "type": "compound_rule",

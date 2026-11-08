@@ -773,10 +773,16 @@
           "type": "object",
           "additionalProperties": false,
           "required": [
-            "real",
-            "rewriteCondition",
-            "headline"
+            "real"
           ],
+          "dependentRequired": {
+            "rewriteCondition": [
+              "headline"
+            ],
+            "headline": [
+              "rewriteCondition"
+            ]
+          },
           "properties": {
             "real": {
               "type": "string",
@@ -785,12 +791,12 @@
             },
             "rewriteCondition": {
               "$ref": "#/$defs/erasTarget",
-              "description": "The result that rewrites the storyline, from the player's side."
+              "description": "The result that rewrites the storyline, from the player's side. Absent: the Eras side really won, so the race has no history-book rewrite (owner decision, Nov 8 2026)."
             },
             "headline": {
               "type": "string",
               "minLength": 1,
-              "description": "An original history-book headline (never quoted team radio)."
+              "description": "An original history-book headline (never quoted team radio): with a rewrite condition, and only with one."
             }
           }
         },
@@ -816,6 +822,45 @@
           "type": "string",
           "minLength": 1,
           "description": "The short era-appropriate intro shown before the race."
+        },
+        "storylineCalls": {
+          "type": "array",
+          "description": "The rival's real stops the storyline turns on (Eras grader fixes, Nov 8 2026): when the driver is the race's rival from the Eras side, in live play it makes them on their real laps whatever its policy; no rival rule or decision point changes its plan before the last of them (or to the flag after one marked untilFlag).",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "driver",
+              "lap",
+              "real",
+              "source"
+            ],
+            "properties": {
+              "driver": {
+                "$ref": "#/$defs/driverCode",
+                "description": "The storyline driver."
+              },
+              "lap": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "The stop's out-lap: one of the driver's real stops."
+              },
+              "real": {
+                "type": "string",
+                "minLength": 1,
+                "description": "What really happened."
+              },
+              "source": {
+                "type": "string",
+                "pattern": "^https?://",
+                "description": "Where the fact was checked (URLs, '; '-separated)."
+              },
+              "untilFlag": {
+                "type": "boolean",
+                "description": "The rival keeps its real plan after this stop too, to the flag."
+              }
+            }
+          }
         },
         "storylineRetirements": {
           "type": "array",

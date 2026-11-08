@@ -33,6 +33,18 @@ const RACE_FILES = import.meta.glob<{ default: RaceModel }>('../../../../data/ra
 const raceFile = (raceId: string) => RACE_FILES[`../../../../data/races/${raceId}.json`];
 const MODEL_URL = /^mock:\/\/races\/([a-z0-9-]+)$/;
 
+// The authored Eras blocks (data/eras overlays), for which races have a rewrite to collect.
+const ERAS_BLOCKS = import.meta.glob<RaceModel['eras']>('../../../../data/eras/*.json', {
+  eager: true,
+  import: 'eras',
+});
+
+/** As the Worker's hasRewrite: a storyline without a rewrite condition has none to collect. */
+function hasRewrite(raceId: string): boolean {
+  const storyline = ERAS_BLOCKS[`../../../../data/eras/${raceId}.json`]?.storyline;
+  return !storyline || storyline.rewriteCondition !== undefined;
+}
+
 /** Whether the mock can start an attempt on a race: an Eras race with a bundled race file. */
 export function mockCanStart(raceId: string): boolean {
   return eraRace(raceId) !== undefined && raceFile(raceId) !== undefined;
@@ -102,6 +114,7 @@ function mockHistory(): HistoryBook {
     const stars = races.reduce((t, r) => t + starCount(normal(r.raceId)), 0);
     const legendStars = races.reduce((t, r) => t + starCount(legend(r.raceId)), 0);
     const rewritten = races.filter((r) => rewrites.has(r.raceId)).length;
+    const rewritable = races.filter((r) => hasRewrite(r.raceId)).length;
     const hidden = races.filter(
       (r) => normal(r.raceId)?.hiddenDone || legend(r.raceId)?.hiddenDone,
     ).length;
@@ -112,7 +125,7 @@ function mockHistory(): HistoryBook {
     };
     const badgeCount = Number(badges.cleared) + Number(badges.mastered) + Number(badges.legend);
     const collected = stars + legendStars + rewritten + hidden + badgeCount;
-    const total = 3 * n * 2 + n + n + 3;
+    const total = 3 * n * 2 + rewritable + n + 3;
     return {
       eraId: era.id,
       name: era.name,
@@ -121,7 +134,7 @@ function mockHistory(): HistoryBook {
       races: n,
       stars: tally(stars, 3 * n),
       legendStars: tally(legendStars, 3 * n),
-      rewrites: tally(rewritten, n),
+      rewrites: tally(rewritten, rewritable),
       hidden: tally(hidden, n),
       badges,
       percent: (collected / total) * 100,

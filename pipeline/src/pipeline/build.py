@@ -1380,16 +1380,16 @@ RACES: dict[str, dict] = {
         "year": 1992,
         "event": "Belgian",
         "source": "reconstruct",
-        "name": "Belgium 1992: Schumacher vs Patrese",
+        "name": "Belgium 1992: Schumacher vs Mansell",
         "era": "1988-1993",
         "takeover_lap": None,  # D3 rule
         "seed": 1,
         "user_side": "MSCM",
-        # 6.2: Patrese, not Mansell. Eras 2-3 run the rival as Expert, which takes the slicks
-        # on the crossover; as Mansell (real slick in-lap 33, Motor Sport) it wins every
-        # checked path, so the storyline's late Williams call could not happen. Mansell runs
-        # his real strategy instead.
-        "rival": "PAT",  # win: Schumacher times the slicks; Patrese the other Williams
+        # Mansell again (Eras grader fixes, Nov 8 2026): 6.2 made Patrese the rival because the
+        # Expert rival took the slicks on the crossover and won every path. The overlay now
+        # flags Mansell's real late slick stop (in-lap 33, Motor Sport) as a storyline call
+        # (eras.storylineCalls), so the rival makes it on its real lap whatever its policy.
+        "rival": "MAN",  # win: Schumacher times the slicks; Mansell's late Williams call
         "score_positions": 6,
         "split": "eras",
     },
@@ -1417,15 +1417,16 @@ RACES: dict[str, dict] = {
         "year": 1993,
         "event": "European",
         "source": "reconstruct",
-        "name": "Europe 1993: Senna vs Prost",
+        "name": "Europe 1993: Senna vs Hill",
         "era": "1988-1993",
         "takeover_lap": None,  # D3 rule
         "seed": 1,
         "user_side": "SENA",
-        # 6.2: Prost, not Hill. As the Expert rival Hill fixes his real calls and wins every
-        # checked path by over a minute; Hill now runs his real strategy. Prost made seven
-        # pit calls to Senna's four (Wikipedia).
-        "rival": "PRO",  # win: Senna through the wet-dry calls; Prost P3
+        # Hill again (Eras grader fixes, Nov 8 2026): 6.2 made Prost the rival because the
+        # Expert rival Hill fixed his real calls and won every path. The overlay now flags
+        # Hill's sourced slick and wet stops (Motor Sport) as storyline calls
+        # (eras.storylineCalls), so the rival makes them on their real laps whatever its policy.
+        "rival": "HIL",  # win: Senna through the wet-dry calls; Hill P2, the only car not lapped
         "score_positions": 6,
         "split": "eras",
     },

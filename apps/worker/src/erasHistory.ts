@@ -11,7 +11,8 @@
 // The player is resolved as every Eras route does (eras.ts playerOf: the linked account, else
 // the anonId). Counts come straight from D1: stars, Legend stars and hidden objectives from
 // era_progress, rewrites from history_entries, badges derived from them (spec §12: never
-// stored). The totals are the campaign's (every era_races row; 830 with the 100 races).
+// stored). The totals are the campaign's (every era_races row; 830 with the 100 races, less
+// one rewrite for each race the Eras side really won: it has no rewrite condition, hasRewrite).
 //
 // Community stats (spec §8: "Only 9% of strategists rewrote this race") are one grouped
 // summary of every race, cached in the Cache API for CACHE_SECONDS (as the Daily stats are):
@@ -26,7 +27,7 @@
 // content update keeps every attempt on the board (decided Nov 7).
 
 import type { Context, Hono } from 'hono';
-import { erasTestMode, getErasRace, playerOf } from './eras.js';
+import { erasTestMode, getErasRace, hasRewrite, playerOf } from './eras.js';
 import type { Env } from './index.js';
 import { displayName } from './names.js';
 import { DISPLAY_NAME } from './players.js';
@@ -329,6 +330,8 @@ export async function historyBook(
     const stars = own.reduce((t, r) => t + starsOf(normal.get(r.race_id)), 0);
     const legendStars = own.reduce((t, r) => t + starsOf(legend.get(r.race_id)), 0);
     const rewrites = own.filter((r) => rewritten.has(r.race_id)).length;
+    // Only races with a rewrite condition have one to collect (eras.ts hasRewrite).
+    const rewritable = own.filter((r) => hasRewrite(r.race_id)).length;
     // One hidden objective per race (spec §6), met in either mode.
     const hidden = own.filter(
       (r) => normal.get(r.race_id)?.hidden_done === 1 || legend.get(r.race_id)?.hidden_done === 1,
@@ -340,7 +343,7 @@ export async function historyBook(
     };
     const badgeCount = Number(badges.cleared) + Number(badges.mastered) + Number(badges.legend);
     const collected = stars + legendStars + rewrites + hidden + badgeCount;
-    const total = STARS * n * 2 + n + n + BADGES;
+    const total = STARS * n * 2 + rewritable + n + BADGES;
     eraList.push({
       eraId: era.id,
       name: era.name,
@@ -349,7 +352,7 @@ export async function historyBook(
       races: n,
       stars: tally(stars, STARS * n),
       legendStars: tally(legendStars, STARS * n),
-      rewrites: tally(rewrites, n),
+      rewrites: tally(rewrites, rewritable),
       hidden: tally(hidden, n),
       badges,
       percent: (collected / total) * 100,

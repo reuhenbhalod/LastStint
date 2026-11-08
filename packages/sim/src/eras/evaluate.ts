@@ -85,7 +85,8 @@ export interface ErasEvaluation {
   cleanCalls: boolean;
   /** The hidden objective was met; null when the race has none authored. */
   hidden: boolean | null;
-  /** The storyline's rewrite condition was met; null when the race has no storyline. */
+  /** The storyline's rewrite condition was met; null when the race has none (no storyline,
+   * or the Eras side really won: no rewrite). */
   rewrite: boolean | null;
   /** Mean decisionAccuracy over the graded calls, 0-100 (0 with no graded calls). */
   raceAccuracy: number;
@@ -296,7 +297,9 @@ export function evaluateEras(input: ErasEvaluationInput): ErasEvaluation {
     masteryObjective,
     cleanCalls,
     hidden: eras.hidden ? objectiveMet(race, eras.hidden) : null,
-    rewrite: eras.storyline ? targetMet(race, eras.storyline.rewriteCondition) : null,
+    rewrite: eras.storyline?.rewriteCondition
+      ? targetMet(race, eras.storyline.rewriteCondition)
+      : null,
     raceAccuracy,
     decisionAccuracies,
     untimed,

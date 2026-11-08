@@ -7,11 +7,7 @@
       "type": "defend"
     },
     "storyline": {
-      "real": "Senna wins his first Grand Prix in heavy rain, more than a minute clear of Alboreto",
-      "rewriteCondition": {
-        "type": "defend"
-      },
-      "headline": "Senna's first win, from the front, through the Estoril floods"
+      "real": "Senna wins his first Grand Prix in heavy rain, more than a minute clear of Alboreto"
     },
     "mastery": {
       "type": "margin",
