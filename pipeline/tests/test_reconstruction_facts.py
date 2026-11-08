@@ -94,3 +94,28 @@ def test_stops_name_cars_in_the_race(race_id):
     assert [(sc.start, sc.end) for sc in anchors.safety_cars] == [
         (sc["startLap"], sc["endLap"]) for sc in facts["safetyCars"]
     ]
+
+
+# The wet races (docs/eras-checks/r2-reconstruction-facts.md, weather): each has a sourced
+# weather timeline; the rest are dry.
+WET = ["monaco-1984", "portugal-1985", "belgium-1992", "brazil-1993", "europe-1993", "belgium-1995"]
+
+
+@pytest.mark.parametrize("race_id", RACES)
+def test_weather_only_on_the_wet_races(race_id):
+    weather = rc.load_facts(race_id).get("weather")
+    assert (weather is not None) == (race_id in WET)
+    if weather:
+        assert all(str(e["source"]).strip() for e in weather["timeline"])
+        assert any(e.get("state", "dry") != "dry" for e in weather["timeline"])
+
+
+@pytest.mark.parametrize("race_id", WET)
+def test_weather_covers_the_race_and_its_tyres_find_their_stops(race_id):
+    dump = _dump()
+    if dump is None:
+        pytest.skip("no Jolpica dump cached")
+    anchors = rc.load_anchors(race_id, dump_dir=dump, **LOOKUP.get(race_id, {}))
+    assert anchors.wetness is not None and len(anchors.wetness) == anchors.laps
+    assert max(anchors.wetness) >= rc.STATE_WETNESS["wet"]
+    assert not [n for n in anchors.notes if n.startswith("weather ")]

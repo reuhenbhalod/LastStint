@@ -6,5 +6,16 @@
     "stops": false,
     "safetyCars": true
   },
-  "notes": "Wet race stopped after 31 laps (red flag at the end of lap 32; result taken at lap 31). No leader's stop is reported. Motor Sport Jul 1984 (https://www.motorsportmagazine.com/archive/article/july-1984/84/reflections-in-the-monte-carlo-puddles/) says Laffite (#5) 'made a pit stop for fresh tyres after suspecting his FW09 was suffering from a puncture' (no lap). Stops not complete."
+  "notes": "Wet race stopped after 31 laps (red flag at the end of lap 32; result taken at lap 31). No leader's stop is reported. Motor Sport Jul 1984 (https://www.motorsportmagazine.com/archive/article/july-1984/84/reflections-in-the-monte-carlo-puddles/) says Laffite (#5) 'made a pit stop for fresh tyres after suspecting his FW09 was suffering from a puncture' (no lap). Stops not complete. Weather: no source read names the tyres the cars ran (Motor Sport mentions only Laffite's 'fresh tyres'), so every stint's tyre is estimated (wets, at heavy rain).",
+  "weather": {
+    "timeline": [
+      {
+        "fromLap": 1,
+        "toLap": 32,
+        "state": "heavy",
+        "source": "https://en.wikipedia.org/wiki/1984_Monaco_Grand_Prix ('The race start was delayed by 45 minutes due to the heavy rain'; 'The race, held amidst heavy rain'; infobox 'Heavy rain and spray'); https://www.motorsportmagazine.com/archive/article/july-1984/84/reflections-in-the-monte-carlo-puddles/ (results header: 'Torrential rain'); https://www.autosport.com/f1/news/when-senna-and-bellof-starred-in-monaco-as-prost-prevailed/6530051/ ('as a monsoon soaked the French riviera'; 'the rain intensified at this point' around Senna's laps 23-24; 'The race conditions also got progressively worse, as laptimes dropped by up to 5s')",
+        "note": "Heavy throughout. Autosport has the rain heavier from about lap 23 and 'even harder' before the stop; Motor Sport's 'arrival of Senna' feature (https://motorsportmagazine.com/articles/single-seaters/f1/1984-monaco-grand-prix-the-arrival-of-senna) says 'the rain was actually easing off' (no lap). The sources conflict, so no change is modelled. The timeline runs to lap 32, the red-flag lap; the reconstruction uses laps 1-31."
+      }
+    ]
+  }
 }

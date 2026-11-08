@@ -7,7 +7,8 @@
       "lap": 27,
       "laneTime": null,
       "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna",
-      "note": "wets"
+      "note": "wets",
+      "tyre": "wet"
     },
     {
       "number": 12,
@@ -15,7 +16,8 @@
       "lap": 27,
       "laneTime": null,
       "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna",
-      "note": "wets"
+      "note": "wets",
+      "tyre": "wet"
     },
     {
       "number": 19,
@@ -23,7 +25,8 @@
       "lap": 27,
       "laneTime": null,
       "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna",
-      "note": "wets"
+      "note": "wets",
+      "tyre": "wet"
     },
     {
       "number": 4,
@@ -31,7 +34,8 @@
       "lap": 27,
       "laneTime": null,
       "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna",
-      "note": "wets"
+      "note": "wets",
+      "tyre": "wet"
     },
     {
       "number": 21,
@@ -39,7 +43,8 @@
       "lap": 27,
       "laneTime": null,
       "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna",
-      "note": "wets"
+      "note": "wets",
+      "tyre": "wet"
     },
     {
       "number": 0,
@@ -47,7 +52,8 @@
       "lap": 28,
       "laneTime": null,
       "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna",
-      "note": "wets"
+      "note": "wets",
+      "tyre": "wet"
     },
     {
       "number": 30,
@@ -55,7 +61,8 @@
       "lap": 28,
       "laneTime": null,
       "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna",
-      "note": "wets"
+      "note": "wets",
+      "tyre": "wet"
     },
     {
       "number": 11,
@@ -63,7 +70,8 @@
       "lap": 28,
       "laneTime": null,
       "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna",
-      "note": "wets"
+      "note": "wets",
+      "tyre": "wet"
     },
     {
       "number": 26,
@@ -71,7 +79,8 @@
       "lap": 28,
       "laneTime": null,
       "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna",
-      "note": "wets"
+      "note": "wets",
+      "tyre": "wet"
     },
     {
       "number": 9,
@@ -79,7 +88,8 @@
       "lap": 28,
       "laneTime": null,
       "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna",
-      "note": "wets"
+      "note": "wets",
+      "tyre": "wet"
     },
     {
       "number": 22,
@@ -87,7 +97,8 @@
       "lap": 28,
       "laneTime": null,
       "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna",
-      "note": "wets"
+      "note": "wets",
+      "tyre": "wet"
     },
     {
       "number": 20,
@@ -95,7 +106,8 @@
       "lap": 28,
       "laneTime": null,
       "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna",
-      "note": "wets"
+      "note": "wets",
+      "tyre": "wet"
     },
     {
       "number": 5,
@@ -103,7 +115,8 @@
       "lap": 30,
       "laneTime": null,
       "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna",
-      "note": "wets; 'a disaster': the car fell off its jack and a wheel nut stuck"
+      "note": "wets; 'a disaster': the car fell off its jack and a wheel nut stuck",
+      "tyre": "wet"
     },
     {
       "number": 27,
@@ -111,7 +124,8 @@
       "lap": 30,
       "laneTime": null,
       "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna",
-      "note": "wets"
+      "note": "wets",
+      "tyre": "wet"
     },
     {
       "number": 12,
@@ -119,7 +133,8 @@
       "lap": 37,
       "laneTime": null,
       "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna",
-      "note": "slicks, very fast stop as the safety car came in"
+      "note": "slicks, very fast stop as the safety car came in",
+      "tyre": "slick"
     },
     {
       "number": 8,
@@ -127,7 +142,8 @@
       "lap": 40,
       "laneTime": null,
       "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna",
-      "note": "slicks, 'at the end of lap 40'"
+      "note": "slicks, 'at the end of lap 40'",
+      "tyre": "slick"
     },
     {
       "number": 0,
@@ -135,7 +151,8 @@
       "lap": 41,
       "laneTime": null,
       "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna",
-      "note": "slicks, 'at the end of 41'"
+      "note": "slicks, 'at the end of 41'",
+      "tyre": "slick"
     },
     {
       "number": 5,
@@ -158,5 +175,60 @@
     "stops": false,
     "safetyCars": true
   },
-  "notes": "Senna also served a 10 s stop-and-go before the rain (penalty issued on lap 25 per Wikipedia; lap served not given). Schumacher's slick stop, Alesi's two stop-and-gos (20 s and 10 s), Katayama's and Suzuki's early stops, and most slick stops: no laps. Prost (#2) stayed out and crashed on lap 29."
+  "notes": "Senna also served a 10 s stop-and-go before the rain (penalty issued on lap 25 per Wikipedia; lap served not given). Schumacher's slick stop, Alesi's two stop-and-gos (20 s and 10 s), Katayama's and Suzuki's early stops, and most slick stops: no laps. Prost (#2) stayed out and crashed on lap 29. Weather: Schumacher's lap-41 stop is a stop-and-go (no tyre change) and his slick stop has no lap, so his stint from lap 42 is estimated (slicks). Cars with no sourced wet stop run their start slicks through the rain: the snapshot invents no stops.",
+  "weather": {
+    "timeline": [
+      {
+        "fromLap": 1,
+        "toLap": 25,
+        "state": "dry",
+        "source": "https://en.wikipedia.org/wiki/1993_Brazilian_Grand_Prix (infobox: 'Dry first then torrential rain for a short period'); https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna ('from the 17th lap the skies had indeed been darkening ominously'; 'By lap 26 spots were falling')"
+      },
+      {
+        "fromLap": 26,
+        "toLap": 26,
+        "state": "damp",
+        "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna ('By lap 26 spots were falling on windscreens and visors')"
+      },
+      {
+        "fromLap": 27,
+        "toLap": 29,
+        "state": "heavy",
+        "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna ('by lap 27 the monsoon arrived'; 'the first corner was totally awash where a river was running across the track'); https://en.wikipedia.org/wiki/1993_Brazilian_Grand_Prix ('There was a heavy rain shower'; 'With the rain coming down harder')"
+      },
+      {
+        "fromLap": 30,
+        "toLap": 36,
+        "state": "heavy",
+        "toState": "wet",
+        "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna ('The pace car had come out on lap 30'; 'It was lap 37 before the racing resumed'); https://en.wikipedia.org/wiki/1993_Brazilian_Grand_Prix ('The rain stopped and the safety car went in')",
+        "note": "Behind the safety car; no source describes these laps' track state. Ramped from the monsoon to wet, the rain having stopped by the restart (WP)."
+      },
+      {
+        "fromLap": 37,
+        "toLap": 39,
+        "state": "wet",
+        "toState": "damp",
+        "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna (lap 39: 'the track was drying rapidly again except for the pit straight'); https://en.wikipedia.org/wiki/1993_Brazilian_Grand_Prix ('The sun then came out, it began to dry rapidly and everyone stopped for dry tyres')"
+      },
+      {
+        "fromLap": 40,
+        "toLap": 43,
+        "state": "damp",
+        "toState": "dry",
+        "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna (slick stops: 'Senna made his at the end of lap 40 and Hill at the end of 41'; lap 43 'as his rivals made their slick stops')"
+      },
+      {
+        "fromLap": 44,
+        "toLap": 71,
+        "state": "dry",
+        "source": "https://en.wikipedia.org/wiki/1993_Brazilian_Grand_Prix (infobox: 'later drying and staying dry for the rest of the race')",
+        "note": "Motor Sport has Hill going 'wide one lap on the water in turn one' later on (puddles, not modelled)."
+      }
+    ],
+    "startTyre": {
+      "tyre": "slick",
+      "source": "https://en.wikipedia.org/wiki/1993_Brazilian_Grand_Prix ('many drivers pitted for wet tyres', Prost 'stayed out on slick tyres'); https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna (the wet-tyre stops on laps 27-30 after a dry start)"
+    }
+  }
 }

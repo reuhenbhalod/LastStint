@@ -7,7 +7,8 @@
       "lap": 3,
       "laneTime": null,
       "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement",
-      "note": "wets ('Mansell and Alesi at the end of lap three')"
+      "note": "wets ('Mansell and Alesi at the end of lap three')",
+      "tyre": "wet"
     },
     {
       "number": 27,
@@ -15,7 +16,8 @@
       "lap": 3,
       "laneTime": null,
       "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement",
-      "note": "wets"
+      "note": "wets",
+      "tyre": "wet"
     },
     {
       "number": 19,
@@ -23,7 +25,8 @@
       "lap": 4,
       "laneTime": null,
       "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement",
-      "note": "wets"
+      "note": "wets",
+      "tyre": "wet"
     },
     {
       "number": 20,
@@ -31,7 +34,8 @@
       "lap": 5,
       "laneTime": null,
       "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement",
-      "note": "wets"
+      "note": "wets",
+      "tyre": "wet"
     },
     {
       "number": 6,
@@ -39,7 +43,8 @@
       "lap": 6,
       "laneTime": null,
       "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement",
-      "note": "wets"
+      "note": "wets",
+      "tyre": "wet"
     },
     {
       "number": 12,
@@ -47,7 +52,8 @@
       "lap": 8,
       "laneTime": null,
       "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement",
-      "note": "wets"
+      "note": "wets",
+      "tyre": "wet"
     },
     {
       "number": 1,
@@ -55,7 +61,8 @@
       "lap": 16,
       "laneTime": null,
       "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement",
-      "note": "wets ('On lap 16 Senna finally yielded')"
+      "note": "wets ('On lap 16 Senna finally yielded')",
+      "tyre": "wet"
     },
     {
       "number": 1,
@@ -63,7 +70,8 @@
       "lap": 28,
       "laneTime": null,
       "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement",
-      "note": "slicks"
+      "note": "slicks",
+      "tyre": "slick"
     },
     {
       "number": 12,
@@ -71,7 +79,8 @@
       "lap": 30,
       "laneTime": null,
       "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement",
-      "note": "slicks"
+      "note": "slicks",
+      "tyre": "slick"
     },
     {
       "number": 19,
@@ -79,7 +88,8 @@
       "lap": 30,
       "laneTime": null,
       "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement; https://www.grandprix.com/gpe/rr528.html ('On lap 30 Schumacher went off at Stavelot and decided to stop immediately')",
-      "note": "slicks, the race-winning call"
+      "note": "slicks, the race-winning call",
+      "tyre": "slick"
     },
     {
       "number": 20,
@@ -87,7 +97,8 @@
       "lap": 31,
       "laneTime": null,
       "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement",
-      "note": "slicks, 'next time round' after Schumacher; slow stop"
+      "note": "slicks, 'next time round' after Schumacher; slow stop",
+      "tyre": "slick"
     },
     {
       "number": 6,
@@ -95,7 +106,8 @@
       "lap": 31,
       "laneTime": null,
       "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement",
-      "note": "slicks ('Hakkinen (who would stop on lap 31, with Patrese)')"
+      "note": "slicks ('Hakkinen (who would stop on lap 31, with Patrese)')",
+      "tyre": "slick"
     },
     {
       "number": 11,
@@ -103,7 +115,8 @@
       "lap": 31,
       "laneTime": null,
       "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement",
-      "note": "slicks"
+      "note": "slicks",
+      "tyre": "slick"
     },
     {
       "number": 5,
@@ -111,7 +124,8 @@
       "lap": 33,
       "laneTime": null,
       "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement",
-      "note": "slicks, 'at the end of lap 33', stationary 6.37 s"
+      "note": "slicks, 'at the end of lap 33', stationary 6.37 s",
+      "tyre": "slick"
     }
   ],
   "safetyCars": [],
@@ -119,5 +133,48 @@
     "stops": false,
     "safetyCars": true
   },
-  "notes": "Rain from lap 2, drying from about lap 27. Missing: Hakkinen's wet-tyre stop, Alesi's puncture stop after the La Source contact (Jolpica: 7 laps), every midfield car. Safety cars: none before 1993."
+  "notes": "Rain from lap 2, drying from about lap 27. Missing: Hakkinen's wet-tyre stop, Alesi's puncture stop after the La Source contact (Jolpica: 7 laps), every midfield car. Safety cars: none before 1993. Weather (step 5.x wet reconstruction): timeline and stop tyres from Motor Sport and Wikipedia; Hakkinen's wet-tyre stop (before lap 8, no lap) is still missing, so his first stint is estimated.",
+  "weather": {
+    "timeline": [
+      {
+        "fromLap": 1,
+        "toLap": 2,
+        "state": "damp",
+        "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement ('It started on a track made so greasy by drizzle just before the start'; the first wet-tyre stops came at the end of lap 3)"
+      },
+      {
+        "fromLap": 3,
+        "toLap": 26,
+        "state": "wet",
+        "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement ('It was raining quite hard now, however, and gradually the leaders were all obliged to come in for wets'; 'the rain continued and Ayrton's advantage shrank'; Senna gave in on lap 16)",
+        "note": "No source describes laps 17-26; held at wet until the drying the sources put just before lap 28."
+      },
+      {
+        "fromLap": 27,
+        "toLap": 30,
+        "state": "wet",
+        "toState": "damp",
+        "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement ('It was also beginning to dry out, and a line was appearing faintly all round the circuit', before Senna's lap-28 slick stop); https://en.wikipedia.org/wiki/1992_Belgian_Grand_Prix ('By the time Thierry Boutsen spun off on lap 28, the track was beginning to dry'); https://www.autosport.com/f1/news/how-schumacher-joined-f1s-elite-5109906/5109906/ (Schumacher's lap-30 'early change to slicks just as the rain stopped')"
+      },
+      {
+        "fromLap": 31,
+        "toLap": 37,
+        "state": "damp",
+        "toState": "dry",
+        "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement (slick stops to lap 33); http://motorsportretro.com/2014/04/michael-schumachers-first-win/ ('On a drying track, he ran wide'; 'Schumacher didn't slow, lapping faster and faster')",
+        "note": "No source gives the lap the track was dry; ramped from the last slick stops to the first of the race's fastest laps (F1DB: laps 38-42)."
+      },
+      {
+        "fromLap": 38,
+        "toLap": 44,
+        "state": "dry",
+        "source": "http://motorsportretro.com/2014/04/michael-schumachers-first-win/ ('On the penultimate lap he set a time that would have put him fifth on the grid'); F1DB: every finisher's fastest lap on laps 38-42 (Schumacher 1:53.791, lap 39)",
+        "note": "Dry pace, not a statement that the track was dry: an owner check."
+      }
+    ],
+    "startTyre": {
+      "tyre": "slick",
+      "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement ('one by one all of the drivers pitted for wets within laps'); https://www.pitdebrief.com/?p=66602 ('all drivers deciding to start on the dry tyres')"
+    }
+  }
 }

@@ -311,7 +311,11 @@ def reconstruct_cmd(
         )
     for note in side["notes"]:
         typer.echo(f"  note: {note}")
-    typer.echo(f"  report: {written[-1]}")
+    if side.get("weather"):
+        w = side["weather"]["wetness"]
+        wet_laps = sum(x >= reconstruct.RAIN_FROM for x in w)
+        typer.echo(f"  weather: {wet_laps}/{len(w)} wet laps (sourced timeline), max {max(w)}")
+    typer.echo(f"  report: {reconstruct.report_path(race_id, out)} ({len(written)} files)")
     if not side["solver"]["passed"]:
         raise typer.Exit(code=1)
 

@@ -124,3 +124,21 @@ def test_a_race_with_no_sourced_stop_takes_the_reconstructions_pit_loss():
     assert got.pit_loss == 20.0 and got.pit_loss_under_sc == 20.0 * build.track.SC_PIT_LOSS_FACTOR
     measured = build.track.TrackParams(18.0, 9.9, 12.4, 0.0, 0.5, 90.0, None, None, 0, 0)
     assert build.reconstructed_pit_loss(measured, side) is measured
+
+
+def test_reconstructed_wet_stints_keep_their_tyres():
+    """A wet reconstruction leaves slick stints empty for step 2.4 and labels its wet-tyre
+    stints (reconstruct.py, facts-file weather); the build fills only the empty ones."""
+    laps = pd.DataFrame(
+        {
+            "Driver": ["A"] * 4,
+            "LapNumber": [1.0, 2.0, 3.0, 4.0],
+            "Stint": [1.0, 1.0, 2.0, 2.0],
+            "TyreLife": [1.0, 2.0, 1.0, 2.0],
+            "Compound": [None, None, "WET", "WET"],
+        }
+    )
+    out = build.reconstructed_laps(laps, 1992)
+    assert list(out["Compound"].iloc[2:]) == ["WET", "WET"]
+    assert out["Compound"].iloc[:2].notna().all()
+    assert "WET" not in set(out["Compound"].iloc[:2])
