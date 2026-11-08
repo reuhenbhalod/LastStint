@@ -225,7 +225,7 @@ function visibleInProduction(era: EraState, race: EraRaceRow): boolean {
  * and the account's own ID is linked to itself); resolving here also keys a browser still on a
  * linked anonymous ID by the account, where sign-in's Eras merge (7.5) moved its rows.
  */
-async function playerOf(db: D1Database, value: unknown): Promise<string> {
+export async function playerOf(db: D1Database, value: unknown): Promise<string> {
   if (!isAnonId(value)) throw new ApiError(400, 'bad-request', 'anonId must be a UUID');
   const linked = await db
     .prepare('SELECT player_id FROM player_ids WHERE anon_id = ?')
