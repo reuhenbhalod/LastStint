@@ -208,11 +208,11 @@ Checked against the sources on Nov 4–5, 2026. Sources, adapters and licences a
 | 10, 9 (2023+) | OpenF1 | Everything | Decision moments, objectives, radio lines |
 | 10, 9, 8 (2018–2022) | Races already built, or in the local FastF1 cache. Otherwise 2018–19 from TUM, and 2020–22 from Jolpica lap times and stops (no F1TV subscription, decided Nov 7) | Everything for built/cached races; lap times and stops otherwise | Same; plus tyre compounds and safety cars (estimated) for 2020–22 races from Jolpica |
 | 8 (2017), 7 (2014–2017) | TUM f1-timing-database (CC BY-NC-SA, accepted Nov 7: credit TUM on a credits page; race files built from it carry the same licence), Jolpica | Lap times, gaps, compounds, tyre age, stops, SC/VSC | Incident causes |
-| 6 (2010–2013) | Jolpica lap times; stops from Jolpica (2011+) or formula1.com (2010) | Lap times, stops | Tyre compounds (estimated), safety cars, weather |
+| 6 (2010–2013) | Jolpica lap times; stops from Jolpica (2011+) or F1DB (2010) | Lap times, stops | Tyre compounds (estimated), safety cars, weather |
 | 5, 4 (2000–2009) | Jolpica lap times; f1db stops | Lap times, stops | Compounds (estimated), fuel loads (estimated), safety cars, weather |
-| 3 (1996–1999) | Jolpica lap times; formula1.com stops | Lap times, stops | Same as above |
-| 3 (1994–1995) | formula1.com stops and fastest laps; Jolpica results | Results, stops, fastest laps | Reconstruction of the laps |
-| 2, 1 (1983–1993) | Jolpica results; formula1.com fastest laps (1990+; earlier unresearched) | Results | Full reconstruction: race reports, solver |
+| 3 (1996–1999) | Jolpica lap times; F1DB stops | Lap times, stops | Same as above |
+| 3 (1994–1995) | F1DB stops and fastest laps; Jolpica results | Results, stops, fastest laps | Reconstruction of the laps |
+| 2, 1 (1983–1993) | Jolpica results; F1DB fastest laps | Results | Full reconstruction: race reports, solver |
 
 Every race, however it was built, must pass the existing validation test before it can be published. Mark races built by full reconstruction as **Reconstructed** in the UI. Races that need a model not built yet (red flags, car faults, wet races before 2018, refuelling) stay **Draft** until it lands; see `docs/simulator-roadmap.md` for which races each model unblocks.
 

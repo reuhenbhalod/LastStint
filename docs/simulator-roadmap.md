@@ -90,14 +90,14 @@ All sources below were tested Nov 4–5, 2026, unless marked.
 | FastF1 | 2018+ | everything | needs an F1TV-subscribed account in `pipeline/.env` since Oct 2026 |
 | TUM f1-timing-database | 2014–2019 | per-lap time, gap, position, compound, tyre age, stops, SC/VSC phases | **CC BY-NC-SA**: accepted Nov 7. Credit TUM; race files built from it carry the same licence |
 | Jolpica CSV dump | lap times 1996+; pit stops 2011+; results all years | laps, positions, stops, grid, result, retirements | summed laps match official race times to the ms |
-| f1db | 2000–2009 stops (all 182 races) | stop lap and pit-lane time | licence to check |
-| formula1.com results pages | pit stops 1994+ (1994: 14 of 16 races; 1995: 17 of 17); fastest laps for every race 1990+ | stops, each driver's fastest lap and the lap it came on, 3-letter codes | cache once; check the terms |
+| F1DB (`pipeline/f1db.py`) | stops 1994+ (1994: 14 of 16); fastest laps every race 1983+ | stop lap, pit-lane time, each driver's fastest lap and its lap | **CC BY 4.0**: credit F1DB |
+| formula1.com results pages | — | **not used**: its terms allow personal, non-commercial use only (checked Nov 7, 2026). F1DB has the same stops and fastest laps | |
 | Race reports (Wikipedia etc.) | all | SC laps and causes, weather, faults | hand-checked facts only |
 | — | 1983–1993 lap times | **none exist** | Eras 1–2 are reconstructed (P3) |
 
 - **P1. One adapter per source.** Each writes the same raw parquet (`LAP_COLUMNS`) and status
   JSON as `ingest.py`, so `clean.py`, `fit.py`, `track.py` and `assemble.py` run unchanged:
-  `jolpica.py`, `f1com.py`, `f1db.py`, `tum.py`.
+  `jolpica.py`, `f1db.py`, `tum.py`.
 - **P2. Compounds before 2014.** One dry compound per race before 2007. From 2007, two
   compounds, assigned to stints from each stint's pace step and wear, with the both-compounds
   rule. Shown as estimates.

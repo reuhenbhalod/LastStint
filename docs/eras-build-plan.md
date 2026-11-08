@@ -54,7 +54,7 @@ The phase table above is the simple order. This table is the real one, per step.
 | 1.5 Hard-call counter | 1.1 | No |
 | 2.1 `tum.py` | — | **Yes** |
 | 2.2 `jolpica.py` | — | **Yes** |
-| 2.3 `f1com.py`, `f1db.py` | — | **Yes** |
+| 2.3 `f1db.py` (formula1.com dropped) | — | **Yes** |
 | 2.4 Estimated fields | 1.1, 2.2 | No |
 | 2.5 Track maps | — | **Yes** |
 | 2.6 Drivers, teams, incidents | — | **Yes** |
@@ -224,10 +224,13 @@ pinned version; tests run on cached fixtures only.
 - **Done when:** each lead-lap finisher's summed laps match the official race time within
   0.1 s, on 3 races from different decades.
 
-**2.3 `f1com.py` and `f1db.py` (1.5%)**
-- `f1com.py`: formula1.com pit-stop summaries (1994+) and fastest laps (all years), cached
-  under `data/raw/f1com/`, at least 1.5 s between requests.
-- `f1db.py`: f1db stops for 2000–09.
+**2.3 `f1db.py` (1.5%)**
+- **formula1.com is dropped.** Its legal notice allows personal, non-commercial use only and
+  forbids extracting or redistributing "historical race data" without F1's written consent
+  (checked Nov 7, 2026).
+- `f1db.py`: F1DB (CC BY 4.0; the credits screen must name F1DB under CC BY 4.0) gives every
+  stop from 1994 (1994: 14 of 16 races; none before) and each driver's fastest lap and its lap
+  for every race from 1983. Output in `data/raw/f1db/`.
 - **Done when:** every stop lands on its official lap for `hungary-1998` and `japan-2005`.
 
 **2.4 Estimated fields (1.5%)**
@@ -488,8 +491,8 @@ The **Needs** column is from race history and must be checked against the data f
 | 7 | `monaco-2016` | TUM | P4 map |  |
 | 7 | `brazil-2016` | TUM | R1 red flag, R3 wet pre-2018, P4 map |  |
 | 7 | `abu-dhabi-2016` | TUM | P4 map |  |
-| 6 | `australia-2010` | Jolpica + formula1.com stops (est. compounds) | R3 wet pre-2018, P4 map |  |
-| 6 | `abu-dhabi-2010` | Jolpica + formula1.com stops (est. compounds) | P4 map |  |
+| 6 | `australia-2010` | Jolpica + F1DB stops (est. compounds) | R3 wet pre-2018, P4 map |  |
+| 6 | `abu-dhabi-2010` | Jolpica + F1DB stops (est. compounds) | P4 map |  |
 | 6 | `china-2011` | Jolpica (est. compounds) | P4 map |  |
 | 6 | `monaco-2011` | Jolpica (est. compounds) | R1 red flag, P4 map |  |
 | 6 | `canada-2011` | Jolpica (est. compounds) | R1 red flag, R3 wet pre-2018, P4 map |  |
@@ -521,13 +524,13 @@ The **Needs** column is from race history and must be checked against the data f
 | 3 | `spain-1994` | Reconstruct (real stops) | R2 fault, R4 refuel, P3 solver, P4 map |  |
 | 3 | `australia-1994` | Reconstruct (real stops) | R4 refuel, P3 solver, P4 map |  |
 | 3 | `belgium-1995` | Reconstruct (real stops) | R3 wet pre-2018, R4 refuel, P3 solver, P4 map |  |
-| 3 | `spain-1996` | Jolpica + formula1.com stops (est. fuel) | R3 wet pre-2018, R4 refuel, P4 map |  |
-| 3 | `hungary-1997` | Jolpica + formula1.com stops (est. fuel) | R4 refuel, P4 map |  |
-| 3 | `europe-1997` | Jolpica + formula1.com stops (est. fuel) | R4 refuel, P4 map |  |
-| 3 | `hungary-1998` | Jolpica + formula1.com stops (est. fuel) | R4 refuel, P4 map |  |
-| 3 | `belgium-1998` | Jolpica + formula1.com stops (est. fuel) | R1 red flag, R3 wet pre-2018, R4 refuel, P4 map |  |
-| 3 | `malaysia-1999` | Jolpica + formula1.com stops (est. fuel) | R4 refuel, P4 map |  |
-| 3 | `europe-1999` | Jolpica + formula1.com stops (est. fuel) | R3 wet pre-2018, R4 refuel, P4 map |  |
+| 3 | `spain-1996` | Jolpica + F1DB stops (est. fuel) | R3 wet pre-2018, R4 refuel, P4 map |  |
+| 3 | `hungary-1997` | Jolpica + F1DB stops (est. fuel) | R4 refuel, P4 map |  |
+| 3 | `europe-1997` | Jolpica + F1DB stops (est. fuel) | R4 refuel, P4 map |  |
+| 3 | `hungary-1998` | Jolpica + F1DB stops (est. fuel) | R4 refuel, P4 map |  |
+| 3 | `belgium-1998` | Jolpica + F1DB stops (est. fuel) | R1 red flag, R3 wet pre-2018, R4 refuel, P4 map |  |
+| 3 | `malaysia-1999` | Jolpica + F1DB stops (est. fuel) | R4 refuel, P4 map |  |
+| 3 | `europe-1999` | Jolpica + F1DB stops (est. fuel) | R3 wet pre-2018, R4 refuel, P4 map |  |
 | 2 | `japan-1989` | Reconstruct | P3 solver, P4 map |  |
 | 2 | `united-states-1990` | Reconstruct | P3 solver, P4 map |  |
 | 2 | `mexico-1990` | Reconstruct | P3 solver, P4 map |  |
