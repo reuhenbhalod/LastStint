@@ -38,3 +38,18 @@ def test_a_non_pool_race_file_carries_its_overlay(path):
         assert model.get(key) == overlay.get(key), f"{path.stem}: {key} differs from its overlay"
     if "provenance" in overlay:
         assert model["provenance"]["kind"] == overlay["provenance"]["kind"]
+
+
+def test_pool_races_keep_their_committed_schema_version():
+    """A Daily/Gauntlet pool race's file is pinned in production: the build keeps its stamp."""
+    from pipeline import SCHEMA_VERSION, build
+
+    pool = sorted(build.shared_races())
+    assert pool
+    race_id = pool[0]
+    committed = json.loads((build.RACES_DIR / f"{race_id}.json").read_text())["schemaVersion"]
+    stamped = build.pinned_schema_version(race_id, {"schemaVersion": SCHEMA_VERSION})
+    assert stamped["schemaVersion"] == committed
+    assert build.pinned_schema_version("not-a-race-1900", {"schemaVersion": 7}) == {
+        "schemaVersion": 7
+    }

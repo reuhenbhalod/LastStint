@@ -32,7 +32,7 @@ from . import (
     wet_laps,
 )
 from . import pace as pace_mod
-from .paths import DATA_DIR, RAW_DIR
+from .paths import DATA_DIR, RACES_DIR, RAW_DIR
 
 # Authored Eras content (eras build plan, "Eras overlay files"): data/eras/<race-id>.json,
 # with up to four keys, applied over the built model by export.with_eras_fields.
@@ -1820,6 +1820,19 @@ def load_overlay(race_id: str, eras_dir: Path = ERAS_DIR) -> dict | None:
     return overlay
 
 
+def pinned_schema_version(race_id: str, model: dict, pools_path: Path = POOLS_PATH) -> dict:
+    """A Daily/Gauntlet pool race keeps the schemaVersion of its committed file: its file and
+    hash are pinned in production, and a newer version stamp would change both. Other races
+    get the current version."""
+    committed = RACES_DIR / f"{race_id}.json"
+    if race_id not in shared_races(pools_path) or not committed.exists():
+        return model
+    version = json.loads(committed.read_text()).get("schemaVersion")
+    if version is None or version == model.get("schemaVersion"):
+        return model
+    return {**model, "schemaVersion": version}
+
+
 def shared_races(pools_path: Path = POOLS_PATH) -> frozenset[str]:
     """The Daily and Gauntlet (survivor) races of data/pools.json. Their race files keep their
     Daily content and hash, so `build_race` leaves their Eras overlay out (the Worker merges it
@@ -1984,6 +1997,7 @@ def build_race(
         report.append("estimated: weather (wet laps from the lap times, `pipeline wet-laps`)")
     if refuelling:
         report.extend(refuel_report(model, refuel_fit, refuel_slope, dry.wet))
+    model = pinned_schema_version(race_id, model, pools_path)
     return BuildResult(
         model=model,
         laps=laps,
