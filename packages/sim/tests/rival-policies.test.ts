@@ -588,4 +588,19 @@ describe('claimed rival choices (server check)', () => {
     expect(regrade.map((r) => r.lap)).toEqual(claims.map((c) => c.lap));
     for (const r of regrade) expect(r.best).toBe(r.claimed);
   });
+
+  it('replays and re-grades a Legend race with Legend’s safety cars', () => {
+    // Seed 3: Legend draws a SC on laps 42-46, and the rival boxes under it after lap 41.
+    const legend = initRun(model, 3, { decisions: [], rivalPolicy: 'expert', legend: true });
+    while (!isFinished(legend)) stepLap(legend);
+    const mine = rivalChoices(legend);
+    expect(mine).toContainEqual({ lap: 41, option: 'box-now' });
+    const replay = replayWithRivalClaims(model, 3, [], mine, { legend: true });
+    expect(replay.run.state).toEqual(legend.state);
+    // Without Legend lap 41 isn't a decision point (the real race is green there).
+    expect(() => replayWithRivalClaims(model, 3, [], mine)).toThrow(RivalClaimError);
+    const regrade = regradeRivalPoints(model, 3, [], mine, { legend: true });
+    expect(regrade.map((r) => r.lap)).toEqual(mine.map((c) => c.lap));
+    for (const r of regrade) expect(r.best).toBe(r.claimed);
+  });
 });

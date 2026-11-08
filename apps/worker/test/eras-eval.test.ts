@@ -6,9 +6,32 @@
 //
 // No bundled race has an `eras` block yet (content is phase 6), so this file gives Abu Dhabi
 // 2021 (Era 9, play order 2: a Standard rival) one, in this test isolate's copy of the bundle.
+// Every rival is replayed: Standard+ and Smart directly, Expert (play orders 8-10, Legend) from
+// the rival's claimed choices, re-graded nightly.
 
 import { createExecutionContext, env, waitOnExecutionContext } from 'cloudflare:test';
-import { type ErasBlock, type RaceModel, difficultyFor, legendDifficulty } from '@laststint/sim';
+import {
+  type ClaimedGrade,
+  type DecisionMoment,
+  EXPERT_SAMPLES,
+  type ErasBlock,
+  type RaceModel,
+  type RivalChoice,
+  type RivalPoint,
+  type RivalPolicy,
+  answerMoment,
+  claimGrade,
+  difficultyFor,
+  gradeMoment,
+  gradeRivalMoment,
+  initRun,
+  isFinished,
+  legendDifficulty,
+  legendMoments,
+  resolveRivalDecision,
+  rivalChoices,
+  stepLap,
+} from '@laststint/sim';
 import { describe, expect, it } from 'vitest';
 import { playDailyRace } from '../../../packages/sim/examples/daily-race.js';
 import { getErasRace } from '../src/eras.js';
@@ -16,9 +39,9 @@ import {
   BadRivalClaimsError,
   type EraAttemptResult,
   EraRaceNotReadyError,
-  RivalUnavailableError,
+  attemptDifficulty,
   evaluateAttempt,
-  rivalReplay,
+  rivalClaimsOf,
 } from '../src/erasEval.js';
 import worker from '../src/index.js';
 import { RACE_FILES } from '../src/races.gen.js';
@@ -48,6 +71,46 @@ const play = (scStop: string) =>
 // Both win; boxing for softs is a clean race (three stars), staying out is a red call.
 const boxSoft = play('box-soft');
 const stayOut = play('stay');
+
+/**
+ * The game's play of an Eras attempt at SEED with `rivalPolicy` (and Legend: its moments
+ * follow the drawn safety cars): the real team's call at each moment, else the first option.
+ * An Expert rival takes its grader's pick at each decision point, except at `cheatLap`, where
+ * it takes another legal option (what an edited client would claim).
+ */
+function playEras(rivalPolicy: RivalPolicy, legend = false, cheatLap?: number) {
+  const moments: DecisionMoment[] = legend ? legendMoments(model, SEED) : model.decisionMoments;
+  const run = initRun(model, SEED, {
+    decisions: [],
+    legend,
+    rivalPolicy,
+    ...(rivalPolicy === 'expert' ? { rivalGrading: 'deferred' as const } : {}),
+  });
+  const grades: ClaimedGrade[] = [];
+  while (!isFinished(run)) {
+    const m = moments.find((x) => x.lap === run.state.lap + 1);
+    if (m) {
+      const grade = gradeMoment(run, m.options, m.target);
+      grades.push(claimGrade(run, m, grade));
+      answerMoment(run, m, m.realOptionId ?? (m.options[0]?.id as string));
+    }
+    stepLap(run);
+    const pending = run.rival?.pending;
+    if (pending) {
+      const best = gradeRivalMoment(run, pending.options, EXPERT_SAMPLES).best;
+      const other = pending.options.find((o) => o.id !== best)?.id;
+      resolveRivalDecision(run, (pending.lap === cheatLap ? other : best) as never);
+    }
+  }
+  return {
+    decisions: run.decisions,
+    grades,
+    rivalClaims: rivalChoices(run),
+    points: (run.rival?.points ?? []) as RivalPoint[],
+    moments,
+  };
+}
+const legendHonest = playEras('expert', true);
 
 type Grades = Array<{ momentId: string; probabilities: number[]; real?: number }>;
 /** Edited grades: staying out at the SC claimed as the best call (shape still valid). */
@@ -264,27 +327,164 @@ describe('POST /api/eras/attempts/:id: Legend', () => {
     expect(await progress(ids.a, 0)).toMatchObject({ star_mastery: 1 });
   });
 
-  it('a Legend attempt (Expert rival) is stored and answered 501 until the sim can check it', async () => {
+  it('a Legend attempt (Expert rival) is replayed from its claims and evaluated', async () => {
     expect(legendDifficulty().rivalPolicy).toBe('expert');
+    // Legend asks the drawn VSC's call, not the real race's SC calls.
+    const momentIds = legendHonest.moments.map((m) => m.id);
+    expect(momentIds).toContain('legend-vsc-35');
+    expect(momentIds).not.toContain('sc-stop');
+    expect(legendHonest.rivalClaims.length).toBeGreaterThan(0);
     const id = await begin(true);
-    const claims = [{ lap: 40, option: 'stay-out' }];
-    const res = await submit(id, send(boxSoft, { rivalClaims: claims, untimed: true }));
-    expect(res.status).toBe(501);
-    expect(await json<{ error: string; rivalPolicy: string }>(res)).toMatchObject({
-      error: 'rival-unavailable',
-      rivalPolicy: 'expert',
+    const res = await submit(
+      id,
+      send(legendHonest as never, { rivalClaims: legendHonest.rivalClaims, untimed: true }),
+    );
+    expect(res.status).toBe(200);
+    const body = await json<Submitted>(res);
+    expect(body).toMatchObject({ legend: true, untimed: true });
+    expect(body.calls.map((c) => c.momentId)).toEqual(momentIds);
+    const row = await attemptRow(id);
+    expect(JSON.parse(row?.rival_claims as string)).toEqual(legendHonest.rivalClaims);
+    expect(row).toMatchObject({ untimed: 1, accuracy: body.accuracy, verified: 0 });
+    // Legend progress only.
+    expect(await progress(ids.a, 1)).toMatchObject({
+      best_accuracy: body.accuracy,
+    });
+    expect(await progress(undefined, 0)).toBeNull();
+    // Honest claims and grades: the nightly re-grade agrees.
+    const [check] = await nightly();
+    expect(check).toMatchObject({ correct: true, rival: { honest: true, wrong: [], error: null } });
+    expect(await attemptRow(id)).toMatchObject({ verified: 1, corrected: 0 });
+    expect((await submit(id, send(legendHonest as never))).status).toBe(409);
+  });
+
+  it('refuses Expert claims that don’t replay with 400 bad-rival-claims and the code', async () => {
+    const id = await begin(true);
+    const claims = legendHonest.rivalClaims;
+    const point = legendHonest.points[0] as RivalPoint;
+    const illegal = (['smart', 'stay-out', 'box-now'] as const).find(
+      (o) => !point.options.some((x) => x.id === o),
+    );
+    const taken = new Set(claims.map((c) => c.lap));
+    const offLap = [...Array(model.race.laps).keys()].find(
+      (l) => l > model.race.takeoverLap && !taken.has(l),
+    ) as number;
+    const cases: Array<[unknown, string]> = [
+      [claims.slice(1), 'missing-claim'],
+      [[...claims, { lap: offLap, option: 'smart' }], 'not-a-decision-point'],
+      [[...claims, claims[0]], 'duplicate-claim'],
+      [[{ lap: 'x', option: 'smart' }], 'bad-claim'],
+      ['smart', 'bad-claim'],
+      [null, 'missing-claim'],
+    ];
+    if (illegal) {
+      cases.push([
+        claims.map((c) => (c.lap === point.lap ? { ...c, option: illegal } : c)),
+        'illegal-option',
+      ]);
+    }
+    for (const [rivalClaims, code] of cases) {
+      const res = await submit(id, send(legendHonest as never, { rivalClaims }));
+      expect(res.status, code).toBe(400);
+      expect(await json<{ error: string; code: string }>(res)).toMatchObject({
+        error: 'bad-rival-claims',
+        code,
+      });
+    }
+    expect(await attemptRow(id)).toMatchObject({ submitted_at: null, result: null });
+    expect(await progress(undefined, 1)).toBeNull();
+    expect((await submit(id, send(legendHonest as never, { rivalClaims: claims }))).status).toBe(
+      200,
+    );
+  });
+});
+
+describe('the nightly re-grade of an Expert rival', () => {
+  it('corrects a legal but wrong claim, and the progress it alone gave', async () => {
+    const first = legendHonest.points[0] as RivalPoint;
+    const cheat = playEras('expert', true, first.lap);
+    expect(cheat.rivalClaims).not.toEqual(legendHonest.rivalClaims);
+    // The honest attempt's true result, for comparison.
+    const honest = evaluateAttempt({
+      model,
+      seed: SEED,
+      legend: true,
+      difficulty: attemptDifficulty(2, true),
+      decisions: legendHonest.decisions,
+      grades: undefined,
+      rivalClaims: legendHonest.rivalClaims,
+      untimed: false,
+    });
+    const id = await begin(true);
+    const res = await submit(id, send(cheat as never, { rivalClaims: cheat.rivalClaims }));
+    expect(res.status).toBe(200); // legal claims: the submit can't tell
+    const [check] = await nightly();
+    expect(check).toMatchObject({
+      correct: false,
+      pending: false,
+      rival: { honest: false, error: null },
+    });
+    expect(check?.rival?.wrong).toContain(first.lap);
+    expect(check?.result).toEqual(honest);
+    expect(await attemptRow(id)).toMatchObject({
+      verified: 1,
+      corrected: 1,
+      accuracy: honest.accuracy,
+    });
+    expect(JSON.parse((await attemptRow(id))?.result as string)).toEqual(honest);
+    const p = await progress(undefined, 1);
+    expect(p).toMatchObject({
+      star_result: honest.stars.result ? 1 : 0,
+      star_strategist: honest.stars.strategist ? 1 : 0,
+      star_mastery: honest.stars.mastery ? 1 : 0,
+      best_accuracy: honest.accuracy,
+    });
+  });
+
+  it('a wrong claim never lowers Legend progress earned on another attempt', async () => {
+    const good = await json<Submitted>(
+      await submit(
+        await begin(true),
+        send(legendHonest as never, { rivalClaims: legendHonest.rivalClaims }),
+      ),
+    );
+    const cheat = playEras('expert', true, (legendHonest.points[0] as RivalPoint).lap);
+    await submit(await begin(true), send(cheat as never, { rivalClaims: cheat.rivalClaims }));
+    const checks = await nightly();
+    expect(checks.map((c) => c.correct)).toEqual([true, false]);
+    expect(await progress(undefined, 1)).toMatchObject({
+      star_result: good.stars.result ? 1 : 0,
+      star_strategist: good.stars.strategist ? 1 : 0,
+      star_mastery: good.stars.mastery ? 1 : 0,
+      best_accuracy: good.accuracy,
+    });
+  });
+
+  it('evaluates an attempt stored unevaluated before the server could replay Expert', async () => {
+    // The old 501 path: decisions stored, no result, no claims (the client sent none).
+    const id = await begin(true);
+    await env.DB.prepare(
+      `UPDATE era_attempts SET decisions = ?, grades = ?, rival_claims = NULL, untimed = 0,
+         submitted_at = ? WHERE id = ?`,
+    )
+      .bind(
+        JSON.stringify(legendHonest.decisions),
+        JSON.stringify(legendHonest.grades),
+        new Date().toISOString(),
+        id,
+      )
+      .run();
+    const [check] = await nightly();
+    expect(check).toMatchObject({
+      correct: false,
+      pending: true,
+      rival: { honest: false, error: 'missing-claim' },
     });
     const row = await attemptRow(id);
-    expect(JSON.parse(row?.rival_claims as string)).toEqual(claims);
-    expect(row).toMatchObject({ untimed: 1, result: null, accuracy: null });
-    expect(row?.submitted_at).not.toBeNull();
-    // No progress of either kind, and the nightly job leaves it for later.
-    expect(await progress(ids.a, 1)).toBeNull();
-    expect(await progress(ids.a, 0)).toBeNull();
-    expect(await nightly()).toEqual([null]);
-    expect((await attemptRow(id))?.verified).toBe(0);
-    // A second submit finds it submitted.
-    expect((await submit(id, send(boxSoft))).status).toBe(409);
+    expect(row).toMatchObject({ verified: 1, corrected: 0, accuracy: check?.result.accuracy });
+    expect(await progress(undefined, 1)).toMatchObject({
+      best_accuracy: check?.result.accuracy as number,
+    });
   });
 });
 
@@ -423,15 +623,42 @@ describe('evaluateAttempt', () => {
     expect(full).toEqual(claimed);
   });
 
-  it('refuses rivals the server cannot replay yet, and claims for a rival that makes none', () => {
-    for (const p of ['standard-plus', 'smart', 'expert'] as const) {
-      expect(() =>
-        evaluateAttempt({ ...input, difficulty: { ...difficultyFor(2), rivalPolicy: p } }),
-      ).toThrow(RivalUnavailableError);
+  it('replays Standard+ and Smart rivals with their policy', () => {
+    for (const [playOrder, policy] of [
+      [3, 'standard-plus'],
+      [5, 'smart'],
+    ] as const) {
+      expect(difficultyFor(playOrder).rivalPolicy).toBe(policy);
+      const played = playEras(policy);
+      const one = { ...input, difficulty: difficultyFor(playOrder), ...played, rivalClaims: null };
+      const claimed = evaluateAttempt(one);
+      expect(evaluateAttempt({ ...one, grades: undefined })).toEqual(claimed);
+      expect(claimed.calls).toHaveLength(model.decisionMoments.length);
     }
-    expect(() => rivalReplay('standard', [])).toThrow(BadRivalClaimsError);
-    expect(() => rivalReplay('expert', 'x')).toThrow(BadRivalClaimsError);
-    expect(rivalReplay('standard', null)).toBe('standard');
+  });
+
+  it('replays an Expert rival (play order 8) from honest claims', () => {
+    const played = playEras('expert');
+    expect(played.rivalClaims.length).toBeGreaterThan(0);
+    const one = { ...input, difficulty: difficultyFor(8), ...played };
+    const claimed = evaluateAttempt(one);
+    expect(evaluateAttempt({ ...one, grades: undefined })).toEqual(claimed);
+    // Without the claims the rival's decision points can't be replayed.
+    expect(() => evaluateAttempt({ ...one, rivalClaims: null })).toThrow(
+      expect.objectContaining({ claimCode: 'missing-claim' }),
+    );
+  });
+
+  it('the claims a rival makes: Expert only, as a list', () => {
+    expect(() => rivalClaimsOf('standard', [])).toThrow(BadRivalClaimsError);
+    expect(() => rivalClaimsOf('smart', [{ lap: 40, option: 'smart' }])).toThrow(
+      expect.objectContaining({ claimCode: 'not-expert' }),
+    );
+    expect(() => rivalClaimsOf('expert', 'x')).toThrow(
+      expect.objectContaining({ claimCode: 'bad-claim' }),
+    );
+    expect(rivalClaimsOf('standard', null)).toBeNull();
+    expect(rivalClaimsOf('expert', null)).toEqual([]);
   });
 
   it('refuses a race with no Eras block, or one built for the other driver', () => {

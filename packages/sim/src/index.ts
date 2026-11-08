@@ -96,6 +96,7 @@ export { PLAN_TARGET, enginePlans, planOption } from './planner.js';
 export type {
   ClaimedGrade,
   RealCall,
+  ReplayOptions,
   VerifiedMoment,
   VerifiedPlan,
   VerifiedRun,

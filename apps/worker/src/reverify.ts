@@ -3,12 +3,14 @@
 // claimed grades were edited and the run gets its true score. Pure: the script
 // (scripts/reverify.ts) does the D1 reads and writes.
 
-import { GRADE_SAMPLES, type RaceModel, verifyRun } from '@laststint/sim';
+import { EXPERT_SAMPLES, GRADE_SAMPLES, type RaceModel, verifyRun } from '@laststint/sim';
 import {
   type EraAttemptResult,
-  RivalUnavailableError,
+  type RivalRegradeResult,
   attemptDifficulty,
   evaluateAttempt,
+  regradeRival,
+  rivalClaimsOf,
 } from './erasEval.js';
 import { type StoredResult, stored } from './results.js';
 
@@ -61,12 +63,13 @@ export function recheckSql(r: Recheck): string[] {
 // ---- Eras attempts (eras build plan 7.3) ------------------------------------------------------
 //
 // The same re-grade for Eras: each submitted, unverified attempt is evaluated again with full
-// playouts (erasEval.ts evaluateAttempt without claimed grades). A match is marked verified. A
-// mismatch means the claimed grades were edited: the attempt gets its true result, and the
-// player's progress on the race is rebuilt from all of their attempts there, so a star earned
+// playouts (erasEval.ts evaluateAttempt without claimed grades). An Expert rival's claimed
+// choices are re-graded first (erasEval.ts regradeRival): wrong ones are replaced by the
+// choices the rival really makes. A match is marked verified. A mismatch means the claimed
+// grades or the rival's claims were edited: the attempt gets its true result, and the player's
+// progress on the race is rebuilt from all of their attempts there, so a star earned
 // legitimately on another attempt is never lowered. An attempt the Worker stored unevaluated
-// (a rival it can't replay yet, erasEval.ts RivalUnavailableError) is evaluated here once it
-// can be, and left for a later night until then.
+// (before the server could replay its rival) is evaluated here.
 
 /** A submitted, unverified Eras attempt with its era's play order, as the script reads it. */
 export interface UnverifiedAttempt {
@@ -85,44 +88,53 @@ export interface UnverifiedAttempt {
 
 export interface AttemptRecheck {
   id: string;
-  /** The stored result matched the full re-grade. */
+  /** The stored result matched the full re-grade (and an Expert rival's claims were honest). */
   correct: boolean;
   /** The attempt had no stored result (it is evaluated for the first time). */
   pending: boolean;
+  /** An Expert rival's re-graded claims (null for any other rival). */
+  rival: Omit<RivalRegradeResult, 'choices'> | null;
   result: EraAttemptResult;
 }
 
 /**
- * Re-grade one attempt in full. Null if its rival still can't be replayed on the server. A
- * stored log that no longer verifies (it did on submit, so only an edited row) throws.
+ * Re-grade one attempt in full: an Expert rival's claims at `rivalSamples` playouts per
+ * decision point (the game's grader), then every call at `samples`. A stored log that no
+ * longer verifies (it did on submit, so only an edited row) throws.
  */
 export function recheckAttempt(
   model: RaceModel,
   a: UnverifiedAttempt,
   samples = GRADE_SAMPLES,
-): AttemptRecheck | null {
+  rivalSamples = EXPERT_SAMPLES,
+): AttemptRecheck {
   const legend = a.legend === 1;
-  let result: EraAttemptResult;
-  try {
-    result = evaluateAttempt({
-      model,
-      seed: a.seed,
-      legend,
-      difficulty: attemptDifficulty(a.play_order, legend),
-      decisions: JSON.parse(a.decisions),
-      grades: undefined,
-      rivalClaims: a.rival_claims === null ? null : JSON.parse(a.rival_claims),
-      untimed: a.untimed === 1,
-      samples,
-    });
-  } catch (e) {
-    if (e instanceof RivalUnavailableError) return null;
-    throw e;
-  }
+  const difficulty = attemptDifficulty(a.play_order, legend);
+  const decisions = JSON.parse(a.decisions);
+  const stored = a.rival_claims === null ? null : JSON.parse(a.rival_claims);
+  const claims = rivalClaimsOf(difficulty.rivalPolicy, stored);
+  const regraded = claims
+    ? regradeRival(model, a.seed, decisions, claims, legend, rivalSamples)
+    : null;
+  const result = evaluateAttempt({
+    model,
+    seed: a.seed,
+    legend,
+    difficulty,
+    decisions,
+    grades: undefined,
+    rivalClaims: regraded ? regraded.choices : null,
+    untimed: a.untimed === 1,
+    samples,
+  });
+  const rival = regraded
+    ? { honest: regraded.honest, wrong: regraded.wrong, error: regraded.error }
+    : null;
   return {
     id: a.id,
-    correct: a.result !== null && JSON.stringify(result) === a.result,
+    correct: a.result !== null && JSON.stringify(result) === a.result && (rival?.honest ?? true),
     pending: a.result === null,
+    rival,
     result,
   };
 }

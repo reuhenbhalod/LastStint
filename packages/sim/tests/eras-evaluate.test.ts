@@ -32,6 +32,7 @@ import {
   raceLog,
   reachedTarget,
   recordLap,
+  rivalChoices,
   stepLap,
   targetMet,
 } from '../src/index.js';
@@ -629,6 +630,30 @@ describe('race log on real runs', () => {
     stepLap(run);
     stepLap(run);
     expect(() => recordLap(log, run)).toThrow(/expected lap 35/);
+  });
+
+  it('raceLog replays a Legend run with an Expert rival as it was played', () => {
+    // Seed 3: Legend draws a SC on laps 42-46 (the real race has a VSC and a late SC), and
+    // the Expert rival boxes under it at its lap-41 decision point.
+    const run = initRun(abu, 3, {
+      decisions: [],
+      legend: true,
+      rivalPolicy: 'expert',
+      rivalSamples: 10,
+    });
+    const log = emptyLog(run);
+    while (!isFinished(run)) {
+      stepLap(run);
+      recordLap(log, run);
+    }
+    const flags = (l: ErasRaceLog) => l.laps.map((x) => x.flag[0]).join('');
+    const real = initRun(abu, 3, { decisions: [] });
+    while (!isFinished(real)) stepLap(real);
+    expect(flags(log)).not.toEqual(flags(raceLog(real)));
+    expect(rivalChoices(run).length).toBeGreaterThan(0);
+    // Without Legend the replay would put the real safety cars back; without the rival's
+    // choices it would re-grade them (at the default samples, to a different plan).
+    expect(raceLog(run)).toEqual(log);
   });
 
   it('raceLog refuses an unfinished run, and a run it cannot reproduce', () => {

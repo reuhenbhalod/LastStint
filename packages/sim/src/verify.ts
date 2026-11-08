@@ -22,7 +22,7 @@ import {
   realOption,
   scoreRun,
 } from './grade.js';
-import type { DecisionMoment } from './moments.js';
+import { type DecisionMoment, legendMoments } from './moments.js';
 import { PLAN_TARGET, enginePlans, planOption } from './planner.js';
 import {
   type Run,
@@ -37,10 +37,16 @@ import {
 import type { Decision, PlanId, RaceModel, RacePlan, RaceResult } from './types.js';
 
 /**
- * How an Eras attempt's race runs (eras build plan 7.3): Legend's moved safety cars and the
- * era's rival policy. Daily and Survivor pass neither, so their replays are unchanged.
+ * How an Eras attempt's race runs (eras build plan 7.3): Legend's moved safety cars (and its
+ * decision moments, moments.ts legendMoments) and the era's rival policy; for an Expert rival,
+ * the choices it made (rivalChoices with rivalGrading 'claims': the server's replay, no
+ * re-grading of its decision points). Daily and Survivor pass none, so their replays are
+ * unchanged.
  */
-export type ReplayOptions = Pick<RunOptions, 'legend' | 'rivalPolicy'>;
+export type ReplayOptions = Pick<
+  RunOptions,
+  'legend' | 'rivalPolicy' | 'rivalChoices' | 'rivalGrading' | 'rivalSamples'
+>;
 
 /** The claimed grade of the race plan uses this id in place of a moment's. */
 export const PLAN_GRADE_ID = 'plan';
@@ -311,7 +317,8 @@ function claimedGrades(
  * from the pause the player saw, and score it. Without `claimed`, each moment is re-graded
  * with full playouts; with it (the game's grades, see ClaimedGrade), the claimed chances are
  * checked for shape and used instead. `replay` runs the race as an Eras attempt played it
- * (Legend, the rival policy). Throws VerifyError on a bad log or bad grades.
+ * (Legend, the rival policy); a Legend run's moments are legendMoments(model, seed), not the
+ * race file's. Throws VerifyError on a bad log or bad grades.
  */
 export function verifyRun(
   model: RaceModel,
@@ -322,15 +329,17 @@ export function verifyRun(
   replay: ReplayOptions = {},
 ): VerifiedRun {
   checkLog(model, decisions);
-  const chosen = answers(model, decisions);
+  // The moments the player was asked: in Legend they follow the drawn safety cars.
+  const played = replay.legend ? { ...model, decisionMoments: legendMoments(model, seed) } : model;
+  const chosen = answers(played, decisions);
   const logged = loggedPlan(model, decisions);
-  const claims = claimed === undefined ? null : claimedGrades(model, claimed, samples, logged);
+  const claims = claimed === undefined ? null : claimedGrades(played, claimed, samples, logged);
 
   const run = initRun(model, seed, { ...replay, decisions });
   while (!isFinished(run)) stepLap(run);
   const result = classify(run);
 
-  const moments = [...model.decisionMoments]
+  const moments = [...played.decisionMoments]
     .sort((a, b) => a.lap - b.lap)
     .map((m): VerifiedMoment => {
       const claim = claims?.get(m.id);

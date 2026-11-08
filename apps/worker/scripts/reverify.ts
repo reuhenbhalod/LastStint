@@ -10,8 +10,9 @@
 //
 // Eras attempts (eras build plan 7.3) get the same re-grade: a corrected attempt's race
 // progress is rebuilt from all of the player's attempts there (src/reverify.ts
-// recheckAttemptSql), so it never loses a star earned on another attempt. An attempt whose race
-// file changed since it started, or whose rival the server can't replay yet, is left for later.
+// recheckAttemptSql), so it never loses a star earned on another attempt. An Expert rival's
+// claimed choices are re-graded too, and wrong ones corrected. An attempt whose race file
+// changed since it started is left for later.
 
 import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -164,9 +165,12 @@ for (const a of attempts) {
     continue;
   }
   const check = recheckAttempt(model, a);
-  if (!check) {
-    attemptsLeft++;
-    continue;
+  if (check.rival && !check.rival.honest) {
+    console.warn(
+      `eras attempt ${a.id} (${a.race_id}): rival claims wrong ${
+        check.rival.error ?? `after laps ${check.rival.wrong.join(', ')}`
+      }`,
+    );
   }
   if (check.correct) attemptsOk++;
   else {
