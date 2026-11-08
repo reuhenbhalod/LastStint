@@ -2475,3 +2475,113 @@ from 1993 SCs run (the real ones and made-up crashes').
 
 **Not regenerated here:** `apps/worker/src/races.gen.ts`, `data/sc_rates.json` and the parity
 fixtures.
+
+## Model fix M1: driver pace on damp and wet tracks (Eras builds), Nov 8 2026
+
+Gap 1 of docs/eras-races-report.md ("no driver-specific damp / intermediate pace", 17 races).
+Before, `wet.driver_wet_pace` gave each driver one wet pace: the median, over every green lap
+at wetness 0.05 and up, of the lap's share lost beyond the curves, divided by the fade-in and
+shrunk by 5 laps. It counted laps in traffic (belgium-2023: VER's damp opening laps coming
+through from 6th), mixed the damp and the wet parts of a race (brazil-2012, united-states-2003),
+and measured each lap against the curves, not against the cars around it.
+
+**Method** (`wet.driver_band_pace`, `wet.wet_tyre_shift`; Eras builds only):
+- **Clear-air laps only.** A lap counts if it and the lap before are racing laps
+  (`track.racing_status`: green or partly under a local yellow), it isn't an in- or out-lap or
+  lap 1, and no car is within 1.5 s ahead (`BAND_TRAFFIC_GAP`). Laps at wetness under 0.02
+  are dry and left out.
+- **Against the field on the same lap.** A lap's residual is its share of a dry lap lost
+  beyond the curves (as before), less the median of the other clear-air cars on that lap and
+  tyre class (at least 2). The timeline and curves then explain the field, and the driver's
+  pace is relative to it.
+- **Two track states.** Damp (wetness under 0.15, `DAMP_EDGE`: slick weather, the
+  slick-inter crossover on the fitted curves is about 0.16) and wet (0.15 and up). Each is a
+  ridge fit through the fade-in `wet_scale` (min(1, w / 0.1)), as the sims apply it: the
+  driver's overall pace is sum(r·s) / (sum(s²) + 2), each band's (sum_b(r·s) + 3·overall) /
+  (sum_b(s²) + 3). So a driver with few laps keeps the field's pace (0) and a band with few
+  laps the driver's overall. Residuals are capped at ±6% (an off).
+- **The priors are empirical Bayes** on the 17 races' clear-air laps (4,739 laps): lap noise
+  sd 2.0% of a lap, between-driver sd 1.5% (prior 1.8 laps, used 2); a driver's damp and wet
+  pace correlate 0.47 (97 drivers with both), so a band's own deviation sd is about 1.1%
+  (prior 3.3 laps, used 3). Alternate-lap halves of a driver's laps correlate 0.89: the
+  signal is real.
+- **Full wets against inters, where a race can tell.** On laps with at least 2 clear-air cars
+  on each, the gap between the two tyres' median residuals; with 5 such laps or more, the
+  race's wet curve `min` moves by their mean, shrunk by 3 laps, and the timeline is refitted
+  on the shifted curves. It fires on canada-2011 (7 laps: wets 2.0% quicker than the shared
+  curves say against inters) and monaco-2016 (18 laps: 0.6%); nowhere else (malaysia-2001,
+  where the report has Ferrari on inters against full wets, has every rain stint labelled
+  INTERMEDIATE: the lap times can't split them, as before).
+- **In the race file:** `wetPace` is the wet-band pace and the new optional `dampPace` the
+  damp one (schema description only; both sims: `sim_reference.driver_wet`, `weather.ts`
+  `wetFactor(..., dampPace)`, `DAMP_EDGE` 0.15 in both). A file without `dampPace` runs
+  exactly as before.
+
+**Gating.** Only `build.py`'s `eras_build` (the race takes its Eras overlay and isn't a
+Daily/Gauntlet pool race) takes the new fit; every other build keeps `driver_wet_pace` and
+writes no `dampPace`. Reconstructed races (1983-1995) keep it too: their laps are solved to
+the anchors, so a lap against the field would read back the solver's noise (their five wet
+files still match a fresh build, `test_build_reconstructed.py`). The two wet pool races (canada-2024, russia-2021) rebuild byte-identical
+to a build at the parent commit (race file and golden); no committed race file, golden or
+parity fixture changes. Parity on the new field: the Python reference and the TS sim agree
+(order, and times to 3 decimals) on five rebuilt races that carry `dampPace` (belgium-2023,
+canada-2011, monaco-2016, europe-2007, united-states-2003; seeds 1-5; a scratch check, not
+committed).
+
+**Before / after** (robust G1, 1,000 runs on each seed set, one race per call; before = the
+merged code at 0cc2bcb, matching docs/eras-races-report.md; after = this fix; rebuilt into a
+scratch directory, data/races not changed). Failing check: the worst after the fix, seed set
+10000 / 20000, limit in brackets.
+
+| Race | Before | Mean gap error | After | Mean gap error | Change | Main failing check after |
+|---|---|---|---|---|---|---|
+| monaco-2022 | fail | 4.93s | fail | 7.25s | +2.32s | duel LEC vs PER gap error 6.69 / 7.33 [3.00] |
+| netherlands-2023 | fail | 3.79s | fail | 4.97s | +1.18s | field HAM gap error 16.76 / 16.74 [5.00] |
+| belgium-2023 | fail | 4.80s | **pass** | 2.20s | -2.60s | |
+| australia-2025 | fail | 4.62s | fail | 2.86s | -1.76s | duel VER vs NOR gap error 6.40 / 6.36 [3.00] |
+| turkey-2020 | fail | 3.25s | fail | 3.25s | 0.00s | field SAI gap error 7.11 / 6.99 [5.00] |
+| monaco-2016 | fail | 8.15s | fail | 6.36s | -1.79s | duel RIC vs HAM gap error 9.79 / 9.83 [3.00] |
+| canada-2011 | fail | 3.51s | fail | 4.36s | +0.85s | field MAS gap error 10.78 / 11.68 [5.00] |
+| brazil-2012 | fail | 3.34s | fail | 3.45s | +0.11s | duel VET vs ALO gap error 5.54 / 5.53 [3.00] |
+| hungary-2006 | fail | 22.00s | fail | 14.18s | -7.82s | duel BUT vs DLR gap error 25.48 / 25.01 [3.00] |
+| europe-2007 | fail | 4.93s | fail | 2.30s | -2.63s | duel ALO vs MAS gap error 6.36 / 6.29 [3.00] |
+| monaco-2008 | fail | 3.28s | fail | 4.32s | +1.04s | duel HAM vs KUB gap error 5.97 / 6.10 [3.00] |
+| japan-2000 | fail | 4.51s | **pass** | 2.00s | -2.51s | |
+| malaysia-2001 | fail | 10.22s | fail | 11.31s | +1.09s | duel MSCM vs BAR gap error 15.26 / 15.30 [3.00] |
+| united-states-2003 | fail | 14.64s | fail | 5.76s | -8.88s | field HEI gap error 17.08 / 17.12 [5.64] |
+| spain-1996 | fail | 7.55s | fail | 4.90s | -2.65s | duel MSCM vs ALE gap error 6.65 / 6.56 [3.00] |
+| belgium-1998 | fail | 4.91s | fail | 13.54s | +8.63s | duel HIL vs SCH gap error 21.24 / 21.22 [3.00] |
+| europe-1999 | fail | 15.56s | fail | 20.16s | +4.60s | field SCH gap error 41.47 / 41.38 [5.00] |
+
+**2 new passes (belgium-2023, japan-2000), 0 lost; mean gap error over the 17: 7.29 -> 6.66 s.**
+9 races improve, 7 get worse, 1 is unchanged.
+
+**What else was tried** (same 17 races, sum of mean gap errors; before 124.0 s): the fit
+against the curves instead of the field on the lap 117.8 s (belgium-2023 fails again); one
+pace per driver instead of two bands 118.7 s; a 1.0 s traffic gap 123.3 s; priors of 10
+laps 120.6 s; priors of 5 laps 114.3 s; the field reference across all tyre classes 120.5 s.
+The chosen fit (field reference by tyre class, two bands, empirical-Bayes priors, the wet-tyre
+shift) is 113.2 s.
+
+**Why the seven get worse:**
+- **belgium-1998** (+8.6 s): Ralf Schumacher's clear-air laps now give him his real wet pace
+  (-2.0%, was -1.3% with the laps stuck behind Hill), so the sim's SCH passes Hill and wins by
+  ~18 s. Really Jordan held him behind Hill (team orders, gap 5); the old fit's traffic laps
+  happened to stand in for the order.
+- **europe-1999** (+4.6 s): every stint but 88 laps is labelled MEDIUM (step 2.4's estimate),
+  so "the same tyre class" mixes cars on slicks and on rain tyres in the second shower, and
+  the field reference is wrong on those laps (Herbert's wet pace goes +0.5% -> +1.4%). The fix
+  is the stint tyre labels (gap 11), not this fit.
+- **monaco-2022, monaco-2008** (+2.3 s, +1.0 s): Monaco has few clear-air laps (monaco-2022:
+  VER 3, LEC 1), so a driver's estimate rests on a handful and the priors let them count.
+- **netherlands-2023** (+1.2 s): HAM's wet laps are 5, all in the finish shower (+1.1%); the
+  red-flag restart then compresses the field.
+- **canada-2011, malaysia-2001, brazil-2012** (+0.1 to +1.1 s): within the noise of the
+  change; the causes in docs/eras-races-report.md stand (canada-2011's drying track, malaysia's
+  unsplittable tyres; brazil-2012's VET wet pace -0.2% -> -0.8%, but BUT's -2.5% and WEB's
+  -0.9% move with him, so his edge over the late wet stint is still too small).
+
+turkey-2020 doesn't move: its fit calls it dry from lap 18 (gap 11), before the takeover.
+
+**Not regenerated here:** data/races, data/golden, `apps/worker/src/races.gen.ts` and the
+parity fixtures (the integrator rebuilds every non-pool race after all model fixes merge).

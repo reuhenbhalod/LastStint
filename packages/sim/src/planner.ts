@@ -201,7 +201,7 @@ function stintTimes(
       // Pushing gains nothing on tyres past their life (the sim's modeLapDelta).
       const dry =
         tyreLapTime(model, car.basePace, compound, wear, lap) + freshTyreDelta(model, age);
-      t += dry * wetFactor(model.weather, compound, wet, car.wetPace ?? 0);
+      t += dry * wetFactor(model.weather, compound, wet, car.wetPace ?? 0, car.dampPace);
       t += lapDelta < 0 && wear >= life ? 0 : lapDelta;
     }
     out[lap - from] = t;

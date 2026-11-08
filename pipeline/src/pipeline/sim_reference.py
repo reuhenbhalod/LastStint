@@ -66,6 +66,9 @@ class Car:
     tyre_wear: float | None = None
     # A wet race: the driver's extra share of a lap in the wet (wet.driver_wet_pace).
     wet_pace: float = 0.0
+    # An Eras build's pace on a damp track (wetness under wet.DAMP_EDGE; wet.driver_band_pace),
+    # where wet_pace is its pace on a wet one. None: wet_pace at any wetness.
+    damp_pace: float | None = None
     # A stop-go owed for entering a closed pit lane (race_rules; 2007-08).
     stop_go: float = 0.0
     # A refuelling race (refuel.py): fuel on board in laps, and the race's laps.
@@ -117,6 +120,17 @@ def weather_wear(weather: dict | None, compound: str, lap: int) -> float:
     return 1.0 - 0.8 * min(1.0, w / 0.05)
 
 
+# Wetness below this is damp: a car's damp_pace applies there (wet.DAMP_EDGE).
+DAMP_EDGE = 0.15
+
+
+def driver_wet(car: Car, w: float) -> float:
+    """The car's extra share of a lap at wetness w, before the fade-in (wet.wet_scale)."""
+    if car.damp_pace is not None and w < DAMP_EDGE:
+        return car.damp_pace
+    return car.wet_pace
+
+
 def _clean_lap(
     car: Car, compounds: dict, fuel_per_lap: float, lap: int, fresh=None, weather=None
 ) -> float:
@@ -131,7 +145,7 @@ def _clean_lap(
     t += refuel.tank_weight_delta(car, fuel_per_lap, lap)  # refuelling: the weight resets
     if weather:
         w = wetness(weather, lap)
-        t *= 1 + wet_penalty(weather, car.compound, lap) + car.wet_pace * min(1.0, w / 0.1)
+        t *= 1 + wet_penalty(weather, car.compound, lap) + driver_wet(car, w) * min(1.0, w / 0.1)
     return t
 
 
@@ -256,6 +270,7 @@ def simulate(
             strategy=list(strat),
             laps_done=takeover,
             wet_pace=d.get("wetPace", 0.0),
+            damp_pace=d.get("dampPace"),
             service=list(d.get("serviceStops", [])),
         )
 

@@ -441,7 +441,7 @@ export function cleanLap(model: RaceModel, car: CarState, lap: number, w?: numbe
     tankWeightDelta(model, car, lap); // refuelling: the weight resets at each stop (refuel.ts)
   if (!model.weather) return dry;
   const wet = w ?? wetnessOn(model.weather.wetness, lap);
-  return dry * wetFactor(model.weather, car.compound, wet, car.wetPace ?? 0);
+  return dry * wetFactor(model.weather, car.compound, wet, car.wetPace ?? 0, car.dampPace);
 }
 
 /**
@@ -627,6 +627,7 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
       basePace: d.basePace,
       noise: d.noise,
       ...(d.wetPace ? { wetPace: d.wetPace } : {}),
+      ...(d.dampPace !== undefined ? { dampPace: d.dampPace } : {}),
       compound: s.compound,
       tyreAge: s.tyreAge,
       tyreWear: s.tyreAge,
@@ -1279,7 +1280,7 @@ function predictedRemaining(
     if (!flag) {
       const dry =
         tyreLapTime(model, car.basePace, compound, wear, lap) + freshTyreDelta(model, age);
-      total += dry * wetFactor(model.weather, compound, wet, car.wetPace ?? 0);
+      total += dry * wetFactor(model.weather, compound, wet, car.wetPace ?? 0, car.dampPace);
     }
     wear += (flag ? 1 : wearMult) * weatherWear(model.weather, compound, wet);
     age += 1;
@@ -1436,7 +1437,8 @@ function planOwedStops(run: Run, car: CarState, k: number): PitStop[] {
   const lapCost = (compound: string, wear: number, age: number, lap: number) => {
     if (known.get(lap)) return 0;
     const dry = tyreLapTime(model, car.basePace, compound, wear, lap) + freshTyreDelta(model, age);
-    return dry * wetFactor(model.weather, compound, wetnessOn(run.wetness, lap), car.wetPace ?? 0);
+    const wet = wetnessOn(run.wetness, lap);
+    return dry * wetFactor(model.weather, compound, wet, car.wetPace ?? 0, car.dampPace);
   };
   const wearStep = (compound: string, lap: number) =>
     (known.get(lap) ? 1 : wearMult) *

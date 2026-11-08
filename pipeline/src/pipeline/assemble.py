@@ -124,6 +124,7 @@ def assemble_race_model(
     sc_unlap: str | None = None,
     weather: dict | None = None,
     wet_pace: dict[str, float] | None = None,
+    damp_pace: dict[str, float] | None = None,
     fault_facts: list[dict] | None = None,
     year: int | None = None,
     red_flags: list[dict] | None = None,
@@ -278,6 +279,7 @@ def assemble_race_model(
             wear,
             wet_pace,
             eras_stops=eras_stops,
+            damp_pace=damp_pace,
         )
         # A stop made with a fault: the sim adds the fault's cost to its laps itself.
         measured.update(faults_mod.adjust_stop_losses(frame, fault_events, laps))
@@ -323,6 +325,7 @@ def assemble_race_model(
             wet_pace,
             service=True,
             eras_stops=eras_stops,
+            damp_pace=damp_pace,
         )
         for (code, out_lap), loss in sorted(frame.items()):
             if out_lap > takeover_lap:
@@ -340,6 +343,7 @@ def assemble_race_model(
                 "basePace": round(fit.driver_pace[code] + race_pace.get(code, 0.0), 4),
                 "noise": round(fit.driver_noise[code], 4),
                 **({"wetPace": wet_pace[code]} if wet_pace and code in wet_pace else {}),
+                **({"dampPace": damp_pace[code]} if damp_pace and code in damp_pace else {}),
                 "stateAtTakeover": {
                     "position": s["position"],
                     "gapAhead": s["gapAhead"] if s["gapAhead"] is not None else 0.0,

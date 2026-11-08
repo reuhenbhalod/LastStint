@@ -86,6 +86,8 @@ export interface DriverModel {
   noise: number;
   /** A wet race: the driver's extra share of a lap in the wet beyond the curves. */
   wetPace?: number;
+  /** An Eras build: the driver's share on a damp track (wetness < DAMP_EDGE); absent: wetPace. */
+  dampPace?: number;
   stateAtTakeover: {
     position: number;
     gapAhead: number;
@@ -394,6 +396,8 @@ export interface CarState {
   noise: number;
   /** A wet race: the driver's extra share of a lap in the wet (DriverModel.wetPace). */
   wetPace?: number;
+  /** An Eras build: its share on a damp track (DriverModel.dampPace). */
+  dampPace?: number;
   compound: Compound;
   /** Laps on the current tyres (what the timing tower shows). */
   tyreAge: number;

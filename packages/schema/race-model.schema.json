@@ -316,7 +316,11 @@
           },
           "wetPace": {
             "type": "number",
-            "description": "A wet race: the driver's extra share of a lap on a wet track beyond the weather curves (negative: quicker in the wet), fading in up to wetness 0.1 (pipeline/wet.py)."
+            "description": "A wet race: the driver's extra share of a lap on a wet track beyond the weather curves (negative: quicker in the wet), fading in up to wetness 0.1 (pipeline/wet.py). With dampPace: its pace at wetness 0.15 and up."
+          },
+          "dampPace": {
+            "type": "number",
+            "description": "An Eras build's wet race: the driver's extra share of a lap on a damp track (wetness under 0.15), where wetPace is its pace on a wet one; fades in up to wetness 0.1 the same way (pipeline wet.driver_band_pace). Absent: wetPace at any wetness."
           },
           "serviceStops": {
             "type": "array",
