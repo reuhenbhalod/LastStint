@@ -4,7 +4,7 @@
     "id": "austria-2002",
     "name": "Austria 2002: Barrichello vs Schumacher",
     "laps": 71,
-    "takeoverLap": 21,
+    "takeoverLap": 26,
     "seed": 1,
     "scUnlap": "none"
   },
@@ -51,39 +51,35 @@
     {
       "code": "BAR",
       "team": "Ferrari",
-      "basePace": 74.4282,
+      "basePace": 74.4256,
       "noise": 0.3337,
       "stateAtTakeover": {
         "position": 1,
         "gapAhead": 0.0,
         "compound": "MEDIUM",
-        "tyreAge": 21,
+        "tyreAge": 2,
         "compoundsUsed": [
           "MEDIUM"
         ]
       },
       "realStrategy": [
         {
-          "lap": 25,
-          "to": "MEDIUM"
-        },
-        {
           "lap": 62,
           "to": "MEDIUM",
-          "loss": 24.041
+          "loss": 24.046
         }
       ]
     },
     {
       "code": "BUT",
       "team": "Renault",
-      "basePace": 75.9436,
+      "basePace": 75.9217,
       "noise": 0.7761,
       "stateAtTakeover": {
-        "position": 9,
-        "gapAhead": 0.906,
+        "position": 8,
+        "gapAhead": 1.229,
         "compound": "MEDIUM",
-        "tyreAge": 21,
+        "tyreAge": 26,
         "compoundsUsed": [
           "MEDIUM"
         ]
@@ -98,13 +94,13 @@
     {
       "code": "COU",
       "team": "McLaren",
-      "basePace": 75.9888,
+      "basePace": 75.9749,
       "noise": 0.6902,
       "stateAtTakeover": {
         "position": 6,
-        "gapAhead": 2.094,
+        "gapAhead": 1.176,
         "compound": "MEDIUM",
-        "tyreAge": 21,
+        "tyreAge": 26,
         "compoundsUsed": [
           "MEDIUM"
         ]
@@ -122,10 +118,10 @@
       "basePace": 75.9292,
       "noise": 0.6925,
       "stateAtTakeover": {
-        "position": 10,
-        "gapAhead": 6.265,
+        "position": 9,
+        "gapAhead": 0.495,
         "compound": "MEDIUM",
-        "tyreAge": 21,
+        "tyreAge": 26,
         "compoundsUsed": [
           "MEDIUM"
         ]
@@ -143,10 +139,10 @@
       "basePace": 76.711,
       "noise": 0.9328,
       "stateAtTakeover": {
-        "position": 17,
-        "gapAhead": 8.118,
+        "position": 15,
+        "gapAhead": 0.498,
         "compound": "MEDIUM",
-        "tyreAge": 21,
+        "tyreAge": 26,
         "compoundsUsed": [
           "MEDIUM"
         ]
@@ -161,13 +157,13 @@
     {
       "code": "HEI",
       "team": "Sauber",
-      "basePace": 73.8228,
+      "basePace": 73.8172,
       "noise": 0.3314,
       "stateAtTakeover": {
         "position": 5,
-        "gapAhead": 13.197,
+        "gapAhead": 1.394,
         "compound": "MEDIUM",
-        "tyreAge": 21,
+        "tyreAge": 26,
         "compoundsUsed": [
           "MEDIUM"
         ]
@@ -180,10 +176,10 @@
       "basePace": 78.3559,
       "noise": 0.6346,
       "stateAtTakeover": {
-        "position": 15,
-        "gapAhead": 1.243,
+        "position": 13,
+        "gapAhead": 1.71,
         "compound": "MEDIUM",
-        "tyreAge": 21,
+        "tyreAge": 26,
         "compoundsUsed": [
           "MEDIUM"
         ]
@@ -205,10 +201,10 @@
       "basePace": 76.3542,
       "noise": 0.7357,
       "stateAtTakeover": {
-        "position": 11,
-        "gapAhead": 2.348,
+        "position": 10,
+        "gapAhead": 1.191,
         "compound": "MEDIUM",
-        "tyreAge": 21,
+        "tyreAge": 26,
         "compoundsUsed": [
           "MEDIUM"
         ]
@@ -223,13 +219,13 @@
     {
       "code": "MON",
       "team": "Williams",
-      "basePace": 74.7404,
+      "basePace": 74.7472,
       "noise": 0.3321,
       "stateAtTakeover": {
         "position": 4,
-        "gapAhead": 12.135,
+        "gapAhead": 3.131,
         "compound": "MEDIUM",
-        "tyreAge": 21,
+        "tyreAge": 26,
         "compoundsUsed": [
           "MEDIUM"
         ]
@@ -238,62 +234,42 @@
         {
           "lap": 52,
           "to": "MEDIUM",
-          "loss": 23.637
+          "loss": 23.624
         }
       ]
     },
     {
       "code": "MSCM",
       "team": "Ferrari",
-      "basePace": 74.3834,
+      "basePace": 74.3724,
       "noise": 0.3522,
       "stateAtTakeover": {
-        "position": 2,
-        "gapAhead": 1.547,
+        "position": 3,
+        "gapAhead": 0.608,
         "compound": "MEDIUM",
-        "tyreAge": 21,
+        "tyreAge": 2,
         "compoundsUsed": [
           "MEDIUM"
         ]
       },
       "realStrategy": [
         {
-          "lap": 25,
-          "to": "MEDIUM"
-        },
-        {
           "lap": 63,
           "to": "MEDIUM",
-          "loss": 23.939
+          "loss": 23.961
         }
       ]
     },
     {
-      "code": "PAN",
-      "team": "BAR",
-      "basePace": 74.4705,
-      "noise": 0.3505,
-      "stateAtTakeover": {
-        "position": 13,
-        "gapAhead": 2.652,
-        "compound": "MEDIUM",
-        "tyreAge": 21,
-        "compoundsUsed": [
-          "MEDIUM"
-        ]
-      },
-      "realStrategy": []
-    },
-    {
       "code": "SAL",
       "team": "Toyota",
-      "basePace": 76.384,
+      "basePace": 76.3747,
       "noise": 0.5689,
       "stateAtTakeover": {
-        "position": 8,
-        "gapAhead": 4.168,
+        "position": 7,
+        "gapAhead": 0.712,
         "compound": "MEDIUM",
-        "tyreAge": 21,
+        "tyreAge": 26,
         "compoundsUsed": [
           "MEDIUM"
         ]
@@ -311,31 +287,26 @@
       "basePace": 77.9679,
       "noise": 0.2672,
       "stateAtTakeover": {
-        "position": 14,
-        "gapAhead": 4.21,
+        "position": 16,
+        "gapAhead": 1.896,
         "compound": "MEDIUM",
-        "tyreAge": 21,
+        "tyreAge": 3,
         "compoundsUsed": [
           "MEDIUM"
         ]
       },
-      "realStrategy": [
-        {
-          "lap": 24,
-          "to": "MEDIUM"
-        }
-      ]
+      "realStrategy": []
     },
     {
       "code": "SCH",
       "team": "Williams",
-      "basePace": 74.7114,
+      "basePace": 74.727,
       "noise": 0.2436,
       "stateAtTakeover": {
-        "position": 3,
-        "gapAhead": 30.894,
+        "position": 2,
+        "gapAhead": 1.999,
         "compound": "MEDIUM",
-        "tyreAge": 21,
+        "tyreAge": 26,
         "compoundsUsed": [
           "MEDIUM"
         ]
@@ -344,7 +315,7 @@
         {
           "lap": 48,
           "to": "MEDIUM",
-          "loss": 27.263
+          "loss": 27.232
         }
       ]
     },
@@ -354,10 +325,10 @@
       "basePace": 76.2984,
       "noise": 0.6742,
       "stateAtTakeover": {
-        "position": 12,
-        "gapAhead": 1.989,
+        "position": 11,
+        "gapAhead": 0.859,
         "compound": "MEDIUM",
-        "tyreAge": 21,
+        "tyreAge": 26,
         "compoundsUsed": [
           "MEDIUM"
         ]
@@ -372,22 +343,18 @@
     {
       "code": "VIL",
       "team": "BAR",
-      "basePace": 75.9002,
+      "basePace": 75.8918,
       "noise": 0.8137,
       "stateAtTakeover": {
-        "position": 7,
-        "gapAhead": 1.568,
+        "position": 12,
+        "gapAhead": 1.248,
         "compound": "MEDIUM",
-        "tyreAge": 21,
+        "tyreAge": 3,
         "compoundsUsed": [
           "MEDIUM"
         ]
       },
       "realStrategy": [
-        {
-          "lap": 24,
-          "to": "MEDIUM"
-        },
         {
           "lap": 30,
           "to": "MEDIUM"
@@ -395,7 +362,7 @@
         {
           "lap": 54,
           "to": "MEDIUM",
-          "loss": 25.493
+          "loss": 25.51
         }
       ]
     },
@@ -405,10 +372,10 @@
       "basePace": 77.3392,
       "noise": 1.1384,
       "stateAtTakeover": {
-        "position": 16,
-        "gapAhead": 4.824,
+        "position": 14,
+        "gapAhead": 109.041,
         "compound": "MEDIUM",
-        "tyreAge": 21,
+        "tyreAge": 26,
         "compoundsUsed": [
           "MEDIUM"
         ]
@@ -431,10 +398,10 @@
       "basePace": 78.5622,
       "noise": 0.7495,
       "stateAtTakeover": {
-        "position": 18,
-        "gapAhead": 14.747,
+        "position": 17,
+        "gapAhead": 0.899,
         "compound": "MEDIUM",
-        "tyreAge": 21,
+        "tyreAge": 26,
         "compoundsUsed": [
           "MEDIUM"
         ]
@@ -454,14 +421,10 @@
   },
   "events": [
     {
-      "lap": 24,
-      "type": "RETIREMENT",
-      "driver": "PAN"
-    },
-    {
-      "lap": 24,
+      "lap": 26,
       "type": "SC",
-      "laps": 13
+      "laps": 11,
+      "storylineEvent": true
     },
     {
       "lap": 28,
@@ -489,10 +452,387 @@
       "driver": "TRU"
     }
   ],
-  "decisionMoments": [],
+  "decisionMoments": [
+    {
+      "id": "battle-37",
+      "lap": 37,
+      "trigger": "cliff",
+      "target": {
+        "kind": "team",
+        "positions": [
+          2,
+          2
+        ]
+      },
+      "options": [
+        {
+          "id": "defend",
+          "label": "Defend hard",
+          "decisions": [
+            {
+              "lap": 37,
+              "kind": "mode",
+              "key": "battle",
+              "value": "defend"
+            }
+          ]
+        },
+        {
+          "id": "hold",
+          "label": "Hold the line",
+          "decisions": [
+            {
+              "lap": 37,
+              "kind": "mode",
+              "key": "battle",
+              "value": "hold"
+            }
+          ]
+        },
+        {
+          "id": "attack",
+          "label": "Attack",
+          "decisions": [
+            {
+              "lap": 37,
+              "kind": "mode",
+              "key": "battle",
+              "value": "attack"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "pace-45",
+      "lap": 45,
+      "trigger": "cliff",
+      "target": {
+        "kind": "team",
+        "positions": [
+          2,
+          2
+        ]
+      },
+      "options": [
+        {
+          "id": "push",
+          "label": "Push now",
+          "decisions": [
+            {
+              "lap": 45,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "standard",
+          "label": "Standard pace",
+          "decisions": [
+            {
+              "lap": 45,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "manage",
+          "label": "Manage the tyres",
+          "decisions": [
+            {
+              "lap": 45,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "push-attack",
+          "label": "Push and attack",
+          "decisions": [
+            {
+              "lap": 45,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            },
+            {
+              "lap": 45,
+              "kind": "mode",
+              "key": "battle",
+              "value": "attack"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "stop-57",
+      "lap": 57,
+      "trigger": "cliff",
+      "target": {
+        "kind": "team",
+        "positions": [
+          2,
+          2
+        ]
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "Stay out",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "Box, mediums",
+          "decisions": [
+            {
+              "lap": 57,
+              "kind": "pit",
+              "compound": "MEDIUM",
+              "fill": "standard"
+            }
+          ]
+        },
+        {
+          "id": "box-medium-short",
+          "label": "Box, mediums, a short fill",
+          "decisions": [
+            {
+              "lap": 57,
+              "kind": "pit",
+              "compound": "MEDIUM",
+              "fill": "short"
+            }
+          ]
+        },
+        {
+          "id": "box-medium-long",
+          "label": "Box, mediums, a long fill",
+          "decisions": [
+            {
+              "lap": 57,
+              "kind": "pit",
+              "compound": "MEDIUM",
+              "fill": "long"
+            }
+          ]
+        },
+        {
+          "id": "box-next-medium",
+          "label": "Box next lap, mediums",
+          "decisions": [
+            {
+              "lap": 58,
+              "kind": "pit",
+              "compound": "MEDIUM",
+              "fill": "standard"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "stay"
+    },
+    {
+      "id": "stop-61",
+      "lap": 61,
+      "trigger": "cliff",
+      "target": {
+        "kind": "team",
+        "positions": [
+          2,
+          2
+        ]
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "Stay out",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "Box, mediums",
+          "decisions": [
+            {
+              "lap": 61,
+              "kind": "pit",
+              "compound": "MEDIUM",
+              "fill": {
+                "laps": 10
+              }
+            }
+          ]
+        },
+        {
+          "id": "box-medium-short",
+          "label": "Box, mediums, a short fill",
+          "decisions": [
+            {
+              "lap": 61,
+              "kind": "pit",
+              "compound": "MEDIUM",
+              "fill": "short"
+            }
+          ]
+        },
+        {
+          "id": "box-medium-long",
+          "label": "Box, mediums, a long fill",
+          "decisions": [
+            {
+              "lap": 61,
+              "kind": "pit",
+              "compound": "MEDIUM",
+              "fill": "long"
+            }
+          ]
+        },
+        {
+          "id": "box-next-medium",
+          "label": "Box next lap, mediums",
+          "decisions": [
+            {
+              "lap": 62,
+              "kind": "pit",
+              "compound": "MEDIUM",
+              "fill": "standard"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "box-medium"
+    },
+    {
+      "id": "stop-63",
+      "lap": 63,
+      "trigger": "cliff",
+      "target": {
+        "kind": "team",
+        "positions": [
+          2,
+          2
+        ]
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "Stay out",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "Box, mediums",
+          "decisions": [
+            {
+              "lap": 63,
+              "kind": "pit",
+              "compound": "MEDIUM",
+              "fill": "standard"
+            }
+          ]
+        },
+        {
+          "id": "box-medium-short",
+          "label": "Box, mediums, a short fill",
+          "decisions": [
+            {
+              "lap": 63,
+              "kind": "pit",
+              "compound": "MEDIUM",
+              "fill": "short"
+            }
+          ]
+        },
+        {
+          "id": "box-medium-long",
+          "label": "Box, mediums, a long fill",
+          "decisions": [
+            {
+              "lap": 63,
+              "kind": "pit",
+              "compound": "MEDIUM",
+              "fill": "long"
+            }
+          ]
+        },
+        {
+          "id": "box-next-medium",
+          "label": "Box next lap, mediums",
+          "decisions": [
+            {
+              "lap": 64,
+              "kind": "pit",
+              "compound": "MEDIUM",
+              "fill": "standard"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "stay"
+    },
+    {
+      "id": "battle-68",
+      "lap": 68,
+      "trigger": "cliff",
+      "target": {
+        "kind": "team",
+        "positions": [
+          2,
+          2
+        ]
+      },
+      "options": [
+        {
+          "id": "defend",
+          "label": "Defend hard",
+          "decisions": [
+            {
+              "lap": 68,
+              "kind": "mode",
+              "key": "battle",
+              "value": "defend"
+            }
+          ]
+        },
+        {
+          "id": "hold",
+          "label": "Hold the line",
+          "decisions": [
+            {
+              "lap": 68,
+              "kind": "mode",
+              "key": "battle",
+              "value": "hold"
+            }
+          ]
+        },
+        {
+          "id": "attack",
+          "label": "Attack",
+          "decisions": [
+            {
+              "lap": 68,
+              "kind": "mode",
+              "key": "battle",
+              "value": "attack"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    }
+  ],
   "candidateMomentLaps": [
-    24,
-    25,
+    26,
     29,
     30,
     31,
@@ -531,6 +871,45 @@
   ],
   "userSide": "BAR",
   "rival": "MSCM",
+  "eras": {
+    "eraId": 4,
+    "order": 4,
+    "userSide": "BAR",
+    "target": {
+      "type": "team",
+      "positions": [
+        2,
+        2
+      ]
+    },
+    "storyline": {
+      "real": "Barrichello starts on pole and leads most of the race. Ferrari order him to let Schumacher win, and he yields on the last lap: Schumacher wins by 0.18 s.",
+      "rewriteCondition": {
+        "type": "team",
+        "positions": [
+          1,
+          2
+        ]
+      },
+      "headline": "No swap at the A1-Ring: Barrichello keeps his win"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 1,
+      "label": "Ferrari one-two on one more stop"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "push",
+      "maxLaps": 0,
+      "label": "Bring the one-two home without a single push lap"
+    },
+    "hardCalls": {
+      "BAR": 1,
+      "MSCM": 0
+    },
+    "briefing": "A1-Ring, 2002. The safety car is out and both Ferraris have just refuelled under it. You run Barrichello, on pole and leading; Schumacher is third, behind Ralf Schumacher, who has yet to stop. One more stop each. Bring the Ferraris home one-two."
+  },
   "provenance": {
     "kind": "real",
     "estimated": [

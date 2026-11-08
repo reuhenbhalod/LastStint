@@ -7,6 +7,8 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { playDailyRace } from '../examples/daily-race.js';
 import { battlesFor } from '../src/engineer.js';
+import headsetConfig from '../src/headset.json';
+import { type RuleSwitchable, hasMove, headsetFor } from '../src/rules.js';
 import { type Run, decide, engineerConfig } from '../src/sim.js';
 import type { BattleMove, RaceModel } from '../src/types.js';
 import { verifyRun } from '../src/verify.js';
@@ -24,12 +26,16 @@ describe('race engineer runs verify on every race', () => {
   it.each(races.map((m) => [m.race.id, m] as const))('%s', (_id, model) => {
     const cfg = engineerConfig(model);
     if (!cfg) throw new Error('no engineer config');
+    // The era's moves only (roadmap R5: no wait-drs before DRS, e.g. a refuelling race).
+    const headset = headsetFor(headsetConfig as unknown as Record<string, RuleSwitchable>, model);
+    const attack = ATTACK.filter((m) => !headset || hasMove(headset, m));
     let k = 0;
     const between = (run: Run) => {
       const next = run.state.lap + 1;
       const b = battlesFor(run.state, model, cfg);
       k++;
-      if (b.ahead) decide(run, { lap: next, kind: 'battle', move: ATTACK[k % 3] as BattleMove });
+      if (b.ahead)
+        decide(run, { lap: next, kind: 'battle', move: attack[k % attack.length] as BattleMove });
       else if (b.behind)
         decide(run, { lap: next, kind: 'battle', move: DEFEND[k % 4] as BattleMove });
       if (k % 7 === 0) decide(run, { lap: next, kind: 'blue', action: 'go-round' });

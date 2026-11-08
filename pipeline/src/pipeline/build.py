@@ -899,12 +899,14 @@ RACES: dict[str, dict] = {
         "year": 2016,
         "event": "Spain",
         "source": "tum",
-        "name": "Spain 2016: Verstappen vs Räikkönen",
+        "name": "Spain 2016: Räikkönen vs Verstappen",
         "era": "2014-2025",
         "takeover_lap": None,  # D3 rule
         "seed": 1,
-        "user_side": "VER",
-        "rival": "RAI",  # defend: Verstappen holds off Räikkönen
+        # Eras side by hard calls (RAI 1, VER 1; tie to RAI by chance given up): Räikkönen
+        # chases the win (real: P2, 0.6 s behind Verstappen).
+        "user_side": "RAI",
+        "rival": "VER",
         "score_positions": 6,
         "split": "eras",
     },
@@ -925,12 +927,14 @@ RACES: dict[str, dict] = {
         "year": 2016,
         "event": "Abu Dhabi",
         "source": "tum",
-        "name": "Abu Dhabi 2016: Hamilton vs Rosberg",
+        "name": "Abu Dhabi 2016: Rosberg vs Hamilton",
         "era": "2014-2025",
         "takeover_lap": None,  # D3 rule
         "seed": 1,
-        "user_side": "HAM",
-        "rival": "ROS",  # Hamilton backs Rosberg into the pack
+        # Eras side by hard calls (ROS 1, HAM 0): Rosberg P3 or better for the title while
+        # Hamilton backs him into the pack (real: P2, champion by 5 points).
+        "user_side": "ROS",
+        "rival": "HAM",
         "score_positions": 6,
         "split": "eras",
     },
@@ -968,12 +972,14 @@ RACES: dict[str, dict] = {
         "year": 2012,
         "event": "Europe",
         "source": "jolpica",
-        "name": "Europe 2012: Alonso vs Räikkönen",
+        "name": "Europe 2012: Räikkönen vs Alonso",
         "era": "2010-2013",
         "takeover_lap": None,  # D3 rule
         "seed": 1,
-        "user_side": "ALO",
-        "rival": "RAI",  # Alonso wins from P11; Räikkönen the car behind at the flag
+        # Eras side by hard calls (RAI 2, ALO 0): Räikkönen chases Alonso, who won from P11
+        # (real: Räikkönen P2).
+        "user_side": "RAI",
+        "rival": "ALO",
         "score_positions": 6,
         "split": "eras",
     },
@@ -1138,12 +1144,14 @@ RACES: dict[str, dict] = {
         "year": 2013,
         "event": "Malaysia",
         "source": "jolpica",
-        "name": "Malaysia 2013: Webber vs Vettel",
+        "name": "Malaysia 2013: Vettel vs Webber",
         "era": "2010-2013",
         "takeover_lap": None,  # D3 rule
         "seed": 1,
-        "user_side": "WEB",
-        "rival": "VET",  # Webber holds P1 (real: Multi 21, Vettel passes him)
+        # Eras side by hard calls (VET 3, WEB 0): Vettel, behind Webber, under the order to
+        # hold station (real: he passed Webber and won).
+        "user_side": "VET",
+        "rival": "WEB",
         "score_positions": 6,
         "split": "eras",
     },
@@ -1667,10 +1675,15 @@ RACES: dict[str, dict] = {
         "source": "jolpica",
         "name": "Austria 2002: Barrichello vs Schumacher",
         "era": "1994-2009",
-        "takeover_lap": None,  # D3 rule
+        # Pinned (Eras 6.2): lap 26, after both Ferraris' stops under the lap-24 SC (the D3
+        # rule's lap 21 came before them). A moment can't offer the stop the grader prices
+        # there (its continuation refuels to the flag, past what a pit card fill can name).
+        "takeover_lap": 26,
         "seed": 1,
+        # Eras side by hard calls from lap 26 (BAR 1, MSCM 0): team, Ferrari 1-2 (real:
+        # Barrichello let Schumacher by on the last lap).
         "user_side": "BAR",
-        "rival": "MSCM",  # team: Ferrari 1-2; Barrichello, told to let Schumacher by
+        "rival": "MSCM",
         "score_positions": 6,
         "split": "eras",
     },

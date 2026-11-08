@@ -1,4 +1,35 @@
 {
+  "eras": {
+    "eraId": 7,
+    "order": 10,
+    "userSide": "ROS",
+    "target": {
+      "type": "position",
+      "position": 3
+    },
+    "storyline": {
+      "real": "Rosberg comes to the final round 12 points ahead and needs a podium. Hamilton leads and slows the pace late on to bring Vettel and Verstappen into play, but Rosberg holds second, 0.4 s behind, and takes the title by 5 points.",
+      "rewriteCondition": {
+        "type": "win"
+      },
+      "headline": "Rosberg wins the race and the title in one go"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 1,
+      "label": "Take a podium on one more stop"
+    },
+    "hidden": {
+      "type": "finish_position",
+      "position": 2,
+      "label": "Finish P2 or better"
+    },
+    "hardCalls": {
+      "ROS": 1,
+      "HAM": 0
+    },
+    "briefing": "Abu Dhabi, the 2016 finale. Rosberg leads Hamilton by 12 points, so a podium makes him champion whatever Hamilton does. You run Rosberg, second behind Hamilton, with one stop to make. The slower Hamilton goes, the closer Vettel and Verstappen get. Stay on the podium."
+  },
   "rules": {
     "twoCompound": true,
     "tyreChanges": true,

@@ -1,4 +1,38 @@
 {
+  "eras": {
+    "eraId": 6,
+    "order": 10,
+    "userSide": "ALO",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Alonso wins his home race from 5th on the grid on four stops; R\u00e4ikk\u00f6nen, on three, finishes second, 9.3 s behind. Massa is third.",
+      "rewriteCondition": {
+        "type": "team",
+        "positions": [
+          1,
+          2
+        ]
+      },
+      "headline": "Alonso and Massa give Ferrari a one-two in Barcelona"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 3,
+      "label": "Win on four stops (three more from here)"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 10,
+      "label": "Win by more than 10 seconds"
+    },
+    "hardCalls": {
+      "ALO": 1,
+      "RAI": 0
+    },
+    "briefing": "Barcelona, 2013. The tyres wear fast. Alonso started 5th, has already stopped once and now leads. R\u00e4ikk\u00f6nen, fourth, will try to make one stop fewer work. You run Alonso. Win at home."
+  },
   "rules": {
     "twoCompound": true,
     "tyreChanges": true,
