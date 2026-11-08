@@ -381,7 +381,9 @@ def build(
 ) -> None:
     """Build data/races/<race-id>.json (schema-validated) and its golden file. A race with an
     Eras overlay (data/eras/<race-id>.json) gets its eras, provenance, rules and
-    storylineEvents keys; an ingested Jolpica race need not be registered. The report lists
+    storylineEvents keys, except a Daily/Gauntlet pool race: its file stays as it is and the
+    worker serves the overlay beside it. An ingested Jolpica race need not be registered. The
+    report lists
     each race's estimated fields and data quirks."""
     from pathlib import Path
 
