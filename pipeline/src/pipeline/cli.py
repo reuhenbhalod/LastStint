@@ -7,6 +7,7 @@ pipeline build <race-id>      build data/races/<id>.json and data/golden/<id>.js
 pipeline validate <race-id>   run the Gate G1 report; exits 1 if the race fails
 pipeline f1db [race-id ...]   F1DB stops and fastest laps -> data/raw/f1db/ (Eras races)
 pipeline tum-ingest <race-id> read a 2014-2019 race from the TUM database into data/raw/
+pipeline hard-calls <race-id> count each storyline driver's hard calls -> data/eras/<id>.json
 """
 
 from __future__ import annotations
@@ -383,6 +384,35 @@ def f1db_cmd(
     typer.echo(f"F1DB {f1db.VERSION} -> {f1db.OUT_DIR.relative_to(paths.REPO_ROOT)}/")
     if bad:
         raise typer.Exit(code=1)
+
+
+@app.command("hard-calls")
+def hard_calls_cmd(
+    race_id: str = typer.Argument(..., help="A race in data/races/, e.g. abu-dhabi-2021."),
+    samples: int = typer.Option(None, help="Grader samples per option (default: the grader's)."),
+    out: str = typer.Option(None, help="Overlay directory to write to (default: data/eras/)."),
+) -> None:
+    """Count the hard calls from each storyline driver's side (moment finder + grader on the
+    real race) and write eras.hardCalls and eras.userSide into the race's Eras overlay."""
+    from pathlib import Path
+
+    from . import hard_calls
+
+    race_file = paths.RACES_DIR / f"{race_id}.json"
+    try:
+        result = hard_calls.run_counter(race_file, samples)
+        written = hard_calls.write_overlay(
+            race_id, result, Path(out) if out else hard_calls.ERAS_DIR
+        )
+    except (FileNotFoundError, ValueError, RuntimeError) as e:
+        typer.echo(f"{race_id}: {e}", err=True)
+        raise typer.Exit(code=1) from e
+    counts = ", ".join(f"{code} {n}" for code, n in result["hardCalls"].items())
+    gave_up = ", ".join(f"{code} {pts:.1f}" for code, pts in result["gaveUp"].items())
+    typer.echo(
+        f"{race_id}: hard calls {counts}; chance given up (pts) {gave_up};"
+        f" userSide {result['userSide']} (by {result['decidedBy']}) -> {written}"
+    )
 
 
 if __name__ == "__main__":
