@@ -13,6 +13,7 @@ from __future__ import annotations
 import json
 import math
 from dataclasses import dataclass, field
+from pathlib import Path
 
 from .paths import GOLDEN_DIR
 from .rng import Mulberry32, derive_seed
@@ -357,9 +358,11 @@ def _bunch(
         cars[c].total_time = last
 
 
-def write_golden(model: dict, seeds: list[int]) -> None:
-    """Write reference outputs for fixed seeds to data/golden/ for TS parity tests."""
-    GOLDEN_DIR.mkdir(parents=True, exist_ok=True)
+def write_golden(model: dict, seeds: list[int], golden_dir: Path | None = None) -> None:
+    """Write reference outputs for fixed seeds to data/golden/ (or golden_dir) for TS parity
+    tests."""
+    golden_dir = Path(golden_dir) if golden_dir is not None else GOLDEN_DIR
+    golden_dir.mkdir(parents=True, exist_ok=True)
     out = {str(s): simulate(model, s) for s in seeds}
-    path = GOLDEN_DIR / f"{model['race']['id']}.json"
+    path = golden_dir / f"{model['race']['id']}.json"
     path.write_text(json.dumps(out, indent=2))

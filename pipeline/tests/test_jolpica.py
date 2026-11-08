@@ -260,6 +260,7 @@ def test_ingest_writes_snapshot_status_and_sidecar(tmp_path, drivers_json):
 
 def test_cli_jolpica_writes_and_prints_the_time_check(tmp_path):
     args = ["jolpica", "abu-dhabi-2012", "--dump", str(FIXTURE), "--raw-dir", str(tmp_path)]
+    args += ["--estimates-dir", str(tmp_path / "estimates")]  # never into data/estimates
     result = CliRunner().invoke(cli.app, args)
     assert result.exit_code == 0, result.output
     assert ingest.raw_snapshot_path("abu-dhabi-2012", tmp_path).exists()
