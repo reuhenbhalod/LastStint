@@ -25,8 +25,12 @@ import {
 } from '../src/sim.js';
 import type { Decision, RaceModel, RaceRules } from '../src/types.js';
 
-const plain = monacoJson as unknown as RaceModel;
-const monaco: RaceModel = { ...plain, rules: overlay.rules as RaceRules };
+// The built race file carries its overlay's rules (minStops 2); `plain` is the same race with
+// the minimum removed, to compare against.
+const built = monacoJson as unknown as RaceModel;
+const { minStops: _owed, ...noMin } = (built.rules ?? {}) as RaceRules;
+const plain: RaceModel = { ...built, rules: noMin };
+const monaco: RaceModel = { ...built, rules: overlay.rules as RaceRules };
 const abu = abuJson as unknown as RaceModel;
 
 function play(model: RaceModel, seed: number, decisions: Decision[], incidents = false): Run {
