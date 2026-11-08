@@ -788,8 +788,8 @@
    "periods": [
     {
      "startLap": 28,
-     "endLap": 29,
-     "laps": 2,
+     "endLap": 33,
+     "laps": 6,
      "kind": "SC",
      "confidence": "ambiguous",
      "peakRatio": 1.234,
@@ -798,19 +798,8 @@
      "reasons": [
       "only 1.23x slower: rain, yellow flags or a short SC?"
      ],
-     "status": "unchecked"
-    },
-    {
-     "startLap": 31,
-     "endLap": 33,
-     "laps": 3,
-     "kind": "SC",
-     "confidence": "likely",
-     "peakRatio": 1.466,
-     "gapBefore": 12.8,
-     "gapAfter": 1.7,
-     "reasons": [],
-     "status": "unchecked"
+     "status": "confirmed",
+     "source": "https://en.wikipedia.org/wiki/2012_European_Grand_Prix (one safety car, per docs/eras-checks/w4-corrections.md): Vergne and Kovalainen collide 'on lap 27'; 'The race restarted on lap 34'. Lap 28 is the field's first slow lap in the timing, so one period, laps 28-33 (the estimate's 28-29 yellow and 31-33 SC merged)"
     }
    ],
    "handCheck": "data/estimates/europe-2012.sc.json"

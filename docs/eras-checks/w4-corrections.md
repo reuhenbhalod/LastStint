@@ -79,6 +79,13 @@ correction is one period, laps 28-33, in place of the estimate's 28-29 (yellow) 
 to flag"). The hand-check file is left unchecked. **Owner / author:** move the storyline SC to
 lap 28 (and check `sc-32`), then confirm 28-33.
 
+**Applied in integration 7.** `data/estimates/europe-2012.sc.json` is now one confirmed period,
+laps 28-33 (`pipeline jolpica europe-2012 --force`, then rebuilt). The overlay's storyline SC
+moved to lap 28 (`storylineEvents: [[28, "SC"]]`). In the moments, `stop-28` (Räikkönen's real
+stop, in-lap 28, real option box-hard) already sat on the new SC's first lap, and `pnpm author
+europe-2012 --eras` now picks `sc-28` there, so `stop-28` became `sc-28` (trigger SC, the same
+options and real option) and `sc-32` was dropped. Owner checked: ______.
+
 ## Team orders and faults (`data/incidents.json`)
 
 | Race | Item | Fact | Sources | Lap from | Owner checked |

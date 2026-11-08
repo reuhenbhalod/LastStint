@@ -50,9 +50,9 @@
     "realOptionId": "box-soft"
   },
   {
-    "id": "stop-28",
+    "id": "sc-28",
     "lap": 28,
-    "trigger": "cliff",
+    "trigger": "SC",
     "target": {
       "kind": "beat-rival",
       "rival": "ALO"
@@ -98,56 +98,6 @@
       }
     ],
     "realOptionId": "box-hard"
-  },
-  {
-    "id": "sc-32",
-    "lap": 32,
-    "trigger": "SC",
-    "target": {
-      "kind": "beat-rival",
-      "rival": "ALO"
-    },
-    "options": [
-      {
-        "id": "stay",
-        "label": "Stay out",
-        "decisions": []
-      },
-      {
-        "id": "box-soft",
-        "label": "Box, softs",
-        "decisions": [
-          {
-            "lap": 32,
-            "kind": "pit",
-            "compound": "SOFT"
-          }
-        ]
-      },
-      {
-        "id": "box-hard",
-        "label": "Box, hards",
-        "decisions": [
-          {
-            "lap": 32,
-            "kind": "pit",
-            "compound": "HARD"
-          }
-        ]
-      },
-      {
-        "id": "box-next-hard",
-        "label": "Box next lap, hards",
-        "decisions": [
-          {
-            "lap": 33,
-            "kind": "pit",
-            "compound": "HARD"
-          }
-        ]
-      }
-    ],
-    "realOptionId": "stay"
   },
   {
     "id": "stop-38",

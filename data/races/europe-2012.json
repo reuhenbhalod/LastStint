@@ -9,51 +9,42 @@
   },
   "era": "2010-2013",
   "track": {
-    "pitLoss": 19.956,
-    "pitLossUnderSC": 10.976,
-    "pitLossUnderVSC": 13.77,
+    "pitLoss": 20.803,
+    "pitLossUnderSC": 11.442,
+    "pitLossUnderVSC": 14.354,
     "pitLossDeviations": [
-      -8.771,
-      -8.637,
-      -6.321,
-      -6.22,
-      -5.65,
-      -5.38,
-      -3.127,
-      -2.539,
-      -2.029,
-      -1.889,
-      -1.796,
-      -1.738,
-      -1.58,
-      -1.469,
-      -1.146,
-      -1.034,
-      -0.748,
-      -0.554,
-      -0.239,
-      -0.239,
-      0.239,
-      0.697,
-      0.847,
-      0.967,
-      1.132,
-      1.133,
-      1.171,
-      1.364,
-      1.454,
-      1.584,
-      1.736,
-      1.949,
-      2.369,
-      2.538,
-      3.412,
-      3.86,
-      4.602,
-      5.359,
-      6.161,
-      7.021,
-      10.294
+      -6.227,
+      -3.974,
+      -3.386,
+      -2.876,
+      -2.737,
+      -2.644,
+      -2.316,
+      -1.993,
+      -1.882,
+      -1.596,
+      -1.401,
+      -1.087,
+      -1.086,
+      -0.609,
+      -0.15,
+      0.0,
+      0.12,
+      0.285,
+      0.285,
+      0.517,
+      0.606,
+      0.737,
+      0.889,
+      1.102,
+      1.521,
+      2.565,
+      3.013,
+      3.755,
+      4.511,
+      5.314,
+      6.174,
+      9.446
     ],
     "overtakeDifficulty": 0.9189,
     "overtakeModel": {
@@ -64,7 +55,7 @@
     },
     "dirtyAirPenalty": 0.3565,
     "greenLapTime": 106.529,
-    "scLapTime": 143.412
+    "scLapTime": 130.318
   },
   "compounds": {
     "SOFT": {
@@ -104,8 +95,7 @@
         },
         {
           "lap": 29,
-          "to": "HARD",
-          "loss": 13.736
+          "to": "HARD"
         }
       ],
       "stintPace": [
@@ -146,8 +136,7 @@
         },
         {
           "lap": 27,
-          "to": "HARD",
-          "loss": 17.816
+          "to": "HARD"
         }
       ],
       "stintPace": [
@@ -251,8 +240,7 @@
         },
         {
           "lap": 29,
-          "to": "HARD",
-          "loss": 13.635
+          "to": "HARD"
         }
       ],
       "stintPace": [
@@ -284,8 +272,7 @@
         },
         {
           "lap": 29,
-          "to": "HARD",
-          "loss": 22.494
+          "to": "HARD"
         }
       ],
       "stintPace": [
@@ -321,8 +308,7 @@
         },
         {
           "lap": 29,
-          "to": "HARD",
-          "loss": 11.319
+          "to": "HARD"
         }
       ],
       "stintPace": [
@@ -436,8 +422,7 @@
         },
         {
           "lap": 28,
-          "to": "HARD",
-          "loss": 87.788
+          "to": "HARD"
         }
       ],
       "stintPace": [
@@ -473,8 +458,7 @@
         },
         {
           "lap": 29,
-          "to": "HARD",
-          "loss": 18.376
+          "to": "HARD"
         }
       ],
       "stintPace": [
@@ -510,8 +494,7 @@
         },
         {
           "lap": 28,
-          "to": "SOFT",
-          "loss": 21.127
+          "to": "SOFT"
         },
         {
           "lap": 35,
@@ -636,8 +619,7 @@
         },
         {
           "lap": 29,
-          "to": "HARD",
-          "loss": 11.185
+          "to": "HARD"
         },
         {
           "lap": 48,
@@ -718,8 +700,7 @@
         },
         {
           "lap": 29,
-          "to": "HARD",
-          "loss": 14.306
+          "to": "HARD"
         }
       ],
       "stintPace": [
@@ -902,8 +883,7 @@
         },
         {
           "lap": 30,
-          "to": "HARD",
-          "loss": 56.992
+          "to": "HARD"
         }
       ],
       "stintPace": [
@@ -971,9 +951,9 @@
       "driver": "VERJ"
     },
     {
-      "lap": 31,
+      "lap": 28,
       "type": "SC",
-      "laps": 3,
+      "laps": 6,
       "storylineEvent": true
     },
     {
@@ -1049,9 +1029,9 @@
       "realOptionId": "box-soft"
     },
     {
-      "id": "stop-28",
+      "id": "sc-28",
       "lap": 28,
-      "trigger": "cliff",
+      "trigger": "SC",
       "target": {
         "kind": "beat-rival",
         "rival": "ALO"
@@ -1097,56 +1077,6 @@
         }
       ],
       "realOptionId": "box-hard"
-    },
-    {
-      "id": "sc-32",
-      "lap": 32,
-      "trigger": "SC",
-      "target": {
-        "kind": "beat-rival",
-        "rival": "ALO"
-      },
-      "options": [
-        {
-          "id": "stay",
-          "label": "Stay out",
-          "decisions": []
-        },
-        {
-          "id": "box-soft",
-          "label": "Box, softs",
-          "decisions": [
-            {
-              "lap": 32,
-              "kind": "pit",
-              "compound": "SOFT"
-            }
-          ]
-        },
-        {
-          "id": "box-hard",
-          "label": "Box, hards",
-          "decisions": [
-            {
-              "lap": 32,
-              "kind": "pit",
-              "compound": "HARD"
-            }
-          ]
-        },
-        {
-          "id": "box-next-hard",
-          "label": "Box next lap, hards",
-          "decisions": [
-            {
-              "lap": 33,
-              "kind": "pit",
-              "compound": "HARD"
-            }
-          ]
-        }
-      ],
-      "realOptionId": "stay"
     },
     {
       "id": "stop-38",
@@ -1283,7 +1213,6 @@
     28,
     29,
     30,
-    31,
     35,
     38,
     39,

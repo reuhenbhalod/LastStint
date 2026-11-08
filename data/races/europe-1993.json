@@ -2,9 +2,9 @@
   "schemaVersion": 11,
   "race": {
     "id": "europe-1993",
-    "name": "Europe 1993: Senna vs Prost",
+    "name": "Europe 1993: Senna vs Hill",
     "laps": 76,
-    "takeoverLap": 15,
+    "takeoverLap": 14,
     "seed": 1,
     "scUnlap": "none"
   },
@@ -62,9 +62,9 @@
       "wetPace": 0.0967,
       "stateAtTakeover": {
         "position": 10,
-        "gapAhead": 12.793,
+        "gapAhead": 10.583,
         "compound": "WET",
-        "tyreAge": 15,
+        "tyreAge": 14,
         "compoundsUsed": [
           "WET"
         ]
@@ -79,9 +79,9 @@
       "wetPace": -0.0043,
       "stateAtTakeover": {
         "position": 7,
-        "gapAhead": 1.65,
+        "gapAhead": 3.462,
         "compound": "WET",
-        "tyreAge": 15,
+        "tyreAge": 14,
         "compoundsUsed": [
           "WET"
         ]
@@ -95,10 +95,10 @@
       "noise": 1.05,
       "wetPace": 0.0091,
       "stateAtTakeover": {
-        "position": 14,
-        "gapAhead": 1.669,
+        "position": 13,
+        "gapAhead": 8.853,
         "compound": "WET",
-        "tyreAge": 15,
+        "tyreAge": 14,
         "compoundsUsed": [
           "WET"
         ]
@@ -112,10 +112,10 @@
       "noise": 1.05,
       "wetPace": 0.0708,
       "stateAtTakeover": {
-        "position": 6,
-        "gapAhead": 0.002,
+        "position": 5,
+        "gapAhead": 0.735,
         "compound": "WET",
-        "tyreAge": 15,
+        "tyreAge": 14,
         "compoundsUsed": [
           "WET"
         ]
@@ -129,10 +129,10 @@
       "noise": 0.175,
       "wetPace": -0.0038,
       "stateAtTakeover": {
-        "position": 4,
-        "gapAhead": 0.998,
+        "position": 6,
+        "gapAhead": 0.469,
         "compound": "WET",
-        "tyreAge": 15,
+        "tyreAge": 14,
         "compoundsUsed": [
           "WET"
         ]
@@ -158,9 +158,9 @@
       "wetPace": 0.0164,
       "stateAtTakeover": {
         "position": 16,
-        "gapAhead": 4.541,
+        "gapAhead": 3.247,
         "compound": "WET",
-        "tyreAge": 15,
+        "tyreAge": 14,
         "compoundsUsed": [
           "WET"
         ]
@@ -175,9 +175,9 @@
       "wetPace": 0.0053,
       "stateAtTakeover": {
         "position": 12,
-        "gapAhead": 0.502,
+        "gapAhead": 1.474,
         "compound": "WET",
-        "tyreAge": 15,
+        "tyreAge": 14,
         "compoundsUsed": [
           "WET"
         ]
@@ -191,10 +191,10 @@
       "noise": 1.05,
       "wetPace": 0.0656,
       "stateAtTakeover": {
-        "position": 5,
-        "gapAhead": 0.999,
+        "position": 4,
+        "gapAhead": 1.483,
         "compound": "WET",
-        "tyreAge": 15,
+        "tyreAge": 14,
         "compoundsUsed": [
           "WET"
         ]
@@ -209,9 +209,9 @@
       "wetPace": 0.0118,
       "stateAtTakeover": {
         "position": 17,
-        "gapAhead": 7.12,
+        "gapAhead": 8.132,
         "compound": "WET",
-        "tyreAge": 15,
+        "tyreAge": 14,
         "compoundsUsed": [
           "WET"
         ]
@@ -226,9 +226,9 @@
       "wetPace": 0.0027,
       "stateAtTakeover": {
         "position": 19,
-        "gapAhead": 0.329,
+        "gapAhead": 2.333,
         "compound": "WET",
-        "tyreAge": 15,
+        "tyreAge": 14,
         "compoundsUsed": [
           "WET"
         ]
@@ -243,9 +243,9 @@
       "wetPace": 0.0096,
       "stateAtTakeover": {
         "position": 15,
-        "gapAhead": 6.529,
+        "gapAhead": 3.18,
         "compound": "WET",
-        "tyreAge": 15,
+        "tyreAge": 14,
         "compoundsUsed": [
           "WET"
         ]
@@ -259,10 +259,10 @@
       "noise": 0.175,
       "wetPace": 0.0208,
       "stateAtTakeover": {
-        "position": 13,
-        "gapAhead": 5.772,
+        "position": 14,
+        "gapAhead": 2.786,
         "compound": "MEDIUM",
-        "tyreAge": 5,
+        "tyreAge": 4,
         "compoundsUsed": [
           "MEDIUM",
           "WET"
@@ -278,9 +278,9 @@
       "wetPace": 0.0011,
       "stateAtTakeover": {
         "position": 3,
-        "gapAhead": 1.003,
+        "gapAhead": 0.208,
         "compound": "WET",
-        "tyreAge": 15,
+        "tyreAge": 14,
         "compoundsUsed": [
           "WET"
         ]
@@ -306,9 +306,9 @@
       "wetPace": 0.0112,
       "stateAtTakeover": {
         "position": 8,
-        "gapAhead": 0.256,
+        "gapAhead": 0.976,
         "compound": "WET",
-        "tyreAge": 15,
+        "tyreAge": 14,
         "compoundsUsed": [
           "WET"
         ]
@@ -323,9 +323,9 @@
       "wetPace": -0.0007,
       "stateAtTakeover": {
         "position": 11,
-        "gapAhead": 6.487,
+        "gapAhead": 6.299,
         "compound": "WET",
-        "tyreAge": 15,
+        "tyreAge": 14,
         "compoundsUsed": [
           "WET"
         ]
@@ -340,9 +340,9 @@
       "wetPace": -0.0048,
       "stateAtTakeover": {
         "position": 2,
-        "gapAhead": 23.856,
+        "gapAhead": 24.501,
         "compound": "WET",
-        "tyreAge": 15,
+        "tyreAge": 14,
         "compoundsUsed": [
           "WET"
         ]
@@ -380,7 +380,7 @@
         "position": 1,
         "gapAhead": 0.0,
         "compound": "WET",
-        "tyreAge": 15,
+        "tyreAge": 14,
         "compoundsUsed": [
           "WET"
         ]
@@ -411,9 +411,9 @@
       "wetPace": 0.0094,
       "stateAtTakeover": {
         "position": 20,
-        "gapAhead": 33.736,
+        "gapAhead": 30.437,
         "compound": "WET",
-        "tyreAge": 15,
+        "tyreAge": 14,
         "compoundsUsed": [
           "WET"
         ]
@@ -428,9 +428,9 @@
       "wetPace": -0.0037,
       "stateAtTakeover": {
         "position": 9,
-        "gapAhead": 4.288,
+        "gapAhead": 4.888,
         "compound": "WET",
-        "tyreAge": 15,
+        "tyreAge": 14,
         "compoundsUsed": [
           "WET"
         ]
@@ -445,9 +445,9 @@
       "wetPace": 0.0066,
       "stateAtTakeover": {
         "position": 18,
-        "gapAhead": 11.135,
+        "gapAhead": 5.327,
         "compound": "WET",
-        "tyreAge": 15,
+        "tyreAge": 14,
         "compoundsUsed": [
           "WET"
         ]
@@ -924,7 +924,7 @@
     "WEN"
   ],
   "userSide": "SENA",
-  "rival": "PRO",
+  "rival": "HIL",
   "weather": {
     "curves": {
       "slick": {
@@ -1029,7 +1029,7 @@
     "userSide": "SENA",
     "hardCalls": {
       "SENA": 1,
-      "PRO": 1
+      "HIL": 0
     },
     "target": {
       "type": "win"
@@ -1053,7 +1053,22 @@
       "seconds": 60,
       "label": "Win by more than a minute"
     },
-    "briefing": "Donington, 1993. Damp at the start, then it dries, rains, dries and rains again. Senna made four stops; Prost made seven. Pit board only: every tyre call counts. Reconstructed race: no lap timing survives, so the laps are rebuilt to fit the result, the fastest laps and the sourced stops (Jolpica, F1DB, Motor Sport, Wikipedia). The lap-by-lap gaps and running order are synthetic, not history."
+    "briefing": "Donington, 1993. Damp at the start, then it dries, rains, dries and rains again. Senna made four stops; Prost made seven. Pit board only: every tyre call counts. Reconstructed race: no lap timing survives, so the laps are rebuilt to fit the result, the fastest laps and the sourced stops (Jolpica, F1DB, Motor Sport, Wikipedia). The lap-by-lap gaps and running order are synthetic, not history.",
+    "storylineCalls": [
+      {
+        "driver": "HIL",
+        "lap": 18,
+        "real": "Hill changes to slicks at the end of lap 17, a lap before Senna",
+        "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked"
+      },
+      {
+        "driver": "HIL",
+        "lap": 25,
+        "real": "Hill goes back to wets two laps after Prost, as it rains again; his four later stops aren't sourced (the reconstruction absorbs them), so he keeps his real plan to the flag and finishes second, 1:23 behind",
+        "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked",
+        "untilFlag": true
+      }
+    ]
   },
   "provenance": {
     "kind": "reconstructed",
