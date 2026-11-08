@@ -366,3 +366,149 @@ def driver_wet_pace(
         d: round(float(np.median(v)) * len(v) / (len(v) + WET_PACE_SHRINK), 4)
         for d, v in res.items()
     }
+
+
+# Eras builds (model fix M1): driver pace by track state. A driver's pace on a damp track and
+# on a wet one, from their clear-air laps, measured against the rest of the field on the same
+# lap and tyre class, and shrunk toward the field (pace 0) so a few laps can't overfit.
+# A lap is clear air with no car within this many seconds ahead (the dirty air of a car
+# within ~1.5 s costs time the sim adds itself).
+BAND_TRAFFIC_GAP = 1.5
+# Wetness below this is damp (slick weather: the slick-inter crossover is about 0.16 on the
+# fitted curves), from it wet.
+DAMP_EDGE = 0.15
+# Prior strength, in full-wetness laps (wet_scale 1): a driver's overall wet-weather pace is
+# shrunk toward the field's by FIELD_PRIOR laps of evidence, and each band's toward the
+# driver's overall by BAND_PRIOR. Empirical Bayes on the 17 wet Eras races' clear-air laps
+# (docs/g1-report.md, model fix M1): lap noise sd 2.0% of a lap, driver sd 1.5% (prior
+# 2.0^2 / 1.5^2 = 1.8 laps); a driver's damp and wet pace correlate 0.47, so a band's own
+# deviation sd is about 1.1% (prior 3.3 laps). A residual is capped at BAND_CLIP (an off).
+FIELD_PRIOR = 2.0
+BAND_PRIOR = 3.0
+BAND_CLIP = 0.06
+# A lap's field reference needs this many other clear-air cars on the same tyre class.
+BAND_MIN_FIELD = 2
+
+
+def band_of(w: float) -> str:
+    return "damp" if w < DAMP_EDGE else "wet"
+
+
+def clear_air_shares(laps: pd.DataFrame, weather: dict, fitted) -> pd.DataFrame:
+    """Each clear-air wet lap's share of a dry lap lost beyond the curves. Clear air: green,
+    the lap before green too (no restart), no pit in or out, not lap 1, no car within
+    BAND_TRAFFIC_GAP ahead. Columns driver, lap, w, cls, share."""
+    from . import fit as fit_mod
+    from .clean import gap_to_car_ahead
+
+    eff = sim_wear(laps, weather) + 1.0
+    gap = gap_to_car_ahead(laps)
+    from .track import racing_status
+
+    racing = laps["TrackStatus"].map(racing_status).astype(bool)
+    prev_green = (
+        laps.assign(_g=racing)
+        .sort_values("LapNumber")
+        .groupby("Driver")["_g"]
+        .shift(1, fill_value=False)
+        .reindex(laps.index, fill_value=False)
+    )
+    ok = (
+        laps["IsAccurate"].fillna(False).astype(bool)
+        & racing
+        & prev_green
+        & laps["PitInTime"].isna()
+        & laps["PitOutTime"].isna()
+        & (laps["LapNumber"] > 1)
+        & laps["LapTime"].notna()
+        & ~(gap < BAND_TRAFFIC_GAP).fillna(False)
+    )
+    rows = []
+    for idx, r in laps[ok].iterrows():
+        d = str(r.Driver)
+        w = float(weather["wetness"][int(r.LapNumber) - 1])
+        if d not in fitted.driver_pace or w < DRY_BELOW:
+            continue
+        comp = str(r.Compound)
+        slick = tyre_class(comp) == "slick"
+        dry = fit_mod.predict(
+            fitted,
+            d,
+            comp if slick else fitted.reference_compound,
+            float(eff.loc[idx]) if slick else 0.0,
+            fuel_lap_of(r),
+        )
+        share = float(r.LapTime) / dry - 1 - float(penalty(weather["curves"], comp, w))
+        if abs(share) < 0.3:
+            rows.append((d, int(r.LapNumber), w, tyre_class(comp), share))
+    return pd.DataFrame(rows, columns=["driver", "lap", "w", "cls", "share"])
+
+
+def band_residuals(laps: pd.DataFrame, weather: dict, fitted) -> pd.DataFrame:
+    """Each clear-air wet lap's residual against the field: its share (clear_air_shares) less
+    the median of the other clear-air cars on that lap and tyre class (BAND_MIN_FIELD of them
+    at least), capped at BAND_CLIP. Columns driver, lap, w, band, cls, r."""
+    df = clear_air_shares(laps, weather, fitted)
+    out = []
+    for _, g in df.groupby(["lap", "cls"]):
+        if len(g) < BAND_MIN_FIELD + 1:
+            continue
+        vals = g["share"].to_numpy()
+        for i, r in enumerate(g.itertuples()):
+            ref = float(np.median(np.delete(vals, i)))
+            res = float(np.clip(r.share - ref, -BAND_CLIP, BAND_CLIP))
+            out.append((r.driver, r.lap, r.w, band_of(r.w), r.cls, res))
+    return pd.DataFrame(out, columns=["driver", "lap", "w", "band", "cls", "r"])
+
+
+def driver_band_pace(
+    laps: pd.DataFrame, weather: dict, fitted
+) -> tuple[dict[str, float], dict[str, float]]:
+    """Eras builds: each driver's pace (share of a lap, negative quicker) on a wet track
+    (wetness DAMP_EDGE and up: the race model's `wetPace`) and a damp one (`dampPace`), both
+    fading in with wet_scale as the sims apply them. A ridge fit through wet_scale: the
+    driver's overall pace is sum(r·s) / (sum(s²) + FIELD_PRIOR), and each band's
+    (sum_b(r·s) + BAND_PRIOR·overall) / (sum_b(s²) + BAND_PRIOR), so a band with few laps
+    keeps the driver's overall pace and a driver with few laps the field's."""
+    res = band_residuals(laps, weather, fitted)
+    wet_out: dict[str, float] = {}
+    damp_out: dict[str, float] = {}
+    for d, g in res.groupby("driver"):
+        s = g["w"].map(wet_scale).to_numpy()
+        r = g["r"].to_numpy()
+        overall = float((r * s).sum() / ((s * s).sum() + FIELD_PRIOR))
+        for band, out in (("wet", wet_out), ("damp", damp_out)):
+            m = (g["band"] == band).to_numpy()
+            p = ((r[m] * s[m]).sum() + BAND_PRIOR * overall) / ((s[m] * s[m]).sum() + BAND_PRIOR)
+            out[str(d)] = round(float(p), 4)
+    return wet_out, damp_out
+
+
+# Eras builds (model fix M1): the full wet against the intermediate, per race, where the race
+# can tell them apart: laps with at least TYRE_MIN_FIELD clear-air cars on each, TYRE_MIN_LAPS
+# such laps at least. The shift of the wet curve is the mean gap between the two tyres'
+# residuals on those laps, shrunk by TYRE_PRIOR laps toward the shared curves (none).
+TYRE_MIN_FIELD = 2
+TYRE_MIN_LAPS = 5
+TYRE_PRIOR = 3.0
+
+
+def wet_tyre_shift(laps: pd.DataFrame, weather: dict, fitted) -> float:
+    """The race's full wets against its inters beyond the shared curves (share of a lap,
+    negative: the wets were quicker than the curves say); 0 where the race can't tell."""
+    df = clear_air_shares(laps, weather, fitted)
+    diffs = []
+    for _, g in df.groupby("lap"):
+        inter, wets = g[g["cls"] == "inter"]["share"], g[g["cls"] == "wet"]["share"]
+        if len(inter) >= TYRE_MIN_FIELD and len(wets) >= TYRE_MIN_FIELD:
+            diffs.append(float(wets.median() - inter.median()))
+    if len(diffs) < TYRE_MIN_LAPS:
+        return 0.0
+    return round(sum(diffs) / (len(diffs) + TYRE_PRIOR), 4)
+
+
+def shifted_curves(curves: dict, shift: float) -> dict:
+    """The curves with the full wet's moved by `shift` (wet_tyre_shift)."""
+    out = {k: dict(v) for k, v in curves.items()}
+    out["wet"]["min"] = round(max(0.0, out["wet"]["min"] + shift), 4)
+    return out

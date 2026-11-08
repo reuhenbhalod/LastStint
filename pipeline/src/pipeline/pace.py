@@ -102,6 +102,7 @@ def sim_frame_losses(
     wet_pace: dict[str, float] | None = None,
     service: bool = False,
     eras_stops: bool = False,
+    damp_pace: dict[str, float] | None = None,
 ) -> dict[tuple[str, int], float]:
     """(driver, out-lap) -> loss for each green-flag stop after the takeover, in the sim frame.
     A stop whose in-lap is the takeover lap is charged its out-lap only. `service`: the stops
@@ -128,6 +129,7 @@ def sim_frame_losses(
             total_time=0.0,
             tyre_wear=tyre_wear,
             wet_pace=(wet_pace or {}).get(code, 0.0),
+            damp_pace=(damp_pace or {}).get(code),
             **car_fuel(row),  # a refuelling race: the tank on board, as the sim carries it
         )
         return _clean_lap(car, compounds, fuel_per_lap, int(row["LapNumber"]), fresh_tyre, weather)

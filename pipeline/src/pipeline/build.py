@@ -2454,16 +2454,27 @@ def build_race(
     dry = dry_fit(race_id, laps, meta["era"], fault_facts, raw_dir, recon)
     clean_df, traffic_df, fitted = dry.clean, dry.traffic, dry.fitted
     weather = wet.weather_block(laps, dry.rain, fitted, wet.load_curves()) if dry.wet else None
-    wet_pace = (
-        wet.driver_wet_pace(laps, weather, fitted, wet.wet_period(laps, dry.rain))
-        if weather
-        else None
-    )
     # Eras sim fixes (a race whose file takes its Eras overlay; never a Daily/Gauntlet race,
     # whose file must replay as it is): the robust pit loss, stops with no tyre change, the
-    # year's no-unlapping rule, and the stop-loss fixes (a back-to-back stop's shared lap
-    # counted once; stops on partly yellow laps priced in the sim frame).
+    # year's no-unlapping rule, the stop-loss fixes (a back-to-back stop's shared lap
+    # counted once; stops on partly yellow laps priced in the sim frame), and driver pace by
+    # track state (model fix M1: damp and wet pace from clear-air laps against the field, and
+    # the race's full wets against its inters; real lap timing only).
     eras_build = overlay is not None and not shared
+    damp_pace = None
+    # Not a reconstructed race: its laps are solved to the anchors, so a driver's pace against
+    # the field on a lap would read back the solver's noise (as with its faults, above).
+    if weather and eras_build and recon is None:
+        shift = wet.wet_tyre_shift(laps, weather, fitted)
+        if shift:  # the race tells full wets from inters: its own wet curve, and timeline
+            weather = wet.weather_block(
+                laps, dry.rain, fitted, wet.shifted_curves(weather["curves"], shift)
+            )
+        wet_pace, damp_pace = wet.driver_band_pace(laps, weather, fitted)
+    elif weather:
+        wet_pace = wet.driver_wet_pace(laps, weather, fitted, wet.wet_period(laps, dry.rain))
+    else:
+        wet_pace = None
     params = track.fit_track_params(
         laps,
         clean_df,
@@ -2501,6 +2512,7 @@ def build_race(
         or (eras_sc_unlap(meta.get("year") or race_rules.year_of(race_id)) if eras_build else None),
         weather=weather,
         wet_pace=wet_pace,
+        damp_pace=damp_pace,
         fault_facts=fault_facts,
         year=meta.get("year"),
         red_flags=red_flags,

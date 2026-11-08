@@ -371,6 +371,7 @@ def _vector_car(model: dict, code: str, compound: str, tyre_age: int) -> Car:
         tyre_age=tyre_age,
         total_time=0.0,
         wet_pace=d.get("wetPace", 0.0),
+        damp_pace=d.get("dampPace"),
     )
 
 

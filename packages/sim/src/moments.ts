@@ -195,6 +195,7 @@ function tyresFor(model: RaceModel, from: number, to: number): string[] {
         tyreWear: 0,
         tyreAge: 1,
         ...(user?.wetPace ? { wetPace: user.wetPace } : {}),
+        ...(user?.dampPace !== undefined ? { dampPace: user.dampPace } : {}),
       } as CarState,
       to + 1,
     );
