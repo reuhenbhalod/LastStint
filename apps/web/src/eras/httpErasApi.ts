@@ -7,16 +7,7 @@
 import type { RaceModel } from '@laststint/sim';
 import { apiGet, apiPost } from '../api.js';
 import { anonId as browserPlayerId } from '../data/player.js';
-import type { AttemptRequest, AttemptResponse, EraDetail, EraSummary } from './api.js';
-
-/**
- * `GET /api/eras`: the eras and the server's mode (`testMode` from ERAS_TEST_MODE). The same
- * shape as api.ts's `ErasResponse` (step 8.2); once that lands here, use it instead.
- */
-export interface ErasResponse {
-  testMode: boolean;
-  eras: EraSummary[];
-}
+import type { AttemptRequest, AttemptResponse, EraDetail, ErasApi, ErasResponse } from './api.js';
 
 export interface HttpErasApiDeps {
   /** The player making the calls (default: this browser's player ID). */
@@ -26,7 +17,7 @@ export interface HttpErasApiDeps {
 }
 
 /** An Eras API client on the Worker. Errors are the server's (`ApiError` with its code). */
-export function createHttpErasApi(deps: HttpErasApiDeps = {}) {
+export function createHttpErasApi(deps: HttpErasApiDeps = {}): ErasApi {
   const playerId = deps.playerId ?? browserPlayerId;
   const get = deps.get ?? apiGet;
   const post = deps.post ?? apiPost;

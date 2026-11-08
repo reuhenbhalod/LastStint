@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { ApiError } from '../api.js';
 import type { AttemptResponse, EraDetail } from './api.js';
-import { type ErasResponse, createHttpErasApi } from './httpErasApi.js';
+import type { ErasResponse } from './api.js';
+import { createHttpErasApi } from './httpErasApi.js';
 
 const PLAYER = '11111111-1111-4111-8111-111111111111';
 
