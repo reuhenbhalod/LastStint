@@ -19,6 +19,7 @@ import pandas as pd
 
 from .clean import gap_to_car_ahead, tyre_change_out_laps
 from .fit import LapTimeFit, predict
+from .refuel import fuel_lap_of
 
 
 @dataclass
@@ -266,7 +267,7 @@ def dirty_air_penalty(traffic_laps: pd.DataFrame, fit: LapTimeFit) -> float:
     if traffic_laps.empty:
         return 0.0
     predicted = [
-        predict(fit, r.Driver, r.Compound, r.TyreLife, r.LapNumber)
+        predict(fit, r.Driver, r.Compound, r.TyreLife, fuel_lap_of(r))
         for r in traffic_laps.itertuples()
     ]
     residual = traffic_laps["LapTime"].astype(float).to_numpy() - predicted
@@ -430,7 +431,7 @@ def fit_overtake_model(
         r = state.get((lap, driver))
         if r is None or driver not in fit.driver_pace:
             return float("nan")
-        return predict(fit, driver, str(r.Compound), float(r.TyreLife), lap)
+        return predict(fit, driver, str(r.Compound), float(r.TyreLife), fuel_lap_of(r))
 
     events = events.assign(
         adv=[predicted(e.leader, e.lap) - predicted(e.follower, e.lap) for e in events.itertuples()]

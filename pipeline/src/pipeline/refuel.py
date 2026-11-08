@@ -318,6 +318,24 @@ def pooled_prior(f1db_dir: Path = F1DB_DIR) -> tuple[float, float]:
 # --- The weight in the pace fit ---------------------------------------------------------------
 
 
+def stop_in_laps(strategy: dict[str, list[dict]]) -> dict[str, list[int]]:
+    """Each car's in-laps from its real stops (scenario.real_strategy: out-laps), the stops the
+    sim refuels at."""
+    return {str(code): [int(s["lap"]) - 1 for s in stops] for code, stops in strategy.items()}
+
+
+def lap_tanks(laps: pd.DataFrame, stints_by_driver: dict[str, list[int]], total: int) -> pd.Series:
+    """The fuel on board (laps) at the start of each lap, as the sim carries it: to the end of
+    the next in-lap (or the flag) plus the reserve. `stints_by_driver`: each driver's in-laps."""
+    out = pd.Series(0.0, index=laps.index)
+    for i, row in laps.iterrows():
+        lap = int(row["LapNumber"])
+        ins = stints_by_driver.get(str(row["Driver"]), [])
+        nxt = min((p for p in ins if p >= lap), default=total)
+        out[i] = float(nxt - lap + 1 + RESERVE_LAPS)
+    return out
+
+
 def effective_lap(
     laps: pd.DataFrame, stints_by_driver: dict[str, list[int]], total: int
 ) -> pd.Series:
@@ -325,14 +343,78 @@ def effective_lap(
     refuelling race's sawtooth: LapNumber - (tank - (total - LapNumber + 1)), with the tank at
     the start of each lap as the sim carries it (fuel to the next in-lap plus the reserve).
     `stints_by_driver`: each driver's in-laps. Replace LapNumber with it before fit.fit."""
-    out = laps["LapNumber"].astype(float).copy()
-    for i, row in laps.iterrows():
-        lap = int(row["LapNumber"])
-        ins = stints_by_driver.get(str(row["Driver"]), [])
-        nxt = min((p for p in ins if p >= lap), default=total)
-        tank = nxt - lap + 1 + RESERVE_LAPS
-        out[i] = lap - (tank - (total - lap + 1))
-    return out
+    tank = lap_tanks(laps, stints_by_driver, total)
+    lap = laps["LapNumber"].astype(float)
+    return lap - (tank - (total - lap + 1))
+
+
+# The columns a refuelling race's laps carry through the build (with_fuel_columns): the tank at
+# the lap's start and the lap covariate of the fuel term. Every fuel term in the build reads
+# them where present (fit.py, track.py, wet.py, pace.py, faults.py, diagnose.py), so the fit
+# and the sim's own frame (sim_reference._clean_lap with a tank) agree. Without them (every
+# other race) the fuel term is -fuel x LapNumber, as before.
+TANK_COLUMN = "Tank"
+FUEL_LAP_COLUMN = "FuelLap"
+
+
+def with_fuel_columns(
+    laps: pd.DataFrame, stints_by_driver: dict[str, list[int]], total: int
+) -> pd.DataFrame:
+    """A copy of `laps` with the Tank and FuelLap columns (see above)."""
+    tank = lap_tanks(laps, stints_by_driver, total)
+    lap = laps["LapNumber"].astype(float)
+    return laps.assign(**{TANK_COLUMN: tank, FUEL_LAP_COLUMN: lap - (tank - (total - lap + 1))})
+
+
+def fuel_laps(frame: pd.DataFrame) -> pd.Series:
+    """The fuel term's lap covariate for each row: FuelLap where the race refuels, else the
+    race lap."""
+    col = FUEL_LAP_COLUMN if FUEL_LAP_COLUMN in frame.columns else "LapNumber"
+    return frame[col].astype(float)
+
+
+def fuel_lap_of(row) -> float:
+    """fuel_laps for one row (an itertuples tuple or an iterrows Series)."""
+    return float(getattr(row, FUEL_LAP_COLUMN, row.LapNumber))
+
+
+def car_fuel(row) -> dict:
+    """The sim Car's tank fields for a lap row of a refuelling race ({} for any other race): the
+    tank at the lap's start and the race's laps (FuelLap = laps + 1 - tank)."""
+    tank = getattr(row, TANK_COLUMN, None)
+    if tank is None:
+        return {}
+    return {
+        "tank": float(tank),
+        "race_laps": int(round(float(getattr(row, FUEL_LAP_COLUMN)) + float(tank) - 1)),
+    }
+
+
+# --- The race's fill model in the build -------------------------------------------------------
+
+
+def finished_laps(results: list[dict]) -> dict[int, int]:
+    """Car number -> laps completed, for the cars that took the flag (finished or lapped), from
+    a Jolpica sidecar's results."""
+    return {
+        int(r["number"]): int(r["laps"])
+        for r in results
+        if r.get("status") in ("finished", "lapped") and r.get("number") is not None
+    }
+
+
+def race_fill_model(
+    race_id: str, results: list[dict] | None, f1db_dir: Path = F1DB_DIR
+) -> tuple[dict | None, dict | None]:
+    """The race's track.refuel from its F1DB stops (fit_fill_rate) and its own unshrunk slope
+    (race_slope, for the report); (None, None) without a stops file."""
+    path = Path(f1db_dir) / f"{race_id}.stops.csv"
+    if not path.exists():
+        return None, None
+    stints = stints_from_stops(pd.read_csv(path), finished_laps(results or []) or None)
+    if stints.empty:
+        return None, None
+    return fit_fill_rate(stints), race_slope(stints)
 
 
 def main(argv: list[str]) -> None:

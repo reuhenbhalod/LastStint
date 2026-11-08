@@ -41,6 +41,21 @@ describe('garages', () => {
     expect(garagesFor(1988)).not.toContainEqual(['Brabham', 'BRA']); // sat out 1988
   });
 
+  it('2008: McLaren, excluded from the 2007 standings, nearest the entry; Ferrari at the exit', () => {
+    const g = garagesFor(2008);
+    expect(g.at(-1)).toEqual(['Ferrari', 'FER']);
+    expect(g[0]).toEqual(['McLaren', 'MCL']);
+    expect(g).toHaveLength(10);
+  });
+
+  it('2006: MF1 under its Brazil name when the race uses it; Super Aguri, new, at the entry', () => {
+    const g = garagesFor(2006, ['Spyker MF1']);
+    expect(g).toContainEqual(['Spyker MF1', 'MF1']);
+    expect(garagesFor(2006)).toContainEqual(['MF1', 'MF1']);
+    expect(g[0]).toEqual(['Super Aguri', 'SA']);
+    expect(g.at(-1)).toEqual(['Renault', 'REN']);
+  });
+
   it('2020: Red Bull and Alfa Romeo under the Jolpica spelling when the race uses it', () => {
     const g = garagesFor(2020, ['Red Bull', 'Alfa Romeo', 'Mercedes']);
     expect(g).toContainEqual(['Red Bull', 'RBR']);

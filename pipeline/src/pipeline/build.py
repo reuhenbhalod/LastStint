@@ -25,6 +25,7 @@ from . import (
     ingest,
     reconstruct,
     redflag,
+    refuel,
     scenario,
     track,
     wet,
@@ -1513,6 +1514,91 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
+    # Eras wave B (build plan 5.1): refuelling races 2005-09 from Jolpica (`pipeline jolpica`,
+    # F1DB stops before 2011, CC BY-NC-SA 4.0, credit in the raw sidecar), with step 2.4's
+    # estimated compounds, SC laps (data/estimates/<id>.sc.json) and fuel loads, and the fill
+    # model fitted from the F1DB stops (refuel.race_fill_model). monaco-2008's wet start is
+    # fitted from the lap times (`pipeline wet-laps`) and Hamilton's puncture is a FAULT
+    # (data/incidents.json). The duel is the storyline pair of the Eras spec's race table (§4),
+    # the user's driver first; split and seeds as for wave A.
+    "san-marino-2005": {
+        "year": 2005,
+        "event": "San Marino",
+        "source": "jolpica",
+        "name": "San Marino 2005: Alonso vs Schumacher",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "ALO",
+        "rival": "MSCM",  # defend: Alonso holds off Schumacher
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "japan-2005": {
+        "year": 2005,
+        "event": "Japan",
+        "source": "jolpica",
+        "name": "Japan 2005: Räikkönen vs Fisichella",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "RAI",
+        "rival": "FIS",  # win from P17: Fisichella, passed on the last lap
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "brazil-2006": {
+        "year": 2006,
+        "event": "Brazil",
+        "source": "jolpica",
+        "name": "Brazil 2006: Alonso vs Schumacher",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "ALO",
+        "rival": "MSCM",  # Alonso P8 or better for the title: Schumacher, his title rival
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "brazil-2007": {
+        "year": 2007,
+        "event": "Brazil",
+        "source": "jolpica",
+        "name": "Brazil 2007: Räikkönen vs Hamilton",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "RAI",
+        "rival": "HAM",  # deny: Räikkönen wins, Hamilton (title rival) kept P6 or lower
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "monaco-2008": {
+        "year": 2008,
+        "event": "Monaco",
+        "source": "jolpica",
+        "name": "Monaco 2008: Hamilton vs Kubica",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "HAM",
+        "rival": "KUB",  # win after the puncture: Kubica the car behind at the flag
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "brazil-2009": {
+        "year": 2009,
+        "event": "Brazil",
+        "source": "jolpica",
+        "name": "Brazil 2009: Button vs Barrichello",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "BUT",
+        "rival": "BAR",  # Button from P14 high enough for the title: Barrichello, his title rival
+        "score_positions": 6,
+        "split": "eras",
+    },
 }
 
 
@@ -1618,12 +1704,6 @@ def _from_raw(load, race_id: str, raw_dir: Path):
     return load(race_id) if raw_dir == RAW_DIR else load(race_id, raw_dir)
 
 
-# A refuelling race's fuel effect (s/lap) until eras build plan 4.2: the fit's fuel term is a
-# slope on the race lap, which refuelling breaks (the car is refilled at each stop, so the
-# weight saws up and down), and it can come out negative. 0 = no race-long weight trend.
-REFUELLING_FUEL = 0.0
-
-
 def _dir_arg(raw_dir: Path) -> tuple[Path, ...]:
     """raw_dir as an extra argument only when it isn't the default, so the one-argument
     loaders existing tests patch in (test_tum.py) keep working."""
@@ -1636,8 +1716,9 @@ def dry_fit(
     era: str,
     fault_facts: list[dict] | None = None,
     raw_dir: Path = RAW_DIR,
-    refuelling: bool = False,
 ) -> DryFit:
+    """The dry lap model. A refuelling race's `laps` carry the Tank and FuelLap columns
+    (refuel.with_fuel_columns): the fuel term is fitted on the sim's sawtooth."""
     clean_df, traffic_df, _ = clean.clean_laps(laps)
     # A faulted car's laps while the fault lasts aren't its pace (faults.py fits the loss).
     clean_df = faults.without_fault_laps(clean_df, fault_facts or [], laps)
@@ -1672,9 +1753,52 @@ def dry_fit(
         pace_laps=clean_df if pace_mod.CLEAR_AIR else pace_laps,
         fallback_pace_laps=pace_laps,
         era=era,
-        fixed_fuel=REFUELLING_FUEL if refuelling else wet.FUEL_PRIOR if wet_race else None,
+        fixed_fuel=wet.FUEL_PRIOR if wet_race else None,
     )
     return DryFit(clean_df, traffic_df, fitted, rain_data, wet_race)
+
+
+def refuelling_race(
+    race_id: str, block: dict | None, overlay: dict | None, shared: bool = False
+) -> bool:
+    """Whether the race file refuels: its overlay's rules.refuelling (the switch the sims read),
+    on a race whose file takes its overlay. A race whose stops refuelled (the sidecar lists
+    fuelLoads) but whose file wouldn't is an error: the fit and the sims would disagree."""
+    rules = (overlay or {}).get("rules") or {}
+    on = rules.get("refuelling") is True and not shared
+    if not on and "fuelLoads" in (block or {}).get("estimated", []):
+        raise ValueError(
+            f"{race_id}: its stops refuelled (the sidecar lists fuelLoads) but its race file"
+            " has no rules.refuelling: set it in data/eras/<id>.json (python -m pipeline.refuel"
+            " overlays)"
+        )
+    return on
+
+
+def refuel_report(model: dict, fill: dict | None, slope: dict | None, wet_race: bool) -> list[str]:
+    """The build report's lines on a refuelling race's fuel effect and fill rate."""
+    fuel = model["fuelEffectPerLap"]
+    lines = [
+        f"  fuel effect {fuel:.4f} s per lap of fuel on board"
+        + (" (the wet races' fixed prior)" if wet_race else ", fitted on the refuelling sawtooth")
+        + " (refuel.with_fuel_columns)"
+    ]
+    if fill is None:
+        lines.append(
+            "  NO FILL FIT: no F1DB stops (data/raw/f1db/<id>.stops.csv); a new stop pays the"
+            f" {refuel.PRIOR_SECONDS_PER_LAP} s/lap prior on its whole fill"
+        )
+        return lines
+    own = (
+        f"its own slope {slope['slope']:+.3f} s, se {slope['se']:.3f}"
+        if slope and slope["slope"] == slope["slope"]
+        else "no slope of its own"
+    )
+    lines.append(
+        f"  fill rate {fill['secondsPerLap']:.4f} s per lap of fuel ({own}; {fill['stops']} stops),"
+        f" refFill {fill['refFill']:.1f} laps, tank {fill['tankLaps']} laps (track.refuel)"
+    )
+    return lines
 
 
 def lap_time_weather(records: list[dict] | None) -> bool:
@@ -1761,10 +1885,23 @@ def build_race(
         # built into the faulted car's laps (reported, never guessed).
         unfitted, fault_facts = fault_facts, []
     fault_facts, fault_notes = faults.split_retired(laps, fault_facts)
-    block = (load_sidecar(race_id, raw_dir) or {}).get("estimates")
-    refuelling = "fuelLoads" in (block or {}).get("estimated", [])
+    sidecar = load_sidecar(race_id, raw_dir) or {}
+    block = sidecar.get("estimates")
+    overlay = load_overlay(race_id, eras_dir)
+    shared = overlay is not None and race_id in shared_races(pools_path)
+    refuelling = refuelling_race(race_id, block, overlay, shared)
+    refuel_fit = refuel_slope = None
+    if refuelling:
+        # Eras build plan 4.2: every fuel term reads the tank the sim carries (to the next
+        # real stop, plus the reserve), and the fill rate is fitted from the F1DB stops.
+        total = int(laps["LapNumber"].max())
+        ins = refuel.stop_in_laps(scenario.real_strategy(laps))
+        laps = refuel.with_fuel_columns(laps, ins, total)
+        refuel_fit, refuel_slope = refuel.race_fill_model(
+            race_id, sidecar.get("results"), Path(raw_dir) / "f1db"
+        )
 
-    dry = dry_fit(race_id, laps, meta["era"], fault_facts, raw_dir, refuelling)
+    dry = dry_fit(race_id, laps, meta["era"], fault_facts, raw_dir)
     clean_df, traffic_df, fitted = dry.clean, dry.traffic, dry.fitted
     weather = wet.weather_block(laps, dry.rain, fitted, wet.load_curves()) if dry.wet else None
     wet_pace = (
@@ -1803,6 +1940,7 @@ def build_race(
         fault_facts=fault_facts,
         year=meta.get("year"),
         red_flags=red_flags,
+        refuel=refuel_fit,
     )
     estimated = list((block or {}).get("estimated", []))
     if recon is not None:
@@ -1810,8 +1948,6 @@ def build_race(
     fitted_weather = lap_time_weather(dry.rain)
     if fitted_weather:
         estimated.append("weather")  # step 4.5: the wetness is fitted from the lap times
-    overlay = load_overlay(race_id, eras_dir)
-    shared = overlay is not None and race_id in shared_races(pools_path)
     if shared:
         # The Worker's merge replaces the provenance block outright (as with_eras_fields
         # does), so it can't also carry this build's estimated fields.
@@ -1847,9 +1983,7 @@ def build_race(
     if fitted_weather:
         report.append("estimated: weather (wet laps from the lap times, `pipeline wet-laps`)")
     if refuelling:
-        report.append(
-            f"  fuel effect fixed at {REFUELLING_FUEL} s/lap: a refuelling race (step 4.2)"
-        )
+        report.extend(refuel_report(model, refuel_fit, refuel_slope, dry.wet))
     return BuildResult(
         model=model,
         laps=laps,
