@@ -26,6 +26,7 @@ from . import (
     scenario,
     track,
     wet,
+    wet_laps,
 )
 from . import pace as pace_mod
 from .paths import DATA_DIR, RAW_DIR
@@ -926,6 +927,91 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
+    # Eras wave B (Eras build plan 5.1): wet races with no weather data (TUM has none, and
+    # FastF1's 2018+ weather now needs an F1TV login). `pipeline wet-laps` fits when the track
+    # was wet from the lap times (step 4.5) and writes <id>.weather.json; the hand check
+    # against the race reports is docs/eras-checks/4.5-wet-races.md. TUM races as above;
+    # Jolpica races (CC BY-NC-SA 4.0, `pipeline jolpica`, credit in the raw sidecar) carry
+    # step 2.4's estimated SC laps (data/estimates/<id>.sc.json) and compounds. Duels, seeds
+    # and split as for wave A.
+    "hungary-2014": {
+        "year": 2014,
+        "event": "Hungary",
+        "source": "tum",
+        "name": "Hungary 2014: Hamilton vs Rosberg",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "HAM",
+        "rival": "ROS",  # beat-rival: Hamilton from the pit lane, ahead of Rosberg
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "united-states-2015": {
+        "year": 2015,
+        "event": "United States",
+        "source": "tum",
+        "name": "USA 2015: Hamilton vs Rosberg",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "HAM",
+        "rival": "ROS",  # beat-rival: Hamilton ahead of Rosberg (and Vettel) for the title
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "germany-2018": {
+        "year": 2018,
+        "event": "Germany",
+        "source": "tum",
+        "name": "Germany 2018: Hamilton vs Bottas",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "HAM",
+        "rival": "BOT",  # win from P14; defend race: the car behind
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "germany-2019": {
+        "year": 2019,
+        "event": "Germany",
+        "source": "tum",
+        "name": "Germany 2019: Verstappen vs Vettel",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "VER",
+        "rival": "VET",  # win through the rain; defend race: the car behind
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "turkey-2020": {
+        "year": 2020,
+        "event": "Turkey",
+        "source": "jolpica",
+        "name": "Turkey 2020: Hamilton vs Perez",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "HAM",
+        "rival": "PER",  # win from P6 for the title; defend race: the car behind
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "turkey-2021": {
+        "year": 2021,
+        "event": "Turkey",
+        "source": "jolpica",
+        "name": "Turkey 2021: Hamilton vs Leclerc",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "HAM",
+        "rival": "LEC",  # position: P4 or better, so the car ahead (real: HAM P5)
+        "score_positions": 6,
+        "split": "eras",
+    },
 }
 
 
@@ -1045,6 +1131,12 @@ def dry_fit(
     return DryFit(clean_df, traffic_df, fitted, rain_data, wet_race)
 
 
+def lap_time_weather(records: list[dict] | None) -> bool:
+    """Whether a race's weather records are `pipeline wet-laps`'s fit from the lap times
+    (step 4.5) rather than a rain gauge, so the race's provenance lists weather as estimated."""
+    return any(r.get("source") == wet_laps.SOURCE for r in records or [])
+
+
 def load_overlay(race_id: str, eras_dir: Path = ERAS_DIR) -> dict | None:
     """data/eras/<race-id>.json, the race's authored Eras keys; None without one. A key that
     isn't one of OVERLAY_KEYS is an error (a typo would otherwise be dropped silently)."""
@@ -1134,10 +1226,13 @@ def build_race(
         wet_pace=wet_pace,
         fault_facts=fault_facts,
     )
-    model, overlay_lines = apply_eras(
-        model, (block or {}).get("estimated", []), load_overlay(race_id, eras_dir)
-    )
+    estimated = list((block or {}).get("estimated", []))
+    if lap_time_weather(dry.rain):
+        estimated.append("weather")  # step 4.5: the wetness is fitted from the lap times
+    model, overlay_lines = apply_eras(model, estimated, load_overlay(race_id, eras_dir))
     report = [*(estimates.report_lines(block) if block else []), *overlay_lines]
+    if "weather" in estimated:
+        report.append("estimated: weather (wet laps from the lap times, `pipeline wet-laps`)")
     if refuelling:
         report.append(
             f"  fuel effect fixed at {REFUELLING_FUEL} s/lap: a refuelling race (step 4.2)"

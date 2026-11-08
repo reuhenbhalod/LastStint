@@ -1,0 +1,522 @@
+{
+ "race": "germany-2018",
+ "source": "lap-times",
+ "neutralSource": "status",
+ "filled": [],
+ "wetSpells": [
+  "45-50"
+ ],
+ "neutralLaps": [
+  "51-57"
+ ],
+ "ambiguous": [
+  {
+   "lap": 50,
+   "why": "lap before a neutralisation (it may have started during it)"
+  },
+  {
+   "lap": 51,
+   "why": "neutralised between a wet and a dry spell: when it changed is unseen"
+  },
+  {
+   "lap": 52,
+   "why": "neutralised between a wet and a dry spell: when it changed is unseen"
+  },
+  {
+   "lap": 53,
+   "why": "neutralised between a wet and a dry spell: when it changed is unseen"
+  },
+  {
+   "lap": 54,
+   "why": "neutralised between a wet and a dry spell: when it changed is unseen"
+  },
+  {
+   "lap": 55,
+   "why": "neutralised between a wet and a dry spell: when it changed is unseen"
+  },
+  {
+   "lap": 56,
+   "why": "neutralised between a wet and a dry spell: when it changed is unseen"
+  },
+  {
+   "lap": 57,
+   "why": "neutralised between a wet and a dry spell: when it changed is unseen"
+  },
+  {
+   "lap": 58,
+   "why": "borderline slowing: drizzle, or tyre wear"
+  }
+ ],
+ "stintClasses": [],
+ "laps": [
+  {
+   "lap": 1,
+   "slowing": null,
+   "gap": 0.767,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 2,
+   "slowing": 0.0089,
+   "gap": 1.115,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 3,
+   "slowing": 0.0032,
+   "gap": 1.292,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 4,
+   "slowing": -0.001,
+   "gap": 1.432,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 5,
+   "slowing": -0.0011,
+   "gap": 1.653,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 6,
+   "slowing": 0.0021,
+   "gap": 1.55,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 7,
+   "slowing": 0.0025,
+   "gap": 1.448,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 8,
+   "slowing": 0.0059,
+   "gap": 1.648,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 9,
+   "slowing": 0.007,
+   "gap": 1.706,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 10,
+   "slowing": 0.0056,
+   "gap": 1.762,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 11,
+   "slowing": 0.0019,
+   "gap": 1.97,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 12,
+   "slowing": 0.0002,
+   "gap": 2.445,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 13,
+   "slowing": 0.0034,
+   "gap": 2.55,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 14,
+   "slowing": 0.0023,
+   "gap": 3.171,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 15,
+   "slowing": 0.006,
+   "gap": 3.114,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 16,
+   "slowing": 0.0057,
+   "gap": 3.229,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 17,
+   "slowing": 0.0038,
+   "gap": 3.571,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 18,
+   "slowing": 0.0047,
+   "gap": 4.563,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 19,
+   "slowing": 0.0067,
+   "gap": 4.668,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 20,
+   "slowing": 0.0069,
+   "gap": 4.038,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 21,
+   "slowing": 0.0074,
+   "gap": 4.442,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 22,
+   "slowing": 0.0091,
+   "gap": 4.376,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 23,
+   "slowing": 0.01,
+   "gap": 4.638,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 24,
+   "slowing": 0.0109,
+   "gap": 5.01,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 25,
+   "slowing": 0.0077,
+   "gap": 3.996,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 26,
+   "slowing": 0.0065,
+   "gap": 3.339,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 27,
+   "slowing": 0.0067,
+   "gap": 3.136,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 28,
+   "slowing": 0.0121,
+   "gap": 2.171,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 29,
+   "slowing": 0.0096,
+   "gap": 1.689,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 30,
+   "slowing": 0.0043,
+   "gap": 3.236,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 31,
+   "slowing": 0.0046,
+   "gap": 2.697,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 32,
+   "slowing": 0.0042,
+   "gap": 3.016,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 33,
+   "slowing": 0.0073,
+   "gap": 2.879,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 34,
+   "slowing": 0.0062,
+   "gap": 3.273,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 35,
+   "slowing": 0.0041,
+   "gap": 3.304,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 36,
+   "slowing": 0.0043,
+   "gap": 3.167,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 37,
+   "slowing": 0.0043,
+   "gap": 3.297,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 38,
+   "slowing": 0.0058,
+   "gap": 3.331,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 39,
+   "slowing": 0.004,
+   "gap": 3.557,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 40,
+   "slowing": 0.005,
+   "gap": 3.608,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 41,
+   "slowing": 0.0061,
+   "gap": 3.709,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 42,
+   "slowing": 0.0082,
+   "gap": 2.743,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 43,
+   "slowing": 0.0099,
+   "gap": 4.38,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 44,
+   "slowing": 0.0226,
+   "gap": 3.638,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 45,
+   "slowing": 0.0421,
+   "gap": 3.596,
+   "neutral": false,
+   "wet": true
+  },
+  {
+   "lap": 46,
+   "slowing": 0.0406,
+   "gap": 3.625,
+   "neutral": false,
+   "wet": true
+  },
+  {
+   "lap": 47,
+   "slowing": 0.0399,
+   "gap": 4.992,
+   "neutral": false,
+   "wet": true
+  },
+  {
+   "lap": 48,
+   "slowing": 0.0486,
+   "gap": 6.648,
+   "neutral": false,
+   "wet": true
+  },
+  {
+   "lap": 49,
+   "slowing": 0.108,
+   "gap": 6.484,
+   "neutral": false,
+   "wet": true
+  },
+  {
+   "lap": 50,
+   "slowing": 0.2191,
+   "gap": 5.532,
+   "neutral": false,
+   "wet": true
+  },
+  {
+   "lap": 51,
+   "slowing": 0.3161,
+   "gap": 7.573,
+   "neutral": true,
+   "wet": false
+  },
+  {
+   "lap": 52,
+   "slowing": 0.524,
+   "gap": 3.675,
+   "neutral": true,
+   "wet": false
+  },
+  {
+   "lap": 53,
+   "slowing": 0.5575,
+   "gap": 3.657,
+   "neutral": true,
+   "wet": false
+  },
+  {
+   "lap": 54,
+   "slowing": 0.3376,
+   "gap": 3.922,
+   "neutral": true,
+   "wet": false
+  },
+  {
+   "lap": 55,
+   "slowing": 0.1516,
+   "gap": 2.169,
+   "neutral": true,
+   "wet": false
+  },
+  {
+   "lap": 56,
+   "slowing": 0.2951,
+   "gap": 1.788,
+   "neutral": true,
+   "wet": false
+  },
+  {
+   "lap": 57,
+   "slowing": 0.241,
+   "gap": 0.765,
+   "neutral": true,
+   "wet": false
+  },
+  {
+   "lap": 58,
+   "slowing": 0.0265,
+   "gap": 0.985,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 59,
+   "slowing": 0.0159,
+   "gap": 1.329,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 60,
+   "slowing": 0.0125,
+   "gap": 1.208,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 61,
+   "slowing": 0.0125,
+   "gap": 1.31,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 62,
+   "slowing": 0.0117,
+   "gap": 1.615,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 63,
+   "slowing": 0.0078,
+   "gap": 1.539,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 64,
+   "slowing": 0.0068,
+   "gap": 1.417,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 65,
+   "slowing": 0.0068,
+   "gap": 1.632,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 66,
+   "slowing": 0.0058,
+   "gap": 1.603,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 67,
+   "slowing": 0.0104,
+   "gap": 1.685,
+   "neutral": false,
+   "wet": false
+  }
+ ]
+}

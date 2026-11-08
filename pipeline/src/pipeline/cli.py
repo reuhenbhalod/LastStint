@@ -56,12 +56,17 @@ def ingest_race(
     force: bool = typer.Option(False, help="Re-download even if a snapshot exists."),
 ) -> None:
     """Download registered races into data/raw/: FastF1, OpenF1 for races registered with
-    source "openf1" (network; rate-limit safe), or the cached TUM database for source "tum"."""
+    source "openf1" (network; rate-limit safe), or the cached TUM database for source "tum".
+    Source "jolpica" races are skipped: `pipeline jolpica` reads them."""
     for rid in _race_ids(race_id, all_races):
         if ingest.raw_snapshot_path(rid).exists() and not force:
             typer.echo(f"{rid}: snapshot exists, skipped")
             continue
         meta = build_mod.RACES[rid]
+        if meta.get("source") == "jolpica":
+            # Read from the cached dump with its estimates and options (Eras 5.1), never FastF1.
+            typer.echo(f"{rid}: a Jolpica race, skipped: run `pipeline jolpica {rid}`")
+            continue
         if meta.get("source") == "tum":
             from . import tum
 
@@ -220,8 +225,14 @@ def wet_laps_cmd(
     if ingest.weather_path(race_id, raw).exists() and not force:
         typer.echo(f"{race_id}: weather file exists in {raw}, skipped (--force to overwrite)")
         return
-    est = wet_laps.estimate(pd.read_parquet(snapshot))
+    # A Jolpica race ingested with estimates: its compounds are step 2.4's dry labels, so the
+    # wet classes are refitted and its slick stints keep those labels.
+    sidecar = build_mod.load_sidecar(race_id, raw)
+    dry_labels = wet_laps.estimated_dry_labels(sidecar)
+    est = wet_laps.estimate(pd.read_parquet(snapshot), dry_labels=dry_labels)
     wet_laps.write(race_id, est, raw)
+    if dry_labels is not None:
+        wet_laps.note_sidecar(race_id, est, sidecar, raw)
     rep = wet_laps.report(est, race_id)
     typer.echo(
         f"{race_id}: wet laps {', '.join(rep['wetSpells']) or 'none'};"

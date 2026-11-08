@@ -19,6 +19,14 @@ describe('garages', () => {
     expect(g).toHaveLength(11);
   });
 
+  it("2020-2021: the Jolpica dump's team names get their teams' garages", () => {
+    const g = garagesFor(2021, ['Red Bull', 'Alpine F1 Team', 'Alfa Romeo']);
+    expect(g.at(-2)).toEqual(['Red Bull', 'RBR']);
+    expect(g.find(([t]) => t === 'Alpine F1 Team')).toEqual(['Alpine F1 Team', 'ALP']);
+    expect(garagesFor(2020, ['Alfa Romeo'])[2]).toEqual(['Alfa Romeo', 'ALF']);
+    expect(garagesFor(2021).at(-2)).toEqual(['Red Bull Racing', 'RBR']);
+  });
+
   it("has a garage for every team in every race, under the race's own team names", () => {
     for (const file of readdirSync(races).filter((f) => f.endsWith('.json'))) {
       const model = JSON.parse(readFileSync(join(races, file), 'utf8')) as {
