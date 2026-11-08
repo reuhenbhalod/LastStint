@@ -3,16 +3,17 @@
  "how": "docs/eras-checks/2.4-estimates.md: check each period against a race report; set status to confirmed or rejected (edit startLap/endLap if they're off), then re-run `pipeline jolpica <race-id> --force`.",
  "periods": [
   {
-   "startLap": 5,
+   "startLap": 4,
    "endLap": 10,
-   "laps": 6,
+   "laps": 7,
    "kind": "SC",
    "confidence": "likely",
    "peakRatio": 1.727,
    "gapBefore": null,
    "gapAfter": 4.3,
    "reasons": [],
-   "status": "unchecked"
+   "status": "confirmed",
+   "source": "https://en.wikipedia.org/wiki/2001_Malaysian_Grand_Prix: 'On lap four, Montoya, Bernoldi, Heidfeld and Villeneuve aquaplaned into a gravel trap ... Whiting deployed the safety car on the lap'; 'the safety car was withdrawn at the end of lap 10'"
   }
  ]
 }

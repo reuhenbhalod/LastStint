@@ -27,14 +27,14 @@
   "lap": 5,
   "time": 702.849,
   "rain": true,
-  "source": "lap-times"
+  "source": "lap-times",
+  "ambiguous": "first green lap after a neutralisation (cold tyres)"
  },
  {
   "lap": 6,
   "time": 806.099,
   "rain": true,
-  "source": "lap-times",
-  "ambiguous": "first green lap after a neutralisation (cold tyres)"
+  "source": "lap-times"
  },
  {
   "lap": 7,

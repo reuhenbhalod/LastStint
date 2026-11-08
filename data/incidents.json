@@ -797,5 +797,127 @@
    "source": "https://en.wikipedia.org/wiki/2018_Russian_Grand_Prix",
    "note": "The article gives lap 26; the timing (FastF1) has HAM ahead of BOT from the end of lap 25, kept as the sims' lap"
   }
+ ],
+ "belgium-1998": [
+  {
+   "lap": 33,
+   "type": "TEAM_ORDER",
+   "driver": "SCH",
+   "passer": "HIL",
+   "detail": "Jordan's order in the closing stages: Ralf Schumacher not to overtake Hill ('Ralf, you cannot overtake Damon, that is a team order', race engineer Sam Michael, Autosport)",
+   "source": "https://en.wikipedia.org/wiki/1998_Belgian_Grand_Prix https://www.autosport.com/f1/news/1998-belgian-gp-when-the-schumachers-went-to-war/10744117/",
+   "note": "A hold order, not a let-by: the article gives no lap, only the closing stages after the restart 'with 12 laps to go' (lap 33 of 44, Autosport). Entered as one let-by item on each green lap from 33 to 44 (an item lapses once HIL is ahead), so a sim SCH that gets ahead of HIL is put back behind him and stays there. The timing (Jolpica) has HIL ahead of SCH at the end of every lap from 26 to the flag"
+  },
+  {
+   "lap": 34,
+   "type": "TEAM_ORDER",
+   "driver": "SCH",
+   "passer": "HIL",
+   "detail": "Jordan's order in the closing stages: Ralf Schumacher not to overtake Hill ('Ralf, you cannot overtake Damon, that is a team order', race engineer Sam Michael, Autosport)",
+   "source": "https://en.wikipedia.org/wiki/1998_Belgian_Grand_Prix https://www.autosport.com/f1/news/1998-belgian-gp-when-the-schumachers-went-to-war/10744117/",
+   "note": "A hold order, not a let-by: the article gives no lap, only the closing stages after the restart 'with 12 laps to go' (lap 33 of 44, Autosport). Entered as one let-by item on each green lap from 33 to 44 (an item lapses once HIL is ahead), so a sim SCH that gets ahead of HIL is put back behind him and stays there. The timing (Jolpica) has HIL ahead of SCH at the end of every lap from 26 to the flag"
+  },
+  {
+   "lap": 35,
+   "type": "TEAM_ORDER",
+   "driver": "SCH",
+   "passer": "HIL",
+   "detail": "Jordan's order in the closing stages: Ralf Schumacher not to overtake Hill ('Ralf, you cannot overtake Damon, that is a team order', race engineer Sam Michael, Autosport)",
+   "source": "https://en.wikipedia.org/wiki/1998_Belgian_Grand_Prix https://www.autosport.com/f1/news/1998-belgian-gp-when-the-schumachers-went-to-war/10744117/",
+   "note": "A hold order, not a let-by: the article gives no lap, only the closing stages after the restart 'with 12 laps to go' (lap 33 of 44, Autosport). Entered as one let-by item on each green lap from 33 to 44 (an item lapses once HIL is ahead), so a sim SCH that gets ahead of HIL is put back behind him and stays there. The timing (Jolpica) has HIL ahead of SCH at the end of every lap from 26 to the flag"
+  },
+  {
+   "lap": 36,
+   "type": "TEAM_ORDER",
+   "driver": "SCH",
+   "passer": "HIL",
+   "detail": "Jordan's order in the closing stages: Ralf Schumacher not to overtake Hill ('Ralf, you cannot overtake Damon, that is a team order', race engineer Sam Michael, Autosport)",
+   "source": "https://en.wikipedia.org/wiki/1998_Belgian_Grand_Prix https://www.autosport.com/f1/news/1998-belgian-gp-when-the-schumachers-went-to-war/10744117/",
+   "note": "A hold order, not a let-by: the article gives no lap, only the closing stages after the restart 'with 12 laps to go' (lap 33 of 44, Autosport). Entered as one let-by item on each green lap from 33 to 44 (an item lapses once HIL is ahead), so a sim SCH that gets ahead of HIL is put back behind him and stays there. The timing (Jolpica) has HIL ahead of SCH at the end of every lap from 26 to the flag"
+  },
+  {
+   "lap": 37,
+   "type": "TEAM_ORDER",
+   "driver": "SCH",
+   "passer": "HIL",
+   "detail": "Jordan's order in the closing stages: Ralf Schumacher not to overtake Hill ('Ralf, you cannot overtake Damon, that is a team order', race engineer Sam Michael, Autosport)",
+   "source": "https://en.wikipedia.org/wiki/1998_Belgian_Grand_Prix https://www.autosport.com/f1/news/1998-belgian-gp-when-the-schumachers-went-to-war/10744117/",
+   "note": "A hold order, not a let-by: the article gives no lap, only the closing stages after the restart 'with 12 laps to go' (lap 33 of 44, Autosport). Entered as one let-by item on each green lap from 33 to 44 (an item lapses once HIL is ahead), so a sim SCH that gets ahead of HIL is put back behind him and stays there. The timing (Jolpica) has HIL ahead of SCH at the end of every lap from 26 to the flag"
+  },
+  {
+   "lap": 38,
+   "type": "TEAM_ORDER",
+   "driver": "SCH",
+   "passer": "HIL",
+   "detail": "Jordan's order in the closing stages: Ralf Schumacher not to overtake Hill ('Ralf, you cannot overtake Damon, that is a team order', race engineer Sam Michael, Autosport)",
+   "source": "https://en.wikipedia.org/wiki/1998_Belgian_Grand_Prix https://www.autosport.com/f1/news/1998-belgian-gp-when-the-schumachers-went-to-war/10744117/",
+   "note": "A hold order, not a let-by: the article gives no lap, only the closing stages after the restart 'with 12 laps to go' (lap 33 of 44, Autosport). Entered as one let-by item on each green lap from 33 to 44 (an item lapses once HIL is ahead), so a sim SCH that gets ahead of HIL is put back behind him and stays there. The timing (Jolpica) has HIL ahead of SCH at the end of every lap from 26 to the flag"
+  },
+  {
+   "lap": 39,
+   "type": "TEAM_ORDER",
+   "driver": "SCH",
+   "passer": "HIL",
+   "detail": "Jordan's order in the closing stages: Ralf Schumacher not to overtake Hill ('Ralf, you cannot overtake Damon, that is a team order', race engineer Sam Michael, Autosport)",
+   "source": "https://en.wikipedia.org/wiki/1998_Belgian_Grand_Prix https://www.autosport.com/f1/news/1998-belgian-gp-when-the-schumachers-went-to-war/10744117/",
+   "note": "A hold order, not a let-by: the article gives no lap, only the closing stages after the restart 'with 12 laps to go' (lap 33 of 44, Autosport). Entered as one let-by item on each green lap from 33 to 44 (an item lapses once HIL is ahead), so a sim SCH that gets ahead of HIL is put back behind him and stays there. The timing (Jolpica) has HIL ahead of SCH at the end of every lap from 26 to the flag"
+  },
+  {
+   "lap": 40,
+   "type": "TEAM_ORDER",
+   "driver": "SCH",
+   "passer": "HIL",
+   "detail": "Jordan's order in the closing stages: Ralf Schumacher not to overtake Hill ('Ralf, you cannot overtake Damon, that is a team order', race engineer Sam Michael, Autosport)",
+   "source": "https://en.wikipedia.org/wiki/1998_Belgian_Grand_Prix https://www.autosport.com/f1/news/1998-belgian-gp-when-the-schumachers-went-to-war/10744117/",
+   "note": "A hold order, not a let-by: the article gives no lap, only the closing stages after the restart 'with 12 laps to go' (lap 33 of 44, Autosport). Entered as one let-by item on each green lap from 33 to 44 (an item lapses once HIL is ahead), so a sim SCH that gets ahead of HIL is put back behind him and stays there. The timing (Jolpica) has HIL ahead of SCH at the end of every lap from 26 to the flag"
+  },
+  {
+   "lap": 41,
+   "type": "TEAM_ORDER",
+   "driver": "SCH",
+   "passer": "HIL",
+   "detail": "Jordan's order in the closing stages: Ralf Schumacher not to overtake Hill ('Ralf, you cannot overtake Damon, that is a team order', race engineer Sam Michael, Autosport)",
+   "source": "https://en.wikipedia.org/wiki/1998_Belgian_Grand_Prix https://www.autosport.com/f1/news/1998-belgian-gp-when-the-schumachers-went-to-war/10744117/",
+   "note": "A hold order, not a let-by: the article gives no lap, only the closing stages after the restart 'with 12 laps to go' (lap 33 of 44, Autosport). Entered as one let-by item on each green lap from 33 to 44 (an item lapses once HIL is ahead), so a sim SCH that gets ahead of HIL is put back behind him and stays there. The timing (Jolpica) has HIL ahead of SCH at the end of every lap from 26 to the flag"
+  },
+  {
+   "lap": 42,
+   "type": "TEAM_ORDER",
+   "driver": "SCH",
+   "passer": "HIL",
+   "detail": "Jordan's order in the closing stages: Ralf Schumacher not to overtake Hill ('Ralf, you cannot overtake Damon, that is a team order', race engineer Sam Michael, Autosport)",
+   "source": "https://en.wikipedia.org/wiki/1998_Belgian_Grand_Prix https://www.autosport.com/f1/news/1998-belgian-gp-when-the-schumachers-went-to-war/10744117/",
+   "note": "A hold order, not a let-by: the article gives no lap, only the closing stages after the restart 'with 12 laps to go' (lap 33 of 44, Autosport). Entered as one let-by item on each green lap from 33 to 44 (an item lapses once HIL is ahead), so a sim SCH that gets ahead of HIL is put back behind him and stays there. The timing (Jolpica) has HIL ahead of SCH at the end of every lap from 26 to the flag"
+  },
+  {
+   "lap": 43,
+   "type": "TEAM_ORDER",
+   "driver": "SCH",
+   "passer": "HIL",
+   "detail": "Jordan's order in the closing stages: Ralf Schumacher not to overtake Hill ('Ralf, you cannot overtake Damon, that is a team order', race engineer Sam Michael, Autosport)",
+   "source": "https://en.wikipedia.org/wiki/1998_Belgian_Grand_Prix https://www.autosport.com/f1/news/1998-belgian-gp-when-the-schumachers-went-to-war/10744117/",
+   "note": "A hold order, not a let-by: the article gives no lap, only the closing stages after the restart 'with 12 laps to go' (lap 33 of 44, Autosport). Entered as one let-by item on each green lap from 33 to 44 (an item lapses once HIL is ahead), so a sim SCH that gets ahead of HIL is put back behind him and stays there. The timing (Jolpica) has HIL ahead of SCH at the end of every lap from 26 to the flag"
+  },
+  {
+   "lap": 44,
+   "type": "TEAM_ORDER",
+   "driver": "SCH",
+   "passer": "HIL",
+   "detail": "Jordan's order in the closing stages: Ralf Schumacher not to overtake Hill ('Ralf, you cannot overtake Damon, that is a team order', race engineer Sam Michael, Autosport)",
+   "source": "https://en.wikipedia.org/wiki/1998_Belgian_Grand_Prix https://www.autosport.com/f1/news/1998-belgian-gp-when-the-schumachers-went-to-war/10744117/",
+   "note": "A hold order, not a let-by: the article gives no lap, only the closing stages after the restart 'with 12 laps to go' (lap 33 of 44, Autosport). Entered as one let-by item on each green lap from 33 to 44 (an item lapses once HIL is ahead), so a sim SCH that gets ahead of HIL is put back behind him and stays there. The timing (Jolpica) has HIL ahead of SCH at the end of every lap from 26 to the flag"
+  }
+ ],
+ "great-britain-2016": [
+  {
+   "lap": 46,
+   "type": "FAULT",
+   "driver": "ROS",
+   "status": "Gearbox",
+   "laps": 2,
+   "detail": "Gearbox problem in the closing laps; the team told him to avoid seventh gear, after which he held his lead over Verstappen",
+   "source": "https://en.wikipedia.org/wiki/2016_British_Grand_Prix",
+   "note": "The article gives no lap: 'As R\u00e4ikk\u00f6nen got back into fifth at the expense of P\u00e9rez, Rosberg reported problems with his gearbox'. R\u00e4ikk\u00f6nen passed P\u00e9rez on lap 46 in the timing (FastF1); Rosberg's laps 46-47 are 3.2 s and 2.5 s over his laps either side, and VER closes from 6.2 s to 2.0 s. Two laps (46-47) from the timing: the article says he 'was able to consolidate his slim lead' once he avoided seventh"
+  }
  ]
 }

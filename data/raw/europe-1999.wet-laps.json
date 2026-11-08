@@ -3,7 +3,8 @@
  "source": "lap-times",
  "neutralSource": "status",
  "filled": [
-  "Compound: each stint's tyre class fitted from the lap times; dry stints keep step 2.4's estimated compound"
+  "Compound: each stint's tyre class fitted from the lap times; dry stints keep step 2.4's estimated compound",
+  "Compound: 12 stints' tyre class from sourced tyre facts (data/estimates/<id>.tyres.json), held through the fit"
  ],
  "wetSpells": [
   "19-24",
@@ -50,17 +51,12 @@
    "class": "inter"
   },
   {
-   "driver": "COU",
-   "stint": 2,
-   "class": "inter"
-  },
-  {
    "driver": "DLR",
    "stint": 3,
    "class": "inter"
   },
   {
-   "driver": "FIS",
+   "driver": "HAK",
    "stint": 2,
    "class": "inter"
   },
@@ -75,18 +71,18 @@
    "class": "inter"
   },
   {
-   "driver": "SCH",
-   "stint": 3,
-   "class": "inter"
-  },
-  {
-   "driver": "TAK",
+   "driver": "SAL",
    "stint": 2,
    "class": "inter"
   },
   {
    "driver": "TRU",
    "stint": 3,
+   "class": "inter"
+  },
+  {
+   "driver": "ZON",
+   "stint": 2,
    "class": "inter"
   }
  ],

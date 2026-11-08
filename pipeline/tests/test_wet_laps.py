@@ -317,3 +317,47 @@ def test_a_rerun_starts_again_from_the_step_2_4_labels():
     out = wet_laps.update_sidecar(side, dry)["estimates"]
     assert out["compounds"]["stints"] == [stint]
     assert sum(n.startswith(wet_laps.SIDECAR_NOTE) for n in out["compounds"]["notes"]) == 1
+
+
+def test_sourced_tyre_facts_are_held_through_the_fit(hungary, tmp_path):
+    """A stint a race report gives (data/estimates/<id>.tyres.json) keeps its class, whatever
+    the lap times say; "rain" (the report says only "wets") fixes it to a rain tyre and the
+    fit picks inter or wet; the other stints are fitted as before."""
+    blank = hungary.assign(Compound=None, TrackStatus=None)
+    fitted = wet_laps.estimate(blank).classes
+    wet_stint = next(k for k, c in fitted.items() if c != "slick")
+    dry_stint = next(k for k, c in fitted.items() if c == "slick")
+    facts = {
+        "race": "hungary-2014",
+        "stints": [
+            {"driver": wet_stint[0], "stint": wet_stint[1], "class": "slick",
+             "source": "https://example.org/report"},
+            {"driver": dry_stint[0], "stint": dry_stint[1], "class": "rain",
+             "source": "https://example.org/report"},
+        ],
+    }  # fmt: skip
+    (tmp_path / "hungary-2014.tyres.json").write_text(json.dumps(facts))
+    known = wet_laps.load_tyre_facts("hungary-2014", tmp_path)
+    assert known == {wet_stint: "slick", dry_stint: "rain"}
+    est = wet_laps.estimate(blank, known=known)
+    assert est.classes[wet_stint] == "slick"
+    assert est.classes[dry_stint] in ("inter", "wet")
+    assert any("sourced tyre facts" in f for f in est.filled)
+    assert wet_laps.load_tyre_facts("nowhere-2014", tmp_path) == {}
+
+
+def test_a_tyre_fact_needs_a_class_and_a_source(tmp_path):
+    for bad in (
+        {"driver": "AAA", "stint": 1, "class": "dry", "source": "https://example.org"},
+        {"driver": "AAA", "stint": 1, "class": "wet"},
+        {"driver": "AAA", "stint": 1, "class": "wet", "source": "https://x.org", "laps": 3},
+    ):
+        (tmp_path / "x-2000.tyres.json").write_text(json.dumps({"stints": [bad]}))
+        with pytest.raises(ValueError):
+            wet_laps.load_tyre_facts("x-2000", tmp_path)
+
+
+def test_committed_tyre_facts_load():
+    for path in sorted((Path(__file__).parents[2] / "data" / "estimates").glob("*.tyres.json")):
+        race = path.name.removesuffix(".tyres.json")
+        assert wet_laps.load_tyre_facts(race), race

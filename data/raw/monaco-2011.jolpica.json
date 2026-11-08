@@ -727,8 +727,8 @@
    "periods": [
     {
      "startLap": 34,
-     "endLap": 35,
-     "laps": 2,
+     "endLap": 38,
+     "laps": 5,
      "kind": "SC",
      "confidence": "ambiguous",
      "peakRatio": 1.62,
@@ -737,27 +737,13 @@
      "reasons": [
       "the field didn't bunch up (P1-P6 70.3s -> 50.1s): rain?"
      ],
-     "status": "unchecked"
-    },
-    {
-     "startLap": 38,
-     "endLap": 38,
-     "laps": 1,
-     "kind": "SC",
-     "confidence": "ambiguous",
-     "peakRatio": 1.376,
-     "gapBefore": 17.2,
-     "gapAfter": 12.9,
-     "reasons": [
-      "the field didn't bunch up (P1-P6 17.2s -> 12.9s): rain?",
-      "a single slow lap"
-     ],
-     "status": "unchecked"
+     "status": "confirmed",
+     "source": "https://en.wikipedia.org/wiki/2011_Monaco_Grand_Prix: 'An incident between Hamilton and Massa caused Massa to crash in the tunnel, bringing out the first safety car' (Massa's last lap is 32 in the timing). One SC: the article gives no laps; the leader (VET) ran 86.3 s on lap 34 (the deployment), 115-129 s on laps 35-38 and 81.0 s on lap 39 (green 79 s), so the estimate's laps 34-35 and 38 are one period with 36-37 between"
     },
     {
      "startLap": 69,
-     "endLap": 73,
-     "laps": 5,
+     "endLap": 71,
+     "laps": 3,
      "kind": "SC",
      "confidence": "ambiguous",
      "peakRatio": 16.42,
@@ -766,7 +752,8 @@
      "reasons": [
       "a 16.4x lap: a red flag?"
      ],
-     "status": "unchecked"
+     "status": "confirmed",
+     "source": "https://en.wikipedia.org/wiki/2011_Monaco_Grand_Prix: after the Sutil / Alguersuari / Petrov crash, 'This brought out the safety car again and on lap 72 the race was red flagged'; the red flag (lap 72) and the SC lap after it (73, 'the safety car, which went in at the end of lap 73') are data/redflags/monaco-2011.json's. Lap 69 from the timing (leader 85.7 s, then 123-130 s)"
     }
    ],
    "handCheck": "data/estimates/monaco-2011.sc.json"
@@ -827,7 +814,7 @@
      "by": "pace",
      "cleanLaps": 14,
      "paceStep": -0.683,
-     "softness": 1.022
+     "softness": 1.023
     },
     {
      "driver": "ALO",
@@ -871,7 +858,7 @@
      "by": "pace",
      "cleanLaps": 5,
      "paceStep": 0.791,
-     "softness": 1.051
+     "softness": 1.052
     },
     {
      "driver": "BUE",
@@ -882,7 +869,7 @@
      "by": "pace",
      "cleanLaps": 31,
      "paceStep": 0.115,
-     "softness": -0.739
+     "softness": -0.738
     },
     {
      "driver": "BUE",
@@ -904,7 +891,7 @@
      "by": "pace",
      "cleanLaps": 8,
      "paceStep": 1.409,
-     "softness": 0.246
+     "softness": 0.247
     },
     {
      "driver": "BUT",
@@ -915,7 +902,7 @@
      "by": "q3",
      "cleanLaps": 13,
      "paceStep": 0.271,
-     "softness": 0.763
+     "softness": 0.764
     },
     {
      "driver": "BUT",
@@ -948,7 +935,7 @@
      "by": "pace",
      "cleanLaps": 24,
      "paceStep": 0.365,
-     "softness": -0.59
+     "softness": -0.589
     },
     {
      "driver": "DAM",
@@ -959,7 +946,7 @@
      "by": "pace",
      "cleanLaps": 30,
      "paceStep": 0.06,
-     "softness": -0.714
+     "softness": -0.713
     },
     {
      "driver": "DAM",
@@ -1003,7 +990,7 @@
      "by": "pace",
      "cleanLaps": 5,
      "paceStep": 0.198,
-     "softness": 1.495
+     "softness": 1.496
     },
     {
      "driver": "DIR",
@@ -1023,9 +1010,9 @@
      "toLap": 76,
      "compound": "HARD",
      "by": "pace",
-     "cleanLaps": 34,
-     "paceStep": 0.326,
-     "softness": -1.796
+     "cleanLaps": 33,
+     "paceStep": 0.342,
+     "softness": -1.803
     },
     {
      "driver": "GLO",
@@ -1057,8 +1044,8 @@
      "compound": "SOFT",
      "by": "q3",
      "cleanLaps": 20,
-     "paceStep": 0.311,
-     "softness": 0.133
+     "paceStep": 0.338,
+     "softness": 0.122
     },
     {
      "driver": "HAM",
@@ -1067,9 +1054,9 @@
      "toLap": 43,
      "compound": "SOFT",
      "by": "pace",
-     "cleanLaps": 14,
-     "paceStep": -0.368,
-     "softness": 0.53
+     "cleanLaps": 13,
+     "paceStep": -0.415,
+     "softness": 0.551
     },
     {
      "driver": "HAM",
@@ -1079,8 +1066,8 @@
      "compound": "SOFT",
      "by": "pace",
      "cleanLaps": 4,
-     "paceStep": -0.2,
-     "softness": 1.764
+     "paceStep": -0.173,
+     "softness": 1.752
     },
     {
      "driver": "HAM",
@@ -1090,8 +1077,8 @@
      "compound": "HARD",
      "by": "pace",
      "cleanLaps": 22,
-     "paceStep": -0.001,
-     "softness": -0.336
+     "paceStep": 0.026,
+     "softness": -0.348
     },
     {
      "driver": "HEI",
@@ -1124,7 +1111,7 @@
      "by": "pace",
      "cleanLaps": 5,
      "paceStep": -0.361,
-     "softness": 1.662
+     "softness": 1.663
     },
     {
      "driver": "KAR",
@@ -1146,7 +1133,7 @@
      "by": "pace",
      "cleanLaps": 4,
      "paceStep": 1.29,
-     "softness": 0.912
+     "softness": 0.913
     },
     {
      "driver": "KAR",
@@ -1157,7 +1144,7 @@
      "by": "pace",
      "cleanLaps": 30,
      "paceStep": 0.785,
-     "softness": -1.742
+     "softness": -1.741
     },
     {
      "driver": "KOB",
@@ -1168,7 +1155,7 @@
      "by": "rule",
      "cleanLaps": 31,
      "paceStep": 0.04,
-     "softness": -0.792
+     "softness": -0.791
     },
     {
      "driver": "KOB",
@@ -1179,7 +1166,7 @@
      "by": "pace",
      "cleanLaps": 34,
      "paceStep": 0.351,
-     "softness": -1.807
+     "softness": -1.806
     },
     {
      "driver": "KOV",
@@ -1201,7 +1188,7 @@
      "by": "pace",
      "cleanLaps": 25,
      "paceStep": 0.457,
-     "softness": -0.894
+     "softness": -0.893
     },
     {
      "driver": "KOV",
@@ -1212,7 +1199,7 @@
      "by": "pace",
      "cleanLaps": 16,
      "paceStep": 0.935,
-     "softness": -0.325
+     "softness": -0.324
     },
     {
      "driver": "LIU",
@@ -1223,7 +1210,7 @@
      "by": "rule",
      "cleanLaps": 29,
      "paceStep": 1.262,
-     "softness": -1.173
+     "softness": -1.172
     },
     {
      "driver": "LIU",
@@ -1234,7 +1221,7 @@
      "by": "pace",
      "cleanLaps": 33,
      "paceStep": -0.428,
-     "softness": -1.366
+     "softness": -1.365
     },
     {
      "driver": "MAL",
@@ -1244,8 +1231,8 @@
      "compound": "SOFT",
      "by": "q3",
      "cleanLaps": 23,
-     "paceStep": 0.277,
-     "softness": -0.113
+     "paceStep": 0.283,
+     "softness": -0.115
     },
     {
      "driver": "MAL",
@@ -1254,9 +1241,9 @@
      "toLap": 54,
      "compound": "HARD",
      "by": "pace",
-     "cleanLaps": 22,
-     "paceStep": 0.195,
-     "softness": -0.426
+     "cleanLaps": 21,
+     "paceStep": 0.184,
+     "softness": -0.42
     },
     {
      "driver": "MAL",
@@ -1266,8 +1253,8 @@
      "compound": "SOFT",
      "by": "pace",
      "cleanLaps": 12,
-     "paceStep": -0.519,
-     "softness": 0.773
+     "paceStep": -0.513,
+     "softness": 0.77
     },
     {
      "driver": "MAS",
@@ -1278,7 +1265,7 @@
      "by": "q3",
      "cleanLaps": 24,
      "paceStep": 0.251,
-     "softness": -0.189
+     "softness": -0.188
     },
     {
      "driver": "MAS",
@@ -1300,7 +1287,7 @@
      "by": "q3",
      "cleanLaps": 10,
      "paceStep": 0.356,
-     "softness": 0.987
+     "softness": 0.988
     },
     {
      "driver": "MSCM",
@@ -1322,7 +1309,7 @@
      "by": "rule",
      "cleanLaps": 26,
      "paceStep": 0.029,
-     "softness": -0.263
+     "softness": -0.262
     },
     {
      "driver": "PET",
@@ -1333,7 +1320,7 @@
      "by": "pace",
      "cleanLaps": 32,
      "paceStep": 0.285,
-     "softness": -1.34
+     "softness": -1.339
     },
     {
      "driver": "ROS",
@@ -1355,7 +1342,7 @@
      "by": "rule",
      "cleanLaps": 15,
      "paceStep": 0.865,
-     "softness": 0.231
+     "softness": 0.232
     },
     {
      "driver": "ROS",
@@ -1366,7 +1353,7 @@
      "by": "pace",
      "cleanLaps": 15,
      "paceStep": 0.113,
-     "softness": 0.398
+     "softness": 0.399
     },
     {
      "driver": "ROS",
@@ -1399,7 +1386,7 @@
      "by": "pace",
      "cleanLaps": 29,
      "paceStep": 0.542,
-     "softness": -1.02
+     "softness": -1.019
     },
     {
      "driver": "SUT",
@@ -1410,7 +1397,7 @@
      "by": "pace",
      "cleanLaps": 5,
      "paceStep": -0.842,
-     "softness": 1.793
+     "softness": 1.794
     },
     {
      "driver": "TRU",
@@ -1443,7 +1430,7 @@
      "by": "pace",
      "cleanLaps": 23,
      "paceStep": 1.672,
-     "softness": -1.184
+     "softness": -1.183
     },
     {
      "driver": "VET",
@@ -1454,7 +1441,7 @@
      "by": "q3",
      "cleanLaps": 14,
      "paceStep": -0.095,
-     "softness": 0.842
+     "softness": 0.843
     },
     {
      "driver": "VET",
@@ -1465,7 +1452,7 @@
      "by": "pace",
      "cleanLaps": 51,
      "paceStep": 0.159,
-     "softness": -3.293
+     "softness": -3.292
     },
     {
      "driver": "WEB",
@@ -1475,8 +1462,8 @@
      "compound": "SOFT",
      "by": "q3",
      "cleanLaps": 14,
-     "paceStep": -1.022,
-     "softness": 1.263
+     "paceStep": -1.015,
+     "softness": 1.26
     },
     {
      "driver": "WEB",
@@ -1485,9 +1472,9 @@
      "toLap": 55,
      "compound": "HARD",
      "by": "pace",
-     "cleanLaps": 32,
-     "paceStep": 0.144,
-     "softness": -1.276
+     "cleanLaps": 31,
+     "paceStep": 0.153,
+     "softness": -1.28
     },
     {
      "driver": "WEB",
@@ -1497,8 +1484,8 @@
      "compound": "SOFT",
      "by": "pace",
      "cleanLaps": 16,
-     "paceStep": -0.397,
-     "softness": 0.368
+     "paceStep": -0.39,
+     "softness": 0.365
     }
    ],
    "notes": [

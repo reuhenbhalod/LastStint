@@ -660,16 +660,17 @@
    "method": "field-wide slow laps (>= 1.1x the green baseline); likely SC when >= 1.25x and the field bunches up, else ambiguous (applied as yellow)",
    "periods": [
     {
-     "startLap": 5,
+     "startLap": 4,
      "endLap": 10,
-     "laps": 6,
+     "laps": 7,
      "kind": "SC",
      "confidence": "likely",
      "peakRatio": 1.727,
      "gapBefore": null,
      "gapAfter": 4.3,
      "reasons": [],
-     "status": "unchecked"
+     "status": "confirmed",
+     "source": "https://en.wikipedia.org/wiki/2001_Malaysian_Grand_Prix: 'On lap four, Montoya, Bernoldi, Heidfeld and Villeneuve aquaplaned into a gravel trap ... Whiting deployed the safety car on the lap'; 'the safety car was withdrawn at the end of lap 10'"
     }
    ],
    "handCheck": "data/estimates/malaysia-2001.sc.json"

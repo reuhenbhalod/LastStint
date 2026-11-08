@@ -107,9 +107,11 @@ def test_only_the_eras_fault_races_have_fault_facts():
     # data/incidents.json: the races built before step 4.4 build exactly as before; only an
     # Eras race registered for its faults (5.1: canada-2014, azerbaijan-2021, monaco-2008,
     # hungary-1997) has any. The reconstructed brazil-1991, hungary-1992, australia-1986 and
-    # spain-1994 have facts too, reported but not fitted (synthetic laps).
+    # spain-1994 have facts too, reported but not fitted (synthetic laps). W4 adds
+    # great-britain-2016 (Rosberg's gearbox, laps 46-47).
     with_faults = {race for race in build.RACES if incidents.fault_facts(race)}
     assert with_faults == {
+        "great-britain-2016",
         "canada-2014",
         "azerbaijan-2021",
         "monaco-2008",

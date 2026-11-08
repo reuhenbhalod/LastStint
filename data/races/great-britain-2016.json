@@ -38,7 +38,7 @@
     ],
     "overtakeDifficulty": 0.9502,
     "overtakeModel": {
-      "intercept": 0.1155,
+      "intercept": 0.1148,
       "paceCoef": 1.8366,
       "gapCoef": -3.8725,
       "trainCoef": -0.9007
@@ -56,7 +56,7 @@
       "provenLaps": 13
     },
     "MEDIUM": {
-      "offset": 0.6549,
+      "offset": 0.655,
       "degPerLap": 0.0,
       "cliffLap": 37,
       "provenLaps": 37
@@ -76,7 +76,7 @@
     {
       "code": "ALO",
       "team": "McLaren",
-      "basePace": 100.2343,
+      "basePace": 100.2341,
       "noise": 0.7517,
       "stateAtTakeover": {
         "position": 10,
@@ -114,10 +114,10 @@
     {
       "code": "BOT",
       "team": "Williams",
-      "basePace": 100.9197,
+      "basePace": 100.9196,
       "noise": 1.0971,
       "wetPace": 0.0137,
-      "dampPace": 0.0087,
+      "dampPace": 0.0086,
       "stateAtTakeover": {
         "position": 13,
         "gapAhead": 8.287,
@@ -145,7 +145,7 @@
     {
       "code": "BUT",
       "team": "McLaren",
-      "basePace": 100.2188,
+      "basePace": 100.2187,
       "noise": 0.6805,
       "wetPace": -0.0059,
       "dampPace": -0.0088,
@@ -176,7 +176,7 @@
     {
       "code": "GUT",
       "team": "Haas F1 Team",
-      "basePace": 101.0966,
+      "basePace": 101.0965,
       "noise": 0.7665,
       "wetPace": 0.0065,
       "dampPace": -0.0017,
@@ -207,7 +207,7 @@
     {
       "code": "HAM",
       "team": "Mercedes",
-      "basePace": 98.8224,
+      "basePace": 98.8223,
       "noise": 0.9266,
       "wetPace": -0.0022,
       "dampPace": 0.0003,
@@ -238,10 +238,10 @@
     {
       "code": "HAR",
       "team": "Manor Marussia",
-      "basePace": 102.6116,
+      "basePace": 102.6115,
       "noise": 0.5953,
       "wetPace": 0.0106,
-      "dampPace": 0.0076,
+      "dampPace": 0.0075,
       "stateAtTakeover": {
         "position": 20,
         "gapAhead": 15.238,
@@ -269,7 +269,7 @@
     {
       "code": "HUL",
       "team": "Force India",
-      "basePace": 99.8196,
+      "basePace": 99.8195,
       "noise": 0.3966,
       "wetPace": -0.0001,
       "dampPace": 0.0049,
@@ -300,10 +300,10 @@
     {
       "code": "KVY",
       "team": "Red Bull Racing",
-      "basePace": 100.0554,
+      "basePace": 100.0553,
       "noise": 0.3907,
       "wetPace": 0.0092,
-      "dampPace": 0.0056,
+      "dampPace": 0.0055,
       "stateAtTakeover": {
         "position": 12,
         "gapAhead": 0.97,
@@ -331,9 +331,9 @@
     {
       "code": "MAG",
       "team": "Renault",
-      "basePace": 101.646,
+      "basePace": 101.6458,
       "noise": 1.0675,
-      "wetPace": 0.0023,
+      "wetPace": 0.0022,
       "dampPace": -0.0086,
       "stateAtTakeover": {
         "position": 18,
@@ -349,7 +349,7 @@
         {
           "lap": 18,
           "to": "MEDIUM",
-          "loss": 20.327
+          "loss": 20.348
         },
         {
           "lap": 41,
@@ -371,8 +371,8 @@
     {
       "code": "MAS",
       "team": "Williams",
-      "basePace": 99.9446,
-      "noise": 0.7321,
+      "basePace": 99.9444,
+      "noise": 0.732,
       "wetPace": 0.0091,
       "dampPace": 0.0079,
       "stateAtTakeover": {
@@ -411,9 +411,9 @@
     {
       "code": "NAS",
       "team": "Sauber",
-      "basePace": 101.2294,
+      "basePace": 101.2293,
       "noise": 0.6346,
-      "wetPace": 0.0082,
+      "wetPace": 0.0081,
       "dampPace": 0.0067,
       "stateAtTakeover": {
         "position": 15,
@@ -429,7 +429,7 @@
         {
           "lap": 17,
           "to": "MEDIUM",
-          "loss": 14.449
+          "loss": 14.47
         }
       ],
       "stintPace": [
@@ -442,9 +442,9 @@
     {
       "code": "PAL",
       "team": "Renault",
-      "basePace": 103.5756,
+      "basePace": 103.5755,
       "noise": 3.0304,
-      "wetPace": -0.0151,
+      "wetPace": -0.0152,
       "dampPace": 0.0015,
       "stateAtTakeover": {
         "position": 17,
@@ -460,12 +460,12 @@
         {
           "lap": 17,
           "to": "MEDIUM",
-          "loss": 39.856
+          "loss": 39.876
         },
         {
           "lap": 20,
           "to": "MEDIUM",
-          "loss": 34.984
+          "loss": 34.993
         }
       ],
       "stintPace": [
@@ -478,10 +478,10 @@
     {
       "code": "PER",
       "team": "Force India",
-      "basePace": 100.4444,
+      "basePace": 100.4443,
       "noise": 1.04,
       "wetPace": -0.0071,
-      "dampPace": -0.0037,
+      "dampPace": -0.0038,
       "stateAtTakeover": {
         "position": 4,
         "gapAhead": 11.897,
@@ -509,7 +509,7 @@
     {
       "code": "RAI",
       "team": "Ferrari",
-      "basePace": 99.8165,
+      "basePace": 99.8164,
       "noise": 0.9607,
       "wetPace": -0.0014,
       "dampPace": -0.0017,
@@ -540,10 +540,10 @@
     {
       "code": "RIC",
       "team": "Red Bull Racing",
-      "basePace": 98.8826,
+      "basePace": 98.8825,
       "noise": 0.5723,
       "wetPace": -0.0015,
-      "dampPace": 0.0007,
+      "dampPace": 0.0006,
       "stateAtTakeover": {
         "position": 5,
         "gapAhead": 1.351,
@@ -571,10 +571,10 @@
     {
       "code": "ROS",
       "team": "Mercedes",
-      "basePace": 98.6817,
-      "noise": 0.8117,
-      "wetPace": -0.0037,
-      "dampPace": -0.0004,
+      "basePace": 98.5542,
+      "noise": 0.7524,
+      "wetPace": -0.0035,
+      "dampPace": -0.0002,
       "stateAtTakeover": {
         "position": 2,
         "gapAhead": 4.566,
@@ -589,20 +589,20 @@
         {
           "lap": 18,
           "to": "MEDIUM",
-          "loss": 26.036
+          "loss": 26.286
         }
       ],
       "stintPace": [
         {
           "lap": 18,
-          "offset": 0.008
+          "offset": -0.008
         }
       ]
     },
     {
       "code": "SAI",
       "team": "Toro Rosso",
-      "basePace": 100.2077,
+      "basePace": 100.2076,
       "noise": 0.642,
       "wetPace": -0.0034,
       "dampPace": -0.0026,
@@ -633,7 +633,7 @@
     {
       "code": "VER",
       "team": "Toro Rosso",
-      "basePace": 98.9088,
+      "basePace": 98.9087,
       "noise": 0.4596,
       "wetPace": -0.0072,
       "dampPace": -0.0066,
@@ -664,7 +664,7 @@
     {
       "code": "VET",
       "team": "Ferrari",
-      "basePace": 99.8453,
+      "basePace": 99.8452,
       "noise": 0.7813,
       "wetPace": 0.0221,
       "dampPace": 0.0158,
@@ -695,7 +695,7 @@
   ],
   "fuelEffectPerLap": 0.056,
   "freshTyre": {
-    "bonus": 0.0164,
+    "bonus": 0.0177,
     "laps": 3
   },
   "events": [
@@ -718,6 +718,15 @@
       "lap": 41,
       "type": "RETIREMENT",
       "driver": "PAL"
+    },
+    {
+      "lap": 46,
+      "type": "FAULT",
+      "driver": "ROS",
+      "fault": "gear-stuck",
+      "paceLoss": 2.253,
+      "laps": 2,
+      "storylineEvent": true
     }
   ],
   "decisionMoments": [],

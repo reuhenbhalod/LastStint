@@ -10,29 +10,29 @@
   },
   "era": "1994-2009",
   "track": {
-    "pitLoss": 33.0,
-    "pitLossUnderSC": 18.15,
-    "pitLossUnderVSC": 22.77,
+    "pitLoss": 31.436,
+    "pitLossUnderSC": 17.29,
+    "pitLossUnderVSC": 21.691,
     "pitLossDeviations": [
-      -10.32,
-      -7.994,
-      -6.172,
-      -6.103,
-      -5.954,
-      -4.974,
-      -4.729,
-      -4.406,
-      -3.913,
-      -3.301,
-      -3.127,
-      0.0,
-      1.58,
-      1.674,
-      1.758,
-      3.269,
-      4.517,
-      8.066,
-      8.169
+      -8.747,
+      -6.207,
+      -4.427,
+      -4.39,
+      -4.385,
+      -3.427,
+      -3.231,
+      -2.909,
+      -2.278,
+      -1.625,
+      -1.563,
+      1.563,
+      3.144,
+      3.31,
+      3.477,
+      4.977,
+      6.081,
+      9.587,
+      9.732
     ],
     "overtakeDifficulty": 0.859,
     "overtakeModel": {
@@ -42,8 +42,8 @@
       "trainCoef": -0.0531
     },
     "dirtyAirPenalty": 0.9155,
-    "greenLapTime": 109.309,
-    "scLapTime": 171.315,
+    "greenLapTime": 109.346,
+    "scLapTime": 169.564,
     "refuel": {
       "secondsPerLap": 0.2464,
       "laneBase": 32.301,
@@ -76,8 +76,8 @@
       "team": "Prost",
       "basePace": 108.6318,
       "noise": 1.6887,
-      "wetPace": 0.0144,
-      "dampPace": -0.0047,
+      "wetPace": 0.0145,
+      "dampPace": -0.0038,
       "stateAtTakeover": {
         "position": 11,
         "gapAhead": 3.671,
@@ -92,7 +92,7 @@
         {
           "lap": 24,
           "to": "MEDIUM",
-          "loss": 31.799
+          "loss": 31.508
         }
       ],
       "stintPace": [
@@ -152,8 +152,8 @@
       "team": "Ferrari",
       "basePace": 106.6578,
       "noise": 1.5389,
-      "wetPace": -0.031,
-      "dampPace": -0.002,
+      "wetPace": -0.0319,
+      "dampPace": -0.0089,
       "stateAtTakeover": {
         "position": 2,
         "gapAhead": 7.34,
@@ -168,7 +168,7 @@
         {
           "lap": 22,
           "to": "MEDIUM",
-          "loss": 30.131
+          "loss": 30.138
         },
         {
           "lap": 42,
@@ -208,7 +208,7 @@
         {
           "lap": 24,
           "to": "MEDIUM",
-          "loss": 43.015
+          "loss": 42.756
         }
       ],
       "stintPace": [
@@ -239,7 +239,7 @@
         {
           "lap": 24,
           "to": "MEDIUM",
-          "loss": 35.962
+          "loss": 35.702
         }
       ],
       "stintPace": [
@@ -255,7 +255,7 @@
       "basePace": 106.7034,
       "noise": 1.4248,
       "wetPace": -0.0175,
-      "dampPace": -0.0051,
+      "dampPace": -0.0049,
       "stateAtTakeover": {
         "position": 3,
         "gapAhead": 9.073,
@@ -270,7 +270,7 @@
         {
           "lap": 26,
           "to": "MEDIUM",
-          "loss": 33.425
+          "loss": 33.23
         }
       ],
       "stintPace": [
@@ -301,7 +301,7 @@
         {
           "lap": 22,
           "to": "MEDIUM",
-          "loss": 20.825
+          "loss": 20.638
         }
       ],
       "stintPace": [
@@ -368,7 +368,7 @@
         {
           "lap": 29,
           "to": "MEDIUM",
-          "loss": 114.785
+          "loss": 114.096
         }
       ],
       "stintPace": [
@@ -384,7 +384,7 @@
       "basePace": 109.2304,
       "noise": 1.7791,
       "wetPace": 0.0189,
-      "dampPace": 0.0256,
+      "dampPace": 0.0269,
       "stateAtTakeover": {
         "position": 12,
         "gapAhead": 5.528,
@@ -399,12 +399,12 @@
         {
           "lap": 25,
           "to": "MEDIUM",
-          "loss": 49.098
+          "loss": 48.916
         },
         {
           "lap": 35,
           "to": "MEDIUM",
-          "loss": 36.413
+          "loss": 36.316
         }
       ],
       "stintPace": [
@@ -435,7 +435,7 @@
         {
           "lap": 31,
           "to": "MEDIUM",
-          "loss": 36.32
+          "loss": 35.802
         }
       ],
       "stintPace": [
@@ -490,8 +490,8 @@
       "team": "Jordan",
       "basePace": 107.4392,
       "noise": 0.7724,
-      "wetPace": -0.0023,
-      "dampPace": -0.0014,
+      "wetPace": -0.0022,
+      "dampPace": 0.0012,
       "stateAtTakeover": {
         "position": 7,
         "gapAhead": 2.466,
@@ -506,7 +506,7 @@
         {
           "lap": 24,
           "to": "MEDIUM",
-          "loss": 25.196
+          "loss": 24.726
         },
         {
           "lap": 40,
@@ -546,7 +546,7 @@
         {
           "lap": 23,
           "to": "MEDIUM",
-          "loss": 33.178
+          "loss": 32.993
         },
         {
           "lap": 44,
@@ -645,14 +645,14 @@
     "wetness": [
       0.0,
       0.0,
-      0.14,
-      0.1,
-      0.07,
+      0.03,
+      0.0,
+      0.0,
+      0.0,
+      0.02,
       0.06,
-      0.07,
-      0.1,
-      0.15,
-      0.22,
+      0.12,
+      0.2,
       0.31,
       0.3,
       0.31,
