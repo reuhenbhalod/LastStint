@@ -61,7 +61,7 @@
             "duel",
             "none"
           ],
-          "description": "Which lapped cars unlap before a safety-car restart: all of them (the rule since 2012, default), only those between userSide and rival (Abu Dhabi 2021's race-control call), or none (before 2012, roadmap R5; the sim treats it as all until eras build plan 4.1)."
+          "description": "Which lapped cars unlap before a safety-car restart: all of them (the rule since 2012, default), only those between userSide and rival (Abu Dhabi 2021's race-control call), or none (before 2007 and 2010-11, roadmap R5: lapped cars stay in the SC queue and the red-flag restart queue where they are on the road, a lap down)."
         }
       }
     },
@@ -317,6 +317,29 @@
           "wetPace": {
             "type": "number",
             "description": "A wet race: the driver's extra share of a lap on a wet track beyond the weather curves (negative: quicker in the wet), fading in up to wetness 0.1 (pipeline/wet.py)."
+          },
+          "serviceStops": {
+            "type": "array",
+            "description": "Real stops after the takeover that changed no tyres (a repair, a penalty stop-go, a drive-through; pipeline track.service_stops): the car pays each one's measured loss on its out-lap whatever its strategy, and keeps its set. Eras builds only; absent: none.",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "lap",
+                "loss"
+              ],
+              "properties": {
+                "lap": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "description": "The out-lap (the stop's time is charged on it)."
+                },
+                "loss": {
+                  "type": "number",
+                  "description": "Measured time lost to the stop (in- and out-lap against the car's clean laps, in the sim frame)."
+                }
+              }
+            }
           }
         }
       }

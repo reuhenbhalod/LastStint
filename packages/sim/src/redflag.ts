@@ -22,23 +22,37 @@ export const RESTART_QUEUE_GAP = 0.5;
 export const STANDING_RESTART_GAP = 0.74;
 
 export interface RedFlagPlan {
-  /** Out-laps on which a stop costs nothing (the tyre change in the stoppage). */
-  free: Set<number>;
+  /** Out-lap -> red lap: a stop with its out-lap there costs nothing (the tyre change in the
+   * stoppage), if the red flag that started on that red lap is in the run's events. */
+  free: Map<number, number>;
   /** At the end of this lap the running cars line up `gap` apart, if the red flag that started
    * on `redLap` is in the run's events (a grader's blind fork may not know it). */
   wipes: Map<number, { gap: number; redLap: number }>;
 }
 
+/**
+ * The out-laps of a stop made in the stoppage of the red flag on laps first..stop: the red laps
+ * after the first. When the cars stopped on the grid on the flag lap itself (stop === first:
+ * every 2007-11 red flag, Monaco 2022), a tyre change made there has its out-lap on the lap
+ * after it (redflag.py free_out_laps).
+ */
+export function freeOutLaps(first: number, stop: number): number[] {
+  if (stop === first) return [first + 1];
+  const out: number[] = [];
+  for (let lap = first + 1; lap <= stop; lap++) out.push(lap);
+  return out;
+}
+
 /** What a race's red flags do in the sim (redflag.py `plan`). */
 export function redFlagPlan(events: RaceEvent[]): RedFlagPlan {
-  const free = new Set<number>();
+  const free = new Map<number, number>();
   const wipes = new Map<number, { gap: number; redLap: number }>();
   const scs = new Map<number, number>();
   for (const e of events) if (e.type === 'SC') scs.set(e.lap, e.laps ?? 1);
   for (const e of events) {
     if (e.type !== 'RED' || (e.restart !== 'standing' && e.restart !== 'rolling')) continue;
     const stop = e.lap + (e.laps ?? 1) - 1;
-    for (let lap = e.lap + 1; lap <= stop; lap++) free.add(lap);
+    for (const lap of freeOutLaps(e.lap, stop)) free.set(lap, e.lap);
     wipes.set(stop, { gap: RESTART_QUEUE_GAP, redLap: e.lap });
     if (e.restart === 'standing') {
       wipes.set(stop + (scs.get(stop + 1) ?? 0), { gap: STANDING_RESTART_GAP, redLap: e.lap });
@@ -47,10 +61,44 @@ export function redFlagPlan(events: RaceEvent[]): RedFlagPlan {
   return { free, wipes };
 }
 
-/** Wipe the gaps: the running cars, in order, `gap` apart behind the leader. */
-export function lineUp(order: string[], cars: Record<string, CarState>, gap: number): void {
+/**
+ * The running cars in the order they are on the road behind the leader, with each car's laps
+ * down and its time behind the leader on the road (redflag.py road_order).
+ */
+export function roadOrder(
+  order: string[],
+  cars: Record<string, CarState>,
+  lapTime: number,
+): { road: string[]; down: Map<string, number>; onRoad: Map<string, number> } {
+  const time = (c: string) => (cars[c] as CarState).totalTime;
+  const lead = time(order[0] as string);
+  const down = new Map(order.map((c) => [c, Math.floor((time(c) - lead) / lapTime)]));
+  const onRoad = new Map(order.map((c) => [c, time(c) - lead - (down.get(c) as number) * lapTime]));
+  const road = [...order].sort((a, b) => (onRoad.get(a) as number) - (onRoad.get(b) as number));
+  return { road, down, onRoad };
+}
+
+/**
+ * Wipe the gaps: the running cars, in order, `gap` apart behind the leader. With `lapTime` (no
+ * unlapping, scUnlap 'none': before 2007 and 2010-11) the lapped cars line up where they are on
+ * the road, each keeping its laps down (Monaco 2011's restart).
+ */
+export function lineUp(
+  order: string[],
+  cars: Record<string, CarState>,
+  gap: number,
+  lapTime?: number,
+): void {
   const lead = order[0] === undefined ? undefined : cars[order[0]];
   if (!lead) return;
+  if (lapTime) {
+    const base = lead.totalTime;
+    const { road, down } = roadOrder(order, cars, lapTime);
+    road.forEach((c, i) => {
+      (cars[c] as CarState).totalTime = base + i * gap + (down.get(c) as number) * lapTime;
+    });
+    return;
+  }
   for (let i = 1; i < order.length; i++) {
     (cars[order[i] as string] as CarState).totalTime = lead.totalTime + i * gap;
   }

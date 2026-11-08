@@ -9,9 +9,9 @@
   },
   "era": "2014-2025",
   "track": {
-    "pitLoss": 48.916,
-    "pitLossUnderSC": 26.904,
-    "pitLossUnderVSC": 33.752,
+    "pitLoss": 23.935,
+    "pitLossUnderSC": 13.165,
+    "pitLossUnderVSC": 16.515,
     "pitLossDeviations": [
       0.0
     ],

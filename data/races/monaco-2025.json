@@ -463,6 +463,12 @@
           "to": "HARD",
           "loss": 16.498
         }
+      ],
+      "serviceStops": [
+        {
+          "lap": 63,
+          "loss": 18.656
+        }
       ]
     },
     {

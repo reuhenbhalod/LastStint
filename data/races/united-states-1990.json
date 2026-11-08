@@ -5,7 +5,8 @@
     "name": "United States 1990: Alesi vs Senna",
     "laps": 72,
     "takeoverLap": 33,
-    "seed": 1
+    "seed": 1,
+    "scUnlap": "none"
   },
   "era": "1988-1993",
   "track": {

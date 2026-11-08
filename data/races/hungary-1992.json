@@ -5,7 +5,8 @@
     "name": "Hungary 1992: Mansell vs Berger",
     "laps": 77,
     "takeoverLap": 58,
-    "seed": 1
+    "seed": 1,
+    "scUnlap": "none"
   },
   "era": "1988-1993",
   "track": {

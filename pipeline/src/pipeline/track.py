@@ -65,6 +65,32 @@ def pit_stops(laps: pd.DataFrame) -> list[tuple[str, pd.Series, pd.Series]]:
     return stops
 
 
+def service_stops(laps: pd.DataFrame) -> list[tuple[str, pd.Series, pd.Series]]:
+    """(driver, in_lap, out_lap) for each stop that changed no tyres (a repair, a penalty
+    stop-go, a drive-through: Baku 2017 HAM's headrest and VET's stop-go, Hungary 2015's
+    drive-throughs), the same set on and after its out-lap (clean.tyre_change_out_laps).
+    Only green stops (both laps green throughout, both timed) count: a pit-lane pass under a
+    SC or a red flag (Hungary 2015 laps 45-46, Brazil 2021) keeps its set too, but isn't a
+    stop. Timing that never shows a set change (estimated compounds) has none."""
+    stops: list[tuple[str, pd.Series, pd.Series]] = []
+    changed = tyre_change_out_laps(laps)
+    for driver, grp in laps.groupby("Driver"):
+        grp = grp.sort_values("LapNumber")
+        for _, in_lap in grp[grp["PitInTime"].notna()].iterrows():
+            out = grp[grp["LapNumber"] == in_lap["LapNumber"] + 1]
+            if not len(out):
+                continue
+            out_lap = out.iloc[0]
+            if bool(changed.loc[out_lap.name]) or pd.isna(out_lap["PitOutTime"]):
+                continue
+            if any(str(r["TrackStatus"]) != "1" for r in (in_lap, out_lap)):
+                continue
+            if pd.isna(in_lap["LapTime"]) or pd.isna(out_lap["LapTime"]):
+                continue
+            stops.append((str(driver), in_lap, out_lap))
+    return stops
+
+
 # Under a safety car the field bunches behind the SC car, so lap times on those laps mix the
 # bunching lap with steady SC pace and a stop's in/out laps can't be compared with the
 # field's (the comparison comes out negative). We estimate it as a fraction of the green
@@ -250,9 +276,59 @@ def pit_loss_deviations(laps: pd.DataFrame, median: float | None) -> list[float]
     return sorted(round(d, 3) for d in devs if abs(d) <= MAX_STOP_DEVIATION)
 
 
-def pit_loss(laps: pd.DataFrame) -> float | None:
-    """Green-flag pit loss: median over green stops of `stop_losses`. None if no stops."""
-    losses = [loss for _, flag, loss in stop_losses(laps) if flag == "green"]
+# The robust guard on the green pit loss (Eras builds, `pit_loss(guard=True)`): a damage or
+# repair stop is slower in the lane (a new nose, a long stationary time) or on its in-lap (the
+# car crawled back). Each is measured against the race's own median over all its stops (any
+# flag: the lane speed limit holds under a SC too, and the in-lap is compared with the same
+# lap's field). The limits are the 95th percentiles over the 3,351 measured stops of the races
+# built in data/races, reconstructed ones left out (Nov 7 2026): pit-lane time 7.6 s over the
+# race's median, in-lap 12.2 s.
+DAMAGE_LANE_EXCESS = 7.6
+DAMAGE_IN_LAP_EXCESS = 12.2
+
+
+def lane_times(laps: pd.DataFrame) -> dict[tuple[str, int], float]:
+    """(driver, out-lap) -> pit-lane time (lane exit on the out-lap minus lane entry on the
+    in-lap) for each tyre stop with both times."""
+    out = {}
+    for driver, in_lap, out_lap in pit_stops(laps):
+        if pd.isna(in_lap["PitInTime"]) or pd.isna(out_lap["PitOutTime"]):
+            continue
+        lane = float(out_lap["PitOutTime"]) - float(in_lap["PitInTime"])
+        out[(driver, int(out_lap["LapNumber"]))] = lane
+    return out
+
+
+def damage_stops(laps: pd.DataFrame, lane: bool = True) -> set[tuple[str, int]]:
+    """(driver, out-lap) of the stops the guard calls damage or repair stops: pit-lane time
+    over DAMAGE_LANE_EXCESS above the race's median (not with `lane` False: a refuelling
+    race's lane time holds its fill), or in-lap loss over DAMAGE_IN_LAP_EXCESS above it."""
+    records = stop_records(laps)
+    out: set[tuple[str, int]] = set()
+    if not records:
+        return out
+    in_median = float(pd.Series([r["in_loss"] for r in records]).median())
+    for r in records:
+        if r["in_loss"] - in_median > DAMAGE_IN_LAP_EXCESS:
+            out.add((r["driver"], r["out_lap"]))
+    times = lane_times(laps) if lane else {}
+    if times:
+        lane_median = float(pd.Series(list(times.values())).median())
+        out |= {key for key, t in times.items() if t - lane_median > DAMAGE_LANE_EXCESS}
+    return out
+
+
+def pit_loss(laps: pd.DataFrame, guard: bool = False, lane: bool = True) -> float | None:
+    """Green-flag pit loss: median over green stops of `stop_losses`. None if no stops.
+    `guard` (Eras builds): damage and repair stops (damage_stops; `lane` as there) are left
+    out, unless that would leave none. Saudi Arabia 2021: three green stops, two of them
+    damage stops (48.9 and 65.1 s), so the median was 48.9 s against ALO's normal 23.9 s."""
+    records = [r for r in stop_records(laps) if r["flag"] == "green"]
+    if guard:
+        bad = damage_stops(laps, lane)
+        kept = [r for r in records if (r["driver"], r["out_lap"]) not in bad]
+        records = kept or records
+    losses = [r["loss"] for r in records]
     return float(pd.Series(losses).median()) if losses else None
 
 
@@ -465,13 +541,24 @@ def fit_track_params(
     clean_laps: pd.DataFrame,
     traffic_laps: pd.DataFrame,
     fit: LapTimeFit,
+    pit_loss_guard: bool = False,
+    refuelling: bool = False,
 ) -> TrackParams:
-    """Fit every track-level parameter from one race."""
+    """Fit every track-level parameter from one race. `pit_loss_guard` (Eras builds): the
+    green pit loss leaves out damage and repair stops (pit_loss; `refuelling`: by in-lap
+    only, since the lane time holds the fill)."""
     times = sc_vsc_lap_times(laps)
     difficulty, n_opp, n_pass = overtake_difficulty(laps)
     green = times["green"]
-    green_pit = pit_loss(laps)
+    green_pit = pit_loss(laps, guard=pit_loss_guard, lane=not refuelling)
     notes: list[str] = []
+    if pit_loss_guard and green_pit is not None:
+        raw = pit_loss(laps)
+        if raw is not None and abs(raw - green_pit) >= 0.0005:
+            notes.append(
+                f"pitLoss {green_pit:.3f}s without damage/repair stops (median of all green"
+                f" stops {raw:.3f}s)"
+            )
     if green_pit is None:
         # No green stop to measure (Australia 2025: every stop under a SC or VSC, or in the
         # rain): back out the green loss from the neutralized ones.

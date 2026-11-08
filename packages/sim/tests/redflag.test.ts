@@ -7,7 +7,7 @@
 import { describe, expect, it } from 'vitest';
 import { legendEvents } from '../src/legend.js';
 import { candidateMoments, pauseAt } from '../src/moments.js';
-import { RESTART_QUEUE_GAP, STANDING_RESTART_GAP, redFlagPlan } from '../src/redflag.js';
+import { RESTART_QUEUE_GAP, STANDING_RESTART_GAP, lineUp, redFlagPlan } from '../src/redflag.js';
 import {
   BUNCH_GAP,
   forkRun,
@@ -17,7 +17,7 @@ import {
   stepLap,
   validateDecisions,
 } from '../src/sim.js';
-import type { RaceModel, RaceResult } from '../src/types.js';
+import type { CarState, RaceModel, RaceResult } from '../src/types.js';
 import goldenJson from './fixtures/redflag-golden.json';
 import zandvoortJson from './fixtures/redflag-netherlands-2023.json';
 
@@ -113,13 +113,28 @@ describe('the red flag model', () => {
 
   it('plans the free tyre change and the restart', () => {
     const plan = redFlagPlan(zandvoort.events);
-    expect([...plan.free]).toEqual([65]);
+    expect([...plan.free]).toEqual([[65, 64]]);
     expect([...plan.wipes]).toEqual([[65, { gap: RESTART_QUEUE_GAP, redLap: 64 }]]);
     const standing = redFlagPlan(variants().standing?.events ?? []);
     expect(standing.wipes.get(66)).toEqual({ gap: STANDING_RESTART_GAP, redLap: 64 });
     // Not resumed: no free stops, nothing wiped.
     const over = redFlagPlan([{ lap: 70, type: 'RED', laps: 3 }]);
     expect(over.free.size + over.wipes.size).toBe(0);
+    // Stopped on the grid on the flag lap (one red lap): the change has its out-lap after it.
+    const grid = redFlagPlan([{ lap: 72, type: 'RED', laps: 1, restart: 'rolling' }]);
+    expect([...grid.free]).toEqual([[73, 72]]);
+  });
+
+  it('no unlapping: the restart queue keeps lapped cars where they are on the road', () => {
+    const car = (code: string, totalTime: number) => ({ code, totalTime }) as CarState;
+    // Lap 100 s. B is on the lead lap 30 s back; L is a lap down, 10 s behind A on the road.
+    const cars = { A: car('A', 0), B: car('B', 30), L: car('L', 110) };
+    lineUp(['A', 'B', 'L'], cars, 0.5, 100);
+    expect(cars.L.totalTime).toBeCloseTo(100.5, 9); // right behind A, still a lap down
+    expect(cars.B.totalTime).toBeCloseTo(1.0, 9); // behind L on the road
+    const all = { A: car('A', 0), B: car('B', 30), L: car('L', 110) };
+    lineUp(['A', 'B', 'L'], all, 0.5);
+    expect(all.L.totalTime).toBeCloseTo(1.0, 9); // unlapped to the back
   });
 
   it('wipes the gaps at the restart: the SC queue, then a standing start spreads it', () => {

@@ -5,7 +5,8 @@
     "name": "Portugal 1984: Lauda vs Prost",
     "laps": 70,
     "takeoverLap": 32,
-    "seed": 1
+    "seed": 1,
+    "scUnlap": "none"
   },
   "era": "1988-1993",
   "track": {
