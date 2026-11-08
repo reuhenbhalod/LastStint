@@ -18,12 +18,12 @@
     "vscPeriodsMeasured": 72
   },
   "allTracks": {
-    "races": 169,
-    "vscRaces": 150,
+    "races": 170,
+    "vscRaces": 151,
     "scPeriods": 118,
-    "vscPeriods": 75,
-    "scPerRace": 0.6982,
-    "vscPerRace": 0.5
+    "vscPeriods": 76,
+    "scPerRace": 0.6941,
+    "vscPerRace": 0.5033
   },
   "circuits": {
     "albert_park": {
@@ -194,8 +194,8 @@
       "vscRaces": 2,
       "scPeriods": 2,
       "vscPeriods": 2,
-      "scPerRace": 0.6982,
-      "vscPerRace": 0.5,
+      "scPerRace": 0.6941,
+      "vscPerRace": 0.5033,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -242,11 +242,11 @@
     },
     "monaco": {
       "name": "Circuit de Monaco",
-      "races": 7,
-      "vscRaces": 6,
+      "races": 8,
+      "vscRaces": 7,
       "scPeriods": 6,
-      "vscPeriods": 6,
-      "scPerRace": 0.8571,
+      "vscPeriods": 7,
+      "scPerRace": 0.75,
       "vscPerRace": 1.0,
       "scFallback": false,
       "vscFallback": false,
@@ -257,7 +257,8 @@
         "monaco-2017 (tum): 1 SC, 0 VSC",
         "monaco-2018 (tum): 0 SC, 1 VSC",
         "monaco-2019 (tum): 1 SC, 0 VSC",
-        "monaco-2023 (fastf1): 0 SC, 0 VSC"
+        "monaco-2023 (fastf1): 0 SC, 0 VSC",
+        "monaco-2025 (fastf1): 0 SC, 1 VSC"
       ]
     },
     "monza": {
@@ -287,8 +288,8 @@
       "vscRaces": 2,
       "scPeriods": 1,
       "vscPeriods": 0,
-      "scPerRace": 0.6982,
-      "vscPerRace": 0.5,
+      "scPerRace": 0.6941,
+      "vscPerRace": 0.5033,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -525,8 +526,8 @@
       "vscRaces": 1,
       "scPeriods": 1,
       "vscPeriods": 1,
-      "scPerRace": 0.6982,
-      "vscPerRace": 0.5,
+      "scPerRace": 0.6941,
+      "vscPerRace": 0.5033,
       "scFallback": true,
       "vscFallback": true,
       "counted": [

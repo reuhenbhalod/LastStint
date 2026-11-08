@@ -2,7 +2,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import type { RaceModel } from '@laststint/sim';
 import { describe, expect, it } from 'vitest';
-import { TEAM_COLOR, colourDistance, inkOn, teamTheme } from './teamTheme.js';
+import { TEAM_COLOR, colourDistance, inkOn, teamColour, teamTheme } from './teamTheme.js';
 
 const dir = join(__dirname, '..', '..', '..', '..', 'data', 'races');
 const races = readdirSync(dir)
@@ -12,8 +12,13 @@ const model = (id: string) => races.find((m) => m.race.id === id) as RaceModel;
 
 describe('team colours', () => {
   it('every team in our races has a colour', () => {
-    const teams = new Set(races.flatMap((m) => m.drivers.map((d) => d.team)));
-    expect([...teams].filter((t) => !TEAM_COLOR[t])).toEqual([]);
+    // In the race's year: Eras teams (Caterham, Lotus F1...) have only a historic livery.
+    const missing = races.flatMap((m) =>
+      m.drivers
+        .filter((d) => !teamColour(d.team, Number(m.race.id.slice(-4))))
+        .map((d) => `${m.race.id}: ${d.team}`),
+    );
+    expect([...new Set(missing)]).toEqual([]);
   });
 
   it('a Ferrari race is red, and the rival keeps its own team colour', () => {

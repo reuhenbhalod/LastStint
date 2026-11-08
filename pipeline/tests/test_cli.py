@@ -31,18 +31,6 @@ def test_build_writes_model_and_golden(tmp_path, monkeypatch):
     assert "note:" in result.output  # prior/fallback notes are surfaced
 
 
-def test_ingest_points_tum_races_at_tum_ingest(monkeypatch):
-    # A TUM race (Eras 3.1) has no FastF1 / OpenF1 path: `ingest --force` must not try one.
-    def no_network(*_args, **_kwargs):
-        raise AssertionError("TUM races are read with tum-ingest")
-
-    monkeypatch.setattr(cli.ingest, "ingest_race", no_network)
-    monkeypatch.setattr(cli.ingest, "ingest_openf1", no_network)
-    result = runner.invoke(cli.app, ["ingest", "monaco-2017", "--force"])
-    assert result.exit_code == 0, result.output
-    assert "pipeline tum-ingest monaco-2017" in result.output
-
-
 def test_build_rejects_unknown_race():
     result = runner.invoke(cli.app, ["build", "monaco-1950"])
     assert result.exit_code != 0

@@ -86,8 +86,9 @@ def test_resolved_meta_fills_an_automatic_duel(monkeypatch):
 
 
 def test_every_race_has_a_split():
-    # "wet": the weather spec's mixed-weather races (validated on their own).
-    assert {m["split"] for m in build.RACES.values()} == {"tune", "holdout", "wet"}
+    # "wet": the weather spec's mixed-weather races (validated on their own). "eras": Eras
+    # races (build plan 3.1), validated on their own too, never used to choose a model change.
+    assert {m["split"] for m in build.RACES.values()} == {"tune", "holdout", "wet", "eras"}
 
 
 def test_a_thinly_run_compound_takes_its_life_from_the_well_run_ones():

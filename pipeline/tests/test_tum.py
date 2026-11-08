@@ -275,3 +275,36 @@ def test_race_model_matches_fastf1_build(tmp_path, monkeypatch, fastf1_abu):
     for key in ("realResult", "events"):
         assert tum_model[key] == ff_model[key]
     assert tum_model["race"]["takeoverLap"] == ff_model["race"]["takeoverLap"]
+
+
+# --- Eras build plan 3.1: the registered TUM races ---------------------------------------
+
+ERA7_TUM = ["bahrain-2014", "monaco-2015", "hungary-2015", "spain-2016", "monaco-2016",
+            "abu-dhabi-2016"]  # fmt: skip
+
+
+@pytest.mark.parametrize("race_id", ERA7_TUM)
+def test_registered_tum_races_have_a_credited_snapshot(race_id):
+    meta = build.RACES[race_id]
+    assert meta["source"] == "tum" and meta["split"] == "eras"
+    assert tum.parse_race_id(race_id)[0] == meta["year"]
+    prov = json.loads(tum.provenance_path(race_id).read_text())
+    assert prov["licence"] == tum.TUM_LICENCE and prov["commit"] == tum.TUM_COMMIT
+    assert prov["notes"] == []  # none of them was red-flagged
+    finishers = assemble.finishing_order(pd.read_parquet(ingest.raw_snapshot_path(race_id)))
+    assert {meta["user_side"], meta["rival"]} <= set(finishers)
+
+
+def test_cli_ingest_reads_tum_races_from_tum(tmp_path, monkeypatch):
+    # `pipeline ingest --force` on a TUM race must not go to FastF1.
+    calls, real = [], tum.ingest_tum
+
+    def fake(race_id, *args, **kwargs):
+        calls.append(race_id)
+        return real(RID, FIXTURE, tmp_path, verify=False)
+
+    monkeypatch.setattr(tum, "ingest_tum", fake)
+    monkeypatch.setattr(ingest, "ingest_race", lambda *a: pytest.fail("went to FastF1"))
+    result = CliRunner().invoke(cli.app, ["ingest", "spain-2016", "--force"])
+    assert result.exit_code == 0, result.output
+    assert calls == ["spain-2016"] and "55 race laps" in result.output

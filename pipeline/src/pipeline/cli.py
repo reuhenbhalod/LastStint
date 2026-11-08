@@ -55,17 +55,18 @@ def ingest_race(
     all_races: bool = typer.Option(False, "--all", help="Ingest every registered race."),
     force: bool = typer.Option(False, help="Re-download even if a snapshot exists."),
 ) -> None:
-    """Download registered races into data/raw/: FastF1, or OpenF1 for races registered with
-    source "openf1" (network; rate-limit safe)."""
+    """Download registered races into data/raw/: FastF1, OpenF1 for races registered with
+    source "openf1" (network; rate-limit safe), or the cached TUM database for source "tum"."""
     for rid in _race_ids(race_id, all_races):
         if ingest.raw_snapshot_path(rid).exists() and not force:
             typer.echo(f"{rid}: snapshot exists, skipped")
             continue
         meta = build_mod.RACES[rid]
         if meta.get("source") == "tum":
-            typer.echo(f"{rid}: a TUM race, skipped (read it with `pipeline tum-ingest {rid}`)")
-            continue
-        if meta.get("source") == "openf1":
+            from . import tum
+
+            laps, facts = tum.ingest_tum(rid)  # offline: the pinned TUM SQLite in the cache
+        elif meta.get("source") == "openf1":
             laps, facts = ingest.ingest_openf1(rid, meta["year"], meta["event"])
         else:
             laps, facts = ingest.ingest_race(rid, meta["year"], meta["event"])
