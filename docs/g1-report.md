@@ -2962,3 +2962,140 @@ storyline races: their overlays gained an `eras` block their committed files don
 Rebuilding every Eras race also writes `track.restart` (and the TEAM_ORDER events for the five
 team-order races) into its file and golden. No parity fixture was regenerated except the new
 one.
+
+## Eras sim fix W3 (Nov 8 2026): the dirty-air cost measured and refitted; not adopted, and M3's realistic passing still not
+
+The M3 follow-up: "the sim's followers lose 0.52-0.62 s a lap in dirty-air range against the
+real 0.30-0.36 s, so trains cost too much; realistic passing needs that fixed first". Code:
+`pipeline/src/pipeline/dirty_air.py` (method in its docstring), `config/dirty_air.json`,
+`dirty_air_cost` / `_no_pass_without_roll` in `sim_reference.py`, `dirtyAirCost` /
+`noPassWithoutRoll` in `sim.ts` (parity: `packages/sim/tests/eras-dirty-air.test.ts`), screens
+`experiments/dirty_air_stats.py` and `experiments/dirty_air_ab.py`.
+
+**The measurement.** A lap's loss is its time less the car's clean-air pace (real laps: the
+race's dry lap model; the sim's: its `clean` lap), by the gap to the car directly ahead at the
+*start* of the lap (the gap the sims price dirty air and the pass roll on), less the car's own
+clear-air level in that stint (its median at 3 s or more back). Kept: green laps after a green
+lap, from lap 2, neither car pitting; residuals within 3 s of the stint's level; standard errors
+clustered by stint. On the 92 dry timed races of M3's fit (all laps):
+
+| Group | < 0.5 s | 0.5-1.0 s | 1.0-1.5 s | 1.5-2.0 s | 2-3 s | laps < 2 s |
+|---|---|---|---|---|---|---|
+| drs (77 races, 2011-2025) | 0.67 | 0.49 | 0.25 | 0.12 | 0.03 | 17,648 |
+| noDrs (15 races, before 2011) | 1.32 | 0.76 | 0.43 | 0.17 | 0.07 | 2,580 |
+
+By track (the scale of a race's losses on its group's shape, layouts shrunk toward 1): Monaco's
+DRS layout 2.08, Yas Marina (2009-20) 1.50, Marina Bay 2023 1.49, the Hungaroring 1.24, Interlagos
+0.90, Catalunya 0.77, Bahrain 0.49; the race-to-race spread within a layout is large (true
+variance 0.22 of a scale of 1 with DRS, 0.02 before).
+
+**The premise was wrong.** Measured the same way on both sides, the sim's followers lose
+*less* than real ones at close range and about the same further back (28 races, mean of the
+races; sim 200 runs each on the current build):
+
+| | < 0.5 s | 0.5-1.0 s | 1.0-1.5 s | 1.5-2.0 s |
+|---|---|---|---|---|
+| real | 0.89 | 0.57 | 0.23 | 0.13 |
+| sim before (flat dirtyAirPenalty within 1 s, held 0.3 s) | 0.58 | 0.50 | 0.19 | 0.14 |
+| sim, refitted bands | 0.92 | 0.66 | 0.37 | 0.19 |
+
+M3's 0.30-0.36 s "real" figures were the races' `dirtyAirPenalty` (the median lap residual on
+laps that *end* within 1 s, which selects the quick laps), and its sim figure an older
+stuck-follower measure (model v3 spec: faster followers still behind after the lap). By start
+gap the sim's trains cost no more than real ones; what differs is where the cars sit: the
+sim's held followers pile up at 0.3 s (of its laps within 2 s, the share under 0.5 s is a
+median 3.3x the real share), the real ones spread over 0.5-1.0 s.
+
+**The refit.** `dirtyAirBands` (`upTo` 0.5 / 1.0 / 1.5 / 2.0 s): the race's real loss (the
+group's shape x its scale, its own laps partly pooled toward its layout's) less the group's
+`simOffset`, the loss the sims' hold rule makes by itself (calibrated by running the reference
+sim on the 43 Eras-built fit races with the bands at the real loss: drs 0.09 / 0.12 / 0.14 /
+0.13 s, noDrs -0.01 / 0.15 / 0.15 / 0.13 s). With it the sim's losses sit at or a little above
+the real ones (table above; the 1-2 s bands over because the hold rule's own cost there is
+larger in some races than the pooled offset).
+
+**Results.** Robust G1 (two seed sets of 1,000 runs, one race per process) on fresh builds of
+M3's 28 races; before = this branch with the model off (the current code: M1-M4 integrated, so
+the "before" column differs from M3's). Passes: on-track passes after the takeover on the laps
+the sims run green (no SC/VSC/red event), a pair adjacent at the start of the lap that swaps by
+the line, neither car on an in- or out-lap, counted the same way on real laps and the sim's
+(mean of 200 runs); "close" = the follower started within 2 s. (M3's real counts used FastF1's
+all-green track status, which drops laps with a local yellow; these don't.)
+
+| Variant | G1 pass / borderline / fail | Mean gap error | Sim passes (real 574) | Sim close (real 546) | Sim loss by band |
+|---|---|---|---|---|---|
+| before | 11 / 0 / 17 | 2.61 s | 797 | 698 | 0.58/0.50/0.19/0.14 |
+| refit (bands) | 8 / 1 / 19 | 3.32 s | 776 | 659 | 0.92/0.66/0.37/0.19 |
+| refit + heldGap 0.79 s | 4 / 0 / 24 | 4.48 s | 564 | 447 | 1.02/0.92/0.51/0.28 |
+| refit + no pass without a roll | 7 / 0 / 21 | 3.79 s | 750 | 750 | 0.96/0.68/0.38/0.19 |
+| refit + both | 2 / 0 / 26 | 5.37 s | 478 | 478 | 1.09/0.96/0.52/0.28 |
+| refit + pace without its traffic loss | 6 / 0 / 22 | 4.16 s | 830 | 704 | 0.93/0.66/0.38/0.19 |
+| before + no pass without a roll | 9 / 1 / 18 | 2.99 s | 792 | 792 | 0.65/0.52/0.20/0.14 |
+| before + heldGap 0.79 s | 5 / 0 / 23 | 3.95 s | 557 | 453 | 0.72/0.81/0.37/0.24 |
+
+Per race (G1 status and mean gap error; passes; loss by band < 0.5 / 0.5-1 / 1-1.5 / 1.5-2 s):
+
+| Race | G1 before | refit | refit + held 0.79 | refit + roll only | refit + both | Real passes (close) | Sim before (close) | refit | refit + held | refit + both | Real loss <0.5 / 0.5-1 / 1-1.5 / 1.5-2 | Sim before | Sim refit |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| singapore-2023 | fail 4.01 | fail 7.14 | fail 11.91 | fail 8.16 | fail 13.39 | 27 (27) | 50.0 (43.8) | 49.8 | 33.8 | 29.5 | 1.29/0.42/0.10/0.01 | 0.61/0.46/0.25/0.15 | 1.11/0.86/0.49/0.27 |
+| monaco-2025 | fail 3.27 | fail 3.98 | fail 4.15 | fail 7.47 | fail 7.88 | 5 (3) | 32.0 (12.2) | 36.1 | 32.5 | 5.5 | 1.87/1.49/0.89/0.90 | 0.96/0.82/0.51/0.35 | 1.52/1.26/0.85/0.52 |
+| spain-2021 | fail 6.15 | fail 5.79 | fail 5.46 | fail 5.61 | fail 5.07 | 29 (29) | 39.6 (34.7) | 38.7 | 32.4 | 29.5 | 0.45/0.87/0.37/0.37 | 0.56/0.57/0.22/0.16 | 0.97/0.78/0.46/0.24 |
+| brazil-2021 | fail 1.85 | fail 1.89 | fail 4.19 | fail 1.65 | fail 4.40 | 36 (35) | 42.0 (39.6) | 41.8 | 28.0 | 22.8 | 0.65/0.69/-0.03/-0.07 | 0.62/0.56/0.14/0.09 | 0.72/0.50/0.24/0.10 |
+| monaco-2017 | fail 2.98 | fail 4.03 | fail 4.16 | fail 4.04 | fail 4.17 | 3 (3) | 5.3 (4.5) | 5.3 | 2.8 | 1.1 | 1.69/0.96/0.52/0.42 | 0.96/0.74/0.22/0.12 | 1.64/1.22/0.64/0.31 |
+| italy-2020 | fail 2.23 | fail 2.51 | fail 3.88 | fail 3.05 | fail 4.78 | 29 (27) | 19.6 (19.6) | 17.7 | 10.1 | 8.9 | 0.85/0.52/0.18/-0.10 | 0.40/0.30/0.04/0.05 | 0.66/0.45/0.17/0.03 |
+| bahrain-2014 | fail 1.17 | fail 1.12 | fail 2.21 | fail 1.42 | fail 2.92 | 30 (29) | 40.0 (37.2) | 40.1 | 29.4 | 27.4 | 0.35/0.07/-0.30/-0.03 | 0.36/0.30/0.15/0.12 | 0.32/0.19/0.14/0.11 |
+| monaco-2015 | fail 4.71 | fail 3.74 | fail 3.15 | fail 3.73 | fail 3.14 | 6 (2) | 4.8 (3.9) | 5.0 | 3.3 | 2.8 | 1.17/1.05/0.53/0.37 | 1.20/0.97/0.21/0.13 | 1.53/1.06/0.55/0.24 |
+| hungary-2015 | fail 6.90 | fail 7.95 | fail 9.09 | fail 9.46 | fail 10.36 | 25 (24) | 40.2 (35.8) | 38.9 | 26.4 | 21.8 | 1.01/0.90/0.31/0.18 | 0.57/0.44/0.19/0.13 | 1.05/0.78/0.41/0.19 |
+| australia-2010 | fail 4.10 | fail 4.93 | fail 5.44 | fail 5.07 | fail 5.79 | 4 (4) | 11.1 (8.6) | 10.9 | 7.0 | 3.5 | 1.06/0.39/0.01/0.35 | 0.78/0.77/0.36/0.24 | 1.25/0.93/0.66/0.34 |
+| abu-dhabi-2010 | pass 1.96 | fail 4.33 | fail 6.11 | fail 4.40 | fail 6.18 | 3 (3) | 14.9 (14.8) | 9.5 | 4.0 | 3.7 | 0.81/0.50/0.37/-0.17 | 0.35/0.19/0.06/0.05 | 0.89/0.46/0.22/0.07 |
+| china-2011 | pass 1.44 | fail 1.75 | fail 4.71 | fail 3.77 | fail 7.69 | 52 (49) | 53.7 (43.1) | 53.1 | 44.0 | 39.9 | 0.88/0.42/0.22/0.08 | 0.45/0.46/0.24/0.19 | 0.63/0.52/0.34/0.21 |
+| abu-dhabi-2012 | fail 1.72 | fail 2.50 | fail 3.64 | fail 3.29 | fail 5.70 | 27 (27) | 36.1 (35.0) | 34.8 | 23.7 | 29.4 | 0.94/0.75/0.31/0.10 | 0.51/0.45/0.10/0.08 | 0.90/0.66/0.32/0.12 |
+| san-marino-2005 | pass 1.70 | fail 4.31 | fail 5.53 | fail 5.52 | fail 6.46 | 6 (6) | 8.3 (7.2) | 6.4 | 4.5 | 2.2 | 1.42/1.18/0.40/0.59 | 0.63/0.42/0.20/0.13 | 1.44/0.88/0.51/0.20 |
+| brazil-2006 | fail 6.99 | fail 9.26 | fail 13.66 | fail 9.57 | fail 14.38 | 10 (10) | 10.6 (9.9) | 8.9 | 4.3 | 3.3 | 1.20/0.75/0.19/0.00 | 0.70/0.50/0.14/0.08 | 1.20/0.68/0.34/0.12 |
+| brazil-2007 | fail 2.00 | fail 2.46 | fail 3.13 | fail 2.53 | fail 3.31 | 8 (7) | 11.4 (9.9) | 10.4 | 6.1 | 4.1 | 1.04/0.68/0.48/0.25 | 0.75/0.68/0.20/0.16 | 1.13/0.72/0.42/0.18 |
+| brazil-2008 | fail 5.42 | fail 8.35 | fail 11.54 | fail 7.28 | fail 13.93 | 18 (15) | 19.3 (17.5) | 16.4 | 9.8 | 7.2 | 0.53/-0.26/-0.21/-0.08 | 0.57/0.37/0.13/0.08 | 1.16/0.65/0.33/0.10 |
+| hungary-2022 | pass 1.97 | pass 1.98 | pass 1.67 | pass 1.64 | fail 1.78 | 39 (38) | 44.9 (42.3) | 45.2 | 31.9 | 30.5 | 0.22/0.36/0.15/0.27 | 0.42/0.39/0.14/0.09 | 0.44/0.30/0.14/0.08 |
+| turkey-2021 | pass 0.41 | pass 0.43 | pass 0.95 | pass 0.58 | pass 1.39 | 4 (4) | 8.4 (6.9) | 8.2 | 6.7 | 5.0 | 1.16/1.00/0.50/0.24 | 0.71/0.81/0.30/0.22 | 1.04/0.92/0.56/0.34 |
+| germany-2018 | pass 1.59 | pass 1.94 | fail 2.15 | pass 1.63 | fail 2.65 | 22 (21) | 41.6 (39.9) | 39.8 | 28.1 | 25.9 | 0.69/0.20/0.13/0.07 | 0.34/0.28/0.08/0.05 | 0.60/0.42/0.20/0.06 |
+| germany-2019 | pass 1.38 | pass 1.05 | pass 1.36 | pass 1.05 | fail 2.26 | 29 (27) | 39.3 (36.8) | 39.0 | 29.1 | 27.9 | 0.75/0.04/-0.05/0.01 | 0.37/0.34/0.17/0.14 | 0.60/0.49/0.27/0.16 |
+| brazil-2019 | fail 1.97 | fail 1.92 | fail 1.67 | fail 1.77 | fail 1.51 | 26 (25) | 28.6 (28.0) | 27.7 | 16.0 | 14.6 | 0.66/0.39/0.23/0.12 | 0.55/0.42/0.11/0.06 | 0.68/0.44/0.18/0.06 |
+| spain-2016 | pass 1.13 | pass 1.12 | pass 1.55 | pass 1.18 | pass 1.74 | 33 (32) | 40.0 (35.2) | 39.8 | 30.9 | 29.9 | 0.36/0.57/0.26/0.00 | 0.55/0.54/0.20/0.15 | 0.57/0.45/0.25/0.13 |
+| abu-dhabi-2016 | pass 0.85 | pass 1.53 | fail 2.20 | pass 1.64 | fail 2.37 | 11 (10) | 17.6 (15.9) | 16.2 | 13.8 | 12.1 | 0.96/0.78/0.47/0.20 | 0.46/0.48/0.14/0.13 | 0.84/0.68/0.41/0.18 |
+| europe-2012 | fail 1.94 | fail 3.90 | fail 5.24 | fail 6.64 | fail 8.77 | 43 (40) | 62.6 (53.2) | 63.5 | 48.5 | 40.4 | 1.10/0.45/0.20/0.08 | 0.62/0.61/0.30/0.23 | 1.01/0.81/0.51/0.30 |
+| malaysia-2013 | pass 1.20 | bord 1.05 | fail 1.79 | fail 1.13 | fail 2.00 | 15 (15) | 22.3 (19.1) | 21.5 | 16.9 | 13.8 | 0.66/0.20/-0.23/-0.28 | 0.28/0.30/0.21/0.15 | 0.58/0.49/0.32/0.18 |
+| spain-2013 | fail 1.51 | pass 1.41 | fail 2.98 | fail 2.16 | fail 4.20 | 28 (28) | 41.4 (32.1) | 41.1 | 34.6 | 30.8 | 0.20/0.32/0.11/-0.10 | 0.45/0.45/0.28/0.26 | 0.42/0.31/0.29/0.25 |
+| austria-2002 | pass 0.63 | pass 0.60 | fail 1.98 | pass 0.68 | fail 2.24 | 6 (6) | 11.6 (11.1) | 9.9 | 5.7 | 4.6 | 1.00/0.33/0.21/-0.18 | 0.48/0.34/0.14/0.09 | 0.91/0.49/0.26/0.10 |
+
+- **Nothing is adopted.** The refitted bands alone: 11 -> 8 passing races, 2.61 -> 3.32 s
+  (worse on 16 of 28 by more than 0.05 s, better on 5: Abu Dhabi 2010 1.96 -> 4.33, San Marino 2005 1.70 ->
+  4.31, Singapore 2023 4.01 -> 7.14, Interlagos 2008 5.42 -> 8.35, Valencia 1.94 -> 3.90;
+  better: Monaco 2015 4.71 -> 3.74, Spain 2021 6.15 -> 5.79, spain-2013 fail -> pass). M3's
+  options on top of them are worse again: the held gap at the real median brings the pass
+  count to the real one (564 against 574) at 4 pass, 4.48 s; no pass without a roll cuts the
+  far passes (Monaco 2025 36 -> 13 against 5) at 7 pass, 3.79 s; both 2 pass, 5.37 s. Re-tested
+  on the current cost, the options alone are worse too (roll only 9 / 1 / 18, 2.99 s; heldGap
+  0.79 5 pass, 3.95 s).
+- **Why: the pace already holds the traffic.** basePace and the stint offsets (M2) are measured
+  on every lap, traffic included, so a car that ran in a train in the real race carries that
+  cost in its pace, and the sims' dirty-air cost then counts it again. The more realistic the
+  cost, the more it is counted twice. Taking each lap's real loss off the pace offsets first
+  (the physically consistent frame: clear-air pace plus the banded loss; `dirty_air.DETRAFFIC`)
+  is worse still (6 pass, 4.16 s): China 2011 1.44 -> 4.55, Brazil 2021 1.85 -> 8.92, Abu Dhabi
+  2016 0.85 -> 5.86 (cars that ran in clear air gain on those that didn't by more than the real
+  race shows), as stage 6's T1 and M2's clear-air stint pace found before.
+- **Owner/sim:** the excess passing (797 against 574) is mostly not the roll: the sim's close
+  passes (698) are 1.3x the real ones, its far passes (99 against 28) 3.5x, at Monaco 2025 20
+  of its 32. The finishing gaps are tuned around the current cost and the extra passes; a
+  realistic count needs the pace frame and the train cost changed together and the G1 tuning
+  redone on them, not a dirty-air change alone.
+
+**Switches.** `dirty_air.IN_ERAS_BUILDS = False`: no race file gets `dirtyAirBands` or
+`heldGap`, so every Daily/Gauntlet and every Eras race file and golden builds as committed
+(`test_dirty_air.py` checks a pool race and monaco-2017 byte for byte). The sims read
+`track.dirtyAirBands`, `overtakeModel.heldGap` and `overtakeModel.rollOnly` only when a file has
+them (schema: optional). `python -m pipeline.dirty_air --cache DIR` refits the table;
+`--calibrate RACE` (one race per call) and `--pool` refit `simOffset`.
+
+**Fixtures.** New: `packages/sim/tests/fixtures/eras-dirty-air.json` (spain-2021 with its bands;
+the same with heldGap 0.79 and rollOnly; brazil-2006 refuelling with its bands and rollOnly; 20
+seeds each; `tests/make_dirty_air_fixture.py`). No existing fixture went stale.

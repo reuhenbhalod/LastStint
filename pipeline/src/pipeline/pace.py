@@ -38,9 +38,16 @@ def post_takeover_offsets(
     shrink_laps: float = SHRINK_LAPS,
     weather: dict | None = None,
     wear: pd.Series | None = None,
+    traffic: list[dict] | None = None,
 ) -> dict[str, float]:
-    """Per-driver pace offset (s/lap) on green, non-pit laps after the takeover lap."""
+    """Per-driver pace offset (s/lap) on green, non-pit laps after the takeover lap.
+    `traffic` (Eras builds of timed races, dirty_air.py): the real dirty-air loss by
+    start-of-lap gap band, taken off each lap first, so the pace is the car's clear-air pace
+    (the sims add the dirty-air loss back by the gap they run at)."""
     from .clean import TRAFFIC_GAP_SECONDS, gap_to_car_ahead
+    from .dirty_air import cost, start_gaps
+
+    start = start_gaps(laps) if traffic else None
 
     clear = (
         (gap_to_car_ahead(laps) >= TRAFFIC_GAP_SECONDS).reindex(laps.index).fillna(True)
@@ -76,6 +83,8 @@ def post_takeover_offsets(
             **car_fuel(r),  # a refuelling race: the tank on board, as the sim carries it
         )
         predicted = _clean_lap(car, compounds, fuel_per_lap, int(r.LapNumber), fresh_tyre, weather)
+        if start is not None:
+            predicted += cost(traffic, float(start.loc[r.Index]))
         residuals.setdefault(str(r.Driver), []).append(float(r.LapTime) - predicted)
     return {
         code: sum(res) / len(res) * len(res) / (len(res) + shrink_laps)
@@ -276,10 +285,15 @@ def stint_offsets(
     min_laps: int = STINT_MIN_LAPS,
     clip: float = STINT_CLIP,
     min_clear_share: float = STINT_MIN_CLEAR_SHARE,
+    traffic: list[dict] | None = None,
 ) -> StintTable:
     """Per car and real stint, the pace offset (s/lap) of its green racing laps after the
-    takeover against the sim's clean lap at `base_pace` (the race model's basePace)."""
+    takeover against the sim's clean lap at `base_pace` (the race model's basePace).
+    `traffic`: as in post_takeover_offsets, each lap's real dirty-air loss taken off first."""
     from .clean import TRAFFIC_GAP_SECONDS, gap_to_car_ahead
+    from .dirty_air import cost, start_gaps
+
+    start = start_gaps(laps) if traffic else None
 
     gap = gap_to_car_ahead(laps).reindex(laps.index)
     clear = gap.isna() | (gap >= TRAFFIC_GAP_SECONDS)  # NaN: the leader
@@ -312,6 +326,8 @@ def stint_offsets(
             **car_fuel(r),  # a refuelling race: the tank on board, as the sim carries it
         )
         predicted = _clean_lap(car, compounds, fuel_per_lap, lap, fresh_tyre, weather)
+        if start is not None:
+            predicted += cost(traffic, float(start.loc[r.Index]))
         key = stint_key(stops.get(code, []), lap)
         if bool(clear.loc[r.Index]):
             in_clear[(code, key)] = in_clear.get((code, key), 0) + 1

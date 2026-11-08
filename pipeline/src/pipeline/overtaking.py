@@ -49,9 +49,11 @@ mostly because a held follower sits at FOLLOW_GAP (0.3 s, the real 5th percentil
 median of a held-up follower is heldGap, 0.79 s), where the gap term is strongest, and because
 lap noise passes cars without a roll. Rules that bring the counts to the real ones (a held gap
 of 0.79 s; no pass without a roll; the roll at the real held gap) all made robust G1 worse on
-most of the 28 races checked: the sim's followers lose 0.52-0.62 s a lap in dirty-air range
-against the real 0.30-0.36 s, so its trains cost more than real ones and the extra passing is
-what keeps the finishing gaps right. Realistic counts need that train cost fixed first.
+most of the 28 races checked. Eras sim fix W3 (dirty_air.py) measured the train cost both ways
+by start-of-lap gap: the real followers lose more than the sim's, not less (the 0.30-0.36 s
+compared here were the races' dirtyAirPenalty, a median on end-of-lap gaps), and with the cost
+matched these rules still make robust G1 worse; so neither is adopted (heldGap, rollOnly and
+dirtyAirBands are in both sims, off).
 
     uv run python -m pipeline.overtaking [--cache DIR]   # refit, write config/overtaking.json
 """

@@ -170,6 +170,22 @@ def _car_ahead(order: list[str], code: str, cars: dict[str, Car]) -> str:
     return live[i - 1] if i > 0 else code
 
 
+def dirty_air_cost(track: dict, gap: float) -> float:
+    """Seconds a car loses on a green lap it starts `gap` s behind the car ahead. An Eras build
+    of a timed race (dirty_air.py) carries track.dirtyAirBands, the loss by start-of-lap gap
+    band ([{upTo, penalty}], ascending); any other file the flat dirtyAirPenalty within
+    DIRTY_AIR_RANGE."""
+    if not gap > 0:
+        return 0.0
+    bands = track.get("dirtyAirBands")
+    if bands is None:
+        return track["dirtyAirPenalty"] if gap < DIRTY_AIR_RANGE else 0.0
+    for band in bands:
+        if gap < band["upTo"]:
+            return band["penalty"]
+    return 0.0
+
+
 def pass_probability(overtake: dict, advantage: float, gap: float, train: bool = False) -> float:
     """Fitted logistic P(follower passes this lap) from pace advantage (s/lap) and gap (s).
     An Eras model (overtaking.py) adds trainCoef when the car ahead is in a train."""
@@ -192,12 +208,19 @@ def _resolve_order(order, cars, clean, pass_rngs, overtake, prev_time, pitted, r
     """
     live = [c for c in order if not cars[c].retired]
     trains = "trainCoef" in overtake
+    # An Eras build (dirty_air.py) may hold a failed follower at its fitted heldGap instead.
+    follow = overtake.get("heldGap", FOLLOW_GAP)
+    roll_only = bool(overtake.get("rollOnly"))
+    won: set[tuple[str, str]] = set()
     for i in range(1, len(live)):
         a, b = cars[live[i - 1]], cars[live[i]]
         if a.code in pitted or b.code in pitted:
             continue
         gap = prev_time[b.code] - prev_time[a.code]
         if not 0 <= gap < PASS_WINDOW:
+            # rollOnly (dirty_air.py): from further back no roll, so no pass this lap.
+            if roll_only and gap >= PASS_WINDOW and b.total_time < a.total_time + follow:
+                b.total_time = a.total_time + follow
             continue
         advantage = clean[a.code] - clean[b.code]  # >0: b is faster on model pace
         cooling = (
@@ -210,12 +233,30 @@ def _resolve_order(order, cars, clean, pass_rngs, overtake, prev_time, pitted, r
         if not cooling and pass_rngs[b.code].next() < p:
             if recent is not None:
                 recent[(a.code, b.code)] = lap  # a was passed by b on this lap
+            won.add((a.code, b.code))
             if b.total_time >= a.total_time:
                 b.total_time = a.total_time - PASS_MARGIN
-        elif b.total_time < a.total_time + FOLLOW_GAP:
-            b.total_time = a.total_time + FOLLOW_GAP
+        elif b.total_time < a.total_time + follow:
+            b.total_time = a.total_time + follow
+    if roll_only:
+        _no_pass_without_roll(live, cars, pitted, won, follow)
     live.sort(key=lambda c: cars[c].total_time)
     order[:] = live + [c for c in order if cars[c].retired]
+
+
+def _no_pass_without_roll(live, cars, pitted, won, follow) -> None:
+    """rollOnly: a car that ends the lap ahead of one that started it ahead of it (neither
+    pitting) without winning its roll against that car is held `follow` behind it, until no
+    such pair is left (`live`: the start-of-lap order)."""
+    start = {c: i for i, c in enumerate(live)}
+    for _ in range(len(live) * len(live)):
+        now = sorted(live, key=lambda c: cars[c].total_time)
+        for y, x in zip(now, now[1:], strict=False):
+            if start[y] > start[x] and x not in pitted and y not in pitted and (x, y) not in won:
+                cars[y].total_time = cars[x].total_time + follow
+                break
+        else:
+            return
 
 
 def _classify(order, cars) -> dict:
@@ -255,7 +296,6 @@ def simulate(
     total_laps = int(model["race"]["laps"])
     takeover = int(model["race"]["takeoverLap"])
     overtake = track["overtakeModel"]
-    dirty_air = track["dirtyAirPenalty"]
     pit_loss = track["pitLoss"]
     pit_loss_sc = track["pitLossUnderSC"]
     pit_loss_vsc = track["pitLossUnderVSC"]
@@ -379,8 +419,7 @@ def simulate(
                 ].normal(car.noise)
                 ahead = _car_ahead(order, code, cars)
                 ahead_gap = car.total_time - prev_time.get(ahead, car.total_time)
-                if 0 < ahead_gap < DIRTY_AIR_RANGE:
-                    lt += dirty_air
+                lt += dirty_air_cost(track, ahead_gap)
                 if restarting:
                     # The restart lap (restart.py): the leader's jump, the queue's spread.
                     lt += restart.extra(restart_block, queue.index(code))
