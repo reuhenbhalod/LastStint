@@ -34,7 +34,10 @@
     "AUTH0_DOMAIN": "dev-umxcdh2y62l4e0gy.us.auth0.com",
     "AUTH0_CLIENT_ID": "Pdlxz3iAqJse61VUhOGpF8wSeFgV7yxM",
     // Admins (the /admin page): Google account emails, comma-separated. Add yours here.
-    "ADMIN_EMAILS": "purohit.abhiram@gmail.com,reuhenbhalod@gmail.com"
+    "ADMIN_EMAILS": "purohit.abhiram@gmail.com,reuhenbhalod@gmail.com",
+    // Eras test mode (eras spec §5, §16): every era and race open, Draft races shown.
+    // Always false in production; only the staging env below turns it on.
+    "ERAS_TEST_MODE": "false"
   },
 
   // Run submissions per IP (Phase 4 spec C1). namespace_id is any account-unique number.
@@ -45,5 +48,37 @@
   // Queue alerts (Phase 4 spec C3): optionally set a Discord or Slack webhook with
   //   npx wrangler secret put ALERT_WEBHOOK
 
-  "observability": { "enabled": true }
+  "observability": { "enabled": true },
+
+  // Staging (docs/staging.md): the pitwall-staging Worker on its own D1, with Eras test mode
+  // on. Deploy with `wrangler deploy --env staging`. Wrangler does not inherit vars, D1,
+  // triggers or ratelimits into an env, so each is set here.
+  "env": {
+    "staging": {
+      "name": "pitwall-staging",
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "pitwall-staging-db",
+          "database_id": "6841f86e-2b24-416b-ae9e-ba3d3793a573"
+        }
+      ],
+      // No daily queue-check cron: staging has no schedule to watch and no alert webhook.
+      "triggers": { "crons": [] },
+      // No RUNS_LIMITER: the API skips rate limiting when it is unbound. To add one, give it a
+      // namespace_id of its own (not production's 4101), e.g.
+      //   "ratelimits": [{ "name": "RUNS_LIMITER", "namespace_id": "4102", "simple": { "limit": 10, "period": 60 } }]
+      "ratelimits": [],
+      "vars": {
+        // A staging website, if one is ever deployed (it is not yet). localhost:5173 is
+        // always allowed, so a local web build pointed at this API works today.
+        "WEB_ORIGIN": "https://pitwall-web-staging.boxboxbox.workers.dev",
+        "GOOGLE_CLIENT_ID": "318278030629-s860fnjjpk6ihcn4iubjqiakf8vu0pqi.apps.googleusercontent.com",
+        "AUTH0_DOMAIN": "dev-umxcdh2y62l4e0gy.us.auth0.com",
+        "AUTH0_CLIENT_ID": "Pdlxz3iAqJse61VUhOGpF8wSeFgV7yxM",
+        "ADMIN_EMAILS": "purohit.abhiram@gmail.com,reuhenbhalod@gmail.com",
+        "ERAS_TEST_MODE": "true"
+      }
+    }
+  }
 }
