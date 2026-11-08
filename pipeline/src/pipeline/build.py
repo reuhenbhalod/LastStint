@@ -1158,6 +1158,91 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
+    # Eras wave B (build plan 5.1): refuelling races 2005-09 from Jolpica (`pipeline jolpica`,
+    # F1DB stops before 2011, CC BY-NC-SA 4.0, credit in the raw sidecar), with step 2.4's
+    # estimated compounds, SC laps (data/estimates/<id>.sc.json) and fuel loads, and the fill
+    # model fitted from the F1DB stops (refuel.race_fill_model). monaco-2008's wet start is
+    # fitted from the lap times (`pipeline wet-laps`) and Hamilton's puncture is a FAULT
+    # (data/incidents.json). The duel is the storyline pair of the Eras spec's race table (§4),
+    # the user's driver first; split and seeds as for wave A.
+    "san-marino-2005": {
+        "year": 2005,
+        "event": "San Marino",
+        "source": "jolpica",
+        "name": "San Marino 2005: Alonso vs Schumacher",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "ALO",
+        "rival": "MSCM",  # defend: Alonso holds off Schumacher
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "japan-2005": {
+        "year": 2005,
+        "event": "Japan",
+        "source": "jolpica",
+        "name": "Japan 2005: Räikkönen vs Fisichella",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "RAI",
+        "rival": "FIS",  # win from P17: Fisichella, passed on the last lap
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "brazil-2006": {
+        "year": 2006,
+        "event": "Brazil",
+        "source": "jolpica",
+        "name": "Brazil 2006: Alonso vs Schumacher",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "ALO",
+        "rival": "MSCM",  # Alonso P8 or better for the title: Schumacher, his title rival
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "brazil-2007": {
+        "year": 2007,
+        "event": "Brazil",
+        "source": "jolpica",
+        "name": "Brazil 2007: Räikkönen vs Hamilton",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "RAI",
+        "rival": "HAM",  # deny: Räikkönen wins, Hamilton (title rival) kept P6 or lower
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "monaco-2008": {
+        "year": 2008,
+        "event": "Monaco",
+        "source": "jolpica",
+        "name": "Monaco 2008: Hamilton vs Kubica",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "HAM",
+        "rival": "KUB",  # win after the puncture: Kubica the car behind at the flag
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "brazil-2009": {
+        "year": 2009,
+        "event": "Brazil",
+        "source": "jolpica",
+        "name": "Brazil 2009: Button vs Barrichello",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "BUT",
+        "rival": "BAR",  # Button from P14 high enough for the title: Barrichello, his title rival
+        "score_positions": 6,
+        "split": "eras",
+    },
 }
 
 

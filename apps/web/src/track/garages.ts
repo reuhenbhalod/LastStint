@@ -4,6 +4,75 @@
 
 /** Previous season's constructors' standings, champions first, in this season's names. */
 const STANDINGS: Record<number, string[]> = {
+  // 2005-2009 (Eras): the 2004-2008 final standings from the Jolpica dump (2026-10-24,
+  // formula_one_teamchampionship), under each season's names (2005: Jaguar is Red Bull; 2006:
+  // BAR is Honda, Sauber is BMW Sauber, Jordan is MF1, Spyker MF1 by Brazil, Minardi is Toro
+  // Rosso; 2007: MF1 is Spyker; 2008: Spyker is Force India; 2009: Honda is Brawn). Teams new
+  // that season go last (2006: Super Aguri). McLaren, excluded from the 2007 standings, has no
+  // standing in 2008 and goes last too; Super Aguri, gone after four races of 2008 (before
+  // Monaco), is dropped.
+  2005: [
+    'Ferrari',
+    'BAR',
+    'Renault',
+    'Williams',
+    'McLaren',
+    'Sauber',
+    'Red Bull',
+    'Toyota',
+    'Jordan',
+    'Minardi',
+  ],
+  2006: [
+    'Renault',
+    'McLaren',
+    'Ferrari',
+    'Toyota',
+    'Williams',
+    'Honda',
+    'Red Bull',
+    'BMW Sauber',
+    'MF1|Spyker MF1',
+    'Toro Rosso',
+    'Super Aguri',
+  ],
+  2007: [
+    'Renault',
+    'Ferrari',
+    'McLaren',
+    'Honda',
+    'BMW Sauber',
+    'Toyota',
+    'Red Bull',
+    'Williams',
+    'Toro Rosso',
+    'Spyker',
+    'Super Aguri',
+  ],
+  2008: [
+    'Ferrari',
+    'BMW Sauber',
+    'Renault',
+    'Williams',
+    'Red Bull',
+    'Toyota',
+    'Toro Rosso',
+    'Honda',
+    'Force India',
+    'McLaren',
+  ],
+  2009: [
+    'Ferrari',
+    'McLaren',
+    'BMW Sauber',
+    'Renault',
+    'Toyota',
+    'Toro Rosso',
+    'Red Bull',
+    'Williams',
+    'Brawn',
+    'Force India',
+  ],
   // 2010-2013 (Eras): the 2009-2012 final standings from the Jolpica dump (2026-10-24,
   // formula_one_teamchampionship), under each season's names (2010: Brawn is Mercedes, BMW
   // Sauber is Sauber; 2012: Renault is Lotus F1, Lotus is Caterham, Virgin is Marussia). A
@@ -234,6 +303,18 @@ const SHORT: Record<string, string> = {
   'Lotus F1': 'LOT',
   Lotus: 'LOT',
   HRT: 'HRT',
+  // 2005-2009
+  BAR: 'BAR',
+  Jordan: 'JOR',
+  Minardi: 'MIN',
+  Toyota: 'TOY',
+  Honda: 'HON',
+  'BMW Sauber': 'BMW',
+  MF1: 'MF1',
+  'Spyker MF1': 'MF1',
+  Spyker: 'SPY',
+  'Super Aguri': 'SA',
+  Brawn: 'BGP',
 };
 
 /**
