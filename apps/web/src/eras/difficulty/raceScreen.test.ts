@@ -60,7 +60,7 @@ const at = (information: DifficultySettings['information']): ErasRace =>
 
 /** The header scoreboard's gap (the number between the two drivers). */
 const scoreboard = (html: string) =>
-  html.match(/rounded bg-\[#1A1F1D\] px-2\.5 py-1 text-\[18px\][^>]*>([^<]*)</)?.[1];
+  html.match(/rounded bg-\[#1A1F1D\] px-2 py-1 text-\[16px\][^>]*>([^<]*)</)?.[1];
 
 describe('race screen without an Eras difficulty', () => {
   it('has no timer, no timer setting, no untimed badge, and the full gap panel', () => {

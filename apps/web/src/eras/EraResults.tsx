@@ -13,12 +13,20 @@ import type { ReactNode } from 'react';
 import type { Submission } from '../state/machine.js';
 import { accuracyText } from './EraDetail.js';
 import { StarIcon } from './EraMap.js';
-import type { AttemptResult, RaceStats, Stars } from './api.js';
-import { type EraInfo, raceName } from './catalog.js';
+import type { AttemptResult, RaceStats, RewriteShare, Stars } from './api.js';
+import {
+  type EraInfo,
+  type EraRaceInfo,
+  HISTORY_PATH,
+  eraLeaderboardPath,
+  raceName,
+} from './catalog.js';
 
 /** What the review screen needs to show an Eras attempt. */
 export interface ErasResultInfo {
   era: EraInfo;
+  /** The race of the attempt, for its leaderboard link. */
+  race: EraRaceInfo;
   legend: boolean;
   difficulty: DifficultySettings;
   /** The race's community stats (GET /api/eras/races/:raceId/stats), if served. */
@@ -43,7 +51,11 @@ export function rewriteHeadline(model: RaceModel | null): string {
 
 /** The community stat's line, or null when the API sent none (no players, or nonsense). */
 export function communityLine(stats: RaceStats | null): string | null {
-  const rewrite = stats?.rewrite;
+  return rewriteShareLine(stats?.rewrite);
+}
+
+/** "Only 9% of strategists rewrote this race.", from a race's rewrite share; null without one. */
+export function rewriteShareLine(rewrite: RewriteShare | null | undefined): string | null {
   if (!rewrite || !(rewrite.players > 0)) return null;
   const share = rewrite.share;
   if (typeof share !== 'number' || !Number.isFinite(share) || share < 0 || share > 1) return null;
@@ -263,23 +275,36 @@ export function EraResultsPanel({
   );
 }
 
-/** The way on: a fresh attempt (a new seed), or back to the era's races. */
+/** The way on: a fresh attempt (a new seed), or back to the era's races; then the race's
+ * leaderboard (the Legend one after a Legend attempt) and the history book. */
 export function EraResultActions({ info }: { info: ErasResultInfo }) {
+  const link =
+    'flex items-center justify-center rounded-md border border-[#262C2A] px-2 py-2.5 text-center text-[13px] font-semibold text-[#B7BEBA] hover:border-[#6B736F]';
   return (
-    <div className="grid grid-cols-2 gap-3">
-      <button
-        type="button"
-        onClick={info.onNewAttempt}
-        className="disp rounded-md bg-[var(--you)] py-3 text-[15px] tracking-wide text-[var(--you-ink)] hover:brightness-110"
-      >
-        New attempt
-      </button>
-      <a
-        href={`/eras/${info.era.id}`}
-        className="flex items-center justify-center rounded-md border border-[#333A37] py-3 text-center font-semibold text-[#D5DAD7] hover:border-[#6B736F]"
-      >
-        Back to era
-      </a>
+    <div className="flex flex-col gap-3">
+      <div className="grid grid-cols-2 gap-3">
+        <button
+          type="button"
+          onClick={info.onNewAttempt}
+          className="disp rounded-md bg-[var(--you)] py-3 text-[15px] tracking-wide text-[var(--you-ink)] hover:brightness-110"
+        >
+          New attempt
+        </button>
+        <a
+          href={`/eras/${info.era.id}`}
+          className="flex items-center justify-center rounded-md border border-[#333A37] py-3 text-center font-semibold text-[#D5DAD7] hover:border-[#6B736F]"
+        >
+          Back to era
+        </a>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <a href={eraLeaderboardPath(info.race, info.legend)} className={link}>
+          {info.legend ? 'Legend leaderboard' : 'Leaderboard'}
+        </a>
+        <a href={HISTORY_PATH} className={link}>
+          History book
+        </a>
+      </div>
     </div>
   );
 }

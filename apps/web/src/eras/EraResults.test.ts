@@ -18,11 +18,13 @@ import {
   rewriteHeadline,
 } from './EraResults.js';
 import type { RaceStats } from './api.js';
-import { eraById } from './catalog.js';
+import { eraById, eraRace } from './catalog.js';
 import { attemptResult } from './erasFixture.js';
 
 const ERA = eraById(9);
 if (!ERA) throw new Error('Era 9');
+const RACE = eraRace('abu-dhabi-2021');
+if (!RACE) throw new Error('abu-dhabi-2021');
 
 const ALL = { result: true, strategist: true, mastery: true };
 
@@ -40,6 +42,7 @@ function stats(share: number, players = 100): RaceStats {
 function info(edit: Partial<ErasResultInfo> = {}): ErasResultInfo {
   return {
     era: ERA as NonNullable<typeof ERA>,
+    race: RACE as NonNullable<typeof RACE>,
     legend: false,
     difficulty: {
       accuracyThreshold: 72,
@@ -186,6 +189,18 @@ describe('the Eras results panel', () => {
     expect(html).toContain('>New attempt</button>');
     expect(html).toContain('href="/eras/9"');
     expect(html).toContain('Back to era');
+  });
+
+  it("links to the race's leaderboard (Legend's after a Legend attempt) and the history book", () => {
+    const html = renderToStaticMarkup(createElement(EraResultActions, { info: info() }));
+    expect(html).toContain('href="/eras/9/abu-dhabi-2021/leaderboard"');
+    expect(html).toContain('>Leaderboard</a>');
+    expect(html).toContain('href="/eras/history"');
+    const legend = renderToStaticMarkup(
+      createElement(EraResultActions, { info: info({ legend: true }) }),
+    );
+    expect(legend).toContain('href="/eras/9/abu-dhabi-2021/leaderboard/legend"');
+    expect(legend).toContain('>Legend leaderboard</a>');
   });
 
   it('shares the race, its stars and accuracy, not "practice"', () => {

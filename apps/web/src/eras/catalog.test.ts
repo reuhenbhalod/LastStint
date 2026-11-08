@@ -4,7 +4,9 @@ import { describe, expect, it } from 'vitest';
 import {
   ERAS,
   ERA_RACES,
+  HISTORY_PATH,
   eraById,
+  eraLeaderboardPath,
   eraRace,
   eraRacePath,
   erasRoute,
@@ -122,6 +124,36 @@ describe('erasRoute', () => {
     });
     expect(erasRoute('/eras/10/races')).toEqual({ kind: 'unknown', segment: '10/races' });
     expect(erasRoute('/eras/11/abu-dhabi-2021')).toEqual({ kind: 'unknown', segment: '11' });
+  });
+
+  it('routes /eras/history to the history book', () => {
+    expect(erasRoute('/eras/history')).toEqual({ kind: 'history' });
+    expect(erasRoute('/eras/history/')).toEqual({ kind: 'history' });
+    expect(erasRoute(HISTORY_PATH)).toEqual({ kind: 'history' });
+    expect(erasRoute('/eras/history/x')).toEqual({ kind: 'unknown', segment: 'history' });
+  });
+
+  it('routes …/<raceId>/leaderboard to the race’s board, …/leaderboard/legend to Legend’s', () => {
+    const race = eraRace('abu-dhabi-2021');
+    if (!race) throw new Error('abu-dhabi-2021');
+    expect(erasRoute('/eras/9/abu-dhabi-2021/leaderboard')).toEqual({
+      kind: 'leaderboard',
+      era: eraById(9),
+      race,
+      legend: false,
+    });
+    expect(erasRoute('/eras/9/abu-dhabi-2021/leaderboard/legend/')).toMatchObject({
+      kind: 'leaderboard',
+      legend: true,
+    });
+    expect(eraLeaderboardPath(race, false)).toBe('/eras/9/abu-dhabi-2021/leaderboard');
+    expect(eraLeaderboardPath(race, true)).toBe('/eras/9/abu-dhabi-2021/leaderboard/legend');
+    expect(erasRoute(eraLeaderboardPath(race, true))).toMatchObject({ kind: 'leaderboard' });
+    expect(erasRoute('/eras/10/abu-dhabi-2021/leaderboard')).toEqual({
+      kind: 'unknown',
+      segment: '10/abu-dhabi-2021',
+    });
+    expect(erasRoute('/eras/9/abu-dhabi-2021/legend/leaderboard')).toBeNull();
   });
 
   it('leaves paths that are not Eras paths alone', () => {

@@ -238,7 +238,10 @@ const TODAY = {
     cards: 'efcfeeeb0a03435b',
     stats: '99026aee5f173aca',
   },
-  screen: 'a3ff5c603c39a2f9',
+  // Retaken in step 8.8, whose only change to the race screen outside Eras is the top bar's
+  // phone-width spacing and type sizes (below md, so desktop is unchanged): the duel was
+  // clipped at 390 px. Taken before 8.8: 'a3ff5c603c39a2f9'.
+  screen: '79aa9a7697842f85',
   decision: '83c43706f3ac536e',
   cards: 'f99d02a3023043c8',
   radio: {

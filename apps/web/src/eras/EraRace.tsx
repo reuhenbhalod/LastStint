@@ -121,13 +121,14 @@ export function EraRace({
       attempt
         ? {
             era,
+            race,
             legend: attempt.legend,
             difficulty: attempt.difficulty,
             stats,
             onNewAttempt: newAttempt,
           }
         : null,
-    [attempt, era, stats, newAttempt],
+    [attempt, era, race, stats, newAttempt],
   );
 
   if (help) return <HowItWorks onClose={() => setHelp(false)} />;

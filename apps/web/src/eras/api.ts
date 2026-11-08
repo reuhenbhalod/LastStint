@@ -331,3 +331,9 @@ export interface ErasHistoryApi {
   /** `GET /api/eras/races/:raceId/leaderboard`: the normal or Legend board and the player's rank. */
   leaderboard(raceId: string, legend: boolean): Promise<EraLeaderboard>;
 }
+
+/** What the history book and leaderboard screens read (step 8.8): the mock serves these too. */
+export type ErasBookApi = Pick<ErasHistoryApi, 'history' | 'leaderboard'>;
+
+/** The history book's and leaderboards' client: the Worker, or the mock with `VITE_ERAS_MOCK=1`. */
+export const erasBookApi: ErasBookApi = erasMockOn() ? mockErasApi : httpErasApi;
