@@ -16,6 +16,7 @@ import type {
   RaceState,
 } from '@laststint/sim';
 import type { RunResponse } from '../data/api.js';
+import type { RaceSource } from '../data/types.js';
 import type { GradedMoment } from '../engine/grading.js';
 
 export type Phase =
@@ -53,14 +54,34 @@ export type Speed = 1 | 2;
 
 /**
  * The run's submission: `practice` (not submitted), `sending`, `done` (the server's numbers),
- * `already` (this player already played today; `response` is that run), or `error`.
+ * `already` (this player already played today; `response` is that run), or `error`. `eras`:
+ * an Eras attempt, graded on this device and not posted as a daily run; the attempt's own
+ * submission is build plan 8.7.
  */
 export type Submission =
   | { status: 'none' }
   | { status: 'practice' }
+  | { status: 'eras' }
   | { status: 'sending' }
   | { status: 'done' | 'already'; response: RunResponse }
   | { status: 'error'; error: string };
+
+/** A new run's submission: a live daily waits to be sent; an Eras attempt is its own. */
+export function initialSubmission(source: RaceSource): Submission {
+  if (source === 'live') return { status: 'none' };
+  if (source === 'eras') return { status: 'eras' };
+  return { status: 'practice' };
+}
+
+/**
+ * What submitting a finished run does, by its source: `post` it as a daily or survivor run,
+ * keep it on this device (`practice`), or hand it to the Eras attempt (`eras`, build plan 8.7).
+ */
+export function submitRoute(source: RaceSource): 'post' | 'practice' | 'eras' {
+  if (source === 'practice') return 'practice';
+  if (source === 'eras') return 'eras';
+  return 'post';
+}
 
 /** A radio message from the driver: a "copy" or a refused call (feedback spec D1). */
 export interface RadioMessage {
@@ -76,7 +97,7 @@ export interface GameMeta {
   /** Puzzle number, for the share line (live dailies only). */
   number?: number;
   /** A live daily is submitted and ranked; practice is played locally only. */
-  source: 'live' | 'practice' | 'survivor';
+  source: RaceSource;
   practiceReason?: string;
   date: string;
   totalLaps: number;

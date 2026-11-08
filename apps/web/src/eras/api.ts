@@ -86,6 +86,13 @@ export interface AttemptResponse {
   seed: number;
   modelUrl: string;
   difficulty: EraDifficulty;
+  /**
+   * The race isn't published (playable on test only), for the race intro's Draft badge.
+   *
+   * NOTE for step 7.2: optional, added by step 8.4 so the intro can mark a Draft race without
+   * loading the whole era; send it from `era_races` with the attempt.
+   */
+  draft?: boolean;
 }
 
 export interface ErasApi {

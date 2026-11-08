@@ -1,6 +1,6 @@
 import type { RaceModel } from '@laststint/sim';
 import { describe, expect, it } from 'vitest';
-import { EraProvider } from './EraProvider.js';
+import { EraProvider, eraDailyOf } from './EraProvider.js';
 import type { AttemptRequest, ErasApi } from './api.js';
 import { ERAS, racesOfEra } from './catalog.js';
 import { mockCanStart, mockErasApi } from './mockErasApi.js';
@@ -38,7 +38,8 @@ describe('EraProvider', () => {
       date: 'eras:a1',
       attemptId: 'a1',
       legend: false,
-      source: 'practice',
+      source: 'eras',
+      draft: true,
     });
     expect(daily.model.race.id).toBe(MOCK_RACE_ID);
     expect(daily.difficulty).toMatchObject({ information: 'full', decisionTimerSeconds: 45 });
@@ -56,6 +57,24 @@ describe('EraProvider', () => {
     expect(a.attemptId).not.toBe(b.attemptId);
     expect(a.date).not.toBe(b.date);
     expect(a.legend).toBe(true);
+  });
+
+  it('is an Eras race, not practice, and Draft only when the attempt says so', async () => {
+    const { api } = recording({
+      startAttempt: async (req) => {
+        const { draft: _draft, ...rest } = await mockErasApi.startAttempt(req);
+        return rest;
+      },
+    });
+    const daily = await new EraProvider(MOCK_RACE_ID, false, api).today();
+    expect(daily.source).toBe('eras');
+    expect(daily.practiceReason).toBeUndefined();
+    expect(daily.draft).toBe(false);
+    expect(eraDailyOf(daily)).toBe(daily);
+    expect(eraDailyOf(null)).toBeNull();
+    expect(eraDailyOf({ ...daily, source: 'practice' })).toBeNull();
+    const { attemptId: _id, ...noAttempt } = daily;
+    expect(eraDailyOf(noAttempt)).toBeNull();
   });
 
   it('fails when the attempt pins a different race', async () => {
