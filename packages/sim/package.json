@@ -14,6 +14,7 @@
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.scripts.json",
     "moments": "tsx scripts/moments.ts",
     "hard-calls": "tsx scripts/hard-calls.ts",
+    "reachability": "tsx scripts/reachability.ts",
     "bench": "tsx scripts/bench.ts",
     "bench:rival": "tsx scripts/bench-rival.ts",
     "whatif": "tsx scripts/whatif.ts",
