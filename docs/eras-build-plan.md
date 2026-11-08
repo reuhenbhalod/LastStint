@@ -208,11 +208,16 @@ Rename `usa-2018`, `usa-2021` and `usa-2022` to `united-states-<year>`, and `sau
 
 **Eras overlay files (decided Nov 7).** `pipeline build` writes each race file fresh from the
 timing data, so authored Eras content can't live in `data/races/<id>.json`. Instead it lives in
-`data/eras/<race-id>.json`, one file per race, with up to four top-level keys: `eras`,
-`provenance`, `rules` and `storylineEvents` (a list of `[lap, eventType]`). `pipeline build`
+`data/eras/<race-id>.json`, one file per race, with up to five top-level keys: `eras`,
+`provenance`, `rules`, `storylineEvents` (a list of `[lap, eventType]`) and `decisionMoments`
+(Nov 8: the Eras side's moments for a shared race whose hard-call side isn't its Daily side;
+an Eras-only race keeps its moments in `data/moments/`). `pipeline build`
 applies the overlay with `export.with_eras_fields` (step 2.4 adds this). Each step writes only
 its own keys: 1.5 writes `eras.hardCalls` and `eras.userSide`, 2.4 writes `provenance`, 4.1
-writes `rules`, 6.2 writes the rest of `eras` and `storylineEvents`.
+writes `rules`, 6.2 writes the rest of `eras` and `storylineEvents` (and `decisionMoments` on a shared race). The merge plays the model from `eras.userSide`:
+when that is the race file's rival, userSide and rival swap in place (owner decision Nov 8: the
+hard-call side wins, also on shared races). An Eras-only race whose hard-call side differs from
+its registry `user_side` is re-registered for that side and rebuilt.
 
 **Shared races (decided Nov 7).** A race in Eras and in the Daily or Gauntlet pool
 (`data/pools.json`: today abu-dhabi-2021, bahrain-2021, france-2021, hungary-2019 and

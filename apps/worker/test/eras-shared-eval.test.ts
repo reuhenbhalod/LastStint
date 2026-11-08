@@ -22,7 +22,9 @@ const ERAS: ErasBlock = {
   target: { type: 'win' },
   mastery: { type: 'finish_position', position: 1, label: 'Win' },
 };
-ERAS_OVERLAYS['abu-dhabi-2021'] = { ...abuOverlay, eras: ERAS };
+// A fixture overlay played from the Daily side with the Daily moments (the real overlay plays
+// Verstappen, with its own moments: eras-shared.test.ts).
+ERAS_OVERLAYS['abu-dhabi-2021'] = { rules: abuOverlay.rules, eras: ERAS };
 const merged = withErasOverlay(abu, ERAS_OVERLAYS['abu-dhabi-2021']);
 
 /** Box for softs at the lap-53 SC, the real call elsewhere: a win, on the merged model. */

@@ -33,6 +33,7 @@ import {
   stepLap,
 } from '@laststint/sim';
 import { describe, expect, it } from 'vitest';
+import abuOverlay from '../../../data/eras/abu-dhabi-2021.json';
 import { playDailyRace } from '../../../packages/sim/examples/daily-race.js';
 import { getErasRace } from '../src/eras.js';
 import {
@@ -44,7 +45,7 @@ import {
   rivalClaimsOf,
 } from '../src/erasEval.js';
 import worker from '../src/index.js';
-import { RACE_FILES } from '../src/races.gen.js';
+import { ERAS_OVERLAYS, RACE_FILES } from '../src/races.gen.js';
 import { type UnverifiedAttempt, recheckAttempt, recheckAttemptSql } from '../src/reverify.js';
 import { SEED, abu, ids } from './helpers.js';
 
@@ -62,6 +63,9 @@ const ERAS: ErasBlock = {
 };
 const model: RaceModel = { ...abu, eras: ERAS };
 RACE_FILES['abu-dhabi-2021'] = model;
+// Played from the Daily side with the Daily moments: the real overlay (Verstappen's side, its
+// own moments) would replace them (eras-shared.test.ts covers it).
+ERAS_OVERLAYS['abu-dhabi-2021'] = { rules: abuOverlay.rules };
 
 /** The game's play: `scStop` at the lap-53 SC, the real team's call elsewhere. */
 const play = (scStop: string) =>

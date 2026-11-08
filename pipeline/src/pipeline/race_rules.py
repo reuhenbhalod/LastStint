@@ -49,6 +49,12 @@ STOP_GO_SECONDS = 10.0  # the stop-go's stationary time
 SAFETY_CAR_FROM = 1993  # the first season the sim may make up a SC (or VSC)
 # rules.minStops by race: the fewest stops a car must make (a car with fewer is disqualified).
 MIN_STOPS = {"monaco-2025": 2}
+# Races run on wet-weather tyres from start to flag whose file has no weather block (its
+# compounds are estimated dry labels), so the sim can't see the tyres that waive the
+# two-compound rule (the regulations require two dry specifications only in a race where no
+# intermediate or wet tyre is used): rules.twoCompound false. turkey-2021: the track never
+# dried enough for slicks (Autocourse 2021-22, cited by the race's Wikipedia article).
+NO_TWO_COMPOUND = frozenset({"turkey-2021"})
 _RACE_YEAR = re.compile(r"^.+?-(\d{4})(?:-.*)?$")
 
 
@@ -153,10 +159,12 @@ def rules_for_year(year: int) -> dict:
 
 def rules_for_race(race_id: str) -> dict:
     """The `rules` keys this step owns for a race: its year's (rules_for_year) and any rule of
-    the race's own (MIN_STOPS)."""
+    the race's own (MIN_STOPS, NO_TWO_COMPOUND)."""
     rules = rules_for_year(race_year(race_id))
     if race_id in MIN_STOPS:
         rules["minStops"] = MIN_STOPS[race_id]
+    if race_id in NO_TWO_COMPOUND:
+        rules["twoCompound"] = False
     return rules
 
 

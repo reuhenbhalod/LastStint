@@ -39,9 +39,11 @@ from . import pace as pace_mod
 from .paths import DATA_DIR, RACES_DIR, RAW_DIR
 
 # Authored Eras content (eras build plan, "Eras overlay files"): data/eras/<race-id>.json,
-# with up to four keys, applied over the built model by export.with_eras_fields.
+# with up to five keys, applied over the built model by export.with_eras_fields
+# (decisionMoments: the Eras side's moments, for a shared race whose Eras driver isn't its
+# Daily one; an Eras-only race keeps its moments in data/moments/).
 ERAS_DIR = DATA_DIR / "eras"
-OVERLAY_KEYS = ("eras", "provenance", "rules", "storylineEvents")
+OVERLAY_KEYS = ("eras", "provenance", "rules", "storylineEvents", "decisionMoments")
 # The game modes' race pools. A Daily or Gauntlet race's file is never given its overlay
 # (eras build plan, "Shared races"): the Worker serves the overlay beside it to Eras only.
 POOLS_PATH = DATA_DIR / "pools.json"
@@ -204,12 +206,12 @@ RACES: dict[str, dict] = {
     "hungary-2022": {
         "year": 2022,
         "event": "Hungary",
-        "name": "Hungary 2022: Leclerc vs Verstappen",
+        "name": "Hungary 2022: Verstappen vs Leclerc",
         "era": "2014-2025",
         "takeover_lap": 13,  # D3 rule
         "seed": 30341,
-        "user_side": "LEC",
-        "rival": "VER",
+        "user_side": "VER",  # the hard-call side (eras 6.2: VER 2, LEC 1)
+        "rival": "LEC",
         "score_positions": 6,
         "split": "tune",
         "dilemma": "Ferrari's hard-tyre call",
@@ -832,12 +834,12 @@ RACES: dict[str, dict] = {
         "year": 2019,
         "event": "Brazil",
         "source": "tum",
-        "name": "Brazil 2019: Gasly vs Hamilton",
+        "name": "Brazil 2019: Hamilton vs Gasly",
         "era": "2014-2025",
         "takeover_lap": None,  # D3 rule
         "seed": 1,
-        "user_side": "GAS",
-        "rival": "HAM",
+        "user_side": "HAM",  # the hard-call side (eras 6.2: 0-0, HAM gave up more chance)
+        "rival": "GAS",
         "score_positions": 6,
         "split": "eras",
     },
@@ -1104,12 +1106,15 @@ RACES: dict[str, dict] = {
         "year": 2021,
         "event": "Turkey",
         "source": "jolpica",
-        "name": "Turkey 2021: Hamilton vs Leclerc",
+        "name": "Turkey 2021: Leclerc vs Hamilton",
         "era": "2014-2025",
-        "takeover_lap": None,  # D3 rule
+        # Pinned (eras 6.2): the D3 rule gives lap 44, three laps before Leclerc's stop, so his
+        # call to stay out and lead after Bottas' stop (lap 37) couldn't be played. Takeovers
+        # at laps 30, 33 and 35 fail G1 (the LEC-HAM gap).
+        "takeover_lap": 38,
         "seed": 1,
-        "user_side": "HAM",
-        "rival": "LEC",  # position: P4 or better, so the car ahead (real: HAM P5)
+        "user_side": "LEC",  # the hard-call side (eras 6.2: LEC 2, HAM 1)
+        "rival": "HAM",
         "score_positions": 6,
         "split": "eras",
     },
@@ -2442,8 +2447,9 @@ def shared_races(pools_path: Path = POOLS_PATH) -> frozenset[str]:
 
 def apply_eras(model: dict, estimated: list[str], overlay: dict | None) -> tuple[dict, list[str]]:
     """The model with its provenance (the estimated fields, merged with the overlay's) and the
-    overlay's eras / rules / storylineEvents, via export.with_eras_fields. Unchanged (the same
-    dict) when there's nothing to apply. Returns the model and report lines."""
+    overlay's eras / rules / storylineEvents / decisionMoments, via export.with_eras_fields
+    (which also plays it from eras.userSide). Unchanged (the same dict) when there's nothing
+    to apply. Returns the model and report lines."""
     prov = estimates.provenance(estimated, (overlay or {}).get("provenance"))
     if prov is None and not overlay:
         return model, []
@@ -2455,6 +2461,7 @@ def apply_eras(model: dict, estimated: list[str], overlay: dict | None) -> tuple
         provenance=prov,
         rules=overlay.get("rules"),
         storyline_events=storyline or None,
+        decision_moments=overlay.get("decisionMoments"),
     )
     lines = [f"overlay: {', '.join(k for k in OVERLAY_KEYS if k in overlay)}"] if overlay else []
     return out, lines

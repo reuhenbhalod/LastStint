@@ -2,7 +2,7 @@
 // a race's decision moments the Abu Dhabi way and keeps only real dilemmas. See author.ts for
 // the recipe.
 
-import { gradeMoment } from '../src/grade.js';
+import { type Target, gradeMoment } from '../src/grade.js';
 import {
   type DecisionMoment,
   type MomentOption,
@@ -20,15 +20,16 @@ const MIN_SPACING = 3;
 const PACE_EVERY = 4;
 
 /** Up to `max` graded calls (MAX_MOMENTS; survivor races take 2) for `model` (its seed, rival
- * and takeover as given). `log` receives a line per candidate. The plan at takeover is the
- * strategy planner's (docs/strategy-planner-spec.md), not a moment. */
+ * and takeover as given), graded on `target` (default: beat the rival; an Eras race grades on
+ * its own target). `log` receives a line per candidate. The plan at takeover is the strategy
+ * planner's (docs/strategy-planner-spec.md), not a moment. */
 export function authorMoments(
   model: RaceModel,
   samples?: number,
   log: (line: string) => void = () => {},
   max = MAX_MOMENTS,
+  target: Target = { kind: 'beat-rival' },
 ): DecisionMoment[] {
-  const target = { kind: 'beat-rival' } as const;
   const first = model.race.takeoverLap + 1;
   const last = model.race.laps - 1;
   const NAME: Record<string, string> = {

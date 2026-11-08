@@ -24,10 +24,12 @@ import { abu, ids } from './helpers.js';
 
 type Mode = 'production' | 'test';
 
-// No bundled race has an Eras block yet (phase 6 content): Hungary 2022 gets one in this test
-// isolate's bundle so its attempts can be submitted (evaluation itself: eras-eval.test.ts).
+// Hungary 2022 gets a fixture Eras block, and no decision moments, in this test isolate's
+// bundle so its attempts can be submitted with an empty call log (evaluation itself:
+// eras-eval.test.ts).
 ERAS_RACE_FILES['hungary-2022'] = {
   ...(hungary2022Json as unknown as RaceModel),
+  decisionMoments: [],
   eras: {
     eraId: 10,
     order: 3,
@@ -484,7 +486,8 @@ describe('GET /api/eras/races/:raceId/model', () => {
 });
 
 describe('POST /api/eras/attempts/:id', () => {
-  // Hungary 2022 has no decision moments: an empty call log and no grades is a whole attempt.
+  // The fixture Hungary 2022 has no decision moments: an empty call log and no grades is a
+  // whole attempt.
   const decisions: unknown[] = [];
   const submit = (id: string, body: Record<string, unknown>) =>
     call('test', `/api/eras/attempts/${id}`, { grades: [], ...body });

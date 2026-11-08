@@ -63,17 +63,25 @@ def with_eras_fields(
     provenance: dict | None = None,
     rules: dict | None = None,
     storyline_events: list[tuple[int, str]] | None = None,
+    decision_moments: list[dict] | None = None,
 ) -> dict:
     """Return a validated copy of an assembled model with the schema v11 blocks set.
 
     None leaves a block as it is (absent keeps today's behaviour). `storyline_events` lists
     (lap, type) pairs, such as (53, "SC"), to flag `storylineEvent: true`; each must match an
-    event in the model. Write the result with `write_race`.
+    event in the model. `decision_moments` replaces the model's moments (the Eras side's, for
+    a race whose Eras driver isn't its Daily one). Then the Eras view (`eras_side`): when the
+    eras block's userSide is the model's rival, userSide and rival swap, so the model is played
+    from the Eras driver's car (every car's takeover state is its own, so nothing else moves).
+    Write the result with `write_race`.
     """
     out = copy.deepcopy(model)
     for key, block in (("eras", eras), ("provenance", provenance), ("rules", rules)):
         if block is not None:
             out[key] = copy.deepcopy(block)
+    if decision_moments is not None:
+        out["decisionMoments"] = copy.deepcopy(decision_moments)
+    out = eras_side(out)
     for lap, kind in storyline_events or []:
         hits = [e for e in out["events"] if e["lap"] == lap and e["type"] == kind]
         if not hits:
@@ -82,6 +90,22 @@ def with_eras_fields(
             event["storylineEvent"] = True
     validate_model(out)
     return out
+
+
+def eras_side(model: dict) -> dict:
+    """The model seen from its eras block's userSide (eras spec section 4: the hard-call
+    side): unchanged when that is absent or already the userSide; userSide and rival swapped
+    (each keeping its key's place) when it is the rival. Any other driver is an error: the Eras
+    side must be one of the race's two storyline drivers."""
+    side = (model.get("eras") or {}).get("userSide")
+    if side is None or side == model["userSide"]:
+        return model
+    if side != model["rival"]:
+        raise ValueError(
+            f"{model['race']['id']}: eras.userSide {side} is neither the userSide"
+            f" {model['userSide']} nor the rival {model['rival']}"
+        )
+    return {**model, "userSide": model["rival"], "rival": model["userSide"]}
 
 
 def write_race(model: dict, races_dir: Path = RACES_DIR) -> Path:

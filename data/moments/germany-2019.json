@@ -1,0 +1,422 @@
+[
+  {
+    "id": "vsc-15",
+    "lap": 15,
+    "trigger": "VSC",
+    "target": {
+      "kind": "win"
+    },
+    "options": [
+      {
+        "id": "stay",
+        "label": "Stay out",
+        "decisions": []
+      },
+      {
+        "id": "box-soft",
+        "label": "Box, softs",
+        "decisions": [
+          {
+            "lap": 15,
+            "kind": "pit",
+            "compound": "SOFT"
+          }
+        ]
+      },
+      {
+        "id": "box-intermediate",
+        "label": "Box, inters",
+        "decisions": [
+          {
+            "lap": 15,
+            "kind": "pit",
+            "compound": "INTERMEDIATE"
+          }
+        ]
+      },
+      {
+        "id": "box-wet",
+        "label": "Box, wets",
+        "decisions": [
+          {
+            "lap": 15,
+            "kind": "pit",
+            "compound": "WET"
+          }
+        ]
+      },
+      {
+        "id": "box-medium",
+        "label": "Box, mediums",
+        "decisions": [
+          {
+            "lap": 15,
+            "kind": "pit",
+            "compound": "MEDIUM"
+          }
+        ]
+      },
+      {
+        "id": "box-next-intermediate",
+        "label": "Box next lap, inters",
+        "decisions": [
+          {
+            "lap": 16,
+            "kind": "pit",
+            "compound": "INTERMEDIATE"
+          }
+        ]
+      }
+    ],
+    "realOptionId": "stay"
+  },
+  {
+    "id": "stop-25",
+    "lap": 25,
+    "trigger": "cliff",
+    "target": {
+      "kind": "win"
+    },
+    "options": [
+      {
+        "id": "stay",
+        "label": "Stay out",
+        "decisions": []
+      },
+      {
+        "id": "box-soft",
+        "label": "Box, softs",
+        "decisions": [
+          {
+            "lap": 25,
+            "kind": "pit",
+            "compound": "SOFT"
+          }
+        ]
+      },
+      {
+        "id": "box-intermediate",
+        "label": "Box, inters",
+        "decisions": [
+          {
+            "lap": 25,
+            "kind": "pit",
+            "compound": "INTERMEDIATE"
+          }
+        ]
+      },
+      {
+        "id": "box-wet",
+        "label": "Box, wets",
+        "decisions": [
+          {
+            "lap": 25,
+            "kind": "pit",
+            "compound": "WET"
+          }
+        ]
+      },
+      {
+        "id": "box-medium",
+        "label": "Box, mediums",
+        "decisions": [
+          {
+            "lap": 25,
+            "kind": "pit",
+            "compound": "MEDIUM"
+          }
+        ]
+      },
+      {
+        "id": "box-next-intermediate",
+        "label": "Box next lap, inters",
+        "decisions": [
+          {
+            "lap": 26,
+            "kind": "pit",
+            "compound": "INTERMEDIATE"
+          }
+        ]
+      }
+    ],
+    "realOptionId": "box-medium"
+  },
+  {
+    "id": "pace-28",
+    "lap": 28,
+    "trigger": "cliff",
+    "target": {
+      "kind": "win"
+    },
+    "options": [
+      {
+        "id": "push",
+        "label": "Push now",
+        "decisions": [
+          {
+            "lap": 28,
+            "kind": "mode",
+            "key": "pace",
+            "value": "push"
+          }
+        ]
+      },
+      {
+        "id": "standard",
+        "label": "Standard pace",
+        "decisions": [
+          {
+            "lap": 28,
+            "kind": "mode",
+            "key": "pace",
+            "value": "standard"
+          }
+        ]
+      },
+      {
+        "id": "manage",
+        "label": "Manage the tyres",
+        "decisions": [
+          {
+            "lap": 28,
+            "kind": "mode",
+            "key": "pace",
+            "value": "manage"
+          }
+        ]
+      },
+      {
+        "id": "push-attack",
+        "label": "Push and attack",
+        "decisions": [
+          {
+            "lap": 28,
+            "kind": "mode",
+            "key": "pace",
+            "value": "push"
+          },
+          {
+            "lap": 28,
+            "kind": "mode",
+            "key": "battle",
+            "value": "attack"
+          }
+        ]
+      }
+    ],
+    "realOptionId": null
+  },
+  {
+    "id": "cliff-32",
+    "lap": 32,
+    "trigger": "cliff",
+    "target": {
+      "kind": "win"
+    },
+    "options": [
+      {
+        "id": "stay",
+        "label": "Stay out",
+        "decisions": []
+      },
+      {
+        "id": "box-soft",
+        "label": "Box, softs",
+        "decisions": [
+          {
+            "lap": 32,
+            "kind": "pit",
+            "compound": "SOFT"
+          }
+        ]
+      },
+      {
+        "id": "box-intermediate",
+        "label": "Box, inters",
+        "decisions": [
+          {
+            "lap": 32,
+            "kind": "pit",
+            "compound": "INTERMEDIATE"
+          }
+        ]
+      },
+      {
+        "id": "box-wet",
+        "label": "Box, wets",
+        "decisions": [
+          {
+            "lap": 32,
+            "kind": "pit",
+            "compound": "WET"
+          }
+        ]
+      },
+      {
+        "id": "box-medium",
+        "label": "Box, mediums",
+        "decisions": [
+          {
+            "lap": 32,
+            "kind": "pit",
+            "compound": "MEDIUM"
+          }
+        ]
+      },
+      {
+        "id": "box-next-intermediate",
+        "label": "Box next lap, inters",
+        "decisions": [
+          {
+            "lap": 33,
+            "kind": "pit",
+            "compound": "INTERMEDIATE"
+          }
+        ]
+      }
+    ],
+    "realOptionId": "stay"
+  },
+  {
+    "id": "stop-46",
+    "lap": 46,
+    "trigger": "cliff",
+    "target": {
+      "kind": "win"
+    },
+    "options": [
+      {
+        "id": "stay",
+        "label": "Stay out",
+        "decisions": []
+      },
+      {
+        "id": "box-soft",
+        "label": "Box, softs",
+        "decisions": [
+          {
+            "lap": 46,
+            "kind": "pit",
+            "compound": "SOFT"
+          }
+        ]
+      },
+      {
+        "id": "box-intermediate",
+        "label": "Box, inters",
+        "decisions": [
+          {
+            "lap": 46,
+            "kind": "pit",
+            "compound": "INTERMEDIATE"
+          }
+        ]
+      },
+      {
+        "id": "box-wet",
+        "label": "Box, wets",
+        "decisions": [
+          {
+            "lap": 46,
+            "kind": "pit",
+            "compound": "WET"
+          }
+        ]
+      },
+      {
+        "id": "box-medium",
+        "label": "Box, mediums",
+        "decisions": [
+          {
+            "lap": 46,
+            "kind": "pit",
+            "compound": "MEDIUM"
+          }
+        ]
+      },
+      {
+        "id": "box-next-intermediate",
+        "label": "Box next lap, inters",
+        "decisions": [
+          {
+            "lap": 47,
+            "kind": "pit",
+            "compound": "INTERMEDIATE"
+          }
+        ]
+      }
+    ],
+    "realOptionId": "box-soft"
+  },
+  {
+    "id": "sc-57",
+    "lap": 57,
+    "trigger": "SC",
+    "target": {
+      "kind": "win"
+    },
+    "options": [
+      {
+        "id": "stay",
+        "label": "Stay out",
+        "decisions": []
+      },
+      {
+        "id": "box-soft",
+        "label": "Box, softs",
+        "decisions": [
+          {
+            "lap": 57,
+            "kind": "pit",
+            "compound": "SOFT"
+          }
+        ]
+      },
+      {
+        "id": "box-intermediate",
+        "label": "Box, inters",
+        "decisions": [
+          {
+            "lap": 57,
+            "kind": "pit",
+            "compound": "INTERMEDIATE"
+          }
+        ]
+      },
+      {
+        "id": "box-wet",
+        "label": "Box, wets",
+        "decisions": [
+          {
+            "lap": 57,
+            "kind": "pit",
+            "compound": "WET"
+          }
+        ]
+      },
+      {
+        "id": "box-medium",
+        "label": "Box, mediums",
+        "decisions": [
+          {
+            "lap": 57,
+            "kind": "pit",
+            "compound": "MEDIUM"
+          }
+        ]
+      },
+      {
+        "id": "box-next-medium",
+        "label": "Box next lap, mediums",
+        "decisions": [
+          {
+            "lap": 58,
+            "kind": "pit",
+            "compound": "MEDIUM"
+          }
+        ]
+      }
+    ],
+    "realOptionId": "stay"
+  }
+]
