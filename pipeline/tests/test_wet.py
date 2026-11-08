@@ -2,6 +2,7 @@
 
 import numpy as np
 import pandas as pd
+import pytest
 
 from pipeline import wet
 from pipeline.sim_reference import Car, _clean_lap, weather_wear, wet_penalty
@@ -51,3 +52,14 @@ def test_python_sim_wet_lap_and_wear_match_the_pipeline():
     assert _clean_lap(car, compounds, 0.05, 2, None, weather) == dry * (
         1 + wet_penalty(weather, "MEDIUM", 2)
     )
+
+
+def test_a_race_with_no_dry_lap_cant_be_fitted():
+    """Brazil 2016 ran every lap on wets or inters (TUM's compounds): the dry model has no lap
+    to fit on, and the build says so instead of failing inside the fit."""
+    from pipeline import build, ingest
+
+    laps = pd.read_parquet(ingest.raw_snapshot_path("brazil-2016"))
+    assert set(laps["Compound"].dropna()) <= set(wet.WET_COMPOUNDS)
+    with pytest.raises(ValueError, match="no dry lap"):
+        build.dry_fit("brazil-2016", laps, "2014-2025")

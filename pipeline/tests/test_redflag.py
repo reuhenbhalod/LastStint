@@ -285,3 +285,128 @@ def test_faults_cost_nothing_on_red_laps():
     # red lap 64.
     assert ver_time(v["faults"], 63) - ver_time(v["rolling"], 63) == pytest.approx(3.0)
     assert ver_time(v["faults"], 64) - ver_time(v["rolling"], 64) == pytest.approx(3.0)
+
+
+# --- red flags that leave no red lap (Brazil 2003, Monaco 1984, Belgium 1998) -------------------
+
+BRAZIL_2003 = {"lap": 56, "restart": "none", "resultsLap": 54, "source": "the FIA ruling"}
+BELGIUM_1998 = {"lap": 1, "restart": "standing", "source": "a full restart over the distance"}
+
+
+def _assembled(laps: pd.DataFrame, entries: list[dict], year: int) -> tuple[list, list]:
+    """The race file's events and classification for a red-flag file, as build_race and
+    assemble_race_model make them."""
+    from pipeline.assemble import finishing_order
+
+    laps = redflag.cut_at_results(laps, entries)
+    laps, kept, _ = redflag.race_entries(laps, entries, year)
+    evs = events.neutralization_events(laps)
+    if any(e["type"] == "RED" for e in evs) or kept:
+        evs = redflag.annotate_restarts(redflag.apply_hand_spans(evs, kept), kept, year)
+    return evs, finishing_order(laps)
+
+
+def test_a_race_ended_under_red_ends_at_its_results_lap():
+    # Jolpica-style: no red-flag timing. The data runs to lap 55 (one car's lap past the
+    # results); BBB passed AAA on lap 55, which doesn't count.
+    laps = _laps({}, {}, n_laps=55)
+    late = (laps["Driver"] == "BBB") & (laps["LapNumber"] == 55)
+    laps.loc[late, "Time"] -= 2.0
+    evs, order = _assembled(laps, [BRAZIL_2003], 2003)
+    assert evs == []  # no RED event: the red flag came after the results lap
+    assert order == ["AAA", "BBB", "CCC"]  # the order at the end of lap 54
+    cut = redflag.cut_at_results(laps, [BRAZIL_2003])
+    assert int(cut["LapNumber"].max()) == 54 and len(cut) == 3 * 54
+    # Data that holds exactly the classified distance (Jolpica's 54 laps) is left alone.
+    exact = _laps({}, {}, n_laps=54)
+    assert redflag.cut_at_results(exact, [BRAZIL_2003]) is exact
+    # Data that stops before the results lap doesn't match the facts.
+    with pytest.raises(redflag.RedFlagError, match="lap 54"):
+        redflag.cut_at_results(_laps({}, {}, n_laps=50), [BRAZIL_2003])
+
+
+def test_a_timed_race_ended_under_red_loses_its_red_laps():
+    # A source with red-flag timing: laps 55-56 carry the red status; they're after the cut.
+    laps = _laps({55: "15", 56: "5"}, {55: 140.0, 56: 140.0}, n_laps=56)
+    evs, _ = _assembled(laps, [BRAZIL_2003], 2003)
+    assert evs == []
+
+
+def test_a_voided_start_is_a_fresh_race():
+    # Jolpica holds only the rerun (no red lap); laps 1-2 of it ran behind the SC.
+    laps = _laps({}, {1: 130.0, 2: 130.0}, n_laps=44)
+    evs, order = _assembled(laps, [BELGIUM_1998], 1998)
+    assert evs == []  # no RED event, no restart
+    assert order == ["AAA", "BBB", "CCC"]
+    with_sc = {**BELGIUM_1998, "restartScLaps": 2}
+    evs, _ = _assembled(laps, [with_sc], 1998)
+    assert evs == [{"lap": 1, "type": "SC", "laps": 2}]
+    _, kept, notes = redflag.race_entries(laps, [with_sc], 1998)
+    assert kept == [] and "start voided" in notes[0] and "laps 1-2" in notes[0]
+    # An SC already estimated on those laps isn't doubled.
+    est = _laps({1: "4", 2: "4"}, {}, n_laps=44)
+    marked, _, _ = redflag.race_entries(est, [with_sc], 1998)
+    assert set(marked[marked["LapNumber"] <= 2]["TrackStatus"]) == {"4"}
+
+
+def test_a_voided_start_needs_the_old_rules():
+    laps = _laps({}, {}, n_laps=44)
+    # From 2005 a lap-1 red flag is a suspension: an untimed one needs its resumeLap.
+    with pytest.raises(redflag.RedFlagError, match="match no red flag"):
+        _assembled(laps, [BELGIUM_1998], 2005)
+    # A red flag after the first two laps, or one never resumed, isn't a voided start.
+    assert not redflag.is_voided_start({**BELGIUM_1998, "lap": 3}, 1998)
+    assert not redflag.is_voided_start({**BELGIUM_1998, "restart": "none"}, 1998)
+    assert not redflag.is_voided_start({**BELGIUM_1998, "resumeLap": 2}, 1998)
+    assert not redflag.is_voided_start(BELGIUM_1998, None)
+    assert redflag.is_voided_start(BELGIUM_1998, 1998)
+
+
+def test_other_red_flags_still_go_through():
+    laps = _laps({}, {}, n_laps=10)
+    entry = {"lap": 4, "resumeLap": 5, "restart": "rolling", "source": "x"}
+    marked, kept, notes = redflag.race_entries(laps, [entry], 2011)
+    assert kept == [entry] and notes == []
+    assert set(marked[marked["LapNumber"].isin([4, 5])]["TrackStatus"]) == {"5"}
+    assert redflag.cut_at_results(laps, [entry]) is laps
+
+
+@pytest.mark.parametrize(
+    "entries",
+    [
+        [{**BRAZIL_2003, "restart": "rolling"}],  # results lap on a resumed race
+        [{**BRAZIL_2003, "resultsLap": 56}],  # results lap not before the flag
+        [{**BRAZIL_2003, "resultsLap": 0}],
+        [{**BRAZIL_2003, "resumeLap": 57}],
+        [BRAZIL_2003, {"lap": 60, "restart": "rolling", "source": "x"}],  # not the last
+    ],
+)
+def test_bad_results_laps_are_refused(entries):
+    with pytest.raises(redflag.RedFlagError):
+        redflag.validate_entries(entries)
+
+
+@pytest.mark.parametrize("race_id", ["brazil-2003", "monaco-1984", "belgium-1998"])
+def test_the_three_untimed_files_need_no_red_lap(race_id):
+    """The R1 files that couldn't load: their entries leave the race file without a RED event."""
+    entries = redflag.load_entries(race_id, raw_dir=redflag.REDFLAGS_DIR / "_none")
+    body = json.loads((redflag.REDFLAGS_DIR / f"{race_id}.json").read_text())
+    laps = _laps({}, {}, n_laps=body["completedLaps"])
+    evs, _ = _assembled(laps, entries, int(race_id.rsplit("-", 1)[1]))
+    assert not [e for e in evs if e["type"] == "RED"]
+
+
+def test_build_ends_a_race_at_its_results_lap(monkeypatch, tmp_path):
+    """build_race with a red-flag file ending Abu Dhabi 2021 under red (a made-up entry): the
+    race file is 48 laps long, with the order at the end of lap 48 and no RED event."""
+    from pipeline import build
+    from pipeline.assemble import finishing_order
+
+    entry = {"lap": 50, "restart": "none", "resultsLap": 48, "source": "test"}
+    monkeypatch.setattr(redflag, "load_entries", lambda *a, **k: [entry])
+    result = build.build_race("abu-dhabi-2021", eras_dir=tmp_path)
+    assert result.model["race"]["laps"] == 48
+    assert int(result.laps["LapNumber"].max()) == 48
+    assert result.model["realResult"] == finishing_order(result.laps)
+    assert not [e for e in result.model["events"] if e["type"] == "RED"]
+    assert any("results lap 48" in line for line in result.estimates)

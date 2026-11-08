@@ -54,8 +54,12 @@ nothing read here says those need correcting.
   most likely case.
 - **Untimed races with no stoppage lap:** brazil-2003, monaco-1984 and belgium-1998 have no
   `resumeLap`. The Jolpica data has no red lap for them: the race ended at the results lap, or
-  holds only the restarted race. `annotate_restarts` will refuse those entries as they stand.
-  The build needs a rule for them: a race ended under red needs no RED event; a voided start
-  over the full distance is a fresh race. Monaco 1984 has no Jolpica lap times at all.
+  holds only the restarted race. **Rule now in the build** (`redflag.cut_at_results` /
+  `race_entries`, step 5.1): a race ended under red (`"restart": "none"` with a `resultsLap`)
+  has its laps after the results lap cut, so it ends there with the order at the end of that
+  lap, and gets no RED event; a red flag in the first two laps before 2005, resumed, with no
+  `resumeLap` is a voided start: a fresh race, no RED event, and its `restartScLaps` (none
+  entered yet for belgium-1998, whose note says laps 1-2) would mark laps 1..n of the rerun
+  as SC laps. Monaco 1984 has no Jolpica lap times at all.
 - Extra fields beyond the documented format: top-level `scheduledLaps`, `completedLaps`,
   `timing`; per entry `note` and, for races never resumed, `resultsLap`. The loader ignores them.

@@ -1,0 +1,49 @@
+{
+ "race": "monaco-2011",
+ "how": "docs/eras-checks/2.4-estimates.md: check each period against a race report; set status to confirmed or rejected (edit startLap/endLap if they're off), then re-run `pipeline jolpica <race-id> --force`.",
+ "periods": [
+  {
+   "startLap": 34,
+   "endLap": 35,
+   "laps": 2,
+   "kind": "SC",
+   "confidence": "ambiguous",
+   "peakRatio": 1.62,
+   "gapBefore": 70.3,
+   "gapAfter": 50.1,
+   "reasons": [
+    "the field didn't bunch up (P1-P6 70.3s -> 50.1s): rain?"
+   ],
+   "status": "unchecked"
+  },
+  {
+   "startLap": 38,
+   "endLap": 38,
+   "laps": 1,
+   "kind": "SC",
+   "confidence": "ambiguous",
+   "peakRatio": 1.376,
+   "gapBefore": 17.2,
+   "gapAfter": 12.9,
+   "reasons": [
+    "the field didn't bunch up (P1-P6 17.2s -> 12.9s): rain?",
+    "a single slow lap"
+   ],
+   "status": "unchecked"
+  },
+  {
+   "startLap": 69,
+   "endLap": 73,
+   "laps": 5,
+   "kind": "SC",
+   "confidence": "ambiguous",
+   "peakRatio": 16.42,
+   "gapBefore": 77.3,
+   "gapAfter": 13.2,
+   "reasons": [
+    "a 16.4x lap: a red flag?"
+   ],
+   "status": "unchecked"
+  }
+ ]
+}

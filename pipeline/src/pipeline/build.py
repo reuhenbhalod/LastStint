@@ -1354,6 +1354,52 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
+    # Eras wave B (build plan 5.1): red-flag races of the 2010s. No source has red-flag timing,
+    # so each red flag's stoppage lap and restart SC laps come from its hand-entered file
+    # (data/redflags/<id>.json, R1). TUM races via `pipeline tum-ingest`, Jolpica ones via
+    # `pipeline jolpica`; the wet ones then `pipeline wet-laps`.
+    "azerbaijan-2017": {
+        "year": 2017,
+        "event": "Azerbaijan",
+        "source": "tum",
+        "name": "Azerbaijan 2017: Ricciardo vs Bottas",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "RIC",
+        "rival": "BOT",  # win from P10: the car behind at the flag
+        "score_positions": 6,
+        "split": "eras",
+    },
+    # brazil-2016 (TUM, two red flags) is ingested (data/raw, with `pipeline wet-laps`) but not
+    # registered: every lap was run on wets or inters, so there's no dry lap to fit the dry
+    # model on and the build stops (dry_fit). See docs/g1-report.md, step 5.1c.
+    "monaco-2011": {
+        "year": 2011,
+        "event": "Monaco",
+        "source": "jolpica",
+        "name": "Monaco 2011: Vettel vs Alonso",
+        "era": "2010-2013",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "VET",
+        "rival": "ALO",  # Vettel holds P1: the car behind
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "canada-2011": {
+        "year": 2011,
+        "event": "Canada",
+        "source": "jolpica",
+        "name": "Canada 2011: Button vs Vettel",
+        "era": "2010-2013",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "BUT",
+        "rival": "VET",  # Button wins from last: the car behind at the flag
+        "score_positions": 6,
+        "split": "eras",
+    },
 }
 
 
@@ -1496,6 +1542,12 @@ def dry_fit(
             return frame[slick & ~frame["LapNumber"].isin(period)]
 
         clean_df, traffic_df = dry(clean_df), dry(traffic_df)
+        if clean_df.empty and traffic_df.empty:
+            raise ValueError(
+                "no dry lap on slicks to fit the dry model on (every lap on wet-weather tyres"
+                " or in the wet period): a race run wet throughout needs a dry-pace reference"
+                " from elsewhere"
+            )
     # Model v3 stage 6 (T1): pace from clear-air laps only; the sim adds the dirty-air
     # penalty itself when a car follows within range, so traffic laps would count it twice.
     pace_laps = pd.concat([clean_df, traffic_df])
@@ -1572,11 +1624,13 @@ def build_race(
     items in data/incidents.json); `pools_path`: the pools file naming the shared races."""
     if laps is None:
         laps = pd.read_parquet(ingest.raw_snapshot_path(race_id, raw_dir))
-    meta = resolved_meta(race_id, laps, raw_dir)
-    # Red flags (eras build plan 4.3): a hand-entered file marks the red laps a source without
-    # red-flag timing (TUM, Jolpica) can't show.
+    # Red flags (eras build plan 4.3): a race ended under the red flag ends at its results
+    # lap; a hand-entered file marks the red laps a source without red-flag timing (TUM,
+    # Jolpica) can't show; a voided start is a fresh race (redflag.race_entries).
     red_flags = redflag.load_entries(race_id, raw_dir)
-    laps = redflag.mark_hand_entries(laps, red_flags)
+    laps = redflag.cut_at_results(laps, red_flags)
+    meta = resolved_meta(race_id, laps, raw_dir)
+    laps, red_flags, red_notes = redflag.race_entries(laps, red_flags, meta.get("year"))
     if fault_facts is None:
         fault_facts = incidents.fault_facts(race_id)
     # A race rebuilt from its anchors (step 4.6): its compounds are filled here, and its file
@@ -1662,7 +1716,7 @@ def build_race(
         # reconstructed.
         prov = {**model["provenance"], "kind": "reconstructed"}
         model = reconstruct.mark_model(model, {"provenance": prov})
-    report = [*(estimates.report_lines(block) if block else []), *overlay_lines]
+    report = [*(estimates.report_lines(block) if block else []), *overlay_lines, *red_notes]
     if recon is not None:
         report.append(
             f"reconstructed (step 4.6): all anchors pass: {recon['solver']['passed']};"
