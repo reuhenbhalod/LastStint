@@ -1,0 +1,17 @@
+race_id,driver,driver_id,number,rank,lap,time
+monaco-1984,SEN,ayrton-senna,19,1,24,114.334
+monaco-1984,DEA,elio-de-angelis,11,2,26,115.026
+monaco-1984,MAN,nigel-mansell,12,3,13,115.112
+monaco-1984,ALB,michele-alboreto,27,4,22,115.437
+monaco-1984,ARN,rene-arnoux,28,5,26,115.541
+monaco-1984,PRO,alain-prost,7,6,19,115.596
+monaco-1984,WIN,manfred-winkelhock,14,7,21,115.712
+monaco-1984,ROS,keke-rosberg,6,8,25,115.775
+monaco-1984,LAF,jacques-laffite,5,9,25,116.946
+monaco-1984,LAU,niki-lauda,8,10,22,116.996
+monaco-1984,GHI,piercarlo-ghinzani,24,11,10,117.439
+monaco-1984,PAT,riccardo-patrese,22,12,24,118.527
+monaco-1984,PIQ,nelson-piquet,1,13,11,118.897
+monaco-1984,HES,francois-hesnault,25,14,12,119.644
+monaco-1984,FAB,corrado-fabi,2,15,6,124.465
+monaco-1984,CEC,johnny-cecotto,20,16,1,155.136

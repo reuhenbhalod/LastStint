@@ -4,6 +4,7 @@ pipeline list                 registered races and whether each has a snapshot /
 pipeline ingest <race-id>     download a race from FastF1 into data/raw/ (network)
 pipeline build <race-id>      build data/races/<id>.json and data/golden/<id>.json
 pipeline validate <race-id>   run the Gate G1 report; exits 1 if the race fails
+pipeline f1db [race-id ...]   F1DB stops and fastest laps -> data/raw/f1db/ (Eras races)
 """
 
 from __future__ import annotations
@@ -267,6 +268,30 @@ def _report_markdown(rows: list) -> str:
             )
         lines.append("")
     return "\n".join(lines)
+
+
+@app.command("f1db")
+def f1db_cmd(
+    race_ids: list[str] = typer.Argument(  # noqa: B008
+        None, help="Races like japan-2005 (default: every appendix race before 2011)."
+    ),
+) -> None:
+    """Write data/raw/f1db/<race-id>.stops.csv and .fastest-laps.csv from the pinned F1DB
+    release (downloaded once into the shared Eras cache); exits 1 if a stop fails its check."""
+    from . import f1db
+
+    db = f1db.F1DB.load(f1db.download())
+    f1db.write_source()
+    bad = []
+    for rid in race_ids or f1db.APPENDIX_RACES:
+        stops, fastest, problems = f1db.write_race(db, rid)
+        note = f"  PROBLEMS: {'; '.join(problems)}" if problems else ""
+        typer.echo(f"{rid}: {len(stops)} stops, {len(fastest)} fastest laps{note}")
+        if problems:
+            bad.append(rid)
+    typer.echo(f"F1DB {f1db.VERSION} -> {f1db.OUT_DIR.relative_to(paths.REPO_ROOT)}/")
+    if bad:
+        raise typer.Exit(code=1)
 
 
 if __name__ == "__main__":
