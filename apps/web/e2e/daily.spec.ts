@@ -35,16 +35,16 @@ test('plays the Abu Dhabi daily end to end', async ({ page, context }) => {
   await expect(page.getByLabel('Max Verstappen details')).toContainText('Red Bull Racing');
   await page.getByRole('button', { name: 'Close driver details' }).click();
 
-  // Each moment: the top-level option, then (after Box) the tyre. Lap 55's stop call isn't
-  // asked: the car stopped on lap 53, so the wall stays out by itself.
+  // Each moment: the top-level option, then (after Box) the tyre. Two calls aren't asked: the
+  // lap-44 tyre call (fresh hards from lap 36) and lap 55's stop call (stopped on lap 53): the
+  // wall stays out by itself (sim autoStay.ts).
   const answers: Record<string, string[]> = {
     '36': ['Box', 'Hards'],
-    '44': ['Stay out'],
     '49': ['Push now'],
     '53': ['Box', 'Softs'],
     '57': ['Attack'],
   };
-  for (const lap of ['36', '44', '49', '53', '57']) {
+  for (const lap of ['36', '49', '53', '57']) {
     const card = page.locator('section.decision');
     await expect(card).toContainText(`Lap ${lap}`, { timeout: 90_000 });
     await expect(page.getByRole('alert')).toContainText(`Lap ${lap}`);

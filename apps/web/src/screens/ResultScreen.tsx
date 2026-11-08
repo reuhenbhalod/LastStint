@@ -2,7 +2,7 @@
 // the server's score, rank and percentile (live dailies), the day's leaderboard and stats, and
 // a spoiler-free share line. Practice runs show the game's own grades, not submitted.
 
-import { type Band, type DecisionMoment, bandFor } from '@boxthislap/sim';
+import { type Band, type DecisionMoment, autoStay, bandFor } from '@boxthislap/sim';
 import { useEffect, useState } from 'react';
 import type { AccountState } from '../account/useAccount.js';
 import { AccountBar } from '../components/AccountBar.js';
@@ -19,7 +19,6 @@ import {
   type RunResponse,
   api,
 } from '../data/api.js';
-import { autoStay } from '../game/autoStay.js';
 import { goalOf } from '../game/goal.js';
 import { planGrade, stopsLine, stopsWord } from '../game/plans.js';
 import { TEAM_COLOR } from '../game/teamTheme.js';
@@ -177,9 +176,9 @@ function GradedCall({
               {auto && (
                 <span
                   className="ml-2 bg-[#232927] px-1.5 py-0.5 align-middle text-[10px] font-bold uppercase tracking-wider text-[#8D9692]"
-                  title="You had just stopped, so the wall stayed out without asking"
+                  title="The wall stayed out without asking (a stop just made, or tyres still good). Not scored."
                 >
-                  Auto
+                  Auto · not scored
                 </span>
               )}
             </span>
@@ -561,7 +560,7 @@ export function ResultScreen({
                   moment={momentById.get(c.momentId)}
                   auto={(() => {
                     const m = momentById.get(c.momentId);
-                    return !!m && autoStay(m, state.decisions) === c.chosen;
+                    return !!m && !!model && autoStay(model, m, state.decisions) === c.chosen;
                   })()}
                 />
               ))}

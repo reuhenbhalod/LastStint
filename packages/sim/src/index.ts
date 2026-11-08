@@ -1,6 +1,13 @@
 // @boxthislap/sim — public surface of the deterministic race simulator.
 
 export * from './types.js';
+export {
+  AUTO_STAY_LAPS,
+  AUTO_STAY_LAPS_NEUTRAL,
+  NEAR_DROP_OFF,
+  autoStay,
+  boxingAt,
+} from './autoStay.js';
 export { mulberry32, deriveSeed } from './rng.js';
 export { battlesFor, isAttack, isDefend, lappedAhead, moodOf, startTrust } from './engineer.js';
 export type { EngineerConfig, MoodEffect, MoveEffect } from './engineer.js';

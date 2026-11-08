@@ -4,8 +4,7 @@
 // whose grade is still running says so. The running score is the same average the results
 // screen shows.
 
-import { BAND_POINTS, type Band } from '@boxthislap/sim';
-import { autoStay } from '../game/autoStay.js';
+import { BAND_POINTS, type Band, type RaceModel, autoStay } from '@boxthislap/sim';
 import { planGrade, stopsWord } from '../game/plans.js';
 import type { GameState } from '../state/machine.js';
 import { Panel } from './Panel.js';
@@ -19,7 +18,7 @@ const BAND: Record<Band, { label: string; color: string }> = {
 
 const pct = (p: number) => `${Math.round(p * 100)}%`;
 
-export function LiveGrades({ state }: { state: GameState }) {
+export function LiveGrades({ state, model }: { state: GameState; model: RaceModel }) {
   const rows = state.moments
     .filter((m) => state.resolved.includes(m.id))
     .map((m) => {
@@ -32,7 +31,7 @@ export function LiveGrades({ state }: { state: GameState }) {
         id: m.id,
         lap: m.lap,
         label: (m.options.find((o) => o.id === chosen)?.label ?? chosen ?? '').split(', ')[0],
-        auto: !!chosen && autoStay(m, state.decisions) === chosen,
+        auto: !!chosen && autoStay(model, m, state.decisions) === chosen,
         mine,
         best,
       };
@@ -50,7 +49,8 @@ export function LiveGrades({ state }: { state: GameState }) {
       best: grade?.options.find((o) => o.id === grade.best),
     });
   }
-  const scored = rows.flatMap((r) => (r.mine ? [BAND_POINTS[r.mine.band]] : []));
+  // The wall's own answers (Auto) are shown but not scored, as on the server.
+  const scored = rows.flatMap((r) => (r.mine && !r.auto ? [BAND_POINTS[r.mine.band]] : []));
   const score = scored.length ? scored.reduce((a, b) => a + b, 0) / scored.length : null;
 
   return (
@@ -88,7 +88,9 @@ export function LiveGrades({ state }: { state: GameState }) {
                   </span>
                   {r.label}
                   {r.auto && (
-                    <span className="ml-1.5 text-[11px] font-normal text-[#8D9692]">Auto</span>
+                    <span className="ml-1.5 text-[11px] font-normal text-[#8D9692]">
+                      Auto · not scored
+                    </span>
                   )}
                 </span>
                 <span

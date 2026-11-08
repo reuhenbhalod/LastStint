@@ -12,6 +12,8 @@ import {
   type RaceNote,
   type RacePlan,
   type RaceState,
+  autoStay,
+  boxingAt,
   engineerConfig,
   moodOf,
   planCalls,
@@ -23,7 +25,6 @@ import { ignoreRate } from '../data/drivers.js';
 import type { Daily } from '../data/types.js';
 import { GameEngine, decisionMoments } from '../engine/engine.js';
 import { type GradedMoment, type Grader, gradedFromHits, inlineGrader } from '../engine/grading.js';
-import { autoStay, boxingAt } from '../game/autoStay.js';
 import { tyreName } from '../game/choices.js';
 import { ownMove } from '../game/engineerCalls.js';
 import { engineerRadio } from '../game/engineerRadio.js';
@@ -159,8 +160,9 @@ export class GameSession {
       if (none) this.choose(none.id);
       return;
     }
-    // A stop booked, or just made: the wall stays out without asking (game/autoStay.ts).
-    const stay = autoStay(moment, this.engine.decisions);
+    // A stop booked or just made, or fresh tyres for a tyre call: the wall stays out without
+    // asking (sim autoStay.ts).
+    const stay = autoStay(this.daily.model, moment, this.engine.decisions);
     if (stay) {
       this.dispatch({
         type: 'RADIO',
@@ -169,7 +171,9 @@ export class GameSession {
           from: 'Engineer',
           text: boxingAt(moment, this.engine.decisions)
             ? 'We’re boxing already. No change to the plan.'
-            : 'We’ve just stopped. Staying out.',
+            : moment.trigger === 'cliff'
+              ? 'Tyres are still good. Staying out.'
+              : 'We’ve just stopped. Staying out.',
           refused: false,
         },
       });
@@ -611,7 +615,10 @@ export class GameSession {
       const radio = this.engine.decisions.find((d) => d.kind === 'radio' && d.momentId === m.id) as
         | Extract<Decision, { kind: 'radio' }>
         | undefined;
-      return graded && radio ? [{ grade: graded.grade, chosen: radio.optionId }] : [];
+      if (!graded || !radio) return [];
+      // The wall's own answers aren't scored (sim autoStay.ts).
+      const auto = autoStay(this.daily.model, m, this.engine.decisions) === radio.optionId;
+      return [{ grade: graded.grade, chosen: radio.optionId, auto }];
     });
     const plan = planGrade(this.state.plan, this.state.meta.takeoverLap);
     const picked = this.state.plan.picked;

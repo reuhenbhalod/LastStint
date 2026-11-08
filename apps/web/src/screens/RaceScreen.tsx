@@ -627,7 +627,7 @@ export function RaceScreen({
           <p className="m-0 text-[12px] text-[#8D9692]">The trace builds as laps go by.</p>
         )}
       </Panel>
-      <LiveGrades state={state} />
+      <LiveGrades state={state} model={model} />
       <Panel title="Radio">
         {state.radio.length ? (
           <RadioLog messages={state.radio} max={8} />
@@ -1024,7 +1024,7 @@ export function RaceScreen({
                     />
                   </div>
                 )}
-                {shown === 'calls' && <LiveGrades state={state} />}
+                {shown === 'calls' && <LiveGrades state={state} model={model} />}
                 {shown === 'log' && <RadioLog messages={state.radio} max={12} />}
               </div>
             </div>

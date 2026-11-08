@@ -11,6 +11,7 @@
 // chances. Grading is deterministic, so a nightly job re-runs verifyRun() without `claimed`
 // and any difference means the claimed grades were edited.
 
+import { autoStay } from './autoStay.js';
 import {
   type Band,
   GRADE_SAMPLES,
@@ -348,8 +349,16 @@ export function verifyRun(
 
   const plan = logged ? gradePlan(model, seed, decisions, samples, logged, claims) : null;
   // The plan's call goes last, so score.calls[i] stays moments[i].
+  const momentById = new Map(model.decisionMoments.map((m) => [m.id, m]));
   const score = scoreRun([
-    ...moments.map((m) => ({ grade: m.grade, chosen: m.chosen })),
+    ...moments.map((m) => ({
+      grade: m.grade,
+      chosen: m.chosen,
+      // The wall answered it for you (autoStay.ts): not scored.
+      auto:
+        autoStay(model, momentById.get(m.momentId) as DecisionMoment, decisions as Decision[]) ===
+        m.chosen,
+    })),
     ...(plan ? [{ grade: plan.grade, chosen: plan.chosen }] : []),
   ]);
   const user = model.userSide;
