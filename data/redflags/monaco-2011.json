@@ -1,0 +1,16 @@
+{
+ "race": "monaco-2011",
+ "scheduledLaps": 78,
+ "completedLaps": 78,
+ "timing": "Jolpica (no red-flag timing)",
+ "redFlags": [
+  {
+   "lap": 72,
+   "resumeLap": 72,
+   "restart": "rolling",
+   "restartScLaps": 1,
+   "source": "Wikipedia, 2011 Monaco Grand Prix: 'on lap 72 the race was red flagged, with the cars stopping on the grid at lap 72', 'the race resumed still behind the safety car, which went in at the end of lap 73', 'During the red flag period, teams were allowed to change tyres' (https://en.wikipedia.org/wiki/2011_Monaco_Grand_Prix); Wikipedia, 'List of red-flagged Formula One races' (https://en.wikipedia.org/wiki/List_of_red-flagged_Formula_One_races): lap 72; Jolpica lap times (api.jolpi.ca/ergast/f1/2011/6/laps), leader's lap 72 took 1313s (the stoppage), lap 73 behind the SC (125s), lap 74 green (78s)",
+   "note": "Laps 70-71 were already behind the SC for the Sutil/Alguersuari/Petrov crash (a separate SC event before the red flag). Cars stopped on the grid, so the stoppage is in the flag lap itself."
+  }
+ ]
+}

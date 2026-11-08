@@ -1,0 +1,16 @@
+{
+ "race": "canada-2011",
+ "scheduledLaps": 70,
+ "completedLaps": 70,
+ "timing": "Jolpica (no red-flag timing)",
+ "redFlags": [
+  {
+   "lap": 25,
+   "resumeLap": 25,
+   "restart": "rolling",
+   "restartScLaps": 9,
+   "source": "D. Bean, 'Button Steals Last-Minute Victory...', The Checkered Flag, 12 Jun 2011: 'on Lap 25, the red flag came out', 'The race restarted under the safety car', 'The safety car finally came in at the end of Lap 34' (https://www.thecheckeredflag.co.uk/2011/06/button-steals-last-minute-victory-in-an-epic-rain-interrupted-canadian-grand-prix/); L. Smith, Autosport, 13 Jun 2020: 'the red flag came out on lap 25, sparking a two-hour delay' (https://www.autosport.com/f1/news/149951/is-buttonEURTMs-mostfamous-f1-win-overhyped); Wikipedia, 'List of red-flagged Formula One races' (https://en.wikipedia.org/wiki/List_of_red-flagged_Formula_One_races): lap 25; Jolpica lap times (api.jolpi.ca/ergast/f1/2011/7/laps), leader's lap 25 took 7505s (the stoppage), laps 26-34 behind the SC, lap 35 green (92s)",
+   "note": "Conflict: Wikipedia's race article says 'By lap 26, increasingly heavy rain led to the race's suspension' and 'once the safety car came in on lap 35'; the lap 25 red flag and SC in at the end of lap 34 (racing from lap 35) agree with the timing, taken. Laps 20-24 were behind the SC before the red flag (separate event)."
+  }
+ ]
+}

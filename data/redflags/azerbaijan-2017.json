@@ -1,0 +1,16 @@
+{
+ "race": "azerbaijan-2017",
+ "scheduledLaps": 51,
+ "completedLaps": 51,
+ "timing": "TUM (no red-flag timing)",
+ "redFlags": [
+  {
+   "lap": 22,
+   "resumeLap": 23,
+   "restart": "rolling",
+   "restartScLaps": 0,
+   "source": "Wikipedia, 2017 Azerbaijan Grand Prix: 'the race was red-flagged on lap 22', 'the race was restarted behind the safety car' (https://en.wikipedia.org/wiki/2017_Azerbaijan_Grand_Prix); E. Karanja, GTspirit, 25 Jun 2017: 'Race has been halted temporarily after 22 laps', 'The safety car led the field and exited on lap 23 after restart' (https://gtspirit.com/?p=205699); Wikipedia, 'List of red-flagged Formula One races' (https://en.wikipedia.org/wiki/List_of_red-flagged_Formula_One_races): lap 22 (citing BBC Sport); Jolpica lap times (api.jolpi.ca/ergast/f1/2017/8/laps), leader's lap 23 took 1480s (the stoppage), lap 24 at green pace (109s)",
+   "note": "Resumed behind the SC (the 2005-2017 rule), which came in at the end of the stoppage lap 23, so no extra SC laps after it. SC periods before it (laps 12-19 and 20-22) are separate events."
+  }
+ ]
+}

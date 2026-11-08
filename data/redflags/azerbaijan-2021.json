@@ -1,0 +1,15 @@
+{
+ "race": "azerbaijan-2021",
+ "scheduledLaps": 51,
+ "completedLaps": 51,
+ "timing": "FastF1",
+ "redFlags": [
+  {
+   "lap": 48,
+   "restart": "standing",
+   "restartScLaps": 0,
+   "source": "GrandPrix.com, Azerbaijan GP 2021 race notes: 'On lap 46 Verstappen's left rear tyre fails ... The safety car is deployed', 'On lap 48 the red flag comes out and the race is stopped', 'The FIA announces that they will restart with a standing start' (https://www.grandprix.com/races/azerbaijan-gp-2021-race-notes.html); Wikipedia, 2021 Azerbaijan Grand Prix: 'the race was restarted on lap 50 with a standing start', 'two laps remaining' (https://en.wikipedia.org/wiki/2021_Azerbaijan_Grand_Prix); Wikipedia, 'List of red-flagged Formula One races' (https://en.wikipedia.org/wiki/List_of_red-flagged_Formula_One_races): lap 48",
+   "note": "Conflict: the same GrandPrix.com page's summary says 'After a red flag at lap 49'; its lap-by-lap text and the Wikipedia list say 48, taken. Jolpica: leader's lap 49 holds the stoppage (2185s); standing restart on lap 50, two racing laps."
+  }
+ ]
+}
