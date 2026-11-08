@@ -15,7 +15,7 @@ import math
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from . import race_rules, redflag
+from . import race_rules, redflag, refuel
 from .legend import legend_events, legend_loss, real_flags
 from .paths import GOLDEN_DIR
 from .rng import Mulberry32, derive_seed
@@ -63,6 +63,9 @@ class Car:
     wet_pace: float = 0.0
     # A stop-go owed for entering a closed pit lane (race_rules; 2007-08).
     stop_go: float = 0.0
+    # A refuelling race (refuel.py): fuel on board in laps, and the race's laps.
+    tank: float | None = None
+    race_laps: int = 0
 
     def __post_init__(self):
         if self.tyre_wear is None:
@@ -118,6 +121,7 @@ def _clean_lap(
     if wear > c["cliffLap"]:  # past the cliff: wear accelerates
         extra = c.get("cliffDegPerLap", CLIFF_FALLBACK * c["degPerLap"])
         t += extra * (wear - c["cliffLap"])
+    t += refuel.tank_weight_delta(car, fuel_per_lap, lap)  # refuelling: the weight resets
     if weather:
         w = wetness(weather, lap)
         t *= 1 + wet_penalty(weather, car.compound, lap) + car.wet_pace * min(1.0, w / 0.1)
@@ -247,6 +251,7 @@ def simulate(
             wet_pace=d.get("wetPace", 0.0),
         )
 
+    refuel.init_tanks(model, cars)  # refuelling (refuel.py): every car's takeover tank
     order = [d["code"] for d in ordered]
     stream = {d["code"]: i for i, d in enumerate(model["drivers"])}
     noise_rngs = {c: Mulberry32(derive_seed(seed, stream[c])) for c in cars}
@@ -283,9 +288,15 @@ def simulate(
                     car.tyre_wear = 0.0
                 default = {"SC": pit_loss_sc, "VSC": pit_loss_vsc}.get(flag, pit_loss)
                 loss = legend_loss(pit, lap, flag, real) if real is not None else pit.get("loss")
-                # A red flag's stoppage: the tyre change there is free (redflag.py).
-                if lap not in red["free"]:
+                # A red flag's stoppage: the tyre change there is free (redflag.py), the fill too.
+                free = lap in red["free"]
+                if not free:
                     pit_cost += default if loss is None else loss
+                # Refuelling (refuel.py): fill for the next stint; the fill time over the base.
+                if car.tank is not None:
+                    fill_time = refuel.refuel_at_stop(model, car, pit, lap)
+                    if not free:
+                        pit_cost += fill_time
                 # Era rules: an added stop into a closed pit lane (2007-08) owes a stop-go.
                 if pit.get("added") and race_rules.pit_lane_closed(model, neutral, lap, pit["to"]):
                     car.stop_go += race_rules.stop_go_cost(model)
@@ -312,6 +323,7 @@ def simulate(
             car.total_time += lt + pit_cost
             car.tyre_age += 1
             car.tyre_wear += weather_wear(weather, car.compound, lap)
+            refuel.burn_tank(car)
             car.laps_done = lap
 
         for code in retire_at.get(lap, ()):

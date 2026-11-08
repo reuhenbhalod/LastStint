@@ -99,6 +99,7 @@ export interface RuleSwitchable {
   ers?: unknown;
   neutralization?: { scPerLap: number; vscPerLap: number };
   incidents?: { scShare: number };
+  fuel?: { burnPerLap: number };
 }
 
 /** Where a battery comes from when the race has one and its era block doesn't. */
@@ -112,7 +113,8 @@ const cache = new WeakMap<RaceModel, unknown>();
  * `overtake-button`), and `kers` / `hybrid` in an era block without one borrows the battery
  * of the era that raced it (rates copied, not tuned). `vsc: false` sets the VSC base rate to
  * 0 (grader playouts never draw one) and makes every crash a SC (`scShare` 1: the draw is
- * still taken, so the streams don't move). Without rules it is the era block itself.
+ * still taken, so the streams don't move). `refuelling` drops the fuel load and `fuelLimit`
+ * sets its burn (eras build plan 4.2). Without rules it is the era block itself.
  */
 export function headsetFor<T extends RuleSwitchable>(
   blocks: Record<string, T>,
@@ -120,7 +122,16 @@ export function headsetFor<T extends RuleSwitchable>(
 ): T | undefined {
   const base = blocks[model.era];
   const r = model.rules;
-  if (!base || !r || (r.drs === undefined && r.ers === undefined && r.vsc !== false)) return base;
+  if (
+    !base ||
+    !r ||
+    (r.drs === undefined &&
+      r.ers === undefined &&
+      r.vsc !== false &&
+      r.refuelling !== true &&
+      r.fuelLimit === undefined)
+  )
+    return base;
   if (cache.has(model)) return cache.get(model) as T;
   const out: T = { ...base, modes: { ...base.modes } };
   if (r.drs !== undefined) out.drs = r.drs;
@@ -131,6 +142,12 @@ export function headsetFor<T extends RuleSwitchable>(
     const from = blocks[ERS_SOURCE[r.ers]];
     out.ers = from?.ers;
     out.modes.ers = from?.modes.ers;
+  }
+  // Eras build plan 4.2 (refuel.ts): a refuelling race has no fuel load (the tank replaces
+  // it); a fuel-limit race's standard burn is its allowance over the distance.
+  if (r.refuelling === true) out.fuel = undefined;
+  else if (r.fuelLimit !== undefined && out.fuel) {
+    out.fuel = { ...out.fuel, burnPerLap: r.fuelLimit / model.race.laps };
   }
   if (r.vsc === false) {
     if (out.neutralization) out.neutralization = { ...out.neutralization, vscPerLap: 0 };
@@ -170,8 +187,8 @@ export function twoCompoundRule(rules: RaceRules | undefined): boolean {
 /**
  * True if a stop from `from` onto `stop.to` fits new tyres. With `tyreChanges: false` (2005) a
  * stop keeps the set unless the set is damaged (a puncture's stop) or the change is for the
- * weather (to or from a wet tyre). Such a stop only refuels: eras build plan 4.2 adds the
- * refuelling; until then it costs its pit loss and nothing else.
+ * weather (to or from a wet tyre). Such a stop only refuels (refuel.ts refuelAtStop, with
+ * the race's `refuelling`).
  */
 export function stopChangesTyres(
   rules: RaceRules | undefined,

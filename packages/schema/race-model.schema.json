@@ -143,6 +143,44 @@
         },
         "vscLapTime": {
           "type": "number"
+        },
+        "refuel": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "A refuelling race's fill model, fitted from the real stops (eras build plan 4.2, pipeline refuel.py): lane time = laneBase + secondsPerLap x laps of fuel added. Absent: the pooled prior.",
+          "required": [
+            "secondsPerLap",
+            "laneBase",
+            "refFill",
+            "tankLaps",
+            "stops"
+          ],
+          "properties": {
+            "secondsPerLap": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Fill time per lap of fuel added (s)."
+            },
+            "laneBase": {
+              "type": "number",
+              "description": "The fitted pit-lane time of a stop adding no fuel (s)."
+            },
+            "refFill": {
+              "type": "number",
+              "minimum": 0,
+              "description": "The mean fill of the real stops (laps): what pitLoss already holds."
+            },
+            "tankLaps": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "The longest real stint (laps): the tank's capacity less the reserve."
+            },
+            "stops": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Real stops in the fit."
+            }
+          }
         }
       }
     },

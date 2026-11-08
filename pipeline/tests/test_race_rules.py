@@ -14,7 +14,7 @@ from pathlib import Path
 
 import pytest
 
-from pipeline import export, race_rules, sim_reference
+from pipeline import export, race_rules, refuel, sim_reference
 from pipeline.paths import DATA_DIR, GOLDEN_DIR, RACES_DIR
 
 VECTORS = Path(__file__).parent / "fixtures" / "race_rules_parity.json"
@@ -352,7 +352,12 @@ def test_every_appendix_race_has_its_rules_overlay():
     for race_id in ids:
         overlay = json.loads((DATA_DIR / "eras" / f"{race_id}.json").read_text())
         rules = overlay["rules"]
-        assert rules == race_rules.rules_for_year(race_rules.race_year(race_id)), race_id
+        # 4.1's keys, plus refuelling / fuelLimit (eras build plan 4.2, refuel.py).
+        want = {
+            **race_rules.rules_for_year(race_rules.race_year(race_id)),
+            **refuel.r4_rules_for_year(race_rules.race_year(race_id)),
+        }
+        assert rules == want, race_id
         # The block validates against the schema (on a copy of a real race).
         export.validate_model({**base, "rules": rules})
 

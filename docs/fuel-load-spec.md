@@ -42,3 +42,23 @@ Ticket 46, "Add fuel load management". The headset's Fuel setting (normal / lift
 
 - A race with long safety cars (Abu Dhabi 2021's VSC and SC) saves a lot of fuel. A car that's short at the takeover is often back on target after a neutralization, as in a real race.
 - The values are estimates to tune by playtesting, like the rest of the headset.
+
+## Refuelling and fuel limits (eras build plan 4.2)
+
+The race's `rules` switch these on (`packages/sim/src/refuel.ts`, `pipeline/src/pipeline/refuel.py`, which has the sources). Without them nothing changes.
+
+**Refuelling** (`rules.refuelling`, 1994–2009 and 1983). Every car carries a tank (`car.tank`), counted in laps of fuel at the standard burn. There is no fuel load in kg in these races: the tank replaces it.
+- At the takeover a car carries the fuel to the end of its next stop's in-lap (or the flag), plus a reserve of 1 lap (`RESERVE_LAPS`).
+- A stop fills the tank to the next stint plus the reserve. The weight resets with it: a lap costs `fuelEffectPerLap × (tank − (laps − lap + 1))` over the single-tank model, so a single-tank car is today's model.
+- A real stop keeps its measured loss. Any other stop pays the pit loss plus `secondsPerLap × (fill − refFill)`. `track.refuel` holds the fill rate, fitted per race from the F1DB stop times against the next stint's length and shrunk toward the pool of every refuelling race.
+- The player's fill (the `fill` on a pit call; standard if absent). R is the laps from the out-lap to the flag, T is the tank (`track.refuel.tankLaps`, the longest real stint), and n = ⌈R / T⌉ is the fewest stints to the flag:
+  - **long:** min(R, T), a full tank (to the flag if it fits);
+  - **standard:** ⌈R / n⌉, the fewest stops from here, split evenly;
+  - **short:** ⌈R / (n + 1)⌉, one stop more, split evenly.
+  The fill adds the reserve and subtracts what is still in the tank. `fillOptions(model, outLap)` gives each choice's laps for the pit card.
+- In live play with incidents, the player's tank burns by the modes (lift and coast 0.85…) and by `neutralBurn` under a SC or VSC. An empty tank stops the car. Replays burn 1 lap of fuel a lap, and the grader's playouts never stop a car on an empty tank. `tankReading(model, car, lap)` gives the laps on board, the laps to empty, the last in-lap and whether the fuel reaches the flag.
+
+**Fuel limits** (`rules.fuelLimit` in kg, 1984–88). The tank above, with no refuelling:
+- The standard burn is the allowance over the distance.
+- An empty tank stops the car, instead of costing `dryLapDelta`.
+- The allowances are 220 L (1984–85), 195 L (1986–87) and 150 L (1988), turbo cars only. They are converted at 0.85 kg/L, AGIP's turbo-era fuel.

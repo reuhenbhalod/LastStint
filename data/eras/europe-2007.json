@@ -5,6 +5,7 @@
     "pitLaneClosedUnderSC": true,
     "vsc": false,
     "drs": false,
-    "ers": "none"
+    "ers": "none",
+    "refuelling": true
   }
 }
