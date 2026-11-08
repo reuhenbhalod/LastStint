@@ -1,3 +1,4 @@
+import { difficultyForEra } from '@laststint/sim';
 // MOCK Eras API, for building the Eras screens before the Worker endpoints exist (build-plan
 // step 7.2). Not the real thing: no player progress, no gating, and every attempt is on the
 // one bundled race file (Abu Dhabi 2021, Era 9 race 10); an attempt on any other race is
@@ -22,12 +23,18 @@ const MOCK_ERA_ID = 9;
 const MOCK_MODEL_URL = `mock://races/${MOCK_RACE_ID}`;
 
 /** Spec §7 play order 2 (Era 9): the mock's attempt difficulty. */
-const MOCK_DIFFICULTY: EraDifficulty = {
-  strategistThreshold: 72,
-  information: 'full',
-  rivalPolicy: 'standard',
-  timerSeconds: 45,
-};
+// Era 9's settings, straight from the Eras config.
+const MOCK_DIFFICULTY: EraDifficulty = (({
+  accuracyThreshold,
+  information,
+  rivalPolicy,
+  decisionTimerSeconds,
+}) => ({
+  accuracyThreshold,
+  information,
+  rivalPolicy,
+  decisionTimerSeconds,
+}))(difficultyForEra(9));
 
 function summary(eraId: number): EraSummary {
   const era = eraById(eraId);

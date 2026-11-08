@@ -37,7 +37,7 @@ describe('EraProvider', () => {
       source: 'practice',
     });
     expect(daily.model.race.id).toBe(MOCK_RACE_ID);
-    expect(daily.difficulty).toMatchObject({ information: 'full', timerSeconds: 45 });
+    expect(daily.difficulty).toMatchObject({ information: 'full', decisionTimerSeconds: 45 });
   });
 
   it('starts a fresh attempt on every load, with Legend passed through', async () => {

@@ -1,3 +1,4 @@
+import type { DifficultySettings } from '@laststint/sim';
 // The Eras API as the client sees it (docs/laststint-eras-mode-spec.md §13). The Worker
 // endpoints are build-plan step 7.2 and don't exist yet, so the app runs on the mock in
 // mockErasApi.ts; swap `erasApi` for an HTTP client once the endpoints are up.
@@ -37,18 +38,12 @@ export interface EraDetail extends EraSummary {
   races: EraRaceSummary[];
 }
 
-export type InformationLevel = 'full' | 'reduced' | 'limited' | 'minimal';
-export type RivalPolicy = 'standard' | 'standard+' | 'smart' | 'expert';
-
-/** The era's difficulty settings for an attempt (spec §7). */
-export interface EraDifficulty {
-  /** ★2 accuracy threshold, 0–100. */
-  strategistThreshold: number;
-  information: InformationLevel;
-  rivalPolicy: RivalPolicy;
-  /** Decision timer in seconds. */
-  timerSeconds: number;
-}
+/**
+ * The era's difficulty settings for an attempt (spec §7). One definition, shared with the
+ * worker and the sim: `packages/sim/src/eras/config.ts` (step 1.3).
+ */
+export type { InformationLevel, RivalPolicy } from '@laststint/sim';
+export type EraDifficulty = DifficultySettings;
 
 /** `POST /api/eras/attempts`: `{ raceId, legend }`. */
 export interface AttemptRequest {
