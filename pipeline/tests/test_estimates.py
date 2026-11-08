@@ -14,7 +14,18 @@ import pandas as pd
 import pytest
 from typer.testing import CliRunner
 
-from pipeline import build, clean, cli, estimates, events, export, ingest, jolpica, paths
+from pipeline import (
+    build,
+    clean,
+    cli,
+    estimates,
+    events,
+    export,
+    ingest,
+    jolpica,
+    paths,
+    refuel,
+)
 
 FIXTURE = Path(__file__).parent / "fixtures" / "jolpica" / "csv-2026-10-24"
 # Jolpica drivers with no usable repo code yet (step 2.6 adds them to data/drivers.json); the
@@ -106,7 +117,105 @@ def test_two_compounds_from_2007_honour_the_both_compounds_rule(estimated):
     # One compound per stint.
     assert (laps.groupby(["Driver", "Stint"])["Compound"].nunique() == 1).all()
     stints = estimated["abu-dhabi-2012"].block["compounds"]["stints"]
-    assert {s["by"] for s in stints} <= {"pace", "rule", "default"}
+    assert {s["by"] for s in stints} <= {"pace", "rule", "default", "q3"}
+
+
+ABU_DHABI_2012_OPTION_START = {"HAM", "WEB", "MAL", "RAI", "BUT", "ALO", "ROS", "MAS", "GRO"}
+
+
+def test_option_starters_are_q3_cars_that_started_in_the_top_ten(raw):
+    side = raw["abu-dhabi-2012"].sidecar
+    starters, why = estimates.option_starters(2012, side)
+    # VET was in Q3 but excluded (grid 24, a pit-lane start: free choice); HUL started 10th
+    # without a Q3 time.
+    assert starters == ABU_DHABI_2012_OPTION_START and why is None
+
+
+@pytest.mark.parametrize("year", [2009, 2014, 2020])
+def test_no_q3_tyre_rule_outside_2010_2013(raw, year):
+    assert estimates.option_starters(year, raw["abu-dhabi-2012"].sidecar) == (None, None)
+
+
+def test_a_sidecar_without_q3_says_the_rule_wasnt_applied(raw):
+    side = {k: v for k, v in raw["abu-dhabi-2012"].sidecar.items() if k != "q3"}
+    starters, why = estimates.option_starters(2012, side)
+    assert starters is None and "re-ingest" in why
+    block = estimates.estimate_race(
+        "abu-dhabi-2012", raw["abu-dhabi-2012"].laps, 2012, sidecar=side
+    ).block
+    assert any(n.startswith("Q3 tyre rule not applied") for n in block["compounds"]["notes"])
+    assert all(s["by"] != "q3" for s in block["compounds"]["stints"])
+
+
+def test_the_top_ten_start_on_the_option_from_2010_to_2013(estimated):
+    est = estimated["abu-dhabi-2012"]
+    stints = est.block["compounds"]["stints"]
+    first = {}
+    for s in sorted(stints, key=lambda s: s["stint"]):
+        first.setdefault(s["driver"], s)
+    for driver in ABU_DHABI_2012_OPTION_START:
+        assert (first[driver]["compound"], first[driver]["by"]) == (estimates.OPTION, "q3")
+    assert sum(s["by"] == "q3" for s in stints) == len(ABU_DHABI_2012_OPTION_START)
+    # The laps carry it, and a car that stopped still runs both compounds.
+    laps = est.laps
+    ham = laps[(laps["Driver"] == "HAM") & (laps["Stint"] == laps["Stint"].min())]
+    assert (ham["Compound"] == estimates.OPTION).all()
+    used = laps.groupby("Driver").agg(stints=("Stint", "nunique"), used=("Compound", "nunique"))
+    assert (used.loc[used["stints"] >= 2, "used"] == 2).all()
+    assert "Q3 tyre rule" in est.block["compounds"]["method"]
+    assert any("top-ten first stints set to SOFT" in n for n in est.block["compounds"]["notes"])
+
+
+def test_a_forced_stint_never_flips():
+    scores = pd.DataFrame(
+        {
+            "Driver": ["AAA", "AAA", "AAA"],
+            "Stint": [1.0, 2.0, 3.0],
+            "softness": [1.0, 3.0, 2.0],
+        }
+    )
+    # The median is 0.75, so AAA's three stints all score SOFT and one must flip to HARD.
+    # Stint 1 is the closest to HARD, but the Q3 rule fixed it: stint 3 (the closer of the
+    # two free ones) flips.
+    others = pd.DataFrame(
+        {"Driver": ["BBB"] * 3, "Stint": [1.0, 2.0, 3.0], "softness": [-3.0, -2.0, 0.5]}
+    )
+    label, why = estimates.assign_two_compounds(
+        pd.concat([scores, others]), {("AAA", 1.0): estimates.OPTION}
+    )
+    assert (label[("AAA", 1.0)], why[("AAA", 1.0)]) == ("SOFT", "q3")
+    assert label[("AAA", 2.0)] == "SOFT"
+    assert (label[("AAA", 3.0)], why[("AAA", 3.0)]) == ("HARD", "rule")
+
+
+def test_a_forced_first_stint_overrides_the_fit():
+    """Two cars, a long first stint each (the fit calls it the prime); the Q3 rule puts AAA's
+    on the option and the both-compounds rule then makes its second stint the prime."""
+    rows = []
+    for driver in ("AAA", "BBB"):
+        for n in range(1, 41):
+            stint = 1 if n <= 30 else 2
+            age = n if stint == 1 else n - 30
+            rows.append(
+                {
+                    **dict.fromkeys(ingest.LAP_COLUMNS),
+                    "Driver": driver,
+                    "LapNumber": float(n),
+                    "LapTime": 90.0 + 0.05 * age,
+                    "Stint": float(stint),
+                    "TyreLife": float(age),
+                    "TrackStatus": "1",
+                    "IsAccurate": True,
+                }
+            )
+    laps = pd.DataFrame(rows)
+    plain = estimates.estimate_compounds(laps, 2011, 1.7, False)
+    assert {(s["driver"], s["stint"]): s["compound"] for s in plain.stints}[("AAA", 1)] == "HARD"
+    got = estimates.estimate_compounds(laps, 2011, 1.7, False, {"AAA", "ZZZ"})
+    label = {(s["driver"], s["stint"]): (s["compound"], s["by"]) for s in got.stints}
+    assert label[("AAA", 1)] == ("SOFT", "q3") and label[("AAA", 2)][0] == "HARD"
+    assert label[("BBB", 1)][0] == "HARD"  # not a Q3 starter: as fitted
+    assert "1 top-ten first stints set to SOFT by the Q3 tyre rule (1 the fit" in got.notes[0]
 
 
 def test_real_compounds_are_never_relabelled():
@@ -332,6 +441,20 @@ def test_fuel_loads_are_stint_laps_times_the_burn(estimated):
         assert s["fuelKg"] == pytest.approx(s["laps"] * 1.7, abs=0.05)
     rai = [s for s in fuel["stints"] if s["driver"] == "RAI"]
     assert sum(s["laps"] for s in rai) == 53 and len(rai) == 3
+
+
+def test_the_fill_rate_is_labelled_an_estimate(estimated):
+    """A refuelling race's fill rate (refuel.py's physical prior) is listed with its fuel
+    loads, so the race file's provenance (fuelLoads) covers it, and the report says so."""
+    block = estimated["japan-2005"].block
+    assert block["fuelLoads"]["fillRate"] == refuel.FILL_RATE_METHOD
+    assert "an estimate, 0.25 s per lap of fuel" in block["fuelLoads"]["fillRate"]
+    assert estimates.provenance(block["estimated"])["estimated"] == [
+        "compounds",
+        "safetyCars",
+        "fuelLoads",
+    ]
+    assert refuel.FILL_RATE_METHOD in "\n".join(estimates.report_lines(block))
 
 
 def test_no_fuel_loads_without_refuelling(estimated):

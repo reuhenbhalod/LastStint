@@ -477,3 +477,105 @@ the 2009 / 2011 / 2012 Jolpica constructors' standings, as for 2014-2016).
 test_committed_rates_match_the_raw_timelines` fails until it's regenerated: the three Jolpica
 races' estimated SC timelines are new in data/raw), `apps/worker/src/races.gen.ts` and the
 parity fixtures.
+
+## Eras fix D2b: top ten on the option (2010-13) and the physical fill rate: 3 pass, 0 borderline, 5 fail
+
+Owner decisions of Nov 7 2026. Written by hand, as the sections above. Robust mode: 1,000 runs on
+each of two seed sets, values seed set 10000 / seed set 20000, limits in brackets.
+
+**1. The top ten start on the option (2010-2013).** The rule: "At the start of the race each car
+which took part in Q3 must be fitted with the tyres with which the driver set his grid time.
+This will only be necessary if dry-weather tyres were used to set the grid time and if
+dry-weather are used at the start of the race". That is FIA F1 Sporting Regulations 2010, art.
+25.4(d), and 2013, art. 25.4(e), with the same words; both texts were read from the FIA PDFs
+via web.archive.org, and 2011-12 weren't fetched. From 2014 the rule bound a Q3 car to the
+tyres of its fastest **Q2** time (2014 regulations, art. 25.4(e)). It was scrapped from 2022
+(Wikipedia, "2022 Formula One World Championship"; Motorsport.com, Feb 19 2022). So the Q3 tyre
+rule ran 2010-2013 (`estimates.Q3_TYRE_RULE`).
+
+How it's estimated:
+- `pipeline jolpica` now reads each round's Q3 classification into the sidecar (`q3`). Jolpica
+  lists a Q3 car only if it set a time there.
+- `estimates.option_starters` takes the Q3 cars that also started in the top ten.
+  - A Q3 car starting further back is left to the fit. A grid penalty kept the rule, but an
+    exclusion or a pit-lane start freed the choice (abu-dhabi-2012 VET, grid 24), and the grid
+    can't tell them apart.
+  - A 2010-13 sidecar without `q3` gets a note, not a silent skip.
+- Each of those cars' first stint is labelled SOFT (`by: "q3"`), never flipped. The rest are
+  fitted as before: the median threshold over every scored stint, then the both-compounds rule.
+
+All eight Jolpica 2010-13 races were re-ingested (`pipeline jolpica <id> --force`; `pipeline
+wet-laps <id> --force` for the three wet ones) and rebuilt. Their SC laps, status timelines,
+weather and hand-check files are unchanged. spain-2013's labels didn't change (the fit already
+had the top ten on SOFT), so its race file is the same.
+
+| Race | Top-ten first stints forced (fit alone said HARD) | Before | After | Mean gap error before -> after | Failing checks after |
+|---|---|---|---|---|---|
+| abu-dhabi-2010 | 10 (2) | fail | fail | 2.89s -> 2.93s | field ROS gap error 6.81 / 6.67 [5.00] (was 7.16 / 7.18); field KUB 7.28 / 7.18 [5.00] (was 7.33 / 7.42) |
+| china-2011 | 9 (1) | fail | fail | 3.01s -> 3.07s | duel HAM vs VET gap error 4.34 / 4.42 [3.00] and order rate 0.49 / 0.48 [0.60]; podium order rate 0.41 / 0.38 [0.50]; field MAS gap error 5.85 / 5.74 [5.00] |
+| europe-2012 | 10 (4) | pass | pass | 1.70s -> 1.45s |  |
+| abu-dhabi-2012 | 9 (7) | fail | fail | 2.61s -> 2.80s | duel VET vs BUT gap error 3.59 / 3.51 [3.00] and order rate 0.52 / 0.53 [0.60] (ALO's podium error 5.21 / 5.16 now passes) |
+| spain-2013 | 10 (0) | pass | pass | 1.71s -> 1.71s |  |
+| australia-2010 (wet) | 10 (3) | fail | fail | 3.35s -> 3.35s | field ROS gap error 11.44 / 11.03 [5.00]; field HAM 4.74 / 5.05 [5.00] (was within) |
+| brazil-2012 (wet) | 9 (3) | fail | fail | 3.32s -> 3.30s | duel VET vs ALO gap error 4.74 / 4.77 [3.00]; field VET 6.77 / 6.81 [5.00] |
+| malaysia-2013 (wet) | 10 (1) | pass | pass | 0.83s -> 0.86s |  |
+
+What changed:
+- **abu-dhabi-2012: the swapped labels are fixed.** WEB, MAL, RAI, BUT and ALO now run
+  SOFT then HARD (their second stints are now HARD), not HARD then
+  SOFT.
+  - The refitted curves: HARD offset 0.56 -> 0.61 s, SOFT wear 0.043 -> 0.048 s a lap.
+  - ALO's podium gap now passes (sim mean 5.25 s behind RAI, was 6.12; real 0.85), and BUT
+    moves closer to his real gap (8.88 s, was 9.63; real 7.79).
+  - VET's labels didn't change (his pit-lane start isn't forced: SOFT 1-13, HARD 14-37, SOFT
+    38-55). The refit costs his long hard stint, so he finishes 8.79 s back (was 8.01; real
+    4.16), level with BUT (real gap 3.6 s). The duel order is a coin flip and the duel fails.
+  - The diagnosis is still race mechanics (pace 5%, rest 95%). Whether VET really started on
+    the option isn't in the data: no knob is applied.
+- **china-2011:** HAM's first stint is now SOFT, as the 3.1c section asked. The duel barely
+  moves (4.17 -> 4.34 s), as that section's in-memory flip predicted: the late-catch timing is
+  the cause.
+- **australia-2010:** the start was wet (wet laps 1-10), so the rule didn't bind (the
+  regulation's own exception). `wet-laps` relabels the inter first stints anyway, but the
+  both-compounds rule has already run on the forced SOFT.
+  - VET's laps 10-25 went SOFT -> HARD, and WEB's last two laps likewise. WEB's laps 1-10
+    (which `wet-laps` fits as slick) went HARD -> SOFT.
+  - The refit curves put HAM's gap over the limit on one seed set (5.05).
+  - malaysia-2013 (also a wet start, wet laps 1-9) changed one stint (WEB's laps 44-56, SOFT
+    -> HARD) and moved by 0.03 s.
+  - The estimator can't see a wet start (it runs before `wet-laps`). A wet-start exemption
+    needs the wet-laps fit first, so it's reported, not built.
+- **sakhir-2020** (not rebuilt): the 2010-13 rule doesn't apply in 2020. That year's rule bound
+  the top ten to their Q2 tyre, which needn't be the softest. As a check, the rule was forced
+  in memory: the race still passes, but the mean gap error goes 0.96 -> 1.10 s. So it doesn't
+  help.
+  - The race used all three compounds (C2-C4; the race report has Bottas "on his worn hard
+    tyres" against the field's "fresher mediums" and Russell's late softs). The estimator
+    gives two, and the real fix is a three-compound estimate. **Reported, not built.**
+
+**2. The fill rate is pinned to the physical figure.** The prior is 0.25 s per lap of fuel:
+about 3 L a lap through a rig of "more than 12 litres per second" (Wikipedia, "Pit stop"),
+3 / 12 = 0.25.
+- **The prior sd is 0.01 s.** That is half the 0.22-0.27 s spread the two figures allow, and
+  it's enough that no single race's stops move it far. Fitted on each of the 30 refuelling
+  races in data/raw/f1db, the rates run from 0.199 to 0.252 s, with a median of 0.247.
+  - The most precise race (europe-2007, se 0.025, a negative slope) gives 0.20.
+  - A precise race sitting exactly on the stops' old pooled slope (0.0648) stays above 0.22
+    (tested).
+- **Both sims are updated** (refuel.py, refuel.ts) and the parity fixture is regenerated. Only
+  its no-fit case (canada-2024 on the prior) changed.
+- **A long fill costs more.** At a typical stop a long fill now costs about 4 s more than a
+  short one: Hungary 1998, out on lap 30 with 48 laps to go, fills 33 laps long and 16 short.
+  That's 4.09 s on the race's own fit (0.2405 s a lap; Python test) and 4.25 s at the prior
+  (TS test). At the old prior it was 1.1 s.
+- **It's labelled an estimate.** Provenance lists `fuelLoads` for every refuelling race; the
+  sidecar's `fuelLoads.fillRate` and the build report name the rate.
+- **G1 doesn't move:** no race file in data/races is a refuelling race yet.
+- **Reported, not fixed:** `refuel.fit_fill_rate` isn't called by the build yet, so a
+  refuelling race file built today has no `track.refuel`. It would take the prior with
+  `refFill` 0, charging the whole fill (about 5 s for 20 laps) on top of a pit loss that
+  already holds a typical fill. It must be wired in (assemble.py, another agent's file)
+  before Eras 3-5 ship.
+
+Daily and Gauntlet race files and goldens are unchanged. The seven changed race files are
+all `eras` races. Their goldens are regenerated, and the TS sim matches them (`pnpm test`).

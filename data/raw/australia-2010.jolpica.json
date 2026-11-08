@@ -656,6 +656,48 @@
    }
   ]
  },
+ "q3": [
+  {
+   "driver": "VET",
+   "position": 1
+  },
+  {
+   "driver": "WEB",
+   "position": 2
+  },
+  {
+   "driver": "ALO",
+   "position": 3
+  },
+  {
+   "driver": "BUT",
+   "position": 4
+  },
+  {
+   "driver": "MAS",
+   "position": 5
+  },
+  {
+   "driver": "ROS",
+   "position": 6
+  },
+  {
+   "driver": "MSCM",
+   "position": 7
+  },
+  {
+   "driver": "BAR",
+   "position": 8
+  },
+  {
+   "driver": "KUB",
+   "position": 9
+  },
+  {
+   "driver": "SUT",
+   "position": 10
+  }
+ ],
  "raceTimeCheck": [
   {
    "driver": "BUT",
@@ -779,7 +821,7 @@
    "handCheck": "data/estimates/australia-2010.sc.json"
   },
   "compounds": {
-   "method": "two compounds (SOFT option, HARD prime) from each stint's pace step and wear (tyre life), with the both-compounds rule",
+   "method": "two compounds (SOFT option, HARD prime) from each stint's pace step and wear (tyre life), with the both-compounds rule; the top ten start on the SOFT (the Q3 tyre rule, 2010)",
    "stints": [
     {
      "driver": "ALG",
@@ -790,7 +832,9 @@
      "by": "wet-laps",
      "cleanLaps": 0,
      "paceStep": null,
-     "softness": null
+     "softness": null,
+     "dry": "SOFT",
+     "dryBy": "default"
     },
     {
      "driver": "ALG",
@@ -823,7 +867,9 @@
      "by": "wet-laps",
      "cleanLaps": 0,
      "paceStep": null,
-     "softness": null
+     "softness": null,
+     "dry": "SOFT",
+     "dryBy": "q3"
     },
     {
      "driver": "ALO",
@@ -845,7 +891,9 @@
      "by": "wet-laps",
      "cleanLaps": 0,
      "paceStep": null,
-     "softness": null
+     "softness": null,
+     "dry": "SOFT",
+     "dryBy": "q3"
     },
     {
      "driver": "BAR",
@@ -889,7 +937,9 @@
      "by": "wet-laps",
      "cleanLaps": 0,
      "paceStep": null,
-     "softness": null
+     "softness": null,
+     "dry": "SOFT",
+     "dryBy": "q3"
     },
     {
      "driver": "BUT",
@@ -911,7 +961,9 @@
      "by": "wet-laps",
      "cleanLaps": 0,
      "paceStep": null,
-     "softness": null
+     "softness": null,
+     "dry": "SOFT",
+     "dryBy": "default"
     },
     {
      "driver": "CHA",
@@ -977,7 +1029,9 @@
      "by": "wet-laps",
      "cleanLaps": 0,
      "paceStep": null,
-     "softness": null
+     "softness": null,
+     "dry": "SOFT",
+     "dryBy": "default"
     },
     {
      "driver": "DLR",
@@ -999,7 +1053,9 @@
      "by": "wet-laps",
      "cleanLaps": 0,
      "paceStep": null,
-     "softness": null
+     "softness": null,
+     "dry": "SOFT",
+     "dryBy": "default"
     },
     {
      "driver": "GLO",
@@ -1021,7 +1077,9 @@
      "by": "wet-laps",
      "cleanLaps": 0,
      "paceStep": null,
-     "softness": null
+     "softness": null,
+     "dry": "HARD",
+     "dryBy": "default"
     },
     {
      "driver": "HAM",
@@ -1076,7 +1134,9 @@
      "by": "wet-laps",
      "cleanLaps": 0,
      "paceStep": null,
-     "softness": null
+     "softness": null,
+     "dry": "SOFT",
+     "dryBy": "default"
     },
     {
      "driver": "KOV",
@@ -1098,7 +1158,9 @@
      "by": "wet-laps",
      "cleanLaps": 0,
      "paceStep": null,
-     "softness": null
+     "softness": null,
+     "dry": "SOFT",
+     "dryBy": "q3"
     },
     {
      "driver": "KUB",
@@ -1120,7 +1182,9 @@
      "by": "wet-laps",
      "cleanLaps": 0,
      "paceStep": null,
-     "softness": null
+     "softness": null,
+     "dry": "SOFT",
+     "dryBy": "default"
     },
     {
      "driver": "LIU",
@@ -1142,7 +1206,9 @@
      "by": "wet-laps",
      "cleanLaps": 0,
      "paceStep": null,
-     "softness": null
+     "softness": null,
+     "dry": "SOFT",
+     "dryBy": "q3"
     },
     {
      "driver": "MAS",
@@ -1160,8 +1226,8 @@
      "stint": 1,
      "fromLap": 1,
      "toLap": 1,
-     "compound": "HARD",
-     "by": "default",
+     "compound": "SOFT",
+     "by": "q3",
      "cleanLaps": 0,
      "paceStep": null,
      "softness": null
@@ -1175,7 +1241,9 @@
      "by": "wet-laps",
      "cleanLaps": 0,
      "paceStep": null,
-     "softness": null
+     "softness": null,
+     "dry": "HARD",
+     "dryBy": "default"
     },
     {
      "driver": "MSCM",
@@ -1208,7 +1276,9 @@
      "by": "wet-laps",
      "cleanLaps": 1,
      "paceStep": null,
-     "softness": null
+     "softness": null,
+     "dry": "SOFT",
+     "dryBy": "default"
     },
     {
      "driver": "PET",
@@ -1230,7 +1300,9 @@
      "by": "wet-laps",
      "cleanLaps": 0,
      "paceStep": null,
-     "softness": null
+     "softness": null,
+     "dry": "SOFT",
+     "dryBy": "q3"
     },
     {
      "driver": "ROS",
@@ -1274,7 +1346,9 @@
      "by": "wet-laps",
      "cleanLaps": 2,
      "paceStep": null,
-     "softness": null
+     "softness": null,
+     "dry": "SOFT",
+     "dryBy": "q3"
     },
     {
      "driver": "VET",
@@ -1285,15 +1359,17 @@
      "by": "wet-laps",
      "cleanLaps": 0,
      "paceStep": null,
-     "softness": null
+     "softness": null,
+     "dry": "SOFT",
+     "dryBy": "q3"
     },
     {
      "driver": "VET",
      "stint": 2,
      "fromLap": 10,
      "toLap": 25,
-     "compound": "SOFT",
-     "by": "pace",
+     "compound": "HARD",
+     "by": "rule",
      "cleanLaps": 15,
      "paceStep": 0.206,
      "softness": 1.056
@@ -1303,8 +1379,8 @@
      "stint": 1,
      "fromLap": 1,
      "toLap": 10,
-     "compound": "HARD",
-     "by": "default",
+     "compound": "SOFT",
+     "by": "q3",
      "cleanLaps": 0,
      "paceStep": null,
      "softness": null
@@ -1336,7 +1412,7 @@
      "stint": 4,
      "fromLap": 57,
      "toLap": 58,
-     "compound": "SOFT",
+     "compound": "HARD",
      "by": "default",
      "cleanLaps": 1,
      "paceStep": null,
@@ -1344,7 +1420,10 @@
     }
    ],
    "notes": [
-    "27 stints too short to score"
+    "10 top-ten first stints set to SOFT by the Q3 tyre rule (3 the fit alone labelled HARD)",
+    "1 stints set by the both-compounds rule",
+    "17 stints too short to score",
+    "wet tyre classes refitted from the lap times by `pipeline wet-laps` (step 4.5): 17 stints on INTERMEDIATE / WET (the snapshot's Compound is final; a relabelled stint keeps 2.4's dry label as `dry`)"
    ]
   },
   "estimated": [

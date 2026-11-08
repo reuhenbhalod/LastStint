@@ -41,6 +41,7 @@ DUMP_ROOT = REPO_ROOT / "pipeline" / "cache" / "eras-sources" / "jolpica"
 DRIVERS_PATH = DATA_DIR / "drivers.json"
 SOURCE = "jolpica"
 RACE = "R"
+Q3 = "Q3"  # the last qualifying segment (2006 on): its cars are the top-ten qualifiers
 STOPS_FROM = 2011  # Jolpica has pit stops from this season on
 
 # SessionEntry.status (jolpica/formula_one/models/session.py, SessionStatus).
@@ -197,6 +198,7 @@ def entries(dump: Dump, session_id: int) -> pd.DataFrame:
     return pd.DataFrame(
         {
             "entry_id": se["id"].astype(int),
+            "round_entry_id": se["round_entry_id"].astype(int),
             "driver_id": driver_id.astype(int),
             "reference": driver_id.map(drivers["reference"]),
             "forename": driver_id.map(drivers["forename"]),
@@ -487,6 +489,36 @@ def standings(dump: Dump, race: Race, ents: pd.DataFrame, codes: Codes) -> dict:
     return {"drivers": drivers, "teams": teams}
 
 
+def q3_classification(
+    dump: Dump, race: Race, ents: pd.DataFrame, codes: Codes
+) -> list[dict] | None:
+    """The cars in the round's Q3 session, in its order ({driver, position}); None when the
+    round has no Q3 (qualifying before 2006, or a dump cut without it). Jolpica lists a Q3
+    car only if it set a time there: the cars a Q3 tyre rule binds (estimates.py)."""
+    sessions = dump["session"]
+    round_id = sessions.loc[sessions["id"] == race.session_id, "round_id"]
+    q3 = sessions[(sessions["round_id"] == round_id.iloc[0]) & (sessions["type"] == Q3)]
+    if q3.empty:
+        return None
+    se = dump["sessionentry"]
+    rows = se[se["session_id"] == int(q3["id"].iloc[0])].sort_values("position")
+    by_round_entry = dict(zip(ents["round_entry_id"], ents["entry_id"], strict=True))
+    out = []
+    for r in rows.itertuples():
+        entry = by_round_entry.get(int(r.round_entry_id))
+        if entry is None:
+            raise IncompleteDataError(
+                f"Q3 entry {r.round_entry_id} of {race.year} {race.name} has no race entry"
+            )
+        out.append(
+            {
+                "driver": codes.by_entry[entry],
+                "position": int(r.position) if pd.notna(r.position) else None,
+            }
+        )
+    return out
+
+
 def race_time_check(df: pd.DataFrame, result: list[dict]) -> list[dict]:
     """Each lead-lap finisher's summed lap times against the official race time."""
     winner_laps = max((r["laps"] or 0) for r in result if r["position"] == 1)
@@ -587,6 +619,7 @@ def load(
         "results": result,
         "retirements": retirements(ents, codes),
         "standings": standings(dump, race, ents, codes),
+        "q3": q3_classification(dump, race, ents, codes),
         "raceTimeCheck": race_time_check(df, result),
     }
     return Ingested(laps=df, facts=facts, sidecar=sidecar)

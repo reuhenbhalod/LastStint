@@ -9,10 +9,12 @@ import abuJson from '../../../data/races/abu-dhabi-2021.json';
 import canadaJson from '../../../data/races/canada-2024.json';
 import vectors from '../../../pipeline/tests/fixtures/refuel_parity.json';
 import {
+  PRIOR_SECONDS_PER_LAP,
   RESERVE_LAPS,
   fillOptions,
   fillStint,
   limitBurnPerLap,
+  refuelAtStop,
   refuelModel,
   takeoverTank,
   tankReading,
@@ -220,10 +222,39 @@ describe('the player in a refuelling race', () => {
     expect(planRemainingStop(ham)).toBeNull();
   });
 
-  it('a race without a fit uses the pooled prior and a tank holding the race', () => {
+  it('a race without a fit uses the physical prior and a tank holding the race', () => {
     const m = tagged(abu, { refuelling: true });
     expect(refuelModel(m).tankLaps).toBe(abu.race.laps);
-    expect(refuelModel(m).secondsPerLap).toBeGreaterThan(0);
+    expect(refuelModel(m).secondsPerLap).toBe(PRIOR_SECONDS_PER_LAP);
+    expect(PRIOR_SECONDS_PER_LAP).toBeCloseTo(3 / 12, 12); // ~3 L a lap at ~12 L/s
+  });
+
+  it('a long fill costs 4-5 s more than a short one at a typical stop', () => {
+    // Hungary 1998's shape (refuel.py's test): 77 laps, a 33-lap tank, the rate at the
+    // physical prior. A first stop out on lap 30 (48 laps to go): long brims the tank (33),
+    // short splits the 48 over three stints (16).
+    const m: RaceModel = {
+      ...tagged(abu, { refuelling: true }),
+      race: { ...abu.race, laps: 77 },
+      track: {
+        ...abu.track,
+        refuel: {
+          secondsPerLap: PRIOR_SECONDS_PER_LAP,
+          laneBase: 25,
+          refFill: 23.6,
+          tankLaps: 33,
+          stops: 31,
+        },
+      },
+    };
+    const cost = (fill: FillChoice) => {
+      const car = { tank: 1, strategy: [] as PitStop[] } as unknown as CarState;
+      return refuelAtStop(m, car, { lap: 29, to: 'HARD', fill }, 30, []);
+    };
+    const delta = cost('long') - cost('short');
+    expect(delta).toBeCloseTo(PRIOR_SECONDS_PER_LAP * (33 - 16), 9);
+    expect(delta).toBeGreaterThanOrEqual(4);
+    expect(delta).toBeLessThanOrEqual(5);
   });
 });
 

@@ -46,7 +46,11 @@ building (eras spec §19).
   - a stop costs the pit-lane time plus the time to put the fuel in;
   - the fuel added is set by the next stint's length;
   - the fill rate is fitted per race from the real stops (stop time against the next stint's
-    length);
+    length), shrunk toward a physical prior of 0.25 s per lap of fuel (~3 L a lap through a
+    ~12 L/s rig: Wikipedia, "Pit stop", "more than 12 litres per second"), prior sd 0.01 s so
+    no single race's noisy stops pull it back toward their pooled slope of 0.065 s (owner
+    decision, Nov 7 2026; an estimate, listed under provenance `fuelLoads`;
+    docs/fuel-load-spec.md);
   - the car's weight resets at each stop.
   - The player chooses the fill (short / standard / long). This extends the fuel-load model
     (`docs/fuel-load-spec.md`) so the tank refills at a stop.
