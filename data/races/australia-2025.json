@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 10,
+  "schemaVersion": 11,
   "race": {
     "id": "australia-2025",
     "name": "Australia 2025: Verstappen vs Norris",
@@ -587,5 +587,14 @@
       0.2,
       0.21
     ]
+  },
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": true,
+    "drs": true,
+    "ers": "hybrid",
+    "refuelling": false
   }
 }

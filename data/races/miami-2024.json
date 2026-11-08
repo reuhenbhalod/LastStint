@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 10,
+  "schemaVersion": 11,
   "race": {
     "id": "miami-2024",
     "name": "Miami 2024",
@@ -555,5 +555,14 @@
     "SAR"
   ],
   "userSide": "VER",
-  "rival": "NOR"
+  "rival": "NOR",
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": true,
+    "drs": true,
+    "ers": "hybrid",
+    "refuelling": false
+  }
 }

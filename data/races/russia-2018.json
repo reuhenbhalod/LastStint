@@ -502,5 +502,14 @@
     "HAR"
   ],
   "userSide": "BOT",
-  "rival": "HAM"
+  "rival": "HAM",
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": true,
+    "drs": true,
+    "ers": "hybrid",
+    "refuelling": false
+  }
 }
