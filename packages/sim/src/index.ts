@@ -113,3 +113,16 @@ export {
   wetnessOn,
 } from './weather.js';
 export * from './eras/config.js';
+export {
+  PIT_CLOSED_SC_LAPS,
+  STOP_GO_SECONDS,
+  allowedFlag,
+  hasMove,
+  pitLaneClosed,
+  resolveRules,
+  scQueue,
+  stopChangesTyres,
+  stopGoCost,
+  twoCompoundRule,
+} from './rules.js';
+export type { ResolvedRules } from './rules.js';

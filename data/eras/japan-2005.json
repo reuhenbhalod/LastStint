@@ -1,0 +1,10 @@
+{
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": false,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none"
+  }
+}

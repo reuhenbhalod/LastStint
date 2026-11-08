@@ -250,8 +250,8 @@ export interface RaceModel {
     takeoverLap: number;
     seed: number;
     /** Which lapped cars unlap before a SC restart: all (the rule, default), only those
-     * between userSide and rival (Abu Dhabi 2021's race-control call), or none (before 2012;
-     * treated as all until eras build plan 4.1). */
+     * between userSide and rival (Abu Dhabi 2021's race-control call), or none (lapped cars
+     * stay a lap down: before 2007 and 2010-11; rules.ts scQueue). */
     scUnlap?: 'all' | 'duel' | 'none';
   };
   era: Era;
@@ -307,6 +307,9 @@ export interface PitStop {
    * the stop's cost; replays and every other car keep it.
    */
   optional?: boolean;
+  /** A stop forced by a damaged tyre (a puncture): it fits new tyres even when a race allows
+   * no tyre changes (rules.tyreChanges false, eras build plan 4.1). */
+  damaged?: boolean;
 }
 
 export interface CarState {
@@ -335,6 +338,8 @@ export interface CarState {
   battery?: number;
   /** Fuel in the tank, kg (the player's car in live play only; fuel load spec). */
   fuel?: number;
+  /** A stop-go penalty owed (s), for entering a closed pit lane (rules.pitLaneClosedUnderSC). */
+  stopGo?: number;
 }
 
 /**
@@ -428,7 +433,8 @@ export interface RaceNote {
     | 'blue' // went round a lapped car; value: the time it gained (negative)
     | 'trust' // value: the change; detail: why (TrustReason)
     | 'rogue' // a furious driver picks his own battle move (detail: the move)
-    | 'fuel'; // fuel load spec: detail 'empty' (the tank ran dry)
+    | 'fuel' // fuel load spec: detail 'empty' (the tank ran dry)
+    | 'stop-go'; // era rules: a closed pit lane's penalty; detail 'owed' | 'served', value: s
   driver: string;
   /** For an incident: 'crash', 'mechanical' or 'puncture'; see the kinds above. */
   detail?: string;
