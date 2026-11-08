@@ -4,6 +4,29 @@
 
 /** Previous season's constructors' standings, champions first, in this season's names. */
 const STANDINGS: Record<number, string[]> = {
+  // 1983 (Eras, reconstructed): the 1982 final standings from the Jolpica dump (2026-10-24,
+  // formula_one_teamchampionship). Fittipaldi (13th) left after 1982 and is dropped. The
+  // teams with no standing (0 points: March, run by RAM, as RAM; Toleman; Theodore, which
+  // took Ensign in) and Spirit, new in 1983, go last in car-number order
+  // (formula_one_roundentry).
+  1983: [
+    'Ferrari',
+    'McLaren',
+    'Renault',
+    'Williams',
+    'Brabham',
+    'Team Lotus',
+    'Tyrrell',
+    'Ligier',
+    'Alfa Romeo',
+    'Arrows',
+    'ATS',
+    'Osella',
+    'RAM',
+    'Theodore',
+    'Toleman',
+    'Spirit',
+  ],
   // 1984-1988 (Eras, reconstructed races): the 1983-1987 final standings from the Jolpica dump
   // (2026-10-24, formula_one_teamchampionship), under each season's names (1986: Toleman is
   // Benetton). A team that left is dropped (Theodore after 1983; ATS after 1984; Renault, Alfa
@@ -200,6 +223,95 @@ const STANDINGS: Record<number, string[]> = {
     'Minardi',
     'Larrousse',
     'Sauber',
+  ],
+  // 1994-1999 (Eras, refuelling): the 1993-1998 final standings from the Jolpica dump
+  // (2026-10-24, formula_one_teamchampionship), under each season's names (1997: Ligier is
+  // Prost, Footwork is Arrows). A team that left is dropped (Lola after 1993; Larrousse and
+  // Team Lotus after 1994; Simtek and Pacific after 1995; Forti after 1996; Tyrrell after
+  // 1998). 1997's Lola, gone after the first race, is dropped too. Teams with no standing
+  // (0 points, or new that season) go last, in car-number order (formula_one_roundentry).
+  1994: [
+    'Williams',
+    'McLaren',
+    'Benetton',
+    'Ferrari',
+    'Ligier',
+    'Team Lotus',
+    'Sauber',
+    'Minardi',
+    'Footwork',
+    'Larrousse',
+    'Jordan',
+    'Tyrrell',
+    'Simtek',
+    'Pacific',
+  ],
+  1995: [
+    'Williams',
+    'Benetton',
+    'Ferrari',
+    'McLaren',
+    'Jordan',
+    'Ligier',
+    'Tyrrell',
+    'Sauber',
+    'Footwork',
+    'Minardi',
+    'Simtek',
+    'Pacific',
+    'Forti',
+  ],
+  1996: [
+    'Benetton',
+    'Williams',
+    'Ferrari',
+    'McLaren',
+    'Ligier',
+    'Jordan',
+    'Sauber',
+    'Footwork',
+    'Tyrrell',
+    'Minardi',
+    'Forti',
+  ],
+  1997: [
+    'Williams',
+    'Ferrari',
+    'Benetton',
+    'McLaren',
+    'Jordan',
+    'Prost',
+    'Sauber',
+    'Tyrrell',
+    'Arrows',
+    'Minardi',
+    'Stewart',
+  ],
+  1998: [
+    'Williams',
+    'Ferrari',
+    'Benetton',
+    'McLaren',
+    'Jordan',
+    'Prost',
+    'Sauber',
+    'Arrows',
+    'Stewart',
+    'Tyrrell',
+    'Minardi',
+  ],
+  1999: [
+    'McLaren',
+    'Ferrari',
+    'Williams',
+    'Jordan',
+    'Benetton',
+    'Sauber',
+    'Arrows',
+    'Stewart',
+    'Prost',
+    'Minardi',
+    'BAR',
   ],
   // 2000 (Eras): the 1999 final standings from the Jolpica dump (2026-10-24,
   // formula_one_teamchampionship), under 2000's names (Stewart is Jaguar). BAR, no points in

@@ -106,6 +106,20 @@ describe('garages', () => {
     expect(garagesFor(1992).find(([t]) => t === 'Team Lotus')).toEqual(['Team Lotus', 'LOT']);
   });
 
+  it('1983 and 1994-1999: the previous champions nearest the exit; renamed teams keep their place', () => {
+    expect(garagesFor(1983).at(-1)).toEqual(['Ferrari', 'FER']);
+    expect(garagesFor(1983)[0]).toEqual(['Spirit', 'SPI']); // new in 1983, highest car number
+    expect(garagesFor(1983)).not.toContainEqual(['Fittipaldi', 'FIT']); // left after 1982
+    expect(garagesFor(1994).at(-1)).toEqual(['Williams', 'WIL']);
+    expect(garagesFor(1994)[0]).toEqual(['Pacific', 'PAC']);
+    expect(garagesFor(1996).at(-1)).toEqual(['Benetton', 'BEN']);
+    // Ligier (1996 6th) races as Prost in 1997, Footwork (9th) as Arrows.
+    expect(garagesFor(1997).findIndex(([t]) => t === 'Prost')).toBe(11 - 6);
+    expect(garagesFor(1997).findIndex(([t]) => t === 'Arrows')).toBe(11 - 9);
+    expect(garagesFor(1999).at(-1)).toEqual(['McLaren', 'MCL']);
+    expect(garagesFor(1999)[0]).toEqual(['BAR', 'BAR']); // new in 1999
+  });
+
   it("has a garage for every team in every race, under the race's own team names", () => {
     for (const file of readdirSync(races).filter((f) => f.endsWith('.json'))) {
       const model = JSON.parse(readFileSync(join(races, file), 'utf8')) as {

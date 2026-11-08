@@ -1,0 +1,436 @@
+{
+  "schemaVersion": 11,
+  "race": {
+    "id": "south-africa-1983",
+    "name": "South Africa 1983: Piquet vs Prost",
+    "laps": 77,
+    "takeoverLap": 25,
+    "seed": 1
+  },
+  "era": "1988-1993",
+  "track": {
+    "pitLoss": 19.131,
+    "pitLossUnderSC": 10.522,
+    "pitLossUnderVSC": 13.2,
+    "pitLossDeviations": [
+      0.0
+    ],
+    "overtakeDifficulty": 0.7875,
+    "overtakeModel": {
+      "intercept": 0.1527,
+      "paceCoef": 0.5355,
+      "gapCoef": -1.755
+    },
+    "dirtyAirPenalty": 0.0939,
+    "greenLapTime": 74.706
+  },
+  "compounds": {
+    "MEDIUM": {
+      "offset": 0.0,
+      "degPerLap": 0.02788,
+      "cliffLap": 77,
+      "provenLaps": 77
+    }
+  },
+  "drivers": [
+    {
+      "code": "ACH",
+      "team": "RAM",
+      "basePace": 79.2356,
+      "noise": 0.9732,
+      "stateAtTakeover": {
+        "position": 16,
+        "gapAhead": 45.876,
+        "compound": "MEDIUM",
+        "tyreAge": 25,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "ALBM",
+      "team": "Tyrrell",
+      "basePace": 74.3144,
+      "noise": 1.5975,
+      "stateAtTakeover": {
+        "position": 15,
+        "gapAhead": 8.825,
+        "compound": "MEDIUM",
+        "tyreAge": 25,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BOE",
+      "team": "Ligier",
+      "basePace": 86.4168,
+      "noise": 4.2391,
+      "stateAtTakeover": {
+        "position": 18,
+        "gapAhead": 49.446,
+        "compound": "MEDIUM",
+        "tyreAge": 25,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BOUT",
+      "team": "Arrows",
+      "basePace": 75.0499,
+      "noise": 0.7626,
+      "stateAtTakeover": {
+        "position": 14,
+        "gapAhead": 4.483,
+        "compound": "MEDIUM",
+        "tyreAge": 25,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "CHE",
+      "team": "Renault",
+      "basePace": 73.7371,
+      "noise": 0.5493,
+      "stateAtTakeover": {
+        "position": 8,
+        "gapAhead": 4.439,
+        "compound": "MEDIUM",
+        "tyreAge": 25,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "DEC",
+      "team": "Alfa Romeo",
+      "basePace": 72.124,
+      "noise": 0.4662,
+      "stateAtTakeover": {
+        "position": 4,
+        "gapAhead": 1.625,
+        "compound": "MEDIUM",
+        "tyreAge": 25,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "FABC",
+      "team": "Osella",
+      "basePace": 78.5629,
+      "noise": 0.7394,
+      "stateAtTakeover": {
+        "position": 17,
+        "gapAhead": 1.543,
+        "compound": "MEDIUM",
+        "tyreAge": 25,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "GIA",
+      "team": "Toleman",
+      "basePace": 72.8728,
+      "noise": 1.5389,
+      "stateAtTakeover": {
+        "position": 9,
+        "gapAhead": 48.878,
+        "compound": "MEDIUM",
+        "tyreAge": 25,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "JARJ",
+      "team": "Ligier",
+      "basePace": 76.6652,
+      "noise": 0.5945,
+      "stateAtTakeover": {
+        "position": 13,
+        "gapAhead": 17.102,
+        "compound": "MEDIUM",
+        "tyreAge": 25,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "LAU",
+      "team": "McLaren",
+      "basePace": 72.5487,
+      "noise": 0.8291,
+      "stateAtTakeover": {
+        "position": 2,
+        "gapAhead": 13.338,
+        "compound": "MEDIUM",
+        "tyreAge": 25,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "MAN",
+      "team": "Team Lotus",
+      "basePace": 81.0361,
+      "noise": 1.9221,
+      "stateAtTakeover": {
+        "position": 19,
+        "gapAhead": 70.4,
+        "compound": "MEDIUM",
+        "tyreAge": 25,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "PAT",
+      "team": "Brabham",
+      "basePace": 72.3773,
+      "noise": 0.5594,
+      "stateAtTakeover": {
+        "position": 1,
+        "gapAhead": 0.0,
+        "compound": "MEDIUM",
+        "tyreAge": 25,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "PIQN",
+      "team": "Brabham",
+      "basePace": 72.5683,
+      "noise": 1.1617,
+      "stateAtTakeover": {
+        "position": 7,
+        "gapAhead": 2.81,
+        "compound": "MEDIUM",
+        "tyreAge": 25,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 29,
+          "to": "MEDIUM",
+          "loss": 20.286
+        }
+      ]
+    },
+    {
+      "code": "PRO",
+      "team": "Renault",
+      "basePace": 72.9589,
+      "noise": 0.526,
+      "stateAtTakeover": {
+        "position": 3,
+        "gapAhead": 9.451,
+        "compound": "MEDIUM",
+        "tyreAge": 25,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "ROSK",
+      "team": "Williams",
+      "basePace": 72.5628,
+      "noise": 2.0168,
+      "stateAtTakeover": {
+        "position": 11,
+        "gapAhead": 4.039,
+        "compound": "MEDIUM",
+        "tyreAge": 25,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "SUL",
+      "team": "Tyrrell",
+      "basePace": 73.92,
+      "noise": 0.7386,
+      "stateAtTakeover": {
+        "position": 10,
+        "gapAhead": 2.272,
+        "compound": "MEDIUM",
+        "tyreAge": 25,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "SUR",
+      "team": "Arrows",
+      "basePace": 74.1181,
+      "noise": 0.7286,
+      "stateAtTakeover": {
+        "position": 12,
+        "gapAhead": 3.889,
+        "compound": "MEDIUM",
+        "tyreAge": 25,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "TAM",
+      "team": "Ferrari",
+      "basePace": 73.0296,
+      "noise": 0.5845,
+      "stateAtTakeover": {
+        "position": 5,
+        "gapAhead": 3.097,
+        "compound": "MEDIUM",
+        "tyreAge": 25,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "WAR",
+      "team": "Toleman",
+      "basePace": 73.5333,
+      "noise": 0.6432,
+      "stateAtTakeover": {
+        "position": 6,
+        "gapAhead": 5.787,
+        "compound": "MEDIUM",
+        "tyreAge": 25,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    }
+  ],
+  "fuelEffectPerLap": 0.01127,
+  "freshTyre": {
+    "bonus": -0.2563,
+    "laps": 3
+  },
+  "events": [
+    {
+      "lap": 31,
+      "type": "RETIREMENT",
+      "driver": "FABC"
+    },
+    {
+      "lap": 36,
+      "type": "RETIREMENT",
+      "driver": "PRO"
+    },
+    {
+      "lap": 57,
+      "type": "RETIREMENT",
+      "driver": "TAM"
+    },
+    {
+      "lap": 58,
+      "type": "RETIREMENT",
+      "driver": "GIA"
+    },
+    {
+      "lap": 63,
+      "type": "RETIREMENT",
+      "driver": "ALBM"
+    },
+    {
+      "lap": 72,
+      "type": "RETIREMENT",
+      "driver": "LAU"
+    }
+  ],
+  "decisionMoments": [],
+  "candidateMomentLaps": [
+    29
+  ],
+  "realResult": [
+    "PAT",
+    "DEC",
+    "PIQN",
+    "WAR",
+    "ROSK",
+    "CHE",
+    "SUL",
+    "SUR",
+    "BOUT",
+    "JARJ",
+    "LAU",
+    "ACH",
+    "MAN",
+    "BOE",
+    "ALBM",
+    "TAM",
+    "GIA",
+    "PRO",
+    "FABC",
+    "DEA",
+    "WAT",
+    "ARN",
+    "BAL",
+    "WINM",
+    "LAF",
+    "GHI"
+  ],
+  "userSide": "PIQN",
+  "rival": "PRO",
+  "provenance": {
+    "kind": "reconstructed",
+    "estimated": [
+      "compounds",
+      "fuelLoads",
+      "weather"
+    ]
+  },
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": true
+  },
+  "reconstructed": true
+}
