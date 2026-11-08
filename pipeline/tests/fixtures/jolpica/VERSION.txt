@@ -1,0 +1,5 @@
+Test fixture: three races (European GP 1997, Japanese GP 2005, Abu Dhabi GP 2012) cut from
+the Jolpica-F1 CSV dump below, keeping only the columns pipeline/src/pipeline/jolpica.py reads.
+uploaded_at: 2026-10-24T01:04:07.015299Z
+sha256: 36ebba976c5a4f09fc8cd5ed439f1e165c6f9e582fb0c377b0b50a7d26957240
+licence: CC BY-NC-SA 4.0, Jolpica-F1 (https://github.com/jolpica/jolpica-f1/blob/main/TERMS.md)

@@ -2,6 +2,7 @@
 
 pipeline list                 registered races and whether each has a snapshot / model
 pipeline ingest <race-id>     download a race from FastF1 into data/raw/ (network)
+pipeline jolpica <race-id>    read a race from the cached Jolpica CSV dump into data/raw/
 pipeline build <race-id>      build data/races/<id>.json and data/golden/<id>.json
 pipeline validate <race-id>   run the Gate G1 report; exits 1 if the race fails
 pipeline f1db [race-id ...]   F1DB stops and fastest laps -> data/raw/f1db/ (Eras races)
@@ -11,6 +12,7 @@ pipeline tum-ingest <race-id> read a 2014-2019 race from the TUM database into d
 from __future__ import annotations
 
 import json
+import re
 
 import typer
 
@@ -96,6 +98,63 @@ def tum_ingest_cmd(
     note = f"  NOT SUITABLE: {'; '.join(problems)}" if problems else ""
     typer.echo(f"{race_id}: {len(laps)} laps, {facts['totalLaps']} race laps -> {raw_dir}{note}")
     typer.echo(f"  {facts['credit']}")
+
+
+@app.command("jolpica")
+def jolpica_cmd(
+    race_id: str = typer.Argument(..., help="e.g. hungary-1998 (any id; need not be registered)."),
+    year: int = typer.Option(None, help="Season (default: the race id's year)."),
+    event: str = typer.Option(
+        None,
+        help="Part of the round's name, or the circuit's country or town (default: the race"
+        " id's name, e.g. 'abu dhabi').",
+    ),
+    round_number: int = typer.Option(None, "--round", help="The round, if the event is ambiguous."),
+    dump: str = typer.Option(None, help="An extracted Jolpica CSV dump (default: newest cached)."),
+    raw_dir: str = typer.Option(None, help="Where to write (default: data/raw/)."),
+    force: bool = typer.Option(False, help="Overwrite an existing snapshot."),
+) -> None:
+    """Read a race from the Jolpica CSV dump into the raw parquet, status JSON and a
+    <race-id>.jolpica.json sidecar (results, standings, gaps), offline."""
+    from pathlib import Path
+
+    from . import jolpica
+
+    match = re.fullmatch(r"(.+)-(\d{4})", race_id)
+    if year is None and not match:
+        raise typer.BadParameter(f"can't read a year from '{race_id}'; give --year")
+    year = year if year is not None else int(match.group(2))
+    if event is None and round_number is None:
+        if not match:
+            raise typer.BadParameter("give --event or --round")
+        event = match.group(1).replace("-", " ")
+    out = Path(raw_dir) if raw_dir else paths.RAW_DIR
+    if ingest.raw_snapshot_path(race_id, out).exists() and not force:
+        typer.echo(f"{race_id}: snapshot exists, skipped (--force to overwrite)")
+        return
+    try:
+        got = jolpica.ingest_jolpica(
+            race_id, year, event, round_number, Path(dump) if dump else None, out
+        )
+    except (LookupError, FileNotFoundError, ingest.IncompleteDataError) as e:
+        typer.echo(f"{race_id}: {e}", err=True)
+        raise typer.Exit(code=1) from e
+    side = got.sidecar
+    typer.echo(
+        f"{race_id}: {got.facts['eventName']} {year}, {len(got.laps)} laps,"
+        f" {got.facts['totalLaps']} race laps, stops: {side['stops'] or 'none'} -> {out}"
+    )
+    typer.echo("  lead-lap finishers, summed laps vs official time:")
+    for r in side["raceTimeCheck"]:
+        diff = "untimed lap" if r["diff"] is None else f"{r['diff']:+.3f}s"
+        typer.echo(f"    P{r['position']:<3} {r['driver']:20s} {r['official']:10.3f}s  {diff}")
+    for d in side["driversFromJolpica"]:
+        typer.echo(f"  not in drivers.json, Jolpica code: {d['code']} {d['name']}")
+    for d in side["driversWithoutCode"]:
+        typer.echo(f"  NO CODE ({d['why']}): {d['name']} -> '{d['reference']}'")
+    for gap in side["timingGaps"]:
+        typer.echo(f"  timing gap: {gap}")
+    typer.echo(f"  not supplied: {', '.join(side['missing'])}")
 
 
 @app.command("wet-fit")
