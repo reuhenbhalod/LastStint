@@ -2,29 +2,34 @@
   "eras": {
     "eraId": 9,
     "order": 10,
-    "userSide": "VER",
+    "userSide": "HAM",
     "target": {
       "type": "beat-rival",
-      "rival": "HAM"
+      "rival": "VER"
     },
     "storyline": {
-      "real": "Hamilton leads until a late safety car; Verstappen pits for soft tyres, passes him on the final lap and takes the race and the title."
+      "real": "Hamilton leads until a late safety car; Verstappen pits for soft tyres, passes him on the final lap and takes the race and the title.",
+      "rewriteCondition": {
+        "type": "beat-rival",
+        "rival": "VER"
+      },
+      "headline": "Hamilton holds on in Abu Dhabi for an eighth title"
     },
     "mastery": {
       "type": "stop_count",
-      "max": 2,
-      "label": "Beat Hamilton on no more than two stops"
+      "exact": 1,
+      "label": "Beat Verstappen with one more stop"
     },
     "hidden": {
       "type": "compound_rule",
-      "mustAvoid": "MEDIUM",
-      "label": "Never fit the medium tyre"
+      "mustAvoid": "SOFT",
+      "label": "Never fit the soft tyre"
     },
     "hardCalls": {
-      "HAM": 1,
-      "VER": 2
+      "VER": 1,
+      "HAM": 1
     },
-    "briefing": "Abu Dhabi, 2021. The final race, and Verstappen and Hamilton arrive level on 369.5 points. Verstappen starts from pole, Hamilton beside him."
+    "briefing": "Abu Dhabi, 2021. The final race, and Verstappen and Hamilton arrive level on 369.5 points. Verstappen starts from pole, Hamilton beside him. You run Hamilton, 5.5 s clear of Verstappen after 34 laps. Finish ahead of him and the title is yours."
   },
   "rules": {
     "twoCompound": true,
@@ -40,304 +45,5 @@
       53,
       "SC"
     ]
-  ],
-  "decisionMoments": [
-    {
-      "id": "vsc-36",
-      "lap": 36,
-      "trigger": "VSC",
-      "target": {
-        "kind": "beat-rival"
-      },
-      "options": [
-        {
-          "id": "stay",
-          "label": "Stay out",
-          "decisions": []
-        },
-        {
-          "id": "box-soft",
-          "label": "Box, softs",
-          "decisions": [
-            {
-              "lap": 36,
-              "kind": "pit",
-              "compound": "SOFT"
-            }
-          ]
-        },
-        {
-          "id": "box-medium",
-          "label": "Box, mediums",
-          "decisions": [
-            {
-              "lap": 36,
-              "kind": "pit",
-              "compound": "MEDIUM"
-            }
-          ]
-        },
-        {
-          "id": "box-hard",
-          "label": "Box, hards",
-          "decisions": [
-            {
-              "lap": 36,
-              "kind": "pit",
-              "compound": "HARD"
-            }
-          ]
-        },
-        {
-          "id": "box-next-hard",
-          "label": "Box next lap, hards",
-          "decisions": [
-            {
-              "lap": 37,
-              "kind": "pit",
-              "compound": "HARD"
-            }
-          ]
-        }
-      ],
-      "realOptionId": "box-hard"
-    },
-    {
-      "id": "pace-42",
-      "lap": 42,
-      "trigger": "cliff",
-      "target": {
-        "kind": "beat-rival"
-      },
-      "options": [
-        {
-          "id": "push",
-          "label": "Push now",
-          "decisions": [
-            {
-              "lap": 42,
-              "kind": "mode",
-              "key": "pace",
-              "value": "push"
-            }
-          ]
-        },
-        {
-          "id": "standard",
-          "label": "Standard pace",
-          "decisions": [
-            {
-              "lap": 42,
-              "kind": "mode",
-              "key": "pace",
-              "value": "standard"
-            }
-          ]
-        },
-        {
-          "id": "manage",
-          "label": "Manage the tyres",
-          "decisions": [
-            {
-              "lap": 42,
-              "kind": "mode",
-              "key": "pace",
-              "value": "manage"
-            }
-          ]
-        },
-        {
-          "id": "push-attack",
-          "label": "Push and attack",
-          "decisions": [
-            {
-              "lap": 42,
-              "kind": "mode",
-              "key": "pace",
-              "value": "push"
-            },
-            {
-              "lap": 42,
-              "kind": "mode",
-              "key": "battle",
-              "value": "attack"
-            }
-          ]
-        }
-      ],
-      "realOptionId": null
-    },
-    {
-      "id": "pace-46",
-      "lap": 46,
-      "trigger": "cliff",
-      "target": {
-        "kind": "beat-rival"
-      },
-      "options": [
-        {
-          "id": "push",
-          "label": "Push now",
-          "decisions": [
-            {
-              "lap": 46,
-              "kind": "mode",
-              "key": "pace",
-              "value": "push"
-            }
-          ]
-        },
-        {
-          "id": "standard",
-          "label": "Standard pace",
-          "decisions": [
-            {
-              "lap": 46,
-              "kind": "mode",
-              "key": "pace",
-              "value": "standard"
-            }
-          ]
-        },
-        {
-          "id": "manage",
-          "label": "Manage the tyres",
-          "decisions": [
-            {
-              "lap": 46,
-              "kind": "mode",
-              "key": "pace",
-              "value": "manage"
-            }
-          ]
-        },
-        {
-          "id": "push-attack",
-          "label": "Push and attack",
-          "decisions": [
-            {
-              "lap": 46,
-              "kind": "mode",
-              "key": "pace",
-              "value": "push"
-            },
-            {
-              "lap": 46,
-              "kind": "mode",
-              "key": "battle",
-              "value": "attack"
-            }
-          ]
-        }
-      ],
-      "realOptionId": null
-    },
-    {
-      "id": "sc-53",
-      "lap": 53,
-      "trigger": "SC",
-      "target": {
-        "kind": "beat-rival"
-      },
-      "options": [
-        {
-          "id": "stay",
-          "label": "Stay out",
-          "decisions": []
-        },
-        {
-          "id": "box-soft",
-          "label": "Box, softs",
-          "decisions": [
-            {
-              "lap": 53,
-              "kind": "pit",
-              "compound": "SOFT"
-            }
-          ]
-        },
-        {
-          "id": "box-medium",
-          "label": "Box, mediums",
-          "decisions": [
-            {
-              "lap": 53,
-              "kind": "pit",
-              "compound": "MEDIUM"
-            }
-          ]
-        },
-        {
-          "id": "box-hard",
-          "label": "Box, hards",
-          "decisions": [
-            {
-              "lap": 53,
-              "kind": "pit",
-              "compound": "HARD"
-            }
-          ]
-        },
-        {
-          "id": "box-next-hard",
-          "label": "Box next lap, hards",
-          "decisions": [
-            {
-              "lap": 54,
-              "kind": "pit",
-              "compound": "HARD"
-            }
-          ]
-        }
-      ],
-      "realOptionId": "box-soft"
-    },
-    {
-      "id": "battle-57",
-      "lap": 57,
-      "trigger": "SC",
-      "target": {
-        "kind": "beat-rival"
-      },
-      "options": [
-        {
-          "id": "defend",
-          "label": "Defend hard",
-          "decisions": [
-            {
-              "lap": 57,
-              "kind": "mode",
-              "key": "battle",
-              "value": "defend"
-            }
-          ]
-        },
-        {
-          "id": "hold",
-          "label": "Hold the line",
-          "decisions": [
-            {
-              "lap": 57,
-              "kind": "mode",
-              "key": "battle",
-              "value": "hold"
-            }
-          ]
-        },
-        {
-          "id": "attack",
-          "label": "Attack",
-          "decisions": [
-            {
-              "lap": 57,
-              "kind": "mode",
-              "key": "battle",
-              "value": "attack"
-            }
-          ]
-        }
-      ],
-      "realOptionId": null
-    }
   ]
 }

@@ -95,3 +95,22 @@ def test_real_counter_on_abu_dhabi(tmp_path):
     assert result["userSide"] == "VER"
     path = hard_calls.write_overlay("abu-dhabi-2021", result, tmp_path)
     assert json.loads(path.read_text())["eras"]["userSide"] == "VER"
+
+
+def test_eras_race_file_merges_a_shared_races_overlay(tmp_path):
+    # abu-dhabi-2021 is a Daily race: its file has no eras block, so the counter gets the file
+    # merged with data/eras/abu-dhabi-2021.json (the model the Eras API serves).
+    path = hard_calls.eras_race_file("abu-dhabi-2021", tmp_path)
+    assert path.parent == tmp_path
+    merged = json.loads(path.read_text())
+    overlay = json.loads((hard_calls.ERAS_DIR / "abu-dhabi-2021.json").read_text())
+    assert merged["eras"]["userSide"] == overlay["eras"]["userSide"] == merged["userSide"]
+    assert merged["rules"] == overlay["rules"]
+    daily = json.loads((paths.RACES_DIR / "abu-dhabi-2021.json").read_text())
+    assert "eras" not in daily and "rules" not in daily
+
+
+def test_eras_race_file_keeps_an_eras_only_race_file(tmp_path):
+    path = hard_calls.eras_race_file("spain-2016", tmp_path)
+    assert path == paths.RACES_DIR / "spain-2016.json"
+    assert not list(tmp_path.iterdir())

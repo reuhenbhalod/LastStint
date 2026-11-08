@@ -130,8 +130,8 @@ function engineRadioLines(
 // Races where the player's car is never in a battle: monaco-1988 (Senna leads by over 40 s at
 // the takeover, and his lap-66 retirement is frozen), and portugal-1985 (Senna led every lap
 // and was 30 s clear by lap 20, the reconstruction's sourced running order), so no car ever
-// comes within reach.
-const NO_BATTLES = new Set(['monaco-1988', 'portugal-1985']);
+// comes within reach), and spain-1996 (Schumacher leads by 31 s at the takeover and won by 45 s).
+const NO_BATTLES = new Set(['monaco-1988', 'portugal-1985', 'spain-1996']);
 
 describe('the race engineer’s radio', () => {
   it.each(races.map((m) => [m.race.id, m] as const))(

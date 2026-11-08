@@ -7,5 +7,33 @@
     "drs": false,
     "ers": "none",
     "refuelling": false
+  },
+  "eras": {
+    "eraId": 6,
+    "order": 2,
+    "userSide": "PET",
+    "target": {
+      "type": "beat-rival",
+      "rival": "ALO"
+    },
+    "storyline": {
+      "real": "Alonso, the championship leader, catches Petrov after the stops and stays behind him for the rest of the race. Petrov finishes sixth, Alonso seventh, and Vettel's win makes him champion."
+    },
+    "mastery": {
+      "type": "mode_rule",
+      "mode": "push",
+      "maxLaps": 15,
+      "label": "Keep Alonso behind pushing for no more than 15 laps"
+    },
+    "hidden": {
+      "type": "finish_position",
+      "position": 6,
+      "label": "Finish sixth or better"
+    },
+    "hardCalls": {
+      "PET": 1,
+      "ALO": 0
+    },
+    "briefing": "Abu Dhabi, 2010, the title decider. Alonso leads the championship on 246 points, Webber has 238 and Vettel 231. You run Petrov's Renault, already through his only stop. Alonso is about to stop, and he will catch you. Keep him behind."
   }
 }

@@ -7,5 +7,35 @@
     "drs": false,
     "ers": "none",
     "refuelling": true
+  },
+  "eras": {
+    "eraId": 4,
+    "order": 2,
+    "userSide": "HAK",
+    "target": {
+      "type": "defend"
+    },
+    "storyline": {
+      "real": "H\u00e4kkinen leads the first stint. Light rain falls from lap 30; at the second stops Ferrari keep Schumacher out longer, and he comes out ahead and wins by 1.8 s, which makes him champion.",
+      "rewriteCondition": {
+        "type": "defend"
+      },
+      "headline": "H\u00e4kkinen holds Suzuka and takes the title to the last race"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 2,
+      "label": "Win on two stops"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 2,
+      "label": "Win by more than 2 seconds"
+    },
+    "hardCalls": {
+      "HAK": 0,
+      "MSCM": 0
+    },
+    "briefing": "Suzuka, 2000. Schumacher on pole, H\u00e4kkinen beside him; a Schumacher win settles the title. You run H\u00e4kkinen, leading by 2.7 s after 19 laps. Keep Schumacher behind to the flag."
   }
 }

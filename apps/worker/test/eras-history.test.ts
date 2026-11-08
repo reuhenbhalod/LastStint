@@ -202,19 +202,17 @@ describe('GET /api/history', () => {
     const book = await json<HistoryBook>(`/api/history?anonId=${ids.a}`);
 
     // By hand: 49 stars (30 + 9 + 10), 30 Legend stars, 3 rewrites, 3 hidden, 4 badges. The
-    // rewrites total leaves out the fourteen races the Eras side really won (no rewrite
-    // condition: germany-2018, germany-2019, abu-dhabi-2021, hungary-1986, mexico-1986,
-    // monaco-1984, portugal-1985, and from the 6.2 re-author spain-1994, belgium-1995,
-    // mexico-1990, brazil-1991, belgium-1992, europe-1993, australia-1993; hungary-2022 has
-    // one in this isolate's bundle, above).
+    // rewrites total leaves out the races the Eras side really won (no rewrite condition: the
+    // modern and reconstructed 6.2 re-authoring together; hungary-2022 has one in this isolate's
+    // bundle, above).
     expect(book.collectibles).toEqual({
       stars: { have: 49, total: 300 },
       legendStars: { have: 30, total: 300 },
-      rewrites: { have: 3, total: 86 },
+      rewrites: { have: 3, total: 82 },
       hidden: { have: 3, total: 100 },
       badges: { have: 4, total: 30 },
     });
-    expect(book.completion).toEqual({ collected: 89, total: 816, percent: (89 / 816) * 100 });
+    expect(book.completion).toEqual({ collected: 89, total: 812, percent: (89 / 812) * 100 });
 
     // And the same from D1 directly.
     const mine = 'FROM era_progress WHERE player_id = ?';
@@ -248,23 +246,23 @@ describe('GET /api/history', () => {
       races: 10,
       stars: { have: 30, total: 30 },
       legendStars: { have: 30, total: 30 },
-      rewrites: { have: 2, total: 10 },
+      rewrites: { have: 2, total: 9 }, // belgium-2023 has no rewrite
       hidden: { have: 3, total: 10 },
       badges: { cleared: true, mastered: true, legend: true },
-      percent: (68 / 83) * 100,
+      percent: (68 / 82) * 100,
     });
     expect(e9).toMatchObject({
       stars: { have: 9, total: 30 },
-      rewrites: { have: 0, total: 9 }, // abu-dhabi-2021 has no rewrite
+      rewrites: { have: 0, total: 10 }, // abu-dhabi-2021 has one again (played from Hamilton)
       hidden: { have: 0, total: 10 },
       badges: { cleared: false, mastered: false, legend: false },
-      percent: (9 / 82) * 100,
+      percent: (9 / 83) * 100,
     });
     expect(e8).toMatchObject({
       stars: { have: 10, total: 30 },
-      rewrites: { have: 1, total: 8 }, // nor germany-2018 and germany-2019
+      rewrites: { have: 1, total: 6 }, // nor germany-2018, germany-2019, hungary-2019, turkey-2020
       badges: { cleared: true, mastered: false, legend: false },
-      percent: (12 / 81) * 100,
+      percent: (12 / 79) * 100,
     });
     expect(e7).toMatchObject({ stars: { have: 0, total: 30 }, percent: 0 });
 
@@ -300,7 +298,7 @@ describe('GET /api/history', () => {
 
   it('a new player: nothing collected, every era listed', async () => {
     const book = await json<HistoryBook>(`/api/history?anonId=${ids.c}`);
-    expect(book.completion).toEqual({ collected: 0, total: 816, percent: 0 });
+    expect(book.completion).toEqual({ collected: 0, total: 812, percent: 0 });
     expect(book.eras).toHaveLength(10);
     expect(book.entries).toEqual([]);
   });

@@ -20,8 +20,8 @@
     },
     "mastery": {
       "type": "stop_count",
-      "max": 4,
-      "label": "Win on no more than four stops"
+      "exact": 4,
+      "label": "Win on four more stops, as Verstappen made"
     },
     "hidden": {
       "type": "margin",
@@ -29,8 +29,8 @@
       "label": "Win by more than 3 seconds"
     },
     "hardCalls": {
-      "VER": 4,
-      "VET": 2
+      "VER": 3,
+      "VET": 1
     },
     "briefing": "Hockenheim, 2019. Rain before the start: the race begins behind the safety car, with every car on wet tyres. Hamilton is on pole, Verstappen second. The track will dry, and then not quite."
   },

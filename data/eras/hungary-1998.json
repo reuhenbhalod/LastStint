@@ -7,5 +7,36 @@
     "drs": false,
     "ers": "none",
     "refuelling": true
+  },
+  "eras": {
+    "eraId": 3,
+    "order": 7,
+    "userSide": "COU",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "H\u00e4kkinen leads the first 46 laps with Coulthard behind, until Ferrari put Schumacher on three stops to McLaren's two. He builds a lead big enough to keep after his third stop and wins by 9.4 s from Coulthard.",
+      "rewriteCondition": {
+        "type": "win"
+      },
+      "headline": "Coulthard answers Ferrari's three stops in Budapest"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 2,
+      "label": "Win on two stops"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "push",
+      "maxLaps": 0,
+      "label": "Win without a single push lap"
+    },
+    "hardCalls": {
+      "COU": 2,
+      "MSCM": 0
+    },
+    "briefing": "Hungaroring, 1998. H\u00e4kkinen on pole, Coulthard beside him, Schumacher third. You run Coulthard, second after 22 laps with Schumacher 0.7 s behind. Win it."
   }
 }

@@ -952,12 +952,13 @@ RACES: dict[str, dict] = {
         "year": 2010,
         "event": "Abu Dhabi",
         "source": "jolpica",
-        "name": "Abu Dhabi 2010: Alonso vs Petrov",
+        "name": "Abu Dhabi 2010: Petrov vs Alonso",
         "era": "2010-2013",
         "takeover_lap": None,  # D3 rule
         "seed": 1,
-        "user_side": "ALO",
-        "rival": "PET",  # Alonso P4 or better for the title (real: stuck behind Petrov, P7)
+        # Eras side by hard calls (Eras 6.2 re-author, the honest grader: PET 1, ALO 0).
+        "user_side": "PET",
+        "rival": "ALO",
         "score_positions": 6,
         "split": "eras",
     },
@@ -965,12 +966,14 @@ RACES: dict[str, dict] = {
         "year": 2011,
         "event": "China",
         "source": "jolpica",
-        "name": "China 2011: Hamilton vs Vettel",
+        "name": "China 2011: Vettel vs Hamilton",
         "era": "2010-2013",
         "takeover_lap": None,  # D3 rule
         "seed": 1,
-        "user_side": "HAM",
-        "rival": "VET",  # Hamilton's three stops beat Vettel's two
+        # Eras side by hard calls (Eras 6.2 re-author, the honest grader: VET 1, HAM 1; Vettel gave
+        # up more chance, 9.0 vs 8.3 pts).
+        "user_side": "VET",
+        "rival": "HAM",
         "score_positions": 6,
         "split": "eras",
     },
@@ -1009,12 +1012,13 @@ RACES: dict[str, dict] = {
         "year": 2013,
         "event": "Spain",
         "source": "jolpica",
-        "name": "Spain 2013: Alonso vs Räikkönen",
+        "name": "Spain 2013: Räikkönen vs Alonso",
         "era": "2010-2013",
         "takeover_lap": None,  # D3 rule
         "seed": 1,
-        "user_side": "ALO",
-        "rival": "RAI",  # Alonso wins on four stops; Räikkönen's three put him P2
+        # Eras side by hard calls (Eras 6.2 re-author, the honest grader: RAI 3, ALO 1).
+        "user_side": "RAI",
+        "rival": "ALO",
         "score_positions": 6,
         "split": "eras",
     },
@@ -1153,14 +1157,14 @@ RACES: dict[str, dict] = {
         "year": 2013,
         "event": "Malaysia",
         "source": "jolpica",
-        "name": "Malaysia 2013: Vettel vs Webber",
+        "name": "Malaysia 2013: Webber vs Vettel",
         "era": "2010-2013",
         "takeover_lap": None,  # D3 rule
         "seed": 1,
-        # Eras side by hard calls (VET 3, WEB 0): Vettel, behind Webber, under the order to
-        # hold station (real: he passed Webber and won).
-        "user_side": "VET",
-        "rival": "WEB",
+        # Eras side by hard calls (Eras 6.2 re-author, the honest grader: WEB 1, VET 1; Webber gave
+        # up more chance, 48.0 vs 45.3 pts).
+        "user_side": "WEB",
+        "rival": "VET",
         "score_positions": 6,
         "split": "eras",
     },
@@ -1602,12 +1606,13 @@ RACES: dict[str, dict] = {
         "year": 2005,
         "event": "San Marino",
         "source": "jolpica",
-        "name": "San Marino 2005: Alonso vs Schumacher",
+        "name": "San Marino 2005: Schumacher vs Alonso",
         "era": "1994-2009",
         "takeover_lap": None,  # D3 rule
         "seed": 1,
-        "user_side": "ALO",
-        "rival": "MSCM",  # defend: Alonso holds off Schumacher
+        # Eras side by hard calls (Eras 6.2 re-author, the honest grader: MSCM 1, ALO 0).
+        "user_side": "MSCM",
+        "rival": "ALO",
         "score_positions": 6,
         "split": "eras",
     },
@@ -1681,12 +1686,14 @@ RACES: dict[str, dict] = {
         "year": 2000,
         "event": "Japan",
         "source": "jolpica",
-        "name": "Japan 2000: Schumacher vs Häkkinen",
+        "name": "Japan 2000: Häkkinen vs Schumacher",
         "era": "1994-2009",
         "takeover_lap": None,  # D3 rule
         "seed": 1,
-        "user_side": "MSCM",
-        "rival": "HAK",  # beat-rival: Schumacher ahead of Häkkinen
+        # Eras side by hard calls (Eras 6.2 re-author, the honest grader: HAK 0, MSCM 0; Häkkinen
+        # gave up more chance, 148.7 vs 115.7 pts).
+        "user_side": "HAK",
+        "rival": "MSCM",
         "score_positions": 6,
         "split": "eras",
     },
@@ -1741,12 +1748,13 @@ RACES: dict[str, dict] = {
         "year": 2004,
         "event": "France",
         "source": "jolpica",
-        "name": "France 2004: Schumacher vs Alonso",
+        "name": "France 2004: Alonso vs Schumacher",
         "era": "1994-2009",
         "takeover_lap": None,  # D3 rule
         "seed": 1,
-        "user_side": "MSCM",
-        "rival": "ALO",  # win: Schumacher beats Alonso on four stops
+        # Eras side by hard calls (Eras 6.2 re-author, the honest grader: ALO 1, MSCM 0).
+        "user_side": "ALO",
+        "rival": "MSCM",
         "score_positions": 6,
         "split": "eras",
     },
@@ -1801,12 +1809,13 @@ RACES: dict[str, dict] = {
         "year": 1998,
         "event": "Hungary",
         "source": "jolpica",
-        "name": "Hungary 1998: Schumacher vs Coulthard",
+        "name": "Hungary 1998: Coulthard vs Schumacher",
         "era": "1994-2009",
         "takeover_lap": None,  # D3 rule
         "seed": 1,
-        "user_side": "MSCM",
-        "rival": "COU",  # win on three stops: Coulthard the car behind at the flag
+        # Eras side by hard calls (Eras 6.2 re-author, the honest grader: COU 2, MSCM 0).
+        "user_side": "COU",
+        "rival": "MSCM",
         "score_positions": 6,
         "split": "eras",
     },
