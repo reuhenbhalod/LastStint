@@ -326,12 +326,14 @@
               "VSC",
               "RED",
               "RAIN",
-              "RETIREMENT"
+              "RETIREMENT",
+              "FAULT"
             ]
           },
           "laps": {
             "type": "integer",
-            "minimum": 1
+            "minimum": 1,
+            "description": "How many laps the event lasts. A FAULT without it lasts to the flag (or to the car's next stop with untilStop)."
           },
           "driver": {
             "type": "string"
@@ -340,7 +342,44 @@
             "type": "boolean",
             "default": false,
             "description": "The event defines the race's storyline: Legend difficulty always runs it on its real lap instead of re-rolling it (eras spec section 8)."
+          },
+          "fault": {
+            "enum": [
+              "gear-stuck",
+              "power-loss",
+              "puncture",
+              "tyre-failure"
+            ],
+            "description": "A FAULT's kind (simulator roadmap R2; pipeline/faults.py)."
+          },
+          "paceLoss": {
+            "type": "number",
+            "minimum": 0,
+            "description": "A FAULT: seconds a green lap the faulted car loses while it lasts, fitted from the car's real laps after the fault."
+          },
+          "slowLap": {
+            "type": "number",
+            "minimum": 0,
+            "description": "A FAULT: extra seconds on the fault's own lap (the forced slow lap of a puncture or tyre failure), fitted like paceLoss."
+          },
+          "untilStop": {
+            "type": "boolean",
+            "description": "A FAULT that lasts until the car's next stop (a puncture or failed tyre is fixed by new tyres)."
           }
+        },
+        "if": {
+          "properties": {
+            "type": {
+              "const": "FAULT"
+            }
+          }
+        },
+        "then": {
+          "required": [
+            "driver",
+            "fault",
+            "paceLoss"
+          ]
         }
       }
     },
@@ -375,7 +414,8 @@
               "cliff",
               "takeover",
               "rain",
-              "drying"
+              "drying",
+              "fault"
             ]
           },
           "target": {

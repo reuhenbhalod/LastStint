@@ -113,3 +113,5 @@ export {
   wetnessOn,
 } from './weather.js';
 export * from './eras/config.js';
+export { FAULT_KINDS, faultCost, faultTable, faultsOf } from './faults.js';
+export type { FaultCost, FaultEntry, FaultTable } from './faults.js';

@@ -186,7 +186,8 @@ def simulate(
     `rival_policy` (rival_policy.py; default "standard") is validated so both sims accept the
     same names; with no player-controlled car the rival never reacts, so it can't change the
     result."""
-    from .rival_policy import resolve_rival_policy  # here, not at the top: it imports this module
+    from .faults import FaultState  # here, not at the top: they import this module
+    from .rival_policy import resolve_rival_policy
 
     resolve_rival_policy(rival_policy)
     track = model["track"]
@@ -213,6 +214,7 @@ def simulate(
                 neutral[lap] = e["type"]
         elif e["type"] == "RETIREMENT":
             retire_at.setdefault(e["lap"], set()).add(e["driver"])
+    faults = FaultState(model["events"])  # car faults (faults.py): frozen on their real laps
 
     ordered = sorted(model["drivers"], key=lambda d: d["stateAtTakeover"]["position"])
     cars: dict[str, Car] = {}
@@ -261,6 +263,7 @@ def simulate(
                 car.tyre_wear = 0.0
                 default = {"SC": pit_loss_sc, "VSC": pit_loss_vsc}.get(flag, pit_loss)
                 pit_cost = pit.get("loss", default)
+            fault_pace, fault_extra = faults.cost(code, lap, bool(pit), flag is None)
 
             if flag == "SC" and sc_time:
                 lt = sc_time
@@ -276,7 +279,8 @@ def simulate(
                 ahead_gap = car.total_time - prev_time.get(ahead, car.total_time)
                 if 0 < ahead_gap < DIRTY_AIR_RANGE:
                     lt += dirty_air
-            clean[code] = _clean_lap(car, compounds, fuel, lap, fresh_tyre, weather)
+            lt += fault_pace + fault_extra
+            clean[code] = _clean_lap(car, compounds, fuel, lap, fresh_tyre, weather) + fault_pace
             car.total_time += lt + pit_cost
             car.tyre_age += 1
             car.tyre_wear += weather_wear(weather, car.compound, lap)
