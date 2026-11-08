@@ -113,3 +113,12 @@ export {
   wetnessOn,
 } from './weather.js';
 export * from './eras/config.js';
+export {
+  LEGEND_STREAM,
+  circuitFor,
+  isKept,
+  legendEvents,
+  legendRates,
+  parseRaceId,
+} from './legend.js';
+export type { LegendRates, ScRates } from './legend.js';

@@ -14,6 +14,7 @@ import json
 import math
 from dataclasses import dataclass, field
 
+from .legend import legend_events
 from .paths import GOLDEN_DIR
 from .rng import Mulberry32, derive_seed
 
@@ -179,13 +180,17 @@ def _classify(order, cars) -> dict:
 
 
 def simulate(
-    model: dict, seed: int, strategies: dict | None = None, rival_policy: str | None = None
+    model: dict,
+    seed: int,
+    strategies: dict | None = None,
+    rival_policy: str | None = None,
+    legend: bool = False,
 ) -> dict:
     """Run one seeded simulation to the flag. Returns finishing order and gaps to winner.
 
     `rival_policy` (rival_policy.py; default "standard") is validated so both sims accept the
     same names; with no player-controlled car the rival never reacts, so it can't change the
-    result."""
+    result. `legend`: Legend difficulty's random SC/VSC periods (legend.py)."""
     from .rival_policy import resolve_rival_policy  # here, not at the top: it imports this module
 
     resolve_rival_policy(rival_policy)
@@ -207,7 +212,7 @@ def simulate(
 
     neutral: dict[int, str] = {}
     retire_at: dict[int, set[str]] = {}
-    for e in model["events"]:
+    for e in legend_events(model, seed) if legend else model["events"]:
         if e["type"] in ("SC", "VSC", "RED"):
             for lap in range(e["lap"], e["lap"] + int(e.get("laps", 1))):
                 neutral[lap] = e["type"]
