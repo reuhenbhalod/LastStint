@@ -15,7 +15,7 @@ import math
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from . import race_rules, redflag, refuel
+from . import race_rules, redflag, refuel, sc_queue
 from .legend import legend_events, legend_loss, real_flags
 from .paths import GOLDEN_DIR
 from .rng import Mulberry32, derive_seed
@@ -34,6 +34,11 @@ BUNCH_GAP = 0.5  # SC train spacing per car (measured on the final SC lap, 2021 
 # over BUNCH_GAP, and the last lap before the restart is nose-to-tail (race control restarts a
 # bunched field).
 SC_GAP_KEEP = 0.34
+# An Eras race (one with an era `rules` block) closes its middle SC laps gap by gap instead,
+# each gap over SC_QUEUE_SPACING keeping SC_QUEUE_KEEP of its excess (fitted on the 2018+ timed
+# races' real queues: sc_queue.py). Daily/Gauntlet race files carry no rules block.
+SC_QUEUE_SPACING = sc_queue.SC_QUEUE_SPACING
+SC_QUEUE_KEEP = sc_queue.SC_QUEUE_KEEP
 SC_FALLBACK = 1.6  # SC lap = this x green if not supplied
 VSC_FALLBACK = 1.35  # VSC lap = this x green if not supplied
 GOLDEN_SEEDS = list(range(1, 21))  # fixed seeds for the TS parity golden files
@@ -66,6 +71,8 @@ class Car:
     # A refuelling race (refuel.py): fuel on board in laps, and the race's laps.
     tank: float | None = None
     race_laps: int = 0
+    # Stops with no tyre change (a repair, a stop-go, a drive-through): {lap, loss} each.
+    service: list = field(default_factory=list)
 
     def __post_init__(self):
         if self.tyre_wear is None:
@@ -249,6 +256,7 @@ def simulate(
             strategy=list(strat),
             laps_done=takeover,
             wet_pace=d.get("wetPace", 0.0),
+            service=list(d.get("serviceStops", [])),
         )
 
     refuel.init_tanks(model, cars)  # refuelling (refuel.py): every car's takeover tank
@@ -289,7 +297,7 @@ def simulate(
                 default = {"SC": pit_loss_sc, "VSC": pit_loss_vsc}.get(flag, pit_loss)
                 loss = legend_loss(pit, lap, flag, real) if real is not None else pit.get("loss")
                 # A red flag's stoppage: the tyre change there is free (redflag.py), the fill too.
-                free = lap in red["free"]
+                free = redflag.is_free(red, neutral, lap)
                 if not free:
                     pit_cost += default if loss is None else loss
                 # Refuelling (refuel.py): fill for the next stint; the fill time over the base.
@@ -302,7 +310,15 @@ def simulate(
                     car.stop_go += race_rules.stop_go_cost(model)
                     if lap >= total_laps:
                         pit_cost += race_rules.serve_stop_go(car, flag, lap, total_laps)
-            fault_pace, fault_extra = faults.cost(code, lap, bool(pit), flag is None)
+            # A stop with no tyre change (a repair, a stop-go, a drive-through; assemble.py):
+            # whatever the car's strategy, it pays its measured loss on its real lap.
+            service = next((st for st in car.service if st["lap"] == lap), None)
+            if service:
+                pitted.add(code)
+                car.service.remove(service)
+                if not redflag.is_free(red, neutral, lap):
+                    pit_cost += service["loss"]
+            fault_pace, fault_extra = faults.cost(code, lap, bool(pit or service), flag is None)
 
             if flag == "SC" and sc_time:
                 lt = sc_time
@@ -342,14 +358,15 @@ def simulate(
                 # Deployment lap: gaps kept (delta time). Middle laps: each gap keeps
                 # SC_GAP_KEEP of its excess. Last lap before the restart: nose-to-tail.
                 keep = 0.0 if neutral.get(lap + 1) != "SC" else SC_GAP_KEEP
-                _bunch(live, cars, green, keep, race_rules.sc_queue(model))
+                _bunch(live, cars, green, keep, race_rules.sc_queue(model), "rules" in model)
                 live = sorted(live, key=lambda c: cars[c].total_time)
                 order[:] = live + [c for c in order if cars[c].retired]
         else:
             _resolve_order(order, cars, clean, pass_rngs, overtake, prev_time, pitted, recent, lap)
         wipe = red["wipes"].get(lap)
         if wipe and neutral.get(wipe[1]) == "RED":
-            redflag.line_up(active_codes(), cars, wipe[0])
+            unlap = race_rules.sc_queue(model) != "none"
+            redflag.line_up(active_codes(), cars, wipe[0], None if unlap else green)
 
     return _classify(order, cars)
 
@@ -360,14 +377,25 @@ def _bunch(
     lap_time: float | None,
     keep: float,
     duel: tuple[str, str] | str | None,
+    eras: bool = False,
 ) -> None:
     """Close the SC queue: each gap keeps `keep` of its excess over BUNCH_GAP (nose-to-tail on
     the last lap). By the rules every lapped car unlaps and joins the back of the queue, so
     the whole field closes up in race order (duel None). A race with scUnlap "duel" follows
     Abu Dhabi 2021's call instead: only the lead lap closes up, the lapped cars stay where
     they are a lap down, and on the last lap (keep 0) the lapped cars sitting between the
-    user's car and the rival are waved through to the back of the lead-lap queue."""
+    user's car and the rival are waved through to the back of the lead-lap queue.
+
+    An Eras race (`eras`: it has a rules block) closes a middle lap gap by gap (_close_gaps,
+    the fit of sc_queue.py). With scUnlap "none" (no unlapping: before 2007 and 2010-11) the
+    lapped cars stay in the queue where they are on the road, a lap down (_bunch_road)."""
     if not live:
+        return
+    if duel == "none" and lap_time:
+        _bunch_road(live, cars, lap_time, keep, eras)
+        return
+    if duel is None and eras and keep > 0.0:
+        _close_gaps(live, cars)
         return
     if duel is None:
         for i in range(1, len(live)):
@@ -396,6 +424,42 @@ def _bunch(
     for c in waved:
         last += BUNCH_GAP
         cars[c].total_time = last
+
+
+def _close_gaps(live: list[str], cars: dict[str, Car]) -> None:
+    """An Eras middle SC lap: each gap to the car ahead over SC_QUEUE_SPACING keeps
+    SC_QUEUE_KEEP of its excess, measured on the queue as it stood (sc_queue.close_queue)."""
+    old = [cars[c].total_time for c in live]
+    for i in range(1, len(live)):
+        gap = old[i] - old[i - 1]
+        if gap > SC_QUEUE_SPACING:
+            gap = SC_QUEUE_SPACING + SC_QUEUE_KEEP * (gap - SC_QUEUE_SPACING)
+        cars[live[i]].total_time = cars[live[i - 1]].total_time + gap
+
+
+def _bunch_road(
+    live: list[str], cars: dict[str, Car], lap_time: float, keep: float, eras: bool
+) -> None:
+    """No unlapping (scUnlap "none"): the whole queue closes up in road order, lapped cars
+    where they are on the road, and each keeps its laps down. Middle laps close as the race's
+    queue does (gap by gap for an Eras race, else `keep` car by car as in _bunch); the last
+    lap (keep 0) is nose-to-tail."""
+    lead = cars[live[0]].total_time
+    road, down, on_road = redflag.road_order(live, cars, lap_time)
+    placed = {road[0]: on_road[road[0]]}
+    for i in range(1, len(road)):
+        ahead, car = road[i - 1], road[i]
+        gap = on_road[car] - on_road[ahead]
+        if keep == 0.0:
+            gap = BUNCH_GAP
+        elif eras:
+            if gap > SC_QUEUE_SPACING:
+                gap = SC_QUEUE_SPACING + SC_QUEUE_KEEP * (gap - SC_QUEUE_SPACING)
+        else:
+            gap = BUNCH_GAP + keep * max(0.0, on_road[car] - placed[ahead] - BUNCH_GAP)
+        placed[car] = placed[ahead] + gap
+    for c in live:
+        cars[c].total_time = lead + placed[c] + down[c] * lap_time
 
 
 def write_golden(model: dict, seeds: list[int], golden_dir: Path | None = None) -> None:

@@ -2113,3 +2113,85 @@ Not regenerated here: `apps/worker/src/races.gen.ts`, `data/sc_rates.json` (so
 `test_every_race_file_finds_its_circuit` fail until integration regenerates it, as on earlier
 race branches: the raw SC timelines are new, and the Nürburgring, europe-1999's circuit, has no
 entry yet) and the parity fixtures.
+
+## Eras sim fixes 2 (Nov 8 2026): stops with no tyre change, the SC queue, red-flag queues, the robust pit loss
+
+Written by hand, like the Eras sections above. Robust status (1,000 runs on each of two seed
+sets); "before" is the code at 8a75b3a, "after" this change, both built from the raw snapshots
+(`pipeline validate <id> --robust`). Every Daily and Gauntlet race file and golden file is
+unchanged: every change is gated to Eras builds (a race whose file takes its Eras overlay,
+`build.eras_build`) or to the sims' Eras-only condition (the race file has a `rules` block,
+which no Daily/Gauntlet file carries), and red flags and `scUnlap: "none"` appear only in Eras
+race files.
+
+**The fixes.**
+1. *Stops with no tyre change* (`drivers[].serviceStops`, schema v11 additive): a stop whose set
+   runs on through the out-lap, with green in- and out-laps (`track.service_stops`; a pit-lane
+   pass under a SC or red flag is never one), priced at its measured loss in the sim frame
+   (`pace.sim_frame_losses(service=True)`). Both sims charge it on its out-lap whatever the car's
+   strategy (a player's plan doesn't drop a penalty), mark the car as pitted, and keep its set.
+   Eras builds only, not in refuelling races (a kept set there may be a fuel stop). Found:
+   azerbaijan-2017 HAM 32 (headrest, 30.3 s), VET 34 (stop-go, 29.0 s), PER 34, RAI 34;
+   hungary-2015 HAM 55 (19.0 s), VER 57 (14.8 s), STE 55, MAL 59; bahrain-2014 BIA, MAL;
+   monaco-2025 RUS. Jolpica races have none (their compounds are estimated per stint), so
+   italy-2020's stop-gos (HAM, GIO) stay tyre stops at their measured loss. No sourced penalty
+   facts exist in the repo, so the entry has no kind (repair / stop-go / drive-through).
+2. *The SC queue* (`pipeline/sc_queue.py`): fitted on the middle SC laps of the 25 timed
+   2018+ races (79 laps, 921 car-laps). Each gap to the car ahead closes on its own toward a
+   relaxed spacing: gap' = 1.7 + 0.34 x (gap - 1.7) above 1.7 s (RMS error of the gaps to the
+   leader 8.00 s; the old rule, 0.34 applied car by car against the car ahead's closed position,
+   10.12 s, and its tail runs 2.7 s long). Deployment and last-lap rules unchanged. Used by both
+   sims for a race with a rules block (`SC_QUEUE_SPACING`, `SC_QUEUE_KEEP`;
+   `test_sim_fixes.py` refits it from the snapshots).
+3. *Free tyre change when the cars stop on the grid* (one red lap, `resumeLap == lap`):
+   `redflag.free_out_laps` / `freeOutLaps` give the stoppage's out-lap as the lap after the
+   flag lap. `plan.free` is now out-lap -> red lap in both sims (`redflag.is_free`,
+   `redFlagFree`), and `redflag.stop_losses` prices such real stops at 0. Monaco 2022's lap-31
+   stops become free.
+4. *No unlapping* (`scUnlap: "none"`, now written by Eras builds from the year:
+   `build.eras_sc_unlap`, before 2007 and 2010-11): the SC queue and the red-flag line-up keep
+   lapped cars where they are on the road, each a lap down (`redflag.road_order`, `roadOrder`).
+5. *Robust green pit loss* (Eras builds): green stops with a pit-lane time over 7.6 s or an
+   in-lap loss over 12.2 s above the race's median (95th percentiles over 3,351 stops; lane
+   time not used in a refuelling race) are damage or repair stops, left out of the median.
+   saudi-arabia-2021: 48.9 -> 23.9 s.
+
+Rebuilt (race file and/or golden): the 45 race files and 24 golden files in this commit's diff.
+The pre-1993 reconstructed races only gain `scUnlap: "none"` (goldens unchanged). australia-2025
+(split wet), brazil-2021 and miami-2024 (split tune) would change too, but their committed files
+have no rules block by design (`test_no_rules_block_replays_the_golden_files`), so they're left
+as they are.
+
+| Race | Before | After |
+|---|---|---|
+| azerbaijan-2017 | fail, 12.25s | fail, 6.86s |
+| hungary-2015 | fail, 10.37s | fail, 5.76s |
+| italy-2020 | fail, 6.36s | fail, 3.69s |
+| saudi-arabia-2021 | fail, 22.65s | fail, 13.96s |
+| monaco-2011 | fail, 11.44s | fail, 32.97s |
+| canada-2011 | fail, 2.96s | fail, 10.27s |
+| germany-2018 | fail, 1.34s | **pass**, 0.94s |
+| sakhir-2020 | pass, 0.96s | fail, 0.97s (duel RUS vs PER gap 5.65) |
+| monaco-2022 | fail, 4.00s | fail, 4.96s |
+| netherlands-2023 | fail, 4.13s | fail, 3.79s |
+| monaco-2015 | fail, 4.64s | fail, 4.52s |
+| europe-2012 / abu-dhabi-2012 / brazil-2012 | pass 1.45 / fail 2.92 / fail 3.30 | pass 1.44 / fail 2.89 / fail 3.28 |
+| bahrain-2014 / hungary-2014 / united-states-2015 | 2.17 / 4.16 / 3.36 (fail) | 2.16 / 4.15 / 3.31 (fail) |
+| monaco-2016 / monaco-2017 / germany-2019 / brazil-2019 | 8.15 f / 3.20 f / 1.59 p / 1.76 p | 8.15 f / 3.19 f / 1.60 p / 1.77 p |
+| azerbaijan-2021 / great-britain-2022 / monaco-2025 | 2.61 / 2.96 / 2.63 (fail) | 2.66 / 2.96 / 2.63 (fail) |
+
+**The regressions.**
+- *monaco-2011 and canada-2011* (fix 4). The rule is right, but the sim decides who is lapped
+  from its own gaps. At Monaco the sim's BUT is 48 s clear of VET at lap 71 (the flat HARD wear,
+  diagnosed in step 5.1c), so HAM, KOB and WEB sit more than a lap (81.7 s) behind him and stay a
+  lap down at the restart; really they were within 35 s. At Canada MAS's two back-to-back stops
+  (out-laps 53 and 54, losses 53.8 + 47.1 s) count their shared lap twice, so he falls over a lap
+  behind and, with no unlapping, stays there (53 s error). That double count is an existing
+  pipeline bug (`track.stop_records` measures both stops over lap 53), not fixed here: fixing it
+  changes other builds.
+- *monaco-2022* (fixes 2, 3 and 5 together, not separated): the 13 stops with out-lap 31 were
+  priced at the SC figure and are now free, as the stoppage's tyre changes really were, the
+  pit loss is 23.5 s (was 24.1) and the lap 13-18 SC closes by the fitted rule; RUS's gap error
+  grows to 13.9 s.
+- *sakhir-2020* (fix 2 alone: its race file is unchanged, only the golden): the SC queue of laps 61-68 now keeps its front gaps near 1.7 s, so the
+  SC stops cost different places; the duel gap (RUS vs PER) goes 5.65 s over its limit.

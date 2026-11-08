@@ -100,11 +100,13 @@ def sim_frame_losses(
     weather: dict | None = None,
     wear: pd.Series | None = None,
     wet_pace: dict[str, float] | None = None,
+    service: bool = False,
 ) -> dict[tuple[str, int], float]:
     """(driver, out-lap) -> loss for each green-flag stop after the takeover, in the sim frame.
-    A stop whose in-lap is the takeover lap is charged its out-lap only."""
+    A stop whose in-lap is the takeover lap is charged its out-lap only. `service`: the stops
+    that changed no tyres instead (track.service_stops), on the set the car kept."""
     from .clean import fitted_compound
-    from .track import pit_stops
+    from .track import pit_stops, service_stops
 
     fitted = fitted_compound(laps)
 
@@ -123,6 +125,24 @@ def sim_frame_losses(
         return _clean_lap(car, compounds, fuel_per_lap, int(row["LapNumber"]), fresh_tyre, weather)
 
     out: dict[tuple[str, int], float] = {}
+    if service:
+        # Stops with no tyre change (track.service_stops): the set runs on through the out-lap.
+        for code, in_lap, out_lap in service_stops(laps):
+            n_in, n_out = int(in_lap["LapNumber"]), int(out_lap["LapNumber"])
+            if n_in < takeover_lap or code not in base_pace:
+                continue
+            compound = str(in_lap["Compound"])
+            if compound not in compounds:
+                continue
+            out_wear = None if wear is None else float(wear.loc[out_lap.name])
+            age = max(0, int(out_lap["TyreLife"]) - 1)
+            loss = float(out_lap["LapTime"]) - clean(code, compound, age, out_lap, out_wear)
+            if n_in > takeover_lap:
+                in_wear = None if wear is None else float(wear.loc[in_lap.name])
+                age = max(0, int(in_lap["TyreLife"]) - 1)
+                loss += float(in_lap["LapTime"]) - clean(code, compound, age, in_lap, in_wear)
+            out[(code, n_out)] = loss
+        return out
     for code, in_lap, out_lap in pit_stops(laps):
         n_in, n_out = int(in_lap["LapNumber"]), int(out_lap["LapNumber"])
         if n_in < takeover_lap or code not in base_pace:

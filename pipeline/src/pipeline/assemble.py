@@ -128,13 +128,17 @@ def assemble_race_model(
     year: int | None = None,
     red_flags: list[dict] | None = None,
     refuel: dict | None = None,
+    service_stops: bool = False,
 ) -> dict:
     """Build the race-model dict (validate + write it with export.write_race). `fault_facts`:
     the race's hand-checked car faults (incidents.fault_facts), fitted into FAULT events.
     `year` and `red_flags` (the race's red-flag file entries, redflag.load_entries) give each
     red flag its restart; races without one ignore them. `refuel`: a refuelling race's fill
     model (refuel.race_fill_model), stored as track.refuel; its laps carry the Tank and
-    FuelLap columns (refuel.with_fuel_columns), so every fuel term below is the sim's."""
+    FuelLap columns (refuel.with_fuel_columns), so every fuel term below is the sim's.
+    `service_stops` (Eras builds): each driver's stops that changed no tyres (a repair, a
+    stop-go, a drive-through: track.service_stops) after the takeover, as drivers[].serviceStops
+    at their measured loss in the sim frame."""
     total_laps = int(laps["LapNumber"].max())
     cliffs = fit.compound_cliff
     longest = longest_stints(laps)
@@ -298,6 +302,27 @@ def assemble_race_model(
         else set()
     )
 
+    # Stops with no tyre change (Eras sim fix 1): every car pays them on their real lap,
+    # whatever its strategy, at the loss measured in the sim frame.
+    service: dict[str, list[dict]] = {}
+    if service_stops:
+        v3_pace = {c: p + race_pace.get(c, 0.0) for c, p in fit.driver_pace.items()}
+        frame = pace_mod.sim_frame_losses(
+            laps,
+            v3_pace,
+            compounds,
+            round(fit.fuel_per_lap, 5),
+            fresh,
+            takeover_lap,
+            weather,
+            wear,
+            wet_pace,
+            service=True,
+        )
+        for (code, out_lap), loss in sorted(frame.items()):
+            if out_lap > takeover_lap:
+                service.setdefault(code, []).append({"lap": out_lap, "loss": round(loss, 3)})
+
     drivers = []
     for code in sorted(set(takeover_state) & set(fit.driver_pace)):
         s = takeover_state[code]
@@ -330,6 +355,7 @@ def assemble_race_model(
                     for st in strategy.get(code, [])
                     if st["lap"] >= takeover_lap
                 ],
+                **({"serviceStops": service[code]} if code in service else {}),
             }
         )
 

@@ -73,6 +73,7 @@ SC laps are read from the leader's lap times.
 from __future__ import annotations
 
 import json
+import math
 from pathlib import Path
 
 import pandas as pd
@@ -458,10 +459,15 @@ def stop_losses(
     out-laps hold the stoppage, so they can't be measured: a car that entered the pits after
     the red flag was shown changed tyres in the stoppage (0, free); one that entered before
     paid the track's figure for the flag it entered under (status timeline). Without timing
-    (hand entries) a stop on the first red lap pays pitLoss; later ones are free."""
+    (hand entries) a stop on the first red lap pays pitLoss; later ones are free. A red flag
+    whose cars stopped on the grid on the flag lap (one red lap) has its stoppage's tyre
+    changes on the lap after it (free_out_laps): free."""
     spans = [(e["lap"], e["lap"] + int(e.get("laps", 1)) - 1) for e in events if e["type"] == "RED"]
     if not spans:
         return {}
+    # The stoppage's out-laps (free_out_laps): a car that stopped on the grid on the flag lap
+    # changed tyres there, so its out-lap is the lap after.
+    stoppage = {lap for a, b in spans for lap in free_out_laps(a, b)}
     from .scenario import real_strategy
 
     timeline = sorted(track_status or [], key=lambda r: float(r["time"]))
@@ -489,11 +495,11 @@ def stop_losses(
     for driver, stops in real_strategy(laps).items():
         for stop in stops:
             lap = stop["lap"]
+            if lap in stoppage:
+                out[(driver, lap)] = 0.0
+                continue
             span = next(((a, b) for a, b in spans if a <= lap <= b), None)
             if span is None:
-                continue
-            if lap > span[0]:
-                out[(driver, lap)] = 0.0
                 continue
             entered = pit_in.get((driver, lap - 1), end.get((driver, lap - 1)))
             red_at = next(
@@ -518,11 +524,21 @@ def stop_losses(
 # --- the rules the sims replay (sim_reference.py; packages/sim/src/redflag.ts) --------------
 
 
+def free_out_laps(first: int, stop: int) -> range:
+    """The out-laps of a stop made in the stoppage of the red flag on laps first..stop: the red
+    laps after the first. When the cars stopped on the grid on the flag lap itself (stop ==
+    first: every 2007-11 red flag, Monaco 2022), the stoppage ends that lap, so a tyre change
+    made there has its out-lap on the lap after it (Monaco 2011: "teams were allowed to change
+    tyres" during the stoppage)."""
+    return range(first + 1, stop + 1) if stop > first else range(first + 1, first + 2)
+
+
 def plan(events: list[dict]) -> dict:
-    """What the sim does with a race's red flags: `free` laps (a stop with its out-lap there
-    costs nothing) and `wipes` {lap: (gap, red lap)} (at the end of `lap`, the running cars
-    are lined up `gap` apart, if the red flag on `red lap` is in the run's events)."""
-    free: set[int] = set()
+    """What the sim does with a race's red flags: `free` {out-lap: red lap} (a stop with its
+    out-lap there costs nothing, if the red flag on `red lap` is in the run's events; see
+    free_out_laps) and `wipes` {lap: (gap, red lap)} (at the end of `lap`, the running cars are
+    lined up `gap` apart, if the red flag on `red lap` is in the run's events)."""
+    free: dict[int, int] = {}
     wipes: dict[int, tuple[float, int]] = {}
     scs = {int(e["lap"]): int(e.get("laps", 1)) for e in events if e["type"] == "SC"}
     for e in events:
@@ -530,14 +546,41 @@ def plan(events: list[dict]) -> dict:
             continue
         first = int(e["lap"])
         stop = first + int(e.get("laps", 1)) - 1
-        free.update(range(first + 1, stop + 1))
+        free.update({lap: first for lap in free_out_laps(first, stop)})
         wipes[stop] = (BUNCH_GAP, first)
         if e["restart"] == "standing":
             wipes[stop + scs.get(stop + 1, 0)] = (STANDING_RESTART_GAP, first)
     return {"free": free, "wipes": wipes}
 
 
-def line_up(live: list[str], cars: dict, gap: float) -> None:
-    """Wipe the gaps: the running cars (in order) `gap` apart behind the leader."""
+def is_free(red_plan: dict, neutral: dict[int, str], lap: int) -> bool:
+    """A stop with its out-lap on `lap` is made in a red flag's stoppage that the run's events
+    hold (`neutral`: the run's flag per lap): free."""
+    first = red_plan["free"].get(lap)
+    return first is not None and neutral.get(first) == "RED"
+
+
+def road_order(
+    live: list[str], cars: dict, lap_time: float
+) -> tuple[list[str], dict[str, int], dict[str, float]]:
+    """The running cars in the order they are on the road behind the leader, with each car's
+    laps down and its time behind the leader on the road (both from `lap_time`)."""
+    lead = cars[live[0]].total_time
+    down = {c: math.floor((cars[c].total_time - lead) / lap_time) for c in live}
+    on_road = {c: cars[c].total_time - lead - down[c] * lap_time for c in live}
+    return sorted(live, key=lambda c: on_road[c]), down, on_road
+
+
+def line_up(live: list[str], cars: dict, gap: float, lap_time: float | None = None) -> None:
+    """Wipe the gaps: the running cars (in order) `gap` apart behind the leader. With
+    `lap_time` (no unlapping, scUnlap "none": before 2007 and 2010-11) the lapped cars line up
+    where they are on the road, each keeping its laps down (road_order); Monaco
+    2011's restart had lapped cars between the leader and the fourth car."""
+    if lap_time:
+        lead = cars[live[0]].total_time
+        road, down, _ = road_order(live, cars, lap_time)
+        for i, c in enumerate(road):
+            cars[c].total_time = lead + i * gap + down[c] * lap_time
+        return
     for i in range(1, len(live)):
         cars[live[i]].total_time = cars[live[0]].total_time + i * gap

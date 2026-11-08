@@ -5,7 +5,8 @@
     "name": "Brazil 1991: Senna vs Patrese",
     "laps": 71,
     "takeoverLap": 32,
-    "seed": 1
+    "seed": 1,
+    "scUnlap": "none"
   },
   "era": "1988-1993",
   "track": {

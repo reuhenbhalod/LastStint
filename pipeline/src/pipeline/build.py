@@ -23,6 +23,7 @@ from . import (
     fit,
     incidents,
     ingest,
+    race_rules,
     reconstruct,
     redflag,
     refuel,
@@ -2101,6 +2102,15 @@ def lap_time_weather(records: list[dict] | None) -> bool:
     return any(r.get("source") == wet_laps.SOURCE for r in records or [])
 
 
+def eras_sc_unlap(year: int | None) -> str | None:
+    """race.scUnlap for an Eras build: "none" in a season whose lapped cars couldn't unlap
+    behind the SC (race_rules.sc_unlap_for_year: before 2007 and 2010-11), else None (the
+    default, every lapped car unlaps)."""
+    if year is None:
+        return None
+    return "none" if race_rules.sc_unlap_for_year(int(year)) == "none" else None
+
+
 def load_overlay(race_id: str, eras_dir: Path = ERAS_DIR) -> dict | None:
     """data/eras/<race-id>.json, the race's authored Eras keys; None without one. A key that
     isn't one of OVERLAY_KEYS is an error (a typo would otherwise be dropped silently)."""
@@ -2216,7 +2226,13 @@ def build_race(
         if weather
         else None
     )
-    params = track.fit_track_params(laps, clean_df, traffic_df, fitted)
+    # Eras sim fixes (a race whose file takes its Eras overlay; never a Daily/Gauntlet race,
+    # whose file must replay as it is): the robust pit loss, stops with no tyre change, and
+    # the year's no-unlapping rule.
+    eras_build = overlay is not None and not shared
+    params = track.fit_track_params(
+        laps, clean_df, traffic_df, fitted, pit_loss_guard=eras_build, refuelling=refuelling
+    )
     if recon is not None:
         params = reconstructed_pit_loss(params, recon)
 
@@ -2241,13 +2257,16 @@ def build_race(
         fastest_lap_point=meta["year"] in scenario.FASTEST_LAP_POINT_YEARS,
         rival=meta["rival"],
         track_status=_from_raw(ingest.load_track_status, race_id, raw_dir),
-        sc_unlap=meta.get("sc_unlap"),
+        sc_unlap=meta.get("sc_unlap")
+        or (eras_sc_unlap(meta.get("year") or race_rules.year_of(race_id)) if eras_build else None),
         weather=weather,
         wet_pace=wet_pace,
         fault_facts=fault_facts,
         year=meta.get("year"),
         red_flags=red_flags,
         refuel=refuel_fit,
+        # A refuelling race's stop that kept its tyres may be a fuel-only stop: not one.
+        service_stops=eras_build and not refuelling,
     )
     estimated = list((block or {}).get("estimated", []))
     if recon is not None:

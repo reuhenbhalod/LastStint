@@ -5,21 +5,22 @@
     "name": "Hungary 1986: Piquet vs Senna",
     "laps": 76,
     "takeoverLap": 32,
-    "seed": 1
+    "seed": 1,
+    "scUnlap": "none"
   },
   "era": "1988-1993",
   "track": {
-    "pitLoss": 19.713,
-    "pitLossUnderSC": 10.842,
-    "pitLossUnderVSC": 13.602,
+    "pitLoss": 19.396,
+    "pitLossUnderSC": 10.668,
+    "pitLossUnderVSC": 13.383,
     "pitLossDeviations": [
-      -1.911,
-      -0.734,
-      -0.465,
-      -0.317,
-      0.317,
-      0.351,
-      7.032
+      -1.593,
+      -0.416,
+      -0.148,
+      0.0,
+      0.635,
+      0.668,
+      7.35
     ],
     "overtakeDifficulty": 0.7376,
     "overtakeModel": {

@@ -95,6 +95,20 @@ export interface DriverModel {
     compoundsUsed: Compound[];
   };
   realStrategy: PitStop[];
+  /**
+   * Real stops after the takeover that changed no tyres (a repair, a penalty stop-go, a
+   * drive-through; pipeline track.service_stops): the car pays each one's measured loss on its
+   * out-lap whatever its strategy, and keeps its set. Eras builds only.
+   */
+  serviceStops?: ServiceStop[];
+}
+
+/** A stop with no tyre change (DriverModel.serviceStops). */
+export interface ServiceStop {
+  /** The out-lap: its loss is charged on this lap. */
+  lap: number;
+  /** Measured time lost to the stop (s). */
+  loss: number;
 }
 
 /** A car fault's kind (simulator roadmap R2; faults.ts). */

@@ -27,7 +27,7 @@ import { type FaultTable, cloneFaults, faultCost, faultTable } from './faults.js
 import headsetConfig from './headset.json';
 import { legendEvents, legendLoss } from './legend.js';
 import { validatePlan } from './plan.js';
-import { type RedFlagPlan, lineUp, redFlagPlan } from './redflag.js';
+import { type RedFlagPlan, lineUp, redFlagPlan, roadOrder } from './redflag.js';
 import {
   burnTank,
   checkFill,
@@ -105,6 +105,11 @@ export const BUNCH_GAP = 0.5; // SC train spacing per car (measured on the final
 // lap, each middle SC lap keeps SC_GAP_KEEP of a gap's excess over BUNCH_GAP, and the last lap
 // before the restart is nose-to-tail. Mirrors sim_reference.py.
 export const SC_GAP_KEEP = 0.34;
+// An Eras race (one with an era `rules` block) closes its middle SC laps gap by gap instead:
+// each gap over SC_QUEUE_SPACING keeps SC_QUEUE_KEEP of its excess (fitted on the 2018+ timed
+// races' real queues, pipeline sc_queue.py). Daily/Gauntlet race files carry no rules block.
+export const SC_QUEUE_SPACING = 1.7;
+export const SC_QUEUE_KEEP = 0.34;
 export const SC_FALLBACK = 1.6; // SC lap = this x green if not supplied
 export const VSC_FALLBACK = 1.35; // VSC lap = this x green if not supplied
 export const CLIFF_FALLBACK = 2.0; // extra wear past the cliff = this x degPerLap if not fitted
@@ -699,7 +704,26 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
 
 /** A stop with its out-lap on `lap` is the tyre change in a red flag's stoppage: free. */
 export function redFlagFree(run: Run, lap: number): boolean {
-  return run.red.free.has(lap) && run.neutral.get(lap) === 'red';
+  const redLap = run.red.free.get(lap);
+  return redLap !== undefined && run.neutral.get(redLap) === 'red';
+}
+
+/** Each car's stops with no tyre change, out-lap -> loss (DriverModel.serviceStops). */
+const SERVICE = new WeakMap<RaceModel, Map<string, Map<number, number>>>();
+
+/** The loss of the car's stop with no tyre change on `lap` (a repair, a stop-go, a
+ * drive-through), if it has one: paid whatever its strategy (sim_reference.py). */
+export function serviceStopLoss(model: RaceModel, code: string, lap: number): number | undefined {
+  let table = SERVICE.get(model);
+  if (!table) {
+    table = new Map();
+    for (const d of model.drivers) {
+      if (d.serviceStops?.length)
+        table.set(d.code, new Map(d.serviceStops.map((s) => [s.lap, s.loss])));
+    }
+    SERVICE.set(model, table);
+  }
+  return table.get(code)?.get(lap);
 }
 
 /** Set the flag the next lap will run under, from the neutralizations known so far. */
@@ -1609,6 +1633,14 @@ export function stepLap(run: Run): RaceState {
       }
     }
 
+    // A stop with no tyre change (a repair, a stop-go, a drive-through; Eras builds): whatever
+    // the car's strategy, it pays its measured loss on its real lap and keeps its set.
+    const service = serviceStopLoss(model, code, lap);
+    if (service !== undefined) {
+      pitted.add(code);
+      c.pittedThisLap = true;
+      if (!redFlagFree(run, lap)) pitCost += service;
+    }
     // A car fault (faults.ts): its pace loss on green laps, its slow lap on its own lap.
     const fault = faultCost(run.faults, code, lap, c.pittedThisLap, !flag);
     if (fault.struck) run.notes.push({ lap, kind: 'fault', driver: code, detail: fault.struck });
@@ -1683,7 +1715,7 @@ export function stepLap(run: Run): RaceState {
     if (flag === 'sc' && run.neutral.get(lap - 1) === 'sc') {
       // Deployment lap: gaps kept. Middle laps: SC_GAP_KEEP of the excess. Last lap: bunched.
       const keep = run.neutral.get(lap + 1) === 'sc' ? SC_GAP_KEEP : 0;
-      bunch(order, cars, green, keep, scQueue(model));
+      bunch(order, cars, green, keep, scQueue(model), model.rules !== undefined);
       state.order = [...sortByTime(order, cars), ...retiredInOrder(run)];
     }
   } else {
@@ -1691,7 +1723,10 @@ export function stepLap(run: Run): RaceState {
     applySwap(run, lap, prevTime);
   }
   const wipe = run.red.wipes.get(lap);
-  if (wipe && run.neutral.get(wipe.redLap) === 'red') lineUp(live(run), cars, wipe.gap);
+  if (wipe && run.neutral.get(wipe.redLap) === 'red') {
+    // No unlapping (scUnlap 'none'): the lapped cars line up where they are on the road.
+    lineUp(live(run), cars, wipe.gap, scQueue(model) === 'none' ? green : undefined);
+  }
   if (state.engineer) engineerAfterLap(run, lap, battle, prevTime, pitted);
   const rivalBefore = rivalPlanBefore(run);
   rivalReacts(run, lap, flag, prevTime);
@@ -1801,6 +1836,10 @@ function forcedCompound(model: RaceModel, c: CarState, w = 0): string {
  * a lap down, and on the last lap (keep 0) the lapped cars sitting between the user's car and
  * the rival are waved through to the back of the lead-lap queue. Mirrors _bunch in
  * sim_reference.py.
+ *
+ * An Eras race (`eras`: it has a rules block) closes a middle lap gap by gap (closeGaps, the
+ * fit of pipeline sc_queue.py). With scUnlap 'none' (no unlapping: before 2007 and 2010-11)
+ * the lapped cars stay in the queue where they are on the road, a lap down (bunchRoad).
  */
 function bunch(
   live: string[],
@@ -1808,8 +1847,17 @@ function bunch(
   lapTime: number | undefined,
   keep: number,
   duel: [string, string] | 'none' | null,
+  eras = false,
 ): void {
   if (!live.length) return;
+  if (duel === 'none' && lapTime) {
+    bunchRoad(live, cars, lapTime, keep, eras);
+    return;
+  }
+  if (!duel && eras && keep > 0) {
+    closeGaps(live, cars);
+    return;
+  }
   if (!duel) {
     for (let i = 1; i < live.length; i++) {
       const ahead = cars[live[i - 1] as string] as CarState;
@@ -1850,6 +1898,53 @@ function bunch(
   for (const c of waved) {
     last += BUNCH_GAP;
     (cars[c] as CarState).totalTime = last;
+  }
+}
+
+/** An Eras middle SC lap: each gap over SC_QUEUE_SPACING keeps SC_QUEUE_KEEP of its excess,
+ * measured on the queue as it stood (sim_reference.py _close_gaps). */
+function closeGaps(live: string[], cars: Record<string, CarState>): void {
+  const old = live.map((c) => (cars[c] as CarState).totalTime);
+  for (let i = 1; i < live.length; i++) {
+    let gap = (old[i] as number) - (old[i - 1] as number);
+    if (gap > SC_QUEUE_SPACING) gap = SC_QUEUE_SPACING + SC_QUEUE_KEEP * (gap - SC_QUEUE_SPACING);
+    (cars[live[i] as string] as CarState).totalTime =
+      (cars[live[i - 1] as string] as CarState).totalTime + gap;
+  }
+}
+
+/** No unlapping (scUnlap 'none'): the whole queue closes up in road order, lapped cars where
+ * they are on the road, each keeping its laps down; the last lap (keep 0) is nose-to-tail
+ * (sim_reference.py _bunch_road). */
+function bunchRoad(
+  live: string[],
+  cars: Record<string, CarState>,
+  lapTime: number,
+  keep: number,
+  eras: boolean,
+): void {
+  const lead = (cars[live[0] as string] as CarState).totalTime;
+  const { road, down, onRoad } = roadOrder(live, cars, lapTime);
+  const placed = new Map<string, number>([
+    [road[0] as string, onRoad.get(road[0] as string) as number],
+  ]);
+  for (let i = 1; i < road.length; i++) {
+    const ahead = road[i - 1] as string;
+    const car = road[i] as string;
+    let gap = (onRoad.get(car) as number) - (onRoad.get(ahead) as number);
+    if (keep === 0) gap = BUNCH_GAP;
+    else if (eras) {
+      if (gap > SC_QUEUE_SPACING) gap = SC_QUEUE_SPACING + SC_QUEUE_KEEP * (gap - SC_QUEUE_SPACING);
+    } else {
+      gap =
+        BUNCH_GAP +
+        keep * Math.max(0, (onRoad.get(car) as number) - (placed.get(ahead) as number) - BUNCH_GAP);
+    }
+    placed.set(car, (placed.get(ahead) as number) + gap);
+  }
+  for (const c of live) {
+    (cars[c] as CarState).totalTime =
+      lead + (placed.get(c) as number) + (down.get(c) as number) * lapTime;
   }
 }
 

@@ -219,11 +219,30 @@ def test_red_flag_stop_losses():
 
 def test_plan():
     evs = [{"lap": 5, "type": "RED", "laps": 2, "restart": "rolling"}]
-    assert redflag.plan(evs) == {"free": {6}, "wipes": {6: (0.5, 5)}}
+    assert redflag.plan(evs) == {"free": {6: 5}, "wipes": {6: (0.5, 5)}}
     standing = [{**evs[0], "restart": "standing"}, {"lap": 7, "type": "SC", "laps": 2}]
-    assert redflag.plan(standing) == {"free": {6}, "wipes": {6: (0.5, 5), 8: (0.74, 5)}}
-    assert redflag.plan([{"lap": 5, "type": "RED", "laps": 2}]) == {"free": set(), "wipes": {}}
-    assert redflag.plan([{"lap": 5, "type": "SC", "laps": 2}]) == {"free": set(), "wipes": {}}
+    assert redflag.plan(standing) == {"free": {6: 5}, "wipes": {6: (0.5, 5), 8: (0.74, 5)}}
+    assert redflag.plan([{"lap": 5, "type": "RED", "laps": 2}]) == {"free": {}, "wipes": {}}
+    assert redflag.plan([{"lap": 5, "type": "SC", "laps": 2}]) == {"free": {}, "wipes": {}}
+    # Stopped on the grid on the flag lap (one red lap): the stoppage's change is free on the
+    # lap after it (every 2007-11 red flag).
+    grid = [{"lap": 72, "type": "RED", "laps": 1, "restart": "rolling"}]
+    assert redflag.plan(grid)["free"] == {73: 72}
+    assert redflag.is_free(redflag.plan(grid), {72: "RED"}, 73)
+    assert not redflag.is_free(redflag.plan(grid), {}, 73)  # a run that doesn't know the flag
+
+
+def test_line_up_no_unlapping_keeps_road_order():
+    from types import SimpleNamespace as Car
+
+    # Lap 100 s. B is on the lead lap 30 s back; L is a lap down, 10 s behind A on the road.
+    cars = {"A": Car(total_time=0.0), "B": Car(total_time=30.0), "L": Car(total_time=110.0)}
+    redflag.line_up(["A", "B", "L"], cars, 0.5, 100.0)
+    assert cars["L"].total_time == pytest.approx(100.5)
+    assert cars["B"].total_time == pytest.approx(1.0)
+    cars = {"A": Car(total_time=0.0), "B": Car(total_time=30.0), "L": Car(total_time=110.0)}
+    redflag.line_up(["A", "B", "L"], cars, 0.5)
+    assert cars["L"].total_time == pytest.approx(1.0)
 
 
 def test_fixture_golden_is_current():

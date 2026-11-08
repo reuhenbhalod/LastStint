@@ -9,15 +9,14 @@
   },
   "era": "2014-2025",
   "track": {
-    "pitLoss": 29.291,
-    "pitLossUnderSC": 16.11,
-    "pitLossUnderVSC": 20.211,
+    "pitLoss": 26.071,
+    "pitLossUnderSC": 14.339,
+    "pitLossUnderVSC": 17.989,
     "pitLossDeviations": [
-      -7.497,
-      -5.182,
-      -1.258,
-      1.258,
-      14.33
+      -4.277,
+      -1.962,
+      1.962,
+      4.478
     ],
     "overtakeDifficulty": 0.8656,
     "overtakeModel": {
@@ -180,6 +179,12 @@
           "to": "SOFT",
           "loss": 0.0
         }
+      ],
+      "serviceStops": [
+        {
+          "lap": 32,
+          "loss": 30.275
+        }
       ]
     },
     {
@@ -329,6 +334,12 @@
           "lap": 21,
           "to": "SOFT"
         }
+      ],
+      "serviceStops": [
+        {
+          "lap": 34,
+          "loss": 15.202
+        }
       ]
     },
     {
@@ -353,6 +364,12 @@
         {
           "lap": 21,
           "to": "SOFT"
+        }
+      ],
+      "serviceStops": [
+        {
+          "lap": 34,
+          "loss": 14.747
         }
       ]
     },
@@ -503,6 +520,12 @@
           "to": "SOFT",
           "loss": 0.0
         }
+      ],
+      "serviceStops": [
+        {
+          "lap": 34,
+          "loss": 28.951
+        }
       ]
     },
     {
@@ -531,7 +554,7 @@
         {
           "lap": 22,
           "to": "SOFT",
-          "loss": 16.11
+          "loss": 14.339
         },
         {
           "lap": 23,
