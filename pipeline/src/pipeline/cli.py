@@ -8,6 +8,7 @@ pipeline validate <race-id>   run the Gate G1 report; exits 1 if the race fails
 pipeline f1db [race-id ...]   F1DB stops and fastest laps -> data/raw/f1db/ (Eras races)
 pipeline tum-ingest <race-id> read a 2014-2019 race from the TUM database into data/raw/
 pipeline hard-calls <race-id> count each storyline driver's hard calls -> data/eras/<id>.json
+pipeline wet-laps <race-id>   wetness from the lap times for a wet race before 2018
 """
 
 from __future__ import annotations
@@ -191,6 +192,42 @@ def jolpica_cmd(
         hand = side["estimates"].get("safetyCars", {}).get("handCheck")
         if hand:
             typer.echo(f"  SC hand-check: {hand} (docs/eras-checks/2.4-estimates.md)")
+
+
+@app.command("wet-laps")
+def wet_laps_cmd(
+    race_id: str = typer.Argument(..., help="A race before 2018, e.g. hungary-2014."),
+    raw_dir: str = typer.Option(None, help="Where its raw snapshot is (default: data/raw/)."),
+    force: bool = typer.Option(False, help="Overwrite an existing weather file."),
+) -> None:
+    """Fit when the track was wet from the lap times (no weather data before 2018) and write
+    it as the race's weather records, plus a <race-id>.wet-laps.json report for the hand
+    check; a source without compounds or track status (Jolpica) gets them estimated too."""
+    from pathlib import Path
+
+    import pandas as pd
+
+    from . import wet_laps
+
+    raw = Path(raw_dir) if raw_dir else paths.RAW_DIR
+    snapshot = ingest.raw_snapshot_path(race_id, raw)
+    if not snapshot.exists():
+        raise typer.BadParameter(f"no snapshot at {snapshot}")
+    if ingest.weather_path(race_id, raw).exists() and not force:
+        typer.echo(f"{race_id}: weather file exists in {raw}, skipped (--force to overwrite)")
+        return
+    est = wet_laps.estimate(pd.read_parquet(snapshot))
+    wet_laps.write(race_id, est, raw)
+    rep = wet_laps.report(est, race_id)
+    typer.echo(
+        f"{race_id}: wet laps {', '.join(rep['wetSpells']) or 'none'};"
+        f" neutralised {', '.join(rep['neutralLaps']) or 'none'} ({rep['neutralSource']})"
+    )
+    for a in rep["ambiguous"]:
+        typer.echo(f"  ambiguous lap {a['lap']}: {a['why']}")
+    for f in rep["filled"]:
+        typer.echo(f"  filled {f}")
+    typer.echo(f"  -> {wet_laps.report_path(race_id, raw)}")
 
 
 @app.command("wet-fit")

@@ -81,9 +81,12 @@ def is_wet_race(laps: pd.DataFrame, weather: list[dict] | None) -> bool:
 
 
 def rain_laps(laps: pd.DataFrame, weather: list[dict] | None) -> set[int]:
-    """Laps on which rain fell in the five minutes before the leader finished them."""
+    """Laps on which rain fell in the five minutes before the leader finished them (records
+    with a `lap`: the laps the lap times say were wet, wet_laps.py)."""
     if not weather:
         return set()
+    if "lap" in weather[0]:
+        return {int(x["lap"]) for x in weather if x["rain"]}
     ends = laps.groupby("LapNumber")["Time"].min()
     out = set()
     for lap, t in ends.items():
@@ -149,8 +152,24 @@ def observations(
     return obs.groupby(["lap", "cls"])["share"].agg(["median", "count"]).reset_index()
 
 
-def timeline(obs: pd.DataFrame, laps: int, rain: set[int], curves: dict) -> list[float]:
-    """The race's wetness on each lap 1..laps: the smooth path that best explains `obs`."""
+# Before 2018 (wet_laps.py): the pull to dry on the laps the lap times call dry (no rain
+# gauge to say so, and the dry model's misses would otherwise read as a damp track).
+DRY_FIRM = 0.05
+
+
+def dry_laps(weather: list[dict] | None) -> set[int]:
+    """The laps lap-time records (wet_laps.py) call dry, ambiguous ones aside; none for a
+    rain gauge's records."""
+    if not weather or "lap" not in weather[0]:
+        return set()
+    return {int(x["lap"]) for x in weather if not x["rain"] and not x.get("ambiguous")}
+
+
+def timeline(
+    obs: pd.DataFrame, laps: int, rain: set[int], curves: dict, dry: set[int] | None = None
+) -> list[float]:
+    """The race's wetness on each lap 1..laps: the smooth path that best explains `obs`
+    (`dry`: laps firmly pulled to dry, wet_laps.py)."""
     model = {
         cls: penalty(curves, comp, GRID)
         for cls, comp in (("slick", "SOFT"), ("inter", "INTERMEDIATE"), ("wet", "WET"))
@@ -170,6 +189,8 @@ def timeline(obs: pd.DataFrame, laps: int, rain: set[int], curves: dict) -> list
             # Raining: at least damp (slicks then wear slowly, wear_mult), even where the
             # lap times hardly show it.
             c += 0.5 * np.maximum(0.0, 0.05 - GRID)
+        if dry and lap in dry:
+            c += DRY_FIRM * GRID
         cost[lap] = c
     trans = SMOOTH * (GRID[:, None] - GRID[None, :]) ** 2
     best = np.full_like(cost, np.inf)
@@ -274,7 +295,10 @@ def race_observations(
     total, rain = int(laps["LapNumber"].max()), rain_laps(laps, weather)
     obs = observations(laps, predict, wet_period(laps, weather))
     if curves is not None:
-        first = {"curves": curves, "wetness": timeline(obs, total, rain, curves)}
+        first = {
+            "curves": curves,
+            "wetness": timeline(obs, total, rain, curves, dry_laps(weather)),
+        }
         obs = observations(laps, predict, wet_period(laps, weather), sim_wear(laps, first))
     return obs, total, rain
 
@@ -282,7 +306,7 @@ def race_observations(
 def weather_block(laps: pd.DataFrame, weather: list[dict] | None, fitted, curves: dict) -> dict:
     """The race model's `weather`: the curves and the race's wetness on every lap."""
     obs, total, rain = race_observations(laps, weather, fitted, curves)
-    return {"curves": curves, "wetness": timeline(obs, total, rain, curves)}
+    return {"curves": curves, "wetness": timeline(obs, total, rain, curves, dry_laps(weather))}
 
 
 def rms(obs: pd.DataFrame, wetness: list[float], curves: dict) -> float:
