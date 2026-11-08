@@ -81,7 +81,8 @@ export function tyreLoss(model: RaceModel, compound: string, wear: number): numb
   const c = model.compounds[compound];
   if (!c) return 0;
   const past = Math.max(0, wear - c.cliffLap);
-  return c.degPerLap * wear + (c.cliffDegPerLap ?? 2 * c.degPerLap) * past;
+  const quad = (c.degQuad ?? 0) * wear * wear; // Eras model fix S4
+  return c.degPerLap * wear + quad + (c.cliffDegPerLap ?? 2 * c.degPerLap) * past;
 }
 
 /** What the director remembers between laps (so it doesn't ask the same thing every lap). */

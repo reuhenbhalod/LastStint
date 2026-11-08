@@ -152,6 +152,8 @@ def _clean_lap(
     c = compounds[car.compound]
     wear = car.tyre_wear
     t = car.base_pace + car.stint_pace + c["offset"] + c["degPerLap"] * wear - fuel_per_lap * lap
+    if "degQuad" in c:  # Eras model fix S4: wear that grows with the set's age (wear_shape.py)
+        t += c["degQuad"] * wear * wear
     if fresh:
         t += fresh["bonus"] * fresh_weight_sim(car.tyre_age, fresh["laps"])
     if wear > c["cliffLap"]:  # past the cliff: wear accelerates

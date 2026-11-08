@@ -3099,3 +3099,114 @@ them (schema: optional). `python -m pipeline.dirty_air --cache DIR` refits the t
 **Fixtures.** New: `packages/sim/tests/fixtures/eras-dirty-air.json` (spain-2021 with its bands;
 the same with heldGap 0.79 and rollOnly; brazil-2006 refuelling with its bands and rollOnly; 20
 seeds each; `tests/make_dirty_air_fixture.py`). No existing fixture went stale.
+
+## Eras model fix S4 (Nov 8 2026): quadratic tyre wear pooled by track and era: 10 -> 11 pass on 24 races, the long-stint races barely move
+
+Job 1.4, the races report's gap 11 ("tyre wear on long stints"): wear is linear per compound
+(plus a cliff kept only where it lowers the race's BIC), so a stint that falls off late runs
+flat. Examples: Alonso's 32-lap softs at Hungary 2014 (about +1.1 s a lap over the last 7
+laps, fuel-corrected, against the race's linear 0.034 s), and Vettel's 62-lap hards at Monaco
+2011 (HARD fit 0.003 s a lap).
+
+**Method** (`wear_shape.py`, `fit.measure_quad`, `fit.QuadPrior`; Eras builds only):
+- **Shape.** Each dry compound gets a quadratic term, `degQuad x wear^2` in the sims on top of
+  `degPerLap x wear`. It is fitted jointly with the rest of the lap model (the ordered,
+  prior-shrunk compounds, the fuel term, the BIC cliff search on top) and bounded at 0.
+- **Measured** on the clean laps of every timed, non-reconstructed snapshot in data/raw (124
+  races; `python -m pipeline.wear_shape` writes `pipeline/config/wear_shape.json`). For each
+  race and compound with 30 clean laps or more, the term is fitted unshrunk and unbounded, with
+  no cliffs, plus its standard error. A race of short stints measures it with a large error.
+- **Pooled** by random effects per era (the compound priors' eras) and compound. `tau2` is the
+  race-to-race variance (DerSimonian-Laird). `tau2Within` is the variance between races at one
+  track layout (`overtaking.layout_of`), from the same estimator on deviations from each
+  layout's mean. The track level's own variance is `tau2 - tau2Within`.
+- **The race's prior.** The layout's level comes from the *other* races there (its own laps
+  count once, in its fit), each at variance se² + tau2Within, shrunk to the era's mean. Its sd
+  is sqrt(that level's variance + tau2Within). It enters the fit as one prior row of weight
+  noise / sd (noise = the race's own residual sd), so the result is the precision-weighted mix
+  of the race's laps and its track and era.
+- **Tyre life** (`sim.ts tyreLife`, `rival_policy.tyre_life`) solves `degPerLap·a + degQuad·a²`
+  (+ the cliff) = LIFE_LOSS, so the rivals, the engineer and the "worn" checks see the same
+  tyre. `engineerCalls.tyreLoss` counts the term too.
+
+Pooled means in ms per lap² (tau, within): 2014-2025 HARD 0.56 (0.59, 0.52), MEDIUM 0.46 (0.72,
+0.63), SOFT 0.02 (0.86, 0.80); 2010-2013 HARD 1.93 (1.80, 0.03), SOFT 1.73 (2.29, 0.42);
+1994-2009 HARD -0.83, MEDIUM -0.38, SOFT -3.52 (their priors are floored at 0). In the modern era
+the track explains little of the spread (within is close to tau).
+
+**What the data says about the named races.** Their own measured terms are flat or negative:
+- monaco-2011: HARD -0.39 ± 0.23 ms/lap², SOFT -0.49 ± 0.70.
+- hungary-2014: SOFT -0.62 ± 0.39, MEDIUM +1.30 ± 0.27.
+- australia-2010: HARD -0.20 ± 0.19.
+
+Vettel's late laps at Monaco ran at the pace of the train behind him, and Hungary's early soft
+stints got quicker on a drying, rubbering track, which offsets Alonso's and Räikkönen's late
+fall-off. With the 0 bound, monaco-2011's HARD and australia-2010's compounds get no term, and
+hungary-2014 gets MEDIUM 0.54 ms/lap² (on top of its fitted cliff at 28).
+
+Over all long stints (25 laps or more), the residuals against the linear fit, centred per stint,
+form a shallow U in the modern eras (+0.04 s early, -0.05 s mid-stint, +0.06 s in the last
+tenth). Most of the late rise is in each stint's last tenth: stints end when their tyres go,
+so it can't be predicted from tyre age alone. The fall-offs the races report names are
+stint-specific (one driver's set, on one day), which a per-compound shape can't carry. A fade
+per real stint (a wear slope next to M2's stint offsets, shrunk the same way) is the next thing
+to try for them.
+
+**Before / after** (robust G1, 1,000 runs on each of two seed sets, one race per call; before =
+the parent commit a911ab9 with S4 off, reproducing docs/eras-races-report.md; after = this
+branch; rebuilt into a scratch directory, data/races not changed). Failing checks are seed set
+10000's, limit as before.
+
+| Race | Before | After | Change | Failing checks after |
+|---|---|---|---|---|
+| monaco-2011 | fail 15.16 s | fail 15.19 s | +0.03 | field HAM 69.08, WEB 25.72, KOB 7.30 |
+| hungary-2014 | fail 2.73 s | fail 2.75 s | +0.02 | podium HAM 5.81; field RAI 5.52 |
+| australia-2010 | fail 4.11 s | fail 4.11 s | 0.00 | podium MAS 5.94; field ALO 6.34, ROS 9.65 |
+| bahrain-2014 | fail 1.17 s | fail 1.22 s | +0.05 | duel order 0.50 |
+| canada-2014 | fail 2.99 s | fail 2.99 s | 0.00 | duel ROS vs RIC 8.61, order 0.22 |
+| hungary-2015 | fail 6.90 s | fail 6.80 s | -0.10 | duel VET vs KVY 5.04; field ALO, VER |
+| monaco-2015 | fail 4.71 s | fail 4.60 s | -0.11 | duel HAM vs ROS 5.38; podium order 0.26 |
+| united-states-2015 | fail 2.31 s | fail 2.23 s | -0.08 | duel HAM vs ROS 4.08, order 0.41 |
+| great-britain-2016 | fail 2.37 s | fail 2.37 s | 0.00 | podium order 0.41 |
+| brazil-2009 | fail 3.79 s | fail 3.77 s | -0.02 | field VET 7.04, RAI 5.23 |
+| abu-dhabi-2012 | fail 1.72 s | fail 1.72 s | 0.00 | duel VET vs BUT 3.40, order 0.55 |
+| japan-2005 | fail 4.48 s | fail 4.48 s | 0.00 | duel RAI vs FIS 7.47 |
+| spain-2013 | fail 1.51 s | fail 1.59 s | +0.08 | duel RAI vs ALO 3.28 |
+| europe-2012 | fail 1.46 s | **pass** 1.37 s | -0.09 | |
+| spain-2016 | pass 1.13 s | pass 1.15 s | +0.02 | |
+| abu-dhabi-2016 | pass 0.85 s | pass 0.87 s | +0.02 | |
+| austria-2002 | pass 0.63 s | pass 0.63 s | 0.00 | |
+| malaysia-2013 | pass 1.20 s | pass 0.91 s | -0.29 | |
+| turkey-2021 | pass 0.41 s | pass 0.41 s | 0.00 | |
+| germany-2019 | pass 1.38 s | pass 1.38 s | 0.00 | |
+| germany-2018 | pass 1.59 s | pass 1.64 s | +0.05 | |
+| hungary-2022 | pass 1.97 s | pass 1.69 s | -0.28 | |
+| france-2004 | pass 1.89 s | pass 1.89 s | 0.00 | |
+| spain-1996 | pass 0.62 s | pass 0.83 s | +0.21 | |
+| **All 24** | **10 pass, 2.80 s** | **11 pass, 2.77 s** | | 7 better, 8 worse (5 of them by 0.05 s or less), 9 unchanged |
+
+No race lost its pass, and one was gained (europe-2012). The three races the job names don't
+move, for the reasons above. The fix is safe to keep, but it doesn't close gap 11.
+
+**Gating.** Only `build.py`'s `eras_build` races of timed laps (`eras_build and recon is None`)
+ask for priors (`wear_shape.quad_priors`). Only compounds with a positive term, rounded to 7
+decimals, carry `degQuad` (schema: optional, additive, no version change). The sims add it only
+when the file has it. All 39 Daily/Gauntlet pool races rebuild byte-identical, race file and
+golden, to a build at the parent commit (checked in a scratch copy). Reconstructed races keep
+linear wear (their laps are solved to a linear one). `build_race(..., wear_shape=False)` turns
+it off (the measurement uses that).
+
+**Parity and tests.** The TS sim replays the Python goldens of the 16 rebuilt scratch files
+that carry `degQuad` (20 seeds each, 320 runs: same order, times within 0.001 s; a scratch
+check, not committed). New: `pipeline/tests/test_wear_shape.py` (the term's fit, prior, bound
+and measurement; pooling with leave-one-out; the sim's lap and tyre life; gating on a pool race
+and on hungary-2014) and `packages/sim/tests/wear-shape.test.ts` (parity on spain-2021 with
+hand-entered degQuad, real and diverged strategies, and the tyre life:
+`pipeline/tests/make_wear_shape_fixture.py` ->
+`packages/sim/tests/fixtures/wear-shape-golden.json`). **Stale parity fixtures: none.** One
+committed-file comparison waits for the rebuild: `test_faults.py`'s hungary-1997 test (Hill's
+fitted fault carries the MEDIUM's term, 11.987 -> 11.963 s a lap), now gated on the committed
+file carrying both `stintPace` and `degQuad`.
+
+**Not done here:** the race files, goldens and `apps/worker/src/races.gen.ts` (the integration
+rebuilds them; until then the committed Eras files carry no `degQuad` and play as before).

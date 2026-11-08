@@ -37,6 +37,7 @@ from . import (
     wet_laps,
 )
 from . import pace as pace_mod
+from . import wear_shape as wear_shape_mod
 from .paths import DATA_DIR, RACES_DIR, RAW_DIR
 
 # Authored Eras content (eras build plan, "Eras overlay files"): data/eras/<race-id>.json,
@@ -2319,11 +2320,13 @@ def dry_fit(
     fault_facts: list[dict] | None = None,
     raw_dir: Path = RAW_DIR,
     recon: dict | None = None,
+    quad_priors: dict | None = None,
 ) -> DryFit:
     """The dry lap model. A refuelling race's `laps` carry the Tank and FuelLap columns
     (refuel.with_fuel_columns): the fuel term is fitted on the sim's sawtooth. `recon`: a
     reconstructed race's sidecar (load_reconstruction); wet on every lap, it gives the dry
-    pace instead (solver_dry_fit). A real-timing race wet on every lap can't be built."""
+    pace instead (solver_dry_fit). A real-timing race wet on every lap can't be built.
+    `quad_priors` (Eras builds, wear_shape.quad_priors): quadratic wear per dry compound."""
     clean_df, traffic_df, _ = clean.clean_laps(laps)
     # A faulted car's laps while the fault lasts aren't its pace (faults.py fits the loss).
     clean_df = faults.without_fault_laps(clean_df, fault_facts or [], laps)
@@ -2364,6 +2367,7 @@ def dry_fit(
         fallback_pace_laps=pace_laps,
         era=era,
         fixed_fuel=wet.FUEL_PRIOR if wet_race else None,
+        quad_priors=quad_priors,
     )
     return DryFit(clean_df, traffic_df, fitted, rain_data, wet_race)
 
@@ -2490,12 +2494,15 @@ def build_race(
     *,
     eras_dir: Path = ERAS_DIR,
     pools_path: Path = POOLS_PATH,
+    wear_shape: bool = True,
 ) -> BuildResult:
     """Build a validated race-model dict for a registered race (or an ingested Jolpica one),
     with its build notes, its estimates applied as provenance and its Eras overlay, unless it
     is a Daily or Gauntlet race (`shared_races`): its overlay stays out of its file.
     `raw_dir`: where its snapshot lives; `fault_facts`: its car faults (default: its FAULT
-    items in data/incidents.json); `pools_path`: the pools file naming the shared races."""
+    items in data/incidents.json); `pools_path`: the pools file naming the shared races.
+    `wear_shape`: False leaves out Eras model fix S4's quadratic wear (wear_shape.py measures
+    races without it)."""
     if laps is None:
         laps = pd.read_parquet(ingest.raw_snapshot_path(race_id, raw_dir))
     # Red flags (eras build plan 4.3): a race ended under the red flag ends at its results
@@ -2524,6 +2531,14 @@ def build_race(
     overlay = load_overlay(race_id, eras_dir)
     shared = overlay is not None and race_id in shared_races(pools_path)
     refuelling = refuelling_race(race_id, block, overlay, shared)
+    # Eras builds (a race whose file takes its Eras overlay; never a Daily/Gauntlet race, whose
+    # file must replay as it is). See the fixes listed below.
+    eras_build = overlay is not None and not shared
+    # Eras model fix S4 (wear_shape.py): quadratic wear per dry compound, shrunk to the track
+    # and era's. Real timing only (a reconstruction's laps are solved to a linear wear).
+    quad_priors, shape_note = None, None
+    if eras_build and recon is None and wear_shape:
+        quad_priors, shape_note = wear_shape_mod.quad_priors(race_id, meta["era"])
     refuel_fit = refuel_slope = None
     if refuelling:
         # Eras build plan 4.2: every fuel term reads the tank the sim carries (to the next
@@ -2535,7 +2550,7 @@ def build_race(
             race_id, sidecar.get("results"), Path(raw_dir) / "f1db"
         )
 
-    dry = dry_fit(race_id, laps, meta["era"], fault_facts, raw_dir, recon)
+    dry = dry_fit(race_id, laps, meta["era"], fault_facts, raw_dir, recon, quad_priors)
     clean_df, traffic_df, fitted = dry.clean, dry.traffic, dry.fitted
     weather = wet.weather_block(laps, dry.rain, fitted, wet.load_curves()) if dry.wet else None
     # Eras sim fixes (a race whose file takes its Eras overlay; never a Daily/Gauntlet race,
@@ -2544,7 +2559,6 @@ def build_race(
     # counted once; stops on partly yellow laps priced in the sim frame), and driver pace by
     # track state (model fix M1: damp and wet pace from clear-air laps against the field, and
     # the race's full wets against its inters; real lap timing only).
-    eras_build = overlay is not None and not shared
     damp_pace = None
     # Not a reconstructed race: its laps are solved to the anchors, so a driver's pace against
     # the field on a lap would read back the solver's noise (as with its faults, above).
@@ -2696,7 +2710,12 @@ def build_race(
     return BuildResult(
         model=model,
         laps=laps,
-        notes=[*fitted.prior_notes, *params.notes, *fault_notes],
+        notes=[
+            *fitted.prior_notes,
+            *([shape_note] if shape_note else []),
+            *params.notes,
+            *fault_notes,
+        ],
         estimates=report,
         fit=fitted,
         wet=dry.wet,
