@@ -572,6 +572,48 @@
    }
   ]
  },
+ "q3": [
+  {
+   "driver": "ROS",
+   "position": 1
+  },
+  {
+   "driver": "HAM",
+   "position": 2
+  },
+  {
+   "driver": "VET",
+   "position": 3
+  },
+  {
+   "driver": "RAI",
+   "position": 4
+  },
+  {
+   "driver": "ALO",
+   "position": 5
+  },
+  {
+   "driver": "MAS",
+   "position": 6
+  },
+  {
+   "driver": "GRO",
+   "position": 7
+  },
+  {
+   "driver": "WEB",
+   "position": 8
+  },
+  {
+   "driver": "PER",
+   "position": 9
+  },
+  {
+   "driver": "DIR",
+   "position": 10
+  }
+ ],
  "raceTimeCheck": [
   {
    "driver": "ALO",
@@ -645,7 +687,7 @@
    "handCheck": "data/estimates/spain-2013.sc.json"
   },
   "compounds": {
-   "method": "two compounds (SOFT option, HARD prime) from each stint's pace step and wear (tyre life), with the both-compounds rule",
+   "method": "two compounds (SOFT option, HARD prime) from each stint's pace step and wear (tyre life), with the both-compounds rule; the top ten start on the SOFT (the Q3 tyre rule, 2013)",
    "stints": [
     {
      "driver": "ALO",
@@ -653,7 +695,7 @@
      "fromLap": 1,
      "toLap": 9,
      "compound": "SOFT",
-     "by": "pace",
+     "by": "q3",
      "cleanLaps": 7,
      "paceStep": 0.393,
      "softness": 1.116
@@ -895,7 +937,7 @@
      "fromLap": 1,
      "toLap": 9,
      "compound": "SOFT",
-     "by": "pace",
+     "by": "q3",
      "cleanLaps": 7,
      "paceStep": 0.011,
      "softness": 1.354
@@ -950,7 +992,7 @@
      "fromLap": 1,
      "toLap": 8,
      "compound": "SOFT",
-     "by": "pace",
+     "by": "q3",
      "cleanLaps": 6,
      "paceStep": 0.035,
      "softness": 1.621
@@ -1016,7 +1058,7 @@
      "fromLap": 1,
      "toLap": 9,
      "compound": "SOFT",
-     "by": "pace",
+     "by": "q3",
      "cleanLaps": 7,
      "paceStep": -0.042,
      "softness": 1.387
@@ -1214,7 +1256,7 @@
      "fromLap": 1,
      "toLap": 8,
      "compound": "SOFT",
-     "by": "pace",
+     "by": "q3",
      "cleanLaps": 6,
      "paceStep": 0.268,
      "softness": 1.476
@@ -1269,7 +1311,7 @@
      "fromLap": 1,
      "toLap": 10,
      "compound": "SOFT",
-     "by": "pace",
+     "by": "q3",
      "cleanLaps": 8,
      "paceStep": -0.063,
      "softness": 1.119
@@ -1368,7 +1410,7 @@
      "fromLap": 1,
      "toLap": 10,
      "compound": "SOFT",
-     "by": "pace",
+     "by": "q3",
      "cleanLaps": 8,
      "paceStep": 0.37,
      "softness": 0.848
@@ -1467,7 +1509,7 @@
      "fromLap": 1,
      "toLap": 10,
      "compound": "SOFT",
-     "by": "pace",
+     "by": "q3",
      "cleanLaps": 8,
      "paceStep": -0.465,
      "softness": 1.37
@@ -1654,7 +1696,7 @@
      "fromLap": 1,
      "toLap": 10,
      "compound": "SOFT",
-     "by": "pace",
+     "by": "q3",
      "cleanLaps": 8,
      "paceStep": -0.003,
      "softness": 1.081
@@ -1709,7 +1751,7 @@
      "fromLap": 1,
      "toLap": 7,
      "compound": "SOFT",
-     "by": "pace",
+     "by": "q3",
      "cleanLaps": 5,
      "paceStep": 0.269,
      "softness": 1.757
@@ -1760,6 +1802,7 @@
     }
    ],
    "notes": [
+    "10 top-ten first stints set to SOFT by the Q3 tyre rule (0 the fit alone labelled HARD)",
     "1 stints set by the both-compounds rule",
     "6 stints too short to score"
    ]

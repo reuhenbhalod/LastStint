@@ -11,9 +11,23 @@ stops (F1DB pit-lane times, data/raw/f1db/<race>.stops.csv): lane time = laneBas
 secondsPerLap x the next stint's laps (a team fuelled for the stint it planned). Stops more
 than SLOW_STOP s over the race's median lane time are left out (a problem, a penalty, a
 repair). The race's least-squares slope is noisy (a stop's time also holds the tyre change
-and the driver's entry and exit), so it is shrunk toward the pooled slope of every refuelling
-race in data/raw/f1db by inverse variance (a random-effects pool; PRIOR_SECONDS_PER_LAP and
-PRIOR_TAU). The race file stores the result as track.refuel.
+and the driver's entry and exit) and biased toward 0 (the next stint's laps are only a proxy
+for the fuel put in), so it is shrunk by inverse variance toward a physical prior that it
+can barely move (PRIOR_SECONDS_PER_LAP, PRIOR_SD; owner decision, Nov 7 2026):
+- The rig: "Cars were fuelled at a rate of more than 12 litres per second" (Wikipedia, "Pit
+  stop", the refuelling era 1994-2009): RIG_LITRES_PER_SECOND = 12.
+- The burn: about 3 L a lap (BURN_LITRES_PER_LAP, the owner's figure, Nov 7 2026; it is not
+  sourced further and varies with the lap's length).
+- So a lap of fuel takes 3 / 12 = 0.25 s to put in. The data's own pooled slope (pooled_prior,
+  0.0648 s a lap over the races in data/raw/f1db with 8+ stops) is a quarter of that: a stop's time
+  hardly tracks the next stint's laps, so the data can't price a fill.
+- PRIOR_SD = 0.01 s a lap: about half the spread the two figures allow (12-12.5 L/s and
+  2.8-3.2 L a lap give 0.22-0.27 s). The most precise race in data/raw/f1db (europe-2007,
+  slope se 0.025) moves the rate 14% of the way to its own slope; a typical race (se 0.076)
+  under 2%. No single race can pull it back toward 0.06.
+The rate is an estimate: the race file lists `fuelLoads` in provenance.estimated for every
+refuelling race (estimates.py, reconstruct.py), and the sidecar's fuelLoads block names the
+fill rate (FILL_RATE_METHOD). The race file stores the result as track.refuel.
 
 Rules by year (checked Nov 7, 2026):
 - Refuelling allowed until 1983, banned 1984-93, allowed 1994-2009, banned from 2010:
@@ -59,10 +73,21 @@ SLOW_STOP = 4.0  # s over the race's median lane time: left out of the fit
 REFUEL_YEARS = (1983, *range(1994, 2010))
 FUEL_LIMIT_LITRES = {1984: 220, 1985: 220, 1986: 195, 1987: 195, 1988: 150}
 FUEL_DENSITY = 0.85  # kg/L (AGIP's turbo-era fuel, see above)
-# The pooled fill rate over the refuelling races in data/raw/f1db (pooled_prior(); a test
-# recomputes it): the random-effects mean (s per lap of fuel) and the between-race sd.
-PRIOR_SECONDS_PER_LAP = 0.0648
-PRIOR_TAU = 0.0908
+# The fill rate's physical prior (see the docstring): litres a second through the rig, and
+# litres a lap at the standard burn.
+RIG_LITRES_PER_SECOND = 12.0
+BURN_LITRES_PER_LAP = 3.0
+PRIOR_SECONDS_PER_LAP = BURN_LITRES_PER_LAP / RIG_LITRES_PER_SECOND  # 0.25 s per lap of fuel
+PRIOR_SD = 0.01  # s per lap: strong enough that no single race's stops can move it far
+# What the stops alone say, for the record (pooled_prior(); a test recomputes it): the
+# random-effects mean of the per-race slopes and their between-race sd. Not used in the fit.
+POOLED_SLOPE = 0.0648
+POOLED_TAU = 0.0908
+FILL_RATE_METHOD = (
+    f"fill rate: an estimate, {PRIOR_SECONDS_PER_LAP:.2f} s per lap of fuel"
+    f" (~{BURN_LITRES_PER_LAP:g} L a lap through a ~{RIG_LITRES_PER_SECOND:g} L/s rig, prior sd"
+    f" {PRIOR_SD} s), barely moved by the race's own stop times (refuel.py)"
+)
 
 F1DB_DIR = RAW_DIR / "f1db"
 ERAS_OVERLAY_DIR = DATA_DIR / "eras"
@@ -111,7 +136,7 @@ def refuelling(model: dict) -> bool:
 
 
 def refuel_model(model: dict) -> dict:
-    """The race's fill model: its fit, or the pooled prior with the tank holding the race."""
+    """The race's fill model: its fit, or the physical prior with the tank holding the race."""
     return model["track"].get("refuel") or {
         "secondsPerLap": PRIOR_SECONDS_PER_LAP,
         "laneBase": 0.0,
@@ -240,8 +265,9 @@ def _ols(stints: pd.DataFrame) -> tuple[float, float, float, pd.DataFrame]:
 
 
 def fit_fill_rate(stints: pd.DataFrame, prior: tuple[float, float] | None = None) -> dict:
-    """The race's fill model (track.refuel) from its stints (stints_from_stops)."""
-    mu, tau = prior if prior is not None else (PRIOR_SECONDS_PER_LAP, PRIOR_TAU)
+    """The race's fill model (track.refuel) from its stints (stints_from_stops): the race's
+    slope shrunk toward `prior` (mean, sd; default the physical prior) by inverse variance."""
+    mu, tau = prior if prior is not None else (PRIOR_SECONDS_PER_LAP, PRIOR_SD)
     slope, _, se, kept = _ols(stints)
     if math.isnan(slope) or not math.isfinite(se) or tau <= 0:
         rate = mu
@@ -269,7 +295,8 @@ def race_slope(stints: pd.DataFrame) -> dict:
 def pooled_prior(f1db_dir: Path = F1DB_DIR) -> tuple[float, float]:
     """The random-effects pool (DerSimonian-Laird) of the per-race slopes over the stops of
     every refuelling race in `f1db_dir`, from the stints between two stops (no results
-    needed). Returns (mean, between-race sd)."""
+    needed). Returns (mean, between-race sd). For the record (POOLED_SLOPE): the fit's prior
+    is the physical one, which this is a quarter of."""
     slopes, ses = [], []
     for path in sorted(f1db_dir.glob("*.stops.csv")):
         year = int(path.name.split(".")[0].rsplit("-", 1)[1])
@@ -310,7 +337,8 @@ def effective_lap(
 
 def main(argv: list[str]) -> None:
     """python -m pipeline.refuel overlays: write rules.refuelling / rules.fuelLimit to the
-    appendix races' overlays. python -m pipeline.refuel prior: print the pooled prior."""
+    appendix races' overlays. python -m pipeline.refuel prior: print the stops' pooled slope
+    (POOLED_SLOPE, POOLED_TAU) next to the physical prior."""
     from .race_rules import appendix_races
 
     cmd = argv[0] if argv else "overlays"
@@ -318,7 +346,8 @@ def main(argv: list[str]) -> None:
         for p in write_r4_overlays(appendix_races()):
             print(p)
     elif cmd == "prior":
-        print(pooled_prior())
+        print(f"stops' pooled slope (mean, tau): {pooled_prior()}")
+        print(f"physical prior (mean, sd): {(PRIOR_SECONDS_PER_LAP, PRIOR_SD)}")
     else:
         raise SystemExit(f"unknown command {cmd}")
 

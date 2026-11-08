@@ -1,7 +1,8 @@
 """Jolpica CSV dump ingest (eras build plan 2.2), offline on a committed fixture.
 
 tests/fixtures/jolpica/csv-2026-10-24 is cut from the 2026-10-24 Jolpica dump (VERSION.txt):
-the European GP 1997, Japanese GP 2005 and Abu Dhabi GP 2012 sessions, every round of those
+the European GP 1997, Japanese GP 2005 and Abu Dhabi GP 2012 race sessions (and Abu Dhabi
+2012's Q3), every round of those
 three seasons (for event lookup), and only the columns jolpica.py reads. A test drivers.json
 keeps the driver-code checks independent of data/drivers.json as it grows.
 """
@@ -165,6 +166,29 @@ def test_results_retirements_and_standings(loaded):
     assert side["standings"]["teams"][0]["position"] == 1
     assert side["licence"].startswith("CC BY-NC-SA")
     assert side["dump"] == "2026-10-24T01:04:07.015299Z"
+
+
+def test_q3_classification_lists_the_q3_cars_in_order(loaded):
+    q3 = loaded[2012].sidecar["q3"]
+    assert [r["driver"] for r in q3] == [
+        "HAM",
+        "WEB",
+        "VET",
+        "MAL",
+        "RAI",
+        "BUT",
+        "ALO",
+        "ROS",
+        "MAS",
+        "GRO",
+    ]
+    assert [r["position"] for r in q3] == list(range(1, 11))
+
+
+def test_no_q3_session_is_none(loaded):
+    # 1997 had one qualifying session; the fixture's 2005 round has no Q3 either.
+    assert loaded[1997].sidecar["q3"] is None
+    assert loaded[2005].sidecar["q3"] is None
 
 
 # --- Driver codes -------------------------------------------------------------------------

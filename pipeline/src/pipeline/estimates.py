@@ -10,8 +10,10 @@ those gaps with estimates, each one listed so the race file can say so
               read as tyre life (stint_scores); the softer-scoring half are the option
               (SOFT), the rest the prime (HARD), and a car that stopped must run both (the
               rule since 2007). On the 2018-2025 FastF1 races with two dry compounds, 79% of
-              stints get the right one of the two. A race with any real compound (TUM,
-              FastF1, OpenF1) is never relabelled.
+              stints get the right one of the two. From 2010 to 2013 a top-ten qualifier's
+              first stint is the option (the Q3 tyre rule, Q3_TYRE_RULE) and the rest are
+              fitted as above. A race with any real compound (TUM, FastF1, OpenF1) is never
+              relabelled.
 - safetyCars  Laps the whole field ran slowly. A safety car slows the field a lot (1.3-1.7x)
               and bunches it up; rain slows it less and spreads it out. A period that looks
               like a safety car is applied as one (TrackStatus "4"); one that might be rain,
@@ -24,7 +26,8 @@ those gaps with estimates, each one listed so the race file can say so
               era's standard burn (headset.json `fuel.burnPerLap`, kg a lap: the fuel-load
               model's unit). The real burn was higher and teams carried margins: an estimate.
               The race file has no field for them yet (eras build plan 4.2), so they live in
-              the raw sidecar and the build report.
+              the raw sidecar and the build report. The fill rate (track.refuel, refuel.py's
+              physical prior) is an estimate too and is listed under the same field.
 
 Also flagged, never hidden (`quirks`): an official race time rounded to 0.1 s (Hungary 1998
 in Jolpica), and a driver whose summed laps disagree with the official time by more than the
@@ -42,6 +45,7 @@ import numpy as np
 import pandas as pd
 
 from . import events as events_mod
+from . import refuel as refuel_mod
 from .paths import DATA_DIR, REPO_ROOT
 
 ESTIMATES_DIR = DATA_DIR / "estimates"
@@ -61,6 +65,15 @@ OUTLIER_FACTOR = 1.07  # as clean.py: slower than this x the driver's median is 
 # (docs/fuel-load-spec.md, "about 0.03 s").
 FUEL_SECONDS_PER_KG = 0.03
 PACE_WEIGHT = 0.25  # the pace step's weight against tyre life in a stint's softness
+# The Q3 tyre rule: "At the start of the race each car which took part in Q3 must be fitted
+# with the tyres with which the driver set his grid time. This will only be necessary if
+# dry-weather tyres were used to set the grid time and if dry-weather are used at the start
+# of the race" (FIA F1 Sporting Regulations 2010, art. 25.4(d); 2013, art. 25.4(e), the same
+# words). From 2014 it was the tyres of the car's fastest Q2 time (2014 regulations, art.
+# 25.4(e)), scrapped from 2022. The Q3 tyre was the option (owner decision, Nov 7 2026), so
+# a top-ten qualifier's first stint is labelled OPTION in these years.
+Q3_TYRE_RULE = range(2010, 2014)
+TOP_TEN = 10  # Q3's cars
 
 # --- safety cars -------------------------------------------------------------------------
 
@@ -196,16 +209,25 @@ def stint_scores(laps: pd.DataFrame, burn: float, refuelling: bool) -> pd.DataFr
     return out
 
 
-def assign_two_compounds(scores: pd.DataFrame) -> tuple[dict[tuple[str, float], str], dict]:
+def assign_two_compounds(
+    scores: pd.DataFrame, forced: dict[tuple[str, float], str] | None = None
+) -> tuple[dict[tuple[str, float], str], dict]:
     """Label each stint OPTION or PRIME from its softness, then make every car with two or
     more stints run both (the stint nearest the threshold flips). Unscored stints take the
-    compound the car still needs, else the race's more common one. Returns the labels and
-    why each was given ("pace" / "rule" / "default")."""
+    compound the car still needs, else the race's more common one. `forced` stints (the Q3
+    tyre rule's first stints) keep their given label and never flip; the threshold is still
+    the median over every scored stint. Returns the labels and why each was given ("pace" /
+    "rule" / "default" / "q3")."""
+    forced = forced or {}
     scored = scores.dropna(subset=["softness"])
     threshold = float(scored["softness"].median()) if len(scored) else 0.0
     label: dict[tuple[str, float], str] = {}
     why: dict[tuple[str, float], str] = {}
+    for key, compound in forced.items():
+        label[key], why[key] = compound, "q3"
     for r in scored.itertuples():
+        if (r.Driver, r.Stint) in forced:
+            continue
         label[(r.Driver, r.Stint)] = OPTION if r.softness > threshold else PRIME
         why[(r.Driver, r.Stint)] = "pace"
     counts = pd.Series(list(label.values())).value_counts()
@@ -222,7 +244,8 @@ def assign_two_compounds(scores: pd.DataFrame) -> tuple[dict[tuple[str, float], 
             have = label[keys[0]]
             need = PRIME if have == OPTION else OPTION
             soft = grp.set_index("Stint")["softness"]
-            # The stint whose score is closest to the other compound flips.
+            soft = soft[[(driver, st) not in forced for st in soft.index]]
+            # The stint whose score is closest to the other compound flips (never a forced one).
             ranked = soft.sort_values(ascending=(need == PRIME), na_position="last")
             flip = (driver, ranked.index[0])
             label[flip] = need
@@ -230,10 +253,37 @@ def assign_two_compounds(scores: pd.DataFrame) -> tuple[dict[tuple[str, float], 
     return label, why
 
 
+def option_starters(year: int, sidecar: dict | None) -> tuple[set[str] | None, str | None]:
+    """The cars the Q3 tyre rule put on the option at the start (Q3_TYRE_RULE years): those
+    in the Jolpica sidecar's Q3 classification that also started in the top ten. A Q3 car
+    starting further back is left to the fit: a grid penalty kept the rule, but an exclusion
+    or a pit-lane start (abu-dhabi-2012 VET, grid 24) freed the choice, and the grid can't
+    tell them apart. Returns (cars, None), or (None, why not) outside those years or without
+    a Q3 classification (a sidecar ingested before it was read: re-ingest)."""
+    if year not in Q3_TYRE_RULE:
+        return None, None
+    side = sidecar or {}
+    q3 = side.get("q3")
+    if q3 is None:
+        return None, (
+            "Q3 tyre rule not applied: no Q3 classification in the sidecar"
+            " (re-ingest with `pipeline jolpica <race-id> --force`)"
+        )
+    top_grid = {
+        r["driver"] for r in side.get("results", []) if r.get("grid") and r["grid"] <= TOP_TEN
+    }
+    return {r["driver"] for r in q3} & top_grid, None
+
+
 def estimate_compounds(
-    laps: pd.DataFrame, year: int, burn: float, refuelling: bool
+    laps: pd.DataFrame,
+    year: int,
+    burn: float,
+    refuelling: bool,
+    option_start: set[str] | None = None,
 ) -> CompoundEstimate:
-    """Fill Compound (roadmap P2). Leaves a race with any real compound untouched."""
+    """Fill Compound (roadmap P2). Leaves a race with any real compound untouched.
+    `option_start`: cars whose first stint is the option (option_starters)."""
     if laps["Compound"].notna().any():
         return CompoundEstimate(laps, False, "real compounds: not relabelled")
     out = laps.copy()
@@ -248,7 +298,9 @@ def estimate_compounds(
     if out["Stint"].isna().all():
         raise ValueError("two-compound estimate needs the stops (Stint is empty)")
     scores = stint_scores(out, burn, refuelling)
-    label, why = assign_two_compounds(scores)
+    first = scores.groupby("Driver")["Stint"].min()
+    forced = {(d, first[d]): OPTION for d in sorted(option_start or ()) if d in first.index}
+    label, why = assign_two_compounds(scores, forced)
     keys = list(zip(out["Driver"], out["Stint"], strict=True))
     out["Compound"] = [label.get(k) for k in keys]
     stints = []
@@ -268,20 +320,26 @@ def estimate_compounds(
             }
         )
     notes = []
+    if forced:
+        unforced, _ = assign_two_compounds(scores)
+        changed = sum(unforced[k] != OPTION for k in forced)
+        notes.append(
+            f"{len(forced)} top-ten first stints set to {OPTION} by the Q3 tyre rule"
+            f" ({changed} the fit alone labelled {PRIME})"
+        )
     flipped = sum(s["by"] == "rule" for s in stints)
     if flipped:
         notes.append(f"{flipped} stints set by the both-compounds rule")
     defaults = sum(s["by"] == "default" for s in stints)
     if defaults:
         notes.append(f"{defaults} stints too short to score")
-    return CompoundEstimate(
-        out,
-        True,
+    method = (
         f"two compounds ({OPTION} option, {PRIME} prime) from each stint's pace step and wear"
-        " (tyre life), with the both-compounds rule",
-        stints,
-        notes,
+        " (tyre life), with the both-compounds rule"
     )
+    if forced:
+        method += f"; the top ten start on the {OPTION} (the Q3 tyre rule, {year})"
+    return CompoundEstimate(out, True, method, stints, notes)
 
 
 # --- safety cars -------------------------------------------------------------------------
@@ -574,10 +632,13 @@ def estimate_race(
         }
     refuelling = year in REFUELLING
     burn = burn_per_lap(era, headset_path)
-    comp = estimate_compounds(out, year, burn, refuelling)
+    starters, no_rule = option_starters(year, sidecar)
+    comp = estimate_compounds(out, year, burn, refuelling, starters)
     out = comp.laps
     if comp.estimated:
         estimated.append("compounds")
+        if no_rule:
+            comp.notes.append(no_rule)
     block["compounds"] = {"method": comp.method, "stints": comp.stints, "notes": comp.notes}
     if refuelling and out["Stint"].notna().any():
         estimated.append("fuelLoads")
@@ -585,6 +646,7 @@ def estimate_race(
             "method": "stint laps x the era's standard burn (headset.json fuel.burnPerLap)",
             "burnPerLap": burn,
             "unit": "kg",
+            "fillRate": refuel_mod.FILL_RATE_METHOD,
             "stints": estimate_fuel_loads(out, burn),
         }
     if year == 2005:
@@ -641,5 +703,7 @@ def report_lines(block: dict) -> list[str]:
         lines.append(
             f"  fuel loads: {len(kg)} stints at {fuel['burnPerLap']} kg/lap, {min(kg)}-{max(kg)} kg"
         )
+        if fuel.get("fillRate"):
+            lines.append(f"  {fuel['fillRate']}")
     lines += [f"  quirk: {q}" for q in block.get("quirks", [])]
     return lines

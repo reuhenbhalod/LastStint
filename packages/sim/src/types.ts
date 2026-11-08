@@ -289,7 +289,7 @@ export interface RaceModel {
     scLapTime?: number;
     vscLapTime?: number;
     /** A refuelling race's fill model, fitted from the real stops (eras build plan 4.2;
-     * refuel.ts). Absent: the pooled prior. */
+     * refuel.ts). Absent: the physical prior (0.25 s per lap of fuel). */
     refuel?: RefuelModel;
   };
   compounds: Record<Compound, CompoundModel>;
