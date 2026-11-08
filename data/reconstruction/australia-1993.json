@@ -1,0 +1,74 @@
+{
+  "raceId": "australia-1993",
+  "stops": [
+    {
+      "number": 5,
+      "name": "Michael Schumacher",
+      "lap": 15,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/december-1993/18/mclaren-overtakes-ferrari; https://www.grandprix.com/gpe/rr548.html ('a stop on lap 15'); Wikipedia https://en.wikipedia.org/wiki/1993_Australian_Grand_Prix"
+    },
+    {
+      "number": 0,
+      "name": "Damon Hill",
+      "lap": 22,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/december-1993/18/mclaren-overtakes-ferrari",
+      "note": "stationary 6.41 s"
+    },
+    {
+      "number": 8,
+      "name": "Ayrton Senna",
+      "lap": 24,
+      "laneTime": null,
+      "source": "https://www.grandprix.com/gpe/rr548.html ('Senna pitted on lap 24'); Wikipedia https://en.wikipedia.org/wiki/1993_Australian_Grand_Prix",
+      "note": "stationary 5.32 s (Motor Sport). Motor Sport has Prost leading 'between the 24th and 28th laps', consistent if the pit entry is before the line"
+    },
+    {
+      "number": 7,
+      "name": "Mika Hakkinen",
+      "lap": 26,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/december-1993/18/mclaren-overtakes-ferrari",
+      "note": "slow stop; pitted again two laps later and retired (brakes), that entry not entered"
+    },
+    {
+      "number": 2,
+      "name": "Alain Prost",
+      "lap": 29,
+      "laneTime": null,
+      "source": "https://www.grandprix.com/gpe/rr548.html ('he stopped on lap 29'); https://www.motorsportmagazine.com/archive/article/december-1993/18/mclaren-overtakes-ferrari ('7.41s for Alain seven laps later' than Hill's lap 22)",
+      "note": "stationary 7.41 s"
+    },
+    {
+      "number": 0,
+      "name": "Damon Hill",
+      "lap": 44,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/december-1993/18/mclaren-overtakes-ferrari",
+      "note": "second stop"
+    },
+    {
+      "number": 2,
+      "name": "Alain Prost",
+      "lap": 48,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/december-1993/18/mclaren-overtakes-ferrari",
+      "note": "second stop"
+    },
+    {
+      "number": 8,
+      "name": "Ayrton Senna",
+      "lap": 55,
+      "laneTime": null,
+      "source": "https://www.grandprix.com/gpe/rr548.html; Wikipedia https://en.wikipedia.org/wiki/1993_Australian_Grand_Prix",
+      "note": "second stop"
+    }
+  ],
+  "safetyCars": [],
+  "complete": {
+    "stops": false,
+    "safetyCars": false
+  },
+  "notes": "Alesi (#27) one stop, Berger (#28) two, Suzuki (#10) one (Motor Sport, no laps). Last race without refuelling until 2010. No safety car mentioned in any source read; not confirmed absent."
+}

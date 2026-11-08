@@ -1,0 +1,35 @@
+{
+  "raceId": "brazil-1991",
+  "stops": [
+    {
+      "number": 27,
+      "name": "Alain Prost",
+      "lap": 17,
+      "laneTime": null,
+      "source": "https://en.wikipedia.org/wiki/1991_Brazilian_Grand_Prix ('On lap 17 Prost pitted for new tyres')",
+      "note": "first of two planned stops; Motor Sport confirms he was first to stop. Second stop lap not given"
+    },
+    {
+      "number": 5,
+      "name": "Nigel Mansell",
+      "lap": 25,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1991/6/formula-one-brazilian-grand-prix ('he came in on lap 25 for his scheduled tyre stop')",
+      "note": "Wikipedia says lap 26. Motor Sport chosen: its lap numbers match Jolpica (Mansell retired on lap 60 with 59 laps; Wikipedia says 61). Slow stop, 'over 14 seconds' (Wikipedia)"
+    },
+    {
+      "number": 5,
+      "name": "Nigel Mansell",
+      "lap": 50,
+      "laneTime": null,
+      "source": "https://en.wikipedia.org/wiki/1991_Brazilian_Grand_Prix ('on lap 50 Mansell had to stop for a new set of tyres after a puncture')",
+      "note": "puncture; stationary 9.5 s (Motor Sport). Only Wikipedia gives the lap; it ran one lap high elsewhere in this race, so check"
+    }
+  ],
+  "safetyCars": [],
+  "complete": {
+    "stops": false,
+    "safetyCars": true
+  },
+  "notes": "Senna (#1) and Patrese (#6) made tyre stops ('After Senna and Patrese had made their stops', Wikipedia), laps not given. Piquet (#20) and Moreno (#19) 'elected to make stops' (Motor Sport), laps not given. Senna had gearbox trouble late on (Motor Sport)."
+}

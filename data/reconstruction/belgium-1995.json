@@ -1,0 +1,16 @@
+{
+  "raceId": "belgium-1995",
+  "stops": [],
+  "safetyCars": [
+    {
+      "startLap": 29,
+      "endLap": 31,
+      "source": "https://www.motorsportmagazine.com/archive/article/october-1995/14/belgian-grand-prix-9/ ('the Safety Car appears on lap 29' ... 'The race proper resumes on lap 32'); https://lightsoutblog.com/every-safety-car-deployment-at-the-belgian-grand-prix ('deployed on Lap 29')",
+      "note": "Called for worsening rain with many cars on slicks. Lap 29-31 per Motor Sport's lap-by-lap. A fan wiki (f1.fandom) says laps 28-33; a search summary of lightsoutblog said 'six laps' but the page as fetched gave only the start lap. Hill's stop-and-go (F1DB lap 33) followed it."
+    }
+  ],
+  "complete": {
+    "safetyCars": true
+  },
+  "notes": "Stops come from F1DB (Hill's five include the lap-33 stop-and-go for pit-lane speeding). Only safety car of the race per Motor Sport's lap-by-lap and Wikipedia."
+}

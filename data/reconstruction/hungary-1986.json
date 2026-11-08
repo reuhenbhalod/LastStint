@@ -1,0 +1,75 @@
+{
+  "raceId": "hungary-1986",
+  "stops": [
+    {
+      "number": 6,
+      "name": "Nelson Piquet",
+      "lap": 35,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/september-1986/61/formula-one-hungarian-grand-prix-2/",
+      "note": "'At the end of lap 35 Piquet pulled in for his single tyre stop'"
+    },
+    {
+      "number": 12,
+      "name": "Ayrton Senna",
+      "lap": 48,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/september-1986/61/formula-one-hungarian-grand-prix-2/",
+      "note": "'eked them out until the end of lap 48 when, still in the lead, he tore in'"
+    },
+    {
+      "number": 5,
+      "name": "Nigel Mansell",
+      "lap": 28,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/september-1986/61/formula-one-hungarian-grand-prix-2/",
+      "note": "'made the first of two tyre stops at the end of lap 28'"
+    },
+    {
+      "number": 5,
+      "name": "Nigel Mansell",
+      "lap": 46,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/september-1986/61/formula-one-hungarian-grand-prix-2/",
+      "note": "'another pit stop for tyres on lap 46'"
+    },
+    {
+      "number": 1,
+      "name": "Alain Prost",
+      "lap": 16,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/september-1986/61/formula-one-hungarian-grand-prix-2/",
+      "note": "end of lap 16; electrical repair, resumed about eight laps down: lane time far above a tyre stop"
+    },
+    {
+      "number": 2,
+      "name": "Keke Rosberg",
+      "lap": 16,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/september-1986/61/formula-one-hungarian-grand-prix-2/",
+      "note": "end of lap 16 drove straight through the pit lane (team-mate's car in the box); no stop"
+    },
+    {
+      "number": 2,
+      "name": "Keke Rosberg",
+      "lap": 17,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/september-1986/61/formula-one-hungarian-grand-prix-2/",
+      "note": "'came in next time round' for a tyre change; one later stop (lap not given)"
+    },
+    {
+      "number": 28,
+      "name": "Stefan Johansson",
+      "lap": 21,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/september-1986/61/formula-one-hungarian-grand-prix-2/",
+      "note": "four tyres, stationary 7.34 s; he made 'two early stops', the other lap not given"
+    }
+  ],
+  "safetyCars": [],
+  "complete": {
+    "stops": false,
+    "safetyCars": true
+  },
+  "notes": "Motor Sport Sep 1986 race report ('By the banks of the Danube'). Missing: Rosberg's second stop, Johansson's other stop, every midfield stop. Race ended at 76 laps on the two-hour limit."
+}

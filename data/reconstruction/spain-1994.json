@@ -1,0 +1,9 @@
+{
+  "raceId": "spain-1994",
+  "stops": [],
+  "safetyCars": [],
+  "complete": {
+    "safetyCars": false
+  },
+  "notes": "Stops come from F1DB (data/raw/f1db/spain-1994.stops.csv). Motor Sport Jul 1994 (https://www.motorsportmagazine.com/archive/article/july-1994/12/atimely-triumph) gives Schumacher 21 and 45, Hakkinen 30 and 45, Hill 41: each one lap below F1DB (22/46, 31/46, 42), so its laps look like laps completed before the in-lap; F1DB kept. Schumacher stuck in fifth gear from about his first stop. No safety car mentioned in Wikipedia, Motor Sport or GrandPrix.com (https://www.grandprix.com/gpe/rr553.html); not confirmed absent."
+}

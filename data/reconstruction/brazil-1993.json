@@ -1,0 +1,162 @@
+{
+  "raceId": "brazil-1993",
+  "stops": [
+    {
+      "number": 8,
+      "name": "Ayrton Senna",
+      "lap": 27,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna",
+      "note": "wets"
+    },
+    {
+      "number": 12,
+      "name": "Johnny Herbert",
+      "lap": 27,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna",
+      "note": "wets"
+    },
+    {
+      "number": 19,
+      "name": "Philippe Alliot",
+      "lap": 27,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna",
+      "note": "wets"
+    },
+    {
+      "number": 4,
+      "name": "Andrea de Cesaris",
+      "lap": 27,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna",
+      "note": "wets"
+    },
+    {
+      "number": 21,
+      "name": "Michele Alboreto",
+      "lap": 27,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna",
+      "note": "wets"
+    },
+    {
+      "number": 0,
+      "name": "Damon Hill",
+      "lap": 28,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna",
+      "note": "wets"
+    },
+    {
+      "number": 30,
+      "name": "JJ Lehto",
+      "lap": 28,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna",
+      "note": "wets"
+    },
+    {
+      "number": 11,
+      "name": "Alessandro Zanardi",
+      "lap": 28,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna",
+      "note": "wets"
+    },
+    {
+      "number": 26,
+      "name": "Mark Blundell",
+      "lap": 28,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna",
+      "note": "wets"
+    },
+    {
+      "number": 9,
+      "name": "Derek Warwick",
+      "lap": 28,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna",
+      "note": "wets"
+    },
+    {
+      "number": 22,
+      "name": "Luca Badoer",
+      "lap": 28,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna",
+      "note": "wets"
+    },
+    {
+      "number": 20,
+      "name": "Erik Comas",
+      "lap": 28,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna",
+      "note": "wets"
+    },
+    {
+      "number": 5,
+      "name": "Michael Schumacher",
+      "lap": 30,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna",
+      "note": "wets; 'a disaster': the car fell off its jack and a wheel nut stuck"
+    },
+    {
+      "number": 27,
+      "name": "Jean Alesi",
+      "lap": 30,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna",
+      "note": "wets"
+    },
+    {
+      "number": 12,
+      "name": "Johnny Herbert",
+      "lap": 37,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna",
+      "note": "slicks, very fast stop as the safety car came in"
+    },
+    {
+      "number": 8,
+      "name": "Ayrton Senna",
+      "lap": 40,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna",
+      "note": "slicks, 'at the end of lap 40'"
+    },
+    {
+      "number": 0,
+      "name": "Damon Hill",
+      "lap": 41,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna",
+      "note": "slicks, 'at the end of 41'"
+    },
+    {
+      "number": 5,
+      "name": "Michael Schumacher",
+      "lap": 41,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna",
+      "note": "10 s stop-and-go penalty (passing under yellows), not a tyre stop"
+    }
+  ],
+  "safetyCars": [
+    {
+      "startLap": 30,
+      "endLap": 36,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna ('The pace car had come out on lap 30' ... 'It was lap 37 before the racing resumed')",
+      "note": "Wikipedia has the Suzuki/Katayama crashes that caused it on lap 27; Motor Sport puts Suzuki's crash on his 28th lap and the car out on lap 30. A fan wiki table (f1.fandom) says laps 29-38. Motor Sport chosen (contemporary, gives both ends)."
+    }
+  ],
+  "complete": {
+    "stops": false,
+    "safetyCars": true
+  },
+  "notes": "Senna also served a 10 s stop-and-go before the rain (penalty issued on lap 25 per Wikipedia; lap served not given). Schumacher's slick stop, Alesi's two stop-and-gos (20 s and 10 s), Katayama's and Suzuki's early stops, and most slick stops: no laps. Prost (#2) stayed out and crashed on lap 29."
+}

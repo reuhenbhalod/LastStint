@@ -1,0 +1,27 @@
+{
+  "raceId": "monaco-1992",
+  "stops": [
+    {
+      "number": 5,
+      "name": "Nigel Mansell",
+      "lap": 71,
+      "laneTime": null,
+      "source": "https://www.grandprix.com/gpe/rr522.html ('On lap 71 Mansell felt something was wrong ... and dived into the pits'); https://www.motorsportmagazine.com/archive/article/july-1992/16/what-did-go-wrong ('the Great Drama unfolded on lap 71'); Wikipedia https://en.wikipedia.org/wiki/1992_Monaco_Grand_Prix",
+      "note": "suspected puncture / loose wheel nut; Wikipedia's body says 'until lap 70', its lead 'until lap 71'. Lap 71 chosen (three sources, 'seven laps to go')"
+    },
+    {
+      "number": 20,
+      "name": "Martin Brundle",
+      "lap": 19,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/july-1992/16/what-did-go-wrong",
+      "note": "'skated over the chicane on lap 19, pitting for a replacement nose and fresh Goodyears'"
+    }
+  ],
+  "safetyCars": [],
+  "complete": {
+    "stops": false,
+    "safetyCars": true
+  },
+  "notes": "Senna (#1) ran the whole race on one set (Wikipedia, Senna's press conference). Patrese, Schumacher: no stop reported."
+}

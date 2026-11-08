@@ -1,0 +1,107 @@
+{
+  "raceId": "europe-1993",
+  "stops": [
+    {
+      "number": 25,
+      "name": "Martin Brundle",
+      "lap": 6,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked",
+      "note": "slicks, 'changing on his sixth lap'"
+    },
+    {
+      "number": 0,
+      "name": "Damon Hill",
+      "lap": 17,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked",
+      "note": "slicks ('Senna changed at the end of the 18th, a lap after Hill')"
+    },
+    {
+      "number": 8,
+      "name": "Ayrton Senna",
+      "lap": 18,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked",
+      "note": "slicks"
+    },
+    {
+      "number": 2,
+      "name": "Alain Prost",
+      "lap": 19,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked",
+      "note": "slicks ('after a lap in the lead Prost followed suit')"
+    },
+    {
+      "number": 14,
+      "name": "Rubens Barrichello",
+      "lap": 19,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked",
+      "note": "slicks ('his own slick call on lap 19')"
+    },
+    {
+      "number": 2,
+      "name": "Alain Prost",
+      "lap": 22,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked",
+      "note": "wets ('came in again for more wets as it rained again on lap 22')"
+    },
+    {
+      "number": 0,
+      "name": "Damon Hill",
+      "lap": 24,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked",
+      "note": "wets ('followed by Hill two laps later')"
+    },
+    {
+      "number": 8,
+      "name": "Ayrton Senna",
+      "lap": 34,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked",
+      "note": "slicks; cross-threaded right-rear nut, lost about 20 s"
+    },
+    {
+      "number": 14,
+      "name": "Rubens Barrichello",
+      "lap": 39,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked",
+      "note": "wets ('changed to wets again on his 39th lap')"
+    },
+    {
+      "number": 2,
+      "name": "Alain Prost",
+      "lap": 48,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked",
+      "note": "stalled (clutch)"
+    },
+    {
+      "number": 2,
+      "name": "Alain Prost",
+      "lap": 53,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked",
+      "note": "suspected left-rear puncture; stalled again"
+    },
+    {
+      "number": 8,
+      "name": "Ayrton Senna",
+      "lap": 57,
+      "laneTime": null,
+      "source": "https://en.wikipedia.org/wiki/1993_European_Grand_Prix ('Senna set the fastest lap on lap 57, on a lap when he drove into the pit lane but aborted the pit stop'); https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked",
+      "note": "drive-through, no stop (tyres not ready): pit-lane transit only"
+    }
+  ],
+  "safetyCars": [],
+  "complete": {
+    "stops": false,
+    "safetyCars": false
+  },
+  "notes": "Stop counts: Senna 5 pit calls incl. the drive-through (Motor Sport; Wikipedia says four stops), Hill 6, Prost 7, Herbert 1 (slicks after about lap 10), Barrichello at least 4. Missing laps: Senna's late wet stop and one more, Hill's other 4, Prost's other 3, Herbert's one, Barrichello's later ones. No safety car is mentioned in Wikipedia, Motor Sport or GrandPrix.com (https://www.grandprix.com/gpe/rr535.html), but no source states there was none: safetyCars left incomplete for the owner to confirm."
+}

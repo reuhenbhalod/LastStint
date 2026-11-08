@@ -1,0 +1,10 @@
+{
+  "raceId": "san-marino-1985",
+  "stops": [],
+  "safetyCars": [],
+  "complete": {
+    "stops": false,
+    "safetyCars": true
+  },
+  "notes": "Fuel-limited race (no refuelling); Wikipedia (https://en.wikipedia.org/wiki/1985_San_Marino_Grand_Prix) mentions no tyre stops, and no stop with a lap was found. Storyline is fuel, not stops (Johansson, Senna, Boutsen running dry; Prost disqualified, Jolpica)."
+}

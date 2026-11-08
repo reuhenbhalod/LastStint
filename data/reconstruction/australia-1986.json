@@ -1,0 +1,19 @@
+{
+  "raceId": "australia-1986",
+  "stops": [
+    {
+      "number": 1,
+      "name": "Alain Prost",
+      "lap": 32,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/december-1986/15/formula-one-mexican-grand-prix-australian-grand-prix ('He came in as early as lap 32 for fresh rubber'); also https://www.motorsportmagazine.com/archive/article/july-2004/142/race-86-australian-gp/",
+      "note": "puncture after clipping Berger; 8 laps before his planned stop"
+    }
+  ],
+  "safetyCars": [],
+  "complete": {
+    "stops": false,
+    "safetyCars": true
+  },
+  "notes": "Piquet (#6) was called in for a precautionary tyre change 'soon after' Mansell's lap-64 tyre failure (Motor Sport Dec 1986; Wikipedia https://en.wikipedia.org/wiki/1986_Australian_Grand_Prix) but no source read gives the lap: STORYLINE GAP. Goodyear then judged a non-stop run possible and the other runners stayed out. Rosberg (#2) retired lap 63 (tyre delamination), Mansell (#5) lap 64 (left-rear tyre)."
+}
