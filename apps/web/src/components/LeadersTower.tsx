@@ -1,8 +1,16 @@
 // The leaders as the TV shows them, over the map in focus view. The top
 // ten, then your car and the rival below a line if they're further back. Team sliver, code,
-// gap to the leader ("PIT" in the lane), live from the map's standings.
+// gap to the leader ("PIT" in the lane), live from the map's standings. In Eras (`info`, eras
+// spec §7) the gaps follow the information level: rounded at Limited; at Minimal only your
+// interval to the car ahead and the car behind's to you. Without it, exactly as before.
 
 import type { RaceModel, RaceState } from '@laststint/sim';
+import {
+  FULL_INFORMATION,
+  type InformationView,
+  intervalToYou,
+  shownGap,
+} from '../eras/difficulty/information.js';
 import { TEAM_COLOR } from '../game/teamTheme.js';
 import type { LiveStanding } from '../track/motion.js';
 import { TimingMark } from './Marks.js';
@@ -16,6 +24,7 @@ export function LeadersTower({
   rival,
   live,
   onPick,
+  info = FULL_INFORMATION,
 }: {
   race: RaceState;
   model: RaceModel;
@@ -23,6 +32,8 @@ export function LeadersTower({
   rival: string;
   live: LiveStanding[] | null;
   onPick: (code: string) => void;
+  /** What the Eras information level shows (everything, otherwise). */
+  info?: InformationView;
 }) {
   const leader = race.cars[race.order[0] ?? ''];
   const rows: Array<{ code: string; gap: number | null; pit: boolean; out: boolean }> = live
@@ -36,6 +47,18 @@ export function LeadersTower({
           out: !!c?.retired,
         };
       });
+  // Minimal: the one interval a row shows, if any (from the last lap's times).
+  const order = rows.map((r) => r.code);
+  const time = (code: string) => {
+    const c = race.cars[code];
+    return c && !c.retired ? c.totalTime : null;
+  };
+  const gapLabel = (r: (typeof rows)[number]) => {
+    if (r.gap === null) return '';
+    if (!info.adjacentGapsOnly) return `+${shownGap(info, r.gap).toFixed(1)}`;
+    const interval = intervalToYou(order, userSide, r.code, time);
+    return interval === null ? '' : `+${shownGap(info, interval).toFixed(1)}`;
+  };
   const top = rows.slice(0, TOP);
   const extra = rows
     .map((r, i) => ({ ...r, pos: i + 1 }))
@@ -63,15 +86,7 @@ export function LeadersTower({
           <span className="h-3.5 -skew-x-12" style={{ background: team(r.code) }} />
           <span className="mono text-[13px] font-bold">{r.code}</span>
           <span className="mono text-right text-[12px] text-[#C9CFCC]">
-            {r.out
-              ? 'OUT'
-              : r.pit
-                ? 'PIT'
-                : pos === 1
-                  ? 'Leader'
-                  : r.gap === null
-                    ? ''
-                    : `+${r.gap.toFixed(1)}`}
+            {r.out ? 'OUT' : r.pit ? 'PIT' : pos === 1 ? 'Leader' : gapLabel(r)}
           </span>
         </button>
       </li>

@@ -1,10 +1,21 @@
 // The driver card: tap a car on the map or in the standings. Name, team and number, place and
 // gaps, tyres, stops this race, last lap, and (for your car) the headset modes, plus where
-// they really finished.
+// they really finished. In Eras (`info`, eras spec §7) the gaps and the tyre age follow the
+// information level: gaps rounded at Limited; at Minimal no gap to the leader, and the gap to
+// you only for the cars directly ahead and behind; another car's tyre age as a range from
+// Reduced down. Without it, exactly as before.
 
 import type { RaceModel, RaceState } from '@laststint/sim';
 import { useEffect } from 'react';
 import { driverInfo } from '../data/drivers.js';
+import {
+  FULL_INFORMATION,
+  type InformationView,
+  gapShown,
+  gapText,
+  shownGap,
+  tyreAgeText,
+} from '../eras/difficulty/information.js';
 import type { LapEvents } from '../game/raceLog.js';
 import { lapTime } from '../track/geometry.js';
 import { CloseIcon } from './Icons.js';
@@ -29,6 +40,7 @@ export function DriverCard({
   userSide,
   rival,
   onClose,
+  info: view = FULL_INFORMATION,
 }: {
   code: string;
   race: RaceState;
@@ -37,6 +49,8 @@ export function DriverCard({
   userSide: string;
   rival: string;
   onClose: () => void;
+  /** What the Eras information level shows (everything, otherwise). */
+  info?: InformationView;
 }) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
@@ -53,7 +67,10 @@ export function DriverCard({
   const lap = lapTime(model, race.flag);
   const toLeader = leader ? car.totalTime - leader.totalTime : 0;
   const down = Math.floor(toLeader / lap);
-  const toYou = me && code !== userSide && !me.retired ? car.totalTime - me.totalTime : null;
+  const toYou =
+    me && code !== userSide && !me.retired && gapShown(view, race.order, userSide, code)
+      ? car.totalTime - me.totalTime
+      : null;
   const stops = log.flatMap((l) => l.pits.filter((p) => p.code === code));
   const last = log.at(-1)?.lapTimes[code];
   const realPos = model.realResult.indexOf(code) + 1;
@@ -96,19 +113,23 @@ export function DriverCard({
               ? 'Leader'
               : down >= 1
                 ? `+${down} lap${down > 1 ? 's' : ''}`
-                : `+${toLeader.toFixed(1)}s`}
+                : view.adjacentGapsOnly
+                  ? '-'
+                  : `+${shownGap(view, toLeader).toFixed(1)}s`}
         </Stat>
         <Stat label={code === userSide ? 'Real finish' : 'To you'}>
-          {code === userSide
-            ? realPos
-              ? `P${realPos}`
-              : '-'
-            : toYou === null
-              ? '-'
-              : `${toYou >= 0 ? '+' : '−'}${Math.abs(toYou).toFixed(1)}s`}
+          {code === userSide ? (realPos ? `P${realPos}` : '-') : gapText(view, toYou)}
         </Stat>
         <Stat label="Tyres">
-          {car.retired ? '-' : <TyreBadge compound={car.compound} age={car.tyreAge} />}
+          {car.retired ? (
+            '-'
+          ) : (
+            <TyreBadge
+              compound={car.compound}
+              age={car.tyreAge}
+              ageText={tyreAgeText(view, car.tyreAge, code === userSide)}
+            />
+          )}
         </Stat>
         <Stat label="Last lap">{last ? lapClock(last) : '-'}</Stat>
         <Stat label="Stops">

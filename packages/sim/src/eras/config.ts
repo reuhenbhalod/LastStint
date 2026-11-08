@@ -1,7 +1,7 @@
 // Eras config (eras build plan 1.3). Every Eras tunable lives in eras-config.json, not in
 // code (eras spec §19): the unlock share (§5), the accuracy multiplier (§6), the hard-call
-// edge (§4, "Which driver the player runs"), the difficulty table (§7) and Legend's settings
-// (§8). This module validates that file once at load and exposes small helpers that read
+// edge (§4, "Which driver the player runs"), the tyre-age range width and the difficulty
+// table (§7), and Legend's settings (§8). This module validates that file once at load and exposes small helpers that read
 // it, so the worker and the web app share one source of truth.
 //
 // Every helper takes the config as an optional last argument (default: the file), so tests
@@ -43,6 +43,9 @@ export interface ErasConfig {
   accuracyMultiplier: number;
   /** HARD_CALL_EDGE: a BAND_EDGES key (resolved against grade.ts) or percentage points. */
   hardCallEdge: BandEdgeKey | number;
+  /** From Reduced information down, other cars' tyre ages show as ranges this many laps wide,
+   * on multiples of it (5: "15–20 laps"); your own car's stays exact (§7). */
+  tyreAgeRangeLaps: number;
   /** Ordered by play order, 1 first. */
   difficulty: EraDifficulty[];
   legend: DifficultySettings;
@@ -113,6 +116,8 @@ export function parseErasConfig(raw: unknown): ErasConfig {
     if (hardCallEdge < 0) fail('hardCallEdge', 'must not be negative');
   }
 
+  const tyreAgeRangeLaps = positiveInteger(root.tyreAgeRangeLaps, 'tyreAgeRangeLaps');
+
   if (!Array.isArray(root.difficulty) || root.difficulty.length === 0)
     fail('difficulty', 'must be a non-empty array');
   const difficulty = root.difficulty.map((value, i): EraDifficulty => {
@@ -129,6 +134,7 @@ export function parseErasConfig(raw: unknown): ErasConfig {
     unlockShare,
     accuracyMultiplier,
     hardCallEdge,
+    tyreAgeRangeLaps,
     difficulty,
     legend: settings(root.legend, 'legend'),
   };
@@ -146,6 +152,7 @@ export function hardCallEdge(config: ErasConfig = ERAS_CONFIG): number {
 export const ERA_UNLOCK_SHARE = ERAS_CONFIG.unlockShare;
 export const ACCURACY_MULTIPLIER = ERAS_CONFIG.accuracyMultiplier;
 export const HARD_CALL_EDGE = hardCallEdge(ERAS_CONFIG);
+export const TYRE_AGE_RANGE_LAPS = ERAS_CONFIG.tyreAgeRangeLaps;
 
 /**
  * Stars needed in an era of `races` races to unlock the next era: ceil(share × 3 × races)

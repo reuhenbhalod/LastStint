@@ -1,8 +1,11 @@
 // A call between the big moments (crew-chief spec D3, race engineer spec): the engineer or the
 // driver asks; you have a few seconds while the race runs on. A battle is red and runs the lap
 // in slow motion. Number keys answer. No answer: no change, or the driver's own move.
+// In Eras (`eras`, eras spec §7) the era's decision timer takes the place of the card's own
+// short one: the race screen holds the race while the card is up, and the timer running out
+// answers it (the same no-answer outcome). Without it, exactly as before.
 
-import { useEffect, useRef } from 'react';
+import { type ReactNode, useEffect, useRef } from 'react';
 import { named, surname } from '../data/names.js';
 import type { QuickCall } from '../game/quickCalls.js';
 import { FlagIcon, HeadsetIcon, OvertakeIcon } from './Icons.js';
@@ -12,19 +15,25 @@ export function QuickCallCard({
   ms,
   onAnswer,
   onTimeout,
+  eras,
 }: {
   call: QuickCall;
   /** How long there is to answer. */
   ms: number;
   onAnswer: (optionId: string) => void;
   onTimeout: () => void;
+  /** An Eras race: the era's decision timer (null with the timer turned off: the card waits).
+   * The card's own countdown (`ms`) then doesn't run. */
+  eras?: { timer: ReactNode };
 }) {
   const timeout = useRef(onTimeout);
   timeout.current = onTimeout;
+  const ownTimer = !eras;
   useEffect(() => {
+    if (!ownTimer) return;
     const id = setTimeout(() => timeout.current(), ms);
     return () => clearTimeout(id);
-  }, [ms]);
+  }, [ms, ownTimer]);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const o = call.options[Number(e.key) - 1];
@@ -74,12 +83,16 @@ export function QuickCallCard({
           ))}
         </dl>
       )}
-      <div className="h-1 overflow-hidden bg-[#232927]">
-        <div
-          className="quick-timer h-full"
-          style={{ animationDuration: `${ms}ms`, background: accent }}
-        />
-      </div>
+      {eras ? (
+        eras.timer
+      ) : (
+        <div className="h-1 overflow-hidden bg-[#232927]">
+          <div
+            className="quick-timer h-full"
+            style={{ animationDuration: `${ms}ms`, background: accent }}
+          />
+        </div>
+      )}
       <div
         className={`grid gap-2 ${call.options.length > 2 ? 'grid-cols-2 lg:grid-cols-4' : 'grid-cols-2'}`}
       >
