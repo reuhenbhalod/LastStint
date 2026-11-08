@@ -217,6 +217,47 @@ const STANDINGS: Record<number, string[]> = {
     'Minardi',
     'BAR',
   ],
+  // 2002-2004 (Eras): the 2001-2003 final standings from the Jolpica dump (2026-10-24,
+  // formula_one_teamchampionship), under each season's names (2002: Benetton is Renault). A
+  // team that left is dropped (Prost after 2001, Arrows after 2002). A team with no standing
+  // (Minardi, no points in 2001; Toyota, new in 2002) goes last, in car-number order.
+  2002: [
+    'Ferrari',
+    'McLaren',
+    'Williams',
+    'Sauber',
+    'Jordan',
+    'BAR',
+    'Renault',
+    'Jaguar',
+    'Arrows',
+    'Minardi',
+    'Toyota',
+  ],
+  2003: [
+    'Ferrari',
+    'Williams',
+    'McLaren',
+    'Renault',
+    'Sauber',
+    'Jordan',
+    'Jaguar',
+    'BAR',
+    'Minardi',
+    'Toyota',
+  ],
+  2004: [
+    'Ferrari',
+    'Williams',
+    'McLaren',
+    'Renault',
+    'BAR',
+    'Sauber',
+    'Jaguar',
+    'Toyota',
+    'Jordan',
+    'Minardi',
+  ],
   // 2005-2009 (Eras): the 2004-2008 final standings from the Jolpica dump (2026-10-24,
   // formula_one_teamchampionship), under each season's names (2005: Jaguar is Red Bull; 2006:
   // BAR is Honda, Sauber is BMW Sauber, Jordan is MF1, Spyker MF1 by Brazil, Minardi is Toro

@@ -1566,6 +1566,74 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
+    # Eras wave B (build plan 5.1): refuelling races 2002-04 (dry), as the 2005-09 races
+    # above: Jolpica with F1DB stops, one estimated dry compound, estimated SC laps and fuel
+    # loads, the fill model fitted from the F1DB stops.
+    "austria-2002": {
+        "year": 2002,
+        "event": "Austria",
+        "source": "jolpica",
+        "name": "Austria 2002: Barrichello vs Schumacher",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "BAR",
+        "rival": "MSCM",  # team: Ferrari 1-2; Barrichello, told to let Schumacher by
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "hungary-2003": {
+        "year": 2003,
+        "event": "Hungary",
+        "source": "jolpica",
+        "name": "Hungary 2003: Alonso vs Räikkönen",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "ALO",
+        "rival": "RAI",  # defend: Alonso holds P1; the car behind at the flag
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "japan-2003": {
+        "year": 2003,
+        "event": "Japan",
+        "source": "jolpica",
+        "name": "Japan 2003: Schumacher vs Räikkönen",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "MSCM",
+        "rival": "RAI",  # Schumacher P8 or better for the title: Räikkönen, his title rival
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "france-2004": {
+        "year": 2004,
+        "event": "France",
+        "source": "jolpica",
+        "name": "France 2004: Schumacher vs Alonso",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "MSCM",
+        "rival": "ALO",  # win: Schumacher beats Alonso on four stops
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "monaco-2004": {
+        "year": 2004,
+        "event": "Monaco",
+        "source": "jolpica",
+        "name": "Monaco 2004: Trulli vs Button",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "TRU",
+        "rival": "BUT",  # defend: Trulli holds P1; the car behind at the flag
+        "score_positions": 6,
+        "split": "eras",
+    },
 }
 
 
