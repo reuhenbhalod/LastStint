@@ -1,0 +1,46 @@
+{
+ "race": "sakhir-2020",
+ "how": "docs/eras-checks/2.4-estimates.md: check each period against a race report; set status to confirmed or rejected (edit startLap/endLap if they're off), then re-run `pipeline jolpica <race-id> --force`.",
+ "periods": [
+  {
+   "startLap": 1,
+   "endLap": 6,
+   "laps": 6,
+   "kind": "SC",
+   "confidence": "likely",
+   "peakRatio": 1.579,
+   "gapBefore": null,
+   "gapAfter": 2.3,
+   "reasons": [],
+   "status": "unchecked"
+  },
+  {
+   "startLap": 55,
+   "endLap": 55,
+   "laps": 1,
+   "kind": "SC",
+   "confidence": "ambiguous",
+   "peakRatio": 1.178,
+   "gapBefore": 32.1,
+   "gapAfter": 37.9,
+   "reasons": [
+    "only 1.18x slower: rain, yellow flags or a short SC?",
+    "the field didn't bunch up (P1-P6 32.1s -> 37.9s): rain?",
+    "a single slow lap"
+   ],
+   "status": "unchecked"
+  },
+  {
+   "startLap": 61,
+   "endLap": 68,
+   "laps": 8,
+   "kind": "SC",
+   "confidence": "likely",
+   "peakRatio": 1.605,
+   "gapBefore": 42.7,
+   "gapAfter": 2.3,
+   "reasons": [],
+   "status": "unchecked"
+  }
+ ]
+}

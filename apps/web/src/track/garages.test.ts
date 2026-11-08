@@ -19,6 +19,24 @@ describe('garages', () => {
     expect(g).toHaveLength(11);
   });
 
+  it('2010: Brawn, the 2009 champions, as Mercedes nearest the exit; the new teams at the entry', () => {
+    const g = garagesFor(2010);
+    expect(g.at(-1)).toEqual(['Mercedes', 'MER']);
+    expect(g.slice(0, 3)).toEqual([
+      ['Virgin', 'VIR'],
+      ['HRT', 'HRT'],
+      ['Lotus', 'LOT'],
+    ]);
+    expect(g).toHaveLength(12);
+  });
+
+  it('2020: Red Bull and Alfa Romeo under the Jolpica spelling when the race uses it', () => {
+    const g = garagesFor(2020, ['Red Bull', 'Alfa Romeo', 'Mercedes']);
+    expect(g).toContainEqual(['Red Bull', 'RBR']);
+    expect(g).toContainEqual(['Alfa Romeo', 'ALF']);
+    expect(garagesFor(2020)).toContainEqual(['Red Bull Racing', 'RBR']);
+  });
+
   it("has a garage for every team in every race, under the race's own team names", () => {
     for (const file of readdirSync(races).filter((f) => f.endsWith('.json'))) {
       const model = JSON.parse(readFileSync(join(races, file), 'utf8')) as {
