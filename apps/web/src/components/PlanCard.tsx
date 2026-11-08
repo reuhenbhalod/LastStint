@@ -44,7 +44,7 @@ export function PlanCard({
   const build = useRef(onBuild);
   build.current = onBuild;
   const own = plan.own;
-  const legal = !!draft && twoCompounds(car, draft);
+  const legal = !!draft && twoCompounds(car, draft, model.rules);
   useEffect(() => {
     if (!draft || !legal || (own && samePlan(own, draft))) return;
     const id = setTimeout(() => build.current(draft), 350);

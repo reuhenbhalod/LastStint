@@ -5,10 +5,13 @@
 // the server grades (game/choices.ts); no chances shown (the grade comes after the call).
 // Number keys pick options, Escape backs out of the tyre choice. In Eras mode (build plan 8.6)
 // the gap follows the difficulty's information level and the decision timer sits by the tag.
+// In Eras 1-2 (build plan 8.5, the race's era) the call reads as a pit-board message.
 
 import { type DecisionMoment, type RaceModel, type RaceState, tyreLife } from '@laststint/sim';
 import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { named, surname } from '../data/names.js';
+import { PIT_BOARD_CLASS } from '../eras/PitBoard.js';
+import { useRaceEra } from '../eras/RaceEraContext.js';
 import {
   FULL_INFORMATION,
   type InformationView,
@@ -45,6 +48,7 @@ export function BroadcastDecision({
   /** The Eras decision timer, shown by the tag. */
   timer?: ReactNode;
 }) {
+  const board = useRaceEra().prompts === 'board';
   const brief = briefFor(moment, race, model);
   const c = choicesFor(moment);
   const [picking, setPicking] = useState<'now' | 'next' | null>(null);
@@ -140,10 +144,14 @@ export function BroadcastDecision({
   );
 
   return (
-    <section aria-label="Your call" className="decision call-plate">
+    <section
+      aria-label="Your call"
+      className={board ? `decision call-plate ${PIT_BOARD_CLASS}` : 'decision call-plate'}
+    >
       <div className="flex flex-wrap items-baseline justify-between gap-x-5 gap-y-1.5">
         <span role="alert" className="call-tag">
-          Engineer · {brief.kind} · Lap {moment.lap}
+          {board ? 'Pit board · ' : 'Engineer · '}
+          {brief.kind} · Lap {moment.lap}
         </span>
         {timer}
         <dl className="m-0 hidden flex-wrap gap-x-4 gap-y-1 md:flex">
@@ -157,7 +165,13 @@ export function BroadcastDecision({
           ))}
         </dl>
       </div>
-      <span className="text-[17px] font-bold leading-snug text-white md:text-[20px]">
+      <span
+        className={
+          board
+            ? 'board-line text-[17px] font-bold leading-snug md:text-[20px]'
+            : 'text-[17px] font-bold leading-snug text-white md:text-[20px]'
+        }
+      >
         {brief.headline}
       </span>
       {box ? (

@@ -18,7 +18,7 @@ import {
   engineerConfig,
   wetnessOn,
 } from '@laststint/sim';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { createElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BattleCard, type BattleStage } from '../components/BattleCard.js';
 import { Brand } from '../components/Brand.js';
 import { BroadcastDecision } from '../components/BroadcastDecision.js';
@@ -47,6 +47,7 @@ import { TimingTower } from '../components/TimingTower.js';
 import { type BattleView, TrackMap } from '../components/TrackMap.js';
 import { TyreBadge } from '../components/TyreBadge.js';
 import { namedUpper, surname } from '../data/names.js';
+import { RaceEraContext, type RaceEraLook } from '../eras/RaceEraContext.js';
 import { DecisionTimer } from '../eras/difficulty/DecisionTimer.js';
 import { NeighbourGaps } from '../eras/difficulty/NeighbourGaps.js';
 import type { ErasRace } from '../eras/difficulty/erasRace.js';
@@ -54,6 +55,7 @@ import { gapShown, gapText, informationView } from '../eras/difficulty/informati
 import { setTimerOn, timerOn } from '../eras/difficulty/settings.js';
 import { takeDefault } from '../eras/difficulty/timeout.js';
 import { attemptUntimed, noteDecisionShown } from '../eras/difficulty/untimed.js';
+import { raceScreenEra } from '../eras/raceRules.js';
 import {
   BATTLE_MS,
   CALL_MS,
@@ -147,7 +149,26 @@ function battleResult(
   return null;
 }
 
-export function RaceScreen({
+type RaceScreenProps = Parameters<typeof RaceScreenBody>[0];
+
+/**
+ * The race screen in the race's era look (eras build plan 8.5): tyre badges and how prompts
+ * look, from its rules and era (eras/raceRules.ts); today's look for every race without them.
+ */
+export function RaceScreen(props: RaceScreenProps) {
+  const { model } = props;
+  const look = useMemo<RaceEraLook>(() => {
+    const e = raceScreenEra(model);
+    return { tyres: e.tyres, lockedTyre: e.lockedTyre, prompts: e.prompts };
+  }, [model]);
+  return createElement(
+    RaceEraContext.Provider,
+    { value: look },
+    createElement(RaceScreenBody, props),
+  );
+}
+
+function RaceScreenBody({
   game,
   state,
   model,

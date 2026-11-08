@@ -23,6 +23,7 @@ import { ignoreRate } from '../data/drivers.js';
 import type { Daily } from '../data/types.js';
 import { GameEngine, decisionMoments } from '../engine/engine.js';
 import { type GradedMoment, type Grader, gradedFromHits, inlineGrader } from '../engine/grading.js';
+import { callBlocked, moveAllowed, pitCompoundFor } from '../eras/raceRules.js';
 import { autoStay, boxingAt } from '../game/autoStay.js';
 import { tyreName } from '../game/choices.js';
 import { ownMove } from '../game/engineerCalls.js';
@@ -488,9 +489,23 @@ export class GameSession {
    * researched rate (game/refusal.ts, data/drivers.json): a refused call is not applied, so it
    * never reaches the call log. A call already booked for the coming lap is ignored. An answer
    * to a quick call (`asked`: the driver or engineer asked for the order) is always followed.
+   * The race's rules come first (eras build plan 8.5): a stop in a race without tyre changes
+   * keeps the dry set, and a move or mode the race doesn't have is not made (the wall is told),
+   * so no call reaches the sim that it would reject.
    */
-  call(decision: Decision, options: { asked?: boolean; quiet?: boolean } = {}): void {
+  call(input: Decision, options: { asked?: boolean; quiet?: boolean } = {}): void {
     if (this.state.phase !== 'racing') return;
+    const model = this.daily.model;
+    const fits = input.kind === 'pit' ? pitCompoundFor(model, input.compound) : null;
+    const decision: Decision =
+      input.kind === 'pit' && fits !== input.compound
+        ? { ...input, compound: fits as string }
+        : input;
+    const blocked = callBlocked(model, decision);
+    if (blocked) {
+      this.say('Engineer', `We can’t make that call: ${blocked}.`, false, decision.lap);
+      return;
+    }
     const side = this.state.meta.userSide;
     const car = this.engine.state.cars[side];
     if (decision.kind !== 'radio' && (!car || car.retired)) return;
@@ -537,6 +552,7 @@ export class GameSession {
           const own = ownMove(
             side,
             ['dive-inside', 'round-outside', 'wait-drs', 'overtake-button'].includes(decision.move),
+            moveAllowed(model, 'wait-drs'),
           );
           this.engine.apply({ lap: decision.lap, kind: 'battle', move: own, driver: true });
           this.dispatch({

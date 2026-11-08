@@ -10,6 +10,7 @@ import {
   type RaceState,
   tyreLife,
 } from '@laststint/sim';
+import { closedPitCost, pitCompoundFor, pitLaneClosedNow } from '../eras/raceRules.js';
 import { flagOn } from '../track/geometry.js';
 import { tyreName } from './choices.js';
 import type { LapEvents } from './raceLog.js';
@@ -245,16 +246,24 @@ export function safetyCarCall(
   const left = model.race.laps - race.lap;
   const byGrip = Object.entries(model.compounds).sort((a, b) => a[1].offset - b[1].offset);
   const lasts = byGrip.find(([, c]) => tyreLife(c) >= left);
-  const compound = (lasts ?? byGrip.at(-1))?.[0] ?? me.compound;
+  // The race's rules (eras build plan 8.5): no tyre changes keeps the dry set; a pit lane
+  // that closes under the SC (2007-08) makes the stop a stop-go, and the option says so.
+  const compound = pitCompoundFor(model, (lasts ?? byGrip.at(-1))?.[0] ?? me.compound);
+  const closed = pitLaneClosedNow(race, model, compound);
   const name = flag === 'sc' ? 'Safety car' : 'Virtual safety car';
   return {
     lap: race.lap,
     from: 'Engineer',
-    text: `${name}! The pit lane is cheap. Box for ${tyreName(compound).toLowerCase()}, or stay out?`,
+    text: closed
+      ? `${name}! The pit lane is closed until the field is queued: boxing now is a stop-go. Box for ${tyreName(compound).toLowerCase()} anyway, or stay out?`
+      : `${name}! The pit lane is cheap. Box for ${tyreName(compound).toLowerCase()}, or stay out?`,
     options: [
       {
         id: 'box',
         label: `Box, ${tyreName(compound).toLowerCase()}`,
+        ...(closed
+          ? { note: `Pit lane closed: stop-go, +${Math.round(closedPitCost(model))}s` }
+          : {}),
         call: { lap: next, kind: 'pit', compound },
       },
       { id: 'stay', label: 'Stay out', call: null },
