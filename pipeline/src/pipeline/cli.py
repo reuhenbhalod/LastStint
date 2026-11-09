@@ -325,14 +325,29 @@ def reconstruct_cmd(
 
 
 @app.command("wet-fit")
-def wet_fit_cmd() -> None:
-    """Fit the weather curves (data/wet.json) on every wet race at once (weather spec)."""
+def wet_fit_cmd(
+    eras: bool = typer.Option(
+        False, help="Fit the Eras curves (data/wet-eras.json) on the Eras wet races instead."
+    ),
+    race: list[str] = typer.Option(  # noqa: B008
+        None, help="With --eras: only build these races' fit inputs into --cache (no fit)."
+    ),
+    cache: str = typer.Option(
+        None, help="With --eras: keep each race's fit inputs here (built once, then reused)."
+    ),
+) -> None:
+    """Fit the weather curves (data/wet.json) on every wet race at once (weather spec); with
+    --eras, the Eras builds' curves (model fix 1.3, wet.fit_eras_curves) on every timed Eras
+    wet race (an overlay, not a Daily/Gauntlet or reconstructed race)."""
     import json as json_mod
 
     import pandas as pd
 
     from . import wet
 
+    if eras:
+        _wet_fit_eras(race, cache)
+        return
     races = []
     for rid, meta in build_mod.RACES.items():
         if meta.get("split") != "wet":
@@ -346,6 +361,66 @@ def wet_fit_cmd() -> None:
     typer.echo(f"wrote {wet.WET_CURVES_PATH.name}: {curves}")
     for rid, obs, n, rain in races:
         typer.echo(f"{rid:22s} rms {wet.rms(obs, wet.timeline(obs, n, rain, curves), curves):.2%}")
+
+
+def eras_wet_races() -> list[str]:
+    """The timed Eras wet races: an Eras overlay, not a Daily/Gauntlet race, not
+    reconstructed, with wet tyres or rain in the snapshot."""
+    import pandas as pd
+
+    from . import wet
+
+    shared = build_mod.shared_races()
+    out = []
+    for rid, meta in build_mod.RACES.items():
+        if rid in shared or meta.get("source") == "reconstruct":
+            continue
+        if build_mod.load_overlay(rid, build_mod.ERAS_DIR) is None:
+            continue
+        path = ingest.raw_snapshot_path(rid)
+        if not path.exists() or build_mod.load_reconstruction(rid, paths.RAW_DIR) is not None:
+            continue
+        if wet.is_wet_race(pd.read_parquet(path), ingest.load_weather(rid)):
+            out.append(rid)
+    return out
+
+
+def _wet_fit_eras(only: list[str] | None, cache: str | None) -> None:
+    import pickle
+    from pathlib import Path
+
+    from . import wet
+
+    start = wet.load_curves()
+    races = []
+    for rid in only or eras_wet_races():
+        path = Path(cache) / f"{rid}.wet-fit.pkl" if cache else None
+        if path is not None and path.exists():
+            inputs = pickle.loads(path.read_bytes())
+        else:
+            captured: list = []
+            try:
+                build_mod.build_race(rid, wet_inputs=captured)
+            except ValueError as e:  # a race that can't be built (china-2007): no inputs
+                typer.echo(f"{rid}: not built ({e}), skipped")
+                continue
+            if not captured:
+                typer.echo(f"{rid}: no timed Eras wet build, skipped")
+                continue
+            laps, rain, fitted = captured[0]
+            obs, n, rain_laps = wet.race_observations(laps, rain, fitted, start)
+            mixed = wet.mixed_laps(laps, wet.weather_block(laps, rain, fitted, start), fitted)
+            inputs = (obs, n, rain_laps, wet.dry_laps(rain), mixed)
+            if path is not None:
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(pickle.dumps(inputs))
+        typer.echo(f"{rid}: {len(inputs[4])} mixed clear-air laps")
+        races.append((rid, inputs))
+    if only:
+        return
+    curves = wet.fit_eras_curves([r for _, r in races], start)
+    wet.ERAS_CURVES_PATH.write_text(json.dumps(curves, indent=2) + "\n")
+    typer.echo(f"wrote {wet.ERAS_CURVES_PATH.name}: {curves}")
 
 
 @app.command("outline")
