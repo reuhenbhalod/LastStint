@@ -159,10 +159,10 @@ describe('Era detail', () => {
     expect(raceLinks(error)).toEqual([]);
   });
 
-  it('shows the briefing slot, then ten race cards in order with their dilemmas', () => {
+  it('shows the briefing, then ten race cards in order with their dilemmas', () => {
     const html = renderDetail(ERA9, detailReady(erasResponse(true), eraDetail(9)));
-    expect(html).toContain('data-todo="era-briefing"');
-    expect(html).toContain('Briefing not written yet.');
+    expect(html).not.toContain('data-todo="era-briefing"');
+    expect(html).toContain('reached the Abu Dhabi finale level on points');
     expect(html.indexOf('Briefing')).toBeLessThan(html.indexOf('Race 1<'));
     const races = [...html.matchAll(/>Race (\d+)</g)].map((m) => Number(m[1]));
     expect(races).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
