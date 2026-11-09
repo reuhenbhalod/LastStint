@@ -27,7 +27,7 @@ import { type FaultTable, cloneFaults, faultCost, faultTable } from './faults.js
 import headsetConfig from './headset.json';
 import { legendEvents, legendLoss } from './legend.js';
 import { validatePlan } from './plan.js';
-import { type RedFlagPlan, lineUp, redFlagPlan, roadOrder } from './redflag.js';
+import { type RedFlagPlan, lineUp, realLapsDown, redFlagPlan, roadOrder } from './redflag.js';
 import {
   burnTank,
   checkFill,
@@ -378,6 +378,11 @@ export interface Run {
   events: NeutralEvent[];
   /** Red flags: free stops in the stoppage, gaps wiped at the restart (redflag.ts). */
   red: RedFlagPlan;
+  /**
+   * A no-unlapping race's SC and red-flag queues: lap -> the scripted cars' real laps down
+   * (redflag.ts realLapsDown; Eras builds' `lapsDown`). Empty for every other race.
+   */
+  lapsDown: Map<number, Map<string, number>>;
   /** Neutralization flag per lap, and retirements per lap, precomputed from events. */
   neutral: Map<number, Exclude<FlagState, 'green'>>;
   retireAt: Map<number, string[]>;
@@ -784,6 +789,10 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
     events,
     neutral: neutralMap(events),
     red: redFlagPlan(timeline),
+    lapsDown: realLapsDown(
+      timeline,
+      (code) => (live && code === model.userSide) || strategies[code] !== undefined,
+    ),
     retireAt,
     faults: faultTable(model.events),
     orders: teamOrdersOf(model.events, live ? model.userSide : undefined),
@@ -1054,14 +1063,23 @@ function blindView(
   run: Run,
   seed: number,
   blindAfter: number | undefined,
-): Pick<Run, 'events' | 'neutral' | 'retireAt'> {
+): Pick<Run, 'events' | 'neutral' | 'retireAt' | 'lapsDown'> {
   if (blindAfter === undefined) {
-    return { events: run.events, neutral: run.neutral, retireAt: run.retireAt };
+    return {
+      events: run.events,
+      neutral: run.neutral,
+      retireAt: run.retireAt,
+      lapsDown: run.lapsDown,
+    };
   }
   const known = run.events.filter((e) => e.lap <= blindAfter);
   const events = [...known, ...sampledEvents(run, seed, known, blindAfter)];
   const retireAt = new Map([...run.retireAt].filter(([lap]) => lap <= blindAfter));
-  return { events, neutral: neutralMap(events), retireAt };
+  // The real laps down of the neutralizations it knows (begun by blindAfter) only.
+  const lapsDown = new Map(
+    [...run.lapsDown].filter(([lap]) => known.some((e) => lap >= e.lap && lap < e.lap + e.laps)),
+  );
+  return { events, neutral: neutralMap(events), retireAt, lapsDown };
 }
 
 function car(run: Run, code: string): CarState {
@@ -1992,7 +2010,15 @@ export function stepLap(run: Run): RaceState {
     if (flag === 'sc' && run.neutral.get(lap - 1) === 'sc') {
       // Deployment lap: gaps kept. Middle laps: SC_GAP_KEEP of the excess. Last lap: bunched.
       const keep = run.neutral.get(lap + 1) === 'sc' ? SC_GAP_KEEP : 0;
-      bunch(order, cars, green, keep, scQueue(model), model.rules !== undefined);
+      bunch(
+        order,
+        cars,
+        green,
+        keep,
+        scQueue(model),
+        model.rules !== undefined,
+        run.lapsDown.get(lap),
+      );
       state.order = [...sortByTime(order, cars), ...retiredInOrder(run)];
     }
   } else {
@@ -2003,7 +2029,8 @@ export function stepLap(run: Run): RaceState {
   const wipe = run.red.wipes.get(lap);
   if (wipe && run.neutral.get(wipe.redLap) === 'red') {
     // No unlapping (scUnlap 'none'): the lapped cars line up where they are on the road.
-    lineUp(live(run), cars, wipe.gap, scQueue(model) === 'none' ? green : undefined);
+    const unlap = scQueue(model) !== 'none';
+    lineUp(live(run), cars, wipe.gap, unlap ? undefined : green, run.lapsDown.get(lap));
   }
   if (state.engineer) engineerAfterLap(run, lap, battle, prevTime, pitted);
   const rivalBefore = rivalPlanBefore(run);
@@ -2175,6 +2202,8 @@ function forcedCompound(model: RaceModel, c: CarState, w = 0): string {
  * An Eras race (`eras`: it has a rules block) closes a middle lap gap by gap (closeGaps, the
  * fit of pipeline sc_queue.py). With scUnlap 'none' (no unlapping: before 2007 and 2010-11)
  * the lapped cars stay in the queue where they are on the road, a lap down (bunchRoad).
+ * `known` (redflag.ts realLapsDown): the scripted cars' real laps down, which win over their
+ * gaps (roadOrder).
  */
 function bunch(
   live: string[],
@@ -2183,10 +2212,11 @@ function bunch(
   keep: number,
   duel: [string, string] | 'none' | null,
   eras = false,
+  known?: Map<string, number>,
 ): void {
   if (!live.length) return;
   if (duel === 'none' && lapTime) {
-    bunchRoad(live, cars, lapTime, keep, eras);
+    bunchRoad(live, cars, lapTime, keep, eras, known);
     return;
   }
   if (!duel && eras && keep > 0) {
@@ -2202,11 +2232,14 @@ function bunch(
     }
     return;
   }
-  const len = lapTime ?? 0;
   const time = (c: string) => (cars[c] as CarState).totalTime;
   const lead = time(live[0] as string);
-  const down = new Map(live.map((c) => [c, len ? Math.floor((time(c) - lead) / len) : 0]));
-  const onTrack = new Map(live.map((c) => [c, time(c) - lead - (down.get(c) as number) * len]));
+  const { down, onRoad: onTrack } = lapTime
+    ? roadOrder(live, cars, lapTime, known)
+    : {
+        down: new Map(live.map((c) => [c, 0])),
+        onRoad: new Map(live.map((c) => [c, time(c) - lead])),
+      };
   const leadLap = live.filter((c) => down.get(c) === 0);
   let waved: string[] = [];
   // scUnlap 'none' (rules.ts scQueue): the lead lap closes up and nobody is waved through.
@@ -2257,9 +2290,10 @@ function bunchRoad(
   lapTime: number,
   keep: number,
   eras: boolean,
+  known?: Map<string, number>,
 ): void {
   const lead = (cars[live[0] as string] as CarState).totalTime;
-  const { road, down, onRoad } = roadOrder(live, cars, lapTime);
+  const { road, down, onRoad } = roadOrder(live, cars, lapTime, known);
   const placed = new Map<string, number>([
     [road[0] as string, onRoad.get(road[0] as string) as number],
   ]);

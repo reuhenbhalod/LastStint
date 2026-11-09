@@ -521,6 +521,14 @@
           "other": {
             "type": "string",
             "description": "A TEAM_ORDER (Eras builds, sourced in data/incidents.json): the car let by. Both sims swap the two on the order's lap (packages/sim scripted.ts)."
+          },
+          "lapsDown": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "An SC or RED event of a no-unlapping race (race.scUnlap none; Eras builds, pipeline restart.py): each car still running at the event's last lap with the most laps down it was at the end of any of the event's laps, counted from the real lap counts. The sims take a scripted car's lapped status in that event's queue from it, not from their own gaps."
           }
         },
         "allOf": [

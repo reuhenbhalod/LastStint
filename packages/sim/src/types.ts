@@ -161,6 +161,11 @@ export interface RaceEvent {
   slowLap?: number;
   /** A FAULT that lasts until the car's next stop (new tyres fix a puncture). */
   untilStop?: boolean;
+  /**
+   * An SC or RED event of a no-unlapping race (Eras builds): each running car's real laps down
+   * (the most it was at the end of any of the event's laps). A scripted car's lapped status in the queue comes from it.
+   */
+  lapsDown?: Record<string, number>;
 }
 
 // Eras mode (eras spec sections 6, 8 and 11; schema v11). Types and validation only: the

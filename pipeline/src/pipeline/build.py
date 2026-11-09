@@ -2657,6 +2657,11 @@ def build_race(
     scripted_lines: list[str] = []
     if eras_build:
         model, scripted_lines = scripted_blocks(model, race_id, recon)
+        if restart.LAPS_DOWN_IN_ERAS_BUILDS:
+            # Job 1.5: a no-unlapping race's SC and red-flag queues take each scripted car's
+            # real laps down (restart.with_laps_down), not the sims' own gaps.
+            model, down_lines = restart.with_laps_down(model, laps)
+            scripted_lines += down_lines
     estimated = list((block or {}).get("estimated", []))
     if recon is not None:
         estimated += [f for f in recon["provenance"].get("estimated", []) if f not in estimated]
