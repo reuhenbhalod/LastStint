@@ -15,6 +15,10 @@ since the dry laps may be few), by tyre class, and a smooth path through them (a
 to dry on dry-looking laps, and away from bone dry where it was raining). Slicks barely wear
 on a wet track, inters and wets wear fast on a dry one (wear multipliers below; the sims use
 the same). Both sims read the curves and the timeline from the race model.
+
+Eras builds of timed races (model fix 1.3) take their own curves, data/wet-eras.json, refitted
+on the Eras wet races' mixed-tyre laps (`pipeline wet-fit --eras`, fit_eras_curves), with each
+race's slick curve scaled by its own mixed laps (slick_scale); every other build keeps wet.json.
 """
 
 from __future__ import annotations
@@ -28,6 +32,9 @@ from .paths import REPO_ROOT
 from .refuel import fuel_lap_of
 
 WET_CURVES_PATH = REPO_ROOT / "data" / "wet.json"
+# Eras builds of timed races (model fix 1.3): the curves refitted on the Eras wet races'
+# mixed-tyre laps (fit_eras_curves, `pipeline wet-fit --eras`). Every other build keeps wet.json.
+ERAS_CURVES_PATH = REPO_ROOT / "data" / "wet-eras.json"
 WET_COMPOUNDS = ("INTERMEDIATE", "WET")
 # The fuel effect wet races are fitted with (s/lap): the median of the dry races' fits. A wet
 # race's dry laps can be a short window, too short to fit it.
@@ -41,6 +48,10 @@ WET_TYRES = {
     "INTERMEDIATE": {"offset": 0.0, "degPerLap": 0.05, "cliffLap": 30},
     "WET": {"offset": 0.0, "degPerLap": 0.04, "cliffLap": 35},
 }
+
+
+# A tyre class's model compound (penalty reads the class from it).
+CLASS_COMPOUND = {"slick": "SOFT", "inter": "INTERMEDIATE", "wet": "WET"}
 
 
 def tyre_class(compound: str) -> str:
@@ -71,8 +82,9 @@ def wear_mult(compound: str, w: float) -> float:
     return 1.0 + 2.0 * max(0.0, (edge - w) / edge)
 
 
-def load_curves() -> dict:
-    return json.loads(WET_CURVES_PATH.read_text())
+def load_curves(eras: bool = False) -> dict:
+    """The shared wet curves, or (`eras`) the Eras builds' (ERAS_CURVES_PATH)."""
+    return json.loads((ERAS_CURVES_PATH if eras else WET_CURVES_PATH).read_text())
 
 
 def is_wet_race(laps: pd.DataFrame, weather: list[dict] | None) -> bool:
@@ -302,6 +314,156 @@ def race_observations(
         }
         obs = observations(laps, predict, wet_period(laps, weather), sim_wear(laps, first))
     return obs, total, rain
+
+
+# Eras model fix 1.3 (docs/g1-report.md): the Eras curves are refitted on the Eras wet races'
+# mixed-tyre laps, and each race scales its slick curve by its own mixed laps.
+#
+# The pooled fit (fit_eras_curves). With one wetness a lap, a lap where the whole field is on
+# one tyre class fits any curve (the wetness moves to suit), so only the laps with cars on two
+# classes at once say how far apart the classes are. The fit is fit_curves' (every lap's field
+# median per class, each race's own timeline) plus MIXED_WEIGHT x the squared miss of the gap
+# between two classes' clear-air medians on the laps with MIXED_MIN_FIELD clear-air cars on
+# each (mixed_laps; weighted by the smaller count, at most MIXED_CAP), under curve_prior and
+# then eras_prior.
+MIXED_MIN_FIELD = 2
+MIXED_CAP = 4
+MIXED_WEIGHT = 30.0
+MIXED_PAIRS = (("slick", "inter"), ("inter", "wet"), ("slick", "wet"))
+# Physics past the data: the Eras races' inter / wet mixed laps are all on a track drying out
+# of the wet (inters quicker), none in standing water, where full wets are the tyre. So on a
+# soaked track (wetness SOAKED and up) wets are held SOAKED_MARGIN of a lap quicker than inters
+# (fit_eras_curves' second stage, on the full wet's curve alone).
+SOAKED = (0.8, 1.0)
+SOAKED_MARGIN = 0.03
+
+
+def eras_prior(c: dict) -> float:
+    """curve_prior, and full wets ahead of inters on a soaked track (SOAKED)."""
+    out = curve_prior(c)
+    for w in SOAKED:
+        gap = float(penalty(c, "WET", w) - penalty(c, "INTERMEDIATE", w))
+        out += 200 * max(0.0, gap + SOAKED_MARGIN) ** 2
+    return out
+
+
+# The race's slicks against its inters (slick_scale): a track that dries on a line, or is wet
+# in one part only (Hockenheim 2000's forest, where Barrichello's slicks kept the inters'
+# pace), costs slicks less than the pooled curves say; Indianapolis 2003's more. On every
+# green lap with cars on both (observations' field medians), r = the real slick-inter gap less
+# the curves' at the fitted wetness, n the smaller count (at most MIXED_CAP), s the slick
+# penalty; the race's slick curve is scaled by k = 1 + sum(n·r·s) / (sum(n·s²) +
+# SLICK_SCALE_PRIOR), held in SLICK_SCALE_BOUNDS. The prior is empirical Bayes on the Eras
+# wet races' mixed laps under the pooled curves: lap noise 0.0028 (n-weighted squared share of
+# a lap), between-race sd of k 0.22 (17 races with mixed laps enough to say), prior
+# 0.0028 / 0.051 = 0.055.
+SLICK_SCALE_PRIOR = 0.05
+SLICK_SCALE_BOUNDS = (0.6, 1.6)
+
+
+def mixed_laps(laps: pd.DataFrame, weather: dict, fitted) -> list[tuple[int, str, str, float, int]]:
+    """The race's mixed-tyre laps in clear air: (lap, class a, class b, a's median share of a
+    dry lap less b's, the smaller count), for each pair of MIXED_PAIRS with MIXED_MIN_FIELD
+    clear-air cars on both (clear_air_shares, the curves added back)."""
+    df = clear_air_shares(laps, weather, fitted)
+    out = []
+    for lap, g in df.groupby("lap"):
+        raw = g["share"] + [
+            float(penalty(weather["curves"], CLASS_COMPOUND[c], w))
+            for c, w in zip(g["cls"], g["w"], strict=True)
+        ]
+        n, med = g.groupby("cls").size(), raw.groupby(g["cls"]).median()
+        for a, b in MIXED_PAIRS:
+            if n.get(a, 0) >= MIXED_MIN_FIELD and n.get(b, 0) >= MIXED_MIN_FIELD:
+                out.append((int(lap), a, b, float(med[a] - med[b]), int(min(n[a], n[b]))))
+    return out
+
+
+def mixed_cost(mixed: list, wetness: list[float], curves: dict) -> float:
+    """The squared miss of the curves' class gaps on mixed laps (mixed_laps)."""
+    err = 0.0
+    for lap, a, b, gap, n in mixed:
+        w = wetness[lap - 1]
+        model = penalty(curves, CLASS_COMPOUND[a], w) - penalty(curves, CLASS_COMPOUND[b], w)
+        err += min(n, MIXED_CAP) * (gap - float(model)) ** 2
+    return err
+
+
+def fit_eras_curves(races: list[tuple], start: dict) -> dict:
+    """The Eras curves: those that best explain every Eras wet race at once, each with its
+    own timeline, with the mixed laps' gaps weighted MIXED_WEIGHT (see above). Two stages:
+    all ten parameters under curve_prior, then the full wet's four alone under eras_prior
+    (the soaked-track physics moves only the tyre it is about). `races`: (observations, laps,
+    rain laps, dry laps, mixed laps) per race."""
+    from scipy.optimize import minimize
+
+    def cost(x, prior):
+        if min(x) < 0 or x[5] > 1 or x[9] > 1:
+            return 1e9
+        c = curves_from(x)
+        out = prior(c)
+        for obs, n, rain, dry, mixed in races:
+            w = timeline(obs, n, rain, c, dry)
+            out += level_cost(obs, w, c) + MIXED_WEIGHT * mixed_cost(mixed, w, c)
+        return out
+
+    opts = {"maxiter": 2500, "xatol": 1e-4, "fatol": 1e-6}
+    x0 = [start["slick"]["a"], start["slick"]["b"]] + [
+        start[k][f] for k in ("inter", "wet") for f in ("min", "dry", "wet", "best")
+    ]
+    x1 = list(minimize(cost, x0, args=(curve_prior,), method="Nelder-Mead", options=opts).x)
+    res = minimize(
+        lambda y: cost(x1[:6] + list(y), eras_prior), x1[6:], method="Nelder-Mead", options=opts
+    )
+    x = x1[:6] + list(res.x)
+    return {k: {f: round(v, 4) for f, v in d.items()} for k, d in curves_from(x).items()}
+
+
+def level_cost(obs: pd.DataFrame, wetness: list[float], curves: dict) -> float:
+    """fit_cost's squared error on a given timeline."""
+    err = 0.0
+    for r in obs.itertuples():
+        pen = float(penalty(curves, CLASS_COMPOUND[r.cls], wetness[r.lap - 1]))
+        err += min(int(r.count), 8) * (float(r.median) - pen) ** 2
+    return err
+
+
+def slick_scale(obs: pd.DataFrame, wetness: list[float], curves: dict) -> float:
+    """The race's slick-curve factor (1: the pooled curves; see SLICK_SCALE_PRIOR), from its
+    mixed slick / inter laps (`obs`: observations' lap, cls, median, count)."""
+    num = den = 0.0
+    for lap, g in obs.groupby("lap"):
+        by = g.set_index("cls")
+        if "slick" not in by.index or "inter" not in by.index:
+            continue
+        w = wetness[int(lap) - 1]
+        s = float(penalty(curves, "SOFT", w))
+        model = s - float(penalty(curves, "INTERMEDIATE", w))
+        r = float(by.at["slick", "median"] - by.at["inter", "median"]) - model
+        n = min(int(by.at["slick", "count"]), int(by.at["inter", "count"]), MIXED_CAP)
+        num += n * r * s
+        den += n * s * s
+    if den == 0.0:
+        return 1.0
+    lo, hi = SLICK_SCALE_BOUNDS
+    return round(min(hi, max(lo, 1.0 + num / (den + SLICK_SCALE_PRIOR))), 3)
+
+
+def scaled_curves(curves: dict, k: float) -> dict:
+    """The curves with the slick's scaled by k (slick_scale)."""
+    out = {key: dict(v) for key, v in curves.items()}
+    out["slick"] = {f: round(v * k, 4) for f, v in curves["slick"].items()}
+    return out
+
+
+def eras_weather_block(laps: pd.DataFrame, weather: list[dict] | None, fitted) -> dict:
+    """An Eras build's weather (model fix 1.3): the Eras curves (ERAS_CURVES_PATH) with the
+    race's slick factor (slick_scale, on the timeline the pooled curves fit), and the
+    timeline they fit."""
+    curves = load_curves(eras=True)
+    obs, total, rain = race_observations(laps, weather, fitted, curves)
+    k = slick_scale(obs, timeline(obs, total, rain, curves, dry_laps(weather)), curves)
+    return weather_block(laps, weather, fitted, scaled_curves(curves, k) if k != 1.0 else curves)
 
 
 def weather_block(laps: pd.DataFrame, weather: list[dict] | None, fitted, curves: dict) -> dict:

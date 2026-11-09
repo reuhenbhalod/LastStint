@@ -3099,3 +3099,139 @@ them (schema: optional). `python -m pipeline.dirty_air --cache DIR` refits the t
 **Fixtures.** New: `packages/sim/tests/fixtures/eras-dirty-air.json` (spain-2021 with its bands;
 the same with heldGap 0.79 and rollOnly; brazil-2006 refuelling with its bands and rollOnly; 20
 seeds each; `tests/make_dirty_air_fixture.py`). No existing fixture went stale.
+
+## Eras model fix 1.3 (Nov 8 2026): the wet curves refitted on mixed-tyre laps (Eras builds)
+
+Gap 2 of docs/eras-races-report.md, its last part: "one wetness per lap (the slick / inter
+curves 2% apart where europe-1999's second shower had them 8%)". On a lap where the whole field
+is on one tyre class the timeline's wetness moves to fit any curve, so only the laps with cars
+on two classes at once say how far apart the classes are. The shared curves (data/wet.json,
+fitted on the 2018+ wet races) put slicks and inters almost parallel past the crossover (inter
+slope 0.79 a unit of wetness, slick 0.79-0.99): about 1.7% apart at every wetness, where
+europe-1999's laps 37-42 had them 6-9% apart (inters ~17% off a dry lap, slicks ~24%).
+
+**Method** (`wet.fit_eras_curves`, `wet.slick_scale`, `pipeline wet-fit --eras`; Eras builds
+only):
+- **Mixed laps** (`wet.mixed_laps`): clear-air laps (M1's `clear_air_shares`: green, not lap 1,
+  no pit, no car within 1.5 s ahead) with at least 2 cars on each of two tyre classes; the gap
+  between the classes' median share of a dry lap. 163 such lap pairs in the 29 timed Eras wet races
+  (europe-1999 17, united-states-2003 16, hungary-2006 16, australia-2025 23, monaco-2016 18
+  inter / wet, ...).
+- **Pooled curves** (`data/wet-eras.json`): the shared fit's objective (every lap's field median
+  per class against its race's own timeline, now with the lap-time weather's dry laps) plus 30x
+  the squared miss of the mixed laps' gaps (weighted by the smaller count, at most 4), pooled over
+  the 29 races, under the shared physics prior (`curve_prior`), from the shared curves. A second
+  stage refits the full wet's four parameters alone under `eras_prior`: the Eras races' inter /
+  wet mixed laps are all on a track drying out of the wet (inters 0.5-2% quicker), none in
+  standing water, so on a soaked track (wetness 0.8 and 1.0) wets are held 3% quicker than inters.
+  The slick-inter gap at the wetness that puts inters 17% off a dry lap: 1.9% before, 8.5% now
+  (europe-1999's laps 37-42: 6-9%).
+
+  | Curve | slick a / b | inter min / dry / wet / best | wet min / dry / wet / best |
+  |---|---|---|---|
+  | shared (data/wet.json) | 0.1855 / 0.9993 | 0.0345 / 1.0187 / 0.789 / 0.18 | 0.1486 / 0.4006 / 0.6344 / 0.2833 |
+  | Eras (data/wet-eras.json) | 0.1868 / 1.1148 | 0.0374 / 1.0876 / 0.576 / 0.1708 | 0.1356 / 0.4256 / 0.4903 / 0.3065 |
+
+- **Per race, a slick factor** (`wet.slick_scale`): the races differ more than one curve can say.
+  At the same inter pace, Hockenheim 2000's slicks (Barrichello, the forest wet and the rest
+  dry) kept the inters' pace, Indianapolis 2003's and Zandvoort 2023's lost 5-13%. On every green
+  lap with cars on both slicks and inters (the field medians the timeline is fitted on), r = the
+  real slick-inter gap less the curves' at the fitted wetness, n the smaller count (at most 4), s
+  the slick penalty; the race's slick curve is scaled by k = 1 + sum(n·r·s) / (sum(n·s²) + 0.05),
+  held in 0.6-1.6, and the timeline refitted. The prior is empirical Bayes on the races' mixed
+  laps under the pooled curves: lap noise 0.0028 (n-weighted squared share), between-race sd of k
+  0.22 (17 races with enough mixed laps), prior 0.0028 / 0.051 = 0.055 (used 0.05). Examples:
+  germany-2000 k 0.83, canada-2011 0.77, europe-1999 0.90, monaco-2016 0.93, netherlands-2023
+  1.41. M1's wet-tyre shift then applies on top, as before.
+- **A drying line per lap, considered and not built.** Letting each tyre class see its own
+  wetness on a lap (slicks on a drier line) is what the slick factor does per race; per lap,
+  the data can't carry it: a race has 1-20 mixed clear-air laps, and the one race where the
+  gap's dependence on the wetness differs from the pooled shape (europe-1999: slicks 3% quicker
+  than inters at laps 46-48, 6-9% slower at laps 37-42) is the race the pooled fit is built
+  around. It would also need a per-class wetness in both sims' race files.
+
+**Gating.** `build.py`: only an Eras build of a timed race (`eras_build` and not reconstructed,
+as M1) takes `wet.eras_weather_block`; every other build keeps data/wet.json and the old path,
+line for line. The two wet pool races rebuild byte-identical to a build at the parent commit
+(canada-2024, russia-2021: race file and golden; abu-dhabi-2021 too, dry); the reconstructed wet
+races keep the shared curves (their laps are solved to anchors with them). The race file's
+`weather.curves` carries the race's own curves, so neither sim changed. Parity: the Python
+reference and the TS sim agree on order and times (3 decimals) on four rebuilt races carrying
+the new curves, 20 seeds each (germany-2000 with its slick factor, europe-1999, canada-2011 and
+monaco-2016 with M1's wet-tyre shift; scratch check, not committed). `wet_laps.py` (the
+lap-time weather of `pipeline wet-laps`, written into data/raw) keeps the shared curves: no raw
+file changes. No committed race file, golden or parity fixture changes (the red-flag fixture's
+netherlands-2023 is a frozen model, still in parity).
+
+**Before / after** (robust G1, 1,000 runs on each seed set, one race per call; before = this
+branch's parent a911ab9, after = this fix; fresh builds in memory, data/races not changed).
+Worst failing check after the fix, seed set 10000 / 20000, limit in brackets.
+
+| Race | Before | Mean gap error | After | Mean gap error | Change | Worst failing check after |
+|---|---|---|---|---|---|---|
+| europe-1999 | fail | 25.63s | fail | 12.28s | -13.35s | field SCH gap error 25.34 / 25.32 [5.00] |
+| malaysia-2001 | fail | 9.92s | fail | 4.80s | -5.12s | field SCH gap error 10.62 / 10.20 [5.00] |
+| united-states-2003 | fail | 6.20s | fail | 6.16s | -0.04s | field HEI gap error 19.69 / 19.72 [5.64] |
+| belgium-1998 | fail | 5.25s | fail | 5.08s | -0.17s | field DIN gap error 13.61 / 13.60 [5.17] |
+| hungary-2006 | fail | 15.15s | fail | 14.47s | -0.68s | podium HEI gap error 47.76 / 47.55 [5.00] |
+| europe-2007 | fail | 2.23s | fail | 2.24s | +0.01s | duel ALO vs MAS gap error 6.38 / 6.30 [3.00] |
+| monaco-2022 | fail | 7.49s | fail | 7.60s | +0.11s | field RUS gap error 14.05 / 13.80 [5.00] |
+| netherlands-2023 | fail | 6.69s | fail | 2.35s | -4.34s | podium order rate 0.50 / 0.50 [0.50] |
+| monaco-2016 | fail | 10.80s | fail | 10.24s | -0.56s | podium PER gap error 17.61 / 17.55 [5.00] |
+| canada-2011 | fail | 3.02s | fail | 3.93s | +0.91s | podium WEB gap error 10.40 / 10.01 [5.00] |
+| brazil-2012 | fail | 3.44s | fail | 3.46s | +0.02s | field VET gap error 6.74 / 6.76 [5.00] |
+| monaco-2008 | fail | 4.53s | fail | 5.16s | +0.63s | field BAR gap error 8.27 / 8.18 [5.00] |
+| australia-2025 | fail | 3.66s | fail | 3.44s | -0.22s | duel VER vs NOR gap error 7.07 / 7.07 [3.00] |
+| germany-2000 | fail | 2.85s | fail | 5.67s | +2.82s | field DLR gap error 8.31 / 8.17 [5.00] |
+| brazil-2008 | fail | 5.42s | fail | 6.48s | +1.06s | field GLO gap error 13.38 / 13.25 [5.00] |
+| australia-2010 | fail | 4.11s | fail | 3.74s | -0.37s | field ROS gap error 8.16 / 8.08 [5.00] |
+| brazil-2003 | fail | 5.74s | fail | 5.55s | -0.19s | field COU gap error 9.64 / 8.91 [5.00] |
+| great-britain-2016 | fail | 2.37s | fail | 2.08s | -0.29s | podium order rate 0.48 / 0.49 [0.50] |
+| hungary-2014 | fail | 2.73s | fail | 2.73s | 0.00s | field RAI gap error 5.66 / 6.39 [5.00] |
+| hungary-2021 | fail | 5.15s | fail | 5.15s | 0.00s | podium HAM gap error 9.87 / 9.73 [5.00] |
+| united-states-2015 | fail | 2.31s | fail | 2.25s | -0.06s | duel HAM vs ROS gap error 4.19 / 4.29 [3.00] |
+| belgium-2023 | pass | 1.73s | pass | 1.79s | +0.06s | |
+| japan-2000 | pass | 1.27s | pass | 1.42s | +0.15s | |
+| spain-1996 | pass | 0.62s | pass | 0.62s | 0.00s | |
+| turkey-2020 | pass | 1.76s | pass | 1.75s | -0.01s | |
+| germany-2018 | pass | 1.59s | pass | 1.60s | +0.01s | |
+| germany-2019 | pass | 1.38s | pass | 1.39s | +0.01s | |
+| malaysia-2013 | pass | 1.20s | pass | 1.20s | 0.00s | |
+
+**0 new passes, 0 lost; the 28 timed Eras wet races 144.24 -> 124.63 s; the 15 failing races
+of gap 2 with germany-2000 and brazil-2008 112.28 -> 93.36 s.** 11 races improve by 0.05 s or
+more, 7 get worse, 10 don't move; the 7 passing wet races all still pass. china-2007 is in the fit
+(17 mixed lap pairs) but not graded here (gap 8: not built for play).
+
+**What else was tried** (the 8 most sensitive races, europe-1999, united-states-2003,
+netherlands-2023, hungary-2006, europe-2007, germany-2000, brazil-2008, malaysia-2001: sum of
+mean gap errors 74.09 s before):
+
+| Variant | Sum | Notes |
+|---|---|---|
+| shared fit's objective on the Eras races, no mixed-lap term, no per-race term | 76.12 s | europe-1999 6.99 s, but germany-2000 19.13 s (Barrichello's slicks too slow) |
+| the same curves + per-race slick factor, prior 0.2 | 68.53 s | |
+| mixed-lap term (x30), no per-race term | 91.39 s | germany-2000 28.80 s, malaysia-2001 18.50 s |
+| mixed-lap term + per-race inter shift (additive, prior 4 laps) | 68.94 s (7 races; europe-2007 not run) | germany-2000 passes (0.90 s), europe-1999 14.95 s, two races at the inter floor |
+| mixed-lap term + per-race slick factor, prior 0.02 | 56.36 s | |
+| + soaked-track prior on all ten parameters (one stage) | worse | malaysia-2001 18.59 s, united-states-2003 7.69 s: the inter slope rose to 0.68 |
+| **chosen: mixed-lap term, two-stage soaked prior, slick factor prior 0.05** | 54.45 s | |
+
+**Why the seven get worse:**
+- **germany-2000** (+2.8 s): Barrichello was the one car on slicks (1 against 10 on inters), so
+  the slick factor (0.83) rests on single-car laps and the prior holds it back: his slicks still
+  cost ~1% a lap more than they did, and the gaps behind him (DLR, BUT) move with him.
+- **brazil-2008, monaco-2008** (+1.1 s, +0.6 s): their mixed laps are few (Interlagos' last
+  laps; Monaco's 46-53) and disagree among themselves, so the slick factor stays near 1 and the
+  steeper pooled slick curve costs their slick runners a little too much.
+- **canada-2011** (+0.9 s): k 0.77 on the drying laps, with M1's wet shift on top; the race's
+  failing checks are still the drying track's lap pace (docs/eras-races-report.md).
+- **japan-2000, monaco-2022, belgium-2023** (+0.06 to +0.15 s): noise; japan-2000 and
+  belgium-2023 still pass.
+
+europe-1999 still fails on SCH (25 s; was 49 s in the races report): the second shower's slick
+runners now lose about the time they did; the rest is beyond the curves (M1's note on its mixed
+labels stands). hungary-2006's HEI (48 s) is the dropped-car gap 8.
+
+**Not regenerated here:** data/races, data/golden and `apps/worker/src/races.gen.ts` (the
+integrator rebuilds every non-pool race after the model fixes merge).

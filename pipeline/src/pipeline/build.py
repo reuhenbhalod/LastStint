@@ -2490,12 +2490,15 @@ def build_race(
     *,
     eras_dir: Path = ERAS_DIR,
     pools_path: Path = POOLS_PATH,
+    wet_inputs: list | None = None,
 ) -> BuildResult:
     """Build a validated race-model dict for a registered race (or an ingested Jolpica one),
     with its build notes, its estimates applied as provenance and its Eras overlay, unless it
     is a Daily or Gauntlet race (`shared_races`): its overlay stays out of its file.
     `raw_dir`: where its snapshot lives; `fault_facts`: its car faults (default: its FAULT
-    items in data/incidents.json); `pools_path`: the pools file naming the shared races."""
+    items in data/incidents.json); `pools_path`: the pools file naming the shared races.
+    `wet_inputs`: a list that an Eras build of a timed wet race appends its (laps, weather
+    records, dry model) to, for the Eras wet-curve fit (`pipeline wet-fit --eras`)."""
     if laps is None:
         laps = pd.read_parquet(ingest.raw_snapshot_path(race_id, raw_dir))
     # Red flags (eras build plan 4.3): a race ended under the red flag ends at its results
@@ -2549,6 +2552,11 @@ def build_race(
     # Not a reconstructed race: its laps are solved to the anchors, so a driver's pace against
     # the field on a lap would read back the solver's noise (as with its faults, above).
     if weather and eras_build and recon is None:
+        # Eras model fix 1.3: the Eras wet curves (data/wet-eras.json), refitted on the Eras
+        # wet races' mixed-tyre laps (wet.fit_eras_curves); the timeline follows them.
+        if wet_inputs is not None:
+            wet_inputs.append((laps, dry.rain, fitted))
+        weather = wet.eras_weather_block(laps, dry.rain, fitted)
         shift = wet.wet_tyre_shift(laps, weather, fitted)
         if shift:  # the race tells full wets from inters: its own wet curve, and timeline
             weather = wet.weather_block(
