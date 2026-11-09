@@ -134,7 +134,22 @@ export function engineerRadio(
         out.push({ from: 'Engineer', text: 'New nose on. The pace should be back.' });
         break;
       case 'fuel':
-        out.push({ from: side, text: 'I’m out of fuel! I have to lift everywhere now.' });
+        // `out`: the tank ran dry and the car has stopped for good (a 1984-88 fuel limit, a
+        // refuelling race's tank). `empty`: a fuel load that only costs lap time. A fuel-limit
+        // car's empty tank notes both on the lap it stops: only the stop is told.
+        if (n.detail === 'out') {
+          out.push(
+            board
+              ? { from: 'Pit wall', text: `${side} has run out of fuel. That’s our race.` }
+              : { from: side, text: 'I’m out of fuel! The car’s stopped.' },
+          );
+        } else if (
+          !notes.some(
+            (o) => o.lap === lap && o.kind === 'fuel' && o.driver === side && o.detail === 'out',
+          )
+        ) {
+          out.push({ from: side, text: 'I’m out of fuel! I have to lift everywhere now.' });
+        }
         break;
       case 'blue':
         out.push({ from: side, text: `Past ${n.other}. Finally.` });

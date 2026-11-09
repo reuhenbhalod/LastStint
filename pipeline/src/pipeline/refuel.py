@@ -180,6 +180,19 @@ def stint_to_next_stop(strategy: list[dict], out_lap: int, laps: int) -> int:
     return nxt - out_lap
 
 
+def fill_cap(model: dict) -> int:
+    """The most laps a fill may name (refuel.ts fillCap): the tank (the fit's tankLaps), or the
+    longest real stint after a stop in the race file if that is longer."""
+    laps = int(model["race"]["laps"])
+    cap = max(1, math.floor(refuel_model(model)["tankLaps"]))
+    for d in model["drivers"]:
+        real = d["realStrategy"]
+        for i, s in enumerate(real):
+            others = [o for j, o in enumerate(real) if j != i]
+            cap = max(cap, stint_to_next_stop(others, int(s["lap"]), laps))
+    return cap
+
+
 def takeover_tank(strategy: list[dict], takeover: int, laps: int) -> int:
     return stint_to_next_stop(strategy, takeover, laps) - 1 + RESERVE_LAPS
 
@@ -197,7 +210,8 @@ def init_tanks(model: dict, cars: dict) -> None:
 
 def refuel_at_stop(model: dict, car, stop: dict, out_lap: int) -> float:
     """Fill the tank at a stop (already off the car's strategy); returns the fill time over
-    the stop's base cost (refuel.ts refuelAtStop)."""
+    the stop's base cost (refuel.ts refuelAtStop). A stop without a fill fills to the car's
+    next stop or the flag, but never past the tank (fill_cap)."""
     if not refuelling(model) or car.tank is None:
         return 0.0
     rm = refuel_model(model)
@@ -205,7 +219,7 @@ def refuel_at_stop(model: dict, car, stop: dict, out_lap: int) -> float:
     if stop.get("fill"):
         stint = fill_laps(stop["fill"], laps - out_lap + 1, rm["tankLaps"])
     else:
-        stint = stint_to_next_stop(car.strategy, out_lap, laps)
+        stint = min(stint_to_next_stop(car.strategy, out_lap, laps), fill_cap(model))
     target = stint + RESERVE_LAPS
     fill = max(0.0, target - car.tank)
     car.tank = max(car.tank, float(target))

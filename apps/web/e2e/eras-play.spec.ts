@@ -219,8 +219,9 @@ test('Era 5: San Marino 2005, the tyre lock and a refuelling stop', async ({ pag
   expect(model.rules).toMatchObject({ tyreChanges: false, refuelling: true, drs: false });
   await mockEras(page, [model]);
   await openRace(page, 'san-marino-2005');
-  // Plan A, the no-stop plan, so the box call below is the player's own (the other plans box
-  // on lap 21, as soon as the race starts).
+  // Plan A. Every plan boxes first on lap 28, where the fuel on board runs out (B3: the plans
+  // run on the tank; before, A was a no-stop plan and B and C boxed on lap 21), so the box call
+  // below is the player's own.
   await startRace(page, { plan: 'A' });
   const radio = await teamRadio(page);
   // The 2005 lock: a stop keeps the dry set.
