@@ -48,7 +48,7 @@ the last report.
 | 4 | singapore-2023 | FastF1 (F1 live timing) | none | yes | G1 | **fail** | 3.69 s | field GAS gap error 9.75 / 9.9 [5.00] (+1 more) | no | - | no | race mechanics (pace 4%): the NOR vs SAI gap, GAS 9.9 s; int. 8: 4.01 -> 3.69 s |
 | 5 | netherlands-2023 | OpenF1 | none | yes | G1 | **fail** | 2.34 s | podium order rate 0.38 / 0.41 [0.50] (+1 more) | no | - | no | HAM's five wet laps, all in the finish shower (M1), and the red-flag restart; 3.79 -> 6.69 s; int. 8: 6.69 -> 2.34 s |
 | 6 | miami-2024 | FastF1 (F1 live timing) | none | yes | G1 | **fail** | 4.68 s | duel VER vs NOR gap error 5.43 / 5.35 [3.00] (+4 more) | no | - | no | race mechanics (pace 3%): the SC that timed Norris' stop (spec §4); rebuilt with the Eras fixes (2.88 s before); int. 8: 4.71 -> 4.68 s |
-| 7 | hungary-2024 | FastF1 (F1 live timing) | none | yes | G1 | pass | 1.93 s |  | no | - | no | now passes (int. 8); McLaren's swap is now scripted (M4 team orders: the duel order passes); LEC's field gap 5.1 s, just over; int. 8: 1.96 -> 1.93 s |
+| 7 | hungary-2024 | FastF1 (F1 live timing) | none | yes | G1 | borderline | 2.58 s | field LEC / VER gap error 5.02 / 5.03 [5.00] (one seed set) | no | - | no | now passes (int. 8); McLaren's swap is now scripted (M4 team orders: the duel order passes); LEC's field gap 5.1 s, just over; int. 8: 1.96 -> 1.93 s; Sector A (A4): VER's lap-63 contact puts him behind LEC as really happened, pass -> borderline, 1.93 -> 2.58 s |
 | 8 | belgium-2023 | OpenF1 | none | yes | G1 | pass | 1.98 s |  | yes (VER) | yes | **yes** | now passes: driver damp / wet pace from clear-air laps against the field (M1); int. 8: 1.73 -> 1.98 s |
 | 9 | australia-2025 | OpenF1 | none | yes | G1 | **fail** | 3.70 s | duel VER vs NOR gap error 8.06 / 7.97 [3.00] (+1 more) | no | - | no | wet-dry race: duel VER vs NOR 7.3 s; 4.62 -> 3.66 s with M1; int. 8: 3.66 -> 3.70 s |
 | 10 | monaco-2025 | OpenF1 | none | yes | G1 | **fail** | 3.28 s | field HAM gap error 8.44 / 8.07 [5.14] (+1 more) | no | - | no | Hamilton in the Monaco queue of the mandatory two-stop (8.5 s); 2.63 -> 3.27 s; int. 8: 3.27 -> 3.28 s |
@@ -78,7 +78,7 @@ the last report.
 | 4 | russia-2018 | TUM f1-timing-database | none | yes | G1 | **fail** | 2.46 s | duel BOT vs HAM gap error 4.2 / 4.36 [3.00] | no | - | no | Mercedes' swap is now scripted (M4: duel and podium order pass); the duel gap 4.2 s, the sim's BOT drops further back; int. 8: 2.34 -> 2.46 s |
 | 5 | germany-2019 | TUM f1-timing-database | weather | yes | G1 | pass | 1.42 s |  | yes (VER) | yes | **yes** | int. 8: 1.38 -> 1.42 s |
 | 6 | hungary-2019 (shared) | FastF1 (F1 live timing) | none | yes | G1 | pass | 0.96 s |  | yes (HAM) | yes | **yes** |  |
-| 7 | brazil-2019 | TUM f1-timing-database | none | yes | G1 | **fail** | 2.08 s | duel HAM vs GAS gap error 4.24 / 4.32 [3.00] | yes (HAM) | yes | no | now played from Hamilton (A1's hard-call side). The duel is the real 0.06 s finish: Gasly's last-stint offset (M2) and the overtake model (M3: Hamilton's late charge passes less) move the mean gap; int. 8: 1.97 -> 2.08 s |
+| 7 | brazil-2019 | TUM f1-timing-database | none | yes | G1 | pass | 1.52 s |  | yes (HAM) | yes | **yes** | Sector A (A4): HAM's and ALB's lap-70 contact (sourced FAULT damage) passes every check on both seed sets, 2.08 -> 1.52 s; reachable after A4 (B1 re-check, no re-author). Before: now played from Hamilton (A1's hard-call side). The duel is the real 0.06 s finish: Gasly's last-stint offset (M2) and the overtake model (M3: Hamilton's late charge passes less) move the mean gap; int. 8: 1.97 -> 2.08 s |
 | 8 | italy-2020 | Jolpica laps | compounds, safetyCars | yes | G1 | **fail** | 2.21 s | duel GAS vs SAI gap error 5 / 5.09 [3.00] (+1 more) | no | - | no | the red-flag restart and Gasly holding Sainz off; 3.69 -> 2.23 s; int. 8: 2.23 -> 2.21 s |
 | 9 | turkey-2020 | Jolpica laps | compounds, safetyCars, weather | yes | G1 | pass | 1.75 s |  | yes (HAM) | yes | **yes** | now passes on the combined fixes; the dry labels from lap 18 (gap 11) remain; int. 8: 1.76 -> 1.75 s |
 | 10 | sakhir-2020 | Jolpica laps | compounds, safetyCars | yes | G1 | **fail** | 2.43 s | duel RUS vs PER gap error 8.87 / 8.9 [3.00] | no | - | no | duel RUS vs PER 8.9 s: the fitted SC queue's stop costs (sim fixes 2) and the overtake model (M3); 1.30 -> 2.51 s; int. 8: 2.51 -> 2.43 s |
@@ -93,7 +93,7 @@ the last report.
 | 4 | monaco-2015 | TUM f1-timing-database | none | yes | G1 | **fail** | 4.60 s | duel HAM vs ROS gap error 5.38 / 5.22 [3.00] (+5 more) | no | - | no | race mechanics (pace 4%): the SC and Monaco traffic (KVY, RIC, RAI); int. 8: 4.71 -> 4.60 s |
 | 5 | hungary-2015 | TUM f1-timing-database | none | yes | G1 | **fail** | 6.80 s | field ALO gap error 19.71 / 19.46 [5.00] (+4 more) | no | - | no | race mechanics: ALO 20 s, VET vs KVY; 5.76 -> 6.90 s (M3 measured 6.59 alone); int. 8: 6.90 -> 6.80 s |
 | 6 | united-states-2015 | TUM f1-timing-database | weather | yes | G1 | **fail** | 1.96 s | duel HAM vs ROS order rate 0.45 / 0.43 [0.60] (+2 more) | no | - | no | Rosberg's one-lap loss on lap 48, which decides the duel, isn't modelled (duel order 0.40); 3.30 -> 2.31 s; int. 8: 2.31 -> 1.96 s |
-| 7 | spain-2016 | TUM f1-timing-database | none | yes | G1 | pass | 1.15 s |  | yes (RAI) | **no** | no | not reachable after the rebuild (int. 8): the best path gets ★2 only, at both levels; int. 8: 1.13 -> 1.15 s |
+| 7 | spain-2016 | TUM f1-timing-database | none | yes | G1 | pass | 1.15 s |  | yes (RAI) | yes | **yes** | not reachable after the rebuild (int. 8): the best path gets ★2 only, at both levels; int. 8: 1.13 -> 1.15 s; B2: re-authored on Räikkönen's real P2 (the Expert VER wins every path at Legend; win kept as the rewrite), hidden: no hard tyre; reachable at both levels |
 | 8 | monaco-2016 | TUM f1-timing-database | none | yes | G1 | **fail** | 10.38 s | duel RIC vs HAM gap error 13.94 / 13.82 [3.00] (+6 more) | no | - | no | a wet race with no rain data; the full-wets shift (M1) and the SC (race mechanics 77%); 8.15 -> 10.79 s; int. 8: 10.79 -> 10.38 s |
 | 9 | great-britain-2016 | TUM f1-timing-database | weather | yes | G1 | **fail** | 1.94 s | podium order rate 0.46 / 0.48 [0.50] | no | - | no | Rosberg's gearbox fault (laps 46-47) is now a sourced FAULT (W4): the duel order passes, the podium order is still 0.41 [0.50] and the gap errors grow a little; 2.11 -> 2.37 s; int. 8: 2.37 -> 1.94 s |
 | 10 | abu-dhabi-2016 | TUM f1-timing-database | none | yes | G1 | pass | 0.87 s |  | yes (ROS) | yes | **yes** | int. 8: 0.85 -> 0.87 s |
@@ -107,11 +107,11 @@ the last report.
 | 3 | china-2011 | Jolpica laps | compounds, safetyCars | yes | G1 | borderline | 1.47 s | podium order rate pass / 0.49 [0.50] | yes (VET) | yes | no | borderline (int. 8): podium order rate 0.49 [0.50] on seed set 20000; now passes on the combined fixes (pooled overtake model, M3; pace by stint, M2); int. 8: 1.44 -> 1.47 s |
 | 4 | monaco-2011 | Jolpica laps | compounds, safetyCars | yes | G1 | **fail** | 5.73 s | field KOB gap error 14.32 / 14.34 [5.00] (+2 more) | no | - | no | W4's SC fix (the first SC one period, laps 34-38; the late SC, 69-71, an SC, not a yellow) puts VET, ALO and BUT within 1 s of their real gaps; what fails is HAM (69 s) and WEB (26 s) a lap down at the red-flag restart (no unlapping); 43.37 -> 15.16 s; int. 8: 15.16 -> 5.73 s |
 | 5 | canada-2011 | Jolpica laps | compounds, safetyCars, weather | yes | G1 | **fail** | 3.68 s | podium WEB gap error 8.94 / 8.65 [5.00] (+3 more) | no | - | no | lap pace (58%) on the drying track (PET, MAS); the back-to-back stop fix took it from 10.27 to 3.51 s; int. 8: 3.02 -> 3.68 s |
-| 6 | europe-2012 | Jolpica laps | compounds, safetyCars | yes | G1 | pass | 1.37 s |  | yes (RAI) | yes | **yes** | now passes (int. 8); the sourced SC (laps 28-33, W4; applied here with the storyline SC moved to lap 28): MSCM's podium gap 5.38 / 5.15 [5.00], just over (race mechanics 76%); 1.94 -> 1.46 s; int. 8: 1.46 -> 1.37 s |
+| 6 | europe-2012 | Jolpica laps | compounds, safetyCars | yes | G1 | pass | 1.37 s |  | yes (RAI) | yes | **yes** | now passes (int. 8); the sourced SC (laps 28-33, W4; applied here with the storyline SC moved to lap 28): MSCM's podium gap 5.38 / 5.15 [5.00], just over (race mechanics 76%); 1.94 -> 1.46 s; int. 8: 1.46 -> 1.37 s; Sector A (A4): MAL's lost front wing from lap 56, 1.37 -> 1.16 s |
 | 7 | abu-dhabi-2012 | Jolpica laps | compounds, safetyCars | yes | G1 | **fail** | 1.72 s | duel VET vs BUT gap error 3.4 / 3.22 [3.00] (+1 more) | no | - | no | the VET vs BUT gap, just over (3.4 / 3.2 [3.00]); 2.89 -> 1.72 s |
 | 8 | brazil-2012 | Jolpica laps | compounds, safetyCars, weather | yes | G1 | **fail** | 3.45 s | duel VET vs ALO gap error 5.68 / 5.7 [3.00] (+2 more) | no | - | no | Vettel's last wet stint (pace 49%); int. 8: 3.44 -> 3.45 s |
-| 9 | malaysia-2013 | Jolpica laps | compounds, safetyCars, weather | yes | G1 | pass | 0.90 s |  | yes (WEB) | **no** | no | not reachable after the rebuild (int. 8): no path earns ★1, at both levels; int. 8: 1.20 -> 0.90 s |
-| 10 | spain-2013 | Jolpica laps | compounds, safetyCars | yes | G1 | **fail** | 1.59 s | duel RAI vs ALO gap error 3.28 / 3.23 [3.00] | yes (RAI) | **no** | no | not reachable after the rebuild (int. 8): ★1-3 but not the hidden objective, at both levels; just over: duel RAI vs ALO 3.08 / 3.16 [3.00] (race mechanics 89%); now played from Räikkönen (6.2); int. 8: 1.51 -> 1.59 s |
+| 9 | malaysia-2013 | Jolpica laps | compounds, safetyCars, weather | yes | G1 | pass | 0.90 s |  | yes (WEB) | yes | **yes** | not reachable after the rebuild (int. 8): no path earns ★1, at both levels; int. 8: 1.20 -> 0.90 s; B2: re-authored on Webber's real P2 (VER ~0.27 s a lap quicker on the rebuilt model; win kept as the rewrite); reachable at both levels |
+| 10 | spain-2013 | Jolpica laps | compounds, safetyCars | yes | G1 | **fail** | 1.59 s | duel RAI vs ALO gap error 3.28 / 3.23 [3.00] | yes (RAI) | yes | no | B2: hidden objective now "win without fitting the soft again" (his real stops were onto hards), reachable at both levels; was not reachable after the rebuild (int. 8): ★1-3 but not the hidden objective, at both levels; just over: duel RAI vs ALO 3.08 / 3.16 [3.00] (race mechanics 89%); now played from Räikkönen (6.2); int. 8: 1.51 -> 1.59 s |
 
 ## Era 5: Alonso, Räikkönen, Hamilton (2005–2009)
 
@@ -152,7 +152,7 @@ the last report.
 | 3 | belgium-1995 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, fuelLoads, weather | yes | anchors | pass | 134/134 core anchors | G1 sanity fail, 6.00 s | yes (MSCM) | yes | **yes** | anchors pass; G1 sanity 2.97 -> 5.76 s on W2's anchors: BRU (21.5 s) and FRE on estimated stint tyres |
 | 4 | spain-1996 | Jolpica laps + F1DB stops | compounds, safetyCars, fuelLoads, weather | yes | G1 | pass | 0.63 s |  | yes (MSCM) | yes | **yes** | now passes: pace by stint (M2); still wet all race and built dry; int. 8: 0.62 -> 0.63 s |
 | 5 | hungary-1997 | Jolpica laps + F1DB stops | compounds, safetyCars, fuelLoads | yes | G1 | **fail** | 2.57 s | field MSCM gap error 10.19 / 10.28 [5.00] (+1 more) | no | - | no | stint pace behind the leaders: MSCM 10 s; 4.15 -> 2.53 s with M2; int. 8: 2.53 -> 2.57 s |
-| 6 | europe-1997 | Jolpica laps + F1DB stops | compounds, safetyCars, fuelLoads | yes | G1 | pass | 1.20 s |  | no | - | no | now passes (int. 8: S9 sources McLaren's swap); the let-bys at the flag scripted (M4: VIL's podium gap passes); podium order 0.45 [0.50], 2.53 -> 0.82 s; int. 8: 0.82 -> 1.20 s |
+| 6 | europe-1997 | Jolpica laps + F1DB stops | compounds, safetyCars, fuelLoads | yes | G1 | pass | 1.20 s |  | yes (VIL) | yes | **yes** | B1: authored from Villeneuve (hard calls VIL 0, MSCM 0, tie to VIL), beat MSCM, no rewrite (he really took the title); now passes (int. 8: S9 sources McLaren's swap); the let-bys at the flag scripted (M4: VIL's podium gap passes); podium order 0.45 [0.50], 2.53 -> 0.82 s; int. 8: 0.82 -> 1.20 s |
 | 7 | hungary-1998 | Jolpica laps + F1DB stops | compounds, safetyCars, fuelLoads | yes | G1 | pass | 1.42 s |  | yes (COU) | yes | **yes** | now passes on the combined fixes (Schumacher's push fitted, M2; overtaking, M3; no SC, so not the restart switch); int. 8: 1.58 -> 1.42 s |
 | 8 | belgium-1998 | Jolpica laps + F1DB stops | compounds, safetyCars, fuelLoads, weather | yes | G1 | **fail** | 5.11 s | field DIN gap error 13.71 / 13.67 [5.17] (+3 more) | no | - | no | W4: SC laps 29-32 and Jordan's hold order (TEAM_ORDER, laps 33-44); the duel passes. The sim's restart is nose-to-tail (really HIL 2.4 s, ALE 4.7 s back) and its ALE then passes the Jordans: DIN 14.0 s, ALE 11.8 s; 14.21 -> 5.25 s; int. 8: 5.25 -> 5.11 s |
 | 9 | malaysia-1999 | Jolpica laps + F1DB stops | compounds, safetyCars, fuelLoads | yes | G1 | **fail** | 2.96 s | duel IRV vs HAK gap error 3.62 / 3.87 [3.00] (+1 more) | no | - | no | Ferrari's team orders scripted (M4); the duel IRV vs HAK gap 3.6 / 3.9 [3.00], Irvine's last laps |
@@ -189,47 +189,55 @@ the last report.
 | 10 | monaco-1988 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, fuelLoads, weather | yes | anchors | pass | 61/61 core anchors | G1 sanity fail, 3.03 s | yes (SENA) | yes | **yes** | anchors pass; Senna's crash comes only on the real push from lap 55 (M4); G1 sanity 6.92 -> 3.03 s on W2's anchors (ALBM 5.0 s) |
 ## Summary
 
-**Result: 47 pass, 1 borderline, 52 fail, 0 not built** (of 100; 23 reconstructed races checked on
-their anchors, 77 on G1). **Authored 48, reachable 45 of 48, ready to publish 43** (with step 6.2's Eras 1-2 authoring: france-1990, monaco-1992, brazil-1993, south-africa-1983). Last report
-(Eras 1.1, 46ad682): 41 pass, 0 borderline, 57 fail, 2 not built; 44 authored, 44 reachable, 41
-ready.
+**Update, integration B (Nov 9 2026, branch eras-integrate-b): 47 pass, 2 borderline, 51 fail,
+0 not built. Authored 49, reachable 49 of 49, ready to publish 47.** What moved: Sector A's A4
+contact damage (brazil-2019 fail -> pass, europe-2012 1.37 -> 1.16 s, hungary-2024 pass ->
+borderline; G1 figures from docs/eras-checks/a4-contact-damage.md, robust mode), B2's re-authoring
+(malaysia-2013, spain-2013, spain-2016 reachable again) and B1's europe-1997 authoring. No race was
+rebuilt beyond the re-authored ones (europe-1997, malaysia-2013, spain-2013, spain-2016), so every
+other G1 figure below is integration 8's. Reachability re-run on every authored race (44 Eras-only,
+5 shared): all pass.
+
+Integration 8 (before this update): 47 pass, 1 borderline, 52 fail, 0 not built (of 100; 23
+reconstructed races checked on their anchors, 77 on G1); authored 48, reachable 45 of 48, ready
+to publish 43 (with step 6.2's Eras 1-2 authoring: france-1990, monaco-1992, brazil-1993,
+south-africa-1983). Last report before that (Eras 1.1, 46ad682): 41 pass, 0 borderline, 57 fail,
+2 not built; 44 authored, 44 reachable, 41 ready.
 
 | Era | Pass | Borderline | Fail | Not built | Authored | Reachable | Ready to publish |
 |---|---|---|---|---|---|---|---|
-| 10 | 3 | 0 | 7 | 0 | 2 | 2 | 2 |
+| 10 | 2 | 1 | 7 | 0 | 2 | 2 | 2 |
 | 9 | 5 | 0 | 5 | 0 | 5 | 5 | 5 |
-| 8 | 4 | 0 | 6 | 0 | 5 | 5 | 4 |
-| 7 | 2 | 0 | 8 | 0 | 2 | 1 | 1 |
-| 6 | 3 | 1 | 6 | 0 | 5 | 3 | 2 |
+| 8 | 5 | 0 | 5 | 0 | 5 | 5 | 5 |
+| 7 | 2 | 0 | 8 | 0 | 2 | 2 | 2 |
+| 6 | 3 | 1 | 6 | 0 | 5 | 5 | 3 |
 | 5 | 1 | 0 | 9 | 0 | 1 | 1 | 1 |
 | 4 | 3 | 0 | 7 | 0 | 3 | 3 | 3 |
-| 3 | 6 | 0 | 4 | 0 | 5 | 5 | 5 |
+| 3 | 6 | 0 | 4 | 0 | 6 | 6 | 6 |
 | 2 | 10 | 0 | 0 | 0 | 10 | 10 | 10 |
 | 1 | 10 | 0 | 0 | 0 | 10 | 10 | 10 |
-| **All** | **47** | **1** | **52** | **0** | **48** | **45** | **43** |
+| **All** | **47** | **2** | **51** | **0** | **49** | **49** | **47** |
 
 Timed races (77, now with china-2007): total mean gap error 269.58 s (last report 294.85 s over
 76). G1 sanity of the 23 reconstructed races (now with brazil-1993): 13 pass, 112.79 s total
 (last report 13 of 22, 104.68 s).
 
-### Ready to publish (43)
+### Ready to publish (47)
 
 - **Era 10** (2): hungary-2022 (VER), belgium-2023 (VER)
 - **Era 9** (5): bahrain-2021 (VER), france-2021 (HAM), russia-2021 (NOR), turkey-2021 (LEC), abu-dhabi-2021 (HAM)
-- **Era 8** (4): germany-2018 (HAM), germany-2019 (VER), hungary-2019 (HAM), turkey-2020 (HAM)
-- **Era 7** (1): abu-dhabi-2016 (ROS)
-- **Era 6** (2): abu-dhabi-2010 (PET), europe-2012 (RAI)
+- **Era 8** (5): germany-2018 (HAM), germany-2019 (VER), hungary-2019 (HAM), brazil-2019 (HAM), turkey-2020 (HAM)
+- **Era 7** (2): spain-2016 (RAI), abu-dhabi-2016 (ROS)
+- **Era 6** (3): abu-dhabi-2010 (PET), europe-2012 (RAI), malaysia-2013 (WEB)
 - **Era 5** (1): san-marino-2005 (MSCM)
 - **Era 4** (3): japan-2000 (HAK), austria-2002 (BAR), france-2004 (ALO)
-- **Era 3** (5): spain-1994 (HIL), australia-1994 (HIL), belgium-1995 (MSCM), spain-1996 (MSCM), hungary-1998 (COU)
+- **Era 3** (6): spain-1994 (HIL), australia-1994 (HIL), belgium-1995 (MSCM), spain-1996 (MSCM), europe-1997 (VIL), hungary-1998 (COU)
 - **Era 2** (10): france-1990 (CAP), united-states-1990 (ALE), mexico-1990 (PRO), brazil-1991 (SENA), monaco-1992 (SENA), belgium-1992 (MSCM), hungary-1992 (BER), brazil-1993 (SENA), europe-1993 (SENA), australia-1993 (SENA)
 - **Era 1** (10): south-africa-1983 (PIQN), monaco-1984 (PRO), portugal-1984 (LAU), germany-1986 (ROSK), portugal-1985 (SENA), mexico-1986 (BER), hungary-1986 (PIQN), australia-1986 (MAN), great-britain-1987 (PIQN), monaco-1988 (SENA)
 
-Authored but not ready (5): **spain-2016** (Era 7, RAI) and **malaysia-2013** (Era 6, WEB) pass G1
-but are no longer reachable on the rebuilt models; **spain-2013** (Era 6, RAI) fails G1 and is no
-longer reachable; **china-2011** (Era 6, VET) is borderline (podium order rate 0.49 [0.50] on one
-seed set); **brazil-2019** (Era 8, HAM) still fails G1 (duel HAM vs GAS 4.24 / 4.32 [3.00]). Passing
-but not authored (2): hungary-2024, europe-1997.
+Authored but not ready (2): **spain-2013** (Era 6, RAI) is reachable again but fails G1 (duel
+RAI vs ALO just over 3 s); **china-2011** (Era 6, VET) is borderline (podium order rate 0.49 [0.50]
+on one seed set). Passing but not authored: none (hungary-2024 is borderline after A4).
 
 ## Since the last report
 
@@ -289,7 +297,7 @@ race is now reachable.
 
 ## Reachability (eras spec §15)
 
-`pnpm --filter @laststint/sim reachability <id>` for each of the 39 authored Eras-only races and
+`pnpm --filter @laststint/sim reachability <id>` for each of the 44 authored Eras-only races and
 `pnpm --filter @laststint/worker reachability:shared <id>` for each of the 5 authored shared races
 (the race file merged with its overlay, the model the Eras API serves), one race per call, on the
 rebuilt race files. Last report = Eras 1.1.
@@ -311,6 +319,7 @@ rebuilt race files. Last report = Eras 1.1.
 | brazil-2019 | reachable | reachable | not earned | pass | pass |
 | china-2011 | reachable | reachable | not earned | pass | pass |
 | europe-1993 | reachable | reachable | not earned | pass | pass |
+| europe-1997 | reachable | reachable | not earned | pass | - (new, B1) |
 | europe-2012 | reachable | reachable | not earned | pass | pass |
 | france-2004 | reachable | reachable | not earned | pass | pass |
 | france-2021 (shared) | reachable | reachable | not earned | pass | pass |
@@ -324,7 +333,7 @@ rebuilt race files. Last report = Eras 1.1.
 | hungary-2019 (shared) | reachable | reachable | not earned | pass | pass |
 | hungary-2022 | reachable | reachable | not earned | pass | pass |
 | japan-2000 | reachable | reachable | not earned | pass | pass |
-| malaysia-2013 | **not reachable** | **not reachable** | not earned | **fail** | pass |
+| malaysia-2013 | reachable | reachable | not earned | pass | pass (int. 8: fail) |
 | mexico-1986 | reachable | reachable | not earned | pass | pass |
 | mexico-1990 | reachable | reachable | not earned | pass | pass |
 | monaco-1984 | reachable | reachable | not earned | pass | pass |
@@ -335,16 +344,16 @@ rebuilt race files. Last report = Eras 1.1.
 | san-marino-2005 | reachable | reachable | not earned | pass | pass |
 | spain-1994 | reachable | reachable | not earned | pass | pass |
 | spain-1996 | reachable | reachable | not earned | pass | pass |
-| spain-2013 | **not reachable** | **not reachable** | not earned | **fail** | pass |
-| spain-2016 | **not reachable** | **not reachable** | not earned | **fail** | pass |
+| spain-2013 | reachable | reachable | not earned | pass | pass (int. 8: fail) |
+| spain-2016 | reachable | reachable | not earned | pass | pass (int. 8: fail) |
 | turkey-2020 | reachable | reachable | not earned | pass | pass |
 | turkey-2021 | reachable | reachable | not earned | pass | pass |
 | united-states-1990 | reachable | reachable | not earned | pass | pass |
 
-**41 pass, 3 fail of 44** (39 Eras-only, 5 shared; Eras-only 36 of 39, shared 5 of 5).
-Last report: 44 pass, 0 fail of 44. The three failures (spain-2016, malaysia-2013, spain-2013)
-need re-authoring on the rebuilt models (their moments and objectives were set before S3-S6).
-Not checked: the 56 built races with no authored `eras` block.
+**49 pass, 0 fail of 49** (44 Eras-only, 5 shared; integration B, Nov 9 2026, run on native
+Windows). Integration 8: 41 pass, 3 fail of 44; spain-2016, malaysia-2013 and spain-2013 were
+re-authored on the rebuilt models (B2) and europe-1997 added (B1).
+Not checked: the 51 built races with no authored `eras` block.
 
 ## Not built
 
