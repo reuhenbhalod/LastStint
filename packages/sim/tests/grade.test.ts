@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import abuJson from '../../../data/races/abu-dhabi-2021.json';
 import germany1986Json from '../../../data/races/germany-1986.json';
 import hungary1992Json from '../../../data/races/hungary-1992.json';
+import japan2000Json from '../../../data/races/japan-2000.json';
 import spainJson from '../../../data/races/spain-2021.json';
 import { fromSide } from '../src/eras/hard-calls.js';
 import { erasModel } from '../src/eras/reachability.js';
@@ -18,14 +19,16 @@ import {
   isFinished,
   planRemainingStop,
   planRemainingStops,
+  realDecisions,
   stepLap,
 } from '../src/sim.js';
-import type { RaceModel } from '../src/types.js';
+import type { Decision, RaceModel } from '../src/types.js';
 
 const abu = abuJson as unknown as RaceModel;
 const spain = spainJson as unknown as RaceModel;
 const hungary1992 = hungary1992Json as unknown as RaceModel;
 const germany1986 = germany1986Json as unknown as RaceModel;
+const japan2000 = japan2000Json as unknown as RaceModel;
 
 /** The race as a Daily file: no rules block (Daily semantics). */
 function daily(model: RaceModel): RaceModel {
@@ -190,6 +193,41 @@ describe('the Eras continuation (sim.ts erasContinuation)', () => {
     const stops = erasContinuation(run, run.state.lap, 3);
     expect(stops).toEqual(planRemainingStops(run));
     expect(stops.length).toBeGreaterThan(0);
+  });
+
+  it('a stop already queued at the pause stays, and the later real stops follow it', () => {
+    // japan-2000 from Hakkinen's side (real stops out on laps 23 and 38, refuelling): the real
+    // call was made on lap 22, so at the pause after lap 22 the lap-23 stop is queued. The
+    // continuation used to add nothing then, so the car ran dry after its 15-lap fill.
+    const m = japan2000;
+    expect(m.userSide).toBe('HAK');
+    expect(real(m)).toEqual([23, 38]);
+    const first = realDecisions(m)[0] as Decision;
+    const pause = (model: RaceModel, call: Decision) => {
+      const run = initRun(model, model.race.seed, { decisions: [call] });
+      while (run.state.lap < call.lap) stepLap(run);
+      return run;
+    };
+    const run = pause(m, first);
+    expect(run.state.lap).toBe(22);
+    expect(run.state.cars.HAK?.strategy.map((s) => s.lap)).toEqual([23]);
+    const stay = playOption(run, 1, { id: 'stay', decisions: [] }, true);
+    expect(stay.state.cars.HAK?.strategy.map((s) => s.lap)).toEqual([23, 38]);
+    while (!isFinished(stay)) stepLap(stay);
+    expect(stay.notes.some((n) => n.kind === 'fuel' && n.driver === 'HAK')).toBe(false);
+    // An early stop queued instead (called on lap 20, out on lap 21) stands in for the real
+    // lap-23 one: the lap-38 stop still follows.
+    const early = playOption(
+      pause(m, { ...first, lap: 20 }),
+      1,
+      { id: 'stay', decisions: [] },
+      true,
+    );
+    expect(early.state.cars.HAK?.strategy.map((s) => s.lap)).toEqual([21, 38]);
+    // The Daily path is unchanged: a queued stop there still gets nothing added.
+    const { fill: _fill, ...dry } = first as Extract<Decision, { kind: 'pit' }>;
+    const day = playOption(pause(daily(m), dry), 1, { id: 'stay', decisions: [] }, true);
+    expect(day.state.cars.HAK?.strategy.map((s) => s.lap)).toEqual([23]);
   });
 
   it("follows the player's own logged plan instead", () => {
