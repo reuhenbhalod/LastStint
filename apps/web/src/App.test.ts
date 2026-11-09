@@ -12,6 +12,7 @@ describe('routeOf', () => {
     expect(routeOf('/admin/tickets')).toEqual({ page: 'admin' });
     expect(routeOf('/privacy')).toEqual({ page: 'privacy' });
     expect(routeOf('/terms')).toEqual({ page: 'terms' });
+    expect(routeOf('/credits')).toEqual({ page: 'credits' });
   });
 
   it('routes /eras and /eras/<eraId>', () => {
@@ -37,6 +38,10 @@ describe('App', () => {
     vi.stubGlobal('location', { pathname, search: '' });
     return renderToStaticMarkup(createElement(App));
   };
+
+  it('renders the credits page at /credits', () => {
+    expect(at('/credits')).toContain('>Credits</h1>');
+  });
 
   it('renders the era map at /eras', () => {
     expect(at('/eras')).toContain('>Eras</h1>');

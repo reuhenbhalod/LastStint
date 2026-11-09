@@ -1,4 +1,4 @@
-// Path routing (the daily at `/`, the Gauntlet, Eras, admin and legal pages), and the
+// Path routing (the daily at `/`, the Gauntlet, Eras, admin, legal and credits pages), and the
 // phase-routed daily shell: load today's race from the Worker (practice on the bundled race if
 // there's no daily), then render by game phase.
 
@@ -12,6 +12,7 @@ import { Eras } from './eras/ErasScreen.js';
 import { type ErasRoute, erasRoute } from './eras/catalog.js';
 import { useFavouriteColour, useTeamTheme } from './game/teamTheme.js';
 import { useGame } from './game/useGame.js';
+import { Credits } from './screens/Credits.js';
 import { HowItWorks } from './screens/HowItWorks.js';
 import { IntroCard } from './screens/IntroCard.js';
 import { Privacy, Terms } from './screens/Legal.js';
@@ -21,13 +22,14 @@ import { Survivor } from './screens/Survivor.js';
 
 /** The page a path is on: the daily (`/`, and any path not below) or a mode's or page's own. */
 export type Route =
-  | { page: 'admin' | 'privacy' | 'terms' | 'gauntlet' | 'daily' }
+  | { page: 'admin' | 'privacy' | 'terms' | 'credits' | 'gauntlet' | 'daily' }
   | { page: 'eras'; eras: ErasRoute };
 
 export function routeOf(pathname: string): Route {
   if (pathname.startsWith('/admin')) return { page: 'admin' };
   if (pathname.startsWith('/privacy')) return { page: 'privacy' };
   if (pathname.startsWith('/terms')) return { page: 'terms' };
+  if (pathname.startsWith('/credits')) return { page: 'credits' };
   if (pathname.startsWith('/gauntlet') || pathname.startsWith('/survivor'))
     return { page: 'gauntlet' };
   const eras = erasRoute(pathname);
@@ -44,6 +46,8 @@ export function App() {
       return <Privacy />;
     case 'terms':
       return <Terms />;
+    case 'credits':
+      return <Credits />;
     case 'gauntlet':
       return <Survivor />;
     case 'eras':

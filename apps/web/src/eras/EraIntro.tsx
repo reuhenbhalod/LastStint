@@ -2,11 +2,14 @@
 // place of the Daily card: the dilemma, the three stars spelled out (★3 in full), and the
 // attempt's difficulty (information level, rival policy, decision timer), with Legend,
 // Reconstructed and Draft marked. The sentences come from raceIntro.ts; a race whose
-// objectives aren't written yet shows a marked empty slot, never invented ones.
+// objectives aren't written yet shows a marked empty slot, never invented ones. A race built
+// from TUM, Jolpica or F1DB data credits them in one line (data/credits.ts), as their
+// licences ask.
 
 import type { DifficultySettings, RaceModel } from '@laststint/sim';
 import { Brand } from '../components/Brand.js';
 import { Disclaimer } from '../components/Disclaimer.js';
+import { raceCreditText } from '../data/credits.js';
 import { surname } from '../data/names.js';
 import { Badge } from './EraDetail.js';
 import type { EraInfo, EraRaceInfo } from './catalog.js';
@@ -149,6 +152,7 @@ export function EraIntro({
   const team = model.drivers.find((d) => d.code === userSide)?.team;
   const { takeoverLap, laps } = model.race;
   const briefing = model.eras?.briefing;
+  const credit = raceCreditText(model.race.id);
   return (
     <div className="flex min-h-screen flex-col">
       <header className="border-b border-[var(--rule)]">
@@ -215,6 +219,15 @@ export function EraIntro({
             How it works
           </button>
         </div>
+
+        {credit && (
+          <p data-credit="race" className="m-0 break-words text-[13px] text-[var(--muted)]">
+            {credit}{' '}
+            <a href="/credits" className="underline underline-offset-2 hover:text-[var(--ink)]">
+              Credits
+            </a>
+          </p>
+        )}
       </main>
       <Disclaimer />
     </div>

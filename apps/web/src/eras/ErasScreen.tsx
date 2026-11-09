@@ -55,9 +55,23 @@ function Shell({ children }: { children: ReactNode }) {
       <Header />
       <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-4 py-8 sm:px-6">
         {children}
+        <DataCredit />
       </main>
       <Disclaimer />
     </div>
+  );
+}
+
+/** The data sources' credit (their licences ask for it), on every Eras screen. */
+export function DataCredit() {
+  return (
+    <p className="m-0 mt-auto pt-4 text-[13px] text-[var(--muted)]">
+      Race data from the TUM f1-timing-database, Jolpica-F1, F1DB and others:{' '}
+      <a href="/credits" className="underline underline-offset-2 hover:text-[var(--ink)]">
+        data credits
+      </a>
+      .
+    </p>
   );
 }
 
