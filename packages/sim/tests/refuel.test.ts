@@ -7,11 +7,12 @@
 import { describe, expect, it } from 'vitest';
 import abuJson from '../../../data/races/abu-dhabi-2021.json';
 import canadaJson from '../../../data/races/canada-2024.json';
+import sanMarino2005Json from '../../../data/races/san-marino-2005.json';
 import vectors from '../../../pipeline/tests/fixtures/refuel_parity.json';
 import { gradeMoment, playOption } from '../src/grade.js';
 import { type DecisionMoment, boxCall, candidateMoments, pauseAt } from '../src/moments.js';
 import { planCalls, validatePlan } from '../src/plan.js';
-import { enginePlans } from '../src/planner.js';
+import { enginePlans, fuelled, planOption } from '../src/planner.js';
 import {
   PRIOR_SECONDS_PER_LAP,
   RESERVE_LAPS,
@@ -296,7 +297,7 @@ describe('the player in a refuelling race', () => {
     for (const p of plans) {
       p.stops.forEach((s, i) => {
         const next = p.stops[i + 1]?.lap ?? refuelRace.race.laps;
-        expect(s.fill).toEqual({ laps: next - s.lap });
+        expect(s.fill).toEqual({ laps: Math.min(fillCap(refuelRace), next - s.lap) });
       });
       expect(() => validatePlan(refuelRace, p, run.state.lap)).not.toThrow();
       for (const c of planCalls(p, run.state.lap, 'standard')) {
@@ -318,6 +319,31 @@ describe('the player in a refuelling race', () => {
         p.stops.every((s) => s.fill === undefined),
       ),
     ).toBe(true);
+  });
+
+  it("a plan's fill never passes the tank (fillCap), so every plan is one the race takes", () => {
+    // A stint to the flag longer than the tank is filled to the tank, not refused.
+    const cap = fillCap(refuelRace);
+    const stops = fuelled(refuelRace, [
+      { lap: 20, compound: 'HARD' },
+      { lap: 24, compound: 'HARD' },
+    ]);
+    expect(refuelRace.race.laps - 24).toBeGreaterThan(cap);
+    expect(stops.map((s) => s.fill)).toEqual([{ laps: 4 }, { laps: cap }]);
+    // San Marino 2005 (A1): its one-stop plan from the takeover (lap 21, 41 laps to the flag)
+    // asked for more than a 2005 tank holds, so checkFill threw and no plan was graded.
+    const sm = sanMarino2005Json as unknown as RaceModel;
+    expect(sm.rules?.refuelling).toBe(true);
+    const run = initRun(sm, 1, { decisions: [] });
+    const plans = enginePlans(run);
+    expect(plans.some((p) => p.stops.length > 0)).toBe(true);
+    for (const p of plans) {
+      for (const s of p.stops) {
+        expect(typeof s.fill === 'object' && s.fill.laps <= fillCap(sm)).toBe(true);
+      }
+      expect(() => validatePlan(sm, p, run.state.lap)).not.toThrow();
+      expect(() => playOption(run, 1, planOption(run, p))).not.toThrow();
+    }
   });
 
   it('every box option at a moment states its fill; the real call is the real option', () => {

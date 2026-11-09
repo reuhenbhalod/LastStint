@@ -183,9 +183,9 @@ test('Era 5: San Marino 2005, the tyre lock and a refuelling stop', async ({ pag
   expect(model.rules).toMatchObject({ tyreChanges: false, refuelling: true, drs: false });
   await mockEras(page, [model]);
   await openRace(page, 'san-marino-2005');
-  // Its race plans never finish grading and the attempt can't be submitted (app bug: see the
-  // fixme below), so the plan is picked ungraded and the calls are read from the game.
-  await startRace(page, { graded: false });
+  // Plan A, the no-stop plan, so the box call below is the player's own (the other plans box
+  // on lap 21, as soon as the race starts).
+  await startRace(page, { plan: 'A' });
   const radio = await teamRadio(page);
   // The 2005 lock: a stop keeps the dry set.
   await expect(radio.getByRole('note')).toContainText('No tyre changes this year');
@@ -318,17 +318,12 @@ test('Era 1: Monaco 1988, the avoidable storyline retirement, repeated then avoi
   expect(eras.submissions).toHaveLength(2);
 });
 
-// App bug found by this suite (step 10.1): San Marino 2005 can't be scored. Its one-stop race
-// plan fills to the flag ({ laps: 41 }, then 40, 39… in the grader's playouts), more than a
-// 2005 tank holds, so the sim's checkFill throws "no fill {"laps":41} in this race" (uncaught
-// page errors): every plan stays at "…", and at the flag the submit fails before it is sent
-// ("Can’t reach the server."). Unskip once the planner caps a stop's fill at the tank.
-test.fixme(
-  'Era 5: San Marino 2005’s plans are graded and the attempt is scored',
-  async ({ page }) => {
-    const eras = await mockEras(page, [loadEraRace('san-marino-2005')]);
-    await openRace(page, 'san-marino-2005');
-    await playRace(page);
-    expect(eras.submissions).toHaveLength(1);
-  },
-);
+// Found by this suite (step 10.1, fixed in A1): San Marino 2005's one-stop race plan filled to
+// the flag ({ laps: 41 }), more than a 2005 tank holds, so checkFill threw, no plan was graded
+// and the submit failed ("Can’t reach the server."). The planner now caps a fill at the tank.
+test('Era 5: San Marino 2005’s plans are graded and the attempt is scored', async ({ page }) => {
+  const eras = await mockEras(page, [loadEraRace('san-marino-2005')]);
+  await openRace(page, 'san-marino-2005');
+  await playRace(page);
+  expect(eras.submissions).toHaveLength(1);
+});
