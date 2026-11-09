@@ -11,10 +11,8 @@
   "track": {
     "pitLoss": 26.785,
     "pitLossUnderSC": 14.732,
-    "pitLossUnderVSC": 22.491,
+    "pitLossUnderVSC": 18.482,
     "pitLossDeviations": [
-      -4.549,
-      -4.061,
       -3.647,
       -3.423,
       -3.034,

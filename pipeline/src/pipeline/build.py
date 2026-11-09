@@ -843,7 +843,7 @@ def build_race(race_id: str, laps: pd.DataFrame | None = None) -> BuildResult:
         if weather
         else None
     )
-    params = track.fit_track_params(laps, clean_df, traffic_df, fitted)
+    params = track.fit_track_params(laps, clean_df, traffic_df, fitted, race_id)
 
     takeover = meta["takeover_lap"]
     if takeover is None:
