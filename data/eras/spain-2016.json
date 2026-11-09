@@ -4,7 +4,8 @@
     "order": 7,
     "userSide": "RAI",
     "target": {
-      "type": "win"
+      "type": "position",
+      "position": 2
     },
     "storyline": {
       "real": "Hamilton and Rosberg collide on the opening lap and both retire. Verstappen, 18, in his first race for Red Bull, wins on two stops; R\u00e4ikk\u00f6nen, also on two stops, finishes second, 0.6 s behind.",
@@ -17,18 +18,18 @@
     "mastery": {
       "type": "stop_count",
       "exact": 2,
-      "label": "Win on two stops"
+      "label": "Finish second or better on two stops, as R\u00e4ikk\u00f6nen made"
     },
     "hidden": {
-      "type": "margin",
-      "seconds": 5,
-      "label": "Win by more than 5 seconds"
+      "type": "compound_rule",
+      "mustAvoid": "HARD",
+      "label": "Finish second or better without the hard tyre"
     },
     "hardCalls": {
       "RAI": 0,
       "VER": 0
     },
-    "briefing": "Barcelona, 2016. Both Mercedes went out on the first lap, so this race is Red Bull against Ferrari. Ricciardo and Verstappen, in his first race for Red Bull, run first and second. You run R\u00e4ikk\u00f6nen, fifth on worn softs. Pick your stops and take the win."
+    "briefing": "Barcelona, 2016. Both Mercedes went out on the first lap, so this race is Red Bull against Ferrari. Ricciardo and Verstappen, in his first race for Red Bull, run first and second. You run R\u00e4ikk\u00f6nen, fifth on worn softs. Pick your stops: finish no lower than second, and beat Verstappen to rewrite the day."
   },
   "rules": {
     "twoCompound": true,

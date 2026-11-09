@@ -601,7 +601,8 @@
               "drying",
               "fault",
               "RED",
-              "preRed"
+              "preRed",
+              "teamOrder"
             ]
           },
           "target": {

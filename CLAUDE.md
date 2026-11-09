@@ -170,6 +170,34 @@ Read these first: `docs/eras-remaining-work.md` (handover spec, rules, decisions
 - **Expert rival grader fix** (see open items): it makes hungary-1998 Legend unreachable.
 - Any new race swap (B4).
 
+### Status (2026-11-09, integration B)
+
+Newest first; the 2026-11-08 notes below still hold where this doesn't replace them.
+
+- **Integration B** (`eras-integrate-b`, merged into `eras`; nothing pushed) adds:
+  - B2 (`eras-b2-reauthor`): malaysia-2013 and spain-2016 re-authored on the real P2 (the win
+    stays as the rewrite), spain-2013's hidden objective changed. All three reachable. Sheet:
+    `docs/eras-checks/b2-reauthor.md`.
+  - B1 (`eras-b1-europe-1997`): europe-1997 authored from Villeneuve (no rewrite). brazil-2019
+    re-checked after A4, still reachable. Sheet: `docs/eras-checks/b1-europe-1997.md`. It also
+    adds `teamOrder` to the moment trigger enum in `race-model.schema.json` (additive; Daily and
+    Gauntlet files unchanged), which needs the owner's OK (spec §19).
+  - A2 e2e (`eras-a2-e2e`): radio assertions for monaco-1988 (pit wall), brazil-2019 (damage
+    fault) and canada-2014 (engine fault). The austria-2002 team-order test is `test.fixme`:
+    austria-2002 has no `teamorder-71` moment, and the sim's Schumacher passes Barrichello by
+    lap 52, so the order never fires.
+  - The pit card now names the fuel fill on tyre buttons when a refuelling stop offers one
+    compound at several fills (they all read "Mediums" before).
+  - Windows support: native setup notes above, LF/UTF-8 pipeline writers.
+- **Counts now** (`docs/eras-races-report.md`): 47 pass, 2 borderline, 51 fail; **49 authored,
+  49 reachable, 47 ready**. By era (ready): E10 2, E9 5, E8 5, E7 2, E6 3, E5 1, E4 3, E3 6, E2 10,
+  E1 10. Authored but not ready: spain-2013 (G1 fail), china-2011 (borderline).
+- **Owner review from integration B**: the two P2 targets (and that their ★1-3 path is the real
+  calls), europe-1997's no-rewrite choice (portugal-1984 does have one), the schema enum, the
+  europe-1997 facts that came through a summarising fetch tool, and the A2 radio-wording notes
+  in the B and A2 reports (raw driver codes in lines, no board signs reachable in Eras 1–2,
+  `damage` has only the generic fault line).
+
 ### Status (2026-11-08)
 
 `docs/eras-remaining-work.md` §1 ("Where things stand") and §5 were written before
@@ -215,8 +243,7 @@ integration 8 and are out of date. Where they disagree, this section is right.
 
 ### Open items carried out of Sector A
 
-- **Reachability failures (B2, re-author):** malaysia-2013, spain-2013 and spain-2016 have been
-  unreachable since integration 8's rebuild. They fail on `eras` before Sector A too.
+- ~~Reachability failures (B2)~~: done in integration B.
 - **Expert rival grader** (`packages/sim/src/rivals/expert.ts` `rivalPlayout`) has the same
   "nothing queued" bug A3 fixed. Fixing it makes hungary-1998 Legend unreachable, so it needs the
   owner's decision plus a re-author of hungary-1998.
@@ -226,15 +253,14 @@ integration 8 and are out of date. Where they disagree, this section is right.
 - **Planner fallback stops** in playouts (`erasContinuation` → `refuelAtStop`) still fuel to the
   flag past the tank. They don't throw, but the fuel weight is wrong. Fixing it changes the replay
   mirrored by `pipeline/refuel.py`, so the parity tests must be updated with it.
-- **A2 e2e:** add radio/pit-board assertions to `apps/web/e2e/eras-play.spec.ts` for
-  monaco-1988 (Era 1), austria-2002 (Era 4) and a fault race.
+- **A2 e2e:** done in integration B, except austria-2002's team-order line (`test.fixme`; needs
+  a re-author with a `teamorder-71` moment and Barrichello able to lead to the end).
 - **A2 wording to confirm:** in Eras 1–2 the retirement line comes from "Pit wall", and board
   signs end in "?" (`SLOW · GEARBOX?`).
 - **Fuel line:** "I'm out of fuel! I have to lift everywhere now." also plays when the car has
   stopped for good (`detail: 'out'`). Minor.
 - **hungary-2024:** borderline because of Leclerc's existing ~5 s gap error. Not authored.
-- **brazil-2019** is already authored (side HAM). Hamilton now has a contact on lap 70 (no
-  decision moment). Re-check its reachability and story after A4.
+- ~~brazil-2019 re-check after A4~~: done in integration B (reachable, story unchanged).
 - **austria-2002 BAR lap 62** real call grades ~3% live. That's because the race plays out as it
   really did (Barrichello loses to Schumacher), not because of a bug. Revisit when authoring.
 - **Expert rival cost** on a real phone isn't measured yet (bench: ~0.3 s per decision at 5×).
@@ -270,8 +296,12 @@ integration 8 and are out of date. Where they disagree, this section is right.
 
 ### Local state to know about
 
-- On GitHub: `main`, `data-ingestion` and the hotfix branch only. `eras`, `eras-integrate-a` and
-  every `eras-*` branch are local and have never been pushed.
+- On GitHub (checked 2026-11-08 from the PC): `eras`, `eras-integrate-a` and ~115 `eras-*`
+  branches **are** on GitHub, at the commit that added this file (22533d0); they were pushed
+  when the repo moved off the Mac. Pushing `eras` runs `staging.yml`, so staging probably
+  deployed that commit. Everything after it (integration B) is local only.
+- The Mac's `.worktrees/` don't exist on the PC. Integration B's agent worktrees are under
+  `.claude/worktrees/` (git-ignored) and can be removed once `eras` has their branches.
 - Worktrees under `.worktrees/`: `fix-contact-loss`, `fix-grader-queued-stop`, `fix-radio-lines`
   and `fix-sm2005-fill` are merged into `eras-integrate-a` and can be removed
   (`git worktree remove`). `fix-contact-loss/scratch/` holds only before/after measurements and

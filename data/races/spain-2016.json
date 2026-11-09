@@ -932,11 +932,12 @@
   ],
   "decisionMoments": [
     {
-      "id": "stop-12",
+      "id": "rivalpit-12",
       "lap": 12,
-      "trigger": "cliff",
+      "trigger": "rivalPit",
       "target": {
-        "kind": "win"
+        "kind": "position",
+        "atBest": 2
       },
       "options": [
         {
@@ -992,71 +993,144 @@
       "realOptionId": "box-medium"
     },
     {
-      "id": "stop-29",
-      "lap": 29,
+      "id": "pace-25",
+      "lap": 25,
       "trigger": "cliff",
       "target": {
-        "kind": "win"
+        "kind": "position",
+        "atBest": 2
       },
       "options": [
         {
-          "id": "stay",
-          "label": "Stay out",
-          "decisions": []
-        },
-        {
-          "id": "box-soft",
-          "label": "Box, softs",
+          "id": "push",
+          "label": "Push now",
           "decisions": [
             {
-              "lap": 29,
-              "kind": "pit",
-              "compound": "SOFT"
+              "lap": 25,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
             }
           ]
         },
         {
-          "id": "box-medium",
-          "label": "Box, mediums",
+          "id": "standard",
+          "label": "Standard pace",
           "decisions": [
             {
-              "lap": 29,
-              "kind": "pit",
-              "compound": "MEDIUM"
+              "lap": 25,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
             }
           ]
         },
         {
-          "id": "box-hard",
-          "label": "Box, hards",
+          "id": "manage",
+          "label": "Manage the tyres",
           "decisions": [
             {
-              "lap": 29,
-              "kind": "pit",
-              "compound": "HARD"
+              "lap": 25,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
             }
           ]
         },
         {
-          "id": "box-next-hard",
-          "label": "Box next lap, hards",
+          "id": "push-attack",
+          "label": "Push and attack",
           "decisions": [
             {
-              "lap": 30,
-              "kind": "pit",
-              "compound": "HARD"
+              "lap": 25,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            },
+            {
+              "lap": 25,
+              "kind": "mode",
+              "key": "battle",
+              "value": "attack"
             }
           ]
         }
       ],
-      "realOptionId": "stay"
+      "realOptionId": null
+    },
+    {
+      "id": "pace-29",
+      "lap": 29,
+      "trigger": "cliff",
+      "target": {
+        "kind": "position",
+        "atBest": 2
+      },
+      "options": [
+        {
+          "id": "push",
+          "label": "Push now",
+          "decisions": [
+            {
+              "lap": 29,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "standard",
+          "label": "Standard pace",
+          "decisions": [
+            {
+              "lap": 29,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "manage",
+          "label": "Manage the tyres",
+          "decisions": [
+            {
+              "lap": 29,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "push-attack",
+          "label": "Push and attack",
+          "decisions": [
+            {
+              "lap": 29,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            },
+            {
+              "lap": 29,
+              "kind": "mode",
+              "key": "battle",
+              "value": "attack"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
     },
     {
       "id": "stop-35",
       "lap": 35,
       "trigger": "cliff",
       "target": {
-        "kind": "win"
+        "kind": "position",
+        "atBest": 2
       },
       "options": [
         {
@@ -1110,118 +1184,6 @@
         }
       ],
       "realOptionId": "box-medium"
-    },
-    {
-      "id": "pace-45",
-      "lap": 45,
-      "trigger": "cliff",
-      "target": {
-        "kind": "win"
-      },
-      "options": [
-        {
-          "id": "push",
-          "label": "Push now",
-          "decisions": [
-            {
-              "lap": 45,
-              "kind": "mode",
-              "key": "pace",
-              "value": "push"
-            }
-          ]
-        },
-        {
-          "id": "standard",
-          "label": "Standard pace",
-          "decisions": [
-            {
-              "lap": 45,
-              "kind": "mode",
-              "key": "pace",
-              "value": "standard"
-            }
-          ]
-        },
-        {
-          "id": "manage",
-          "label": "Manage the tyres",
-          "decisions": [
-            {
-              "lap": 45,
-              "kind": "mode",
-              "key": "pace",
-              "value": "manage"
-            }
-          ]
-        },
-        {
-          "id": "push-attack",
-          "label": "Push and attack",
-          "decisions": [
-            {
-              "lap": 45,
-              "kind": "mode",
-              "key": "pace",
-              "value": "push"
-            },
-            {
-              "lap": 45,
-              "kind": "mode",
-              "key": "battle",
-              "value": "attack"
-            }
-          ]
-        }
-      ],
-      "realOptionId": null
-    },
-    {
-      "id": "battle-60",
-      "lap": 60,
-      "trigger": "cliff",
-      "target": {
-        "kind": "win"
-      },
-      "options": [
-        {
-          "id": "defend",
-          "label": "Defend hard",
-          "decisions": [
-            {
-              "lap": 60,
-              "kind": "mode",
-              "key": "battle",
-              "value": "defend"
-            }
-          ]
-        },
-        {
-          "id": "hold",
-          "label": "Hold the line",
-          "decisions": [
-            {
-              "lap": 60,
-              "kind": "mode",
-              "key": "battle",
-              "value": "hold"
-            }
-          ]
-        },
-        {
-          "id": "attack",
-          "label": "Attack",
-          "decisions": [
-            {
-              "lap": 60,
-              "kind": "mode",
-              "key": "battle",
-              "value": "attack"
-            }
-          ]
-        }
-      ],
-      "realOptionId": null
     }
   ],
   "candidateMomentLaps": [
@@ -1284,7 +1246,8 @@
     "order": 7,
     "userSide": "RAI",
     "target": {
-      "type": "win"
+      "type": "position",
+      "position": 2
     },
     "storyline": {
       "real": "Hamilton and Rosberg collide on the opening lap and both retire. Verstappen, 18, in his first race for Red Bull, wins on two stops; R\u00e4ikk\u00f6nen, also on two stops, finishes second, 0.6 s behind.",
@@ -1297,18 +1260,18 @@
     "mastery": {
       "type": "stop_count",
       "exact": 2,
-      "label": "Win on two stops"
+      "label": "Finish second or better on two stops, as R\u00e4ikk\u00f6nen made"
     },
     "hidden": {
-      "type": "margin",
-      "seconds": 5,
-      "label": "Win by more than 5 seconds"
+      "type": "compound_rule",
+      "mustAvoid": "HARD",
+      "label": "Finish second or better without the hard tyre"
     },
     "hardCalls": {
       "RAI": 0,
       "VER": 0
     },
-    "briefing": "Barcelona, 2016. Both Mercedes went out on the first lap, so this race is Red Bull against Ferrari. Ricciardo and Verstappen, in his first race for Red Bull, run first and second. You run R\u00e4ikk\u00f6nen, fifth on worn softs. Pick your stops and take the win."
+    "briefing": "Barcelona, 2016. Both Mercedes went out on the first lap, so this race is Red Bull against Ferrari. Ricciardo and Verstappen, in his first race for Red Bull, run first and second. You run R\u00e4ikk\u00f6nen, fifth on worn softs. Pick your stops: finish no lower than second, and beat Verstappen to rewrite the day."
   },
   "rules": {
     "twoCompound": true,
