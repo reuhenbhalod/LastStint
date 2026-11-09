@@ -288,7 +288,7 @@ export function fuelMargin(model: RaceModel, car: CarState, lap: number): number
 /** The fuel load's lap-time effect on this lap (0 without one): its weight, or an empty tank. */
 function fuelLapDelta(run: Run, car: CarState, lap: number): number {
   const f = run.headset?.fuel;
-  if (!f || car.fuel === undefined || !run.incidents) return 0;
+  if (!f || car.fuel === undefined || !run.liveFuel) return 0;
   if (car.fuel <= 0) return f.dryLapDelta;
   // Off the standard load (what the fitted fuel effect assumes), each kg moves the lap time.
   const nominal = f.burnPerLap * (run.model.race.laps - lap + 1);
@@ -298,7 +298,7 @@ function fuelLapDelta(run: Run, car: CarState, lap: number): number {
 /** Burn a lap's fuel: the modes' multipliers on green, a fraction under a SC or VSC. */
 function burnFuel(run: Run, car: CarState, lap: number, neutral: boolean): void {
   const f = run.headset?.fuel;
-  if (!f || car.fuel === undefined || !run.incidents || car.fuel <= 0) return;
+  if (!f || car.fuel === undefined || !run.liveFuel || car.fuel <= 0) return;
   const mult = neutral
     ? f.neutralBurn
     : (effect(run, car, 'pace').burnMult ?? 1) * (effect(run, car, 'fuel').burnMult ?? 1);
@@ -371,6 +371,12 @@ export interface Run {
   passedBy: Map<string, number>;
   /** Live play: crashes, failures and punctures happen (RunOptions.incidents). */
   incidents: boolean;
+  /**
+   * The player's fuel load (`car.fuel`) burns live: with incidents (live play), or after
+   * liveFuelFrom (an Eras fuel-rule race paused for the offline grader). The refuelling tank's
+   * own flag is CarState.tankLive.
+   */
+  liveFuel: boolean;
   /** A crash brings out a SC/VSC (off in grader playouts, which sample neutralizations). */
   incidentFlags: boolean;
   /**
@@ -748,6 +754,7 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
     headset: headsetFor(HEADSET, model),
     passedBy: new Map(),
     incidents: live && options.incidents !== false && !!headsetFor(HEADSET, model)?.incidents,
+    liveFuel: live && options.incidents !== false && !!headsetFor(HEADSET, model)?.incidents,
     incidentFlags: true,
     wetness: [...(model.weather?.wetness ?? [])],
     state: {
@@ -768,16 +775,51 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
     storylineLaps: [],
   };
   // The fuel load: what the flag needs at the standard burn, plus the race's margin.
-  const fuel = run.headset?.fuel;
   const user = run.state.cars[model.userSide];
-  if (run.incidents && fuel && user) {
-    const margin =
-      fuel.marginMin +
-      (fuel.marginMax - fuel.marginMin) * run.rng.get(FUEL_STREAM, model.userSide).next();
-    user.fuel = fuel.burnPerLap * (model.race.laps - model.race.takeoverLap) + margin;
-  }
+  const load = run.liveFuel ? takeoverFuel(run) : undefined;
+  if (user && load !== undefined) user.fuel = load;
   markNextFlag(run);
   return run;
+}
+
+/** The player's fuel load at the takeover (kg): the flag at the standard burn, plus the
+ * race's margin (drawn from the run's seed). Undefined without a fuel load. */
+function takeoverFuel(run: Run): number | undefined {
+  const fuel = run.headset?.fuel;
+  if (!fuel) return undefined;
+  const { laps, takeoverLap } = run.model.race;
+  const margin =
+    fuel.marginMin +
+    (fuel.marginMax - fuel.marginMin) * run.rng.get(FUEL_STREAM, run.model.userSide).next();
+  return fuel.burnPerLap * (laps - takeoverLap) + margin;
+}
+
+/**
+ * The offline grader's pause (moments.ts pauseAt) in an Eras race with a fuel rule
+ * (erasFuelRule): from the run's current lap on, the player's fuel burns live, as in live
+ * play, so the hard-call counter and the author grade a skipped fill or a missed lift as
+ * running dry. The laps already run stay the real race's replay:
+ * - refuelling: the replay's tank (one lap a lap, the real fills) goes live: it burns by the
+ *   modes and stops the car when it runs dry (CarState.tankLive);
+ * - a fuel limit: the car gets live play's load, the takeover load from the run's seed less
+ *   the default modes' burn over the laps run (neutralBurn under a SC or VSC), burns it by the
+ *   modes and stops when it runs out.
+ * Does nothing in any other race (every Daily and Gauntlet race), or on a run that isn't live.
+ */
+export function liveFuelFrom(run: Run): void {
+  const user = run.state.cars[run.model.userSide];
+  if (!run.live || !user || !erasFuelRule(run.model)) return;
+  if (user.tank !== undefined) user.tankLive = true;
+  if (run.liveFuel || fuelLimit(run.model) === null) return;
+  const fuel = run.headset?.fuel;
+  const load = takeoverFuel(run);
+  if (!fuel || load === undefined) return;
+  let burnt = 0;
+  for (let lap = run.model.race.takeoverLap + 1; lap <= run.state.lap; lap++) {
+    burnt += fuel.burnPerLap * (run.neutral.get(lap) ? fuel.neutralBurn : 1);
+  }
+  user.fuel = Math.max(0, load - burnt);
+  run.liveFuel = true;
 }
 
 /** A stop with its out-lap on `lap` is the tyre change in a red flag's stoppage: free. */
@@ -944,7 +986,7 @@ export function forkRun(
   // staying out on an empty tank grades as what it is. Every other race's playouts leave the
   // fuel load out, as before (fuel load spec: there an empty tank only costs lap time, which
   // the player is shown and can lift for). Daily and Gauntlet races have no rules block.
-  const keepFuel = erasRace(run.model) && (refuelling(run.model) || fuelLimit(run.model) !== null);
+  const keepFuel = erasFuelRule(run.model);
   for (const [code, c] of Object.entries(run.state.cars)) {
     cars[code] = cloneCar(c);
     // The grader's playouts leave the fuel load out (fuel load spec: live play only).
@@ -1538,6 +1580,16 @@ function owedAfterPlan(model: RaceModel, car: CarState, lap: number): number {
  */
 export function erasRace(model: RaceModel): boolean {
   return model.eras !== undefined || model.rules !== undefined;
+}
+
+/**
+ * True for an Eras race with a fuel rule: refuelling, or a 1984-88 fuel limit. Its playouts keep
+ * the player's fuel (forkRun), and the real-race pause the offline tools grade from burns it
+ * live from the pause on (liveFuelFrom, moments.ts pauseAt). False for every Daily and
+ * Gauntlet race.
+ */
+export function erasFuelRule(model: RaceModel): boolean {
+  return erasRace(model) && (refuelling(model) || fuelLimit(model) !== null);
 }
 
 /**
