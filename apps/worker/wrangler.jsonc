@@ -70,8 +70,8 @@
       //   "ratelimits": [{ "name": "RUNS_LIMITER", "namespace_id": "4102", "simple": { "limit": 10, "period": 60 } }]
       "ratelimits": [],
       "vars": {
-        // A staging website, if one is ever deployed (it is not yet). localhost:5173 is
-        // always allowed, so a local web build pointed at this API works today.
+        // The staging website (pitwall-web-staging, apps/web env.staging). localhost:5173 is
+        // always allowed too, so a local web build pointed at this API also works.
         "WEB_ORIGIN": "https://pitwall-web-staging.boxboxbox.workers.dev",
         "GOOGLE_CLIENT_ID": "318278030629-s860fnjjpk6ihcn4iubjqiakf8vu0pqi.apps.googleusercontent.com",
         "AUTH0_DOMAIN": "dev-umxcdh2y62l4e0gy.us.auth0.com",
