@@ -250,19 +250,18 @@ integration 8 and are out of date. Where they disagree, this section is right.
 - **Expert rival grader** (`packages/sim/src/rivals/expert.ts` `rivalPlayout`) has the same
   "nothing queued" bug A3 fixed. Fixing it makes hungary-1998 Legend unreachable, so it needs the
   owner's decision plus a re-author of hungary-1998.
-- **San Marino 2005 plans all run dry.** The planner ignores tank size, so every offered plan
-  grades 0%. A planner change to keep stints within `fillCap` would affect every refuelling-era
-  race; it belongs in B3 and must be measured.
-- **Planner fallback stops** in playouts (`erasContinuation` → `refuelAtStop`) still fuel to the
-  flag past the tank. They don't throw, but the fuel weight is wrong. Fixing it changes the replay
-  mirrored by `pipeline/refuel.py`, so the parity tests must be updated with it.
+- ~~San Marino 2005 plans all run dry / planner fallback stops past the tank~~: done in
+  integration C (`eras-b3-tank-planner`). It was every authored refuelling race, not just San
+  Marino. Plans now respect the tank on board, `fillCap` and push burn; fallback stops fill
+  within the tank (parity updated); Daily grades byte-identical. Owner review: refuelling races
+  now offer different (all two-stop in tight races) plans; europe-1997's "different plan" gap
+  is 3 laps instead of 6.
 - **A2 e2e:** done in integration B, except austria-2002's team-order line (`test.fixme`; needs
   a re-author with a `teamorder-71` moment and Barrichello able to lead to the end).
 - **A2 wording to confirm:** in Eras 1–2 the retirement line comes from "Pit wall", and board
   signs end in "?" (`SLOW · GEARBOX?`).
-- **Fuel line:** "I'm out of fuel! I have to lift everywhere now." also plays when the car has
-  stopped for good (`detail: 'out'`). Minor.
-- **hungary-2024:** borderline because of Leclerc's existing ~5 s gap error. Not authored.
+- ~~Fuel line on a stopped car~~: done in integration C ("The car's stopped"; pit wall in Eras 1–2).
+- ~~hungary-2024 borderline~~: passes robust G1 at 973d827 (2.52 s); authoring in integration C.
 - ~~brazil-2019 re-check after A4~~: done in integration B (reachable, story unchanged).
 - **austria-2002 BAR lap 62** real call grades ~3% live. That's because the race plays out as it
   really did (Barrichello loses to Schumacher), not because of a bug. Revisit when authoring.
