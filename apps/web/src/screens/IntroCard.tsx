@@ -234,6 +234,12 @@ export function IntroCard({
             <span className="eyebrow hidden sm:inline">Daily race strategy</span>
           </a>
           <span className="flex flex-wrap items-center gap-2">
+            <a
+              href="/tutorial"
+              className="rounded-full border border-[var(--rule)] px-3 py-1 text-[13px] font-semibold text-[var(--ink)] hover:border-[var(--you)] hover:bg-[color-mix(in_srgb,var(--you)_12%,transparent)]"
+            >
+              Tutorial
+            </a>
             {source !== 'survivor' && (
               <a
                 href="/gauntlet"
@@ -328,6 +334,13 @@ export function IntroCard({
                     →
                   </span>
                 </button>
+                <a
+                  href="/tutorial"
+                  className="flex items-center justify-center gap-2 rounded-xl border border-[var(--rule)] px-6 py-2.5 text-[14px] font-semibold text-[var(--ink)] hover:border-[var(--you)] hover:bg-[color-mix(in_srgb,var(--you)_10%,transparent)]"
+                >
+                  New here? Play the tutorial race
+                  <span className="text-[12px] font-normal text-[var(--muted)]">· 5 min</span>
+                </a>
                 <span className="flex justify-center gap-5 text-[13px] text-[var(--muted)]">
                   <button
                     type="button"
@@ -336,9 +349,6 @@ export function IntroCard({
                   >
                     How to play
                   </button>
-                  <a href="/tutorial" className="underline hover:text-[var(--ink)]">
-                    Tutorial race
-                  </a>
                   {source !== 'survivor' && (
                     <button
                       type="button"
