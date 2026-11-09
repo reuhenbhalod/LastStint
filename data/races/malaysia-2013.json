@@ -1129,7 +1129,8 @@
       "lap": 19,
       "trigger": "cliff",
       "target": {
-        "kind": "win"
+        "kind": "position",
+        "atBest": 2
       },
       "options": [
         {
@@ -1196,82 +1197,12 @@
       "realOptionId": "box-soft"
     },
     {
-      "id": "rivalpit-22",
-      "lap": 22,
-      "trigger": "rivalPit",
-      "target": {
-        "kind": "win"
-      },
-      "options": [
-        {
-          "id": "stay",
-          "label": "Stay out",
-          "decisions": []
-        },
-        {
-          "id": "box-soft",
-          "label": "Box, softs",
-          "decisions": [
-            {
-              "lap": 22,
-              "kind": "pit",
-              "compound": "SOFT"
-            }
-          ]
-        },
-        {
-          "id": "box-hard",
-          "label": "Box, hards",
-          "decisions": [
-            {
-              "lap": 22,
-              "kind": "pit",
-              "compound": "HARD"
-            }
-          ]
-        },
-        {
-          "id": "box-intermediate",
-          "label": "Box, inters",
-          "decisions": [
-            {
-              "lap": 22,
-              "kind": "pit",
-              "compound": "INTERMEDIATE"
-            }
-          ]
-        },
-        {
-          "id": "box-wet",
-          "label": "Box, wets",
-          "decisions": [
-            {
-              "lap": 22,
-              "kind": "pit",
-              "compound": "WET"
-            }
-          ]
-        },
-        {
-          "id": "box-next-wet",
-          "label": "Box next lap, wets",
-          "decisions": [
-            {
-              "lap": 23,
-              "kind": "pit",
-              "compound": "WET"
-            }
-          ]
-        }
-      ],
-      "realOptionId": "stay"
-    },
-    {
-      "id": "pace-28",
-      "lap": 28,
+      "id": "pace-24",
+      "lap": 24,
       "trigger": "cliff",
       "target": {
-        "kind": "win"
+        "kind": "position",
+        "atBest": 2
       },
       "options": [
         {
@@ -1279,7 +1210,7 @@
           "label": "Push now",
           "decisions": [
             {
-              "lap": 28,
+              "lap": 24,
               "kind": "mode",
               "key": "pace",
               "value": "push"
@@ -1291,7 +1222,7 @@
           "label": "Standard pace",
           "decisions": [
             {
-              "lap": 28,
+              "lap": 24,
               "kind": "mode",
               "key": "pace",
               "value": "standard"
@@ -1303,7 +1234,7 @@
           "label": "Manage the tyres",
           "decisions": [
             {
-              "lap": 28,
+              "lap": 24,
               "kind": "mode",
               "key": "pace",
               "value": "manage"
@@ -1315,13 +1246,13 @@
           "label": "Push and attack",
           "decisions": [
             {
-              "lap": 28,
+              "lap": 24,
               "kind": "mode",
               "key": "pace",
               "value": "push"
             },
             {
-              "lap": 28,
+              "lap": 24,
               "kind": "mode",
               "key": "battle",
               "value": "attack"
@@ -1336,7 +1267,8 @@
       "lap": 31,
       "trigger": "cliff",
       "target": {
-        "kind": "win"
+        "kind": "position",
+        "atBest": 2
       },
       "options": [
         {
@@ -1407,7 +1339,8 @@
       "lap": 36,
       "trigger": "cliff",
       "target": {
-        "kind": "win"
+        "kind": "position",
+        "atBest": 2
       },
       "options": [
         {
@@ -1472,7 +1405,8 @@
       "lap": 43,
       "trigger": "cliff",
       "target": {
-        "kind": "win"
+        "kind": "position",
+        "atBest": 2
       },
       "options": [
         {
@@ -1674,7 +1608,8 @@
     "order": 9,
     "userSide": "WEB",
     "target": {
-      "type": "win"
+      "type": "position",
+      "position": 2
     },
     "storyline": {
       "real": "After the last stops Red Bull tell both drivers to hold position, Webber ahead. Vettel passes Webber on lap 46 anyway and wins by 4.3 s.",
@@ -1686,18 +1621,18 @@
     "mastery": {
       "type": "stop_count",
       "exact": 3,
-      "label": "Win on three more stops"
+      "label": "Finish second or better on three more stops, as Webber made"
     },
     "hidden": {
       "type": "compound_rule",
       "mustUse": "HARD",
-      "label": "Win with a stint on the hard tyre"
+      "label": "Finish second or better with a stint on the hard tyre"
     },
     "hardCalls": {
       "VET": 1,
       "WEB": 1
     },
-    "briefing": "Sepang, 2013. The race started wet on intermediates and the track has dried. Vettel started on pole, Webber fifth, but Webber now leads him by 2.4 s. You run Webber. Stay ahead of Vettel to the flag."
+    "briefing": "Sepang, 2013. The race started wet on intermediates and the track has dried. Vettel started on pole, Webber fifth, but Webber now leads him by 2.4 s. You run Webber. Bring the car home no lower than second, and keep Vettel behind to rewrite the day."
   },
   "provenance": {
     "kind": "real",
