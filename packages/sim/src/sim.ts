@@ -1641,6 +1641,10 @@ export function erasFuelRule(model: RaceModel): boolean {
  * - The race's rules come first, as a player is told them: if those stops leave the car short of
  *   the two-compound rule or the minimum stops, the planner's legal plan (planRemainingStops)
  *   is used instead. Fuel doesn't: a car that skipped a fill runs dry, as in live play.
+ * - Stops already queued on the car (a call made on an earlier lap, still to come: the real
+ *   call made the lap before the moment) stay and count as made: the real stops up to the last
+ *   of them are answered, and the remaining real stops follow it (the planner's legal plan, if
+ *   needed, only after it).
  *
  * Deterministic, and the same for every sample of an option.
  */
@@ -1650,27 +1654,31 @@ export function erasContinuation(run: Run, answered: number, playerStops: number
   if (!user || user.retired) return [];
   const real = [...realOf(model, model.userSide)].sort((a, b) => a.lap - b.lap);
   const { takeoverLap } = model.race;
-  const realMade = real.filter((s) => s.lap > takeoverLap && s.lap <= answered).length;
-  const extra = Math.max(0, playerStops - realMade);
+  // Stops already queued on the car are made; the continuation starts after the last of them.
+  const queued = user.strategy.filter((s) => s.lap > state.lap).sort((a, b) => a.lap - b.lap);
+  const from = Math.max(state.lap, ...queued.map((s) => s.lap));
+  const upTo = Math.max(answered, from);
+  const realMade = real.filter((s) => s.lap > takeoverLap && s.lap <= upTo).length;
+  const extra = Math.max(0, playerStops + queued.length - realMade);
   const stops = real
-    .filter((s) => s.lap > Math.max(answered, state.lap))
+    .filter((s) => s.lap > upTo)
     .slice(extra)
     .map((s) => ({ ...s }));
   // The rules: the car must end the race legal (two compounds, the minimum stops).
   let compound = user.compound;
   const used = [...user.compoundsUsed];
-  for (const s of stops) {
+  for (const s of [...queued, ...stops]) {
     if (stopChangesTyres(model.rules, compound, s)) compound = s.to;
     if (!used.includes(s.to)) used.push(s.to);
   }
   const after = {
     compound,
     compoundsUsed: used,
-    ...(user.stops !== undefined ? { stops: user.stops + stops.length } : {}),
+    ...(user.stops !== undefined ? { stops: user.stops + queued.length + stops.length } : {}),
   };
   const legal =
     ruleSatisfied(after as CarState, model.rules) && stopsOwed(model.rules, after) === 0;
-  return legal ? stops : planRemainingStops(run);
+  return legal ? stops : planRemainingStops(run).filter((s) => s.lap > from);
 }
 
 /**

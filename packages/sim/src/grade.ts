@@ -175,19 +175,18 @@ export function playOption(
   );
   while (fork.state.lap < settled && !isFinished(fork)) stepLap(fork);
   const user = fork.state.cars[fork.model.userSide];
-  if (
-    !option.final &&
-    user &&
-    !isFinished(fork) &&
-    !user.strategy.some((s) => s.lap > fork.state.lap)
-  ) {
+  if (!option.final && user && !isFinished(fork)) {
+    const queued = user.strategy.some((s) => s.lap > fork.state.lap);
     if (!erasRace(run.model)) {
-      for (const stop of planRemainingStops(fork)) user.strategy.push({ ...stop, added: true });
+      if (!queued)
+        for (const stop of planRemainingStops(fork)) user.strategy.push({ ...stop, added: true });
     } else if (!fork.decisions.some((d) => d.kind === 'pit' && d.lap > fork.state.lap)) {
       // Eras: the real team's plan (erasContinuation), unless the player has logged a plan of
       // their own (its later pit calls are in the run and play out as called).
       // A stop question (some option boxes) answers the moment's box-now stop too: staying out
       // there skips it (the real team's stop on that lap isn't made later).
+      // A stop already queued (the real call made the lap before the moment) stays, and the
+      // remaining real stops follow it (erasContinuation).
       const answered = stopQuestion ? Math.max(settled, run.state.lap + 2) : settled;
       const made = playerStopsBy([...run.decisions, ...option.decisions], fork.state.lap);
       for (const stop of erasContinuation(fork, answered, made)) user.strategy.push(stop);
