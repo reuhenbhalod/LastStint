@@ -170,10 +170,23 @@ Read these first: `docs/eras-remaining-work.md` (handover spec, rules, decisions
 - **Expert rival grader fix** (see open items): it makes hungary-1998 Legend unreachable.
 - Any new race swap (B4).
 
-### Status (2026-11-09, integration B)
+### Status (2026-11-09, integrations B and C)
 
 Newest first; the 2026-11-08 notes below still hold where this doesn't replace them.
 
+- **Integration C** (`eras-integrate-c`, merged into `eras`; nothing pushed) adds:
+  - B3 tank planner (`eras-b3-tank-planner`): the engineer's plans and fallback stops stay within
+    a refuelling car's tank (`withinTank`, `fillCap`), mirrored in `refuel.py`; the stopped-car
+    fuel line. Daily grades byte-identical on all 39 pool races.
+  - B1 hungary-2024 (`eras-b1-hungary-2024`): authored from Piastri (the race file's player car
+    NOR -> PIA, rebuilt), McLaren one-two target, no rewrite, hidden objective "no push laps".
+    Robust G1 after the flip: pass, 2.45 s. Sheet: `docs/eras-checks/b1-hungary-2024.md`.
+  - B3 near-misses (`eras-b3-near-misses`): doc only, no honest fix found.
+  - The monaco-1988 e2e's avoided run now lifts and coasts at the lap 70 fuel call: with the
+    pit-board defaults Senna ran dry on the last lap (always did; the new fuel line made it
+    show).
+- **Owner review from integration C**: hungary-2024's weak hidden objective (the margin
+  objectives couldn't be reached at Legend) and the PIA side flip.
 - **Integration B** (`eras-integrate-b`, merged into `eras`; nothing pushed) adds:
   - B2 (`eras-b2-reauthor`): malaysia-2013 and spain-2016 re-authored on the real P2 (the win
     stays as the rewrite), spain-2013's hidden objective changed. All three reachable. Sheet:
@@ -189,9 +202,12 @@ Newest first; the 2026-11-08 notes below still hold where this doesn't replace t
   - The pit card now names the fuel fill on tyre buttons when a refuelling stop offers one
     compound at several fills (they all read "Mediums" before).
   - Windows support: native setup notes above, LF/UTF-8 pipeline writers.
-- **Counts now** (`docs/eras-races-report.md`): 47 pass, 2 borderline, 51 fail; **49 authored,
-  49 reachable, 47 ready**. By era (ready): E10 2, E9 5, E8 5, E7 2, E6 3, E5 1, E4 3, E3 6, E2 10,
+- **Counts now** (`docs/eras-races-report.md`): 48 pass, 1 borderline, 51 fail; **50 authored,
+  50 reachable, 48 ready**. By era (ready): E10 3, E9 5, E8 5, E7 2, E6 3, E5 1, E4 3, E3 6, E2 10,
   E1 10. Authored but not ready: spain-2013 (G1 fail), china-2011 (borderline).
+  Passing but not authored: none. B3
+  near-miss attempt found no honest fix for spain-2013, china-2011, abu-dhabi-2012 or
+  brazil-2021 (`docs/eras-checks/b3-near-misses.md`): they need model gaps 1 and 3.
 - **Owner review from integration B**: the two P2 targets (and that their ★1-3 path is the real
   calls), europe-1997's no-rewrite choice (portugal-1984 does have one), the schema enum, the
   europe-1997 facts that came through a summarising fetch tool, and the A2 radio-wording notes
@@ -247,19 +263,18 @@ integration 8 and are out of date. Where they disagree, this section is right.
 - **Expert rival grader** (`packages/sim/src/rivals/expert.ts` `rivalPlayout`) has the same
   "nothing queued" bug A3 fixed. Fixing it makes hungary-1998 Legend unreachable, so it needs the
   owner's decision plus a re-author of hungary-1998.
-- **San Marino 2005 plans all run dry.** The planner ignores tank size, so every offered plan
-  grades 0%. A planner change to keep stints within `fillCap` would affect every refuelling-era
-  race; it belongs in B3 and must be measured.
-- **Planner fallback stops** in playouts (`erasContinuation` → `refuelAtStop`) still fuel to the
-  flag past the tank. They don't throw, but the fuel weight is wrong. Fixing it changes the replay
-  mirrored by `pipeline/refuel.py`, so the parity tests must be updated with it.
+- ~~San Marino 2005 plans all run dry / planner fallback stops past the tank~~: done in
+  integration C (`eras-b3-tank-planner`). It was every authored refuelling race, not just San
+  Marino. Plans now respect the tank on board, `fillCap` and push burn; fallback stops fill
+  within the tank (parity updated); Daily grades byte-identical. Owner review: refuelling races
+  now offer different (all two-stop in tight races) plans; europe-1997's "different plan" gap
+  is 3 laps instead of 6.
 - **A2 e2e:** done in integration B, except austria-2002's team-order line (`test.fixme`; needs
   a re-author with a `teamorder-71` moment and Barrichello able to lead to the end).
 - **A2 wording to confirm:** in Eras 1–2 the retirement line comes from "Pit wall", and board
   signs end in "?" (`SLOW · GEARBOX?`).
-- **Fuel line:** "I'm out of fuel! I have to lift everywhere now." also plays when the car has
-  stopped for good (`detail: 'out'`). Minor.
-- **hungary-2024:** borderline because of Leclerc's existing ~5 s gap error. Not authored.
+- ~~Fuel line on a stopped car~~: done in integration C ("The car's stopped"; pit wall in Eras 1–2).
+- ~~hungary-2024 borderline~~: passes robust G1 at 973d827 (2.52 s); authoring in integration C.
 - ~~brazil-2019 re-check after A4~~: done in integration B (reachable, story unchanged).
 - **austria-2002 BAR lap 62** real call grades ~3% live. That's because the race plays out as it
   really did (Barrichello loses to Schumacher), not because of a bug. Revisit when authoring.
