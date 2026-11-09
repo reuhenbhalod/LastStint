@@ -48,7 +48,7 @@ the last report.
 | 4 | singapore-2023 | FastF1 (F1 live timing) | none | yes | G1 | **fail** | 3.69 s | field GAS gap error 9.75 / 9.9 [5.00] (+1 more) | no | - | no | race mechanics (pace 4%): the NOR vs SAI gap, GAS 9.9 s; int. 8: 4.01 -> 3.69 s |
 | 5 | netherlands-2023 | OpenF1 | none | yes | G1 | **fail** | 2.34 s | podium order rate 0.38 / 0.41 [0.50] (+1 more) | no | - | no | HAM's five wet laps, all in the finish shower (M1), and the red-flag restart; 3.79 -> 6.69 s; int. 8: 6.69 -> 2.34 s |
 | 6 | miami-2024 | FastF1 (F1 live timing) | none | yes | G1 | **fail** | 4.68 s | duel VER vs NOR gap error 5.43 / 5.35 [3.00] (+4 more) | no | - | no | race mechanics (pace 3%): the SC that timed Norris' stop (spec §4); rebuilt with the Eras fixes (2.88 s before); int. 8: 4.71 -> 4.68 s |
-| 7 | hungary-2024 | FastF1 (F1 live timing) | none | yes | G1 | pass | 2.52 s |  | no | - | no | now passes (int. 8); McLaren's swap is now scripted (M4 team orders: the duel order passes); LEC's field gap 5.1 s, just over; int. 8: 1.96 -> 1.93 s; Sector A (A4): VER's lap-63 contact puts him behind LEC as really happened; robust G1 re-run at 973d827 (B3): pass, 2.52 s (LEC 4.82 / 4.83, VER 4.77 / 4.89 [5.00]); the A4 sheet's 2.58 s borderline was the A4 branch before later merges |
+| 7 | hungary-2024 | FastF1 (F1 live timing) | none | yes | G1 | pass | 2.45 s |  | yes (PIA) | yes | **yes** | B1 (integration C): authored from Piastri (the hard-call side: PIA 2, NOR 0; the race file's player car NOR -> PIA), target a McLaren one-two, no rewrite (it really happened), hidden objective no push laps (weak: the margin objectives couldn't be reached at Legend, owner to review); robust G1 after the side flip: pass, 2.45 s; reachable at both levels; now passes (int. 8); McLaren's swap is now scripted (M4 team orders: the duel order passes); LEC's field gap 5.1 s, just over; int. 8: 1.96 -> 1.93 s; Sector A (A4): VER's lap-63 contact puts him behind LEC as really happened; robust G1 re-run at 973d827 (B3): pass, 2.52 s (LEC 4.82 / 4.83, VER 4.77 / 4.89 [5.00]); the A4 sheet's 2.58 s borderline was the A4 branch before later merges |
 | 8 | belgium-2023 | OpenF1 | none | yes | G1 | pass | 1.98 s |  | yes (VER) | yes | **yes** | now passes: driver damp / wet pace from clear-air laps against the field (M1); int. 8: 1.73 -> 1.98 s |
 | 9 | australia-2025 | OpenF1 | none | yes | G1 | **fail** | 3.70 s | duel VER vs NOR gap error 8.06 / 7.97 [3.00] (+1 more) | no | - | no | wet-dry race: duel VER vs NOR 7.3 s; 4.62 -> 3.66 s with M1; int. 8: 3.66 -> 3.70 s |
 | 10 | monaco-2025 | OpenF1 | none | yes | G1 | **fail** | 3.28 s | field HAM gap error 8.44 / 8.07 [5.14] (+1 more) | no | - | no | Hamilton in the Monaco queue of the mandatory two-stop (8.5 s); 2.63 -> 3.27 s; int. 8: 3.27 -> 3.28 s |
@@ -190,6 +190,10 @@ the last report.
 ## Summary
 
 **Update, integration B/C (Nov 9 2026): 48 pass, 1 borderline, 51 fail, 0 not built.**
+**Integration C: Authored 50, reachable 50 of 50, ready to publish 48.** hungary-2024 authored
+(B1, Piastri) and ready; B3's tank planner (the engineer's plans and fallback stops stay within
+a refuelling car's tank) changes no Daily grade (all 39 pool races byte-identical) and every
+authored race stays reachable.
 (Integration C corrects B: hungary-2024 passes robust G1 at 973d827, 2.52 s.)
 **Integration B: Authored 49, reachable 49 of 49, ready to publish 47.** What moved: Sector A's A4
 contact damage (brazil-2019 fail -> pass; G1 re-run at 973d827 in docs/eras-checks/b3-near-misses.md:
@@ -207,7 +211,7 @@ south-africa-1983). Last report before that (Eras 1.1, 46ad682): 41 pass, 0 bord
 
 | Era | Pass | Borderline | Fail | Not built | Authored | Reachable | Ready to publish |
 |---|---|---|---|---|---|---|---|
-| 10 | 3 | 0 | 7 | 0 | 2 | 2 | 2 |
+| 10 | 3 | 0 | 7 | 0 | 3 | 3 | 3 |
 | 9 | 5 | 0 | 5 | 0 | 5 | 5 | 5 |
 | 8 | 5 | 0 | 5 | 0 | 5 | 5 | 5 |
 | 7 | 2 | 0 | 8 | 0 | 2 | 2 | 2 |
@@ -217,15 +221,15 @@ south-africa-1983). Last report before that (Eras 1.1, 46ad682): 41 pass, 0 bord
 | 3 | 6 | 0 | 4 | 0 | 6 | 6 | 6 |
 | 2 | 10 | 0 | 0 | 0 | 10 | 10 | 10 |
 | 1 | 10 | 0 | 0 | 0 | 10 | 10 | 10 |
-| **All** | **48** | **1** | **51** | **0** | **49** | **49** | **47** |
+| **All** | **48** | **1** | **51** | **0** | **50** | **50** | **48** |
 
 Timed races (77, now with china-2007): total mean gap error 269.58 s (last report 294.85 s over
 76). G1 sanity of the 23 reconstructed races (now with brazil-1993): 13 pass, 112.79 s total
 (last report 13 of 22, 104.68 s).
 
-### Ready to publish (47)
+### Ready to publish (48)
 
-- **Era 10** (2): hungary-2022 (VER), belgium-2023 (VER)
+- **Era 10** (3): hungary-2022 (VER), belgium-2023 (VER), hungary-2024 (PIA)
 - **Era 9** (5): bahrain-2021 (VER), france-2021 (HAM), russia-2021 (NOR), turkey-2021 (LEC), abu-dhabi-2021 (HAM)
 - **Era 8** (5): germany-2018 (HAM), germany-2019 (VER), hungary-2019 (HAM), brazil-2019 (HAM), turkey-2020 (HAM)
 - **Era 7** (2): spain-2016 (RAI), abu-dhabi-2016 (ROS)
@@ -238,7 +242,7 @@ Timed races (77, now with china-2007): total mean gap error 269.58 s (last repor
 
 Authored but not ready (2): **spain-2013** (Era 6, RAI) is reachable again but fails G1 (duel
 RAI vs ALO just over 3 s); **china-2011** (Era 6, VET) is borderline (podium order rate 0.49 [0.50]
-on one seed set). Passing but not authored: hungary-2024 (Era 10).
+on one seed set). Passing but not authored: none.
 
 ## Since the last report
 
@@ -298,7 +302,7 @@ race is now reachable.
 
 ## Reachability (eras spec §15)
 
-`pnpm --filter @laststint/sim reachability <id>` for each of the 44 authored Eras-only races and
+`pnpm --filter @laststint/sim reachability <id>` for each of the 45 authored Eras-only races and
 `pnpm --filter @laststint/worker reachability:shared <id>` for each of the 5 authored shared races
 (the race file merged with its overlay, the model the Eras API serves), one race per call, on the
 rebuilt race files. Last report = Eras 1.1.
@@ -333,6 +337,7 @@ rebuilt race files. Last report = Eras 1.1.
 | hungary-1998 | reachable | reachable | not earned | pass | pass |
 | hungary-2019 (shared) | reachable | reachable | not earned | pass | pass |
 | hungary-2022 | reachable | reachable | not earned | pass | pass |
+| hungary-2024 | reachable | reachable | not earned | pass | - (new, B1) |
 | japan-2000 | reachable | reachable | not earned | pass | pass |
 | malaysia-2013 | reachable | reachable | not earned | pass | pass (int. 8: fail) |
 | mexico-1986 | reachable | reachable | not earned | pass | pass |
@@ -351,8 +356,8 @@ rebuilt race files. Last report = Eras 1.1.
 | turkey-2021 | reachable | reachable | not earned | pass | pass |
 | united-states-1990 | reachable | reachable | not earned | pass | pass |
 
-**49 pass, 0 fail of 49** (44 Eras-only, 5 shared; integration B, Nov 9 2026, run on native
-Windows). Integration 8: 41 pass, 3 fail of 44; spain-2016, malaysia-2013 and spain-2013 were
+**50 pass, 0 fail of 50** (45 Eras-only, 5 shared; integration C, Nov 9 2026, run on native
+Windows, after B3's tank planner; hungary-2024 added by B1). Integration 8: 41 pass, 3 fail of 44; spain-2016, malaysia-2013 and spain-2013 were
 re-authored on the rebuilt models (B2) and europe-1997 added (B1).
 Not checked: the 51 built races with no authored `eras` block.
 

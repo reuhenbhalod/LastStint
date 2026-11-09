@@ -414,7 +414,10 @@ test('Era 1: Monaco 1988, the avoidable storyline retirement, repeated then avoi
   expect(heard.map((l) => l.text)).not.toContain('That’s it, I’m out. The car’s finished.');
   await resultsFor(page, 1);
 
-  // A new attempt, saving the car instead: he's still running at the flag.
+  // A new attempt, saving the car instead: he's still running at the flag. The 1988 fuel
+  // limit is the whole allowance at standard pace, and the pit-board calls this run leaves to
+  // their defaults put him back on it, so he lifts and coasts from the lap 70 fuel call (a car
+  // that ran dry on the last lap would stop, and the pit wall would say so).
   await page.getByRole('button', { name: 'New attempt' }).click();
   await expect(page.getByRole('button', { name: 'Start the race' })).toBeVisible({
     timeout: 30_000,
@@ -422,7 +425,14 @@ test('Era 1: Monaco 1988, the avoidable storyline retirement, repeated then avoi
   const avoidedRadio = radioLog(page);
   await playRace(page, {
     each: avoidedRadio.read,
-    answer: (lap) => (lap === 40 ? ['EASY - save the car'] : lap === 48 ? ['STAY OUT'] : undefined),
+    answer: (lap) =>
+      lap === 40
+        ? ['EASY - save the car']
+        : lap === 48
+          ? ['STAY OUT']
+          : lap === 70
+            ? ['FUEL - lift and coast to the flag']
+            : undefined,
   });
   const avoided = (await raceNotes(page)).filter((n) => n.kind === 'storyline');
   expect(avoided).toEqual([expect.objectContaining({ driver: 'SENA', detail: 'avoided' })]);

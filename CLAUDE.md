@@ -170,10 +170,23 @@ Read these first: `docs/eras-remaining-work.md` (handover spec, rules, decisions
 - **Expert rival grader fix** (see open items): it makes hungary-1998 Legend unreachable.
 - Any new race swap (B4).
 
-### Status (2026-11-09, integration B)
+### Status (2026-11-09, integrations B and C)
 
 Newest first; the 2026-11-08 notes below still hold where this doesn't replace them.
 
+- **Integration C** (`eras-integrate-c`, merged into `eras`; nothing pushed) adds:
+  - B3 tank planner (`eras-b3-tank-planner`): the engineer's plans and fallback stops stay within
+    a refuelling car's tank (`withinTank`, `fillCap`), mirrored in `refuel.py`; the stopped-car
+    fuel line. Daily grades byte-identical on all 39 pool races.
+  - B1 hungary-2024 (`eras-b1-hungary-2024`): authored from Piastri (the race file's player car
+    NOR -> PIA, rebuilt), McLaren one-two target, no rewrite, hidden objective "no push laps".
+    Robust G1 after the flip: pass, 2.45 s. Sheet: `docs/eras-checks/b1-hungary-2024.md`.
+  - B3 near-misses (`eras-b3-near-misses`): doc only, no honest fix found.
+  - The monaco-1988 e2e's avoided run now lifts and coasts at the lap 70 fuel call: with the
+    pit-board defaults Senna ran dry on the last lap (always did; the new fuel line made it
+    show).
+- **Owner review from integration C**: hungary-2024's weak hidden objective (the margin
+  objectives couldn't be reached at Legend) and the PIA side flip.
 - **Integration B** (`eras-integrate-b`, merged into `eras`; nothing pushed) adds:
   - B2 (`eras-b2-reauthor`): malaysia-2013 and spain-2016 re-authored on the real P2 (the win
     stays as the rewrite), spain-2013's hidden objective changed. All three reachable. Sheet:
@@ -189,10 +202,10 @@ Newest first; the 2026-11-08 notes below still hold where this doesn't replace t
   - The pit card now names the fuel fill on tyre buttons when a refuelling stop offers one
     compound at several fills (they all read "Mediums" before).
   - Windows support: native setup notes above, LF/UTF-8 pipeline writers.
-- **Counts now** (`docs/eras-races-report.md`): 48 pass, 1 borderline, 51 fail; **49 authored,
-  49 reachable, 47 ready**. By era (ready): E10 2, E9 5, E8 5, E7 2, E6 3, E5 1, E4 3, E3 6, E2 10,
+- **Counts now** (`docs/eras-races-report.md`): 48 pass, 1 borderline, 51 fail; **50 authored,
+  50 reachable, 48 ready**. By era (ready): E10 3, E9 5, E8 5, E7 2, E6 3, E5 1, E4 3, E3 6, E2 10,
   E1 10. Authored but not ready: spain-2013 (G1 fail), china-2011 (borderline).
-  Passing but not authored: hungary-2024 (robust G1 re-run at 973d827: pass, 2.52 s). B3
+  Passing but not authored: none. B3
   near-miss attempt found no honest fix for spain-2013, china-2011, abu-dhabi-2012 or
   brazil-2021 (`docs/eras-checks/b3-near-misses.md`): they need model gaps 1 and 3.
 - **Owner review from integration B**: the two P2 targets (and that their ★1-3 path is the real
