@@ -116,8 +116,9 @@ Not in git, so it must be copied over by hand:
 The TUM database path is `pipeline/cache/eras-sources/tum/repo/F1_timingdata_2014_2019.sqlite`
 (`pipeline/src/pipeline/tum.py` `DEFAULT_DB`). You can also point `TUM_DB` at it.
 
-**Moving the repo.** `eras` and ~100 `eras-*` branches are local only, and pushing `eras` deploys
-staging. To move everything without pushing, make a bundle on the Mac and clone it on the PC:
+**Moving the repo.** `eras` is on GitHub (see Local state); the individual `eras-*` work
+branches may be local only. Pushing `eras` deploys staging. To move everything without pushing,
+make a bundle and clone it on the other machine:
 
 ```sh
 # Mac
@@ -175,9 +176,10 @@ Read these first: `docs/eras-remaining-work.md` (handover spec, rules, decisions
 Integrations B and C were done on the PC and merged into local `eras` (`c817397`, then this
 commit). Every `eras-*` branch from that work (`eras-integrate-b`, `eras-integrate-c`,
 `eras-b1-europe-1997`, `eras-b1-hungary-2024`, `eras-b2-reauthor`, `eras-b3-near-misses`,
-`eras-b3-tank-planner`, `eras-a2-e2e`) is merged into `eras`. None of it is pushed: the Mac
-gets it by pushing `eras` (which deploys staging) or by a `git bundle`. The PC's agent
-worktrees are removed.
+`eras-b3-tank-planner`, `eras-a2-e2e`) is merged into `eras`, and `eras` is pushed to GitHub
+(2026-11-09, `68e17e4` and this commit; the Mac picks it up with `git pull`). The individual
+B/C branches weren't pushed (all merged into `eras`). The push ran `staging.yml`; the PC had
+no `gh` CLI to check the run, so check the Actions tab. The PC's agent worktrees are removed.
 
 Where it stands: 48 pass, 1 borderline, 51 fail; 50 authored, 50 reachable, 48 ready. All
 suites, both reachability checks (45 + 5), hungary-2024's robust G1 (2.45 s) and e2e green at
@@ -226,7 +228,7 @@ Concerns to pick up on the Mac:
 
 Newest first; the 2026-11-08 notes below still hold where this doesn't replace them.
 
-- **Integration C** (`eras-integrate-c`, merged into `eras`; nothing pushed) adds:
+- **Integration C** (`eras-integrate-c`, merged into `eras`; `eras` pushed) adds:
   - B3 tank planner (`eras-b3-tank-planner`): the engineer's plans and fallback stops stay within
     a refuelling car's tank (`withinTank`, `fillCap`), mirrored in `refuel.py`; the stopped-car
     fuel line. Daily grades byte-identical on all 39 pool races.
@@ -239,7 +241,7 @@ Newest first; the 2026-11-08 notes below still hold where this doesn't replace t
     show).
 - **Owner review from integration C**: hungary-2024's weak hidden objective (the margin
   objectives couldn't be reached at Legend) and the PIA side flip.
-- **Integration B** (`eras-integrate-b`, merged into `eras`; nothing pushed) adds:
+- **Integration B** (`eras-integrate-b`, merged into `eras`; `eras` pushed) adds:
   - B2 (`eras-b2-reauthor`): malaysia-2013 and spain-2016 re-authored on the real P2 (the win
     stays as the rewrite), spain-2013's hidden objective changed. All three reachable. Sheet:
     `docs/eras-checks/b2-reauthor.md`.
@@ -365,8 +367,9 @@ integration 8 and are out of date. Where they disagree, this section is right.
 
 - On GitHub (checked 2026-11-08 from the PC): `eras`, `eras-integrate-a` and ~115 `eras-*`
   branches **are** on GitHub, at the commit that added this file (22533d0); they were pushed
-  when the repo moved off the Mac. Pushing `eras` runs `staging.yml`, so staging probably
-  deployed that commit. Everything after it (integration B) is local only.
+  when the repo moved off the Mac. Pushing `eras` runs `staging.yml`. On 2026-11-09 the PC
+  pushed integrations B and C (`eras` at `68e17e4` and later), so staging should be on that
+  (not verified from the PC). The B/C work branches themselves are local to the PC only.
 - The Mac's `.worktrees/` don't exist on the PC. The PC's agent worktrees (integrations B and
   C) are removed; their branches are merged into `eras`.
 - Worktrees under `.worktrees/`: `fix-contact-loss`, `fix-grader-queued-stop`, `fix-radio-lines`
