@@ -460,6 +460,15 @@ All driven by the race's `rules` and the era config:
 - One race per era, from the map to the result: refuelling, the 2005 tyre lock, no DRS,
   a red flag, a fault, a reconstructed race.
 - Plus a full regression of Daily and Gauntlet.
+- **Done (Nov 8 2026):** `apps/web/e2e/eras-play.spec.ts` (mocked Worker and play driver in
+  `e2e/eras.ts`), at 1440 px (`desktop` project) and 390 px (`phone`). The playthroughs run
+  laps at 5× through the app's e2e hook (`window.__laststintE2E`, src/game/useGame.ts). Runtime
+  with `CI=1` (build included, 9 workers, 18-core laptop): 5 min 36 s for all 40 tests (38
+  pass, 2 `fixme`); the slowest is the existing defend spec (4.5 min), and every Eras
+  playthrough takes 27 s to 1.9 min. `E2E_PORT` moves the preview server off 4173.
+- No authored race has a red flag or a car fault, so those are played on Draft races
+  (italy-2020, canada-2014). Known app bug, `fixme` in the spec: san-marino-2005 can't be
+  scored (a plan's fill to the flag is more than the tank holds).
 
 **10.2 Test play-through (1%)**
 - All 10 eras and 100 races on staging (`ERAS_TEST_MODE`).
