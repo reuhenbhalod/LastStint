@@ -8,5 +8,18 @@
   // Public at https://pitwall-web.boxboxbox.workers.dev. Set to false and deploy to take the
   // site offline (it was offline Nov 1-2, 2026, at the owner's request).
   "workers_dev": true,
-  "assets": { "directory": "./dist", "not_found_handling": "single-page-application" }
+  "assets": { "directory": "./dist", "not_found_handling": "single-page-application" },
+
+  // Staging (docs/staging.md): the same site built with VITE_API_BASE pointing at the staging
+  // API (https://pitwall-staging.boxboxbox.workers.dev), served by its own Worker at
+  // https://pitwall-web-staging.boxboxbox.workers.dev. Deploy with `deploy:staging`, which
+  // builds and runs `wrangler deploy --env staging`. Without --env staging, wrangler targets
+  // production (pitwall-web).
+  "env": {
+    "staging": {
+      "name": "pitwall-web-staging",
+      "workers_dev": true,
+      "assets": { "directory": "./dist", "not_found_handling": "single-page-application" }
+    }
+  }
 }

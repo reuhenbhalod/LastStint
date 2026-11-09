@@ -116,12 +116,22 @@ def lap_time_gap(model: dict, car: Car, lap: int, compound: str) -> float:
 # --- the rule functions (rivals/rules.ts) ---------------------------------------------------
 
 
+def _root(a: float, b: float, c: float) -> float:
+    """sim.ts quadRoot: the positive root of a*x^2 + b*x = c (a > 0, c > 0)."""
+    return (math.sqrt(b * b + 4 * a * c) - b) / (2 * a)
+
+
 def tyre_life(c: dict) -> int:
     """sim.ts tyreLife: the tyre age at which a compound is LIFE_LOSS s a lap slower than new."""
     deg = c["degPerLap"]
     cliff = c["cliffLap"]
     extra = c.get("cliffDegPerLap", CLIFF_FALLBACK * deg)
-    if deg * cliff >= LIFE_LOSS:
+    quad = c.get("degQuad", 0.0)
+    if quad > 0:  # Eras model fix S4: the age where deg*a + quad*a^2 (+ the cliff) = LIFE_LOSS
+        loss = _root(quad, deg, LIFE_LOSS)
+        if loss > cliff:
+            loss = _root(quad, deg + extra, LIFE_LOSS + extra * cliff)
+    elif deg * cliff >= LIFE_LOSS:
         loss = LIFE_LOSS / deg
     else:
         loss = (LIFE_LOSS + extra * cliff) / (deg + extra)

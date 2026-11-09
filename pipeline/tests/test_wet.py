@@ -183,3 +183,161 @@ def test_band_pace_is_an_eras_build_only():
     eras = build.build_race("belgium-2023").model
     assert all("dampPace" in d for d in eras["drivers"] if "wetPace" in d)
     assert any("dampPace" in d for d in eras["drivers"])
+
+
+# Model fix 1.3 (Eras builds): the Eras curves from mixed-tyre laps, and the race's slick scale.
+
+ERAS = wet.load_curves(eras=True)
+
+
+def test_eras_curves_cross_over_and_open_up_in_the_wet():
+    w = np.linspace(0, 1, 101)
+    slick = wet.penalty(ERAS, "SOFT", w)
+    inter = wet.penalty(ERAS, "INTERMEDIATE", w)
+    wets = wet.penalty(ERAS, "WET", w)
+    assert slick[0] == 0 and inter[0] > 0.06
+    cross = int(np.argmax(inter < slick))
+    assert 0.03 < slick[cross] < 0.12
+    assert (inter[cross:] <= slick[cross:]).all()
+    assert wets[-1] < inter[-1]
+
+    # The real mixed laps (europe-1999's second shower: inters ~17% off a dry lap, slicks
+    # ~24%): at the wetness that puts the inters there, the Eras slicks are ~6% further off;
+    # the shared curves had them ~2.5%.
+    def gap_at_inter(c, share):
+        i = wet.penalty(c, "INTERMEDIATE", w)
+        k = int(np.argmax((w > c["inter"]["best"]) & (i >= share)))
+        return float(wet.penalty(c, "SOFT", w[k]) - i[k])
+
+    assert gap_at_inter(ERAS, 0.17) > 0.05
+    assert gap_at_inter(CURVES, 0.17) < 0.035
+
+
+def _mixed_obs(gap_extra: float, laps: int = 10, n: int = 4) -> tuple[pd.DataFrame, list]:
+    """Laps at wetness 0.3 with n cars on slicks and n on inters, the slicks `gap_extra` (share
+    of a dry lap) further off than the Eras curves say."""
+    w = [0.3] * laps
+    s = float(wet.penalty(ERAS, "SOFT", 0.3))
+    i = float(wet.penalty(ERAS, "INTERMEDIATE", 0.3))
+    rows = [(lap, "slick", s + gap_extra, n) for lap in range(1, laps + 1)]
+    rows += [(lap, "inter", i, n) for lap in range(1, laps + 1)]
+    return pd.DataFrame(rows, columns=["lap", "cls", "median", "count"]), w
+
+
+def test_slick_scale_is_one_where_the_curves_fit_or_nothing_is_mixed():
+    obs, w = _mixed_obs(0.0)
+    assert wet.slick_scale(obs, w, ERAS) == 1.0
+    only = obs[obs["cls"] == "inter"]
+    assert wet.slick_scale(only, w, ERAS) == 1.0
+
+
+def test_slick_scale_follows_the_race_and_shrinks_to_the_pooled_curves():
+    s = float(wet.penalty(ERAS, "SOFT", 0.3))
+    obs, w = _mixed_obs(-0.03)  # slicks 3% nearer the inters: a drying line
+    k = wet.slick_scale(obs, w, ERAS)
+    full = 1 - 0.03 / s  # what the laps alone say
+    assert full < k < 1.0
+    few, w3 = _mixed_obs(-0.03, laps=2, n=1)  # two laps, one car each: barely moves
+    assert k < wet.slick_scale(few, w3, ERAS) < 1.0
+    big, _ = _mixed_obs(-0.5)
+    assert wet.slick_scale(big, w, ERAS) == wet.SLICK_SCALE_BOUNDS[0]
+    scaled = wet.scaled_curves(ERAS, 0.8)
+    assert scaled["slick"]["a"] == round(ERAS["slick"]["a"] * 0.8, 4)
+    assert scaled["inter"] == ERAS["inter"] and scaled["wet"] == ERAS["wet"]
+
+
+def test_mixed_laps_pair_the_tyre_classes_in_clear_air():
+    laps, weather, fitted = _band_race()
+    assert wet.mixed_laps(laps, weather, fitted) == []  # inters only
+    late = (laps["LapNumber"] >= 11) & laps["Driver"].isin(["B", "C", "D"])
+    laps.loc[late, "Compound"] = "WET"
+    laps.loc[late, "LapTime"] *= 1.01
+    mixed = wet.mixed_laps(laps, weather, fitted)
+    assert mixed and {(a, b) for _, a, b, _, _ in mixed} == {("inter", "wet")}
+    for lap, _, _, gap, n in mixed:
+        assert lap >= 11 and n >= wet.MIXED_MIN_FIELD
+        # Every car ran the inter curve, the wets' laps 1% longer: wets ~1% of a lap slower.
+        inter = float(wet.penalty(CURVES, "INTERMEDIATE", 0.3))
+        assert abs(gap + 0.01 * (1 + inter)) < 0.005
+    # The fit's mixed term is zero on the curves that made the laps' gap, positive off them.
+    exact = [(lap, a, b, float(wet.penalty(CURVES, "INTERMEDIATE", 0.3)
+              - wet.penalty(CURVES, "WET", 0.3)), n) for lap, a, b, _, n in mixed]  # fmt: skip
+    assert wet.mixed_cost(exact, weather["wetness"], CURVES) == 0.0
+    assert wet.mixed_cost(exact, weather["wetness"], ERAS) > 0.0
+
+
+def test_eras_curves_are_an_eras_timed_build_only():
+    """A wet Daily/Gauntlet race and a wet reconstructed race keep the shared curves; a timed
+    wet Eras race takes the Eras curves (its slick scaled by its own mixed laps)."""
+    import pytest
+
+    from pipeline import build, ingest
+
+    for race_id in ("canada-2024", "germany-2000", "monaco-1984"):
+        if not ingest.raw_snapshot_path(race_id, build.RAW_DIR).exists():
+            pytest.skip(f"no raw snapshot for {race_id}")
+    assert build.build_race("canada-2024").model["weather"]["curves"] == CURVES
+    assert build.build_race("monaco-1984").model["weather"]["curves"] == CURVES
+    eras = build.build_race("germany-2000").model["weather"]["curves"]
+    assert eras["inter"] == ERAS["inter"] and eras["wet"] == ERAS["wet"]
+    assert eras["slick"] != ERAS["slick"]  # Barrichello's slicks kept the inters' pace
+    assert eras["slick"]["a"] < ERAS["slick"]["a"]
+
+
+# Model fix 1.6 (Eras builds): a car that ran only wet laps takes an estimated dry pace.
+
+
+def _without(fitted, car):
+    from dataclasses import replace
+
+    return replace(
+        fitted,
+        driver_pace={c: p for c, p in fitted.driver_pace.items() if c != car},
+        driver_noise={c: n for c, n in fitted.driver_noise.items() if c != car},
+    )
+
+
+def test_estimated_dry_pace_inverts_the_wet_model_at_the_field_offset():
+    laps, weather, fitted = _band_race()
+    # B ran at the field's pace (80 s dry) in the wet: its laps give 80 s back.
+    p, noise, how = wet.estimated_dry_pace(laps, weather, _without(fitted, "B"), ["B"])["B"]
+    assert abs(p - 80.0) < 0.2 and noise == 0.3 and "laps against the wet model" in how
+    # The whole field 2% slower in the wet than the curves say: still B's 80 s (the field's
+    # offset, not B's dry pace).
+    laps2 = laps.assign(LapTime=laps["LapTime"] * 1.02)
+    p2, *_ = wet.estimated_dry_pace(laps2, weather, _without(fitted, "B"), ["B"])["B"]
+    assert abs(p2 - 80.0) < 0.2
+
+
+def test_estimated_dry_pace_blends_with_the_team_mate_and_falls_back_to_it():
+    laps, weather, fitted = _band_race()
+    laps["Team"] = laps["Driver"].map({"A": "X", "B": "X"}).fillna("Y")
+    f = _without(fitted, "B")
+    f.driver_pace["A"] = 81.0  # B's team-mate
+    p, _, how = wet.estimated_dry_pace(laps, weather, f, ["B"])["B"]
+    w = wet.ESTIMATE_WET_WEIGHT
+    assert abs(p - (w * 80.0 + (1 - w) * 81.0)) < 0.1 and "team-mate A" in how
+    # Too few laps (two): the team-mate's pace alone; no team-mate either: the field's median.
+    short = laps[(laps["Driver"] != "B") | (laps["LapNumber"] <= 3)]
+    assert wet.estimated_dry_pace(short, weather, f, ["B"])["B"][0] == 81.0
+    alone = short.assign(Team=short["Team"].where(short["Driver"] != "B", "Z"))
+    p, _, how = wet.estimated_dry_pace(alone, None, f, ["B"])["B"]
+    assert p == 80.0 and "field's median" in how  # A 81, the rest 80
+
+
+def test_a_car_with_only_wet_laps_stays_in_an_eras_race():
+    """china-2007: Hamilton (the user's car) ran only wet laps before retiring; his dry pace is
+    estimated (provenance driverPace) and every car running at the takeover is in the model."""
+    import pytest
+
+    from pipeline import build, ingest
+
+    if not ingest.raw_snapshot_path("china-2007", build.RAW_DIR).exists():
+        pytest.skip("no raw snapshot for china-2007")
+    result = build.build_race("china-2007")
+    codes = {d["code"] for d in result.model["drivers"]}
+    assert {"HAM", "SCH", "SUT"} <= codes
+    takeover = result.model["race"]["takeoverLap"]
+    assert build.running_at(result.laps, takeover) <= codes
+    assert "driverPace" in result.model["provenance"]["estimated"]
+    assert any(line.startswith("estimated: driverPace (HAM") for line in result.estimates)

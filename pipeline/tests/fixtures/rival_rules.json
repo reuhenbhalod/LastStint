@@ -4306,16 +4306,16 @@
       {
        "lap": 29,
        "to": "MEDIUM",
-       "loss": 22.742
+       "loss": 22.752
       },
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 3788.1331033333345,
+     "planTime": 3786.628728366665,
      "latestStop": 47,
      "overcutLap": 30,
      "wetSwitch": [
@@ -4333,18 +4333,18 @@
       {
        "lap": 29,
        "to": "MEDIUM",
-       "loss": 22.742
+       "loss": 22.752
       },
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 3793.5584100000015,
+     "planTime": 3791.8314224999986,
      "latestStop": 36,
-     "overcutLap": 24,
+     "overcutLap": 25,
      "wetSwitch": [
       null,
       null
@@ -4360,16 +4360,16 @@
       {
        "lap": 29,
        "to": "MEDIUM",
-       "loss": 22.742
+       "loss": 22.752
       },
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 3799.4952500000013,
+     "planTime": 3797.8272432999984,
      "latestStop": 24,
      "overcutLap": 21,
      "wetSwitch": [
@@ -4387,18 +4387,18 @@
       {
        "lap": 29,
        "to": "MEDIUM",
-       "loss": 22.742
+       "loss": 22.752
       },
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 3788.9484233333346,
+     "planTime": 3786.443158366665,
      "latestStop": 57,
-     "overcutLap": 30,
+     "overcutLap": 31,
      "wetSwitch": [
       null,
       null
@@ -4414,16 +4414,16 @@
       {
        "lap": 29,
        "to": "MEDIUM",
-       "loss": 22.742
+       "loss": 22.752
       },
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 3792.7290100000014,
+     "planTime": 3792.144636499999,
      "latestStop": 46,
      "overcutLap": 25,
      "wetSwitch": [
@@ -4441,16 +4441,16 @@
       {
        "lap": 29,
        "to": "MEDIUM",
-       "loss": 22.742
+       "loss": 22.752
       },
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 3803.5416500000015,
+     "planTime": 3801.8964412999985,
      "latestStop": 34,
      "overcutLap": 21,
      "wetSwitch": [
@@ -4684,16 +4684,16 @@
       {
        "lap": 29,
        "to": "MEDIUM",
-       "loss": 22.742
+       "loss": 22.752
       },
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 3540.8770633333343,
+     "planTime": 3539.365445366666,
      "latestStop": 50,
      "overcutLap": 32,
      "wetSwitch": [
@@ -4711,18 +4711,18 @@
       {
        "lap": 29,
        "to": "MEDIUM",
-       "loss": 22.742
+       "loss": 22.752
       },
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 3544.303230000001,
+     "planTime": 3542.6241556999994,
      "latestStop": 39,
-     "overcutLap": 26,
+     "overcutLap": 27,
      "wetSwitch": [
       null,
       null
@@ -4738,16 +4738,16 @@
       {
        "lap": 29,
        "to": "MEDIUM",
-       "loss": 22.742
+       "loss": 22.752
       },
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 3547.9380300000007,
+     "planTime": 3546.2787316999993,
      "latestStop": 27,
      "overcutLap": 24,
      "wetSwitch": [
@@ -4765,16 +4765,16 @@
       {
        "lap": 29,
        "to": "MEDIUM",
-       "loss": 22.742
+       "loss": 22.752
       },
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 3541.526813333334,
+     "planTime": 3539.323552866666,
      "latestStop": 60,
      "overcutLap": 32,
      "wetSwitch": [
@@ -4792,16 +4792,16 @@
       {
        "lap": 29,
        "to": "MEDIUM",
-       "loss": 22.742
+       "loss": 22.752
       },
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 3543.925030000001,
+     "planTime": 3542.6457606999993,
      "latestStop": 49,
      "overcutLap": 26,
      "wetSwitch": [
@@ -4819,16 +4819,16 @@
       {
        "lap": 29,
        "to": "MEDIUM",
-       "loss": 22.742
+       "loss": 22.752
       },
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 3549.703430000001,
+     "planTime": 3548.4458166999993,
      "latestStop": 37,
      "overcutLap": 24,
      "wetSwitch": [
@@ -5062,18 +5062,18 @@
       {
        "lap": 29,
        "to": "MEDIUM",
-       "loss": 22.742
+       "loss": 22.752
       },
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 3294.6182233333343,
+     "planTime": 3293.075701366666,
      "latestStop": 53,
-     "overcutLap": 34,
+     "overcutLap": 33,
      "wetSwitch": [
       null,
       null
@@ -5089,16 +5089,16 @@
       {
        "lap": 29,
        "to": "MEDIUM",
-       "loss": 22.742
+       "loss": 22.752
       },
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 3296.0452500000006,
+     "planTime": 3294.416841099999,
      "latestStop": 42,
      "overcutLap": 28,
      "wetSwitch": [
@@ -5116,16 +5116,16 @@
       {
        "lap": 29,
        "to": "MEDIUM",
-       "loss": 22.742
+       "loss": 22.752
       },
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 3297.499170000001,
+     "planTime": 3295.869066699999,
      "latestStop": 30,
      "overcutLap": 27,
      "wetSwitch": [
@@ -5143,16 +5143,16 @@
       {
        "lap": 29,
        "to": "MEDIUM",
-       "loss": 22.742
+       "loss": 22.752
       },
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 3294.934193333334,
+     "planTime": 3293.106633866666,
      "latestStop": 63,
      "overcutLap": 33,
      "wetSwitch": [
@@ -5170,16 +5170,16 @@
       {
        "lap": 29,
        "to": "MEDIUM",
-       "loss": 22.742
+       "loss": 22.752
       },
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 3295.9500400000006,
+     "planTime": 3294.3738755999993,
      "latestStop": 52,
      "overcutLap": 28,
      "wetSwitch": [
@@ -5197,16 +5197,16 @@
       {
        "lap": 29,
        "to": "MEDIUM",
-       "loss": 22.742
+       "loss": 22.752
       },
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 3297.869600000001,
+     "planTime": 3296.5759691999992,
      "latestStop": 40,
      "overcutLap": 27,
      "wetSwitch": [
@@ -5440,13 +5440,13 @@
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 3027.274613333334,
+     "planTime": 3026.9900952666662,
      "latestStop": 56,
-     "overcutLap": 46,
+     "overcutLap": 48,
      "wetSwitch": [
       null,
       null
@@ -5462,13 +5462,13 @@
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 3036.0318200000006,
+     "planTime": 3035.4914583999994,
      "latestStop": 45,
-     "overcutLap": 42,
+     "overcutLap": null,
      "wetSwitch": [
       null,
       null
@@ -5484,11 +5484,11 @@
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 3048.0266600000004,
+     "planTime": 3047.4715191999994,
      "latestStop": 33,
      "overcutLap": 33,
      "wetSwitch": [
@@ -5506,11 +5506,11 @@
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 3027.992083333334,
+     "planTime": 3026.6282727666658,
      "latestStop": 66,
      "overcutLap": 47,
      "wetSwitch": [
@@ -5528,13 +5528,13 @@
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 3034.860220000001,
+     "planTime": 3037.015877399999,
      "latestStop": 55,
-     "overcutLap": 41,
+     "overcutLap": 42,
      "wetSwitch": [
       null,
       null
@@ -5550,13 +5550,13 @@
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 3055.8916600000007,
+     "planTime": 3054.1401221999995,
      "latestStop": 43,
-     "overcutLap": 35,
+     "overcutLap": 36,
      "wetSwitch": [
       null,
       null
@@ -5788,13 +5788,13 @@
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 2780.465813333334,
+     "planTime": 2780.235699266666,
      "latestStop": 59,
-     "overcutLap": 47,
+     "overcutLap": 49,
      "wetSwitch": [
       null,
       null
@@ -5810,13 +5810,13 @@
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 2787.223880000001,
+     "planTime": 2786.749056599999,
      "latestStop": 48,
-     "overcutLap": 42,
+     "overcutLap": 44,
      "wetSwitch": [
       null,
       null
@@ -5832,11 +5832,11 @@
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 2795.220440000001,
+     "planTime": 2794.7987285999993,
      "latestStop": 36,
      "overcutLap": 36,
      "wetSwitch": [
@@ -5854,13 +5854,13 @@
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 2781.298063333334,
+     "planTime": 2779.955101766666,
      "latestStop": 69,
-     "overcutLap": 48,
+     "overcutLap": 49,
      "wetSwitch": [
       null,
       null
@@ -5876,11 +5876,11 @@
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 2786.0002300000006,
+     "planTime": 2787.4229290999992,
      "latestStop": 58,
      "overcutLap": null,
      "wetSwitch": [
@@ -5898,11 +5898,11 @@
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 2800.8220300000007,
+     "planTime": 2800.0057810999992,
      "latestStop": 46,
      "overcutLap": 37,
      "wetSwitch": [
@@ -6136,13 +6136,13 @@
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 2534.6542133333337,
+     "planTime": 2534.466848266667,
      "latestStop": 62,
-     "overcutLap": 49,
+     "overcutLap": 50,
      "wetSwitch": [
       null,
       null
@@ -6158,13 +6158,13 @@
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 2539.4131400000006,
+     "planTime": 2539.0186129999997,
      "latestStop": 51,
-     "overcutLap": null,
+     "overcutLap": 46,
      "wetSwitch": [
       null,
       null
@@ -6180,11 +6180,11 @@
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 2544.5018600000003,
+     "planTime": 2544.1574305999998,
      "latestStop": 39,
      "overcutLap": 39,
      "wetSwitch": [
@@ -6202,11 +6202,11 @@
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 2535.4330333333337,
+     "planTime": 2534.332028266667,
      "latestStop": 72,
      "overcutLap": 50,
      "wetSwitch": [
@@ -6224,13 +6224,13 @@
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 2538.7528300000004,
+     "planTime": 2539.2043825,
      "latestStop": 61,
-     "overcutLap": 44,
+     "overcutLap": 45,
      "wetSwitch": [
       null,
       null
@@ -6246,11 +6246,11 @@
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 2547.7567900000004,
+     "planTime": 2547.5996281,
      "latestStop": 49,
      "overcutLap": 38,
      "wetSwitch": [
@@ -6484,11 +6484,11 @@
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 2289.8398133333335,
+     "planTime": 2289.676338666667,
      "latestStop": 65,
      "overcutLap": 51,
      "wetSwitch": [
@@ -6506,13 +6506,13 @@
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 2292.5996000000005,
+     "planTime": 2292.2929240000003,
      "latestStop": 54,
-     "overcutLap": 44,
+     "overcutLap": 47,
      "wetSwitch": [
       null,
       null
@@ -6528,13 +6528,13 @@
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 2295.5074400000008,
+     "planTime": 2295.2101816,
      "latestStop": 42,
-     "overcutLap": 41,
+     "overcutLap": 42,
      "wetSwitch": [
       null,
       null
@@ -6550,13 +6550,13 @@
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 2290.3969933333337,
+     "planTime": 2289.670605666667,
      "latestStop": 75,
-     "overcutLap": 51,
+     "overcutLap": 52,
      "wetSwitch": [
       null,
       null
@@ -6572,11 +6572,11 @@
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 2292.3344200000006,
+     "planTime": 2292.271791,
      "latestStop": 64,
      "overcutLap": 46,
      "wetSwitch": [
@@ -6594,11 +6594,11 @@
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 2296.6959400000005,
+     "planTime": 2296.8332166,
      "latestStop": 52,
      "overcutLap": 40,
      "wetSwitch": [
@@ -6832,11 +6832,11 @@
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 2046.0226133333338,
+     "planTime": 2045.856966866667,
      "latestStop": 68,
      "overcutLap": 53,
      "wetSwitch": [
@@ -6854,13 +6854,13 @@
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 2046.7832600000004,
+     "planTime": 2046.5647860000006,
      "latestStop": 57,
-     "overcutLap": 46,
+     "overcutLap": 48,
      "wetSwitch": [
       null,
       null
@@ -6876,13 +6876,13 @@
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 2047.5102200000003,
+     "planTime": 2047.2892980000004,
      "latestStop": 45,
-     "overcutLap": 42,
+     "overcutLap": null,
      "wetSwitch": [
       null,
       null
@@ -6898,11 +6898,11 @@
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 2046.1899433333338,
+     "planTime": 2045.8823873666672,
      "latestStop": 78,
      "overcutLap": 53,
      "wetSwitch": [
@@ -6920,13 +6920,13 @@
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 2046.7450000000003,
+     "planTime": 2046.5367080000005,
      "latestStop": 67,
-     "overcutLap": 47,
+     "overcutLap": 48,
      "wetSwitch": [
       null,
       null
@@ -6942,11 +6942,11 @@
       {
        "lap": 43,
        "to": "MEDIUM",
-       "loss": 22.641
+       "loss": 22.761
       }
      ],
      "known": {},
-     "planTime": 2047.6394800000003,
+     "planTime": 2047.6181000000006,
      "latestStop": 55,
      "overcutLap": 42,
      "wetSwitch": [
@@ -7183,7 +7183,7 @@
       }
      ],
      "known": {},
-     "planTime": 1796.7549233333334,
+     "planTime": 1794.9611371666667,
      "latestStop": 71,
      "overcutLap": 54,
      "wetSwitch": [
@@ -7204,9 +7204,9 @@
       }
      ],
      "known": {},
-     "planTime": 1801.51385,
+     "planTime": 1799.5129018999999,
      "latestStop": 60,
-     "overcutLap": 48,
+     "overcutLap": 49,
      "wetSwitch": [
       null,
       null
@@ -7225,7 +7225,7 @@
       }
      ],
      "known": {},
-     "planTime": 1806.6025700000002,
+     "planTime": 1804.6517195,
      "latestStop": 48,
      "overcutLap": 45,
      "wetSwitch": [
@@ -7246,9 +7246,9 @@
       }
      ],
      "known": {},
-     "planTime": 1797.5337433333334,
+     "planTime": 1794.8263171666665,
      "latestStop": 81,
-     "overcutLap": 54,
+     "overcutLap": 55,
      "wetSwitch": [
       null,
       null
@@ -7267,7 +7267,7 @@
       }
      ],
      "known": {},
-     "planTime": 1800.85354,
+     "planTime": 1799.6986713999997,
      "latestStop": 70,
      "overcutLap": 49,
      "wetSwitch": [
@@ -7288,7 +7288,7 @@
       }
      ],
      "known": {},
-     "planTime": 1809.8575,
+     "planTime": 1808.093917,
      "latestStop": 58,
      "overcutLap": 45,
      "wetSwitch": [
@@ -7525,7 +7525,7 @@
       }
      ],
      "known": {},
-     "planTime": 1552.4464733333332,
+     "planTime": 1550.7952860666667,
      "latestStop": 74,
      "overcutLap": 56,
      "wetSwitch": [
@@ -7546,9 +7546,9 @@
       }
      ],
      "known": {},
-     "planTime": 1557.2054,
+     "planTime": 1555.3470507999998,
      "latestStop": 63,
-     "overcutLap": 50,
+     "overcutLap": 51,
      "wetSwitch": [
       null,
       null
@@ -7567,7 +7567,7 @@
       }
      ],
      "known": {},
-     "planTime": 1562.29412,
+     "planTime": 1560.4858683999998,
      "latestStop": 51,
      "overcutLap": 48,
      "wetSwitch": [
@@ -7588,7 +7588,7 @@
       }
      ],
      "known": {},
-     "planTime": 1553.2252933333332,
+     "planTime": 1550.6604660666665,
      "latestStop": 84,
      "overcutLap": 56,
      "wetSwitch": [
@@ -7609,9 +7609,9 @@
       }
      ],
      "known": {},
-     "planTime": 1556.54509,
+     "planTime": 1555.5328202999997,
      "latestStop": 73,
-     "overcutLap": 51,
+     "overcutLap": 50,
      "wetSwitch": [
       null,
       null
@@ -7630,7 +7630,7 @@
       }
      ],
      "known": {},
-     "planTime": 1565.54905,
+     "planTime": 1563.9280658999999,
      "latestStop": 61,
      "overcutLap": 48,
      "wetSwitch": [
@@ -7867,9 +7867,9 @@
       }
      ],
      "known": {},
-     "planTime": 1308.9670133333332,
+     "planTime": 1307.6500502666665,
      "latestStop": 77,
-     "overcutLap": null,
+     "overcutLap": 57,
      "wetSwitch": [
       null,
       null
@@ -7888,7 +7888,7 @@
       }
      ],
      "known": {},
-     "planTime": 1313.7259399999998,
+     "planTime": 1312.201815,
      "latestStop": 66,
      "overcutLap": 52,
      "wetSwitch": [
@@ -7909,7 +7909,7 @@
       }
      ],
      "known": {},
-     "planTime": 1318.8146599999998,
+     "planTime": 1317.3406326,
      "latestStop": 54,
      "overcutLap": 51,
      "wetSwitch": [
@@ -7930,9 +7930,9 @@
       }
      ],
      "known": {},
-     "planTime": 1309.7458333333332,
+     "planTime": 1307.5152302666665,
      "latestStop": 87,
-     "overcutLap": null,
+     "overcutLap": 57,
      "wetSwitch": [
       null,
       null
@@ -7951,7 +7951,7 @@
       }
      ],
      "known": {},
-     "planTime": 1313.0656299999998,
+     "planTime": 1312.3875844999998,
      "latestStop": 76,
      "overcutLap": 52,
      "wetSwitch": [
@@ -7972,7 +7972,7 @@
       }
      ],
      "known": {},
-     "planTime": 1322.0695899999998,
+     "planTime": 1320.7828301,
      "latestStop": 64,
      "overcutLap": 51,
      "wetSwitch": [
@@ -8209,9 +8209,9 @@
       }
      ],
      "known": {},
-     "planTime": 1066.3165433333334,
+     "planTime": 1065.4369831666666,
      "latestStop": 80,
-     "overcutLap": 60,
+     "overcutLap": 59,
      "wetSwitch": [
       null,
       null
@@ -8230,7 +8230,7 @@
       }
      ],
      "known": {},
-     "planTime": 1071.0754700000002,
+     "planTime": 1069.9887479,
      "latestStop": 69,
      "overcutLap": 54,
      "wetSwitch": [
@@ -8251,7 +8251,7 @@
       }
      ],
      "known": {},
-     "planTime": 1076.16419,
+     "planTime": 1075.1275655,
      "latestStop": 57,
      "overcutLap": 54,
      "wetSwitch": [
@@ -8272,7 +8272,7 @@
       }
      ],
      "known": {},
-     "planTime": 1067.0953633333334,
+     "planTime": 1065.3021631666666,
      "latestStop": 90,
      "overcutLap": 59,
      "wetSwitch": [
@@ -8293,7 +8293,7 @@
       }
      ],
      "known": {},
-     "planTime": 1070.41516,
+     "planTime": 1070.1745174,
      "latestStop": 79,
      "overcutLap": 54,
      "wetSwitch": [
@@ -8314,7 +8314,7 @@
       }
      ],
      "known": {},
-     "planTime": 1079.41912,
+     "planTime": 1078.569763,
      "latestStop": 67,
      "overcutLap": 54,
      "wetSwitch": [
@@ -8551,9 +8551,9 @@
       }
      ],
      "known": {},
-     "planTime": 824.58933,
+     "planTime": 824.1450715000001,
      "latestStop": 83,
-     "overcutLap": 62,
+     "overcutLap": 60,
      "wetSwitch": [
       null,
       null
@@ -8572,7 +8572,7 @@
       }
      ],
      "known": {},
-     "planTime": 829.3482566666667,
+     "planTime": 828.6968362333334,
      "latestStop": 72,
      "overcutLap": 57,
      "wetSwitch": [
@@ -8593,7 +8593,7 @@
       }
      ],
      "known": {},
-     "planTime": 834.4369766666667,
+     "planTime": 833.8356538333333,
      "latestStop": 60,
      "overcutLap": 57,
      "wetSwitch": [
@@ -8614,7 +8614,7 @@
       }
      ],
      "known": {},
-     "planTime": 825.36815,
+     "planTime": 824.0102515000001,
      "latestStop": 93,
      "overcutLap": 60,
      "wetSwitch": [
@@ -8635,7 +8635,7 @@
       }
      ],
      "known": {},
-     "planTime": 828.6879466666667,
+     "planTime": 828.8826057333333,
      "latestStop": 82,
      "overcutLap": 57,
      "wetSwitch": [
@@ -8656,7 +8656,7 @@
       }
      ],
      "known": {},
-     "planTime": 837.6919066666667,
+     "planTime": 837.2778513333333,
      "latestStop": 70,
      "overcutLap": 57,
      "wetSwitch": [
@@ -8893,9 +8893,9 @@
       }
      ],
      "known": {},
-     "planTime": 583.2442033333333,
+     "planTime": 582.9634835666667,
      "latestStop": 86,
-     "overcutLap": 63,
+     "overcutLap": 62,
      "wetSwitch": [
       null,
       null
@@ -8914,7 +8914,7 @@
       }
      ],
      "known": {},
-     "planTime": 586.6703699999999,
+     "planTime": 586.2221939,
      "latestStop": 75,
      "overcutLap": 60,
      "wetSwitch": [
@@ -8935,7 +8935,7 @@
       }
      ],
      "known": {},
-     "planTime": 590.3051700000001,
+     "planTime": 589.8767699,
      "latestStop": 63,
      "overcutLap": 60,
      "wetSwitch": [
@@ -8956,7 +8956,7 @@
       }
      ],
      "known": {},
-     "planTime": 583.8939533333333,
+     "planTime": 582.9215910666667,
      "latestStop": 96,
      "overcutLap": 62,
      "wetSwitch": [
@@ -8977,7 +8977,7 @@
       }
      ],
      "known": {},
-     "planTime": 586.29217,
+     "planTime": 586.2437989000001,
      "latestStop": 85,
      "overcutLap": 60,
      "wetSwitch": [
@@ -8998,7 +8998,7 @@
       }
      ],
      "known": {},
-     "planTime": 592.0705700000001,
+     "planTime": 592.0438549,
      "latestStop": 73,
      "overcutLap": 60,
      "wetSwitch": [
@@ -9235,7 +9235,7 @@
       }
      ],
      "known": {},
-     "planTime": 342.40912333333335,
+     "planTime": 342.1957795666667,
      "latestStop": 89,
      "overcutLap": 64,
      "wetSwitch": [
@@ -9256,7 +9256,7 @@
       }
      ],
      "known": {},
-     "planTime": 343.83615000000003,
+     "planTime": 343.5369193,
      "latestStop": 78,
      "overcutLap": 63,
      "wetSwitch": [
@@ -9277,7 +9277,7 @@
       }
      ],
      "known": {},
-     "planTime": 345.29007,
+     "planTime": 344.98914490000004,
      "latestStop": 66,
      "overcutLap": 63,
      "wetSwitch": [
@@ -9298,9 +9298,9 @@
       }
      ],
      "known": {},
-     "planTime": 342.72509333333335,
+     "planTime": 342.22671206666666,
      "latestStop": 99,
-     "overcutLap": 64,
+     "overcutLap": 63,
      "wetSwitch": [
       null,
       null
@@ -9319,7 +9319,7 @@
       }
      ],
      "known": {},
-     "planTime": 343.74094,
+     "planTime": 343.49395380000004,
      "latestStop": 88,
      "overcutLap": 63,
      "wetSwitch": [
@@ -9340,7 +9340,7 @@
       }
      ],
      "known": {},
-     "planTime": 345.6605,
+     "planTime": 345.6960474,
      "latestStop": 76,
      "overcutLap": 63,
      "wetSwitch": [

@@ -658,6 +658,57 @@ def test_a_wet_race_car_out_on_lap_one_keeps_its_start_tyre():
     assert row.Compound == "WET" and pd.isna(row.LapTime)
 
 
+def test_slick_change_adds_estimated_slick_stops_to_cars_left_on_wets():
+    """weather.slickChange (brazil-1993): a source says the field changed back to slicks in a
+    window; a car on sourced wets with no stop there gets one on the median sourced slick
+    in-lap, marked estimated (not an anchor of its own tyre)."""
+    a = wet_toy()
+    ccc = a.car("CCC")
+    ccc.stops = [rc.replace(ccc.stops[0], lap=17, tyre="wet")]  # wets, no slick stop sourced
+    change = {"fromLap": 30, "toLap": 40, "source": SRC}
+    assert rc.slick_change_lap(a.cars, change) == 35  # BBB's sourced slick stop
+    notes = rc.apply_slick_change(a.cars, change)
+    assert [s.lap for s in ccc.stops] == [17, 35] and ccc.stops[1].estimated
+    assert ccc.stops[1].tyre == "slick" and ccc.stops[1].source.startswith("estimate")
+    assert a.car("AAA").stops[-1].estimated  # on wets from lap 20, no stop in the window
+    assert not any(s.estimated for s in a.car("BBB").stops)  # its own stop is in the window
+    assert any("CCC: slick stop on lap 35 estimated" in n for n in notes)
+    tyres = rc.stint_tyres(ccc, a.wetness, a.curves)
+    assert tyres[-1] == ("slick", False)  # an estimate, not a sourced stint
+    res = rc.reconstruct(a)
+    assert rc.failures(res.sidecar["anchors"]) == []
+    rows = [r for r in res.sidecar["anchors"] if r["subject"] == "CCC (estimated lap)"]
+    assert rows and rows[0]["pass"]
+    assert any(w.startswith("Slick stops on lap 35 estimated") for w in res.sidecar["estimates"])
+
+
+def test_slick_change_needs_a_source_and_laps(tmp_path):
+    tl = [{"fromLap": 1, "toLap": 3, "state": "wet", "source": SRC}]
+    for bad, why in (
+        ({"fromLap": 2, "toLap": 3}, "no source"),
+        ({"fromLap": 3, "toLap": 2, "source": SRC}, "laps"),
+    ):
+        d = _facts(tmp_path, "brazil-1993", {"weather": {"timeline": tl, "slickChange": bad}})
+        with pytest.raises(ValueError, match=why):
+            rc.load_facts("brazil-1993", d)
+
+
+def test_a_lap_one_retirement_stands_outside_the_grid_ladder():
+    """A car out after lap 1 whose one lap is its (slow) F1DB fastest lap keeps that time and
+    pushes no car back; the grid anchor checks the others (monaco-1992's Moreno, 5:34.5)."""
+    a = toy()
+    a.cars.append(rc.Car("JJJ", "TJJJ", None, 2, None, False, "retired", 1, None, 400.0, 1))
+    assert rc.lap1_retirement(a.car("JJJ")) and not rc.lap1_retirement(a.car("AAA"))
+    res = rc.reconstruct(a)
+    assert rc.failures(res.sidecar["anchors"]) == []
+    lap1 = res.laps[res.laps["LapNumber"] == 1].dropna(subset=["LapTime"])
+    assert lap1.sort_values("Time")["Driver"].tolist()[-1] == "JJJ"
+    assert lap1.set_index("Driver")["LapTime"]["JJJ"] == pytest.approx(400.0)
+    assert lap1["Time"].drop(lap1.index[lap1["Driver"] == "JJJ"]).max() < 120.0  # no push
+    (grid,) = [r for r in res.sidecar["anchors"] if r["anchor"] == "grid"]
+    assert "JJJ" not in grid["target"] and "JJJ" in grid["subject"] and grid["pass"]
+
+
 # --- The sourced running order (facts lapLeaders, runningOrder) ------------------------------
 
 

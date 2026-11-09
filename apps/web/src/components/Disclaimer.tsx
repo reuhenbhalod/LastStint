@@ -44,7 +44,7 @@ export function Disclaimer({
             driver names are used only to describe the real races, and team names and colours belong
             to their owners.
           </p>
-          <p className="m-0 flex gap-4">
+          <p className="m-0 flex flex-wrap gap-x-4 gap-y-1">
             <a
               href="/privacy"
               className="underline-offset-2 hover:text-[var(--ink)] hover:underline"
@@ -53,6 +53,12 @@ export function Disclaimer({
             </a>
             <a href="/terms" className="underline-offset-2 hover:text-[var(--ink)] hover:underline">
               Terms
+            </a>
+            <a
+              href="/credits"
+              className="underline-offset-2 hover:text-[var(--ink)] hover:underline"
+            >
+              Credits
             </a>
           </p>
         </div>

@@ -17,7 +17,15 @@ import { type GradeOption, type MomentGrade, type Target, gradeMoment } from './
 import { drawnEvents, legendEvents, removedEvents } from './legend.js';
 import { realFill, refuelling } from './refuel.js';
 import { illegalPitCompound } from './rules.js';
-import { type Run, cleanLap, initRun, realDecisions, stepLap, tyreLife } from './sim.js';
+import {
+  type Run,
+  cleanLap,
+  initRun,
+  liveFuelFrom,
+  realDecisions,
+  stepLap,
+  tyreLife,
+} from './sim.js';
 import type { CarState, Decision, Fill, RaceModel } from './types.js';
 import { isWetTyre, wetnessOn } from './weather.js';
 
@@ -116,6 +124,10 @@ export function pauseAt(model: RaceModel, lap: number): Run {
     );
   }
   while (run.state.lap < lap - 1) stepLap(run);
+  // An Eras race with a fuel rule: from here the player's fuel burns live, as in live play, so
+  // the hard-call counter and the author grade a skipped fill or a missed lift as running dry
+  // (sim.ts liveFuelFrom). Every other race (Daily, Gauntlet) pauses as before.
+  liveFuelFrom(run);
   return run;
 }
 

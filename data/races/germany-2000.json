@@ -97,7 +97,7 @@
     {
       "code": "BAR",
       "team": "Ferrari",
-      "basePace": 107.0552,
+      "basePace": 107.0556,
       "noise": 0.9242,
       "wetPace": -0.0027,
       "dampPace": -0.0021,
@@ -131,7 +131,7 @@
     {
       "code": "BUT",
       "team": "Williams",
-      "basePace": 109.4725,
+      "basePace": 109.4728,
       "noise": 0.3934,
       "wetPace": -0.0208,
       "dampPace": -0.0161,
@@ -152,7 +152,7 @@
         {
           "lap": 35,
           "to": "INTERMEDIATE",
-          "loss": 19.083
+          "loss": 19.519
         }
       ],
       "stintPace": [
@@ -165,7 +165,7 @@
     {
       "code": "COU",
       "team": "McLaren",
-      "basePace": 106.7425,
+      "basePace": 106.7428,
       "noise": 0.2361,
       "wetPace": 0.0128,
       "dampPace": 0.0108,
@@ -186,7 +186,7 @@
         {
           "lap": 39,
           "to": "INTERMEDIATE",
-          "loss": 20.667
+          "loss": 19.674
         }
       ],
       "stintPace": [
@@ -221,7 +221,7 @@
     {
       "code": "DLR",
       "team": "Arrows",
-      "basePace": 108.1988,
+      "basePace": 108.1991,
       "noise": 0.2889,
       "wetPace": 0.0051,
       "dampPace": 0.0043,
@@ -242,7 +242,7 @@
         {
           "lap": 36,
           "to": "INTERMEDIATE",
-          "loss": 19.325
+          "loss": 20.209
         }
       ],
       "stintPace": [
@@ -255,7 +255,7 @@
     {
       "code": "FRE",
       "team": "Jordan",
-      "basePace": 107.3562,
+      "basePace": 107.3565,
       "noise": 1.3095,
       "stateAtTakeover": {
         "position": 6,
@@ -291,7 +291,7 @@
     {
       "code": "GEN",
       "team": "Minardi",
-      "basePace": 109.3398,
+      "basePace": 109.3401,
       "noise": 0.2344,
       "stateAtTakeover": {
         "position": 16,
@@ -318,7 +318,7 @@
     {
       "code": "HAK",
       "team": "McLaren",
-      "basePace": 106.8005,
+      "basePace": 106.8008,
       "noise": 0.3163,
       "wetPace": 0.0087,
       "dampPace": 0.0054,
@@ -339,7 +339,7 @@
         {
           "lap": 36,
           "to": "INTERMEDIATE",
-          "loss": 17.991
+          "loss": 18.863
         }
       ],
       "stintPace": [
@@ -373,7 +373,7 @@
         {
           "lap": 34,
           "to": "INTERMEDIATE",
-          "loss": 21.138
+          "loss": 22.633
         }
       ],
       "stintPace": [
@@ -386,7 +386,7 @@
     {
       "code": "IRV",
       "team": "Jaguar",
-      "basePace": 109.8466,
+      "basePace": 109.8469,
       "noise": 0.4654,
       "wetPace": -0.0091,
       "dampPace": 0.0126,
@@ -407,7 +407,7 @@
         {
           "lap": 36,
           "to": "INTERMEDIATE",
-          "loss": 39.037
+          "loss": 39.935
         }
       ],
       "stintPace": [
@@ -420,10 +420,10 @@
     {
       "code": "MAZG",
       "team": "Minardi",
-      "basePace": 109.696,
+      "basePace": 109.6963,
       "noise": 0.4584,
       "wetPace": 0.0192,
-      "dampPace": 0.017,
+      "dampPace": 0.0169,
       "stateAtTakeover": {
         "position": 19,
         "gapAhead": 2.616,
@@ -441,7 +441,7 @@
         {
           "lap": 36,
           "to": "INTERMEDIATE",
-          "loss": 32.605
+          "loss": 33.502
         }
       ],
       "stintPace": [
@@ -454,7 +454,7 @@
     {
       "code": "SAL",
       "team": "Sauber",
-      "basePace": 109.4056,
+      "basePace": 109.4059,
       "noise": 0.3877,
       "wetPace": -0.0122,
       "dampPace": -0.0101,
@@ -475,14 +475,14 @@
         {
           "lap": 36,
           "to": "INTERMEDIATE",
-          "loss": 20.677
+          "loss": 21.571
         }
       ]
     },
     {
       "code": "SCH",
       "team": "Williams",
-      "basePace": 109.7418,
+      "basePace": 109.7421,
       "noise": 0.242,
       "wetPace": -0.0164,
       "dampPace": -0.0092,
@@ -508,14 +508,14 @@
         {
           "lap": 37,
           "to": "INTERMEDIATE",
-          "loss": 20.394
+          "loss": 20.654
         }
       ]
     },
     {
       "code": "TRU",
       "team": "Jordan",
-      "basePace": 108.0992,
+      "basePace": 108.0994,
       "noise": 0.3547,
       "wetPace": 0.0078,
       "dampPace": 0.004,
@@ -536,12 +536,12 @@
         {
           "lap": 36,
           "to": "MEDIUM",
-          "loss": 17.386
+          "loss": 18.185
         },
         {
           "lap": 38,
           "to": "INTERMEDIATE",
-          "loss": 25.33
+          "loss": 25.422
         }
       ],
       "stintPace": [
@@ -554,7 +554,7 @@
     {
       "code": "VERO",
       "team": "Arrows",
-      "basePace": 109.7404,
+      "basePace": 109.7407,
       "noise": 0.4441,
       "wetPace": -0.0121,
       "dampPace": -0.007,
@@ -575,7 +575,7 @@
         {
           "lap": 36,
           "to": "INTERMEDIATE",
-          "loss": 23.436
+          "loss": 24.333
         }
       ],
       "stintPace": [
@@ -588,7 +588,7 @@
     {
       "code": "VIL",
       "team": "BAR",
-      "basePace": 109.5089,
+      "basePace": 109.5092,
       "noise": 0.3371,
       "wetPace": -0.0081,
       "dampPace": -0.0069,
@@ -609,7 +609,7 @@
         {
           "lap": 36,
           "to": "INTERMEDIATE",
-          "loss": 35.911
+          "loss": 36.805
         }
       ]
     },
@@ -637,7 +637,7 @@
     {
       "code": "ZON",
       "team": "BAR",
-      "basePace": 109.3094,
+      "basePace": 109.3097,
       "noise": 0.2985,
       "wetPace": -0.01,
       "dampPace": -0.0075,
@@ -673,7 +673,28 @@
     {
       "lap": 25,
       "type": "SC",
-      "laps": 4
+      "laps": 4,
+      "lapsDown": {
+        "ALE": 0,
+        "BAR": 0,
+        "BUT": 0,
+        "COU": 0,
+        "DIN": 0,
+        "DLR": 0,
+        "FRE": 0,
+        "GEN": 0,
+        "HAK": 0,
+        "HEI": 0,
+        "IRV": 0,
+        "MAZG": 0,
+        "SAL": 0,
+        "SCH": 0,
+        "TRU": 0,
+        "VERO": 0,
+        "VIL": 0,
+        "WUR": 0,
+        "ZON": 0
+      }
     },
     {
       "lap": 30,
@@ -688,7 +709,26 @@
     {
       "lap": 30,
       "type": "SC",
-      "laps": 2
+      "laps": 2,
+      "lapsDown": {
+        "BAR": 0,
+        "BUT": 0,
+        "COU": 0,
+        "DLR": 0,
+        "FRE": 0,
+        "GEN": 0,
+        "HAK": 0,
+        "HEI": 0,
+        "IRV": 0,
+        "MAZG": 0,
+        "SAL": 0,
+        "SCH": 0,
+        "TRU": 0,
+        "VERO": 0,
+        "VIL": 0,
+        "WUR": 0,
+        "ZON": 0
+      }
     },
     {
       "lap": 32,
@@ -769,20 +809,20 @@
   "weather": {
     "curves": {
       "slick": {
-        "a": 0.1855,
-        "b": 0.9993
+        "a": 0.1547,
+        "b": 0.9231
       },
       "inter": {
-        "min": 0.0345,
-        "dry": 1.0187,
-        "wet": 0.789,
-        "best": 0.18
+        "min": 0.0374,
+        "dry": 1.0876,
+        "wet": 0.576,
+        "best": 0.1708
       },
       "wet": {
-        "min": 0.1486,
-        "dry": 0.4006,
-        "wet": 0.6344,
-        "best": 0.2833
+        "min": 0.1356,
+        "dry": 0.4256,
+        "wet": 0.4903,
+        "best": 0.3065
       }
     },
     "wetness": [
@@ -817,20 +857,20 @@
       0.0,
       0.0,
       0.0,
-      0.04,
+      0.05,
       0.0,
-      0.12,
-      0.26,
-      0.28,
-      0.28,
+      0.13,
+      0.27,
       0.3,
+      0.3,
+      0.33,
+      0.35,
+      0.33,
+      0.32,
+      0.31,
       0.31,
       0.3,
-      0.29,
-      0.29,
-      0.28,
-      0.28,
-      0.3
+      0.33
     ]
   },
   "provenance": {

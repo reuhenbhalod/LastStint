@@ -3099,3 +3099,436 @@ them (schema: optional). `python -m pipeline.dirty_air --cache DIR` refits the t
 **Fixtures.** New: `packages/sim/tests/fixtures/eras-dirty-air.json` (spain-2021 with its bands;
 the same with heldGap 0.79 and rollOnly; brazil-2006 refuelling with its bands and rollOnly; 20
 seeds each; `tests/make_dirty_air_fixture.py`). No existing fixture went stale.
+
+## Eras model fix 1.3 (Nov 8 2026): the wet curves refitted on mixed-tyre laps (Eras builds)
+
+Gap 2 of docs/eras-races-report.md, its last part: "one wetness per lap (the slick / inter
+curves 2% apart where europe-1999's second shower had them 8%)". On a lap where the whole field
+is on one tyre class the timeline's wetness moves to fit any curve, so only the laps with cars
+on two classes at once say how far apart the classes are. The shared curves (data/wet.json,
+fitted on the 2018+ wet races) put slicks and inters almost parallel past the crossover (inter
+slope 0.79 a unit of wetness, slick 0.79-0.99): about 1.7% apart at every wetness, where
+europe-1999's laps 37-42 had them 6-9% apart (inters ~17% off a dry lap, slicks ~24%).
+
+**Method** (`wet.fit_eras_curves`, `wet.slick_scale`, `pipeline wet-fit --eras`; Eras builds
+only):
+- **Mixed laps** (`wet.mixed_laps`): clear-air laps (M1's `clear_air_shares`: green, not lap 1,
+  no pit, no car within 1.5 s ahead) with at least 2 cars on each of two tyre classes; the gap
+  between the classes' median share of a dry lap. 163 such lap pairs in the 29 timed Eras wet races
+  (europe-1999 17, united-states-2003 16, hungary-2006 16, australia-2025 23, monaco-2016 18
+  inter / wet, ...).
+- **Pooled curves** (`data/wet-eras.json`): the shared fit's objective (every lap's field median
+  per class against its race's own timeline, now with the lap-time weather's dry laps) plus 30x
+  the squared miss of the mixed laps' gaps (weighted by the smaller count, at most 4), pooled over
+  the 29 races, under the shared physics prior (`curve_prior`), from the shared curves. A second
+  stage refits the full wet's four parameters alone under `eras_prior`: the Eras races' inter /
+  wet mixed laps are all on a track drying out of the wet (inters 0.5-2% quicker), none in
+  standing water, so on a soaked track (wetness 0.8 and 1.0) wets are held 3% quicker than inters.
+  The slick-inter gap at the wetness that puts inters 17% off a dry lap: 1.9% before, 8.5% now
+  (europe-1999's laps 37-42: 6-9%).
+
+  | Curve | slick a / b | inter min / dry / wet / best | wet min / dry / wet / best |
+  |---|---|---|---|
+  | shared (data/wet.json) | 0.1855 / 0.9993 | 0.0345 / 1.0187 / 0.789 / 0.18 | 0.1486 / 0.4006 / 0.6344 / 0.2833 |
+  | Eras (data/wet-eras.json) | 0.1868 / 1.1148 | 0.0374 / 1.0876 / 0.576 / 0.1708 | 0.1356 / 0.4256 / 0.4903 / 0.3065 |
+
+- **Per race, a slick factor** (`wet.slick_scale`): the races differ more than one curve can say.
+  At the same inter pace, Hockenheim 2000's slicks (Barrichello, the forest wet and the rest
+  dry) kept the inters' pace, Indianapolis 2003's and Zandvoort 2023's lost 5-13%. On every green
+  lap with cars on both slicks and inters (the field medians the timeline is fitted on), r = the
+  real slick-inter gap less the curves' at the fitted wetness, n the smaller count (at most 4), s
+  the slick penalty; the race's slick curve is scaled by k = 1 + sum(n·r·s) / (sum(n·s²) + 0.05),
+  held in 0.6-1.6, and the timeline refitted. The prior is empirical Bayes on the races' mixed
+  laps under the pooled curves: lap noise 0.0028 (n-weighted squared share), between-race sd of k
+  0.22 (17 races with enough mixed laps), prior 0.0028 / 0.051 = 0.055 (used 0.05). Examples:
+  germany-2000 k 0.83, canada-2011 0.77, europe-1999 0.90, monaco-2016 0.93, netherlands-2023
+  1.41. M1's wet-tyre shift then applies on top, as before.
+- **A drying line per lap, considered and not built.** Letting each tyre class see its own
+  wetness on a lap (slicks on a drier line) is what the slick factor does per race; per lap,
+  the data can't carry it: a race has 1-20 mixed clear-air laps, and the one race where the
+  gap's dependence on the wetness differs from the pooled shape (europe-1999: slicks 3% quicker
+  than inters at laps 46-48, 6-9% slower at laps 37-42) is the race the pooled fit is built
+  around. It would also need a per-class wetness in both sims' race files.
+
+**Gating.** `build.py`: only an Eras build of a timed race (`eras_build` and not reconstructed,
+as M1) takes `wet.eras_weather_block`; every other build keeps data/wet.json and the old path,
+line for line. The two wet pool races rebuild byte-identical to a build at the parent commit
+(canada-2024, russia-2021: race file and golden; abu-dhabi-2021 too, dry); the reconstructed wet
+races keep the shared curves (their laps are solved to anchors with them). The race file's
+`weather.curves` carries the race's own curves, so neither sim changed. Parity: the Python
+reference and the TS sim agree on order and times (3 decimals) on four rebuilt races carrying
+the new curves, 20 seeds each (germany-2000 with its slick factor, europe-1999, canada-2011 and
+monaco-2016 with M1's wet-tyre shift; scratch check, not committed). `wet_laps.py` (the
+lap-time weather of `pipeline wet-laps`, written into data/raw) keeps the shared curves: no raw
+file changes. No committed race file, golden or parity fixture changes (the red-flag fixture's
+netherlands-2023 is a frozen model, still in parity).
+
+**Before / after** (robust G1, 1,000 runs on each seed set, one race per call; before = this
+branch's parent a911ab9, after = this fix; fresh builds in memory, data/races not changed).
+Worst failing check after the fix, seed set 10000 / 20000, limit in brackets.
+
+| Race | Before | Mean gap error | After | Mean gap error | Change | Worst failing check after |
+|---|---|---|---|---|---|---|
+| europe-1999 | fail | 25.63s | fail | 12.28s | -13.35s | field SCH gap error 25.34 / 25.32 [5.00] |
+| malaysia-2001 | fail | 9.92s | fail | 4.80s | -5.12s | field SCH gap error 10.62 / 10.20 [5.00] |
+| united-states-2003 | fail | 6.20s | fail | 6.16s | -0.04s | field HEI gap error 19.69 / 19.72 [5.64] |
+| belgium-1998 | fail | 5.25s | fail | 5.08s | -0.17s | field DIN gap error 13.61 / 13.60 [5.17] |
+| hungary-2006 | fail | 15.15s | fail | 14.47s | -0.68s | podium HEI gap error 47.76 / 47.55 [5.00] |
+| europe-2007 | fail | 2.23s | fail | 2.24s | +0.01s | duel ALO vs MAS gap error 6.38 / 6.30 [3.00] |
+| monaco-2022 | fail | 7.49s | fail | 7.60s | +0.11s | field RUS gap error 14.05 / 13.80 [5.00] |
+| netherlands-2023 | fail | 6.69s | fail | 2.35s | -4.34s | podium order rate 0.50 / 0.50 [0.50] |
+| monaco-2016 | fail | 10.80s | fail | 10.24s | -0.56s | podium PER gap error 17.61 / 17.55 [5.00] |
+| canada-2011 | fail | 3.02s | fail | 3.93s | +0.91s | podium WEB gap error 10.40 / 10.01 [5.00] |
+| brazil-2012 | fail | 3.44s | fail | 3.46s | +0.02s | field VET gap error 6.74 / 6.76 [5.00] |
+| monaco-2008 | fail | 4.53s | fail | 5.16s | +0.63s | field BAR gap error 8.27 / 8.18 [5.00] |
+| australia-2025 | fail | 3.66s | fail | 3.44s | -0.22s | duel VER vs NOR gap error 7.07 / 7.07 [3.00] |
+| germany-2000 | fail | 2.85s | fail | 5.67s | +2.82s | field DLR gap error 8.31 / 8.17 [5.00] |
+| brazil-2008 | fail | 5.42s | fail | 6.48s | +1.06s | field GLO gap error 13.38 / 13.25 [5.00] |
+| australia-2010 | fail | 4.11s | fail | 3.74s | -0.37s | field ROS gap error 8.16 / 8.08 [5.00] |
+| brazil-2003 | fail | 5.74s | fail | 5.55s | -0.19s | field COU gap error 9.64 / 8.91 [5.00] |
+| great-britain-2016 | fail | 2.37s | fail | 2.08s | -0.29s | podium order rate 0.48 / 0.49 [0.50] |
+| hungary-2014 | fail | 2.73s | fail | 2.73s | 0.00s | field RAI gap error 5.66 / 6.39 [5.00] |
+| hungary-2021 | fail | 5.15s | fail | 5.15s | 0.00s | podium HAM gap error 9.87 / 9.73 [5.00] |
+| united-states-2015 | fail | 2.31s | fail | 2.25s | -0.06s | duel HAM vs ROS gap error 4.19 / 4.29 [3.00] |
+| belgium-2023 | pass | 1.73s | pass | 1.79s | +0.06s | |
+| japan-2000 | pass | 1.27s | pass | 1.42s | +0.15s | |
+| spain-1996 | pass | 0.62s | pass | 0.62s | 0.00s | |
+| turkey-2020 | pass | 1.76s | pass | 1.75s | -0.01s | |
+| germany-2018 | pass | 1.59s | pass | 1.60s | +0.01s | |
+| germany-2019 | pass | 1.38s | pass | 1.39s | +0.01s | |
+| malaysia-2013 | pass | 1.20s | pass | 1.20s | 0.00s | |
+
+**0 new passes, 0 lost; the 28 timed Eras wet races 144.24 -> 124.63 s; the 15 failing races
+of gap 2 with germany-2000 and brazil-2008 112.28 -> 93.36 s.** 11 races improve by 0.05 s or
+more, 7 get worse, 10 don't move; the 7 passing wet races all still pass. china-2007 is in the fit
+(17 mixed lap pairs) but not graded here (gap 8: not built for play).
+
+**What else was tried** (the 8 most sensitive races, europe-1999, united-states-2003,
+netherlands-2023, hungary-2006, europe-2007, germany-2000, brazil-2008, malaysia-2001: sum of
+mean gap errors 74.09 s before):
+
+| Variant | Sum | Notes |
+|---|---|---|
+| shared fit's objective on the Eras races, no mixed-lap term, no per-race term | 76.12 s | europe-1999 6.99 s, but germany-2000 19.13 s (Barrichello's slicks too slow) |
+| the same curves + per-race slick factor, prior 0.2 | 68.53 s | |
+| mixed-lap term (x30), no per-race term | 91.39 s | germany-2000 28.80 s, malaysia-2001 18.50 s |
+| mixed-lap term + per-race inter shift (additive, prior 4 laps) | 68.94 s (7 races; europe-2007 not run) | germany-2000 passes (0.90 s), europe-1999 14.95 s, two races at the inter floor |
+| mixed-lap term + per-race slick factor, prior 0.02 | 56.36 s | |
+| + soaked-track prior on all ten parameters (one stage) | worse | malaysia-2001 18.59 s, united-states-2003 7.69 s: the inter slope rose to 0.68 |
+| **chosen: mixed-lap term, two-stage soaked prior, slick factor prior 0.05** | 54.45 s | |
+
+**Why the seven get worse:**
+- **germany-2000** (+2.8 s): Barrichello was the one car on slicks (1 against 10 on inters), so
+  the slick factor (0.83) rests on single-car laps and the prior holds it back: his slicks still
+  cost ~1% a lap more than they did, and the gaps behind him (DLR, BUT) move with him.
+- **brazil-2008, monaco-2008** (+1.1 s, +0.6 s): their mixed laps are few (Interlagos' last
+  laps; Monaco's 46-53) and disagree among themselves, so the slick factor stays near 1 and the
+  steeper pooled slick curve costs their slick runners a little too much.
+- **canada-2011** (+0.9 s): k 0.77 on the drying laps, with M1's wet shift on top; the race's
+  failing checks are still the drying track's lap pace (docs/eras-races-report.md).
+- **japan-2000, monaco-2022, belgium-2023** (+0.06 to +0.15 s): noise; japan-2000 and
+  belgium-2023 still pass.
+
+europe-1999 still fails on SCH (25 s; was 49 s in the races report): the second shower's slick
+runners now lose about the time they did; the rest is beyond the curves (M1's note on its mixed
+labels stands). hungary-2006's HEI (48 s) is the dropped-car gap 8.
+
+**Not regenerated here:** data/races, data/golden and `apps/worker/src/races.gen.ts` (the
+integrator rebuilds every non-pool race after the model fixes merge).
+
+## Eras model fix S4 (Nov 8 2026): quadratic tyre wear pooled by track and era: 10 -> 11 pass on 24 races, the long-stint races barely move
+
+Job 1.4, the races report's gap 11 ("tyre wear on long stints"): wear is linear per compound
+(plus a cliff kept only where it lowers the race's BIC), so a stint that falls off late runs
+flat. Examples: Alonso's 32-lap softs at Hungary 2014 (about +1.1 s a lap over the last 7
+laps, fuel-corrected, against the race's linear 0.034 s), and Vettel's 62-lap hards at Monaco
+2011 (HARD fit 0.003 s a lap).
+
+**Method** (`wear_shape.py`, `fit.measure_quad`, `fit.QuadPrior`; Eras builds only):
+- **Shape.** Each dry compound gets a quadratic term, `degQuad x wear^2` in the sims on top of
+  `degPerLap x wear`. It is fitted jointly with the rest of the lap model (the ordered,
+  prior-shrunk compounds, the fuel term, the BIC cliff search on top) and bounded at 0.
+- **Measured** on the clean laps of every timed, non-reconstructed snapshot in data/raw (124
+  races; `python -m pipeline.wear_shape` writes `pipeline/config/wear_shape.json`). For each
+  race and compound with 30 clean laps or more, the term is fitted unshrunk and unbounded, with
+  no cliffs, plus its standard error. A race of short stints measures it with a large error.
+- **Pooled** by random effects per era (the compound priors' eras) and compound. `tau2` is the
+  race-to-race variance (DerSimonian-Laird). `tau2Within` is the variance between races at one
+  track layout (`overtaking.layout_of`), from the same estimator on deviations from each
+  layout's mean. The track level's own variance is `tau2 - tau2Within`.
+- **The race's prior.** The layout's level comes from the *other* races there (its own laps
+  count once, in its fit), each at variance se² + tau2Within, shrunk to the era's mean. Its sd
+  is sqrt(that level's variance + tau2Within). It enters the fit as one prior row of weight
+  noise / sd (noise = the race's own residual sd), so the result is the precision-weighted mix
+  of the race's laps and its track and era.
+- **Tyre life** (`sim.ts tyreLife`, `rival_policy.tyre_life`) solves `degPerLap·a + degQuad·a²`
+  (+ the cliff) = LIFE_LOSS, so the rivals, the engineer and the "worn" checks see the same
+  tyre. `engineerCalls.tyreLoss` counts the term too.
+
+Pooled means in ms per lap² (tau, within): 2014-2025 HARD 0.56 (0.59, 0.52), MEDIUM 0.46 (0.72,
+0.63), SOFT 0.02 (0.86, 0.80); 2010-2013 HARD 1.93 (1.80, 0.03), SOFT 1.73 (2.29, 0.42);
+1994-2009 HARD -0.83, MEDIUM -0.38, SOFT -3.52 (their priors are floored at 0). In the modern era
+the track explains little of the spread (within is close to tau).
+
+**What the data says about the named races.** Their own measured terms are flat or negative:
+- monaco-2011: HARD -0.39 ± 0.23 ms/lap², SOFT -0.49 ± 0.70.
+- hungary-2014: SOFT -0.62 ± 0.39, MEDIUM +1.30 ± 0.27.
+- australia-2010: HARD -0.20 ± 0.19.
+
+Vettel's late laps at Monaco ran at the pace of the train behind him, and Hungary's early soft
+stints got quicker on a drying, rubbering track, which offsets Alonso's and Räikkönen's late
+fall-off. With the 0 bound, monaco-2011's HARD and australia-2010's compounds get no term, and
+hungary-2014 gets MEDIUM 0.54 ms/lap² (on top of its fitted cliff at 28).
+
+Over all long stints (25 laps or more), the residuals against the linear fit, centred per stint,
+form a shallow U in the modern eras (+0.04 s early, -0.05 s mid-stint, +0.06 s in the last
+tenth). Most of the late rise is in each stint's last tenth: stints end when their tyres go,
+so it can't be predicted from tyre age alone. The fall-offs the races report names are
+stint-specific (one driver's set, on one day), which a per-compound shape can't carry. A fade
+per real stint (a wear slope next to M2's stint offsets, shrunk the same way) is the next thing
+to try for them.
+
+**Before / after** (robust G1, 1,000 runs on each of two seed sets, one race per call; before =
+the parent commit a911ab9 with S4 off, reproducing docs/eras-races-report.md; after = this
+branch; rebuilt into a scratch directory, data/races not changed). Failing checks are seed set
+10000's, limit as before.
+
+| Race | Before | After | Change | Failing checks after |
+|---|---|---|---|---|
+| monaco-2011 | fail 15.16 s | fail 15.19 s | +0.03 | field HAM 69.08, WEB 25.72, KOB 7.30 |
+| hungary-2014 | fail 2.73 s | fail 2.75 s | +0.02 | podium HAM 5.81; field RAI 5.52 |
+| australia-2010 | fail 4.11 s | fail 4.11 s | 0.00 | podium MAS 5.94; field ALO 6.34, ROS 9.65 |
+| bahrain-2014 | fail 1.17 s | fail 1.22 s | +0.05 | duel order 0.50 |
+| canada-2014 | fail 2.99 s | fail 2.99 s | 0.00 | duel ROS vs RIC 8.61, order 0.22 |
+| hungary-2015 | fail 6.90 s | fail 6.80 s | -0.10 | duel VET vs KVY 5.04; field ALO, VER |
+| monaco-2015 | fail 4.71 s | fail 4.60 s | -0.11 | duel HAM vs ROS 5.38; podium order 0.26 |
+| united-states-2015 | fail 2.31 s | fail 2.23 s | -0.08 | duel HAM vs ROS 4.08, order 0.41 |
+| great-britain-2016 | fail 2.37 s | fail 2.37 s | 0.00 | podium order 0.41 |
+| brazil-2009 | fail 3.79 s | fail 3.77 s | -0.02 | field VET 7.04, RAI 5.23 |
+| abu-dhabi-2012 | fail 1.72 s | fail 1.72 s | 0.00 | duel VET vs BUT 3.40, order 0.55 |
+| japan-2005 | fail 4.48 s | fail 4.48 s | 0.00 | duel RAI vs FIS 7.47 |
+| spain-2013 | fail 1.51 s | fail 1.59 s | +0.08 | duel RAI vs ALO 3.28 |
+| europe-2012 | fail 1.46 s | **pass** 1.37 s | -0.09 | |
+| spain-2016 | pass 1.13 s | pass 1.15 s | +0.02 | |
+| abu-dhabi-2016 | pass 0.85 s | pass 0.87 s | +0.02 | |
+| austria-2002 | pass 0.63 s | pass 0.63 s | 0.00 | |
+| malaysia-2013 | pass 1.20 s | pass 0.91 s | -0.29 | |
+| turkey-2021 | pass 0.41 s | pass 0.41 s | 0.00 | |
+| germany-2019 | pass 1.38 s | pass 1.38 s | 0.00 | |
+| germany-2018 | pass 1.59 s | pass 1.64 s | +0.05 | |
+| hungary-2022 | pass 1.97 s | pass 1.69 s | -0.28 | |
+| france-2004 | pass 1.89 s | pass 1.89 s | 0.00 | |
+| spain-1996 | pass 0.62 s | pass 0.83 s | +0.21 | |
+| **All 24** | **10 pass, 2.80 s** | **11 pass, 2.77 s** | | 7 better, 8 worse (5 of them by 0.05 s or less), 9 unchanged |
+
+No race lost its pass, and one was gained (europe-2012). The three races the job names don't
+move, for the reasons above. The fix is safe to keep, but it doesn't close gap 11.
+
+**Gating.** Only `build.py`'s `eras_build` races of timed laps (`eras_build and recon is None`)
+ask for priors (`wear_shape.quad_priors`). Only compounds with a positive term, rounded to 7
+decimals, carry `degQuad` (schema: optional, additive, no version change). The sims add it only
+when the file has it. All 39 Daily/Gauntlet pool races rebuild byte-identical, race file and
+golden, to a build at the parent commit (checked in a scratch copy). Reconstructed races keep
+linear wear (their laps are solved to a linear one). `build_race(..., wear_shape=False)` turns
+it off (the measurement uses that).
+
+**Parity and tests.** The TS sim replays the Python goldens of the 16 rebuilt scratch files
+that carry `degQuad` (20 seeds each, 320 runs: same order, times within 0.001 s; a scratch
+check, not committed). New: `pipeline/tests/test_wear_shape.py` (the term's fit, prior, bound
+and measurement; pooling with leave-one-out; the sim's lap and tyre life; gating on a pool race
+and on hungary-2014) and `packages/sim/tests/wear-shape.test.ts` (parity on spain-2021 with
+hand-entered degQuad, real and diverged strategies, and the tyre life:
+`pipeline/tests/make_wear_shape_fixture.py` ->
+`packages/sim/tests/fixtures/wear-shape-golden.json`). **Stale parity fixtures: none.** One
+committed-file comparison waits for the rebuild: `test_faults.py`'s hungary-1997 test (Hill's
+fitted fault carries the MEDIUM's term, 11.987 -> 11.963 s a lap), now gated on the committed
+file carrying both `stintPace` and `degQuad`.
+
+**Not done here:** the race files, goldens and `apps/worker/src/races.gen.ts` (the integration
+rebuilds them; until then the committed Eras files carry no `degQuad` and play as before).
+
+## Eras job 1.5 (Nov 8 2026): real laps down in no-unlapping SC queues; the restart refitted, still off
+
+Written by hand. Robust status (1,000 runs on each of two seed sets, one race per call;
+`pipeline/experiments/restart_ab.py RACE VARIANT`), every race built fresh from its raw snapshot
+on this branch. Nothing in data/races or data/golden is committed. Every Daily and Gauntlet race
+file and golden is byte-identical: both changes are written only by an Eras build, and the sims
+act only on the new field or block.
+
+**1. Lapped status from the real lap counts** (`restart.laps_down`, `restart.with_laps_down`,
+events' `lapsDown`; `redflag.real_laps_down` / `road_order(known)` in the reference sim,
+`realLapsDown` / `roadOrder(known)` in packages/sim/src/redflag.ts). Both sims decided who is a
+lap down in a no-unlapping race's SC queue and red-flag line-up (scUnlap "none": before 2007
+and 2010-11) as `floor(gap / green lap)` on their own gaps. At Monaco 2011, Hamilton was 82.9 s
+behind at the end of lap 68 but on the lead lap (Vettel's next lap was an SC lap). So in most
+runs the sim had him a lap down, and he finished a lap behind. Now an Eras build of such a race
+writes, on each SC and RED event after the takeover, every running car's real laps down, counted
+from lap counts and not gaps. When the leader finished each of the event's laps, a car that had
+completed lap - 2 laps was a lap down. The field keeps the most over the event's laps:
+- A car lapped as the queue formed stays lapped (Monaco 2011's first SC: Heidfeld and Buemi,
+  lapped on its second lap).
+- A car lapped by a leader who then stopped also stays lapped (Monaco 2004: Montoya, lapped by
+  Schumacher, is 0 laps down to Trulli only on the SC's last lap).
+
+The sims take a scripted car's laps down from the field. Excluded are a car whose strategy the
+run overrides and the player's car in live play; a blind grader playout keeps only the events it
+knows. Where the real count is fewer laps than the sim's gap, the car joins the back of the road
+queue (it was really on that lap). Where it is more, the car keeps its road place and loses the
+lap. Switch: `restart.LAPS_DOWN_IN_ERAS_BUILDS = True`.
+
+**2. The restart, diagnosed and refitted** (`restart.fit(baseline="sim")`). M4's fit assumed
+that the sims' restart lap, with no restart term, is the nose-to-tail queue plus dirty air. It
+isn't. The sims' lap noise sorted into a running order, the 0.3 s hold of a failed pass and the
+dirty air already spread the queue. Over the 45 SC restarts after the takeover in the 30 Eras
+races that have one (60 seeds), gap to the leader at the end of the restart lap less that at the
+end of the last SC lap, by place:
+
+| | P2 | P3 | P4 | P5 | P6 | P8 | P11 | P15 |
+|---|---|---|---|---|---|---|---|---|
+| real | 0.98 | 1.58 | 2.37 | 3.14 | 3.21 | 4.47 | 4.19 | 5.32 |
+| sims, no term | 0.82 | 1.25 | 1.69 | 1.97 | 2.18 | 2.48 | 3.04 | 4.54 |
+| sims, M4's term | 1.28 | 2.09 | 2.98 | 3.62 | 4.26 | 5.36 | 6.58 | 8.16 |
+
+So M4's term roughly doubled the spread from P5 back. The car that pays most is one restarting
+from the back of the queue, and so worse placed than it really was. That is the sakhir-2020
+regression: the stop costs put Russell P9 in the sim's queue where he really restarted P5, so he
+paid 3.7 s against the leader (duel RUS vs PER 5.3 -> 8.2). miami-2024 is the same mechanism,
+smaller. Refitted on the same 31 FIT_RACES restarts against the sims' own spread
+(`SIM_RESTART_SPREAD`), the term becomes JUMP -0.25 s, SPREAD 0.14 s a place, PLACES 10:
+-0.11 s for P2, +0.45 s for P6, +1.15 s from P11. Huber loss is 2.60 against 2.77 with no term,
+and the median error +0.07 s against -0.35 s. M4's fit stays as `fit(baseline="analytic")`
+(`M4_JUMP` / `M4_SPREAD` / `M4_PLACES`).
+
+**Results.** Every timed Eras race that either change touches: 30 with an SC restart after the
+takeover, plus saudi-arabia-2021 and azerbaijan-2017, the stop-pricing races, which neither
+change touches (their restarts are standing, or before the takeover). The other timed Eras races
+have no restart lap after the takeover and no `lapsDown`, so they replay exactly as before.
+"Unlap": the race's rule (none = no unlapping, gets `lapsDown`). "=": the column before (no
+`lapsDown` in that race).
+
+| Race | Unlap | Before (both off) | M4 restart | Real laps down | Laps down + refitted restart |
+|---|---|---|---|---|---|
+| abu-dhabi-2012 | all | fail, 1.72s | fail, 2.56s | = | fail, 1.77s |
+| australia-2025 | all | fail, 3.66s | fail, 5.30s | = | fail, 3.83s |
+| austria-2002 | none | pass, 0.63s | pass, 0.60s | pass, 0.63s | pass, 0.59s |
+| azerbaijan-2017 | all | fail, 5.85s | fail, 5.85s | = | fail, 5.85s |
+| azerbaijan-2021 | all | fail, 2.90s | fail, 2.74s | = | fail, 2.81s |
+| bahrain-2014 | all | fail, 1.17s | fail, 1.58s | = | fail, 1.23s |
+| belgium-1998 | none | fail, 5.25s | fail, 4.62s | fail, 5.28s | fail, 5.23s |
+| brazil-2003 | none | fail, 5.75s | fail, 6.66s | fail, 5.75s | fail, 5.68s |
+| brazil-2012 | all | fail, 3.44s | fail, 3.45s | = | fail, 3.45s |
+| brazil-2019 | all | fail, 1.97s | fail, 2.08s | = | fail, 2.00s |
+| canada-2011 | none | fail, 3.02s | fail, 3.52s | fail, 2.90s | fail, 3.14s |
+| europe-2012 | all | fail, 1.46s | fail, 2.35s | = | fail, 1.62s |
+| germany-2000 | none | fail, 2.85s | fail, 2.98s | fail, 2.85s | fail, 2.82s |
+| germany-2018 | all | pass, 1.59s | fail, 1.88s | = | pass, 1.48s |
+| germany-2019 | all | pass, 1.38s | pass, 0.94s | = | pass, 1.32s |
+| great-britain-2022 | all | fail, 2.03s | fail, 2.27s | = | fail, 2.01s |
+| hungary-2006 | none | fail, 15.15s | fail, 15.30s | fail, 14.86s | fail, 14.94s |
+| hungary-2014 | all | fail, 2.73s | fail, 2.92s | = | fail, 2.74s |
+| hungary-2015 | all | fail, 6.90s | fail, 7.23s | = | fail, 6.96s |
+| italy-2020 | all | fail, 2.23s | fail, 2.40s | = | fail, 2.28s |
+| miami-2024 | all | fail, 4.71s | fail, 4.94s | = | fail, 4.77s |
+| monaco-2004 | none | fail, 3.64s | fail, 3.48s | fail, 4.61s | fail, 4.58s |
+| monaco-2008 | all | fail, 4.53s | fail, 4.25s | = | fail, 4.51s |
+| monaco-2011 | none | fail, 15.16s | fail, 18.20s | fail, 5.74s | fail, 5.67s |
+| monaco-2015 | all | fail, 4.71s | fail, 4.33s | = | fail, 4.71s |
+| monaco-2017 | all | fail, 2.98s | fail, 3.45s | = | fail, 2.95s |
+| monaco-2022 | all | fail, 7.49s | fail, 7.26s | = | fail, 7.53s |
+| netherlands-2023 | all | fail, 6.69s | fail, 6.05s | = | fail, 6.55s |
+| sakhir-2020 | all | fail, 2.51s | fail, 3.73s | = | fail, 2.73s |
+| saudi-arabia-2021 | all | fail, 8.56s | fail, 8.56s | = | fail, 8.56s |
+| singapore-2023 | all | fail, 4.00s | fail, 4.50s | = | fail, 4.17s |
+| united-states-2015 | all | fail, 2.31s | fail, 2.17s | = | fail, 2.21s |
+| total (32 races) | | 3 pass, 139.0 s | 2 pass, 148.2 s | 3 pass, 130.1 s | 3 pass, 130.7 s |
+
+- **Real laps down: on.** monaco-2011 goes from 15.16 to 5.74 s. HAM 70 -> 14 s and WEB 27 ->
+  10 s; no run has either a lap down. What is left is KOB, WEB and HAM about 13 s behind the
+  podium against the real 23-27 s. Four lapped cars (SUT, HEI, BAR, BUE) were between BUT and
+  KOB in the real restart queue and held them up. The sims race lapped cars in total-time order,
+  not road order, so a lapped car can't hold up the lead-lap cars behind it on the road. Smaller
+  gains: hungary-2006 -0.29 s, canada-2011 -0.12 s. monaco-2004 goes 3.64 -> 4.61 s (BAR's
+  podium gap 7.6 -> 11.5 s). That is a better replay, not a worse one: before, the sim had
+  Barrichello a lap down in 57% of runs (P4/P5), and the lap made up the time his pace loses.
+  Now he is P3 in every run (really P3, on the lead lap), and the gap error is his pace after
+  the restart (sim 65 s, real 76 s). Sum over the 8 no-unlapping races: 51.5 -> 42.6 s. One
+  reconstructed race also gets `lapsDown`, belgium-1995 (G1 sanity only, anchors unaffected):
+  fail 5.76 -> 6.00 s.
+- **Restart: off** (`restart.IN_ERAS_BUILDS = False`, unchanged). The refit is close to neutral
+  and still slightly worse: 130.7 against 130.1 s, better on 8 races and worse on 10 by more than
+  0.05 s. sakhir-2020 is 2.73 s against 2.51 off (M4's term: 3.73), miami-2024 4.77 against 4.71
+  (4.94). germany-2018 keeps its pass (M4's term failed it). The reason any spread hurts is at
+  the flag. With the term off, the sims' finishing gaps in these races are already too wide
+  behind the leader: the median signed error is +1.2 / +2.0 / +2.4 s at P2 / P3 / P4 and about
+  0 from P6. So a term that matches the restart lap better still widens the finish. That comes
+  from the sims' post-restart pace spread and the stop pricing (sakhir's Russell), not from the
+  restart lap. The refit is committed so that turning the switch on gives the measured term once
+  those are fixed.
+- Not changed: the queue at the end of the last SC lap is wider in the real races than the sims'
+  nose-to-tail 0.5 s a car (P2 1.16 s, P10 7.25 s against 0.52 s and 4.56 s). Widening it would
+  widen the finish too, for the same reason.
+
+**Tests.** `pipeline/tests/test_laps_down.py` (new: the count, the most over the event, the road
+order and line-up with known laps down, the overridden cars, monaco-2011's Hamilton, and the
+parity vectors `pipeline/tests/fixtures/laps_down_parity.json`, new: monaco-2011 with its
+`lapsDown`, 8 seeds, plus 8 with HAM's strategy passed in) and
+`packages/sim/tests/laps-down.test.ts` (new: parity, roadOrder / lineUp / realLapsDown). The
+committed restart fit test now refits on the sim baseline.
+
+**Stale fixtures and files.** `pipeline/tests/fixtures/scripted_parity.json` was regenerated
+(`SCRIPTED_PARITY_WRITE=1`): it carries `restart.track_block()`, whose numbers the refit changed.
+`test_build_reconstructed.py::test_wet_builds_match_the_committed_race_files[belgium-1995]`
+fails until the rebuild (expected): its fresh build gains `lapsDown` on its SC event, and the
+only difference from the committed file is that field. Rebuilding the eight no-unlapping timed
+Eras races (monaco-2004, germany-2000, hungary-2006, monaco-2011, canada-2011, austria-2002,
+brazil-2003, belgium-1998) and belgium-1995 writes `lapsDown` into their files and goldens.
+
+## Eras model fix 1.6: cars with no dry laps
+
+Nov 8 2026, by hand. A car that ran only wet laps before it retired (or up to the takeover) had
+no dry lap for `build.dry_fit` to fit, so `assemble` dropped it (`set(takeover_state) &
+set(fit.driver_pace)`). That blocked china-2007 (the user's car, HAM; SCH and SUT too) and lost
+running cars in hungary-2006 and malaysia-2001 (5.1 above).
+
+**Method** (`wet.estimated_dry_pace`, `build.with_estimated_pace`; Eras builds of real-timing
+races only, so Daily/Gauntlet files are untouched). Each car running at the takeover with no
+dry pace gets one, estimated after the weather timeline is fitted without it:
+1. *Its wet laps against the wet model.* On each racing lap (accurate, green, no pit, clear air
+   where it has 3 such laps), dry = lap time / (1 + the curve's penalty + the field's offset).
+   The field's offset is the median share beyond the curves of the cars with a dry pace on the
+   same lap and tyre class. A car's own wet offset can't be told from its dry pace, so it is
+   shrunk all the way to the field's. The estimate is the median over its laps.
+2. *Blended with the car's pace*: 0.4 x (1) + 0.6 x its team-mate's dry pace. The weight is a
+   leave-one-out over the 27 wet Eras races (391 cars with a fitted dry pace and a team-mate,
+   each re-estimated from its wet-period laps with its own pace removed): rms error 1.29 s from
+   its wet laps alone, 1.18 s from its team-mate alone, 0.95 s blended at 0.4 (0.3-0.5 within
+   0.03 s; the two errors correlate 0.17).
+3. With fewer than 3 laps, the team-mate's pace alone; with no team-mate either, the field's
+   median. Noise is the field's median.
+The car's `wetPace` / `dampPace` (M1) then come from its wet laps against that pace, so its
+wet laps still replay as it ran them. Provenance lists `driverPace` (new schema enum value,
+additive), and the build report names each car, its laps and its blend. An Eras build now fails
+if a car running at the takeover is missing from the model. Not for a reconstructed race (its
+laps are the solver's): belgium-1992 still drops BOUT (reported, not fixed). The nearest dry
+race of the season wasn't used (not needed: every estimated car had wet laps or a team-mate).
+
+**Robust G1, before / after** (1,000 runs on each of two seed sets; rebuilt to a scratch
+directory, committed files not changed):
+
+| Race | Cars | Status | Mean gap error | Failing checks after |
+|---|---|---|---|---|
+| hungary-2006 | 15 -> 19 (FIS, LIU, RAI, ROS) | fail -> fail | 15.15 -> 15.07 s | duel BUT vs DLR 21.54 / 20.72 [3.00]; podium DLR 21.54 / 20.72, HEI 24.62 / 25.40 [5.00]; field BAR 8.31 / 7.90 [5.00] |
+| malaysia-2001 | 14 -> 15 (FIS) | fail -> fail | 9.92 -> 9.23 s | duel MSCM vs BAR 16.89 / 16.55 [3.00]; podium BAR 16.89 / 16.55, COU 9.01 / 9.30 [5.00]; field FRE 11.52 / 11.60, HAK 6.28 / 6.25 [5.00]. the podium order rate (0.50 / 0.50 [0.50] before) now passes |
+| china-2007 | 18 -> 21 (HAM, SCH, SUT) | fail -> fail | 7.30 -> 7.51 s | field VET 24.64 / 24.61 [5.35], BUT 16.11 / 16.37 [6.87]; duel not scored (HAM DNF) |
+
+The two rebuilt races still fail on wet pace (5.1's diagnoses: Button's inter pace and de la
+Rosa's dry-labelled stint; Ferrari's inters against the full wets), not on the dropped cars.
+china-2007's estimated dry paces: HAM 100.84 s (his 27 laps 100.60, ALO 101.00), SCH 102.67,
+SUT 104.89. Its race and golden files are committed; `live-replay.test.ts` (the real calls)
+and `parity.test.ts` pass on it.
+
+**Other Eras race files the fix changes once rebuilt** (not rebuilt here): australia-2025 (ALO),
+monaco-2016 (MAG, VER), germany-2019 (HUL, LEC, NOR, RIC), canada-2011 (ALO, KOV, SUT),
+netherlands-2023 (SAR), monaco-2022 (MAG, MSC; MAG on the field median), monaco-2008 (FIS, PIQ),
+europe-2007 (WIN), great-britain-2016 (GRO), with hungary-2006 and malaysia-2001. No
+Daily/Gauntlet file or golden changes.

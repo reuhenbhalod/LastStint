@@ -75,6 +75,11 @@ export interface CompoundModel {
   cliffLap: number;
   /** Extra seconds per lap of tyre age past cliffLap; absent when no cliff was fitted. */
   cliffDegPerLap?: number;
+  /**
+   * Seconds per lap of tyre wear squared (Eras model fix S4): the lap costs degQuad x wear^2 on
+   * top of the linear wear, so a long stint falls off late. Absent: linear wear.
+   */
+  degQuad?: number;
   /** The longest stint run on it in the real race: its life is at least this (tyre-life fix 2). */
   provenLaps?: number;
 }
@@ -156,6 +161,11 @@ export interface RaceEvent {
   slowLap?: number;
   /** A FAULT that lasts until the car's next stop (new tyres fix a puncture). */
   untilStop?: boolean;
+  /**
+   * An SC or RED event of a no-unlapping race (Eras builds): each running car's real laps down
+   * (the most it was at the end of any of the event's laps). A scripted car's lapped status in the queue comes from it.
+   */
+  lapsDown?: Record<string, number>;
 }
 
 // Eras mode (eras spec sections 6, 8 and 11; schema v11). Types and validation only: the
@@ -335,7 +345,14 @@ export interface RestartModel {
 }
 
 /** Fields estimated rather than measured (eras build plan 2.4). */
-export const ESTIMATED_FIELDS = ['compounds', 'safetyCars', 'fuelLoads', 'weather'] as const;
+export const ESTIMATED_FIELDS = [
+  'compounds',
+  'safetyCars',
+  'fuelLoads',
+  'weather',
+  // A car that ran only wet laps: its dry pace from its wet laps (or its team-mate's).
+  'driverPace',
+] as const;
 export type EstimatedField = (typeof ESTIMATED_FIELDS)[number];
 
 /** Where the race's data came from. Absent: real, nothing estimated. */

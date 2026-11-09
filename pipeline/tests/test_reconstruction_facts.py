@@ -87,7 +87,8 @@ def test_stops_name_cars_in_the_race(race_id):
     anchors = rc.load_anchors(race_id, dump_dir=dump, **LOOKUP.get(race_id, {}))
     facts = json.loads(rc.facts_path(race_id).read_text())
     if rc.race_year(race_id) < 1994:
-        entered = sum(len(c.stops) for c in anchors.cars)
+        # weather.slickChange adds estimated stops (brazil-1993): not entered ones.
+        entered = sum(not s.estimated for c in anchors.cars for s in c.stops)
         dropped = [n for n in anchors.notes if "retired on; not run" in n]
         assert entered + len(dropped) == len(facts["stops"])
         assert not dropped, f"stops after the car's last lap: {dropped}"
@@ -138,7 +139,22 @@ def test_monaco_1984_places_the_disqualified_bellof_on_the_road():
     assert rc.road_order(anchors)[:4] == [winner.driver, "SENA", bel.driver, "ARN"]
 
 
-@pytest.mark.parametrize("race_id", [r for r in RACES if r != "monaco-1984"])
+def test_france_1990_places_the_disqualified_de_cesaris_on_the_road():
+    """De Cesaris (#22, underweight, 78 laps) is listed between Larini (14th) and Brabham (15th)
+    in GrandPrix.com's results: 15th on the road, no gap sourced."""
+    (item,) = rc.load_facts("france-1990")["roadPositions"]
+    assert item["number"] == 22 and item["position"] == 15 and item["gap"] is None
+    assert "grandprix.com" in item["source"]
+    dump = _dump()
+    if dump is None:
+        pytest.skip("no Jolpica dump cached")
+    anchors = rc.load_anchors("france-1990", dump_dir=dump, **LOOKUP.get("france-1990", {}))
+    dec = next(c for c in anchors.cars if c.number == 22)
+    assert dec.status == "disqualified" and not dec.classified and dec.road_position == 15
+    assert rc.road_order(anchors)[12:16] == ["MOD", "LAR", dec.driver, "BRA"]
+
+
+@pytest.mark.parametrize("race_id", [r for r in RACES if r not in ("monaco-1984", "france-1990")])
 def test_no_other_race_places_a_car_on_the_road(race_id):
     assert not rc.load_facts(race_id).get("roadPositions")
 

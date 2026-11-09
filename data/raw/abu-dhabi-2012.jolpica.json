@@ -829,7 +829,8 @@
      "gapBefore": 9.8,
      "gapAfter": 3.0,
      "reasons": [],
-     "status": "unchecked"
+     "status": "confirmed",
+     "source": "https://en.wikipedia.org/wiki/2012_Abu_Dhabi_Grand_Prix: Rosberg hit Karthikeyan, 'the intervention of the safety car on lap nine'; 'Racing resumed at the end of lap 14 when the safety car drove into the pit lane'"
     },
     {
      "startLap": 39,
@@ -841,7 +842,8 @@
      "gapBefore": 32.6,
      "gapAfter": 3.4,
      "reasons": [],
-     "status": "unchecked"
+     "status": "confirmed",
+     "source": "https://en.wikipedia.org/wiki/2012_Abu_Dhabi_Grand_Prix: 'On lap 39' Grosjean and Webber collided, 'the debris on-track from the accident called for the second safety car period of the race'; 'once the safety car came in on the end of lap 42'"
     }
    ],
    "handCheck": "data/estimates/abu-dhabi-2012.sc.json"

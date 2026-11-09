@@ -11,20 +11,21 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 | retirement | 13 | 13 |
 | retirement event | 13 | 13 |
 | laps down | 7 | 7 |
-| stop | 18 | 18 |
+| stop | 28 | 28 |
 | tyre | 38 | 38 |
 | safety car | 1 | 1 |
 | leader | 3 | 3 |
-| running order | 1 | 1 |
+| running order | 4 | 4 |
+| lap gap | 2 | 2 |
 
 | Anchor | Subject | Target | Achieved | Pass |
 |---|---|---|---|---|
 | grid | lap-1 order is the grid order | 21 cars: PRO HIL SENA MSCM PAT JAR WEN ALE BLU ALL HER BAR ZAN COM WAR SUZ FITC BAD KAT DEC ALBM | 21 cars: PRO HIL SENA MSCM PAT JAR WEN ALE BLU ALL HER BAR ZAN COM WAR SUZ FITC BAD KAT DEC ALBM | pass |
 | order | classification | 12 cars: SENA HIL MSCM HER BLU ZAN ALL ALE WAR COM ALBM BAD | 12 cars: SENA HIL MSCM HER BLU ZAN ALL ALE WAR COM ALBM BAD | pass |
-| gap | HIL | 16.625 | 16.629 | pass |
-| gap | MSCM | 45.436 | 45.439 | pass |
-| gap | HER | 46.557 | 46.555 | pass |
-| gap | BLU | 52.127 | 52.133 | pass |
+| gap | HIL | 16.625 | 16.621 | pass |
+| gap | MSCM | 45.436 | 45.429 | pass |
+| gap | HER | 46.557 | 46.552 | pass |
+| gap | BLU | 52.127 | 52.123 | pass |
 | fastest | SENA | [80.187, 59] | [80.187, 59] | pass |
 | fastest | HIL | [80.794, 53] | [80.794, 53] | pass |
 | fastest | MSCM | [80.024, 61] | [80.024, 61] | pass |
@@ -88,15 +89,25 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 | stop | HER | 27 | 27 | pass |
 | stop | HER | 37 | 37 | pass |
 | stop | BLU | 28 | 28 | pass |
+| stop | BLU (estimated lap) | 40 | 40 | pass |
 | stop | ZAN | 28 | 28 | pass |
+| stop | ZAN (estimated lap) | 40 | 40 | pass |
 | stop | ALL | 27 | 27 | pass |
+| stop | ALL (estimated lap) | 40 | 40 | pass |
 | stop | ALE | 30 | 30 | pass |
+| stop | ALE (estimated lap) | 40 | 40 | pass |
 | stop | WAR | 28 | 28 | pass |
+| stop | WAR (estimated lap) | 40 | 40 | pass |
 | stop | COM | 28 | 28 | pass |
+| stop | COM (estimated lap) | 40 | 40 | pass |
 | stop | ALBM | 27 | 27 | pass |
+| stop | ALBM (estimated lap) | 40 | 40 | pass |
 | stop | BAD | 28 | 28 | pass |
+| stop | BAD (estimated lap) | 40 | 40 | pass |
 | stop | JAR | 28 | 28 | pass |
+| stop | JAR (estimated lap) | 40 | 40 | pass |
 | stop | DEC | 27 | 27 | pass |
+| stop | DEC (estimated lap) | 40 | 40 | pass |
 | tyre | SENA stint 1 | slick | ["None"] | pass |
 | tyre | SENA stint 2 | wet | ["WET"] | pass |
 | tyre | SENA stint 3 | slick | ["None"] | pass |
@@ -140,6 +151,11 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 | leader | HIL laps 30-41 | 12 laps | 12 of 12 laps | pass |
 | leader | SENA laps 42-71 | 30 laps | 30 of 30 laps | pass |
 | running order | lap 11 | ["PRO", "HIL", "SENA"] | ["PRO", "HIL", "SENA"] | pass |
+| running order | lap 39 | ["HIL", "SENA"] | ["HIL", "SENA"] | pass |
+| lap gap | SENA at lap 39 (+/-1s) | 2.9 | 3.306 | pass |
+| running order | lap 43 | ["SENA", "HIL", "HER"] | ["SENA", "HIL", "HER"] | pass |
+| running order | lap 47 | ["SENA", "HIL"] | ["SENA", "HIL"] | pass |
+| lap gap | HIL at lap 47 (+/-0.5s) | 0.199 | 0.693 | pass |
 
 ## Estimated
 
@@ -152,27 +168,44 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 - Weather: each lap's wetness from the facts file's sourced timeline (track states as wetness: {'dry': 0.0, 'damp': 0.15, 'wet': 0.45, 'heavy': 0.65}; ramps between sourced points are linear)
 - Wet laps: the dry lap x (1 + the stint tyre's penalty at that wetness), the weather model's curves (data/wet.json); tyre wear at wet.wear_mult
 - Compound: WET / INTERMEDIATE on wet-tyre stints, slick stints left empty (step 2.4's dry compound); a stint no source names gets the tyre that loses least over its laps
+- Slick stops on lap 40 estimated for ALBM ALE ALL BAD BLU COM DEC JAR WAR ZAN: a source says the field changed back to slicks (weather.slickChange) but not on which lap; the lap is the median of the sourced slick stops in that window
 - Stops: only the sourced ones; cars may have stopped more (unknown)
 
 ## Notes
 
-- the laps behind the safety car did not settle
-- HIL: target 6692.1s not reachable
+- BLU: slick stop on lap 40 estimated (the field changed to slicks in laps 37-43; no source gives this car's lap)
+- ZAN: slick stop on lap 40 estimated (the field changed to slicks in laps 37-43; no source gives this car's lap)
+- ALL: slick stop on lap 40 estimated (the field changed to slicks in laps 37-43; no source gives this car's lap)
+- ALE: slick stop on lap 40 estimated (the field changed to slicks in laps 37-43; no source gives this car's lap)
+- WAR: slick stop on lap 40 estimated (the field changed to slicks in laps 37-43; no source gives this car's lap)
+- COM: slick stop on lap 40 estimated (the field changed to slicks in laps 37-43; no source gives this car's lap)
+- ALBM: slick stop on lap 40 estimated (the field changed to slicks in laps 37-43; no source gives this car's lap)
+- BAD: slick stop on lap 40 estimated (the field changed to slicks in laps 37-43; no source gives this car's lap)
+- JAR: slick stop on lap 40 estimated (the field changed to slicks in laps 37-43; no source gives this car's lap)
+- DEC: slick stop on lap 40 estimated (the field changed to slicks in laps 37-43; no source gives this car's lap)
 - SENA: target 6675.5s not reachable
+- HIL: target 6692.1s not reachable
 - MSCM: target 6720.9s not reachable
 - HER: target 6722.0s not reachable
 - BLU: target 6727.6s not reachable
-- ZAN: target 6692.0s not reachable
-- ALL: target 6708.0s not reachable
-- ALE: target 6724.0s not reachable
-- WAR: target 6697.5s not reachable
-- COM: target 6719.0s not reachable
-- ALBM: target 6697.6s not reachable
-- BAD: target 6719.2s not reachable
-- ZAN: target 6676.0s not reachable
-- ALL: target 6676.5s not reachable
-- ALE: target 6677.0s not reachable
+- ZAN: target 6684.2s not reachable
+- ALL: target 6729.8s not reachable
+- ALE: target 6730.3s not reachable
+- WAR: target 6676.2s not reachable
+- COM: target 6676.7s not reachable
+- ALBM: target 6680.7s not reachable
+- BAD: target 6681.2s not reachable
+- ZAN: target 6687.0s not reachable
+- ALL: target 6732.6s not reachable
+- ALE: target 6733.1s not reachable
+- WAR: target 6679.8s not reachable
+- COM: target 6680.3s not reachable
+- ALBM: target 6676.0s not reachable
+- BAD: target 6683.1s not reachable
+- ZAN: target 6683.0s not reachable
+- ALL: target 6728.7s not reachable
+- ALE: target 6729.2s not reachable
 - WAR: target 6676.0s not reachable
 - COM: target 6676.5s not reachable
-- ALBM: target 6676.0s not reachable
 - BAD: target 6676.5s not reachable
+- the sourced running order could not be held on every lap (see the report)

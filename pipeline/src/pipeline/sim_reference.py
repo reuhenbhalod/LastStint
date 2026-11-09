@@ -152,6 +152,8 @@ def _clean_lap(
     c = compounds[car.compound]
     wear = car.tyre_wear
     t = car.base_pace + car.stint_pace + c["offset"] + c["degPerLap"] * wear - fuel_per_lap * lap
+    if "degQuad" in c:  # Eras model fix S4: wear that grows with the set's age (wear_shape.py)
+        t += c["degQuad"] * wear * wear
     if fresh:
         t += fresh["bonus"] * fresh_weight_sim(car.tyre_age, fresh["laps"])
     if wear > c["cliffLap"]:  # past the cliff: wear accelerates
@@ -317,6 +319,8 @@ def simulate(
     orders = team_orders(model["events"])  # scripted team orders and let-bys (TEAM_ORDER)
     restart_block = track.get("restart")  # the SC restart's jump and spread (restart.py)
     red = redflag.plan(events)  # free stops in the stoppage, gaps wiped at the restart
+    # A no-unlapping race's SC and red-flag queues: the scripted cars' real laps down (job 1.5).
+    known_down = redflag.real_laps_down(events, set(strategies or {}))
 
     ordered = sorted(model["drivers"], key=lambda d: d["stateAtTakeover"]["position"])
     cars: dict[str, Car] = {}
@@ -447,7 +451,15 @@ def simulate(
                 # Deployment lap: gaps kept (delta time). Middle laps: each gap keeps
                 # SC_GAP_KEEP of its excess. Last lap before the restart: nose-to-tail.
                 keep = 0.0 if neutral.get(lap + 1) != "SC" else SC_GAP_KEEP
-                _bunch(live, cars, green, keep, race_rules.sc_queue(model), "rules" in model)
+                _bunch(
+                    live,
+                    cars,
+                    green,
+                    keep,
+                    race_rules.sc_queue(model),
+                    "rules" in model,
+                    known_down.get(lap),
+                )
                 live = sorted(live, key=lambda c: cars[c].total_time)
                 order[:] = live + [c for c in order if cars[c].retired]
         else:
@@ -456,7 +468,9 @@ def simulate(
         wipe = red["wipes"].get(lap)
         if wipe and neutral.get(wipe[1]) == "RED":
             unlap = race_rules.sc_queue(model) != "none"
-            redflag.line_up(active_codes(), cars, wipe[0], None if unlap else green)
+            redflag.line_up(
+                active_codes(), cars, wipe[0], None if unlap else green, known_down.get(lap)
+            )
 
     return _classify(order, cars)
 
@@ -520,6 +534,7 @@ def _bunch(
     keep: float,
     duel: tuple[str, str] | str | None,
     eras: bool = False,
+    known: dict[str, int] | None = None,
 ) -> None:
     """Close the SC queue: each gap keeps `keep` of its excess over BUNCH_GAP (nose-to-tail on
     the last lap). By the rules every lapped car unlaps and joins the back of the queue, so
@@ -530,11 +545,13 @@ def _bunch(
 
     An Eras race (`eras`: it has a rules block) closes a middle lap gap by gap (_close_gaps,
     the fit of sc_queue.py). With scUnlap "none" (no unlapping: before 2007 and 2010-11) the
-    lapped cars stay in the queue where they are on the road, a lap down (_bunch_road)."""
+    lapped cars stay in the queue where they are on the road, a lap down (_bunch_road).
+    `known` (redflag.real_laps_down): the scripted cars' real laps down, which win over their
+    gaps (redflag.road_order)."""
     if not live:
         return
     if duel == "none" and lap_time:
-        _bunch_road(live, cars, lap_time, keep, eras)
+        _bunch_road(live, cars, lap_time, keep, eras, known)
         return
     if duel is None and eras and keep > 0.0:
         _close_gaps(live, cars)
@@ -545,9 +562,13 @@ def _bunch(
             excess = max(0.0, car.total_time - ahead.total_time - BUNCH_GAP)
             car.total_time = ahead.total_time + BUNCH_GAP + keep * excess
         return
-    lead = cars[live[0]].total_time
-    down = {c: math.floor((cars[c].total_time - lead) / lap_time) if lap_time else 0 for c in live}
-    on_track = {c: cars[c].total_time - lead - down[c] * (lap_time or 0.0) for c in live}
+    if lap_time:
+        _, down, on_track = redflag.road_order(live, cars, lap_time, known)
+    else:
+        down, on_track = (
+            dict.fromkeys(live, 0),
+            {c: cars[c].total_time - cars[live[0]].total_time for c in live},
+        )
     lead_lap = [c for c in live if down[c] == 0]
     waved: list[str] = []
     # scUnlap "none" (race_rules.sc_queue): the lead lap closes up, nobody is waved through.
@@ -580,14 +601,19 @@ def _close_gaps(live: list[str], cars: dict[str, Car]) -> None:
 
 
 def _bunch_road(
-    live: list[str], cars: dict[str, Car], lap_time: float, keep: float, eras: bool
+    live: list[str],
+    cars: dict[str, Car],
+    lap_time: float,
+    keep: float,
+    eras: bool,
+    known: dict[str, int] | None = None,
 ) -> None:
     """No unlapping (scUnlap "none"): the whole queue closes up in road order, lapped cars
     where they are on the road, and each keeps its laps down. Middle laps close as the race's
     queue does (gap by gap for an Eras race, else `keep` car by car as in _bunch); the last
     lap (keep 0) is nose-to-tail."""
     lead = cars[live[0]].total_time
-    road, down, on_road = redflag.road_order(live, cars, lap_time)
+    road, down, on_road = redflag.road_order(live, cars, lap_time, known)
     placed = {road[0]: on_road[road[0]]}
     for i in range(1, len(road)):
         ahead, car = road[i - 1], road[i]

@@ -117,7 +117,7 @@ describe('gradeMoment', () => {
 describe('sensible-strategist continuation', () => {
   it('plans the best legal stop (Spain lap 23: VER has only run softs, so not softs again)', () => {
     // Without the two-compound rule the planner preferred lap 33 for softs, which is illegal.
-    expect(planRemainingStop(pausedAt(spain, 23))).toEqual({ lap: 35, to: 'MEDIUM' });
+    expect(planRemainingStop(pausedAt(spain, 23))).toEqual({ lap: 34, to: 'MEDIUM' });
   });
 
   it('plans no stop when one would not pay before the flag', () => {
@@ -129,9 +129,9 @@ describe('sensible-strategist continuation', () => {
     // Eras continuation (below).
     const run = pausedAt(daily(spain), 23);
     const fork = playOption(run, 1, { id: 'stay-out', decisions: [] });
-    expect(fork.state.cars.VER?.strategy).toEqual([{ lap: 35, to: 'MEDIUM', added: true }]);
+    expect(fork.state.cars.VER?.strategy).toEqual([{ lap: 34, to: 'MEDIUM', added: true }]);
     while (!isFinished(fork)) stepLap(fork);
-    expect(fork.state.cars.VER?.tyreAge).toBe(spain.race.laps - 35 + 1);
+    expect(fork.state.cars.VER?.tyreAge).toBe(spain.race.laps - 34 + 1);
   });
 });
 

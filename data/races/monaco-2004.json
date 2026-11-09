@@ -586,7 +586,19 @@
     {
       "lap": 44,
       "type": "SC",
-      "laps": 3
+      "laps": 3,
+      "lapsDown": {
+        "BAR": 0,
+        "BAU": 3,
+        "BUT": 0,
+        "DAMC": 1,
+        "HEI": 1,
+        "MAS": 1,
+        "MON": 1,
+        "PAN": 2,
+        "SCH": 2,
+        "TRU": 0
+      }
     },
     {
       "lap": 45,

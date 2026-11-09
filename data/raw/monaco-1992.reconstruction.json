@@ -75,7 +75,7 @@
  "solver": {
   "attempts": 1,
   "sigma": 0.35,
-  "passed": false
+  "passed": true
  },
  "fitted": {
   "SENA": {
@@ -231,7 +231,7 @@
  },
  "summary": {
   "grid": {
-   "pass": 0,
+   "pass": 1,
    "total": 1
   },
   "order": {
@@ -278,7 +278,7 @@
  "anchors": [
   {
    "anchor": "grid",
-   "subject": "lap-1 order is the grid order (the sourced lap-1 order at the front)",
+   "subject": "lap-1 order is the grid order (the sourced lap-1 order at the front) (out after lap 1, at its sourced time: MOR WEN)",
    "target": [
     "MAN",
     "SENA",
@@ -291,11 +291,9 @@
     "HER",
     "DEC",
     "ALBM",
-    "MOR",
     "GUG",
     "HAK",
     "GAC",
-    "WEN",
     "FITC",
     "SUZ",
     "JAR",
@@ -329,11 +327,9 @@
     "COM",
     "GROO",
     "TAR",
-    "MOE",
-    "WEN",
-    "MOR"
+    "MOE"
    ],
-   "pass": false
+   "pass": true
   },
   {
    "anchor": "order",
@@ -1025,6 +1021,8 @@
  ],
  "notes": [
   "MOR: fastest lap on lap 1, its lap-1 time is the fastest lap's",
-  "WEN: fastest lap on lap 1, its lap-1 time is the fastest lap's"
+  "MOR: out after lap 1, its lap-1 place is its sourced time's",
+  "WEN: fastest lap on lap 1, its lap-1 time is the fastest lap's",
+  "WEN: out after lap 1, its lap-1 place is its sourced time's"
  ]
 }

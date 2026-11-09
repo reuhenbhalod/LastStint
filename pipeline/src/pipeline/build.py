@@ -37,6 +37,7 @@ from . import (
     wet_laps,
 )
 from . import pace as pace_mod
+from . import wear_shape as wear_shape_mod
 from .paths import DATA_DIR, RACES_DIR, RAW_DIR
 
 # Authored Eras content (eras build plan, "Eras overlay files"): data/eras/<race-id>.json,
@@ -1412,13 +1413,12 @@ RACES: dict[str, dict] = {
         "rival": "HIL",  # win: Senna in the rain; Hill the car behind at the flag
         "score_positions": 6,
         "split": "eras",
-        # Anchors pass, but the synthetic race isn't the real one (docs/g1-report.md, 5.5): no
-        # source gives the field's slick stops, so eight cars run wets on a dry track for the
-        # last 30 laps and the solver gives them dry pace up to 9.5 s a lap quicker than
-        # Senna's, who is P14 at the takeover; with his real calls he wins 0 of 20 live runs.
-        # No race file is committed until the stops are sourced or the solver changes (owner).
-        "data_issue": "synthetic race unlike the real one (unsourced slick stops; Senna P14 at"
-        " the takeover, can't win with his real calls)",
+        # Built from Nov 8 2026 (was a data issue, docs/g1-report.md, 5.5: no source gives the
+        # field's slick stops, so eight cars ran wets on a dry track for the last 30 laps and
+        # Senna was P14 at the takeover). The facts file's weather.slickChange (GPE, Wikipedia:
+        # everyone changed to slicks, laps 37-43) gives those cars an estimated slick stop
+        # (reconstruct.apply_slick_change), and Motor Sport's lap-39/43/47 order holds Senna
+        # P3 at the takeover, Hill ahead until the stops, Herbert third after them.
     },
     "europe-1993": {
         "year": 1993,
@@ -2312,6 +2312,41 @@ def solver_dry_fit(recon: dict, laps: pd.DataFrame | None = None) -> fit.LapTime
     )
 
 
+def running_at(laps: pd.DataFrame, takeover: int) -> set[str]:
+    """The cars running at the takeover (a position and a tyre on the takeover lap): the race
+    model's cars."""
+    state = scenario.state_at_takeover(laps, takeover)
+    return {c for c, s in state.items() if s["position"] is not None and s["compound"] is not None}
+
+
+def with_estimated_pace(
+    laps: pd.DataFrame, weather: dict | None, fitted: fit.LapTimeFit, takeover: int
+) -> tuple[fit.LapTimeFit, list[str]]:
+    """Model fix 1.6 (Eras builds): `fitted` with a dry pace for each car running at the
+    takeover that has none (it ran only wet laps: dry_fit fits on the dry ones), estimated by
+    wet.estimated_dry_pace, and the build report's lines (provenance: driverPace). A car with
+    no pace would be dropped from the model (assemble)."""
+    missing = sorted(running_at(laps, takeover) - set(fitted.driver_pace))
+    if not missing:
+        return fitted, []
+    est = wet.estimated_dry_pace(laps, weather, fitted, missing)
+    lines = [
+        f"estimated: driverPace ({', '.join(missing)}: no dry lap to fit; model fix 1.6)",
+        *(
+            f"  dry pace {d} {p:.3f} s (noise {n:.3f}): {how}"
+            for d, (p, n, how) in sorted(est.items())
+        ),
+    ]
+    return (
+        replace(
+            fitted,
+            driver_pace={**fitted.driver_pace, **{d: p for d, (p, _, _) in est.items()}},
+            driver_noise={**fitted.driver_noise, **{d: n for d, (_, n, _) in est.items()}},
+        ),
+        lines,
+    )
+
+
 def dry_fit(
     race_id: str,
     laps: pd.DataFrame,
@@ -2319,11 +2354,13 @@ def dry_fit(
     fault_facts: list[dict] | None = None,
     raw_dir: Path = RAW_DIR,
     recon: dict | None = None,
+    quad_priors: dict | None = None,
 ) -> DryFit:
     """The dry lap model. A refuelling race's `laps` carry the Tank and FuelLap columns
     (refuel.with_fuel_columns): the fuel term is fitted on the sim's sawtooth. `recon`: a
     reconstructed race's sidecar (load_reconstruction); wet on every lap, it gives the dry
-    pace instead (solver_dry_fit). A real-timing race wet on every lap can't be built."""
+    pace instead (solver_dry_fit). A real-timing race wet on every lap can't be built.
+    `quad_priors` (Eras builds, wear_shape.quad_priors): quadratic wear per dry compound."""
     clean_df, traffic_df, _ = clean.clean_laps(laps)
     # A faulted car's laps while the fault lasts aren't its pace (faults.py fits the loss).
     clean_df = faults.without_fault_laps(clean_df, fault_facts or [], laps)
@@ -2364,6 +2401,7 @@ def dry_fit(
         fallback_pace_laps=pace_laps,
         era=era,
         fixed_fuel=wet.FUEL_PRIOR if wet_race else None,
+        quad_priors=quad_priors,
     )
     return DryFit(clean_df, traffic_df, fitted, rain_data, wet_race)
 
@@ -2490,12 +2528,18 @@ def build_race(
     *,
     eras_dir: Path = ERAS_DIR,
     pools_path: Path = POOLS_PATH,
+    wet_inputs: list | None = None,
+    wear_shape: bool = True,
 ) -> BuildResult:
     """Build a validated race-model dict for a registered race (or an ingested Jolpica one),
     with its build notes, its estimates applied as provenance and its Eras overlay, unless it
     is a Daily or Gauntlet race (`shared_races`): its overlay stays out of its file.
     `raw_dir`: where its snapshot lives; `fault_facts`: its car faults (default: its FAULT
-    items in data/incidents.json); `pools_path`: the pools file naming the shared races."""
+    items in data/incidents.json); `pools_path`: the pools file naming the shared races.
+    `wet_inputs`: a list that an Eras build of a timed wet race appends its (laps, weather
+    records, dry model) to, for the Eras wet-curve fit (`pipeline wet-fit --eras`).
+    `wear_shape`: False leaves out Eras model fix S4's quadratic wear (wear_shape.py measures
+    races without it)."""
     if laps is None:
         laps = pd.read_parquet(ingest.raw_snapshot_path(race_id, raw_dir))
     # Red flags (eras build plan 4.3): a race ended under the red flag ends at its results
@@ -2524,6 +2568,14 @@ def build_race(
     overlay = load_overlay(race_id, eras_dir)
     shared = overlay is not None and race_id in shared_races(pools_path)
     refuelling = refuelling_race(race_id, block, overlay, shared)
+    # Eras builds (a race whose file takes its Eras overlay; never a Daily/Gauntlet race, whose
+    # file must replay as it is). See the fixes listed below.
+    eras_build = overlay is not None and not shared
+    # Eras model fix S4 (wear_shape.py): quadratic wear per dry compound, shrunk to the track
+    # and era's. Real timing only (a reconstruction's laps are solved to a linear wear).
+    quad_priors, shape_note = None, None
+    if eras_build and recon is None and wear_shape:
+        quad_priors, shape_note = wear_shape_mod.quad_priors(race_id, meta["era"])
     refuel_fit = refuel_slope = None
     if refuelling:
         # Eras build plan 4.2: every fuel term reads the tank the sim carries (to the next
@@ -2535,7 +2587,7 @@ def build_race(
             race_id, sidecar.get("results"), Path(raw_dir) / "f1db"
         )
 
-    dry = dry_fit(race_id, laps, meta["era"], fault_facts, raw_dir, recon)
+    dry = dry_fit(race_id, laps, meta["era"], fault_facts, raw_dir, recon, quad_priors)
     clean_df, traffic_df, fitted = dry.clean, dry.traffic, dry.fitted
     weather = wet.weather_block(laps, dry.rain, fitted, wet.load_curves()) if dry.wet else None
     # Eras sim fixes (a race whose file takes its Eras overlay; never a Daily/Gauntlet race,
@@ -2544,16 +2596,35 @@ def build_race(
     # counted once; stops on partly yellow laps priced in the sim frame), and driver pace by
     # track state (model fix M1: damp and wet pace from clear-air laps against the field, and
     # the race's full wets against its inters; real lap timing only).
-    eras_build = overlay is not None and not shared
     damp_pace = None
+    takeover = meta["takeover_lap"]
+    if takeover is None:
+        takeover = scenario.default_takeover_lap(
+            laps,
+            events.extract_events(laps),
+            [meta["user_side"], meta["rival"]],
+        )
+    pace_lines: list[str] = []
     # Not a reconstructed race: its laps are solved to the anchors, so a driver's pace against
     # the field on a lap would read back the solver's noise (as with its faults, above).
     if weather and eras_build and recon is None:
+        # Eras model fix 1.3: the Eras wet curves (data/wet-eras.json), refitted on the Eras
+        # wet races' mixed-tyre laps (wet.fit_eras_curves); the timeline follows them.
+        if wet_inputs is not None:
+            wet_inputs.append((laps, dry.rain, fitted))
+        weather = wet.eras_weather_block(laps, dry.rain, fitted)
         shift = wet.wet_tyre_shift(laps, weather, fitted)
         if shift:  # the race tells full wets from inters: its own wet curve, and timeline
             weather = wet.weather_block(
                 laps, dry.rain, fitted, wet.shifted_curves(weather["curves"], shift)
             )
+    if eras_build and recon is None:
+        # Model fix 1.6: a car still running at the takeover with no dry lap (wet laps only)
+        # takes an estimated dry pace, after the weather is fitted (without it) and before
+        # the wet pace (its own then measured against it). Not a reconstructed race: its laps
+        # against the field would read back the solver's (belgium-1992's BOUT, reported).
+        fitted, pace_lines = with_estimated_pace(laps, weather, fitted, takeover)
+    if weather and eras_build and recon is None:
         wet_pace, damp_pace = wet.driver_band_pace(laps, weather, fitted)
     elif weather:
         wet_pace = wet.driver_wet_pace(laps, weather, fitted, wet.wet_period(laps, dry.rain))
@@ -2591,13 +2662,6 @@ def build_race(
             params = replace(params, overtake_model={**params.overtake_model, "heldGap": held})
         params = replace(params, notes=[*params.notes, da_note])
 
-    takeover = meta["takeover_lap"]
-    if takeover is None:
-        takeover = scenario.default_takeover_lap(
-            laps,
-            events.extract_events(laps),
-            [meta["user_side"], meta["rival"]],
-        )
     model = assemble.assemble_race_model(
         race_id=race_id,
         laps=laps,
@@ -2629,18 +2693,29 @@ def build_race(
         stint_pace=eras_build and recon is None,
         dirty_air=dirty,
     )
+    if eras_build and recon is None:
+        missing = sorted(running_at(laps, takeover) - {d["code"] for d in model["drivers"]})
+        if missing:
+            raise ValueError(f"{race_id}: cars running at the takeover not in the model: {missing}")
     official_lines: list[str] = []
     if recon is not None and recon.get("roadPositions"):
         model, official_lines = official_result(model, recon)
     scripted_lines: list[str] = []
     if eras_build:
         model, scripted_lines = scripted_blocks(model, race_id, recon)
+        if restart.LAPS_DOWN_IN_ERAS_BUILDS:
+            # Job 1.5: a no-unlapping race's SC and red-flag queues take each scripted car's
+            # real laps down (restart.with_laps_down), not the sims' own gaps.
+            model, down_lines = restart.with_laps_down(model, laps)
+            scripted_lines += down_lines
     estimated = list((block or {}).get("estimated", []))
     if recon is not None:
         estimated += [f for f in recon["provenance"].get("estimated", []) if f not in estimated]
     fitted_weather = lap_time_weather(dry.rain)
     if fitted_weather:
         estimated.append("weather")  # step 4.5: the wetness is fitted from the lap times
+    if pace_lines:
+        estimated.append("driverPace")  # model fix 1.6: a wet-only car's dry pace
     if shared:
         # The Worker's merge replaces the provenance block outright (as with_eras_fields
         # does), so it can't also carry this build's estimated fields.
@@ -2670,6 +2745,7 @@ def build_race(
         *overlay_lines,
         *scripted_lines,
         *red_notes,
+        *pace_lines,
     ]
     if recon is not None:
         report.append(
@@ -2696,7 +2772,12 @@ def build_race(
     return BuildResult(
         model=model,
         laps=laps,
-        notes=[*fitted.prior_notes, *params.notes, *fault_notes],
+        notes=[
+            *fitted.prior_notes,
+            *([shape_note] if shape_note else []),
+            *params.notes,
+            *fault_notes,
+        ],
         estimates=report,
         fit=fitted,
         wet=dry.wet,

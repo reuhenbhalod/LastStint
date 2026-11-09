@@ -27,6 +27,23 @@ allowance runs out (`outOfFuel`) and a refuelling car stops when its tank runs d
 live play. The fuel margin is the run's own (drawn once at the takeover from the race's seed), so
 every sample of every option starts from the same tank.
 
+**The offline grader's pause** (Nov 8 2026). The hard-call counter (`eras/hard-calls.ts`) and
+the moment author (`pnpm author`) grade from `moments.ts pauseAt`: the real race replayed to
+just before the moment with incidents off, so the player's fuel used to be the replay's (the
+tank burnt one lap a lap and never ran dry; a fuel-limit car carried no load). In an Eras race
+with a fuel rule (`sim.ts erasFuelRule`) `pauseAt` now ends with `liveFuelFrom`: the laps
+already run stay the real race's, and from the pause on the player's fuel burns live, as in
+live play. A refuelling car's replay tank goes live (`tankLive`: burnt by the modes, dry stops
+the car); a fuel-limit car gets live play's load (the takeover load from the race's seed, less
+the default modes' burn over the laps run) and stops when it runs out. So pushing to a real
+stop on a short tank grades as running dry (japan-2000, Schumacher at lap 22: push 94% before,
+5% now). The tank isn't live from the takeover: under a SC the live burn saves fuel, which
+would add weight to the replay with no fill-time credit at the measured real stops and move
+the paused state off the real race (austria-2002's Barrichello lost the lead by lap 61).
+Every other race (all Daily and Gauntlet) pauses as before: the same Daily/Gauntlet proof as
+above (21 + 18 races, every candidate and authored moment, live runs at seeds 1 and 7, 356
+graded moments) is byte-identical before and after.
+
 Other Eras races (the hybrid-era fuel load, where an empty tank only costs `dryLapDelta` a lap)
 keep the fuel load out of playouts, as Daily does: with the margin drawn around zero, about half
 of all runs would otherwise grade every non-lifting option on a dry-tank penalty the player is

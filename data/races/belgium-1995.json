@@ -710,6 +710,22 @@
       "lap": 29,
       "type": "SC",
       "laps": 3,
+      "lapsDown": {
+        "BAR": 0,
+        "BLU": 0,
+        "BOUJ": 1,
+        "BRU": 0,
+        "DIN": 1,
+        "FRE": 0,
+        "HER": 1,
+        "HIL": 0,
+        "INO": 1,
+        "LAM": 1,
+        "MOE": 1,
+        "MSCM": 0,
+        "PAN": 0,
+        "SAL": 0
+      },
       "storylineEvent": true
     }
   ],

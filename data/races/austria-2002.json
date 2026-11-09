@@ -527,6 +527,23 @@
       "lap": 26,
       "type": "SC",
       "laps": 11,
+      "lapsDown": {
+        "BAR": 0,
+        "BUT": 0,
+        "COU": 0,
+        "FIS": 0,
+        "FRE": 1,
+        "IRV": 0,
+        "MCN": 0,
+        "MON": 0,
+        "MSCM": 0,
+        "SAL": 0,
+        "SCH": 0,
+        "TRU": 0,
+        "VIL": 0,
+        "WEB": 1,
+        "YOO": 1
+      },
       "storylineEvent": true
     },
     {

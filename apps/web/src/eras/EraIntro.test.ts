@@ -217,4 +217,22 @@ describe('EraIntro', () => {
   it('shows the briefing when there is one', () => {
     expect(text(render(withEras({ briefing: 'Level on points.' })))).toContain('Level on points.');
   });
+  it('credits the sources a race was built from, by its provenance, linking the credits', () => {
+    const asRace = (id: string) => render({ ...BASE, race: { ...BASE.race, id } });
+    const tum = asRace('spain-2016');
+    expect(tum).toContain('data-credit="race"');
+    expect(text(tum)).toContain('Race data: TUM f1-timing-database (CC BY-NC-SA 3.0). Credits');
+    expect(tum).toMatch(/<p data-credit="race"[^>]*>[\s\S]*?href="\/credits"/);
+    expect(text(asRace('brazil-2003'))).toContain(
+      'Race data: Jolpica-F1 (CC BY-NC-SA 4.0) and F1DB (CC BY 4.0).',
+    );
+    expect(text(asRace('australia-1986'))).toContain(
+      'Race data: Jolpica-F1 (CC BY-NC-SA 4.0) and F1DB (CC BY 4.0).',
+    );
+  });
+
+  it('has no source credit for a race built from OpenF1 or FastF1', () => {
+    expect(render(BASE)).not.toContain('data-credit');
+    expect(text(render(BASE))).not.toContain('Race data:');
+  });
 });

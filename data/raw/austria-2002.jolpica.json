@@ -687,15 +687,29 @@
    "periods": [
     {
      "startLap": 24,
-     "endLap": 36,
-     "laps": 13,
+     "endLap": 27,
+     "laps": 4,
      "kind": "SC",
      "confidence": "likely",
      "peakRatio": 1.755,
      "gapBefore": 64.8,
      "gapAfter": 3.0,
      "reasons": [],
-     "status": "unchecked"
+     "status": "confirmed",
+     "source": "https://en.wikipedia.org/wiki/2002_Austrian_Grand_Prix: 'Lap 24 saw the safety car's first deployment by the race director: Panis' engine seized'; 'The safety car was withdrawn at the conclusion of the 27th lap and Barrichello led at the restart'"
+    },
+    {
+     "startLap": 28,
+     "endLap": 36,
+     "laps": 9,
+     "kind": "SC",
+     "confidence": "likely",
+     "peakRatio": 1.755,
+     "gapBefore": 64.8,
+     "gapAfter": 3.0,
+     "reasons": [],
+     "status": "confirmed",
+     "source": "https://en.wikipedia.org/wiki/2002_Austrian_Grand_Prix: 'a major accident prompted the safety car's second deployment on lap 28' (Heidfeld and Sato); 'the race restarted at lap 36's end when the safety car entered the pit lane'. Detected as one period (24-36): the leader's lap 28 (85.5 s) is the restart lap the second SC came out on"
     }
    ],
    "handCheck": "data/estimates/austria-2002.sc.json"

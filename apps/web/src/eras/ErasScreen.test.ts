@@ -25,6 +25,14 @@ describe('Eras screens', () => {
     expect(html).toContain('href="/eras/history"');
   });
 
+  it('links the data credits from every Eras screen', () => {
+    for (const path of ['/eras', '/eras/2', '/eras/history', '/eras/12']) {
+      const html = render(path);
+      expect(html, path).toContain('href="/credits"');
+      expect(html, path).toContain('data credits</a>');
+    }
+  });
+
   it("starts an era's detail loading, under its name", () => {
     const html = render('/eras/2');
     expect(html).toContain('Senna vs Prost</h1>');
@@ -151,10 +159,10 @@ describe('Era detail', () => {
     expect(raceLinks(error)).toEqual([]);
   });
 
-  it('shows the briefing slot, then ten race cards in order with their dilemmas', () => {
+  it('shows the briefing, then ten race cards in order with their dilemmas', () => {
     const html = renderDetail(ERA9, detailReady(erasResponse(true), eraDetail(9)));
-    expect(html).toContain('data-todo="era-briefing"');
-    expect(html).toContain('Briefing not written yet.');
+    expect(html).not.toContain('data-todo="era-briefing"');
+    expect(html).toContain('reached the Abu Dhabi finale level on points');
     expect(html.indexOf('Briefing')).toBeLessThan(html.indexOf('Race 1<'));
     const races = [...html.matchAll(/>Race (\d+)</g)].map((m) => Number(m[1]));
     expect(races).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
@@ -260,19 +268,18 @@ describe('Era detail', () => {
   });
 
   it('links only races an attempt can start on, saying why the others cannot', () => {
-    // The newest era that still has a race with no race file in this build (Era 10 is
-    // complete since belgium-2023 was built).
-    const eraId = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1].find((id) =>
-      eraDetail(id).races.some((r) => !mockCanStart(r.raceId)),
-    ) as number;
-    expect(eraId).toBeDefined();
+    // Every Eras race has a race file in this build (brazil-1993 and china-2007 were the
+    // last built), so a stand-in refuses one of Era 10's races.
+    const eraId = 10;
+    const missing = eraDetail(eraId).races[3]?.raceId;
+    const canStart = (id: string) => id !== missing && mockCanStart(id);
     const html = renderDetail(
       eraById(eraId) as EraInfo,
-      detailReady(erasResponse(true), eraDetail(eraId), mockCanStart),
+      detailReady(erasResponse(true), eraDetail(eraId), canStart),
     );
     const playable = eraDetail(eraId)
       .races.map((r) => r.raceId)
-      .filter(mockCanStart);
+      .filter(canStart);
     expect(playable.length).toBeLessThan(10);
     expect(raceLinks(html)).toEqual(playable.map((id) => `/eras/${eraId}/${id}`));
     expect(html.match(/no race file in this build/g)).toHaveLength(10 - playable.length);

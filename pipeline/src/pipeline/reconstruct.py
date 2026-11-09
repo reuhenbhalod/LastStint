@@ -106,6 +106,9 @@ class Stop:
     lane_time: float | None  # pit-lane seconds, None where the source has none
     source: str
     tyre: str | None = None  # the tyre class fitted (TYRES), where a source names it
+    # A stop no source gives the lap of (weather.slickChange: the field's sourced change back
+    # to slicks): its lap is the solver's estimate, its tyre an estimate too (not an anchor).
+    estimated: bool = False
 
 
 @dataclass
@@ -391,6 +394,14 @@ def check_weather(weather: dict, where: str) -> None:
                 raise ValueError(f"{where}: weather.{kind}[{i}] needs a driver or number")
             if kind == "tyreChanges" and "lap" not in t:
                 raise ValueError(f"{where}: weather.{kind}[{i}] needs the stop's in-lap")
+    sc = weather.get("slickChange")
+    if sc is not None:
+        at = f"{where}: weather.slickChange"
+        if not str(sc.get("source") or "").strip():
+            raise ValueError(f"{at} has no source")
+        lo, hi = sc.get("fromLap"), sc.get("toLap")
+        if not (isinstance(lo, int) and isinstance(hi, int) and 1 <= lo <= hi):
+            raise ValueError(f"{at}: laps {lo}-{hi}")
 
 
 def timeline_wetness(timeline: list[dict], laps: int) -> list[float]:
@@ -730,6 +741,62 @@ def apply_tyres(cars: list[Car], weather: dict) -> list[str]:
             )
             continue
         car.stops[k] = replace(car.stops[k], tyre=t["tyre"])
+    if weather.get("slickChange"):
+        notes += apply_slick_change(cars, weather["slickChange"])
+    return notes
+
+
+def slick_change_lap(cars: list[Car], change: dict) -> int:
+    """The estimated in-lap of an unsourced change back to slicks (weather.slickChange): the
+    median of the race's sourced slick in-laps inside the window, else the window's middle."""
+    lo, hi = int(change["fromLap"]), int(change["toLap"])
+    laps = sorted(
+        s.lap
+        for c in cars
+        for s in c.stops
+        if s.tyre == "slick" and not s.estimated and lo <= s.lap <= hi
+    )
+    return laps[(len(laps) - 1) // 2] if laps else (lo + hi) // 2
+
+
+def apply_slick_change(cars: list[Car], change: dict) -> list[str]:
+    """The facts file's `weather.slickChange`: a source says the field changed back to slicks
+    in laps fromLap..toLap (brazil-1993: 'everyone stopped for dry tyres') but gives the lap
+    for only some cars. A car still on sourced wet tyres at fromLap, with no stop in the window
+    (a stop there with no tyre named is left to the stint estimate), that runs past the
+    estimated lap gets a slick stop on it (slick_change_lap), its lap and tyre marked
+    estimated: the only stops the reconstruction adds, and only where a source says they
+    happened. Returns notes."""
+    lo, hi = int(change["fromLap"]), int(change["toLap"])
+    lap = slick_change_lap(cars, change)
+    notes = []
+    for car in cars:
+        if car.laps < lo:
+            continue
+        before = [s for s in car.stops if s.lap < lo]
+        on = before[-1].tyre if before else car.start_tyre
+        if on != "wet" or any(lo <= s.lap <= hi for s in car.stops):
+            continue
+        if car.laps <= lap:
+            notes.append(
+                f"{car.driver}: on wets at lap {lo}, out on lap {car.laps} before the estimated"
+                f" slick stop (lap {lap})"
+            )
+            continue
+        car.stops.append(
+            Stop(
+                lap,
+                None,
+                f"estimate (weather.slickChange, laps {lo}-{hi}): {change['source']}",
+                "slick",
+                estimated=True,
+            )
+        )
+        car.stops.sort(key=lambda s: s.lap)
+        notes.append(
+            f"{car.driver}: slick stop on lap {lap} estimated (the field changed to slicks in laps"
+            f" {lo}-{hi}; no source gives this car's lap)"
+        )
     return notes
 
 
@@ -836,10 +903,11 @@ def stint_tyres(car: Car, wetness: list[float], curves: dict) -> list[tuple[str,
     (wet_laps.py's rule), an estimate."""
     ends = [0, *[s.lap for s in car.stops], car.laps]
     named = [car.start_tyre, *[s.tyre for s in car.stops]]
+    guessed = [False, *[s.estimated for s in car.stops]]
     out = []
     for k, (a, b) in enumerate(zip(ends, ends[1:], strict=False)):
         if named[k] is not None:
-            out.append((named[k], True))
+            out.append((named[k], not guessed[k]))
             continue
         ws = np.array(wetness[a:b] or [wetness[min(a, len(wetness) - 1)]])
         lost = {
@@ -1126,6 +1194,13 @@ def grid_order(cars: list[Car]) -> list[Car]:
     return sorted(starters, key=lambda c: (not c.grid, c.grid or 0, c.position or 99))
 
 
+def lap1_retirement(c: Car) -> bool:
+    """A car out after lap 1 whose one lap is its F1DB fastest lap: its lap-1 time is the
+    source's, often a crawl back to the pits (monaco-1992's Moreno: 5:34.5), so it stands
+    outside the grid ladder: it pushes no car back and the grid anchor doesn't place it."""
+    return c.laps == 1 and c.fastest_lap == 1 and c.fastest_time is not None
+
+
 def lap1_order(anchors: Anchors, cars: list[Car]) -> list[Car]:
     """The lap-1 order: the grid order, with the cars a source puts at the front at the end of
     lap 1 (the lap-1 leader of `lapLeaders`, a lap-1 `runningOrder`) moved there."""
@@ -1382,7 +1457,11 @@ def solve(anchors: Anchors, p: Params, sigma: float | None = None) -> Solution:
         if c.fastest_lap == 1:
             notes.append(f"{c.driver}: fastest lap on lap 1, its lap-1 time is the fastest lap's")
             grid_pins[c.driver] = {}
-            prev = max(prev, c.fastest_time or prev)
+            if lap1_retirement(c):
+                # Its sourced lap stands outside the ladder: the cars behind keep their slots.
+                notes.append(f"{c.driver}: out after lap 1, its lap-1 place is its sourced time's")
+            else:
+                prev = max(prev, c.fastest_time or prev)
             continue
         pin = lap1 + rank * p.grid_gap
         if c.fastest_time is not None and pin < c.fastest_time + p.fastest_margin:
@@ -1973,12 +2052,17 @@ def check_anchors(anchors: Anchors, df: pd.DataFrame, p: Params) -> list[dict]:
     timed = df[df["LapTime"].notna()]
     by_car = {d: g.sort_values("LapNumber") for d, g in timed.groupby("Driver")}
 
-    starters = [c.driver for c in lap1_order(anchors, anchors.cars)]
+    # A lap-1 retirement's place on lap 1 is its sourced time's (lap1_retirement): not checked.
+    out_on_one = {c.driver for c in anchors.cars if lap1_retirement(c)}
+    starters = [c.driver for c in lap1_order(anchors, anchors.cars) if c.driver not in out_on_one]
     lap1 = timed[timed["LapNumber"] == 1].sort_values("Time")["Driver"].tolist()
-    moved = starters != [c.driver for c in grid_order(anchors.cars)]
+    lap1 = [d for d in lap1 if d not in out_on_one]
+    moved = starters != [c.driver for c in grid_order(anchors.cars) if c.driver not in out_on_one]
     subject = "lap-1 order is the grid order" + (
         " (the sourced lap-1 order at the front)" if moved else ""
     )
+    if out_on_one:
+        subject += f" (out after lap 1, at its sourced time: {' '.join(sorted(out_on_one))})"
     out.append(_row("grid", subject, starters, lap1, lap1 == starters))
 
     # The classified cars head the road order (assemble.finishing_order): no unclassified car
@@ -2054,7 +2138,8 @@ def check_anchors(anchors: Anchors, df: pd.DataFrame, p: Params) -> list[dict]:
             ok = len(row) == 1 and pd.notna(row["PitInTime"].iloc[0])
             if len(nxt):
                 ok = ok and float(nxt["Stint"].iloc[0]) == float(row["Stint"].iloc[0]) + 1
-            out.append(_row("stop", c.driver, s.lap, s.lap if ok else None, bool(ok)))
+            who = f"{c.driver} (estimated lap)" if s.estimated else c.driver
+            out.append(_row("stop", who, s.lap, s.lap if ok else None, bool(ok)))
 
     if anchors.wetness is not None:
         # Each sourced stint tyre on its laps (the snapshot's Compound).
@@ -2210,6 +2295,14 @@ def estimates_in_words(anchors: Anchors, p: Params) -> list[str]:
         words.append(
             f"{r['driver']}: disqualified, run to the flag P{r['position']} on the road {where};"
             " the official result keeps it excluded"
+        )
+    guessed = sorted({(s.lap, c.driver) for c in anchors.cars for s in c.stops if s.estimated})
+    if guessed:
+        words.append(
+            f"Slick stops on lap {guessed[0][0]} estimated for"
+            f" {' '.join(d for _, d in guessed)}: a source says the field changed back to slicks"
+            " (weather.slickChange) but not on which lap; the lap is the median of the sourced"
+            " slick stops in that window"
         )
     if not anchors.stops_complete:
         words.append("Stops: only the sourced ones; cars may have stopped more (unknown)")

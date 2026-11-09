@@ -1,5 +1,6 @@
 // The privacy policy (/privacy) and terms (/terms): what the game keeps and why, in plain
 // words, and the rules for a free fan game. Linked from the footer and Google's consent screen.
+// Page and H also lay out the credits page (Credits.tsx).
 
 import { Brand } from '../components/Brand.js';
 import { Disclaimer } from '../components/Disclaimer.js';
@@ -7,7 +8,11 @@ import { Disclaimer } from '../components/Disclaimer.js';
 const CONTACT = 'purohit.abhiram@gmail.com';
 const UPDATED = '6 November 2026';
 
-function Page({ title, children }: { title: string; children: React.ReactNode }) {
+export function Page({
+  title,
+  updated = UPDATED,
+  children,
+}: { title: string; updated?: string; children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col">
       <header className="flex h-14 items-center border-b border-[#1F2523] px-4 md:h-16 md:px-6">
@@ -18,7 +23,7 @@ function Page({ title, children }: { title: string; children: React.ReactNode })
       <main className="mx-auto flex w-full max-w-[680px] flex-col gap-5 px-4 py-8 text-[15px] leading-relaxed text-[#D5DAD7] md:px-6">
         <div className="flex flex-col gap-1">
           <h1 className="disp m-0 text-[28px] leading-none text-white">{title}</h1>
-          <span className="text-[13px] text-[#8D9692]">Last updated {UPDATED}</span>
+          <span className="text-[13px] text-[#8D9692]">Last updated {updated}</span>
         </div>
         {children}
       </main>
@@ -29,7 +34,7 @@ function Page({ title, children }: { title: string; children: React.ReactNode })
   );
 }
 
-function H({ children }: { children: React.ReactNode }) {
+export function H({ children }: { children: React.ReactNode }) {
   return <h2 className="disp m-0 mt-2 text-[16px] text-white">{children}</h2>;
 }
 

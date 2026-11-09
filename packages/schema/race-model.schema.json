@@ -262,6 +262,11 @@
             "minimum": 0,
             "description": "Extra seconds per lap of tyre age past cliffLap. Absent: no fitted cliff."
           },
+          "degQuad": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Seconds per lap of tyre wear squared: the lap costs degQuad x wear^2 on top of degPerLap x wear, so a long stint falls off late (Eras model fix S4, pooled by track and era). Absent: linear wear."
+          },
           "provenLaps": {
             "type": "integer",
             "minimum": 1,
@@ -516,6 +521,14 @@
           "other": {
             "type": "string",
             "description": "A TEAM_ORDER (Eras builds, sourced in data/incidents.json): the car let by. Both sims swap the two on the order's lap (packages/sim scripted.ts)."
+          },
+          "lapsDown": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "An SC or RED event of a no-unlapping race (race.scUnlap none; Eras builds, pipeline restart.py): each car still running at the event's last lap with the most laps down it was at the end of any of the event's laps, counted from the real lap counts. The sims take a scripted car's lapped status in that event's queue from it, not from their own gaps."
           }
         },
         "allOf": [
@@ -946,13 +959,14 @@
           "type": "array",
           "uniqueItems": true,
           "default": [],
-          "description": "Fields estimated rather than measured (eras build plan 2.4): stint compounds, safety-car laps, fuel loads (and a refuelling race's fill rate), the wetness timeline.",
+          "description": "Fields estimated rather than measured (eras build plan 2.4): stint compounds, safety-car laps, fuel loads (and a refuelling race's fill rate), the wetness timeline, and the dry pace of a car that ran only wet laps (model fix 1.6: from its wet laps against the field, or its team-mate's).",
           "items": {
             "enum": [
               "compounds",
               "safetyCars",
               "fuelLoads",
-              "weather"
+              "weather",
+              "driverPace"
             ]
           }
         }
