@@ -1,0 +1,280 @@
+[
+  {
+    "id": "stop-27",
+    "lap": 27,
+    "trigger": "rain",
+    "target": {
+      "kind": "win"
+    },
+    "options": [
+      {
+        "id": "stay",
+        "label": "STAY OUT",
+        "decisions": []
+      },
+      {
+        "id": "box-medium",
+        "label": "IN - slicks",
+        "decisions": [
+          {
+            "lap": 27,
+            "kind": "pit",
+            "compound": "MEDIUM"
+          }
+        ]
+      },
+      {
+        "id": "box-intermediate",
+        "label": "IN - inters",
+        "decisions": [
+          {
+            "lap": 27,
+            "kind": "pit",
+            "compound": "INTERMEDIATE"
+          }
+        ]
+      },
+      {
+        "id": "box-wet",
+        "label": "IN - wets",
+        "decisions": [
+          {
+            "lap": 27,
+            "kind": "pit",
+            "compound": "WET"
+          }
+        ]
+      },
+      {
+        "id": "box-next-wet",
+        "label": "IN NEXT LAP - wets",
+        "decisions": [
+          {
+            "lap": 28,
+            "kind": "pit",
+            "compound": "WET"
+          }
+        ]
+      }
+    ],
+    "realOptionId": "box-wet"
+  },
+  {
+    "id": "sc-30",
+    "lap": 30,
+    "trigger": "SC",
+    "target": {
+      "kind": "win"
+    },
+    "options": [
+      {
+        "id": "stay",
+        "label": "STAY OUT",
+        "decisions": []
+      },
+      {
+        "id": "box-medium",
+        "label": "IN - slicks",
+        "decisions": [
+          {
+            "lap": 30,
+            "kind": "pit",
+            "compound": "MEDIUM"
+          }
+        ]
+      },
+      {
+        "id": "box-intermediate",
+        "label": "IN - inters",
+        "decisions": [
+          {
+            "lap": 30,
+            "kind": "pit",
+            "compound": "INTERMEDIATE"
+          }
+        ]
+      },
+      {
+        "id": "box-wet",
+        "label": "IN - wets",
+        "decisions": [
+          {
+            "lap": 30,
+            "kind": "pit",
+            "compound": "WET"
+          }
+        ]
+      }
+    ],
+    "realOptionId": null
+  },
+  {
+    "id": "battle-36",
+    "lap": 36,
+    "trigger": "cliff",
+    "target": {
+      "kind": "win"
+    },
+    "options": [
+      {
+        "id": "hold",
+        "label": "Hold position",
+        "decisions": []
+      },
+      {
+        "id": "defend",
+        "label": "DEFEND",
+        "decisions": [
+          {
+            "lap": 36,
+            "kind": "mode",
+            "key": "battle",
+            "value": "defend"
+          }
+        ]
+      },
+      {
+        "id": "attack",
+        "label": "ATTACK",
+        "decisions": [
+          {
+            "lap": 36,
+            "kind": "mode",
+            "key": "battle",
+            "value": "attack"
+          }
+        ]
+      }
+    ],
+    "realOptionId": null
+  },
+  {
+    "id": "stop-40",
+    "lap": 40,
+    "trigger": "cliff",
+    "target": {
+      "kind": "win"
+    },
+    "options": [
+      {
+        "id": "stay",
+        "label": "STAY OUT",
+        "decisions": []
+      },
+      {
+        "id": "box-medium",
+        "label": "IN - slicks",
+        "decisions": [
+          {
+            "lap": 40,
+            "kind": "pit",
+            "compound": "MEDIUM"
+          }
+        ]
+      },
+      {
+        "id": "box-intermediate",
+        "label": "IN - inters",
+        "decisions": [
+          {
+            "lap": 40,
+            "kind": "pit",
+            "compound": "INTERMEDIATE"
+          }
+        ]
+      },
+      {
+        "id": "box-wet",
+        "label": "IN - wets",
+        "decisions": [
+          {
+            "lap": 40,
+            "kind": "pit",
+            "compound": "WET"
+          }
+        ]
+      }
+    ],
+    "realOptionId": "box-medium"
+  },
+  {
+    "id": "pace-44",
+    "lap": 44,
+    "trigger": "cliff",
+    "target": {
+      "kind": "win"
+    },
+    "options": [
+      {
+        "id": "keep",
+        "label": "Hold the pace",
+        "decisions": []
+      },
+      {
+        "id": "push",
+        "label": "PUSH",
+        "decisions": [
+          {
+            "lap": 44,
+            "kind": "mode",
+            "key": "pace",
+            "value": "push"
+          }
+        ]
+      },
+      {
+        "id": "easy",
+        "label": "EASY - save the car",
+        "decisions": [
+          {
+            "lap": 44,
+            "kind": "mode",
+            "key": "pace",
+            "value": "manage"
+          }
+        ]
+      }
+    ],
+    "realOptionId": null
+  },
+  {
+    "id": "pace-48",
+    "lap": 48,
+    "trigger": "cliff",
+    "target": {
+      "kind": "win"
+    },
+    "options": [
+      {
+        "id": "keep",
+        "label": "Hold the pace",
+        "decisions": []
+      },
+      {
+        "id": "push",
+        "label": "PUSH",
+        "decisions": [
+          {
+            "lap": 48,
+            "kind": "mode",
+            "key": "pace",
+            "value": "push"
+          }
+        ]
+      },
+      {
+        "id": "easy",
+        "label": "EASY - save the car",
+        "decisions": [
+          {
+            "lap": 48,
+            "kind": "mode",
+            "key": "pace",
+            "value": "manage"
+          }
+        ]
+      }
+    ],
+    "realOptionId": null
+  }
+]

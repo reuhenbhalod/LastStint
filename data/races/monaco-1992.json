@@ -2,7 +2,7 @@
   "schemaVersion": 11,
   "race": {
     "id": "monaco-1992",
-    "name": "Monaco 1992: Mansell vs Senna",
+    "name": "Monaco 1992: Senna vs Mansell",
     "laps": 78,
     "takeoverLap": 68,
     "seed": 1,
@@ -241,7 +241,115 @@
     "laps": 3
   },
   "events": [],
-  "decisionMoments": [],
+  "decisionMoments": [
+    {
+      "id": "stop-71",
+      "lap": 71,
+      "trigger": "rivalPit",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "STAY OUT",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "IN - fresh tyres",
+          "decisions": [
+            {
+              "lap": 71,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "stay"
+    },
+    {
+      "id": "pace-73",
+      "lap": 73,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 73,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "easy",
+          "label": "EASY - save the car",
+          "decisions": [
+            {
+              "lap": 73,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "battle-75",
+      "lap": 75,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "hold",
+          "label": "Hold position",
+          "decisions": []
+        },
+        {
+          "id": "defend",
+          "label": "DEFEND",
+          "decisions": [
+            {
+              "lap": 75,
+              "kind": "mode",
+              "key": "battle",
+              "value": "defend"
+            }
+          ]
+        },
+        {
+          "id": "attack",
+          "label": "ATTACK",
+          "decisions": [
+            {
+              "lap": 75,
+              "kind": "mode",
+              "key": "battle",
+              "value": "attack"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    }
+  ],
   "candidateMomentLaps": [
     72
   ],
@@ -273,8 +381,42 @@
     "WEN",
     "MOR"
   ],
-  "userSide": "MAN",
-  "rival": "SENA",
+  "userSide": "SENA",
+  "rival": "MAN",
+  "eras": {
+    "eraId": 2,
+    "order": 5,
+    "userSide": "SENA",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Mansell leads from pole until lap 71, when he feels something wrong and dives into the pits; Senna, on the set of tyres he started on, takes the lead and holds off Mansell on fresh tyres for the last laps to win by 0.215 seconds"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 1,
+      "label": "Answer Mansell's fresh tyres with your own: win with one tyre stop"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 2.0,
+      "label": "Win by more than 2 seconds"
+    },
+    "briefing": "Monaco, May 1992. Mansell has won the first five races of the year and leads from pole; Senna's McLaren started third. Your tyres have done the whole race. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports. Who led each lap is sourced; the lap times are reconstructed.",
+    "hardCalls": {
+      "MAN": 0,
+      "SENA": 0
+    },
+    "storylineCalls": [
+      {
+        "driver": "MAN",
+        "lap": 72,
+        "real": "Mansell feels something wrong (a suspected puncture or loose wheel nut) and dives into the pits at the end of lap 71, handing Senna the lead",
+        "source": "https://www.grandprix.com/gpe/rr522.html; https://www.motorsportmagazine.com/archive/article/july-1992/16/what-did-go-wrong"
+      }
+    ]
+  },
   "provenance": {
     "kind": "reconstructed",
     "estimated": [

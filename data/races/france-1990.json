@@ -459,7 +459,246 @@
       "driver": "NAN"
     }
   ],
-  "decisionMoments": [],
+  "decisionMoments": [
+    {
+      "id": "rivalpit-27",
+      "lap": 27,
+      "trigger": "rivalPit",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "STAY OUT",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "IN - fresh tyres",
+          "decisions": [
+            {
+              "lap": 27,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "box-next-medium",
+          "label": "IN NEXT LAP - fresh tyres",
+          "decisions": [
+            {
+              "lap": 28,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "stay"
+    },
+    {
+      "id": "pace-32",
+      "lap": 32,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 32,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "easy",
+          "label": "EASY - save the car",
+          "decisions": [
+            {
+              "lap": 32,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "pace-36",
+      "lap": 36,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 36,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "easy",
+          "label": "EASY - save the car",
+          "decisions": [
+            {
+              "lap": 36,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "pace-40",
+      "lap": 40,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 40,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "easy",
+          "label": "EASY - save the car",
+          "decisions": [
+            {
+              "lap": 40,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "pace-60",
+      "lap": 60,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 60,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "easy",
+          "label": "EASY - save the car",
+          "decisions": [
+            {
+              "lap": 60,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "battle-76",
+      "lap": 76,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "hold",
+          "label": "Hold position",
+          "decisions": []
+        },
+        {
+          "id": "defend",
+          "label": "DEFEND",
+          "decisions": [
+            {
+              "lap": 76,
+              "kind": "mode",
+              "key": "battle",
+              "value": "defend"
+            }
+          ]
+        },
+        {
+          "id": "attack",
+          "label": "ATTACK",
+          "decisions": [
+            {
+              "lap": 76,
+              "kind": "mode",
+              "key": "battle",
+              "value": "attack"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    }
+  ],
   "candidateMomentLaps": [
     28,
     29,
@@ -497,6 +736,36 @@
   ],
   "userSide": "CAP",
   "rival": "PRO",
+  "eras": {
+    "eraId": 2,
+    "order": 1,
+    "userSide": "CAP",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Capelli, seventh on the grid, runs non-stop in the Leyton House while the front-runners stop for tyres; he leads from lap 33 until Prost passes him on lap 78, and finishes second, 8.6 seconds behind",
+      "rewriteCondition": {
+        "type": "win"
+      },
+      "headline": "Capelli's Leyton House goes the distance and wins at Paul Ricard"
+    },
+    "mastery": {
+      "type": "margin",
+      "seconds": 3,
+      "label": "Win by more than 3 seconds"
+    },
+    "hidden": {
+      "type": "stop_count",
+      "max": 1,
+      "label": "Win with no more than one tyre stop"
+    },
+    "briefing": "Paul Ricard, July 1990. Capelli started seventh in the Leyton House. The front-runners stop for fresh tyres from lap 20; Capelli and Gugelmin ran the race on one set. Prost, from fourth on the grid, stopped on lap 27. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports. Who led each lap is sourced; the lap times are reconstructed.",
+    "hardCalls": {
+      "CAP": 0,
+      "PRO": 0
+    }
+  },
   "provenance": {
     "kind": "reconstructed",
     "estimated": [
