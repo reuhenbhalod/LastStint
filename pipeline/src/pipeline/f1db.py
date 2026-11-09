@@ -304,7 +304,7 @@ def write_source(out_dir: Path | None = None, version: str = VERSION) -> Path:
         "attribution": ATTRIBUTION,
         "columns": {"stops": STOP_COLUMNS, "fastest-laps": FASTEST_COLUMNS},
     }
-    path.write_text(json.dumps(meta, indent=2) + "\n")
+    path.write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8", newline="\n")
     return path
 
 

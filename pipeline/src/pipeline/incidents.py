@@ -283,5 +283,7 @@ def write(race_id: str, items: list[dict] | dict, path: Path = INCIDENTS_PATH) -
         kept = [i for i in old if isinstance(i, dict) and i.get("type") in hand]
         items = [*[i for i in items if i.get("type") not in hand], *kept]
     data[race_id] = items
-    path.write_text(json.dumps(dict(sorted(data.items())), indent=1) + "\n")
+    path.write_text(
+        json.dumps(dict(sorted(data.items())), indent=1) + "\n", encoding="utf-8", newline="\n"
+    )
     return path

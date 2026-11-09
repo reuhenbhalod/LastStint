@@ -304,7 +304,7 @@ def main(argv: list[str] | None = None) -> None:
         opps[race_id] = ev
         print(f"{race_id}: {len(ev)} opportunities, {int(ev['passed'].sum())} passes")
     table = fit(opps)
-    args.out.write_text(json.dumps(table, indent=2) + "\n")
+    args.out.write_text(json.dumps(table, indent=2) + "\n", encoding="utf-8", newline="\n")
     print(f"wrote {args.out}: {json.dumps(table['groups'])} heldGap {table['heldGap']}")
 
 

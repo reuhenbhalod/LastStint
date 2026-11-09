@@ -349,7 +349,9 @@ def build(cache: Path = DEFAULT_CACHE, raw_dir: Path = RAW_DIR) -> dict:
 
 
 def write(doc: dict, path: Path = SC_RATES_PATH) -> Path:
-    path.write_text(json.dumps(doc, indent=2, ensure_ascii=False) + "\n")
+    path.write_text(
+        json.dumps(doc, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n"
+    )
     return path
 
 

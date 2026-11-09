@@ -90,7 +90,11 @@ def project_track_status(track_status: pd.DataFrame) -> list[dict]:
 def save_track_status(race_id: str, session, raw_dir: Path = RAW_DIR) -> Path:
     path = track_status_path(race_id, raw_dir)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(project_track_status(session.track_status), indent=1) + "\n")
+    path.write_text(
+        json.dumps(project_track_status(session.track_status), indent=1) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
     return path
 
 
@@ -120,7 +124,7 @@ def project_weather(weather: pd.DataFrame) -> list[dict]:
 def save_weather(race_id: str, weather: list[dict], raw_dir: Path = RAW_DIR) -> Path:
     path = weather_path(race_id, raw_dir)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(weather, indent=1) + "\n")
+    path.write_text(json.dumps(weather, indent=1) + "\n", encoding="utf-8", newline="\n")
     return path
 
 
@@ -327,7 +331,9 @@ def ingest_openf1(
     path.parent.mkdir(parents=True, exist_ok=True)
     df.to_parquet(path)
     status = track_status_path(race_id, raw_dir)
-    status.write_text(json.dumps(openf1.track_status(raw), indent=1) + "\n")
+    status.write_text(
+        json.dumps(openf1.track_status(raw), indent=1) + "\n", encoding="utf-8", newline="\n"
+    )
     save_weather(race_id, openf1.weather(raw), raw_dir)
     if has_red_flag(df):
         save_red_flags(race_id, raw["race_control"], "OpenF1", raw_dir)
