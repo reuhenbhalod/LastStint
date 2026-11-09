@@ -561,7 +561,24 @@
     {
       "lap": 30,
       "type": "SC",
-      "laps": 7
+      "laps": 7,
+      "lapsDown": {
+        "ALBM": 1,
+        "ALE": 1,
+        "ALL": 0,
+        "BAD": 1,
+        "BLU": 0,
+        "COM": 1,
+        "DEC": 1,
+        "HER": 0,
+        "HIL": 0,
+        "JAR": 0,
+        "MSCM": 0,
+        "SENA": 0,
+        "WAR": 1,
+        "WEN": 0,
+        "ZAN": 0
+      }
     },
     {
       "lap": 50,

@@ -66,7 +66,15 @@ describe.each(VARIANTS)('%s strategies match the Python reference sim', (name, s
 
 describe('quadratic wear', () => {
   it('adds degQuad x wear^2 to the lap', () => {
-    const plain = tyreLapTime(spain, 80, 'SOFT', 20, 30);
+    // The rebuilt Spain 2021 carries its own fitted degQuad: the plain lap has none.
+    const { degQuad: _, ...soft } = spain.compounds.SOFT as CompoundModel;
+    const plain = tyreLapTime(
+      { ...spain, compounds: { ...spain.compounds, SOFT: soft } },
+      80,
+      'SOFT',
+      20,
+      30,
+    );
     expect(tyreLapTime(model, 80, 'SOFT', 20, 30) - plain).toBeCloseTo(0.0011 * 400, 9);
   });
 

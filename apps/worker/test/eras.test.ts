@@ -38,6 +38,10 @@ ERAS_RACE_FILES['hungary-2022'] = {
   },
 };
 
+// Every Eras race has a race file since china-2007 and brazil-1993 were built: china-2007's
+// is left out of this isolate's bundle, so the not-built path stays covered.
+Reflect.deleteProperty(ERAS_RACE_FILES, 'china-2007');
+
 /** A request to the Worker with ERAS_TEST_MODE set for this call. */
 async function call(mode: Mode, path: string, body?: unknown): Promise<Response> {
   const req = new Request(`https://api.test${path}`, {

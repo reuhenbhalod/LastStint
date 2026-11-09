@@ -53,31 +53,34 @@
     ],
     "overtakeDifficulty": 0.8935,
     "overtakeModel": {
-      "intercept": 0.4294,
+      "intercept": 0.3953,
       "paceCoef": 1.8366,
       "gapCoef": -3.8725,
       "trainCoef": -0.9007
     },
-    "dirtyAirPenalty": 0.4256,
+    "dirtyAirPenalty": 0.3774,
     "greenLapTime": 107.135
   },
   "compounds": {
     "SOFT": {
       "offset": 0.0,
-      "degPerLap": 0.11858,
+      "degPerLap": 0.091,
       "cliffLap": 15,
+      "degQuad": 0.0003603,
       "provenLaps": 11
     },
     "MEDIUM": {
-      "offset": 0.3443,
-      "degPerLap": 0.08923,
+      "offset": 0.3664,
+      "degPerLap": 0.06243,
       "cliffLap": 25,
+      "degQuad": 0.000951,
       "provenLaps": 23
     },
     "HARD": {
-      "offset": 0.667,
-      "degPerLap": 0.07408,
+      "offset": 0.6648,
+      "degPerLap": 0.04222,
       "cliffLap": 38,
+      "degQuad": 0.0012467,
       "provenLaps": 38
     }
   },
@@ -85,8 +88,8 @@
     {
       "code": "ALO",
       "team": "McLaren",
-      "basePace": 107.2657,
-      "noise": 0.8061,
+      "basePace": 107.4416,
+      "noise": 0.8237,
       "stateAtTakeover": {
         "position": 10,
         "gapAhead": 5.059,
@@ -101,25 +104,25 @@
         {
           "lap": 39,
           "to": "MEDIUM",
-          "loss": 21.866
+          "loss": 21.494
         }
       ],
       "stintPace": [
         {
           "lap": 0,
-          "offset": -0.269
+          "offset": -0.317
         },
         {
           "lap": 39,
-          "offset": 0.196
+          "offset": 0.226
         }
       ]
     },
     {
       "code": "ERI",
       "team": "Sauber",
-      "basePace": 108.7711,
-      "noise": 0.4027,
+      "basePace": 108.8336,
+      "noise": 0.366,
       "stateAtTakeover": {
         "position": 12,
         "gapAhead": 4.327,
@@ -133,25 +136,25 @@
         {
           "lap": 39,
           "to": "MEDIUM",
-          "loss": 26.765
+          "loss": 26.271
         }
       ],
       "stintPace": [
         {
           "lap": 0,
-          "offset": 0.01
+          "offset": -0.133
         },
         {
           "lap": 39,
-          "offset": -0.002
+          "offset": 0.11
         }
       ]
     },
     {
       "code": "GRO",
       "team": "Haas F1 Team",
-      "basePace": 107.3564,
-      "noise": 1.0748,
+      "basePace": 107.5827,
+      "noise": 1.119,
       "stateAtTakeover": {
         "position": 13,
         "gapAhead": 0.725,
@@ -165,25 +168,25 @@
         {
           "lap": 39,
           "to": "MEDIUM",
-          "loss": 22.214
+          "loss": 22.066
         }
       ],
       "stintPace": [
         {
           "lap": 0,
-          "offset": -0.269
+          "offset": -0.256
         },
         {
           "lap": 39,
-          "offset": 0.111
+          "offset": 0.102
         }
       ]
     },
     {
       "code": "GUT",
       "team": "Haas F1 Team",
-      "basePace": 107.6432,
-      "noise": 0.6582,
+      "basePace": 107.8667,
+      "noise": 0.6395,
       "stateAtTakeover": {
         "position": 11,
         "gapAhead": 23.15,
@@ -198,21 +201,21 @@
         {
           "lap": 29,
           "to": "HARD",
-          "loss": 22.73
+          "loss": 22.555
         }
       ],
       "stintPace": [
         {
           "lap": 29,
-          "offset": -0.015
+          "offset": -0.018
         }
       ]
     },
     {
       "code": "HAM",
       "team": "Mercedes",
-      "basePace": 106.6834,
-      "noise": 0.5092,
+      "basePace": 106.9056,
+      "noise": 0.5088,
       "stateAtTakeover": {
         "position": 1,
         "gapAhead": 0.0,
@@ -227,21 +230,21 @@
         {
           "lap": 29,
           "to": "HARD",
-          "loss": 20.189
+          "loss": 19.998
         }
       ],
       "stintPace": [
         {
           "lap": 29,
-          "offset": 0.093
+          "offset": 0.092
         }
       ]
     },
     {
       "code": "HUL",
       "team": "Force India",
-      "basePace": 107.3935,
-      "noise": 0.3964,
+      "basePace": 107.5958,
+      "noise": 0.3321,
       "stateAtTakeover": {
         "position": 5,
         "gapAhead": 12.171,
@@ -256,21 +259,21 @@
         {
           "lap": 27,
           "to": "HARD",
-          "loss": 21.987
+          "loss": 21.869
         }
       ],
       "stintPace": [
         {
           "lap": 27,
-          "offset": 0.026
+          "offset": 0.027
         }
       ]
     },
     {
       "code": "MAS",
       "team": "Williams",
-      "basePace": 107.4353,
-      "noise": 0.2633,
+      "basePace": 107.6688,
+      "noise": 0.2806,
       "stateAtTakeover": {
         "position": 9,
         "gapAhead": 4.883,
@@ -285,13 +288,13 @@
         {
           "lap": 31,
           "to": "HARD",
-          "loss": 20.833
+          "loss": 20.614
         }
       ],
       "stintPace": [
         {
           "lap": 0,
-          "offset": -0.128
+          "offset": -0.135
         },
         {
           "lap": 31,
@@ -302,8 +305,8 @@
     {
       "code": "NAS",
       "team": "Sauber",
-      "basePace": 108.5541,
-      "noise": 0.5577,
+      "basePace": 108.7645,
+      "noise": 0.5245,
       "stateAtTakeover": {
         "position": 15,
         "gapAhead": 5.542,
@@ -318,25 +321,25 @@
         {
           "lap": 37,
           "to": "HARD",
-          "loss": 35.055
+          "loss": 34.71
         }
       ],
       "stintPace": [
         {
           "lap": 0,
-          "offset": -0.025
+          "offset": -0.075
         },
         {
           "lap": 37,
-          "offset": 0.015
+          "offset": 0.048
         }
       ]
     },
     {
       "code": "OCO",
       "team": "Manor Marussia",
-      "basePace": 108.7567,
-      "noise": 0.6914,
+      "basePace": 108.9634,
+      "noise": 0.6837,
       "stateAtTakeover": {
         "position": 16,
         "gapAhead": 8.751,
@@ -350,25 +353,25 @@
         {
           "lap": 37,
           "to": "MEDIUM",
-          "loss": 23.0
+          "loss": 22.891
         }
       ],
       "stintPace": [
         {
           "lap": 0,
-          "offset": 0.056
+          "offset": 0.066
         },
         {
           "lap": 37,
-          "offset": -0.074
+          "offset": -0.065
         }
       ]
     },
     {
       "code": "PAL",
       "team": "Renault",
-      "basePace": 108.7954,
-      "noise": 0.7723,
+      "basePace": 109.0137,
+      "noise": 0.7601,
       "stateAtTakeover": {
         "position": 17,
         "gapAhead": 3.295,
@@ -383,25 +386,25 @@
         {
           "lap": 42,
           "to": "MEDIUM",
-          "loss": 31.184
+          "loss": 31.036
         }
       ],
       "stintPace": [
         {
           "lap": 0,
-          "offset": 0.066
+          "offset": 0.083
         },
         {
           "lap": 42,
-          "offset": 0.013
+          "offset": 0.002
         }
       ]
     },
     {
       "code": "PER",
       "team": "Force India",
-      "basePace": 107.6217,
-      "noise": 0.7262,
+      "basePace": 107.8431,
+      "noise": 0.748,
       "stateAtTakeover": {
         "position": 6,
         "gapAhead": 3.284,
@@ -416,21 +419,21 @@
         {
           "lap": 28,
           "to": "HARD",
-          "loss": 21.661
+          "loss": 21.517
         }
       ],
       "stintPace": [
         {
           "lap": 28,
-          "offset": -0.008
+          "offset": -0.015
         }
       ]
     },
     {
       "code": "RAI",
       "team": "Ferrari",
-      "basePace": 106.7848,
-      "noise": 0.4854,
+      "basePace": 106.9843,
+      "noise": 0.5127,
       "stateAtTakeover": {
         "position": 3,
         "gapAhead": 10.286,
@@ -445,21 +448,21 @@
         {
           "lap": 26,
           "to": "HARD",
-          "loss": 19.961
+          "loss": 19.815
         }
       ],
       "stintPace": [
         {
           "lap": 26,
-          "offset": 0.036
+          "offset": 0.035
         }
       ]
     },
     {
       "code": "RIC",
       "team": "Red Bull Racing",
-      "basePace": 106.3228,
-      "noise": 0.5175,
+      "basePace": 106.5008,
+      "noise": 0.618,
       "stateAtTakeover": {
         "position": 8,
         "gapAhead": 3.063,
@@ -480,15 +483,15 @@
       "stintPace": [
         {
           "lap": 0,
-          "offset": 0.008
+          "offset": 0.014
         }
       ]
     },
     {
       "code": "ROS",
       "team": "Mercedes",
-      "basePace": 106.6321,
-      "noise": 0.3713,
+      "basePace": 106.8572,
+      "noise": 0.3639,
       "stateAtTakeover": {
         "position": 2,
         "gapAhead": 4.088,
@@ -503,25 +506,25 @@
         {
           "lap": 30,
           "to": "HARD",
-          "loss": 20.051
+          "loss": 19.855
         }
       ],
       "stintPace": [
         {
           "lap": 0,
-          "offset": -0.355
+          "offset": -0.356
         },
         {
           "lap": 30,
-          "offset": 0.117
+          "offset": 0.12
         }
       ]
     },
     {
       "code": "SAI",
       "team": "Toro Rosso",
-      "basePace": 109.4366,
-      "noise": 0.8528,
+      "basePace": 109.6498,
+      "noise": 0.8387,
       "stateAtTakeover": {
         "position": 14,
         "gapAhead": 2.638,
@@ -536,7 +539,7 @@
         {
           "lap": 29,
           "to": "HARD",
-          "loss": 19.428
+          "loss": 19.234
         }
       ],
       "stintPace": [
@@ -549,8 +552,8 @@
     {
       "code": "VER",
       "team": "Toro Rosso",
-      "basePace": 106.0687,
-      "noise": 0.4257,
+      "basePace": 106.2164,
+      "noise": 0.408,
       "stateAtTakeover": {
         "position": 7,
         "gapAhead": 0.428,
@@ -565,15 +568,15 @@
       "stintPace": [
         {
           "lap": 0,
-          "offset": 0.014
+          "offset": 0.016
         }
       ]
     },
     {
       "code": "VET",
       "team": "Ferrari",
-      "basePace": 106.3277,
-      "noise": 0.7153,
+      "basePace": 106.5174,
+      "noise": 0.7574,
       "stateAtTakeover": {
         "position": 4,
         "gapAhead": 0.231,
@@ -588,25 +591,25 @@
         {
           "lap": 38,
           "to": "MEDIUM",
-          "loss": 21.786
+          "loss": 21.454
         }
       ],
       "stintPace": [
         {
           "lap": 0,
-          "offset": -0.454
+          "offset": -0.484
         },
         {
           "lap": 38,
-          "offset": 0.311
+          "offset": 0.332
         }
       ]
     },
     {
       "code": "WEH",
       "team": "Manor Marussia",
-      "basePace": 108.5803,
-      "noise": 0.5822,
+      "basePace": 108.7711,
+      "noise": 0.6122,
       "stateAtTakeover": {
         "position": 18,
         "gapAhead": 12.269,
@@ -627,14 +630,14 @@
       "stintPace": [
         {
           "lap": 0,
-          "offset": 0.011
+          "offset": 0.01
         }
       ]
     }
   ],
-  "fuelEffectPerLap": 0.06073,
+  "fuelEffectPerLap": 0.06265,
   "freshTyre": {
-    "bonus": -0.0913,
+    "bonus": -0.1474,
     "laps": 3
   },
   "events": [

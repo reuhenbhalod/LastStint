@@ -99,8 +99,8 @@
       "team": "Ferrari",
       "basePace": 86.0018,
       "noise": 1.6175,
-      "wetPace": 0.0295,
-      "dampPace": 0.0364,
+      "wetPace": 0.03,
+      "dampPace": 0.0375,
       "stateAtTakeover": {
         "position": 6,
         "gapAhead": 1.054,
@@ -191,8 +191,8 @@
       "team": "Toyota",
       "basePace": 93.0537,
       "noise": 1.633,
-      "wetPace": -0.0257,
-      "dampPace": -0.0231,
+      "wetPace": -0.0259,
+      "dampPace": -0.0235,
       "stateAtTakeover": {
         "position": 12,
         "gapAhead": 7.917,
@@ -237,8 +237,8 @@
       "team": "Jordan",
       "basePace": 91.0175,
       "noise": 0.6509,
-      "wetPace": -0.0442,
-      "dampPace": -0.0372,
+      "wetPace": -0.0443,
+      "dampPace": -0.0374,
       "stateAtTakeover": {
         "position": 18,
         "gapAhead": 0.396,
@@ -279,7 +279,7 @@
       "team": "Sauber",
       "basePace": 88.2935,
       "noise": 1.3425,
-      "wetPace": 0.0038,
+      "wetPace": 0.0039,
       "dampPace": 0.0047,
       "stateAtTakeover": {
         "position": 14,
@@ -303,8 +303,8 @@
       "team": "Williams",
       "basePace": 90.7195,
       "noise": 0.5115,
-      "wetPace": -0.0126,
-      "dampPace": -0.0186,
+      "wetPace": -0.0129,
+      "dampPace": -0.019,
       "stateAtTakeover": {
         "position": 4,
         "gapAhead": 5.808,
@@ -326,8 +326,8 @@
       "team": "Ferrari",
       "basePace": 87.2776,
       "noise": 1.9776,
-      "wetPace": 0.0094,
-      "dampPace": 0.0038,
+      "wetPace": 0.0095,
+      "dampPace": 0.004,
       "stateAtTakeover": {
         "position": 3,
         "gapAhead": 6.396,
@@ -355,8 +355,8 @@
       "team": "Toyota",
       "basePace": 92.4735,
       "noise": 1.4092,
-      "wetPace": 0.0007,
-      "dampPace": 0.0012,
+      "wetPace": 0.0009,
+      "dampPace": 0.0015,
       "stateAtTakeover": {
         "position": 16,
         "gapAhead": 13.968,
@@ -373,8 +373,8 @@
       "team": "Jaguar",
       "basePace": 89.3513,
       "noise": 0.1305,
-      "wetPace": -0.0243,
-      "dampPace": -0.0188,
+      "wetPace": -0.0242,
+      "dampPace": -0.0186,
       "stateAtTakeover": {
         "position": 13,
         "gapAhead": 1.892,
@@ -392,7 +392,7 @@
       "basePace": 88.0301,
       "noise": 1.0882,
       "wetPace": -0.02,
-      "dampPace": -0.0115,
+      "dampPace": -0.0114,
       "stateAtTakeover": {
         "position": 1,
         "gapAhead": 0.0,
@@ -424,8 +424,8 @@
       "team": "Williams",
       "basePace": 88.6998,
       "noise": 1.3165,
-      "wetPace": 0.005,
-      "dampPace": 0.0074,
+      "wetPace": 0.0054,
+      "dampPace": 0.0079,
       "stateAtTakeover": {
         "position": 10,
         "gapAhead": 5.021,
@@ -492,7 +492,7 @@
       "basePace": 89.5503,
       "noise": 0.2654,
       "wetPace": 0.0021,
-      "dampPace": 0.0038,
+      "dampPace": 0.0037,
       "stateAtTakeover": {
         "position": 15,
         "gapAhead": 2.807,
@@ -515,8 +515,8 @@
       "team": "BAR",
       "basePace": 88.6253,
       "noise": 1.9837,
-      "wetPace": 0.0063,
-      "dampPace": 0.0145,
+      "wetPace": 0.0064,
+      "dampPace": 0.0149,
       "stateAtTakeover": {
         "position": 11,
         "gapAhead": 1.017,
@@ -544,8 +544,8 @@
       "team": "Jaguar",
       "basePace": 88.8585,
       "noise": 1.2558,
-      "wetPace": -0.0044,
-      "dampPace": -0.0044,
+      "wetPace": -0.0045,
+      "dampPace": -0.0045,
       "stateAtTakeover": {
         "position": 5,
         "gapAhead": 0.477,
@@ -596,7 +596,25 @@
     {
       "lap": 20,
       "type": "SC",
-      "laps": 3
+      "laps": 3,
+      "lapsDown": {
+        "ALO": 0,
+        "BAR": 0,
+        "BUT": 0,
+        "COU": 0,
+        "DAMC": 0,
+        "FIS": 0,
+        "FRE": 0,
+        "MON": 0,
+        "MSCM": 0,
+        "PIZ": 0,
+        "RAI": 0,
+        "SCH": 0,
+        "TRU": 0,
+        "VERO": 0,
+        "VIL": 0,
+        "WEB": 0
+      }
     },
     {
       "lap": 25,
@@ -616,7 +634,22 @@
     {
       "lap": 28,
       "type": "SC",
-      "laps": 2
+      "laps": 2,
+      "lapsDown": {
+        "ALO": 0,
+        "BAR": 0,
+        "BUT": 0,
+        "COU": 0,
+        "DAMC": 0,
+        "FIS": 0,
+        "FRE": 0,
+        "RAI": 0,
+        "SCH": 0,
+        "TRU": 0,
+        "VERO": 0,
+        "VIL": 0,
+        "WEB": 0
+      }
     },
     {
       "lap": 31,
@@ -631,7 +664,20 @@
     {
       "lap": 34,
       "type": "SC",
-      "laps": 3
+      "laps": 3,
+      "lapsDown": {
+        "ALO": 0,
+        "BAR": 0,
+        "COU": 0,
+        "DAMC": 0,
+        "FIS": 0,
+        "FRE": 0,
+        "RAI": 0,
+        "SCH": 0,
+        "TRU": 0,
+        "VIL": 0,
+        "WEB": 0
+      }
     },
     {
       "lap": 46,
@@ -678,36 +724,36 @@
   "weather": {
     "curves": {
       "slick": {
-        "a": 0.1855,
-        "b": 0.9993
+        "a": 0.1868,
+        "b": 1.1148
       },
       "inter": {
-        "min": 0.0345,
-        "dry": 1.0187,
-        "wet": 0.789,
-        "best": 0.18
+        "min": 0.0374,
+        "dry": 1.0876,
+        "wet": 0.576,
+        "best": 0.1708
       },
       "wet": {
-        "min": 0.1486,
-        "dry": 0.4006,
-        "wet": 0.6344,
-        "best": 0.2833
+        "min": 0.1356,
+        "dry": 0.4256,
+        "wet": 0.4903,
+        "best": 0.3065
       }
     },
     "wetness": [
-      0.28,
-      0.28,
-      0.28,
-      0.28,
-      0.28,
-      0.28,
-      0.28,
-      0.28,
-      0.28,
-      0.2,
-      0.18,
+      0.27,
+      0.27,
+      0.27,
+      0.27,
+      0.27,
+      0.27,
+      0.27,
+      0.27,
+      0.27,
+      0.19,
+      0.17,
       0.12,
-      0.03,
+      0.04,
       0.0,
       0.0,
       0.0,

@@ -115,7 +115,7 @@
       "basePace": 87.4587,
       "noise": 0.4903,
       "wetPace": -0.0162,
-      "dampPace": -0.0103,
+      "dampPace": -0.0099,
       "stateAtTakeover": {
         "position": 10,
         "gapAhead": 14.746,
@@ -129,7 +129,7 @@
         {
           "lap": 36,
           "to": "INTERMEDIATE",
-          "loss": 50.278
+          "loss": 52.772
         }
       ],
       "stintPace": [
@@ -145,7 +145,7 @@
       "basePace": 86.8784,
       "noise": 0.6469,
       "wetPace": 0.0015,
-      "dampPace": -0.0017,
+      "dampPace": -0.0016,
       "stateAtTakeover": {
         "position": 5,
         "gapAhead": 14.322,
@@ -159,7 +159,7 @@
         {
           "lap": 38,
           "to": "MEDIUM",
-          "loss": 34.053
+          "loss": 32.558
         }
       ],
       "stintPace": [
@@ -205,7 +205,7 @@
       "basePace": 88.5219,
       "noise": 0.7233,
       "wetPace": 0.0087,
-      "dampPace": 0.0073,
+      "dampPace": 0.0071,
       "stateAtTakeover": {
         "position": 13,
         "gapAhead": 28.128,
@@ -219,7 +219,7 @@
         {
           "lap": 47,
           "to": "INTERMEDIATE",
-          "loss": 71.275
+          "loss": 71.4
         }
       ],
       "stintPace": [
@@ -235,7 +235,7 @@
       "basePace": 86.7499,
       "noise": 0.6718,
       "wetPace": -0.031,
-      "dampPace": -0.0194,
+      "dampPace": -0.0187,
       "stateAtTakeover": {
         "position": 4,
         "gapAhead": 9.729,
@@ -264,8 +264,8 @@
       "team": "Jordan",
       "basePace": 84.0531,
       "noise": 0.622,
-      "wetPace": -0.0092,
-      "dampPace": -0.0004,
+      "wetPace": -0.0091,
+      "dampPace": -0.0002,
       "stateAtTakeover": {
         "position": 1,
         "gapAhead": 0.0,
@@ -303,7 +303,7 @@
         {
           "lap": 35,
           "to": "MEDIUM",
-          "loss": 26.753
+          "loss": 26.512
         }
       ],
       "stintPace": [
@@ -323,7 +323,7 @@
       "basePace": 85.7848,
       "noise": 0.8805,
       "wetPace": 0.0077,
-      "dampPace": 0.0029,
+      "dampPace": 0.0026,
       "stateAtTakeover": {
         "position": 14,
         "gapAhead": 9.103,
@@ -354,7 +354,7 @@
       "basePace": 86.9483,
       "noise": 0.5042,
       "wetPace": 0.0123,
-      "dampPace": 0.012,
+      "dampPace": 0.0117,
       "stateAtTakeover": {
         "position": 8,
         "gapAhead": 0.157,
@@ -368,12 +368,12 @@
         {
           "lap": 36,
           "to": "INTERMEDIATE",
-          "loss": 16.546
+          "loss": 18.99
         },
         {
           "lap": 48,
           "to": "MEDIUM",
-          "loss": 23.859
+          "loss": 24.525
         }
       ],
       "stintPace": [
@@ -392,8 +392,8 @@
       "team": "Ferrari",
       "basePace": 87.0595,
       "noise": 0.74,
-      "wetPace": 0.0125,
-      "dampPace": -0.0044,
+      "wetPace": 0.0124,
+      "dampPace": -0.0045,
       "stateAtTakeover": {
         "position": 12,
         "gapAhead": 2.112,
@@ -407,12 +407,12 @@
         {
           "lap": 41,
           "to": "INTERMEDIATE",
-          "loss": 20.441
+          "loss": 22.35
         },
         {
           "lap": 50,
           "to": "MEDIUM",
-          "loss": 23.401
+          "loss": 23.285
         }
       ],
       "stintPace": [
@@ -427,8 +427,8 @@
       "team": "Prost",
       "basePace": 87.5332,
       "noise": 0.3488,
-      "wetPace": -0.0163,
-      "dampPace": 0.0107,
+      "wetPace": -0.0162,
+      "dampPace": 0.0104,
       "stateAtTakeover": {
         "position": 16,
         "gapAhead": 1.103,
@@ -442,7 +442,7 @@
         {
           "lap": 45,
           "to": "MEDIUM",
-          "loss": 24.302
+          "loss": 23.673
         }
       ],
       "stintPace": [
@@ -461,8 +461,8 @@
       "team": "Ferrari",
       "basePace": 86.3008,
       "noise": 0.7144,
-      "wetPace": 0.0334,
-      "dampPace": 0.0003,
+      "wetPace": 0.0332,
+      "dampPace": -0.0006,
       "stateAtTakeover": {
         "position": 17,
         "gapAhead": 6.986,
@@ -487,7 +487,7 @@
       "basePace": 86.3184,
       "noise": 0.5872,
       "wetPace": -0.0116,
-      "dampPace": -0.0084,
+      "dampPace": -0.0081,
       "stateAtTakeover": {
         "position": 2,
         "gapAhead": 0.479,
@@ -506,12 +506,12 @@
         {
           "lap": 45,
           "to": "MEDIUM",
-          "loss": 27.47
+          "loss": 26.872
         },
         {
           "lap": 51,
           "to": "MEDIUM",
-          "loss": 78.657
+          "loss": 79.047
         }
       ],
       "stintPace": [
@@ -530,8 +530,8 @@
       "team": "Arrows",
       "basePace": 87.7044,
       "noise": 0.8768,
-      "wetPace": 0.0313,
-      "dampPace": 0.0177,
+      "wetPace": 0.0312,
+      "dampPace": 0.0166,
       "stateAtTakeover": {
         "position": 18,
         "gapAhead": 8.802,
@@ -555,7 +555,7 @@
       "basePace": 87.569,
       "noise": 0.8289,
       "wetPace": -0.0004,
-      "dampPace": 0.0063,
+      "dampPace": 0.0062,
       "stateAtTakeover": {
         "position": 6,
         "gapAhead": 3.319,
@@ -574,12 +574,12 @@
         {
           "lap": 36,
           "to": "INTERMEDIATE",
-          "loss": 14.482
+          "loss": 16.948
         },
         {
           "lap": 49,
           "to": "MEDIUM",
-          "loss": 27.633
+          "loss": 27.921
         }
       ],
       "stintPace": [
@@ -599,7 +599,7 @@
       "basePace": 86.5314,
       "noise": 0.6375,
       "wetPace": 0.0209,
-      "dampPace": 0.0131,
+      "dampPace": 0.0124,
       "stateAtTakeover": {
         "position": 9,
         "gapAhead": 6.207,
@@ -613,7 +613,7 @@
         {
           "lap": 34,
           "to": "MEDIUM",
-          "loss": 25.974
+          "loss": 26.093
         }
       ],
       "stintPace": [
@@ -629,7 +629,7 @@
       "basePace": 87.1435,
       "noise": 0.4914,
       "wetPace": -0.0137,
-      "dampPace": 0.0053,
+      "dampPace": 0.0051,
       "stateAtTakeover": {
         "position": 15,
         "gapAhead": 4.105,
@@ -649,7 +649,7 @@
         {
           "lap": 45,
           "to": "MEDIUM",
-          "loss": 21.039
+          "loss": 20.431
         }
       ],
       "stintPace": [
@@ -763,20 +763,20 @@
   "weather": {
     "curves": {
       "slick": {
-        "a": 0.1855,
-        "b": 0.9993
+        "a": 0.1687,
+        "b": 1.0067
       },
       "inter": {
-        "min": 0.0345,
-        "dry": 1.0187,
-        "wet": 0.789,
-        "best": 0.18
+        "min": 0.0374,
+        "dry": 1.0876,
+        "wet": 0.576,
+        "best": 0.1708
       },
       "wet": {
-        "min": 0.1486,
-        "dry": 0.4006,
-        "wet": 0.6344,
-        "best": 0.2833
+        "min": 0.1356,
+        "dry": 0.4256,
+        "wet": 0.4903,
+        "best": 0.3065
       }
     },
     "wetness": [
@@ -797,35 +797,35 @@
       0.0,
       0.0,
       0.0,
-      0.08,
-      0.21,
-      0.25,
-      0.23,
-      0.11,
-      0.06,
-      0.11,
-      0.08,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.06,
-      0.34,
-      0.4,
-      0.39,
-      0.37,
-      0.4,
-      0.41,
-      0.42,
-      0.39,
-      0.36,
-      0.33,
-      0.31,
+      0.09,
+      0.22,
       0.26,
+      0.23,
+      0.1,
+      0.06,
+      0.11,
+      0.09,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.06,
+      0.35,
+      0.41,
+      0.4,
+      0.39,
+      0.41,
+      0.43,
+      0.43,
+      0.41,
+      0.38,
+      0.34,
+      0.32,
+      0.27,
       0.24,
       0.22,
       0.2,
@@ -834,9 +834,9 @@
       0.15,
       0.14,
       0.1,
+      0.08,
       0.07,
-      0.07,
-      0.07,
+      0.08,
       0.06,
       0.05,
       0.04,

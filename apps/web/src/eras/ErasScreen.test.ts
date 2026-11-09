@@ -268,19 +268,18 @@ describe('Era detail', () => {
   });
 
   it('links only races an attempt can start on, saying why the others cannot', () => {
-    // The newest era that still has a race with no race file in this build (Era 10 is
-    // complete since belgium-2023 was built).
-    const eraId = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1].find((id) =>
-      eraDetail(id).races.some((r) => !mockCanStart(r.raceId)),
-    ) as number;
-    expect(eraId).toBeDefined();
+    // Every Eras race has a race file in this build (brazil-1993 and china-2007 were the
+    // last built), so a stand-in refuses one of Era 10's races.
+    const eraId = 10;
+    const missing = eraDetail(eraId).races[3]?.raceId;
+    const canStart = (id: string) => id !== missing && mockCanStart(id);
     const html = renderDetail(
       eraById(eraId) as EraInfo,
-      detailReady(erasResponse(true), eraDetail(eraId), mockCanStart),
+      detailReady(erasResponse(true), eraDetail(eraId), canStart),
     );
     const playable = eraDetail(eraId)
       .races.map((r) => r.raceId)
-      .filter(mockCanStart);
+      .filter(canStart);
     expect(playable.length).toBeLessThan(10);
     expect(raceLinks(html)).toEqual(playable.map((id) => `/eras/${eraId}/${id}`));
     expect(html.match(/no race file in this build/g)).toHaveLength(10 - playable.length);

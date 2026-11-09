@@ -115,14 +115,16 @@ describe('eraDetailView', () => {
   });
 
   it('blocks races an attempt can’t start on, saying why', () => {
-    // An era with a race that has no race file yet (looked up: races get files as they're built).
-    const era = ERAS.find((e) => racesOfEra(e.id).some((r) => !mockCanStart(r.raceId)));
-    if (!era) throw new Error('every Eras race has a race file');
-    const view = eraDetailView(erasResponse(true), eraDetail(era.id), mockCanStart);
+    // Every Eras race has a race file in this build, so a stand-in refuses one of Era 9's.
+    const era = ERAS.find((e) => e.id === 9) as (typeof ERAS)[number];
+    const missing = racesOfEra(era.id)[2]?.raceId;
+    const canStart = (id: string) => id !== missing && mockCanStart(id);
+    const view = eraDetailView(erasResponse(true), eraDetail(era.id), canStart);
     const byId = Object.fromEntries(view.cards.map((c) => [c.raceId, c.blocked]));
+    expect(byId[missing as string]).not.toBeNull();
     for (const { raceId } of racesOfEra(era.id)) {
       expect(byId[raceId]).toBe(
-        mockCanStart(raceId) ? null : 'Not playable yet: this race has no race file in this build.',
+        canStart(raceId) ? null : 'Not playable yet: this race has no race file in this build.',
       );
     }
 
