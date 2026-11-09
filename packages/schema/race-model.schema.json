@@ -262,6 +262,11 @@
             "minimum": 0,
             "description": "Extra seconds per lap of tyre age past cliffLap. Absent: no fitted cliff."
           },
+          "degQuad": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Seconds per lap of tyre wear squared: the lap costs degQuad x wear^2 on top of degPerLap x wear, so a long stint falls off late (Eras model fix S4, pooled by track and era). Absent: linear wear."
+          },
           "provenLaps": {
             "type": "integer",
             "minimum": 1,

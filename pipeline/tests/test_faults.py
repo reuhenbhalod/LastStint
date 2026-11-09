@@ -471,8 +471,12 @@ def test_hungary_1997_fits_hills_last_laps_hydraulic_failure():
     assert 9.0 < fault["paceLoss"] < 15.0
     committed = json.loads((RACES_DIR / "hungary-1997.json").read_text())
     # The fit carries Hill's stint pace (Eras model fix M2), so a file built before it differs
-    # by that much (12.266 vs 11.987 s); compared once the file is rebuilt with it.
-    if any("stintPace" in d for d in committed["drivers"]):
+    # by that much (12.266 vs 11.987 s), and the MEDIUM's quadratic wear (Eras model fix S4) by
+    # 11.987 vs 11.963 s; compared once the file is rebuilt with both.
+    rebuilt = any("stintPace" in d for d in committed["drivers"]) and any(
+        "degQuad" in c for c in committed["compounds"].values()
+    )
+    if rebuilt:
         assert [e for e in committed["events"] if e["type"] == "FAULT"] == got
     # Real Hill lost the lead on the last lap (by 9.1 s): so does the replay, on average. (Not
     # the single noise-free run: with pace by stint, Villeneuve reaches Hill's gearbox on the

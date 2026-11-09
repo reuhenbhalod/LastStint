@@ -155,6 +155,11 @@ def assemble_race_model(
     longest = longest_stints(laps)
     stints = stint_counts(laps)
 
+    def quad(compound: str) -> dict:
+        """Eras model fix S4: its quadratic wear (s per lap^2), where the fit has a positive one."""
+        q = round(fit.compound_quad.get(compound, 0.0), 7)
+        return {"degQuad": q} if q > 0 else {}
+
     def proven(compound: str) -> dict:
         """The longest stint run on it (the game's life never falls short of it)."""
         laps_run = longest.get(compound, 0)
@@ -170,6 +175,7 @@ def assemble_race_model(
                 "offset": round(offset, 4),
                 "degPerLap": round(fit.compound_wear[compound], 5),
                 "cliffLap": thin,
+                **quad(compound),
                 **proven(compound),
             }
             continue
@@ -188,6 +194,7 @@ def assemble_race_model(
                 life_floor(compound, longest, stints, total_laps, harder_only=True) or 0,
             ),
             **({"cliffDegPerLap": round(hinge[1], 4)} if hinge else {}),
+            **quad(compound),
             **proven(compound),
         }
 

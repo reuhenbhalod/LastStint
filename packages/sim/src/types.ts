@@ -75,6 +75,11 @@ export interface CompoundModel {
   cliffLap: number;
   /** Extra seconds per lap of tyre age past cliffLap; absent when no cliff was fitted. */
   cliffDegPerLap?: number;
+  /**
+   * Seconds per lap of tyre wear squared (Eras model fix S4): the lap costs degQuad x wear^2 on
+   * top of the linear wear, so a long stint falls off late. Absent: linear wear.
+   */
+  degQuad?: number;
   /** The longest stint run on it in the real race: its life is at least this (tyre-life fix 2). */
   provenLaps?: number;
 }

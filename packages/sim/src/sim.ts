@@ -144,13 +144,27 @@ export const GO_LONG_MARGIN = 3;
  */
 export function tyreLife(c: CompoundModel): number {
   const extra = c.cliffDegPerLap ?? CLIFF_FALLBACK * c.degPerLap;
-  const loss =
-    c.degPerLap * c.cliffLap >= LIFE_LOSS
-      ? LIFE_LOSS / c.degPerLap
-      : (LIFE_LOSS + extra * c.cliffLap) / (c.degPerLap + extra);
+  let loss: number;
+  if (c.degQuad !== undefined && c.degQuad > 0) {
+    // Eras model fix S4: the age where degPerLap*a + degQuad*a^2 (+ the cliff) = LIFE_LOSS.
+    loss = quadRoot(c.degQuad, c.degPerLap, LIFE_LOSS);
+    if (loss > c.cliffLap) {
+      loss = quadRoot(c.degQuad, c.degPerLap + extra, LIFE_LOSS + extra * c.cliffLap);
+    }
+  } else {
+    loss =
+      c.degPerLap * c.cliffLap >= LIFE_LOSS
+        ? LIFE_LOSS / c.degPerLap
+        : (LIFE_LOSS + extra * c.cliffLap) / (c.degPerLap + extra);
+  }
   const life = c.cliffDegPerLap === undefined ? Math.min(loss, c.cliffLap) : loss;
   // A tyre that real teams ran for N laps in this race lasts at least N (tyre-life fix 2).
   return Math.min(99, Math.max(Math.floor(life), c.provenLaps ?? 0));
+}
+
+/** The positive root of a*x^2 + b*x = c (a > 0, c > 0). */
+function quadRoot(a: number, b: number, c: number): number {
+  return (Math.sqrt(b * b + 4 * a * c) - b) / (2 * a);
 }
 
 /** Usable life of `compound` in `model` (Infinity if the race has no model for it). */
@@ -510,6 +524,8 @@ export function tyreLapTime(
   const c = model.compounds[compound];
   if (!c) throw new Error(`no compound model for ${compound}`);
   let t = basePace + c.offset + c.degPerLap * wear - model.fuelEffectPerLap * lap;
+  // Eras model fix S4: wear that grows with the set's age (pipeline wear_shape.py).
+  if (c.degQuad !== undefined) t += c.degQuad * wear * wear;
   if (wear > c.cliffLap) {
     const extra = c.cliffDegPerLap ?? CLIFF_FALLBACK * c.degPerLap;
     t += extra * (wear - c.cliffLap);
