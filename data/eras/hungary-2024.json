@@ -7,5 +7,36 @@
     "drs": true,
     "ers": "hybrid",
     "refuelling": false
+  },
+  "eras": {
+    "eraId": 10,
+    "order": 7,
+    "userSide": "PIA",
+    "target": {
+      "type": "team",
+      "positions": [
+        2,
+        2
+      ]
+    },
+    "storyline": {
+      "real": "Piastri takes the lead from his pole-sitting team-mate at the start. Norris stops first both times and comes out ahead after the second round of stops, then pulls about six seconds clear. McLaren keep asking him to give the lead back, and he does on lap 68: Piastri wins his first Grand Prix by 2.1 s, McLaren's first one-two since the 2021 Italian Grand Prix."
+    },
+    "mastery": {
+      "type": "finish_position",
+      "position": 1,
+      "label": "Win the race yourself"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "push",
+      "maxLaps": 0,
+      "label": "Finish without a single push lap"
+    },
+    "hardCalls": {
+      "PIA": 2,
+      "NOR": 0
+    },
+    "briefing": "Hungaroring, July 2024. Norris took pole with Piastri alongside, McLaren's first front-row lockout since 2012, but Piastri led into the first corner. You run Piastri, 3.4 s ahead of Norris after 14 laps, with Verstappen third. Bring the McLarens home one-two."
   }
 }
