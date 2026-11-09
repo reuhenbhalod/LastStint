@@ -70,6 +70,47 @@ describe('faultCost', () => {
     expect(c('CCC', 10, false, true)).toEqual([0, 0]);
   });
 
+  it('a contact (damage) lap is flagged, so the car is out of its pass rolls', () => {
+    const spin: RaceEvent = { ...gear, fault: 'damage', paceLoss: 0, laps: 1, slowLap: 8 };
+    const t = faultTable([spin, puncture]);
+    expect(faultCost(t, 'BBB', 10, false, true)).toEqual({
+      pace: 0,
+      extra: 8,
+      struck: 'damage',
+      contact: true,
+    });
+    expect(faultCost(t, 'BBB', 11, false, true).contact).toBeUndefined();
+    expect(faultCost(t, 'AAA', 10, false, true).contact).toBeUndefined(); // a puncture
+  });
+
+  it('a spun car does not hold up the car behind it', () => {
+    // VER leads SAI by 0.5 s; VER spins on lap 35 (10 s). As a puncture SAI is held behind
+    // (its slow lap isn't in its model pace); as a contact SAI is by on the time order.
+    const drivers = ABU.drivers
+      .filter((d) => d.code === 'VER' || d.code === 'SAI')
+      .map((d) => {
+        const lead = d.code === 'VER';
+        const at = { ...d.stateAtTakeover, position: lead ? 1 : 2, gapAhead: lead ? 0 : 0.5 };
+        return { ...d, noise: 0, stateAtTakeover: at };
+      });
+    const verBehind = (fault: 'damage' | 'puncture') => {
+      const spin: RaceEvent = {
+        lap: 35,
+        type: 'FAULT',
+        driver: 'VER',
+        fault,
+        paceLoss: 0,
+        laps: 1,
+        slowLap: 10,
+      };
+      const model = { ...ABU, drivers, events: [spin], race: { ...ABU.race, laps: 35 } };
+      const { times } = simulate(model, 1);
+      return (times.VER ?? 0) - (times.SAI ?? 0);
+    };
+    expect(verBehind('damage')).toBeGreaterThan(5);
+    expect(verBehind('puncture')).toBeLessThan(0);
+  });
+
   it('names the fault on the lap it struck', () => {
     const t = faultTable([puncture]);
     expect(faultCost(t, 'AAA', 10, false, true).struck).toBe('puncture');
@@ -172,6 +213,13 @@ describe('fault moments', () => {
       'Box for mediums',
       'Limp on and nurse it',
     ]);
+  });
+
+  it('a contact over in its own lap brings no moment', () => {
+    const model = withFaults(ABU, [
+      { lap: 44, type: 'FAULT', driver: 'HAM', fault: 'damage', paceLoss: 0, laps: 1, slowLap: 5 },
+    ]);
+    expect(candidateMoments(model).some((x) => x.trigger === 'fault')).toBe(false);
   });
 
   it("only the user's car's faults bring a moment", () => {

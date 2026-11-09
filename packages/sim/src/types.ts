@@ -133,7 +133,7 @@ export interface ServiceStop {
 }
 
 /** A car fault's kind (simulator roadmap R2; faults.ts). */
-export type FaultKind = 'gear-stuck' | 'power-loss' | 'puncture' | 'tyre-failure';
+export type FaultKind = 'gear-stuck' | 'power-loss' | 'puncture' | 'tyre-failure' | 'damage';
 
 export interface RaceEvent {
   lap: number;

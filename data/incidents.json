@@ -250,6 +250,18 @@
    "detail": "McLaren told Norris to give the lead back to Piastri; he slowed on the start-finish straight on lap 68",
    "source": "https://en.wikipedia.org/wiki/2024_Hungarian_Grand_Prix",
    "note": "Lap 68 in the article and in the timing (PIA ahead at the end of lap 68)"
+  },
+  {
+   "lap": 63,
+   "type": "FAULT",
+   "driver": "VER",
+   "status": "Collision",
+   "fault": "damage",
+   "laps": 1,
+   "detail": "Touched Hamilton diving down the inside at turn 1, went off track and lost fourth to Leclerc",
+   "turn": 1,
+   "source": "https://www.grandprix.com/races/hungarian-gp-2024-race-notes.html",
+   "note": "Lap 63 and turn 1 in GrandPrix.com's race notes and Autosport (https://www.autosport.com/f1/news/fia-hamilton-could-have-done-more-to-avoid-verstappen-clash-but-no-action-taken/10637398/). No source names damage: it costs its contact lap only (laps 1), fitted from the timing"
   }
  ],
  "belgium-2023": [],
@@ -589,6 +601,17 @@
     "KOV"
    ],
    "source": "https://en.wikipedia.org/wiki/2012_European_Grand_Prix"
+  },
+  {
+   "lap": 56,
+   "type": "FAULT",
+   "driver": "MAL",
+   "status": "Collision",
+   "fault": "damage",
+   "detail": "Hit Hamilton at turn 13 on the penultimate lap, lost his front wing and dropped down the order; ran on without it to the flag",
+   "turn": 13,
+   "source": "https://en.wikipedia.org/wiki/2012_European_Grand_Prix",
+   "note": "Penultimate lap of 57 = lap 56 (Hamilton classified with 55 laps); Hamilton's car retired there, so it has no FAULT item"
   }
  ],
  "abu-dhabi-2012": [
@@ -918,6 +941,32 @@
    "detail": "Gearbox problem in the closing laps; the team told him to avoid seventh gear, after which he held his lead over Verstappen",
    "source": "https://en.wikipedia.org/wiki/2016_British_Grand_Prix",
    "note": "The article gives no lap: 'As R\u00e4ikk\u00f6nen got back into fifth at the expense of P\u00e9rez, Rosberg reported problems with his gearbox'. R\u00e4ikk\u00f6nen passed P\u00e9rez on lap 46 in the timing (FastF1); Rosberg's laps 46-47 are 3.2 s and 2.5 s over his laps either side, and VER closes from 6.2 s to 2.0 s. Two laps (46-47) from the timing: the article says he 'was able to consolidate his slim lead' once he avoided seventh"
+  }
+ ],
+ "brazil-2019": [
+  {
+   "lap": 70,
+   "type": "FAULT",
+   "driver": "ALB",
+   "status": "Collision",
+   "fault": "damage",
+   "laps": 1,
+   "detail": "Hit by Hamilton at turn 10 at the restart, spun and rejoined fifteenth",
+   "turn": 10,
+   "source": "https://en.wikipedia.org/wiki/2019_Brazilian_Grand_Prix",
+   "note": "No source names damage: it costs its contact lap only (laps 1), fitted from the timing"
+  },
+  {
+   "lap": 70,
+   "type": "FAULT",
+   "driver": "HAM",
+   "status": "Collision",
+   "fault": "damage",
+   "laps": 1,
+   "detail": "Made contact with Albon trying to pass at turn 10 and was slowed, letting Gasly into second",
+   "turn": 10,
+   "source": "https://en.wikipedia.org/wiki/2019_Brazilian_Grand_Prix",
+   "note": "No source names damage: it costs its contact lap only (laps 1), fitted from the timing"
   }
  ]
 }

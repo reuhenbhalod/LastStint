@@ -406,6 +406,8 @@ def simulate(
                 if not redflag.is_free(red, neutral, lap):
                     pit_cost += service["loss"]
             fault_pace, fault_extra = faults.cost(code, lap, bool(pit or service), flag is None)
+            if faults.contact(code, lap):
+                pitted.add(code)  # a spin or a trip off: out of the lap's pass rolls
 
             if flag == "SC" and sc_time:
                 lt = sc_time

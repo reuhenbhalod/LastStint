@@ -1851,6 +1851,9 @@ export function stepLap(run: Run): RaceState {
     // A car fault (faults.ts): its pace loss on green laps, its slow lap on its own lap.
     const fault = faultCost(run.faults, code, lap, c.pittedThisLap, !flag);
     if (fault.struck) run.notes.push({ lap, kind: 'fault', driver: code, detail: fault.struck });
+    // A contact (damage) lap: the car spun or ran off, so the pairs around it go to the time
+    // order like a stop's (it doesn't hold up the cars behind it).
+    if (fault.contact) pitted.add(code);
     const wet = wetnessOn(run.wetness, lap);
     const base = cleanLap(model, c, lap, wet);
     const eng = code === model.userSide && !flag ? state.engineer : undefined;

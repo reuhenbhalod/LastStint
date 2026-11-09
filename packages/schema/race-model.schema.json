@@ -495,7 +495,8 @@
               "gear-stuck",
               "power-loss",
               "puncture",
-              "tyre-failure"
+              "tyre-failure",
+              "damage"
             ],
             "description": "A FAULT's kind (simulator roadmap R2; pipeline/faults.py)."
           },

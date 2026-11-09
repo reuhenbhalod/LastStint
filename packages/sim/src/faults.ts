@@ -1,10 +1,10 @@
 // Car faults (simulator roadmap R2; eras build plan 4.4). Same rule as the Python reference
 // sim's FaultState (pipeline/faults.py), for parity.
 //
-// A FAULT event is frozen on its real lap, like a safety car: from `lap` (for `laps` laps, or
-// to the flag, or with `untilStop` to the car's next stop) its car loses `paceLoss` on every
-// green lap (neutralized laps run at the SC/VSC pace whatever the car), plus `slowLap` once on
-// the fault's own lap. The magnitudes are fitted by the pipeline from the car's real laps.
+// A FAULT event (a breakdown, or `damage` from a collision) is frozen on its real lap, like a
+// safety car: from `lap` (for `laps` laps, or to the flag, or with `untilStop` to the car's
+// next stop) its car loses `paceLoss` on every green lap (neutralized laps run at the SC/VSC
+// pace whatever the car), plus `slowLap` once on the fault's own lap (a contact's lap). The magnitudes are fitted by the pipeline from the car's real laps.
 
 import type { FaultKind, RaceEvent } from './types.js';
 
@@ -13,6 +13,7 @@ export const FAULT_KINDS: readonly FaultKind[] = [
   'power-loss',
   'puncture',
   'tyre-failure',
+  'damage',
 ];
 
 /** One car's fault in a run, and whether a stop has fixed it. */
@@ -55,6 +56,8 @@ export interface FaultCost {
   extra: number;
   /** The kind of a fault that struck on this lap (for the run's notes). */
   struck?: FaultKind;
+  /** A contact (`damage`) struck on this lap: the car is out of the lap's pass rolls. */
+  contact?: boolean;
 }
 
 const NONE: FaultCost = Object.freeze({ pace: 0, extra: 0 });
@@ -75,6 +78,7 @@ export function faultCost(
   let pace = 0;
   let extra = 0;
   let struck: FaultKind | undefined;
+  let contact = false;
   for (const f of list) {
     const e = f.event;
     if (f.ended || lap < e.lap) continue;
@@ -87,9 +91,11 @@ export function faultCost(
     if (lap === e.lap) {
       extra += e.slowLap ?? 0;
       struck = e.fault;
+      if (e.fault === 'damage') contact = true;
     }
   }
   if (pace === 0 && extra === 0 && !struck) return NONE;
+  if (contact) return { pace, extra, struck, contact };
   return struck ? { pace, extra, struck } : { pace, extra };
 }
 
