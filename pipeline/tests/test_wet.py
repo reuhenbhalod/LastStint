@@ -269,6 +269,19 @@ def test_mixed_laps_pair_the_tyre_classes_in_clear_air():
 def test_eras_curves_are_an_eras_timed_build_only():
     """A wet Daily/Gauntlet race and a wet reconstructed race keep the shared curves; a timed
     wet Eras race takes the Eras curves (its slick scaled by its own mixed laps)."""
+    import pytest
+
+    from pipeline import build, ingest
+
+    for race_id in ("canada-2024", "germany-2000", "monaco-1984"):
+        if not ingest.raw_snapshot_path(race_id, build.RAW_DIR).exists():
+            pytest.skip(f"no raw snapshot for {race_id}")
+    assert build.build_race("canada-2024").model["weather"]["curves"] == CURVES
+    assert build.build_race("monaco-1984").model["weather"]["curves"] == CURVES
+    eras = build.build_race("germany-2000").model["weather"]["curves"]
+    assert eras["inter"] == ERAS["inter"] and eras["wet"] == ERAS["wet"]
+    assert eras["slick"] != ERAS["slick"]  # Barrichello's slicks kept the inters' pace
+    assert eras["slick"]["a"] < ERAS["slick"]["a"]
 
 
 # Model fix 1.6 (Eras builds): a car that ran only wet laps takes an estimated dry pace.
@@ -318,17 +331,6 @@ def test_a_car_with_only_wet_laps_stays_in_an_eras_race():
     import pytest
 
     from pipeline import build, ingest
-
-    for race_id in ("canada-2024", "germany-2000", "monaco-1984"):
-        if not ingest.raw_snapshot_path(race_id, build.RAW_DIR).exists():
-            pytest.skip(f"no raw snapshot for {race_id}")
-    assert build.build_race("canada-2024").model["weather"]["curves"] == CURVES
-    assert build.build_race("monaco-1984").model["weather"]["curves"] == CURVES
-    eras = build.build_race("germany-2000").model["weather"]["curves"]
-    assert eras["inter"] == ERAS["inter"] and eras["wet"] == ERAS["wet"]
-    assert eras["slick"] != ERAS["slick"]  # Barrichello's slicks kept the inters' pace
-    assert eras["slick"]["a"] < ERAS["slick"]["a"]
-
 
     if not ingest.raw_snapshot_path("china-2007", build.RAW_DIR).exists():
         pytest.skip("no raw snapshot for china-2007")

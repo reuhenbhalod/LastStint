@@ -75,7 +75,7 @@
  "solver": {
   "attempts": 1,
   "sigma": 0.35,
-  "passed": false
+  "passed": true
  },
  "fitted": {
   "PAT": {
@@ -237,7 +237,7 @@
  },
  "summary": {
   "grid": {
-   "pass": 0,
+   "pass": 1,
    "total": 1
   },
   "order": {
@@ -284,7 +284,7 @@
  "anchors": [
   {
    "anchor": "grid",
-   "subject": "lap-1 order is the grid order (the sourced lap-1 order at the front)",
+   "subject": "lap-1 order is the grid order (the sourced lap-1 order at the front) (out after lap 1, at its sourced time: GHI LAF WINM)",
    "target": [
     "PIQN",
     "PAT",
@@ -293,9 +293,7 @@
     "PRO",
     "ROSK",
     "MAN",
-    "WINM",
     "DEC",
-    "LAF",
     "DEA",
     "LAU",
     "WAR",
@@ -310,8 +308,7 @@
     "SUR",
     "BOE",
     "ACH",
-    "FABC",
-    "GHI"
+    "FABC"
    ],
    "achieved": [
     "PIQN",
@@ -324,11 +321,9 @@
     "DEC",
     "DEA",
     "LAU",
-    "WINM",
     "WAR",
     "CHE",
     "WAT",
-    "LAF",
     "GIA",
     "BAL",
     "ALBM",
@@ -337,11 +332,10 @@
     "JARJ",
     "SUR",
     "BOE",
-    "GHI",
     "ACH",
     "FABC"
    ],
-   "pass": false
+   "pass": true
   },
   {
    "anchor": "order",
@@ -1024,8 +1018,11 @@
  ],
  "notes": [
   "WINM: fastest lap on lap 1, its lap-1 time is the fastest lap's",
+  "WINM: out after lap 1, its lap-1 place is its sourced time's",
   "LAF: fastest lap on lap 1, its lap-1 time is the fastest lap's",
+  "LAF: out after lap 1, its lap-1 place is its sourced time's",
   "GHI: fastest lap on lap 1, its lap-1 time is the fastest lap's",
+  "GHI: out after lap 1, its lap-1 place is its sourced time's",
   "SUR: target 5641.9s not reachable",
   "BOUT: target 5633.6s not reachable"
  ]

@@ -156,14 +156,14 @@ the eras branch.
 
 | # | Race | Data source | Estimated | Built | Check | Result | Mean gap error / anchors | Main failing check | Diagnosis |
 |---|---|---|---|---|---|---|---|---|---|
-| 1 | france-1990 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, fuelLoads, weather | yes | anchors | **fail** | 67/68 core anchors | order anchor; G1 sanity fail, 3.86 s | anchor fail (order): de Cesaris' disqualification puts him in the road order (solver); G1 sanity 0.52 -> 3.86 s on W2's anchors: duel CAP vs PRO 8.1 s (race mechanics 98%) |
+| 1 | france-1990 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, fuelLoads, weather | yes | anchors | pass | 68/68 core anchors | G1 sanity fail, 3.79 s | anchors pass (S7, Nov 8: de Cesaris run 15th on the road, GrandPrix.com, `roadPositions`); G1 sanity 3.86 -> 3.79 s: race mechanics (96%) |
 | 2 | united-states-1990 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, fuelLoads, weather | yes | anchors | pass | 60/60 core anchors | G1 sanity pass, 2.18 s |  |
 | 3 | mexico-1990 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, fuelLoads, weather | yes | anchors | pass | 73/73 core anchors | G1 sanity pass, 1.84 s | anchors pass; G1 sanity now passes on W2's anchors (2.00 -> 1.84 s) |
 | 4 | brazil-1991 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, fuelLoads, weather | yes | anchors | pass | 61/61 core anchors | G1 sanity fail, 3.64 s | anchors pass; G1 sanity 2.37 -> 3.64 s on W2's anchors: ALE and PRO about 7 s (pace 69%) |
-| 5 | monaco-1992 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, fuelLoads, weather | yes | anchors | **fail** | 57/58 core anchors | grid anchor; G1 sanity pass, 1.60 s | anchor fail (grid): Moreno's and Wendlinger's lap 1 pinned by their fastest laps (solver) |
+| 5 | monaco-1992 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, fuelLoads, weather | yes | anchors | pass | 58/58 core anchors | G1 sanity pass, 1.60 s | anchors pass (S7: Moreno and Wendlinger, out after lap 1, stand outside the grid ladder; race file unchanged) |
 | 6 | belgium-1992 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, fuelLoads, weather | yes | anchors | pass | 110/110 core anchors | G1 sanity fail, 10.86 s | anchors pass; rival Mansell again (W1: his slick stop is a storyline call); Mansell leads at the takeover as sourced. G1 sanity 5.18 -> 10.86 s on W2's anchors (10.80 s with Patrese as the rival): duel MSCM vs MAN 14.4 s, PAT 13.8 s |
 | 7 | hungary-1992 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, fuelLoads, weather | yes | anchors | pass | 57/57 core anchors | G1 sanity fail, 4.10 s | anchors pass; G1 sanity 2.55 -> 4.10 s on W2's anchors: duel MAN vs BER 6.5 s, Mansell's fresh-tyre pace (pace 90%) |
-| 8 | brazil-1993 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, fuelLoads, weather (sidecar) | no: `data_issue`: the synthetic race isn't the real one (no source for the field's slick stops on laps 40-43; Senna P14 at the takeover, can't win with his real calls). Raw reconstruction only; anchors 108/108 (G1 sanity 46.25 s, integration 6; not re-run) | anchors | **not built** |  |  |  |
+| 8 | brazil-1993 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, fuelLoads, weather | yes | anchors | pass | 123/123 core anchors | G1 sanity fail, 6.56 s | built (S7, Nov 8): the field's slick stops (GPE, Wikipedia: everyone changed, laps 37-43) estimated on lap 40 for the ten cars left on wets (`weather.slickChange`), Motor Sport's lap-39/43/47 order; Senna P3 at the takeover (was P14); G1 sanity 46.25 -> 6.56 s (lap pace 52%). No Eras overlay yet (owner) |
 | 9 | europe-1993 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, safetyCars, fuelLoads, weather | yes | anchors | pass | 106/106 core anchors | G1 sanity fail, 52.20 s | anchors pass; Senna now leads at the takeover (W2's lap leaders; was P12); rival Hill again (W1). G1 sanity 1.16 -> 52.20 s: HIL 78 s off his real gap (38.20 s with Prost as the rival, so mostly the anchors): his four unsourced later stops are absorbed into his pace |
 | 10 | australia-1993 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, safetyCars, fuelLoads, weather | yes | anchors | pass | 60/60 core anchors | G1 sanity pass, 0.72 s |  |
 
@@ -171,7 +171,7 @@ the eras branch.
 
 | # | Race | Data source | Estimated | Built | Check | Result | Mean gap error / anchors | Main failing check | Diagnosis |
 |---|---|---|---|---|---|---|---|---|---|
-| 1 | south-africa-1983 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, fuelLoads, weather | yes | anchors | **fail** | 57/58 core anchors | grid anchor; G1 sanity pass, 2.95 s | anchor fail (grid): a lap-1 retirement pinned by its fastest lap (solver); G1 sanity now passes on W2's anchors (3.93 -> 2.95 s) |
+| 1 | south-africa-1983 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, fuelLoads, weather | yes | anchors | pass | 58/58 core anchors | G1 sanity pass, 2.95 s | anchors pass (S7: Winkelhock, Laffite and Ghinzani, out after lap 1, stand outside the grid ladder; race file unchanged) |
 | 2 | monaco-1984 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, fuelLoads, weather | yes | anchors | pass | 41/41 core anchors | G1 sanity fail, 2.40 s | anchors pass; fuel limit bites in the rain as if dry; G1 sanity 5.54 -> 2.40 s on W2's anchors (BEL 6.3 s) |
 | 3 | portugal-1984 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, fuelLoads, weather | yes | anchors | pass | 58/58 core anchors | G1 sanity fail, 3.00 s | anchors pass; G1 sanity: race mechanics (pace 32%) |
 | 4 | germany-1986 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, fuelLoads, weather | yes | anchors | pass | 68/68 core anchors | G1 sanity pass, 1.77 s | anchors pass; Rosberg runs to the last lap 2.0 s behind Piquet (M4 lastLapStops) and his out-of-fuel stop is left to the fuel model |
@@ -184,7 +184,7 @@ the eras branch.
 
 ## Summary
 
-**Result: 41 pass, 0 borderline, 57 fail, 2 not built** (of 100; 22 reconstructed races checked on their anchors, 76 on G1). Last report (integration 6): 41 pass, 0 borderline, 57 fail, 2 not built. No race changed status; the errors moved (below).
+**Result: 45 pass, 0 borderline, 54 fail, 1 not built** (of 100; 23 reconstructed races checked on their anchors, 76 on G1; S7, Nov 8 2026: france-1990, monaco-1992 and south-africa-1983 now pass their anchors and brazil-1993 is built and passes; before S7: 41 pass, 57 fail, 2 not built). Last report (integration 6): 41 pass, 0 borderline, 57 fail, 2 not built. No race changed status; the errors moved (below).
 
 | Era | Pass | Borderline | Fail | Not built |
 |---|---|---|---|---|
@@ -196,8 +196,8 @@ the eras branch.
 | 5 | 1 | 0 | 8 | 1 |
 | 4 | 3 | 0 | 7 | 0 |
 | 3 | 5 | 0 | 5 | 0 |
-| 2 | 7 | 0 | 2 | 1 |
-| 1 | 9 | 0 | 1 | 0 |
+| 2 | 10 | 0 | 0 | 0 |
+| 1 | 10 | 0 | 0 | 0 |
 | **All** | **41** | **0** | **57** | **2** |
 
 Timed races (76): total mean gap error 294.85 s (integration 6: 356.32 s, the same 76 races), all
@@ -223,13 +223,13 @@ wear; not the cause), and the reconstructed running order at europe-1993 and aus
 4. **SC / red-flag restart mechanics (late-SC sprints, restart order and spacing, the fitted SC queue's stop costs; M4's restart model is built but off).** 12 failing: great-britain-2022, miami-2024, azerbaijan-2021, saudi-arabia-2021, azerbaijan-2017, italy-2020, sakhir-2020, bahrain-2014, monaco-2015, belgium-1998 (the sim's restart nose-to-tail, then ALE passes the Jordans), germany-2000 (its two sourced SCs; duel and DLR at their limits), europe-2012 (MSCM's podium gap behind the sourced SC, race mechanics 76%).
 5. **Team orders and let-bys: scripted since M4 (TEAM_ORDER facts), but the sim's cars around the swap don't end where the real ones did.** 4 failing: hungary-2024, russia-2018, europe-1997, malaysia-1999.
 6. **One-off losses and car problems: unsourced (not in data/incidents.json), or a sourced fault's fitted constant loss that doesn't settle a near-tie.** 3 failing: canada-2014, united-states-2015, great-britain-2016.
-7. **Reconstruction solver anchor conflicts (lap-1 grid vs fastest-lap-pinned retirements; disqualified cars in the road order).** 3 failing: france-1990, monaco-1992, south-africa-1983.
+7. **Reconstruction solver anchor conflicts (lap-1 grid vs fastest-lap-pinned retirements; disqualified cars in the road order).** 0 failing (S7, Nov 8 2026: a lap-1 retirement stands outside the grid ladder; france-1990's de Cesaris has a sourced road place). Was 3: france-1990, monaco-1992, south-africa-1983.
 8. **Dropped cars with no dry laps (a car that ran only wet laps has no pace fit).** Fixed in Eras builds by model fix 1.6 (an estimated dry pace, provenance `driverPace`; docs/g1-report.md): china-2007 built; hungary-2006 (FIS, LIU, RAI, ROS) and malaysia-2001 (FIS) keep their cars once rebuilt (still failing on wet pace, gap 2). The reconstructed belgium-1992 still drops BOUT.
 9. **No unlapping decided from the sim's own gaps (a car the sim has a lap down stays there).** 1 failing: monaco-2011 (HAM 69 s, WEB 26 s).
 10. **Estimated dry compounds (step 2.4's SOFT/HARD split).** 1 failing: brazil-2008.
 11. **Tyre wear on long stints (flat HARD wear, last-stint wear).** 1 failing: hungary-2014.
 12. **Eras content under the merged grader and anchors (W1's fuel in playouts and real-plan continuation; W2's sourced running order).** 12 blocked in play (reachability fails, every one with its anchors or G1 as before): australia-1993, australia-1994, europe-1993, hungary-1986, portugal-1985, great-britain-1987, portugal-1984, belgium-1995, hungary-1992, brazil-2019, europe-2012, hungary-2019 (shared); and mexico-1990 has no decision moments. Content to re-author (owner).
-13. **Unreconstructed stops (unsourced tyre changes or later stops absorbed into pace).** 1 not built: brazil-1993; europe-1993's G1 sanity (Hill's four unsourced later stops: HIL 78 s).
+13. **Unreconstructed stops (unsourced tyre changes or later stops absorbed into pace).** brazil-1993 built (S7: `weather.slickChange` estimates the unsourced slick stops); europe-1993's G1 sanity (Hill's four unsourced later stops: HIL 78 s).
 14. **Fuel limit bites in the rain as if dry (the takeover margin is drawn for a dry burn).** 2 blocked in play or flagged: monaco-1984, portugal-1985.
 
 ## Since the last report
@@ -354,7 +354,5 @@ pick HIL): not changed, owner to confirm.
 
 ## Not built
 
-- **brazil-1993** (Era 2): registered with `data_issue`, raw reconstruction only. Anchors pass
-  (108/108 with W2's lap leaders), but no source gives the field's slick stops (laps 40-43), so
-  the synthetic race isn't the real one. Needs the slick stops sourced, or a solver rule for
-  unsourced tyre changes.
+- ~~brazil-1993~~ (Era 2): built from S7 (Nov 8 2026); see its row.
+- ~~china-2007~~ (Era 5): built from model fix 1.6; see its row.

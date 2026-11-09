@@ -20,6 +20,7 @@
   "PitInTime is the in-lap's end; PitOutTime adds the out-lap's share of the lane time",
   "Compound is left empty (one dry compound per race, estimated in step 2.4)",
   "No weather timeline: the race is assumed dry",
+  "DEC: disqualified, run to the flag P15 on the road between its road neighbours (no gap sourced: its time is an estimate); the official result keeps it excluded",
   "Stops: only the sourced ones; cars may have stopped more (unknown)"
  ],
  "sources": {
@@ -49,7 +50,15 @@
   "DAL",
   "MAN"
  ],
- "roadPositions": [],
+ "roadPositions": [
+  {
+   "driver": "DEC",
+   "position": 15,
+   "gap": null,
+   "gapSourced": false,
+   "source": "https://www.grandprix.com/gpe/rr491.html and https://www.grandprix.com/races/french-gp-1990.html (results table, in order: '13 | 8 | Stefano Modena | Brabham-Judd | 78', '14 | 25 | Nicola Larini | Ligier-Cosworth | 78', 'dq | 22 | Andrea de Cesaris | Dallara-Cosworth | 78 | Car Under Weight | 21', '15 | 7 | David Brabham | Brabham-Judd | 77'); https://en.wikipedia.org/wiki/1990_French_Grand_Prix (classification: DSQ, 22, Andrea de Cesaris, Dallara-Ford, 78 laps, 'Underweight', grid 21; Modena and Larini '+2 laps', 78 laps)"
+  }
+ ],
  "lastLapStops": [],
  "stopsComplete": false,
  "safetyCarsComplete": true,
@@ -81,7 +90,7 @@
  "solver": {
   "attempts": 1,
   "sigma": 0.35,
-  "passed": false
+  "passed": true
  },
  "fitted": {
   "PRO": {
@@ -124,61 +133,61 @@
    "pace": 66.503,
    "wear": 0.05,
    "noise": 0.35,
-   "target": 5620.501
+   "target": 5620.518
   },
   "BEN": {
    "pace": 65.905,
    "wear": 0.075,
    "noise": 0.525,
-   "target": 5629.76
+   "target": 5629.741
   },
   "ALL": {
    "pace": 66.962,
    "wear": 0.05,
    "noise": 0.7,
-   "target": 5641.173
+   "target": 5641.13
   },
   "ALBM": {
    "pace": 67.934,
    "wear": 0.025,
    "noise": 0.525,
-   "target": 5655.32
+   "target": 5655.34
   },
   "WAR": {
    "pace": 68.058,
    "wear": 0.025,
    "noise": 0.525,
-   "target": 5655.82
+   "target": 5655.84
   },
   "DON": {
    "pace": 69.073,
    "wear": 0.0,
    "noise": 0.7,
-   "target": 5656.32
+   "target": 5656.34
   },
   "MOD": {
-   "pace": 68.781,
+   "pace": 68.778,
    "wear": 0.025,
    "noise": 0.35,
-   "target": 5645.78
+   "target": 5645.558
   },
   "LAR": {
-   "pace": 68.999,
+   "pace": 68.994,
    "wear": 0.025,
    "noise": 0.35,
-   "target": 5661.172
+   "target": 5660.815
   },
   "BRA": {
-   "pace": 69.526,
+   "pace": 69.532,
    "wear": 0.025,
    "noise": 0.525,
-   "target": 5631.429
+   "target": 5631.871
   },
   "NAN": {
    "pace": 66.985,
    "wear": 0.025,
    "noise": 0.525,
-   "target": 5291.141
+   "target": 5291.146
   },
   "DAL": {
    "pace": 72.214,
@@ -190,55 +199,55 @@
    "pace": 66.243,
    "wear": 0.05,
    "noise": 0.35,
-   "target": 5051.864
+   "target": 5051.905
   },
   "DEC": {
-   "pace": 66.486,
-   "wear": 0.05,
-   "noise": 0.525,
-   "target": 5549.109
+   "pace": 69.892,
+   "wear": 0.0,
+   "noise": 0.7,
+   "target": 5661.66
   },
   "NAKS": {
-   "pace": 68.21,
+   "pace": 68.209,
    "wear": 0.0,
    "noise": 0.262,
-   "target": 4494.758
+   "target": 4494.697
   },
   "GUG": {
-   "pace": 66.522,
+   "pace": 66.523,
    "wear": 0.025,
    "noise": 0.35,
-   "target": 4091.914
+   "target": 4091.972
   },
   "MAR": {
-   "pace": 69.417,
+   "pace": 69.425,
    "wear": 0.0,
    "noise": 0.35,
-   "target": 2936.691
+   "target": 2936.986
   },
   "ALE": {
-   "pace": 67.412,
+   "pace": 67.411,
    "wear": 0.0,
    "noise": 0.35,
-   "target": 1652.666
+   "target": 1652.659
   },
   "CAF": {
-   "pace": 68.468,
+   "pace": 68.469,
    "wear": 0.0,
    "noise": 0.7,
-   "target": 1609.333
+   "target": 1609.358
   },
   "BOUT": {
-   "pace": 67.572,
+   "pace": 67.515,
    "wear": 0.05,
    "noise": 0.7,
-   "target": 513.933
+   "target": 513.649
   },
   "PIR": {
-   "pace": 68.628,
+   "pace": 68.606,
    "wear": 0.05,
    "noise": 0.7,
-   "target": 529.26
+   "target": 529.15
   }
  },
  "summary": {
@@ -247,7 +256,7 @@
    "total": 1
   },
   "order": {
-   "pass": 0,
+   "pass": 1,
    "total": 1
   },
   "gap": {
@@ -259,16 +268,16 @@
    "total": 26
   },
   "retirement": {
-   "pass": 10,
-   "total": 10
+   "pass": 9,
+   "total": 9
   },
   "retirement event": {
-   "pass": 10,
-   "total": 10
+   "pass": 9,
+   "total": 9
   },
   "laps down": {
-   "pass": 10,
-   "total": 10
+   "pass": 11,
+   "total": 11
   },
   "stop": {
    "pass": 6,
@@ -351,7 +360,7 @@
   },
   {
    "anchor": "order",
-   "subject": "classification",
+   "subject": "classification (road order: DEC disqualified, at the sourced road place)",
    "target": [
     "PRO",
     "CAP",
@@ -367,6 +376,7 @@
     "DON",
     "MOD",
     "LAR",
+    "DEC",
     "BRA",
     "NAN",
     "DAL",
@@ -385,48 +395,49 @@
     "ALBM",
     "WAR",
     "DON",
-    "DEC",
     "MOD",
     "LAR",
+    "DEC",
     "BRA",
     "NAN",
-    "DAL"
+    "DAL",
+    "MAN"
    ],
-   "pass": false
+   "pass": true
   },
   {
    "anchor": "gap",
    "subject": "CAP",
    "target": 8.626,
-   "achieved": 8.633,
+   "achieved": 8.624,
    "pass": true
   },
   {
    "anchor": "gap",
    "subject": "SENA",
    "target": 11.606,
-   "achieved": 11.604,
+   "achieved": 11.601,
    "pass": true
   },
   {
    "anchor": "gap",
    "subject": "PIQN",
    "target": 41.207,
-   "achieved": 41.204,
+   "achieved": 41.207,
    "pass": true
   },
   {
    "anchor": "gap",
    "subject": "BER",
    "target": 42.219,
-   "achieved": 42.208,
+   "achieved": 42.213,
    "pass": true
   },
   {
    "anchor": "gap",
    "subject": "PAT",
    "target": 69.351,
-   "achieved": 69.351,
+   "achieved": 69.344,
    "pass": true
   },
   {
@@ -797,20 +808,6 @@
   },
   {
    "anchor": "retirement",
-   "subject": "DEC",
-   "target": 78,
-   "achieved": 78,
-   "pass": true
-  },
-  {
-   "anchor": "retirement event",
-   "subject": "DEC",
-   "target": true,
-   "achieved": true,
-   "pass": true
-  },
-  {
-   "anchor": "retirement",
    "subject": "NAKS",
    "target": 63,
    "achieved": 63,
@@ -978,6 +975,13 @@
    "pass": true
   },
   {
+   "anchor": "laps down",
+   "subject": "DEC",
+   "target": 2,
+   "achieved": 2,
+   "pass": true
+  },
+  {
    "anchor": "stop",
    "subject": "PRO",
    "target": 27,
@@ -1112,13 +1116,16 @@
   }
  ],
  "notes": [
+  "DEC: disqualified, placed P15 on the road between its road neighbours (no gap sourced: an estimate)",
+  "CAP: target 5618.2s not reachable",
   "SENA: target 5621.2s not reachable",
   "BER: target 5651.8s not reachable",
-  "BEN: target 5634.7s not reachable",
-  "MAN: target 5047.7s not reachable",
+  "BEN: target 5636.0s not reachable",
+  "MAN: target 5047.8s not reachable",
   "PRO: target 5609.6s not reachable",
-  "BEN: target 5629.8s not reachable",
-  "ALL: target 5641.2s not reachable",
+  "SUZ: target 5620.5s not reachable",
+  "BEN: target 5629.7s not reachable",
+  "ALL: target 5641.1s not reachable",
   "MAN: target 5051.9s not reachable"
  ]
 }

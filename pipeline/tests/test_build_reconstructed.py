@@ -145,9 +145,16 @@ def test_reconstructed_wet_stints_keep_their_tyres():
 
 
 # Eras build plan 5.5: the wet reconstructed races (facts-file weather). brazil-1993 is
-# registered with a data issue and has no race file (docs/g1-report.md, 5.5).
-WET_BUILT = ["monaco-1984", "portugal-1985", "belgium-1992", "europe-1993", "belgium-1995"]
-ALL_WET = [*WET_BUILT[:3], "brazil-1993", *WET_BUILT[3:]]
+# built from Nov 8 2026 (its unsourced slick stops estimated: weather.slickChange).
+WET_BUILT = [
+    "monaco-1984",
+    "portugal-1985",
+    "belgium-1992",
+    "brazil-1993",
+    "europe-1993",
+    "belgium-1995",
+]
+ALL_WET = WET_BUILT
 WET_EVERY_LAP = ["monaco-1984", "portugal-1985", "europe-1993"]
 
 

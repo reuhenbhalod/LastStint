@@ -286,7 +286,7 @@
  "anchors": [
   {
    "anchor": "grid",
-   "subject": "lap-1 order is the grid order",
+   "subject": "lap-1 order is the grid order (out after lap 1, at its sourced time: BEG)",
    "target": [
     "SENA",
     "PIQN",
@@ -312,8 +312,7 @@
     "BOUT",
     "GHI",
     "PALJ",
-    "ROT",
-    "BEG"
+    "ROT"
    ],
    "achieved": [
     "SENA",
@@ -340,8 +339,7 @@
     "BOUT",
     "GHI",
     "PALJ",
-    "ROT",
-    "BEG"
+    "ROT"
    ],
    "pass": true
   },
@@ -1155,6 +1153,7 @@
   }
  ],
  "notes": [
-  "BEG: fastest lap on lap 1, its lap-1 time is the fastest lap's"
+  "BEG: fastest lap on lap 1, its lap-1 time is the fastest lap's",
+  "BEG: out after lap 1, its lap-1 place is its sourced time's"
  ]
 }

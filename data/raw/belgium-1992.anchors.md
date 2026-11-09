@@ -18,7 +18,7 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 
 | Anchor | Subject | Target | Achieved | Pass |
 |---|---|---|---|---|
-| grid | lap-1 order is the grid order (the sourced lap-1 order at the front) | 24 cars: SENA MAN MSCM PAT ALE BOUT HAK BRU HER TAR CAP DEC ALBM VANE JAR MOD WEN GAC NASE GROO MOR GUG SUZ KAT | 24 cars: SENA MAN MSCM PAT ALE BOUT HAK BRU HER TAR CAP DEC ALBM VANE JAR MOD WEN GAC NASE GROO MOR GUG SUZ KAT | pass |
+| grid | lap-1 order is the grid order (the sourced lap-1 order at the front) (out after lap 1, at its sourced time: GROO) | 23 cars: SENA MAN MSCM PAT ALE BOUT HAK BRU HER TAR CAP DEC ALBM VANE JAR MOD WEN GAC NASE MOR GUG SUZ KAT | 23 cars: SENA MAN MSCM PAT ALE BOUT HAK BRU HER TAR CAP DEC ALBM VANE JAR MOD WEN GAC NASE MOR GUG SUZ KAT | pass |
 | order | classification | 18 cars: MSCM MAN PAT BRU SENA HAK JAR DEC SUZ VANE WEN NASE HER GUG MOD MOR KAT GAC | 18 cars: MSCM MAN PAT BRU SENA HAK JAR DEC SUZ VANE WEN NASE HER GUG MOD MOR KAT GAC | pass |
 | gap | MAN | 36.595 | 36.592 | pass |
 | gap | PAT | 43.897 | 43.897 | pass |
@@ -156,5 +156,6 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 
 - ALE: fastest lap on lap 1, its lap-1 time is the fastest lap's
 - GROO: fastest lap on lap 1, its lap-1 time is the fastest lap's
+- GROO: out after lap 1, its lap-1 place is its sourced time's
 - HER: classified retirement stopped at its natural time, after the point a retirement is seen
 - HER: no time fits both its classification and its window

@@ -18,7 +18,7 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 
 | Anchor | Subject | Target | Achieved | Pass |
 |---|---|---|---|---|
-| grid | lap-1 order is the grid order (the sourced lap-1 order at the front) | 24 cars: HER BER ALE HAK COU BLU IRV HIL PAN FRE SAL BAR BRU BOUJ KAT MSCM LAM INO BAD PAP MONA MOE LAV DIN | 24 cars: HER BER ALE HAK COU BLU IRV HIL PAN FRE SAL BAR BRU BOUJ KAT MSCM LAM INO BAD PAP MONA MOE LAV DIN | pass |
+| grid | lap-1 order is the grid order (the sourced lap-1 order at the front) (out after lap 1, at its sourced time: HAK) | 23 cars: HER BER ALE COU BLU IRV HIL PAN FRE SAL BAR BRU BOUJ KAT MSCM LAM INO BAD PAP MONA MOE LAV DIN | 23 cars: HER BER ALE COU BLU IRV HIL PAN FRE SAL BAR BRU BOUJ KAT MSCM LAM INO BAD PAP MONA MOE LAV DIN | pass |
 | order | classification | 14 cars: MSCM HIL BRU FRE BLU BAR HER SAL PAN LAM BOUJ INO DIN MOE | 14 cars: MSCM HIL BRU FRE BLU BAR HER SAL PAN LAM BOUJ INO DIN MOE | pass |
 | gap | HIL | 19.493 | 19.491 | pass |
 | gap | BRU | 24.998 | 24.999 | pass |
@@ -179,5 +179,6 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 
 - ALE: stop on lap 5, the lap it retired on; not run
 - HAK: fastest lap on lap 1, its lap-1 time is the fastest lap's
+- HAK: out after lap 1, its lap-1 place is its sourced time's
 - HIL: target 5827.4s not reachable
 - the laps behind the safety car did not settle

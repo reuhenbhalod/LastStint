@@ -1413,13 +1413,12 @@ RACES: dict[str, dict] = {
         "rival": "HIL",  # win: Senna in the rain; Hill the car behind at the flag
         "score_positions": 6,
         "split": "eras",
-        # Anchors pass, but the synthetic race isn't the real one (docs/g1-report.md, 5.5): no
-        # source gives the field's slick stops, so eight cars run wets on a dry track for the
-        # last 30 laps and the solver gives them dry pace up to 9.5 s a lap quicker than
-        # Senna's, who is P14 at the takeover; with his real calls he wins 0 of 20 live runs.
-        # No race file is committed until the stops are sourced or the solver changes (owner).
-        "data_issue": "synthetic race unlike the real one (unsourced slick stops; Senna P14 at"
-        " the takeover, can't win with his real calls)",
+        # Built from Nov 8 2026 (was a data issue, docs/g1-report.md, 5.5: no source gives the
+        # field's slick stops, so eight cars ran wets on a dry track for the last 30 laps and
+        # Senna was P14 at the takeover). The facts file's weather.slickChange (GPE, Wikipedia:
+        # everyone changed to slicks, laps 37-43) gives those cars an estimated slick stop
+        # (reconstruct.apply_slick_change), and Motor Sport's lap-39/43/47 order holds Senna
+        # P3 at the takeover, Hill ahead until the stops, Herbert third after them.
     },
     "europe-1993": {
         "year": 1993,

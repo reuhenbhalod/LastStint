@@ -19,7 +19,7 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 
 | Anchor | Subject | Target | Achieved | Pass |
 |---|---|---|---|---|
-| grid | lap-1 order is the grid order | 26 cars: SENA PIQN PRO MAN ROSK TAM JOH DUM ARN JON BER ALL FAB PAT ALBM BRU NAN STRP WAR DEC DAN BOUT GHI PALJ ROT BEG | 26 cars: SENA PIQN PRO MAN ROSK TAM JOH DUM ARN JON BER ALL FAB PAT ALBM BRU NAN STRP WAR DEC DAN BOUT GHI PALJ ROT BEG | pass |
+| grid | lap-1 order is the grid order (out after lap 1, at its sourced time: BEG) | 25 cars: SENA PIQN PRO MAN ROSK TAM JOH DUM ARN JON BER ALL FAB PAT ALBM BRU NAN STRP WAR DEC DAN BOUT GHI PALJ ROT | 25 cars: SENA PIQN PRO MAN ROSK TAM JOH DUM ARN JON BER ALL FAB PAT ALBM BRU NAN STRP WAR DEC DAN BOUT GHI PALJ ROT | pass |
 | order | classification | 10 cars: PIQN SENA MAN JOH DUM BRU TAM STRP ALL PALJ | 10 cars: PIQN SENA MAN JOH DUM BRU TAM STRP ALL PALJ | pass |
 | gap | SENA | 17.673 | 17.669 | pass |
 | fastest | PIQN | [91.001, 73] | [91.001, 73] | pass |
@@ -122,3 +122,4 @@ Solver: 1 attempt(s), noise sigma 0.35s; all anchors pass: True.
 ## Notes
 
 - BEG: fastest lap on lap 1, its lap-1 time is the fastest lap's
+- BEG: out after lap 1, its lap-1 place is its sourced time's
