@@ -49,12 +49,12 @@
     ],
     "overtakeDifficulty": 0.9203,
     "overtakeModel": {
-      "intercept": -0.499,
+      "intercept": -0.4991,
       "paceCoef": 1.8366,
       "gapCoef": -3.8725,
       "trainCoef": -0.9007
     },
-    "dirtyAirPenalty": 0.3064,
+    "dirtyAirPenalty": 0.3061,
     "greenLapTime": 74.224,
     "scLapTime": 98.385
   },
@@ -84,7 +84,7 @@
     {
       "code": "ALB",
       "team": "Red Bull Racing",
-      "basePace": 74.1561,
+      "basePace": 73.8856,
       "noise": 0.3375,
       "stateAtTakeover": {
         "position": 5,
@@ -99,26 +99,26 @@
         {
           "lap": 25,
           "to": "MEDIUM",
-          "loss": 24.579
+          "loss": 24.749
         },
         {
           "lap": 51,
           "to": "SOFT",
-          "loss": 23.284
+          "loss": 23.67
         }
       ],
       "stintPace": [
         {
           "lap": 0,
-          "offset": 0.036
+          "offset": 0.183
         },
         {
           "lap": 25,
-          "offset": -0.239
+          "offset": -0.015
         },
         {
           "lap": 51,
-          "offset": -0.057
+          "offset": -0.126
         }
       ]
     },
@@ -273,8 +273,8 @@
     {
       "code": "HAM",
       "team": "Mercedes",
-      "basePace": 73.5959,
-      "noise": 0.2985,
+      "basePace": 73.4926,
+      "noise": 0.2819,
       "stateAtTakeover": {
         "position": 2,
         "gapAhead": 2.471,
@@ -288,12 +288,12 @@
         {
           "lap": 21,
           "to": "SOFT",
-          "loss": 19.547
+          "loss": 19.669
         },
         {
           "lap": 44,
           "to": "MEDIUM",
-          "loss": 20.146
+          "loss": 20.192
         },
         {
           "lap": 67,
@@ -303,11 +303,11 @@
       "stintPace": [
         {
           "lap": 21,
-          "offset": 0.012
+          "offset": 0.096
         },
         {
           "lap": 44,
-          "offset": -0.204
+          "offset": -0.127
         }
       ]
     },
@@ -913,6 +913,26 @@
       "lap": 67,
       "type": "RETIREMENT",
       "driver": "VET"
+    },
+    {
+      "lap": 70,
+      "type": "FAULT",
+      "driver": "ALB",
+      "fault": "damage",
+      "paceLoss": 0.0,
+      "laps": 1,
+      "slowLap": 10.095,
+      "storylineEvent": true
+    },
+    {
+      "lap": 70,
+      "type": "FAULT",
+      "driver": "HAM",
+      "fault": "damage",
+      "paceLoss": 0.0,
+      "laps": 1,
+      "slowLap": 2.672,
+      "storylineEvent": true
     }
   ],
   "decisionMoments": [

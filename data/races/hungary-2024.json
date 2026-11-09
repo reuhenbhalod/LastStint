@@ -837,6 +837,16 @@
       "driver": "GAS"
     },
     {
+      "lap": 63,
+      "type": "FAULT",
+      "driver": "VER",
+      "fault": "damage",
+      "paceLoss": 0.0,
+      "laps": 1,
+      "slowLap": 5.878,
+      "storylineEvent": true
+    },
+    {
       "lap": 68,
       "type": "TEAM_ORDER",
       "driver": "NOR",

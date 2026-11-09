@@ -48,12 +48,12 @@
     ],
     "overtakeDifficulty": 0.9189,
     "overtakeModel": {
-      "intercept": -0.2961,
+      "intercept": -0.2974,
       "paceCoef": 1.8366,
       "gapCoef": -3.8725,
       "trainCoef": -0.9007
     },
-    "dirtyAirPenalty": 0.3334,
+    "dirtyAirPenalty": 0.3347,
     "greenLapTime": 106.529,
     "scLapTime": 130.318
   },
@@ -445,8 +445,8 @@
     {
       "code": "MAL",
       "team": "Williams",
-      "basePace": 107.4353,
-      "noise": 0.5659,
+      "basePace": 106.7671,
+      "noise": 0.5396,
       "stateAtTakeover": {
         "position": 5,
         "gapAhead": 1.098,
@@ -460,7 +460,7 @@
         {
           "lap": 15,
           "to": "HARD",
-          "loss": 19.926
+          "loss": 20.849
         },
         {
           "lap": 29,
@@ -470,11 +470,11 @@
       "stintPace": [
         {
           "lap": 15,
-          "offset": -0.174
+          "offset": 0.24
         },
         {
           "lap": 29,
-          "offset": -0.438
+          "offset": -0.149
         }
       ]
     },
@@ -976,6 +976,15 @@
       "lap": 41,
       "type": "RETIREMENT",
       "driver": "GRO"
+    },
+    {
+      "lap": 56,
+      "type": "FAULT",
+      "driver": "MAL",
+      "fault": "damage",
+      "paceLoss": 14.203,
+      "slowLap": 0.0,
+      "storylineEvent": true
     },
     {
       "lap": 56,
