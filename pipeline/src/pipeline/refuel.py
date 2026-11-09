@@ -123,7 +123,7 @@ def write_r4_overlays(race_ids: list[str], out_dir: Path = ERAS_OVERLAY_DIR) -> 
         rules.update(r4_rules_for_year(int(race_id.rsplit("-", 1)[1])))
         overlay["rules"] = rules
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(overlay, indent=2) + "\n")
+        path.write_text(json.dumps(overlay, indent=2) + "\n", encoding="utf-8", newline="\n")
         written.append(path)
     return written
 

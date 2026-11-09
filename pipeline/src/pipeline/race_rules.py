@@ -198,7 +198,7 @@ def write_rules_overlays(race_ids: list[str], out_dir: Path = ERAS_OVERLAY_DIR) 
         old = overlay.get("rules") or {}
         kept = {k: old[k] for k in ("refuelling", "fuelLimit") if k in old}
         overlay["rules"] = {**rules_for_race(race_id), **kept}
-        path.write_text(json.dumps(overlay, indent=2) + "\n")
+        path.write_text(json.dumps(overlay, indent=2) + "\n", encoding="utf-8", newline="\n")
         written.append(path)
     return written
 

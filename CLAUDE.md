@@ -96,7 +96,8 @@ pnpm --filter @laststint/web exec playwright install --with-deps chromium
 - Clone with `git clone -c core.autocrlf=false …`. With Git for Windows' default
   (`autocrlf=true`) every data file is checked out with CRLF, which breaks the frozen pool files.
 - Set `PYTHONUTF8=1` for every pipeline command. Python's Windows default (cp1252) misreads
-  `data/drivers.json` (e.g. Räikkönen) and would write data files differently.
+  `data/drivers.json` (e.g. Räikkönen). Every pipeline `write_text` passes
+  `encoding="utf-8", newline="\n"`, so builds write LF on Windows too; keep that on new writers.
 - `corepack enable` needs admin; `npm install -g pnpm@12.15.0` works instead. Playwright:
   `playwright install chromium` (no `--with-deps`).
 - Local dev: `npx wrangler d1 migrations apply pitwall-db --local`, then

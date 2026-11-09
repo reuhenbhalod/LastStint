@@ -418,7 +418,11 @@ def ingest_tum(
     path = raw_snapshot_path(race_id, raw_dir)
     path.parent.mkdir(parents=True, exist_ok=True)
     df.to_parquet(path)
-    track_status_path(race_id, raw_dir).write_text(json.dumps(status, indent=1) + "\n")
+    track_status_path(race_id, raw_dir).write_text(
+        json.dumps(status, indent=1) + "\n", encoding="utf-8", newline="\n"
+    )
     prov = provenance(race, compound_map(race["availablecompounds"]), sha256(db_path))
-    provenance_path(race_id, raw_dir).write_text(json.dumps(prov, indent=1) + "\n")
+    provenance_path(race_id, raw_dir).write_text(
+        json.dumps(prov, indent=1) + "\n", encoding="utf-8", newline="\n"
+    )
     return df, {**race_facts(race), "notes": prov["notes"], "credit": TUM_CREDIT}

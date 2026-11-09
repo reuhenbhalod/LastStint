@@ -668,6 +668,10 @@ def ingest_jolpica(
     path = raw_snapshot_path(race_id, raw_dir)
     path.parent.mkdir(parents=True, exist_ok=True)
     got.laps.to_parquet(path)
-    track_status_path(race_id, raw_dir).write_text(json.dumps(status, indent=1) + "\n")
-    sidecar_path(race_id, raw_dir).write_text(json.dumps(got.sidecar, indent=1) + "\n")
+    track_status_path(race_id, raw_dir).write_text(
+        json.dumps(status, indent=1) + "\n", encoding="utf-8", newline="\n"
+    )
+    sidecar_path(race_id, raw_dir).write_text(
+        json.dumps(got.sidecar, indent=1) + "\n", encoding="utf-8", newline="\n"
+    )
     return got
