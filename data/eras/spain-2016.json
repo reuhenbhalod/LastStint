@@ -18,7 +18,7 @@
     "mastery": {
       "type": "stop_count",
       "exact": 2,
-      "label": "Finish second or better on two stops, as Räikkönen made"
+      "label": "Finish second or better on two stops, as R\u00e4ikk\u00f6nen made"
     },
     "hidden": {
       "type": "compound_rule",
