@@ -107,6 +107,8 @@ const LIVE_MS = 400;
 const SLOW_BEFORE = 0.05;
 /** How long the race waits at the braking zone for your call before the driver goes alone. */
 const BATTLE_WAIT_MS = 8000;
+/** The tutorial's calls wait for an answer (10 minutes is as good as never). */
+const NO_TIMEOUT = 10 * 60_000;
 
 /** What a lap's fight came to for your car, from the race model's notes. */
 function battleResult(
@@ -136,12 +138,26 @@ function battleResult(
   return null;
 }
 
+/** What the tutorial asks of the race screen. */
+export interface TutorialHooks {
+  /** Still raise quick calls / battles (off once each is taught). */
+  quick: boolean;
+  battle: boolean;
+  /** The call on screen changed. */
+  onCall: (call: TutorialCall | null) => void;
+}
+
+export type TutorialCall =
+  | { kind: 'plan' | 'quick' | 'battle' | 'headsUp' | 'replan' }
+  | { kind: 'decision'; trigger: string; lap: number };
+
 export function RaceScreen({
   game,
   state,
   model,
   onFinished,
   onHome,
+  tutorial,
 }: {
   game: Game;
   state: GameState;
@@ -150,11 +166,15 @@ export function RaceScreen({
   onFinished?: () => void;
   /** The Pit Wall brand: the home page (the race holds). */
   onHome?: () => void;
+  /** The tutorial race (screens/Tutorial.tsx): calls never time out, the quick calls and
+   * battles it has taught are skipped, and it hears which call is on screen. */
+  tutorial?: TutorialHooks;
 }) {
   const { userSide, rival, totalLaps, number, source } = state.meta;
   const me = state.race.cars[userSide];
   const them = state.race.cars[rival];
   const paused = state.phase === 'decision';
+  const battleWait = tutorial ? NO_TIMEOUT : BATTLE_WAIT_MS;
   const planning = state.phase === 'planning';
   // The race plan: the heads-up before a planned stop (once per stop), the engineer's better
   // plan (until you keep yours), and the plan editor.
@@ -315,6 +335,8 @@ export function RaceScreen({
       state.decisions.some((d) => d.kind === 'pit' && d.lap > raceLap) ||
         !!state.plan.active?.stops.some((s) => s.lap > raceLap && s.lap <= raceLap + 2),
     );
+    // The tutorial skips the kinds of call it has already taught.
+    if (call && tutorial && !(call.kind === 'battle' ? tutorial.battle : tutorial.quick)) return;
     if (call?.kind === 'battle') {
       const fight = battleAt(call);
       if (fight) {
@@ -426,9 +448,9 @@ export function RaceScreen({
         (x) => x.call?.kind === 'battle' && x.call.move === own.move,
       );
       if (match) answerBattle(match.id, true);
-    }, BATTLE_WAIT_MS);
+    }, battleWait);
     return () => clearTimeout(id);
-  }, [stage, game, userSide, state.race.lap, answerBattle]);
+  }, [stage, game, userSide, state.race.lap, answerBattle, battleWait]);
 
   // The lap a BOX call turns in at (pit fix): the end of the lap being shown, if your car can
   // still reach pit entry on it (the map knows where it is); otherwise the end of the next one.
@@ -672,7 +694,7 @@ export function RaceScreen({
       clock={game.clock}
       fromP={battle.fromP}
       brakeP={battle.brakeP}
-      waitMs={BATTLE_WAIT_MS}
+      waitMs={battleWait}
       chosen={battle.chosen}
       result={battle.stage === 'done' ? battle.result : null}
       onAnswer={answerBattle}
@@ -704,9 +726,11 @@ export function RaceScreen({
       key={quick.lap}
       call={quick}
       ms={
-        quick.kind === 'battle'
-          ? Math.min(BATTLE_MS, LAP_MS[state.speed] * SLOW_MOTION * 0.85)
-          : Math.min(CALL_MS, LAP_MS[state.speed] * 0.9)
+        tutorial
+          ? NO_TIMEOUT
+          : quick.kind === 'battle'
+            ? Math.min(BATTLE_MS, LAP_MS[state.speed] * SLOW_MOTION * 0.85)
+            : Math.min(CALL_MS, LAP_MS[state.speed] * 0.9)
       }
       onAnswer={answerQuick}
       onTimeout={quickTimeout}
@@ -721,6 +745,26 @@ export function RaceScreen({
   ) : (
     driverCard
   );
+  // The tutorial hears which call is on screen (once per change).
+  const onTutorialCall = tutorial?.onCall;
+  const shownCall: TutorialCall | null = planning
+    ? { kind: 'plan' }
+    : paused && state.currentMoment
+      ? { kind: 'decision', trigger: state.currentMoment.trigger, lap: state.currentMoment.lap }
+      : battle && racing && (battle.stage !== 'done' || battle.zoom)
+        ? { kind: 'battle' }
+        : headsUp && racing && headsUpSeen !== headsUp.lap
+          ? { kind: 'headsUp' }
+          : replan && racing && !quick && replanKey !== keepKey
+            ? { kind: 'replan' }
+            : quick && racing
+              ? { kind: quick.kind === 'battle' ? 'battle' : 'quick' }
+              : null;
+  const shownKey = shownCall ? JSON.stringify(shownCall) : '';
+  useEffect(() => {
+    onTutorialCall?.(shownKey ? (JSON.parse(shownKey) as TutorialCall) : null);
+  }, [shownKey, onTutorialCall]);
+
   const callKey = planning
     ? 'plan'
     : paused && state.currentMoment
@@ -744,7 +788,10 @@ export function RaceScreen({
             </span>
           )}
         </button>
-        <div className="flex min-w-0 flex-1 items-center justify-center gap-2 overflow-hidden px-3 md:justify-start md:gap-4 md:px-6">
+        <div
+          data-tour="score"
+          className="flex min-w-0 flex-1 items-center justify-center gap-2 overflow-hidden px-3 md:justify-start md:gap-4 md:px-6"
+        >
           <span className="h-8 w-1.5 shrink-0 -skew-x-12 bg-[var(--you)]" />
           <span className="disp wide shrink-0 text-[17px] md:text-[22px]">
             <span className="md:hidden">{userSide}</span>
@@ -856,6 +903,7 @@ export function RaceScreen({
         {/* The map (it shrinks as things open under it), the call, the dock, the control bar. */}
         <section aria-label="Race" className="flex min-h-0 flex-col gap-2 md:gap-3">
           <div
+            data-tour="map"
             className={`relative flex min-h-[200px] flex-1 flex-col overflow-hidden bg-[var(--tarmac)] md:rounded-lg ${paused ? 'map-alert' : ''}`}
           >
             {wetNow >= 0.03 && (
@@ -920,6 +968,7 @@ export function RaceScreen({
               {/* Focus view: the leaders, TV style (stats view has the full tower instead). */}
               {!stats && (
                 <div
+                  data-tour="leaders"
                   className={`absolute left-3 top-2 z-10 origin-top-left scale-[0.82] md:block md:scale-100 ${tight ? 'hidden' : ''}`}
                 >
                   <LeadersTower
@@ -966,6 +1015,7 @@ export function RaceScreen({
           {call && (
             <div
               key={callKey}
+              data-tour="call"
               className="bc-slide max-h-[52%] shrink-0 overflow-y-auto px-3 md:px-0"
             >
               {call}
@@ -1037,6 +1087,7 @@ export function RaceScreen({
           >
             <button
               type="button"
+              data-tour="radio"
               aria-pressed={panelOpen === 'radio'}
               disabled={planning || paused}
               onClick={() => toggle2('radio')}
@@ -1047,6 +1098,7 @@ export function RaceScreen({
             </button>
             <button
               type="button"
+              data-tour="plan"
               aria-pressed={panelOpen === 'plan'}
               disabled={planning || paused || !state.plan.active}
               onClick={() => toggle2('plan')}
@@ -1077,6 +1129,7 @@ export function RaceScreen({
             <span className="min-w-[8px] flex-1" />
             <button
               type="button"
+              data-tour="stats"
               aria-pressed={stats}
               onClick={() => setStats(!stats)}
               className={`${pill(stats)} hidden md:flex`}

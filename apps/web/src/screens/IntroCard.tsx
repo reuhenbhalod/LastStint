@@ -336,6 +336,9 @@ export function IntroCard({
                   >
                     How to play
                   </button>
+                  <a href="/tutorial" className="underline hover:text-[var(--ink)]">
+                    Tutorial race
+                  </a>
                   {source !== 'survivor' && (
                     <button
                       type="button"

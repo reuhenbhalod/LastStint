@@ -16,6 +16,8 @@ import { RUN_KEY, clearRun, loadRun, saveRun } from '../state/storage.js';
 // One lap tick on screen. Testers found 3-5 s per lap too fast to follow (feedback spec D4).
 // The track map runs the field one lap round per tick, so this is also how fast the dots move.
 export const LAP_MS: Record<Speed, number> = { 1: 10000, 2: 5000 };
+/** The tutorial's fast-forward between its steps: laps run this many times quicker. */
+export const FAST_FORWARD = 8;
 /** A battle slows the lap by this much as the cars near the corner (race engineer spec D7). */
 export const SLOW_MOTION = 3;
 
@@ -53,6 +55,8 @@ export interface Game {
   setPace: (pace: Pace) => void;
   /** Hold the race (the player went to the home page); the lap resumes where it was. */
   setHold: (on: boolean) => void;
+  /** The tutorial's fast-forward (FAST_FORWARD x) between its steps. */
+  setFastForward: (on: boolean) => void;
   choose: (optionId: string) => void;
   /** The race plan (strategy planner spec): build your own, pick one, change or delay it. */
   buildPlan: (plan: RacePlan) => boolean;
@@ -98,6 +102,7 @@ export function useGame(
   const [clock, setClock] = useState<LapClock | null>(null);
   const [pace, setPace] = useState<Pace>('normal');
   const [hold, setHold] = useState(false);
+  const [fastForward, setFastForward] = useState(false);
   // How far through the lap tick the clock was when it stopped (a speed change keeps it).
   const carry = useRef(0);
   // One grading worker for the page's lifetime.
@@ -165,7 +170,9 @@ export function useGame(
       setClock({ start: 0, ms: 1, frozen: carry.current });
       return;
     }
-    const ms = LAP_MS[state.speed] * (pace === 'slow' ? SLOW_MOTION : 1);
+    const ms =
+      (LAP_MS[state.speed] * (pace === 'slow' ? SLOW_MOTION : 1)) /
+      (fastForward ? FAST_FORWARD : 1);
     let start = performance.now() - carry.current * ms;
     let id = 0;
     const schedule = () => {
@@ -186,7 +193,7 @@ export function useGame(
       clearTimeout(id);
       carry.current = Math.min(0.99, (performance.now() - start) / ms);
     };
-  }, [state?.phase, state?.speed, pace, hold, sync]);
+  }, [state?.phase, state?.speed, pace, hold, fastForward, sync]);
 
   const act = useCallback(
     (f: (s: GameSession) => void) => () => {
@@ -253,6 +260,7 @@ export function useGame(
     setSpeed: (speed) => act((s) => s.setSpeed(speed))(),
     setPace,
     setHold,
+    setFastForward,
     choose: (optionId) => act((s) => s.choose(optionId))(),
     buildPlan,
     pickPlan: (id) => act((s) => s.pickPlan(id))(),

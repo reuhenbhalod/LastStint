@@ -380,3 +380,20 @@ label:has(input) {
   font-size: 10px;
   color: #6b736f;
 }
+
+/* The tutorial's highlight on the control a step is about (screens/Tutorial.tsx). */
+.tour-target {
+  outline: 3px solid var(--flag);
+  outline-offset: 3px;
+  border-radius: 10px;
+  animation: tour-pulse 1.4s ease-in-out infinite;
+}
+@keyframes tour-pulse {
+  0%,
+  100% {
+    outline-color: var(--flag);
+  }
+  50% {
+    outline-color: color-mix(in srgb, var(--flag) 35%, transparent);
+  }
+}
