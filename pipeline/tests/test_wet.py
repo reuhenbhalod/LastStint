@@ -269,6 +269,52 @@ def test_mixed_laps_pair_the_tyre_classes_in_clear_air():
 def test_eras_curves_are_an_eras_timed_build_only():
     """A wet Daily/Gauntlet race and a wet reconstructed race keep the shared curves; a timed
     wet Eras race takes the Eras curves (its slick scaled by its own mixed laps)."""
+
+
+# Model fix 1.6 (Eras builds): a car that ran only wet laps takes an estimated dry pace.
+
+
+def _without(fitted, car):
+    from dataclasses import replace
+
+    return replace(
+        fitted,
+        driver_pace={c: p for c, p in fitted.driver_pace.items() if c != car},
+        driver_noise={c: n for c, n in fitted.driver_noise.items() if c != car},
+    )
+
+
+def test_estimated_dry_pace_inverts_the_wet_model_at_the_field_offset():
+    laps, weather, fitted = _band_race()
+    # B ran at the field's pace (80 s dry) in the wet: its laps give 80 s back.
+    p, noise, how = wet.estimated_dry_pace(laps, weather, _without(fitted, "B"), ["B"])["B"]
+    assert abs(p - 80.0) < 0.2 and noise == 0.3 and "laps against the wet model" in how
+    # The whole field 2% slower in the wet than the curves say: still B's 80 s (the field's
+    # offset, not B's dry pace).
+    laps2 = laps.assign(LapTime=laps["LapTime"] * 1.02)
+    p2, *_ = wet.estimated_dry_pace(laps2, weather, _without(fitted, "B"), ["B"])["B"]
+    assert abs(p2 - 80.0) < 0.2
+
+
+def test_estimated_dry_pace_blends_with_the_team_mate_and_falls_back_to_it():
+    laps, weather, fitted = _band_race()
+    laps["Team"] = laps["Driver"].map({"A": "X", "B": "X"}).fillna("Y")
+    f = _without(fitted, "B")
+    f.driver_pace["A"] = 81.0  # B's team-mate
+    p, _, how = wet.estimated_dry_pace(laps, weather, f, ["B"])["B"]
+    w = wet.ESTIMATE_WET_WEIGHT
+    assert abs(p - (w * 80.0 + (1 - w) * 81.0)) < 0.1 and "team-mate A" in how
+    # Too few laps (two): the team-mate's pace alone; no team-mate either: the field's median.
+    short = laps[(laps["Driver"] != "B") | (laps["LapNumber"] <= 3)]
+    assert wet.estimated_dry_pace(short, weather, f, ["B"])["B"][0] == 81.0
+    alone = short.assign(Team=short["Team"].where(short["Driver"] != "B", "Z"))
+    p, _, how = wet.estimated_dry_pace(alone, None, f, ["B"])["B"]
+    assert p == 80.0 and "field's median" in how  # A 81, the rest 80
+
+
+def test_a_car_with_only_wet_laps_stays_in_an_eras_race():
+    """china-2007: Hamilton (the user's car) ran only wet laps before retiring; his dry pace is
+    estimated (provenance driverPace) and every car running at the takeover is in the model."""
     import pytest
 
     from pipeline import build, ingest
@@ -282,3 +328,14 @@ def test_eras_curves_are_an_eras_timed_build_only():
     assert eras["inter"] == ERAS["inter"] and eras["wet"] == ERAS["wet"]
     assert eras["slick"] != ERAS["slick"]  # Barrichello's slicks kept the inters' pace
     assert eras["slick"]["a"] < ERAS["slick"]["a"]
+
+
+    if not ingest.raw_snapshot_path("china-2007", build.RAW_DIR).exists():
+        pytest.skip("no raw snapshot for china-2007")
+    result = build.build_race("china-2007")
+    codes = {d["code"] for d in result.model["drivers"]}
+    assert {"HAM", "SCH", "SUT"} <= codes
+    takeover = result.model["race"]["takeoverLap"]
+    assert build.running_at(result.laps, takeover) <= codes
+    assert "driverPace" in result.model["provenance"]["estimated"]
+    assert any(line.startswith("estimated: driverPace (HAM") for line in result.estimates)

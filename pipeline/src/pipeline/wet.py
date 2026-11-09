@@ -556,15 +556,9 @@ def band_of(w: float) -> str:
     return "damp" if w < DAMP_EDGE else "wet"
 
 
-def clear_air_shares(laps: pd.DataFrame, weather: dict, fitted) -> pd.DataFrame:
-    """Each clear-air wet lap's share of a dry lap lost beyond the curves. Clear air: green,
-    the lap before green too (no restart), no pit in or out, not lap 1, no car within
-    BAND_TRAFFIC_GAP ahead. Columns driver, lap, w, cls, share."""
-    from . import fit as fit_mod
-    from .clean import gap_to_car_ahead
-
-    eff = sim_wear(laps, weather) + 1.0
-    gap = gap_to_car_ahead(laps)
+def racing_laps(laps: pd.DataFrame) -> pd.Series:
+    """Laps that show a car's pace: accurate, green, the lap before green too (no restart), no
+    pit in or out, not lap 1, timed."""
     from .track import racing_status
 
     racing = laps["TrackStatus"].map(racing_status).astype(bool)
@@ -575,7 +569,7 @@ def clear_air_shares(laps: pd.DataFrame, weather: dict, fitted) -> pd.DataFrame:
         .shift(1, fill_value=False)
         .reindex(laps.index, fill_value=False)
     )
-    ok = (
+    return (
         laps["IsAccurate"].fillna(False).astype(bool)
         & racing
         & prev_green
@@ -583,8 +577,24 @@ def clear_air_shares(laps: pd.DataFrame, weather: dict, fitted) -> pd.DataFrame:
         & laps["PitOutTime"].isna()
         & (laps["LapNumber"] > 1)
         & laps["LapTime"].notna()
-        & ~(gap < BAND_TRAFFIC_GAP).fillna(False)
     )
+
+
+def clear_air(laps: pd.DataFrame) -> pd.Series:
+    """Laps with no car within BAND_TRAFFIC_GAP ahead."""
+    from .clean import gap_to_car_ahead
+
+    return ~(gap_to_car_ahead(laps) < BAND_TRAFFIC_GAP).fillna(False)
+
+
+def clear_air_shares(laps: pd.DataFrame, weather: dict, fitted) -> pd.DataFrame:
+    """Each clear-air wet lap's share of a dry lap lost beyond the curves. Clear air: green,
+    the lap before green too (no restart), no pit in or out, not lap 1, no car within
+    BAND_TRAFFIC_GAP ahead. Columns driver, lap, w, cls, share."""
+    from . import fit as fit_mod
+
+    eff = sim_wear(laps, weather) + 1.0
+    ok = racing_laps(laps) & clear_air(laps)
     rows = []
     for idx, r in laps[ok].iterrows():
         d = str(r.Driver)
@@ -673,4 +683,101 @@ def shifted_curves(curves: dict, shift: float) -> dict:
     """The curves with the full wet's moved by `shift` (wet_tyre_shift)."""
     out = {k: dict(v) for k, v in curves.items()}
     out["wet"]["min"] = round(max(0.0, out["wet"]["min"] + shift), 4)
+    return out
+
+
+# Eras builds (model fix 1.6): a car that ran only wet laps (it retired, or the takeover came,
+# before the track dried) has no dry lap to fit its dry pace on. Its dry pace is the wet model
+# inverted on its own laps: a lap's time is dry x (1 + the curve's penalty + the car's wet
+# offset), and the car's own offset, which its laps can't tell from its dry pace, is shrunk all
+# the way to the field's: the median offset of the cars with a dry pace on the same lap and
+# tyre class (the curves alone where too few of them ran it). The median over the car's laps
+# (its clear-air ones where it has ESTIMATE_MIN_LAPS of them) is that estimate; it is blended
+# with the car's pace (its team-mate's dry pace) at ESTIMATE_WET_WEIGHT. Fewer usable laps:
+# the team-mate's pace alone, else the field's median. The weight is the leave-one-out best
+# over the wet Eras races (job 1.6: 391 cars with a fitted dry pace and a team-mate, 27
+# races, each one's estimate from its wet-period laps with its own pace removed, against its
+# fitted pace): rms error 1.29 s from its wet laps alone, 1.18 s from its team-mate, 0.95 s
+# blended at 0.4 (0.3-0.5 within 0.03 s; the two errors correlate 0.17). The car's own wet
+# offset then comes from its wet laps against that pace (driver_band_pace, shrunk to the
+# field's), so its wet laps still replay as it ran them.
+ESTIMATE_MIN_LAPS = 3
+ESTIMATE_WET_WEIGHT = 0.4
+
+
+def estimated_dry_pace(
+    laps: pd.DataFrame, weather: dict | None, fitted, drivers: list[str]
+) -> dict[str, tuple[float, float, str]]:
+    """Each of `drivers` (none with a dry pace in `fitted`): (dry pace, noise, how), the pace
+    on fit.LapTimeFit's terms (reference compound, age 0, lap 0), the noise the field's
+    median. `how` names the method for the build report."""
+    from dataclasses import replace
+
+    from . import fit as fit_mod
+
+    noise = float(np.median(list(fitted.driver_noise.values())))
+    field_pace = float(np.median(list(fitted.driver_pace.values())))
+    refs: dict[tuple[int, str], float] = {}
+    eff = None
+    if weather is not None:
+        eff = sim_wear(laps, weather) + 1.0
+        shares = clear_air_shares(laps, weather, fitted)
+        for (lap, cls), g in shares.groupby(["lap", "cls"]):
+            if len(g) >= BAND_MIN_FIELD:
+                refs[(int(lap), str(cls))] = float(g["share"].median())
+    racing = racing_laps(laps)
+    clear = clear_air(laps)
+    teams = (
+        laps.dropna(subset=["Team"]).groupby("Driver")["Team"].first()
+        if "Team" in laps
+        else pd.Series(dtype=str)
+    )
+    out: dict[str, tuple[float, float, str]] = {}
+    for d in drivers:
+        mine = laps["Driver"].astype(str).eq(d) & racing
+        if weather is not None and (mine & clear).sum() >= ESTIMATE_MIN_LAPS:
+            mine &= clear
+        probe = replace(fitted, driver_pace={**fitted.driver_pace, d: 0.0})
+        est, n_field = [], 0
+        for idx, r in laps[mine].iterrows() if weather is not None else iter(()):
+            lap = int(r.LapNumber)
+            w = float(weather["wetness"][lap - 1])
+            comp = str(r.Compound)
+            cls = tyre_class(comp)
+            slick = cls == "slick"
+            base = fit_mod.predict(
+                probe,
+                d,
+                comp if slick else fitted.reference_compound,
+                float(eff.loc[idx]) if slick else 0.0,
+                fuel_lap_of(r),
+            )
+            ref = refs.get((lap, cls))
+            n_field += ref is not None
+            pen = float(penalty(weather["curves"], comp, w)) + (ref or 0.0)
+            est.append(float(r.LapTime) / (1 + pen) - base)
+        team = teams.get(d)
+        mates = sorted(
+            c for c, t in teams.items() if t == team and c != d and c in fitted.driver_pace
+        )
+        if len(est) >= ESTIMATE_MIN_LAPS:
+            own = float(np.median(est))
+            how = (
+                f"its {len(est)} laps against the wet model, offset at the field's"
+                f" ({n_field} of them against the field on the same lap and tyre): {own:.3f} s"
+            )
+            if mates:
+                car = float(fitted.driver_pace[mates[0]])
+                own = ESTIMATE_WET_WEIGHT * own + (1 - ESTIMATE_WET_WEIGHT) * car
+                how += f", blended {ESTIMATE_WET_WEIGHT} with team-mate {mates[0]}'s {car:.3f} s"
+            out[d] = (round(own, 4), noise, how)
+            continue
+        if mates:
+            out[d] = (
+                round(float(fitted.driver_pace[mates[0]]), 4),
+                noise,
+                f"too few laps to measure ({len(est)}): its team-mate {mates[0]}'s dry pace",
+            )
+        else:
+            out[d] = (round(field_pace, 4), noise, "too few laps, no team-mate: the field's median")
     return out

@@ -52,7 +52,7 @@ ESTIMATES_DIR = DATA_DIR / "estimates"
 HEADSET_PATH = REPO_ROOT / "packages" / "sim" / "src" / "headset.json"
 
 # The provenance.estimated names (race-model schema v11), in the schema's order.
-FIELDS = ("compounds", "safetyCars", "fuelLoads", "weather")
+FIELDS = ("compounds", "safetyCars", "fuelLoads", "weather", "driverPace")
 
 # --- compounds ---------------------------------------------------------------------------
 
