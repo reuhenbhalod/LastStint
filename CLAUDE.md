@@ -170,6 +170,58 @@ Read these first: `docs/eras-remaining-work.md` (handover spec, rules, decisions
 - **Expert rival grader fix** (see open items): it makes hungary-1998 Legend unreachable.
 - Any new race swap (B4).
 
+### PC work (2026-11-09, native Windows; resume on the Mac)
+
+Integrations B and C were done on the PC and merged into local `eras` (`c817397`, then this
+commit). Every `eras-*` branch from that work (`eras-integrate-b`, `eras-integrate-c`,
+`eras-b1-europe-1997`, `eras-b1-hungary-2024`, `eras-b2-reauthor`, `eras-b3-near-misses`,
+`eras-b3-tank-planner`, `eras-a2-e2e`) is merged into `eras`. None of it is pushed: the Mac
+gets it by pushing `eras` (which deploys staging) or by a `git bundle`. The PC's agent
+worktrees are removed.
+
+Where it stands: 48 pass, 1 borderline, 51 fail; 50 authored, 50 reachable, 48 ready. All
+suites, both reachability checks (45 + 5), hungary-2024's robust G1 (2.45 s) and e2e green at
+`c817397`.
+
+Concerns to pick up on the Mac:
+
+- **C1 isn't finished: no full rebuild.** The PC has no `pipeline/cache/eras-sources/`, so
+  every non-pool race wasn't rebuilt and races.gen.ts / sc_rates.json / legend parity weren't
+  regenerated. B3's tank planner changed `refuel.py` (`fillCap`), so rebuild all non-pool
+  races on the Mac (never pool races), diff, then re-run robust G1, anchors, both reachability
+  checks and e2e. Don't refetch the cache from the network: other source snapshots would change
+  built files.
+- **Pipeline writers now write LF + UTF-8** (all 37 `write_text` calls). Before, a Windows
+  build wrote CRLF. Mac builds were already LF, so expect no diff from this.
+- **Owner review:**
+  - hungary-2024: the hidden objective "no push laps" is weak (the margin objectives
+    couldn't be reached at Legend), and the player car changed NOR -> PIA (hard calls PIA 2,
+    NOR 0).
+  - Integration B: malaysia-2013 / spain-2016 P2 targets, europe-1997 no rewrite, the
+    `teamOrder` schema enum (spec §19), europe-1997 facts read through a summarising fetch
+    tool, and the A2 radio wording notes.
+  - The new fuel line ("I'm out of fuel! The car's stopped." / pit wall in Eras 1–2) now shows
+    every fuel-limit stop. The monaco-1988 e2e found that Senna runs dry on the last lap at
+    standard pace on some seeds (the 1984–88 load is drawn from 1.5 kg short to 1 kg over the
+    need). That's by design, but it's worth a look in play.
+- **Still owner-only:** Expert grader decision (hungary-1998 B2), C2 sign-offs (new sheets:
+  `b1-europe-1997.md`, `b1-hungary-2024.md`, `b2-reauthor.md`, `b3-near-misses.md`), B4 swaps,
+  C3 publish, D1–D5.
+- **B4 / near-misses:** no honest fix found for spain-2013, china-2011, abu-dhabi-2012 or
+  brazil-2021. They need model gaps 1 and 3 (`docs/eras-checks/b3-near-misses.md`).
+- **austria-2002 team-order e2e** is still `test.fixme` (no `teamorder-71` moment, and the
+  sim's Schumacher passes Barrichello by lap 52).
+- **Flaky tests on the PC:** the sim "meets the runtime budget" test is wall-clock and fails
+  under load (it passes alone, about 0.5 s). The Hungary 1992 e2e failed once, then passed 6
+  of 6.
+- **Native Windows gotchas** (if the PC is used again): `PYTHONUTF8=1` for all pipeline
+  commands; `corepack enable` needs admin, so pnpm came from `npm i -g pnpm@12.15.0`; `d1.ts`
+  and the reachability CLI test were fixed to spawn without `.cmd` shims; there's no `gh` CLI
+  on the PC.
+- The B3 tank-planner agent's Daily-grade before/after evidence (the 39 pool races
+  byte-identical) was in a session scratch folder on the PC. It isn't in the repo; re-run it
+  on the Mac if you need it.
+
 ### Status (2026-11-09, integrations B and C)
 
 Newest first; the 2026-11-08 notes below still hold where this doesn't replace them.
@@ -315,8 +367,8 @@ integration 8 and are out of date. Where they disagree, this section is right.
   branches **are** on GitHub, at the commit that added this file (22533d0); they were pushed
   when the repo moved off the Mac. Pushing `eras` runs `staging.yml`, so staging probably
   deployed that commit. Everything after it (integration B) is local only.
-- The Mac's `.worktrees/` don't exist on the PC. Integration B's agent worktrees are under
-  `.claude/worktrees/` (git-ignored) and can be removed once `eras` has their branches.
+- The Mac's `.worktrees/` don't exist on the PC. The PC's agent worktrees (integrations B and
+  C) are removed; their branches are merged into `eras`.
 - Worktrees under `.worktrees/`: `fix-contact-loss`, `fix-grader-queued-stop`, `fix-radio-lines`
   and `fix-sm2005-fill` are merged into `eras-integrate-a` and can be removed
   (`git worktree remove`). `fix-contact-loss/scratch/` holds only before/after measurements and
