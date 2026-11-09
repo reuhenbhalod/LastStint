@@ -524,13 +524,17 @@ async function tryClick(target: Locator) {
   await target.click({ timeout: 2_000 }).catch(() => {});
 }
 
-/** From the race intro to the race: start, go with the engineer's plan, at 2×. */
-export async function startRace(page: Page, { graded = true }: { graded?: boolean } = {}) {
+/** From the race intro to the race: start, go with the engineer's plan (or `plan`), at 2×. */
+export async function startRace(
+  page: Page,
+  { graded = true, plan }: { graded?: boolean; plan?: string } = {},
+) {
   await page.getByRole('button', { name: /^Start the race/ }).click();
   const plans = page.getByRole('region', { name: 'Race plan' });
   await expect(plans).toBeVisible({ timeout: 30_000 });
-  // Every plan graded first (`graded: false` for a race whose plans can't be: see its test).
+  // Every plan graded first (`graded: false` skips the wait).
   if (graded) await expect(plans).not.toContainText('…', { timeout: 90_000 });
+  if (plan) await plans.getByRole('button', { name: new RegExp(`^${plan} ·`) }).click();
   await plans.getByRole('button', { name: /Go with plan/ }).click();
   await page.getByRole('button', { name: '2×' }).click();
 }

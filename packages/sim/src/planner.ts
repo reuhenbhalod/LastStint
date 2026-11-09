@@ -8,11 +8,12 @@
 // stop names only the set the car is on or a wet tyre (illegalPitCompound), and a dry stop
 // keeps its set (it only refuels), so the next stint goes on with the same tyres. A race with a
 // minimum of stops (rules.minStops) offers only plans that reach it. A refuelling race's plans
-// state each stop's fill (required there): exactly to the plan's next stop or the flag.
+// state each stop's fill (required there): exactly to the plan's next stop or the flag, capped
+// at the tank (fillCap).
 
 import type { GradeOption, Target } from './grade.js';
 import { MIN_STINT, planCalls, stintStarts } from './plan.js';
-import { refuelling } from './refuel.js';
+import { fillCap, refuelling } from './refuel.js';
 import { illegalPitCompound, minStopsRule, stopChangesTyres, stopsOwed } from './rules.js';
 import {
   DRY_COMPOUNDS,
@@ -331,13 +332,16 @@ export function enginePlans(run: Run): RacePlan[] {
 /**
  * A refuelling race: each planned stop fills exactly to the plan's next stop or the flag
  * (refuel.ts: `{ laps }` from the out-lap, the reserve on top), as a team planning those stops
- * would. Any other race: the stops as they are.
+ * would, but never more than the tank holds (refuel.ts fillCap: San Marino 2005's one-stop
+ * plan from the takeover is 41 laps to the flag on a 25-lap tank, a fill checkFill refuses).
+ * Any other race: the stops as they are.
  */
 export function fuelled(model: RaceModel, stops: RacePlan['stops']): RacePlan['stops'] {
   if (!refuelling(model)) return stops;
+  const cap = fillCap(model);
   return stops.map((s, i) => ({
     ...s,
-    fill: { laps: (stops[i + 1]?.lap ?? model.race.laps) - s.lap },
+    fill: { laps: Math.min(cap, (stops[i + 1]?.lap ?? model.race.laps) - s.lap) },
   }));
 }
 
