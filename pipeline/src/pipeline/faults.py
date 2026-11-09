@@ -1,6 +1,8 @@
 """Car faults (simulator roadmap R2; eras build plan 4.4).
 
-A fault from the real race: stuck in a gear, a power loss, a puncture or a failed tyre. It is
+A fault from the real race: stuck in a gear, a power loss, a puncture, a failed tyre or
+contact damage (a collision: the time lost on the contact lap, then what the damage cost on
+the laps after it, to the flag or for its sourced `laps`). It is
 frozen on its real lap like a safety car, and flagged `storylineEvent`. In the race model it
 is an event:
 
@@ -27,6 +29,10 @@ the in-lap of the stop that fixed it, less the field's median in-lap residual to
 an in-lap that is pit entry, not the fault). A fault fixed at once (a puncture with no laps
 run on it before the stop) has no limping laps to fit: limping on costs what its measured
 slow lap did, per lap. Anything else with too few laps raises: no invented magnitudes.
+A contact that lasts only its own lap (`laps: 1`: no damage after it) costs its slow lap
+alone. Contact damage's slow lap may be run under a local yellow (any lap not under the SC, VSC or
+red flag), and is less the field's median residual on that lap too (the part of a restart or
+yellow-flag lap that every car lost).
 """
 
 from __future__ import annotations
@@ -36,10 +42,14 @@ import pandas as pd
 from .refuel import car_fuel
 from .sim_reference import Car, _clean_lap
 
-FAULT_KINDS = ("gear-stuck", "power-loss", "puncture", "tyre-failure")
+FAULT_KINDS = ("gear-stuck", "power-loss", "puncture", "tyre-failure", "damage")
 # By default a tyre fault lasts until the next stop and costs a forced slow lap; a gear or
-# power fault lasts to the flag (a fact can say otherwise).
+# power fault lasts to the flag; contact damage costs its slow lap (the contact) and lasts to
+# the flag (a fact can say otherwise).
 TYRE_FAULTS = ("puncture", "tyre-failure")
+CONTACT_FAULTS = ("damage",)
+# Track status digits that neutralize a lap (SC, red, VSC, VSC ending).
+NEUTRALIZED = set("4567")
 MIN_FAULT_LAPS = 1
 DECIMALS = 3
 
@@ -53,7 +63,7 @@ def until_stop(fact: dict) -> bool:
 
 
 def has_slow_lap(fact: dict) -> bool:
-    return bool(fact.get("slowLap", fact["fault"] in TYRE_FAULTS))
+    return bool(fact.get("slowLap", fact["fault"] in TYRE_FAULTS + CONTACT_FAULTS))
 
 
 def residuals(
@@ -67,8 +77,9 @@ def residuals(
 ) -> pd.DataFrame:
     """Every timed lap of a car in `base_pace` on a modelled compound: Driver, LapNumber,
     residual (real minus the sim's clean lap for the car), green, usable (green, not an in- or
-    out-lap) and in_lap. `stint` (a pace.StintTable; Eras builds): the clean lap carries the
-    offset of the real stint the lap is in, as the sim runs it."""
+    out-lap), racing (not under the SC, VSC or red flag) and in_lap. `stint` (a
+    pace.StintTable; Eras builds): the clean lap carries the offset of the real stint the lap
+    is in, as the sim runs it."""
     rows = []
     timed = laps[laps["LapTime"].notna() & laps["TyreLife"].notna()]
     for r in timed.itertuples():
@@ -96,11 +107,13 @@ def residuals(
                 "residual": float(r.LapTime) - predicted,
                 "green": str(r.TrackStatus) == "1",
                 "usable": str(r.TrackStatus) == "1" and not in_lap and not out_lap,
+                "racing": not NEUTRALIZED & set(str(r.TrackStatus)),
                 "in_lap": in_lap,
             }
         )
     return pd.DataFrame(
-        rows, columns=["Driver", "LapNumber", "residual", "green", "usable", "in_lap"]
+        rows,
+        columns=["Driver", "LapNumber", "residual", "green", "usable", "racing", "in_lap"],
     )
 
 
@@ -130,6 +143,14 @@ def in_lap_excess(res: pd.DataFrame, exclude: str | None = None) -> float:
     that is pit entry."""
     ins = res[res["in_lap"] & res["green"] & (res["Driver"] != exclude)]
     return float(ins["residual"].median()) if not ins.empty else 0.0
+
+
+def field_lap_excess(res: pd.DataFrame, lap: int, exclude: str) -> float:
+    """The field's median residual on race lap `lap` (less car `exclude`'s, in-laps left
+    out): what every car lost on it (a restart, a yellow), not the contact."""
+    on = res[(res["LapNumber"] == lap) & res["racing"] & ~res["in_lap"]]
+    on = on[on["Driver"] != exclude]
+    return float(on["residual"].median()) if not on.empty else 0.0
 
 
 def fit_fault(
@@ -163,16 +184,22 @@ def fit_fault(
 
     slow_lap: float | None = None
     if slow:
-        row = own[(own["LapNumber"] == start) & own["green"]]
+        contact = fact["fault"] in CONTACT_FAULTS
+        row = own[(own["LapNumber"] == start) & own["racing" if contact else "green"]]
         if row.empty:
             raise FaultFitError(f"{where}: the fault lap isn't a timed green lap")
         excess = float(row["residual"].iloc[0])
         if bool(row["in_lap"].iloc[0]):
             excess -= in_lap_excess(res, code)
+        if contact:
+            excess -= field_lap_excess(res, start, code)
         slow_lap = max(0.0, excess - (pace_loss or 0.0))
 
     if pace_loss is None:
-        if until_stop(fact) and slow_lap is not None:
+        if fact["fault"] in CONTACT_FAULTS and slow and list(window) == [start]:
+            # A contact with no damage after it (`laps: 1`): its cost is its slow lap.
+            pace_loss = 0.0
+        elif until_stop(fact) and slow_lap is not None:
             # Fixed at the first stop, nothing run on it: limping on a lap costs what the
             # measured slow lap did.
             pace_loss = slow_lap
@@ -339,3 +366,11 @@ class FaultState:
             if lap == e["lap"]:
                 extra += e.get("slowLap", 0.0)
         return pace, extra
+
+    def contact(self, code: str, lap: int) -> bool:
+        """True if a contact (damage) struck the car on lap `lap`: it spun or ran off, so the
+        sim leaves the pairs around it to the time order that lap, like a stop's."""
+        return any(
+            e["lap"] == lap and e.get("fault") in CONTACT_FAULTS and id(e) not in self.ended
+            for e in self.by_car.get(code, ())
+        )

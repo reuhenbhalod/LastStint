@@ -47,6 +47,8 @@ def test_fault_facts_read_the_fault_items_and_take_the_kind_from_the_status(tmp_
                 {"lap": 30, "type": "FAULT", "driver": "STR", "status": "Tyre", "source": SOURCE},
                 {"lap": 40, "type": "FAULT", "driver": "BOT", "status": "Tyre",
                  "fault": "puncture", "laps": 3, "source": SOURCE},
+                {"lap": 50, "type": "FAULT", "driver": "ALB", "status": "Collision",
+                 "laps": 1, "source": SOURCE},
             ]
         },
     )  # fmt: skip
@@ -57,6 +59,7 @@ def test_fault_facts_read_the_fault_items_and_take_the_kind_from_the_status(tmp_
         ("HAM", "puncture"),
         ("STR", "tyre-failure"),
         ("BOT", "puncture"),  # its own `fault` overrides the status
+        ("ALB", "damage"),  # a collision
     ]
     assert facts[0]["detail"] == "MGU-K"  # display fields kept
     assert incidents.fault_facts("other-race", path) == []
@@ -108,9 +111,13 @@ def test_only_the_eras_fault_races_have_fault_facts():
     # Eras race registered for its faults (5.1: canada-2014, azerbaijan-2021, monaco-2008,
     # hungary-1997) has any. The reconstructed brazil-1991, hungary-1992, australia-1986 and
     # spain-1994 have facts too, reported but not fitted (synthetic laps). W4 adds
-    # great-britain-2016 (Rosberg's gearbox, laps 46-47).
+    # great-britain-2016 (Rosberg's gearbox, laps 46-47). A4 adds the collisions (damage) of
+    # brazil-2019, hungary-2024 and europe-2012.
     with_faults = {race for race in build.RACES if incidents.fault_facts(race)}
     assert with_faults == {
+        "brazil-2019",
+        "hungary-2024",
+        "europe-2012",
         "great-britain-2016",
         "canada-2014",
         "azerbaijan-2021",
@@ -210,6 +217,25 @@ def test_a_puncture_fixed_at_once_limps_at_its_slow_lap_cost():
     assert event["paceLoss"] == event["slowLap"]
 
 
+def test_a_contact_with_no_damage_costs_its_slow_lap_alone():
+    # Lap 10 under a local yellow (status 12): the whole field loses 1 s, AAA spins (+9 s).
+    laps = _laps({("AAA", 10): 9.0, ("BBB", 10): 1.0}, {})
+    laps.loc[laps["LapNumber"] == 10, "TrackStatus"] = "12"
+    event = _fit(laps, _fact(fault="damage", laps=1))
+    assert event["paceLoss"] == 0.0
+    assert event["slowLap"] == pytest.approx(9.0 - 1.0, abs=1e-3)  # less the field's lap
+    assert event["laps"] == 1 and "untilStop" not in event
+
+
+def test_contact_damage_to_the_flag_is_its_slow_lap_then_the_mean_loss():
+    # Contact on lap 25 (+6 s), then a lost front wing: +3 s a lap to the flag.
+    extra = {("AAA", 25): 6.0, **{("AAA", lap): 3.0 for lap in range(26, 31)}}
+    event = _fit(_laps(extra, {}), _fact(lap=25, fault="damage"))
+    assert event["paceLoss"] == pytest.approx(3.0, abs=1e-3)
+    assert event["slowLap"] == pytest.approx(3.0, abs=1e-3)  # 6 s less the pace loss
+    assert "laps" not in event and "untilStop" not in event
+
+
 def test_too_few_laps_to_fit_raises():
     laps = _laps({}, {})
     with pytest.raises(FaultFitError, match="usable laps"):
@@ -278,6 +304,14 @@ def test_fault_state_costs():
     assert s.cost("CCC", 10, False, True) == (0.0, 0.0)
 
 
+def test_a_contact_lap_takes_its_car_out_of_the_pass_rolls():
+    contact = {"lap": 10, "type": "FAULT", "driver": "AAA", "fault": "damage", "paceLoss": 0.0,
+               "laps": 1, "slowLap": 8.0}  # fmt: skip
+    s = FaultState([contact, {**contact, "driver": "BBB", "fault": "puncture"}])
+    assert s.contact("AAA", 10) and not s.contact("AAA", 11)
+    assert not s.contact("BBB", 10)  # a puncture still holds up the cars behind it
+
+
 def _abu() -> dict:
     return json.loads((RACES_DIR / "abu-dhabi-2021.json").read_text())
 
@@ -297,6 +331,31 @@ def test_a_lone_car_loses_exactly_its_faults_cost():
     assert after - before == pytest.approx(1.5 * len(green) + 4.0, abs=2e-3)
 
 
+def test_a_spun_car_does_not_hold_up_the_car_behind():
+    # VER leads SAI by 0.5 s at the takeover; VER spins on lap 35 (10 s). A slow lap isn't in
+    # the car's model pace, so as a puncture it holds SAI behind it (SAI loses its pass roll);
+    # as a contact the pair goes to the time order and SAI is by.
+    model = _abu()
+    model["drivers"] = [d for d in model["drivers"] if d["code"] in ("VER", "SAI")]
+    for d in model["drivers"]:
+        lead = d["code"] == "VER"
+        d["noise"] = 0.0
+        d["stateAtTakeover"].update(position=1 if lead else 2, gapAhead=0.0 if lead else 0.5)
+    model["events"] = []
+    model["race"]["laps"] = 35
+
+    def ver_behind(kind: str, seed: int) -> float:
+        m = copy.deepcopy(model)
+        m["events"] = [{"lap": 35, "type": "FAULT", "driver": "VER", "fault": kind,
+                        "paceLoss": 0.0, "laps": 1, "slowLap": 10.0}]  # fmt: skip
+        t = sim_reference.simulate(m, seed)["times"]
+        return t["VER"] - t["SAI"]
+
+    for seed in range(1, 6):
+        assert ver_behind("damage", seed) > 5.0  # by on the time order
+        assert ver_behind("puncture", seed) < 0  # held behind
+
+
 # --- parity with the TS sim -------------------------------------------------------------------
 
 PARITY_FAULTS = [
@@ -314,6 +373,12 @@ PARITY_FAULTS = [
     # Under the SC: the slow lap counts, the pace loss waits for green.
     {"lap": 54, "type": "FAULT", "driver": "OCO", "fault": "puncture", "paceLoss": 3.0,
      "slowLap": 6.0, "untilStop": True, "storylineEvent": True},
+    # A spin from contact: its lap only, out of the lap's pass rolls.
+    {"lap": 44, "type": "FAULT", "driver": "LEC", "fault": "damage", "paceLoss": 0.0,
+     "laps": 1, "slowLap": 8.0, "storylineEvent": True},
+    # Contact damage to the flag (a lost front wing).
+    {"lap": 41, "type": "FAULT", "driver": "RIC", "fault": "damage", "paceLoss": 0.6,
+     "slowLap": 3.0, "storylineEvent": True},
 ]  # fmt: skip
 PARITY_SEEDS = list(range(1, 9))
 

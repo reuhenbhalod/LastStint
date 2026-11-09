@@ -21,11 +21,12 @@ them): a race's list may also hold items with "type": "FAULT", which the build r
   "Tyre"...); it gives the sim's fault kind (FAULT_STATUS) unless `fault` names it;
 - source: where the fact was checked (an http(s) URL; required);
 - display only, optional: detail (what happened, in words), turn, note;
-- sim parameters, optional: fault (the kind: "gear-stuck", "power-loss", "puncture" or
-  "tyre-failure"; overrides the status), laps (how many laps it lasted; absent: to the flag,
-  or to the next stop for a tyre fault), untilStop (true: it lasted until the car's next
-  stop; default true for a puncture or tyre failure), slowLap (true: its lap was a forced
-  slow lap; default true for a puncture or tyre failure).
+- sim parameters, optional: fault (the kind: "gear-stuck", "power-loss", "puncture",
+  "tyre-failure" or "damage", a collision's contact and damage; overrides the status), laps
+  (how many laps it lasted; absent: to the flag, or to the next stop for a tyre fault),
+  untilStop (true: it lasted until the car's next stop; default true for a puncture or tyre
+  failure), slowLap (true: its lap was a forced slow lap; default true for a puncture, a
+  tyre failure or damage: the contact lap).
 
 No magnitudes: the seconds lost are fitted from the car's real laps, never written here.
 
@@ -156,7 +157,7 @@ FAULT_KEYS = {
     "lap", "type", "driver", "status", "detail", "turn", "source", "note",
     "fault", "laps", "untilStop", "slowLap",
 }  # fmt: skip
-FAULT_KINDS = ("gear-stuck", "power-loss", "puncture", "tyre-failure")  # = faults.FAULT_KINDS
+FAULT_KINDS = ("gear-stuck", "power-loss", "puncture", "tyre-failure", "damage")  # = faults
 # A fault's official status -> the sim's fault kind (a fact's own `fault` overrides it).
 FAULT_STATUS = {
     "Gearbox": "gear-stuck",
@@ -167,6 +168,8 @@ FAULT_STATUS = {
     "Electrical": "power-loss",
     "Puncture": "puncture",
     "Tyre": "tyre-failure",
+    "Collision": "damage",
+    "Collision damage": "damage",
 }
 
 

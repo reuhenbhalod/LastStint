@@ -358,9 +358,11 @@ export function candidateMoments(model: RaceModel, target = DEFAULT_TARGET): Dec
       found.push({ lap: e.lap, trigger: e.type });
     }
   }
-  // A fault on the user's car: the call comes on the lap after it struck.
+  // A fault on the user's car: the call comes on the lap after it struck. A contact over in
+  // its own lap (`damage`, one lap, no pace loss) leaves nothing to call.
   const untilStop = new Map<number, boolean>();
   for (const e of faultsOf(model.events, model.userSide)) {
+    if (e.fault === 'damage' && e.laps === 1 && !e.paceLoss) continue;
     found.push({ lap: e.lap + 1, trigger: 'fault' });
     untilStop.set(e.lap + 1, e.untilStop === true);
   }
