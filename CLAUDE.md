@@ -189,9 +189,12 @@ Newest first; the 2026-11-08 notes below still hold where this doesn't replace t
   - The pit card now names the fuel fill on tyre buttons when a refuelling stop offers one
     compound at several fills (they all read "Mediums" before).
   - Windows support: native setup notes above, LF/UTF-8 pipeline writers.
-- **Counts now** (`docs/eras-races-report.md`): 47 pass, 2 borderline, 51 fail; **49 authored,
+- **Counts now** (`docs/eras-races-report.md`): 48 pass, 1 borderline, 51 fail; **49 authored,
   49 reachable, 47 ready**. By era (ready): E10 2, E9 5, E8 5, E7 2, E6 3, E5 1, E4 3, E3 6, E2 10,
   E1 10. Authored but not ready: spain-2013 (G1 fail), china-2011 (borderline).
+  Passing but not authored: hungary-2024 (robust G1 re-run at 973d827: pass, 2.52 s). B3
+  near-miss attempt found no honest fix for spain-2013, china-2011, abu-dhabi-2012 or
+  brazil-2021 (`docs/eras-checks/b3-near-misses.md`): they need model gaps 1 and 3.
 - **Owner review from integration B**: the two P2 targets (and that their ★1-3 path is the real
   calls), europe-1997's no-rewrite choice (portugal-1984 does have one), the schema enum, the
   europe-1997 facts that came through a summarising fetch tool, and the A2 radio-wording notes
