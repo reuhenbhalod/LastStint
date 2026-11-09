@@ -32,7 +32,7 @@ import {
   gradedFromHits,
   inlineGrader,
 } from '../engine/grading.js';
-import { callBlocked, moveAllowed, pitCompoundFor } from '../eras/raceRules.js';
+import { callBlocked, moveAllowed, pitCompoundFor, raceScreenEra } from '../eras/raceRules.js';
 import { autoStay, boxingAt } from '../game/autoStay.js';
 import { tyreName } from '../game/choices.js';
 import { ownMove } from '../game/engineerCalls.js';
@@ -556,6 +556,7 @@ export class GameSession {
       this.engine.state,
       engineerConfig(model),
       corner,
+      raceScreenEra(model).prompts === 'board',
     );
     // The same line from the same voice within a few laps is left out (a long battle).
     const recent = this.state.radio.filter((m) => m.lap >= lap - 3);
