@@ -13,6 +13,7 @@
     "tankLaps": 30,
     "stops": 20
    },
+   "fillCap": 30,
    "results": {
     "1": {
      "order": [
@@ -428,6 +429,7 @@
      }
     ]
    },
+   "fillCap": 30,
    "results": {
     "1": {
      "order": [
@@ -844,6 +846,7 @@
      }
     ]
    },
+   "fillCap": 30,
    "results": {
     "1": {
      "order": [
@@ -1193,6 +1196,7 @@
    "rules": {
     "refuelling": true
    },
+   "fillCap": 70,
    "results": {
     "1": {
      "order": [
@@ -1557,6 +1561,385 @@
       "ZHO",
       "GAS",
       "BOT"
+     ]
+    }
+   }
+  },
+  {
+   "name": "san-marino-2005, a stop with no fill fills to the tank, not the flag",
+   "race": "san-marino-2005",
+   "rules": {
+    "twoCompound": false,
+    "tyreChanges": false,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": true
+   },
+   "strategies": {
+    "MSCM": [
+     {
+      "lap": 30,
+      "to": "MEDIUM"
+     }
+    ]
+   },
+   "fillCap": 25,
+   "results": {
+    "1": {
+     "order": [
+      "MSCM",
+      "ALO",
+      "BUT",
+      "SAT",
+      "WUR",
+      "VIL",
+      "TRU",
+      "HEI",
+      "LIU",
+      "WEB",
+      "SCH",
+      "MAS",
+      "COU",
+      "KAR",
+      "TMO",
+      "ALBC"
+     ],
+     "gaps": {
+      "MSCM": 0.0,
+      "ALO": 19.376,
+      "BUT": 25.663,
+      "SAT": 51.99,
+      "WUR": 54.205,
+      "VIL": 80.955,
+      "TRU": 87.969,
+      "HEI": 90.45,
+      "LIU": 104.851,
+      "WEB": 106.795,
+      "SCH": 111.299,
+      "MAS": 112.759,
+      "COU": 133.38,
+      "KAR": 147.255,
+      "TMO": 264.419
+     },
+     "times": {
+      "MSCM": 3564.809,
+      "ALO": 3584.185,
+      "BUT": 3590.473,
+      "SAT": 3616.799,
+      "WUR": 3619.014,
+      "VIL": 3645.764,
+      "TRU": 3652.779,
+      "HEI": 3655.259,
+      "LIU": 3669.66,
+      "WEB": 3671.604,
+      "SCH": 3676.108,
+      "MAS": 3677.568,
+      "COU": 3698.189,
+      "KAR": 3712.064,
+      "TMO": 3829.229
+     },
+     "finishers": [
+      "MSCM",
+      "ALO",
+      "BUT",
+      "SAT",
+      "WUR",
+      "VIL",
+      "TRU",
+      "HEI",
+      "LIU",
+      "WEB",
+      "SCH",
+      "MAS",
+      "COU",
+      "KAR",
+      "TMO"
+     ]
+    },
+    "2": {
+     "order": [
+      "MSCM",
+      "ALO",
+      "BUT",
+      "WUR",
+      "SAT",
+      "TRU",
+      "VIL",
+      "HEI",
+      "WEB",
+      "LIU",
+      "SCH",
+      "MAS",
+      "COU",
+      "KAR",
+      "TMO",
+      "ALBC"
+     ],
+     "gaps": {
+      "MSCM": 0.0,
+      "ALO": 8.22,
+      "BUT": 23.828,
+      "WUR": 41.752,
+      "SAT": 49.398,
+      "TRU": 83.892,
+      "VIL": 84.192,
+      "HEI": 89.738,
+      "WEB": 92.712,
+      "LIU": 95.249,
+      "SCH": 105.404,
+      "MAS": 113.857,
+      "COU": 119.875,
+      "KAR": 143.847,
+      "TMO": 251.393
+     },
+     "times": {
+      "MSCM": 3570.154,
+      "ALO": 3578.375,
+      "BUT": 3593.982,
+      "WUR": 3611.906,
+      "SAT": 3619.553,
+      "TRU": 3654.046,
+      "VIL": 3654.346,
+      "HEI": 3659.893,
+      "WEB": 3662.867,
+      "LIU": 3665.403,
+      "SCH": 3675.558,
+      "MAS": 3684.011,
+      "COU": 3690.029,
+      "KAR": 3714.001,
+      "TMO": 3821.547
+     },
+     "finishers": [
+      "MSCM",
+      "ALO",
+      "BUT",
+      "WUR",
+      "SAT",
+      "TRU",
+      "VIL",
+      "HEI",
+      "WEB",
+      "LIU",
+      "SCH",
+      "MAS",
+      "COU",
+      "KAR",
+      "TMO"
+     ]
+    },
+    "3": {
+     "order": [
+      "MSCM",
+      "ALO",
+      "BUT",
+      "WUR",
+      "SAT",
+      "VIL",
+      "HEI",
+      "TRU",
+      "WEB",
+      "LIU",
+      "SCH",
+      "MAS",
+      "COU",
+      "KAR",
+      "TMO",
+      "ALBC"
+     ],
+     "gaps": {
+      "MSCM": 0.0,
+      "ALO": 9.64,
+      "BUT": 14.134,
+      "WUR": 33.251,
+      "SAT": 42.763,
+      "VIL": 75.61,
+      "HEI": 82.118,
+      "TRU": 83.991,
+      "WEB": 91.246,
+      "LIU": 94.033,
+      "SCH": 98.926,
+      "MAS": 122.998,
+      "COU": 123.298,
+      "KAR": 139.355,
+      "TMO": 255.184
+     },
+     "times": {
+      "MSCM": 3574.057,
+      "ALO": 3583.696,
+      "BUT": 3588.191,
+      "WUR": 3607.308,
+      "SAT": 3616.82,
+      "VIL": 3649.667,
+      "HEI": 3656.175,
+      "TRU": 3658.048,
+      "WEB": 3665.303,
+      "LIU": 3668.09,
+      "SCH": 3672.983,
+      "MAS": 3697.055,
+      "COU": 3697.355,
+      "KAR": 3713.412,
+      "TMO": 3829.241
+     },
+     "finishers": [
+      "MSCM",
+      "ALO",
+      "BUT",
+      "WUR",
+      "SAT",
+      "VIL",
+      "HEI",
+      "TRU",
+      "WEB",
+      "LIU",
+      "SCH",
+      "MAS",
+      "COU",
+      "KAR",
+      "TMO"
+     ]
+    },
+    "4": {
+     "order": [
+      "MSCM",
+      "ALO",
+      "BUT",
+      "WUR",
+      "SAT",
+      "VIL",
+      "TRU",
+      "HEI",
+      "WEB",
+      "SCH",
+      "LIU",
+      "MAS",
+      "COU",
+      "KAR",
+      "TMO",
+      "ALBC"
+     ],
+     "gaps": {
+      "MSCM": 0.0,
+      "ALO": 2.836,
+      "BUT": 15.313,
+      "WUR": 35.005,
+      "SAT": 38.592,
+      "VIL": 70.955,
+      "TRU": 73.269,
+      "HEI": 78.714,
+      "WEB": 85.864,
+      "SCH": 97.567,
+      "LIU": 97.867,
+      "MAS": 100.089,
+      "COU": 116.684,
+      "KAR": 127.655,
+      "TMO": 257.939
+     },
+     "times": {
+      "MSCM": 3579.841,
+      "ALO": 3582.677,
+      "BUT": 3595.154,
+      "WUR": 3614.846,
+      "SAT": 3618.433,
+      "VIL": 3650.795,
+      "TRU": 3653.11,
+      "HEI": 3658.555,
+      "WEB": 3665.704,
+      "SCH": 3677.408,
+      "LIU": 3677.708,
+      "MAS": 3679.93,
+      "COU": 3696.525,
+      "KAR": 3707.496,
+      "TMO": 3837.78
+     },
+     "finishers": [
+      "MSCM",
+      "ALO",
+      "BUT",
+      "WUR",
+      "SAT",
+      "VIL",
+      "TRU",
+      "HEI",
+      "WEB",
+      "SCH",
+      "LIU",
+      "MAS",
+      "COU",
+      "KAR",
+      "TMO"
+     ]
+    },
+    "5": {
+     "order": [
+      "MSCM",
+      "ALO",
+      "BUT",
+      "WUR",
+      "SAT",
+      "VIL",
+      "TRU",
+      "HEI",
+      "WEB",
+      "LIU",
+      "SCH",
+      "MAS",
+      "COU",
+      "KAR",
+      "TMO",
+      "ALBC"
+     ],
+     "gaps": {
+      "MSCM": 0.0,
+      "ALO": 2.625,
+      "BUT": 13.698,
+      "WUR": 27.846,
+      "SAT": 35.461,
+      "VIL": 65.342,
+      "TRU": 69.163,
+      "HEI": 69.69,
+      "WEB": 85.654,
+      "LIU": 86.886,
+      "SCH": 96.968,
+      "MAS": 106.935,
+      "COU": 115.275,
+      "KAR": 130.481,
+      "TMO": 252.949
+     },
+     "times": {
+      "MSCM": 3581.197,
+      "ALO": 3583.822,
+      "BUT": 3594.894,
+      "WUR": 3609.043,
+      "SAT": 3616.658,
+      "VIL": 3646.539,
+      "TRU": 3650.36,
+      "HEI": 3650.887,
+      "WEB": 3666.851,
+      "LIU": 3668.083,
+      "SCH": 3678.165,
+      "MAS": 3688.132,
+      "COU": 3696.472,
+      "KAR": 3711.677,
+      "TMO": 3834.146
+     },
+     "finishers": [
+      "MSCM",
+      "ALO",
+      "BUT",
+      "WUR",
+      "SAT",
+      "VIL",
+      "TRU",
+      "HEI",
+      "WEB",
+      "LIU",
+      "SCH",
+      "MAS",
+      "COU",
+      "KAR",
+      "TMO"
      ]
     }
    }

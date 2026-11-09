@@ -73,7 +73,9 @@ In an Eras race the car keeps to **the real team's plan** (`erasContinuation`):
   real stops is dropped for each extra one: the early stop stands in for it.
 - The rules come first, as a player is told them: if those stops would leave the car short of
   the two-compound rule or the race's minimum stops, the planner's legal plan is used instead.
-  Fuel does not get this help: a car that skipped a fill runs dry, as in live play.
+  Fuel does not get this help: a car that skipped a fill runs dry, as in live play. In a
+  refuelling race the planner's stops keep every stint after a stop within the tank (B3, Nov 9
+  2026: `sim.ts withinTank` adds stops; a stop without a fill fills to `fillCap` at most).
 - A player who logged a race plan of their own (pit calls after the option) follows it as
   called; nothing is added.
 - Expert's own grader (`rivalPlayout`) uses the same continuation for the player's car.
