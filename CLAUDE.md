@@ -91,6 +91,18 @@ cd pipeline && uv sync --dev && cd ..
 pnpm --filter @laststint/web exec playwright install --with-deps chromium
 ```
 
+**Native Windows also works** (set up 2026-11-08 at `C:\Users\bhalo\LastStint`, all checks pass):
+
+- Clone with `git clone -c core.autocrlf=false …`. With Git for Windows' default
+  (`autocrlf=true`) every data file is checked out with CRLF, which breaks the frozen pool files.
+- Set `PYTHONUTF8=1` for every pipeline command. Python's Windows default (cp1252) misreads
+  `data/drivers.json` (e.g. Räikkönen) and would write data files differently.
+- `corepack enable` needs admin; `npm install -g pnpm@12.15.0` works instead. Playwright:
+  `playwright install chromium` (no `--with-deps`).
+- Local dev: `npx wrangler d1 migrations apply pitwall-db --local`, then
+  `pnpm --filter @laststint/worker schedule --local --days 7`, then `wrangler dev --var
+  ERAS_TEST_MODE:true` (apps/worker, :8787) and `vite` (apps/web, :5173, proxies `/api`).
+
 Not in git, so it must be copied over by hand:
 
 | What | Path | Size | Needed for |
