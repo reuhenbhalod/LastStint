@@ -162,14 +162,14 @@ the last report.
 
 | # | Race | Data source | Estimated | Built | Check | Result | Mean gap error / anchors | Main failing check | Authored (side) | Reachable | Ready | Diagnosis |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1 | france-1990 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, fuelLoads, weather | yes | anchors | pass | 68/68 core anchors | G1 sanity fail, 3.79 s | no | - | no | now passes (S7: de Cesaris run at his sourced road place); anchor fail (order): de Cesaris' disqualification puts him in the road order (solver); G1 sanity 0.52 -> 3.86 s on W2's anchors: duel CAP vs PRO 8.1 s (race mechanics 98%); int. 8: anchors 67/68 core anchors -> 68/68 core anchors |
+| 1 | france-1990 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, fuelLoads, weather | yes | anchors | pass | 68/68 core anchors | G1 sanity fail, 3.79 s | yes (CAP) | yes | **yes** | now passes (S7: de Cesaris run at his sourced road place); anchor fail (order): de Cesaris' disqualification puts him in the road order (solver); G1 sanity 0.52 -> 3.86 s on W2's anchors: duel CAP vs PRO 8.1 s (race mechanics 98%); int. 8: anchors 67/68 core anchors -> 68/68 core anchors; 6.2 (Eras 1-2): authored from Capelli (hard calls CAP 0, PRO 0, tie to Capelli) |
 | 2 | united-states-1990 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, fuelLoads, weather | yes | anchors | pass | 60/60 core anchors | G1 sanity pass, 2.18 s | yes (ALE) | yes | **yes** |  |
 | 3 | mexico-1990 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, fuelLoads, weather | yes | anchors | pass | 73/73 core anchors | G1 sanity pass, 1.84 s | yes (PRO) | yes | **yes** | anchors pass; G1 sanity now passes on W2's anchors (2.00 -> 1.84 s) |
 | 4 | brazil-1991 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, fuelLoads, weather | yes | anchors | pass | 61/61 core anchors | G1 sanity fail, 3.64 s | yes (SENA) | yes | **yes** | anchors pass; G1 sanity 2.37 -> 3.64 s on W2's anchors: ALE and PRO about 7 s (pace 69%) |
-| 5 | monaco-1992 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, fuelLoads, weather | yes | anchors | pass | 58/58 core anchors | G1 sanity pass, 1.60 s | no | - | no | now passes (S7: a lap-1 retirement stands outside the grid ladder); anchor fail (grid): Moreno's and Wendlinger's lap 1 pinned by their fastest laps (solver); int. 8: anchors 57/58 core anchors -> 58/58 core anchors |
+| 5 | monaco-1992 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, fuelLoads, weather | yes | anchors | pass | 58/58 core anchors | G1 sanity pass, 1.60 s | yes (SENA) | yes | **yes** | now passes (S7: a lap-1 retirement stands outside the grid ladder); anchor fail (grid): Moreno's and Wendlinger's lap 1 pinned by their fastest laps (solver); int. 8: anchors 57/58 core anchors -> 58/58 core anchors; 6.2 (Eras 1-2): side flipped to Senna (hard calls 0-0, tie to Senna), rebuilt; Mansell's lap-71 stop is a storyline call; G1 sanity not re-run after the flip |
 | 6 | belgium-1992 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, fuelLoads, weather | yes | anchors | pass | 110/110 core anchors | G1 sanity fail, 10.86 s | yes (MSCM) | yes | **yes** | anchors pass; rival Mansell again (W1: his slick stop is a storyline call); Mansell leads at the takeover as sourced. G1 sanity 5.18 -> 10.86 s on W2's anchors (10.80 s with Patrese as the rival): duel MSCM vs MAN 14.4 s, PAT 13.8 s |
 | 7 | hungary-1992 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, fuelLoads, weather | yes | anchors | pass | 57/57 core anchors | G1 sanity fail, 4.10 s | yes (BER) | yes | **yes** | anchors pass; G1 sanity 2.55 -> 4.10 s on W2's anchors: duel MAN vs BER 6.5 s, Mansell's fresh-tyre pace (pace 90%) |
-| 8 | brazil-1993 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, fuelLoads, weather | yes | anchors | pass | 123/123 core anchors | G1 sanity fail, 7.92 s | no | - | no | built (S7): the field's slick change sourced (weather.slickChange), Senna P3 at the takeover; anchors pass; int. 8: anchors not built -> 123/123 core anchors |
+| 8 | brazil-1993 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, fuelLoads, weather | yes | anchors | pass | 123/123 core anchors | G1 sanity fail, 7.92 s | yes (SENA) | yes | **yes** | built (S7): the field's slick change sourced (weather.slickChange), Senna P3 at the takeover; anchors pass; int. 8: anchors not built -> 123/123 core anchors; 6.2 (Eras 1-2): authored from Senna (hard calls SENA 4, HIL 1) |
 | 9 | europe-1993 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, safetyCars, fuelLoads, weather | yes | anchors | pass | 106/106 core anchors | G1 sanity fail, 52.20 s | yes (SENA) | yes | **yes** | anchors pass; Senna now leads at the takeover (W2's lap leaders; was P12); rival Hill again (W1). G1 sanity 1.16 -> 52.20 s: HIL 78 s off his real gap (38.20 s with Prost as the rival, so mostly the anchors): his four unsourced later stops are absorbed into his pace |
 | 10 | australia-1993 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, safetyCars, fuelLoads, weather | yes | anchors | pass | 60/60 core anchors | G1 sanity pass, 0.72 s | yes (SENA) | yes | **yes** |  |
 
@@ -177,7 +177,7 @@ the last report.
 
 | # | Race | Data source | Estimated | Built | Check | Result | Mean gap error / anchors | Main failing check | Authored (side) | Reachable | Ready | Diagnosis |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1 | south-africa-1983 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, fuelLoads, weather | yes | anchors | pass | 58/58 core anchors | G1 sanity pass, 2.95 s | no | - | no | now passes (S7: a lap-1 retirement stands outside the grid ladder); anchor fail (grid): a lap-1 retirement pinned by its fastest lap (solver); G1 sanity now passes on W2's anchors (3.93 -> 2.95 s); int. 8: anchors 57/58 core anchors -> 58/58 core anchors |
+| 1 | south-africa-1983 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, fuelLoads, weather | yes | anchors | pass | 58/58 core anchors | G1 sanity pass, 2.95 s | yes (PIQN) | yes | **yes** | now passes (S7: a lap-1 retirement stands outside the grid ladder); anchor fail (grid): a lap-1 retirement pinned by its fastest lap (solver); G1 sanity now passes on W2's anchors (3.93 -> 2.95 s); int. 8: anchors 57/58 core anchors -> 58/58 core anchors; 6.2 (Eras 1-2): kept on Piquet against the 0-0 tie (which goes to Prost by 0.3 pts): Prost's lap-35 turbo failure has no sourced call to make avoidable, so every Prost path retires; owner to confirm |
 | 2 | monaco-1984 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, fuelLoads, weather | yes | anchors | pass | 41/41 core anchors | G1 sanity fail, 2.40 s | yes (PRO) | yes | **yes** | anchors pass; fuel limit bites in the rain as if dry; G1 sanity 5.54 -> 2.40 s on W2's anchors (BEL 6.3 s) |
 | 3 | portugal-1984 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, fuelLoads, weather | yes | anchors | pass | 58/58 core anchors | G1 sanity fail, 3.00 s | yes (LAU) | yes | **yes** | anchors pass; G1 sanity: race mechanics (pace 32%) |
 | 4 | germany-1986 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, fuelLoads, weather | yes | anchors | pass | 68/68 core anchors | G1 sanity pass, 1.77 s | yes (ROSK) | yes | **yes** | anchors pass; Rosberg runs to the last lap 2.0 s behind Piquet (M4 lastLapStops) and his out-of-fuel stop is left to the fuel model |
@@ -190,7 +190,7 @@ the last report.
 ## Summary
 
 **Result: 47 pass, 1 borderline, 52 fail, 0 not built** (of 100; 23 reconstructed races checked on
-their anchors, 77 on G1). **Authored 44, reachable 41 of 44, ready to publish 39.** Last report
+their anchors, 77 on G1). **Authored 48, reachable 45 of 48, ready to publish 43** (with step 6.2's Eras 1-2 authoring: france-1990, monaco-1992, brazil-1993, south-africa-1983). Last report
 (Eras 1.1, 46ad682): 41 pass, 0 borderline, 57 fail, 2 not built; 44 authored, 44 reachable, 41
 ready.
 
@@ -204,15 +204,15 @@ ready.
 | 5 | 1 | 0 | 9 | 0 | 1 | 1 | 1 |
 | 4 | 3 | 0 | 7 | 0 | 3 | 3 | 3 |
 | 3 | 6 | 0 | 4 | 0 | 5 | 5 | 5 |
-| 2 | 10 | 0 | 0 | 0 | 7 | 7 | 7 |
-| 1 | 10 | 0 | 0 | 0 | 9 | 9 | 9 |
-| **All** | **47** | **1** | **52** | **0** | **44** | **41** | **39** |
+| 2 | 10 | 0 | 0 | 0 | 10 | 10 | 10 |
+| 1 | 10 | 0 | 0 | 0 | 10 | 10 | 10 |
+| **All** | **47** | **1** | **52** | **0** | **48** | **45** | **43** |
 
 Timed races (77, now with china-2007): total mean gap error 269.58 s (last report 294.85 s over
 76). G1 sanity of the 23 reconstructed races (now with brazil-1993): 13 pass, 112.79 s total
 (last report 13 of 22, 104.68 s).
 
-### Ready to publish (39)
+### Ready to publish (43)
 
 - **Era 10** (2): hungary-2022 (VER), belgium-2023 (VER)
 - **Era 9** (5): bahrain-2021 (VER), france-2021 (HAM), russia-2021 (NOR), turkey-2021 (LEC), abu-dhabi-2021 (HAM)
@@ -222,15 +222,14 @@ Timed races (77, now with china-2007): total mean gap error 269.58 s (last repor
 - **Era 5** (1): san-marino-2005 (MSCM)
 - **Era 4** (3): japan-2000 (HAK), austria-2002 (BAR), france-2004 (ALO)
 - **Era 3** (5): spain-1994 (HIL), australia-1994 (HIL), belgium-1995 (MSCM), spain-1996 (MSCM), hungary-1998 (COU)
-- **Era 2** (7): united-states-1990 (ALE), mexico-1990 (PRO), brazil-1991 (SENA), belgium-1992 (MSCM), hungary-1992 (BER), europe-1993 (SENA), australia-1993 (SENA)
-- **Era 1** (9): monaco-1984 (PRO), portugal-1984 (LAU), germany-1986 (ROSK), portugal-1985 (SENA), mexico-1986 (BER), hungary-1986 (PIQN), australia-1986 (MAN), great-britain-1987 (PIQN), monaco-1988 (SENA)
+- **Era 2** (10): france-1990 (CAP), united-states-1990 (ALE), mexico-1990 (PRO), brazil-1991 (SENA), monaco-1992 (SENA), belgium-1992 (MSCM), hungary-1992 (BER), brazil-1993 (SENA), europe-1993 (SENA), australia-1993 (SENA)
+- **Era 1** (10): south-africa-1983 (PIQN), monaco-1984 (PRO), portugal-1984 (LAU), germany-1986 (ROSK), portugal-1985 (SENA), mexico-1986 (BER), hungary-1986 (PIQN), australia-1986 (MAN), great-britain-1987 (PIQN), monaco-1988 (SENA)
 
 Authored but not ready (5): **spain-2016** (Era 7, RAI) and **malaysia-2013** (Era 6, WEB) pass G1
 but are no longer reachable on the rebuilt models; **spain-2013** (Era 6, RAI) fails G1 and is no
 longer reachable; **china-2011** (Era 6, VET) is borderline (podium order rate 0.49 [0.50] on one
 seed set); **brazil-2019** (Era 8, HAM) still fails G1 (duel HAM vs GAS 4.24 / 4.32 [3.00]). Passing
-but not authored (6): hungary-2024, europe-1997, france-1990, monaco-1992, south-africa-1983,
-brazil-1993.
+but not authored (2): hungary-2024, europe-1997.
 
 ## Since the last report
 

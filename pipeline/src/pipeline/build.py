@@ -1229,12 +1229,14 @@ RACES: dict[str, dict] = {
         "year": 1992,
         "event": "Monaco",
         "source": "reconstruct",
-        "name": "Monaco 1992: Mansell vs Senna",
+        "name": "Monaco 1992: Senna vs Mansell",
         "era": "1988-1993",
         "takeover_lap": None,  # D3 rule
         "seed": 1,
-        "user_side": "MAN",
-        "rival": "SENA",  # Mansell pits on lap 71 and chases Senna (real: P2 by 0.2 s)
+        # Eras side flipped to Senna (6.2, Nov 8 2026): `pipeline hard-calls` MAN 0, SENA 0;
+        # the tie goes to Senna, whose real calls gave up more chance (31.7 pts vs 0.0).
+        "user_side": "SENA",
+        "rival": "MAN",  # Senna holds off Mansell's fresh tyres to the flag (real: by 0.2 s)
         "score_positions": 6,
         "split": "eras",
     },

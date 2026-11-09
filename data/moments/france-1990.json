@@ -1,0 +1,240 @@
+[
+  {
+    "id": "rivalpit-27",
+    "lap": 27,
+    "trigger": "rivalPit",
+    "target": {
+      "kind": "win"
+    },
+    "options": [
+      {
+        "id": "stay",
+        "label": "STAY OUT",
+        "decisions": []
+      },
+      {
+        "id": "box-medium",
+        "label": "IN - fresh tyres",
+        "decisions": [
+          {
+            "lap": 27,
+            "kind": "pit",
+            "compound": "MEDIUM"
+          }
+        ]
+      },
+      {
+        "id": "box-next-medium",
+        "label": "IN NEXT LAP - fresh tyres",
+        "decisions": [
+          {
+            "lap": 28,
+            "kind": "pit",
+            "compound": "MEDIUM"
+          }
+        ]
+      }
+    ],
+    "realOptionId": "stay"
+  },
+  {
+    "id": "pace-32",
+    "lap": 32,
+    "trigger": "cliff",
+    "target": {
+      "kind": "win"
+    },
+    "options": [
+      {
+        "id": "keep",
+        "label": "Hold the pace",
+        "decisions": []
+      },
+      {
+        "id": "push",
+        "label": "PUSH",
+        "decisions": [
+          {
+            "lap": 32,
+            "kind": "mode",
+            "key": "pace",
+            "value": "push"
+          }
+        ]
+      },
+      {
+        "id": "easy",
+        "label": "EASY - save the car",
+        "decisions": [
+          {
+            "lap": 32,
+            "kind": "mode",
+            "key": "pace",
+            "value": "manage"
+          }
+        ]
+      }
+    ],
+    "realOptionId": null
+  },
+  {
+    "id": "pace-36",
+    "lap": 36,
+    "trigger": "cliff",
+    "target": {
+      "kind": "win"
+    },
+    "options": [
+      {
+        "id": "keep",
+        "label": "Hold the pace",
+        "decisions": []
+      },
+      {
+        "id": "push",
+        "label": "PUSH",
+        "decisions": [
+          {
+            "lap": 36,
+            "kind": "mode",
+            "key": "pace",
+            "value": "push"
+          }
+        ]
+      },
+      {
+        "id": "easy",
+        "label": "EASY - save the car",
+        "decisions": [
+          {
+            "lap": 36,
+            "kind": "mode",
+            "key": "pace",
+            "value": "manage"
+          }
+        ]
+      }
+    ],
+    "realOptionId": null
+  },
+  {
+    "id": "pace-40",
+    "lap": 40,
+    "trigger": "cliff",
+    "target": {
+      "kind": "win"
+    },
+    "options": [
+      {
+        "id": "keep",
+        "label": "Hold the pace",
+        "decisions": []
+      },
+      {
+        "id": "push",
+        "label": "PUSH",
+        "decisions": [
+          {
+            "lap": 40,
+            "kind": "mode",
+            "key": "pace",
+            "value": "push"
+          }
+        ]
+      },
+      {
+        "id": "easy",
+        "label": "EASY - save the car",
+        "decisions": [
+          {
+            "lap": 40,
+            "kind": "mode",
+            "key": "pace",
+            "value": "manage"
+          }
+        ]
+      }
+    ],
+    "realOptionId": null
+  },
+  {
+    "id": "pace-60",
+    "lap": 60,
+    "trigger": "cliff",
+    "target": {
+      "kind": "win"
+    },
+    "options": [
+      {
+        "id": "keep",
+        "label": "Hold the pace",
+        "decisions": []
+      },
+      {
+        "id": "push",
+        "label": "PUSH",
+        "decisions": [
+          {
+            "lap": 60,
+            "kind": "mode",
+            "key": "pace",
+            "value": "push"
+          }
+        ]
+      },
+      {
+        "id": "easy",
+        "label": "EASY - save the car",
+        "decisions": [
+          {
+            "lap": 60,
+            "kind": "mode",
+            "key": "pace",
+            "value": "manage"
+          }
+        ]
+      }
+    ],
+    "realOptionId": null
+  },
+  {
+    "id": "battle-76",
+    "lap": 76,
+    "trigger": "cliff",
+    "target": {
+      "kind": "win"
+    },
+    "options": [
+      {
+        "id": "hold",
+        "label": "Hold position",
+        "decisions": []
+      },
+      {
+        "id": "defend",
+        "label": "DEFEND",
+        "decisions": [
+          {
+            "lap": 76,
+            "kind": "mode",
+            "key": "battle",
+            "value": "defend"
+          }
+        ]
+      },
+      {
+        "id": "attack",
+        "label": "ATTACK",
+        "decisions": [
+          {
+            "lap": 76,
+            "kind": "mode",
+            "key": "battle",
+            "value": "attack"
+          }
+        ]
+      }
+    ],
+    "realOptionId": null
+  }
+]
