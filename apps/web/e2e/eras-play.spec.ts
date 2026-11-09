@@ -3,14 +3,17 @@
 // Between them: refuelling (a box call waits for its fuel fill), the 2005 tyre lock, no DRS
 // before 2011, a team order, the decision timer running out and the untimed opt-out, Legend,
 // reconstructed races with pit-board prompts (Eras 1-2), an avoidable storyline retirement
-// (repeated and avoided), the history book and a leaderboard. No authored race has a red flag
-// or a car fault yet, so those two are played on the catalog's Draft races that do (italy-2020,
-// canada-2014), as test mode serves them.
+// (repeated and avoided), the history book and a leaderboard. The radio lines for a car fault
+// and a storyline retirement (on the pit wall in Era 1): brazil-2019's contact and monaco-1988;
+// austria-2002's last-lap team order is fixme'd (see that test). No authored race has a red
+// flag, so that is played on the catalog's Draft race that does (italy-2020), as test mode
+// serves it; so is canada-2014's power loss.
 //
 // Each test plays a whole race at five times the normal lap speed (the app's e2e hook); the
 // tests run in parallel. Runtime: see docs/eras-build-plan.md step 10.1.
 import { expect, test } from '@playwright/test';
 import {
+  type Moment,
   closeTeamRadio,
   finishRace,
   gameDecisions,
@@ -21,6 +24,7 @@ import {
   playRace,
   raceNotes,
   radioLines,
+  radioLog,
   startRace,
   teamRadio,
 } from './eras.js';
@@ -131,6 +135,29 @@ test('Era 8 (Draft): Italy 2020’s red flag', async ({ page }) => {
   await resultsFor(page, 8);
 });
 
+test('Era 8: Brazil 2019, Hamilton’s contact on the radio', async ({ page }) => {
+  const model = loadEraRace('brazil-2019');
+  // A4's sourced contact (FAULT, damage) on Hamilton, yours, on lap 70.
+  expect(model.events).toContainEqual(
+    expect.objectContaining({ type: 'FAULT', driver: 'HAM', lap: 70, fault: 'damage' }),
+  );
+  await mockEras(page, [model]);
+  await openRace(page, 'brazil-2019');
+  const radio = radioLog(page);
+  await playRace(page, { each: radio.read });
+  const faults = (await raceNotes(page)).filter((n) => n.kind === 'fault');
+  expect(faults).toContainEqual(
+    expect.objectContaining({ driver: 'HAM', lap: 70, detail: 'damage' }),
+  );
+  // A2's line for a fault with no line of its own (damage), from the driver.
+  expect(await radio.lines()).toContainEqual({
+    lap: 70,
+    from: 'HAM',
+    text: 'Something’s wrong with the car!',
+  });
+  await resultsFor(page, 8);
+});
+
 test('Era 7: Abu Dhabi 2016 from the map to the results', async ({ page }) => {
   const eras = await mockEras(page, [loadEraRace('abu-dhabi-2016')]);
   await openRace(page, 'abu-dhabi-2016');
@@ -144,7 +171,8 @@ test('Era 7 (Draft): Canada 2014’s car faults', async ({ page }) => {
   const model = loadEraRace('canada-2014');
   await mockEras(page, [model]);
   await openRace(page, 'canada-2014');
-  await playRace(page);
+  const radio = radioLog(page);
+  await playRace(page, { each: radio.read });
   // Both Mercedes lose power on their real laps; Rosberg is yours.
   const faults = (await raceNotes(page)).filter((n) => n.kind === 'fault');
   expect(faults).toContainEqual(
@@ -153,6 +181,14 @@ test('Era 7 (Draft): Canada 2014’s car faults', async ({ page }) => {
   expect(faults).toContainEqual(
     expect.objectContaining({ driver: 'HAM', lap: 36, detail: 'power-loss' }),
   );
+  // Rosberg calls his on the radio (A2); Hamilton's isn't told to you.
+  const heard = await radio.lines();
+  expect(heard).toContainEqual({
+    lap: 37,
+    from: 'ROS',
+    text: 'I’ve lost power! Something’s up with the engine.',
+  });
+  expect(heard.filter((l) => l.from === 'HAM')).toEqual([]);
   await resultsFor(page, 7);
 });
 
@@ -232,6 +268,70 @@ test('Era 4: Austria 2002, a team order', async ({ page }) => {
   );
 });
 
+// A2's team-order line in Era 4, at austria-2002's real last-corner swap: not reachable in live
+// play yet, so fixme'd. Two things stop it (found by this test, 2026-11-08):
+// 1. The race's moments were authored before the TEAM_ORDER event (M4), so the race file has no
+//    teamorder-71 call, and the player's own scripted order waits for a `comply` (scripted.ts
+//    `call`), so live play never arms it. The test serves the call moments.ts teamOrderMoments
+//    would make, as a re-author would add it.
+// 2. Even with it, the order only fires if Barrichello leads Schumacher into lap 71 within
+//    TEAM_ORDER_WINDOW. In live play Schumacher is the quicker car (0.5-1 s a lap) and is past
+//    by lap 52 on the best path found here (plan A, the real stop on lap 61, defending every
+//    battle), 10.5 s ahead at the flag, so the order is dropped and no note or line follows.
+// Un-fixme this when austria-2002 is re-authored with the call and Barrichello can lead to the end.
+test.fixme('Era 4: Austria 2002, the last-corner team order on the radio', async ({ page }) => {
+  const model = loadEraRace('austria-2002');
+  const order = model.events.find((e) => e.type === 'TEAM_ORDER');
+  expect(order).toMatchObject({ lap: 71, driver: 'BAR', other: 'MSCM' });
+  if (!model.decisionMoments.some((m) => m.id.startsWith('teamorder-'))) {
+    const target = (model.decisionMoments[0] as unknown as { target: unknown }).target;
+    model.decisionMoments.push({
+      id: 'teamorder-71-mscm',
+      lap: 71,
+      trigger: 'teamOrder',
+      target,
+      options: [
+        {
+          id: 'comply',
+          label: 'Let MSCM through',
+          decisions: [{ lap: 71, kind: 'teamOrder', order: 'comply' }],
+        },
+        { id: 'ignore', label: 'Ignore the order', decisions: [] },
+      ],
+      realOptionId: 'comply',
+    } as Moment);
+  }
+  await mockEras(page, [model]);
+  await openRace(page, 'austria-2002');
+  const radio = radioLog(page);
+  await startRace(page, { plan: 'A' });
+  const played = await finishRace(page, {
+    each: radio.read,
+    answer: (lap) =>
+      ({
+        37: ['Hold the line'],
+        45: ['Standard pace'],
+        57: ['Stay out'],
+        61: ['Box'], // then the first tyre: box-medium, the real fill
+        63: ['Stay out'],
+        68: ['Defend hard'],
+        71: ['Let MSCM through'],
+      })[lap],
+    quick: (text) => (/Defending from/.test(text) ? 'Defend hard' : undefined),
+  });
+  expect(played.moments.get(71)).toMatch(/^Engineer · /);
+  // Barrichello yields on the last lap, and the wall tells him on the radio (A2; Era 4 has team
+  // radio, not the pit board).
+  const swap = (await raceNotes(page)).filter((n) => n.kind === 'team-order');
+  expect(swap).toEqual([{ lap: 71, kind: 'team-order', driver: 'MSCM', detail: 'BAR' }]);
+  expect(await radio.lines()).toContainEqual({
+    lap: 71,
+    from: 'Engineer',
+    text: 'Team orders: let MSCM by, then hold station.',
+  });
+  await resultsFor(page, 4);
+});
+
 test('Era 3: Belgium 1995, refuelling stops in the rain', async ({ page }) => {
   const model = loadEraRace('belgium-1995');
   expect(model.rules?.refuelling).toBe(true);
@@ -288,7 +388,9 @@ test('Era 1: Monaco 1988, the avoidable storyline retirement, repeated then avoi
   });
   await openRace(page, 'monaco-1988');
   // Senna's real call: push from lap 40 and keep pushing. He crashes out on his real lap.
+  const repeatedRadio = radioLog(page);
   const repeated = await playRace(page, {
+    each: repeatedRadio.read,
     answer: (lap) => (lap === 40 ? ['PUSH'] : lap === 48 ? ['STAY OUT'] : ['Hold the pace']),
     // And no pace call on the pit board takes him off it.
     quick: (text) =>
@@ -301,6 +403,14 @@ test('Era 1: Monaco 1988, the avoidable storyline retirement, repeated then avoi
   for (const tag of repeated.moments.values()) expect(tag).toMatch(/^Pit board · /);
   const crashed = (await raceNotes(page)).filter((n) => n.kind === 'storyline');
   expect(crashed).toEqual([expect.objectContaining({ driver: 'SENA', detail: 'retired' })]);
+  // Era 1: the retirement comes from the pit wall (A2), not as the driver's radio call.
+  const heard = await repeatedRadio.lines();
+  expect(heard).toContainEqual({
+    lap: crashed[0]?.lap,
+    from: 'Pit wall',
+    text: 'SENA has stopped. That’s our race.',
+  });
+  expect(heard.map((l) => l.text)).not.toContain('That’s it, I’m out. The car’s finished.');
   await resultsFor(page, 1);
 
   // A new attempt, saving the car instead: he's still running at the flag.
@@ -308,11 +418,15 @@ test('Era 1: Monaco 1988, the avoidable storyline retirement, repeated then avoi
   await expect(page.getByRole('button', { name: 'Start the race' })).toBeVisible({
     timeout: 30_000,
   });
+  const avoidedRadio = radioLog(page);
   await playRace(page, {
+    each: avoidedRadio.read,
     answer: (lap) => (lap === 40 ? ['EASY - save the car'] : lap === 48 ? ['STAY OUT'] : undefined),
   });
   const avoided = (await raceNotes(page)).filter((n) => n.kind === 'storyline');
   expect(avoided).toEqual([expect.objectContaining({ driver: 'SENA', detail: 'avoided' })]);
+  // An avoided retirement is a race that goes on: nothing is said.
+  expect((await avoidedRadio.lines()).filter((l) => l.from === 'Pit wall')).toEqual([]);
   await resultsFor(page, 1);
   expect(eras.starts).toHaveLength(2);
   expect(eras.submissions).toHaveLength(2);
