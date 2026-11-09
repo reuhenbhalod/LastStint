@@ -578,7 +578,8 @@
         "WAR": 1,
         "WEN": 0,
         "ZAN": 0
-      }
+      },
+      "storylineEvent": true
     },
     {
       "lap": 50,
@@ -596,7 +597,286 @@
       "driver": "WEN"
     }
   ],
-  "decisionMoments": [],
+  "decisionMoments": [
+    {
+      "id": "stop-27",
+      "lap": 27,
+      "trigger": "rain",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "STAY OUT",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "IN - slicks",
+          "decisions": [
+            {
+              "lap": 27,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "box-intermediate",
+          "label": "IN - inters",
+          "decisions": [
+            {
+              "lap": 27,
+              "kind": "pit",
+              "compound": "INTERMEDIATE"
+            }
+          ]
+        },
+        {
+          "id": "box-wet",
+          "label": "IN - wets",
+          "decisions": [
+            {
+              "lap": 27,
+              "kind": "pit",
+              "compound": "WET"
+            }
+          ]
+        },
+        {
+          "id": "box-next-wet",
+          "label": "IN NEXT LAP - wets",
+          "decisions": [
+            {
+              "lap": 28,
+              "kind": "pit",
+              "compound": "WET"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "box-wet"
+    },
+    {
+      "id": "sc-30",
+      "lap": 30,
+      "trigger": "SC",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "STAY OUT",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "IN - slicks",
+          "decisions": [
+            {
+              "lap": 30,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "box-intermediate",
+          "label": "IN - inters",
+          "decisions": [
+            {
+              "lap": 30,
+              "kind": "pit",
+              "compound": "INTERMEDIATE"
+            }
+          ]
+        },
+        {
+          "id": "box-wet",
+          "label": "IN - wets",
+          "decisions": [
+            {
+              "lap": 30,
+              "kind": "pit",
+              "compound": "WET"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "battle-36",
+      "lap": 36,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "hold",
+          "label": "Hold position",
+          "decisions": []
+        },
+        {
+          "id": "defend",
+          "label": "DEFEND",
+          "decisions": [
+            {
+              "lap": 36,
+              "kind": "mode",
+              "key": "battle",
+              "value": "defend"
+            }
+          ]
+        },
+        {
+          "id": "attack",
+          "label": "ATTACK",
+          "decisions": [
+            {
+              "lap": 36,
+              "kind": "mode",
+              "key": "battle",
+              "value": "attack"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "stop-40",
+      "lap": 40,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "STAY OUT",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "IN - slicks",
+          "decisions": [
+            {
+              "lap": 40,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "box-intermediate",
+          "label": "IN - inters",
+          "decisions": [
+            {
+              "lap": 40,
+              "kind": "pit",
+              "compound": "INTERMEDIATE"
+            }
+          ]
+        },
+        {
+          "id": "box-wet",
+          "label": "IN - wets",
+          "decisions": [
+            {
+              "lap": 40,
+              "kind": "pit",
+              "compound": "WET"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "box-medium"
+    },
+    {
+      "id": "pace-44",
+      "lap": 44,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 44,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "easy",
+          "label": "EASY - save the car",
+          "decisions": [
+            {
+              "lap": 44,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "pace-48",
+      "lap": 48,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 48,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "easy",
+          "label": "EASY - save the car",
+          "decisions": [
+            {
+              "lap": 48,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    }
+  ],
   "candidateMomentLaps": [
     28,
     29,
@@ -727,6 +1007,32 @@
       0.0,
       0.0
     ]
+  },
+  "eras": {
+    "eraId": 2,
+    "order": 8,
+    "userSide": "SENA",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Prost leads from pole until the rain comes; he stays out on slicks and crashes on lap 29. Hill leads behind the safety car; Senna, in for wets on lap 27 and for slicks at the end of lap 40, takes the lead when Hill stops for slicks a lap later and wins by 16.6 seconds"
+    },
+    "mastery": {
+      "type": "margin",
+      "seconds": 3,
+      "label": "Win by more than 3 seconds"
+    },
+    "hidden": {
+      "type": "stop_count",
+      "exact": 2,
+      "label": "Win with two tyre stops, as Senna did"
+    },
+    "briefing": "Interlagos, March 1993. Dry at the start: Prost leads from pole in the Williams, Hill second, Senna third in the McLaren. Rain is on the way. Pit boards only, no radio: every tyre call counts. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports. Who led each lap is sourced, and so is the order at a few laps; the lap times, and the rest of the order, are reconstructed.",
+    "hardCalls": {
+      "SENA": 4,
+      "HIL": 1
+    }
   },
   "provenance": {
     "kind": "reconstructed",

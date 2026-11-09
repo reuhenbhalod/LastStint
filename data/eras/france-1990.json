@@ -7,5 +7,35 @@
     "drs": false,
     "ers": "none",
     "refuelling": false
+  },
+  "eras": {
+    "eraId": 2,
+    "order": 1,
+    "userSide": "CAP",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Capelli, seventh on the grid, runs non-stop in the Leyton House while the front-runners stop for tyres; he leads from lap 33 until Prost passes him on lap 78, and finishes second, 8.6 seconds behind",
+      "rewriteCondition": {
+        "type": "win"
+      },
+      "headline": "Capelli's Leyton House goes the distance and wins at Paul Ricard"
+    },
+    "mastery": {
+      "type": "margin",
+      "seconds": 3,
+      "label": "Win by more than 3 seconds"
+    },
+    "hidden": {
+      "type": "stop_count",
+      "max": 1,
+      "label": "Win with no more than one tyre stop"
+    },
+    "briefing": "Paul Ricard, July 1990. Capelli started seventh in the Leyton House. The front-runners stop for fresh tyres from lap 20; Capelli and Gugelmin ran the race on one set. Prost, from fourth on the grid, stopped on lap 27. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports. Who led each lap is sourced; the lap times are reconstructed.",
+    "hardCalls": {
+      "CAP": 0,
+      "PRO": 0
+    }
   }
 }
