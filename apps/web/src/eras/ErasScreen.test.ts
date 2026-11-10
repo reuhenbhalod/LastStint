@@ -50,7 +50,7 @@ describe('Eras screens', () => {
 
   it('says so for an era or race that does not exist', () => {
     expect(render('/eras/99')).toContain('No such era');
-    expect(render('/eras/9/monaco-2022')).toContain('No such era');
+    expect(render('/eras/9/bahrain-2023')).toContain('No such era');
   });
 });
 
@@ -194,7 +194,7 @@ describe('Era detail', () => {
     expect(races).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     expect(html.indexOf('Bahrain 2021')).toBeLessThan(html.indexOf('Abu Dhabi 2021'));
     expect(html).toContain('Track limits and the undercut');
-    expect(html).toContain('Mercedes&#x27; extra stop catches Verstappen');
+    expect(html).toContain('Hamilton on wilting mediums four seconds back');
     expect(raceLinks(html)).toHaveLength(10);
     expect(raceLinks(html)[9]).toBe('/eras/9/abu-dhabi-2021');
   });
@@ -298,7 +298,7 @@ describe('Era detail', () => {
     expect(off).toContain('Legend off</button>');
     expect(off).toContain('1/30<span class="sr-only"> Legend stars</span>');
     expect(off).toContain('10/30<span class="sr-only"> stars</span>');
-    expect(raceLinks(off)[0]).toBe('/eras/10/monaco-2022');
+    expect(raceLinks(off)[0]).toBe('/eras/10/bahrain-2023');
 
     const on = renderDetail(ERA10, detailReady(erasResponse(true), cleared), true);
     expect(on).toContain('aria-pressed="true"');
@@ -322,7 +322,7 @@ describe('Era detail', () => {
     const on = renderDetail(ERA10, detailReady(erasResponse(true), cleared), true);
     expect(boardLinks(on)).toHaveLength(10);
     expect(boardLinks(on).every((l) => l?.endsWith('/leaderboard/legend'))).toBe(true);
-    expect(on).toContain('Legend leaderboard<span class="sr-only"> for Monaco 2022</span>');
+    expect(on).toContain('Legend leaderboard<span class="sr-only"> for Bahrain 2023</span>');
   });
 
   it('ignores Legend on for an era that is not Cleared', () => {
@@ -395,19 +395,19 @@ describe('Era detail', () => {
 
 describe('Era race', () => {
   it('says clearly when a race cannot be started, with a way back', () => {
-    const race = eraRace('monaco-2022');
+    const race = eraRace('bahrain-2023');
     if (!race) throw new Error('no race');
     const html = renderToStaticMarkup(
       createElement(RaceStartError, {
         era: ERA10,
         race,
-        message: 'no race file for monaco-2022 in this build yet',
+        message: 'no race file for bahrain-2023 in this build yet',
         onRetry: () => {},
       }),
     );
     expect(html).toContain('role="alert"');
-    expect(html).toContain('Couldn’t start Monaco 2022.');
-    expect(html).toContain('no race file for monaco-2022 in this build yet');
+    expect(html).toContain('Couldn’t start Bahrain 2023.');
+    expect(html).toContain('no race file for bahrain-2023 in this build yet');
     expect(html).toContain('href="/eras/10"');
     expect(html).toContain('Back to Ground-effect era');
   });

@@ -362,7 +362,7 @@ describe('GET /api/eras/races/:raceId/stats', () => {
   });
 
   it('a race nobody has played: zeros', async () => {
-    const stats = await json<RaceStats>('/api/eras/races/monaco-2022/stats');
+    const stats = await json<RaceStats>('/api/eras/races/bahrain-2023/stats');
     expect(stats.rewrite).toEqual({ players: 0, rewrites: 0, share: 0 });
     expect(stats.stars.players).toBe(0);
   });
