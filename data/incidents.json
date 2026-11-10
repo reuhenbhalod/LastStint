@@ -325,6 +325,16 @@
  "abu-dhabi-2022": [],
  "emilia-romagna-2024": [],
  "netherlands-2021": [],
+ "saudi-arabia-2023": [
+  {
+   "lap": 18,
+   "type": "SC",
+   "driver": "STR",
+   "status": "Retired",
+   "source": "https://api.openf1.org/v1/race_control?session_key=7779",
+   "note": "Race control: SC deployed on lap 18, in this lap on lap 20 (the built model has one SC from lap 18, 3 laps); Stroll stopped on track (https://en.wikipedia.org/wiki/2023_Saudi_Arabian_Grand_Prix, lap 17; GrandPrix.com lap 18); Jolpica status Retired (16 laps)"
+  }
+ ],
  "great-britain-2021": [
   {
    "lap": 40,

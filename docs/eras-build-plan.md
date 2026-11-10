@@ -501,7 +501,7 @@ The **Needs** column is from race history and must be checked against the data f
 | 10 | `emilia-romagna-2024` | OpenF1 | none |  |
 | 10 | `hungary-2024` | built | none |  |
 | 10 | `belgium-2023` | OpenF1 | wet model (exists) |  |
-| 10 | `australia-2025` | built | wet model (exists) |  |
+| 10 | `saudi-arabia-2023` | OpenF1 | none |  |
 | 10 | `abu-dhabi-2022` | Jolpica (est. compounds, SC) | none |  |
 | 9 | `bahrain-2021` | built (Daily) | none |  |
 | 9 | `styria-2021` | built | none |  |

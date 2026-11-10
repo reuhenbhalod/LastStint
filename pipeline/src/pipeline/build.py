@@ -1587,7 +1587,8 @@ RACES: dict[str, dict] = {
         "era": "2014-2025",
         "takeover_lap": None,  # D3 rule
         "seed": 1,
-        # Candidate for Era 10 (measured only). Side to be set by `pipeline hard-calls`.
+        # Swapped in for australia-2025 (swap-races-e10-e9-c.md). Side provisional until
+        # authoring: `pipeline hard-calls` gives VER 2, PER 0 (side VER).
         # pace_skip: VER was told to manage his tyres after the SC restart until DRS was
         # enabled on lap 23 (Autosport; docs/eras-checks/fix-saudi-arabia-2023.md).
         "pace_skip": {"VER": [21, 22]},
