@@ -221,7 +221,7 @@ its registry `user_side` is re-registered for that side and rebuilt.
 
 **Shared races (decided Nov 7).** A race in Eras and in the Daily or Gauntlet pool
 (`data/pools.json`: today abu-dhabi-2021, bahrain-2021, france-2021, hungary-2019 and
-russia-2021) keeps its Daily race file and hash unchanged forever. Its Eras content stays in its
+russia-2021 from Daily, and portugal-2021 from the Gauntlet, swapped in Nov 9) keeps its Daily race file and hash unchanged forever. Its Eras content stays in its
 overlay, which is never baked into `data/races/<id>.json`:
 - `pipeline build` leaves a pool race's overlay out of its race file (`build.shared_races`; the
   report says so). A pool race with estimated fields can't take an overlay `provenance`, since
@@ -235,7 +235,7 @@ overlay, which is never baked into `data/races/<id>.json`:
   `GET /api/races/:id` and the Daily hash use the race file alone.
 - Parity vectors keep the two merges equal (`pipeline/tests/fixtures/eras_overlay_parity.json`,
   regenerated with `REGEN_OVERLAY_VECTORS=1`). `apps/worker/test/eras-shared.test.ts` replays
-  them and pins the five Daily hashes and their Eras hashes.
+  them and pins the shared races' Daily and Gauntlet hashes and their Eras hashes.
 - Editing a shared race's overlay changes its Eras hash only. Attempts started before the edit
   are refused at submit (409 `model-changed`), as for a rebuilt Eras-only race.
 
@@ -292,7 +292,7 @@ pinned version; tests run on cached fixtures only.
 
 ## Phase 3: Races, wave A (10%)
 
-The 35 races in the appendix that need **no new sim model** (Needs column: "none", "wet model
+The 36 races in the appendix that need **no new sim model** (Needs column: "none", "wet model
 (exists)" or "P4 map" only).
 
 **3.1 Build and validate (8%)**
@@ -331,7 +331,7 @@ for every existing race.
 
 ## Phase 5: Races, wave B (13%)
 
-**5.1 Build and validate the other 65 races (11%)**
+**5.1 Build and validate the other 64 races (11%)**
 - As in 3.1, as each race's models from phase 4 land.
 - Reconstructed races are checked on their anchors (eras spec §4) instead of G1.
 - **Done when:** every race in the appendix is pass, or flagged to the owner with a diagnosis.
@@ -507,7 +507,7 @@ The **Needs** column is from race history and must be checked against the data f
 | 9 | `styria-2021` | built | none |  |
 | 9 | `azerbaijan-2021` | Jolpica (est. compounds, SC) | R1 red flag, R2 fault |  |
 | 9 | `france-2021` | built (Daily) | none |  |
-| 9 | `hungary-2021` | FastF1 cache | R1 red flag, wet model (exists) |  |
+| 9 | `portugal-2021` | built (Gauntlet) | none |  |
 | 9 | `russia-2021` | built (Daily) | wet model (exists) |  |
 | 9 | `turkey-2021` | Jolpica (est. compounds, SC) | wet model (exists) |  |
 | 9 | `netherlands-2021` | Jolpica (est. compounds, SC) | none |  |

@@ -1,5 +1,5 @@
 {
- "_comment": "Eras appendix entry lists (docs/eras-build-plan.md appendix), from the Jolpica API results endpoint (api.jolpi.ca/ergast/f1/<year>/<round>/results), fetched Nov 7, 2026 (bahrain-2023, styria-2021 and great-britain-2021: Nov 9; japan-2023, abu-dhabi-2022, emilia-romagna-2024, great-britain-2023 and netherlands-2021: Nov 9, second batch; saudi-arabia-2023: Nov 9, third batch). code is the driver's key in data/drivers.json; team is Jolpica's constructor name. Fixture for eras-roster.test.ts.",
+ "_comment": "Eras appendix entry lists (docs/eras-build-plan.md appendix), from the Jolpica API results endpoint (api.jolpi.ca/ergast/f1/<year>/<round>/results), fetched Nov 7, 2026 (bahrain-2023, styria-2021 and great-britain-2021: Nov 9; japan-2023, abu-dhabi-2022, emilia-romagna-2024, great-britain-2023 and netherlands-2021: Nov 9, second batch; saudi-arabia-2023: Nov 9, third batch; portugal-2021: Nov 9, Era 9 swap). code is the driver's key in data/drivers.json; team is Jolpica's constructor name. Fixture for eras-roster.test.ts.",
  "races": {
   "bahrain-2023": {"round": 1, "entries": [
    {"driverId": "max_verstappen", "name": "Max Verstappen", "code": "VER", "team": "Red Bull"},
@@ -309,27 +309,27 @@
    {"driverId": "mick_schumacher", "name": "Mick Schumacher", "code": "MSC", "team": "Haas F1 Team"},
    {"driverId": "mazepin", "name": "Nikita Mazepin", "code": "MAZ", "team": "Haas F1 Team"}
   ]},
-  "hungary-2021": {"round": 11, "entries": [
-   {"driverId": "ocon", "name": "Esteban Ocon", "code": "OCO", "team": "Alpine F1 Team"},
+  "portugal-2021": {"round": 3, "entries": [
    {"driverId": "hamilton", "name": "Lewis Hamilton", "code": "HAM", "team": "Mercedes"},
-   {"driverId": "sainz", "name": "Carlos Sainz", "code": "SAI", "team": "Ferrari"},
-   {"driverId": "alonso", "name": "Fernando Alonso", "code": "ALO", "team": "Alpine F1 Team"},
-   {"driverId": "gasly", "name": "Pierre Gasly", "code": "GAS", "team": "AlphaTauri"},
-   {"driverId": "tsunoda", "name": "Yuki Tsunoda", "code": "TSU", "team": "AlphaTauri"},
-   {"driverId": "latifi", "name": "Nicholas Latifi", "code": "LAT", "team": "Williams"},
-   {"driverId": "russell", "name": "George Russell", "code": "RUS", "team": "Williams"},
    {"driverId": "max_verstappen", "name": "Max Verstappen", "code": "VER", "team": "Red Bull"},
-   {"driverId": "raikkonen", "name": "Kimi Räikkönen", "code": "RAI", "team": "Alfa Romeo"},
-   {"driverId": "ricciardo", "name": "Daniel Ricciardo", "code": "RIC", "team": "McLaren"},
-   {"driverId": "mick_schumacher", "name": "Mick Schumacher", "code": "MSC", "team": "Haas F1 Team"},
-   {"driverId": "giovinazzi", "name": "Antonio Giovinazzi", "code": "GIO", "team": "Alfa Romeo"},
-   {"driverId": "mazepin", "name": "Nikita Mazepin", "code": "MAZ", "team": "Haas F1 Team"},
-   {"driverId": "norris", "name": "Lando Norris", "code": "NOR", "team": "McLaren"},
    {"driverId": "bottas", "name": "Valtteri Bottas", "code": "BOT", "team": "Mercedes"},
    {"driverId": "perez", "name": "Sergio Pérez", "code": "PER", "team": "Red Bull"},
+   {"driverId": "norris", "name": "Lando Norris", "code": "NOR", "team": "McLaren"},
    {"driverId": "leclerc", "name": "Charles Leclerc", "code": "LEC", "team": "Ferrari"},
+   {"driverId": "ocon", "name": "Esteban Ocon", "code": "OCO", "team": "Alpine F1 Team"},
+   {"driverId": "alonso", "name": "Fernando Alonso", "code": "ALO", "team": "Alpine F1 Team"},
+   {"driverId": "ricciardo", "name": "Daniel Ricciardo", "code": "RIC", "team": "McLaren"},
+   {"driverId": "gasly", "name": "Pierre Gasly", "code": "GAS", "team": "AlphaTauri"},
+   {"driverId": "sainz", "name": "Carlos Sainz", "code": "SAI", "team": "Ferrari"},
+   {"driverId": "giovinazzi", "name": "Antonio Giovinazzi", "code": "GIO", "team": "Alfa Romeo"},
+   {"driverId": "vettel", "name": "Sebastian Vettel", "code": "VET", "team": "Aston Martin"},
    {"driverId": "stroll", "name": "Lance Stroll", "code": "STR", "team": "Aston Martin"},
-   {"driverId": "vettel", "name": "Sebastian Vettel", "code": "VET", "team": "Aston Martin"}
+   {"driverId": "tsunoda", "name": "Yuki Tsunoda", "code": "TSU", "team": "AlphaTauri"},
+   {"driverId": "russell", "name": "George Russell", "code": "RUS", "team": "Williams"},
+   {"driverId": "mick_schumacher", "name": "Mick Schumacher", "code": "MSC", "team": "Haas F1 Team"},
+   {"driverId": "latifi", "name": "Nicholas Latifi", "code": "LAT", "team": "Williams"},
+   {"driverId": "mazepin", "name": "Nikita Mazepin", "code": "MAZ", "team": "Haas F1 Team"},
+   {"driverId": "raikkonen", "name": "Kimi Räikkönen", "code": "RAI", "team": "Alfa Romeo"}
   ]},
   "russia-2021": {"round": 15, "entries": [
    {"driverId": "hamilton", "name": "Lewis Hamilton", "code": "HAM", "team": "Mercedes"},
