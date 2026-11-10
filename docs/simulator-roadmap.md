@@ -38,9 +38,9 @@ building (eras spec §19).
   brazil-2003, malaysia-2001, germany-2000, europe-1999, belgium-1998, spain-1996,
   belgium-1995, europe-1993, brazil-1993, belgium-1992, portugal-1985, monaco-1984.
 - **2018+ wet races** (germany-2018, germany-2019, turkey-2020, russia-2021, turkey-2021,
-  netherlands-2023, belgium-2023 (a mid-race shower, no wet-tyre stops),
-  australia-2025) use today's model. Each must still pass G1;
-  Australia 2025 failed it so far.
+  netherlands-2023, belgium-2023 (a mid-race shower, no wet-tyre stops)) use today's model.
+  Each must still pass G1. Australia 2025 failed it and was swapped out for saudi-arabia-2023
+  (owner, Nov 9).
 
 ### R4. Refuelling (1994–2009) and fuel limits (1983–88)
 - **Refuelling:**

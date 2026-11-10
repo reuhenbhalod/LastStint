@@ -143,7 +143,10 @@ const RACE_TABLE: Record<number, ReadonlyArray<readonly [string, string]>> = {
     ],
     ['hungary-2024', 'McLaren team orders'],
     ['belgium-2023', 'Verstappen wins from sixth after a gearbox penalty'],
-    ['australia-2025', 'Wet-dry chaos'],
+    [
+      'saudi-arabia-2023',
+      'From 15th on the grid, Verstappen has to time his only stop and chase down his own team-mate',
+    ],
     [
       'abu-dhabi-2022',
       "Second in the title on strategy: Pérez's mediums grain while Ferrari stretches Leclerc's stint",

@@ -1,5 +1,5 @@
 {
- "_comment": "Eras appendix entry lists (docs/eras-build-plan.md appendix), from the Jolpica API results endpoint (api.jolpi.ca/ergast/f1/<year>/<round>/results), fetched Nov 7, 2026 (bahrain-2023, styria-2021 and great-britain-2021: Nov 9; japan-2023, abu-dhabi-2022, emilia-romagna-2024, great-britain-2023 and netherlands-2021: Nov 9, second batch). code is the driver's key in data/drivers.json; team is Jolpica's constructor name. Fixture for eras-roster.test.ts.",
+ "_comment": "Eras appendix entry lists (docs/eras-build-plan.md appendix), from the Jolpica API results endpoint (api.jolpi.ca/ergast/f1/<year>/<round>/results), fetched Nov 7, 2026 (bahrain-2023, styria-2021 and great-britain-2021: Nov 9; japan-2023, abu-dhabi-2022, emilia-romagna-2024, great-britain-2023 and netherlands-2021: Nov 9, second batch; saudi-arabia-2023: Nov 9, third batch). code is the driver's key in data/drivers.json; team is Jolpica's constructor name. Fixture for eras-roster.test.ts.",
  "races": {
   "bahrain-2023": {"round": 1, "entries": [
    {"driverId": "max_verstappen", "name": "Max Verstappen", "code": "VER", "team": "Red Bull"},
@@ -177,27 +177,27 @@
    {"driverId": "sainz", "name": "Carlos Sainz", "code": "SAI", "team": "Ferrari"},
    {"driverId": "piastri", "name": "Oscar Piastri", "code": "PIA", "team": "McLaren"}
   ]},
-  "australia-2025": {"round": 1, "entries": [
-   {"driverId": "norris", "name": "Lando Norris", "code": "NOR", "team": "McLaren"},
+  "saudi-arabia-2023": {"round": 2, "entries": [
+   {"driverId": "perez", "name": "Sergio Pérez", "code": "PER", "team": "Red Bull"},
    {"driverId": "max_verstappen", "name": "Max Verstappen", "code": "VER", "team": "Red Bull"},
-   {"driverId": "russell", "name": "George Russell", "code": "RUS", "team": "Mercedes"},
-   {"driverId": "antonelli", "name": "Andrea Kimi Antonelli", "code": "ANT", "team": "Mercedes"},
-   {"driverId": "albon", "name": "Alexander Albon", "code": "ALB", "team": "Williams"},
-   {"driverId": "stroll", "name": "Lance Stroll", "code": "STR", "team": "Aston Martin"},
-   {"driverId": "hulkenberg", "name": "Nico Hülkenberg", "code": "HUL", "team": "Sauber"},
-   {"driverId": "leclerc", "name": "Charles Leclerc", "code": "LEC", "team": "Ferrari"},
-   {"driverId": "piastri", "name": "Oscar Piastri", "code": "PIA", "team": "McLaren"},
-   {"driverId": "hamilton", "name": "Lewis Hamilton", "code": "HAM", "team": "Ferrari"},
-   {"driverId": "gasly", "name": "Pierre Gasly", "code": "GAS", "team": "Alpine F1 Team"},
-   {"driverId": "tsunoda", "name": "Yuki Tsunoda", "code": "TSU", "team": "RB F1 Team"},
-   {"driverId": "ocon", "name": "Esteban Ocon", "code": "OCO", "team": "Haas F1 Team"},
-   {"driverId": "bearman", "name": "Oliver Bearman", "code": "BEA", "team": "Haas F1 Team"},
-   {"driverId": "lawson", "name": "Liam Lawson", "code": "LAW", "team": "Red Bull"},
-   {"driverId": "bortoleto", "name": "Gabriel Bortoleto", "code": "BOR", "team": "Sauber"},
    {"driverId": "alonso", "name": "Fernando Alonso", "code": "ALO", "team": "Aston Martin"},
-   {"driverId": "sainz", "name": "Carlos Sainz", "code": "SAI", "team": "Williams"},
-   {"driverId": "doohan", "name": "Jack Doohan", "code": "DOO", "team": "Alpine F1 Team"},
-   {"driverId": "hadjar", "name": "Isack Hadjar", "code": "HAD", "team": "RB F1 Team"}
+   {"driverId": "russell", "name": "George Russell", "code": "RUS", "team": "Mercedes"},
+   {"driverId": "hamilton", "name": "Lewis Hamilton", "code": "HAM", "team": "Mercedes"},
+   {"driverId": "sainz", "name": "Carlos Sainz", "code": "SAI", "team": "Ferrari"},
+   {"driverId": "leclerc", "name": "Charles Leclerc", "code": "LEC", "team": "Ferrari"},
+   {"driverId": "ocon", "name": "Esteban Ocon", "code": "OCO", "team": "Alpine F1 Team"},
+   {"driverId": "gasly", "name": "Pierre Gasly", "code": "GAS", "team": "Alpine F1 Team"},
+   {"driverId": "kevin_magnussen", "name": "Kevin Magnussen", "code": "MAG", "team": "Haas F1 Team"},
+   {"driverId": "tsunoda", "name": "Yuki Tsunoda", "code": "TSU", "team": "AlphaTauri"},
+   {"driverId": "hulkenberg", "name": "Nico Hülkenberg", "code": "HUL", "team": "Haas F1 Team"},
+   {"driverId": "zhou", "name": "Guanyu Zhou", "code": "ZHO", "team": "Alfa Romeo"},
+   {"driverId": "de_vries", "name": "Nyck de Vries", "code": "DEV", "team": "AlphaTauri"},
+   {"driverId": "piastri", "name": "Oscar Piastri", "code": "PIA", "team": "McLaren"},
+   {"driverId": "sargeant", "name": "Logan Sargeant", "code": "SAR", "team": "Williams"},
+   {"driverId": "norris", "name": "Lando Norris", "code": "NOR", "team": "McLaren"},
+   {"driverId": "bottas", "name": "Valtteri Bottas", "code": "BOT", "team": "Alfa Romeo"},
+   {"driverId": "albon", "name": "Alexander Albon", "code": "ALB", "team": "Williams"},
+   {"driverId": "stroll", "name": "Lance Stroll", "code": "STR", "team": "Aston Martin"}
   ]},
   "abu-dhabi-2022": {"round": 22, "entries": [
    {"driverId": "max_verstappen", "name": "Max Verstappen", "code": "VER", "team": "Red Bull"},
