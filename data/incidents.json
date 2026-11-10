@@ -265,6 +265,16 @@
   }
  ],
  "belgium-2023": [],
+ "bahrain-2023": [
+  {
+   "lap": 41,
+   "type": "VSC",
+   "driver": "LEC",
+   "status": "Retired",
+   "source": "https://api.openf1.org/v1/race_control?session_key=7953"
+  }
+ ],
+ "great-britain-2021": [],
  "australia-2025": [
   {
    "lap": 34,

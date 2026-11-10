@@ -171,7 +171,7 @@ test('a released era with unpublished races lists only the published ones', asyn
   await expect(play).toHaveCount(2, { timeout: 10_000 });
   await expect(playLink(page, 'hungary-2022')).toBeVisible();
   await expect(playLink(page, 'belgium-2023')).toBeVisible();
-  await expect(page.getByText(raceName('monaco-2022'))).toHaveCount(0);
+  await expect(page.getByText(raceName('bahrain-2023'))).toHaveCount(0);
   await noDraftOrTestMode(page);
   expect(errors).toEqual([]);
 });
@@ -195,9 +195,9 @@ async function refused(page: Page, raceId: string, errors: Error[]) {
 }
 
 test('a direct link to an unpublished race is refused, not a crash', async ({ page }) => {
-  const published = LAUNCH.published.filter((id) => id !== 'monaco-2022');
+  const published = LAUNCH.published.filter((id) => id !== 'bahrain-2023');
   const errors = await mockLaunch(page, { ...LAUNCH, published });
-  const alert = await refused(page, 'monaco-2022', errors);
+  const alert = await refused(page, 'bahrain-2023', errors);
   await expect(alert).toContainText('This race isn’t available yet.');
   await expect(alert).not.toContainText('race-unpublished');
 });

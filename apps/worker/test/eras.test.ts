@@ -244,7 +244,7 @@ describe('GET /api/eras', () => {
     await env.DB.prepare('INSERT INTO player_ids (anon_id, player_id, linked_at) VALUES (?, ?, ?)')
       .bind(ids.c, ids.b, PAST)
       .run();
-    await stars('monaco-2022', [1, 1, 0], { player: ids.b });
+    await stars('bahrain-2023', [1, 1, 0], { player: ids.b });
     // The stale anonymous ID and the account's ID both see the account's progress.
     expect((await eras('production', ids.c)).eras[0]?.stars).toBe(2);
     expect((await eras('production', ids.b)).eras[0]?.stars).toBe(2);
@@ -276,7 +276,7 @@ describe('GET /api/eras/:eraId', () => {
       reconstructed: (hungary2022Json as unknown as RaceModel).reconstructed === true,
       draft: true,
     });
-    expect(d.races.find((r) => r.raceId === 'monaco-2022')).toMatchObject({
+    expect(d.races.find((r) => r.raceId === 'bahrain-2023')).toMatchObject({
       stars: { result: false, strategist: false, mastery: false },
       hiddenDone: false,
       bestAccuracy: null,
@@ -289,13 +289,13 @@ describe('GET /api/eras/:eraId', () => {
     expect(d.released).toBe(false);
     expect(d.races).toEqual([]);
 
-    await publish('monaco-2022', 'hungary-2022');
+    await publish('bahrain-2023', 'hungary-2022');
     d = await json<Detail>(await era('production', 10));
     expect(d.races).toEqual([]); // published, but the era isn't released
 
     await release(10);
     d = await json<Detail>(await era('production', 10));
-    expect(d.races.map((r) => r.raceId)).toEqual(['monaco-2022', 'hungary-2022']);
+    expect(d.races.map((r) => r.raceId)).toEqual(['bahrain-2023', 'hungary-2022']);
     expect(d.races.every((r) => !r.draft)).toBe(true);
   });
 

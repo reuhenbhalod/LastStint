@@ -112,7 +112,7 @@ describe('launchEraDetail', () => {
 });
 
 describe('launchRefusal', () => {
-  const partial = { ...LAUNCH, published: LAUNCH.published.filter((id) => id !== 'monaco-2022') };
+  const partial = { ...LAUNCH, published: LAUNCH.published.filter((id) => id !== 'bahrain-2023') };
 
   it('starts a published race in the open era', () => {
     expect(launchRefusal(LAUNCH, 'hungary-2022', false, NOW)).toBeNull();
@@ -127,7 +127,7 @@ describe('launchRefusal', () => {
       status: 403,
       error: 'era-unreleased',
     });
-    expect(launchRefusal(partial, 'monaco-2022', false, NOW)).toEqual({
+    expect(launchRefusal(partial, 'bahrain-2023', false, NOW)).toEqual({
       status: 403,
       error: 'race-unpublished',
     });
@@ -150,7 +150,7 @@ describe('launchRefusal', () => {
 
   it('serves models of published races in released eras only', () => {
     expect(launchModelServed(LAUNCH, 'hungary-2022', NOW)).toBe(true);
-    expect(launchModelServed(partial, 'monaco-2022', NOW)).toBe(false);
+    expect(launchModelServed(partial, 'bahrain-2023', NOW)).toBe(false);
     expect(launchModelServed(LAUNCH, 'monaco-1984', NOW)).toBe(false);
   });
 });

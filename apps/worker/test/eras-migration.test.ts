@@ -39,7 +39,7 @@ describe('migration 0010: eras', () => {
         `era ${era}`,
       ).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     }
-    expect(races.find((r) => r.race_id === 'monaco-2022')).toMatchObject({
+    expect(races.find((r) => r.race_id === 'bahrain-2023')).toMatchObject({
       era_id: 10,
       position: 1,
     });
@@ -133,9 +133,10 @@ describe('migration 0012: four Eras races swapped', () => {
     return m;
   };
 
-  it('applies last, after 0011', () => {
+  it('applies after 0011', () => {
     const names = env.TEST_MIGRATIONS.map((m) => m.name);
-    expect(names.slice(-2)).toEqual(['0011_era_attempt_hash.sql', '0012_swap_eras_races.sql']);
+    const at = names.indexOf('0012_swap_eras_races.sql');
+    expect(names[at - 1]).toBe('0011_era_attempt_hash.sql');
   });
 
   it("puts each new race in the old one's era and position, still Draft", async () => {
@@ -189,5 +190,79 @@ describe('migration 0012: four Eras races swapped', () => {
       "SELECT era_id, position FROM era_races WHERE race_id = 'belgium-2023'",
     ).first();
     expect(belgium).toEqual({ era_id: 10, position: 8 });
+  });
+});
+
+describe('migration 0013: three more Eras races swapped (Era 10 and Era 9)', () => {
+  const SWAPS = [
+    { gone: 'monaco-2022', race_id: 'bahrain-2023', era_id: 10, position: 1 },
+    { gone: 'spain-2021', race_id: 'styria-2021', era_id: 9, position: 2 },
+    { gone: 'saudi-arabia-2021', race_id: 'great-britain-2021', era_id: 9, position: 9 },
+  ];
+  const migration = () => {
+    const m = env.TEST_MIGRATIONS.find((x) => x.name === '0013_swap_eras_races_e10_e9.sql');
+    if (!m) throw new Error('0013 missing');
+    return m;
+  };
+
+  it('applies last, after 0012', () => {
+    const names = env.TEST_MIGRATIONS.map((m) => m.name);
+    expect(names.slice(-2)).toEqual([
+      '0012_swap_eras_races.sql',
+      '0013_swap_eras_races_e10_e9.sql',
+    ]);
+  });
+
+  it("puts each new race in the old one's era and position, still Draft", async () => {
+    const races = await all<EraRace>('SELECT * FROM era_races');
+    expect(races).toHaveLength(100);
+    for (const s of SWAPS) {
+      expect(races.find((r) => r.race_id === s.race_id)).toEqual({
+        race_id: s.race_id,
+        era_id: s.era_id,
+        position: s.position,
+        published: 0,
+      });
+      expect(races.find((r) => r.race_id === s.gone)).toBeUndefined();
+    }
+  });
+
+  it("deletes a removed race's attempts, stars and history entries, and keeps the rest", async () => {
+    // Back to the state before 0013 for one race, with a player who played it and another.
+    await env.DB.prepare(
+      "UPDATE era_races SET race_id = 'saudi-arabia-2021' WHERE race_id = 'great-britain-2021'",
+    ).run();
+    const now = new Date().toISOString();
+    for (const [id, race] of [
+      ['a-old', 'saudi-arabia-2021'],
+      ['a-kept', 'abu-dhabi-2021'],
+    ]) {
+      await env.DB.prepare(
+        `INSERT INTO era_attempts (id, player_id, race_id, seed, created_at) VALUES (?1, 'p1', ?2, 1, ?3)`,
+      )
+        .bind(id, race, now)
+        .run();
+      await env.DB.prepare(
+        `INSERT INTO era_progress (player_id, race_id, star_result, updated_at) VALUES ('p1', ?1, 1, ?2)`,
+      )
+        .bind(race, now)
+        .run();
+      await env.DB.prepare(
+        `INSERT INTO history_entries (player_id, race_id, attempt_id, achieved_at) VALUES ('p1', ?1, ?2, ?3)`,
+      )
+        .bind(race, id, now)
+        .run();
+    }
+    await env.DB.batch(migration().queries.map((q) => env.DB.prepare(q)));
+
+    const ids = async (table: string) =>
+      (await all<{ race_id: string }>(`SELECT race_id FROM ${table}`)).map((r) => r.race_id);
+    expect(await ids('era_attempts')).toEqual(['abu-dhabi-2021']);
+    expect(await ids('era_progress')).toEqual(['abu-dhabi-2021']);
+    expect(await ids('history_entries')).toEqual(['abu-dhabi-2021']);
+    const britain = await env.DB.prepare(
+      "SELECT era_id, position FROM era_races WHERE race_id = 'great-britain-2021'",
+    ).first();
+    expect(britain).toEqual({ era_id: 9, position: 9 });
   });
 });

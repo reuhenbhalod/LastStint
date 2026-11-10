@@ -100,6 +100,7 @@ def test_every_appendix_race_has_a_plan_and_a_track_file():
             "russia-2021",
             "abu-dhabi-2021",
             "hungary-2019",
+            "styria-2021",  # swapped in Nov 9; outlined by `pipeline outline` before 2.5
         }, race_id
     for layout in set(et.F1DB.values()):
         assert layout in et.LAYOUT_SPECS

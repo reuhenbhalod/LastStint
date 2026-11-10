@@ -1529,6 +1529,18 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
+    "great-britain-2021": {
+        "year": 2021,
+        "event": "British",
+        "name": "Britain 2021: Hamilton vs Leclerc",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        "user_side": "HAM",
+        "rival": "LEC",  # swapped in for saudi-arabia-2021; side to be set by `pipeline hard-calls`
+        "score_positions": 6,
+        "split": "eras",
+    },
     "monaco-2022": {
         "year": 2022,
         "event": "Monaco",

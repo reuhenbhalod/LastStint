@@ -292,7 +292,7 @@ pinned version; tests run on cached fixtures only.
 
 ## Phase 3: Races, wave A (10%)
 
-The 33 races in the appendix that need **no new sim model** (Needs column: "none", "wet model
+The 34 races in the appendix that need **no new sim model** (Needs column: "none", "wet model
 (exists)" or "P4 map" only).
 
 **3.1 Build and validate (8%)**
@@ -331,7 +331,7 @@ for every existing race.
 
 ## Phase 5: Races, wave B (13%)
 
-**5.1 Build and validate the other 67 races (11%)**
+**5.1 Build and validate the other 66 races (11%)**
 - As in 3.1, as each race's models from phase 4 land.
 - Reconstructed races are checked on their anchors (eras spec §4) instead of G1.
 - **Done when:** every race in the appendix is pass, or flagged to the owner with a diagnosis.
@@ -493,7 +493,7 @@ The **Needs** column is from race history and must be checked against the data f
 
 | Era | Race | Data source | Needs before it can build | Status |
 |---|---|---|---|---|
-| 10 | `monaco-2022` | Jolpica (est. compounds, SC) | R1 red flag, wet model (exists) |  |
+| 10 | `bahrain-2023` | built | none |  |
 | 10 | `great-britain-2022` | Jolpica (est. compounds, SC) | R1 red flag |  |
 | 10 | `hungary-2022` | built | none |  |
 | 10 | `singapore-2023` | built | none |  |
@@ -504,14 +504,14 @@ The **Needs** column is from race history and must be checked against the data f
 | 10 | `australia-2025` | built | wet model (exists) |  |
 | 10 | `monaco-2025` | OpenF1 | none |  |
 | 9 | `bahrain-2021` | built (Daily) | none |  |
-| 9 | `spain-2021` | built | none |  |
+| 9 | `styria-2021` | built | none |  |
 | 9 | `azerbaijan-2021` | Jolpica (est. compounds, SC) | R1 red flag, R2 fault |  |
 | 9 | `france-2021` | built (Daily) | none |  |
 | 9 | `hungary-2021` | FastF1 cache | R1 red flag, wet model (exists) |  |
 | 9 | `russia-2021` | built (Daily) | wet model (exists) |  |
 | 9 | `turkey-2021` | Jolpica (est. compounds, SC) | wet model (exists) |  |
 | 9 | `brazil-2021` | built | none |  |
-| 9 | `saudi-arabia-2021` | Jolpica (est. compounds, SC) | R1 red flag |  |
+| 9 | `great-britain-2021` | FastF1 cache | R1 red flag |  |
 | 9 | `abu-dhabi-2021` | built (Daily) | none |  |
 | 8 | `monaco-2017` | TUM | P4 map |  |
 | 8 | `azerbaijan-2017` | TUM | R1 red flag, P4 map |  |
