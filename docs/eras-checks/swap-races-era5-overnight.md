@@ -522,6 +522,45 @@ where a number was not given. No team radio quoted.
 | AS-tyre | https://www.autosport.com/f1/news/tyre-problem-specific-to-hamilton-4421765/4421765/ | 2026-11-09 |
 | AS-strat | https://www.autosport.com/f1/news/tyre-strategies-turkish-gp-4429804/4429804/ (table partly garbled) | 2026-11-09 |
 
+### Authored (B1, Nov 9): Hamilton, P2 or better
+
+Branch `eras-author-turkey-2008` (base `eras-swap-era5`). Content in `data/eras/turkey-2008.json`
+and `data/moments/turkey-2008.json`; the race file is the integrator's to rebuild.
+
+- Robust G1 (`pipeline validate turkey-2008 --robust`, Eras build with this overlay): pass,
+  0.98 s (strict status fail), unchanged by the overlay.
+- `pipeline hard-calls turkey-2008`: HAM 0, MAS 0; chance given up HAM 109.3 pts, MAS 14.7 →
+  side **Hamilton** (tie broken by chance given up), rival Massa. Hamilton didn't win, so the
+  history-book rewrite is allowed (on a win).
+- Target: **position 2** (owner-accepted pattern: a position target when beating the rival is
+  unreachable). With a win target (`author --target win`) no searched path won: the real calls
+  (soft, soft, hard on laps 16, 32, 45) finish 0.3-5.4 s behind Massa on seeds 2-4 and win
+  only on seed 5; the reachability search (seeds 1-3) never earned ★1. The win stays as the
+  rewrite condition.
+- Moments (`pnpm --filter @laststint/sim author turkey-2008 --eras --target position:2 --write`):
+  stop-16, pace-29, stop-32, pace-37, stop-45. Real calls carry fills derived from the stop
+  laps (no source gives fill amounts, fact 13): stop-16 box-soft `{laps:16}`, stop-32 box-soft
+  `{laps:13}`, stop-45 box-hard `{laps:13}`; the other pit options use the standard fill.
+  The compounds are the build's estimates (Hamilton's sequence is not reliably sourced, fact 12;
+  the build has Massa starting on softs where AS-strat's table says hards).
+- Mastery: exactly three stops (Hamilton's real, tyre-safety plan). Hidden: no more than 30
+  laps on push (the passing path pushes from lap 29 to the flag).
+- storylineEvents: none. The only event after the takeover (lap 13) is Bourdais's retirement,
+  which Legend keeps anyway; the lap-1 safety car is not in the built model.
+- Reachability (`pnpm --filter @laststint/sim reachability turkey-2008`): **pass** at era
+  difficulty (threshold 82, Smart rival) and at Legend (90, Expert rival), all three stars and
+  the hidden objective on seed 2 (stop-16 box-soft, pace-29 push, stop-32 box-soft, pace-37
+  push, stop-45 box-hard). Stay-out never earns ★3 (seeds 1-3, both levels).
+
+| Authored text | Wording | Rests on | Owner checked |
+|---|---|---|---|
+| Storyline (real) | A tyre warning puts Hamilton on three stops in a light McLaren. He passes Massa for the lead on lap 24 and is 14.4 s clear of him on lap 43, but after his last stop on lap 45 he rejoins behind him. Massa wins by 3.8 s, his third Istanbul win in a row, with Räikkönen half a second behind Hamilton. | Facts 10, 14, 15, 16 (3.779 s; Räikkönen +4.271 s, 0.492 s behind Hamilton) | |
+| Headline (rewrite, original) | Hamilton's three stops beat Massa in Istanbul | Rewrite on a win | |
+| Briefing | Istanbul, 2008. Massa takes pole for Ferrari, Hamilton qualifies third. Bridgestone fears for Hamilton's front-right tyre, so McLaren run him light on three stops. You run Hamilton, second and 1.2 s behind Massa after 13 laps. Finish second at least, and beat Massa's two-stop Ferrari if you can. | Facts 3, 10, 11 (Massa two stops); P2 and 1.2 s at lap 13 from the race model (Jolpica lap times, `stateAtTakeover`), not from a written source | |
+| Target | Finish second or better | Fact 16 (real P2) | |
+| Mastery | Finish second or better on three stops | Facts 10, 11 | |
+| Hidden | Finish second or better pushing for no more than 30 laps | Game objective, no fact | |
+
 ## malaysia-2006 (2006 Malaysian Grand Prix): swap candidate, Era 5
 
 Replaces `brazil-2009` (Era 5 #10). Robust G1: pass, 1.10 s.
