@@ -525,6 +525,10 @@ function Race({
                 onSelect={() => undefined}
                 dim={!!view.moments.length}
                 ahead={ahead}
+                carShapes={{
+                  [model.userSide]: setup.players[seat].car,
+                  [model.rival]: setup.players[other].car,
+                }}
               />
             ) : (
               <p className="p-8 text-center text-[var(--muted)]">No map for this track.</p>

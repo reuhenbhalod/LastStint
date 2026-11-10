@@ -37,6 +37,7 @@ import {
   polyline,
 } from '../track/geometry.js';
 import { MapMotion } from '../track/motion.js';
+import { CarIcon } from './CarIcon.js';
 
 const REDUCED =
   typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -523,6 +524,7 @@ export function TrackMap({
   ahead = null,
   userBox = null,
   motionRef,
+  carShapes,
 }: {
   outline: TrackOutline;
   race: RaceState;
@@ -549,6 +551,8 @@ export function TrackMap({
   userBox?: number | null;
   /** Filled with the map's motion (the race screen asks it whether a BOX makes this lap). */
   motionRef?: MutableRefObject<MapMotion | null>;
+  /** Versus: each player's car shape (CarIcon). */
+  carShapes?: Record<string, string>;
 }) {
   const line = useMemo(() => polyline(outline.points), [outline]);
   const lane = useMemo(() => pitLane(outline, line, TRACK), [outline, line]);
@@ -572,6 +576,8 @@ export function TrackMap({
   // The battle cam's view, easing toward its target each frame.
   const camRef = useRef<Box>({ x: 0, y: 0, w: outline.width, h: outline.height });
   const camMoving = useRef(false);
+  // Which way each main car points: along the track, or (in the pit lane) the way it last moved.
+  const headings = useRef(new Map<string, { x: number; y: number; deg: number }>());
   const motion = useMemo(
     () => new MapMotion(line, lane, (code) => garageAt(teams.get(code), garages), 24 / line.length),
     [line, lane, teams, garages],
@@ -704,6 +710,15 @@ export function TrackMap({
   const view = camRef.current;
   // Cars and labels shrink a little as the camera closes in, so the corner stays readable.
   const glyph = Math.max(0.55, Math.min(1, view.w / outline.width + 0.15));
+  // Two main cars side by side: their names move apart so both read.
+  const labelShift = (code: string): number => {
+    const a = places.get(userSide);
+    const b = places.get(rival);
+    if (!a || !b || (code !== userSide && code !== rival)) return 0;
+    if (Math.hypot(a.x - b.x, a.y - b.y) > 40 / glyph) return 0;
+    const left = a.x <= b.x ? userSide : rival;
+    return code === left ? -24 : 24;
+  };
   const inBattle = (code: string) => !!battle?.zoom && (code === userSide || code === battle.other);
   // Your car (and the other) on the chosen line through the braking zone and the corner.
   const lateral = (code: string, at: number): [number, number] => {
@@ -809,6 +824,18 @@ export function TrackMap({
         const lit = c.code === selected;
         const ring = TYRE_RING[car?.compound ?? ''] ?? 'var(--tarmac)';
         const lapped = c.lapped && !key;
+        let deg = 0;
+        if (key) {
+          const last = headings.current.get(c.code);
+          if (!inLane) {
+            const [ax, ay] = pointAt(line, place.at - 0.004);
+            const [bx, by] = pointAt(line, place.at + 0.004);
+            deg = (Math.atan2(by - ay, bx - ax) * 180) / Math.PI;
+          } else if (last && Math.hypot(x - last.x, y - last.y) > 0.4) {
+            deg = (Math.atan2(y - last.y, x - last.x) * 180) / Math.PI;
+          } else deg = last?.deg ?? 0;
+          headings.current.set(c.code, { x, y, deg });
+        }
         return (
           <g
             key={c.code}
@@ -831,16 +858,23 @@ export function TrackMap({
             <circle r={24} fill="transparent" stroke="none" />
             {key && <circle r={20} fill={fill} opacity={0.22} />}
             {lit && <circle r={21} fill="none" stroke="var(--ink)" strokeWidth={2.5} />}
-            <circle
-              r={key ? 13 : 9.5}
-              fill={lapped ? 'var(--tarmac)' : fill}
-              stroke={lapped ? 'var(--field)' : ring}
-              strokeWidth={lapped ? 2 : 3}
-              strokeDasharray={lapped ? '3 2' : undefined}
-            />
+            {key ? (
+              <g transform={`rotate(${deg.toFixed(1)}) scale(0.82)`}>
+                <CarIcon color={fill} tyre={ring} shape={carShapes?.[c.code]} />
+              </g>
+            ) : (
+              <circle
+                r={9.5}
+                fill={lapped ? 'var(--tarmac)' : fill}
+                stroke={lapped ? 'var(--field)' : ring}
+                strokeWidth={lapped ? 2 : 3}
+                strokeDasharray={lapped ? '3 2' : undefined}
+              />
+            )}
             {key ? (
               <text
-                y={-20}
+                x={labelShift(c.code)}
+                y={-24}
                 textAnchor="middle"
                 fill="#ffffff"
                 fontSize={17}
