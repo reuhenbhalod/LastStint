@@ -169,3 +169,13 @@ export {
   versusOptions,
 } from './versusGrade.js';
 export type { VersusAnswer, VersusScore } from './versusGrade.js';
+export { ROOM_CODE } from './versusProtocol.js';
+export type {
+  ClientMessage,
+  RaceSync,
+  RoomPhase,
+  RoomSeat,
+  RoomView,
+  ServerMessage,
+  VersusOutcome,
+} from './versusProtocol.js';
