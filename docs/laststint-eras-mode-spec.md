@@ -95,12 +95,12 @@ Players start at Era 10 and move back through the timeline to Era 1. The eras be
 ### Era 7: Hybrid turbo (2014–2016) · play order 4
 | # | Race ID | Dilemma | Target (draft) |
 |---|---|---|---|
-| 1 | bahrain-2014 | Hamilton vs Rosberg, the Duel in the Desert | defend: Hamilton holds off Rosberg |
+| 1 | united-states-2014 | Fifth on the grid behind two Williams on the same softs: do you stop early for mediums and attack on fresh rubber, then time the second stop off whichever Williams blinks first? | position: Ricciardo on the podium from P5 |
 | 2 | brazil-2014 | Stay out to overcut your team-mate on fading rears, or pit with him and fight on track? | win: Hamilton from P2, ahead of Rosberg |
 | 3 | canada-2016 | A virtual safety car hands Ferrari a cheap stop from the lead: take it and commit to two, or stay out and trust the tyres to last in the cold? | win: Vettel beats Hamilton |
 | 4 | singapore-2014 | Second behind Hamilton, who still owes a stop on the harder tyre: make two stops last on the softs, or take a third under the safety car? | position: Vettel holds P2 (rewrite: beat Hamilton) |
 | 5 | abu-dhabi-2015 | Second to your team-mate: stretch the softs, or skip the last stop and gamble on Rosberg's tyres fading? | beat-rival: Hamilton ahead of Rosberg |
-| 6 | united-states-2015 | Hamilton clinches the title in mixed conditions | beat-rival: Hamilton ahead of Rosberg and Vettel for the title |
+| 6 | germany-2016 | Red Bull split the strategies: let your team-mate cover the Mercedes early, stretch your own stints and choose late between two stops and three as the tyres fade in the heat. | position: Ricciardo P2, ahead of Verstappen and Rosberg |
 | 7 | spain-2016 | Mercedes cars collide; Red Bull's split strategy | defend: Verstappen holds off Räikkönen |
 | 8 | bahrain-2015 | Ferrari runs Räikkönen against the grain: mediums in the middle, then a late sprint on softs to reel in the Mercedes | win: Räikkönen from P4 |
 | 9 | malaysia-2015 | Vettel stayed out under the early safety car and leads: make two stops last on a 60-degree track while Mercedes, on hards, stops three times | win: Vettel from P2 |
@@ -242,9 +242,9 @@ Every race has one target, set in `eras.target`. Each race's draft target is in 
 | Type | Means | Grader `Target` | Races (draft) |
 |---|---|---|---|
 | `win` | Chase down the win from behind | `win` | 45 |
-| `defend` | Start in the lead and keep it to the flag | `win`, starting from P1 | 20 |
-| `position` | Reach a set position, such as P3 to win the title | `position` | 17 |
-| `beat-rival` | Finish ahead of a named car, wherever that is | `beat-rival` | 14 |
+| `defend` | Start in the lead and keep it to the flag | `win`, starting from P1 | 19 |
+| `position` | Reach a set position, such as P3 to win the title | `position` | 19 |
+| `beat-rival` | Finish ahead of a named car, wherever that is | `beat-rival` | 13 |
 | `team` | A team result, such as a 1–2 in a set order | `team` (new) | 2 |
 | `deny` | Keep a rival at or below a set position, such as out of the top 3 to stop their title | `deny` (new) | 2 |
 

@@ -198,7 +198,10 @@ const RACE_TABLE: Record<number, ReadonlyArray<readonly [string, string]>> = {
     ['sakhir-2020', "Mercedes' pit stop mix-up costs Russell"],
   ],
   7: [
-    ['bahrain-2014', 'Hamilton vs Rosberg, the Duel in the Desert'],
+    [
+      'united-states-2014',
+      'Fifth on the grid behind two Williams on the same softs: do you stop early for mediums and attack on fresh rubber, then time the second stop off whichever Williams blinks first?',
+    ],
     [
       'brazil-2014',
       'Stay out to overcut your team-mate on fading rears, or pit with him and fight on track?',
@@ -215,7 +218,10 @@ const RACE_TABLE: Record<number, ReadonlyArray<readonly [string, string]>> = {
       'abu-dhabi-2015',
       "Second to your team-mate: stretch the softs, or skip the last stop and gamble on Rosberg's tyres fading?",
     ],
-    ['united-states-2015', 'Hamilton clinches the title in mixed conditions'],
+    [
+      'germany-2016',
+      'Red Bull split the strategies: let your team-mate cover the Mercedes early, stretch your own stints and choose late between two stops and three as the tyres fade in the heat.',
+    ],
     ['spain-2016', "Mercedes cars collide; Red Bull's split strategy"],
     [
       'bahrain-2015',

@@ -1085,6 +1085,36 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
+    "united-states-2014": {
+        "year": 2014,
+        "event": "United States",
+        "source": "tum",
+        "name": "USA 2014: Hamilton vs Rosberg",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for bahrain-2014 (swap-races-era7-overnight.md). Side provisional until
+        # `pipeline hard-calls` (the facts sheet also proposes Ricciardo, from P5).
+        "user_side": "HAM",
+        "rival": "ROS",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "germany-2016": {
+        "year": 2016,
+        "event": "Germany",
+        "source": "tum",
+        "name": "Germany 2016: Hamilton vs Ricciardo",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for united-states-2015 (swap-races-era7-overnight.md). Side provisional
+        # until `pipeline hard-calls` (the facts sheet proposes Ricciardo; Hamilton really won).
+        "user_side": "HAM",
+        "rival": "RIC",
+        "score_positions": 6,
+        "split": "eras",
+    },
     # Eras wave A (Eras build plan 3.1c): Era 6 races and sakhir-2020 from the Jolpica dump
     # (`pipeline jolpica`; CC BY-NC-SA, credit in data/raw/<id>.jolpica.json), with F1DB stops
     # before 2011 and estimated compounds and SC laps (data/estimates/<id>.sc.json, for the
