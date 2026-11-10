@@ -7,5 +7,36 @@
     "drs": false,
     "ers": "none",
     "refuelling": true
+  },
+  "eras": {
+    "eraId": 5,
+    "order": 7,
+    "userSide": "RAI",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Alonso's grid penalty hands Hamilton pole, and he leads every lap. R\u00e4ikk\u00f6nen passes Heidfeld at the start and follows the McLaren all race: both stop on lap 19, and R\u00e4ikk\u00f6nen stops again four laps before Hamilton, but never gets back in front. He closes to half a second by lap 57 and finishes 0.715 s behind.",
+      "rewriteCondition": {
+        "type": "win"
+      },
+      "headline": "R\u00e4ikk\u00f6nen beats Hamilton to the Hungaroring win"
+    },
+    "mastery": {
+      "type": "margin",
+      "seconds": 0.7,
+      "label": "Win by more than 0.7 seconds"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "push",
+      "maxLaps": 0,
+      "label": "Win without pushing for a single lap"
+    },
+    "hardCalls": {
+      "HAM": 0,
+      "RAI": 0
+    },
+    "briefing": "Hungaroring, 2007. Alonso's grid penalty hands Hamilton pole. You run R\u00e4ikk\u00f6nen's Ferrari, second and 4.6 s behind the McLaren after 16 laps, with Heidfeld's BMW 8.3 s further back. Two stops each, and the fuel you take at the first decides the order. Win it."
   }
 }
