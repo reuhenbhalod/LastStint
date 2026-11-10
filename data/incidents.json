@@ -292,6 +292,24 @@
    "status": "Debris",
    "source": "https://api.openf1.org/v1/race_control?session_key=9173",
    "note": "Race control: VSC deployed and ending on lap 14 (lap 14 in the built model too), for debris after P\u00e9rez hit Magnussen at turn 11 (https://en.wikipedia.org/wiki/2023_Japanese_Grand_Prix). The lap-1 SC (Bottas/Albon debris, in on lap 4) is before the takeover"
+  },
+  {
+   "lap": 27,
+   "type": "TEAM_ORDER",
+   "driver": "PIA",
+   "passer": "NOR",
+   "detail": "McLaren swapped its cars on the hards after discussing Russell's one-stop threat: Piastri let Norris back into second",
+   "source": "https://www.autosport.com/f1/news/10-things-we-learned-at-the-2023-f1-japanese-grand-prix/10525290/ https://www.grandprix.com/races/japanese-gp-2023-race-notes.html",
+   "note": "Autosport's '10 things' gives no lap; GrandPrix.com's race notes put Norris back in second in the lap-26 entries and record no order. The timing (FastF1) has PIA ahead of NOR at the end of lap 26 and NOR ahead from the end of lap 27, kept as the sims' lap"
+  },
+  {
+   "lap": 49,
+   "type": "TEAM_ORDER",
+   "driver": "RUS",
+   "passer": "HAM",
+   "detail": "Mercedes told Russell to swap places; Hamilton went by at the first corner to take fifth",
+   "source": "https://www.grandprix.com/races/japanese-gp-2023-race-notes.html https://www.autosport.com/f1/news/10-things-we-learned-at-the-2023-f1-japanese-grand-prix/10525290/",
+   "note": "Lap 49 in GrandPrix.com's race notes (Autosport: with five laps left); the timing (FastF1) has HAM ahead of RUS from the end of lap 49"
   }
  ],
  "great-britain-2023": [

@@ -391,12 +391,15 @@ RACES: dict[str, dict] = {
     "japan-2023": {
         "year": 2023,
         "event": "Japan",
-        "name": "Japan 2023",
+        "name": "Japan 2023: Russell vs Hamilton",
         "era": "2014-2025",
         "takeover_lap": None,  # D3 rule
         "seed": 87206,
-        "user_side": None,  # validation race: automatic duel, runner-up vs winner
-        "rival": None,
+        # Eras storyline (swap-races-e10-e9-b.md): Mercedes split Russell and Hamilton's
+        # strategies (one stop against two). Eras side by hard calls (RUS 2, HAM 1; real:
+        # Hamilton P5, Russell P7).
+        "user_side": "RUS",
+        "rival": "HAM",
         "score_positions": 6,
         "split": "holdout",
     },
