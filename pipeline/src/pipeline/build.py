@@ -2644,7 +2644,11 @@ def build_race(
         shift = wet.wet_tyre_shift(laps, weather, fitted)
         if shift:  # the race tells full wets from inters: its own wet curve, and timeline
             weather = wet.weather_block(
-                laps, dry.rain, fitted, wet.shifted_curves(weather["curves"], shift)
+                laps,
+                dry.rain,
+                fitted,
+                wet.shifted_curves(weather["curves"], shift),
+                wet_side=True,
             )
     if eras_build and recon is None:
         # Model fix 1.6: a car still running at the takeover with no dry lap (wet laps only)
