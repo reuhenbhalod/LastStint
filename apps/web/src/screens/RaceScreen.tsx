@@ -1,9 +1,8 @@
 // The race view: the standings on the left; in the middle the scoreboard and the circuit,
 // with your calls under it (the big decision as a wide strip, or a quick call) and the team
 // radio below (every order the wall can give: box, headset, team orders); on the right the
-// stats (your driver, the car, the radio log). Speed, sound and restart sit in the header; the
-// gap trace opens from a button on the map. On a phone it stacks, and the decision card
-// rises as a bottom sheet. When the race stops for a call, a radio banner drops over the map
+// stats (your driver, the car, your calls, the radio log). Speed, sound and restart sit in the
+// header. On a phone it stacks, and the decision card rises as a bottom sheet. When the race stops for a call, a radio banner drops over the map
 // (and chirps, if sound is on). Tap any car, on the map or in the standings, for its card; a
 // stop by your car or the rival is called out while it drives the pit lane.
 
@@ -22,7 +21,6 @@ import { BroadcastDecision } from '../components/BroadcastDecision.js';
 import { CarStats } from '../components/CarStats.js';
 import { DriverCard } from '../components/DriverCard.js';
 import { DriverProfile } from '../components/DriverProfile.js';
-import { GapTrace } from '../components/GapTrace.js';
 import { GroundBackdrop } from '../components/GroundBackdrop.js';
 import { ChequeredIcon, OvertakeIcon, SoundOffIcon, SoundOnIcon } from '../components/Icons.js';
 import { LeadersTower } from '../components/LeadersTower.js';
@@ -206,11 +204,6 @@ export function RaceScreen({
   const radar = forecast(model, state.race.lap);
   const lapsLeft = totalLaps - state.race.lap;
   const gap = me && them && !me.retired && !them.retired ? them.totalTime - me.totalTime : null;
-
-  // Gap history for the trace (> 0: we're ahead), from the laps this screen has seen.
-  const trace = useRef(new Map<number, number>());
-  if (gap !== null) trace.current.set(state.race.lap, gap);
-  const points = [...trace.current.entries()].sort((a, b) => a[0] - b[0]).slice(-15);
 
   // The flag: run the field to the line, then hold the chequered flag before the results.
   const finishing = state.phase === 'finished';
@@ -615,7 +608,6 @@ export function RaceScreen({
       ? latest.pits.find((p) => p.code === userSide || p.code === rival)
       : undefined;
 
-  const gapText = gap === null ? '-' : `${gap >= 0 ? '+' : '−'}${Math.abs(gap).toFixed(1)}s`;
   // Focus view: the map takes the screen, the leaders beside it as on TV. Stats view: the
   // timing tower and the stats come in at the sides and the map shrinks between them. Nothing
   // sits on the track: the calls and the panels (team radio, the plan) open under the map,
@@ -662,24 +654,6 @@ export function RaceScreen({
         notes={game.notes()}
       />
       <CarStats race={state.race} model={model} log={log} userSide={userSide} rival={rival} />
-      <Panel
-        label={`Gap to ${rival}`}
-        title={`Gap to ${surname(rival)}`}
-        right={
-          <span
-            className="mono text-[15px] font-bold"
-            style={{ color: gap === null ? undefined : gap >= 0 ? 'var(--you)' : 'var(--rival)' }}
-          >
-            {gapText}
-          </span>
-        }
-      >
-        {points.length >= 2 ? (
-          <GapTrace points={points} rival={rival} />
-        ) : (
-          <p className="m-0 text-[12px] text-[#9AA5A0]">The trace builds as laps go by.</p>
-        )}
-      </Panel>
       <LiveGrades state={state} model={model} />
       <Panel title="Radio">
         {state.radio.length ? (
