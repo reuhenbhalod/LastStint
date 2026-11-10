@@ -498,6 +498,35 @@ country_name=Netherlands` returned "No results found"), so it could not settle i
 | Storyline drivers | Hamilton (undercut threat, two-stop, late fastest-lap stop); Bottas (long first stint, leads, later stop for softs). | |
 | Risk | **Medium.** (1) Stop laps are off by one lap between sources. (2) No SC/VSC, and Verstappen won by 20.9 s, so a Hamilton-side `beat-rival` target may be out of reach (the gap was 3-4 s before Hamilton's lap-70 stop). (3) A Verstappen `defend` target may be too easy. (4) Bottas's 2nd stop and Hamilton's 3rd were fastest-lap stops, not strategy calls. (5) Leclerc's and Gasly's second stop laps are not in sources. (6) Retirement causes differ between WP and Jolpica. (7) No OpenF1 or `data/raw` data to cross-check. | |
 
+### Authored (B1, Nov 9)
+
+Built as an Eras build with `user_side` VER / `rival` HAM (`build.py`); takeover lap 17 (D3
+rule). Robust G1 (`pipeline validate netherlands-2021 --robust`): pass, 1.76 s, with the
+rules-only overlay and again with the eras block. Reachability (`pnpm --filter @laststint/sim
+reachability netherlands-2021`): pass at era difficulty (threshold 72, Standard rival) and at
+Legend (90, Expert rival), all three stars and the hidden objective on seed 1; the stay-out
+path never earns ★1 or ★3.
+
+"Timing" below is the Jolpica lap and stop data in `data/raw/netherlands-2021.parquet`
+(CC BY-NC-SA 4.0), as built into `data/races/netherlands-2021.json`. In it Hamilton's in-laps
+are 20, 39 and 70 and Verstappen's 21 and 40 (the race file's out-laps: HAM 21, 40, 71; VER 22,
+41).
+
+| Item | As authored | Basis | Owner checked |
+|---|---|---|---|
+| Side | **Verstappen.** `pipeline hard-calls`: VER 0, HAM 0, a tie, broken by chance given up (VER 50.0 pts, HAM 2.7). | hard-call counter | |
+| Target | `defend` (spec §4: "Verstappen wins from pole"; the grader plays it as a win). | Grid top 6, Result top 6 | |
+| Rewrite | None: the side really won (Verstappen 1st, Hamilton +20.932). | Result top 6 (WP, Jolpica) | |
+| Storyline | "Verstappen leads from pole at his home race." | Grid top 6 (pole); the MS-LBL headline, "Verstappen the home hero with Zandvoort victory" (its URL); Timing: VER P1 laps 1-21 | |
+| Storyline | "Mercedes splits its cars: Hamilton stops first at both rounds of stops, chasing the undercut, and Bottas runs long and leads for a while." | Hamilton stops (undercut try, GPE, AS; AS-strat "a sniff of an undercut"); Bottas stops (one-stop plan, led after the leaders' first stops, AS); Timing: BOT P1 laps 22-29 | |
+| Storyline | "Verstappen stops a lap after Hamilton each time, passes Bottas on lap 30" | Verstappen stops ("a lap after Hamilton", both stops); Bottas stops ("Verstappen passed him on lap 30", AS); Timing: VER P1 from lap 30 | |
+| Storyline | "and wins by 20.9 s, after Hamilton's late stop for fastest lap." | Result top 6 (+20.932); Hamilton stop 3 (lap 70, softs, for fastest lap); Fastest lap row | |
+| Briefing | "Zandvoort, 2021. Verstappen started from pole at home and leads Hamilton by three and a half seconds, seventeen laps in. You run him. Mercedes has two cars to play: Hamilton can try the undercut, and Bottas can stay out long. Cover them and win." | Grid; Timing: VER leads HAM by 3.5 s at the end of lap 17 (the takeover), Bottas third at 10.6 s; Hamilton and Bottas stops rows; AS-strat | |
+| Mastery | `margin` 4 s, "Win by more than 4 seconds". The game's choice: more than the real lead before Hamilton's fastest-lap stop (3.1 s at the end of lap 69, Timing; 4.0 s on lap 65, GPE), since the real 20.9 s includes that stop. `stop_count` exact 2 (the real two stops) was tried first: Legend's best path (seed 1, one stop) won but missed ★3, so it failed at Legend. `stop_count` exact 1 as mastery was rejected: the stay-out path makes one forced stop and earned ★3 on seed 3 without winning. | Gaps during the race (GPE); Timing; reachability | |
+| Hidden | `stop_count` exact 1, "Win on one stop" (a counterfactual: Mercedes avoided a one-stop for Hamilton because the hard tyre was unknown, AS-strat; the best era and Legend paths stop once, on lap 40 or 41, for hards). | Strategy (Mercedes) row; reachability | |
+| storylineEvents | None. The race has no SC, VSC or red flag (SC / VSC / red flag row); its only events are Mazepin's and Tsunoda's retirements, which don't touch the story. | SC / VSC / red flag, Retirements rows | |
+| Moments | `stop-21`, `pace-25`, `pace-29`, `cliff-33`, `stop-40` (`pnpm --filter @laststint/sim author netherlands-2021 --target win --eras --write`), as the tool picked them. Graded on the race file's seed 1, where Hamilton's lap-39 undercut gets him ahead (VER's win chance at `stop-40` is 2-16%); across 200 seeds of the real calls Verstappen wins 72% (scratch check), so the late moments are hard but not lost. The model has two compounds only (SOFT/HARD, estimated from Jolpica, which has no compound data), so the moments' "softs" stand in for the real mediums. | author output | |
+
 ## Notes for the owner
 
 - **Spec §4 dilemmas and draft targets** are taken from each race's proposal: great-britain-2023

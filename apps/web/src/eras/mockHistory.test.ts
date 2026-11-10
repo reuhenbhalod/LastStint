@@ -67,7 +67,7 @@ describe('the mock’s history book and leaderboards', () => {
     const book = await mockErasApi.history();
     const era9 = book.eras.find((e) => e.eraId === 9);
     expect(era9?.stars).toEqual({ have: 3, total: 30 });
-    expect(era9?.rewrites).toEqual({ have: 1, total: 8 }); // styria-2021, azerbaijan-2021: the side won
+    expect(era9?.rewrites).toEqual({ have: 1, total: 7 }); // styria-2021, azerbaijan-2021, netherlands-2021: the side won
     expect(era9?.badges).toEqual({ cleared: false, mastered: false, legend: false });
     expect(book.completion.collected).toBe(4);
     expect(book.collectibles.stars).toEqual({ have: 3, total: 300 });
