@@ -228,11 +228,20 @@ const RACE_TABLE: Record<number, ReadonlyArray<readonly [string, string]>> = {
     ['abu-dhabi-2016', 'Hamilton backs Rosberg into the pack'],
   ],
   6: [
-    ['australia-2010', "Button's early switch to slicks"],
+    [
+      'bahrain-2012',
+      "Räikkönen closes in on Lotus' fresher softs: cover the undercut at the last stop, or trust Red Bull's own plan",
+    ],
     ['abu-dhabi-2010', 'Ferrari covers the wrong car and loses the title'],
     ['china-2011', "Hamilton's three stops beat Vettel's two"],
-    ['monaco-2011', "Vettel's long final stint, saved by a red flag"],
-    ['canada-2011', 'Button from last to first in four hours of rain'],
+    [
+      'italy-2010',
+      'Button blinks first: does Alonso stay out one more lap and trust his crew to win it in the pit lane?',
+    ],
+    [
+      'australia-2013',
+      'Lotus is kind to its tyres: stretch Räikkönen to two stops while the Ferraris and Red Bulls stop three times',
+    ],
     ['europe-2012', 'Alonso wins from 11th in Valencia'],
     ['abu-dhabi-2012', 'Vettel from the pit lane to the podium'],
     ['brazil-2012', 'Vettel recovers from a first-lap spin to win the title'],

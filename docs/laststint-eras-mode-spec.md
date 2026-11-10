@@ -109,11 +109,11 @@ Players start at Era 10 and move back through the timeline to Era 1. The eras be
 ### Era 6: Fast-wearing tyres (2010–2013) · play order 5
 | # | Race ID | Dilemma | Target (draft) |
 |---|---|---|---|
-| 1 | australia-2010 | Button's early switch to slicks | win: Button chases the win |
+| 1 | bahrain-2012 | Räikkönen closes in on Lotus' fresher softs: cover the undercut at the last stop, or trust Red Bull's own plan | defend: Vettel holds P1 |
 | 2 | abu-dhabi-2010 | Ferrari covers the wrong car and loses the title | position: Alonso P4 or better for the title |
 | 3 | china-2011 | Hamilton's three stops beat Vettel's two | win: Hamilton beats Vettel |
-| 4 | monaco-2011 | Vettel's long final stint, saved by a red flag | defend: Vettel holds P1 |
-| 5 | canada-2011 | Button from last to first in four hours of rain | win: Button from last |
+| 4 | italy-2010 | Button blinks first: does Alonso stay out one more lap and trust his crew to win it in the pit lane? | win: Alonso gets ahead of Button at the stops |
+| 5 | australia-2013 | Lotus is kind to its tyres: stretch Räikkönen to two stops while the Ferraris and Red Bulls stop three times | win: Räikkönen from P7 |
 | 6 | europe-2012 | Alonso wins from 11th in Valencia | win: Alonso from P11 |
 | 7 | abu-dhabi-2012 | Vettel from the pit lane to the podium | position: Vettel from the pit lane to the podium |
 | 8 | brazil-2012 | Vettel recovers from a first-lap spin to win the title | position: Vettel high enough for the title |
