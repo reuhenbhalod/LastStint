@@ -110,8 +110,14 @@ export function blockedReason(
 
 /**
  * The detail's view from the two responses. Throws on a response that doesn't make sense (the
- * era missing from the list, positions not 1..n, a race from another era, a star total that
- * isn't 3 per race), so a bad payload shows as an error rather than a wrong card.
+ * era missing from the list, a star total that isn't a whole number of races, a position or a
+ * race listed twice or outside the era, a race from another era), so a bad payload shows as an
+ * error rather than a wrong card.
+ *
+ * Production lists only an era's published races, at their real positions, with `maxStars` for
+ * every race of the era (the server's unlock rule counts them all). So the positions may have
+ * gaps and the listing may be shorter than `maxStars / 3`: the cards keep position order and the
+ * star total stays the era's, as on the map.
  */
 export function eraDetailView(
   eras: Parameters<typeof eraNodes>[0],
@@ -121,17 +127,28 @@ export function eraDetailView(
   const node = eraNodes(eras).find((n) => n.era.eraId === detail.eraId);
   if (!node) invalid(`era ${detail.eraId} is not in the eras list`);
 
+  if (detail.maxStars !== node.era.maxStars)
+    invalid(`${detail.maxStars} stars to earn, but ${node.era.maxStars} on the eras list`);
+  const eraRaces = detail.maxStars / STARS_PER_RACE;
+  if (!Number.isInteger(eraRaces) || eraRaces < 0)
+    invalid(`${detail.maxStars} stars to earn is not ${STARS_PER_RACE} per race`);
   const ordered = [...detail.races].sort((a, b) => a.position - b.position);
+  if (ordered.length > eraRaces)
+    invalid(`${ordered.length} races but ${detail.maxStars} stars to earn`);
+  const ids = new Set<string>();
   ordered.forEach((r, i) => {
-    if (r.position !== i + 1) invalid(`race positions are not 1..${ordered.length}`);
+    if (!Number.isInteger(r.position) || r.position < 1 || r.position > eraRaces)
+      invalid(`${r.raceId} is at position ${r.position}, not 1..${eraRaces}`);
+    if (i > 0 && ordered[i - 1]?.position === r.position)
+      invalid(`two races at position ${r.position}`);
+    if (ids.has(r.raceId)) invalid(`${r.raceId} is listed twice`);
+    ids.add(r.raceId);
     const known = eraRace(r.raceId);
     if (known && known.eraId !== detail.eraId)
       invalid(`${r.raceId} is in Era ${known.eraId}, not Era ${detail.eraId}`);
     if (r.bestAccuracy !== null && !(r.bestAccuracy >= 0 && r.bestAccuracy <= 100))
       invalid(`${r.raceId} has best accuracy ${r.bestAccuracy}`);
   });
-  if (ordered.length > 0 && ordered.length * STARS_PER_RACE !== detail.maxStars)
-    invalid(`${ordered.length} races but ${detail.maxStars} stars to earn`);
 
   const cards = ordered.map((r): RaceCard => {
     const info: EraRaceInfo | undefined = eraRace(r.raceId);
@@ -162,9 +179,13 @@ export function eraDetailView(
     cards,
     stars,
     legendStars: cards.reduce((n, c) => n + starCount(c.legend.stars), 0),
-    maxStars: cards.length * STARS_PER_RACE,
+    // The era's total, from the server (as on the map and in the unlock rule), not just the
+    // listed races'.
+    maxStars: detail.maxStars,
     racesStarred: cards.filter((c) => starCount(c.progress.stars) > 0).length,
-    cleared: isCleared(ordered),
+    // Cleared needs a star on every race of the era (the server's rule for Legend), so a
+    // partial listing is never Cleared here: Legend stays shut rather than being refused.
+    cleared: ordered.length === eraRaces && isCleared(ordered),
   };
 }
 

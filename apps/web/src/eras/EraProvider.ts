@@ -2,6 +2,7 @@
 // Eras API, which deals the seed and pins the race file, then loads that file. Follows the
 // DailyProvider interface the game runs on (data/types.ts), like SurvivorProvider.
 
+import { ApiError } from '../api.js';
 import type { Daily, DailyProvider } from '../data/types.js';
 import { type AttemptResponse, type ErasApi, erasApi } from './api.js';
 
@@ -25,7 +26,11 @@ export class EraProvider implements DailyProvider {
 
   async today(): Promise<EraDaily> {
     if (!this.raceId) throw new Error('no race to start an attempt on');
-    const attempt = await this.api.startAttempt({ raceId: this.raceId, legend: this.legend });
+    const attempt = await this.api
+      .startAttempt({ raceId: this.raceId, legend: this.legend })
+      .catch((e: unknown) => {
+        throw friendlyStartError(e);
+      });
     const model = await this.api.loadModel(attempt.modelUrl);
     if (model.race.id !== this.raceId) {
       throw new Error(`attempt ${attempt.attemptId} served ${model.race.id}, not ${this.raceId}`);
@@ -47,6 +52,18 @@ export class EraProvider implements DailyProvider {
       ...(attempt.modelHash ? { modelHash: attempt.modelHash } : {}),
     };
   }
+}
+
+/**
+ * The error a refused attempt shows. A race taken down in production (`403 race-unpublished`,
+ * for example to fix it) reads as plain words rather than the server's code; anything else is
+ * passed on as it is.
+ */
+export function friendlyStartError(e: unknown): unknown {
+  if (e instanceof ApiError && e.code === 'race-unpublished') {
+    return new Error('This race isn’t available yet.');
+  }
+  return e;
 }
 
 /** The Eras attempt a loaded race belongs to, or null if it isn't one. */

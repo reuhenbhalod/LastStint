@@ -294,9 +294,10 @@ export function EraDetailBody({
               ))}
             </ol>
             <p className="m-0 text-[12px] text-[var(--muted)]">
-              Reconstructed: rebuilt from race reports, without full lap timing. Draft: not
-              published yet, so playable on test only. Hidden objective: a new challenge once a race
-              has all three stars, shown on its results.
+              Reconstructed: rebuilt from race reports, without full lap timing.
+              {/* Draft badges only appear in test mode (production lists published races). */}
+              {view.testMode && ' Draft: not published yet, so playable on test only.'} Hidden
+              objective: a new challenge once a race has all three stars, shown on its results.
             </p>
           </section>
         </>
