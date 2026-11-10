@@ -177,10 +177,19 @@ const RACE_TABLE: Record<number, ReadonlyArray<readonly [string, string]>> = {
     ['abu-dhabi-2021', 'The finale'],
   ],
   8: [
-    ['monaco-2017', 'Ferrari overcuts Vettel past Räikkönen'],
-    ['azerbaijan-2017', 'Red flag chaos'],
+    [
+      'australia-2017',
+      "Hamilton's ultrasofts fade into Verstappen's traffic: cover his stop, or stay out and overcut",
+    ],
+    [
+      'australia-2018',
+      'Run long behind the early stoppers and bank on a neutralisation to jump the leader',
+    ],
     ['germany-2018', 'Vettel crashes in the rain; Hamilton stays out from 14th'],
-    ['russia-2018', 'Bottas told to let Hamilton through'],
+    [
+      'spain-2017',
+      'A late virtual safety car with the lead: box now for the slower tyre, or stay out and risk the cheap stop behind',
+    ],
     ['germany-2019', 'Rain and constant tyre swaps'],
     ['hungary-2019', 'Mercedes switches to two stops to catch Verstappen'],
     ['brazil-2019', 'Late safety car chaos'],

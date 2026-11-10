@@ -811,6 +811,51 @@ RACES: dict[str, dict] = {
     # is the Eras storyline's (eras spec §3); `pipeline hard-calls` sets the Eras userSide.
     # TUM races are read with `pipeline tum-ingest`, and carry its CC BY-NC-SA 3.0 licence
     # and credit (data/raw/<id>.provenance.json).
+    "australia-2017": {
+        "year": 2017,
+        "event": "Australia",
+        "source": "tum",
+        "name": "Australia 2017: Vettel vs Hamilton",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for monaco-2017 (swap-races-era8-overnight.md). `pipeline hard-calls` on
+        # the first build: VET 1, HAM 1, tied on chance given up; VET by the race file.
+        "user_side": "VET",
+        "rival": "HAM",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "australia-2018": {
+        "year": 2018,
+        "event": "Australia",
+        "source": "tum",
+        "name": "Australia 2018: Vettel vs Hamilton",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for azerbaijan-2017 (swap-races-era8-overnight.md). `pipeline hard-calls`
+        # on the first build: VET 2, HAM 0.
+        "user_side": "VET",
+        "rival": "HAM",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "spain-2017": {
+        "year": 2017,
+        "event": "Spain",
+        "source": "tum",
+        "name": "Spain 2017: Vettel vs Hamilton",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for russia-2018 (swap-races-era8-overnight.md). `pipeline hard-calls` on
+        # the first build: VET 1, HAM 1, VET by chance given up (37.3 vs 8.3 pts).
+        "user_side": "VET",
+        "rival": "HAM",
+        "score_positions": 6,
+        "split": "eras",
+    },
     "monaco-2017": {
         "year": 2017,
         "event": "Monaco",

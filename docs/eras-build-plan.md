@@ -513,10 +513,10 @@ The **Needs** column is from race history and must be checked against the data f
 | 9 | `netherlands-2021` | Jolpica (est. compounds, SC) | none |  |
 | 9 | `great-britain-2021` | FastF1 cache | R1 red flag |  |
 | 9 | `abu-dhabi-2021` | built (Daily) | none |  |
-| 8 | `monaco-2017` | TUM | P4 map |  |
-| 8 | `azerbaijan-2017` | TUM | R1 red flag, P4 map |  |
+| 8 | `australia-2017` | TUM | none |  |
+| 8 | `australia-2018` | TUM | none |  |
 | 8 | `germany-2018` | TUM | wet model (exists) |  |
-| 8 | `russia-2018` | TUM | none |  |
+| 8 | `spain-2017` | TUM | none |  |
 | 8 | `germany-2019` | TUM | wet model (exists) |  |
 | 8 | `hungary-2019` | built (Daily) | none |  |
 | 8 | `brazil-2019` | TUM | none |  |

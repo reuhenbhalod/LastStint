@@ -574,7 +574,7 @@ describe('POST /api/eras/attempts/:id', () => {
   });
 
   it('refuses a race whose file has no Eras target yet (503), storing nothing', async () => {
-    const a = await json<Attempt>(await start('test', 'monaco-2017'));
+    const a = await json<Attempt>(await start('test', 'italy-2020'));
     const res = await submit(a.attemptId, { anonId: ids.a, decisions });
     expect(res.status).toBe(503);
     expect((await json<{ error: string }>(res)).error).toBe('race-not-ready');
