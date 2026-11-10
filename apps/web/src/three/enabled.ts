@@ -12,7 +12,7 @@ import { circuitFor } from './scenery.js';
 
 /** The 3D view shows for this race: switched on, a computer, a circuit with scenery, and a
  * browser that draws WebGL. Automated browsers (the e2e tests) keep the 2D map unless the URL
- * asks for 3D (?view=3d). */
+ * asks for 3D (?view=3d, for testing; phones and tablets still get the 2D map). */
 export function use3D(raceId: string | null | undefined): boolean {
   const [desktop, setDesktop] = useState(() => matches());
   useEffect(() => {
@@ -24,11 +24,20 @@ export function use3D(raceId: string | null | undefined): boolean {
   }, []);
   if (!SCENE_3D || !raceId || !circuitFor(raceId)) return false;
   if (typeof navigator !== 'undefined' && navigator.webdriver && !forced()) return false;
-  return (desktop || forced()) && webgl();
+  // (?view=3d stands in for a mouse in a headless browser, but never on a narrow or touch screen)
+  return (desktop || (forced() && wideNoTouch())) && webgl();
 }
 
 function matches(): boolean {
   return typeof matchMedia !== 'undefined' && matchMedia(DESKTOP).matches;
+}
+
+function wideNoTouch(): boolean {
+  return (
+    typeof matchMedia !== 'undefined' &&
+    matchMedia('(min-width: 900px)').matches &&
+    !matchMedia('(pointer: coarse)').matches
+  );
 }
 
 function forced(): boolean {
