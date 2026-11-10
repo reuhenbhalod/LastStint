@@ -201,6 +201,36 @@ AS-live and AS-top10 were read through a fetch tool that summarises; check their
 | Side really won? | Räikkönen yes, so no rewrite. Alonso no (2nd, 12.451 s). |
 | Risk | Medium. No timing source for SC status or compounds after stop 1; the both-compounds rule matters (Sutil); Webber's start, Rosberg's retirement and Hamilton's flat-spot stop (lap 31/32 conflict) need storyline handling. |
 
+### Authored (B1, Nov 9)
+
+Timing = Jolpica laps and stops (CC BY-NC-SA 4.0) in `data/raw/australia-2013.parquet`, as built
+into `data/races/australia-2013.json` (Eras build, base `eras-swap-era6`).
+
+- Robust G1 (`pipeline validate australia-2013 --robust`): **pass** (strict pass), mean gap
+  error 1.74 s, before and after the overlay.
+- Reachability (`pnpm --filter @laststint/sim reachability australia-2013`): **pass** at era
+  difficulty (threshold 80, Smart rival) and at Legend (90, Expert rival): all three stars and
+  the hidden objective on seed 1. The stay-out path earns no star on any seed.
+- Moments (`pnpm --filter @laststint/sim author australia-2013 --target win --eras --write`):
+  pace-29, stop-34 (real call box-hard, 87%), pace-41, pace-45 (`data/moments/australia-2013.json`).
+  Takeover lap 17, after the first stops. The author tool lists no stop call for Alonso's lap-20
+  or lap-39 stops (no tension for Räikkönen).
+
+| Item | Value | Fact it rests on | Source | Owner checked |
+|---|---|---|---|---|
+| Side | RAI (hard calls RAI 2, ALO 0; `pipeline hard-calls`) | the grader, not a fact | - | |
+| Target | `win` | Räikkönen won | Jolpica-r, WP | |
+| Rewrite | none: the side really won | Räikkönen won | Jolpica-r, WP | |
+| Storyline | "Sutil leads the middle of the race on a medium-tyre start" | Sutil started on mediums and led in the first part of the race; SUT P1 at the end of laps 16-17 | WP; Timing | |
+| Storyline | "Räikkönen, seventh on the grid, makes his tyres last for two stops while Alonso, Vettel and Massa stop three times" | grid 7th; RAI stops 9, 34; ALO 9, 20, 39; VET 7, 21, 37; MAS 8, 23, 36 | Jolpica-r, Jolpica-p, GPE | |
+| Storyline | "he wins by 12.451 s from Alonso" | Alonso +12.451 | Jolpica-r | |
+| Briefing | "you run Räikkönen fifth after the first stops, behind Vettel, Massa and Alonso" | end of lap 17 (takeover): SUT, VET, MAS, ALO, RAI P1-P5 | Timing | |
+| Briefing | "the Ferraris and Red Bulls will stop three times" | Alonso, Massa, Vettel, Webber three stops each | Jolpica-p | |
+| Briefing | "Lotus wants two stops to work" | two stops "always the team's plan, should it look attainable"; Räikkönen two stops, next five three | MS; GPE | |
+| Mastery | `margin` 12.5 s: "Win by more than 12.5 seconds" (beat the real margin) | Alonso +12.451 | Jolpica-r | |
+| Hidden | `stop_count` exact 1 from the takeover: "Win on two stops in all" | Räikkönen's lap-9 stop is before the takeover; his real race was two stops (9, 34) | Jolpica-p | |
+| storylineEvents | none | no safety car, VSC or red flag in the sources read; the three retirements (MAL, ROS, RIC) are not the side's story | WP, AS-live, GPE | |
+
 ## bahrain-2012 (2012 Bahrain Grand Prix; Era 6 #1, replaces australia-2010)
 
 ### Sources
