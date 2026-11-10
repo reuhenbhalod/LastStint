@@ -175,6 +175,13 @@ export interface ErasApi {
   raceStats(raceId: string): Promise<RaceStats | null>;
 }
 
+/**
+ * Whether this build may use the mock at all: dev and test, or a build made with
+ * `VITE_ERAS_MOCK=1`. A build-time constant, so a production build drops every mock branch
+ * below and mockErasApi.ts (with its eager data/eras overlays) stays out of the bundle.
+ */
+const MOCK_ALLOWED = !import.meta.env.PROD || import.meta.env.VITE_ERAS_MOCK === '1';
+
 /** The dev flag: run Eras on the in-browser mock (`VITE_ERAS_MOCK=1`). */
 export function erasMockOn(env: { VITE_ERAS_MOCK?: string } = import.meta.env): boolean {
   return env.VITE_ERAS_MOCK === '1';
@@ -186,7 +193,7 @@ export function erasClient(mock: boolean): {
   api: ErasApi;
   canStart: (raceId: string) => boolean;
 } {
-  return mock
+  return MOCK_ALLOWED && mock
     ? { api: mockErasApi, canStart: mockCanStart }
     : { api: httpErasApi, canStart: () => true };
 }
@@ -198,7 +205,7 @@ export const erasApi: ErasApi = client.api;
 
 /** Which races a given client can start (the mock: bundled race files only). */
 export function canStartWith(api: ErasApi): (raceId: string) => boolean {
-  return api === mockErasApi ? mockCanStart : () => true;
+  return MOCK_ALLOWED && api === mockErasApi ? mockCanStart : () => true;
 }
 
 // ---- history book, community stats, leaderboards (spec §8, §13; build plan 7.4) -----------
@@ -336,4 +343,4 @@ export interface ErasHistoryApi {
 export type ErasBookApi = Pick<ErasHistoryApi, 'history' | 'leaderboard'>;
 
 /** The history book's and leaderboards' client: the Worker, or the mock with `VITE_ERAS_MOCK=1`. */
-export const erasBookApi: ErasBookApi = erasMockOn() ? mockErasApi : httpErasApi;
+export const erasBookApi: ErasBookApi = MOCK_ALLOWED && erasMockOn() ? mockErasApi : httpErasApi;

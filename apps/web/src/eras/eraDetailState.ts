@@ -8,7 +8,6 @@ import { STARS_PER_RACE } from '@laststint/sim';
 import type { EraDetail, EraRaceSummary, ErasApi } from './api.js';
 import { type EraRaceInfo, eraRace, raceName } from './catalog.js';
 import { type EraNode, eraNodes } from './eraMapState.js';
-import { mockCanStart } from './mockErasApi.js';
 
 export type RaceStars = EraRaceSummary['stars'];
 
@@ -161,7 +160,7 @@ export type EraDetailState =
 export async function loadEraDetail(
   api: ErasApi,
   eraId: number,
-  canStart: (raceId: string) => boolean = mockCanStart,
+  canStart: (raceId: string) => boolean,
 ): Promise<EraDetailState> {
   try {
     const [eras, detail] = await Promise.all([api.eras(), api.era(eraId)]);
