@@ -183,6 +183,29 @@ not consulted.
   several stop and retirement laps differ by one between sources; Jolpica's Barrichello
   qualifying time looks wrong.
 
+### Authored (B1, Nov 9 2026)
+
+Eras content in `data/eras/san-marino-2000.json` (eraId 4, order 3) and moments in
+`data/moments/san-marino-2000.json`. The storyline and briefing are original wording built only
+from the facts above; no team radio is quoted.
+
+| Item | Authored | From | Owner checked |
+|---|---|---|---|
+| Side | M. Schumacher. `pipeline hard-calls`: MSCM 0, HAK 0, a tie settled by chance given up (MSCM 45.3 pts, HAK 7.7) | `pipeline hard-calls` | |
+| Target | `win` (from P2 at the takeover, lap 24) | Grid, Opening stint gaps, Top 6 | |
+| Rewrite | None: Schumacher really won, so no rewrite condition or headline (history book) | Top 6 | |
+| Storyline (real) | Häkkinen leads from pole, 3.3 s clear after 22 laps; Ferrari give Schumacher the bigger fill at the lap-27 stops; Häkkinen runs with a damaged splitter and loses ~2 s to an engine cut-out; Häkkinen stops on lap 44, Schumacher four laps later on lap 48, rejoins ahead and wins by 1.168 s | Opening stint gaps, Leaders' stop 1, Häkkinen problems, stop 2 rows, Top 6 | |
+| Mastery | Win on two stops (`stop_count` exact 2, Schumacher's real count) | Leaders' stop 1, Schumacher stop 2 | |
+| Hidden | Win by more than 1.2 s (`margin` 1.2; his real margin was 1.168 s) | Top 6 | |
+| Briefing | Imola, Häkkinen on pole and 3.3 s ahead after 22 laps, two refuelling stops each | Grid, Opening stint gaps | |
+| storylineEvents | `[46, "RETIREMENT"]`: R. Schumacher's fuel-system retirement (Jolpica 45 laps; the race file's event is the lap after) is kept in Legend | Retirements | |
+| Moments | `rivalpit-27` (real: box, mediums, fill 21 laps = laps 28-48), `pace-36`, `pace-40`, `rivalpit-44` (Häkkinen's second stop; real: stay out), `stop-48` (real: box, mediums, fill 14 laps = laps 49-62); graded on `win`. Compounds are the build's (per-stint compounds are not in sources) | `pnpm --filter @laststint/sim author san-marino-2000 --target win --eras` | |
+
+Robust G1 (Eras build, this branch): pass (strict pass), 0.75 s mean gap error. Reachability:
+pass at era difficulty (threshold 84, Smart rival) and at Legend (90, Expert rival), all three
+stars and the hidden objective on the real calls (box 27, stay 44, box 48); the stay-out path
+earns no star.
+
 ## hungary-2001 (2001 Hungarian Grand Prix)
 
 Replaces `brazil-2003` (Era 4 #5; fail, 5.55 s (duel FIS vs RAI, last-lap pass)). Robust G1: pass, 1.24 s mean gap error. Built (provisionally) as MSCM vs BAR.
