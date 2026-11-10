@@ -7,5 +7,38 @@
     "drs": false,
     "ers": "none",
     "refuelling": true
-  }
+  },
+  "eras": {
+    "eraId": 4,
+    "order": 7,
+    "userSide": "MSCM",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Ralf Schumacher leads from his first pole. Michael stops a lap after him at the first round of stops and comes out ahead, Montoya, on a longer first stint, leads twice before his engine fails, and Michael wins by 10.4 s from Ralf for his 50th Grand Prix win."
+    },
+    "mastery": {
+      "type": "margin",
+      "seconds": 5,
+      "label": "Win by more than 5 seconds"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "push",
+      "maxLaps": 0,
+      "label": "Win without a single push lap"
+    },
+    "hardCalls": {
+      "MSCM": 0,
+      "SCH": 0
+    },
+    "briefing": "Magny-Cours, 2001, 21 laps in. Your brother Ralf leads from pole in the Williams, about two and a half seconds ahead of you; Coulthard's McLaren is third. Two stops is the norm here, and Ralf will stop first. Get your Ferrari out of the stops ahead of him and win."
+  },
+  "storylineEvents": [
+    [
+      53,
+      "RETIREMENT"
+    ]
+  ]
 }

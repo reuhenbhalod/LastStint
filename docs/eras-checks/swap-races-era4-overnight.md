@@ -355,6 +355,34 @@ Where sources disagree, the row says so. Put your initials and the date in **Own
 | Side really won? | No. Ralf finished 2nd (+10.399), so a rewrite is allowed. (Barrichello really did finish 3rd, so no rewrite if he is the side.) |
 | Risk | Medium. The 2.8 s slow stop and Ralf's poor second tyre set are not strategy choices and may need scripting; Coulthard's stop-go, Montoya's lap-52 engine failure and Häkkinen's DNS must be storyline events; stop laps differ by one between sources (WP/GPE vs AS); no sourced fuel loads; the team-order story differs between sources. No SC, dry, so the model fit should hold. |
 
+### Authored (Eras B1, Nov 9 2026)
+
+Authored from the facts above (no new source read). "Timing" is the Jolpica laps as built into
+`data/races/france-2001.json` (Eras build, takeover lap 21 by the D3 rule). The storyline and
+briefing are original wording; no team radio is quoted.
+
+| Item | Value | Fact it rests on | Source | Owner checked |
+|---|---|---|---|---|
+| Side | MSCM. `pipeline hard-calls`: MSCM 0, SCH 0; chance given up 0.0 each, so the tie stays on the race file's side (MSCM). Not the draft above (Ralf) | the grader, not a fact | - | |
+| Target | `win` (MSCM is P2 at the takeover) | MSCM P2, 2.418 s behind SCH at the end of lap 21 | Timing | |
+| Rewrite | none: the side really won | M. Schumacher won (50th win) | Jolpica, WP, AS | |
+| Storyline | "Ralf Schumacher leads from his first pole" | R. Schumacher pole, first career pole; led from pole | WP, GPE | |
+| Storyline | "Michael stops a lap after him at the first round of stops and comes out ahead" | Michael stopped one lap after Ralf and came out ahead | WP, GPE, AS | |
+| Storyline | "Montoya, on a longer first stint, leads twice before his engine fails" | longer first stint; P1 laps 27-30 and 46-50; engine, lap 52/53 | GPE, WP, Jolpica, AS | |
+| Storyline | "Michael wins by 10.4 s from Ralf for his 50th Grand Prix win" | R. Schumacher +10.399; 50th win | Jolpica, WP, AS | |
+| Briefing | "21 laps in. Your brother Ralf leads from pole in the Williams, about two and a half seconds ahead of you; Coulthard's McLaren is third" | SCH, MSCM, COU P1-P3 at the end of lap 21, MSCM 2.418 s behind | Timing; WP (grid) | |
+| Briefing | "Two stops is the norm here, and Ralf will stop first" | two stops standard; Michael stopped one lap after Ralf | WP, GPE | |
+| Mastery | `margin` 5 s: "Win by more than 5 seconds" | the game's choice. Michael's real margin (10.399 s) was tried first and can't be earned at Legend against the Expert rival (reachability: Legend ★3 not reached); 5 s and 8 s both pass, 5 s kept for slack | Jolpica (margin); reachability | |
+| Hidden | `mode_rule` push, 0 laps: "Win without a single push lap" | the game's choice; Ferrari told Michael to ease off to protect the car | WP | |
+| storylineEvents | [53, RETIREMENT] (Montoya's engine) | Montoya's engine, lap 52 (Jolpica, AS) / 53 (WP, GPE); model event lap 53 | Jolpica, WP, AS, GPE | |
+| Moments | stop-25 (real: box, fill 20 laps), pace-29, stop-45 (real: box), pace-53; `pnpm --filter @laststint/sim author france-2001 --target win --eras --write` | Michael's real stops on laps 26 and 46 (out-laps) | Timing, WP, AS | |
+
+Checks: robust G1 pass, 0.59 s (before and after the overlay). Reachability
+(`pnpm --filter @laststint/sim reachability france-2001`): pass at era difficulty (threshold 84,
+Smart rival) and Legend (90, Expert), all three stars and the hidden objective; the stay-out
+path earns no star. Not modelled: Ralf's 2.8 s slow first stop (it is in his real stop loss),
+the Williams team-order dispute, Coulthard's stop-go (in his real strategy as a stop on lap 33).
+
 ## italy-2001 (2001 Italian Grand Prix)
 
 Replaces `japan-2003` (Era 4 #8; fail, 4.05 s (duel MSCM vs RAI, stint pace)). Robust G1: pass, 1.62 s mean gap error. Built (provisionally) as MON vs BAR.
