@@ -49,6 +49,18 @@ game itself doesn't change: every call, panel and control stays where the player
     instead of hard-coded greys.
 - **The 3D view stays parked.** Its switch and code are untouched.
 
+## Detail on the map
+
+- **Barriers:** the real walls, armco and catch fences from the map data, in their real places,
+  drawn about twice their real width so they read on a whole-lap view.
+- **Kerbs:** red and white along the track's edge, on the inside at each apex and on the
+  outside at each exit.
+- **Buildings:** each casts a shadow as long as it's tall (the map's real heights), with roofs in
+  a few real tones and a darker rim.
+- **Grandstands:** rows of coloured seats along each stand's length.
+- **Track width:** over real ground the track is drawn near 30 m wide (between 12 and 22 map
+  units), so the run-off and barriers beside it show. The battle lines scale with it.
+
 ## Circuits
 
 Monza, Spa, Bahrain, Suzuka, the Hungaroring, Yas Marina, the Red Bull Ring (Austria and

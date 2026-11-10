@@ -146,6 +146,102 @@ def _shade_png(h: np.ndarray, step: float) -> str:
     return base64.b64encode(buf.getvalue()).decode()
 
 
+# Roof tones (a building's is picked from its outline, so it stays the same on every run), the
+# grandstands' seat colours, and how the barriers are drawn.
+ROOFS = ["#dcd7ce", "#d0cbc1", "#c3c6c6", "#d6cab8", "#bdb8ae", "#cfd2cf"]
+SEATS = ["#3a6690", "#8c3a3f", "#5f6a73", "#36795c", "#7a6a3a"]
+CONCRETE = "#bfbab0"
+# kind: (colour, width in m, dash). Drawn about twice their real width, so they read on a
+# whole-lap view (at about a pixel and a half a metre).
+BARRIERS = {
+    "wall": ("#ece9e2", 2.2, None),
+    "retaining_wall": ("#dcd8ce", 2.2, None),
+    "guard_rail": ("#d3dade", 1.6, None),
+    "fence": ("#262b2e", 1.0, "3 1.6"),
+}
+SUN = (0.42, 0.58)  # m of shadow, per m of height, along x and y (the light from the north-west)
+
+
+def _hash(pts: list[list[float]]) -> int:
+    x, y = pts[0]
+    return int(abs(x * 7.31 + y * 3.17) * 10) % 9973
+
+
+def _axis(pts: list[list[float]]) -> float:
+    """The angle (degrees) of a footprint's long side: its principal axis."""
+    a = np.asarray(pts, float)
+    a = a - a.mean(0)
+    _, vecs = np.linalg.eigh(a.T @ a)
+    vx, vy = vecs[:, -1]
+    return math.degrees(math.atan2(vy, vx))
+
+
+def _buildings(s: dict, pal: dict) -> tuple[str, str]:
+    """Buildings and grandstands from above: each casts a shadow as long as it's tall; roofs
+    in a few real tones with a darker rim; a grandstand shows its rows of seats, running along
+    its length. Returns (pattern defs, the drawing)."""
+    defs: list[str] = []
+    shadows: list[str] = []
+    roofs: list[str] = []
+    for k, b in enumerate(s.get("buildings", [])):
+        pts = b["p"]
+        if len(pts) < 3:
+            continue
+        rise = min(max(b.get("h", 6) - b.get("min", 0), 2.5), 45)
+        dx, dy = SUN[0] * rise, SUN[1] * rise
+        ring = _ring(pts)
+        # The shadow: the footprint pushed away from the sun, joined to it by its own sweep
+        # (the footprint drawn at a few steps along the way).
+        steps = 4
+        for i in range(1, steps + 1):
+            f = i / steps
+            shadows.append(f'<path d="{ring}" transform="translate({dx * f:.1f} {dy * f:.1f})"/>')
+        if b.get("stand"):
+            seat = SEATS[_hash(pts) % len(SEATS)]
+            pid = f"seats{k}"
+            defs.append(
+                f'<pattern id="{pid}" patternUnits="userSpaceOnUse" width="2.4" height="2.4" '
+                f'patternTransform="rotate({_axis(pts):.1f})">'
+                f'<rect width="2.4" height="2.4" fill="{CONCRETE}"/>'
+                f'<rect width="2.4" height="1.5" fill="{seat}"/></pattern>'
+            )
+            roofs.append(
+                f'<path d="{ring}" fill="url(#{pid})" stroke="#6f6a62" stroke-width="0.9"/>'
+            )
+        else:
+            roof = ROOFS[_hash(pts) % len(ROOFS)]
+            roofs.append(
+                f'<path d="{ring}" fill="{roof}" stroke="{pal["building_edge"]}" '
+                f'stroke-width="0.9"/>'
+            )
+    drawing = (
+        f'<g fill="#000" opacity="0.3" filter="url(#soft-shadow)">{"".join(shadows)}</g>'
+        f"<g>{''.join(roofs)}</g>"
+    )
+    return "".join(defs), drawing
+
+
+def _barriers(s: dict) -> str:
+    """The real barriers: concrete walls, armco and catch fencing, each its own line."""
+    out = []
+    for kind, (colour, width, dash) in BARRIERS.items():
+        d = "".join(_line(b["p"]) for b in s.get("barriers", []) if b["kind"] == kind)
+        if not d:
+            continue
+        dashes = f' stroke-dasharray="{dash}"' if dash else ""
+        if kind in ("wall", "retaining_wall", "guard_rail"):
+            out.append(
+                f'<path d="{d}" fill="none" stroke="#000" stroke-opacity="0.35" '
+                f'stroke-width="{width + 0.9:.1f}" stroke-linejoin="round" '
+                f'transform="translate(0.4 0.6)"/>'
+            )
+        out.append(
+            f'<path d="{d}" fill="none" stroke="{colour}" stroke-width="{width}" '
+            f'stroke-linejoin="round"{dashes}/>'
+        )
+    return "".join(out)
+
+
 def svg(circuit: str) -> str:
     s = json.loads((SCENERY_DIR / f"{circuit}.json").read_text())
     w, h = s["size"]
@@ -174,8 +270,7 @@ def svg(circuit: str) -> str:
         f'<path d="{_line(r["p"])}" stroke-width="{max(r["w"], 2):.1f}"/>'
         for r in s.get("streams", [])
     )
-    stands = "".join(_ring(b["p"]) for b in s.get("buildings", []) if b.get("stand"))
-    blocks = "".join(_ring(b["p"]) for b in s.get("buildings", []) if not b.get("stand"))
+    seat_defs, buildings = _buildings(s, pal)
 
     head = (
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w:.1f} {h:.1f}" '
@@ -188,6 +283,8 @@ def svg(circuit: str) -> str:
     )
     return f"""{head}
 {DEFS}
+<defs><filter id="soft-shadow" x="-5%" y="-5%" width="110%" height="110%">\
+<feGaussianBlur stdDeviation="0.9"/></filter>{seat_defs}</defs>
 <rect width="{w:.1f}" height="{h:.1f}" fill="{pal["base"]}"/>
 {area("farm", pal["farm"])}
 {area("grass", pal["grass"])}
@@ -204,10 +301,8 @@ def svg(circuit: str) -> str:
 <g stroke="{pal["road_edge"]}" {line}>{road_edge}</g>
 <g stroke="{pal["road"]}" {line}>{road}</g>
 {shading}
-<g filter="url(#shadow)">
-<path d="{stands}" fill="{pal["stand"]}" stroke="{pal["building_edge"]}" stroke-width="0.6"/>
-<path d="{blocks}" fill="{pal["building"]}" stroke="{pal["building_edge"]}" stroke-width="0.6"/>
-</g>
+{_barriers(s)}
+{buildings}
 <rect width="{w:.1f}" height="{h:.1f}" filter="url(#grain)"/>
 </svg>"""
 

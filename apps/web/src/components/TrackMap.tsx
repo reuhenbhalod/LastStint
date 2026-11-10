@@ -73,10 +73,13 @@ function BattleLines({
   line,
   battle,
   glyph,
+  track,
 }: {
   line: Polyline;
   battle: BattleView;
   glyph: number;
+  /** The track's drawn width (map units). */
+  track: number;
 }) {
   const inside = insideSide(line, battle.at);
   const [from, to] = lineStretch(battle.at);
@@ -84,7 +87,7 @@ function BattleLines({
   const brake = battle.at - BRAKE_BEFORE;
   const [bx, by] = pointAt(line, brake);
   const [bnx, bny] = normalAt(line, brake);
-  const half = TRACK / 2 + 3;
+  const half = track / 2 + 3;
   // Options with no line of their own (wait, let him by) sit as tags beside the braking zone,
   // on the outside of the track.
   const tagAt: [number, number] = [
@@ -132,7 +135,7 @@ function BattleLines({
         const called = opts.find((o) => o.line === battle.chosen);
         const lit = battle.chosen === null || !!called;
         const color = LINE_COLOR[(called ?? opts[0])?.line ?? 'inside'];
-        const pts = offsetPath(line, from, to, sideSign * inside * TRACK * 0.32);
+        const pts = offsetPath(line, from, to, sideSign * inside * track * 0.32);
         const d = `M${pts.map((p) => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join('L')}`;
         const end = pts[pts.length - 1] as [number, number];
         const prev = pts[pts.length - 2] as [number, number];
@@ -158,7 +161,7 @@ function BattleLines({
                 line,
                 from + 0.004 + k * 0.009,
                 from + 0.004 + k * 0.009,
-                sideSign * inside * (TRACK / 2 + 14),
+                sideSign * inside * (track / 2 + 14),
                 1,
               )[0] as [number, number];
               return (
@@ -262,11 +265,6 @@ function garageAt(team: string | undefined, garages: Array<[string, string]>): n
 const pathOf = (pts: Array<[number, number]>, closed: boolean) =>
   `M${pts.map((p) => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join('L')}${closed ? 'Z' : ''}`;
 
-/** Points of the lap from fraction a to b (a short stretch: a kerb). */
-function stretch(line: Polyline, a: number, b: number, n = 8): Array<[number, number]> {
-  return Array.from({ length: n + 1 }, (_, i) => pointAt(line, a + ((b - a) * i) / n));
-}
-
 /** The circuit itself: drawn once per outline (cars move over it). */
 const TrackArt = memo(function TrackArt({
   outline,
@@ -276,6 +274,7 @@ const TrackArt = memo(function TrackArt({
   userTeam,
   rivalTeam,
   ground,
+  track,
 }: {
   outline: TrackOutline;
   garageList: Array<[string, string]>;
@@ -285,6 +284,8 @@ const TrackArt = memo(function TrackArt({
   rivalTeam?: string;
   /** The real ground under the track (track/ground.ts), when the circuit has it. */
   ground: Ground | null;
+  /** The track's drawn width (map units). */
+  track: number;
 }) {
   const lap = pathOf(outline.points, true);
   const lanePts = lane?.path.points ?? [];
@@ -292,9 +293,22 @@ const TrackArt = memo(function TrackArt({
   // Centre of the circuit, to put corner badges on the outside.
   const cx = outline.points.reduce((t, p) => t + p[0], 0) / outline.points.length;
   const cy = outline.points.reduce((t, p) => t + p[1], 0) / outline.points.length;
-  const kerbs = outline.corners.map(([n, x, y]) => {
+  // Kerbs as on a real corner: on the inside at the apex, on the outside at the exit, each
+  // laid just off the track's edge.
+  const kerbs = outline.corners.flatMap(([n, x, y]) => {
     const f = nearestFraction(line, [x, y]);
-    return { n, d: pathOf(stretch(line, f - 0.012, f + 0.012), false) };
+    const side = insideSide(line, f);
+    const edge = track / 2 + 1.4;
+    return [
+      {
+        key: `${n}-apex`,
+        d: pathOf(offsetPath(line, f - 0.008, f + 0.008, side * edge, 10), false),
+      },
+      {
+        key: `${n}-exit`,
+        d: pathOf(offsetPath(line, f + 0.004, f + 0.022, -side * edge, 12), false),
+      },
+    ];
   });
   // Start/finish: across the track at the first point.
   const [sx, sy] = outline.points[0] ?? [0, 0];
@@ -350,7 +364,7 @@ const TrackArt = memo(function TrackArt({
           d={lap}
           fill="none"
           stroke="var(--runoff)"
-          strokeWidth={TRACK + 34}
+          strokeWidth={track + 34}
           strokeLinejoin="round"
         />
       )}
@@ -360,7 +374,7 @@ const TrackArt = memo(function TrackArt({
         fill="none"
         stroke="#000"
         strokeOpacity={0.35}
-        strokeWidth={TRACK + 9}
+        strokeWidth={track + 9}
         strokeLinejoin="round"
         transform="translate(1.5,2)"
       />
@@ -393,33 +407,20 @@ const TrackArt = memo(function TrackArt({
           />
         </>
       )}
-      {/* Kerbs: red and white, just wider than the track at each corner */}
-      {kerbs.map((k) => (
-        <g key={k.n}>
-          <path d={k.d} fill="none" stroke="#f3f4f2" strokeWidth={TRACK + 5} strokeLinecap="butt" />
-          <path
-            d={k.d}
-            fill="none"
-            stroke="#d63a2f"
-            strokeWidth={TRACK + 5}
-            strokeDasharray="5 5"
-            strokeLinecap="butt"
-          />
-        </g>
-      ))}
+
       {/* Track edges, then the asphalt */}
       <path
         d={lap}
         fill="none"
         stroke="var(--track-line)"
-        strokeWidth={TRACK + 3}
+        strokeWidth={track + 3}
         strokeLinejoin="round"
       />
       <path
         d={lap}
         fill="none"
         stroke="var(--tarmac-lane)"
-        strokeWidth={TRACK}
+        strokeWidth={track}
         strokeLinejoin="round"
       />
       <path
@@ -430,6 +431,20 @@ const TrackArt = memo(function TrackArt({
         strokeDasharray="10 14"
         opacity={0.7}
       />
+      {/* Kerbs: red and white, along the track's edge at each corner */}
+      {kerbs.map((k) => (
+        <g key={k.key}>
+          <path d={k.d} fill="none" stroke="#f3f4f2" strokeWidth={3.2} strokeLinecap="butt" />
+          <path
+            d={k.d}
+            fill="none"
+            stroke="#d63a2f"
+            strokeWidth={3.2}
+            strokeDasharray="3 3"
+            strokeLinecap="butt"
+          />
+        </g>
+      ))}
       {/* Start/finish: a chequered band */}
       <g transform={`translate(${sx},${sy}) rotate(${startAngle})`}>
         {Array.from({ length: 10 }, (_, i) =>
@@ -437,9 +452,9 @@ const TrackArt = memo(function TrackArt({
             <rect
               key={`${i}-${col}`}
               x={-4 + col * 4}
-              y={-TRACK / 2 + i * (TRACK / 10)}
+              y={-track / 2 + i * (track / 10)}
               width={4}
-              height={TRACK / 10}
+              height={track / 10}
               fill={(i + col) % 2 ? '#151A1D' : '#f3f4f2'}
             />
           )),
@@ -595,6 +610,14 @@ export function TrackMap({
   const line = useMemo(() => polyline(outline.points), [outline]);
   const lane = useMemo(() => pitLane(outline, line, TRACK), [outline, line]);
   const ground = useMemo(() => groundFor(model.race.id), [model.race.id]);
+  // Over real ground the track is drawn nearer its real width (about 30 m, so the barriers and
+  // run-off beside it show); never thinner than reads at a glance, nor wider than before.
+  const track = useMemo(() => {
+    if (!ground) return TRACK;
+    const [a, b, c, d] = ground.matrix;
+    const unitsPerMetre = Math.sqrt(Math.abs(a * d - b * c));
+    return Math.min(TRACK, Math.max(12, 30 * unitsPerMetre));
+  }, [ground]);
   const garages = useMemo(
     () =>
       garagesFor(
@@ -781,7 +804,7 @@ export function TrackMap({
     if (!side) return [0, 0];
     const k = Math.min(1, (d + 0.06) / 0.02) * Math.min(1, (0.02 - d) / 0.01);
     const [nx, ny] = normalAt(line, at);
-    const w = TRACK * 0.28 * (code === userSide ? side : -side) * k;
+    const w = track * 0.28 * (code === userSide ? side : -side) * k;
     return [nx * w, ny * w];
   };
 
@@ -804,6 +827,7 @@ export function TrackMap({
         userTeam={race.cars[userSide]?.team}
         rivalTeam={race.cars[rival]?.team}
         ground={ground}
+        track={track}
       />
       {/* Shade over the ground too, beyond the outline's box. */}
       {dim && (
@@ -826,7 +850,7 @@ export function TrackMap({
           opacity={0.3}
         />
       )}
-      {battle && <BattleLines line={line} battle={battle} glyph={glyph} />}
+      {battle && <BattleLines line={line} battle={battle} glyph={glyph} track={track} />}
       {sc && (
         <g transform={`translate(${sc[0].toFixed(1)},${sc[1].toFixed(1)})`}>
           <rect x={-15} y={-9} width={30} height={18} rx={4} fill="var(--flag)" />
