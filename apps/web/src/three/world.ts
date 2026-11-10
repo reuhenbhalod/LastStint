@@ -314,6 +314,38 @@ export async function buildWorld(s: Scenery, maxAniso: number): Promise<World> {
   (su.mieDirectionalG as THREE.IUniform).value = 0.82;
   (su.sunPosition as THREE.IUniform).value.copy(sunDir);
   scene.add(sky);
+  // a cloud deck: heavy at Spa, scattered elsewhere, thin at dusk
+  {
+    const cover = { overcast: 0.38, afternoon: 0.58, summer: 0.66, dusk: 0.62 }[s.light];
+    const nz = tileNoise(512, 4, 5, 77);
+    const c = canvasOf(512, (_x, _y, k) => {
+      const v = n(nz, k);
+      const a = Math.min(1, Math.max(0, (v - cover) / 0.16));
+      const shade = 236 - (1 - a) * 30;
+      return [shade, shade, shade + 4, a * 235];
+    });
+    const t = keep(new THREE.CanvasTexture(c));
+    t.wrapS = t.wrapT = THREE.RepeatWrapping;
+    t.repeat.set(5, 5);
+    t.colorSpace = THREE.SRGBColorSpace;
+    const deck = new THREE.Mesh(
+      keep(new THREE.PlaneGeometry(60000, 60000)),
+      keep(
+        new THREE.MeshBasicMaterial({
+          map: t,
+          transparent: true,
+          depthWrite: false,
+          side: THREE.DoubleSide,
+          color: s.light === 'dusk' ? 0xf0b896 : 0xffffff,
+          opacity: s.light === 'overcast' ? 0.95 : 0.8,
+        }),
+      ),
+    );
+    deck.rotation.x = -Math.PI / 2;
+    deck.position.set(SX / 2, 1900, SZ / 2);
+    deck.renderOrder = -1;
+    scene.add(deck);
+  }
   scene.fog = new THREE.FogExp2(L.haze, 0.115 / radius);
   const hemi = new THREE.HemisphereLight(0xdfe9f4, 0x5a5f45, L.hemi);
   scene.add(hemi);
