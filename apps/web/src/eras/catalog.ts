@@ -209,7 +209,7 @@ const RACE_TABLE: Record<number, ReadonlyArray<readonly [string, string]>> = {
     ],
     [
       'singapore-2014',
-      'After the safety car Hamilton still owes a stop for the harder tyre: how long can he push to build the gap, while Vettel tries to run his softs to the flag?',
+      'Second behind Hamilton, who still owes a stop on the harder tyre: make two stops last on the softs, or take a third under the safety car?',
     ],
     [
       'abu-dhabi-2015',

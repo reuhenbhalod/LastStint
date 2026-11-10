@@ -276,6 +276,30 @@ Jolpica unless marked.
 | Did the side win? | Hamilton: yes, so no rewrite. Vettel: no (2nd), rewrite allowed. The side should come from `pipeline hard-calls`. | Jolpica-r | |
 | Risk | Medium. The race ended on the two-hour limit (60 of 61 laps), the SC lap differs by one between sources (30 vs 31), first-stop compounds are not in sources, and Rosberg's pit-lane start is listed as grid 2 in Jolpica. | WP, GPE, Jolpica-r | |
 
+### Authored (B1, Nov 9 2026, branch `eras-author-singapore-2014`)
+
+Played as **Vettel**, not the draft's Hamilton: `pipeline hard-calls singapore-2014` gives
+**VET 1, HAM 0** (chance given up VET 66.0 pts, HAM 4.0), the same on the authored model. Robust
+G1 (Eras build, authored overlay): **pass**, 0.76 s (0.85 s on the rules-only overlay).
+Moments (`author singapore-2014 --target position:2 --eras --write`): rivalpit-13, pace-17,
+pace-21, stop-25, sc-31, battle-37. Graded on a win, every option is 0-12% except under the
+safety car (32-50%), so the target is a position (owner-accepted pattern), with the win as the
+rewrite. Reachability: pass at era difficulty (78, Standard+) and at Legend (90, Expert); the
+stay-out path never earns a star. The best path stops under the safety car, so mastery is
+counterfactual (three stops; the real car made two, and staying out at sc-31 grades red).
+
+| Item | Authored | Basis | Owner checked |
+|---|---|---|---|
+| Side | Vettel (`userSide` VET, rival HAM), by hard calls | `pipeline hard-calls` | |
+| Target | `position` P2: Vettel's real finish | Jolpica-r | |
+| Did the side win? | No (2nd, +13.534 s), so a rewrite is allowed: `win`, headline "Vettel beats Hamilton under the Marina Bay lights" (original wording) | Jolpica-r | |
+| Storyline | Hamilton leads from pole; Rosberg, from the pit lane, retires; Vettel stops twice, the second time onto the softs to the flag; debris SC on lap 30 while Hamilton still owes a stop on the harder tyre; he builds a 25 s gap, rejoins just behind Vettel and passes him a lap later; Vettel second, 13.5 s behind | Jolpica-r, Jolpica-p, WP, MS, GPE (rows above: Grid, Grid penalties, Safety car, Hamilton stops, final-stop gap, Vettel stops, Result) | |
+| Briefing | Takeover lap 9 (model), Vettel P2 behind Hamilton at takeover (model), Rosberg from the pit lane, Hamilton still to use the harder tyre | Model `stateAtTakeover`; WP, GPE; MS | |
+| Mastery | `stop_count` exactly 3, "Take second on three stops" (counterfactual: one more than the real two) | Jolpica-p | |
+| Hidden | `mode_rule` no push laps, "Finish second without a single push lap" | game objective, no fact | |
+| storylineEvents | the lap-31 SC (model lap; sources lap 30/31) | WP, MS, GPE | |
+| Spec / catalog | Dilemma reworded for Vettel's side; spec §4 target now `position: Vettel holds P2 (rewrite: beat Hamilton)` | | |
+
 ## brazil-2014 (2014 Brazilian Grand Prix)
 
 Replaces `canada-2014` in Era 7 #2.
