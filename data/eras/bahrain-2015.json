@@ -7,5 +7,35 @@
     "drs": true,
     "ers": "hybrid",
     "refuelling": false
+  },
+  "eras": {
+    "eraId": 7,
+    "order": 8,
+    "userSide": "RAI",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Hamilton leads from pole. Räikkönen, fourth after ten laps, stops last of the top four each time: mediums in the middle stint, softs for the last 17 laps. He closes on the Mercedes by more than a second a lap, passes Rosberg when his brakes fail two laps from the end, and finishes second, 3.380 s behind Hamilton.",
+      "rewriteCondition": {
+        "type": "win"
+      },
+      "headline": "Räikkönen's late softs catch Hamilton in Bahrain"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 2,
+      "label": "Win on two stops, as Räikkönen made"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 3,
+      "label": "Win by more than 3 seconds"
+    },
+    "hardCalls": {
+      "RAI": 1,
+      "ROS": 0
+    },
+    "briefing": "Bahrain, 2015. Hamilton leads from pole; you run Räikkönen fourth, 8 s behind him after ten laps, with Rosberg and Vettel between you. All four of you are on softs. Ferrari can run against the grain: stop later than the Mercedes and save the fast tyres for the end."
   }
 }

@@ -105,6 +105,48 @@ busy") on every try and is not used. OpenF1 has no 2015 data.
 - Gap between Räikkönen and Hamilton at the moment of the lap-40 pass (only lap-sum gaps from Jolpica-L).
 - Whether the Rosberg brake-by-wire failure lost a measurable amount of time beyond the place.
 
+### Authored (B1, Nov 9 2026)
+
+Content in `data/eras/bahrain-2015.json`, moments in `data/moments/bahrain-2015.json`. Every
+row rests on a fact in the table above (the rows named there) or on the timing ("Timing":
+TUM f1-timing-database @ 9eaad9c in `data/raw/bahrain-2015.parquet`, CC BY-NC-SA 3.0, gaps at
+the end of a lap). The storyline, headline and briefing are original wording; no radio is
+quoted.
+
+| Item | Value | Fact it rests on | Source | Owner checked |
+|---|---|---|---|---|
+| Side | RAI (hard calls RAI 1, ROS 0; `pipeline hard-calls`) | the grader, not a fact | - | |
+| Target | `win` (spec §4 draft: "win: Räikkönen from P4") | Räikkönen 2nd, +3.380 s | Result row | |
+| Rewrite | `rewriteCondition` win; headline "Räikkönen's late softs catch Hamilton in Bahrain" | the side did not really win | Result row | |
+| Storyline | "Hamilton leads from pole" | pole 1:32.571; "Hamilton led away" | Grid, Start rows | |
+| Storyline | "Räikkönen, fourth after ten laps" | HAM, ROS, VET, RAI P1-P4 at the end of lap 10 | Timing | |
+| Storyline | "stops last of the top four each time: mediums in the middle stint, softs for the last 17 laps" | soft-medium-soft, in-laps 17 and 40 (laps 41-57 on softs); "last of the top four to stop each time" | Stops: Räikkönen row | |
+| Storyline | "He closes on the Mercedes by more than a second a lap" | "closing by more than a second a lap" (on Rosberg) | Räikkönen's charge row (WP) | |
+| Storyline | "passes Rosberg when his brakes fail two laps from the end" | Rosberg's brake-by-wire failed into Turn 1 two laps from the end; Räikkönen passed him | Mercedes brakes row (MS, AS-B) | |
+| Storyline | "finishes second, 3.380 s behind Hamilton" | Räikkönen +3.380 | Result row | |
+| Briefing | "you run Räikkönen fourth, 8 s behind him after ten laps, with Rosberg and Vettel between you" | RAI 8.05 s behind HAM at the end of lap 10; ROS P2, VET P3 (takeover lap 11, D3 rule) | Timing | |
+| Briefing | "All four of you are on softs" | compound SOFT for HAM, ROS, VET, RAI on lap 10; all four started soft | Timing; Stops rows (MS) | |
+| Briefing | "Ferrari can run against the grain: stop later than the Mercedes and save the fast tyres for the end" | the dilemma (catalog line); Räikkönen last to stop, softs for the final stint | Stops: Räikkönen row | |
+| Mastery | `stop_count` exact 2: "Win on two stops, as Räikkönen made" | two stops (in-laps 17, 40) | Jolpica-P | |
+| Hidden | `margin` 3 s: "Win by more than 3 seconds" | the game's choice, near Hamilton's real 3.380 s margin | Result row | |
+| storylineEvents | none | no SC, VSC or red flag in the race; the built model's only events are SAI (lap 30) and VER (lap 37) retirements, which don't touch the story | SC row; Retirements row | |
+
+Model and checks:
+
+- Robust G1 (`pipeline validate bahrain-2015 --robust`, Eras build on `eras-swap-era7`): pass
+  (strict), mean gap error 0.71 s, with the rules-only overlay and with the full eras block.
+- Moments (`pnpm --filter @laststint/sim author bahrain-2015 --target win --eras --write`):
+  rivalpit-14, stop-17, pace-23, rivalpit-34, stop-40. Win chances are low throughout (best
+  options 15-21%), as in the real race.
+- Reachability (`pnpm --filter @laststint/sim reachability bahrain-2015`): pass at era
+  difficulty (threshold 78, Standard+ rival) and at Legend (90, Expert rival); all three stars and
+  the hidden objective on seed 3, on Räikkönen's real line (stay at 14, mediums at 17, stay at
+  34, softs at 40). Stay-out never earns ★1 or ★3.
+- Not modelled: Rosberg's lap-56 brake failure, Hamilton's last-lap brake loss and Vettel's
+  lap-36 wing damage have no FAULT events. Robust G1 passes without them.
+- `data/races/bahrain-2015.json` and its golden are rebuilt by the integrator
+  (`pipeline build bahrain-2015`); this branch does not commit them.
+
 ## abu-dhabi-2015 (2015 Abu Dhabi Grand Prix)
 
 Replaces `hungary-2015` in Era 7 #5.

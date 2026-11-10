@@ -1003,8 +1003,8 @@ RACES: dict[str, dict] = {
         "era": "2014-2025",
         "takeover_lap": None,  # D3 rule
         "seed": 1,
-        # Swapped in for monaco-2016 (swap-races-era7-overnight.md). Side provisional until
-        # `pipeline hard-calls`.
+        # Swapped in for monaco-2016 (swap-races-era7-overnight.md). Eras side by hard calls
+        # (RAI 1, ROS 0): Räikkönen chases the win from P4 (real: P2, +3.380 s).
         "user_side": "RAI",
         "rival": "ROS",
         "score_positions": 6,
