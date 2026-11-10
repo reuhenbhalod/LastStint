@@ -266,8 +266,14 @@ const RACE_TABLE: Record<number, ReadonlyArray<readonly [string, string]>> = {
       'great-britain-2007',
       'Two-stopping at Silverstone with fuel deciding the order: short-fill Alonso to jump Räikkönen at the first stops, or run long like Ferrari and win it at the second?',
     ],
-    ['europe-2007', 'Rain chaos at the Nürburgring'],
-    ['brazil-2007', 'Three-way title decider'],
+    [
+      'belgium-2009',
+      "Stuck a second behind a KERS Ferrari he can't pass on track, Fisichella's team must decide whether to keep mirroring Ferrari's stops or split the strategy to jump him in the pits",
+    ],
+    [
+      'hungary-2007',
+      'Stuck a second behind the leader at a track with no overtaking, Räikkönen must pick his fuel at the shared first stop: run short and try to jump him at the second stops, or take more and hope he stays out longer',
+    ],
     [
       'bahrain-2006',
       'Schumacher pits first on lap 36; Renault can keep Alonso out three more laps on a lighter tank and gamble that the overcut puts him ahead at pit exit',

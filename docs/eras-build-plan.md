@@ -548,8 +548,8 @@ The **Needs** column is from race history and must be checked against the data f
 | 5 | `france-2007` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
 | 5 | `san-marino-2006` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
 | 5 | `great-britain-2007` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
-| 5 | `europe-2007` | Jolpica + f1db (est. compounds, fuel) | R1 red flag, R3 wet pre-2018, R4 refuel, P4 map |  |
-| 5 | `brazil-2007` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
+| 5 | `belgium-2009` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
+| 5 | `hungary-2007` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
 | 5 | `bahrain-2006` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
 | 5 | `turkey-2008` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
 | 5 | `malaysia-2006` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
