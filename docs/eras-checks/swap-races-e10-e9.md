@@ -192,6 +192,21 @@ taken as the in-lap below; the others are recorded for the owner.
 | Side really won? | Yes, Hamilton won, so no rewrite. (If the hard-call counter picks Leclerc, the target would be `defend`; he really lost, so a rewrite would apply.) | |
 | Modelling risk | **High.** Red flag on lap 1-3 with a standing restart and a free tyre change (avoidable if the takeover lap is after the restart); a 10 s time penalty served at the stop that decides the strategy; a team order (Bottas, lap 40); the win comes from a pass on lap 50 of 52, final gap 3.871 s; Leclerc's intermittent engine problem; lap-1 contact (possible Hamilton damage unconfirmed). No rain. The SC was before the red flag, so no SC restart decides the result. | |
 
+### Authoring (B1, Nov 9)
+
+| Item | What was done | Owner checked |
+|---|---|---|
+| Red flag | `data/redflags/great-britain-2021.json`: flag lap 2, standing restart. The race's FastF1 timing has the red status ('5', session time 3938.8 s) inside the leader's (LEC) lap 2, and the cars enter the pit lane at the end of it. Sources' laps 1 / 2 / 3 are recorded in its `note` and in `r1-red-flags.md`. The file confirms what the timing already holds: the race file is byte-identical with and without it. Robust G1 after it: pass, 1.34 s; after the team order and the eras block: pass, 1.14 s. | |
+| Takeover | Lap 24 (D3 rule), after the standing restart (lap 3/4). Order at the end of lap 24 (timing): LEC, HAM +2.4 s, SAI, BOT, NOR, ALO; LEC and HAM on 22-lap-old mediums. | |
+| Side | `pipeline hard-calls`: HAM 0, LEC 0 (tie); chance given up HAM 10.3 pts, LEC 45.0, so **Leclerc**. Unlike south-africa-1983, nothing sourced stands against the Leclerc side (his engine problem was managed, not a retirement). **Owner: please confirm Leclerc.** | |
+| Target | `defend` (win from the lead). Leclerc really finished 2nd, so a rewrite applies (`rewriteCondition: defend`). Draft headline is original. | |
+| Mastery / hidden | Win on exactly one stop (the real plan was one stop) / win by more than 3 s (the real margin was -3.871 s). | |
+| Team order | Bottas lets Hamilton by on lap 40 (`data/incidents.json` TEAM_ORDER, `m4-scripted-events.md`). Timing: HAM ahead of BOT from the end of lap 40. | |
+| Penalty | Hamilton's 10 s is already in his stop: the race file's real stop (lap 28 in its numbering, Jolpica's in-lap 27) loses 33.1 s against the track's 19.4 s pit loss, so no extra event. | |
+| storylineEvents | None. The only post-takeover events are the team order and Vettel's lap-41 retirement, neither part of the story. | |
+| Moments | The author tool (`--target win --eras`) picked `stop-29` + three pace calls, but its "stay out" at lap 29 cancels Leclerc's only real stop: the grader then plays a legal planner stop (97%), while the race itself runs no stop (two-compound disqualification), so reachability failed. Hand-adjusted to the tool's own `rivalpit-27` candidate (the lap before Hamilton's stop) with honest options: stay out (the real plan: hards at the end of lap 29, Jolpica; lap 30 in the race file; graded 34-44%, red), box now on softs or hards, or box on lap 31 / lap 34 on softs (89-92%), then `pace-32`, `pace-36`, `pace-40` as authored. The soft options come from the model only; no source read says Ferrari considered softs. | |
+| Reachability | Era (standard rival, threshold 72): reachable on seed 2 (box on lap 34 on softs). Legend (expert, 90): reachable on seed 3. Stay-out never earns 3 stars (no result star on any seed). | |
+
 ## Notes for the owner
 
 - **Target counts** (spec §6) with the draft targets above: `win` 37 to 38 (styria-2021 and
