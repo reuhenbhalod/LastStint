@@ -200,7 +200,7 @@ function Lobby({
               onClick={onStart}
               className="rounded-xl bg-[var(--box)] px-8 py-4 text-[18px] font-bold text-white shadow-[0_10px_40px_-12px_var(--box)] hover:brightness-110 disabled:opacity-60"
             >
-              {busy ? 'Dealing the first race…' : 'Start a run →'}
+              {busy ? 'Dealing the first race…' : 'Start a run'}
             </button>
             <span className="text-[13px] text-[var(--muted)]">Play as many runs as you like.</span>
           </div>
@@ -356,7 +356,7 @@ function Between({
         onClick={onNext}
         className="rounded-xl bg-[var(--you)] px-10 py-4 text-[18px] font-bold text-[var(--you-ink)] hover:brightness-110"
       >
-        Next race →
+        Next race
       </button>
     </section>
   );
@@ -390,7 +390,7 @@ function Over({
           onClick={onAgain}
           className="rounded-xl bg-[var(--box)] px-10 py-4 text-[18px] font-bold text-white hover:brightness-110"
         >
-          Start a new run →
+          Start a new run
         </button>
       </section>
       {run.history.length > 0 && (
