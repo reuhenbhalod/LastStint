@@ -7,5 +7,36 @@
     "drs": false,
     "ers": "none",
     "refuelling": true
+  },
+  "eras": {
+    "eraId": 4,
+    "order": 1,
+    "userSide": "SCH",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Ralf Schumacher starts from pole and leads the first 19 laps, his tyres graining in the first stint. He stops on lap 20 and keeps his front tyres; Michael stops a lap later and comes out ahead. Ralf changes only the rears again at his second stop and loses time in traffic. He finishes second, 0.784 s behind his brother, with Montoya third.",
+      "rewriteCondition": {
+        "type": "win"
+      },
+      "headline": "Ralf beats his brother to the flag in Montreal"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 2,
+      "label": "Win on two stops"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "manage",
+      "maxLaps": 0,
+      "label": "Win without a lap managing the tyres"
+    },
+    "hardCalls": {
+      "MSCM": 0,
+      "SCH": 0
+    },
+    "briefing": "Montreal, 2003. You run Ralf Schumacher's Williams from pole, leading after 17 laps, 1.0 s ahead of your brother's Ferrari and with Montoya 8.7 s further back. Your tyres are graining. Michael will stop a lap after you. Keep him behind and win."
   }
 }
