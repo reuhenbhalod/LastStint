@@ -103,8 +103,8 @@ interface Battle {
   shown: boolean;
 }
 
-/** Where the TV camera choice is kept. */
-const TV_KEY = 'pitwall.tv-camera';
+/** Where the follow camera choice is kept. */
+const FOLLOW_KEY = 'pitwall.follow-camera';
 
 /** How often the standings follow the map while the lap runs. */
 const LIVE_MS = 400;
@@ -617,21 +617,21 @@ export function RaceScreen({
   // which shrinks to make room. On a phone the stats are tabs in the control bar.
   type Panel = 'radio' | 'plan' | 'car' | 'calls' | 'log' | 'standings';
   const [stats, setStats] = useState(false);
-  // The map's TV camera (kept for the next race on this device).
-  const [tv, setTv] = useState(() => {
+  // The map's follow camera (kept for the next race on this device).
+  const [follow, setFollow] = useState(() => {
     try {
-      return localStorage.getItem(TV_KEY) === 'on';
+      return localStorage.getItem(FOLLOW_KEY) === 'on';
     } catch {
       return false;
     }
   });
-  const toggleTv = () => {
+  const toggleFollow = () => {
     try {
-      localStorage.setItem(TV_KEY, tv ? 'off' : 'on');
+      localStorage.setItem(FOLLOW_KEY, follow ? 'off' : 'on');
     } catch {
       // private mode: the choice lasts this page only
     }
-    setTv(!tv);
+    setFollow(!follow);
   };
   // The calls, the dock and the control bar float over the map's lower edge; the circuit's
   // frame stays above them (nothing sits on the track), so their height is measured.
@@ -1050,7 +1050,7 @@ export function RaceScreen({
                       dim={paused}
                       finishing={finishMeta}
                       battle={battleView}
-                      tv={tv}
+                      follow={follow}
                       ahead={ahead}
                       flash={flash}
                       userBox={userBox}
@@ -1187,10 +1187,10 @@ export function RaceScreen({
               {outline && (
                 <button
                   type="button"
-                  aria-pressed={tv}
-                  title={tv ? 'Back to the whole lap' : 'Trackside cameras on your car'}
-                  onClick={toggleTv}
-                  className={pill(tv)}
+                  aria-pressed={follow}
+                  title={follow ? 'Back to the whole lap' : 'Move with your car'}
+                  onClick={toggleFollow}
+                  className={pill(follow)}
                 >
                   <svg
                     aria-hidden="true"
@@ -1206,7 +1206,7 @@ export function RaceScreen({
                     <rect x="2" y="7" width="14" height="11" rx="2" />
                     <path d="M16 11l6-3v9l-6-3" />
                   </svg>
-                  TV camera
+                  Follow car
                 </button>
               )}
               <button
