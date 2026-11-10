@@ -292,7 +292,7 @@ pinned version; tests run on cached fixtures only.
 
 ## Phase 3: Races, wave A (10%)
 
-The 35 races in the appendix that need **no new sim model** (Needs column: "none", "wet model
+The 38 races in the appendix that need **no new sim model** (Needs column: "none", "wet model
 (exists)" or "P4 map" only).
 
 **3.1 Build and validate (8%)**
@@ -331,7 +331,7 @@ for every existing race.
 
 ## Phase 5: Races, wave B (13%)
 
-**5.1 Build and validate the other 65 races (11%)**
+**5.1 Build and validate the other 62 races (11%)**
 - As in 3.1, as each race's models from phase 4 land.
 - Reconstructed races are checked on their anchors (eras spec §4) instead of G1.
 - **Done when:** every race in the appendix is pass, or flagged to the owner with a diagnosis.
@@ -524,14 +524,14 @@ The **Needs** column is from race history and must be checked against the data f
 | 8 | `turkey-2020` | Jolpica (est. compounds, SC) | wet model (exists) |  |
 | 8 | `sakhir-2020` | Jolpica (est. compounds, SC) | none |  |
 | 7 | `bahrain-2014` | TUM | P4 map |  |
-| 7 | `canada-2014` | TUM | R2 fault, P4 map |  |
-| 7 | `hungary-2014` | TUM | R3 wet pre-2018, P4 map |  |
-| 7 | `monaco-2015` | TUM | P4 map |  |
-| 7 | `hungary-2015` | TUM | P4 map |  |
+| 7 | `brazil-2014` | TUM | P4 map |  |
+| 7 | `canada-2016` | TUM | P4 map |  |
+| 7 | `singapore-2014` | TUM | P4 map |  |
+| 7 | `abu-dhabi-2015` | TUM | P4 map |  |
 | 7 | `united-states-2015` | TUM | R3 wet pre-2018, P4 map |  |
 | 7 | `spain-2016` | TUM | P4 map |  |
-| 7 | `monaco-2016` | TUM | P4 map |  |
-| 7 | `great-britain-2016` | TUM | R3 wet pre-2018, P4 map |  |
+| 7 | `bahrain-2015` | TUM | P4 map |  |
+| 7 | `malaysia-2015` | TUM | P4 map |  |
 | 7 | `abu-dhabi-2016` | TUM | P4 map |  |
 | 6 | `australia-2010` | Jolpica + F1DB stops (est. compounds) | R3 wet pre-2018, P4 map |  |
 | 6 | `abu-dhabi-2010` | Jolpica + F1DB stops (est. compounds) | P4 map |  |

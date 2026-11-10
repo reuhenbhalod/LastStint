@@ -325,6 +325,33 @@
  "abu-dhabi-2022": [],
  "emilia-romagna-2024": [],
  "netherlands-2021": [],
+ "bahrain-2015": [],
+ "abu-dhabi-2015": [],
+ "singapore-2014": [
+  {
+   "lap": 31,
+   "type": "SC",
+   "cars": [
+    "SUT",
+    "PER"
+   ],
+   "status": "Debris",
+   "source": "https://en.wikipedia.org/wiki/2014_Singapore_Grand_Prix",
+   "note": "Debris after Sutil and P\u00e9rez touched at Turn 8 (P\u00e9rez's front wing broke). Wikipedia puts the SC out on lap 30, GrandPrix.com on lap 31 (https://www.grandprix.com/races/singapore-gp-2014-race-notes-hamilton-wins-signapore-gp.html); the built model has it from lap 31, 7 laps, in at the end of lap 37 as in Wikipedia and Motor Sport"
+  }
+ ],
+ "brazil-2014": [],
+ "canada-2016": [
+  {
+   "lap": 11,
+   "type": "VSC",
+   "driver": "BUT",
+   "status": "Power Unit",
+   "source": "https://www.motorsportmagazine.com/reports/f1/2016-canadian-grand-prix/",
+   "note": "The VSC was for Button's McLaren engine failure (Motor Sport says lap 10; Jolpica: 9 laps, status Power Unit). The built model has a one-lap VSC on lap 11; its end lap is not in the sources"
+  }
+ ],
+ "malaysia-2015": [],
  "great-britain-2021": [
   {
    "lap": 40,

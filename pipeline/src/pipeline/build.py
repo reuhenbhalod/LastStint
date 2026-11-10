@@ -950,6 +950,96 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
+    "bahrain-2015": {
+        "year": 2015,
+        "event": "Bahrain",
+        "source": "tum",
+        "name": "Bahrain 2015: Räikkönen vs Rosberg",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for monaco-2016 (swap-races-era7-overnight.md). Side provisional until
+        # `pipeline hard-calls`.
+        "user_side": "RAI",
+        "rival": "ROS",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "abu-dhabi-2015": {
+        "year": 2015,
+        "event": "Abu Dhabi",
+        "source": "tum",
+        "name": "Abu Dhabi 2015: Hamilton vs Rosberg",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for hungary-2015 (swap-races-era7-overnight.md). Side provisional until
+        # `pipeline hard-calls`.
+        "user_side": "HAM",
+        "rival": "ROS",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "singapore-2014": {
+        "year": 2014,
+        "event": "Singapore",
+        "source": "tum",
+        "name": "Singapore 2014: Hamilton vs Vettel",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for monaco-2015 (swap-races-era7-overnight.md). Side provisional until
+        # `pipeline hard-calls`.
+        "user_side": "HAM",
+        "rival": "VET",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "brazil-2014": {
+        "year": 2014,
+        "event": "Brazil",
+        "source": "tum",
+        "name": "Brazil 2014: Hamilton vs Rosberg",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for canada-2014 (swap-races-era7-overnight.md). Side provisional until
+        # `pipeline hard-calls`.
+        "user_side": "HAM",
+        "rival": "ROS",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "canada-2016": {
+        "year": 2016,
+        "event": "Canada",
+        "source": "tum",
+        "name": "Canada 2016: Vettel vs Hamilton",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for hungary-2014 (swap-races-era7-overnight.md). Side provisional until
+        # `pipeline hard-calls`.
+        "user_side": "VET",
+        "rival": "HAM",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "malaysia-2015": {
+        "year": 2015,
+        "event": "Malaysia",
+        "source": "tum",
+        "name": "Malaysia 2015: Vettel vs Hamilton",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for great-britain-2016 (swap-races-era7-overnight.md). Side provisional until
+        # `pipeline hard-calls`.
+        "user_side": "VET",
+        "rival": "HAM",
+        "score_positions": 6,
+        "split": "eras",
+    },
     # Eras wave A (Eras build plan 3.1c): Era 6 races and sakhir-2020 from the Jolpica dump
     # (`pipeline jolpica`; CC BY-NC-SA, credit in data/raw/<id>.jolpica.json), with F1DB stops
     # before 2011 and estimated compounds and SC laps (data/estimates/<id>.sc.json, for the

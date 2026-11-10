@@ -4,8 +4,8 @@
 // before 2011, a team order, the decision timer running out and the untimed opt-out, Legend,
 // reconstructed races with pit-board prompts (Eras 1-2), an avoidable storyline retirement
 // (repeated and avoided), the history book and a leaderboard. No authored race has a red flag
-// or a car fault yet, so those two are played on the catalog's Draft races that do (italy-2020,
-// canada-2014), as test mode serves them.
+// or a car fault of its own yet, so those two are played on the catalog's Draft races that do
+// (italy-2020, hungary-1997), as test mode serves them.
 //
 // Each test plays a whole race at five times the normal lap speed (the app's e2e hook); the
 // tests run in parallel. Runtime: see docs/eras-build-plan.md step 10.1.
@@ -167,24 +167,21 @@ test('Era 7: Abu Dhabi 2016 from the map to the results', async ({ page }) => {
   expect(eras.submissions).toHaveLength(1);
 });
 
-test('Era 7 (Draft): Canada 2014’s car faults', async ({ page }) => {
-  const model = loadEraRace('canada-2014');
+test('Era 3 (Draft): Hungary 1997’s stuck gearbox', async ({ page }) => {
+  const model = loadEraRace('hungary-1997');
   await mockEras(page, [model]);
-  await openRace(page, 'canada-2014');
-  // Rosberg's own call on the radio when the power goes (engineerRadio.ts FAULT_LINES).
-  const lost = 'I’ve lost power! Something’s up with the engine.';
-  const radio = watchRadio(page, [lost]);
+  await openRace(page, 'hungary-1997');
+  // Hill's own call on the radio when the gearbox sticks (engineerRadio.ts FAULT_LINES).
+  const stuck = 'The gearbox is stuck in one gear! I’m losing loads.';
+  const radio = watchRadio(page, [stuck]);
   await playRace(page, { each: radio.each });
-  expect(radio.seen.get(lost), 'the fault line in the radio log').toMatch(/^L37 · Rosberg/);
-  // Both Mercedes lose power on their real laps; Rosberg is yours.
+  expect(radio.seen.get(stuck), 'the fault line in the radio log').toMatch(/^L74 · Hill/);
+  // The hydraulics fault strikes on its real lap; Hill is yours.
   const faults = (await raceNotes(page)).filter((n) => n.kind === 'fault');
   expect(faults).toContainEqual(
-    expect.objectContaining({ driver: 'ROS', lap: 37, detail: 'power-loss' }),
+    expect.objectContaining({ driver: 'HIL', lap: 74, detail: 'gear-stuck' }),
   );
-  expect(faults).toContainEqual(
-    expect.objectContaining({ driver: 'HAM', lap: 36, detail: 'power-loss' }),
-  );
-  await resultsFor(page, 7);
+  await resultsFor(page, 3);
 });
 
 test('Era 6: Abu Dhabi 2010 at Legend, no DRS', async ({ page }) => {

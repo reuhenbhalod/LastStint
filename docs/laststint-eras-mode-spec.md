@@ -96,14 +96,14 @@ Players start at Era 10 and move back through the timeline to Era 1. The eras be
 | # | Race ID | Dilemma | Target (draft) |
 |---|---|---|---|
 | 1 | bahrain-2014 | Hamilton vs Rosberg, the Duel in the Desert | defend: Hamilton holds off Rosberg |
-| 2 | canada-2014 | Both Mercedes have power failures | defend: Rosberg nurses a failing car to the win |
-| 3 | hungary-2014 | Safety car chaos | beat-rival: Hamilton from the pit lane, ahead of Rosberg |
-| 4 | monaco-2015 | Mercedes' unnecessary stop costs Hamilton the win | defend: Hamilton holds P1 |
-| 5 | hungary-2015 | Chaos, Vettel wins | win: Vettel takes the lead |
+| 2 | brazil-2014 | Stay out to overcut your team-mate on fading rears, or pit with him and fight on track? | win: Hamilton from P2, ahead of Rosberg |
+| 3 | canada-2016 | A virtual safety car hands Ferrari a cheap stop from the lead: take it and commit to two, or stay out and trust the tyres to last in the cold? | win: Vettel beats Hamilton |
+| 4 | singapore-2014 | After the safety car Hamilton still owes a stop for the harder tyre: how long can he push to build the gap, while Vettel tries to run his softs to the flag? | defend: Hamilton wins from pole |
+| 5 | abu-dhabi-2015 | Second to your team-mate: stretch the softs, or skip the last stop and gamble on Rosberg's tyres fading? | beat-rival: Hamilton ahead of Rosberg |
 | 6 | united-states-2015 | Hamilton clinches the title in mixed conditions | beat-rival: Hamilton ahead of Rosberg and Vettel for the title |
 | 7 | spain-2016 | Mercedes cars collide; Red Bull's split strategy | defend: Verstappen holds off Räikkönen |
-| 8 | monaco-2016 | The tyres aren't ready at Ricciardo's stop | defend: Ricciardo holds P1 |
-| 9 | great-britain-2016 | A wet start that dries: when to switch tyres, Verstappen vs Rosberg | position: Verstappen on the podium |
+| 8 | bahrain-2015 | Ferrari runs Räikkönen against the grain: mediums in the middle, then a late sprint on softs to reel in the Mercedes | win: Räikkönen from P4 |
+| 9 | malaysia-2015 | Vettel stayed out under the early safety car and leads: make two stops last on a 60-degree track while Mercedes, on hards, stops three times | win: Vettel from P2 |
 | 10 | abu-dhabi-2016 | Hamilton backs Rosberg into the pack | deny: Hamilton keeps Rosberg P4 or lower |
 
 ### Era 6: Fast-wearing tyres (2010–2013) · play order 5
@@ -241,9 +241,9 @@ Every race has one target, set in `eras.target`. Each race's draft target is in 
 
 | Type | Means | Grader `Target` | Races (draft) |
 |---|---|---|---|
-| `win` | Chase down the win from behind | `win` | 37 |
-| `defend` | Start in the lead and keep it to the flag | `win`, starting from P1 | 25 |
-| `position` | Reach a set position, such as P3 to win the title | `position` | 21 |
+| `win` | Chase down the win from behind | `win` | 40 |
+| `defend` | Start in the lead and keep it to the flag | `win`, starting from P1 | 23 |
+| `position` | Reach a set position, such as P3 to win the title | `position` | 20 |
 | `beat-rival` | Finish ahead of a named car, wherever that is | `beat-rival` | 10 |
 | `team` | A team result, such as a 1–2 in a set order | `team` (new) | 4 |
 | `deny` | Keep a rival at or below a set position, such as out of the top 3 to stop their title | `deny` (new) | 3 |
