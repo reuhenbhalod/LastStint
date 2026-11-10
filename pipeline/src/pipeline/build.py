@@ -2104,14 +2104,14 @@ RACES: dict[str, dict] = {
         "year": 2001,
         "event": "Austrian",
         "source": "jolpica",
-        "name": "Austria 2001: Coulthard vs Schumacher",
+        "name": "Austria 2001: Coulthard vs Barrichello",
         "era": "1994-2009",
         "takeover_lap": None,  # D3 rule
         "seed": 1,
         # Swapped in for hungary-2003 (swap-races-era4-overnight.md). Side provisional until
         # `pipeline hard-calls`.
         "user_side": "COU",
-        "rival": "MSCM",
+        "rival": "BAR",
         "score_positions": 6,
         "split": "eras",
     },
