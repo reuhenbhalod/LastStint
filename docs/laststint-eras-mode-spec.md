@@ -61,7 +61,7 @@ Players start at Era 10 and move back through the timeline to Era 1. The eras be
 | 6 | emilia-romagna-2024 | Imola's one-stop chess: pit first to chase the leader, or stretch the mediums and trust the hards to the flag | win: Norris beats Verstappen |
 | 7 | hungary-2024 | McLaren team orders | team: McLaren 1–2 |
 | 8 | belgium-2023 | Verstappen wins from sixth after a gearbox penalty | win: Verstappen from P6 |
-| 9 | saudi-arabia-2023 | From 15th on the grid, Verstappen has to time his only stop and chase down his own team-mate | win: Verstappen from P15 |
+| 9 | saudi-arabia-2023 | From 15th on the grid, Verstappen has to time his only stop and chase down his own team-mate | position: Verstappen P2 or better (rewrite: the win) |
 | 10 | abu-dhabi-2022 | Second in the title on strategy: Pérez's mediums grain while Ferrari stretches Leclerc's stint | beat-rival: Leclerc ahead of Pérez |
 
 ### Era 9: The 2021 title fight · play order 2
@@ -241,9 +241,9 @@ Every race has one target, set in `eras.target`. Each race's draft target is in 
 
 | Type | Means | Grader `Target` | Races (draft) |
 |---|---|---|---|
-| `win` | Chase down the win from behind | `win` | 38 |
+| `win` | Chase down the win from behind | `win` | 37 |
 | `defend` | Start in the lead and keep it to the flag | `win`, starting from P1 | 24 |
-| `position` | Reach a set position, such as P3 to win the title | `position` | 21 |
+| `position` | Reach a set position, such as P3 to win the title | `position` | 22 |
 | `beat-rival` | Finish ahead of a named car, wherever that is | `beat-rival` | 10 |
 | `team` | A team result, such as a 1–2 in a set order | `team` (new) | 4 |
 | `deny` | Keep a rival at or below a set position, such as out of the top 3 to stop their title | `deny` (new) | 3 |
