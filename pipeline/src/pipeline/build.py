@@ -1553,8 +1553,8 @@ RACES: dict[str, dict] = {
         "era": "2014-2025",
         "takeover_lap": None,  # D3 rule
         "seed": 1,
-        # Swapped in for monaco-2025 (swap-races-e10-e9-b.md). Side provisional until
-        # `pipeline hard-calls`: Leclerc's one stop against Pérez's two (real: LEC P2, PER P3).
+        # Swapped in for monaco-2025 (swap-races-e10-e9-b.md). Hard calls LEC 1, PER 0:
+        # Leclerc's one stop against Pérez's two (real: LEC P2, PER P3).
         "user_side": "LEC",
         "rival": "PER",
         "score_positions": 6,

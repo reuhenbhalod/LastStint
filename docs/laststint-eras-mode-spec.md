@@ -62,7 +62,7 @@ Players start at Era 10 and move back through the timeline to Era 1. The eras be
 | 7 | hungary-2024 | McLaren team orders | team: McLaren 1–2 |
 | 8 | belgium-2023 | Verstappen wins from sixth after a gearbox penalty | win: Verstappen from P6 |
 | 9 | australia-2025 | Wet-dry chaos | defend: Norris holds P1 |
-| 10 | abu-dhabi-2022 | Second in the title on strategy: Pérez's mediums grain while Ferrari stretches Leclerc's stint | beat-rival: Pérez ahead of Leclerc |
+| 10 | abu-dhabi-2022 | Second in the title on strategy: Pérez's mediums grain while Ferrari stretches Leclerc's stint | beat-rival: Leclerc ahead of Pérez |
 
 ### Era 9: The 2021 title fight · play order 2
 | # | Race ID | Dilemma | Target (draft) |

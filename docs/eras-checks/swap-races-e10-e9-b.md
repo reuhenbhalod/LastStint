@@ -281,6 +281,36 @@ Note: round 17 in Jolpica is Qatar. Japan 2023 is **round 16** (Jolpica-r confir
 | Suggested side and target | Pérez: `beat-rival` Leclerc (finish ahead of him). He finished 3rd, 1.3 s behind, so he did not really win the fight; a rewrite is allowed. If Leclerc is picked: `defend` P2 from Pérez; he really did it, so no rewrite. `win` is a poor fit (Verstappen +8.8 s, unchallenged). | |
 | Modelling risk | **Medium.** For: dry, clear, no SC/VSC/red flag reported, no contact or damage among the top three, few stops, and the sim check passed (0.54 s). Against: the decisive margin is 1.3 s, so small pace or traffic errors flip the outcome; Pérez's loss depends on graining (not true wear), traffic from lapped cars and Yas Marina's difficulty of passing, which the sim may not reproduce; sources disagree on Pérez's first-stop compound and stop laps (Jolpica 15/33 vs GPE 16/34); the no-SC claim rests on absence in reports, not on track-status data. | |
 
+### Authored (B1, Nov 9)
+
+Side picked by `pipeline hard-calls abu-dhabi-2022` (Eras build): **LEC 1, PER 0** (chance given
+up: LEC 0.0 pts, PER 29.0), so the player runs **Leclerc**, not the draft's Pérez (this matches
+the build entry's provisional `user_side`). Leclerc really finished ahead of Pérez, so there is
+no rewrite (no `rewriteCondition` / headline). No SC, VSC or red flag in any source, so no
+`storylineEvents` (the three real retirements, Alonso, Hamilton and Latifi, stay in every run,
+Legend included). Moments (`author abu-dhabi-2022 --target beat-rival --eras`, graded against
+Pérez): stop-21 (box for hards, the real call, 73% green; stay out 66% orange), pace-32, pace-44,
+pace-48; takeover lap 12 (Leclerc third). Robust G1 re-run on this Eras build: pass, 0.54 s.
+
+Compound names: the build estimates two compounds from the timing data (Jolpica has none) and
+labels them SOFT (option) and HARD (prime); the sources say Leclerc started on mediums and
+changed to hards. The authored text names no compound.
+
+| Item | Authored text / value | Facts used (rows above) | Owner checked |
+|---|---|---|---|
+| Target | `beat-rival` Pérez | Result (Leclerc 2nd, Pérez 3rd) | |
+| Storyline (real) | "Verstappen wins from pole. Pérez stops first, on lap 15; Leclerc runs six laps longer and makes only one stop. Red Bull switches Pérez to a second stop, and on fresher tyres he closes in over the last laps, but Leclerc holds second by 1.3 s and takes second in the championship, three points ahead of him." | Grid; Pérez stops (lap 15, two stops); Leclerc stops (one stop, about six laps longer); Why the strategies split (switch to two stops); Pace (faster on his last hards, 1.7 s behind on lap 57); Result (1.3 s; 308 vs 305) | |
+| Mastery | `stop_count` exact 1, "Beat Pérez on one stop, as Leclerc did" | Leclerc stops (one stop) | |
+| Hidden | `mode_rule` manage, 0 laps, "Beat Pérez without a single lap of tyre management" (game goal, not a fact) | none | |
+| Briefing | "Yas Marina, 2022, the season finale. Verstappen leads from pole and Pérez runs second. You run Leclerc's Ferrari in third, and second place in the championship is between you and Pérez. Finish ahead of him." | Laps (final round); Grid (VER pole); Gaps to Verstappen (lap 10: PER 2nd, LEC 3rd); Result (championship 2nd/3rd) | |
+| Reachability | Era (threshold 70, standard rival) and Legend (90, expert): reachable; stay-out never earns 3 stars. | `pnpm --filter @laststint/sim reachability abu-dhabi-2022` | |
+
+**Knife-edge result:** the 3-star path (box for hards at lap 21, then push) beats Pérez only on
+seed 3 of the checker's three seeds, at the era's difficulty and at Legend; on seeds 1 and 2
+Pérez finishes ahead whatever the answers. The real margin was 1.3 s, so a run often goes either
+way. A first draft hidden goal, "without a single push lap", was dropped: every 3-star path
+pushes (push grades green late in the race, standard yellow to orange).
+
 ## netherlands-2021 (2021 Dutch Grand Prix)
 
 **Lap counting:** the sources count pit laps differently. GPE notes and the MS race report give
