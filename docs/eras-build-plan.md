@@ -221,7 +221,7 @@ its registry `user_side` is re-registered for that side and rebuilt.
 
 **Shared races (decided Nov 7).** A race in Eras and in the Daily or Gauntlet pool
 (`data/pools.json`: today abu-dhabi-2021, bahrain-2021, france-2021, hungary-2019 and
-russia-2021) keeps its Daily race file and hash unchanged forever. Its Eras content stays in its
+russia-2021 from Daily, and portugal-2021 from the Gauntlet, swapped in Nov 9) keeps its Daily race file and hash unchanged forever. Its Eras content stays in its
 overlay, which is never baked into `data/races/<id>.json`:
 - `pipeline build` leaves a pool race's overlay out of its race file (`build.shared_races`; the
   report says so). A pool race with estimated fields can't take an overlay `provenance`, since
@@ -235,7 +235,7 @@ overlay, which is never baked into `data/races/<id>.json`:
   `GET /api/races/:id` and the Daily hash use the race file alone.
 - Parity vectors keep the two merges equal (`pipeline/tests/fixtures/eras_overlay_parity.json`,
   regenerated with `REGEN_OVERLAY_VECTORS=1`). `apps/worker/test/eras-shared.test.ts` replays
-  them and pins the five Daily hashes and their Eras hashes.
+  them and pins the shared races' Daily and Gauntlet hashes and their Eras hashes.
 - Editing a shared race's overlay changes its Eras hash only. Attempts started before the edit
   are refused at submit (409 `model-changed`), as for a rebuilt Eras-only race.
 
@@ -292,7 +292,7 @@ pinned version; tests run on cached fixtures only.
 
 ## Phase 3: Races, wave A (10%)
 
-The 35 races in the appendix that need **no new sim model** (Needs column: "none", "wet model
+The 43 races in the appendix that need **no new sim model** (Needs column: "none", "wet model
 (exists)" or "P4 map" only).
 
 **3.1 Build and validate (8%)**
@@ -331,7 +331,7 @@ for every existing race.
 
 ## Phase 5: Races, wave B (13%)
 
-**5.1 Build and validate the other 65 races (11%)**
+**5.1 Build and validate the other 57 races (11%)**
 - As in 3.1, as each race's models from phase 4 land.
 - Reconstructed races are checked on their anchors (eras spec §4) instead of G1.
 - **Done when:** every race in the appendix is pass, or flagged to the owner with a diagnosis.
@@ -507,16 +507,16 @@ The **Needs** column is from race history and must be checked against the data f
 | 9 | `styria-2021` | built | none |  |
 | 9 | `azerbaijan-2021` | Jolpica (est. compounds, SC) | R1 red flag, R2 fault |  |
 | 9 | `france-2021` | built (Daily) | none |  |
-| 9 | `hungary-2021` | FastF1 cache | R1 red flag, wet model (exists) |  |
+| 9 | `portugal-2021` | built (Gauntlet) | none |  |
 | 9 | `russia-2021` | built (Daily) | wet model (exists) |  |
 | 9 | `turkey-2021` | Jolpica (est. compounds, SC) | wet model (exists) |  |
 | 9 | `netherlands-2021` | Jolpica (est. compounds, SC) | none |  |
 | 9 | `great-britain-2021` | FastF1 cache | R1 red flag |  |
 | 9 | `abu-dhabi-2021` | built (Daily) | none |  |
-| 8 | `monaco-2017` | TUM | P4 map |  |
-| 8 | `azerbaijan-2017` | TUM | R1 red flag, P4 map |  |
+| 8 | `australia-2017` | TUM | none |  |
+| 8 | `australia-2018` | TUM | none |  |
 | 8 | `germany-2018` | TUM | wet model (exists) |  |
-| 8 | `russia-2018` | TUM | none |  |
+| 8 | `spain-2017` | TUM | none |  |
 | 8 | `germany-2019` | TUM | wet model (exists) |  |
 | 8 | `hungary-2019` | built (Daily) | none |  |
 | 8 | `brazil-2019` | TUM | none |  |
@@ -524,45 +524,45 @@ The **Needs** column is from race history and must be checked against the data f
 | 8 | `turkey-2020` | Jolpica (est. compounds, SC) | wet model (exists) |  |
 | 8 | `sakhir-2020` | Jolpica (est. compounds, SC) | none |  |
 | 7 | `bahrain-2014` | TUM | P4 map |  |
-| 7 | `canada-2014` | TUM | R2 fault, P4 map |  |
-| 7 | `hungary-2014` | TUM | R3 wet pre-2018, P4 map |  |
-| 7 | `monaco-2015` | TUM | P4 map |  |
-| 7 | `hungary-2015` | TUM | P4 map |  |
+| 7 | `brazil-2014` | TUM | P4 map |  |
+| 7 | `canada-2016` | TUM | P4 map |  |
+| 7 | `singapore-2014` | TUM | P4 map |  |
+| 7 | `abu-dhabi-2015` | TUM | P4 map |  |
 | 7 | `united-states-2015` | TUM | R3 wet pre-2018, P4 map |  |
 | 7 | `spain-2016` | TUM | P4 map |  |
-| 7 | `monaco-2016` | TUM | P4 map |  |
-| 7 | `great-britain-2016` | TUM | R3 wet pre-2018, P4 map |  |
+| 7 | `bahrain-2015` | TUM | P4 map |  |
+| 7 | `malaysia-2015` | TUM | P4 map |  |
 | 7 | `abu-dhabi-2016` | TUM | P4 map |  |
-| 6 | `australia-2010` | Jolpica + F1DB stops (est. compounds) | R3 wet pre-2018, P4 map |  |
+| 6 | `bahrain-2012` | Jolpica (est. compounds) | P4 map |  |
 | 6 | `abu-dhabi-2010` | Jolpica + F1DB stops (est. compounds) | P4 map |  |
 | 6 | `china-2011` | Jolpica (est. compounds) | P4 map |  |
-| 6 | `monaco-2011` | Jolpica (est. compounds) | R1 red flag, P4 map |  |
-| 6 | `canada-2011` | Jolpica (est. compounds) | R1 red flag, R3 wet pre-2018, P4 map |  |
+| 6 | `italy-2010` | Jolpica + F1DB stops (est. compounds) | P4 map |  |
+| 6 | `australia-2013` | Jolpica (est. compounds) | P4 map |  |
 | 6 | `europe-2012` | Jolpica (est. compounds) | P4 map |  |
 | 6 | `abu-dhabi-2012` | Jolpica (est. compounds) | P4 map |  |
 | 6 | `brazil-2012` | Jolpica (est. compounds) | R3 wet pre-2018, P4 map |  |
 | 6 | `malaysia-2013` | Jolpica (est. compounds) | R3 wet pre-2018, P4 map |  |
 | 6 | `spain-2013` | Jolpica (est. compounds) | P4 map |  |
 | 5 | `san-marino-2005` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
-| 5 | `japan-2005` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
-| 5 | `hungary-2006` | Jolpica + f1db (est. compounds, fuel) | R3 wet pre-2018, R4 refuel, P4 map |  |
-| 5 | `brazil-2006` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
-| 5 | `china-2007` | Jolpica + f1db (est. compounds, fuel) | R3 wet pre-2018, R4 refuel, P4 map |  |
+| 5 | `europe-2009` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
+| 5 | `france-2007` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
+| 5 | `san-marino-2006` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
+| 5 | `great-britain-2007` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
 | 5 | `europe-2007` | Jolpica + f1db (est. compounds, fuel) | R1 red flag, R3 wet pre-2018, R4 refuel, P4 map |  |
 | 5 | `brazil-2007` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
-| 5 | `monaco-2008` | Jolpica + f1db (est. compounds, fuel) | R2 fault, R4 refuel, P4 map |  |
-| 5 | `brazil-2008` | Jolpica + f1db (est. compounds, fuel) | R3 wet pre-2018, R4 refuel, P4 map |  |
-| 5 | `brazil-2009` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
-| 4 | `germany-2000` | Jolpica + f1db (est. compounds, fuel) | R3 wet pre-2018, R4 refuel, P4 map |  |
+| 5 | `bahrain-2006` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
+| 5 | `turkey-2008` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
+| 5 | `malaysia-2006` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
+| 4 | `canada-2003` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
 | 4 | `japan-2000` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
-| 4 | `malaysia-2001` | Jolpica + f1db (est. compounds, fuel) | R3 wet pre-2018, R4 refuel, P4 map |  |
+| 4 | `san-marino-2000` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
 | 4 | `austria-2002` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
-| 4 | `brazil-2003` | Jolpica + f1db (est. compounds, fuel) | R1 red flag, R3 wet pre-2018, R4 refuel, P4 map |  |
-| 4 | `hungary-2003` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
-| 4 | `united-states-2003` | Jolpica + f1db (est. compounds, fuel) | R3 wet pre-2018, R4 refuel, P4 map |  |
-| 4 | `japan-2003` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
+| 4 | `hungary-2001` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
+| 4 | `austria-2001` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
+| 4 | `france-2001` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
+| 4 | `italy-2001` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
 | 4 | `france-2004` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
-| 4 | `monaco-2004` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
+| 4 | `san-marino-2003` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
 | 3 | `spain-1994` | Reconstruct (real stops) | R2 fault, R4 refuel, P3 solver, P4 map |  |
 | 3 | `australia-1994` | Reconstruct (real stops) | R4 refuel, P3 solver, P4 map |  |
 | 3 | `belgium-1995` | Reconstruct (real stops) | R3 wet pre-2018, R4 refuel, P3 solver, P4 map |  |
@@ -570,9 +570,9 @@ The **Needs** column is from race history and must be checked against the data f
 | 3 | `hungary-1997` | Jolpica + F1DB stops (est. fuel) | R4 refuel, P4 map |  |
 | 3 | `europe-1997` | Jolpica + F1DB stops (est. fuel) | R4 refuel, P4 map |  |
 | 3 | `hungary-1998` | Jolpica + F1DB stops (est. fuel) | R4 refuel, P4 map |  |
-| 3 | `belgium-1998` | Jolpica + F1DB stops (est. fuel) | R1 red flag, R3 wet pre-2018, R4 refuel, P4 map |  |
-| 3 | `malaysia-1999` | Jolpica + F1DB stops (est. fuel) | R4 refuel, P4 map |  |
-| 3 | `europe-1999` | Jolpica + F1DB stops (est. fuel) | R3 wet pre-2018, R4 refuel, P4 map |  |
+| 3 | `germany-1996` | Jolpica + F1DB stops (est. fuel) | R4 refuel, P4 map |  |
+| 3 | `germany-1997` | Jolpica + F1DB stops (est. fuel) | R4 refuel, P4 map |  |
+| 3 | `san-marino-1999` | Jolpica + F1DB stops (est. fuel) | R4 refuel, P4 map |  |
 | 2 | `france-1990` | Reconstruct | P3 solver, P4 map |  |
 | 2 | `united-states-1990` | Reconstruct | P3 solver, P4 map |  |
 | 2 | `mexico-1990` | Reconstruct | P3 solver, P4 map |  |

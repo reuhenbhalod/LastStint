@@ -1,0 +1,263 @@
+[
+  {
+    "id": "rivalpit-14",
+    "lap": 14,
+    "trigger": "rivalPit",
+    "target": {
+      "kind": "win"
+    },
+    "options": [
+      {
+        "id": "stay",
+        "label": "Stay out",
+        "decisions": []
+      },
+      {
+        "id": "box-soft",
+        "label": "Box, softs",
+        "decisions": [
+          {
+            "lap": 14,
+            "kind": "pit",
+            "compound": "SOFT"
+          }
+        ]
+      },
+      {
+        "id": "box-medium",
+        "label": "Box, mediums",
+        "decisions": [
+          {
+            "lap": 14,
+            "kind": "pit",
+            "compound": "MEDIUM"
+          }
+        ]
+      },
+      {
+        "id": "box-next-medium",
+        "label": "Box next lap, mediums",
+        "decisions": [
+          {
+            "lap": 15,
+            "kind": "pit",
+            "compound": "MEDIUM"
+          }
+        ]
+      }
+    ],
+    "realOptionId": "stay"
+  },
+  {
+    "id": "stop-17",
+    "lap": 17,
+    "trigger": "cliff",
+    "target": {
+      "kind": "win"
+    },
+    "options": [
+      {
+        "id": "stay",
+        "label": "Stay out",
+        "decisions": []
+      },
+      {
+        "id": "box-soft",
+        "label": "Box, softs",
+        "decisions": [
+          {
+            "lap": 17,
+            "kind": "pit",
+            "compound": "SOFT"
+          }
+        ]
+      },
+      {
+        "id": "box-medium",
+        "label": "Box, mediums",
+        "decisions": [
+          {
+            "lap": 17,
+            "kind": "pit",
+            "compound": "MEDIUM"
+          }
+        ]
+      },
+      {
+        "id": "box-next-medium",
+        "label": "Box next lap, mediums",
+        "decisions": [
+          {
+            "lap": 18,
+            "kind": "pit",
+            "compound": "MEDIUM"
+          }
+        ]
+      }
+    ],
+    "realOptionId": "box-medium"
+  },
+  {
+    "id": "pace-23",
+    "lap": 23,
+    "trigger": "cliff",
+    "target": {
+      "kind": "win"
+    },
+    "options": [
+      {
+        "id": "push",
+        "label": "Push now",
+        "decisions": [
+          {
+            "lap": 23,
+            "kind": "mode",
+            "key": "pace",
+            "value": "push"
+          }
+        ]
+      },
+      {
+        "id": "standard",
+        "label": "Standard pace",
+        "decisions": [
+          {
+            "lap": 23,
+            "kind": "mode",
+            "key": "pace",
+            "value": "standard"
+          }
+        ]
+      },
+      {
+        "id": "manage",
+        "label": "Manage the tyres",
+        "decisions": [
+          {
+            "lap": 23,
+            "kind": "mode",
+            "key": "pace",
+            "value": "manage"
+          }
+        ]
+      },
+      {
+        "id": "push-attack",
+        "label": "Push and attack",
+        "decisions": [
+          {
+            "lap": 23,
+            "kind": "mode",
+            "key": "pace",
+            "value": "push"
+          },
+          {
+            "lap": 23,
+            "kind": "mode",
+            "key": "battle",
+            "value": "attack"
+          }
+        ]
+      }
+    ],
+    "realOptionId": null
+  },
+  {
+    "id": "rivalpit-34",
+    "lap": 34,
+    "trigger": "rivalPit",
+    "target": {
+      "kind": "win"
+    },
+    "options": [
+      {
+        "id": "stay",
+        "label": "Stay out",
+        "decisions": []
+      },
+      {
+        "id": "box-soft",
+        "label": "Box, softs",
+        "decisions": [
+          {
+            "lap": 34,
+            "kind": "pit",
+            "compound": "SOFT"
+          }
+        ]
+      },
+      {
+        "id": "box-medium",
+        "label": "Box, mediums",
+        "decisions": [
+          {
+            "lap": 34,
+            "kind": "pit",
+            "compound": "MEDIUM"
+          }
+        ]
+      },
+      {
+        "id": "box-next-medium",
+        "label": "Box next lap, mediums",
+        "decisions": [
+          {
+            "lap": 35,
+            "kind": "pit",
+            "compound": "MEDIUM"
+          }
+        ]
+      }
+    ],
+    "realOptionId": "stay"
+  },
+  {
+    "id": "stop-40",
+    "lap": 40,
+    "trigger": "cliff",
+    "target": {
+      "kind": "win"
+    },
+    "options": [
+      {
+        "id": "stay",
+        "label": "Stay out",
+        "decisions": []
+      },
+      {
+        "id": "box-soft",
+        "label": "Box, softs",
+        "decisions": [
+          {
+            "lap": 40,
+            "kind": "pit",
+            "compound": "SOFT"
+          }
+        ]
+      },
+      {
+        "id": "box-medium",
+        "label": "Box, mediums",
+        "decisions": [
+          {
+            "lap": 40,
+            "kind": "pit",
+            "compound": "MEDIUM"
+          }
+        ]
+      },
+      {
+        "id": "box-next-medium",
+        "label": "Box next lap, mediums",
+        "decisions": [
+          {
+            "lap": 41,
+            "kind": "pit",
+            "compound": "MEDIUM"
+          }
+        ]
+      }
+    ],
+    "realOptionId": "box-soft"
+  }
+]

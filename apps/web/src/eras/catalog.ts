@@ -160,7 +160,10 @@ const RACE_TABLE: Record<number, ReadonlyArray<readonly [string, string]>> = {
     ],
     ['azerbaijan-2021', 'Tyre failure, then the restart'],
     ['france-2021', "Red Bull's two-stop beats Hamilton"],
-    ['hungary-2021', 'Hamilton alone on the grid at the restart'],
+    [
+      'portugal-2021',
+      'Leading on worn mediums with Verstappen in the mirrors: stop for hards before Red Bull tries the undercut, or stretch the stint',
+    ],
     ['russia-2021', 'Norris stays on slicks as the rain arrives'],
     ['turkey-2021', 'Hamilton argues against pitting'],
     [
@@ -174,10 +177,19 @@ const RACE_TABLE: Record<number, ReadonlyArray<readonly [string, string]>> = {
     ['abu-dhabi-2021', 'The finale'],
   ],
   8: [
-    ['monaco-2017', 'Ferrari overcuts Vettel past Räikkönen'],
-    ['azerbaijan-2017', 'Red flag chaos'],
+    [
+      'australia-2017',
+      "Hamilton's ultrasofts fade into Verstappen's traffic: cover his stop, or stay out and overcut",
+    ],
+    [
+      'australia-2018',
+      'Run long behind the early stoppers and bank on a neutralisation to jump the leader',
+    ],
     ['germany-2018', 'Vettel crashes in the rain; Hamilton stays out from 14th'],
-    ['russia-2018', 'Bottas told to let Hamilton through'],
+    [
+      'spain-2017',
+      'A late virtual safety car with the lead: box now for the slower tyre, or stay out and risk the cheap stop behind',
+    ],
     ['germany-2019', 'Rain and constant tyre swaps'],
     ['hungary-2019', 'Mercedes switches to two stops to catch Verstappen'],
     ['brazil-2019', 'Late safety car chaos'],
@@ -187,22 +199,49 @@ const RACE_TABLE: Record<number, ReadonlyArray<readonly [string, string]>> = {
   ],
   7: [
     ['bahrain-2014', 'Hamilton vs Rosberg, the Duel in the Desert'],
-    ['canada-2014', 'Both Mercedes have power failures'],
-    ['hungary-2014', 'Safety car chaos'],
-    ['monaco-2015', "Mercedes' unnecessary stop costs Hamilton the win"],
-    ['hungary-2015', 'Chaos, Vettel wins'],
+    [
+      'brazil-2014',
+      'Stay out to overcut your team-mate on fading rears, or pit with him and fight on track?',
+    ],
+    [
+      'canada-2016',
+      'A virtual safety car hands Ferrari a cheap stop from the lead: take it and commit to two, or stay out and trust the tyres to last in the cold?',
+    ],
+    [
+      'singapore-2014',
+      'Second behind Hamilton, who still owes a stop on the harder tyre: make two stops last on the softs, or take a third under the safety car?',
+    ],
+    [
+      'abu-dhabi-2015',
+      "Second to your team-mate: stretch the softs, or skip the last stop and gamble on Rosberg's tyres fading?",
+    ],
     ['united-states-2015', 'Hamilton clinches the title in mixed conditions'],
     ['spain-2016', "Mercedes cars collide; Red Bull's split strategy"],
-    ['monaco-2016', "The tyres aren't ready at Ricciardo's stop"],
-    ['great-britain-2016', 'A wet start that dries: when to switch tyres, Verstappen vs Rosberg'],
+    [
+      'bahrain-2015',
+      'Ferrari runs Räikkönen against the grain: mediums in the middle, then a late sprint on softs to reel in the Mercedes',
+    ],
+    [
+      'malaysia-2015',
+      'Vettel stayed out under the early safety car and leads: make two stops last on a 60-degree track while Mercedes, on hards, stops three times',
+    ],
     ['abu-dhabi-2016', 'Hamilton backs Rosberg into the pack'],
   ],
   6: [
-    ['australia-2010', "Button's early switch to slicks"],
+    [
+      'bahrain-2012',
+      "Räikkönen closes in on Lotus' fresher softs: cover the undercut at the last stop, or trust Red Bull's own plan",
+    ],
     ['abu-dhabi-2010', 'Ferrari covers the wrong car and loses the title'],
     ['china-2011', "Hamilton's three stops beat Vettel's two"],
-    ['monaco-2011', "Vettel's long final stint, saved by a red flag"],
-    ['canada-2011', 'Button from last to first in four hours of rain'],
+    [
+      'italy-2010',
+      'Button blinks first: does Alonso stay out one more lap and trust his crew to win it in the pit lane?',
+    ],
+    [
+      'australia-2013',
+      'Lotus is kind to its tyres: stretch Räikkönen to two stops while the Ferraris and Red Bulls stop three times',
+    ],
     ['europe-2012', 'Alonso wins from 11th in Valencia'],
     ['abu-dhabi-2012', 'Vettel from the pit lane to the podium'],
     ['brazil-2012', 'Vettel recovers from a first-lap spin to win the title'],
@@ -211,27 +250,69 @@ const RACE_TABLE: Record<number, ReadonlyArray<readonly [string, string]>> = {
   ],
   5: [
     ['san-marino-2005', 'Alonso holds off Schumacher'],
-    ['japan-2005', 'Räikkönen from 17th to win'],
-    ['hungary-2006', "Button's first win, in the rain"],
-    ['brazil-2006', 'Alonso protects the title'],
-    ['china-2007', 'McLaren leaves Hamilton out on worn tyres'],
+    [
+      'europe-2009',
+      "Hamilton leads on the lighter tank while Barrichello's longer-fuelled Brawn keeps closing: box now and cover him, or stretch the stint and risk losing the lead in the pits?",
+    ],
+    [
+      'france-2007',
+      'Two seconds behind team-mate Massa with lapped cars ahead, Räikkönen must choose: box when Massa does, or stretch the stint three laps longer and jump him at the second stops',
+    ],
+    [
+      'san-marino-2006',
+      'Glued to a grip-starved Ferrari on a track where nobody passes, does Renault gamble on stopping a lap early, or wait for Schumacher to blink?',
+    ],
+    [
+      'great-britain-2007',
+      'Two-stopping at Silverstone with fuel deciding the order: short-fill Alonso to jump Räikkönen at the first stops, or run long like Ferrari and win it at the second?',
+    ],
     ['europe-2007', 'Rain chaos at the Nürburgring'],
     ['brazil-2007', 'Three-way title decider'],
-    ['monaco-2008', "Hamilton's puncture stop turns into a win"],
-    ['brazil-2008', 'Glock on dry tyres in the rain, last-corner title'],
-    ['brazil-2009', 'Button clinches the title from 14th'],
+    [
+      'bahrain-2006',
+      'Schumacher pits first on lap 36; Renault can keep Alonso out three more laps on a lighter tank and gamble that the overcut puts him ahead at pit exit',
+    ],
+    [
+      'turkey-2008',
+      "A tyre warning forces Hamilton onto three stops: can a light McLaren build enough of a gap to beat Massa's two-stop Ferrari?",
+    ],
+    [
+      'malaysia-2006',
+      'Stuck with a heavy tank after a fuel mistake in qualifying, Alonso starts 7th: how long can Renault stretch the first stint, and how little fuel is enough at the last stop to come out ahead of Button?',
+    ],
   ],
   4: [
-    ['germany-2000', 'Barrichello stays on slicks in the rain'],
+    [
+      'canada-2003',
+      'Fading brakes and one more lap of fuel than his brother: stop a lap after Ralf to jump him, then hold off three cars inside five seconds',
+    ],
     ['japan-2000', 'A pit stop decides the title'],
-    ['malaysia-2001', "Ferrari's double stop in a downpour"],
+    [
+      'san-marino-2000',
+      'Ferrari takes the bigger fill at the first stop and bets that four extra laps on a light car will jump the McLaren at the second',
+    ],
     ['austria-2002', 'Team orders on the final lap'],
-    ['brazil-2003', 'Red flag chaos'],
-    ['hungary-2003', "Alonso's first win on Renault's fuel strategy"],
-    ['united-states-2003', 'The rain tyre gamble'],
-    ['japan-2003', 'Schumacher needs one point'],
+    [
+      'hungary-2001',
+      'A Ferrari is backing you into the pack on a track with no passing: stay out longer or stop shorter to break free, knowing a slow fuel rig can undo it',
+    ],
+    [
+      'austria-2001',
+      'Coulthard has saved fuel from P7: stay out three laps longer than the Ferrari and hope the lighter car makes the overcut stick',
+    ],
+    [
+      'france-2001',
+      "Pole on Michelins with a three-second lead: stop when the plan says, or stretch the stint before your brother's Ferrari jumps you in the pits",
+    ],
+    [
+      'italy-2001',
+      "Ferrari runs light on two stops to escape Montoya's one-stop Williams, but a slow first fill hands back most of the margin",
+    ],
     ['france-2004', "Ferrari's four-stop strategy"],
-    ['monaco-2004', 'A safety car shapes the stops'],
+    [
+      'san-marino-2003',
+      'From sixth in a slower McLaren, on a track with no overtaking: run long on two stops while the Ferraris and Williams sprint on three',
+    ],
   ],
   3: [
     ['spain-1994', 'Schumacher stuck in fifth gear'],
@@ -241,9 +322,18 @@ const RACE_TABLE: Record<number, ReadonlyArray<readonly [string, string]>> = {
     ['hungary-1997', "Hill's Arrows almost wins"],
     ['europe-1997', 'The title decider at Jerez'],
     ['hungary-1998', 'Ferrari switches to three stops mid-race'],
-    ['belgium-1998', "Rain, a mass crash, Jordan's first win"],
-    ['malaysia-1999', "Ferrari team orders for Irvine's title push"],
-    ['europe-1999', "Rain chaos, Stewart's only win"],
+    [
+      'germany-1996',
+      'Boxed in behind the one-stopping Benettons: a short first stop for Hill to find clear air',
+    ],
+    [
+      'germany-1997',
+      'Two stops and a light car against a one-stopping Jordan: make the gap, then pass him again',
+    ],
+    [
+      'san-marino-1999',
+      'Coulthard runs one long stop; Ferrari switches Schumacher to two short ones and sprints, if the backmarkers allow',
+    ],
   ],
   2: [
     ['france-1990', "Capelli's Leyton House runs non-stop and leads; Prost closes in"],

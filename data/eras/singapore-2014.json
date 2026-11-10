@@ -1,0 +1,49 @@
+{
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": true,
+    "ers": "hybrid",
+    "refuelling": false
+  },
+  "eras": {
+    "eraId": 7,
+    "order": 4,
+    "userSide": "VET",
+    "target": {
+      "type": "position",
+      "position": 2
+    },
+    "storyline": {
+      "real": "Hamilton leads from pole, and Rosberg, who started from the pit lane, retires. Red Bull stop Vettel twice, the second time onto the softs to run to the flag. A safety car for debris comes out on lap 30 while Hamilton still owes a stop on the harder tyre; he builds a 25-second gap, rejoins just behind Vettel and passes him a lap later. Vettel finishes second, 13.5 s behind.",
+      "rewriteCondition": {
+        "type": "win"
+      },
+      "headline": "Vettel beats Hamilton under the Marina Bay lights"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 3,
+      "label": "Take second on three stops"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "push",
+      "maxLaps": 0,
+      "label": "Finish second without a single push lap"
+    },
+    "hardCalls": {
+      "VET": 1,
+      "HAM": 0
+    },
+    "briefing": "Marina Bay, 2014, under the lights, nine laps in. You run Vettel, second behind Hamilton; Rosberg started from the pit lane. Hamilton still has to run the harder tyre before the flag. Hold second, and be ready if the race turns."
+  },
+  "storylineEvents": [
+    [
+      31,
+      "SC"
+    ]
+  ]
+}

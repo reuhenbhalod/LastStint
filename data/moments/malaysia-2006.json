@@ -1,0 +1,220 @@
+[
+  {
+    "id": "stop-26",
+    "lap": 26,
+    "trigger": "cliff",
+    "target": {
+      "kind": "position",
+      "atBest": 2
+    },
+    "options": [
+      {
+        "id": "stay",
+        "label": "Stay out",
+        "decisions": []
+      },
+      {
+        "id": "box-medium",
+        "label": "Box, mediums",
+        "decisions": [
+          {
+            "lap": 26,
+            "kind": "pit",
+            "compound": "MEDIUM",
+            "fill": {
+              "laps": 17
+            }
+          }
+        ]
+      },
+      {
+        "id": "box-next-medium",
+        "label": "Box next lap, mediums",
+        "decisions": [
+          {
+            "lap": 27,
+            "kind": "pit",
+            "compound": "MEDIUM",
+            "fill": "standard"
+          }
+        ]
+      }
+    ],
+    "realOptionId": "box-medium"
+  },
+  {
+    "id": "pace-30",
+    "lap": 30,
+    "trigger": "cliff",
+    "target": {
+      "kind": "position",
+      "atBest": 2
+    },
+    "options": [
+      {
+        "id": "push",
+        "label": "Push now",
+        "decisions": [
+          {
+            "lap": 30,
+            "kind": "mode",
+            "key": "pace",
+            "value": "push"
+          }
+        ]
+      },
+      {
+        "id": "standard",
+        "label": "Standard pace",
+        "decisions": [
+          {
+            "lap": 30,
+            "kind": "mode",
+            "key": "pace",
+            "value": "standard"
+          }
+        ]
+      },
+      {
+        "id": "manage",
+        "label": "Manage the tyres",
+        "decisions": [
+          {
+            "lap": 30,
+            "kind": "mode",
+            "key": "pace",
+            "value": "manage"
+          }
+        ]
+      },
+      {
+        "id": "push-attack",
+        "label": "Push and attack",
+        "decisions": [
+          {
+            "lap": 30,
+            "kind": "mode",
+            "key": "pace",
+            "value": "push"
+          },
+          {
+            "lap": 30,
+            "kind": "mode",
+            "key": "battle",
+            "value": "attack"
+          }
+        ]
+      }
+    ],
+    "realOptionId": null
+  },
+  {
+    "id": "pace-34",
+    "lap": 34,
+    "trigger": "cliff",
+    "target": {
+      "kind": "position",
+      "atBest": 2
+    },
+    "options": [
+      {
+        "id": "push",
+        "label": "Push now",
+        "decisions": [
+          {
+            "lap": 34,
+            "kind": "mode",
+            "key": "pace",
+            "value": "push"
+          }
+        ]
+      },
+      {
+        "id": "standard",
+        "label": "Standard pace",
+        "decisions": [
+          {
+            "lap": 34,
+            "kind": "mode",
+            "key": "pace",
+            "value": "standard"
+          }
+        ]
+      },
+      {
+        "id": "manage",
+        "label": "Manage the tyres",
+        "decisions": [
+          {
+            "lap": 34,
+            "kind": "mode",
+            "key": "pace",
+            "value": "manage"
+          }
+        ]
+      },
+      {
+        "id": "push-attack",
+        "label": "Push and attack",
+        "decisions": [
+          {
+            "lap": 34,
+            "kind": "mode",
+            "key": "pace",
+            "value": "push"
+          },
+          {
+            "lap": 34,
+            "kind": "mode",
+            "key": "battle",
+            "value": "attack"
+          }
+        ]
+      }
+    ],
+    "realOptionId": null
+  },
+  {
+    "id": "stop-43",
+    "lap": 43,
+    "trigger": "cliff",
+    "target": {
+      "kind": "position",
+      "atBest": 2
+    },
+    "options": [
+      {
+        "id": "stay",
+        "label": "Stay out",
+        "decisions": []
+      },
+      {
+        "id": "box-medium",
+        "label": "Box, mediums",
+        "decisions": [
+          {
+            "lap": 43,
+            "kind": "pit",
+            "compound": "MEDIUM",
+            "fill": {
+              "laps": 13
+            }
+          }
+        ]
+      },
+      {
+        "id": "box-next-medium",
+        "label": "Box next lap, mediums",
+        "decisions": [
+          {
+            "lap": 44,
+            "kind": "pit",
+            "compound": "MEDIUM",
+            "fill": "standard"
+          }
+        ]
+      }
+    ],
+    "realOptionId": "box-medium"
+  }
+]

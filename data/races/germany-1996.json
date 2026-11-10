@@ -1,0 +1,916 @@
+{
+  "schemaVersion": 11,
+  "race": {
+    "id": "germany-1996",
+    "name": "Germany 1996: Hill vs Berger",
+    "laps": 45,
+    "takeoverLap": 17,
+    "seed": 1,
+    "scUnlap": "none"
+  },
+  "era": "1994-2009",
+  "track": {
+    "pitLoss": 22.29,
+    "pitLossUnderSC": 12.26,
+    "pitLossUnderVSC": 15.38,
+    "pitLossDeviations": [
+      -3.145,
+      -1.934,
+      -1.59,
+      -1.316,
+      -1.108,
+      -1.058,
+      -0.582,
+      -0.402,
+      -0.183,
+      0.0,
+      0.279,
+      0.406,
+      1.13,
+      1.486,
+      2.666,
+      3.602,
+      4.352,
+      4.47,
+      7.434
+    ],
+    "overtakeDifficulty": 0.9739,
+    "overtakeModel": {
+      "intercept": -0.9162,
+      "paceCoef": 0.8092,
+      "gapCoef": -4.1132,
+      "trainCoef": -0.0531
+    },
+    "dirtyAirPenalty": 0.2298,
+    "greenLapTime": 109.903,
+    "refuel": {
+      "secondsPerLap": 0.2529,
+      "laneBase": 24.941,
+      "refFill": 17.941,
+      "tankLaps": 24,
+      "stops": 17
+    }
+  },
+  "compounds": {
+    "MEDIUM": {
+      "offset": 0.0,
+      "degPerLap": 0.03501,
+      "cliffLap": 21,
+      "cliffDegPerLap": 0.5511,
+      "degQuad": 0.0001297,
+      "provenLaps": 24
+    }
+  },
+  "drivers": [
+    {
+      "code": "ALE",
+      "team": "Benetton",
+      "basePace": 108.9393,
+      "noise": 0.2612,
+      "stateAtTakeover": {
+        "position": 2,
+        "gapAhead": 1.869,
+        "compound": "MEDIUM",
+        "tyreAge": 17,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 23,
+          "to": "MEDIUM",
+          "loss": 23.674
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.298
+        },
+        {
+          "lap": 23,
+          "offset": 0.161
+        }
+      ]
+    },
+    {
+      "code": "BAR",
+      "team": "Jordan",
+      "basePace": 110.8259,
+      "noise": 0.4353,
+      "stateAtTakeover": {
+        "position": 6,
+        "gapAhead": 18.312,
+        "compound": "MEDIUM",
+        "tyreAge": 17,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 22,
+          "to": "MEDIUM",
+          "loss": 24.258
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.009
+        },
+        {
+          "lap": 22,
+          "offset": 0.095
+        }
+      ]
+    },
+    {
+      "code": "BER",
+      "team": "Benetton",
+      "basePace": 108.5695,
+      "noise": 0.2992,
+      "stateAtTakeover": {
+        "position": 1,
+        "gapAhead": 0.0,
+        "compound": "MEDIUM",
+        "tyreAge": 17,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 24,
+          "to": "MEDIUM",
+          "loss": 24.752
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.178
+        },
+        {
+          "lap": 24,
+          "offset": 0.1
+        }
+      ]
+    },
+    {
+      "code": "BRU",
+      "team": "Jordan",
+      "basePace": 110.3082,
+      "noise": 0.2989,
+      "stateAtTakeover": {
+        "position": 7,
+        "gapAhead": 1.206,
+        "compound": "MEDIUM",
+        "tyreAge": 17,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 23,
+          "to": "MEDIUM",
+          "loss": 130.213
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": 0.293
+        },
+        {
+          "lap": 23,
+          "offset": -0.066
+        }
+      ]
+    },
+    {
+      "code": "COU",
+      "team": "McLaren",
+      "basePace": 109.2231,
+      "noise": 0.6825,
+      "stateAtTakeover": {
+        "position": 8,
+        "gapAhead": 0.242,
+        "compound": "MEDIUM",
+        "tyreAge": 1,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 17,
+          "to": "MEDIUM",
+          "loss": 21.232
+        },
+        {
+          "lap": 33,
+          "to": "MEDIUM",
+          "loss": 19.673
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.04
+        },
+        {
+          "lap": 33,
+          "offset": 0.07
+        }
+      ]
+    },
+    {
+      "code": "DIN",
+      "team": "Ligier",
+      "basePace": 109.9401,
+      "noise": 0.5384,
+      "stateAtTakeover": {
+        "position": 10,
+        "gapAhead": 3.546,
+        "compound": "MEDIUM",
+        "tyreAge": 17,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "FRE",
+      "team": "Sauber",
+      "basePace": 111.0272,
+      "noise": 0.316,
+      "stateAtTakeover": {
+        "position": 12,
+        "gapAhead": 4.237,
+        "compound": "MEDIUM",
+        "tyreAge": 1,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 17,
+          "to": "MEDIUM",
+          "loss": 21.183
+        },
+        {
+          "lap": 32,
+          "to": "MEDIUM",
+          "loss": 18.991
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.022
+        },
+        {
+          "lap": 32,
+          "offset": 0.102
+        }
+      ]
+    },
+    {
+      "code": "HER",
+      "team": "Sauber",
+      "basePace": 113.7127,
+      "noise": 0.7425,
+      "stateAtTakeover": {
+        "position": 17,
+        "gapAhead": 136.355,
+        "compound": "MEDIUM",
+        "tyreAge": 1,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 17,
+          "to": "MEDIUM",
+          "loss": 173.369
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -1.178
+        }
+      ]
+    },
+    {
+      "code": "HIL",
+      "team": "Williams",
+      "basePace": 108.244,
+      "noise": 0.5904,
+      "stateAtTakeover": {
+        "position": 3,
+        "gapAhead": 0.987,
+        "compound": "MEDIUM",
+        "tyreAge": 17,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 21,
+          "to": "MEDIUM",
+          "loss": 22.412
+        },
+        {
+          "lap": 35,
+          "to": "MEDIUM",
+          "loss": 19.441
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 21,
+          "offset": -0.501
+        },
+        {
+          "lap": 35,
+          "offset": 0.526
+        }
+      ]
+    },
+    {
+      "code": "IRV",
+      "team": "Ferrari",
+      "basePace": 109.6006,
+      "noise": 0.3635,
+      "stateAtTakeover": {
+        "position": 9,
+        "gapAhead": 3.744,
+        "compound": "MEDIUM",
+        "tyreAge": 3,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 31,
+          "to": "MEDIUM",
+          "loss": 21.898
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": 0.149
+        },
+        {
+          "lap": 31,
+          "offset": -0.153
+        }
+      ]
+    },
+    {
+      "code": "KAT",
+      "team": "Tyrrell",
+      "basePace": 111.2197,
+      "noise": 0.9212,
+      "stateAtTakeover": {
+        "position": 14,
+        "gapAhead": 7.535,
+        "compound": "MEDIUM",
+        "tyreAge": 17,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "LAM",
+      "team": "Minardi",
+      "basePace": 114.2385,
+      "noise": 1.2136,
+      "stateAtTakeover": {
+        "position": 16,
+        "gapAhead": 21.753,
+        "compound": "MEDIUM",
+        "tyreAge": 4,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 30,
+          "to": "MEDIUM",
+          "loss": 21.071
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.295
+        },
+        {
+          "lap": 30,
+          "offset": 0.487
+        }
+      ]
+    },
+    {
+      "code": "MSCM",
+      "team": "Ferrari",
+      "basePace": 109.359,
+      "noise": 0.2415,
+      "stateAtTakeover": {
+        "position": 4,
+        "gapAhead": 14.59,
+        "compound": "MEDIUM",
+        "tyreAge": 17,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 23,
+          "to": "MEDIUM",
+          "loss": 27.291
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.063
+        },
+        {
+          "lap": 23,
+          "offset": 0.046
+        }
+      ]
+    },
+    {
+      "code": "PAN",
+      "team": "Ligier",
+      "basePace": 110.2413,
+      "noise": 0.6764,
+      "stateAtTakeover": {
+        "position": 11,
+        "gapAhead": 13.593,
+        "compound": "MEDIUM",
+        "tyreAge": 13,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 24,
+          "to": "MEDIUM",
+          "loss": 26.251
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.287
+        },
+        {
+          "lap": 24,
+          "offset": 0.114
+        }
+      ]
+    },
+    {
+      "code": "ROSR",
+      "team": "Footwork",
+      "basePace": 113.1505,
+      "noise": 0.4927,
+      "stateAtTakeover": {
+        "position": 15,
+        "gapAhead": 7.475,
+        "compound": "MEDIUM",
+        "tyreAge": 17,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 23,
+          "to": "MEDIUM",
+          "loss": 29.878
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.19
+        },
+        {
+          "lap": 23,
+          "offset": 0.096
+        }
+      ]
+    },
+    {
+      "code": "SAL",
+      "team": "Tyrrell",
+      "basePace": 111.8344,
+      "noise": 0.3983,
+      "stateAtTakeover": {
+        "position": 13,
+        "gapAhead": 1.811,
+        "compound": "MEDIUM",
+        "tyreAge": 17,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 24,
+          "to": "MEDIUM",
+          "loss": 20.755
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.374
+        },
+        {
+          "lap": 24,
+          "offset": 0.176
+        }
+      ]
+    },
+    {
+      "code": "VIL",
+      "team": "Williams",
+      "basePace": 109.1351,
+      "noise": 0.3189,
+      "stateAtTakeover": {
+        "position": 5,
+        "gapAhead": 0.656,
+        "compound": "MEDIUM",
+        "tyreAge": 17,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 23,
+          "to": "MEDIUM",
+          "loss": 25.439
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 23,
+          "offset": -0.02
+        }
+      ]
+    }
+  ],
+  "fuelEffectPerLap": 0.01915,
+  "freshTyre": {
+    "bonus": -0.1479,
+    "laps": 3
+  },
+  "events": [
+    {
+      "lap": 20,
+      "type": "RETIREMENT",
+      "driver": "DIN"
+    },
+    {
+      "lap": 20,
+      "type": "RETIREMENT",
+      "driver": "KAT"
+    },
+    {
+      "lap": 28,
+      "type": "RETIREMENT",
+      "driver": "HER"
+    },
+    {
+      "lap": 35,
+      "type": "RETIREMENT",
+      "driver": "IRV"
+    },
+    {
+      "lap": 42,
+      "type": "RETIREMENT",
+      "driver": "BER",
+      "storylineEvent": true
+    }
+  ],
+  "decisionMoments": [
+    {
+      "id": "stop-20",
+      "lap": 20,
+      "trigger": "cliff",
+      "target": {
+        "kind": "position",
+        "atBest": 2
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "Stay out",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "Box, mediums",
+          "decisions": [
+            {
+              "lap": 20,
+              "kind": "pit",
+              "compound": "MEDIUM",
+              "fill": {
+                "laps": 14
+              }
+            }
+          ]
+        },
+        {
+          "id": "box-next-medium",
+          "label": "Box next lap, mediums",
+          "decisions": [
+            {
+              "lap": 21,
+              "kind": "pit",
+              "compound": "MEDIUM",
+              "fill": "standard"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "box-medium"
+    },
+    {
+      "id": "pace-25",
+      "lap": 25,
+      "trigger": "cliff",
+      "target": {
+        "kind": "position",
+        "atBest": 2
+      },
+      "options": [
+        {
+          "id": "push",
+          "label": "Push now",
+          "decisions": [
+            {
+              "lap": 25,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "standard",
+          "label": "Standard pace",
+          "decisions": [
+            {
+              "lap": 25,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "manage",
+          "label": "Manage the tyres",
+          "decisions": [
+            {
+              "lap": 25,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "push-attack",
+          "label": "Push and attack",
+          "decisions": [
+            {
+              "lap": 25,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            },
+            {
+              "lap": 25,
+              "kind": "mode",
+              "key": "battle",
+              "value": "attack"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "pace-29",
+      "lap": 29,
+      "trigger": "cliff",
+      "target": {
+        "kind": "position",
+        "atBest": 2
+      },
+      "options": [
+        {
+          "id": "push",
+          "label": "Push now",
+          "decisions": [
+            {
+              "lap": 29,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "standard",
+          "label": "Standard pace",
+          "decisions": [
+            {
+              "lap": 29,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "manage",
+          "label": "Manage the tyres",
+          "decisions": [
+            {
+              "lap": 29,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "push-attack",
+          "label": "Push and attack",
+          "decisions": [
+            {
+              "lap": 29,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            },
+            {
+              "lap": 29,
+              "kind": "mode",
+              "key": "battle",
+              "value": "attack"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "stop-34",
+      "lap": 34,
+      "trigger": "cliff",
+      "target": {
+        "kind": "position",
+        "atBest": 2
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "Stay out",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "Box, mediums",
+          "decisions": [
+            {
+              "lap": 34,
+              "kind": "pit",
+              "compound": "MEDIUM",
+              "fill": {
+                "laps": 11
+              }
+            }
+          ]
+        },
+        {
+          "id": "box-next-medium",
+          "label": "Box next lap, mediums",
+          "decisions": [
+            {
+              "lap": 35,
+              "kind": "pit",
+              "compound": "MEDIUM",
+              "fill": "standard"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "box-medium"
+    }
+  ],
+  "candidateMomentLaps": [
+    17,
+    21,
+    22,
+    23,
+    24,
+    30,
+    31,
+    32,
+    33,
+    35
+  ],
+  "realResult": [
+    "HIL",
+    "ALE",
+    "VIL",
+    "MSCM",
+    "COU",
+    "BAR",
+    "PAN",
+    "FRE",
+    "SAL",
+    "BRU",
+    "ROSR",
+    "LAM",
+    "BER",
+    "IRV",
+    "HER",
+    "DIN",
+    "KAT",
+    "HAK",
+    "VERO"
+  ],
+  "userSide": "HIL",
+  "rival": "BER",
+  "eras": {
+    "eraId": 3,
+    "order": 8,
+    "userSide": "HIL",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Hill takes pole, but Berger and Alesi pass him at the start and the one-stopping Benettons hold him up. Williams bring him in on lap 20 for a short stop and a small fuel load, and he leads once the Benettons have stopped. After his second stop on lap 34 he comes out just behind Berger and cannot find a way past. Berger's engine fails in the closing laps, and Hill wins by 11.5 s from Alesi."
+    },
+    "mastery": {
+      "type": "margin",
+      "seconds": 11.5,
+      "label": "Win by more than 11.5 seconds"
+    },
+    "hidden": {
+      "type": "stop_count",
+      "exact": 2,
+      "label": "Win on two stops, as Hill did"
+    },
+    "hardCalls": {
+      "HIL": 0,
+      "BER": 0
+    },
+    "briefing": "Hockenheim, 1996. Hill took pole but lost two places at the start, and after 17 laps you run him third, close behind Berger and Alesi in the two Benettons. Williams have Hill on two stops; the Benettons will stop once. Get him into clear air and win."
+  },
+  "provenance": {
+    "kind": "real",
+    "estimated": [
+      "compounds",
+      "safetyCars",
+      "fuelLoads"
+    ]
+  },
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": true
+  }
+}

@@ -84,6 +84,18 @@ REUSE: dict[str, tuple[str, str]] = {
     "japan-2023": ("japan-2024", "suzuka-2"),
     "abu-dhabi-2022": ("abu-dhabi-2021", "yas-marina-2"),
     "netherlands-2021": ("netherlands-2022", "zandvoort-5"),
+    "bahrain-2006": ("bahrain-2021", "bahrain-1"),
+    "turkey-2008": ("turkey-2021", "istanbul-1"),
+    "italy-2010": ("italy-2019", "monza-7"),
+    "australia-2013": ("australia-2010", "melbourne-1"),
+    "bahrain-2012": ("bahrain-2021", "bahrain-1"),
+    "bahrain-2015": ("bahrain-2021", "bahrain-1"),
+    "abu-dhabi-2015": ("abu-dhabi-2020", "yas-marina-1"),
+    "brazil-2014": ("brazil-2019", "interlagos-2"),
+    "canada-2016": ("canada-2019", "montreal-6"),
+    "australia-2017": ("australia-2010", "melbourne-1"),
+    "australia-2018": ("australia-2010", "melbourne-1"),
+    "spain-2017": ("spain-2020", "catalunya-4"),
     "saudi-arabia-2023": ("saudi-arabia-2025", "jeddah-1"),
     "miami-2024": ("miami-2023", "miami-1"),
     "saudi-arabia-2021": ("saudi-arabia-2025", "jeddah-1"),
@@ -112,6 +124,9 @@ REUSE: dict[str, tuple[str, str]] = {
     "japan-2005": ("japan-2024", "suzuka-2"),
     "japan-2003": ("japan-2024", "suzuka-2"),
     "austria-2002": ("austria-2019", "spielberg-3"),
+    "austria-2001": ("austria-2019", "spielberg-3"),
+    "canada-2003": ("canada-2019", "montreal-6"),
+    "italy-2001": ("italy-2019", "monza-7"),
 }
 
 # f1db layouts no 2018+ race shares. `start`: the start/finish line as a fraction of the way
@@ -151,6 +166,10 @@ LAYOUT_SPECS: dict[str, dict] = {
     },
     "indianapolis-2": {"clockwise": True, "start": 0.87, "pit": (-0.09, 0.10), "turns": 13},
     "magny-cours-3": {"clockwise": True, "start": 0.31, "pit": (-0.07, 0.07), "turns": 17},
+    # The pre-2003 layout (the old final chicane): f1db draws it from a different point, so
+    # its start is -3's line moved onto this path (nearest point after aligning the
+    # drawings' centres); pits as -3's.
+    "magny-cours-2": {"clockwise": True, "start": 0.325, "pit": (-0.07, 0.07), "turns": 15},
     "jerez-2": {"clockwise": True, "start": 0.925, "pit": (-0.075, 0.065), "turns": 15},
     "nurburgring-3": {"clockwise": True, "start": 0.08, "pit": (-0.04, 0.10), "turns": 12},
     "phoenix-1": {"clockwise": False, "start": 0.88, "pit": (-0.06, 0.06), "turns": 15},
@@ -169,6 +188,12 @@ LAYOUT_SPECS: dict[str, dict] = {
     "kyalami-1": {"clockwise": True, "start": 0.72, "pit": (-0.04, 0.06), "turns": 9},
     "estoril-1": {"clockwise": True, "start": 0.84, "pit": (-0.06, 0.08), "turns": 11},
     "silverstone-3": {"clockwise": True, "start": 0.22, "pit": (-0.05, 0.06), "turns": 9},
+    # The 1997-2009 layout (Bridge and Priory, before the 2010 Arena): drawn clockwise from
+    # Abbey; line on the old pit straight between Woodcote and Copse, placed by judgement.
+    "silverstone-7": {"clockwise": True, "start": 0.31, "pit": (-0.06, 0.05), "turns": 17},
+    # singapore-2014's layout: line on the pit straight between the last corner and Turn 1,
+    # placed by judgement against the 2023 MultiViewer outline's line; f1db's direction.
+    "marina-bay-2": {"clockwise": False, "start": 0.045, "pit": (-0.05, 0.06), "turns": 23},
 }
 
 # Older race -> f1db layout drawn from its SVG.
@@ -178,6 +203,7 @@ F1DB: dict[str, str] = {
     "hungary-1992": "hungaroring-2",
     "hungary-1997": "hungaroring-2",
     "hungary-1998": "hungaroring-2",
+    "hungary-2001": "hungaroring-2",
     "spain-1994": "catalunya-1",
     "spain-1996": "catalunya-2",
     "australia-1986": "adelaide-1",
@@ -189,14 +215,27 @@ F1DB: dict[str, str] = {
     "malaysia-1999": "sepang-1",
     "malaysia-2001": "sepang-1",
     "malaysia-2013": "sepang-1",
+    "malaysia-2015": "sepang-1",
+    "singapore-2014": "marina-bay-2",
     "europe-2012": "valencia-1",
     "san-marino-2005": "imola-2",
+    "san-marino-2000": "imola-2",
+    "san-marino-2003": "imola-2",
+    "san-marino-2006": "imola-2",
+    "malaysia-2006": "sepang-1",
+    "europe-2009": "valencia-1",
+    "france-2007": "magny-cours-3",
+    "great-britain-2007": "silverstone-7",
     "germany-2000": "hockenheimring-3",
+    "germany-1996": "hockenheimring-3",
+    "germany-1997": "hockenheimring-3",
+    "san-marino-1999": "imola-2",
     "germany-1986": "hockenheimring-2",
     "france-1990": "paul-ricard-2",
     "japan-2000": "suzuka-1",
     "united-states-2003": "indianapolis-2",
     "france-2004": "magny-cours-3",
+    "france-2001": "magny-cours-2",
     "europe-1997": "jerez-2",
     "europe-1999": "nurburgring-3",
     "united-states-1990": "phoenix-1",

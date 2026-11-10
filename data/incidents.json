@@ -325,6 +325,43 @@
  "abu-dhabi-2022": [],
  "emilia-romagna-2024": [],
  "netherlands-2021": [],
+ "europe-2009": [],
+ "france-2007": [],
+ "san-marino-2006": [],
+ "great-britain-2007": [],
+ "bahrain-2006": [],
+ "turkey-2008": [],
+ "malaysia-2006": [],
+ "italy-2010": [],
+ "australia-2013": [],
+ "bahrain-2012": [],
+ "bahrain-2015": [],
+ "abu-dhabi-2015": [],
+ "singapore-2014": [
+  {
+   "lap": 31,
+   "type": "SC",
+   "cars": [
+    "SUT",
+    "PER"
+   ],
+   "status": "Debris",
+   "source": "https://en.wikipedia.org/wiki/2014_Singapore_Grand_Prix",
+   "note": "Debris after Sutil and P\u00e9rez touched at Turn 8 (P\u00e9rez's front wing broke). Wikipedia puts the SC out on lap 30, GrandPrix.com on lap 31 (https://www.grandprix.com/races/singapore-gp-2014-race-notes-hamilton-wins-signapore-gp.html); the built model has it from lap 31, 7 laps, in at the end of lap 37 as in Wikipedia and Motor Sport"
+  }
+ ],
+ "brazil-2014": [],
+ "canada-2016": [
+  {
+   "lap": 11,
+   "type": "VSC",
+   "driver": "BUT",
+   "status": "Power Unit",
+   "source": "https://www.motorsportmagazine.com/reports/f1/2016-canadian-grand-prix/",
+   "note": "The VSC was for Button's McLaren engine failure (Motor Sport says lap 10; Jolpica: 9 laps, status Power Unit). The built model has a one-lap VSC on lap 11; its end lap is not in the sources"
+  }
+ ],
+ "malaysia-2015": [],
  "saudi-arabia-2023": [
   {
    "lap": 18,
@@ -837,6 +874,9 @@
  "monaco-1984": [],
  "portugal-1984": [],
  "germany-1986": [],
+ "germany-1996": [],
+ "germany-1997": [],
+ "san-marino-1999": [],
  "portugal-1985": [],
  "mexico-1986": [],
  "hungary-1986": [],
@@ -911,6 +951,42 @@
    "note": "The article gives lap 26; the timing (FastF1) has HAM ahead of BOT from the end of lap 25, kept as the sims' lap"
   }
  ],
+ "australia-2018": [
+  {
+   "lap": 26,
+   "type": "VSC",
+   "driver": "GRO",
+   "status": "Wheel",
+   "turn": 2,
+   "source": "https://en.wikipedia.org/wiki/2018_Australian_Grand_Prix",
+   "note": "Grosjean stopped at turn 2 with a wheel not fitted properly after his stop, which brought out the VSC (Wikipedia; Autosport has him stopping on lap 24). Autosport (how-hamiltons-needless-loss-revealed-a-mercedes-flaw-5110682) has the VSC deployed on lap 26, as in the built model (TUM track status); Jolpica status Wheel (24 laps)"
+  },
+  {
+   "lap": 28,
+   "type": "SC",
+   "driver": "GRO",
+   "status": "Wheel",
+   "turn": 2,
+   "source": "https://en.wikipedia.org/wiki/2018_Australian_Grand_Prix",
+   "note": "The VSC for Grosjean's car became a full safety car on lap 27 (Wikipedia) and came in at the end of lap 31; the built model (TUM track status) starts the SC on lap 28, kept as the sims' lap"
+  }
+ ],
+ "spain-2017": [
+  {
+   "lap": 34,
+   "type": "VSC",
+   "driver": "VAN",
+   "status": "Collision",
+   "turn": 1,
+   "cars": [
+    "VAN",
+    "MAS"
+   ],
+   "source": "https://www.motorsportmagazine.com/articles/single-seaters/f1/2017-spanish-grand-prix-report/",
+   "note": "Vandoorne hit Massa at turn 1 and ended in the gravel (Wikipedia, Motor Sport); VSC on lap 34 (Motor Sport, and the built model's TUM track status) or lap 33 (Autosport); Jolpica status Collision (32 laps)"
+  }
+ ],
+ "australia-2017": [],
  "belgium-1998": [
   {
    "lap": 33,

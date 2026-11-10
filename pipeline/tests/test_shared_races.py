@@ -18,8 +18,18 @@ import pytest
 from pipeline import build, export, paths, restart
 
 VECTORS = Path(__file__).parent / "fixtures" / "eras_overlay_parity.json"
-# The races in both Eras and a Daily/Gauntlet pool (data/pools.json, Nov 7 2026).
-SHARED = ("abu-dhabi-2021", "bahrain-2021", "france-2021", "hungary-2019", "russia-2021")
+# The races in both Eras and a Daily/Gauntlet pool (data/pools.json, Nov 7 2026; portugal-2021,
+# a Gauntlet race, swapped into Era 9 on Nov 9).
+SHARED = (
+    "abu-dhabi-2021",
+    "bahrain-2021",
+    "france-2021",
+    "hungary-2019",
+    "portugal-2021",
+    "russia-2021",
+)
+# Every shared race's side is authored into its overlay (portugal-2021 in B1, Nov 9 2026).
+AUTHORED = SHARED
 TOUCHED = ("eras", "provenance", "rules", "decisionMoments", "userSide", "rival")
 
 
@@ -159,7 +169,7 @@ def test_parity_vectors_are_current():
     assert json.loads(VECTORS.read_text()) == json.loads(json.dumps(want))
 
 
-@pytest.mark.parametrize("race_id", SHARED)
+@pytest.mark.parametrize("race_id", AUTHORED)
 def test_shared_eras_model_plays_the_hard_call_side(race_id):
     """The Eras model (file + overlay) is played from eras.userSide, the hard-call side (owner
     decision Nov 8), with the overlay's moments when it has its own; the rival is the other

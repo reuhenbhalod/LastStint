@@ -1,0 +1,37 @@
+{
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": true
+  },
+  "eras": {
+    "eraId": 4,
+    "order": 6,
+    "userSide": "COU",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Montoya leads from the start until Schumacher goes for the lead at turn 2 on lap 16 and both run off the road, which hands Barrichello the lead. Coulthard, up from seventh on the grid, has saved fuel: he stops three laps after Barrichello, comes out ahead and wins by 2.19 s. Ferrari have Barrichello give second to Schumacher at the last corner."
+    },
+    "mastery": {
+      "type": "margin",
+      "seconds": 2.2,
+      "label": "Win by more than 2.2 seconds"
+    },
+    "hidden": {
+      "type": "stop_count",
+      "exact": 1,
+      "label": "Win on one stop"
+    },
+    "briefing": "A1-Ring, 2001. Schumacher started on pole and Coulthard seventh. You run Coulthard, second after 44 laps, a second behind Barrichello with Schumacher right behind you, and none of the three has stopped. You saved fuel early: stay out longer than the Ferrari and win.",
+    "hardCalls": {
+      "COU": 0,
+      "BAR": 0
+    }
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": false
+  },
+  "eras": {
+    "eraId": 6,
+    "order": 4,
+    "userSide": "ALO",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Button takes the lead from Alonso at the first chicane, and for more than 30 laps the two run within two seconds of each other on the same soft tyres, Alonso unable to find a way past. Button stops first. Alonso stays out one more lap, a quicker Ferrari stop puts him out just ahead, and he holds the inside through the first chicane. Alonso wins Ferrari's home race by 2.938 s."
+    },
+    "mastery": {
+      "type": "margin",
+      "seconds": 3,
+      "label": "Win by more than 3 seconds"
+    },
+    "hidden": {
+      "type": "stop_count",
+      "exact": 1,
+      "label": "Win on one stop"
+    },
+    "hardCalls": {
+      "ALO": 0,
+      "BUT": 0
+    },
+    "briefing": "Monza, 2010. Button took the lead from you at the first chicane, and 33 laps in he is still less than a second ahead, on the same soft tyres. You can't pass him on track, and each of you has one stop to make. Win the race in the pit lane."
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": true
+  },
+  "eras": {
+    "eraId": 5,
+    "order": 4,
+    "userSide": "ALO",
+    "target": {
+      "type": "position",
+      "position": 2
+    },
+    "storyline": {
+      "real": "Schumacher takes a record 66th pole and leads. Alonso runs five laps longer to his first stop on lap 25, then catches the graining Ferrari and is right behind it from lap 34, but Imola gives him no way past. Renault stop him first on lap 41, Ferrari answer a lap later, and Schumacher comes out ahead. Alonso finishes second, 2.1 s behind.",
+      "rewriteCondition": {
+        "type": "win"
+      },
+      "headline": "Alonso turns the tables on Schumacher at Imola"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "max": 2,
+      "label": "Finish second or better on no more than two stops"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "push",
+      "maxLaps": 10,
+      "label": "Finish second or better pushing for no more than 10 laps"
+    },
+    "hardCalls": {
+      "ALO": 0,
+      "MSCM": 0
+    },
+    "briefing": "Imola, 2006. Schumacher started from pole and leads; you run Alonso's Renault, third and 10.8 s behind him after 17 laps. Schumacher will be the first of the two to stop. Passing here is close to impossible, so the pit stops decide it. Finish second at least, and beat Schumacher if you can."
+  }
+}
