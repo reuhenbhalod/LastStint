@@ -53,6 +53,10 @@ def stint_counts(laps: pd.DataFrame) -> dict[str, int]:
 # life (Monza 24: one soft stint, 2 laps), so its life comes from the compounds that were run,
 # at these ratios of their longest stints (a soft lasts about 0.4x the longest hard stint...).
 THIN_STINTS = 3
+# Eras model fix W5: pace by stint (M2) measures a wet race's rain-tyre laps too, against the
+# sim's wet clean lap, and leaves out its restart laps (pace.stint_offsets wet_stints). Only
+# where stint_pace is on (Eras builds of timed races); a dry race's offsets don't change.
+WET_STINTS = True
 # A life guessed from the other compounds stops short of this share of the race (tyre-life fix
 # 2): 1.5x the longest medium stint often came out past the flag, a hard that never wore out.
 GUESS_CAP = 0.8
@@ -275,6 +279,9 @@ def assemble_race_model(
             weather,
             wear,
             traffic=(dirty_air or {}).get("real"),
+            wet_pace=wet_pace,
+            damp_pace=damp_pace,
+            wet_stints=WET_STINTS,
         )
         if stint_pace
         else None
