@@ -960,7 +960,7 @@ RACES: dict[str, dict] = {
         "era": "2014-2025",
         "takeover_lap": None,  # D3 rule
         "seed": 1,
-        # Eras side by hard calls (RAI 1, VER 1; tie to RAI by chance given up): Räikkönen
+        # Eras side by hard calls (RAI 1, VER 0; B2 re-author, Nov 9): Räikkönen
         # chases the win (real: P2, 0.6 s behind Verstappen).
         "user_side": "RAI",
         "rival": "VER",
