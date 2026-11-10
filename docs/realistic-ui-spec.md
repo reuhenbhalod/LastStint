@@ -19,6 +19,12 @@ game itself doesn't change: every call, panel and control stays where the player
 - **No battle camera popup.** The map itself is the battle camera: during a battle it zooms onto
   the two cars, as it does today, and zooms back out after. The picture-in-picture from the
   mockups is dropped.
+- **A TV camera, on a button.** "TV camera" in the control bar swaps the whole-lap view for
+  trackside shots of your car: a camera on a post at the corners (at least a sixth of a lap
+  apart) has the shot while your car is nearest it. It pans to keep the car in frame, closes in
+  as the car passes its post and opens out as it goes away, and the picture cuts to the next
+  post halfway between them. Pressing the button pans onto the shot (and back out). A battle
+  still takes the camera and hands it back after. The choice is kept on the device.
 - **Real maps for every circuit.** Under the track: forests, grass, farmland, buildings, roads,
   water, gravel and run-off from OpenStreetMap, placed where they really are, for all 20
   circuits. The track keeps its outline, drawn as tarmac with red and white kerbs.

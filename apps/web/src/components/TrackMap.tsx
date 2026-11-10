@@ -39,6 +39,7 @@ import {
 } from '../track/geometry.js';
 import { type Ground, groundFor } from '../track/ground.js';
 import { MapMotion } from '../track/motion.js';
+import { tvPosts, tvShot } from '../track/tvcam.js';
 import { CarIcon } from './CarIcon.js';
 
 const REDUCED =
@@ -50,6 +51,8 @@ const TRACK = 22;
 
 /** Share of the way to its target the battle cam moves each frame. */
 const CAM_EASE = 0.08;
+/** The same, on the TV camera's shot (it keeps up with the car). */
+const TV_EASE = 0.25;
 
 /** A battle on the map (battles and trust spec D1). */
 export interface BattleView {
@@ -569,6 +572,7 @@ export function TrackMap({
   dim,
   finishing = null,
   battle = null,
+  tv = false,
   flash = null,
   ahead = null,
   userBox = null,
@@ -592,6 +596,9 @@ export function TrackMap({
   finishing?: { lapMs: number; onCrossed: () => void } | null;
   /** A battle this lap (battles and trust spec): drawn on the track, the camera on it. */
   battle?: BattleView | null;
+  /** The TV camera: shots of your car from posts round the lap (track/tvcam.ts). A battle
+   * still takes the camera, and hands it back after. */
+  tv?: boolean;
 
   /** The lap being shown, run ahead (GameSession.previewLap): cars move toward its gaps all
    * lap, a car that retires on it stops on track, a puncture shows. */
@@ -638,6 +645,9 @@ export function TrackMap({
   // The battle cam's view, easing toward its target each frame.
   const camRef = useRef<Box>({ x: 0, y: 0, w: outline.width, h: outline.height });
   const camMoving = useRef(false);
+  // The TV camera: its posts, which one has the shot, and whether the pan onto it has landed.
+  const posts = useMemo(() => tvPosts(outline, line), [outline, line]);
+  const tvRef = useRef({ on: false, post: -1 });
   // Which way each main car points: along the track, or (in the pit lane) the way it last moved.
   const headings = useRef(new Map<string, { x: number; y: number; deg: number }>());
   const motion = useMemo(
@@ -761,8 +771,11 @@ export function TrackMap({
   const meXY = places.get(userSide);
   const otherXY = battle ? places.get(battle.other) : undefined;
   const cornerXY = battle ? pointAt(line, battle.at) : null;
+  const battleCam = !!battle?.zoom && !!meXY && !!cornerXY && !REDUCED;
+  const shot =
+    tv && !battleCam && meXY ? tvShot(line, outline, posts, [meXY.x, meXY.y], meXY.at) : null;
   const want =
-    battle?.zoom && meXY && cornerXY && !REDUCED
+    battleCam && meXY && cornerXY
       ? cameraBox(
           [
             [meXY.x, meXY.y],
@@ -771,17 +784,32 @@ export function TrackMap({
           ],
           outline,
         )
-      : full;
+      : (shot?.box ?? full);
   const cam = camRef.current;
-  const next = {
-    x: cam.x + (want.x - cam.x) * CAM_EASE,
-    y: cam.y + (want.y - cam.y) * CAM_EASE,
-    w: cam.w + (want.w - cam.w) * CAM_EASE,
-    h: cam.h + (want.h - cam.h) * CAM_EASE,
-  };
+  // On the TV camera the shot tracks the car closely, and a new post cuts straight to its
+  // shot; anything else (the button, a battle starting or ending) pans.
+  const onShot = tvRef.current.on && shot !== null;
+  const cut = onShot && shot.post !== tvRef.current.post;
+  const k = onShot ? TV_EASE : CAM_EASE;
+  const next =
+    cut || (shot && REDUCED)
+      ? want
+      : {
+          x: cam.x + (want.x - cam.x) * k,
+          y: cam.y + (want.y - cam.y) * k,
+          w: cam.w + (want.w - cam.w) * k,
+          h: cam.h + (want.h - cam.h) * k,
+        };
   const settled = Math.abs(next.w - want.w) < 0.5 && Math.abs(next.x - want.x) < 0.5;
   camRef.current = settled ? want : next;
   camMoving.current = !settled;
+  // The camera is on the shot once the pan onto it has landed.
+  tvRef.current = shot
+    ? {
+        on: tvRef.current.on || settled || Math.abs(next.w - want.w) < want.w * 0.04,
+        post: shot.post,
+      }
+    : { on: false, post: -1 };
   const view = camRef.current;
   // Cars and labels shrink a little as the camera closes in, so the corner stays readable.
   const glyph = Math.max(0.55, Math.min(1, view.w / outline.width + 0.15));

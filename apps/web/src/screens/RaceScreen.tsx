@@ -103,6 +103,9 @@ interface Battle {
   shown: boolean;
 }
 
+/** Where the TV camera choice is kept. */
+const TV_KEY = 'pitwall.tv-camera';
+
 /** How often the standings follow the map while the lap runs. */
 const LIVE_MS = 400;
 
@@ -614,6 +617,22 @@ export function RaceScreen({
   // which shrinks to make room. On a phone the stats are tabs in the control bar.
   type Panel = 'radio' | 'plan' | 'car' | 'calls' | 'log' | 'standings';
   const [stats, setStats] = useState(false);
+  // The map's TV camera (kept for the next race on this device).
+  const [tv, setTv] = useState(() => {
+    try {
+      return localStorage.getItem(TV_KEY) === 'on';
+    } catch {
+      return false;
+    }
+  });
+  const toggleTv = () => {
+    try {
+      localStorage.setItem(TV_KEY, tv ? 'off' : 'on');
+    } catch {
+      // private mode: the choice lasts this page only
+    }
+    setTv(!tv);
+  };
   // The calls, the dock and the control bar float over the map's lower edge; the circuit's
   // frame stays above them (nothing sits on the track), so their height is measured.
   const stackRef = useRef<HTMLDivElement>(null);
@@ -1031,6 +1050,7 @@ export function RaceScreen({
                       dim={paused}
                       finishing={finishMeta}
                       battle={battleView}
+                      tv={tv}
                       ahead={ahead}
                       flash={flash}
                       userBox={userBox}
@@ -1164,6 +1184,31 @@ export function RaceScreen({
                 </button>
               ))}
               <span className="min-w-[8px] flex-1" />
+              {outline && (
+                <button
+                  type="button"
+                  aria-pressed={tv}
+                  title={tv ? 'Back to the whole lap' : 'Trackside cameras on your car'}
+                  onClick={toggleTv}
+                  className={pill(tv)}
+                >
+                  <svg
+                    aria-hidden="true"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <rect x="2" y="7" width="14" height="11" rx="2" />
+                    <path d="M16 11l6-3v9l-6-3" />
+                  </svg>
+                  TV camera
+                </button>
+              )}
               <button
                 type="button"
                 data-tour="stats"
