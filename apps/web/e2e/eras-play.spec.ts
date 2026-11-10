@@ -23,6 +23,7 @@ import {
   radioLines,
   startRace,
   teamRadio,
+  watchRadio,
 } from './eras.js';
 
 test.describe.configure({ mode: 'parallel' });
@@ -144,7 +145,11 @@ test('Era 7 (Draft): Canada 2014’s car faults', async ({ page }) => {
   const model = loadEraRace('canada-2014');
   await mockEras(page, [model]);
   await openRace(page, 'canada-2014');
-  await playRace(page);
+  // Rosberg's own call on the radio when the power goes (engineerRadio.ts FAULT_LINES).
+  const lost = 'I’ve lost power! Something’s up with the engine.';
+  const radio = watchRadio(page, [lost]);
+  await playRace(page, { each: radio.each });
+  expect(radio.seen.get(lost), 'the fault line in the radio log').toMatch(/^L37 · Rosberg/);
   // Both Mercedes lose power on their real laps; Rosberg is yours.
   const faults = (await raceNotes(page)).filter((n) => n.kind === 'fault');
   expect(faults).toContainEqual(
@@ -232,6 +237,20 @@ test('Era 4: Austria 2002, a team order', async ({ page }) => {
   );
 });
 
+// Found by this suite (A2 e2e): the real order, on lap 71 (TEAM_ORDER BAR → MSCM), never
+// reaches the radio. It is the player's call (scripted.ts `call`), armed only by a `comply`
+// decision, and the authored austria-2002 has no lap-71 team-order moment to give one; the
+// team radio's "Let Schumacher by" is a swap (a `team-swap` note), which has no radio line.
+// So engineerRadio.ts's team-order line can't show in this race.
+test.fixme('Era 4: Austria 2002, the real team order on the radio', async ({ page }) => {
+  await mockEras(page, [loadEraRace('austria-2002')]);
+  await openRace(page, 'austria-2002');
+  const order = 'Team orders: let Schumacher by, then hold station.';
+  const radio = watchRadio(page, [order]);
+  await playRace(page, { each: radio.each });
+  expect(radio.seen.get(order), 'the team order in the radio log').toMatch(/^L71 · Engineer/);
+});
+
 test('Era 3: Belgium 1995, refuelling stops in the rain', async ({ page }) => {
   const model = loadEraRace('belgium-1995');
   expect(model.rules?.refuelling).toBe(true);
@@ -288,7 +307,13 @@ test('Era 1: Monaco 1988, the avoidable storyline retirement, repeated then avoi
   });
   await openRace(page, 'monaco-1988');
   // Senna's real call: push from lap 40 and keep pushing. He crashes out on his real lap.
+  // The retirement, on the pit wall's word (Eras 1-2: engineerRadio.ts `board`). The name is
+  // left out: names.ts `named` only turns three-letter codes into names, so the line reads
+  // "SENA has stopped" (a known bug, reported with this test).
+  const stopped = 'has stopped. That’s our race.';
+  const radio = watchRadio(page, [stopped]);
   const repeated = await playRace(page, {
+    each: radio.each,
     answer: (lap) => (lap === 40 ? ['PUSH'] : lap === 48 ? ['STAY OUT'] : ['Hold the pace']),
     // And no pace call on the pit board takes him off it.
     quick: (text) =>
@@ -301,6 +326,9 @@ test('Era 1: Monaco 1988, the avoidable storyline retirement, repeated then avoi
   for (const tag of repeated.moments.values()) expect(tag).toMatch(/^Pit board · /);
   const crashed = (await raceNotes(page)).filter((n) => n.kind === 'storyline');
   expect(crashed).toEqual([expect.objectContaining({ driver: 'SENA', detail: 'retired' })]);
+  expect(radio.seen.get(stopped), 'the retirement in the radio log').toMatch(
+    new RegExp(`^L${crashed[0]?.lap} · Pit wall“\\S+ has stopped\\. That’s our race\\.”$`),
+  );
   await resultsFor(page, 1);
 
   // A new attempt, saving the car instead: he's still running at the flag.
