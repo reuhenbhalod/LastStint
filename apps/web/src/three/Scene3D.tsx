@@ -224,13 +224,18 @@ export default function Scene3D({
       const frameTimes: number[] = [];
       let last = performance.now();
       let frameNo = 0;
+      let devFrozen = false;
       if (import.meta.env.DEV) {
         // Local testing: scripts can point the camera (docs/3d-spec.md, screenshots).
         (window as unknown as Record<string, unknown>).__scene3d = {
           camera,
           controls,
           world,
+          cars,
           THREE,
+          freeze: (on: boolean) => {
+            devFrozen = on;
+          },
         };
       }
       setStatus('ready');
@@ -253,7 +258,7 @@ export default function Scene3D({
         let you: THREE.Vector3 | null = null;
         let other: THREE.Vector3 | null = null;
         const seen = new Set<string>();
-        if (feed) {
+        if (feed && !devFrozen) {
           for (const code of feed.places.keys()) {
             const at = placeOf(code, feed);
             if (!at) continue;
@@ -300,7 +305,7 @@ export default function Scene3D({
           } else sc.visible = false;
         }
         for (const [code, c] of cars) {
-          if (!seen.has(code)) {
+          if (!devFrozen && !seen.has(code)) {
             scene.remove(c.obj);
             cars.delete(code);
           }

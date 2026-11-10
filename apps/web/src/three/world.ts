@@ -936,8 +936,9 @@ export async function buildWorld(s: Scenery, maxAniso: number): Promise<World> {
           const inz = -NZ(i) * sd * 0.12;
           const v0 = 1 - (row + 1) / BOARD_ROWS;
           const v1 = 1 - row / BOARD_ROWS;
-          const u1 = run / 24;
-          const u2 = (run + seg) / 24;
+          // read the right way round from the track on either side
+          const u1 = (sd > 0 ? -run : run) / 24;
+          const u2 = (sd > 0 ? -(run + seg) : run + seg) / 24;
           boardP.push(
             x1 + inx,
             y1 + 0.4,

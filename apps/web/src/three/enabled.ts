@@ -41,10 +41,17 @@ function wideNoTouch(): boolean {
 }
 
 function forced(): boolean {
-  return (
-    typeof location !== 'undefined' && new URLSearchParams(location.search).get('view') === '3d'
-  );
+  if (typeof location === 'undefined') return false;
+  // kept for the tab, so it lasts through versus's move to /versus/CODE
+  try {
+    if (new URLSearchParams(location.search).get('view') === '3d')
+      sessionStorage.setItem(FORCE_KEY, '1');
+    return sessionStorage.getItem(FORCE_KEY) === '1';
+  } catch {
+    return new URLSearchParams(location.search).get('view') === '3d';
+  }
 }
+const FORCE_KEY = 'laststint:view3d';
 
 let gl: boolean | null = null;
 function webgl(): boolean {
