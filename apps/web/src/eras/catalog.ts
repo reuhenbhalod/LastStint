@@ -349,7 +349,10 @@ const RACE_TABLE: Record<number, ReadonlyArray<readonly [string, string]>> = {
     ['australia-1994', 'Schumacher vs Hill for the title'],
     ['belgium-1995', 'Schumacher from 16th on slicks in the wet'],
     ['spain-1996', "Schumacher's rain masterclass"],
-    ['hungary-1997', "Hill's Arrows almost wins"],
+    [
+      'luxembourg-1998',
+      'Ferrari brings the leader in first on lap 24; McLaren keeps Häkkinen out four more laps on a light car to jump him in the pits',
+    ],
     ['europe-1997', 'The title decider at Jerez'],
     ['hungary-1998', 'Ferrari switches to three stops mid-race'],
     [

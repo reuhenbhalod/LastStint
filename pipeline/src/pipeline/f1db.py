@@ -82,6 +82,9 @@ APPENDIX_RACES = [
     # Swapped into Era 5 on Nov 9, third batch (docs/eras-checks/swap-races-era5-overnight.md);
     # europe-2007 and brazil-2007 stay above as Eras-build fixtures.
     *("belgium-2009", "hungary-2007"),
+    # Swapped into Era 3 for hungary-1997 on Nov 9 (same sheet); hungary-1997 stays above as an
+    # Eras-build fixture.
+    "luxembourg-1998",
 ]
 FIRST_STOPS_YEAR = 1994
 

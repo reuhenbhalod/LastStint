@@ -155,7 +155,7 @@ Players start at Era 10 and move back through the timeline to Era 1. The eras be
 | 2 | australia-1994 | Schumacher vs Hill for the title | beat-rival: Schumacher ahead of Hill |
 | 3 | belgium-1995 | Schumacher from 16th on slicks in the wet | win: Schumacher from P16 |
 | 4 | spain-1996 | Schumacher's rain masterclass | win: Schumacher in the rain |
-| 5 | hungary-1997 | Hill's Arrows almost wins | defend: Hill holds P1 |
+| 5 | luxembourg-1998 | Ferrari brings the leader in first on lap 24; McLaren keeps Häkkinen out four more laps on a light car to jump him in the pits | win: Häkkinen from P3 |
 | 6 | europe-1997 | The title decider at Jerez | beat-rival: Villeneuve ahead of Schumacher |
 | 7 | hungary-1998 | Ferrari switches to three stops mid-race | win: Schumacher on three stops |
 | 8 | germany-1996 | Boxed in behind the one-stopping Benettons: a short first stop for Hill to find clear air | win: Hill beats Berger |
@@ -241,8 +241,8 @@ Every race has one target, set in `eras.target`. Each race's draft target is in 
 
 | Type | Means | Grader `Target` | Races (draft) |
 |---|---|---|---|
-| `win` | Chase down the win from behind | `win` | 47 |
-| `defend` | Start in the lead and keep it to the flag | `win`, starting from P1 | 20 |
+| `win` | Chase down the win from behind | `win` | 48 |
+| `defend` | Start in the lead and keep it to the flag | `win`, starting from P1 | 19 |
 | `position` | Reach a set position, such as P3 to win the title | `position` | 17 |
 | `beat-rival` | Finish ahead of a named car, wherever that is | `beat-rival` | 13 |
 | `team` | A team result, such as a 1–2 in a set order | `team` (new) | 2 |

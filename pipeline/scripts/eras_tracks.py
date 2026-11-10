@@ -240,6 +240,7 @@ F1DB: dict[str, str] = {
     "germany-1996": "hockenheimring-3",
     "germany-1997": "hockenheimring-3",
     "san-marino-1999": "imola-2",
+    "luxembourg-1998": "nurburgring-3",
     "germany-1986": "hockenheimring-2",
     "france-1990": "paul-ricard-2",
     "japan-2000": "suzuka-1",
