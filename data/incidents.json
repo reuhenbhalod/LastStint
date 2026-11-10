@@ -239,6 +239,13 @@
    "driver": "SAR",
    "status": "Collision",
    "source": "https://en.wikipedia.org/wiki/2024_Miami_Grand_Prix"
+  },
+  {
+   "lap": 28,
+   "type": "SC_PICKUP",
+   "driver": "VER",
+   "detail": "The safety car picked up Verstappen while Norris led, so Norris ran on ahead of it",
+   "source": "https://en.wikipedia.org/wiki/2024_Miami_Grand_Prix"
   }
  ],
  "hungary-2024": [

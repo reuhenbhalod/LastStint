@@ -309,7 +309,10 @@ def simulate(
     retire_at: dict[int, set[str]] = {}
     real = real_flags(model) if legend else None  # Legend: stops pay the lap's conditions
     events = legend_events(model, seed) if legend else model["events"]
+    pickup: dict[int, str] = {}  # an SC's first lap -> the car it picked up (sourced, Eras)
     for e in events:
+        if e["type"] == "SC" and e.get("pickup"):
+            pickup[int(e["lap"])] = e["pickup"]
         if e["type"] in ("SC", "VSC", "RED"):
             for lap in range(e["lap"], e["lap"] + int(e.get("laps", 1))):
                 neutral[lap] = e["type"]
@@ -318,7 +321,8 @@ def simulate(
     faults = FaultState(model["events"])  # car faults (faults.py): frozen on their real laps
     orders = team_orders(model["events"])  # scripted team orders and let-bys (TEAM_ORDER)
     restart_block = track.get("restart")  # the SC restart's jump and spread (restart.py)
-    red = redflag.plan(events)  # free stops in the stoppage, gaps wiped at the restart
+    # Free stops in the stoppage, gaps wiped at the restart (Eras: a standing one a lap later).
+    red = redflag.plan(events, "rules" in model)
     # A no-unlapping race's SC and red-flag queues: the scripted cars' real laps down (job 1.5).
     known_down = redflag.real_laps_down(events, set(strategies or {}))
 
@@ -363,6 +367,9 @@ def simulate(
         pitted: set[str] = set()
         queue = active_codes()
         restarting = restart_block is not None and is_restart_lap(neutral, red, lap)
+        # An SC that picked up a car behind the leader (`pickup`): the cars ahead of it on the
+        # road run a racing lap on the SC's first lap (they are ahead of the safety car).
+        front = sc_front(queue, cars, pickup.get(lap)) if flag == "SC" else set()
 
         for code in active_codes():
             car = cars[code]
@@ -413,7 +420,11 @@ def simulate(
             if faults.contact(code, lap):
                 pitted.add(code)  # a spin or a trip off: out of the lap's pass rolls
 
-            if flag == "SC" and sc_time:
+            if code in front:
+                lt = _clean_lap(car, compounds, fuel, lap, fresh_tyre, weather) + noise_rngs[
+                    code
+                ].normal(car.noise)
+            elif flag == "SC" and sc_time:
                 lt = sc_time
             elif flag == "VSC" and vsc_time:
                 lt = vsc_time
@@ -454,7 +465,7 @@ def simulate(
                 # SC_GAP_KEEP of its excess. Last lap before the restart: nose-to-tail.
                 keep = 0.0 if neutral.get(lap + 1) != "SC" else SC_GAP_KEEP
                 _bunch(
-                    live,
+                    queue_behind(live, pickup.get(lap - 1)) if keep > 0.0 else live,
                     cars,
                     green,
                     keep,
@@ -477,16 +488,34 @@ def simulate(
     return _classify(order, cars)
 
 
+def sc_front(queue: list[str], cars: dict[str, Car], picked: str | None) -> set[str]:
+    """The cars on the road ahead of the car an SC picked up (`pickup`) on the SC's first lap:
+    none if that car is out or leads."""
+    if not picked or picked not in queue or cars[picked].retired:
+        return set()
+    return set(queue[: queue.index(picked)])
+
+
+def queue_behind(live: list[str], picked: str | None) -> list[str]:
+    """The lap after a pickup SC's first lap (its first middle lap): the queue closes up from
+    the picked-up car back; the cars ahead of it are still ahead of the safety car and keep
+    their gaps (Miami 2024: Norris's lead over Verstappen grew on both laps)."""
+    if not picked or picked not in live:
+        return live
+    return live[live.index(picked) :]
+
+
 def is_restart_lap(neutral: dict[int, str], red: dict, lap: int) -> bool:
     """A green lap straight after an SC lap: a safety car's restart (also a red flag's rolling
     restart behind it), not a standing restart's first lap (its own spread)."""
     if neutral.get(lap) or neutral.get(lap - 1) != "SC":
         return False
-    wipe = red["wipes"].get(lap - 1)
-    standing = (
+    # An Eras race spaces a standing restart at the end of its first racing lap (redflag.plan).
+    standing = any(
         wipe is not None
         and wipe[0] == redflag.STANDING_RESTART_GAP
         and neutral.get(wipe[1]) == "RED"
+        for wipe in (red["wipes"].get(lap - 1), red["wipes"].get(lap))
     )
     return not standing
 

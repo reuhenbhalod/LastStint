@@ -483,6 +483,10 @@
             "type": "string",
             "description": "The car the event is about; a TEAM_ORDER's car told to let `other` by."
           },
+          "pickup": {
+            "type": "string",
+            "description": "An SC event (Eras builds, sourced in data/incidents.json as SC_PICKUP): the car the safety car picked up when it wasn't the leader. Both sims run the cars ahead of it on the road a racing lap on the SC's first lap and keep their gaps on its second."
+          },
           "restart": {
             "enum": [
               "standing",

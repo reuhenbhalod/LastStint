@@ -340,6 +340,7 @@ def assemble_race_model(
             track_params.pit_loss,
             track_params.pit_loss_under_sc,
             track_params.pit_loss_under_vsc,
+            eras=eras_stops,
         )
     )
 

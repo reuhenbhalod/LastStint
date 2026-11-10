@@ -44,9 +44,11 @@ export function isRestartLap(
   lap: number,
 ): boolean {
   if (neutral.get(lap) || neutral.get(lap - 1) !== 'sc') return false;
-  const wipe = red.wipes.get(lap - 1);
-  const standing =
-    wipe !== undefined && wipe.gap === STANDING_RESTART_GAP && neutral.get(wipe.redLap) === 'red';
+  // An Eras race spaces a standing restart at the end of its first racing lap (redFlagPlan).
+  const standing = [red.wipes.get(lap - 1), red.wipes.get(lap)].some(
+    (wipe) =>
+      wipe !== undefined && wipe.gap === STANDING_RESTART_GAP && neutral.get(wipe.redLap) === 'red',
+  );
   return !standing;
 }
 
