@@ -10,6 +10,7 @@
 // Each test plays a whole race at five times the normal lap speed (the app's e2e hook); the
 // tests run in parallel. Runtime: see docs/eras-build-plan.md step 10.1.
 import { expect, test } from '@playwright/test';
+import { raceName } from '../src/eras/catalog.js';
 import {
   closeTeamRadio,
   finishRace,
@@ -57,6 +58,31 @@ test('Era 9: Turkey 2021 from the map to the results', async ({ page }) => {
   await resultsFor(page, 9);
   expect(eras.submissions).toHaveLength(1);
   expect(eras.submissions[0]?.body.untimed).toBe(false);
+});
+
+test('the era detail badges hidden objectives on the race cards, never their text', async ({
+  page,
+}) => {
+  const ALL = { result: true, strategist: true, mastery: true };
+  await mockEras(page, [loadEraRace('turkey-2021')], {
+    progress: {
+      'turkey-2021': { stars: ALL, hiddenDone: true, accuracy: 96.5 },
+      'abu-dhabi-2021': { stars: ALL, accuracy: 93 },
+      'bahrain-2021': { stars: { result: true, strategist: true, mastery: false }, accuracy: 80 },
+    },
+  });
+  await page.goto('/eras/9');
+  const card = (raceId: string) =>
+    page.locator('article').filter({ has: page.getByRole('heading', { name: raceName(raceId) }) });
+  await expect(card('turkey-2021')).toContainText('Hidden objective done');
+  await expect(card('abu-dhabi-2021')).toContainText('Hidden objective open');
+  await expect(card('bahrain-2021')).not.toContainText('Hidden objective');
+  await expect(page.getByText(/Hidden objective (done|open)/)).toHaveCount(2);
+  // The badge stays inside its card on a phone.
+  const badge = await card('turkey-2021').getByText('Hidden objective done').boundingBox();
+  const box = await card('turkey-2021').boundingBox();
+  expect(badge && box && badge.x + badge.width <= box.x + box.width).toBe(true);
+  await noSidewaysScroll(page);
 });
 
 test('Era 10: Belgium 2023, the decision timer runs out, then the untimed opt-out', async ({

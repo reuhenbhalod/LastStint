@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import type { EraDetail, ErasApi } from './api.js';
 import { ERAS, racesOfEra } from './catalog.js';
-import { eraDetailView, isCleared, loadEraDetail, starCount } from './eraDetailState.js';
+import {
+  eraDetailView,
+  hiddenState,
+  isCleared,
+  loadEraDetail,
+  starCount,
+} from './eraDetailState.js';
 import { eraDetail, erasResponse, starredRaces } from './erasFixture.js';
 import { mockCanStart, mockErasApi } from './mockErasApi.js';
 
@@ -34,6 +40,37 @@ describe('eraDetailView', () => {
     expect(view.maxStars).toBe(30);
     expect(view.racesStarred).toBe(2);
     expect(view.cleared).toBe(false);
+  });
+
+  it('shows the hidden objective only once a race has all three stars (spec §6)', () => {
+    const two = { result: true, strategist: true, mastery: false };
+    const detail = eraDetail(9, {
+      races: {
+        1: { stars: two },
+        2: { stars: ALL_STARS },
+        3: { stars: ALL_STARS, hiddenDone: true },
+        // Done without all three stars can't come from the server; still nothing is shown.
+        4: { stars: two, hiddenDone: true },
+        // Legend's three stars don't reveal it: it's kept at the era's own difficulty.
+        5: { legend: { stars: ALL_STARS, bestAccuracy: 95 } },
+      },
+    });
+    const view = eraDetailView(erasResponse(true), detail, all);
+    expect(view.cards.map((c) => c.hidden)).toEqual([
+      'hidden',
+      'open',
+      'done',
+      'hidden',
+      'hidden',
+      'hidden',
+      'hidden',
+      'hidden',
+      'hidden',
+      'hidden',
+    ]);
+    expect(hiddenState({ stars: ALL_STARS, hiddenDone: false })).toBe('open');
+    expect(hiddenState({ stars: ALL_STARS, hiddenDone: true })).toBe('done');
+    expect(hiddenState({ stars: two, hiddenDone: false })).toBe('hidden');
   });
 
   it('is Cleared at a star on every race, not before (spec §8)', () => {
