@@ -257,6 +257,42 @@ no race facts.
   which a plain rival model reproduces; first-stop laps differ by one between AS-E's text and
   its own tables; fill sizes are missing except Barrichello's 91 l.
 
+### Authored (B1, Nov 9 2026)
+
+Rows rest on the Facts table above (WP, AS-E, GPE, Jolpica, read Nov 9 2026) and on Timing
+(Jolpica laps and F1DB stops in `data/raw/hungary-2001.parquet`, as built into
+`data/races/hungary-2001.json`). Storyline, headline and briefing are original wording; no team
+radio is quoted.
+
+| Item | Value | Fact it rests on | Source | Owner checked |
+|---|---|---|---|---|
+| Side | BAR (hard calls MSCM 0, BAR 1; `pipeline hard-calls`), not the provisional MSCM and not the proposal's Coulthard | the grader, not a fact | - | |
+| Takeover | lap 25 (D3 rule) | BAR P2, 11.328 s behind MSCM; COU P3, 0.627 s behind BAR at the end of lap 25 | Timing | |
+| Target | `position` 2 (Barrichello finishes second, ahead of Coulthard). Not `win`: from 11 s behind the other Ferrari the author tool's best win chance is ~10% (owner-accepted pattern: a position target when beating the draft rival is unreachable) | Barrichello 2nd, +3.363; Coulthard 3rd, +3.940 | Facts table (Top 6) | |
+| Rewrite | `win`, headline "Barrichello beats Schumacher to the Hungaroring win" | the side did not win (M. Schumacher won) | Facts table (Top 6) | |
+| Storyline | "Schumacher leads from pole while Barrichello, second, holds Coulthard's McLaren up behind him" | pole MSCM; Barrichello passed Coulthard into turn 1; from lap 12 Barrichello slowed and Coulthard was stuck behind him (a tactic, not an explicit team order) | Facts table (Grid, Start, Barrichello slowing Coulthard) | |
+| Storyline | "Coulthard gets ahead at the first stops" | BAR stop end of lap 31, COU lap 32, came out ahead of Barrichello | Facts table (stops 1) | |
+| Storyline | "his rig sticks at the second and Barrichello takes second back, holding him off to the flag by 0.577 s" | Coulthard lap-54 fuel rig jammed about two seconds, Barrichello took 2nd; Barrichello held off Coulthard; 3.940 - 3.363 = 0.577 s | Facts table (Coulthard stop 2, End of race, Top 6) | |
+| Storyline | "Schumacher wins and takes his fourth title; the Ferrari one-two clinches the constructors' title" | win clinched his 4th title; Ferrari 1-2 clinched the constructors' title | Facts table (Titles) | |
+| Briefing | "Schumacher leads from pole ... second and 11 seconds behind him after 25 laps, with Coulthard's McLaren 0.6 s behind you" | pole (Facts table); gaps at the end of lap 25 | Facts table; Timing | |
+| Briefing | "Two stops each" | MSCM, BAR and COU each stopped twice | Facts table (Strategy expectation) | |
+| Mastery | `stop_count` exact 2: "Second on two stops, as Barrichello made" | Barrichello stopped twice (laps 31 and 53) | Facts table; Timing | |
+| Hidden | `team_result` [2, 2]: "Bring the Ferraris home one-two" | the real result (Ferrari 1-2); the game's choice | Facts table (Top 6) | |
+| storylineEvents | none: no SC, VSC or red flag; neither storyline car retired (Trulli, Irvine and the other retirements stay as plain events) | "None mentioned in any source" (Facts table, SC row) | Facts table | |
+
+- Moments (`pnpm --filter @laststint/sim author hungary-2001 --target position:2 --eras --write`):
+  rivalpit-28, stop-31, stop-53, pace-57, pace-61 (`data/moments/hungary-2001.json`). Real calls
+  carry the real fills: box on lap 31 with 22 laps, box on lap 53 with 24 laps (pit-in to pit-in
+  and pit-in to the flag in Timing; WP gives Barrichello's first fill as 91 litres, which the
+  game's lap-based fill doesn't use). The real calls grade: stay out at rivalpit-28 72% (green),
+  box on lap 31 72% (green), box on lap 53 66% (green; box a lap later 28%, red).
+- Robust G1 (`pipeline validate hungary-2001 --robust`, Eras build, BAR side): pass, mean gap
+  error 1.15 s (1.24 s on the provisional MSCM build).
+- Reachability (`pnpm --filter @laststint/sim reachability hungary-2001`): pass at era
+  difficulty (threshold 84, Smart rival) and at Legend (90, Expert rival); ★1-★3 and the hidden
+  objective on seed 1 with the real calls and standard pace. The stay-out path earns no star on
+  seeds 1-3.
+
 ## austria-2001 (2001 Austrian Grand Prix)
 
 Replaces `hungary-2003` (Era 4 #6; fail, 7.08 s (field SCH gap, Williams stint pace)). Robust G1: pass, 0.62 s mean gap error. Built (provisionally) as COU vs MSCM.
