@@ -856,6 +856,36 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
+    "china-2017": {
+        "year": 2017,
+        "event": "China",
+        "source": "tum",
+        "name": "China 2017: Hamilton vs Vettel",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for italy-2020 (swap-races-era8-overnight.md). `pipeline hard-calls` on
+        # the first build (as VET): VET 0, HAM 1, so HAM.
+        "user_side": "HAM",
+        "rival": "VET",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "china-2018": {
+        "year": 2018,
+        "event": "China",
+        "source": "tum",
+        "name": "China 2018: Bottas vs Ricciardo",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for sakhir-2020 (swap-races-era8-overnight.md). `pipeline hard-calls` on
+        # the first build (as RIC): RIC 2, BOT 3, so BOT.
+        "user_side": "BOT",
+        "rival": "RIC",
+        "score_positions": 6,
+        "split": "eras",
+    },
     "monaco-2017": {
         "year": 2017,
         "event": "Monaco",
@@ -1082,6 +1112,36 @@ RACES: dict[str, dict] = {
         # `pipeline hard-calls`.
         "user_side": "VET",
         "rival": "HAM",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "united-states-2014": {
+        "year": 2014,
+        "event": "United States",
+        "source": "tum",
+        "name": "USA 2014: Hamilton vs Rosberg",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for bahrain-2014 (swap-races-era7-overnight.md). Hard calls HAM 0, ROS 0;
+        # chance given up ROS 45.3, HAM 11.0, so the Eras side is ROS (overlay; eras_side swaps).
+        "user_side": "HAM",
+        "rival": "ROS",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "germany-2016": {
+        "year": 2016,
+        "event": "Germany",
+        "source": "tum",
+        "name": "Germany 2016: Hamilton vs Ricciardo",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for united-states-2015 (swap-races-era7-overnight.md). Side provisional
+        # until `pipeline hard-calls` (the facts sheet proposes Ricciardo; Hamilton really won).
+        "user_side": "HAM",
+        "rival": "RIC",
         "score_positions": 6,
         "split": "eras",
     },
@@ -1354,6 +1414,69 @@ RACES: dict[str, dict] = {
         # the overlay): Vettel from pole holds off Räikkönen's fresher softs (real: VET P1).
         "user_side": "VET",
         "rival": "RAI",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    # Era 6 swaps, second round (owner, Nov 9; docs/eras-checks/swap-races-era6-overnight.md),
+    # each in the slot of the race it replaced. Sides from a local `pipeline hard-calls` run;
+    # authoring (B1) writes them to the overlays.
+    "abu-dhabi-2011": {
+        "year": 2011,
+        "event": "Abu Dhabi",
+        "source": "jolpica",
+        "name": "Abu Dhabi 2011: Hamilton vs Alonso",
+        "era": "2010-2013",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for spain-2013. Hard calls HAM 3, ALO 1 (local run): Hamilton leads once
+        # Vettel's lap-1 puncture puts him out, with Alonso 2-4 s behind (real: HAM P1).
+        "user_side": "HAM",
+        "rival": "ALO",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "china-2013": {
+        "year": 2013,
+        "event": "Chinese",
+        "source": "jolpica",
+        "name": "China 2013: Alonso vs Räikkönen",
+        "era": "2010-2013",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for brazil-2012. Hard calls ALO 2, RAI 1 (local run): Alonso's three stops
+        # from P3 (real: ALO P1).
+        "user_side": "ALO",
+        "rival": "RAI",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "germany-2012": {
+        "year": 2012,
+        "event": "German",
+        "source": "jolpica",
+        "name": "Germany 2012: Button vs Vettel",
+        "era": "2010-2013",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for abu-dhabi-2012. Hard calls BUT 2, VET 0 (local run): Button's last stop
+        # a lap before Vettel's (real: BUT P2, behind Alonso).
+        "user_side": "BUT",
+        "rival": "VET",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "germany-2013": {
+        "year": 2013,
+        "event": "German",
+        "source": "jolpica",
+        "name": "Germany 2013: Räikkönen vs Vettel",
+        "era": "2010-2013",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for china-2011. Hard calls RAI 1, VET 0 (local run): Räikkönen's late stop
+        # for softs while leading (real: RAI P2, behind Vettel).
+        "user_side": "RAI",
+        "rival": "VET",
         "score_positions": 6,
         "split": "eras",
     },
@@ -2069,6 +2192,36 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
+    "belgium-2009": {
+        "year": 2009,
+        "event": "Belgium",
+        "source": "jolpica",
+        "name": "Belgium 2009: Fisichella vs Räikkönen",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for europe-2007 (swap-races-era5-overnight.md, third batch). Side
+        # provisional until `pipeline hard-calls`.
+        "user_side": "FIS",
+        "rival": "RAI",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "hungary-2007": {
+        "year": 2007,
+        "event": "Hungary",
+        "source": "jolpica",
+        "name": "Hungary 2007: Räikkönen vs Hamilton",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for brazil-2007 (swap-races-era5-overnight.md, third batch). Eras side by
+        # hard calls (HAM 0, RAI 0; chance given up RAI 9.7, HAM 0.0): win (real: Räikkönen 2nd).
+        "user_side": "RAI",
+        "rival": "HAM",
+        "score_positions": 6,
+        "split": "eras",
+    },
     # Era 4 (2000-04), refuelling as above: one dry compound, new tyres at a stop.
     "japan-2000": {
         "year": 2000,
@@ -2177,6 +2330,25 @@ RACES: dict[str, dict] = {
         "seed": 1,
         "user_side": "HIL",
         "rival": "VIL",  # defend: Hill holds P1 (real: hydraulics on lap 74, Villeneuve wins)
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "luxembourg-1998": {
+        "year": 1998,
+        "event": "Luxembourg",
+        "source": "jolpica",
+        "name": "Luxembourg 1998: Häkkinen vs Schumacher",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for hungary-1997 (Era 3 #5, Nov 9, migration 0028;
+        # docs/eras-checks/swap-races-era3-overnight.md). Side provisional until
+        # `pipeline hard-calls`.
+        # pace_skip: Irvine held Häkkinen up from the end of lap 1 until Häkkinen passed him
+        # on lap 14 (Wikipedia; docs/eras-checks/fix-luxembourg-1998.md).
+        "pace_skip": {"HAK": [*range(2, 15), 65, 66, 67]},
+        "user_side": "HAK",
+        "rival": "MSCM",
         "score_positions": 6,
         "split": "eras",
     },

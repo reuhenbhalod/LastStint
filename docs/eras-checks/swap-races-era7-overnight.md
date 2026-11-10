@@ -1,4 +1,4 @@
-# Six Era 7 races swapped (owner's Nov 9 pre-approval, picked by robust G1): owner sign-off
+# Eight Era 7 races swapped (owner's Nov 9 pre-approval, picked by robust G1): owner sign-off
 
 The owner pre-approved (Nov 9) swapping failing Eras races for the next best race by the
 numbers. Era 7 had eight races failing robust G1; the six worst (by status, then mean gap error
@@ -19,7 +19,8 @@ row against its links and put your initials and the date in **Owner checked**.
 | 7 / #9 | `great-britain-2016` | fail, 1.95 s (podium order rate) | `malaysia-2015` | pass, 2.02 s |
 
 `united-states-2015` (fail, 1.88 s) and `bahrain-2014` (fail, 1.22 s) also fail but stay in
-place: only six candidates passed. The other seven Era 7 candidates measured failed (russia-2014
+place: only six candidates passed. A later scout round found two more passing candidates, and
+both were swapped too (migration 0024; see "Third round" at the end). The other seven Era 7 candidates measured failed (russia-2014
 1.55 s, austria-2014 1.63 s, japan-2016 2.60 s, spain-2014 3.05 s, singapore-2016 3.55 s,
 germany-2014 3.64 s, belgium-2015 9.15 s). The replacements' numbers were measured on TUM
 ingests (`pipeline validate <id> --robust`, one race per call) with rules-only overlays; the race
@@ -602,3 +603,212 @@ those reads.
   (`2.6-drivers-incidents.md`).
 - The removed races keep their race files, overlays, track files and build entries as Eras-build
   fixtures; their attempts, stars and history-book entries are deleted by migration 0018.
+
+## Third round: bahrain-2014 and united-states-2015 (Nov 9, migration 0024)
+
+The two Era 7 races left in place above still fail robust G1. A second scout round measured
+eight more Era 7 candidates on TUM ingests with rules-only overlays (`pipeline validate <id>
+--robust`, one race per call); three passed. The two remaining failures are replaced, worst
+first, by the two best passing candidates, best first, each in the old race's era and slot
+(D1 migration 0024). The race files rebuilt here match the measured ones except for their
+`name` (now spelled out: "USA 2014: Hamilton vs Rosberg", "Germany 2016: Hamilton vs
+Ricciardo"), and the goldens are byte-identical. united-states-2014's rules-only overlay was
+scouted with `vsc: true`; the VSC came in for 2015, so the overlay here has `vsc: false` (as
+brazil-2014 and singapore-2014). Its golden is unchanged by that, and robust G1 re-run with it is
+still pass, 0.83 s.
+
+| Era / slot | Removed | Its robust G1 (races report) | Replacement | Robust G1 of the replacement (Eras build, rules-only overlay) |
+|---|---|---|---|---|
+| 7 / #6 | `united-states-2015` | fail, 1.88 s (Rosberg's one-lap loss on lap 48 isn't modelled; duel order) | `germany-2016` | pass, 1.48 s (duel HAM vs RIC) |
+| 7 / #1 | `bahrain-2014` | fail, 1.22 s (the late-SC fight between HAM and ROS; duel order) | `united-states-2014` | pass, 0.83 s (duel HAM vs ROS) |
+
+The slots were assigned by the overnight coordinator (bahrain-2014's slot to
+united-states-2014, united-states-2015's to germany-2016). The strict worst-first/best-first
+rule used above would instead give united-states-2015's slot to united-states-2014; say if you
+want them the other way round (only pools.json, the catalog, spec §4 and migration 0024 change). The third passing candidate,
+`abu-dhabi-2014` (pass, 2.26 s with Massa as rival; 2.84 s with Rosberg), is not used. The other
+five failed: malaysia-2016 1.82 s, china-2016 3.47 s, belgium-2014 3.56 s, austria-2016 5.93 s,
+great-britain-2015 7.83 s.
+
+Neither replacement is authored yet. The `user_side` / `rival` pairs in `build.py` (HAM vs ROS,
+HAM vs RIC) are the ones measured and are provisional until `pipeline hard-calls`. Spec §4 and
+the catalog take the dilemmas and targets proposed in the sheets below, which are written for
+Ricciardo in both races:
+
+- **united-states-2014**: `position: Ricciardo on the podium from P5`. Ricciardo really finished
+  3rd, so no rewrite if he is the side.
+- **germany-2016**: `position: Ricciardo P2, ahead of Verstappen and Rosberg`. Ricciardo really
+  finished 2nd, so no rewrite for that target (the sheet allows a `win` rewrite instead).
+
+**Wording check needed:** germany-2016's AS-pen and GPE rows come from search-result summaries
+only (the pages were not opened in full); check them against the pages.
+
+Incidents: united-states-2014's lap-1 SC (in at the end of lap 4) comes before the takeover
+(lap 12 in the built model) and the built model has no SC event, so nothing is entered;
+germany-2016 has none. Both are `[]` in `data/incidents.json` (`2.6-drivers-incidents.md`).
+Track files are reuse copies (`united-states-2019`, `germany-2019`; `2.5-track-maps.md`).
+The removed races keep their race files, overlays, track files and build entries as Eras-build
+fixtures; their attempts, stars and history-book entries are deleted by migration 0024.
+
+## united-states-2014 (2014 United States Grand Prix)
+
+Replaces `bahrain-2014` in Era 7 #1.
+
+Every fact below was read in the linked source on 2026-11-09; nothing comes from memory.
+Where sources disagree, the row says so. Check each row and put your initials and the date in
+**Owner checked**.
+
+### Sources
+
+| Short name | What |
+|---|---|
+| WP | [English Wikipedia race article](https://en.wikipedia.org/wiki/2014_United_States_Grand_Prix) (first ~100k characters read) |
+| MS | [Motor Sport, 2014 United States GP report](https://www.motorsportmagazine.com/articles/single-seaters/f1/2014-united-states-gp-report/) |
+| GPE | [GrandPrix.com race notes](https://www.grandprix.com/races/united-states-gp-2014-race-notes-hamilton-wins-in-austin.html) |
+| GPE-r | [GrandPrix.com race report "How the West was won"](https://www.grandprix.com/races/united-states-gp-2014-race-report-how-the-west-was-won.html) (no lap numbers, quotes only) |
+| Jolpica-r | [Jolpica results, 2014 round 17](https://api.jolpi.ca/ergast/f1/2014/17/results/?limit=100) |
+| Jolpica-p | [Jolpica pit stops, 2014 round 17](https://api.jolpi.ca/ergast/f1/2014/17/pitstops/?limit=100) |
+
+OpenF1 has no 2014 data. GPE's stop laps run one higher than Jolpica's in-laps for most drivers
+(as in other GPE race notes). Lap numbers below use Jolpica unless marked.
+
+### Facts
+
+| Topic | Fact | Sources | Owner checked |
+|---|---|---|---|
+| Grid | Qualifying: Rosberg pole (1:36.067), Hamilton 2nd (1:36.443), Bottas 3rd (1:36.906), Massa 4th (1:37.205), Ricciardo 5th (1:37.244), Alonso 6th (1:37.610). Jolpica grid: ROS 1, HAM 2, BOT 3, MAS 4, RIC 5, ALO 6. | WP, Jolpica-r | |
+| Grid penalties | None for the top six. Button 5 places (gearbox; qualified 7th, started 12th). Kvyat 10 places (engine component). Vettel started from the pit lane (sixth power-unit component, over the limit of five); Jolpica lists him as grid 18. | WP, MS, Jolpica-r | |
+| Laps | 56. Winner's time 1:40:04.785. | WP, Jolpica-r | |
+| Weather | Dry and sunny; air 23 °C, track 31-34 °C (WP). Gusting cross-wind; qualifying had been calmer and warmer (MS). | WP, MS | |
+| Start tyres | Everyone on softs except Vettel, Kvyat and Hülkenberg (mediums). | WP, GPE | |
+| Safety car | One SC after the lap-1 crash (Pérez hit Räikkönen at Turn 15, then Sutil). Withdrawn at the end of lap 4 (WP, MS); "restarted on lap 5" (GPE). Several drivers pitted under it (Jolpica: Vettel, Magnussen, Button, Hülkenberg, Gutiérrez in-lap 1). | WP, MS, GPE, Jolpica-p | |
+| VSC / red flag | None in the race. The VSC was only tested in Friday practice (WP). | WP | |
+| Rosberg stops | Two: in-laps 15 and 34 (Jolpica-p; GPE: 16 and 35). Onto primes (mediums) at the first stop (MS), mediums at the second (GPE). Led lap 34, was told to go faster, pitted and rejoined behind Hamilton (WP); 3.6 s behind (GPE). At the second stop he took 1.5 turns more front wing (MS). | Jolpica-p, WP, MS, GPE | |
+| Hamilton stops | Two: in-laps 16 and 33 (Jolpica-p; GPE: 17 and 34). Mediums both times (GPE); WP describes the first as "for a front wing adjustment". Half a turn less front wing at the second stop (MS). Both Mercedes made their second stops shortly after Bottas's lap-30 stop (MS). | Jolpica-p, GPE, WP, MS | |
+| Lead pass | Hamilton closed to 0.7 s and was in DRS range by lap 22, then passed Rosberg into the Turn 12 hairpin on lap 24 (WP, MS, GPE). MS: Rosberg had selected the wrong switch for extra energy, so the boost didn't come. WP: they narrowly avoided contact. | WP, MS, GPE | |
+| Ricciardo stops | Two: in-laps 14 and 31 (Jolpica-p). Softs at the start, mediums on lap 14 (WP, MS). **Sources differ on where he beat the Williams:** MS says Massa's lap-14 stop left Bottas out and Ricciardo passed Bottas on his out-lap at Turn 1 (fresh-tyre undercut); WP says after the first stop Bottas passed him back on the outside, and that Ricciardo pitted the lap after Bottas's lap-30 stop and came out ahead of him. Both agree he got ahead of Massa when Massa's second stop was slowed by about 1 s on a front wheel. | Jolpica-p, MS, WP | |
+| Massa stops | Two: in-laps 14 and 32 (Jolpica-p). Softs at the first stop (GPE: "more softs"), mediums at the second (GPE). Lap-32 stop delayed ~1 s on a front tyre (WP, MS). Never within DRS of Ricciardo afterwards (MS). | Jolpica-p, GPE, WP, MS | |
+| Bottas stops | Two: in-laps 15 and 30 (Jolpica-p). Mediums at the second (WP, MS). Massa passed him at the start (wheelspin, MS). | Jolpica-p, WP, MS | |
+| Alonso stops | Two: in-laps 16 and 43 (Jolpica-p). Long middle stint on mediums, short final stint on softs (MS, WP). | Jolpica-p, MS, WP | |
+| Vettel stops | Four: in-laps 1, 2, 26, 48 (Jolpica-p). Pit-lane start on primes, options under the SC, back to primes on lap 2, fresh options eight laps from the end (MS). Fastest lap 1:41.379 on lap 50 (WP). | Jolpica-p, MS, WP | |
+| Gaps (lap 50) | Hamilton led Rosberg by 2.3 s; Ricciardo 21.8 s; Massa 23.4 s; Bottas 28.8 s; Alonso 78.6 s (GPE). | GPE | |
+| Result | 1 Hamilton 1:40:04.785; 2 Rosberg +4.314; 3 Ricciardo +25.560; 4 Massa +26.924; 5 Bottas +30.992; 6 Alonso +1:35.231; 7 Vettel +1:35.734; 8 Magnussen +1:40.682. Hamilton led the championship by 24 points (316 to 292, MS). | Jolpica-r, WP, MS, GPE | |
+| Retirements | Sutil 0 laps (collision), Pérez 1 lap (collision damage), Hülkenberg 16 laps (engine; Jolpica-r 16 laps, WP and GPE text say lap 18; power-unit failure, MS). No top-six car retired. | Jolpica-r, WP, GPE, MS | |
+| Penalties | Maldonado, Gutiérrez and Vergne: 5 s stop-go for speeding behind the SC (lap 11, GPE); Maldonado a second for pit-lane speeding (lap 41 WP; lap 40 GPE). Vergne 5 s time penalty for hitting Grosjean (lap 50 WP; lap 51 GPE), dropping him from 9th to 10th. Pérez: 7-place grid penalty for Brazil for the lap-1 crash. | WP, GPE, MS | |
+| Contact | Pérez–Räikkönen–Sutil, lap 1. Vergne–Grosjean, Turn 1, late race. Hamilton–Rosberg near miss on lap 24. | WP, MS, GPE | |
+| Team orders | None in the sources read. Mercedes told Rosberg to go faster before his second stop (WP). | WP | |
+
+### Dilemma, side and target (drafts)
+
+| Item | Draft | Basis | Owner checked |
+|---|---|---|---|
+| Storyline drivers | Ricciardo and Bottas (the stop-timing fight for 3rd). Alternative pair: Hamilton and Rosberg (lead fight, but it was settled by an on-track pass, not a call). | MS, WP, Jolpica-p | |
+| Dilemma | Fifth on the grid behind two Williams on the same softs: do you stop early for mediums and attack on fresh rubber, then time the second stop off whichever Williams blinks first? | MS, WP, Jolpica-p | |
+| Target | position: Ricciardo on the podium (from P5). Hamilton/Rosberg alternative: win as Rosberg from pole. | Jolpica-r | |
+| Did the side win? | Ricciardo: yes (3rd), so no rewrite. Hamilton: yes. Rosberg: no (2nd), rewrite allowed. The side should come from `pipeline hard-calls`. | Jolpica-r | |
+| Risk | Medium. Dry, one early SC (laps 1-4), simple two-stop race. But MS and WP disagree on which stop Ricciardo beat Bottas at, WP calls Hamilton's first stop a "front wing adjustment", and the lead changed on a pass (lap 24) helped by Rosberg's switch error, which a sim may not reproduce. | MS, WP | |
+
+### Authored (B1, Nov 9 2026)
+
+Job `eras-author-united-states-2014-p3` (base `eras-swap-era7-p3`). Every fact below is from the
+Facts table above (read Nov 9 2026); "Timing" is the TUM lap data in
+`data/raw/united-states-2014.parquet`. Storyline, headline and briefing are original wording; no
+team radio is quoted. The Ricciardo draft above is not used: the side comes from
+`pipeline hard-calls`, and the duel built for this race is Hamilton vs Rosberg.
+
+- Side: **ROS**. `pipeline hard-calls united-states-2014`: HAM 0, ROS 0, a tie, broken by chance
+  given up (ROS 45.3 pts, HAM 11.0), as the job rules say.
+- Robust G1 (`pipeline validate united-states-2014 --robust`, Eras build with the eras block):
+  **pass** (strict), mean gap error 0.75 s (0.83 s rules-only, above).
+- Reachability (`pnpm --filter @laststint/sim reachability united-states-2014`): **pass** at era
+  difficulty (threshold 78, Standard+ rival) and at Legend (90, Expert), all three stars and the
+  hidden objective; the stay-out path never earns a star.
+
+| Item | Value | Fact it rests on | Source | Owner checked |
+|---|---|---|---|---|
+| Era / slot | Era 7, order 1 (bahrain-2014's slot) | the third-round swap above | this sheet | |
+| Target | `win` (beat Hamilton) | Hamilton won, Rosberg 2nd +4.314 | Jolpica-r, WP | |
+| Rewrite | allowed (`win`): the side did not win | Rosberg 2nd | Jolpica-r | |
+| Headline | "Rosberg holds Hamilton off in Austin" | original wording | - | |
+| Storyline | "Rosberg leads from pole and through the first stops" | pole 1:36.067; stops ROS 15, HAM 16; Timing: ROS P1 at the end of lap 17 | WP, Jolpica-p, Timing | |
+| Storyline | "but Hamilton closes into DRS range and passes him into the Turn 12 hairpin on lap 24, when Rosberg's extra energy does not come" | Lead pass row: DRS range by lap 22, pass into the Turn 12 hairpin on lap 24; Rosberg selected the wrong switch so the boost did not come | WP, MS, GPE | |
+| Storyline | "Hamilton makes his second stop a lap before Rosberg, stays ahead and wins by 4.3 s" | in-laps HAM 33, ROS 34; "+4.314" | Jolpica-p, Jolpica-r | |
+| Briefing | "Rosberg took pole" | pole 1:36.067 | WP, Jolpica-r | |
+| Briefing | "still leads, 12 laps in, with Hamilton 0.9 s behind on the same soft tyres" | Timing: ROS P1, HAM P2 0.93 s behind at the end of lap 12 (the takeover lap, D3 rule), both on softs from the start | Timing; WP, GPE (start tyres) | |
+| Briefing | "with two stops to make if you follow the plan" | Rosberg's two stops, in-laps 15 and 34 | Jolpica-p | |
+| Mastery | `margin` 4.3 s: "Win by more than 4.3 seconds" (Hamilton's real winning margin, turned round) | "+4.314" | Jolpica-r | |
+| Hidden | `margin` 7 s: "Win by more than 7 seconds" | the game's choice | - | |
+| storylineEvents | none | the only SC is laps 1-4, before the takeover; no VSC or red flag; neither duel car retired | Safety car, VSC and Retirements rows | |
+| Dilemma (spec, catalog) | "Leading from pole with Hamilton under a second behind on the same softs: box first to cover him, or stay out and keep the track position?" | Timing lap 12; ROS stopped on lap 15, a lap before HAM | Timing, Jolpica-p | |
+
+Notes:
+
+- Moments (`pnpm --filter @laststint/sim author united-states-2014 --target win --eras
+  --write`): stop-15, pace-20, pace-28, stop-34 (`data/moments/united-states-2014.json`), the
+  author tool's own picks, not hand-adjusted. Real calls: box mediums on 15 and on 34 (MS, GPE).
+  The model prefers softs at the first stop, so the real lap-15 call grades red against the win
+  (26%, box softs 66%); the real lap-34 call grades 45%.
+- Rosberg's lap-24 switch error is not modelled, so the lap-24 pass is not forced; the win is
+  reachable but not given (author grades 26-90% for the win at the stop calls).
+- Rejected hidden objective (reachability): `margin` 10 s (not reached at Legend).
+- `data/races/united-states-2014.json` and its golden must be rebuilt by the integrator
+  (`pipeline build united-states-2014`); this branch does not commit them.
+
+## germany-2016 (2016 German Grand Prix)
+
+Replaces `united-states-2015` in Era 7 #6.
+
+Every fact below was read in the linked source (fetched 2026-11-09); nothing comes from memory.
+Where sources disagree, the row says so. Put your initials and the date in **Owner checked**.
+Simulator check: passed. Team radio is paraphrased only, never quoted.
+
+### Sources
+
+| Short name | What |
+|---|---|
+| WP | [English Wikipedia race article](https://en.wikipedia.org/wiki/2016_German_Grand_Prix) (qualifying table, infobox, result; no race narrative) |
+| MS | [Motor Sport race report, "2016 German Grand Prix" (Mark Hughes, 1 Aug 2016)](https://www.motorsportmagazine.com/reports/f1/2016-german-grand-prix/) |
+| AS | [Autosport, "Lewis Hamilton stretches Formula 1 lead with German Grand Prix win"](https://www.autosport.com/f1/news/125566/hamilton-wins-as-rosberg-ends-up-fourth) |
+| AS-pen | [Autosport, "Nico Rosberg surprised 'awesome' move on Max Verstappen penalised"](https://www.autosport.com/f1/news/nico-rosberg-surprised-awesome-move-on-max-verstappen-penalised-5039333/5039333/) (search-result summary only; not opened in full) |
+| GPE | [GrandPrix.com race results](https://www.grandprix.com/races/german-gp-2016-race-results.html) (search-result summary only; no GPE narrative report found; the race-notes URL returned an unrelated page) |
+| J-res | [Jolpica results](https://api.jolpi.ca/ergast/f1/2016/12/results.json) |
+| J-pit | [Jolpica pit stops](https://api.jolpi.ca/ergast/f1/2016/12/pitstops.json?limit=100) |
+| OpenF1 | Not used: no 2016 data |
+
+### Facts
+
+| Topic | Fact | Sources | Owner checked |
+|---|---|---|---|
+| Grid | Rosberg pole (1:14.363), Hamilton 2nd (1:14.470), Ricciardo 3rd, Verstappen 4th, Räikkönen 5th, Vettel 6th; Bottas 7th, Hülkenberg 8th, Pérez 9th, Massa 10th. | WP, J-res | |
+| Grid penalties | None in the top six. Hülkenberg one place (tyre allocation in Q1); Sainz three places (impeding Massa; 13th → 15th); Grosjean five places (gearbox; 15th → 20th). | WP, J-res | |
+| Laps | 67 laps, 306.458 km (4.574 km lap), round 12, Hockenheimring, 31 Jul 2016. | WP, J-res | |
+| Weather | Dry. "Partially cloudy and dry" (WP); sunny with high track temperatures (MS). Temperatures in numbers: not in sources. | WP, MS | |
+| Tyres | Medium, soft, supersoft available (WP). Higher degradation than expected: the hotter the track, the more the race moved to three stops; almost everyone ended up three-stopping (MS, AS). | WP, MS, AS | |
+| Start | Rosberg's poor start (wheelspin); Hamilton led into Turn 1. Verstappen went round the outside of Ricciardo for 2nd; both Red Bulls passed Rosberg, who fell to 4th. Vettel and Räikkönen swapped places. Hamilton led Verstappen by 1.3 s after lap 1. Massa hit by Palmer at Turn 6 on lap 1. | MS, AS | |
+| SC / VSC / red flag | None mentioned in any source read. Not confirmed from track-status data (OpenF1 has no 2016). | MS, AS, WP | |
+| Hamilton stops | Three (J-pit: laps 14, 34, 47; AS: all leaders three-stopped). End of lap 14 to softs (MS, AS), lap 34 (one lap after Ricciardo's 2nd stop) to supersofts (AS), last stop back to softs (AS, MS). MS text as fetched read as "two stops": conflicts with J-pit/AS; three taken. | J-pit, MS, AS | |
+| Rosberg stops | Three: laps 11, 27, 44 (J-pit). 1st to supersofts (MS, AS), 2nd to softs (MS lap 27, AS). 3rd stop included the 5 s penalty and ran ~3 s long (see below); J-pit duration 28.364 s vs ~19 s normal. 3rd-stop compound: not in sources. | J-pit, MS, AS | |
+| Ricciardo stops | Three: laps 12, 33, 46 (J-pit). 1st to softs about a lap after Verstappen (MS, AS); 2nd to supersofts (MS lap 33, AS); 3rd to supersofts again (AS). | J-pit, MS, AS | |
+| Verstappen stops | Three: laps 11, 28, 45 (J-pit). 1st to supersofts with Rosberg (MS, AS); 2nd to softs (MS lap 28, AS); 3rd compound: not in sources. | J-pit, MS, AS | |
+| Vettel stops | Three: laps 13, 31, 46 (J-pit; 3rd-stop duration blank in Jolpica). Softs after 1st stop (MS). Before the 2nd round of stops he was told to pit to undercut Verstappen and asked to stay out a couple more laps (MS; paraphrased radio). | J-pit, MS | |
+| Räikkönen stops | Three: laps 14, 32, 47 (J-pit). Softs after 1st stop (MS). | J-pit, MS | |
+| Pit loss | Jolpica pit-lane durations for leaders ~18.5-19.7 s (normal stops). | J-pit | |
+| Red Bull split | Red Bull planned Verstappen for three stops and Ricciardo for two; Verstappen's stops covered three-stopping Rosberg while Ricciardo stayed flexible. Higher degradation made both three-stop. Ricciardo got more life from supersofts; Verstappen lacked rear grip on them. | MS | |
+| Rosberg penalty / contact | Lap 27 (MS): Rosberg dived inside Verstappen into the Turn 6 hairpin and pushed him wide off track. 5 s time penalty, served at his final stop (MS, AS, AS-pen). The team's stopwatch for the 5 s failed, adding ~3 s stationary; both Red Bulls pitted on the next two laps and rejoined ahead (MS). WP: penalised for forcing Verstappen off; slipped to 4th. | MS, AS, AS-pen, WP | |
+| Team orders | Around lap 40 Verstappen let Ricciardo through on team instruction, on the straight to the hairpin (MS). AS reports the pass but not the instruction. | MS, AS | |
+| Key gaps | Lap 1: HAM +1.3 s on VER; lap 6: VER 2.7 s behind; lap 25: HAM lead 8 s; after 2nd stops HAM 5.7 s ahead of ROS, VER ~3 s further back; start of last stint HAM led RIC (on supersofts) by 11 s; RIC closed to 6 s, HAM responded (MS). VER finished a couple of seconds out of Rosberg's reach... MS phrasing ambiguous; result below from J-res. | MS | |
+| Result | Hamilton 1:30:44.200; Ricciardo +6.996; Verstappen +13.413; Rosberg +15.845; Vettel +32.570; Räikkönen +37.023; Hülkenberg +1:10.049 (last on lead lap). Fastest lap Ricciardo 1:18.442, lap 48 (WP). | J-res, AS, WP | |
+| Retirements | Massa suspension, 36 laps (J-res; AS: lap-1 Palmer contact, later into the garage). Nasr power unit, 57 laps (J-res). No top-six retirements. | J-res, AS, WP | |
+| Other penalties | None to front-runners besides Rosberg in sources read. | | |
+| Championship | After the race: Hamilton 217, Rosberg 198 (WP, AS). | WP, AS | |
+| Not in sources | Numeric temperatures; any VSC (none reported); 3rd-stop compounds for Rosberg, Verstappen, Vettel, Räikkönen; exact lap of the Ricciardo/Verstappen swap ("around 40"). | | |
+
+### Draft storyline
+
+| Item | Draft | Owner checked |
+|---|---|---|
+| Storyline drivers | Ricciardo (Red Bull, flexible two-to-three-stop plan, long supersoft stints) and Rosberg (Mercedes, pole, lost the start, 5 s penalty plus slow final stop). | |
+| Dilemma (original wording) | Red Bull split the strategies: let your team-mate cover the Mercedes early, stretch your own stints and choose late between two stops and three as the tyres fade in the heat. | |
+| Hard-call candidates | Ricciardo lap 12 (stop vs extend, compound), lap 33 (supersofts and the run to the end vs a 3rd stop), lap 46 (react to Rosberg's slow stop). Rosberg laps 11/27/44 (cover Verstappen, when to serve the penalty). `pipeline hard-calls` should pick the side. | |
+| Suggested side and target | Ricciardo: `position` P2 (beat Verstappen and Rosberg), or a `win` rewrite (he finished 2nd, 7.0 s behind, so he did not really win; rewrite allowed). If Rosberg is picked: `position` podium (he finished 4th; rewrite allowed). Hamilton really won, so no rewrite if he is picked. | |
+| Modelling risk | **Medium-low.** For: dry, no SC/VSC/red flag reported, no front-runner retirements, sim check passed, Jolpica stop laps for all. Against: Rosberg's 5 s penalty and ~3 s stopwatch delay must be scripted; the Red Bull swap (team order ~lap 40) and the lap-27 Verstappen/Rosberg contact affect the order; some 3rd-stop compounds missing; high, heat-driven degradation must be reproduced for three stops to be optimal. | |

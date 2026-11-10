@@ -88,19 +88,19 @@ Players start at Era 10 and move back through the timeline to Era 1. The eras be
 | 5 | germany-2019 | Rain and constant tyre swaps | win: Verstappen through the rain |
 | 6 | hungary-2019 | Mercedes switches to two stops to catch Verstappen | win: Hamilton catches Verstappen |
 | 7 | brazil-2019 | Late safety car chaos | position: Gasly on the podium |
-| 8 | italy-2020 | Red flag and a pit-lane penalty hand Gasly the win | defend: Gasly holds the lead to the flag |
+| 8 | china-2017 | Vettel stops first for fresh softs: cover him at once, or stay out and defend the lead on older tyres? | defend: Hamilton holds P1 ahead of Vettel |
 | 9 | turkey-2020 | Hamilton's worn intermediates win the title | win: Hamilton from P6 for the title |
-| 10 | sakhir-2020 | Mercedes' pit stop mix-up costs Russell | defend: Russell holds P1 |
+| 10 | china-2018 | A safety car with 25 laps left: give up the lead for fresh softs, or stay out on old mediums and hold off the Red Bulls? | win: Bottas from P2, ahead of Ricciardo |
 
 ### Era 7: Hybrid turbo (2014–2016) · play order 4
 | # | Race ID | Dilemma | Target (draft) |
 |---|---|---|---|
-| 1 | bahrain-2014 | Hamilton vs Rosberg, the Duel in the Desert | defend: Hamilton holds off Rosberg |
+| 1 | united-states-2014 | Leading from pole with Hamilton under a second behind on the same softs: box first to cover him, or stay out and keep the track position? | win: Rosberg (the hard-call side; he finished second, so a rewrite) holds off Hamilton from pole |
 | 2 | brazil-2014 | Stay out to overcut your team-mate on fading rears, or pit with him and fight on track? | win: Hamilton from P2, ahead of Rosberg |
 | 3 | canada-2016 | A virtual safety car hands Ferrari a cheap stop from the lead: take it and commit to two, or stay out and trust the tyres to last in the cold? | win: Vettel beats Hamilton |
 | 4 | singapore-2014 | Second behind Hamilton, who still owes a stop on the harder tyre: make two stops last on the softs, or take a third under the safety car? | position: Vettel holds P2 (rewrite: beat Hamilton) |
 | 5 | abu-dhabi-2015 | Second to your team-mate: stretch the softs, or skip the last stop and gamble on Rosberg's tyres fading? | beat-rival: Hamilton ahead of Rosberg |
-| 6 | united-states-2015 | Hamilton clinches the title in mixed conditions | beat-rival: Hamilton ahead of Rosberg and Vettel for the title |
+| 6 | germany-2016 | Leading from the start as the tyres fade in the heat: time three stops against two Red Bulls on split strategies. | defend: Hamilton holds P1 |
 | 7 | spain-2016 | Mercedes cars collide; Red Bull's split strategy | defend: Verstappen holds off Räikkönen |
 | 8 | bahrain-2015 | Ferrari runs Räikkönen against the grain: mediums in the middle, then a late sprint on softs to reel in the Mercedes | win: Räikkönen from P4 |
 | 9 | malaysia-2015 | Vettel stayed out under the early safety car and leads: make two stops last on a 60-degree track while Mercedes, on hards, stops three times | win: Vettel from P2 |
@@ -111,14 +111,14 @@ Players start at Era 10 and move back through the timeline to Era 1. The eras be
 |---|---|---|---|
 | 1 | bahrain-2012 | Räikkönen closes in on Lotus' fresher softs: cover the undercut at the last stop, or trust Red Bull's own plan | defend: Vettel holds P1 |
 | 2 | abu-dhabi-2010 | Ferrari covers the wrong car and loses the title | position: Alonso P4 or better for the title |
-| 3 | china-2011 | Hamilton's three stops beat Vettel's two | win: Hamilton beats Vettel |
+| 3 | germany-2013 | Räikkönen inherits the lead when Vettel and Grosjean make their last stops: run to the flag on ageing tyres, or stop for softs and hunt Vettel down | win: Räikkönen from P4 |
 | 4 | italy-2010 | Button blinks first: does Alonso stay out one more lap and trust his crew to win it in the pit lane? | win: Alonso gets ahead of Button at the stops |
 | 5 | australia-2013 | Lotus is kind to its tyres: stretch Räikkönen to two stops while the Ferraris and Red Bulls stop three times | win: Räikkönen from P7 |
 | 6 | europe-2012 | Alonso wins from 11th in Valencia | win: Alonso from P11 |
-| 7 | abu-dhabi-2012 | Vettel from the pit lane to the podium | position: Vettel from the pit lane to the podium |
-| 8 | brazil-2012 | Vettel recovers from a first-lap spin to win the title | position: Vettel high enough for the title |
+| 7 | germany-2012 | Button sits third behind Alonso and Vettel: bring the last stop forward a lap to jump the Red Bull, then chase the Ferrari on fresher tyres | win: Button from P6 |
+| 8 | china-2013 | Ferrari's softs last only a handful of laps: commit Alonso to three stops and find a way past the cars running long on mediums | win: Alonso from P3 |
 | 9 | malaysia-2013 | Multi 21 team orders | defend: Webber holds P1 |
-| 10 | spain-2013 | Alonso wins on four stops | win: Alonso on four stops |
+| 10 | abu-dhabi-2011 | Three seconds clear of Alonso on the same tyres: box first for the last stint to cover the undercut, or stay out and risk Ferrari going longer | defend: Hamilton holds P1 |
 
 ### Era 5: Alonso, Räikkönen, Hamilton (2005–2009) · play order 6
 | # | Race ID | Dilemma | Target (draft) |
@@ -128,8 +128,8 @@ Players start at Era 10 and move back through the timeline to Era 1. The eras be
 | 3 | france-2007 | Two seconds behind team-mate Massa with lapped cars ahead, Räikkönen must choose: box when Massa does, or stretch the stint three laps longer and jump him at the second stops | position: Räikkönen (the hard-call side; he won, so no rewrite) in the top two from P3 |
 | 4 | san-marino-2006 | Glued to a grip-starved Ferrari on a track where nobody passes, does Renault gamble on stopping a lap early, or wait for Schumacher to blink? | beat-rival: Alonso ahead of Schumacher |
 | 5 | great-britain-2007 | Two-stopping at Silverstone with fuel deciding the order: short-fill Alonso to jump Räikkönen at the first stops, or run long like Ferrari and win it at the second? | beat-rival: Alonso ahead of Räikkönen |
-| 6 | europe-2007 | Rain chaos at the Nürburgring | win: Alonso chases Massa |
-| 7 | brazil-2007 | Three-way title decider | deny: Räikkönen wins, Hamilton kept P6 or lower |
+| 6 | belgium-2009 | Stuck a second behind a KERS Ferrari he can't pass on track, Fisichella's team must decide whether to keep mirroring Ferrari's stops or split the strategy to jump him in the pits | position: Fisichella top two from P2 (rewrite on the win) |
+| 7 | hungary-2007 | Stuck a second behind the leader at a track with no overtaking, Räikkönen must pick his fuel at the shared first stop: run short and try to jump him at the second stops, or take more and hope he stays out longer | win: Räikkönen from P3 |
 | 8 | bahrain-2006 | Schumacher pits first on lap 36; Renault can keep Alonso out three more laps on a lighter tank and gamble that the overcut puts him ahead at pit exit | win: Alonso from P4 |
 | 9 | turkey-2008 | A tyre warning forces Hamilton onto three stops: can a light McLaren build enough of a gap to beat Massa's two-stop Ferrari? | win: Hamilton from P3 on three stops |
 | 10 | malaysia-2006 | Stuck with a heavy tank after a fuel mistake in qualifying, Alonso starts 7th: how long can Renault stretch the first stint, and how little fuel is enough at the last stop to come out ahead of Button? | beat-rival: Alonso ahead of Button |
@@ -155,7 +155,7 @@ Players start at Era 10 and move back through the timeline to Era 1. The eras be
 | 2 | australia-1994 | Schumacher vs Hill for the title | beat-rival: Schumacher ahead of Hill |
 | 3 | belgium-1995 | Schumacher from 16th on slicks in the wet | win: Schumacher from P16 |
 | 4 | spain-1996 | Schumacher's rain masterclass | win: Schumacher in the rain |
-| 5 | hungary-1997 | Hill's Arrows almost wins | defend: Hill holds P1 |
+| 5 | luxembourg-1998 | Ferrari brings the leader in first on lap 24; McLaren keeps Häkkinen out four more laps on a light car to jump him in the pits | win: Häkkinen from P2 (lap-21 takeover) |
 | 6 | europe-1997 | The title decider at Jerez | beat-rival: Villeneuve ahead of Schumacher |
 | 7 | hungary-1998 | Ferrari switches to three stops mid-race | win: Schumacher on three stops |
 | 8 | germany-1996 | Boxed in behind the one-stopping Benettons: a short first stop for Hill to find clear air | win: Hill beats Berger |
@@ -241,12 +241,12 @@ Every race has one target, set in `eras.target`. Each race's draft target is in 
 
 | Type | Means | Grader `Target` | Races (draft) |
 |---|---|---|---|
-| `win` | Chase down the win from behind | `win` | 45 |
-| `defend` | Start in the lead and keep it to the flag | `win`, starting from P1 | 20 |
+| `win` | Chase down the win from behind | `win` | 48 |
+| `defend` | Start in the lead and keep it to the flag | `win`, starting from P1 | 19 |
 | `position` | Reach a set position, such as P3 to win the title | `position` | 17 |
-| `beat-rival` | Finish ahead of a named car, wherever that is | `beat-rival` | 14 |
+| `beat-rival` | Finish ahead of a named car, wherever that is | `beat-rival` | 13 |
 | `team` | A team result, such as a 1–2 in a set order | `team` (new) | 2 |
-| `deny` | Keep a rival at or below a set position, such as out of the top 3 to stop their title | `deny` (new) | 2 |
+| `deny` | Keep a rival at or below a set position, such as out of the top 3 to stop their title | `deny` (new) | 1 |
 
 Every era has at least three different target types.
 

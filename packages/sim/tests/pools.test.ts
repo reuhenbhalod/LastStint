@@ -65,7 +65,16 @@ describe('race pools', () => {
   });
 
   it('puts every playable race in a pool', () => {
-    const pooled = new Set([...pools.daily, ...Object.keys(pools.survivor), ...erasRaces]);
+    // Authored Eras races swapped out of the pools (Era 6 second round, Nov 9) keep their
+    // overlays, moments and race files as Eras-build fixtures; they aren't served.
+    const swappedOut = ['china-2011', 'spain-2013'];
+    const pooled = new Set([
+      ...pools.daily,
+      ...Object.keys(pools.survivor),
+      ...erasRaces,
+      ...swappedOut,
+    ]);
+    expect(swappedOut.filter((id) => erasRaces.includes(id))).toEqual([]);
     const playable = readdirSync(join(data, 'races'))
       .filter((f) => f.endsWith('.json'))
       .map((f) => f.slice(0, -5))

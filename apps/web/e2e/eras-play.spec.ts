@@ -3,9 +3,9 @@
 // Between them: refuelling (a box call waits for its fuel fill), the 2005 tyre lock, no DRS
 // before 2011, a team order, the decision timer running out and the untimed opt-out, Legend,
 // reconstructed races with pit-board prompts (Eras 1-2), an avoidable storyline retirement
-// (repeated and avoided), the history book and a leaderboard. No authored race has a red flag
-// or a car fault of its own yet, so those two are played on the catalog's Draft races that do
-// (italy-2020, hungary-1997), as test mode serves them.
+// (repeated and avoided), the history book and a leaderboard. The red flag is azerbaijan-2021's
+// (authored; italy-2020 left Eras in migration 0023). The car fault is brazil-2019's (authored):
+// Hamilton's lap-70 contact damage (hungary-1997 left Eras in migration 0028).
 //
 // Each test plays a whole race at five times the normal lap speed (the app's e2e hook); the
 // tests run in parallel. Runtime: see docs/eras-build-plan.md step 10.1.
@@ -147,15 +147,14 @@ test('Era 8: Turkey 2020 from the map to the results', async ({ page }) => {
   expect(eras.submissions).toHaveLength(1);
 });
 
-test('Era 8 (Draft): Italy 2020’s red flag', async ({ page }) => {
-  const model = loadEraRace('italy-2020');
+test('Era 9: Azerbaijan 2021’s red flag', async ({ page }) => {
+  const model = loadEraRace('azerbaijan-2021');
   expect(model.events.some((e) => e.type === 'RED')).toBe(true);
   await mockEras(page, [model]);
-  await openRace(page, 'italy-2020');
-  await expect(page.getByText('Draft', { exact: true })).toBeVisible();
+  await openRace(page, 'azerbaijan-2021');
   const played = await playRace(page);
   expect(played.redFlag, 'the red flag shows on the race screen').toBe(true);
-  await resultsFor(page, 8);
+  await resultsFor(page, 9);
 });
 
 test('Era 7: Abu Dhabi 2016 from the map to the results', async ({ page }) => {
@@ -167,21 +166,22 @@ test('Era 7: Abu Dhabi 2016 from the map to the results', async ({ page }) => {
   expect(eras.submissions).toHaveLength(1);
 });
 
-test('Era 3 (Draft): Hungary 1997’s stuck gearbox', async ({ page }) => {
-  const model = loadEraRace('hungary-1997');
+test('Era 8: Brazil 2019’s contact damage on the radio', async ({ page }) => {
+  const model = loadEraRace('brazil-2019');
   await mockEras(page, [model]);
-  await openRace(page, 'hungary-1997');
-  // Hill's own call on the radio when the gearbox sticks (engineerRadio.ts FAULT_LINES).
-  const stuck = 'The gearbox is stuck in one gear! I’m losing loads.';
-  const radio = watchRadio(page, [stuck]);
+  await openRace(page, 'brazil-2019');
+  // Hamilton's own call when the contact strikes (engineerRadio.ts: a `damage` fault has no
+  // line of its own, so the general one plays).
+  const hit = 'Something’s wrong with the car!';
+  const radio = watchRadio(page, [hit]);
   await playRace(page, { each: radio.each });
-  expect(radio.seen.get(stuck), 'the fault line in the radio log').toMatch(/^L74 · Hill/);
-  // The hydraulics fault strikes on its real lap; Hill is yours.
+  expect(radio.seen.get(hit), 'the fault line in the radio log').toMatch(/^L70 · Hamilton/);
+  // The contact strikes on its real lap; Hamilton is yours.
   const faults = (await raceNotes(page)).filter((n) => n.kind === 'fault');
   expect(faults).toContainEqual(
-    expect.objectContaining({ driver: 'HIL', lap: 74, detail: 'gear-stuck' }),
+    expect.objectContaining({ driver: 'HAM', lap: 70, detail: 'damage' }),
   );
-  await resultsFor(page, 3);
+  await resultsFor(page, 8);
 });
 
 test('Era 6: Abu Dhabi 2010 at Legend, no DRS', async ({ page }) => {

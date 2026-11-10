@@ -367,10 +367,10 @@ describe('verifyRun', () => {
 });
 
 describe('Legend', () => {
-  // Seed 4242: Legend removes the real VSC, SC and restart moments and draws a SC on lap 35
-  // (Yas Marina's rates with abu-dhabi-2010 and -2012 in data/sc_rates.json), so the player is
-  // asked legend-sc-35, then the two green-flag calls.
-  const seed = 4242;
+  // Seed 4363: Legend removes the real VSC, SC and restart moments and draws a SC on lap 35
+  // (Yas Marina's rates with abu-dhabi-2010, -2011 and -2012 in data/sc_rates.json), so the
+  // player is asked legend-sc-35, then the two green-flag calls.
+  const seed = 4363;
   const moments = legendMoments(fullAbu, seed);
   const run = initRun(fullAbu, seed, { decisions: [], legend: true });
   const grades: ClaimedGrade[] = [];

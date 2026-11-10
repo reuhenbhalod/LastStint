@@ -1,0 +1,39 @@
+{
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": true,
+    "ers": "kers",
+    "refuelling": false
+  },
+  "eras": {
+    "eraId": 6,
+    "order": 10,
+    "userSide": "HAM",
+    "hardCalls": {
+      "HAM": 3,
+      "ALO": 1
+    },
+    "target": {
+      "type": "defend"
+    },
+    "storyline": {
+      "real": "Vettel leads into the first corner from pole, then spins at Turn 2 with a punctured right-rear tyre and is out on the first lap, so Hamilton leads with Alonso second. Both make their first stop on lap 16. McLaren bring Hamilton in again on lap 40; Ferrari keep Alonso out three laps longer on old tyres, and he rejoins more than four seconds behind. Hamilton wins by 8.457 s, and for the only time in 2011 no Red Bull is on the podium."
+    },
+    "mastery": {
+      "type": "margin",
+      "seconds": 8,
+      "label": "Win by more than 8 seconds"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "push",
+      "maxLaps": 0,
+      "label": "Win without a single push lap"
+    },
+    "briefing": "Abu Dhabi, 2011. Vettel's pole came to nothing: a right-rear puncture put him out on the first lap. You run Hamilton, leading after 13 laps, 2.3 s clear of Alonso's Ferrari, both on softs. Bring Hamilton home first."
+  },
+  "storylineEvents": []
+}

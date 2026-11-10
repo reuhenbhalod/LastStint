@@ -172,7 +172,7 @@
       "australia-1994",
       "belgium-1995",
       "spain-1996",
-      "hungary-1997",
+      "luxembourg-1998",
       "europe-1997",
       "hungary-1998",
       "germany-1996",
@@ -197,8 +197,8 @@
       "france-2007",
       "san-marino-2006",
       "great-britain-2007",
-      "europe-2007",
-      "brazil-2007",
+      "belgium-2009",
+      "hungary-2007",
       "bahrain-2006",
       "turkey-2008",
       "malaysia-2006"
@@ -206,22 +206,22 @@
     "6": [
       "bahrain-2012",
       "abu-dhabi-2010",
-      "china-2011",
+      "germany-2013",
       "italy-2010",
       "australia-2013",
       "europe-2012",
-      "abu-dhabi-2012",
-      "brazil-2012",
+      "germany-2012",
+      "china-2013",
       "malaysia-2013",
-      "spain-2013"
+      "abu-dhabi-2011"
     ],
     "7": [
-      "bahrain-2014",
+      "united-states-2014",
       "brazil-2014",
       "canada-2016",
       "singapore-2014",
       "abu-dhabi-2015",
-      "united-states-2015",
+      "germany-2016",
       "spain-2016",
       "bahrain-2015",
       "malaysia-2015",
@@ -235,9 +235,9 @@
       "germany-2019",
       "hungary-2019",
       "brazil-2019",
-      "italy-2020",
+      "china-2017",
       "turkey-2020",
-      "sakhir-2020"
+      "china-2018"
     ],
     "9": [
       "bahrain-2021",

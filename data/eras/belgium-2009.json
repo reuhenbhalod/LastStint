@@ -1,0 +1,43 @@
+{
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "kers",
+    "refuelling": true
+  },
+  "eras": {
+    "eraId": 5,
+    "order": 6,
+    "userSide": "FIS",
+    "target": {
+      "type": "position",
+      "position": 2
+    },
+    "storyline": {
+      "real": "Fisichella puts the Force India on pole. Räikkönen, sixth on the grid and the only KERS car in the top ten, takes second on the opening lap, and at the restart after the lap-one safety car he uses KERS to pass Fisichella for the lead. The two make the same two stops on the same laps, and Ferrari stays ahead each time. Fisichella stays close but can't get past: Räikkönen wins by 0.939 s, and Force India takes its first podium.",
+      "rewriteCondition": {
+        "type": "win"
+      },
+      "headline": "Force India's first win: Fisichella beats the Ferrari at Spa"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 2,
+      "label": "Top two on two stops"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "manage",
+      "maxLaps": 0,
+      "label": "Top two without a lap managing the tyres"
+    },
+    "hardCalls": {
+      "FIS": 0,
+      "RAI": 0
+    },
+    "briefing": "Spa, 2009. You run Fisichella's Force India from pole, but Räikkönen's KERS Ferrari passed you at the restart after the lap-one safety car. After 11 laps you're second, 1.8 s behind him, with Kubica 1.9 s behind you. Ferrari will stop when you do. Hold on to a top-two finish, or find a way past."
+  }
+}

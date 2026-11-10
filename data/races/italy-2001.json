@@ -859,7 +859,8 @@
     "order": 8,
     "userSide": "MON",
     "target": {
-      "type": "win"
+      "type": "position",
+      "position": 2
     },
     "storyline": {
       "real": "Montoya leads from pole until a blistered tyre slows him out of a chicane and Barrichello, lighter on fuel for two stops, passes him on lap 9. Barrichello's first stop runs six or seven seconds long while Ferrari switch to Schumacher's refuelling rig. Montoya stops once, after 28 laps, takes the lead for good at Barrichello's second stop and wins by 5.2 s, his first Formula 1 win."
@@ -867,19 +868,19 @@
     "mastery": {
       "type": "stop_count",
       "exact": 1,
-      "label": "Win on one stop"
+      "label": "Top two on one stop"
     },
     "hidden": {
       "type": "mode_rule",
       "mode": "push",
       "maxLaps": 0,
-      "label": "Win without a single push lap"
+      "label": "Top two without a single push lap"
     },
     "hardCalls": {
       "MON": 1,
       "BAR": 0
     },
-    "briefing": "Monza, 2001. Montoya starts from pole for Williams, but Barrichello's Ferrari, lighter on fuel for two stops, has passed him. You run Montoya, second and 8.6 s behind after 16 laps, on one stop. Win it."
+    "briefing": "Monza, 2001. Montoya starts from pole for Williams, but Barrichello's Ferrari, lighter on fuel for two stops, has passed him. You run Montoya, second and 8.6 s behind after 16 laps, on one stop. Bring it home in the top two."
   },
   "provenance": {
     "kind": "real",

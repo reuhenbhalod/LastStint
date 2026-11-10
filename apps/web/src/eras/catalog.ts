@@ -193,12 +193,21 @@ const RACE_TABLE: Record<number, ReadonlyArray<readonly [string, string]>> = {
     ['germany-2019', 'Rain and constant tyre swaps'],
     ['hungary-2019', 'Mercedes switches to two stops to catch Verstappen'],
     ['brazil-2019', 'Late safety car chaos'],
-    ['italy-2020', 'Red flag and a pit-lane penalty hand Gasly the win'],
+    [
+      'china-2017',
+      'Vettel stops first for fresh softs: cover him at once, or stay out and defend the lead on older tyres?',
+    ],
     ['turkey-2020', "Hamilton's worn intermediates win the title"],
-    ['sakhir-2020', "Mercedes' pit stop mix-up costs Russell"],
+    [
+      'china-2018',
+      'A safety car with 25 laps left: give up the lead for fresh softs, or stay out on old mediums and hold off the Red Bulls?',
+    ],
   ],
   7: [
-    ['bahrain-2014', 'Hamilton vs Rosberg, the Duel in the Desert'],
+    [
+      'united-states-2014',
+      'Leading from pole with Hamilton under a second behind on the same softs: box first to cover him, or stay out and keep the track position?',
+    ],
     [
       'brazil-2014',
       'Stay out to overcut your team-mate on fading rears, or pit with him and fight on track?',
@@ -215,7 +224,10 @@ const RACE_TABLE: Record<number, ReadonlyArray<readonly [string, string]>> = {
       'abu-dhabi-2015',
       "Second to your team-mate: stretch the softs, or skip the last stop and gamble on Rosberg's tyres fading?",
     ],
-    ['united-states-2015', 'Hamilton clinches the title in mixed conditions'],
+    [
+      'germany-2016',
+      'Leading from the start as the tyres fade in the heat: time three stops against two Red Bulls on split strategies.',
+    ],
     ['spain-2016', "Mercedes cars collide; Red Bull's split strategy"],
     [
       'bahrain-2015',
@@ -233,7 +245,10 @@ const RACE_TABLE: Record<number, ReadonlyArray<readonly [string, string]>> = {
       "Räikkönen closes in on Lotus' fresher softs: cover the undercut at the last stop, or trust Red Bull's own plan",
     ],
     ['abu-dhabi-2010', 'Ferrari covers the wrong car and loses the title'],
-    ['china-2011', "Hamilton's three stops beat Vettel's two"],
+    [
+      'germany-2013',
+      'Räikkönen inherits the lead when Vettel and Grosjean make their last stops: run to the flag on ageing tyres, or stop for softs and hunt Vettel down',
+    ],
     [
       'italy-2010',
       'Button blinks first: does Alonso stay out one more lap and trust his crew to win it in the pit lane?',
@@ -243,10 +258,19 @@ const RACE_TABLE: Record<number, ReadonlyArray<readonly [string, string]>> = {
       'Lotus is kind to its tyres: stretch Räikkönen to two stops while the Ferraris and Red Bulls stop three times',
     ],
     ['europe-2012', 'Alonso wins from 11th in Valencia'],
-    ['abu-dhabi-2012', 'Vettel from the pit lane to the podium'],
-    ['brazil-2012', 'Vettel recovers from a first-lap spin to win the title'],
+    [
+      'germany-2012',
+      'Button sits third behind Alonso and Vettel: bring the last stop forward a lap to jump the Red Bull, then chase the Ferrari on fresher tyres',
+    ],
+    [
+      'china-2013',
+      "Ferrari's softs last only a handful of laps: commit Alonso to three stops and find a way past the cars running long on mediums",
+    ],
     ['malaysia-2013', 'Multi 21 team orders'],
-    ['spain-2013', 'Alonso wins on four stops'],
+    [
+      'abu-dhabi-2011',
+      'Three seconds clear of Alonso on the same tyres: box first for the last stint to cover the undercut, or stay out and risk Ferrari going longer',
+    ],
   ],
   5: [
     ['san-marino-2005', 'Alonso holds off Schumacher'],
@@ -266,8 +290,14 @@ const RACE_TABLE: Record<number, ReadonlyArray<readonly [string, string]>> = {
       'great-britain-2007',
       'Two-stopping at Silverstone with fuel deciding the order: short-fill Alonso to jump Räikkönen at the first stops, or run long like Ferrari and win it at the second?',
     ],
-    ['europe-2007', 'Rain chaos at the Nürburgring'],
-    ['brazil-2007', 'Three-way title decider'],
+    [
+      'belgium-2009',
+      "Stuck a second behind a KERS Ferrari he can't pass on track, Fisichella's team must decide whether to keep mirroring Ferrari's stops or split the strategy to jump him in the pits",
+    ],
+    [
+      'hungary-2007',
+      'Stuck a second behind the leader at a track with no overtaking, Räikkönen must pick his fuel at the shared first stop: run short and try to jump him at the second stops, or take more and hope he stays out longer',
+    ],
     [
       'bahrain-2006',
       'Schumacher pits first on lap 36; Renault can keep Alonso out three more laps on a lighter tank and gamble that the overcut puts him ahead at pit exit',
@@ -319,7 +349,10 @@ const RACE_TABLE: Record<number, ReadonlyArray<readonly [string, string]>> = {
     ['australia-1994', 'Schumacher vs Hill for the title'],
     ['belgium-1995', 'Schumacher from 16th on slicks in the wet'],
     ['spain-1996', "Schumacher's rain masterclass"],
-    ['hungary-1997', "Hill's Arrows almost wins"],
+    [
+      'luxembourg-1998',
+      'Ferrari brings the leader in first on lap 24; McLaren keeps Häkkinen out four more laps on a light car to jump him in the pits',
+    ],
     ['europe-1997', 'The title decider at Jerez'],
     ['hungary-1998', 'Ferrari switches to three stops mid-race'],
     [

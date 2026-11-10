@@ -38,10 +38,22 @@ ERAS_RACE_FILES['hungary-2022'] = {
   },
 };
 
-// Every Eras race has a race file since china-2007 and brazil-1993 were built: europe-2007's
+// china-2018 (Era 8 #10 since migration 0023) has no Eras block yet; this isolate's bundle gets a
+// stand-in race file without one (Hungary 2022's, renamed), so the "no Eras target yet" path stays
+// covered whatever china-2018's real file holds.
+{
+  const { eras: _eras, ...noEras } = hungary2022Json as unknown as RaceModel;
+  ERAS_RACE_FILES['china-2018'] = {
+    ...noEras,
+    race: { ...noEras.race, id: 'china-2018' },
+    decisionMoments: [],
+  };
+}
+
+// Every Eras race has a race file since china-2007 and brazil-1993 were built: san-marino-2005's
 // is left out of this isolate's bundle, so the not-built path stays covered (china-2007 left
-// Eras in migration 0020).
-Reflect.deleteProperty(ERAS_RACE_FILES, 'europe-2007');
+// Eras in migration 0020, europe-2007 in 0026).
+Reflect.deleteProperty(ERAS_RACE_FILES, 'san-marino-2005');
 
 /** A request to the Worker with ERAS_TEST_MODE set for this call. */
 async function call(mode: Mode, path: string, body?: unknown): Promise<Response> {
@@ -447,10 +459,10 @@ describe('POST /api/eras/attempts', () => {
   });
 
   it('refuses a race with no race file yet, an unknown race and a bad body', async () => {
-    expect(await json<{ error: string }>(await start('test', 'europe-2007'))).toMatchObject({
+    expect(await json<{ error: string }>(await start('test', 'san-marino-2005'))).toMatchObject({
       error: 'model-missing',
     });
-    expect((await start('test', 'europe-2007')).status).toBe(503);
+    expect((await start('test', 'san-marino-2005')).status).toBe(503);
     expect((await start('test', 'spain-2020')).status).toBe(404); // a Daily race, not Eras
     expect((await call('test', '/api/eras/attempts', { anonId: 'x', raceId: 'x' })).status).toBe(
       400,
@@ -479,7 +491,7 @@ describe('GET /api/eras/races/:raceId/model', () => {
 
   it('test serves every built Eras race; never one with no file or not in Eras', async () => {
     expect((await model('test', 'hungary-2022')).status).toBe(200);
-    expect((await model('test', 'europe-2007')).status).toBe(404);
+    expect((await model('test', 'san-marino-2005')).status).toBe(404);
     expect((await model('test', 'spain-2020')).status).toBe(404);
   });
 
@@ -575,7 +587,7 @@ describe('POST /api/eras/attempts/:id', () => {
   });
 
   it('refuses a race whose file has no Eras target yet (503), storing nothing', async () => {
-    const a = await json<Attempt>(await start('test', 'italy-2020'));
+    const a = await json<Attempt>(await start('test', 'china-2018'));
     const res = await submit(a.attemptId, { anonId: ids.a, decisions });
     expect(res.status).toBe(503);
     expect((await json<{ error: string }>(res)).error).toBe('race-not-ready');
