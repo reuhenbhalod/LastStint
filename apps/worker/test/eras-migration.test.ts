@@ -279,12 +279,10 @@ describe('migration 0014: five more Eras races swapped (Era 10 and Era 9, second
     return m;
   };
 
-  it('applies last, after 0013', () => {
+  it('applies after 0013', () => {
     const names = env.TEST_MIGRATIONS.map((m) => m.name);
-    expect(names.slice(-2)).toEqual([
-      '0013_swap_eras_races_e10_e9.sql',
-      '0014_swap_eras_races_e10_e9_b.sql',
-    ]);
+    const at = names.indexOf('0014_swap_eras_races_e10_e9_b.sql');
+    expect(names[at - 1]).toBe('0013_swap_eras_races_e10_e9.sql');
   });
 
   it("puts each new race in the old one's era and position, still Draft", async () => {
@@ -338,6 +336,89 @@ describe('migration 0014: five more Eras races swapped (Era 10 and Era 9, second
     expect(await ids('era_attempts')).toEqual(['abu-dhabi-2021']);
     expect(await ids('era_progress')).toEqual(['abu-dhabi-2021']);
     expect(await ids('history_entries')).toEqual(['abu-dhabi-2021']);
+    for (const s of SWAPS) {
+      const row = await env.DB.prepare('SELECT era_id, position FROM era_races WHERE race_id = ?1')
+        .bind(s.race_id)
+        .first();
+      expect(row, s.race_id).toEqual({ era_id: s.era_id, position: s.position });
+    }
+  });
+});
+
+describe('migration 0022: three Era 3 races swapped (stats picks)', () => {
+  const SWAPS = [
+    { gone: 'belgium-1998', race_id: 'germany-1996', era_id: 3, position: 8 },
+    { gone: 'malaysia-1999', race_id: 'germany-1997', era_id: 3, position: 9 },
+    { gone: 'europe-1999', race_id: 'san-marino-1999', era_id: 3, position: 10 },
+  ];
+  const migration = () => {
+    const m = env.TEST_MIGRATIONS.find((x) => x.name === '0022_swap_eras_races_era3.sql');
+    if (!m) throw new Error('0022 missing');
+    return m;
+  };
+
+  it('applies last, after 0014', () => {
+    const names = env.TEST_MIGRATIONS.map((m) => m.name);
+    expect(names.at(-1)).toBe('0022_swap_eras_races_era3.sql');
+    expect(names.indexOf('0014_swap_eras_races_e10_e9_b.sql')).toBeLessThan(names.length - 1);
+  });
+
+  it("puts each new race in the old one's era and position, still Draft", async () => {
+    const races = await all<EraRace>('SELECT * FROM era_races');
+    expect(races).toHaveLength(100);
+    for (const s of SWAPS) {
+      expect(races.find((r) => r.race_id === s.race_id)).toEqual({
+        race_id: s.race_id,
+        era_id: s.era_id,
+        position: s.position,
+        published: 0,
+      });
+      expect(races.find((r) => r.race_id === s.gone)).toBeUndefined();
+    }
+    // hungary-1997 stays in its slot.
+    expect(races.find((r) => r.race_id === 'hungary-1997')).toMatchObject({
+      era_id: 3,
+      position: 5,
+    });
+  });
+
+  it("deletes the removed races' attempts, stars and history entries, and keeps the rest", async () => {
+    // Back to the state before 0022 for every swap, with a player who played each removed race
+    // and one race that stays.
+    for (const s of SWAPS) {
+      await env.DB.prepare('UPDATE era_races SET race_id = ?1 WHERE race_id = ?2')
+        .bind(s.gone, s.race_id)
+        .run();
+    }
+    const now = new Date().toISOString();
+    const played = [
+      ...SWAPS.map((s, i) => [`a-old-${i}`, s.gone] as const),
+      ['a-kept', 'hungary-1997'] as const,
+    ];
+    for (const [id, race] of played) {
+      await env.DB.prepare(
+        `INSERT INTO era_attempts (id, player_id, race_id, seed, created_at) VALUES (?1, 'p1', ?2, 1, ?3)`,
+      )
+        .bind(id, race, now)
+        .run();
+      await env.DB.prepare(
+        `INSERT INTO era_progress (player_id, race_id, star_result, updated_at) VALUES ('p1', ?1, 1, ?2)`,
+      )
+        .bind(race, now)
+        .run();
+      await env.DB.prepare(
+        `INSERT INTO history_entries (player_id, race_id, attempt_id, achieved_at) VALUES ('p1', ?1, ?2, ?3)`,
+      )
+        .bind(race, id, now)
+        .run();
+    }
+    await env.DB.batch(migration().queries.map((q) => env.DB.prepare(q)));
+
+    const ids = async (table: string) =>
+      (await all<{ race_id: string }>(`SELECT race_id FROM ${table}`)).map((r) => r.race_id);
+    expect(await ids('era_attempts')).toEqual(['hungary-1997']);
+    expect(await ids('era_progress')).toEqual(['hungary-1997']);
+    expect(await ids('history_entries')).toEqual(['hungary-1997']);
     for (const s of SWAPS) {
       const row = await env.DB.prepare('SELECT era_id, position FROM era_races WHERE race_id = ?1')
         .bind(s.race_id)

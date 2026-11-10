@@ -75,6 +75,9 @@ APPENDIX_RACES = [
     *("san-marino-2005", "japan-2005", "hungary-2006", "brazil-2006", "china-2007"),
     *("europe-2007", "brazil-2007", "monaco-2008", "brazil-2008", "brazil-2009"),
     *("australia-2010", "abu-dhabi-2010"),
+    # Swapped into Era 3 on Nov 9 (docs/eras-checks/swap-races-era3-overnight.md); the races
+    # they replaced (belgium-1998, malaysia-1999, europe-1999) stay above as Eras-build fixtures.
+    *("germany-1996", "germany-1997", "san-marino-1999"),
 ]
 FIRST_STOPS_YEAR = 1994
 

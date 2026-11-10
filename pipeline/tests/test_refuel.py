@@ -290,7 +290,7 @@ def test_the_stops_pooled_slope_is_current():
 def test_no_single_race_pulls_the_rate_back_toward_the_pooled_slope():
     """Every refuelling race in data/raw/f1db keeps its rate within 0.06 s of the prior (the
     most precise, europe-2007, has a negative slope: 0.20), and a precise race at the
-    stops' pooled slope (0.0648, se 0.025) stays above 0.22."""
+    stops' pooled slope (0.0621, se 0.025) stays above 0.22."""
     rates = {}
     for path in sorted(refuel.F1DB_DIR.glob("*.stops.csv")):
         race = path.name.split(".")[0]
