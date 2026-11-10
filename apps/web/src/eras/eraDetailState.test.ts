@@ -165,7 +165,7 @@ describe('eraDetailView', () => {
 
 describe('loadEraDetail', () => {
   it('loads an era from the mock, with only bundled races startable', async () => {
-    const state = await loadEraDetail(mockErasApi, 9);
+    const state = await loadEraDetail(mockErasApi, 9, mockCanStart);
     if (state.kind !== 'ready') throw new Error(state.kind);
     expect(state.view.testMode).toBe(true);
     expect(state.view.cards).toHaveLength(10);
@@ -183,12 +183,12 @@ describe('loadEraDetail', () => {
         throw new Error('offline');
       },
     };
-    expect(await loadEraDetail(offline, 9)).toEqual({
+    expect(await loadEraDetail(offline, 9, mockCanStart)).toEqual({
       kind: 'error',
       message: 'Couldn’t load this era (offline).',
     });
     const wrong: ErasApi = { ...mockErasApi, era: async () => mockErasApi.era(8) };
-    expect(await loadEraDetail(wrong, 9)).toMatchObject({
+    expect(await loadEraDetail(wrong, 9, mockCanStart)).toMatchObject({
       kind: 'error',
       message: expect.stringContaining('asked for Era 9, got Era 8'),
     });
