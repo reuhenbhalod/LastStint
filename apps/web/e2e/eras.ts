@@ -11,6 +11,13 @@
 import { readFileSync } from 'node:fs';
 import { type Locator, type Page, expect } from '@playwright/test';
 import { ERAS, eraRace, raceName, racesOfEra } from '../src/eras/catalog.js';
+import {
+  type ErasProduction,
+  attemptRefusal,
+  releasedForReal,
+  seededStars,
+  unlockedEras,
+} from './erasProduction.js';
 
 /** A lap at 2× takes 5 s × this: 0.2 is one second a lap. */
 export const LAP_SCALE = 0.2;
@@ -65,6 +72,7 @@ const CONFIG = JSON.parse(
 ) as {
   difficulty: Array<Difficulty & { era: number; playOrder: number }>;
   legend: Difficulty;
+  unlockShare: number;
 };
 
 const settings = ({
@@ -110,6 +118,10 @@ export interface ErasMockOptions {
   cleared?: number[];
   /** The ★1 result the server finds (default: the user's car finished the race). */
   result?: (raceId: string, submitted: Submitted) => boolean;
+  /** Normal stars the player already has, per era (3 a race, in race order). */
+  stars?: Record<number, number>;
+  /** Serve as production (ERAS_TEST_MODE off; e2e/erasProduction.ts). Default: test mode. */
+  production?: ErasProduction;
 }
 
 /** What the mocked Worker saw. */
@@ -249,13 +261,33 @@ export async function mockEras(
   const progress = new Map<string, { stars: Stars; accuracy: number }>();
   const entries: Array<Record<string, unknown>> = [];
   const key = (raceId: string, legend: boolean) => `${raceId}:${legend}`;
+  const seeded = new Map(
+    Object.entries(opts.stars ?? {}).flatMap(([eraId, n]) => [
+      ...seededStars(
+        racesOfEra(Number(eraId)).map((r) => r.raceId),
+        n,
+      ),
+    ]),
+  );
   const starsOf = (raceId: string, legend: boolean, eraId: number): Stars =>
     progress.get(key(raceId, legend))?.stars ??
+    (legend ? undefined : seeded.get(raceId)) ??
     (!legend && opts.cleared?.includes(eraId)
       ? { result: true, strategist: false, mastery: false }
       : NO_STARS);
   const eraStars = (eraId: number, legend = false) =>
     racesOfEra(eraId).reduce((n, r) => n + count(starsOf(r.raceId, legend, eraId)), 0);
+  // Production mode: what the Worker's `campaign` works out, on every request.
+  const prod = opts.production;
+  const testMode = !prod;
+  const released = (eraId: number) =>
+    !prod || releasedForReal(prod.releasedAt[eraId], new Date().toISOString());
+  const published = (raceId: string) => !prod || (prod.published?.(raceId) ?? true);
+  const unlocked = () =>
+    unlockedEras(
+      ERAS.map((e) => ({ eraId: e.id, stars: eraStars(e.id), races: racesOfEra(e.id).length })),
+      CONFIG.unlockShare,
+    );
 
   await page.addInitScript((lapScale) => {
     const w = window as unknown as { __laststintE2E: object; __seen: { redFlag: boolean } };
@@ -277,14 +309,14 @@ export async function mockEras(
     if (path === '/api/eras' && !post) {
       return route.fulfill({
         json: {
-          testMode: true,
+          testMode,
           eras: ERAS.map((e) => ({
             eraId: e.id,
             name: e.name,
             years: e.years,
             playOrder: e.playOrder,
-            released: true,
-            unlocked: e.playOrder === 1,
+            released: released(e.id),
+            unlocked: unlocked().get(e.id) ?? false,
             stars: eraStars(e.id),
             maxStars: 30,
           })),
@@ -302,25 +334,30 @@ export async function mockEras(
           name: info.name,
           years: info.years,
           playOrder: info.playOrder,
-          released: true,
-          unlocked: info.playOrder === 1,
+          released: released(eraId),
+          unlocked: unlocked().get(eraId) ?? false,
           stars: eraStars(eraId),
           maxStars: 30,
-          races: racesOfEra(eraId).map((r) => {
-            const m = byId.get(r.raceId);
-            const legend = progress.get(key(r.raceId, true));
-            return {
-              raceId: r.raceId,
-              position: r.position,
-              stars: starsOf(r.raceId, false, eraId),
-              hiddenDone: false,
-              bestAccuracy: progress.get(key(r.raceId, false))?.accuracy ?? null,
-              reconstructed: m?.provenance?.kind === 'reconstructed',
-              // On test an unauthored race (no ★1 target yet) plays as a Draft.
-              draft: !m?.eras?.target,
-              ...(legend ? { legend: { stars: legend.stars, bestAccuracy: legend.accuracy } } : {}),
-            };
-          }),
+          // Production lists published races of released eras only.
+          races: (released(eraId) ? racesOfEra(eraId) : [])
+            .filter((r) => published(r.raceId))
+            .map((r) => {
+              const m = byId.get(r.raceId);
+              const legend = progress.get(key(r.raceId, true));
+              return {
+                raceId: r.raceId,
+                position: r.position,
+                stars: starsOf(r.raceId, false, eraId),
+                hiddenDone: false,
+                bestAccuracy: progress.get(key(r.raceId, false))?.accuracy ?? null,
+                reconstructed: m?.provenance?.kind === 'reconstructed',
+                // On test an unauthored race (no ★1 target yet) plays as a Draft.
+                draft: testMode && !m?.eras?.target,
+                ...(legend
+                  ? { legend: { stars: legend.stars, bestAccuracy: legend.accuracy } }
+                  : {}),
+              };
+            }),
         },
       });
     }
@@ -329,6 +366,14 @@ export async function mockEras(
       const m = byId.get(raceId);
       const race = eraRace(raceId);
       if (!m || !race) return route.fulfill({ status: 404, json: { error: 'race-not-found' } });
+      const refused =
+        prod &&
+        attemptRefusal({
+          released: released(race.eraId),
+          unlocked: unlocked().get(race.eraId) ?? false,
+          published: published(raceId),
+        });
+      if (refused) return route.fulfill({ status: 403, json: { error: refused } });
       seen.starts.push({ raceId, legend });
       const attemptId = `11111111-1111-4111-8111-${String(seen.starts.length).padStart(12, '0')}`;
       const difficulty =
@@ -342,7 +387,7 @@ export async function mockEras(
           modelUrl: `${url.origin}/api/eras/races/${raceId}/model?h=e2e`,
           modelHash: `e2e-${raceId}`,
           difficulty,
-          draft: !m.eras?.target,
+          draft: testMode && !m.eras?.target,
         },
       });
     }

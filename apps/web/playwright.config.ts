@@ -3,7 +3,7 @@
 // running the race in the page, so no Worker or network is needed.
 //
 // Two projects: `phone` (a 390 px iPhone 13, every spec; the Gauntlet and defend specs size
-// themselves to a laptop) and `desktop` (1440 × 900: the Eras playthroughs and the daily).
+// themselves to a laptop) and `desktop` (1440 × 900: the Eras playthroughs, the era unlock flow and the daily).
 // The Eras playthroughs run in parallel; runtime is recorded in docs/eras-build-plan.md 10.1.
 import { defineConfig, devices } from '@playwright/test';
 
@@ -18,7 +18,7 @@ export default defineConfig({
     { name: 'phone', use: { ...devices['iPhone 13'], browserName: 'chromium' } },
     {
       name: 'desktop',
-      testMatch: /(eras-play|daily)\.spec\.ts$/,
+      testMatch: /(eras-play|eras-unlock|daily)\.spec\.ts$/,
       use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
     },
   ],
