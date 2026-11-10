@@ -802,3 +802,23 @@ li:nth-child(even) > .hb-stamp-earned {
     translate: none;
   }
 }
+
+/* Two chapters a row on a phone: smaller plate, sheet and stamps below 640px. */
+@media (max-width: 639.98px) {
+  .hb-chapter-compact .hb-plate {
+    font-size: 9px;
+    padding: 1px 5px;
+  }
+  .hb-chapter-compact .eyebrow {
+    font-size: 9px;
+    letter-spacing: 0.04em;
+  }
+  .hb-chapter-compact .hb-sheet {
+    font-size: 11px;
+  }
+  .hb-chapter-compact .hb-stamp {
+    font-size: 8.5px;
+    gap: 2px;
+    padding: 1px 4px;
+  }
+}

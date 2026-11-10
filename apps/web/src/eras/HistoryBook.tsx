@@ -66,7 +66,7 @@ function TickIcon({ done }: { done: boolean }) {
 /** An era's three badges, each earned (solid, a tick) or not yet (dashed, an open ring). */
 export function BadgeList({ badges }: { badges: EraBadges }) {
   return (
-    <ul className="m-0 flex list-none flex-wrap gap-2 p-0" aria-label="Badges">
+    <ul className="m-0 flex list-none flex-wrap gap-1.5 p-0 sm:gap-2" aria-label="Badges">
       {BADGES.map(({ key, name, what }) => {
         const earned = badges[key];
         return (
@@ -144,19 +144,21 @@ function EraProgress({ era }: { era: HistoryEra }) {
   const { percent: pct } = eraChapter(era);
   return (
     <li className="min-w-0">
-      <article className="hb-chapter" data-era={era.eraId}>
-        <div className="relative h-[92px] overflow-hidden border-b-[3px] border-[#1c1b29] sm:h-[108px]">
+      <article className="hb-chapter hb-chapter-compact" data-era={era.eraId}>
+        <div className="relative h-[72px] overflow-hidden border-b-[3px] border-[#1c1b29] sm:h-[108px]">
           <EraScene eraId={era.eraId} />
-          <span className="hb-plate absolute bottom-2 left-2">Chapter {era.playOrder}</span>
-          <span className="hb-board absolute right-2 top-2 !text-[15px]">
+          <span className="hb-plate absolute bottom-1.5 left-1.5 sm:bottom-2 sm:left-2">
+            Chapter {era.playOrder}
+          </span>
+          <span className="hb-board absolute right-1.5 top-1.5 !text-[12px] sm:right-2 sm:top-2 sm:!text-[15px]">
             {pct}%<span className="sr-only"> collected</span>
           </span>
         </div>
-        <div className="flex flex-1 flex-col gap-2.5 p-3 sm:p-4">
+        <div className="flex flex-1 flex-col gap-2 p-2 sm:gap-2.5 sm:p-4">
           <span className="eyebrow">
             Era {era.eraId} · {era.years}
           </span>
-          <h3 className="disp m-0 break-words text-[21px] leading-none">
+          <h3 className="disp m-0 break-words text-[14px] leading-tight sm:text-[21px] sm:leading-none">
             <a href={`/eras/${era.eraId}`} className="hb-link">
               {era.name}
             </a>
@@ -171,7 +173,10 @@ function EraProgress({ era }: { era: HistoryEra }) {
                 ['Hidden', era.hidden],
               ] as const
             ).map(([name, t]) => (
-              <div key={name} className="flex items-baseline gap-2 px-2 py-1">
+              <div
+                key={name}
+                className="flex items-baseline gap-1 px-1.5 py-0.5 sm:gap-2 sm:px-2 sm:py-1"
+              >
                 <dt>{name}</dt>
                 <span aria-hidden="true" className="hb-leader" />
                 <dd className="m-0 font-mono font-bold">{tallyText(t)}</dd>
@@ -339,7 +344,7 @@ export function HistoryBookBody({ state, onRetry }: { state: HistoryState; onRet
                 One chapter per era, in play order.
               </p>
             </div>
-            <ol className="hb-spread m-0 grid list-none grid-cols-1 gap-5 p-0 sm:grid-cols-2 sm:gap-x-12">
+            <ol className="hb-spread m-0 grid list-none grid-cols-2 gap-x-3 gap-y-4 p-0 sm:gap-x-12 sm:gap-y-5">
               {eras.map((era) => (
                 <EraProgress key={era.eraId} era={era} />
               ))}
