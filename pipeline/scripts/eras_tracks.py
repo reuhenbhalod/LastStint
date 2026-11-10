@@ -84,6 +84,10 @@ REUSE: dict[str, tuple[str, str]] = {
     "japan-2023": ("japan-2024", "suzuka-2"),
     "abu-dhabi-2022": ("abu-dhabi-2021", "yas-marina-2"),
     "netherlands-2021": ("netherlands-2022", "zandvoort-5"),
+    "bahrain-2015": ("bahrain-2021", "bahrain-1"),
+    "abu-dhabi-2015": ("abu-dhabi-2020", "yas-marina-1"),
+    "brazil-2014": ("brazil-2019", "interlagos-2"),
+    "canada-2016": ("canada-2019", "montreal-6"),
     "australia-2017": ("australia-2010", "melbourne-1"),
     "australia-2018": ("australia-2010", "melbourne-1"),
     "spain-2017": ("spain-2020", "catalunya-4"),
@@ -172,6 +176,9 @@ LAYOUT_SPECS: dict[str, dict] = {
     "kyalami-1": {"clockwise": True, "start": 0.72, "pit": (-0.04, 0.06), "turns": 9},
     "estoril-1": {"clockwise": True, "start": 0.84, "pit": (-0.06, 0.08), "turns": 11},
     "silverstone-3": {"clockwise": True, "start": 0.22, "pit": (-0.05, 0.06), "turns": 9},
+    # singapore-2014's layout: line on the pit straight between the last corner and Turn 1,
+    # placed by judgement against the 2023 MultiViewer outline's line; f1db's direction.
+    "marina-bay-2": {"clockwise": False, "start": 0.045, "pit": (-0.05, 0.06), "turns": 23},
 }
 
 # Older race -> f1db layout drawn from its SVG.
@@ -192,6 +199,8 @@ F1DB: dict[str, str] = {
     "malaysia-1999": "sepang-1",
     "malaysia-2001": "sepang-1",
     "malaysia-2013": "sepang-1",
+    "malaysia-2015": "sepang-1",
+    "singapore-2014": "marina-bay-2",
     "europe-2012": "valencia-1",
     "san-marino-2005": "imola-2",
     "germany-2000": "hockenheimring-3",

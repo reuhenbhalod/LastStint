@@ -199,14 +199,32 @@ const RACE_TABLE: Record<number, ReadonlyArray<readonly [string, string]>> = {
   ],
   7: [
     ['bahrain-2014', 'Hamilton vs Rosberg, the Duel in the Desert'],
-    ['canada-2014', 'Both Mercedes have power failures'],
-    ['hungary-2014', 'Safety car chaos'],
-    ['monaco-2015', "Mercedes' unnecessary stop costs Hamilton the win"],
-    ['hungary-2015', 'Chaos, Vettel wins'],
+    [
+      'brazil-2014',
+      'Stay out to overcut your team-mate on fading rears, or pit with him and fight on track?',
+    ],
+    [
+      'canada-2016',
+      'A virtual safety car hands Ferrari a cheap stop from the lead: take it and commit to two, or stay out and trust the tyres to last in the cold?',
+    ],
+    [
+      'singapore-2014',
+      'After the safety car Hamilton still owes a stop for the harder tyre: how long can he push to build the gap, while Vettel tries to run his softs to the flag?',
+    ],
+    [
+      'abu-dhabi-2015',
+      "Second to your team-mate: stretch the softs, or skip the last stop and gamble on Rosberg's tyres fading?",
+    ],
     ['united-states-2015', 'Hamilton clinches the title in mixed conditions'],
     ['spain-2016', "Mercedes cars collide; Red Bull's split strategy"],
-    ['monaco-2016', "The tyres aren't ready at Ricciardo's stop"],
-    ['great-britain-2016', 'A wet start that dries: when to switch tyres, Verstappen vs Rosberg'],
+    [
+      'bahrain-2015',
+      'Ferrari runs Räikkönen against the grain: mediums in the middle, then a late sprint on softs to reel in the Mercedes',
+    ],
+    [
+      'malaysia-2015',
+      'Vettel stayed out under the early safety car and leads: make two stops last on a 60-degree track while Mercedes, on hards, stops three times',
+    ],
     ['abu-dhabi-2016', 'Hamilton backs Rosberg into the pack'],
   ],
   6: [

@@ -1,0 +1,26 @@
+{
+ "source": "TUM f1-timing-database",
+ "url": "https://github.com/TUMFTM/f1-timing-database",
+ "commit": "9eaad9c22780d7a2169fd4517938e9dc721d5729",
+ "sha256": "bf46e62930c9ede978e7d6323e5e2796ca1e17dc157666c25d87fd1c266c0e7c",
+ "licence": "CC BY-NC-SA 3.0",
+ "credit": "Lap data: TUM f1-timing-database (Institute of Automotive Technology, Technical University of Munich; based on the Ergast API), https://github.com/TUMFTM/f1-timing-database @ 9eaad9c, licensed CC BY-NC-SA 3.0.",
+ "tumRaceId": 18,
+ "tumComment": null,
+ "nominatedCompounds": "A2,A3,I,W",
+ "compoundMap": {
+  "I": "INTERMEDIATE",
+  "W": "WET",
+  "A3": "SOFT",
+  "A2": "MEDIUM"
+ },
+ "lapsPlanned": 71,
+ "estimates": [
+  "PitInTime is the in-lap's end; PitOutTime adds TUM's pit-lane time",
+  "TrackStatus has SC/VSC only (TUM has no yellow or red flags)",
+  "IsAccurate: every timed lap except lap 1 and pit in/out laps",
+  "TyreLife of a top-10 starter's first set: TUM's default of 2 laps at the start",
+  "Each retired car's unfinished lap ends at the fastest time anyone ran that lap"
+ ],
+ "notes": []
+}
