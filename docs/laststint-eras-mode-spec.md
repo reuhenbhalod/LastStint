@@ -95,7 +95,7 @@ Players start at Era 10 and move back through the timeline to Era 1. The eras be
 ### Era 7: Hybrid turbo (2014–2016) · play order 4
 | # | Race ID | Dilemma | Target (draft) |
 |---|---|---|---|
-| 1 | united-states-2014 | Fifth on the grid behind two Williams on the same softs: do you stop early for mediums and attack on fresh rubber, then time the second stop off whichever Williams blinks first? | position: Ricciardo on the podium from P5 |
+| 1 | united-states-2014 | Leading from pole with Hamilton under a second behind on the same softs: box first to cover him, or stay out and keep the track position? | win: Rosberg (the hard-call side; he finished second, so a rewrite) holds off Hamilton from pole |
 | 2 | brazil-2014 | Stay out to overcut your team-mate on fading rears, or pit with him and fight on track? | win: Hamilton from P2, ahead of Rosberg |
 | 3 | canada-2016 | A virtual safety car hands Ferrari a cheap stop from the lead: take it and commit to two, or stay out and trust the tyres to last in the cold? | win: Vettel beats Hamilton |
 | 4 | singapore-2014 | Second behind Hamilton, who still owes a stop on the harder tyre: make two stops last on the softs, or take a third under the safety car? | position: Vettel holds P2 (rewrite: beat Hamilton) |

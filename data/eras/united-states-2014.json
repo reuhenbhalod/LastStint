@@ -7,5 +7,35 @@
     "drs": true,
     "ers": "hybrid",
     "refuelling": false
+  },
+  "eras": {
+    "eraId": 7,
+    "order": 1,
+    "userSide": "ROS",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Rosberg leads from pole and through the first stops, but Hamilton closes into DRS range and passes him into the Turn 12 hairpin on lap 24, when Rosberg's extra energy does not come. Hamilton makes his second stop a lap before Rosberg, stays ahead and wins by 4.3 s.",
+      "rewriteCondition": {
+        "type": "win"
+      },
+      "headline": "Rosberg holds Hamilton off in Austin"
+    },
+    "mastery": {
+      "type": "margin",
+      "seconds": 4.3,
+      "label": "Win by more than 4.3 seconds"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 7,
+      "label": "Win by more than 7 seconds"
+    },
+    "hardCalls": {
+      "HAM": 0,
+      "ROS": 0
+    },
+    "briefing": "Austin, 2014. Rosberg took pole and still leads, 12 laps in, with Hamilton 0.9 s behind on the same soft tyres. You run Rosberg, with two stops to make if you follow the plan. Hamilton is close enough to attack: keep him behind."
   }
 }
