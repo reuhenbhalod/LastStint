@@ -99,6 +99,25 @@ OpenF1, TUM and Jolpica pit-stop data do not cover 1999. No Motor Sport race rep
   Häkkinen/Irvine laps conflict, and Jolpica's Villeneuve/Trulli grid swap must be corrected
   if a build reads it.
 
+### Authored (B1, Nov 9)
+
+Written into `data/eras/san-marino-1999.json` from the facts above; nothing new was looked up.
+Each row names the fact rows it rests on.
+
+| Item | Authored | Rests on | Owner checked |
+|---|---|---|---|
+| Side | **Schumacher (MSCM)**. `pipeline hard-calls`: MSCM 0, COU 0, chance given up 0.0 / 0.0, so the race file's side stands (tie on both). Rival COU | — | |
+| Grid check | The built race has no Villeneuve or Trulli row (both out on lap 1, before the lap-28 takeover), so the Jolpica grid swap above doesn't reach the game | Grid discrepancy, Start | |
+| Target (★1) | **position 2** (Schumacher P2 or better), the accepted "position target" pattern. A win was reachable at era difficulty but not at Legend: in the sim Coulthard loses no time to backmarkers (no traffic model), so Schumacher's lead before his second stop is ~11 s against the real 22-23 s, he rejoins behind and can't pass (seed 1 ends 0.3 s behind on every pace path), and Legend's drawn SCs (seeds 2, 3) take the rest. The moments are still graded on the **win** | After lap 17, Traffic, Schumacher stop 2 | |
+| Storyline (real) | Häkkinen out of the lead at the final chicane after 17 laps; Coulthard on one stop; Ferrari stop Schumacher early with little fuel; Coulthard held up by backmarkers; second quick stop from a lead of more than 20 s; win by 4.265 s. No rewrite (Schumacher won) | Häkkinen crash, Early strategy read, Schumacher stop 1, Coulthard stop, Traffic, Schumacher stop 2, Top 6 | |
+| Mastery | Finish on two stops (`stop_count` exact 2), Schumacher's real count | Schumacher stop 1, stop 2 | |
+| Hidden | Never back off to manage the tyres (`mode_rule` manage 0 laps): the sprint | Schumacher stop 1 (first lap after it half a second quicker than Häkkinen's best) | |
+| Briefing | Häkkinen out of the lead; Schumacher second "a few seconds" behind Coulthard (the race file has 3.1 s at the lap-28 takeover; AS-L 3.3 s on lap 23), Coulthard on one stop; one stop or two short stints | After lap 17, Early strategy read | |
+| storylineCalls | COU, lap 36 (the race file's out-lap for his lap-35 stop), `untilFlag`: Coulthard makes his one stop on his real lap and runs to the flag | Coulthard stop | |
+| storylineEvents | `[47, "RETIREMENT"]`: Irvine's engine from third and Frentzen's spin on his oil (both on the race file's lap 47) stay in Legend | Retirements | |
+| Moments | `pnpm --filter @laststint/sim author san-marino-1999 --target win --eras`: stop-31 (real: box, fill 14 laps), rivalpit-35 (real: stay), stop-45 (real: box, fill 17 laps), pace-48, pace-52, battle-56. Not hand-adjusted. The stop laps are AS-L's 31 and 45 | Schumacher stop 1, Coulthard stop, Schumacher stop 2 | |
+| Checks | Robust G1 pass, mean gap error 0.91 s (strict pass). Reachable at era difficulty (threshold 86, Expert) and at Legend (90), both on seed 1 with all real stop calls; stay-out never earns ★3 | — | |
+
 ## germany-1996 (1996 German Grand Prix)
 
 Replaces `belgium-1998` (Era 3 #8). Robust G1: pass, mean gap error 1.27 s.
