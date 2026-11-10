@@ -2,20 +2,11 @@
 // real stints at their fitted offsets (DriverModel.stintPace), keyed by the lap the stint began.
 // Parity with the Python reference sim on Spain 2021 with offsets entered by hand
 // (pipeline/tests/make_stint_pace_fixture.py), on the real strategies and on strategies that
-// leave them; and the player's car in live play runs its race-wide mean offset in every stint
-// (sim.ts playerStintOffset).
+// leave them; and the player's car runs at 0 in live play (its effort is the pace modes').
 
 import { describe, expect, it } from 'vitest';
 import spainJson from '../../../data/races/spain-2021.json';
-import {
-  initRun,
-  isFinished,
-  playerStintOffset,
-  realDecisions,
-  simulate,
-  stepLap,
-  stintOffset,
-} from '../src/sim.js';
+import { initRun, isFinished, realDecisions, simulate, stepLap, stintOffset } from '../src/sim.js';
 import type { PitStop, RaceModel, RaceResult, StintPace } from '../src/types.js';
 import goldenJson from './fixtures/stint-pace-golden.json';
 
@@ -109,41 +100,21 @@ describe('pace by stint', () => {
     expect(simulate(oco, 1, moved)).toEqual(simulate(spain, 1, moved));
   });
 
-  it("the player's car in live play runs its race-wide offset; the rest keep their offsets", () => {
-    // VER is the player's car: its stints run laps 21-24 at +0.1, 25-60 at -0.2 and 61-66 at
-    // +0.3, so live play with the real calls is the replay with VER at the laps-weighted mean
-    // in every stint (and HAM, the rival, keeps his).
-    const mean = (4 * 0.1 + 36 * -0.2 + 6 * 0.3) / 46;
-    expect(playerStintOffset(model)).toBeCloseTo(mean, 12);
+  it("the player's car runs at 0 in live play; the rest keep their offsets", () => {
+    // VER is the player's car: with the real calls, live play is the replay of the race with
+    // VER's offsets removed (and HAM, the rival, keeps his).
     const live = initRun(model, model.race.seed, {
       decisions: realDecisions(model),
       incidents: false,
     });
-    expect(live.state.cars.VER?.stintPace).toBe(playerStintOffset(model));
     while (!isFinished(live)) stepLap(live);
-    const flat = [0, 25, 61].map((lap) => ({ lap, offset: playerStintOffset(model) }));
-    const replay = initRun(withStintPace(spain, { ...STINT_PACE, VER: flat }), model.race.seed);
+    const without = withStintPace(spain, { ...STINT_PACE, VER: [] });
+    const replay = initRun(without, model.race.seed);
     while (!isFinished(replay)) stepLap(replay);
     for (const [code, car] of Object.entries(replay.state.cars)) {
       expect(live.state.cars[code]?.totalTime).toBeCloseTo(car.totalTime, 9);
     }
-    expect(live.state.cars.VER?.stintPace).toBe(playerStintOffset(model));
+    expect(live.state.cars.VER?.stintPace ?? 0).toBe(0);
     expect(live.state.cars.HAM?.stintPace).toBe(-0.4);
-  });
-
-  it("a stop on another lap keeps the player's race-wide offset", () => {
-    const live = initRun(model, model.race.seed, {
-      decisions: [{ lap: 29, kind: 'pit', compound: 'MEDIUM' }],
-      incidents: false,
-    });
-    while (live.state.lap < 31) stepLap(live);
-    expect(live.state.cars.VER?.stintPace).toBe(playerStintOffset(model));
-  });
-
-  it("outside an Eras race the player's car runs at 0", () => {
-    const { rules: _, ...plain } = model;
-    expect(playerStintOffset(plain as RaceModel)).toBe(0);
-    const live = initRun(plain as RaceModel, model.race.seed, { decisions: [], incidents: false });
-    expect(live.state.cars.VER?.stintPace).toBeUndefined();
   });
 });

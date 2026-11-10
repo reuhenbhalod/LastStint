@@ -115,8 +115,7 @@ export interface DriverModel {
    * Pace by stint (Eras model fix M2; pipeline pace.stint_offsets): the car's offset to
    * basePace in each real stint after the takeover, keyed by the lap the stint began (a real
    * stop's out-lap, or 0 for the takeover stint). A car runs an offset while its current stint
-   * began on that lap; any other stint runs at 0. The player's car in live play runs its
-   * race-wide mean in every stint (sim.ts playerStintOffset).
+   * began on that lap; any other stint runs at 0, and so does the player's car in live play.
    * Eras builds only.
    */
   stintPace?: StintPace[];

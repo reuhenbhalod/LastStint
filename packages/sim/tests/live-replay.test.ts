@@ -11,10 +11,9 @@
 // too, with no car running dry. No race file on this branch refuels, so every race is
 // re-tagged in memory (rules.refuelling, with a fitted fill model and with the prior).
 //
-// Pace by stint (Eras model fix M2, DriverModel.stintPace): the player's car in live play runs
-// its race-wide mean offset in every stint (sim.ts playerStintOffset), while a replay runs its
-// real stints' offsets. So live play with the real calls is compared with the replay of the race
-// with every real stint of the user's car at that mean.
+// Pace by stint (Eras model fix M2, DriverModel.stintPace): the player's car runs at 0 in live
+// play (its effort is the pace modes'), while a replay runs it at its real stints' offsets. So
+// live play with the real calls is compared with the replay of the race less the user's offsets.
 //
 // Scripted events (Eras model fixes M4): the real calls include complying with a TEAM_ORDER to
 // the player's car (a `team-order` note, as the replay's swap). A storyline retirement on a
@@ -25,14 +24,7 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import {
-  type Run,
-  initRun,
-  isFinished,
-  playerStintOffset,
-  realDecisions,
-  stepLap,
-} from '../src/sim.js';
+import { type Run, initRun, isFinished, realDecisions, stepLap } from '../src/sim.js';
 import type { Decision, RaceModel, RefuelModel } from '../src/types.js';
 
 const dir = join(__dirname, '..', '..', '..', 'data', 'races');
@@ -61,23 +53,19 @@ function realCalls(model: RaceModel): Decision[] {
   return calls.sort((a, b) => a.lap - b.lap);
 }
 
-/** The race with every real stint of the user's car at the offset live play runs it at. */
-function withUserStintPace(model: RaceModel): RaceModel {
-  const user = model.drivers.find((d) => d.code === model.userSide);
-  const laps = [0, ...(user?.realStrategy ?? []).map((s) => s.lap)];
-  const stintPace = [...new Set(laps)].map((lap) => ({
-    lap,
-    offset: playerStintOffset(model),
-  }));
+/** The race with the user's stint offsets removed (live play runs the player's car at 0). */
+function withoutUserStintPace(model: RaceModel): RaceModel {
   return {
     ...model,
-    drivers: model.drivers.map((d) => (d.code === model.userSide ? { ...d, stintPace } : d)),
+    drivers: model.drivers.map((d) =>
+      d.code === model.userSide && d.stintPace ? { ...d, stintPace: [] } : d,
+    ),
   };
 }
 
 /** Replay `model`, then play it live with the real calls: every car's time must match. */
 function realCallsReplay(model: RaceModel): { live: Run; replay: Run } {
-  const replayed = withUserStintPace(model);
+  const replayed = withoutUserStintPace(model);
   const replay = initRun(replayed, model.race.seed);
   while (!isFinished(replay)) stepLap(replay);
   const user = model.drivers.find((d) => d.code === model.userSide);
