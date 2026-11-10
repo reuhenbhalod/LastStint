@@ -1,19 +1,17 @@
 # Eras races report
 
-Eras integration wave 3, Nov 9 2026: the races report after the wave-3 merges on branch
-eras-integrate-w3 (base eras d4b53ec): the second Era 10 / Era 9 swap batch
-(eras-swap-e10-e9-b: great-britain-2022 -> great-britain-2023, singapore-2023 -> japan-2023,
-miami-2024 -> emilia-romagna-2024, monaco-2025 -> abu-dhabi-2022, brazil-2021 ->
-netherlands-2021), the B1 authoring of japan-2023, abu-dhabi-2022, emilia-romagna-2024,
-great-britain-2023, netherlands-2021 and netherlands-2023, the player's pace-by-stint fix and
-the wet-tyres-only lap fix (eras-model-player-pace). It also takes in azerbaijan-2021's
-authoring (merged into eras after the wave-1 rebuild). Every non-pool race was rebuilt (114,
-with the four new races; 5 race files and 4 goldens changed, plus the four new pairs;
-Daily/Gauntlet race and golden files unchanged, `git diff --stat` against eras empty) and all 23
-reconstructed races re-reconstructed (identical to the committed snapshots). One row per race of
-the 100 in data/pools.json's `eras` block, in the spec's §4 order (Era 10, play order 1,
-first). Diagnoses are carried over from the last report (integration wave 1, 08ae2a6) with this
-run's moves appended ("int. w3").
+Eras integration wave 4, Nov 9 2026: the races report after the wave-4 merges on branch
+eras-integrate-w3 (on top of wave 3, b651864, and the Eras-gated radio fix cd66163):
+eras-revert-player-pace (the owner's revert of the player's race-wide stint offset in live
+play), eras-swap-saudi-2023 (australia-2025 -> saudi-arabia-2023, migration 0015, with
+eras-fix-saudi-arabia-2023's sourced `pace_skip`) and eras-author-saudi-arabia-2023 (B1, side
+VER). No Era 9 fix branch is merged (awaiting the owner). Every non-pool race was rebuilt (115,
+with saudi-arabia-2023) and all 23 reconstructed races re-reconstructed: every race file and
+golden is byte-identical to wave 3's except the new saudi-arabia-2023 pair (Daily/Gauntlet race
+and golden files unchanged, `git diff --stat` against eras empty). sc_rates.json is regenerated
+(Jeddah 2023 joins the sources); the legend fixture is unchanged. One row per race of the 100 in
+data/pools.json's `eras` block, in the spec's §4 order (Era 10, play order 1, first).
+Diagnoses are carried over with this run's moves appended ("int. w4").
 
 **How it was run.** For each race, one race per call: robust G1 (`pipeline validate`'s robust
 mode: 1,000 runs on each of two seed sets; pass = both sets pass, borderline = one) with the
@@ -51,13 +49,13 @@ the last report.
 | 1 | bahrain-2023 | FastF1 (F1 live timing) | none | yes | G1 | pass | 1.22 s |  | yes (SAI) | yes | **yes** | swapped in for monaco-2022 (owner, Nov 9; swap-races-e10-e9.md) |
 | 2 | great-britain-2023 | OpenF1 | none | yes | G1 | pass | 1.56 s |  | yes (NOR) | yes | **yes** | swapped in for great-britain-2022 (owner, Nov 9; swap-races-e10-e9-b.md); B1 authored (NOR) |
 | 3 | hungary-2022 | FastF1 (F1 live timing) | none | yes | G1 | pass | 1.69 s |  | yes (VER) | yes | **yes** | passes; now played from Verstappen (A1); int. 8: 1.97 -> 1.69 s |
-| 4 | japan-2023 | FastF1 (F1 live timing) | none | yes | G1 | pass | 1.97 s |  | yes (RUS) | **no** | no | swapped in for singapore-2023 (owner, Nov 9; swap-races-e10-e9-b.md); B1 authored (RUS); int. w3: not reachable at the era's difficulty (the player's race-wide stint offset in live play, eras-model-player-pace; best path misses ★1), reachable before it |
+| 4 | japan-2023 | FastF1 (F1 live timing) | none | yes | G1 | pass | 1.97 s |  | yes (RUS) | yes | **yes** | swapped in for singapore-2023 (owner, Nov 9; swap-races-e10-e9-b.md); B1 authored (RUS); int. w3: not reachable at the era's difficulty (the player's race-wide stint offset in live play, eras-model-player-pace; best path misses ★1), reachable before it; int. w4: reachable again (eras-revert-player-pace) |
 | 5 | netherlands-2023 | OpenF1 | driverPace | yes | G1 | pass | 2.49 s |  | yes (VER) | yes | **yes** | HAM's five wet laps, all in the finish shower (M1), and the red-flag restart; 3.79 -> 6.69 s; int. 8: 6.69 -> 2.34 s; int. w1: 2.34 -> 2.47 s; int. w3: 2.47 -> 2.49 s; B1 authored (VER; side won, no rewrite) |
 | 6 | emilia-romagna-2024 | OpenF1 | none | yes | G1 | pass | 0.88 s |  | yes (NOR) | yes | **yes** | swapped in for miami-2024 (owner, Nov 9; swap-races-e10-e9-b.md); B1 authored (NOR) |
-| 7 | hungary-2024 | FastF1 (F1 live timing) | none | yes | G1 | pass | 2.52 s |  | yes (PIA) | **no** | no | now passes (int. 8); McLaren's swap is now scripted (M4 team orders: the duel order passes); LEC's field gap 5.1 s, just over; int. 8: 1.96 -> 1.93 s; int. w1: 1.93 -> 2.52 s; int. w3: Legend no longer reachable (the player's race-wide stint offset in live play, eras-model-player-pace; best Legend path misses the hidden objective) |
+| 7 | hungary-2024 | FastF1 (F1 live timing) | none | yes | G1 | pass | 2.52 s |  | yes (PIA) | yes | **yes** | now passes (int. 8); McLaren's swap is now scripted (M4 team orders: the duel order passes); LEC's field gap 5.1 s, just over; int. 8: 1.96 -> 1.93 s; int. w1: 1.93 -> 2.52 s; int. w3: Legend no longer reachable (the player's race-wide stint offset in live play, eras-model-player-pace; best Legend path misses the hidden objective); int. w4: reachable again (eras-revert-player-pace) |
 | 8 | belgium-2023 | OpenF1 | none | yes | G1 | pass | 1.99 s |  | yes (VER) | yes | **yes** | now passes: driver damp / wet pace from clear-air laps against the field (M1); int. 8: 1.73 -> 1.98 s; int. w1: 1.98 -> 1.99 s |
-| 9 | australia-2025 | OpenF1 | driverPace | yes | G1 | **fail** | 3.43 s | duel VER vs NOR gap error 5.07 / 4.96 [3.00] (+2 more) | no | - | no | wet-dry race: duel VER vs NOR 7.3 s; 4.62 -> 3.66 s with M1; int. 8: 3.66 -> 3.70 s; int. w1: 3.70 -> 3.43 s |
-| 10 | abu-dhabi-2022 | Jolpica laps | compounds, safetyCars | yes | G1 | pass | 0.54 s |  | yes (LEC) | **no** | no | swapped in for monaco-2025 (owner, Nov 9; swap-races-e10-e9-b.md); B1 authored (LEC); int. w3: stay-out earns ★3 at the era's difficulty and Legend is not reachable (the player's race-wide stint offset in live play, eras-model-player-pace), reachable before it |
+| 9 | saudi-arabia-2023 | OpenF1 | none | yes | G1 | pass | 0.86 s |  | yes (VER) | yes | **yes** | swapped in for australia-2025 (owner, Nov 9, third batch; swap-races-e10-e9-c.md; australia-2025 failed G1, 3.43 s); sourced pace_skip for VER laps 21-22 (fix-saudi-arabia-2023.md); B1 authored (VER; hard calls VER 2, PER 0) |
+| 10 | abu-dhabi-2022 | Jolpica laps | compounds, safetyCars | yes | G1 | pass | 0.54 s |  | yes (LEC) | yes | **yes** | swapped in for monaco-2025 (owner, Nov 9; swap-races-e10-e9-b.md); B1 authored (LEC); int. w3: stay-out earns ★3 at the era's difficulty and Legend is not reachable (the player's race-wide stint offset in live play, eras-model-player-pace), reachable before it; int. w4: reachable again, stay-out no longer earns ★3 (eras-revert-player-pace) |
 
 ## Era 9: The 2021 title fight
 
@@ -69,7 +67,7 @@ the last report.
 | 4 | france-2021 (shared) | FastF1 (F1 live timing) | none | yes | G1 | pass | 3.01 s |  | yes (HAM) | yes | **yes** |  |
 | 5 | hungary-2021 | FastF1 (F1 live timing) | weather | yes | G1 | **fail** | 4.36 s | podium HAM gap error 7.82 / 8.15 [5.00] (+3 more) | no | - | no | Hamilton's charge on hards after the wet start (HAM 9.9 s); 5.74 -> 5.15 s; int. 8: 5.15 -> 4.80 s; int. w1: 4.80 -> 4.36 s |
 | 6 | russia-2021 (shared) | FastF1 (F1 live timing) | none | yes | G1 | pass | 2.89 s |  | yes (NOR) | yes | **yes** |  |
-| 7 | turkey-2021 | Jolpica laps | compounds, safetyCars, weather | yes | G1 | pass | 0.41 s |  | yes (LEC) | **no** | no | passes; now played from Leclerc (A1), takeover pinned at lap 38; int. w3: Legend no longer reachable (the player's race-wide stint offset in live play, eras-model-player-pace; best Legend path misses ★1) |
+| 7 | turkey-2021 | Jolpica laps | compounds, safetyCars, weather | yes | G1 | pass | 0.41 s |  | yes (LEC) | yes | **yes** | passes; now played from Leclerc (A1), takeover pinned at lap 38; int. w3: Legend no longer reachable (the player's race-wide stint offset in live play, eras-model-player-pace; best Legend path misses ★1); int. w4: reachable again (eras-revert-player-pace) |
 | 8 | netherlands-2021 | Jolpica laps | compounds, safetyCars | yes | G1 | pass | 1.76 s |  | yes (VER) | yes | **yes** | swapped in for brazil-2021 (owner, Nov 9; swap-races-e10-e9-b.md); B1 authored (VER; side won, no rewrite) |
 | 9 | great-britain-2021 | FastF1 (F1 live timing) | none | yes | G1 | pass | 1.14 s |  | yes (LEC) | yes | **yes** | swapped in for saudi-arabia-2021 (owner, Nov 9; swap-races-e10-e9.md) |
 | 10 | abu-dhabi-2021 (shared) | FastF1 (F1 live timing) | none | yes | G1 | pass | 2.27 s |  | yes (HAM) | yes | **yes** |  |
@@ -159,7 +157,7 @@ the last report.
 | 4 | spain-1996 | Jolpica laps + F1DB stops | compounds, safetyCars, fuelLoads, weather | yes | G1 | pass | 0.63 s |  | yes (MSCM) | yes | **yes** | now passes: pace by stint (M2); still wet all race and built dry; int. 8: 0.62 -> 0.63 s |
 | 5 | hungary-1997 | Jolpica laps + F1DB stops | compounds, safetyCars, fuelLoads | yes | G1 | **fail** | 2.57 s | field MSCM gap error 10.19 / 10.28 [5.00] (+1 more) | no | - | no | stint pace behind the leaders: MSCM 10 s; 4.15 -> 2.53 s with M2; int. 8: 2.53 -> 2.57 s |
 | 6 | europe-1997 | Jolpica laps + F1DB stops | compounds, safetyCars, fuelLoads | yes | G1 | pass | 1.20 s |  | no | - | no | now passes (int. 8: S9 sources McLaren's swap); the let-bys at the flag scripted (M4: VIL's podium gap passes); podium order 0.45 [0.50], 2.53 -> 0.82 s; int. 8: 0.82 -> 1.20 s |
-| 7 | hungary-1998 | Jolpica laps + F1DB stops | compounds, safetyCars, fuelLoads | yes | G1 | pass | 1.42 s |  | yes (COU) | **no** | no | now passes on the combined fixes (Schumacher's push fitted, M2; overtaking, M3; no SC, so not the restart switch); int. 8: 1.58 -> 1.42 s; int. w3: Legend no longer reachable (the player's race-wide stint offset in live play, eras-model-player-pace; best Legend path misses ★1) |
+| 7 | hungary-1998 | Jolpica laps + F1DB stops | compounds, safetyCars, fuelLoads | yes | G1 | pass | 1.42 s |  | yes (COU) | yes | **yes** | now passes on the combined fixes (Schumacher's push fitted, M2; overtaking, M3; no SC, so not the restart switch); int. 8: 1.58 -> 1.42 s; int. w3: Legend no longer reachable (the player's race-wide stint offset in live play, eras-model-player-pace; best Legend path misses ★1); int. w4: reachable again (eras-revert-player-pace) |
 | 8 | belgium-1998 | Jolpica laps + F1DB stops | compounds, safetyCars, fuelLoads, weather | yes | G1 | **fail** | 5.11 s | field DIN gap error 13.71 / 13.67 [5.17] (+3 more) | no | - | no | W4: SC laps 29-32 and Jordan's hold order (TEAM_ORDER, laps 33-44); the duel passes. The sim's restart is nose-to-tail (really HIL 2.4 s, ALE 4.7 s back) and its ALE then passes the Jordans: DIN 14.0 s, ALE 11.8 s; 14.21 -> 5.25 s; int. 8: 5.25 -> 5.11 s |
 | 9 | malaysia-1999 | Jolpica laps + F1DB stops | compounds, safetyCars, fuelLoads | yes | G1 | **fail** | 2.96 s | duel IRV vs HAK gap error 3.62 / 3.87 [3.00] (+1 more) | no | - | no | Ferrari's team orders scripted (M4); the duel IRV vs HAK gap 3.6 / 3.9 [3.00], Irvine's last laps |
 | 10 | europe-1999 | Jolpica laps + F1DB stops | compounds, safetyCars, fuelLoads, weather | yes | G1 | **fail** | 10.26 s | field SCH gap error 21.1 / 21.05 [5.00] (+4 more) | no | - | no | W4's sourced tyre classes and the rejected lap 36-43 'SC' (rain): the wet runners finish too far back, the slick runners too far forward (SCH 49 s). At the fitted wetness the slick and inter curves sit about 2% apart, the real second shower about 8%: needs a per-car wetness or new wet curves; 23.24 -> 25.63 s; int. 8: 25.63 -> 12.28 s; int. w1: 12.28 -> 10.26 s |
@@ -195,80 +193,71 @@ the last report.
 | 10 | monaco-1988 | Reconstructed (Jolpica + F1DB anchors, sourced facts) | compounds, fuelLoads, weather | yes | anchors | pass | 61/61 core anchors |  | yes (SENA) | yes | **yes** | anchors pass; Senna's crash comes only on the real push from lap 55 (M4); G1 sanity 6.92 -> 3.03 s on W2's anchors (ALBM 5.0 s) |
 ## Summary
 
-**Result: 58 pass, 1 borderline, 41 fail, 0 not built** (of 100; 23 reconstructed races checked on
-their anchors, 77 on G1). **Authored 59, reachable 51 of 59, ready to publish 50.** Last report
-(integration wave 1, 08ae2a6): 53 pass, 1 borderline, 46 fail, 0 not built; 52 authored, 49
-reachable, 48 ready.
+**Result: 59 pass, 1 borderline, 40 fail, 0 not built** (of 100; 23 reconstructed races checked on
+their anchors, 77 on G1). **Authored 60, reachable 57 of 60, ready to publish 56.** Last report
+(integration wave 3, b651864): 58 pass, 1 borderline, 41 fail, 0 not built; 59 authored, 51
+reachable, 50 ready.
 
 | Era | Pass | Borderline | Fail | Not built | Authored | Reachable | Ready to publish |
 |---|---|---|---|---|---|---|---|
-| 10 | 9 | 0 | 1 | 0 | 9 | 6 | 6 |
-| 9 | 9 | 0 | 1 | 0 | 9 | 8 | 8 |
+| 10 | 10 | 0 | 0 | 0 | 10 | 10 | 10 |
+| 9 | 9 | 0 | 1 | 0 | 9 | 9 | 9 |
 | 8 | 5 | 0 | 5 | 0 | 5 | 5 | 5 |
 | 7 | 2 | 0 | 8 | 0 | 2 | 1 | 1 |
 | 6 | 3 | 1 | 6 | 0 | 5 | 3 | 2 |
 | 5 | 1 | 0 | 9 | 0 | 1 | 1 | 1 |
 | 4 | 3 | 0 | 7 | 0 | 3 | 3 | 3 |
-| 3 | 6 | 0 | 4 | 0 | 5 | 4 | 4 |
+| 3 | 6 | 0 | 4 | 0 | 5 | 5 | 5 |
 | 2 | 10 | 0 | 0 | 0 | 10 | 10 | 10 |
 | 1 | 10 | 0 | 0 | 0 | 10 | 10 | 10 |
-| **All** | **58** | **1** | **41** | **0** | **59** | **51** | **50** |
+| **All** | **59** | **1** | **40** | **0** | **60** | **57** | **56** |
 
-Timed races (77; the five swapped-in races replace five that failed): total mean gap error
-245.23 s (last report 252.39 s over 77). G1 sanity of the 23 reconstructed races:
+Timed races (77; saudi-arabia-2023 replaces australia-2025, which failed): total mean gap error
+242.66 s (last report 245.23 s over 77). G1 sanity of the 23 reconstructed races:
 13 pass, 112.79 s total (last report 13 of 23, 112.79 s); all 23 pass every core anchor.
 
-### Ready to publish (50)
+### Ready to publish (56)
 
-- **Era 10** (6): bahrain-2023 (SAI), great-britain-2023 (NOR), hungary-2022 (VER), netherlands-2023 (VER), emilia-romagna-2024 (NOR), belgium-2023 (VER)
-- **Era 9** (8): bahrain-2021 (VER), styria-2021 (VER), azerbaijan-2021 (PER), france-2021 (HAM), russia-2021 (NOR), netherlands-2021 (VER), great-britain-2021 (LEC), abu-dhabi-2021 (HAM)
+- **Era 10** (10): bahrain-2023 (SAI), great-britain-2023 (NOR), hungary-2022 (VER), japan-2023 (RUS), netherlands-2023 (VER), emilia-romagna-2024 (NOR), hungary-2024 (PIA), belgium-2023 (VER), saudi-arabia-2023 (VER), abu-dhabi-2022 (LEC)
+- **Era 9** (9): bahrain-2021 (VER), styria-2021 (VER), azerbaijan-2021 (PER), france-2021 (HAM), russia-2021 (NOR), turkey-2021 (LEC), netherlands-2021 (VER), great-britain-2021 (LEC), abu-dhabi-2021 (HAM)
 - **Era 8** (5): germany-2018 (HAM), germany-2019 (VER), hungary-2019 (HAM), brazil-2019 (HAM), turkey-2020 (HAM)
 - **Era 7** (1): abu-dhabi-2016 (ROS)
 - **Era 6** (2): abu-dhabi-2010 (PET), europe-2012 (RAI)
 - **Era 5** (1): san-marino-2005 (MSCM)
 - **Era 4** (3): japan-2000 (HAK), austria-2002 (BAR), france-2004 (ALO)
-- **Era 3** (4): spain-1994 (HIL), australia-1994 (HIL), belgium-1995 (MSCM), spain-1996 (MSCM)
+- **Era 3** (5): spain-1994 (HIL), australia-1994 (HIL), belgium-1995 (MSCM), spain-1996 (MSCM), hungary-1998 (COU)
 - **Era 2** (10): france-1990 (CAP), united-states-1990 (ALE), mexico-1990 (PRO), brazil-1991 (SENA), monaco-1992 (SENA), belgium-1992 (MSCM), hungary-1992 (BER), brazil-1993 (SENA), europe-1993 (SENA), australia-1993 (SENA)
 - **Era 1** (10): south-africa-1983 (PIQN), monaco-1984 (PRO), portugal-1984 (LAU), germany-1986 (ROSK), portugal-1985 (SENA), mexico-1986 (BER), hungary-1986 (PIQN), australia-1986 (MAN), great-britain-1987 (PIQN), monaco-1988 (SENA)
 
-Authored but not ready (9): five pass but are no longer, or not, reachable since
-eras-model-player-pace (see "Since the last report"): **hungary-1998** (Era 3, COU),
-**turkey-2021** (Era 9, LEC), **hungary-2024** (Era 10, PIA), **japan-2023** (Era 10, RUS) and
-**abu-dhabi-2022** (Era 10, LEC); **spain-2016** (Era 7, RAI) and **malaysia-2013** (Era 6, WEB)
+Authored but not ready (4): **spain-2016** (Era 7, RAI) and **malaysia-2013** (Era 6, WEB)
 pass G1 but are not reachable; **spain-2013** (Era 6, RAI) fails G1 and is not reachable;
 **china-2011** (Era 6, VET) is still borderline. Passing but not authored (1): europe-1997.
 
 ## Since the last report
 
-Against the last report (08ae2a6). Ready = authored + reachable + pass. No race lost a pass.
+Against the last report (wave 3, b651864). Ready = authored + reachable + pass. No race lost a
+pass, and no race's G1 result or mean gap error moved (the rebuilt race files are byte-identical
+to wave 3's; the only new pair is saudi-arabia-2023).
 
 | Race | Era | Before | After | Why |
 |---|---|---|---|---|
-| great-britain-2023 | 10 | - (swapped in for great-britain-2022, fail 2.03 s) | pass (1.56 s), authored (NOR), reachable, **ready** | swap + B1 authoring |
-| japan-2023 | 10 | - (swapped in for singapore-2023, fail 3.69 s) | pass (1.97 s), authored (RUS), **not reachable** (era difficulty) | swap + B1 authoring; reachable without eras-model-player-pace's sim change |
-| netherlands-2023 | 10 | pass (2.47 s), not authored | pass (2.49 s), authored (VER), reachable, **ready** | B1 authoring, the wet-tyres-only lap fix |
-| emilia-romagna-2024 | 10 | - (swapped in for miami-2024, fail 2.79 s) | pass (0.88 s), authored (NOR), reachable, **ready** | swap + B1 authoring |
-| hungary-2024 | 10 | pass, authored, reachable, ready | pass (2.52 s), **not reachable** (Legend) | eras-model-player-pace's sim change |
-| abu-dhabi-2022 | 10 | - (swapped in for monaco-2025, fail 3.28 s) | pass (0.54 s), authored (LEC), **not reachable** (Legend; stay-out ★3 at era difficulty) | swap + B1 authoring; reachable without eras-model-player-pace's sim change |
-| azerbaijan-2021 | 9 | pass (1.27 s), not authored | pass (1.27 s), authored (PER), reachable, **ready** | B1 authoring (merged after the wave-1 rebuild; its race file is rebuilt here) |
-| turkey-2021 | 9 | pass, authored, reachable, ready | pass (0.41 s), **not reachable** (Legend) | eras-model-player-pace's sim change |
-| netherlands-2021 | 9 | - (swapped in for brazil-2021, fail 1.91 s) | pass (1.76 s), authored (VER), reachable, **ready** | swap + B1 authoring |
-| hungary-1998 | 3 | pass, authored, reachable, ready | pass (1.42 s), **not reachable** (Legend) | eras-model-player-pace's sim change |
+| saudi-arabia-2023 | 10 | - (swapped in for australia-2025, fail 3.43 s) | pass (0.86 s), authored (VER), reachable, **ready** | swap (owner, Nov 9, third batch) + sourced pace_skip + B1 authoring |
+| japan-2023 | 10 | pass, authored, **not reachable** (era difficulty) | reachable, **ready** | eras-revert-player-pace |
+| hungary-2024 | 10 | pass, authored, **not reachable** (Legend) | reachable, **ready** | eras-revert-player-pace |
+| abu-dhabi-2022 | 10 | pass, authored, **not reachable** (Legend; stay-out ★3) | reachable, stay-out ★3 not earned, **ready** | eras-revert-player-pace |
+| turkey-2021 | 9 | pass, authored, **not reachable** (Legend) | reachable, **ready** | eras-revert-player-pace |
+| hungary-1998 | 3 | pass, authored, **not reachable** (Legend) | reachable, **ready** | eras-revert-player-pace |
 
-**Reachability lost to eras-model-player-pace.** The five races above marked "not reachable"
-were each checked on this branch's parent before that merge (d98aed2^1, with this run's rebuilt
-race files): all five pass there, and fail after it. The change (sim.ts `playerStintOffset`:
-the player's car runs its race-wide mean stint offset in live play, so in the grader's
-playouts) moves the player's pace in every Eras race with `stintPace`. netherlands-2023, the
-race it was made for, is reachable with or without the sim change (its wet-side fix is in the
-race file). Fixing this means re-authoring the five races (B2) or revisiting the change; that
-is a coordinator / owner call, so this integration leaves it merged.
+**eras-revert-player-pace.** The owner reverted wave 3's `playerStintOffset` (sim.ts): the
+player's car in live play again runs no stint offset. The five races wave 3 lost to it are
+reachable again on the rebuilt files, as the revert branch measured. The underlying bug (the
+player's car carries no share of basePace's error) is logged under B3 in
+docs/eras-remaining-work.md.
 
-Model moves: the wet-tyres-only lap fix changes three timed wet races: netherlands-2023 2.47 ->
-2.49 s (pass), great-britain-2016 2.05 -> 1.95 s (fail), united-states-2015 1.97 -> 1.88 s
-(fail). No other race's gap error moved. The history-book totals drop by four rewrites
-(abu-dhabi-2022, azerbaijan-2021, netherlands-2021, netherlands-2023: the side won, no
-rewrite): 28 races without one, web mock 802, worker 803.
+**Era 10 is complete**: 10 of 10 ready (pending owner sign-off of the facts sheets). The
+history-book totals don't move: australia-2025 (unauthored, so one rewrite) leaves and
+saudi-arabia-2023 (Verstappen lost; rewrite condition "win") comes in. Web mock 802, worker 803,
+28 races without a rewrite.
 
 ## Model gaps, ranked
 
@@ -307,22 +296,22 @@ race is now reachable.
 
 ## Reachability (eras spec §15)
 
-`pnpm --filter @laststint/sim reachability <id>` for each of the 54 authored Eras-only races and
+`pnpm --filter @laststint/sim reachability <id>` for each of the 55 authored Eras-only races and
 `pnpm --filter @laststint/worker reachability:shared <id>` for each of the 5 authored shared races
 (the race file merged with its overlay, the model the Eras API serves), one race per call, on the
-rebuilt race files. Last report = integration wave 1; "new" = authored since.
+rebuilt race files. Last report = integration wave 3; "new" = authored since.
 
 | Race | Era difficulty | Legend | Stay-out ★3 | Result | Last report |
 |---|---|---|---|---|---|
 | abu-dhabi-2010 | reachable | reachable | not earned | pass | pass |
 | abu-dhabi-2016 | reachable | reachable | not earned | pass | pass |
 | abu-dhabi-2021 (shared) | reachable | reachable | not earned | pass | pass |
-| abu-dhabi-2022 | reachable | **not reachable** | **earned** | **fail** | new |
+| abu-dhabi-2022 | reachable | reachable | not earned | pass | fail |
 | australia-1986 | reachable | reachable | not earned | pass | pass |
 | australia-1993 | reachable | reachable | not earned | pass | pass |
 | australia-1994 | reachable | reachable | not earned | pass | pass |
 | austria-2002 | reachable | reachable | not earned | pass | pass |
-| azerbaijan-2021 | reachable | reachable | not earned | pass | new |
+| azerbaijan-2021 | reachable | reachable | not earned | pass | pass |
 | bahrain-2021 (shared) | reachable | reachable | not earned | pass | pass |
 | bahrain-2023 | reachable | reachable | not earned | pass | pass |
 | belgium-1992 | reachable | reachable | not earned | pass | pass |
@@ -332,7 +321,7 @@ rebuilt race files. Last report = integration wave 1; "new" = authored since.
 | brazil-1993 | reachable | reachable | not earned | pass | pass |
 | brazil-2019 | reachable | reachable | not earned | pass | pass |
 | china-2011 | reachable | reachable | not earned | pass | pass |
-| emilia-romagna-2024 | reachable | reachable | not earned | pass | new |
+| emilia-romagna-2024 | reachable | reachable | not earned | pass | pass |
 | europe-1993 | reachable | reachable | not earned | pass | pass |
 | europe-2012 | reachable | reachable | not earned | pass | pass |
 | france-1990 | reachable | reachable | not earned | pass | pass |
@@ -343,27 +332,28 @@ rebuilt race files. Last report = integration wave 1; "new" = authored since.
 | germany-2019 | reachable | reachable | not earned | pass | pass |
 | great-britain-1987 | reachable | reachable | not earned | pass | pass |
 | great-britain-2021 | reachable | reachable | not earned | pass | pass |
-| great-britain-2023 | reachable | reachable | not earned | pass | new |
+| great-britain-2023 | reachable | reachable | not earned | pass | pass |
 | hungary-1986 | reachable | reachable | not earned | pass | pass |
 | hungary-1992 | reachable | reachable | not earned | pass | pass |
-| hungary-1998 | reachable | **not reachable** | not earned | **fail** | pass |
+| hungary-1998 | reachable | reachable | not earned | pass | fail |
 | hungary-2019 (shared) | reachable | reachable | not earned | pass | pass |
 | hungary-2022 | reachable | reachable | not earned | pass | pass |
-| hungary-2024 | reachable | **not reachable** | not earned | **fail** | pass |
+| hungary-2024 | reachable | reachable | not earned | pass | fail |
 | japan-2000 | reachable | reachable | not earned | pass | pass |
-| japan-2023 | **not reachable** | reachable | not earned | **fail** | new |
+| japan-2023 | reachable | reachable | not earned | pass | fail |
 | malaysia-2013 | **not reachable** | **not reachable** | not earned | **fail** | fail |
 | mexico-1986 | reachable | reachable | not earned | pass | pass |
 | mexico-1990 | reachable | reachable | not earned | pass | pass |
 | monaco-1984 | reachable | reachable | not earned | pass | pass |
 | monaco-1988 | reachable | reachable | not earned | pass | pass |
 | monaco-1992 | reachable | reachable | not earned | pass | pass |
-| netherlands-2021 | reachable | reachable | not earned | pass | new |
-| netherlands-2023 | reachable | reachable | not earned | pass | new |
+| netherlands-2021 | reachable | reachable | not earned | pass | pass |
+| netherlands-2023 | reachable | reachable | not earned | pass | pass |
 | portugal-1984 | reachable | reachable | not earned | pass | pass |
 | portugal-1985 | reachable | reachable | not earned | pass | pass |
 | russia-2021 (shared) | reachable | reachable | not earned | pass | pass |
 | san-marino-2005 | reachable | reachable | not earned | pass | pass |
+| saudi-arabia-2023 | reachable | reachable | not earned | pass | new |
 | south-africa-1983 | reachable | reachable | not earned | pass | pass |
 | spain-1994 | reachable | reachable | not earned | pass | pass |
 | spain-1996 | reachable | reachable | not earned | pass | pass |
@@ -371,14 +361,14 @@ rebuilt race files. Last report = integration wave 1; "new" = authored since.
 | spain-2016 | **not reachable** | **not reachable** | not earned | **fail** | fail |
 | styria-2021 | reachable | reachable | not earned | pass | pass |
 | turkey-2020 | reachable | reachable | not earned | pass | pass |
-| turkey-2021 | reachable | **not reachable** | not earned | **fail** | pass |
+| turkey-2021 | reachable | reachable | not earned | pass | fail |
 | united-states-1990 | reachable | reachable | not earned | pass | pass |
 
-**51 pass, 8 fail of 59** (54 Eras-only, 5 shared; shared 5 of 5).
-Last report: 49 pass, 3 fail of 52. Still failing: spain-2016, malaysia-2013, spain-2013 (B2
-re-author). Newly failing: hungary-1998, turkey-2021, hungary-2024 (Legend) and the new
-japan-2023 (era difficulty) and abu-dhabi-2022 (Legend; stay-out ★3 at era difficulty), all from
-eras-model-player-pace (above). Not checked: the built races with no authored `eras` block.
+**57 pass, 3 fail of 60** (55 Eras-only, 5 shared; shared 5 of 5).
+Last report: 51 pass, 8 fail of 59. Still failing: spain-2016, malaysia-2013, spain-2013 (B2
+re-author; not reachable at either level). Passing again: hungary-1998, turkey-2021,
+hungary-2024, japan-2023, abu-dhabi-2022 (eras-revert-player-pace). New: saudi-arabia-2023
+(pass). Not checked: the built races with no authored `eras` block.
 
 ## Not built
 
