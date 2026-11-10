@@ -33,6 +33,13 @@ describe('race pools', () => {
     }
   });
 
+  it('lets a Gauntlet race be in Eras too: portugal-2021 (Era 9 swap, Nov 9)', () => {
+    const survivor = Object.keys(pools.survivor);
+    const shared = erasRaces.filter((id) => survivor.includes(id));
+    expect(shared).toEqual(['portugal-2021']);
+    expect(pools.eras['9']?.[4]).toBe('portugal-2021');
+  });
+
   it('lists the ten eras, ten distinct races each', () => {
     expect(Object.keys(pools.eras).sort((a, b) => Number(a) - Number(b))).toEqual(
       Array.from({ length: 10 }, (_, i) => String(i + 1)),

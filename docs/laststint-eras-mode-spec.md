@@ -71,7 +71,7 @@ Players start at Era 10 and move back through the timeline to Era 1. The eras be
 | 2 | styria-2021 | Hamilton on wilting mediums four seconds back: pit early, stretch the stint, or stop twice | win: Hamilton beats Verstappen |
 | 3 | azerbaijan-2021 | Tyre failure, then the restart | defend: Pérez holds the lead at the restart |
 | 4 | france-2021 | Red Bull's two-stop beats Hamilton | win: Verstappen chases Hamilton |
-| 5 | hungary-2021 | Hamilton alone on the grid at the restart | position: Hamilton on the podium |
+| 5 | portugal-2021 | Leading on worn mediums with Verstappen in the mirrors: stop for hards before Red Bull tries the undercut, or stretch the stint | defend: Hamilton holds P1 |
 | 6 | russia-2021 | Norris stays on slicks as the rain arrives | defend: Norris holds P1 |
 | 7 | turkey-2021 | Hamilton argues against pitting | position: Hamilton limits the damage (P4 or better) |
 | 8 | netherlands-2021 | Mercedes splits its cars against a quicker Red Bull: Hamilton undercuts, Bottas runs long | defend: Verstappen wins from pole |
@@ -221,7 +221,7 @@ Every race, however it was built, must pass the existing validation test before 
 - The map shows all ten eras in timeline order. Era 10 (play order 1) is unlocked from the start.
 - An era unlocks when the player has **70% of the stars (21 of 30)** in the era before it in play order (Era 9 unlocks from Era 10, and so on back to Era 1).
 - Within an unlocked era, all ten races are open and can be played in any order.
-- **Sharing with Daily and Gauntlet (decided Nov 7):** an Eras race can also be in the Daily or Gauntlet pool. Five of the 100 are already in the Daily pool (`abu-dhabi-2021`, `bahrain-2021`, `france-2021`, `russia-2021`, `hungary-2019`) and stay there; none are in the Gauntlet. `data/pools.json` gains an `eras` block, and the pools rule becomes: a race is in at most one of Daily and Gauntlet, and in Eras as well if it's one of the 100.
+- **Sharing with Daily and Gauntlet (decided Nov 7):** an Eras race can also be in the Daily or Gauntlet pool. Five of the 100 are already in the Daily pool (`abu-dhabi-2021`, `bahrain-2021`, `france-2021`, `russia-2021`, `hungary-2019`) and stay there. One is in the Gauntlet pool and stays there: `portugal-2021`, swapped in for `hungary-2021` on Nov 9 (owner-approved swap; `docs/eras-checks/swap-races-era9-overnight.md`). `data/pools.json` gains an `eras` block, and the pools rule becomes: a race is in at most one of Daily and Gauntlet, and in Eras as well if it's one of the 100.
 - **Test:** all ten eras and all 100 races are up at once, including Draft races, so the whole campaign can be played through.
 - **Production:** eras are released one at a time, in play order, by setting `released_at`. An unreleased era shows as "Coming soon" with its date range.
 - The unlock threshold lives in config as a share (`ERA_UNLOCK_SHARE = 0.7`, decided Nov 7), not in code. With 10 races an era needs 21 stars; the count is `ceil(0.7 × 3 × races)`.
@@ -242,8 +242,8 @@ Every race has one target, set in `eras.target`. Each race's draft target is in 
 | Type | Means | Grader `Target` | Races (draft) |
 |---|---|---|---|
 | `win` | Chase down the win from behind | `win` | 37 |
-| `defend` | Start in the lead and keep it to the flag | `win`, starting from P1 | 25 |
-| `position` | Reach a set position, such as P3 to win the title | `position` | 21 |
+| `defend` | Start in the lead and keep it to the flag | `win`, starting from P1 | 26 |
+| `position` | Reach a set position, such as P3 to win the title | `position` | 20 |
 | `beat-rival` | Finish ahead of a named car, wherever that is | `beat-rival` | 10 |
 | `team` | A team result, such as a 1–2 in a set order | `team` (new) | 4 |
 | `deny` | Keep a rival at or below a set position, such as out of the top 3 to stop their title | `deny` (new) | 3 |

@@ -7,11 +7,13 @@ import { SELF, createExecutionContext, env, waitOnExecutionContext } from 'cloud
 import { type RaceModel, initRun } from '@laststint/sim';
 import { describe, expect, it } from 'vitest';
 import abuOverlay from '../../../data/eras/abu-dhabi-2021.json';
+import portugalOverlay from '../../../data/eras/portugal-2021.json';
 import abuJson from '../../../data/races/abu-dhabi-2021.json';
 import bahrainJson from '../../../data/races/bahrain-2021.json';
 import franceJson from '../../../data/races/france-2021.json';
 import hungary2019Json from '../../../data/races/hungary-2019.json';
 import hungary2022Json from '../../../data/races/hungary-2022.json';
+import portugalJson from '../../../data/races/portugal-2021.json';
 import russiaJson from '../../../data/races/russia-2021.json';
 import vectors from '../../../pipeline/tests/fixtures/eras_overlay_parity.json';
 import { getErasRace } from '../src/eras.js';
@@ -25,28 +27,38 @@ const FILES: Record<string, RaceModel> = {
   'bahrain-2021': bahrainJson as unknown as RaceModel,
   'france-2021': franceJson as unknown as RaceModel,
   'hungary-2019': hungary2019Json as unknown as RaceModel,
+  'portugal-2021': portugalJson as unknown as RaceModel,
   'russia-2021': russiaJson as unknown as RaceModel,
 };
 const SHARED = Object.keys(FILES);
+// Shared races whose overlay is rules-only so far: portugal-2021, a Gauntlet race swapped into
+// Era 9 on Nov 9 (docs/eras-checks/swap-races-era9-overnight.md). Its side, target and content
+// are authored into the overlay in B1.
+const UNAUTHORED = ['portugal-2021'];
+const AUTHORED = SHARED.filter((id) => !UNAUTHORED.includes(id));
 
-// The Daily hashes as scheduled before Eras (Nov 7 2026): these never change.
+// The Daily hashes as scheduled before Eras (Nov 7 2026), and portugal-2021's Gauntlet hash
+// (its race file since Nov 5 2026): these never change.
 const DAILY_HASHES: Record<string, string> = {
   'abu-dhabi-2021': 'f3d051610bb18897976f0a26a0e50ef73df42f1754e0e9a082d8a18520fed524',
   'bahrain-2021': '4bc64da4ef5a6684135ee9394292519717e0eea40705e9921af6616085a3a314',
   'france-2021': 'da4947b0158de2b130e491543b34a1d2e71e1235bff9add74211160ea5d0d2b1',
   'hungary-2019': '500a886adc23c5c7f014bbacbcfe929757aa13165ef52e9cf759df50ff94032d',
+  'portugal-2021': '099e1d5af834e0122b9113e67b9b01ab5a2fe3f30e87913117acb72500a874ef',
   'russia-2021': '038a27369e37f828e0f66081ba284c99ebf6af2e9f2e30ec0943928daedf06fa',
 };
 // Their Eras models' hashes (race file + the overlay as authored in step 6.2, Nov 8 2026):
 // change only with the overlay. abu-dhabi-2021's moved when its rewrite condition was taken out
 // (the Eras side really won; Eras grader fixes, Nov 8 2026); abu-dhabi-2021's, france-2021's,
 // hungary-2019's and russia-2021's moved with the 6.2 re-author (hard calls recounted on the
-// Eras grader; the first three now play Hamilton).
+// Eras grader; the first three now play Hamilton). portugal-2021's is its file with the rules-only
+// overlay (Era 9 swap, Nov 9 2026).
 const ERAS_HASHES: Record<string, string> = {
   'abu-dhabi-2021': 'dd3c65a9cb71b0c9395de425e78aab405e561040e50cc616085d254edb8e65d5',
   'bahrain-2021': '3fc5e332a9dde5d1f108c5006fcc963f0be1b80bb6ab902b2be9355c91ddd82e',
   'france-2021': '690eb948006f21d9036c2dd90f457f39c43989216b7eff5f7958b5cce4e6ca54',
   'hungary-2019': 'ec1f25684f6af44532acb16cb235c301eb6f5f87e8db018bf540658fb578fdce',
+  'portugal-2021': '9da4062b841faa09e2c06ed5a0cee4759c94b35e2f2122b0b01ebde0d8097639',
   'russia-2021': 'b5e389cff73b5572b052884927f2aba8703bd3abda6f0d90e636aa5190568003',
 };
 
@@ -134,7 +146,7 @@ describe('shared races', () => {
   // Owner decision (Nov 8): the hard-call side wins, also on a shared race. The Eras model is
   // the other car's when the hard calls say so, with moments authored from that side, while
   // the Daily file keeps its side and moments.
-  it.each(SHARED)('%s: the Eras model plays the hard-call side', async (id) => {
+  it.each(AUTHORED)('%s: the Eras model plays the hard-call side', async (id) => {
     const file = FILES[id] as RaceModel;
     const overlay = ERAS_OVERLAYS[id] as {
       eras: { userSide: string; hardCalls: Record<string, number> };
@@ -158,6 +170,16 @@ describe('shared races', () => {
     // The Daily view still plays its own side.
     const daily = (await getRace(id))?.model as RaceModel;
     expect([daily.userSide, daily.rival]).toEqual([file.userSide, file.rival]);
+  });
+
+  it.each(UNAUTHORED)('%s: a rules-only overlay plays the race file side', async (id) => {
+    const file = FILES[id] as RaceModel;
+    expect(Object.keys(ERAS_OVERLAYS[id] as object)).toEqual(['rules']);
+    const eras = (await getErasRace(id))?.model as RaceModel;
+    expect(eras.eras).toBeUndefined();
+    expect([eras.userSide, eras.rival]).toEqual([file.userSide, file.rival]);
+    expect(eras.decisionMoments).toEqual(file.decisionMoments);
+    expect(eras.rules).toEqual(portugalOverlay.rules);
   });
 
   it('the Eras model route serves the merged model, pinned by its hash', async () => {

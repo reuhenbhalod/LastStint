@@ -157,7 +157,10 @@ const RACE_TABLE: Record<number, ReadonlyArray<readonly [string, string]>> = {
     ],
     ['azerbaijan-2021', 'Tyre failure, then the restart'],
     ['france-2021', "Red Bull's two-stop beats Hamilton"],
-    ['hungary-2021', 'Hamilton alone on the grid at the restart'],
+    [
+      'portugal-2021',
+      'Leading on worn mediums with Verstappen in the mirrors: stop for hards before Red Bull tries the undercut, or stretch the stint',
+    ],
     ['russia-2021', 'Norris stays on slicks as the rain arrives'],
     ['turkey-2021', 'Hamilton argues against pitting'],
     [

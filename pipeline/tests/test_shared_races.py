@@ -18,8 +18,20 @@ import pytest
 from pipeline import build, export, paths, restart
 
 VECTORS = Path(__file__).parent / "fixtures" / "eras_overlay_parity.json"
-# The races in both Eras and a Daily/Gauntlet pool (data/pools.json, Nov 7 2026).
-SHARED = ("abu-dhabi-2021", "bahrain-2021", "france-2021", "hungary-2019", "russia-2021")
+# The races in both Eras and a Daily/Gauntlet pool (data/pools.json, Nov 7 2026; portugal-2021,
+# a Gauntlet race, swapped into Era 9 on Nov 9).
+SHARED = (
+    "abu-dhabi-2021",
+    "bahrain-2021",
+    "france-2021",
+    "hungary-2019",
+    "portugal-2021",
+    "russia-2021",
+)
+# Shared races with a rules-only overlay so far: their side (`pipeline hard-calls`), target and
+# content are authored into the overlay in B1 (docs/eras-checks/swap-races-era9-overnight.md).
+UNAUTHORED = ("portugal-2021",)
+AUTHORED = tuple(rid for rid in SHARED if rid not in UNAUTHORED)
 TOUCHED = ("eras", "provenance", "rules", "decisionMoments", "userSide", "rival")
 
 
@@ -133,6 +145,17 @@ def _cases() -> list[dict]:
     ]
 
 
+def test_an_unauthored_shared_race_has_a_rules_only_overlay():
+    """A shared race swapped in before B1 carries only its era rules: no eras block, so the
+    Eras model plays the race file's side and moments until its side is authored."""
+    for rid in UNAUTHORED:
+        overlay = build.load_overlay(rid)
+        assert set(overlay) == {"rules"}, rid
+        merged = merge(_race(rid), overlay)
+        assert "eras" not in merged
+        assert merged["rules"] == overlay["rules"]
+
+
 def build_vectors() -> dict:
     """Each case's merged model, stored compactly: its top-level key order, the blocks the merge
     sets, and its events (where storylineEvent is flagged). Every other key is the race file's."""
@@ -159,7 +182,7 @@ def test_parity_vectors_are_current():
     assert json.loads(VECTORS.read_text()) == json.loads(json.dumps(want))
 
 
-@pytest.mark.parametrize("race_id", SHARED)
+@pytest.mark.parametrize("race_id", AUTHORED)
 def test_shared_eras_model_plays_the_hard_call_side(race_id):
     """The Eras model (file + overlay) is played from eras.userSide, the hard-call side (owner
     decision Nov 8), with the overlay's moments when it has its own; the rival is the other
