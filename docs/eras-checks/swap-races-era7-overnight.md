@@ -390,6 +390,35 @@ WP, GPE, AS and MS were read through a fetch tool that summarises; check their w
 | Side really won? | Vettel yes, so no rewrite. Hamilton no (2nd, 8.569 s). |
 | Risk | Low to medium. Dry, one SC, full Jolpica stops and compounds from MS/GPE. Risks: stop laps off by one between sources (Jolpica vs WP/GPE); the SC deploy lap (3 vs 4); the outcome depends on the model getting Ferrari's tyre-wear edge in the heat. |
 
+### Authored (B1, Nov 9)
+
+Built as an Eras build with `user_side` VET / `rival` HAM (`build.py`); takeover lap 14 (D3
+rule), so the lap-4 safety car is behind the player. Robust G1: pass, 2.02 s (strict pass, same
+before and after the `eras` block). Reachability: era (threshold 78, Standard+ rival) and Legend
+(threshold 90, Expert rival) reachable, stay-out never ★1, ★2 or ★3 on any seed.
+
+Two sources were re-read directly for the rows below (not through the summarising tool): WP as
+wikitext (`action=raw`) and MS as the page's own text. The quotes in the Basis column are from
+those reads.
+
+| Item | As authored | Basis | Owner checked |
+|---|---|---|---|
+| Side | **Vettel.** `pipeline hard-calls`: VET 1, HAM 1, chance given up VET 0.0 pts, HAM 0.0 pts: a full tie, so the race file's side (VET) stands. | hard-call counter | |
+| Target | `defend`: Vettel leads at the takeover (TUM timing, end of lap 14: VET P1, HAM P2 9.228 s back) and won. The spec §4 draft said "win from P2" (his grid slot). | Timing; Jolpica-r | |
+| Rewrite | None: Vettel really won. | Jolpica-r, WP | |
+| Storyline | "Hamilton leads from pole until Ericsson's spin brings out the safety car on lap 4" | WP: "At the start, Lewis Hamilton got away well"; "On lap four, Marcus Ericsson braked too late and spun in turn one, retiring from the race and bringing out the safety car". MS has Ericsson's spin on "the third lap" (conflict row above; WP taken). | WP, MS | |
+| Storyline | "Both Mercedes pit for the hard tyre and Vettel stays out to lead on mediums" | MS: "The Mercs peeled in and switched to the hard tyre, Vettel stayed out"; "All the top 10 had to start on the option (medium) tyre"; WP: "When racing resumed on lap seven, Vettel led" | MS, WP | |
+| Storyline | "He stops twice, on lap 18 and lap 38, while Mercedes stops three times" | WP: "Vettel came in for his first stop on lap 18"; "Vettel made a pit stop for a second and final time on lap 38". Jolpica-p has 17 and 37 (off by one, row above); the race file's real stops are laps 18 and 38. Hamilton and Rosberg three stops each (Jolpica-p). | WP, Jolpica-p, Timing | |
+| Storyline | "Vettel wins Ferrari's first race since Spain 2013 by 8.569 s from Hamilton" | WP: "It was Ferrari's first win since the 2013 Spanish Grand Prix"; MS: "its first victory since Spain 2013"; Hamilton +8.569 | WP, MS, Jolpica-r | |
+| Briefing | "the track is close to 60 degrees" | MS: "The tarmac was 60deg C by 3pm, race start" | MS | |
+| Briefing | "Vettel stayed out under the early safety car and leads, about nine seconds clear of Hamilton, fourteen laps in" | VET P1, HAM 9.228 s behind at the end of lap 14 | Timing; WP | |
+| Briefing | "Mercedes switched to the hard tyre and will stop three times. You run Vettel on the medium: make two stops last" | MS rows above; Jolpica-p (HAM and ROS three stops, VET two) | MS, Jolpica-p | |
+| Mastery | `margin` 8.6 s, "Win by more than 8.6 seconds" (beat his real margin, 8.569 s). | Jolpica-r; reachability | |
+| Hidden | `stop_count` exact 2, "Win on two stops" (as Vettel made). | Jolpica-p; reachability | |
+| storylineEvents | None. The only SC (laps 4-6) is before the takeover, and no source has a VSC or red flag (row above). The three retirements after the takeover (ALO, BUT, MAL) are other cars and stay in Legend anyway. | WP, GPE | |
+| Moments | From the author tool unchanged (`author malaysia-2015 --target win --eras --write`): stop-17 (real box, onto the model's SOFT = the real medium), pace-22, pace-34, stop-37 (real box, onto the model's MEDIUM = the real hard). The model's SOFT/MEDIUM are the real medium/hard. | author output | |
+| Reachability paths | Era (seed 3): box softs at 17, standard at 22 and 34, box next lap on mediums at 37: ★1 ★2 ★3, hidden. Legend (seed 3): the same with the second stop at 37 (box-medium, the real call). Stay-out: no star on any seed (accuracy 74-75). | reachability | |
+
 ## Notes for the owner
 
 - Track maps: five reuse an existing outline on the same f1db layout (bahrain-2015 from
