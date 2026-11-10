@@ -3325,6 +3325,32 @@
    "race": "portugal-2021",
    "overlays": [
     {
+     "eras": {
+      "eraId": 9,
+      "order": 5,
+      "userSide": "HAM",
+      "target": {
+       "type": "defend"
+      },
+      "storyline": {
+       "real": "Hamilton passes Bottas for the lead on lap 20 and keeps his mediums until lap 38, two laps after Red Bull stops Verstappen. He comes out ahead of both, passes the one-stopping P\u00e9rez on lap 51 and wins by 29.148 s from Verstappen."
+      },
+      "mastery": {
+       "type": "margin",
+       "seconds": 30,
+       "label": "Win by more than 30 seconds"
+      },
+      "hidden": {
+       "type": "stop_count",
+       "exact": 1,
+       "label": "Win on one stop"
+      },
+      "hardCalls": {
+       "VER": 0,
+       "HAM": 1
+      },
+      "briefing": "Portim\u00e3o, 2021. You run Hamilton, leading Bottas by 3.3 s on worn mediums after 30 laps, with Verstappen close behind. Hamilton, Bottas and Verstappen all still have to stop for hards. Pick your lap before Red Bull tries the undercut."
+     },
      "rules": {
       "twoCompound": true,
       "tyreChanges": true,
@@ -3333,7 +3359,189 @@
       "drs": true,
       "ers": "hybrid",
       "refuelling": false
-     }
+     },
+     "decisionMoments": [
+      {
+       "id": "rivalpit-35",
+       "lap": 35,
+       "trigger": "rivalPit",
+       "target": {
+        "kind": "win"
+       },
+       "options": [
+        {
+         "id": "stay",
+         "label": "Stay out",
+         "decisions": []
+        },
+        {
+         "id": "box-soft",
+         "label": "Box, softs",
+         "decisions": [
+          {
+           "lap": 35,
+           "kind": "pit",
+           "compound": "SOFT"
+          }
+         ]
+        },
+        {
+         "id": "box-medium",
+         "label": "Box, mediums",
+         "decisions": [
+          {
+           "lap": 35,
+           "kind": "pit",
+           "compound": "MEDIUM"
+          }
+         ]
+        },
+        {
+         "id": "box-hard",
+         "label": "Box, hards",
+         "decisions": [
+          {
+           "lap": 35,
+           "kind": "pit",
+           "compound": "HARD"
+          }
+         ]
+        },
+        {
+         "id": "box-next-hard",
+         "label": "Box next lap, hards",
+         "decisions": [
+          {
+           "lap": 36,
+           "kind": "pit",
+           "compound": "HARD"
+          }
+         ]
+        }
+       ],
+       "realOptionId": "stay"
+      },
+      {
+       "id": "cliff-52",
+       "lap": 52,
+       "trigger": "cliff",
+       "target": {
+        "kind": "win"
+       },
+       "options": [
+        {
+         "id": "stay",
+         "label": "Stay out",
+         "decisions": []
+        },
+        {
+         "id": "box-soft",
+         "label": "Box, softs",
+         "decisions": [
+          {
+           "lap": 52,
+           "kind": "pit",
+           "compound": "SOFT"
+          }
+         ]
+        },
+        {
+         "id": "box-medium",
+         "label": "Box, mediums",
+         "decisions": [
+          {
+           "lap": 52,
+           "kind": "pit",
+           "compound": "MEDIUM"
+          }
+         ]
+        },
+        {
+         "id": "box-hard",
+         "label": "Box, hards",
+         "decisions": [
+          {
+           "lap": 52,
+           "kind": "pit",
+           "compound": "HARD"
+          }
+         ]
+        },
+        {
+         "id": "box-next-hard",
+         "label": "Box next lap, hards",
+         "decisions": [
+          {
+           "lap": 53,
+           "kind": "pit",
+           "compound": "HARD"
+          }
+         ]
+        }
+       ],
+       "realOptionId": "stay"
+      },
+      {
+       "id": "rivalpit-64",
+       "lap": 64,
+       "trigger": "rivalPit",
+       "target": {
+        "kind": "win"
+       },
+       "options": [
+        {
+         "id": "stay",
+         "label": "Stay out",
+         "decisions": []
+        },
+        {
+         "id": "box-soft",
+         "label": "Box, softs",
+         "decisions": [
+          {
+           "lap": 64,
+           "kind": "pit",
+           "compound": "SOFT"
+          }
+         ]
+        },
+        {
+         "id": "box-medium",
+         "label": "Box, mediums",
+         "decisions": [
+          {
+           "lap": 64,
+           "kind": "pit",
+           "compound": "MEDIUM"
+          }
+         ]
+        },
+        {
+         "id": "box-hard",
+         "label": "Box, hards",
+         "decisions": [
+          {
+           "lap": 64,
+           "kind": "pit",
+           "compound": "HARD"
+          }
+         ]
+        },
+        {
+         "id": "box-next-hard",
+         "label": "Box next lap, hards",
+         "decisions": [
+          {
+           "lap": 65,
+           "kind": "pit",
+           "compound": "HARD"
+          }
+         ]
+        }
+       ],
+       "realOptionId": "stay"
+      }
+     ]
     }
    ],
    "keys": [
@@ -3351,9 +3559,36 @@
     "realResult",
     "userSide",
     "rival",
+    "eras",
     "rules"
    ],
    "blocks": {
+    "eras": {
+     "eraId": 9,
+     "order": 5,
+     "userSide": "HAM",
+     "target": {
+      "type": "defend"
+     },
+     "storyline": {
+      "real": "Hamilton passes Bottas for the lead on lap 20 and keeps his mediums until lap 38, two laps after Red Bull stops Verstappen. He comes out ahead of both, passes the one-stopping P\u00e9rez on lap 51 and wins by 29.148 s from Verstappen."
+     },
+     "mastery": {
+      "type": "margin",
+      "seconds": 30,
+      "label": "Win by more than 30 seconds"
+     },
+     "hidden": {
+      "type": "stop_count",
+      "exact": 1,
+      "label": "Win on one stop"
+     },
+     "hardCalls": {
+      "VER": 0,
+      "HAM": 1
+     },
+     "briefing": "Portim\u00e3o, 2021. You run Hamilton, leading Bottas by 3.3 s on worn mediums after 30 laps, with Verstappen close behind. Hamilton, Bottas and Verstappen all still have to stop for hards. Pick your lap before Red Bull tries the undercut."
+    },
     "rules": {
      "twoCompound": true,
      "tyreChanges": true,
@@ -3365,11 +3600,11 @@
     },
     "decisionMoments": [
      {
-      "id": "stop-35",
+      "id": "rivalpit-35",
       "lap": 35,
-      "trigger": "cliff",
+      "trigger": "rivalPit",
       "target": {
-       "kind": "beat-rival"
+       "kind": "win"
       },
       "options": [
        {
@@ -3422,76 +3657,131 @@
         ]
        }
       ],
-      "realOptionId": "box-hard"
+      "realOptionId": "stay"
      },
      {
-      "id": "pace-44",
-      "lap": 44,
+      "id": "cliff-52",
+      "lap": 52,
       "trigger": "cliff",
       "target": {
-       "kind": "beat-rival"
+       "kind": "win"
       },
       "options": [
        {
-        "id": "push",
-        "label": "Push now",
+        "id": "stay",
+        "label": "Stay out",
+        "decisions": []
+       },
+       {
+        "id": "box-soft",
+        "label": "Box, softs",
         "decisions": [
          {
-          "lap": 44,
-          "kind": "mode",
-          "key": "pace",
-          "value": "push"
+          "lap": 52,
+          "kind": "pit",
+          "compound": "SOFT"
          }
         ]
        },
        {
-        "id": "standard",
-        "label": "Standard pace",
+        "id": "box-medium",
+        "label": "Box, mediums",
         "decisions": [
          {
-          "lap": 44,
-          "kind": "mode",
-          "key": "pace",
-          "value": "standard"
+          "lap": 52,
+          "kind": "pit",
+          "compound": "MEDIUM"
          }
         ]
        },
        {
-        "id": "manage",
-        "label": "Manage the tyres",
+        "id": "box-hard",
+        "label": "Box, hards",
         "decisions": [
          {
-          "lap": 44,
-          "kind": "mode",
-          "key": "pace",
-          "value": "manage"
+          "lap": 52,
+          "kind": "pit",
+          "compound": "HARD"
          }
         ]
        },
        {
-        "id": "push-attack",
-        "label": "Push and attack",
+        "id": "box-next-hard",
+        "label": "Box next lap, hards",
         "decisions": [
          {
-          "lap": 44,
-          "kind": "mode",
-          "key": "pace",
-          "value": "push"
-         },
-         {
-          "lap": 44,
-          "kind": "mode",
-          "key": "battle",
-          "value": "attack"
+          "lap": 53,
+          "kind": "pit",
+          "compound": "HARD"
          }
         ]
        }
       ],
-      "realOptionId": null
+      "realOptionId": "stay"
+     },
+     {
+      "id": "rivalpit-64",
+      "lap": 64,
+      "trigger": "rivalPit",
+      "target": {
+       "kind": "win"
+      },
+      "options": [
+       {
+        "id": "stay",
+        "label": "Stay out",
+        "decisions": []
+       },
+       {
+        "id": "box-soft",
+        "label": "Box, softs",
+        "decisions": [
+         {
+          "lap": 64,
+          "kind": "pit",
+          "compound": "SOFT"
+         }
+        ]
+       },
+       {
+        "id": "box-medium",
+        "label": "Box, mediums",
+        "decisions": [
+         {
+          "lap": 64,
+          "kind": "pit",
+          "compound": "MEDIUM"
+         }
+        ]
+       },
+       {
+        "id": "box-hard",
+        "label": "Box, hards",
+        "decisions": [
+         {
+          "lap": 64,
+          "kind": "pit",
+          "compound": "HARD"
+         }
+        ]
+       },
+       {
+        "id": "box-next-hard",
+        "label": "Box next lap, hards",
+        "decisions": [
+         {
+          "lap": 65,
+          "kind": "pit",
+          "compound": "HARD"
+         }
+        ]
+       }
+      ],
+      "realOptionId": "stay"
      }
     ],
-    "userSide": "VER",
-    "rival": "HAM"
+    "userSide": "HAM",
+    "rival": "VER"
    },
    "events": []
   },
