@@ -19,8 +19,9 @@ can barely move (PRIOR_SECONDS_PER_LAP, PRIOR_SD; owner decision, Nov 7 2026):
 - The burn: about 3 L a lap (BURN_LITRES_PER_LAP, the owner's figure, Nov 7 2026; it is not
   sourced further and varies with the lap's length).
 - So a lap of fuel takes 3 / 12 = 0.25 s to put in. The data's own pooled slope (pooled_prior,
-  0.0648 s a lap over the races in data/raw/f1db with 8+ stops) is a quarter of that: a stop's time
-  hardly tracks the next stint's laps, so the data can't price a fill.
+  about 0.07 s a lap over the races in data/raw/f1db with 8+ stops, POOLED_SLOPE) is about a
+  quarter of that: a stop's time hardly tracks the next stint's laps, so the data can't price a
+  fill.
 - PRIOR_SD = 0.01 s a lap: about half the spread the two figures allow (12-12.5 L/s and
   2.8-3.2 L a lap give 0.22-0.27 s). The most precise race in data/raw/f1db (europe-2007,
   slope se 0.025) moves the rate 14% of the way to its own slope; a typical race (se 0.076)
@@ -81,8 +82,8 @@ PRIOR_SECONDS_PER_LAP = BURN_LITRES_PER_LAP / RIG_LITRES_PER_SECOND  # 0.25 s pe
 PRIOR_SD = 0.01  # s per lap: strong enough that no single race's stops can move it far
 # What the stops alone say, for the record (pooled_prior(); a test recomputes it): the
 # random-effects mean of the per-race slopes and their between-race sd. Not used in the fit.
-POOLED_SLOPE = 0.0648
-POOLED_TAU = 0.0908
+POOLED_SLOPE = 0.0679
+POOLED_TAU = 0.0882
 FILL_RATE_METHOD = (
     f"fill rate: an estimate, {PRIOR_SECONDS_PER_LAP:.2f} s per lap of fuel"
     f" (~{BURN_LITRES_PER_LAP:g} L a lap through a ~{RIG_LITRES_PER_SECOND:g} L/s rig, prior sd"

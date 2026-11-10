@@ -553,16 +553,16 @@ The **Needs** column is from race history and must be checked against the data f
 | 5 | `monaco-2008` | Jolpica + f1db (est. compounds, fuel) | R2 fault, R4 refuel, P4 map |  |
 | 5 | `brazil-2008` | Jolpica + f1db (est. compounds, fuel) | R3 wet pre-2018, R4 refuel, P4 map |  |
 | 5 | `brazil-2009` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
-| 4 | `germany-2000` | Jolpica + f1db (est. compounds, fuel) | R3 wet pre-2018, R4 refuel, P4 map |  |
+| 4 | `canada-2003` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
 | 4 | `japan-2000` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
-| 4 | `malaysia-2001` | Jolpica + f1db (est. compounds, fuel) | R3 wet pre-2018, R4 refuel, P4 map |  |
+| 4 | `san-marino-2000` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
 | 4 | `austria-2002` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
-| 4 | `brazil-2003` | Jolpica + f1db (est. compounds, fuel) | R1 red flag, R3 wet pre-2018, R4 refuel, P4 map |  |
-| 4 | `hungary-2003` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
-| 4 | `united-states-2003` | Jolpica + f1db (est. compounds, fuel) | R3 wet pre-2018, R4 refuel, P4 map |  |
-| 4 | `japan-2003` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
+| 4 | `hungary-2001` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
+| 4 | `austria-2001` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
+| 4 | `france-2001` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
+| 4 | `italy-2001` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
 | 4 | `france-2004` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
-| 4 | `monaco-2004` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
+| 4 | `san-marino-2003` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
 | 3 | `spain-1994` | Reconstruct (real stops) | R2 fault, R4 refuel, P3 solver, P4 map |  |
 | 3 | `australia-1994` | Reconstruct (real stops) | R4 refuel, P3 solver, P4 map |  |
 | 3 | `belgium-1995` | Reconstruct (real stops) | R3 wet pre-2018, R4 refuel, P3 solver, P4 map |  |

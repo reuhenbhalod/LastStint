@@ -111,6 +111,9 @@ REUSE: dict[str, tuple[str, str]] = {
     "japan-2005": ("japan-2024", "suzuka-2"),
     "japan-2003": ("japan-2024", "suzuka-2"),
     "austria-2002": ("austria-2019", "spielberg-3"),
+    "austria-2001": ("austria-2019", "spielberg-3"),
+    "canada-2003": ("canada-2019", "montreal-6"),
+    "italy-2001": ("italy-2019", "monza-7"),
 }
 
 # f1db layouts no 2018+ race shares. `start`: the start/finish line as a fraction of the way
@@ -150,6 +153,10 @@ LAYOUT_SPECS: dict[str, dict] = {
     },
     "indianapolis-2": {"clockwise": True, "start": 0.87, "pit": (-0.09, 0.10), "turns": 13},
     "magny-cours-3": {"clockwise": True, "start": 0.31, "pit": (-0.07, 0.07), "turns": 17},
+    # The pre-2003 layout (the old final chicane): f1db draws it from a different point, so
+    # its start is -3's line moved onto this path (nearest point after aligning the
+    # drawings' centres); pits as -3's.
+    "magny-cours-2": {"clockwise": True, "start": 0.325, "pit": (-0.07, 0.07), "turns": 15},
     "jerez-2": {"clockwise": True, "start": 0.925, "pit": (-0.075, 0.065), "turns": 15},
     "nurburgring-3": {"clockwise": True, "start": 0.08, "pit": (-0.04, 0.10), "turns": 12},
     "phoenix-1": {"clockwise": False, "start": 0.88, "pit": (-0.06, 0.06), "turns": 15},
@@ -177,6 +184,7 @@ F1DB: dict[str, str] = {
     "hungary-1992": "hungaroring-2",
     "hungary-1997": "hungaroring-2",
     "hungary-1998": "hungaroring-2",
+    "hungary-2001": "hungaroring-2",
     "spain-1994": "catalunya-1",
     "spain-1996": "catalunya-2",
     "australia-1986": "adelaide-1",
@@ -190,12 +198,15 @@ F1DB: dict[str, str] = {
     "malaysia-2013": "sepang-1",
     "europe-2012": "valencia-1",
     "san-marino-2005": "imola-2",
+    "san-marino-2000": "imola-2",
+    "san-marino-2003": "imola-2",
     "germany-2000": "hockenheimring-3",
     "germany-1986": "hockenheimring-2",
     "france-1990": "paul-ricard-2",
     "japan-2000": "suzuka-1",
     "united-states-2003": "indianapolis-2",
     "france-2004": "magny-cours-3",
+    "france-2001": "magny-cours-2",
     "europe-1997": "jerez-2",
     "europe-1999": "nurburgring-3",
     "united-states-1990": "phoenix-1",

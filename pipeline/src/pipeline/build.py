@@ -2070,6 +2070,111 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
+    "san-marino-2000": {
+        "year": 2000,
+        "event": "San Marino",
+        "source": "jolpica",
+        "name": "San Marino 2000: Schumacher vs Häkkinen",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for malaysia-2001 (swap-races-era4-overnight.md). Side provisional until
+        # `pipeline hard-calls`.
+        "user_side": "MSCM",
+        "rival": "HAK",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "france-2001": {
+        "year": 2001,
+        "event": "French",
+        "source": "jolpica",
+        "name": "France 2001: Schumacher vs R. Schumacher",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for united-states-2003 (swap-races-era4-overnight.md). Side provisional until
+        # `pipeline hard-calls`.
+        "user_side": "MSCM",
+        "rival": "SCH",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "austria-2001": {
+        "year": 2001,
+        "event": "Austrian",
+        "source": "jolpica",
+        "name": "Austria 2001: Coulthard vs Schumacher",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for hungary-2003 (swap-races-era4-overnight.md). Side provisional until
+        # `pipeline hard-calls`.
+        "user_side": "COU",
+        "rival": "MSCM",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "hungary-2001": {
+        "year": 2001,
+        "event": "Hungarian",
+        "source": "jolpica",
+        "name": "Hungary 2001: Schumacher vs Barrichello",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for brazil-2003 (swap-races-era4-overnight.md). Side provisional until
+        # `pipeline hard-calls`.
+        "user_side": "MSCM",
+        "rival": "BAR",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "italy-2001": {
+        "year": 2001,
+        "event": "Italian",
+        "source": "jolpica",
+        "name": "Italy 2001: Montoya vs Barrichello",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for japan-2003 (swap-races-era4-overnight.md). Side provisional until
+        # `pipeline hard-calls`.
+        "user_side": "MON",
+        "rival": "BAR",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "san-marino-2003": {
+        "year": 2003,
+        "event": "San Marino",
+        "source": "jolpica",
+        "name": "San Marino 2003: Schumacher vs Räikkönen",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for monaco-2004 (swap-races-era4-overnight.md). Side provisional until
+        # `pipeline hard-calls`.
+        "user_side": "MSCM",
+        "rival": "RAI",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "canada-2003": {
+        "year": 2003,
+        "event": "Canadian",
+        "source": "jolpica",
+        "name": "Canada 2003: Schumacher vs R. Schumacher",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for germany-2000 (swap-races-era4-overnight.md). Side provisional until
+        # `pipeline hard-calls`.
+        "user_side": "MSCM",
+        "rival": "SCH",
+        "score_positions": 6,
+        "split": "eras",
+    },
     "hungary-2006": {
         "year": 2006,
         "event": "Hungary",
