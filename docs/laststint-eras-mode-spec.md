@@ -124,15 +124,15 @@ Players start at Era 10 and move back through the timeline to Era 1. The eras be
 | # | Race ID | Dilemma | Target (draft) |
 |---|---|---|---|
 | 1 | san-marino-2005 | Alonso holds off Schumacher | defend: Alonso holds off Schumacher |
-| 2 | japan-2005 | Räikkönen from 17th to win | win: Räikkönen from P17 |
-| 3 | hungary-2006 | Button's first win, in the rain | win: Button from P14 |
-| 4 | brazil-2006 | Alonso protects the title | position: Alonso P8 or better for the title |
-| 5 | china-2007 | McLaren leaves Hamilton out on worn tyres | position: Hamilton finishes high enough to clinch |
+| 2 | europe-2009 | Hamilton leads on the lighter tank while Barrichello's longer-fuelled Brawn keeps closing: box now and cover him, or stretch the stint and risk losing the lead in the pits? | win: Hamilton beats Barrichello |
+| 3 | france-2007 | Leading by two seconds with traffic ahead, Massa must choose: box first and risk the lapped cars, or stretch the stint and match Räikkönen's fuel | defend: Massa wins from pole |
+| 4 | san-marino-2006 | Glued to a grip-starved Ferrari on a track where nobody passes, does Renault gamble on stopping a lap early, or wait for Schumacher to blink? | beat-rival: Alonso ahead of Schumacher |
+| 5 | great-britain-2007 | Two-stopping at Silverstone with fuel deciding the order: short-fill Alonso to jump Räikkönen at the first stops, or run long like Ferrari and win it at the second? | beat-rival: Alonso ahead of Räikkönen |
 | 6 | europe-2007 | Rain chaos at the Nürburgring | win: Alonso chases Massa |
 | 7 | brazil-2007 | Three-way title decider | deny: Räikkönen wins, Hamilton kept P6 or lower |
-| 8 | monaco-2008 | Hamilton's puncture stop turns into a win | win: Hamilton after the puncture |
-| 9 | brazil-2008 | Glock on dry tyres in the rain, last-corner title | position: Hamilton P5 or better for the title |
-| 10 | brazil-2009 | Button clinches the title from 14th | position: Button from P14, high enough for the title |
+| 8 | bahrain-2006 | Schumacher pits first on lap 36; Renault can keep Alonso out three more laps on a lighter tank and gamble that the overcut puts him ahead at pit exit | win: Alonso from P4 |
+| 9 | turkey-2008 | A tyre warning forces Hamilton onto three stops: can a light McLaren build enough of a gap to beat Massa's two-stop Ferrari? | win: Hamilton from P3 on three stops |
+| 10 | malaysia-2006 | Stuck with a heavy tank after a fuel mistake in qualifying, Alonso starts 7th: how long can Renault stretch the first stint, and how little fuel is enough at the last stop to come out ahead of Button? | beat-rival: Alonso ahead of Button |
 
 ### Era 4: Ferrari dynasty (2000–2004) · play order 7
 | # | Race ID | Dilemma | Target (draft) |
@@ -243,8 +243,8 @@ Every race has one target, set in `eras.target`. Each race's draft target is in 
 |---|---|---|---|
 | `win` | Chase down the win from behind | `win` | 42 |
 | `defend` | Start in the lead and keep it to the flag | `win`, starting from P1 | 22 |
-| `position` | Reach a set position, such as P3 to win the title | `position` | 20 |
-| `beat-rival` | Finish ahead of a named car, wherever that is | `beat-rival` | 10 |
+| `position` | Reach a set position, such as P3 to win the title | `position` | 17 |
+| `beat-rival` | Finish ahead of a named car, wherever that is | `beat-rival` | 13 |
 | `team` | A team result, such as a 1–2 in a set order | `team` (new) | 3 |
 | `deny` | Keep a rival at or below a set position, such as out of the top 3 to stop their title | `deny` (new) | 3 |
 

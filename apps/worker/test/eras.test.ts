@@ -38,9 +38,10 @@ ERAS_RACE_FILES['hungary-2022'] = {
   },
 };
 
-// Every Eras race has a race file since china-2007 and brazil-1993 were built: china-2007's
-// is left out of this isolate's bundle, so the not-built path stays covered.
-Reflect.deleteProperty(ERAS_RACE_FILES, 'china-2007');
+// Every Eras race has a race file since china-2007 and brazil-1993 were built: europe-2007's
+// is left out of this isolate's bundle, so the not-built path stays covered (china-2007 left
+// Eras in migration 0020).
+Reflect.deleteProperty(ERAS_RACE_FILES, 'europe-2007');
 
 /** A request to the Worker with ERAS_TEST_MODE set for this call. */
 async function call(mode: Mode, path: string, body?: unknown): Promise<Response> {
@@ -446,10 +447,10 @@ describe('POST /api/eras/attempts', () => {
   });
 
   it('refuses a race with no race file yet, an unknown race and a bad body', async () => {
-    expect(await json<{ error: string }>(await start('test', 'china-2007'))).toMatchObject({
+    expect(await json<{ error: string }>(await start('test', 'europe-2007'))).toMatchObject({
       error: 'model-missing',
     });
-    expect((await start('test', 'china-2007')).status).toBe(503);
+    expect((await start('test', 'europe-2007')).status).toBe(503);
     expect((await start('test', 'spain-2020')).status).toBe(404); // a Daily race, not Eras
     expect((await call('test', '/api/eras/attempts', { anonId: 'x', raceId: 'x' })).status).toBe(
       400,
@@ -478,7 +479,7 @@ describe('GET /api/eras/races/:raceId/model', () => {
 
   it('test serves every built Eras race; never one with no file or not in Eras', async () => {
     expect((await model('test', 'hungary-2022')).status).toBe(200);
-    expect((await model('test', 'china-2007')).status).toBe(404);
+    expect((await model('test', 'europe-2007')).status).toBe(404);
     expect((await model('test', 'spain-2020')).status).toBe(404);
   });
 

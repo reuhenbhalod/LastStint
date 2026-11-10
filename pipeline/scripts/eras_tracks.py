@@ -84,6 +84,8 @@ REUSE: dict[str, tuple[str, str]] = {
     "japan-2023": ("japan-2024", "suzuka-2"),
     "abu-dhabi-2022": ("abu-dhabi-2021", "yas-marina-2"),
     "netherlands-2021": ("netherlands-2022", "zandvoort-5"),
+    "bahrain-2006": ("bahrain-2021", "bahrain-1"),
+    "turkey-2008": ("turkey-2021", "istanbul-1"),
     "italy-2010": ("italy-2019", "monza-7"),
     "australia-2013": ("australia-2010", "melbourne-1"),
     "bahrain-2012": ("bahrain-2021", "bahrain-1"),
@@ -179,6 +181,9 @@ LAYOUT_SPECS: dict[str, dict] = {
     "kyalami-1": {"clockwise": True, "start": 0.72, "pit": (-0.04, 0.06), "turns": 9},
     "estoril-1": {"clockwise": True, "start": 0.84, "pit": (-0.06, 0.08), "turns": 11},
     "silverstone-3": {"clockwise": True, "start": 0.22, "pit": (-0.05, 0.06), "turns": 9},
+    # The 1997-2009 layout (Bridge and Priory, before the 2010 Arena): drawn clockwise from
+    # Abbey; line on the old pit straight between Woodcote and Copse, placed by judgement.
+    "silverstone-7": {"clockwise": True, "start": 0.31, "pit": (-0.06, 0.05), "turns": 17},
     # singapore-2014's layout: line on the pit straight between the last corner and Turn 1,
     # placed by judgement against the 2023 MultiViewer outline's line; f1db's direction.
     "marina-bay-2": {"clockwise": False, "start": 0.045, "pit": (-0.05, 0.06), "turns": 23},
@@ -206,6 +211,11 @@ F1DB: dict[str, str] = {
     "singapore-2014": "marina-bay-2",
     "europe-2012": "valencia-1",
     "san-marino-2005": "imola-2",
+    "san-marino-2006": "imola-2",
+    "malaysia-2006": "sepang-1",
+    "europe-2009": "valencia-1",
+    "france-2007": "magny-cours-3",
+    "great-britain-2007": "silverstone-7",
     "germany-2000": "hockenheimring-3",
     "germany-1986": "hockenheimring-2",
     "france-1990": "paul-ricard-2",

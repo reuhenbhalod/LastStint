@@ -544,15 +544,15 @@ The **Needs** column is from race history and must be checked against the data f
 | 6 | `malaysia-2013` | Jolpica (est. compounds) | R3 wet pre-2018, P4 map |  |
 | 6 | `spain-2013` | Jolpica (est. compounds) | P4 map |  |
 | 5 | `san-marino-2005` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
-| 5 | `japan-2005` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
-| 5 | `hungary-2006` | Jolpica + f1db (est. compounds, fuel) | R3 wet pre-2018, R4 refuel, P4 map |  |
-| 5 | `brazil-2006` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
-| 5 | `china-2007` | Jolpica + f1db (est. compounds, fuel) | R3 wet pre-2018, R4 refuel, P4 map |  |
+| 5 | `europe-2009` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
+| 5 | `france-2007` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
+| 5 | `san-marino-2006` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
+| 5 | `great-britain-2007` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
 | 5 | `europe-2007` | Jolpica + f1db (est. compounds, fuel) | R1 red flag, R3 wet pre-2018, R4 refuel, P4 map |  |
 | 5 | `brazil-2007` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
-| 5 | `monaco-2008` | Jolpica + f1db (est. compounds, fuel) | R2 fault, R4 refuel, P4 map |  |
-| 5 | `brazil-2008` | Jolpica + f1db (est. compounds, fuel) | R3 wet pre-2018, R4 refuel, P4 map |  |
-| 5 | `brazil-2009` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
+| 5 | `bahrain-2006` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
+| 5 | `turkey-2008` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
+| 5 | `malaysia-2006` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
 | 4 | `germany-2000` | Jolpica + f1db (est. compounds, fuel) | R3 wet pre-2018, R4 refuel, P4 map |  |
 | 4 | `japan-2000` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
 | 4 | `malaysia-2001` | Jolpica + f1db (est. compounds, fuel) | R3 wet pre-2018, R4 refuel, P4 map |  |
