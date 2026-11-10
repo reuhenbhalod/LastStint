@@ -87,6 +87,7 @@ import type {
   FlagState,
   Modes,
   PitStop,
+  RaceEvent,
   RaceModel,
   RaceNote,
   RaceResult,
@@ -378,6 +379,11 @@ export interface Run {
   events: NeutralEvent[];
   /** Red flags: free stops in the stoppage, gaps wiped at the restart (redflag.ts). */
   red: RedFlagPlan;
+  /**
+   * An SC's first lap -> the car it picked up (`pickup`, Eras builds, sourced): the cars ahead
+   * of it run a racing lap on that lap and keep their gaps on the next (scFront, queueBehind).
+   */
+  scPickup: Map<number, string>;
   /**
    * A no-unlapping race's SC and red-flag queues: lap -> the scripted cars' real laps down
    * (redflag.ts realLapsDown; Eras builds' `lapsDown`). Empty for every other race.
@@ -788,7 +794,8 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
     },
     events,
     neutral: neutralMap(events),
-    red: redFlagPlan(timeline),
+    red: redFlagPlan(timeline, model.rules !== undefined),
+    scPickup: scPickupOf(timeline),
     lapsDown: realLapsDown(
       timeline,
       (code) => (live && code === model.userSide) || strategies[code] !== undefined,
@@ -1063,13 +1070,14 @@ function blindView(
   run: Run,
   seed: number,
   blindAfter: number | undefined,
-): Pick<Run, 'events' | 'neutral' | 'retireAt' | 'lapsDown'> {
+): Pick<Run, 'events' | 'neutral' | 'retireAt' | 'lapsDown' | 'scPickup'> {
   if (blindAfter === undefined) {
     return {
       events: run.events,
       neutral: run.neutral,
       retireAt: run.retireAt,
       lapsDown: run.lapsDown,
+      scPickup: run.scPickup,
     };
   }
   const known = run.events.filter((e) => e.lap <= blindAfter);
@@ -1079,7 +1087,35 @@ function blindView(
   const lapsDown = new Map(
     [...run.lapsDown].filter(([lap]) => known.some((e) => lap >= e.lap && lap < e.lap + e.laps)),
   );
-  return { events, neutral: neutralMap(events), retireAt, lapsDown };
+  // A pickup belongs to the real SC it was sourced for: only one the playout already knows.
+  const scPickup = new Map([...run.scPickup].filter(([lap]) => lap <= blindAfter));
+  return { events, neutral: neutralMap(events), retireAt, lapsDown, scPickup };
+}
+
+/** Each SC's sourced pickup (`pickup`), by the SC's first lap. */
+function scPickupOf(events: readonly RaceEvent[]): Map<number, string> {
+  const out = new Map<number, string>();
+  for (const e of events) if (e.type === 'SC' && e.pickup) out.set(e.lap, e.pickup);
+  return out;
+}
+
+/**
+ * The cars on the road ahead of the car an SC picked up (`pickup`) on the SC's first lap: none
+ * if that car is out or leads (sim_reference.py sc_front).
+ */
+function scFront(running: string[], picked: string | undefined): Set<string> {
+  const at = picked === undefined ? -1 : running.indexOf(picked);
+  return new Set(at > 0 ? running.slice(0, at) : []);
+}
+
+/**
+ * The lap after a pickup SC's first lap: the queue closes up from the picked-up car back; the
+ * cars ahead of it are still ahead of the safety car and keep their gaps
+ * (sim_reference.py queue_behind).
+ */
+function queueBehind(order: string[], picked: string | undefined): string[] {
+  const at = picked === undefined ? -1 : order.indexOf(picked);
+  return at > 0 ? order.slice(at) : order;
 }
 
 function car(run: Run, code: string): CarState {
@@ -1848,6 +1884,9 @@ export function stepLap(run: Run): RaceState {
   if (run.storyline.length) storylineBeforeLap(run, lap, running, prevTime);
   // The SC restart's jump and spread (scripted.ts; Eras race files carry track.restart).
   const restart = track.restart && isRestartLap(run.neutral, run.red, lap) ? track.restart : null;
+  // An SC that picked up a car behind the leader (`pickup`): the cars ahead of it on the road
+  // run a racing lap on the SC's first lap (they are ahead of the safety car).
+  const front = flag === 'sc' ? scFront(running, run.scPickup.get(lap)) : new Set<string>();
 
   for (let i = 0; i < running.length; i++) {
     const code = running[i] as string;
@@ -1957,7 +1996,8 @@ export function stepLap(run: Run): RaceState {
       ? 0
       : modeLapDelta(run, c) + (lapEng?.pace ?? 0) + fuelLapDelta(run, c, lap);
     let lt: number;
-    if (flag === 'sc' && scTime) lt = scTime;
+    if (front.has(code)) lt = base + run.rng.get(NOISE_STREAM, code).normal(c.noise);
+    else if (flag === 'sc' && scTime) lt = scTime;
     else if (flag === 'vsc' && vscTime) lt = vscTime;
     else if (flag === 'red' && green) lt = green;
     else {
@@ -2022,7 +2062,7 @@ export function stepLap(run: Run): RaceState {
       // Deployment lap: gaps kept. Middle laps: SC_GAP_KEEP of the excess. Last lap: bunched.
       const keep = run.neutral.get(lap + 1) === 'sc' ? SC_GAP_KEEP : 0;
       bunch(
-        order,
+        keep > 0 ? queueBehind(order, run.scPickup.get(lap - 1)) : order,
         cars,
         green,
         keep,

@@ -42,7 +42,21 @@ that both sims replay as a forced swap (sim_reference.apply_team_orders):
 - driver: the car told to let the other by; passer: the car let by;
 - source: where the fact was checked (http(s) URLs; required); detail, note: display only.
 
-The SC causes written by `pipeline incidents` keep a race's FAULT and TEAM_ORDER items (write).
+A safety car that picked up a car behind the race leader (Eras sim fixes, SC/red-flag
+mechanics) is a hand-checked fact too, an item with "type": "SC_PICKUP", which an Eras build
+writes onto the race's SC event that begins on that lap as `pickup` (sc_pickup_events):
+
+    {"lap": 28, "type": "SC_PICKUP", "driver": "VER",
+     "detail": "The safety car picked up Verstappen; Norris, leading, ran on ahead of it",
+     "source": "https://en.wikipedia.org/wiki/2024_Miami_Grand_Prix"}
+
+- lap: the first lap of the SC (the model's SC event); driver: the car it picked up;
+- source: where the fact was checked (http(s) URL; required); detail, note: display only.
+The sims run the cars ahead of that car on the road a racing lap on the SC's first lap, and
+keep their gaps on its second (sim_reference.sc_front / queue_behind).
+
+The SC causes written by `pipeline incidents` keep a race's FAULT, TEAM_ORDER and SC_PICKUP
+items (write).
 """
 
 from __future__ import annotations
@@ -227,6 +241,56 @@ def check_team_order(item: dict, where: str) -> dict:
     return dict(item)
 
 
+SC_PICKUP_KEYS = {"lap", "type", "driver", "detail", "source", "note"}
+
+
+def check_sc_pickup(item: dict, where: str) -> dict:
+    """The SC pickup fact, checked (the module docstring); ValueError unless well formed."""
+    bad = sorted(set(item) - SC_PICKUP_KEYS)
+    if bad:
+        raise ValueError(f"{where}: unknown SC pickup fields {bad}")
+    lap = item.get("lap")
+    if not isinstance(lap, int) or isinstance(lap, bool) or lap < 1:
+        raise ValueError(f"{where}: lap must be a race lap (int >= 1), got {lap!r}")
+    if not isinstance(item.get("driver"), str) or not item["driver"]:
+        raise ValueError(f"{where}: driver must be a driver code")
+    src = item.get("source")
+    if not isinstance(src, str) or not src.startswith(("http://", "https://")):
+        raise ValueError(f"{where}: an SC pickup fact needs its source URL")
+    return dict(item)
+
+
+def sc_pickup_facts(race_id: str, path: Path = INCIDENTS_PATH) -> list[dict]:
+    """A race's SC pickups (its SC_PICKUP items), checked; [] for none."""
+    if not path.exists():
+        return []
+    entry = json.loads(path.read_text()).get(race_id) or []
+    if not isinstance(entry, list):
+        raise ValueError(f"{path.name}: {race_id} must be a list")
+    return [
+        check_sc_pickup(item, f"{path.name}: {race_id}[{i}]")
+        for i, item in enumerate(entry)
+        if isinstance(item, dict) and item.get("type") == "SC_PICKUP"
+    ]
+
+
+def sc_pickup_events(facts: list[dict], model: dict) -> list[dict]:
+    """The model's events with each pickup written onto the SC event beginning on its lap.
+    Raises on a fact naming a car the race doesn't have, or a lap with no SC beginning."""
+    codes = {d["code"] for d in model["drivers"]}
+    events = [dict(e) for e in model["events"]]
+    for f in facts:
+        if f["driver"] not in codes:
+            raise ValueError(
+                f"{model['race']['id']}: SC pickup lap {f['lap']}: no car {f['driver']}"
+            )
+        sc = next((e for e in events if e["type"] == "SC" and e["lap"] == f["lap"]), None)
+        if sc is None:
+            raise ValueError(f"{model['race']['id']}: SC pickup lap {f['lap']}: no SC begins then")
+        sc["pickup"] = f["driver"]
+    return events
+
+
 def team_order_facts(race_id: str, path: Path = INCIDENTS_PATH) -> list[dict]:
     """A race's team orders and let-bys (its TEAM_ORDER items), checked; [] for none."""
     if not path.exists():
@@ -279,7 +343,7 @@ def write(race_id: str, items: list[dict] | dict, path: Path = INCIDENTS_PATH) -
     data = json.loads(path.read_text()) if path.exists() else {}
     old = data.get(race_id)
     if isinstance(items, list) and isinstance(old, list):
-        hand = ("FAULT", "TEAM_ORDER")  # hand-checked facts
+        hand = ("FAULT", "TEAM_ORDER", "SC_PICKUP")  # hand-checked facts
         kept = [i for i in old if isinstance(i, dict) and i.get("type") in hand]
         items = [*[i for i in items if i.get("type") not in hand], *kept]
     data[race_id] = items

@@ -52,7 +52,29 @@ function variants(): Record<string, RaceModel> {
       slowLap: 5.0,
     },
   ].sort((a, b) => a.lap - b.lap || a.type.localeCompare(b.type)) as RaceModel['events'];
-  return { rolling: zandvoort, standing, 'standing-free-stop': extra, faults };
+  // As an Eras race (a rules block): the standing restart, and an SC with a pickup.
+  const rules = {
+    twoCompound: true,
+    tyreChanges: true,
+    pitLaneClosedUnderSC: false,
+    vsc: true,
+    drs: true,
+    ers: 'hybrid',
+    refuelling: false,
+  } as unknown as RaceModel['rules'];
+  const standingEras = { ...structuredClone(standing), rules };
+  const pickup = { ...structuredClone(zandvoort), rules };
+  pickup.events = [...pickup.events, { lap: 68, type: 'SC', laps: 3, pickup: 'ALO' }].sort(
+    (a, b) => a.lap - b.lap || a.type.localeCompare(b.type),
+  ) as RaceModel['events'];
+  return {
+    rolling: zandvoort,
+    standing,
+    'standing-free-stop': extra,
+    faults,
+    'standing-eras': standingEras,
+    'sc-pickup': pickup,
+  };
 }
 
 const upTo = (model: RaceModel, laps: number): RaceModel => ({
@@ -123,6 +145,46 @@ describe('the red flag model', () => {
     // Stopped on the grid on the flag lap (one red lap): the change has its out-lap after it.
     const grid = redFlagPlan([{ lap: 72, type: 'RED', laps: 1, restart: 'rolling' }]);
     expect([...grid.free]).toEqual([[73, 72]]);
+    // An Eras race spaces a standing restart at the end of its first racing lap.
+    // (The red laps are 64-65 and the SC lap 66, so the first racing lap is 67.)
+    const eras = redFlagPlan(variants().standing?.events ?? [], true);
+    expect([...eras.wipes]).toEqual([
+      [65, { gap: RESTART_QUEUE_GAP, redLap: 64 }],
+      [67, { gap: STANDING_RESTART_GAP, redLap: 64 }],
+    ]);
+    expect(redFlagPlan(zandvoort.events, true).wipes).toEqual(plan.wipes); // rolling: as before
+  });
+
+  it('an Eras standing restart ends its first racing lap STANDING_RESTART_GAP apart', () => {
+    const model = variants()['standing-eras'] as RaceModel;
+    const run = initRun(model, 1);
+    while (run.state.lap < 67) stepLap(run);
+    const order = run.state.order.filter((c) => !run.state.cars[c]?.retired);
+    for (let i = 1; i < order.length; i++) {
+      const gap =
+        (run.state.cars[order[i] as string] as CarState).totalTime -
+        (run.state.cars[order[i - 1] as string] as CarState).totalTime;
+      expect(gap).toBeCloseTo(STANDING_RESTART_GAP, 9);
+    }
+  });
+
+  it('an SC pickup: the cars ahead of the picked-up car run on, then keep their gap', () => {
+    const model = variants()['sc-pickup'] as RaceModel;
+    const without = structuredClone(model);
+    for (const e of without.events) e.pickup = undefined;
+    const gapAt = (m: RaceModel, lap: number) => {
+      const run = initRun(m, 1);
+      while (run.state.lap < lap) stepLap(run);
+      const t = (c: string) => (run.state.cars[c] as CarState).totalTime;
+      const running = run.state.order.filter((c) => !run.state.cars[c]?.retired);
+      // behind: the queue's length behind ALO (its last car's gap).
+      return { lead: t('ALO') - t('PER'), behind: t(running.at(-1) as string) - t('ALO') };
+    };
+    // Lap 68 (the SC's first): PER runs a racing lap, ALO the SC lap.
+    expect(gapAt(model, 68).lead).toBeGreaterThan(gapAt(without, 68).lead + 15);
+    // Lap 69: the gap to PER is kept; the queue behind ALO still closes up.
+    expect(gapAt(model, 69).lead).toBeCloseTo(gapAt(model, 68).lead, 9);
+    expect(gapAt(model, 69).behind).toBeLessThan(gapAt(model, 68).behind);
   });
 
   it('no unlapping: the restart queue keeps lapped cars where they are on the road', () => {

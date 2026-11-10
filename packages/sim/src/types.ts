@@ -149,6 +149,12 @@ export interface RaceEvent {
   driver?: string;
   /** A TEAM_ORDER (Eras builds; sourced in data/incidents.json): the car let by. */
   other?: string;
+  /**
+   * An SC event (Eras builds; sourced in data/incidents.json as SC_PICKUP): the car the safety
+   * car picked up, when it wasn't the leader. The cars ahead of it on the road run a racing lap
+   * on the SC's first lap and keep their gaps on its second (sim.ts scFront / queueBehind).
+   */
+  pickup?: string;
   /** A RED event: how the race resumed (eras build plan 4.3, redflag.ts). Absent: it didn't. */
   restart?: 'standing' | 'rolling';
   /** Defines the storyline: Legend difficulty always runs it on its real lap (eras spec 8). */

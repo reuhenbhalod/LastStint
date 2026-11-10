@@ -2168,11 +2168,16 @@ def official_result(model: dict, recon: dict) -> tuple[dict, list[str]]:
 
 
 def scripted_blocks(
-    model: dict, race_id: str, recon: dict | None, team_orders: list[dict] | None = None
+    model: dict,
+    race_id: str,
+    recon: dict | None,
+    team_orders: list[dict] | None = None,
+    sc_pickups: list[dict] | None = None,
 ) -> tuple[dict, list[str]]:
     """Eras model fixes M4 (Eras builds only): the SC restart's jump and spread
     (`track.restart`, restart.py), the race's sourced team orders and let-bys as TEAM_ORDER
-    events (data/incidents.json), and a reconstruction's last-lap stops (`lastLapStops`: a car
+    events (data/incidents.json), its sourced SC pickups as `pickup` on their SC events
+    (incidents.sc_pickup_events), and a reconstruction's last-lap stops (`lastLapStops`: a car
     that ran dry on the last lap) as RETIREMENT events on the last lap where the timing doesn't
     already show one. Returns the model and report lines."""
     out, lines = {**model}, []
@@ -2182,6 +2187,11 @@ def scripted_blocks(
             f"SC restart: jump {restart.JUMP}s, spread {restart.SPREAD}s a place"
             f" (to P{restart.PLACES + 1})"
         )
+    pickups = incidents.sc_pickup_facts(race_id) if sc_pickups is None else sc_pickups
+    if pickups:
+        out["events"] = incidents.sc_pickup_events(pickups, out)
+        for f in pickups:
+            lines.append(f"  SC pickup: lap {f['lap']} the safety car picks up {f['driver']}")
     facts = incidents.team_order_facts(race_id) if team_orders is None else team_orders
     added = incidents.team_order_events(facts, out)
     total = int(out["race"]["laps"])
