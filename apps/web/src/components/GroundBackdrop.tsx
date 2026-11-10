@@ -6,13 +6,22 @@ import { useMemo } from 'react';
 import { groundFor } from '../track/ground.js';
 import { outlineFor } from '../track/outlines.js';
 
-export function GroundBackdrop({ raceId, dim = 0.32 }: { raceId: string; dim?: number }) {
+export function GroundBackdrop({
+  raceId,
+  dim = 0.32,
+  fill = 'fixed',
+}: {
+  raceId: string;
+  dim?: number;
+  /** Fixed to the window (a scrolling page), or filling its positioned parent (the race). */
+  fill?: 'fixed' | 'absolute';
+}) {
   const outline = outlineFor(raceId);
   const ground = useMemo(() => groundFor(raceId), [raceId]);
   if (!outline) return null;
   const d = `M${outline.points.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join('L')}Z`;
   return (
-    <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10">
+    <div aria-hidden="true" className={`pointer-events-none ${fill} inset-0 -z-10`}>
       <svg
         viewBox={`-60 -60 ${outline.width + 120} ${outline.height + 120}`}
         preserveAspectRatio="xMidYMid slice"

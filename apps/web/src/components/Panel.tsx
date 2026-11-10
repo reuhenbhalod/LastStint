@@ -1,5 +1,5 @@
-// The race screen's panels, broadcast style (like the leaders tower and the call): a dark plate,
-// a team-colour slash and the title, an optional reading on the right. Stat tiles and bars to
+// The race screen's panels, in the realistic theme: a glass plate over the ground, a team-colour
+// tick and the title, an optional reading on the right. Stat tiles and bars to
 // go in them, so every panel reads the same way.
 
 export function Panel({
@@ -19,12 +19,14 @@ export function Panel({
   return (
     <section
       aria-label={label ?? title}
-      className={`flex shrink-0 flex-col gap-3 rounded-lg border border-[var(--glass-edge)] bg-[var(--glass)] p-3.5 ${className}`}
+      className={`flex shrink-0 flex-col gap-3 rounded-xl border border-[var(--glass-edge)] bg-[var(--glass)] p-3.5 backdrop-blur-[14px] ${className}`}
     >
       <header className="flex items-center justify-between gap-2">
         <span className="flex min-w-0 items-center gap-2">
-          <span aria-hidden="true" className="h-3.5 w-[5px] shrink-0 -skew-x-12 bg-[var(--you)]" />
-          <span className="disp truncate text-[12px] tracking-[0.08em]">{title}</span>
+          <span aria-hidden="true" className="h-3 w-[3px] shrink-0 rounded-full bg-[var(--you)]" />
+          <span className="truncate text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--muted)]">
+            {title}
+          </span>
         </span>
         {right}
       </header>

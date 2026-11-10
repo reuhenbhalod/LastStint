@@ -66,11 +66,11 @@ export function DriverProfile({
   return (
     <section
       aria-label="Your driver"
-      className="flex shrink-0 flex-col gap-3 overflow-hidden rounded-lg border border-[var(--glass-edge)] bg-[var(--glass)]"
+      className="flex shrink-0 flex-col gap-3 overflow-hidden rounded-xl border border-[var(--glass-edge)] bg-[var(--glass)] backdrop-blur-[14px]"
     >
       {/* The name plate, as the TV shows a driver: number on the team colour, then the name. */}
       <header className="flex items-stretch">
-        <span className="disp flex w-14 shrink-0 items-center justify-center bg-[var(--you)] text-[22px] leading-none text-[var(--you-ink)] [clip-path:polygon(0_0,100%_0,82%_100%,0_100%)]">
+        <span className="disp ml-3 mt-3 flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-[var(--you)] text-[20px] leading-none text-[var(--you-ink)]">
           {info?.number ?? code}
         </span>
         <span className="flex min-w-0 flex-1 flex-col justify-center gap-1 px-3 py-2.5">

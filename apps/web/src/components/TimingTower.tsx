@@ -58,22 +58,22 @@ export function TimingTower({
               type="button"
               onClick={() => onPick?.(code)}
               className={[
-                'grid w-full grid-cols-[22px_4px_44px_1fr_auto] items-center gap-2 px-2 py-1 text-left hover:bg-[var(--card-2)] focus-visible:bg-[var(--card-2)] focus-visible:outline-none',
-                you ? 'bg-[color-mix(in_srgb,var(--you)_30%,#12171A)]' : '',
-                isRival ? 'bg-[color-mix(in_srgb,var(--rival)_18%,#12171A)]' : '',
+                'grid w-full grid-cols-[22px_4px_44px_1fr_auto] items-center gap-2 rounded-md px-2 py-1 text-left hover:bg-white/5 focus-visible:bg-white/5 focus-visible:outline-none',
+                you ? 'bg-[color-mix(in_srgb,var(--you)_24%,transparent)]' : '',
+                isRival ? 'bg-[color-mix(in_srgb,var(--rival)_18%,transparent)]' : '',
                 out || down >= 1 ? 'opacity-55' : '',
               ].join(' ')}
             >
               <span className="mono text-right text-[12px] text-[var(--muted)]">{i + 1}</span>
               <span
-                className="h-[16px] w-1 -skew-x-12"
+                className="h-[14px] w-1 rounded-sm"
                 style={{
                   background:
                     TEAM_COLOR[model.drivers.find((d) => d.code === code)?.team ?? ''] ??
                     'var(--rule)',
                 }}
               />
-              <span className="disp text-[14px] leading-none">{code}</span>
+              <span className="text-[14px] font-extrabold leading-none">{code}</span>
               <span>{!out && <TyreBadge compound={car.compound} age={car.tyreAge} />}</span>
               <span className="mono text-right text-[12px] text-[var(--muted)]">{text}</span>
             </button>

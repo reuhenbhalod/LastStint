@@ -24,7 +24,7 @@ export function PitCard({
   const lost = stop.to - stop.from;
   return (
     <output
-      className="pit-card flex min-w-0 items-center gap-2 rounded border-l-4 bg-black/75 px-2.5 py-1 text-[12px] text-white"
+      className="pit-card flex min-w-0 items-center gap-2 rounded-lg border border-[var(--glass-edge)] border-l-4 bg-[var(--glass-strong)] px-3 py-1.5 text-[12px] text-white backdrop-blur-[14px]"
       style={{ borderColor: you ? 'var(--you)' : 'var(--rival)' }}
     >
       <span className="disp shrink-0 text-[12px] leading-none">

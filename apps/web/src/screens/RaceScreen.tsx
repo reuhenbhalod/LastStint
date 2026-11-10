@@ -23,6 +23,7 @@ import { CarStats } from '../components/CarStats.js';
 import { DriverCard } from '../components/DriverCard.js';
 import { DriverProfile } from '../components/DriverProfile.js';
 import { GapTrace } from '../components/GapTrace.js';
+import { GroundBackdrop } from '../components/GroundBackdrop.js';
 import { ChequeredIcon, OvertakeIcon, SoundOffIcon, SoundOnIcon } from '../components/Icons.js';
 import { LeadersTower } from '../components/LeadersTower.js';
 import { LiveGrades } from '../components/LiveGrades.js';
@@ -649,7 +650,7 @@ export function RaceScreen({
     `flex h-10 shrink-0 items-center gap-2 rounded-full border px-4 text-[13px] font-bold transition-colors disabled:opacity-40 ${
       on
         ? 'border-[#EEF1EE] bg-[#EEF1EE] text-[#0E1214]'
-        : 'border-[#343D42] bg-[#0E1214]/80 text-[#D5DBD7] hover:border-[#5A625F]'
+        : 'border-[var(--glass-edge)] bg-[var(--glass)] text-[#D5DBD7] backdrop-blur-[14px] hover:border-white/30'
     }`;
   const statsPanels = (
     <>
@@ -805,9 +806,11 @@ export function RaceScreen({
       : (shownBattle && `battle-${shownBattle.lap}`) || (quick && `quick-${quick.lap}`) || 'other';
 
   return (
-    <main className="relative flex h-[100dvh] flex-col overflow-hidden bg-[#0E1214] text-[#EEF1EE]">
+    <main className="relative isolate flex h-[100dvh] flex-col overflow-hidden bg-[#0E1214] text-[#EEF1EE]">
+      {/* The circuit's ground, dimmed, behind everything: the panels float over it as glass. */}
+      <GroundBackdrop raceId={model.race.id} dim={0.36} fill="absolute" />
       {/* The top bar: brand, the duel as a scoreboard, the lap and the clock. */}
-      <header className="flex h-14 shrink-0 items-stretch border-b border-[var(--glass-edge)] md:h-16">
+      <header className="flex h-14 shrink-0 items-stretch border-b border-[var(--glass-edge)] bg-[var(--paper)]/60 backdrop-blur-[14px] md:h-16">
         <button
           type="button"
           onClick={onHome}
@@ -924,11 +927,13 @@ export function RaceScreen({
         <section
           aria-label="Standings"
           aria-hidden={!stats}
-          className={`hidden min-h-0 flex-col overflow-hidden rounded-lg border border-[var(--glass-edge)] bg-[var(--glass)] transition-opacity duration-300 md:flex ${stats ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
+          className={`hidden min-h-0 flex-col overflow-hidden rounded-xl border border-[var(--glass-edge)] bg-[var(--glass)] backdrop-blur-[14px] transition-opacity duration-300 md:flex ${stats ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
         >
-          <div className="flex items-center justify-between bg-[#EEF1EE] px-3 py-2 text-[#0E1214]">
-            <span className="disp text-[13px]">Lap {state.race.lap}</span>
-            <span className="mono text-[11px] font-bold">{lapsLeft} to go</span>
+          <div className="flex items-baseline justify-between border-b border-[var(--glass-edge)] px-3 py-2.5">
+            <span className="eyebrow">Lap {state.race.lap}</span>
+            <span className="mono text-[11px] font-semibold text-[var(--muted)]">
+              {lapsLeft} to go
+            </span>
           </div>
           <div className="min-h-0 flex-1 overflow-y-auto">{tower}</div>
         </section>
@@ -1072,7 +1077,7 @@ export function RaceScreen({
             style={{ gridTemplateRows: dockOpen ? '1fr' : '0fr' }}
           >
             <div className="min-h-0 overflow-hidden">
-              <div className="mx-3 max-h-[38vh] overflow-y-auto rounded-lg border border-[#283034] bg-[#131A1D] p-3 md:mx-0">
+              <div className="mx-3 max-h-[38vh] overflow-y-auto rounded-xl border border-[var(--glass-edge)] bg-[var(--glass-strong)] p-3 backdrop-blur-[14px] md:mx-0">
                 {shown === 'radio' && (
                   <TeamRadio
                     race={state.race}
