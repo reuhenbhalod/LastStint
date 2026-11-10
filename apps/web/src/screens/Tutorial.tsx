@@ -7,6 +7,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Brand } from '../components/Brand.js';
+import { GroundBackdrop } from '../components/GroundBackdrop.js';
 import { surname } from '../data/names.js';
 import { RaceFileProvider } from '../data/provider.js';
 import { useTeamTheme } from '../game/teamTheme.js';
@@ -258,7 +259,8 @@ export function Tutorial() {
 
   if (phase === 'intro') {
     return (
-      <main className="mx-auto flex min-h-screen max-w-lg flex-col justify-center gap-5 p-6">
+      <main className="relative isolate mx-auto flex min-h-screen max-w-lg flex-col justify-center gap-5 p-6">
+        <GroundBackdrop raceId={RACE} dim={0.42} />
         <Brand className="text-[20px]" />
         <section className="call-plate !gap-3 !p-5">
           <span className="call-tag">Tutorial race · not scored</span>

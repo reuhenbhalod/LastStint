@@ -21,6 +21,7 @@ import {
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ApiError, apiPost } from '../api.js';
 import { Brand } from '../components/Brand.js';
+import { GroundBackdrop } from '../components/GroundBackdrop.js';
 import { TrackMap } from '../components/TrackMap.js';
 import { TyreBadge } from '../components/TyreBadge.js';
 import { RaceStage } from '../three/RaceStage.js';
@@ -60,8 +61,10 @@ export function Versus() {
   const [name, setName] = useState(storedName);
   const [named, setNamed] = useState(!!storedName());
   return (
-    <main className="min-h-[100dvh] bg-[#0E1214] text-[#EEF1EE]">
-      <header className="flex h-14 items-center justify-between border-b border-[var(--glass-edge)] px-4">
+    <main className="relative isolate min-h-[100dvh] text-[#EEF1EE]">
+      {/* Versus runs at the five 3D circuits; Spa stands behind the lobby. */}
+      {!code && <GroundBackdrop raceId="belgium-2024" />}
+      <header className="flex h-14 items-center justify-between border-b border-[var(--glass-edge)] bg-[var(--paper)]/70 px-4 backdrop-blur">
         <a href="/" aria-label="LastStint home">
           <Brand className="text-[20px]" />
         </a>

@@ -364,18 +364,31 @@ def raceway_edges(elements: list[dict], frame: Frame) -> list[dict]:
     return edges
 
 
-def lap_cycles(edges: list[dict], official: float, slack: float = 0.04) -> list[list[dict]]:
-    """Every simple cycle of edges whose length is within `slack` of the official lap."""
+def lap_cycles(
+    edges: list[dict],
+    official: float,
+    slack: float = 0.04,
+    budget: int = 3_000_000,
+    keep: int = 300,
+) -> list[list[dict]]:
+    """Simple cycles of edges whose length is within `slack` of the official lap. A circuit
+    with many layouts (Paul Ricard has dozens) has too many to list, so the search stops after
+    `budget` steps in all, and only the `keep` cycles closest to the official length are
+    kept for fitting."""
     out: dict[frozenset, list[dict]] = {}
+    spent = 0
     by_from: dict[int, list[int]] = {}
     for k, e in enumerate(edges):
         by_from.setdefault(e["from"], []).append(k)
     hi, lo = official * (1 + slack), official * (1 - slack)
     for start_k, start in enumerate(edges):
+        if spent >= budget:
+            break
         stack = [(start["to"], [start_k], start["len"], {start["from"], start["to"]})]
         steps = 0
-        while stack and steps < 200000:
+        while stack and steps < 200000 and spent < budget:
             steps += 1
+            spent += 1
             node, path, length, seen = stack.pop()
             for k in by_from.get(node, []):
                 e = edges[k]
@@ -395,7 +408,9 @@ def lap_cycles(edges: list[dict], official: float, slack: float = 0.04) -> list[
     for e in edges:
         if e["from"] == e["to"] and lo <= e["len"] <= hi:
             out[frozenset([id(e)])] = [e]
-    return list(out.values())
+    found = list(out.values())
+    found.sort(key=lambda c: abs(sum(e["len"] for e in c) - official))
+    return found[:keep]
 
 
 def resample(pts: list[tuple[float, float]], step: float, closed: bool) -> np.ndarray:
