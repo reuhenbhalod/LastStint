@@ -7,5 +7,33 @@
     "drs": true,
     "ers": "hybrid",
     "refuelling": false
-  }
+  },
+  "eras": {
+    "eraId": 7,
+    "order": 6,
+    "userSide": "HAM",
+    "target": {
+      "type": "defend"
+    },
+    "storyline": {
+      "real": "Rosberg makes a poor start from pole and Hamilton leads into turn 1, with both Red Bulls also past Rosberg. In the heat the tyres wear faster than expected and the leaders all stop three times. Rosberg gets a 5 s penalty for forcing Verstappen off at the hairpin on lap 27 and serves it at his last stop, which runs about 3 s long, so both Red Bulls get ahead; Verstappen later lets Ricciardo by. Hamilton wins by 7.0 s from Ricciardo, with Verstappen third."
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 3,
+      "label": "Win on three stops, as Hamilton did"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "manage",
+      "maxLaps": 0,
+      "label": "Win without a single lap managing the tyres"
+    },
+    "hardCalls": {
+      "HAM": 3,
+      "RIC": 3
+    },
+    "briefing": "Hockenheim, 2016. You run Hamilton, nine laps in, leading Verstappen by 3.8 seconds. Ricciardo is third, 5.5 seconds back, and Rosberg fourth after a poor start from pole. The tyres are wearing faster than expected in the heat. Bring Hamilton home first."
+  },
+  "storylineEvents": []
 }
