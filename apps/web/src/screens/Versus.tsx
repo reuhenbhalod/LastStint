@@ -18,11 +18,13 @@ import {
   versusOptions,
   versusTrack,
 } from '@boxthislap/sim';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ApiError, apiPost } from '../api.js';
 import { Brand } from '../components/Brand.js';
 import { TrackMap } from '../components/TrackMap.js';
 import { TyreBadge } from '../components/TyreBadge.js';
+import { RaceStage } from '../three/RaceStage.js';
+import type { MapFeed } from '../track/feed.js';
 import { outlineFor } from '../track/outlines.js';
 import { type VersusView, useVersus } from '../versus/useVersus.js';
 import { versusModel, versusRaceState } from '../versus/view.js';
@@ -464,6 +466,7 @@ function Race({
   const model = useMemo(() => versusModel(base, setup, seat), [base, setup, seat]);
   const outline = outlineFor(base.race.id);
   const other: PlayerIndex = seat === 0 ? 1 : 0;
+  const feed = useRef<MapFeed | null>(null);
   // The map glides from the lap's start to its end while the lap runs.
   const shown = view.before ?? run.state;
   const race = versusRaceState(shown, model, setup);
@@ -514,22 +517,29 @@ function Race({
         <div className="flex min-w-0 flex-col gap-3">
           <div className="relative h-[42vh] min-h-[240px] overflow-hidden rounded-lg border border-[#1F2523] bg-[#0F1312] md:h-[56vh]">
             {outline ? (
-              <TrackMap
-                outline={outline}
-                race={race}
-                model={model}
-                userSide={model.userSide}
-                rival={model.rival}
-                clock={view.clock}
-                selected={null}
-                onSelect={() => undefined}
-                dim={!!view.moments.length}
-                ahead={ahead}
-                carShapes={{
-                  [model.userSide]: setup.players[seat].car,
-                  [model.rival]: setup.players[other].car,
-                }}
-              />
+              <RaceStage
+                raceId={base.race.id}
+                feedRef={feed}
+                mapAspect={outline.width / outline.height}
+              >
+                <TrackMap
+                  outline={outline}
+                  race={race}
+                  model={model}
+                  userSide={model.userSide}
+                  rival={model.rival}
+                  clock={view.clock}
+                  selected={null}
+                  onSelect={() => undefined}
+                  dim={!!view.moments.length}
+                  ahead={ahead}
+                  carShapes={{
+                    [model.userSide]: setup.players[seat].car,
+                    [model.rival]: setup.players[other].car,
+                  }}
+                  feedRef={feed}
+                />
+              </RaceStage>
             ) : (
               <p className="p-8 text-center text-[var(--muted)]">No map for this track.</p>
             )}

@@ -22,6 +22,7 @@ import {
   offsetPath,
 } from '../track/battle.js';
 import { cornerPoint } from '../track/corners.js';
+import type { MapFeed } from '../track/feed.js';
 import { garagesFor, seasonOf } from '../track/garages.js';
 import {
   type PitLane,
@@ -525,6 +526,7 @@ export function TrackMap({
   userBox = null,
   motionRef,
   carShapes,
+  feedRef,
 }: {
   outline: TrackOutline;
   race: RaceState;
@@ -553,6 +555,8 @@ export function TrackMap({
   motionRef?: MutableRefObject<MapMotion | null>;
   /** Versus: each player's car shape (CarIcon). */
   carShapes?: Record<string, string>;
+  /** Filled each frame with where every car is (the 3D view follows it). */
+  feedRef?: MutableRefObject<MapFeed | null>;
 }) {
   const line = useMemo(() => polyline(outline.points), [outline]);
   const lane = useMemo(() => pitLane(outline, line, TRACK), [outline, line]);
@@ -679,6 +683,18 @@ export function TrackMap({
   const leadAt = leader ? places.get(leader)?.at : undefined;
   const sc =
     !finishing && driven === 'sc' && leadAt !== undefined ? pointAt(line, leadAt + 0.018) : null;
+  if (feedRef) {
+    feedRef.current = {
+      places,
+      team: teams,
+      compound: new Map(Object.entries(race.cars).map(([code, c]) => [code, c.compound])),
+      userSide,
+      rival,
+      sc: sc && leadAt !== undefined ? leadAt + 0.018 : null,
+      battle: battle?.zoom ? { codes: [userSide, battle.other], at: battle.at } : null,
+      selected,
+    };
+  }
 
   // The battle cam (battles and trust spec D1): the view eases onto the two cars and the
   // corner, and back out to the whole circuit after.

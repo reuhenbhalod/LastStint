@@ -61,8 +61,10 @@ import { radioChirp, setSoundOn, soundOn } from '../game/sound.js';
 import { type Game, LAP_MS, SLOW_MOTION, clockProgress } from '../game/useGame.js';
 import { CONDITION_WORD, conditionsOf, forecast } from '../game/weather.js';
 import type { GameState } from '../state/machine.js';
+import { RaceStage } from '../three/RaceStage.js';
 import { BRAKE_BEFORE, cornerKind } from '../track/battle.js';
 import { cornerPoint, overtakingCorners } from '../track/corners.js';
+import type { MapFeed } from '../track/feed.js';
 import { flagOn, nearestFraction, polyline } from '../track/geometry.js';
 import type { LiveStanding, MapMotion } from '../track/motion.js';
 import { outlineFor } from '../track/outlines.js';
@@ -256,6 +258,8 @@ export function RaceScreen({
   const battleLock = useRef<number | null>(null);
   const [flash, setFlash] = useState<{ text: string; good: boolean; corner: number } | null>(null);
   const motion = useRef<MapMotion | null>(null);
+  // Where every car is, for the 3D view (three/RaceStage).
+  const feed = useRef<MapFeed | null>(null);
   const clockRef = useRef(game.clock);
   clockRef.current = game.clock;
   const raceLap = state.race.lap;
@@ -1014,23 +1018,31 @@ export function RaceScreen({
                 className={`absolute inset-y-2 right-2 transition-[left] duration-500 ${stats ? 'left-2' : tight ? 'left-2 md:left-[190px]' : 'left-[150px] md:left-[190px]'}`}
               >
                 {outline ? (
-                  <TrackMap
-                    outline={outline}
-                    race={state.race}
-                    model={model}
-                    userSide={userSide}
-                    rival={rival}
-                    clock={game.clock}
-                    selected={selected}
+                  <RaceStage
+                    raceId={model.race.id}
+                    feedRef={feed}
+                    mapAspect={outline.width / outline.height}
                     onSelect={select}
-                    dim={paused}
-                    finishing={finishMeta}
-                    battle={battleView}
-                    ahead={ahead}
-                    flash={flash}
-                    userBox={userBox}
-                    motionRef={motion}
-                  />
+                  >
+                    <TrackMap
+                      outline={outline}
+                      race={state.race}
+                      model={model}
+                      userSide={userSide}
+                      rival={rival}
+                      clock={game.clock}
+                      selected={selected}
+                      onSelect={select}
+                      dim={paused}
+                      finishing={finishMeta}
+                      battle={battleView}
+                      ahead={ahead}
+                      flash={flash}
+                      userBox={userBox}
+                      motionRef={motion}
+                      feedRef={feed}
+                    />
+                  </RaceStage>
                 ) : (
                   <p className="p-8 text-center text-[var(--muted)]">
                     No track map for this race yet.
