@@ -88,7 +88,7 @@ test('the map at launch: Eras 10 and 9 released, Era 9 locked, the rest coming s
 
   const era10 = node(page, 10);
   await expect(era10).toContainText('Unlocked');
-  await expect(era10.getByRole('link')).toHaveCount(1);
+  await expect(era10.locator('a[href]')).toHaveCount(1);
   await expect(linkTo(page, 10)).toBeVisible();
 
   const era9 = node(page, 9);
@@ -96,14 +96,14 @@ test('the map at launch: Eras 10 and 9 released, Era 9 locked, the rest coming s
   await expect(era9).toContainText('21 stars in Era 10 to unlock (21 to go)');
   await expect(era9).not.toContainText('Coming soon');
   await expect(era9).not.toContainText('open on test');
-  await expect(era9.getByRole('link')).toHaveCount(0);
+  await expect(era9.locator('a[href]')).toHaveCount(0);
   await expect(linkTo(page, 9)).toHaveCount(0);
 
   for (const era of ERAS.filter((e) => e.id <= 8)) {
     const n = node(page, era.id);
     await expect(n).toContainText('Coming soon');
     await expect(n).toContainText(era.years);
-    await expect(n.getByRole('link')).toHaveCount(0);
+    await expect(n.locator('a[href]')).toHaveCount(0);
     await expect(linkTo(page, era.id)).toHaveCount(0);
   }
   await noDraftOrTestMode(page);

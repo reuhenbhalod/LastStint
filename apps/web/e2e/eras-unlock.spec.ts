@@ -52,7 +52,7 @@ test('20 Era 10 stars: Era 9 is released but locked, and says what unlocks it', 
   await expect(era9).toContainText('Locked');
   await expect(era9).toContainText('21 stars in Era 10 to unlock (1 to go)');
   await expect(era9).not.toContainText('Coming soon');
-  await expect(era9.getByRole('link')).toHaveCount(0);
+  await expect(era9.locator('a[href]')).toHaveCount(0);
   await expect(openNode(page, ERA_9)).toHaveCount(0);
 
   // Its page lists its races but won't start one.
