@@ -322,9 +322,18 @@ const RACE_TABLE: Record<number, ReadonlyArray<readonly [string, string]>> = {
     ['hungary-1997', "Hill's Arrows almost wins"],
     ['europe-1997', 'The title decider at Jerez'],
     ['hungary-1998', 'Ferrari switches to three stops mid-race'],
-    ['belgium-1998', "Rain, a mass crash, Jordan's first win"],
-    ['malaysia-1999', "Ferrari team orders for Irvine's title push"],
-    ['europe-1999', "Rain chaos, Stewart's only win"],
+    [
+      'germany-1996',
+      'Boxed in behind the one-stopping Benettons: a short first stop for Hill to find clear air',
+    ],
+    [
+      'germany-1997',
+      'Two stops and a light car against a one-stopping Jordan: make the gap, then pass him again',
+    ],
+    [
+      'san-marino-1999',
+      'Coulthard runs one long stop; Ferrari switches Schumacher to two short ones and sprints, if the backmarkers allow',
+    ],
   ],
   2: [
     ['france-1990', "Capelli's Leyton House runs non-stop and leads; Prost closes in"],

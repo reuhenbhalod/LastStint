@@ -570,9 +570,9 @@ The **Needs** column is from race history and must be checked against the data f
 | 3 | `hungary-1997` | Jolpica + F1DB stops (est. fuel) | R4 refuel, P4 map |  |
 | 3 | `europe-1997` | Jolpica + F1DB stops (est. fuel) | R4 refuel, P4 map |  |
 | 3 | `hungary-1998` | Jolpica + F1DB stops (est. fuel) | R4 refuel, P4 map |  |
-| 3 | `belgium-1998` | Jolpica + F1DB stops (est. fuel) | R1 red flag, R3 wet pre-2018, R4 refuel, P4 map |  |
-| 3 | `malaysia-1999` | Jolpica + F1DB stops (est. fuel) | R4 refuel, P4 map |  |
-| 3 | `europe-1999` | Jolpica + F1DB stops (est. fuel) | R3 wet pre-2018, R4 refuel, P4 map |  |
+| 3 | `germany-1996` | Jolpica + F1DB stops (est. fuel) | R4 refuel, P4 map |  |
+| 3 | `germany-1997` | Jolpica + F1DB stops (est. fuel) | R4 refuel, P4 map |  |
+| 3 | `san-marino-1999` | Jolpica + F1DB stops (est. fuel) | R4 refuel, P4 map |  |
 | 2 | `france-1990` | Reconstruct | P3 solver, P4 map |  |
 | 2 | `united-states-1990` | Reconstruct | P3 solver, P4 map |  |
 | 2 | `mexico-1990` | Reconstruct | P3 solver, P4 map |  |

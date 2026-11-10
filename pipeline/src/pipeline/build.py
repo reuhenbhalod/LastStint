@@ -2337,6 +2337,51 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
+    "san-marino-1999": {
+        "year": 1999,
+        "event": "San Marino",
+        "source": "jolpica",
+        "name": "San Marino 1999: Schumacher vs Coulthard",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for europe-1999 (swap-races-era3-overnight.md). Side provisional until
+        # `pipeline hard-calls`: Ferrari's short first stop and two stops against Coulthard's one.
+        "user_side": "MSCM",
+        "rival": "COU",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "germany-1996": {
+        "year": 1996,
+        "event": "German",
+        "source": "jolpica",
+        "name": "Germany 1996: Hill vs Berger",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for belgium-1998 (swap-races-era3-overnight.md). Side provisional until
+        # `pipeline hard-calls`: Hill's two stops against the one-stopping Benettons.
+        "user_side": "HIL",
+        "rival": "BER",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "germany-1997": {
+        "year": 1997,
+        "event": "German",
+        "source": "jolpica",
+        "name": "Germany 1997: Berger vs Fisichella",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for malaysia-1999 (swap-races-era3-overnight.md). Side provisional until
+        # `pipeline hard-calls`: Berger's two stops against Fisichella's one.
+        "user_side": "BER",
+        "rival": "FIS",
+        "score_positions": 6,
+        "split": "eras",
+    },
     "germany-2000": {
         "year": 2000,
         "event": "German",

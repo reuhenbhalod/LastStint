@@ -158,9 +158,9 @@ Players start at Era 10 and move back through the timeline to Era 1. The eras be
 | 5 | hungary-1997 | Hill's Arrows almost wins | defend: Hill holds P1 |
 | 6 | europe-1997 | The title decider at Jerez | beat-rival: Villeneuve ahead of Schumacher |
 | 7 | hungary-1998 | Ferrari switches to three stops mid-race | win: Schumacher on three stops |
-| 8 | belgium-1998 | Rain, a mass crash, Jordan's first win | team: Jordan 1–2 |
-| 9 | malaysia-1999 | Ferrari team orders for Irvine's title push | deny: Irvine wins, Häkkinen kept P3 or lower |
-| 10 | europe-1999 | Rain chaos, Stewart's only win | win: Herbert from P14 |
+| 8 | germany-1996 | Boxed in behind the one-stopping Benettons: a short first stop for Hill to find clear air | win: Hill beats Berger |
+| 9 | germany-1997 | Two stops and a light car against a one-stopping Jordan: make the gap, then pass him again | defend: Berger wins from pole on two stops |
+| 10 | san-marino-1999 | Coulthard runs one long stop; Ferrari switches Schumacher to two short ones and sprints, if the backmarkers allow | win: Schumacher from P3 on two stops |
 
 ### Era 2: Senna vs Prost (1989–1993) · play order 9
 | # | Race ID | Dilemma | Target (draft) |
@@ -241,12 +241,12 @@ Every race has one target, set in `eras.target`. Each race's draft target is in 
 
 | Type | Means | Grader `Target` | Races (draft) |
 |---|---|---|---|
-| `win` | Chase down the win from behind | `win` | 44 |
-| `defend` | Start in the lead and keep it to the flag | `win`, starting from P1 | 19 |
+| `win` | Chase down the win from behind | `win` | 45 |
+| `defend` | Start in the lead and keep it to the flag | `win`, starting from P1 | 20 |
 | `position` | Reach a set position, such as P3 to win the title | `position` | 17 |
 | `beat-rival` | Finish ahead of a named car, wherever that is | `beat-rival` | 14 |
-| `team` | A team result, such as a 1–2 in a set order | `team` (new) | 3 |
-| `deny` | Keep a rival at or below a set position, such as out of the top 3 to stop their title | `deny` (new) | 3 |
+| `team` | A team result, such as a 1–2 in a set order | `team` (new) | 2 |
+| `deny` | Keep a rival at or below a set position, such as out of the top 3 to stop their title | `deny` (new) | 2 |
 
 Every era has at least three different target types.
 
