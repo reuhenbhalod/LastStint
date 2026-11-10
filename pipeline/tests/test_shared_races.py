@@ -28,10 +28,8 @@ SHARED = (
     "portugal-2021",
     "russia-2021",
 )
-# Shared races with a rules-only overlay so far: their side (`pipeline hard-calls`), target and
-# content are authored into the overlay in B1 (docs/eras-checks/swap-races-era9-overnight.md).
-UNAUTHORED = ("portugal-2021",)
-AUTHORED = tuple(rid for rid in SHARED if rid not in UNAUTHORED)
+# Every shared race's side is authored into its overlay (portugal-2021 in B1, Nov 9 2026).
+AUTHORED = SHARED
 TOUCHED = ("eras", "provenance", "rules", "decisionMoments", "userSide", "rival")
 
 
@@ -143,17 +141,6 @@ def _cases() -> list[dict]:
             for rid in SHARED
         ),
     ]
-
-
-def test_an_unauthored_shared_race_has_a_rules_only_overlay():
-    """A shared race swapped in before B1 carries only its era rules: no eras block, so the
-    Eras model plays the race file's side and moments until its side is authored."""
-    for rid in UNAUTHORED:
-        overlay = build.load_overlay(rid)
-        assert set(overlay) == {"rules"}, rid
-        merged = merge(_race(rid), overlay)
-        assert "eras" not in merged
-        assert merged["rules"] == overlay["rules"]
 
 
 def build_vectors() -> dict:
