@@ -1786,8 +1786,8 @@ RACES: dict[str, dict] = {
         "era": "1994-2009",
         "takeover_lap": None,  # D3 rule
         "seed": 1,
-        # Swapped in for hungary-2006 (swap-races-era5-overnight.md). Side provisional until
-        # `pipeline hard-calls`.
+        # Swapped in for hungary-2006 (swap-races-era5-overnight.md). Hard calls MAS 0, RAI 0;
+        # chance given up RAI 50.7, MAS 0.0, so the Eras side is RAI (overlay; eras_side swaps).
         "user_side": "MAS",
         "rival": "RAI",
         "score_positions": 6,

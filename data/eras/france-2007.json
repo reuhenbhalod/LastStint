@@ -7,5 +7,33 @@
     "drs": false,
     "ers": "none",
     "refuelling": true
+  },
+  "eras": {
+    "eraId": 5,
+    "order": 3,
+    "userSide": "RAI",
+    "target": {
+      "type": "position",
+      "position": 2
+    },
+    "storyline": {
+      "real": "Massa leads from pole and R\u00e4ikk\u00f6nen, past Hamilton at the first corner, follows him through the first stint. Massa stops first both times; R\u00e4ikk\u00f6nen runs three laps longer before his second stop, comes out just ahead while Massa is held up behind a lapped Williams, and wins by 2.414 s."
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 2,
+      "label": "Finish in the top two on two stops"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "manage",
+      "maxLaps": 5,
+      "label": "Finish in the top two managing for no more than 5 laps"
+    },
+    "hardCalls": {
+      "MAS": 0,
+      "RAI": 0
+    },
+    "briefing": "Magny-Cours, 2007. Massa started on pole and leads; you run R\u00e4ikk\u00f6nen in the other Ferrari, second and 4.6 s behind him after 15 laps. Both Ferraris are on two stops and Massa will stop first. Finish in the top two, and take the win from him in the pits if you can."
   }
 }
