@@ -289,8 +289,8 @@ describe('GET /api/history', () => {
         legend: true,
         accuracy: 91,
         stars: { result: true, strategist: true, mastery: true },
-        headline: null,
-        real: null,
+        headline: 'Sainz holds Alonso off in Bahrain',
+        real: expect.stringContaining('Alonso, on a later second stop, passes Sainz'),
       }),
       expect.objectContaining({ raceId: era8[4], eraId: 8, position: 5, accuracy: 70 }),
     ]);

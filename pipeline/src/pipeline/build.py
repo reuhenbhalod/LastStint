@@ -365,12 +365,14 @@ RACES: dict[str, dict] = {
     "bahrain-2023": {
         "year": 2023,
         "event": "Bahrain",
-        "name": "Bahrain 2023",
+        "name": "Bahrain 2023: Sainz vs Alonso",
         "era": "2014-2025",
         "takeover_lap": None,  # D3 rule
         "seed": 62631,
-        "user_side": None,  # validation race: automatic duel, runner-up vs winner
-        "rival": None,
+        # Eras storyline (swap-races-e10-e9.md): Sainz and Alonso fight for the last podium
+        # place. Eras side by hard calls (SAI 2, ALO 1; real: Alonso P3, Sainz P4).
+        "user_side": "SAI",
+        "rival": "ALO",
         "score_positions": 6,
         "split": "holdout",
     },
