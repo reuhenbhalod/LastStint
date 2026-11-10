@@ -341,3 +341,25 @@ hidden objective and briefing come in B1. The `user_side` / `rival` pair in `bui
 | Side really won? | Häkkinen: yes. Schumacher: no (2nd, 2.2 s) |
 | Risk | **Medium.** Dry, no SC, few retirements, first-stop laps agree in AS, WP and F1DB (Schumacher's second stop: AS lap 46, F1DB lap 47). Gaps are small (under 1 s after stop 1, 2.2 s at the flag), so the sim's stop-time model decides the undercut. No fuel loads or compounds sourced. Irvine's holding role is only called a team game by AS |
 
+
+### Authored (B1, Nov 9)
+
+Written into `data/eras/luxembourg-1998.json` from the facts above and the built race's timing
+(Jolpica laps in `data/raw/luxembourg-1998.parquet`); nothing new was looked up. Each row names
+the fact rows it rests on.
+
+| Item | Authored | Rests on | Owner checked |
+|---|---|---|---|
+| Side | **Häkkinen (HAK)**. `pipeline hard-calls`: HAK 0, MSCM 0, chance given up 0.0 / 0.0, so the race file's side stands (tie on both). Rival MSCM | — | |
+| Target (★1) | **win** (Häkkinen from P2 at the lap-21 takeover, 6.9 s behind Schumacher in the timing) | Result top 6 | |
+| Rewrite | none: the side really won | Result top 6 | |
+| Storyline (real) | Irvine holds Häkkinen up until Häkkinen passes him at the chicane on lap 14; Ferrari pit the leader first on lap 24 with Häkkinen 3.5 s behind; McLaren keep Häkkinen out to lap 28, he rejoins ahead by under a second; 2.9 s clear after the second stops; wins by 2.2 s; four points ahead with one race to go | Team orders, Häkkinen passes Irvine, Gap before stop 1, Stops: M. Schumacher, Stops: Häkkinen, Result top 6, Championship | |
+| Briefing | Schumacher pole; Irvine kept Häkkinen behind until lap 14; Häkkinen second after 21 laps, 6.9 s behind (timing: end of lap 21, 6.86 s); both on two stops; Ferrari pit first; two races left (round 15, title decided at Suzuka) | Event, Grid top 6, Häkkinen passes Irvine, Strategy, Stops: M. Schumacher, Championship | |
+| Mastery | `margin` 2.2 s: "Win by more than 2.2 seconds" (Häkkinen's real margin, 2.212 s per WP, 2.211 s per Jolpica) | Result top 6 | |
+| Hidden | `stop_count` exact 2: "Win on two stops", Häkkinen's real count | Stops: Häkkinen | |
+| storylineEvents | none: the three retirements after the takeover (Herbert, Rosset, R. Schumacher) are not storyline cars | Retirements | |
+| Moments | `pnpm --filter @laststint/sim author luxembourg-1998 --target win --eras --write`: stop-28 (real: box, fill 20 laps, to the lap-48 stop), stop-48 (real: box, fill 19 laps, to the flag), pace-53, pace-57, battle-61. Not hand-adjusted. Every pit option carries a fill; the stop laps are AS/F1DB's 28 and 48 (in-laps; the race file's real stops are on the out-laps 29 and 49) | Stops: Häkkinen | |
+| Checks | Robust G1 pass, mean gap error 0.88 s (strict pass), with the eras block. Reachable at era difficulty (threshold 86, Expert) and at Legend (90), both on seed 1 with the real stop calls (box 28, box 48); stay-out earns no star on any seed (accuracy 80.0) | — | |
+
+The race file and golden must be rebuilt by the integrator (`pipeline build luxembourg-1998`);
+this branch does not commit them.

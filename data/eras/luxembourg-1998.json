@@ -7,5 +7,31 @@
     "drs": false,
     "ers": "none",
     "refuelling": true
+  },
+  "eras": {
+    "eraId": 3,
+    "order": 5,
+    "userSide": "HAK",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Irvine holds Häkkinen up behind Schumacher's Ferrari until Häkkinen passes him at the chicane on lap 14. Ferrari bring the leader in first, on lap 24, with Häkkinen 3.5 s behind; McLaren keep Häkkinen out until lap 28 and he rejoins ahead by under a second. He comes out of the second stops 2.9 s clear and wins by 2.2 s, four points ahead with one race to go."
+    },
+    "mastery": {
+      "type": "margin",
+      "seconds": 2.2,
+      "label": "Win by more than 2.2 seconds"
+    },
+    "hidden": {
+      "type": "stop_count",
+      "exact": 2,
+      "label": "Win on two stops"
+    },
+    "hardCalls": {
+      "HAK": 0,
+      "MSCM": 0
+    },
+    "briefing": "Nürburgring, 1998, with two races left in the title fight. Schumacher took pole, and Irvine's Ferrari kept Häkkinen behind until lap 14. You run Häkkinen, second after 21 laps and 6.9 s behind Schumacher, both on two stops. Ferrari will pit first: jump the leader in the stops and win."
   }
 }
