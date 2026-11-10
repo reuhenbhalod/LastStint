@@ -110,6 +110,8 @@ export interface ErasMockOptions {
   cleared?: number[];
   /** The ★1 result the server finds (default: the user's car finished the race). */
   result?: (raceId: string, submitted: Submitted) => boolean;
+  /** Progress the player already has, by race (at the era's difficulty, not Legend). */
+  progress?: Record<string, { stars: Stars; hiddenDone?: boolean; accuracy: number }>;
 }
 
 /** What the mocked Worker saw. */
@@ -246,7 +248,9 @@ export async function mockEras(
   const seen: ErasMock = { starts: [], submissions: [] };
   const attempts = new Map<string, { raceId: string; legend: boolean; difficulty: Difficulty }>();
   // Best per race and mode, from this page's attempts.
-  const progress = new Map<string, { stars: Stars; accuracy: number }>();
+  const progress = new Map<string, { stars: Stars; hiddenDone?: boolean; accuracy: number }>(
+    Object.entries(opts.progress ?? {}).map(([raceId, p]) => [`${raceId}:false`, p]),
+  );
   const entries: Array<Record<string, unknown>> = [];
   const key = (raceId: string, legend: boolean) => `${raceId}:${legend}`;
   const starsOf = (raceId: string, legend: boolean, eraId: number): Stars =>
@@ -313,7 +317,7 @@ export async function mockEras(
               raceId: r.raceId,
               position: r.position,
               stars: starsOf(r.raceId, false, eraId),
-              hiddenDone: false,
+              hiddenDone: progress.get(key(r.raceId, false))?.hiddenDone ?? false,
               bestAccuracy: progress.get(key(r.raceId, false))?.accuracy ?? null,
               reconstructed: m?.provenance?.kind === 'reconstructed',
               // On test an unauthored race (no ★1 target yet) plays as a Draft.
@@ -370,6 +374,7 @@ export async function mockEras(
       const prev = progress.get(key(a.raceId, a.legend));
       progress.set(key(a.raceId, a.legend), {
         stars: res.progress.stars,
+        hiddenDone: prev?.hiddenDone ?? false,
         accuracy: Math.max(prev?.accuracy ?? 0, res.accuracy),
       });
       if (res.historyEntry && !entries.some((e) => e.raceId === a.raceId)) {

@@ -1,5 +1,6 @@
 // The era detail's view (build-plan 8.3; spec §14): the era's briefing, its lock state, then its
-// ten race cards with stars, best accuracy and the Reconstructed and Draft badges. Once the era
+// ten race cards with stars, best accuracy and the Reconstructed, Draft and hidden-objective
+// badges (the objective's text stays on the results screen; spec §6). Once the era
 // is Cleared (spec §8) a Legend toggle switches the cards to Legend difficulty, whose progress
 // is shown apart from the era's. Star and lock states are spelled out in text, not by colour or
 // symbol alone; each playable card's race name is a link (a tab stop) that covers the card.
@@ -7,7 +8,13 @@
 import { legendDifficulty } from '@laststint/sim';
 import { LockLine, StarIcon } from './EraMap.js';
 import { type EraInfo, eraLeaderboardPath, eraRace, eraRacePath } from './catalog.js';
-import type { EraDetailState, EraDetailView, RaceCard, RaceProgress } from './eraDetailState.js';
+import type {
+  EraDetailState,
+  EraDetailView,
+  HiddenState,
+  RaceCard,
+  RaceProgress,
+} from './eraDetailState.js';
 
 const STARS = [
   { key: 'result', n: 1, name: 'Result' },
@@ -59,6 +66,19 @@ export function Badge({ children, tone }: { children: string; tone: 'muted' | 'f
   );
 }
 
+/**
+ * The hidden objective's badge (spec §6): nothing before the race has all three stars, then
+ * "open" (a new challenge) and "done". Never the objective's text.
+ */
+export function HiddenBadge({ state }: { state: HiddenState }) {
+  if (state === 'hidden') return null;
+  return state === 'done' ? (
+    <Badge tone="flag">Hidden objective done</Badge>
+  ) : (
+    <Badge tone="muted">Hidden objective open</Badge>
+  );
+}
+
 function RaceCardView({ card, legend }: { card: RaceCard; legend: boolean }) {
   const progress = legend ? card.legend : card.progress;
   const race = eraRace(card.raceId);
@@ -75,6 +95,7 @@ function RaceCardView({ card, legend }: { card: RaceCard; legend: boolean }) {
           <span className="eyebrow mr-auto">Race {card.position}</span>
           {card.reconstructed && <Badge tone="muted">Reconstructed</Badge>}
           {card.draft && <Badge tone="flag">Draft</Badge>}
+          <HiddenBadge state={card.hidden} />
         </div>
         <h3 className="disp m-0 break-words text-[22px] leading-none">
           {href ? (
@@ -274,7 +295,8 @@ export function EraDetailBody({
             </ol>
             <p className="m-0 text-[12px] text-[var(--muted)]">
               Reconstructed: rebuilt from race reports, without full lap timing. Draft: not
-              published yet, so playable on test only.
+              published yet, so playable on test only. Hidden objective: a new challenge once a race
+              has all three stars, shown on its results.
             </p>
           </section>
         </>

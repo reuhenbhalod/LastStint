@@ -199,6 +199,35 @@ describe('Era detail', () => {
     expect(raceLinks(html)[9]).toBe('/eras/9/abu-dhabi-2021');
   });
 
+  it('badges a done or open hidden objective, never its text, and nothing before ★3', () => {
+    const ALL = { result: true, strategist: true, mastery: true };
+    const none = renderDetail(ERA9, detailReady(erasResponse(true), eraDetail(9)));
+    expect(none).not.toMatch(/Hidden objective (done|open)/);
+    const detail = eraDetail(9, {
+      races: {
+        9: { stars: ALL },
+        10: { stars: ALL, hiddenDone: true, bestAccuracy: 95 },
+      },
+    });
+    const html = renderDetail(ERA9, detailReady(erasResponse(true), detail));
+    expect(html.match(/>Hidden objective done</g)).toHaveLength(1);
+    expect(html.match(/>Hidden objective open</g)).toHaveLength(1);
+    // On their own cards: race 9 open, race 10 (Abu Dhabi) done.
+    const open = html.indexOf('>Hidden objective open<');
+    const done = html.indexOf('>Hidden objective done<');
+    expect(open).toBeGreaterThan(html.indexOf('>Race 9<'));
+    expect(open).toBeLessThan(html.indexOf('>Race 10<'));
+    expect(done).toBeGreaterThan(html.indexOf('>Race 10<'));
+    expect(done).toBeLessThan(html.indexOf('Abu Dhabi 2021'));
+    // At Legend too: the objective is the race's, kept at the era's difficulty.
+    const cleared = eraDetail(9, {
+      races: { ...starredRaces(9), 10: { stars: ALL, hiddenDone: true } },
+    });
+    const legend = renderDetail(ERA9, detailReady(erasResponse(true), cleared), true);
+    expect(legend).toContain('Races · Legend difficulty');
+    expect(legend.match(/>Hidden objective done</g)).toHaveLength(1);
+  });
+
   it('spells out each star, earned or not, and the best accuracy', () => {
     const detail = eraDetail(9, {
       races: {

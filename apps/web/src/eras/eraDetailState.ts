@@ -11,6 +11,14 @@ import { type EraNode, eraNodes } from './eraMapState.js';
 
 export type RaceStars = EraRaceSummary['stars'];
 
+/**
+ * A race's hidden objective as its card may show it (spec §6, "Hidden objectives"): `hidden`
+ * until the race has all three stars (nothing is shown, not even that it exists), then `open` (a
+ * new challenge) and `done` once completed. The card never shows the objective's text; that is
+ * the results screen's. From the era's own difficulty, where the server keeps it.
+ */
+export type HiddenState = 'hidden' | 'open' | 'done';
+
 /** A race's progress at one difficulty: its three stars and best accuracy. */
 export interface RaceProgress {
   stars: RaceStars;
@@ -28,6 +36,8 @@ export interface RaceCard {
   progress: RaceProgress;
   /** At Legend difficulty (spec §8: its own stars, tracked separately). */
   legend: RaceProgress;
+  /** The hidden objective's state (spec §6). */
+  hidden: HiddenState;
   reconstructed: boolean;
   draft: boolean;
   /** Why the race can't be started from here, or null when it can. */
@@ -63,6 +73,16 @@ export function starCount(stars: RaceStars): number {
  */
 export function isCleared(races: readonly Pick<EraRaceSummary, 'stars'>[]): boolean {
   return races.length > 0 && races.every((r) => starCount(r.stars) > 0);
+}
+
+/**
+ * The hidden objective's state from a race's progress at the era's difficulty. The server only
+ * marks it done once the race has all three stars; a payload that says done without them still
+ * shows nothing, so the card never reveals more than the spec allows.
+ */
+export function hiddenState(race: Pick<EraRaceSummary, 'stars' | 'hiddenDone'>): HiddenState {
+  if (starCount(race.stars) < STARS_PER_RACE) return 'hidden';
+  return race.hiddenDone ? 'done' : 'open';
 }
 
 function invalid(why: string): never {
@@ -122,6 +142,7 @@ export function eraDetailView(
       dilemma: info?.dilemma ?? null,
       progress: { stars: r.stars, bestAccuracy: r.bestAccuracy },
       legend: r.legend ?? { stars: NO_STARS, bestAccuracy: null },
+      hidden: hiddenState(r),
       reconstructed: r.reconstructed,
       draft: r.draft,
       blocked: blockedReason(r, {
