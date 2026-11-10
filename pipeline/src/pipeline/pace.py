@@ -224,8 +224,10 @@ def sim_frame_losses(
 # stint began on that lap, so a car on its real strategy runs each real stint at its real pace.
 # A stint begun on a lap the real car never stopped on (a rival's reaction, an added stop) runs
 # at 0, and a car that stays out past its real stop keeps the offset of the stint it is in. The
-# player's car runs at 0 in live play (its effort is the player's: the pace modes), but in a
-# replay of the real calls it is a scripted car like any other (Gate G1 replays the real race).
+# player's car in live play (sim.ts playerStintOffset) runs its race-wide mean (weighted by the
+# stints' real laps) in every stint: basePace's error for the car, without the real driver's
+# stint-to-stint effort (the player's: the pace modes). In a replay of the real calls it is a
+# scripted car like any other (Gate G1 replays the real race).
 # Eras builds only (build.py's eras_build), never a reconstructed race (its laps are solved to
 # the anchors, not timed).
 STINT_SHRINK_LAPS = 5.0

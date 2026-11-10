@@ -42,6 +42,13 @@ FUEL_PRIOR = 0.056
 # The wetness grid the timeline is fitted on, and how smooth it must be lap to lap.
 GRID = np.linspace(0.0, 1.0, 101)
 SMOOTH = 0.05
+# An Eras build's timeline (wet_side): a lap the field runs on wet tyres only (no slick car in
+# the observations) is at least as wet as the slick / intermediate crossover, the wetness where
+# inters stop losing to slicks. With one tyre class on the lap, the inter curve fits the lap
+# time on either side of its best (dry side or wet side) and the smooth path can take the dry
+# one (netherlands-2023's finish shower: w 0.06-0.10, where slicks beat inters by ~9%), though
+# the whole field chose inters. Weight of the pull, per unit of wetness short of the crossover.
+WET_SIDE_PULL = 0.5
 # Model compounds for the wet tyres (no dry evidence to fit them on): their pace is in the
 # curves; wear in seconds a lap of tyre age, and their life.
 WET_TYRES = {
@@ -178,15 +185,29 @@ def dry_laps(weather: list[dict] | None) -> set[int]:
     return {int(x["lap"]) for x in weather if not x["rain"] and not x.get("ambiguous")}
 
 
+def crossover(curves: dict) -> float:
+    """The lowest wetness on GRID where inters lose no more than slicks (1.0 if none)."""
+    gap = penalty(curves, "INTERMEDIATE", GRID) - penalty(curves, "SOFT", GRID)
+    at = np.flatnonzero(gap <= 0.0)
+    return float(GRID[at[0]]) if at.size else 1.0
+
+
 def timeline(
-    obs: pd.DataFrame, laps: int, rain: set[int], curves: dict, dry: set[int] | None = None
+    obs: pd.DataFrame,
+    laps: int,
+    rain: set[int],
+    curves: dict,
+    dry: set[int] | None = None,
+    wet_side: bool = False,
 ) -> list[float]:
     """The race's wetness on each lap 1..laps: the smooth path that best explains `obs`
-    (`dry`: laps firmly pulled to dry, wet_laps.py)."""
+    (`dry`: laps firmly pulled to dry, wet_laps.py; `wet_side`: an Eras build's pull of a
+    wet-tyres-only lap to at least the slick / inter crossover, WET_SIDE_PULL)."""
     model = {
         cls: penalty(curves, comp, GRID)
         for cls, comp in (("slick", "SOFT"), ("inter", "INTERMEDIATE"), ("wet", "WET"))
     }
+    cross = crossover(curves) if wet_side else 0.0
     cost = np.zeros((laps + 1, len(GRID)))
     by_lap = {lap: g for lap, g in obs.groupby("lap")}
     for lap in range(1, laps + 1):
@@ -204,6 +225,8 @@ def timeline(
             c += 0.5 * np.maximum(0.0, 0.05 - GRID)
         if dry and lap in dry:
             c += DRY_FIRM * GRID
+        if wet_side and g is not None and not g["cls"].eq("slick").any():
+            c += WET_SIDE_PULL * np.maximum(0.0, cross - GRID)
         cost[lap] = c
     trans = SMOOTH * (GRID[:, None] - GRID[None, :]) ** 2
     best = np.full_like(cost, np.inf)
@@ -293,9 +316,14 @@ def sim_wear(laps: pd.DataFrame, weather: dict) -> pd.Series:
 
 
 def race_observations(
-    laps: pd.DataFrame, weather: list[dict] | None, fitted, curves: dict | None = None
+    laps: pd.DataFrame,
+    weather: list[dict] | None,
+    fitted,
+    curves: dict | None = None,
+    wet_side: bool = False,
 ) -> tuple[pd.DataFrame, int, set[int]]:
-    """A wet race's observations against its dry model, its laps, and its rain laps."""
+    """A wet race's observations against its dry model, its laps, and its rain laps
+    (`wet_side`: timeline's)."""
     from . import fit as fit_mod
 
     def predict(driver, compound, age, lap):
@@ -310,7 +338,7 @@ def race_observations(
     if curves is not None:
         first = {
             "curves": curves,
-            "wetness": timeline(obs, total, rain, curves, dry_laps(weather)),
+            "wetness": timeline(obs, total, rain, curves, dry_laps(weather), wet_side),
         }
         obs = observations(laps, predict, wet_period(laps, weather), sim_wear(laps, first))
     return obs, total, rain
@@ -459,17 +487,25 @@ def scaled_curves(curves: dict, k: float) -> dict:
 def eras_weather_block(laps: pd.DataFrame, weather: list[dict] | None, fitted) -> dict:
     """An Eras build's weather (model fix 1.3): the Eras curves (ERAS_CURVES_PATH) with the
     race's slick factor (slick_scale, on the timeline the pooled curves fit), and the
-    timeline they fit."""
+    timeline they fit, with a wet-tyres-only lap on the wet side (timeline's `wet_side`)."""
     curves = load_curves(eras=True)
-    obs, total, rain = race_observations(laps, weather, fitted, curves)
-    k = slick_scale(obs, timeline(obs, total, rain, curves, dry_laps(weather)), curves)
-    return weather_block(laps, weather, fitted, scaled_curves(curves, k) if k != 1.0 else curves)
+    obs, total, rain = race_observations(laps, weather, fitted, curves, wet_side=True)
+    k = slick_scale(
+        obs, timeline(obs, total, rain, curves, dry_laps(weather), wet_side=True), curves
+    )
+    return weather_block(
+        laps, weather, fitted, scaled_curves(curves, k) if k != 1.0 else curves, wet_side=True
+    )
 
 
-def weather_block(laps: pd.DataFrame, weather: list[dict] | None, fitted, curves: dict) -> dict:
-    """The race model's `weather`: the curves and the race's wetness on every lap."""
-    obs, total, rain = race_observations(laps, weather, fitted, curves)
-    return {"curves": curves, "wetness": timeline(obs, total, rain, curves, dry_laps(weather))}
+def weather_block(
+    laps: pd.DataFrame, weather: list[dict] | None, fitted, curves: dict, wet_side: bool = False
+) -> dict:
+    """The race model's `weather`: the curves and the race's wetness on every lap (`wet_side`:
+    an Eras build's, timeline's)."""
+    obs, total, rain = race_observations(laps, weather, fitted, curves, wet_side)
+    wetness = timeline(obs, total, rain, curves, dry_laps(weather), wet_side)
+    return {"curves": curves, "wetness": wetness}
 
 
 def rms(obs: pd.DataFrame, wetness: list[float], curves: dict) -> float:
