@@ -97,6 +97,47 @@ through a fetch tool that summarises pages. Check their wording against the page
 - Not flagged: rain (sunny), safety car / VSC / red flag (none), team orders (none reported),
   a last-lap pass.
 
+### Authored content (B1, Nov 9)
+
+Eras job B1, built and checked on branch `eras-author-italy-2010` (base `eras-swap-era6`).
+Storyline and briefing are original wording; no team radio is quoted. Every fact rests on a
+row in **Facts** above (read Nov 9, 2026).
+
+- Robust G1 (`pipeline validate italy-2010 --robust`, Eras build): **pass** (strict), mean gap
+  error 0.79 s, before and after the overlay.
+- Reachability (`pnpm --filter @laststint/sim reachability italy-2010`): **pass** at era
+  difficulty (threshold 80, Smart rival) and at Legend (90, Expert rival): all three stars and
+  the hidden objective on seed 2 (stop-37 box-hard, then push-attack, push, push). The
+  stay-out path never earns ★1 or ★3 at either level (it can earn ★2 at era difficulty).
+- Moments (`pnpm --filter @laststint/sim author italy-2010 --target win --eras --write`):
+  stop-37 (real option box-hard: in-lap 37, out-lap 38), pace-41, pace-45, pace-49
+  (`data/moments/italy-2010.json`). The author tool also offered rivalpit-36 (Button's in-lap:
+  stay 42%, box next lap on hards 42%), not kept because stop-37 is the same call one lap later.
+  Takeover lap 33 (build): Button P1, Alonso P2 0.809 s behind, both on 33-lap-old softs.
+
+| Item | Value | Fact it rests on | Source | Owner checked |
+|---|---|---|---|---|
+| Side | ALO (hard calls ALO 0, BUT 0; chance given up ALO 38.0, BUT 30.3 pts; `pipeline hard-calls`) | the grader, not a fact | - | |
+| Target | `win` | Alonso won; Button 2nd, +2.938 | Jolpica, AS, GPE, WP | |
+| Rewrite | none: the side really won | Alonso won | Jolpica | |
+| Storyline | "Button takes the lead from Alonso at the first chicane" | Button passed Alonso into the first chicane | AS | |
+| Storyline | "for more than 30 laps the two run within two seconds of each other on the same soft tyres, Alonso unable to find a way past" | 0.6 s lap 10, 0.9 s lap 20, 0.9 s lap 30; lead peaked about 1.5 s (AS) / 1.6 s (GPE); Alonso couldn't pass on track; top ten started on softs | GPE, AS | |
+| Storyline | "Button stops first. Alonso stays out one more lap, a quicker Ferrari stop puts him out just ahead, and he holds the inside through the first chicane" | Alonso stopped one lap after Button; Ferrari's stop 0.8 s quicker; rejoined just ahead, side by side through Turns 1-2, held the inside | WP, AS, GPE, Jolpica | |
+| Storyline | "Alonso wins Ferrari's home race by 2.938 s" | Button +2.938 | Jolpica | |
+| Briefing | "Button took the lead from you at the first chicane" | as above | AS | |
+| Briefing | "33 laps in he is still less than a second ahead, on the same soft tyres" | build state at takeover (lap 33): 0.809 s; GPE 0.9 s at lap 30, computed 0.96 s at lap 35 | build, GPE, Jolpica | |
+| Briefing | "You can't pass him on track, and each of you has one stop to make" | Alonso couldn't pass on track (AS); both one stop (WP, AS, GPE) | AS, WP, GPE | |
+| Mastery | `margin` 3 s: "Win by more than 3 seconds" (beat the real margin) | Button +2.938 | Jolpica | |
+| Hidden | `stop_count` exact 1: "Win on one stop" | the game's choice; Alonso really stopped once | WP, AS, GPE | |
+| storylineEvents | none | no SC, VSC or red flag; the only event after the takeover is Trulli's retirement (not part of the story); Hamilton's and Kobayashi's lap-1 retirements are before the takeover | WP, AS, GPE; 2.6 | |
+
+Rejected objectives (reachability): hidden `mode_rule` push at most 8, 10 or 12 laps, and
+hidden `margin` 4 s or 5 s, all met at era difficulty but not at Legend (Legend's winning paths push from lap 41 to the
+flag, and none of the searched paths wins by 4 s).
+
+`data/races/italy-2010.json`, its golden and `races.gen.ts` are for the integrator to rebuild
+(`pipeline build italy-2010`); this branch does not commit them.
+
 ### Sources
 
 | Short name | What |
