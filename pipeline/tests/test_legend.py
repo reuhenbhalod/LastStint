@@ -163,7 +163,9 @@ def test_rates_fall_back_and_flag():
     measured = legend.legend_rates(_model("abu-dhabi-2021"))
     assert measured["circuit"] == "yas_marina" and not measured["scFallback"]
     all_tracks = legend.load_rates()["allTracks"]
-    for race_id in ("atlantis-2021", "south-africa-1983", "netherlands-2022"):
+    # qatar-2021: Losail has too few races for its own rate (Zandvoort has enough since
+    # netherlands-2021 joined the sources).
+    for race_id in ("atlantis-2021", "south-africa-1983", "qatar-2021"):
         r = legend.legend_rates({"race": {"id": race_id}})
         assert r["scFallback"] and r["vscFallback"], race_id
         assert (r["scPerRace"], r["vscPerRace"]) == (

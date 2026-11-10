@@ -137,6 +137,7 @@ def assemble_race_model(
     eras_stops: bool = False,
     stint_pace: bool = False,
     dirty_air: dict | None = None,
+    pace_skip: dict[str, list[int]] | None = None,
 ) -> dict:
     """Build the race-model dict (validate + write it with export.write_race). `fault_facts`:
     the race's hand-checked car faults (incidents.fault_facts), fitted into FAULT events.
@@ -255,7 +256,9 @@ def assemble_race_model(
     # Model v3 (spec B2a): each driver's pace over the laps the game replays.
     fresh = {"bonus": round(fit.fresh_tyre_bonus, 4), "laps": fit.fresh_tyre_laps}
     race_pace = pace_mod.post_takeover_offsets(
-        faults_mod.without_fault_laps(laps, facts),  # a faulted car's normal pace
+        faults_mod.without_laps(
+            faults_mod.without_fault_laps(laps, facts), pace_skip
+        ),  # a faulted car's normal pace
         fit.driver_pace,
         compounds,
         round(fit.fuel_per_lap, 5),
@@ -269,7 +272,7 @@ def assemble_race_model(
     # Pace by stint (Eras model fix M2, pace.stint_offsets): fitted against the file's basePace.
     stint_table = (
         pace_mod.stint_offsets(
-            faults_mod.without_fault_laps(laps, facts),
+            faults_mod.without_laps(faults_mod.without_fault_laps(laps, facts), pace_skip),
             {c: round(p + race_pace.get(c, 0.0), 4) for c, p in fit.driver_pace.items()},
             compounds,
             round(fit.fuel_per_lap, 5),

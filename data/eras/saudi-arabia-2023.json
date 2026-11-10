@@ -1,0 +1,49 @@
+{
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": true,
+    "drs": true,
+    "ers": "hybrid",
+    "refuelling": false
+  },
+  "eras": {
+    "eraId": 10,
+    "order": 9,
+    "userSide": "VER",
+    "target": {
+      "type": "position",
+      "position": 2
+    },
+    "storyline": {
+      "real": "A driveshaft failure in qualifying leaves Verstappen fifteenth on the grid, with P\u00e9rez on pole. P\u00e9rez takes the lead back from Alonso on lap 4 while Verstappen climbs into the top four. Stroll's stopped car brings out the safety car, and the leaders all pit for hards under it. Verstappen restarts fourth, passes Russell and Alonso, and chips away at a 5.4 s gap, but a driveshaft worry costs him time and P\u00e9rez wins by 5.355 s.",
+      "rewriteCondition": {
+        "type": "win"
+      },
+      "headline": "Verstappen wins in Jeddah from fifteenth on the grid"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 1,
+      "label": "Finish second or better on one stop"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "manage",
+      "maxLaps": 0,
+      "label": "Finish second or better without a single lap of tyre management"
+    },
+    "hardCalls": {
+      "PER": 0,
+      "VER": 2
+    },
+    "briefing": "Jeddah, 2023. A driveshaft failure in qualifying put Verstappen fifteenth on the grid, and P\u00e9rez started on pole. Fifteen laps in, you run Verstappen sixth on mediums, 21.4 s behind P\u00e9rez, and the cars around you have started to stop. Finish second at least, and if you can, beat your team-mate."
+  },
+  "storylineEvents": [
+    [
+      18,
+      "SC"
+    ]
+  ]
+}

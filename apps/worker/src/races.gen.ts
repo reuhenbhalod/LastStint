@@ -10,12 +10,12 @@ import e1 from '../../../data/races/abu-dhabi-2012.json';
 import e2 from '../../../data/races/abu-dhabi-2016.json';
 import r0 from '../../../data/races/abu-dhabi-2020.json';
 import r1 from '../../../data/races/abu-dhabi-2021.json';
+import e3 from '../../../data/races/abu-dhabi-2022.json';
 import r2 from '../../../data/races/abu-dhabi-2024.json';
-import e3 from '../../../data/races/australia-1986.json';
-import e4 from '../../../data/races/australia-1993.json';
-import e5 from '../../../data/races/australia-1994.json';
-import e6 from '../../../data/races/australia-2010.json';
-import e7 from '../../../data/races/australia-2025.json';
+import e4 from '../../../data/races/australia-1986.json';
+import e5 from '../../../data/races/australia-1993.json';
+import e6 from '../../../data/races/australia-1994.json';
+import e7 from '../../../data/races/australia-2010.json';
 import e8 from '../../../data/races/austria-2002.json';
 import r3 from '../../../data/races/austria-2019.json';
 import r4 from '../../../data/races/austria-2025.json';
@@ -39,16 +39,16 @@ import e22 from '../../../data/races/brazil-2008.json';
 import e23 from '../../../data/races/brazil-2009.json';
 import e24 from '../../../data/races/brazil-2012.json';
 import e25 from '../../../data/races/brazil-2019.json';
-import e26 from '../../../data/races/brazil-2021.json';
-import e27 from '../../../data/races/canada-2011.json';
-import e28 from '../../../data/races/canada-2014.json';
+import e26 from '../../../data/races/canada-2011.json';
+import e27 from '../../../data/races/canada-2014.json';
 import r8 from '../../../data/races/canada-2019.json';
 import r9 from '../../../data/races/canada-2022.json';
 import r10 from '../../../data/races/canada-2024.json';
-import e29 from '../../../data/races/china-2007.json';
-import e30 from '../../../data/races/china-2011.json';
+import e28 from '../../../data/races/china-2007.json';
+import e29 from '../../../data/races/china-2011.json';
 import r11 from '../../../data/races/china-2024.json';
 import r12 from '../../../data/races/china-2025.json';
+import e30 from '../../../data/races/emilia-romagna-2024.json';
 import e31 from '../../../data/races/europe-1993.json';
 import e32 from '../../../data/races/europe-1997.json';
 import e33 from '../../../data/races/europe-1999.json';
@@ -65,7 +65,7 @@ import e41 from '../../../data/races/germany-2019.json';
 import e42 from '../../../data/races/great-britain-1987.json';
 import e43 from '../../../data/races/great-britain-2016.json';
 import e44 from '../../../data/races/great-britain-2021.json';
-import e45 from '../../../data/races/great-britain-2022.json';
+import e45 from '../../../data/races/great-britain-2023.json';
 import e46 from '../../../data/races/hungary-1986.json';
 import e47 from '../../../data/races/hungary-1992.json';
 import e48 from '../../../data/races/hungary-1997.json';
@@ -86,19 +86,19 @@ import r19 from '../../../data/races/italy-2024.json';
 import e58 from '../../../data/races/japan-2000.json';
 import e59 from '../../../data/races/japan-2003.json';
 import e60 from '../../../data/races/japan-2005.json';
+import e61 from '../../../data/races/japan-2023.json';
 import r20 from '../../../data/races/japan-2024.json';
-import e61 from '../../../data/races/malaysia-1999.json';
-import e62 from '../../../data/races/malaysia-2001.json';
-import e63 from '../../../data/races/malaysia-2013.json';
-import e64 from '../../../data/races/mexico-1986.json';
-import e65 from '../../../data/races/mexico-1990.json';
+import e62 from '../../../data/races/malaysia-1999.json';
+import e63 from '../../../data/races/malaysia-2001.json';
+import e64 from '../../../data/races/malaysia-2013.json';
+import e65 from '../../../data/races/mexico-1986.json';
+import e66 from '../../../data/races/mexico-1990.json';
 import r21 from '../../../data/races/mexico-2019.json';
 import r22 from '../../../data/races/mexico-2021.json';
 import r23 from '../../../data/races/mexico-2022.json';
 import r24 from '../../../data/races/mexico-2024.json';
 import r25 from '../../../data/races/miami-2022.json';
 import r26 from '../../../data/races/miami-2023.json';
-import e66 from '../../../data/races/miami-2024.json';
 import e67 from '../../../data/races/monaco-1984.json';
 import e68 from '../../../data/races/monaco-1988.json';
 import e69 from '../../../data/races/monaco-1992.json';
@@ -108,7 +108,7 @@ import e72 from '../../../data/races/monaco-2011.json';
 import e73 from '../../../data/races/monaco-2015.json';
 import e74 from '../../../data/races/monaco-2016.json';
 import e75 from '../../../data/races/monaco-2017.json';
-import e76 from '../../../data/races/monaco-2025.json';
+import e76 from '../../../data/races/netherlands-2021.json';
 import r27 from '../../../data/races/netherlands-2022.json';
 import e77 from '../../../data/races/netherlands-2023.json';
 import e78 from '../../../data/races/portugal-1984.json';
@@ -120,8 +120,8 @@ import r30 from '../../../data/races/russia-2020.json';
 import r31 from '../../../data/races/russia-2021.json';
 import e81 from '../../../data/races/sakhir-2020.json';
 import e82 from '../../../data/races/san-marino-2005.json';
+import e83 from '../../../data/races/saudi-arabia-2023.json';
 import r32 from '../../../data/races/saudi-arabia-2025.json';
-import e83 from '../../../data/races/singapore-2023.json';
 import e84 from '../../../data/races/south-africa-1983.json';
 import e85 from '../../../data/races/spain-1994.json';
 import e86 from '../../../data/races/spain-1996.json';
@@ -187,11 +187,11 @@ export const ERAS_RACE_FILES: Record<string, unknown> = {
   'abu-dhabi-2010': e0,
   'abu-dhabi-2012': e1,
   'abu-dhabi-2016': e2,
-  'australia-1986': e3,
-  'australia-1993': e4,
-  'australia-1994': e5,
-  'australia-2010': e6,
-  'australia-2025': e7,
+  'abu-dhabi-2022': e3,
+  'australia-1986': e4,
+  'australia-1993': e5,
+  'australia-1994': e6,
+  'australia-2010': e7,
   'austria-2002': e8,
   'azerbaijan-2017': e9,
   'azerbaijan-2021': e10,
@@ -210,11 +210,11 @@ export const ERAS_RACE_FILES: Record<string, unknown> = {
   'brazil-2009': e23,
   'brazil-2012': e24,
   'brazil-2019': e25,
-  'brazil-2021': e26,
-  'canada-2011': e27,
-  'canada-2014': e28,
-  'china-2007': e29,
-  'china-2011': e30,
+  'canada-2011': e26,
+  'canada-2014': e27,
+  'china-2007': e28,
+  'china-2011': e29,
+  'emilia-romagna-2024': e30,
   'europe-1993': e31,
   'europe-1997': e32,
   'europe-1999': e33,
@@ -229,7 +229,7 @@ export const ERAS_RACE_FILES: Record<string, unknown> = {
   'great-britain-1987': e42,
   'great-britain-2016': e43,
   'great-britain-2021': e44,
-  'great-britain-2022': e45,
+  'great-britain-2023': e45,
   'hungary-1986': e46,
   'hungary-1992': e47,
   'hungary-1997': e48,
@@ -245,12 +245,12 @@ export const ERAS_RACE_FILES: Record<string, unknown> = {
   'japan-2000': e58,
   'japan-2003': e59,
   'japan-2005': e60,
-  'malaysia-1999': e61,
-  'malaysia-2001': e62,
-  'malaysia-2013': e63,
-  'mexico-1986': e64,
-  'mexico-1990': e65,
-  'miami-2024': e66,
+  'japan-2023': e61,
+  'malaysia-1999': e62,
+  'malaysia-2001': e63,
+  'malaysia-2013': e64,
+  'mexico-1986': e65,
+  'mexico-1990': e66,
   'monaco-1984': e67,
   'monaco-1988': e68,
   'monaco-1992': e69,
@@ -260,14 +260,14 @@ export const ERAS_RACE_FILES: Record<string, unknown> = {
   'monaco-2015': e73,
   'monaco-2016': e74,
   'monaco-2017': e75,
-  'monaco-2025': e76,
+  'netherlands-2021': e76,
   'netherlands-2023': e77,
   'portugal-1984': e78,
   'portugal-1985': e79,
   'russia-2018': e80,
   'sakhir-2020': e81,
   'san-marino-2005': e82,
-  'singapore-2023': e83,
+  'saudi-arabia-2023': e83,
   'south-africa-1983': e84,
   'spain-1994': e85,
   'spain-1996': e86,

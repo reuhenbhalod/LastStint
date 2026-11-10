@@ -36,6 +36,30 @@ def test_the_timeline_follows_the_laps():
     assert all(0.2 <= x <= 0.4 for x in w[6:])
 
 
+def test_an_eras_timeline_puts_an_inters_only_lap_on_the_wet_side():
+    # A dry race with a late shower: the field stays on slicks to lap 10, then runs inters
+    # whose laps fit the inter curve on either side of its best. Eras builds (wet_side) read
+    # the inters-only laps as at least the slick / inter crossover; other builds as before.
+    curves = wet.load_curves(eras=True)
+    cross = wet.crossover(curves)
+    best = curves["inter"]["best"]
+    assert 0.0 < cross < best
+    dry_side = float(wet.penalty(curves, "INTERMEDIATE", 0.08))
+    rows = [(lap, "slick", 0.0, 18) for lap in range(1, 11)]
+    rows += [(lap, "inter", dry_side, 18) for lap in range(11, 17)]
+    obs = pd.DataFrame(rows, columns=["lap", "cls", "median", "count"])
+    plain = wet.timeline(obs, 16, set(range(11, 17)), curves)
+    eras = wet.timeline(obs, 16, set(range(11, 17)), curves, wet_side=True)
+    assert max(plain[11:]) < cross  # the dry side: slicks would beat inters there
+    assert min(eras[11:]) >= cross and max(eras[:9]) <= 0.02
+    # A lap with a slick car on it is left to the lap times.
+    mixed = [*rows, *((lap, "slick", 0.1, 2) for lap in range(11, 17))]
+    obs = pd.DataFrame(mixed, columns=["lap", "cls", "median", "count"])
+    assert wet.timeline(obs, 16, set(range(11, 17)), curves, wet_side=True) == wet.timeline(
+        obs, 16, set(range(11, 17)), curves
+    )
+
+
 def test_python_sim_wet_lap_and_wear_match_the_pipeline():
     weather = {"curves": CURVES, "wetness": [0.0, 0.3]}
     assert wet_penalty(weather, "SOFT", 2) == float(wet.penalty(CURVES, "SOFT", 0.3))

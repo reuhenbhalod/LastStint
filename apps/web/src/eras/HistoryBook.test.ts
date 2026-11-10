@@ -120,7 +120,7 @@ describe('the history book', () => {
             real: 'What the race file says happened',
           }),
           historyEntry({
-            raceId: 'miami-2024',
+            raceId: 'emilia-romagna-2024',
             eraId: 10,
             position: 6,
             achievedAt: '2026-11-08T09:00:00.000Z',
@@ -140,18 +140,18 @@ describe('the history book', () => {
     expect(t).toContain('7 Nov 2026');
     expect(t).toContain('91.2%');
     // No headline authored: the neutral line, and no "really happened" made up.
-    expect(t).toContain('Miami 2024');
+    expect(t).toContain('Emilia Romagna 2024');
     expect(t).toContain(NEUTRAL_REWRITE);
     expect(t).toContain('75% of strategists rewrote this race.');
     expect(t).not.toContain('Only 75%');
     expect(t).toContain('77.3%');
     expect(t.match(/What really happened/g)).toHaveLength(1);
     // Newest first, Legend marked, stars read out, each linking to its board.
-    expect(t.indexOf('Miami 2024')).toBeLessThan(t.indexOf('Abu Dhabi 2021'));
+    expect(t.indexOf('Emilia Romagna 2024')).toBeLessThan(t.indexOf('Abu Dhabi 2021'));
     expect(t).toContain('Era 10 · Race 6Legend');
     expect(t).toContain('Star 1, Result: earned.');
     expect(t).toContain('Star 2, Strategist: not earned.');
-    expect(html).toContain('href="/eras/10/miami-2024/leaderboard/legend"');
+    expect(html).toContain('href="/eras/10/emilia-romagna-2024/leaderboard/legend"');
     expect(html).toContain('href="/eras/9/abu-dhabi-2021/leaderboard"');
     expect(html).not.toContain('No rewrites yet.');
   });

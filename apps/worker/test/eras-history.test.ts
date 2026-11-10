@@ -208,11 +208,11 @@ describe('GET /api/history', () => {
     expect(book.collectibles).toEqual({
       stars: { have: 49, total: 300 },
       legendStars: { have: 30, total: 300 },
-      rewrites: { have: 3, total: 77 },
+      rewrites: { have: 3, total: 73 },
       hidden: { have: 3, total: 100 },
       badges: { have: 4, total: 30 },
     });
-    expect(book.completion).toEqual({ collected: 89, total: 807, percent: (89 / 807) * 100 });
+    expect(book.completion).toEqual({ collected: 89, total: 803, percent: (89 / 803) * 100 });
 
     // And the same from D1 directly.
     const mine = 'FROM era_progress WHERE player_id = ?';
@@ -246,17 +246,17 @@ describe('GET /api/history', () => {
       races: 10,
       stars: { have: 30, total: 30 },
       legendStars: { have: 30, total: 30 },
-      rewrites: { have: 2, total: 8 }, // belgium-2023 and hungary-2024 have no rewrite
+      rewrites: { have: 2, total: 6 }, // belgium-2023, hungary-2024, netherlands-2023, abu-dhabi-2022: none
       hidden: { have: 3, total: 10 },
       badges: { cleared: true, mastered: true, legend: true },
-      percent: (68 / 81) * 100,
+      percent: (68 / 79) * 100,
     });
     expect(e9).toMatchObject({
       stars: { have: 9, total: 30 },
-      rewrites: { have: 0, total: 9 }, // styria-2021 has none (Verstappen won)
+      rewrites: { have: 0, total: 7 }, // styria-2021, azerbaijan-2021, netherlands-2021: none (the side won)
       hidden: { have: 0, total: 10 },
       badges: { cleared: false, mastered: false, legend: false },
-      percent: (9 / 82) * 100,
+      percent: (9 / 80) * 100,
     });
     expect(e8).toMatchObject({
       stars: { have: 10, total: 30 },
@@ -298,7 +298,7 @@ describe('GET /api/history', () => {
 
   it('a new player: nothing collected, every era listed', async () => {
     const book = await json<HistoryBook>(`/api/history?anonId=${ids.c}`);
-    expect(book.completion).toEqual({ collected: 0, total: 807, percent: 0 });
+    expect(book.completion).toEqual({ collected: 0, total: 803, percent: 0 });
     expect(book.eras).toHaveLength(10);
     expect(book.entries).toEqual([]);
   });
@@ -331,8 +331,8 @@ describe('GET /api/eras/races/:raceId/stats', () => {
     await historyEntry(ids.b, race, b1, T0);
     await attempt(ids.c, race, 40);
     await attempt(more.d, race, null);
-    const e1 = await attempt(more.e, 'miami-2024', 90, { rewrite: true });
-    await historyEntry(more.e, 'miami-2024', e1, T0);
+    const e1 = await attempt(more.e, 'emilia-romagna-2024', 90, { rewrite: true });
+    await historyEntry(more.e, 'emilia-romagna-2024', e1, T0);
     // Star rates: three players on normal, one on Legend.
     await progress(ids.a, race, [1, 1, 0], { accuracy: 75 });
     await progress(ids.c, race, [1, 0, 0], { accuracy: 40 });
@@ -368,7 +368,7 @@ describe('GET /api/eras/races/:raceId/stats', () => {
   });
 
   it('is cached for CACHE_SECONDS: a new rewrite shows once the cache expires', async () => {
-    const race = 'miami-2024';
+    const race = 'emilia-romagna-2024';
     await attempt(ids.a, race, 50);
     const vars = { CACHE_SECONDS: '60' };
     const path = `/api/eras/races/${race}/stats`;

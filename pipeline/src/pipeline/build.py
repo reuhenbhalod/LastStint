@@ -391,12 +391,15 @@ RACES: dict[str, dict] = {
     "japan-2023": {
         "year": 2023,
         "event": "Japan",
-        "name": "Japan 2023",
+        "name": "Japan 2023: Russell vs Hamilton",
         "era": "2014-2025",
         "takeover_lap": None,  # D3 rule
         "seed": 87206,
-        "user_side": None,  # validation race: automatic duel, runner-up vs winner
-        "rival": None,
+        # Eras storyline (swap-races-e10-e9-b.md): Mercedes split Russell and Hamilton's
+        # strategies (one stop against two). Eras side by hard calls (RUS 2, HAM 1; real:
+        # Hamilton P5, Russell P7).
+        "user_side": "RUS",
+        "rival": "HAM",
         "score_positions": 6,
         "split": "holdout",
     },
@@ -1545,6 +1548,85 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
+    "abu-dhabi-2022": {
+        "year": 2022,
+        "event": "Abu Dhabi",
+        "source": "jolpica",
+        "name": "Abu Dhabi 2022: Leclerc vs Pérez",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for monaco-2025 (swap-races-e10-e9-b.md). Hard calls LEC 1, PER 0:
+        # Leclerc's one stop against Pérez's two (real: LEC P2, PER P3).
+        "user_side": "LEC",
+        "rival": "PER",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "emilia-romagna-2024": {
+        "year": 2024,
+        "event": "Italy",
+        "location": "Imola",  # OpenF1 lists two 2024 races in Italy (Imola, Monza)
+        "source": "openf1",  # FastF1 needs F1TV since Oct 2026 (pipeline/openf1.py)
+        "name": "Emilia Romagna 2024: Norris vs Verstappen",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for miami-2024 (swap-races-e10-e9-b.md). Side provisional until
+        # `pipeline hard-calls`.
+        "user_side": "NOR",
+        "rival": "VER",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "saudi-arabia-2023": {
+        "year": 2023,
+        "event": "Saudi Arabia",
+        "source": "openf1",  # FastF1 needs F1TV since Oct 2026 (pipeline/openf1.py)
+        "name": "Saudi Arabia 2023: Pérez vs Verstappen",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for australia-2025 (swap-races-e10-e9-c.md). Hard calls VER 2, PER 0:
+        # the overlay's eras.userSide (VER) plays it from Verstappen's side.
+        # pace_skip: VER was told to manage his tyres after the SC restart until DRS was
+        # enabled on lap 23 (Autosport; docs/eras-checks/fix-saudi-arabia-2023.md).
+        "pace_skip": {"VER": [21, 22]},
+        "user_side": "PER",
+        "rival": "VER",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "great-britain-2023": {
+        "year": 2023,
+        "event": "United Kingdom",  # OpenF1's country_name is the lookup key
+        "source": "openf1",
+        "name": "Britain 2023: Norris vs Hamilton",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for great-britain-2022 (swap-races-e10-e9-b.md). Side provisional until
+        # `pipeline hard-calls`.
+        "user_side": "NOR",
+        "rival": "HAM",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "netherlands-2021": {
+        "year": 2021,
+        "event": "Dutch",
+        "source": "jolpica",
+        "name": "Netherlands 2021: Verstappen vs Hamilton",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for brazil-2021 (swap-races-e10-e9-b.md). Side provisional until
+        # `pipeline hard-calls`.
+        "user_side": "VER",
+        "rival": "HAM",
+        "score_positions": 6,
+        "split": "eras",
+    },
     "monaco-2022": {
         "year": 2022,
         "event": "Monaco",
@@ -2383,13 +2465,17 @@ def dry_fit(
     raw_dir: Path = RAW_DIR,
     recon: dict | None = None,
     quad_priors: dict | None = None,
+    pace_skip: dict[str, list[int]] | None = None,
 ) -> DryFit:
     """The dry lap model. A refuelling race's `laps` carry the Tank and FuelLap columns
     (refuel.with_fuel_columns): the fuel term is fitted on the sim's sawtooth. `recon`: a
     reconstructed race's sidecar (load_reconstruction); wet on every lap, it gives the dry
     pace instead (solver_dry_fit). A real-timing race wet on every lap can't be built.
-    `quad_priors` (Eras builds, wear_shape.quad_priors): quadratic wear per dry compound."""
+    `quad_priors` (Eras builds, wear_shape.quad_priors): quadratic wear per dry compound.
+    `pace_skip` (Eras builds, faults.without_laps): sourced laps that weren't racing laps."""
     clean_df, traffic_df, _ = clean.clean_laps(laps)
+    clean_df = faults.without_laps(clean_df, pace_skip)
+    traffic_df = faults.without_laps(traffic_df, pace_skip)
     # A faulted car's laps while the fault lasts aren't its pace (faults.py fits the loss).
     clean_df = faults.without_fault_laps(clean_df, fault_facts or [], laps)
     traffic_df = faults.without_fault_laps(traffic_df, fault_facts or [], laps)
@@ -2615,7 +2701,10 @@ def build_race(
             race_id, sidecar.get("results"), Path(raw_dir) / "f1db"
         )
 
-    dry = dry_fit(race_id, laps, meta["era"], fault_facts, raw_dir, recon, quad_priors)
+    # A car's laps that a source says weren't racing laps stay out of its pace fits (Eras
+    # builds only; registry `pace_skip`, facts in docs/eras-checks).
+    pace_skip = meta.get("pace_skip") if eras_build else None
+    dry = dry_fit(race_id, laps, meta["era"], fault_facts, raw_dir, recon, quad_priors, pace_skip)
     clean_df, traffic_df, fitted = dry.clean, dry.traffic, dry.fitted
     weather = wet.weather_block(laps, dry.rain, fitted, wet.load_curves()) if dry.wet else None
     # Eras sim fixes (a race whose file takes its Eras overlay; never a Daily/Gauntlet race,
@@ -2644,7 +2733,11 @@ def build_race(
         shift = wet.wet_tyre_shift(laps, weather, fitted)
         if shift:  # the race tells full wets from inters: its own wet curve, and timeline
             weather = wet.weather_block(
-                laps, dry.rain, fitted, wet.shifted_curves(weather["curves"], shift)
+                laps,
+                dry.rain,
+                fitted,
+                wet.shifted_curves(weather["curves"], shift),
+                wet_side=True,
             )
     if eras_build and recon is None:
         # Model fix 1.6: a car still running at the takeover with no dry lap (wet laps only)
@@ -2720,6 +2813,7 @@ def build_race(
         # solved to its anchors, so their stint residuals are the solver's, not the drivers').
         stint_pace=eras_build and recon is None,
         dirty_air=dirty,
+        pace_skip=pace_skip,
     )
     if eras_build and recon is None:
         missing = sorted(running_at(laps, takeover) - {d["code"] for d in model["drivers"]})

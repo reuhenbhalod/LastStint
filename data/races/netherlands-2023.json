@@ -123,10 +123,10 @@
     {
       "code": "ALB",
       "team": "Williams",
-      "basePace": 79.3474,
+      "basePace": 77.4031,
       "noise": 0.3526,
-      "wetPace": 0.0048,
-      "dampPace": 0.0011,
+      "wetPace": 0.0055,
+      "dampPace": -0.0022,
       "stateAtTakeover": {
         "position": 15,
         "gapAhead": 7.484,
@@ -140,12 +140,12 @@
         {
           "lap": 45,
           "to": "MEDIUM",
-          "loss": 20.884
+          "loss": 22.63
         },
         {
           "lap": 62,
           "to": "INTERMEDIATE",
-          "loss": 34.837
+          "loss": 23.174
         },
         {
           "lap": 64,
@@ -156,25 +156,25 @@
       "stintPace": [
         {
           "lap": 0,
-          "offset": -0.719
+          "offset": 0.159
         },
         {
           "lap": 45,
-          "offset": -1.328
+          "offset": 0.018
         },
         {
           "lap": 64,
-          "offset": -1.081
+          "offset": -0.057
         }
       ]
     },
     {
       "code": "ALO",
       "team": "Aston Martin",
-      "basePace": 79.454,
+      "basePace": 77.0491,
       "noise": 0.1654,
-      "wetPace": -0.0013,
-      "dampPace": 0.0008,
+      "wetPace": -0.0015,
+      "dampPace": 0.0016,
       "stateAtTakeover": {
         "position": 5,
         "gapAhead": 2.516,
@@ -189,41 +189,41 @@
         {
           "lap": 11,
           "to": "SOFT",
-          "loss": 19.782
+          "loss": 23.593
         },
         {
           "lap": 49,
           "to": "SOFT",
-          "loss": 26.342
+          "loss": 28.402
         },
         {
           "lap": 62,
           "to": "INTERMEDIATE",
-          "loss": 31.404
+          "loss": 20.352
         }
       ],
       "stintPace": [
         {
           "lap": 11,
-          "offset": -1.063
+          "offset": 0.14
         },
         {
           "lap": 49,
-          "offset": -1.623
+          "offset": -0.076
         },
         {
           "lap": 62,
-          "offset": -1.636
+          "offset": -0.468
         }
       ]
     },
     {
       "code": "BOT",
       "team": "Alfa Romeo",
-      "basePace": 79.8162,
+      "basePace": 78.1219,
       "noise": 0.6432,
-      "wetPace": -0.011,
-      "dampPace": 0.0014,
+      "wetPace": -0.0009,
+      "dampPace": -0.0054,
       "stateAtTakeover": {
         "position": 17,
         "gapAhead": 3.86,
@@ -241,12 +241,12 @@
         {
           "lap": 48,
           "to": "SOFT",
-          "loss": 19.886
+          "loss": 21.361
         },
         {
           "lap": 60,
           "to": "INTERMEDIATE",
-          "loss": 15.407
+          "loss": 19.18
         },
         {
           "lap": 64,
@@ -257,25 +257,25 @@
       "stintPace": [
         {
           "lap": 17,
-          "offset": -0.75
+          "offset": 0.125
         },
         {
           "lap": 48,
-          "offset": -1.186
+          "offset": -0.038
         },
         {
           "lap": 64,
-          "offset": -0.6
+          "offset": 0.543
         }
       ]
     },
     {
       "code": "GAS",
       "team": "Alpine",
-      "basePace": 79.621,
+      "basePace": 77.5179,
       "noise": 0.2215,
-      "wetPace": 0.011,
-      "dampPace": -0.0013,
+      "wetPace": 0.0021,
+      "dampPace": 0.0039,
       "stateAtTakeover": {
         "position": 4,
         "gapAhead": 0.656,
@@ -290,41 +290,41 @@
         {
           "lap": 12,
           "to": "SOFT",
-          "loss": 16.773
+          "loss": 19.723
         },
         {
           "lap": 47,
           "to": "SOFT",
-          "loss": 25.548
+          "loss": 27.137
         },
         {
           "lap": 61,
           "to": "INTERMEDIATE",
-          "loss": 20.056
+          "loss": 21.724
         }
       ],
       "stintPace": [
         {
           "lap": 12,
-          "offset": -1.13
+          "offset": -0.095
         },
         {
           "lap": 47,
-          "offset": -1.284
+          "offset": 0.152
         },
         {
           "lap": 61,
-          "offset": -1.636
+          "offset": -0.658
         }
       ]
     },
     {
       "code": "HAM",
       "team": "Mercedes",
-      "basePace": 79.5205,
+      "basePace": 77.497,
       "noise": 0.3484,
-      "wetPace": 0.0147,
-      "dampPace": -0.0033,
+      "wetPace": 0.0097,
+      "dampPace": -0.0008,
       "stateAtTakeover": {
         "position": 13,
         "gapAhead": 17.843,
@@ -339,17 +339,17 @@
         {
           "lap": 10,
           "to": "SOFT",
-          "loss": 19.003
+          "loss": 22.943
         },
         {
           "lap": 46,
           "to": "SOFT",
-          "loss": 18.571
+          "loss": 21.17
         },
         {
           "lap": 61,
           "to": "INTERMEDIATE",
-          "loss": 18.265
+          "loss": 20.37
         },
         {
           "lap": 65,
@@ -360,16 +360,16 @@
       "stintPace": [
         {
           "lap": 46,
-          "offset": -1.519
+          "offset": -0.132
         }
       ]
     },
     {
       "code": "HUL",
       "team": "Haas F1 Team",
-      "basePace": 79.6224,
+      "basePace": 77.7837,
       "noise": 0.3322,
-      "wetPace": 0.0053,
+      "wetPace": 0.0054,
       "dampPace": 0.0065,
       "stateAtTakeover": {
         "position": 19,
@@ -388,12 +388,12 @@
         {
           "lap": 49,
           "to": "SOFT",
-          "loss": 22.097
+          "loss": 23.668
         },
         {
           "lap": 61,
           "to": "INTERMEDIATE",
-          "loss": 29.741
+          "loss": 32.708
         },
         {
           "lap": 64,
@@ -404,25 +404,25 @@
       "stintPace": [
         {
           "lap": 17,
-          "offset": -0.817
+          "offset": 0.105
         },
         {
           "lap": 49,
-          "offset": -1.328
+          "offset": -0.144
         },
         {
           "lap": 64,
-          "offset": -1.091
+          "offset": -0.022
         }
       ]
     },
     {
       "code": "LAW",
       "team": "AlphaTauri",
-      "basePace": 79.6417,
+      "basePace": 78.1659,
       "noise": 0.4262,
-      "wetPace": 0.0083,
-      "dampPace": 0.0158,
+      "wetPace": 0.0132,
+      "dampPace": 0.0122,
       "stateAtTakeover": {
         "position": 11,
         "gapAhead": 8.093,
@@ -437,7 +437,7 @@
         {
           "lap": 11,
           "to": "SOFT",
-          "loss": 28.516
+          "loss": 32.228
         },
         {
           "lap": 18,
@@ -446,12 +446,12 @@
         {
           "lap": 47,
           "to": "SOFT",
-          "loss": 19.259
+          "loss": 20.55
         },
         {
           "lap": 60,
           "to": "INTERMEDIATE",
-          "loss": 15.027
+          "loss": 18.143
         },
         {
           "lap": 64,
@@ -462,15 +462,15 @@
       "stintPace": [
         {
           "lap": 18,
-          "offset": -0.574
+          "offset": 0.181
         },
         {
           "lap": 47,
-          "offset": -1.229
+          "offset": -0.204
         },
         {
           "lap": 64,
-          "offset": -1.053
+          "offset": -0.208
         }
       ]
     },
@@ -508,7 +508,7 @@
     {
       "code": "MAG",
       "team": "Haas F1 Team",
-      "basePace": 79.6593,
+      "basePace": 78.2087,
       "noise": 0.2892,
       "wetPace": -0.0023,
       "dampPace": 0.0001,
@@ -526,33 +526,33 @@
         {
           "lap": 10,
           "to": "SOFT",
-          "loss": 20.938
+          "loss": 24.049
         },
         {
           "lap": 36,
           "to": "MEDIUM",
-          "loss": 21.31
+          "loss": 23.128
         },
         {
           "lap": 61,
           "to": "INTERMEDIATE",
-          "loss": 34.116
+          "loss": 36.524
         }
       ],
       "stintPace": [
         {
           "lap": 36,
-          "offset": -1.094
+          "offset": -0.004
         }
       ]
     },
     {
       "code": "NOR",
       "team": "McLaren",
-      "basePace": 79.7889,
+      "basePace": 77.7306,
       "noise": 0.317,
       "wetPace": -0.0165,
-      "dampPace": -0.0158,
+      "dampPace": -0.0149,
       "stateAtTakeover": {
         "position": 12,
         "gapAhead": 0.235,
@@ -567,17 +567,17 @@
         {
           "lap": 11,
           "to": "SOFT",
-          "loss": 18.613
+          "loss": 22.844
         },
         {
           "lap": 43,
           "to": "SOFT",
-          "loss": 17.997
+          "loss": 20.648
         },
         {
           "lap": 61,
           "to": "INTERMEDIATE",
-          "loss": 20.125
+          "loss": 23.496
         },
         {
           "lap": 64,
@@ -588,16 +588,16 @@
       "stintPace": [
         {
           "lap": 43,
-          "offset": -1.384
+          "offset": 0.067
         }
       ]
     },
     {
       "code": "OCO",
       "team": "Alpine",
-      "basePace": 79.6816,
+      "basePace": 77.7342,
       "noise": 0.2924,
-      "wetPace": 0.0002,
+      "wetPace": 0.0016,
       "dampPace": 0.0058,
       "stateAtTakeover": {
         "position": 10,
@@ -613,17 +613,17 @@
         {
           "lap": 11,
           "to": "SOFT",
-          "loss": 18.598
+          "loss": 22.038
         },
         {
           "lap": 44,
           "to": "SOFT",
-          "loss": 20.116
+          "loss": 21.944
         },
         {
           "lap": 62,
           "to": "WET",
-          "loss": 30.135
+          "loss": 25.622
         },
         {
           "lap": 64,
@@ -634,25 +634,25 @@
       "stintPace": [
         {
           "lap": 11,
-          "offset": -0.755
+          "offset": -0.023
         },
         {
           "lap": 44,
-          "offset": -1.288
+          "offset": 0.053
         },
         {
           "lap": 64,
-          "offset": -1.073
+          "offset": 0.184
         }
       ]
     },
     {
       "code": "PER",
       "team": "Red Bull Racing",
-      "basePace": 79.4265,
+      "basePace": 77.2574,
       "noise": 0.3542,
-      "wetPace": 0.0047,
-      "dampPace": 0.0032,
+      "wetPace": 0.0046,
+      "dampPace": 0.003,
       "stateAtTakeover": {
         "position": 1,
         "gapAhead": 0.0,
@@ -667,17 +667,17 @@
         {
           "lap": 13,
           "to": "SOFT",
-          "loss": 16.007
+          "loss": 19.03
         },
         {
           "lap": 46,
           "to": "SOFT",
-          "loss": 19.05
+          "loss": 20.822
         },
         {
           "lap": 61,
           "to": "INTERMEDIATE",
-          "loss": 25.657
+          "loss": 28.882
         },
         {
           "lap": 64,
@@ -688,29 +688,29 @@
       "stintPace": [
         {
           "lap": 0,
-          "offset": -1.118
+          "offset": -0.579
         },
         {
           "lap": 13,
-          "offset": -1.11
+          "offset": -0.021
         },
         {
           "lap": 46,
-          "offset": -1.42
+          "offset": 0.074
         },
         {
           "lap": 64,
-          "offset": -1.25
+          "offset": -0.465
         }
       ]
     },
     {
       "code": "PIA",
       "team": "McLaren",
-      "basePace": 79.1912,
+      "basePace": 77.3719,
       "noise": 0.4154,
-      "wetPace": -0.0059,
-      "dampPace": -0.0125,
+      "wetPace": -0.0068,
+      "dampPace": -0.013,
       "stateAtTakeover": {
         "position": 16,
         "gapAhead": 2.109,
@@ -729,12 +729,12 @@
         {
           "lap": 47,
           "to": "MEDIUM",
-          "loss": 21.855
+          "loss": 23.347
         },
         {
           "lap": 61,
           "to": "INTERMEDIATE",
-          "loss": 27.877
+          "loss": 30.497
         },
         {
           "lap": 64,
@@ -745,25 +745,25 @@
       "stintPace": [
         {
           "lap": 16,
-          "offset": -0.638
+          "offset": 0.275
         },
         {
           "lap": 47,
-          "offset": -1.443
+          "offset": -0.19
         },
         {
           "lap": 64,
-          "offset": -0.603
+          "offset": 0.442
         }
       ]
     },
     {
       "code": "RUS",
       "team": "Mercedes",
-      "basePace": 79.2367,
+      "basePace": 77.3411,
       "noise": 0.7477,
-      "wetPace": -0.0123,
-      "dampPace": -0.0087,
+      "wetPace": -0.0138,
+      "dampPace": -0.0027,
       "stateAtTakeover": {
         "position": 14,
         "gapAhead": 3.438,
@@ -778,7 +778,7 @@
         {
           "lap": 11,
           "to": "SOFT",
-          "loss": 20.218
+          "loss": 23.423
         },
         {
           "lap": 17,
@@ -787,7 +787,7 @@
         {
           "lap": 61,
           "to": "INTERMEDIATE",
-          "loss": 24.675
+          "loss": 27.689
         },
         {
           "lap": 64,
@@ -797,28 +797,28 @@
         {
           "lap": 68,
           "to": "INTERMEDIATE",
-          "loss": 44.258,
+          "loss": 49.465,
           "optional": true
         }
       ],
       "stintPace": [
         {
           "lap": 17,
-          "offset": -1.389
+          "offset": 0.035
         },
         {
           "lap": 68,
-          "offset": -1.269
+          "offset": -0.229
         }
       ]
     },
     {
       "code": "SAI",
       "team": "Ferrari",
-      "basePace": 79.6997,
+      "basePace": 77.6555,
       "noise": 0.3394,
-      "wetPace": 0.0024,
-      "dampPace": 0.0015,
+      "wetPace": 0.003,
+      "dampPace": 0.0023,
       "stateAtTakeover": {
         "position": 7,
         "gapAhead": 0.797,
@@ -833,17 +833,17 @@
         {
           "lap": 11,
           "to": "SOFT",
-          "loss": 17.921
+          "loss": 21.409
         },
         {
           "lap": 42,
           "to": "SOFT",
-          "loss": 19.146
+          "loss": 20.98
         },
         {
           "lap": 61,
           "to": "INTERMEDIATE",
-          "loss": 19.597
+          "loss": 22.534
         },
         {
           "lap": 65,
@@ -854,15 +854,15 @@
       "stintPace": [
         {
           "lap": 11,
-          "offset": -0.826
+          "offset": -0.06
         },
         {
           "lap": 42,
-          "offset": -1.394
+          "offset": 0.082
         },
         {
           "lap": 65,
-          "offset": -1.62
+          "offset": -0.402
         }
       ]
     },
@@ -887,10 +887,10 @@
     {
       "code": "STR",
       "team": "Aston Martin",
-      "basePace": 79.7786,
+      "basePace": 78.0278,
       "noise": 0.3497,
-      "wetPace": 0.0033,
-      "dampPace": 0.0019,
+      "wetPace": 0.0029,
+      "dampPace": 0.0021,
       "stateAtTakeover": {
         "position": 18,
         "gapAhead": 0.421,
@@ -905,7 +905,7 @@
         {
           "lap": 10,
           "to": "SOFT",
-          "loss": 21.24
+          "loss": 24.971
         },
         {
           "lap": 17,
@@ -914,12 +914,12 @@
         {
           "lap": 35,
           "to": "SOFT",
-          "loss": 19.712
+          "loss": 21.906
         },
         {
           "lap": 61,
           "to": "INTERMEDIATE",
-          "loss": 28.391
+          "loss": 30.927
         },
         {
           "lap": 64,
@@ -930,21 +930,21 @@
       "stintPace": [
         {
           "lap": 35,
-          "offset": -1.327
+          "offset": -0.012
         },
         {
           "lap": 64,
-          "offset": -1.137
+          "offset": -0.087
         }
       ]
     },
     {
       "code": "TSU",
       "team": "AlphaTauri",
-      "basePace": 80.4571,
+      "basePace": 78.7738,
       "noise": 0.2983,
-      "wetPace": 0.0121,
-      "dampPace": 0.0105,
+      "wetPace": 0.0119,
+      "dampPace": 0.0089,
       "stateAtTakeover": {
         "position": 8,
         "gapAhead": 5.906,
@@ -959,12 +959,12 @@
         {
           "lap": 11,
           "to": "SOFT",
-          "loss": 18.293
+          "loss": 20.821
         },
         {
           "lap": 61,
           "to": "INTERMEDIATE",
-          "loss": 24.45
+          "loss": 26.814
         },
         {
           "lap": 64,
@@ -975,21 +975,21 @@
       "stintPace": [
         {
           "lap": 11,
-          "offset": -1.105
+          "offset": 0.186
         },
         {
           "lap": 64,
-          "offset": -1.106
+          "offset": -0.384
         }
       ]
     },
     {
       "code": "VER",
       "team": "Red Bull Racing",
-      "basePace": 79.3509,
+      "basePace": 76.9051,
       "noise": 0.2824,
-      "wetPace": -0.0083,
-      "dampPace": -0.0035,
+      "wetPace": -0.01,
+      "dampPace": -0.001,
       "stateAtTakeover": {
         "position": 2,
         "gapAhead": 6.141,
@@ -1004,17 +1004,17 @@
         {
           "lap": 12,
           "to": "SOFT",
-          "loss": 16.701
+          "loss": 20.359
         },
         {
           "lap": 50,
           "to": "SOFT",
-          "loss": 19.476
+          "loss": 21.54
         },
         {
           "lap": 62,
           "to": "INTERMEDIATE",
-          "loss": 24.398
+          "loss": 15.532
         },
         {
           "lap": 64,
@@ -1030,15 +1030,15 @@
       "stintPace": [
         {
           "lap": 12,
-          "offset": -1.266
+          "offset": 0.062
         },
         {
           "lap": 50,
-          "offset": -1.451
+          "offset": 0.049
         },
         {
           "lap": 65,
-          "offset": -1.636
+          "offset": -0.313
         }
       ]
     },
@@ -1047,8 +1047,8 @@
       "team": "Alfa Romeo",
       "basePace": 78.2811,
       "noise": 0.2478,
-      "wetPace": -0.0108,
-      "dampPace": -0.0073,
+      "wetPace": -0.0079,
+      "dampPace": -0.0091,
       "stateAtTakeover": {
         "position": 3,
         "gapAhead": 4.359,
@@ -1063,23 +1063,23 @@
         {
           "lap": 11,
           "to": "MEDIUM",
-          "loss": 27.344
+          "loss": 27.597
         },
         {
           "lap": 38,
           "to": "SOFT",
-          "loss": 22.117
+          "loss": 22.139
         },
         {
           "lap": 61,
           "to": "INTERMEDIATE",
-          "loss": 29.349
+          "loss": 29.825
         }
       ],
       "stintPace": [
         {
           "lap": 38,
-          "offset": 0.039
+          "offset": 0.044
         }
       ]
     }
@@ -1108,21 +1108,482 @@
     {
       "lap": 63,
       "type": "RETIREMENT",
-      "driver": "ZHO"
+      "driver": "ZHO",
+      "storylineEvent": true
     },
     {
       "lap": 64,
       "type": "RED",
       "laps": 2,
-      "restart": "rolling"
+      "restart": "rolling",
+      "storylineEvent": true
     },
     {
       "lap": 66,
       "type": "SC",
-      "laps": 1
+      "laps": 1,
+      "storylineEvent": true
     }
   ],
-  "decisionMoments": [],
+  "decisionMoments": [
+    {
+      "id": "stop-11",
+      "lap": 11,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "Stay out",
+          "decisions": []
+        },
+        {
+          "id": "box-soft",
+          "label": "Box, softs",
+          "decisions": [
+            {
+              "lap": 11,
+              "kind": "pit",
+              "compound": "SOFT"
+            }
+          ]
+        },
+        {
+          "id": "box-medium",
+          "label": "Box, mediums",
+          "decisions": [
+            {
+              "lap": 11,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "box-hard",
+          "label": "Box, hards",
+          "decisions": [
+            {
+              "lap": 11,
+              "kind": "pit",
+              "compound": "HARD"
+            }
+          ]
+        },
+        {
+          "id": "box-intermediate",
+          "label": "Box, inters",
+          "decisions": [
+            {
+              "lap": 11,
+              "kind": "pit",
+              "compound": "INTERMEDIATE"
+            }
+          ]
+        },
+        {
+          "id": "box-wet",
+          "label": "Box, wets",
+          "decisions": [
+            {
+              "lap": 11,
+              "kind": "pit",
+              "compound": "WET"
+            }
+          ]
+        },
+        {
+          "id": "box-next-intermediate",
+          "label": "Box next lap, inters",
+          "decisions": [
+            {
+              "lap": 12,
+              "kind": "pit",
+              "compound": "INTERMEDIATE"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "box-soft"
+    },
+    {
+      "id": "sc-16",
+      "lap": 16,
+      "trigger": "SC",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "Stay out",
+          "decisions": []
+        },
+        {
+          "id": "box-soft",
+          "label": "Box, softs",
+          "decisions": [
+            {
+              "lap": 16,
+              "kind": "pit",
+              "compound": "SOFT"
+            }
+          ]
+        },
+        {
+          "id": "box-medium",
+          "label": "Box, mediums",
+          "decisions": [
+            {
+              "lap": 16,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "box-hard",
+          "label": "Box, hards",
+          "decisions": [
+            {
+              "lap": 16,
+              "kind": "pit",
+              "compound": "HARD"
+            }
+          ]
+        },
+        {
+          "id": "box-intermediate",
+          "label": "Box, inters",
+          "decisions": [
+            {
+              "lap": 16,
+              "kind": "pit",
+              "compound": "INTERMEDIATE"
+            }
+          ]
+        },
+        {
+          "id": "box-wet",
+          "label": "Box, wets",
+          "decisions": [
+            {
+              "lap": 16,
+              "kind": "pit",
+              "compound": "WET"
+            }
+          ]
+        },
+        {
+          "id": "box-next-intermediate",
+          "label": "Box next lap, inters",
+          "decisions": [
+            {
+              "lap": 17,
+              "kind": "pit",
+              "compound": "INTERMEDIATE"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "stay"
+    },
+    {
+      "id": "battle-21",
+      "lap": 21,
+      "trigger": "SC",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "defend",
+          "label": "Defend hard",
+          "decisions": [
+            {
+              "lap": 21,
+              "kind": "mode",
+              "key": "battle",
+              "value": "defend"
+            }
+          ]
+        },
+        {
+          "id": "hold",
+          "label": "Hold the line",
+          "decisions": [
+            {
+              "lap": 21,
+              "kind": "mode",
+              "key": "battle",
+              "value": "hold"
+            }
+          ]
+        },
+        {
+          "id": "attack",
+          "label": "Attack",
+          "decisions": [
+            {
+              "lap": 21,
+              "kind": "mode",
+              "key": "battle",
+              "value": "attack"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "stop-49",
+      "lap": 49,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "Stay out",
+          "decisions": []
+        },
+        {
+          "id": "box-soft",
+          "label": "Box, softs",
+          "decisions": [
+            {
+              "lap": 49,
+              "kind": "pit",
+              "compound": "SOFT"
+            }
+          ]
+        },
+        {
+          "id": "box-medium",
+          "label": "Box, mediums",
+          "decisions": [
+            {
+              "lap": 49,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "box-hard",
+          "label": "Box, hards",
+          "decisions": [
+            {
+              "lap": 49,
+              "kind": "pit",
+              "compound": "HARD"
+            }
+          ]
+        },
+        {
+          "id": "box-intermediate",
+          "label": "Box, inters",
+          "decisions": [
+            {
+              "lap": 49,
+              "kind": "pit",
+              "compound": "INTERMEDIATE"
+            }
+          ]
+        },
+        {
+          "id": "box-wet",
+          "label": "Box, wets",
+          "decisions": [
+            {
+              "lap": 49,
+              "kind": "pit",
+              "compound": "WET"
+            }
+          ]
+        },
+        {
+          "id": "box-next-hard",
+          "label": "Box next lap, hards",
+          "decisions": [
+            {
+              "lap": 50,
+              "kind": "pit",
+              "compound": "HARD"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "box-soft"
+    },
+    {
+      "id": "stop-61",
+      "lap": 61,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "Stay out",
+          "decisions": []
+        },
+        {
+          "id": "box-soft",
+          "label": "Box, softs",
+          "decisions": [
+            {
+              "lap": 61,
+              "kind": "pit",
+              "compound": "SOFT"
+            }
+          ]
+        },
+        {
+          "id": "box-medium",
+          "label": "Box, mediums",
+          "decisions": [
+            {
+              "lap": 61,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "box-hard",
+          "label": "Box, hards",
+          "decisions": [
+            {
+              "lap": 61,
+              "kind": "pit",
+              "compound": "HARD"
+            }
+          ]
+        },
+        {
+          "id": "box-intermediate",
+          "label": "Box, inters",
+          "decisions": [
+            {
+              "lap": 61,
+              "kind": "pit",
+              "compound": "INTERMEDIATE"
+            }
+          ]
+        },
+        {
+          "id": "box-wet",
+          "label": "Box, wets",
+          "decisions": [
+            {
+              "lap": 61,
+              "kind": "pit",
+              "compound": "WET"
+            }
+          ]
+        },
+        {
+          "id": "box-next-intermediate",
+          "label": "Box next lap, inters",
+          "decisions": [
+            {
+              "lap": 62,
+              "kind": "pit",
+              "compound": "INTERMEDIATE"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "box-intermediate"
+    },
+    {
+      "id": "red-64",
+      "lap": 64,
+      "trigger": "RED",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "Stay out",
+          "decisions": []
+        },
+        {
+          "id": "box-soft",
+          "label": "Box, softs",
+          "decisions": [
+            {
+              "lap": 64,
+              "kind": "pit",
+              "compound": "SOFT"
+            }
+          ]
+        },
+        {
+          "id": "box-medium",
+          "label": "Box, mediums",
+          "decisions": [
+            {
+              "lap": 64,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "box-hard",
+          "label": "Box, hards",
+          "decisions": [
+            {
+              "lap": 64,
+              "kind": "pit",
+              "compound": "HARD"
+            }
+          ]
+        },
+        {
+          "id": "box-intermediate",
+          "label": "Box, inters",
+          "decisions": [
+            {
+              "lap": 64,
+              "kind": "pit",
+              "compound": "INTERMEDIATE"
+            }
+          ]
+        },
+        {
+          "id": "box-wet",
+          "label": "Box, wets",
+          "decisions": [
+            {
+              "lap": 64,
+              "kind": "pit",
+              "compound": "WET"
+            }
+          ]
+        },
+        {
+          "id": "box-next-intermediate",
+          "label": "Box next lap, inters",
+          "decisions": [
+            {
+              "lap": 65,
+              "kind": "pit",
+              "compound": "INTERMEDIATE"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "box-intermediate"
+    }
+  ],
   "candidateMomentLaps": [
     10,
     11,
@@ -1173,8 +1634,8 @@
     "LEC",
     "SAR"
   ],
-  "userSide": "ALO",
-  "rival": "VER",
+  "userSide": "VER",
+  "rival": "ALO",
   "weather": {
     "curves": {
       "slick": {
@@ -1254,20 +1715,46 @@
       0.01,
       0.01,
       0.02,
-      0.06,
-      0.09,
-      0.08,
-      0.06,
-      0.05,
-      0.02,
-      0.01,
-      0.02,
       0.07,
-      0.09,
-      0.09,
-      0.1,
-      0.09
+      0.31,
+      0.33,
+      0.34,
+      0.35,
+      0.36,
+      0.4,
+      0.45,
+      0.36,
+      0.32,
+      0.31,
+      0.31,
+      0.32
     ]
+  },
+  "eras": {
+    "eraId": 10,
+    "order": 5,
+    "userSide": "VER",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Verstappen starts on pole, but heavy rain on the first lap sends P\u00e9rez in for intermediates, then Verstappen and Alonso a lap later, and P\u00e9rez takes the lead. Verstappen goes back to slicks a lap before P\u00e9rez and leads from lap 12. The rain returns late, Zhou's crash brings out the red flag, and Verstappen wins the six-lap run to the flag on intermediates by 3.744 s from Alonso: his ninth win in a row, equalling Vettel's record."
+    },
+    "mastery": {
+      "type": "margin",
+      "seconds": 3.7,
+      "label": "Win by more than 3.7 seconds"
+    },
+    "hidden": {
+      "type": "compound_rule",
+      "mustAvoid": "WET",
+      "label": "Never fit the full wet tyre"
+    },
+    "hardCalls": {
+      "ALO": 1,
+      "VER": 5
+    },
+    "briefing": "Zandvoort, 2023. Rain on the opening laps has the leaders on intermediates. You run Verstappen from pole, second and 6.1 s behind P\u00e9rez after eight laps, and the track is drying. Win at home, and watch the sky: the rain isn't done."
   },
   "provenance": {
     "kind": "real",

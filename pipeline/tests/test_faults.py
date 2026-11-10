@@ -548,3 +548,17 @@ def test_hungary_1997_fits_hills_last_laps_hydraulic_failure():
     # last lap there, and one pass roll decides it.)
     runs = [sim_reference.simulate(result.model, s)["times"] for s in range(1, 41)]
     assert np.mean([t["HIL"] - t["VIL"] for t in runs]) > 5.0
+
+
+def test_without_laps_drops_only_the_named_cars_laps():
+    frame = pd.DataFrame({"Driver": ["VER", "VER", "VER", "PER"], "LapNumber": [20, 21, 22, 21]})
+    kept = faults.without_laps(frame, {"VER": [21, 22]})
+    assert list(zip(kept["Driver"], kept["LapNumber"], strict=True)) == [("VER", 20), ("PER", 21)]
+    assert faults.without_laps(frame, None) is frame
+
+
+def test_pace_skip_is_registered_only_for_saudi_arabia_2023():
+    # Data-keyed (sourced laps, docs/eras-checks/fix-saudi-arabia-2023.md): no other race's
+    # fit changes.
+    assert [r for r, m in build.RACES.items() if m.get("pace_skip")] == ["saudi-arabia-2023"]
+    assert build.RACES["saudi-arabia-2023"]["pace_skip"] == {"VER": [21, 22]}

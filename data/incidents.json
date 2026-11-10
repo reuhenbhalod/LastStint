@@ -281,6 +281,60 @@
    "source": "https://api.openf1.org/v1/race_control?session_key=7953"
   }
  ],
+ "japan-2023": [
+  {
+   "lap": 14,
+   "type": "VSC",
+   "cars": [
+    "PER",
+    "MAG"
+   ],
+   "status": "Debris",
+   "source": "https://api.openf1.org/v1/race_control?session_key=9173",
+   "note": "Race control: VSC deployed and ending on lap 14 (lap 14 in the built model too), for debris after P\u00e9rez hit Magnussen at turn 11 (https://en.wikipedia.org/wiki/2023_Japanese_Grand_Prix). The lap-1 SC (Bottas/Albon debris, in on lap 4) is before the takeover"
+  },
+  {
+   "lap": 27,
+   "type": "TEAM_ORDER",
+   "driver": "PIA",
+   "passer": "NOR",
+   "detail": "McLaren swapped its cars on the hards after discussing Russell's one-stop threat: Piastri let Norris back into second",
+   "source": "https://www.autosport.com/f1/news/10-things-we-learned-at-the-2023-f1-japanese-grand-prix/10525290/ https://www.grandprix.com/races/japanese-gp-2023-race-notes.html",
+   "note": "Autosport's '10 things' gives no lap; GrandPrix.com's race notes put Norris back in second in the lap-26 entries and record no order. The timing (FastF1) has PIA ahead of NOR at the end of lap 26 and NOR ahead from the end of lap 27, kept as the sims' lap"
+  },
+  {
+   "lap": 49,
+   "type": "TEAM_ORDER",
+   "driver": "RUS",
+   "passer": "HAM",
+   "detail": "Mercedes told Russell to swap places; Hamilton went by at the first corner to take fifth",
+   "source": "https://www.grandprix.com/races/japanese-gp-2023-race-notes.html https://www.autosport.com/f1/news/10-things-we-learned-at-the-2023-f1-japanese-grand-prix/10525290/",
+   "note": "Lap 49 in GrandPrix.com's race notes (Autosport: with five laps left); the timing (FastF1) has HAM ahead of RUS from the end of lap 49"
+  }
+ ],
+ "great-britain-2023": [
+  {
+   "lap": 33,
+   "type": "SC",
+   "driver": "MAG",
+   "status": "Retired",
+   "source": "https://api.openf1.org/v1/race_control?session_key=9126",
+   "note": "Race control: VSC then SC deployed on lap 33, SC in on lap 38 (the built model has one SC from lap 33, 6 laps); Magnussen's engine failed on the Wellington straight (https://www.autosport.com/f1/news/f1-british-gp-race-report/10493893/); Jolpica status Retired (31 laps)"
+  }
+ ],
+ "abu-dhabi-2022": [],
+ "emilia-romagna-2024": [],
+ "netherlands-2021": [],
+ "saudi-arabia-2023": [
+  {
+   "lap": 18,
+   "type": "SC",
+   "driver": "STR",
+   "status": "Retired",
+   "source": "https://api.openf1.org/v1/race_control?session_key=7779",
+   "note": "Race control: SC deployed on lap 18, in this lap on lap 20 (the built model has one SC from lap 18, 3 laps); Stroll stopped on track (https://en.wikipedia.org/wiki/2023_Saudi_Arabian_Grand_Prix, lap 17; GrandPrix.com lap 18); Jolpica status Retired (16 laps)"
+  }
+ ],
  "great-britain-2021": [
   {
    "lap": 40,

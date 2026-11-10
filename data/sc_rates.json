@@ -15,16 +15,16 @@
   "lengths": {
     "scLaps": 5,
     "vscLaps": 2,
-    "scPeriodsMeasured": 157,
+    "scPeriodsMeasured": 159,
     "vscPeriodsMeasured": 72
   },
   "allTracks": {
-    "races": 219,
-    "vscRaces": 163,
-    "scPeriods": 161,
-    "vscPeriods": 77,
-    "scPerRace": 0.7352,
-    "vscPerRace": 0.4724
+    "races": 224,
+    "vscRaces": 168,
+    "scPeriods": 163,
+    "vscPeriods": 78,
+    "scPerRace": 0.7277,
+    "vscPerRace": 0.4643
   },
   "circuits": {
     "albert_park": {
@@ -182,15 +182,16 @@
     },
     "imola": {
       "name": "Autodromo Enzo e Dino Ferrari",
-      "races": 1,
-      "vscRaces": 0,
+      "races": 2,
+      "vscRaces": 1,
       "scPeriods": 0,
       "vscPeriods": 0,
-      "scPerRace": 0.7352,
-      "vscPerRace": 0.4724,
+      "scPerRace": 0.7277,
+      "vscPerRace": 0.4643,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
+        "emilia-romagna-2024 (fastf1): 0 SC, 0 VSC",
         "san-marino-2005 (jolpica-estimate): 0 SC, 0 VSC"
       ]
     },
@@ -200,8 +201,8 @@
       "vscRaces": 0,
       "scPeriods": 0,
       "vscPeriods": 0,
-      "scPerRace": 0.7352,
-      "vscPerRace": 0.4724,
+      "scPerRace": 0.7277,
+      "vscPerRace": 0.4643,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -240,8 +241,8 @@
       "vscRaces": 2,
       "scPeriods": 0,
       "vscPeriods": 0,
-      "scPerRace": 0.7352,
-      "vscPerRace": 0.4724,
+      "scPerRace": 0.7277,
+      "vscPerRace": 0.4643,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -251,17 +252,18 @@
     },
     "jeddah": {
       "name": "Jeddah Corniche Circuit",
-      "races": 3,
-      "vscRaces": 3,
-      "scPeriods": 3,
+      "races": 4,
+      "vscRaces": 4,
+      "scPeriods": 4,
       "vscPeriods": 2,
       "scPerRace": 1.0,
-      "vscPerRace": 0.6667,
+      "vscPerRace": 0.5,
       "scFallback": false,
       "vscFallback": false,
       "counted": [
         "saudi-arabia-2021 (jolpica-estimate): 1 SC, 0 VSC",
         "saudi-arabia-2022 (fastf1): 1 SC, 2 VSC",
+        "saudi-arabia-2023 (fastf1): 1 SC, 0 VSC",
         "saudi-arabia-2025 (fastf1): 1 SC, 0 VSC"
       ]
     },
@@ -271,8 +273,8 @@
       "vscRaces": 0,
       "scPeriods": 0,
       "vscPeriods": 0,
-      "scPerRace": 0.7352,
-      "vscPerRace": 0.4724,
+      "scPerRace": 0.7277,
+      "vscPerRace": 0.4643,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -285,8 +287,8 @@
       "vscRaces": 0,
       "scPeriods": 0,
       "vscPeriods": 0,
-      "scPerRace": 0.7352,
-      "vscPerRace": 0.4724,
+      "scPerRace": 0.7277,
+      "vscPerRace": 0.4643,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -383,8 +385,8 @@
       "vscRaces": 0,
       "scPeriods": 1,
       "vscPeriods": 0,
-      "scPerRace": 0.7352,
-      "vscPerRace": 0.4724,
+      "scPerRace": 0.7277,
+      "vscPerRace": 0.4643,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -398,8 +400,8 @@
       "vscRaces": 2,
       "scPeriods": 1,
       "vscPeriods": 0,
-      "scPerRace": 0.7352,
-      "vscPerRace": 0.4724,
+      "scPerRace": 0.7277,
+      "vscPerRace": 0.4643,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -512,12 +514,12 @@
     },
     "silverstone": {
       "name": "Silverstone Circuit",
-      "races": 10,
-      "vscRaces": 9,
-      "scPeriods": 9,
-      "vscPeriods": 2,
-      "scPerRace": 0.9,
-      "vscPerRace": 0.2222,
+      "races": 11,
+      "vscRaces": 10,
+      "scPeriods": 10,
+      "vscPeriods": 3,
+      "scPerRace": 0.9091,
+      "vscPerRace": 0.3,
       "scFallback": false,
       "vscFallback": false,
       "counted": [
@@ -530,6 +532,7 @@
         "great-britain-2019 (tum): 1 SC, 0 VSC",
         "great-britain-2021 (fastf1): 1 SC, 0 VSC",
         "great-britain-2022 (jolpica-estimate): 1 SC, 0 VSC",
+        "great-britain-2023 (fastf1): 1 SC, 1 VSC",
         "great-britain-2024 (fastf1): 0 SC, 0 VSC"
       ]
     },
@@ -606,8 +609,8 @@
       "vscRaces": 0,
       "scPeriods": 1,
       "vscPeriods": 0,
-      "scPerRace": 0.7352,
-      "vscPerRace": 0.4724,
+      "scPerRace": 0.7277,
+      "vscPerRace": 0.4643,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -638,12 +641,12 @@
     },
     "yas_marina": {
       "name": "Yas Marina Circuit",
-      "races": 11,
-      "vscRaces": 8,
+      "races": 12,
+      "vscRaces": 9,
       "scPeriods": 6,
       "vscPeriods": 4,
-      "scPerRace": 0.5455,
-      "vscPerRace": 0.5,
+      "scPerRace": 0.5,
+      "vscPerRace": 0.4444,
       "scFallback": false,
       "vscFallback": false,
       "counted": [
@@ -657,20 +660,22 @@
         "abu-dhabi-2019 (tum): 0 SC, 0 VSC",
         "abu-dhabi-2020 (fastf1): 1 SC, 1 VSC",
         "abu-dhabi-2021 (fastf1): 1 SC, 1 VSC",
+        "abu-dhabi-2022 (jolpica-estimate): 0 SC, 0 VSC",
         "abu-dhabi-2024 (fastf1): 0 SC, 1 VSC"
       ]
     },
     "zandvoort": {
       "name": "Circuit Park Zandvoort",
-      "races": 2,
-      "vscRaces": 2,
+      "races": 3,
+      "vscRaces": 3,
       "scPeriods": 2,
       "vscPeriods": 2,
-      "scPerRace": 0.7352,
-      "vscPerRace": 0.4724,
-      "scFallback": true,
-      "vscFallback": true,
+      "scPerRace": 0.6667,
+      "vscPerRace": 0.6667,
+      "scFallback": false,
+      "vscFallback": false,
       "counted": [
+        "netherlands-2021 (jolpica-estimate): 0 SC, 0 VSC",
         "netherlands-2022 (fastf1): 1 SC, 1 VSC",
         "netherlands-2023 (fastf1): 1 SC, 1 VSC"
       ]
