@@ -286,3 +286,34 @@ database page has no report text. No Motor Sport race report was found.
 - Compound for each stint except Räikkönen's 2nd stint and the top 10's last stints.
 - Laps of Rosberg's moves on Hamilton and Alonso (only "after the lap-9 stops" and "lap 23" context).
 - Gap between Räikkönen and Vettel at specific laps other than lap 12 (4.2 s) and after lap 39 (>3 s).
+
+## malaysia-2013 re-authored (Era 6 #9, Webber; not swapped)
+
+malaysia-2013 was authored but not reachable after the integration-8 rebuild (no path earned
+★1). Re-authored on Nov 9 on a local Eras build (`pipeline build malaysia-2013`; robust G1
+pass, 0.90 s). `pipeline hard-calls`: WEB 2, VET 1 (chance given up WEB 15.3, VET 35.3 pts), so
+the side stays Webber. With `win`, the author tool's best option at each stop gave Webber a
+win chance of 7-36%, and reachability found no winning path at either level. Following the
+owner-accepted "position target when beating the draft rival is unreachable" pattern, the
+target is now Webber's real result, P2.
+
+- Target `position` 2 (was `win`). Rewrite stays `win` (Webber didn't really win). Headline
+  unchanged: "Webber keeps Vettel behind and wins in Sepang".
+- Mastery: stop_count exact 3, "Finish second or better on three more stops" (as Webber made).
+  Hidden: compound_rule mustUse HARD, "Finish second or better with a stint on the hard tyre"
+  (Webber's last stint was on hards).
+- Briefing: last sentence now "Bring the car home second or better." (was "Stay ahead of
+  Vettel to the flag.").
+- Moments (`author malaysia-2013 --eras --target position:2 --write`): stop-19 (real
+  box-soft), pace-24, stop-31 (real box-soft), pace-36, stop-43 (real box-hard).
+- Storyline events: none (no SC; the wet start is weather, before the takeover).
+- Reachability: PASS. Era (80, Smart): stop-19 box-soft, pace-24 push, stop-31 box-soft, pace-36
+  push-attack, stop-43 box-hard, accuracy 100, seed 1. Legend (90, Expert): PASS, same path,
+  seed 1. Stay-out: no ★3 at either level.
+
+| Fact | Used in | Source | Owner checked |
+|---|---|---|---|
+| Vettel won, Webber P2 +4.298 s | target, storyline | earlier (6.2-eras7-4: JOL; WP) | |
+| Webber's stops after the lap-16 takeover: out-laps 20, 32 (SOFT), 44 (HARD) | mastery, hidden, moments | earlier (6.2-reauthor-modern: RAW) | |
+| Webber grid 5, Vettel pole; at lap 16 WEB P1, VET 2.4 s behind | briefing | earlier (6.2-reauthor-modern: JOL; RACE) | |
+| Hold-position order after the last stops, Vettel's lap-46 pass | storyline | earlier (6.2-eras7-4: WP) | |

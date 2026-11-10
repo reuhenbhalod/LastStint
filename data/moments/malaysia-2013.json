@@ -4,7 +4,8 @@
     "lap": 19,
     "trigger": "cliff",
     "target": {
-      "kind": "win"
+      "kind": "position",
+      "atBest": 2
     },
     "options": [
       {
@@ -71,82 +72,12 @@
     "realOptionId": "box-soft"
   },
   {
-    "id": "rivalpit-22",
-    "lap": 22,
-    "trigger": "rivalPit",
-    "target": {
-      "kind": "win"
-    },
-    "options": [
-      {
-        "id": "stay",
-        "label": "Stay out",
-        "decisions": []
-      },
-      {
-        "id": "box-soft",
-        "label": "Box, softs",
-        "decisions": [
-          {
-            "lap": 22,
-            "kind": "pit",
-            "compound": "SOFT"
-          }
-        ]
-      },
-      {
-        "id": "box-hard",
-        "label": "Box, hards",
-        "decisions": [
-          {
-            "lap": 22,
-            "kind": "pit",
-            "compound": "HARD"
-          }
-        ]
-      },
-      {
-        "id": "box-intermediate",
-        "label": "Box, inters",
-        "decisions": [
-          {
-            "lap": 22,
-            "kind": "pit",
-            "compound": "INTERMEDIATE"
-          }
-        ]
-      },
-      {
-        "id": "box-wet",
-        "label": "Box, wets",
-        "decisions": [
-          {
-            "lap": 22,
-            "kind": "pit",
-            "compound": "WET"
-          }
-        ]
-      },
-      {
-        "id": "box-next-wet",
-        "label": "Box next lap, wets",
-        "decisions": [
-          {
-            "lap": 23,
-            "kind": "pit",
-            "compound": "WET"
-          }
-        ]
-      }
-    ],
-    "realOptionId": "stay"
-  },
-  {
-    "id": "pace-28",
-    "lap": 28,
+    "id": "pace-24",
+    "lap": 24,
     "trigger": "cliff",
     "target": {
-      "kind": "win"
+      "kind": "position",
+      "atBest": 2
     },
     "options": [
       {
@@ -154,7 +85,7 @@
         "label": "Push now",
         "decisions": [
           {
-            "lap": 28,
+            "lap": 24,
             "kind": "mode",
             "key": "pace",
             "value": "push"
@@ -166,7 +97,7 @@
         "label": "Standard pace",
         "decisions": [
           {
-            "lap": 28,
+            "lap": 24,
             "kind": "mode",
             "key": "pace",
             "value": "standard"
@@ -178,7 +109,7 @@
         "label": "Manage the tyres",
         "decisions": [
           {
-            "lap": 28,
+            "lap": 24,
             "kind": "mode",
             "key": "pace",
             "value": "manage"
@@ -190,13 +121,13 @@
         "label": "Push and attack",
         "decisions": [
           {
-            "lap": 28,
+            "lap": 24,
             "kind": "mode",
             "key": "pace",
             "value": "push"
           },
           {
-            "lap": 28,
+            "lap": 24,
             "kind": "mode",
             "key": "battle",
             "value": "attack"
@@ -211,7 +142,8 @@
     "lap": 31,
     "trigger": "cliff",
     "target": {
-      "kind": "win"
+      "kind": "position",
+      "atBest": 2
     },
     "options": [
       {
@@ -282,7 +214,8 @@
     "lap": 36,
     "trigger": "cliff",
     "target": {
-      "kind": "win"
+      "kind": "position",
+      "atBest": 2
     },
     "options": [
       {
@@ -347,7 +280,8 @@
     "lap": 43,
     "trigger": "cliff",
     "target": {
-      "kind": "win"
+      "kind": "position",
+      "atBest": 2
     },
     "options": [
       {
