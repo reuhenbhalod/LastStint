@@ -7,5 +7,35 @@
     "drs": true,
     "ers": "hybrid",
     "refuelling": false
+  },
+  "eras": {
+    "eraId": 7,
+    "order": 2,
+    "userSide": "HAM",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Rosberg leads from pole and makes each of his three stops first. At the second round of stops Hamilton stays out two laps longer to try to jump him, spins at turn 4 on his worn tyres, and rejoins 7.4 s behind. He is within 0.8 s at the start of the last lap but finishes second, 1.457 s behind.",
+      "rewriteCondition": {
+        "type": "win"
+      },
+      "headline": "Hamilton turns the tables on Rosberg at Interlagos"
+    },
+    "mastery": {
+      "type": "margin",
+      "seconds": 1.5,
+      "label": "Win by more than 1.5 seconds"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 5,
+      "label": "Win by more than 5 seconds"
+    },
+    "hardCalls": {
+      "HAM": 0,
+      "ROS": 0
+    },
+    "briefing": "Interlagos, 2014. Hamilton leads the championship by 24 points, but Rosberg took pole and has led since lap 14. You run Hamilton, second and 1.8 s behind him, 23 laps in, with two stops to make if you follow the plan. Rosberg has stopped first so far. Find a way past him."
   }
 }

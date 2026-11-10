@@ -353,6 +353,52 @@ where a number was not given. No team radio quoted.
   stint 1 not sourced; spin lap differs (GPE ~26 vs WP/Jolpica 28); a two-Mercedes race leaves
   little else in play.
 
+### Authored (B1, Nov 9 2026)
+
+Job `eras-author-brazil-2014` (base `eras-swap-era7`). WP re-read as plain text (MediaWiki
+`action=raw`) on Nov 9 2026; "Timing" is the TUM lap data in `data/raw/brazil-2014.parquet`.
+Storyline, headline and briefing are original wording; no team radio is quoted.
+
+- Side: **HAM**. `pipeline hard-calls brazil-2014`: HAM 0, ROS 0, a tie, broken by chance given
+  up (HAM 89.7 pts, ROS 46.0), as the job rules say.
+- Robust G1 (`pipeline validate brazil-2014 --robust`, Eras build, rules-only overlay): **pass**
+  (strict), mean gap error 1.41 s.
+- Reachability (`pnpm --filter @laststint/sim reachability brazil-2014`): **pass** at era
+  difficulty (threshold 78, Standard+ rival) and at Legend (90, Expert), all three stars and the
+  hidden objective on seed 1; the stay-out path never earns ★1 or ★3.
+
+| Item | Value | Fact it rests on | Source | Owner checked |
+|---|---|---|---|---|
+| Era / slot | Era 7, order 2 (canada-2014's slot) | the swap above | this sheet | |
+| Target | `win` (beat Rosberg) | Rosberg won, Hamilton 2nd +1.457 | WP classification | |
+| Rewrite | allowed (`win`): the side did not win | Hamilton 2nd | WP classification | |
+| Headline | "Hamilton turns the tables on Rosberg at Interlagos" | original wording | - | |
+| Storyline | "Rosberg leads from pole and makes each of his three stops first" | pole 1:10.023; stops ROS 7, 26, 50 and HAM 8, 28, 51 | WP; Jolpica; Timing | |
+| Storyline | "At the second round of stops Hamilton stays out two laps longer to try to jump him, spins at turn 4 on his worn tyres, and rejoins 7.4 s behind" | Rosberg's second stop "on the same lap" (26); Hamilton's "rear tyre locked ... and spun"; "despite his turn four spin"; "made his pit stop on that lap and emerged in second, 7.4 seconds behind"; MS: kept out to try an overcut (row 9) | WP race report and post-race; MS | |
+| Storyline | "He is within 0.8 s at the start of the last lap but finishes second, 1.457 s behind" | "within 0.8 seconds ... at the start of the final lap"; "+1.457" | WP | |
+| Briefing | "Hamilton leads the championship by 24 points" | "316 championship points, 24 ahead of teammate Nico Rosberg" | WP background | |
+| Briefing | "Rosberg took pole and has led since lap 14" | Rosberg overtook Hülkenberg "for the lead ... at the start of lap 14"; Timing: ROS P1 at the end of laps 14-23 | WP; Timing | |
+| Briefing | "second and 1.8 s behind him, 23 laps in" | Timing: HAM P2, 1.77 s behind ROS at the end of lap 23 (the takeover lap, D3 rule) | Timing | |
+| Briefing | "with two stops to make if you follow the plan. Rosberg has stopped first so far" | HAM's later stops 28 and 51; ROS stopped on lap 7, HAM on lap 8 | Jolpica; Timing | |
+| Mastery | `margin` 1.5 s: "Win by more than 1.5 seconds" (beat Rosberg's real margin) | "+1.457" | WP classification | |
+| Hidden | `margin` 5 s: "Win by more than 5 seconds" | the game's choice | - | |
+| storylineEvents | none | no SC, VSC or red flag; no retirement of either storyline car | rows 6, 14 | |
+
+Notes:
+
+- Moments (`pnpm --filter @laststint/sim author brazil-2014 --target win --eras --write`):
+  stop-28, pace-35, cliff-43, pace-47, stop-51, battle-65 (`data/moments/brazil-2014.json`), the
+  author tool's own picks. Real calls: box on 28 and stay on 43 (Hamilton's real stops were 28
+  and 51).
+- Hamilton's lap-28 spin is not in the model (no incident; the player's car is simulated from
+  lap 23), so the lap-28 stay-out does not carry the ~7 s loss. This makes the win reachable on
+  most sensible paths (author grades 85-94% at the stop calls).
+- Rejected hidden objectives (reachability): `stop_count` exact 2 from the takeover (the real
+  count; not reached at era difficulty) and exact 1 (not reached at Legend; the stay-out path
+  also met it, since `stop_count` does not need a win).
+- `data/races/brazil-2014.json` and its golden must be rebuilt by the integrator
+  (`pipeline build brazil-2014`); this branch does not commit them.
+
 ### Sources
 
 | Short name | URL | Read |
