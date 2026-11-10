@@ -190,6 +190,25 @@ The credential is an ID token: Auth0's when `AUTH0_DOMAIN` and `AUTH0_CLIENT_ID`
 | `POST /api/profile` `{ credential, displayName, favouriteTeam }` | Sets the profile and returns `{ displayName, favouriteTeam }`. The name is 3–20 letters, digits, spaces, `_`, `-` or `.`, unique ignoring case. Errors: 400 `bad-name` / `bad-team`, 409 `name-taken`, 404 `no-account` (sign in first). |
 | `GET /api/players/:anonId?today=YYYY-MM-DD` | `{ account, streak }`. `account` is null when signed out; it carries the profile fields above. |
 
+### Versus (docs/versus-spec.md V5)
+
+**Creating and finding a match.**
+- `POST /api/versus` with `{ "track": "monza" }` creates a match and returns `201` with the room: `{ code, track, phase: "lobby", seats }`. The `code` is four letters, A–Z without I and O. The track must be one of `VERSUS_TRACKS` (monza, spa, bahrain, suzuka, hungaroring); any other gives `400 bad-track`.
+- `GET /api/versus/:code` returns the room (`RoomView`), or `404`.
+
+**Playing.**
+- `GET /api/versus/:code/ws` is the match's WebSocket. It goes straight to the match's Durable Object (`VersusRoom`), with no CORS layer.
+- The messages are typed in `packages/sim/src/versusProtocol.ts`.
+- **Joining:** a player joins with `{ t: "join", name, key? }`. The `key` from `welcome` takes the seat back after a reload or a dropped connection.
+- **The car pick:** starts when the second player joins and lasts 30 s. Picks are hidden until both are in.
+- **The race:**
+  - **Laps:** fixed at 8 s each. Every call reaches both players before the `run` message for the lap it acts on.
+  - **Big calls:** they pause both players for up to 14 s. With no answer, the room answers "stay out" (or "hold" in the final laps).
+  - **A dropped player:** the room waits 30 s for them, then their driver answers for them.
+- **Leaving:** `{ t: "leave" }` mid-race forfeits.
+- **The result:** at the flag the room grades both players' calls (`gradeVersus`) and sends `result`.
+- **Storage:** rooms live in memory only, and results aren't stored yet.
+
 ### `GET /api/health`
 
 `{ ok, queueDays }`: how many consecutive days, from today (UTC), have a race scheduled.

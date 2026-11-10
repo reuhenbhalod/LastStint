@@ -28,6 +28,12 @@ export default defineConfig(async () => {
             // Survivor tests deal from two bundled races: Spain 2020 (the real calls win: VER
             // holds BOT) and Canada 2022 (they lose: SAI P2 behind VER).
             SURVIVOR_POOL: JSON.stringify({ 'spain-2020': [85579], 'canada-2022': [592] }),
+            // Versus rooms at test speed: short laps, picks, calls and waits.
+            VERSUS_LAP_MS: '15',
+            VERSUS_PICK_MS: '3000',
+            VERSUS_CALL_MS: '300',
+            VERSUS_RECONNECT_MS: '400',
+            VERSUS_REVEAL_MS: '10',
           },
         },
       }),
