@@ -161,13 +161,9 @@ test('Era 10 lists its published races, and one plays with no Draft badge', asyn
   expect(errors).toEqual([]);
 });
 
-// KNOWN BUG: production lists only published races, keeping their real positions (3 and 8
-// here) and `maxStars` for every race row (30). The era detail (eraDetailState.ts
-// `eraDetailView`) requires positions 1..n and 3 stars per listed race, so a released era with
-// any race unpublished shows "Couldn't load this era (… race positions are not 1..2)". Kept
-// strict and marked as failing until the detail or the Worker is fixed; remove `test.fail` then.
+// Production lists only published races, keeping their real positions (3 and 8 here) and
+// `maxStars` for every race of the era (30). The era detail takes the gaps and keeps the order.
 test('a released era with unpublished races lists only the published ones', async ({ page }) => {
-  test.fail(true, 'known bug: era detail rejects a partly published era (positions, maxStars)');
   const published = ['hungary-2022', 'belgium-2023', ...racesOfEra(9).map((r) => r.raceId)];
   const errors = await mockLaunch(page, { ...LAUNCH, published });
   await page.goto('/eras/10');
@@ -202,7 +198,8 @@ test('a direct link to an unpublished race is refused, not a crash', async ({ pa
   const published = LAUNCH.published.filter((id) => id !== 'monaco-2022');
   const errors = await mockLaunch(page, { ...LAUNCH, published });
   const alert = await refused(page, 'monaco-2022', errors);
-  await expect(alert).toContainText('race-unpublished');
+  await expect(alert).toContainText('This race isn’t available yet.');
+  await expect(alert).not.toContainText('race-unpublished');
 });
 
 test('a direct link to a race of a coming-soon era is refused, not a crash', async ({ page }) => {

@@ -172,15 +172,71 @@ describe('eraDetailView', () => {
     expect(unknown?.blocked).toMatch(/doesn’t have this race/);
   });
 
-  it('rejects a response that does not make sense', () => {
-    const gap = eraDetail(10);
-    gap.races.splice(4, 1);
-    expect(() => eraDetailView(erasResponse(true), { ...gap, maxStars: 27 }, all)).toThrow(
-      /positions are not 1..9/,
+  it('accepts a partly published era: gaps in the positions, the era’s own star total', () => {
+    // Production lists published races only, at their real positions, with maxStars for all.
+    const detail = eraDetail(10, { races: starredRaces(10) });
+    detail.races = detail.races.filter((r) => r.position === 3 || r.position === 8).reverse();
+    const view = eraDetailView(erasResponse(false), detail, all);
+    expect(view.cards.map((c) => c.position)).toEqual([3, 8]);
+    expect(view.cards.map((c) => c.raceId)).toEqual(
+      racesOfEra(10)
+        .filter((_, i) => i === 2 || i === 7)
+        .map((r) => r.raceId),
     );
+    expect(view.maxStars).toBe(30);
+    expect(view.stars).toBe(2);
+    expect(view.racesStarred).toBe(2);
+    // Every listed race has a star, but the era has races not listed: not Cleared.
+    expect(view.cleared).toBe(false);
+    expect(view.cards.every((c) => c.blocked === null)).toBe(true);
+
+    const none = eraDetailView(erasResponse(false), { ...detail, races: [] }, all);
+    expect(none.cards).toEqual([]);
+    expect(none.maxStars).toBe(30);
+  });
+
+  it('leaves a full era as it was', () => {
+    const view = eraDetailView(erasResponse(true), eraDetail(10, { races: starredRaces(10) }), all);
+    expect(view.cards.map((c) => c.position)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    expect(view.maxStars).toBe(30);
+    expect(view.cleared).toBe(true);
+  });
+
+  it('rejects a response that does not make sense', () => {
+    const twice = eraDetail(10);
+    twice.races[4] = { ...(twice.races[4] as EraDetail['races'][number]), position: 4 };
+    expect(() => eraDetailView(erasResponse(true), twice, all)).toThrow(/two races at position 4/);
+    const sameId = eraDetail(10);
+    sameId.races[4] = {
+      ...(sameId.races[4] as EraDetail['races'][number]),
+      raceId: (sameId.races[3] as EraDetail['races'][number]).raceId,
+    };
+    expect(() => eraDetailView(erasResponse(true), sameId, all)).toThrow(/listed twice/);
+    for (const position of [0, 11, 2.5]) {
+      const out = eraDetail(10);
+      out.races = out.races.slice(1);
+      out.races[0] = { ...(out.races[0] as EraDetail['races'][number]), position };
+      expect(() => eraDetailView(erasResponse(true), out, all)).toThrow(
+        new RegExp(`at position ${position}, not 1..10`),
+      );
+    }
     expect(() =>
       eraDetailView(erasResponse(true), { ...eraDetail(10), maxStars: 33 }, all),
-    ).toThrow(/10 races but 33 stars/);
+    ).toThrow(/33 stars to earn, but 30 on the eras list/);
+    expect(() =>
+      eraDetailView(
+        erasResponse(true, { 10: { maxStars: 27 } }),
+        { ...eraDetail(10), maxStars: 27 },
+        all,
+      ),
+    ).toThrow(/10 races but 27 stars/);
+    expect(() =>
+      eraDetailView(
+        erasResponse(true, { 10: { maxStars: 31 } }),
+        { ...eraDetail(10), maxStars: 31 },
+        all,
+      ),
+    ).toThrow();
     const elsewhere = eraDetail(10);
     elsewhere.races[0] = {
       ...(elsewhere.races[0] as EraDetail['races'][number]),

@@ -1,6 +1,7 @@
 import type { RaceModel } from '@laststint/sim';
 import { describe, expect, it } from 'vitest';
-import { EraProvider, eraDailyOf } from './EraProvider.js';
+import { ApiError } from '../api.js';
+import { EraProvider, eraDailyOf, friendlyStartError } from './EraProvider.js';
 import type { AttemptRequest, ErasApi } from './api.js';
 import { ERAS, racesOfEra } from './catalog.js';
 import { mockCanStart, mockErasApi } from './mockErasApi.js';
@@ -175,5 +176,21 @@ describe('mockErasApi', () => {
       rivalPolicy: 'expert',
       decisionTimerSeconds: 20,
     });
+  });
+
+  it('says a race taken down is not available, rather than the server code', async () => {
+    const { api } = recording({
+      startAttempt: async () => {
+        throw new ApiError(403, 'race-unpublished');
+      },
+    });
+    await expect(new EraProvider(MOCK_RACE_ID, false, api).today()).rejects.toThrow(
+      /^This race isn’t available yet\.$/,
+    );
+    // Any other refusal passes through unchanged.
+    const locked = new ApiError(403, 'era-locked');
+    expect(friendlyStartError(locked)).toBe(locked);
+    const offline = new Error('offline');
+    expect(friendlyStartError(offline)).toBe(offline);
   });
 });

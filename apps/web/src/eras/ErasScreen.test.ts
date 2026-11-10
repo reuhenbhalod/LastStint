@@ -266,6 +266,15 @@ describe('Era detail', () => {
     expect(none).not.toContain('>Draft<');
   });
 
+  it('explains Draft in the footnote only on test, where the badge can appear', () => {
+    const onTest = renderDetail(ERA10, detailReady(erasResponse(true), eraDetail(10)));
+    expect(onTest).toContain('Draft: not published yet, so playable on test only.');
+    const inProduction = renderDetail(ERA10, detailReady(erasResponse(false), eraDetail(10)));
+    expect(inProduction).not.toContain('Draft:');
+    expect(inProduction).toContain('Reconstructed: rebuilt from race reports');
+    expect(inProduction).toContain('Hidden objective: a new challenge');
+  });
+
   it('offers Legend only once the era is Cleared, with its progress shown apart', () => {
     const at9 = renderDetail(
       ERA10,
