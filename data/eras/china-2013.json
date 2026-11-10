@@ -7,5 +7,33 @@
     "drs": true,
     "ers": "kers",
     "refuelling": false
-  }
+  },
+  "eras": {
+    "eraId": 6,
+    "order": 8,
+    "userSide": "ALO",
+    "hardCalls": {
+      "ALO": 2,
+      "RAI": 1
+    },
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Alonso starts third on softs, gets past Hamilton in the opening laps and makes the first of his three stops on lap 6. He takes the lead from Vettel on lap 28 and wins by 10.168 s. Räikkönen finishes second with a nose damaged against Pérez's McLaren, and Hamilton holds third from Vettel by 0.203 s."
+    },
+    "mastery": {
+      "type": "margin",
+      "seconds": 5,
+      "label": "Win by more than 5 seconds"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "manage",
+      "maxLaps": 0,
+      "label": "Never back off to save tyres"
+    },
+    "briefing": "Shanghai, 2013. You run Alonso, second after 18 laps on his second set of tyres, 0.8 s behind Button's McLaren, which has yet to stop. Hamilton is third and Räikkönen fourth, five seconds back. The softs last only a handful of laps. Bring Alonso home first."
+  },
+  "storylineEvents": []
 }
