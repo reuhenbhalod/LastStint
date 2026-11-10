@@ -56,6 +56,22 @@ describe('fault, storyline and team-order radio', () => {
     expect(radio(yields, true)).toEqual([{ from: 'Pit board', text: 'LET BER BY' }]);
   });
 
+  it('tells a dry tank: lifting while it runs on, stopped when it is out', () => {
+    const fuel = (detail: string): RaceNote => ({ lap: 10, kind: 'fuel', driver: 'SEN', detail });
+    const lift = [{ from: 'SEN', text: 'I’m out of fuel! I have to lift everywhere now.' }];
+    expect(radio([fuel('empty')])).toEqual(lift);
+    expect(radio([fuel('empty')], true)).toEqual(lift);
+    const stopped = [{ from: 'SEN', text: 'No fuel left, the car’s stopped. I’m out.' }];
+    const wall = [{ from: 'Pit wall', text: 'SEN is out of fuel. The car has stopped.' }];
+    expect(radio([fuel('out')])).toEqual(stopped);
+    expect(radio([fuel('out')], true)).toEqual(wall);
+    // A fuel-limit race notes 'empty' then 'out' on the lap the car stops: only the stop is told.
+    expect(radio([fuel('empty'), fuel('out')])).toEqual(stopped);
+    expect(radio([fuel('empty'), fuel('out')], true)).toEqual(wall);
+    // Another car stopping does not silence the player's lift line.
+    expect(radio([fuel('empty'), { ...fuel('out'), driver: 'BER' }])).toEqual(lift);
+  });
+
   it('says nothing for other cars or other laps', () => {
     expect(
       radio([
