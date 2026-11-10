@@ -171,6 +171,36 @@ Note: round 17 in Jolpica is Qatar. Japan 2023 is **round 16** (Jolpica-r confir
 - Last-lap pass: none. Hamilton held off Sainz to the line.
 - Suzuka is not a Monaco-style track.
 
+### Authored (B1, Nov 9)
+
+Built with `user_side` RUS / `rival` HAM (`build.py`; before, the holdout entry's automatic
+duel was NOR vs VER, where the counter gave VER 3, NOR 0); takeover lap 11 (D3 rule). Robust G1
+after the change (Eras build, with the two team orders below): pass, 1.97 s (2.35 s before the
+team orders). Reachability: era and Legend reachable, stay-out never ★3.
+
+Timing: lap-end positions and gaps from the race's FastF1 snapshot (`data/raw/japan-2023.parquet`).
+
+| Item | As authored | Basis | Owner checked |
+|---|---|---|---|
+| Side | **Russell.** `pipeline hard-calls`: RUS 2, HAM 1 (chance given up RUS 4.0 pts, HAM 0.7). | hard-call counter | |
+| Team order (McLaren) | `TEAM_ORDER` lap 27, PIA lets NOR by (`data/incidents.json`). AS10: Norris came back past after discussion of Russell's one-stop threat, Piastri slower on the hards (no lap). GPE: "Norris gets by on fresher tyres for second place" in its lap-26 entries (no order mentioned). Timing: PIA ahead at the end of lap 26 (0.4 s), NOR ahead from the end of lap 27, so 27 is the sims' lap. | AS10, GPE, Timing | |
+| Team order (Mercedes) | `TEAM_ORDER` lap 49, RUS lets HAM by. GPE lap 49: "Mercedes gives Russell the instruction to swap places, and Hamilton goes by Russell at the first corner to take fifth place." AS10: with five laps left, after a radio protest (not quoted). Timing: HAM ahead from the end of lap 49. For the player it is a comply/ignore call (moment `teamorder-49-ham`; real option comply). | GPE, AS10, Timing | |
+| Target | `position: 6` (Russell sixth or better). The draft `beat-rival` HAM was tried first: the grader gives Russell at most ~9-10% at any call against Hamilton's two-stop, and no path on the reachability seeds beat him at era difficulty or Legend, so it was dropped. Sixth means beating Sainz (6th) or a car ahead. | author and reachability output | |
+| Rewrite | Yes, `position: 6`: Russell really finished 7th (Jolpica-r). Headline (original): "Russell turns Suzuka's split strategy into sixth". | Jolpica-r | |
+| Storyline text | Verstappen wins by 19.4 s; Russell runs long on his first mediums and stops once while Hamilton stops twice; with five laps left Mercedes swaps them, Sainz passes Russell too, and Russell finishes 7th, 8.3 s behind Hamilton in 5th (57.659 − 49.376). | Result, Russell stops, Hamilton stops, Russell passed, Mercedes orders rows; AS10 (19.4 s) | |
+| Briefing | Verstappen leads from pole with the two McLarens behind him; Russell eighth after ten laps on mediums, right behind Hamilton (7th); Mercedes splits its strategies. Positions after ten laps from the timing; starting compound from OF1-s. | Grid row, Russell stops row, Timing | |
+| Mastery | `stop_count` exact 2, "Finish sixth or better on two stops" (a counterfactual: Russell really stopped once; no clean one-stop path reached ★1 on the reachability seeds). | reachability | |
+| Hidden | `compound_rule` mustUse SOFT, "Finish sixth or better with a stint on softs". | — | |
+| storylineEvents | `[14, "VSC"]` (the Pérez/Magnussen debris VSC, kept in Legend too, so the cheap-stop call is always there). | VSC row | |
+| Moments | Hand-adjusted. The author tool (`author japan-2023 --target position:6 --eras`) kept vsc-14, pace-19, stop-24, pace-27 but offered only one-stop answers (its later calls graded "no-choice"), and with them neither difficulty was reachable. Authored: vsc-14 (author's; real stay), stop-17 (stay / mediums / hards; real stay, the lap the leaders stop), stop-24 (author's; real box hards), stop-39 (stay / softs / mediums / hards; real stay, after Hamilton's second stop), teamorder-49-ham (comply / ignore; real comply). Every option is graded by the grader as live play grades it. | author and reachability output | |
+| Reachability paths | Era (seed 1): box mediums under the VSC, stay at 17 and 24, softs at 39, comply: ★1 ★2 ★3, hidden. Legend (seed 1): stay under the VSC, mediums at 17, stay at 24, softs at 39, comply: ★1 ★2 ★3, hidden. Stay-out never earns ★3 (it stops once). | reachability | |
+
+Fetch note: AS10's wording came through a fetch tool that summarises pages; check the two
+team-order rows against the article.
+
+Schema: `teamOrder` is added to the moment `trigger` enum in `packages/schema/race-model.schema.json`
+(the sim's `DecisionMoment` type already had it; no race file used it before this one).
+
 ## emilia-romagna-2024 (2024 Emilia Romagna Grand Prix)
 
 ### Sources
