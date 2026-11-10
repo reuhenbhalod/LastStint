@@ -432,6 +432,57 @@ confirming.
 Not used: the Motor Sport report URL returned 404; an Autosport "post-race press conference: Abu
 Dhabi" page turned out to be 2010 and was discarded.
 
+### Authored content (B1, Nov 9)
+
+Eras job B1, built and checked on branch `eras-author-abu-dhabi-2011-p3` (base
+`eras-swap-era6-p3`). Storyline and briefing are original wording; no team radio is quoted.
+Every fact rests on a row in **Facts** above (read Nov 9, 2026) or on the race's timing.
+
+- Robust G1 (`pipeline validate abu-dhabi-2011 --robust`, Eras build of this branch): **pass**
+  (strict), mean gap error 0.87 s (same figure as the swap job).
+- Side (`pipeline hard-calls abu-dhabi-2011`): HAM 3, ALO 1 (chance given up HAM 1.7, ALO 108.0
+  pts). Hamilton really won, so no rewrite.
+- Reachability (`pnpm --filter @laststint/sim reachability abu-dhabi-2011`): **pass** at era
+  difficulty (threshold 80, Smart rival) and at Legend (90, Expert rival): all three stars and
+  the hidden objective on seed 1 (rivalpit-16 box-hard, pace-21 standard, cliff-26 stay, stop-40
+  box-soft at era difficulty; stop-40 stay at Legend). The stay-out path never earns ★1 or ★3 at
+  either level, nor the hidden objective (it can earn ★2).
+- Moments (`pnpm --filter @laststint/sim author abu-dhabi-2011 --target win --eras --write`):
+  rivalpit-16, pace-21, cliff-26 (`data/moments/abu-dhabi-2011.json`), plus **stop-40 added by
+  hand** (the spec's dilemma: box first to cover Alonso, or stay out). The tool graded stop-40
+  "no-choice" (stay 100%, box-soft 100%, box-hard and box-next-hard 98%); it is kept so the
+  real second stop can be played. Real options: rivalpit-16 box-hard, cliff-26 stay, stop-40
+  box-soft; pace-21 has none. Takeover lap 13 (build): Hamilton P1, Alonso P2 2.347 s behind,
+  both on 13-lap-old softs.
+- **Compounds in the model differ from the sources.** The build's compound estimate (no tyre
+  data for 2011) gives Hamilton soft, then the prime (labelled HARD) from lap 17, then soft from
+  lap 41; GPE has softs at the first stop and mediums at the second. So the real options above
+  are "Box, hards" on lap 16 and "Box, softs" on lap 40. The storyline and briefing name no
+  compound after the start for this reason. A tyre-facts override for dry compounds would be
+  model work (B3); not done here.
+
+| Item | Value | Fact it rests on | Source | Owner checked |
+|---|---|---|---|---|
+| Side | HAM (hard calls HAM 3, ALO 1; `pipeline hard-calls`) | the grader, not a fact | - | |
+| Target | `defend` (spec §4: "defend: Hamilton holds P1") | Hamilton led from lap 1 after Vettel's retirement and won | WP, GPE, Jolpica | |
+| Rewrite | none: the side really won | Hamilton 1st, Alonso +8.457 | Jolpica, GPE | |
+| Storyline | "Vettel leads into the first corner from pole, then spins at Turn 2 with a punctured right-rear tyre and is out on the first lap" | Vettel pole; led into Turn 1, spun at Turn 2 with a punctured right-rear, retired (Jolpica: 1 lap, "Puncture") | WP, GPE, Jolpica | |
+| Storyline | "so Hamilton leads with Alonso second" | Hamilton led from there; Alonso passed Webber and Button for 2nd | GPE | |
+| Storyline | "Both make their first stop on lap 16" | Jolpica pit data: HAM and ALO lap 16 (GPE: lap 17) | Jolpica, GPE | |
+| Storyline | "McLaren bring Hamilton in again on lap 40; Ferrari keep Alonso out three laps longer on old tyres, and he rejoins more than four seconds behind" | Jolpica: HAM lap 40, ALO lap 43; rejoined 4.5 s behind (computed) / 4.4 s (GPE); "ran three laps longer on softs" | Jolpica, GPE | |
+| Storyline | "Hamilton wins by 8.457 s, and for the only time in 2011 no Red Bull is on the podium" | Alonso +8.457; only race of 2011 with no Red Bull on the podium | Jolpica, GPE, WP | |
+| Briefing | "Vettel's pole came to nothing: a right-rear puncture put him out on the first lap" | as above | WP, GPE, Jolpica | |
+| Briefing | "leading after 13 laps, 2.3 s clear of Alonso's Ferrari, both on softs" | build state at takeover (lap 13): HAM P1, ALO P2 2.347 s (sum of Jolpica lap times); the front nine started on softs and neither stopped before lap 16 | build, Jolpica, GPE | |
+| Mastery | `margin` 8 s: "Win by more than 8 seconds" | Alonso +8.457 (8.5 s was not reached at Legend; 8 s was) | Jolpica | |
+| Hidden | `mode_rule` push at most 0 laps: "Win without a single push lap" (as bahrain-2012) | the game's choice | - | |
+| storylineEvents | none | Vettel's retirement is before the takeover; no SC, VSC or red flag; the retirements after the takeover (d'Ambrosio, Buemi, Ricciardo) are not part of the story | WP, GPE, Jolpica | |
+
+Rejected objectives (reachability): mastery `margin` 8.5 s (met at era difficulty, not at
+Legend); hidden `stop_count` exact 2 (the stay-out path met it too).
+
+`data/races/abu-dhabi-2011.json`, its golden and `races.gen.ts` are for the integrator to
+rebuild (`pipeline build abu-dhabi-2011`); this branch does not commit them.
+
 ## china-2013 (2013 Chinese Grand Prix; Era 6 #8, replaces brazil-2012)
 
 **Side and target.** `pipeline hard-calls` (local run): ALO 2, RAI 1 (chance given up ALO 1.7, RAI 1.7 pts), so the race is drafted from Alonso's side, not the Vettel draft in the proposal below. Alonso really won, so no rewrite. Spec §4 draft: "Ferrari's softs last only a handful of laps: commit Alonso to three stops and find a way past the cars running long on mediums"; target `win: Alonso from P3`. Sourced in the facts below: soft "guaranteed a pitstop within a handful of laps" (MS), Alonso's three stops and soft start, Vettel and Hülkenberg starting on mediums, Alonso fast through traffic on mediums (AS). OpenF1 has no 2013 data and TUM starts in 2014, so there is no timing source for track status or per-stint compounds. No GrandPrix.com 2013 race report or notes page was found by search; the Autosport live-text archive (live.autosport.com) refused the connection.
