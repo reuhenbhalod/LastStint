@@ -7,5 +7,37 @@
     "drs": true,
     "ers": "hybrid",
     "refuelling": false
-  }
+  },
+  "eras": {
+    "eraId": 8,
+    "order": 1,
+    "userSide": "VET",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Hamilton leads from pole, but his tyres overheat on a hot track. He stops on lap 17 and rejoins behind Verstappen, who has not stopped yet, and can't find a way past. Ferrari keep Vettel out until lap 23: he rejoins ahead of them both and wins by 9.975 s."
+    },
+    "mastery": {
+      "type": "margin",
+      "seconds": 8,
+      "label": "Win by more than 8 seconds"
+    },
+    "hidden": {
+      "type": "stop_count",
+      "exact": 1,
+      "label": "Win on one stop"
+    },
+    "hardCalls": {
+      "VET": 1,
+      "HAM": 1
+    },
+    "briefing": "Melbourne, 2017. Hamilton started on pole and leads; you run Vettel second, 1.5 s behind him after 14 laps. It's hot, and the Mercedes is struggling with its tyres. Hamilton will stop first, and Verstappen, fifth, will still be out when he does."
+  },
+  "storylineEvents": [
+    [
+      15,
+      "RETIREMENT"
+    ]
+  ]
 }
