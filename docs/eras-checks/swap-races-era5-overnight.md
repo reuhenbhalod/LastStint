@@ -30,7 +30,7 @@ mean gap error leave: hungary-2006 (11.35 s), china-2007 (7.62 s), brazil-2006 (
 brazil-2008 (5.57 s), japan-2005 (4.48 s), brazil-2009 (3.77 s) and monaco-2008. monaco-2008 and
 europe-2007 tie at 2.48 s in the report; re-run here at full precision (robust G1, one race per
 call, on this branch's base) monaco-2008 is 2.4784 s and europe-2007 2.4771 s, so monaco-2008
-leaves. europe-2007 (2.48 s) and brazil-2007 (2.00 s) stay in Era 5, still failing G1.
+leaves. europe-2007 (2.48 s) and brazil-2007 (2.00 s) stay in Era 5, still failing G1. (Both left later the same night, in the third batch below.)
 
 The replacements, best first (robust G1 mean gap error from the Era 5 scout run, on race files
 rebuilt here byte-identical): france-2007 0.57 s, great-britain-2007 0.58 s, san-marino-2006
@@ -67,6 +67,45 @@ reuse copies (bahrain-2006 from bahrain-2021, turkey-2008 from turkey-2021); see
 `2.5-track-maps.md`. The lap-1 safety cars of san-marino-2006 and turkey-2008 are not in the
 built race models (see `2.6-drivers-incidents.md`). The removed races keep their overlays,
 race files and build entries: tests use them as Eras-build fixtures.
+
+## Third batch (Nov 9): europe-2007 and brazil-2007
+
+The last two Era 5 races that fail G1 are replaced the same way, each in the old race's slot.
+D1 migration 0026 (`apps/worker/migrations/0026_swap_eras_races_era5_b.sql`) renames the two
+`era_races` rows and deletes the removed races' attempts, progress and history entries.
+
+| Era / slot | Removed | Removed race's robust G1 (fail; mean gap error, main failing check) | Replacement | Replacement's robust G1 (Eras build, rules-only overlay) | Provisional build pair (`build.py`) |
+|---|---|---|---|---|---|
+| 5 / #6 | `europe-2007` | 2.48 s, pace in the late rain: duel ALO vs MAS | `belgium-2009` | pass, 0.51 s (strict pass) | FIS vs RAI |
+| 5 / #7 | `brazil-2007` | 2.00 s, the second-stop swap and Rosberg's train: field ROS | `hungary-2007` | pass, 1.85 s (strict pass) | HAM vs RAI |
+
+**How the races were picked.** The removed races' figures are from `docs/eras-races-report.md`
+(integration p2). The replacements were picked by robust-G1 mean gap error from a second Era 5
+scout round (ingest from Jolpica and F1DB, rules-only overlays); the figures above were
+re-measured on this branch (robust G1, one race per call, race files built here from the same
+ingest). The better replacement goes into the worse race's slot: belgium-2009 for europe-2007,
+hungary-2007 for brazil-2007. That leaves no Era 5 race failing G1 in the report. Era 5 play
+order is now san-marino-2005, europe-2009, france-2007, san-marino-2006, great-britain-2007,
+belgium-2009, hungary-2007, bahrain-2006, turkey-2008, malaysia-2006 (still not in date order;
+**owner to decide**, as above). The scout round's other Era 5 candidates (singapore-2008,
+hungary-2008, monaco-2005, japan-2006, canada-2008) were not picked.
+
+**Not authored yet.** Both have rules-only overlays. The build pairs are provisional:
+hungary-2007 is built HAM vs RAI while its dilemma and draft target are Räikkönen's (Hamilton
+really won from pole); belgium-2009's draft target is written `defend` in spec §4 (Fisichella
+started on pole) where its sheet drafted "win: Fisichella from P1". `pipeline hard-calls`
+settles each side.
+
+**Wording check needed:** hungary-2007's Wikipedia, GrandPrix.com race hub and Autosport rows
+came through a fetch tool that summarises pages (its notes say which); check those rows against
+the pages themselves.
+
+**Other files.** Track outlines are reuse copies (belgium-2009 from belgium-2024,
+`spa-francorchamps-4`; hungary-2007 from hungary-2019, `hungaroring-3`); see
+`2.5-track-maps.md`. belgium-2009's lap-1 safety car (laps 2-4) is not in the built race model
+(it is before the takeover; see `2.6-drivers-incidents.md`). Every driver in both entry lists
+was already in `data/drivers.json`. europe-2007 and brazil-2007 keep their overlays, race
+files and build entries as Eras-build fixtures.
 
 ## europe-2009 (2009 European Grand Prix, Valencia): swap candidate for Era 5
 
@@ -661,3 +700,132 @@ report (none found). Jolpica has no pit-stop data before 2011.
 - Tyre choices (one Michelin/Bridgestone spec per weekend; compounds not reported).
 - Gap between Alonso and Button before the final stops.
 - GrandPrix.com and Motor Sport reports (not read; see above).
+
+## belgium-2009 (2009 Belgian Grand Prix): swap candidate, Era 5
+
+Replaces `europe-2007` (Era 5 #6, third batch). Robust G1: pass, 0.51 s.
+
+
+Every fact below was read in the linked source (fetched 2026-11-09); nothing comes from memory.
+Where sources disagree, the row says so. Check each row against its links and put your initials
+and the date in **Owner checked**. OpenF1 does not cover 2009; Jolpica has no 2009 pit-stop data
+(`pitstops.json` empty), so stop laps come from the reports, cross-checked against Jolpica lap
+times (the stop shows as a lap about 17-21 s slower than the driver's median of about 108-109 s).
+Autosport's original race report (`/f1/news/78173/...`) returns HTTP 410; the Autosport live
+text was used instead.
+
+### Sources
+
+| Short name | What |
+|---|---|
+| WP | [English Wikipedia race article](https://en.wikipedia.org/wiki/2009_Belgian_Grand_Prix) |
+| GPE | [GrandPrix.com race notes, "Räikkönen takes Belgian GP for Ferrari"](https://www.grandprix.com/races/belgian-gp-2009-race-notes-raikkonen-takes-belgian-gp-for-ferrari.html) |
+| AS-L | [Autosport live text, race day](https://www.autosport.com/f1/live-text/2009-belgian-grand-prix-race-day-at-spa-francorchamps-46359/46359/) |
+| MS | [Motor Sport, "2009 Belgium Grand Prix report"](https://www.motorsportmagazine.com/articles/single-seaters/f1/2009-belgium-grand-prix-report/) |
+| Jolpica-R | [Jolpica results](https://api.jolpi.ca/ergast/f1/2009/12/results.json) |
+| Jolpica-Q | [Jolpica qualifying](https://api.jolpi.ca/ergast/f1/2009/12/qualifying.json) |
+| Jolpica-L | [Jolpica lap times](https://api.jolpi.ca/ergast/f1/2009/12/laps.json) (paged, 663 rows) |
+
+### Facts
+
+| Topic | Fact | Sources | Owner checked |
+|---|---|---|---|
+| Grid | Fisichella (Force India) pole 1:46.308, Trulli 2nd 1:46.395, Heidfeld 3rd 1:46.500, Barrichello 4th 1:46.513, Kubica 5th 1:46.586, Räikkönen 6th 1:46.633; Glock 7th, Vettel 8th, Webber 9th, Rosberg 10th. Grid = qualifying order for the top 10 (Jolpica-R grid column). Button 14th, Hamilton 12th, Kovalainen 15th (Hamilton and Kovalainen out in Q1, MS). Penalties: none listed (WP). Räikkönen the only KERS car in the qualifying top 10 (WP). Fuel loads: not in sources. | Jolpica-Q, Jolpica-R, WP, MS | |
+| Laps | 44 laps, 308.052 km. | WP, Jolpica-R | |
+| Weather | "Clear but Mild" (WP). Dry throughout; no source mentions rain. | WP | |
+| SC / VSC / red flag | One safety car for the lap-1 crash at Les Combes. GPE: deployed after lap 1, out for three laps, restart at the start of lap 5. MS: "two laps". Jolpica-L: laps 2-4 run at about 175-178 s (SC pace), green from lap 5. Taken: SC laps 2-4, restart lap 5. No VSC (did not exist), no red flag. | GPE, MS, WP, Jolpica-L | |
+| Start / lap 1 | Barrichello bogged down (anti-stall) at the start. Fisichella led; Räikkönen took 2nd at Les Combes using KERS (GPE; AS-L: Räikkönen had contact at Les Combes). At Les Combes Grosjean hit Button, Alguersuari hit Hamilton; all four retired (0 laps, "Collision"). Heidfeld ran wide at Les Combes and lost places (GPE). Alonso had first-corner contact with Sutil (WP). Barrichello pitted end of lap 1 and switched to a longer first stint (GPE). | GPE, WP, AS-L, MS, Jolpica-R | |
+| Restart / lead | At the restart Räikkönen used KERS to pass Fisichella on the climb after Eau Rouge / run to Les Combes and led from lap 5 (Jolpica-L positions). Lap 6: Räikkönen led by 1.4 s, Kubica 1.7 s further back; lap 11: Räikkönen +1.8 s over Fisichella, Kubica another 1.8 s (GPE). The pair were never more than about a second apart after the restart; Fisichella was stuck in the Ferrari's dirty air and Räikkönen used KERS to defend on the hill (MS). | GPE, MS, Jolpica-L | |
+| Stops: Räikkönen and Fisichella | Same strategy, two stops each, pitting together: GPE laps 14 and 31 (both 7.1 s on lap 31); Jolpica-L slow laps 15 and 32 for both (the one-lap offset is the same for every car). Ferrari kept the lead at both stops. Compounds: not in sources. Fuel: not in sources. | GPE, MS, Jolpica-L | |
+| Stops: Vettel | Two stops, long first stint: led laps 15-16 (Jolpica-L) during the first stops, stopped GPE lap 16 / Jolpica-L 17 and GPE lap 35 / AS-L lap 36 / Jolpica-L 36, taking soft tyres at the last stop (AS-L) and passing the BMWs for 3rd. Lap 35: Räikkönen +0.8 s over Fisichella, Vettel 5.9 s back (GPE). Lap 40: Vettel 3.6 s behind Fisichella (GPE). Fastest lap 1:47.263, lap 38 (WP). Finished 3.875 s behind the winner. | GPE, AS-L, WP, Jolpica-L, Jolpica-R | |
+| Stops: others | Kubica laps 12 and 30 (GPE; Jolpica-L 13, 31). Glock lap 12 with a large fuel load (GPE); a refuelling fault cost him 4th (GPE); Jolpica-L 13 and 33. Heidfeld laps 14 and ~33 (GPE; Jolpica-L 15, 33). Rosberg laps 18 and 33, led lap 17 (GPE; Jolpica-L 19, 34). Kovalainen one stop, end of lap 26 (GPE; Jolpica-L 27). Barrichello end of lap 1 then one more (Jolpica-L 28). Alonso one stop lap 24 with a left-front wheel problem (GPE). | GPE, Jolpica-L | |
+| Retirements | Button, Grosjean, Hamilton, Alguersuari: lap 1 collision. Trulli: brakes, 21 laps (slow refuelling on lap 21, retired in the pits, GPE). Alonso: 26 laps, front-left wheel (WP: "wheel"; Jolpica: "Retired"). | Jolpica-R, WP, GPE, AS-L | |
+| Penalties / contact / orders | Webber drive-through for an unsafe release into Heidfeld's path at the lap-14 stops, served lap 18 (GPE; Jolpica-L lap 19 slow); fell to 11th, finished 9th. MS (as read) also mentions a Vettel drive-through; WP and GPE list only Webber's, so it is not taken. Stewards to look at the lap-1 clashes after the race (GPE). Barrichello's engine smoked from about lap 41 and caught fire after the finish (GPE, AS-L). Team orders: none in sources. | GPE, WP, MS, AS-L | |
+| Result | Räikkönen 1:23:50.995; Fisichella +0.939; Vettel +3.875; Kubica +9.966; Heidfeld +11.276; Kovalainen +32.763; Barrichello +35.461; Rosberg +36.208; Webber +36.959; Glock +41.490. Force India's first podium (AS-L); Ferrari's first win of 2009 (MS). | Jolpica-R, WP, AS-L, MS | |
+
+### Proposal (draft, for the owner)
+
+| Item | Draft | Owner checked |
+|---|---|---|
+| Storyline drivers | Fisichella (Force India, pole, lost the lead at the restart) and Räikkönen (Ferrari, from 6th, led from lap 5). Vettel is the third story (long first stint, 8th to 3rd). | |
+| Dilemma (original wording) | Stuck a second behind a KERS Ferrari he can't pass on track, Fisichella's team must decide whether to keep mirroring Ferrari's stops or split the strategy to jump him in the pits. | |
+| Suggested side | Fisichella (pending `pipeline hard-calls`). Alternative: Vettel (the stop timing that gained most places). | |
+| Target (draft) | win: Fisichella from P1. Alternative: beat-rival Räikkönen, or Vettel: position P2. | |
+| Side really won? | No: Fisichella lost by 0.939 s, so a rewrite is allowed. (If Räikkönen is picked, he really won: no rewrite.) | |
+| Modelling risk | **Medium-high.** Dry, one early SC (laps 2-4), no red flag. But the lead was decided by Räikkönen's KERS pass at the restart, and the race stayed within a second on identical stops, so the outcome rests on whether the sim models KERS/restart pace and track-position (dirty air is off). Four cars out on lap 1 and Webber's drive-through must be scripted. Fuel loads and compounds are not in sources. | |
+
+### Not in sources
+
+- Fuel loads (kg / laps) for any car; tyre compound per stint (only Vettel's final "soft" set).
+- Stationary times other than Räikkönen and Fisichella's 7.1 s on lap 31.
+- Exact stop laps: reports and lap-time data differ by one lap throughout (GPE lap N = Jolpica slow lap N+1).
+- Any team order.
+
+## hungary-2007 (2007 Hungarian Grand Prix): swap candidate for Era 5, facts sheet
+
+Replaces `brazil-2007` (Era 5 #7, third batch). Robust G1: pass, 1.85 s.
+
+
+Every fact below was read in the linked source on 2026-11-09; nothing comes from memory.
+Where sources disagree, the row says so. Check each row and put your initials and the date in
+**Owner checked**.
+
+### Sources
+
+| Short name | What |
+|---|---|
+| WP | [English Wikipedia race article](https://en.wikipedia.org/wiki/2007_Hungarian_Grand_Prix) (read through a fetch tool's summary) |
+| GPE-n | [GrandPrix.com race notes, "Hamilton takes flag-to-flag victory in Hungary"](https://www.grandprix.com/races/hungarian-gp-2007-race-notes-hamilton-takes-flag-to-flag-victory-in-hungary.html) (downloaded, read in full) |
+| GPE-q | [GrandPrix.com Sunday team quotes](https://www.grandprix.com/races/hungarian-gp-2007-sunday-team-quotes.html) (downloaded, read in full; press-release quotes, not radio) |
+| GPE-h | [GrandPrix.com race hub, Hungarian GP 2007](https://www.grandprix.com/races/hungarian-gp-2007.html) (fetch-tool summary) |
+| AS-st | [Autosport, "The full decision by the race stewards"](https://www.autosport.com/f1/news/the-full-decision-by-the-race-stewards-4412898/4412898/) (fetch-tool summary) |
+| AS-rv | [Autosport, "The 2007 Race-by-Race Review"](https://www.autosport.com/general/news/the-2007-race-by-race-review-5078630/5078630/), round 11 section (fetch-tool summary) |
+| Jolpica-r | [Jolpica results, 2007 round 11](https://api.jolpi.ca/ergast/f1/2007/11/results/) |
+| F1DB | F1DB v2026.19.0 `f1db-races-pit-stops.csv`, raceId 779 (local cache `pipeline/cache/eras-sources/f1db`) |
+
+Notes on sources:
+- WP, GPE-h, AS-st and AS-rv were read only through a fetch tool's summary; verify their rows
+  against the pages. GPE-n and GPE-q were downloaded and read as text.
+- Jolpica has **no pit-stop data** for this race (`pitstops` total 0); F1DB does.
+- OpenF1 starts in 2023: nothing here. Motor Sport: no 2007 race report found in search.
+- GPE's race-incidents page returned "Public traffic is temporarily busy" twice; not read.
+- **Lap numbering:** GPE-n's stop laps are 1 higher than F1DB's for some cars (Massa 36/51 vs
+  35/50; Kubica second stop 42 both; Rosberg 32 both). F1DB is taken as the in-lap.
+
+### Facts
+
+| Topic | Fact | Sources | Owner checked |
+|---|---|---|---|
+| Grid | Hamilton pole, Heidfeld 2nd, Räikkönen 3rd, Rosberg 4th, R. Schumacher 5th, Alonso 6th; Kubica 7th, Trulli 8th, Webber 9th, Coulthard 10th. Massa 14th. | WP, Jolpica-r | |
+| Grid penalties | Alonso fastest in Q3 but lost 5 grid places for impeding Hamilton in the pit lane (held in his pit box about 10 s after the signal to go, so Hamilton could not start a final flying lap); Hamilton promoted to pole. McLaren's constructors' points from the race withdrawn. Fisichella dropped 5 places (8th to 13th) for impeding Yamamoto in Q1 (WP, GPE-n). | AS-st, WP, GPE-n | |
+| Massa's qualifying | Sent out in Q2 without enough fuel (AS-rv); qualified 14th (Jolpica-r grid 14). Ferrari's Baldisserri refers to "the mistakes made with Felipe yesterday" (GPE-q). | AS-rv, GPE-q, Jolpica-r | |
+| Laps | 70 laps, 306.663 km (4.381 km lap, F1DB race row). | WP, Jolpica-r, F1DB | |
+| Weather | Sunny, up to 27 °C. Dry throughout (no source mentions rain). | WP | |
+| Safety car / red flag | None reported. GPE-n's notes mention none; WP gives none. Red Bull brought Coulthard in on Davidson's beached car "as we thought the safety car could be deployed" (Horner); it was not. | GPE-n, WP, GPE-q | |
+| Start / lap 1 | Hamilton kept the lead; Räikkönen passed Heidfeld for 2nd (Heidfeld: dirty side of the grid). Order after lap 1: Hamilton, Räikkönen, Heidfeld, Rosberg, Schumacher, Kubica, Webber, Alonso (fell to 8th). Alonso passed Webber lap 3 and Kubica lap 4. | GPE-n, GPE-h, GPE-q | |
+| Gaps, first stint | Lap 3-4: Hamilton 3 s ahead. Lap 13: 4.6 s (GPE-h). Lap 15: 4.5 s, Heidfeld 10 s further back. Räikkönen lost 1.6 s in one lap after two off-track moments (GPE-h). | GPE-n, GPE-h | |
+| Hamilton | Two stops: laps 19 and 50 (GPE-n, F1DB). Led every lap (WP). Reported a small steering problem in the last two stints (GPE-q). | GPE-n, F1DB, WP, GPE-q | |
+| Räikkönen | Two stops: laps 19 and 46 (GPE-n, F1DB). Stopped on the same lap as Hamilton at the first stop; afterwards said the fuel choice at that stop decided the result (press quote, GPE-q). Fastest lap 1:20.047 on lap 70 (GPE-h). | GPE-n, F1DB, GPE-q, GPE-h | |
+| Gaps, middle and late | Lap 25: Räikkönen 1.5 s behind; Heidfeld 14 s further back. Lap 40: 1.1 s. Lap 57: 0.5 s. Lap 60: under a second. Finish: 0.715 s. | GPE-n, Jolpica-r | |
+| Heidfeld | Three stops: laps 17, 41, 54 (F1DB; GPE-n 17, 41, 54). Three-stop plan chosen because the softer tyre caused trouble; softer tyre only in the last stint (GPE-q). Finished 3rd, 1.729 s ahead of Alonso, whom he called a "ghost" on a different strategy. | F1DB, GPE-n, GPE-q, Jolpica-r | |
+| Alonso | Two stops: laps 17 and 50 (F1DB, GPE-n). Spent much of the race behind R. Schumacher (WP); passed him in the pits at the lap 50 stops (GPE-n). Finished 4th. | F1DB, GPE-n, WP | |
+| Kubica | Three stops: laps 19, 42, 56 (F1DB). | F1DB, GPE-n | |
+| R. Schumacher | Two stops: laps 18 and 48 (F1DB). Toyota chose two stops from first-stint evidence; held up behind Heidfeld (GPE-q). | F1DB, GPE-q | |
+| Rosberg | Three stops: laps 17, 32, 55 (F1DB). | F1DB, GPE-n | |
+| Compounds | Bridgestone (F1DB). Names of the two compounds and which leader ran which: **not in sources** read. Sato called his third-stint tyre "super soft"; Trulli his last stint "the option tyre" (GPE-q). | GPE-q, F1DB | |
+| Fuel loads | No litres or kg in any source. | | |
+| Retirements | Yamamoto (accident; Jolpica 4 laps, GPE-n "lap 6"), Button (throttle; Jolpica 35 laps, GPE-n lap 37), Davidson (accident/spin; 41 laps), Liuzzi (electrical; 42 laps). No top-six car retired. | Jolpica-r, GPE-n, GPE-h | |
+| Contact | Davidson and Fisichella touched as Fisichella left the pits on cold tyres (Davidson out; Fisichella's car damaged). Massa ran wide at Turn 2 and lost places. No front-runner contact. | GPE-q, WP | |
+| Penalties (race) | None reported for front-runners. | GPE-n, WP | |
+| Team orders | None in any source read (the qualifying row concerns a pit-lane hold, not a race order). | | |
+| Result | 1 Hamilton 1:35:52.991; 2 Räikkönen +0.715; 3 Heidfeld +43.129; 4 Alonso +44.858; 5 Kubica +47.616; 6 R. Schumacher +50.669; 7 Rosberg +59.139; 8 Kovalainen +1:08.104. Massa 13th, one lap down. | Jolpica-r, WP | |
+
+### Dilemma, side and target (drafts)
+
+| Item | Draft | Basis | Owner checked |
+|---|---|---|---|
+| Storyline drivers | Räikkönen and Hamilton (stopped together on lap 19; Räikkönen's second stop came 4 laps before Hamilton's). Alternative pair: Alonso (two stops) vs Heidfeld (three stops) for 3rd, 1.7 s apart. | GPE-n, F1DB, GPE-q | |
+| Dilemma | Stuck a second behind the leader at a track with no overtaking, Räikkönen must pick his fuel at the shared first stop: run short and try to jump him at the second stops, or take more and hope he stays out longer. | GPE-n, GPE-q | |
+| Target | win: Räikkönen from P3 (real: 2nd, 0.715 s behind). Alternative: position, Alonso on the podium from P6 (real: 4th, 1.729 s off 3rd). | Jolpica-r | |
+| Did the side win? | Räikkönen: no, so a rewrite is allowed. Alonso: no. (Hamilton did win; no rewrite if he is the side.) `pipeline hard-calls` picks the side. | Jolpica-r | |
+| Risk | **Medium-high.** Dry, no SC, clean stop data (F1DB). Risks: the win needs a 0.7 s swing at a no-overtaking track, so it depends on the sim's traffic and pass model; no fuel numbers; compound per stint not sourced; Räikkönen's 4-lap-shorter second stint is the only lever, and a real two-stop leader leading every lap gives few hard calls. The Alonso/Heidfeld 3rd-place battle may be the stronger story. | | |

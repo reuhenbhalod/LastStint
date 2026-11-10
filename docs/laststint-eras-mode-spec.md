@@ -128,8 +128,8 @@ Players start at Era 10 and move back through the timeline to Era 1. The eras be
 | 3 | france-2007 | Two seconds behind team-mate Massa with lapped cars ahead, Räikkönen must choose: box when Massa does, or stretch the stint three laps longer and jump him at the second stops | position: Räikkönen (the hard-call side; he won, so no rewrite) in the top two from P3 |
 | 4 | san-marino-2006 | Glued to a grip-starved Ferrari on a track where nobody passes, does Renault gamble on stopping a lap early, or wait for Schumacher to blink? | beat-rival: Alonso ahead of Schumacher |
 | 5 | great-britain-2007 | Two-stopping at Silverstone with fuel deciding the order: short-fill Alonso to jump Räikkönen at the first stops, or run long like Ferrari and win it at the second? | beat-rival: Alonso ahead of Räikkönen |
-| 6 | europe-2007 | Rain chaos at the Nürburgring | win: Alonso chases Massa |
-| 7 | brazil-2007 | Three-way title decider | deny: Räikkönen wins, Hamilton kept P6 or lower |
+| 6 | belgium-2009 | Stuck a second behind a KERS Ferrari he can't pass on track, Fisichella's team must decide whether to keep mirroring Ferrari's stops or split the strategy to jump him in the pits | defend: Fisichella wins from pole |
+| 7 | hungary-2007 | Stuck a second behind the leader at a track with no overtaking, Räikkönen must pick his fuel at the shared first stop: run short and try to jump him at the second stops, or take more and hope he stays out longer | win: Räikkönen from P3 |
 | 8 | bahrain-2006 | Schumacher pits first on lap 36; Renault can keep Alonso out three more laps on a lighter tank and gamble that the overcut puts him ahead at pit exit | win: Alonso from P4 |
 | 9 | turkey-2008 | A tyre warning forces Hamilton onto three stops: can a light McLaren build enough of a gap to beat Massa's two-stop Ferrari? | win: Hamilton from P3 on three stops |
 | 10 | malaysia-2006 | Stuck with a heavy tank after a fuel mistake in qualifying, Alonso starts 7th: how long can Renault stretch the first stint, and how little fuel is enough at the last stop to come out ahead of Button? | beat-rival: Alonso ahead of Button |
@@ -242,11 +242,11 @@ Every race has one target, set in `eras.target`. Each race's draft target is in 
 | Type | Means | Grader `Target` | Races (draft) |
 |---|---|---|---|
 | `win` | Chase down the win from behind | `win` | 47 |
-| `defend` | Start in the lead and keep it to the flag | `win`, starting from P1 | 19 |
+| `defend` | Start in the lead and keep it to the flag | `win`, starting from P1 | 20 |
 | `position` | Reach a set position, such as P3 to win the title | `position` | 17 |
 | `beat-rival` | Finish ahead of a named car, wherever that is | `beat-rival` | 13 |
 | `team` | A team result, such as a 1–2 in a set order | `team` (new) | 2 |
-| `deny` | Keep a rival at or below a set position, such as out of the top 3 to stop their title | `deny` (new) | 2 |
+| `deny` | Keep a rival at or below a set position, such as out of the top 3 to stop their title | `deny` (new) | 1 |
 
 Every era has at least three different target types.
 

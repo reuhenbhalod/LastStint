@@ -86,6 +86,8 @@ REUSE: dict[str, tuple[str, str]] = {
     "netherlands-2021": ("netherlands-2022", "zandvoort-5"),
     "bahrain-2006": ("bahrain-2021", "bahrain-1"),
     "turkey-2008": ("turkey-2021", "istanbul-1"),
+    "belgium-2009": ("belgium-2024", "spa-francorchamps-4"),
+    "hungary-2007": ("hungary-2019", "hungaroring-3"),
     "italy-2010": ("italy-2019", "monza-7"),
     "australia-2013": ("australia-2010", "melbourne-1"),
     "bahrain-2012": ("bahrain-2021", "bahrain-1"),

@@ -17,7 +17,7 @@ building (eras spec §19).
 - **Pipeline:** `race_suitability()` stops turning red-flag races down; the race-status
   timeline gains a red-flag code.
 - **Unblocks (draft list):** netherlands-2023, azerbaijan-2021, great-britain-2021,
-  europe-2007, monaco-1984.
+  monaco-1984.
 
 ### R2. Car faults
 - **What:** a scripted fault from the real race: stuck in a gear (a pace loss per lap), power
@@ -33,8 +33,8 @@ building (eras spec §19).
   weather and each lap's tyre, which only exist from 2018 (FastF1/OpenF1). Before 2018 the
   wetness timeline has to be fitted from lap times alone (the whole field slowing), checked
   against race reports, with the tyre changes taken from the pit stops.
-- **Unblocks (draft list):** malaysia-2013, europe-2007.
-- **Unblocks (draft list):** malaysia-2013, europe-2007,
+- **Unblocks (draft list):** malaysia-2013.
+- **Unblocks (draft list):** malaysia-2013,
   spain-1996, belgium-1995, europe-1993, brazil-1993, belgium-1992, portugal-1985, monaco-1984.
 - **2018+ wet races** (germany-2018, germany-2019, turkey-2020, russia-2021, turkey-2021,
   netherlands-2023, belgium-2023 (a mid-race shower, no wet-tyre stops)) use today's model.

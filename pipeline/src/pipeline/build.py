@@ -2192,6 +2192,36 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
+    "belgium-2009": {
+        "year": 2009,
+        "event": "Belgium",
+        "source": "jolpica",
+        "name": "Belgium 2009: Fisichella vs Räikkönen",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for europe-2007 (swap-races-era5-overnight.md, third batch). Side
+        # provisional until `pipeline hard-calls`.
+        "user_side": "FIS",
+        "rival": "RAI",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "hungary-2007": {
+        "year": 2007,
+        "event": "Hungary",
+        "source": "jolpica",
+        "name": "Hungary 2007: Hamilton vs Räikkönen",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for brazil-2007 (swap-races-era5-overnight.md, third batch). Side
+        # provisional until `pipeline hard-calls`.
+        "user_side": "HAM",
+        "rival": "RAI",
+        "score_positions": 6,
+        "split": "eras",
+    },
     # Era 4 (2000-04), refuelling as above: one dry compound, new tyres at a stop.
     "japan-2000": {
         "year": 2000,

@@ -1160,3 +1160,14 @@ describe('migration 0025: four more Era 6 races swapped (second round, stats pic
     }
   });
 });
+
+describe('migration 0026: the last two failing Era 5 races swapped (stats picks)', () => {
+  const NAME = '0026_swap_eras_races_era5_b.sql';
+
+  it('applies after every earlier swap, 0022 included', () => {
+    const names = env.TEST_MIGRATIONS.map((m) => m.name);
+    const at = names.indexOf(NAME);
+    expect(at).toBeGreaterThan(names.indexOf('0022_swap_eras_races_era3.sql'));
+    expect(names.slice(0, at).every((n) => n < NAME)).toBe(true);
+  });
+});
