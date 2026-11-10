@@ -425,12 +425,12 @@ RACES: dict[str, dict] = {
     "hungary-2024": {
         "year": 2024,
         "event": "Hungary",
-        "name": "Hungary 2024",
+        "name": "Hungary 2024: Piastri vs Norris",
         "era": "2014-2025",
         "takeover_lap": None,  # D3 rule
         "seed": 36730,
-        "user_side": None,  # validation race: automatic duel, runner-up vs winner
-        "rival": None,
+        "user_side": "PIA",  # the hard-call side (eras B1: PIA 2, NOR 0)
+        "rival": "NOR",
         "score_positions": 6,
         "split": "holdout",
     },
