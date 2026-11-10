@@ -1,7 +1,8 @@
-# Three Era 6 races swapped (owner, Nov 9, overnight): owner sign-off
+# Era 6 races swapped (owner, Nov 9, overnight): owner sign-off
 
 The owner pre-approved (Nov 9) swapping failing Eras races for the next-best race by stats.
-In Era 6 the three races with the worst robust-G1 status and mean gap error in
+Two rounds: the first (below) swapped three races; the second ("Second round", after
+malaysia-2013) swapped four more. In the first round, in Era 6 the three races with the worst robust-G1 status and mean gap error in
 `docs/eras-races-report.md` go, worst first, and each takes the best remaining candidate by
 robust-G1 mean gap error, in the old race's slot (migration 0019, as 0012-0014 did). The other
 four Era 6 races that fail or are borderline (brazil-2012, abu-dhabi-2012, spain-2013,
@@ -317,3 +318,296 @@ target is now Webber's real result, P2.
 | Webber's stops after the lap-16 takeover: out-laps 20, 32 (SOFT), 44 (HARD) | mastery, hidden, moments | earlier (6.2-reauthor-modern: RAW) | |
 | Webber grid 5, Vettel pole; at lap 16 WEB P1, VET 2.4 s behind | briefing | earlier (6.2-reauthor-modern: JOL; RACE) | |
 | Hold-position order after the last stops, Vettel's lap-46 pass | storyline | earlier (6.2-eras7-4: WP) | |
+
+## Second round: four more Era 6 races (owner pre-approved, Nov 9)
+
+The same pre-approval, a second time: the four Era 6 races that still fail or are borderline in
+`docs/eras-races-report.md` (spain-2013, brazil-2012, abu-dhabi-2012, china-2011) each take a
+new race picked by robust-G1 mean gap error, in the old race's slot (migration 0025, as 0019).
+malaysia-2013 stays (re-authored above). Candidates were scouted on local Eras builds
+(rules-only overlays); bahrain-2013, italy-2012, united-states-2012 and hungary-2013 failed
+robust G1 and turkey-2011 (pass, 1.56 s) was the next pick not taken. Every fact below was read in
+the linked source on Nov 9, 2026; nothing comes from memory. Check each row and put your
+initials and the date in **Owner checked**.
+
+| Era / slot | Removed | Why (robust G1, races report) | Replacement | Robust G1 of the replacement (Eras build, rules-only overlay) | Owner checked |
+|---|---|---|---|---|---|
+| 6 / #10 | `spain-2013` | Fails, 1.59 s (duel RAI vs ALO gap error 3.28 / 3.23 [3.00]); authored but not reachable since integration 8 | `abu-dhabi-2011` | pass, 0.87 s (new race) | |
+| 6 / #8 | `brazil-2012` | Fails, 3.56 s (Vettel's last wet stint; duel VET vs ALO gap error 6.12 / 6.09 [3.00]) | `china-2013` | pass, 0.95 s (new race) | |
+| 6 / #7 | `abu-dhabi-2012` | Fails, 1.72 s (duel VET vs BUT gap error 3.4 / 3.22 [3.00]) | `germany-2012` | pass, 1.24 s (new race) | |
+| 6 / #3 | `china-2011` | Borderline, 1.47 s (podium order rate 0.49 [0.50]) | `germany-2013` | pass, 1.25 s (new race) | |
+
+The removed races' numbers are from `docs/eras-races-report.md`. The replacements' numbers were
+measured on local builds (`pipeline build <id>`, then `pipeline validate <id> --robust`, one race
+per call, Nov 9; the same on the scouting builds and on this branch's rebuilds). Race files,
+goldens and `races.gen.ts` are left for the integrator to rebuild and commit. The removed
+races keep their overlays (spain-2013 and china-2011 authored), race files, tracks, build
+entries and incidents as Eras-build fixtures.
+
+**Sides.** Local `pipeline hard-calls` runs (written to a scratch directory, not to the
+overlays): abu-dhabi-2011 HAM 3, ALO 1; china-2013 ALO 2, RAI 1; germany-2012 BUT 2, VET 0;
+germany-2013 RAI 1, VET 0. The overlays stay rules-only: side, target, storyline, mastery,
+hidden objective and briefing come in B1. The proposals below are drafts; where a proposal's
+side differs from the hard-call side, the note above it says so.
+
+**Wording check needed:** china-2013's Autosport and Motor Sport rows came through a fetch tool
+that summarises pages. Check their wording against the pages.
+
+**Track status:** none of the four has an OpenF1 session or TUM data. abu-dhabi-2011,
+china-2013 and germany-2012: no safety car rests on the race reports and on the Jolpica SC
+estimate (no periods). germany-2013: the estimate finds one SC, laps 24-29 (`likely`,
+`data/estimates/germany-2013.sc.json`, left `unchecked`), against lap 23 (WP) or 22 (MS) in
+the sources, whose end lap no source gives; check it against a race-control source before
+confirming.
+
+## abu-dhabi-2011 (2011 Abu Dhabi Grand Prix; Era 6 #10, replaces spain-2013)
+
+**Side and target.** `pipeline hard-calls` (local run): HAM 3, ALO 1 (chance given up HAM 1.7, ALO 108.0 pts), so the race is drafted from Hamilton's side, not the Alonso draft in the proposal below. Hamilton really won, so no rewrite. Spec §4 draft: "Three seconds clear of Alonso on the same tyres: box first for the last stint to cover the undercut, or stay out and risk Ferrari going longer"; target `defend: Hamilton holds P1` (Hamilton leads at the lap-13 takeover in the local build). The 3 s and "same tyres" are the computed 3.2 s at the end of lap 39 (GPE: 3.1 s) and both cars' soft second stints (GPE). In the facts below, gaps marked "computed" are sums of Jolpica lap times, not a published figure; "not in sources" means no opened source gave the number.
+
+### Facts
+
+| Topic | Facts verified | Sources | Owner checked |
+|---|---|---|---|
+| Grid top 6 | Vettel pole (1:38.481, on his last lap), Hamilton 2nd (1:38.622), Button 3rd (1:38.631), Webber 4th (1:38.858), Alonso 5th (1:39.058), Massa 6th (1:39.695); Rosberg 7th, Schumacher 8th, Sutil 9th, di Resta 10th. Vettel's 14th pole of the season, equalling Mansell's 1992 record (WP; GPE: 14th pole). Qualifying had a red flag for a loose bollard Massa drove over (WP). | WP, GPE, Jolpica | |
+| Grid penalties | Maldonado ten places for his ninth engine of the season, started 23rd. Barrichello set no time (oil leak) but was allowed to start 24th (WP; Jolpica grid MAL 23, BAR 24). No penalties in the top 6. | WP, Jolpica | |
+| Race laps, weather | 55 laps, 305.470 km. Fine and dry, air 25 °C (WP infobox). No source mentions rain. Twilight race (AS live). | WP, AS live | |
+| Tyres at the start | The front nine started on softs; di Resta (10th) started on mediums (GPE). Compound for the final stints: GPE says "medium"; AS live calls Webber's last-lap tyre "hard". **Sources differ on the name; GPE's medium is taken.** | GPE, AS live | |
+| Start and lap 1 | Vettel led into Turn 1, then spun at Turn 2 with a punctured right-rear tyre; he got back to the pits with damage and retired (WP, GPE; Jolpica: 1 lap, "Puncture"). Cause not established: Horner suspected debris, Pirelli found none on a circuit walk (GPE news). Hamilton led from there. Alonso passed Webber on the outside and Button under braking for 2nd; Button kept 3rd (GPE). Computed end of lap 1: Alonso +2.6 s, Button +3.3 s, Webber +3.9 s. | WP, GPE, GPE news, Jolpica | |
+| First stint | Gaps (GPE): lap 5 Alonso 2.7 s, Button 5.7 s, Webber 6.9 s; lap 15 Alonso 1.9 s, Button 12.3 s, Webber 13.1 s. Button reported a KERS problem around lap 12, working again by lap 32 (GPE); his pace on the soft was poor (GPE). Webber and Button side by side on lap 15; Button held (GPE). | GPE, Jolpica | |
+| Stops: Hamilton | Two stops. Jolpica pit data: laps 16 and 40 (stationary-plus-lane 19.439 s and 19.350 s). GPE reports them as laps 17 (softs) and 40 (mediums). | Jolpica, GPE | |
+| Stops: Alonso | Two stops. Jolpica: laps 16 and 43 (20.211 s, 21.314 s). GPE: lap 17 (softs), lap 44 (from the lead, rejoined behind Hamilton). Computed: 3.2 s behind at the end of lap 39 (GPE: closed to 3.1 s on lap 39); led by about 20 s while Hamilton stopped; rejoined 4.5 s behind at the end of lap 44 (GPE: 4.4 s). He ran three laps longer on softs and gained nothing. | Jolpica, GPE | |
+| Stops: Button | Two stops. Jolpica: laps 16 and 36. GPE: lap 17 (softs), lap 37 from third (mediums). | Jolpica, GPE | |
+| Stops: Webber (three stops) | Jolpica: laps 17, 35 (no duration listed), 54. GPE: lap 18 from the lead with a slow 9.4 s stop (Jolpica duration 25.182 s, the slowest of the leaders' first stops); lap 35 from 5th onto softs again; the mandatory medium on the final lap (GPE; AS live: one lap on the other compound), rejoining 4th behind Button. Fastest lap 1:42.612 on lap 51 (WP, GPE results). Computed: 9.7 s ahead of Button at lap 51 (AS live) was not enough; finished 9.9 s behind him. | Jolpica, GPE, AS live, WP | |
+| Stops: Massa, Rosberg | Massa: Jolpica laps 15 and 40 (GPE 16 softs, 40). Rosberg: Jolpica 17 and 48 (GPE 18, 49). | Jolpica, GPE | |
+| Second stint | Computed Hamilton-Alonso gap: 3.4 s (lap 18), 5.1 s (lap 30), 3.2 s (lap 39). Alonso set 1:44.2 on lap 33 (GPE). After the stops: 6.0 s on lap 50 (GPE), 8.457 s at the flag. | Jolpica, GPE | |
+| SC / VSC / red flag | None in the race. No opened source reports a safety car or red flag (VSC did not exist in 2011). Red flag in qualifying only (WP). | WP, GPE | |
+| Penalties | **Sources differ.** WP: Maldonado 30 s and Alguersuari 20 s time penalties for ignoring blue flags, neither changing a position. GPE: Maldonado drive-through (lap 32) and Senna drive-through (lap 38), both for blue flags. AS live: Maldonado ignored blue flags. None involves the top 6. | WP, GPE, AS live | |
+| Contact / team orders | No car-to-car contact reported among the front-runners (GPE). Massa hit a winglet dropped by another car on lap 45 and spun on lap 49, continuing (GPE). No team orders reported. | GPE | |
+| Retirements | Vettel lap 1 (puncture), d'Ambrosio 18 laps (brakes), Buemi 19 laps (hydraulics; GPE: retired in the pit lane on lap 21), Ricciardo 48 laps (alternator; Jolpica "Mechanical"; GPE lap 52, AS live lap 53). | Jolpica, WP, GPE, AS live | |
+| Result top 6 | Hamilton 1:37:11.886; Alonso +8.457; Button +25.881 (Jolpica, GPE; WP +25.871); Webber +35.784; Massa +50.578; Rosberg +52.317. Only race of 2011 with no Red Bull on the podium (WP). | Jolpica, GPE, WP | |
+
+### Strategy dilemma
+
+- **Alonso / Ferrari:** 2-4 s behind Hamilton all race on the same two-stop plan. Both stopped
+  together on lap 16. For the second stop Hamilton went first (in-lap 40); Ferrari kept Alonso
+  out three more laps on old softs (in-lap 43) and he came out 4.5 s behind (computed). Undercut
+  (stop first, or stop on lap 39-40 with Hamilton) versus overcut was the call.
+- **Hamilton / McLaren:** leading with Alonso 3 s back, box first for mediums to cover an
+  undercut (the real call), or stay out and risk Alonso's softs.
+- **Webber / Red Bull:** three stops on softs, mediums only on the final lap; lost the lead
+  phase to a 9.4 s stop (GPE) and ended 4th, about 10 s behind Button's two-stop.
+- **Button:** two stops with KERS trouble; held 3rd.
+
+### Proposal (draft, for the owner)
+
+| Item | Proposal |
+|---|---|
+| Storyline drivers | Alonso and Hamilton |
+| Dilemma (original wording) | Three seconds behind on the same tyres: does Alonso jump first for the final stint, or stay out and hope Hamilton's new mediums are slow to wake up? |
+| Side | Alonso (to be confirmed by `pipeline hard-calls`; Webber's soft-tyre three-stop is the alternative side) |
+| Target (draft) | win: Alonso from P5, beating Hamilton at the second stops |
+| Did the side really win? | No. Alonso was 2nd, 8.457 s behind, so a rewrite (history book) is allowed. (If the side is Hamilton, he really won: no rewrite.) |
+| Modelling risk | **Medium** |
+
+**Why medium risk:**
+- **Pole-sitter out on lap 1:** Vettel's puncture must be scripted (storyline retirement, cause
+  unconfirmed in sources).
+- **Win needs ~8.5 s:** Alonso's real gap at the flag; reachable only if an earlier second stop
+  is worth several seconds in the model. Reachability must be checked.
+- **Slow stop:** Webber's 9.4 s stop (GPE) shapes the P3-P5 order.
+- **Lap numbering:** GPE stop laps are mostly one higher than Jolpica's pit data; Jolpica taken.
+- **Compound name:** medium (GPE) versus hard (AS live).
+- Not flagged: rain, safety car / VSC / red flag (none), team orders (none), contact at the front.
+
+### Sources
+
+| Short name | What |
+|---|---|
+| WP | [English Wikipedia, 2011 Abu Dhabi Grand Prix](https://en.wikipedia.org/wiki/2011_Abu_Dhabi_Grand_Prix) (text and infobox) |
+| GPE | [GrandPrix.com race notes](https://www.grandprix.com/races/abu-dhabi-gp-2011-race-notes-hamilton-wins-abu-dhabi-gp.html) and [results](https://www.grandprix.com/races/abu-dhabi-gp-2011-race-results.html) |
+| GPE news | [GrandPrix.com, "Pirelli investigates Vettel failure"](https://www.grandprix.com/news/pirelli-investigates-vettel-failure.html) |
+| AS live | [Autosport live text](https://www.autosport.com/f1/live-text/2011-abu-dhabi-grand-prix-the-abu-dhabi-grand-prix-45976/45976/) (laps 51-55 only) |
+| Jolpica | [Results](https://api.jolpi.ca/ergast/f1/2011/18/results/), [pit stops](https://api.jolpi.ca/ergast/f1/2011/18/pitstops/?limit=100) and lap times (`api.jolpi.ca/ergast/f1/2011/18/drivers/<id>/laps/`, hamilton, alonso, button, webber), fetched 2026-11-09 |
+
+Not used: the Motor Sport report URL returned 404; an Autosport "post-race press conference: Abu
+Dhabi" page turned out to be 2010 and was discarded.
+
+## china-2013 (2013 Chinese Grand Prix; Era 6 #8, replaces brazil-2012)
+
+**Side and target.** `pipeline hard-calls` (local run): ALO 2, RAI 1 (chance given up ALO 1.7, RAI 1.7 pts), so the race is drafted from Alonso's side, not the Vettel draft in the proposal below. Alonso really won, so no rewrite. Spec §4 draft: "Ferrari's softs last only a handful of laps: commit Alonso to three stops and find a way past the cars running long on mediums"; target `win: Alonso from P3`. Sourced in the facts below: soft "guaranteed a pitstop within a handful of laps" (MS), Alonso's three stops and soft start, Vettel and Hülkenberg starting on mediums, Alonso fast through traffic on mediums (AS). OpenF1 has no 2013 data and TUM starts in 2014, so there is no timing source for track status or per-stint compounds. No GrandPrix.com 2013 race report or notes page was found by search; the Autosport live-text archive (live.autosport.com) refused the connection.
+
+### Sources
+
+| Short name | What |
+|---|---|
+| WP | [English Wikipedia race article](https://en.wikipedia.org/wiki/2013_Chinese_Grand_Prix) (raw wikitext read) |
+| AS | [Autosport race report, "Chinese GP: Alonso takes commanding victory for Ferrari"](https://www.autosport.com/f1/news/chinese-gp-alonso-takes-commanding-victory-for-ferrari-4464410/4464410/) |
+| MS | [Motor Sport, Nigel Roebuck, June 2013](https://www.motorsportmagazine.com/archive/article/june-2013/50/nigel-roebuck/) |
+| Jolpica-r | [Jolpica results, 2013 round 3](https://api.jolpi.ca/ergast/f1/2013/3/results/) |
+| Jolpica-q | [Jolpica qualifying, 2013 round 3](https://api.jolpi.ca/ergast/f1/2013/3/qualifying/) |
+| Jolpica-p | [Jolpica pit stops, 2013 round 3](https://api.jolpi.ca/ergast/f1/2013/3/pitstops/?limit=100) |
+
+AS and MS were read through a fetch tool that summarises; check their wording.
+
+### Facts
+
+| Topic | Fact | Sources | Owner checked |
+|---|---|---|---|
+| Grid | Hamilton pole (1:34.484), Räikkönen 2nd, Alonso 3rd, Rosberg 4th, Massa 5th, Grosjean 6th; Ricciardo 7th, Button 8th (token Q3 lap, 2:05.673), Vettel 9th and Hülkenberg 10th (no Q3 time). | WP, Jolpica-q, Jolpica-r | |
+| Q3 tyre choice | Mercedes, Lotus, Ferrari and Toro Rosso used the soft and took the top seven places; Red Bull, McLaren and Sauber ran mediums in Q3 and set no time (MS). WP: Vettel aborted his lap after a braking problem; Hülkenberg saved tyres. **Conflict:** Button has a Q3 time (token lap) in WP/Jolpica. | MS, WP, Jolpica-q | |
+| Grid penalties | Webber (14th in qualifying) ran out of fuel in Q2, could not give the 1-litre sample, was sent to the back; Red Bull then changed his gearbox, so he started from the pit lane. No penalties for the top 6. | WP | |
+| Laps | 56 laps, 305.066 km (5.451 km lap). | WP, Jolpica-r | |
+| Weather | Cloudy (WP infobox); dry (AS). Temperatures: not in sources. | WP, AS | |
+| Tyres available | Medium (prime) and soft (option). MS: soft about 1.5 s a lap quicker in qualifying but "guaranteed a pitstop within a handful of laps". | WP, MS | |
+| Safety car / VSC / red flag | None mentioned in WP, AS or MS. No timing source checked. Treat as "none" only after a check. | WP, AS | |
+| Start tyres | Alonso, Räikkönen, Hamilton, Massa on softs; Vettel and Hülkenberg on mediums. Button: not in sources (MS: mediums in Q3). | AS, MS | |
+| Start | Hamilton led; Alonso, Massa, then a slow-starting Räikkönen. Webber pitted at the end of lap 1. Alonso and Massa passed Hamilton together at Turn 1: lap 4 (WP), lap 5 (AS). **Conflict.** | WP, AS, Jolpica-p | |
+| Alonso stops | Three: laps 6, 23, 41 (Jolpica-p; WP same). Switched to mediums after the soft stint; fast through traffic on mediums (AS). Passed Vettel for the lead on lap 28 (WP). Compound per stop: not in sources. | Jolpica-p, WP, AS | |
+| Räikkönen stops | Three: laps 6, 21, 34 (Jolpica-p; WP same). Compounds: not in sources. | Jolpica-p, WP | |
+| Hamilton stops | Three: laps 5, 21, 37 (Jolpica-p; WP mentions 21 and 37). Softs "faded quicker" (AS). Brawn: rubber marbles on the front wing caused understeer until they fell off (MS). | Jolpica-p, WP, AS, MS | |
+| Vettel stops | Two: laps 14, 31 (Jolpica-p), 51. **Conflict:** WP has the second stop on lap 29 ("new hard compound tyres"); Jolpica has Hülkenberg, not Vettel, on lap 29. Ran mediums and left the softs to the final five laps (AS). Led after the lap-23 stops until Alonso passed him on lap 28 (WP). | Jolpica-p, WP, AS | |
+| Massa stops | Three: laps 7, 19, 36. Stayed out one lap longer than most, then faded (AS). | Jolpica-p, WP, AS | |
+| Button stops | Two: laps 23 and 49 (two-stop strategy, AS). McLaren told him to race Vettel, not the leaders (MS). | Jolpica-p, WP, AS, MS | |
+| Hülkenberg | Led after the lap 6-7 stops on Vettel's strategy (WP, AS). Stops 14, 29, 36; slow stop and a very short middle stint on softs, finished 10th (AS). | Jolpica-p, WP, AS | |
+| End of race | Vettel closed a 10 s gap to Hamilton to a few tenths within five laps (WP); about 3 s a lap after his late stop (AS); Hamilton held 3rd by 0.203 s. Fastest lap: Vettel 1:36.808, lap 53 (WP infobox). | WP, AS, Jolpica-r | |
+| Result (top 6) | Alonso 1:36:26.945; Räikkönen +10.168; Hamilton +12.322; Vettel +12.525; Button +35.285; Massa +40.827. Ricciardo 7th +42.691. | Jolpica-r, WP, AS | |
+| Retirements | Gutiérrez 4 laps (ran into the back of Sutil at the hairpin, lap 5 per WP); Sutil 5 laps (damage; exhaust fire in the pits, WP); Webber 15 laps (right-rear wheel came off at the hairpin after a lap-14 stop following contact with Vergne); Rosberg 21 laps (suspension). | Jolpica-r, WP | |
+| Contact | Di Resta and Sutil touched on lap 1, no damage; Gutiérrez into Sutil; Webber into Vergne (lap 14); Räikkönen nudged Pérez's McLaren (lap 15, WP) and tore his nose but did not pit for it (WP, AS). | WP, AS | |
+| Penalties | Webber's pit-lane start only. No in-race penalties found. | WP | |
+| Team orders | None found. WP reports a radio instruction to Vettel not to resist Alonso's attack (not quoted here). | WP | |
+
+### Proposal
+
+| Item | Proposal |
+|---|---|
+| Storyline drivers | Vettel (Red Bull, medium-medium-soft, two stops from P9) and Alonso (Ferrari, soft start, three stops from P3). |
+| Dilemma (original wording) | Start on the long-lasting medium and save the soft for a short sprint at the end: when do you bolt it on to catch the podium? |
+| Draft target | position: Vettel P3 or better (finished 4th, 0.203 s short). If `pipeline hard-calls` picks Alonso: win from P3. |
+| Side really won? | Vettel no (4th), so a rewrite is allowed. Alonso yes (won by 10.168 s), so no rewrite. |
+| Risk | Medium. No timing source for SC status or compounds per stint; Vettel's second-stop lap conflicts (29 WP / 31 Jolpica); Räikkönen's nose damage, Hamilton's marbles and four retirements (incl. Webber's wheel, Rosberg) need storyline handling; the both-compounds rule shapes Vettel's soft stint. |
+
+## germany-2012 (2012 German Grand Prix; Era 6 #7, replaces abu-dhabi-2012)
+
+**Side and target.** `pipeline hard-calls` (local run): BUT 2, VET 0 (chance given up BUT 2.0, VET 22.3 pts), so Button, as proposed. Button did not win (P2, 6.949 s behind Alonso), so a rewrite is allowed. Spec §4 draft: the proposal's dilemma, lightly reworded; target `win: Button from P6`. The build notes Vettel's 20 s post-race penalty (and Button's +2.268 s difference against the summed laps) as quirks: the laps order is used.
+
+### Sources
+
+| Short name | What |
+|---|---|
+| WP | [English Wikipedia race article](https://en.wikipedia.org/wiki/2012_German_Grand_Prix) (raw wikitext) |
+| AS-race | [Autosport, "Fernando Alonso holds off Vettel and Button to take third win of 2012 in the German GP"](https://www.autosport.com/f1/news/fernando-alonso-holds-off-vettel-and-button-to-take-third-win-of-2012-in-the-german-gp-4456411/4456411/) (provisional results table) |
+| AS-quali | [Autosport, "Fernando Alonso grabs pole at wet Hockenheim ahead of German Grand Prix"](https://www.autosport.com/f1/news/fernando-alonso-grabs-pole-at-wet-hockenheim-ahead-of-german-grand-prix-4456471/4456471/) |
+| AS-pen | [Autosport, "Sebastian Vettel's German Grand Prix penalty came after FIA warning over off-track moves"](https://www.autosport.com/f1/news/sebastian-vettels-german-grand-prix-penalty-came-after-fia-warning-over-off-track-moves-4456335/4456335/) |
+| AS-pit | [Autosport, "McLaren bullish after new pitstop record during the German Grand Prix"](https://www.autosport.com/f1/news/mclaren-bullish-after-new-pitstop-record-during-the-german-grand-prix-4456362/4456362/) |
+| GPE | [GrandPrix.com, "Race Report - Alonso wins tight Hockenheim battle"](https://www.grandprix.com/races/german-gp-2012-race-report-alonso-wins-tight-hockenheim-battle.html) |
+| Jolpica-R | [Jolpica results](https://api.jolpi.ca/ergast/f1/2012/10/results.json) |
+| Jolpica-P | [Jolpica pit stops](https://api.jolpi.ca/ergast/f1/2012/10/pitstops.json?limit=100) |
+
+Not used: OpenF1 has no 2012 data; TUM covers 2014-2019 only. Motor Sport has only a database
+page for this race (no report text found). The Autosport live commentary (live.autosport.com,
+id 497) refused the connection and its web.archive.org copy could not be fetched, so nothing
+from it is used (a search-result summary of it is not counted as a source).
+
+### Facts
+
+| Topic | Fact | Sources | Owner checked |
+|---|---|---|---|
+| Qualifying | Wet: Q1 fully dry, rain arrived just before Q2 (AS-quali). Alonso pole 1:40.621; Vettel 1:41.026; Webber 1:41.496; Schumacher 1:42.459; Hülkenberg 1:43.501; Maldonado 1:43.950; Button 1:44.113; Hamilton 1:44.186; di Resta 1:44.889; Räikkönen 1:45.811. | AS-quali, WP | |
+| Grid (after penalties) | Alonso 1, Vettel 2, Schumacher 3, Hülkenberg 4, Maldonado 5, Button 6; Hamilton 7, Webber 8, di Resta 9, Räikkönen 10, Kobayashi 12, Pérez 17, Grosjean 19, Rosberg 21. | WP, Jolpica-R | |
+| Grid penalties | Webber, Rosberg, Grosjean: five places each for gearbox changes. Pérez: five places for impeding Alonso and Räikkönen in Q2. | WP, AS-quali | |
+| Laps | 67 (306.458 km). | WP, Jolpica-R | |
+| Weather (race) | Dry; "dry and sunny" on the grid, air 20-21 °C, track 30-32 °C (infobox: "Fine and Dry", air 22 °C, track 30 °C). | WP | |
+| Tyres | Pirelli medium (prime) and soft (option). Alonso led the first stint on softs; Alonso and Vettel changed to mediums at the first stops. Schumacher's last stint was on fresh softs. Other compounds per stint: not in sources. | WP, AS-race | |
+| SC / VSC / red flag | None mentioned in GPE, AS-race or WP. No source states it explicitly; race-control data: not in sources. | GPE, AS-race | |
+| Lap 1 | Hamilton, Massa, Senna and Grosjean delayed in first-lap incidents (contact or debris) and pitted early (AS-race). Hamilton's puncture came from debris from Massa's front wing (GPE). Jolpica-P: Massa, Senna, Grosjean in on lap 1, Hamilton lap 3. | AS-race, GPE, Jolpica-P | |
+| Stops: Alonso | In-laps 18, 41 (two stops). | Jolpica-P | |
+| Stops: Vettel | In-laps 20, 41. | Jolpica-P | |
+| Stops: Button | In-laps 19, 40. Stopped one lap before Vettel at the final stops (AS-race); McLaren's 2.31 s stationary time (FIA timed 2.4 s) was "decisive to get past Vettel" (AS-pit); GPE: the early second stop from third, with the record stop, moved him ahead of Vettel into 2nd. | Jolpica-P, AS-race, AS-pit, GPE | |
+| Stops: others | Räikkönen 11, 38; Kobayashi 22, 43; Pérez 17, 40 (first stop earlier than planned, GPE); Webber 12, 40; Schumacher 14, 36, 52 (three stops); Hülkenberg 12, 31, 46; Rosberg 12, 32, 50; Hamilton 3, 31, 47. | Jolpica-P, GPE, AS-race | |
+| Button's race | Passed Schumacher and Hülkenberg early; gained on the leaders when Hamilton unlapped himself from Vettel; after the final stops held off Vettel at the hairpin and chased Alonso. | AS-race | |
+| Hamilton | After his puncture and second stop he rejoined just behind the leaders, unlapped himself by passing Vettel into the Turn 6 hairpin and ran wheel-to-wheel with Alonso (GPE). Retired, puncture: 56 laps (Jolpica-R, WP); AS-race's provisional table says lap 58. The only retirement (GPE). | GPE, Jolpica-R, WP, AS-race | |
+| Vettel's pass and penalty | On the penultimate lap Vettel went round the outside of Button into the hairpin and used the run-off on the exit to pass. Stewards added 20 s to his race time (instead of a drive-through) for not using the track "at all times", dropping him from 2nd to 5th; Räikkönen inherited 3rd. | AS-pen, AS-race, GPE, WP | |
+| Other | Räikkönen was delayed early behind Hamilton, letting di Resta past (GPE). Maldonado had high tyre wear and fell to 15th (AS-race). Webber struggled on the prime (GPE). | GPE, AS-race | |
+| Team orders | None sourced. | | |
+| Result | Alonso 1:31:05.862; Button +6.949 (Jolpica-R, AS-race; WP says +6.931); Räikkönen +16.409; Kobayashi +21.925; Vettel +23.732 (road gap +3.732 before the 20 s, AS-race); Pérez +27.896; Schumacher +28.970 (AS-race provisional +28.960); Webber +46.941. | Jolpica-R, WP, AS-race | |
+
+### Proposal (draft, for the owner)
+
+| Item | Draft | Owner checked |
+|---|---|---|
+| Storyline drivers | Button (McLaren) and Alonso (Ferrari); Vettel is the third car in the fight. | |
+| Dilemma (original wording) | Button sits third behind Alonso and Vettel: McLaren can bring the last stop forward a lap to jump the Red Bull, then has to find a way past the Ferrari on fresher tyres. | |
+| Suggested side | Button (pending `pipeline hard-calls`; Alonso and Vettel are the other candidates). | |
+| Target (draft) | win: Button from P6 (beat Alonso). Fallback: position P2 or better on the road (beat Vettel without relying on his penalty). | |
+| Side really won? | No: Button was classified 2nd, 6.949 s behind Alonso (and was 3rd on the road before Vettel's penalty). A rewrite is allowed. | |
+| Modelling risk | **Medium.** Dry race, no SC/red flag mentioned, real stop laps from Jolpica, two-stop leaders. Risks: compounds known only for Alonso/Vettel's first two stints and Schumacher's last stint; the gaps between the leaders during the race are not in sources (only "never a huge lead"); Vettel's 20 s post-race penalty must be applied as a storyline event or his road finish modelled; Hamilton's unlapping and lap-1 debris stops (Massa, Senna, Grosjean, Hamilton) need scripting; the 2.31 s record stop vs normal stop loss sets the undercut margin. Qualifying was wet but the race dry, so no wet model is needed. | |
+
+### Not in sources
+
+- Safety car / VSC status from race control (none mentioned, not stated).
+- Tyre compound for each stint, except Alonso's and Vettel's soft-then-medium and Schumacher's final softs.
+- Gaps between Alonso, Button and Vettel at any lap during the race.
+- The lap Hamilton unlapped himself; the lap of Hamilton's puncture beyond "opening lap" (pit in-lap 3, Jolpica).
+- Fuel figures (no refuelling in 2012).
+
+## germany-2013 (2013 German Grand Prix; Era 6 #3, replaces china-2011)
+
+**Side and target.** `pipeline hard-calls` (local run): RAI 1, VET 0 (chance given up RAI 7.0, VET 5.7 pts), so Räikkönen, as proposed. Räikkönen did not win (P2, 1.008 s behind Vettel), so a rewrite is allowed. Spec §4 draft: the proposal's dilemma with "ageing mediums" changed to "ageing tyres" (his middle-stint compound is not in the sources); target `win: Räikkönen from P4`. The safety car is entered in `data/incidents.json` at the built model's lap 24 (sources: lap 23 WP, lap 22 MS); the SC estimate stays unchecked.
+
+### Sources
+
+| Short name | What |
+|---|---|
+| WP | [English Wikipedia race article](https://en.wikipedia.org/wiki/2013_German_Grand_Prix) (raw wikitext) |
+| MS | [Motor Sport, "2013 German Grand Prix report"](https://www.motorsportmagazine.com/articles/single-seaters/f1/2013-german-grand-prix-report/) |
+| AS-K | [Autosport, "Raikkonen suspects last stop not needed"](https://autosport.com/f1/news/108644/raikkonen-suspects-last-stop-not-needed) |
+| AS-V | [Autosport, "Sebastian Vettel says Nurburgring win a huge relief"](https://www.autosport.com/f1/news/german-gp-sebastian-vettel-says-nurburgring-win-a-huge-relief-4466682/4466682/) |
+| GPE | [GrandPrix.com, Sunday team quotes](https://www.grandprix.com/races/german-gp-2013-sunday-team-quotes.html) |
+| Jolpica-R | [Jolpica results](https://api.jolpi.ca/ergast/f1/2013/9/results.json) |
+| Jolpica-P | [Jolpica pit stops](https://api.jolpi.ca/ergast/f1/2013/9/pitstops.json?limit=100) |
+| Jolpica-Q | [Jolpica qualifying](https://api.jolpi.ca/ergast/f1/2013/9/qualifying.json) |
+
+Not used: OpenF1 has no 2013 data; TUM covers 2014-2019 only. No GrandPrix.com race report was
+found for this race (only results and team quotes).
+
+### Facts
+
+| Topic | Fact | Sources | Owner checked |
+|---|---|---|---|
+| Grid | Hamilton pole (1:29.398), Vettel 2nd, Webber 3rd, Räikkönen 4th, Grosjean 5th, Ricciardo 6th; Massa 7th, Alonso 8th, Button 9th, Hülkenberg 10th, Rosberg 11th (out in Q2 after a team mistake). Massa and Alonso started on mediums; Button and Hülkenberg set no Q3 time to save tyres. | WP, Jolpica-R, Jolpica-Q | |
+| Penalties (grid) | None in sources; Jolpica grid matches the qualifying order for the top 6. | Jolpica-R | |
+| Tyres | Pirelli changed the rear construction (Kevlar instead of steel belts) after the Silverstone failures; swapping left/right tyres was banned. Compounds on offer: soft and medium (named in the race account). | WP, AS-V | |
+| Laps | 60 (5.148 km). | WP, Jolpica-R | |
+| Weather | Dry, "Sunny" (WP); MS mentions "the prevailing heat"; teams cite hotter-than-expected temperatures (GPE: Ferrari, Mercedes, Renault). Temperature figures: not in sources. | WP, MS, GPE | |
+| Start | Vettel led from Turn 1; Webber 2nd, Hamilton 3rd. | WP, MS, AS-V | |
+| SC / VSC / red flag | One safety car for Bianchi's Marussia (engine failure, fire; the car rolled back across the track). Deployed lap 23 (WP) / lap 22 (MS: "neutralised for five laps"). Exact in-lap of the SC: not in sources. No red flag; VSC did not exist in 2013. | WP, MS | |
+| Stops: Vettel | In-laps 7, 24 (under SC), 41 (Jolpica-P; MS gives lap 6 for the first). Mediums from the first stop (MS). Under the SC: scrubbed mediums, keeping one new set (MS); last stint new mediums (AS-K). Horner: without the SC they would have run "another five to seven laps" (MS). Red Bull stopped him a lap after Grosjean to cover him, rather than risk "conceding the lead to Kimi if he didn't need to stop" (MS). | Jolpica-P, MS, AS-K | |
+| Stops: Räikkönen | In-laps 8, 24 (under SC), 49 (Jolpica-P; WP: lap 49). First stint softs (worn softs, WP's general account); last stint scrubbed softs (MS), "softs" (WP, AS-K). Held up by Hamilton after his first stop (GPE, Permane and Räikkönen). Led from lap 41 when Vettel and Grosjean stopped (WP). | Jolpica-P, WP, MS, AS-K, GPE | |
+| Stops: Grosjean | In-laps 13, 24 (under SC), 40 (Jolpica-P; MS: final stop lap 40). First stint softs (GPE, Grosjean); led before his first stop (WP). Last stint new mediums (AS-K). MS: Grosjean had the greater tyre range, so the SC "didn't do Grosjean any favours". | Jolpica-P, MS, AS-K, GPE, WP | |
+| Stops: others | Alonso 12, 24, 49 (started on mediums; last stint softs per WP; MS says lap 13, "one before Grosjean"). Hamilton 6, 22, 45. Button two-stop, 21 and 47. Webber 8 (2:42.042 s in pit, wheel loss), 23, 38. Hamilton and Button stopped shortly before the SC (MS). | Jolpica-P, WP, MS | |
+| Webber wheel | At his first stop the right-rear wheel was not attached, came off in the pit lane and hit a FOM cameraman; Webber rejoined a lap down and regained the lead lap under the SC (WP, GPE Horner). Lap: Jolpica in-lap 8; MS lap 7 ("one lap after Vettel"); WP's "a lap later" than Grosjean's lap-13 stop conflicts with both. | WP, MS, GPE, Jolpica-P | |
+| Retirements | Massa lap 3-4 (spun at Turn 1 after locking the rears, engine stalled; Jolpica: 3 laps, "Spun off"; MS: lap 4). Bianchi 21 laps (engine, fire). Vergne 22 laps (hydraulics, during the SC). | Jolpica-R, WP, MS | |
+| Penalties / fines | Red Bull fined €30,000 (Webber's wheel); Force India €5,000 (unsafe release of di Resta into Vergne's path). No driver penalties sourced. | WP, MS | |
+| Contact | None between front-runners sourced. | | |
+| Team orders | Lotus told Grosjean not to hold Räikkönen up (WP); Räikkönen passed him within "a few laps" of his lap-49 stop (WP); exact lap: not in sources. Grosjean: letting Räikkönen by was sensible as they were on different strategies (GPE). | WP, GPE | |
+| Lotus decision | Permane: Lotus considered running Räikkönen on a two-stop but saw his tyre performance dropping (GPE). Boullier: "Kimi's pace was beginning to drop" and the tyres would not last (MS). Räikkönen afterwards wondered whether he could have gone to the end (AS-K). | GPE, MS, AS-K | |
+| Result | Vettel 1:41:14.711; Räikkönen +1.008; Grosjean +5.830; Alonso +7.721; Hamilton +26.927; Button +27.996. Webber 7th +37.562. Fastest lap Alonso 1:33.468 (lap 51). | Jolpica-R, WP | |
+
+### Proposal (draft, for the owner)
+
+| Item | Draft | Owner checked |
+|---|---|---|
+| Storyline drivers | Räikkönen (Lotus) and Vettel (Red Bull). | |
+| Dilemma (original wording) | Räikkönen inherits the lead when Vettel and Grosjean make their last stops: stay out to the flag on ageing mediums, or stop for softs and hunt Vettel down in the final ten laps. | |
+| Suggested side | Räikkönen (pending `pipeline hard-calls`; Grosjean is the alternative Lotus side). | |
+| Target (draft) | win: Räikkönen from P4 (equivalently beat-rival Vettel). Fallback: position P2. | |
+| Side really won? | No: Räikkönen finished 2nd, 1.008 s behind Vettel. A rewrite is allowed. | |
+| Modelling risk | **Medium.** Dry, one SC with real stop laps from Jolpica. Risks: SC lap differs (WP 23 vs MS 22) and its end lap is not in sources; Webber's lost wheel (~2 min stop, lap down, back on the lead lap via SC) needs scripting; per-stint compounds only partly sourced; one-off tyre construction this race; Lotus team-order swap needs a storyline event; no OpenF1/TUM laps for 2013. | |
+
+### Not in sources
+
+- Lap the safety car came in, and an agreed lap it came out.
+- Lap Räikkönen passed Grosjean after his last stop.
+- Compounds for Räikkönen's and Grosjean's middle stints, Vettel's first stint (only "mediums from the first stop"), and the rest of the top 6 except where listed.
+- Air and track temperatures.
+- Gaps during the race (only the final classification).

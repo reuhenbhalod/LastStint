@@ -335,6 +335,19 @@
  "italy-2010": [],
  "australia-2013": [],
  "bahrain-2012": [],
+ "abu-dhabi-2011": [],
+ "china-2013": [],
+ "germany-2012": [],
+ "germany-2013": [
+  {
+   "lap": 24,
+   "type": "SC",
+   "driver": "BIA",
+   "status": "Engine",
+   "source": "https://en.wikipedia.org/wiki/2013_German_Grand_Prix",
+   "note": "Bianchi's Marussia stopped with an engine failure and fire and rolled back across the track (Jolpica: 21 laps, status Engine). Wikipedia puts the SC out on lap 23, Motor Sport on lap 22 (neutralised for five laps, https://www.motorsportmagazine.com/articles/single-seaters/f1/2013-german-grand-prix-report/); the lap it came in is not in the sources. The built model has it from lap 24, 6 laps (Jolpica estimate, data/estimates/germany-2013.sc.json, unchecked)"
+  }
+ ],
  "bahrain-2015": [],
  "abu-dhabi-2015": [],
  "singapore-2014": [

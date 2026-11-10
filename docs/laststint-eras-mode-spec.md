@@ -111,14 +111,14 @@ Players start at Era 10 and move back through the timeline to Era 1. The eras be
 |---|---|---|---|
 | 1 | bahrain-2012 | Räikkönen closes in on Lotus' fresher softs: cover the undercut at the last stop, or trust Red Bull's own plan | defend: Vettel holds P1 |
 | 2 | abu-dhabi-2010 | Ferrari covers the wrong car and loses the title | position: Alonso P4 or better for the title |
-| 3 | china-2011 | Hamilton's three stops beat Vettel's two | win: Hamilton beats Vettel |
+| 3 | germany-2013 | Räikkönen inherits the lead when Vettel and Grosjean make their last stops: run to the flag on ageing tyres, or stop for softs and hunt Vettel down | win: Räikkönen from P4 |
 | 4 | italy-2010 | Button blinks first: does Alonso stay out one more lap and trust his crew to win it in the pit lane? | win: Alonso gets ahead of Button at the stops |
 | 5 | australia-2013 | Lotus is kind to its tyres: stretch Räikkönen to two stops while the Ferraris and Red Bulls stop three times | win: Räikkönen from P7 |
 | 6 | europe-2012 | Alonso wins from 11th in Valencia | win: Alonso from P11 |
-| 7 | abu-dhabi-2012 | Vettel from the pit lane to the podium | position: Vettel from the pit lane to the podium |
-| 8 | brazil-2012 | Vettel recovers from a first-lap spin to win the title | position: Vettel high enough for the title |
+| 7 | germany-2012 | Button sits third behind Alonso and Vettel: bring the last stop forward a lap to jump the Red Bull, then chase the Ferrari on fresher tyres | win: Button from P6 |
+| 8 | china-2013 | Ferrari's softs last only a handful of laps: commit Alonso to three stops and find a way past the cars running long on mediums | win: Alonso from P3 |
 | 9 | malaysia-2013 | Multi 21 team orders | defend: Webber holds P1 |
-| 10 | spain-2013 | Alonso wins on four stops | win: Alonso on four stops |
+| 10 | abu-dhabi-2011 | Three seconds clear of Alonso on the same tyres: box first for the last stint to cover the undercut, or stay out and risk Ferrari going longer | defend: Hamilton holds P1 |
 
 ### Era 5: Alonso, Räikkönen, Hamilton (2005–2009) · play order 6
 | # | Race ID | Dilemma | Target (draft) |
@@ -241,9 +241,9 @@ Every race has one target, set in `eras.target`. Each race's draft target is in 
 
 | Type | Means | Grader `Target` | Races (draft) |
 |---|---|---|---|
-| `win` | Chase down the win from behind | `win` | 46 |
-| `defend` | Start in the lead and keep it to the flag | `win`, starting from P1 | 18 |
-| `position` | Reach a set position, such as P3 to win the title | `position` | 19 |
+| `win` | Chase down the win from behind | `win` | 47 |
+| `defend` | Start in the lead and keep it to the flag | `win`, starting from P1 | 19 |
+| `position` | Reach a set position, such as P3 to win the title | `position` | 17 |
 | `beat-rival` | Finish ahead of a named car, wherever that is | `beat-rival` | 13 |
 | `team` | A team result, such as a 1–2 in a set order | `team` (new) | 2 |
 | `deny` | Keep a rival at or below a set position, such as out of the top 3 to stop their title | `deny` (new) | 2 |

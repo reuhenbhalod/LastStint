@@ -536,14 +536,14 @@ The **Needs** column is from race history and must be checked against the data f
 | 7 | `abu-dhabi-2016` | TUM | P4 map |  |
 | 6 | `bahrain-2012` | Jolpica (est. compounds) | P4 map |  |
 | 6 | `abu-dhabi-2010` | Jolpica + F1DB stops (est. compounds) | P4 map |  |
-| 6 | `china-2011` | Jolpica (est. compounds) | P4 map |  |
+| 6 | `germany-2013` | Jolpica (est. compounds) | P4 map |  |
 | 6 | `italy-2010` | Jolpica + F1DB stops (est. compounds) | P4 map |  |
 | 6 | `australia-2013` | Jolpica (est. compounds) | P4 map |  |
 | 6 | `europe-2012` | Jolpica (est. compounds) | P4 map |  |
-| 6 | `abu-dhabi-2012` | Jolpica (est. compounds) | P4 map |  |
-| 6 | `brazil-2012` | Jolpica (est. compounds) | R3 wet pre-2018, P4 map |  |
+| 6 | `germany-2012` | Jolpica (est. compounds) | P4 map |  |
+| 6 | `china-2013` | Jolpica (est. compounds) | P4 map |  |
 | 6 | `malaysia-2013` | Jolpica (est. compounds) | R3 wet pre-2018, P4 map |  |
-| 6 | `spain-2013` | Jolpica (est. compounds) | P4 map |  |
+| 6 | `abu-dhabi-2011` | Jolpica (est. compounds) | P4 map |  |
 | 5 | `san-marino-2005` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
 | 5 | `europe-2009` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
 | 5 | `france-2007` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
