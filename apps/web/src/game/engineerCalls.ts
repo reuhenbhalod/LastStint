@@ -912,7 +912,9 @@ export function directorCall(
     if (call && offersStop(call)) mem.last.stop = race.lap;
     return call;
   };
-  if (!stopping) {
+  // The safety car asks too: not within a few laps of the last stop question (a weather call,
+  // say, as netherlands-2023's track dries under the lap-16 SC).
+  if (!stopping && race.lap - (mem.last.stop ?? -99) >= STOP_ASK_EVERY) {
     const sc = safetyCarCall(race, model, false);
     if (sc) return asked(sc);
   }
