@@ -161,3 +161,11 @@ export type {
   VersusMoment,
   VersusMomentKind,
 } from './versus.js';
+export {
+  VERSUS_GRADE_SAMPLES,
+  gradeVersus,
+  gradeVersusCall,
+  optionCalls,
+  versusOptions,
+} from './versusGrade.js';
+export type { VersusAnswer, VersusScore } from './versusGrade.js';

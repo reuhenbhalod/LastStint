@@ -144,8 +144,8 @@ export const VERSUS_LAPS = 20;
 /** The grid: the second car starts this far behind the first. */
 export const GRID_GAP = 0.3;
 /** A SC or VSC can start on these laps. */
-const NEUTRAL_FROM = 4;
-const NEUTRAL_TO = 17;
+export const NEUTRAL_FROM = 4;
+export const NEUTRAL_TO = 17;
 
 // --- Setup, calls, state ---------------------------------------------------------------------
 

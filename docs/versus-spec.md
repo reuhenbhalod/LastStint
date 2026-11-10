@@ -194,7 +194,12 @@ Each phase is tested before the next.
    - Two player cars, with no computer reactions for either.
    - The triggered calls.
    - **Tests:** determinism (same seed and calls, same race); car balance (V2); and that solo is unchanged against the golden files.
-2. **Grading.** Grading against the other car's real calls (V4), and the balance runs.
+2. **Grading (`packages/sim/src/versusGrade.ts`).** Done.
+   - **What it grades:** each answered big call. The options are stay out and box for each dry tyre, or the three stances in the final laps.
+   - **The replays:** 400 replays from the pause. The other car keeps all its real calls. The caller's later calls are replaced by one sensible stop if they still owe one.
+   - **What's resampled:** each replay draws a new future, including any SC or VSC not yet showing, and every option sees the same draws.
+   - **The winner:** the score, then the mean chance, then the road result.
+   - **Speed:** a whole race grades in about 0.2 s of CPU in Node, which is fine for a Durable Object.
 3. **The live room (`apps/worker`).**
    - The Durable Object, the WebSocket messages, lockstep, the paused big calls, reconnects and checking the result.
    - Tested with two simulated clients.
