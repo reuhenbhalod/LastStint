@@ -7,5 +7,39 @@
     "drs": false,
     "ers": "none",
     "refuelling": true
+  },
+  "eras": {
+    "eraId": 4,
+    "order": 5,
+    "userSide": "BAR",
+    "target": {
+      "type": "position",
+      "position": 2
+    },
+    "storyline": {
+      "real": "Schumacher leads from pole while Barrichello, second, holds Coulthard's McLaren up behind him. Coulthard gets ahead at the first stops, but his rig sticks at the second and Barrichello takes second back, holding him off to the flag by 0.577 s. Schumacher wins and takes his fourth title; the Ferrari one-two clinches the constructors' title.",
+      "rewriteCondition": {
+        "type": "win"
+      },
+      "headline": "Barrichello beats Schumacher to the Hungaroring win"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 2,
+      "label": "Second on two stops, as Barrichello made"
+    },
+    "hidden": {
+      "type": "team_result",
+      "positions": [
+        2,
+        2
+      ],
+      "label": "Bring the Ferraris home one-two"
+    },
+    "hardCalls": {
+      "MSCM": 0,
+      "BAR": 1
+    },
+    "briefing": "Hungaroring, 2001. Schumacher leads from pole. You run Barrichello's Ferrari, second and 11 seconds behind him after 25 laps, with Coulthard's McLaren 0.6 s behind you. Two stops each. Keep Coulthard behind you to the flag."
   }
 }

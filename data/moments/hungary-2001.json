@@ -1,0 +1,261 @@
+[
+  {
+    "id": "rivalpit-28",
+    "lap": 28,
+    "trigger": "rivalPit",
+    "target": {
+      "kind": "position",
+      "atBest": 2
+    },
+    "options": [
+      {
+        "id": "stay",
+        "label": "Stay out",
+        "decisions": []
+      },
+      {
+        "id": "box-medium",
+        "label": "Box, mediums",
+        "decisions": [
+          {
+            "lap": 28,
+            "kind": "pit",
+            "compound": "MEDIUM",
+            "fill": "standard"
+          }
+        ]
+      },
+      {
+        "id": "box-next-medium",
+        "label": "Box next lap, mediums",
+        "decisions": [
+          {
+            "lap": 29,
+            "kind": "pit",
+            "compound": "MEDIUM",
+            "fill": "standard"
+          }
+        ]
+      }
+    ],
+    "realOptionId": "stay"
+  },
+  {
+    "id": "stop-31",
+    "lap": 31,
+    "trigger": "cliff",
+    "target": {
+      "kind": "position",
+      "atBest": 2
+    },
+    "options": [
+      {
+        "id": "stay",
+        "label": "Stay out",
+        "decisions": []
+      },
+      {
+        "id": "box-medium",
+        "label": "Box, mediums",
+        "decisions": [
+          {
+            "lap": 31,
+            "kind": "pit",
+            "compound": "MEDIUM",
+            "fill": {
+              "laps": 22
+            }
+          }
+        ]
+      },
+      {
+        "id": "box-next-medium",
+        "label": "Box next lap, mediums",
+        "decisions": [
+          {
+            "lap": 32,
+            "kind": "pit",
+            "compound": "MEDIUM",
+            "fill": "standard"
+          }
+        ]
+      }
+    ],
+    "realOptionId": "box-medium"
+  },
+  {
+    "id": "stop-53",
+    "lap": 53,
+    "trigger": "cliff",
+    "target": {
+      "kind": "position",
+      "atBest": 2
+    },
+    "options": [
+      {
+        "id": "stay",
+        "label": "Stay out",
+        "decisions": []
+      },
+      {
+        "id": "box-medium",
+        "label": "Box, mediums",
+        "decisions": [
+          {
+            "lap": 53,
+            "kind": "pit",
+            "compound": "MEDIUM",
+            "fill": {
+              "laps": 24
+            }
+          }
+        ]
+      },
+      {
+        "id": "box-next-medium",
+        "label": "Box next lap, mediums",
+        "decisions": [
+          {
+            "lap": 54,
+            "kind": "pit",
+            "compound": "MEDIUM",
+            "fill": "standard"
+          }
+        ]
+      }
+    ],
+    "realOptionId": "box-medium"
+  },
+  {
+    "id": "pace-57",
+    "lap": 57,
+    "trigger": "cliff",
+    "target": {
+      "kind": "position",
+      "atBest": 2
+    },
+    "options": [
+      {
+        "id": "push",
+        "label": "Push now",
+        "decisions": [
+          {
+            "lap": 57,
+            "kind": "mode",
+            "key": "pace",
+            "value": "push"
+          }
+        ]
+      },
+      {
+        "id": "standard",
+        "label": "Standard pace",
+        "decisions": [
+          {
+            "lap": 57,
+            "kind": "mode",
+            "key": "pace",
+            "value": "standard"
+          }
+        ]
+      },
+      {
+        "id": "manage",
+        "label": "Manage the tyres",
+        "decisions": [
+          {
+            "lap": 57,
+            "kind": "mode",
+            "key": "pace",
+            "value": "manage"
+          }
+        ]
+      },
+      {
+        "id": "push-attack",
+        "label": "Push and attack",
+        "decisions": [
+          {
+            "lap": 57,
+            "kind": "mode",
+            "key": "pace",
+            "value": "push"
+          },
+          {
+            "lap": 57,
+            "kind": "mode",
+            "key": "battle",
+            "value": "attack"
+          }
+        ]
+      }
+    ],
+    "realOptionId": null
+  },
+  {
+    "id": "pace-61",
+    "lap": 61,
+    "trigger": "cliff",
+    "target": {
+      "kind": "position",
+      "atBest": 2
+    },
+    "options": [
+      {
+        "id": "push",
+        "label": "Push now",
+        "decisions": [
+          {
+            "lap": 61,
+            "kind": "mode",
+            "key": "pace",
+            "value": "push"
+          }
+        ]
+      },
+      {
+        "id": "standard",
+        "label": "Standard pace",
+        "decisions": [
+          {
+            "lap": 61,
+            "kind": "mode",
+            "key": "pace",
+            "value": "standard"
+          }
+        ]
+      },
+      {
+        "id": "manage",
+        "label": "Manage the tyres",
+        "decisions": [
+          {
+            "lap": 61,
+            "kind": "mode",
+            "key": "pace",
+            "value": "manage"
+          }
+        ]
+      },
+      {
+        "id": "push-attack",
+        "label": "Push and attack",
+        "decisions": [
+          {
+            "lap": 61,
+            "kind": "mode",
+            "key": "pace",
+            "value": "push"
+          },
+          {
+            "lap": 61,
+            "kind": "mode",
+            "key": "battle",
+            "value": "attack"
+          }
+        ]
+      }
+    ],
+    "realOptionId": null
+  }
+]
