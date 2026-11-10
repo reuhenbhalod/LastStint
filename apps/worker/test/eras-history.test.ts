@@ -331,8 +331,8 @@ describe('GET /api/eras/races/:raceId/stats', () => {
     await historyEntry(ids.b, race, b1, T0);
     await attempt(ids.c, race, 40);
     await attempt(more.d, race, null);
-    const e1 = await attempt(more.e, 'miami-2024', 90, { rewrite: true });
-    await historyEntry(more.e, 'miami-2024', e1, T0);
+    const e1 = await attempt(more.e, 'emilia-romagna-2024', 90, { rewrite: true });
+    await historyEntry(more.e, 'emilia-romagna-2024', e1, T0);
     // Star rates: three players on normal, one on Legend.
     await progress(ids.a, race, [1, 1, 0], { accuracy: 75 });
     await progress(ids.c, race, [1, 0, 0], { accuracy: 40 });
@@ -368,7 +368,7 @@ describe('GET /api/eras/races/:raceId/stats', () => {
   });
 
   it('is cached for CACHE_SECONDS: a new rewrite shows once the cache expires', async () => {
-    const race = 'miami-2024';
+    const race = 'emilia-romagna-2024';
     await attempt(ids.a, race, 50);
     const vars = { CACHE_SECONDS: '60' };
     const path = `/api/eras/races/${race}/stats`;

@@ -1545,6 +1545,67 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
+    "abu-dhabi-2022": {
+        "year": 2022,
+        "event": "Abu Dhabi",
+        "source": "jolpica",
+        "name": "Abu Dhabi 2022: Leclerc vs Pérez",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for monaco-2025 (swap-races-e10-e9-b.md). Side provisional until
+        # `pipeline hard-calls`: Leclerc's one stop against Pérez's two (real: LEC P2, PER P3).
+        "user_side": "LEC",
+        "rival": "PER",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "emilia-romagna-2024": {
+        "year": 2024,
+        "event": "Italy",
+        "location": "Imola",  # OpenF1 lists two 2024 races in Italy (Imola, Monza)
+        "source": "openf1",  # FastF1 needs F1TV since Oct 2026 (pipeline/openf1.py)
+        "name": "Emilia Romagna 2024: Norris vs Verstappen",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for miami-2024 (swap-races-e10-e9-b.md). Side provisional until
+        # `pipeline hard-calls`.
+        "user_side": "NOR",
+        "rival": "VER",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "great-britain-2023": {
+        "year": 2023,
+        "event": "United Kingdom",  # OpenF1's country_name is the lookup key
+        "source": "openf1",
+        "name": "Britain 2023: Norris vs Hamilton",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for great-britain-2022 (swap-races-e10-e9-b.md). Side provisional until
+        # `pipeline hard-calls`.
+        "user_side": "NOR",
+        "rival": "HAM",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "netherlands-2021": {
+        "year": 2021,
+        "event": "Dutch",
+        "source": "jolpica",
+        "name": "Netherlands 2021: Verstappen vs Hamilton",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for brazil-2021 (swap-races-e10-e9-b.md). Side provisional until
+        # `pipeline hard-calls`.
+        "user_side": "VER",
+        "rival": "HAM",
+        "score_positions": 6,
+        "split": "eras",
+    },
     "monaco-2022": {
         "year": 2022,
         "event": "Monaco",

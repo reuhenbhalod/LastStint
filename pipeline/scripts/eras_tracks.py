@@ -56,6 +56,7 @@ MULTIVIEWER: dict[str, tuple[int, int, int, tuple[float, float]]] = {
     "germany-2018": (34, 2018, 2019, (-0.05, 0.06)),
     "germany-2019": (34, 2019, 2019, (-0.05, 0.06)),
     "europe-2007": (72, 2020, 2020, (-0.06, 0.08)),
+    "emilia-romagna-2024": (6, 2024, 2022, (-0.06, 0.06)),
 }
 
 # Race -> (outline it reuses, the f1db layout id both races ran on). The source is a
@@ -79,6 +80,10 @@ REUSE: dict[str, tuple[str, str]] = {
     "great-britain-2016": ("great-britain-2022", "silverstone-8"),
     "great-britain-2021": ("great-britain-2022", "silverstone-8"),
     "bahrain-2023": ("bahrain-2021", "bahrain-1"),
+    "great-britain-2023": ("great-britain-2022", "silverstone-8"),
+    "japan-2023": ("japan-2024", "suzuka-2"),
+    "abu-dhabi-2022": ("abu-dhabi-2021", "yas-marina-2"),
+    "netherlands-2021": ("netherlands-2022", "zandvoort-5"),
     "miami-2024": ("miami-2023", "miami-1"),
     "saudi-arabia-2021": ("saudi-arabia-2025", "jeddah-1"),
     "russia-2018": ("russia-2020", "sirius-1"),

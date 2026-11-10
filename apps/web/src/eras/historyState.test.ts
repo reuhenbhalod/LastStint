@@ -102,9 +102,9 @@ describe('a rewrite entry', () => {
   it('lists the newest rewrite first', () => {
     const old = historyEntry({ raceId: 'monaco-2022', achievedAt: '2026-01-01T00:00:00Z' });
     const mid = historyEntry({ raceId: 'hungary-2022', achievedAt: '2026-06-01T00:00:00Z' });
-    const now = historyEntry({ raceId: 'miami-2024', achievedAt: '2026-11-01T00:00:00Z' });
+    const now = historyEntry({ raceId: 'emilia-romagna-2024', achievedAt: '2026-11-01T00:00:00Z' });
     expect(entriesNewestFirst([old, mid, now]).map((e) => e.raceId)).toEqual([
-      'miami-2024',
+      'emilia-romagna-2024',
       'hungary-2022',
       'monaco-2022',
     ]);
