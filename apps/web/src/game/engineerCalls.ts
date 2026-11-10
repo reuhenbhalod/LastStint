@@ -26,6 +26,7 @@ import {
   type RaceState,
   battlesFor,
   cleanLap,
+  erasRace,
   isWetTyre,
   lappedAhead,
   moodOf,
@@ -912,9 +913,11 @@ export function directorCall(
     if (call && offersStop(call)) mem.last.stop = race.lap;
     return call;
   };
-  // The safety car asks too: not within a few laps of the last stop question (a weather call,
-  // say, as netherlands-2023's track dries under the lap-16 SC).
-  if (!stopping && race.lap - (mem.last.stop ?? -99) >= STOP_ASK_EVERY) {
+  // The safety car asks too. In an Eras race, not within a few laps of the last stop question
+  // (a weather call, say, as netherlands-2023's track dries under the lap-16 SC); Daily and
+  // Gauntlet keep their radio as it was (frozen).
+  const scRecent = erasRace(model) && race.lap - (mem.last.stop ?? -99) < STOP_ASK_EVERY;
+  if (!stopping && !scRecent) {
     const sc = safetyCarCall(race, model, false);
     if (sc) return asked(sc);
   }
