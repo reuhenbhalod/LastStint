@@ -15,16 +15,16 @@
   "lengths": {
     "scLaps": 5,
     "vscLaps": 2,
-    "scPeriodsMeasured": 158,
+    "scPeriodsMeasured": 159,
     "vscPeriodsMeasured": 72
   },
   "allTracks": {
-    "races": 223,
-    "vscRaces": 167,
-    "scPeriods": 162,
+    "races": 224,
+    "vscRaces": 168,
+    "scPeriods": 163,
     "vscPeriods": 78,
-    "scPerRace": 0.7265,
-    "vscPerRace": 0.4671
+    "scPerRace": 0.7277,
+    "vscPerRace": 0.4643
   },
   "circuits": {
     "albert_park": {
@@ -186,8 +186,8 @@
       "vscRaces": 1,
       "scPeriods": 0,
       "vscPeriods": 0,
-      "scPerRace": 0.7265,
-      "vscPerRace": 0.4671,
+      "scPerRace": 0.7277,
+      "vscPerRace": 0.4643,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -201,8 +201,8 @@
       "vscRaces": 0,
       "scPeriods": 0,
       "vscPeriods": 0,
-      "scPerRace": 0.7265,
-      "vscPerRace": 0.4671,
+      "scPerRace": 0.7277,
+      "vscPerRace": 0.4643,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -241,8 +241,8 @@
       "vscRaces": 2,
       "scPeriods": 0,
       "vscPeriods": 0,
-      "scPerRace": 0.7265,
-      "vscPerRace": 0.4671,
+      "scPerRace": 0.7277,
+      "vscPerRace": 0.4643,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -252,17 +252,18 @@
     },
     "jeddah": {
       "name": "Jeddah Corniche Circuit",
-      "races": 3,
-      "vscRaces": 3,
-      "scPeriods": 3,
+      "races": 4,
+      "vscRaces": 4,
+      "scPeriods": 4,
       "vscPeriods": 2,
       "scPerRace": 1.0,
-      "vscPerRace": 0.6667,
+      "vscPerRace": 0.5,
       "scFallback": false,
       "vscFallback": false,
       "counted": [
         "saudi-arabia-2021 (jolpica-estimate): 1 SC, 0 VSC",
         "saudi-arabia-2022 (fastf1): 1 SC, 2 VSC",
+        "saudi-arabia-2023 (fastf1): 1 SC, 0 VSC",
         "saudi-arabia-2025 (fastf1): 1 SC, 0 VSC"
       ]
     },
@@ -272,8 +273,8 @@
       "vscRaces": 0,
       "scPeriods": 0,
       "vscPeriods": 0,
-      "scPerRace": 0.7265,
-      "vscPerRace": 0.4671,
+      "scPerRace": 0.7277,
+      "vscPerRace": 0.4643,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -286,8 +287,8 @@
       "vscRaces": 0,
       "scPeriods": 0,
       "vscPeriods": 0,
-      "scPerRace": 0.7265,
-      "vscPerRace": 0.4671,
+      "scPerRace": 0.7277,
+      "vscPerRace": 0.4643,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -384,8 +385,8 @@
       "vscRaces": 0,
       "scPeriods": 1,
       "vscPeriods": 0,
-      "scPerRace": 0.7265,
-      "vscPerRace": 0.4671,
+      "scPerRace": 0.7277,
+      "vscPerRace": 0.4643,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -399,8 +400,8 @@
       "vscRaces": 2,
       "scPeriods": 1,
       "vscPeriods": 0,
-      "scPerRace": 0.7265,
-      "vscPerRace": 0.4671,
+      "scPerRace": 0.7277,
+      "vscPerRace": 0.4643,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -608,8 +609,8 @@
       "vscRaces": 0,
       "scPeriods": 1,
       "vscPeriods": 0,
-      "scPerRace": 0.7265,
-      "vscPerRace": 0.4671,
+      "scPerRace": 0.7277,
+      "vscPerRace": 0.4643,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
