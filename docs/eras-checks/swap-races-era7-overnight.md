@@ -708,6 +708,52 @@ OpenF1 has no 2014 data. GPE's stop laps run one higher than Jolpica's in-laps f
 | Did the side win? | Ricciardo: yes (3rd), so no rewrite. Hamilton: yes. Rosberg: no (2nd), rewrite allowed. The side should come from `pipeline hard-calls`. | Jolpica-r | |
 | Risk | Medium. Dry, one early SC (laps 1-4), simple two-stop race. But MS and WP disagree on which stop Ricciardo beat Bottas at, WP calls Hamilton's first stop a "front wing adjustment", and the lead changed on a pass (lap 24) helped by Rosberg's switch error, which a sim may not reproduce. | MS, WP | |
 
+### Authored (B1, Nov 9 2026)
+
+Job `eras-author-united-states-2014-p3` (base `eras-swap-era7-p3`). Every fact below is from the
+Facts table above (read Nov 9 2026); "Timing" is the TUM lap data in
+`data/raw/united-states-2014.parquet`. Storyline, headline and briefing are original wording; no
+team radio is quoted. The Ricciardo draft above is not used: the side comes from
+`pipeline hard-calls`, and the duel built for this race is Hamilton vs Rosberg.
+
+- Side: **ROS**. `pipeline hard-calls united-states-2014`: HAM 0, ROS 0, a tie, broken by chance
+  given up (ROS 45.3 pts, HAM 11.0), as the job rules say.
+- Robust G1 (`pipeline validate united-states-2014 --robust`, Eras build with the eras block):
+  **pass** (strict), mean gap error 0.75 s (0.83 s rules-only, above).
+- Reachability (`pnpm --filter @laststint/sim reachability united-states-2014`): **pass** at era
+  difficulty (threshold 78, Standard+ rival) and at Legend (90, Expert), all three stars and the
+  hidden objective; the stay-out path never earns a star.
+
+| Item | Value | Fact it rests on | Source | Owner checked |
+|---|---|---|---|---|
+| Era / slot | Era 7, order 1 (bahrain-2014's slot) | the third-round swap above | this sheet | |
+| Target | `win` (beat Hamilton) | Hamilton won, Rosberg 2nd +4.314 | Jolpica-r, WP | |
+| Rewrite | allowed (`win`): the side did not win | Rosberg 2nd | Jolpica-r | |
+| Headline | "Rosberg holds Hamilton off in Austin" | original wording | - | |
+| Storyline | "Rosberg leads from pole and through the first stops" | pole 1:36.067; stops ROS 15, HAM 16; Timing: ROS P1 at the end of lap 17 | WP, Jolpica-p, Timing | |
+| Storyline | "but Hamilton closes into DRS range and passes him into the Turn 12 hairpin on lap 24, when Rosberg's extra energy does not come" | Lead pass row: DRS range by lap 22, pass into the Turn 12 hairpin on lap 24; Rosberg selected the wrong switch so the boost did not come | WP, MS, GPE | |
+| Storyline | "Hamilton makes his second stop a lap before Rosberg, stays ahead and wins by 4.3 s" | in-laps HAM 33, ROS 34; "+4.314" | Jolpica-p, Jolpica-r | |
+| Briefing | "Rosberg took pole" | pole 1:36.067 | WP, Jolpica-r | |
+| Briefing | "still leads, 12 laps in, with Hamilton 0.9 s behind on the same soft tyres" | Timing: ROS P1, HAM P2 0.93 s behind at the end of lap 12 (the takeover lap, D3 rule), both on softs from the start | Timing; WP, GPE (start tyres) | |
+| Briefing | "with two stops to make if you follow the plan" | Rosberg's two stops, in-laps 15 and 34 | Jolpica-p | |
+| Mastery | `margin` 4.3 s: "Win by more than 4.3 seconds" (Hamilton's real winning margin, turned round) | "+4.314" | Jolpica-r | |
+| Hidden | `margin` 7 s: "Win by more than 7 seconds" | the game's choice | - | |
+| storylineEvents | none | the only SC is laps 1-4, before the takeover; no VSC or red flag; neither duel car retired | Safety car, VSC and Retirements rows | |
+| Dilemma (spec, catalog) | "Leading from pole with Hamilton under a second behind on the same softs: box first to cover him, or stay out and keep the track position?" | Timing lap 12; ROS stopped on lap 15, a lap before HAM | Timing, Jolpica-p | |
+
+Notes:
+
+- Moments (`pnpm --filter @laststint/sim author united-states-2014 --target win --eras
+  --write`): stop-15, pace-20, pace-28, stop-34 (`data/moments/united-states-2014.json`), the
+  author tool's own picks, not hand-adjusted. Real calls: box mediums on 15 and on 34 (MS, GPE).
+  The model prefers softs at the first stop, so the real lap-15 call grades red against the win
+  (26%, box softs 66%); the real lap-34 call grades 45%.
+- Rosberg's lap-24 switch error is not modelled, so the lap-24 pass is not forced; the win is
+  reachable but not given (author grades 26-90% for the win at the stop calls).
+- Rejected hidden objective (reachability): `margin` 10 s (not reached at Legend).
+- `data/races/united-states-2014.json` and its golden must be rebuilt by the integrator
+  (`pipeline build united-states-2014`); this branch does not commit them.
+
 ## germany-2016 (2016 German Grand Prix)
 
 Replaces `united-states-2015` in Era 7 #6.

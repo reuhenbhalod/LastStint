@@ -206,7 +206,7 @@ const RACE_TABLE: Record<number, ReadonlyArray<readonly [string, string]>> = {
   7: [
     [
       'united-states-2014',
-      'Fifth on the grid behind two Williams on the same softs: do you stop early for mediums and attack on fresh rubber, then time the second stop off whichever Williams blinks first?',
+      'Leading from pole with Hamilton under a second behind on the same softs: box first to cover him, or stay out and keep the track position?',
     ],
     [
       'brazil-2014',

@@ -1123,8 +1123,8 @@ RACES: dict[str, dict] = {
         "era": "2014-2025",
         "takeover_lap": None,  # D3 rule
         "seed": 1,
-        # Swapped in for bahrain-2014 (swap-races-era7-overnight.md). Side provisional until
-        # `pipeline hard-calls` (the facts sheet also proposes Ricciardo, from P5).
+        # Swapped in for bahrain-2014 (swap-races-era7-overnight.md). Hard calls HAM 0, ROS 0;
+        # chance given up ROS 45.3, HAM 11.0, so the Eras side is ROS (overlay; eras_side swaps).
         "user_side": "HAM",
         "rival": "ROS",
         "score_positions": 6,
