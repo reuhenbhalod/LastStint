@@ -261,7 +261,8 @@ describe('verifyRun', () => {
   it('verifies the shipped six-moment Abu Dhabi run', () => {
     const choices = {
       'vsc-cover': 'cover-hard',
-      'tyres-going': 'box-medium',
+      // Fresh hards from lap 36: the lap-44 tyre call isn't asked (autoStay), it stays out.
+      'tyres-going': 'stay',
       'manage-or-push': 'manage',
       'sc-stop': 'box-soft',
       'sc-last-chance': 'stay',

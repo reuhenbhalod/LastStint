@@ -234,6 +234,12 @@ export function IntroCard({
             <span className="eyebrow hidden sm:inline">Daily race strategy</span>
           </a>
           <span className="flex flex-wrap items-center gap-2">
+            <a
+              href="/tutorial"
+              className="rounded-full border border-[var(--rule)] px-3 py-1 text-[13px] font-semibold text-[var(--ink)] hover:border-[var(--you)] hover:bg-[color-mix(in_srgb,var(--you)_12%,transparent)]"
+            >
+              Tutorial
+            </a>
             {source !== 'survivor' && (
               <a
                 href="/gauntlet"
@@ -321,13 +327,14 @@ export function IntroCard({
                   className="group flex items-center justify-center gap-3 rounded-xl bg-[var(--you)] px-8 py-4 text-[18px] font-bold text-[var(--you-ink)] shadow-[0_10px_40px_-10px_var(--you)] hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
                 >
                   {resume ?? `Take the ${userTeam ? `${userTeam} ` : ''}pit wall`}
-                  <span
-                    aria-hidden="true"
-                    className="transition-transform group-hover:translate-x-1"
-                  >
-                    →
-                  </span>
                 </button>
+                <a
+                  href="/tutorial"
+                  className="flex items-center justify-center gap-2 rounded-xl border border-[var(--rule)] px-6 py-2.5 text-[14px] font-semibold text-[var(--ink)] hover:border-[var(--you)] hover:bg-[color-mix(in_srgb,var(--you)_10%,transparent)]"
+                >
+                  New here? Play the tutorial race
+                  <span className="text-[12px] font-normal text-[var(--muted)]">· 5 min</span>
+                </a>
                 <span className="flex justify-center gap-5 text-[13px] text-[var(--muted)]">
                   <button
                     type="button"

@@ -15,10 +15,12 @@ import { Privacy, Terms } from './screens/Legal.js';
 import { RaceScreen } from './screens/RaceScreen.js';
 import { ResultScreen } from './screens/ResultScreen.js';
 import { Survivor } from './screens/Survivor.js';
+import { Tutorial } from './screens/Tutorial.js';
 
 export function App() {
   if (location.pathname.startsWith('/admin')) return <AdminPage />;
   if (location.pathname.startsWith('/privacy')) return <Privacy />;
+  if (location.pathname.startsWith('/tutorial')) return <Tutorial />;
   if (location.pathname.startsWith('/terms')) return <Terms />;
   if (location.pathname.startsWith('/gauntlet') || location.pathname.startsWith('/survivor'))
     return <Survivor />;

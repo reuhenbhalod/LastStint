@@ -140,7 +140,7 @@ export function PlanCard({
             }}
             className="rounded-lg border border-[var(--rule)] px-3 py-2 text-[13px] font-semibold hover:bg-[var(--card-2)]"
           >
-            {draft ? '← The engineer’s plans' : 'Build your own'}
+            {draft ? 'The engineer’s plans' : 'Build your own'}
           </button>
           <span className="hidden text-[12px] text-[var(--muted)] md:inline">
             % = chance to beat {rival} · change it any time
@@ -152,7 +152,7 @@ export function PlanCard({
           onClick={() => selected && onPick(selected)}
           className="rounded-lg bg-[var(--you)] px-5 py-2 text-[14px] font-bold text-[var(--you-ink)] hover:brightness-110 disabled:opacity-50"
         >
-          {goLabel} →
+          {goLabel}
         </button>
       </div>
     </section>

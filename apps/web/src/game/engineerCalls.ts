@@ -37,6 +37,7 @@ import { FUEL_BACK, FUEL_SHORT, fuelReading, liftText, marginText } from './fuel
 import {
   type BattleLine,
   type BattleOdds,
+  type BattleTag,
   FRESH_TYRES,
   type QuickCall,
   type QuickOption,
@@ -44,10 +45,21 @@ import {
   safetyCarCall,
 } from './quickCalls.js';
 import type { LapEvents } from './raceLog.js';
+import { tyreLoss, wantToBox } from './tyreTalk.js';
 
 /** Seconds to answer: a battle is now or never; the rest can wait a little longer. */
 export const BATTLE_MS = 12000;
 export const CALL_MS = 8000;
+
+/** Time to read a call before its clock starts (call timing): a beat plus a little per word
+ * of the question and its options, so a long call isn't a race to read. */
+export const READ_MIN_MS = 1500;
+export const READ_MAX_MS = 3500;
+const READ_PER_WORD_MS = 55;
+export function readMs(call: { text: string; options: { label: string }[] }): number {
+  const words = [call.text, ...call.options.map((o) => o.label)].join(' ').split(/\s+/).length;
+  return Math.min(READ_MAX_MS, Math.max(READ_MIN_MS, 1000 + READ_PER_WORD_MS * words));
+}
 
 /** Laps between two stop questions (a "stay out" answer stands for a while). */
 export const STOP_ASK_EVERY = 3;
@@ -57,13 +69,8 @@ export function offersStop(call: QuickCall): boolean {
   return call.options.some((o) => [o.call, ...(o.also ?? [])].some((d) => d?.kind === 'pit'));
 }
 
-/** What the tyres cost now against new ones (s a lap): wear, and more past the cliff. */
-export function tyreLoss(model: RaceModel, compound: string, wear: number): number {
-  const c = model.compounds[compound];
-  if (!c) return 0;
-  const past = Math.max(0, wear - c.cliffLap);
-  return c.degPerLap * wear + (c.cliffDegPerLap ?? 2 * c.degPerLap) * past;
-}
+// What the tyres cost now against new ones (s a lap): tyreTalk.ts, kept here for its callers.
+export { tyreLoss };
 
 /** What the director remembers between laps (so it doesn't ask the same thing every lap). */
 export interface DirectorMemory {
@@ -164,6 +171,15 @@ function battleCall(
       contact: cfg.contactBase * (m.contact ?? 1),
     };
   };
+  // How the fight stands with no special move (DRS counts): the meter (round 3 R2).
+  const still = passProbability(model.track.overtakeModel, advantage, gap, drs);
+  const meter = attacking ? still : 1 - still;
+  // Each move's risk instead of its odds: by its contact chance.
+  const tag = (move: BattleMove): BattleTag => {
+    if (move === 'let-go') return 'Gives way';
+    const contact = cfg.moves[move].contact ?? 1;
+    return contact < 1 ? 'Safer' : contact <= 2 ? 'Balanced' : 'Risky';
+  };
   const opt = (
     id: string,
     label: string,
@@ -175,6 +191,7 @@ function battleCall(
     label,
     note: read(move) ? `${what} · he’s ${attacking ? 'covering' : 'expecting'} it now` : what,
     odds: odds(move),
+    tag: tag(move),
     line,
     call: battle(next, move),
   });
@@ -241,6 +258,7 @@ function battleCall(
       corner,
       attacking: true,
       gap,
+      meter,
       stats,
       asked: false,
       text: battleLine(race.lap, other, rival, gap, drsRange, true, eng?.lastMove ?? null),
@@ -256,6 +274,7 @@ function battleCall(
     corner,
     attacking: false,
     gap,
+    meter,
     stats,
     asked: false,
     text: battleLine(race.lap, other, rival, gap, drsRange, false, eng?.lastMove ?? null),
@@ -611,7 +630,7 @@ function requestCall(
       from: us,
       kind: 'request',
       asked: true,
-      text: `These ${tyreName(me.compound).toLowerCase()} are gone, ${me.tyreAge} laps old. I want to box!`,
+      text: wantToBox(me.compound, race.lap),
       options: [
         {
           id: 'yes',

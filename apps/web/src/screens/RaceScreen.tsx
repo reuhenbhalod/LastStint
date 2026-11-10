@@ -44,13 +44,13 @@ import { type BattleView, TrackMap } from '../components/TrackMap.js';
 import { TyreBadge } from '../components/TyreBadge.js';
 import { namedUpper, surname } from '../data/names.js';
 import {
-  BATTLE_MS,
   CALL_MS,
   directorCall,
   flavourBattle,
   infoLine,
   newMemory,
   offersStop,
+  readMs,
 } from '../game/engineerCalls.js';
 import { modeLine } from '../game/guide.js';
 import { neutralCause } from '../game/neutral.js';
@@ -98,6 +98,8 @@ interface Battle {
   result: { text: string; good: boolean } | null;
   swap: { at: number } | null;
   zoom: boolean;
+  /** The card is up (it comes up SHOW_BEFORE ahead of the braking zone). */
+  shown: boolean;
 }
 
 /** How often the standings follow the map while the lap runs. */
@@ -105,8 +107,13 @@ const LIVE_MS = 400;
 
 /** The race slows this far (tick progress) before the braking zone. */
 const SLOW_BEFORE = 0.05;
+/** The battle card comes up this far (tick progress) before the braking zone, so it doesn't sit
+ * on screen for most of the lap when the corner is late in it. */
+const SHOW_BEFORE = 0.12;
 /** How long the race waits at the braking zone for your call before the driver goes alone. */
 const BATTLE_WAIT_MS = 8000;
+/** The tutorial's calls wait for an answer (10 minutes is as good as never). */
+const NO_TIMEOUT = 10 * 60_000;
 
 /** What a lap's fight came to for your car, from the race model's notes. */
 function battleResult(
@@ -136,12 +143,26 @@ function battleResult(
   return null;
 }
 
+/** What the tutorial asks of the race screen. */
+export interface TutorialHooks {
+  /** Still raise quick calls / battles (off once each is taught). */
+  quick: boolean;
+  battle: boolean;
+  /** The call on screen changed. */
+  onCall: (call: TutorialCall | null) => void;
+}
+
+export type TutorialCall =
+  | { kind: 'plan' | 'quick' | 'battle' | 'headsUp' | 'replan' }
+  | { kind: 'decision'; trigger: string; lap: number };
+
 export function RaceScreen({
   game,
   state,
   model,
   onFinished,
   onHome,
+  tutorial,
 }: {
   game: Game;
   state: GameState;
@@ -150,11 +171,15 @@ export function RaceScreen({
   onFinished?: () => void;
   /** The Pit Wall brand: the home page (the race holds). */
   onHome?: () => void;
+  /** The tutorial race (screens/Tutorial.tsx): calls never time out, the quick calls and
+   * battles it has taught are skipped, and it hears which call is on screen. */
+  tutorial?: TutorialHooks;
 }) {
   const { userSide, rival, totalLaps, number, source } = state.meta;
   const me = state.race.cars[userSide];
   const them = state.race.cars[rival];
   const paused = state.phase === 'decision';
+  const battleWait = tutorial ? NO_TIMEOUT : BATTLE_WAIT_MS;
   const planning = state.phase === 'planning';
   // The race plan: the heads-up before a planned stop (once per stop), the engineer's better
   // plan (until you keep yours), and the plan editor.
@@ -218,8 +243,11 @@ export function RaceScreen({
   const lastCorner = useRef(new Map<string, number>());
   const asked = useRef(new Set<number>());
   const [quick, setQuick] = useState<QuickCall | null>(null);
+  // Time to read a call before its clock runs (call timing).
+  const quickRead = quick ? readMs(quick) : 0;
   const [battle, setBattleState] = useState<Battle | null>(null);
   const battleRef = useRef<Battle | null>(null);
+  const battleRead = !tutorial && battle ? readMs(battle.call) : 0;
   const setBattle = useCallback((b: Battle | null) => {
     battleRef.current = b;
     setBattleState(b);
@@ -264,19 +292,21 @@ export function RaceScreen({
       const best = from[(raceLap + (call.other as string).charCodeAt(0)) % from.length];
       if (!best) return null;
       lastCorner.current.set(call.other, best.n);
+      const brakeP = Math.max(p0 + 0.02, best.p - BRAKE_BEFORE);
       return {
         call,
         lap: raceLap,
         corner: best.n,
         at: best.f,
         fromP: p0,
-        brakeP: Math.max(p0 + 0.02, best.p - BRAKE_BEFORE),
+        brakeP,
         cornerP: best.p,
         stage: 'approach',
         chosen: null,
         result: null,
         swap: null,
         zoom: true,
+        shown: brakeP - p0 <= SHOW_BEFORE,
       };
     },
     [line, outline, corners, userSide, raceLap],
@@ -315,6 +345,8 @@ export function RaceScreen({
       state.decisions.some((d) => d.kind === 'pit' && d.lap > raceLap) ||
         !!state.plan.active?.stops.some((s) => s.lap > raceLap && s.lap <= raceLap + 2),
     );
+    // The tutorial skips the kinds of call it has already taught.
+    if (call && tutorial && !(call.kind === 'battle' ? tutorial.battle : tutorial.quick)) return;
     if (call?.kind === 'battle') {
       const fight = battleAt(call);
       if (fight) {
@@ -323,10 +355,14 @@ export function RaceScreen({
         setBattle({ ...fight, call: flavourBattle({ ...call, corner: fight.corner }, kind) });
         return;
       }
-      // No corner to draw it at: the plain card, the lap in slow motion.
-      setPace('slow');
+      // No corner to draw it at: the plain card, the race held until you call (BATTLE_WAIT_MS
+      // at most), not a whole lap in slow motion.
+      setPace('frozen');
     }
     if (call) {
+      // The race runs on in slow motion while you read and answer (call timing); a battle
+      // with no corner to draw is held still instead (above).
+      if (call.kind !== 'battle') setPace('slow');
       setQuick(call);
       return;
     }
@@ -360,7 +396,7 @@ export function RaceScreen({
         const p = clockProgress(c);
         if (b.stage === 'approach' && p >= b.brakeP) {
           setPace('frozen');
-          setBattle({ ...b, stage: 'waiting' });
+          setBattle({ ...b, stage: 'waiting', shown: true });
           return;
         }
         if (b.stage === 'move' && p >= b.cornerP + 0.012) {
@@ -368,6 +404,9 @@ export function RaceScreen({
           setPace('normal');
           setBattle({ ...b, stage: 'done' });
           return;
+        }
+        if (b.stage === 'approach' && !b.shown && p >= b.brakeP - SHOW_BEFORE) {
+          setBattle({ ...b, shown: true });
         }
         if (p >= b.brakeP - SLOW_BEFORE) setPace('slow');
       }
@@ -409,7 +448,11 @@ export function RaceScreen({
         result: result ?? { text: 'NO MOVE', good: true },
         swap,
       });
-      setPace('slow');
+      // Slow motion only from just before the braking zone: a call made early in the lap
+      // doesn't slow the rest of it (the frame loop slows it there).
+      const c = clockRef.current;
+      const near = b.stage === 'waiting' || (!!c && clockProgress(c) >= b.brakeP - SLOW_BEFORE);
+      setPace(near ? 'slow' : 'normal');
     },
     [game, state.race.lap, userSide, setPace, setBattle],
   );
@@ -426,9 +469,9 @@ export function RaceScreen({
         (x) => x.call?.kind === 'battle' && x.call.move === own.move,
       );
       if (match) answerBattle(match.id, true);
-    }, BATTLE_WAIT_MS);
+    }, battleWait + battleRead);
     return () => clearTimeout(id);
-  }, [stage, game, userSide, state.race.lap, answerBattle]);
+  }, [stage, game, userSide, state.race.lap, answerBattle, battleWait, battleRead]);
 
   // The lap a BOX call turns in at (pit fix): the end of the lap being shown, if your car can
   // still reach pit entry on it (the map knows where it is); otherwise the end of the next one.
@@ -518,20 +561,25 @@ export function RaceScreen({
   // A stop booked another way (the team radio's BOX) answers a stop question already up.
   const stopQuestion = !!quick && offersStop(quick);
   useEffect(() => {
-    if (userBox !== null && stopQuestion) setQuick(null);
-  }, [userBox, stopQuestion]);
+    if (userBox !== null && stopQuestion) {
+      setQuick(null);
+      setPace('normal');
+    }
+  }, [userBox, stopQuestion, setPace]);
 
+  // The battle once its card is up (the map, the camera and the call area wait for it).
+  const shownBattle = battle && (battle.shown || battle.chosen !== null) ? battle : null;
   // The battle as the map draws it.
   const battleView: BattleView | null =
-    battle?.call.other !== undefined
+    shownBattle?.call.other !== undefined
       ? {
-          other: battle.call.other,
-          corner: battle.corner,
-          at: battle.at,
-          options: battle.call.options.map((o, i) => ({ n: i + 1, line: o.line ?? 'wait' })),
-          chosen: battle.call.options.find((o) => o.id === battle.chosen)?.line ?? null,
-          zoom: battle.zoom,
-          swap: battle.swap,
+          other: shownBattle.call.other,
+          corner: shownBattle.corner,
+          at: shownBattle.at,
+          options: shownBattle.call.options.map((o, i) => ({ n: i + 1, line: o.line ?? 'wait' })),
+          chosen: shownBattle.call.options.find((o) => o.id === shownBattle.chosen)?.line ?? null,
+          zoom: shownBattle.zoom,
+          swap: shownBattle.swap,
         }
       : null;
 
@@ -583,7 +631,7 @@ export function RaceScreen({
   const callUp =
     planning ||
     (paused && !!state.currentMoment) ||
-    (!!battle && racing && (battle.stage !== 'done' || battle.zoom)) ||
+    (!!shownBattle && racing && (shownBattle.stage !== 'done' || shownBattle.zoom)) ||
     (!!headsUp && racing && headsUpSeen !== headsUp.lap) ||
     (!!replan && racing && !quick && replanKey !== keepKey) ||
     (!!quick && racing);
@@ -627,7 +675,7 @@ export function RaceScreen({
           <p className="m-0 text-[12px] text-[#8D9692]">The trace builds as laps go by.</p>
         )}
       </Panel>
-      <LiveGrades state={state} />
+      <LiveGrades state={state} model={model} />
       <Panel title="Radio">
         {state.radio.length ? (
           <RadioLog messages={state.radio} max={8} />
@@ -663,18 +711,19 @@ export function RaceScreen({
       model={model}
       onChoose={game.choose}
     />
-  ) : battle && racing && (battle.stage !== 'done' || battle.zoom) ? (
+  ) : shownBattle && racing && (shownBattle.stage !== 'done' || shownBattle.zoom) ? (
     <BattleCard
-      key={battle.lap}
-      call={battle.call}
-      corner={battle.corner}
-      stage={battle.stage}
+      key={shownBattle.lap}
+      call={shownBattle.call}
+      corner={shownBattle.corner}
+      stage={shownBattle.stage}
       clock={game.clock}
-      fromP={battle.fromP}
-      brakeP={battle.brakeP}
-      waitMs={BATTLE_WAIT_MS}
-      chosen={battle.chosen}
-      result={battle.stage === 'done' ? battle.result : null}
+      fromP={shownBattle.fromP}
+      brakeP={shownBattle.brakeP}
+      waitMs={battleWait}
+      readMs={battleRead}
+      chosen={shownBattle.chosen}
+      result={shownBattle.stage === 'done' ? shownBattle.result : null}
       onAnswer={answerBattle}
     />
   ) : headsUp && racing && headsUpSeen !== headsUp.lap ? (
@@ -703,10 +752,14 @@ export function RaceScreen({
     <QuickCallCard
       key={quick.lap}
       call={quick}
+      read={tutorial ? 0 : quickRead}
       ms={
-        quick.kind === 'battle'
-          ? Math.min(BATTLE_MS, LAP_MS[state.speed] * SLOW_MOTION * 0.85)
-          : Math.min(CALL_MS, LAP_MS[state.speed] * 0.9)
+        tutorial
+          ? NO_TIMEOUT
+          : quick.kind === 'battle'
+            ? battleWait
+            : // The answer lands this lap: the lap runs in slow motion while the call is up.
+              Math.min(CALL_MS, LAP_MS[state.speed] * SLOW_MOTION * 0.9 - quickRead)
       }
       onAnswer={answerQuick}
       onTimeout={quickTimeout}
@@ -721,11 +774,31 @@ export function RaceScreen({
   ) : (
     driverCard
   );
+  // The tutorial hears which call is on screen (once per change).
+  const onTutorialCall = tutorial?.onCall;
+  const shownCall: TutorialCall | null = planning
+    ? { kind: 'plan' }
+    : paused && state.currentMoment
+      ? { kind: 'decision', trigger: state.currentMoment.trigger, lap: state.currentMoment.lap }
+      : shownBattle && racing && (shownBattle.stage !== 'done' || shownBattle.zoom)
+        ? { kind: 'battle' }
+        : headsUp && racing && headsUpSeen !== headsUp.lap
+          ? { kind: 'headsUp' }
+          : replan && racing && !quick && replanKey !== keepKey
+            ? { kind: 'replan' }
+            : quick && racing
+              ? { kind: quick.kind === 'battle' ? 'battle' : 'quick' }
+              : null;
+  const shownKey = shownCall ? JSON.stringify(shownCall) : '';
+  useEffect(() => {
+    onTutorialCall?.(shownKey ? (JSON.parse(shownKey) as TutorialCall) : null);
+  }, [shownKey, onTutorialCall]);
+
   const callKey = planning
     ? 'plan'
     : paused && state.currentMoment
       ? state.currentMoment.id
-      : (battle && `battle-${battle.lap}`) || (quick && `quick-${quick.lap}`) || 'other';
+      : (shownBattle && `battle-${shownBattle.lap}`) || (quick && `quick-${quick.lap}`) || 'other';
 
   return (
     <main className="relative flex h-[100dvh] flex-col overflow-hidden bg-[#0B0E0D] text-[#EEF1EF]">
@@ -744,7 +817,10 @@ export function RaceScreen({
             </span>
           )}
         </button>
-        <div className="flex min-w-0 flex-1 items-center justify-center gap-2 overflow-hidden px-3 md:justify-start md:gap-4 md:px-6">
+        <div
+          data-tour="score"
+          className="flex min-w-0 flex-1 items-center justify-center gap-2 overflow-hidden px-3 md:justify-start md:gap-4 md:px-6"
+        >
           <span className="h-8 w-1.5 shrink-0 -skew-x-12 bg-[var(--you)]" />
           <span className="disp wide shrink-0 text-[17px] md:text-[22px]">
             <span className="md:hidden">{userSide}</span>
@@ -856,6 +932,7 @@ export function RaceScreen({
         {/* The map (it shrinks as things open under it), the call, the dock, the control bar. */}
         <section aria-label="Race" className="flex min-h-0 flex-col gap-2 md:gap-3">
           <div
+            data-tour="map"
             className={`relative flex min-h-[200px] flex-1 flex-col overflow-hidden bg-[var(--tarmac)] md:rounded-lg ${paused ? 'map-alert' : ''}`}
           >
             {wetNow >= 0.03 && (
@@ -892,16 +969,16 @@ export function RaceScreen({
                   {why}
                 </span>
               )}
-              {battle && !paused && battle.stage !== 'done' && (
+              {shownBattle && !paused && shownBattle.stage !== 'done' && (
                 <output
-                  className={`flex items-center gap-1.5 rounded bg-[var(--box)] px-2.5 py-1 text-[12px] font-bold text-white ${battle.stage === 'waiting' ? 'animate-pulse' : ''}`}
+                  className={`flex items-center gap-1.5 rounded bg-[var(--box)] px-2.5 py-1 text-[12px] font-bold text-white ${shownBattle.stage === 'waiting' ? 'animate-pulse' : ''}`}
                 >
                   <OvertakeIcon size={14} />
-                  {battle.stage === 'waiting'
-                    ? `Braking for T${battle.corner}: your call`
-                    : battle.call.attacking
-                      ? `${surname(userSide)} on ${surname(battle.call.other ?? '')} · T${battle.corner}`
-                      : `${surname(battle.call.other ?? '')} on ${surname(userSide)} · T${battle.corner}`}
+                  {shownBattle.stage === 'waiting'
+                    ? `Braking for T${shownBattle.corner}: your call`
+                    : shownBattle.call.attacking
+                      ? `${surname(userSide)} on ${surname(shownBattle.call.other ?? '')} · T${shownBattle.corner}`
+                      : `${surname(shownBattle.call.other ?? '')} on ${surname(userSide)} · T${shownBattle.corner}`}
                 </output>
               )}
               {stop && (
@@ -920,6 +997,7 @@ export function RaceScreen({
               {/* Focus view: the leaders, TV style (stats view has the full tower instead). */}
               {!stats && (
                 <div
+                  data-tour="leaders"
                   className={`absolute left-3 top-2 z-10 origin-top-left scale-[0.82] md:block md:scale-100 ${tight ? 'hidden' : ''}`}
                 >
                   <LeadersTower
@@ -966,6 +1044,7 @@ export function RaceScreen({
           {call && (
             <div
               key={callKey}
+              data-tour="call"
               className="bc-slide max-h-[52%] shrink-0 overflow-y-auto px-3 md:px-0"
             >
               {call}
@@ -1024,7 +1103,7 @@ export function RaceScreen({
                     />
                   </div>
                 )}
-                {shown === 'calls' && <LiveGrades state={state} />}
+                {shown === 'calls' && <LiveGrades state={state} model={model} />}
                 {shown === 'log' && <RadioLog messages={state.radio} max={12} />}
               </div>
             </div>
@@ -1037,6 +1116,7 @@ export function RaceScreen({
           >
             <button
               type="button"
+              data-tour="radio"
               aria-pressed={panelOpen === 'radio'}
               disabled={planning || paused}
               onClick={() => toggle2('radio')}
@@ -1047,6 +1127,7 @@ export function RaceScreen({
             </button>
             <button
               type="button"
+              data-tour="plan"
               aria-pressed={panelOpen === 'plan'}
               disabled={planning || paused || !state.plan.active}
               onClick={() => toggle2('plan')}
@@ -1077,6 +1158,7 @@ export function RaceScreen({
             <span className="min-w-[8px] flex-1" />
             <button
               type="button"
+              data-tour="stats"
               aria-pressed={stats}
               onClick={() => setStats(!stats)}
               className={`${pill(stats)} hidden md:flex`}
