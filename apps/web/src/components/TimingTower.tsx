@@ -59,8 +59,8 @@ export function TimingTower({
               onClick={() => onPick?.(code)}
               className={[
                 'grid w-full grid-cols-[22px_4px_44px_1fr_auto] items-center gap-2 px-2 py-1 text-left hover:bg-[var(--card-2)] focus-visible:bg-[var(--card-2)] focus-visible:outline-none',
-                you ? 'bg-[color-mix(in_srgb,var(--you)_30%,#0F1312)]' : '',
-                isRival ? 'bg-[color-mix(in_srgb,var(--rival)_18%,#0F1312)]' : '',
+                you ? 'bg-[color-mix(in_srgb,var(--you)_30%,#12171A)]' : '',
+                isRival ? 'bg-[color-mix(in_srgb,var(--rival)_18%,#12171A)]' : '',
                 out || down >= 1 ? 'opacity-55' : '',
               ].join(' ')}
             >

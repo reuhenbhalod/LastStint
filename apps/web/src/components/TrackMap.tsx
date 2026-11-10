@@ -37,14 +37,16 @@ import {
   pointAt,
   polyline,
 } from '../track/geometry.js';
+import { type Ground, groundFor } from '../track/ground.js';
 import { MapMotion } from '../track/motion.js';
 import { CarIcon } from './CarIcon.js';
 
 const REDUCED =
   typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-/** Track width in map units (the asphalt band). */
-const TRACK = 30;
+/** Track width in map units (the asphalt band). Narrower than the real scale would draw it on
+ * a whole-lap view, wide enough to read and to carry the battle lines. */
+const TRACK = 22;
 
 /** Share of the way to its target the battle cam moves each frame. */
 const CAM_EASE = 0.08;
@@ -164,7 +166,7 @@ function BattleLines({
                   <circle
                     r={11 * glyph}
                     fill={LINE_COLOR[o.line]}
-                    stroke="#141716"
+                    stroke="#151A1D"
                     strokeWidth={2}
                   />
                   <text
@@ -173,7 +175,7 @@ function BattleLines({
                     fontSize={13 * glyph}
                     fontWeight={800}
                     fontFamily="var(--display)"
-                    fill="#141716"
+                    fill="#151A1D"
                   >
                     {o.n}
                   </text>
@@ -206,7 +208,7 @@ function BattleLines({
               fontSize={12 * glyph}
               fontWeight={800}
               fontFamily="var(--display)"
-              fill="#141716"
+              fill="#151A1D"
             >
               {o.n} · {o.line === 'let' ? 'LET BY' : 'WAIT'}
             </text>
@@ -273,6 +275,7 @@ const TrackArt = memo(function TrackArt({
   lane,
   userTeam,
   rivalTeam,
+  ground,
 }: {
   outline: TrackOutline;
   garageList: Array<[string, string]>;
@@ -280,6 +283,8 @@ const TrackArt = memo(function TrackArt({
   lane: PitLane | null;
   userTeam?: string;
   rivalTeam?: string;
+  /** The real ground under the track (track/ground.ts), when the circuit has it. */
+  ground: Ground | null;
 }) {
   const lap = pathOf(outline.points, true);
   const lanePts = lane?.path.points ?? [];
@@ -328,13 +333,36 @@ const TrackArt = memo(function TrackArt({
 
   return (
     <g>
-      {/* Run-off */}
+      {/* The real ground, or plain run-off where there's none */}
+      {ground && <rect x={-20000} y={-20000} width={40000} height={40000} fill={ground.base} />}
+      {ground ? (
+        <image
+          href={ground.src}
+          x={0}
+          y={0}
+          width={ground.w}
+          height={ground.h}
+          preserveAspectRatio="none"
+          transform={`matrix(${ground.matrix.join(' ')})`}
+        />
+      ) : (
+        <path
+          d={lap}
+          fill="none"
+          stroke="var(--runoff)"
+          strokeWidth={TRACK + 34}
+          strokeLinejoin="round"
+        />
+      )}
+      {/* The track's shadow on the ground */}
       <path
         d={lap}
         fill="none"
-        stroke="var(--runoff)"
-        strokeWidth={TRACK + 34}
+        stroke="#000"
+        strokeOpacity={0.35}
+        strokeWidth={TRACK + 9}
         strokeLinejoin="round"
+        transform="translate(1.5,2)"
       />
       {/* Pit lane: under the track, so the exit tunnel passes beneath it */}
       {lanePath && (
@@ -343,7 +371,7 @@ const TrackArt = memo(function TrackArt({
             d={lanePath}
             fill="none"
             stroke="var(--pit-edge)"
-            strokeWidth={16}
+            strokeWidth={12}
             strokeLinejoin="round"
             strokeLinecap="round"
           />
@@ -351,7 +379,7 @@ const TrackArt = memo(function TrackArt({
             d={lanePath}
             fill="none"
             stroke="var(--pit-lane)"
-            strokeWidth={12}
+            strokeWidth={9}
             strokeLinejoin="round"
             strokeLinecap="round"
           />
@@ -368,12 +396,12 @@ const TrackArt = memo(function TrackArt({
       {/* Kerbs: red and white, just wider than the track at each corner */}
       {kerbs.map((k) => (
         <g key={k.n}>
-          <path d={k.d} fill="none" stroke="#f3f4f2" strokeWidth={TRACK + 7} strokeLinecap="butt" />
+          <path d={k.d} fill="none" stroke="#f3f4f2" strokeWidth={TRACK + 5} strokeLinecap="butt" />
           <path
             d={k.d}
             fill="none"
             stroke="#d63a2f"
-            strokeWidth={TRACK + 7}
+            strokeWidth={TRACK + 5}
             strokeDasharray="5 5"
             strokeLinecap="butt"
           />
@@ -412,7 +440,7 @@ const TrackArt = memo(function TrackArt({
               y={-TRACK / 2 + i * (TRACK / 10)}
               width={4}
               height={TRACK / 10}
-              fill={(i + col) % 2 ? '#141716' : '#f3f4f2'}
+              fill={(i + col) % 2 ? '#151A1D' : '#f3f4f2'}
             />
           )),
         )}
@@ -481,18 +509,23 @@ const TrackArt = memo(function TrackArt({
         const dx = x - cx;
         const dy = y - cy;
         const len = Math.hypot(dx, dy) || 1;
-        const bx = x + (dx / len) * 34;
-        const by = y + (dy / len) * 34;
+        const bx = x + (dx / len) * 30;
+        const by = y + (dy / len) * 30;
         return (
           <g key={`${n}-${x}-${y}`} transform={`translate(${bx.toFixed(1)},${by.toFixed(1)})`}>
-            <circle r={9} fill="var(--paper)" stroke="var(--tarmac-edge)" strokeWidth={1.5} />
+            <circle
+              r={9}
+              fill="rgba(12,16,18,0.82)"
+              stroke="rgba(255,255,255,0.3)"
+              strokeWidth={1}
+            />
             <text
               y={3.5}
               textAnchor="middle"
               fontSize={9.5}
               fontWeight={700}
               fontFamily="var(--mono)"
-              fill="#9aa39f"
+              fill="#d5dbd7"
             >
               {n}
             </text>
@@ -521,6 +554,7 @@ export function TrackMap({
   dim,
   finishing = null,
   battle = null,
+  align = 'center',
   flash = null,
   ahead = null,
   userBox = null,
@@ -544,6 +578,9 @@ export function TrackMap({
   finishing?: { lapMs: number; onCrossed: () => void } | null;
   /** A battle this lap (battles and trust spec): drawn on the track, the camera on it. */
   battle?: BattleView | null;
+  /** Where the circuit sits when its box is wider than it: centred, or to the right (the
+   * leaders' panel floats over the ground on the left). */
+  align?: 'center' | 'right';
   /** The lap being shown, run ahead (GameSession.previewLap): cars move toward its gaps all
    * lap, a car that retires on it stops on track, a puncture shows. */
   ahead?: { race: RaceState; notes: RaceNote[] } | null;
@@ -560,6 +597,7 @@ export function TrackMap({
 }) {
   const line = useMemo(() => polyline(outline.points), [outline]);
   const lane = useMemo(() => pitLane(outline, line, TRACK), [outline, line]);
+  const ground = useMemo(() => groundFor(model.race.id), [model.race.id]);
   const garages = useMemo(
     () =>
       garagesFor(
@@ -756,6 +794,7 @@ export function TrackMap({
       // Phone/tablet: full width at the outline's shape. Laptop: fills its box (the rest of the
       // column), keeping the shape.
       className="absolute inset-0 block h-full w-full"
+      preserveAspectRatio={align === 'right' ? 'xMaxYMid meet' : 'xMidYMid meet'}
       aria-labelledby="track-map-title"
     >
       <title id="track-map-title">{`Track map, lap ${race.lap}. Select a car for its details.`}</title>
@@ -766,10 +805,28 @@ export function TrackMap({
         lane={lane}
         userTeam={race.cars[userSide]?.team}
         rivalTeam={race.cars[rival]?.team}
+        ground={ground}
       />
-      {dim && <rect width={outline.width} height={outline.height} fill="#000" opacity={0.35} />}
+      {/* Shade over the ground too, beyond the outline's box. */}
+      {dim && (
+        <rect
+          x={-outline.width}
+          y={-outline.height}
+          width={outline.width * 3}
+          height={outline.height * 3}
+          fill="#000"
+          opacity={0.35}
+        />
+      )}
       {battle?.zoom && (
-        <rect width={outline.width} height={outline.height} fill="#000" opacity={0.3} />
+        <rect
+          x={-outline.width}
+          y={-outline.height}
+          width={outline.width * 3}
+          height={outline.height * 3}
+          fill="#000"
+          opacity={0.3}
+        />
       )}
       {battle && <BattleLines line={line} battle={battle} glyph={glyph} />}
       {sc && (
@@ -778,7 +835,7 @@ export function TrackMap({
           <text
             y={4.5}
             textAnchor="middle"
-            fill="#141716"
+            fill="#151A1D"
             fontSize={12}
             fontWeight={800}
             fontFamily="var(--mono)"
@@ -798,13 +855,13 @@ export function TrackMap({
           <circle r={10} fill="var(--tarmac)" stroke="var(--box)" strokeWidth={3} />
           <path d="M-6,5 L6,-5 M-6,-5 L6,5" stroke="var(--box)" strokeWidth={2.5} />
           <g transform="translate(0,-24)">
-            <polygon points="0,-9 9,7 -9,7" fill="var(--flag)" stroke="#141716" strokeWidth={1.5} />
-            <text y={5} textAnchor="middle" fontSize={11} fontWeight={900} fill="#141716">
+            <polygon points="0,-9 9,7 -9,7" fill="var(--flag)" stroke="#151A1D" strokeWidth={1.5} />
+            <text y={5} textAnchor="middle" fontSize={11} fontWeight={900} fill="#151A1D">
               !
             </text>
           </g>
           <g transform="translate(0,22)">
-            <rect x={-46} y={-9} width={92} height={18} rx={5} fill="#141716" opacity={0.9} />
+            <rect x={-46} y={-9} width={92} height={18} rx={5} fill="#151A1D" opacity={0.9} />
             <text
               y={4}
               textAnchor="middle"
@@ -837,7 +894,7 @@ export function TrackMap({
             ? 'var(--rival)'
             : fighting
               ? 'var(--box)'
-              : 'var(--field)';
+              : 'var(--map-car)';
         const lit = c.code === selected;
         const ring = TYRE_RING[car?.compound ?? ''] ?? 'var(--tarmac)';
         const lapped = c.lapped && !key;
@@ -880,6 +937,9 @@ export function TrackMap({
                 <CarIcon color={fill} tyre={ring} shape={carShapes?.[c.code]} />
               </g>
             ) : (
+              <circle r={9.5} cx={0.8} cy={1.4} fill="#000" opacity={0.35} />
+            )}
+            {!key && (
               <circle
                 r={9.5}
                 fill={lapped ? 'var(--tarmac)' : fill}
@@ -894,6 +954,10 @@ export function TrackMap({
                 y={-24}
                 textAnchor="middle"
                 fill="#ffffff"
+                stroke="rgba(8,11,12,0.85)"
+                strokeWidth={4}
+                strokeLinejoin="round"
+                paintOrder="stroke"
                 fontSize={17}
                 fontWeight={800}
                 fontFamily="var(--display)"
@@ -905,7 +969,7 @@ export function TrackMap({
               <text
                 y={3.5}
                 textAnchor="middle"
-                fill={c.lapped ? 'var(--field)' : 'var(--tarmac)'}
+                fill={c.lapped ? 'var(--field)' : 'var(--map-car-ink)'}
                 fontSize={8}
                 fontWeight={700}
                 fontFamily="var(--mono)"

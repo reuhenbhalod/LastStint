@@ -60,8 +60,8 @@ export function Versus() {
   const [name, setName] = useState(storedName);
   const [named, setNamed] = useState(!!storedName());
   return (
-    <main className="min-h-[100dvh] bg-[#0B0E0D] text-[#EEF1EF]">
-      <header className="flex h-14 items-center justify-between border-b border-[#1F2523] px-4">
+    <main className="min-h-[100dvh] bg-[#0E1214] text-[#EEF1EE]">
+      <header className="flex h-14 items-center justify-between border-b border-[var(--glass-edge)] px-4">
         <a href="/" aria-label="LastStint home">
           <Brand className="text-[20px]" />
         </a>
@@ -175,7 +175,7 @@ function Lobby({ name, onRename }: { name: string; onRename: () => void }) {
               className={`flex flex-col items-start gap-1 rounded-lg border px-4 py-3 text-left ${
                 track === t.id
                   ? 'border-[var(--you)] bg-[color-mix(in_srgb,var(--you)_12%,transparent)]'
-                  : 'border-[var(--rule)] bg-[var(--card)] hover:border-[#4a5350]'
+                  : 'border-[var(--rule)] bg-[var(--card)] hover:border-[#4A555B]'
               }`}
             >
               <span className="text-[16px] font-bold">{t.name}</span>
@@ -352,7 +352,7 @@ function Pick({ view, onPick }: { view: VersusView; onPick: (car: string, tyre: 
             className={`flex flex-col gap-3 rounded-lg border p-4 text-left ${
               car === c.id
                 ? 'border-[var(--you)] bg-[color-mix(in_srgb,var(--you)_10%,transparent)]'
-                : 'border-[var(--rule)] bg-[var(--card)] hover:border-[#4a5350]'
+                : 'border-[var(--rule)] bg-[var(--card)] hover:border-[#4A555B]'
             }`}
           >
             <span className="flex items-baseline justify-between gap-2">
@@ -417,8 +417,8 @@ function StatBar({ label, value }: { label: string; value: number }) {
   return (
     <span className="grid w-full grid-cols-[96px_minmax(0,1fr)] items-center gap-2 text-[12px]">
       <span className="text-[var(--muted)]">{label}</span>
-      <span className="relative block h-2 w-full rounded-full bg-[#232927]">
-        <span className="absolute left-1/2 top-0 block h-2 w-px bg-[#4a5350]" />
+      <span className="relative block h-2 w-full rounded-full bg-[#252D31]">
+        <span className="absolute left-1/2 top-0 block h-2 w-px bg-[#4A555B]" />
         <span
           className="absolute top-0 block h-2 rounded-full"
           style={{
@@ -495,7 +495,7 @@ function Race({
 
   return (
     <section className="mx-auto flex max-w-6xl flex-col gap-3 px-3 py-3 md:px-4">
-      <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-[#1F2523] bg-[#0F1312] px-3 py-2">
+      <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-[var(--glass-edge)] bg-[var(--glass)] px-3 py-2">
         <Driver name={setup.players[seat].name} car={setup.players[seat].car} you />
         <span className="flex flex-col items-center">
           <span className="disp text-[22px] tabular-nums">
@@ -508,14 +508,14 @@ function Race({
         <Driver name={setup.players[other].name} car={setup.players[other].car} />
       </div>
       {flag !== 'green' && (
-        <div className="rounded bg-[var(--flag)] px-3 py-1 text-center text-[13px] font-extrabold uppercase tracking-[0.14em] text-[#141716]">
+        <div className="rounded bg-[var(--flag)] px-3 py-1 text-center text-[13px] font-extrabold uppercase tracking-[0.14em] text-[#151A1D]">
           {flag === 'sc' ? 'Safety car' : 'Virtual safety car'}
         </div>
       )}
 
       <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_320px]">
         <div className="flex min-w-0 flex-col gap-3">
-          <div className="relative h-[42vh] min-h-[240px] overflow-hidden rounded-lg border border-[#1F2523] bg-[#0F1312] md:h-[56vh]">
+          <div className="relative h-[42vh] min-h-[240px] overflow-hidden rounded-lg border border-[var(--glass-edge)] bg-[var(--glass)] md:h-[56vh]">
             {outline ? (
               <RaceStage
                 raceId={base.race.id}
@@ -745,7 +745,7 @@ function Driver({ name, car, you = false }: { name: string; car: string; you?: b
 
 function Panel({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="flex flex-col gap-2 rounded-lg border border-[#1F2523] bg-[#0F1312] p-3">
+    <section className="flex flex-col gap-2 rounded-lg border border-[var(--glass-edge)] bg-[var(--glass)] p-3">
       <h2 className="m-0 text-[11px] font-extrabold uppercase tracking-[0.14em] text-[var(--muted)]">
         {title}
       </h2>

@@ -66,7 +66,7 @@ export function DriverProfile({
   return (
     <section
       aria-label="Your driver"
-      className="flex shrink-0 flex-col gap-3 overflow-hidden rounded-lg border border-[#1F2523] bg-[#0F1312]"
+      className="flex shrink-0 flex-col gap-3 overflow-hidden rounded-lg border border-[var(--glass-edge)] bg-[var(--glass)]"
     >
       {/* The name plate, as the TV shows a driver: number on the team colour, then the name. */}
       <header className="flex items-stretch">
@@ -75,7 +75,7 @@ export function DriverProfile({
         </span>
         <span className="flex min-w-0 flex-1 flex-col justify-center gap-1 px-3 py-2.5">
           <span className="disp truncate text-[17px] leading-none">{info?.name ?? code}</span>
-          <span className="truncate text-[12px] text-[#8D9692]">
+          <span className="truncate text-[12px] text-[#9AA5A0]">
             {car?.team}
             {info && (
               <span className="font-semibold text-[var(--you)]"> · {TIER_LABEL[info.tier]}</span>
@@ -87,7 +87,7 @@ export function DriverProfile({
         {eng && mood && (
           <div className="flex flex-col gap-1.5" aria-label={`${code}'s mood`}>
             <div className="flex items-baseline justify-between">
-              <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#8D9692]">
+              <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#9AA5A0]">
                 Trust in the wall
               </span>
               <span

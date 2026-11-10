@@ -30,12 +30,12 @@ export function PitCard({
       <span className="disp shrink-0 text-[12px] leading-none">
         {surname(stop.code)} boxes · {tyreName(stop.compound)}
       </span>
-      <span className="mono truncate text-[#cfd6d3]">
+      <span className="mono truncate text-[#CFD7D3]">
         {stop.cost !== null ? `${stop.cost.toFixed(1)}s · ` : ''}P{stop.from} → P{stop.to}
         {lost > 0 ? ` (−${lost})` : ''}
       </span>
       {other && !other.retired && (
-        <span className="hidden shrink-0 items-center gap-1.5 text-[#cfd6d3] lg:flex">
+        <span className="hidden shrink-0 items-center gap-1.5 text-[#CFD7D3] lg:flex">
           {otherCode} on <TyreBadge compound={other.compound} age={other.tyreAge} />
         </span>
       )}

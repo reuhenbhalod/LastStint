@@ -17,7 +17,7 @@ const TAG_COLOR: Record<BattleTag, string> = {
   Safer: '#4ade80',
   Balanced: '#facc15',
   Risky: '#f87171',
-  'Gives way': '#8D9692',
+  'Gives way': '#9AA5A0',
 };
 
 /** The fight as it stands: hold vs he gets by (defending), or pass vs stay behind. */
@@ -35,7 +35,7 @@ function FightMeter({ call }: { call: QuickCall }) {
           {no} {pct(1 - good)}
         </span>
       </div>
-      <div className="flex h-2 overflow-hidden bg-[#232927]">
+      <div className="flex h-2 overflow-hidden bg-[#252D31]">
         <span className="h-full" style={{ width: pct(good), background: 'var(--you)' }} />
         <span className="h-full flex-1" style={{ background: 'var(--rival)', opacity: 0.85 }} />
       </div>
@@ -111,13 +111,13 @@ export function BattleCard({
           <span className="flex -skew-x-6 items-center gap-1.5 bg-[var(--box)] px-2 py-0.5 text-[11px] font-extrabold uppercase tracking-[0.12em] text-white">
             <OvertakeIcon size={13} /> Battle · T{corner}
           </span>
-          <span className="text-[13px] font-semibold text-[#D5DAD7]">
+          <span className="text-[13px] font-semibold text-[#D5DBD7]">
             {who} · {(call.gap ?? 0).toFixed(1)} s
           </span>
         </span>
         <span
           className="call-tag"
-          style={{ color: stage === 'waiting' ? 'var(--box-ink)' : '#8D9692' }}
+          style={{ color: stage === 'waiting' ? 'var(--box-ink)' : '#9AA5A0' }}
         >
           {stage === 'approach' && !chosen
             ? 'Braking zone ahead'
@@ -130,7 +130,7 @@ export function BattleCard({
       </div>
       <p className="m-0 text-[16px] font-bold leading-snug text-white md:text-[18px]">
         {call.from !== 'Engineer' && (
-          <span className="mr-1 font-semibold text-[#8D9692]">{named(call.from)}:</span>
+          <span className="mr-1 font-semibold text-[#9AA5A0]">{named(call.from)}:</span>
         )}
         {named(call.text)}
       </p>
@@ -138,7 +138,7 @@ export function BattleCard({
       {call.meter !== undefined && !result && <FightMeter call={call} />}
       {/* The approach: your car closing on the braking zone; then the wait for your call. */}
       {!chosen && (
-        <div className="h-1 overflow-hidden bg-[#232927]">
+        <div className="h-1 overflow-hidden bg-[#252D31]">
           {stage === 'waiting' ? (
             <div
               className="quick-timer h-full"
@@ -167,7 +167,7 @@ export function BattleCard({
           {result.text}
         </output>
       ) : picked ? (
-        <output className="flex items-center gap-2 rounded-md border border-[#2D3431] bg-[#181D1B] px-3 py-2 text-[14px] font-bold">
+        <output className="flex items-center gap-2 rounded-md border border-[#2E373B] bg-[#192024] px-3 py-2 text-[14px] font-bold">
           <span
             className="h-3 w-3 rounded-full"
             style={{ background: LINE_COLOR[picked.line ?? 'wait'] }}
@@ -191,7 +191,7 @@ export function BattleCard({
               >
                 <span className="label flex items-center gap-1.5">
                   <span
-                    className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[12px] font-extrabold text-[#141716]"
+                    className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[12px] font-extrabold text-[#151A1D]"
                     style={{ background: color }}
                   >
                     {i + 1}
@@ -216,10 +216,10 @@ export function BattleCard({
         <dl className="m-0 flex flex-wrap gap-x-4 gap-y-1 text-[12px]">
           {call.stats.map((s) => (
             <div key={s.label} className="flex items-baseline gap-1.5">
-              <dt className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#8D9692]">
+              <dt className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#9AA5A0]">
                 {s.label}
               </dt>
-              <dd className="m-0 font-semibold text-[#D5DAD7]">{named(s.value)}</dd>
+              <dd className="m-0 font-semibold text-[#D5DBD7]">{named(s.value)}</dd>
             </div>
           ))}
         </dl>

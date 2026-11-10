@@ -96,7 +96,7 @@ export function PlanCard({
                 type="button"
                 aria-pressed={on}
                 onClick={() => setPicked(p.id)}
-                className={`flex min-w-0 flex-col items-stretch gap-1.5 rounded-md border px-2.5 py-2 text-left transition-colors ${on ? 'border-[var(--you)] bg-[color-mix(in_srgb,var(--you)_14%,#181D1B)]' : 'border-[#2D3431] bg-[#181D1B] hover:border-[#6B736F]'}`}
+                className={`flex min-w-0 flex-col items-stretch gap-1.5 rounded-md border px-2.5 py-2 text-left transition-colors ${on ? 'border-[var(--you)] bg-[color-mix(in_srgb,var(--you)_14%,#192024)]' : 'border-[#2E373B] bg-[#192024] hover:border-[#6E7A75]'}`}
               >
                 <span className="flex items-center justify-between gap-2">
                   <span className="flex min-w-0 items-center gap-1.5">

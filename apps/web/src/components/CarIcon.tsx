@@ -22,7 +22,7 @@ const SHAPES: Record<string, Shape> = {
   endurance: { nose: 18, pod: 8.5, fw: 9.5, rw: 8.5, body: 5.8 },
 };
 
-const DARK = '#0b0e0d';
+const DARK = '#0E1214';
 
 export function CarIcon({
   color,

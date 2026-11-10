@@ -106,6 +106,20 @@ def outline_cmd(
     )
 
 
+@app.command("basemap")
+def basemap_cmd(
+    circuits: list[str] = typer.Argument(None, help="Circuits (default: every one with scenery)"),
+) -> None:
+    """Write the ground under the 2D map: cache/basemap/<circuit>.svg (in metres),
+    data/basemap/index.json (where each race's outline sits on it) and the images,
+    apps/web/public/basemap/<circuit>.webp (rendered in a headless browser)."""
+    from . import basemap
+
+    print(basemap.write(circuits or None))
+    for p in basemap.images(circuits or None):
+        print(p, f"{p.stat().st_size // 1024} KB")
+
+
 @app.command("scenery")
 def scenery_cmd(
     circuits: list[str] = typer.Argument(None, help="Circuits, e.g. spa (default: all five)."),  # noqa: B008

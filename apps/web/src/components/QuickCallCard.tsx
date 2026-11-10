@@ -57,11 +57,11 @@ export function QuickCallCard({
         <span className="call-tag">
           <TagIcon size={14} /> {tag}
         </span>
-        <span className="call-tag !text-[#8D9692]">Lap {call.lap + 1}</span>
+        <span className="call-tag !text-[#9AA5A0]">Lap {call.lap + 1}</span>
       </div>
       <p className="m-0 text-[16px] font-bold leading-snug text-white md:text-[18px]">
         {call.from !== 'Engineer' && (
-          <span className="mr-1 font-semibold text-[#8D9692]">{named(call.from)}:</span>
+          <span className="mr-1 font-semibold text-[#9AA5A0]">{named(call.from)}:</span>
         )}
         {named(call.text)}
       </p>
@@ -69,15 +69,15 @@ export function QuickCallCard({
         <dl className="m-0 flex flex-wrap gap-x-4 gap-y-1 text-[12px]">
           {call.stats.map((s) => (
             <div key={s.label} className="flex items-baseline gap-1.5">
-              <dt className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#8D9692]">
+              <dt className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#9AA5A0]">
                 {s.label}
               </dt>
-              <dd className="m-0 font-semibold text-[#D5DAD7]">{named(s.value)}</dd>
+              <dd className="m-0 font-semibold text-[#D5DBD7]">{named(s.value)}</dd>
             </div>
           ))}
         </dl>
       )}
-      <div className="h-1 overflow-hidden bg-[#232927]">
+      <div className="h-1 overflow-hidden bg-[#252D31]">
         <div
           className="quick-timer h-full"
           style={{ animationDuration: `${ms}ms`, animationDelay: `${read}ms`, background: accent }}

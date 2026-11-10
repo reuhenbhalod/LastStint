@@ -79,8 +79,8 @@ const WEATHER_BG = {
 
 const FLAG = {
   green: { text: 'Green', cls: 'bg-black/55 text-white' },
-  sc: { text: 'Safety car', cls: 'bg-[var(--flag)] text-[#141716] animate-pulse' },
-  vsc: { text: 'Virtual safety car', cls: 'bg-[var(--flag)] text-[#141716] animate-pulse' },
+  sc: { text: 'Safety car', cls: 'bg-[var(--flag)] text-[#151A1D] animate-pulse' },
+  vsc: { text: 'Virtual safety car', cls: 'bg-[var(--flag)] text-[#151A1D] animate-pulse' },
   red: { text: 'Red flag', cls: 'bg-red-600 text-white animate-pulse' },
 } as const;
 
@@ -648,8 +648,8 @@ export function RaceScreen({
   const pill = (on: boolean) =>
     `flex h-10 shrink-0 items-center gap-2 rounded-full border px-4 text-[13px] font-bold transition-colors disabled:opacity-40 ${
       on
-        ? 'border-[#EEF1EF] bg-[#EEF1EF] text-[#0B0E0D]'
-        : 'border-[#333A37] bg-[#0B0E0D]/80 text-[#D5DAD7] hover:border-[#5A625F]'
+        ? 'border-[#EEF1EE] bg-[#EEF1EE] text-[#0E1214]'
+        : 'border-[#343D42] bg-[#0E1214]/80 text-[#D5DBD7] hover:border-[#5A625F]'
     }`;
   const statsPanels = (
     <>
@@ -676,7 +676,7 @@ export function RaceScreen({
         {points.length >= 2 ? (
           <GapTrace points={points} rival={rival} />
         ) : (
-          <p className="m-0 text-[12px] text-[#8D9692]">The trace builds as laps go by.</p>
+          <p className="m-0 text-[12px] text-[#9AA5A0]">The trace builds as laps go by.</p>
         )}
       </Panel>
       <LiveGrades state={state} model={model} />
@@ -684,7 +684,7 @@ export function RaceScreen({
         {state.radio.length ? (
           <RadioLog messages={state.radio} max={8} />
         ) : (
-          <p className="m-0 text-[12px] text-[#8D9692]">Quiet so far.</p>
+          <p className="m-0 text-[12px] text-[#9AA5A0]">Quiet so far.</p>
         )}
       </Panel>
     </>
@@ -769,7 +769,7 @@ export function RaceScreen({
       onTimeout={quickTimeout}
     />
   ) : finishing && crossed ? (
-    <output className="flex items-center justify-center gap-3 bg-[#F4F6F5] px-5 py-3 text-[#0B0E0D]">
+    <output className="flex items-center justify-center gap-3 bg-[#F2F4F2] px-5 py-3 text-[#0E1214]">
       <ChequeredIcon size={24} />
       <span className="disp text-[18px]">
         Chequered flag · {surname(userSide)} P{finishPos}
@@ -805,18 +805,18 @@ export function RaceScreen({
       : (shownBattle && `battle-${shownBattle.lap}`) || (quick && `quick-${quick.lap}`) || 'other';
 
   return (
-    <main className="relative flex h-[100dvh] flex-col overflow-hidden bg-[#0B0E0D] text-[#EEF1EF]">
+    <main className="relative flex h-[100dvh] flex-col overflow-hidden bg-[#0E1214] text-[#EEF1EE]">
       {/* The top bar: brand, the duel as a scoreboard, the lap and the clock. */}
-      <header className="flex h-14 shrink-0 items-stretch border-b border-[#1F2523] md:h-16">
+      <header className="flex h-14 shrink-0 items-stretch border-b border-[var(--glass-edge)] md:h-16">
         <button
           type="button"
           onClick={onHome}
           title="Home (the race waits for you)"
-          className="hidden min-w-0 flex-col items-start justify-center gap-1 border-r border-[#1F2523] px-5 text-left md:flex"
+          className="hidden min-w-0 flex-col items-start justify-center gap-1 border-r border-[var(--glass-edge)] px-5 text-left md:flex"
         >
           <Brand className="text-[19px] leading-none" />
           {team && (
-            <span className="max-w-[260px] truncate text-[11px] font-semibold leading-none text-[#8D9692]">
+            <span className="max-w-[260px] truncate text-[11px] font-semibold leading-none text-[#9AA5A0]">
               {surname(userSide)}’s race engineer · {team}
             </span>
           )}
@@ -835,7 +835,7 @@ export function RaceScreen({
               <TyreBadge compound={me.compound} age={me.tyreAge} />
             </span>
           )}
-          <span className="mono shrink-0 rounded bg-[#1A1F1D] px-2.5 py-1 text-[18px] font-bold md:text-[22px]">
+          <span className="mono shrink-0 rounded bg-[#1A2124] px-2.5 py-1 text-[18px] font-bold md:text-[22px]">
             {gap === null ? '-' : `${gap >= 0 ? '+' : '−'}${Math.abs(gap).toFixed(1)}`}
           </span>
           {them && !them.retired && (
@@ -849,7 +849,7 @@ export function RaceScreen({
           </span>
           <span className="h-8 w-1.5 shrink-0 -skew-x-12 bg-[var(--rival)]" />
         </div>
-        <div className="flex shrink-0 items-center gap-3 border-l border-[#1F2523] px-3 md:px-5">
+        <div className="flex shrink-0 items-center gap-3 border-l border-[var(--glass-edge)] px-3 md:px-5">
           {source === 'survivor' && (
             <span className="hidden shrink-0 rounded-full bg-[var(--box)] px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-white lg:inline">
               Gauntlet · round {number}
@@ -857,7 +857,7 @@ export function RaceScreen({
           )}
           {source === 'practice' && (
             <span
-              className="hidden shrink-0 rounded-full bg-[var(--flag)] px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-[#141716] lg:inline"
+              className="hidden shrink-0 rounded-full bg-[var(--flag)] px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-[#151A1D] lg:inline"
               title={state.meta.practiceReason ?? 'Practice run'}
             >
               Practice · not saved
@@ -865,9 +865,9 @@ export function RaceScreen({
           )}
           <span className="mono text-[18px] font-bold md:text-[22px]">
             {state.race.lap}
-            <span className="text-[13px] text-[#8D9692] md:text-[15px]">/{totalLaps}</span>
+            <span className="text-[13px] text-[#9AA5A0] md:text-[15px]">/{totalLaps}</span>
           </span>
-          <span className="flex overflow-hidden rounded-full border border-[#333A37]">
+          <span className="flex overflow-hidden rounded-full border border-[#343D42]">
             {([1, 2] as const).map((sp) => (
               <button
                 key={sp}
@@ -875,7 +875,7 @@ export function RaceScreen({
                 aria-pressed={state.speed === sp}
                 onClick={() => game.setSpeed(sp)}
                 className={`h-9 px-3 text-[13px] font-bold ${
-                  state.speed === sp ? 'bg-[#EEF1EF] text-[#0B0E0D]' : 'text-[#8D9692]'
+                  state.speed === sp ? 'bg-[#EEF1EE] text-[#0E1214]' : 'text-[#9AA5A0]'
                 }`}
               >
                 {sp}×
@@ -892,7 +892,7 @@ export function RaceScreen({
               setSound(!sound);
               if (!sound) radioChirp();
             }}
-            className="hidden h-9 w-9 items-center justify-center rounded-full border border-[#333A37] text-[#8D9692] md:flex"
+            className="hidden h-9 w-9 items-center justify-center rounded-full border border-[#343D42] text-[#9AA5A0] md:flex"
           >
             {sound ? <SoundOnIcon size={16} /> : <SoundOffIcon size={16} />}
           </button>
@@ -902,7 +902,7 @@ export function RaceScreen({
               onClick={game.reset}
               aria-label="Restart the race"
               title="Restart the race"
-              className="hidden h-9 w-9 items-center justify-center rounded-full border border-[#333A37] text-[#8D9692] md:flex"
+              className="hidden h-9 w-9 items-center justify-center rounded-full border border-[#343D42] text-[#9AA5A0] md:flex"
             >
               ↺
             </button>
@@ -924,9 +924,9 @@ export function RaceScreen({
         <section
           aria-label="Standings"
           aria-hidden={!stats}
-          className={`hidden min-h-0 flex-col overflow-hidden rounded-lg border border-[#1F2523] bg-[#0F1312] transition-opacity duration-300 md:flex ${stats ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
+          className={`hidden min-h-0 flex-col overflow-hidden rounded-lg border border-[var(--glass-edge)] bg-[var(--glass)] transition-opacity duration-300 md:flex ${stats ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
         >
-          <div className="flex items-center justify-between bg-[#EEF1EF] px-3 py-2 text-[#0B0E0D]">
+          <div className="flex items-center justify-between bg-[#EEF1EE] px-3 py-2 text-[#0E1214]">
             <span className="disp text-[13px]">Lap {state.race.lap}</span>
             <span className="mono text-[11px] font-bold">{lapsLeft} to go</span>
           </div>
@@ -937,7 +937,7 @@ export function RaceScreen({
         <section aria-label="Race" className="flex min-h-0 flex-col gap-2 md:gap-3">
           <div
             data-tour="map"
-            className={`relative flex min-h-[200px] flex-1 flex-col overflow-hidden bg-[var(--tarmac)] md:rounded-lg ${paused ? 'map-alert' : ''}`}
+            className={`relative flex min-h-[200px] flex-1 flex-col overflow-hidden bg-[var(--ground)] md:rounded-xl ${paused ? 'map-alert' : ''}`}
           >
             {wetNow >= 0.03 && (
               <div
@@ -997,12 +997,13 @@ export function RaceScreen({
                 </span>
               )}
             </div>
-            <div className="relative min-h-0 flex-1">
+            {/* The map fills its box: the real ground runs edge to edge under the panels. */}
+            <div className="absolute inset-0">
               {/* Focus view: the leaders, TV style (stats view has the full tower instead). */}
               {!stats && (
                 <div
                   data-tour="leaders"
-                  className={`absolute left-3 top-2 z-10 origin-top-left scale-[0.82] md:block md:scale-100 ${tight ? 'hidden' : ''}`}
+                  className={`absolute left-3 top-12 z-10 origin-top-left scale-[0.82] md:block md:scale-100 ${tight ? 'hidden' : ''}`}
                 >
                   <LeadersTower
                     race={state.race}
@@ -1014,9 +1015,7 @@ export function RaceScreen({
                   />
                 </div>
               )}
-              <div
-                className={`absolute inset-y-2 right-2 transition-[left] duration-500 ${stats ? 'left-2' : tight ? 'left-2 md:left-[190px]' : 'left-[150px] md:left-[190px]'}`}
-              >
+              <div className="absolute inset-0">
                 {outline ? (
                   <RaceStage
                     raceId={model.race.id}
@@ -1041,6 +1040,7 @@ export function RaceScreen({
                       userBox={userBox}
                       motionRef={motion}
                       feedRef={feed}
+                      align={!stats && !tight ? 'right' : 'center'}
                     />
                   </RaceStage>
                 ) : (
@@ -1070,7 +1070,7 @@ export function RaceScreen({
             style={{ gridTemplateRows: dockOpen ? '1fr' : '0fr' }}
           >
             <div className="min-h-0 overflow-hidden">
-              <div className="mx-3 max-h-[38vh] overflow-y-auto rounded-lg border border-[#262C2A] bg-[#131716] p-3 md:mx-0">
+              <div className="mx-3 max-h-[38vh] overflow-y-auto rounded-lg border border-[#283034] bg-[#131A1D] p-3 md:mx-0">
                 {shown === 'radio' && (
                   <TeamRadio
                     race={state.race}

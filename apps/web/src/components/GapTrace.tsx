@@ -38,7 +38,7 @@ export function GapTrace({ points, rival }: { points: Array<[number, number]>; r
           clipPath={`url(#${id}-down)`}
           style={{ fill: 'var(--rival)', opacity: 0.18 }}
         />
-        <line x1="0" x2={W} y1={H / 2} y2={H / 2} stroke="#3A413E" strokeDasharray="2 3" />
+        <line x1="0" x2={W} y1={H / 2} y2={H / 2} stroke="#3B454A" strokeDasharray="2 3" />
         <path
           d={line}
           fill="none"
@@ -60,11 +60,11 @@ export function GapTrace({ points, rival }: { points: Array<[number, number]>; r
           cy={y(last)}
           r="3.5"
           style={{ fill: last >= 0 ? 'var(--you)' : 'var(--rival)' }}
-          stroke="#0F1312"
+          stroke="#12171A"
           strokeWidth="1.5"
         />
       </svg>
-      <figcaption className="mono flex justify-between text-[10px] text-[#8D9692]">
+      <figcaption className="mono flex justify-between text-[10px] text-[#9AA5A0]">
         <span>L{lo}</span>
         <span>above: you lead · below: {surname(rival)} leads</span>
         <span>L{hi}</span>
