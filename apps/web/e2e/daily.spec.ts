@@ -8,6 +8,8 @@ const model = loadRace('abu-dhabi-2021');
 const shots = process.env.E2E_SHOTS;
 
 test('plays the Abu Dhabi daily end to end', async ({ page, context }) => {
+  // Unanswered quick calls run their lap in slow motion (call timing), so the race takes longer.
+  test.setTimeout(480_000);
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   const submitted = await mockApi(page, model);
 
@@ -46,7 +48,7 @@ test('plays the Abu Dhabi daily end to end', async ({ page, context }) => {
   };
   for (const lap of ['36', '49', '53', '57']) {
     const card = page.locator('section.decision');
-    await expect(card).toContainText(`Lap ${lap}`, { timeout: 90_000 });
+    await expect(card).toContainText(`Lap ${lap}`, { timeout: 180_000 });
     await expect(page.getByRole('alert')).toContainText(`Lap ${lap}`);
     if (shots && lap === '53')
       await page.screenshot({ path: `${shots}/3-decision-53.png`, fullPage: true });

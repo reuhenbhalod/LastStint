@@ -1,6 +1,6 @@
 // A call between the big moments (crew-chief spec D3, race engineer spec): the engineer or the
-// driver asks; you have a few seconds while the race runs on. A battle is red and runs the lap
-// in slow motion. Number keys answer. No answer: no change, or the driver's own move.
+// driver asks, the race runs on in slow motion, and after a moment to read it you have a few
+// seconds to answer. Number keys answer. No answer: no change, or the driver's own move.
 
 import { useEffect, useRef } from 'react';
 import { named, surname } from '../data/names.js';
@@ -10,21 +10,24 @@ import { FlagIcon, HeadsetIcon, OvertakeIcon } from './Icons.js';
 export function QuickCallCard({
   call,
   ms,
+  read = 0,
   onAnswer,
   onTimeout,
 }: {
   call: QuickCall;
-  /** How long there is to answer. */
+  /** How long there is to answer, once the reading time is up. */
   ms: number;
+  /** Time to read the call before its clock starts (the bar stays full). */
+  read?: number;
   onAnswer: (optionId: string) => void;
   onTimeout: () => void;
 }) {
   const timeout = useRef(onTimeout);
   timeout.current = onTimeout;
   useEffect(() => {
-    const id = setTimeout(() => timeout.current(), ms);
+    const id = setTimeout(() => timeout.current(), read + ms);
     return () => clearTimeout(id);
-  }, [ms]);
+  }, [ms, read]);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const o = call.options[Number(e.key) - 1];
@@ -77,7 +80,7 @@ export function QuickCallCard({
       <div className="h-1 overflow-hidden bg-[#232927]">
         <div
           className="quick-timer h-full"
-          style={{ animationDuration: `${ms}ms`, background: accent }}
+          style={{ animationDuration: `${ms}ms`, animationDelay: `${read}ms`, background: accent }}
         />
       </div>
       <div

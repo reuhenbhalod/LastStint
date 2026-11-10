@@ -51,6 +51,16 @@ import { tyreLoss, wantToBox } from './tyreTalk.js';
 export const BATTLE_MS = 12000;
 export const CALL_MS = 8000;
 
+/** Time to read a call before its clock starts (call timing): a beat plus a little per word
+ * of the question and its options, so a long call isn't a race to read. */
+export const READ_MIN_MS = 1500;
+export const READ_MAX_MS = 3500;
+const READ_PER_WORD_MS = 55;
+export function readMs(call: { text: string; options: { label: string }[] }): number {
+  const words = [call.text, ...call.options.map((o) => o.label)].join(' ').split(/\s+/).length;
+  return Math.min(READ_MAX_MS, Math.max(READ_MIN_MS, 1000 + READ_PER_WORD_MS * words));
+}
+
 /** Laps between two stop questions (a "stay out" answer stands for a while). */
 export const STOP_ASK_EVERY = 3;
 

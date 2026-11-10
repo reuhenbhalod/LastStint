@@ -50,6 +50,7 @@ import {
   infoLine,
   newMemory,
   offersStop,
+  readMs,
 } from '../game/engineerCalls.js';
 import { modeLine } from '../game/guide.js';
 import { neutralCause } from '../game/neutral.js';
@@ -57,7 +58,7 @@ import { delayStop } from '../game/plans.js';
 import { type QuickCall, quickCallLaps } from '../game/quickCalls.js';
 import { useRaceLog } from '../game/raceLog.js';
 import { radioChirp, setSoundOn, soundOn } from '../game/sound.js';
-import { type Game, LAP_MS, clockProgress } from '../game/useGame.js';
+import { type Game, LAP_MS, SLOW_MOTION, clockProgress } from '../game/useGame.js';
 import { CONDITION_WORD, conditionsOf, forecast } from '../game/weather.js';
 import type { GameState } from '../state/machine.js';
 import { BRAKE_BEFORE, cornerKind } from '../track/battle.js';
@@ -242,8 +243,11 @@ export function RaceScreen({
   const lastCorner = useRef(new Map<string, number>());
   const asked = useRef(new Set<number>());
   const [quick, setQuick] = useState<QuickCall | null>(null);
+  // Time to read a call before its clock runs (call timing).
+  const quickRead = quick ? readMs(quick) : 0;
   const [battle, setBattleState] = useState<Battle | null>(null);
   const battleRef = useRef<Battle | null>(null);
+  const battleRead = !tutorial && battle ? readMs(battle.call) : 0;
   const setBattle = useCallback((b: Battle | null) => {
     battleRef.current = b;
     setBattleState(b);
@@ -356,6 +360,9 @@ export function RaceScreen({
       setPace('frozen');
     }
     if (call) {
+      // The race runs on in slow motion while you read and answer (call timing); a battle
+      // with no corner to draw is held still instead (above).
+      if (call.kind !== 'battle') setPace('slow');
       setQuick(call);
       return;
     }
@@ -462,9 +469,9 @@ export function RaceScreen({
         (x) => x.call?.kind === 'battle' && x.call.move === own.move,
       );
       if (match) answerBattle(match.id, true);
-    }, battleWait);
+    }, battleWait + battleRead);
     return () => clearTimeout(id);
-  }, [stage, game, userSide, state.race.lap, answerBattle, battleWait]);
+  }, [stage, game, userSide, state.race.lap, answerBattle, battleWait, battleRead]);
 
   // The lap a BOX call turns in at (pit fix): the end of the lap being shown, if your car can
   // still reach pit entry on it (the map knows where it is); otherwise the end of the next one.
@@ -554,8 +561,11 @@ export function RaceScreen({
   // A stop booked another way (the team radio's BOX) answers a stop question already up.
   const stopQuestion = !!quick && offersStop(quick);
   useEffect(() => {
-    if (userBox !== null && stopQuestion) setQuick(null);
-  }, [userBox, stopQuestion]);
+    if (userBox !== null && stopQuestion) {
+      setQuick(null);
+      setPace('normal');
+    }
+  }, [userBox, stopQuestion, setPace]);
 
   // The battle once its card is up (the map, the camera and the call area wait for it).
   const shownBattle = battle && (battle.shown || battle.chosen !== null) ? battle : null;
@@ -711,6 +721,7 @@ export function RaceScreen({
       fromP={shownBattle.fromP}
       brakeP={shownBattle.brakeP}
       waitMs={battleWait}
+      readMs={battleRead}
       chosen={shownBattle.chosen}
       result={shownBattle.stage === 'done' ? shownBattle.result : null}
       onAnswer={answerBattle}
@@ -741,12 +752,14 @@ export function RaceScreen({
     <QuickCallCard
       key={quick.lap}
       call={quick}
+      read={tutorial ? 0 : quickRead}
       ms={
         tutorial
           ? NO_TIMEOUT
           : quick.kind === 'battle'
             ? battleWait
-            : Math.min(CALL_MS, LAP_MS[state.speed] * 0.9)
+            : // The answer lands this lap: the lap runs in slow motion while the call is up.
+              Math.min(CALL_MS, LAP_MS[state.speed] * SLOW_MOTION * 0.9 - quickRead)
       }
       onAnswer={answerQuick}
       onTimeout={quickTimeout}

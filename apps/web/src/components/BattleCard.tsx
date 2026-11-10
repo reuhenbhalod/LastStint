@@ -53,6 +53,7 @@ export function BattleCard({
   fromP,
   brakeP,
   waitMs,
+  readMs = 0,
   chosen,
   result,
   onAnswer,
@@ -66,6 +67,8 @@ export function BattleCard({
   brakeP: number;
   /** How long the race waits at the braking zone. */
   waitMs: number;
+  /** Time to read the moves before the wait's clock starts. */
+  readMs?: number;
   /** The option called (by you or, with no call, the driver). */
   chosen: string | null;
   result: { text: string; good: boolean } | null;
@@ -139,7 +142,11 @@ export function BattleCard({
           {stage === 'waiting' ? (
             <div
               className="quick-timer h-full"
-              style={{ animationDuration: `${waitMs}ms`, background: 'var(--box)' }}
+              style={{
+                animationDuration: `${waitMs}ms`,
+                animationDelay: `${readMs}ms`,
+                background: 'var(--box)',
+              }}
             />
           ) : (
             <div
