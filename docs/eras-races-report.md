@@ -1,5 +1,28 @@
 # Eras races report
 
+**Integration PC, Nov 10 2026** (branch eras-integrate-pc: local `eras` fc23ca5 merged with
+`origin/eras` 7bf23c7, the owner's PC integrations B and C). The merge brings in the B3 tank
+planner (`planner.ts withinTank`/`fillCap`, mirrored in `refuel.py fill_cap`), the stopped-car
+fuel line, LF/UTF-8 pipeline writers, pit-card fill labels and the A2 radio e2e. Race content
+for europe-1997, hungary-2024, malaysia-2013 and spain-2016 keeps local `eras`'s versions
+(authored later, validated in this 100-race set); the PC authoring of those races is not shipped
+(its facts sheets are kept as appendices in `docs/eras-checks/b1-europe-1997.md` and
+`b1-hungary-2024.md`; `b2-reauthor.md` describes the PC re-author of malaysia-2013 and
+spain-2016, which is likewise not shipped). spain-2013 (not in the 100) takes the PC's hidden
+objective. Every non-pool race was rebuilt (155: 132 built, 23 reconstructed with --force) and
+sc_rates.json, the legend parity fixture and races.gen.ts regenerated: **every file came out
+byte-identical to the merge commit** (the tank planner changes play and grading, not the
+built race models), and the 39 Daily/Gauntlet race and golden files are byte-identical to
+`eras`. Robust G1 on all 100, one race per call: every result and mean gap error is unchanged
+(77 timed races pass, 100.82 s total; the 23 reconstructed races' anchor reports are
+unchanged, G1 sanity 13 of 23, 112.79 s). Reachability, one race per call: 94 of 94 Eras-only
+races and 6 of 6 shared races (`reachability:shared`, portugal-2021 now shared with the
+Gauntlet) reachable at the era's difficulty and at Legend, stay-out never ★3, on the tank
+planner. **Nothing broke: 100 pass, 100 authored, 100 reachable, 100 ready.** The table rows
+below are carried over from phase 3 unchanged (every value re-measured equal).
+
+### Earlier header (overnight phase 3)
+
 Eras integration overnight phase 3, Nov 10 2026: the races report after the phase-3 merges on
 branch eras-integrate-p3 (on top of phase 2, eras d036ef6). Merged: the five swap branches (owner
 pre-approved Nov 9: each failing race swapped for the next-best race by robust-G1 mean gap error;
@@ -236,6 +259,12 @@ Not ready: none. Every era has 10 of 10 races ready to publish, pending the owne
 the facts sheets (C2) and publishing (C3).
 
 ## Since the last report
+
+**Integration PC** (against phase 3, fc23ca5): no change to any race's build, G1 result, mean gap
+error, reachability or readiness. Every refuelling race (Eras 3-5, 1994-2009) stays reachable at both levels on
+the B3 tank planner.
+
+**Phase 3** (against the last report then):
 
 Against the last report (overnight phase 2, d036ef6). Ready = authored + reachable + pass. No
 race lost a pass: the 11 races swapped out (italy-2020, sakhir-2020; bahrain-2014,
