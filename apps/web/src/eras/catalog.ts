@@ -226,7 +226,7 @@ const RACE_TABLE: Record<number, ReadonlyArray<readonly [string, string]>> = {
     ],
     [
       'germany-2016',
-      'Red Bull split the strategies: let your team-mate cover the Mercedes early, stretch your own stints and choose late between two stops and three as the tyres fade in the heat.',
+      'Leading from the start as the tyres fade in the heat: time three stops against two Red Bulls on split strategies.',
     ],
     ['spain-2016', "Mercedes cars collide; Red Bull's split strategy"],
     [
