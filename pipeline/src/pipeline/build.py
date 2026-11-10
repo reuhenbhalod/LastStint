@@ -2554,6 +2554,52 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
+    # Eras 3 scout 4 (eras-scout4-era3): swap candidates for hungary-1998, measured only.
+    "canada-1996": {
+        "year": 1996,
+        "event": "Canadian",
+        "source": "jolpica",
+        "name": "Canada 1996: Villeneuve vs Hill",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swap candidate for hungary-1998 (Era 3). Side provisional until `pipeline hard-calls`:
+        # Villeneuve's one stop against Hill's two; hard-calls 0-0, VIL by chance given up.
+        "user_side": "VIL",
+        "rival": "HIL",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "brazil-1999": {
+        "year": 1999,
+        "event": "Brazilian",
+        "source": "jolpica",
+        "name": "Brazil 1999: Hakkinen vs Schumacher",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swap candidate for hungary-1998 (Era 3). Side provisional until `pipeline hard-calls`:
+        # one stop each, Schumacher in on lap 38 and Hakkinen on lap 42 (F1DB); hard-calls 0-0.
+        "user_side": "HAK",
+        "rival": "MSCM",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "japan-1999": {
+        "year": 1999,
+        "event": "Japanese",
+        "source": "jolpica",
+        "name": "Japan 1999: Hakkinen vs Schumacher",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swap candidate for hungary-1998 (Era 3). Side provisional until `pipeline hard-calls`:
+        # two stops each, the title decider; hard-calls HAK 1, MSCM 0.
+        "user_side": "HAK",
+        "rival": "MSCM",
+        "score_positions": 6,
+        "split": "eras",
+    },
     "germany-2000": {
         "year": 2000,
         "event": "German",

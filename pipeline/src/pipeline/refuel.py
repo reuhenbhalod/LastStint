@@ -82,9 +82,10 @@ PRIOR_SD = 0.01  # s per lap: strong enough that no single race's stops can move
 # What the stops alone say, for the record (pooled_prior(); a test recomputes it): the
 # random-effects mean of the per-race slopes and their between-race sd. Not used in the fit.
 # 0.0648 before the Era 3, 4 and 5 swaps; 0.0986 before Era 5's third batch and luxembourg-1998
-# (Nov 9).
-POOLED_SLOPE = 0.0945
-POOLED_TAU = 0.1251
+# (Nov 9); 0.0945 before the Era 3 scout 4 candidates canada-1996, brazil-1999 and japan-1999
+# (Nov 10).
+POOLED_SLOPE = 0.0984
+POOLED_TAU = 0.1255
 FILL_RATE_METHOD = (
     f"fill rate: an estimate, {PRIOR_SECONDS_PER_LAP:.2f} s per lap of fuel"
     f" (~{BURN_LITRES_PER_LAP:g} L a lap through a ~{RIG_LITRES_PER_SECOND:g} L/s rig, prior sd"
