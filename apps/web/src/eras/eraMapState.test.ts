@@ -1,7 +1,16 @@
 import { unlockThreshold } from '@laststint/sim';
 import { describe, expect, it } from 'vitest';
 import type { ErasApi, ErasResponse } from './api.js';
-import { eraNodes, loadEraMap } from './eraMapState.js';
+import {
+  NODE_X,
+  currentEraId,
+  eraNodes,
+  isMastered,
+  loadEraMap,
+  nodeLabel,
+  nodeX,
+  trailLegs,
+} from './eraMapState.js';
 import { erasResponse } from './erasFixture.js';
 import { mockErasApi } from './mockErasApi.js';
 
@@ -90,5 +99,72 @@ describe('loadEraMap', () => {
     const state = await loadEraMap(api);
     expect(state).toMatchObject({ kind: 'error' });
     if (state.kind === 'error') expect(state.message).toMatch(/99 of 30/);
+  });
+});
+
+describe('the map path', () => {
+  it('names each node by its era and state', () => {
+    const prod = byId(erasResponse(false, { 10: { stars: 20 }, 8: { released: false } }));
+    expect(nodeLabel(prod.get(10) as never, false)).toBe(
+      'Era 10, Ground-effect era, 2022–2025. Unlocked. 20/30 stars.',
+    );
+    expect(nodeLabel(prod.get(9) as never, false)).toBe(
+      'Era 9, The 2021 title fight, 2021. Locked. 21 stars in Era 10 to unlock (1 to go). 0/30 stars.',
+    );
+    expect(nodeLabel(prod.get(8) as never, false)).toBe(
+      'Era 8, Mercedes vs Ferrari, 2017–2020. Coming soon. 0/30 stars.',
+    );
+    const test = byId(erasResponse(true, { 10: { stars: 30 } }));
+    expect(nodeLabel(test.get(10) as never, true)).toBe(
+      'Era 10, Ground-effect era, 2022–2025. Unlocked. 30/30 stars. Mastered.',
+    );
+    expect(nodeLabel(test.get(8) as never, true)).toBe(
+      'Era 8, Mercedes vs Ferrari, 2017–2020. Locked, open on test. 21 stars in Era 9 to unlock (21 to go). 0/30 stars.',
+    );
+  });
+
+  it('marks Mastered only with every star', () => {
+    const nodes = byId(erasResponse(false, { 10: { stars: 30 }, 9: { stars: 29 } }));
+    expect(isMastered(nodes.get(10) as never)).toBe(true);
+    expect(isMastered(nodes.get(9) as never)).toBe(false);
+  });
+
+  it('marks the furthest open era as the one to play next', () => {
+    expect(currentEraId(eraNodes(erasResponse(false)))).toBe(10);
+    expect(currentEraId(eraNodes(erasResponse(false, { 10: { stars: 21 } })))).toBe(9);
+    // Unlocked but not released: the marker stays on the last playable era.
+    expect(
+      currentEraId(eraNodes(erasResponse(false, { 10: { stars: 21 }, 9: { released: false } }))),
+    ).toBe(10);
+    // On test every era opens, but the marker still follows the locks.
+    expect(currentEraId(eraNodes(erasResponse(true, { 10: { stars: 25 } })))).toBe(9);
+  });
+
+  it('winds the trail: nodes alternate sides and stay clear of the edges', () => {
+    for (let i = 0; i < 10; i++) {
+      expect(nodeX(i) < 50).toBe(i % 2 === 0);
+      expect(nodeX(i)).toBeGreaterThanOrEqual(20);
+      expect(nodeX(i)).toBeLessThanOrEqual(80);
+    }
+    expect(nodeX(NODE_X.length)).toBe(nodeX(0));
+  });
+
+  it('joins each node to the next, bright only where the next era is open', () => {
+    const nodes = eraNodes(erasResponse(false, { 10: { stars: 21 } }));
+    const legs = trailLegs(nodes);
+    expect(legs).toHaveLength(9);
+    expect(legs[0]?.d).toBe(`M${nodeX(0)} 50C${nodeX(0)} 100 ${nodeX(1)} 100 ${nodeX(1)} 150`);
+    expect(legs[8]?.d.endsWith(`${nodeX(9)} 950`)).toBe(true);
+    expect(legs.map((l) => l.open)).toEqual([
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+    ]);
   });
 });

@@ -110,6 +110,32 @@ describe('Era map', () => {
     expect(html.match(/ Unlocked</g)).toHaveLength(1);
   });
 
+  it('makes every node a named tab stop, a link only when open', () => {
+    const html = renderMap(
+      ready(erasResponse(false, { 10: { stars: 30 }, 9: { stars: 3 }, 7: { released: false } })),
+    );
+    expect(html).toContain(
+      'aria-label="Era 10, Ground-effect era, 2022–2025. Unlocked. 30/30 stars. Mastered."',
+    );
+    expect(html).toContain('aria-current="step"');
+    expect(html).toContain('Era 8, Mercedes vs Ferrari, 2017–2020. Locked.');
+    expect(html).toContain('Era 7, Hybrid turbo, 2014–2016. Coming soon.');
+    const stops = [...html.matchAll(/<(a|span) [^>]*aria-label="Era (\d+),[^>]*>/g)];
+    expect(stops.map((m) => Number(m[2]))).toEqual([10, 9, 8, 7, 6, 5, 4, 3, 2, 1]);
+    for (const [tag, kind, id] of stops.map((m) => [m[0], m[1], Number(m[2])] as const)) {
+      if (id >= 9) expect(kind, `Era ${id}`).toBe('a');
+      else {
+        expect(tag, `Era ${id}`).toContain('role="link"');
+        expect(tag, `Era ${id}`).toContain('tabindex="0"');
+        expect(tag, `Era ${id}`).toContain('aria-disabled="true"');
+        expect(tag, `Era ${id}`).not.toContain('href=');
+      }
+    }
+    // One scene per era, and the trail: nine legs between ten nodes, all hidden from readers.
+    expect(html.match(/viewBox="0 0 1000 260"/g)).toHaveLength(10);
+    expect(html).toContain('viewBox="0 0 100 1000"');
+  });
+
   it('shows a load error with a way to try again', () => {
     const html = renderMap({ kind: 'error', message: 'Couldn’t load the eras (offline).' });
     expect(html).toContain('role="alert"');

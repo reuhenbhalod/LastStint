@@ -1,9 +1,19 @@
-// The era map's view (build-plan 8.2; spec §14): a timeline from 2025 back to 1983 in play
-// order, one node per era with its stars and its lock. A single column on a phone (no sideways
-// scroll at 390 px), left to right across the page from desktop width. Lock and star states are
-// spelled out in text, not shown by colour alone; open eras are links, so they're tab stops.
+// The era map's view (build-plan 8.2; spec §14): a level-select path from 2025 back to 1983 in
+// play order. Each era is a band with its own cartoon scene (eraMapArt.tsx) and a round node on
+// a dotted trail that winds down the page, so it fits a 390 px phone without sideways scroll.
+// Lock and star states are spelled out in text, not shown by colour alone; every node is a tab
+// stop named by `nodeLabel` (eraMapState.ts), a link when the era is open.
 
-import type { EraMapState, EraNode } from './eraMapState.js';
+import { EraScene } from './eraMapArt.js';
+import {
+  type EraMapState,
+  type EraNode,
+  currentEraId,
+  isMastered,
+  nodeLabel,
+  nodeX,
+  trailLegs,
+} from './eraMapState.js';
 
 export function LockIcon({ open }: { open: boolean }) {
   return (
@@ -73,75 +83,181 @@ export function LockLine({ node, testMode }: { node: EraNode; testMode: boolean 
   );
 }
 
-function NodeBody({ node, testMode }: { node: EraNode; testMode: boolean }) {
+/** The round node on the path: the era's number, its lock, and a chequered flag once Mastered. */
+function NodeBadge({ node, current }: { node: EraNode; current: boolean }) {
   const { era } = node;
+  const mastered = isMastered(node);
+  const tone = node.comingSoon
+    ? 'border-dashed border-[var(--muted)] bg-[var(--card)] text-[var(--muted)]'
+    : node.locked
+      ? 'border-[var(--rule)] bg-[var(--card-2)] text-[var(--muted)]'
+      : mastered
+        ? 'border-[#1c1b29] bg-[var(--flag)] text-[#1c1b29]'
+        : 'border-[#1c1b29] bg-[var(--you)] text-[var(--you-ink)]';
   return (
-    <>
-      <div className="flex items-baseline justify-between gap-2">
-        <span className="eyebrow">Era {era.eraId}</span>
-        <span className="font-mono text-[13px] font-semibold">
-          <StarIcon /> {era.stars}/{era.maxStars}
-          <span className="sr-only"> stars</span>
-        </span>
-      </div>
-      <span className="disp text-[22px] leading-none">{era.years}</span>
-      <span className="text-[14px] font-semibold leading-snug">{era.name}</span>
-      <span className="mt-auto pt-1">
-        <LockLine node={node} testMode={testMode} />
+    <span aria-hidden="true" className="relative block shrink-0">
+      {current && <span className="era-node-pulse absolute inset-[-7px] rounded-full" />}
+      <span
+        className={`era-node relative grid h-[72px] w-[72px] place-items-center rounded-full border-4 shadow-[0_5px_0_#1c1b29] ${tone}`}
+      >
+        <span className="disp wide text-[28px] leading-none">{era.eraId}</span>
+        {(node.locked || node.comingSoon) && (
+          <span className="absolute -right-1 -top-1 grid h-7 w-7 place-items-center rounded-full border-2 border-[var(--rule)] bg-[var(--paper)] text-[var(--ink)]">
+            <LockIcon open={false} />
+          </span>
+        )}
+        {mastered && (
+          <span className="checker absolute -right-1 -top-1 h-7 w-7 rounded-full border-2 border-[#1c1b29] bg-[var(--paper)]" />
+        )}
       </span>
-    </>
+      <span className="absolute left-1/2 top-[78px] -translate-x-1/2 whitespace-nowrap rounded-full border-2 border-[#1c1b29] bg-[var(--paper)] px-2 py-0.5 font-mono text-[12px] font-bold text-[var(--flag)]">
+        <StarIcon /> {era.stars}/{era.maxStars}
+      </span>
+    </span>
   );
 }
 
-const NODE = 'card flex h-full flex-col gap-1.5 !p-3 sm:!p-4';
+/** The label beside a node: era, years, name, stars and lock. */
+function NodeCard({ node, testMode }: { node: EraNode; testMode: boolean }) {
+  const { era } = node;
+  return (
+    <span className="flex min-w-0 max-w-[260px] flex-1 flex-col gap-1 rounded-xl border-2 border-[var(--rule)] bg-[color-mix(in_srgb,var(--card)_94%,transparent)] px-3 py-2 shadow-[0_4px_0_rgba(0,0,0,0.35)]">
+      <span className="flex items-baseline justify-between gap-2">
+        <span className="eyebrow">Era {era.eraId}</span>
+        <span className="font-mono text-[12px] font-semibold">
+          {era.stars}/{era.maxStars}
+          <span className="sr-only"> stars</span>
+        </span>
+      </span>
+      <span className="disp text-[19px] leading-none">{era.years}</span>
+      <span className="text-[13.5px] font-semibold leading-snug">{era.name}</span>
+      {isMastered(node) && (
+        <span className="text-[12px] font-semibold text-[var(--flag)]">Mastered</span>
+      )}
+      <span className="pt-0.5">
+        <LockLine node={node} testMode={testMode} />
+      </span>
+    </span>
+  );
+}
 
-function EraNodeCard({ node, testMode }: { node: EraNode; testMode: boolean }) {
-  if (node.open) {
+const STOP =
+  'era-stop absolute top-1/2 flex -translate-y-1/2 items-center gap-2.5 rounded-2xl text-left text-[var(--ink)] focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-[var(--flag)]';
+
+/**
+ * One era on the path. Its node and label are one tab stop, named by `nodeLabel`: a link into
+ * the era when it's open, otherwise a disabled link (still focusable, so the lock is read out).
+ */
+function EraStop({
+  node,
+  index,
+  testMode,
+  current,
+}: {
+  node: EraNode;
+  index: number;
+  testMode: boolean;
+  current: boolean;
+}) {
+  const x = nodeX(index);
+  const left = x < 50;
+  // The node's centre sits on the trail at x%; the label takes the wider side.
+  const style = left
+    ? { left: `calc(${x}% - 36px)`, maxWidth: `calc(${100 - x}% + 28px)` }
+    : { right: `calc(${100 - x}% - 36px)`, maxWidth: `calc(${x}% + 28px)` };
+  const cls = `${STOP} ${left ? '' : 'flex-row-reverse'}`;
+  const label = nodeLabel(node, testMode);
+  const body = (
+    <>
+      <NodeBadge node={node} current={current} />
+      <NodeCard node={node} testMode={testMode} />
+    </>
+  );
+  if (node.open)
     return (
       <a
         href={`/eras/${node.era.eraId}`}
-        className={`${NODE} hover:bg-[var(--card-2)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--you)] ${node.locked ? 'border-dashed' : ''}`}
+        aria-label={label}
+        aria-current={current ? 'step' : undefined}
+        className={`${cls} hover:brightness-110`}
+        style={style}
       >
-        <NodeBody node={node} testMode={testMode} />
+        {body}
       </a>
     );
-  }
   return (
-    <div
+    // A locked era is a disabled link: no href, but focusable so its lock is read out.
+    // biome-ignore lint/a11y/useSemanticElements: an <a> needs an href, and a locked era has none
+    <span
+      role="link"
+      tabIndex={0}
       aria-disabled="true"
-      className={`${NODE} border-dashed opacity-70 ${node.comingSoon ? 'bg-transparent' : ''}`}
+      aria-label={label}
+      className={`${cls} cursor-not-allowed`}
+      style={style}
     >
-      <NodeBody node={node} testMode={testMode} />
-    </div>
+      {body}
+    </span>
   );
 }
 
-/** The step number above each node, joined to the next by a line: the timeline's rail. */
-function Rail({ order, last }: { order: number; last: boolean }) {
+/** The dotted trail joining the nodes, under them: bright where it leads to an open era. */
+function Trail({ nodes }: { nodes: EraNode[] }) {
   return (
-    <div aria-hidden="true" className="mb-1.5 flex items-center gap-2">
-      <span className="font-mono text-[11px] font-semibold text-[var(--muted)]">
-        {String(order).padStart(2, '0')}
-      </span>
-      <span className={`h-px flex-1 ${last ? 'bg-transparent' : 'bg-[var(--rule)]'}`} />
-    </div>
-  );
-}
-
-/** The timeline of era nodes, newest first. */
-export function EraTimeline({ nodes, testMode }: { nodes: EraNode[]; testMode: boolean }) {
-  return (
-    <ol
-      aria-label="Eras, in play order from 2025 back to 1983"
-      className="m-0 grid list-none grid-cols-1 gap-x-3 gap-y-5 p-0 sm:grid-cols-2 lg:grid-cols-5"
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      viewBox={`0 0 100 ${nodes.length * 100}`}
+      preserveAspectRatio="none"
+      className="pointer-events-none absolute inset-0 z-[1] h-full w-full"
     >
-      {nodes.map((node) => (
-        <li key={node.era.eraId} className="relative min-w-0">
-          <Rail order={node.era.playOrder} last={node.era.playOrder === nodes.length} />
-          <EraNodeCard node={node} testMode={testMode} />
-        </li>
+      {trailLegs(nodes).map((leg) => (
+        <g key={leg.d} fill="none" strokeLinecap="round" vectorEffect="non-scaling-stroke">
+          <path
+            d={leg.d}
+            stroke="#1c1b29"
+            strokeOpacity={0.55}
+            strokeWidth={16}
+            vectorEffect="non-scaling-stroke"
+          />
+          <path
+            d={leg.d}
+            stroke={leg.open ? '#ffffff' : '#8b9692'}
+            strokeWidth={7}
+            strokeDasharray="0.1 16"
+            vectorEffect="non-scaling-stroke"
+          />
+        </g>
       ))}
-    </ol>
+    </svg>
+  );
+}
+
+/** The map of era nodes, newest first, down a winding path through each era's scene. */
+export function EraTimeline({ nodes, testMode }: { nodes: EraNode[]; testMode: boolean }) {
+  const current = currentEraId(nodes);
+  return (
+    <div className="relative overflow-hidden rounded-2xl border-4 border-[#1c1b29] shadow-[0_6px_0_rgba(0,0,0,0.4)]">
+      <ol aria-label="Eras, in play order from 2025 back to 1983" className="m-0 list-none p-0">
+        {nodes.map((node, i) => (
+          <li key={node.era.eraId} className="relative h-[230px] sm:h-[250px]">
+            <EraScene eraId={node.era.eraId} />
+            {(node.locked || node.comingSoon) && (
+              <span aria-hidden="true" className="absolute inset-0 bg-[rgba(18,21,20,0.45)]" />
+            )}
+            <span className="relative z-[2] block h-full">
+              <EraStop
+                node={node}
+                index={i}
+                testMode={testMode}
+                current={node.era.eraId === current}
+              />
+            </span>
+          </li>
+        ))}
+      </ol>
+      <Trail nodes={nodes} />
+    </div>
   );
 }
 
