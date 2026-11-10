@@ -10,7 +10,7 @@ import { Disclaimer } from '../components/Disclaimer.js';
 import { EraDetailBody } from './EraDetail.js';
 import { EraMapBody } from './EraMap.js';
 import { EraRace } from './EraRace.js';
-import { HistoryBookBody } from './HistoryBook.js';
+import { HistoryBookBody, HistoryBookCover } from './HistoryBook.js';
 import { LeaderboardBody } from './RaceLeaderboard.js';
 import { type ErasApi, type ErasBookApi, canStartWith, erasApi, erasBookApi } from './api.js';
 import {
@@ -199,9 +199,9 @@ export function HistoryBookScreen({
       <a href="/eras" className="text-[13px] text-[var(--muted)] underline hover:text-[var(--ink)]">
         All eras
       </a>
-      <p className="eyebrow m-0 !text-[var(--box-ink)]">Eras</p>
-      <h1 className="disp wide m-0 text-[40px] leading-[0.95] sm:text-[60px]">History book</h1>
-      <HistoryBookBody state={state} onRetry={retry} />
+      <HistoryBookCover>
+        <HistoryBookBody state={state} onRetry={retry} />
+      </HistoryBookCover>
     </Shell>
   );
 }

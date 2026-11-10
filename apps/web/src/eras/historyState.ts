@@ -3,7 +3,7 @@
 // Every count is the server's (GET /api/history); the screens only round and label them.
 
 import { NEUTRAL_REWRITE } from './EraResults.js';
-import type { EraLeaderboard, ErasBookApi, HistoryBook, HistoryEntry } from './api.js';
+import type { EraLeaderboard, ErasBookApi, HistoryBook, HistoryEntry, HistoryEra } from './api.js';
 
 /**
  * A completion percentage as shown: whole numbers, but never "0%" once something is collected
@@ -15,6 +15,29 @@ export function displayPercent(percent: number, collected: number, total: number
   if (collected > 0 && rounded === 0) return 1;
   if (collected < total && rounded === 100) return 99;
   return rounded;
+}
+
+/** An era's three badges (spec §8): one collectible each. */
+const ERA_BADGES = ['cleared', 'mastered', 'legend'] as const;
+
+/**
+ * An era's chapter in the book: what's collected of what's collectible (stars, Legend stars,
+ * rewrites, hidden objectives and its three badges) and the percentage shown for it.
+ */
+export function eraChapter(era: HistoryEra): { collected: number; total: number; percent: number } {
+  const collected =
+    era.stars.have +
+    era.legendStars.have +
+    era.rewrites.have +
+    era.hidden.have +
+    ERA_BADGES.filter((b) => era.badges[b]).length;
+  const total =
+    era.stars.total +
+    era.legendStars.total +
+    era.rewrites.total +
+    era.hidden.total +
+    ERA_BADGES.length;
+  return { collected, total, percent: displayPercent(era.percent, collected, total) };
 }
 
 /** A rewrite's headline: the race's authored one, or a neutral line (never invented copy). */

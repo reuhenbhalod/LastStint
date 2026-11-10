@@ -8,6 +8,7 @@ import {
   entriesNewestFirst,
   entryDate,
   entryHeadline,
+  eraChapter,
   loadHistory,
   loadLeaderboard,
   myPlace,
@@ -17,6 +18,53 @@ const api = (edit: Partial<ErasBookApi>): ErasBookApi => ({
   history: async () => historyBook(),
   leaderboard: async (raceId, legend) => leaderboard(3, 2, { raceId, legend }),
   ...edit,
+});
+
+describe('eraChapter', () => {
+  const era = (id: number, book = historyBook()) => {
+    const found = book.eras.find((e) => e.eraId === id);
+    if (!found) throw new Error(`no era ${id}`);
+    return found;
+  };
+
+  it('counts an era’s 83 collectibles, badges included', () => {
+    expect(eraChapter(era(10))).toEqual({ collected: 0, total: 83, percent: 0 });
+    const book = historyBook({
+      eras: {
+        10: {
+          stars: { have: 30, total: 30 },
+          legendStars: { have: 4, total: 30 },
+          rewrites: { have: 3, total: 10 },
+          hidden: { have: 2, total: 10 },
+          badges: { cleared: true, mastered: true, legend: false },
+        },
+      },
+    });
+    // 30 + 4 + 3 + 2 + 2 badges = 41 of 83, 49.4%.
+    expect(eraChapter(era(10, book))).toEqual({ collected: 41, total: 83, percent: 49 });
+  });
+
+  it('shows 1% for one collectible and 99% one short of all', () => {
+    const one = historyBook({ eras: { 9: { stars: { have: 1, total: 30 } } } });
+    expect(eraChapter(era(9, one)).percent).toBe(1);
+    const almost = historyBook({
+      eras: {
+        1: {
+          stars: { have: 30, total: 30 },
+          legendStars: { have: 30, total: 30 },
+          rewrites: { have: 10, total: 10 },
+          hidden: { have: 9, total: 10 },
+          badges: { cleared: true, mastered: true, legend: true },
+        },
+      },
+    });
+    expect(eraChapter(era(1, almost))).toEqual({ collected: 82, total: 83, percent: 99 });
+  });
+
+  it('counts a shorter rewrites total (races with no rewrite)', () => {
+    const book = historyBook({ eras: { 4: { rewrites: { have: 0, total: 8 } } } });
+    expect(eraChapter(era(4, book)).total).toBe(81);
+  });
 });
 
 describe('displayPercent', () => {
