@@ -1059,14 +1059,14 @@ RACES: dict[str, dict] = {
         "year": 2016,
         "event": "Canada",
         "source": "tum",
-        "name": "Canada 2016: Vettel vs Hamilton",
+        "name": "Canada 2016: Hamilton vs Vettel",
         "era": "2014-2025",
         "takeover_lap": None,  # D3 rule
         "seed": 1,
-        # Swapped in for hungary-2014 (swap-races-era7-overnight.md). Side provisional until
-        # `pipeline hard-calls`.
-        "user_side": "VET",
-        "rival": "HAM",
+        # Swapped in for hungary-2014 (swap-races-era7-overnight.md). Side by `pipeline
+        # hard-calls` (HAM 1, VET 0).
+        "user_side": "HAM",
+        "rival": "VET",
         "score_positions": 6,
         "split": "eras",
     },
