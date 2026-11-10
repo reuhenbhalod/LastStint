@@ -3532,3 +3532,40 @@ monaco-2016 (MAG, VER), germany-2019 (HUL, LEC, NOR, RIC), canada-2011 (ALO, KOV
 netherlands-2023 (SAR), monaco-2022 (MAG, MSC; MAG on the field median), monaco-2008 (FIS, PIQ),
 europe-2007 (WIN), great-britain-2016 (GRO), with hungary-2006 and malaysia-2001. No
 Daily/Gauntlet file or golden changes.
+
+## Eras model fix W5 (Nov 9 2026): pace by stint on rain tyres
+
+**Why.** M2's stint offsets (`pace.stint_offsets`) skip every lap at wetness 0.02 and up, so a
+wet race's rain-tyre stints keep no offset of their own: netherlands-2023's finish on inters
+(after the lap-64 red flag) ran with the field compressed (HAM 5.05 s, podium order 0.38), and
+australia-2025's last inter stint had VER 0.85 s a lap slower than NOR where the real laps were
+level. The restart lap after netherlands-2023's red flag (lap 66, lap time +45 s on the model)
+also counted as a racing lap, clipped at +3 s.
+
+**Change** (`pace.stint_offsets(wet_stints=True)`, `assemble.WET_STINTS`; only where M2 runs:
+Eras builds of timed races with wet laps): laps on inters or wets at wetness 0.02 and up count,
+against the sim's wet clean lap (the curves plus the car's `wetPace` / `dampPace`), each miss
+divided by the lap's wet factor; and a restart lap (the lap before not green) is left out, as
+`wet.racing_laps` does. Slicks on a wet track stay out: counting them too lost belgium-2023
+(RUS 8.8 s) and germany-2018 (duel 3.7 s). No sim change (the file's `stintPace` as before);
+Daily/Gauntlet builds don't run M2 (in-memory check: canada-2024 and russia-2021 build the same
+with W5 on and off).
+
+**Before / after** (robust G1, one race per call, fresh builds in memory):
+
+| Race | Before | After | Failing checks after |
+|---|---|---|---|
+| netherlands-2023 | fail 2.34 s | **pass** 2.47 s | |
+| australia-2025 | fail 3.70 s | fail 3.43 s | duel VER vs NOR 5.07 / 4.96 [3.00]; VER 5.07 / 4.96 [5.00]; ANT 5.55 / 5.74 [5.00] |
+| hungary-2021 | fail 4.80 s | fail 4.36 s | duel HAM vs ALO 4.08 / 4.04 [3.00]; HAM 7.82 / 8.15; SAI 5.04 / 5.16 [5.00]; GAS 8.98 / 9.08 [6.36] |
+| belgium-2023 | pass 1.98 s | pass 1.99 s | |
+| germany-2018 | pass 1.64 s | pass 1.64 s | |
+| germany-2019 | pass 1.42 s | pass 1.54 s | |
+| japan-2000 | pass 1.29 s | pass 1.29 s | |
+| malaysia-2013 | pass 0.90 s | pass 0.90 s | |
+| spain-1996 | pass 0.63 s | pass 0.63 s | |
+| turkey-2020 | pass 1.75 s | pass 1.75 s | |
+
+Other timed wet Eras races (failing ones) change too once rebuilt; not measured here.
+australia-2025's rest: VER's last stint is short (6 green laps, shrunk by 5) and mostly within
+1.5 s of NOR. hungary-2021's error is dry stint pace (gap 3), not the wet start.

@@ -21,7 +21,7 @@ import numpy as np
 import pandas as pd
 
 from .refuel import car_fuel
-from .sim_reference import Car, _clean_lap
+from .sim_reference import Car, _clean_lap, driver_wet, wet_penalty, wetness
 
 SHRINK_LAPS = 5.0
 # Stage 6 (T1): measure the offset on clear-air laps only (the sim adds dirty air itself).
@@ -100,6 +100,8 @@ def post_takeover_offsets(
 SIM_FRAME_LOSS = True
 # A wet race's laps at this wetness and up aren't dry (wet.DRY_BELOW).
 DRY_LAP_BELOW = 0.02
+# Eras model fix W5 (stint_offsets wet_stints): the tyres whose wet laps count.
+RAIN_TYRES = ("INTERMEDIATE", "WET")
 
 
 def sim_frame_losses(
@@ -286,10 +288,19 @@ def stint_offsets(
     clip: float = STINT_CLIP,
     min_clear_share: float = STINT_MIN_CLEAR_SHARE,
     traffic: list[dict] | None = None,
+    wet_pace: dict[str, float] | None = None,
+    damp_pace: dict[str, float] | None = None,
+    wet_stints: bool = False,
 ) -> StintTable:
     """Per car and real stint, the pace offset (s/lap) of its green racing laps after the
     takeover against the sim's clean lap at `base_pace` (the race model's basePace).
-    `traffic`: as in post_takeover_offsets, each lap's real dirty-air loss taken off first."""
+    `traffic`: as in post_takeover_offsets, each lap's real dirty-air loss taken off first.
+    `wet_stints` (Eras model fix W5): a wet race's laps on rain tyres (RAIN_TYRES) at
+    DRY_LAP_BELOW and up count too (slicks on a wet track stay out, as before), against the
+    sim's wet clean lap (the curves and the car's `wet_pace` / `damp_pace`), each
+    lap's miss divided by the lap's wet factor (the sim multiplies the offset by it); and a wet
+    race's restart laps (the lap before not green: after a red flag or a safety car) are left
+    out, as wet.racing_laps leaves them out."""
     from .clean import TRAFFIC_GAP_SECONDS, gap_to_car_ahead
     from .dirty_air import cost, start_gaps
 
@@ -305,13 +316,29 @@ def stint_offsets(
         & laps["LapTime"].notna()
         & laps["TyreLife"].notna()
     ]
+    wet_race = (
+        wet_stints and bool(weather) and max(weather["wetness"], default=0.0) >= DRY_LAP_BELOW
+    )
+    if wet_race:
+        # A wet race's restart lap (the lap after a red flag or SC) is no racing lap: green
+        # the lap before too (wet.racing_laps).
+        green = laps["TrackStatus"].astype(str) == "1"
+        prev_green = (
+            laps.assign(_g=green)
+            .sort_values("LapNumber")
+            .groupby("Driver")["_g"]
+            .shift(1, fill_value=False)
+            .reindex(laps.index, fill_value=False)
+        )
+        post = post[prev_green.loc[post.index]]
     residuals: dict[tuple[str, int], list[float]] = {}
     in_clear: dict[tuple[str, int], int] = {}
     for r in post.itertuples():
         code = str(r.Driver)
         compound = None if pd.isna(r.Compound) else str(r.Compound)
         lap = int(r.LapNumber)
-        if weather and weather["wetness"][lap - 1] >= DRY_LAP_BELOW:
+        wet_lap = bool(weather) and weather["wetness"][lap - 1] >= DRY_LAP_BELOW
+        if wet_lap and not (wet_race and compound in RAIN_TYRES):
             continue
         if code not in base_pace or compound not in compounds:
             continue
@@ -323,6 +350,8 @@ def stint_offsets(
             tyre_age=max(0, int(r.TyreLife) - 1),  # the sim's age while running this lap
             total_time=0.0,
             tyre_wear=None if wear is None else float(wear.loc[r.Index]),
+            wet_pace=(wet_pace or {}).get(code, 0.0) if wet_race else 0.0,
+            damp_pace=(damp_pace or {}).get(code) if wet_race and damp_pace else None,
             **car_fuel(r),  # a refuelling race: the tank on board, as the sim carries it
         )
         predicted = _clean_lap(car, compounds, fuel_per_lap, lap, fresh_tyre, weather)
@@ -331,7 +360,11 @@ def stint_offsets(
         key = stint_key(stops.get(code, []), lap)
         if bool(clear.loc[r.Index]):
             in_clear[(code, key)] = in_clear.get((code, key), 0) + 1
-        residuals.setdefault((code, key), []).append(float(r.LapTime) - predicted)
+        miss = float(r.LapTime) - predicted
+        if wet_lap:
+            w = wetness(weather, lap)
+            miss /= 1 + wet_penalty(weather, compound, lap) + driver_wet(car, w) * min(1.0, w / 0.1)
+        residuals.setdefault((code, key), []).append(miss)
     offsets: dict[str, dict[int, float]] = {}
     for (code, key), res in sorted(residuals.items()):
         n = len(res)
