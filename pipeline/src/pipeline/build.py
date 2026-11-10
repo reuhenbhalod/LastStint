@@ -1812,14 +1812,14 @@ RACES: dict[str, dict] = {
         "year": 2007,
         "event": "Great Britain",
         "source": "jolpica",
-        "name": "Great Britain 2007: Hamilton vs Räikkönen",
+        "name": "Great Britain 2007: Räikkönen vs Hamilton",
         "era": "1994-2009",
         "takeover_lap": None,  # D3 rule
         "seed": 1,
-        # Swapped in for china-2007 (swap-races-era5-overnight.md). Side provisional until
-        # `pipeline hard-calls`.
-        "user_side": "HAM",
-        "rival": "RAI",
+        # Swapped in for china-2007 (swap-races-era5-overnight.md). Eras side by hard calls
+        # (RAI 1, HAM 0): win (real: Räikkönen won).
+        "user_side": "RAI",
+        "rival": "HAM",
         "score_positions": 6,
         "split": "eras",
     },
