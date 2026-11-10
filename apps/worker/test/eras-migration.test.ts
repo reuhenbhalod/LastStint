@@ -915,10 +915,11 @@ describe('migration 0022: three Era 3 races swapped (stats picks)', () => {
     return m;
   };
 
-  it('applies last, after 0014', () => {
+  it('applies after 0014', () => {
     const names = env.TEST_MIGRATIONS.map((m) => m.name);
-    expect(names.at(-1)).toBe('0022_swap_eras_races_era3.sql');
-    expect(names.indexOf('0014_swap_eras_races_e10_e9_b.sql')).toBeLessThan(names.length - 1);
+    expect(names.indexOf('0022_swap_eras_races_era3.sql')).toBeGreaterThan(
+      names.indexOf('0014_swap_eras_races_e10_e9_b.sql'),
+    );
   });
 
   it("puts each new race in the old one's era and position, still Draft", async () => {
@@ -983,5 +984,14 @@ describe('migration 0022: three Era 3 races swapped (stats picks)', () => {
         .first();
       expect(row, s.race_id).toEqual({ era_id: s.era_id, position: s.position });
     }
+  });
+});
+
+describe('migration 0023: the last two failing Era 8 races swapped (stats picks)', () => {
+  it('applies after 0022', () => {
+    const names = env.TEST_MIGRATIONS.map((m) => m.name);
+    expect(names.indexOf('0023_swap_eras_races_era8_b.sql')).toBeGreaterThan(
+      names.indexOf('0022_swap_eras_races_era3.sql'),
+    );
   });
 });

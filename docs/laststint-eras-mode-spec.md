@@ -88,9 +88,9 @@ Players start at Era 10 and move back through the timeline to Era 1. The eras be
 | 5 | germany-2019 | Rain and constant tyre swaps | win: Verstappen through the rain |
 | 6 | hungary-2019 | Mercedes switches to two stops to catch Verstappen | win: Hamilton catches Verstappen |
 | 7 | brazil-2019 | Late safety car chaos | position: Gasly on the podium |
-| 8 | italy-2020 | Red flag and a pit-lane penalty hand Gasly the win | defend: Gasly holds the lead to the flag |
+| 8 | china-2017 | Vettel stops first for fresh softs: cover him at once, or stay out and defend the lead on older tyres? | defend: Hamilton holds P1 ahead of Vettel |
 | 9 | turkey-2020 | Hamilton's worn intermediates win the title | win: Hamilton from P6 for the title |
-| 10 | sakhir-2020 | Mercedes' pit stop mix-up costs Russell | defend: Russell holds P1 |
+| 10 | china-2018 | A safety car with 25 laps left: give up the lead for fresh softs, or stay out on old mediums and hold off the Red Bulls? | win: Bottas from P2, ahead of Ricciardo |
 
 ### Era 7: Hybrid turbo (2014–2016) · play order 4
 | # | Race ID | Dilemma | Target (draft) |
@@ -241,8 +241,8 @@ Every race has one target, set in `eras.target`. Each race's draft target is in 
 
 | Type | Means | Grader `Target` | Races (draft) |
 |---|---|---|---|
-| `win` | Chase down the win from behind | `win` | 45 |
-| `defend` | Start in the lead and keep it to the flag | `win`, starting from P1 | 20 |
+| `win` | Chase down the win from behind | `win` | 46 |
+| `defend` | Start in the lead and keep it to the flag | `win`, starting from P1 | 19 |
 | `position` | Reach a set position, such as P3 to win the title | `position` | 17 |
 | `beat-rival` | Finish ahead of a named car, wherever that is | `beat-rival` | 14 |
 | `team` | A team result, such as a 1–2 in a set order | `team` (new) | 2 |

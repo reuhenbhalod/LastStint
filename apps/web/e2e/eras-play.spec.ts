@@ -3,9 +3,10 @@
 // Between them: refuelling (a box call waits for its fuel fill), the 2005 tyre lock, no DRS
 // before 2011, a team order, the decision timer running out and the untimed opt-out, Legend,
 // reconstructed races with pit-board prompts (Eras 1-2), an avoidable storyline retirement
-// (repeated and avoided), the history book and a leaderboard. No authored race has a red flag
-// or a car fault of its own yet, so those two are played on the catalog's Draft races that do
-// (italy-2020, hungary-1997), as test mode serves them.
+// (repeated and avoided), the history book and a leaderboard. The red flag is azerbaijan-2021's
+// (authored; italy-2020 left Eras in migration 0023). No authored race has a car fault of its
+// own yet, so that is played on a catalog Draft race that does (hungary-1997), as test mode
+// serves it.
 //
 // Each test plays a whole race at five times the normal lap speed (the app's e2e hook); the
 // tests run in parallel. Runtime: see docs/eras-build-plan.md step 10.1.
@@ -147,15 +148,14 @@ test('Era 8: Turkey 2020 from the map to the results', async ({ page }) => {
   expect(eras.submissions).toHaveLength(1);
 });
 
-test('Era 8 (Draft): Italy 2020’s red flag', async ({ page }) => {
-  const model = loadEraRace('italy-2020');
+test('Era 9: Azerbaijan 2021’s red flag', async ({ page }) => {
+  const model = loadEraRace('azerbaijan-2021');
   expect(model.events.some((e) => e.type === 'RED')).toBe(true);
   await mockEras(page, [model]);
-  await openRace(page, 'italy-2020');
-  await expect(page.getByText('Draft', { exact: true })).toBeVisible();
+  await openRace(page, 'azerbaijan-2021');
   const played = await playRace(page);
   expect(played.redFlag, 'the red flag shows on the race screen').toBe(true);
-  await resultsFor(page, 8);
+  await resultsFor(page, 9);
 });
 
 test('Era 7: Abu Dhabi 2016 from the map to the results', async ({ page }) => {

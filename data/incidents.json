@@ -987,6 +987,20 @@
   }
  ],
  "australia-2017": [],
+ "china-2017": [],
+ "china-2018": [
+  {
+   "lap": 31,
+   "type": "SC",
+   "status": "Collision",
+   "cars": [
+    "HAR",
+    "GAS"
+   ],
+   "source": "https://www.grandprix.com/races/chinese-gp-2018-race-analysis.html",
+   "note": "Hartley and Gasly (Toro Rosso) collided at the hairpin on lap 30 (Wikipedia, GrandPrix.com); SC deployed on lap 31 (GrandPrix.com, Motor Sport) and in on lap 35 (Motor Sport), as in the built model (TUM track status, laps 31-35). Hartley carried on; Jolpica status Collision damage (51 laps)"
+  }
+ ],
  "belgium-1998": [
   {
    "lap": 33,

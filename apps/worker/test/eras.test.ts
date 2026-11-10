@@ -38,6 +38,18 @@ ERAS_RACE_FILES['hungary-2022'] = {
   },
 };
 
+// china-2018 (Era 8 #10 since migration 0023) has no Eras block yet; this isolate's bundle gets a
+// stand-in race file without one (Hungary 2022's, renamed), so the "no Eras target yet" path stays
+// covered whatever china-2018's real file holds.
+{
+  const { eras: _eras, ...noEras } = hungary2022Json as unknown as RaceModel;
+  ERAS_RACE_FILES['china-2018'] = {
+    ...noEras,
+    race: { ...noEras.race, id: 'china-2018' },
+    decisionMoments: [],
+  };
+}
+
 // Every Eras race has a race file since china-2007 and brazil-1993 were built: europe-2007's
 // is left out of this isolate's bundle, so the not-built path stays covered (china-2007 left
 // Eras in migration 0020).
@@ -575,7 +587,7 @@ describe('POST /api/eras/attempts/:id', () => {
   });
 
   it('refuses a race whose file has no Eras target yet (503), storing nothing', async () => {
-    const a = await json<Attempt>(await start('test', 'italy-2020'));
+    const a = await json<Attempt>(await start('test', 'china-2018'));
     const res = await submit(a.attemptId, { anonId: ids.a, decisions });
     expect(res.status).toBe(503);
     expect((await json<{ error: string }>(res)).error).toBe('race-not-ready');

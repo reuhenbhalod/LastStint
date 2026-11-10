@@ -193,9 +193,15 @@ const RACE_TABLE: Record<number, ReadonlyArray<readonly [string, string]>> = {
     ['germany-2019', 'Rain and constant tyre swaps'],
     ['hungary-2019', 'Mercedes switches to two stops to catch Verstappen'],
     ['brazil-2019', 'Late safety car chaos'],
-    ['italy-2020', 'Red flag and a pit-lane penalty hand Gasly the win'],
+    [
+      'china-2017',
+      'Vettel stops first for fresh softs: cover him at once, or stay out and defend the lead on older tyres?',
+    ],
     ['turkey-2020', "Hamilton's worn intermediates win the title"],
-    ['sakhir-2020', "Mercedes' pit stop mix-up costs Russell"],
+    [
+      'china-2018',
+      'A safety car with 25 laps left: give up the lead for fresh softs, or stay out on old mediums and hold off the Red Bulls?',
+    ],
   ],
   7: [
     ['bahrain-2014', 'Hamilton vs Rosberg, the Duel in the Desert'],

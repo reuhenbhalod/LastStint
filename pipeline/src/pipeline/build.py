@@ -856,6 +856,36 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
+    "china-2017": {
+        "year": 2017,
+        "event": "China",
+        "source": "tum",
+        "name": "China 2017: Hamilton vs Vettel",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for italy-2020 (swap-races-era8-overnight.md). `pipeline hard-calls` on
+        # the first build (as VET): VET 0, HAM 1, so HAM.
+        "user_side": "HAM",
+        "rival": "VET",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "china-2018": {
+        "year": 2018,
+        "event": "China",
+        "source": "tum",
+        "name": "China 2018: Bottas vs Ricciardo",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for sakhir-2020 (swap-races-era8-overnight.md). `pipeline hard-calls` on
+        # the first build (as RIC): RIC 2, BOT 3, so BOT.
+        "user_side": "BOT",
+        "rival": "RIC",
+        "score_positions": 6,
+        "split": "eras",
+    },
     "monaco-2017": {
         "year": 2017,
         "event": "Monaco",
