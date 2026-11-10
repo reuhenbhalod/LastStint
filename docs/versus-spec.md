@@ -1,6 +1,6 @@
 # Versus mode spec
 
-**Status:** draft for review (Nov 9, 2026). Nothing is built yet.
+**Status:** agreed (Nov 9, 2026). Phase 1 is in progress.
 
 **Decided so far (the owner):**
 - Two people play each other live.
@@ -8,7 +8,14 @@
 - Each car has realistic strengths and weaknesses.
 - **The winner is whoever makes the better calls (grading).** The race result is shown too.
 
-**Open:** questions marked **[Q]** need the owner's answer before building.
+**Also decided (the owner, Nov 9):**
+- the five launch tracks;
+- the same car is allowed;
+- each player picks a starting tyre;
+- the server does the grading;
+- matches are invite-only.
+
+**Default:** team liveries are colours only.
 
 ---
 
@@ -25,10 +32,9 @@
 
 **The grid.**
 - Two cars start side by side: P1 and P2, 0.3 s apart. Who starts in front is picked by the seed, and the result shows it.
-- Both start on mediums with 0 laps on them.
+- Each player picks a starting tyre (soft, medium or hard, 0 laps old) on the grid. Both see the picks once they're revealed.
 - Each car has 20 laps of fuel plus the player's chosen margin.
 - 20 laps.
-- **[Q]** Should both cars start on mediums, or does each player pick their starting tyre (visible to both)?
 - No other cars on track.
 
 **The rules.**
@@ -37,7 +43,7 @@
 
 **Events.**
 - The seed decides any safety car, VSC or rain, using the track's real rate.
-- **Safety car or VSC:** about one race in three gets one, between laps 4 and 17, lasting 2–4 laps.
+- **Safety car or VSC:** a race has a one-in-three chance of one. It comes out between laps 4 and 17, as a SC or a VSC in the era's ratio (about 1 to 2). A SC lasts 3–4 laps and a VSC 2.
 - **Rain:** dry only at launch. Rain comes later, on a track that has had wet races.
 - Both players get the same events on the same laps, and neither knows them in advance.
 
@@ -51,7 +57,7 @@
 | Bahrain | Heavy tyre wear | `bahrain-2022` |
 | Suzuka | Flowing corners | `japan-2024` |
 
-Monaco, Silverstone and Singapore have no map outline yet. Adding one needs a network download (`pipeline outline`), which can come later. **[Q]** Are these five OK for launch?
+Monaco, Silverstone and Singapore have no map outline yet. Adding one needs a network download (`pipeline outline`), which can come later.
 
 ## V2. The cars
 
@@ -59,19 +65,22 @@ Monaco, Silverstone and Singapore have no map outline yet. Adding one needs a ne
 - Every car spends the same budget over five stats.
 - Each stat is a small, realistic change to what the engine already models, so the calls decide the race rather than the car.
 
-| Stat | Effect in the engine | Range |
-|---|---|---|
-| **Top speed** | Lap time on the track's straight share | up to ±0.30 s a lap |
-| **Cornering** | Lap time on the track's corner share | up to ±0.30 s a lap |
-| **Tyre wear** | Wear rate, so the drop-off comes earlier or later | ±15% |
-| **Fuel use** | Burn per lap, and so weight and lift-and-coast | ±5% |
-| **Pit crew** | Stationary time added to every stop | ±0.6 s |
+| Stat | Effect in the engine | Per point | At ±2 |
+|---|---|---|---|
+| **Top speed** | Lap time on the track's straight share; also helps passing | 0.035 s a lap | about ±0.07–0.08 s a lap |
+| **Cornering** | Lap time on the rest of the lap | 0.035 s a lap | about ±0.05–0.09 s a lap |
+| **Tyre wear** | Wear rate, so the drop-off comes earlier or later | 13% | ±26% |
+| **Fuel use** | Burn per lap, so a lighter or heavier car | 5% | ±10% |
+| **Pit crew** | Stationary time on every stop | 0.15 s | ±0.3 s |
 
-**Track character.** Each track gets a straight share from its outline: the share of the lap with low curvature. Monza's is about 0.75 and the Hungaroring's about 0.45. On a given track a car's lap time changes by:
+These values came out of the balance runs. They're smaller than the first draft's ±0.3 s a lap, because a gap that big decided the race on its own.
 
-  `topSpeed × straightShare + cornering × (1 − straightShare)`
+**Track character.** Each track has a straight share: the share of the lap at full throttle.
+- **Where the numbers come from:** published estimates, labelled as such on the car-pick screen. They run from Monza 0.78 down to the Hungaroring 0.56.
+- **Why not the outlines:** measuring the share from the track outlines didn't work. The outlines have only about 100 points, and the method rated the Hungaroring among the straightest tracks.
+- **The weighting:** each stat is weighed against the average of the five tracks, so neither top speed nor cornering is worth more everywhere:
 
-The shares are estimates from the track shapes, and the car-pick screen says so.
+  `topSpeed × share / mean + cornering × (1 − share) / (1 − mean)`
 
 **The four cars** (stat points out of ±2; each car's points add up to 0):
 
@@ -82,15 +91,21 @@ The shares are estimates from the track shapes, and the car-pick screen says so.
 | **Endurance** | −1 | −1 | +1 | +1 | 0 | Slower, but goes long and saves fuel |
 | **Balanced** | 0 | 0 | 0 | 0 | 0 | Middle of the road at everything |
 
-The point values are a first pass. Before launch they get checked with simulated head-to-heads on all five tracks:
-- no car may win more than 60% of no-call races on any track;
-- across the five tracks, every car should average close to 50%.
+**Balance** (`tests/versus.test.ts`). Every car pair races 400 seeds on each track, both making the same one stop. The test fails if any car wins more than 63% or less than 37% on a track.
+
+| Track | Bullet | Glider | Endurance | Balanced |
+|---|---|---|---|---|
+| Monza | 60% | 42% | 45% | 49% |
+| Spa | 59% | 40% | 51% | 48% |
+| Bahrain | 43% | 56% | 55% | 47% |
+| Suzuka | 48% | 50% | 51% | 48% |
+| Hungaroring | 49% | 55% | 42% | 47% |
+| **Average** | **52%** | **48%** | **49%** | **48%** |
 
 **Picking.**
 - Players pick at the same time, and either can pick any car, including the same one.
 - The picks are revealed together before the start.
-- **[Q]** Should both be allowed the same car, or must they differ?
-- **[Q]** Should players also get a team livery (colours only) on top of the car?
+- Each player also picks a team livery, which is colours only.
 
 ## V3. The calls
 
@@ -121,7 +136,7 @@ Quick calls, battles and the headset work as in solo, and each player answers th
   - **First tie-break:** the higher average chance across the calls.
   - **Second tie-break:** the race result.
 - **The results screen:** "Calls 82 vs 64: Alex wins", the road result next to it ("Sam finished 1.4 s ahead"), and both players' calls side by side on one lap timeline.
-- **Grading time:** solo grades in the browser. In versus the server grades, so both players see the same score at the same time. **[Q]** Do we accept a short "grading…" wait (a few seconds) at the end, or grade on both browsers and compare?
+- **Grading time:** solo grades in the browser. In versus the server grades, so both players see the same score at the same time, after a short "grading…" wait at the end.
 
 ## V5. Playing live
 
@@ -129,7 +144,6 @@ Quick calls, battles and the headset work as in solo, and each player answers th
 - One player creates a match and gets a link and a 4-letter code.
 - The other joins with either one.
 - No accounts needed. Signed-in players get their name shown and their result saved.
-- **[Q]** Is invite-only enough to start? Matchmaking with strangers can come later.
 
 **The server.**
 - **The room:** each match is one Cloudflare Durable Object, holding a WebSocket to each player.
@@ -172,9 +186,11 @@ Quick calls, battles and the headset work as in solo, and each player answers th
 
 Each phase is tested before the next.
 
-1. **The engine (`packages/sim`).**
+1. **The engine (`packages/sim/src/versus.ts`).** Done.
+   - It's its own module, not a change to the solo engine. The solo engine is built around one player car plus a scripted field, and its battles, trust and battery exist only for the player's car.
+   - Versus reuses the solo pieces: tyre and fuel lap times, the overtake model, pit-loss figures, and the headset's mode and battle-move numbers.
    - Two-car custom races: a race from a track template, two cars and seeded events.
-   - Car stats on `CarState`, with defaults of 0 so solo and the Python parity are unchanged.
+   - Car stats, in the versus module only, so solo and the Python parity are unchanged.
    - Two player cars, with no computer reactions for either.
    - The triggered calls.
    - **Tests:** determinism (same seed and calls, same race); car balance (V2); and that solo is unchanged against the golden files.
