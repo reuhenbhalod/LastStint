@@ -79,6 +79,9 @@ export function engineerRadio(
   const trustOf = new Set(
     notes.filter((n) => n.lap === lap && n.kind === 'trust').map((n) => n.detail),
   );
+  const stoppedDry = notes.some(
+    (n) => n.lap === lap && n.kind === 'fuel' && n.driver === side && n.detail === 'out',
+  );
   for (const n of notes) {
     if (n.lap !== lap) continue;
     // A team order names the car let by; the player's car may be the one told to yield.
@@ -134,6 +137,17 @@ export function engineerRadio(
         out.push({ from: 'Engineer', text: 'New nose on. The pace should be back.' });
         break;
       case 'fuel':
+        // 'out': the dry tank stopped the car for good (the 'empty' note on the same lap is
+        // then not told: the car is not lifting, it has stopped).
+        if (n.detail === 'out') {
+          out.push(
+            board
+              ? { from: 'Pit wall', text: `${side} is out of fuel. The car has stopped.` }
+              : { from: side, text: 'No fuel left, the car’s stopped. I’m out.' },
+          );
+          break;
+        }
+        if (stoppedDry) break;
         out.push({ from: side, text: 'I’m out of fuel! I have to lift everywhere now.' });
         break;
       case 'blue':
