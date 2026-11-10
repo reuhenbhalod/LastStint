@@ -240,11 +240,22 @@ describe('helpers', () => {
 
 describe('the CLI', () => {
   const script = join(dirname(fileURLToPath(import.meta.url)), '..', 'scripts', 'reachability.ts');
-  const tsx = join(dirname(fileURLToPath(import.meta.url)), '..', 'node_modules', '.bin', 'tsx');
+  // On Windows the .bin shim is tsx.cmd, and Node only runs .cmd files through a shell.
+  const win = process.platform === 'win32';
+  const tsx = join(
+    dirname(fileURLToPath(import.meta.url)),
+    '..',
+    'node_modules',
+    '.bin',
+    win ? 'tsx.cmd' : 'tsx',
+  );
   const dir = mkdtempSync(join(tmpdir(), 'reachability-'));
   afterAll(() => rmSync(dir, { recursive: true, force: true }));
   const cli = (...args: string[]) =>
-    spawnSync(tsx, [script, ...args, '--samples', '20', '--seeds', '1'], { encoding: 'utf8' });
+    spawnSync(tsx, [script, ...args, '--samples', '20', '--seeds', '1'], {
+      encoding: 'utf8',
+      shell: win,
+    });
 
   it('exits 1 on an unreachable fixture race', () => {
     const file = join(dir, 'unreachable.json');

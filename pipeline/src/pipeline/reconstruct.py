@@ -2449,9 +2449,9 @@ def write(race_id: str, result: Result, raw_dir: Path = RAW_DIR) -> list[Path]:
         report_path(race_id, raw_dir),
     ]
     result.laps.to_parquet(paths[0])
-    paths[1].write_text(json.dumps(result.status, indent=1) + "\n")
-    paths[2].write_text(json.dumps(result.sidecar, indent=1) + "\n")
-    paths[3].write_text(report_markdown(result.sidecar))
+    paths[1].write_text(json.dumps(result.status, indent=1) + "\n", encoding="utf-8", newline="\n")
+    paths[2].write_text(json.dumps(result.sidecar, indent=1) + "\n", encoding="utf-8", newline="\n")
+    paths[3].write_text(report_markdown(result.sidecar), encoding="utf-8", newline="\n")
     if result.weather is not None:
         paths.append(save_weather(race_id, result.weather, raw_dir))
     else:

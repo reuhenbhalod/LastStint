@@ -79,9 +79,6 @@ export function engineerRadio(
   const trustOf = new Set(
     notes.filter((n) => n.lap === lap && n.kind === 'trust').map((n) => n.detail),
   );
-  const stoppedDry = notes.some(
-    (n) => n.lap === lap && n.kind === 'fuel' && n.driver === side && n.detail === 'out',
-  );
   for (const n of notes) {
     if (n.lap !== lap) continue;
     // A team order names the car let by; the player's car may be the one told to yield.
@@ -137,18 +134,22 @@ export function engineerRadio(
         out.push({ from: 'Engineer', text: 'New nose on. The pace should be back.' });
         break;
       case 'fuel':
-        // 'out': the dry tank stopped the car for good (the 'empty' note on the same lap is
-        // then not told: the car is not lifting, it has stopped).
+        // `out`: the tank ran dry and the car has stopped for good (a 1984-88 fuel limit, a
+        // refuelling race's tank). `empty`: a fuel load that only costs lap time. A fuel-limit
+        // car's empty tank notes both on the lap it stops: only the stop is told.
         if (n.detail === 'out') {
           out.push(
             board
-              ? { from: 'Pit wall', text: `${side} is out of fuel. The car has stopped.` }
-              : { from: side, text: 'No fuel left, the car’s stopped. I’m out.' },
+              ? { from: 'Pit wall', text: `${side} has run out of fuel. That’s our race.` }
+              : { from: side, text: 'I’m out of fuel! The car’s stopped.' },
           );
-          break;
+        } else if (
+          !notes.some(
+            (o) => o.lap === lap && o.kind === 'fuel' && o.driver === side && o.detail === 'out',
+          )
+        ) {
+          out.push({ from: side, text: 'I’m out of fuel! I have to lift everywhere now.' });
         }
-        if (stoppedDry) break;
-        out.push({ from: side, text: 'I’m out of fuel! I have to lift everywhere now.' });
         break;
       case 'blue':
         out.push({ from: side, text: `Past ${n.other}. Finally.` });

@@ -91,6 +91,19 @@ cd pipeline && uv sync --dev && cd ..
 pnpm --filter @laststint/web exec playwright install --with-deps chromium
 ```
 
+**Native Windows also works** (set up 2026-11-08 at `C:\Users\bhalo\LastStint`, all checks pass):
+
+- Clone with `git clone -c core.autocrlf=false …`. With Git for Windows' default
+  (`autocrlf=true`) every data file is checked out with CRLF, which breaks the frozen pool files.
+- Set `PYTHONUTF8=1` for every pipeline command. Python's Windows default (cp1252) misreads
+  `data/drivers.json` (e.g. Räikkönen). Every pipeline `write_text` passes
+  `encoding="utf-8", newline="\n"`, so builds write LF on Windows too; keep that on new writers.
+- `corepack enable` needs admin; `npm install -g pnpm@12.15.0` works instead. Playwright:
+  `playwright install chromium` (no `--with-deps`).
+- Local dev: `npx wrangler d1 migrations apply pitwall-db --local`, then
+  `pnpm --filter @laststint/worker schedule --local --days 7`, then `wrangler dev --var
+  ERAS_TEST_MODE:true` (apps/worker, :8787) and `vite` (apps/web, :5173, proxies `/api`).
+
 Not in git, so it must be copied over by hand:
 
 | What | Path | Size | Needed for |
@@ -103,8 +116,9 @@ Not in git, so it must be copied over by hand:
 The TUM database path is `pipeline/cache/eras-sources/tum/repo/F1_timingdata_2014_2019.sqlite`
 (`pipeline/src/pipeline/tum.py` `DEFAULT_DB`). You can also point `TUM_DB` at it.
 
-**Moving the repo.** `eras` and ~100 `eras-*` branches are local only, and pushing `eras` deploys
-staging. To move everything without pushing, make a bundle on the Mac and clone it on the PC:
+**Moving the repo.** `eras` is on GitHub (see Local state); the individual `eras-*` work
+branches may be local only. Pushing `eras` deploys staging. To move everything without pushing,
+make a bundle and clone it on the other machine:
 
 ```sh
 # Mac
@@ -157,6 +171,103 @@ Read these first: `docs/eras-remaining-work.md` (handover spec, rules, decisions
 - **Expert rival grader fix** (see open items): it makes hungary-1998 Legend unreachable.
 - Any new race swap (B4).
 
+### PC work (2026-11-09, native Windows; resume on the Mac)
+
+Integrations B and C were done on the PC and merged into local `eras` (`c817397`, then this
+commit). Every `eras-*` branch from that work (`eras-integrate-b`, `eras-integrate-c`,
+`eras-b1-europe-1997`, `eras-b1-hungary-2024`, `eras-b2-reauthor`, `eras-b3-near-misses`,
+`eras-b3-tank-planner`, `eras-a2-e2e`) is merged into `eras`, and `eras` is pushed to GitHub
+(2026-11-09, `68e17e4` and this commit; the Mac picks it up with `git pull`). The individual
+B/C branches weren't pushed (all merged into `eras`). The push ran `staging.yml`; the PC had
+no `gh` CLI to check the run, so check the Actions tab. The PC's agent worktrees are removed.
+
+Where it stands: 48 pass, 1 borderline, 51 fail; 50 authored, 50 reachable, 48 ready. All
+suites, both reachability checks (45 + 5), hungary-2024's robust G1 (2.45 s) and e2e green at
+`c817397`.
+
+Concerns to pick up on the Mac:
+
+- **C1 isn't finished: no full rebuild.** The PC has no `pipeline/cache/eras-sources/`, so
+  every non-pool race wasn't rebuilt and races.gen.ts / sc_rates.json / legend parity weren't
+  regenerated. B3's tank planner changed `refuel.py` (`fillCap`), so rebuild all non-pool
+  races on the Mac (never pool races), diff, then re-run robust G1, anchors, both reachability
+  checks and e2e. Don't refetch the cache from the network: other source snapshots would change
+  built files.
+- **Pipeline writers now write LF + UTF-8** (all 37 `write_text` calls). Before, a Windows
+  build wrote CRLF. Mac builds were already LF, so expect no diff from this.
+- **Owner review:**
+  - hungary-2024: the hidden objective "no push laps" is weak (the margin objectives
+    couldn't be reached at Legend), and the player car changed NOR -> PIA (hard calls PIA 2,
+    NOR 0).
+  - Integration B: malaysia-2013 / spain-2016 P2 targets, europe-1997 no rewrite, the
+    `teamOrder` schema enum (spec §19), europe-1997 facts read through a summarising fetch
+    tool, and the A2 radio wording notes.
+  - The new fuel line ("I'm out of fuel! The car's stopped." / pit wall in Eras 1–2) now shows
+    every fuel-limit stop. The monaco-1988 e2e found that Senna runs dry on the last lap at
+    standard pace on some seeds (the 1984–88 load is drawn from 1.5 kg short to 1 kg over the
+    need). That's by design, but it's worth a look in play.
+- **Still owner-only:** Expert grader decision (hungary-1998 B2), C2 sign-offs (new sheets:
+  `b1-europe-1997.md`, `b1-hungary-2024.md`, `b2-reauthor.md`, `b3-near-misses.md`), B4 swaps,
+  C3 publish, D1–D5.
+- **B4 / near-misses:** no honest fix found for spain-2013, china-2011, abu-dhabi-2012 or
+  brazil-2021. They need model gaps 1 and 3 (`docs/eras-checks/b3-near-misses.md`).
+- **austria-2002 team-order e2e** is still `test.fixme` (no `teamorder-71` moment, and the
+  sim's Schumacher passes Barrichello by lap 52).
+- **Flaky tests on the PC:** the sim "meets the runtime budget" test is wall-clock and fails
+  under load (it passes alone, about 0.5 s). The Hungary 1992 e2e failed once, then passed 6
+  of 6.
+- **Native Windows gotchas** (if the PC is used again): `PYTHONUTF8=1` for all pipeline
+  commands; `corepack enable` needs admin, so pnpm came from `npm i -g pnpm@12.15.0`; `d1.ts`
+  and the reachability CLI test were fixed to spawn without `.cmd` shims; there's no `gh` CLI
+  on the PC.
+- The B3 tank-planner agent's Daily-grade before/after evidence (the 39 pool races
+  byte-identical) was in a session scratch folder on the PC. It isn't in the repo; re-run it
+  on the Mac if you need it.
+
+### Status (2026-11-09, integrations B and C)
+
+Newest first; the 2026-11-08 notes below still hold where this doesn't replace them.
+
+- **Integration C** (`eras-integrate-c`, merged into `eras`; `eras` pushed) adds:
+  - B3 tank planner (`eras-b3-tank-planner`): the engineer's plans and fallback stops stay within
+    a refuelling car's tank (`withinTank`, `fillCap`), mirrored in `refuel.py`; the stopped-car
+    fuel line. Daily grades byte-identical on all 39 pool races.
+  - B1 hungary-2024 (`eras-b1-hungary-2024`): authored from Piastri (the race file's player car
+    NOR -> PIA, rebuilt), McLaren one-two target, no rewrite, hidden objective "no push laps".
+    Robust G1 after the flip: pass, 2.45 s. Sheet: `docs/eras-checks/b1-hungary-2024.md`.
+  - B3 near-misses (`eras-b3-near-misses`): doc only, no honest fix found.
+  - The monaco-1988 e2e's avoided run now lifts and coasts at the lap 70 fuel call: with the
+    pit-board defaults Senna ran dry on the last lap (always did; the new fuel line made it
+    show).
+- **Owner review from integration C**: hungary-2024's weak hidden objective (the margin
+  objectives couldn't be reached at Legend) and the PIA side flip.
+- **Integration B** (`eras-integrate-b`, merged into `eras`; `eras` pushed) adds:
+  - B2 (`eras-b2-reauthor`): malaysia-2013 and spain-2016 re-authored on the real P2 (the win
+    stays as the rewrite), spain-2013's hidden objective changed. All three reachable. Sheet:
+    `docs/eras-checks/b2-reauthor.md`.
+  - B1 (`eras-b1-europe-1997`): europe-1997 authored from Villeneuve (no rewrite). brazil-2019
+    re-checked after A4, still reachable. Sheet: `docs/eras-checks/b1-europe-1997.md`. It also
+    adds `teamOrder` to the moment trigger enum in `race-model.schema.json` (additive; Daily and
+    Gauntlet files unchanged), which needs the owner's OK (spec §19).
+  - A2 e2e (`eras-a2-e2e`): radio assertions for monaco-1988 (pit wall), brazil-2019 (damage
+    fault) and canada-2014 (engine fault). The austria-2002 team-order test is `test.fixme`:
+    austria-2002 has no `teamorder-71` moment, and the sim's Schumacher passes Barrichello by
+    lap 52, so the order never fires.
+  - The pit card now names the fuel fill on tyre buttons when a refuelling stop offers one
+    compound at several fills (they all read "Mediums" before).
+  - Windows support: native setup notes above, LF/UTF-8 pipeline writers.
+- **Counts now** (`docs/eras-races-report.md`): 48 pass, 1 borderline, 51 fail; **50 authored,
+  50 reachable, 48 ready**. By era (ready): E10 3, E9 5, E8 5, E7 2, E6 3, E5 1, E4 3, E3 6, E2 10,
+  E1 10. Authored but not ready: spain-2013 (G1 fail), china-2011 (borderline).
+  Passing but not authored: none. B3
+  near-miss attempt found no honest fix for spain-2013, china-2011, abu-dhabi-2012 or
+  brazil-2021 (`docs/eras-checks/b3-near-misses.md`): they need model gaps 1 and 3.
+- **Owner review from integration B**: the two P2 targets (and that their ★1-3 path is the real
+  calls), europe-1997's no-rewrite choice (portugal-1984 does have one), the schema enum, the
+  europe-1997 facts that came through a summarising fetch tool, and the A2 radio-wording notes
+  in the B and A2 reports (raw driver codes in lines, no board signs reachable in Eras 1–2,
+  `damage` has only the generic fault line).
+
 ### Status (2026-11-08)
 
 `docs/eras-remaining-work.md` §1 ("Where things stand") and §5 were written before
@@ -202,26 +313,23 @@ integration 8 and are out of date. Where they disagree, this section is right.
 
 ### Open items carried out of Sector A
 
-- **Reachability failures (B2, re-author):** malaysia-2013, spain-2013 and spain-2016 have been
-  unreachable since integration 8's rebuild. They fail on `eras` before Sector A too.
+- ~~Reachability failures (B2)~~: done in integration B.
 - **Expert rival grader** (`packages/sim/src/rivals/expert.ts` `rivalPlayout`) has the same
   "nothing queued" bug A3 fixed. Fixing it makes hungary-1998 Legend unreachable, so it needs the
   owner's decision plus a re-author of hungary-1998.
-- **San Marino 2005 plans all run dry.** The planner ignores tank size, so every offered plan
-  grades 0%. A planner change to keep stints within `fillCap` would affect every refuelling-era
-  race; it belongs in B3 and must be measured.
-- **Planner fallback stops** in playouts (`erasContinuation` → `refuelAtStop`) still fuel to the
-  flag past the tank. They don't throw, but the fuel weight is wrong. Fixing it changes the replay
-  mirrored by `pipeline/refuel.py`, so the parity tests must be updated with it.
-- **A2 e2e:** add radio/pit-board assertions to `apps/web/e2e/eras-play.spec.ts` for
-  monaco-1988 (Era 1), austria-2002 (Era 4) and a fault race.
+- ~~San Marino 2005 plans all run dry / planner fallback stops past the tank~~: done in
+  integration C (`eras-b3-tank-planner`). It was every authored refuelling race, not just San
+  Marino. Plans now respect the tank on board, `fillCap` and push burn; fallback stops fill
+  within the tank (parity updated); Daily grades byte-identical. Owner review: refuelling races
+  now offer different (all two-stop in tight races) plans; europe-1997's "different plan" gap
+  is 3 laps instead of 6.
+- **A2 e2e:** done in integration B, except austria-2002's team-order line (`test.fixme`; needs
+  a re-author with a `teamorder-71` moment and Barrichello able to lead to the end).
 - **A2 wording to confirm:** in Eras 1–2 the retirement line comes from "Pit wall", and board
   signs end in "?" (`SLOW · GEARBOX?`).
-- **Fuel line:** "I'm out of fuel! I have to lift everywhere now." also plays when the car has
-  stopped for good (`detail: 'out'`). Minor.
-- **hungary-2024:** borderline because of Leclerc's existing ~5 s gap error. Not authored.
-- **brazil-2019** is already authored (side HAM). Hamilton now has a contact on lap 70 (no
-  decision moment). Re-check its reachability and story after A4.
+- ~~Fuel line on a stopped car~~: done in integration C ("The car's stopped"; pit wall in Eras 1–2).
+- ~~hungary-2024 borderline~~: passes robust G1 at 973d827 (2.52 s); authoring in integration C.
+- ~~brazil-2019 re-check after A4~~: done in integration B (reachable, story unchanged).
 - **austria-2002 BAR lap 62** real call grades ~3% live. That's because the race plays out as it
   really did (Barrichello loses to Schumacher), not because of a bug. Revisit when authoring.
 - **Expert rival cost** on a real phone isn't measured yet (bench: ~0.3 s per decision at 5×).
@@ -257,8 +365,13 @@ integration 8 and are out of date. Where they disagree, this section is right.
 
 ### Local state to know about
 
-- On GitHub: `main`, `data-ingestion` and the hotfix branch only. `eras`, `eras-integrate-a` and
-  every `eras-*` branch are local and have never been pushed.
+- On GitHub (checked 2026-11-08 from the PC): `eras`, `eras-integrate-a` and ~115 `eras-*`
+  branches **are** on GitHub, at the commit that added this file (22533d0); they were pushed
+  when the repo moved off the Mac. Pushing `eras` runs `staging.yml`. On 2026-11-09 the PC
+  pushed integrations B and C (`eras` at `68e17e4` and later), so staging should be on that
+  (not verified from the PC). The B/C work branches themselves are local to the PC only.
+- The Mac's `.worktrees/` don't exist on the PC. The PC's agent worktrees (integrations B and
+  C) are removed; their branches are merged into `eras`.
 - Worktrees under `.worktrees/`: `fix-contact-loss`, `fix-grader-queued-stop`, `fix-radio-lines`
   and `fix-sm2005-fill` are merged into `eras-integrate-a` and can be removed
   (`git worktree remove`). `fix-contact-loss/scratch/` holds only before/after measurements and

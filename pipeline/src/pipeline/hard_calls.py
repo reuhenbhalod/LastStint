@@ -43,7 +43,7 @@ def eras_race_file(
     model = json.loads(race_file.read_text())
     merged, _ = build.apply_eras(model, [], overlay)
     out = Path(tmp_dir) / f"{race_id}.json"
-    out.write_text(json.dumps(merged))
+    out.write_text(json.dumps(merged), encoding="utf-8", newline="\n")
     return out
 
 
@@ -102,5 +102,5 @@ def write_overlay(race_id: str, result: dict, eras_dir: Path = ERAS_DIR) -> Path
     eras["hardCalls"] = dict(result["hardCalls"])
     eras["userSide"] = result["userSide"]
     eras_dir.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(overlay, indent=2) + "\n")
+    path.write_text(json.dumps(overlay, indent=2) + "\n", encoding="utf-8", newline="\n")
     return path

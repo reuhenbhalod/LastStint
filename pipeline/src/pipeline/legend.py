@@ -207,7 +207,7 @@ def main() -> None:
     from pathlib import Path
 
     path = Path(__file__).resolve().parents[2] / "tests" / "fixtures" / "legend_parity.json"
-    path.write_text(json.dumps(parity_vectors(), indent=1) + "\n")
+    path.write_text(json.dumps(parity_vectors(), indent=1) + "\n", encoding="utf-8", newline="\n")
     print(f"wrote {path}")
 
 

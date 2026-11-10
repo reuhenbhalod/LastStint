@@ -60,7 +60,7 @@ def fetch(session_key: int, cache_dir: Path = CACHE_DIR, sleep=time.sleep) -> di
                     raise
                 sleep(2 + 3 * attempt)
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(data))
+        path.write_text(json.dumps(data), encoding="utf-8", newline="\n")
         out[endpoint] = data
         sleep(0.5)  # OpenF1 asks for a few requests a second at most
     return out

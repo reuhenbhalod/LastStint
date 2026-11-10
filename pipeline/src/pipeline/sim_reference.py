@@ -668,4 +668,4 @@ def write_golden(model: dict, seeds: list[int], golden_dir: Path | None = None) 
     golden_dir.mkdir(parents=True, exist_ok=True)
     out = {str(s): simulate(model, s) for s in seeds}
     path = golden_dir / f"{model['race']['id']}.json"
-    path.write_text(json.dumps(out, indent=2))
+    path.write_text(json.dumps(out, indent=2), encoding="utf-8", newline="\n")

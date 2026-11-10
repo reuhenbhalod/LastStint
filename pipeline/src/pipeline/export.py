@@ -125,5 +125,5 @@ def write_race(model: dict, races_dir: Path = RACES_DIR) -> Path:
     validate_model(model)
     races_dir.mkdir(parents=True, exist_ok=True)
     out = races_dir / f"{model['race']['id']}.json"
-    out.write_text(json.dumps(model, indent=2))
+    out.write_text(json.dumps(model, indent=2), encoding="utf-8", newline="\n")
     return out

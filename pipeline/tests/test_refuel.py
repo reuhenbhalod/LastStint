@@ -90,6 +90,14 @@ def _cases() -> list[dict]:
             "race": "canada-2024",
             "rules": {"refuelling": True},
         },
+        {
+            # B3: a stop without a fill fills to the next stop or the flag, but never past the
+            # tank (fill_cap 25): MSCM's one stop out on lap 30 (33 laps to the flag) fills 25.
+            "name": "san-marino-2005, a stop with no fill fills to the tank, not the flag",
+            "race": "san-marino-2005",
+            "rules": _model("san-marino-2005")["rules"],
+            "strategies": {"MSCM": [{"lap": 30, "to": "MEDIUM"}]},
+        },
     ]
 
 
@@ -129,20 +137,22 @@ def build_vectors() -> dict:
             str(s): sim_reference.simulate(m, s, copy.deepcopy(case.get("strategies")))
             for s in SEEDS
         }
-        out.append({**case, "results": results})
+        out.append({**case, "fillCap": refuel.fill_cap(m), "results": results})
     return {"cases": out, "functions": _functions()}
 
 
 def test_parity_vectors_are_current():
     want = build_vectors()
     if os.environ.get("REGEN_REFUEL_VECTORS"):
-        VECTORS.write_text(json.dumps(want, indent=1) + "\n")
+        VECTORS.write_text(json.dumps(want, indent=1) + "\n", encoding="utf-8", newline="\n")
     assert json.loads(VECTORS.read_text()) == json.loads(json.dumps(want))
 
 
 def test_refuelling_changes_each_replay():
     for case in _cases():
         base = _model(case["race"])
+        if refuel.refuelling(base):
+            continue  # a refuelling race already (san-marino-2005): see the fill_cap test
         strategies = case.get("strategies")
         ruled = apply_case(case)
         assert any(
@@ -150,6 +160,24 @@ def test_refuelling_changes_each_replay():
             != sim_reference.simulate(ruled, s, copy.deepcopy(strategies))
             for s in SEEDS
         ), case["name"]
+
+
+def test_a_stop_with_no_fill_fills_to_the_tank(monkeypatch):
+    """B3: a stop without a fill fills to the next stop or the flag, never past the tank
+    (fill_cap). San Marino 2005: MSCM out on lap 30, 33 laps to the flag on a 25-lap tank."""
+    m = _model("san-marino-2005")
+    assert refuel.fill_cap(m) == 25
+    car = SimpleNamespace(code="MSCM", tank=1.0, strategy=[])
+    refuel.refuel_at_stop(m, car, {"lap": 30, "to": "MEDIUM"}, 30)
+    assert car.tank == 25 + refuel.RESERVE_LAPS
+    nxt = SimpleNamespace(code="MSCM", tank=1.0, strategy=[{"lap": 50, "to": "MEDIUM"}])
+    refuel.refuel_at_stop(m, nxt, {"lap": 30, "to": "MEDIUM"}, 30)
+    assert nxt.tank == 20 + refuel.RESERVE_LAPS
+    # The parity case's replay is the capped one: without the cap it differs.
+    strategies = {"MSCM": [{"lap": 30, "to": "MEDIUM"}]}
+    capped = sim_reference.simulate(m, 1, copy.deepcopy(strategies))
+    monkeypatch.setattr(refuel, "fill_cap", lambda model: 10**6)
+    assert sim_reference.simulate(m, 1, copy.deepcopy(strategies)) != capped
 
 
 def test_refuelling_false_changes_nothing():

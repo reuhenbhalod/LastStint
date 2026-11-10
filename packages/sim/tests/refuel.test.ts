@@ -35,10 +35,12 @@ import {
   initRun,
   isFinished,
   planRemainingStop,
+  planRemainingStops,
   realDecisions,
   simulate,
   stepLap,
   validateDecisions,
+  withinTank,
 } from '../src/sim.js';
 import type {
   CarState,
@@ -54,7 +56,11 @@ import type {
 
 const abu = abuJson as unknown as RaceModel;
 const canada = canadaJson as unknown as RaceModel;
-const MODELS: Record<string, RaceModel> = { 'abu-dhabi-2021': abu, 'canada-2024': canada };
+const MODELS: Record<string, RaceModel> = {
+  'abu-dhabi-2021': abu,
+  'canada-2024': canada,
+  'san-marino-2005': sanMarino2005Json as unknown as RaceModel,
+};
 const FILL: RefuelModel = {
   secondsPerLap: 0.3,
   laneBase: 18,
@@ -69,6 +75,8 @@ interface Vector {
   rules: RaceRules;
   refuel?: RefuelModel;
   strategies?: Record<string, PitStop[]>;
+  /** refuel.py fill_cap of the case's race. */
+  fillCap: number;
   results: Record<
     string,
     {
@@ -96,6 +104,7 @@ const tagged = (model: RaceModel, rules: RaceRules, refuel?: RefuelModel): RaceM
 
 describe.each(V.cases.map((c) => [c.name, c] as const))('parity: %s', (_name, c) => {
   const model = tagged(MODELS[c.race] as RaceModel, c.rules, c.refuel);
+  it('fillCap matches refuel.py fill_cap', () => expect(fillCap(model)).toBe(c.fillCap));
   it.each(Object.keys(c.results))('seed %s matches the Python reference sim', (seed) => {
     const want = c.results[seed] as Vector['results'][string];
     const strategies = c.strategies ? structuredClone(c.strategies) : undefined;
@@ -344,6 +353,99 @@ describe('the player in a refuelling race', () => {
       expect(() => validatePlan(sm, p, run.state.lap)).not.toThrow();
       expect(() => playOption(run, 1, planOption(run, p))).not.toThrow();
     }
+  });
+
+  it("the engineer's plans run on the fuel they have (B3): San Marino 2005's no longer run dry", () => {
+    // Before B3 every San Marino 2005 plan ran dry (a 25-lap tank, 42 laps to go, 8 laps of
+    // fuel at the takeover): no stop, a stop on lap 21 to the tank, and 21 + 24 to the tank.
+    const sm = sanMarino2005Json as unknown as RaceModel;
+    const run = initRun(sm, 1, { decisions: [] });
+    const car = user(run);
+    const cap = fillCap(sm);
+    const plans = enginePlans(run);
+    expect(plans).toHaveLength(3);
+    for (const p of plans) {
+      // The first stint ends before the fuel on board runs out; no later stint passes the tank.
+      expect((p.stops[0]?.lap ?? sm.race.laps) - run.state.lap).toBeLessThanOrEqual(
+        car.tank as number,
+      );
+      p.stops.forEach((s, i) => {
+        const stint = (p.stops[i + 1]?.lap ?? sm.race.laps) - s.lap;
+        expect(stint).toBeLessThanOrEqual(cap);
+        expect(s.fill).toEqual({ laps: stint });
+      });
+      // No stint pushes past what its fuel covers (push burns 6% more: 16 laps on a fill's
+      // reserve of one lap).
+      p.pace.forEach((pace, i) => {
+        const from = i === 0 ? run.state.lap : (p.stops[i - 1]?.lap as number);
+        const to = p.stops[i]?.lap ?? sm.race.laps;
+        if (pace === 'push') expect(to - from).toBeLessThanOrEqual(16);
+      });
+      // Played out, no plan runs the car dry.
+      for (let i = 0; i < 8; i++) {
+        const fork = playOption(run, 100 + i, planOption(run, p));
+        while (!isFinished(fork)) stepLap(fork);
+        expect(
+          fork.notes.some(
+            (n) => n.kind === 'fuel' && n.detail === 'out' && n.driver === sm.userSide,
+          ),
+          `plan ${p.id} sample ${i}`,
+        ).toBe(false);
+      }
+    }
+  });
+
+  it('a car whose tank no plan of up to two stops can carry gets the plans as before', () => {
+    // Half a lap of fuel: dry before any stop could be made, so no plan runs on it; the
+    // engineer still offers the plans made as in any other race (the fills to the tank).
+    const run = initRun(refuelRace, 1, { decisions: [] });
+    user(run).tank = 0.5;
+    const plans = enginePlans(run);
+    expect(plans.length).toBeGreaterThan(0);
+    for (const p of plans) expect(() => validatePlan(refuelRace, p, run.state.lap)).not.toThrow();
+  });
+
+  it('a stop without a fill fills to the next stop or the flag, never past the tank (B3)', () => {
+    const sm = sanMarino2005Json as unknown as RaceModel;
+    const cap = fillCap(sm);
+    expect(cap).toBe(25);
+    // Out on lap 30 with 33 laps to the flag and nothing else planned: it fills the tank.
+    const car = { tank: 1, strategy: [] as PitStop[] } as unknown as CarState;
+    refuelAtStop(sm, car, { lap: 30, to: 'MEDIUM' }, 30, []);
+    expect(car.tank).toBe(cap + RESERVE_LAPS);
+    // To a next stop within the tank: to that stop, as before.
+    const next = { tank: 1, strategy: [{ lap: 50, to: 'MEDIUM' }] } as unknown as CarState;
+    refuelAtStop(sm, next, { lap: 30, to: 'MEDIUM' }, 30, []);
+    expect(next.tank).toBe(20 + RESERVE_LAPS);
+  });
+
+  it("the grader's planner stops keep every stint within the tank (withinTank)", () => {
+    const sm = sanMarino2005Json as unknown as RaceModel;
+    const cap = fillCap(sm);
+    const run = initRun(sm, 1, { decisions: [] });
+    const car = user(run);
+    // One stop out on lap 28 (35 laps to the flag) becomes two even stints.
+    expect(withinTank(sm, car, [{ lap: 28, to: 'MEDIUM' }])).toEqual([
+      { lap: 28, to: 'MEDIUM' },
+      { lap: 46, to: 'MEDIUM' },
+    ]);
+    // Within the tank: as it is.
+    expect(withinTank(sm, car, [{ lap: 40, to: 'MEDIUM' }])).toEqual([{ lap: 40, to: 'MEDIUM' }]);
+    // planRemainingStops: every stint after a stop within the tank, and the car reaches the
+    // flag in a playout that follows them.
+    const stops = planRemainingStops(run);
+    expect(stops.length).toBeGreaterThanOrEqual(2);
+    stops.forEach((s, i) => {
+      expect((stops[i + 1]?.lap ?? sm.race.laps + 1) - s.lap).toBeLessThanOrEqual(cap);
+    });
+    const fork = forkRun(run, 7, [], { blindAfter: run.state.lap + 1 });
+    for (const s of stops) user(fork).strategy.push({ ...s });
+    while (!isFinished(fork)) stepLap(fork);
+    expect(user(fork).retired).toBe(false);
+    // A race without refuelling: the stops as they are.
+    const abuRun = initRun(abu, 1, { decisions: [] });
+    const long = [{ lap: 35, to: 'HARD' }];
+    expect(withinTank(abu, user(abuRun), long)).toBe(long);
   });
 
   it('every box option at a moment states its fill; the real call is the real option', () => {

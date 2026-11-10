@@ -253,7 +253,9 @@ def wet_laps_cmd(
         from . import jolpica
 
         jolpica.sidecar_path(race_id, raw).write_text(
-            json.dumps(wet_laps.update_sidecar(sidecar, est), indent=1) + "\n"
+            json.dumps(wet_laps.update_sidecar(sidecar, est), indent=1) + "\n",
+            encoding="utf-8",
+            newline="\n",
         )
     wet_laps.write(race_id, est, raw)
     rep = wet_laps.report(est, race_id)
@@ -359,7 +361,9 @@ def wet_fit_cmd(
         obs = wet.race_observations(laps, dry.rain, dry.fitted, wet.load_curves())
         races.append((rid, *obs))
     curves = wet.fit_curves([r[1:] for r in races], wet.load_curves())
-    wet.WET_CURVES_PATH.write_text(json_mod.dumps(curves, indent=2) + "\n")
+    wet.WET_CURVES_PATH.write_text(
+        json_mod.dumps(curves, indent=2) + "\n", encoding="utf-8", newline="\n"
+    )
     typer.echo(f"wrote {wet.WET_CURVES_PATH.name}: {curves}")
     for rid, obs, n, rain in races:
         typer.echo(f"{rid:22s} rms {wet.rms(obs, wet.timeline(obs, n, rain, curves), curves):.2%}")
@@ -421,7 +425,9 @@ def _wet_fit_eras(only: list[str] | None, cache: str | None) -> None:
     if only:
         return
     curves = wet.fit_eras_curves([r for _, r in races], start)
-    wet.ERAS_CURVES_PATH.write_text(json.dumps(curves, indent=2) + "\n")
+    wet.ERAS_CURVES_PATH.write_text(
+        json.dumps(curves, indent=2) + "\n", encoding="utf-8", newline="\n"
+    )
     typer.echo(f"wrote {wet.ERAS_CURVES_PATH.name}: {curves}")
 
 
@@ -592,7 +598,7 @@ def _robust(ids: list[str], report: str | None = None) -> None:
             f" mean gap error {mean:.2f}s over {len(part)} races"
         )
     if report:
-        Path(report).write_text(_report_markdown(rows))
+        Path(report).write_text(_report_markdown(rows), encoding="utf-8", newline="\n")
         typer.echo(f"wrote {report}")
 
 

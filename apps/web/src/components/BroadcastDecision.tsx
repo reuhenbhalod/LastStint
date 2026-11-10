@@ -22,7 +22,7 @@ import {
   tyreAgeText,
 } from '../eras/difficulty/information.js';
 import { briefFor } from '../game/brief.js';
-import { choicesFor, tyreName } from '../game/choices.js';
+import { choicesFor, tyreLabel, tyreName } from '../game/choices.js';
 import { type Fact, modeFacts, tyreOutlooks } from '../game/guide.js';
 
 const LETTER: Record<string, string> = {
@@ -196,7 +196,7 @@ export function BroadcastDecision({
                   key={t.option.id}
                   ref={i === 0 ? first : undefined}
                   type="button"
-                  aria-label={tyreName(t.compound)}
+                  aria-label={tyreLabel(t, tyreOpts)}
                   title={o ? `Good: ${o.good}\nBad: ${o.bad}` : undefined}
                   className="call-opt"
                   onClick={() => onChoose(t.option.id)}
@@ -205,7 +205,7 @@ export function BroadcastDecision({
                     <span className={`tyre ${t.compound}`}>
                       {LETTER[t.compound] ?? t.compound[0]}
                     </span>
-                    <span className="label">{tyreName(t.compound)}</span>
+                    <span className="label">{tyreLabel(t, tyreOpts)}</span>
                     {o?.gain != null && (
                       <span
                         className="mono ml-auto text-[14px] font-bold"

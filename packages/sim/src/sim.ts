@@ -31,6 +31,7 @@ import { type RedFlagPlan, lineUp, realLapsDown, redFlagPlan, roadOrder } from '
 import {
   burnTank,
   checkFill,
+  fillCap,
   fuelLimit,
   initTanks,
   realFill,
@@ -1737,9 +1738,35 @@ export function planRemainingStops(run: Run): PitStop[] {
   const user = run.state.cars[run.model.userSide];
   if (!user || user.retired) return [];
   const owed = owedAfterPlan(run.model, user, run.state.lap);
-  if (owed > 1) return planOwedStops(run, user, owed);
+  if (owed > 1) return withinTank(run.model, user, planOwedStops(run, user, owed));
   const stop = planRemainingStop(run);
-  return stop ? [stop] : [];
+  return withinTank(run.model, user, stop ? [stop] : []);
+}
+
+/**
+ * A refuelling race (B3): the planned stops, plus the stops that keep every stint after one of
+ * them within the tank (refuel.ts fillCap), so a car that follows them reaches the flag. A
+ * stop fills to the next stop or the flag but never past the tank (refuelAtStop), so a stint
+ * longer than that would run dry: it is split evenly over the fewest stints the tank allows,
+ * each new stop fitting the tyre the stop before it fitted. The planner prices its stop as
+ * filling to the flag (tankPlanDelta); the stops added here only make that plan runnable. Any
+ * other race: the stops as they are.
+ */
+export function withinTank(model: RaceModel, car: CarState, stops: PitStop[]): PitStop[] {
+  if (!refuelling(model) || car.tank === undefined || !stops.length) return stops;
+  const cap = fillCap(model);
+  const laps = model.race.laps;
+  const sorted = [...stops].sort((a, b) => a.lap - b.lap);
+  const out: PitStop[] = [];
+  sorted.forEach((s, i) => {
+    out.push(s);
+    const stint = (sorted[i + 1]?.lap ?? laps + 1) - s.lap;
+    if (stint <= cap) return;
+    const n = Math.ceil(stint / cap);
+    const len = Math.ceil(stint / n);
+    for (let k = 1; k < n; k++) out.push({ lap: s.lap + k * len, to: s.to });
+  });
+  return out;
 }
 
 /**

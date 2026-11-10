@@ -191,7 +191,7 @@ def main(argv: list[str] | None = None) -> None:
             m = race_measure(race_id)
             if cached is not None:
                 cached.parent.mkdir(parents=True, exist_ok=True)
-                cached.write_text(json.dumps(m))
+                cached.write_text(json.dumps(m), encoding="utf-8", newline="\n")
         if m is None:
             print(f"{race_id}: left out (doesn't build, or no dry compound with {MIN_LAPS} laps)")
             continue
@@ -204,7 +204,7 @@ def main(argv: list[str] | None = None) -> None:
             flush=True,
         )
     table = pool(measured)
-    args.out.write_text(json.dumps(table, indent=1) + "\n")
+    args.out.write_text(json.dumps(table, indent=1) + "\n", encoding="utf-8", newline="\n")
     print(f"wrote {args.out}")
     for era, cs in table["groups"].items():
         for c, g in cs.items():
