@@ -557,8 +557,12 @@ def test_without_laps_drops_only_the_named_cars_laps():
     assert faults.without_laps(frame, None) is frame
 
 
-def test_pace_skip_is_registered_only_for_saudi_arabia_2023():
-    # Data-keyed (sourced laps, docs/eras-checks/fix-saudi-arabia-2023.md): no other race's
-    # fit changes.
-    assert [r for r, m in build.RACES.items() if m.get("pace_skip")] == ["saudi-arabia-2023"]
+def test_pace_skip_is_registered_only_for_sourced_races():
+    # Data-keyed (sourced laps, docs/eras-checks/fix-saudi-arabia-2023.md and
+    # fix-luxembourg-1998.md): no other race's fit changes.
+    assert sorted(r for r, m in build.RACES.items() if m.get("pace_skip")) == [
+        "luxembourg-1998",
+        "saudi-arabia-2023",
+    ]
     assert build.RACES["saudi-arabia-2023"]["pace_skip"] == {"VER": [21, 22]}
+    assert build.RACES["luxembourg-1998"]["pace_skip"] == {"HAK": [*range(2, 15), 65, 66, 67]}
