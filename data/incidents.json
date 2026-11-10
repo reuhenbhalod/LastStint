@@ -346,6 +346,15 @@
    "status": "Engine",
    "source": "https://en.wikipedia.org/wiki/2013_German_Grand_Prix",
    "note": "Bianchi's Marussia stopped with an engine failure and fire and rolled back across the track (Jolpica: 21 laps, status Engine). Wikipedia puts the SC out on lap 23, Motor Sport on lap 22 (neutralised for five laps, https://www.motorsportmagazine.com/articles/single-seaters/f1/2013-german-grand-prix-report/); the lap it came in is not in the sources. The built model has it from lap 24, 6 laps (Jolpica estimate, data/estimates/germany-2013.sc.json, unchecked)"
+  },
+  {
+   "lap": 55,
+   "type": "TEAM_ORDER",
+   "driver": "GRO",
+   "passer": "RAI",
+   "detail": "Lotus told Grosjean not to hold up R\u00e4ikk\u00f6nen, who passed him for second within a few laps of his last stop",
+   "source": "https://en.wikipedia.org/wiki/2013_German_Grand_Prix https://www.grandprix.com/races/german-gp-2013-sunday-team-quotes.html",
+   "note": "Wikipedia: R\u00e4ikk\u00f6nen passed Grosjean within a few laps of his lap-49 stop, no lap given; GrandPrix.com (Grosjean): letting him by made sense, they were on different strategies. The timing (Jolpica) has GRO ahead of RAI at the end of lap 54 and RAI ahead from the end of lap 55, kept as the sims' lap"
   }
  ],
  "bahrain-2015": [],
