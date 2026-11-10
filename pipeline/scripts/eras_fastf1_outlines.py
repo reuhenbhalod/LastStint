@@ -46,7 +46,7 @@ SESSIONS: dict[str, tuple[int, str]] = {
     "netherlands-2021": (2021, "Netherlands"),
     "great-britain-2021": (2021, "British"),
     "germany-2018": (2018, "Germany"),
-    "russia-2018": (2018, "Russia"),
+    "australia-2018": (2018, "Australia"),
     "germany-2019": (2019, "Germany"),
     "brazil-2019": (2019, "Brazil"),
     "italy-2020": (2020, "Italy"),

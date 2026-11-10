@@ -292,7 +292,7 @@ pinned version; tests run on cached fixtures only.
 
 ## Phase 3: Races, wave A (10%)
 
-The 35 races in the appendix that need **no new sim model** (Needs column: "none", "wet model
+The 36 races in the appendix that need **no new sim model** (Needs column: "none", "wet model
 (exists)" or "P4 map" only).
 
 **3.1 Build and validate (8%)**
@@ -331,7 +331,7 @@ for every existing race.
 
 ## Phase 5: Races, wave B (13%)
 
-**5.1 Build and validate the other 65 races (11%)**
+**5.1 Build and validate the other 64 races (11%)**
 - As in 3.1, as each race's models from phase 4 land.
 - Reconstructed races are checked on their anchors (eras spec §4) instead of G1.
 - **Done when:** every race in the appendix is pass, or flagged to the owner with a diagnosis.
@@ -513,10 +513,10 @@ The **Needs** column is from race history and must be checked against the data f
 | 9 | `netherlands-2021` | Jolpica (est. compounds, SC) | none |  |
 | 9 | `great-britain-2021` | FastF1 cache | R1 red flag |  |
 | 9 | `abu-dhabi-2021` | built (Daily) | none |  |
-| 8 | `monaco-2017` | TUM | P4 map |  |
-| 8 | `azerbaijan-2017` | TUM | R1 red flag, P4 map |  |
+| 8 | `australia-2017` | TUM | none |  |
+| 8 | `australia-2018` | TUM | none |  |
 | 8 | `germany-2018` | TUM | wet model (exists) |  |
-| 8 | `russia-2018` | TUM | none |  |
+| 8 | `spain-2017` | TUM | none |  |
 | 8 | `germany-2019` | TUM | wet model (exists) |  |
 | 8 | `hungary-2019` | built (Daily) | none |  |
 | 8 | `brazil-2019` | TUM | none |  |

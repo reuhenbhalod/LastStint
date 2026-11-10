@@ -81,10 +81,10 @@ Players start at Era 10 and move back through the timeline to Era 1. The eras be
 ### Era 8: Mercedes vs Ferrari (2017–2020) · play order 3
 | # | Race ID | Dilemma | Target (draft) |
 |---|---|---|---|
-| 1 | monaco-2017 | Ferrari overcuts Vettel past Räikkönen | defend: Räikkönen holds P1 |
-| 2 | azerbaijan-2017 | Red flag chaos | win: Ricciardo from P10 |
+| 1 | australia-2017 | Hamilton's ultrasofts fade into Verstappen's traffic: cover his stop, or stay out and overcut | win: Vettel from P2, ahead of Hamilton |
+| 2 | australia-2018 | Run long behind the early stoppers and bank on a neutralisation to jump the leader | win: Vettel from P3, ahead of Hamilton |
 | 3 | germany-2018 | Vettel crashes in the rain; Hamilton stays out from 14th | win: Hamilton from P14 |
-| 4 | russia-2018 | Bottas told to let Hamilton through | team: Mercedes 1–2, Hamilton ahead |
+| 4 | spain-2017 | A late virtual safety car with the lead: box now for the slower tyre, or stay out and risk the cheap stop behind | win: Vettel from P2, ahead of Hamilton |
 | 5 | germany-2019 | Rain and constant tyre swaps | win: Verstappen through the rain |
 | 6 | hungary-2019 | Mercedes switches to two stops to catch Verstappen | win: Hamilton catches Verstappen |
 | 7 | brazil-2019 | Late safety car chaos | position: Gasly on the podium |
@@ -241,11 +241,11 @@ Every race has one target, set in `eras.target`. Each race's draft target is in 
 
 | Type | Means | Grader `Target` | Races (draft) |
 |---|---|---|---|
-| `win` | Chase down the win from behind | `win` | 37 |
-| `defend` | Start in the lead and keep it to the flag | `win`, starting from P1 | 25 |
+| `win` | Chase down the win from behind | `win` | 39 |
+| `defend` | Start in the lead and keep it to the flag | `win`, starting from P1 | 24 |
 | `position` | Reach a set position, such as P3 to win the title | `position` | 21 |
 | `beat-rival` | Finish ahead of a named car, wherever that is | `beat-rival` | 10 |
-| `team` | A team result, such as a 1–2 in a set order | `team` (new) | 4 |
+| `team` | A team result, such as a 1–2 in a set order | `team` (new) | 3 |
 | `deny` | Keep a rival at or below a set position, such as out of the top 3 to stop their title | `deny` (new) | 3 |
 
 Every era has at least three different target types.

@@ -17,7 +17,7 @@ building (eras spec §19).
 - **Pipeline:** `race_suitability()` stops turning red-flag races down; the race-status
   timeline gains a red-flag code.
 - **Unblocks (draft list):** netherlands-2023, azerbaijan-2021, hungary-2021,
-  great-britain-2021, azerbaijan-2017, italy-2020,
+  great-britain-2021, italy-2020,
   monaco-2011, canada-2011, europe-2007, brazil-2003, belgium-1998, monaco-1984.
 
 ### R2. Car faults
