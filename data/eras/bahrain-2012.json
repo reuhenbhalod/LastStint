@@ -7,5 +7,33 @@
     "drs": true,
     "ers": "kers",
     "refuelling": false
-  }
+  },
+  "eras": {
+    "eraId": 6,
+    "order": 1,
+    "userSide": "VET",
+    "target": {
+      "type": "defend"
+    },
+    "storyline": {
+      "real": "Vettel leads from pole to the flag. R\u00e4ikk\u00f6nen, 11th on the grid, climbs to second and is within DRS range by lap 33, but his attack at turn 1 on lap 36 doesn't come off. Vettel wins by 3.333 s, with Grosjean third."
+    },
+    "mastery": {
+      "type": "margin",
+      "seconds": 3.4,
+      "label": "Win by more than 3.4 seconds"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "push",
+      "maxLaps": 0,
+      "label": "Win without a single push lap"
+    },
+    "hardCalls": {
+      "VET": 3,
+      "RAI": 1
+    },
+    "briefing": "Bahrain, 2012. You run Vettel, leading from pole, eight laps in, five seconds clear of Grosjean's Lotus. The other Lotus, R\u00e4ikk\u00f6nen, started 11th and is sixth, with a set of softs he saved in qualifying. Bring Vettel home first."
+  },
+  "storylineEvents": []
 }
