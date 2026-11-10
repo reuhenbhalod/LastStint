@@ -211,3 +211,22 @@ summarises, so check wording against the pages. WP and Jolpica were read raw.
   and end lap not sourced; start compounds of Vettel and Bottas and Ricciardo's compounds not in
   sources; two lap-1 retirements of front-runners (storyline events); pit-exit contact disputed
   (MS vs WP/AS); Bottas as a scripted blocker on a one-stop.
+
+### Authored (B1, Nov 9)
+
+Built as an Eras build with `user_side` VET / `rival` HAM (`build.py`); takeover lap 11 (D3
+rule). Robust G1: pass, 2.57 s. Reachability: era (threshold 75, Standard+ rival) and Legend
+(threshold 90, Expert rival) reachable, stay-out never ★3.
+
+| Item | As authored | Basis | Owner checked |
+|---|---|---|---|
+| Side | **Vettel.** `pipeline hard-calls`: VET 1, HAM 1, tie broken by chance given up (VET 37.3 pts, HAM 8.3). | hard-call counter | |
+| Target | `win` (beat Hamilton and everyone else). | draft target above | |
+| Rewrite | Yes, `win`: Vettel really finished 2nd, +3.490 s (Jolpica-R). Headline (original): "Vettel holds off Mercedes to win in Barcelona". | Jolpica-R | |
+| Storyline text | Hamilton wins by 3.5 s; Vettel leads from the start and stops on lap 14; Mercedes leaves Bottas out to hold him up, then stops Hamilton as the VSC ends; Vettel stops a lap later under green, comes out alongside Hamilton and is passed for the lead on lap 44. The VSC lap is left out of the text (33 or 34 in the sources). | Result, Start, Stops: Vettel, Team tactics, The VSC call, Pit-exit fight, Pass for the lead rows | |
+| Briefing | Hamilton's pole by 0.051 s; Vettel passed him into Turn 1 and leads by just over two seconds after ten laps (MS: 2.3 s on lap 11; the model has 2.39 s at the takeover); Bottas third, about eight seconds further back (MS). Vettel's start compound is not in the sources, so the briefing does not name it. | Grid, Start, Early gaps rows | |
+| Mastery | `stop_count` exact 2, "Win on two stops, as Vettel made". | Stops: Vettel row; reachability | |
+| Hidden | `margin` 3.5 s, "Win by more than 3.5 seconds, Hamilton's real margin" (3.490 s). | Result row | |
+| storylineEvents | `[34, "VSC"]` (Vandoorne/Massa; lap 34 from the built model's TUM track status and MS; kept in Legend too, so the VSC call is always there). The lap-1 retirements of Räikkönen and Verstappen happen before the takeover and are in the model's start state. | VSC row | |
+| Moments | From the author tool unchanged (`author spain-2017 --target win --eras --write`): stop-14 (real box softs), pace-27, pace-31, vsc-34 (real stay; box next lap on mediums grades best), stop-37 (real box mediums). The model's stop laps are one later than Jolpica's (VET 15 and 38). | author output | |
+| Reachability paths | Era and Legend (seed 2): softs at 14, standard pace at 27 and 31, box next lap on mediums under the VSC, stay at 37: ★1 ★2 ★3, hidden. Stay-out: no ★3 on any seed (best ★2 at era difficulty, seed 3). | reachability | |
