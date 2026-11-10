@@ -127,15 +127,27 @@ const RACE_TABLE: Record<number, ReadonlyArray<readonly [string, string]>> = {
       'bahrain-2023',
       "Ferrari stops early for hards; Aston Martin stretches Alonso's softs to catch Sainz late",
     ],
-    ['great-britain-2022', "Ferrari doesn't pit Leclerc under the safety car"],
+    [
+      'great-britain-2023',
+      'Box from third now, or hold out on old mediums and gamble on a neutralisation',
+    ],
     ['hungary-2022', "Ferrari's hard-tyre gamble"],
-    ['singapore-2023', "Sainz manages the gaps; Mercedes' late stop"],
+    [
+      'japan-2023',
+      'Russell stretches his first set while the field stops twice: hold on one stop, or stop again and attack',
+    ],
     ['netherlands-2023', 'Rain at the start and the finish'],
-    ['miami-2024', "Norris' first win, timed with the safety car"],
+    [
+      'emilia-romagna-2024',
+      "Imola's one-stop chess: pit first to chase the leader, or stretch the mediums and trust the hards to the flag",
+    ],
     ['hungary-2024', 'McLaren team orders'],
     ['belgium-2023', 'Verstappen wins from sixth after a gearbox penalty'],
     ['australia-2025', 'Wet-dry chaos'],
-    ['monaco-2025', 'The mandatory two-stop race'],
+    [
+      'abu-dhabi-2022',
+      "Second in the title on strategy: Pérez's mediums grain while Ferrari stretches Leclerc's stint",
+    ],
   ],
   9: [
     ['bahrain-2021', 'Track limits and the undercut'],
@@ -148,7 +160,10 @@ const RACE_TABLE: Record<number, ReadonlyArray<readonly [string, string]>> = {
     ['hungary-2021', 'Hamilton alone on the grid at the restart'],
     ['russia-2021', 'Norris stays on slicks as the rain arrives'],
     ['turkey-2021', 'Hamilton argues against pitting'],
-    ['brazil-2021', 'Hamilton from 10th'],
+    [
+      'netherlands-2021',
+      'Mercedes splits its cars against a quicker Red Bull: Hamilton undercuts, Bottas runs long',
+    ],
     [
       'great-britain-2021',
       'A 10-second penalty to serve at the one stop, then a one-stopping Ferrari to catch',

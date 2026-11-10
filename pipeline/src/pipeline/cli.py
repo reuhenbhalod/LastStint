@@ -82,7 +82,9 @@ def ingest_race(
 
             laps, facts = tum.ingest_tum(rid)  # offline: the pinned TUM SQLite in the cache
         elif meta.get("source") == "openf1":
-            laps, facts = ingest.ingest_openf1(rid, meta["year"], meta["event"])
+            laps, facts = ingest.ingest_openf1(
+                rid, meta["year"], meta["event"], location=meta.get("location")
+            )
         elif offline:
             laps, facts = ingest.ingest_race(rid, meta["year"], meta["event"], offline=True)
         else:

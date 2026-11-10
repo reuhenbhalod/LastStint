@@ -65,7 +65,7 @@ function book() {
         community: { players: 1200, rewrites: 108, share: 0.09 },
       },
       {
-        raceId: 'great-britain-2022',
+        raceId: 'great-britain-2023',
         eraId: 10,
         position: 2,
         attemptId: 'a2',
@@ -128,7 +128,7 @@ test('the history book fits a phone', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'History book' })).toBeVisible();
   await expect(page.getByTestId('completion')).toHaveText('7%');
   await expect(page.getByText('60 of 830 collected')).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Great Britain 2022' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Great Britain 2023' })).toBeVisible();
   await expect(page.getByText('Only 9% of strategists rewrote this race.')).toBeVisible();
   await noSidewaysScroll(page);
   if (shots) await page.screenshot({ path: `${shots}/eras-history.png`, fullPage: true });

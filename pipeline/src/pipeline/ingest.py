@@ -306,16 +306,25 @@ def ingest_race(
 
 
 def ingest_openf1(
-    race_id: str, year: int, country: str, cache_dir: Path = CACHE_DIR, raw_dir: Path = RAW_DIR
+    race_id: str,
+    year: int,
+    country: str,
+    cache_dir: Path = CACHE_DIR,
+    raw_dir: Path = RAW_DIR,
+    location: str | None = None,
 ) -> tuple[pd.DataFrame, dict]:
     """Load a race from OpenF1 (openf1.py) and save the same raw snapshot, track status and
-    weather as the FastF1 ingest."""
+    weather as the FastF1 ingest. `location` picks one race when a country has two in a season
+    (Italy 2024: Imola and Monza)."""
     import urllib.parse
     import urllib.request
 
     from . import openf1
 
-    query = urllib.parse.urlencode({"year": year, "session_name": "Race", "country_name": country})
+    params = {"year": year, "session_name": "Race", "country_name": country}
+    if location:
+        params["location"] = location
+    query = urllib.parse.urlencode(params)
     with urllib.request.urlopen(f"{openf1.API}/sessions?{query}", timeout=60) as r:
         sessions = json.load(r)
     if len(sessions) != 1:

@@ -54,15 +54,15 @@ Players start at Era 10 and move back through the timeline to Era 1. The eras be
 | # | Race ID | Dilemma | Target (draft) |
 |---|---|---|---|
 | 1 | bahrain-2023 | Ferrari stops early for hards; Aston Martin stretches Alonso's softs to catch Sainz late | position: Alonso on the podium |
-| 2 | great-britain-2022 | Ferrari doesn't pit Leclerc under the safety car | defend: Leclerc holds the lead after the SC |
+| 2 | great-britain-2023 | Box from third now, or hold out on old mediums and gamble on a neutralisation | position: Piastri on the podium |
 | 3 | hungary-2022 | Ferrari's hard-tyre gamble | beat-rival: Leclerc ahead of Verstappen |
-| 4 | singapore-2023 | Sainz manages the gaps; Mercedes' late stop | defend: Sainz holds P1 |
+| 4 | japan-2023 | Russell stretches his first set while the field stops twice: hold on one stop, or stop again and attack | beat-rival: Russell ahead of Hamilton |
 | 5 | netherlands-2023 | Rain at the start and the finish | position: Alonso P2 or better |
-| 6 | miami-2024 | Norris' first win, timed with the safety car | win: Norris chases the win |
+| 6 | emilia-romagna-2024 | Imola's one-stop chess: pit first to chase the leader, or stretch the mediums and trust the hards to the flag | win: Norris beats Verstappen |
 | 7 | hungary-2024 | McLaren team orders | team: McLaren 1–2 |
 | 8 | belgium-2023 | Verstappen wins from sixth after a gearbox penalty | win: Verstappen from P6 |
 | 9 | australia-2025 | Wet-dry chaos | defend: Norris holds P1 |
-| 10 | monaco-2025 | The mandatory two-stop race | defend: Norris holds P1 |
+| 10 | abu-dhabi-2022 | Second in the title on strategy: Pérez's mediums grain while Ferrari stretches Leclerc's stint | beat-rival: Pérez ahead of Leclerc |
 
 ### Era 9: The 2021 title fight · play order 2
 | # | Race ID | Dilemma | Target (draft) |
@@ -74,7 +74,7 @@ Players start at Era 10 and move back through the timeline to Era 1. The eras be
 | 5 | hungary-2021 | Hamilton alone on the grid at the restart | position: Hamilton on the podium |
 | 6 | russia-2021 | Norris stays on slicks as the rain arrives | defend: Norris holds P1 |
 | 7 | turkey-2021 | Hamilton argues against pitting | position: Hamilton limits the damage (P4 or better) |
-| 8 | brazil-2021 | Hamilton from 10th | win: Hamilton from P10 |
+| 8 | netherlands-2021 | Mercedes splits its cars against a quicker Red Bull: Hamilton undercuts, Bottas runs long | defend: Verstappen wins from pole |
 | 9 | great-britain-2021 | A 10-second penalty to serve at the one stop, then a one-stopping Ferrari to catch | win: Hamilton from P2 at the restart, with a 10 s penalty |
 | 10 | abu-dhabi-2021 | The finale | beat-rival: title to whoever finishes ahead |
 
@@ -241,10 +241,10 @@ Every race has one target, set in `eras.target`. Each race's draft target is in 
 
 | Type | Means | Grader `Target` | Races (draft) |
 |---|---|---|---|
-| `win` | Chase down the win from behind | `win` | 38 |
-| `defend` | Start in the lead and keep it to the flag | `win`, starting from P1 | 27 |
-| `position` | Reach a set position, such as P3 to win the title | `position` | 20 |
-| `beat-rival` | Finish ahead of a named car, wherever that is | `beat-rival` | 8 |
+| `win` | Chase down the win from behind | `win` | 37 |
+| `defend` | Start in the lead and keep it to the flag | `win`, starting from P1 | 25 |
+| `position` | Reach a set position, such as P3 to win the title | `position` | 21 |
+| `beat-rival` | Finish ahead of a named car, wherever that is | `beat-rival` | 10 |
 | `team` | A team result, such as a 1–2 in a set order | `team` (new) | 4 |
 | `deny` | Keep a rival at or below a set position, such as out of the top 3 to stop their title | `deny` (new) | 3 |
 
