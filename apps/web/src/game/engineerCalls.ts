@@ -45,6 +45,7 @@ import {
   safetyCarCall,
 } from './quickCalls.js';
 import type { LapEvents } from './raceLog.js';
+import { tyreLoss, wantToBox } from './tyreTalk.js';
 
 /** Seconds to answer: a battle is now or never; the rest can wait a little longer. */
 export const BATTLE_MS = 12000;
@@ -58,13 +59,8 @@ export function offersStop(call: QuickCall): boolean {
   return call.options.some((o) => [o.call, ...(o.also ?? [])].some((d) => d?.kind === 'pit'));
 }
 
-/** What the tyres cost now against new ones (s a lap): wear, and more past the cliff. */
-export function tyreLoss(model: RaceModel, compound: string, wear: number): number {
-  const c = model.compounds[compound];
-  if (!c) return 0;
-  const past = Math.max(0, wear - c.cliffLap);
-  return c.degPerLap * wear + (c.cliffDegPerLap ?? 2 * c.degPerLap) * past;
-}
+// What the tyres cost now against new ones (s a lap): tyreTalk.ts, kept here for its callers.
+export { tyreLoss };
 
 /** What the director remembers between laps (so it doesn't ask the same thing every lap). */
 export interface DirectorMemory {
@@ -624,7 +620,7 @@ function requestCall(
       from: us,
       kind: 'request',
       asked: true,
-      text: `These ${tyreName(me.compound).toLowerCase()} are gone, ${me.tyreAge} laps old. I want to box!`,
+      text: wantToBox(me.compound, race.lap),
       options: [
         {
           id: 'yes',

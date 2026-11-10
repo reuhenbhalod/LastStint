@@ -14,6 +14,7 @@ import { flagOn } from '../track/geometry.js';
 import { tyreName } from './choices.js';
 import type { LapEvents } from './raceLog.js';
 import type { LiveCall } from './refusal.js';
+import { startingToGo } from './tyreTalk.js';
 
 /** Where a battle option is drawn on the track (battles and trust spec D1). */
 export type BattleLine = 'inside' | 'outside' | 'wait' | 'boost' | 'hard' | 'let';
@@ -187,7 +188,7 @@ export function quickCallAt(race: RaceState, model: RaceModel, log: LapEvents[])
     return {
       lap: race.lap,
       from: us,
-      text: `These ${tyreName(me.compound).toLowerCase()} are ${me.tyreAge} laps old and starting to go. Do I look after them?`,
+      text: startingToGo(me.compound, race.lap),
       options: [
         opt('manage', 'Manage them', m, next, 'pace', 'manage'),
         opt('push', 'Keep pushing', m, next, 'pace', m.pace === 'manage' ? 'standard' : m.pace),
