@@ -7,5 +7,47 @@
     "drs": true,
     "ers": "hybrid",
     "refuelling": false
-  }
+  },
+  "eras": {
+    "eraId": 10,
+    "order": 2,
+    "userSide": "NOR",
+    "target": {
+      "type": "position",
+      "position": 2
+    },
+    "storyline": {
+      "real": "Norris takes the lead at the start, but Verstappen is back past within five laps and leads the rest of the way. McLaren stops Piastri from third on lap 29; three laps later Magnussen's engine fails and the safety car comes out. Norris, Verstappen and Hamilton all stop under it: Norris gets hards, Verstappen and Hamilton take softs. Norris holds Hamilton off at the restart and finishes second, 3.8 s behind Verstappen and 3.0 s ahead of Hamilton.",
+      "rewriteCondition": {
+        "type": "win"
+      },
+      "headline": "Norris beats Verstappen at Silverstone"
+    },
+    "mastery": {
+      "type": "compound_rule",
+      "mustAvoid": "HARD",
+      "label": "Finish second or better without running the hard tyre"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "manage",
+      "maxLaps": 0,
+      "label": "Finish second or better without a single lap managing the tyres"
+    },
+    "hardCalls": {
+      "NOR": 0,
+      "HAM": 0
+    },
+    "briefing": "Silverstone, 2023. Norris took the lead at the start, but Verstappen was back past within five laps. You run Norris, second and 9.0 s behind him after 30 laps, still on the mediums he started on. McLaren has just stopped Piastri from third for hards, so Hamilton is third on old mediums. Hold on to second."
+  },
+  "storylineEvents": [
+    [
+      32,
+      "RETIREMENT"
+    ],
+    [
+      33,
+      "SC"
+    ]
+  ]
 }

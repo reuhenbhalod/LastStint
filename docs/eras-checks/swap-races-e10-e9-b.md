@@ -102,6 +102,62 @@ Lap numbers: OpenF1 gives the in-lap (last lap of the stint); GPE counts the lap
 - Pérez-Hulkenberg contact lap: not in sources.
 - Motor Sport report not opened.
 
+### Authored (B1, Nov 9 2026)
+
+The `eras` block in `data/eras/great-britain-2023.json`. It replaces the draft proposal above:
+`pipeline hard-calls` chose Norris, not Piastri. Every fact is from the Facts table above or from
+the timing built into the race file ("Timing": OpenF1 session 9126 laps and stints in
+`data/raw/great-britain-2023.*`, as built into `data/races/great-britain-2023.json`). The
+storyline, headline and briefing are original wording; no team radio is quoted.
+
+Model status:
+
+- Robust G1 (`pipeline validate great-britain-2023 --robust`, Eras build on this branch, base
+  `eras-swap-e10-e9-b`): **pass** (strict pass), mean gap error 1.56 s, with the rules-only
+  overlay and again with the authored overlay.
+- Reachability (`pnpm --filter @laststint/sim reachability great-britain-2023`): **pass** at era
+  difficulty (threshold 70, Standard rival) and at Legend (90, Expert rival): all three stars and
+  the hidden objective on seed 1 (sc-33 box-soft, battle-38 attack, pace-42 push, pace-46
+  push). Only that one path earns all three (the search was exhaustive). The stay-out path never
+  earns ★1 or ★3 (one compound only: the two-compound rule leaves the car unclassified).
+
+| Item | Value | Fact it rests on | Source | Owner checked |
+|---|---|---|---|---|
+| Side | NOR (hard calls NOR 0, HAM 0; chance given up NOR 14.0 pts, HAM 0.0; `pipeline hard-calls`, decided by chance given up) | the grader, not a fact | - | |
+| Target | `position` 2: "Hold on to second" | Norris finished 2nd, +3.798 | Jolpica, WP | |
+| Rewrite | `win`; headline "Norris beats Verstappen at Silverstone". Allowed: the side didn't win | Verstappen won | Jolpica, WP | |
+| Storyline | "Norris takes the lead at the start, but Verstappen is back past within five laps and leads the rest of the way" | Start and Lead change rows (lap 5, AS, GPE; WP "by lap 4"; led every lap after) | GPE, AS, WP | |
+| Storyline | "McLaren stops Piastri from third on lap 29; three laps later Magnussen's engine fails and the safety car comes out" | Piastri stop row (in-lap 29, from 3rd); VSC / SC row (lap 32; VSC first, then the SC: the model has one SC from lap 33) | OpenF1, AS, GPE, WP | |
+| Storyline | "Norris, Verstappen and Hamilton all stop under it: Norris gets hards, Verstappen and Hamilton take softs" | Stops under SC row (in-lap 33) | OpenF1, AS, GPE | |
+| Storyline | "Norris holds Hamilton off at the restart and finishes second, 3.8 s behind Verstappen and 3.0 s ahead of Hamilton" | Restart row; Result row (+3.798, Hamilton +6.783: 2.985 s) | AS, GPE, Jolpica | |
+| Briefing | "Norris took the lead at the start, but Verstappen was back past within five laps" | as the storyline | GPE, AS | |
+| Briefing | "You run Norris, second and 9.0 s behind him after 30 laps, still on the mediums he started on" | NOR P2, 8.984 s behind VER at the takeover (lap 30, D3 rule), medium tyres 30 laps old; started on mediums, first stop in-lap 33 | Timing; OpenF1 stints | |
+| Briefing | "McLaren has just stopped Piastri from third for hards, so Hamilton is third on old mediums" | Piastri stop row (in-lap 29, new hards); HAM P3 at the takeover on 30-lap-old mediums | OpenF1, AS; Timing | |
+| Mastery | `compound_rule` mustAvoid HARD: "Finish second or better without running the hard tyre" (counterfactual: Norris's real call was hards, which the grader rates below softs at sc-33, 78% vs 93%) | Stops under SC row | OpenF1 | |
+| Hidden | `mode_rule` manage, 0 laps: "Finish second or better without a single lap managing the tyres" | the game's choice | - | |
+| storylineEvents | [32, RETIREMENT] (MAG), [33, SC] | VSC / SC row: Magnussen's engine lap 32 (Jolpica 31 laps), VSC and SC logged on lap 33, SC in lap 38 (model SC laps 33-38); `data/incidents.json` | OpenF1, AS, GPE, Jolpica | |
+
+Notes:
+
+- Side: the counter only compares the two build storyline drivers (NOR, HAM). As a check,
+  a scratch copy of the race file with PIA as a storyline driver gave NOR 1 / PIA 1 (Norris by
+  chance given up, 3.3 vs 1.7 pts) and PIA 0 / HAM 0, so Piastri would not have been the side
+  either. The spec §4 dilemma ("Box from third now…", Piastri's call) and draft target
+  ("Piastri on the podium") still describe Piastri; the catalog line is unchanged pending the
+  owner.
+- Moments (`pnpm --filter @laststint/sim author great-britain-2023 --target position:2 --eras
+  --write`, `data/moments/great-britain-2023.json`): sc-33 (stay 46% red, box-soft 93% green,
+  box-medium 32% red, box-hard 78% red (real), box-next-hard 37% red), battle-38 (the
+  restart), pace-42, pace-46. Not hand-adjusted. No stop call before the SC passed the quality
+  bar (laps 30-32).
+- The SC is flagged so Legend keeps it with Magnussen's retirement (kept in Legend anyway),
+  as bahrain-2023 and azerbaijan-2021 do: the SC tyre call is the race's dilemma.
+- Rejected hidden objectives (reachability): push 0 laps (the only three-star path pushes),
+  `finish_position` 1 (no path wins), `no_neutralized_stop` (the only three-star path stops
+  under the SC), standard at most 3 or 4 laps (not met; 5 passes).
+- `data/races/great-britain-2023.json` and its golden are rebuilt by the integrator
+  (`pipeline build great-britain-2023`); this branch does not commit them.
+
 ## japan-2023 (2023 Japanese Grand Prix)
 
 ### Sources
