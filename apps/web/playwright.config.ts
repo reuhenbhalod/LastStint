@@ -18,7 +18,7 @@ export default defineConfig({
     { name: 'phone', use: { ...devices['iPhone 13'], browserName: 'chromium' } },
     {
       name: 'desktop',
-      testMatch: /(eras-play|daily)\.spec\.ts$/,
+      testMatch: /(eras-play|eras-launch|daily)\.spec\.ts$/,
       use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
     },
   ],
