@@ -260,6 +260,49 @@ Schema: `teamOrder` is added to the moment `trigger` enum in `packages/schema/ra
 - No source gives a lap for Verstappen's Turn 7 near-off.
 - Albon's penalty: race control says "10 second stop/go"; WP calls it a ten-second penalty (same thing; the stop lap is lap 10 per WP).
 
+### Authoring (B1, Nov 9)
+
+| Item | Value | Fact it rests on | Source | Owner checked |
+|---|---|---|---|---|
+| Side | NOR. `pipeline hard-calls`: NOR 0, VER 0 (tie); chance given up NOR 0.0 pts, VER 0.0 (tie too), so the race file's side stands (`build.py` `user_side: "NOR"`, the spec §4 draft). **Owner: please confirm Norris.** | the grader, not a fact | - | |
+| Target | `win` (spec §4: "Norris beats Verstappen"), with a rewrite (`rewriteCondition: win`): Norris really lost. Headline (original): "Norris finds the extra laps he needed at Imola". | Verstappen 1st, Norris +0.725 | Jolpica, WP | |
+| Takeover | Lap 19 (D3 rule). End of lap 19: VER, NOR +5.9 s, LEC +1.7 s behind NOR, SAI, PIA, RUS; all on 19-lap-old mediums. | race file `stateAtTakeover` (NOR gap 5.944, LEC 1.709); OF1-gap 5.9 s at the start of lap 20; start tyres | Timing, OF1-gap, OF1-stints | |
+| Storyline | "Verstappen leads from pole, bar a few laps for Sainz during the stops" | Verstappen pole; Sainz briefly led before Verstappen retook the lead on lap 27 | WP, Jolpica | |
+| Storyline | "Norris is the first of the leaders to stop, on lap 22, and Verstappen covers two laps later" | Norris lap 22, first of the leaders; Verstappen "two laps later" (lap 24) | AS-race, OF1-pit | |
+| Storyline | "On the hards Norris closes from about six seconds in the last 15 laps, but never gets into DRS range and loses by 0.725 s" | "closed the gap from six seconds in the final 15 laps"; never in DRS range; +0.725 | WP, AS-race, AS-VER, MS, Jolpica | |
+| Briefing | "Verstappen started from pole and leads; you run Norris, second and 5.9 s behind after 19 laps, with Leclerc 1.7 s behind you" | takeover row above | Timing, OF1-gap | |
+| Briefing | "All three of you started on mediums and have one stop to make" | VER, NOR, LEC started on mediums; each made one stop (M → H) | OF1-stints, OF1-pit | |
+| Mastery | `stop_count` exact 1: "Win on one stop, as Norris made" | Norris one stop, lap 22 | OF1-pit, AS-race | |
+| Hidden | `margin` 3 s: "Win by more than 3 seconds" | the game's choice (his real margin was -0.725 s) | Jolpica | |
+| storylineEvents | None: no SC, VSC, red flag or front-runner retirement after the takeover (Albon's retirement is not part of the story). | race control has no SC/VSC/red; top 9 finished all 63 laps | OF1-rc, Jolpica | |
+
+Notes:
+
+- **Moments** (`data/moments/emilia-romagna-2024.json`): `stop-21`, `pace-31`, `pace-35`,
+  `pace-39`. The author tool (`--target win --eras`) picked `stop-22` + the three pace calls,
+  but at `stop-22` its "stay out" cancels Norris's only real stop: the grader plays a legal
+  planner stop (61-81%, green), while the race itself runs no stop (two-compound
+  disqualification), and every box option was orange or red, so no path earned the result
+  star. Hand-adjusted (as great-britain-2021) to one lap earlier with honest options: stay out
+  (graded 28-37%, red), box now on hards, box on lap 23 on hards (the real call: the race file's
+  stop lap 23 is Norris's lap-22 in-lap; `realOptionId`), box on lap 25 or lap 28 on hards
+  (47-69% across seeds 1-3; the model prefers a later stop). Soft options were graded and left
+  out (0-46%, red). No source read says McLaren considered stopping later.
+- **Reachability** (`pnpm --filter @laststint/sim reachability emilia-romagna-2024`): pass.
+  Era (standard rival, threshold 70) and Legend (expert, 90): reachable on seed 1
+  (box on lap 28, push, push and attack, standard). Stay-out never earns 3 stars (no result
+  star on any seed). Win rate over 20 seeds: 35-65% at era difficulty, 25-55% in Legend
+  depending on the path.
+- **Timing** in the rows above: the OpenF1 ingest `data/raw/emilia-romagna-2024.parquet` and
+  the race file built from it.
+- **Rejected objective:** mastery `mode_rule` push 0 ("Win without a single push lap"):
+  not reachable at either difficulty.
+- **G1:** robust pass, 0.88 s (Eras build, rebuilt here), but strict status fails: a near-tie
+  (Norris lost by 0.725 s, within the sim's error), so the result is close to a coin flip in
+  the model.
+- `data/races/emilia-romagna-2024.json`, its golden and `races.gen.ts` must be rebuilt by the
+  integrator (`pipeline build emilia-romagna-2024`); this branch does not commit them.
+
 ## abu-dhabi-2022 (2022 Abu Dhabi Grand Prix)
 
 ### Sources
