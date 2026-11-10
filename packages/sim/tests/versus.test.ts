@@ -151,6 +151,9 @@ describe('versus engine', () => {
     expect(seen).toContain('1:theyPitted:10'); // player 0 stopped on lap 9 (in-lap 8)
     expect(seen.filter((x) => x.startsWith('1:pitWindow')).length).toBeGreaterThan(1); // asked again
     expect(new Set(seen).size).toBe(seen.length);
+    // Player 1 never stopped: asked one last time on lap 19, and nothing on lap 20.
+    expect(seen).toContain('1:pitWindow:19');
+    expect(seen.some((x) => x.endsWith(':pitWindow:20'))).toBe(false);
   });
 
   it('raises the safety car call for both players the lap before it comes out', () => {

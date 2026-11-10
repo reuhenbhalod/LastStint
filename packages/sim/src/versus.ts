@@ -688,6 +688,17 @@ export function versusCallsDue(run: VersusRun): VersusMoment[] {
     }
     const left = VERSUS_LAPS - state.lap;
     const life = lifeOf(run.model, car.compound) - car.tyreWear;
+    // A stop called now boxes at the end of `lap`: the last lap has nothing to box for.
+    if (lap >= VERSUS_LAPS) {
+      if (left === FINAL_LAPS && gap < FINAL_GAP)
+        raise(p, 'finalLaps', 'final', ['attack', 'defend', 'hold']);
+      continue;
+    }
+    // The last lap a stop can still be made, with it still owed: the last chance.
+    if (car.stops === 0 && lap === VERSUS_LAPS - 1) {
+      raise(p, 'pitWindow', 'last', ['box', 'stay']);
+      continue;
+    }
     if (
       car.stops === 0 &&
       lap >= PIT_WINDOW_LAP &&

@@ -240,6 +240,12 @@ export function IntroCard({
             >
               Tutorial
             </a>
+            <a
+              href="/versus"
+              className="rounded-full border border-[var(--rival)] px-3 py-1 text-[13px] font-semibold text-[var(--ink)] hover:bg-[color-mix(in_srgb,var(--rival)_14%,transparent)]"
+            >
+              Versus
+            </a>
             {source !== 'survivor' && (
               <a
                 href="/gauntlet"

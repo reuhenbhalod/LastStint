@@ -23,6 +23,7 @@ export {
   fuelConfig,
   fuelMargin,
   initRun,
+  lifeOf,
   isFinished,
   modeEffects,
   passProbability,

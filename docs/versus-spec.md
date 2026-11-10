@@ -1,6 +1,6 @@
 # Versus mode spec
 
-**Status:** agreed (Nov 9, 2026). Phase 1 is in progress.
+**Status:** built (Nov 9, 2026). Phases 1–4 are done and tested on localhost. Phase 5 (going live) waits for the owner.
 
 **Decided so far (the owner):**
 - Two people play each other live.
@@ -200,10 +200,13 @@ Each phase is tested before the next.
    - **What's resampled:** each replay draws a new future, including any SC or VSC not yet showing, and every option sees the same draws.
    - **The winner:** the score, then the mean chance, then the road result.
    - **Speed:** a whole race grades in about 0.2 s of CPU in Node, which is fine for a Durable Object.
-3. **The live room (`apps/worker`).**
+3. **The live room (`apps/worker/src/versus.ts`).** Done. The worker tests run whole matches through the room and check that both browsers' copies of the race end where the room's does. Results aren't stored in D1 yet.
    - The Durable Object, the WebSocket messages, lockstep, the paused big calls, reconnects and checking the result.
    - Tested with two simulated clients.
-4. **The screens (`apps/web`).**
+4. **The screens (`apps/web/src/screens/Versus.tsx`).** Done. A scripted run plays full matches in two browsers on localhost, one laptop-sized and one phone-sized. Differences from V6:
+   - **No opening plan choice:** the race opens straight into the laps, and the plan is made through the pit window calls.
+   - **No rematch button yet:** there's "New match" instead.
+   - **One extra big call:** a "last chance" pit call on lap 19 for a car that still owes its stop.
    - Lobby, car pick, the versus race screen and results.
    - Two browsers in an end-to-end test.
 5. **Launch.** Localhost first, then live.

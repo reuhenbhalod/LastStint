@@ -17,7 +17,8 @@ export default defineConfig({
     // same-origin and need no CORS. In production the web app calls the Worker's absolute
     // URL via VITE_API_BASE instead (see src/api.ts).
     proxy: {
-      '/api': 'http://localhost:8787',
+      // ws: versus mode's match WebSockets (/api/versus/<code>/ws) go through too.
+      '/api': { target: 'http://localhost:8787', ws: true },
     },
   },
   test: { environment: 'node', include: ['src/**/*.test.ts'] },
