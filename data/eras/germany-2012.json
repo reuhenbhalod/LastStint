@@ -7,5 +7,37 @@
     "drs": true,
     "ers": "kers",
     "refuelling": false
+  },
+  "eras": {
+    "eraId": 6,
+    "order": 7,
+    "userSide": "BUT",
+    "target": {
+      "type": "position",
+      "position": 2
+    },
+    "storyline": {
+      "real": "Alonso leads from pole on a dry track after a wet qualifying. Button, sixth on the grid, passes Schumacher and Hülkenberg early. McLaren stop him a lap before Vettel for the last time, and a 2.3 s stop puts him ahead of the Red Bull. He holds Vettel off until Vettel goes round the outside at the hairpin on the penultimate lap, using the run-off. Vettel's 20 s penalty gives Button second, 6.949 s behind Alonso.",
+      "rewriteCondition": {
+        "type": "win"
+      },
+      "headline": "Button's quick stops carry McLaren past Alonso at Hockenheim"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 2,
+      "label": "Finish P2 or better on two stops, as Button did"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "manage",
+      "maxLaps": 0,
+      "label": "Finish P2 or better without a lap managing the tyres"
+    },
+    "hardCalls": {
+      "BUT": 2,
+      "VET": 0
+    },
+    "briefing": "Hockenheim, 2012. Alonso took pole in the wet, but the race is dry. You run Button third after 16 laps, 7.7 s behind Alonso's Ferrari and 5.5 s behind Vettel's Red Bull. McLaren's pit crew is fast: time your stops to jump the Red Bull, then go after the Ferrari."
   }
 }

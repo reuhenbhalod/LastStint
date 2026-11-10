@@ -601,6 +601,48 @@ from it is used (a search-result summary of it is not counted as a source).
 - The lap Hamilton unlapped himself; the lap of Hamilton's puncture beyond "opening lap" (pit in-lap 3, Jolpica).
 - Fuel figures (no refuelling in 2012).
 
+### Authored (B1, Nov 9 2026)
+
+Content in `data/eras/germany-2012.json`, moments in `data/moments/germany-2012.json`. Every
+row rests on a fact in the table above (the rows named there) or on the timing ("Timing":
+Jolpica-F1 laps in `data/raw/germany-2012.parquet`, CC BY-NC-SA 4.0, gaps at the end of a lap).
+The storyline, headline and briefing are original wording; no radio is quoted.
+
+| Item | Value | Fact it rests on | Source | Owner checked |
+|---|---|---|---|---|
+| Side | BUT (hard calls BUT 2, VET 0; chance given up BUT 2.0, VET 22.3 pts; `pipeline hard-calls`) | the grader, not a fact | - | |
+| Target | `position` 2 (P2 or better), the draft's fallback, not the draft's `win` | Button classified 2nd, 3rd on the road before Vettel's penalty | Result; Vettel's pass and penalty rows | |
+| Why not `win` | Graded on the win, the best option at every call is 1-7%, and on P2 the real line earns all three stars; owner-accepted pattern "a position target when beating the draft rival is unreachable". The built race uses the laps order (Vettel P2, Button P3), so P2 here means passing Vettel on the road. | - | build quirk note (Timing) | |
+| Rewrite | `rewriteCondition` win; headline "Button's quick stops carry McLaren past Alonso at Hockenheim" | Button did not win (2nd, +6.949 s) | Result row | |
+| Storyline | "Alonso leads from pole on a dry track after a wet qualifying" | Alonso pole 1:40.621 in the wet; race dry; ALO P1 at the end of lap 16 | Qualifying, Weather rows; Timing | |
+| Storyline | "Button, sixth on the grid, passes Schumacher and Hülkenberg early" | grid P6; passed Schumacher and Hülkenberg early | Grid, Button's race rows (AS-race) | |
+| Storyline | "McLaren stop him a lap before Vettel for the last time, and a 2.3 s stop puts him ahead of the Red Bull" | stopped one lap before Vettel at the final stops (in-laps 40 and 41); 2.31 s stationary, "decisive to get past Vettel" | Stops: Button, Stops: Vettel rows (AS-race, AS-pit, Jolpica-P) | |
+| Storyline | "He holds Vettel off until Vettel goes round the outside at the hairpin on the penultimate lap, using the run-off" | held off Vettel at the hairpin; Vettel's penultimate-lap pass round the outside, using the run-off on the exit | Button's race; Vettel's pass and penalty rows (AS-race, AS-pen) | |
+| Storyline | "Vettel's 20 s penalty gives Button second, 6.949 s behind Alonso" | 20 s added, Vettel 2nd to 5th; Button +6.949 (WP says +6.931) | Vettel's pass and penalty; Result rows | |
+| Briefing | "Alonso took pole in the wet, but the race is dry" | as above | Qualifying, Weather rows | |
+| Briefing | "You run Button third after 16 laps, 7.7 s behind Alonso's Ferrari and 5.5 s behind Vettel's Red Bull" | ALO, VET, BUT P1-P3 at the end of lap 16 (takeover lap 16); BUT 7.686 s behind ALO, 5.454 s behind VET | Timing | |
+| Briefing | "McLaren's pit crew is fast: time your stops to jump the Red Bull, then go after the Ferrari" | McLaren's record 2.31 s stop got Button past Vettel; the dilemma (proposal) | Stops: Button row (AS-pit, GPE); Proposal | |
+| Mastery | `stop_count` exact 2: "Finish P2 or better on two stops, as Button did" | two stops, in-laps 19 and 40 | Stops: Button row (Jolpica-P) | |
+| Hidden | `mode_rule` manage, 0 laps: "Finish P2 or better without a lap managing the tyres" | the game's choice (no fact) | - | |
+| storylineEvents | none | no SC, VSC or red flag; the built model's only event is Hamilton's retirement (lap 58 in the race file; 56 laps in Jolpica-R), which doesn't touch Button's fight | SC, Hamilton rows | |
+
+Model and checks:
+
+- Robust G1 (`pipeline validate germany-2012 --robust`, Eras build on `eras-swap-era6-p3`): pass
+  (strict), mean gap error 1.24 s, with the full eras block (the rules-only overlay can't be
+  validated once `pipeline hard-calls` has written a partial eras block).
+- Moments (`pnpm --filter @laststint/sim author germany-2012 --target position:2 --eras --write`):
+  stop-19 (real: box, softs), stop-40 (real: box, hards), pace-52, pace-56, battle-61. The stop
+  laps match Button's in-laps (19, 40); the compounds are the build's fit (not in sources).
+- Reachability (`pnpm --filter @laststint/sim reachability germany-2012`): pass at era
+  difficulty (threshold 80, Smart rival) and at Legend (90, Expert rival); all three stars and
+  the hidden objective on seed 1, on Button's real stops (box 19, box 40) with push at 52 and
+  56 and hold at 61. Stay-out never earns ★1 or ★3 (it earns ★2 at era difficulty on
+  accuracy 80-89).
+- Not modelled: Vettel's 20 s penalty (the laps order is used), Hamilton's unlapping.
+- `data/races/germany-2012.json` and its golden are rebuilt by the integrator
+  (`pipeline build germany-2012`); this branch does not commit them.
+
 ## germany-2013 (2013 German Grand Prix; Era 6 #3, replaces china-2011)
 
 **Side and target.** `pipeline hard-calls` (local run): RAI 1, VET 0 (chance given up RAI 7.0, VET 5.7 pts), so Räikkönen, as proposed. Räikkönen did not win (P2, 1.008 s behind Vettel), so a rewrite is allowed. Spec §4 draft: the proposal's dilemma with "ageing mediums" changed to "ageing tyres" (his middle-stint compound is not in the sources); target `win: Räikkönen from P4`. The safety car is entered in `data/incidents.json` at the built model's lap 24 (sources: lap 23 WP, lap 22 MS); the SC estimate stays unchecked.
