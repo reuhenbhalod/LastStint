@@ -614,6 +614,18 @@ export function RaceScreen({
   // which shrinks to make room. On a phone the stats are tabs in the control bar.
   type Panel = 'radio' | 'plan' | 'car' | 'calls' | 'log' | 'standings';
   const [stats, setStats] = useState(false);
+  // The calls, the dock and the control bar float over the map's lower edge; the circuit's
+  // frame stays above them (nothing sits on the track), so their height is measured.
+  const stackRef = useRef<HTMLDivElement>(null);
+  const [stackH, setStackH] = useState(0);
+  useEffect(() => {
+    const el = stackRef.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(() => setStackH(el.offsetHeight));
+    ro.observe(el);
+    setStackH(el.offsetHeight);
+    return () => ro.disconnect();
+  }, []);
   const [panelOpen, setPanelOpen] = useState<Panel | null>(null);
   useEffect(() => {
     if (paused || planning) setPanelOpen(null);
@@ -889,7 +901,7 @@ export function RaceScreen({
 
       {/* Tower | race | stats. In focus view the sides are closed and the race takes it all. */}
       <div
-        className="grid min-h-0 flex-1 grid-cols-1 gap-0 transition-[grid-template-columns] duration-500 ease-out md:gap-3 md:p-3 md:[grid-template-columns:var(--cols)]"
+        className={`grid min-h-0 flex-1 grid-cols-1 gap-0 transition-[grid-template-columns] duration-500 ease-out md:[grid-template-columns:var(--cols)] ${stats ? 'md:gap-3 md:p-3' : ''}`}
         style={
           {
             '--cols': stats
@@ -912,11 +924,12 @@ export function RaceScreen({
           <div className="min-h-0 flex-1 overflow-y-auto">{tower}</div>
         </section>
 
-        {/* The map (it shrinks as things open under it), the call, the dock, the control bar. */}
-        <section aria-label="Race" className="flex min-h-0 flex-col gap-2 md:gap-3">
+        {/* The map fills the race's box (in focus view, the whole screen under the header); the
+            call, the dock and the control bar float over its lower edge. */}
+        <section aria-label="Race" className="relative flex min-h-0 flex-col">
           <div
             data-tour="map"
-            className={`relative flex min-h-[200px] flex-1 flex-col overflow-hidden bg-[var(--ground)] md:rounded-xl ${paused ? 'map-alert' : ''}`}
+            className={`absolute inset-0 flex flex-col overflow-hidden bg-[var(--ground)] ${stats ? 'md:rounded-xl' : ''} ${paused ? 'map-alert' : ''}`}
           >
             {wetNow >= 0.03 && (
               <div
@@ -996,7 +1009,8 @@ export function RaceScreen({
               {/* The circuit's frame, as before: clear of the leaders' panel and the edges. The
                   ground is drawn beyond it, so it still fills the whole box. */}
               <div
-                className={`absolute inset-y-2 right-2 transition-[left] duration-500 ${stats ? 'left-2' : tight ? 'left-2 md:left-[190px]' : 'left-[150px] md:left-[190px]'}`}
+                className={`absolute top-2 right-2 transition-[left,bottom] duration-500 ${stats ? 'left-2' : tight ? 'left-2 md:left-[190px]' : 'left-[150px] md:left-[190px]'}`}
+                style={{ bottom: stackH + 8 }}
               >
                 {outline ? (
                   <RaceStage
@@ -1033,145 +1047,147 @@ export function RaceScreen({
             </div>
           </div>
 
-          {/* The call, under the map (never on it). */}
-          {call && (
-            <div
-              key={callKey}
-              data-tour="call"
-              className="bc-slide max-h-[52%] shrink-0 overflow-y-auto px-3 md:px-0"
-            >
-              {call}
-            </div>
-          )}
-
-          {/* The dock: a panel opened from the control bar slides up under the map, which
-              shrinks to make room. */}
           <div
-            className="grid shrink-0 transition-[grid-template-rows] duration-300 ease-out"
-            style={{ gridTemplateRows: dockOpen ? '1fr' : '0fr' }}
+            ref={stackRef}
+            className="pointer-events-none relative z-20 mt-auto flex max-h-full flex-col gap-2 px-3 pb-3 md:gap-3 [&>*]:pointer-events-auto"
           >
-            <div className="min-h-0 overflow-hidden">
-              <div className="mx-3 max-h-[38vh] overflow-y-auto rounded-xl border border-[var(--glass-edge)] bg-[var(--glass-strong)] p-3 backdrop-blur-[14px] md:mx-0">
-                {shown === 'radio' && (
-                  <TeamRadio
-                    race={state.race}
-                    model={model}
-                    userSide={userSide}
-                    rival={rival}
-                    pending={pending}
-                    boxing={boxing}
-                    disabled={!racing}
-                    describe={(key, value) => modeLine(model, key, value)}
-                    onCall={(c) => game.call(place(c))}
-                  />
-                )}
-                {shown === 'plan' &&
-                  (state.plan.active ? (
-                    <PlanBar
-                      state={state}
-                      model={model}
-                      onChange={game.changePlan}
-                      editing={planEdit}
-                      setEditing={setPlanEdit}
-                    />
-                  ) : (
-                    <p className="m-0 text-[13px] text-[var(--muted)]">No plan yet.</p>
-                  ))}
-                {shown === 'standings' && tower}
-                {shown === 'car' && (
-                  <div className="flex flex-col gap-3">
-                    <DriverProfile
-                      code={userSide}
+            {/* The call, over the map's lower edge (never on the track). */}
+            {call && (
+              <div
+                key={callKey}
+                data-tour="call"
+                className="bc-slide max-h-[52vh] shrink-0 overflow-y-auto"
+              >
+                {call}
+              </div>
+            )}
+
+            {/* The dock: a panel opened from the control bar slides up under the map, which
+              shrinks to make room. */}
+            <div
+              className="grid shrink-0 transition-[grid-template-rows] duration-300 ease-out"
+              style={{ gridTemplateRows: dockOpen ? '1fr' : '0fr' }}
+            >
+              <div className="min-h-0 overflow-hidden">
+                <div className="max-h-[38vh] overflow-y-auto rounded-xl border border-[var(--glass-edge)] bg-[var(--glass-strong)] p-3 backdrop-blur-[14px] md:mx-0">
+                  {shown === 'radio' && (
+                    <TeamRadio
                       race={state.race}
                       model={model}
-                      log={log}
-                      notes={game.notes()}
-                    />
-                    <CarStats
-                      race={state.race}
-                      model={model}
-                      log={log}
                       userSide={userSide}
                       rival={rival}
+                      pending={pending}
+                      boxing={boxing}
+                      disabled={!racing}
+                      describe={(key, value) => modeLine(model, key, value)}
+                      onCall={(c) => game.call(place(c))}
                     />
-                  </div>
-                )}
-                {shown === 'calls' && <LiveGrades state={state} model={model} />}
-                {shown === 'log' && <RadioLog messages={state.radio} max={12} />}
+                  )}
+                  {shown === 'plan' &&
+                    (state.plan.active ? (
+                      <PlanBar
+                        state={state}
+                        model={model}
+                        onChange={game.changePlan}
+                        editing={planEdit}
+                        setEditing={setPlanEdit}
+                      />
+                    ) : (
+                      <p className="m-0 text-[13px] text-[var(--muted)]">No plan yet.</p>
+                    ))}
+                  {shown === 'standings' && tower}
+                  {shown === 'car' && (
+                    <div className="flex flex-col gap-3">
+                      <DriverProfile
+                        code={userSide}
+                        race={state.race}
+                        model={model}
+                        log={log}
+                        notes={game.notes()}
+                      />
+                      <CarStats
+                        race={state.race}
+                        model={model}
+                        log={log}
+                        userSide={userSide}
+                        rival={rival}
+                      />
+                    </div>
+                  )}
+                  {shown === 'calls' && <LiveGrades state={state} model={model} />}
+                  {shown === 'log' && <RadioLog messages={state.radio} max={12} />}
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* The control bar, under it all: the plan and team radio left, stats right. */}
-          <nav
-            aria-label="Controls"
-            className="flex shrink-0 items-center gap-2 overflow-x-auto px-3 pb-3 md:px-0 md:pb-0"
-          >
-            <button
-              type="button"
-              data-tour="radio"
-              aria-pressed={panelOpen === 'radio'}
-              disabled={planning || paused}
-              onClick={() => toggle2('radio')}
-              className={pill(panelOpen === 'radio')}
-            >
-              <span className="h-2 w-2 rounded-full bg-[var(--you)]" />
-              Team radio
-            </button>
-            <button
-              type="button"
-              data-tour="plan"
-              aria-pressed={panelOpen === 'plan'}
-              disabled={planning || paused || !state.plan.active}
-              onClick={() => toggle2('plan')}
-              className={pill(panelOpen === 'plan')}
-            >
-              {planLabel}
-            </button>
-            {/* On a phone the stats are these tabs. */}
-            {(
-              [
-                ['standings', 'Standings'],
-                ['car', 'Car'],
-                ['calls', 'Calls'],
-                ['log', 'Radio'],
-              ] as Array<[Panel, string]>
-            ).map(([id, label]) => (
+            {/* The control bar, under it all: the plan and team radio left, stats right. */}
+            <nav aria-label="Controls" className="flex shrink-0 items-center gap-2 overflow-x-auto">
               <button
-                key={id}
                 type="button"
-                aria-pressed={panelOpen === id}
+                data-tour="radio"
+                aria-pressed={panelOpen === 'radio'}
                 disabled={planning || paused}
-                onClick={() => toggle2(id)}
-                className={`${pill(panelOpen === id)} md:hidden`}
+                onClick={() => toggle2('radio')}
+                className={pill(panelOpen === 'radio')}
               >
-                {label}
+                <span className="h-2 w-2 rounded-full bg-[var(--you)]" />
+                Team radio
               </button>
-            ))}
-            <span className="min-w-[8px] flex-1" />
-            <button
-              type="button"
-              data-tour="stats"
-              aria-pressed={stats}
-              onClick={() => setStats(!stats)}
-              className={`${pill(stats)} hidden md:flex`}
-            >
-              <svg
-                aria-hidden="true"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
+              <button
+                type="button"
+                data-tour="plan"
+                aria-pressed={panelOpen === 'plan'}
+                disabled={planning || paused || !state.plan.active}
+                onClick={() => toggle2('plan')}
+                className={pill(panelOpen === 'plan')}
               >
-                <rect x="3" y="4" width="18" height="16" rx="2" />
-                <path d="M9 4v16M15 4v16" />
-              </svg>
-              {stats ? 'Focus view' : 'Show stats'}
-            </button>
-          </nav>
+                {planLabel}
+              </button>
+              {/* On a phone the stats are these tabs. */}
+              {(
+                [
+                  ['standings', 'Standings'],
+                  ['car', 'Car'],
+                  ['calls', 'Calls'],
+                  ['log', 'Radio'],
+                ] as Array<[Panel, string]>
+              ).map(([id, label]) => (
+                <button
+                  key={id}
+                  type="button"
+                  aria-pressed={panelOpen === id}
+                  disabled={planning || paused}
+                  onClick={() => toggle2(id)}
+                  className={`${pill(panelOpen === id)} md:hidden`}
+                >
+                  {label}
+                </button>
+              ))}
+              <span className="min-w-[8px] flex-1" />
+              <button
+                type="button"
+                data-tour="stats"
+                aria-pressed={stats}
+                onClick={() => setStats(!stats)}
+                className={`${pill(stats)} hidden md:flex`}
+              >
+                <svg
+                  aria-hidden="true"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                >
+                  <rect x="3" y="4" width="18" height="16" rx="2" />
+                  <path d="M9 4v16M15 4v16" />
+                </svg>
+                {stats ? 'Focus view' : 'Show stats'}
+              </button>
+            </nav>
+          </div>
         </section>
 
         <aside
