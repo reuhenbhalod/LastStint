@@ -150,8 +150,10 @@ function Side({
         <span className="hidden truncate text-[13px] font-semibold sm:block">
           {info?.name ?? code}
         </span>
-        <span className="flex items-center gap-1.5 text-[12px] text-[var(--muted)]">
-          <span className="hidden truncate sm:inline">{team}</span>
+        <span
+          className={`flex min-w-0 max-w-full items-center gap-1.5 text-[12px] text-[var(--muted)] ${right ? 'flex-row-reverse' : ''}`}
+        >
+          <span className="hidden min-w-0 truncate sm:inline">{team}</span>
           {compound && age !== undefined && <TyreBadge compound={compound} age={age} />}
         </span>
       </span>
@@ -388,7 +390,7 @@ export function IntroCard({
               </div>
               <section
                 aria-label="The situation"
-                className="glass relative -mt-6 flex flex-col gap-4 p-4 shadow-2xl sm:mx-6 lg:mx-0 lg:mt-0 lg:ml-auto lg:w-[460px]"
+                className="glass relative -mt-6 flex flex-col gap-4 p-4 shadow-2xl sm:mx-6 lg:mx-0 lg:mt-0 lg:ml-auto lg:w-[600px]"
               >
                 <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
                   <Side
@@ -398,12 +400,12 @@ export function IntroCard({
                     compound={me?.compound}
                     age={me?.tyreAge}
                   />
-                  <div className="flex flex-col items-center text-center">
+                  <div className="flex w-[96px] flex-col items-center text-center">
                     <span className="eyebrow">Gap</span>
                     <span className="disp wide text-[24px] leading-none">
                       {gap === null ? '-' : `${Math.abs(gap).toFixed(1)}s`}
                     </span>
-                    <span className="text-[11px] text-[var(--muted)]">
+                    <span className="text-[11px] leading-tight text-[var(--muted)]">
                       {gap === null
                         ? ''
                         : gap >= 0
