@@ -79,3 +79,60 @@ history entries.
 | Draft target | `win`: Verstappen from P15 (target position 1; real road gap to Pérez 5.355 s, Jolpica-R) | |
 | Side really won? | No: Verstappen finished 2nd, so a history-book rewrite is allowed (hard-calls picked Verstappen; Pérez, who really won, would get no rewrite) | |
 | Risk | **Medium.** G1 now passes (1.03 s) only with the `pace_skip` fix; reachability of a VER win is unmeasured and needs ~5.4 s found over 30 laps with no SC after lap 20, so it depends on stop timing before the SC. Lap numbers differ by one between WP/GPE and Jolpica/OpenF1 for Stroll and the Leclerc/Ocon stops (Jolpica/OpenF1 taken). Alonso's post-race penalty saga is not needed for the story | |
+
+## Authored (B1, Nov 9)
+
+Branch `eras-author-saudi-arabia-2023` (base `eras-swap-saudi-2023`). The WP and AS rows above
+were re-read on Nov 9, 2026 for the authored text (WP as wikitext, `action=raw`; AS through the
+same Wayback copy). The storyline, headline and briefing are original wording; no team radio is
+quoted. Takeover lap 15 (D3 rule). Timing is the committed OpenF1 snapshot
+`data/raw/saudi-arabia-2023.parquet`.
+
+**Side.** `pipeline hard-calls saudi-arabia-2023` (Eras build): **VER 2, PER 0** (chance given up
+0.0 pts each), so the player runs **Verstappen** (rival Pérez). `build.py` keeps its measured
+PER / VER pair; the overlay's `eras.userSide` plays the model from Verstappen's side.
+
+**Target: `position` 2, not the draft's `win`.** The win was tried first (moments graded on the
+win, `author saudi-arabia-2023 --target win --eras`): at era difficulty no path wins on the
+checker's seeds 1-3, with the author tool's moments or with hand-made sets that add earlier
+pace and attack calls (laps 19-24); the best path (box for hards under the SC, then push) loses
+by 3.7-5.4 s there and wins on seed 4 only (Legend wins on seed 2, from a random SC). Across
+20 seeds that path wins 30-35% at era difficulty and 25% in Legend (scratch check), close to
+the real 5.355 s. As japan-2023 did with its draft, the target is the reachable one:
+**P2 or better**, Verstappen's real result from 15th on the grid. The win is the rewrite
+(`rewriteCondition` win), as abu-dhabi-2016 does (target P3, rewrite the win).
+
+**Moments** (`author saudi-arabia-2023 --target win --eras --write`, as the tool picked them;
+graded on the win, so every call is a fight for the rewrite): sc-18 (stay 14% yellow, softs 0%
+red, mediums 7% orange, **hards 17% green**, the real call; hards next lap 11% orange), pace-23 and
+pace-27 (push or push and attack green, 46-48% and 29%; manage red, 1%), cliff-31 (stay 5%
+green, every box 0%). Graded on P2 the same calls were nearly flat (96-100%) and gave no dilemma, so they stay graded on the win.
+
+**Robust G1** (`pipeline validate saudi-arabia-2023 --robust`, Eras build with this overlay):
+**pass** (strict pass), mean gap error 0.86 s (1.03 s with the rules-only overlay).
+
+**Reachability** (`pnpm --filter @laststint/sim reachability saudi-arabia-2023`): **pass**. Era
+(threshold 70, standard rival) and Legend (90, expert rival): ★1 ★2 ★3 and the hidden objective
+on seed 1 (sc-18 box hards, pace-23 push and attack, pace-27 push, cliff-31 stay). The stay-out
+path never earns ★1 or ★3 on seeds 1-3 (no stop: its mediums don't reach the flag, so it isn't
+classified). Over 20 seeds the 3-star path finishes P2 or better 18 times (the other two are a
+random retirement and a P7).
+
+| Item | Authored text / value | Facts used | Source | Owner checked |
+|---|---|---|---|---|
+| Side | VER (`eras.userSide`), rival PER | Hard calls VER 2, PER 0 | `pipeline hard-calls` | |
+| Target | `position` 2: "P2 or better" | Verstappen finished 2nd, +5.355 s; started 15th | WP classification, Jolpica-R | |
+| Rewrite | `rewriteCondition` win; headline "Verstappen wins in Jeddah from fifteenth on the grid" (original) | He did not win (2nd); grid 15th | WP classification | |
+| Storyline | "A driveshaft failure in qualifying leaves Verstappen fifteenth on the grid, with Pérez on pole." | Q2: "what was later identified as a driveshaft failure ... left him in fifteenth place"; Pérez "taking his second career pole position" | WP qualifying | |
+| Storyline | "Pérez takes the lead back from Alonso on lap 4 while Verstappen climbs into the top four." | Alonso led into Turn 1; Pérez passed him "at the start of lap four" (AS); VER P4 at the end of lap 17 | AS, WP, Timing | |
+| Storyline | "Stroll's stopped car brings out the safety car, and the leaders all pit for hards under it." | Stroll stopped on track, SC deployed; the top five pitted under it; front-runners "traded their medium tyres for the hardest compound" | WP, AS, Jolpica-P (all lap 18) | |
+| Storyline | "Verstappen restarts fourth, passes Russell and Alonso, and chips away at a 5.4 s gap" | Restart order Pérez, Alonso, Russell, Verstappen; passed Russell, then Alonso "at the end of the following lap"; "closing down the 5.4s gap to Perez ... chip about a tenth out per lap" | WP, AS | |
+| Storyline | "but a driveshaft worry costs him time and Pérez wins by 5.355 s." | "the driveshaft making strange noises at high speed, which restored Perez's gap to 5.2s"; Verstappen +5.355 | AS; WP classification | |
+| Mastery | `stop_count` exact 1: "Finish second or better on one stop" | Verstappen stopped once (lap 18, medium to hard) | Jolpica-P, OpenF1 | |
+| Hidden | `mode_rule` manage, 0 laps: "Finish second or better without a single lap of tyre management" (a counterfactual) | After the restart Verstappen "was initially told to prioritise managing his tyres until DRS was activated on lap 23" | AS | |
+| Briefing | "Jeddah, 2023. A driveshaft failure in qualifying put Verstappen fifteenth on the grid, and Pérez started on pole. Fifteen laps in, you run Verstappen sixth on mediums, 21.4 s behind Pérez, and the cars around you have started to stop. Finish second at least, and if you can, beat your team-mate." | Grid; end of lap 15: PER 1st, VER 6th on mediums (15 laps old), 21.42 s behind; Stroll (13), Gasly (14), Sainz (15) had stopped or were stopping | WP, Timing, Jolpica-P | |
+| storylineEvents | [18, SC] (Stroll) | SC deployed lap 18, in lap 20 (race control); Stroll's retirement is in every run, Legend included | OpenF1 race control; `data/incidents.json` | |
+
+Not used: Alonso's penalties and the post-race reversal (not the player's story); the fastest
+lap on the last lap (the sim has no fastest-lap goal). The "Finish second at least" line in the
+briefing is the game's goal, not a fact.
