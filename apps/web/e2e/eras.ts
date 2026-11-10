@@ -701,3 +701,39 @@ export async function noSidewaysScroll(page: Page) {
 
 /** The phone project (390 px wide). */
 export const isPhone = (page: Page) => (page.viewportSize()?.width ?? 0) <= 390;
+
+/**
+ * The radio log where the player reads it: the stats view's Radio panel on a desktop, the
+ * Radio tab of the control bar on a phone (closed while a decision pauses the race, so it is
+ * opened again each turn).
+ */
+async function openRadioLog(page: Page) {
+  const controls = page.getByRole('navigation', { name: 'Controls' });
+  const button = isPhone(page)
+    ? controls.getByRole('button', { name: 'Radio', exact: true })
+    : controls.getByRole('button', { name: 'Show stats' });
+  // The race may reach the flag (and the bar go) at any point: nothing here waits.
+  const pressed = await button.getAttribute('aria-pressed', { timeout: 1_000 }).catch(() => null);
+  if (pressed !== 'false' || !(await button.isEnabled().catch(() => false))) return;
+  await tryClick(button);
+}
+
+/**
+ * Watch the radio log for `lines` (each a line's text as the player reads it). `each` goes in
+ * a play loop's `each`; `seen` has every watched line seen on screen, with its whole entry
+ * ("L37 · Rosberg“…”": the lap, who says it and the line).
+ */
+export function watchRadio(page: Page, lines: string[]) {
+  const seen = new Map<string, string>();
+  return {
+    seen,
+    each: async () => {
+      await openRadioLog(page);
+      for (const line of lines) {
+        if (seen.has(line)) continue;
+        const entry = page.getByRole('listitem').filter({ hasText: line }).first();
+        if (await entry.isVisible()) seen.set(line, (await entry.textContent()) ?? '');
+      }
+    },
+  };
+}
