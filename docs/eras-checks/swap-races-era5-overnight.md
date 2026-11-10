@@ -210,6 +210,53 @@ Notes on sources:
 | Did the side win? | Massa: no, so a rewrite is allowed. Räikkönen: yes (no rewrite). `pipeline hard-calls` picks the side. | Jolpica-r | |
 | Risk | **Medium.** Dry, no SC, clean stop data (F1DB). Risks: the outcome depends on traffic (Wurz) and on the first fill fixing the second-stop lap; Räikkönen's first stop is lap 21 or 22 depending on source; no fuel numbers; no second-stop compound for Massa. | | |
 
+### Authored (B1, Nov 9)
+
+The `eras` block in `data/eras/france-2007.json` and the moments in
+`data/moments/france-2007.json`. It replaces the draft above: `pipeline hard-calls` chose
+Räikkönen, not Massa, and Räikkönen really won, so there is no rewrite. Every fact is from the
+Facts table above or from the timing built into the race file ("Timing":
+`data/races/france-2007.json`, Eras build, takeover lap 16 by the D3 rule). The storyline and
+briefing are original wording; no team radio is quoted.
+
+Model status:
+
+- Robust G1 (`pipeline validate france-2007 --robust`, Eras build on this branch, base
+  `eras-swap-era5`): **pass** (strict pass), mean gap error 0.57 s with the rules-only overlay,
+  0.49 s with the authored overlay (seen from Räikkönen's car).
+- Reachability (`pnpm --filter @laststint/sim reachability france-2007`): **pass** at era
+  difficulty (threshold 82, Smart rival) and at Legend (90, Expert rival): all three stars and
+  the hidden objective on seed 1 (rivalpit-19 box-soft, cliff-22 stay, rivalpit-43 stay, stop-46
+  box-hard, pace-56 push or push-attack, battle-64 defend). The stay-out path never earns ★1 or
+  ★3 on seeds 1-3 (★2 once, seed 2 at era difficulty).
+- **A win target was tried first** and is unreachable at Legend: no searched path wins against
+  the Expert Massa on seeds 1-3 (beam 4 and beam 10; best ★2 only). Owner-accepted pattern: a
+  position target (top two) when beating the rival is unreachable; the moments stay graded on the
+  win, so accuracy and the clean-calls part of ★3 still reward playing for it.
+- **Real calls graded red.** The moments are graded on the win, and the model prefers softs for
+  both later stints: the real first stop (cliff-22, box hards with the real fill of 24 laps)
+  grades 37% against 79% for softs, and the real second stop (stop-46, hards, fill 24 laps to
+  the flag) 43% against 69%. So repeating Räikkönen's real compounds can't earn ★3; the 3-star
+  path stops early for softs on lap 19 and takes hards on lap 46. The tyre compounds are
+  estimated by the pipeline (no compound data in any source beyond GPE's notes).
+
+| Item | Value | Fact it rests on | Source | Owner checked |
+|---|---|---|---|---|
+| Side | RAI (hard calls MAS 0, RAI 0; chance given up RAI 50.7 pts, MAS 0.0; `pipeline hard-calls`, decided by chance given up). Build pair stays MAS vs RAI; the overlay's userSide swaps it (`eras_side`) | the grader, not a fact | - | |
+| Target | `position` 2 (top two). The win was unreachable at Legend (above) | Räikkönen won, Massa 2nd +2.414 | Jolpica-r | |
+| Rewrite | None: the side really won | Result row | Jolpica-r, WP | |
+| Storyline | "Massa leads from pole and Räikkönen, past Hamilton at the first corner, follows him through the first stint" | Grid row (MAS pole, RAI 3rd); Start row (RAI past HAM into Turn 1) | WP, GPE, AS-r | |
+| Storyline | "Massa stops first both times; Räikkönen runs three laps longer before his second stop" | Massa row (laps 19, 43); Räikkönen row (21/22, 46); AS-f "three extra light-fuel laps" | GPE, F1DB, AS-f | |
+| Storyline | "comes out just ahead while Massa is held up behind a lapped Williams, and wins by 2.414 s" | The pass row (rejoined just ahead while Massa was trying to pass Wurz's lapped Williams; Massa blamed traffic); Result row | GPE, AS-r, AS-f, Jolpica-r | |
+| Mastery | `stop_count` exact 2: "Finish in the top two on two stops" (his real stop count) | Räikkönen row (two stops) | GPE, F1DB | |
+| Hidden | `mode_rule` manage, at most 5 laps: "Finish in the top two managing for no more than 5 laps" | game design, not a fact | - | |
+| Briefing | "Massa started on pole and leads; you run Räikkönen in the other Ferrari, second and 4.6 s behind him after 15 laps" | Grid row; Gaps, first stint row (lap 15: 4.6 s). The race file has RAI P2, 4.95 s behind at the takeover (lap 16) | GPE; Timing | |
+| Briefing | "Both Ferraris are on two stops and Massa will stop first" | Massa and Räikkönen rows; AS-f: mid-race the Ferraris were fuelled for one more stop | GPE, F1DB, AS-f | |
+| Briefing | "Finish in the top two, and take the win from him in the pits if you can" | the target, not a fact | - | |
+| storylineEvents | None: no SC, VSC or red flag in any source; the two retirements (Albers lap 29, Speed lap 57) are left out of the storyline | Safety car / red flag row; Retirements row | GPE, AS-f, Jolpica-r | |
+| Moments | From the author tool (`author france-2007 --target win --eras`), not hand-adjusted: rivalpit-19 (real stay; Massa's first stop), cliff-22 (real box hards, fill 24 laps), rivalpit-43 (real stay; Massa's second stop), stop-46 (real box hards, fill 24 laps to the flag), pace-56, battle-64. Every pit option carries a fill; the real calls carry the real fill | Räikkönen row (stops 22 and 46, hards both times); fills are laps to the next stop or the flag, not litres (no fuel numbers in sources) | GPE, F1DB; Timing | |
+| Dilemma (spec §4, `catalog.ts`) | "Two seconds behind team-mate Massa with lapped cars ahead, Räikkönen must choose: box when Massa does, or stretch the stint three laps longer and jump him at the second stops" | Gaps, middle row (lap 43: Massa 2.0 s ahead); The pass row; AS-f three extra laps | GPE, AS-f | |
+
 ## san-marino-2006 (2006 San Marino Grand Prix): swap candidate for Era 5
 
 Replaces `brazil-2006` (Era 5 #4). Robust G1: pass, 0.79 s.

@@ -256,7 +256,7 @@ const RACE_TABLE: Record<number, ReadonlyArray<readonly [string, string]>> = {
     ],
     [
       'france-2007',
-      "Leading by two seconds with traffic ahead, Massa must choose: box first and risk the lapped cars, or stretch the stint and match Räikkönen's fuel",
+      'Two seconds behind team-mate Massa with lapped cars ahead, Räikkönen must choose: box when Massa does, or stretch the stint three laps longer and jump him at the second stops',
     ],
     [
       'san-marino-2006',

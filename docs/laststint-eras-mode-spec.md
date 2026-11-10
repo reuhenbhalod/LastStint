@@ -125,7 +125,7 @@ Players start at Era 10 and move back through the timeline to Era 1. The eras be
 |---|---|---|---|
 | 1 | san-marino-2005 | Alonso holds off Schumacher | defend: Alonso holds off Schumacher |
 | 2 | europe-2009 | Hamilton leads on the lighter tank while Barrichello's longer-fuelled Brawn keeps closing: box now and cover him, or stretch the stint and risk losing the lead in the pits? | win: Hamilton beats Barrichello |
-| 3 | france-2007 | Leading by two seconds with traffic ahead, Massa must choose: box first and risk the lapped cars, or stretch the stint and match Räikkönen's fuel | defend: Massa wins from pole |
+| 3 | france-2007 | Two seconds behind team-mate Massa with lapped cars ahead, Räikkönen must choose: box when Massa does, or stretch the stint three laps longer and jump him at the second stops | position: Räikkönen (the hard-call side; he won, so no rewrite) in the top two from P3 |
 | 4 | san-marino-2006 | Glued to a grip-starved Ferrari on a track where nobody passes, does Renault gamble on stopping a lap early, or wait for Schumacher to blink? | beat-rival: Alonso ahead of Schumacher |
 | 5 | great-britain-2007 | Two-stopping at Silverstone with fuel deciding the order: short-fill Alonso to jump Räikkönen at the first stops, or run long like Ferrari and win it at the second? | beat-rival: Alonso ahead of Räikkönen |
 | 6 | europe-2007 | Rain chaos at the Nürburgring | win: Alonso chases Massa |
