@@ -292,7 +292,7 @@ pinned version; tests run on cached fixtures only.
 
 ## Phase 3: Races, wave A (10%)
 
-The 43 races in the appendix that need **no new sim model** (Needs column: "none", "wet model
+The 44 races in the appendix that need **no new sim model** (Needs column: "none", "wet model
 (exists)" or "P4 map" only).
 
 **3.1 Build and validate (8%)**
@@ -331,7 +331,7 @@ for every existing race.
 
 ## Phase 5: Races, wave B (13%)
 
-**5.1 Build and validate the other 57 races (11%)**
+**5.1 Build and validate the other 56 races (11%)**
 - As in 3.1, as each race's models from phase 4 land.
 - Reconstructed races are checked on their anchors (eras spec §4) instead of G1.
 - **Done when:** every race in the appendix is pass, or flagged to the owner with a diagnosis.
@@ -466,8 +466,9 @@ All driven by the race's `rules` and the era config:
   with `CI=1` (build included, 9 workers, 18-core laptop): 5 min 36 s for all 40 tests (38
   pass, 2 `fixme`); the slowest is the existing defend spec (4.5 min), and every Eras
   playthrough takes 27 s to 1.9 min. `E2E_PORT` moves the preview server off 4173.
-- No authored race has a red flag or a car fault, so those are played on Draft races
-  (italy-2020, canada-2014). Known app bug, `fixme` in the spec: san-marino-2005 can't be
+- No authored race had a red flag or a car fault, so those were played on Draft races
+  (italy-2020, canada-2014). Since the second Era 8 swaps (migration 0023, italy-2020 out) the
+  red flag is played on the authored azerbaijan-2021. Known app bug, `fixme` in the spec: san-marino-2005 can't be
   scored (a plan's fill to the flag is more than the tank holds).
 
 **10.2 Test play-through (1%)**
@@ -520,9 +521,9 @@ The **Needs** column is from race history and must be checked against the data f
 | 8 | `germany-2019` | TUM | wet model (exists) |  |
 | 8 | `hungary-2019` | built (Daily) | none |  |
 | 8 | `brazil-2019` | TUM | none |  |
-| 8 | `italy-2020` | Jolpica (est. compounds, SC) | R1 red flag |  |
+| 8 | `china-2017` | TUM | wet model (exists) |  |
 | 8 | `turkey-2020` | Jolpica (est. compounds, SC) | wet model (exists) |  |
-| 8 | `sakhir-2020` | Jolpica (est. compounds, SC) | none |  |
+| 8 | `china-2018` | TUM | none |  |
 | 7 | `bahrain-2014` | TUM | P4 map |  |
 | 7 | `brazil-2014` | TUM | P4 map |  |
 | 7 | `canada-2016` | TUM | P4 map |  |

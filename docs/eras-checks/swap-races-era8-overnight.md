@@ -1,9 +1,11 @@
-# Three Era 8 races swapped (owner pre-approved, Nov 9, overnight): owner sign-off
+# Five Era 8 races swapped (owner pre-approved, Nov 9, overnight): owner sign-off
 
 The owner approved (Nov 9) swapping failing Eras races for the next-best race by stats. Three
 Era 8 races are replaced by a 2017-2018 race in the same slot, as in the earlier swaps
 (`swap-races.md` and migration 0012, `swap-races-e10-e9.md` and 0013, `swap-races-e10-e9-b.md`
-and 0014); this batch is D1 migration 0017. The replacements were picked by robust-G1 mean gap
+and 0014); this batch is D1 migration 0017. A second batch (phase 3) swaps the last two failing
+Era 8 races, italy-2020 and sakhir-2020, for two Chinese Grands Prix in D1 migration 0023 (see
+"Second batch" below). The replacements were picked by robust-G1 mean gap
 error; each pick replaces one of the five failing Era 8 races, worst first. Every fact below
 was read in the linked source on Nov 9, 2026; nothing comes from memory. Where sources
 disagree, the row says which was taken. Check each row against its links and put your initials
@@ -14,11 +16,13 @@ and the date in **Owner checked**.
 | 8 / #2 | `azerbaijan-2017` | Fails G1 (5.85 s, red flag and SC restarts) | `australia-2018` | pass, 1.06 s (new race) |
 | 8 / #1 | `monaco-2017` | Fails G1 (2.98 s, Bottas in Monaco traffic) | `australia-2017` | pass, 2.11 s (new race) |
 | 8 / #4 | `russia-2018` | Fails G1 (2.46 s, the cars around Mercedes' swap) | `spain-2017` | pass, 2.57 s (new race) |
+| 8 / #8 | `italy-2020` | Fails G1 (2.17 s, duel GAS vs SAI after the red-flag restart) | `china-2017` | pass, 0.78 s (new race; second batch) |
+| 8 / #10 | `sakhir-2020` | Fails G1 (2.43 s, duel RUS vs PER through the late SC queue) | `china-2018` | pass, 2.26 s (new race; second batch) |
 
 The removed races' G1 numbers are from `docs/eras-races-report.md`. The replacements' numbers
 were measured here on fresh TUM builds (`pipeline validate <id> --robust`, one race per call).
-italy-2020 (2.17 s) and sakhir-2020 (2.43 s) also fail G1 but are the two least-bad of the five,
-so they stay in place. The removed races keep their rules-only overlays, race files, track files
+italy-2020 (2.17 s) and sakhir-2020 (2.43 s) also failed G1 but were the two least-bad of the
+five, so they stayed in the first batch; the second batch replaces them. The removed races keep their rules-only overlays, race files, track files
 and build entries as Eras-build fixtures.
 
 The replacements are not authored yet (no `eras` block): target, storyline, mastery, hidden
@@ -230,3 +234,134 @@ rule). Robust G1: pass, 2.57 s. Reachability: era (threshold 75, Standard+ rival
 | storylineEvents | `[34, "VSC"]` (Vandoorne/Massa; lap 34 from the built model's TUM track status and MS; kept in Legend too, so the VSC call is always there). The lap-1 retirements of Räikkönen and Verstappen happen before the takeover and are in the model's start state. | VSC row | |
 | Moments | From the author tool unchanged (`author spain-2017 --target win --eras --write`): stop-14 (real box softs), pace-27, pace-31, vsc-34 (real stay; box next lap on mediums grades best), stop-37 (real box mediums). The model's stop laps are one later than Jolpica's (VET 15 and 38). | author output | |
 | Reachability paths | Era and Legend (seed 2): softs at 14, standard pace at 27 and 31, box next lap on mediums under the VSC, stay at 37: ★1 ★2 ★3, hidden. Stay-out: no ★3 on any seed (best ★2 at era difficulty, seed 3). | reachability | |
+
+## Second batch (phase 3): italy-2020 and sakhir-2020
+
+The last two failing Era 8 races are replaced in their own slots (D1 migration 0023). The picks
+were chosen by robust-G1 mean gap error among the 2017-2020 races not already in Eras; the
+numbers below were measured on fresh TUM builds with the sides the hard-call count gave
+(`pipeline validate <id> --robust`, one race per call, Eras build, rules-only overlay):
+
+| Era / slot | Removed (robust G1) | Replacement | Robust G1 of the replacement |
+|---|---|---|---|
+| 8 / #8 | `italy-2020` (fail, 2.17 s) | `china-2017` | pass, mean gap error 0.78 s |
+| 8 / #10 | `sakhir-2020` (fail, 2.43 s) | `china-2018` | pass, mean gap error 2.26 s |
+
+italy-2020 and sakhir-2020 keep their rules-only overlays, race files, track files and build
+entries as Eras-build fixtures. The e2e red-flag playthrough moves from italy-2020 to the
+authored azerbaijan-2021, and the worker's "no Eras target yet" test uses a stand-in file under
+china-2018's id.
+
+`pipeline hard-calls` was run on each first build (into a scratch directory, not into
+`data/eras/`), and again on the rebuild with the new side (same counts):
+
+| Race | First build's side | Hard calls | Side | Did the side really win? |
+|---|---|---|---|---|
+| `china-2017` | VET | HAM 1, VET 0; chance given up HAM 15.0, VET 12.7 pts | HAM | Yes (Hamilton won by 6.250 s): no rewrite |
+| `china-2018` | RIC | BOT 3, RIC 2; chance given up BOT 85.0, RIC 2.0 pts | BOT | No (2nd, +8.894 s): a rewrite is allowed |
+
+`build.py` sets these sides (rival VET and RIC). Both proposals below were written before the
+count and take the other side or leave it open; the spec's draft targets (§4) follow the count:
+china-2017 `defend` (Hamilton leads at the takeover, lap 31, in the built model) and china-2018
+`win` (Bottas second at the takeover, lap 14, in the built model). Track maps are copies of
+`china-2024` (`shanghai-1`, F1DB v2026.19.0 CSV: 2017 round 2 and 2018 round 3 on the same
+layout) in `2.5-track-maps.md`; the SC/VSC rows are in `2.6-drivers-incidents.md`.
+
+## china-2017 (2017 Chinese Grand Prix)
+
+Replaces `italy-2020` (Era 8 #8). Robust G1 0.78 s.
+
+### Sources
+
+| Short name | What |
+|---|---|
+| WP | [English Wikipedia, 2017 Chinese Grand Prix](https://en.wikipedia.org/wiki/2017_Chinese_Grand_Prix) |
+| MS | [Motor Sport, 2017 Chinese Grand Prix report](https://www.motorsportmagazine.com/articles/single-seaters/f1/2017-chinese-grand-prix-report/) |
+| AS | [Autosport, Vettel on the safety car timing](https://www.autosport.com/f1/news/sebastian-vettel-timing-of-f1-safety-car-unfortunate-in-chinese-gp-5017032/5017032/) |
+| GPE | [GrandPrix.com, race notes](https://www.grandprix.com/races/chinese-gp-2017-race-notes-hamilton-wins-chinese-grand-prix.html) |
+| Jolpica-R | [api.jolpi.ca/ergast/f1/2017/2/results.json](https://api.jolpi.ca/ergast/f1/2017/2/results.json) |
+| Jolpica-P | [api.jolpi.ca/ergast/f1/2017/2/pitstops.json](https://api.jolpi.ca/ergast/f1/2017/2/pitstops.json?limit=100) |
+| OpenF1 | Not used: no 2017 sessions (`/v1/sessions?year=2017` returns "No results found"). |
+
+### Facts
+
+| Topic | Fact | Sources | Owner checked |
+|---|---|---|---|
+| Date / laps | 9 April 2017, Shanghai International Circuit, 56 laps (305.066 km). | WP, Jolpica-R | |
+| Grid top 6 | Hamilton (Mercedes) pole, Vettel (Ferrari) 2nd, Bottas (Mercedes) 3rd, Räikkönen (Ferrari) 4th, Ricciardo (Red Bull) 5th, Massa (Williams) 6th. Verstappen started 16th. | WP, Jolpica-R | |
+| Grid penalties | Grosjean and Palmer five places each for ignoring yellow flags in qualifying; Giovinazzi five places for a gearbox change (15th to 18th). Palmer started from the pit lane after pitting on the formation lap for slicks. None affects the top 6. | WP | |
+| Weather | Light rain at the start, drying later (WP infobox); damp track at the start, the main straight stayed wetter. Nearly all started on intermediates; Sainz the only starter on super-soft slicks. | WP | |
+| VSC | Stroll spun into the gravel after contact with Pérez (Stroll out, 0 laps). WP and AS place the VSC in the first lap; GPE says it ended at the end of lap 3; GPE gives no start lap. | WP, AS, GPE, Jolpica-R | |
+| Vettel's VSC stop | Inters to slicks at the end of lap 2 (MS; Jolpica-P lap 2). Compound: not in sources. Hülkenberg had pitted just before (MS; Jolpica-P lap 1). | MS, WP, AS, Jolpica-P | |
+| Mercedes stayed out | Mercedes judged the slick window not yet open on lap 3 and not worth giving up the lead for. | MS | |
+| Safety car | Giovinazzi crashed on the start-finish straight on a wet patch (lap 4 per MS; GPE lists it under lap 3; Jolpica-R: 3 laps completed). SC withdrawn at the end of lap 7 (GPE). Under the SC every car ran through the pit lane whether stopping or not (MS). | MS, GPE, WP, Jolpica-R | |
+| Stops under the SC | Hamilton, Bottas, Ricciardo, Räikkönen and Verstappen pitted (GPE; Jolpica-P lap 4 for all five). Hamilton went onto softs (MS); other compounds not in sources. Vettel rejoined 6th, behind Verstappen, so the others got their stops for free (MS). Jolpica-P also lists ~17 s entries on laps 4-6 for most cars: these match the pit-lane passes behind the SC, not stops. | GPE, MS, Jolpica-P | |
+| Bottas | Spun behind the SC while warming his tyres and fell to 12th. | WP, GPE | |
+| Overtakes | Verstappen from 16th made up many places on lap 1 and passed Ricciardo for 2nd on lap 11 (WP). Vettel was stuck behind Räikkönen until lap 20 (MS, WP; GPE: about lap 19), passed Ricciardo on lap 22 (WP), with contact between them (MS), and passed Verstappen when he locked up (lap 29 WP; lap 27 MS). | WP, MS, GPE | |
+| Second stops | Sources differ by about a lap. Verstappen fresh super-softs the lap after his lock-up (lap 30 WP; Jolpica-P 29); Ricciardo super-softs lap 33 (MS, Jolpica-P; GPE 34); Vettel new softs (lap 35 GPE; Jolpica-P 34; MS "two laps before Hamilton"), rejoined 3rd; Bottas softs (lap 35 GPE; Jolpica-P 35); Hamilton softs (lap 36 MS, GPE, Jolpica-P; WP 37), kept the lead; Räikkönen super-softs lap 39 (MS, GPE, Jolpica-P), from 2nd to 6th. Red Bull's super-soft choice committed them to two stops (MS). Ferrari tried to keep Räikkönen on one stop (MS). | WP, MS, GPE, Jolpica-P | |
+| Late race | Vettel was told he needed about 0.7 s a lap (MS); afterwards he said a bit over half a second (AS). Hamilton set the fastest lap, 1:35.378 on lap 44 (WP), with the gap at 7.7 s (MS). | MS, AS, WP | |
+| Result top 6 | Hamilton 1:37:36.158; Vettel +6.250; Verstappen +45.192; Ricciardo +46.035; Räikkönen +48.076; Bottas +48.808. | Jolpica-R, WP | |
+| Retirements | Stroll collision (0 laps), Giovinazzi accident (3), Vandoorne fuel pressure (17), Kvyat hydraulics (18), Alonso driveshaft (33). | Jolpica-R, WP | |
+| Penalties | Hülkenberg 5 s for passing under the VSC and 10 s for passing Ericsson under the SC (WP); GPE mentions only a 5 s penalty for passing Ericsson under the SC. Vettel was investigated for starting out of position; no action (WP). | WP, GPE | |
+| Team orders | None reported. Räikkönen held Vettel up until about lap 20. | WP, MS | |
+| Vettel's view | He called the SC timing unlucky because it wiped out the gain from his early stop, and said Hamilton did the best job (paraphrased). | AS | |
+
+### Storyline proposal (draft, owner decides)
+
+| Item | Proposal |
+|---|---|
+| Storyline drivers | Hamilton (Mercedes, pole) and Vettel (Ferrari, P2 start). |
+| Side | **Hamilton** by the hard-call count (HAM 1, VET 0). The sourcing sheet had proposed Vettel (the VSC slick call), but that call is before the takeover (lap 31). |
+| Dilemma (original wording) | Vettel stops first for fresh softs: cover him at once, or stay out and defend the lead on older tyres? |
+| Target (draft) | `defend`: Hamilton holds P1 ahead of Vettel (he leads at the takeover in the built model). |
+| Did the side really win? | Yes: no rewrite (history book). |
+| Risk | Medium. The wet-to-dry opening (inters, VSC, SC through the pit lane) is all before the takeover, so the played part is dry. Stop laps differ by about a lap between sources; most early slick compounds are not in sources. The built model has Alonso's retirement on lap 35 as an event. |
+
+## china-2018 (2018 Chinese Grand Prix)
+
+Replaces `sakhir-2020` (Era 8 #10). Robust G1 2.26 s.
+
+### Sources
+
+| Short name | What |
+|---|---|
+| WP | [English Wikipedia, 2018 Chinese Grand Prix](https://en.wikipedia.org/wiki/2018_Chinese_Grand_Prix) (raw wikitext read) |
+| MS | [Motor Sport, 2018 Chinese Grand Prix report (Mark Hughes)](https://www.motorsportmagazine.com/articles/single-seaters/f1/2018-chinese-grand-prix-report/) |
+| AS-race | [Autosport, "Chinese Grand Prix: Ricciardo wins, Verstappen and Vettel collide"](https://autosport.com/f1/news/135405/ricciardo-wins-vettel-and-verstappen-collide) |
+| AS-merc | [Autosport, "Mercedes F1 team explains Chinese Grand Prix strategy miscue"](https://autosport.com/f1/news/135484/mercedes-explains-china-strategy-miscue-further) |
+| GPE | [GrandPrix.com, "Race Analysis - Sister Act"](https://www.grandprix.com/races/chinese-gp-2018-race-analysis.html) |
+| Jolpica | [api.jolpi.ca/ergast/f1/2018/3/results.json](https://api.jolpi.ca/ergast/f1/2018/3/results.json), [pitstops.json](https://api.jolpi.ca/ergast/f1/2018/3/pitstops.json?limit=100), [qualifying.json](https://api.jolpi.ca/ergast/f1/2018/3/qualifying.json) |
+| OpenF1 | Not used: OpenF1 has no 2018 sessions. |
+
+### Facts
+
+| Topic | Fact | Sources | Owner checked |
+|---|---|---|---|
+| Grid | Vettel pole (1:31.095, track record), Räikkönen 2nd, Bottas 3rd, Hamilton 4th, Verstappen 5th, Ricciardo 6th, Hülkenberg 7th, Pérez 8th, Sainz 9th, Grosjean 10th. | WP, Jolpica, MS | |
+| Grid penalties | None in the top six. Ericsson: five places for ignoring double yellows (started 20th). Ricciardo's turbo failed in FP3; the new power unit was fitted in time for Q1 (MS: "45sec to spare"; GPE: "about a minute"). | WP, MS, GPE, Jolpica | |
+| Laps | 56 laps (305.066 km). | WP, Jolpica | |
+| Weather | Sunny (WP infobox). Race-day track temperature "around 20deg C higher" than practice (MS; exact figure not given). Dry race. | WP, MS | |
+| Start tyres | Ferrari and Mercedes on softs (used in Q2); Red Bulls on ultrasofts. | MS, GPE, AS-race | |
+| Lap 1 | Vettel kept the lead; Bottas 2nd, Verstappen passed Räikkönen for 3rd, Hamilton 5th, Ricciardo 6th. | WP, MS, GPE | |
+| First stops | Jolpica laps: Verstappen 17, Ricciardo 17 (double stop, both to mediums), Hamilton 18 (mediums), Bottas 19 (mediums, 1.8 s stationary per MS), Vettel 20 (mediums), Räikkönen 27 (mediums). Vettel led Bottas by 3.4 s at the end of lap 18 (MS); Bottas undercut him. Ferrari kept Räikkönen out to hold Bottas up; Bottas passed him at Turn 1 at the start of lap 27 (GPE: lap 27; MS: end of lap 26). | Jolpica, MS, GPE, AS-race | |
+| Safety car | Hartley and Gasly (Toro Rosso) collided at the hairpin on lap 30 (WP, GPE). SC deployed on lap 31 (GPE, MS), just after Bottas and Vettel had passed the pit entry (MS). SC in on lap 35 (MS: "stayed out until the 35th lap"), 21 laps to go. No VSC, no red flag found in any source. | WP, GPE, MS | |
+| SC stops | Verstappen and Ricciardo both pitted on lap 31 (Jolpica) for new softs (double stop). Bottas, Vettel, Hamilton and Räikkönen stayed out on mediums. Restart order (MS): Bottas (16-lap-old mediums), Vettel (15), Hamilton (17), Verstappen (new softs), Räikkönen (8), Ricciardo (new softs). | Jolpica, MS, AS-race, GPE | |
+| Why Hamilton stayed out | Mercedes judged track position worth more than fresher tyres: few passes had been made despite compound differences, the medium could do 40 laps, and a stop risked losing places to Ricciardo and Räikkönen (AS-merc, Vowles; MS). Mercedes did not expect the soft to be that fast (AS-merc). | AS-merc, MS, GPE | |
+| Recovery | Ricciardo passed Räikkönen; Verstappen went off at Turn 7 trying to pass Hamilton on lap 39 and Ricciardo got by (WP, MS). Ricciardo passed Hamilton at the hairpin on lap 40 (GPE, MS), Vettel for 2nd on lap 42 (GPE), Bottas for the lead on lap 45 (WP; AS-race: "with 12 laps to go they were nose-to-tail"). Pass location for the lead: Turn 6 (MS, AS-race top) vs Turn 4 (AS-race body). | WP, GPE, MS, AS-race | |
+| Contact | Lap 43: Verstappen hit Vettel at the hairpin, both spun; Vettel's floor was damaged, he fell to 8th (passed by Hülkenberg, then Alonso on the penultimate lap). | WP, MS, AS-race | |
+| Penalties | Verstappen +10 s (Vettel collision): 4th on the road, 5th classified. Gasly +10 s (Hartley collision). | WP, MS, AS-race, Jolpica | |
+| Retirements | Hartley only (51 laps, "Collision damage"). No front-runner retired. | Jolpica | |
+| Team orders | Toro Rosso told Hartley to let Gasly through (MS; the cause of the collision). Haas swapped Grosjean and Magnussen (MS). Ferrari used Räikkönen's long stint to hold Bottas up (MS, AS-race); no explicit order quoted. | MS, AS-race | |
+| Result | Ricciardo 1:35:36.380; Bottas +8.894; Räikkönen +9.637; Hamilton +16.985; Verstappen +20.436; Hülkenberg +21.052. Then Alonso, Vettel, Sainz, Magnussen. | Jolpica | |
+| Lap-by-lap gaps | Only those above (3.4 s at lap 18; Verstappen ~7 s behind Vettel after the stops, MS; Ricciardo 2.8 s off the lead after passing Hamilton, AS-race). Others: not in sources. | MS, AS-race | |
+
+### Storyline proposal (draft, owner decides)
+
+| Item | Proposal |
+|---|---|
+| Storyline drivers | Bottas (Mercedes, P3 grid, in the lead after undercutting Vettel) and Ricciardo (Red Bull, P6 grid, two stops). |
+| Side | **Bottas** by the hard-call count (BOT 3, RIC 2). The sourcing sheet had proposed Hamilton or Ricciardo. |
+| Dilemma (original wording) | A safety car with 25 laps left: give up the lead for fresh softs, or stay out on old mediums and hold off the Red Bulls? |
+| Target (draft) | `win`: Bottas from P2 (second at the takeover in the built model), ahead of Ricciardo. |
+| Did the side really win? | No: Bottas 2nd, +8.894 s. A rewrite is allowed. |
+| Risk | Medium-high. The race turns on the soft-vs-old-medium pace gap after the SC (laps 31-35 in the built model); the overtaking model must hold passes before the SC and allow them after. Bottas had passed the pit entry when the SC came out (MS), so a stop under it would really have come a lap later. Vettel's lap-43 damage and Verstappen's 10 s penalty are not scripted in the build. |

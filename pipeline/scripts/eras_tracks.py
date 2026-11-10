@@ -96,6 +96,8 @@ REUSE: dict[str, tuple[str, str]] = {
     "australia-2017": ("australia-2010", "melbourne-1"),
     "australia-2018": ("australia-2010", "melbourne-1"),
     "spain-2017": ("spain-2020", "catalunya-4"),
+    "china-2017": ("china-2024", "shanghai-1"),
+    "china-2018": ("china-2024", "shanghai-1"),
     "saudi-arabia-2023": ("saudi-arabia-2025", "jeddah-1"),
     "miami-2024": ("miami-2023", "miami-1"),
     "saudi-arabia-2021": ("saudi-arabia-2025", "jeddah-1"),
