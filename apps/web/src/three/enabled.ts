@@ -40,18 +40,25 @@ function wideNoTouch(): boolean {
   );
 }
 
+// ?view=3d (testing) is noted for the tab as the page loads, so it lasts through versus's move
+// to /versus/CODE.
+const FORCE_KEY = 'laststint:view3d';
+const forcedOnLoad =
+  typeof location !== 'undefined' && new URLSearchParams(location.search).get('view') === '3d';
+try {
+  if (forcedOnLoad) sessionStorage.setItem(FORCE_KEY, '1');
+} catch {
+  // private mode: the flag lasts for this page only
+}
+
 function forced(): boolean {
-  if (typeof location === 'undefined') return false;
-  // kept for the tab, so it lasts through versus's move to /versus/CODE
+  if (forcedOnLoad) return true;
   try {
-    if (new URLSearchParams(location.search).get('view') === '3d')
-      sessionStorage.setItem(FORCE_KEY, '1');
     return sessionStorage.getItem(FORCE_KEY) === '1';
   } catch {
-    return new URLSearchParams(location.search).get('view') === '3d';
+    return false;
   }
 }
-const FORCE_KEY = 'laststint:view3d';
 
 let gl: boolean | null = null;
 function webgl(): boolean {

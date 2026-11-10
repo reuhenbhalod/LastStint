@@ -15,4 +15,6 @@ export interface MapFeed {
   battle: { codes: string[]; at: number } | null;
   /** The car whose card is open. */
   selected: string | null;
+  /** Versus: each player's car shape (bullet, glider...). */
+  shapes: Record<string, string> | null;
 }

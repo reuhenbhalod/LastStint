@@ -693,6 +693,7 @@ export function TrackMap({
       sc: sc && leadAt !== undefined ? leadAt + 0.018 : null,
       battle: battle?.zoom ? { codes: [userSide, battle.other], at: battle.at } : null,
       selected,
+      shapes: carShapes ?? null,
     };
   }
 

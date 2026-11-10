@@ -19,6 +19,13 @@ import { type World, buildWorld } from './world.js';
 
 export type CameraMode = 'overview' | 'follow' | 'tv';
 
+/** Versus cars' proportions (length, height, width), as their 2D icons. */
+const PROPORTIONS: Record<string, [number, number, number]> = {
+  bullet: [1.08, 0.94, 0.9],
+  glider: [0.98, 1, 1.08],
+  endurance: [1, 1.06, 1.12],
+};
+
 const TYRE: Record<string, string> = {
   SOFT: '#e5483b',
   MEDIUM: '#f2c230',
@@ -388,7 +395,10 @@ export default function Scene3D({
         const focus = m === 'overview' ? controls.target : camLook;
         const dist = camera.position.distanceTo(focus);
         const grow = THREE.MathUtils.clamp(dist / 150, 1, 14);
-        for (const c of cars.values()) c.obj.scale.setScalar(grow);
+        for (const [code, c] of cars) {
+          const [sx, sy, sz] = PROPORTIONS[feed?.shapes?.[code] ?? ''] ?? [1, 1, 1];
+          c.obj.scale.set(grow * sx, grow * sy, grow * sz);
+        }
         sc.scale.setScalar(grow);
 
         // shadows follow the view
@@ -409,12 +419,12 @@ export default function Scene3D({
         if (isMain) composer.render();
         else renderer.render(scene, camera);
 
-        // name tags
-        const tag = (el2: HTMLDivElement | null, p: THREE.Vector3 | null, text: string) => {
-          if (!el2) return;
+        // name tags (the two main cars' move apart when they're side by side)
+        const place = (el2: HTMLDivElement | null, p: THREE.Vector3 | null, text: string) => {
+          if (!el2) return null;
           if (!p || !isMain) {
             el2.hidden = true;
-            return;
+            return null;
           }
           const q = tmp
             .copy(p)
@@ -422,19 +432,40 @@ export default function Scene3D({
             .project(camera);
           const vis = q.z < 1 && Math.abs(q.x) < 1.05 && Math.abs(q.y) < 1.05;
           el2.hidden = !vis;
-          if (!vis) return;
+          if (!vis) return null;
           el2.textContent = text;
-          el2.style.transform = `translate(${(((q.x + 1) / 2) * box.clientWidth).toFixed(0)}px,${(((1 - q.y) / 2) * box.clientHeight).toFixed(0)}px) translate(-50%,-100%)`;
+          return {
+            el: el2,
+            x: ((q.x + 1) / 2) * box.clientWidth,
+            y: ((1 - q.y) / 2) * box.clientHeight,
+          };
         };
-        const rivalPos = feed ? (cars.get(feed.rival)?.obj.position ?? null) : null;
-        const youPos = feed ? (cars.get(feed.userSide)?.obj.position ?? null) : null;
-        tag(tagYou.current, youPos, feed?.userSide ?? '');
-        tag(tagRival.current, rivalPos, feed?.rival ?? '');
+        const show = (t: { el: HTMLDivElement; x: number; y: number } | null) => {
+          if (t)
+            t.el.style.transform = `translate(${t.x.toFixed(0)}px,${t.y.toFixed(0)}px) translate(-50%,-100%)`;
+        };
+        const youTag = place(
+          tagYou.current,
+          feed ? (cars.get(feed.userSide)?.obj.position ?? null) : null,
+          feed?.userSide ?? '',
+        );
+        const rivalTag = place(
+          tagRival.current,
+          feed ? (cars.get(feed.rival)?.obj.position ?? null) : null,
+          feed?.rival ?? '',
+        );
+        if (youTag && rivalTag && Math.hypot(youTag.x - rivalTag.x, youTag.y - rivalTag.y) < 56) {
+          const d = rivalTag.x >= youTag.x ? 30 : -30;
+          youTag.x -= d;
+          rivalTag.x += d;
+        }
+        show(youTag);
+        show(rivalTag);
         const sel =
           feed?.selected && feed.selected !== feed.userSide && feed.selected !== feed.rival
             ? feed.selected
             : null;
-        tag(tagSel.current, sel ? (cars.get(sel)?.obj.position ?? null) : null, sel ?? '');
+        show(place(tagSel.current, sel ? (cars.get(sel)?.obj.position ?? null) : null, sel ?? ''));
 
         // quality: drop the occlusion, then resolution, if frames run slow
         if (isMain) {
