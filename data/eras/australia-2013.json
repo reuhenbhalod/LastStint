@@ -7,5 +7,31 @@
     "drs": true,
     "ers": "kers",
     "refuelling": false
+  },
+  "eras": {
+    "eraId": 6,
+    "order": 5,
+    "userSide": "RAI",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Sutil leads the middle of the race on a medium-tyre start. R\u00e4ikk\u00f6nen, seventh on the grid, makes his tyres last for two stops while Alonso, Vettel and Massa stop three times, and he wins by 12.451 s from Alonso."
+    },
+    "mastery": {
+      "type": "margin",
+      "seconds": 12.5,
+      "label": "Win by more than 12.5 seconds"
+    },
+    "hidden": {
+      "type": "stop_count",
+      "exact": 1,
+      "label": "Win on two stops in all"
+    },
+    "hardCalls": {
+      "RAI": 2,
+      "ALO": 0
+    },
+    "briefing": "Melbourne, 2013. Sutil leads on a medium-tyre start, and you run R\u00e4ikk\u00f6nen fifth after the first stops, behind Vettel, Massa and Alonso. Lotus wants two stops to work, and the Ferraris and Red Bulls will stop three times. Make your tyres last and win."
   }
 }
