@@ -456,6 +456,40 @@ not cover 2006; Jolpica has no 2006 pit-stop data.
 - Tyre compounds and tyre makers for each stint.
 - Any safety car, team order or Motor Sport race report.
 
+### Authored (B1, Nov 9 2026)
+
+Read for these rows on Nov 9 2026: WP (as plain text, MediaWiki `action=raw`) and Timing
+(Jolpica laps in `data/raw/bahrain-2006.parquet`, as built into `data/races/bahrain-2006.json`).
+Storyline, headline and briefing are original wording; no team radio is quoted.
+
+| Item | Value | Fact it rests on | Source | Owner checked |
+|---|---|---|---|---|
+| Side | MSCM (hard calls MSCM 1, ALO 0; `pipeline hard-calls`), not the provisional ALO | the grader, not a fact | - | |
+| Takeover | lap 12 (D3 rule, unchanged by the side swap) | MSCM P1, ALO P2 5.058 s behind at the end of lap 12 | Timing | |
+| Target | `win` (Schumacher wins) | Alonso won, Schumacher 2nd | WP classification | |
+| Rewrite | `win`, headline "Schumacher keeps Alonso behind in Bahrain" | the side did not win | WP classification | |
+| Storyline | "Schumacher leads from pole and pulls away, Alonso second" | caption "started on pole"; "Ferraris swept the front row"; Alonso "moved up to second in the first lap, only for Michael Schumacher to begin to pull away" | WP | |
+| Storyline | "Renault keep Alonso out longer at both stops" | pit-in laps MSCM 15 and 36, ALO 19 and 39 | Timing | |
+| Storyline | "at the second he rejoins side by side with the Ferrari, takes the lead into turn 1 and holds off Schumacher to win by 1.246 s" | "staying out longer than Schumacher by coming out of the pit lane side by side with Schumacher. As they came into the first corner both cars were neck and neck, but Alonso was able to pull out in front"; "coming under heavy pressure from Schumacher towards the end"; Schumacher "+1.246" | WP | |
+| Briefing | "the first race of the 2.4-litre V8s" | "It also saw the début of the 2.4 litre ... V8 engines which were used by all teams except Toro Rosso" | WP | |
+| Briefing | "Schumacher took pole ... leading Alonso's Renault by five seconds after 12 laps" | pole (above); 5.058 s at the end of lap 12 | WP; Timing | |
+| Briefing | "Alonso will run four laps longer before his first stop" | pit-in laps MSCM 15, ALO 19 | Timing | |
+| Mastery | `stop_count` exact 2: "Win on two stops" (Schumacher's real count) | two stops, laps 15 and 36 | Timing | |
+| Hidden | `margin` 5 s: "Win by more than 5 seconds" | the game's choice | - | |
+| storylineEvents | none: no SC, VSC or red flag; no retirement of either storyline car (FIS, VIL, IDE retirements stay as plain events) | "None mentioned in any source read" (Facts table above) | Facts table | |
+
+- Moments (`pnpm --filter @laststint/sim author bahrain-2006 --target win --eras --write`):
+  stop-15, rivalpit-19, pace-24, stop-36, pace-44 (`data/moments/bahrain-2006.json`). Real calls
+  carry the real fills: box on lap 15 with 21 laps, box on lap 36 with 21 laps (pit-in to pit-in
+  and pit-in to the flag in Timing). The real lap-15 stop grades 29% (box a lap later 69%) and the
+  real lap-36 stop 5% (box a lap later 17%): the hard calls Schumacher's side is played for.
+- Robust G1 (`pipeline validate bahrain-2006 --robust`, Eras build, rules-only overlay): pass,
+  mean gap error 1.39 s.
+- Reachability (`pnpm --filter @laststint/sim reachability bahrain-2006`): pass at era difficulty
+  (threshold 82, Smart rival) and at Legend (90, Expert rival); ★1-★3 and the hidden objective on
+  seed 1 (stop-15 box next lap, stop-36 the real box). The stay-out path earns no star on seeds
+  1-3.
+
 ## turkey-2008 (Era 5 swap candidate): facts sheet
 
 Replaces `brazil-2008` (Era 5 #9). Robust G1: pass, 0.98 s (strict: fail; robust: pass).
