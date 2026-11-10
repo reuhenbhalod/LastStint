@@ -2180,6 +2180,24 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
+    "luxembourg-1998": {
+        "year": 1998,
+        "event": "Luxembourg",
+        "source": "jolpica",
+        "name": "Luxembourg 1998: Häkkinen vs Schumacher",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swap candidate for hungary-1997 (Era 3, eras-scout-era3). Side provisional until
+        # `pipeline hard-calls`.
+        # pace_skip: Irvine held Häkkinen up from the end of lap 1 until Häkkinen passed him
+        # on lap 14 (Wikipedia; docs/eras-checks/fix-luxembourg-1998.md).
+        "pace_skip": {"HAK": [*range(2, 15), 65, 66, 67]},
+        "user_side": "HAK",
+        "rival": "MSCM",
+        "score_positions": 6,
+        "split": "eras",
+    },
     "europe-1997": {
         "year": 1997,
         "event": "European",
