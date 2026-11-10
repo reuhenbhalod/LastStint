@@ -75,6 +75,23 @@ the pages themselves.
 - Any sourced damage to Alonso's car from Stroll's hit.
 - Gaps between Alonso and Sainz before the final stops.
 
+### Authored (B1, Nov 9)
+
+Built with `user_side` SAI / `rival` ALO (`build.py`); takeover lap 10 (D3 rule). Robust G1
+after the change: pass, 1.22 s. Reachability: era and Legend reachable, stay-out never ★3.
+
+| Item | As authored | Basis | Owner checked |
+|---|---|---|---|
+| Side | **Sainz.** `pipeline hard-calls`: SAI 2, ALO 1 (chance given up SAI 15.7 pts, ALO 0.0). The draft above suggested Alonso; the counter puts the player in the Ferrari. | hard-call counter | |
+| Target | `beat-rival` ALO. `position: 3` was tried first: the grader gives Sainz at most ~3% at any call, so it was dropped. | author output | |
+| Rewrite | Yes, `beat-rival` ALO: Sainz really finished 4th, 9.4 s behind Alonso (48.052 − 38.637). Headline (original): "Sainz holds Alonso off in Bahrain". | Jolpica-R, WP, AS | |
+| Storyline text | Verstappen wins from pole, Pérez second; Leclerc's engine fails while he runs third; Alonso, on a later second stop, passes Sainz for the last podium place; Sainz 4th, 9.4 s behind. | Facts rows above (Grid, Result, Leclerc retirement, Stops: Alonso, Alonso's passes) | |
+| Briefing | Verstappen leads from pole, Leclerc second; Sainz fourth after ten laps; Alonso seventh after Stroll hit him on lap 1. Positions after ten laps are from the race model's takeover state (timing data). | Grid, Start / lap 1 rows; model | |
+| Mastery | `stop_count` exact 3, "Beat Alonso on three stops" (a counterfactual: the best era/Legend paths take a third stop under the lap-41 VSC; with exactly two stops no clean path reached ★3 at era difficulty). | reachability | |
+| Hidden | `mode_rule` push, maxLaps 0: "Beat Alonso without a single push lap". | — | |
+| storylineEvents | `[41, "RETIREMENT"]` (Leclerc, so the place he hands over is always there) and `[41, "VSC"]` (the VSC for his car, laps 41-42, kept in Legend too). | SC / VSC and Leclerc retirement rows | |
+| Moments | stop-13, cliff-21, stop-31, vsc-41 (`pnpm --filter @laststint/sim author bahrain-2023 --target beat-rival --eras --write`). | author output | |
+
 ## styria-2021 (2021 Styrian Grand Prix)
 
 ### Sources
