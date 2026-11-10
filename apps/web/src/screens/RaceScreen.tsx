@@ -44,7 +44,6 @@ import { type BattleView, TrackMap } from '../components/TrackMap.js';
 import { TyreBadge } from '../components/TyreBadge.js';
 import { namedUpper, surname } from '../data/names.js';
 import {
-  BATTLE_MS,
   CALL_MS,
   directorCall,
   flavourBattle,
@@ -58,7 +57,7 @@ import { delayStop } from '../game/plans.js';
 import { type QuickCall, quickCallLaps } from '../game/quickCalls.js';
 import { useRaceLog } from '../game/raceLog.js';
 import { radioChirp, setSoundOn, soundOn } from '../game/sound.js';
-import { type Game, LAP_MS, SLOW_MOTION, clockProgress } from '../game/useGame.js';
+import { type Game, LAP_MS, clockProgress } from '../game/useGame.js';
 import { CONDITION_WORD, conditionsOf, forecast } from '../game/weather.js';
 import type { GameState } from '../state/machine.js';
 import { BRAKE_BEFORE, cornerKind } from '../track/battle.js';
@@ -98,6 +97,8 @@ interface Battle {
   result: { text: string; good: boolean } | null;
   swap: { at: number } | null;
   zoom: boolean;
+  /** The card is up (it comes up SHOW_BEFORE ahead of the braking zone). */
+  shown: boolean;
 }
 
 /** How often the standings follow the map while the lap runs. */
@@ -105,6 +106,9 @@ const LIVE_MS = 400;
 
 /** The race slows this far (tick progress) before the braking zone. */
 const SLOW_BEFORE = 0.05;
+/** The battle card comes up this far (tick progress) before the braking zone, so it doesn't sit
+ * on screen for most of the lap when the corner is late in it. */
+const SHOW_BEFORE = 0.12;
 /** How long the race waits at the braking zone for your call before the driver goes alone. */
 const BATTLE_WAIT_MS = 8000;
 /** The tutorial's calls wait for an answer (10 minutes is as good as never). */
@@ -284,19 +288,21 @@ export function RaceScreen({
       const best = from[(raceLap + (call.other as string).charCodeAt(0)) % from.length];
       if (!best) return null;
       lastCorner.current.set(call.other, best.n);
+      const brakeP = Math.max(p0 + 0.02, best.p - BRAKE_BEFORE);
       return {
         call,
         lap: raceLap,
         corner: best.n,
         at: best.f,
         fromP: p0,
-        brakeP: Math.max(p0 + 0.02, best.p - BRAKE_BEFORE),
+        brakeP,
         cornerP: best.p,
         stage: 'approach',
         chosen: null,
         result: null,
         swap: null,
         zoom: true,
+        shown: brakeP - p0 <= SHOW_BEFORE,
       };
     },
     [line, outline, corners, userSide, raceLap],
@@ -345,8 +351,9 @@ export function RaceScreen({
         setBattle({ ...fight, call: flavourBattle({ ...call, corner: fight.corner }, kind) });
         return;
       }
-      // No corner to draw it at: the plain card, the lap in slow motion.
-      setPace('slow');
+      // No corner to draw it at: the plain card, the race held until you call (BATTLE_WAIT_MS
+      // at most), not a whole lap in slow motion.
+      setPace('frozen');
     }
     if (call) {
       setQuick(call);
@@ -382,7 +389,7 @@ export function RaceScreen({
         const p = clockProgress(c);
         if (b.stage === 'approach' && p >= b.brakeP) {
           setPace('frozen');
-          setBattle({ ...b, stage: 'waiting' });
+          setBattle({ ...b, stage: 'waiting', shown: true });
           return;
         }
         if (b.stage === 'move' && p >= b.cornerP + 0.012) {
@@ -390,6 +397,9 @@ export function RaceScreen({
           setPace('normal');
           setBattle({ ...b, stage: 'done' });
           return;
+        }
+        if (b.stage === 'approach' && !b.shown && p >= b.brakeP - SHOW_BEFORE) {
+          setBattle({ ...b, shown: true });
         }
         if (p >= b.brakeP - SLOW_BEFORE) setPace('slow');
       }
@@ -431,7 +441,11 @@ export function RaceScreen({
         result: result ?? { text: 'NO MOVE', good: true },
         swap,
       });
-      setPace('slow');
+      // Slow motion only from just before the braking zone: a call made early in the lap
+      // doesn't slow the rest of it (the frame loop slows it there).
+      const c = clockRef.current;
+      const near = b.stage === 'waiting' || (!!c && clockProgress(c) >= b.brakeP - SLOW_BEFORE);
+      setPace(near ? 'slow' : 'normal');
     },
     [game, state.race.lap, userSide, setPace, setBattle],
   );
@@ -543,17 +557,19 @@ export function RaceScreen({
     if (userBox !== null && stopQuestion) setQuick(null);
   }, [userBox, stopQuestion]);
 
+  // The battle once its card is up (the map, the camera and the call area wait for it).
+  const shownBattle = battle && (battle.shown || battle.chosen !== null) ? battle : null;
   // The battle as the map draws it.
   const battleView: BattleView | null =
-    battle?.call.other !== undefined
+    shownBattle?.call.other !== undefined
       ? {
-          other: battle.call.other,
-          corner: battle.corner,
-          at: battle.at,
-          options: battle.call.options.map((o, i) => ({ n: i + 1, line: o.line ?? 'wait' })),
-          chosen: battle.call.options.find((o) => o.id === battle.chosen)?.line ?? null,
-          zoom: battle.zoom,
-          swap: battle.swap,
+          other: shownBattle.call.other,
+          corner: shownBattle.corner,
+          at: shownBattle.at,
+          options: shownBattle.call.options.map((o, i) => ({ n: i + 1, line: o.line ?? 'wait' })),
+          chosen: shownBattle.call.options.find((o) => o.id === shownBattle.chosen)?.line ?? null,
+          zoom: shownBattle.zoom,
+          swap: shownBattle.swap,
         }
       : null;
 
@@ -605,7 +621,7 @@ export function RaceScreen({
   const callUp =
     planning ||
     (paused && !!state.currentMoment) ||
-    (!!battle && racing && (battle.stage !== 'done' || battle.zoom)) ||
+    (!!shownBattle && racing && (shownBattle.stage !== 'done' || shownBattle.zoom)) ||
     (!!headsUp && racing && headsUpSeen !== headsUp.lap) ||
     (!!replan && racing && !quick && replanKey !== keepKey) ||
     (!!quick && racing);
@@ -685,18 +701,18 @@ export function RaceScreen({
       model={model}
       onChoose={game.choose}
     />
-  ) : battle && racing && (battle.stage !== 'done' || battle.zoom) ? (
+  ) : shownBattle && racing && (shownBattle.stage !== 'done' || shownBattle.zoom) ? (
     <BattleCard
-      key={battle.lap}
-      call={battle.call}
-      corner={battle.corner}
-      stage={battle.stage}
+      key={shownBattle.lap}
+      call={shownBattle.call}
+      corner={shownBattle.corner}
+      stage={shownBattle.stage}
       clock={game.clock}
-      fromP={battle.fromP}
-      brakeP={battle.brakeP}
+      fromP={shownBattle.fromP}
+      brakeP={shownBattle.brakeP}
       waitMs={battleWait}
-      chosen={battle.chosen}
-      result={battle.stage === 'done' ? battle.result : null}
+      chosen={shownBattle.chosen}
+      result={shownBattle.stage === 'done' ? shownBattle.result : null}
       onAnswer={answerBattle}
     />
   ) : headsUp && racing && headsUpSeen !== headsUp.lap ? (
@@ -729,7 +745,7 @@ export function RaceScreen({
         tutorial
           ? NO_TIMEOUT
           : quick.kind === 'battle'
-            ? Math.min(BATTLE_MS, LAP_MS[state.speed] * SLOW_MOTION * 0.85)
+            ? battleWait
             : Math.min(CALL_MS, LAP_MS[state.speed] * 0.9)
       }
       onAnswer={answerQuick}
@@ -751,7 +767,7 @@ export function RaceScreen({
     ? { kind: 'plan' }
     : paused && state.currentMoment
       ? { kind: 'decision', trigger: state.currentMoment.trigger, lap: state.currentMoment.lap }
-      : battle && racing && (battle.stage !== 'done' || battle.zoom)
+      : shownBattle && racing && (shownBattle.stage !== 'done' || shownBattle.zoom)
         ? { kind: 'battle' }
         : headsUp && racing && headsUpSeen !== headsUp.lap
           ? { kind: 'headsUp' }
@@ -769,7 +785,7 @@ export function RaceScreen({
     ? 'plan'
     : paused && state.currentMoment
       ? state.currentMoment.id
-      : (battle && `battle-${battle.lap}`) || (quick && `quick-${quick.lap}`) || 'other';
+      : (shownBattle && `battle-${shownBattle.lap}`) || (quick && `quick-${quick.lap}`) || 'other';
 
   return (
     <main className="relative flex h-[100dvh] flex-col overflow-hidden bg-[#0B0E0D] text-[#EEF1EF]">
@@ -940,16 +956,16 @@ export function RaceScreen({
                   {why}
                 </span>
               )}
-              {battle && !paused && battle.stage !== 'done' && (
+              {shownBattle && !paused && shownBattle.stage !== 'done' && (
                 <output
-                  className={`flex items-center gap-1.5 rounded bg-[var(--box)] px-2.5 py-1 text-[12px] font-bold text-white ${battle.stage === 'waiting' ? 'animate-pulse' : ''}`}
+                  className={`flex items-center gap-1.5 rounded bg-[var(--box)] px-2.5 py-1 text-[12px] font-bold text-white ${shownBattle.stage === 'waiting' ? 'animate-pulse' : ''}`}
                 >
                   <OvertakeIcon size={14} />
-                  {battle.stage === 'waiting'
-                    ? `Braking for T${battle.corner}: your call`
-                    : battle.call.attacking
-                      ? `${surname(userSide)} on ${surname(battle.call.other ?? '')} · T${battle.corner}`
-                      : `${surname(battle.call.other ?? '')} on ${surname(userSide)} · T${battle.corner}`}
+                  {shownBattle.stage === 'waiting'
+                    ? `Braking for T${shownBattle.corner}: your call`
+                    : shownBattle.call.attacking
+                      ? `${surname(userSide)} on ${surname(shownBattle.call.other ?? '')} · T${shownBattle.corner}`
+                      : `${surname(shownBattle.call.other ?? '')} on ${surname(userSide)} · T${shownBattle.corner}`}
                 </output>
               )}
               {stop && (
