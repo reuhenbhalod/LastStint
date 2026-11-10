@@ -106,6 +106,26 @@ def outline_cmd(
     )
 
 
+@app.command("scenery")
+def scenery_cmd(
+    circuits: list[str] = typer.Argument(None, help="Circuits, e.g. spa (default: all five)."),  # noqa: B008
+) -> None:
+    """Write data/scenery/<circuit>.json: the 3D view's scenery (network: OpenStreetMap and
+    the Terrarium terrain tiles; cached in cache/scenery)."""
+    from . import scenery
+
+    for c in circuits or list(scenery.CIRCUITS):
+        path = scenery.write(c)
+        d = json.loads(path.read_text())
+        fits = ", ".join(f"{r} {v['err']} m" for r, v in d["races"].items())
+        typer.echo(
+            f"{c}: lap {d['lap']['length']:.0f} m (fit {d['fit']} m),"
+            f" {len(d['buildings'])} buildings,"
+            f" {sum(len(v) for v in d['areas'].values())} areas, races: {fits},"
+            f" {path.stat().st_size // 1024} KB"
+        )
+
+
 @app.command("incidents")
 def incidents_cmd(
     race_ids: list[str] = typer.Argument(..., help="Registered races, e.g. abu-dhabi-2021."),  # noqa: B008
