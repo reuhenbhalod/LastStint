@@ -7,5 +7,31 @@
     "drs": true,
     "ers": "hybrid",
     "refuelling": false
+  },
+  "eras": {
+    "eraId": 7,
+    "order": 9,
+    "userSide": "VET",
+    "target": {
+      "type": "defend"
+    },
+    "storyline": {
+      "real": "Hamilton leads from pole until Ericsson's spin brings out the safety car on lap 4. Both Mercedes pit for the hard tyre and Vettel stays out to lead on mediums. He stops twice, on lap 18 and lap 38, while Mercedes stops three times, and Vettel wins Ferrari's first race since Spain 2013 by 8.569 s from Hamilton."
+    },
+    "mastery": {
+      "type": "margin",
+      "seconds": 8.6,
+      "label": "Win by more than 8.6 seconds"
+    },
+    "hidden": {
+      "type": "stop_count",
+      "exact": 2,
+      "label": "Win on two stops"
+    },
+    "hardCalls": {
+      "VET": 1,
+      "HAM": 1
+    },
+    "briefing": "Sepang, 2015, and the track is close to 60 degrees. Vettel stayed out under the early safety car and leads, about nine seconds clear of Hamilton, fourteen laps in. Mercedes switched to the hard tyre and will stop three times. You run Vettel on the medium: make two stops last and keep the lead."
   }
 }
