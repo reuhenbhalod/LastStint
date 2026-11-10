@@ -379,7 +379,7 @@
           },
           "stintPace": {
             "type": "array",
-            "description": "Pace by stint (Eras model fix M2; pipeline pace.stint_offsets): the car's pace offset (s/lap, added to basePace) in each real stint after the takeover, fitted from its clean laps in that stint and shrunk toward 0. Keyed by the lap the stint began: a real stop's out-lap, or 0 for the stint the car is on at the takeover. A car runs an offset while its current stint began on that lap; a stint begun on any other lap runs at 0. The player's car in live play runs its race-wide mean (weighted by the stints' real laps) in every stint (sim.ts playerStintOffset). Eras builds only; absent: none.",
+            "description": "Pace by stint (Eras model fix M2; pipeline pace.stint_offsets): the car's pace offset (s/lap, added to basePace) in each real stint after the takeover, fitted from its clean laps in that stint and shrunk toward 0. Keyed by the lap the stint began: a real stop's out-lap, or 0 for the stint the car is on at the takeover. A car runs an offset while its current stint began on that lap; a stint begun on any other lap runs at 0, and so does the player's car in live play (its effort is the pace modes'). Eras builds only; absent: none.",
             "items": {
               "type": "object",
               "additionalProperties": false,
