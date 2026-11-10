@@ -465,6 +465,73 @@ def align(game: np.ndarray, real: np.ndarray) -> tuple[np.ndarray, np.ndarray, f
     return M, t, float(d.mean())
 
 
+def road_points(elements: list[dict], frame: Frame, step: float = 4.0) -> np.ndarray:
+    """Points every `step` m along every road and raceway."""
+    out: list[tuple[float, float]] = []
+    for e in elements:
+        if e["type"] != "way" or "highway" not in e.get("tags", {}):
+            continue
+        pts = [frame.xz(p["lat"], p["lon"]) for p in e.get("geometry", [])]
+        if len(pts) >= 2:
+            out += [tuple(p) for p in resample(pts, step, closed=False)]
+    return np.asarray(out, float)
+
+
+def align_to_roads(
+    game: np.ndarray, roads: np.ndarray, official: float, reach: float = 900.0
+) -> tuple[np.ndarray, np.ndarray, float]:
+    """Fit the game's outline onto a road network (a circuit with no raceway lap): the scale
+    from the official length, then a search over mirror, rotation and position near the
+    centre for the fit that keeps the outline on the roads, refined on the near roads only.
+    Returns M, t (real ~ game @ M.T + t) and the mean distance left (m)."""
+    tree = cKDTree(roads)
+    g_len = float(np.linalg.norm(np.diff(np.vstack([game, game[:1]]), axis=0), axis=1).sum())
+    s = official / g_len
+    g_mu = game.mean(0)
+    g0 = game - g_mu
+    probe = g0[:: max(1, len(g0) // 240)]
+    clip = 40.0
+
+    def score(M: np.ndarray, t: np.ndarray, pts: np.ndarray) -> float:
+        d, _ = tree.query(pts @ M.T + t)
+        return float(np.minimum(d, clip).mean())
+
+    best = (math.inf, None, None)
+    for flip in (1, -1):
+        F = np.diag([1, flip])
+        for deg in range(0, 360, 3):
+            a = math.radians(deg)
+            R = np.array([[math.cos(a), -math.sin(a)], [math.sin(a), math.cos(a)]])
+            M = s * R @ F
+            for dx in np.arange(-reach, reach + 1, 60.0):
+                for dz in np.arange(-reach, reach + 1, 60.0):
+                    t = np.array([dx, dz])
+                    v = score(M, t, probe)
+                    if v < best[0]:
+                        best = (v, M, t)
+    _, M, t = best
+    # Finer around the best, then least squares on the near points (a road within 15 m).
+    for _ in range(40):
+        moved = g0 @ M.T + t
+        d, idx = tree.query(moved)
+        near = d < 15
+        if near.sum() < len(g0) * 0.3:
+            break
+        A, B = g0[near], roads[idx[near]]
+        am, bm = A.mean(0), B.mean(0)
+        F = np.diag([1, np.sign(np.linalg.det(M))])
+        Af = (A - am) @ F.T
+        U, S, Vt = np.linalg.svd(Af.T @ (B - bm))
+        D = np.diag([1, np.sign(np.linalg.det(U @ Vt))])
+        R = (U @ D @ Vt).T
+        scale = (S * np.diag(D)).sum() / (Af**2).sum()
+        M = scale * R @ F
+        t = bm - am @ M.T
+    t = t - g_mu @ M.T
+    d, _ = tree.query(game @ M.T + t)
+    return M, t, float(np.median(d))
+
+
 def fraction_table(
     game: np.ndarray, real: np.ndarray, M: np.ndarray, t: np.ndarray, n: int = 400
 ) -> list[float]:
@@ -613,27 +680,32 @@ def build(circuit: str) -> dict:
     # The lap: the cycle matching the official length and the game's outline best.
     edges = raceway_edges(E, frame)
     cycles = lap_cycles(edges, cfg["length"])
-    if not cycles:
-        raise RuntimeError(f"{circuit}: no raceway cycle near {cfg['length']} m")
     first_race = cfg["races"][0]
     outline = json.loads((paths.DATA_DIR / "tracks" / f"{first_race}.json").read_text())
     game = resample([tuple(p) for p in outline["points"]], 2, closed=True)
-    scored = []
-    for cyc in cycles:
-        pts: list[tuple[float, float]] = []
-        for e in cyc:
-            pts += e["pts"] if not pts else e["pts"][1:]
-        real = resample(pts, SAMPLE, closed=True)
-        _, _, err = align(game, real)
-        scored.append((err, cyc, real))
-    scored.sort(key=lambda s: s[0])
-    err, cyc, _ = scored[0]
     lap_pts: list[tuple[float, float]] = []
     bridge_pts: list[bool] = []
-    for e in cyc:
-        add = e["pts"] if not lap_pts else e["pts"][1:]
-        lap_pts += add
-        bridge_pts += [e["bridge"]] * len(add)
+    if cycles:
+        scored = []
+        for cyc in cycles:
+            pts: list[tuple[float, float]] = []
+            for e in cyc:
+                pts += e["pts"] if not pts else e["pts"][1:]
+            real = resample(pts, SAMPLE, closed=True)
+            _, _, err = align(game, real)
+            scored.append((err, cyc, real))
+        scored.sort(key=lambda s: s[0])
+        err, cyc, _ = scored[0]
+        for e in cyc:
+            add = e["pts"] if not lap_pts else e["pts"][1:]
+            lap_pts += add
+            bridge_pts += [e["bridge"]] * len(add)
+    else:
+        # No lap tagged as a raceway (Sochi runs on the Olympic Park's roads): the game's own
+        # outline, fitted onto the real roads, stands in for it.
+        M, t, err = align_to_roads(game, road_points(E, frame), cfg["length"])
+        lap_pts = [tuple(p) for p in (game @ M.T + t)]
+        bridge_pts = [False] * len(lap_pts)
 
     # Scenery box round the lap, in a frame whose origin is its corner.
     xs = [p[0] for p in lap_pts]

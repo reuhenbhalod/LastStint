@@ -87,6 +87,25 @@ COMMON = {
     "building_edge": "#9c958a",
     "stand": "#c9c3b8",
 }
+# Shadows under forests and buildings, a dappled canopy, and a fine grain over everything.
+DEFS = (
+    "<defs>"
+    '<filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">'
+    '<feDropShadow dx="1.6" dy="2.2" stdDeviation="1.4" flood-color="#000" flood-opacity="0.4"/>'
+    "</filter>"
+    '<filter id="canopy" x="-2%" y="-2%" width="104%" height="104%">'
+    '<feTurbulence type="fractalNoise" baseFrequency="0.08" numOctaves="3" seed="7" result="n"/>'
+    '<feColorMatrix in="n" type="matrix" '
+    'values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -1.1 0.75" result="dots"/>'
+    '<feComposite in="dots" in2="SourceGraphic" operator="in" result="d"/>'
+    '<feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="d"/></feMerge>'
+    "</filter>"
+    '<filter id="grain" x="0" y="0" width="100%" height="100%">'
+    '<feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="2" seed="4"/>'
+    '<feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.12 0"/>'
+    "</filter>"
+    "</defs>"
+)
 PX_PER_M = 1.25  # the image's detail, for the battle camera close up
 MAX_PX = 4096
 
@@ -158,12 +177,17 @@ def svg(circuit: str) -> str:
     stands = "".join(_ring(b["p"]) for b in s.get("buildings", []) if b.get("stand"))
     blocks = "".join(_ring(b["p"]) for b in s.get("buildings", []) if not b.get("stand"))
 
-    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w:.1f} {h:.1f}" width="{w:.0f}" height="{h:.0f}">
-<defs>
-<filter id="shadow" x="-5%" y="-5%" width="110%" height="110%"><feDropShadow dx="1.6" dy="2.2" stdDeviation="1.4" flood-color="#000" flood-opacity="0.4"/></filter>
-<filter id="canopy" x="-2%" y="-2%" width="104%" height="104%"><feTurbulence type="fractalNoise" baseFrequency="0.08" numOctaves="3" seed="7" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -1.1 0.75" result="dots"/><feComposite in="dots" in2="SourceGraphic" operator="in" result="d"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="d"/></feMerge></filter>
-<filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="2" seed="4"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.12 0"/></filter>
-</defs>
+    head = (
+        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w:.1f} {h:.1f}" '
+        f'width="{w:.0f}" height="{h:.0f}">'
+    )
+    line = 'fill="none" stroke-linecap="round" stroke-linejoin="round"'
+    shading = (
+        f'<image href="data:image/png;base64,{shade}" x="0" y="0" width="{gw:.1f}" '
+        f'height="{gh:.1f}" preserveAspectRatio="none" style="mix-blend-mode:multiply"/>'
+    )
+    return f"""{head}
+{DEFS}
 <rect width="{w:.1f}" height="{h:.1f}" fill="{pal["base"]}"/>
 {area("farm", pal["farm"])}
 {area("grass", pal["grass"])}
@@ -176,10 +200,10 @@ def svg(circuit: str) -> str:
 {area("water", pal["water"])}
 {area("gravel", pal["gravel"])}
 {area("asphalt", pal["asphalt"])}
-<g fill="none" stroke="{pal["stream"]}" stroke-linecap="round" stroke-linejoin="round">{streams}</g>
-<g fill="none" stroke="{pal["road_edge"]}" stroke-linecap="round" stroke-linejoin="round">{road_edge}</g>
-<g fill="none" stroke="{pal["road"]}" stroke-linecap="round" stroke-linejoin="round">{road}</g>
-<image href="data:image/png;base64,{shade}" x="0" y="0" width="{gw:.1f}" height="{gh:.1f}" preserveAspectRatio="none" style="mix-blend-mode:multiply"/>
+<g stroke="{pal["stream"]}" {line}>{streams}</g>
+<g stroke="{pal["road_edge"]}" {line}>{road_edge}</g>
+<g stroke="{pal["road"]}" {line}>{road}</g>
+{shading}
 <g filter="url(#shadow)">
 <path d="{stands}" fill="{pal["stand"]}" stroke="{pal["building_edge"]}" stroke-width="0.6"/>
 <path d="{blocks}" fill="{pal["building"]}" stroke="{pal["building_edge"]}" stroke-width="0.6"/>

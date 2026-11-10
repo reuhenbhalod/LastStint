@@ -1,6 +1,8 @@
 # Realistic redesign
 
-Status: in progress on the `realistic-ui` branch. Tested on localhost before any PR.
+Status: built on the `realistic-ui` branch (not merged). Every screen is in the new look; all 18
+circuits with a track outline (the 40 races that have one) have their real ground. Lint, types,
+unit tests (web and pipeline) and the end-to-end race pass. For testing on localhost.
 
 The whole game gets the realistic look from the design board ("Realistic · complete"): the race
 over the real ground around each circuit, seen from above, with glass panels floating over it. The
@@ -46,6 +48,20 @@ game itself doesn't change: every call, panel and control stays where the player
   - Theme tokens live in `index.css`. Components use the tokens and the shared glass classes
     instead of hard-coded greys.
 - **The 3D view stays parked.** Its switch and code are untouched.
+
+## Circuits
+
+Monza, Spa, Bahrain, Suzuka, the Hungaroring, Yas Marina, the Red Bull Ring (Austria and
+Styria), Montreal, Shanghai, Paul Ricard, Mexico City, Miami, Zandvoort, Portimão, Sochi, Jeddah,
+Barcelona and the Circuit of the Americas. Each race's outline sits on its circuit's image to
+within 1 to 4 m (Abu Dhabi 2020, run on the old layout, 7 m).
+
+- **Sochi** has no lap tagged as a raceway (it runs on the Olympic Park's roads). There the game's
+  own outline is fitted onto the real roads (`align_to_roads`) and stands in for the lap.
+- **The lap search is bounded.** Paul Ricard's dozens of layouts made the search hang, so it now
+  stops after a set number of steps and keeps the 300 laps nearest the official length.
+- **Races with no outline** (Monaco, Singapore, Silverstone, Australia, Brazil, the 70th
+  Anniversary and the extra years at some circuits) have no map, as before.
 
 ## Phases
 

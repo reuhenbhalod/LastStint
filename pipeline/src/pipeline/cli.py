@@ -108,7 +108,7 @@ def outline_cmd(
 
 @app.command("basemap")
 def basemap_cmd(
-    circuits: list[str] = typer.Argument(None, help="Circuits (default: every one with scenery)"),
+    circuits: list[str] = typer.Argument(None, help="Circuits (default: all with scenery)."),  # noqa: B008
 ) -> None:
     """Write the ground under the 2D map: cache/basemap/<circuit>.svg (in metres),
     data/basemap/index.json (where each race's outline sits on it) and the images,
@@ -122,7 +122,7 @@ def basemap_cmd(
 
 @app.command("scenery")
 def scenery_cmd(
-    circuits: list[str] = typer.Argument(None, help="Circuits, e.g. spa (default: all five)."),  # noqa: B008
+    circuits: list[str] = typer.Argument(None, help="Circuits, e.g. spa (default: all)."),  # noqa: B008
 ) -> None:
     """Write data/scenery/<circuit>.json: the 3D view's scenery (network: OpenStreetMap and
     the Terrarium terrain tiles; cached in cache/scenery)."""
