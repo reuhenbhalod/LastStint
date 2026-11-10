@@ -1870,8 +1870,11 @@ export function stepLap(run: Run): RaceState {
         behind !== undefined
           ? (prevTime[behind] as number) - (prevTime[code] as number)
           : Number.POSITIVE_INFINITY;
-      // Era rules (minStops): never skipped when the rival needs it for the minimum.
-      const needed = stopsOwed(model.rules, c) > c.strategy.length - 1;
+      // Era rules (minStops): never skipped when the rival needs it for the minimum. In a
+      // refuelling race it's never skipped either: the fill before it ran only to this stop,
+      // so skipping it would leave the car dry on the last laps.
+      const needed =
+        stopsOwed(model.rules, c) > c.strategy.length - 1 || model.rules?.refuelling === true;
       if (
         !needed &&
         gapBehind <= (stopLoss(run, stop, lap) ?? stopCost(run, code, flag, false, lap))
