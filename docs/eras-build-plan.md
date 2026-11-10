@@ -292,7 +292,7 @@ pinned version; tests run on cached fixtures only.
 
 ## Phase 3: Races, wave A (10%)
 
-The 43 races in the appendix that need **no new sim model** (Needs column: "none", "wet model
+The 44 races in the appendix that need **no new sim model** (Needs column: "none", "wet model
 (exists)" or "P4 map" only).
 
 **3.1 Build and validate (8%)**
@@ -331,7 +331,7 @@ for every existing race.
 
 ## Phase 5: Races, wave B (13%)
 
-**5.1 Build and validate the other 57 races (11%)**
+**5.1 Build and validate the other 56 races (11%)**
 - As in 3.1, as each race's models from phase 4 land.
 - Reconstructed races are checked on their anchors (eras spec §4) instead of G1.
 - **Done when:** every race in the appendix is pass, or flagged to the owner with a diagnosis.
@@ -535,14 +535,14 @@ The **Needs** column is from race history and must be checked against the data f
 | 7 | `abu-dhabi-2016` | TUM | P4 map |  |
 | 6 | `bahrain-2012` | Jolpica (est. compounds) | P4 map |  |
 | 6 | `abu-dhabi-2010` | Jolpica + F1DB stops (est. compounds) | P4 map |  |
-| 6 | `china-2011` | Jolpica (est. compounds) | P4 map |  |
+| 6 | `germany-2013` | Jolpica (est. compounds) | P4 map |  |
 | 6 | `italy-2010` | Jolpica + F1DB stops (est. compounds) | P4 map |  |
 | 6 | `australia-2013` | Jolpica (est. compounds) | P4 map |  |
 | 6 | `europe-2012` | Jolpica (est. compounds) | P4 map |  |
-| 6 | `abu-dhabi-2012` | Jolpica (est. compounds) | P4 map |  |
-| 6 | `brazil-2012` | Jolpica (est. compounds) | R3 wet pre-2018, P4 map |  |
+| 6 | `germany-2012` | Jolpica (est. compounds) | P4 map |  |
+| 6 | `china-2013` | Jolpica (est. compounds) | P4 map |  |
 | 6 | `malaysia-2013` | Jolpica (est. compounds) | R3 wet pre-2018, P4 map |  |
-| 6 | `spain-2013` | Jolpica (est. compounds) | P4 map |  |
+| 6 | `abu-dhabi-2011` | Jolpica (est. compounds) | P4 map |  |
 | 5 | `san-marino-2005` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
 | 5 | `europe-2009` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |
 | 5 | `france-2007` | Jolpica + f1db (est. compounds, fuel) | R4 refuel, P4 map |  |

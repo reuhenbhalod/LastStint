@@ -1357,6 +1357,69 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
+    # Era 6 swaps, second round (owner, Nov 9; docs/eras-checks/swap-races-era6-overnight.md),
+    # each in the slot of the race it replaced. Sides from a local `pipeline hard-calls` run;
+    # authoring (B1) writes them to the overlays.
+    "abu-dhabi-2011": {
+        "year": 2011,
+        "event": "Abu Dhabi",
+        "source": "jolpica",
+        "name": "Abu Dhabi 2011: Hamilton vs Alonso",
+        "era": "2010-2013",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for spain-2013. Hard calls HAM 3, ALO 1 (local run): Hamilton leads once
+        # Vettel's lap-1 puncture puts him out, with Alonso 2-4 s behind (real: HAM P1).
+        "user_side": "HAM",
+        "rival": "ALO",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "china-2013": {
+        "year": 2013,
+        "event": "Chinese",
+        "source": "jolpica",
+        "name": "China 2013: Alonso vs Räikkönen",
+        "era": "2010-2013",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for brazil-2012. Hard calls ALO 2, RAI 1 (local run): Alonso's three stops
+        # from P3 (real: ALO P1).
+        "user_side": "ALO",
+        "rival": "RAI",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "germany-2012": {
+        "year": 2012,
+        "event": "German",
+        "source": "jolpica",
+        "name": "Germany 2012: Button vs Vettel",
+        "era": "2010-2013",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for abu-dhabi-2012. Hard calls BUT 2, VET 0 (local run): Button's last stop
+        # a lap before Vettel's (real: BUT P2, behind Alonso).
+        "user_side": "BUT",
+        "rival": "VET",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "germany-2013": {
+        "year": 2013,
+        "event": "German",
+        "source": "jolpica",
+        "name": "Germany 2013: Räikkönen vs Vettel",
+        "era": "2010-2013",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for china-2011. Hard calls RAI 1, VET 0 (local run): Räikkönen's late stop
+        # for softs while leading (real: RAI P2, behind Vettel).
+        "user_side": "RAI",
+        "rival": "VET",
+        "score_positions": 6,
+        "split": "eras",
+    },
     "canada-2014": {
         "year": 2014,
         "event": "Canada",

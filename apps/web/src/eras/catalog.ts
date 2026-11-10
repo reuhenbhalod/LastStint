@@ -233,7 +233,10 @@ const RACE_TABLE: Record<number, ReadonlyArray<readonly [string, string]>> = {
       "Räikkönen closes in on Lotus' fresher softs: cover the undercut at the last stop, or trust Red Bull's own plan",
     ],
     ['abu-dhabi-2010', 'Ferrari covers the wrong car and loses the title'],
-    ['china-2011', "Hamilton's three stops beat Vettel's two"],
+    [
+      'germany-2013',
+      'Räikkönen inherits the lead when Vettel and Grosjean make their last stops: run to the flag on ageing tyres, or stop for softs and hunt Vettel down',
+    ],
     [
       'italy-2010',
       'Button blinks first: does Alonso stay out one more lap and trust his crew to win it in the pit lane?',
@@ -243,10 +246,19 @@ const RACE_TABLE: Record<number, ReadonlyArray<readonly [string, string]>> = {
       'Lotus is kind to its tyres: stretch Räikkönen to two stops while the Ferraris and Red Bulls stop three times',
     ],
     ['europe-2012', 'Alonso wins from 11th in Valencia'],
-    ['abu-dhabi-2012', 'Vettel from the pit lane to the podium'],
-    ['brazil-2012', 'Vettel recovers from a first-lap spin to win the title'],
+    [
+      'germany-2012',
+      'Button sits third behind Alonso and Vettel: bring the last stop forward a lap to jump the Red Bull, then chase the Ferrari on fresher tyres',
+    ],
+    [
+      'china-2013',
+      "Ferrari's softs last only a handful of laps: commit Alonso to three stops and find a way past the cars running long on mediums",
+    ],
     ['malaysia-2013', 'Multi 21 team orders'],
-    ['spain-2013', 'Alonso wins on four stops'],
+    [
+      'abu-dhabi-2011',
+      'Three seconds clear of Alonso on the same tyres: box first for the last stint to cover the undercut, or stay out and risk Ferrari going longer',
+    ],
   ],
   5: [
     ['san-marino-2005', 'Alonso holds off Schumacher'],
