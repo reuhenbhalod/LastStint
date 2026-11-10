@@ -1,8 +1,8 @@
 // The 3D race view (docs/3d-spec.md): on or off, and for whom.
 //
-// THE SWITCH: set SCENE_3D to false and the game is back to the 2D track map alone (with the
-// main cars' icons), everywhere. Nothing else needs to change.
-export const SCENE_3D = true;
+// THE SWITCH is SCENE_3D, in switch.ts.
+import { SCENE_3D } from './switch.js';
+export { SCENE_3D };
 
 /** Computers only: a wide screen, a mouse or trackpad. Phones and tablets keep the 2D map. */
 export const DESKTOP = '(min-width: 900px) and (hover: hover) and (pointer: fine)';

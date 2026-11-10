@@ -12,10 +12,11 @@ import {
   useState,
 } from 'react';
 import type { CameraMode } from './Scene3D.js';
-import { saveView, savedView, use3D } from './enabled.js';
+import { SCENE_3D, saveView, savedView, use3D } from './enabled.js';
 import { type MapFeed, circuitFor } from './scenery.js';
 
-const Scene3D = lazy(() => import('./Scene3D.js'));
+// Behind the switch, so with SCENE_3D off the 3D code isn't built at all.
+const Scene3D = SCENE_3D ? lazy(() => import('./Scene3D.js')) : null;
 
 const MAIN = 'absolute inset-0 z-0';
 const CORNER =
@@ -50,7 +51,7 @@ export function RaceStage({
   const [camera, setCamera] = useState<CameraMode>('overview');
   const onReady = useCallback(() => setReady(true), []);
   const onFail = useCallback(() => setFailed(true), []);
-  if (!on || failed || !circuit) return <>{children}</>;
+  if (!Scene3D || !on || failed || !circuit) return <>{children}</>;
   // Until the 3D view has built, the 2D map stays the main view.
   const main3D = view === '3d' && ready;
   const swap = () => {

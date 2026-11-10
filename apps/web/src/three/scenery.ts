@@ -1,6 +1,8 @@
 // A circuit's 3D scenery (data/scenery, written by `pipeline scenery`; docs/3d-spec.md), and
 // where a car on the game's lap is in it.
 
+import { SCENE_3D } from './switch.js';
+
 export interface SceneryRace {
   /** The game's outline (2D map units) into the scenery: world = M · p + t. */
   m: [number, number, number, number];
@@ -40,7 +42,10 @@ export interface Scenery {
   credit: string;
 }
 
-const FILES = import.meta.glob<{ default: Scenery }>('../../../../data/scenery/*.json');
+// Behind the switch, so with SCENE_3D off the scenery files aren't built at all.
+const FILES: Record<string, () => Promise<{ default: Scenery }>> = SCENE_3D
+  ? import.meta.glob<{ default: Scenery }>('../../../../data/scenery/*.json')
+  : {};
 
 /** Which races have scenery: the circuit file's name by race id prefix. */
 const CIRCUIT_OF: Record<string, string> = {

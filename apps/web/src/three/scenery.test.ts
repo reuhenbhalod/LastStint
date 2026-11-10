@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { type SceneryRace, circuitFor, lapIndex, toWorld } from './scenery.js';
+import { SCENE_3D } from './switch.js';
 
 const race = (frac: number[]): SceneryRace => ({
   m: [2, 0, 0, -2],
@@ -11,7 +12,12 @@ const race = (frac: number[]): SceneryRace => ({
 });
 
 describe('3D scenery', () => {
-  it('has scenery for the five circuits and no others', () => {
+  it.runIf(!SCENE_3D)('has no scenery anywhere while the 3D view is switched off', () => {
+    expect(circuitFor('belgium-2024')).toBeNull();
+    expect(circuitFor('italy-2024')).toBeNull();
+  });
+
+  it.runIf(SCENE_3D)('has scenery for the five circuits and no others', () => {
     expect(circuitFor('belgium-2024')).toBe('spa');
     expect(circuitFor('italy-2019')).toBe('monza');
     expect(circuitFor('bahrain-2022')).toBe('bahrain');

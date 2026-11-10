@@ -1,6 +1,9 @@
 # 3D race view
 
-Status: built for five circuits, on the `graphics-3d` branch, not merged. For testing on localhost.
+Status: **parked, switched off** (2026-11-10). Built for five circuits and tested, then turned off
+for this release. Players get the 2D track map, with icons for the two main cars, everywhere. All
+the code, the scenery files and the pipeline stay in the repo so a later release can pick up from
+here (see "Picking it back up").
 
 ## What it is
 
@@ -69,12 +72,26 @@ The five versus tracks are the same five, so versus gets the 3D view too.
 - Automated browsers (the e2e tests) keep the 2D map. Add `?view=3d` to show 3D in a headless
   desktop browser.
 
+## Picking it back up
+
+1. In `apps/web/src/three/switch.ts`, set `SCENE_3D = true`. That is the only change needed: the
+   3D view comes back exactly as it was built.
+2. Test on localhost with the URLs above.
+3. While the switch is off, the build leaves out the 3D code and the scenery files entirely
+   (both sit behind the switch: the `Scene3D` import in `RaceStage.tsx` and the scenery files in
+   `scenery.ts`), so nothing of the 3D view reaches players. One scenery test runs only with the
+   switch on, and its twin checks that no race has scenery while it's off.
+4. To add circuits: add them to `CIRCUITS` in `pipeline/src/pipeline/scenery.py`, run
+   `pipeline scenery <circuit>`, and add the races to `CIRCUIT_OF`/`RACES` in `scenery.ts`.
+5. Where it most needs work, if it comes back: the cars and trees up close, building detail and
+   the lighting. The goal was "as close to F1 25 as possible"; it reached a clean game world.
+
 ## Scrapping it
 
 To go back to the normal track map with icons for the two main cars, there are three options.
 
-1. **Quickest, leaves the code in:** in `apps/web/src/three/enabled.ts`, set `SCENE_3D = false`.
-   The race screen is then the 2D map with the car icons everywhere.
+1. **Quickest, leaves the code in (what's done now):** `SCENE_3D = false` in
+   `apps/web/src/three/switch.ts`. The race screen is then the 2D map with the car icons everywhere.
 2. **Clean, never merge the branch:** the car icons alone are the commit tagged `before-3d`. Start
    a branch from it with `git switch -c car-icons before-3d` and merge that one instead.
 3. **Clean, after merging:** revert the 3D commits (everything after `before-3d`). The car icons
