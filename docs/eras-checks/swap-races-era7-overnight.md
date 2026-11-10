@@ -335,6 +335,46 @@ Simulator check: passed (1.97 s).
 | Suggested side and target | Vettel: `win` (beat Hamilton, P1). He finished 2nd, 5.0 s behind, so he did not really win; a rewrite is allowed. If Hamilton is picked: `win` from pole; he really won, so no rewrite. | |
 | Modelling risk | **Medium.** For: dry, one VSC, no SC/red flag, no front-runner contact after lap 1, sim check passed (1.97 s). Against: the counterfactual (Vettel stays out and one-stops) depends entirely on the sim reproducing unusually low wear in cold conditions; the VSC lap (10/11) and Vettel's stop laps differ between sources; compounds conflict for Hamilton (AS/MS soft vs GPE ultrasoft), Verstappen and Ricciardo; Vettel's lock-ups (laps 56, 61) cost ~2.4 s that the sim will not reproduce; Rosberg's lap-1 off and puncture shape the mid-field order. | |
 
+### Authored (B1, Nov 9 2026)
+
+Eras job B1 on branch `eras-author-canada-2016` (base `eras-swap-era7`). Every row rests on the
+facts table above (same sources) or on Timing: `data/raw/canada-2016.parquet` (TUM, CC BY-NC-SA
+3.0) as built into `data/races/canada-2016.json`. Model compounds: SOFT = ultrasoft, MEDIUM =
+supersoft, HARD = soft. The storyline and briefing are original wording; no team radio is quoted.
+
+- Side: **HAM** (`pipeline hard-calls`: HAM 1, VET 0; chance given up HAM 0.0, VET 8.7 pts),
+  not the draft's Vettel. Registry side and rival swapped in `pipeline/src/pipeline/build.py`
+  (`user_side` HAM, `rival` VET, name "Canada 2016: Hamilton vs Vettel").
+- Robust G1 (`pipeline validate canada-2016 --robust`, Eras build as HAM with this overlay):
+  **pass** (strict), mean gap error 1.97 s.
+- Reachability (`pnpm --filter @laststint/sim reachability canada-2016`): **pass** at era
+  difficulty (threshold 78, Standard+ rival) and at Legend (90, Expert), all three stars and the
+  hidden objective (seed 2: standard, standard, box-hard on lap 24, stay on lap 37). The
+  stay-out path never earns ★1 or ★3.
+- Moments (`pnpm --filter @laststint/sim author canada-2016 --target win --eras --write`):
+  pace-12, pace-16, stop-24, rivalpit-37 (`data/moments/canada-2016.json`). The tool rates the
+  lap-11 VSC call "no-tension" for Hamilton (stay 83%, box 48% or less), so it is not a moment:
+  Hamilton plays the side of the dilemma that stayed out.
+
+| Item | Value | Fact it rests on | Source | Owner checked |
+|---|---|---|---|---|
+| Target | `win` (Hamilton from P2 at the takeover) | Hamilton won; HAM P2 behind VET at the end of lap 8 (takeover lap, D3 rule) | J-res; Timing | |
+| Rewrite | none: the side really won | Hamilton 1st | J-res | |
+| Storyline | "Vettel jumps both Mercedes at the start and leads" | Vettel passed both Mercedes to lead into Turn 1 | AS, MS, GPE | |
+| Storyline | "Ferrari pits him under the virtual safety car on lap 11 and commits to two stops" | Vettel's 1st stop under the VSC, end of lap 11 (GPE says 10); two stops | AS, J-pit | |
+| Storyline | "Hamilton stays out, makes his only stop on lap 24 for softs" | Hamilton stayed out under the VSC; one stop, lap 24, to softs (GPE's ultrasoft conflicts; AS/MS taken) | J-pit, AS, MS | |
+| Storyline | "takes the lead when Vettel stops again on lap 37" | Vettel's 2nd stop lap 37 (MS 36); HAM P1 at the end of lap 37 | J-pit, GPE; Timing | |
+| Storyline | "wins by 5.011 s" | Vettel +5.011 | J-res | |
+| Briefing | "Vettel jumped both Mercedes at the start" | as above | AS, MS, GPE | |
+| Briefing | "you run Hamilton second, about a second behind, eight laps in" | HAM P2, 1.3 s behind VET at the end of lap 8 | Timing | |
+| Briefing | "It's cold, and Mercedes is aiming for one stop. Ferrari may not be." | 12 C air; Mercedes, Red Bull and Williams aimed for one stop, Ferrari expected rivals to two-stop | WP, MS | |
+| Mastery | `stop_count` exact 1: "Win on one stop, as Hamilton did" | Hamilton's one stop | J-pit, AS, MS | |
+| Hidden | `compound_rule` mustAvoid MEDIUM: "Never fit the medium tyre" | the game's choice; Hamilton ran ultrasoft then soft (model SOFT then HARD), never the supersoft | AS, MS; Timing | |
+| storylineEvents | [11, VSC] (Button's engine failure), kept in Legend | one VSC for Button (MS lap 10; Button classified at 9 laps); the built model's VSC is lap 11, one lap | MS, J-res, 2.6 | |
+
+Rejected objectives (reachability at Legend): mastery margin > 5.1 s (beat the real 5.011 s) and
+hidden margin > 5 s; Legend's winning path doesn't reach either.
+
 ## malaysia-2015 (2015 Malaysian Grand Prix)
 
 Replaces `great-britain-2016` in Era 7 #9.
