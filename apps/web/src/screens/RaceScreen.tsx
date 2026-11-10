@@ -997,13 +997,12 @@ export function RaceScreen({
                 </span>
               )}
             </div>
-            {/* The map fills its box: the real ground runs edge to edge under the panels. */}
-            <div className="absolute inset-0">
+            <div className="relative min-h-0 flex-1">
               {/* Focus view: the leaders, TV style (stats view has the full tower instead). */}
               {!stats && (
                 <div
                   data-tour="leaders"
-                  className={`absolute left-3 top-12 z-10 origin-top-left scale-[0.82] md:block md:scale-100 ${tight ? 'hidden' : ''}`}
+                  className={`absolute left-3 top-2 z-10 origin-top-left scale-[0.82] md:block md:scale-100 ${tight ? 'hidden' : ''}`}
                 >
                   <LeadersTower
                     race={state.race}
@@ -1015,7 +1014,11 @@ export function RaceScreen({
                   />
                 </div>
               )}
-              <div className="absolute inset-0">
+              {/* The circuit's frame, as before: clear of the leaders' panel and the edges. The
+                  ground is drawn beyond it, so it still fills the whole box. */}
+              <div
+                className={`absolute inset-y-2 right-2 transition-[left] duration-500 ${stats ? 'left-2' : tight ? 'left-2 md:left-[190px]' : 'left-[150px] md:left-[190px]'}`}
+              >
                 {outline ? (
                   <RaceStage
                     raceId={model.race.id}
@@ -1040,7 +1043,6 @@ export function RaceScreen({
                       userBox={userBox}
                       motionRef={motion}
                       feedRef={feed}
-                      align={!stats && !tight ? 'right' : 'center'}
                     />
                   </RaceStage>
                 ) : (

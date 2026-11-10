@@ -554,7 +554,6 @@ export function TrackMap({
   dim,
   finishing = null,
   battle = null,
-  align = 'center',
   flash = null,
   ahead = null,
   userBox = null,
@@ -578,9 +577,7 @@ export function TrackMap({
   finishing?: { lapMs: number; onCrossed: () => void } | null;
   /** A battle this lap (battles and trust spec): drawn on the track, the camera on it. */
   battle?: BattleView | null;
-  /** Where the circuit sits when its box is wider than it: centred, or to the right (the
-   * leaders' panel floats over the ground on the left). */
-  align?: 'center' | 'right';
+
   /** The lap being shown, run ahead (GameSession.previewLap): cars move toward its gaps all
    * lap, a car that retires on it stops on track, a puncture shows. */
   ahead?: { race: RaceState; notes: RaceNote[] } | null;
@@ -794,7 +791,8 @@ export function TrackMap({
       // Phone/tablet: full width at the outline's shape. Laptop: fills its box (the rest of the
       // column), keeping the shape.
       className="absolute inset-0 block h-full w-full"
-      preserveAspectRatio={align === 'right' ? 'xMaxYMid meet' : 'xMidYMid meet'}
+      // The ground runs on past the circuit's frame, to the edges of the map's box.
+      overflow="visible"
       aria-labelledby="track-map-title"
     >
       <title id="track-map-title">{`Track map, lap ${race.lap}. Select a car for its details.`}</title>
