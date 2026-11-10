@@ -98,7 +98,7 @@ Players start at Era 10 and move back through the timeline to Era 1. The eras be
 | 1 | bahrain-2014 | Hamilton vs Rosberg, the Duel in the Desert | defend: Hamilton holds off Rosberg |
 | 2 | brazil-2014 | Stay out to overcut your team-mate on fading rears, or pit with him and fight on track? | win: Hamilton from P2, ahead of Rosberg |
 | 3 | canada-2016 | A virtual safety car hands Ferrari a cheap stop from the lead: take it and commit to two, or stay out and trust the tyres to last in the cold? | win: Vettel beats Hamilton |
-| 4 | singapore-2014 | After the safety car Hamilton still owes a stop for the harder tyre: how long can he push to build the gap, while Vettel tries to run his softs to the flag? | defend: Hamilton wins from pole |
+| 4 | singapore-2014 | Second behind Hamilton, who still owes a stop on the harder tyre: make two stops last on the softs, or take a third under the safety car? | position: Vettel holds P2 (rewrite: beat Hamilton) |
 | 5 | abu-dhabi-2015 | Second to your team-mate: stretch the softs, or skip the last stop and gamble on Rosberg's tyres fading? | beat-rival: Hamilton ahead of Rosberg |
 | 6 | united-states-2015 | Hamilton clinches the title in mixed conditions | beat-rival: Hamilton ahead of Rosberg and Vettel for the title |
 | 7 | spain-2016 | Mercedes cars collide; Red Bull's split strategy | defend: Verstappen holds off Räikkönen |
