@@ -298,6 +298,18 @@ def without_fault_laps(
     return frame[~fault_laps(frame, facts, laps)]
 
 
+def without_laps(frame: pd.DataFrame, skip: dict[str, list[int]] | None) -> pd.DataFrame:
+    """`frame` less a car's laps that a source says weren't racing laps (the registry's
+    `pace_skip`, Eras builds only: e.g. a driver told to save his tyres after a restart), so
+    the car's pace is fitted on its racing laps. The race replays them as it does any lap."""
+    if not skip:
+        return frame
+    drop = pd.Series(False, index=frame.index)
+    for code, laps in skip.items():
+        drop |= (frame["Driver"] == code) & frame["LapNumber"].isin([int(n) for n in laps])
+    return frame[~drop]
+
+
 def lap_cost(event: dict, lap: int, green: bool) -> float:
     """What the fault adds to its car's lap `lap` while it lasts: the pace loss on a green
     lap, plus the slow lap on its own lap. (Whether it lasts is FaultState's job.)"""

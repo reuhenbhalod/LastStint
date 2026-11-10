@@ -1579,6 +1579,23 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
+    "saudi-arabia-2023": {
+        "year": 2023,
+        "event": "Saudi Arabia",
+        "source": "openf1",  # FastF1 needs F1TV since Oct 2026 (pipeline/openf1.py)
+        "name": "Saudi Arabia 2023: Pérez vs Verstappen",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Candidate for Era 10 (measured only). Side to be set by `pipeline hard-calls`.
+        # pace_skip: VER was told to manage his tyres after the SC restart until DRS was
+        # enabled on lap 23 (Autosport; docs/eras-checks/fix-saudi-arabia-2023.md).
+        "pace_skip": {"VER": [21, 22]},
+        "user_side": "PER",
+        "rival": "VER",
+        "score_positions": 6,
+        "split": "eras",
+    },
     "great-britain-2023": {
         "year": 2023,
         "event": "United Kingdom",  # OpenF1's country_name is the lookup key
@@ -2447,13 +2464,17 @@ def dry_fit(
     raw_dir: Path = RAW_DIR,
     recon: dict | None = None,
     quad_priors: dict | None = None,
+    pace_skip: dict[str, list[int]] | None = None,
 ) -> DryFit:
     """The dry lap model. A refuelling race's `laps` carry the Tank and FuelLap columns
     (refuel.with_fuel_columns): the fuel term is fitted on the sim's sawtooth. `recon`: a
     reconstructed race's sidecar (load_reconstruction); wet on every lap, it gives the dry
     pace instead (solver_dry_fit). A real-timing race wet on every lap can't be built.
-    `quad_priors` (Eras builds, wear_shape.quad_priors): quadratic wear per dry compound."""
+    `quad_priors` (Eras builds, wear_shape.quad_priors): quadratic wear per dry compound.
+    `pace_skip` (Eras builds, faults.without_laps): sourced laps that weren't racing laps."""
     clean_df, traffic_df, _ = clean.clean_laps(laps)
+    clean_df = faults.without_laps(clean_df, pace_skip)
+    traffic_df = faults.without_laps(traffic_df, pace_skip)
     # A faulted car's laps while the fault lasts aren't its pace (faults.py fits the loss).
     clean_df = faults.without_fault_laps(clean_df, fault_facts or [], laps)
     traffic_df = faults.without_fault_laps(traffic_df, fault_facts or [], laps)
@@ -2679,7 +2700,10 @@ def build_race(
             race_id, sidecar.get("results"), Path(raw_dir) / "f1db"
         )
 
-    dry = dry_fit(race_id, laps, meta["era"], fault_facts, raw_dir, recon, quad_priors)
+    # A car's laps that a source says weren't racing laps stay out of its pace fits (Eras
+    # builds only; registry `pace_skip`, facts in docs/eras-checks).
+    pace_skip = meta.get("pace_skip") if eras_build else None
+    dry = dry_fit(race_id, laps, meta["era"], fault_facts, raw_dir, recon, quad_priors, pace_skip)
     clean_df, traffic_df, fitted = dry.clean, dry.traffic, dry.fitted
     weather = wet.weather_block(laps, dry.rain, fitted, wet.load_curves()) if dry.wet else None
     # Eras sim fixes (a race whose file takes its Eras overlay; never a Daily/Gauntlet race,
@@ -2788,6 +2812,7 @@ def build_race(
         # solved to its anchors, so their stint residuals are the solver's, not the drivers').
         stint_pace=eras_build and recon is None,
         dirty_air=dirty,
+        pace_skip=pace_skip,
     )
     if eras_build and recon is None:
         missing = sorted(running_at(laps, takeover) - {d["code"] for d in model["drivers"]})
