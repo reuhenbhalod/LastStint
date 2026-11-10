@@ -27,6 +27,9 @@ your initials and the date in **Owner checked**.
 | WP-GER86 | https://en.wikipedia.org/wiki/1986_German_Grand_Prix |
 | AS-GER86 | https://www.autosport.com/f1/feature/3783/grand-prix-gold-german-gp-1986 |
 | WP-AUS94 | https://en.wikipedia.org/wiki/1994_Australian_Grand_Prix |
+| MS-GBR21 | https://www.motorsportmagazine.com/articles/single-seaters/f1/hamilton-claws-his-way-back-to-silverstone-win-after-verstappen-crash-2021-british-gp-lap-by-lap-report/ |
+| AS-GBR21 | https://www.autosport.com/f1/news/f1-british-gp-hamilton-wins-despite-penalty-for-verstappen-crash/6633130/ |
+| GPE-GBR21 | https://www.grandprix.com/races/british-gp-2021-race-analysis.html |
 | Timing | The race's lap positions in `data/raw/<id>.parquet` (FastF1 2018+, Jolpica 1996+) |
 
 ## Team orders and let-bys
@@ -43,6 +46,7 @@ lap or one of the next two green laps (`TEAM_ORDER_LAPS`), and only while the pa
 | europe-1997 | 69 | VIL | COU | The same let-by | WP-EUR97 | The same | |
 | malaysia-1999 | 53 | MSCM | IRV | "Schumacher slowed once again to allow Irvine to retake the lead" (after the second stops) | WP-MAL99 | No lap in WP; the Timing has IRV retaking the lead from MSCM at the end of lap 53. The lap-4 let-by is before the takeover (lap 22), so it isn't entered | |
 | austria-2002 | 71 | BAR | MSCM | Ferrari's order: Barrichello yielded in the last 100 to 50 yards and finished 0.182 s behind | WP-AUT02 | Last lap (71 of 71); Timing agrees | |
+| great-britain-2021 | 40 | BOT | HAM | Mercedes told Bottas to let Hamilton by; he did, at Stowe | MS-GBR21, AS-GBR21, GPE-GBR21 | All three say lap 40; Timing agrees (HAM ahead from the end of lap 40) | |
 
 Not entered: Malaysia 1999's "Schumacher ... block[ed] the McLarens" (holding a car up isn't a
 swap), and the earlier, undated "Schumacher slowed again in order to allow Irvine to build an

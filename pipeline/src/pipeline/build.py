@@ -1534,12 +1534,14 @@ RACES: dict[str, dict] = {
     "great-britain-2021": {
         "year": 2021,
         "event": "British",
-        "name": "Britain 2021: Hamilton vs Leclerc",
+        "name": "Britain 2021: Leclerc vs Hamilton",
         "era": "2014-2025",
         "takeover_lap": None,  # D3 rule
         "seed": 1,
-        "user_side": "HAM",
-        "rival": "LEC",  # swapped in for saudi-arabia-2021; side to be set by `pipeline hard-calls`
+        # Swapped in for saudi-arabia-2021. Hard calls tie 0-0; LEC by chance given up (45.0
+        # pts against HAM's 10.3). The lap-2 red flag is before the D3 takeover (lap 24).
+        "user_side": "LEC",
+        "rival": "HAM",
         "score_positions": 6,
         "split": "eras",
     },
