@@ -129,13 +129,17 @@
         {
           "lap": 36,
           "to": "INTERMEDIATE",
-          "loss": 52.772
+          "loss": 52.464
         }
       ],
       "stintPace": [
         {
           "lap": 0,
           "offset": -0.097
+        },
+        {
+          "lap": 36,
+          "offset": 0.266
         }
       ]
     },
@@ -219,13 +223,17 @@
         {
           "lap": 47,
           "to": "INTERMEDIATE",
-          "loss": 71.4
+          "loss": 70.912
         }
       ],
       "stintPace": [
         {
           "lap": 0,
           "offset": -0.046
+        },
+        {
+          "lap": 47,
+          "offset": 0.449
         }
       ]
     },
@@ -368,18 +376,22 @@
         {
           "lap": 36,
           "to": "INTERMEDIATE",
-          "loss": 18.99
+          "loss": 19.553
         },
         {
           "lap": 48,
           "to": "MEDIUM",
-          "loss": 24.525
+          "loss": 25.041
         }
       ],
       "stintPace": [
         {
           "lap": 0,
           "offset": -0.048
+        },
+        {
+          "lap": 36,
+          "offset": -0.474
         },
         {
           "lap": 48,
@@ -407,15 +419,19 @@
         {
           "lap": 41,
           "to": "INTERMEDIATE",
-          "loss": 22.35
+          "loss": 21.803
         },
         {
           "lap": 50,
           "to": "MEDIUM",
-          "loss": 23.285
+          "loss": 22.799
         }
       ],
       "stintPace": [
+        {
+          "lap": 41,
+          "offset": 0.456
+        },
         {
           "lap": 50,
           "offset": -0.354
@@ -574,18 +590,22 @@
         {
           "lap": 36,
           "to": "INTERMEDIATE",
-          "loss": 16.948
+          "loss": 17.576
         },
         {
           "lap": 49,
           "to": "MEDIUM",
-          "loss": 27.921
+          "loss": 28.49
         }
       ],
       "stintPace": [
         {
           "lap": 29,
           "offset": -0.094
+        },
+        {
+          "lap": 36,
+          "offset": -0.534
         },
         {
           "lap": 49,

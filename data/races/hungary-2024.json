@@ -2,7 +2,7 @@
   "schemaVersion": 11,
   "race": {
     "id": "hungary-2024",
-    "name": "Hungary 2024",
+    "name": "Hungary 2024: Piastri vs Norris",
     "laps": 70,
     "takeoverLap": 14,
     "seed": 36730
@@ -850,10 +850,278 @@
       "lap": 68,
       "type": "TEAM_ORDER",
       "driver": "NOR",
-      "other": "PIA"
+      "other": "PIA",
+      "storylineEvent": true
     }
   ],
-  "decisionMoments": [],
+  "decisionMoments": [
+    {
+      "id": "stop-18",
+      "lap": 18,
+      "trigger": "cliff",
+      "target": {
+        "kind": "team",
+        "positions": [
+          2,
+          2
+        ]
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "Stay out",
+          "decisions": []
+        },
+        {
+          "id": "box-soft",
+          "label": "Box, softs",
+          "decisions": [
+            {
+              "lap": 18,
+              "kind": "pit",
+              "compound": "SOFT"
+            }
+          ]
+        },
+        {
+          "id": "box-medium",
+          "label": "Box, mediums",
+          "decisions": [
+            {
+              "lap": 18,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "box-hard",
+          "label": "Box, hards",
+          "decisions": [
+            {
+              "lap": 18,
+              "kind": "pit",
+              "compound": "HARD"
+            }
+          ]
+        },
+        {
+          "id": "box-next-hard",
+          "label": "Box next lap, hards",
+          "decisions": [
+            {
+              "lap": 19,
+              "kind": "pit",
+              "compound": "HARD"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "box-hard"
+    },
+    {
+      "id": "pace-22",
+      "lap": 22,
+      "trigger": "cliff",
+      "target": {
+        "kind": "team",
+        "positions": [
+          2,
+          2
+        ]
+      },
+      "options": [
+        {
+          "id": "push",
+          "label": "Push now",
+          "decisions": [
+            {
+              "lap": 22,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "standard",
+          "label": "Standard pace",
+          "decisions": [
+            {
+              "lap": 22,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "manage",
+          "label": "Manage the tyres",
+          "decisions": [
+            {
+              "lap": 22,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "push-attack",
+          "label": "Push and attack",
+          "decisions": [
+            {
+              "lap": 22,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            },
+            {
+              "lap": 22,
+              "kind": "mode",
+              "key": "battle",
+              "value": "attack"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "pace-26",
+      "lap": 26,
+      "trigger": "cliff",
+      "target": {
+        "kind": "team",
+        "positions": [
+          2,
+          2
+        ]
+      },
+      "options": [
+        {
+          "id": "push",
+          "label": "Push now",
+          "decisions": [
+            {
+              "lap": 26,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "standard",
+          "label": "Standard pace",
+          "decisions": [
+            {
+              "lap": 26,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "manage",
+          "label": "Manage the tyres",
+          "decisions": [
+            {
+              "lap": 26,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "push-attack",
+          "label": "Push and attack",
+          "decisions": [
+            {
+              "lap": 26,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            },
+            {
+              "lap": 26,
+              "kind": "mode",
+              "key": "battle",
+              "value": "attack"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "stop-47",
+      "lap": 47,
+      "trigger": "cliff",
+      "target": {
+        "kind": "team",
+        "positions": [
+          2,
+          2
+        ]
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "Stay out",
+          "decisions": []
+        },
+        {
+          "id": "box-soft",
+          "label": "Box, softs",
+          "decisions": [
+            {
+              "lap": 47,
+              "kind": "pit",
+              "compound": "SOFT"
+            }
+          ]
+        },
+        {
+          "id": "box-medium",
+          "label": "Box, mediums",
+          "decisions": [
+            {
+              "lap": 47,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "box-hard",
+          "label": "Box, hards",
+          "decisions": [
+            {
+              "lap": 47,
+              "kind": "pit",
+              "compound": "HARD"
+            }
+          ]
+        },
+        {
+          "id": "box-next-hard",
+          "label": "Box next lap, hards",
+          "decisions": [
+            {
+              "lap": 48,
+              "kind": "pit",
+              "compound": "HARD"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "box-medium"
+    }
+  ],
   "candidateMomentLaps": [
     15,
     17,
@@ -898,8 +1166,38 @@
     "ZHO",
     "GAS"
   ],
-  "userSide": "NOR",
-  "rival": "PIA",
+  "userSide": "PIA",
+  "rival": "NOR",
+  "eras": {
+    "eraId": 10,
+    "order": 7,
+    "userSide": "PIA",
+    "target": {
+      "type": "team",
+      "positions": [
+        2,
+        2
+      ]
+    },
+    "storyline": {
+      "real": "Piastri leads from the first corner, but Norris gets ahead with the earlier second stop. McLaren tell Norris to give the place back; he does on lap 68, and Piastri takes his first win by 2.1 s, McLaren's first one-two since Italy 2021."
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 2,
+      "label": "McLaren one-two on two more stops, as Piastri made"
+    },
+    "hidden": {
+      "type": "compound_rule",
+      "mustAvoid": "SOFT",
+      "label": "McLaren one-two without running the soft tyre"
+    },
+    "hardCalls": {
+      "NOR": 0,
+      "PIA": 2
+    },
+    "briefing": "Hungaroring, 2024. Norris and Piastri lock out the front row, McLaren's first since Brazil 2012, and Piastri takes the lead from Norris at the start. You run Piastri, 3.4 s ahead of Norris after 14 laps. Bring the McLarens home one-two."
+  },
   "rules": {
     "twoCompound": true,
     "tyreChanges": true,

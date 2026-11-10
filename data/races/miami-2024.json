@@ -681,7 +681,8 @@
     {
       "lap": 28,
       "type": "SC",
-      "laps": 5
+      "laps": 5,
+      "pickup": "VER"
     },
     {
       "lap": 29,

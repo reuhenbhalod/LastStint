@@ -83,7 +83,13 @@
         {
           "lap": 45,
           "to": "INTERMEDIATE",
-          "loss": 23.141
+          "loss": 23.419
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 45,
+          "offset": -0.264
         }
       ]
     },
@@ -129,7 +135,13 @@
         {
           "lap": 45,
           "to": "INTERMEDIATE",
-          "loss": 25.919
+          "loss": 26.198
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 45,
+          "offset": -0.267
         }
       ]
     },
@@ -154,7 +166,13 @@
         {
           "lap": 45,
           "to": "INTERMEDIATE",
-          "loss": 44.163
+          "loss": 44.858
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 45,
+          "offset": -0.652
         }
       ]
     },
@@ -207,6 +225,12 @@
           "to": "INTERMEDIATE",
           "loss": 22.252
         }
+      ],
+      "stintPace": [
+        {
+          "lap": 47,
+          "offset": 0.459
+        }
       ]
     },
     {
@@ -234,6 +258,12 @@
           "lap": 48,
           "to": "INTERMEDIATE"
         }
+      ],
+      "stintPace": [
+        {
+          "lap": 48,
+          "offset": 0.098
+        }
       ]
     },
     {
@@ -260,7 +290,13 @@
         {
           "lap": 45,
           "to": "INTERMEDIATE",
-          "loss": 23.396
+          "loss": 24.013
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 45,
+          "offset": -0.582
         }
       ]
     },
@@ -312,6 +348,12 @@
           "lap": 48,
           "to": "INTERMEDIATE"
         }
+      ],
+      "stintPace": [
+        {
+          "lap": 48,
+          "offset": 0.212
+        }
       ]
     },
     {
@@ -338,7 +380,13 @@
         {
           "lap": 45,
           "to": "INTERMEDIATE",
-          "loss": 27.221
+          "loss": 27.468
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 45,
+          "offset": -0.23
         }
       ]
     },
@@ -367,6 +415,12 @@
           "lap": 47,
           "to": "INTERMEDIATE"
         }
+      ],
+      "stintPace": [
+        {
+          "lap": 47,
+          "offset": -0.413
+        }
       ]
     },
     {
@@ -393,7 +447,13 @@
         {
           "lap": 45,
           "to": "INTERMEDIATE",
-          "loss": 113.982
+          "loss": 113.473
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 45,
+          "offset": 0.477
         }
       ]
     },
@@ -421,7 +481,13 @@
         {
           "lap": 45,
           "to": "INTERMEDIATE",
-          "loss": 25.035
+          "loss": 25.24
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 45,
+          "offset": -0.194
         }
       ]
     },
@@ -449,7 +515,13 @@
         {
           "lap": 45,
           "to": "INTERMEDIATE",
-          "loss": 22.159
+          "loss": 22.587
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 45,
+          "offset": -0.403
         }
       ]
     },
@@ -478,6 +550,12 @@
           "lap": 48,
           "to": "INTERMEDIATE"
         }
+      ],
+      "stintPace": [
+        {
+          "lap": 48,
+          "offset": 0.609
+        }
       ]
     },
     {
@@ -505,6 +583,12 @@
           "lap": 47,
           "to": "INTERMEDIATE",
           "loss": 22.252
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 47,
+          "offset": -0.635
         }
       ]
     }
