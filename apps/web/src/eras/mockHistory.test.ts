@@ -33,11 +33,11 @@ async function play(raceId: string, legend: boolean, edit: Partial<MockEvaluatio
 }
 
 describe('the mock’s history book and leaderboards', () => {
-  // 830 less the twenty-two races the Eras side really won (no rewrite condition: the Worker's
+  // 830 less the twenty-three races the Eras side really won (no rewrite condition: the Worker's
   // hasRewrite), one rewrite each.
-  it('starts empty: 808 to collect, nothing on any board', async () => {
+  it('starts empty: 807 to collect, nothing on any board', async () => {
     const book = await mockErasApi.history();
-    expect(book.completion).toEqual({ collected: 0, total: 808, percent: 0 });
+    expect(book.completion).toEqual({ collected: 0, total: 807, percent: 0 });
     expect(book.eras.map((e) => e.eraId)).toEqual([10, 9, 8, 7, 6, 5, 4, 3, 2, 1]);
     expect(book.entries).toEqual([]);
     expect(await mockErasApi.leaderboard('abu-dhabi-2021', false)).toEqual({
@@ -67,7 +67,7 @@ describe('the mock’s history book and leaderboards', () => {
     const book = await mockErasApi.history();
     const era9 = book.eras.find((e) => e.eraId === 9);
     expect(era9?.stars).toEqual({ have: 3, total: 30 });
-    expect(era9?.rewrites).toEqual({ have: 1, total: 10 }); // every Era 9 race has a rewrite
+    expect(era9?.rewrites).toEqual({ have: 1, total: 9 }); // styria-2021: Verstappen won
     expect(era9?.badges).toEqual({ cleared: false, mastered: false, legend: false });
     expect(book.completion.collected).toBe(4);
     expect(book.collectibles.stars).toEqual({ have: 3, total: 300 });

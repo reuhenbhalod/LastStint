@@ -129,6 +129,27 @@ the pages themselves.
 - Exact lap of Verstappen's brake issue; compounds of Norris's stop; title standings before/after
   the race; any Mercedes discussion of an alternative (two-stop) plan; OpenF1 track status.
 
+### Authored (B1, Nov 9)
+
+Side picked by `pipeline hard-calls styria-2021` (Eras build): **VER 2, HAM 0** (chance given up:
+HAM 34.0 pts, VER 0.0), so the player runs **Verstappen**, not the draft's Hamilton. Verstappen
+really won, so there is no rewrite (no `rewriteCondition` / headline). No SC, VSC or red flag in
+any source, so no `storylineEvents`. Moments (`author --target win --eras`): lap 28 (Hamilton's
+stop) and lap 35 (tyre cliff); takeover lap 25.
+
+| Item | Authored text / value | Facts used (rows above) | Owner checked |
+|---|---|---|---|
+| Target | `win` | Result: Verstappen 1st | |
+| Storyline (real) | "Verstappen starts from pole on mediums, makes his only stop for hards a lap after Hamilton, leads every lap and wins by 35.7 s." | Grid; Start compounds; Verstappen stops (one stop, a lap after Hamilton); Result (+35.743 s, led every lap) | |
+| Mastery | `stop_count` exact 1, "Win on one stop" | Verstappen stops (one stop) | |
+| Hidden | `margin` 10 s, "Win by more than 10 seconds" (game goal; real margin 35.7 s included Hamilton's late second stop) | Result; Hamilton stops | |
+| Briefing | "Red Bull Ring, 2021. Verstappen starts from pole on mediums with Hamilton alongside. You run him, nearly six seconds clear as the stops come. Mercedes can bring Hamilton in first. Win it." | Grid (VER 1, HAM 2); Start compounds; Gaps ("before stops nearly 6 s", AS); Hamilton stop 1 a lap before Verstappen's | |
+| Reachability | Era (threshold 72, standard rival) and Legend (90, expert): reachable; stay-out never earns 3 stars. | `pnpm --filter @laststint/sim reachability styria-2021` | |
+
+**Thin dilemma:** at lap 28 every option keeps a 92-98% win chance; at lap 35 a wrong stop
+costs (box hard now 59%, box soft 75%, box hard next lap 70%; stay or box medium 96%). The
+sources call a one-stop the optimum. The challenge sits in the hidden margin goal, not in the main target.
+
 ## great-britain-2021 (2021 British Grand Prix)
 
 ### Sources

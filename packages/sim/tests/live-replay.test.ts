@@ -140,3 +140,44 @@ describe('live play with the real calls in a refuelling race', () => {
     }
   });
 });
+
+// A refuelling race keeps the rival's optional stop in live play: the fill before it ran only
+// to that stop, so skipping it (as a non-refuelling race may, when the gap behind is small)
+// would leave the rival dry on the last laps (styria-2021 as VER showed it, Nov 9 2026). The
+// stop's 60 s loss is more than the gap behind, so without the rule it would be skipped.
+describe("the rival's optional stop in a refuelling race", () => {
+  it.each(['belgium-2023.json', 'turkey-2021.json'])(
+    '%s: taken, with no car running dry',
+    (file) => {
+      const base = load(file);
+      const laps = base.race.laps;
+      const model: RaceModel = {
+        ...base,
+        rules: { ...base.rules, refuelling: true },
+        drivers: base.drivers.map((d) =>
+          d.code === base.rival
+            ? {
+                ...d,
+                realStrategy: [
+                  ...(d.realStrategy ?? []),
+                  { lap: laps - 1, to: 'SOFT', optional: true, loss: 60 },
+                ],
+              }
+            : d,
+        ),
+      };
+      const live = initRun(model, model.race.seed, {
+        decisions: realCalls(model),
+        incidents: false,
+      });
+      let low = Number.POSITIVE_INFINITY;
+      while (!isFinished(live)) {
+        stepLap(live);
+        const c = live.state.cars[model.rival];
+        if (c && !c.retired && c.tank !== undefined) low = Math.min(low, c.tank);
+      }
+      expect(live.state.cars[model.rival]?.tyreAge).toBe(2);
+      expect(low).toBeGreaterThanOrEqual(0);
+    },
+  );
+});
