@@ -7,7 +7,7 @@
 
 import * as THREE from 'three';
 import { Sky } from 'three/addons/objects/Sky.js';
-import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { mergeGeometries, mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
 import { type Scenery, heights } from './scenery.js';
 import {
   BOARD_ROWS,
@@ -80,32 +80,32 @@ const LIGHT = {
 /** Land cover colours by region. */
 const GROUND = {
   park: {
-    base: '#4c6a2a',
-    grass: '#587a31',
-    farm: '#7a8240',
-    forest: '#28381b',
-    scrub: '#4a5f28',
+    base: '#485d2f',
+    grass: '#506639',
+    farm: '#6f7444',
+    forest: '#29331f',
+    scrub: '#465531',
     urban: '#7a7b72',
     sand: '#c4b088',
     gravel: '#b5a37c',
     asphalt: '#5a5d59',
     water: '#3c5f73',
-    verge: '#628a36',
-    outer: ['#4a6528', '#2a3a1d'],
+    verge: '#57703c',
+    outer: ['#46592e', '#26301d'],
   },
   forest: {
-    base: '#4a6829',
-    grass: '#567a30',
-    farm: '#76803f',
-    forest: '#26351a',
-    scrub: '#475d27',
+    base: '#465c2e',
+    grass: '#4e6538',
+    farm: '#6b7243',
+    forest: '#262f1d',
+    scrub: '#43532f',
     urban: '#787970',
     sand: '#c4b088',
     gravel: '#b5a37c',
     asphalt: '#5a5d59',
     water: '#3c5f73',
-    verge: '#608a35',
-    outer: ['#46612a', '#25341a'],
+    verge: '#556e3b',
+    outer: ['#43572c', '#232c1b'],
   },
   desert: {
     base: '#c2a578',
@@ -122,18 +122,18 @@ const GROUND = {
     outer: ['#c4a87b', '#b89c70'],
   },
   dry: {
-    base: '#7f8444',
-    grass: '#7a8540',
-    farm: '#a6995a',
-    forest: '#33452a',
-    scrub: '#6c7139',
+    base: '#77764a',
+    grass: '#6f7444',
+    farm: '#9b9060',
+    forest: '#323d28',
+    scrub: '#666a3e',
     urban: '#8a887d',
     sand: '#c4b088',
     gravel: '#b5a37c',
     asphalt: '#5a5d59',
     water: '#3c5f73',
-    verge: '#7e8d42',
-    outer: ['#86854a', '#3a4a2c'],
+    verge: '#737a47',
+    outer: ['#7c7a4d', '#35402a'],
   },
 } as const;
 
@@ -314,7 +314,7 @@ export async function buildWorld(s: Scenery, maxAniso: number): Promise<World> {
   (su.mieDirectionalG as THREE.IUniform).value = 0.82;
   (su.sunPosition as THREE.IUniform).value.copy(sunDir);
   scene.add(sky);
-  scene.fog = new THREE.Fog(L.haze, radius * 2.2, radius * 9 + 6000);
+  scene.fog = new THREE.FogExp2(L.haze, 0.115 / radius);
   const hemi = new THREE.HemisphereLight(0xdfe9f4, 0x5a5f45, L.hemi);
   scene.add(hemi);
   const sun = new THREE.DirectionalLight(s.light === 'dusk' ? 0xffb780 : 0xfff0dc, L.sun);
@@ -409,7 +409,7 @@ export async function buildWorld(s: Scenery, maxAniso: number): Promise<World> {
     return [v, v, v];
   });
   g.globalCompositeOperation = 'soft-light';
-  g.globalAlpha = 0.55;
+  g.globalAlpha = 0.3;
   g.drawImage(bigC, 0, 0, SX, SZ);
   g.globalAlpha = 1;
   g.globalCompositeOperation = 'source-over';
@@ -497,6 +497,7 @@ export async function buildWorld(s: Scenery, maxAniso: number): Promise<World> {
     const idx: number[] = [];
     const cA = new THREE.Color(C.outer[0]);
     const cB = new THREE.Color(C.outer[1]);
+    const base = new THREE.Color(C.base);
     const c = new THREE.Color();
     for (let j = 0; j <= cz; j++)
       for (let i = 0; i <= cx; i++) {
@@ -504,7 +505,13 @@ export async function buildWorld(s: Scenery, maxAniso: number): Promise<World> {
         const z = -OUT + j * OS;
         const inside = x > 40 && x < SX - 40 && z > 40 && z < SZ - 40;
         pos.push(x, inside ? hAt(x, z) - 14 : rollAt(x, z), z);
-        c.copy(forestAt(x, z) > 0.5 ? cB : cA).multiplyScalar(0.85 + rnd() * 0.25);
+        const edge = Math.min(
+          1,
+          Math.hypot(Math.max(0, -x, x - SX), Math.max(0, -z, z - SZ)) / 900,
+        );
+        c.copy(forestAt(x, z) > 0.5 ? cB : cA)
+          .lerp(base, 1 - edge)
+          .multiplyScalar(0.88 + rnd() * 0.18);
         col.push(c.r, c.g, c.b);
       }
     for (let j = 0; j < cz; j++)
@@ -596,30 +603,33 @@ export async function buildWorld(s: Scenery, maxAniso: number): Promise<World> {
   const kerbCol = (i: number) => (Math.floor(n(DIST, i) / 2.5) % 2 ? 0xc22a22 : 0xeeeeea);
   scene.add(ribbon(W / 2, W / 2 + 1.5, kerbMat, { filter: kerbOn, color: kerbCol, lift: 0.07 }));
   scene.add(ribbon(-W / 2 - 1.5, -W / 2, kerbMat, { filter: kerbOn, color: kerbCol, lift: 0.07 }));
-  // bridges: the deck's sides down to the ground, and piers either side of the road beneath
+  // bridges: where the deck spans the road beneath (the ground well below it), a concrete
+  // deck with its underside and parapets; the approaches are embankments in the ground itself
   if (s.lap.bridge.length) {
-    const concrete = keep(new THREE.MeshStandardMaterial({ color: 0x9a9893, roughness: 0.85 }));
+    const concrete = keep(
+      new THREE.MeshStandardMaterial({ color: 0xa3a19b, roughness: 0.85, side: THREE.DoubleSide }),
+    );
+    const span = new Set(s.lap.bridge.filter((i) => hAt(n(LX, i), n(LZ, i)) < n(LY, i) - 2.5));
     const pos: number[] = [];
-    const set = new Set(s.lap.bridge);
     for (let i = 0; i < N; i++) {
       const j = (i + 1) % N;
-      if (!set.has(i) || !set.has(j)) continue;
+      if (!span.has(i) || !span.has(j)) continue;
       for (const sd of [-1, 1]) {
-        const o = sd * (W / 2 + 0.6);
+        const o = sd * (W / 2 + 0.5);
         const x1 = n(LX, i) + NX(i) * o;
         const z1 = n(LZ, i) + NZ(i) * o;
         const x2 = n(LX, j) + NX(j) * o;
         const z2 = n(LZ, j) + NZ(j) * o;
-        const top1 = n(LY, i) + 1.1;
-        const top2 = n(LY, j) + 1.1;
-        const deck1 = n(LY, i) - 1.4;
-        const deck2 = n(LY, j) - 1.4;
+        const top1 = n(LY, i) + 1.0;
+        const top2 = n(LY, j) + 1.0;
+        const bot1 = n(LY, i) - 1.5;
+        const bot2 = n(LY, j) - 1.5;
         pos.push(
           x1,
-          deck1,
+          bot1,
           z1,
           x2,
-          deck2,
+          bot2,
           z2,
           x1,
           top1,
@@ -628,55 +638,29 @@ export async function buildWorld(s: Scenery, maxAniso: number): Promise<World> {
           top1,
           z1,
           x2,
-          deck2,
+          bot2,
           z2,
           x2,
           top2,
           z2,
         );
-        // fill down to the ground where nothing passes underneath
-        if (trackDist(x1, z1) > 10 || clearOf(x1, z1, i, 9)) {
-          const g1 = hAt(x1, z1) - 1;
-          const g2 = hAt(x2, z2) - 1;
-          if (clearOf(x1, z1, i, 11))
-            pos.push(
-              x1,
-              g1,
-              z1,
-              x2,
-              g2,
-              z2,
-              x1,
-              deck1,
-              z1,
-              x1,
-              deck1,
-              z1,
-              x2,
-              g2,
-              z2,
-              x2,
-              deck2,
-              z2,
-            );
-        }
       }
     }
-    const geo = keep(new THREE.BufferGeometry());
-    geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-    geo.computeVertexNormals();
-    const m = new THREE.Mesh(geo, concrete);
-    m.material.side = THREE.DoubleSide;
-    m.castShadow = true;
-    m.receiveShadow = true;
-    scene.add(m);
-    // the deck's underside
-    scene.add(
-      ribbon(-W / 2 - 0.6, W / 2 + 0.6, concrete, {
-        filter: (i) => set.has(i) && set.has((i + 1) % N),
-        lift: -1.4,
-      }),
-    );
+    if (pos.length) {
+      const geo = keep(new THREE.BufferGeometry());
+      geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+      geo.computeVertexNormals();
+      const m = new THREE.Mesh(geo, concrete);
+      m.castShadow = true;
+      m.receiveShadow = true;
+      scene.add(m);
+      scene.add(
+        ribbon(-W / 2 - 0.5, W / 2 + 0.5, concrete, {
+          filter: (i) => span.has(i) && span.has((i + 1) % N),
+          lift: -1.5,
+        }),
+      );
+    }
   }
   // start line and grid boxes: the game's lap starts at its line
   {
@@ -1130,6 +1114,8 @@ export async function buildWorld(s: Scenery, maxAniso: number): Promise<World> {
   const crowd: Array<[number, number, number]> = [];
   {
     const wpos: number[] = [];
+    const wcol: number[] = [];
+    const TINTS = [0xffffff, 0xf3e9d8, 0xe9e3da, 0xd9d6cf, 0xefe2c6, 0xcfd3d6, 0xe8d6c0, 0xbfc3c5];
     const wuv: number[] = [];
     const rpos: number[] = [];
     const rcol: number[] = [];
@@ -1294,6 +1280,7 @@ export async function buildWorld(s: Scenery, maxAniso: number): Promise<World> {
       const base = Math.min(...p.map(([x, z]) => hAt(x, z))) - 0.4;
       const bottom = base + (b.min ?? 0);
       const top = base + 0.4 + b.h;
+      const tint = new THREE.Color(TINTS[Math.floor(rnd() * TINTS.length)] as number);
       if (!b.min) {
         for (let k = 0; k < p.length; k++) {
           const [x1, z1] = p[k] as [number, number];
@@ -1322,6 +1309,7 @@ export async function buildWorld(s: Scenery, maxAniso: number): Promise<World> {
           const u = len / 7;
           const v = (top - bottom) / 9.5;
           wuv.push(0, 0, u, 0, 0, v, 0, v, u, 0, u, v);
+          for (let m = 0; m < 6; m++) wcol.push(tint.r, tint.g, tint.b);
         }
       }
       const area =
@@ -1405,13 +1393,27 @@ export async function buildWorld(s: Scenery, maxAniso: number): Promise<World> {
       scene.add(m);
     };
     const winTex = keep(windows());
-    mk(
-      wpos,
-      ['uv', wuv, 2],
-      keep(
-        new THREE.MeshStandardMaterial({ map: winTex, roughness: 0.75, side: THREE.DoubleSide }),
-      ),
-    );
+    {
+      const geo = keep(new THREE.BufferGeometry());
+      geo.setAttribute('position', new THREE.Float32BufferAttribute(wpos, 3));
+      geo.setAttribute('uv', new THREE.Float32BufferAttribute(wuv, 2));
+      geo.setAttribute('color', new THREE.Float32BufferAttribute(wcol, 3));
+      geo.computeVertexNormals();
+      const walls = new THREE.Mesh(
+        geo,
+        keep(
+          new THREE.MeshStandardMaterial({
+            map: winTex,
+            vertexColors: true,
+            roughness: 0.78,
+            side: THREE.DoubleSide,
+          }),
+        ),
+      );
+      walls.castShadow = true;
+      walls.receiveShadow = true;
+      if (wpos.length) scene.add(walls);
+    }
     mk(
       rpos,
       ['color', rcol, 3],
@@ -1545,13 +1547,13 @@ export async function buildWorld(s: Scenery, maxAniso: number): Promise<World> {
         spruce.setMatrixAt(ns, M);
         spruce.setColorAt(
           ns++,
-          col.setHSL(0.29 + rnd() * 0.06, 0.34 + rnd() * 0.12, 0.16 + rnd() * 0.07),
+          col.setHSL(0.33 + rnd() * 0.06, 0.24 + rnd() * 0.12, 0.12 + rnd() * 0.06),
         );
       } else if (kind === 'leafy' && nl < MAX) {
         leafy.setMatrixAt(nl, M);
         leafy.setColorAt(
           nl++,
-          col.setHSL(0.2 + rnd() * 0.09, 0.36 + rnd() * 0.16, 0.22 + rnd() * 0.08),
+          col.setHSL(0.21 + rnd() * 0.08, 0.3 + rnd() * 0.14, 0.11 + rnd() * 0.06),
         );
       } else if (kind === 'palm' && np < 4000) {
         palm.setMatrixAt(np, M);
@@ -1592,15 +1594,16 @@ export async function buildWorld(s: Scenery, maxAniso: number): Promise<World> {
       const z = -3200 + rnd() * (SZ + 6400);
       if (x > 0 && x < SX && z > 0 && z < SZ) continue;
       if (forestAt(x, z) < 0.5) continue;
+      if (Math.hypot(Math.max(0, -x, x - SX), Math.max(0, -z, z - SZ)) < 350) continue;
       Q.setFromAxisAngle(up, rnd() * 6.28);
       const sc = 0.9 + rnd() * 0.6;
       M.compose(new THREE.Vector3(x, rollAt(x, z) - 1, z), Q, new THREE.Vector3(sc, sc, sc));
       if (rnd() < Math.max(conifer, 0.4)) {
         spruce.setMatrixAt(ns, M);
-        spruce.setColorAt(ns++, col.setHSL(0.29 + rnd() * 0.05, 0.3, 0.15 + rnd() * 0.05));
+        spruce.setColorAt(ns++, col.setHSL(0.33 + rnd() * 0.05, 0.24, 0.12 + rnd() * 0.05));
       } else if (nl < MAX) {
         leafy.setMatrixAt(nl, M);
-        leafy.setColorAt(nl++, col.setHSL(0.22 + rnd() * 0.06, 0.34, 0.21 + rnd() * 0.06));
+        leafy.setColorAt(nl++, col.setHSL(0.22 + rnd() * 0.06, 0.28, 0.11 + rnd() * 0.05));
       }
     }
     spruce.count = ns;
@@ -1689,6 +1692,12 @@ function treeGeometries(): {
     g.setAttribute('color', new THREE.BufferAttribute(col, 3));
     return g;
   };
+  // one shared vertex per corner, so a roughened crown stays closed and shades smoothly
+  const solid = (geo: THREE.BufferGeometry) => {
+    geo.deleteAttribute('normal');
+    geo.deleteAttribute('uv');
+    return mergeVertices(geo);
+  };
   const rough = (geo: THREE.BufferGeometry, amt: number) => {
     const p = geo.attributes.position as THREE.BufferAttribute;
     for (let i = 0; i < p.count; i++) {
@@ -1701,12 +1710,12 @@ function treeGeometries(): {
   const trunk = (h: number, r: number) =>
     paint(new THREE.CylinderGeometry(r * 0.6, r, h, 6).translate(0, h / 2, 0), 0x4a3a2c, () => 1);
   const skirts: THREE.BufferGeometry[] = [trunk(6, 0.35)];
-  const tiers = 7;
+  const tiers = 10;
   for (let t = 0; t < tiers; t++) {
     const f = t / (tiers - 1);
-    const r = 3.6 * (1 - f * 0.8);
-    const h = 4.2 - f * 1.4;
-    const y = 3 + f * 15.5;
+    const r = 3.3 * (1 - f * 0.86);
+    const h = 3.5 - f * 1.1;
+    const y = 2.6 + f * 16.8;
     skirts.push(
       paint(
         rough(new THREE.ConeGeometry(r, h, 9, 1, true).translate(0, y + h / 2, 0), 0.25),
@@ -1716,7 +1725,6 @@ function treeGeometries(): {
     );
   }
   const spruce = mergeGeometries(skirts) as THREE.BufferGeometry;
-  spruce.computeVertexNormals();
   const crowns: THREE.BufferGeometry[] = [trunk(7, 0.45)];
   for (const [x, y, z, r] of [
     [0, 9.5, 0, 4.4],
@@ -1727,9 +1735,9 @@ function treeGeometries(): {
   ] as Array<[number, number, number, number]>) {
     crowns.push(
       paint(
-        rough(new THREE.IcosahedronGeometry(r, 1).translate(x, y, z), 0.3),
+        rough(solid(new THREE.IcosahedronGeometry(r, 2)).translate(x, y, z), 0.3),
         0xffffff,
-        (yy, rr) => 0.6 + 0.4 * Math.min(1, (yy - 5) / 8) * Math.min(1, rr / 3),
+        (yy, rr) => 0.45 + 0.55 * Math.min(1, (yy - 5) / 8) * Math.min(1, rr / 3),
       ),
     );
   }

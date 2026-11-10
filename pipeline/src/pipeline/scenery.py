@@ -238,11 +238,9 @@ def raceway_edges(elements: list[dict], frame: Frame) -> list[dict]:
     edges = []
     for w in ways:
         t = w.get("tags", {})
-        bridge = (
-            t.get("bridge") not in (None, "no")
-            or t.get("layer", "0").lstrip("-").isdigit()
-            and int(t.get("layer", "0")) > 0
-        )
+        # only a section tagged as a bridge is raised (a layer on its own often just marks a
+        # section drawn over another way, not a bridge)
+        bridge = t.get("bridge") not in (None, "no")
         nodes, geom = w["nodes"], w["geometry"]
         cut = [0] + [k for k in range(1, len(nodes) - 1) if uses[nodes[k]] > 1] + [len(nodes) - 1]
         for a, b in zip(cut, cut[1:], strict=False):
@@ -525,10 +523,13 @@ def build(circuit: str) -> dict:
     shift = lambda p: (p[0] - X0, p[1] - Z0)  # noqa: E731
     lap_pts = [shift(p) for p in lap_pts]
     lap = resample(lap_pts, SAMPLE, closed=True)
-    # which resampled points are on a bridge
-    raw_tree = cKDTree(np.asarray(lap_pts))
-    _, near = raw_tree.query(lap)
-    on_bridge = np.array([bridge_pts[k] for k in near])
+    # which resampled points are on a bridge: by distance along the lap (a nearest-point match
+    # would jump to the other road where the lap crosses itself)
+    raw = np.asarray(lap_pts + [lap_pts[0]], float)
+    cum = np.concatenate([[0], np.cumsum(np.linalg.norm(np.diff(raw, axis=0), axis=1))])
+    along = np.linspace(0, cum[-1], len(lap), endpoint=False)
+    seg_end = np.clip(np.searchsorted(cum, along, side="right"), 1, len(raw) - 1)
+    on_bridge = np.array([bridge_pts[k % len(bridge_pts)] for k in seg_end])
 
     # Ground.
     nx = int((X1 - X0) / STEP) + 1
@@ -569,12 +570,16 @@ def build(circuit: str) -> dict:
     prof = prof + rise
 
     # Shape the ground to the track: flat under it, easing back to the real ground 35 m out.
-    track_tree = cKDTree(lap[~on_bridge] if (~on_bridge).any() else lap)
-    track_h = prof[~on_bridge] if (~on_bridge).any() else prof
+    # A bridge's approaches become embankments (the ground rises with the deck), except over the
+    # road it crosses: there the ground keeps that road's height, leaving the span open.
     gx, gz = np.meshgrid(np.arange(nx) * STEP, np.arange(nz) * STEP)
-    d, idx = track_tree.query(np.stack([gx.ravel(), gz.ravel()], 1))
-    d = d.reshape(nz, nx)
-    h_track = track_h[idx].reshape(nz, nx) - 0.2
+    grid_pts = np.stack([gx.ravel(), gz.ravel()], 1)
+    d_all, i_all = cKDTree(lap).query(grid_pts)
+    below = ~on_bridge if (~on_bridge).any() else np.ones(n, bool)
+    d_low, i_low = cKDTree(lap[below]).query(grid_pts)
+    under = d_low < TRACK_HALF + 8
+    h_track = (np.where(under, prof[below][i_low], prof[i_all]) - 0.2).reshape(nz, nx)
+    d = np.where(under, d_low, d_all).reshape(nz, nx)
     t = np.clip((d - (TRACK_HALF + 6)) / 35, 0, 1)
     t = t * t * (3 - 2 * t)
     ground = h_track * (1 - t) + ground * t

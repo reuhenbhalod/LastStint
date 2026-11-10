@@ -116,7 +116,7 @@ export default function Scene3D({
       envScene.add(skyCopy);
       const env = pmrem.fromScene(envScene, 0.02).texture;
       scene.environment = env;
-      scene.environmentIntensity = 0.55;
+      scene.environmentIntensity = 0.4;
 
       // Post: ambient occlusion, bloom at night, then tone mapping and anti-aliasing.
       const composer = new EffectComposer(renderer);
@@ -138,7 +138,7 @@ export default function Scene3D({
       const home = () => {
         const c = world.centre;
         const d = world.radius * 1.55;
-        camera.position.set(c.x + d * 0.55, c.y + d * 0.95, c.z + d * 0.75);
+        camera.position.set(c.x + d * 0.62, c.y + d * 0.78, c.z + d * 0.86);
         controls.target.copy(c);
         controls.update();
       };
@@ -224,6 +224,15 @@ export default function Scene3D({
       const frameTimes: number[] = [];
       let last = performance.now();
       let frameNo = 0;
+      if (import.meta.env.DEV) {
+        // Local testing: scripts can point the camera (docs/3d-spec.md, screenshots).
+        (window as unknown as Record<string, unknown>).__scene3d = {
+          camera,
+          controls,
+          world,
+          THREE,
+        };
+      }
       setStatus('ready');
       onReady?.(s.name);
 
