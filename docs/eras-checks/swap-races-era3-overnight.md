@@ -177,6 +177,45 @@ Replaces `belgium-1998` (Era 3 #8). Robust G1: pass, mean gap error 1.27 s.
 | MS | [Motor Sport, September 1996, "Benetton: The Great Pretender?"](https://www.motorsportmagazine.com/archive/article/september-1996/16/the-great-pretender/) |
 | Jolpica | [Results](https://api.jolpi.ca/ergast/f1/1996/11/results/), fetched 2026-11-09. Jolpica has no pit-stop data for 1996. |
 
+### Authored (B1, Nov 9)
+
+Side, target and objectives as built into the `eras` block of `data/eras/germany-1996.json`.
+"Timing" is the Jolpica lap positions in `data/raw/germany-1996.parquet`, as built into
+`data/races/germany-1996.json`. Storyline and briefing are original wording; no team radio
+is quoted.
+
+| Item | Value | Fact it rests on | Source | Owner checked |
+|---|---|---|---|---|
+| Side | HIL (hard calls HIL 0, BER 0; chance given up HIL 14.7, BER 10.0 pts; `pipeline hard-calls`) | the grader, not a fact | - | |
+| Target | `win` | Hill won | Jolpica, WP | |
+| Rewrite | none: the side really won | Hill 1st, 1:21:43.417 | Jolpica | |
+| Storyline | "Hill takes pole, but Berger and Alesi pass him at the start" | Hill pole 1:43.912; Berger and Alesi passed Hill into Turn 1 | AS, GPE, Jolpica | |
+| Storyline | "the one-stopping Benettons hold him up" | both Benettons on one stop; the Benettons held Hill up in the first stint | GPE, AS | |
+| Storyline | "Williams bring him in on lap 20 for a short stop and a small fuel load, and he leads once the Benettons have stopped" | Hill lap 20, 8.1 s, "just 8.1s worth of fuel"; small fuel load for clear track while the Benettons stopped; Alesi in lap 22, Berger lap 23; Hill led laps 24-34 | AS, GPE, WP lap chart, Timing | |
+| Storyline | "After his second stop on lap 34 he comes out just behind Berger and cannot find a way past" | lap 34, 8.2 s, "emerged just behind Berger"; Hill attacked laps 35-42 but could not pass; Berger led 35-42 | AS, GPE, WP lap chart | |
+| Storyline | "Berger's engine fails in the closing laps" | engine failure on lap 43 (AS "two laps to go", GPE "three laps from home"; no lap count is given in the text) | AS, GPE, MS, Jolpica | |
+| Storyline | "Hill wins by 11.5 s from Alesi" | Alesi +11.452 | Jolpica | |
+| Briefing | "Hill took pole but lost two places at the start" | as above | AS, GPE | |
+| Briefing | "after 17 laps you run him third, close behind Berger and Alesi" | end of lap 17 (takeover, D3 rule): BER, ALE, HIL P1-P3; gaps 1.9 s (ALE to BER) and 1.0 s (HIL to ALE) | Timing | |
+| Briefing | "Williams have Hill on two stops; the Benettons will stop once" | Hill two stops, both Benettons one | GPE, AS | |
+| Mastery | `margin` 11.5 s: "Win by more than 11.5 seconds" (beat Hill's real margin) | Alesi +11.452 | Jolpica | |
+| Hidden | `stop_count` exact 2: "Win on two stops, as Hill did" | Hill stopped on laps 20 and 34 | AS, GPE | |
+| storylineEvents | [42, RETIREMENT] (Berger; the model's last full lap for him is 42) | Berger 42 laps, engine | Jolpica | |
+
+Notes:
+- Robust G1 (`pipeline validate germany-1996 --robust`, Eras build): pass (strict), mean gap
+  error 1.27 s, before and after the overlay.
+- Moments (`pnpm --filter @laststint/sim author germany-1996 --target position:2 --eras
+  --write`): stop-20, pace-25, pace-29, stop-34. Graded on **P2 or better**, not the win:
+  playouts don't know Berger's engine fails, so on the win target the lap-20 stop was "no
+  choice" (every option 0-3%). P2 is the race Hill really ran against the Benettons. Star 1 is
+  still the win.
+- Berger's retirement is flagged as a storyline event, so Legend keeps it too.
+- Reachability (`pnpm --filter @laststint/sim reachability germany-1996`): pass at era
+  difficulty (threshold 86, Expert rival) and at Legend (90, Expert), all three stars and the
+  hidden objective on seed 1 (stop-20 box, pace-25 push-attack, pace-29 standard, stop-34 box).
+  The stay-out path earns no star on seeds 1-3.
+
 ## germany-1997 (1997 German Grand Prix)
 
 Replaces `malaysia-1999` (Era 3 #9). Robust G1: pass, mean gap error 1.41 s.

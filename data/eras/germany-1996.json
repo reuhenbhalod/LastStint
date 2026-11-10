@@ -7,5 +7,37 @@
     "drs": false,
     "ers": "none",
     "refuelling": true
-  }
+  },
+  "eras": {
+    "eraId": 3,
+    "order": 8,
+    "userSide": "HIL",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Hill takes pole, but Berger and Alesi pass him at the start and the one-stopping Benettons hold him up. Williams bring him in on lap 20 for a short stop and a small fuel load, and he leads once the Benettons have stopped. After his second stop on lap 34 he comes out just behind Berger and cannot find a way past. Berger's engine fails in the closing laps, and Hill wins by 11.5 s from Alesi."
+    },
+    "mastery": {
+      "type": "margin",
+      "seconds": 11.5,
+      "label": "Win by more than 11.5 seconds"
+    },
+    "hidden": {
+      "type": "stop_count",
+      "exact": 2,
+      "label": "Win on two stops, as Hill did"
+    },
+    "hardCalls": {
+      "HIL": 0,
+      "BER": 0
+    },
+    "briefing": "Hockenheim, 1996. Hill took pole but lost two places at the start, and after 17 laps you run him third, close behind Berger and Alesi in the two Benettons. Williams have Hill on two stops; the Benettons will stop once. Get him into clear air and win."
+  },
+  "storylineEvents": [
+    [
+      42,
+      "RETIREMENT"
+    ]
+  ]
 }
