@@ -160,6 +160,25 @@ Not opened (rate-limited, HTTP 429): the GrandPrix.com race report "The Trilogy"
 | Did that side really win? | No. Hamilton finished 2nd, 8.271 s behind, so a rewrite (history book) is allowed. |
 | Risk | **Medium-high.** No SC/VSC to shuffle things, and Mercedes' own sums (MS) say both alternatives (no stop, longer stint) fall short. The win may be unreachable in the sim. Fallback target: `position` P2 for Hamilton (low risk, but a weak storyline). Lap disagreements (WP +1 lap on several stops) should be settled from Jolpica/TUM when building. Run `pipeline hard-calls` before fixing the side. |
 
+### Authored (B1, Nov 9)
+
+Built as an Eras build with `user_side` HAM / `rival` ROS (`build.py`); takeover lap 8 (D3
+rule). Robust G1: pass, 0.76 s. Reachability: era (threshold 78, Standard+ rival) and Legend
+(threshold 90, Expert rival) reachable, stay-out never ★3.
+
+| Item | As authored | Basis | Owner checked |
+|---|---|---|---|
+| Side | **Hamilton.** `pipeline hard-calls`: HAM 2, ROS 1 (chance given up HAM 23.7 pts, ROS 1.0). | hard-call counter | |
+| Target | `beat-rival` Rosberg (draft target above). | rows 1, 14 | |
+| Rewrite | Yes, `beat-rival` ROS: Hamilton really finished 2nd, +8.271 s. Headline (original): "Hamilton turns the tables on Rosberg at Yas Marina". | row 14 | |
+| Storyline text | Rosberg wins from pole by 8.3 s; both Mercedes stop for softs early (Rosberg lap 10, Hamilton lap 11); Rosberg stops again on lap 31; Hamilton leads, asks to run to the flag without a second stop, and is brought in on lap 41, rejoining about 12 s behind. Jolpica stop laps taken (WP is one lap later). | rows 7, 8, 13, 14, 19 | |
+| Briefing | Season finale; Rosberg pole and leads Hamilton by just under three seconds after seven laps (TUM timing in `data/raw`: 2.78 s at the end of lap 7), both on super-softs (rows 7, 8), Räikkönen third (TUM lap 7 position). | rows 1, 7, 8; TUM | |
+| Mastery | `stop_count` exact 2, "Beat Rosberg on two stops, as Hamilton made". | row 8; reachability | |
+| Hidden | `mode_rule` manage, maxLaps 0, "Beat Rosberg without a single lap of tyre management" (a game rule, no fact). | reachability | |
+| storylineEvents | None: no SC, VSC or red flag in any source (row 5), and the only retirement (Maldonado, lap 1) is before the takeover. | rows 5, 15 | |
+| Moments | From the author tool unchanged (`author abu-dhabi-2015 --rival ROS --target beat-rival --eras --write`): stop-11 (real box; the model's MEDIUM is the real soft, its SOFT the super-soft), pace-20, cliff-25 (real stay), pace-28, rivalpit-31 (Rosberg's second stop), stop-41 (real box). | author output | |
+| Reachability paths | Era (seed 1): box softs (model MEDIUM) at 11, standard at 20 and 28, box next lap on softs at 25, stay at 31 and 41: ★1 ★2 ★3, hidden. Legend (seed 3): the same with the first stop a lap later (12). Stay-out: no ★3 on any seed (best ★2 at era difficulty). The winning line stops for the second time at 26, fifteen laps before Hamilton really did. | reachability | |
+
 ## singapore-2014 (2014 Singapore Grand Prix)
 
 Replaces `monaco-2015` in Era 7 #4.

@@ -7,5 +7,38 @@
     "drs": true,
     "ers": "hybrid",
     "refuelling": false
+  },
+  "eras": {
+    "eraId": 7,
+    "order": 5,
+    "userSide": "HAM",
+    "target": {
+      "type": "beat-rival",
+      "rival": "ROS"
+    },
+    "storyline": {
+      "real": "Rosberg wins from pole by 8.3 s. Both Mercedes stop for softs early, Rosberg on lap 10 and Hamilton a lap later. Rosberg stops again on lap 31; Hamilton leads, asks to run to the flag without a second stop, and is brought in on lap 41, rejoining about 12 s behind.",
+      "rewriteCondition": {
+        "type": "beat-rival",
+        "rival": "ROS"
+      },
+      "headline": "Hamilton turns the tables on Rosberg at Yas Marina"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 2,
+      "label": "Beat Rosberg on two stops, as Hamilton made"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "manage",
+      "maxLaps": 0,
+      "label": "Beat Rosberg without a single lap of tyre management"
+    },
+    "hardCalls": {
+      "HAM": 2,
+      "ROS": 1
+    },
+    "briefing": "Yas Marina, 2015, the season finale. Rosberg took pole and leads Hamilton by just under three seconds after seven laps, both Mercedes on super-softs, with Räikkönen third. You run Hamilton. Finish ahead of your team-mate."
   }
 }
