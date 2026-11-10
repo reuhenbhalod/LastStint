@@ -282,16 +282,37 @@ const RACE_TABLE: Record<number, ReadonlyArray<readonly [string, string]>> = {
     ],
   ],
   4: [
-    ['germany-2000', 'Barrichello stays on slicks in the rain'],
+    [
+      'canada-2003',
+      'Fading brakes and one more lap of fuel than his brother: stop a lap after Ralf to jump him, then hold off three cars inside five seconds',
+    ],
     ['japan-2000', 'A pit stop decides the title'],
-    ['malaysia-2001', "Ferrari's double stop in a downpour"],
+    [
+      'san-marino-2000',
+      'Ferrari takes the bigger fill at the first stop and bets that four extra laps on a light car will jump the McLaren at the second',
+    ],
     ['austria-2002', 'Team orders on the final lap'],
-    ['brazil-2003', 'Red flag chaos'],
-    ['hungary-2003', "Alonso's first win on Renault's fuel strategy"],
-    ['united-states-2003', 'The rain tyre gamble'],
-    ['japan-2003', 'Schumacher needs one point'],
+    [
+      'hungary-2001',
+      'A Ferrari is backing you into the pack on a track with no passing: stay out longer or stop shorter to break free, knowing a slow fuel rig can undo it',
+    ],
+    [
+      'austria-2001',
+      'Coulthard has saved fuel from P7: stay out three laps longer than the Ferrari and hope the lighter car makes the overcut stick',
+    ],
+    [
+      'france-2001',
+      "Pole on Michelins with a three-second lead: stop when the plan says, or stretch the stint before your brother's Ferrari jumps you in the pits",
+    ],
+    [
+      'italy-2001',
+      "Ferrari runs light on two stops to escape Montoya's one-stop Williams, but a slow first fill hands back most of the margin",
+    ],
     ['france-2004', "Ferrari's four-stop strategy"],
-    ['monaco-2004', 'A safety car shapes the stops'],
+    [
+      'san-marino-2003',
+      'From sixth in a slower McLaren, on a track with no overtaking: run long on two stops while the Ferraris and Williams sprint on three',
+    ],
   ],
   3: [
     ['spain-1994', 'Schumacher stuck in fifth gear'],

@@ -137,16 +137,16 @@ Players start at Era 10 and move back through the timeline to Era 1. The eras be
 ### Era 4: Ferrari dynasty (2000–2004) · play order 7
 | # | Race ID | Dilemma | Target (draft) |
 |---|---|---|---|
-| 1 | germany-2000 | Barrichello stays on slicks in the rain | win: Barrichello from P18 |
+| 1 | canada-2003 | Fading brakes and one more lap of fuel than his brother: stop a lap after Ralf to jump him, then hold off three cars inside five seconds | win: M. Schumacher from P3 |
 | 2 | japan-2000 | A pit stop decides the title | beat-rival: Schumacher ahead of Häkkinen |
-| 3 | malaysia-2001 | Ferrari's double stop in a downpour | win: Schumacher recovers the lead |
+| 3 | san-marino-2000 | Ferrari takes the bigger fill at the first stop and bets that four extra laps on a light car will jump the McLaren at the second | win: M. Schumacher from P2, ahead of Häkkinen |
 | 4 | austria-2002 | Team orders on the final lap | team: Ferrari 1–2 |
-| 5 | brazil-2003 | Red flag chaos | win: Fisichella in the chaos |
-| 6 | hungary-2003 | Alonso's first win on Renault's fuel strategy | defend: Alonso holds P1 |
-| 7 | united-states-2003 | The rain tyre gamble | win: Schumacher on the right tyre |
-| 8 | japan-2003 | Schumacher needs one point | position: Schumacher P8 or better for the title |
+| 5 | hungary-2001 | A Ferrari is backing you into the pack on a track with no passing: stay out longer or stop shorter to break free, knowing a slow fuel rig can undo it | beat-rival: Coulthard ahead of Barrichello |
+| 6 | austria-2001 | Coulthard has saved fuel from P7: stay out three laps longer than the Ferrari and hope the lighter car makes the overcut stick | win: Coulthard from P7 |
+| 7 | france-2001 | Pole on Michelins with a three-second lead: stop when the plan says, or stretch the stint before your brother's Ferrari jumps you in the pits | win: R. Schumacher from pole, ahead of Michael |
+| 8 | italy-2001 | Ferrari runs light on two stops to escape Montoya's one-stop Williams, but a slow first fill hands back most of the margin | win: Barrichello from P2, ahead of Montoya |
 | 9 | france-2004 | Ferrari's four-stop strategy | win: Schumacher beats Alonso |
-| 10 | monaco-2004 | A safety car shapes the stops | defend: Trulli holds P1 |
+| 10 | san-marino-2003 | From sixth in a slower McLaren, on a track with no overtaking: run long on two stops while the Ferraris and Williams sprint on three | win: Räikkönen from P6 |
 
 ### Era 3: Refuelling returns (1994–1999) · play order 8
 | # | Race ID | Dilemma | Target (draft) |
@@ -241,10 +241,10 @@ Every race has one target, set in `eras.target`. Each race's draft target is in 
 
 | Type | Means | Grader `Target` | Races (draft) |
 |---|---|---|---|
-| `win` | Chase down the win from behind | `win` | 42 |
-| `defend` | Start in the lead and keep it to the flag | `win`, starting from P1 | 22 |
+| `win` | Chase down the win from behind | `win` | 44 |
+| `defend` | Start in the lead and keep it to the flag | `win`, starting from P1 | 19 |
 | `position` | Reach a set position, such as P3 to win the title | `position` | 17 |
-| `beat-rival` | Finish ahead of a named car, wherever that is | `beat-rival` | 13 |
+| `beat-rival` | Finish ahead of a named car, wherever that is | `beat-rival` | 14 |
 | `team` | A team result, such as a 1–2 in a set order | `team` (new) | 3 |
 | `deny` | Keep a rival at or below a set position, such as out of the top 3 to stop their title | `deny` (new) | 3 |
 
