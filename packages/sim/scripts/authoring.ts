@@ -144,7 +144,10 @@ export function authorMoments(
 
   // The candidates.
   const candidates: DecisionMoment[] = [];
-  for (const m of candidateMoments(model, target)) candidates.push(stopCall(m));
+  // A team order keeps its own comply / ignore options (not a stop call: it can fall on the
+  // final lap, where no pit call is allowed).
+  for (const m of candidateMoments(model, target))
+    candidates.push(m.trigger === 'teamOrder' ? m : stopCall(m));
   // The real team's own stops (the in-lap): the calls they actually made. Kept even when the
   // answer is clear (verdict no-tension), so a race can always be played the real way.
   const realStops = new Set<number>();
