@@ -1177,6 +1177,66 @@
       "realOptionId": null
     },
     {
+      "id": "stop-48",
+      "lap": 48,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "Stay out",
+          "decisions": []
+        },
+        {
+          "id": "box-soft",
+          "label": "Box, softs",
+          "decisions": [
+            {
+              "lap": 48,
+              "kind": "pit",
+              "compound": "SOFT"
+            }
+          ]
+        },
+        {
+          "id": "box-medium",
+          "label": "Box, mediums",
+          "decisions": [
+            {
+              "lap": 48,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "box-hard",
+          "label": "Box, hards",
+          "decisions": [
+            {
+              "lap": 48,
+              "kind": "pit",
+              "compound": "HARD"
+            }
+          ]
+        },
+        {
+          "id": "box-next-hard",
+          "label": "Box next lap, hards",
+          "decisions": [
+            {
+              "lap": 49,
+              "kind": "pit",
+              "compound": "HARD"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "stay"
+    },
+    {
       "id": "battle-60",
       "lap": 60,
       "trigger": "cliff",
@@ -1296,16 +1356,16 @@
     },
     "mastery": {
       "type": "stop_count",
-      "exact": 2,
-      "label": "Win on two stops"
+      "exact": 3,
+      "label": "Win on three stops"
     },
     "hidden": {
-      "type": "margin",
-      "seconds": 5,
-      "label": "Win by more than 5 seconds"
+      "type": "compound_rule",
+      "mustAvoid": "HARD",
+      "label": "Never fit the hard tyre"
     },
     "hardCalls": {
-      "RAI": 0,
+      "RAI": 1,
       "VER": 0
     },
     "briefing": "Barcelona, 2016. Both Mercedes went out on the first lap, so this race is Red Bull against Ferrari. Ricciardo and Verstappen, in his first race for Red Bull, run first and second. You run R\u00e4ikk\u00f6nen, fifth on worn softs. Pick your stops and take the win."

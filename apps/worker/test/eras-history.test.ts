@@ -208,11 +208,11 @@ describe('GET /api/history', () => {
     expect(book.collectibles).toEqual({
       stars: { have: 49, total: 300 },
       legendStars: { have: 30, total: 300 },
-      rewrites: { have: 3, total: 72 },
+      rewrites: { have: 3, total: 55 },
       hidden: { have: 3, total: 100 },
       badges: { have: 4, total: 30 },
     });
-    expect(book.completion).toEqual({ collected: 89, total: 802, percent: (89 / 802) * 100 });
+    expect(book.completion).toEqual({ collected: 89, total: 785, percent: (89 / 785) * 100 });
 
     // And the same from D1 directly.
     const mine = 'FROM era_progress WHERE player_id = ?';
@@ -260,9 +260,10 @@ describe('GET /api/history', () => {
     });
     expect(e8).toMatchObject({
       stars: { have: 10, total: 30 },
-      rewrites: { have: 1, total: 6 }, // nor germany-2018, germany-2019, hungary-2019, turkey-2020
+      // nor australia-2017, australia-2018, germany-2018, germany-2019, hungary-2019, turkey-2020
+      rewrites: { have: 1, total: 4 },
       badges: { cleared: true, mastered: false, legend: false },
-      percent: (12 / 79) * 100,
+      percent: (12 / 77) * 100,
     });
     expect(e7).toMatchObject({ stars: { have: 0, total: 30 }, percent: 0 });
 
@@ -298,7 +299,7 @@ describe('GET /api/history', () => {
 
   it('a new player: nothing collected, every era listed', async () => {
     const book = await json<HistoryBook>(`/api/history?anonId=${ids.c}`);
-    expect(book.completion).toEqual({ collected: 0, total: 802, percent: 0 });
+    expect(book.completion).toEqual({ collected: 0, total: 785, percent: 0 });
     expect(book.eras).toHaveLength(10);
     expect(book.entries).toEqual([]);
   });

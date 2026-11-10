@@ -890,7 +890,8 @@
     {
       "lap": 47,
       "type": "RETIREMENT",
-      "driver": "MSCM"
+      "driver": "MSCM",
+      "storylineEvent": true
     },
     {
       "lap": 48,
@@ -916,7 +917,254 @@
       "other": "COU"
     }
   ],
-  "decisionMoments": [],
+  "decisionMoments": [
+    {
+      "id": "stop-23",
+      "lap": 23,
+      "trigger": "cliff",
+      "target": {
+        "kind": "position",
+        "atBest": 2
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "Stay out",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "Box, mediums",
+          "decisions": [
+            {
+              "lap": 23,
+              "kind": "pit",
+              "compound": "MEDIUM",
+              "fill": {
+                "laps": 21
+              }
+            }
+          ]
+        },
+        {
+          "id": "box-next-medium",
+          "label": "Box next lap, mediums",
+          "decisions": [
+            {
+              "lap": 24,
+              "kind": "pit",
+              "compound": "MEDIUM",
+              "fill": "standard"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "box-medium"
+    },
+    {
+      "id": "stop-44",
+      "lap": 44,
+      "trigger": "cliff",
+      "target": {
+        "kind": "position",
+        "atBest": 2
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "Stay out",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "Box, mediums",
+          "decisions": [
+            {
+              "lap": 44,
+              "kind": "pit",
+              "compound": "MEDIUM",
+              "fill": {
+                "laps": 25
+              }
+            }
+          ]
+        },
+        {
+          "id": "box-next-medium",
+          "label": "Box next lap, mediums",
+          "decisions": [
+            {
+              "lap": 45,
+              "kind": "pit",
+              "compound": "MEDIUM",
+              "fill": "standard"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "box-medium"
+    },
+    {
+      "id": "pace-47",
+      "lap": 47,
+      "trigger": "cliff",
+      "target": {
+        "kind": "position",
+        "atBest": 2
+      },
+      "options": [
+        {
+          "id": "push",
+          "label": "Push now",
+          "decisions": [
+            {
+              "lap": 47,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "standard",
+          "label": "Standard pace",
+          "decisions": [
+            {
+              "lap": 47,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "manage",
+          "label": "Manage the tyres",
+          "decisions": [
+            {
+              "lap": 47,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "push-attack",
+          "label": "Push and attack",
+          "decisions": [
+            {
+              "lap": 47,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            },
+            {
+              "lap": 47,
+              "kind": "mode",
+              "key": "battle",
+              "value": "attack"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "pace-51",
+      "lap": 51,
+      "trigger": "cliff",
+      "target": {
+        "kind": "position",
+        "atBest": 2
+      },
+      "options": [
+        {
+          "id": "push",
+          "label": "Push now",
+          "decisions": [
+            {
+              "lap": 51,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "standard",
+          "label": "Standard pace",
+          "decisions": [
+            {
+              "lap": 51,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "manage",
+          "label": "Manage the tyres",
+          "decisions": [
+            {
+              "lap": 51,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "push-attack",
+          "label": "Push and attack",
+          "decisions": [
+            {
+              "lap": 51,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            },
+            {
+              "lap": 51,
+              "kind": "mode",
+              "key": "battle",
+              "value": "attack"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "teamorder-69-hak",
+      "lap": 69,
+      "trigger": "teamOrder",
+      "target": {
+        "kind": "position",
+        "atBest": 2
+      },
+      "options": [
+        {
+          "id": "comply",
+          "label": "Let HAK and COU through",
+          "decisions": [
+            {
+              "lap": 69,
+              "kind": "teamOrder",
+              "order": "comply"
+            }
+          ]
+        },
+        {
+          "id": "ignore",
+          "label": "Ignore the order",
+          "decisions": []
+        }
+      ],
+      "realOptionId": "comply"
+    }
+  ],
   "candidateMomentLaps": [
     20,
     21,
@@ -965,6 +1213,37 @@
   ],
   "userSide": "VIL",
   "rival": "MSCM",
+  "eras": {
+    "eraId": 3,
+    "order": 6,
+    "userSide": "VIL",
+    "hardCalls": {
+      "VIL": 0,
+      "MSCM": 0
+    },
+    "target": {
+      "type": "beat-rival",
+      "rival": "MSCM"
+    },
+    "storyline": {
+      "real": "Schumacher leads from the start and Frentzen lets Villeneuve into second on lap 8. On lap 48 Villeneuve goes for the inside at Dry Sac, Schumacher turns in on him and is out. Villeneuve drives on with a damaged car, lets both McLarens by on the last lap and finishes third, 0.116 s clear of Berger: champion by three points, and H\u00e4kkinen wins his first race.",
+      "rewriteCondition": {
+        "type": "win"
+      },
+      "headline": "Villeneuve wins at Jerez and takes the title"
+    },
+    "mastery": {
+      "type": "finish_position",
+      "position": 2,
+      "label": "Finish in the top two"
+    },
+    "hidden": {
+      "type": "finish_position",
+      "position": 1,
+      "label": "Win the race"
+    },
+    "briefing": "Jerez, 1997, the final round. Schumacher leads the championship on 78 points, Villeneuve is one behind on 77 but holds the tie-break on wins. Finish ahead of Schumacher and in the points, and the title is yours. You run Villeneuve, second after 19 laps, 5.6 s behind the Ferrari."
+  },
   "provenance": {
     "kind": "real",
     "estimated": [
