@@ -1,0 +1,21 @@
+{
+ "race": "san-marino-2006",
+ "how": "docs/eras-checks/2.4-estimates.md: check each period against a race report; set status to confirmed or rejected (edit startLap/endLap if they're off), then re-run `pipeline jolpica <race-id> --force`.",
+ "periods": [
+  {
+   "startLap": 2,
+   "endLap": 2,
+   "laps": 1,
+   "kind": "SC",
+   "confidence": "ambiguous",
+   "peakRatio": 1.688,
+   "gapBefore": 5.6,
+   "gapAfter": 4.9,
+   "reasons": [
+    "the field didn't bunch up (P1-P6 5.6s -> 4.9s): rain?",
+    "a single slow lap"
+   ],
+   "status": "unchecked"
+  }
+ ]
+}

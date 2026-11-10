@@ -208,15 +208,36 @@ const RACE_TABLE: Record<number, ReadonlyArray<readonly [string, string]>> = {
   ],
   5: [
     ['san-marino-2005', 'Alonso holds off Schumacher'],
-    ['japan-2005', 'Räikkönen from 17th to win'],
-    ['hungary-2006', "Button's first win, in the rain"],
-    ['brazil-2006', 'Alonso protects the title'],
-    ['china-2007', 'McLaren leaves Hamilton out on worn tyres'],
+    [
+      'europe-2009',
+      "Hamilton leads on the lighter tank while Barrichello's longer-fuelled Brawn keeps closing: box now and cover him, or stretch the stint and risk losing the lead in the pits?",
+    ],
+    [
+      'france-2007',
+      "Leading by two seconds with traffic ahead, Massa must choose: box first and risk the lapped cars, or stretch the stint and match Räikkönen's fuel",
+    ],
+    [
+      'san-marino-2006',
+      'Glued to a grip-starved Ferrari on a track where nobody passes, does Renault gamble on stopping a lap early, or wait for Schumacher to blink?',
+    ],
+    [
+      'great-britain-2007',
+      'Two-stopping at Silverstone with fuel deciding the order: short-fill Alonso to jump Räikkönen at the first stops, or run long like Ferrari and win it at the second?',
+    ],
     ['europe-2007', 'Rain chaos at the Nürburgring'],
     ['brazil-2007', 'Three-way title decider'],
-    ['monaco-2008', "Hamilton's puncture stop turns into a win"],
-    ['brazil-2008', 'Glock on dry tyres in the rain, last-corner title'],
-    ['brazil-2009', 'Button clinches the title from 14th'],
+    [
+      'bahrain-2006',
+      'Schumacher pits first on lap 36; Renault can keep Alonso out three more laps on a lighter tank and gamble that the overcut puts him ahead at pit exit',
+    ],
+    [
+      'turkey-2008',
+      "A tyre warning forces Hamilton onto three stops: can a light McLaren build enough of a gap to beat Massa's two-stop Ferrari?",
+    ],
+    [
+      'malaysia-2006',
+      'Stuck with a heavy tank after a fuel mistake in qualifying, Alonso starts 7th: how long can Renault stretch the first stint, and how little fuel is enough at the last stop to come out ahead of Button?',
+    ],
   ],
   4: [
     ['germany-2000', 'Barrichello stays on slicks in the rain'],

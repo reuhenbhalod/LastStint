@@ -1763,6 +1763,111 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
+    "europe-2009": {
+        "year": 2009,
+        "event": "Europe",
+        "source": "jolpica",
+        "name": "Europe 2009: Hamilton vs Barrichello",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for japan-2005 (swap-races-era5-overnight.md). Side provisional until
+        # `pipeline hard-calls`.
+        "user_side": "HAM",
+        "rival": "BAR",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "france-2007": {
+        "year": 2007,
+        "event": "France",
+        "source": "jolpica",
+        "name": "France 2007: Massa vs Räikkönen",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for hungary-2006 (swap-races-era5-overnight.md). Side provisional until
+        # `pipeline hard-calls`.
+        "user_side": "MAS",
+        "rival": "RAI",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "san-marino-2006": {
+        "year": 2006,
+        "event": "San Marino",
+        "source": "jolpica",
+        "name": "San Marino 2006: Alonso vs Schumacher",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for brazil-2006 (swap-races-era5-overnight.md). Side provisional until
+        # `pipeline hard-calls`.
+        "user_side": "ALO",
+        "rival": "MSCM",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "great-britain-2007": {
+        "year": 2007,
+        "event": "Great Britain",
+        "source": "jolpica",
+        "name": "Great Britain 2007: Hamilton vs Räikkönen",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for china-2007 (swap-races-era5-overnight.md). Side provisional until
+        # `pipeline hard-calls`.
+        "user_side": "HAM",
+        "rival": "RAI",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "bahrain-2006": {
+        "year": 2006,
+        "event": "Bahrain",
+        "source": "jolpica",
+        "name": "Bahrain 2006: Alonso vs Schumacher",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for monaco-2008 (swap-races-era5-overnight.md). Side provisional until
+        # `pipeline hard-calls`.
+        "user_side": "ALO",
+        "rival": "MSCM",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "turkey-2008": {
+        "year": 2008,
+        "event": "Turkey",
+        "source": "jolpica",
+        "name": "Turkey 2008: Hamilton vs Massa",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for brazil-2008 (swap-races-era5-overnight.md). Side provisional until
+        # `pipeline hard-calls`.
+        "user_side": "HAM",
+        "rival": "MAS",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "malaysia-2006": {
+        "year": 2006,
+        "event": "Malaysia",
+        "source": "jolpica",
+        "name": "Malaysia 2006: Alonso vs Fisichella",
+        "era": "1994-2009",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for brazil-2009 (swap-races-era5-overnight.md). Side provisional until
+        # `pipeline hard-calls`.
+        "user_side": "ALO",
+        "rival": "FIS",
+        "score_positions": 6,
+        "split": "eras",
+    },
     # Era 4 (2000-04), refuelling as above: one dry compound, new tyres at a stop.
     "japan-2000": {
         "year": 2000,

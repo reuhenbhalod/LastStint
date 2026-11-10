@@ -1692,6 +1692,18 @@
       "codeSource": "f1db",
       "jolpicaId": "damon_hill"
     },
+    "IDE": {
+      "name": "Yuji Ide",
+      "number": 23,
+      "tier": "low",
+      "ignores": 0,
+      "pushback": 0,
+      "confidence": "low",
+      "evidence": [],
+      "code": "IDE",
+      "codeSource": "jolpica",
+      "jolpicaId": "ide"
+    },
     "INO": {
       "name": "Taki Inoue",
       "number": 10,
