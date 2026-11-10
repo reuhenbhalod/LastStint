@@ -524,12 +524,12 @@ The **Needs** column is from race history and must be checked against the data f
 | 8 | `china-2017` | TUM | wet model (exists) |  |
 | 8 | `turkey-2020` | Jolpica (est. compounds, SC) | wet model (exists) |  |
 | 8 | `china-2018` | TUM | none |  |
-| 7 | `bahrain-2014` | TUM | P4 map |  |
+| 7 | `united-states-2014` | TUM | P4 map |  |
 | 7 | `brazil-2014` | TUM | P4 map |  |
 | 7 | `canada-2016` | TUM | P4 map |  |
 | 7 | `singapore-2014` | TUM | P4 map |  |
 | 7 | `abu-dhabi-2015` | TUM | P4 map |  |
-| 7 | `united-states-2015` | TUM | R3 wet pre-2018, P4 map |  |
+| 7 | `germany-2016` | TUM | P4 map |  |
 | 7 | `spain-2016` | TUM | P4 map |  |
 | 7 | `bahrain-2015` | TUM | P4 map |  |
 | 7 | `malaysia-2015` | TUM | P4 map |  |
