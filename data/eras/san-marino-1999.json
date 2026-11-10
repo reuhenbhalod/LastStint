@@ -7,5 +7,48 @@
     "drs": false,
     "ers": "none",
     "refuelling": true
-  }
+  },
+  "eras": {
+    "eraId": 3,
+    "order": 10,
+    "userSide": "MSCM",
+    "target": {
+      "type": "position",
+      "position": 2
+    },
+    "storyline": {
+      "real": "H\u00e4kkinen crashes out of the lead at the final chicane after 17 laps, leaving Coulthard ahead of Schumacher. Coulthard is on one stop; Ferrari bring Schumacher in early with little fuel, and he sprints while Coulthard loses time behind backmarkers. A second quick stop from a lead of more than 20 s keeps Schumacher in front, and he wins by 4.265 s."
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 2,
+      "label": "Finish on two stops"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "manage",
+      "maxLaps": 0,
+      "label": "Never back off to manage the tyres"
+    },
+    "hardCalls": {
+      "MSCM": 0,
+      "COU": 0
+    },
+    "briefing": "Imola, 1999. H\u00e4kkinen has crashed out of the lead, and you run Schumacher, second and a few seconds behind Coulthard, who is on one stop. Stay on one stop, or split the race into two short stints and sprint? Bring the Ferrari home at least second, and catch Coulthard if you can.",
+    "storylineCalls": [
+      {
+        "driver": "COU",
+        "lap": 36,
+        "untilFlag": true,
+        "real": "Coulthard makes his one stop at the end of lap 35 with a fullish fuel load and runs to the flag on it, while Ferrari split Schumacher's race into two short stints",
+        "source": "http://atlasf1.autosport.com/99/san/lupini.html"
+      }
+    ]
+  },
+  "storylineEvents": [
+    [
+      47,
+      "RETIREMENT"
+    ]
+  ]
 }
