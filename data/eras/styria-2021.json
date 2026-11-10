@@ -1,0 +1,37 @@
+{
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": true,
+    "drs": true,
+    "ers": "hybrid",
+    "refuelling": false
+  },
+  "eras": {
+    "eraId": 9,
+    "order": 2,
+    "userSide": "VER",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Verstappen starts from pole on mediums, makes his only stop for hards a lap after Hamilton, leads every lap and wins by 35.7 s."
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 1,
+      "label": "Win on one stop"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 10,
+      "label": "Win by more than 10 seconds"
+    },
+    "hardCalls": {
+      "HAM": 0,
+      "VER": 2
+    },
+    "briefing": "Red Bull Ring, 2021. Verstappen starts from pole on mediums with Hamilton alongside. You run him, nearly six seconds clear as the stops come. Mercedes can bring Hamilton in first. Win it."
+  }
+}

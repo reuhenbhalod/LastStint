@@ -35,7 +35,9 @@ describe('eraDetailView', () => {
       draft: true,
       blocked: null,
     });
-    expect(view.cards[1]?.dilemma).toBe("Mercedes' extra stop catches Verstappen");
+    expect(view.cards[1]?.dilemma).toBe(
+      'Hamilton on wilting mediums four seconds back: pit early, stretch the stint, or stop twice',
+    );
     expect(view.stars).toBe(4);
     expect(view.maxStars).toBe(30);
     expect(view.racesStarred).toBe(2);

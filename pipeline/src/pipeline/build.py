@@ -365,12 +365,14 @@ RACES: dict[str, dict] = {
     "bahrain-2023": {
         "year": 2023,
         "event": "Bahrain",
-        "name": "Bahrain 2023",
+        "name": "Bahrain 2023: Sainz vs Alonso",
         "era": "2014-2025",
         "takeover_lap": None,  # D3 rule
         "seed": 62631,
-        "user_side": None,  # validation race: automatic duel, runner-up vs winner
-        "rival": None,
+        # Eras storyline (swap-races-e10-e9.md): Sainz and Alonso fight for the last podium
+        # place. Eras side by hard calls (SAI 2, ALO 1; real: Alonso P3, Sainz P4).
+        "user_side": "SAI",
+        "rival": "ALO",
         "score_positions": 6,
         "split": "holdout",
     },
@@ -425,12 +427,12 @@ RACES: dict[str, dict] = {
     "hungary-2024": {
         "year": 2024,
         "event": "Hungary",
-        "name": "Hungary 2024",
+        "name": "Hungary 2024: Piastri vs Norris",
         "era": "2014-2025",
         "takeover_lap": None,  # D3 rule
         "seed": 36730,
-        "user_side": None,  # validation race: automatic duel, runner-up vs winner
-        "rival": None,
+        "user_side": "PIA",  # the hard-call side (eras B1: PIA 2, NOR 0)
+        "rival": "NOR",
         "score_positions": 6,
         "split": "holdout",
     },
@@ -1529,6 +1531,20 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
+    "great-britain-2021": {
+        "year": 2021,
+        "event": "British",
+        "name": "Britain 2021: Leclerc vs Hamilton",
+        "era": "2014-2025",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for saudi-arabia-2021. Hard calls tie 0-0; LEC by chance given up (45.0
+        # pts against HAM's 10.3). The lap-2 red flag is before the D3 takeover (lap 24).
+        "user_side": "LEC",
+        "rival": "HAM",
+        "score_positions": 6,
+        "split": "eras",
+    },
     "monaco-2022": {
         "year": 2022,
         "event": "Monaco",
@@ -2168,11 +2184,16 @@ def official_result(model: dict, recon: dict) -> tuple[dict, list[str]]:
 
 
 def scripted_blocks(
-    model: dict, race_id: str, recon: dict | None, team_orders: list[dict] | None = None
+    model: dict,
+    race_id: str,
+    recon: dict | None,
+    team_orders: list[dict] | None = None,
+    sc_pickups: list[dict] | None = None,
 ) -> tuple[dict, list[str]]:
     """Eras model fixes M4 (Eras builds only): the SC restart's jump and spread
     (`track.restart`, restart.py), the race's sourced team orders and let-bys as TEAM_ORDER
-    events (data/incidents.json), and a reconstruction's last-lap stops (`lastLapStops`: a car
+    events (data/incidents.json), its sourced SC pickups as `pickup` on their SC events
+    (incidents.sc_pickup_events), and a reconstruction's last-lap stops (`lastLapStops`: a car
     that ran dry on the last lap) as RETIREMENT events on the last lap where the timing doesn't
     already show one. Returns the model and report lines."""
     out, lines = {**model}, []
@@ -2182,6 +2203,11 @@ def scripted_blocks(
             f"SC restart: jump {restart.JUMP}s, spread {restart.SPREAD}s a place"
             f" (to P{restart.PLACES + 1})"
         )
+    pickups = incidents.sc_pickup_facts(race_id) if sc_pickups is None else sc_pickups
+    if pickups:
+        out["events"] = incidents.sc_pickup_events(pickups, out)
+        for f in pickups:
+            lines.append(f"  SC pickup: lap {f['lap']} the safety car picks up {f['driver']}")
     facts = incidents.team_order_facts(race_id) if team_orders is None else team_orders
     added = incidents.team_order_events(facts, out)
     total = int(out["race"]["laps"])

@@ -16,8 +16,8 @@ building (eras spec §19).
   restart.
 - **Pipeline:** `race_suitability()` stops turning red-flag races down; the race-status
   timeline gains a red-flag code.
-- **Unblocks (draft list):** monaco-2022, great-britain-2022, netherlands-2023,
-  azerbaijan-2021, hungary-2021, saudi-arabia-2021, azerbaijan-2017, italy-2020,
+- **Unblocks (draft list):** great-britain-2022, netherlands-2023, azerbaijan-2021,
+  hungary-2021, great-britain-2021, azerbaijan-2017, italy-2020,
   monaco-2011, canada-2011, europe-2007, brazil-2003, belgium-1998, monaco-1984.
 
 ### R2. Car faults
@@ -38,7 +38,7 @@ building (eras spec §19).
   brazil-2003, malaysia-2001, germany-2000, europe-1999, belgium-1998, spain-1996,
   belgium-1995, europe-1993, brazil-1993, belgium-1992, portugal-1985, monaco-1984.
 - **2018+ wet races** (germany-2018, germany-2019, turkey-2020, russia-2021, turkey-2021,
-  monaco-2022, netherlands-2023, belgium-2023 (a mid-race shower, no wet-tyre stops),
+  netherlands-2023, belgium-2023 (a mid-race shower, no wet-tyre stops),
   australia-2025) use today's model. Each must still pass G1;
   Australia 2025 failed it so far.
 

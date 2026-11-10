@@ -164,7 +164,7 @@
         {
           "lap": 21,
           "to": "INTERMEDIATE",
-          "loss": 25.671
+          "loss": 25.977
         },
         {
           "lap": 31,
@@ -173,6 +173,10 @@
         }
       ],
       "stintPace": [
+        {
+          "lap": 21,
+          "offset": -0.274
+        },
         {
           "lap": 31,
           "offset": 0.078
@@ -275,7 +279,7 @@
         {
           "lap": 20,
           "to": "WET",
-          "loss": 32.06
+          "loss": 31.062
         },
         {
           "lap": 30,
@@ -284,6 +288,10 @@
         }
       ],
       "stintPace": [
+        {
+          "lap": 20,
+          "offset": 0.888
+        },
         {
           "lap": 30,
           "offset": 0.025
@@ -365,6 +373,12 @@
         {
           "lap": 18,
           "to": "INTERMEDIATE"
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 18,
+          "offset": -0.308
         }
       ]
     },
@@ -510,7 +524,7 @@
         {
           "lap": 20,
           "to": "INTERMEDIATE",
-          "loss": 32.638
+          "loss": 33.067
         },
         {
           "lap": 31,
@@ -519,6 +533,10 @@
         }
       ],
       "stintPace": [
+        {
+          "lap": 20,
+          "offset": -0.388
+        },
         {
           "lap": 31,
           "offset": 0.066
@@ -617,7 +635,7 @@
         {
           "lap": 25,
           "to": "WET",
-          "loss": 21.291
+          "loss": 21.949
         },
         {
           "lap": 30,
@@ -626,6 +644,10 @@
         }
       ],
       "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.606
+        },
         {
           "lap": 30,
           "offset": 0.07
@@ -737,7 +759,7 @@
         {
           "lap": 24,
           "to": "INTERMEDIATE",
-          "loss": 21.538
+          "loss": 22.194
         },
         {
           "lap": 31,
@@ -746,6 +768,10 @@
         }
       ],
       "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.593
+        },
         {
           "lap": 31,
           "offset": 0.072
@@ -772,12 +798,18 @@
         {
           "lap": 20,
           "to": "INTERMEDIATE",
-          "loss": 24.541
+          "loss": 24.838
         },
         {
           "lap": 30,
           "to": "HARD",
           "loss": 23.508
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 20,
+          "offset": -0.261
         }
       ]
     }

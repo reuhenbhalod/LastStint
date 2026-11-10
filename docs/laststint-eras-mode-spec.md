@@ -53,7 +53,7 @@ Players start at Era 10 and move back through the timeline to Era 1. The eras be
 ### Era 10: Ground-effect era (2022–2025) · play order 1
 | # | Race ID | Dilemma | Target (draft) |
 |---|---|---|---|
-| 1 | monaco-2022 | Ferrari's calls in the rain | defend: Leclerc holds the lead |
+| 1 | bahrain-2023 | Ferrari stops early for hards; Aston Martin stretches Alonso's softs to catch Sainz late | position: Alonso on the podium |
 | 2 | great-britain-2022 | Ferrari doesn't pit Leclerc under the safety car | defend: Leclerc holds the lead after the SC |
 | 3 | hungary-2022 | Ferrari's hard-tyre gamble | beat-rival: Leclerc ahead of Verstappen |
 | 4 | singapore-2023 | Sainz manages the gaps; Mercedes' late stop | defend: Sainz holds P1 |
@@ -68,14 +68,14 @@ Players start at Era 10 and move back through the timeline to Era 1. The eras be
 | # | Race ID | Dilemma | Target (draft) |
 |---|---|---|---|
 | 1 | bahrain-2021 | Track limits and the undercut | defend: Hamilton holds off Verstappen |
-| 2 | spain-2021 | Mercedes' extra stop catches Verstappen | win: Hamilton chases Verstappen |
+| 2 | styria-2021 | Hamilton on wilting mediums four seconds back: pit early, stretch the stint, or stop twice | win: Hamilton beats Verstappen |
 | 3 | azerbaijan-2021 | Tyre failure, then the restart | defend: Pérez holds the lead at the restart |
 | 4 | france-2021 | Red Bull's two-stop beats Hamilton | win: Verstappen chases Hamilton |
 | 5 | hungary-2021 | Hamilton alone on the grid at the restart | position: Hamilton on the podium |
 | 6 | russia-2021 | Norris stays on slicks as the rain arrives | defend: Norris holds P1 |
 | 7 | turkey-2021 | Hamilton argues against pitting | position: Hamilton limits the damage (P4 or better) |
 | 8 | brazil-2021 | Hamilton from 10th | win: Hamilton from P10 |
-| 9 | saudi-arabia-2021 | Red flags and restarts | beat-rival: Hamilton ahead of Verstappen |
+| 9 | great-britain-2021 | A 10-second penalty to serve at the one stop, then a one-stopping Ferrari to catch | win: Hamilton from P2 at the restart, with a 10 s penalty |
 | 10 | abu-dhabi-2021 | The finale | beat-rival: title to whoever finishes ahead |
 
 ### Era 8: Mercedes vs Ferrari (2017–2020) · play order 3
@@ -241,10 +241,10 @@ Every race has one target, set in `eras.target`. Each race's draft target is in 
 
 | Type | Means | Grader `Target` | Races (draft) |
 |---|---|---|---|
-| `win` | Chase down the win from behind | `win` | 37 |
-| `defend` | Start in the lead and keep it to the flag | `win`, starting from P1 | 28 |
-| `position` | Reach a set position, such as P3 to win the title | `position` | 19 |
-| `beat-rival` | Finish ahead of a named car, wherever that is | `beat-rival` | 9 |
+| `win` | Chase down the win from behind | `win` | 38 |
+| `defend` | Start in the lead and keep it to the flag | `win`, starting from P1 | 27 |
+| `position` | Reach a set position, such as P3 to win the title | `position` | 20 |
+| `beat-rival` | Finish ahead of a named car, wherever that is | `beat-rival` | 8 |
 | `team` | A team result, such as a 1–2 in a set order | `team` (new) | 4 |
 | `deny` | Keep a rival at or below a set position, such as out of the top 3 to stop their title | `deny` (new) | 3 |
 

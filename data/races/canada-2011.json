@@ -129,6 +129,10 @@
       ],
       "stintPace": [
         {
+          "lap": 0,
+          "offset": -0.071
+        },
+        {
           "lap": 52,
           "offset": -0.039
         }
@@ -154,12 +158,18 @@
         {
           "lap": 18,
           "to": "HARD",
-          "loss": 11.017
+          "loss": 11.461
         },
         {
           "lap": 20,
           "to": "WET",
           "loss": 18.469
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.386
         }
       ]
     },
@@ -193,15 +203,19 @@
         {
           "lap": 35,
           "to": "INTERMEDIATE",
-          "loss": 38.566
+          "loss": 39.026
         },
         {
           "lap": 51,
           "to": "HARD",
-          "loss": 17.504
+          "loss": 17.94
         }
       ],
       "stintPace": [
+        {
+          "lap": 35,
+          "offset": -0.403
+        },
         {
           "lap": 51,
           "offset": -0.212
@@ -228,7 +242,7 @@
         {
           "lap": 18,
           "to": "SOFT",
-          "loss": 11.324
+          "loss": 10.903
         },
         {
           "lap": 21,
@@ -238,15 +252,23 @@
         {
           "lap": 35,
           "to": "INTERMEDIATE",
-          "loss": 36.214
+          "loss": 36.425
         },
         {
           "lap": 51,
           "to": "HARD",
-          "loss": 26.57
+          "loss": 26.77
         }
       ],
       "stintPace": [
+        {
+          "lap": 0,
+          "offset": 0.363
+        },
+        {
+          "lap": 35,
+          "offset": -0.183
+        },
         {
           "lap": 51,
           "offset": -0.185
@@ -274,7 +296,7 @@
         {
           "lap": 14,
           "to": "INTERMEDIATE",
-          "loss": 6.24
+          "loss": 6.412
         },
         {
           "lap": 20,
@@ -292,10 +314,18 @@
         {
           "lap": 52,
           "to": "SOFT",
-          "loss": 22.088
+          "loss": 21.984
         }
       ],
       "stintPace": [
+        {
+          "lap": 14,
+          "offset": -0.148
+        },
+        {
+          "lap": 38,
+          "offset": 0.095
+        },
         {
           "lap": 52,
           "offset": -0.094
@@ -322,7 +352,7 @@
         {
           "lap": 18,
           "to": "INTERMEDIATE",
-          "loss": 13.953
+          "loss": 13.984
         },
         {
           "lap": 24,
@@ -341,10 +371,18 @@
         {
           "lap": 53,
           "to": "SOFT",
-          "loss": 34.831
+          "loss": 35.001
         }
       ],
       "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.027
+        },
+        {
+          "lap": 37,
+          "offset": -0.16
+        },
         {
           "lap": 53,
           "offset": -0.277
@@ -375,12 +413,12 @@
         {
           "lap": 44,
           "to": "INTERMEDIATE",
-          "loss": 22.49
+          "loss": 22.707
         },
         {
           "lap": 51,
           "to": "SOFT",
-          "loss": 3.96
+          "loss": 4.171
         },
         {
           "lap": 54,
@@ -389,6 +427,10 @@
         }
       ],
       "stintPace": [
+        {
+          "lap": 44,
+          "offset": -0.194
+        },
         {
           "lap": 54,
           "offset": -0.098
@@ -419,10 +461,18 @@
         {
           "lap": 53,
           "to": "HARD",
-          "loss": 24.076
+          "loss": 25.001
         }
       ],
       "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.459
+        },
+        {
+          "lap": 36,
+          "offset": -0.854
+        },
         {
           "lap": 53,
           "offset": -0.064
@@ -449,15 +499,23 @@
         {
           "lap": 35,
           "to": "INTERMEDIATE",
-          "loss": 34.272
+          "loss": 35.25
         },
         {
           "lap": 52,
           "to": "HARD",
-          "loss": 32.281
+          "loss": 32.72
         }
       ],
       "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.458
+        },
+        {
+          "lap": 35,
+          "offset": -0.413
+        },
         {
           "lap": 52,
           "offset": -0.15
@@ -488,7 +546,17 @@
         {
           "lap": 53,
           "to": "HARD",
-          "loss": 22.629
+          "loss": 23.148
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.112
+        },
+        {
+          "lap": 36,
+          "offset": -0.504
         }
       ]
     },
@@ -516,10 +584,18 @@
         {
           "lap": 52,
           "to": "HARD",
-          "loss": 39.526
+          "loss": 39.51
         }
       ],
       "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.702
+        },
+        {
+          "lap": 38,
+          "offset": 0.014
+        },
         {
           "lap": 52,
           "offset": -0.076
@@ -550,10 +626,18 @@
         {
           "lap": 54,
           "to": "HARD",
-          "loss": 25.13
+          "loss": 25.236
         }
       ],
       "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.18
+        },
+        {
+          "lap": 37,
+          "offset": -0.097
+        },
         {
           "lap": 54,
           "offset": 0.023
@@ -581,6 +665,12 @@
           "lap": 20,
           "to": "WET",
           "loss": 35.677
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.119
         }
       ]
     },
@@ -613,10 +703,18 @@
         {
           "lap": 53,
           "to": "SOFT",
-          "loss": 48.287
+          "loss": 48.147
         }
       ],
       "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.634
+        },
+        {
+          "lap": 36,
+          "offset": 0.13
+        },
         {
           "lap": 53,
           "offset": -0.083
@@ -643,7 +741,7 @@
         {
           "lap": 18,
           "to": "SOFT",
-          "loss": 11.32
+          "loss": 11.477
         },
         {
           "lap": 20,
@@ -657,7 +755,17 @@
         {
           "lap": 52,
           "to": "SOFT",
-          "loss": 25.118
+          "loss": 26.21
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.141
+        },
+        {
+          "lap": 36,
+          "offset": -1.046
         }
       ]
     },
@@ -690,12 +798,22 @@
         {
           "lap": 53,
           "to": "SOFT",
-          "loss": 55.219
+          "loss": 54.92
         },
         {
           "lap": 54,
           "to": "HARD",
           "loss": 7.799
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.13
+        },
+        {
+          "lap": 37,
+          "offset": 0.281
         }
       ]
     },
@@ -729,15 +847,23 @@
         {
           "lap": 35,
           "to": "INTERMEDIATE",
-          "loss": 38.661
+          "loss": 38.927
         },
         {
           "lap": 53,
           "to": "HARD",
-          "loss": 25.346
+          "loss": 25.595
         }
       ],
       "stintPace": [
+        {
+          "lap": 0,
+          "offset": 0.063
+        },
+        {
+          "lap": 35,
+          "offset": -0.233
+        },
         {
           "lap": 53,
           "offset": -0.094
@@ -768,10 +894,18 @@
         {
           "lap": 54,
           "to": "SOFT",
-          "loss": 22.178
+          "loss": 22.854
         }
       ],
       "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.194
+        },
+        {
+          "lap": 37,
+          "offset": -0.598
+        },
         {
           "lap": 54,
           "offset": 0.049
@@ -798,7 +932,7 @@
         {
           "lap": 18,
           "to": "SOFT",
-          "loss": 9.352
+          "loss": 9.961
         },
         {
           "lap": 20,
@@ -812,10 +946,18 @@
         {
           "lap": 54,
           "to": "HARD",
-          "loss": 28.365
+          "loss": 29.21
         }
       ],
       "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.532
+        },
+        {
+          "lap": 37,
+          "offset": -0.769
+        },
         {
           "lap": 54,
           "offset": -0.459
@@ -847,12 +989,18 @@
         {
           "lap": 35,
           "to": "INTERMEDIATE",
-          "loss": 34.18
+          "loss": 34.539
         },
         {
           "lap": 46,
           "to": "INTERMEDIATE",
-          "loss": 5.714
+          "loss": 6.059
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 35,
+          "offset": -0.313
         }
       ]
     },
@@ -885,10 +1033,18 @@
         {
           "lap": 53,
           "to": "HARD",
-          "loss": 29.907
+          "loss": 30.323
         }
       ],
       "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.21
+        },
+        {
+          "lap": 37,
+          "offset": -0.387
+        },
         {
           "lap": 53,
           "offset": -0.21
@@ -924,10 +1080,18 @@
         {
           "lap": 54,
           "to": "HARD",
-          "loss": 21.215
+          "loss": 21.283
         }
       ],
       "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.396
+        },
+        {
+          "lap": 38,
+          "offset": -0.061
+        },
         {
           "lap": 54,
           "offset": -0.12
@@ -967,6 +1131,10 @@
         }
       ],
       "stintPace": [
+        {
+          "lap": 0,
+          "offset": 0.389
+        },
         {
           "lap": 51,
           "offset": -0.081

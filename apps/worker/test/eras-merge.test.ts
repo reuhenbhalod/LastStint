@@ -66,30 +66,30 @@ describe('Eras account merge', () => {
     expect(account).toBe(ids.a);
     const anon = ids.b;
 
-    await attempt('acc-1', account, 'monaco-2022');
-    await attempt('acc-2', account, 'spain-2021');
-    await attempt('anon-1', anon, 'monaco-2022');
-    await attempt('anon-2', anon, 'spain-2021');
+    await attempt('acc-1', account, 'bahrain-2023');
+    await attempt('acc-2', account, 'styria-2021');
+    await attempt('anon-1', anon, 'bahrain-2023');
+    await attempt('anon-2', anon, 'styria-2021');
     await attempt('anon-3', anon, 'bahrain-2021', 1);
 
-    // monaco-2022, no legend: both have it, stars OR'd, accuracy max, latest update.
-    await progress(account, 'monaco-2022', 0, [1, 0, 0, 0], 0.6, T(5));
-    await progress(anon, 'monaco-2022', 0, [0, 1, 0, 1], 0.8, T(3));
-    // monaco-2022 with the legend: only the anon has it, kept separate from legend 0.
-    await progress(anon, 'monaco-2022', 1, [0, 0, 1, 0], 0.4, T(4));
-    // spain-2021: the account's accuracy is unknown (NULL), the anon's wins.
-    await progress(account, 'spain-2021', 0, [0, 0, 1, 0], null, T(2));
-    await progress(anon, 'spain-2021', 0, [1, 0, 0, 0], 0.7, T(6));
+    // bahrain-2023, no legend: both have it, stars OR'd, accuracy max, latest update.
+    await progress(account, 'bahrain-2023', 0, [1, 0, 0, 0], 0.6, T(5));
+    await progress(anon, 'bahrain-2023', 0, [0, 1, 0, 1], 0.8, T(3));
+    // bahrain-2023 with the legend: only the anon has it, kept separate from legend 0.
+    await progress(anon, 'bahrain-2023', 1, [0, 0, 1, 0], 0.4, T(4));
+    // styria-2021: the account's accuracy is unknown (NULL), the anon's wins.
+    await progress(account, 'styria-2021', 0, [0, 0, 1, 0], null, T(2));
+    await progress(anon, 'styria-2021', 0, [1, 0, 0, 0], 0.7, T(6));
     // bahrain-2021: the anon's accuracy is NULL, the account's stays.
     await progress(account, 'bahrain-2021', 0, [0, 0, 0, 0], 0.3, T(1));
     await progress(anon, 'bahrain-2021', 0, [0, 0, 0, 0], null, T(1));
 
     // History: monaco clashes (the anon's is earlier and wins), spain clashes (the account's
     // is earlier and stays), bahrain is the anon's alone.
-    await history(account, 'monaco-2022', 'acc-1', T(5));
-    await history(anon, 'monaco-2022', 'anon-1', T(2));
-    await history(account, 'spain-2021', 'acc-2', T(1));
-    await history(anon, 'spain-2021', 'anon-2', T(3));
+    await history(account, 'bahrain-2023', 'acc-1', T(5));
+    await history(anon, 'bahrain-2023', 'anon-1', T(2));
+    await history(account, 'styria-2021', 'acc-2', T(1));
+    await history(anon, 'styria-2021', 'anon-2', T(3));
     await history(anon, 'bahrain-2021', 'anon-3', T(4));
 
     const signed = await signIn(env.DB, who('acct'), anon, Date.now());
@@ -110,7 +110,7 @@ describe('Eras account merge', () => {
       },
       {
         player_id: account,
-        race_id: 'monaco-2022',
+        race_id: 'bahrain-2023',
         legend: 0,
         star_result: 1,
         star_strategist: 1,
@@ -121,7 +121,7 @@ describe('Eras account merge', () => {
       },
       {
         player_id: account,
-        race_id: 'monaco-2022',
+        race_id: 'bahrain-2023',
         legend: 1,
         star_result: 0,
         star_strategist: 0,
@@ -132,7 +132,7 @@ describe('Eras account merge', () => {
       },
       {
         player_id: account,
-        race_id: 'spain-2021',
+        race_id: 'styria-2021',
         legend: 0,
         star_result: 1,
         star_strategist: 0,
@@ -144,8 +144,8 @@ describe('Eras account merge', () => {
     ]);
     expect(after.history).toEqual([
       { player_id: account, race_id: 'bahrain-2021', attempt_id: 'anon-3', achieved_at: T(4) },
-      { player_id: account, race_id: 'monaco-2022', attempt_id: 'anon-1', achieved_at: T(2) },
-      { player_id: account, race_id: 'spain-2021', attempt_id: 'acc-2', achieved_at: T(1) },
+      { player_id: account, race_id: 'bahrain-2023', attempt_id: 'anon-1', achieved_at: T(2) },
+      { player_id: account, race_id: 'styria-2021', attempt_id: 'acc-2', achieved_at: T(1) },
     ]);
     expect(after.attempts.every((a) => a.player_id === account)).toBe(true);
     expect(after.attempts).toHaveLength(5);
@@ -159,9 +159,9 @@ describe('Eras account merge', () => {
   it("never moves another account's progress off a shared browser", async () => {
     // ids.a becomes account A's player ID, with A's progress under it.
     const a = (await signIn(env.DB, who('owner-a'), ids.a, Date.now())).playerId;
-    await attempt('a-1', a, 'monaco-2022');
-    await progress(a, 'monaco-2022', 0, [1, 1, 1, 1], 0.9, T(1));
-    await history(a, 'monaco-2022', 'a-1', T(1));
+    await attempt('a-1', a, 'bahrain-2023');
+    await progress(a, 'bahrain-2023', 0, [1, 1, 1, 1], 0.9, T(1));
+    await history(a, 'bahrain-2023', 'a-1', T(1));
     const before = await snapshot();
 
     // Account B signs in on the same browser: it gets a fresh ID and none of A's progress.
@@ -171,9 +171,9 @@ describe('Eras account merge', () => {
   });
 
   it('leaves progress in place when the account is made from the browser itself', async () => {
-    await attempt('c-1', ids.c, 'monaco-2022');
-    await progress(ids.c, 'monaco-2022', 0, [1, 0, 0, 0], 0.5, T(1));
-    await history(ids.c, 'monaco-2022', 'c-1', T(1));
+    await attempt('c-1', ids.c, 'bahrain-2023');
+    await progress(ids.c, 'bahrain-2023', 0, [1, 0, 0, 0], 0.5, T(1));
+    await history(ids.c, 'bahrain-2023', 'c-1', T(1));
     const before = await snapshot();
 
     const account = await signIn(env.DB, who('fresh'), ids.c, Date.now());

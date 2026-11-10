@@ -157,3 +157,69 @@ def test_assemble_leaves_it_out_unless_asked(monkeypatch):
     model, _ = build.build_race_model(pool[0])
     assert seen["stint_pace"] is False
     assert not any("stintPace" in d for d in model["drivers"])
+
+
+# Eras model fix W5: a wet race's stints on rain tyres are measured too (wet_stints).
+WET_CURVES = {
+    "slick": {"a": 0.2, "b": 1.0},
+    "inter": {"min": 0.05, "dry": 1.0, "wet": 0.5, "best": 0.2},
+    "wet": {"min": 0.15, "dry": 0.4, "wet": 0.5, "best": 0.3},
+}
+WET_COMPOUNDS = COMPOUNDS | {"INTERMEDIATE": {"offset": 0.0, "degPerLap": 0.0, "cliffLap": 99}}
+
+
+def _wet_weather(laps: int, from_lap: int, w: float) -> dict:
+    return {"curves": WET_CURVES, "wetness": [0.0] * (from_lap - 1) + [w] * (laps - from_lap + 1)}
+
+
+def _wet_fit(laps, stops, **kw):
+    base = {c: 80.0 for c in laps["Driver"].unique()}
+    return pace.stint_offsets(laps, base, WET_COMPOUNDS, 0.0, None, 1, stops, **kw)
+
+
+def _on_inters(laps: pd.DataFrame, code: str, from_lap: int) -> pd.DataFrame:
+    rain = laps["Driver"].eq(code) & (laps["LapNumber"] >= from_lap)
+    laps.loc[rain, "Compound"] = "INTERMEDIATE"
+    return laps
+
+
+def test_rain_tyre_laps_are_left_out_unless_asked():
+    # A runs 0.6 s a lap (in dry-lap terms) slower on inters from lap 11 on a wet track.
+    weather = _wet_weather(20, 11, 0.3)
+    k = 1 + sim_reference.wet_penalty(weather, "INTERMEDIATE", 15)
+    laps = _on_inters(
+        _laps({"A": [80.0] * 10 + [80.6 * k] * 10, "B": [90.0] * 20}, {"A": 11}), "A", 11
+    )
+    off = _wet_fit(laps, {"A": [11], "B": []}, weather=weather)
+    assert 11 not in off.offsets.get("A", {})
+    on = _wet_fit(laps, {"A": [11], "B": []}, weather=weather, wet_stints=True)
+    n = 9
+    assert on.offsets["A"][11] == pytest.approx(0.6 * n / (n + pace.STINT_SHRINK_LAPS), abs=2e-3)
+
+
+def test_slicks_on_a_wet_track_stay_out():
+    weather = _wet_weather(20, 11, 0.3)
+    laps = _laps({"A": [80.0] * 10 + [95.0] * 10, "B": [90.0] * 20}, {"A": 11})
+    table = _wet_fit(laps, {"A": [11], "B": []}, weather=weather, wet_stints=True)
+    assert 11 not in table.offsets.get("A", {})
+
+
+def test_a_rain_tyre_stint_is_measured_against_the_car_s_wet_pace():
+    weather = _wet_weather(20, 1, 0.3)
+    k = 1 + sim_reference.wet_penalty(weather, "INTERMEDIATE", 5) + 0.02
+    laps = _on_inters(_laps({"A": [80.0 * k] * 20, "B": [90.0] * 20}, {}), "A", 1)
+    table = _wet_fit(
+        laps, {"A": [], "B": []}, weather=weather, wet_stints=True, wet_pace={"A": 0.02}
+    )
+    assert table.offsets.get("A", {}).get(0, 0.0) == pytest.approx(0.0, abs=1e-3)
+
+
+def test_a_wet_race_s_restart_lap_is_left_out():
+    # Lap 10 under a safety car, lap 11 the restart: A's slow restart lap doesn't count.
+    weather = _wet_weather(20, 1, 0.3)
+    k = 1 + sim_reference.wet_penalty(weather, "INTERMEDIATE", 5)
+    times = {"A": [80.0 * k] * 10 + [95.0 * k] + [80.0 * k] * 9, "B": [90.0] * 20}
+    laps = _on_inters(_laps(times, {}), "A", 1)
+    laps.loc[laps["LapNumber"] == 10, "TrackStatus"] = "4"
+    table = _wet_fit(laps, {"A": [], "B": []}, weather=weather, wet_stints=True)
+    assert table.offsets.get("A", {}).get(0, 0.0) == pytest.approx(0.0, abs=1e-3)

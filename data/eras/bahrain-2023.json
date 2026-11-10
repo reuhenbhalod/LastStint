@@ -1,0 +1,54 @@
+{
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": true,
+    "drs": true,
+    "ers": "hybrid",
+    "refuelling": false
+  },
+  "eras": {
+    "eraId": 10,
+    "order": 1,
+    "userSide": "SAI",
+    "target": {
+      "type": "beat-rival",
+      "rival": "ALO"
+    },
+    "storyline": {
+      "real": "Verstappen wins from pole and P\u00e9rez is second. Leclerc's engine fails while he runs third, and Alonso, on a later second stop, passes Sainz for the last podium place; Sainz finishes fourth, 9.4 s behind Alonso.",
+      "rewriteCondition": {
+        "type": "beat-rival",
+        "rival": "ALO"
+      },
+      "headline": "Sainz holds Alonso off in Bahrain"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 3,
+      "label": "Beat Alonso on three stops"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "push",
+      "maxLaps": 0,
+      "label": "Beat Alonso without a single push lap"
+    },
+    "hardCalls": {
+      "ALO": 1,
+      "SAI": 2
+    },
+    "briefing": "Bahrain, 2023. Verstappen leads from pole and Leclerc runs second. You run Sainz, fourth after ten laps; Alonso is seventh after his team-mate Stroll hit him on the opening lap. Finish ahead of Alonso."
+  },
+  "storylineEvents": [
+    [
+      41,
+      "RETIREMENT"
+    ],
+    [
+      41,
+      "VSC"
+    ]
+  ]
+}

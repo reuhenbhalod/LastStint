@@ -214,6 +214,42 @@ def test_red_flag_stop_losses():
     assert got == {("AAA", 5): 11.0, ("BBB", 5): 0.0, ("CCC", 6): 0.0}
 
 
+def _pit_lane_pass(drivers: set[str]) -> pd.DataFrame:
+    """No timing (a Jolpica race): red flag on laps 6-7; `drivers` enter the pits on lap 5
+    (out-lap 6, the first red lap) and change tyres in the stoppage (out-lap 7)."""
+    laps = _laps({}, {6: 1500.0, 7: 900.0})
+
+    def fix(r):
+        lap = int(r["LapNumber"])
+        if r["Driver"] in drivers:
+            r["PitInTime"] = r["Time"] if lap in (5, 6) else None
+            r["PitOutTime"] = r["Time"] if lap in (6, 7) else None
+            if lap >= 6:
+                r["Stint"] = 2.0 if lap == 6 else 3.0
+                r["Compound"] = "HARD" if lap == 6 else "SOFT"
+                r["TyreLife"] = 1.0
+        return r
+
+    return laps.apply(fix, axis=1)
+
+
+def test_a_pit_lane_pass_costs_nothing_in_an_eras_build():
+    evs = [{"lap": 6, "type": "RED", "laps": 2, "restart": "standing"}]
+    # Every car through the pit lane into the red flag (Baku 2021): free in an Eras build.
+    laps = _pit_lane_pass({"AAA", "BBB", "CCC"})
+    assert redflag.stop_losses(laps, evs, None, 20.0, 11.0, 14.0) == {
+        **{(d, 6): 20.0 for d in ("AAA", "BBB", "CCC")},
+        **{(d, 7): 0.0 for d in ("AAA", "BBB", "CCC")},
+    }
+    eras = redflag.stop_losses(laps, evs, None, 20.0, 11.0, 14.0, eras=True)
+    assert eras == {(d, n): 0.0 for d in ("AAA", "BBB", "CCC") for n in (6, 7)}
+    # Two cars of three (under FIELD_PIT_SHARE): real stops, priced as before.
+    laps = _pit_lane_pass({"AAA", "BBB"})
+    assert redflag.FIELD_PIT_SHARE > 2 / 3
+    got = redflag.stop_losses(laps, evs, None, 20.0, 11.0, 14.0, eras=True)
+    assert got[("AAA", 6)] == got[("BBB", 6)] == 20.0
+
+
 # --- the reference sim ------------------------------------------------------------------------
 
 
@@ -222,6 +258,9 @@ def test_plan():
     assert redflag.plan(evs) == {"free": {6: 5}, "wipes": {6: (0.5, 5)}}
     standing = [{**evs[0], "restart": "standing"}, {"lap": 7, "type": "SC", "laps": 2}]
     assert redflag.plan(standing) == {"free": {6: 5}, "wipes": {6: (0.5, 5), 8: (0.74, 5)}}
+    # An Eras race: a standing restart is spaced at the end of its first racing lap.
+    assert redflag.plan(standing, eras=True)["wipes"] == {6: (0.5, 5), 9: (0.74, 5)}
+    assert redflag.plan(evs, eras=True) == redflag.plan(evs)  # rolling: unchanged
     assert redflag.plan([{"lap": 5, "type": "RED", "laps": 2}]) == {"free": {}, "wipes": {}}
     assert redflag.plan([{"lap": 5, "type": "SC", "laps": 2}]) == {"free": {}, "wipes": {}}
     # Stopped on the grid on the flag lap (one red lap): the stoppage's change is free on the
@@ -265,6 +304,31 @@ def test_gaps_wiped_at_the_restart():
     res = sim_reference.simulate({**standing, "race": {**standing["race"], "laps": 66}}, 1)
     gaps = [res["gaps"][c] for c in res["finishers"]]
     assert gaps == pytest.approx([0.74 * i for i in range(len(gaps))])
+    # An Eras race: still the queue after the SC lap; spread at the end of the racing lap.
+    eras = variants(model)["standing-eras"]
+    res = sim_reference.simulate({**eras, "race": {**eras["race"], "laps": 66}}, 1)
+    gaps = [res["gaps"][c] for c in res["finishers"]]
+    assert gaps == pytest.approx([0.5 * i for i in range(len(gaps))])
+    res = sim_reference.simulate({**eras, "race": {**eras["race"], "laps": 67}}, 1)
+    gaps = [res["gaps"][c] for c in res["finishers"]]
+    assert gaps == pytest.approx([0.74 * i for i in range(len(gaps))])
+
+
+def test_an_sc_pickup_lets_the_cars_ahead_run_on():
+    model = variants(json.loads(MODEL.read_text()))["sc-pickup"]
+    without = json.loads(json.dumps(model))
+    for e in without["events"]:
+        e.pop("pickup", None)
+
+    def lead(m: dict, laps: int) -> float:
+        t = sim_reference.simulate({**m, "race": {**m["race"], "laps": laps}}, 1)["times"]
+        return t["ALO"] - t["PER"]
+
+    assert lead(model, 68) > lead(without, 68) + 15  # PER ran a racing lap, ALO the SC's
+    assert lead(model, 69) == pytest.approx(lead(model, 68))  # kept on the next lap
+    assert sim_reference.sc_front(["A", "B", "C"], {}, None) == set()
+    assert sim_reference.queue_behind(["A", "B", "C"], "B") == ["B", "C"]
+    assert sim_reference.queue_behind(["A", "B", "C"], "X") == ["A", "B", "C"]
 
 
 def test_a_stop_in_the_stoppage_is_free():

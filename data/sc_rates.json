@@ -15,16 +15,16 @@
   "lengths": {
     "scLaps": 5,
     "vscLaps": 2,
-    "scPeriodsMeasured": 156,
+    "scPeriodsMeasured": 157,
     "vscPeriodsMeasured": 72
   },
   "allTracks": {
-    "races": 218,
-    "vscRaces": 162,
-    "scPeriods": 160,
+    "races": 219,
+    "vscRaces": 163,
+    "scPeriods": 161,
     "vscPeriods": 77,
-    "scPerRace": 0.7339,
-    "vscPerRace": 0.4753
+    "scPerRace": 0.7352,
+    "vscPerRace": 0.4724
   },
   "circuits": {
     "albert_park": {
@@ -186,8 +186,8 @@
       "vscRaces": 0,
       "scPeriods": 0,
       "vscPeriods": 0,
-      "scPerRace": 0.7339,
-      "vscPerRace": 0.4753,
+      "scPerRace": 0.7352,
+      "vscPerRace": 0.4724,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -200,8 +200,8 @@
       "vscRaces": 0,
       "scPeriods": 0,
       "vscPeriods": 0,
-      "scPerRace": 0.7339,
-      "vscPerRace": 0.4753,
+      "scPerRace": 0.7352,
+      "vscPerRace": 0.4724,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -240,8 +240,8 @@
       "vscRaces": 2,
       "scPeriods": 0,
       "vscPeriods": 0,
-      "scPerRace": 0.7339,
-      "vscPerRace": 0.4753,
+      "scPerRace": 0.7352,
+      "vscPerRace": 0.4724,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -271,8 +271,8 @@
       "vscRaces": 0,
       "scPeriods": 0,
       "vscPeriods": 0,
-      "scPerRace": 0.7339,
-      "vscPerRace": 0.4753,
+      "scPerRace": 0.7352,
+      "vscPerRace": 0.4724,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -285,8 +285,8 @@
       "vscRaces": 0,
       "scPeriods": 0,
       "vscPeriods": 0,
-      "scPerRace": 0.7339,
-      "vscPerRace": 0.4753,
+      "scPerRace": 0.7352,
+      "vscPerRace": 0.4724,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -383,8 +383,8 @@
       "vscRaces": 0,
       "scPeriods": 1,
       "vscPeriods": 0,
-      "scPerRace": 0.7339,
-      "vscPerRace": 0.4753,
+      "scPerRace": 0.7352,
+      "vscPerRace": 0.4724,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -398,8 +398,8 @@
       "vscRaces": 2,
       "scPeriods": 1,
       "vscPeriods": 0,
-      "scPerRace": 0.7339,
-      "vscPerRace": 0.4753,
+      "scPerRace": 0.7352,
+      "vscPerRace": 0.4724,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -512,12 +512,12 @@
     },
     "silverstone": {
       "name": "Silverstone Circuit",
-      "races": 9,
-      "vscRaces": 8,
-      "scPeriods": 8,
+      "races": 10,
+      "vscRaces": 9,
+      "scPeriods": 9,
       "vscPeriods": 2,
-      "scPerRace": 0.8889,
-      "vscPerRace": 0.25,
+      "scPerRace": 0.9,
+      "vscPerRace": 0.2222,
       "scFallback": false,
       "vscFallback": false,
       "counted": [
@@ -528,6 +528,7 @@
         "great-britain-2017 (tum): 1 SC, 0 VSC",
         "great-britain-2018 (tum): 2 SC, 0 VSC",
         "great-britain-2019 (tum): 1 SC, 0 VSC",
+        "great-britain-2021 (fastf1): 1 SC, 0 VSC",
         "great-britain-2022 (jolpica-estimate): 1 SC, 0 VSC",
         "great-britain-2024 (fastf1): 0 SC, 0 VSC"
       ]
@@ -605,8 +606,8 @@
       "vscRaces": 0,
       "scPeriods": 1,
       "vscPeriods": 0,
-      "scPerRace": 0.7339,
-      "vscPerRace": 0.4753,
+      "scPerRace": 0.7352,
+      "vscPerRace": 0.4724,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -665,8 +666,8 @@
       "vscRaces": 2,
       "scPeriods": 2,
       "vscPeriods": 2,
-      "scPerRace": 0.7339,
-      "vscPerRace": 0.4753,
+      "scPerRace": 0.7352,
+      "vscPerRace": 0.4724,
       "scFallback": true,
       "vscFallback": true,
       "counted": [

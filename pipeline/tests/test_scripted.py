@@ -106,6 +106,39 @@ def test_the_committed_team_orders_name_real_cars():
             assert len(events) == len(facts)  # every one is after the takeover
 
 
+MIAMI = "https://en.wikipedia.org/wiki/2024_Miami_Grand_Prix"
+
+
+def test_sc_pickup_facts_are_checked(tmp_path):
+    good = {"lap": 28, "type": "SC_PICKUP", "driver": "VER", "source": MIAMI}
+    path = _write(tmp_path, {"x-2024": [good, {"lap": 28, "type": "SC"}]})
+    assert incidents.sc_pickup_facts("x-2024", path) == [good]
+    for bad in ({**good, "source": "Wikipedia"}, {**good, "lap": 0}, {**good, "gap": 20.0}):
+        with pytest.raises(ValueError):
+            incidents.sc_pickup_facts("x-2024", _write(tmp_path, {"x-2024": [bad]}))
+
+
+def test_the_committed_sc_pickup_is_on_miami_2024s_sc():
+    facts = incidents.sc_pickup_facts("miami-2024")
+    assert [(f["lap"], f["driver"]) for f in facts] == [(28, "VER")]
+    path = RACES_DIR / "miami-2024.json"
+    if not path.exists():
+        pytest.skip("no miami-2024 race file")
+    model = json.loads(path.read_text())
+    for e in model["events"]:
+        e.pop("pickup", None)
+    events = incidents.sc_pickup_events(facts, model)
+    assert {"lap": 28, "type": "SC", "laps": 5, "pickup": "VER"} in events
+    assert all("pickup" not in e for e in model["events"])  # the input is left alone
+    out, lines = build.scripted_blocks(model, "miami-2024", None, [], facts)
+    assert "  SC pickup: lap 28 the safety car picks up VER" in lines
+    export.validate_model(out)
+    with pytest.raises(ValueError):
+        incidents.sc_pickup_events([{**facts[0], "driver": "XXX"}], model)
+    with pytest.raises(ValueError):
+        incidents.sc_pickup_events([{**facts[0], "lap": 29}], model)  # no SC begins on lap 29
+
+
 def test_team_order_events_keep_the_laps_after_the_takeover():
     model = _abu()
     facts = [

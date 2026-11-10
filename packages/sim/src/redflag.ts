@@ -43,8 +43,13 @@ export function freeOutLaps(first: number, stop: number): number[] {
   return out;
 }
 
-/** What a race's red flags do in the sim (redflag.py `plan`). */
-export function redFlagPlan(events: RaceEvent[]): RedFlagPlan {
+/**
+ * What a race's red flags do in the sim (redflag.py `plan`). `eras` (an Eras race: it has a
+ * rules block): a standing restart's STANDING_RESTART_GAP is the field's spacing at the end of
+ * a lap 1, so the field is spaced that far apart at the end of the restart's first racing lap,
+ * in that lap's order, not at the end of the lap before it.
+ */
+export function redFlagPlan(events: RaceEvent[], eras = false): RedFlagPlan {
   const free = new Map<number, number>();
   const wipes = new Map<number, { gap: number; redLap: number }>();
   const scs = new Map<number, number>();
@@ -55,7 +60,8 @@ export function redFlagPlan(events: RaceEvent[]): RedFlagPlan {
     for (const lap of freeOutLaps(e.lap, stop)) free.set(lap, e.lap);
     wipes.set(stop, { gap: RESTART_QUEUE_GAP, redLap: e.lap });
     if (e.restart === 'standing') {
-      wipes.set(stop + (scs.get(stop + 1) ?? 0), { gap: STANDING_RESTART_GAP, redLap: e.lap });
+      const start = stop + (scs.get(stop + 1) ?? 0);
+      wipes.set(eras ? start + 1 : start, { gap: STANDING_RESTART_GAP, redLap: e.lap });
     }
   }
   return { free, wipes };

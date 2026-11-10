@@ -454,6 +454,7 @@ def stop_losses(
     pit_loss: float,
     pit_loss_sc: float,
     pit_loss_vsc: float,
+    eras: bool = False,
 ) -> dict[tuple[str, int], float]:
     """(driver, out-lap) -> loss for real stops whose out-lap is a red lap. Their in- and
     out-laps hold the stoppage, so they can't be measured: a car that entered the pits after
@@ -461,7 +462,13 @@ def stop_losses(
     paid the track's figure for the flag it entered under (status timeline). Without timing
     (hand entries) a stop on the first red lap pays pitLoss; later ones are free. A red flag
     whose cars stopped on the grid on the flag lap (one red lap) has its stoppage's tyre
-    changes on the lap after it (free_out_laps): free."""
+    changes on the lap after it (free_out_laps): free.
+
+    `eras` (Eras builds): a pit-lane pass. When at least FIELD_PIT_SHARE of the cars running
+    entered the pits on the same lap into a red flag's first red lap, the field was sent
+    through the pit lane together (Baku 2021: race control "ordered the cars to pass through
+    the pit lane to bypass the accident scene" under the SC before the red flag), so those
+    passes cost nothing: the queue went through in order."""
     spans = [(e["lap"], e["lap"] + int(e.get("laps", 1)) - 1) for e in events if e["type"] == "RED"]
     if not spans:
         return {}
@@ -492,10 +499,12 @@ def stop_losses(
         if not pd.isna(r.Time)
     }
     out: dict[tuple[str, int], float] = {}
-    for driver, stops in real_strategy(laps).items():
+    strategy = real_strategy(laps)
+    field_pass = field_pit_passes(laps, strategy, spans) if eras else set()
+    for driver, stops in strategy.items():
         for stop in stops:
             lap = stop["lap"]
-            if lap in stoppage:
+            if lap in stoppage or (driver, lap) in field_pass:
                 out[(driver, lap)] = 0.0
                 continue
             span = next(((a, b) for a, b in spans if a <= lap <= b), None)
@@ -521,6 +530,28 @@ def stop_losses(
     return out
 
 
+# A pit-lane pass (stop_losses, Eras builds): the share of the running cars entering the pits
+# on one lap that makes it the whole field sent through the pit lane, not a stop. Baku 2021:
+# 16 of the 17 cars running on lap 47 (all but LAT, who stayed out against the instruction).
+FIELD_PIT_SHARE = 0.75
+
+
+def field_pit_passes(
+    laps: pd.DataFrame, strategy: dict[str, list[dict]], spans: list[tuple[int, int]]
+) -> set[tuple[str, int]]:
+    """(driver, out-lap) of the stops whose out-lap is a red flag's first red lap, when at
+    least FIELD_PIT_SHARE of the cars that completed the lap before made one (a pit-lane pass:
+    stop_losses)."""
+    out: set[tuple[str, int]] = set()
+    for first, _ in spans:
+        running = set(laps.loc[laps["LapNumber"] == first - 1, "Driver"].astype(str))
+        stopped = {d for d, stops in strategy.items() if any(s["lap"] == first for s in stops)}
+        stopped &= running
+        if running and len(stopped) >= FIELD_PIT_SHARE * len(running):
+            out |= {(d, first) for d in stopped}
+    return out
+
+
 # --- the rules the sims replay (sim_reference.py; packages/sim/src/redflag.ts) --------------
 
 
@@ -533,11 +564,17 @@ def free_out_laps(first: int, stop: int) -> range:
     return range(first + 1, stop + 1) if stop > first else range(first + 1, first + 2)
 
 
-def plan(events: list[dict]) -> dict:
+def plan(events: list[dict], eras: bool = False) -> dict:
     """What the sim does with a race's red flags: `free` {out-lap: red lap} (a stop with its
     out-lap there costs nothing, if the red flag on `red lap` is in the run's events; see
     free_out_laps) and `wipes` {lap: (gap, red lap)} (at the end of `lap`, the running cars are
-    lined up `gap` apart, if the red flag on `red lap` is in the run's events)."""
+    lined up `gap` apart, if the red flag on `red lap` is in the run's events).
+
+    `eras` (an Eras race: it has a rules block): a standing restart's STANDING_RESTART_GAP is
+    the field's spacing at the end of a lap 1, so the field is spaced that far apart at the end
+    of the restart's first racing lap, in that lap's order, rather than at the end of the lap
+    before it (where the racing lap's spread was then added on top). Until then it waits in
+    the BUNCH_GAP queue."""
     free: dict[int, int] = {}
     wipes: dict[int, tuple[float, int]] = {}
     scs = {int(e["lap"]): int(e.get("laps", 1)) for e in events if e["type"] == "SC"}
@@ -549,7 +586,8 @@ def plan(events: list[dict]) -> dict:
         free.update({lap: first for lap in free_out_laps(first, stop)})
         wipes[stop] = (BUNCH_GAP, first)
         if e["restart"] == "standing":
-            wipes[stop + scs.get(stop + 1, 0)] = (STANDING_RESTART_GAP, first)
+            start = stop + scs.get(stop + 1, 0)
+            wipes[start + 1 if eras else start] = (STANDING_RESTART_GAP, first)
     return {"free": free, "wipes": wipes}
 
 

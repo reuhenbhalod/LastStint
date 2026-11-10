@@ -239,6 +239,13 @@
    "driver": "SAR",
    "status": "Collision",
    "source": "https://en.wikipedia.org/wiki/2024_Miami_Grand_Prix"
+  },
+  {
+   "lap": 28,
+   "type": "SC_PICKUP",
+   "driver": "VER",
+   "detail": "The safety car picked up Verstappen while Norris led, so Norris ran on ahead of it",
+   "source": "https://en.wikipedia.org/wiki/2024_Miami_Grand_Prix"
   }
  ],
  "hungary-2024": [
@@ -265,6 +272,26 @@
   }
  ],
  "belgium-2023": [],
+ "bahrain-2023": [
+  {
+   "lap": 41,
+   "type": "VSC",
+   "driver": "LEC",
+   "status": "Retired",
+   "source": "https://api.openf1.org/v1/race_control?session_key=7953"
+  }
+ ],
+ "great-britain-2021": [
+  {
+   "lap": 40,
+   "type": "TEAM_ORDER",
+   "driver": "BOT",
+   "passer": "HAM",
+   "detail": "Mercedes told Bottas to let Hamilton by; he did, at Stowe, on lap 40",
+   "source": "https://www.motorsportmagazine.com/articles/single-seaters/f1/hamilton-claws-his-way-back-to-silverstone-win-after-verstappen-crash-2021-british-gp-lap-by-lap-report/",
+   "note": "Lap 40 in Motor Sport, Autosport and GrandPrix.com (analysis); the timing (FastF1) has HAM ahead of BOT from the end of lap 40"
+  }
+ ],
  "australia-2025": [
   {
    "lap": 34,

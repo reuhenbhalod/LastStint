@@ -677,10 +677,14 @@
         {
           "lap": 19,
           "to": "MEDIUM",
-          "loss": 22.876
+          "loss": 22.945
         }
       ],
       "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.067
+        },
         {
           "lap": 19,
           "offset": 0.017

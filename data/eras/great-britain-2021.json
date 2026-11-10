@@ -1,0 +1,41 @@
+{
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": true,
+    "drs": true,
+    "ers": "hybrid",
+    "refuelling": false
+  },
+  "eras": {
+    "eraId": 9,
+    "order": 9,
+    "userSide": "LEC",
+    "target": {
+      "type": "defend"
+    },
+    "storyline": {
+      "real": "Verstappen crashes out on lap 1 after contact with Hamilton; Leclerc leads from the standing restart on one stop, and Hamilton, carrying a 10-second penalty, catches him and passes him at Copse on lap 50 to win by 3.871 s.",
+      "rewriteCondition": {
+        "type": "defend"
+      },
+      "headline": "Leclerc holds Hamilton off to win at Silverstone"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 1,
+      "label": "Win on one stop"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 3,
+      "label": "Win by more than 3 seconds"
+    },
+    "hardCalls": {
+      "HAM": 0,
+      "LEC": 0
+    },
+    "briefing": "Silverstone, 2021. Verstappen is out on lap 1 after touching wheels with Hamilton at Copse, and the race is red-flagged. You run Leclerc, who leads from the standing restart with Hamilton right behind. Hamilton has a 10-second penalty to serve at his stop. Hold him off."
+  }
+}

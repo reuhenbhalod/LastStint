@@ -3532,3 +3532,95 @@ monaco-2016 (MAG, VER), germany-2019 (HUL, LEC, NOR, RIC), canada-2011 (ALO, KOV
 netherlands-2023 (SAR), monaco-2022 (MAG, MSC; MAG on the field median), monaco-2008 (FIS, PIQ),
 europe-2007 (WIN), great-britain-2016 (GRO), with hungary-2006 and malaysia-2001. No
 Daily/Gauntlet file or golden changes.
+
+## Eras model fix W5 (Nov 9 2026): pace by stint on rain tyres
+
+**Why.** M2's stint offsets (`pace.stint_offsets`) skip every lap at wetness 0.02 and up, so a
+wet race's rain-tyre stints keep no offset of their own: netherlands-2023's finish on inters
+(after the lap-64 red flag) ran with the field compressed (HAM 5.05 s, podium order 0.38), and
+australia-2025's last inter stint had VER 0.85 s a lap slower than NOR where the real laps were
+level. The restart lap after netherlands-2023's red flag (lap 66, lap time +45 s on the model)
+also counted as a racing lap, clipped at +3 s.
+
+**Change** (`pace.stint_offsets(wet_stints=True)`, `assemble.WET_STINTS`; only where M2 runs:
+Eras builds of timed races with wet laps): laps on inters or wets at wetness 0.02 and up count,
+against the sim's wet clean lap (the curves plus the car's `wetPace` / `dampPace`), each miss
+divided by the lap's wet factor; and a restart lap (the lap before not green) is left out, as
+`wet.racing_laps` does. Slicks on a wet track stay out: counting them too lost belgium-2023
+(RUS 8.8 s) and germany-2018 (duel 3.7 s). No sim change (the file's `stintPace` as before);
+Daily/Gauntlet builds don't run M2 (in-memory check: canada-2024 and russia-2021 build the same
+with W5 on and off).
+
+**Before / after** (robust G1, one race per call, fresh builds in memory):
+
+| Race | Before | After | Failing checks after |
+|---|---|---|---|
+| netherlands-2023 | fail 2.34 s | **pass** 2.47 s | |
+| australia-2025 | fail 3.70 s | fail 3.43 s | duel VER vs NOR 5.07 / 4.96 [3.00]; VER 5.07 / 4.96 [5.00]; ANT 5.55 / 5.74 [5.00] |
+| hungary-2021 | fail 4.80 s | fail 4.36 s | duel HAM vs ALO 4.08 / 4.04 [3.00]; HAM 7.82 / 8.15; SAI 5.04 / 5.16 [5.00]; GAS 8.98 / 9.08 [6.36] |
+| belgium-2023 | pass 1.98 s | pass 1.99 s | |
+| germany-2018 | pass 1.64 s | pass 1.64 s | |
+| germany-2019 | pass 1.42 s | pass 1.54 s | |
+| japan-2000 | pass 1.29 s | pass 1.29 s | |
+| malaysia-2013 | pass 0.90 s | pass 0.90 s | |
+| spain-1996 | pass 0.63 s | pass 0.63 s | |
+| turkey-2020 | pass 1.75 s | pass 1.75 s | |
+
+Other timed wet Eras races (failing ones) change too once rebuilt; not measured here.
+australia-2025's rest: VER's last stint is short (6 green laps, shrunk by 5) and mostly within
+1.5 s of NOR. hungary-2021's error is dry stint pace (gap 3), not the wet start.
+
+## Eras overtaking stream (Nov 9 2026): the three Era 10/9 targets are not held back by the pass model; nothing adopted
+
+Targets: singapore-2023, monaco-2025, brazil-2021 (races report gap 1, "weak overtaking").
+Robust G1 before (this branch = `eras` at `abcf03c`, fresh builds): singapore-2023 fail 3.69 s,
+monaco-2025 fail 3.28 s, brazil-2021 fail 1.91 s (the races report's figures). No model code
+changed, so the "after" figures are the same and no other race was re-measured.
+
+**Diagnosis** (reference sim, 100-200 runs, each car's mean gap to the winner traced lap by lap
+against the real laps; scripts in the worktree's untracked `scratch/`):
+
+- **singapore-2023.** Two causes, neither the pass roll.
+  1. *The Ferrari and Mercedes double-stacks under the lap-20 SC.* Pit-lane times from the
+     timing (PitOutTime - PitInTime): LEC 32.9 s behind SAI's 29.5 s, HAM 32.6 s behind RUS's
+     30.0 s, HUL 35.5 s behind MAG's 31.4 s (median of the 13 SC stops 30.6 s). The sims charge
+     every SC stop the flat `pitLossUnderSC` (15.9 s), so LEC rejoins 3rd (real 7th) and holds
+     NOR behind him for laps while SAI drives away (NOR 6.5 s behind SAI on lap 41 in the sim,
+     1.7 s real). Test (not committed): each SC stop charged pitLossUnderSC plus its lane time
+     less the race's median SC lane time. The duel passes on both seed sets (4.38 / 5.03 ->
+     ~2.9 / ~3.0 s at 500 runs), mean gap error 3.66 -> 3.06 s. GAS stays at 10.5-10.7 s.
+  2. *GAS (and PIA, LAW): the managed lead pace.* After the lap-44 VSC every car runs 0.8-1.9 s
+     a lap faster than its model lap (track and fuel), GAS and PIA about 0.4-0.5 s a lap more
+     than SAI and NOR, who ran under Sainz's managed pace (keeping Norris in DRS range). GAS is
+     barely held in the sim (about 1 lap in 17 at the hold gap after lap 46): it is pace, not
+     traffic. Dropping the HARD cliff or its quadratic wear doesn't move it (9.2 -> 8.8-9.0 s).
+     Also seen: the Mercedes on fresh mediums (adv 2.0-2.5 s a lap) pass NOR and SAI too often
+     at the end (HAM's mean finish 2.2 against 3rd). The real RUS failed 5 rolls in a row
+     (model P 0.11-0.94 a lap), luck the model can't call.
+- **monaco-2025.** HAM's 9 s is his lap-57 stop and the laps after it, not the queue: his real
+  out-lap is 81.5 s against LEC's 77.1 s on the same tyre, with no car within 4 s of him at the
+  line. The stop's measured loss (23.8 s) already carries most of it, and the rest builds up
+  over laps 58-70 (HAM's last-stint offset +0.67 s). It's pace and stop residuals, and HAM runs
+  5th alone in every run.
+- **brazil-2021.** The duel error is VER's last-stint shape: on the hards from lap 41 he runs
+  0.6-0.9 s a lap under his model on laps 51-57 (defending) and 1.0-1.1 s over it on laps
+  66-71. Real HAM pulls 0.75 s a lap after his lap-59 pass, the sim's 0.4 s. The sim's HAM
+  passes earlier than the real one, so passing harder would make the gap smaller still. This
+  belongs to per-stint wear (B3), not overtaking.
+
+**Pass-model calibration (measured, not adopted).** On the 92 fit races' opportunities
+(M3's fit) the pooled logistic is well calibrated in the pace advantage (drs: real / predicted
+0.349 / 0.351 at 1.0-1.5 s, 0.531 / 0.524 at 1.5-2 s). There is one significant effect it
+misses: the pace slope grows with the track's ease. With the race's own model as offset, the
+terms adv x intercept get +0.343 (z 5.4) and gap x intercept -0.225 (z -2.5). In the hardest
+quarter of tracks, adv > 2 s passes 58.5% real against 70.1% predicted; in the easiest, 87.8%
+against 78.6%. Applied with the intercept re-matched to each race's own pass count, it barely
+moves the targets (500 runs, seeds 10000 / 20000): singapore-2023 3.66 / 3.79 s still fails;
+brazil-2021 duel 3.59 -> 3.38 s (seed 20000), still fails; monaco-2025 HAM 8.5 / 8.0 s still
+fails. So it isn't proposed without a target it fixes. The SC lane-time rule above is the one
+candidate with a measured win (the Singapore duel). It is an SC stop-pricing change for the
+stop-loss stream, Eras-gated, and needs a no-pass-lost run on every Eras race with an SC stop.
+
+Outcome: all three targets are **swap candidates** for the overtaking stream (none fixable by
+the pass model). singapore-2023 needs the SC lane-time rule plus a managed-pace fix, monaco-2025
+HAM's stop and stint residuals, brazil-2021 per-stint wear.

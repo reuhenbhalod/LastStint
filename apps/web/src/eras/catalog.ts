@@ -123,7 +123,10 @@ export interface EraRaceInfo {
 /** Spec §4: each era's races in position order, as `[raceId, dilemma]`, by era id. */
 const RACE_TABLE: Record<number, ReadonlyArray<readonly [string, string]>> = {
   10: [
-    ['monaco-2022', "Ferrari's calls in the rain"],
+    [
+      'bahrain-2023',
+      "Ferrari stops early for hards; Aston Martin stretches Alonso's softs to catch Sainz late",
+    ],
     ['great-britain-2022', "Ferrari doesn't pit Leclerc under the safety car"],
     ['hungary-2022', "Ferrari's hard-tyre gamble"],
     ['singapore-2023', "Sainz manages the gaps; Mercedes' late stop"],
@@ -136,14 +139,20 @@ const RACE_TABLE: Record<number, ReadonlyArray<readonly [string, string]>> = {
   ],
   9: [
     ['bahrain-2021', 'Track limits and the undercut'],
-    ['spain-2021', "Mercedes' extra stop catches Verstappen"],
+    [
+      'styria-2021',
+      'Hamilton on wilting mediums four seconds back: pit early, stretch the stint, or stop twice',
+    ],
     ['azerbaijan-2021', 'Tyre failure, then the restart'],
     ['france-2021', "Red Bull's two-stop beats Hamilton"],
     ['hungary-2021', 'Hamilton alone on the grid at the restart'],
     ['russia-2021', 'Norris stays on slicks as the rain arrives'],
     ['turkey-2021', 'Hamilton argues against pitting'],
     ['brazil-2021', 'Hamilton from 10th'],
-    ['saudi-arabia-2021', 'Red flags and restarts'],
+    [
+      'great-britain-2021',
+      'A 10-second penalty to serve at the one stop, then a one-stopping Ferrari to catch',
+    ],
     ['abu-dhabi-2021', 'The finale'],
   ],
   8: [
