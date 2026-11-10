@@ -6,7 +6,8 @@ picks that pass robust G1, so the three with the worst robust-G1 mean gap error 
 first, each replaced by the best remaining pick in the same era and slot, as in the earlier
 swaps (`swap-races.md` / migration 0012, `swap-races-e10-e9.md` / 0013,
 `swap-races-e10-e9-b.md` / 0014). D1 migration 0022 renames the three `era_races` rows.
-hungary-1997 (fail, 2.57 s, the fourth-worst) stays in place.
+hungary-1997 (fail, 2.57 s, the fourth-worst) stayed in place in that batch; a later batch
+(migration 0028, section "luxembourg-1998" at the end) swapped it for luxembourg-1998.
 
 Every fact below was read in the linked source on Nov 9, 2026; nothing comes from memory.
 Where sources disagree, the row says so. "Not in sources" means no opened source gave the
@@ -18,7 +19,7 @@ number. Check each row against its links and put your initials and the date in
 | 3 / #10 | `europe-1999` | fail, 10.26 s (field SCH gap error, the second shower's wet pace) | `san-marino-1999` | pass, 0.91 s (strict pass) |
 | 3 / #8 | `belgium-1998` | fail, 5.11 s (field DIN gap error, the SC restart) | `germany-1996` | pass, 1.27 s (strict pass) |
 | 3 / #9 | `malaysia-1999` | fail, 2.96 s (duel IRV vs HAK gap error, Ferrari's team orders) | `germany-1997` | pass, 1.41 s (strict pass) |
-| 3 / #5 | `hungary-1997` | fail, 2.57 s | stays | – |
+| 3 / #5 | `hungary-1997` | fail, 2.57 s (field MSCM gap error) | `luxembourg-1998` (later batch, migration 0028; section below) | pass, 0.88 s, after the sourced `pace_skip` fix (`fix-luxembourg-1998.md`) |
 
 The removed races' numbers are from `docs/eras-races-report.md`. The replacements' numbers were
 measured on an Eras build with a rules-only overlay (`pipeline build <id>`, then
@@ -275,3 +276,68 @@ Nothing below relies on it. Motor Sport has no race report linked on its databas
   AS-G alone; Fisichella's tyre failure and Schumacher's fuel-short stop need FAULT / refuel
   modelling; two source conflicts (Berger delay cause, Villeneuve's spin) to settle; lap of
   Schumacher's extra stop not sourced.
+
+## luxembourg-1998 (1998 Luxembourg Grand Prix)
+
+Replaces `hungary-1997` (Era 3 #5) in a later batch, D1 migration 0028. Robust G1: fail
+(1.86 s) on a rules-only Eras build, **pass, 0.88 s** after the sourced `pace_skip` fix for
+Häkkinen (`docs/eras-checks/fix-luxembourg-1998.md`: held up by Irvine laps 2-14, eased off
+laps 65-67). hungary-1997 (fail, 2.57 s) keeps its race file, overlay, build entry, track file
+and incidents as an Eras-build fixture. Raw data (Jolpica laps and results, F1DB stops and
+fastest laps, SC estimate) was ingested by the Era 3 scout.
+
+Not authored yet (no `eras` block): side (`pipeline hard-calls`), target, storyline, mastery,
+hidden objective and briefing come in B1. The `user_side` / `rival` pair in `build.py`
+(HAK vs MSCM) is provisional.
+
+### Sources
+
+| Short name | What |
+|---|---|
+| WP | English Wikipedia, [1998 Luxembourg Grand Prix](https://en.wikipedia.org/wiki/1998_Luxembourg_Grand_Prix) |
+| AS | Autosport (Atlas F1) race review, [atlasf1.autosport.com/98/lux/ryder.html](http://atlasf1.autosport.com/98/lux/ryder.html). States "All timing is unofficial." |
+| MS | Motor Sport, November 1998, ["Modern Times"](https://www.motorsportmagazine.com/archive/article/november-1998/12/modern-times/) |
+| Jolpica | `https://api.jolpi.ca/ergast/f1/1998/15/results.json` (fetched 2026-11-09) |
+| F1DB | Stops in `data/raw/f1db/luxembourg-1998.stops.csv` (F1DB v2026.19.0) |
+| GPE | GrandPrix.com [rr629](https://www.grandprix.com/gpe/rr629.html): returned HTTP 429 twice, **not read**; nothing below comes from it |
+
+### Facts
+
+| Item | Fact | Sources | Owner checked |
+|---|---|---|---|
+| Event | Luxembourg GP, Nürburgring, 27 September 1998; round 15 | WP, Jolpica | |
+| Grid top 6 | M. Schumacher (Ferrari) pole 1:18.561; Irvine (Ferrari) 2nd 1:18.907; Häkkinen (McLaren) 3rd 1:18.940; Fisichella (Benetton) 4th; Coulthard (McLaren) 5th; R. Schumacher (Jordan) 6th. Frentzen 7th, Wurz 8th | WP, Jolpica (grid) | |
+| Grid penalties | None in sources (Jolpica grid matches the qualifying order above) | WP, Jolpica | |
+| Laps | 67 laps, 305.235 km (WP; F1DB gives 305.252 km) | WP, Jolpica, F1DB | |
+| Weather | "Cloudy, cold, dry" (WP); dry race, rain only on Saturday morning (AS) | WP, AS | |
+| SC / VSC / red flag | None in sources (no safety car or red flag mentioned by WP or AS); the Jolpica SC estimate has no periods | WP, AS | |
+| Start | Irvine passed Schumacher before the first corner. Coulthard got alongside Häkkinen but backed off; Häkkinen 3rd. Irvine ran wide at the final chicane and Schumacher took the lead on lap 1 (AS). WP: Irvine "let his team leader back past" at the end of lap 1 | AS, WP | |
+| Team orders | AS: Irvine was expected to let Schumacher by and "play the team game" to hold Häkkinen back. WP and MS describe Irvine holding Häkkinen up but do not call it a team order | AS, WP, MS | |
+| Early gaps | End of lap 7: Schumacher 3.3 s ahead of Irvine, Irvine 1.8 s ahead of Häkkinen. Lap 9: Schumacher 3.9 s ahead of Irvine | AS | |
+| Häkkinen passes Irvine | Lap 14, Veedol chicane | WP, AS | |
+| Strategy | Two-stop race for the leaders (MS). Fuel loads: not in sources. MS: Häkkinen ran "light tanks" for four fast laps after Schumacher stopped | MS | |
+| Gap before stop 1 | Lap 24: Häkkinen 3.5 s behind Schumacher (AS); "less than five seconds" at one third distance (MS) | AS, MS | |
+| Stops: M. Schumacher | Lap 24 and lap 46 (AS); WP gives lap 24 for the first; **F1DB gives laps 24 and 47** (sources disagree on the second). Stationary 8.6 s at stop 1 (MS; he complained of oversteer, took tyres and fuel); "25.8 seconds" at stop 2 (AS, probably pit-lane time; not stated) | AS, WP, MS, F1DB | |
+| Stops: Häkkinen | Lap 28 and lap 48 (AS, F1DB); WP gives lap 28 for the first. Stationary 8.7 s at stop 1 (MS); "24.8 seconds" at stop 2 (AS). Rejoined ahead of Schumacher by under a second after stop 1 (WP, AS), 2.9 s ahead after stop 2 (AS) | AS, WP, MS, F1DB | |
+| Stops: Irvine | Lap 25 and lap 49 | AS, F1DB | |
+| Stops: Coulthard | Lap 29 and lap 52; he passed Irvine in the first round of stops (WP) | AS, WP, F1DB | |
+| Stops: others | Takagi and Verstappen lap 22; Villeneuve lap 31 (1st). Second stops: Fisichella lap 42, Wurz and Frentzen lap 43 | AS | |
+| Compounds | Not in sources (1998 grooved tyres; no compound named for any stop) | | |
+| Contact | No major collisions (AS). Frentzen passed Salo in the pit lane, legal but called dangerous (AS). Häkkinen had a big sideways moment braking for the chicane, no contact (MS) | AS, MS | |
+| Penalties | None in sources | WP, AS, Jolpica | |
+| Retirements | Diniz lap 6 hydraulics; Trulli lap 6 transmission; Rosset 36 laps engine; Herbert 37 laps engine; R. Schumacher 53 laps brakes; Tuero 56 laps engine (Jolpica laps/status; AS gives Tuero as driveshaft). None is a storyline car | Jolpica, WP, AS | |
+| Result top 6 | 1 Häkkinen 1:32:14.789; 2 M. Schumacher +2.212; 3 Coulthard +34.164; 4 Irvine +58.183; 5 Frentzen +1:00.248; 6 Fisichella +1:01.360 (WP; Jolpica gives each gap 0.001 s smaller) | WP, Jolpica | |
+| Late gaps | Lap 46: Schumacher 2.3 s behind; Häkkinen led by 4.7 s with two laps to go (AS); WP: about five seconds, then eased off | AS, WP | |
+| Fastest lap | Häkkinen 1:20.450, lap 25 | WP, AS, F1DB | |
+| Championship | Häkkinen 90 pts, Schumacher 86 after the race; title to Suzuka | WP, MS | |
+
+### Proposal (draft, for the owner)
+
+| Item | Draft |
+|---|---|
+| Storyline drivers | Mika Häkkinen (McLaren) and Michael Schumacher (Ferrari) |
+| Dilemma (original wording) | Ferrari brings the leader in first on lap 24; McLaren keeps Häkkinen out four more laps on a light car to jump him in the pits |
+| Side | Set by `pipeline hard-calls`. If Häkkinen: **target `win`: Häkkinen from P3** (spec §4 draft), the real result, so no rewrite. If Schumacher: **target `win`: Schumacher keeps the lead through the stops** (he really lost, so a rewrite is allowed) |
+| Side really won? | Häkkinen: yes. Schumacher: no (2nd, 2.2 s) |
+| Risk | **Medium.** Dry, no SC, few retirements, first-stop laps agree in AS, WP and F1DB (Schumacher's second stop: AS lap 46, F1DB lap 47). Gaps are small (under 1 s after stop 1, 2.2 s at the flag), so the sim's stop-time model decides the undercut. No fuel loads or compounds sourced. Irvine's holding role is only called a team game by AS |
+

@@ -79,6 +79,9 @@ APPENDIX_RACES = [
     # Swapped into Era 3 on Nov 9 (docs/eras-checks/swap-races-era3-overnight.md); the races
     # they replaced (belgium-1998, malaysia-1999, europe-1999) stay above as Eras-build fixtures.
     *("germany-1996", "germany-1997", "san-marino-1999"),
+    # Swapped into Era 3 for hungary-1997 on Nov 9 (same sheet); hungary-1997 stays above as an
+    # Eras-build fixture.
+    "luxembourg-1998",
 ]
 FIRST_STOPS_YEAR = 1994
 

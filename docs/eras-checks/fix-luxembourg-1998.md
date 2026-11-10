@@ -4,8 +4,9 @@ Near-miss fix, Nov 9 2026. Every fact below was read in the linked source on Nov
 taken from memory. No team radio is quoted. Check each row against its source, then put your
 initials and the date in **Owner checked**. This race is a candidate only: it is registered
 for measurement (`pipeline/src/pipeline/build.py` RACES, rules-only overlay
-`data/eras/luxembourg-1998.json`, both from the eras-scout-era3 scout) and is not in
-`data/pools.json`. Side (HAK) is provisional until `pipeline hard-calls`.
+`data/eras/luxembourg-1998.json`, both from the eras-scout-era3 scout). It has since been
+swapped into Era 3 #5 for hungary-1997 (`swap-races-era3-overnight.md`, migration 0028).
+Side (HAK) is provisional until `pipeline hard-calls`.
 
 ## Sources
 

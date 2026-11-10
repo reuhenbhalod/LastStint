@@ -2188,7 +2188,8 @@ RACES: dict[str, dict] = {
         "era": "1994-2009",
         "takeover_lap": None,  # D3 rule
         "seed": 1,
-        # Swap candidate for hungary-1997 (Era 3, eras-scout-era3). Side provisional until
+        # Swapped in for hungary-1997 (Era 3 #5, Nov 9, migration 0028;
+        # docs/eras-checks/swap-races-era3-overnight.md). Side provisional until
         # `pipeline hard-calls`.
         # pace_skip: Irvine held Häkkinen up from the end of lap 1 until Häkkinen passed him
         # on lap 14 (Wikipedia; docs/eras-checks/fix-luxembourg-1998.md).
