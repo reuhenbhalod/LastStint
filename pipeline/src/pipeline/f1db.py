@@ -63,6 +63,7 @@ FASTEST_COLUMNS = ["race_id", "driver", "driver_id", "number", "rank", "lap", "t
 
 # Appendix races F1DB covers: stops for every race from 1994 to 2010 (Jolpica has stops from
 # 2011), fastest laps for every race before 2011 (later years come with full laps).
+# australia-2010 left the appendix (Era 6 swap, Nov 9) but stays: its build is an Eras fixture.
 APPENDIX_RACES = [
     *("south-africa-1983", "monaco-1984", "portugal-1984", "germany-1986", "portugal-1985"),
     *("mexico-1986", "hungary-1986", "australia-1986", "great-britain-1987", "monaco-1988"),
@@ -74,7 +75,7 @@ APPENDIX_RACES = [
     *("hungary-2003", "united-states-2003", "japan-2003", "france-2004", "monaco-2004"),
     *("san-marino-2005", "japan-2005", "hungary-2006", "brazil-2006", "china-2007"),
     *("europe-2007", "brazil-2007", "monaco-2008", "brazil-2008", "brazil-2009"),
-    *("australia-2010", "abu-dhabi-2010"),
+    *("australia-2010", "abu-dhabi-2010", "italy-2010"),
 ]
 FIRST_STOPS_YEAR = 1994
 

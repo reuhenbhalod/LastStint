@@ -1174,6 +1174,54 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
+    # Era 6 swaps (owner, Nov 9; docs/eras-checks/swap-races-era6-overnight.md), each in the
+    # slot of the race it replaced. Sides from a local `pipeline hard-calls` run; authoring
+    # (B1) writes them to the overlays.
+    "italy-2010": {
+        "year": 2010,
+        "event": "Italy",
+        "source": "jolpica",
+        "name": "Italy 2010: Alonso vs Button",
+        "era": "2010-2013",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for monaco-2011. Hard calls ALO 0, BUT 0, Alonso by chance given up (38.0
+        # vs 30.3 pts; local run): his one-lap overcut on Button (real: ALO P1).
+        "user_side": "ALO",
+        "rival": "BUT",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "australia-2013": {
+        "year": 2013,
+        "event": "Australia",
+        "source": "jolpica",
+        "name": "Australia 2013: Räikkönen vs Alonso",
+        "era": "2010-2013",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for canada-2011. Hard calls RAI 2, ALO 0 (local run): Räikkönen's two
+        # stops against Alonso's three (real: RAI P1).
+        "user_side": "RAI",
+        "rival": "ALO",
+        "score_positions": 6,
+        "split": "eras",
+    },
+    "bahrain-2012": {
+        "year": 2012,
+        "event": "Bahrain",
+        "source": "jolpica",
+        "name": "Bahrain 2012: Vettel vs Räikkönen",
+        "era": "2010-2013",
+        "takeover_lap": None,  # D3 rule
+        "seed": 1,
+        # Swapped in for australia-2010. Hard calls VET 3, RAI 1 (local run, not yet written to
+        # the overlay): Vettel from pole holds off Räikkönen's fresher softs (real: VET P1).
+        "user_side": "VET",
+        "rival": "RAI",
+        "score_positions": 6,
+        "split": "eras",
+    },
     "canada-2014": {
         "year": 2014,
         "event": "Canada",
