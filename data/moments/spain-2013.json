@@ -1,59 +1,10 @@
 [
   {
-    "id": "rivalpit-21",
-    "lap": 21,
-    "trigger": "rivalPit",
-    "target": {
-      "kind": "win"
-    },
-    "options": [
-      {
-        "id": "stay",
-        "label": "Stay out",
-        "decisions": []
-      },
-      {
-        "id": "box-soft",
-        "label": "Box, softs",
-        "decisions": [
-          {
-            "lap": 21,
-            "kind": "pit",
-            "compound": "SOFT"
-          }
-        ]
-      },
-      {
-        "id": "box-hard",
-        "label": "Box, hards",
-        "decisions": [
-          {
-            "lap": 21,
-            "kind": "pit",
-            "compound": "HARD"
-          }
-        ]
-      },
-      {
-        "id": "box-next-hard",
-        "label": "Box next lap, hards",
-        "decisions": [
-          {
-            "lap": 22,
-            "kind": "pit",
-            "compound": "HARD"
-          }
-        ]
-      }
-    ],
-    "realOptionId": "stay"
-  },
-  {
     "id": "stop-26",
     "lap": 26,
     "trigger": "cliff",
     "target": {
-      "kind": "win"
+      "kind": "beat-rival"
     },
     "options": [
       {
@@ -98,109 +49,11 @@
     "realOptionId": "box-hard"
   },
   {
-    "id": "cliff-33",
-    "lap": 33,
-    "trigger": "cliff",
-    "target": {
-      "kind": "win"
-    },
-    "options": [
-      {
-        "id": "stay",
-        "label": "Stay out",
-        "decisions": []
-      },
-      {
-        "id": "box-soft",
-        "label": "Box, softs",
-        "decisions": [
-          {
-            "lap": 33,
-            "kind": "pit",
-            "compound": "SOFT"
-          }
-        ]
-      },
-      {
-        "id": "box-hard",
-        "label": "Box, hards",
-        "decisions": [
-          {
-            "lap": 33,
-            "kind": "pit",
-            "compound": "HARD"
-          }
-        ]
-      },
-      {
-        "id": "box-next-hard",
-        "label": "Box next lap, hards",
-        "decisions": [
-          {
-            "lap": 34,
-            "kind": "pit",
-            "compound": "HARD"
-          }
-        ]
-      }
-    ],
-    "realOptionId": "stay"
-  },
-  {
-    "id": "rivalpit-36",
-    "lap": 36,
-    "trigger": "rivalPit",
-    "target": {
-      "kind": "win"
-    },
-    "options": [
-      {
-        "id": "stay",
-        "label": "Stay out",
-        "decisions": []
-      },
-      {
-        "id": "box-soft",
-        "label": "Box, softs",
-        "decisions": [
-          {
-            "lap": 36,
-            "kind": "pit",
-            "compound": "SOFT"
-          }
-        ]
-      },
-      {
-        "id": "box-hard",
-        "label": "Box, hards",
-        "decisions": [
-          {
-            "lap": 36,
-            "kind": "pit",
-            "compound": "HARD"
-          }
-        ]
-      },
-      {
-        "id": "box-next-hard",
-        "label": "Box next lap, hards",
-        "decisions": [
-          {
-            "lap": 37,
-            "kind": "pit",
-            "compound": "HARD"
-          }
-        ]
-      }
-    ],
-    "realOptionId": "stay"
-  },
-  {
     "id": "stop-45",
     "lap": 45,
     "trigger": "cliff",
     "target": {
-      "kind": "win"
+      "kind": "beat-rival"
     },
     "options": [
       {
@@ -243,54 +96,5 @@
       }
     ],
     "realOptionId": "box-hard"
-  },
-  {
-    "id": "rivalpit-49",
-    "lap": 49,
-    "trigger": "rivalPit",
-    "target": {
-      "kind": "win"
-    },
-    "options": [
-      {
-        "id": "stay",
-        "label": "Stay out",
-        "decisions": []
-      },
-      {
-        "id": "box-soft",
-        "label": "Box, softs",
-        "decisions": [
-          {
-            "lap": 49,
-            "kind": "pit",
-            "compound": "SOFT"
-          }
-        ]
-      },
-      {
-        "id": "box-hard",
-        "label": "Box, hards",
-        "decisions": [
-          {
-            "lap": 49,
-            "kind": "pit",
-            "compound": "HARD"
-          }
-        ]
-      },
-      {
-        "id": "box-next-hard",
-        "label": "Box next lap, hards",
-        "decisions": [
-          {
-            "lap": 50,
-            "kind": "pit",
-            "compound": "HARD"
-          }
-        ]
-      }
-    ],
-    "realOptionId": "stay"
   }
 ]
