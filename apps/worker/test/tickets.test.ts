@@ -414,3 +414,28 @@ describe('assignee', () => {
     expect((await list()).find((x) => x.id === t.id)?.assignee).toBe('');
   });
 });
+
+describe('ticket audit log', () => {
+  const logged = async () =>
+    (
+      await env.DB.prepare('SELECT action, detail FROM admin_log ORDER BY id').all<{
+        action: string;
+        detail: string;
+      }>()
+    ).results.map((r) => ({ action: r.action, detail: JSON.parse(r.detail) }));
+
+  it('logs creating a ticket, changing its status and deleting it, not other edits', async () => {
+    const t = await create({ title: 'Logged' });
+    await patched(t.id, { title: 'Logged, renamed' });
+    await patched(t.id, { status: 'done' });
+    expect((await api('DELETE', `/api/admin/tickets/${t.id}`)).status).toBe(200);
+    expect(await logged()).toEqual([
+      { action: 'ticket-create', detail: { id: t.id, title: 'Logged' } },
+      {
+        action: 'ticket-status',
+        detail: expect.objectContaining({ id: t.id, from: t.status, to: 'done' }),
+      },
+      { action: 'ticket-delete', detail: { id: t.id } },
+    ]);
+  });
+});

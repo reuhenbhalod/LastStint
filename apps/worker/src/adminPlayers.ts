@@ -67,15 +67,17 @@ interface Row {
   hidden: number;
 }
 
+/** The players, newest first (or with `id`, just that one, whatever its age). */
 export async function listPlayers(
   db: D1Database,
   limit = PLAYERS_LIMIT,
+  id: string | null = null,
 ): Promise<{ total: number; players: AdminPlayer[] }> {
   const [count, rows] = await db.batch([
     db.prepare('SELECT COUNT(*) AS n FROM players'),
     db
       .prepare(
-        `WITH links AS (SELECT player_id, anon_id FROM player_ids),
+        `WITH links AS (SELECT player_id, anon_id FROM player_ids WHERE ?2 IS NULL OR player_id = ?2),
          daily AS (
            SELECT l.player_id, COUNT(*) AS n, MAX(r.created_at) AS last
            FROM runs r JOIN links l ON l.anon_id = r.anon_id GROUP BY l.player_id),
@@ -94,10 +96,11 @@ export async function listPlayers(
          LEFT JOIN devices dv ON dv.player_id = p.id
          LEFT JOIN daily d ON d.player_id = p.id
          LEFT JOIN gauntlet g ON g.player_id = p.id
+         WHERE ?2 IS NULL OR p.id = ?2
          ORDER BY p.created_at DESC, p.id
-         LIMIT ?`,
+         LIMIT ?1`,
       )
-      .bind(limit),
+      .bind(limit, id),
   ]);
   const total = (count?.results[0] as { n: number } | undefined)?.n ?? 0;
   const players = ((rows?.results ?? []) as Row[]).map((r) => ({
@@ -136,8 +139,8 @@ export interface PlayerDetail {
 }
 
 export async function playerDetail(db: D1Database, id: string, now: number): Promise<PlayerDetail> {
-  const { players } = await listPlayers(db, PLAYERS_LIMIT);
-  const player = players.find((p) => p.id === id);
+  const { players } = await listPlayers(db, 1, id);
+  const player = players[0];
   if (!player) throw new ApiError(404, 'no-player');
   const [{ results: links }, dates, runs] = await Promise.all([
     db
@@ -183,12 +186,13 @@ export async function setPlayerName(db: D1Database, email: string, id: string, r
 
 /** Hide a player from every leaderboard, or show them again. */
 export async function setHidden(db: D1Database, email: string, id: string, hidden: boolean) {
-  const res = await db
-    .prepare('UPDATE players SET hidden = ? WHERE id = ?')
-    .bind(hidden ? 1 : 0, id)
-    .run();
-  if (!res.meta.changes) throw new ApiError(404, 'no-player');
-  await logStatement(db, email, 'hide', { id, hidden }).run();
+  const row = await db.prepare('SELECT 1 FROM players WHERE id = ?').bind(id).first();
+  if (!row) throw new ApiError(404, 'no-player');
+  // The change and its log row commit together.
+  await db.batch([
+    db.prepare('UPDATE players SET hidden = ? WHERE id = ?').bind(hidden ? 1 : 0, id),
+    logStatement(db, email, 'hide', { id, hidden }),
+  ]);
   return { id, hidden };
 }
 

@@ -101,17 +101,32 @@ export interface Standing {
   ahead: number;
 }
 
+/**
+ * Hidden players (admin) don't count in anyone else's rank or total, so a rank matches the
+ * leaderboard; the run's own player always counts, so a hidden player still gets their place.
+ */
 export async function standing(db: D1Database, run: RunRow): Promise<Standing> {
   const row = await db
     .prepare(
-      `SELECT
-         (SELECT COUNT(*) FROM runs WHERE date = ?1) AS total,
-         (SELECT COUNT(*) FROM runs WHERE date = ?1 AND score < ?2) AS lower,
-         (SELECT COUNT(*) FROM runs WHERE date = ?1 AND
-            (-score, -mean_probability, finish_position, created_at, rowid)
+      `WITH counted AS (
+         SELECT rowid AS rid, score, mean_probability, finish_position, created_at FROM runs
+         WHERE date = ?1 AND (${NOT_HIDDEN('anon_id')} OR anon_id = ?7))
+       SELECT
+         (SELECT COUNT(*) FROM counted) AS total,
+         (SELECT COUNT(*) FROM counted WHERE score < ?2) AS lower,
+         (SELECT COUNT(*) FROM counted WHERE
+            (-score, -mean_probability, finish_position, created_at, rid)
               < (-?2, -?3, ?4, ?5, (SELECT rowid FROM runs WHERE id = ?6))) AS ahead`,
     )
-    .bind(run.date, run.score, run.mean_probability, run.finish_position, run.created_at, run.id)
+    .bind(
+      run.date,
+      run.score,
+      run.mean_probability,
+      run.finish_position,
+      run.created_at,
+      run.id,
+      run.anon_id,
+    )
     .first<Standing>();
   return row ?? { total: 0, lower: 0, ahead: 0 };
 }

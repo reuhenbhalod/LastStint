@@ -237,15 +237,15 @@ Same admin check. Every change is written to the audit log (`admin_log`, migrati
 
 | Endpoint | What it does |
 |---|---|
-| `GET /api/admin/today` | Today's and tomorrow's daily, `queue: { days, low, warnUnder }` (low under 7), the stale days (today on, pinned to an old race file), and today's runs: `{ total, verified, corrected, disqualified }` |
+| `GET /api/admin/today` | Today's and tomorrow's daily, `queue: { days, low, warnUnder }` (low under 7), the stale days (today on, pinned to an old race file), and today's runs: `{ total, verified, corrected, unverified }` (unverified: not checked yet, or the check couldn't grade it) |
 | `POST /api/admin/announcement` `{ text, tone?, endsAt? }` | Sets the banner (1-280 characters; replaces the current one) |
 | `POST /api/admin/announcement/clear` | Clears it |
 | `GET /api/admin/eras` | Every era (play order) with `releasedAt`, `status` (`coming-soon`, `scheduled`, `released`), its published count and its races: position, published, attempts and players |
 | `POST /api/admin/eras/race` `{ raceId, published }` | Publishes or unpublishes a race. 409 `era-released` when unpublishing a race of a released or scheduled era |
-| `POST /api/admin/eras/release` `{ eraId, at, confirm? }` | `at`: `'now'`, a date (midnight UTC) or an ISO time. 409 `too-few-races` under 10 published races. `at: null` clears the release (back to Coming soon) and needs `confirm: true` (409 `confirm-needed`) |
+| `POST /api/admin/eras/release` `{ eraId, at, confirm? }` | `at`: `'now'`, a date (midnight UTC) or an ISO time. 409 `too-few-races` under 10 published races. `at: null` clears the release (back to Coming soon) and needs `confirm: true` (409 `confirm-needed`), as does moving a released era to a later date (it leaves players until then) |
 | `GET /api/admin/runs?date&player&mode` | Runs newest first, 200 at most: daily runs, Gauntlet runs and submitted Eras attempts. `date` defaults to today unless `player` (a name, email, player ID or anonId) is given |
 | `GET /api/admin/runs/:mode/:id` | One run with its calls and grades (a Gauntlet run: its rounds) |
-| `POST /api/admin/runs/reverify` `{ mode, id }` or `{ date }` | Sets `verified = 0` on one run, or every daily run that day, for the nightly check: `{ marked }` |
+| `POST /api/admin/runs/reverify` `{ mode, id }` or `{ date, mode? }` | Sets `verified = 0` on one run, or every run submitted that day (UTC) in every mode, or just `mode`, for the nightly check: `{ marked }` |
 | `POST /api/admin/runs/delete` `{ id }` | Deletes a daily run and its calls |
 | `GET /api/admin/players/:id` | A player's page: the account, linked browsers, streak (worked out from the days played), the days, and their runs |
 | `POST /api/admin/players/:id/name` `{ displayName }` | Sets the leaderboard name, or `''` to clear it (400 `bad-name`, 409 `name-taken`) |

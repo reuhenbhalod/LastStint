@@ -157,6 +157,7 @@ export async function setRelease(
   eraId: number,
   at: string | null,
   confirm: boolean,
+  now = Date.now(),
 ) {
   const era = await db
     .prepare(
@@ -176,6 +177,15 @@ export async function setRelease(
   }
   if (at === null && era.released_at && !confirm) {
     throw new ApiError(409, 'confirm-needed', 'clearing a release needs confirmation');
+  }
+  // Moving a released era to a later date takes it away from players until then, like clearing it.
+  const liveNow = !!era.released_at && Date.parse(era.released_at) <= now;
+  if (at !== null && liveNow && Date.parse(at) > now && !confirm) {
+    throw new ApiError(
+      409,
+      'confirm-needed',
+      'moving a released era to a later date takes it from players until then; confirm to do it',
+    );
   }
   await db.batch([
     db.prepare('UPDATE eras SET released_at = ? WHERE id = ?').bind(at, eraId),
@@ -209,7 +219,8 @@ export function registerAdminEras(app: Hono<{ Bindings: Env }>) {
     if (!Number.isInteger(eraId) || !('at' in b)) {
       throw new ApiError(400, 'bad-request', 'eraId and at are required');
     }
-    const at = releaseTime(b.at, Date.now());
-    return c.json(await setRelease(c.env.DB, who.email, eraId, at, b.confirm === true));
+    const now = Date.now();
+    const at = releaseTime(b.at, now);
+    return c.json(await setRelease(c.env.DB, who.email, eraId, at, b.confirm === true, now));
   });
 }

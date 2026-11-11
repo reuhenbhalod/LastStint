@@ -5,8 +5,9 @@
 //        date: YYYY-MM-DD (UTC; default today unless a player is given), player: a name,
 //        email, player ID or anonId, mode: daily / gauntlet / eras (default all three)
 //   GET  /api/admin/runs/:mode/:id              one run, with its calls (and Gauntlet rounds)
-//   POST /api/admin/runs/reverify               { mode, id } one run, or { date } every daily
-//                                               run that day: verified = 0, so the nightly
+//   POST /api/admin/runs/reverify               { mode, id } one run, or { date, mode? } every
+//                                               run submitted that day (UTC) in every mode, or
+//                                               just `mode`: verified = 0, so the nightly
 //                                               check (scripts/reverify.ts) grades it again
 //   POST /api/admin/runs/delete                 { id }: a daily run and its calls
 //
@@ -362,24 +363,38 @@ export async function runDetail(db: D1Database, mode: RunMode, id: string): Prom
 export async function reverify(
   db: D1Database,
   email: string,
-  target: { mode: RunMode; id: string } | { date: string },
+  target: { mode: RunMode; id: string } | { date: string; mode?: RunMode },
 ): Promise<{ marked: number }> {
+  if ('date' in target) {
+    const day = (mode: RunMode) =>
+      mode === 'daily'
+        ? db.prepare('UPDATE runs SET verified = 0 WHERE date = ?').bind(target.date)
+        : db
+            .prepare(
+              `UPDATE ${mode === 'gauntlet' ? 'survivor_rounds' : 'era_attempts'} SET verified = 0
+               WHERE submitted_at IS NOT NULL AND substr(submitted_at, 1, 10) = ?`,
+            )
+            .bind(target.date);
+    const modes = target.mode ? [target.mode] : [...RUN_MODES];
+    const done = await db.batch(modes.map(day));
+    const marked = done.reduce((n, res) => n + (res.meta.changes ?? 0), 0);
+    await logStatement(db, email, 'reverify', { ...target, marked }).run();
+    return { marked };
+  }
   const stmt =
-    'date' in target
-      ? db.prepare('UPDATE runs SET verified = 0 WHERE date = ?').bind(target.date)
-      : target.mode === 'daily'
-        ? db.prepare('UPDATE runs SET verified = 0 WHERE id = ?').bind(target.id)
-        : target.mode === 'gauntlet'
-          ? db
-              .prepare(
-                'UPDATE survivor_rounds SET verified = 0 WHERE run_id = ? AND submitted_at IS NOT NULL',
-              )
-              .bind(target.id)
-          : db
-              .prepare(
-                'UPDATE era_attempts SET verified = 0 WHERE id = ? AND submitted_at IS NOT NULL',
-              )
-              .bind(target.id);
+    target.mode === 'daily'
+      ? db.prepare('UPDATE runs SET verified = 0 WHERE id = ?').bind(target.id)
+      : target.mode === 'gauntlet'
+        ? db
+            .prepare(
+              'UPDATE survivor_rounds SET verified = 0 WHERE run_id = ? AND submitted_at IS NOT NULL',
+            )
+            .bind(target.id)
+        : db
+            .prepare(
+              'UPDATE era_attempts SET verified = 0 WHERE id = ? AND submitted_at IS NOT NULL',
+            )
+            .bind(target.id);
   const [res] = await db.batch([stmt]);
   const marked = res?.meta.changes ?? 0;
   await logStatement(db, email, 'reverify', { ...target, marked }).run();
@@ -436,9 +451,15 @@ export function registerAdminRuns(app: Hono<{ Bindings: Env }>) {
   app.post('/api/admin/runs/reverify', async (c) => {
     const who = await requireAdmin(c);
     const b = await body(c);
-    if (isDate(b.date)) return c.json(await reverify(c.env.DB, who.email, { date: b.date }));
+    if (isDate(b.date)) {
+      if (b.mode !== undefined && !isMode(b.mode)) {
+        throw new ApiError(400, 'bad-request', 'mode is daily, gauntlet or eras');
+      }
+      const target = isMode(b.mode) ? { date: b.date, mode: b.mode } : { date: b.date };
+      return c.json(await reverify(c.env.DB, who.email, target));
+    }
     if (!isMode(b.mode) || typeof b.id !== 'string' || !b.id) {
-      throw new ApiError(400, 'bad-request', 'send { mode, id } or { date }');
+      throw new ApiError(400, 'bad-request', 'send { mode, id } or { date, mode? }');
     }
     return c.json(await reverify(c.env.DB, who.email, { mode: b.mode, id: b.id }));
   });

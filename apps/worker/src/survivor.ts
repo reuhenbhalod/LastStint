@@ -140,15 +140,19 @@ async function rounds(db: D1Database, runId: string): Promise<RoundRow[]> {
   return results;
 }
 
+/** Hidden players count only in their own rank, so the rank matches the board (see standing). */
 async function rankOf(db: D1Database, run: RunRow): Promise<{ rank: number; total: number }> {
   const row = await db
     .prepare(
-      `SELECT
-         (SELECT COUNT(*) FROM survivor_runs WHERE rounds > ?1
+      `WITH counted AS (
+         SELECT rounds, score_sum FROM survivor_runs
+         WHERE ${NOT_HIDDEN('anon_id')} OR anon_id = ?3)
+       SELECT
+         (SELECT COUNT(*) FROM counted WHERE rounds > ?1
             OR (rounds = ?1 AND score_sum > ?2)) AS ahead,
-         (SELECT COUNT(*) FROM survivor_runs) AS total`,
+         (SELECT COUNT(*) FROM counted) AS total`,
     )
-    .bind(run.rounds, run.score_sum)
+    .bind(run.rounds, run.score_sum, run.anon_id)
     .first<{ ahead: number; total: number }>();
   return { rank: (row?.ahead ?? 0) + 1, total: row?.total ?? 1 };
 }

@@ -9,9 +9,9 @@ import type { RunDetail } from '../src/adminRuns.js';
 import type { AdminStats } from '../src/adminStats.js';
 import type { AdminToday } from '../src/adminToday.js';
 import { addDays, todayUtc } from '../src/dates.js';
-import { leaderboard } from '../src/db.js';
-import { topOfBoard } from '../src/erasHistory.js';
-import { survivorBoard } from '../src/survivor.js';
+import { type RunRow, leaderboard, standing } from '../src/db.js';
+import { rankOnBoard, topOfBoard } from '../src/erasHistory.js';
+import { survivorBoard, survivorState } from '../src/survivor.js';
 import { idToken, schedule } from './helpers.js';
 
 async function admin(path: string, body?: unknown, token?: string) {
@@ -186,7 +186,7 @@ describe('Today', () => {
     expect(res.days.tomorrow).toMatchObject({ number: 6, current: false });
     expect(res.queue).toEqual({ days: 2, low: true, warnUnder: 7 });
     expect(res.stale.map((d) => d.date)).toEqual([addDays(today, 1)]);
-    expect(res.runs).toEqual({ total: 2, verified: 1, corrected: 1, disqualified: 1 });
+    expect(res.runs).toEqual({ total: 2, verified: 1, corrected: 1, unverified: 1 });
   });
 
   it('logs the old tab’s changes too', async () => {
@@ -194,6 +194,13 @@ describe('Today', () => {
     await admin('/api/admin/repin', {});
     await admin('/api/admin/runs/clear', { date: today });
     expect(await logActions()).toEqual(['clear-run', 'repin', 'schedule']);
+  });
+
+  it('logs setting a day', async () => {
+    await schedule(today, { number: 5 });
+    const res = await admin('/api/admin/day', { date: today, raceId: 'canada-2022' });
+    expect(res.status).toBe(200);
+    expect(await logActions()).toEqual(['day']);
   });
 });
 
@@ -289,6 +296,27 @@ describe('Eras release controls', () => {
     expect((await admin('/api/admin/eras/release', { eraId: era.id, at: 'now' })).status).toBe(200);
     expect((await eras())[0]?.status).toBe('released');
 
+    // Moving a released era to a later date takes it from players: it needs confirmation too.
+    const moved = await admin('/api/admin/eras/release', { eraId: era.id, at: '2099-01-01' });
+    expect(moved.status).toBe(409);
+    expect(await moved.json()).toMatchObject({ error: 'confirm-needed' });
+    expect((await eras())[0]?.status).toBe('released');
+    // An earlier time keeps it out, so it needs no confirmation.
+    expect(
+      (await admin('/api/admin/eras/release', { eraId: era.id, at: '2020-01-01' })).status,
+    ).toBe(200);
+    expect(
+      (
+        await admin('/api/admin/eras/release', {
+          eraId: era.id,
+          at: '2099-01-01',
+          confirm: true,
+        })
+      ).status,
+    ).toBe(200);
+    expect((await eras())[0]?.status).toBe('scheduled');
+    expect((await admin('/api/admin/eras/release', { eraId: era.id, at: 'now' })).status).toBe(200);
+
     // A released era's races stay published; clearing the release needs confirmation.
     const unpublish = await admin('/api/admin/eras/race', {
       raceId: first?.raceId,
@@ -302,7 +330,7 @@ describe('Eras release controls', () => {
 
     const actions = await logActions();
     expect(actions.filter((a) => a === 'publish')).toHaveLength(10);
-    expect(actions.filter((a) => a === 'release')).toHaveLength(3);
+    expect(actions.filter((a) => a === 'release')).toHaveLength(6);
   });
 });
 
@@ -350,12 +378,59 @@ describe('Runs', () => {
     });
     expect(await json(admin('/api/admin/runs/reverify', { date: today }))).toEqual({ marked: 2 });
     expect((await admin('/api/admin/runs/reverify', {})).status).toBe(400);
+    expect((await admin('/api/admin/runs/reverify', { date: today, mode: 'nope' })).status).toBe(
+      400,
+    );
 
     expect((await admin('/api/admin/runs/delete', { id: 'r2' })).status).toBe(200);
     const left = await env.DB.prepare('SELECT COUNT(*) AS n FROM run_calls').first<{ n: number }>();
     expect(left?.n).toBe(1);
     expect((await admin('/api/admin/runs/delete', { id: 'r2' })).status).toBe(404);
     expect(await logActions()).toEqual(['delete-run', 'reverify', 'reverify']);
+  });
+
+  it('marks every run on a day in every mode, or in one', async () => {
+    await dailyRun('r1', ann, 80);
+    await gauntletRun('s1', ann, 3);
+    await eraAttempt('a1', ann, await firstEraRace(), 75);
+    await eraAttempt('a2', bo, await firstEraRace(), 70);
+    await env.DB.prepare(
+      "UPDATE era_attempts SET submitted_at = '2000-01-01T10:00:00.000Z', verified = 1 WHERE id = 'a2'",
+    ).run();
+    for (const t of ['runs', 'survivor_rounds', 'era_attempts']) {
+      await env.DB.prepare(`UPDATE ${t} SET verified = 1`).run();
+    }
+    const unverified = async () => {
+      const n = async (t: string) =>
+        (
+          await env.DB.prepare(`SELECT COUNT(*) AS n FROM ${t} WHERE verified = 0`).first<{
+            n: number;
+          }>()
+        )?.n;
+      return {
+        daily: await n('runs'),
+        gauntlet: await n('survivor_rounds'),
+        eras: await n('era_attempts'),
+      };
+    };
+    expect(await json(admin('/api/admin/runs/reverify', { date: today, mode: 'eras' }))).toEqual({
+      marked: 1,
+    });
+    expect(await unverified()).toEqual({ daily: 0, gauntlet: 0, eras: 1 });
+    expect(await json(admin('/api/admin/runs/reverify', { date: today }))).toEqual({ marked: 3 });
+    // a2 was submitted on another day, so it stays verified.
+    expect(await unverified()).toEqual({ daily: 1, gauntlet: 1, eras: 1 });
+  });
+
+  it('counts today’s runs the nightly check hasn’t verified', async () => {
+    await schedule(today, { number: 5 });
+    await dailyRun('r1', ann, 80);
+    await dailyRun('r2', bo, 40, { disqualified: true });
+    await dailyRun('r3', anon, 60);
+    await env.DB.prepare("UPDATE runs SET verified = 1 WHERE id IN ('r1', 'r2')").run();
+    const res = await json<AdminToday>(admin('/api/admin/today'));
+    // A disqualified run is a race outcome, not a failed check: r2 counts as verified.
+    expect(res.runs).toEqual({ total: 3, verified: 2, corrected: 0, unverified: 1 });
   });
 });
 
@@ -429,6 +504,78 @@ describe('player actions', () => {
     expect((await boards()).daily).toEqual([anon, bo]);
     expect(await logActions()).toEqual(['hide', 'hide']);
     expect((await admin('/api/admin/players/nobody/hide', { hidden: true })).status).toBe(404);
+  });
+
+  it('keeps a hidden player’s own rank, and leaves them out of everyone else’s', async () => {
+    await schedule(today);
+    await signIn({ sub: 'google-a', email: 'ann@example.com', name: 'Ann' }, ann);
+    await signIn({ sub: 'google-b', email: 'bo@example.com', name: 'Bo' }, bo);
+    await dailyRun('r1', ann, 90);
+    await dailyRun('r2', bo, 50);
+    await gauntletRun('s1', ann, 4);
+    await gauntletRun('s2', bo, 2);
+    const race = await firstEraRace();
+    await eraAttempt('a1', ann, race, 90);
+    await eraAttempt('a2', bo, race, 60);
+    await admin(`/api/admin/players/${ann}/hide`, { hidden: true });
+
+    const daily = async (id: string) => {
+      const run = await env.DB.prepare('SELECT * FROM runs WHERE id = ?').bind(id).first<RunRow>();
+      const s = await standing(env.DB, run as RunRow);
+      return { rank: s.ahead + 1, total: s.total };
+    };
+    // Bo tops the board everyone sees, so his rank says 1; Ann is ranked among the visible.
+    expect(await daily('r2')).toEqual({ rank: 1, total: 1 });
+    expect(await daily('r1')).toEqual({ rank: 1, total: 2 });
+
+    const gauntlet = async (id: string) => {
+      const run = await env.DB.prepare('SELECT * FROM survivor_runs WHERE id = ?')
+        .bind(id)
+        .first<Parameters<typeof survivorState>[1]>();
+      const s = await survivorState(env.DB, run as Parameters<typeof survivorState>[1]);
+      return { rank: s.rank, total: s.total };
+    };
+    expect(await gauntlet('s2')).toEqual({ rank: 1, total: 1 });
+    expect(await gauntlet('s1')).toEqual({ rank: 1, total: 2 });
+
+    expect(await rankOnBoard(env.DB, race, false, bo)).toMatchObject({ rank: 1, total: 1 });
+    expect(await rankOnBoard(env.DB, race, false, ann)).toMatchObject({ rank: 1, total: 2 });
+    // Over HTTP (the race out in production): the hidden player still gets their own place
+    // ("me"), but isn't on the list.
+    await env.DB.prepare(
+      "UPDATE eras SET released_at = '2020-01-01T00:00:00.000Z' WHERE id = 10",
+    ).run();
+    await env.DB.prepare('UPDATE era_races SET published = 1 WHERE race_id = ?').bind(race).run();
+    const board = await json<{ entries: Array<{ accuracy: number }>; me: unknown }>(
+      SELF.fetch(`https://api.test/api/eras/races/${race}/leaderboard?anonId=${ann}`),
+    );
+    expect(board.entries.map((e) => e.accuracy)).toEqual([60]);
+    expect(board.me).toEqual({ rank: 1, accuracy: 90 });
+  });
+
+  it('opens a player’s page whatever the account’s age', async () => {
+    await signIn({ sub: 'google-a', email: 'ann@example.com', name: 'Ann' }, ann);
+    // Push Ann out of the newest list: a later account, and a list of one.
+    await env.DB.prepare("UPDATE players SET created_at = '2000-01-01T00:00:00.000Z' WHERE id = ?")
+      .bind(ann)
+      .run();
+    await signIn({ sub: 'google-b', email: 'bo@example.com', name: 'Bo' }, bo);
+    const { listPlayers } = await import('../src/adminPlayers.js');
+    expect((await listPlayers(env.DB, 1)).players.map((p) => p.id)).toEqual([bo]);
+    expect((await listPlayers(env.DB, 1, ann)).players.map((p) => p.id)).toEqual([ann]);
+    const p = await json<PlayerDetail>(admin(`/api/admin/players/${ann}`));
+    expect(p.player).toMatchObject({ id: ann, email: 'ann@example.com' });
+  });
+
+  it('writes the hide and its log row together', async () => {
+    await signIn({ sub: 'google-a', email: 'ann@example.com', name: 'Ann' }, ann);
+    await admin(`/api/admin/players/${ann}/hide`, { hidden: true });
+    const log = await env.DB.prepare("SELECT detail FROM admin_log WHERE action = 'hide'").all<{
+      detail: string;
+    }>();
+    expect(log.results.map((r) => JSON.parse(r.detail))).toEqual([{ id: ann, hidden: true }]);
+    expect((await admin('/api/admin/players/nobody/hide', { hidden: true })).status).toBe(404);
+    expect(await logActions()).toEqual(['hide']);
   });
 });
 

@@ -29,7 +29,11 @@ export interface AdminToday {
   /** Today's and later days pinned to an old race file. */
   stale: TodayDay[];
   /** Runs submitted for today's daily. */
-  runs: { total: number; verified: number; corrected: number; disqualified: number };
+  /**
+   * Today's daily runs and the nightly check: verified, corrected (the check changed the result)
+   * and unverified (not checked yet, or the check couldn't grade it: it writes nothing then).
+   */
+  runs: { total: number; verified: number; corrected: number; unverified: number };
 }
 
 export async function todayHealth(db: D1Database, now: number): Promise<AdminToday> {
@@ -41,7 +45,7 @@ export async function todayHealth(db: D1Database, now: number): Promise<AdminTod
     .prepare(
       `SELECT COUNT(*) AS total, COALESCE(SUM(verified), 0) AS verified,
               COALESCE(SUM(corrected), 0) AS corrected,
-              COALESCE(SUM(disqualified), 0) AS disqualified
+              COUNT(*) - COALESCE(SUM(verified), 0) AS unverified
        FROM runs WHERE date = ?`,
     )
     .bind(today)
@@ -54,7 +58,7 @@ export async function todayHealth(db: D1Database, now: number): Promise<AdminTod
     },
     queue: { days: queued, low: queued < LOW_QUEUE_DAYS, warnUnder: LOW_QUEUE_DAYS },
     stale: ahead.filter((d) => !d.current),
-    runs: runs ?? { total: 0, verified: 0, corrected: 0, disqualified: 0 },
+    runs: runs ?? { total: 0, verified: 0, corrected: 0, unverified: 0 },
   };
 }
 
