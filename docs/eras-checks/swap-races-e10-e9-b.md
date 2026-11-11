@@ -257,6 +257,24 @@ team-order rows against the article.
 Schema: `teamOrder` is added to the moment `trigger` enum in `packages/schema/race-model.schema.json`
 (the sim's `DecisionMoment` type already had it; no race file used it before this one).
 
+### Re-authored (B2, Nov 10)
+
+With the Expert rival grader fix and the player stint-pace fix in (`eras-integrate-fixes`,
+`35975b7`), the era level stopped being reachable: the best path (seed 2) earned ★2, ★3 and
+the hidden objective but finished seventh. Only seed 1 reaches sixth at the era's Standard
+rivals, and there the soft stop at lap 39 graded orange (93% against 98% for staying out, whose
+continuation the planner times better). Legend stayed reachable.
+
+The fix moves the late call earlier, to Hamilton's second stop. Side (RUS; `pipeline
+hard-calls`: RUS 2, HAM 1, chance given up RUS 4.3 pts, HAM 0.0), target, rewrite, headline,
+storyline, briefing, mastery, hidden and the other four moments are unchanged.
+
+| Item | As re-authored | Basis | Owner checked |
+|---|---|---|---|
+| Moment `stop-39` replaced by `rivalpit-34` | Lap 34, trigger `rivalPit` (the game shows "HAM is due in for tyres. Box with him to cover, or stay out?"); options stay / softs / mediums / hards; real option stay (Russell made his only stop on in-lap 24). Hamilton's second stop is on in-lap 34. | Hamilton stops row, Russell stops row (Jolpica-p, OF1-s) | |
+| Reachability (local Eras build) | Era (Standard, seed 1): box mediums under the VSC, stay at 17 and 24, softs at 34, comply: ★1 ★2 ★3, hidden, accuracy 100. Legend (Expert, seed 1): the same path, ★1 ★2 ★3, hidden, accuracy 99.8. Stay-out never earns ★3 at either level (it keeps one set of mediums and is disqualified under the two-compound rule). | reachability | |
+| Robust G1 | Pass, 1.97 s (unchanged). | `pipeline validate japan-2023 --robust` | |
+
 ## emilia-romagna-2024 (2024 Emilia Romagna Grand Prix)
 
 ### Sources
