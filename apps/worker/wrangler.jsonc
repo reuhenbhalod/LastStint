@@ -20,6 +20,10 @@
     }
   ],
 
+  // Versus mode's rooms (docs/versus-spec.md V5): one Durable Object per match.
+  "durable_objects": { "bindings": [{ "name": "VERSUS", "class_name": "VersusRoom" }] },
+  "migrations": [{ "tag": "versus-v1", "new_sqlite_classes": ["VersusRoom"] }],
+
   // Daily queue-check cron (Implementation Plan 4.6) — handled by scheduled() in src/index.ts.
   "triggers": { "crons": ["0 9 * * *"] },
 
@@ -56,6 +60,8 @@
   "env": {
     "staging": {
       "name": "pitwall-staging",
+      // Versus mode's rooms: Durable Object bindings aren't inherited into an env either.
+      "durable_objects": { "bindings": [{ "name": "VERSUS", "class_name": "VersusRoom" }] },
       "d1_databases": [
         {
           "binding": "DB",

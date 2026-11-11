@@ -1,6 +1,6 @@
 // A call between the big moments (crew-chief spec D3, race engineer spec): the engineer or the
-// driver asks; you have a few seconds while the race runs on. A battle is red and runs the lap
-// in slow motion. Number keys answer. No answer: no change, or the driver's own move.
+// driver asks, the race runs on in slow motion, and after a moment to read it you have a few
+// seconds to answer. Number keys answer. No answer: no change, or the driver's own move.
 // In Eras (`eras`, eras spec §7) the era's decision timer takes the place of the card's own
 // short one: the race screen holds the race while the card is up, and the timer running out
 // answers it (the same no-answer outcome). Without it, exactly as before. In Eras 1-2 (the
@@ -26,14 +26,17 @@ export function answerBoxes(o: QuickOption): boolean {
 export function QuickCallCard({
   call,
   ms,
+  read = 0,
   onAnswer,
   onTimeout,
   eras,
   fuel,
 }: {
   call: QuickCall;
-  /** How long there is to answer. */
+  /** How long there is to answer, once the reading time is up. */
   ms: number;
+  /** Time to read the call before its clock starts (the bar stays full). */
+  read?: number;
   /** `fill`: the fuel fill picked for an answer that boxes (a refuelling race). */
   onAnswer: (optionId: string, fill?: FuelFill) => void;
   onTimeout: () => void;
@@ -58,9 +61,9 @@ export function QuickCallCard({
   const ownTimer = !eras;
   useEffect(() => {
     if (!ownTimer) return;
-    const id = setTimeout(() => timeout.current(), ms);
+    const id = setTimeout(() => timeout.current(), read + ms);
     return () => clearTimeout(id);
-  }, [ms, ownTimer]);
+  }, [ms, read, ownTimer]);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const o = call.options[Number(e.key) - 1];
@@ -96,7 +99,7 @@ export function QuickCallCard({
         <span className="call-tag">
           <TagIcon size={14} /> {tag}
         </span>
-        <span className="call-tag !text-[#8D9692]">Lap {call.lap + 1}</span>
+        <span className="call-tag !text-[#9AA5A0]">Lap {call.lap + 1}</span>
       </div>
       <p
         className={
@@ -106,7 +109,7 @@ export function QuickCallCard({
         }
       >
         {call.from !== 'Engineer' && (
-          <span className="mr-1 font-semibold text-[#8D9692]">{named(call.from)}:</span>
+          <span className="mr-1 font-semibold text-[#9AA5A0]">{named(call.from)}:</span>
         )}
         {named(call.text)}
       </p>
@@ -114,10 +117,10 @@ export function QuickCallCard({
         <dl className="m-0 flex flex-wrap gap-x-4 gap-y-1 text-[12px]">
           {call.stats.map((s) => (
             <div key={s.label} className="flex items-baseline gap-1.5">
-              <dt className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#8D9692]">
+              <dt className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#9AA5A0]">
                 {s.label}
               </dt>
-              <dd className="m-0 font-semibold text-[#D5DAD7]">{named(s.value)}</dd>
+              <dd className="m-0 font-semibold text-[#D5DBD7]">{named(s.value)}</dd>
             </div>
           ))}
         </dl>
@@ -125,10 +128,14 @@ export function QuickCallCard({
       {eras ? (
         eras.timer
       ) : (
-        <div className="h-1 overflow-hidden bg-[#232927]">
+        <div className="h-1 overflow-hidden bg-[#252D31]">
           <div
             className="quick-timer h-full"
-            style={{ animationDuration: `${ms}ms`, background: accent }}
+            style={{
+              animationDuration: `${ms}ms`,
+              animationDelay: `${read}ms`,
+              background: accent,
+            }}
           />
         </div>
       )}

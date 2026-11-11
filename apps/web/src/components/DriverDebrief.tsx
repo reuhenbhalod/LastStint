@@ -65,7 +65,7 @@ export function DriverDebrief({
   return (
     <section
       aria-label="Your driver"
-      className="flex flex-col gap-3 rounded-lg border border-[#1F2523] bg-[#0F1312] p-3.5"
+      className="flex flex-col gap-3 rounded-lg border border-[var(--glass-edge)] bg-[var(--glass)] p-3.5"
     >
       <div className="flex items-baseline justify-between gap-2">
         <span className="flex items-center gap-2">

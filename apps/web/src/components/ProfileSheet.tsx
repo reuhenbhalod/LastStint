@@ -50,12 +50,12 @@ export function ProfileSheet({ account }: { account: AccountState }) {
             <h2 id="profile-title" className="disp m-0 text-[22px] leading-none">
               {first ? 'Set up your profile' : 'Edit your profile'}
             </h2>
-            <p className="m-0 text-[13px] text-[#8D9692]">
+            <p className="m-0 text-[13px] text-[#9AA5A0]">
               Your name shows on the leaderboards. Your team’s colour themes the home page.
             </p>
           </div>
           <label className="flex flex-col gap-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#8D9692]">
+            <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#9AA5A0]">
               Display name
             </span>
             <input
@@ -65,11 +65,11 @@ export function ProfileSheet({ account }: { account: AccountState }) {
               maxLength={20}
               autoComplete="nickname"
               placeholder="e.g. Box Box Box"
-              className="rounded-md border border-[#2D3431] bg-[#181D1B] px-3 py-2.5 text-[15px] text-white outline-none focus:border-[var(--you)]"
+              className="rounded-md border border-[#2E373B] bg-[#192024] px-3 py-2.5 text-[15px] text-white outline-none focus:border-[var(--you)]"
             />
           </label>
           <fieldset className="m-0 flex flex-col gap-1.5 border-0 p-0">
-            <legend className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-[#8D9692]">
+            <legend className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-[#9AA5A0]">
               Favourite team
             </legend>
             <div className="grid grid-cols-2 gap-1.5">
@@ -81,8 +81,8 @@ export function ProfileSheet({ account }: { account: AccountState }) {
                   onClick={() => setTeam(team === t ? '' : t)}
                   className={`flex items-center gap-2 rounded-md border px-2.5 py-2 text-left text-[13px] font-semibold ${
                     team === t
-                      ? 'border-[var(--you)] bg-[color-mix(in_srgb,var(--you)_14%,#181D1B)]'
-                      : 'border-[#2D3431] bg-[#181D1B] hover:border-[#6B736F]'
+                      ? 'border-[var(--you)] bg-[color-mix(in_srgb,var(--you)_14%,#192024)]'
+                      : 'border-[#2E373B] bg-[#192024] hover:border-[#6E7A75]'
                   }`}
                 >
                   <span
@@ -100,7 +100,7 @@ export function ProfileSheet({ account }: { account: AccountState }) {
             <button
               type="button"
               onClick={() => account.setProfileOpen(false)}
-              className="rounded-md px-3 py-2.5 text-[13px] font-semibold text-[#B7BEBA] hover:text-white"
+              className="rounded-md px-3 py-2.5 text-[13px] font-semibold text-[#B9C2BD] hover:text-white"
             >
               {first ? 'Later' : 'Cancel'}
             </button>

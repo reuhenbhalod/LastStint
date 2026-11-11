@@ -3419,6 +3419,7 @@ def build_race(
         pit_loss_guard=eras_build,
         refuelling=refuelling,
         eras_stops=eras_build,
+        race_id=None if eras_build else race_id,
     )
     if recon is not None:
         params = reconstructed_pit_loss(params, recon)

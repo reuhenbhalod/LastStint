@@ -373,10 +373,12 @@ export interface CallScore {
   points: number;
   /** The chosen option's chance of the target (tie-break). */
   probability: number;
+  /** The wall answered it for you (autoStay.ts): shown, but not in the score. */
+  auto?: boolean;
 }
 
 export interface RunScore {
-  /** 0-100: mean band points over the race's calls. */
+  /** 0-100: mean band points over the race's calls (those the wall answered left out). */
   score: number;
   calls: CallScore[];
   /** First tie-break: mean chance of the target over the chosen options. */
@@ -387,8 +389,10 @@ export interface RunScore {
  * Score a finished run from its graded moments and the option chosen at each. Ties on
  * `score` break on `meanProbability`, then on the finishing result (the caller's to compare).
  */
-export function scoreRun(calls: Array<{ grade: MomentGrade; chosen: string }>): RunScore {
-  const scored = calls.map(({ grade, chosen }) => {
+export function scoreRun(
+  calls: Array<{ grade: MomentGrade; chosen: string; auto?: boolean }>,
+): RunScore {
+  const scored = calls.map(({ grade, chosen, auto }) => {
     const option = grade.options.find((o) => o.id === chosen);
     if (!option) throw new Error(`option ${chosen} not graded at lap ${grade.lap}`);
     return {
@@ -397,12 +401,15 @@ export function scoreRun(calls: Array<{ grade: MomentGrade; chosen: string }>): 
       band: option.band,
       points: BAND_POINTS[option.band],
       probability: option.probability,
+      ...(auto ? { auto: true } : {}),
     };
   });
   const mean = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0);
+  // The calls you made count; the wall's own answers don't (feedback round 3 R1).
+  const yours = scored.filter((c) => !c.auto);
   return {
-    score: mean(scored.map((c) => c.points)),
+    score: mean(yours.map((c) => c.points)),
     calls: scored,
-    meanProbability: mean(scored.map((c) => c.probability)),
+    meanProbability: mean(yours.map((c) => c.probability)),
   };
 }

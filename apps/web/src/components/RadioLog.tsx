@@ -19,9 +19,9 @@ export function RadioLog({ messages, max = 3 }: { messages: RadioMessage[]; max?
                 : i === 0
                   ? 'border-[var(--you)]'
                   : 'border-[#2A302E]'
-            } ${i > 0 ? 'text-[#B7BEBA]' : ''}`}
+            } ${i > 0 ? 'text-[#B9C2BD]' : ''}`}
           >
-            <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#8D9692]">
+            <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#9AA5A0]">
               <span className="mono">L{m.lap}</span> · {named(m.from)}
               {m.refused && <span className="text-[var(--box-ink)]"> · refused</span>}
             </span>

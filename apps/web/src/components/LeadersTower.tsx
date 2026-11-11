@@ -74,17 +74,17 @@ export function LeadersTower({
         <button
           type="button"
           onClick={() => onPick(r.code)}
-          className={`grid w-full grid-cols-[18px_4px_38px_1fr] items-center gap-2 px-2.5 py-[5px] text-left ${
+          className={`grid w-full grid-cols-[18px_4px_38px_1fr] items-center gap-2 rounded-md px-2 py-[5px] text-left ${
             mine
-              ? 'bg-[color-mix(in_srgb,var(--you)_30%,#0B0E0D)]'
+              ? 'bg-[color-mix(in_srgb,var(--you)_24%,transparent)]'
               : theirs
-                ? 'bg-[color-mix(in_srgb,var(--rival)_18%,#0B0E0D)]'
+                ? 'bg-[color-mix(in_srgb,var(--rival)_18%,transparent)]'
                 : 'hover:bg-white/5'
           }`}
         >
-          <span className="mono text-[12px] text-[#9AA39F]">{pos}</span>
-          <span className="h-3.5 -skew-x-12" style={{ background: team(r.code) }} />
-          <span className="mono text-[13px] font-bold">{r.code}</span>
+          <span className="mono text-[12px] text-[#9AA5A0]">{pos}</span>
+          <span className="h-3.5 rounded-sm" style={{ background: team(r.code) }} />
+          <span className="text-[13px] font-extrabold">{r.code}</span>
           <span className="mono text-right text-[12px] text-[#C9CFCC]">
             {r.out ? 'OUT' : r.pit ? 'PIT' : pos === 1 ? 'Leader' : gapLabel(r)}
           </span>
@@ -94,18 +94,17 @@ export function LeadersTower({
   };
 
   return (
-    <section
-      aria-label="Leaders"
-      className="w-[168px] overflow-hidden rounded bg-[#0B0E0D]/88 shadow-xl backdrop-blur-sm"
-    >
-      <div className="flex items-center justify-between bg-[#EEF1EF] px-2.5 py-1 text-[#0B0E0D]">
-        <span className="disp flex items-center gap-1 text-[11px]">
+    <section aria-label="Leaders" className="glass w-[180px] overflow-hidden p-1.5 shadow-xl">
+      <div className="flex items-baseline justify-between px-2 pb-1 pt-0.5">
+        <span className="eyebrow flex items-center gap-1">
           <TimingMark size={11} className="text-[var(--you)]" />
           Lap {race.lap}
         </span>
-        <span className="mono text-[10px] font-bold">/{model.race.laps}</span>
+        <span className="mono text-[11px] font-semibold text-[var(--muted)]">
+          /{model.race.laps}
+        </span>
       </div>
-      <ol className="m-0 list-none p-0">{top.map((r, i) => row(r, i + 1))}</ol>
+      <ol className="m-0 flex list-none flex-col gap-px p-0">{top.map((r, i) => row(r, i + 1))}</ol>
       {extra.length > 0 && (
         <ol className="m-0 list-none border-t border-white/15 p-0">
           {extra.map((r) => row(r, r.pos))}

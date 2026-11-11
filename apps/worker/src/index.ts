@@ -2,6 +2,7 @@
 // Serves the daily, verifies every run by replaying it with the shared TS sim, and computes
 // ranks, stats and the leaderboard. docs/api.md documents the endpoints for the web app.
 
+import { ROOM_CODE, VERSUS_TRACKS } from '@laststint/sim';
 import { type Context, Hono } from 'hono';
 import { cors } from 'hono/cors';
 import type { ContentfulStatusCode } from 'hono/utils/http-status';
@@ -19,6 +20,9 @@ import { getRace } from './races.js';
 import { ApiError, dailyWithModel, isAnonId, submitRun, withStanding } from './runs.js';
 import { getState, startRun, submitRound, survivorBoard } from './survivor.js';
 import { registerTickets } from './tickets.js';
+import { VersusRoom } from './versus.js';
+
+export { VersusRoom };
 
 export interface Env {
   DB: D1Database;
@@ -47,6 +51,16 @@ export interface Env {
   SURVIVOR_POOL?: string;
   /** "true" on staging only (eras spec §5): every era and race open, Draft races shown. */
   ERAS_TEST_MODE?: string;
+  /** Versus mode's rooms (docs/versus-spec.md V5): one Durable Object per match. */
+  VERSUS: DurableObjectNamespace;
+  /** The room's clocks in ms (tests shorten them): a lap, the car pick, a big call, a
+   * dropped player's wait, the reveal before the start. */
+  VERSUS_LAP_MS?: string;
+  VERSUS_PICK_MS?: string;
+  VERSUS_CALL_MS?: string;
+  VERSUS_BATTLE_MS?: string;
+  VERSUS_RECONNECT_MS?: string;
+  VERSUS_REVEAL_MS?: string;
 }
 
 /** The survivor races and their seeds (data/pools.json, or the tests' own). */
@@ -334,10 +348,53 @@ app.post('/api/survivor/:runId/round', async (c) => {
   return c.json(res);
 });
 
+// Versus mode (docs/versus-spec.md V5): create a match (its code), look one up. The match's
+// WebSocket (/api/versus/:code/ws) is routed straight to its room in fetch() below.
+const VERSUS_TRACK_IDS = new Set(VERSUS_TRACKS.map((t) => t.id));
+const CODE_LETTERS = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+
+const room = (env: Env, code: string) => env.VERSUS.get(env.VERSUS.idFromName(code));
+
+app.post('/api/versus', async (c) => {
+  const body = (await c.req.json().catch(() => ({}))) as { track?: string };
+  const track = body.track ?? '';
+  if (!VERSUS_TRACK_IDS.has(track)) throw new ApiError(400, 'bad-track');
+  for (let tries = 0; tries < 8; tries++) {
+    const bytes = crypto.getRandomValues(new Uint8Array(4));
+    const code = [...bytes].map((b) => CODE_LETTERS[b % CODE_LETTERS.length]).join('');
+    const seed = crypto.getRandomValues(new Uint32Array(1))[0] as number;
+    const res = await room(c.env, code).fetch('https://room/create', {
+      method: 'POST',
+      body: JSON.stringify({ code, track, seed }),
+    });
+    if (res.ok) return c.json(await res.json(), 201);
+  }
+  throw new ApiError(503, 'no-free-code');
+});
+
+app.get('/api/versus/:code', async (c) => {
+  const code = c.req.param('code').toUpperCase();
+  if (!ROOM_CODE.test(code)) throw new ApiError(404, 'not-found');
+  const res = await room(c.env, code).fetch('https://room/view');
+  if (!res.ok) throw new ApiError(404, 'not-found');
+  return c.json(await res.json());
+});
+
 app.notFound((c) => c.json({ error: 'not-found' }, 404));
 
+const VERSUS_WS = /^\/api\/versus\/([A-Za-z]{4})\/ws$/;
+
 export default {
-  fetch: app.fetch,
+  fetch(request: Request, env: Env, ctx: ExecutionContext) {
+    // A match's WebSocket goes straight to its room (no CORS layer: a 101 can't be changed).
+    const ws = VERSUS_WS.exec(new URL(request.url).pathname);
+    if (ws) {
+      const code = (ws[1] as string).toUpperCase();
+      if (!ROOM_CODE.test(code)) return new Response('not found', { status: 404 });
+      return room(env, code).fetch(new Request('https://room/ws', request));
+    }
+    return app.fetch(request, env, ctx);
+  },
   // Daily queue check (Implementation Plan 4.6): alert when the queue runs low.
   async scheduled(_event: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
     ctx.waitUntil(checkQueue(env.DB, Date.now(), env.ALERT_WEBHOOK).then(() => undefined));

@@ -114,7 +114,7 @@ function towerRows(html: string): Record<string, { age: string; text: string }> 
 function leaderRows(html: string): Record<string, string> {
   const rows: Record<string, string> = {};
   for (const li of html.split('<li>').slice(1)) {
-    const code = li.match(/font-bold">([^<]+)</)?.[1] ?? '';
+    const code = li.match(/font-extrabold">([^<]+)</)?.[1] ?? '';
     rows[code] = li.match(/text-\[#C9CFCC\]">([^<]*)</)?.[1] ?? '';
   }
   return rows;

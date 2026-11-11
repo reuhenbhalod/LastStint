@@ -12,13 +12,16 @@ Fits the track-level constants the simulator needs:
 
 from __future__ import annotations
 
+import json
 import math
+import re
 from dataclasses import dataclass, field
 
 import pandas as pd
 
 from .clean import gap_to_car_ahead, tyre_change_out_laps
 from .fit import LapTimeFit, predict
+from .paths import CONFIG_DIR
 from .refuel import fuel_lap_of
 
 
@@ -294,6 +297,26 @@ def stop_losses(laps: pd.DataFrame, eras_stops: bool = False) -> list[tuple[str,
 
 # Stops slower than this beyond the median are penalties or damage, not pit-stop variance.
 MAX_STOP_DEVIATION = 15.0
+# The pit-loss fixes below (docs/pit-loss-spec.md) apply to a build given its race id
+# (fit_track_params `race_id`), which build.py passes for every build but an Eras build: the
+# Eras races keep the pit losses they were authored and validated on.
+# Stops faster than this below the median are measurement noise: the lane can't be driven much
+# quicker than its median (Silverstone 2024 measured -13s, a 10s stop). docs/pit-loss-spec.md P2.
+MIN_STOP_DEVIATION = -4.0
+# A measured VSC loss outside this share of the green loss is noise (Japan 2023: 33.5s, above
+# green; USA 2018: 8.2s); the VSC_PIT_LOSS_FACTOR fallback is used instead. Spec P3.
+VSC_SHARE_RANGE = (0.40, 0.80)
+# A race is wet-affected when at least this share of its stops fit or remove an intermediate or
+# wet tyre; its green loss then comes from the circuit reference (spec P1).
+WET_STOP_SHARE = 0.25
+SLICKS = frozenset({"SOFT", "MEDIUM", "HARD"})
+# Race ids whose circuit name differs from their prefix.
+CIRCUIT_ALIASES = {
+    "70th-anniversary": "great-britain",
+    "styria": "austria",
+    "usa": "united-states",
+    "saudi": "saudi-arabia",
+}
 
 
 def measured_stop_losses(
@@ -317,13 +340,44 @@ def measured_stop_losses(
 
 
 def pit_loss_deviations(
-    laps: pd.DataFrame, median: float | None, eras_stops: bool = False
+    laps: pd.DataFrame,
+    median: float | None,
+    eras_stops: bool = False,
+    min_deviation: float | None = None,
 ) -> list[float]:
-    """Green-stop losses minus the median, excluding penalty-sized outliers."""
+    """Green-stop losses minus the median, excluding penalty-sized outliers (and, with
+    `min_deviation`, noise-sized fast ones)."""
     if median is None:
         return []
     devs = [loss - median for _, flag, loss in stop_losses(laps, eras_stops) if flag == "green"]
-    return sorted(round(d, 3) for d in devs if abs(d) <= MAX_STOP_DEVIATION)
+    low = -MAX_STOP_DEVIATION if min_deviation is None else min_deviation
+    return sorted(round(d, 3) for d in devs if low <= d <= MAX_STOP_DEVIATION)
+
+
+def circuit_of(race_id: str) -> str:
+    """The circuit a race id runs on ("canada-2024" -> "canada", "styria-2020" -> "austria")."""
+    name = re.sub(r"-\d{4}$", "", race_id)
+    return CIRCUIT_ALIASES.get(name, name)
+
+
+def reference_pit_loss(race_id: str) -> float | None:
+    """The circuit's reference green loss (config/pit_loss_reference.json), if it has one."""
+    ref = json.loads((CONFIG_DIR / "pit_loss_reference.json").read_text())["circuits"]
+    entry = ref.get(circuit_of(race_id))
+    return float(entry["seconds"]) if entry else None
+
+
+def wet_stop_share(laps: pd.DataFrame) -> float:
+    """Share of stops that fit or remove an intermediate or wet tyre."""
+    stops = pit_stops(laps)
+    if not stops:
+        return 0.0
+    wet = sum(
+        1
+        for _, in_lap, out_lap in stops
+        if str(in_lap["Compound"]) not in SLICKS or str(out_lap["Compound"]) not in SLICKS
+    )
+    return wet / len(stops)
 
 
 # The robust guard on the green pit loss (Eras builds, `pit_loss(guard=True)`): a damage or
@@ -639,16 +693,29 @@ def fit_track_params(
     pit_loss_guard: bool = False,
     refuelling: bool = False,
     eras_stops: bool = False,
+    race_id: str | None = None,
 ) -> TrackParams:
     """Fit every track-level parameter from one race. `pit_loss_guard` (Eras builds): the
     green pit loss leaves out damage and repair stops (pit_loss; `refuelling`: by in-lap
     only, since the lane time holds the fill). `eras_stops` (Eras builds): back-to-back stops
-    count their shared lap once (stop_records)."""
+    count their shared lap once (stop_records). `race_id` (every build but an Eras one): the
+    pit-loss fixes of docs/pit-loss-spec.md (wet races take the circuit reference, noise-fast
+    stops and implausible VSC losses dropped)."""
     times = sc_vsc_lap_times(laps)
     difficulty, n_opp, n_pass = overtake_difficulty(laps)
     green = times["green"]
     green_pit = pit_loss(laps, guard=pit_loss_guard, lane=not refuelling, eras_stops=eras_stops)
+    measured_green = green_pit
     notes: list[str] = []
+    reference = reference_pit_loss(race_id) if race_id else None
+    wet_share = wet_stop_share(laps) if race_id else 0.0
+    if reference is not None and wet_share >= WET_STOP_SHARE:
+        notes.append(
+            f"pitLoss: wet-affected ({wet_share:.0%} of stops on wet tyres), measured "
+            f"{green_pit if green_pit is None else round(green_pit, 2)}s, using the circuit "
+            f"reference {reference}s"
+        )
+        green_pit = reference
     if pit_loss_guard and green_pit is not None:
         raw = pit_loss(laps, eras_stops=eras_stops)
         if raw is not None and abs(raw - green_pit) >= 0.0005:
@@ -668,6 +735,19 @@ def fit_track_params(
     sc_pit = green_pit * SC_PIT_LOSS_FACTOR if green_pit is not None else None
     notes.append(f"pitLossUnderSC estimated as {SC_PIT_LOSS_FACTOR} x green")
     vsc_pit, n_vsc = pit_loss_under_vsc(laps, eras_stops)
+    lo, hi = VSC_SHARE_RANGE
+    if (
+        race_id
+        and n_vsc >= MIN_VSC_STOPS
+        and vsc_pit is not None
+        and green_pit
+        and not lo <= vsc_pit / green_pit <= hi
+    ):
+        notes.append(
+            f"pitLossUnderVSC: measured {vsc_pit:.2f}s is {vsc_pit / green_pit:.0%} of green, "
+            f"outside {lo:.0%}-{hi:.0%}; using {VSC_PIT_LOSS_FACTOR} x green"
+        )
+        n_vsc = 0
     if n_vsc < MIN_VSC_STOPS:
         vsc_pit = green_pit * VSC_PIT_LOSS_FACTOR if green_pit is not None else None
         notes.append(
@@ -684,7 +764,13 @@ def fit_track_params(
         notes.append(overtake_note)
     return TrackParams(
         overtake_model=overtake,
-        pit_loss_deviations=pit_loss_deviations(laps, green_pit, eras_stops),
+        # With `race_id`: the spread around what this race's stops measured, not around a
+        # reference.
+        pit_loss_deviations=(
+            pit_loss_deviations(laps, measured_green, eras_stops, MIN_STOP_DEVIATION)
+            if race_id
+            else pit_loss_deviations(laps, green_pit, eras_stops)
+        ),
         pit_loss=green_pit,
         pit_loss_under_sc=sc_pit,
         pit_loss_under_vsc=vsc_pit,

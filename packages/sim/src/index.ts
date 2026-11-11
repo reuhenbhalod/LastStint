@@ -1,6 +1,14 @@
 // @laststint/sim — public surface of the deterministic race simulator.
 
 export * from './types.js';
+export {
+  AUTO_STAY_LAPS,
+  AUTO_STAY_LAPS_NEUTRAL,
+  NEAR_DROP_OFF,
+  autoAnswered,
+  autoStay,
+  boxingAt,
+} from './autoStay.js';
 export { mulberry32, deriveSeed } from './rng.js';
 export { battlesFor, isAttack, isDefend, lappedAhead, moodOf, startTrust } from './engineer.js';
 export type { EngineerConfig, MoodEffect, MoveEffect } from './engineer.js';
@@ -19,6 +27,7 @@ export {
   fuelConfig,
   fuelMargin,
   initRun,
+  lifeOf,
   isFinished,
   liveFuelFrom,
   modeEffects,
@@ -256,3 +265,77 @@ export {
   userOrdersOn,
 } from './scripted.js';
 export type { StorylineLap, TeamOrderState } from './scripted.js';
+export {
+  GRID_GAP,
+  STAT_SCALE,
+  VERSUS_CARS,
+  VERSUS_LAPS,
+  VERSUS_TRACKS,
+  callVersus,
+  classifyVersus,
+  initVersus,
+  simulateVersus,
+  statPace,
+  stepVersus,
+  versusCar,
+  versusFinished,
+  versusRuleMet,
+  versusTrack,
+  versusCallsDue,
+  NEUTRAL_CHANCE,
+  PIT_WINDOW_NEAR,
+  ATTACK_PICKS,
+  BATTLE_GAP,
+  BOOSTS,
+  DEFEND_PICKS,
+  DUEL,
+  GRADED_KINDS,
+  OUT_LAP_COST,
+  UNDERCUT_AGE,
+  UNDERCUT_GAP,
+  autoPick,
+  battleDue,
+  canBoost,
+  undercutEdge,
+} from './versus.js';
+export type {
+  CarStat,
+  CarStats,
+  PlayerIndex,
+  VersusCall,
+  VersusCar,
+  VersusCarState,
+  VersusFlag,
+  VersusNote,
+  VersusPlayer,
+  VersusResult,
+  VersusRun,
+  VersusSetup,
+  VersusState,
+  VersusTrack,
+  VersusMoment,
+  VersusMomentKind,
+  AttackPick,
+  BattlePick,
+  DefendPick,
+  GremlinKind,
+} from './versus.js';
+export {
+  VERSUS_GRADE_SAMPLES,
+  gradeVersus,
+  gradeVersusCall,
+  optionCalls,
+  validOption,
+  versusOptions,
+} from './versusGrade.js';
+export type { VersusAnswer, VersusScore } from './versusGrade.js';
+export { ROOM_CODE } from './versusProtocol.js';
+export type {
+  ClientMessage,
+  RaceSync,
+  RoomPhase,
+  RoomSeat,
+  RoomView,
+  ServerMessage,
+  VersusOutcome,
+} from './versusProtocol.js';

@@ -1,9 +1,9 @@
 // The decision timer running out (eras spec §7): the wall takes the moment's default option
-// (stay out, or keep the current mode; game/autoStay.ts `defaultOption`) and says so on the
+// (stay out, or keep the current mode; game/defaultOption.ts) and says so on the
 // radio, so the call log shows why.
 
 import type { DecisionMoment, Modes } from '@laststint/sim';
-import { defaultOption } from '../../game/autoStay.js';
+import { defaultOption } from '../../game/defaultOption.js';
 import type { Game } from '../../game/useGame.js';
 
 /** Answer an unanswered moment with its default option. Returns the option taken, or null

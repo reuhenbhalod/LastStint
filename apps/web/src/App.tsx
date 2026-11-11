@@ -19,17 +19,31 @@ import { Privacy, Terms } from './screens/Legal.js';
 import { RaceScreen } from './screens/RaceScreen.js';
 import { ResultScreen } from './screens/ResultScreen.js';
 import { Survivor } from './screens/Survivor.js';
+import { Tutorial } from './screens/Tutorial.js';
+import { Versus } from './screens/Versus.js';
 
 /** The page a path is on: the daily (`/`, and any path not below) or a mode's or page's own. */
 export type Route =
-  | { page: 'admin' | 'privacy' | 'terms' | 'credits' | 'gauntlet' | 'daily' }
+  | {
+      page:
+        | 'admin'
+        | 'privacy'
+        | 'terms'
+        | 'credits'
+        | 'gauntlet'
+        | 'daily'
+        | 'tutorial'
+        | 'versus';
+    }
   | { page: 'eras'; eras: ErasRoute };
 
 export function routeOf(pathname: string): Route {
   if (pathname.startsWith('/admin')) return { page: 'admin' };
   if (pathname.startsWith('/privacy')) return { page: 'privacy' };
+  if (pathname.startsWith('/tutorial')) return { page: 'tutorial' };
   if (pathname.startsWith('/terms')) return { page: 'terms' };
   if (pathname.startsWith('/credits')) return { page: 'credits' };
+  if (pathname.startsWith('/versus')) return { page: 'versus' };
   if (pathname.startsWith('/gauntlet') || pathname.startsWith('/survivor'))
     return { page: 'gauntlet' };
   const eras = erasRoute(pathname);
@@ -44,10 +58,14 @@ export function App() {
       return <AdminPage />;
     case 'privacy':
       return <Privacy />;
+    case 'tutorial':
+      return <Tutorial />;
     case 'terms':
       return <Terms />;
     case 'credits':
       return <Credits />;
+    case 'versus':
+      return <Versus />;
     case 'gauntlet':
       return <Survivor />;
     case 'eras':

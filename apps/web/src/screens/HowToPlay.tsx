@@ -129,6 +129,14 @@ export function HowToPlay({
             />
           ))}
         </div>
+        {last && (
+          <a
+            href="/tutorial"
+            className="rounded-lg border border-[var(--you)] py-2.5 text-center font-bold text-[var(--you)] hover:bg-[color-mix(in_srgb,var(--you)_12%,transparent)]"
+          >
+            Play the tutorial race (5 min)
+          </a>
+        )}
         <div className="grid grid-cols-2 gap-2">
           <button
             type="button"

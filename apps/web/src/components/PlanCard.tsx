@@ -105,7 +105,7 @@ export function PlanCard({
                 type="button"
                 aria-pressed={on}
                 onClick={() => setPicked(p.id)}
-                className={`flex min-w-0 flex-col items-stretch gap-1.5 rounded-md border px-2.5 py-2 text-left transition-colors ${on ? 'border-[var(--you)] bg-[color-mix(in_srgb,var(--you)_14%,#181D1B)]' : 'border-[#2D3431] bg-[#181D1B] hover:border-[#6B736F]'}`}
+                className={`flex min-w-0 flex-col items-stretch gap-1.5 rounded-md border px-2.5 py-2 text-left transition-colors ${on ? 'border-[var(--you)] bg-[color-mix(in_srgb,var(--you)_14%,#192024)]' : 'border-[#2E373B] bg-[#192024] hover:border-[#6E7A75]'}`}
               >
                 <span className="flex items-center justify-between gap-2">
                   <span className="flex min-w-0 items-center gap-1.5">
@@ -149,7 +149,7 @@ export function PlanCard({
             }}
             className="rounded-lg border border-[var(--rule)] px-3 py-2 text-[13px] font-semibold hover:bg-[var(--card-2)]"
           >
-            {draft ? '← The engineer’s plans' : 'Build your own'}
+            {draft ? 'The engineer’s plans' : 'Build your own'}
           </button>
           <span className="hidden text-[12px] text-[var(--muted)] md:inline">
             % = chance to beat {rival} · change it any time
@@ -161,7 +161,7 @@ export function PlanCard({
           onClick={() => selected && onPick(selected)}
           className="rounded-lg bg-[var(--you)] px-5 py-2 text-[14px] font-bold text-[var(--you-ink)] hover:brightness-110 disabled:opacity-50"
         >
-          {goLabel} →
+          {goLabel}
         </button>
       </div>
     </section>

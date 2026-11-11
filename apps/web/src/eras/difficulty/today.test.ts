@@ -230,23 +230,28 @@ describe('outside Eras, byte-identical to before the information levels', () => 
   });
 });
 
-/** Taken from the code before the information levels reached these components. */
+/**
+ * Taken from the code before the information levels reached these components, then retaken
+ * when main's realistic UI, call timing and tyre calls were merged in (Nov 10 2026): the
+ * towers, cards, big call and radio digests are exactly main's (checked against an origin/main
+ * checkout); the leaders and the race screen differ from main's only by Eras's shared-screen
+ * touches (the timing mark in the leaders' and standings' headers, the radio mark on the Team
+ * radio pill, the tapped car's card over the map, the top bar's phone spacing).
+ */
 const TODAY = {
   components: {
-    towers: 'a449f21e721bd551',
-    leaders: '54c52f9a97e88bc8',
+    towers: '744def06d2cc0263',
+    leaders: '92b7aa6722da2ecb',
     cards: 'efcfeeeb0a03435b',
-    stats: '99026aee5f173aca',
+    stats: '41a6d50080639e8b',
   },
-  // Retaken in step 8.8, whose only change to the race screen outside Eras is the top bar's
-  // phone-width spacing and type sizes (below md, so desktop is unchanged): the duel was
-  // clipped at 390 px. Taken before 8.8: 'a3ff5c603c39a2f9'.
-  screen: '79aa9a7697842f85',
-  decision: '83c43706f3ac536e',
-  cards: 'f99d02a3023043c8',
+  // Before the merge: '79aa9a7697842f85' (8.8's phone spacing), 'a3ff5c603c39a2f9' (before 8.8).
+  screen: 'ee1d94ac9fe089d8',
+  decision: 'f71311307784d55e',
+  cards: '82ea30e0dbd15610',
   radio: {
-    'abu-dhabi-2021': 'a55e7569522eda73',
-    'bahrain-2021': '0de38febb3d20a64',
-    'austria-2019': '76eb6270fef0185e',
+    'abu-dhabi-2021': 'eac4bbd654ee15dc',
+    'bahrain-2021': '23f7c24ac4ac5b24',
+    'austria-2019': '68bbb551ab858735',
   } as Record<string, string>,
 };

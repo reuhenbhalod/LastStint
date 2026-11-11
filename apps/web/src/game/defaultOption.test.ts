@@ -1,6 +1,6 @@
 import type { DecisionMoment, Modes } from '@laststint/sim';
 import { describe, expect, it } from 'vitest';
-import { defaultOption } from './autoStay.js';
+import { defaultOption } from './defaultOption.js';
 
 const moment = (options: DecisionMoment['options']): DecisionMoment => ({
   id: 'm',

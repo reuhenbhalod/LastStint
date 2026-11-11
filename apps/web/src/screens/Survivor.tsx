@@ -8,6 +8,7 @@ import type { RaceModel } from '@laststint/sim';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Brand } from '../components/Brand.js';
 import { Disclaimer } from '../components/Disclaimer.js';
+import { GroundBackdrop } from '../components/GroundBackdrop.js';
 import { ChequeredIcon, FlagIcon, OvertakeIcon } from '../components/Icons.js';
 import { ApiError, type SurvivorBoardEntry, type SurvivorState, survivorApi } from '../data/api.js';
 import { anonId } from '../data/player.js';
@@ -200,7 +201,7 @@ function Lobby({
               onClick={onStart}
               className="rounded-xl bg-[var(--box)] px-8 py-4 text-[18px] font-bold text-white shadow-[0_10px_40px_-12px_var(--box)] hover:brightness-110 disabled:opacity-60"
             >
-              {busy ? 'Dealing the first race…' : 'Start a run →'}
+              {busy ? 'Dealing the first race…' : 'Start a run'}
             </button>
             <span className="text-[13px] text-[var(--muted)]">Play as many runs as you like.</span>
           </div>
@@ -356,7 +357,7 @@ function Between({
         onClick={onNext}
         className="rounded-xl bg-[var(--you)] px-10 py-4 text-[18px] font-bold text-[var(--you-ink)] hover:brightness-110"
       >
-        Next race →
+        Next race
       </button>
     </section>
   );
@@ -390,7 +391,7 @@ function Over({
           onClick={onAgain}
           className="rounded-xl bg-[var(--box)] px-10 py-4 text-[18px] font-bold text-white hover:brightness-110"
         >
-          Start a new run →
+          Start a new run
         </button>
       </section>
       {run.history.length > 0 && (
@@ -487,7 +488,8 @@ export function Survivor() {
     return <RoundRace key={run.current.round} run={run} onResult={onResult} onHome={home} />;
   }
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="relative isolate flex min-h-screen flex-col">
+      <GroundBackdrop raceId="italy-2024" />
       <Header onHome={home} />
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6 sm:px-6">
         {view === 'loading' && <p className="text-center text-[var(--muted)]">Loading…</p>}

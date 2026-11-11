@@ -60,18 +60,17 @@ const at = (information: DifficultySettings['information']): ErasRace =>
 
 /** The header scoreboard's gap (the number between the two drivers). */
 const scoreboard = (html: string) =>
-  html.match(/rounded bg-\[#1A1F1D\] px-2 py-1 text-\[16px\][^>]*>([^<]*)</)?.[1];
+  html.match(/rounded bg-\[#1A2124\] px-2 py-1 text-\[16px\][^>]*>([^<]*)</)?.[1];
 
 describe('race screen without an Eras difficulty', () => {
-  it('has no timer, no timer setting, no untimed badge, and the full gap panel', () => {
+  it('has no timer, no timer setting, no untimed badge, and no gap panel (main removed it)', () => {
     for (const s of [session('decision'), session('racing')]) {
       const html = render(s);
       expect(html).not.toContain('role="timer"');
       expect(html).not.toContain('Timer on');
       expect(html).not.toContain('Timer off');
       expect(html).not.toContain('Untimed');
-      expect(html).not.toContain('No gap trace');
-      expect(html).toContain('The trace builds as laps go by.');
+      expect(html).not.toContain('Only the cars either side of you are timed');
     }
   });
 
@@ -181,18 +180,17 @@ describe('DecisionTimer', () => {
 });
 
 describe('information levels on the race screen', () => {
-  it('Full shows the gap trace and the exact gap', () => {
+  // The gap trace went with main's gap-to-rival panel (Nov 10 2026); only Minimal keeps a gap
+  // panel, for the cars either side.
+  it('Full shows the exact gap', () => {
     const s = session('racing');
     const html = render(s, at('full'));
-    expect(html).not.toContain('No gap trace');
     expect(scoreboard(html)).toBe(scoreboard(render(s)));
   });
 
-  it('Reduced drops the gap trace and keeps the exact gap', () => {
+  it('Reduced keeps the exact gap', () => {
     const s = session('racing');
     const html = render(s, at('reduced'));
-    expect(html).toContain('No gap trace at this difficulty.');
-    expect(html).not.toContain('The trace builds');
     expect(scoreboard(html)).toBe(scoreboard(render(s)));
   });
 
@@ -216,7 +214,6 @@ describe('information levels on the race screen', () => {
     expect(off()).toBe(true);
     const rounded = Math.round(gapNow() * 2) / 2;
     const html = render(s, at('limited'));
-    expect(html).toContain('No gap trace at this difficulty.');
     expect(scoreboard(html)).toBe(`${rounded >= 0 ? '+' : '−'}${Math.abs(rounded).toFixed(1)}`);
     expect(scoreboard(html)).not.toBe(scoreboard(render(s)));
   });

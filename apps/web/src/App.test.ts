@@ -13,6 +13,9 @@ describe('routeOf', () => {
     expect(routeOf('/privacy')).toEqual({ page: 'privacy' });
     expect(routeOf('/terms')).toEqual({ page: 'terms' });
     expect(routeOf('/credits')).toEqual({ page: 'credits' });
+    expect(routeOf('/tutorial')).toEqual({ page: 'tutorial' });
+    expect(routeOf('/versus')).toEqual({ page: 'versus' });
+    expect(routeOf('/versus/ABCD')).toEqual({ page: 'versus' });
   });
 
   it('routes /eras and /eras/<eraId>', () => {

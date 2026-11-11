@@ -24,18 +24,18 @@ export function PitCard({
   const lost = stop.to - stop.from;
   return (
     <output
-      className="pit-card flex min-w-0 items-center gap-2 rounded border-l-4 bg-black/75 px-2.5 py-1 text-[12px] text-white"
+      className="pit-card flex min-w-0 items-center gap-2 rounded-lg border border-[var(--glass-edge)] border-l-4 bg-[var(--glass-strong)] px-3 py-1.5 text-[12px] text-white backdrop-blur-[14px]"
       style={{ borderColor: you ? 'var(--you)' : 'var(--rival)' }}
     >
       <span className="disp shrink-0 text-[12px] leading-none">
         {surname(stop.code)} boxes · {tyreName(stop.compound)}
       </span>
-      <span className="mono truncate text-[#cfd6d3]">
+      <span className="mono truncate text-[#CFD7D3]">
         {stop.cost !== null ? `${stop.cost.toFixed(1)}s · ` : ''}P{stop.from} → P{stop.to}
         {lost > 0 ? ` (−${lost})` : ''}
       </span>
       {other && !other.retired && (
-        <span className="hidden shrink-0 items-center gap-1.5 text-[#cfd6d3] lg:flex">
+        <span className="hidden shrink-0 items-center gap-1.5 text-[#CFD7D3] lg:flex">
           {otherCode} on <TyreBadge compound={other.compound} age={other.tyreAge} />
         </span>
       )}

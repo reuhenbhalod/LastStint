@@ -9,7 +9,7 @@ import { Stat, Stats } from './Panel.js';
 
 const TONE: Record<Verdict['outcome'], { color: string; word: string }> = {
   beat: { color: 'var(--good)', word: 'Better than the real team' },
-  matched: { color: '#EEF1EF', word: 'Level with the real team' },
+  matched: { color: '#EEF1EE', word: 'Level with the real team' },
   worse: { color: 'var(--box-ink)', word: 'Behind the real team' },
 };
 
@@ -20,7 +20,7 @@ function Chequer() {
       className="h-2.5 w-full opacity-90"
       style={{
         backgroundImage:
-          'conic-gradient(#EEF1EF 25%, transparent 0 50%, #EEF1EF 0 75%, transparent 0)',
+          'conic-gradient(#EEF1EE 25%, transparent 0 50%, #EEF1EE 0 75%, transparent 0)',
         backgroundSize: '10px 10px',
       }}
     />
@@ -62,7 +62,7 @@ export function ResultHero({
   return (
     <section
       aria-label="Result"
-      className="overflow-hidden rounded-lg border border-[#262C2A] bg-[linear-gradient(180deg,#151A18_0%,#0F1312_100%)]"
+      className="glass-strong overflow-hidden"
       style={{ borderTop: `3px solid ${tone.color}` }}
     >
       <Chequer />
@@ -75,7 +75,7 @@ export function ResultHero({
             {place}
           </span>
           <span className="flex min-w-0 flex-col gap-1.5">
-            <span className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-[#8D9692]">
+            <span className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-[#9AA5A0]">
               Chequered flag · {raceName.split(':')[0]}
             </span>
             <h1 className="disp m-0 text-balance text-[26px] leading-[1.05]">{v.headline}</h1>
@@ -95,7 +95,7 @@ export function ResultHero({
             <span className="flex flex-col gap-1">
               <span className="text-[24px]">{rivalPos > 0 ? `P${rivalPos}` : 'OUT'}</span>
               {gapToRival !== null && (
-                <span className="mono text-[11px] font-semibold normal-case text-[#8D9692]">
+                <span className="mono text-[11px] font-semibold normal-case text-[#9AA5A0]">
                   {gapToRival >= 0
                     ? `you +${gapToRival.toFixed(1)}s ahead`
                     : `${(-gapToRival).toFixed(1)}s ahead of you`}
@@ -105,7 +105,7 @@ export function ResultHero({
           </Stat>
         </Stats>
         {podium.length > 0 && (
-          <ol className="m-0 flex list-none items-end justify-center gap-1.5 border-t border-[#232927] p-0 pt-4">
+          <ol className="m-0 flex list-none items-end justify-center gap-1.5 border-t border-[#252D31] p-0 pt-4">
             {[1, 0, 2].map((i) => {
               const code = podium[i];
               if (!code) return null;
@@ -120,8 +120,8 @@ export function ResultHero({
                     {code}
                   </span>
                   <span
-                    className={`disp flex w-full items-start justify-center bg-[#1A1F1D] pt-2 text-[18px] leading-none text-[#8D9692] ${i === 0 ? 'h-[72px]' : i === 1 ? 'h-[52px]' : 'h-[38px]'}`}
-                    style={{ borderTop: `3px solid ${teamOf?.(code) ?? '#3A413E'}` }}
+                    className={`disp flex w-full items-start justify-center bg-[#1A2124] pt-2 text-[18px] leading-none text-[#9AA5A0] ${i === 0 ? 'h-[72px]' : i === 1 ? 'h-[52px]' : 'h-[38px]'}`}
+                    style={{ borderTop: `3px solid ${teamOf?.(code) ?? '#3B454A'}` }}
                   >
                     {i + 1}
                   </span>

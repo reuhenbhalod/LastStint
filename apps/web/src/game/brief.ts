@@ -12,6 +12,7 @@ import {
   wetnessOn,
 } from '@laststint/sim';
 import { named } from '../data/names.js';
+import { tyreFacts } from './tyreTalk.js';
 
 export interface TyreFact {
   code: string;
@@ -111,7 +112,9 @@ export function briefFor(moment: DecisionMoment, race: RaceState, model: RaceMod
           : `${left} laps to go and ${r} is ${(-gap).toFixed(1)}s ahead. How do we race him?`;
   } else if (only('pace')) {
     kind = 'Tyres';
-    headline = `Our ${me ? tyres(me.compound) : 'tyres'} are ${me?.tyreAge ?? '?'} laps old. Push to hold the gap, run to plan, or look after them for the end?`;
+    // What the tyres are doing, not just their age (tyre calls spec).
+    const facts = tyreFacts(race, model, null).slice(0, 2).join(' ');
+    headline = `${facts || `Our ${me ? tyres(me.compound) : 'tyres'} are ${me?.tyreAge ?? '?'} laps old.`} Push to hold the gap, run to plan, or look after them for the end?`;
   } else if (flag === 'SC' && neutral && moment.lap > neutral.from) {
     kind = 'Safety car';
     headline =
@@ -129,7 +132,8 @@ export function briefFor(moment: DecisionMoment, race: RaceState, model: RaceMod
     headline = weatherCall.headline;
   } else if (moment.trigger === 'cliff' && stops) {
     kind = 'Tyres';
-    headline = `Our ${me ? tyres(me.compound) : 'tyres'} are ${me?.tyreAge ?? '?'} laps old and the lap times are starting to drop. Box under green for fresh tyres, or run them to the end?`;
+    const facts = tyreFacts(race, model, pitLoss).slice(0, 2).join(' ');
+    headline = `${facts || `Our ${me ? tyres(me.compound) : 'tyres'} are ${me?.tyreAge ?? '?'} laps old and the lap times are starting to drop.`} Box under green for fresh tyres, or run them to the end?`;
   } else if (moment.trigger === 'rivalPit') {
     kind = `${r} due in`;
     headline = `${r} is due in for tyres. Box with him to cover, or stay out?`;

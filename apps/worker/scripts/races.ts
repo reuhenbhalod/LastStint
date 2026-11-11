@@ -1,10 +1,10 @@
 // Writes src/races.gen.ts: the race models the game modes play (data/pools.json: the daily,
-// survivor and eras pools), bundled into the Worker (Phase 4 spec A2). Races in no pool
-// (validation only) stay out, which keeps the Worker small. CI checks the generated file is up
-// to date.
+// survivor and eras pools, plus versus mode's tracks), bundled into the Worker (Phase 4 spec
+// A2). Races in no pool (validation only) stay out, which keeps the Worker small. CI checks the
+// generated file is up to date.
 //
-// RACE_FILES holds the Daily and Gauntlet races, exactly as before Eras (GET /api/races serves
-// them). ERAS_RACE_FILES holds the Eras races that are in neither of those pools and already
+// RACE_FILES holds the Daily and Gauntlet races and versus mode's tracks, exactly as before
+// Eras (GET /api/races serves them). ERAS_RACE_FILES holds the Eras races that are in neither of those pools and already
 // have a race file in data/races: most Eras races aren't built yet, and are skipped until they
 // are. They're served only through the Eras API, which keeps Draft races off production.
 // ERAS_OVERLAYS holds the Eras overlays (data/eras/<race-id>.json) of the races in Eras and in
@@ -24,7 +24,9 @@ const pools = JSON.parse(readFileSync(join(races, '..', 'pools.json'), 'utf8')) 
   survivor: Record<string, number[]>;
   eras: Record<string, string[]>;
 };
-const ids = [...pools.daily, ...Object.keys(pools.survivor)].sort();
+// Versus mode's tracks run on these race files (packages/sim/src/versus.ts VERSUS_TRACKS).
+const versus = ['italy-2024', 'belgium-2024', 'bahrain-2022', 'japan-2024', 'hungary-2025'];
+const ids = [...new Set([...pools.daily, ...Object.keys(pools.survivor), ...versus])].sort();
 const bundled = new Set(ids);
 const erasAll = Object.values(pools.eras).flat();
 const erasIds = erasAll

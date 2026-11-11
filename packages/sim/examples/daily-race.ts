@@ -11,6 +11,8 @@ import {
   type Run,
   type RunScore,
   answerMoment,
+  autoAnswered,
+  autoStay,
   claimGrade,
   classify,
   gradeMoment,
@@ -25,6 +27,8 @@ export interface PlayedCall {
   moment: DecisionMoment;
   grade: MomentGrade;
   chosen: string;
+  /** The game answered it ("stay out") without asking: not scored. */
+  auto: boolean;
 }
 
 export interface DailyRaceResult {
@@ -70,10 +74,15 @@ export function playDailyRace(
       const grade = gradeMoment(run, moment.options, moment.target, options.samples);
       // What the server scores from (it re-grades every run overnight); before the answer.
       grades.push(claimGrade(run, moment, grade, options.samples));
-      const chosen = choose(moment, run);
+      // A stop just made or booked, or fresh tyres for a tyre call: the game answers "stay out"
+      // itself (autoStay) and that answer isn't scored.
+      const auto = autoStay(model, moment, run.decisions);
+      const chosen = auto ?? choose(moment, run);
+      // Not scored (in Eras the wall's answer is scored: autoAnswered), as verifyRun decides.
+      const unscored = autoAnswered(model, moment, run.decisions, chosen);
       // Logs the radio answer and the option's calls: the server checks both (verifyRun).
       answerMoment(run, moment, chosen);
-      calls.push({ moment, grade, chosen });
+      calls.push({ moment, grade, chosen, auto: unscored });
     }
     // Between moments the BOX button and headset modes call decide() for a future lap.
     stepLap(run);
@@ -92,7 +101,7 @@ export function playDailyRace(
 
   return {
     result: classify(run),
-    score: scoreRun(calls.map(({ grade, chosen }) => ({ grade, chosen }))),
+    score: scoreRun(calls.map(({ grade, chosen, auto }) => ({ grade, chosen, auto }))),
     calls,
     decisions: run.decisions,
     grades,

@@ -1,0 +1,10 @@
+{
+  "_note": "Green-flag pit loss (s) per circuit, used for a wet-affected race (docs/pit-loss-spec.md P1). 'measured' is the median of that circuit's dry races; 'estimate' is a published typical figure where no dry race is in the game yet.",
+  "circuits": {
+    "canada": { "seconds": 18.94, "source": "measured", "races": ["canada-2019", "canada-2022"] },
+    "great-britain": { "seconds": 18.76, "source": "measured", "races": ["70th-anniversary-2020"] },
+    "russia": { "seconds": 25.38, "source": "measured", "races": ["russia-2020"] },
+    "monaco": { "seconds": 20.0, "source": "estimate" },
+    "australia": { "seconds": 19.5, "source": "estimate" }
+  }
+}
