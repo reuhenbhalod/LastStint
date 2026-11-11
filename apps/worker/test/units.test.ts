@@ -1,5 +1,6 @@
 // The day boundary (spec B1) and generated names (spec B3).
 import { describe, expect, it } from 'vitest';
+import { providerOf } from '../src/adminPlayers.js';
 import { isDate, isPlayable, isSubmittable, playableDates } from '../src/dates.js';
 import { displayName } from '../src/names.js';
 
@@ -36,5 +37,13 @@ describe('leaderboard names', () => {
     expect(displayName('11111111-1111-4111-8111-111111111111')).toBe(a);
     const names = new Set(Array.from({ length: 200 }, (_, i) => displayName(`id-${i}`)));
     expect(names.size).toBeGreaterThan(190);
+  });
+});
+
+describe('admin players: sign-in provider', () => {
+  it('reads the provider from the account key', () => {
+    expect(providerOf('1234567890')).toBe('google');
+    expect(providerOf('auth0|abc')).toBe('email');
+    expect(providerOf('apple|xyz')).toBe('apple');
   });
 });
