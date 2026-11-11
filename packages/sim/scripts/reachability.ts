@@ -1,7 +1,7 @@
 // Reachability and difficulty checker CLI (eras build plan 6.1; eras spec §15):
 //   pnpm --filter @laststint/sim reachability [race-id ...] [--samples N] [--seeds 1,2,3]
 //                                             [--beam N] [--json]
-// With no race ids it checks every data/races/*.json with an `eras` block (none is a pass).
+// With no race ids it checks every race in data/pools.json "eras" (none is a pass).
 // An argument ending in .json is read as a race file path instead (relative to the caller).
 // Prints one block per race (pass/fail, the best path, its stars, the runtime), or the full
 // reports as JSON with --json, and exits 1 if any race fails. See src/eras/reachability.ts for
@@ -65,10 +65,22 @@ function load(id: string): RaceModel {
   }
 }
 
+// With no ids: the races the eras play (data/pools.json "eras"). A race authored but swapped
+// out of every era (spain-2013, china-2011) keeps its eras block but isn't served, so it's
+// skipped; name it to check it.
+const erasPool = new Set(
+  Object.values(
+    (
+      JSON.parse(readFileSync(join(races, '..', 'pools.json'), 'utf8')) as {
+        eras: Record<string, string[]>;
+      }
+    ).eras,
+  ).flat(),
+);
 const all = ids.length
   ? ids.map(load)
   : readdirSync(races)
-      .filter((f) => f.endsWith('.json'))
+      .filter((f) => f.endsWith('.json') && erasPool.has(f.slice(0, -'.json'.length)))
       .sort()
       .map((f) => load(f.slice(0, -'.json'.length)));
 if (ids.length) {
@@ -78,4 +90,5 @@ if (ids.length) {
 
 const summary = checkRaces(all, { samples, beamWidth, seeds });
 process.stdout.write(`${json ? JSON.stringify(summary, null, 2) : formatSummary(summary)}\n`);
-process.exit(summary.ok ? 0 : 1);
+// exitCode, not exit(): exit() can cut off a long report still being written to a pipe (CI).
+process.exitCode = summary.ok ? 0 : 1;

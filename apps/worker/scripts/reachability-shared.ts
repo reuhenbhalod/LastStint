@@ -42,4 +42,4 @@ const models = chosen.map((id) =>
 );
 const summary = checkRaces(models);
 process.stdout.write(`${json ? JSON.stringify(summary, null, 2) : formatSummary(summary)}\n`);
-process.exit(summary.ok ? 0 : 1);
+process.exitCode = summary.ok ? 0 : 1;
