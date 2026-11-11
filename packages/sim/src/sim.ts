@@ -731,9 +731,10 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
       noise: d.noise,
       ...(d.wetPace ? { wetPace: d.wetPace } : {}),
       ...(d.dampPace !== undefined ? { dampPace: d.dampPace } : {}),
-      // Pace by stint: the takeover stint's offset; never the player's car in live play.
-      ...(stintOffset(model, d.code, 0) !== 0 && !(live && d.code === model.userSide)
-        ? { stintPace: stintOffset(model, d.code, 0) }
+      // Pace by stint: the takeover stint's offset; the player's car in live play runs its
+      // race-wide one in every stint (playerStintOffset).
+      ...(stintPaceAtTakeover(model, d.code, live) !== 0
+        ? { stintPace: stintPaceAtTakeover(model, d.code, live) }
         : {}),
       compound: s.compound,
       tyreAge: s.tyreAge,
@@ -880,6 +881,48 @@ export function stintOffset(model: RaceModel, code: string, lap: number): number
     STINTS.set(model, table);
   }
   return table.get(code)?.get(lap) ?? 0;
+}
+
+/** Each Eras race's player's car: its race-wide stint offset (playerStintOffset). */
+const PLAYER_MEAN = new WeakMap<RaceModel, number>();
+
+/**
+ * Pace by stint for the player's car in live play (and so in the grader's playouts, which fork
+ * it) in an Eras race: the car's race-wide offset, the mean of its real stints' offsets
+ * weighted by their real length in laps (0 if it has none), the same in every stint whatever
+ * its calls. The offsets carry basePace's error for the car (san-marino-2005: Schumacher's
+ * stints average -0.59 s/lap), which the player's car needs as much as the others; the
+ * stint-to-stint shape (a real push or an eased-off last stint) is the real driver's effort,
+ * which in play is the player's (the pace modes). It is barely shared by the field over the
+ * same laps (correlation 0.19 over 153 player stints), and running it only when a stop lands on
+ * the real lap would grade the real call on effort (a cliff of up to 15 s, spain-1996).
+ * Always 0 outside Eras races (no Daily or Gauntlet race has stint offsets).
+ */
+export function playerStintOffset(model: RaceModel): number {
+  if (!erasRace(model)) return 0;
+  let mean = PLAYER_MEAN.get(model);
+  if (mean === undefined) {
+    const d = model.drivers.find((x) => x.code === model.userSide);
+    const stops = (d?.realStrategy ?? []).map((s) => s.lap).sort((a, b) => a - b);
+    let laps = 0;
+    let sum = 0;
+    for (const e of d?.stintPace ?? []) {
+      const start = e.lap === 0 ? model.race.takeoverLap + 1 : e.lap;
+      const end = stops.find((l) => l > start) ?? model.race.laps + 1;
+      const n = Math.max(0, end - start);
+      laps += n;
+      sum += n * e.offset;
+    }
+    mean = laps > 0 ? sum / laps : 0;
+    PLAYER_MEAN.set(model, mean);
+  }
+  return mean;
+}
+
+/** A car's stint offset at the takeover: the player's car in live play takes its race-wide
+ * offset (playerStintOffset), every other car (and every car in a replay) its takeover stint's. */
+function stintPaceAtTakeover(model: RaceModel, code: string, live: boolean): number {
+  return live && code === model.userSide ? playerStintOffset(model) : stintOffset(model, code, 0);
 }
 
 /** Each car's stops with no tyre change, out-lap -> loss (DriverModel.serviceStops). */
@@ -1965,7 +2008,8 @@ export function stepLap(run: Run): RaceState {
       c.pittedThisLap = true;
       if (c.stops !== undefined) c.stops++; // era rules: minStops
       // Pace by stint: the stint begun on this lap runs at the real one's offset if the real car
-      // began one here, else 0. The player's car in live play has none (its pace is the modes').
+      // began one here, else 0. The player's car in live play keeps its race-wide offset
+      // (playerStintOffset, set at the takeover).
       if (!(run.live && code === model.userSide)) {
         const offset = stintOffset(model, code, lap);
         if (offset !== 0 || c.stintPace !== undefined) c.stintPace = offset;
