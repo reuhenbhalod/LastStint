@@ -361,13 +361,14 @@ export function IntroCard({
                 above it). */}
             <div className="relative flex flex-col lg:justify-end lg:self-stretch">
               <div
-                className="mx-auto w-full max-w-[640px] overflow-hidden rounded-2xl lg:hidden"
+                className="relative mx-auto w-full max-w-[640px] overflow-hidden rounded-2xl lg:hidden"
                 style={(() => {
                   const o = outlineFor(model.race.id);
                   return o ? { aspectRatio: `${o.width + 80} / ${o.height + 80}` } : undefined;
                 })()}
               >
                 <Circuit state={state} model={model} />
+                <MapCredit raceId={model.race.id} className="absolute right-2 top-2 z-10" />
               </div>
               <section
                 aria-label="The situation"
