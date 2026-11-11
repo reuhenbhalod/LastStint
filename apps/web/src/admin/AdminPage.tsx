@@ -1,10 +1,12 @@
-// The admin page (/admin): for the people running the game. Sign in with a Google account on
-// the Worker's ADMIN_EMAILS list, then: play any race (practice, with any seed), and run the
-// daily schedule (see it, set a day's race, schedule the next days, re-pin stale days, clear
-// your own run to replay a day). On localhost the race list works without the admin API.
-// The Tickets tab (/admin/tickets, TicketsPage.tsx) is the game-change ticket tracker, shown
-// only once the server has confirmed the sign-in is an admin's. The Players tab (/admin/players,
-// PlayersPage.tsx) lists every account that has signed up, on the same terms.
+// The admin page (/admin): for the people running the game. Sign in with an account on the
+// Worker's ADMIN_EMAILS list. The tabs (docs/admin-v2-spec.md), each shown only once the server
+// has confirmed the sign-in is an admin's:
+//   Today (/admin, TodayPage.tsx): the health check and the announcement banner.
+//   Schedule (/admin/schedule, below): play any race (practice, with any seed) with a preview
+//     (RacePreview.tsx), and run the daily schedule (see it, set a day's race, schedule the next
+//     days, re-pin stale days, clear your own run to replay a day). On localhost the race list
+//     works without the admin API.
+//   Eras, Runs, Players, Versus, Stats, Tickets and Log: their own *Page.tsx files.
 
 import type { RaceModel } from '@laststint/sim';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -13,8 +15,15 @@ import { GOOGLE_CLIENT_ID, loadGoogle } from '../account/google.js';
 import { ApiError } from '../api.js';
 import { Brand } from '../components/Brand.js';
 import { goalOf } from '../game/goal.js';
+import { ErasAdminPage } from './ErasAdminPage.js';
+import { LogPage } from './LogPage.js';
 import { PlayersPage } from './PlayersPage.js';
+import { RacePreview } from './RacePreview.js';
+import { RunsPage } from './RunsPage.js';
+import { StatsPage } from './StatsPage.js';
 import { TicketsPage } from './TicketsPage.js';
+import { TodayPage } from './TodayPage.js';
+import { VersusAdminPage } from './VersusAdminPage.js';
 import { adminCall, adminToken, setAdminToken } from './session.js';
 import { btn, primary } from './ui.js';
 
@@ -31,6 +40,7 @@ interface RaceCard {
   calls: number;
   seed: number;
   laps: string;
+  model: RaceModel;
 }
 
 interface Day {
@@ -42,21 +52,36 @@ interface Day {
   current: boolean;
 }
 
-type Tab = 'races' | 'tickets' | 'players';
+export type Tab =
+  | 'today'
+  | 'schedule'
+  | 'eras'
+  | 'runs'
+  | 'players'
+  | 'versus'
+  | 'stats'
+  | 'tickets'
+  | 'log';
 
-const TABS: Array<{ id: Tab; label: string; href: string }> = [
-  { id: 'races', label: 'Races & schedule', href: '/admin' },
-  { id: 'tickets', label: 'Tickets', href: '/admin/tickets' },
+export const TABS: Array<{ id: Tab; label: string; href: string }> = [
+  { id: 'today', label: 'Today', href: '/admin' },
+  { id: 'schedule', label: 'Schedule', href: '/admin/schedule' },
+  { id: 'eras', label: 'Eras', href: '/admin/eras' },
+  { id: 'runs', label: 'Runs', href: '/admin/runs' },
   { id: 'players', label: 'Players', href: '/admin/players' },
+  { id: 'versus', label: 'Versus', href: '/admin/versus' },
+  { id: 'stats', label: 'Stats', href: '/admin/stats' },
+  { id: 'tickets', label: 'Tickets', href: '/admin/tickets' },
+  { id: 'log', label: 'Log', href: '/admin/log' },
 ];
 
-/** The admin tab the URL asks for: /admin/tickets, /admin/players, or the races and schedule. */
-function adminTab(pathname: string): Tab {
-  const m = /^\/admin\/(tickets|players)\/?$/.exec(pathname);
-  return (m?.[1] as Tab | undefined) ?? 'races';
+/** The admin tab the URL asks for: /admin/<tab>, or Today. */
+export function adminTab(pathname: string): Tab {
+  const m = /^\/admin\/([a-z]+)\/?$/.exec(pathname);
+  return TABS.find((t) => t.id === m?.[1] && t.id !== 'today')?.id ?? 'today';
 }
 
-/** The playable race files (not loaded until `enabled`: the Tickets tab doesn't need them). */
+/** The playable race files (not loaded until `enabled`: only the Schedule tab needs them). */
 function useRaces(enabled: boolean): RaceCard[] | null {
   const [races, setRaces] = useState<RaceCard[] | null>(null);
   useEffect(() => {
@@ -80,6 +105,7 @@ function useRaces(enabled: boolean): RaceCard[] | null {
               calls: m.decisionMoments.length,
               seed: m.race.seed,
               laps: `${m.race.laps - m.race.takeoverLap} laps`,
+              model: m,
             };
           })
           .sort((a, b) => a.name.localeCompare(b.name)),
@@ -112,7 +138,7 @@ function SignIn({ onToken }: { onToken: (t: string) => void }) {
 
 export function AdminPage() {
   const tab = adminTab(location.pathname);
-  const races = useRaces(tab === 'races');
+  const races = useRaces(tab === 'schedule');
   const [token, setToken] = useState(adminToken);
   // Auth0: back from its login page, or already signed in to it (another tab), the ID token
   // is the admin token (docs/auth0-spec.md).
@@ -140,6 +166,7 @@ export function AdminPage() {
   const [seeds, setSeeds] = useState<Record<string, string>>({});
   const [count, setCount] = useState('14');
   const [pick, setPick] = useState('');
+  const [preview, setPreview] = useState<string | null>(null);
   const local = import.meta.env.DEV;
 
   const say = useCallback(
@@ -175,7 +202,7 @@ export function AdminPage() {
     adminCall<{ email: string }>('/api/admin/me').then(
       (r) => {
         setMe(r);
-        if (tab === 'races') load();
+        if (tab === 'schedule') load();
       },
       (e) => {
         if (e instanceof ApiError && e.status === 401) {
@@ -202,7 +229,8 @@ export function AdminPage() {
   };
 
   const signedIn = !!token && !!me;
-  const showRaces = tab === 'races' && (signedIn || local);
+  const showRaces = tab === 'schedule' && (signedIn || local);
+  const previewed = races?.find((r) => r.id === preview)?.model;
   const nameOf = (id: string) => races?.find((r) => r.id === id)?.name ?? id;
 
   return (
@@ -236,13 +264,16 @@ export function AdminPage() {
             </a>
           </span>
         </div>
-        <nav aria-label="Admin" className="mx-auto flex max-w-6xl gap-1 px-4 sm:px-6">
+        <nav
+          aria-label="Admin"
+          className="mx-auto flex max-w-6xl gap-1 overflow-x-auto px-4 sm:px-6"
+        >
           {TABS.map((t) => (
             <a
               key={t.id}
               href={t.href}
               aria-current={tab === t.id ? 'page' : undefined}
-              className={`-mb-px border-b-2 px-3 py-2 text-[13px] font-semibold ${
+              className={`-mb-px shrink-0 border-b-2 px-3 py-2 text-[13px] font-semibold ${
                 tab === t.id
                   ? 'border-[var(--you)] text-[var(--ink)]'
                   : 'border-transparent text-[var(--muted)] hover:text-[var(--ink)]'
@@ -261,7 +292,7 @@ export function AdminPage() {
               <h1 className="disp m-0 text-[22px] leading-none">Admin sign-in</h1>
               <p className="m-0 mt-1 text-[14px] text-[var(--muted)]">
                 Sign in with an account on the admin list.
-                {local && tab === 'races'
+                {local && tab === 'schedule'
                   ? ' On localhost you can play any race without signing in.'
                   : ''}
               </p>
@@ -297,11 +328,17 @@ export function AdminPage() {
           </p>
         )}
 
-        {tab !== 'races' && token && !me && !error && (
+        {tab !== 'schedule' && token && !me && !error && (
           <p className="m-0 text-[14px] text-[var(--muted)]">Checking your sign-in…</p>
         )}
-        {tab === 'tickets' && signedIn && <TicketsPage />}
-        {tab === 'players' && signedIn && <PlayersPage />}
+        {signedIn && tab === 'today' && <TodayPage />}
+        {signedIn && tab === 'eras' && <ErasAdminPage />}
+        {signedIn && tab === 'runs' && <RunsPage />}
+        {signedIn && tab === 'players' && <PlayersPage />}
+        {signedIn && tab === 'versus' && <VersusAdminPage />}
+        {signedIn && tab === 'stats' && <StatsPage />}
+        {signedIn && tab === 'tickets' && <TicketsPage />}
+        {signedIn && tab === 'log' && <LogPage />}
 
         {showRaces && (
           <section className="flex flex-col gap-3">
@@ -314,45 +351,62 @@ export function AdminPage() {
             {!races ? (
               <p className="m-0 text-[14px] text-[var(--muted)]">Loading races…</p>
             ) : (
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {races.map((r) => (
-                  <article key={r.id} className="card flex flex-col gap-2 !p-4">
-                    <div className="flex items-start justify-between gap-2">
-                      <span className="disp text-[16px] leading-tight">{r.name}</span>
-                      <span
-                        className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold ${r.defend ? 'bg-[color-mix(in_srgb,var(--rival)_18%,transparent)] text-[var(--rival)]' : 'bg-[color-mix(in_srgb,var(--you)_18%,transparent)] text-[var(--you)]'}`}
-                      >
-                        {r.defend ? 'Defend' : 'Beat'}
+              <div
+                className={`grid items-start gap-4 ${previewed ? 'lg:grid-cols-[minmax(0,1fr)_380px]' : ''}`}
+              >
+                <div className={`grid gap-3 sm:grid-cols-2 ${previewed ? '' : 'lg:grid-cols-3'}`}>
+                  {races.map((r) => (
+                    <article key={r.id} className="card flex flex-col gap-2 !p-4">
+                      <div className="flex items-start justify-between gap-2">
+                        <span className="disp text-[16px] leading-tight">{r.name}</span>
+                        <span
+                          className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold ${r.defend ? 'bg-[color-mix(in_srgb,var(--rival)_18%,transparent)] text-[var(--rival)]' : 'bg-[color-mix(in_srgb,var(--you)_18%,transparent)] text-[var(--you)]'}`}
+                        >
+                          {r.defend ? 'Defend' : 'Beat'}
+                        </span>
+                      </div>
+                      <span className="text-[13px] text-[var(--muted)]">
+                        {r.user} ({r.team}) · {r.goal} · {r.calls} calls · {r.laps}
                       </span>
-                    </div>
-                    <span className="text-[13px] text-[var(--muted)]">
-                      {r.user} ({r.team}) · {r.goal} · {r.calls} calls · {r.laps}
-                    </span>
-                    <div className="mt-auto flex items-center gap-2">
-                      <label className="flex items-center gap-1.5 text-[12px] text-[var(--muted)]">
-                        Seed
-                        <input
-                          value={seeds[r.id] ?? String(r.seed)}
-                          onChange={(e) => setSeeds({ ...seeds, [r.id]: e.target.value })}
-                          inputMode="numeric"
-                          className="w-24 rounded-md border border-[var(--rule)] bg-[var(--card-2)] px-2 py-1 text-[13px] text-[var(--ink)]"
-                        />
-                      </label>
-                      <a
-                        className={`${primary} ml-auto`}
-                        href={`/?race=${r.id}&seed=${encodeURIComponent(seeds[r.id] ?? String(r.seed))}`}
-                      >
-                        Play
-                      </a>
-                    </div>
-                  </article>
-                ))}
+                      <div className="mt-auto flex items-center gap-2">
+                        <label className="flex items-center gap-1.5 text-[12px] text-[var(--muted)]">
+                          Seed
+                          <input
+                            value={seeds[r.id] ?? String(r.seed)}
+                            onChange={(e) => setSeeds({ ...seeds, [r.id]: e.target.value })}
+                            inputMode="numeric"
+                            className="w-24 rounded-md border border-[var(--rule)] bg-[var(--card-2)] px-2 py-1 text-[13px] text-[var(--ink)]"
+                          />
+                        </label>
+                        <button
+                          type="button"
+                          className={`${btn} ml-auto`}
+                          aria-pressed={preview === r.id}
+                          onClick={() => setPreview(preview === r.id ? null : r.id)}
+                        >
+                          Preview
+                        </button>
+                        <a
+                          className={primary}
+                          href={`/?race=${r.id}&seed=${encodeURIComponent(seeds[r.id] ?? String(r.seed))}`}
+                        >
+                          Play
+                        </a>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+                {previewed && (
+                  <div className="lg:sticky lg:top-4">
+                    <RacePreview model={previewed} onClose={() => setPreview(null)} />
+                  </div>
+                )}
               </div>
             )}
           </section>
         )}
 
-        {tab === 'races' && signedIn && (
+        {tab === 'schedule' && signedIn && (
           <section className="flex flex-col gap-3">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <h2 className="disp m-0 text-[20px] leading-none">Daily schedule</h2>
