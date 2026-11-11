@@ -2465,6 +2465,18 @@
       "codeSource": "f1db",
       "jolpicaId": "salo"
     },
+    "SARS": {
+      "name": "Stéphane Sarrazin",
+      "number": 20,
+      "tier": "low",
+      "ignores": 0,
+      "pushback": 0,
+      "confidence": "low",
+      "evidence": [],
+      "code": "SAR",
+      "codeSource": "f1db",
+      "jolpicaId": "sarrazin"
+    },
     "SAT": {
       "name": "Takuma Sato",
       "number": 22,

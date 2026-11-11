@@ -85,6 +85,9 @@ APPENDIX_RACES = [
     # Swapped into Era 3 for hungary-1997 on Nov 9 (same sheet); hungary-1997 stays above as an
     # Eras-build fixture.
     "luxembourg-1998",
+    # Swapped into Era 3 for hungary-1998 on Nov 10 (docs/eras-checks/b1-brazil-1999.md);
+    # hungary-1998 stays above as an Eras-build fixture.
+    "brazil-1999",
 ]
 FIRST_STOPS_YEAR = 1994
 
@@ -314,7 +317,7 @@ def write_source(out_dir: Path | None = None, version: str = VERSION) -> Path:
         "attribution": ATTRIBUTION,
         "columns": {"stops": STOP_COLUMNS, "fastest-laps": FASTEST_COLUMNS},
     }
-    path.write_text(json.dumps(meta, indent=2) + "\n")
+    path.write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8", newline="\n")
     return path
 
 

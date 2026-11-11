@@ -92,6 +92,49 @@ after the change: pass, 1.22 s. Reachability: era and Legend reachable, stay-out
 | storylineEvents | `[41, "RETIREMENT"]` (Leclerc, so the place he hands over is always there) and `[41, "VSC"]` (the VSC for his car, laps 41-42, kept in Legend too). | SC / VSC and Leclerc retirement rows | |
 | Moments | stop-13, cliff-21, stop-31, vsc-41 (`pnpm --filter @laststint/sim author bahrain-2023 --target beat-rival --eras --write`). | author output | |
 
+### B2 re-author (Nov 10 2026)
+
+Eras job B2, on `eras-integrate-fixes` (35975b7: Expert rival grader fix and player stint-pace
+fix in). With both fixes, Legend was not reachable: best seed 1 earned ★2 ★3 and the hidden
+objective at accuracy 100 but not ★1 (beat Alonso). The era level stayed reachable. Measured on
+this branch (scratch playouts, not committed):
+
+- Legend (Expert rival, threshold 90), exhaustive search on seed 2: only 7 paths are clean (no
+  orange or red call), and none of them finishes ahead of Alonso. In playouts of 24 paths that
+  box for mediums at lap 13, Sainz finishes behind Alonso on almost every seed (up to 50 s); the
+  four playouts that beat him (seed 1: stay out on lap 31; seed 2: box for hards on lap 31) all
+  take a call graded red at Legend. In the model Alonso is
+  about 0.24 s a lap faster (base pace), so beating him is out of reach at Legend.
+- Change: **target** `beat-rival` ALO -> `position` 4, Sainz's real result (as malaysia-2013 and
+  spain-2016 went to their real P2). **Rewrite** stays `beat-rival` ALO and the headline is
+  unchanged, so beating Alonso is still the history-book rewrite.
+- **Mastery** unchanged (`stop_count` exact 3); label now "Finish fourth or better on three
+  stops". **Hidden** unchanged (no push lap); label now "Finish fourth or better without a single
+  push lap".
+- **Briefing:** last sentence "Finish ahead of Alonso." -> "Bring the car home no lower than
+  fourth, and beat Alonso to rewrite the day." The rest is unchanged.
+- **hardCalls** re-run (`pipeline hard-calls bahrain-2023`): now SAI 2, ALO 2 (was SAI 2, ALO
+  1); chance given up SAI 13.7 pts, ALO 0.0, so the side stays **Sainz** (by gave-up, the
+  counter's tie-break).
+- **Moments** re-authored on P4 (`pnpm --filter @laststint/sim author bahrain-2023 --eras
+  --target position:4 --write`): the same four moments and options (stop-13, cliff-21, stop-31,
+  vsc-41) and real options; only each moment's grading target changed (`position`, atBest 4).
+- Reachability (scratch race file with the new overlay and moments): **pass**. Era and Legend
+  seed 1: box-medium, stay, box-medium, box-medium (★1 ★2 ★3 hidden, accuracy 100; exhaustive
+  search). Stay-out never earns ★3 (no star at Legend, ★2 only at era).
+- Robust G1: **pass** (strict pass), mean gap error 1.22 s.
+- The integrator must rebuild `data/races/bahrain-2023.json` so it carries the new overlay and
+  moments (`test_a_non_pool_race_file_carries_its_overlay[bahrain-2023]` fails until then).
+
+| Item | As re-authored | Basis | Owner checked |
+|---|---|---|---|
+| Target | `position` 4: Sainz's real finishing place | Result row (Sainz 4th, +48.052) | |
+| Rewrite | unchanged: `beat-rival` ALO, "Sainz holds Alonso off in Bahrain" | Result row | |
+| Mastery label | "Finish fourth or better on three stops" (counterfactual; Sainz really stopped twice) | Stops: Sainz row | |
+| Hidden label | "Finish fourth or better without a single push lap" | game's choice | |
+| Briefing | "... Bring the car home no lower than fourth, and beat Alonso to rewrite the day." | game advice, not a fact | |
+| Side | Sainz (hard calls SAI 2, ALO 2; gave-up SAI 13.7, ALO 0.0) | hard-call counter | |
+
 ## styria-2021 (2021 Styrian Grand Prix)
 
 ### Sources

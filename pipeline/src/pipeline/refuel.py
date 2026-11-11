@@ -82,9 +82,10 @@ PRIOR_SD = 0.01  # s per lap: strong enough that no single race's stops can move
 # What the stops alone say, for the record (pooled_prior(); a test recomputes it): the
 # random-effects mean of the per-race slopes and their between-race sd. Not used in the fit.
 # 0.0648 before the Era 3, 4 and 5 swaps; 0.0986 before Era 5's third batch and luxembourg-1998
-# (Nov 9).
-POOLED_SLOPE = 0.0945
-POOLED_TAU = 0.1251
+# (Nov 9); 0.0945 before the Era 3 scout 4 candidates canada-1996, brazil-1999 and japan-1999
+# (Nov 10).
+POOLED_SLOPE = 0.0984
+POOLED_TAU = 0.1255
 FILL_RATE_METHOD = (
     f"fill rate: an estimate, {PRIOR_SECONDS_PER_LAP:.2f} s per lap of fuel"
     f" (~{BURN_LITRES_PER_LAP:g} L a lap through a ~{RIG_LITRES_PER_SECOND:g} L/s rig, prior sd"
@@ -125,7 +126,7 @@ def write_r4_overlays(race_ids: list[str], out_dir: Path = ERAS_OVERLAY_DIR) -> 
         rules.update(r4_rules_for_year(int(race_id.rsplit("-", 1)[1])))
         overlay["rules"] = rules
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(overlay, indent=2) + "\n")
+        path.write_text(json.dumps(overlay, indent=2) + "\n", encoding="utf-8", newline="\n")
         written.append(path)
     return written
 
@@ -182,6 +183,19 @@ def stint_to_next_stop(strategy: list[dict], out_lap: int, laps: int) -> int:
     return nxt - out_lap
 
 
+def fill_cap(model: dict) -> int:
+    """The most laps a fill may name (refuel.ts fillCap): the tank (the fit's tankLaps), or the
+    longest real stint after a stop in the race file if that is longer."""
+    laps = int(model["race"]["laps"])
+    cap = max(1, math.floor(refuel_model(model)["tankLaps"]))
+    for d in model["drivers"]:
+        real = d["realStrategy"]
+        for i, s in enumerate(real):
+            others = [o for j, o in enumerate(real) if j != i]
+            cap = max(cap, stint_to_next_stop(others, int(s["lap"]), laps))
+    return cap
+
+
 def takeover_tank(strategy: list[dict], takeover: int, laps: int) -> int:
     return stint_to_next_stop(strategy, takeover, laps) - 1 + RESERVE_LAPS
 
@@ -199,7 +213,8 @@ def init_tanks(model: dict, cars: dict) -> None:
 
 def refuel_at_stop(model: dict, car, stop: dict, out_lap: int) -> float:
     """Fill the tank at a stop (already off the car's strategy); returns the fill time over
-    the stop's base cost (refuel.ts refuelAtStop)."""
+    the stop's base cost (refuel.ts refuelAtStop). A stop without a fill fills to the car's
+    next stop or the flag, but never past the tank (fill_cap)."""
     if not refuelling(model) or car.tank is None:
         return 0.0
     rm = refuel_model(model)
@@ -207,7 +222,7 @@ def refuel_at_stop(model: dict, car, stop: dict, out_lap: int) -> float:
     if stop.get("fill"):
         stint = fill_laps(stop["fill"], laps - out_lap + 1, rm["tankLaps"])
     else:
-        stint = stint_to_next_stop(car.strategy, out_lap, laps)
+        stint = min(stint_to_next_stop(car.strategy, out_lap, laps), fill_cap(model))
     target = stint + RESERVE_LAPS
     fill = max(0.0, target - car.tank)
     car.tank = max(car.tank, float(target))

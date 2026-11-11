@@ -198,7 +198,9 @@ def write_entries(race_id: str, entries: list[dict], raw_dir: Path = RAW_DIR) ->
     """Write the ingest's red-flag file (data/raw/<race-id>.redflags.json)."""
     path = raw_dir / f"{race_id}.redflags.json"
     path.write_text(
-        json.dumps({"race": race_id, "redFlags": validate_entries(entries)}, indent=1) + "\n"
+        json.dumps({"race": race_id, "redFlags": validate_entries(entries)}, indent=1) + "\n",
+        encoding="utf-8",
+        newline="\n",
     )
     return path
 

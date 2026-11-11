@@ -958,7 +958,8 @@
       "lap": 13,
       "trigger": "cliff",
       "target": {
-        "kind": "beat-rival"
+        "kind": "position",
+        "atBest": 4
       },
       "options": [
         {
@@ -1018,7 +1019,8 @@
       "lap": 21,
       "trigger": "cliff",
       "target": {
-        "kind": "beat-rival"
+        "kind": "position",
+        "atBest": 4
       },
       "options": [
         {
@@ -1078,7 +1080,8 @@
       "lap": 31,
       "trigger": "cliff",
       "target": {
-        "kind": "beat-rival"
+        "kind": "position",
+        "atBest": 4
       },
       "options": [
         {
@@ -1138,7 +1141,8 @@
       "lap": 41,
       "trigger": "VSC",
       "target": {
-        "kind": "beat-rival"
+        "kind": "position",
+        "atBest": 4
       },
       "options": [
         {
@@ -1247,8 +1251,8 @@
     "order": 1,
     "userSide": "SAI",
     "target": {
-      "type": "beat-rival",
-      "rival": "ALO"
+      "type": "position",
+      "position": 4
     },
     "storyline": {
       "real": "Verstappen wins from pole and P\u00e9rez is second. Leclerc's engine fails while he runs third, and Alonso, on a later second stop, passes Sainz for the last podium place; Sainz finishes fourth, 9.4 s behind Alonso.",
@@ -1261,19 +1265,19 @@
     "mastery": {
       "type": "stop_count",
       "exact": 3,
-      "label": "Beat Alonso on three stops"
+      "label": "Finish fourth or better on three stops"
     },
     "hidden": {
       "type": "mode_rule",
       "mode": "push",
       "maxLaps": 0,
-      "label": "Beat Alonso without a single push lap"
+      "label": "Finish fourth or better without a single push lap"
     },
     "hardCalls": {
-      "ALO": 1,
-      "SAI": 2
+      "SAI": 2,
+      "ALO": 2
     },
-    "briefing": "Bahrain, 2023. Verstappen leads from pole and Leclerc runs second. You run Sainz, fourth after ten laps; Alonso is seventh after his team-mate Stroll hit him on the opening lap. Finish ahead of Alonso."
+    "briefing": "Bahrain, 2023. Verstappen leads from pole and Leclerc runs second. You run Sainz, fourth after ten laps; Alonso is seventh after his team-mate Stroll hit him on the opening lap. Bring the car home no lower than fourth, and beat Alonso to rewrite the day."
   },
   "rules": {
     "twoCompound": true,

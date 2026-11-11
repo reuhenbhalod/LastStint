@@ -3,7 +3,8 @@
 // daily schedule (see it, set a day's race, schedule the next days, re-pin stale days, clear
 // your own run to replay a day). On localhost the race list works without the admin API.
 // The Tickets tab (/admin/tickets, TicketsPage.tsx) is the game-change ticket tracker, shown
-// only once the server has confirmed the sign-in is an admin's.
+// only once the server has confirmed the sign-in is an admin's. The Players tab (/admin/players,
+// PlayersPage.tsx) lists every account that has signed up, on the same terms.
 
 import type { RaceModel } from '@laststint/sim';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -12,6 +13,7 @@ import { GOOGLE_CLIENT_ID, loadGoogle } from '../account/google.js';
 import { ApiError } from '../api.js';
 import { Brand } from '../components/Brand.js';
 import { goalOf } from '../game/goal.js';
+import { PlayersPage } from './PlayersPage.js';
 import { TicketsPage } from './TicketsPage.js';
 import { adminCall, adminToken, setAdminToken } from './session.js';
 import { btn, primary } from './ui.js';
@@ -40,16 +42,18 @@ interface Day {
   current: boolean;
 }
 
-type Tab = 'races' | 'tickets';
+type Tab = 'races' | 'tickets' | 'players';
 
 const TABS: Array<{ id: Tab; label: string; href: string }> = [
   { id: 'races', label: 'Races & schedule', href: '/admin' },
   { id: 'tickets', label: 'Tickets', href: '/admin/tickets' },
+  { id: 'players', label: 'Players', href: '/admin/players' },
 ];
 
-/** The admin tab the URL asks for: /admin/tickets, or the races and schedule. */
+/** The admin tab the URL asks for: /admin/tickets, /admin/players, or the races and schedule. */
 function adminTab(pathname: string): Tab {
-  return /^\/admin\/tickets\/?$/.test(pathname) ? 'tickets' : 'races';
+  const m = /^\/admin\/(tickets|players)\/?$/.exec(pathname);
+  return (m?.[1] as Tab | undefined) ?? 'races';
 }
 
 /** The playable race files (not loaded until `enabled`: the Tickets tab doesn't need them). */
@@ -293,10 +297,11 @@ export function AdminPage() {
           </p>
         )}
 
-        {tab === 'tickets' && token && !me && !error && (
+        {tab !== 'races' && token && !me && !error && (
           <p className="m-0 text-[14px] text-[var(--muted)]">Checking your sign-in…</p>
         )}
         {tab === 'tickets' && signedIn && <TicketsPage />}
+        {tab === 'players' && signedIn && <PlayersPage />}
 
         {showRaces && (
           <section className="flex flex-col gap-3">

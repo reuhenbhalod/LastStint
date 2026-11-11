@@ -10,7 +10,8 @@
 //   rival in them is Smart (sim.ts forkRun, policy.ts playoutPolicy: no grading inside grading);
 // - the user's car runs only what the rival can see (its calls already charged or under way)
 //   and then the sensible-strategist continuation (planRemainingStops; in an Eras race the real
-//   team's plan, sim.ts erasContinuation, as the player's grader uses). The player's later calls
+//   team's plan, sim.ts erasContinuation, as the player's grader uses, after any stop already
+//   queued). The player's later calls
 //   are dropped: live, the client doesn't have them yet, and a server replay has them all, so
 //   reading them would both cheat and make the client and server disagree.
 
@@ -73,12 +74,18 @@ export function rivalPlayout(run: Run, seed: number, option: RivalOption): Run {
   const fork = forkRun(run, seed, [], { blindAfter: run.state.lap + 1 });
   fork.decisions = [];
   const user = fork.state.cars[fork.model.userSide];
-  if (user && !user.retired && !user.strategy.some((s) => s.lap > fork.state.lap)) {
-    // An Eras race: the player's car keeps to the real team's plan, as in the player's grader.
-    const stops = erasRace(fork.model)
-      ? erasContinuation(fork, fork.state.lap, playerStopsBy(run.decisions, fork.state.lap))
-      : planRemainingStops(fork).map((stop) => ({ ...stop, added: true }));
-    for (const stop of stops) user.strategy.push(stop);
+  if (user && !user.retired) {
+    const queued = user.strategy.some((s) => s.lap > fork.state.lap);
+    if (!erasRace(fork.model)) {
+      if (!queued)
+        for (const stop of planRemainingStops(fork)) user.strategy.push({ ...stop, added: true });
+    } else {
+      // An Eras race: the player's car keeps to the real team's plan, as in the player's grader
+      // (grade.ts playOption). A stop already queued (a call made the lap before) stays, and
+      // the remaining real stops follow it (erasContinuation).
+      const made = playerStopsBy(run.decisions, fork.state.lap);
+      for (const stop of erasContinuation(fork, fork.state.lap, made)) user.strategy.push(stop);
+    }
   }
   const rival = fork.state.cars[fork.model.rival];
   if (rival) rival.strategy = option.stops.map((s) => ({ ...s }));

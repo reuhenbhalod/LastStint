@@ -1237,3 +1237,69 @@ describe('migration 0028: hungary-1997 swapped for luxembourg-1998 (Era 3, stats
     expect(row).toEqual({ era_id: 3, position: 5 });
   });
 });
+
+describe('migration 0029: hungary-1998 swapped for brazil-1999 (Era 3, winnable at Legend)', () => {
+  const NAME = '0029_swap_eras_races_era3_c.sql';
+  const migration = () => {
+    const m = env.TEST_MIGRATIONS.find((x) => x.name === NAME);
+    if (!m) throw new Error('0029 missing');
+    return m;
+  };
+
+  it('applies after 0028', () => {
+    const names = env.TEST_MIGRATIONS.map((m) => m.name);
+    expect(names.indexOf(NAME)).toBeGreaterThan(names.indexOf('0028_swap_eras_races_era3_b.sql'));
+  });
+
+  it("puts brazil-1999 in hungary-1998's era and position, still Draft", async () => {
+    const races = await all<EraRace>('SELECT * FROM era_races');
+    expect(races).toHaveLength(100);
+    expect(races.find((r) => r.race_id === 'brazil-1999')).toEqual({
+      race_id: 'brazil-1999',
+      era_id: 3,
+      position: 7,
+      published: 0,
+    });
+    expect(races.find((r) => r.race_id === 'hungary-1998')).toBeUndefined();
+  });
+
+  it("deletes hungary-1998's attempts, stars and history entries, and keeps the rest", async () => {
+    // Back to the state before 0029, with a player who played hungary-1998 and a race that stays.
+    await env.DB.prepare('UPDATE era_races SET race_id = ?1 WHERE race_id = ?2')
+      .bind('hungary-1998', 'brazil-1999')
+      .run();
+    const now = new Date().toISOString();
+    const played = [
+      ['a-old', 'hungary-1998'],
+      ['a-kept', 'germany-1996'],
+    ] as const;
+    for (const [id, race] of played) {
+      await env.DB.prepare(
+        `INSERT INTO era_attempts (id, player_id, race_id, seed, created_at) VALUES (?1, 'p1', ?2, 1, ?3)`,
+      )
+        .bind(id, race, now)
+        .run();
+      await env.DB.prepare(
+        `INSERT INTO era_progress (player_id, race_id, star_result, updated_at) VALUES ('p1', ?1, 1, ?2)`,
+      )
+        .bind(race, now)
+        .run();
+      await env.DB.prepare(
+        `INSERT INTO history_entries (player_id, race_id, attempt_id, achieved_at) VALUES ('p1', ?1, ?2, ?3)`,
+      )
+        .bind(race, id, now)
+        .run();
+    }
+    await env.DB.batch(migration().queries.map((q) => env.DB.prepare(q)));
+
+    const ids = async (table: string) =>
+      (await all<{ race_id: string }>(`SELECT race_id FROM ${table}`)).map((r) => r.race_id);
+    expect(await ids('era_attempts')).toEqual(['germany-1996']);
+    expect(await ids('era_progress')).toEqual(['germany-1996']);
+    expect(await ids('history_entries')).toEqual(['germany-1996']);
+    const row = await env.DB.prepare('SELECT era_id, position FROM era_races WHERE race_id = ?1')
+      .bind('brazil-1999')
+      .first();
+    expect(row).toEqual({ era_id: 3, position: 7 });
+  });
+});

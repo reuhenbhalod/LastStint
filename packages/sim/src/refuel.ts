@@ -200,6 +200,12 @@ export function initTanks(
  * Refuel at a stop on `outLap` (after the stop is taken off the car's strategy). Returns the
  * time the fill adds over the stop's base cost (s; negative for a small fill). `frozen`: the
  * stop's measured loss is charged (a real stop).
+ *
+ * A stop without a fill (a scripted car's, the grader's continuation, a rival policy's) fills
+ * to the car's next planned stop or the flag, but never past the tank (fillCap): a car whose
+ * next stint is longer than the tank holds fills it (B3; before, the grader's planner stop
+ * fuelled to the flag past the tank and carried weight no car could). A real stint is never
+ * longer than fillCap, so the real stops fill as before.
  */
 export function refuelAtStop(
   model: RaceModel,
@@ -213,7 +219,7 @@ export function refuelAtStop(
   const { laps } = model.race;
   const stint = stop.fill
     ? fillLaps(stop.fill, laps - outLap + 1, rm.tankLaps)
-    : stintToNextStop(car.strategy, outLap, laps);
+    : Math.min(stintToNextStop(car.strategy, outLap, laps), fillCap(model));
   const target = stint + RESERVE_LAPS;
   const fill = Math.max(0, target - car.tank);
   car.tank = Math.max(car.tank, target);
@@ -246,7 +252,8 @@ export function tankWeightDelta(model: RaceModel, car: CarState, lap: number): n
  * The planner's refuelling term (sim.ts predictedRemaining) for running laps (fromLap, laps]
  * with at most `stop`: the tank's weight on the green laps (`neutral` laps are skipped, as
  * there), plus the stop's fill time over the track's pit loss (a planned stop fills to the
- * flag). Infinity if the fuel runs out before the flag at one lap a lap.
+ * flag; where that is past the tank, sim.ts withinTank adds the stops that carry the car
+ * there, which this leaves out). Infinity if the fuel runs out before the flag at one lap a lap.
  */
 export function tankPlanDelta(
   model: RaceModel,

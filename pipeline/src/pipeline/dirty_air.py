@@ -500,7 +500,7 @@ def main(argv: list[str] | None = None) -> None:
         part = calibrate_race(args.calibrate)
         path = args.cache / "calibration" / f"{args.calibrate}.json"
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(part))
+        path.write_text(json.dumps(part), encoding="utf-8", newline="\n")
         print(f"{args.calibrate}: {part}")
         return
     if args.pool:
@@ -513,7 +513,7 @@ def main(argv: list[str] | None = None) -> None:
         for g, offsets in pool_calibration(parts).items():
             table["groups"][g]["simOffset"] = offsets
             table["groups"][g]["calibrationRaces"] = sum(p["group"] == g for p in parts)
-        args.out.write_text(json.dumps(table, indent=2) + "\n")
+        args.out.write_text(json.dumps(table, indent=2) + "\n", encoding="utf-8", newline="\n")
         print(f"wrote {args.out}: simOffset {pool_calibration(parts)}")
         return
     rows: dict[str, pd.DataFrame] = {}
@@ -541,7 +541,7 @@ def main(argv: list[str] | None = None) -> None:
     for g, grp in table["groups"].items():  # the sim calibration (calibrate) is kept
         if "simOffset" in old.get("groups", {}).get(g, {}):
             grp["simOffset"] = old["groups"][g]["simOffset"]
-    args.out.write_text(json.dumps(table, indent=2) + "\n")
+    args.out.write_text(json.dumps(table, indent=2) + "\n", encoding="utf-8", newline="\n")
     print(f"wrote {args.out}: {json.dumps(table['groups'])}")
 
 

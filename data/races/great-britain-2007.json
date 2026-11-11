@@ -891,14 +891,14 @@
         },
         {
           "id": "box-soft",
-          "label": "Box, softs",
+          "label": "Box, softs, a long fill",
           "decisions": [
             {
               "lap": 18,
               "kind": "pit",
               "compound": "SOFT",
               "fill": {
-                "laps": 25
+                "laps": 28
               }
             }
           ]

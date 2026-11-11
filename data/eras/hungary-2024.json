@@ -28,9 +28,10 @@
       "label": "McLaren one-two on two more stops, as Piastri made"
     },
     "hidden": {
-      "type": "compound_rule",
-      "mustAvoid": "SOFT",
-      "label": "McLaren one-two without running the soft tyre"
+      "type": "mode_rule",
+      "mode": "push",
+      "maxLaps": 0,
+      "label": "McLaren one-two without a single push lap"
     },
     "hardCalls": {
       "NOR": 0,

@@ -528,7 +528,7 @@ def write_hand_checks(race_id: str, periods: list[dict], estimates_dir: Path) ->
         " re-run `pipeline jolpica <race-id> --force`.",
         "periods": periods,
     }
-    path.write_text(json.dumps(doc, indent=1) + "\n")
+    path.write_text(json.dumps(doc, indent=1) + "\n", encoding="utf-8", newline="\n")
     return path
 
 

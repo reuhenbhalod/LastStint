@@ -61,3 +61,34 @@ initials and the date in **Owner checked**.
   re-count.
 - `data/races/great-britain-2007.json` and its golden must be rebuilt by the integrator
   (`pipeline build great-britain-2007`); this branch does not commit them.
+
+## B2 re-author (Nov 10 2026, base `eras-integrate-fixes` 35975b7)
+
+With the Expert rival grader fix and the player stint-pace fix in, the race was unreachable at
+era difficulty (Smart rival, threshold 82): best path ★2 only (seed 2, accuracy 99.0), missing
+★1 and ★3. Legend stayed reachable on the real calls.
+
+**Why:** at stop-18 the grader now rates the box-soft option (25-lap fill) best (green) and the
+real box-hard call orange (seed 1, 5.7 s behind) or yellow (seeds 2-3). The beam search kept
+only box-soft prefixes. After box-soft the stop-43 grade rates stay out green (the grader's
+playout adds a planner stop) and box-hard yellow, so the kept paths stayed out at lap 43 and ran
+dry, or lost to Alonso on seed 2. The real calls (box-hard, then box-soft at 43) win on seed 1
+with the Smart rival by about 10 s.
+
+**Change (moments only):** the stop-18 box-soft option now carries a 28-lap fill and is labelled
+"Box, softs, a long fill" (was "Box, softs", 25 laps). It is a game option, not a claim about
+any car's fuel. With it the real box-hard call grades green on seeds 1-3 and the soft long fill
+orange. Side (RAI, hard calls RAI 1 / HAM 0, re-counted), target `win`, no rewrite (Räikkönen
+won), mastery (margin 2.4 s), hidden (no manage laps), briefing, storyline and the other
+moments are unchanged. No new outside fact.
+
+| Check | Result | Owner checked |
+|---|---|---|
+| Reachability (`reachability great-britain-2007`) | pass. Era: seed 1, ★1 ★2 ★3 hidden, accuracy 100, exhaustive (box-hard, push-attack, push, box-soft). Legend: seed 1, same path, ★1 ★2 ★3 hidden, exhaustive. Stay-out: no ★1 or ★3 on any seed (★2 at era on seeds 2-3, as before) | |
+| Robust G1 (`pipeline validate great-britain-2007 --robust`) | pass (strict), mean gap error 0.58 s | |
+| Hard calls (`pipeline hard-calls great-britain-2007`) | RAI 1, HAM 0 (chance given up RAI 2.7, HAM 0.7); side RAI unchanged | |
+
+Rejected: box-soft with an 18 or 17-lap short fill (Alonso-style) also passes, but only on
+seed 3 (bounded search); the 25-lap and standard (21-lap) fills fail at era difficulty.
+`data/races/great-britain-2007.json` must be rebuilt by the integrator so it carries the new
+moment.

@@ -20,7 +20,10 @@ export function d1Args(target: Target): string[] {
 
 /** Run `wrangler d1 execute` on the chosen D1; throws with Wrangler's output. */
 export function wrangler(target: Target, ...args: string[]): string {
-  const res = spawnSync('npx', ['wrangler', 'd1', 'execute', ...d1Args(target), ...args], {
+  // Run Wrangler's JS entry with this Node rather than `npx`: npx is npx.cmd on Windows, which
+  // Node only spawns through a shell, and a shell would split the SQL in `--command`.
+  const bin = join(workerDir, 'node_modules', 'wrangler', 'bin', 'wrangler.js');
+  const res = spawnSync(process.execPath, [bin, 'd1', 'execute', ...d1Args(target), ...args], {
     cwd: workerDir,
     encoding: 'utf8',
   });

@@ -513,7 +513,9 @@ def _option_vectors() -> list[dict]:
 
 
 def write_rule_vectors(races_dir: Path, out: Path = RULE_VECTORS) -> None:
-    out.write_text(json.dumps(rule_vectors(races_dir), indent=1) + "\n")
+    out.write_text(
+        json.dumps(rule_vectors(races_dir), indent=1) + "\n", encoding="utf-8", newline="\n"
+    )
 
 
 if __name__ == "__main__":  # python -m pipeline.rival_policy: rewrite rival_rules.json

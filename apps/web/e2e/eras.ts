@@ -566,7 +566,11 @@ export interface PlayOptions {
 
 /** The lap the race screen's top bar shows. */
 export async function shownLap(page: Page): Promise<number> {
-  const text = await page.locator('main > header').innerText();
+  // Not waited for: at the flag the race screen can go before a play loop's `each` reads it.
+  const text = await page
+    .locator('main > header')
+    .innerText({ timeout: 1_000 })
+    .catch(() => '');
   return Number(text.match(/(\d+)\s*\/\s*\d+/)?.[1] ?? 0);
 }
 
@@ -730,10 +734,31 @@ export function radioLines(page: Page) {
     () =>
       (
         window as unknown as {
-          __laststintE2E?: { session?: { state: { radio: Array<{ lap: number; text: string }> } } };
+          __laststintE2E?: {
+            session?: { state: { radio: Array<{ lap: number; from: string; text: string }> } };
+          };
         }
       ).__laststintE2E?.session?.state.radio ?? [],
   );
+}
+
+/**
+ * Every radio line of a race. The session keeps only the last 12 lines, so `read` (pass it as
+ * a play loop's `each`) collects them on every turn; `lines` reads once more and gives them all.
+ */
+export function radioLog(page: Page) {
+  const heard = new Map<string, { lap: number; from: string; text: string }>();
+  const read = async () => {
+    for (const { lap, from, text } of await radioLines(page))
+      heard.set(`${lap}|${from}|${text}`, { lap, from, text });
+  };
+  return {
+    read,
+    lines: async () => {
+      await read();
+      return [...heard.values()];
+    },
+  };
 }
 
 /** Nothing on the page wider than the screen. */

@@ -585,11 +585,27 @@ those reads.
 | Briefing | "the track is close to 60 degrees" | MS: "The tarmac was 60deg C by 3pm, race start" | MS | |
 | Briefing | "Vettel stayed out under the early safety car and leads, about nine seconds clear of Hamilton, fourteen laps in" | VET P1, HAM 9.228 s behind at the end of lap 14 | Timing; WP | |
 | Briefing | "Mercedes switched to the hard tyre and will stop three times. You run Vettel on the medium: make two stops last" | MS rows above; Jolpica-p (HAM and ROS three stops, VET two) | MS, Jolpica-p | |
-| Mastery | `margin` 8.6 s, "Win by more than 8.6 seconds" (beat his real margin, 8.569 s). | Jolpica-r; reachability | |
-| Hidden | `stop_count` exact 2, "Win on two stops" (as Vettel made). | Jolpica-p; reachability | |
+| Mastery | `stop_count` exact 2, "Win on two stops, as Vettel made" (B2 re-author, Nov 10; was `margin` 8.6 s, "Win by more than 8.6 seconds"). | Jolpica-p, WP, GPE, MS (two stops); reachability | |
+| Hidden | `mode_rule` push maxLaps 0, "Win without a single push lap" (B2 re-author, Nov 10; was `stop_count` exact 2, now the mastery). A game objective, not a claim about the race; it fits MS's "the Ferrari was kinder to its tyres" row above, but no source says Vettel never pushed. | reachability | |
 | storylineEvents | None. The only SC (laps 4-6) is before the takeover, and no source has a VSC or red flag (row above). The three retirements after the takeover (ALO, BUT, MAL) are other cars and stay in Legend anyway. | WP, GPE | |
 | Moments | From the author tool unchanged (`author malaysia-2015 --target win --eras --write`): stop-17 (real box, onto the model's SOFT = the real medium), pace-22, pace-34, stop-37 (real box, onto the model's MEDIUM = the real hard). The model's SOFT/MEDIUM are the real medium/hard. | author output | |
 | Reachability paths | Era (seed 3): box softs at 17, standard at 22 and 34, box next lap on mediums at 37: ★1 ★2 ★3, hidden. Legend (seed 3): the same with the second stop at 37 (box-medium, the real call). Stay-out: no star on any seed (accuracy 74-75). | reachability | |
+
+### B2 re-author (Nov 10)
+
+After the Expert rival grader fix (`1e9c3fb`) and the player stint-pace fix (`8e26f5c`, the
+player's car now runs its race-wide stint offsets, Vettel's last stint +0.238 s a lap), Legend was
+no longer reachable: the best path won but missed ★3 (win by more than 8.6 s). On seeds 1-3 the
+real-call path (box softs at 17, standard, standard, box mediums at 37) wins at Legend by 0.6 s,
+4.1 s and 7.8 s (Hamilton out of the top three on seed 3), so Vettel's real 8.569 s margin is out
+of reach. Smallest change, as in b2-reauthor.md: the mastery becomes the two stops (the old hidden
+objective), and the hidden objective becomes "Win without a single push lap". Side (VET), target
+(`defend`), no rewrite, storyline, briefing and moments are unchanged. No new outside facts.
+
+Checks on a local Eras build (race file not committed; only its `eras` block changes):
+reachability era ★1 ★2 ★3 hidden (seed 2, 100.0) and Legend ★1 ★2 ★3 hidden (seed 1, 100.0), both
+on the real-call path with standard pace; stay-out earns no star and no hidden objective on any
+seed. Robust G1: pass, 2.02 s (unchanged).
 
 ## Notes for the owner
 

@@ -32,7 +32,7 @@ put your initials and the date in **Owner checked**.
 
 | Item | Value | Fact it rests on | Source | Owner checked |
 |---|---|---|---|---|
-| Side | VET (hard calls VET 1, HAM 1; chance given up tied, 11.0 pts each; the race file's side) | the grader, not a fact; a tie keeps the race file's side, as in south-africa-1983 | - | |
+| Side | VET (hard calls VET 1, HAM 1; chance given up tied, 11.0 pts each; the race file's side). Nov 10 re-author, with the Expert grader and player stint-pace fixes: VET 1, HAM 0 (13.0 vs 8.3 pts), so VET by hard calls | the grader, not a fact; a tie keeps the race file's side, as in south-africa-1983 | - | |
 | Target | `win` | Vettel won; Hamilton 2nd +9.975 s | WP, AS, Jolpica | |
 | Rewrite | none: the side really won | Vettel 1st | WP, AS, Jolpica | |
 | Storyline | "Hamilton leads from pole" | Hamilton pole 1:22.188; HAM P1 at the end of laps 1-16 | WP, Jolpica; Timing | |
@@ -44,7 +44,7 @@ put your initials and the date in **Owner checked**.
 | Briefing | "Hamilton started on pole and leads; you run Vettel second, 1.5 s behind him after 14 laps" | HAM P1, VET P2 +1.53 s at the end of lap 14 (the takeover lap); MS: Vettel within 1.3 s on lap 16 | Timing; MS | |
 | Briefing | "It's hot, and the Mercedes is struggling with its tyres" | 24 °C air, 31-36 °C track (WP); track about 38 °C, high temperatures overheated Mercedes' tyres (MS) | WP, MS | |
 | Briefing | "Hamilton will stop first, and Verstappen, fifth, will still be out when he does" | HAM stop lap 17, VET lap 23, VER lap 25; VER P5 at the end of lap 14 | Jolpica; Timing | |
-| Mastery | `margin` 8 s: "Win by more than 8 seconds" | Vettel's real margin was 9.975 s (Hamilton +9.975). Below it on purpose: Legend's best path wins by more than 8 s but not by 9 s (reachability), so beating the real margin is not reachable at Legend | WP, AS, Jolpica | |
+| Mastery | `margin` 7 s: "Win by more than 7 seconds" (was 8 s; B2 re-author, Nov 10) | Vettel's real margin was 9.975 s (Hamilton +9.975). Below it on purpose: with the Expert grader and player stint-pace fixes, Legend's only winning path wins by 7.97 s (seed 3; seeds 1-2 do not win), so 8 s and above are not reachable at Legend | WP, AS, Jolpica | |
 | Hidden | `stop_count` exact 1: "Win on one stop" | Vettel stopped once (lap 23) | Jolpica; Timing | |
 | storylineEvents | [15, RETIREMENT] (Grosjean) | Grosjean retired after 13 laps (water leak: WP, Jolpica; MS: suspected turbo), running 6th from P6 on the grid; his last timed lap is 14 and the race file's RETIREMENT event is on lap 15 | WP, Jolpica, MS; Timing | |
 
@@ -65,5 +65,14 @@ put your initials and the date in **Owner checked**.
   the race file's real strategy puts the new tyre on laps 18 and 24.
 - Compounds: the model's SOFT / MEDIUM / HARD are the race's ultrasoft / supersoft / soft. The
   storyline and briefing name no compound.
+- B2 re-author (Nov 10, branch `eras-reauthor-australia-2017`, base `eras-integrate-fixes`
+  35975b7): with the Expert rival grader fix and the player stint-pace fix in, Legend was not
+  reachable (best path seed 3: ★1 ★2, no ★3, hidden yes). That path (rivalpit-17 stay, stop-23
+  box-medium, cliff-33 stay) wins by 7.97 s over Verstappen; the era level's best path wins by
+  10.65 s over Bottas. Only the mastery margin changed (8 s -> 7 s, the largest whole second
+  reachable at Legend; 6 s and 5 s were also reachable). Target `win`, no rewrite (Vettel really
+  won), hidden, storyline, briefing and moments unchanged. On a local Eras rebuild: reachable at
+  era and Legend, stay-out never ★1 or ★3; robust G1 pass (strict, mean gap error 2.11 s). The
+  rebuild changes only the overlay's mastery fields in the race file.
 - `data/races/australia-2017.json` and its golden must be rebuilt by the integrator
   (`pipeline build australia-2017`); this branch does not commit them.

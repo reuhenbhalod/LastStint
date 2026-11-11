@@ -19,9 +19,9 @@
       "label": "Win on two more stops, as R\u00e4ikk\u00f6nen made"
     },
     "hidden": {
-      "type": "margin",
-      "seconds": 5,
-      "label": "Win by more than 5 seconds"
+      "type": "compound_rule",
+      "mustAvoid": "SOFT",
+      "label": "Win without fitting the soft tyre again"
     },
     "hardCalls": {
       "ALO": 1,

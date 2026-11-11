@@ -200,5 +200,7 @@ def fetch_outline(year: int, event: str, driver: str | None = None, step: int = 
 def write_outline(race_id: str, outline: dict, tracks_dir: Path = TRACKS_DIR) -> Path:
     tracks_dir.mkdir(parents=True, exist_ok=True)
     path = tracks_dir / f"{race_id}.json"
-    path.write_text(json.dumps({"raceId": race_id, **outline}) + "\n")
+    path.write_text(
+        json.dumps({"raceId": race_id, **outline}) + "\n", encoding="utf-8", newline="\n"
+    )
     return path

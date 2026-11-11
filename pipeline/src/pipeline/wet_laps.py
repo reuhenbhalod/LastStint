@@ -523,7 +523,7 @@ def write(race_id: str, est: Estimate, raw_dir: Path, wetness: list[float] | Non
         est.laps.to_parquet(ingest.raw_snapshot_path(race_id, raw_dir))
     ingest.save_weather(race_id, est.records(), raw_dir)
     report_path(race_id, raw_dir).write_text(
-        json.dumps(report(est, race_id, wetness), indent=1) + "\n"
+        json.dumps(report(est, race_id, wetness), indent=1) + "\n", encoding="utf-8", newline="\n"
     )
 
 

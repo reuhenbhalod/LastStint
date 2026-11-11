@@ -1,5 +1,5 @@
 {
- "_comment": "Eras appendix entry lists (docs/eras-build-plan.md appendix), from the Jolpica API results endpoint (api.jolpi.ca/ergast/f1/<year>/<round>/results), fetched Nov 7, 2026 (bahrain-2023, styria-2021 and great-britain-2021: Nov 9; japan-2023, abu-dhabi-2022, emilia-romagna-2024, great-britain-2023 and netherlands-2021: Nov 9, second batch; saudi-arabia-2023: Nov 9, third batch; portugal-2021: Nov 9, Era 9 swap; australia-2017, australia-2018 and spain-2017: Nov 9, Era 8 swaps; bahrain-2015, abu-dhabi-2015, singapore-2014, brazil-2014, canada-2016 and malaysia-2015: Nov 9, Era 7; united-states-2014 and germany-2016: Nov 9, Era 7 third round; bahrain-2012, italy-2010 and australia-2013: Nov 9, Era 6; europe-2009, france-2007, san-marino-2006, great-britain-2007, bahrain-2006, turkey-2008 and malaysia-2006: Nov 9, Era 5 overnight batch, from the cached Jolpica results in data/raw/<id>.jolpica.json; canada-2003, san-marino-2000, hungary-2001, austria-2001, france-2001, italy-2001 and san-marino-2003: Nov 9, Era 4 swaps; germany-1996, germany-1997 and san-marino-1999: the results in their Jolpica ingest, data/raw/<race>.jolpica.json, with driverId from data/drivers.json jolpicaId; china-2017 and china-2018: Nov 9, Era 8 swaps, phase 3; abu-dhabi-2011, china-2013, germany-2012 and germany-2013: Nov 9, Era 6 second round; belgium-2009 and hungary-2007: Nov 9, Era 5 third batch, from the cached Jolpica results in data/raw/<id>.jolpica.json; luxembourg-1998: Nov 9, Era 3 swap, the same way). code is the driver's key in data/drivers.json; team is Jolpica's constructor name. Fixture for eras-roster.test.ts.",
+ "_comment": "Eras appendix entry lists (docs/eras-build-plan.md appendix), from the Jolpica API results endpoint (api.jolpi.ca/ergast/f1/<year>/<round>/results), fetched Nov 7, 2026 (bahrain-2023, styria-2021 and great-britain-2021: Nov 9; japan-2023, abu-dhabi-2022, emilia-romagna-2024, great-britain-2023 and netherlands-2021: Nov 9, second batch; saudi-arabia-2023: Nov 9, third batch; portugal-2021: Nov 9, Era 9 swap; australia-2017, australia-2018 and spain-2017: Nov 9, Era 8 swaps; bahrain-2015, abu-dhabi-2015, singapore-2014, brazil-2014, canada-2016 and malaysia-2015: Nov 9, Era 7; united-states-2014 and germany-2016: Nov 9, Era 7 third round; bahrain-2012, italy-2010 and australia-2013: Nov 9, Era 6; europe-2009, france-2007, san-marino-2006, great-britain-2007, bahrain-2006, turkey-2008 and malaysia-2006: Nov 9, Era 5 overnight batch, from the cached Jolpica results in data/raw/<id>.jolpica.json; canada-2003, san-marino-2000, hungary-2001, austria-2001, france-2001, italy-2001 and san-marino-2003: Nov 9, Era 4 swaps; germany-1996, germany-1997 and san-marino-1999: the results in their Jolpica ingest, data/raw/<race>.jolpica.json, with driverId from data/drivers.json jolpicaId; china-2017 and china-2018: Nov 9, Era 8 swaps, phase 3; abu-dhabi-2011, china-2013, germany-2012 and germany-2013: Nov 9, Era 6 second round; belgium-2009 and hungary-2007: Nov 9, Era 5 third batch, from the cached Jolpica results in data/raw/<id>.jolpica.json; luxembourg-1998: Nov 9, Era 3 swap, the same way; brazil-1999: Nov 10, Era 3 swap for hungary-1998, the same way). code is the driver's key in data/drivers.json; team is Jolpica's constructor name. Fixture for eras-roster.test.ts.",
  "races": {
   "bahrain-2023": {"round": 1, "entries": [
    {"driverId": "max_verstappen", "name": "Max Verstappen", "code": "VER", "team": "Red Bull"},
@@ -1758,28 +1758,28 @@
    {"driverId": "barrichello", "name": "Rubens Barrichello", "code": "BAR", "team": "Stewart"},
    {"driverId": "diniz", "name": "Pedro Diniz", "code": "DIN", "team": "Arrows"}
   ]},
-  "hungary-1998": {"round": 12, "entries": [
-   {"driverId": "michael_schumacher", "name": "Michael Schumacher", "code": "MSCM", "team": "Ferrari"},
-   {"driverId": "coulthard", "name": "David Coulthard", "code": "COU", "team": "McLaren"},
-   {"driverId": "villeneuve", "name": "Jacques Villeneuve", "code": "VIL", "team": "Williams"},
-   {"driverId": "damon_hill", "name": "Damon Hill", "code": "HIL", "team": "Jordan"},
-   {"driverId": "frentzen", "name": "Heinz-Harald Frentzen", "code": "FRE", "team": "Williams"},
+  "brazil-1999": {"round": 2, "entries": [
    {"driverId": "hakkinen", "name": "Mika Häkkinen", "code": "HAK", "team": "McLaren"},
-   {"driverId": "alesi", "name": "Jean Alesi", "code": "ALE", "team": "Sauber"},
-   {"driverId": "fisichella", "name": "Giancarlo Fisichella", "code": "FIS", "team": "Benetton"},
-   {"driverId": "ralf_schumacher", "name": "Ralf Schumacher", "code": "SCH", "team": "Jordan"},
-   {"driverId": "herbert", "name": "Johnny Herbert", "code": "HER", "team": "Sauber"},
-   {"driverId": "diniz", "name": "Pedro Diniz", "code": "DIN", "team": "Arrows"},
-   {"driverId": "panis", "name": "Olivier Panis", "code": "PAN", "team": "Prost"},
-   {"driverId": "verstappen", "name": "Jos Verstappen", "code": "VERO", "team": "Stewart"},
-   {"driverId": "takagi", "name": "Toranosuke Takagi", "code": "TAK", "team": "Tyrrell"},
-   {"driverId": "nakano", "name": "Shinji Nakano", "code": "NAKH", "team": "Minardi"},
-   {"driverId": "wurz", "name": "Alexander Wurz", "code": "WUR", "team": "Benetton"},
-   {"driverId": "barrichello", "name": "Rubens Barrichello", "code": "BAR", "team": "Stewart"},
-   {"driverId": "trulli", "name": "Jarno Trulli", "code": "TRU", "team": "Prost"},
-   {"driverId": "salo", "name": "Mika Salo", "code": "SAL", "team": "Arrows"},
+   {"driverId": "michael_schumacher", "name": "Michael Schumacher", "code": "MSCM", "team": "Ferrari"},
+   {"driverId": "frentzen", "name": "Heinz-Harald Frentzen", "code": "FRE", "team": "Jordan"},
+   {"driverId": "ralf_schumacher", "name": "Ralf Schumacher", "code": "SCH", "team": "Williams"},
    {"driverId": "irvine", "name": "Eddie Irvine", "code": "IRV", "team": "Ferrari"},
-   {"driverId": "tuero", "name": "Esteban Tuero", "code": "TUE", "team": "Minardi"}
+   {"driverId": "panis", "name": "Olivier Panis", "code": "PAN", "team": "Prost"},
+   {"driverId": "wurz", "name": "Alexander Wurz", "code": "WUR", "team": "Benetton"},
+   {"driverId": "takagi", "name": "Toranosuke Takagi", "code": "TAK", "team": "Arrows"},
+   {"driverId": "gene", "name": "Marc Gené", "code": "GEN", "team": "Minardi"},
+   {"driverId": "rosa", "name": "Pedro de la Rosa", "code": "DLR", "team": "Arrows"},
+   {"driverId": "villeneuve", "name": "Jacques Villeneuve", "code": "VIL", "team": "BAR"},
+   {"driverId": "zanardi", "name": "Alessandro Zanardi", "code": "ZAN", "team": "Williams"},
+   {"driverId": "barrichello", "name": "Rubens Barrichello", "code": "BAR", "team": "Stewart"},
+   {"driverId": "diniz", "name": "Pedro Diniz", "code": "DIN", "team": "Sauber"},
+   {"driverId": "fisichella", "name": "Giancarlo Fisichella", "code": "FIS", "team": "Benetton"},
+   {"driverId": "sarrazin", "name": "Stéphane Sarrazin", "code": "SARS", "team": "Minardi"},
+   {"driverId": "alesi", "name": "Jean Alesi", "code": "ALE", "team": "Sauber"},
+   {"driverId": "coulthard", "name": "David Coulthard", "code": "COU", "team": "McLaren"},
+   {"driverId": "trulli", "name": "Jarno Trulli", "code": "TRU", "team": "Prost"},
+   {"driverId": "herbert", "name": "Johnny Herbert", "code": "HER", "team": "Stewart"},
+   {"driverId": "damon_hill", "name": "Damon Hill", "code": "HIL", "team": "Jordan"}
   ]},
   "germany-1996": {"round": 11, "entries": [
    {"driverId": "damon_hill", "name": "Damon Hill", "code": "HIL", "team": "Williams"},
