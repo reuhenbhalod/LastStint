@@ -4,7 +4,7 @@
 // only the streak shows. Signed in: the display name, Edit profile, and for admins an Admin
 // button.
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { GOOGLE_CLIENT_ID, loadGoogle } from '../account/google.js';
 import { type AccountState, SIGN_IN } from '../account/useAccount.js';
 import { StreakIcon } from './Icons.js';
@@ -55,7 +55,7 @@ function SignInControl({ account, large = false }: { account: AccountState; larg
 }
 
 /** The signed-in player: their name (display name first), Edit profile, Sign out. */
-function SignedIn({ account, compact }: { account: AccountState; compact: boolean }) {
+function SignedIn({ account }: { account: AccountState }) {
   const a = account.player?.account;
   if (!a) return null;
   return (
@@ -65,7 +65,7 @@ function SignedIn({ account, compact }: { account: AccountState; compact: boolea
         type="button"
         onClick={() => account.setProfileOpen(true)}
         title="Edit profile"
-        className={`max-w-[160px] truncate font-semibold text-[var(--ink)] underline-offset-2 hover:underline ${compact ? 'hidden sm:inline' : ''}`}
+        className="max-w-[160px] truncate font-semibold text-[var(--ink)] underline-offset-2 hover:underline"
       >
         {a.displayName || a.name || a.email}
       </button>
@@ -77,6 +77,93 @@ function SignedIn({ account, compact }: { account: AccountState; compact: boolea
         Sign out
       </button>
     </span>
+  );
+}
+
+/** The top bar's account button: the player's initial and name, opening a menu with Edit
+ * profile, Admin (for admins) and Sign out. */
+function AccountMenu({ account }: { account: AccountState }) {
+  const a = account.player?.account;
+  const [open, setOpen] = useState(false);
+  const box = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const close = (e: MouseEvent | KeyboardEvent) => {
+      if (
+        e instanceof KeyboardEvent ? e.key === 'Escape' : !box.current?.contains(e.target as Node)
+      )
+        setOpen(false);
+    };
+    document.addEventListener('mousedown', close);
+    document.addEventListener('keydown', close);
+    return () => {
+      document.removeEventListener('mousedown', close);
+      document.removeEventListener('keydown', close);
+    };
+  }, [open]);
+  if (!a) return null;
+  const name = a.displayName || a.name || a.email || 'Account';
+  const item =
+    'block w-full rounded-md px-3 py-2 text-left text-[14px] font-semibold text-[var(--ink)] hover:bg-[var(--card-2)]';
+  return (
+    <div ref={box} className="relative">
+      <button
+        type="button"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-2 rounded-full border border-[var(--rule)] py-1 pl-1 pr-3 text-[13px] font-semibold hover:border-[var(--muted)]"
+      >
+        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--ink)] text-[12px] font-extrabold text-[var(--paper)]">
+          {name.trim().charAt(0).toUpperCase()}
+        </span>
+        <span className="hidden max-w-[140px] truncate sm:inline">{name}</span>
+        <svg
+          aria-hidden="true"
+          width="10"
+          height="10"
+          viewBox="0 0 10 10"
+          className="text-[var(--muted)]"
+        >
+          <path d="M1 3l4 4 4-4" fill="none" stroke="currentColor" strokeWidth="1.6" />
+        </svg>
+      </button>
+      {open && (
+        <div
+          role="menu"
+          className="glass-strong absolute right-0 top-[calc(100%+6px)] z-30 flex w-48 flex-col p-1 shadow-2xl"
+        >
+          <span className="truncate px-3 pt-2 pb-1 text-[12px] text-[var(--muted)]">{name}</span>
+          <button
+            type="button"
+            role="menuitem"
+            className={item}
+            onClick={() => {
+              setOpen(false);
+              account.setProfileOpen(true);
+            }}
+          >
+            Edit profile
+          </button>
+          {a.admin && (
+            <a role="menuitem" href="/admin" className={item}>
+              Admin
+            </a>
+          )}
+          <button
+            type="button"
+            role="menuitem"
+            className={`${item} text-[var(--muted)]`}
+            onClick={() => {
+              setOpen(false);
+              account.signOut();
+            }}
+          >
+            Sign out
+          </button>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -106,17 +193,18 @@ export function AccountBar({
     return (
       <div className="flex items-center gap-2">
         <span
-          className="flex items-center gap-1.5 rounded-full border border-[var(--rule)] px-3 py-1 text-[13px] font-semibold"
+          className="flex items-center gap-1.5 px-1 text-[13px] font-semibold tabular-nums"
           title={
             streak && streak.days > 0
-              ? `Best ${streak.best} · ${streak.days} race${streak.days === 1 ? '' : 's'} played`
-              : 'Play every day to build it'
+              ? `Daily streak · best ${streak.best} · ${streak.days} race${streak.days === 1 ? '' : 's'} played`
+              : 'Daily streak: play every day to build it'
           }
         >
-          <StreakIcon size={14} className="text-[var(--flag)]" />
-          {streak ? `${streak.current}-day streak` : 'Daily streak'}
+          <StreakIcon size={15} className="text-[var(--flag)]" />
+          {streak?.current ?? 0}
+          <span className="hidden font-normal text-[var(--muted)] sm:inline">day streak</span>
         </span>
-        {p?.account ? <SignedIn account={account} compact /> : <SignInControl account={account} />}
+        {p?.account ? <AccountMenu account={account} /> : <SignInControl account={account} />}
       </div>
     );
   }
@@ -136,7 +224,7 @@ export function AccountBar({
         </span>
       </div>
       {p?.account ? (
-        <SignedIn account={account} compact={false} />
+        <SignedIn account={account} />
       ) : (
         <div className="flex flex-col items-end gap-1">
           <SignInControl account={account} large />

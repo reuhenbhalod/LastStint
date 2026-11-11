@@ -9,9 +9,9 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { takeHowToPending } from '../account/howTo.js';
 import type { AccountState } from '../account/useAccount.js';
 import { AccountBar } from '../components/AccountBar.js';
-import { Brand } from '../components/Brand.js';
 import { Disclaimer } from '../components/Disclaimer.js';
 import { HeadsetIcon, OvertakeIcon, TyreIcon } from '../components/Icons.js';
+import { TopBar } from '../components/TopBar.js';
 import { TyreBadge } from '../components/TyreBadge.js';
 import { TIER_LABEL, driverInfo } from '../data/drivers.js';
 import { surname } from '../data/names.js';
@@ -237,37 +237,10 @@ export function IntroCard({
         />
       )}
 
-      <header className="relative z-10 border-b border-[var(--glass-edge)] bg-[var(--paper)]/80 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
-          <a href="/" className="flex items-baseline gap-2">
-            <Brand className="text-[20px]" />
-            <span className="eyebrow hidden sm:inline">Daily race strategy</span>
-          </a>
-          <span className="flex flex-wrap items-center gap-2">
-            <a
-              href="/tutorial"
-              className="rounded-full border border-[var(--rule)] px-3 py-1 text-[13px] font-semibold text-[var(--ink)] hover:border-[var(--you)] hover:bg-[color-mix(in_srgb,var(--you)_12%,transparent)]"
-            >
-              Tutorial
-            </a>
-            <a
-              href="/versus"
-              className="rounded-full border border-[var(--rival)] px-3 py-1 text-[13px] font-semibold text-[var(--ink)] hover:bg-[color-mix(in_srgb,var(--rival)_14%,transparent)]"
-            >
-              Versus
-            </a>
-            {source !== 'survivor' && (
-              <a
-                href="/gauntlet"
-                className="rounded-full border border-[var(--box)] px-3 py-1 text-[13px] font-semibold text-[var(--ink)] hover:bg-[color-mix(in_srgb,var(--box)_14%,transparent)]"
-              >
-                Gauntlet
-              </a>
-            )}
-            {account && <AccountBar account={account} compact />}
-          </span>
-        </div>
-      </header>
+      <TopBar
+        active={source === 'survivor' ? 'gauntlet' : 'daily'}
+        right={account && <AccountBar account={account} compact />}
+      />
 
       <main className="flex flex-1 flex-col">
         {/* The hero: the circuit behind the race's name. */}

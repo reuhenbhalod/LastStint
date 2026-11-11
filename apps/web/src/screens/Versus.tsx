@@ -27,8 +27,8 @@ import {
 } from '@boxthislap/sim';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ApiError, apiPost } from '../api.js';
-import { Brand } from '../components/Brand.js';
 import { GroundBackdrop } from '../components/GroundBackdrop.js';
+import { TopBar } from '../components/TopBar.js';
 import { type BattleView, TrackMap } from '../components/TrackMap.js';
 import { TyreBadge } from '../components/TyreBadge.js';
 import type { BattleLine } from '../game/quickCalls.js';
@@ -73,14 +73,7 @@ export function Versus() {
     <main className="relative isolate min-h-[100dvh] text-[#EEF1EE]">
       {/* Versus runs at the five 3D circuits; Spa stands behind the lobby. */}
       {!code && <GroundBackdrop raceId="belgium-2024" />}
-      <header className="flex h-14 items-center justify-between border-b border-[var(--glass-edge)] bg-[var(--paper)]/70 px-4 backdrop-blur">
-        <a href="/" aria-label="LastStint home">
-          <Brand className="text-[20px]" />
-        </a>
-        <span className="text-[12px] font-extrabold uppercase tracking-[0.16em] text-[var(--rival)]">
-          Versus
-        </span>
-      </header>
+      <TopBar active="versus" />
       {!named ? (
         <NameCard
           name={name}
