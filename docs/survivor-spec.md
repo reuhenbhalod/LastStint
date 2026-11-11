@@ -91,3 +91,15 @@ Nov 3, 2026 · Branch `survivor`. A second game mode, separate from the daily: r
 **Driver data:** Pietro Fittipaldi (Abu Dhabi 2020) added to `data/drivers.json` as low attitude, with no researched radio history, like Doohan.
 
 **Update (Nov 5, 2026):** the tyre-life fix re-tuned the survivor seeds. Styria 2021 has no seed left where good play wins, so it left the pool (its moments removed): 18 survivor races.
+
+**Update (Nov 11, 2026):** at the owner's request, spain-2013 (Räikkönen vs Alonso), an Era 6
+race swapped out of Eras on Nov 9, joined the Gauntlet: 19 survivor races. Its Eras overlay was
+removed, so it builds as a plain (non-Eras) race like the rest of the pool: robust G1 pass
+(mean gap error 1.71 s; it failed G1 as an Eras build), 2 calls after the race plan
+(`author --max 2`: stop-26, stop-45), and 5 seeds from `tune --survivor 5` (1, 52021, 76680,
+26539, 71378: the real way gives the real P2 behind Alonso, good play wins, random play wins
+13%). It is now frozen like the other pool races. china-2011 was asked for too but stays out:
+as a plain build it fails G1 (duel VET vs HAM gap 4.44 s and order 49%, podium order 40%, field
+MAS 5.74 s; robust fail, 3.07 s), and `scripts/duels.py` finds no pairing that passes (the
+podium order and the field fail whatever the duel). As an Eras build it was borderline. Its
+Eras overlay, moments and race file are left as they were.

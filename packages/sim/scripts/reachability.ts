@@ -66,7 +66,7 @@ function load(id: string): RaceModel {
 }
 
 // With no ids: the races the eras play (data/pools.json "eras"). A race authored but swapped
-// out of every era (spain-2013, china-2011) keeps its eras block but isn't served, so it's
+// out of every era (china-2011) keeps its eras block but isn't served, so it's
 // skipped; name it to check it.
 const erasPool = new Set(
   Object.values(
