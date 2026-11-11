@@ -1227,14 +1227,13 @@
     },
     "mastery": {
       "type": "margin",
-      "seconds": 8,
-      "label": "Win by more than 8 seconds"
+      "seconds": 5,
+      "label": "Win by more than 5 seconds"
     },
     "hidden": {
-      "type": "mode_rule",
-      "mode": "push",
-      "maxLaps": 0,
-      "label": "Win without a single push lap"
+      "type": "stop_count",
+      "exact": 2,
+      "label": "Win on two more stops, as Hamilton made"
     },
     "briefing": "Abu Dhabi, 2011. Vettel's pole came to nothing: a right-rear puncture put him out on the first lap. You run Hamilton, leading after 13 laps, 2.3 s clear of Alonso's Ferrari, both on softs. Bring Hamilton home first."
   },

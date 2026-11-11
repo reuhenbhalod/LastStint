@@ -897,8 +897,8 @@
     },
     "mastery": {
       "type": "margin",
-      "seconds": 8,
-      "label": "Win by more than 8 seconds"
+      "seconds": 7,
+      "label": "Win by more than 7 seconds"
     },
     "hidden": {
       "type": "stop_count",
@@ -907,7 +907,7 @@
     },
     "hardCalls": {
       "VET": 1,
-      "HAM": 1
+      "HAM": 0
     },
     "briefing": "Melbourne, 2017. Hamilton started on pole and leads; you run Vettel second, 1.5 s behind him after 14 laps. It's hot, and the Mercedes is struggling with its tyres. Hamilton will stop first, and Verstappen, fifth, will still be out when he does."
   },

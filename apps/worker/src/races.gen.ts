@@ -38,44 +38,44 @@ import e21 from '../../../data/races/belgium-2023.json';
 import r7 from '../../../data/races/belgium-2024.json';
 import e22 from '../../../data/races/brazil-1991.json';
 import e23 from '../../../data/races/brazil-1993.json';
-import e24 from '../../../data/races/brazil-2014.json';
-import e25 from '../../../data/races/brazil-2019.json';
-import e26 from '../../../data/races/canada-2003.json';
-import e27 from '../../../data/races/canada-2016.json';
+import e24 from '../../../data/races/brazil-1999.json';
+import e25 from '../../../data/races/brazil-2014.json';
+import e26 from '../../../data/races/brazil-2019.json';
+import e27 from '../../../data/races/canada-2003.json';
+import e28 from '../../../data/races/canada-2016.json';
 import r8 from '../../../data/races/canada-2019.json';
 import r9 from '../../../data/races/canada-2022.json';
 import r10 from '../../../data/races/canada-2024.json';
-import e28 from '../../../data/races/china-2013.json';
-import e29 from '../../../data/races/china-2017.json';
-import e30 from '../../../data/races/china-2018.json';
+import e29 from '../../../data/races/china-2013.json';
+import e30 from '../../../data/races/china-2017.json';
+import e31 from '../../../data/races/china-2018.json';
 import r11 from '../../../data/races/china-2024.json';
 import r12 from '../../../data/races/china-2025.json';
-import e31 from '../../../data/races/emilia-romagna-2024.json';
-import e32 from '../../../data/races/europe-1993.json';
-import e33 from '../../../data/races/europe-1997.json';
-import e34 from '../../../data/races/europe-2009.json';
-import e35 from '../../../data/races/europe-2012.json';
-import e36 from '../../../data/races/france-1990.json';
-import e37 from '../../../data/races/france-2001.json';
-import e38 from '../../../data/races/france-2004.json';
-import e39 from '../../../data/races/france-2007.json';
+import e32 from '../../../data/races/emilia-romagna-2024.json';
+import e33 from '../../../data/races/europe-1993.json';
+import e34 from '../../../data/races/europe-1997.json';
+import e35 from '../../../data/races/europe-2009.json';
+import e36 from '../../../data/races/europe-2012.json';
+import e37 from '../../../data/races/france-1990.json';
+import e38 from '../../../data/races/france-2001.json';
+import e39 from '../../../data/races/france-2004.json';
+import e40 from '../../../data/races/france-2007.json';
 import r13 from '../../../data/races/france-2019.json';
 import r14 from '../../../data/races/france-2021.json';
-import e40 from '../../../data/races/germany-1986.json';
-import e41 from '../../../data/races/germany-1996.json';
-import e42 from '../../../data/races/germany-1997.json';
-import e43 from '../../../data/races/germany-2012.json';
-import e44 from '../../../data/races/germany-2013.json';
-import e45 from '../../../data/races/germany-2016.json';
-import e46 from '../../../data/races/germany-2018.json';
-import e47 from '../../../data/races/germany-2019.json';
-import e48 from '../../../data/races/great-britain-1987.json';
-import e49 from '../../../data/races/great-britain-2007.json';
-import e50 from '../../../data/races/great-britain-2021.json';
-import e51 from '../../../data/races/great-britain-2023.json';
-import e52 from '../../../data/races/hungary-1986.json';
-import e53 from '../../../data/races/hungary-1992.json';
-import e54 from '../../../data/races/hungary-1998.json';
+import e41 from '../../../data/races/germany-1986.json';
+import e42 from '../../../data/races/germany-1996.json';
+import e43 from '../../../data/races/germany-1997.json';
+import e44 from '../../../data/races/germany-2012.json';
+import e45 from '../../../data/races/germany-2013.json';
+import e46 from '../../../data/races/germany-2016.json';
+import e47 from '../../../data/races/germany-2018.json';
+import e48 from '../../../data/races/germany-2019.json';
+import e49 from '../../../data/races/great-britain-1987.json';
+import e50 from '../../../data/races/great-britain-2007.json';
+import e51 from '../../../data/races/great-britain-2021.json';
+import e52 from '../../../data/races/great-britain-2023.json';
+import e53 from '../../../data/races/hungary-1986.json';
+import e54 from '../../../data/races/hungary-1992.json';
 import e55 from '../../../data/races/hungary-2001.json';
 import e56 from '../../../data/races/hungary-2007.json';
 import r15 from '../../../data/races/hungary-2019.json';
@@ -208,37 +208,37 @@ export const ERAS_RACE_FILES: Record<string, unknown> = {
   'belgium-2023': e21,
   'brazil-1991': e22,
   'brazil-1993': e23,
-  'brazil-2014': e24,
-  'brazil-2019': e25,
-  'canada-2003': e26,
-  'canada-2016': e27,
-  'china-2013': e28,
-  'china-2017': e29,
-  'china-2018': e30,
-  'emilia-romagna-2024': e31,
-  'europe-1993': e32,
-  'europe-1997': e33,
-  'europe-2009': e34,
-  'europe-2012': e35,
-  'france-1990': e36,
-  'france-2001': e37,
-  'france-2004': e38,
-  'france-2007': e39,
-  'germany-1986': e40,
-  'germany-1996': e41,
-  'germany-1997': e42,
-  'germany-2012': e43,
-  'germany-2013': e44,
-  'germany-2016': e45,
-  'germany-2018': e46,
-  'germany-2019': e47,
-  'great-britain-1987': e48,
-  'great-britain-2007': e49,
-  'great-britain-2021': e50,
-  'great-britain-2023': e51,
-  'hungary-1986': e52,
-  'hungary-1992': e53,
-  'hungary-1998': e54,
+  'brazil-1999': e24,
+  'brazil-2014': e25,
+  'brazil-2019': e26,
+  'canada-2003': e27,
+  'canada-2016': e28,
+  'china-2013': e29,
+  'china-2017': e30,
+  'china-2018': e31,
+  'emilia-romagna-2024': e32,
+  'europe-1993': e33,
+  'europe-1997': e34,
+  'europe-2009': e35,
+  'europe-2012': e36,
+  'france-1990': e37,
+  'france-2001': e38,
+  'france-2004': e39,
+  'france-2007': e40,
+  'germany-1986': e41,
+  'germany-1996': e42,
+  'germany-1997': e43,
+  'germany-2012': e44,
+  'germany-2013': e45,
+  'germany-2016': e46,
+  'germany-2018': e47,
+  'germany-2019': e48,
+  'great-britain-1987': e49,
+  'great-britain-2007': e50,
+  'great-britain-2021': e51,
+  'great-britain-2023': e52,
+  'hungary-1986': e53,
+  'hungary-1992': e54,
   'hungary-2001': e55,
   'hungary-2007': e56,
   'hungary-2022': e57,

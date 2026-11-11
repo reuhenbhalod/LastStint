@@ -939,7 +939,8 @@
       "lap": 15,
       "trigger": "cliff",
       "target": {
-        "kind": "win"
+        "kind": "position",
+        "atBest": 2
       },
       "options": [
         {
@@ -977,51 +978,12 @@
       "realOptionId": "box-medium"
     },
     {
-      "id": "rivalpit-19",
-      "lap": 19,
-      "trigger": "rivalPit",
-      "target": {
-        "kind": "win"
-      },
-      "options": [
-        {
-          "id": "stay",
-          "label": "Stay out",
-          "decisions": []
-        },
-        {
-          "id": "box-medium",
-          "label": "Box, mediums",
-          "decisions": [
-            {
-              "lap": 19,
-              "kind": "pit",
-              "compound": "MEDIUM",
-              "fill": "standard"
-            }
-          ]
-        },
-        {
-          "id": "box-next-medium",
-          "label": "Box next lap, mediums",
-          "decisions": [
-            {
-              "lap": 20,
-              "kind": "pit",
-              "compound": "MEDIUM",
-              "fill": "standard"
-            }
-          ]
-        }
-      ],
-      "realOptionId": "stay"
-    },
-    {
-      "id": "pace-24",
-      "lap": 24,
+      "id": "pace-20",
+      "lap": 20,
       "trigger": "cliff",
       "target": {
-        "kind": "win"
+        "kind": "position",
+        "atBest": 2
       },
       "options": [
         {
@@ -1029,7 +991,7 @@
           "label": "Push now",
           "decisions": [
             {
-              "lap": 24,
+              "lap": 20,
               "kind": "mode",
               "key": "pace",
               "value": "push"
@@ -1041,7 +1003,7 @@
           "label": "Standard pace",
           "decisions": [
             {
-              "lap": 24,
+              "lap": 20,
               "kind": "mode",
               "key": "pace",
               "value": "standard"
@@ -1053,7 +1015,7 @@
           "label": "Manage the tyres",
           "decisions": [
             {
-              "lap": 24,
+              "lap": 20,
               "kind": "mode",
               "key": "pace",
               "value": "manage"
@@ -1065,13 +1027,13 @@
           "label": "Push and attack",
           "decisions": [
             {
-              "lap": 24,
+              "lap": 20,
               "kind": "mode",
               "key": "pace",
               "value": "push"
             },
             {
-              "lap": 24,
+              "lap": 20,
               "kind": "mode",
               "key": "battle",
               "value": "attack"
@@ -1086,7 +1048,8 @@
       "lap": 36,
       "trigger": "cliff",
       "target": {
-        "kind": "win"
+        "kind": "position",
+        "atBest": 2
       },
       "options": [
         {
@@ -1124,11 +1087,12 @@
       "realOptionId": "box-medium"
     },
     {
-      "id": "pace-44",
-      "lap": 44,
+      "id": "pace-40",
+      "lap": 40,
       "trigger": "cliff",
       "target": {
-        "kind": "win"
+        "kind": "position",
+        "atBest": 2
       },
       "options": [
         {
@@ -1136,7 +1100,7 @@
           "label": "Push now",
           "decisions": [
             {
-              "lap": 44,
+              "lap": 40,
               "kind": "mode",
               "key": "pace",
               "value": "push"
@@ -1148,7 +1112,7 @@
           "label": "Standard pace",
           "decisions": [
             {
-              "lap": 44,
+              "lap": 40,
               "kind": "mode",
               "key": "pace",
               "value": "standard"
@@ -1160,7 +1124,7 @@
           "label": "Manage the tyres",
           "decisions": [
             {
-              "lap": 44,
+              "lap": 40,
               "kind": "mode",
               "key": "pace",
               "value": "manage"
@@ -1172,13 +1136,13 @@
           "label": "Push and attack",
           "decisions": [
             {
-              "lap": 44,
+              "lap": 40,
               "kind": "mode",
               "key": "pace",
               "value": "push"
             },
             {
-              "lap": 44,
+              "lap": 40,
               "kind": "mode",
               "key": "battle",
               "value": "attack"
@@ -1246,7 +1210,8 @@
     "order": 8,
     "userSide": "MSCM",
     "target": {
-      "type": "win"
+      "type": "position",
+      "position": 2
     },
     "storyline": {
       "real": "Schumacher leads from pole and pulls away, Alonso second. Renault keep Alonso out longer at both stops, and at the second he rejoins side by side with the Ferrari, takes the lead into turn 1 and holds off Schumacher to win by 1.246 s.",
@@ -1258,18 +1223,19 @@
     "mastery": {
       "type": "stop_count",
       "exact": 2,
-      "label": "Win on two stops"
+      "label": "Finish second or better on two stops, as Schumacher made"
     },
     "hidden": {
-      "type": "margin",
-      "seconds": 5,
-      "label": "Win by more than 5 seconds"
+      "type": "mode_rule",
+      "mode": "manage",
+      "maxLaps": 0,
+      "label": "Finish second or better without a single lap managing the tyres"
     },
     "hardCalls": {
       "ALO": 0,
       "MSCM": 1
     },
-    "briefing": "Bahrain, 2006, the first race of the 2.4-litre V8s. Schumacher took pole. You run his Ferrari, leading Alonso's Renault by five seconds after 12 laps, but Alonso will run four laps longer before his first stop. Win the stops, then hold him off to the flag."
+    "briefing": "Bahrain, 2006, the first race of the 2.4-litre V8s. Schumacher took pole. You run his Ferrari, leading Alonso's Renault by five seconds after 12 laps, but Alonso will run four laps longer before his first stop. Bring the car home no lower than second, and keep Alonso behind to rewrite the day."
   },
   "provenance": {
     "kind": "real",

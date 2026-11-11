@@ -1117,14 +1117,15 @@
       "real": "Hamilton leads from pole until Ericsson's spin brings out the safety car on lap 4. Both Mercedes pit for the hard tyre and Vettel stays out to lead on mediums. He stops twice, on lap 18 and lap 38, while Mercedes stops three times, and Vettel wins Ferrari's first race since Spain 2013 by 8.569 s from Hamilton."
     },
     "mastery": {
-      "type": "margin",
-      "seconds": 8.6,
-      "label": "Win by more than 8.6 seconds"
-    },
-    "hidden": {
       "type": "stop_count",
       "exact": 2,
-      "label": "Win on two stops"
+      "label": "Win on two stops, as Vettel made"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "push",
+      "maxLaps": 0,
+      "label": "Win without a single push lap"
     },
     "hardCalls": {
       "VET": 1,
