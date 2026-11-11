@@ -9,9 +9,12 @@ import { defineConfig, devices } from '@playwright/test';
 
 // E2E_PORT: another port for the preview server (two checkouts running the suite at once).
 const port = Number(process.env.E2E_PORT ?? 4173);
+// E2E_SKIP_ERAS=1: leave out the Eras specs (CI does this when no Eras code or race data changed).
+const skipEras = process.env.E2E_SKIP_ERAS === '1';
 
 export default defineConfig({
   testDir: 'e2e',
+  testIgnore: skipEras ? /eras-[^/]*\.spec\.ts$/ : undefined,
   timeout: 300_000,
   use: { baseURL: `http://localhost:${port}`, actionTimeout: 30_000 },
   projects: [
