@@ -150,9 +150,9 @@
     "realOptionId": "box-hard"
   },
   {
-    "id": "stop-39",
-    "lap": 39,
-    "trigger": "cliff",
+    "id": "rivalpit-34",
+    "lap": 34,
+    "trigger": "rivalPit",
     "target": {
       "kind": "position",
       "atBest": 6
@@ -168,7 +168,7 @@
         "label": "Box, softs",
         "decisions": [
           {
-            "lap": 39,
+            "lap": 34,
             "kind": "pit",
             "compound": "SOFT"
           }
@@ -179,7 +179,7 @@
         "label": "Box, mediums",
         "decisions": [
           {
-            "lap": 39,
+            "lap": 34,
             "kind": "pit",
             "compound": "MEDIUM"
           }
@@ -190,7 +190,7 @@
         "label": "Box, hards",
         "decisions": [
           {
-            "lap": 39,
+            "lap": 34,
             "kind": "pit",
             "compound": "HARD"
           }
