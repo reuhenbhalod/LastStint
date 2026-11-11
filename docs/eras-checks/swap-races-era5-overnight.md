@@ -529,6 +529,49 @@ Storyline, headline and briefing are original wording; no team radio is quoted.
   seed 1 (stop-15 box next lap, stop-36 the real box). The stay-out path earns no star on seeds
   1-3.
 
+### Re-authored (B2, Nov 10 2026): target win -> position 2
+
+On `eras-integrate-fixes` (Expert rival grader fix + player stint-pace fix), Legend was no longer
+reachable: the best path finished second (★2 ★3, no ★1, no hidden). The era level still passed.
+The Expert grader fix is the cause (the race passes with the stint-pace fix alone).
+
+Why the win target was dropped: an exhaustive Legend search (every path with no orange or red
+call, seeds 1-3, scratch script, not committed) finds no win on seed 1 (its only path is P2,
+0.79 s behind Alonso) and wins of 0.47 s (seed 2) and 0.31 s (seed 3) only on one exact path each
+(stop-36 the real box, then push and attack at lap 44, or push and attack at lap 24). The
+reachability checker's bounded search (beam 4) cuts both, and no Legend path won by more than
+5 s except seed-3 paths that box twice by lap 19 and then stay out at lap 36. As with
+malaysia-2013 and spain-2016 (b2-reauthor.md), the target moves to the side's real result and
+the win stays as the rewrite. No new outside facts; headline and storyline unchanged; no team
+radio quoted. Side unchanged: `pipeline hard-calls bahrain-2006` still gives MSCM 1, ALO 0.
+
+- **Target** `position` 2 (was `win`). **Rewrite** stays `win`, headline unchanged
+  ("Schumacher keeps Alonso behind in Bahrain").
+- **Mastery** unchanged (stop_count exact 2); label now "Finish second or better on two stops, as
+  Schumacher made".
+- **Hidden** `mode_rule` manage maxLaps 0, "Finish second or better without a single lap managing
+  the tyres" (was margin 5 s, which needs a win). The game's choice, not a fact.
+- **Briefing:** the last sentence is now "Bring the car home no lower than second, and keep
+  Alonso behind to rewrite the day." (was "Win the stops, then hold him off to the flag."). The
+  rest is unchanged.
+- **Moments** re-authored on P2 (`pnpm --filter @laststint/sim author bahrain-2006 --eras --target
+  position:2 --write`): stop-15 (real: box-medium, 21 laps of fuel), pace-20, stop-36 (real:
+  box-medium, 21 laps), pace-40. Was: stop-15, rivalpit-19, pace-24, stop-36, pace-44, graded on
+  the win. On P2 the real stops grade green (lap 15 90%, lap 36 99%); staying out grades red at
+  both.
+
+| Fact | Used in | Source | Owner checked |
+|---|---|---|---|
+| Schumacher finished P2, +1.246 s behind Alonso | target, mastery and hidden labels | Jolpica-R, WP (Facts table above) | |
+| Schumacher's two stops after the lap-12 takeover: pit-in laps 15 and 36, fills of 21 laps each | mastery, moments' real options | Timing (Authored rows above) | |
+| Alonso P2, 5.058 s behind at the end of lap 12 | briefing (unchanged part) | Timing (Authored rows above) | |
+
+- Reachability (`pnpm --filter @laststint/sim reachability bahrain-2006`, race file with the new
+  overlay and moments): PASS. Era (82, Smart) and Legend (90, Expert) both ★1-★3 and hidden on
+  seed 1, the real calls: stop-15 box-medium, pace-20 standard, stop-36 box-medium, pace-40
+  standard. The stay-out path earns no star on seeds 1-3 at either level (accuracy 75).
+- Robust G1 (`pipeline validate bahrain-2006 --robust`): pass (strict pass), mean gap error 1.34 s.
+
 ## turkey-2008 (Era 5 swap candidate): facts sheet
 
 Replaces `brazil-2008` (Era 5 #9). Robust G1: pass, 0.98 s (strict: fail; robust: pass).
