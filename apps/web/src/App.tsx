@@ -45,10 +45,9 @@ function Game() {
   const [help, setHelp] = useState(false);
   // The home page mid-race (the Pit Wall brand): the race holds until you go back to it.
   const [home, setHome] = useState(false);
-  // The race in the driver's team colours (game/teamTheme.ts); the home page in the player's
-  // favourite team's, if they have one.
-  const onHome = home || game.state?.phase === 'intro';
-  useTeamTheme(game.model, onHome ? account.player?.account?.favouriteTeam : null);
+  // The race in its drivers' real team colours (game/teamTheme.ts), everywhere: the player's
+  // favourite team never recolours a real car.
+  useTeamTheme(game.model);
   const { setHold } = game;
   const goHome = useCallback(() => {
     setHold(true);

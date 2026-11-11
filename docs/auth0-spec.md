@@ -9,7 +9,7 @@ Tickets 22 ("Improve auth and its UI") and 33 ("Add username and favourite team 
 | A1 | Ways to sign in | **Google, or email and password.** These are Auth0's `google-oauth2` and `Username-Password-Authentication` connections. Auth0 handles email verification and password resets. |
 | A2 | Existing Google accounts | **Linked automatically.** An Auth0 Google user's `sub` is `google-oauth2\|<Google ID>`. The Worker strips the prefix, so the user finds their existing account (keyed by Google ID), and their streak and runs carry over. |
 | A3 | The old Google button | **Replaced.** One "Sign in" button opens Auth0's login page, with Google as one of its options. |
-| A4 | Profile | **Display name and favourite team at sign-up.** After a first sign-in, or for an account without a display name, the game asks for both. The name shows on the leaderboard, and the team's colour themes the home page. Both can be changed later from the account bar. |
+| A4 | Profile | **Display name and favourite team at sign-up.** After a first sign-in, or for an account without a display name, the game asks for both. The name shows on the leaderboard. Both can be changed later from the account bar. (The team's colour used to theme the home page; since Nov 11, 2026 it doesn't: the race's real cars always keep their own teams' colours.) |
 
 ## Worker
 
