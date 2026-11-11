@@ -20,9 +20,9 @@
       "real": "Verstappen wins from pole. P\u00e9rez stops first, on lap 15; Leclerc runs six laps longer and makes only one stop. Red Bull switches P\u00e9rez to a second stop, and on fresher tyres he closes in over the last laps, but Leclerc holds second by 1.3 s and takes second in the championship, three points ahead of him."
     },
     "mastery": {
-      "type": "stop_count",
-      "exact": 1,
-      "label": "Beat P\u00e9rez on one stop, as Leclerc did"
+      "type": "finish_position",
+      "position": 2,
+      "label": "Finish second or better, as Leclerc did"
     },
     "hidden": {
       "type": "mode_rule",
