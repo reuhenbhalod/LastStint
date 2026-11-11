@@ -1,7 +1,7 @@
 // D1 access (migrations 0001-0004). Every query the API runs lives here (accounts and
 // streaks: players.ts).
 
-import { DISPLAY_NAME, SAME_PLAYER } from './players.js';
+import { DISPLAY_NAME, NOT_HIDDEN, SAME_PLAYER } from './players.js';
 
 export interface DailyRow {
   date: string;
@@ -124,7 +124,8 @@ export async function leaderboard(
 ): Promise<Array<{ anon_id: string; score: number; name: string }>> {
   const { results } = await db
     .prepare(
-      `SELECT anon_id, score, ${DISPLAY_NAME('runs.anon_id')} AS name FROM runs WHERE date = ?
+      `SELECT anon_id, score, ${DISPLAY_NAME('runs.anon_id')} AS name FROM runs
+       WHERE date = ? AND ${NOT_HIDDEN('runs.anon_id')}
        ORDER BY score DESC, mean_probability DESC, finish_position, created_at, rowid
        LIMIT ${LEADERBOARD_SIZE}`,
     )

@@ -207,7 +207,11 @@ The credential is an ID token: Auth0's when `AUTH0_DOMAIN` and `AUTH0_CLIENT_ID`
   - **A dropped player:** the room waits 30 s for them, then their driver answers for them.
 - **Leaving:** `{ t: "leave" }` mid-race forfeits.
 - **The result:** at the flag the room grades both players' calls (`gradeVersus`) and sends `result`.
-- **Storage:** rooms live in memory only, and results aren't stored yet.
+- **Storage:** a room's race lives in memory only. For the admin page the room keeps its row in `versus_rooms` (phase, players, lap; closed at the flag) and stores each finished match in `versus_matches` (migration 0030).
+
+### `GET /api/announcement`
+
+`{ announcement: { id, text, tone, endsAt, createdAt } | null }`: the banner under the top bar (`tone` is `info` or `warning`; `endsAt` null means until cleared). One at a time; admins set it (below).
 
 ### `GET /api/health`
 
@@ -226,6 +230,29 @@ For the people running the game (`apps/worker/src/admin.ts`, the website's `/adm
 | `POST /api/admin/day` `{ date, raceId }` | Sets a day's race (a new day, or one with no runs: 409 `day-has-runs` otherwise) |
 | `POST /api/admin/repin` | Re-pins today's and later days to their race file's current hash; days with runs are left as they are |
 | `POST /api/admin/runs/clear` `{ date }` | Deletes the admin's own runs on that day (every browser linked to their Google account), to play it again |
+
+### Admin page v2 (docs/admin-v2-spec.md)
+
+Same admin check. Every change is written to the audit log (`admin_log`, migration 0030), including the schedule, day, re-pin and clear-run calls above and ticket create, status change and delete.
+
+| Endpoint | What it does |
+|---|---|
+| `GET /api/admin/today` | Today's and tomorrow's daily, `queue: { days, low, warnUnder }` (low under 7), the stale days (today on, pinned to an old race file), and today's runs: `{ total, verified, corrected, disqualified }` |
+| `POST /api/admin/announcement` `{ text, tone?, endsAt? }` | Sets the banner (1-280 characters; replaces the current one) |
+| `POST /api/admin/announcement/clear` | Clears it |
+| `GET /api/admin/eras` | Every era (play order) with `releasedAt`, `status` (`coming-soon`, `scheduled`, `released`), its published count and its races: position, published, attempts and players |
+| `POST /api/admin/eras/race` `{ raceId, published }` | Publishes or unpublishes a race. 409 `era-released` when unpublishing a race of a released or scheduled era |
+| `POST /api/admin/eras/release` `{ eraId, at, confirm? }` | `at`: `'now'`, a date (midnight UTC) or an ISO time. 409 `too-few-races` under 10 published races. `at: null` clears the release (back to Coming soon) and needs `confirm: true` (409 `confirm-needed`) |
+| `GET /api/admin/runs?date&player&mode` | Runs newest first, 200 at most: daily runs, Gauntlet runs and submitted Eras attempts. `date` defaults to today unless `player` (a name, email, player ID or anonId) is given |
+| `GET /api/admin/runs/:mode/:id` | One run with its calls and grades (a Gauntlet run: its rounds) |
+| `POST /api/admin/runs/reverify` `{ mode, id }` or `{ date }` | Sets `verified = 0` on one run, or every daily run that day, for the nightly check: `{ marked }` |
+| `POST /api/admin/runs/delete` `{ id }` | Deletes a daily run and its calls |
+| `GET /api/admin/players/:id` | A player's page: the account, linked browsers, streak (worked out from the days played), the days, and their runs |
+| `POST /api/admin/players/:id/name` `{ displayName }` | Sets the leaderboard name, or `''` to clear it (400 `bad-name`, 409 `name-taken`) |
+| `POST /api/admin/players/:id/hide` `{ hidden }` | Hides the player from (or shows them on) the daily, Gauntlet and Eras leaderboards. They still play and their runs count for them |
+| `GET /api/admin/versus` | `{ matches, rooms }`: the last 100 finished matches, and the rooms open now (changed in the last 2 hours) |
+| `GET /api/admin/stats` | Daily (players a day for 30 days, the share not disqualified, the mean score, the most-missed calls of the last 7 days), Gauntlet (started, rounds survived, best run), Eras (attempts, stars and players per era), Versus (matches a day) and accounts (sign-ups a day, the share of recent players signed in) |
+| `GET /api/admin/log?action&before` | The audit log, newest first, 200 at a time (`before`: an id, for the next page) |
 
 ### Tickets
 

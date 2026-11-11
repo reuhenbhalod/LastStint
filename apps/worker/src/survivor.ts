@@ -11,7 +11,7 @@
 
 import { GRADE_SAMPLES, type RaceModel, VerifyError, verifyRun } from '@laststint/sim';
 import { displayName } from './names.js';
-import { DISPLAY_NAME } from './players.js';
+import { DISPLAY_NAME, NOT_HIDDEN } from './players.js';
 import { SURVIVOR_POOL } from './pools.js';
 import { getRace } from './races.js';
 import { type StoredResult, stored } from './results.js';
@@ -280,7 +280,8 @@ export async function survivorBoard(db: D1Database, now: number) {
       .prepare(
         `SELECT anon_id, rounds, score_sum, status, started_at,
                 ${DISPLAY_NAME('survivor_runs.anon_id')} AS name FROM survivor_runs
-         WHERE rounds > 0 ${since ? 'AND started_at >= ?' : ''}
+         WHERE rounds > 0 AND ${NOT_HIDDEN('survivor_runs.anon_id')}
+           ${since ? 'AND started_at >= ?' : ''}
          ORDER BY rounds DESC, score_sum DESC, started_at LIMIT ${SURVIVOR_BOARD}`,
       )
       .bind(...(since ? [since] : []))

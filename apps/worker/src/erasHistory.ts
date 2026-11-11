@@ -30,7 +30,7 @@ import type { Context, Hono } from 'hono';
 import { erasTestMode, getErasRace, hasRewrite, playerOf } from './eras.js';
 import type { Env } from './index.js';
 import { displayName } from './names.js';
-import { DISPLAY_NAME } from './players.js';
+import { DISPLAY_NAME, NOT_HIDDEN } from './players.js';
 import { ApiError, isAnonId } from './runs.js';
 
 type Ctx = Context<{ Bindings: Env }>;
@@ -413,11 +413,12 @@ export async function historyBook(
 /**
  * Each player's best accuracy on the race (normal or Legend), and when an attempt first reached
  * it. Binds ?1 race, ?2 legend. The order: best accuracy, then who reached it first, then the
- * player ID, so equal boards always come out the same.
+ * player ID, so equal boards always come out the same. Hidden players (admin) aren't on it.
  */
 const BOARD = `WITH best AS (
     SELECT player_id, max(accuracy) AS accuracy FROM era_attempts
-    WHERE race_id = ?1 AND legend = ?2 AND accuracy IS NOT NULL GROUP BY player_id),
+    WHERE race_id = ?1 AND legend = ?2 AND accuracy IS NOT NULL AND ${NOT_HIDDEN('player_id')}
+    GROUP BY player_id),
   board AS (
     SELECT b.player_id, b.accuracy,
       (SELECT min(a.submitted_at) FROM era_attempts a
