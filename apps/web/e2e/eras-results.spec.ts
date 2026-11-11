@@ -91,7 +91,9 @@ test('plays an Eras race and shows its stars, rewrite and the way on', async ({ 
 
   const answers: Record<string, string[]> = {
     '36': ['Box', 'Hards'],
-    '44': ['Stay out'],
+    // No lap 44: the mocked model is the Daily race file (no Eras overlay), so the Daily wall
+    // answers its tyre call itself on the hards fitted at lap 36 (sim autoStay, main's round 3
+    // R1). A real Eras attempt gets the merged model, which keeps the call.
     '49': ['Push now'],
     '53': ['Box', 'Softs'],
     '57': ['Attack'],
