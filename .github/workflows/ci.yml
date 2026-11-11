@@ -50,13 +50,52 @@ jobs:
         run: pnpm --filter @laststint/worker races && git diff --exit-code apps/worker/src/races.gen.ts
       - name: Test
         run: pnpm test
-      # Eras spec §15: every race with an eras block has a path to all three stars and the
-      # hidden objective (era difficulty and Legend), and staying out every time can't earn ★3.
+
+  # Eras spec §15: every Eras race has a path to all three stars and the hidden objective (era
+  # difficulty and Legend), and staying out every time can't earn ★3. It plays ~100 races and
+  # takes ~100 minutes, so it runs only when a change can move a race's outcome: race data
+  # (data/), the sim or schema, or the Eras worker code. Other changes (web UI, docs, CI)
+  # pass this job in about a minute. Run it by hand with workflow_dispatch.
+  eras-reachability:
+    name: Eras reachability
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Did race data or the sim change?
+        id: changed
+        env:
+          BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          if [ "${{ github.event_name }}" = workflow_dispatch ] || [ -z "$BASE" ] \
+             || ! git cat-file -e "$BASE^{commit}" 2>/dev/null; then
+            echo "run=true" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          files=$(git diff --name-only "$BASE"...HEAD)
+          echo "$files"
+          if echo "$files" | grep -qE '^(data/|packages/sim/|packages/schema/|apps/worker/src/eras|apps/worker/scripts/reachability)'; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "No race data or sim change: reachability skipped."
+          fi
+      - if: steps.changed.outputs.run == 'true'
+        uses: pnpm/action-setup@v4  # version from package.json "packageManager"
+      - if: steps.changed.outputs.run == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - if: steps.changed.outputs.run == 'true'
+        run: pnpm install --frozen-lockfile
       - name: Eras reachability
+        if: steps.changed.outputs.run == 'true'
         run: pnpm --filter @laststint/sim reachability
       # The shared races' eras blocks live in their overlays (their Daily files are pinned):
       # check them on the merged model the Eras API serves.
       - name: Eras reachability (shared races)
+        if: steps.changed.outputs.run == 'true'
         run: pnpm --filter @laststint/worker reachability:shared
 
   # Parity (Gate G2): the committed race models and golden files must be exactly what the
@@ -124,7 +163,7 @@ jobs:
   # Deploy runs only on main and only once every check above has passed.
   deploy:
     name: Deploy Worker + D1 migrations
-    needs: [python, js, parity, e2e]
+    needs: [python, js, eras-reachability, parity, e2e]
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     concurrency:
