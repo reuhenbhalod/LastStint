@@ -4,7 +4,8 @@
     "lap": 13,
     "trigger": "cliff",
     "target": {
-      "kind": "beat-rival"
+      "kind": "position",
+      "atBest": 4
     },
     "options": [
       {
@@ -64,7 +65,8 @@
     "lap": 21,
     "trigger": "cliff",
     "target": {
-      "kind": "beat-rival"
+      "kind": "position",
+      "atBest": 4
     },
     "options": [
       {
@@ -124,7 +126,8 @@
     "lap": 31,
     "trigger": "cliff",
     "target": {
-      "kind": "beat-rival"
+      "kind": "position",
+      "atBest": 4
     },
     "options": [
       {
@@ -184,7 +187,8 @@
     "lap": 41,
     "trigger": "VSC",
     "target": {
-      "kind": "beat-rival"
+      "kind": "position",
+      "atBest": 4
     },
     "options": [
       {
