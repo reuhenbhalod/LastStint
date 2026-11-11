@@ -1,5 +1,11 @@
 # Eras races report
 
+**Nov 11, 2026 (branch eras-gauntlet-add):** spain-2013 left Eras for the Gauntlet (owner
+request): its overlay `data/eras/spain-2013.json` is removed, and it is now a plain pool race
+(robust G1 pass, 1.71 s; see the Nov 11 update in `docs/survivor-spec.md`). Its facts sheets
+stay in `docs/eras-checks/`. china-2011 stays an unserved Eras fixture (it fails G1 as a plain
+build). The 100 Eras races are unchanged.
+
 **Integration Nov 10, 2026** (branch eras-integrate-nov10, on `eras` fc23ca5 + the PC integration;
 `origin/eras` 9a2584b, the Admin Players tab, merged in). Owner-approved Nov 10: the Expert rival
 grader fix (`eras-fix-expert-grader`: `rivals/expert.ts rivalPlayout` keeps the player's later real

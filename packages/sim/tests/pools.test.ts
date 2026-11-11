@@ -66,9 +66,10 @@ describe('race pools', () => {
 
   it('puts every playable race in a pool', () => {
     // Authored Eras races swapped out of the pools (Era 6 second round, Nov 9) keep their
-    // overlays, moments and race files as Eras-build fixtures; they aren't served. hungary-1998
-    // (Era 3, Nov 10) is a rules-only fixture: its moments go when its race file is rebuilt.
-    const swappedOut = ['china-2011', 'spain-2013', 'hungary-1998'];
+    // overlays, moments and race files as Eras-build fixtures; they aren't served (china-2011;
+    // spain-2013 moved to Gauntlet on Nov 11). hungary-1998 (Era 3, Nov 10) is a rules-only
+    // fixture: its moments go when its race file is rebuilt.
+    const swappedOut = ['china-2011', 'hungary-1998'];
     const pooled = new Set([
       ...pools.daily,
       ...Object.keys(pools.survivor),

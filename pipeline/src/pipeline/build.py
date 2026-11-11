@@ -1217,7 +1217,10 @@ RACES: dict[str, dict] = {
         "era": "2010-2013",
         "takeover_lap": None,  # D3 rule
         "seed": 1,
-        # Eras side by hard calls (Eras 6.2 re-author, the honest grader: RAI 3, ALO 1).
+        # Eras side by hard calls (Eras 6.2 re-author, the honest grader: RAI 3, ALO 1). Swapped
+        # out of Era 6 (Nov 9); a Gauntlet race since Nov 11 (owner request): no overlay, so a
+        # plain (non-Eras) build, which passes robust G1 (1.71 s) and data/pools.json survivor
+        # deals its tuned seeds. Being a pool race now, it is frozen like the others.
         "user_side": "RAI",
         "rival": "ALO",
         "score_positions": 6,
