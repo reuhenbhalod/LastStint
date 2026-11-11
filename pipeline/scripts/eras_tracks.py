@@ -126,6 +126,7 @@ REUSE: dict[str, tuple[str, str]] = {
     "brazil-2003": ("brazil-2019", "interlagos-2"),
     "brazil-1993": ("brazil-2019", "interlagos-2"),
     "brazil-1991": ("brazil-2019", "interlagos-2"),
+    "brazil-1999": ("brazil-2019", "interlagos-2"),
     "abu-dhabi-2016": ("abu-dhabi-2020", "yas-marina-1"),
     "abu-dhabi-2012": ("abu-dhabi-2020", "yas-marina-1"),
     "abu-dhabi-2010": ("abu-dhabi-2020", "yas-marina-1"),

@@ -157,7 +157,7 @@ Players start at Era 10 and move back through the timeline to Era 1. The eras be
 | 4 | spain-1996 | Schumacher's rain masterclass | win: Schumacher in the rain |
 | 5 | luxembourg-1998 | Ferrari brings the leader in first on lap 24; McLaren keeps Häkkinen out four more laps on a light car to jump him in the pits | win: Häkkinen from P2 (lap-21 takeover) |
 | 6 | europe-1997 | The title decider at Jerez | beat-rival: Villeneuve ahead of Schumacher |
-| 7 | hungary-1998 | Ferrari switches to three stops mid-race | win: Schumacher on three stops |
+| 7 | brazil-1999 | Held up behind Schumacher until Ferrari stops first: four laps to push and overcut him | win: Häkkinen from P2 (lap-35 takeover) |
 | 8 | germany-1996 | Boxed in behind the one-stopping Benettons: a short first stop for Hill to find clear air | win: Hill beats Berger |
 | 9 | germany-1997 | Two stops and a light car against a one-stopping Jordan: make the gap, then pass him again | defend: Berger wins from pole on two stops |
 | 10 | san-marino-1999 | Coulthard runs one long stop; Ferrari switches Schumacher to two short ones and sprints, if the backmarkers allow | win: Schumacher from P3 on two stops |
