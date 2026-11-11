@@ -249,7 +249,8 @@ const TODAY = {
   // 'ee1d94ac9fe089d8' before the logo went white (Brand: text-white, not the team colour).
   // 'ff65482385daa3aa' before the map's OpenStreetMap credit (components/MapCredit.tsx).
   // '0a151c0f15589328' before the credit moved to the map's bottom right (clear of the strip).
-  screen: '3ea81a4162b5cb5a',
+  // '3ea81a4162b5cb5a' before every venue was re-fitted (31efc59): the ground image's placement matrix moved.
+  screen: 'ccf7241ff273c1b3',
   decision: 'f71311307784d55e',
   cards: '82ea30e0dbd15610',
   radio: {
