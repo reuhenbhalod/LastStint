@@ -162,3 +162,37 @@ option 99%), so it was not kept.
 The real path (hards, standard, standard, mediums) also earned all three stars at era difficulty
 (seed 2, in a run of the same moments with the earlier margin objective); it has no push lap, so
 it meets the hidden objective too.
+
+---
+
+## B2 re-author (Nov 10 2026): hidden objective "no soft tyre" -> "no push lap"
+
+On `eras-integrate-fixes` (35975b7: Expert rival grader fix and player stint-pace fix in), the
+shipped Mac content above stopped being reachable at Legend. Reachability before the change:
+era reachable (★1-3, hidden yes, real-like path with a push lap at pace-26); Legend best path
+(seed 1: stop-18 box mediums, pace-22 manage, pace-26 manage, stop-47 box softs) earned ★1 ★2 ★3
+but missed the hidden objective, because it fits the soft tyre. No path in the Legend search
+earned all three stars on mediums or hards at the last stop.
+
+Change (smallest one, as spain-2013's B2 re-author in `b2-reauthor.md`): **Hidden** is now
+`mode_rule` push, `maxLaps` 0, "McLaren one-two without a single push lap" (was `compound_rule`
+mustAvoid SOFT). The PC authoring (appendix above) used the same rule. Everything else is
+unchanged: side PIA (hard calls PIA 2, NOR 0), target `team` [2, 2], no rewrite (Piastri really
+won), mastery `stop_count` exact 2, briefing, storyline, storylineEvents and the four moments
+(stop-18, pace-22, pace-26, stop-47).
+
+No new outside fact is used: the rule is a game objective, not a claim about the real race.
+
+| Item | Value | Fact it rests on | Source | Owner checked |
+|---|---|---|---|---|
+| Hidden | `mode_rule` push, maxLaps 0: "McLaren one-two without a single push lap" | none (game objective); the one-two rests on the Target row above | - | |
+
+Checks (local rebuild of `data/races/hungary-2024.json`, which changes only its `eras` block;
+not committed, the integrator rebuilds it):
+
+- Reachability: **pass**. Era (70, Standard): seed 1 ★1 ★2 ★3 hidden yes, accuracy 99.8, on the
+  real calls (stop-18 box hards, pace-22 standard, pace-26 standard, stop-47 box mediums). Legend
+  (90, Expert): seed 1 ★1 ★2 ★3 hidden yes, accuracy 100.0 (box mediums, manage, manage, box
+  softs). Stay-out earns no star on seeds 1-3 at either level and no longer meets the hidden
+  objective.
+- Robust G1 (`pipeline validate hungary-2024 --robust`): **pass** (strict), mean gap error 2.52 s.
