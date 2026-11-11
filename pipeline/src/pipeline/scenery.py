@@ -204,6 +204,7 @@ CIRCUITS: dict[str, dict] = {
         "name": "Baku",
         "centre": (40.3725, 49.8533),
         "length": 6003,
+        "fit": {"footways": True},
         "races": [],
         "light": "afternoon",
         "ground": "dry",
@@ -334,6 +335,7 @@ CIRCUITS: dict[str, dict] = {
         "name": "Monaco",
         "centre": (43.7347, 7.4206),
         "length": 3337,
+        "fit": {"footways": True},
         "races": [],
         "light": "summer",
         "ground": "dry",
@@ -846,11 +848,16 @@ def _road_kw(hint: dict, frame: Frame) -> dict:
     return kw
 
 
-def _hint_roads(elements: list[dict], hint: dict, frame: Frame) -> np.ndarray:
+def _hint_roads(
+    elements: list[dict], hint: dict, frame: Frame, stand_in: bool = False
+) -> np.ndarray:
     """The road points a venue's fit uses: vehicle roads (only the raceways and the streets
     the circuit runs on, with the hint's `streets`), within its `near` metres of its `around`
-    when it has one."""
-    pts = road_points(elements, frame, vehicles=True, streets=hint.get("streets"))
+    when it has one. `stand_in`: for the lap that stands in when OSM has no raceway lap, a
+    `footways` hint keeps the pedestrian ways too (Monaco and Baku run on streets OSM maps as
+    pedestrian in places)."""
+    vehicles = not (stand_in and hint.get("footways"))
+    pts = road_points(elements, frame, vehicles=vehicles, streets=hint.get("streets"))
     return _near(pts, hint, frame)
 
 
@@ -1165,7 +1172,7 @@ def build(circuit: str) -> dict:
         hint = fit_hint(circuit, first_race)
         M, t, err = align_to_roads(
             game,
-            _hint_roads(E, hint, frame),
+            _hint_roads(E, hint, frame, stand_in=True),
             cfg["length"],
             **_road_kw({k: v for k, v in hint.items() if k != "on"}, frame),
         )
@@ -1311,6 +1318,10 @@ def build(circuit: str) -> dict:
     R = lambda pts: [[round(x, 1), round(z, 1)] for x, z in pts]  # noqa: E731
     areas: dict[str, list] = {}
     buildings, roads, streams, barriers, rails, trees, landmarks = [], [], [], [], [], [], []
+    # Today's tarmac (every raceway in use, pit lanes and other layouts too: the 2D map draws
+    # it under the race's own track, so a race on a layout that's gone still shows the circuit
+    # as it is now) and the coastline (the 2D map fills the sea from it).
+    raceways, coast = [], []
     for e in E:
         tg = e.get("tags", {})
         if e["type"] == "node":
@@ -1391,6 +1402,18 @@ def build(circuit: str) -> dict:
             )
             continue
         hw = tg.get("highway")
+        if (
+            hw == "raceway"
+            and tg.get("area") != "yes"
+            and "abandoned:highway" not in tg
+            and tg.get("historic") != "raceway"
+        ):
+            pit_lane = re.search(r"pit", tg.get("name", "") + tg.get("service", ""), re.I)
+            raceways.append({"w": 8 if pit_lane else 12, "p": R(simplify(pts, 0.8))})
+            continue
+        if tg.get("natural") == "coastline":
+            coast.append(R(simplify(pts, 1.5)))
+            continue
         if hw in ROAD_W and tg.get("area") != "yes":
             roads.append({"w": ROAD_W[hw], "p": R(simplify(pts, 1))})
             continue
@@ -1476,6 +1499,8 @@ def build(circuit: str) -> dict:
         "areas": areas,
         "buildings": buildings,
         "roads": roads,
+        "raceways": raceways,
+        "coast": coast,
         "streams": streams,
         "rails": rails,
         "barriers": barriers,
