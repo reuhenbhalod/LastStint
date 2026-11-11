@@ -1,5 +1,6 @@
-// Grading a versus race (docs/versus-spec.md V4): each big call's options by the chance of
-// finishing ahead of the other car (whose real calls stand), and the winner by the score.
+// Grading a versus race (docs/versus-spec.md V4, action spec A5): each strategy call's options by
+// the chance of finishing ahead of the other car (whose real calls stand); the winner is first
+// past the flag.
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -43,9 +44,9 @@ function scSeed(from: number, to: number): { seed: number; lap: number } {
 
 describe('versus grading', () => {
   it('rates a stop under the safety car above staying out, before either car has stopped', () => {
-    const { seed, lap } = scSeed(9, 13);
-    // The other car stops at the end of lap 15 whatever happens.
-    const calls: VersusCall[] = [{ player: 1, lap: 15, kind: 'pit', compound: 'HARD' }];
+    const { seed, lap } = scSeed(6, 10);
+    // The other car stops at the end of lap 12 whatever happens.
+    const calls: VersusCall[] = [{ player: 1, lap: 12, kind: 'pit', compound: 'HARD' }];
     // The call comes the lap before the SC: box at the end of the SC's first lap.
     const answer: VersusAnswer = { player: 0, lap, kind: 'neutral', option: 'stay' };
     const options = versusOptions({ options: ['box', 'stay'] });
@@ -55,10 +56,10 @@ describe('versus grading', () => {
     expect(p('box-HARD')).toBeGreaterThan(p('stay'));
   });
 
-  it('grades the same race the same way twice, and names the better caller the winner', () => {
-    const { seed, lap } = scSeed(9, 13);
+  it('grades the same race the same way twice; the winner is first past the flag', () => {
+    const { seed, lap } = scSeed(6, 10);
     // Player 0 takes the best stop for the SC; player 1 stays out and stops late under green.
-    const late: VersusCall = { player: 1, lap: 16, kind: 'pit', compound: 'SOFT' };
+    const late: VersusCall = { player: 1, lap: 13, kind: 'pit', compound: 'SOFT' };
     const best = gradeVersusCall(
       model,
       setup(seed),
@@ -77,7 +78,7 @@ describe('versus grading', () => {
     const two = gradeVersus(model, setup(seed), calls, answers, SAMPLES);
     expect(two).toEqual(one);
     expect(one.scores[0].score).toBeGreaterThan(one.scores[1].score);
-    expect(one.winner).toBe(0);
-    expect(one.by).toBe('score');
+    expect(one.winner).toBe(one.road.order[0]);
+    expect(one.by).toBe('road');
   });
 });

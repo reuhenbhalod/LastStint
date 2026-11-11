@@ -7,6 +7,7 @@ import { SELF } from 'cloudflare:test';
 import {
   type RaceModel,
   type ServerMessage,
+  VERSUS_LAPS,
   VERSUS_TRACKS,
   type VersusCall,
   callVersus,
@@ -77,7 +78,7 @@ function replay(inbox: ServerMessage[]) {
     if (m.t === 'call') callVersus(run, m.call);
     if (m.t === 'run') while (run.state.lap < m.lap - 1) stepVersus(run);
   }
-  while (run.state.lap < 20) stepVersus(run);
+  while (run.state.lap < VERSUS_LAPS) stepVersus(run);
   return run;
 }
 
@@ -135,7 +136,12 @@ describe('versus room', () => {
         if (!pushed) {
           b.send({
             t: 'call',
-            call: { lap: mine ? mine.lap + 1 : 20, kind: 'mode', key: 'pace', value: 'push' },
+            call: {
+              lap: mine ? mine.lap + 1 : VERSUS_LAPS,
+              kind: 'mode',
+              key: 'pace',
+              value: 'push',
+            },
           });
           pushed = true;
         }
@@ -152,11 +158,27 @@ describe('versus room', () => {
     const rb = replay(b.inbox);
     expect(ra.state.cars).toEqual(rb.state.cars);
     const room = initVersus(bahrain, result.result.setup, result.result.calls as VersusCall[]);
-    while (room.state.lap < 20) stepVersus(room);
+    while (room.state.lap < VERSUS_LAPS) stepVersus(room);
     expect(ra.state.cars).toEqual(room.state.cars);
     // Sam never stopped: classified last whatever the times (the one-stop rule).
     expect(score?.road).toEqual(classifyVersus(ra));
     expect(score?.road.disqualified).toEqual([1]);
+    // First past the flag wins.
+    expect(score?.winner).toBe(score?.road.order[0]);
+
+    // Lap 1 is a battle from the grid: its lap runs to the braking zone, holds for the picks
+    // (nobody's pick is sent on before both are in), then runs on from there.
+    const battle = a.inbox.find((m) => m.t === 'moments' && m.approach);
+    if (!battle || battle.t !== 'moments') throw new Error('no battle');
+    expect(battle.moments.map((x) => x.kind)).toEqual(['battle', 'battle']);
+    const i = a.inbox.indexOf(battle);
+    const resumed = a.inbox.findIndex((m, k) => k > i && m.t === 'run');
+    const run = a.inbox[resumed];
+    expect(run?.t === 'run' && run.from).toBeCloseTo(battle.approach?.brake ?? 0);
+    const picks = a.inbox.filter(
+      (m, k) => k > i && k < resumed && m.t === 'call' && m.call.kind === 'battle',
+    );
+    expect(picks.length).toBe(2);
   });
 
   it('waits for a dropped player, takes them back with their key, and forfeits a leaver', async () => {
@@ -171,7 +193,7 @@ describe('versus room', () => {
     a.send({ t: 'pick', car: 'balanced', startTyre: 'MEDIUM' });
     b.send({ t: 'pick', car: 'balanced', startTyre: 'MEDIUM' });
     await a.next('start');
-    await a.next('run');
+    await a.next('moments'); // lap 1's battle
     a.ws.close();
     expect(await b.next('paused')).toMatchObject({ player: 0 });
     const back = await connect(code);

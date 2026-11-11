@@ -18,14 +18,15 @@ import {
   type VersusPlayer,
   type VersusRun,
   type VersusSetup,
+  autoPick,
   callVersus,
   gradeVersus,
   initVersus,
   optionCalls,
   stepVersus,
+  validOption,
   versusCallsDue,
   versusFinished,
-  versusOptions,
   versusTrack,
 } from '@boxthislap/sim';
 import type { Env } from './index.js';
@@ -33,8 +34,12 @@ import { getRace } from './races.js';
 
 /** A lap's length (the race runs at one speed: both screens stay in step). */
 export const LAP_MS = 8000;
-/** Time to answer a big call: 12 s, plus a moment to read it (call timing spec). */
-export const CALL_MS = 14_000;
+/** Time to answer a big call: 8 s, plus a moment to read it (action spec A3). */
+export const CALL_MS = 10_000;
+/** A battle's picks: 6 s, plus a moment to read it, once the cars reach the braking zone. */
+export const BATTLE_MS = 7000;
+/** How far before its corner a battle's braking zone starts (a share of the lap; the map's). */
+export const BRAKE_BEFORE = 0.035;
 /** The car pick: this long, then whoever hasn't picked gets Balanced on mediums. */
 export const PICK_MS = 30_000;
 /** A dropped player gets this long to come back before their driver takes over. */
@@ -58,6 +63,7 @@ interface Timing {
   lap: number;
   pick: number;
   call: number;
+  battle: number;
   reconnect: number;
   reveal: number;
 }
@@ -68,6 +74,7 @@ function timingOf(env: Env): Timing {
     lap: n(env.VERSUS_LAP_MS, LAP_MS),
     pick: n(env.VERSUS_PICK_MS, PICK_MS),
     call: n(env.VERSUS_CALL_MS, CALL_MS),
+    battle: n(env.VERSUS_BATTLE_MS, BATTLE_MS),
     reconnect: n(env.VERSUS_RECONNECT_MS, RECONNECT_MS),
     reveal: n(env.VERSUS_REVEAL_MS, REVEAL_MS),
   };
@@ -88,8 +95,16 @@ export class VersusRoom implements DurableObject {
   private moments: VersusMoment[] = [];
   private momentsUntil = 0;
   private answered = new Set<PlayerIndex>();
-  /** The lap running now and when it started. */
-  private running: { lap: number; ms: number; start: number } | null = null;
+  /** The lap running now and when it started; a battle's holds at `brake` until resolved. */
+  private running: {
+    lap: number;
+    ms: number;
+    start: number;
+    brake?: number;
+    held?: boolean;
+  } | null = null;
+  /** Answers' calls, sent on when the moments close (blind: nobody sees the other's first). */
+  private held: VersusCall[] = [];
   private waitingFor: PlayerIndex | null = null;
   private result: VersusOutcome | null = null;
   private readonly timing: Timing;
@@ -216,9 +231,9 @@ export class VersusRoom implements DurableObject {
   private answer(seat: PlayerIndex, lap: number, option: string): void {
     const moment = this.moments.find((m) => m.player === seat && m.lap === lap);
     if (!moment || this.answered.has(seat)) throw new Error('no call waiting for you');
-    if (!versusOptions(moment).includes(option)) throw new Error(`no option ${option}`);
+    if (!validOption(moment, option)) throw new Error(`no option ${option}`);
     this.applyAnswer(moment, option);
-    if (this.moments.every((m) => this.answered.has(m.player))) this.closeMoments();
+    if (this.moments.every((m) => this.answered.has(m.player))) this.closeWhenReady();
   }
 
   private leave(seat: PlayerIndex): void {
@@ -298,18 +313,44 @@ export class VersusRoom implements DurableObject {
     if (due.length) {
       this.moments = due;
       this.answered.clear();
-      this.momentsUntil = Date.now() + this.timing.call;
-      this.broadcast({ t: 'moments', moments: due, until: this.momentsUntil });
+      const battle = due[0]?.battle;
+      if (battle) {
+        // A battle (action spec A1): the lap runs to the braking zone and holds there for the
+        // picks.
+        const lap = run.state.lap + 1;
+        const brake = Math.max(0.02, battle.at - BRAKE_BEFORE);
+        const approach = brake * this.timing.lap;
+        this.running = { lap, ms: this.timing.lap, start: Date.now(), brake, held: true };
+        this.momentsUntil = Date.now() + approach + this.timing.battle;
+        this.broadcast({
+          t: 'moments',
+          moments: due,
+          until: this.momentsUntil,
+          approach: { lap, ms: this.timing.lap, brake },
+        });
+      } else {
+        this.momentsUntil = Date.now() + this.timing.call;
+        this.broadcast({ t: 'moments', moments: due, until: this.momentsUntil });
+      }
       // A player who's away has their driver answer at once.
-      for (const m of due) if (this.seats[m.player]?.away) this.applyAnswer(m, defaultOption(m));
+      for (const m of due)
+        if (this.seats[m.player]?.away) this.applyAnswer(m, defaultOption(run, m));
       if (due.every((m) => this.answered.has(m.player))) {
-        this.closeMoments();
+        this.closeWhenReady();
         return;
       }
-      this.later(this.timing.call, () => this.closeMoments(), 'call');
+      this.later(Math.max(0, this.momentsUntil - Date.now()), () => this.closeMoments(), 'call');
       return;
     }
     this.runLap();
+  }
+
+  /** Everyone's answered: close now, or (a battle) once the cars reach the braking zone. */
+  private closeWhenReady(): void {
+    const r = this.running;
+    const reach = r?.held && r.brake !== undefined ? r.start + r.brake * r.ms - Date.now() : 0;
+    if (reach > 0) this.later(reach, () => this.closeMoments(), 'call');
+    else this.closeMoments();
   }
 
   private applyAnswer(moment: VersusMoment, option: string): void {
@@ -324,28 +365,37 @@ export class VersusRoom implements DurableObject {
     this.answered.add(moment.player);
     for (const c of optionCalls(moment.player, moment.lap, option)) {
       callVersus(run, c);
-      this.broadcast({ t: 'call', call: c });
+      this.held.push(c);
     }
     this.broadcast({ t: 'answered', player: moment.player });
   }
 
-  /** The answer window closed (all in, or time up): unanswered calls stay out (or hold). */
+  /** The answer window closed (all in, or time up): unanswered calls stay out (or the
+   * driver picks his own battle move). The calls go to both browsers now, then a battle's lap
+   * runs on from the braking zone, or (strategy calls) the lap's battle is raised, if any. */
   private closeMoments(): void {
     if (!this.moments.length) return;
     this.clearTimer();
+    this.clearTimer('call');
+    const run = this.run as VersusRun;
     for (const m of this.moments)
-      if (!this.answered.has(m.player)) this.applyAnswer(m, defaultOption(m));
+      if (!this.answered.has(m.player)) this.applyAnswer(m, defaultOption(run, m));
+    for (const c of this.held.splice(0)) this.broadcast({ t: 'call', call: c });
     this.moments = [];
     this.answered.clear();
-    this.runLap();
+    const r = this.running;
+    if (r?.held && r.brake !== undefined) this.runLap(r.brake);
+    else this.nextLap();
   }
 
-  private runLap(): void {
+  /** Run the next lap (from `from` of the way round: a battle's, after its picks). */
+  private runLap(from = 0): void {
     const run = this.run as VersusRun;
     const lap = run.state.lap + 1;
-    this.running = { lap, ms: this.timing.lap, start: Date.now() };
-    this.broadcast({ t: 'run', lap, ms: this.timing.lap });
-    this.later(this.timing.lap, () => {
+    const ms = this.timing.lap;
+    this.running = { lap, ms, start: Date.now() - from * ms };
+    this.broadcast({ t: 'run', lap, ms, ...(from ? { from } : {}) });
+    this.later(ms * (1 - from), () => {
       stepVersus(run);
       this.running = null;
       this.nextLap();
@@ -361,8 +411,8 @@ export class VersusRoom implements DurableObject {
     if (this.moments.length) {
       for (const m of this.moments)
         if (this.seats[m.player]?.away && !this.answered.has(m.player))
-          this.applyAnswer(m, defaultOption(m));
-      if (this.moments.every((m) => this.answered.has(m.player))) this.closeMoments();
+          this.applyAnswer(m, defaultOption(this.run as VersusRun, m));
+      if (this.moments.every((m) => this.answered.has(m.player))) this.closeWhenReady();
       else
         this.later(Math.max(0, this.momentsUntil - Date.now()), () => this.closeMoments(), 'call');
     } else if (!this.running) this.nextLap();
@@ -441,7 +491,12 @@ export class VersusRoom implements DurableObject {
       answers: [...this.answers],
       lap: this.run.state.lap,
       running: this.running
-        ? { lap: this.running.lap, ms: this.running.ms, elapsed: Date.now() - this.running.start }
+        ? {
+            lap: this.running.lap,
+            ms: this.running.ms,
+            elapsed: Date.now() - this.running.start,
+            ...(this.running.held ? { brake: this.running.brake as number, held: true } : {}),
+          }
         : null,
       moments: this.moments,
       ...(this.moments.length ? { momentsUntil: this.momentsUntil } : {}),
@@ -462,7 +517,8 @@ export class VersusRoom implements DurableObject {
   }
 }
 
-/** No answer: stay out, or race him normally in the final laps. */
-function defaultOption(m: VersusMoment): string {
-  return m.options.includes('stay') ? 'stay' : 'hold';
+/** No answer: stay out, go normally at the restart, or (a battle) the driver's own move. */
+function defaultOption(run: VersusRun, m: VersusMoment): string {
+  if (m.battle) return autoPick(run, m.player, m.battle.attacker === m.player);
+  return m.options.includes('stay') ? 'stay' : 'normal';
 }

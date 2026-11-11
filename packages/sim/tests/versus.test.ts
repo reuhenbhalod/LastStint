@@ -1,12 +1,14 @@
-// Versus mode's engine (docs/versus-spec.md V1-V2): two player cars on a real track's numbers,
-// the same race from the same setup and calls, the one-stop rule, the safety car, and how the
-// four cars compare when nobody makes a call beyond the same one stop.
+// Versus mode's engine (docs/versus-spec.md V1-V2, docs/versus-action-spec.md): two player cars
+// on a real track's numbers, the same race from the same setup and calls, the one-stop rule,
+// the safety car, the battles and the calls, and how the four cars compare when nobody makes a
+// call beyond the same one stop.
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import type { RaceModel } from '../src/types.js';
 import {
+  DUEL,
   VERSUS_CARS,
   VERSUS_LAPS,
   VERSUS_TRACKS,
@@ -35,10 +37,10 @@ const setup = (track: string, seed: number, a = 'balanced', b = 'balanced'): Ver
     { name: 'B', car: b, startTyre: 'MEDIUM' },
   ],
 });
-/** The same one stop for both: hards at the end of lap 10. */
+/** The same one stop for both: hards at the end of lap 7. */
 const oneStop: VersusCall[] = [
-  { player: 0, lap: 10, kind: 'pit', compound: 'HARD' },
-  { player: 1, lap: 10, kind: 'pit', compound: 'HARD' },
+  { player: 0, lap: 7, kind: 'pit', compound: 'HARD' },
+  { player: 1, lap: 7, kind: 'pit', compound: 'HARD' },
 ];
 
 describe('versus engine', () => {
@@ -86,16 +88,62 @@ describe('versus engine', () => {
     expect(result.order).toEqual([0, 1]);
   });
 
-  it('runs 20 laps, with a SC or VSC in about one race in three', () => {
+  it('runs 15 laps, with a SC or VSC in about two races in three and a gremlin in one in four', () => {
     let neutral = 0;
+    let gremlins = 0;
     for (let seed = 1; seed <= 300; seed++) {
       const run = initVersus(model('suzuka'), setup('suzuka', seed));
       if (run.neutral.size) neutral++;
+      if (run.gremlin) gremlins++;
       while (!versusFinished(run)) stepVersus(run);
       expect(run.state.lap).toBe(VERSUS_LAPS);
+      if (run.gremlin)
+        expect(
+          run.state.notes.some((n) => n.kind === 'gremlin' && n.lap === run.gremlin?.lap),
+        ).toBe(true);
     }
-    expect(neutral / 300).toBeGreaterThan(0.2);
-    expect(neutral / 300).toBeLessThan(0.5);
+    expect(VERSUS_LAPS).toBe(15);
+    expect(neutral / 300).toBeGreaterThan(0.55);
+    expect(neutral / 300).toBeLessThan(0.8);
+    expect(gremlins / 300).toBeGreaterThan(0.17);
+    expect(gremlins / 300).toBeLessThan(0.33);
+  });
+
+  it('fights every pass as a battle: covering the side the attacker goes shuts the door', () => {
+    // Lap 1 from the grid (0.3 s apart) is always a battle; force both picks.
+    const passRate = (attack: 'inside' | 'outside', defend: 'cover-inside' | 'cover-outside') => {
+      let passes = 0;
+      for (let seed = 1; seed <= 300; seed++) {
+        const run = initVersus(model('monza'), setup('monza', seed));
+        run.neutral.clear();
+        run.state.nextFlag = 'green';
+        const due = versusCallsDue(run).find((m) => m.kind === 'battle');
+        if (!due?.battle) throw new Error('no battle on lap 1');
+        const atk = due.battle.attacker;
+        callVersus(run, { player: atk, lap: 1, kind: 'battle', pick: attack, boost: false });
+        callVersus(run, {
+          player: atk === 0 ? 1 : 0,
+          lap: 1,
+          kind: 'battle',
+          pick: defend,
+          boost: false,
+        });
+        stepVersus(run);
+        const [a, b] = run.state.cars;
+        const leader = a.totalTime <= b.totalTime ? 0 : 1;
+        if (leader === atk) passes++;
+        const note = run.state.notes.find((n) => n.kind === 'battle');
+        expect(note?.detail?.startsWith(`${attack}|${defend}|`)).toBe(true);
+      }
+      return passes / 300;
+    };
+    expect(DUEL.inside['cover-outside'].pass).toBeGreaterThan(DUEL.inside['cover-inside'].pass);
+    expect(passRate('inside', 'cover-outside')).toBeGreaterThan(
+      passRate('inside', 'cover-inside') + 0.3,
+    );
+    expect(passRate('outside', 'cover-inside')).toBeGreaterThan(
+      passRate('outside', 'cover-outside') + 0.3,
+    );
   });
 
   it('bunches the cars up at the end of a safety car', () => {
@@ -132,28 +180,50 @@ describe('versus engine', () => {
     }
   });
 
-  it('raises the big calls: the pit window, the other car pitting, the final laps; once each', () => {
+  it('raises the calls that matter, once each, and no filler', () => {
     const run = initVersus(model('suzuka'), setup('suzuka', 21));
     run.neutral.clear(); // a green race
     run.state.nextFlag = 'green';
     const seen: string[] = [];
+    let battles = 0;
     while (!versusFinished(run)) {
-      for (const m of versusCallsDue(run)) {
-        seen.push(`${m.player}:${m.kind}:${m.lap}`);
-        // Player 0 answers the first pit window by boxing; player 1 always stays out.
-        if (m.player === 0 && m.kind === 'pitWindow' && run.state.cars[0].stops === 0)
-          callVersus(run, { player: 0, lap: m.lap, kind: 'pit', compound: 'HARD' });
+      // Strategy calls first, then (asked again) the lap's battle.
+      for (let k = 0; k < 2; k++) {
+        for (const m of versusCallsDue(run)) {
+          seen.push(`${m.player}:${m.kind}:${m.lap}`);
+          if (m.kind === 'battle') {
+            battles++;
+            expect(m.battle?.attacker).toBe(
+              run.state.cars[0].totalTime <= run.state.cars[1].totalTime ? 1 : 0,
+            );
+          }
+          // Player 0 takes the first stop it's offered; player 1 stays out to the end.
+          if (m.player === 0 && m.options.includes('box') && run.state.cars[0].stops === 0)
+            callVersus(run, { player: 0, lap: m.lap, kind: 'pit', compound: 'HARD' });
+        }
       }
       stepVersus(run);
     }
-    expect(seen).toContain('0:pitWindow:8');
-    expect(seen).toContain('1:pitWindow:8');
-    expect(seen).toContain('1:theyPitted:10'); // player 0 stopped on lap 9 (in-lap 8)
-    expect(seen.filter((x) => x.startsWith('1:pitWindow')).length).toBeGreaterThan(1); // asked again
+    // Lap 1 is a battle from the grid, for both players.
+    expect(seen).toContain('0:battle:1');
+    expect(seen).toContain('1:battle:1');
+    expect(battles).toBeGreaterThanOrEqual(2);
     expect(new Set(seen).size).toBe(seen.length);
-    // Player 1 never stopped: asked one last time on lap 19, and nothing on lap 20.
-    expect(seen).toContain('1:pitWindow:19');
-    expect(seen.some((x) => x.endsWith(':pitWindow:20'))).toBe(false);
+    // Player 1 answered player 0's stop, and never stopped: asked one last time on lap 14.
+    expect(seen.some((x) => x.startsWith('1:theyPitted'))).toBe(true);
+    expect(seen).toContain('1:pitWindow:14');
+    expect(seen.some((x) => x.endsWith(':15') && !x.includes('battle'))).toBe(false);
+    // Never a battle on the lap straight after one (no one waited here).
+    const battleLaps = [
+      ...new Set(seen.filter((x) => x.includes('battle')).map((x) => Number(x.split(':')[2]))),
+    ];
+    for (let i = 1; i < battleLaps.length; i++) {
+      const gap = (battleLaps[i] as number) - (battleLaps[i - 1] as number);
+      const waited = run.state.notes.some(
+        (n) => n.kind === 'battle' && n.lap === battleLaps[i - 1] && n.detail?.startsWith('wait'),
+      );
+      if (!waited) expect(gap).toBeGreaterThan(1);
+    }
   });
 
   it('raises the safety car call for both players the lap before it comes out', () => {

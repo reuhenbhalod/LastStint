@@ -1,5 +1,5 @@
-// Grading a versus race (docs/versus-spec.md V4): the winner is whoever made the better calls.
-// Each big call is graded as in solo (grade.ts): from the pause it was asked at, the race is
+// Grading a versus race (docs/versus-spec.md V4): the winner is whoever is first past the flag
+// (action spec A5); the strategy calls are graded as a breakdown. Each strategy call is graded as in solo (grade.ts): from the pause it was asked at, the race is
 // played out many times with each option and the chance of finishing ahead of the other car is
 // counted. The other car runs its real calls, all of them; the caller's later calls are
 // replaced by a sensible continuation (one stop if it still owes one), so a call is graded on
@@ -12,6 +12,8 @@ import { deriveSeed, mulberry32 } from './rng.js';
 import { DRY_COMPOUNDS, lifeOf } from './sim.js';
 import type { Compound, RaceModel } from './types.js';
 import {
+  type BattlePick,
+  GRADED_KINDS,
   NEUTRAL_CHANCE,
   NEUTRAL_FROM,
   NEUTRAL_TO,
@@ -49,13 +51,27 @@ export function versusOptions(moment: Pick<VersusMoment, 'options'>): string[] {
   return moment.options.flatMap((o) => (o === 'box' ? DRY_COMPOUNDS.map((c) => `box-${c}`) : [o]));
 }
 
+/** Whether `option` answers `moment`: one of its options, or (a battle) one with "+boost"
+ * when the car has a boost to spend. */
+export function validOption(
+  moment: Pick<VersusMoment, 'options' | 'battle'>,
+  option: string,
+): boolean {
+  const [base, extra] = option.split('+');
+  if (!versusOptions(moment).includes(base as string)) return false;
+  if (extra === undefined) return true;
+  return extra === 'boost' && !!moment.battle?.canBoost;
+}
+
 /** The calls an option makes. */
 export function optionCalls(player: PlayerIndex, lap: number, option: string): VersusCall[] {
   if (option.startsWith('box-'))
     return [{ player, lap, kind: 'pit', compound: option.slice(4) as Compound }];
-  if (option === 'attack' || option === 'defend' || option === 'hold')
-    return [{ player, lap, kind: 'mode', key: 'battle', value: option }];
-  return [];
+  if (option === 'early' || option === 'normal')
+    return [{ player, lap, kind: 'restart', jump: option }];
+  if (option === 'stay') return [];
+  const [pick, extra] = option.split('+');
+  return [{ player, lap, kind: 'battle', pick: pick as BattlePick, boost: extra === 'boost' }];
 }
 
 /** The race paused before `lap` ran: every call made by then, the other player's all. */
@@ -177,7 +193,7 @@ export function gradeVersusCall(
 
 export interface VersusScore {
   scores: [RunScore, RunScore];
-  /** Who made the better calls: score, then the mean chance, then the road result. */
+  /** First past the flag (a car that never stopped is classified last). */
   winner: PlayerIndex;
   /** What decided it. */
   by: 'score' | 'chance' | 'road';
@@ -198,11 +214,9 @@ export function gradeVersus(
   const score = (player: PlayerIndex) =>
     scoreRun(
       answers
-        .filter((a) => a.player === player)
+        .filter((a) => a.player === player && GRADED_KINDS.includes(a.kind))
         .map((a) => {
-          const options = versusOptions({
-            options: a.kind === 'finalLaps' ? ['attack', 'defend', 'hold'] : ['box', 'stay'],
-          });
+          const options = versusOptions({ options: ['box', 'stay'] });
           return {
             grade: gradeVersusCall(model, setup, calls, a, options, samples),
             chosen: a.option,
@@ -213,18 +227,6 @@ export function gradeVersus(
   const run = initVersus(model, setup, calls);
   while (!versusFinished(run)) stepVersus(run);
   const road = classifyVersus(run);
-  const [a, b] = scores;
-  let winner: PlayerIndex;
-  let by: VersusScore['by'];
-  if (a.score !== b.score) {
-    winner = a.score > b.score ? 0 : 1;
-    by = 'score';
-  } else if (a.meanProbability !== b.meanProbability) {
-    winner = a.meanProbability > b.meanProbability ? 0 : 1;
-    by = 'chance';
-  } else {
-    winner = road.order[0] as PlayerIndex;
-    by = 'road';
-  }
-  return { scores, winner, by, road };
+  // First past the flag wins (action spec A5); the calls are the breakdown.
+  return { scores, winner: road.order[0] as PlayerIndex, by: 'road', road };
 }
