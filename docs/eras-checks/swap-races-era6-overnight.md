@@ -483,6 +483,35 @@ Legend); hidden `stop_count` exact 2 (the stay-out path met it too).
 `data/races/abu-dhabi-2011.json`, its golden and `races.gen.ts` are for the integrator to
 rebuild (`pipeline build abu-dhabi-2011`); this branch does not commit them.
 
+### B2 re-author (Nov 10): mastery 8 s -> 5 s, hidden no-push -> two stops
+
+Branch `eras-reauthor-abu-dhabi-2011` (base `eras-integrate-fixes`, with the Expert rival
+grader fix and the player stint-pace fix). With the player's car now running its race-wide
+stint offset, the race stopped being reachable: at era difficulty (Smart) the only winning
+paths in the search push from lap 21 (wins by 13 to 17 s; the no-push hidden objective fails),
+and at Legend (Expert) the one winning path, the real calls at standard pace, wins by 6.5 s on
+seed 1 (★3 at 8 s fails). The grader now rates push ahead of standard pace at lap 21 on most
+seeds, so "no push lap" no longer fits the race. Side (HAM), target (`defend`), no rewrite,
+storyline, briefing, moments and storylineEvents are unchanged.
+
+| Item | Value | Fact it rests on | Source | Owner checked |
+|---|---|---|---|---|
+| Mastery | `margin` 5 s: "Win by more than 5 seconds" (was 8 s) | Alonso +8.457 at the flag; 5 s is below the real margin (the Legend path wins by 6.5 s; 8 s was not reached at Legend) | Jolpica | |
+| Hidden | `stop_count` exact 2: "Win on two more stops, as Hamilton made" (was `mode_rule` push 0) | Hamilton made two stops, both after the lap-13 takeover: Jolpica laps 16 and 40 (GPE 17 and 40) | Jolpica, GPE | |
+
+Checks on this branch (local Eras build of abu-dhabi-2011, not committed):
+
+- Reachability (`pnpm --filter @laststint/sim reachability abu-dhabi-2011`): **pass**. Era
+  (threshold 80, Smart): seed 2, rivalpit-16 box-hard, pace-21 push, cliff-26 stay, stop-40
+  box-soft, ★1-3 and hidden, accuracy 97.5. Legend (90, Expert): seed 1, rivalpit-16 box-hard,
+  pace-21 standard, cliff-26 stay, stop-40 box-soft, ★1-3 and hidden, accuracy 97.9. Both are
+  the real stop calls. The stay-out path earns neither ★1 nor ★3 at either level; it meets the
+  hidden objective on seed 1 only (it finishes P2 on two stops).
+- Robust G1 (`pipeline validate abu-dhabi-2011 --robust`): **pass** (strict), mean gap error
+  0.87 s (unchanged).
+- Tried and rejected: hidden `compound_rule` mustUse HARD and `mode_rule` manage 0 (both
+  reachable, but the stay-out path meets them on more seeds).
+
 ## china-2013 (2013 Chinese Grand Prix; Era 6 #8, replaces brazil-2012)
 
 **Side and target.** `pipeline hard-calls` (local run): ALO 2, RAI 1 (chance given up ALO 1.7, RAI 1.7 pts), so the race is drafted from Alonso's side, not the Vettel draft in the proposal below. Alonso really won, so no rewrite. Spec §4 draft: "Ferrari's softs last only a handful of laps: commit Alonso to three stops and find a way past the cars running long on mediums"; target `win: Alonso from P3`. Sourced in the facts below: soft "guaranteed a pitstop within a handful of laps" (MS), Alonso's three stops and soft start, Vettel and Hülkenberg starting on mediums, Alonso fast through traffic on mediums (AS). OpenF1 has no 2013 data and TUM starts in 2014, so there is no timing source for track status or per-stint compounds. No GrandPrix.com 2013 race report or notes page was found by search; the Autosport live-text archive (live.autosport.com) refused the connection.
