@@ -3,13 +3,26 @@
 // (game/guide.ts). Stops fold into a "Box" button per timing (this lap, next lap) that opens
 // the tyre choice in place, each compound with what it gains over the laps left. Same options
 // the server grades (game/choices.ts); no chances shown (the grade comes after the call).
-// Number keys pick options, Escape backs out of the tyre choice.
+// Number keys pick options, Escape backs out of the tyre choice. In Eras mode (build plan 8.6)
+// the gap and the rival's tyre age follow the difficulty's information level and the decision
+// timer sits by the tag. In Eras 1-2 (build plan 8.5, the race's era) the call reads as a
+// pit-board message.
 
-import { type DecisionMoment, type RaceModel, type RaceState, tyreLife } from '@boxthislap/sim';
-import { useEffect, useRef, useState } from 'react';
+import { type DecisionMoment, type RaceModel, type RaceState, tyreLife } from '@laststint/sim';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { named, surname } from '../data/names.js';
+import { PIT_BOARD_CLASS } from '../eras/PitBoard.js';
+import { useRaceEra } from '../eras/RaceEraContext.js';
+import {
+  FULL_INFORMATION,
+  type InformationView,
+  gapShown,
+  gapText,
+  shownGap,
+  tyreAgeText,
+} from '../eras/difficulty/information.js';
 import { briefFor } from '../game/brief.js';
-import { choicesFor, tyreName } from '../game/choices.js';
+import { choicesFor, tyreLabel, tyreName } from '../game/choices.js';
 import { type Fact, modeFacts, tyreOutlooks } from '../game/guide.js';
 
 const LETTER: Record<string, string> = {
@@ -25,12 +38,19 @@ export function BroadcastDecision({
   race,
   model,
   onChoose,
+  info = FULL_INFORMATION,
+  timer,
 }: {
   moment: DecisionMoment;
   race: RaceState;
   model: RaceModel;
   onChoose: (optionId: string) => void;
+  /** What the Eras information level shows (everything, otherwise). */
+  info?: InformationView;
+  /** The Eras decision timer, shown by the tag. */
+  timer?: ReactNode;
 }) {
+  const board = useRaceEra().prompts === 'board';
   const brief = briefFor(moment, race, model);
   const c = choicesFor(moment);
   const [picking, setPicking] = useState<'now' | 'next' | null>(null);
@@ -105,16 +125,16 @@ export function BroadcastDecision({
   });
 
   const facts: Array<[string, string]> = [];
-  if (brief.gap !== null)
+  if (brief.gap !== null && gapShown(info, race.order, model.userSide, model.rival))
     facts.push([
       'Gap',
-      `${brief.gap >= 0 ? '+' : '−'}${Math.abs(brief.gap).toFixed(1)}s ${brief.gap >= 0 ? `on ${surname(model.rival)}` : `to ${surname(model.rival)}`}`,
+      `${gapText(info, brief.gap)} ${shownGap(info, brief.gap) >= 0 ? `on ${surname(model.rival)}` : `to ${surname(model.rival)}`}`,
     ]);
   if (brief.us) facts.push(['Tyres', `${tyreName(brief.us.compound)} · ${brief.us.age}`]);
   if (brief.rival)
     facts.push([
       surname(brief.rival.code),
-      `${tyreName(brief.rival.compound)} · ${brief.rival.age}`,
+      `${tyreName(brief.rival.compound)} · ${tyreAgeText(info, brief.rival.age, false)}`,
     ]);
   if (brief.stop) facts.push(['Stop costs', `${Math.round(brief.stop.now)}s`]);
   facts.push(['Laps left', String(brief.lapsLeft)]);
@@ -126,11 +146,16 @@ export function BroadcastDecision({
   );
 
   return (
-    <section aria-label="Your call" className="decision call-plate">
+    <section
+      aria-label="Your call"
+      className={board ? `decision call-plate ${PIT_BOARD_CLASS}` : 'decision call-plate'}
+    >
       <div className="flex flex-wrap items-baseline justify-between gap-x-5 gap-y-1.5">
         <span role="alert" className="call-tag">
-          Engineer · {brief.kind} · Lap {moment.lap}
+          {board ? 'Pit board · ' : 'Engineer · '}
+          {brief.kind} · Lap {moment.lap}
         </span>
+        {timer}
         <dl className="m-0 hidden flex-wrap gap-x-4 gap-y-1 md:flex">
           {facts.map(([k, v]) => (
             <div key={k} className="flex items-baseline gap-1.5 text-[12px]">
@@ -142,7 +167,13 @@ export function BroadcastDecision({
           ))}
         </dl>
       </div>
-      <span className="text-[17px] font-bold leading-snug text-white md:text-[20px]">
+      <span
+        className={
+          board
+            ? 'board-line text-[17px] font-bold leading-snug md:text-[20px]'
+            : 'text-[17px] font-bold leading-snug text-white md:text-[20px]'
+        }
+      >
         {brief.headline}
       </span>
       {box ? (
@@ -165,7 +196,7 @@ export function BroadcastDecision({
                   key={t.option.id}
                   ref={i === 0 ? first : undefined}
                   type="button"
-                  aria-label={tyreName(t.compound)}
+                  aria-label={tyreLabel(t, tyreOpts)}
                   title={o ? `Good: ${o.good}\nBad: ${o.bad}` : undefined}
                   className="call-opt"
                   onClick={() => onChoose(t.option.id)}
@@ -174,7 +205,7 @@ export function BroadcastDecision({
                     <span className={`tyre ${t.compound}`}>
                       {LETTER[t.compound] ?? t.compound[0]}
                     </span>
-                    <span className="label">{tyreName(t.compound)}</span>
+                    <span className="label">{tyreLabel(t, tyreOpts)}</span>
                     {o?.gain != null && (
                       <span
                         className="mono ml-auto text-[14px] font-bold"

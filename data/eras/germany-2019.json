@@ -1,0 +1,51 @@
+{
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": true,
+    "drs": true,
+    "ers": "hybrid",
+    "refuelling": false
+  },
+  "eras": {
+    "eraId": 8,
+    "order": 5,
+    "userSide": "VER",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Verstappen wins a wet race at Hockenheim, through a spin and several safety cars; Vettel climbs from last on the grid to second."
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 4,
+      "label": "Win on four more stops, as Verstappen made"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 3,
+      "label": "Win by more than 3 seconds"
+    },
+    "hardCalls": {
+      "VER": 3,
+      "VET": 1
+    },
+    "briefing": "Hockenheim, 2019. Rain before the start: the race begins behind the safety car, with every car on wet tyres. Hamilton is on pole, Verstappen second. The track will dry, and then not quite."
+  },
+  "storylineEvents": [
+    [
+      29,
+      "SC"
+    ],
+    [
+      41,
+      "SC"
+    ],
+    [
+      57,
+      "SC"
+    ]
+  ]
+}

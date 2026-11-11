@@ -2,31 +2,35 @@
 // a race's decision moments the Abu Dhabi way and keeps only real dilemmas. See author.ts for
 // the recipe.
 
-import { gradeMoment } from '../src/grade.js';
+import { type Target, gradeMoment } from '../src/grade.js';
 import {
   type DecisionMoment,
   type MomentOption,
+  boxCall,
   candidateMoments,
   pauseAt,
+  pitCompounds,
   verdictFor,
 } from '../src/moments.js';
+import { resolveRules } from '../src/rules.js';
 import type { Decision, RaceModel } from '../src/types.js';
-import { wetnessOn } from '../src/weather.js';
+import { isWetTyre, wetnessOn } from '../src/weather.js';
 
 const MAX_MOMENTS = 6;
 const MIN_SPACING = 3;
 const PACE_EVERY = 4;
 
 /** Up to `max` graded calls (MAX_MOMENTS; survivor races take 2) for `model` (its seed, rival
- * and takeover as given). `log` receives a line per candidate. The plan at takeover is the
- * strategy planner's (docs/strategy-planner-spec.md), not a moment. */
+ * and takeover as given), graded on `target` (default: beat the rival; an Eras race grades on
+ * its own target). `log` receives a line per candidate. The plan at takeover is the strategy
+ * planner's (docs/strategy-planner-spec.md), not a moment. */
 export function authorMoments(
   model: RaceModel,
   samples?: number,
   log: (line: string) => void = () => {},
   max = MAX_MOMENTS,
+  target: Target = { kind: 'beat-rival' },
 ): DecisionMoment[] {
-  const target = { kind: 'beat-rival' } as const;
   const first = model.race.takeoverLap + 1;
   const last = model.race.laps - 1;
   const NAME: Record<string, string> = {
@@ -36,7 +40,8 @@ export function authorMoments(
     INTERMEDIATE: 'inters',
     WET: 'wets',
   };
-  const pit = (lap: number, compound: string): Decision => ({ lap, kind: 'pit', compound });
+  // A refuelling race: the real call's fill, else 'standard' (moments.ts boxCall).
+  const pit = (lap: number, compound: string): Decision => boxCall(model, lap, compound);
   const mode = (lap: number, key: 'pace' | 'battle', value: string): Decision =>
     ({ lap, kind: 'mode', key, value }) as Decision;
 
@@ -57,19 +62,23 @@ export function authorMoments(
   /** A finder stop call, re-offered the Abu Dhabi way. */
   function stopCall(m: DecisionMoment): DecisionMoment {
     const lap = m.lap;
-    const compounds = Object.keys(model.compounds);
+    // Era rules: only the tyres a pit call may name (no tyre changes: the set it's on, or wets).
+    const compounds = pitCompounds(model);
     const next = lap + 1 < model.race.laps;
     // Box next lap: under a neutralization that runs another lap, or a green call (one more lap
     // on these tyres).
     const nextOk = next && (neutral.has(lap) ? neutral.has(lap + 1) : true);
     // A wet race: the tyre for the track next lap (inters as it turns wet, wets when soaked).
     const wetNext = model.weather ? wetnessOn(model.weather.wetness, lap + 1) : 0;
-    const nextCompound =
+    const wanted =
       wetNext >= 0.6 && model.compounds.WET
         ? 'WET'
         : wetNext >= 0.05 && model.compounds.INTERMEDIATE
           ? 'INTERMEDIATE'
           : (lasting(lap + 1).at(-1) as string);
+    const nextCompound = compounds.includes(wanted)
+      ? wanted
+      : ((compounds.find((c) => !isWetTyre(c)) ?? compounds[0]) as string);
     const options: MomentOption[] = [
       { id: 'stay', label: 'Stay out', decisions: [] },
       ...compounds.map((c) => ({
@@ -136,10 +145,18 @@ export function authorMoments(
 
   // The candidates.
   const candidates: DecisionMoment[] = [];
-  for (const m of candidateMoments(model, target)) candidates.push(stopCall(m));
   // The real team's own stops (the in-lap): the calls they actually made. Kept even when the
   // answer is clear (verdict no-tension), so a race can always be played the real way.
   const realStops = new Set<number>();
+  for (const m of candidateMoments(model, target)) {
+    // A team order to the player's car (comply / ignore, moments.ts teamOrderMoments) stays as
+    // the finder offers it, and is always kept, whatever its verdict: the game offers only
+    // authored moments, so without it the car could never make the real driver's call.
+    if (m.trigger === 'teamOrder') {
+      candidates.push(m);
+      realStops.add(m.lap);
+    } else candidates.push(stopCall(m));
+  }
   for (const s of model.drivers.find((d) => d.code === model.userSide)?.realStrategy ?? []) {
     const lap = s.lap - 1;
     if (lap <= first || lap > last || candidates.some((c) => c.lap === lap)) continue;
@@ -200,11 +217,17 @@ export function authorMoments(
   const MAX_PACE = 2;
   const MIN_CALLS = 4;
   const picked: DecisionMoment[] = [];
+  // A refuelling race's real stops are kept even when every option grades alike (no-choice):
+  // the car has no other way to its fills, so without them it runs dry.
+  const refuelling = resolveRules(model).refuelling;
   const keep = graded
     .filter(
       (x) =>
         x.verdict === 'keep' ||
-        (realStops.has(x.m.lap) && x.verdict === 'no-tension' && !x.m.id.startsWith('pace-')),
+        x.m.trigger === 'teamOrder' ||
+        (realStops.has(x.m.lap) &&
+          (x.verdict === 'no-tension' || (refuelling && x.verdict === 'no-choice')) &&
+          !x.m.id.startsWith('pace-')),
     )
     // The real stops first (a race must be playable the real way), then the most tense.
     .sort(

@@ -24,7 +24,7 @@ import {
   versusOptions,
   versusRuleMet,
   versusTrack,
-} from '@boxthislap/sim';
+} from '@laststint/sim';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ApiError, apiPost } from '../api.js';
 import { GroundBackdrop } from '../components/GroundBackdrop.js';

@@ -1,4 +1,4 @@
-import type { RaceModel } from '@boxthislap/sim';
+import type { RaceModel } from '@laststint/sim';
 import { describe, expect, it } from 'vitest';
 import { ApiError } from '../api.js';
 import { ApiDailyProvider, ModelError, StaticDailyProvider, practiceReason } from './provider.js';

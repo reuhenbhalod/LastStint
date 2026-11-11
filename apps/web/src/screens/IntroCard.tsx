@@ -1,10 +1,11 @@
 // The home page (the daily card). A full-width hero: the day's circuit drawn large behind the
 // race's name and the duel, with your driver and the rival placed where they are when you take
 // over; the goal and Start. Under it, the duel in numbers and what your job is tonight. The top
-// bar has the brand, your streak and sign-in. The how-to-play walkthrough opens over it on a
-// fresh visit; coming back mid-race (the Pit Wall brand), Start becomes "Back to the race".
+// bar has the brand, the Gauntlet and Eras pills, your streak and sign-in. The how-to-play
+// walkthrough opens over it on a fresh visit; coming back mid-race (the Pit Wall brand), Start
+// becomes "Back to the race".
 
-import type { RaceModel } from '@boxthislap/sim';
+import type { RaceModel } from '@laststint/sim';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { takeHowToPending } from '../account/howTo.js';
 import type { AccountState } from '../account/useAccount.js';

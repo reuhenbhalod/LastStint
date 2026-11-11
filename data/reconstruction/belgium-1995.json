@@ -1,0 +1,211 @@
+{
+  "raceId": "belgium-1995",
+  "stops": [],
+  "safetyCars": [
+    {
+      "startLap": 29,
+      "endLap": 31,
+      "source": "https://www.motorsportmagazine.com/archive/article/october-1995/14/belgian-grand-prix-9/ ('the Safety Car appears on lap 29' ... 'The race proper resumes on lap 32'); https://lightsoutblog.com/every-safety-car-deployment-at-the-belgian-grand-prix ('deployed on Lap 29')",
+      "note": "Called for worsening rain with many cars on slicks. Lap 29-31 per Motor Sport's lap-by-lap. A fan wiki (f1.fandom) says laps 28-33; a search summary of lightsoutblog said 'six laps' but the page as fetched gave only the start lap. Hill's stop-and-go (F1DB lap 33) followed it."
+    }
+  ],
+  "complete": {
+    "safetyCars": true
+  },
+  "weather": {
+    "timeline": [
+      {
+        "fromLap": 1,
+        "toLap": 19,
+        "state": "dry",
+        "source": "https://www.formulaonehistory.com/1995-belgian-grand-prix/ ('although the afternoon began dry'); https://en.wikipedia.org/wiki/1995_Belgian_Grand_Prix (Herbert 'struggled for pace once the track was dry'); F1DB: Coulthard's fastest lap of the race on lap 11",
+        "note": "WP's 'once the track was dry' could mean the opening laps were damp; no source says so."
+      },
+      {
+        "fromLap": 20,
+        "toLap": 20,
+        "state": "damp",
+        "source": "https://www.motorsportmagazine.com/archive/article/october-1995/14/belgian-grand-prix-9/ (lap 21: 'as the drizzle becomes rain, he pits for wets': drizzle before lap 21)"
+      },
+      {
+        "fromLap": 21,
+        "toLap": 24,
+        "state": "wet",
+        "source": "https://www.motorsportmagazine.com/archive/article/october-1995/14/belgian-grand-prix-9/ (lap 21 'as the drizzle becomes rain'; lap 24 'Still Schumacher stays on slicks'); https://www.grandprix.com/gpe/rr575.html ('Then it started to rain')"
+      },
+      {
+        "fromLap": 25,
+        "toLap": 25,
+        "state": "damp",
+        "source": "https://www.motorsportmagazine.com/archive/article/october-1995/14/belgian-grand-prix-9/ ('The rain stops and Hill's wets tail off dramatically on lap 25'); https://www.grandprix.com/gpe/rr575.html ('The track conditions changed and slicks suddenly began to work')"
+      },
+      {
+        "fromLap": 26,
+        "toLap": 28,
+        "state": "damp",
+        "toState": "wet",
+        "source": "https://www.motorsportmagazine.com/archive/article/october-1995/14/belgian-grand-prix-9/ (lap 26: Panis 'stops for slicks just as the rain begins again')"
+      },
+      {
+        "fromLap": 29,
+        "toLap": 31,
+        "state": "heavy",
+        "source": "https://www.motorsportmagazine.com/archive/article/october-1995/14/belgian-grand-prix-9/ ('the Safety Car appears on lap 29'; 'The race proper resumes on lap 32'); https://en.wikipedia.org/wiki/1995_Belgian_Grand_Prix ('The rain intensified again and the field levelled out when the safety car appeared'); https://www.grandprix.com/gpe/rr575.html ('when the rains increased')"
+      },
+      {
+        "fromLap": 32,
+        "toLap": 44,
+        "state": "wet",
+        "source": "https://www.motorsportmagazine.com/archive/article/october-1995/14/belgian-grand-prix-9/ (lap 32 'A now wet-shod Panis spins'; lap 40 'Frentzen's earlier gamble to stay on wets pays dividends'); https://en.wikipedia.org/wiki/1995_Belgian_Grand_Prix (infobox 'Cloudy, then heavy rain')",
+        "note": "No source says the track dried before the flag."
+      }
+    ],
+    "startTyre": {
+      "tyre": "slick",
+      "source": "https://www.formulaonehistory.com/1995-belgian-grand-prix/ ('the afternoon began dry'); https://en.wikipedia.org/wiki/1995_Belgian_Grand_Prix (Hill's first stop 'for fresh slick tyres')"
+    },
+    "tyreChanges": [
+      {
+        "number": 5,
+        "name": "Damon Hill",
+        "lap": 15,
+        "tyre": "slick",
+        "source": "https://en.wikipedia.org/wiki/1995_Belgian_Grand_Prix ('Hill made his first pit stop for fresh slick tyres'); https://www.motorsportmagazine.com/archive/article/october-1995/14/belgian-grand-prix-9/ (lap 15)"
+      },
+      {
+        "number": 5,
+        "name": "Damon Hill",
+        "lap": 21,
+        "tyre": "wet",
+        "source": "https://www.motorsportmagazine.com/archive/article/october-1995/14/belgian-grand-prix-9/ (lap 21: 'as the drizzle becomes rain, he pits for wets')"
+      },
+      {
+        "number": 5,
+        "name": "Damon Hill",
+        "lap": 26,
+        "tyre": "slick",
+        "source": "https://www.grandprix.com/gpe/rr575.html ('leaving Damon no choice but to pit for slicks'); https://en.wikipedia.org/wiki/1995_Belgian_Grand_Prix ('Hill pitted again for slicks')",
+        "note": "F1DB lap 26, after his wets 'tail off' on lap 25 (MS)"
+      },
+      {
+        "number": 5,
+        "name": "Damon Hill",
+        "lap": 30,
+        "tyre": "wet",
+        "source": "https://www.motorsportmagazine.com/archive/article/october-1995/14/belgian-grand-prix-9/ (lap 29: 'Schumacher and Hill pit for wets and fuel'); https://www.grandprix.com/gpe/rr575.html ('Hill and Schumacher went back onto wets')",
+        "note": "F1DB has the stop on lap 30, Motor Sport's paragraph is headed lap 29"
+      },
+      {
+        "number": 1,
+        "name": "Michael Schumacher",
+        "lap": 18,
+        "tyre": "slick",
+        "source": "https://www.motorsportmagazine.com/archive/article/october-1995/14/belgian-grand-prix-9/ (lap 18 'when Schumacher refuels'; lap 21 'Schumacher stays on slicks')"
+      },
+      {
+        "number": 1,
+        "name": "Michael Schumacher",
+        "lap": 30,
+        "tyre": "wet",
+        "source": "https://www.motorsportmagazine.com/archive/article/october-1995/14/belgian-grand-prix-9/ (lap 29: 'Schumacher and Hill pit for wets and fuel'); https://www.grandprix.com/gpe/rr575.html",
+        "note": "F1DB lap 30"
+      },
+      {
+        "number": 25,
+        "name": "Martin Brundle",
+        "lap": 22,
+        "tyre": "wet",
+        "source": "https://www.motorsportmagazine.com/archive/article/october-1995/14/belgian-grand-prix-9/ ('Brundle stays third despite a stop for fuel and wets')",
+        "note": "F1DB lap 22, Brundle's only stop"
+      },
+      {
+        "number": 26,
+        "name": "Olivier Panis",
+        "lap": 26,
+        "tyre": "slick",
+        "source": "https://www.motorsportmagazine.com/archive/article/october-1995/14/belgian-grand-prix-9/ (lap 26: Panis 'stops for slicks just as the rain begins again')"
+      },
+      {
+        "number": 26,
+        "name": "Olivier Panis",
+        "lap": 29,
+        "tyre": "wet",
+        "source": "https://www.motorsportmagazine.com/archive/article/october-1995/14/belgian-grand-prix-9/ (lap 32: 'A now wet-shod Panis spins'): his next stop after the lap-26 slicks",
+        "note": "derived: F1DB's lap-29 stop is the only one between"
+      }
+    ]
+  },
+  "lapLeaders": [
+    {
+      "driver": "HER",
+      "name": "Johnny Herbert",
+      "fromLap": 1,
+      "toLap": 1,
+      "source": "https://en.wikipedia.org/wiki/1995_Belgian_Grand_Prix (lap-leader chart, Template:F1Laps1995 'BEL')"
+    },
+    {
+      "driver": "ALE",
+      "name": "Jean Alesi",
+      "fromLap": 2,
+      "toLap": 3,
+      "source": "https://en.wikipedia.org/wiki/1995_Belgian_Grand_Prix (lap-leader chart, Template:F1Laps1995 'BEL')"
+    },
+    {
+      "driver": "HER",
+      "name": "Johnny Herbert",
+      "fromLap": 4,
+      "toLap": 5,
+      "source": "https://en.wikipedia.org/wiki/1995_Belgian_Grand_Prix (lap-leader chart, Template:F1Laps1995 'BEL')"
+    },
+    {
+      "driver": "COU",
+      "name": "David Coulthard",
+      "fromLap": 6,
+      "toLap": 13,
+      "source": "https://en.wikipedia.org/wiki/1995_Belgian_Grand_Prix (lap-leader chart, Template:F1Laps1995 'BEL')"
+    },
+    {
+      "driver": "HIL",
+      "name": "Damon Hill",
+      "fromLap": 14,
+      "toLap": 15,
+      "source": "https://en.wikipedia.org/wiki/1995_Belgian_Grand_Prix (lap-leader chart, Template:F1Laps1995 'BEL')"
+    },
+    {
+      "driver": "MSCM",
+      "name": "Michael Schumacher",
+      "fromLap": 16,
+      "toLap": 18,
+      "source": "https://en.wikipedia.org/wiki/1995_Belgian_Grand_Prix (lap-leader chart, Template:F1Laps1995 'BEL')"
+    },
+    {
+      "driver": "HIL",
+      "name": "Damon Hill",
+      "fromLap": 19,
+      "toLap": 21,
+      "source": "https://en.wikipedia.org/wiki/1995_Belgian_Grand_Prix (lap-leader chart, Template:F1Laps1995 'BEL')"
+    },
+    {
+      "driver": "MSCM",
+      "name": "Michael Schumacher",
+      "fromLap": 22,
+      "toLap": 23,
+      "source": "https://en.wikipedia.org/wiki/1995_Belgian_Grand_Prix (lap-leader chart, Template:F1Laps1995 'BEL')"
+    },
+    {
+      "driver": "HIL",
+      "name": "Damon Hill",
+      "fromLap": 24,
+      "toLap": 24,
+      "source": "https://en.wikipedia.org/wiki/1995_Belgian_Grand_Prix (lap-leader chart, Template:F1Laps1995 'BEL')"
+    },
+    {
+      "driver": "MSCM",
+      "name": "Michael Schumacher",
+      "fromLap": 25,
+      "toLap": 44,
+      "source": "https://en.wikipedia.org/wiki/1995_Belgian_Grand_Prix (lap-leader chart, Template:F1Laps1995 'BEL')"
+    }
+  ],
+  "notes": "Stops come from F1DB (Hill's five include the lap-33 stop-and-go for pit-lane speeding). Only safety car of the race per Motor Sport's lap-by-lap and Wikipedia. Weather: tyres for F1DB's stops in weather.tyreChanges (matched by in-lap). Hill's lap-33 stop is the stop-and-go (tyres not given); the other cars' stops have no sourced tyre and are estimated."
+}

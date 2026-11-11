@@ -1,0 +1,37 @@
+{
+ "race": "turkey-2020",
+ "how": "docs/eras-checks/2.4-estimates.md: check each period against a race report; set status to confirmed or rejected (edit startLap/endLap if they're off), then re-run `pipeline jolpica <race-id> --force`.",
+ "periods": [
+  {
+   "startLap": 2,
+   "endLap": 2,
+   "laps": 1,
+   "kind": "SC",
+   "confidence": "ambiguous",
+   "peakRatio": 1.123,
+   "gapBefore": 11.9,
+   "gapAfter": 16.7,
+   "reasons": [
+    "only 1.12x slower: rain, yellow flags or a short SC?",
+    "the field didn't bunch up (P1-P6 11.9s -> 16.7s): rain?",
+    "a single slow lap"
+   ],
+   "status": "unchecked"
+  },
+  {
+   "startLap": 13,
+   "endLap": 14,
+   "laps": 2,
+   "kind": "SC",
+   "confidence": "ambiguous",
+   "peakRatio": 1.168,
+   "gapBefore": 15.8,
+   "gapAfter": 18.3,
+   "reasons": [
+    "only 1.17x slower: rain, yellow flags or a short SC?",
+    "the field didn't bunch up (P1-P6 15.8s -> 18.3s): rain?"
+   ],
+   "status": "unchecked"
+  }
+ ]
+}

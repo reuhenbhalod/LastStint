@@ -1,6 +1,6 @@
 // The fuel load as the screens read it (fuel load spec).
 
-import { type RaceModel, initRun, stepLap } from '@boxthislap/sim';
+import { type RaceModel, initRun, stepLap } from '@laststint/sim';
 import { describe, expect, it } from 'vitest';
 import abuJson from '../../../../data/races/abu-dhabi-2021.json';
 import { fuelReading, liftText, marginText } from './fuel.js';

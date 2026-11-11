@@ -1,0 +1,163 @@
+{
+  "raceId": "mexico-1990",
+  "stops": [
+    {
+      "number": 28,
+      "name": "Gerhard Berger",
+      "lap": 13,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/august-1990/6/mexican-magic (Berger: 'I came in on lap 13'); https://www.grandprix.com/gpe/rr490.html ('pitted on lap 13'); Wikipedia https://en.wikipedia.org/wiki/1990_Mexican_Grand_Prix",
+      "note": "blistered left-front; rejoined 12th on Bs left / Cs right"
+    },
+    {
+      "number": 26,
+      "name": "Philippe Alliot",
+      "lap": 12,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/august-1990/6/mexican-magic",
+      "note": "'a quick stop for tyres on lap 12'"
+    },
+    {
+      "number": 20,
+      "name": "Nelson Piquet",
+      "lap": 44,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/august-1990/6/mexican-magic",
+      "note": "'Prost duplicated Mansell's move on lap 42. Two laps later Nelson dived into the pits' for a set of Cs (vibration)"
+    }
+  ],
+  "safetyCars": [],
+  "complete": {
+    "stops": false,
+    "safetyCars": true
+  },
+  "lapLeaders": [
+    {
+      "driver": "SENA",
+      "name": "Ayrton Senna",
+      "fromLap": 1,
+      "toLap": 60,
+      "source": "https://en.wikipedia.org/wiki/1990_Mexican_Grand_Prix (lap-leader chart, Template:F1Laps1990 'MEX')"
+    },
+    {
+      "driver": "PRO",
+      "name": "Alain Prost",
+      "fromLap": 61,
+      "toLap": 69,
+      "source": "https://en.wikipedia.org/wiki/1990_Mexican_Grand_Prix (lap-leader chart, Template:F1Laps1990 'MEX')"
+    }
+  ],
+  "runningOrder": [
+    {
+      "lap": 12,
+      "order": [
+        "SENA",
+        "BER"
+      ],
+      "source": "https://en.wikipedia.org/wiki/1990_Mexican_Grand_Prix: 'Senna and Berger both passed Patrese on lap 2, and the McLaren drivers opened a significant lead over the rest of the field ... Berger's run in second place came to an early end when he had to stop for new tyres on lap 13'"
+    },
+    {
+      "lap": 20,
+      "order": [
+        "SENA",
+        "PIQN"
+      ],
+      "gaps": {
+        "PIQN": 15.0
+      },
+      "gapTolerance": 1.5,
+      "source": "https://www.motorsportmagazine.com/archive/article/august-1990/6/mexican-magic: 'By lap 20 he was 15s ahead of Piquet, who was going like a train in the Benetton'"
+    },
+    {
+      "lap": 14,
+      "order": [
+        "SENA",
+        "PIQN"
+      ],
+      "source": "https://en.wikipedia.org/wiki/1990_Mexican_Grand_Prix: 'Berger's run in second place came to an early end when he had to stop for new tyres on lap 13, leaving Piquet in second'"
+    },
+    {
+      "lap": 30,
+      "order": [
+        "SENA",
+        "PIQN"
+      ],
+      "source": "https://www.motorsportmagazine.com/archive/article/august-1990/6/mexican-magic: 'By the 30 lap mark Piquet's tenancy of second place, keeping Senna honest, was coming under closer scrutiny from Mansell and Prost'"
+    },
+    {
+      "lap": 35,
+      "order": [
+        "SENA",
+        "PIQN",
+        "MAN",
+        "PRO"
+      ],
+      "source": "https://www.motorsportmagazine.com/archive/article/august-1990/6/mexican-magic: '... from Mansell and Prost, who five laps later had worked into third and fourth places.'"
+    },
+    {
+      "lap": 36,
+      "order": [
+        "SENA",
+        "PIQN",
+        "MAN",
+        "PRO"
+      ],
+      "source": "https://www.motorsportmagazine.com/archive/article/august-1990/6/mexican-magic: 'On lap 36 Nigel had a look inside Nelson going into turn one, and made it next time round after a neat slingshot.'",
+      "note": "Wikipedia has Mansell passing Piquet 'soon afterwards' (after Berger's lap-13 stop); Motor Sport's lap-by-lap account (lap 37) is used"
+    },
+    {
+      "lap": 37,
+      "order": [
+        "SENA",
+        "MAN",
+        "PIQN",
+        "PRO"
+      ],
+      "source": "https://www.motorsportmagazine.com/archive/article/august-1990/6/mexican-magic: 'On lap 36 Nigel had a look inside Nelson going into turn one, and made it next time round after a neat slingshot.'"
+    },
+    {
+      "lap": 42,
+      "order": [
+        "SENA",
+        "MAN",
+        "PRO",
+        "PIQN"
+      ],
+      "source": "https://www.motorsportmagazine.com/archive/article/august-1990/6/mexican-magic: 'Prost duplicated Mansell's move on lap 42. Two laps later Nelson dived into the pits'"
+    },
+    {
+      "lap": 48,
+      "order": [
+        "SENA",
+        "MAN"
+      ],
+      "gaps": {
+        "MAN": 12.2
+      },
+      "gapTolerance": 1.0,
+      "source": "https://www.motorsportmagazine.com/archive/article/august-1990/6/mexican-magic: 'by lap 48 the gap between the McLaren and the lead Ferrari was 12.2 seconds'",
+      "note": "the lead Ferrari at lap 48 is Mansell: Prost took second from him with 15 laps to go (Wikipedia) / on lap 55 (MS)"
+    },
+    {
+      "lap": 55,
+      "order": [
+        "SENA",
+        "PRO",
+        "MAN"
+      ],
+      "source": "https://www.motorsportmagazine.com/archive/article/august-1990/6/mexican-magic: 'Ferrari number one slithered into second place' (lap 55); https://en.wikipedia.org/wiki/1990_Mexican_Grand_Prix: 'eventually taking second from Mansell with 15 laps to go'"
+    },
+    {
+      "lap": 62,
+      "order": [
+        "PRO"
+      ],
+      "gaps": {
+        "SENA": 8.0
+      },
+      "gapTolerance": 1.5,
+      "source": "https://www.motorsportmagazine.com/archive/article/august-1990/6/mexican-magic: 'by lap 62 Senna was eight seconds away from the lead'"
+    }
+  ],
+  "notes": "Senna (#27) gambled on no stop and retired with a right-rear tyre failure (Wikipedia: three laps after Prost passed him on lap 60; GrandPrix.com: lap 63; Jolpica: 63 laps). Prost (#1) and Mansell (#2): no stop reported in Motor Sport, GrandPrix.com or Wikipedia, but none states they ran non-stop. Larini (#25) 'had also stopped early for fresh rubber' (no lap)."
+}

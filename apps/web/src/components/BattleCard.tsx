@@ -2,9 +2,12 @@
 // (hold vs he gets by, or pass vs stay behind, round 3 R2), a bar for your car closing on the
 // braking zone (the race stops there and waits for your call), and the moves as numbered
 // buttons in the colours of their lines on the map, each tagged Safer, Balanced or Risky (not
-// its odds). Then the call, and the result at the corner. Number keys answer.
+// its odds). Then the call, and the result at the corner. Number keys answer. In Eras (`eras`,
+// eras spec §7) the wait at the braking zone runs on the era's decision timer, shown in place
+// of the short bar; the race screen makes the driver's own move when it runs out. Without it,
+// exactly as before.
 
-import { useEffect, useState } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 import { named, surname } from '../data/names.js';
 import type { BattleTag, QuickCall } from '../game/quickCalls.js';
 import { type LapClock, clockProgress } from '../game/useGame.js';
@@ -57,6 +60,7 @@ export function BattleCard({
   chosen,
   result,
   onAnswer,
+  eras,
 }: {
   call: QuickCall;
   corner: number;
@@ -73,6 +77,9 @@ export function BattleCard({
   chosen: string | null;
   result: { text: string; good: boolean } | null;
   onAnswer: (optionId: string) => void;
+  /** An Eras race: the era's decision timer for the wait at the braking zone (null with the
+   * timer turned off: the race waits for the call). `waitMs` then isn't shown. */
+  eras?: { timer: ReactNode };
 }) {
   // The bar to the braking zone, from the lap clock.
   const [closing, setClosing] = useState(0);
@@ -137,7 +144,9 @@ export function BattleCard({
       {/* How the fight stands with no special move (round 3 R2): the moves only say how risky. */}
       {call.meter !== undefined && !result && <FightMeter call={call} />}
       {/* The approach: your car closing on the braking zone; then the wait for your call. */}
-      {!chosen && (
+      {!chosen && eras && stage === 'waiting' ? (
+        eras.timer
+      ) : !chosen ? (
         <div className="h-1 overflow-hidden bg-[#252D31]">
           {stage === 'waiting' ? (
             <div
@@ -155,7 +164,7 @@ export function BattleCard({
             />
           )}
         </div>
-      )}
+      ) : null}
       {result ? (
         <output
           className="rounded-lg px-3 py-2 text-center text-[18px] font-extrabold uppercase tracking-wide"

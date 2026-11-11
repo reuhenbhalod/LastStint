@@ -55,6 +55,15 @@ def test_events_from_takeover_onward(model: dict):
     assert any(e["type"] == "VSC" for e in model["events"])
 
 
+def test_an_sc_running_at_the_takeover_is_kept_from_it():
+    # Abu Dhabi 2012: the D3 rule takes over on lap 10, inside the lap 9-14 SC.
+    sc, _ = build.build_race_model("abu-dhabi-2012")
+    assert sc["race"]["takeoverLap"] == 10
+    first = sc["events"][0]
+    assert first == {"lap": 10, "type": "SC", "laps": 5}
+    export.validate_model(sc)
+
+
 def test_compounds_valid(model: dict):
     for vals in model["compounds"].values():
         assert isinstance(vals["cliffLap"], int) and vals["cliffLap"] >= 1
@@ -86,8 +95,9 @@ def test_resolved_meta_fills_an_automatic_duel(monkeypatch):
 
 
 def test_every_race_has_a_split():
-    # "wet": the weather spec's mixed-weather races (validated on their own).
-    assert {m["split"] for m in build.RACES.values()} == {"tune", "holdout", "wet"}
+    # "wet": the weather spec's mixed-weather races (validated on their own). "eras": Eras
+    # races (build plan 3.1), validated on their own too, never used to choose a model change.
+    assert {m["split"] for m in build.RACES.values()} == {"tune", "holdout", "wet", "eras"}
 
 
 def test_a_thinly_run_compound_takes_its_life_from_the_well_run_ones():

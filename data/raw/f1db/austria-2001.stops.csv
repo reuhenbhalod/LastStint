@@ -1,0 +1,13 @@
+race_id,driver,driver_id,number,stop,lap,lane_time
+austria-2001,VER,jos-verstappen,14,1,23,32.302
+austria-2001,DLR,pedro-de-la-rosa,19,1,36,35.049
+austria-2001,BUT,jenson-button,8,1,39,34.762
+austria-2001,ALE,jean-alesi,22,1,43,33.548
+austria-2001,BUR,luciano-burti,23,1,44,33.429
+austria-2001,PAN,olivier-panis,9,1,44,33.714
+austria-2001,VER,jos-verstappen,14,2,45,32.874
+austria-2001,MSC,michael-schumacher,1,1,46,31.684
+austria-2001,RAI,kimi-raikkonen,17,1,46,41.488
+austria-2001,BAR,rubens-barrichello,2,1,47,32.136
+austria-2001,IRV,eddie-irvine,18,1,48,32.322
+austria-2001,COU,david-coulthard,4,1,50,30.786

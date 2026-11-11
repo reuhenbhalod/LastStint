@@ -1,7 +1,7 @@
 // A stop, called out in the strip over the map while the car drives the pit lane, on one line:
 // who, onto what, what it cost, places lost, and the other car in the fight's tyres.
 
-import type { RaceState } from '@boxthislap/sim';
+import type { RaceState } from '@laststint/sim';
 import { surname } from '../data/names.js';
 import { tyreName } from '../game/choices.js';
 import type { PitEvent } from '../game/raceLog.js';

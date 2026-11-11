@@ -1,6 +1,6 @@
 # Phase 3 Spec: Game Frontend (React + Vite)
 
-Status: draft · Owner: @Reuhen · Branch: `UI` · Depends on: Phase 2 (`@boxthislap/sim`, done)
+Status: draft · Owner: @Reuhen · Branch: `UI` · Depends on: Phase 2 (`@laststint/sim`, done)
 
 ## Purpose
 
@@ -33,7 +33,7 @@ Most players arrive from a shared link on a phone, so **design for a 390px scree
 
 ### What the UI consumes
 
-- **`@boxthislap/sim`** (workspace package) — the only source of race behaviour:
+- **`@laststint/sim`** (workspace package) — the only source of race behaviour:
   `initRun`, `stepLap`, `decide`, `isFinished`, `classify`, `forkRun`, `realDecisions`,
   `validateDecisions`, `DEFAULT_MODES`; the moment layer `candidateMoments`, `proposeMoments`,
   `pauseAt`, `verdictFor`; and the grader `gradeMoment`/`bandFor` with `Target`, `GradeOption`,
@@ -67,7 +67,7 @@ flow driven by the state machine).
    seed, model }`. `StaticDailyProvider` bundles the model (via the `@data` alias to the
    shared `data/` dir); `ApiDailyProvider` hits `/api/daily` later. The UI depends only on
    the interface. Moments are derived from the model by the sim, not carried here.
-2. **Engine layer** (`src/engine/`) — thin wrappers over `@boxthislap/sim`: own the `Run`,
+2. **Engine layer** (`src/engine/`) — thin wrappers over `@laststint/sim`: own the `Run`,
    expose `step()`, `apply(decision)`, `result()`, and post grading jobs to the worker.
 3. **Grader worker** (`src/engine/grader.worker.ts`) — receives `(model, seed, decisions,
    options, target)`, rebuilds the run, calls `gradeMoment`, posts back `MomentGrade`.
@@ -208,7 +208,7 @@ is a reasonable alternative if the chart grows; not needed at launch.
 | Components | Render tests for TimingTower/GradeChip from fixture state |
 | E2E | One Playwright playthrough: start → make calls → results → share |
 
-CI runs `pnpm typecheck` + `pnpm test`; the web build (`pnpm --filter @boxthislap/web build`)
+CI runs `pnpm typecheck` + `pnpm test`; the web build (`pnpm --filter @laststint/web build`)
 must pass. Grading uses the bundled fixture (no network).
 
 ## Open decisions

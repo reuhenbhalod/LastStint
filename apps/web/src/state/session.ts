@@ -12,19 +12,31 @@ import {
   type RaceNote,
   type RacePlan,
   type RaceState,
+  type RivalChoice,
+  type RivalOptionId,
+  type RunOptions,
+  autoAnswered,
   autoStay,
   boxingAt,
   engineerConfig,
+  erasRace,
   moodOf,
   planCalls,
   scoreRun,
   validatePlan,
-} from '@boxthislap/sim';
+} from '@laststint/sim';
 import type { RunResponse, RunSubmission } from '../data/api.js';
 import { ignoreRate } from '../data/drivers.js';
 import type { Daily } from '../data/types.js';
 import { GameEngine, decisionMoments } from '../engine/engine.js';
-import { type GradedMoment, type Grader, gradedFromHits, inlineGrader } from '../engine/grading.js';
+import {
+  type GradedMoment,
+  type Grader,
+  gradeRival,
+  gradedFromHits,
+  inlineGrader,
+} from '../engine/grading.js';
+import { callBlocked, moveAllowed, pitCompoundFor, raceScreenEra } from '../eras/raceRules.js';
 import { tyreName } from '../game/choices.js';
 import { ownMove } from '../game/engineerCalls.js';
 import { engineerRadio } from '../game/engineerRadio.js';
@@ -49,6 +61,7 @@ import {
   type PlanState,
   type Speed,
   type Submission,
+  initialSubmission,
   reducer,
 } from './machine.js';
 
@@ -66,6 +79,39 @@ export interface PersistedRun {
   plan?: PlanState;
   /** Laps of the pit calls the plan made (other stops change the plan). */
   planned?: number[];
+  /** An Expert rival's choices so far (eras spec §7), replayed as claims on a resume. */
+  rivalChoices?: RivalChoice[];
+}
+
+/**
+ * The sim options of a daily's live run, without the calls: the Eras attempt's rival policy and
+ * Legend (as the server replays it). An Expert rival is graded by the background workers, so
+ * its decisions wait for them ('deferred') instead of grading on the UI thread.
+ */
+export function liveOptions(daily: Daily): Omit<RunOptions, 'decisions'> {
+  const rules = daily.run;
+  if (!rules) return {};
+  return {
+    ...(rules.rivalPolicy && rules.rivalPolicy !== 'standard'
+      ? { rivalPolicy: rules.rivalPolicy }
+      : {}),
+    ...(rules.legend ? { legend: true } : {}),
+    ...(rules.rivalPolicy === 'expert' ? { rivalGrading: 'deferred' as const } : {}),
+  };
+}
+
+/** The decision moments a daily's run asks: Legend's own from its seed, else the race's. */
+export function momentsOf(daily: Daily): DecisionMoment[] {
+  return decisionMoments(daily.model, daily.run?.legend ? { seed: daily.seed } : null);
+}
+
+/** A live engine for the daily's run, with these calls (and an Expert rival's choices). */
+function engineFor(daily: Daily, decisions: Decision[], rivalChoices?: RivalChoice[]): GameEngine {
+  return new GameEngine(daily.model, daily.seed, {
+    ...liveOptions(daily),
+    decisions,
+    ...(rivalChoices?.length ? { rivalChoices } : {}),
+  });
 }
 
 /** Playouts per plan for the re-rank each lap (the takeover grade uses GRADE_SAMPLES). */
@@ -101,6 +147,7 @@ const ORDER_COPY: Record<Extract<Decision, { kind: 'teamOrder' }>['order'], stri
   release: 'Team-mate released: race your own race.',
   teammateLetsYouPast: 'Team-mate told to let you through.',
   letTeammatePast: 'Let your team-mate through, please.',
+  comply: 'Let him through, please.',
 };
 
 export class GameSession {
@@ -112,6 +159,10 @@ export class GameSession {
   private readonly planned = new Set<number>();
   /** Stops off the plan already taken into account. */
   private readonly offPlan = new Set<number>();
+  /** An Expert rival's decision being graded by the workers (the race waits for it). */
+  private rivalGrading: Promise<void> | null = null;
+  /** A lap tick arrived while the rival's decision was being graded: run it once it's in. */
+  private tickWaiting = false;
   state: GameState;
   /** Called after a change that happens outside a method call (a grade arriving). */
   onChange: () => void = () => {};
@@ -122,18 +173,18 @@ export class GameSession {
   ) {
     this.daily = daily;
     this.grader = options.grader ?? inlineGrader;
-    this.engine = options.engine ?? new GameEngine(daily.model, daily.seed, { decisions: [] });
+    this.engine = options.engine ?? engineFor(daily, []);
     this.state = options.state ?? {
       phase: 'intro',
       speed: 1,
       race: this.engine.state,
-      moments: decisionMoments(daily.model),
+      moments: momentsOf(daily),
       currentMoment: null,
       resolved: [],
       decisions: this.engine.decisions,
       result: null,
       grades: {},
-      submission: { status: daily.source === 'live' ? 'none' : 'practice' },
+      submission: initialSubmission(daily.source),
       meta: metaOf(daily),
       radio: [],
       plan: NO_PLAN,
@@ -171,7 +222,7 @@ export class GameSession {
           from: 'Engineer',
           text: boxingAt(moment, this.engine.decisions)
             ? 'We’re boxing already. No change to the plan.'
-            : moment.trigger === 'cliff'
+            : moment.trigger === 'cliff' && !erasRace(this.daily.model)
               ? 'Tyres are still good. Staying out.'
               : 'We’ve just stopped. Staying out.',
           refused: false,
@@ -206,6 +257,52 @@ export class GameSession {
     return this.state.grades;
   }
 
+  /**
+   * An Expert rival's decision is waiting (eras spec §7): grade it in the background workers
+   * and take the best option; the race holds until then. A worker that fails is retried on this
+   * thread; if that fails too, the rival takes Smart's move (always a legal option, so the
+   * attempt still verifies; the nightly re-grade judges it), and the failure is logged.
+   */
+  private gradeRivalDecision(): void {
+    if (!this.engine.rivalPending || this.rivalGrading) return;
+    const job = this.engine.rivalJob();
+    const lap = job.pausedAtLap;
+    const resolve = (option: RivalOptionId, probabilities?: Record<string, number>) => {
+      if (this.engine.rivalPending && this.engine.lap === lap)
+        this.engine.resolveRival(option, probabilities);
+    };
+    this.rivalGrading = gradeRival(this.grader, job)
+      .catch((e) => {
+        console.error('rival grading worker failed, grading here', e);
+        return gradeRival(inlineGrader, job);
+      })
+      .then(
+        (grade) => resolve(grade.best as RivalOptionId, grade.probabilities),
+        (e) => {
+          console.error('rival grading failed: the rival takes Smart’s move', e);
+          resolve('smart');
+        },
+      )
+      .finally(() => {
+        this.rivalGrading = null;
+        if (this.tickWaiting) {
+          this.tickWaiting = false;
+          this.tick();
+        }
+        this.onChange();
+      });
+  }
+
+  /** The rival's decision being graded, if one is (tests and the submit wait on it). */
+  async rivalGraded(): Promise<void> {
+    await this.rivalGrading;
+  }
+
+  /** An Expert rival's choices so far, as an Eras attempt submits them (eras spec §7). */
+  rivalChoices(): RivalChoice[] {
+    return this.engine.rivalChoices();
+  }
+
   /** Off the daily card: the engineer brings the plans (the race waits for a pick). */
   start(): void {
     this.dispatch({ type: 'START' });
@@ -224,7 +321,7 @@ export class GameSession {
     if (!plans.length) return;
     const key = `plan:${plans.map((p) => `${p.id}${JSON.stringify(p.stops)}${p.pace}`).join('|')}`;
     if (this.grading.has(key)) return;
-    const takeover = new GameEngine(this.daily.model, this.daily.seed, { decisions: [] });
+    const takeover = engineFor(this.daily, []);
     const job = takeover.planJob(plans);
     const samples = job.samples ?? GRADE_SAMPLES;
     const done = this.grader.hits(job).then((hits) => {
@@ -368,7 +465,14 @@ export class GameSession {
   /** Advance one lap (no-op unless racing), then settle the phase. */
   tick(): void {
     if (this.state.phase !== 'racing') return;
+    if (this.engine.rivalPending) {
+      // The rival's call after the last lap is still being graded: this lap runs once it's in.
+      this.tickWaiting = true;
+      this.gradeRivalDecision();
+      return;
+    }
     this.engine.step();
+    this.gradeRivalDecision();
     this.reportIncidents();
     this.reportNeutral();
     this.reportEngineer();
@@ -437,10 +541,12 @@ export class GameSession {
   previewLap(): { race: RaceState; notes: RaceNote[] } | null {
     if (this.engine.isFinished()) return null;
     const lap = this.engine.lap + 1;
-    const replay = new GameEngine(this.daily.model, this.daily.seed, {
-      decisions: this.engine.decisions,
-    });
-    while (replay.lap < lap && !replay.isFinished()) replay.step();
+    const replay = engineFor(this.daily, this.engine.decisions, this.engine.rivalChoices());
+    while (replay.lap < lap && !replay.isFinished()) {
+      // The rival's call still being graded: the preview shows Smart's move meanwhile.
+      if (replay.rivalPending) replay.resolveRival('smart');
+      replay.step();
+    }
     return { race: replay.state, notes: replay.notes.filter((n) => n.lap === lap) };
   }
 
@@ -456,6 +562,7 @@ export class GameSession {
       this.engine.state,
       engineerConfig(model),
       corner,
+      raceScreenEra(model).prompts === 'board',
     );
     // The same line from the same voice within a few laps is left out (a long battle).
     const recent = this.state.radio.filter((m) => m.lap >= lap - 3);
@@ -492,9 +599,23 @@ export class GameSession {
    * researched rate (game/refusal.ts, data/drivers.json): a refused call is not applied, so it
    * never reaches the call log. A call already booked for the coming lap is ignored. An answer
    * to a quick call (`asked`: the driver or engineer asked for the order) is always followed.
+   * The race's rules come first (eras build plan 8.5): a stop in a race without tyre changes
+   * keeps the dry set, and a move or mode the race doesn't have is not made (the wall is told),
+   * so no call reaches the sim that it would reject.
    */
-  call(decision: Decision, options: { asked?: boolean; quiet?: boolean } = {}): void {
+  call(input: Decision, options: { asked?: boolean; quiet?: boolean } = {}): void {
     if (this.state.phase !== 'racing') return;
+    const model = this.daily.model;
+    const fits = input.kind === 'pit' ? pitCompoundFor(model, input.compound) : null;
+    const decision: Decision =
+      input.kind === 'pit' && fits !== input.compound
+        ? { ...input, compound: fits as string }
+        : input;
+    const blocked = callBlocked(model, decision);
+    if (blocked) {
+      this.say('Engineer', `We can’t make that call: ${blocked}.`, false, decision.lap);
+      return;
+    }
     const side = this.state.meta.userSide;
     const car = this.engine.state.cars[side];
     if (decision.kind !== 'radio' && (!car || car.retired)) return;
@@ -541,6 +662,7 @@ export class GameSession {
           const own = ownMove(
             side,
             ['dive-inside', 'round-outside', 'wait-drs', 'overtake-button'].includes(decision.move),
+            moveAllowed(model, 'wait-drs'),
           );
           this.engine.apply({ lap: decision.lap, kind: 'battle', move: own, driver: true });
           this.dispatch({
@@ -617,7 +739,7 @@ export class GameSession {
         | undefined;
       if (!graded || !radio) return [];
       // The wall's own answers aren't scored (sim autoStay.ts).
-      const auto = autoStay(this.daily.model, m, this.engine.decisions) === radio.optionId;
+      const auto = autoAnswered(this.daily.model, m, this.engine.decisions, radio.optionId);
       return [{ grade: graded.grade, chosen: radio.optionId, auto }];
     });
     const plan = planGrade(this.state.plan, this.state.meta.takeoverLap);
@@ -641,6 +763,7 @@ export class GameSession {
       submission: this.state.submission,
       plan: { ...this.state.plan, live: null },
       planned: [...this.planned],
+      ...(this.engine.rivalChoices().length ? { rivalChoices: this.engine.rivalChoices() } : {}),
     };
   }
 
@@ -656,10 +779,14 @@ export class GameSession {
     ) {
       return null;
     }
-    const engine = new GameEngine(daily.model, daily.seed, { decisions: saved.decisions });
-    while (engine.lap < saved.lap && !engine.isFinished()) engine.step();
+    const engine = engineFor(daily, saved.decisions, saved.rivalChoices);
+    while (engine.lap < saved.lap && !engine.isFinished()) {
+      // A rival decision with no saved choice: the save can't be replayed as it was played.
+      if (engine.rivalPending) return null;
+      engine.step();
+    }
 
-    const moments = decisionMoments(daily.model);
+    const moments = momentsOf(daily);
     const finished = engine.isFinished();
     // A save made mid-submit resumes at the finish, to submit again.
     const phase = saved.phase === 'submitting' ? 'finished' : saved.phase;
@@ -676,7 +803,7 @@ export class GameSession {
       submission:
         saved.submission && saved.submission.status !== 'sending'
           ? saved.submission
-          : { status: daily.source === 'live' ? 'none' : 'practice' },
+          : initialSubmission(daily.source),
       meta: metaOf(daily),
       radio: [],
       plan: saved.plan ?? NO_PLAN,
@@ -695,14 +822,22 @@ export class GameSession {
       const reached = saved.resolved.includes(m.id) || state.currentMoment?.id === m.id;
       if (reached) session.startGrading(m, session.pausedAt(m, saved.decisions));
     }
+    // The rival's decision after the saved lap was still being graded: grade it again.
+    session.gradeRivalDecision();
     return session;
   }
 
   /** A replay paused before `moment`, holding only the calls made before that pause. */
   private pausedAt(moment: DecisionMoment, decisions: Decision[]): GameEngine {
-    const known = decisions.filter((d) => (d.at as number) < moment.lap - 1);
-    const engine = new GameEngine(this.daily.model, this.daily.seed, { decisions: known });
-    while (engine.lap < moment.lap - 1) engine.step();
+    const pause = moment.lap - 1;
+    const known = decisions.filter((d) => (d.at as number) < pause);
+    // The rival's choices made before the pause (one at the pause was still being graded).
+    const choices = this.engine.rivalChoices().filter((c) => c.lap < pause);
+    const engine = engineFor(this.daily, known, choices);
+    while (engine.lap < pause) {
+      if (engine.rivalPending) engine.resolveRival('smart');
+      engine.step();
+    }
     return engine;
   }
 }

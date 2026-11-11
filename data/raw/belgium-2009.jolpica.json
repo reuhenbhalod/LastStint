@@ -1,0 +1,1634 @@
+{
+ "source": "jolpica",
+ "licence": "CC BY-NC-SA 4.0 (Jolpica-F1)",
+ "dump": "2026-10-24T01:04:07.015299Z",
+ "year": 2009,
+ "round": 12,
+ "scheduledLaps": 44,
+ "stops": "f1db",
+ "missing": {
+  "Compound": "not in Jolpica (estimated in step 2.4)",
+  "TrackStatus": "not in Jolpica (SC laps estimated in step 2.4); status JSON is []",
+  "TyreLife": "laps since the last stop (age of the set when fitted is unknown)",
+  "PitInTime": "the in-lap's end (the lane entry isn't timed)",
+  "PitOutTime": "PitInTime + the stop's pit-lane time"
+ },
+ "timingGaps": [],
+ "driversFromJolpica": [],
+ "driversWithoutCode": [],
+ "results": [
+  {
+   "driver": "RAI",
+   "name": "Kimi R\u00e4ikk\u00f6nen",
+   "team": "Ferrari",
+   "number": 4,
+   "grid": 6,
+   "position": 1,
+   "classified": true,
+   "status": "finished",
+   "detail": "Finished",
+   "laps": 44,
+   "time": 5030.995,
+   "points": 10.0
+  },
+  {
+   "driver": "FIS",
+   "name": "Giancarlo Fisichella",
+   "team": "Force India",
+   "number": 21,
+   "grid": 1,
+   "position": 2,
+   "classified": true,
+   "status": "finished",
+   "detail": "Finished",
+   "laps": 44,
+   "time": 5031.934,
+   "points": 8.0
+  },
+  {
+   "driver": "VET",
+   "name": "Sebastian Vettel",
+   "team": "Red Bull",
+   "number": 15,
+   "grid": 8,
+   "position": 3,
+   "classified": true,
+   "status": "finished",
+   "detail": "Finished",
+   "laps": 44,
+   "time": 5034.87,
+   "points": 6.0
+  },
+  {
+   "driver": "KUB",
+   "name": "Robert Kubica",
+   "team": "BMW Sauber",
+   "number": 5,
+   "grid": 5,
+   "position": 4,
+   "classified": true,
+   "status": "finished",
+   "detail": "Finished",
+   "laps": 44,
+   "time": 5040.961,
+   "points": 5.0
+  },
+  {
+   "driver": "HEI",
+   "name": "Nick Heidfeld",
+   "team": "BMW Sauber",
+   "number": 6,
+   "grid": 3,
+   "position": 5,
+   "classified": true,
+   "status": "finished",
+   "detail": "Finished",
+   "laps": 44,
+   "time": 5042.271,
+   "points": 4.0
+  },
+  {
+   "driver": "KOV",
+   "name": "Heikki Kovalainen",
+   "team": "McLaren",
+   "number": 2,
+   "grid": 15,
+   "position": 6,
+   "classified": true,
+   "status": "finished",
+   "detail": "Finished",
+   "laps": 44,
+   "time": 5063.758,
+   "points": 3.0
+  },
+  {
+   "driver": "BAR",
+   "name": "Rubens Barrichello",
+   "team": "Brawn",
+   "number": 23,
+   "grid": 4,
+   "position": 7,
+   "classified": true,
+   "status": "finished",
+   "detail": "Finished",
+   "laps": 44,
+   "time": 5066.456,
+   "points": 2.0
+  },
+  {
+   "driver": "ROS",
+   "name": "Nico Rosberg",
+   "team": "Williams",
+   "number": 16,
+   "grid": 10,
+   "position": 8,
+   "classified": true,
+   "status": "finished",
+   "detail": "Finished",
+   "laps": 44,
+   "time": 5067.203,
+   "points": 1.0
+  },
+  {
+   "driver": "WEB",
+   "name": "Mark Webber",
+   "team": "Red Bull",
+   "number": 14,
+   "grid": 9,
+   "position": 9,
+   "classified": true,
+   "status": "finished",
+   "detail": "Finished",
+   "laps": 44,
+   "time": 5067.954,
+   "points": 0.0
+  },
+  {
+   "driver": "GLO",
+   "name": "Timo Glock",
+   "team": "Toyota",
+   "number": 10,
+   "grid": 7,
+   "position": 10,
+   "classified": true,
+   "status": "finished",
+   "detail": "Finished",
+   "laps": 44,
+   "time": 5072.485,
+   "points": 0.0
+  },
+  {
+   "driver": "SUT",
+   "name": "Adrian Sutil",
+   "team": "Force India",
+   "number": 20,
+   "grid": 11,
+   "position": 11,
+   "classified": true,
+   "status": "finished",
+   "detail": "Finished",
+   "laps": 44,
+   "time": 5073.631,
+   "points": 0.0
+  },
+  {
+   "driver": "BUE",
+   "name": "S\u00e9bastien Buemi",
+   "team": "Toro Rosso",
+   "number": 12,
+   "grid": 16,
+   "position": 12,
+   "classified": true,
+   "status": "finished",
+   "detail": "Finished",
+   "laps": 44,
+   "time": 5077.101,
+   "points": 0.0
+  },
+  {
+   "driver": "NAK",
+   "name": "Kazuki Nakajima",
+   "team": "Williams",
+   "number": 17,
+   "grid": 18,
+   "position": 13,
+   "classified": true,
+   "status": "finished",
+   "detail": "Finished",
+   "laps": 44,
+   "time": 5085.236,
+   "points": 0.0
+  },
+  {
+   "driver": "BAD",
+   "name": "Luca Badoer",
+   "team": "Ferrari",
+   "number": 3,
+   "grid": 20,
+   "position": 14,
+   "classified": true,
+   "status": "finished",
+   "detail": "Finished",
+   "laps": 44,
+   "time": 5133.172,
+   "points": 0.0
+  },
+  {
+   "driver": "ALO",
+   "name": "Fernando Alonso",
+   "team": "Renault",
+   "number": 7,
+   "grid": 13,
+   "position": 15,
+   "classified": false,
+   "status": "retired",
+   "detail": "Retired",
+   "laps": 26,
+   "time": null,
+   "points": 0.0
+  },
+  {
+   "driver": "TRU",
+   "name": "Jarno Trulli",
+   "team": "Toyota",
+   "number": 9,
+   "grid": 2,
+   "position": 16,
+   "classified": false,
+   "status": "retired",
+   "detail": "Brakes",
+   "laps": 21,
+   "time": null,
+   "points": 0.0
+  },
+  {
+   "driver": "BUT",
+   "name": "Jenson Button",
+   "team": "Brawn",
+   "number": 22,
+   "grid": 14,
+   "position": 17,
+   "classified": false,
+   "status": "accident",
+   "detail": "Collision",
+   "laps": 0,
+   "time": null,
+   "points": 0.0
+  },
+  {
+   "driver": "GRO",
+   "name": "Romain Grosjean",
+   "team": "Renault",
+   "number": 8,
+   "grid": 19,
+   "position": 18,
+   "classified": false,
+   "status": "accident",
+   "detail": "Collision",
+   "laps": 0,
+   "time": null,
+   "points": 0.0
+  },
+  {
+   "driver": "HAM",
+   "name": "Lewis Hamilton",
+   "team": "McLaren",
+   "number": 1,
+   "grid": 12,
+   "position": 19,
+   "classified": false,
+   "status": "accident",
+   "detail": "Collision",
+   "laps": 0,
+   "time": null,
+   "points": 0.0
+  },
+  {
+   "driver": "ALG",
+   "name": "Jaime Alguersuari",
+   "team": "Toro Rosso",
+   "number": 11,
+   "grid": 17,
+   "position": 20,
+   "classified": false,
+   "status": "accident",
+   "detail": "Collision",
+   "laps": 0,
+   "time": null,
+   "points": 0.0
+  }
+ ],
+ "retirements": [
+  {
+   "driver": "ALO",
+   "laps": 26,
+   "status": "retired",
+   "detail": "Retired"
+  },
+  {
+   "driver": "TRU",
+   "laps": 21,
+   "status": "retired",
+   "detail": "Brakes"
+  },
+  {
+   "driver": "BUT",
+   "laps": 0,
+   "status": "accident",
+   "detail": "Collision"
+  },
+  {
+   "driver": "GRO",
+   "laps": 0,
+   "status": "accident",
+   "detail": "Collision"
+  },
+  {
+   "driver": "HAM",
+   "laps": 0,
+   "status": "accident",
+   "detail": "Collision"
+  },
+  {
+   "driver": "ALG",
+   "laps": 0,
+   "status": "accident",
+   "detail": "Collision"
+  }
+ ],
+ "standings": {
+  "drivers": [
+   {
+    "position": 1,
+    "driver": "BUT",
+    "name": "Jenson Button",
+    "points": 72.0,
+    "wins": 6
+   },
+   {
+    "position": 2,
+    "driver": "BAR",
+    "name": "Rubens Barrichello",
+    "points": 56.0,
+    "wins": 1
+   },
+   {
+    "position": 3,
+    "driver": "VET",
+    "name": "Sebastian Vettel",
+    "points": 53.0,
+    "wins": 2
+   },
+   {
+    "position": 4,
+    "driver": "WEB",
+    "name": "Mark Webber",
+    "points": 51.5,
+    "wins": 1
+   },
+   {
+    "position": 5,
+    "driver": "RAI",
+    "name": "Kimi R\u00e4ikk\u00f6nen",
+    "points": 34.0,
+    "wins": 1
+   },
+   {
+    "position": 6,
+    "driver": "ROS",
+    "name": "Nico Rosberg",
+    "points": 30.5,
+    "wins": 0
+   },
+   {
+    "position": 7,
+    "driver": "HAM",
+    "name": "Lewis Hamilton",
+    "points": 27.0,
+    "wins": 1
+   },
+   {
+    "position": 8,
+    "driver": "TRU",
+    "name": "Jarno Trulli",
+    "points": 22.5,
+    "wins": 0
+   },
+   {
+    "position": 9,
+    "driver": null,
+    "name": "Felipe Massa",
+    "points": 22.0,
+    "wins": 0
+   },
+   {
+    "position": 10,
+    "driver": "KOV",
+    "name": "Heikki Kovalainen",
+    "points": 17.0,
+    "wins": 0
+   },
+   {
+    "position": 11,
+    "driver": "GLO",
+    "name": "Timo Glock",
+    "points": 16.0,
+    "wins": 0
+   },
+   {
+    "position": 12,
+    "driver": "ALO",
+    "name": "Fernando Alonso",
+    "points": 16.0,
+    "wins": 0
+   },
+   {
+    "position": 13,
+    "driver": "HEI",
+    "name": "Nick Heidfeld",
+    "points": 10.0,
+    "wins": 0
+   },
+   {
+    "position": 14,
+    "driver": "FIS",
+    "name": "Giancarlo Fisichella",
+    "points": 8.0,
+    "wins": 0
+   },
+   {
+    "position": 15,
+    "driver": "KUB",
+    "name": "Robert Kubica",
+    "points": 8.0,
+    "wins": 0
+   },
+   {
+    "position": 16,
+    "driver": "BUE",
+    "name": "S\u00e9bastien Buemi",
+    "points": 3.0,
+    "wins": 0
+   },
+   {
+    "position": 17,
+    "driver": null,
+    "name": "S\u00e9bastien Bourdais",
+    "points": 2.0,
+    "wins": 0
+   },
+   {
+    "position": 18,
+    "driver": "SUT",
+    "name": "Adrian Sutil",
+    "points": 0.0,
+    "wins": 0
+   },
+   {
+    "position": 19,
+    "driver": "NAK",
+    "name": "Kazuki Nakajima",
+    "points": 0.0,
+    "wins": 0
+   },
+   {
+    "position": 20,
+    "driver": null,
+    "name": "Nelson Piquet Jr.",
+    "points": 0.0,
+    "wins": 0
+   },
+   {
+    "position": 21,
+    "driver": "BAD",
+    "name": "Luca Badoer",
+    "points": 0.0,
+    "wins": 0
+   },
+   {
+    "position": 22,
+    "driver": "ALG",
+    "name": "Jaime Alguersuari",
+    "points": 0.0,
+    "wins": 0
+   },
+   {
+    "position": 23,
+    "driver": "GRO",
+    "name": "Romain Grosjean",
+    "points": 0.0,
+    "wins": 0
+   }
+  ],
+  "teams": [
+   {
+    "position": 1,
+    "team": "Brawn",
+    "points": 128.0,
+    "wins": 7
+   },
+   {
+    "position": 2,
+    "team": "Red Bull",
+    "points": 104.5,
+    "wins": 3
+   },
+   {
+    "position": 3,
+    "team": "Ferrari",
+    "points": 56.0,
+    "wins": 1
+   },
+   {
+    "position": 4,
+    "team": "McLaren",
+    "points": 44.0,
+    "wins": 1
+   },
+   {
+    "position": 5,
+    "team": "Toyota",
+    "points": 38.5,
+    "wins": 0
+   },
+   {
+    "position": 6,
+    "team": "Williams",
+    "points": 30.5,
+    "wins": 0
+   },
+   {
+    "position": 7,
+    "team": "BMW Sauber",
+    "points": 18.0,
+    "wins": 0
+   },
+   {
+    "position": 8,
+    "team": "Renault",
+    "points": 16.0,
+    "wins": 0
+   },
+   {
+    "position": 9,
+    "team": "Force India",
+    "points": 8.0,
+    "wins": 0
+   },
+   {
+    "position": 10,
+    "team": "Toro Rosso",
+    "points": 5.0,
+    "wins": 0
+   }
+  ]
+ },
+ "q3": [
+  {
+   "driver": "FIS",
+   "position": 1
+  },
+  {
+   "driver": "TRU",
+   "position": 2
+  },
+  {
+   "driver": "HEI",
+   "position": 3
+  },
+  {
+   "driver": "BAR",
+   "position": 4
+  },
+  {
+   "driver": "KUB",
+   "position": 5
+  },
+  {
+   "driver": "RAI",
+   "position": 6
+  },
+  {
+   "driver": "GLO",
+   "position": 7
+  },
+  {
+   "driver": "VET",
+   "position": 8
+  },
+  {
+   "driver": "WEB",
+   "position": 9
+  },
+  {
+   "driver": "ROS",
+   "position": 10
+  }
+ ],
+ "raceTimeCheck": [
+  {
+   "driver": "RAI",
+   "position": 1,
+   "official": 5030.995,
+   "summed": 5030.995,
+   "diff": -0.0
+  },
+  {
+   "driver": "FIS",
+   "position": 2,
+   "official": 5031.934,
+   "summed": 5031.934,
+   "diff": 0.0
+  },
+  {
+   "driver": "VET",
+   "position": 3,
+   "official": 5034.87,
+   "summed": 5034.87,
+   "diff": 0.0
+  },
+  {
+   "driver": "KUB",
+   "position": 4,
+   "official": 5040.961,
+   "summed": 5040.961,
+   "diff": -0.0
+  },
+  {
+   "driver": "HEI",
+   "position": 5,
+   "official": 5042.271,
+   "summed": 5042.271,
+   "diff": 0.0
+  },
+  {
+   "driver": "KOV",
+   "position": 6,
+   "official": 5063.758,
+   "summed": 5063.758,
+   "diff": -0.0
+  },
+  {
+   "driver": "BAR",
+   "position": 7,
+   "official": 5066.456,
+   "summed": 5066.456,
+   "diff": 0.0
+  },
+  {
+   "driver": "ROS",
+   "position": 8,
+   "official": 5067.203,
+   "summed": 5067.203,
+   "diff": 0.0
+  },
+  {
+   "driver": "WEB",
+   "position": 9,
+   "official": 5067.954,
+   "summed": 5067.954,
+   "diff": 0.0
+  },
+  {
+   "driver": "GLO",
+   "position": 10,
+   "official": 5072.485,
+   "summed": 5072.485,
+   "diff": 0.0
+  },
+  {
+   "driver": "SUT",
+   "position": 11,
+   "official": 5073.631,
+   "summed": 5073.631,
+   "diff": 0.0
+  },
+  {
+   "driver": "BUE",
+   "position": 12,
+   "official": 5077.101,
+   "summed": 5077.101,
+   "diff": 0.0
+  },
+  {
+   "driver": "NAK",
+   "position": 13,
+   "official": 5085.236,
+   "summed": 5085.236,
+   "diff": 0.0
+  },
+  {
+   "driver": "BAD",
+   "position": 14,
+   "official": 5133.172,
+   "summed": 5133.172,
+   "diff": -0.0
+  }
+ ],
+ "estimates": {
+  "era": "1994-2009",
+  "safetyCars": {
+   "method": "field-wide slow laps (>= 1.1x the green baseline); likely SC when >= 1.25x and the field bunches up, else ambiguous (applied as yellow)",
+   "periods": [
+    {
+     "startLap": 2,
+     "endLap": 4,
+     "laps": 3,
+     "kind": "SC",
+     "confidence": "likely",
+     "peakRatio": 1.584,
+     "gapBefore": 9.2,
+     "gapAfter": 3.5,
+     "reasons": [],
+     "status": "unchecked"
+    }
+   ],
+   "handCheck": "data/estimates/belgium-2009.sc.json"
+  },
+  "compounds": {
+   "method": "two compounds (SOFT option, HARD prime) from each stint's pace step and wear (tyre life), with the both-compounds rule",
+   "stints": [
+    {
+     "driver": "ALG",
+     "stint": 1,
+     "fromLap": 1,
+     "toLap": 1,
+     "compound": "HARD",
+     "by": "default",
+     "cleanLaps": 0,
+     "paceStep": null,
+     "softness": null
+    },
+    {
+     "driver": "ALO",
+     "stint": 1,
+     "fromLap": 1,
+     "toLap": 24,
+     "compound": "HARD",
+     "by": "pace",
+     "cleanLaps": 19,
+     "paceStep": -0.028,
+     "softness": -1.501
+    },
+    {
+     "driver": "ALO",
+     "stint": 2,
+     "fromLap": 25,
+     "toLap": 26,
+     "compound": "SOFT",
+     "by": "default",
+     "cleanLaps": 0,
+     "paceStep": null,
+     "softness": null
+    },
+    {
+     "driver": "BAD",
+     "stint": 1,
+     "fromLap": 1,
+     "toLap": 24,
+     "compound": "HARD",
+     "by": "pace",
+     "cleanLaps": 19,
+     "paceStep": -0.239,
+     "softness": -1.362
+    },
+    {
+     "driver": "BAD",
+     "stint": 2,
+     "fromLap": 25,
+     "toLap": 44,
+     "compound": "SOFT",
+     "by": "rule",
+     "cleanLaps": 19,
+     "paceStep": 0.297,
+     "softness": -0.89
+    },
+    {
+     "driver": "BAR",
+     "stint": 1,
+     "fromLap": 1,
+     "toLap": 1,
+     "compound": "SOFT",
+     "by": "default",
+     "cleanLaps": 0,
+     "paceStep": null,
+     "softness": null
+    },
+    {
+     "driver": "BAR",
+     "stint": 2,
+     "fromLap": 2,
+     "toLap": 27,
+     "compound": "HARD",
+     "by": "pace",
+     "cleanLaps": 22,
+     "paceStep": 0.026,
+     "softness": -1.948
+    },
+    {
+     "driver": "BAR",
+     "stint": 3,
+     "fromLap": 28,
+     "toLap": 44,
+     "compound": "HARD",
+     "by": "pace",
+     "cleanLaps": 16,
+     "paceStep": 0.185,
+     "softness": -0.198
+    },
+    {
+     "driver": "BUE",
+     "stint": 1,
+     "fromLap": 1,
+     "toLap": 21,
+     "compound": "HARD",
+     "by": "pace",
+     "cleanLaps": 16,
+     "paceStep": 0.306,
+     "softness": -1.101
+    },
+    {
+     "driver": "BUE",
+     "stint": 2,
+     "fromLap": 22,
+     "toLap": 30,
+     "compound": "SOFT",
+     "by": "pace",
+     "cleanLaps": 7,
+     "paceStep": 0.64,
+     "softness": 1.152
+    },
+    {
+     "driver": "BUE",
+     "stint": 3,
+     "fromLap": 31,
+     "toLap": 44,
+     "compound": "SOFT",
+     "by": "pace",
+     "cleanLaps": 13,
+     "paceStep": -0.179,
+     "softness": 0.659
+    },
+    {
+     "driver": "BUT",
+     "stint": 1,
+     "fromLap": 1,
+     "toLap": 1,
+     "compound": "HARD",
+     "by": "default",
+     "cleanLaps": 0,
+     "paceStep": null,
+     "softness": null
+    },
+    {
+     "driver": "FIS",
+     "stint": 1,
+     "fromLap": 1,
+     "toLap": 14,
+     "compound": "SOFT",
+     "by": "pace",
+     "cleanLaps": 9,
+     "paceStep": -0.789,
+     "softness": 1.059
+    },
+    {
+     "driver": "FIS",
+     "stint": 2,
+     "fromLap": 15,
+     "toLap": 31,
+     "compound": "HARD",
+     "by": "pace",
+     "cleanLaps": 15,
+     "paceStep": 0.054,
+     "softness": -0.112
+    },
+    {
+     "driver": "FIS",
+     "stint": 3,
+     "fromLap": 32,
+     "toLap": 44,
+     "compound": "SOFT",
+     "by": "pace",
+     "cleanLaps": 12,
+     "paceStep": 0.036,
+     "softness": 0.724
+    },
+    {
+     "driver": "GLO",
+     "stint": 1,
+     "fromLap": 1,
+     "toLap": 12,
+     "compound": "SOFT",
+     "by": "pace",
+     "cleanLaps": 7,
+     "paceStep": -0.901,
+     "softness": 1.544
+    },
+    {
+     "driver": "GLO",
+     "stint": 2,
+     "fromLap": 13,
+     "toLap": 32,
+     "compound": "HARD",
+     "by": "pace",
+     "cleanLaps": 18,
+     "paceStep": 0.325,
+     "softness": -0.908
+    },
+    {
+     "driver": "GLO",
+     "stint": 3,
+     "fromLap": 33,
+     "toLap": 44,
+     "compound": "SOFT",
+     "by": "pace",
+     "cleanLaps": 11,
+     "paceStep": 0.211,
+     "softness": 0.815
+    },
+    {
+     "driver": "GRO",
+     "stint": 1,
+     "fromLap": 1,
+     "toLap": 1,
+     "compound": "HARD",
+     "by": "default",
+     "cleanLaps": 0,
+     "paceStep": null,
+     "softness": null
+    },
+    {
+     "driver": "HAM",
+     "stint": 1,
+     "fromLap": 1,
+     "toLap": 1,
+     "compound": "HARD",
+     "by": "default",
+     "cleanLaps": 0,
+     "paceStep": null,
+     "softness": null
+    },
+    {
+     "driver": "HEI",
+     "stint": 1,
+     "fromLap": 1,
+     "toLap": 14,
+     "compound": "SOFT",
+     "by": "pace",
+     "cleanLaps": 9,
+     "paceStep": -0.209,
+     "softness": 0.679
+    },
+    {
+     "driver": "HEI",
+     "stint": 2,
+     "fromLap": 15,
+     "toLap": 32,
+     "compound": "HARD",
+     "by": "pace",
+     "cleanLaps": 16,
+     "paceStep": 0.156,
+     "softness": -0.385
+    },
+    {
+     "driver": "HEI",
+     "stint": 3,
+     "fromLap": 33,
+     "toLap": 44,
+     "compound": "SOFT",
+     "by": "pace",
+     "cleanLaps": 11,
+     "paceStep": -0.062,
+     "softness": 0.994
+    },
+    {
+     "driver": "KOV",
+     "stint": 1,
+     "fromLap": 1,
+     "toLap": 26,
+     "compound": "HARD",
+     "by": "pace",
+     "cleanLaps": 21,
+     "paceStep": -0.098,
+     "softness": -1.866
+    },
+    {
+     "driver": "KOV",
+     "stint": 2,
+     "fromLap": 27,
+     "toLap": 44,
+     "compound": "SOFT",
+     "by": "rule",
+     "cleanLaps": 17,
+     "paceStep": 0.234,
+     "softness": -0.436
+    },
+    {
+     "driver": "KUB",
+     "stint": 1,
+     "fromLap": 1,
+     "toLap": 12,
+     "compound": "SOFT",
+     "by": "pace",
+     "cleanLaps": 7,
+     "paceStep": -0.738,
+     "softness": 1.438
+    },
+    {
+     "driver": "KUB",
+     "stint": 2,
+     "fromLap": 13,
+     "toLap": 30,
+     "compound": "HARD",
+     "by": "pace",
+     "cleanLaps": 16,
+     "paceStep": 0.125,
+     "softness": -0.365
+    },
+    {
+     "driver": "KUB",
+     "stint": 3,
+     "fromLap": 31,
+     "toLap": 44,
+     "compound": "SOFT",
+     "by": "pace",
+     "cleanLaps": 13,
+     "paceStep": 0.185,
+     "softness": 0.42
+    },
+    {
+     "driver": "NAK",
+     "stint": 1,
+     "fromLap": 1,
+     "toLap": 28,
+     "compound": "HARD",
+     "by": "pace",
+     "cleanLaps": 23,
+     "paceStep": 0.4,
+     "softness": -2.605
+    },
+    {
+     "driver": "NAK",
+     "stint": 2,
+     "fromLap": 29,
+     "toLap": 44,
+     "compound": "SOFT",
+     "by": "pace",
+     "cleanLaps": 15,
+     "paceStep": -0.56,
+     "softness": 0.497
+    },
+    {
+     "driver": "RAI",
+     "stint": 1,
+     "fromLap": 1,
+     "toLap": 14,
+     "compound": "SOFT",
+     "by": "pace",
+     "cleanLaps": 9,
+     "paceStep": -0.97,
+     "softness": 1.178
+    },
+    {
+     "driver": "RAI",
+     "stint": 2,
+     "fromLap": 15,
+     "toLap": 31,
+     "compound": "HARD",
+     "by": "pace",
+     "cleanLaps": 15,
+     "paceStep": 0.153,
+     "softness": -0.177
+    },
+    {
+     "driver": "RAI",
+     "stint": 3,
+     "fromLap": 32,
+     "toLap": 44,
+     "compound": "SOFT",
+     "by": "pace",
+     "cleanLaps": 12,
+     "paceStep": 0.111,
+     "softness": 0.674
+    },
+    {
+     "driver": "ROS",
+     "stint": 1,
+     "fromLap": 1,
+     "toLap": 18,
+     "compound": "HARD",
+     "by": "pace",
+     "cleanLaps": 13,
+     "paceStep": -0.058,
+     "softness": -0.244
+    },
+    {
+     "driver": "ROS",
+     "stint": 2,
+     "fromLap": 19,
+     "toLap": 33,
+     "compound": "SOFT",
+     "by": "pace",
+     "cleanLaps": 13,
+     "paceStep": 0.433,
+     "softness": 0.051
+    },
+    {
+     "driver": "ROS",
+     "stint": 3,
+     "fromLap": 34,
+     "toLap": 44,
+     "compound": "SOFT",
+     "by": "pace",
+     "cleanLaps": 10,
+     "paceStep": -0.126,
+     "softness": 1.242
+    },
+    {
+     "driver": "SUT",
+     "stint": 1,
+     "fromLap": 1,
+     "toLap": 1,
+     "compound": "SOFT",
+     "by": "default",
+     "cleanLaps": 0,
+     "paceStep": null,
+     "softness": null
+    },
+    {
+     "driver": "SUT",
+     "stint": 2,
+     "fromLap": 2,
+     "toLap": 26,
+     "compound": "HARD",
+     "by": "pace",
+     "cleanLaps": 21,
+     "paceStep": 0.431,
+     "softness": -2.007
+    },
+    {
+     "driver": "SUT",
+     "stint": 3,
+     "fromLap": 27,
+     "toLap": 44,
+     "compound": "HARD",
+     "by": "pace",
+     "cleanLaps": 17,
+     "paceStep": -0.104,
+     "softness": -0.214
+    },
+    {
+     "driver": "TRU",
+     "stint": 1,
+     "fromLap": 1,
+     "toLap": 1,
+     "compound": "SOFT",
+     "by": "default",
+     "cleanLaps": 0,
+     "paceStep": null,
+     "softness": null
+    },
+    {
+     "driver": "TRU",
+     "stint": 2,
+     "fromLap": 2,
+     "toLap": 20,
+     "compound": "HARD",
+     "by": "pace",
+     "cleanLaps": 15,
+     "paceStep": 0.005,
+     "softness": -0.492
+    },
+    {
+     "driver": "TRU",
+     "stint": 3,
+     "fromLap": 21,
+     "toLap": 21,
+     "compound": "HARD",
+     "by": "default",
+     "cleanLaps": 0,
+     "paceStep": null,
+     "softness": null
+    },
+    {
+     "driver": "VET",
+     "stint": 1,
+     "fromLap": 1,
+     "toLap": 16,
+     "compound": "SOFT",
+     "by": "pace",
+     "cleanLaps": 11,
+     "paceStep": -0.036,
+     "softness": 0.153
+    },
+    {
+     "driver": "VET",
+     "stint": 2,
+     "fromLap": 17,
+     "toLap": 35,
+     "compound": "HARD",
+     "by": "pace",
+     "cleanLaps": 17,
+     "paceStep": 0.002,
+     "softness": -0.49
+    },
+    {
+     "driver": "VET",
+     "stint": 3,
+     "fromLap": 36,
+     "toLap": 44,
+     "compound": "SOFT",
+     "by": "pace",
+     "cleanLaps": 8,
+     "paceStep": 0.017,
+     "softness": 1.56
+    },
+    {
+     "driver": "WEB",
+     "stint": 1,
+     "fromLap": 1,
+     "toLap": 14,
+     "compound": "SOFT",
+     "by": "pace",
+     "cleanLaps": 9,
+     "paceStep": -0.792,
+     "softness": 1.061
+    },
+    {
+     "driver": "WEB",
+     "stint": 2,
+     "fromLap": 15,
+     "toLap": 18,
+     "compound": "HARD",
+     "by": "default",
+     "cleanLaps": 2,
+     "paceStep": null,
+     "softness": null
+    },
+    {
+     "driver": "WEB",
+     "stint": 3,
+     "fromLap": 19,
+     "toLap": 34,
+     "compound": "HARD",
+     "by": "pace",
+     "cleanLaps": 14,
+     "paceStep": 0.216,
+     "softness": -0.012
+    },
+    {
+     "driver": "WEB",
+     "stint": 4,
+     "fromLap": 35,
+     "toLap": 44,
+     "compound": "SOFT",
+     "by": "pace",
+     "cleanLaps": 9,
+     "paceStep": -0.072,
+     "softness": 1.412
+    }
+   ],
+   "notes": [
+    "2 stints set by the both-compounds rule",
+    "10 stints too short to score"
+   ]
+  },
+  "fuelLoads": {
+   "method": "stint laps x the era's standard burn (headset.json fuel.burnPerLap)",
+   "burnPerLap": 1.7,
+   "unit": "kg",
+   "fillRate": "fill rate: an estimate, 0.25 s per lap of fuel (~3 L a lap through a ~12 L/s rig, prior sd 0.01 s), barely moved by the race's own stop times (refuel.py)",
+   "stints": [
+    {
+     "driver": "ALG",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 1,
+     "fuelKg": 1.7
+    },
+    {
+     "driver": "ALO",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 24,
+     "fuelKg": 40.8
+    },
+    {
+     "driver": "ALO",
+     "stint": 2,
+     "fromLap": 25,
+     "laps": 2,
+     "fuelKg": 3.4
+    },
+    {
+     "driver": "BAD",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 24,
+     "fuelKg": 40.8
+    },
+    {
+     "driver": "BAD",
+     "stint": 2,
+     "fromLap": 25,
+     "laps": 20,
+     "fuelKg": 34.0
+    },
+    {
+     "driver": "BAR",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 1,
+     "fuelKg": 1.7
+    },
+    {
+     "driver": "BAR",
+     "stint": 2,
+     "fromLap": 2,
+     "laps": 26,
+     "fuelKg": 44.2
+    },
+    {
+     "driver": "BAR",
+     "stint": 3,
+     "fromLap": 28,
+     "laps": 17,
+     "fuelKg": 28.9
+    },
+    {
+     "driver": "BUE",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 21,
+     "fuelKg": 35.7
+    },
+    {
+     "driver": "BUE",
+     "stint": 2,
+     "fromLap": 22,
+     "laps": 9,
+     "fuelKg": 15.3
+    },
+    {
+     "driver": "BUE",
+     "stint": 3,
+     "fromLap": 31,
+     "laps": 14,
+     "fuelKg": 23.8
+    },
+    {
+     "driver": "BUT",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 1,
+     "fuelKg": 1.7
+    },
+    {
+     "driver": "FIS",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 14,
+     "fuelKg": 23.8
+    },
+    {
+     "driver": "FIS",
+     "stint": 2,
+     "fromLap": 15,
+     "laps": 17,
+     "fuelKg": 28.9
+    },
+    {
+     "driver": "FIS",
+     "stint": 3,
+     "fromLap": 32,
+     "laps": 13,
+     "fuelKg": 22.1
+    },
+    {
+     "driver": "GLO",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 12,
+     "fuelKg": 20.4
+    },
+    {
+     "driver": "GLO",
+     "stint": 2,
+     "fromLap": 13,
+     "laps": 20,
+     "fuelKg": 34.0
+    },
+    {
+     "driver": "GLO",
+     "stint": 3,
+     "fromLap": 33,
+     "laps": 12,
+     "fuelKg": 20.4
+    },
+    {
+     "driver": "GRO",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 1,
+     "fuelKg": 1.7
+    },
+    {
+     "driver": "HAM",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 1,
+     "fuelKg": 1.7
+    },
+    {
+     "driver": "HEI",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 14,
+     "fuelKg": 23.8
+    },
+    {
+     "driver": "HEI",
+     "stint": 2,
+     "fromLap": 15,
+     "laps": 18,
+     "fuelKg": 30.6
+    },
+    {
+     "driver": "HEI",
+     "stint": 3,
+     "fromLap": 33,
+     "laps": 12,
+     "fuelKg": 20.4
+    },
+    {
+     "driver": "KOV",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 26,
+     "fuelKg": 44.2
+    },
+    {
+     "driver": "KOV",
+     "stint": 2,
+     "fromLap": 27,
+     "laps": 18,
+     "fuelKg": 30.6
+    },
+    {
+     "driver": "KUB",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 12,
+     "fuelKg": 20.4
+    },
+    {
+     "driver": "KUB",
+     "stint": 2,
+     "fromLap": 13,
+     "laps": 18,
+     "fuelKg": 30.6
+    },
+    {
+     "driver": "KUB",
+     "stint": 3,
+     "fromLap": 31,
+     "laps": 14,
+     "fuelKg": 23.8
+    },
+    {
+     "driver": "NAK",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 28,
+     "fuelKg": 47.6
+    },
+    {
+     "driver": "NAK",
+     "stint": 2,
+     "fromLap": 29,
+     "laps": 16,
+     "fuelKg": 27.2
+    },
+    {
+     "driver": "RAI",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 14,
+     "fuelKg": 23.8
+    },
+    {
+     "driver": "RAI",
+     "stint": 2,
+     "fromLap": 15,
+     "laps": 17,
+     "fuelKg": 28.9
+    },
+    {
+     "driver": "RAI",
+     "stint": 3,
+     "fromLap": 32,
+     "laps": 13,
+     "fuelKg": 22.1
+    },
+    {
+     "driver": "ROS",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 18,
+     "fuelKg": 30.6
+    },
+    {
+     "driver": "ROS",
+     "stint": 2,
+     "fromLap": 19,
+     "laps": 15,
+     "fuelKg": 25.5
+    },
+    {
+     "driver": "ROS",
+     "stint": 3,
+     "fromLap": 34,
+     "laps": 11,
+     "fuelKg": 18.7
+    },
+    {
+     "driver": "SUT",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 1,
+     "fuelKg": 1.7
+    },
+    {
+     "driver": "SUT",
+     "stint": 2,
+     "fromLap": 2,
+     "laps": 25,
+     "fuelKg": 42.5
+    },
+    {
+     "driver": "SUT",
+     "stint": 3,
+     "fromLap": 27,
+     "laps": 18,
+     "fuelKg": 30.6
+    },
+    {
+     "driver": "TRU",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 1,
+     "fuelKg": 1.7
+    },
+    {
+     "driver": "TRU",
+     "stint": 2,
+     "fromLap": 2,
+     "laps": 19,
+     "fuelKg": 32.3
+    },
+    {
+     "driver": "TRU",
+     "stint": 3,
+     "fromLap": 21,
+     "laps": 1,
+     "fuelKg": 1.7
+    },
+    {
+     "driver": "VET",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 16,
+     "fuelKg": 27.2
+    },
+    {
+     "driver": "VET",
+     "stint": 2,
+     "fromLap": 17,
+     "laps": 19,
+     "fuelKg": 32.3
+    },
+    {
+     "driver": "VET",
+     "stint": 3,
+     "fromLap": 36,
+     "laps": 9,
+     "fuelKg": 15.3
+    },
+    {
+     "driver": "WEB",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 14,
+     "fuelKg": 23.8
+    },
+    {
+     "driver": "WEB",
+     "stint": 2,
+     "fromLap": 15,
+     "laps": 4,
+     "fuelKg": 6.8
+    },
+    {
+     "driver": "WEB",
+     "stint": 3,
+     "fromLap": 19,
+     "laps": 16,
+     "fuelKg": 27.2
+    },
+    {
+     "driver": "WEB",
+     "stint": 4,
+     "fromLap": 35,
+     "laps": 10,
+     "fuelKg": 17.0
+    }
+   ]
+  },
+  "estimated": [
+   "compounds",
+   "safetyCars",
+   "fuelLoads"
+  ],
+  "quirks": []
+ }
+}

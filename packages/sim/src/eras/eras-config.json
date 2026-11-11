@@ -1,0 +1,20 @@
+{
+  "_comment": "Eras mode tunables (eras build plan 1.3; eras spec sections 4, 5, 6, 7 and 8). Read through eras/config.ts, never directly. unlockShare: share of an era's stars (3 per race) needed to unlock the next era in play order; the count is ceil(unlockShare x 3 x races), so 0.7 with 10 races is 21 (spec 5, ERA_UNLOCK_SHARE). accuracyMultiplier: decisionAccuracy = max(0, 100 - accuracyMultiplier x winChanceLost), winChanceLost in percentage points (spec 6). hardCallEdge: a decision moment is a hard call when the best two options are within this many percentage points; either a BAND_EDGES key from grade.ts (default 'yellow', 5 points) or a number (spec 4, HARD_CALL_EDGE). difficulty: one row per play order (spec 7): accuracyThreshold is the star-2 race accuracy (0-100) needed; information is full | reduced | limited | minimal; rivalPolicy is standard | standard-plus | smart | expert; decisionTimerSeconds is the decision timer. legend: Legend difficulty, the hardest settings regardless of era (spec 8). tyreAgeRangeLaps: from Reduced information down, every other car's tyre age shows as a range this many laps wide, on multiples of it (5: '15-20 laps'); your own car's stays exact (spec 7).",
+  "unlockShare": 0.7,
+  "accuracyMultiplier": 2.5,
+  "hardCallEdge": "yellow",
+  "tyreAgeRangeLaps": 5,
+  "difficulty": [
+    { "playOrder": 1, "era": 10, "accuracyThreshold": 70, "information": "full", "rivalPolicy": "standard", "decisionTimerSeconds": 45 },
+    { "playOrder": 2, "era": 9, "accuracyThreshold": 72, "information": "full", "rivalPolicy": "standard", "decisionTimerSeconds": 45 },
+    { "playOrder": 3, "era": 8, "accuracyThreshold": 75, "information": "full", "rivalPolicy": "standard-plus", "decisionTimerSeconds": 45 },
+    { "playOrder": 4, "era": 7, "accuracyThreshold": 78, "information": "reduced", "rivalPolicy": "standard-plus", "decisionTimerSeconds": 45 },
+    { "playOrder": 5, "era": 6, "accuracyThreshold": 80, "information": "reduced", "rivalPolicy": "smart", "decisionTimerSeconds": 30 },
+    { "playOrder": 6, "era": 5, "accuracyThreshold": 82, "information": "reduced", "rivalPolicy": "smart", "decisionTimerSeconds": 30 },
+    { "playOrder": 7, "era": 4, "accuracyThreshold": 84, "information": "limited", "rivalPolicy": "smart", "decisionTimerSeconds": 30 },
+    { "playOrder": 8, "era": 3, "accuracyThreshold": 86, "information": "limited", "rivalPolicy": "expert", "decisionTimerSeconds": 20 },
+    { "playOrder": 9, "era": 2, "accuracyThreshold": 88, "information": "minimal", "rivalPolicy": "expert", "decisionTimerSeconds": 20 },
+    { "playOrder": 10, "era": 1, "accuracyThreshold": 90, "information": "minimal", "rivalPolicy": "expert", "decisionTimerSeconds": 20 }
+  ],
+  "legend": { "accuracyThreshold": 90, "information": "minimal", "rivalPolicy": "expert", "decisionTimerSeconds": 20 }
+}

@@ -13,7 +13,9 @@ import pandas as pd
 
 from . import SCHEMA_VERSION
 from . import events as events_mod
+from . import faults as faults_mod
 from . import pace as pace_mod
+from . import redflag as redflag_mod
 from . import scenario as scenario_mod
 from . import track as track_mod
 from .fit import LapTimeFit
@@ -51,6 +53,10 @@ def stint_counts(laps: pd.DataFrame) -> dict[str, int]:
 # life (Monza 24: one soft stint, 2 laps), so its life comes from the compounds that were run,
 # at these ratios of their longest stints (a soft lasts about 0.4x the longest hard stint...).
 THIN_STINTS = 3
+# Eras model fix W5: pace by stint (M2) measures a wet race's rain-tyre laps too, against the
+# sim's wet clean lap, and leaves out its restart laps (pace.stint_offsets wet_stints). Only
+# where stint_pace is on (Eras builds of timed races); a dry race's offsets don't change.
+WET_STINTS = True
 # A life guessed from the other compounds stops short of this share of the race (tyre-life fix
 # 2): 1.5x the longest medium stint often came out past the flag, a hard that never wore out.
 GUESS_CAP = 0.8
@@ -122,12 +128,42 @@ def assemble_race_model(
     sc_unlap: str | None = None,
     weather: dict | None = None,
     wet_pace: dict[str, float] | None = None,
+    damp_pace: dict[str, float] | None = None,
+    fault_facts: list[dict] | None = None,
+    year: int | None = None,
+    red_flags: list[dict] | None = None,
+    refuel: dict | None = None,
+    service_stops: bool = False,
+    eras_stops: bool = False,
+    stint_pace: bool = False,
+    dirty_air: dict | None = None,
+    pace_skip: dict[str, list[int]] | None = None,
 ) -> dict:
-    """Build the race-model dict (validate + write it with export.write_race)."""
+    """Build the race-model dict (validate + write it with export.write_race). `fault_facts`:
+    the race's hand-checked car faults (incidents.fault_facts), fitted into FAULT events.
+    `year` and `red_flags` (the race's red-flag file entries, redflag.load_entries) give each
+    red flag its restart; races without one ignore them. `refuel`: a refuelling race's fill
+    model (refuel.race_fill_model), stored as track.refuel; its laps carry the Tank and
+    FuelLap columns (refuel.with_fuel_columns), so every fuel term below is the sim's.
+    `service_stops` (Eras builds): each driver's stops that changed no tyres (a repair, a
+    stop-go, a drive-through: track.service_stops) after the takeover, as drivers[].serviceStops
+    at their measured loss in the sim frame. `eras_stops` (Eras builds): back-to-back stops
+    count their shared lap once, and stops on laps partly under a local yellow are priced in the
+    sim frame (track.stop_records, pace.sim_frame_losses). `stint_pace` (Eras builds, model fix
+    M2): each car's pace offset by real stint (pace.stint_offsets), as drivers[].stintPace; the
+    faults' and the stops' sim-frame fits then carry it too. `dirty_air` (Eras builds of timed
+    races, dirty_air.eras_dirty_air): {"real": the race's real dirty-air loss by start-of-lap
+    gap band, taken off each lap of the pace offsets above; "bands": the sims' banded cost,
+    written as track.dirtyAirBands}."""
     total_laps = int(laps["LapNumber"].max())
     cliffs = fit.compound_cliff
     longest = longest_stints(laps)
     stints = stint_counts(laps)
+
+    def quad(compound: str) -> dict:
+        """Eras model fix S4: its quadratic wear (s per lap^2), where the fit has a positive one."""
+        q = round(fit.compound_quad.get(compound, 0.0), 7)
+        return {"degQuad": q} if q > 0 else {}
 
     def proven(compound: str) -> dict:
         """The longest stint run on it (the game's life never falls short of it)."""
@@ -144,6 +180,7 @@ def assemble_race_model(
                 "offset": round(offset, 4),
                 "degPerLap": round(fit.compound_wear[compound], 5),
                 "cliffLap": thin,
+                **quad(compound),
                 **proven(compound),
             }
             continue
@@ -162,6 +199,7 @@ def assemble_race_model(
                 life_floor(compound, longest, stints, total_laps, harder_only=True) or 0,
             ),
             **({"cliffDegPerLap": round(hinge[1], 4)} if hinge else {}),
+            **quad(compound),
             **proven(compound),
         }
 
@@ -200,18 +238,27 @@ def assemble_race_model(
 
     # Events and remaining strategy from the takeover lap onward; earlier history is already
     # baked into stateAtTakeover.
-    future_events = [
-        e for e in events_mod.extract_events(laps, total_laps) if e["lap"] >= takeover_lap
-    ]
+    all_events = events_mod.extract_events(laps, total_laps)
+    if any(e["type"] == "RED" for e in all_events) or red_flags:
+        # Eras build plan 4.3: each red flag's span (hand-entered for untimed sources) and
+        # restart (standing / rolling).
+        all_events = redflag_mod.annotate_restarts(
+            redflag_mod.apply_hand_spans(all_events, red_flags or []), red_flags or [], year
+        )
+    # An SC/VSC already running at the takeover is kept from the takeover lap to its end.
+    future_events = events_mod.from_takeover(all_events, takeover_lap)
+    facts = fault_facts or []
     takeover_state = scenario_mod.state_at_takeover(laps, takeover_lap)
     strategy = scenario_mod.real_strategy(laps)
     teams = _team_map(laps)
     # Real stops keep their measured time (spec B1): a slow or quick stop is a real event.
-    measured = track_mod.measured_stop_losses(laps, takeover_lap)
+    measured = track_mod.measured_stop_losses(laps, takeover_lap, eras_stops)
     # Model v3 (spec B2a): each driver's pace over the laps the game replays.
     fresh = {"bonus": round(fit.fresh_tyre_bonus, 4), "laps": fit.fresh_tyre_laps}
     race_pace = pace_mod.post_takeover_offsets(
-        laps,
+        faults_mod.without_laps(
+            faults_mod.without_fault_laps(laps, facts), pace_skip
+        ),  # a faulted car's normal pace
         fit.driver_pace,
         compounds,
         round(fit.fuel_per_lap, 5),
@@ -220,35 +267,115 @@ def assemble_race_model(
         pace_mod.SHRINK_LAPS,
         weather,
         wear,
+        traffic=(dirty_air or {}).get("real"),
+    )
+    # Pace by stint (Eras model fix M2, pace.stint_offsets): fitted against the file's basePace.
+    stint_table = (
+        pace_mod.stint_offsets(
+            faults_mod.without_laps(faults_mod.without_fault_laps(laps, facts), pace_skip),
+            {c: round(p + race_pace.get(c, 0.0), 4) for c, p in fit.driver_pace.items()},
+            compounds,
+            round(fit.fuel_per_lap, 5),
+            fresh,
+            takeover_lap,
+            pace_mod.real_stops(strategy, takeover_lap),
+            weather,
+            wear,
+            traffic=(dirty_air or {}).get("real"),
+            wet_pace=wet_pace,
+            damp_pace=damp_pace,
+            wet_stints=WET_STINTS,
+        )
+        if stint_pace
+        else None
+    )
+    # Car faults (faults.py): fitted from the car's own laps against its sim pace; one that
+    # struck before the takeover and still lasts is kept too (the sim runs it from then on).
+    fault_events = faults_mod.fault_events(
+        laps,
+        facts,
+        {c: round(p + race_pace.get(c, 0.0), 4) for c, p in fit.driver_pace.items()},
+        compounds,
+        round(fit.fuel_per_lap, 5),
+        fresh,
+        weather,
+        stint_table,
+    )
+    future_events = events_mod.with_faults(
+        future_events,
+        [
+            e
+            for e in fault_events
+            if e["lap"] >= takeover_lap or faults_mod.lasts_past(e, laps, takeover_lap)
+        ],
     )
     if pace_mod.SIM_FRAME_LOSS:
         v3_pace = {c: p + race_pace.get(c, 0.0) for c, p in fit.driver_pace.items()}
-        measured.update(
-            pace_mod.sim_frame_losses(
-                laps,
-                v3_pace,
-                compounds,
-                round(fit.fuel_per_lap, 5),
-                fresh,
-                takeover_lap,
-                weather,
-                wear,
-                wet_pace,
-            )
+        frame = pace_mod.sim_frame_losses(
+            laps,
+            v3_pace,
+            compounds,
+            round(fit.fuel_per_lap, 5),
+            fresh,
+            takeover_lap,
+            weather,
+            wear,
+            wet_pace,
+            eras_stops=eras_stops,
+            damp_pace=damp_pace,
+            stint=stint_table,
         )
+        # A stop made with a fault: the sim adds the fault's cost to its laps itself.
+        measured.update(faults_mod.adjust_stop_losses(frame, fault_events, laps))
 
     # Model v3 stage 9: a stop entered before an SC/VSC was deployed is a green-flag stop,
     # though its out-lap is neutralized (the sim prices a stop by its out-lap's flag).
     if track_status and track_params.pit_loss is not None:
-        all_events = events_mod.extract_events(laps, total_laps)
         for key in events_mod.green_entry_stops(laps, all_events, track_status):
             measured.setdefault(key, track_params.pit_loss)
+    # Red flags: a stop made in the stoppage is free; one entered before it pays its flag's
+    # figure (the stoppage makes both unmeasurable).
+    measured.update(
+        redflag_mod.stop_losses(
+            laps,
+            all_events,
+            track_status,
+            track_params.pit_loss,
+            track_params.pit_loss_under_sc,
+            track_params.pit_loss_under_vsc,
+            eras=eras_stops,
+        )
+    )
 
     optional = (
         scenario_mod.fastest_lap_stops(laps, measured, track_params.pit_loss)
         if fastest_lap_point and track_params.pit_loss is not None
         else set()
     )
+
+    # Stops with no tyre change (Eras sim fix 1): every car pays them on their real lap,
+    # whatever its strategy, at the loss measured in the sim frame.
+    service: dict[str, list[dict]] = {}
+    if service_stops:
+        v3_pace = {c: p + race_pace.get(c, 0.0) for c, p in fit.driver_pace.items()}
+        frame = pace_mod.sim_frame_losses(
+            laps,
+            v3_pace,
+            compounds,
+            round(fit.fuel_per_lap, 5),
+            fresh,
+            takeover_lap,
+            weather,
+            wear,
+            wet_pace,
+            service=True,
+            eras_stops=eras_stops,
+            damp_pace=damp_pace,
+            stint=stint_table,
+        )
+        for (code, out_lap), loss in sorted(frame.items()):
+            if out_lap > takeover_lap:
+                service.setdefault(code, []).append({"lap": out_lap, "loss": round(loss, 3)})
 
     drivers = []
     for code in sorted(set(takeover_state) & set(fit.driver_pace)):
@@ -262,6 +389,7 @@ def assemble_race_model(
                 "basePace": round(fit.driver_pace[code] + race_pace.get(code, 0.0), 4),
                 "noise": round(fit.driver_noise[code], 4),
                 **({"wetPace": wet_pace[code]} if wet_pace and code in wet_pace else {}),
+                **({"dampPace": damp_pace[code]} if damp_pace and code in damp_pace else {}),
                 "stateAtTakeover": {
                     "position": s["position"],
                     "gapAhead": s["gapAhead"] if s["gapAhead"] is not None else 0.0,
@@ -282,6 +410,12 @@ def assemble_race_model(
                     for st in strategy.get(code, [])
                     if st["lap"] >= takeover_lap
                 ],
+                **({"serviceStops": service[code]} if code in service else {}),
+                **(
+                    {"stintPace": stint_table.entries(code)}
+                    if stint_table and stint_table.entries(code)
+                    else {}
+                ),
             }
         )
 
@@ -308,6 +442,7 @@ def assemble_race_model(
             "overtakeDifficulty": round(track_params.overtake_difficulty, 4),
             "overtakeModel": {k: round(v, 4) for k, v in track_params.overtake_model.items()},
             "dirtyAirPenalty": round(track_params.dirty_air_penalty, 4),
+            **({"dirtyAirBands": dirty_air["bands"]} if dirty_air else {}),
             # Neutralized-lap pace for the simulator; omitted when a race had none.
             **(
                 {"greenLapTime": round(track_params.green_lap_time, 3)}
@@ -324,6 +459,9 @@ def assemble_race_model(
                 if track_params.vsc_lap_time is not None
                 else {}
             ),
+            # A refuelling race's fill model: a new stop pays the pit loss (which holds a
+            # typical fill, refFill) plus secondsPerLap x (its fill - refFill).
+            **({"refuel": refuel} if refuel else {}),
         },
         "compounds": compounds,
         "drivers": drivers,

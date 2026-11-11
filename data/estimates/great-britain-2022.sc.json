@@ -1,0 +1,32 @@
+{
+ "race": "great-britain-2022",
+ "how": "docs/eras-checks/2.4-estimates.md: check each period against a race report; set status to confirmed or rejected (edit startLap/endLap if they're off), then re-run `pipeline jolpica <race-id> --force`.",
+ "periods": [
+  {
+   "startLap": 3,
+   "endLap": 3,
+   "laps": 1,
+   "kind": "SC",
+   "confidence": "ambiguous",
+   "peakRatio": 1.375,
+   "gapBefore": null,
+   "gapAfter": 4.5,
+   "reasons": [
+    "a single slow lap"
+   ],
+   "status": "unchecked"
+  },
+  {
+   "startLap": 39,
+   "endLap": 42,
+   "laps": 4,
+   "kind": "SC",
+   "confidence": "likely",
+   "peakRatio": 1.664,
+   "gapBefore": 45.7,
+   "gapAfter": 2.3,
+   "reasons": [],
+   "status": "unchecked"
+  }
+ ]
+}

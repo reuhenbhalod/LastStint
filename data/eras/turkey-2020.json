@@ -1,0 +1,38 @@
+{
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": true,
+    "drs": true,
+    "ers": "hybrid",
+    "refuelling": false
+  },
+  "eras": {
+    "eraId": 8,
+    "order": 9,
+    "userSide": "HAM",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "On a wet, low-grip Istanbul Park, Hamilton starts sixth, runs his worn intermediates to the flag without another stop and wins by 31.6 s, securing his seventh title."
+    },
+    "mastery": {
+      "type": "mode_rule",
+      "mode": "push",
+      "maxLaps": 8,
+      "label": "Win pushing for no more than 8 laps"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 30,
+      "label": "Win by more than 30 seconds"
+    },
+    "hardCalls": {
+      "HAM": 1,
+      "PER": 0
+    },
+    "briefing": "Istanbul, 2020. A wet track on a smooth new surface with little grip, and Hamilton starts sixth. You run him, fifth after 26 laps on a worn set of tyres, 13.6 s behind the leader Stroll. Win, and the title is his."
+  }
+}

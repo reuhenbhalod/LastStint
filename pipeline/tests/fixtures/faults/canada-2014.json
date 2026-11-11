@@ -1,0 +1,23 @@
+{
+ "_comment": "canada-2014's fault facts exactly as step 2.6 wrote them in data/incidents.json (on the eras branch; read by incidents.fault_facts), a fixture so the build test doesn't depend on that merge. Source: Wikipedia, 2014 Canadian Grand Prix, Race section: 'Hamilton's failed into turn 10 on lap 36 and Rosberg's shut down on the approach to turn one on lap 37, losing their engines 160 hp of electrical boost' (both cars' kinetic motor-generator units, MGU-K). Hamilton retired with overheating rear brakes after 47 laps (the race's RETIREMENT event); Rosberg finished second. Status 'Power Unit' gives the sim's kind, power-loss, lasting to the flag.",
+ "canada-2014": [
+  {
+   "lap": 36,
+   "type": "FAULT",
+   "driver": "HAM",
+   "status": "Power Unit",
+   "detail": "MGU-K failed into turn 10: no electrical boost, brakes overworked",
+   "turn": 10,
+   "source": "https://en.wikipedia.org/wiki/2014_Canadian_Grand_Prix"
+  },
+  {
+   "lap": 37,
+   "type": "FAULT",
+   "driver": "ROS",
+   "status": "Power Unit",
+   "detail": "MGU-K shut down approaching turn 1: no electrical boost",
+   "turn": 1,
+   "source": "https://en.wikipedia.org/wiki/2014_Canadian_Grand_Prix"
+  }
+ ]
+}

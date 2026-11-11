@@ -1,4 +1,4 @@
-import { type RaceState, battlesFor, engineerConfig, verifyRun } from '@boxthislap/sim';
+import { type RaceState, battlesFor, engineerConfig, verifyRun } from '@laststint/sim';
 import { describe, expect, it } from 'vitest';
 import { StaticDailyProvider } from '../data/provider.js';
 import { GameSession } from './session.js';
@@ -390,5 +390,24 @@ describe('the race plan (strategy planner spec)', () => {
     expect(() =>
       verifyRun(today.model, today.seed, body.decisions, undefined, body.grades),
     ).not.toThrow();
+  });
+
+  it('keeps an Eras attempt apart from practice, and practice and survivor as they were', async () => {
+    const practice = await daily();
+    expect(new GameSession(practice).state.submission).toEqual({ status: 'practice' });
+    expect(new GameSession({ ...practice, source: 'live' }).state.submission).toEqual({
+      status: 'none',
+    });
+    expect(new GameSession({ ...practice, source: 'survivor' }).state.submission).toEqual({
+      status: 'practice',
+    });
+    const eras = new GameSession({ ...practice, source: 'eras', date: 'eras:a1' });
+    expect(eras.state.meta.source).toBe('eras');
+    expect(eras.state.submission).toEqual({ status: 'eras' });
+    // A saved Eras run comes back as an Eras run, not practice.
+    const saved = eras.persist();
+    const back = GameSession.restore({ ...practice, source: 'eras', date: 'eras:a1' }, saved);
+    expect(back?.state.submission).toEqual({ status: 'eras' });
+    expect(back?.state.meta.source).toBe('eras');
   });
 });

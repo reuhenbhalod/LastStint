@@ -1,0 +1,787 @@
+{
+  "schemaVersion": 11,
+  "race": {
+    "id": "germany-1986",
+    "name": "Germany 1986: Rosberg vs Senna",
+    "laps": 44,
+    "takeoverLap": 16,
+    "seed": 1,
+    "scUnlap": "none"
+  },
+  "era": "1988-1993",
+  "track": {
+    "pitLoss": 21.169,
+    "pitLossUnderSC": 11.643,
+    "pitLossUnderVSC": 14.607,
+    "pitLossDeviations": [
+      -4.028,
+      -2.433,
+      -0.227,
+      0.0,
+      0.711,
+      1.147,
+      3.711
+    ],
+    "overtakeDifficulty": 0.7453,
+    "overtakeModel": {
+      "intercept": -0.1325,
+      "paceCoef": 0.6557,
+      "gapCoef": -1.2261
+    },
+    "dirtyAirPenalty": 0.004,
+    "greenLapTime": 116.246
+  },
+  "compounds": {
+    "MEDIUM": {
+      "offset": 0.0,
+      "degPerLap": 0.02796,
+      "cliffLap": 44,
+      "provenLaps": 44
+    }
+  },
+  "drivers": [
+    {
+      "code": "ARN",
+      "team": "Ligier",
+      "basePace": 114.0269,
+      "noise": 1.0991,
+      "stateAtTakeover": {
+        "position": 6,
+        "gapAhead": 16.844,
+        "compound": "MEDIUM",
+        "tyreAge": 16,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BEG",
+      "team": "Osella",
+      "basePace": 123.575,
+      "noise": 1.1137,
+      "stateAtTakeover": {
+        "position": 20,
+        "gapAhead": 51.435,
+        "compound": "MEDIUM",
+        "tyreAge": 16,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BER",
+      "team": "Benetton",
+      "basePace": 117.1106,
+      "noise": 1.4504,
+      "stateAtTakeover": {
+        "position": 17,
+        "gapAhead": 4.328,
+        "compound": "MEDIUM",
+        "tyreAge": 11,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BRU",
+      "team": "Tyrrell",
+      "basePace": 117.3571,
+      "noise": 0.7011,
+      "stateAtTakeover": {
+        "position": 13,
+        "gapAhead": 5.472,
+        "compound": "MEDIUM",
+        "tyreAge": 16,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "DAN",
+      "team": "Arrows",
+      "basePace": 118.6026,
+      "noise": 0.9283,
+      "stateAtTakeover": {
+        "position": 15,
+        "gapAhead": 3.526,
+        "compound": "MEDIUM",
+        "tyreAge": 16,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "DEC",
+      "team": "Minardi",
+      "basePace": 118.365,
+      "noise": 0.9962,
+      "stateAtTakeover": {
+        "position": 16,
+        "gapAhead": 0.858,
+        "compound": "MEDIUM",
+        "tyreAge": 16,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "DUM",
+      "team": "Team Lotus",
+      "basePace": 117.9471,
+      "noise": 1.3045,
+      "stateAtTakeover": {
+        "position": 11,
+        "gapAhead": 3.541,
+        "compound": "MEDIUM",
+        "tyreAge": 16,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "JOH",
+      "team": "Ferrari",
+      "basePace": 114.4719,
+      "noise": 1.3919,
+      "stateAtTakeover": {
+        "position": 7,
+        "gapAhead": 11.213,
+        "compound": "MEDIUM",
+        "tyreAge": 16,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "JON",
+      "team": "Lola",
+      "basePace": 119.0178,
+      "noise": 3.6402,
+      "stateAtTakeover": {
+        "position": 8,
+        "gapAhead": 2.926,
+        "compound": "MEDIUM",
+        "tyreAge": 16,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "MAN",
+      "team": "Williams",
+      "basePace": 113.1521,
+      "noise": 1.0474,
+      "stateAtTakeover": {
+        "position": 5,
+        "gapAhead": 8.837,
+        "compound": "MEDIUM",
+        "tyreAge": 16,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 18,
+          "to": "MEDIUM",
+          "loss": 22.682
+        }
+      ]
+    },
+    {
+      "code": "NAN",
+      "team": "Minardi",
+      "basePace": 121.361,
+      "noise": 1.2957,
+      "stateAtTakeover": {
+        "position": 18,
+        "gapAhead": 14.327,
+        "compound": "MEDIUM",
+        "tyreAge": 16,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "PALJ",
+      "team": "Zakspeed",
+      "basePace": 119.64,
+      "noise": 1.3728,
+      "stateAtTakeover": {
+        "position": 19,
+        "gapAhead": 3.52,
+        "compound": "MEDIUM",
+        "tyreAge": 16,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "PAT",
+      "team": "Brabham",
+      "basePace": 116.535,
+      "noise": 1.2566,
+      "stateAtTakeover": {
+        "position": 9,
+        "gapAhead": 5.541,
+        "compound": "MEDIUM",
+        "tyreAge": 16,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "PIQN",
+      "team": "Williams",
+      "basePace": 112.0033,
+      "noise": 1.1424,
+      "stateAtTakeover": {
+        "position": 4,
+        "gapAhead": 5.347,
+        "compound": "MEDIUM",
+        "tyreAge": 1,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 16,
+          "to": "MEDIUM",
+          "loss": 20.943
+        },
+        {
+          "lap": 28,
+          "to": "MEDIUM",
+          "loss": 19.453
+        }
+      ]
+    },
+    {
+      "code": "PRO",
+      "team": "McLaren",
+      "basePace": 113.7821,
+      "noise": 1.1638,
+      "stateAtTakeover": {
+        "position": 3,
+        "gapAhead": 4.961,
+        "compound": "MEDIUM",
+        "tyreAge": 16,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 21,
+          "to": "MEDIUM",
+          "loss": 24.474
+        }
+      ]
+    },
+    {
+      "code": "ROSK",
+      "team": "McLaren",
+      "basePace": 112.5832,
+      "noise": 0.7544,
+      "stateAtTakeover": {
+        "position": 1,
+        "gapAhead": 0.0,
+        "compound": "MEDIUM",
+        "tyreAge": 16,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 20,
+          "to": "MEDIUM",
+          "loss": 21.556
+        }
+      ]
+    },
+    {
+      "code": "ROT",
+      "team": "Zakspeed",
+      "basePace": 120.9467,
+      "noise": 1.5949,
+      "stateAtTakeover": {
+        "position": 14,
+        "gapAhead": 17.539,
+        "compound": "MEDIUM",
+        "tyreAge": 16,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "SENA",
+      "team": "Team Lotus",
+      "basePace": 112.9175,
+      "noise": 0.8956,
+      "stateAtTakeover": {
+        "position": 2,
+        "gapAhead": 7.599,
+        "compound": "MEDIUM",
+        "tyreAge": 16,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 22,
+          "to": "MEDIUM",
+          "loss": 17.053
+        }
+      ]
+    },
+    {
+      "code": "TAM",
+      "team": "Lola",
+      "basePace": 116.7039,
+      "noise": 1.0499,
+      "stateAtTakeover": {
+        "position": 10,
+        "gapAhead": 22.166,
+        "compound": "MEDIUM",
+        "tyreAge": 16,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "WAR",
+      "team": "Brabham",
+      "basePace": 116.52,
+      "noise": 1.3948,
+      "stateAtTakeover": {
+        "position": 12,
+        "gapAhead": 0.665,
+        "compound": "MEDIUM",
+        "tyreAge": 16,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    }
+  ],
+  "fuelEffectPerLap": 0.05812,
+  "freshTyre": {
+    "bonus": 0.2325,
+    "laps": 3
+  },
+  "events": [
+    {
+      "lap": 18,
+      "type": "RETIREMENT",
+      "driver": "DUM"
+    },
+    {
+      "lap": 21,
+      "type": "RETIREMENT",
+      "driver": "NAN"
+    },
+    {
+      "lap": 22,
+      "type": "RETIREMENT",
+      "driver": "DEC"
+    },
+    {
+      "lap": 23,
+      "type": "RETIREMENT",
+      "driver": "PAT"
+    },
+    {
+      "lap": 36,
+      "type": "RETIREMENT",
+      "driver": "BRU"
+    },
+    {
+      "lap": 40,
+      "type": "RETIREMENT",
+      "driver": "PALJ"
+    },
+    {
+      "lap": 41,
+      "type": "RETIREMENT",
+      "driver": "DAN"
+    },
+    {
+      "lap": 41,
+      "type": "RETIREMENT",
+      "driver": "ROT"
+    },
+    {
+      "lap": 42,
+      "type": "RETIREMENT",
+      "driver": "JOH"
+    },
+    {
+      "lap": 44,
+      "type": "RETIREMENT",
+      "driver": "ROSK",
+      "storylineEvent": true
+    },
+    {
+      "lap": 44,
+      "type": "RETIREMENT",
+      "driver": "PRO",
+      "storylineEvent": true
+    }
+  ],
+  "decisionMoments": [
+    {
+      "id": "stop-19",
+      "lap": 19,
+      "trigger": "cliff",
+      "target": {
+        "kind": "position",
+        "atBest": 2
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "STAY OUT",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "IN - fresh tyres",
+          "decisions": [
+            {
+              "lap": 19,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "box-medium"
+    },
+    {
+      "id": "pace-24",
+      "lap": 24,
+      "trigger": "cliff",
+      "target": {
+        "kind": "position",
+        "atBest": 2
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 24,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "easy",
+          "label": "EASY - save the car",
+          "decisions": [
+            {
+              "lap": 24,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "lift",
+          "label": "FUEL - lift and coast",
+          "decisions": [
+            {
+              "lap": 24,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "liftAndCoast"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "fuel-31",
+      "lap": 31,
+      "trigger": "cliff",
+      "target": {
+        "kind": "position",
+        "atBest": 2
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "lift",
+          "label": "FUEL - lift and coast to the flag",
+          "decisions": [
+            {
+              "lap": 31,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "liftAndCoast"
+            },
+            {
+              "lap": 31,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "full",
+          "label": "FUEL OK - full mixture",
+          "decisions": [
+            {
+              "lap": 31,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "normal"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "fuel-38",
+      "lap": 38,
+      "trigger": "cliff",
+      "target": {
+        "kind": "position",
+        "atBest": 2
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "lift",
+          "label": "FUEL - lift and coast to the flag",
+          "decisions": [
+            {
+              "lap": 38,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "liftAndCoast"
+            },
+            {
+              "lap": 38,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "full",
+          "label": "FUEL OK - full mixture",
+          "decisions": [
+            {
+              "lap": 38,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "normal"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "fuel-42",
+      "lap": 42,
+      "trigger": "cliff",
+      "target": {
+        "kind": "position",
+        "atBest": 2
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "lift",
+          "label": "FUEL - lift and coast to the flag",
+          "decisions": [
+            {
+              "lap": 42,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "liftAndCoast"
+            },
+            {
+              "lap": 42,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "full",
+          "label": "FUEL OK - full mixture",
+          "decisions": [
+            {
+              "lap": 42,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "normal"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    }
+  ],
+  "candidateMomentLaps": [
+    16,
+    18,
+    20,
+    21,
+    22,
+    28
+  ],
+  "realResult": [
+    "PIQN",
+    "SENA",
+    "MAN",
+    "ARN",
+    "ROSK",
+    "PRO",
+    "WAR",
+    "TAM",
+    "JON",
+    "BER",
+    "JOH",
+    "BEG",
+    "DAN",
+    "ROT",
+    "PALJ",
+    "BRU",
+    "PAT",
+    "DEC",
+    "NAN",
+    "DUM",
+    "BOUT",
+    "ALL",
+    "GHI",
+    "STRP",
+    "ALBM",
+    "FAB"
+  ],
+  "userSide": "ROSK",
+  "rival": "SENA",
+  "eras": {
+    "eraId": 1,
+    "order": 4,
+    "userSide": "ROSK",
+    "target": {
+      "type": "position",
+      "position": 2
+    },
+    "storyline": {
+      "real": "Rosberg, second at the start of the last lap, runs out of fuel and is classified fifth; Piquet wins",
+      "rewriteCondition": {
+        "type": "position",
+        "position": 2
+      },
+      "headline": "Rosberg's McLaren reaches the flag with fuel to spare"
+    },
+    "mastery": {
+      "type": "finish_position",
+      "position": 1,
+      "label": "Win the race on 195 litres"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "push",
+      "maxLaps": 0,
+      "label": "Never turn the boost up: no laps at PUSH"
+    },
+    "briefing": "Hockenheim, July 1986. Rosberg started on pole in the McLaren. Fuel is cut to 195 litres this year, and on this fast track it may not last to the flag. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports. Who led each lap is sourced; the lap times are reconstructed.",
+    "hardCalls": {
+      "ROSK": 1,
+      "SENA": 0
+    },
+    "storylineRetirements": [
+      {
+        "driver": "ROSK",
+        "condition": {
+          "type": "fuel"
+        },
+        "real": "Rosberg ran minimum boost all race on the 195-litre limit, his gauge 'exactly on schedule to cross the line with a zero reading'; second, about two seconds behind Piquet at the start of the last lap, he ran dry at the first chicane and pulled off (classified fifth, a lap down)",
+        "source": "https://www.autosport.com/f1/feature/3783/grand-prix-gold-german-gp-1986; https://en.wikipedia.org/wiki/1986_German_Grand_Prix"
+      }
+    ]
+  },
+  "provenance": {
+    "kind": "reconstructed",
+    "estimated": [
+      "compounds",
+      "fuelLoads",
+      "weather"
+    ]
+  },
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": false,
+    "fuelLimit": 165.75
+  },
+  "reconstructed": true
+}

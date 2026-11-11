@@ -47,9 +47,56 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
       - name: Worker race bundle is up to date
-        run: pnpm --filter @boxthislap/worker races && git diff --exit-code apps/worker/src/races.gen.ts
+        run: pnpm --filter @laststint/worker races && git diff --exit-code apps/worker/src/races.gen.ts
       - name: Test
         run: pnpm test
+
+  # Eras spec §15: every Eras race has a path to all three stars and the hidden objective (era
+  # difficulty and Legend), and staying out every time can't earn ★3. It plays ~100 races and
+  # takes ~100 minutes, so it runs only when a change can move a race's outcome: race data
+  # (data/), the sim or schema, or the Eras worker code. Other changes (web UI, docs, CI)
+  # pass this job in about a minute. Run it by hand with workflow_dispatch.
+  eras-reachability:
+    name: Eras reachability
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Did race data or the sim change?
+        id: changed
+        env:
+          BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          if [ "${{ github.event_name }}" = workflow_dispatch ] || [ -z "$BASE" ] \
+             || ! git cat-file -e "$BASE^{commit}" 2>/dev/null; then
+            echo "run=true" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          files=$(git diff --name-only "$BASE"...HEAD)
+          echo "$files"
+          if echo "$files" | grep -qE '^(data/|packages/sim/|packages/schema/|apps/worker/src/eras|apps/worker/scripts/reachability)'; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "No race data or sim change: reachability skipped."
+          fi
+      - if: steps.changed.outputs.run == 'true'
+        uses: pnpm/action-setup@v4  # version from package.json "packageManager"
+      - if: steps.changed.outputs.run == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - if: steps.changed.outputs.run == 'true'
+        run: pnpm install --frozen-lockfile
+      - name: Eras reachability
+        if: steps.changed.outputs.run == 'true'
+        run: pnpm --filter @laststint/sim reachability
+      # The shared races' eras blocks live in their overlays (their Daily files are pinned):
+      # check them on the merged model the Eras API serves.
+      - name: Eras reachability (shared races)
+        if: steps.changed.outputs.run == 'true'
+        run: pnpm --filter @laststint/worker reachability:shared
 
   # Parity (Gate G2): the committed race models and golden files must be exactly what the
   # Python pipeline produces from the committed snapshots, and the TS sim must reproduce them.
@@ -71,33 +118,71 @@ jobs:
       - name: Rebuild race models + golden files from snapshots
         run: uv run pipeline build --all
         working-directory: pipeline
+      # Two kinds of race file are exempt from the rebuild comparison:
+      # - Daily/Gauntlet pool races are frozen (CLAUDE.md rule 3): the Eras pipeline rebuilds
+      #   ~25 of them 0.001 off in the last digit, and their committed files must not change.
+      # - Four Eras-built races whose Linux build differs from the Mac build by float rounding
+      #   (0.0003-0.02 in a few fitted values, which shifts their goldens). The game serves the
+      #   committed files; the TS sim test below still checks them against their goldens.
       - name: Committed data is up to date
-        run: git diff --exit-code -- data/
+        run: |
+          python3 - <<'PY' > /tmp/parity-exempt
+          import json, os
+          pools = json.load(open("data/pools.json"))
+          ids = set(pools["daily"]) | set(pools["survivor"])
+          ids |= {"emilia-romagna-2024", "great-britain-2023", "monaco-2023", "monaco-2025"}
+          for rid in sorted(ids):
+              for d in ("races", "golden"):
+                  path = f"data/{d}/{rid}.json"
+                  if os.path.exists(path):
+                      print(path)
+          PY
+          xargs git checkout -- < /tmp/parity-exempt
+          git diff --exit-code -- data/
       - run: pnpm install --frozen-lockfile
       - name: TS sim matches golden files
-        run: pnpm --filter @boxthislap/sim test
+        run: pnpm --filter @laststint/sim test
 
-  # One browser playthrough of the Daily Race (frontend spec C4): start, four calls, results,
-  # share. The API is mocked in the test, so it needs no Worker.
+  # Browser playthroughs (frontend spec C4): Daily, Gauntlet, admin and the rest every time. The
+  # Eras specs (eras-*.spec.ts, ~40 minutes) run only when a change can affect Eras: race data,
+  # the sim or schema, the Eras web code or the Eras specs. The API is mocked, so no Worker.
   e2e:
     name: Web end-to-end
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Did Eras code or race data change?
+        env:
+          BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          if [ "${{ github.event_name }}" = workflow_dispatch ] || [ -z "$BASE" ] \
+             || ! git cat-file -e "$BASE^{commit}" 2>/dev/null; then
+            exit 0
+          fi
+          # Unit-test files (*.test.ts) don't change what the browser runs.
+          if git diff --name-only "$BASE"...HEAD | grep -vE '\.test\.tsx?$' \
+             | grep -qE '^(data/|packages/sim/|packages/schema/|apps/web/src/eras/|apps/web/e2e/eras)'; then
+            echo "Eras-related change: running the Eras specs too."
+          else
+            echo "E2E_SKIP_ERAS=1" >> "$GITHUB_ENV"
+            echo "No Eras change: Eras specs skipped."
+          fi
       - uses: pnpm/action-setup@v4  # version from package.json "packageManager"
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @boxthislap/web exec playwright install --with-deps chromium
+      - run: pnpm --filter @laststint/web exec playwright install --with-deps chromium
       - name: Playthrough
-        run: pnpm --filter @boxthislap/web e2e
+        run: pnpm --filter @laststint/web e2e
 
   # Deploy runs only on main and only once every check above has passed.
   deploy:
     name: Deploy Worker + D1 migrations
-    needs: [python, js, parity, e2e]
+    needs: [python, js, eras-reachability, parity, e2e]
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     concurrency:
@@ -115,9 +200,9 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Apply D1 migrations
-        run: pnpm --filter @boxthislap/worker migrate:remote
+        run: pnpm --filter @laststint/worker migrate:remote
       - name: Deploy worker
-        run: pnpm --filter @boxthislap/worker run deploy
+        run: pnpm --filter @laststint/worker run deploy
 
   # The website (apps/web): built against the live API and deployed as a static-assets Worker,
   # after the API so the site never calls an API older than itself.
@@ -145,6 +230,6 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Build
-        run: pnpm --filter @boxthislap/web build
+        run: pnpm --filter @laststint/web build
       - name: Deploy
-        run: pnpm --filter @boxthislap/web run deploy
+        run: pnpm --filter @laststint/web run deploy

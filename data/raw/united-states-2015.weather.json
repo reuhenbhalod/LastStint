@@ -1,0 +1,353 @@
+[
+ {
+  "lap": 1,
+  "time": 118.693,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 2,
+  "time": 235.97,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 3,
+  "time": 353.374,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 4,
+  "time": 471.457,
+  "rain": true,
+  "source": "lap-times",
+  "ambiguous": "lap before a neutralisation (it may have started during it)"
+ },
+ {
+  "lap": 5,
+  "time": 596.638,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 6,
+  "time": 734.497,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 7,
+  "time": 871.513,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 8,
+  "time": 996.306,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 9,
+  "time": 1113.382,
+  "rain": true,
+  "source": "lap-times",
+  "ambiguous": "first green lap after a neutralisation (cold tyres)"
+ },
+ {
+  "lap": 10,
+  "time": 1231.194,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 11,
+  "time": 1349.474,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 12,
+  "time": 1468.698,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 13,
+  "time": 1585.967,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 14,
+  "time": 1703.057,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 15,
+  "time": 1818.752,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 16,
+  "time": 1933.437,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 17,
+  "time": 2048.087,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 18,
+  "time": 2162.281,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 19,
+  "time": 2276.424,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 20,
+  "time": 2414.812,
+  "rain": true,
+  "source": "lap-times"
+ },
+ {
+  "lap": 21,
+  "time": 2524.351,
+  "rain": false,
+  "source": "lap-times",
+  "ambiguous": "borderline slowing: drizzle, or tyre wear"
+ },
+ {
+  "lap": 22,
+  "time": 2631.545,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 23,
+  "time": 2735.544,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 24,
+  "time": 2839.078,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 25,
+  "time": 2942.309,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 26,
+  "time": 3045.589,
+  "rain": false,
+  "source": "lap-times",
+  "ambiguous": "lap before a neutralisation (it may have started during it)"
+ },
+ {
+  "lap": 27,
+  "time": 3158.399,
+  "rain": false,
+  "source": "lap-times",
+  "ambiguous": "neutralised between a wet and a dry spell: when it changed is unseen"
+ },
+ {
+  "lap": 28,
+  "time": 3315.264,
+  "rain": false,
+  "source": "lap-times",
+  "ambiguous": "neutralised between a wet and a dry spell: when it changed is unseen"
+ },
+ {
+  "lap": 29,
+  "time": 3469.191,
+  "rain": false,
+  "source": "lap-times",
+  "ambiguous": "neutralised between a wet and a dry spell: when it changed is unseen"
+ },
+ {
+  "lap": 30,
+  "time": 3630.641,
+  "rain": false,
+  "source": "lap-times",
+  "ambiguous": "neutralised between a wet and a dry spell: when it changed is unseen"
+ },
+ {
+  "lap": 31,
+  "time": 3787.928,
+  "rain": false,
+  "source": "lap-times",
+  "ambiguous": "neutralised between a wet and a dry spell: when it changed is unseen"
+ },
+ {
+  "lap": 32,
+  "time": 3940.422,
+  "rain": false,
+  "source": "lap-times",
+  "ambiguous": "neutralised between a wet and a dry spell: when it changed is unseen"
+ },
+ {
+  "lap": 33,
+  "time": 4045.734,
+  "rain": true,
+  "source": "lap-times",
+  "ambiguous": "first green lap after a neutralisation (cold tyres)"
+ },
+ {
+  "lap": 34,
+  "time": 4148.698,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 35,
+  "time": 4251.694,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 36,
+  "time": 4355.045,
+  "rain": false,
+  "source": "lap-times",
+  "ambiguous": "lap before a neutralisation (it may have started during it)"
+ },
+ {
+  "lap": 37,
+  "time": 4458.41,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 38,
+  "time": 4593.036,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 39,
+  "time": 4732.116,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 40,
+  "time": 4836.066,
+  "rain": false,
+  "source": "lap-times",
+  "ambiguous": "first green lap after a neutralisation (cold tyres)"
+ },
+ {
+  "lap": 41,
+  "time": 4939.027,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 42,
+  "time": 5041.606,
+  "rain": false,
+  "source": "lap-times",
+  "ambiguous": "lap before a neutralisation (it may have started during it)"
+ },
+ {
+  "lap": 43,
+  "time": 5166.352,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 44,
+  "time": 5331.182,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 45,
+  "time": 5482.222,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 46,
+  "time": 5634.103,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 47,
+  "time": 5735.437,
+  "rain": false,
+  "source": "lap-times",
+  "ambiguous": "first green lap after a neutralisation (cold tyres)"
+ },
+ {
+  "lap": 48,
+  "time": 5837.816,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 49,
+  "time": 5938.876,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 50,
+  "time": 6040.099,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 51,
+  "time": 6141.121,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 52,
+  "time": 6242.162,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 53,
+  "time": 6343.322,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 54,
+  "time": 6445.458,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 55,
+  "time": 6548.397,
+  "rain": false,
+  "source": "lap-times"
+ },
+ {
+  "lap": 56,
+  "time": 6652.703,
+  "rain": false,
+  "source": "lap-times"
+ }
+]

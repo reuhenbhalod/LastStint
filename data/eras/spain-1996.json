@@ -1,0 +1,38 @@
+{
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": true
+  },
+  "eras": {
+    "eraId": 3,
+    "order": 4,
+    "userSide": "MSCM",
+    "target": {
+      "type": "defend"
+    },
+    "storyline": {
+      "real": "In torrential rain Schumacher recovers from a poor start, takes the lead from Villeneuve on lap 13 and wins his first race for Ferrari by 45.3 s from Alesi."
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 2,
+      "label": "Win on two stops"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "push",
+      "maxLaps": 0,
+      "label": "Win without a single push lap"
+    },
+    "hardCalls": {
+      "MSCM": 3,
+      "ALE": 2
+    },
+    "briefing": "Barcelona, 1996, in the rain. Schumacher starts third in his first season with Ferrari. You run him, leading by 31.1 s after 21 laps, with Villeneuve second and Alesi third. Bring the lead home."
+  }
+}

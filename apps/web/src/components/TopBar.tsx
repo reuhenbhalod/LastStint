@@ -1,15 +1,16 @@
-// The top bar on the home page, the Gauntlet and Versus: the brand, the three ways to play as
-// tabs (today's daily, the Gauntlet, Versus), and on the right whatever the page puts there (the
+// The top bar on the home page, the Gauntlet and Versus: the brand, the four ways to play as
+// tabs (today's daily, the Gauntlet, Eras, Versus), and on the right whatever the page puts there (the
 // streak and the account menu). On a phone the tabs take a row of their own under the brand.
 
 import type { ReactNode } from 'react';
 import { Brand } from './Brand.js';
 
-export type Mode = 'daily' | 'gauntlet' | 'versus';
+export type Mode = 'daily' | 'gauntlet' | 'eras' | 'versus';
 
 const TABS: Array<{ id: Mode; label: string; href: string }> = [
   { id: 'daily', label: 'Daily', href: '/' },
   { id: 'gauntlet', label: 'Gauntlet', href: '/gauntlet' },
+  { id: 'eras', label: 'Eras', href: '/eras' },
   { id: 'versus', label: 'Versus', href: '/versus' },
 ];
 

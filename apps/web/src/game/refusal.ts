@@ -6,7 +6,7 @@
 // always gets the same answer, so neither a refresh nor pressing again re-rolls it. The
 // graded decision moments, and answers to the radio's quick calls, are always followed.
 
-import type { CarState, Decision, Mood } from '@boxthislap/sim';
+import type { CarState, Decision, Mood } from '@laststint/sim';
 import { tyreName } from './choices.js';
 
 export type LiveCall = Extract<Decision, { kind: 'pit' } | { kind: 'mode' } | { kind: 'battle' }>;

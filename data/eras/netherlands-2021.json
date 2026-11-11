@@ -1,0 +1,37 @@
+{
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": true,
+    "drs": true,
+    "ers": "hybrid",
+    "refuelling": false
+  },
+  "eras": {
+    "eraId": 9,
+    "order": 8,
+    "userSide": "VER",
+    "target": {
+      "type": "defend"
+    },
+    "storyline": {
+      "real": "Verstappen leads from pole at his home race. Mercedes splits its cars: Hamilton stops first at both rounds of stops, chasing the undercut, and Bottas runs long and leads for a while. Verstappen stops a lap after Hamilton each time, passes Bottas on lap 30 and wins by 20.9 s, after Hamilton's late stop for fastest lap."
+    },
+    "mastery": {
+      "type": "margin",
+      "seconds": 4,
+      "label": "Win by more than 4 seconds"
+    },
+    "hidden": {
+      "type": "stop_count",
+      "exact": 1,
+      "label": "Win on one stop"
+    },
+    "hardCalls": {
+      "VER": 0,
+      "HAM": 0
+    },
+    "briefing": "Zandvoort, 2021. Verstappen started from pole at home and leads Hamilton by three and a half seconds, seventeen laps in. You run him. Mercedes has two cars to play: Hamilton can try the undercut, and Bottas can stay out long. Cover them and win."
+  }
+}

@@ -1,0 +1,15 @@
+{
+ "race": "great-britain-2021",
+ "scheduledLaps": 52,
+ "completedLaps": 52,
+ "timing": "FastF1",
+ "redFlags": [
+  {
+   "lap": 2,
+   "restart": "standing",
+   "restartScLaps": 0,
+   "source": "FastF1 timing in the project cache (data/raw/great-britain-2021.parquet, .status.json): leader LEC's lap 2 TrackStatus '45' (SC then red; status '5' at session time 3938.8s, inside lap 2, which ends at 4024.5s), the cars entering the pit lane at the end of lap 2; Autosport, 'British GP red-flagged after Hamilton and Verstappen clash', 18 July 2021: 'after the first lap was completed' (https://www.autosport.com/f1/news/british-gp-red-flagged-after-hamilton-and-verstappen-clash/6633015/); GrandPrix.com race notes: 'after two laps' (https://www.grandprix.com/races/british-gp-2021-race-notes.html); Autosport race report: standing restart 'on lap 3 of 52' (https://www.autosport.com/f1/news/f1-british-gp-hamilton-wins-despite-penalty-for-verstappen-crash/6633130/)",
+   "note": "Conflict: Autosport's red-flag story says after lap 1; GrandPrix.com says after two laps; Motor Sport's lap-by-lap says 'on lap 3' (https://www.motorsportmagazine.com/articles/single-seaters/f1/hamilton-claws-his-way-back-to-silverstone-win-after-verstappen-crash-2021-british-gp-lap-by-lap-report/). Lap 2 taken: the race's own timing shows the red status on the leader's lap 2 (the SC came out on lap 1). Jolpica pit stops log every runner's red-flag stop on lap 2 (~34 min). Standing restart (Autosport race report; the 2019+ rule)."
+  }
+ ]
+}

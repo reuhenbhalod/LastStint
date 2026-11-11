@@ -18,8 +18,8 @@
 // Between calls, random play also uses the BOX button when the two-compound warning shows
 // (the last 5 laps). A stop a call makes takes out the planned stop it replaced.
 // The current seed is kept when it already passes.
-//   pnpm --filter @boxthislap/sim tune <race-id> [--seeds N] [--paths N] [--target 0.15] [--write]
-//   pnpm --filter @boxthislap/sim tune <race-id> --survivor N [--write]
+//   pnpm --filter @laststint/sim tune <race-id> [--seeds N] [--paths N] [--target 0.15] [--write]
+//   pnpm --filter @laststint/sim tune <race-id> --survivor N [--write]
 // --survivor collects up to N seeds that each pass (survivor deals one at random per run);
 // with --write it puts them in data/pools.json under survivor, instead of changing the file.
 
@@ -33,6 +33,7 @@ import {
   type RacePlan,
   type Run,
   answerMoment,
+  boxCall,
   classify,
   decide,
   enginePlans,
@@ -108,9 +109,10 @@ type Box = (run: Run) => void;
 const stopAhead = (run: Run) =>
   !!run.state.cars[run.model.userSide]?.strategy.some((s) => s.lap > run.state.lap);
 
-/** Box next lap (the in-lap; the stop is charged on the lap after). */
+/** Box next lap (the in-lap; the stop is charged on the lap after). A refuelling race: the
+ * real fill on the real stop, else 'standard' (moments.ts boxCall). */
 const boxNext = (run: Run, compound: string) =>
-  decide(run, { lap: run.state.lap + 1, kind: 'pit', compound });
+  decide(run, boxCall(run.model, run.state.lap + 1, compound));
 
 /** The real way: the real team's stops after the takeover, on their laps. */
 const realBox: Box = (run) => {

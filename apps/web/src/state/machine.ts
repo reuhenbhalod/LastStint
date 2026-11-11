@@ -14,9 +14,11 @@ import type {
   RacePlan,
   RaceResult,
   RaceState,
-} from '@boxthislap/sim';
+} from '@laststint/sim';
 import type { RunResponse } from '../data/api.js';
+import type { RaceSource } from '../data/types.js';
 import type { GradedMoment } from '../engine/grading.js';
+import type { AttemptResult } from '../eras/api.js';
 
 export type Phase =
   | 'intro'
@@ -53,14 +55,37 @@ export type Speed = 1 | 2;
 
 /**
  * The run's submission: `practice` (not submitted), `sending`, `done` (the server's numbers),
- * `already` (this player already played today; `response` is that run), or `error`.
+ * `already` (this player already played today; `response` is that run), or `error` (`retry`
+ * false: submitting again can't help). An Eras attempt (eras/submit.ts) starts `eras` (not
+ * sent yet), and ends `eras-done` (the server's stars and accuracy) or `eras-held` (the server
+ * kept the calls but can't evaluate them now: `message` says why).
  */
 export type Submission =
   | { status: 'none' }
   | { status: 'practice' }
+  | { status: 'eras' }
   | { status: 'sending' }
   | { status: 'done' | 'already'; response: RunResponse }
-  | { status: 'error'; error: string };
+  | { status: 'eras-done'; result: AttemptResult }
+  | { status: 'eras-held'; message: string }
+  | { status: 'error'; error: string; retry?: boolean };
+
+/** A new run's submission: a live daily waits to be sent; an Eras attempt is its own. */
+export function initialSubmission(source: RaceSource): Submission {
+  if (source === 'live') return { status: 'none' };
+  if (source === 'eras') return { status: 'eras' };
+  return { status: 'practice' };
+}
+
+/**
+ * What submitting a finished run does, by its source: `post` it as a daily or survivor run,
+ * keep it on this device (`practice`), or hand it to the Eras attempt (`eras`, build plan 8.7).
+ */
+export function submitRoute(source: RaceSource): 'post' | 'practice' | 'eras' {
+  if (source === 'practice') return 'practice';
+  if (source === 'eras') return 'eras';
+  return 'post';
+}
 
 /** A radio message from the driver: a "copy" or a refused call (feedback spec D1). */
 export interface RadioMessage {
@@ -76,7 +101,7 @@ export interface GameMeta {
   /** Puzzle number, for the share line (live dailies only). */
   number?: number;
   /** A live daily is submitted and ranked; practice is played locally only. */
-  source: 'live' | 'practice' | 'survivor';
+  source: RaceSource;
   practiceReason?: string;
   date: string;
   totalLaps: number;
@@ -186,7 +211,9 @@ export function reducer(state: GameState, action: Action): GameState {
 
     case 'SUBMIT':
       return state.phase === 'finished' ||
-        (state.phase === 'results' && state.submission.status === 'error')
+        (state.phase === 'results' &&
+          state.submission.status === 'error' &&
+          state.submission.retry !== false)
         ? { ...state, phase: 'submitting', submission: { status: 'sending' } }
         : state;
 

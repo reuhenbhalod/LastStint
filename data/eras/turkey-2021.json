@@ -1,0 +1,44 @@
+{
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": true,
+    "drs": true,
+    "ers": "hybrid",
+    "refuelling": false
+  },
+  "eras": {
+    "eraId": 9,
+    "order": 7,
+    "userSide": "LEC",
+    "target": {
+      "type": "position",
+      "position": 4
+    },
+    "storyline": {
+      "real": "Leclerc leads after Bottas stops for fresh intermediates and tries to run to the flag without stopping; Bottas retakes the lead on lap 47, Leclerc pits and finishes fourth.",
+      "rewriteCondition": {
+        "type": "position",
+        "position": 3
+      },
+      "headline": "Leclerc turns a lost lead into an Istanbul podium"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 1,
+      "label": "Make exactly one stop for fresh intermediates"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "push",
+      "maxLaps": 9,
+      "label": "Push for no more than 9 laps"
+    },
+    "hardCalls": {
+      "LEC": 2,
+      "HAM": 1
+    },
+    "briefing": "Istanbul, 2021. Light rain all afternoon, and a track that never dries enough for slicks. Bottas starts from pole, Leclerc third. When the leaders stop for fresh intermediates, Leclerc stays out and leads."
+  }
+}

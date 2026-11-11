@@ -1,0 +1,689 @@
+{
+  "schemaVersion": 11,
+  "race": {
+    "id": "australia-1993",
+    "name": "Australia 1993: Senna vs Prost",
+    "laps": 79,
+    "takeoverLap": 21,
+    "seed": 1,
+    "scUnlap": "none"
+  },
+  "era": "1988-1993",
+  "track": {
+    "pitLoss": 20.335,
+    "pitLossUnderSC": 11.184,
+    "pitLossUnderVSC": 14.031,
+    "pitLossDeviations": [
+      -1.149,
+      -0.956,
+      -0.205,
+      -0.003,
+      0.003,
+      0.024,
+      0.342,
+      1.948
+    ],
+    "overtakeDifficulty": 0.7292,
+    "overtakeModel": {
+      "intercept": 0.4917,
+      "paceCoef": 1.0038,
+      "gapCoef": -1.9493
+    },
+    "dirtyAirPenalty": 0.0,
+    "greenLapTime": 80.907
+  },
+  "compounds": {
+    "MEDIUM": {
+      "offset": 0.0,
+      "degPerLap": 0.02042,
+      "cliffLap": 78,
+      "provenLaps": 78
+    }
+  },
+  "drivers": [
+    {
+      "code": "ALE",
+      "team": "Ferrari",
+      "basePace": 81.8661,
+      "noise": 1.2953,
+      "stateAtTakeover": {
+        "position": 4,
+        "gapAhead": 2.262,
+        "compound": "MEDIUM",
+        "tyreAge": 21,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BAR",
+      "team": "Jordan",
+      "basePace": 82.9011,
+      "noise": 1.4621,
+      "stateAtTakeover": {
+        "position": 13,
+        "gapAhead": 14.342,
+        "compound": "MEDIUM",
+        "tyreAge": 21,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BER",
+      "team": "Ferrari",
+      "basePace": 81.3197,
+      "noise": 0.6423,
+      "stateAtTakeover": {
+        "position": 7,
+        "gapAhead": 19.529,
+        "compound": "MEDIUM",
+        "tyreAge": 21,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BLU",
+      "team": "Ligier",
+      "basePace": 82.1236,
+      "noise": 0.568,
+      "stateAtTakeover": {
+        "position": 8,
+        "gapAhead": 0.361,
+        "compound": "MEDIUM",
+        "tyreAge": 21,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BRU",
+      "team": "Ligier",
+      "basePace": 81.6756,
+      "noise": 0.7331,
+      "stateAtTakeover": {
+        "position": 6,
+        "gapAhead": 6.279,
+        "compound": "MEDIUM",
+        "tyreAge": 21,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "COM",
+      "team": "Larrousse",
+      "basePace": 83.0962,
+      "noise": 0.7467,
+      "stateAtTakeover": {
+        "position": 16,
+        "gapAhead": 3.344,
+        "compound": "MEDIUM",
+        "tyreAge": 21,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "DEC",
+      "team": "Tyrrell",
+      "basePace": 84.7761,
+      "noise": 1.3807,
+      "stateAtTakeover": {
+        "position": 12,
+        "gapAhead": 0.907,
+        "compound": "MEDIUM",
+        "tyreAge": 21,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "GOU",
+      "team": "Minardi",
+      "basePace": 86.1449,
+      "noise": 1.0725,
+      "stateAtTakeover": {
+        "position": 18,
+        "gapAhead": 20.505,
+        "compound": "MEDIUM",
+        "tyreAge": 21,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "HAK",
+      "team": "McLaren",
+      "basePace": 83.3823,
+      "noise": 0.8226,
+      "stateAtTakeover": {
+        "position": 11,
+        "gapAhead": 13.928,
+        "compound": "MEDIUM",
+        "tyreAge": 21,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 27,
+          "to": "MEDIUM",
+          "loss": 22.801
+        }
+      ]
+    },
+    {
+      "code": "HIL",
+      "team": "Williams",
+      "basePace": 80.3615,
+      "noise": 0.7743,
+      "stateAtTakeover": {
+        "position": 3,
+        "gapAhead": 10.272,
+        "compound": "MEDIUM",
+        "tyreAge": 21,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 23,
+          "to": "MEDIUM",
+          "loss": 19.211
+        },
+        {
+          "lap": 45,
+          "to": "MEDIUM",
+          "loss": 21.036
+        }
+      ]
+    },
+    {
+      "code": "JAR",
+      "team": "Sauber",
+      "basePace": 83.2051,
+      "noise": 1.3291,
+      "stateAtTakeover": {
+        "position": 15,
+        "gapAhead": 2.884,
+        "compound": "MEDIUM",
+        "tyreAge": 21,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "PAT",
+      "team": "Benetton",
+      "basePace": 81.5924,
+      "noise": 0.89,
+      "stateAtTakeover": {
+        "position": 10,
+        "gapAhead": 0.306,
+        "compound": "MEDIUM",
+        "tyreAge": 21,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "PRO",
+      "team": "Williams",
+      "basePace": 80.1149,
+      "noise": 0.4477,
+      "stateAtTakeover": {
+        "position": 2,
+        "gapAhead": 1.428,
+        "compound": "MEDIUM",
+        "tyreAge": 21,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 30,
+          "to": "MEDIUM",
+          "loss": 20.016
+        },
+        {
+          "lap": 49,
+          "to": "MEDIUM",
+          "loss": 19.487
+        }
+      ]
+    },
+    {
+      "code": "SENA",
+      "team": "McLaren",
+      "basePace": 79.9557,
+      "noise": 0.7136,
+      "stateAtTakeover": {
+        "position": 1,
+        "gapAhead": 0.0,
+        "compound": "MEDIUM",
+        "tyreAge": 21,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 25,
+          "to": "MEDIUM",
+          "loss": 20.213
+        },
+        {
+          "lap": 56,
+          "to": "MEDIUM",
+          "loss": 20.786
+        }
+      ]
+    },
+    {
+      "code": "SUU",
+      "team": "Larrousse",
+      "basePace": 85.375,
+      "noise": 0.6184,
+      "stateAtTakeover": {
+        "position": 17,
+        "gapAhead": 30.874,
+        "compound": "MEDIUM",
+        "tyreAge": 21,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "SUZ",
+      "team": "Footwork",
+      "basePace": 81.8081,
+      "noise": 1.1089,
+      "stateAtTakeover": {
+        "position": 5,
+        "gapAhead": 12.542,
+        "compound": "MEDIUM",
+        "tyreAge": 21,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "WAR",
+      "team": "Footwork",
+      "basePace": 82.3098,
+      "noise": 0.4163,
+      "stateAtTakeover": {
+        "position": 9,
+        "gapAhead": 9.663,
+        "compound": "MEDIUM",
+        "tyreAge": 21,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "WEN",
+      "team": "Sauber",
+      "basePace": 83.1659,
+      "noise": 1.3898,
+      "stateAtTakeover": {
+        "position": 14,
+        "gapAhead": 2.112,
+        "compound": "MEDIUM",
+        "tyreAge": 21,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    }
+  ],
+  "fuelEffectPerLap": 0.05377,
+  "freshTyre": {
+    "bonus": -0.1686,
+    "laps": 3
+  },
+  "events": [
+    {
+      "lap": 30,
+      "type": "RETIREMENT",
+      "driver": "HAK"
+    },
+    {
+      "lap": 37,
+      "type": "RETIREMENT",
+      "driver": "GOU"
+    },
+    {
+      "lap": 59,
+      "type": "RETIREMENT",
+      "driver": "JAR"
+    },
+    {
+      "lap": 77,
+      "type": "RETIREMENT",
+      "driver": "WEN"
+    }
+  ],
+  "decisionMoments": [
+    {
+      "id": "stop-24",
+      "lap": 24,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "STAY OUT",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "IN - fresh tyres",
+          "decisions": [
+            {
+              "lap": 24,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "box-next-medium",
+          "label": "IN NEXT LAP - fresh tyres",
+          "decisions": [
+            {
+              "lap": 25,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "box-medium"
+    },
+    {
+      "id": "pace-37",
+      "lap": 37,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 37,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "standard",
+          "label": "STEADY - standard pace",
+          "decisions": [
+            {
+              "lap": 37,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "manage",
+          "label": "EASY - save the tyres",
+          "decisions": [
+            {
+              "lap": 37,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "push-attack",
+          "label": "PUSH - attack",
+          "decisions": [
+            {
+              "lap": 37,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            },
+            {
+              "lap": 37,
+              "kind": "mode",
+              "key": "battle",
+              "value": "attack"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "pace-41",
+      "lap": 41,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 41,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "standard",
+          "label": "STEADY - standard pace",
+          "decisions": [
+            {
+              "lap": 41,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "manage",
+          "label": "EASY - save the tyres",
+          "decisions": [
+            {
+              "lap": 41,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "push-attack",
+          "label": "PUSH - attack",
+          "decisions": [
+            {
+              "lap": 41,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            },
+            {
+              "lap": 41,
+              "kind": "mode",
+              "key": "battle",
+              "value": "attack"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "rivalpit-48",
+      "lap": 48,
+      "trigger": "rivalPit",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "STAY OUT",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "IN - fresh tyres",
+          "decisions": [
+            {
+              "lap": 48,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "box-next-medium",
+          "label": "IN NEXT LAP - fresh tyres",
+          "decisions": [
+            {
+              "lap": 49,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "stay"
+    }
+  ],
+  "candidateMomentLaps": [
+    23,
+    25,
+    27,
+    30,
+    45,
+    49,
+    56
+  ],
+  "realResult": [
+    "SENA",
+    "PRO",
+    "HIL",
+    "ALE",
+    "BER",
+    "BRU",
+    "SUZ",
+    "PAT",
+    "BLU",
+    "WAR",
+    "BAR",
+    "COM",
+    "DEC",
+    "SUU",
+    "WEN",
+    "JAR",
+    "GOU",
+    "HAK",
+    "MSCM",
+    "KAT",
+    "IRV",
+    "HER",
+    "MAR",
+    "LAM"
+  ],
+  "userSide": "SENA",
+  "rival": "PRO",
+  "eras": {
+    "eraId": 2,
+    "order": 10,
+    "userSide": "SENA",
+    "hardCalls": {
+      "SENA": 1,
+      "PRO": 0
+    },
+    "target": {
+      "type": "defend"
+    },
+    "storyline": {
+      "real": "Senna leads from pole except during the stops and wins by nine seconds from Prost, in Prost's last Grand Prix; it is Senna's 41st and last win"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 1,
+      "label": "Win on exactly one stop"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 10,
+      "label": "Win by more than 10 seconds"
+    },
+    "briefing": "Adelaide, 1993. Senna's last race for McLaren and Prost's last race of all. Senna starts from pole; Prost is already champion. Pit board only: hold the lead to the flag. Reconstructed race: no lap timing survives, so the laps are rebuilt to fit the result, the fastest laps, the sourced stops and who led each lap (Jolpica, F1DB, Motor Sport, Wikipedia). Who led each lap is sourced; the lap times, and the order behind the leader, are reconstructed."
+  },
+  "provenance": {
+    "kind": "reconstructed",
+    "estimated": [
+      "compounds",
+      "safetyCars",
+      "fuelLoads",
+      "weather"
+    ]
+  },
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": false
+  },
+  "reconstructed": true
+}

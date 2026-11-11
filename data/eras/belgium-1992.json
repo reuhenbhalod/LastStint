@@ -1,0 +1,45 @@
+{
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": false
+  },
+  "eras": {
+    "eraId": 2,
+    "order": 6,
+    "userSide": "MSCM",
+    "hardCalls": {
+      "MSCM": 2,
+      "MAN": 0
+    },
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Schumacher wins his first Grand Prix: wets on lap 4, slicks on lap 30 after going off at Stavelot, 36.6 seconds ahead of the new champion Mansell"
+    },
+    "mastery": {
+      "type": "margin",
+      "seconds": 15,
+      "label": "Win by more than 15 seconds"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 37,
+      "label": "Win by more than Schumacher's real 36.6 seconds"
+    },
+    "briefing": "Spa, 1992. Rain arrived just before the start and everyone has stopped for wets. Now a dry line is appearing. Schumacher's Benetton started third. Pit board only: call the slicks. Reconstructed race: no lap timing survives, so the laps are rebuilt to fit the result, the fastest laps, the sourced stops and who led each lap (Jolpica, F1DB, Motor Sport, Wikipedia). Who led each lap is sourced; the lap times, and the order behind the leader, are reconstructed.",
+    "storylineCalls": [
+      {
+        "driver": "MAN",
+        "lap": 34,
+        "real": "Mansell stays out on wets until the end of lap 33, three laps after Schumacher's slick stop at the end of lap 30, and finishes second",
+        "source": "https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement"
+      }
+    ]
+  }
+}

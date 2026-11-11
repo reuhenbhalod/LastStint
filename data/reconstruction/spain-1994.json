@@ -1,0 +1,46 @@
+{
+  "raceId": "spain-1994",
+  "stops": [],
+  "safetyCars": [],
+  "complete": {
+    "safetyCars": false
+  },
+  "lapLeaders": [
+    {
+      "driver": "MSCM",
+      "name": "Michael Schumacher",
+      "fromLap": 1,
+      "toLap": 22,
+      "source": "https://en.wikipedia.org/wiki/1994_Spanish_Grand_Prix (lap-leader chart, Template:F1Laps1994 'ESP')"
+    },
+    {
+      "driver": "HAK",
+      "name": "Mika Häkkinen",
+      "fromLap": 23,
+      "toLap": 30,
+      "source": "https://en.wikipedia.org/wiki/1994_Spanish_Grand_Prix (lap-leader chart, Template:F1Laps1994 'ESP')"
+    },
+    {
+      "driver": "HIL",
+      "name": "Damon Hill",
+      "fromLap": 31,
+      "toLap": 40,
+      "source": "https://en.wikipedia.org/wiki/1994_Spanish_Grand_Prix (lap-leader chart, Template:F1Laps1994 'ESP')"
+    },
+    {
+      "driver": "MSCM",
+      "name": "Michael Schumacher",
+      "fromLap": 41,
+      "toLap": 45,
+      "source": "https://en.wikipedia.org/wiki/1994_Spanish_Grand_Prix (lap-leader chart, Template:F1Laps1994 'ESP')"
+    },
+    {
+      "driver": "HIL",
+      "name": "Damon Hill",
+      "fromLap": 46,
+      "toLap": 65,
+      "source": "https://en.wikipedia.org/wiki/1994_Spanish_Grand_Prix (lap-leader chart, Template:F1Laps1994 'ESP')"
+    }
+  ],
+  "notes": "Stops come from F1DB (data/raw/f1db/spain-1994.stops.csv). Motor Sport Jul 1994 (https://www.motorsportmagazine.com/archive/article/july-1994/12/atimely-triumph) gives Schumacher 21 and 45, Hakkinen 30 and 45, Hill 41: each one lap below F1DB (22/46, 31/46, 42), so its laps look like laps completed before the in-lap; F1DB kept. Schumacher stuck in fifth gear from about his first stop. No safety car mentioned in Wikipedia, Motor Sport or GrandPrix.com (https://www.grandprix.com/gpe/rr553.html); not confirmed absent."
+}

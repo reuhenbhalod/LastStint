@@ -1,4 +1,4 @@
-# BoxThisLap
+# LastStint
 
 A free daily F1 strategy game. Everyone gets the same real race situation each day; you
 make the pit-wall calls and a simulator grades them against the best possible call and
@@ -57,6 +57,6 @@ uv run pytest
   - Player calls, headset modes, team orders, the reactive rival and the two-compound rule.
   - Grader without hindsight, decision moments, scoring.
   - Web Worker grading: 42 ms on 2 workers for the plan's budget case.
-- **Next:** the game UI (Phase 3, @Reuhen) on top of `@boxthislap/sim` 0.1.0.
+- **Next:** the game UI (Phase 3, @Reuhen) on top of `@laststint/sim` 0.1.0.
 
 > Not affiliated with Formula 1. No F1 wordmark, team logos or liveries are used.

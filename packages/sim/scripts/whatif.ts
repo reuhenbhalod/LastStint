@@ -1,11 +1,11 @@
 // What-if check (realism): famous calls with a broad fan consensus, graded from the real race
 // state, to see whether the grader agrees.
-//   pnpm --filter @boxthislap/sim whatif
+//   pnpm --filter @laststint/sim whatif
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { type GradeOption, type Target, gradeMoment } from '../src/grade.js';
-import { pauseAt } from '../src/moments.js';
+import { boxCall, pauseAt } from '../src/moments.js';
 import type { RaceModel } from '../src/types.js';
 
 const repo = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
@@ -158,7 +158,7 @@ const CASES: Case[] = [
   },
   {
     name: 'Saudi 22, SC lap 16: LEC boxes?',
-    race: 'saudi-2022',
+    race: 'saudi-arabia-2022',
     user: 'LEC',
     rival: 'VER',
     lap: 16,
@@ -196,7 +196,7 @@ for (const c of CASES) {
   const run = pauseAt(model, c.lap);
   const options: GradeOption[] = c.options.map(([id, compound]) => ({
     id,
-    decisions: compound ? [{ lap: c.lap, kind: 'pit', compound }] : [],
+    decisions: compound ? [boxCall(model, c.lap, compound)] : [],
   }));
   const g = gradeMoment(run, options, target, SAMPLES);
   const top = Math.max(...g.options.map((o) => o.probability));

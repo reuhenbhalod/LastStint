@@ -1,0 +1,59 @@
+{
+  "eras": {
+    "eraId": 3,
+    "order": 2,
+    "userSide": "HIL",
+    "hardCalls": {
+      "MSCM": 0,
+      "HIL": 1
+    },
+    "target": {
+      "type": "beat-rival",
+      "rival": "MSCM"
+    },
+    "storyline": {
+      "real": "Schumacher hits the wall and the two collide on lap 36 as Hill tries to pass; both retire and Schumacher takes the title by one point",
+      "rewriteCondition": {
+        "type": "beat-rival",
+        "rival": "MSCM"
+      },
+      "headline": "Hill beats Schumacher to the Adelaide flag"
+    },
+    "mastery": {
+      "type": "finish_position",
+      "position": 2,
+      "label": "Finish in the top two"
+    },
+    "hidden": {
+      "type": "finish_position",
+      "position": 1,
+      "label": "Win the race"
+    },
+    "briefing": "Adelaide, 1994, the final round. Schumacher leads the championship on 92 points, Hill is one behind on 91. One point between them, one race left, and Schumacher's Benetton is the car ahead. Mansell started from pole. Reconstructed race: no lap timing survives, so the laps are rebuilt to fit the result, the fastest laps, the sourced stops and who led each lap (Jolpica, F1DB, Motor Sport, Wikipedia). Who led each lap is sourced, and so is the order at a few laps; the lap times, and the rest of the order, are reconstructed.",
+    "storylineRetirements": [
+      {
+        "driver": "HIL",
+        "condition": {
+          "type": "mode",
+          "key": "battle",
+          "value": "attack",
+          "fromLap": 34
+        },
+        "alsoRetires": [
+          "MSCM"
+        ],
+        "real": "Hill was catching Schumacher when the Benetton went off at East Terrace and hit the wall; Schumacher pulled back across the track, Hill tried to pass at the next corner and they collided as Schumacher turned in: Schumacher out on the spot, Hill retired with front-left suspension damage",
+        "source": "https://en.wikipedia.org/wiki/1994_Australian_Grand_Prix"
+      }
+    ]
+  },
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": true
+  }
+}

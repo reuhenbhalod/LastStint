@@ -1,0 +1,43 @@
+{
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": false,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": true
+  },
+  "eras": {
+    "eraId": 5,
+    "order": 1,
+    "userSide": "MSCM",
+    "target": {
+      "type": "position",
+      "position": 2
+    },
+    "storyline": {
+      "real": "Schumacher starts 13th and is stuck behind Trulli for 20 laps. After his stop he catches Alonso and they battle for the lead, but he can't pass and finishes second, 0.2 s behind.",
+      "rewriteCondition": {
+        "type": "win"
+      },
+      "headline": "Schumacher finds a way past Alonso at Imola"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "max": 2,
+      "label": "Finish second or better on no more than two stops"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "push",
+      "maxLaps": 10,
+      "label": "Finish second or better pushing for no more than 10 laps"
+    },
+    "hardCalls": {
+      "MSCM": 1,
+      "ALO": 0
+    },
+    "briefing": "Imola, 2005. Schumacher qualified only 13th. You run his Ferrari, tenth after 20 laps but on a long first stint, 36.5 s behind Alonso in the lead. Finish second at least, and take the win from Alonso if you can."
+  }
+}

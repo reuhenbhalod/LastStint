@@ -1,0 +1,47 @@
+{
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": true,
+    "drs": true,
+    "ers": "hybrid",
+    "refuelling": false
+  },
+  "eras": {
+    "eraId": 8,
+    "order": 4,
+    "userSide": "VET",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Hamilton wins by 3.5 s. Vettel takes the lead at the start and stops early, on lap 14; Mercedes leaves Bottas out to hold him up, then stops Hamilton as the virtual safety car ends. Vettel stops a lap later under green, comes out alongside Hamilton, and is passed for the lead on lap 44.",
+      "rewriteCondition": {
+        "type": "win"
+      },
+      "headline": "Vettel holds off Mercedes to win in Barcelona"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 2,
+      "label": "Win on two stops, as Vettel made"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 3.5,
+      "label": "Win by more than 3.5 seconds, Hamilton's real margin"
+    },
+    "hardCalls": {
+      "VET": 1,
+      "HAM": 1
+    },
+    "briefing": "Barcelona, 2017. Hamilton took pole by 0.051 s, but Vettel passed him into Turn 1 and leads him by just over two seconds after ten laps. Bottas runs third, eight seconds further back. Keep Vettel ahead of the Mercedes to the flag."
+  },
+  "storylineEvents": [
+    [
+      34,
+      "VSC"
+    ]
+  ]
+}

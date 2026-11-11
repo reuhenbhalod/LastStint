@@ -1,0 +1,438 @@
+{
+  "schemaVersion": 11,
+  "race": {
+    "id": "monaco-1992",
+    "name": "Monaco 1992: Senna vs Mansell",
+    "laps": 78,
+    "takeoverLap": 68,
+    "seed": 1,
+    "scUnlap": "none"
+  },
+  "era": "1988-1993",
+  "track": {
+    "pitLoss": 19.767,
+    "pitLossUnderSC": 10.872,
+    "pitLossUnderVSC": 13.639,
+    "pitLossDeviations": [
+      -1.439,
+      1.439
+    ],
+    "overtakeDifficulty": 0.7846,
+    "overtakeModel": {
+      "intercept": 0.004,
+      "paceCoef": 0.8106,
+      "gapCoef": -1.6132
+    },
+    "dirtyAirPenalty": 0.0155,
+    "greenLapTime": 86.932
+  },
+  "compounds": {
+    "MEDIUM": {
+      "offset": 0.0,
+      "degPerLap": 0.03181,
+      "cliffLap": 28,
+      "cliffDegPerLap": 0.0225,
+      "provenLaps": 78
+    }
+  },
+  "drivers": [
+    {
+      "code": "ALBM",
+      "team": "Footwork",
+      "basePace": 87.7487,
+      "noise": 0.5827,
+      "stateAtTakeover": {
+        "position": 7,
+        "gapAhead": 6.748,
+        "compound": "MEDIUM",
+        "tyreAge": 68,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BOUT",
+      "team": "Ligier",
+      "basePace": 90.3765,
+      "noise": 1.5057,
+      "stateAtTakeover": {
+        "position": 12,
+        "gapAhead": 16.473,
+        "compound": "MEDIUM",
+        "tyreAge": 68,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BRU",
+      "team": "Benetton",
+      "basePace": 87.258,
+      "noise": 1.2016,
+      "stateAtTakeover": {
+        "position": 5,
+        "gapAhead": 56.732,
+        "compound": "MEDIUM",
+        "tyreAge": 49,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "COM",
+      "team": "Ligier",
+      "basePace": 88.778,
+      "noise": 0.6794,
+      "stateAtTakeover": {
+        "position": 10,
+        "gapAhead": 33.928,
+        "compound": "MEDIUM",
+        "tyreAge": 68,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "FITC",
+      "team": "Minardi",
+      "basePace": 87.9401,
+      "noise": 0.757,
+      "stateAtTakeover": {
+        "position": 8,
+        "gapAhead": 2.629,
+        "compound": "MEDIUM",
+        "tyreAge": 68,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "GAC",
+      "team": "Larrousse",
+      "basePace": 87.4901,
+      "noise": 0.768,
+      "stateAtTakeover": {
+        "position": 6,
+        "gapAhead": 35.865,
+        "compound": "MEDIUM",
+        "tyreAge": 68,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "JAR",
+      "team": "Dallara",
+      "basePace": 87.6485,
+      "noise": 0.8918,
+      "stateAtTakeover": {
+        "position": 9,
+        "gapAhead": 33.596,
+        "compound": "MEDIUM",
+        "tyreAge": 68,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "MAN",
+      "team": "Williams",
+      "basePace": 86.5113,
+      "noise": 0.4535,
+      "stateAtTakeover": {
+        "position": 1,
+        "gapAhead": 0.0,
+        "compound": "MEDIUM",
+        "tyreAge": 68,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 72,
+          "to": "MEDIUM",
+          "loss": 20.074
+        }
+      ]
+    },
+    {
+      "code": "MSCM",
+      "team": "Benetton",
+      "basePace": 87.2129,
+      "noise": 0.9021,
+      "stateAtTakeover": {
+        "position": 4,
+        "gapAhead": 7.801,
+        "compound": "MEDIUM",
+        "tyreAge": 68,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "PAT",
+      "team": "Williams",
+      "basePace": 87.19,
+      "noise": 0.7028,
+      "stateAtTakeover": {
+        "position": 3,
+        "gapAhead": 18.59,
+        "compound": "MEDIUM",
+        "tyreAge": 68,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "SENA",
+      "team": "McLaren",
+      "basePace": 86.1935,
+      "noise": 0.719,
+      "stateAtTakeover": {
+        "position": 2,
+        "gapAhead": 1.004,
+        "compound": "MEDIUM",
+        "tyreAge": 68,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "SUZ",
+      "team": "Footwork",
+      "basePace": 88.1527,
+      "noise": 1.3685,
+      "stateAtTakeover": {
+        "position": 11,
+        "gapAhead": 10.144,
+        "compound": "MEDIUM",
+        "tyreAge": 68,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    }
+  ],
+  "fuelEffectPerLap": 0.06144,
+  "freshTyre": {
+    "bonus": -0.1137,
+    "laps": 3
+  },
+  "events": [],
+  "decisionMoments": [
+    {
+      "id": "stop-71",
+      "lap": 71,
+      "trigger": "rivalPit",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "STAY OUT",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "IN - fresh tyres",
+          "decisions": [
+            {
+              "lap": 71,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "stay"
+    },
+    {
+      "id": "pace-73",
+      "lap": 73,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 73,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "easy",
+          "label": "EASY - save the car",
+          "decisions": [
+            {
+              "lap": 73,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "battle-75",
+      "lap": 75,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "hold",
+          "label": "Hold position",
+          "decisions": []
+        },
+        {
+          "id": "defend",
+          "label": "DEFEND",
+          "decisions": [
+            {
+              "lap": 75,
+              "kind": "mode",
+              "key": "battle",
+              "value": "defend"
+            }
+          ]
+        },
+        {
+          "id": "attack",
+          "label": "ATTACK",
+          "decisions": [
+            {
+              "lap": 75,
+              "kind": "mode",
+              "key": "battle",
+              "value": "attack"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    }
+  ],
+  "candidateMomentLaps": [
+    72
+  ],
+  "realResult": [
+    "SENA",
+    "MAN",
+    "PAT",
+    "MSCM",
+    "BRU",
+    "GAC",
+    "ALBM",
+    "FITC",
+    "JAR",
+    "COM",
+    "SUZ",
+    "BOUT",
+    "CAP",
+    "BER",
+    "HAK",
+    "ALE",
+    "GUG",
+    "HER",
+    "MOE",
+    "DEC",
+    "TAR",
+    "MOD",
+    "GROO",
+    "MAR",
+    "WEN",
+    "MOR"
+  ],
+  "userSide": "SENA",
+  "rival": "MAN",
+  "eras": {
+    "eraId": 2,
+    "order": 5,
+    "userSide": "SENA",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Mansell leads from pole until lap 71, when he feels something wrong and dives into the pits; Senna, on the set of tyres he started on, takes the lead and holds off Mansell on fresh tyres for the last laps to win by 0.215 seconds"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 1,
+      "label": "Answer Mansell's fresh tyres with your own: win with one tyre stop"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 2.0,
+      "label": "Win by more than 2 seconds"
+    },
+    "briefing": "Monaco, May 1992. Mansell has won the first five races of the year and leads from pole; Senna's McLaren started third. Your tyres have done the whole race. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports. Who led each lap is sourced; the lap times are reconstructed.",
+    "hardCalls": {
+      "MAN": 0,
+      "SENA": 0
+    },
+    "storylineCalls": [
+      {
+        "driver": "MAN",
+        "lap": 72,
+        "real": "Mansell feels something wrong (a suspected puncture or loose wheel nut) and dives into the pits at the end of lap 71, handing Senna the lead",
+        "source": "https://www.grandprix.com/gpe/rr522.html; https://www.motorsportmagazine.com/archive/article/july-1992/16/what-did-go-wrong"
+      }
+    ]
+  },
+  "provenance": {
+    "kind": "reconstructed",
+    "estimated": [
+      "compounds",
+      "fuelLoads",
+      "weather"
+    ]
+  },
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": false
+  },
+  "reconstructed": true
+}

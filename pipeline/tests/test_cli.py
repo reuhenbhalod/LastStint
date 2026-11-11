@@ -31,6 +31,18 @@ def test_build_writes_model_and_golden(tmp_path, monkeypatch):
     assert "note:" in result.output  # prior/fallback notes are surfaced
 
 
+def test_ingest_points_jolpica_races_at_pipeline_jolpica(monkeypatch):
+    # A Jolpica race (Eras 5.1) has no FastF1 / OpenF1 path: `ingest --force` must not try one.
+    def no_network(*_args, **_kwargs):
+        raise AssertionError("Jolpica races are read with `pipeline jolpica`")
+
+    monkeypatch.setattr(cli.ingest, "ingest_race", no_network)
+    monkeypatch.setattr(cli.ingest, "ingest_openf1", no_network)
+    result = runner.invoke(cli.app, ["ingest", "turkey-2021", "--force"])
+    assert result.exit_code == 0, result.output
+    assert "pipeline jolpica turkey-2021" in result.output
+
+
 def test_build_rejects_unknown_race():
     result = runner.invoke(cli.app, ["build", "monaco-1950"])
     assert result.exit_code != 0

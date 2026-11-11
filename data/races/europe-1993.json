@@ -1,0 +1,1086 @@
+{
+  "schemaVersion": 11,
+  "race": {
+    "id": "europe-1993",
+    "name": "Europe 1993: Senna vs Hill",
+    "laps": 76,
+    "takeoverLap": 14,
+    "seed": 1,
+    "scUnlap": "none"
+  },
+  "era": "1988-1993",
+  "track": {
+    "pitLoss": 16.699,
+    "pitLossUnderSC": 9.185,
+    "pitLossUnderVSC": 11.522,
+    "pitLossDeviations": [
+      -8.693,
+      -4.998,
+      -4.62,
+      -3.878,
+      -3.726,
+      -0.286,
+      0.286,
+      2.027,
+      2.379,
+      3.555
+    ],
+    "overtakeDifficulty": 0.6635,
+    "overtakeModel": {
+      "intercept": -0.1105,
+      "paceCoef": 0.0902,
+      "gapCoef": -0.7034
+    },
+    "dirtyAirPenalty": 0.0,
+    "greenLapTime": 90.514
+  },
+  "compounds": {
+    "MEDIUM": {
+      "offset": 0.0,
+      "degPerLap": 0.0,
+      "cliffLap": 65,
+      "provenLaps": 65
+    },
+    "WET": {
+      "offset": 0.0,
+      "degPerLap": 0.0,
+      "cliffLap": 74,
+      "provenLaps": 74
+    },
+    "INTERMEDIATE": {
+      "offset": 0.0,
+      "degPerLap": 0.05,
+      "cliffLap": 30
+    }
+  },
+  "drivers": [
+    {
+      "code": "ALBM",
+      "team": "Lola",
+      "basePace": 73.363,
+      "noise": 1.05,
+      "wetPace": 0.0967,
+      "stateAtTakeover": {
+        "position": 10,
+        "gapAhead": 10.583,
+        "compound": "WET",
+        "tyreAge": 14,
+        "compoundsUsed": [
+          "WET"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "ALE",
+      "team": "Ferrari",
+      "basePace": 76.164,
+      "noise": 1.05,
+      "wetPace": -0.0043,
+      "stateAtTakeover": {
+        "position": 7,
+        "gapAhead": 3.462,
+        "compound": "WET",
+        "tyreAge": 14,
+        "compoundsUsed": [
+          "WET"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "ALL",
+      "team": "Larrousse",
+      "basePace": 76.693,
+      "noise": 1.05,
+      "wetPace": 0.0091,
+      "stateAtTakeover": {
+        "position": 13,
+        "gapAhead": 8.853,
+        "compound": "WET",
+        "tyreAge": 14,
+        "compoundsUsed": [
+          "WET"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BAB",
+      "team": "Minardi",
+      "basePace": 72.263,
+      "noise": 1.05,
+      "wetPace": 0.0708,
+      "stateAtTakeover": {
+        "position": 5,
+        "gapAhead": 0.735,
+        "compound": "WET",
+        "tyreAge": 14,
+        "compoundsUsed": [
+          "WET"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BAR",
+      "team": "Jordan",
+      "basePace": 75.165,
+      "noise": 0.175,
+      "wetPace": -0.0038,
+      "stateAtTakeover": {
+        "position": 6,
+        "gapAhead": 0.469,
+        "compound": "WET",
+        "tyreAge": 14,
+        "compoundsUsed": [
+          "WET"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 20,
+          "to": "MEDIUM",
+          "loss": 25.603
+        },
+        {
+          "lap": 40,
+          "to": "WET",
+          "loss": 10.759
+        }
+      ]
+    },
+    {
+      "code": "BER",
+      "team": "Ferrari",
+      "basePace": 76.461,
+      "noise": 1.05,
+      "wetPace": 0.0164,
+      "stateAtTakeover": {
+        "position": 16,
+        "gapAhead": 3.247,
+        "compound": "WET",
+        "tyreAge": 14,
+        "compoundsUsed": [
+          "WET"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BLU",
+      "team": "Ligier",
+      "basePace": 75.489,
+      "noise": 1.05,
+      "wetPace": 0.0053,
+      "stateAtTakeover": {
+        "position": 12,
+        "gapAhead": 1.474,
+        "compound": "WET",
+        "tyreAge": 14,
+        "compoundsUsed": [
+          "WET"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BOUT",
+      "team": "Jordan",
+      "basePace": 72.72,
+      "noise": 1.05,
+      "wetPace": 0.0656,
+      "stateAtTakeover": {
+        "position": 4,
+        "gapAhead": 1.483,
+        "compound": "WET",
+        "tyreAge": 14,
+        "compoundsUsed": [
+          "WET"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "COM",
+      "team": "Larrousse",
+      "basePace": 77.76,
+      "noise": 1.05,
+      "wetPace": 0.0118,
+      "stateAtTakeover": {
+        "position": 17,
+        "gapAhead": 8.132,
+        "compound": "WET",
+        "tyreAge": 14,
+        "compoundsUsed": [
+          "WET"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "DEC",
+      "team": "Tyrrell",
+      "basePace": 77.654,
+      "noise": 1.05,
+      "wetPace": 0.0027,
+      "stateAtTakeover": {
+        "position": 19,
+        "gapAhead": 2.333,
+        "compound": "WET",
+        "tyreAge": 14,
+        "compoundsUsed": [
+          "WET"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "FITC",
+      "team": "Minardi",
+      "basePace": 76.802,
+      "noise": 1.05,
+      "wetPace": 0.0096,
+      "stateAtTakeover": {
+        "position": 15,
+        "gapAhead": 3.18,
+        "compound": "WET",
+        "tyreAge": 14,
+        "compoundsUsed": [
+          "WET"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "HER",
+      "team": "Team Lotus",
+      "basePace": 78.096,
+      "noise": 0.175,
+      "wetPace": 0.0208,
+      "stateAtTakeover": {
+        "position": 14,
+        "gapAhead": 2.786,
+        "compound": "MEDIUM",
+        "tyreAge": 4,
+        "compoundsUsed": [
+          "MEDIUM",
+          "WET"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "HIL",
+      "team": "Williams",
+      "basePace": 74.839,
+      "noise": 1.05,
+      "wetPace": 0.0011,
+      "stateAtTakeover": {
+        "position": 3,
+        "gapAhead": 0.208,
+        "compound": "WET",
+        "tyreAge": 14,
+        "compoundsUsed": [
+          "WET"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 18,
+          "to": "MEDIUM",
+          "loss": 25.344
+        },
+        {
+          "lap": 25,
+          "to": "WET",
+          "loss": 21.943
+        }
+      ]
+    },
+    {
+      "code": "MSCM",
+      "team": "Benetton",
+      "basePace": 74.681,
+      "noise": 1.05,
+      "wetPace": 0.0112,
+      "stateAtTakeover": {
+        "position": 8,
+        "gapAhead": 0.976,
+        "compound": "WET",
+        "tyreAge": 14,
+        "compoundsUsed": [
+          "WET"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "PAT",
+      "team": "Benetton",
+      "basePace": 76.148,
+      "noise": 1.05,
+      "wetPace": -0.0007,
+      "stateAtTakeover": {
+        "position": 11,
+        "gapAhead": 6.299,
+        "compound": "WET",
+        "tyreAge": 14,
+        "compoundsUsed": [
+          "WET"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "PRO",
+      "team": "Williams",
+      "basePace": 76.384,
+      "noise": 0.175,
+      "wetPace": -0.0048,
+      "stateAtTakeover": {
+        "position": 2,
+        "gapAhead": 24.501,
+        "compound": "WET",
+        "tyreAge": 14,
+        "compoundsUsed": [
+          "WET"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 20,
+          "to": "MEDIUM",
+          "loss": 15.853
+        },
+        {
+          "lap": 23,
+          "to": "WET",
+          "loss": 32.579
+        },
+        {
+          "lap": 49,
+          "to": "MEDIUM",
+          "loss": 14.509
+        },
+        {
+          "lap": 54,
+          "to": "MEDIUM",
+          "loss": 23.935
+        }
+      ]
+    },
+    {
+      "code": "SENA",
+      "team": "McLaren",
+      "basePace": 76.537,
+      "noise": 0.525,
+      "wetPace": 0.0005,
+      "stateAtTakeover": {
+        "position": 1,
+        "gapAhead": 0.0,
+        "compound": "WET",
+        "tyreAge": 14,
+        "compoundsUsed": [
+          "WET"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 19,
+          "to": "MEDIUM",
+          "loss": 36.493
+        },
+        {
+          "lap": 35,
+          "to": "MEDIUM",
+          "loss": 34.878
+        },
+        {
+          "lap": 58,
+          "to": "MEDIUM",
+          "loss": 13.015
+        }
+      ]
+    },
+    {
+      "code": "SUZ",
+      "team": "Footwork",
+      "basePace": 79.604,
+      "noise": 1.05,
+      "wetPace": 0.0094,
+      "stateAtTakeover": {
+        "position": 20,
+        "gapAhead": 30.437,
+        "compound": "WET",
+        "tyreAge": 14,
+        "compoundsUsed": [
+          "WET"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "WAR",
+      "team": "Footwork",
+      "basePace": 75.043,
+      "noise": 1.05,
+      "wetPace": -0.0037,
+      "stateAtTakeover": {
+        "position": 9,
+        "gapAhead": 4.888,
+        "compound": "WET",
+        "tyreAge": 14,
+        "compoundsUsed": [
+          "WET"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "ZAN",
+      "team": "Team Lotus",
+      "basePace": 78.023,
+      "noise": 1.05,
+      "wetPace": 0.0066,
+      "stateAtTakeover": {
+        "position": 18,
+        "gapAhead": 5.327,
+        "compound": "WET",
+        "tyreAge": 14,
+        "compoundsUsed": [
+          "WET"
+        ]
+      },
+      "realStrategy": []
+    }
+  ],
+  "fuelEffectPerLap": 0.06,
+  "freshTyre": {
+    "bonus": 0.0,
+    "laps": 3
+  },
+  "events": [
+    {
+      "lap": 15,
+      "type": "RETIREMENT",
+      "driver": "JAR"
+    },
+    {
+      "lap": 20,
+      "type": "RETIREMENT",
+      "driver": "BER"
+    },
+    {
+      "lap": 21,
+      "type": "RETIREMENT",
+      "driver": "BLU"
+    },
+    {
+      "lap": 23,
+      "type": "RETIREMENT",
+      "driver": "MSCM"
+    },
+    {
+      "lap": 28,
+      "type": "RETIREMENT",
+      "driver": "ALL"
+    },
+    {
+      "lap": 31,
+      "type": "RETIREMENT",
+      "driver": "SUZ"
+    },
+    {
+      "lap": 37,
+      "type": "RETIREMENT",
+      "driver": "ALE"
+    },
+    {
+      "lap": 58,
+      "type": "RETIREMENT",
+      "driver": "DEC"
+    },
+    {
+      "lap": 65,
+      "type": "RETIREMENT",
+      "driver": "BOUT"
+    },
+    {
+      "lap": 68,
+      "type": "RETIREMENT",
+      "driver": "WAR"
+    },
+    {
+      "lap": 72,
+      "type": "RETIREMENT",
+      "driver": "BAR"
+    }
+  ],
+  "decisionMoments": [
+    {
+      "id": "stop-18",
+      "lap": 18,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "STAY OUT",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "IN - slicks",
+          "decisions": [
+            {
+              "lap": 18,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "box-wet",
+          "label": "IN - wets",
+          "decisions": [
+            {
+              "lap": 18,
+              "kind": "pit",
+              "compound": "WET"
+            }
+          ]
+        },
+        {
+          "id": "box-intermediate",
+          "label": "IN - inters",
+          "decisions": [
+            {
+              "lap": 18,
+              "kind": "pit",
+              "compound": "INTERMEDIATE"
+            }
+          ]
+        },
+        {
+          "id": "box-next-intermediate",
+          "label": "IN NEXT LAP - inters",
+          "decisions": [
+            {
+              "lap": 19,
+              "kind": "pit",
+              "compound": "INTERMEDIATE"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "box-medium"
+    },
+    {
+      "id": "rivalpit-24",
+      "lap": 24,
+      "trigger": "rivalPit",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "STAY OUT",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "IN - slicks",
+          "decisions": [
+            {
+              "lap": 24,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "box-wet",
+          "label": "IN - wets",
+          "decisions": [
+            {
+              "lap": 24,
+              "kind": "pit",
+              "compound": "WET"
+            }
+          ]
+        },
+        {
+          "id": "box-intermediate",
+          "label": "IN - inters",
+          "decisions": [
+            {
+              "lap": 24,
+              "kind": "pit",
+              "compound": "INTERMEDIATE"
+            }
+          ]
+        },
+        {
+          "id": "box-next-intermediate",
+          "label": "IN NEXT LAP - inters",
+          "decisions": [
+            {
+              "lap": 25,
+              "kind": "pit",
+              "compound": "INTERMEDIATE"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "stay"
+    },
+    {
+      "id": "stop-34",
+      "lap": 34,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "STAY OUT",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "IN - slicks",
+          "decisions": [
+            {
+              "lap": 34,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "box-wet",
+          "label": "IN - wets",
+          "decisions": [
+            {
+              "lap": 34,
+              "kind": "pit",
+              "compound": "WET"
+            }
+          ]
+        },
+        {
+          "id": "box-intermediate",
+          "label": "IN - inters",
+          "decisions": [
+            {
+              "lap": 34,
+              "kind": "pit",
+              "compound": "INTERMEDIATE"
+            }
+          ]
+        },
+        {
+          "id": "box-next-intermediate",
+          "label": "IN NEXT LAP - inters",
+          "decisions": [
+            {
+              "lap": 35,
+              "kind": "pit",
+              "compound": "INTERMEDIATE"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "box-medium"
+    },
+    {
+      "id": "cliff-54",
+      "lap": 54,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "STAY OUT",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "IN - slicks",
+          "decisions": [
+            {
+              "lap": 54,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "box-wet",
+          "label": "IN - wets",
+          "decisions": [
+            {
+              "lap": 54,
+              "kind": "pit",
+              "compound": "WET"
+            }
+          ]
+        },
+        {
+          "id": "box-intermediate",
+          "label": "IN - inters",
+          "decisions": [
+            {
+              "lap": 54,
+              "kind": "pit",
+              "compound": "INTERMEDIATE"
+            }
+          ]
+        },
+        {
+          "id": "box-next-intermediate",
+          "label": "IN NEXT LAP - inters",
+          "decisions": [
+            {
+              "lap": 55,
+              "kind": "pit",
+              "compound": "INTERMEDIATE"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "stay"
+    },
+    {
+      "id": "stop-57",
+      "lap": 57,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "STAY OUT",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "IN - slicks",
+          "decisions": [
+            {
+              "lap": 57,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "box-wet",
+          "label": "IN - wets",
+          "decisions": [
+            {
+              "lap": 57,
+              "kind": "pit",
+              "compound": "WET"
+            }
+          ]
+        },
+        {
+          "id": "box-intermediate",
+          "label": "IN - inters",
+          "decisions": [
+            {
+              "lap": 57,
+              "kind": "pit",
+              "compound": "INTERMEDIATE"
+            }
+          ]
+        },
+        {
+          "id": "box-next-intermediate",
+          "label": "IN NEXT LAP - inters",
+          "decisions": [
+            {
+              "lap": 58,
+              "kind": "pit",
+              "compound": "INTERMEDIATE"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "box-medium"
+    },
+    {
+      "id": "pace-70",
+      "lap": 70,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 70,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "standard",
+          "label": "STEADY - standard pace",
+          "decisions": [
+            {
+              "lap": 70,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "manage",
+          "label": "EASY - save the tyres",
+          "decisions": [
+            {
+              "lap": 70,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "push-attack",
+          "label": "PUSH - attack",
+          "decisions": [
+            {
+              "lap": 70,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            },
+            {
+              "lap": 70,
+              "kind": "mode",
+              "key": "battle",
+              "value": "attack"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    }
+  ],
+  "candidateMomentLaps": [
+    18,
+    19,
+    20,
+    23,
+    25,
+    35,
+    40,
+    49,
+    54,
+    58
+  ],
+  "realResult": [
+    "SENA",
+    "HIL",
+    "PRO",
+    "HER",
+    "PAT",
+    "BAB",
+    "FITC",
+    "ZAN",
+    "COM",
+    "BAR",
+    "ALBM",
+    "WAR",
+    "BOUT",
+    "DEC",
+    "ALE",
+    "SUZ",
+    "ALL",
+    "MSCM",
+    "BLU",
+    "BER",
+    "JAR",
+    "KAT",
+    "BRU",
+    "AND",
+    "WEN"
+  ],
+  "userSide": "SENA",
+  "rival": "HIL",
+  "weather": {
+    "curves": {
+      "slick": {
+        "a": 0.1855,
+        "b": 0.9993
+      },
+      "inter": {
+        "min": 0.0345,
+        "dry": 1.0187,
+        "wet": 0.789,
+        "best": 0.18
+      },
+      "wet": {
+        "min": 0.1486,
+        "dry": 0.4006,
+        "wet": 0.6344,
+        "best": 0.2833
+      }
+    },
+    "wetness": [
+      0.42,
+      0.42,
+      0.42,
+      0.43,
+      0.42,
+      0.42,
+      0.37,
+      0.31,
+      0.32,
+      0.35,
+      0.36,
+      0.2,
+      0.19,
+      0.16,
+      0.16,
+      0.15,
+      0.16,
+      0.19,
+      0.19,
+      0.17,
+      0.19,
+      0.43,
+      0.44,
+      0.42,
+      0.43,
+      0.43,
+      0.43,
+      0.44,
+      0.46,
+      0.46,
+      0.49,
+      0.42,
+      0.4,
+      0.44,
+      0.44,
+      0.43,
+      0.53,
+      0.52,
+      0.48,
+      0.53,
+      0.39,
+      0.35,
+      0.17,
+      0.16,
+      0.19,
+      0.19,
+      0.17,
+      0.18,
+      0.19,
+      0.17,
+      0.21,
+      0.23,
+      0.18,
+      0.19,
+      0.18,
+      0.18,
+      0.2,
+      0.19,
+      0.18,
+      0.19,
+      0.19,
+      0.21,
+      0.2,
+      0.19,
+      0.2,
+      0.2,
+      0.4,
+      0.39,
+      0.4,
+      0.4,
+      0.4,
+      0.39,
+      0.38,
+      0.36,
+      0.35,
+      0.39
+    ]
+  },
+  "eras": {
+    "eraId": 2,
+    "order": 9,
+    "userSide": "SENA",
+    "hardCalls": {
+      "SENA": 3,
+      "HIL": 1
+    },
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Senna takes the lead on the first lap from fourth on the grid and wins through the wet-dry calls; he laps everyone but Hill, who finishes 1:23.2 behind"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "max": 4,
+      "label": "Win on four stops or fewer, as Senna did"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 60,
+      "label": "Win by more than a minute"
+    },
+    "briefing": "Donington, 1993. Damp at the start, then it dries, rains, dries and rains again. Senna made four stops; Prost made seven. Pit board only: every tyre call counts. Reconstructed race: no lap timing survives, so the laps are rebuilt to fit the result, the fastest laps, the sourced stops and who led each lap (Jolpica, F1DB, Motor Sport, Wikipedia). Who led each lap is sourced, and so is the order at a few laps; the lap times, and the rest of the order, are reconstructed.",
+    "storylineCalls": [
+      {
+        "driver": "HIL",
+        "lap": 18,
+        "real": "Hill changes to slicks at the end of lap 17, a lap before Senna",
+        "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked"
+      },
+      {
+        "driver": "HIL",
+        "lap": 25,
+        "real": "Hill goes back to wets two laps after Prost, as it rains again; his four later stops aren't sourced (the reconstruction absorbs them), so he keeps his real plan to the flag and finishes second, 1:23 behind",
+        "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked",
+        "untilFlag": true
+      }
+    ]
+  },
+  "provenance": {
+    "kind": "reconstructed",
+    "estimated": [
+      "compounds",
+      "safetyCars",
+      "fuelLoads",
+      "weather"
+    ]
+  },
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": false
+  },
+  "reconstructed": true
+}

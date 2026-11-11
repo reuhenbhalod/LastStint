@@ -1,0 +1,43 @@
+{
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": true,
+    "drs": true,
+    "ers": "hybrid",
+    "refuelling": false
+  },
+  "eras": {
+    "eraId": 7,
+    "order": 3,
+    "userSide": "HAM",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Vettel jumps both Mercedes at the start and leads. Ferrari pits him under the virtual safety car on lap 11 and commits to two stops; Hamilton stays out, makes his only stop on lap 24 for softs, takes the lead when Vettel stops again on lap 37 and wins by 5.011 s."
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 1,
+      "label": "Win on one stop, as Hamilton did"
+    },
+    "hidden": {
+      "type": "compound_rule",
+      "mustAvoid": "MEDIUM",
+      "label": "Never fit the medium tyre"
+    },
+    "hardCalls": {
+      "VET": 0,
+      "HAM": 1
+    },
+    "briefing": "Montreal, 2016. Vettel jumped both Mercedes at the start, and you run Hamilton second, about a second behind, eight laps in. It's cold, and Mercedes is aiming for one stop. Ferrari may not be. Win it."
+  },
+  "storylineEvents": [
+    [
+      11,
+      "VSC"
+    ]
+  ]
+}

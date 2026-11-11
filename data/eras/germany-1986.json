@@ -1,0 +1,61 @@
+{
+  "eras": {
+    "eraId": 1,
+    "order": 4,
+    "userSide": "ROSK",
+    "target": {
+      "type": "position",
+      "position": 2
+    },
+    "storyline": {
+      "real": "Rosberg, second at the start of the last lap, runs out of fuel and is classified fifth; Piquet wins",
+      "rewriteCondition": {
+        "type": "position",
+        "position": 2
+      },
+      "headline": "Rosberg's McLaren reaches the flag with fuel to spare"
+    },
+    "mastery": {
+      "type": "finish_position",
+      "position": 1,
+      "label": "Win the race on 195 litres"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "push",
+      "maxLaps": 0,
+      "label": "Never turn the boost up: no laps at PUSH"
+    },
+    "briefing": "Hockenheim, July 1986. Rosberg started on pole in the McLaren. Fuel is cut to 195 litres this year, and on this fast track it may not last to the flag. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports. Who led each lap is sourced; the lap times are reconstructed.",
+    "hardCalls": {
+      "ROSK": 1,
+      "SENA": 0
+    },
+    "storylineRetirements": [
+      {
+        "driver": "ROSK",
+        "condition": {
+          "type": "fuel"
+        },
+        "real": "Rosberg ran minimum boost all race on the 195-litre limit, his gauge 'exactly on schedule to cross the line with a zero reading'; second, about two seconds behind Piquet at the start of the last lap, he ran dry at the first chicane and pulled off (classified fifth, a lap down)",
+        "source": "https://www.autosport.com/f1/feature/3783/grand-prix-gold-german-gp-1986; https://en.wikipedia.org/wiki/1986_German_Grand_Prix"
+      }
+    ]
+  },
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": false,
+    "fuelLimit": 165.75
+  },
+  "storylineEvents": [
+    [
+      44,
+      "RETIREMENT"
+    ]
+  ]
+}

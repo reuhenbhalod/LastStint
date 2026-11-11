@@ -14,7 +14,7 @@ import {
   classifyVersus,
   initVersus,
   stepVersus,
-} from '@boxthislap/sim';
+} from '@laststint/sim';
 import { describe, expect, it } from 'vitest';
 import bahrainJson from '../../../data/races/bahrain-2022.json';
 import { RACE_FILES } from '../src/races.gen.js';

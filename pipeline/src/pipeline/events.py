@@ -6,6 +6,9 @@ events are replayed unchanged by the simulator.
 
 Rain is not derivable from the lap snapshot (it needs weather/race-control data) and is
 added later for wet races; both Gate G1 races are dry.
+
+Car faults (FAULT events) aren't derivable from timing either: they come from hand-checked
+facts (incidents.fault_facts), fitted by pipeline/faults.py and merged in by with_faults.
 """
 
 from __future__ import annotations
@@ -158,6 +161,33 @@ def retirement_events(laps: pd.DataFrame, total_laps: int | None = None) -> list
 
 
 def extract_events(laps: pd.DataFrame, total_laps: int | None = None) -> list[dict]:
-    """All frozen events (neutralizations + retirements), sorted by lap."""
-    events = neutralization_events(laps) + retirement_events(laps, total_laps)
+    """All frozen events (neutralizations + retirements), sorted by lap. A red flag runs to
+    the lap holding its stoppage, and the safety-car laps of its resumption follow it as an SC
+    event (redflag.refine_events; its `restart` is added at assembly)."""
+    from .redflag import refine_events
+
+    events = refine_events(laps, neutralization_events(laps)) + retirement_events(laps, total_laps)
     return sorted(events, key=lambda e: (e["lap"], e["type"]))
+
+
+def from_takeover(events: list[dict], takeover_lap: int) -> list[dict]:
+    """The events a game taking over on `takeover_lap` replays: those from that lap on, plus
+    any SC or VSC that started earlier and is still running after it, cut to start on the
+    takeover lap (the sim then runs its remaining laps neutralised, and sees the period as
+    already out rather than deployed on its first lap). A red flag isn't cut: its restart and
+    free stops are tied to its real start."""
+    out = []
+    for e in events:  # in timeline order: a cut period starts before every event kept whole
+        end = e["lap"] + int(e.get("laps", 1))  # the first lap after the period
+        if e["lap"] >= takeover_lap:
+            out.append(e)
+        elif e["type"] in ("SC", "VSC") and end - 1 > takeover_lap:
+            out.append({**e, "lap": takeover_lap, "laps": end - takeover_lap})
+    return out
+
+
+def with_faults(events: list[dict], faults: list[dict]) -> list[dict]:
+    """The timeline with the race's FAULT events (faults.fault_events) merged in, by lap."""
+    if not faults:
+        return events
+    return sorted([*events, *faults], key=lambda e: (e["lap"], e["type"]))

@@ -3,7 +3,7 @@
 // (real teams see rain coming minutes out), less sure the further it looks: blind playouts
 // grade the calls against a forecast like it (sim forecastWetness), never the real future.
 
-import { type RaceModel, wetPenalty, wetnessOn } from '@boxthislap/sim';
+import { type RaceModel, wetPenalty, wetnessOn } from '@laststint/sim';
 
 export type Conditions = 'dry' | 'damp' | 'wet' | 'soaked';
 

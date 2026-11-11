@@ -1,0 +1,62 @@
+{
+  "eras": {
+    "eraId": 1,
+    "order": 10,
+    "userSide": "SENA",
+    "target": {
+      "type": "defend"
+    },
+    "storyline": {
+      "real": "Senna, far ahead of Prost, crashes at Portier on lap 67; Prost wins",
+      "rewriteCondition": {
+        "type": "defend"
+      },
+      "headline": "Senna keeps his concentration and wins in Monte Carlo"
+    },
+    "mastery": {
+      "type": "mode_rule",
+      "mode": "push",
+      "maxLaps": 0,
+      "label": "Bring it home: no laps at PUSH"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 50,
+      "label": "Win by more than 50 seconds"
+    },
+    "briefing": "Monaco, May 1988. Senna started on pole in the McLaren-Honda and leads; Prost spent the first half of the race stuck behind Berger's Ferrari. Turbo fuel is down to 150 litres this year. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports. Who led each lap is sourced; the lap times are reconstructed.",
+    "hardCalls": {
+      "SENA": 0,
+      "PRO": 0
+    },
+    "storylineRetirements": [
+      {
+        "driver": "SENA",
+        "condition": {
+          "type": "mode",
+          "key": "pace",
+          "value": "push",
+          "fromLap": 55
+        },
+        "real": "Prost passed Berger for second on lap 54 and started trading fastest laps with Senna, who answered (his fastest lap on lap 59); on lap 67, as McLaren radioed him to slow down, Senna lost concentration at Portier and crashed out of the lead",
+        "source": "https://en.wikipedia.org/wiki/1988_Monaco_Grand_Prix"
+      }
+    ]
+  },
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": false,
+    "fuelLimit": 127.5
+  },
+  "storylineEvents": [
+    [
+      66,
+      "RETIREMENT"
+    ]
+  ]
+}

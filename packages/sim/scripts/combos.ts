@@ -3,7 +3,7 @@
 // the results show whether the race's seed plays fairly (the best play shouldn't always lose).
 // Races with more than MAX_COMBOS paths are checked on a fixed random sample of them, which
 // still takes every option of every moment (feedback round 2); --all checks every path.
-//   pnpm --filter @boxthislap/sim combos <race-id> [seed] [--all] [--max N]
+//   pnpm --filter @laststint/sim combos <race-id> [seed] [--all] [--max N]
 
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';

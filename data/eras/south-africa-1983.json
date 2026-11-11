@@ -1,0 +1,44 @@
+{
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": true
+  },
+  "eras": {
+    "eraId": 1,
+    "order": 1,
+    "userSide": "PIQN",
+    "target": {
+      "type": "position",
+      "position": 4
+    },
+    "storyline": {
+      "real": "Piquet leads from the start and makes his routine stop for fuel and tyres on lap 28 without losing the lead; once Prost's Renault is out with turbo failure he turns his boost down, lets Patrese through and takes third and the title by two points"
+    },
+    "mastery": {
+      "type": "beat_real_call",
+      "label": "Beat Piquet's real third place and still take the title"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "standard",
+      "maxLaps": 14,
+      "label": "Turn the boost down once Prost is out: no more than 14 laps at standard pace"
+    },
+    "briefing": "Kyalami, October 1983, the last race of the season. Prost leads the championship on 57 points, Piquet has 55 and Arnoux 49. Brabham plan a stop for fuel and tyres mid-race. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports. Who led each lap is sourced; the lap times are reconstructed.",
+    "hardCalls": {
+      "PIQN": 0,
+      "PRO": 0
+    }
+  },
+  "storylineEvents": [
+    [
+      36,
+      "RETIREMENT"
+    ]
+  ]
+}

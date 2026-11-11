@@ -1,0 +1,40 @@
+{
+ "race": "united-states-2003",
+ "how": "docs/eras-checks/2.4-estimates.md: check each period against a race report; set status to confirmed or rejected (edit startLap/endLap if they're off), then re-run `pipeline jolpica <race-id> --force`.",
+ "periods": [
+  {
+   "startLap": 21,
+   "endLap": 21,
+   "laps": 1,
+   "kind": "SC",
+   "confidence": "ambiguous",
+   "peakRatio": 1.138,
+   "gapBefore": 9.4,
+   "gapAfter": 27.6,
+   "reasons": [
+    "only 1.14x slower: rain, yellow flags or a short SC?",
+    "the field didn't bunch up (P1-P6 9.4s -> 27.6s): rain?",
+    "a single slow lap"
+   ],
+   "status": "rejected",
+   "source": "https://en.wikipedia.org/wiki/2003_United_States_Grand_Prix: rain, not an SC: 'On lap 18, light rain returned to the circuit before intensifying on the next lap'; 'On lap 21, Button lost control of his car on the wet track ... as drivers began stopping for rain tyres'. The article has no safety car"
+  },
+  {
+   "startLap": 23,
+   "endLap": 23,
+   "laps": 1,
+   "kind": "SC",
+   "confidence": "ambiguous",
+   "peakRatio": 1.103,
+   "gapBefore": null,
+   "gapAfter": 7.4,
+   "reasons": [
+    "only 1.10x slower: rain, yellow flags or a short SC?",
+    "no gap before it to show bunching",
+    "a single slow lap"
+   ],
+   "status": "rejected",
+   "source": "https://en.wikipedia.org/wiki/2003_United_States_Grand_Prix: rain, not an SC: 'On lap 18, light rain returned to the circuit before intensifying on the next lap'; 'On lap 21, Button lost control of his car on the wet track ... as drivers began stopping for rain tyres'. The article has no safety car"
+  }
+ ]
+}

@@ -183,13 +183,998 @@
  "styria-2021": [],
  "united-states-2019": [],
  "united-states-2023": [],
- "usa-2022": [
+ "united-states-2022": [
   {
    "lap": 18,
    "type": "SC",
    "driver": "BOT",
    "status": "Spun off",
    "turn": 19
+  }
+ ],
+ "great-britain-2022": [
+  {
+   "lap": 39,
+   "type": "SC",
+   "driver": "OCO",
+   "status": "Fuel pump",
+   "source": "https://en.wikipedia.org/wiki/2022_British_Grand_Prix"
+  }
+ ],
+ "hungary-2022": [
+  {
+   "lap": 68,
+   "type": "VSC",
+   "driver": "BOT",
+   "status": "Power Unit",
+   "source": "FastF1 (F1 live timing: race control messages and result status), via pipeline/incidents.py causes()"
+  }
+ ],
+ "singapore-2023": [
+  {
+   "lap": 20,
+   "type": "SC",
+   "status": "Debris",
+   "source": "https://en.wikipedia.org/wiki/2023_Singapore_Grand_Prix"
+  },
+  {
+   "lap": 44,
+   "type": "VSC",
+   "driver": "OCO",
+   "status": "Gearbox",
+   "source": "https://en.wikipedia.org/wiki/2023_Singapore_Grand_Prix"
+  }
+ ],
+ "miami-2024": [
+  {
+   "lap": 23,
+   "type": "VSC",
+   "status": "Debris",
+   "turn": 16,
+   "source": "https://en.wikipedia.org/wiki/2024_Miami_Grand_Prix"
+  },
+  {
+   "lap": 28,
+   "type": "SC",
+   "driver": "SAR",
+   "status": "Collision",
+   "source": "https://en.wikipedia.org/wiki/2024_Miami_Grand_Prix"
+  },
+  {
+   "lap": 28,
+   "type": "SC_PICKUP",
+   "driver": "VER",
+   "detail": "The safety car picked up Verstappen while Norris led, so Norris ran on ahead of it",
+   "source": "https://en.wikipedia.org/wiki/2024_Miami_Grand_Prix"
+  }
+ ],
+ "hungary-2024": [
+  {
+   "lap": 68,
+   "type": "TEAM_ORDER",
+   "driver": "NOR",
+   "passer": "PIA",
+   "detail": "McLaren told Norris to give the lead back to Piastri; he slowed on the start-finish straight on lap 68",
+   "source": "https://en.wikipedia.org/wiki/2024_Hungarian_Grand_Prix",
+   "note": "Lap 68 in the article and in the timing (PIA ahead at the end of lap 68)"
+  },
+  {
+   "lap": 63,
+   "type": "FAULT",
+   "driver": "VER",
+   "status": "Collision",
+   "fault": "damage",
+   "laps": 1,
+   "detail": "Touched Hamilton diving down the inside at turn 1, went off track and lost fourth to Leclerc",
+   "turn": 1,
+   "source": "https://www.grandprix.com/races/hungarian-gp-2024-race-notes.html",
+   "note": "Lap 63 and turn 1 in GrandPrix.com's race notes and Autosport (https://www.autosport.com/f1/news/fia-hamilton-could-have-done-more-to-avoid-verstappen-clash-but-no-action-taken/10637398/). No source names damage: it costs its contact lap only (laps 1), fitted from the timing"
+  }
+ ],
+ "belgium-2023": [],
+ "bahrain-2023": [
+  {
+   "lap": 41,
+   "type": "VSC",
+   "driver": "LEC",
+   "status": "Retired",
+   "source": "https://api.openf1.org/v1/race_control?session_key=7953"
+  }
+ ],
+ "japan-2023": [
+  {
+   "lap": 14,
+   "type": "VSC",
+   "cars": [
+    "PER",
+    "MAG"
+   ],
+   "status": "Debris",
+   "source": "https://api.openf1.org/v1/race_control?session_key=9173",
+   "note": "Race control: VSC deployed and ending on lap 14 (lap 14 in the built model too), for debris after P\u00e9rez hit Magnussen at turn 11 (https://en.wikipedia.org/wiki/2023_Japanese_Grand_Prix). The lap-1 SC (Bottas/Albon debris, in on lap 4) is before the takeover"
+  },
+  {
+   "lap": 27,
+   "type": "TEAM_ORDER",
+   "driver": "PIA",
+   "passer": "NOR",
+   "detail": "McLaren swapped its cars on the hards after discussing Russell's one-stop threat: Piastri let Norris back into second",
+   "source": "https://www.autosport.com/f1/news/10-things-we-learned-at-the-2023-f1-japanese-grand-prix/10525290/ https://www.grandprix.com/races/japanese-gp-2023-race-notes.html",
+   "note": "Autosport's '10 things' gives no lap; GrandPrix.com's race notes put Norris back in second in the lap-26 entries and record no order. The timing (FastF1) has PIA ahead of NOR at the end of lap 26 and NOR ahead from the end of lap 27, kept as the sims' lap"
+  },
+  {
+   "lap": 49,
+   "type": "TEAM_ORDER",
+   "driver": "RUS",
+   "passer": "HAM",
+   "detail": "Mercedes told Russell to swap places; Hamilton went by at the first corner to take fifth",
+   "source": "https://www.grandprix.com/races/japanese-gp-2023-race-notes.html https://www.autosport.com/f1/news/10-things-we-learned-at-the-2023-f1-japanese-grand-prix/10525290/",
+   "note": "Lap 49 in GrandPrix.com's race notes (Autosport: with five laps left); the timing (FastF1) has HAM ahead of RUS from the end of lap 49"
+  }
+ ],
+ "great-britain-2023": [
+  {
+   "lap": 33,
+   "type": "SC",
+   "driver": "MAG",
+   "status": "Retired",
+   "source": "https://api.openf1.org/v1/race_control?session_key=9126",
+   "note": "Race control: VSC then SC deployed on lap 33, SC in on lap 38 (the built model has one SC from lap 33, 6 laps); Magnussen's engine failed on the Wellington straight (https://www.autosport.com/f1/news/f1-british-gp-race-report/10493893/); Jolpica status Retired (31 laps)"
+  }
+ ],
+ "abu-dhabi-2022": [],
+ "emilia-romagna-2024": [],
+ "netherlands-2021": [],
+ "europe-2009": [],
+ "france-2007": [],
+ "san-marino-2006": [],
+ "great-britain-2007": [],
+ "bahrain-2006": [],
+ "turkey-2008": [],
+ "malaysia-2006": [],
+ "belgium-2009": [],
+ "hungary-2007": [],
+ "italy-2010": [],
+ "australia-2013": [],
+ "bahrain-2012": [],
+ "abu-dhabi-2011": [],
+ "china-2013": [],
+ "germany-2012": [],
+ "germany-2013": [
+  {
+   "lap": 24,
+   "type": "SC",
+   "driver": "BIA",
+   "status": "Engine",
+   "source": "https://en.wikipedia.org/wiki/2013_German_Grand_Prix",
+   "note": "Bianchi's Marussia stopped with an engine failure and fire and rolled back across the track (Jolpica: 21 laps, status Engine). Wikipedia puts the SC out on lap 23, Motor Sport on lap 22 (neutralised for five laps, https://www.motorsportmagazine.com/articles/single-seaters/f1/2013-german-grand-prix-report/); the lap it came in is not in the sources. The built model has it from lap 24, 6 laps (Jolpica estimate, data/estimates/germany-2013.sc.json, unchecked)"
+  },
+  {
+   "lap": 55,
+   "type": "TEAM_ORDER",
+   "driver": "GRO",
+   "passer": "RAI",
+   "detail": "Lotus told Grosjean not to hold up R\u00e4ikk\u00f6nen, who passed him for second within a few laps of his last stop",
+   "source": "https://en.wikipedia.org/wiki/2013_German_Grand_Prix https://www.grandprix.com/races/german-gp-2013-sunday-team-quotes.html",
+   "note": "Wikipedia: R\u00e4ikk\u00f6nen passed Grosjean within a few laps of his lap-49 stop, no lap given; GrandPrix.com (Grosjean): letting him by made sense, they were on different strategies. The timing (Jolpica) has GRO ahead of RAI at the end of lap 54 and RAI ahead from the end of lap 55, kept as the sims' lap"
+  }
+ ],
+ "bahrain-2015": [],
+ "abu-dhabi-2015": [],
+ "singapore-2014": [
+  {
+   "lap": 31,
+   "type": "SC",
+   "cars": [
+    "SUT",
+    "PER"
+   ],
+   "status": "Debris",
+   "source": "https://en.wikipedia.org/wiki/2014_Singapore_Grand_Prix",
+   "note": "Debris after Sutil and P\u00e9rez touched at Turn 8 (P\u00e9rez's front wing broke). Wikipedia puts the SC out on lap 30, GrandPrix.com on lap 31 (https://www.grandprix.com/races/singapore-gp-2014-race-notes-hamilton-wins-signapore-gp.html); the built model has it from lap 31, 7 laps, in at the end of lap 37 as in Wikipedia and Motor Sport"
+  }
+ ],
+ "brazil-2014": [],
+ "canada-2016": [
+  {
+   "lap": 11,
+   "type": "VSC",
+   "driver": "BUT",
+   "status": "Power Unit",
+   "source": "https://www.motorsportmagazine.com/reports/f1/2016-canadian-grand-prix/",
+   "note": "The VSC was for Button's McLaren engine failure (Motor Sport says lap 10; Jolpica: 9 laps, status Power Unit). The built model has a one-lap VSC on lap 11; its end lap is not in the sources"
+  }
+ ],
+ "malaysia-2015": [],
+ "united-states-2014": [],
+ "germany-2016": [],
+ "saudi-arabia-2023": [
+  {
+   "lap": 18,
+   "type": "SC",
+   "driver": "STR",
+   "status": "Retired",
+   "source": "https://api.openf1.org/v1/race_control?session_key=7779",
+   "note": "Race control: SC deployed on lap 18, in this lap on lap 20 (the built model has one SC from lap 18, 3 laps); Stroll stopped on track (https://en.wikipedia.org/wiki/2023_Saudi_Arabian_Grand_Prix, lap 17; GrandPrix.com lap 18); Jolpica status Retired (16 laps)"
+  }
+ ],
+ "great-britain-2021": [
+  {
+   "lap": 40,
+   "type": "TEAM_ORDER",
+   "driver": "BOT",
+   "passer": "HAM",
+   "detail": "Mercedes told Bottas to let Hamilton by; he did, at Stowe, on lap 40",
+   "source": "https://www.motorsportmagazine.com/articles/single-seaters/f1/hamilton-claws-his-way-back-to-silverstone-win-after-verstappen-crash-2021-british-gp-lap-by-lap-report/",
+   "note": "Lap 40 in Motor Sport, Autosport and GrandPrix.com (analysis); the timing (FastF1) has HAM ahead of BOT from the end of lap 40"
+  }
+ ],
+ "australia-2025": [
+  {
+   "lap": 34,
+   "type": "SC",
+   "driver": "ALO",
+   "status": "Accident",
+   "source": "OpenF1 race control messages, via pipeline/incidents.py causes(); status from the Jolpica result"
+  },
+  {
+   "lap": 47,
+   "type": "SC",
+   "driver": "LAW",
+   "status": "Accident",
+   "source": "OpenF1 race control messages, via pipeline/incidents.py causes(); status from the Jolpica result"
+  }
+ ],
+ "spain-2021": [],
+ "azerbaijan-2021": [
+  {
+   "lap": 30,
+   "type": "SC",
+   "driver": "STR",
+   "status": "Accident",
+   "source": "https://en.wikipedia.org/wiki/2021_Azerbaijan_Grand_Prix"
+  },
+  {
+   "lap": 46,
+   "type": "SC",
+   "driver": "VER",
+   "status": "Accident",
+   "source": "https://en.wikipedia.org/wiki/2021_Azerbaijan_Grand_Prix"
+  },
+  {
+   "lap": 30,
+   "type": "FAULT",
+   "driver": "STR",
+   "status": "Tyre",
+   "detail": "Left-rear tyre failure on the exit of turn 20",
+   "source": "https://en.wikipedia.org/wiki/2021_Azerbaijan_Grand_Prix"
+  },
+  {
+   "lap": 46,
+   "type": "FAULT",
+   "driver": "VER",
+   "status": "Tyre",
+   "detail": "Left-rear tyre failure on the main straight",
+   "source": "https://en.wikipedia.org/wiki/2021_Azerbaijan_Grand_Prix"
+  }
+ ],
+ "brazil-2021": [
+  {
+   "lap": 12,
+   "type": "VSC",
+   "status": "Debris",
+   "turn": 1,
+   "cars": [
+    "TSU",
+    "STR"
+   ],
+   "source": "FastF1 (F1 live timing: race control messages and result status), via pipeline/incidents.py causes()"
+  },
+  {
+   "lap": 30,
+   "type": "VSC",
+   "status": "Hazard",
+   "sector": 16,
+   "source": "FastF1 (F1 live timing: race control messages and result status), via pipeline/incidents.py causes()"
+  }
+ ],
+ "saudi-arabia-2021": [
+  {
+   "lap": 10,
+   "type": "SC",
+   "driver": "MSC",
+   "status": "Accident",
+   "turn": 22,
+   "source": "https://en.wikipedia.org/wiki/2021_Saudi_Arabian_Grand_Prix"
+  },
+  {
+   "lap": 23,
+   "type": "VSC",
+   "status": "Debris",
+   "turn": 2,
+   "cars": [
+    "VET",
+    "TSU"
+   ],
+   "source": "https://en.wikipedia.org/wiki/2021_Saudi_Arabian_Grand_Prix"
+  },
+  {
+   "lap": 28,
+   "type": "VSC",
+   "status": "Debris",
+   "turn": 4,
+   "cars": [
+    "VET",
+    "RAI"
+   ],
+   "source": "https://en.wikipedia.org/wiki/2021_Saudi_Arabian_Grand_Prix"
+  },
+  {
+   "lap": 29,
+   "type": "VSC",
+   "status": "Debris",
+   "turn": 4,
+   "cars": [
+    "VET",
+    "RAI"
+   ],
+   "source": "https://en.wikipedia.org/wiki/2021_Saudi_Arabian_Grand_Prix"
+  },
+  {
+   "lap": 36,
+   "type": "VSC",
+   "status": "Debris",
+   "turn": 14,
+   "source": "https://en.wikipedia.org/wiki/2021_Saudi_Arabian_Grand_Prix"
+  }
+ ],
+ "azerbaijan-2017": [
+  {
+   "lap": 12,
+   "type": "SC",
+   "driver": "KVY",
+   "status": "Battery",
+   "source": "https://en.wikipedia.org/wiki/2017_Azerbaijan_Grand_Prix"
+  },
+  {
+   "lap": 17,
+   "type": "SC",
+   "status": "Debris",
+   "source": "https://en.wikipedia.org/wiki/2017_Azerbaijan_Grand_Prix"
+  }
+ ],
+ "germany-2018": [
+  {
+   "lap": 52,
+   "type": "SC",
+   "driver": "VET",
+   "status": "Accident",
+   "turn": 12,
+   "source": "https://en.wikipedia.org/wiki/2018_German_Grand_Prix"
+  }
+ ],
+ "germany-2019": [
+  {
+   "lap": 2,
+   "type": "SC",
+   "driver": "PER",
+   "status": "Spun off",
+   "turn": 10,
+   "source": "https://en.wikipedia.org/wiki/2019_German_Grand_Prix"
+  },
+  {
+   "lap": 14,
+   "type": "VSC",
+   "driver": "RIC",
+   "status": "Exhaust",
+   "source": "https://en.wikipedia.org/wiki/2019_German_Grand_Prix"
+  },
+  {
+   "lap": 26,
+   "type": "VSC",
+   "driver": "NOR",
+   "status": "Power loss",
+   "source": "https://en.wikipedia.org/wiki/2019_German_Grand_Prix"
+  }
+ ],
+ "sakhir-2020": [
+  {
+   "lap": 1,
+   "type": "SC",
+   "driver": "VER",
+   "status": "Accident",
+   "source": "https://en.wikipedia.org/wiki/2020_Sakhir_Grand_Prix"
+  },
+  {
+   "lap": 54,
+   "type": "VSC",
+   "driver": "LAT",
+   "status": "Engine",
+   "turn": 8,
+   "source": "https://en.wikipedia.org/wiki/2020_Sakhir_Grand_Prix"
+  },
+  {
+   "lap": 63,
+   "type": "SC",
+   "status": "Debris",
+   "source": "https://en.wikipedia.org/wiki/2020_Sakhir_Grand_Prix"
+  }
+ ],
+ "canada-2014": [
+  {
+   "lap": 1,
+   "type": "SC",
+   "driver": "CHI",
+   "status": "Collision",
+   "source": "https://en.wikipedia.org/wiki/2014_Canadian_Grand_Prix"
+  },
+  {
+   "lap": 70,
+   "type": "SC",
+   "driver": "MAS",
+   "status": "Collision",
+   "source": "https://en.wikipedia.org/wiki/2014_Canadian_Grand_Prix"
+  },
+  {
+   "lap": 36,
+   "type": "FAULT",
+   "driver": "HAM",
+   "status": "Power Unit",
+   "detail": "MGU-K failed into turn 10: no electrical boost, brakes overworked",
+   "turn": 10,
+   "source": "https://en.wikipedia.org/wiki/2014_Canadian_Grand_Prix"
+  },
+  {
+   "lap": 37,
+   "type": "FAULT",
+   "driver": "ROS",
+   "status": "Power Unit",
+   "detail": "MGU-K shut down approaching turn 1: no electrical boost",
+   "turn": 1,
+   "source": "https://en.wikipedia.org/wiki/2014_Canadian_Grand_Prix"
+  }
+ ],
+ "hungary-2014": [
+  {
+   "lap": 9,
+   "type": "SC",
+   "driver": "ERI",
+   "status": "Accident",
+   "source": "https://en.wikipedia.org/wiki/2014_Hungarian_Grand_Prix"
+  }
+ ],
+ "united-states-2015": [
+  {
+   "lap": 5,
+   "type": "VSC",
+   "status": "Debris",
+   "turn": 1,
+   "source": "https://en.wikipedia.org/wiki/2015_United_States_Grand_Prix"
+  },
+  {
+   "lap": 27,
+   "type": "SC",
+   "driver": "ERI",
+   "status": "Retired",
+   "source": "https://en.wikipedia.org/wiki/2015_United_States_Grand_Prix"
+  },
+  {
+   "lap": 36,
+   "type": "VSC",
+   "driver": "HUL",
+   "status": "Accident",
+   "source": "https://en.wikipedia.org/wiki/2015_United_States_Grand_Prix"
+  },
+  {
+   "lap": 43,
+   "type": "SC",
+   "driver": "KVY",
+   "status": "Accident",
+   "source": "https://en.wikipedia.org/wiki/2015_United_States_Grand_Prix"
+  }
+ ],
+ "spain-2016": [
+  {
+   "lap": 1,
+   "type": "SC",
+   "driver": "HAM",
+   "status": "Collision",
+   "source": "https://en.wikipedia.org/wiki/2016_Spanish_Grand_Prix"
+  }
+ ],
+ "monaco-2016": [
+  {
+   "lap": 35,
+   "type": "VSC",
+   "driver": "VER",
+   "status": "Accident",
+   "source": "https://en.wikipedia.org/wiki/2016_Monaco_Grand_Prix"
+  },
+  {
+   "lap": 68,
+   "type": "VSC",
+   "status": "Debris",
+   "source": "https://en.wikipedia.org/wiki/2016_Monaco_Grand_Prix"
+  }
+ ],
+ "australia-2010": [
+  {
+   "lap": 1,
+   "type": "SC",
+   "driver": "KOB",
+   "status": "Collision",
+   "turn": 6,
+   "source": "https://en.wikipedia.org/wiki/2010_Australian_Grand_Prix"
+  }
+ ],
+ "abu-dhabi-2010": [
+  {
+   "lap": 1,
+   "type": "SC",
+   "driver": "MSCM",
+   "status": "Collision",
+   "turn": 6,
+   "source": "https://en.wikipedia.org/wiki/2010_Abu_Dhabi_Grand_Prix"
+  }
+ ],
+ "canada-2011": [
+  {
+   "lap": 8,
+   "type": "SC",
+   "driver": "HAM",
+   "status": "Collision",
+   "source": "https://en.wikipedia.org/wiki/2011_Canadian_Grand_Prix"
+  },
+  {
+   "lap": 37,
+   "type": "SC",
+   "driver": "ALO",
+   "status": "Collision",
+   "turn": 3,
+   "source": "https://en.wikipedia.org/wiki/2011_Canadian_Grand_Prix"
+  }
+ ],
+ "europe-2012": [
+  {
+   "lap": 27,
+   "type": "SC",
+   "status": "Debris",
+   "turn": 12,
+   "cars": [
+    "VERJ",
+    "KOV"
+   ],
+   "source": "https://en.wikipedia.org/wiki/2012_European_Grand_Prix"
+  },
+  {
+   "lap": 56,
+   "type": "FAULT",
+   "driver": "MAL",
+   "status": "Collision",
+   "fault": "damage",
+   "detail": "Hit Hamilton at turn 13 on the penultimate lap, lost his front wing and dropped down the order; ran on without it to the flag",
+   "turn": 13,
+   "source": "https://en.wikipedia.org/wiki/2012_European_Grand_Prix",
+   "note": "Penultimate lap of 57 = lap 56 (Hamilton classified with 55 laps); Hamilton's car retired there, so it has no FAULT item"
+  }
+ ],
+ "abu-dhabi-2012": [
+  {
+   "lap": 9,
+   "type": "SC",
+   "driver": "ROS",
+   "status": "Collision",
+   "source": "https://en.wikipedia.org/wiki/2012_Abu_Dhabi_Grand_Prix"
+  },
+  {
+   "lap": 39,
+   "type": "SC",
+   "driver": "GRO",
+   "status": "Collision",
+   "source": "https://en.wikipedia.org/wiki/2012_Abu_Dhabi_Grand_Prix"
+  }
+ ],
+ "monaco-2008": [
+  {
+   "lap": 8,
+   "type": "SC",
+   "driver": "COU",
+   "status": "Accident",
+   "source": "https://en.wikipedia.org/wiki/2008_Monaco_Grand_Prix"
+  },
+  {
+   "lap": 62,
+   "type": "SC",
+   "driver": "ROS",
+   "status": "Accident",
+   "source": "https://en.wikipedia.org/wiki/2008_Monaco_Grand_Prix"
+  },
+  {
+   "lap": 6,
+   "type": "FAULT",
+   "driver": "HAM",
+   "status": "Puncture",
+   "detail": "Hit the barrier at Tabac: right-rear puncture, pitted for new tyres",
+   "source": "https://en.wikipedia.org/wiki/2008_Monaco_Grand_Prix"
+  }
+ ],
+ "brazil-2008": [
+  {
+   "lap": 1,
+   "type": "SC",
+   "driver": "COU",
+   "status": "Collision",
+   "source": "https://en.wikipedia.org/wiki/2008_Brazilian_Grand_Prix"
+  }
+ ],
+ "brazil-2009": [
+  {
+   "lap": 1,
+   "type": "SC",
+   "driver": "TRU",
+   "status": "Accident",
+   "source": "https://en.wikipedia.org/wiki/2009_Brazilian_Grand_Prix"
+  }
+ ],
+ "austria-2002": [
+  {
+   "lap": 24,
+   "type": "SC",
+   "driver": "PAN",
+   "status": "Engine",
+   "source": "https://en.wikipedia.org/wiki/2002_Austrian_Grand_Prix"
+  },
+  {
+   "lap": 28,
+   "type": "SC",
+   "driver": "SAT",
+   "status": "Collision",
+   "source": "https://en.wikipedia.org/wiki/2002_Austrian_Grand_Prix"
+  },
+  {
+   "lap": 71,
+   "type": "TEAM_ORDER",
+   "driver": "BAR",
+   "passer": "MSCM",
+   "detail": "Ferrari's order: Barrichello yielded to Schumacher in the last 100 yards of the last lap and finished 0.182 s behind",
+   "source": "https://en.wikipedia.org/wiki/2002_Austrian_Grand_Prix",
+   "note": "Lap 71 of 71 (article; Jolpica has MSCM ahead at the end of lap 71)"
+  }
+ ],
+ "brazil-2003": [
+  {
+   "lap": 27,
+   "type": "SC",
+   "driver": "MSCM",
+   "status": "Accident",
+   "source": "https://en.wikipedia.org/wiki/2003_Brazilian_Grand_Prix"
+  }
+ ],
+ "spain-1994": [
+  {
+   "lap": 22,
+   "type": "FAULT",
+   "driver": "MSCM",
+   "status": "Gearbox",
+   "detail": "Stuck in fifth gear from his first pit stop to the finish",
+   "source": "https://en.wikipedia.org/wiki/1994_Spanish_Grand_Prix"
+  }
+ ],
+ "hungary-1997": [
+  {
+   "lap": 74,
+   "type": "FAULT",
+   "driver": "HIL",
+   "status": "Hydraulics",
+   "fault": "gear-stuck",
+   "detail": "Hydraulic pump failed with three laps left: stuck in third gear with an intermittent throttle; Villeneuve passed him on the last lap",
+   "source": "https://en.wikipedia.org/wiki/1997_Hungarian_Grand_Prix",
+   "note": "'On lap 74, with three laps left, the hydraulic pump failed on Hill's car, causing it to become stuck in third gear and have an intermittent throttle' (Wikipedia, citing ESPN, 'The Broken Arrow', 20 Aug 2012)"
+  }
+ ],
+ "france-1990": [],
+ "united-states-1990": [],
+ "mexico-1990": [],
+ "brazil-1991": [
+  {
+   "lap": 50,
+   "type": "FAULT",
+   "driver": "MAN",
+   "status": "Puncture",
+   "detail": "Puncture from debris, stopped for new tyres",
+   "source": "https://en.wikipedia.org/wiki/1991_Brazilian_Grand_Prix"
+  }
+ ],
+ "monaco-1992": [],
+ "hungary-1992": [
+  {
+   "lap": 61,
+   "type": "FAULT",
+   "driver": "MAN",
+   "status": "Tyre",
+   "detail": "Pitted with tyre trouble and rejoined sixth",
+   "source": "https://en.wikipedia.org/wiki/1992_Hungarian_Grand_Prix"
+  }
+ ],
+ "south-africa-1983": [],
+ "monaco-1984": [],
+ "portugal-1984": [],
+ "germany-1986": [],
+ "germany-1996": [],
+ "germany-1997": [],
+ "san-marino-1999": [],
+ "luxembourg-1998": [],
+ "brazil-1999": [],
+ "portugal-1985": [],
+ "mexico-1986": [],
+ "hungary-1986": [],
+ "australia-1986": [
+  {
+   "lap": 63,
+   "type": "FAULT",
+   "driver": "ROSK",
+   "status": "Tyre",
+   "detail": "Right-rear tyre failure, retired",
+   "source": "https://en.wikipedia.org/wiki/1986_Australian_Grand_Prix"
+  },
+  {
+   "lap": 64,
+   "type": "FAULT",
+   "driver": "MAN",
+   "status": "Tyre",
+   "detail": "Left-rear tyre exploded on the Brabham Straight, retired",
+   "source": "https://en.wikipedia.org/wiki/1986_Australian_Grand_Prix"
+  }
+ ],
+ "great-britain-1987": [],
+ "monaco-1988": [],
+ "europe-1997": [
+  {
+   "lap": 67,
+   "type": "TEAM_ORDER",
+   "driver": "COU",
+   "passer": "HAK",
+   "detail": "McLaren's order: Coulthard gave second place back to Häkkinen, who then took the win when Villeneuve let both McLarens by on the last lap",
+   "source": "https://en.wikipedia.org/wiki/1997_European_Grand_Prix",
+   "note": "The article gives no lap: on the last lap Villeneuve 'had been caught by both McLarens, Häkkinen having regained second place from Coulthard under team orders'. The timing (Jolpica) has COU ahead of HAK at every lap end from 48 to 66 and HAK ahead from the end of lap 67"
+  },
+  {
+   "lap": 69,
+   "type": "TEAM_ORDER",
+   "driver": "VIL",
+   "passer": "HAK",
+   "detail": "On the last lap Villeneuve, caught by both McLarens, let them through to take the title",
+   "source": "https://en.wikipedia.org/wiki/1997_European_Grand_Prix",
+   "note": "Lap 69 of 69; the timing (Jolpica) has HAK and COU ahead at the end of it"
+  },
+  {
+   "lap": 69,
+   "type": "TEAM_ORDER",
+   "driver": "VIL",
+   "passer": "COU",
+   "detail": "On the last lap Villeneuve, caught by both McLarens, let them through to take the title",
+   "source": "https://en.wikipedia.org/wiki/1997_European_Grand_Prix",
+   "note": "Lap 69 of 69; the timing (Jolpica) has HAK and COU ahead at the end of it"
+  }
+ ],
+ "malaysia-1999": [
+  {
+   "lap": 53,
+   "type": "TEAM_ORDER",
+   "driver": "MSCM",
+   "passer": "IRV",
+   "detail": "After the second stops Schumacher slowed once again to let Irvine retake the lead",
+   "source": "https://en.wikipedia.org/wiki/1999_Malaysian_Grand_Prix",
+   "note": "The article gives no lap (its lap-4 let-by is before the takeover); lap 53 from the timing (Jolpica): IRV retakes the lead from MSCM at the end of lap 53"
+  }
+ ],
+ "russia-2018": [
+  {
+   "lap": 25,
+   "type": "TEAM_ORDER",
+   "driver": "BOT",
+   "passer": "HAM",
+   "detail": "Mercedes asked Bottas to let Hamilton through into second at turn 13",
+   "source": "https://en.wikipedia.org/wiki/2018_Russian_Grand_Prix",
+   "note": "The article gives lap 26; the timing (FastF1) has HAM ahead of BOT from the end of lap 25, kept as the sims' lap"
+  }
+ ],
+ "australia-2018": [
+  {
+   "lap": 26,
+   "type": "VSC",
+   "driver": "GRO",
+   "status": "Wheel",
+   "turn": 2,
+   "source": "https://en.wikipedia.org/wiki/2018_Australian_Grand_Prix",
+   "note": "Grosjean stopped at turn 2 with a wheel not fitted properly after his stop, which brought out the VSC (Wikipedia; Autosport has him stopping on lap 24). Autosport (how-hamiltons-needless-loss-revealed-a-mercedes-flaw-5110682) has the VSC deployed on lap 26, as in the built model (TUM track status); Jolpica status Wheel (24 laps)"
+  },
+  {
+   "lap": 28,
+   "type": "SC",
+   "driver": "GRO",
+   "status": "Wheel",
+   "turn": 2,
+   "source": "https://en.wikipedia.org/wiki/2018_Australian_Grand_Prix",
+   "note": "The VSC for Grosjean's car became a full safety car on lap 27 (Wikipedia) and came in at the end of lap 31; the built model (TUM track status) starts the SC on lap 28, kept as the sims' lap"
+  }
+ ],
+ "spain-2017": [
+  {
+   "lap": 34,
+   "type": "VSC",
+   "driver": "VAN",
+   "status": "Collision",
+   "turn": 1,
+   "cars": [
+    "VAN",
+    "MAS"
+   ],
+   "source": "https://www.motorsportmagazine.com/articles/single-seaters/f1/2017-spanish-grand-prix-report/",
+   "note": "Vandoorne hit Massa at turn 1 and ended in the gravel (Wikipedia, Motor Sport); VSC on lap 34 (Motor Sport, and the built model's TUM track status) or lap 33 (Autosport); Jolpica status Collision (32 laps)"
+  }
+ ],
+ "australia-2017": [],
+ "china-2017": [],
+ "china-2018": [
+  {
+   "lap": 31,
+   "type": "SC",
+   "status": "Collision",
+   "cars": [
+    "HAR",
+    "GAS"
+   ],
+   "source": "https://www.grandprix.com/races/chinese-gp-2018-race-analysis.html",
+   "note": "Hartley and Gasly (Toro Rosso) collided at the hairpin on lap 30 (Wikipedia, GrandPrix.com); SC deployed on lap 31 (GrandPrix.com, Motor Sport) and in on lap 35 (Motor Sport), as in the built model (TUM track status, laps 31-35). Hartley carried on; Jolpica status Collision damage (51 laps)"
+  }
+ ],
+ "belgium-1998": [
+  {
+   "lap": 33,
+   "type": "TEAM_ORDER",
+   "driver": "SCH",
+   "passer": "HIL",
+   "detail": "Jordan's order in the closing stages: Ralf Schumacher not to overtake Hill ('Ralf, you cannot overtake Damon, that is a team order', race engineer Sam Michael, Autosport)",
+   "source": "https://en.wikipedia.org/wiki/1998_Belgian_Grand_Prix https://www.autosport.com/f1/news/1998-belgian-gp-when-the-schumachers-went-to-war/10744117/",
+   "note": "A hold order, not a let-by: the article gives no lap, only the closing stages after the restart 'with 12 laps to go' (lap 33 of 44, Autosport). Entered as one let-by item on each green lap from 33 to 44 (an item lapses once HIL is ahead), so a sim SCH that gets ahead of HIL is put back behind him and stays there. The timing (Jolpica) has HIL ahead of SCH at the end of every lap from 26 to the flag"
+  },
+  {
+   "lap": 34,
+   "type": "TEAM_ORDER",
+   "driver": "SCH",
+   "passer": "HIL",
+   "detail": "Jordan's order in the closing stages: Ralf Schumacher not to overtake Hill ('Ralf, you cannot overtake Damon, that is a team order', race engineer Sam Michael, Autosport)",
+   "source": "https://en.wikipedia.org/wiki/1998_Belgian_Grand_Prix https://www.autosport.com/f1/news/1998-belgian-gp-when-the-schumachers-went-to-war/10744117/",
+   "note": "A hold order, not a let-by: the article gives no lap, only the closing stages after the restart 'with 12 laps to go' (lap 33 of 44, Autosport). Entered as one let-by item on each green lap from 33 to 44 (an item lapses once HIL is ahead), so a sim SCH that gets ahead of HIL is put back behind him and stays there. The timing (Jolpica) has HIL ahead of SCH at the end of every lap from 26 to the flag"
+  },
+  {
+   "lap": 35,
+   "type": "TEAM_ORDER",
+   "driver": "SCH",
+   "passer": "HIL",
+   "detail": "Jordan's order in the closing stages: Ralf Schumacher not to overtake Hill ('Ralf, you cannot overtake Damon, that is a team order', race engineer Sam Michael, Autosport)",
+   "source": "https://en.wikipedia.org/wiki/1998_Belgian_Grand_Prix https://www.autosport.com/f1/news/1998-belgian-gp-when-the-schumachers-went-to-war/10744117/",
+   "note": "A hold order, not a let-by: the article gives no lap, only the closing stages after the restart 'with 12 laps to go' (lap 33 of 44, Autosport). Entered as one let-by item on each green lap from 33 to 44 (an item lapses once HIL is ahead), so a sim SCH that gets ahead of HIL is put back behind him and stays there. The timing (Jolpica) has HIL ahead of SCH at the end of every lap from 26 to the flag"
+  },
+  {
+   "lap": 36,
+   "type": "TEAM_ORDER",
+   "driver": "SCH",
+   "passer": "HIL",
+   "detail": "Jordan's order in the closing stages: Ralf Schumacher not to overtake Hill ('Ralf, you cannot overtake Damon, that is a team order', race engineer Sam Michael, Autosport)",
+   "source": "https://en.wikipedia.org/wiki/1998_Belgian_Grand_Prix https://www.autosport.com/f1/news/1998-belgian-gp-when-the-schumachers-went-to-war/10744117/",
+   "note": "A hold order, not a let-by: the article gives no lap, only the closing stages after the restart 'with 12 laps to go' (lap 33 of 44, Autosport). Entered as one let-by item on each green lap from 33 to 44 (an item lapses once HIL is ahead), so a sim SCH that gets ahead of HIL is put back behind him and stays there. The timing (Jolpica) has HIL ahead of SCH at the end of every lap from 26 to the flag"
+  },
+  {
+   "lap": 37,
+   "type": "TEAM_ORDER",
+   "driver": "SCH",
+   "passer": "HIL",
+   "detail": "Jordan's order in the closing stages: Ralf Schumacher not to overtake Hill ('Ralf, you cannot overtake Damon, that is a team order', race engineer Sam Michael, Autosport)",
+   "source": "https://en.wikipedia.org/wiki/1998_Belgian_Grand_Prix https://www.autosport.com/f1/news/1998-belgian-gp-when-the-schumachers-went-to-war/10744117/",
+   "note": "A hold order, not a let-by: the article gives no lap, only the closing stages after the restart 'with 12 laps to go' (lap 33 of 44, Autosport). Entered as one let-by item on each green lap from 33 to 44 (an item lapses once HIL is ahead), so a sim SCH that gets ahead of HIL is put back behind him and stays there. The timing (Jolpica) has HIL ahead of SCH at the end of every lap from 26 to the flag"
+  },
+  {
+   "lap": 38,
+   "type": "TEAM_ORDER",
+   "driver": "SCH",
+   "passer": "HIL",
+   "detail": "Jordan's order in the closing stages: Ralf Schumacher not to overtake Hill ('Ralf, you cannot overtake Damon, that is a team order', race engineer Sam Michael, Autosport)",
+   "source": "https://en.wikipedia.org/wiki/1998_Belgian_Grand_Prix https://www.autosport.com/f1/news/1998-belgian-gp-when-the-schumachers-went-to-war/10744117/",
+   "note": "A hold order, not a let-by: the article gives no lap, only the closing stages after the restart 'with 12 laps to go' (lap 33 of 44, Autosport). Entered as one let-by item on each green lap from 33 to 44 (an item lapses once HIL is ahead), so a sim SCH that gets ahead of HIL is put back behind him and stays there. The timing (Jolpica) has HIL ahead of SCH at the end of every lap from 26 to the flag"
+  },
+  {
+   "lap": 39,
+   "type": "TEAM_ORDER",
+   "driver": "SCH",
+   "passer": "HIL",
+   "detail": "Jordan's order in the closing stages: Ralf Schumacher not to overtake Hill ('Ralf, you cannot overtake Damon, that is a team order', race engineer Sam Michael, Autosport)",
+   "source": "https://en.wikipedia.org/wiki/1998_Belgian_Grand_Prix https://www.autosport.com/f1/news/1998-belgian-gp-when-the-schumachers-went-to-war/10744117/",
+   "note": "A hold order, not a let-by: the article gives no lap, only the closing stages after the restart 'with 12 laps to go' (lap 33 of 44, Autosport). Entered as one let-by item on each green lap from 33 to 44 (an item lapses once HIL is ahead), so a sim SCH that gets ahead of HIL is put back behind him and stays there. The timing (Jolpica) has HIL ahead of SCH at the end of every lap from 26 to the flag"
+  },
+  {
+   "lap": 40,
+   "type": "TEAM_ORDER",
+   "driver": "SCH",
+   "passer": "HIL",
+   "detail": "Jordan's order in the closing stages: Ralf Schumacher not to overtake Hill ('Ralf, you cannot overtake Damon, that is a team order', race engineer Sam Michael, Autosport)",
+   "source": "https://en.wikipedia.org/wiki/1998_Belgian_Grand_Prix https://www.autosport.com/f1/news/1998-belgian-gp-when-the-schumachers-went-to-war/10744117/",
+   "note": "A hold order, not a let-by: the article gives no lap, only the closing stages after the restart 'with 12 laps to go' (lap 33 of 44, Autosport). Entered as one let-by item on each green lap from 33 to 44 (an item lapses once HIL is ahead), so a sim SCH that gets ahead of HIL is put back behind him and stays there. The timing (Jolpica) has HIL ahead of SCH at the end of every lap from 26 to the flag"
+  },
+  {
+   "lap": 41,
+   "type": "TEAM_ORDER",
+   "driver": "SCH",
+   "passer": "HIL",
+   "detail": "Jordan's order in the closing stages: Ralf Schumacher not to overtake Hill ('Ralf, you cannot overtake Damon, that is a team order', race engineer Sam Michael, Autosport)",
+   "source": "https://en.wikipedia.org/wiki/1998_Belgian_Grand_Prix https://www.autosport.com/f1/news/1998-belgian-gp-when-the-schumachers-went-to-war/10744117/",
+   "note": "A hold order, not a let-by: the article gives no lap, only the closing stages after the restart 'with 12 laps to go' (lap 33 of 44, Autosport). Entered as one let-by item on each green lap from 33 to 44 (an item lapses once HIL is ahead), so a sim SCH that gets ahead of HIL is put back behind him and stays there. The timing (Jolpica) has HIL ahead of SCH at the end of every lap from 26 to the flag"
+  },
+  {
+   "lap": 42,
+   "type": "TEAM_ORDER",
+   "driver": "SCH",
+   "passer": "HIL",
+   "detail": "Jordan's order in the closing stages: Ralf Schumacher not to overtake Hill ('Ralf, you cannot overtake Damon, that is a team order', race engineer Sam Michael, Autosport)",
+   "source": "https://en.wikipedia.org/wiki/1998_Belgian_Grand_Prix https://www.autosport.com/f1/news/1998-belgian-gp-when-the-schumachers-went-to-war/10744117/",
+   "note": "A hold order, not a let-by: the article gives no lap, only the closing stages after the restart 'with 12 laps to go' (lap 33 of 44, Autosport). Entered as one let-by item on each green lap from 33 to 44 (an item lapses once HIL is ahead), so a sim SCH that gets ahead of HIL is put back behind him and stays there. The timing (Jolpica) has HIL ahead of SCH at the end of every lap from 26 to the flag"
+  },
+  {
+   "lap": 43,
+   "type": "TEAM_ORDER",
+   "driver": "SCH",
+   "passer": "HIL",
+   "detail": "Jordan's order in the closing stages: Ralf Schumacher not to overtake Hill ('Ralf, you cannot overtake Damon, that is a team order', race engineer Sam Michael, Autosport)",
+   "source": "https://en.wikipedia.org/wiki/1998_Belgian_Grand_Prix https://www.autosport.com/f1/news/1998-belgian-gp-when-the-schumachers-went-to-war/10744117/",
+   "note": "A hold order, not a let-by: the article gives no lap, only the closing stages after the restart 'with 12 laps to go' (lap 33 of 44, Autosport). Entered as one let-by item on each green lap from 33 to 44 (an item lapses once HIL is ahead), so a sim SCH that gets ahead of HIL is put back behind him and stays there. The timing (Jolpica) has HIL ahead of SCH at the end of every lap from 26 to the flag"
+  },
+  {
+   "lap": 44,
+   "type": "TEAM_ORDER",
+   "driver": "SCH",
+   "passer": "HIL",
+   "detail": "Jordan's order in the closing stages: Ralf Schumacher not to overtake Hill ('Ralf, you cannot overtake Damon, that is a team order', race engineer Sam Michael, Autosport)",
+   "source": "https://en.wikipedia.org/wiki/1998_Belgian_Grand_Prix https://www.autosport.com/f1/news/1998-belgian-gp-when-the-schumachers-went-to-war/10744117/",
+   "note": "A hold order, not a let-by: the article gives no lap, only the closing stages after the restart 'with 12 laps to go' (lap 33 of 44, Autosport). Entered as one let-by item on each green lap from 33 to 44 (an item lapses once HIL is ahead), so a sim SCH that gets ahead of HIL is put back behind him and stays there. The timing (Jolpica) has HIL ahead of SCH at the end of every lap from 26 to the flag"
+  }
+ ],
+ "great-britain-2016": [
+  {
+   "lap": 46,
+   "type": "FAULT",
+   "driver": "ROS",
+   "status": "Gearbox",
+   "laps": 2,
+   "detail": "Gearbox problem in the closing laps; the team told him to avoid seventh gear, after which he held his lead over Verstappen",
+   "source": "https://en.wikipedia.org/wiki/2016_British_Grand_Prix",
+   "note": "The article gives no lap: 'As R\u00e4ikk\u00f6nen got back into fifth at the expense of P\u00e9rez, Rosberg reported problems with his gearbox'. R\u00e4ikk\u00f6nen passed P\u00e9rez on lap 46 in the timing (FastF1); Rosberg's laps 46-47 are 3.2 s and 2.5 s over his laps either side, and VER closes from 6.2 s to 2.0 s. Two laps (46-47) from the timing: the article says he 'was able to consolidate his slim lead' once he avoided seventh"
+  }
+ ],
+ "brazil-2019": [
+  {
+   "lap": 70,
+   "type": "FAULT",
+   "driver": "ALB",
+   "status": "Collision",
+   "fault": "damage",
+   "laps": 1,
+   "detail": "Hit by Hamilton at turn 10 at the restart, spun and rejoined fifteenth",
+   "turn": 10,
+   "source": "https://en.wikipedia.org/wiki/2019_Brazilian_Grand_Prix",
+   "note": "No source names damage: it costs its contact lap only (laps 1), fitted from the timing"
+  },
+  {
+   "lap": 70,
+   "type": "FAULT",
+   "driver": "HAM",
+   "status": "Collision",
+   "fault": "damage",
+   "laps": 1,
+   "detail": "Made contact with Albon trying to pass at turn 10 and was slowed, letting Gasly into second",
+   "turn": 10,
+   "source": "https://en.wikipedia.org/wiki/2019_Brazilian_Grand_Prix",
+   "note": "No source names damage: it costs its contact lap only (laps 1), fitted from the timing"
   }
  ]
 }

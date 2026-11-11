@@ -1,0 +1,51 @@
+{
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": true,
+    "drs": true,
+    "ers": "hybrid",
+    "refuelling": false
+  },
+  "eras": {
+    "eraId": 10,
+    "order": 5,
+    "userSide": "VER",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Verstappen starts on pole, but heavy rain on the first lap sends P\u00e9rez in for intermediates, then Verstappen and Alonso a lap later, and P\u00e9rez takes the lead. Verstappen goes back to slicks a lap before P\u00e9rez and leads from lap 12. The rain returns late, Zhou's crash brings out the red flag, and Verstappen wins the six-lap run to the flag on intermediates by 3.744 s from Alonso: his ninth win in a row, equalling Vettel's record."
+    },
+    "mastery": {
+      "type": "margin",
+      "seconds": 3.7,
+      "label": "Win by more than 3.7 seconds"
+    },
+    "hidden": {
+      "type": "compound_rule",
+      "mustAvoid": "WET",
+      "label": "Never fit the full wet tyre"
+    },
+    "hardCalls": {
+      "ALO": 1,
+      "VER": 5
+    },
+    "briefing": "Zandvoort, 2023. Rain on the opening laps has the leaders on intermediates. You run Verstappen from pole, second and 6.1 s behind P\u00e9rez after eight laps, and the track is drying. Win at home, and watch the sky: the rain isn't done."
+  },
+  "storylineEvents": [
+    [
+      63,
+      "RETIREMENT"
+    ],
+    [
+      64,
+      "RED"
+    ],
+    [
+      66,
+      "SC"
+    ]
+  ]
+}

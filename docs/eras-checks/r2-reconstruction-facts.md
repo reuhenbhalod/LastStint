@@ -1,0 +1,222 @@
+# Checking the reconstruction facts (1983-1995)
+
+The 23 Eras races from 1983 to 1995 have no lap timing. `pipeline reconstruct` rebuilds them
+from anchors, and the pit stops before 1994 plus all safety cars come from a facts file a
+person enters: `data/reconstruction/<race-id>.json` (format: `docs/reconstruction-facts.md`).
+This pass entered every stop and safety car it could source. Check each race against its
+links, then put your initials and the date in **Owner checked**.
+
+## How to read this
+
+- **Stops entered**: car number, driver, in-lap. Everything in a race file was read in the
+  linked source; nothing comes from memory. Some in-laps are worked out from the source's wording
+  rather than quoted, and their notes give the wording: great-britain-1987 Mansell 35 ("added
+  20 seconds to lap 36"), mexico-1990 Piquet 44 ("two laps later" than lap 42), and the six
+  france-1990 stops, marked **derived** (from Motor Sport's order of the stops and Wikipedia's
+  lap-leader chart).
+- **Lane times**: no source read gives pit-lane times for these races, so every `laneTime` is
+  `null` and the reconstruction uses its default. Where a source gives a **stationary** time
+  (wheels-off to wheels-on), it is in the stop's `note`. Stationary time is not lane time.
+- **`complete.stops`** is `false` everywhere. The reports cover the front-runners' stops at
+  best, never the whole field.
+- **`complete.safetyCars`** is `true` before 1993 (the loader allows none). From 1993 it is
+  `true` only for brazil-1993 and belgium-1995, where a lap-by-lap report covers the whole
+  race. For europe-1993, australia-1993, spain-1994 and australia-1994 no source mentions a
+  safety car, but none says there wasn't one, so they are left `false` for you to decide.
+- **1994-95**: F1DB supplies every stop (`data/raw/f1db/<race-id>.stops.csv`) and the loader
+  ignores facts-file stops, so those files carry only safety cars and notes.
+- Extra keys (`name`, `note`) are for the checker; the loader ignores them.
+- The format has no field for retirement causes. Causes found while reading are listed below
+  (Jolpica already supplies retirement laps and statuses).
+
+## Sources
+
+| Short name | What |
+|---|---|
+| MS | Motor Sport magazine archive race report (motorsportmagazine.com/archive), linked per race |
+| AS | Autosport's archive report (autosport.com 'Grand Prix Gold'), linked per race |
+| GPE | GrandPrix.com Grand Prix Encyclopedia race report (grandprix.com/gpe/rrNNN.html) |
+| WP | English Wikipedia race article |
+
+## Per race
+
+| Race | Stops entered (car, driver, in-lap) | Safety cars | Missing / doubts | Owner checked |
+|---|---|---|---|---|
+| south-africa-1983 | #5 Piquet 28 ([GPE](https://www.grandprix.com/gpe/rr388.html), [historyracingpedia](https://www.historyracingpedia.com/stories/nl/f1-1983-south-africa-titledecider-piquet-prost.html)) | n/a | Patrese (#6), Lauda (#8), Tambay (#27) refuelling stops are described in [MS](https://www.motorsportmagazine.com/archive/article/november-1983/66/south-african-grand-prix-9/) with no laps. The Brabham pre-race plan (laps 27, 46) is a plan, not entered. | |
+| monaco-1984 | none | n/a | Laffite (#5) tyre stop, no lap ([MS](https://www.motorsportmagazine.com/archive/article/july-1984/84/reflections-in-the-monte-carlo-puddles/)). No leader stopped; no source says so outright. **Road position (Nov 8):** #4 Bellof third on the road, 21.141 s behind Prost (see "Disqualified cars on the road" below). | |
+| portugal-1984 | none | n/a | Johansson (#20) nose stop and Warwick (#16) tyre stop, no laps ([MS](https://www.motorsportmagazine.com/archive/article/november-1984/76/another-mclaren-double/)). Retirement: Mansell, brake failure, spins on laps 51-52 ([GPE](https://www.grandprix.com/gpe/rr404.html), [WP](https://en.wikipedia.org/wiki/1984_Portuguese_Grand_Prix)). | |
+| germany-1986 | #20 Berger 5 (repair, two laps lost); #6 Piquet 15, 27; #5 Mansell 17; #2 Rosberg 19; #1 Prost 20; #12 Senna 21 ([AS](https://www.autosport.com/f1/feature/3783/grand-prix-gold-german-gp-1986), [MS](https://www.motorsportmagazine.com/archive/article/september-1986/35/formula-one-german-grand-prix-2), [WP](https://en.wikipedia.org/wiki/1986_German_Grand_Prix) lap-leader chart) | n/a | MS puts Piquet's stops on laps 16 and 28; Autosport says lap 15 and the end of lap 27, and WP's chart (Rosberg leads from 15 and from 27) agrees with Autosport, so 15 and 27 are entered. Berger's second tyre stop, Tambay's (#16) early stop (lost wheel weights) and Brundle's (#3) black-box stop: no laps. Storyline is fuel (195 L): Rosberg and Prost ran minimum boost and both ran dry on the last lap, Rosberg second at the start of it, Prost fourth (AS, MS); both classified a lap down (Jolpica). | |
+| portugal-1985 | none | n/a | Piquet (#7) "pitted repeatedly around lap 25" then retired with a tyre problem ([WP](https://en.wikipedia.org/wiki/1985_Portuguese_Grand_Prix)): not precise enough to enter. Race cut to 67 laps on the 2-hour limit. | |
+| mexico-1986 | none | n/a | Berger (#20) no stop ([WP](https://en.wikipedia.org/wiki/1986_Mexican_Grand_Prix), [MS](https://www.motorsportmagazine.com/archive/article/december-1986/15/formula-one-mexican-grand-prix-australian-grand-prix), [GPE](https://www.grandprix.com/gpe/rr435.html)). Piquet 3 stops, Mansell 2, Prost 1 (MS): **no laps, storyline gap**. | |
+| hungary-1986 | #6 Piquet 35; #12 Senna 48; #5 Mansell 28, 46; #1 Prost 16 (long repair); #2 Rosberg 16 (drive-through), 17; #28 Johansson 21 (7.34 s stationary) ([MS](https://www.motorsportmagazine.com/archive/article/september-1986/61/formula-one-hungarian-grand-prix-2/)) | n/a | Rosberg's later stop, Johansson's other stop, the midfield. Prost's lap-16 stop lasted about 8 laps, so the default lane time is far too short. Rosberg retired end of lap 35 with broken rear suspension; Prost with suspension damage after Arnoux contact (MS). | |
+| australia-1986 | #1 Prost 32 ([MS Dec 1986](https://www.motorsportmagazine.com/archive/article/december-1986/15/formula-one-mexican-grand-prix-australian-grand-prix), [MS Jul 2004](https://www.motorsportmagazine.com/archive/article/july-2004/142/race-86-australian-gp/)) | n/a | **Piquet's precautionary stop, after Mansell's lap-64 failure: no source read gives the lap. Storyline gap.** Retirements: Rosberg lap 63 (tyre delaminated), Mansell lap 64 (left-rear tyre exploded) (MS, WP). | |
+| great-britain-1987 | #5 Mansell 35 ([MS](https://www.motorsportmagazine.com/archive/article/august-1987/57/sunrise-over-silverstone), [WP](https://en.wikipedia.org/wiki/1987_British_Grand_Prix)) | n/a | MS: "This added only 20 seconds to lap 36", with the timing line at the start of the pit lane, so the in-lap is 35. Piquet (#6) non-stop. Prost (#1) tyre stop, no lap; retired with clutch failure (MS). | |
+| monaco-1988 | none | n/a | Patrese (#6) repair stop after the lap-51 Alliot collision, in-lap not given ([MS](https://www.motorsportmagazine.com/archive/article/june-1988/22/a-minute-error-of-judgement), [WP](https://en.wikipedia.org/wiki/1988_Monaco_Grand_Prix)). Senna crashed at Portier on lap 67 (WP). | |
+| france-1990 | #20 Piquet 20; #1 Prost 27; #28 Berger 28; #27 Senna 30; #2 Mansell 32; #6 Patrese 33, all **derived** ([MS](https://www.motorsportmagazine.com/archive/article/august-1990/16/a-touch-of-the-sun/), [WP](https://en.wikipedia.org/wiki/1990_French_Grand_Prix) lap-leader chart, [GPE](https://www.grandprix.com/gpe/rr491.html)) | n/a | MS: Piquet in 'as the front half of the field started lap 21', Prost 'at the start of lap 28', then Berger, Senna (after two laps leading), Mansell, Patrese (after one lap leading); WP's chart (Berger 1-27, Senna 28-29, Mansell 30-31, Patrese 32, Capelli 33-77) fixes the leaders' in-laps. Capelli (#16) and Gugelmin (#15) non-stop (MS, WP). Alesi's (#4) stop (final drive failed leaving the pits), Nannini's stop, Berger's and Mansell's second stops: no laps. Prost passed Capelli on lap 78 (MS, WP chart; WP text: 77). | |
+| united-states-1990 | #20 Piquet 28 ([MS](https://www.motorsportmagazine.com/archive/article/april-1990/5/phoenix-revivial), [WP](https://en.wikipedia.org/wiki/1990_United_States_Grand_Prix)) | n/a | Berger (#28) nose/wing stop: WP puts the crash on lap 9, MS has him rejoining on lap 15, so not entered. Patrese, Nannini (2), Schneider, Martini, Moreno stops: no laps. Alesi (#4) and Senna (#27) appear to have run non-stop (MS: "only Piquet stopped specifically for tyres" of the Goodyear runners). | |
+| mexico-1990 | #28 Berger 13; #26 Alliot 12; #20 Piquet 44 ([MS](https://www.motorsportmagazine.com/archive/article/august-1990/6/mexican-magic), [GPE](https://www.grandprix.com/gpe/rr490.html), [WP](https://en.wikipedia.org/wiki/1990_Mexican_Grand_Prix)) | n/a | Prost (#1) and Mansell (#2): no stop in any source, but none says non-stop. Larini (#25) early stop, no lap. Senna (#27) no stop, right-rear tyre failure; WP and GPE differ on the lap (WP: three laps after lap 60; GPE: lap 63; Jolpica: 63 laps). | |
+| brazil-1991 | #27 Prost 17 (WP); #5 Mansell 25 (MS), 50 (WP) | n/a | Mansell first stop: MS says 25, WP 26. MS chosen because it matches Jolpica elsewhere (Mansell retired on lap 60 with 59 laps; WP says 61). The lap-50 stop is WP only, so check it. Senna's and Patrese's single stops, Prost's second, Piquet's and Moreno's: no laps. Mansell retired with gearbox failure ([MS](https://www.motorsportmagazine.com/archive/article/may-1991/6/formula-one-brazilian-grand-prix), [WP](https://en.wikipedia.org/wiki/1991_Brazilian_Grand_Prix)). | |
+| monaco-1992 | #5 Mansell 71; #20 Brundle 19 ([GPE](https://www.grandprix.com/gpe/rr522.html), [MS](https://www.motorsportmagazine.com/archive/article/july-1992/16/what-did-go-wrong), [WP](https://en.wikipedia.org/wiki/1992_Monaco_Grand_Prix)) | n/a | WP's body says Mansell led "until lap 70"; its lead section, GPE and MS say 71. 71 chosen. Senna (#1) ran non-stop on one set (WP). | |
+| belgium-1992 | Wets: #5 Mansell 3, #27 Alesi 3, #19 Schumacher 4, #20 Brundle 5, #6 Patrese 6, #12 Herbert 8, #1 Senna 16. Slicks: Senna 28, Herbert 30, Schumacher 30, Brundle 31, Patrese 31, #11 Hakkinen 31, Mansell 33 (6.37 s) ([MS](https://www.motorsportmagazine.com/archive/article/october-1992/8/luck-and-judgement), [GPE](https://www.grandprix.com/gpe/rr528.html)) | n/a | Hakkinen's wet-tyre stop, Alesi's puncture stop, every midfield car. Mansell and Patrese both had loose exhausts late on (MS). | |
+| hungary-1992 | #5 Mansell 61; #1 Senna 67 ([MS](https://www.motorsportmagazine.com/archive/article/september-1992/16/mansell-is-finally-crowned/), [WP](https://en.wikipedia.org/wiki/1992_Hungarian_Grand_Prix), [GPE](https://www.grandprix.com/gpe/rr527.html)) | n/a (lap-14 "SC" board shown, no car deployed: WP) | Everyone else planned to run non-stop (MS). Retirements: Patrese dropped a valve on lap 56; Schumacher's rear wing failed at the start of lap 64 (MS). | |
+| brazil-1993 | Wets lap 27: #8 Senna, #12 Herbert, #19 Alliot, #4 de Cesaris, #21 Alboreto. Lap 28: #0 Hill, #30 Lehto, #11 Zanardi, #26 Blundell, #9 Warwick, #22 Badoer, #20 Comas. Lap 30: #5 Schumacher, #27 Alesi. Slicks: Herbert 37, Senna 40, Hill 41. Schumacher 41 (10 s stop-and-go) ([MS](https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna)) | Laps 30-36 (MS: "came out on lap 30" ... "lap 37 before the racing resumed") | WP has the crashes on lap 27; a fan wiki says 29-38. Senna's pre-rain stop-and-go (issued lap 25, WP), Alesi's two stop-and-gos, Schumacher's slick stop, Katayama's and Suzuki's early stops: no laps. Prost (#2) stayed out on slicks and crashed on lap 29. A trial reconstruct notes "the laps behind the safety car did not settle". | |
+| europe-1993 | #25 Brundle 6; #12 Herbert 10 (weather pass, MS 75 greatest); #0 Hill 17, 24; #8 Senna 18, 34, 57 (drive-through, WP); #2 Prost 19, 22, 48, 53; #14 Barrichello 19, 39 ([MS](https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked), [WP](https://en.wikipedia.org/wiki/1993_European_Grand_Prix), [GPE](https://www.grandprix.com/gpe/rr535.html)) | none entered; `complete: false` | Totals (MS): Senna 5 pit calls including the drive-through (WP: 4 stops), Hill 6, Prost 7, Herbert 1, Barrichello at least 4. About 11 front-runner stops have no lap. A trial reconstruct fails the lap-1 grid-order anchor: Lehto started from the pit lane in the spare (MS), but Jolpica has him on grid 7. That is an anchor issue, not a facts one. | |
+| australia-1993 | #5 Schumacher 15; #0 Hill 22 (6.41 s), 44; #8 Senna 24 (5.32 s), 55; #7 Hakkinen 26; #2 Prost 29 (7.41 s), 48 ([MS](https://www.motorsportmagazine.com/archive/article/december-1993/18/mclaren-overtakes-ferrari), [GPE](https://www.grandprix.com/gpe/rr548.html), [WP](https://en.wikipedia.org/wiki/1993_Australian_Grand_Prix)) | none entered; `complete: false` | MS has Prost leading laps 24-28, which fits a Senna in-lap of 24 if the pit entry is before the line. Hakkinen's lap-28 retirement into the pits (brakes) is not entered. Alesi 1 stop, Berger 2, Suzuki 1: no laps. Schumacher's engine failed on lap 20; Patrese's fuel pressure dropped on the last lap (WP). | |
+| spain-1994 | F1DB | none entered; `complete: false` | MS gives each leader's stop one lap below F1DB (Schumacher 21/45 against 22/46, Hakkinen 30/45 against 31/46, Hill 41 against 42); F1DB kept ([MS](https://www.motorsportmagazine.com/archive/article/july-1994/12/atimely-triumph)). No safety car in WP, MS or [GPE](https://www.grandprix.com/gpe/rr553.html). | |
+| australia-1994 | F1DB | none entered; `complete: false` | MS agrees with F1DB's laps ([MS](https://www.motorsportmagazine.com/archive/article/december-1994/18/game)). F1DB's Barrichello 58 and Hakkinen 62 (about 14 s each) look like the 10 s stop-and-go penalties MS puts on laps 58 and 61. No safety car in WP, MS or [GPE](https://www.grandprix.com/gpe/rr564.html). Hill retired at his lap-36 pit visit with broken suspension. | |
+| belgium-1995 | F1DB | Laps 29-31 ([MS](https://www.motorsportmagazine.com/archive/article/october-1995/14/belgian-grand-prix-9/): "Safety Car appears on lap 29" ... "race proper resumes on lap 32"; [lightsoutblog](https://lightsoutblog.com/every-safety-car-deployment-at-the-belgian-grand-prix): deployed lap 29) | A fan wiki says 28-33, and a search summary claimed "six laps", but the page as fetched doesn't say that. F1DB's Hill stop on lap 33 is the pit-lane speeding stop-and-go (MS, GPE). | |
+
+## Weather (the six wet races)
+
+Each wet race's facts file has a `weather` block (format and state-to-wetness mapping:
+docs/reconstruction-facts.md): a timeline of track states per lap range, every entry with its
+source, plus the tyre each stop fitted where a source says (`stops[].tyre`, or
+`weather.tyreChanges` on F1DB's 1994-95 stops). States: dry 0, damp 0.15, wet 0.45, heavy
+0.65. "a-b x->y" is a linear ramp from state x on lap a to y on lap b; a ramp between two
+sourced points is an interpolation. Check each range against its links, then initial
+**Owner checked**.
+
+Extra sources read for the weather: [Autosport (Bradley, 2023)](https://www.autosport.com/f1/news/when-senna-and-bellof-starred-in-monaco-as-prost-prevailed/6530051/) and [Motor Sport feature](https://motorsportmagazine.com/articles/single-seaters/f1/1984-monaco-grand-prix-the-arrival-of-senna) (Monaco 1984); [MS Jun 1985](https://www.motorsportmagazine.com/archive/article/june-1985/22/portuguese-grand-prix-2/) (Portugal 1985); [Autosport](https://www.autosport.com/f1/news/how-schumacher-joined-f1s-elite-5109906/5109906/), [motorsportretro](http://motorsportretro.com/2014/04/michael-schumachers-first-win/), [pitdebrief](https://www.pitdebrief.com/?p=66602) (Belgium 1992); [MS 75 greatest](https://motorsportmagazine.com/special-article/the-75-greatest-grands-prix/104/19-1993-gp-of-europe-sennas-lap-of-the-gods), [sidepodcast](https://sidepodcast.com/post/races-to-remember-europe-1993) (Europe 1993); [GPE rr575](https://www.grandprix.com/gpe/rr575.html), [formulaonehistory](https://www.formulaonehistory.com/1995-belgian-grand-prix/) (Belgium 1995).
+
+| Race | Timeline | Tyres | Missing / doubts | Owner checked |
+|---|---|---|---|---|
+| monaco-1984 | 1-32 heavy (WP: start delayed 45 min by heavy rain, "held amidst heavy rain"; MS: "Torrential rain"; Autosport: "a monsoon"). Cut to lap 31, the results lap. | None sourced: every stint estimated (wets). | Autosport has the rain heavier from about lap 23 ("laptimes dropped by up to 5s") and "even harder" before the flag; the MS feature says "the rain was actually easing off". Conflict, so no change is modelled. No source names the tyres. The order anchor used to fail on the disqualified Bellof (BEL) heading the road order; since Nov 8 his sourced road place (below) puts him third, and every anchor passes. | |
+| portugal-1985 | 1-24 wet (MS: "rain falling steadily"; WP: rain "already falling at the start"); 25-30 wet->heavy (WP: "continued and got heavier", after the lap-25 stops, before lap 30); 31-67 heavy (MS: "huge lakes were forming", Prost spun "on the standing water", Jolpica: Prost out with 30 laps). | Start: #7 Piquet wet (MS: "Pirelli's wet weather rubber"); the rest estimated (wets). | The lap the rain got heavier isn't given (ramped 25-30). No source says it eased. | |
+| belgium-1992 | 1-2 damp (MS: "a track made so greasy by drizzle just before the start"); 3-26 wet (MS: "raining quite hard now", "the rain continued"); 27-30 wet->damp (MS: "a line was appearing faintly"; WP: "By ... lap 28, the track was beginning to dry"; Autosport: slicks lap 30 "just as the rain stopped"); 31-37 damp->dry; 38-44 dry (motorsportretro: on the penultimate lap Schumacher's time "would have put him fifth on the grid"; F1DB: every fastest lap on laps 38-42). | Start slick (MS: "all of the drivers pitted for wets within laps"; pitdebrief: "all drivers deciding to start on the dry tyres"). Stops: the 7 wet and 7 slick stops already entered get `tyre`. | No source describes laps 17-26 (held at wet). The dry end (31-44) rests on the late pace and the fastest laps, not on a source saying "dry". Hakkinen's wet-tyre stop has no lap, so he runs slicks to his lap-31 stop. pitdebrief puts Senna's wet stop on lap 14 (MS: 16, kept). | |
+| brazil-1993 | 1-25 dry (WP infobox: "Dry first"; MS: "By lap 26 spots were falling"); 26 damp (MS); 27-29 heavy (MS: "by lap 27 the monsoon arrived", "a river was running across the track"); 30-36 heavy->wet (safety car; WP: "The rain stopped and the safety car went in"); 37-39 wet->damp (MS lap 39: "drying rapidly again"); 40-43 damp->dry (MS: slick stops 40-43); 44-71 dry (WP infobox: "staying dry for the rest of the race"). | Start slick (WP: Prost "stayed out on slick tyres"). The 14 wet and 3 slick stops already entered get `tyre`; Schumacher's lap-41 stop-and-go has none, so his stint from lap 42 is estimated (slicks). | No source describes the track behind the safety car (ramped). Cars with no sourced wet stop run slicks through the rain. MS: Hill "wide one lap on the water in turn one" later on (not modelled). | |
+| europe-1993 | 1-5 wet (GPE: "raining at the start"; WP: "damp"; sidepodcast: "soaking ... the rain had eased"); 6-10 wet->damp (MS: drying line; Brundle slicks lap 6, Herbert end of lap 10); 11-21 damp (GPE: "beginning to dry"; slick stops 17-19); 22-30 wet (MS: "rained again on lap 22"); 31-34 wet->damp (GPE: "The rain then stopped again"; Senna slicks lap 34); 35-36 damp; 37-40 wet (sidepodcast: "on the 37th lap ... the others were hurrying to fit wets"; MS: Barrichello wets lap 39; GPE: "the rain began to fall heavily"); 41-66 damp (GPE: "the track began to dry again"; Senna's fastest lap 1:18.029 on lap 57 against a 1:10.458 pole); 67-76 wet (sidepodcast: "With just 10 laps to go, wet tyres"; GPE: "The rain came again in the closing laps"). | Start wet (GPE; the leaders' first stops were for slicks), #30 Lehto slick (MS: from the pit lane on slicks). Stops get `tyre`; **new stop: #12 Herbert lap 10, slicks** ([MS 75 greatest](https://motorsportmagazine.com/special-article/the-75-greatest-grands-prix/104/19-1993-gp-of-europe-sennas-lap-of-the-gods): "switched from wets to slicks at the end of lap 10"). Senna's lap-57 drive-through: slicks kept. | Senna's wet stop between laps 24 and 34 (GPE: "stayed out for four more laps" after Hill, about lap 28) and his closing-laps wet stop have no lap, so he runs slicks through those showers. WP's "it rained and then stopped again" (laps 49-54) and the shower before lap 57 are unlocated, not modelled. When each shower ended is not given. Prost's lap-48/53 tyres not given. | |
+| belgium-1995 | 1-19 dry (formulaonehistory: "the afternoon began dry"; F1DB: fastest lap on lap 11); 20 damp (MS lap 21: "as the drizzle becomes rain"); 21-24 wet (MS; GPE: "Then it started to rain"); 25 damp (MS: "The rain stops"); 26-28 damp->wet (MS lap 26: "just as the rain begins again"); 29-31 heavy (safety car; WP: "The rain intensified again"); 32-44 wet (MS lap 32 "a now wet-shod Panis"; lap 40 Frentzen's gamble on wets). | Start slick. tyreChanges on F1DB stops: Hill 15 slick, 21 wet, 26 slick, 30 wet; Schumacher 18 slick, 30 wet; Brundle 22 wet; Panis 26 slick, 29 wet (derived: "now wet-shod" by lap 32). | MS puts the Hill/Schumacher wet stops on lap 29, F1DB on 30 (F1DB's laps kept). WP's "Herbert struggled for pace once the track was dry" could mean a damp opening; no source says so. Hill's lap-33 stop-and-go and every other car's stops have no sourced tyre (estimated). | |
+
+A trial `pipeline reconstruct` of all six into a temp dir passes every core anchor except
+monaco-1984's order (Bellof, above), including a `tyre` row for every sourced stint. An
+in-memory build of belgium-1992, brazil-1993 and belgium-1995 gives each a weather block
+fitted from the synthetic laps close to the sourced timeline. monaco-1984, portugal-1985 and
+europe-1993 are wet on every lap (damp counts), so `build.dry_fit` has no dry lap to fit on:
+the build step will need a dry-pace reference for them.
+
+## Disqualified cars on the road (`roadPositions`)
+
+Owner decision, Nov 8 2026: a car excluded from the result after the flag runs to the flag at
+its sourced road place, with its sourced gap; the official result keeps it excluded (format:
+docs/reconstruction-facts.md).
+
+| Race | Car | Road place, gap | Sources | Owner checked |
+|---|---|---|---|---|
+| monaco-1984 | #4 Stefan Bellof (Tyrrell 012, Cosworth) | P3 at the results lap (31), +21.141 s behind Prost | [MS Jul 1984](https://www.motorsportmagazine.com/archive/article/july-1984/84/reflections-in-the-monte-carlo-puddles/), results: Prost 1 hr 01 min 07.740 sec, Senna 1 hr 01 min 15.186 sec, "3rd : Stefan Bellof ... 1 hr 01 min 28.881 sec", Arnoux 1 hr 01 min 36.817 sec; "Rene Arnoux started and finished in the same position after Bellof's disqualification". [WP](https://en.wikipedia.org/wiki/1984_Monaco_Grand_Prix) classification: "DSQ, 4, Stefan Bellof, Tyrrell-Ford, 31, Underweight car (+21.141), 20"; "Bellof ... finished third"; "The Tyrrell team's results were erased later in the season due to weight infringements". The two agree (1:01:28.881 - 1:01:07.740 = 21.141 s). Jolpica: `disqualified`, 31 laps, no time. | |
+
+## Running order (`lapLeaders`, `runningOrder`), Nov 8 2026
+
+The reconstruction used to anchor everything but the order mid-race, so a takeover could
+start from a race that never happened (mexico-1990: Prost leading by lap 31; he led from lap
+61). Every race now has its **lap leaders** from Wikipedia's lap-leader chart
+(`Template:F1Laps<year>`, shown in the race article's infobox; every lap of every race), and
+**snapshots** of the order and gaps where a source states them with a lap (format and
+solver: docs/reconstruction-facts.md). Sentences are quoted in each entry's `source`; a lap
+worked out from the wording ("with 25 laps to go") says how in its `note`. Only places the
+source gives are listed (a snapshot says nothing about the cars behind its last car, beyond
+being behind it). Motor Sport was read through its archive pages (Mexico 1990, Hungary 1986,
+Mexico/Australia 1986, Monaco 1988, Britain 1987, Europe 1993); GrandPrix.com rate-limited
+again.
+
+Every core anchor passes on every race, the new `leader`, `running order` and `lap gap` rows
+included, except three failures that predate this pass and don't involve the order:
+france-1990's classification (de Cesaris, #22, disqualified with 78 laps and no road place,
+runs ahead of Modena) and the lap-1 grid order of monaco-1992 and south-africa-1983 (a slow
+car's fastest lap, pinned on its ladder lap, breaks the grid order behind it). All three pass
+from S7 (below).
+
+| Race | Lap leaders (chart) | Snapshots | Doubts / conflicts | Owner checked |
+|---|---|---|---|---|
+| australia-1986 | PIQN 1-6 ROSK 7-62 PIQN 63-64 PRO 65-82 ([WP](https://en.wikipedia.org/wiki/1986_Australian_Grand_Prix) chart) | lap 1: PIQN SENA ROSK ([WP](https://en.wikipedia.org/wiki/1986_Australian_Grand_Prix), [MS](https://www.motorsportmagazine.com/archive/article/december-1986/15/formula-one-mexican-grand-prix-australian-grand-prix)); lap 44: ROSK PIQN MAN ([WP](https://en.wikipedia.org/wiki/1986_Australian_Grand_Prix)); lap 57: ROSK PIQN MAN PRO ([WP](https://en.wikipedia.org/wiki/1986_Australian_Grand_Prix)); lap 62: ROSK PIQN PRO MAN ([MS](https://www.motorsportmagazine.com/archive/article/december-1986/15/formula-one-mexican-grand-prix-australian-grand-prix)); lap 80: PRO PIQN (PIQN +15.484 s ±1) ([WP](https://en.wikipedia.org/wiki/1986_Australian_Grand_Prix)) | Lap 57's order of the three contenders is worked out (WP: 'positions 2, 3 and 4'; Piquet second since lap 44, Prost 'closed on the two Williams cars' and passed Mansell just before Rosberg retired). MS: Piquet 'resumed almost 20 sec behind Prost' after his stop: no lap, not entered. Streiff (classified, out of fuel two laps down) now stops at his natural time (see the format doc). | |
+| australia-1993 | SENA 1-23 PRO 24-28 SENA 29-79 ([WP](https://en.wikipedia.org/wiki/1993_Australian_Grand_Prix) chart) | none found |  | |
+| australia-1994 | MSCM 1-35 MAN 36-53 BER 54-63 MAN 64-81 ([WP](https://en.wikipedia.org/wiki/1994_Australian_Grand_Prix) chart) | lap 1: MSCM HIL ([WP](https://en.wikipedia.org/wiki/1994_Australian_Grand_Prix)) | WP: Hill second 'until lap 36'; only lap 1 is entered as a snapshot (the order between the two is already the leader rule; Hill's place during the stops isn't stated). | |
+| belgium-1992 | SENA 1-1 MAN 2-3 PAT 4-6 SENA 7-10 MAN 11-33 MSCM 34-44 ([WP](https://en.wikipedia.org/wiki/1992_Belgian_Grand_Prix) chart) | none found | WP's text has Mansell passing Senna 'at the end of the second lap'; the chart has Mansell leading laps 2-3 (chart kept). Boutsen's place before his lap-28 spin isn't sourced. | |
+| belgium-1995 | HER 1-1 ALE 2-3 HER 4-5 COU 6-13 HIL 14-15 MSCM 16-18 HIL 19-21 MSCM 22-23 HIL 24-24 MSCM 25-44 ([WP](https://en.wikipedia.org/wiki/1995_Belgian_Grand_Prix) chart) | none found |  | |
+| brazil-1991 | SENA 1-71 ([WP](https://en.wikipedia.org/wiki/1991_Brazilian_Grand_Prix) chart) | lap 1: SENA MAN PAT ALE BER PRO ([WP](https://en.wikipedia.org/wiki/1991_Brazilian_Grand_Prix)); lap 8: SENA MAN (MAN +3 s ±1) ([WP](https://en.wikipedia.org/wiki/1991_Brazilian_Grand_Prix)); lap 20: SENA MAN (MAN +0.7 s ±0.7) ([WP](https://en.wikipedia.org/wiki/1991_Brazilian_Grand_Prix)) | Lap 1 is WP's 'made a perfect start to lead from ...'. | |
+| brazil-1993 | PRO 1-29 HIL 30-41 SENA 42-71 ([WP](https://en.wikipedia.org/wiki/1993_Brazilian_Grand_Prix) chart) | lap 11: PRO HIL SENA ([WP](https://en.wikipedia.org/wiki/1993_Brazilian_Grand_Prix)) | Built from S7 (below): with the estimated slick stops and the lap-39/43/47 snapshots Senna is P3 at the takeover (lap 24), as the lap-11 snapshot has him. | |
+| europe-1993 | SENA 1-18 PRO 19-19 SENA 20-34 PRO 35-38 SENA 39-76 ([WP](https://en.wikipedia.org/wiki/1993_European_Grand_Prix) chart) | lap 5: SENA PRO HIL BAR ([MS](https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked)); lap 10: SENA PRO HIL BAR ([MS](https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked)); lap 15: SENA PRO HIL BAR ([MS](https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked)); lap 1: SENA PRO HIL BAR ALE MSCM JAR ([WP](https://en.wikipedia.org/wiki/1993_European_Grand_Prix)) | WP's 'Schumacher stayed out and was leading but spun out on lap 23' disagrees with the chart (Senna 20-34); chart kept. Laps 5-15 from MS's 'for the first 18 laps that was how the front of the field remained'. | |
+| france-1990 | BER 1-27 SENA 28-29 MAN 30-31 PAT 32-32 CAP 33-77 PRO 78-80 ([WP](https://en.wikipedia.org/wiki/1990_French_Grand_Prix) chart) | lap 1: BER MAN SENA NAN PAT PRO BOUT PIQN ALE ([WP](https://en.wikipedia.org/wiki/1990_French_Grand_Prix)); lap 54: CAP PRO GUG ([WP](https://en.wikipedia.org/wiki/1990_French_Grand_Prix)) | The lap-1 order is WP's 'took the lead at the start followed by ...', read as the end of lap 1. | |
+| germany-1986 | SENA 1-1 ROSK 2-5 PIQN 6-14 ROSK 15-19 PRO 20-20 PIQN 21-26 ROSK 27-38 PIQN 39-44 ([WP](https://en.wikipedia.org/wiki/1986_German_Grand_Prix) chart) | none found |  | |
+| great-britain-1987 | PIQN 1-62 MAN 63-65 ([WP](https://en.wikipedia.org/wiki/1987_British_Grand_Prix) chart) | lap 1: PIQN MAN ([WP](https://en.wikipedia.org/wiki/1987_British_Grand_Prix), [MS](https://www.motorsportmagazine.com/archive/article/august-1987/57/sunrise-over-silverstone)); lap 34: PIQN MAN (MAN +2 s ±1.5) ([WP](https://en.wikipedia.org/wiki/1987_British_Grand_Prix)) | The '~2 s on lap 35' is entered at the end of lap 34: lap 35 is Mansell's in-lap, whose synthetic time carries part of the stop. WP's 'rejoined some 29 seconds behind' and MS's 'added only 20 seconds to lap 36' disagree; neither entered (the solve gives ~21 s). | |
+| hungary-1986 | SENA 1-11 PIQN 12-35 SENA 36-56 PIQN 57-76 ([WP](https://en.wikipedia.org/wiki/1986_Hungarian_Grand_Prix) chart) | lap 2: SENA MAN ([MS](https://www.motorsportmagazine.com/archive/article/september-1986/61/formula-one-hungarian-grand-prix-2/)); lap 3: SENA PIQN MAN ([MS](https://www.motorsportmagazine.com/archive/article/september-1986/61/formula-one-hungarian-grand-prix-2/)); lap 29: PIQN SENA MAN ([MS](https://www.motorsportmagazine.com/archive/article/september-1986/61/formula-one-hungarian-grand-prix-2/)); lap 53: SENA PIQN (PIQN +1.1 s ±0.7) ([MS](https://www.motorsportmagazine.com/archive/article/september-1986/61/formula-one-hungarian-grand-prix-2/)) | Lap 29 is Mansell's out-lap ('resuming in third place'). No source read places Streiff; he is no longer third at the takeover (Mansell is, per lap 29). | |
+| hungary-1992 | PAT 1-38 SENA 39-77 ([WP](https://en.wikipedia.org/wiki/1992_Hungarian_Grand_Prix) chart) | lap 8: PAT SENA MAN BER ([WP](https://en.wikipedia.org/wiki/1992_Hungarian_Grand_Prix)); lap 31: PAT SENA BER MAN ([WP](https://en.wikipedia.org/wiki/1992_Hungarian_Grand_Prix)); lap 33: PAT SENA MAN BER ([WP](https://en.wikipedia.org/wiki/1992_Hungarian_Grand_Prix)) | Lap 8's Senna-ahead-of-Mansell is from the same sentence ('set off after Senna'). WP's lap-60/61 Mansell stop text is inconsistent; not entered. | |
+| mexico-1986 | PIQN 1-31 SENA 32-35 BER 36-68 ([WP](https://en.wikipedia.org/wiki/1986_Mexican_Grand_Prix) chart) | none found | No source read gives the order beyond the chart (MS: Berger 'never lower than fourth' in the opening stages, no lap). Piquet's three and Senna's stops have no laps, so Piquet leading to 31 and Senna 32-35 are held by pace, not by stops. | |
+| mexico-1990 | SENA 1-60 PRO 61-69 ([WP](https://en.wikipedia.org/wiki/1990_Mexican_Grand_Prix) chart) | lap 12: SENA BER ([WP](https://en.wikipedia.org/wiki/1990_Mexican_Grand_Prix)); lap 20: SENA PIQN (PIQN +15 s ±1.5) ([MS](https://www.motorsportmagazine.com/archive/article/august-1990/6/mexican-magic)); lap 14: SENA PIQN ([WP](https://en.wikipedia.org/wiki/1990_Mexican_Grand_Prix)); lap 30: SENA PIQN ([MS](https://www.motorsportmagazine.com/archive/article/august-1990/6/mexican-magic)); lap 35: SENA PIQN MAN PRO ([MS](https://www.motorsportmagazine.com/archive/article/august-1990/6/mexican-magic)); lap 36: SENA PIQN MAN PRO ([MS](https://www.motorsportmagazine.com/archive/article/august-1990/6/mexican-magic)); lap 37: SENA MAN PIQN PRO ([MS](https://www.motorsportmagazine.com/archive/article/august-1990/6/mexican-magic)); lap 42: SENA MAN PRO PIQN ([MS](https://www.motorsportmagazine.com/archive/article/august-1990/6/mexican-magic)); lap 48: SENA MAN (MAN +12.2 s ±1) ([MS](https://www.motorsportmagazine.com/archive/article/august-1990/6/mexican-magic)); lap 55: SENA PRO MAN ([MS](https://www.motorsportmagazine.com/archive/article/august-1990/6/mexican-magic), [WP](https://en.wikipedia.org/wiki/1990_Mexican_Grand_Prix)); lap 62: PRO (SENA +8 s ±1.5) ([MS](https://www.motorsportmagazine.com/archive/article/august-1990/6/mexican-magic)) | WP's text has Patrese away first and Senna and Berger passing him on lap 2; the chart and MS ('by the end of the lap the order was Senna') have Senna leading lap 1 (chart kept). WP has Mansell past Piquet 'soon afterwards' (after lap 13); MS gives lap 37 (MS kept). Gaps at laps 49-53 (11.4 s, 9.5 s) not entered: their laps are relative ('a lap later', 'within two laps'). | |
+| monaco-1984 | PRO 1-10 MAN 11-15 PRO 16-31 ([WP](https://en.wikipedia.org/wiki/1984_Monaco_Grand_Prix) chart) | none found |  | |
+| monaco-1988 | SENA 1-66 PRO 67-78 ([WP](https://en.wikipedia.org/wiki/1988_Monaco_Grand_Prix) chart) | lap 1: SENA BER PRO MAN ALBM NAN ([WP](https://en.wikipedia.org/wiki/1988_Monaco_Grand_Prix)); lap 16: SENA BER PRO MAN ALBM NAN ([WP](https://en.wikipedia.org/wiki/1988_Monaco_Grand_Prix)); lap 32: SENA BER PRO MAN ALBM NAN ([WP](https://en.wikipedia.org/wiki/1988_Monaco_Grand_Prix)); lap 36: SENA BER PRO ALBM ([WP](https://en.wikipedia.org/wiki/1988_Monaco_Grand_Prix)); lap 45: SENA BER PRO ALBM ([WP](https://en.wikipedia.org/wiki/1988_Monaco_Grand_Prix)); lap 53: SENA BER PRO ALBM ([WP](https://en.wikipedia.org/wiki/1988_Monaco_Grand_Prix)); lap 54: SENA PRO BER (PRO +50 s ±5) ([WP](https://en.wikipedia.org/wiki/1988_Monaco_Grand_Prix), [MS](https://www.motorsportmagazine.com/archive/article/june-1988/22/a-minute-error-of-judgement)) | Laps 36, 45, 53 are implied, not stated: the order 'was maintained until lap 33' (Mansell out) and 'On lap 54, Prost passed Berger for second' put Berger second in between. 'Some 50 seconds' entered with a 5 s tolerance. | |
+| monaco-1992 | MAN 1-70 SENA 71-78 ([WP](https://en.wikipedia.org/wiki/1992_Monaco_Grand_Prix) chart) | lap 1: MAN SENA PAT ALE MSCM BER ([WP](https://en.wikipedia.org/wiki/1992_Monaco_Grand_Prix)) |  | |
+| portugal-1984 | ROSK 1-8 PRO 9-70 ([WP](https://en.wikipedia.org/wiki/1984_Portuguese_Grand_Prix) chart) | none found |  | |
+| portugal-1985 | SENA 1-67 ([WP](https://en.wikipedia.org/wiki/1985_Portuguese_Grand_Prix) chart) | lap 20: SENA DEA (DEA +30 s ±3) ([WP](https://en.wikipedia.org/wiki/1985_Portuguese_Grand_Prix)) | Lap 10's 'almost 13 seconds' names no second car: not entered. '30 seconds' at lap 20 entered with a 3 s tolerance. | |
+| south-africa-1983 | PIQN 1-59 PAT 60-77 ([WP](https://en.wikipedia.org/wiki/1983_South_African_Grand_Prix) chart) | lap 1: PIQN PAT ([WP](https://en.wikipedia.org/wiki/1983_South_African_Grand_Prix)) |  | |
+| spain-1994 | MSCM 1-22 HAK 23-30 HIL 31-40 MSCM 41-45 HIL 46-65 ([WP](https://en.wikipedia.org/wiki/1994_Spanish_Grand_Prix) chart) | none found |  | |
+| united-states-1990 | ALE 1-34 SENA 35-72 ([WP](https://en.wikipedia.org/wiki/1990_United_States_Grand_Prix) chart) | lap 1: ALE BER ([WP](https://en.wikipedia.org/wiki/1990_United_States_Grand_Prix)); lap 9: ALE SENA (SENA +8.2 s ±1.5) ([WP](https://en.wikipedia.org/wiki/1990_United_States_Grand_Prix)); lap 17: ALE SENA PIQN PRO ([WP](https://en.wikipedia.org/wiki/1990_United_States_Grand_Prix)) | Lap 9's 8.2 s is 'when Berger spun' (lap 9) with a 1.5 s tolerance. 'Led by 2.4 seconds after one lap' is not entered (lap-1 gaps aren't modelled; the grid ladder sets lap 1). | |
+
+## S7 (Nov 8 2026): lap-1 retirements, de Cesaris, Brazil 1993's slick stops
+
+**south-africa-1983, monaco-1992 (solver, no new facts).** The cars that failed the lap-1 grid
+anchor were out after lap 1 with that lap as their F1DB fastest lap: south-africa-1983's
+Winkelhock (83.427 s), Laffite (84.689 s) and Ghinzani (89.776 s); monaco-1992's Moreno
+(334.5 s) and Wendlinger (104.613 s). Those times are the source's (a car crawling back to
+retire), so the car really crossed the line behind the cars it started ahead of. Such a car
+now stands outside the grid ladder (`reconstruct.lap1_retirement`): it keeps its sourced time,
+pushes nobody back, and the grid anchor checks the others' order (the row names it). Pushing
+the field back behind it (the wet rule) would have put monaco-1992's field four minutes late.
+Wet races are unchanged (their lap-1 retirements, belgium-1992's Grouillard, belgium-1995's
+Hakkinen, monaco-1984's Cecotto, never pushed a car back). Neither race file changed.
+
+**france-1990, #22 de Cesaris (Dallara), `roadPositions`.** P15 on the road, no gap.
+
+| Source | What it says |
+|---|---|
+| [GrandPrix.com GPE](https://www.grandprix.com/gpe/rr491.html), [GrandPrix.com results](https://www.grandprix.com/races/french-gp-1990.html) | Results in road order: '13 \| 8 \| Stefano Modena \| Brabham-Judd \| 78', '14 \| 25 \| Nicola Larini \| Ligier-Cosworth \| 78', 'dq \| 22 \| Andrea de Cesaris \| Dallara-Cosworth \| 78 \| Car Under Weight \| 21', '15 \| 7 \| David Brabham \| Brabham-Judd \| 77' |
+| [Wikipedia](https://en.wikipedia.org/wiki/1990_French_Grand_Prix) | DSQ, 78 laps, 'Underweight', grid 21 (listed after the classified cars, no place) |
+| ESPN (race 3560), flyinglap.com.br, Motor Sport Aug 1990 | ESPN and flyinglap list him apart (no place); Motor Sport doesn't mention him |
+
+The place is read from GrandPrix.com's table order, not stated in words: he is two laps down
+like Modena and Larini and listed after them, ahead of Brabham (three down). No source read
+gives a time, so he sits midway between Larini and Brabham's lap (an estimate). Not found:
+statsf1 (404), racing-reference (403), Motor Sport's database page (results not rendered).
+
+**brazil-1993, the field's slick stops (`weather.slickChange`, new runningOrder snapshots).**
+
+| Source | What it says |
+|---|---|
+| [GrandPrix.com GPE rr534](https://www.grandprix.com/gpe/rr534.html) | 'The track was drying and with the cars on wet tires it was time to pit and switch to dry ones. The man to stop first was Johnny Herbert'; 'When everyone else had stopped Herbert was third behind Senna and Hill, the Brazilian having taken the lead after the stop' |
+| [Wikipedia](https://en.wikipedia.org/wiki/1993_Brazilian_Grand_Prix) | 'The sun then came out, it began to dry rapidly and everyone stopped for dry tyres' (no laps) |
+| [Motor Sport May 1993](https://www.motorsportmagazine.com/archive/article/may-1993/10/cardinal-senna) | at the restart Hill 'leaped ahead of Senna and stretched his lead again'; 'The gap was 2.9s by lap 39'; 'By lap 43, nevertheless, he [Herbert] had climbed to an excellent and genuine third as his rivals made their slick stops'; 'Hill began a counter attack that took him to a tantalising 0.199s on lap 47'; Wendlinger 'retired with rising engine temperatures on lap 62' |
+| formulaonehistory.com, flyinglap.com.br | no slick-stop laps |
+
+So every car on wets changed back to slicks between Herbert's stop (lap 37) and lap 43, but
+only Herbert's (37), Senna's (40) and Hill's (41) laps are sourced. The facts file's
+`weather.slickChange` (laps 37-43) gives the other cars still on sourced wets a slick stop on
+the median sourced in-lap, **lap 40, an estimate** (format doc), for ten cars: #26 Blundell,
+#11 Zanardi, #19 Alliot, #27 Alesi, #9 Warwick, #20 Comas, #21 Alboreto, #22 Badoer, #30 Lehto
+(`JAR`, Järvilehto) and #4 de Cesaris (the sidecar's notes name them). Schumacher's lap-41 stop-and-go stays his only stop in the
+window (his stint after it is estimated slicks, as before). New snapshots: lap 39 HIL SENA
+(SENA +2.9 s, ±1), lap 43 SENA HIL HER, lap 47 SENA HIL (HIL +0.199 s, ±0.5). Cars with no
+sourced wet stop (Wendlinger among them) still run slicks through the rain. Anchors 123/123;
+Senna P3 at the takeover (was P14); built and registered without `data_issue`.
+
+| Race | Owner checked |
+|---|---|
+| south-africa-1983, monaco-1992 (rule) | |
+| france-1990 (de Cesaris P15) | |
+| brazil-1993 (slickChange, snapshots) | |
+
+## Not found anywhere read
+
+- Exact laps for Piquet's stop in Australia 1986 and for the Williams stops in Mexico 1986.
+  Both are storyline stops. Autosport's archive (paywalled) or a contemporary lap chart would
+  settle them.
+- Pit-lane times for every race before 1994.
+- Whether europe-1993, australia-1993, spain-1994 and australia-1994 had no safety car. No
+  source read mentions one.
+
+GrandPrix.com rate-limits requests, so its reports for Hungary 1986, Germany 1986,
+Australia 1986, Britain 1987, Monaco 1988 and Brazil 1991 were not read (nor, for the running
+order, any race).
+
+- The running order between the sourced laps of every race, and every gap not quoted above
+  (in particular how far Rosberg led in Australia 1986, the margins in Mexico 1986, France
+  1990 and the Europe 1993 queue behind Senna at the takeover). A contemporary lap chart with
+  times (Autosport's) would settle them.

@@ -1,0 +1,104 @@
+{
+  "raceId": "australia-1986",
+  "stops": [
+    {
+      "number": 1,
+      "name": "Alain Prost",
+      "lap": 32,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/december-1986/15/formula-one-mexican-grand-prix-australian-grand-prix ('He came in as early as lap 32 for fresh rubber'); also https://www.motorsportmagazine.com/archive/article/july-2004/142/race-86-australian-gp/",
+      "note": "puncture after clipping Berger; 8 laps before his planned stop"
+    }
+  ],
+  "safetyCars": [],
+  "complete": {
+    "stops": false,
+    "safetyCars": true
+  },
+  "lapLeaders": [
+    {
+      "driver": "PIQN",
+      "name": "Nelson Piquet",
+      "fromLap": 1,
+      "toLap": 6,
+      "source": "https://en.wikipedia.org/wiki/1986_Australian_Grand_Prix (lap-leader chart, Template:F1Laps1986 'AUS')"
+    },
+    {
+      "driver": "ROSK",
+      "name": "Keke Rosberg",
+      "fromLap": 7,
+      "toLap": 62,
+      "source": "https://en.wikipedia.org/wiki/1986_Australian_Grand_Prix (lap-leader chart, Template:F1Laps1986 'AUS')"
+    },
+    {
+      "driver": "PIQN",
+      "name": "Nelson Piquet",
+      "fromLap": 63,
+      "toLap": 64,
+      "source": "https://en.wikipedia.org/wiki/1986_Australian_Grand_Prix (lap-leader chart, Template:F1Laps1986 'AUS')"
+    },
+    {
+      "driver": "PRO",
+      "name": "Alain Prost",
+      "fromLap": 65,
+      "toLap": 82,
+      "source": "https://en.wikipedia.org/wiki/1986_Australian_Grand_Prix (lap-leader chart, Template:F1Laps1986 'AUS')"
+    }
+  ],
+  "runningOrder": [
+    {
+      "lap": 1,
+      "order": [
+        "PIQN",
+        "SENA",
+        "ROSK"
+      ],
+      "source": "https://en.wikipedia.org/wiki/1986_Australian_Grand_Prix: 'Mansell yielded the lead to Senna's Lotus at the second corner on lap 1 and fell behind both Piquet and Rosberg on the same lap. Piquet also overtook Senna on lap 1 to take the lead'; https://www.motorsportmagazine.com/archive/article/december-1986/15/formula-one-mexican-grand-prix-australian-grand-prix: 'the McLaren in third place at the end of lap one was number two — Rosberg!'"
+    },
+    {
+      "lap": 44,
+      "order": [
+        "ROSK",
+        "PIQN",
+        "MAN"
+      ],
+      "source": "https://en.wikipedia.org/wiki/1986_Australian_Grand_Prix: 'Piquet charged back through the field, passing Mansell for second place on lap 44'",
+      "note": "Rosberg leading laps 7-62 (lap chart)"
+    },
+    {
+      "lap": 57,
+      "order": [
+        "ROSK",
+        "PIQN",
+        "MAN",
+        "PRO"
+      ],
+      "source": "https://en.wikipedia.org/wiki/1986_Australian_Grand_Prix: 'with 25 laps to go, all three championship contenders were running together in positions 2, 3 and 4'",
+      "note": "25 to go of 82 = after lap 57. The order of the three is worked out: Piquet second since lap 44; Prost 'closed on the two Williams cars' and 'had just passed Mansell for third' when Rosberg retired"
+    },
+    {
+      "lap": 62,
+      "order": [
+        "ROSK",
+        "PIQN",
+        "PRO",
+        "MAN"
+      ],
+      "source": "https://www.motorsportmagazine.com/archive/article/december-1986/15/formula-one-mexican-grand-prix-australian-grand-prix: 'Going into lap 63 the order was Rosberg, Piquet, Prost and Mansell.'"
+    },
+    {
+      "lap": 80,
+      "order": [
+        "PRO",
+        "PIQN"
+      ],
+      "gaps": {
+        "PIQN": 15.484
+      },
+      "gapTolerance": 1.0,
+      "source": "https://en.wikipedia.org/wiki/1986_Australian_Grand_Prix: 'Piquet would make a late charge, closing the gap from 15.484 seconds with 2 laps remaining to just 4.205 at the finish'",
+      "note": "2 laps remaining of 82 = at the end of lap 80"
+    }
+  ],
+  "notes": "Piquet (#6) was called in for a precautionary tyre change 'soon after' Mansell's lap-64 tyre failure (Motor Sport Dec 1986; Wikipedia https://en.wikipedia.org/wiki/1986_Australian_Grand_Prix) but no source read gives the lap: STORYLINE GAP. Goodyear then judged a non-stop run possible and the other runners stayed out. Rosberg (#2) retired lap 63 (tyre delamination), Mansell (#5) lap 64 (left-rear tyre)."
+}

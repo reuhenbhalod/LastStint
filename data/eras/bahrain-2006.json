@@ -1,0 +1,43 @@
+{
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": true
+  },
+  "eras": {
+    "eraId": 5,
+    "order": 8,
+    "userSide": "MSCM",
+    "target": {
+      "type": "position",
+      "position": 2
+    },
+    "storyline": {
+      "real": "Schumacher leads from pole and pulls away, Alonso second. Renault keep Alonso out longer at both stops, and at the second he rejoins side by side with the Ferrari, takes the lead into turn 1 and holds off Schumacher to win by 1.246 s.",
+      "rewriteCondition": {
+        "type": "win"
+      },
+      "headline": "Schumacher keeps Alonso behind in Bahrain"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 2,
+      "label": "Finish second or better on two stops, as Schumacher made"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "manage",
+      "maxLaps": 0,
+      "label": "Finish second or better without a single lap managing the tyres"
+    },
+    "hardCalls": {
+      "ALO": 0,
+      "MSCM": 1
+    },
+    "briefing": "Bahrain, 2006, the first race of the 2.4-litre V8s. Schumacher took pole. You run his Ferrari, leading Alonso's Renault by five seconds after 12 laps, but Alonso will run four laps longer before his first stop. Bring the car home no lower than second, and keep Alonso behind to rewrite the day."
+  }
+}

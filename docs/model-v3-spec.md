@@ -357,7 +357,7 @@ The baseline is the current model on the tuning races: 9 pass / 0 borderline, 2.
 
 ## What-if check (Oct 27, 2026)
 
-`pnpm --filter @boxthislap/sim whatif` grades famous calls with a broad fan consensus, from the real race state, at 1,000 samples per option.
+`pnpm --filter @laststint/sim whatif` grades famous calls with a broad fan consensus, from the real race state, at 1,000 samples per option.
 
 ### Bugs it found (all fixed, TS only, so replays and parity are unchanged)
 

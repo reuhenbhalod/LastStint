@@ -1,0 +1,285 @@
+{
+  "raceId": "europe-1993",
+  "stops": [
+    {
+      "number": 25,
+      "name": "Martin Brundle",
+      "lap": 6,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked",
+      "note": "slicks, 'changing on his sixth lap'",
+      "tyre": "slick"
+    },
+    {
+      "number": 12,
+      "name": "Johnny Herbert",
+      "lap": 10,
+      "laneTime": null,
+      "source": "https://motorsportmagazine.com/special-article/the-75-greatest-grands-prix/104/19-1993-gp-of-europe-sennas-lap-of-the-gods ('switched from wets to slicks at the end of lap 10… and stayed out thereafter'); https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked (slicks after his first 10 laps)",
+      "note": "slicks; his only stop",
+      "tyre": "slick"
+    },
+    {
+      "number": 0,
+      "name": "Damon Hill",
+      "lap": 17,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked",
+      "note": "slicks ('Senna changed at the end of the 18th, a lap after Hill')",
+      "tyre": "slick"
+    },
+    {
+      "number": 8,
+      "name": "Ayrton Senna",
+      "lap": 18,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked",
+      "note": "slicks",
+      "tyre": "slick"
+    },
+    {
+      "number": 2,
+      "name": "Alain Prost",
+      "lap": 19,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked",
+      "note": "slicks ('after a lap in the lead Prost followed suit')",
+      "tyre": "slick"
+    },
+    {
+      "number": 14,
+      "name": "Rubens Barrichello",
+      "lap": 19,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked",
+      "note": "slicks ('his own slick call on lap 19')",
+      "tyre": "slick"
+    },
+    {
+      "number": 2,
+      "name": "Alain Prost",
+      "lap": 22,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked",
+      "note": "wets ('came in again for more wets as it rained again on lap 22')",
+      "tyre": "wet"
+    },
+    {
+      "number": 0,
+      "name": "Damon Hill",
+      "lap": 24,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked",
+      "note": "wets ('followed by Hill two laps later')",
+      "tyre": "wet"
+    },
+    {
+      "number": 8,
+      "name": "Ayrton Senna",
+      "lap": 34,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked",
+      "note": "slicks; cross-threaded right-rear nut, lost about 20 s",
+      "tyre": "slick"
+    },
+    {
+      "number": 14,
+      "name": "Rubens Barrichello",
+      "lap": 39,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked",
+      "note": "wets ('changed to wets again on his 39th lap')",
+      "tyre": "wet"
+    },
+    {
+      "number": 2,
+      "name": "Alain Prost",
+      "lap": 48,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked",
+      "note": "stalled (clutch)"
+    },
+    {
+      "number": 2,
+      "name": "Alain Prost",
+      "lap": 53,
+      "laneTime": null,
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked",
+      "note": "suspected left-rear puncture; stalled again"
+    },
+    {
+      "number": 8,
+      "name": "Ayrton Senna",
+      "lap": 57,
+      "laneTime": null,
+      "source": "https://en.wikipedia.org/wiki/1993_European_Grand_Prix ('Senna set the fastest lap on lap 57, on a lap when he drove into the pit lane but aborted the pit stop'); https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked",
+      "note": "drive-through, no stop (tyres not ready): pit-lane transit only; tyre 'slick': the slicks stayed on (no stop)",
+      "tyre": "slick"
+    }
+  ],
+  "safetyCars": [],
+  "complete": {
+    "stops": false,
+    "safetyCars": false
+  },
+  "weather": {
+    "timeline": [
+      {
+        "fromLap": 1,
+        "toLap": 5,
+        "state": "wet",
+        "source": "https://www.grandprix.com/gpe/rr535.html ('It was raining at the start as Prost and Hill led away'); https://en.wikipedia.org/wiki/1993_European_Grand_Prix ('At the start, it was damp'); https://sidepodcast.com/post/races-to-remember-europe-1993 ('The track was soaking on Sunday morning, although the rain had eased when the pack got going')"
+      },
+      {
+        "fromLap": 6,
+        "toLap": 10,
+        "state": "wet",
+        "toState": "damp",
+        "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked (the racing line drying while rain came and went; Brundle to slicks 'on his sixth lap'); https://motorsportmagazine.com/special-article/the-75-greatest-grands-prix/104/19-1993-gp-of-europe-sennas-lap-of-the-gods (Herbert to slicks at the end of lap 10)"
+      },
+      {
+        "fromLap": 11,
+        "toLap": 21,
+        "state": "damp",
+        "source": "https://www.grandprix.com/gpe/rr535.html ('The track was now beginning to dry and the first drivers came in for slicks'); https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked (slick stops: Hill end of lap 17, Senna 18, Prost and Barrichello 19)"
+      },
+      {
+        "fromLap": 22,
+        "toLap": 30,
+        "state": "wet",
+        "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked ('as it rained again on lap 22', Prost back to wets, Hill two laps later); https://www.grandprix.com/gpe/rr535.html ('It began to rain again and Prost decided to return to the pits for wet tyres'); https://sidepodcast.com/post/races-to-remember-europe-1993 ('20 laps in ... the rain returned')"
+      },
+      {
+        "fromLap": 31,
+        "toLap": 34,
+        "state": "wet",
+        "toState": "damp",
+        "source": "https://www.grandprix.com/gpe/rr535.html ('The rain then stopped again'; 'Prost returned to the pits for slicks to be followed by Senna and Hill'); https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked (Senna's slick stop on lap 34)",
+        "note": "When the rain stopped isn't given; drying ramped to Senna's lap-34 slick stop."
+      },
+      {
+        "fromLap": 35,
+        "toLap": 36,
+        "state": "damp",
+        "source": "https://www.grandprix.com/gpe/rr535.html (on slicks after the second round of slick stops)"
+      },
+      {
+        "fromLap": 37,
+        "toLap": 40,
+        "state": "wet",
+        "source": "https://sidepodcast.com/post/races-to-remember-europe-1993 ('on the 37th lap, whilst the others were hurrying to fit wets'); https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked (Barrichello 'changed to wets again on his 39th lap'); https://www.grandprix.com/gpe/rr535.html ('Just as he rejoined the rain began to fall heavily')",
+        "note": "The shower's end isn't given; held to lap 40."
+      },
+      {
+        "fromLap": 41,
+        "toLap": 66,
+        "state": "damp",
+        "source": "https://www.grandprix.com/gpe/rr535.html ('as the track began to dry again the two Williams-Renaults could not catch him'; 'They had to stop again for slicks'); https://en.wikipedia.org/wiki/1993_European_Grand_Prix (Senna's fastest lap, 1:18.029 on lap 57, against a 1:10.458 pole: the track never fully dried)",
+        "note": "WP's 'it rained and then stopped again' (Barrichello second, laps 49-54 in Motor Sport) and Senna's call for wets before lap 57 are short showers with no laps; not modelled (Senna's fastest lap came on lap 57)."
+      },
+      {
+        "fromLap": 67,
+        "toLap": 76,
+        "state": "wet",
+        "source": "https://sidepodcast.com/post/races-to-remember-europe-1993 ('With just 10 laps to go, wet tyres were the name of the game, and Senna bolted into the pit lane'); https://www.grandprix.com/gpe/rr535.html ('The rain came again in the closing laps and Senna decided that this time he had to stop'); https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked (rain again toward the end)"
+      }
+    ],
+    "startTyre": {
+      "tyre": "wet",
+      "source": "https://www.grandprix.com/gpe/rr535.html ('It was raining at the start'); https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked (the leaders' first stops, laps 6-19, were for slicks)"
+    },
+    "startTyres": [
+      {
+        "number": 30,
+        "tyre": "slick",
+        "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked (Lehto started from the pit lane on slicks)"
+      }
+    ]
+  },
+  "lapLeaders": [
+    {
+      "driver": "SENA",
+      "name": "Ayrton Senna",
+      "fromLap": 1,
+      "toLap": 18,
+      "source": "https://en.wikipedia.org/wiki/1993_European_Grand_Prix (lap-leader chart, Template:F1Laps1993 'EUR')"
+    },
+    {
+      "driver": "PRO",
+      "name": "Alain Prost",
+      "fromLap": 19,
+      "toLap": 19,
+      "source": "https://en.wikipedia.org/wiki/1993_European_Grand_Prix (lap-leader chart, Template:F1Laps1993 'EUR')"
+    },
+    {
+      "driver": "SENA",
+      "name": "Ayrton Senna",
+      "fromLap": 20,
+      "toLap": 34,
+      "source": "https://en.wikipedia.org/wiki/1993_European_Grand_Prix (lap-leader chart, Template:F1Laps1993 'EUR')"
+    },
+    {
+      "driver": "PRO",
+      "name": "Alain Prost",
+      "fromLap": 35,
+      "toLap": 38,
+      "source": "https://en.wikipedia.org/wiki/1993_European_Grand_Prix (lap-leader chart, Template:F1Laps1993 'EUR')"
+    },
+    {
+      "driver": "SENA",
+      "name": "Ayrton Senna",
+      "fromLap": 39,
+      "toLap": 76,
+      "source": "https://en.wikipedia.org/wiki/1993_European_Grand_Prix (lap-leader chart, Template:F1Laps1993 'EUR')"
+    }
+  ],
+  "runningOrder": [
+    {
+      "lap": 5,
+      "order": [
+        "SENA",
+        "PRO",
+        "HIL",
+        "BAR"
+      ],
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked: 'Hill moved to within a second and a half of him' ... 'for the first 18 laps that was how the front of the field remained.'; 'Barrichello thus settled down in fourth place at the end of the first lap.' ... 'though he dropped to fifth behind Alesi after his own slick call on lap 19'",
+      "note": "the front of the field Senna, Prost, Hill through lap 18 (Hill stopped at the end of lap 17); Barrichello fourth from lap 1 until his lap-19 stop"
+    },
+    {
+      "lap": 10,
+      "order": [
+        "SENA",
+        "PRO",
+        "HIL",
+        "BAR"
+      ],
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked: 'Hill moved to within a second and a half of him' ... 'for the first 18 laps that was how the front of the field remained.'; 'Barrichello thus settled down in fourth place at the end of the first lap.' ... 'though he dropped to fifth behind Alesi after his own slick call on lap 19'",
+      "note": "the front of the field Senna, Prost, Hill through lap 18 (Hill stopped at the end of lap 17); Barrichello fourth from lap 1 until his lap-19 stop"
+    },
+    {
+      "lap": 15,
+      "order": [
+        "SENA",
+        "PRO",
+        "HIL",
+        "BAR"
+      ],
+      "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked: 'Hill moved to within a second and a half of him' ... 'for the first 18 laps that was how the front of the field remained.'; 'Barrichello thus settled down in fourth place at the end of the first lap.' ... 'though he dropped to fifth behind Alesi after his own slick call on lap 19'",
+      "note": "the front of the field Senna, Prost, Hill through lap 18 (Hill stopped at the end of lap 17); Barrichello fourth from lap 1 until his lap-19 stop"
+    },
+    {
+      "lap": 1,
+      "order": [
+        "SENA",
+        "PRO",
+        "HIL",
+        "BAR",
+        "ALE",
+        "MSCM",
+        "JAR"
+      ],
+      "source": "https://en.wikipedia.org/wiki/1993_European_Grand_Prix: 'Going into the second lap, Senna led Prost, Hill, Rubens Barrichello (who had started 12th), Jean Alesi, Schumacher and JJ Lehto.'"
+    }
+  ],
+  "notes": "Stop counts: Senna 5 pit calls incl. the drive-through (Motor Sport; Wikipedia says four stops), Hill 6, Prost 7, Herbert 1 (slicks after about lap 10), Barrichello at least 4. Missing laps: Senna's late wet stop and one more, Hill's other 4, Prost's other 3, Herbert's one, Barrichello's later ones. No safety car is mentioned in Wikipedia, Motor Sport or GrandPrix.com (https://www.grandprix.com/gpe/rr535.html), but no source states there was none: safetyCars left incomplete for the owner to confirm. Weather: Senna's wet stop between his lap-18 and lap-34 slick stops (GPE: 'Senna stayed out for four more laps' after Hill's lap-24 wet stop, so about lap 28) and his closing-laps wet stop ('10 laps to go') have no exact lap, so he runs slicks through those showers; Prost's lap-48/53 stops and Hill's later stops have no tyre, so those stints are estimated."
+}

@@ -1,0 +1,42 @@
+{
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "kers",
+    "refuelling": true
+  },
+  "eras": {
+    "eraId": 5,
+    "order": 2,
+    "userSide": "HAM",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Hamilton starts from pole and leads both stints, but Barrichello, fuelled for longer, stays within a few seconds. McLaren calls Hamilton in on lap 37, then tries to keep him out a lap; the tyres aren't ready and he is stationary for 13.4 s. Barrichello stops three laps later, rejoins in the lead and wins by 2.358 s, his first win since China 2004.",
+      "rewriteCondition": {
+        "type": "win"
+      },
+      "headline": "Hamilton keeps Barrichello behind at Valencia"
+    },
+    "mastery": {
+      "type": "margin",
+      "seconds": 2.4,
+      "label": "Win by more than 2.4 seconds"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "push",
+      "maxLaps": 10,
+      "label": "Win pushing for no more than 10 laps"
+    },
+    "hardCalls": {
+      "HAM": 1,
+      "BAR": 0
+    },
+    "briefing": "Valencia, 2009. Hamilton takes his first pole of the year with Kovalainen beside him. You run Hamilton, leading his team-mate by 6.3 s after 12 laps, with Barrichello 8.1 s back on a heavier Brawn. Win the race."
+  }
+}

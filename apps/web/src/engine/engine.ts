@@ -1,6 +1,6 @@
 // GameEngine: a thin, UI-facing wrapper over a sim Run. It owns the run, advances it lap by
 // lap, applies player calls, and reports the result. It holds no race physics of its own ,
-// everything delegates to @boxthislap/sim, so the browser shows exactly what the Worker will
+// everything delegates to @laststint/sim, so the browser shows exactly what the Worker will
 // later recompute from the same (model, seed, decisions).
 
 import {
@@ -13,6 +13,9 @@ import {
   type RacePlan,
   type RaceResult,
   type RaceState,
+  type RivalChoice,
+  type RivalGradeJob,
+  type RivalOptionId,
   type Run,
   type RunOptions,
   answerMoment,
@@ -22,9 +25,13 @@ import {
   gradeJob,
   initRun,
   isFinished,
+  legendMoments,
   planOption,
+  resolveRivalDecision,
+  rivalChoices,
+  rivalGradeJob,
   stepLap,
-} from '@boxthislap/sim';
+} from '@laststint/sim';
 import { type MomentJob, momentJob } from './grading.js';
 
 export class GameEngine {
@@ -93,6 +100,32 @@ export class GameEngine {
     return gradeJob(this.run, options, PLAN_TARGET, samples);
   }
 
+  /**
+   * An Expert rival's decision is waiting for its grade (`rivalGrading: 'deferred'`, eras spec
+   * §7): the run can't step until `resolveRival`.
+   */
+  get rivalPending(): boolean {
+    return !!this.run.rival?.pending;
+  }
+
+  /** The waiting rival decision as a job for the grading worker (`rivalPending` only). */
+  rivalJob(): RivalGradeJob {
+    return rivalGradeJob(this.run);
+  }
+
+  /** Take the option the rival's grade picked (or any legal one) and let the run go on. */
+  resolveRival(
+    option: RivalOptionId,
+    probabilities?: Partial<Record<RivalOptionId, number>>,
+  ): void {
+    resolveRivalDecision(this.run, option, probabilities);
+  }
+
+  /** The Expert rival's choices so far (its claims, submitted with an Eras attempt). */
+  rivalChoices(): RivalChoice[] {
+    return rivalChoices(this.run);
+  }
+
   /** Advance one lap; returns the new race state. */
   step(): RaceState {
     return stepLap(this.run);
@@ -111,8 +144,13 @@ export class GameEngine {
 
 /**
  * The race's approved decision moments, in lap order. These are the moments the server grades
- * (`verifyRun` requires one answer each), so the game must ask exactly these.
+ * (`verifyRun` requires one answer each), so the game must ask exactly these. A Legend attempt
+ * (eras spec §8) asks the moments of its own safety cars: `legendMoments` from its seed.
  */
-export function decisionMoments(model: RaceModel): DecisionMoment[] {
+export function decisionMoments(
+  model: RaceModel,
+  legend?: { seed: number } | null,
+): DecisionMoment[] {
+  if (legend) return legendMoments(model, legend.seed);
   return [...model.decisionMoments].sort((a, b) => a.lap - b.lap);
 }

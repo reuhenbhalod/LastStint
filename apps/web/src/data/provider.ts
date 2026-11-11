@@ -3,8 +3,8 @@
 // from the repo's shared data/ dir (via the @data alias): practice mode when there's no daily
 // or no connection.
 
-import type { RaceModel } from '@boxthislap/sim';
 import abuDhabi2021 from '@data/races/abu-dhabi-2021.json';
+import type { RaceModel } from '@laststint/sim';
 import { ApiError, type DailyResponse, api } from './api.js';
 import { localDate } from './player.js';
 import type { Daily, DailyProvider } from './types.js';

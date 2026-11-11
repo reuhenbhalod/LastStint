@@ -1,0 +1,52 @@
+{
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": false
+  },
+  "eras": {
+    "eraId": 2,
+    "order": 9,
+    "userSide": "SENA",
+    "hardCalls": {
+      "SENA": 3,
+      "HIL": 1
+    },
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Senna takes the lead on the first lap from fourth on the grid and wins through the wet-dry calls; he laps everyone but Hill, who finishes 1:23.2 behind"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "max": 4,
+      "label": "Win on four stops or fewer, as Senna did"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 60,
+      "label": "Win by more than a minute"
+    },
+    "briefing": "Donington, 1993. Damp at the start, then it dries, rains, dries and rains again. Senna made four stops; Prost made seven. Pit board only: every tyre call counts. Reconstructed race: no lap timing survives, so the laps are rebuilt to fit the result, the fastest laps, the sourced stops and who led each lap (Jolpica, F1DB, Motor Sport, Wikipedia). Who led each lap is sourced, and so is the order at a few laps; the lap times, and the rest of the order, are reconstructed.",
+    "storylineCalls": [
+      {
+        "driver": "HIL",
+        "lap": 18,
+        "real": "Hill changes to slicks at the end of lap 17, a lap before Senna",
+        "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked"
+      },
+      {
+        "driver": "HIL",
+        "lap": 25,
+        "real": "Hill goes back to wets two laps after Prost, as it rains again; his four later stops aren't sourced (the reconstruction absorbs them), so he keeps his real plan to the flag and finishes second, 1:23 behind",
+        "source": "https://www.motorsportmagazine.com/archive/article/may-1993/18/opportunity-knocked",
+        "untilFlag": true
+      }
+    ]
+  }
+}

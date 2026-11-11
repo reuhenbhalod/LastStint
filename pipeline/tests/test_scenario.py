@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+import json
+
 import pandas as pd
 import pytest
 
-from pipeline import events, ingest, scenario
+from pipeline import events, ingest, paths, scenario
 
 
 @pytest.fixture(scope="module")
@@ -68,3 +70,28 @@ def test_stop_whose_new_set_shows_a_lap_late():
     ]
     bahrain = pd.read_parquet(ingest.raw_snapshot_path("bahrain-2018"))
     assert scenario.real_strategy(bahrain)["HAM"] == [{"lap": 26, "to": "HARD"}]
+
+
+def test_state_at_takeover_dry_race_lists_dry_compounds(laps: pd.DataFrame):
+    # A dry race: compoundsUsed is the dry compounds run so far, the takeover tyre included.
+    state = scenario.state_at_takeover(laps, 34)
+    assert state["HAM"]["compoundsUsed"] == ["HARD", "MEDIUM"]
+    assert all(c in scenario.DRY_COMPOUNDS for s in state.values() for c in s["compoundsUsed"])
+
+
+def test_state_at_takeover_lists_wet_tyres():
+    # Wet tyres count (they waive the two-compound rule): a car on intermediates at the
+    # takeover lists them (great-britain-2016, lap 14), and so does one that started on them
+    # and is on slicks at the takeover (hungary-2021, lap 4: Hamilton on mediums).
+    gb = scenario.state_at_takeover(
+        pd.read_parquet(ingest.raw_snapshot_path("great-britain-2016")), 14
+    )
+    assert gb["VER"]["compound"] == "INTERMEDIATE"
+    assert "INTERMEDIATE" in gb["VER"]["compoundsUsed"]
+    hu = pd.read_parquet(ingest.raw_snapshot_path("hungary-2021"))
+    takeover = int(
+        json.loads((paths.RACES_DIR / "hungary-2021.json").read_text())["race"]["takeoverLap"]
+    )
+    state = scenario.state_at_takeover(hu, takeover)
+    assert state["HAM"]["compound"] in scenario.DRY_COMPOUNDS
+    assert "INTERMEDIATE" in state["HAM"]["compoundsUsed"]

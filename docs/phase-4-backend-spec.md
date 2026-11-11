@@ -12,7 +12,7 @@ The server side of the Daily Race, on Cloudflare: serve the day's race, verify e
 |---|---|
 | API | Cloudflare Worker, Hono router (`apps/worker`) |
 | Database | Cloudflare D1 (SQLite), migrations in `apps/worker/migrations`, applied by Wrangler |
-| Sim | `@boxthislap/sim`, the same code the browser runs |
+| Sim | `@laststint/sim`, the same code the browser runs |
 | Cron | Worker `scheduled()` handler: daily queue check |
 | Tests | vitest on `@cloudflare/vitest-pool-workers`, so the tests run inside workerd with a local D1 |
 | Deploy | Wrangler; GitHub Actions deploys `main` once a Cloudflare API token is in the repo secrets |
@@ -157,7 +157,7 @@ Errors use `{ error, detail? }` with 400 (invalid run), 404 (no daily or run), 4
 **C4. Scheduling races (plan 5.4)**
 
 - **a. A `schedule` script.** ← recommended
-  - Run as `pnpm --filter @boxthislap/worker schedule --from <date> --days N [--race id]`.
+  - Run as `pnpm --filter @laststint/worker schedule --from <date> --days N [--race id]`.
   - It picks only **eligible** races: approved moments and a G1 pass or borderline.
   - It draws a random seed per date with `crypto` (never derived from the date), numbers the dailies, pins the model hash, and writes to D1 through `wrangler d1 execute` (`--local` or `--remote`).
   - It never overwrites a date already published.
@@ -176,7 +176,7 @@ Each stage ends with its tests passing and one commit pushed.
 | **3. Endpoints** | `/api/daily`, `/api/races/:id`, `POST /api/runs`, `GET /api/runs/:date/:anonId`, stats, leaderboard, CORS, date window (B1), names (B3) | Endpoint tests on a local D1: submit → rank and percentile, duplicate → 409, stats and leaderboard numbers by hand-computed fixtures |
 | **4. Abuse and ops** | Rate limit binding, cron queue check, webhook alert, `/api/health` `queueDays`, `schedule` script | Tests for the rate limit (429) and the cron; `schedule --local` fills a local D1 and `wrangler dev` serves a playable daily |
 | **5. Deploy** (after A3 login) | Create D1, apply migrations remotely, deploy, schedule Abu Dhabi 2021 for the coming days, CI deploy job | `curl` on the live `/api/daily` and a scripted full run submitted to the live Worker returns a verified score |
-| **6. Docs** | `docs/api.md` for Reuhen: endpoints, request/response shapes, the radio-answer rule, local dev (`pnpm --filter @boxthislap/worker dev` + Vite proxy) | Reuhen can call every endpoint from the doc alone |
+| **6. Docs** | `docs/api.md` for Reuhen: endpoints, request/response shapes, the radio-answer rule, local dev (`pnpm --filter @laststint/worker dev` + Vite proxy) | Reuhen can call every endpoint from the doc alone |
 
 ## Progress
 

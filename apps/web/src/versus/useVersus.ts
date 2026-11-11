@@ -19,7 +19,7 @@ import {
   initVersus,
   stepVersus,
   versusTrack,
-} from '@boxthislap/sim';
+} from '@laststint/sim';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { apiUrl } from '../api.js';
 import type { LapClock } from '../game/useGame.js';

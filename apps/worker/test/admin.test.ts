@@ -116,3 +116,83 @@ describe('admin controls', () => {
     expect(cleared.cleared).toBe(0);
   });
 });
+
+describe('admin players list', () => {
+  const signIn = async (claims: Record<string, unknown>, anonId: string) =>
+    SELF.fetch('https://api.test/api/auth/google', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ credential: await idToken(claims), anonId }),
+    });
+  const first = '6f1c2d3e-4a5b-4c6d-8e9f-0a1b2c3d4e5f';
+  const second = '7a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d';
+  const laptop = '8b3c4d5e-6f7a-4b8c-9d0e-1f2a3b4c5d6e';
+
+  it('is for admins only', async () => {
+    expect((await SELF.fetch('https://api.test/api/admin/players')).status).toBe(401);
+    const stranger = await admin(
+      '/api/admin/players',
+      undefined,
+      await idToken({ email: 'x@example.com' }),
+    );
+    expect(stranger.status).toBe(403);
+  });
+
+  it('lists every account, newest first, with devices and play counts', async () => {
+    const empty = await (await admin('/api/admin/players')).json();
+    expect(empty).toEqual({ total: 0, players: [] });
+
+    await signIn({ sub: 'google-a', email: 'a@example.com', name: 'Ann' }, first);
+    await signIn({ sub: 'google-a', email: 'a@example.com', name: 'Ann' }, laptop);
+    await signIn({ sub: 'auth0|b', email: 'b@example.com', name: 'Bo' }, second);
+    // Make the order certain, and give Ann a daily run and a Gauntlet on her laptop.
+    await env.DB.prepare('UPDATE players SET created_at = ? WHERE id = ?')
+      .bind('2026-01-01T00:00:00.000Z', first)
+      .run();
+    await env.DB.prepare(
+      `INSERT INTO daily (date, race_id, seed, side, published_at) VALUES (?, 'x', 1, 'X', ?)`,
+    )
+      .bind('2026-02-01', '2026-02-01T00:00:00.000Z')
+      .run();
+    await env.DB.prepare(
+      `INSERT INTO runs (id, date, anon_id, decisions, score, result, created_at)
+       VALUES ('r1', '2026-02-01', ?, '[]', 50, '{}', '2026-02-01T10:00:00.000Z')`,
+    )
+      .bind(laptop)
+      .run();
+    await env.DB.prepare(
+      `INSERT INTO survivor_runs (id, anon_id, started_at) VALUES ('s1', ?, '2026-03-01T09:00:00.000Z')`,
+    )
+      .bind(first)
+      .run();
+
+    const res = await admin('/api/admin/players');
+    expect(res.status).toBe(200);
+    const { total, players } = (await res.json()) as {
+      total: number;
+      players: Array<Record<string, unknown>>;
+    };
+    expect(total).toBe(2);
+    expect(players.map((p) => p.email)).toEqual(['b@example.com', 'a@example.com']);
+    expect(players[0]).toMatchObject({
+      id: second,
+      name: 'Bo',
+      provider: 'email',
+      displayName: '',
+      devices: 1,
+      dailyRuns: 0,
+      gauntletRuns: 0,
+      lastPlayed: null,
+    });
+    expect(players[1]).toMatchObject({
+      id: first,
+      name: 'Ann',
+      provider: 'google',
+      createdAt: '2026-01-01T00:00:00.000Z',
+      devices: 2,
+      dailyRuns: 1,
+      gauntletRuns: 1,
+      lastPlayed: '2026-03-01T09:00:00.000Z',
+    });
+  });
+});

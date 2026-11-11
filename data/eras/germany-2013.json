@@ -1,0 +1,49 @@
+{
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": true,
+    "ers": "kers",
+    "refuelling": false
+  },
+  "eras": {
+    "eraId": 6,
+    "order": 3,
+    "userSide": "RAI",
+    "target": {
+      "type": "position",
+      "position": 2
+    },
+    "storyline": {
+      "real": "Vettel leads from the first corner. R\u00e4ikk\u00f6nen, fourth on the grid, stops under the safety car for Bianchi's burning Marussia, then leads when Vettel and Grosjean make their last stops. With his pace dropping, Lotus bring him in for softs on lap 49; he passes Grosjean and finishes second, 1.008 s behind Vettel.",
+      "rewriteCondition": {
+        "type": "win"
+      },
+      "headline": "R\u00e4ikk\u00f6nen's late softs catch Vettel at the N\u00fcrburgring"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 2,
+      "label": "Finish second or better on two more stops, as R\u00e4ikk\u00f6nen made"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "manage",
+      "maxLaps": 0,
+      "label": "Finish second or better without a single lap managing the tyres"
+    },
+    "hardCalls": {
+      "RAI": 1,
+      "VET": 0
+    },
+    "briefing": "N\u00fcrburgring, 2013. Hamilton took pole, but Vettel has led since the first corner. You run R\u00e4ikk\u00f6nen, third after 21 laps and 12.9 s behind him, with your team-mate Grosjean in between. Lotus are weighing two stops against three. Bring the Lotus home in the top two."
+  },
+  "storylineEvents": [
+    [
+      24,
+      "SC"
+    ]
+  ]
+}

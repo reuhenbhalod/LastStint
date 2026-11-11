@@ -7,4 +7,6 @@ Heavy dependencies are imported inside the functions that need them.
 __version__ = "0.0.0"
 
 # v2: added track.greenLapTime / scLapTime / vscLapTime (neutralized-lap pace for the sim).
-SCHEMA_VERSION = 10
+# v11: optional eras, provenance and rules blocks, events[].storylineEvent, race.scUnlap
+# "none" (eras build plan 1.1). Additive: v10 files still validate and load unchanged.
+SCHEMA_VERSION = 11

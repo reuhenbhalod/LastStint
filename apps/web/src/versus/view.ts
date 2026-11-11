@@ -11,7 +11,7 @@ import {
   type VersusCall,
   type VersusSetup,
   type VersusState,
-} from '@boxthislap/sim';
+} from '@laststint/sim';
 
 /** A three-letter code for each player (their name's letters, made distinct). */
 export function codesFor(setup: VersusSetup): [string, string] {

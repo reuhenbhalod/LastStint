@@ -3,8 +3,8 @@
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { type RaceModel, tyreLife } from '@boxthislap/sim';
 import pools from '@data/pools.json';
+import { type RaceModel, tyreLife } from '@laststint/sim';
 import { describe, expect, it } from 'vitest';
 
 const load = (id: string) =>

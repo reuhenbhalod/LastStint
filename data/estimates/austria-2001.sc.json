@@ -1,0 +1,19 @@
+{
+ "race": "austria-2001",
+ "how": "docs/eras-checks/2.4-estimates.md: check each period against a race report; set status to confirmed or rejected (edit startLap/endLap if they're off), then re-run `pipeline jolpica <race-id> --force`.",
+ "periods": [
+  {
+   "startLap": 2,
+   "endLap": 3,
+   "laps": 2,
+   "kind": "SC",
+   "confidence": "likely",
+   "peakRatio": 1.574,
+   "gapBefore": 5.6,
+   "gapAfter": 3.3,
+   "reasons": [],
+   "status": "confirmed",
+   "source": "https://en.wikipedia.org/wiki/2001_Austrian_Grand_Prix: one safety car from lap 1 for the cars stranded on the grid, in at the end of lap 3; Atlas F1 (Autosport) lap chart, http://atlasf1.autosport.com/2001/aut/elizalde.html: racing resumed on lap 4 (docs/eras-checks/swap-races-era4-overnight.md). Laps kept as estimated (2-3)"
+  }
+ ]
+}

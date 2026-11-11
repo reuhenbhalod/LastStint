@@ -60,7 +60,7 @@ function SignedIn({ account }: { account: AccountState }) {
   if (!a) return null;
   return (
     <span className="flex items-center gap-2 text-[13px]">
-      {a.admin && <AdminLink />}
+      {a.admin && <AdminLink top={false} />}
       <button
         type="button"
         onClick={() => account.setProfileOpen(true)}
@@ -114,7 +114,7 @@ function AccountMenu({ account }: { account: AccountState }) {
         onClick={() => setOpen(!open)}
         className="flex items-center gap-2 rounded-full border border-[var(--rule)] py-1 pl-1 pr-3 text-[13px] font-semibold hover:border-[var(--muted)]"
       >
-        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--ink)] text-[12px] font-extrabold text-[var(--paper)]">
+        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--fav,var(--ink))] text-[12px] font-extrabold text-[var(--paper)]">
           {name.trim().charAt(0).toUpperCase()}
         </span>
         <span className="hidden max-w-[140px] truncate sm:inline">{name}</span>
@@ -167,12 +167,19 @@ function AccountMenu({ account }: { account: AccountState }) {
   );
 }
 
-/** Only for accounts on the admin list (the server says so; it checks every admin call too). */
-function AdminLink() {
+/**
+ * Only for accounts on the admin list (the server says so; it checks every admin call too).
+ * `top`: in the top bar, in the favourite team's colour.
+ */
+function AdminLink({ top }: { top: boolean }) {
   return (
     <a
       href="/admin"
-      className="rounded-full border border-[var(--you)] px-3 py-1 font-semibold text-[var(--you)] hover:bg-[color-mix(in_srgb,var(--you)_12%,transparent)]"
+      className={
+        top
+          ? 'rounded-full border border-[var(--fav,var(--you))] px-3 py-1 font-semibold text-[var(--fav,var(--you))] hover:bg-[color-mix(in_srgb,var(--fav,var(--you))_12%,transparent)]'
+          : 'rounded-full border border-[var(--you)] px-3 py-1 font-semibold text-[var(--you)] hover:bg-[color-mix(in_srgb,var(--you)_12%,transparent)]'
+      }
     >
       Admin
     </a>
@@ -184,7 +191,10 @@ export function AccountBar({
   compact = false,
 }: {
   account: AccountState;
-  /** One line for a top bar: the streak as a chip, then sign-in. */
+  /**
+   * One line for a top bar: the streak as a chip, then sign-in. Its buttons take the
+   * favourite team's colour (`--fav`, game/teamTheme.ts), or their usual one without it.
+   */
   compact?: boolean;
 }) {
   const p = account.player;
@@ -193,7 +203,7 @@ export function AccountBar({
     return (
       <div className="flex items-center gap-2">
         <span
-          className="flex items-center gap-1.5 px-1 text-[13px] font-semibold tabular-nums"
+          className="flex items-center gap-1.5 rounded-full border border-[var(--fav,var(--rule))] bg-[color-mix(in_srgb,var(--fav,transparent)_12%,transparent)] px-3 py-1 text-[13px] font-semibold tabular-nums"
           title={
             streak && streak.days > 0
               ? `Daily streak · best ${streak.best} · ${streak.days} race${streak.days === 1 ? '' : 's'} played`

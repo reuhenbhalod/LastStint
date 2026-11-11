@@ -22,9 +22,63 @@ import {
   newEngineer,
   validEngineerCall,
 } from './engineer.js';
+import type { RivalPolicy } from './eras/config.js';
+import { type FaultTable, cloneFaults, faultCost, faultTable } from './faults.js';
 import headsetConfig from './headset.json';
+import { legendEvents, legendLoss } from './legend.js';
 import { validatePlan } from './plan.js';
+import { type RedFlagPlan, lineUp, realLapsDown, redFlagPlan, roadOrder } from './redflag.js';
+import {
+  burnTank,
+  checkFill,
+  fillCap,
+  fuelLimit,
+  initTanks,
+  realFill,
+  refuelAtStop,
+  refuelling,
+  tankPlanDelta,
+  tankWeightDelta,
+} from './refuel.js';
+import { coverWindow, playoutPolicy, resolveRivalPolicy } from './rivals/policy.js';
+import {
+  type RivalChoice,
+  type RivalGrading,
+  type RivalRunState,
+  assertRivalReady,
+  forkRivalState,
+  initRivalState,
+  rivalAfterLap,
+  rivalPlanBefore,
+} from './rivals/react.js';
 import { type Rng, deriveSeed, mulberry32 } from './rng.js';
+import {
+  allowedFlag,
+  hasMove,
+  headsetFor,
+  illegalPitCompound,
+  minStopsRule,
+  pitLaneClosed,
+  scQueue,
+  serveStopGo,
+  stopChangesTyres,
+  stopGoCost,
+  stopsBeforeTakeover,
+  stopsOwed,
+  takeoverCompoundsUsed,
+  twoCompoundRule,
+} from './rules.js';
+import {
+  type StorylineLap,
+  type TeamOrderState,
+  applyTeamOrders,
+  conditionMet,
+  isRestartLap,
+  restartExtra,
+  storylineFor,
+  teamOrdersOf,
+  userOrdersOn,
+} from './scripted.js';
 import type {
   BattleMove,
   CarState,
@@ -34,6 +88,7 @@ import type {
   FlagState,
   Modes,
   PitStop,
+  RaceEvent,
   RaceModel,
   RaceNote,
   RaceResult,
@@ -59,18 +114,27 @@ export const PASS_MARGIN = 0.05; // a completed pass puts the follower this far 
 // A car that has just been passed gets no pass roll against the car that passed it for this
 // many laps (real races undo ~4% of passes within 3 laps; without it the sim undid 25-60%).
 export const REPASS_COOLDOWN = 3;
+// Eras overtake model (pipeline overtaking.py; an overtakeModel with trainCoef): the car ahead
+// is in a train when it started the lap within this gap (s) of its own car ahead, and the
+// roll's logit takes trainCoef. Mirrors sim_reference.TRAIN_GAP.
+export const TRAIN_GAP = 1.0;
 export const BUNCH_GAP = 0.5; // SC train spacing per car (measured on the final SC lap)
 // SC bunching (measured on the tuning races' SCs, 259 gaps): gaps are kept on the deployment
 // lap, each middle SC lap keeps SC_GAP_KEEP of a gap's excess over BUNCH_GAP, and the last lap
 // before the restart is nose-to-tail. Mirrors sim_reference.py.
 export const SC_GAP_KEEP = 0.34;
+// An Eras race (one with an era `rules` block) closes its middle SC laps gap by gap instead:
+// each gap over SC_QUEUE_SPACING keeps SC_QUEUE_KEEP of its excess (fitted on the 2018+ timed
+// races' real queues, pipeline sc_queue.py). Daily/Gauntlet race files carry no rules block.
+export const SC_QUEUE_SPACING = 1.7;
+export const SC_QUEUE_KEEP = 0.34;
 export const SC_FALLBACK = 1.6; // SC lap = this x green if not supplied
 export const VSC_FALLBACK = 1.35; // VSC lap = this x green if not supplied
 export const CLIFF_FALLBACK = 2.0; // extra wear past the cliff = this x degPerLap if not fitted
 /** A tyre is worn out once it's this much slower than new (s/lap): its usable life. */
 export const LIFE_LOSS = 2.0;
 /** Laps of life a rival keeps in hand when it skips a stop to go long. */
-const GO_LONG_MARGIN = 3;
+export const GO_LONG_MARGIN = 3;
 
 /**
  * A compound's usable life (tyre-life fix): the tyre age at which its wear and its cliff make it
@@ -82,13 +146,27 @@ const GO_LONG_MARGIN = 3;
  */
 export function tyreLife(c: CompoundModel): number {
   const extra = c.cliffDegPerLap ?? CLIFF_FALLBACK * c.degPerLap;
-  const loss =
-    c.degPerLap * c.cliffLap >= LIFE_LOSS
-      ? LIFE_LOSS / c.degPerLap
-      : (LIFE_LOSS + extra * c.cliffLap) / (c.degPerLap + extra);
+  let loss: number;
+  if (c.degQuad !== undefined && c.degQuad > 0) {
+    // Eras model fix S4: the age where degPerLap*a + degQuad*a^2 (+ the cliff) = LIFE_LOSS.
+    loss = quadRoot(c.degQuad, c.degPerLap, LIFE_LOSS);
+    if (loss > c.cliffLap) {
+      loss = quadRoot(c.degQuad, c.degPerLap + extra, LIFE_LOSS + extra * c.cliffLap);
+    }
+  } else {
+    loss =
+      c.degPerLap * c.cliffLap >= LIFE_LOSS
+        ? LIFE_LOSS / c.degPerLap
+        : (LIFE_LOSS + extra * c.cliffLap) / (c.degPerLap + extra);
+  }
   const life = c.cliffDegPerLap === undefined ? Math.min(loss, c.cliffLap) : loss;
   // A tyre that real teams ran for N laps in this race lasts at least N (tyre-life fix 2).
   return Math.min(99, Math.max(Math.floor(life), c.provenLaps ?? 0));
+}
+
+/** The positive root of a*x^2 + b*x = c (a > 0, c > 0). */
+function quadRoot(a: number, b: number, c: number): number {
+  return (Math.sqrt(b * b + 4 * a * c) - b) / (2 * a);
 }
 
 /** Usable life of `compound` in `model` (Infinity if the race has no model for it). */
@@ -120,6 +198,22 @@ export interface RunOptions {
    * On by default; off reproduces the real race exactly from the real calls.
    */
   incidents?: boolean;
+  /**
+   * Live play: the rival's policy (eras spec §7; rivals/policy.ts). Default `standard`, today's
+   * rival. Throws RivalPolicyError on an unknown name.
+   */
+  rivalPolicy?: RivalPolicy;
+  /**
+   * Legend difficulty (eras spec 8; legend.ts): the real non-storyline SC/VSC periods after
+   * the takeover are replaced by ones drawn from `seed` at the track's historical rate.
+   */
+  legend?: boolean;
+  /** Expert: the rival's claimed choices to replay (rivals/react.ts). */
+  rivalChoices?: RivalChoice[];
+  /** Expert: how its decisions are graded without a claim (default 'inline'; rivals/react.ts). */
+  rivalGrading?: RivalGrading;
+  /** Expert: samples per decision (default EXPERT_SAMPLES). */
+  rivalSamples?: number;
 }
 
 export interface ModeEffect {
@@ -157,11 +251,21 @@ interface IncidentRates {
   scShare: number;
 }
 
+/**
+ * One era's block in headset.json (eras build plan 1.2: one for each schema era). Rule
+ * switches by era (roadmap R5): `drs` false drops the `wait-drs` move; an era without `ers`
+ * has no battery, so no `ers` modes and no `overtake-button`.
+ */
 interface HeadsetEra {
   baseErrorRate: number;
   errorCost: number;
-  modes: { [K in keyof Modes]: Record<string, ModeEffect> };
+  /** The `wait-drs` battle move exists (DRS, 2011-2025). Absent means true. */
+  drs?: boolean;
+  modes: { [K in Exclude<keyof Modes, 'ers'>]: Record<string, ModeEffect> } & {
+    ers?: Record<string, ModeEffect>;
+  };
   neutralization?: { scPerLap: number; vscPerLap: number; scLaps: number; vscLaps: number };
+  /** The battery (KERS / hybrid ERS); absent in eras without one. */
   ers?: { startBattery: number; scCharge: number };
   fuel?: FuelConfig;
   incidents?: IncidentRates;
@@ -179,12 +283,12 @@ const HEADSET = headsetConfig as unknown as Record<string, HeadsetEra>;
 
 /** The race engineer config for a model's era (battles, trust...), or null. */
 export function engineerConfig(model: RaceModel): EngineerConfig | null {
-  return HEADSET[model.era]?.engineer ?? null;
+  return headsetFor(HEADSET, model)?.engineer ?? null;
 }
 
 /** The era's fuel load settings (null: no fuel load in this era). */
 export function fuelConfig(model: RaceModel): FuelConfig | null {
-  return HEADSET[model.era]?.fuel ?? null;
+  return headsetFor(HEADSET, model)?.fuel ?? null;
 }
 
 /**
@@ -200,7 +304,7 @@ export function fuelMargin(model: RaceModel, car: CarState, lap: number): number
 /** The fuel load's lap-time effect on this lap (0 without one): its weight, or an empty tank. */
 function fuelLapDelta(run: Run, car: CarState, lap: number): number {
   const f = run.headset?.fuel;
-  if (!f || car.fuel === undefined || !run.incidents) return 0;
+  if (!f || car.fuel === undefined || !run.liveFuel) return 0;
   if (car.fuel <= 0) return f.dryLapDelta;
   // Off the standard load (what the fitted fuel effect assumes), each kg moves the lap time.
   const nominal = f.burnPerLap * (run.model.race.laps - lap + 1);
@@ -210,17 +314,37 @@ function fuelLapDelta(run: Run, car: CarState, lap: number): number {
 /** Burn a lap's fuel: the modes' multipliers on green, a fraction under a SC or VSC. */
 function burnFuel(run: Run, car: CarState, lap: number, neutral: boolean): void {
   const f = run.headset?.fuel;
-  if (!f || car.fuel === undefined || !run.incidents || car.fuel <= 0) return;
+  if (!f || car.fuel === undefined || !run.liveFuel || car.fuel <= 0) return;
   const mult = neutral
     ? f.neutralBurn
     : (effect(run, car, 'pace').burnMult ?? 1) * (effect(run, car, 'fuel').burnMult ?? 1);
   car.fuel = Math.max(0, car.fuel - f.burnPerLap * mult);
   if (car.fuel <= 0) run.notes.push({ lap, kind: 'fuel', driver: car.code, detail: 'empty' });
+  // A fuel-limit race (eras build plan 4.2): an empty tank stops the car.
+  if (car.fuel <= 0 && fuelLimit(run.model) !== null) outOfFuel(run, car, lap);
+}
+
+/** Eras build plan 4.2: the car ran out of fuel and stops (retires on this lap). */
+function outOfFuel(run: Run, car: CarState, lap: number): void {
+  car.retired = true;
+  car.retiredLap = lap;
+  run.notes.push({ lap, kind: 'fuel', driver: car.code, detail: 'out' });
+}
+
+/** A refuelling race: burn a lap from the tank (refuel.ts); a live tank burns by the modes
+ * and the era's neutral share, and stops the car when it runs dry. */
+function burnRefuelTank(run: Run, car: CarState, lap: number, neutral: boolean): void {
+  const mult = !car.tankLive
+    ? 1
+    : neutral
+      ? (HEADSET[run.model.era]?.fuel?.neutralBurn ?? 1)
+      : (effect(run, car, 'pace').burnMult ?? 1) * (effect(run, car, 'fuel').burnMult ?? 1);
+  if (burnTank(car, mult)) outOfFuel(run, car, lap);
 }
 
 /** The headset modes' effects for a model's era (for explaining the options in the game). */
 export function modeEffects(model: RaceModel): HeadsetEra['modes'] | null {
-  return HEADSET[model.era]?.modes ?? null;
+  return headsetFor(HEADSET, model)?.modes ?? null;
 }
 
 export const DEFAULT_MODES: Modes = {
@@ -240,6 +364,12 @@ export interface Run {
   decisions: Decision[];
   /** True when the user's car is player-controlled and the rival reacts. */
   live: boolean;
+  /** How the rival reacts in live play (RunOptions.rivalPolicy). Forks keep the parent's. */
+  rivalPolicy: RivalPolicy;
+  /** Legend difficulty (RunOptions.legend): the evaluator and server read it off the run. */
+  legend: boolean;
+  /** Expert's decision state (rivals/react.ts); undefined for every other policy. */
+  rival?: RivalRunState;
   notes: RaceNote[];
   headset: HeadsetEra | undefined;
   /** Per-car random streams, created on first use (see Streams). */
@@ -248,6 +378,18 @@ export interface Run {
   scratch: { prevTime: Record<string, number>; clean: Record<string, number>; pitted: Set<string> };
   /** Neutralizations (start lap, length, flag): the real ones, or a grader fork's view. */
   events: NeutralEvent[];
+  /** Red flags: free stops in the stoppage, gaps wiped at the restart (redflag.ts). */
+  red: RedFlagPlan;
+  /**
+   * An SC's first lap -> the car it picked up (`pickup`, Eras builds, sourced): the cars ahead
+   * of it run a racing lap on that lap and keep their gaps on the next (scFront, queueBehind).
+   */
+  scPickup: Map<number, string>;
+  /**
+   * A no-unlapping race's SC and red-flag queues: lap -> the scripted cars' real laps down
+   * (redflag.ts realLapsDown; Eras builds' `lapsDown`). Empty for every other race.
+   */
+  lapsDown: Map<number, Map<string, number>>;
   /** Neutralization flag per lap, and retirements per lap, precomputed from events. */
   neutral: Map<number, Exclude<FlagState, 'green'>>;
   retireAt: Map<number, string[]>;
@@ -255,6 +397,12 @@ export interface Run {
   passedBy: Map<string, number>;
   /** Live play: crashes, failures and punctures happen (RunOptions.incidents). */
   incidents: boolean;
+  /**
+   * The player's fuel load (`car.fuel`) burns live: with incidents (live play), or after
+   * liveFuelFrom (an Eras fuel-rule race paused for the offline grader). The refuelling tank's
+   * own flag is CarState.tankLive.
+   */
+  liveFuel: boolean;
   /** A crash brings out a SC/VSC (off in grader playouts, which sample neutralizations). */
   incidentFlags: boolean;
   /**
@@ -262,6 +410,31 @@ export interface Run {
    * forecast (weather spec W3). Empty in a dry race.
    */
   wetness: number[];
+  /** Car faults by car (faults.ts): frozen on their real laps; forks end their own. */
+  faults: FaultTable;
+  /** Scripted team orders and let-bys still open (TEAM_ORDER events; scripted.ts). */
+  orders: TeamOrderState[];
+  /** Live play: the player's avoidable storyline retirements still to come (scripted.ts). */
+  storyline: StorylinePending[];
+  /** Live play with storyline retirements: the player's car at the start of each lap run. */
+  storylineLaps: StorylineLap[];
+}
+
+/** An avoidable storyline retirement waiting for its lap (scripted.ts conditionMet). */
+export interface StorylinePending {
+  /** The player's car's real retirement lap: retired at its end. */
+  lap: number;
+  /**
+   * The lap the call is judged at the start of: the retirement lap, or a linked car's earlier
+   * one (a collision whose other car retired a lap before the player's: Australia 1994 from
+   * Hill's side), so the linked car can retire on its own lap.
+   */
+  judgeLap: number;
+  condition: import('./types.js').StorylineCondition;
+  /** Linked cars' real retirements (alsoRetires): code -> lap. */
+  linked: Array<[string, number]>;
+  /** Judged: true (retires), false (avoided); undefined until its lap. */
+  met?: boolean;
 }
 
 export interface NeutralEvent {
@@ -307,9 +480,15 @@ function stopCost(
   return base + (devs[pick] as number);
 }
 
+/** A stop's measured loss, if it applies: in Legend only under the flag it was measured under. */
+function stopLoss(run: Run, stop: PitStop, lap: number): number | undefined {
+  return run.legend ? legendLoss(run.model, run.neutral, stop, lap) : stop.loss;
+}
+
 /**
  * Fitted logistic P(follower passes this lap) from pace advantage (s/lap) and gap (s), plus
  * any battle-stance shift to the logit (attacker's attackLogit + defender's defendLogit).
+ * An Eras model's trainCoef (the car ahead in a train) is passed in by the caller's shift.
  */
 export function passProbability(
   overtake: RaceModel['track']['overtakeModel'],
@@ -328,11 +507,12 @@ export function passProbability(
  */
 export function cleanLap(model: RaceModel, car: CarState, lap: number, w?: number): number {
   const dry =
-    tyreLapTime(model, car.basePace, car.compound, car.tyreWear, lap) +
-    freshTyreDelta(model, car.tyreAge);
+    tyreLapTime(model, car.basePace + (car.stintPace ?? 0), car.compound, car.tyreWear, lap) +
+    freshTyreDelta(model, car.tyreAge) +
+    tankWeightDelta(model, car, lap); // refuelling: the weight resets at each stop (refuel.ts)
   if (!model.weather) return dry;
   const wet = w ?? wetnessOn(model.weather.wetness, lap);
-  return dry * wetFactor(model.weather, car.compound, wet, car.wetPace ?? 0);
+  return dry * wetFactor(model.weather, car.compound, wet, car.wetPace ?? 0, car.dampPace);
 }
 
 /**
@@ -356,6 +536,8 @@ export function tyreLapTime(
   const c = model.compounds[compound];
   if (!c) throw new Error(`no compound model for ${compound}`);
   let t = basePace + c.offset + c.degPerLap * wear - model.fuelEffectPerLap * lap;
+  // Eras model fix S4: wear that grows with the set's age (pipeline wear_shape.py).
+  if (c.degQuad !== undefined) t += c.degQuad * wear * wear;
   if (wear > c.cliffLap) {
     const extra = c.cliffDegPerLap ?? CLIFF_FALLBACK * c.degPerLap;
     t += extra * (wear - c.cliffLap);
@@ -421,7 +603,7 @@ function extraErrorRate(run: Run, car: CarState): number {
  * player's window, compounds the race doesn't have, or a stop with no lap left to run.
  */
 export function validateDecisions(model: RaceModel, decisions: Decision[]): void {
-  const headset = HEADSET[model.era];
+  const headset = headsetFor(HEADSET, model);
   for (const d of decisions) {
     if (!Number.isInteger(d.lap) || d.lap <= model.race.takeoverLap || d.lap > model.race.laps) {
       throw new Error(
@@ -437,12 +619,20 @@ export function validateDecisions(model: RaceModel, decisions: Decision[]): void
     if (d.kind === 'pit') {
       if (!model.compounds[d.compound]) throw new Error(`unknown compound ${d.compound}`);
       if (d.lap >= model.race.laps) throw new Error('no stop on the final lap');
+      const illegal = illegalPitCompound(model, d.compound); // era rules (rules.ts)
+      if (illegal) throw new Error(illegal);
+      checkFill(model, d.fill); // refuel.ts
     } else if (d.kind === 'mode') {
       if (!headset?.modes[d.key]?.[d.value]) throw new Error(`unknown mode ${d.key}=${d.value}`);
     } else if (d.kind === 'teamOrder') {
-      const orders = ['letTeammatePast', 'teammateLetsYouPast', 'holdUp', 'release'];
+      const orders = ['letTeammatePast', 'teammateLetsYouPast', 'holdUp', 'release', 'comply'];
       if (!orders.includes(d.order)) throw new Error('unknown team order');
-      if (!teammateOf(model)) throw new Error(`${model.userSide} has no teammate in this race`);
+      if (d.order === 'comply') {
+        // A scripted order to the player's car (TEAM_ORDER), open on this lap (scripted.ts).
+        if (!userOrdersOn(model.events, model.userSide, d.lap).length)
+          throw new Error(`no team order for ${model.userSide} on lap ${d.lap}`);
+      } else if (!teammateOf(model))
+        throw new Error(`${model.userSide} has no teammate in this race`);
     } else if (
       d.kind === 'battle' ||
       d.kind === 'limits' ||
@@ -450,6 +640,9 @@ export function validateDecisions(model: RaceModel, decisions: Decision[]): void
       d.kind === 'reply'
     ) {
       if (!headset?.engineer || !validEngineerCall(d)) throw new Error(`bad ${d.kind} call`);
+      if (d.kind === 'battle' && !hasMove(headset, d.move)) {
+        throw new Error(`no ${d.move} in the ${model.era} era`);
+      }
     } else if (d.kind === 'plan') {
       validatePlan(model, d, model.race.takeoverLap);
     } else if (d.kind !== 'radio') {
@@ -464,10 +657,19 @@ export function teammateOf(model: RaceModel): string | undefined {
   return model.drivers.find((d) => d.team === team && d.code !== model.userSide)?.code;
 }
 
-/** The user's real calls as pit decisions (in-lap = real out-lap - 1), for comparison. */
+/**
+ * The user's real calls as pit decisions (in-lap = real out-lap - 1), for comparison. In a
+ * refuelling race each carries the real fill (refuel.ts realFill: the next real stint).
+ */
 export function realDecisions(model: RaceModel): Decision[] {
   const user = model.drivers.find((d) => d.code === model.userSide);
-  return (user?.realStrategy ?? []).map((s) => ({ lap: s.lap - 1, kind: 'pit', compound: s.to }));
+  const fuel = refuelling(model);
+  return (user?.realStrategy ?? []).map((s) => ({
+    lap: s.lap - 1,
+    kind: 'pit',
+    compound: s.to,
+    ...(fuel ? { fill: realFill(model, model.userSide, s.lap) } : {}),
+  }));
 }
 
 const FLAG_OF = { SC: 'sc', VSC: 'vsc', RED: 'red' } as const;
@@ -479,11 +681,38 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
   if (live) validateDecisions(model, options.decisions ?? []);
   const events: NeutralEvent[] = [];
   const retireAt = new Map<number, string[]>();
-  for (const e of model.events) {
+  // Legend: random SC/VSC periods; red flags stay real (legend.ts isKept).
+  const timeline = options.legend ? legendEvents(model, seed) : model.events;
+  for (const e of timeline) {
     if (e.type === 'SC' || e.type === 'VSC' || e.type === 'RED') {
       events.push({ lap: e.lap, laps: e.laps ?? 1, flag: FLAG_OF[e.type] });
     } else if (e.type === 'RETIREMENT' && e.driver) {
       retireAt.set(e.lap, [...(retireAt.get(e.lap) ?? []), e.driver]);
+    }
+  }
+
+  // Live play: the player's avoidable storyline retirements (scripted.ts) leave the frozen
+  // timeline; each comes back on its lap only if the player repeated the real call.
+  const storyline: StorylinePending[] = [];
+  if (live) {
+    const lapOf = (code: string) =>
+      model.events.find((e) => e.type === 'RETIREMENT' && e.driver === code)?.lap;
+    for (const item of storylineFor(model.eras?.storylineRetirements, model.userSide)) {
+      const lap = lapOf(item.driver);
+      if (lap === undefined) continue;
+      const linked: Array<[string, number]> = [];
+      for (const code of [item.driver, ...(item.alsoRetires ?? [])]) {
+        const at = lapOf(code);
+        if (at === undefined) continue;
+        const rest = (retireAt.get(at) ?? []).filter((c) => c !== code);
+        if (rest.length) retireAt.set(at, rest);
+        else retireAt.delete(at);
+        if (code !== item.driver) linked.push([code, at]);
+      }
+      if (item.condition.type !== 'fuel') {
+        const judgeLap = Math.min(lap, ...linked.map(([, at]) => at));
+        storyline.push({ lap, judgeLap, condition: item.condition, linked });
+      }
     }
   }
 
@@ -501,10 +730,16 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
       basePace: d.basePace,
       noise: d.noise,
       ...(d.wetPace ? { wetPace: d.wetPace } : {}),
+      ...(d.dampPace !== undefined ? { dampPace: d.dampPace } : {}),
+      // Pace by stint: the takeover stint's offset; the player's car in live play runs its
+      // race-wide one in every stint (playerStintOffset).
+      ...(stintPaceAtTakeover(model, d.code, live) !== 0
+        ? { stintPace: stintPaceAtTakeover(model, d.code, live) }
+        : {}),
       compound: s.compound,
       tyreAge: s.tyreAge,
       tyreWear: s.tyreAge,
-      compoundsUsed: [...(s.compoundsUsed ?? [])],
+      compoundsUsed: takeoverCompoundsUsed(s),
       totalTime: cum,
       // A player-controlled car pits only when the player calls it.
       strategy:
@@ -513,25 +748,42 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
       retired: false,
       retiredLap: null,
       modes: { ...DEFAULT_MODES },
+      // Era rules (rules.ts minStops): the stops count only where the race has a minimum.
+      ...(minStopsRule(model.rules) > 0 ? { stops: stopsBeforeTakeover(d) } : {}),
     };
   }
-  const ers = HEADSET[model.era]?.ers;
+  // Refuelling (refuel.ts): every car's takeover tank; the player's burns live with incidents.
+  initTanks(
+    model,
+    cars,
+    (code) => realOf(model, code),
+    live ? model.userSide : undefined,
+    live && options.incidents !== false,
+  );
+  const ers = headsetFor(HEADSET, model)?.ers;
   const userCar = cars[model.userSide];
   if (live && ers && userCar) userCar.battery = ers.startBattery;
   // The race engineer side comes with live play's chaos (incidents): without it the real
   // calls replay the real race exactly.
-  const engineer = live && options.incidents !== false ? HEADSET[model.era]?.engineer : undefined;
+  const engineer =
+    live && options.incidents !== false ? headsetFor(HEADSET, model)?.engineer : undefined;
 
+  const rivalPolicy = resolveRivalPolicy(options.rivalPolicy);
+  const rival = live ? initRivalState(rivalPolicy, options) : undefined;
   const run: Run = {
     model,
     seed,
     ...makeStreams(model, seed),
     decisions: [...(options.decisions ?? [])],
     live,
+    rivalPolicy,
+    legend: options.legend === true,
+    ...(rival ? { rival } : {}),
     notes: [],
-    headset: HEADSET[model.era],
+    headset: headsetFor(HEADSET, model),
     passedBy: new Map(),
-    incidents: live && options.incidents !== false && !!HEADSET[model.era]?.incidents,
+    incidents: live && options.incidents !== false && !!headsetFor(HEADSET, model)?.incidents,
+    liveFuel: live && options.incidents !== false && !!headsetFor(HEADSET, model)?.incidents,
     incidentFlags: true,
     wetness: [...(model.weather?.wetness ?? [])],
     state: {
@@ -544,19 +796,151 @@ export function initRun(model: RaceModel, seed: number, options: RunOptions = {}
     },
     events,
     neutral: neutralMap(events),
+    red: redFlagPlan(timeline, model.rules !== undefined),
+    scPickup: scPickupOf(timeline),
+    lapsDown: realLapsDown(
+      timeline,
+      (code) => (live && code === model.userSide) || strategies[code] !== undefined,
+    ),
     retireAt,
+    faults: faultTable(model.events),
+    orders: teamOrdersOf(model.events, live ? model.userSide : undefined),
+    storyline,
+    storylineLaps: [],
   };
   // The fuel load: what the flag needs at the standard burn, plus the race's margin.
-  const fuel = run.headset?.fuel;
   const user = run.state.cars[model.userSide];
-  if (run.incidents && fuel && user) {
-    const margin =
-      fuel.marginMin +
-      (fuel.marginMax - fuel.marginMin) * run.rng.get(FUEL_STREAM, model.userSide).next();
-    user.fuel = fuel.burnPerLap * (model.race.laps - model.race.takeoverLap) + margin;
-  }
+  const load = run.liveFuel ? takeoverFuel(run) : undefined;
+  if (user && load !== undefined) user.fuel = load;
   markNextFlag(run);
   return run;
+}
+
+/** The player's fuel load at the takeover (kg): the flag at the standard burn, plus the
+ * race's margin (drawn from the run's seed). Undefined without a fuel load. */
+function takeoverFuel(run: Run): number | undefined {
+  const fuel = run.headset?.fuel;
+  if (!fuel) return undefined;
+  const { laps, takeoverLap } = run.model.race;
+  const margin =
+    fuel.marginMin +
+    (fuel.marginMax - fuel.marginMin) * run.rng.get(FUEL_STREAM, run.model.userSide).next();
+  return fuel.burnPerLap * (laps - takeoverLap) + margin;
+}
+
+/**
+ * The offline grader's pause (moments.ts pauseAt) in an Eras race with a fuel rule
+ * (erasFuelRule): from the run's current lap on, the player's fuel burns live, as in live
+ * play, so the hard-call counter and the author grade a skipped fill or a missed lift as
+ * running dry. The laps already run stay the real race's replay:
+ * - refuelling: the replay's tank (one lap a lap, the real fills) goes live: it burns by the
+ *   modes and stops the car when it runs dry (CarState.tankLive);
+ * - a fuel limit: the car gets live play's load, the takeover load from the run's seed less
+ *   the default modes' burn over the laps run (neutralBurn under a SC or VSC), burns it by the
+ *   modes and stops when it runs out.
+ * Does nothing in any other race (every Daily and Gauntlet race), or on a run that isn't live.
+ */
+export function liveFuelFrom(run: Run): void {
+  const user = run.state.cars[run.model.userSide];
+  if (!run.live || !user || !erasFuelRule(run.model)) return;
+  if (user.tank !== undefined) user.tankLive = true;
+  if (run.liveFuel || fuelLimit(run.model) === null) return;
+  const fuel = run.headset?.fuel;
+  const load = takeoverFuel(run);
+  if (!fuel || load === undefined) return;
+  let burnt = 0;
+  for (let lap = run.model.race.takeoverLap + 1; lap <= run.state.lap; lap++) {
+    burnt += fuel.burnPerLap * (run.neutral.get(lap) ? fuel.neutralBurn : 1);
+  }
+  user.fuel = Math.max(0, load - burnt);
+  run.liveFuel = true;
+}
+
+/** A stop with its out-lap on `lap` is the tyre change in a red flag's stoppage: free. */
+export function redFlagFree(run: Run, lap: number): boolean {
+  const redLap = run.red.free.get(lap);
+  return redLap !== undefined && run.neutral.get(redLap) === 'red';
+}
+
+/** Each car's stint offsets, the lap its stint began (0: the takeover stint) -> s/lap. */
+const STINTS = new WeakMap<RaceModel, Map<string, Map<number, number>>>();
+
+/**
+ * Pace by stint (DriverModel.stintPace; Eras model fix M2): the offset of the car's stint begun
+ * on `lap` (0: the takeover stint), or 0 if the real car began no stint there. Mirrors
+ * sim_reference.py's stint_table.
+ */
+export function stintOffset(model: RaceModel, code: string, lap: number): number {
+  let table = STINTS.get(model);
+  if (!table) {
+    table = new Map();
+    for (const d of model.drivers) {
+      if (d.stintPace?.length)
+        table.set(d.code, new Map(d.stintPace.map((e) => [e.lap, e.offset])));
+    }
+    STINTS.set(model, table);
+  }
+  return table.get(code)?.get(lap) ?? 0;
+}
+
+/** Each Eras race's player's car: its race-wide stint offset (playerStintOffset). */
+const PLAYER_MEAN = new WeakMap<RaceModel, number>();
+
+/**
+ * Pace by stint for the player's car in live play (and so in the grader's playouts, which fork
+ * it) in an Eras race: the car's race-wide offset, the mean of its real stints' offsets
+ * weighted by their real length in laps (0 if it has none), the same in every stint whatever
+ * its calls. The offsets carry basePace's error for the car (san-marino-2005: Schumacher's
+ * stints average -0.59 s/lap), which the player's car needs as much as the others; the
+ * stint-to-stint shape (a real push or an eased-off last stint) is the real driver's effort,
+ * which in play is the player's (the pace modes). It is barely shared by the field over the
+ * same laps (correlation 0.19 over 153 player stints), and running it only when a stop lands on
+ * the real lap would grade the real call on effort (a cliff of up to 15 s, spain-1996).
+ * Always 0 outside Eras races (no Daily or Gauntlet race has stint offsets).
+ */
+export function playerStintOffset(model: RaceModel): number {
+  if (!erasRace(model)) return 0;
+  let mean = PLAYER_MEAN.get(model);
+  if (mean === undefined) {
+    const d = model.drivers.find((x) => x.code === model.userSide);
+    const stops = (d?.realStrategy ?? []).map((s) => s.lap).sort((a, b) => a - b);
+    let laps = 0;
+    let sum = 0;
+    for (const e of d?.stintPace ?? []) {
+      const start = e.lap === 0 ? model.race.takeoverLap + 1 : e.lap;
+      const end = stops.find((l) => l > start) ?? model.race.laps + 1;
+      const n = Math.max(0, end - start);
+      laps += n;
+      sum += n * e.offset;
+    }
+    mean = laps > 0 ? sum / laps : 0;
+    PLAYER_MEAN.set(model, mean);
+  }
+  return mean;
+}
+
+/** A car's stint offset at the takeover: the player's car in live play takes its race-wide
+ * offset (playerStintOffset), every other car (and every car in a replay) its takeover stint's. */
+function stintPaceAtTakeover(model: RaceModel, code: string, live: boolean): number {
+  return live && code === model.userSide ? playerStintOffset(model) : stintOffset(model, code, 0);
+}
+
+/** Each car's stops with no tyre change, out-lap -> loss (DriverModel.serviceStops). */
+const SERVICE = new WeakMap<RaceModel, Map<string, Map<number, number>>>();
+
+/** The loss of the car's stop with no tyre change on `lap` (a repair, a stop-go, a
+ * drive-through), if it has one: paid whatever its strategy (sim_reference.py). */
+export function serviceStopLoss(model: RaceModel, code: string, lap: number): number | undefined {
+  let table = SERVICE.get(model);
+  if (!table) {
+    table = new Map();
+    for (const d of model.drivers) {
+      if (d.serviceStops?.length)
+        table.set(d.code, new Map(d.serviceStops.map((s) => [s.lap, s.loss])));
+    }
+    SERVICE.set(model, table);
+  }
+  return table.get(code)?.get(lap);
 }
 
 /** Set the flag the next lap will run under, from the neutralizations known so far. */
@@ -647,7 +1031,9 @@ function sampledEvents(
   for (let lap = from + 1; lap <= run.model.race.laps; lap++) {
     const u = rng.next(); // one draw per lap, so the stream doesn't depend on the outcome
     if (busy.has(lap)) continue;
-    const flag = u < rates.scPerLap ? 'sc' : u < rates.scPerLap + rates.vscPerLap ? 'vsc' : null;
+    const drawn = u < rates.scPerLap ? 'sc' : u < rates.scPerLap + rates.vscPerLap ? 'vsc' : null;
+    // Era rules (rules.ts allowedFlag): no made-up SC or VSC before 1993.
+    const flag = drawn && allowedFlag(run.model, drawn);
     if (!flag) continue;
     const laps = Math.min(
       flag === 'sc' ? rates.scLaps : rates.vscLaps,
@@ -671,10 +1057,19 @@ export function forkRun(
   }
   validateDecisions(run.model, decisions);
   const cars: Record<string, CarState> = {};
+  // An Eras race with a fuel rule (refuelling, or a 1984-88 fuel limit) keeps the tank in its
+  // playouts (erasRace): a car runs dry in them and stops, as in live play, so pushing or
+  // staying out on an empty tank grades as what it is. Every other race's playouts leave the
+  // fuel load out, as before (fuel load spec: there an empty tank only costs lap time, which
+  // the player is shown and can lift for). Daily and Gauntlet races have no rules block.
+  const keepFuel = erasFuelRule(run.model);
   for (const [code, c] of Object.entries(run.state.cars)) {
     cars[code] = cloneCar(c);
     // The grader's playouts leave the fuel load out (fuel load spec: live play only).
-    if (options.blindAfter !== undefined) (cars[code] as CarState).fuel = undefined;
+    if (options.blindAfter !== undefined && !keepFuel) {
+      (cars[code] as CarState).fuel = undefined;
+      (cars[code] as CarState).tankLive = undefined; // refuel.ts: no dry stop in playouts
+    }
   }
   return {
     ...run,
@@ -692,8 +1087,19 @@ export function forkRun(
       ...(run.state.engineer ? { engineer: cloneEngineer(run.state.engineer) } : {}),
     },
     decisions: [...run.decisions.filter((d) => d.lap > run.state.lap), ...decisions],
+    // Playouts in an Expert race have Smart rivals (eras spec §7: no grading inside grading).
+    rivalPolicy:
+      options.blindAfter === undefined ? run.rivalPolicy : playoutPolicy(run.rivalPolicy),
+    rival: forkRivalState(run.rival, options.blindAfter !== undefined),
     notes: [],
     ...blindView(run, seed, options.blindAfter),
+    faults: cloneFaults(run.faults, options.blindAfter),
+    orders: run.orders.map((o) => ({ ...o })),
+    // A blind playout doesn't know a storyline retirement still to come (like the others).
+    storyline: run.storyline
+      .filter((p) => options.blindAfter === undefined || p.lap <= options.blindAfter)
+      .map((p) => ({ ...p, linked: [...p.linked] })),
+    storylineLaps: [...run.storylineLaps],
     // Blind playouts already draw neutralizations at the base rates, crashes included.
     incidentFlags: options.blindAfter === undefined ? run.incidentFlags : false,
     // Blind: the weather after the decision is the forecast's, not the real race's (W3).
@@ -708,14 +1114,52 @@ function blindView(
   run: Run,
   seed: number,
   blindAfter: number | undefined,
-): Pick<Run, 'events' | 'neutral' | 'retireAt'> {
+): Pick<Run, 'events' | 'neutral' | 'retireAt' | 'lapsDown' | 'scPickup'> {
   if (blindAfter === undefined) {
-    return { events: run.events, neutral: run.neutral, retireAt: run.retireAt };
+    return {
+      events: run.events,
+      neutral: run.neutral,
+      retireAt: run.retireAt,
+      lapsDown: run.lapsDown,
+      scPickup: run.scPickup,
+    };
   }
   const known = run.events.filter((e) => e.lap <= blindAfter);
   const events = [...known, ...sampledEvents(run, seed, known, blindAfter)];
   const retireAt = new Map([...run.retireAt].filter(([lap]) => lap <= blindAfter));
-  return { events, neutral: neutralMap(events), retireAt };
+  // The real laps down of the neutralizations it knows (begun by blindAfter) only.
+  const lapsDown = new Map(
+    [...run.lapsDown].filter(([lap]) => known.some((e) => lap >= e.lap && lap < e.lap + e.laps)),
+  );
+  // A pickup belongs to the real SC it was sourced for: only one the playout already knows.
+  const scPickup = new Map([...run.scPickup].filter(([lap]) => lap <= blindAfter));
+  return { events, neutral: neutralMap(events), retireAt, lapsDown, scPickup };
+}
+
+/** Each SC's sourced pickup (`pickup`), by the SC's first lap. */
+function scPickupOf(events: readonly RaceEvent[]): Map<number, string> {
+  const out = new Map<number, string>();
+  for (const e of events) if (e.type === 'SC' && e.pickup) out.set(e.lap, e.pickup);
+  return out;
+}
+
+/**
+ * The cars on the road ahead of the car an SC picked up (`pickup`) on the SC's first lap: none
+ * if that car is out or leads (sim_reference.py sc_front).
+ */
+function scFront(running: string[], picked: string | undefined): Set<string> {
+  const at = picked === undefined ? -1 : running.indexOf(picked);
+  return new Set(at > 0 ? running.slice(0, at) : []);
+}
+
+/**
+ * The lap after a pickup SC's first lap: the queue closes up from the picked-up car back; the
+ * cars ahead of it are still ahead of the safety car and keep their gaps
+ * (sim_reference.py queue_behind).
+ */
+function queueBehind(order: string[], picked: string | undefined): string[] {
+  const at = picked === undefined ? -1 : order.indexOf(picked);
+  return at > 0 ? order.slice(at) : order;
 }
 
 function car(run: Run, code: string): CarState {
@@ -789,6 +1233,11 @@ function playerStop(run: Run, outLap: number, compound: string): PitStop {
     : { lap: outLap, to: compound };
 }
 
+/** A car's real strategy (refuel.ts prices a fill choice at a real stop against it). */
+function realOf(model: RaceModel, code: string): readonly PitStop[] {
+  return model.drivers.find((d) => d.code === code)?.realStrategy ?? [];
+}
+
 /** True if the user's real strategy has this stop (out-lap and compound). */
 function isRealStop(run: Run, outLap: number, compound: string): boolean {
   return !!run.model.drivers
@@ -822,9 +1271,15 @@ function applyDecisions(run: Run, lap: number): void {
       (user.modes as unknown as Record<string, string>)[d.key] = d.value;
     } else if (d.kind === 'pit') {
       user.strategy = user.strategy.filter((s) => s.lap !== lap + 1);
-      user.strategy.push(playerStop(run, lap + 1, d.compound));
+      const stop = playerStop(run, lap + 1, d.compound);
+      // A refuelling race's call always carries its fill (validateDecisions).
+      user.strategy.push(d.fill !== undefined ? { ...stop, fill: d.fill } : stop);
     } else if (d.kind === 'teamOrder') {
       const orders = run.state.teamOrders;
+      if (d.order === 'comply') {
+        // Obey the scripted order(s) telling the player's car to let a car by (scripted.ts).
+        for (const o of run.orders) if (o.call && lap >= o.lap && lap <= o.until) o.armed = true;
+      }
       if (d.order === 'holdUp') orders.holdUp = true;
       if (d.order === 'release') orders.holdUp = false;
       if (d.order === 'letTeammatePast' || d.order === 'teammateLetsYouPast') {
@@ -929,6 +1384,19 @@ function applySwap(run: Run, lap: number, prevTime: Record<string, number>): voi
  * next lap if its own next planned stop is within COVER_WINDOW laps. Otherwise it keeps its
  * real strategy. A cover replaces the rival's next planned stop (taking its compound).
  */
+/**
+ * True while the rival still has a storyline call to make after `lap` (eras.storylineCalls,
+ * the race's rival only), or for the rest of the race after a call marked `untilFlag`: its plan
+ * stays its real one until then, whatever its policy, so no
+ * rival rule or decision point runs (rivalReacts, rivalGoesLong, rivals/react.ts
+ * rivalAfterLap). False in every race without storyline calls (every Daily and Gauntlet race).
+ */
+export function rivalHeld(run: Pick<Run, 'model'>, lap: number): boolean {
+  const calls = run.model.eras?.storylineCalls;
+  if (!calls) return false;
+  return calls.some((c) => c.driver === run.model.rival && (c.untilFlag === true || c.lap > lap));
+}
+
 function rivalReacts(
   run: Run,
   lap: number,
@@ -939,7 +1407,10 @@ function rivalReacts(
   const user = state.cars[model.userSide];
   const rival = state.cars[model.rival];
   if (!run.live || !user || !rival || !user.pittedThisLap) return;
+  if (rivalHeld(run, lap)) return; // a storyline call still to come: the real plan stands
   if (rival.retired || rival.pittedThisLap || lap >= model.race.laps) return;
+  // Expert covers green-flag stops on the player's in-lap instead (rivals/react.ts).
+  if (run.rivalPolicy === 'expert' && flag !== 'sc' && flag !== 'vsc') return;
   const to = rivalCover(model, rival, {
     lap,
     flag,
@@ -947,8 +1418,10 @@ function rivalReacts(
     startGap: Math.abs((prevTime[user.code] ?? 0) - (prevTime[rival.code] ?? 0)),
     userBehind: user.totalTime - rival.totalTime,
     userCompound: user.compound,
+    window: coverWindow(run.rivalPolicy),
   });
   if (!to) return;
+  if (pitLaneClosed(model, run.neutral, lap + 1, to)) return; // era rules: no stop-go cover
   const nextStop = rival.strategy.filter((s) => s.lap > lap).sort((a, b) => a.lap - b.lap)[0];
   rival.strategy = rival.strategy.filter((s) => s !== nextStop);
   rival.strategy.push({ lap: lap + 1, to, added: true });
@@ -972,9 +1445,13 @@ export function rivalCover(
     startGap: number;
     userBehind: number;
     userCompound: string;
+    /** The green-flag cover window (default COVER_WINDOW; rivals/policy.ts coverWindow). */
+    window?: number;
   },
 ): string | null {
   const { lap, flag, nextFlag } = at;
+  // Era rules: with no tyre changes there's no fresh set to cover with (4.2: refuel stops).
+  if (model.rules?.tyreChanges === false) return null;
   // The real stop: the rival's real answer to it is already its real strategy.
   const real = model.drivers
     .find((d) => d.code === model.userSide)
@@ -989,7 +1466,9 @@ export function rivalCover(
     }
   } else {
     cover =
-      at.startGap < model.track.pitLoss && !!nextStop && nextStop.lap - (lap + 1) <= COVER_WINDOW;
+      at.startGap < model.track.pitLoss &&
+      !!nextStop &&
+      nextStop.lap - (lap + 1) <= (at.window ?? COVER_WINDOW);
   }
   return cover ? (nextStop?.to ?? at.userCompound) : null;
 }
@@ -1010,6 +1489,11 @@ function rivalGoesLong(run: Run, lap: number): void {
   const user = state.cars[model.userSide];
   const rival = state.cars[model.rival];
   if (!run.live || !user || !rival || user.retired || rival.retired) return;
+  if (rivalHeld(run, lap)) return; // a storyline call still to come: the real plan stands
+  // Era rules: a no-tyre-change race's stops refuel, so none is skipped (eras build plan 4.2).
+  if (model.rules?.tyreChanges === false) return;
+  // Refuelling: a rival whose fuel doesn't reach the flag can't skip a stop.
+  if (rival.tank !== undefined && rival.tank - 1 < model.race.laps - lap) return;
   const stopLap = lap + 1;
   const userStop = user.strategy.find((s) => s.lap === stopLap);
   if (!userStop || isRealStop(run, stopLap, userStop.to)) return;
@@ -1031,8 +1515,10 @@ function rivalGoesLong(run: Run, lap: number): void {
   const others = rival.strategy.filter((s) => s !== planned);
   // Two-compound rule: going long may not drop the stop that would make the rival comply.
   const needsThisStop =
-    !ruleSatisfied(rival) && !others.some((s) => !rival.compoundsUsed.includes(s.to));
+    !ruleSatisfied(rival, model.rules) && !others.some((s) => !rival.compoundsUsed.includes(s.to));
   if (needsThisStop) return;
+  // Era rules (minStops): nor the stop that the rival needs for the minimum.
+  if (stopsOwed(model.rules, rival) > others.length) return;
   rival.strategy = others;
   run.notes.push({ lap, kind: 'rival-stays-out', driver: rival.code, detail: 'no stop' });
 }
@@ -1059,26 +1545,32 @@ function predictedRemaining(
   for (let lap = fromLap + 1; lap <= model.race.laps; lap++) {
     const flag = known.get(lap);
     if (stop && lap === stop.lap) {
-      compound = stop.to;
-      wear = 0;
-      age = 0;
+      if (stopChangesTyres(model.rules, compound, stop)) {
+        compound = stop.to;
+        wear = 0;
+        age = 0;
+      }
       const { track } = model;
-      total +=
-        flag === 'sc'
+      total += redFlagFree(run, lap)
+        ? 0
+        : flag === 'sc'
           ? track.pitLossUnderSC
           : flag === 'vsc'
             ? track.pitLossUnderVSC
             : track.pitLoss;
+      if (pitLaneClosed(model, known, lap, stop.to)) total += stopGoCost(model); // era rules
     }
     const wet = wetnessOn(run.wetness, lap);
     if (!flag) {
       const dry =
         tyreLapTime(model, car.basePace, compound, wear, lap) + freshTyreDelta(model, age);
-      total += dry * wetFactor(model.weather, compound, wet, car.wetPace ?? 0);
+      total += dry * wetFactor(model.weather, compound, wet, car.wetPace ?? 0, car.dampPace);
     }
     wear += (flag ? 1 : wearMult) * weatherWear(model.weather, compound, wet);
     age += 1;
   }
+  // Refuelling (refuel.ts): the fill time and the tank's weight; Infinity if it runs dry.
+  if (car.tank !== undefined) total += tankPlanDelta(model, car, fromLap, stop, known);
   return total;
 }
 
@@ -1093,17 +1585,22 @@ export function planRemainingStop(run: Run, options: { exact?: boolean } = {}): 
   const { model, state } = run;
   const user = state.cars[model.userSide];
   if (!user || user.retired) return null;
+  // Era rules: with no tyre changes a dry stop only costs time, unless it refuels (refuel.ts).
+  if (model.rules?.tyreChanges === false && !model.weather && !refuelling(model)) return null;
   // Two-compound rule: a car that hasn't yet run two dry compounds must stop for a new one.
-  const mustChange = !ruleSatisfied(user);
+  const mustChange = !ruleSatisfied(user, model.rules);
+  // Minimum stops (rules.minStops): a car still owing one must stop.
+  const mustStop = mustChange || owedAfterPlan(model, user, state.lap) > 0;
+  // Refuelling: the planner prices the tank (exact path); one stop at most, as ever.
   let best: PitStop | null = null;
   // Plan only on what is known now: neutralizations that have started by the next lap.
-  const known = neutralMap(run.events.filter((e) => e.lap <= state.lap + 1));
+  const known = knownNow(run);
   let knownAhead = false;
   for (const lap of known.keys()) if (lap > state.lap) knownAhead = true;
   // The fast path assumes a dry race (a lap's time splits into a lap term and a tyre term).
-  if (!knownAhead && !options.exact && !model.weather)
-    return planGreenToFlag(run, user, mustChange);
-  let bestTime = mustChange
+  if (!knownAhead && !options.exact && !model.weather && user.tank === undefined)
+    return planGreenToFlag(run, user, mustChange, mustStop);
+  let bestTime = mustStop
     ? Number.POSITIVE_INFINITY
     : predictedRemaining(run, user, state.lap, null, known);
   for (let lap = state.lap + 1; lap <= model.race.laps; lap++) {
@@ -1127,7 +1624,12 @@ export function planRemainingStop(run: Run, options: { exact?: boolean } = {}): 
  * compound cumulative sum over tyre age. Same choices as the full loop (sums differ only in
  * floating-point order).
  */
-function planGreenToFlag(run: Run, user: CarState, mustChange: boolean): PitStop | null {
+function planGreenToFlag(
+  run: Run,
+  user: CarState,
+  mustChange: boolean,
+  mustStop: boolean,
+): PitStop | null {
   const { model, state } = run;
   const first = state.lap + 1;
   const last = model.race.laps;
@@ -1152,7 +1654,7 @@ function planGreenToFlag(run: Run, user: CarState, mustChange: boolean): PitStop
   for (let i = n - 1; i >= 0; i--) suffix[i] = (suffix[i + 1] as number) + lapTerm(first + i);
 
   let best: PitStop | null = null;
-  let bestTime = mustChange ? Number.POSITIVE_INFINITY : (pre[n] as number);
+  let bestTime = mustStop ? Number.POSITIVE_INFINITY : (pre[n] as number);
   for (const to of Object.keys(model.compounds)) {
     if (mustChange && user.compoundsUsed.includes(to)) continue;
     // ageSum[a]: tyre-age terms for ages 0..a-1 on a fresh set of `to`.
@@ -1173,6 +1675,258 @@ function planGreenToFlag(run: Run, user: CarState, mustChange: boolean): PitStop
   return best;
 }
 
+/** Neutralizations the run knows of now: those that have started by the next lap. */
+function knownNow(run: Run): Map<number, Exclude<FlagState, 'green'>> {
+  return neutralMap(run.events.filter((e) => e.lap <= run.state.lap + 1));
+}
+
+/** Stops the car still owes the race's minimum beyond those it has planned after `lap`. */
+function owedAfterPlan(model: RaceModel, car: CarState, lap: number): number {
+  const owed = stopsOwed(model.rules, car);
+  return owed && Math.max(0, owed - car.strategy.filter((s) => s.lap > lap).length);
+}
+
+/**
+ * True for an Eras race: a race file with a `rules` or an `eras` block (an Eras-only race, or a
+ * shared race merged with its Eras overlay). No Daily or Gauntlet race file has either, so the
+ * grader changes gated on this (fuel in playouts, the real-plan continuation) leave every Daily
+ * and Gauntlet grade as it was.
+ */
+export function erasRace(model: RaceModel): boolean {
+  return model.eras !== undefined || model.rules !== undefined;
+}
+
+/**
+ * True for an Eras race with a fuel rule: refuelling, or a 1984-88 fuel limit. Its playouts keep
+ * the player's fuel (forkRun), and the real-race pause the offline tools grade from burns it
+ * live from the pause on (liveFuelFrom, moments.ts pauseAt). False for every Daily and
+ * Gauntlet race.
+ */
+export function erasFuelRule(model: RaceModel): boolean {
+  return erasRace(model) && (refuelling(model) || fuelLimit(model) !== null);
+}
+
+/**
+ * The Eras continuation (grade.ts playOption, rivals/expert.ts rivalPlayout): after a graded
+ * option, the player's car keeps to the real team's plan, as a player following the real race
+ * would, instead of the planner's best stop from wherever the option left it (a best-case
+ * oracle: hungary-1992's "stay out" graded on a later perfect stop that live play never makes).
+ *
+ * - `answered`: the last out-lap the option's question covers (the moment's box-now or
+ *   box-next stop). Real stops up to it are behind the car or answered by the option: one
+ *   skipped there (stay out where the real team boxed) is not made later.
+ * - The car makes the real stops after `answered` (their real laps, compounds and fills), less
+ *   the first few if it has already stopped more often than the real car had by then
+ *   (`playerStops`, counted from the takeover): an early stop stands in for the real one.
+ * - The race's rules come first, as a player is told them: if those stops leave the car short of
+ *   the two-compound rule or the minimum stops, the planner's legal plan (planRemainingStops)
+ *   is used instead. Fuel doesn't: a car that skipped a fill runs dry, as in live play.
+ * - Stops already queued on the car (a call made on an earlier lap, still to come: the real
+ *   call made the lap before the moment) stay and count as made: the real stops up to the last
+ *   of them are answered, and the remaining real stops follow it (the planner's legal plan, if
+ *   needed, only after it).
+ *
+ * Deterministic, and the same for every sample of an option.
+ */
+export function erasContinuation(run: Run, answered: number, playerStops: number): PitStop[] {
+  const { model, state } = run;
+  const user = state.cars[model.userSide];
+  if (!user || user.retired) return [];
+  const real = [...realOf(model, model.userSide)].sort((a, b) => a.lap - b.lap);
+  const { takeoverLap } = model.race;
+  // Stops already queued on the car are made; the continuation starts after the last of them.
+  const queued = user.strategy.filter((s) => s.lap > state.lap).sort((a, b) => a.lap - b.lap);
+  const from = Math.max(state.lap, ...queued.map((s) => s.lap));
+  const upTo = Math.max(answered, from);
+  const realMade = real.filter((s) => s.lap > takeoverLap && s.lap <= upTo).length;
+  const extra = Math.max(0, playerStops + queued.length - realMade);
+  const stops = real
+    .filter((s) => s.lap > upTo)
+    .slice(extra)
+    .map((s) => ({ ...s }));
+  // The rules: the car must end the race legal (two compounds, the minimum stops).
+  let compound = user.compound;
+  const used = [...user.compoundsUsed];
+  for (const s of [...queued, ...stops]) {
+    if (stopChangesTyres(model.rules, compound, s)) compound = s.to;
+    if (!used.includes(s.to)) used.push(s.to);
+  }
+  const after = {
+    compound,
+    compoundsUsed: used,
+    ...(user.stops !== undefined ? { stops: user.stops + queued.length + stops.length } : {}),
+  };
+  const legal =
+    ruleSatisfied(after as CarState, model.rules) && stopsOwed(model.rules, after) === 0;
+  return legal ? stops : planRemainingStops(run).filter((s) => s.lap > from);
+}
+
+/**
+ * The player's stops from the takeover to the end of lap `lap`, from the calls (one per pit
+ * call's out-lap; a forced stop, such as a puncture's, isn't counted).
+ */
+export function playerStopsBy(decisions: readonly Decision[], lap: number): number {
+  const outLaps = new Set<number>();
+  for (const d of decisions) if (d.kind === 'pit' && d.lap + 1 <= lap) outLaps.add(d.lap + 1);
+  return outLaps.size;
+}
+
+/**
+ * The grader's sensible-strategist continuation as a list of stops: planRemainingStop's one
+ * stop (or none), unless the car owes more than one stop for the race's minimum
+ * (rules.minStops), when it is the fastest plan of exactly that many stops
+ * (planOwedStops). Without the rule, exactly planRemainingStop.
+ */
+export function planRemainingStops(run: Run): PitStop[] {
+  const user = run.state.cars[run.model.userSide];
+  if (!user || user.retired) return [];
+  const owed = owedAfterPlan(run.model, user, run.state.lap);
+  if (owed > 1) return withinTank(run.model, user, planOwedStops(run, user, owed));
+  const stop = planRemainingStop(run);
+  return withinTank(run.model, user, stop ? [stop] : []);
+}
+
+/**
+ * A refuelling race (B3): the planned stops, plus the stops that keep every stint after one of
+ * them within the tank (refuel.ts fillCap), so a car that follows them reaches the flag. A
+ * stop fills to the next stop or the flag but never past the tank (refuelAtStop), so a stint
+ * longer than that would run dry: it is split evenly over the fewest stints the tank allows,
+ * each new stop fitting the tyre the stop before it fitted. The planner prices its stop as
+ * filling to the flag (tankPlanDelta); the stops added here only make that plan runnable. Any
+ * other race: the stops as they are.
+ */
+export function withinTank(model: RaceModel, car: CarState, stops: PitStop[]): PitStop[] {
+  if (!refuelling(model) || car.tank === undefined || !stops.length) return stops;
+  const cap = fillCap(model);
+  const laps = model.race.laps;
+  const sorted = [...stops].sort((a, b) => a.lap - b.lap);
+  const out: PitStop[] = [];
+  sorted.forEach((s, i) => {
+    out.push(s);
+    const stint = (sorted[i + 1]?.lap ?? laps + 1) - s.lap;
+    if (stint <= cap) return;
+    const n = Math.ceil(stint / cap);
+    const len = Math.ceil(stint / n);
+    for (let k = 1; k < n; k++) out.push({ lap: s.lap + k * len, to: s.to });
+  });
+  return out;
+}
+
+/**
+ * The fastest plan of exactly `k` more stops for `car` by the lap-time model (as
+ * predictedRemaining: no noise, traffic or rivals; known neutralizations skipped; the pit loss
+ * for each stop's flag), with the two-compound rule kept: a dynamic programme over (stops
+ * left, out-lap, rule met), O(k x laps^2 x compounds). The tank is left out: no race with a
+ * minimum refuels. Each stop fits new tyres. The earliest stops win a tie. Empty if no plan
+ * of `k` stops fits.
+ */
+function planOwedStops(run: Run, car: CarState, k: number): PitStop[] {
+  const { model, state } = run;
+  const known = knownNow(run);
+  const first = state.lap + 1;
+  const last = model.race.laps;
+  const n = last - first + 1;
+  if (n < k) return [];
+  const compounds = Object.keys(model.compounds).filter((c) => !illegalPitCompound(model, c));
+  const wearMult = modeWearMult(run, car);
+  const lapCost = (compound: string, wear: number, age: number, lap: number) => {
+    if (known.get(lap)) return 0;
+    const dry = tyreLapTime(model, car.basePace, compound, wear, lap) + freshTyreDelta(model, age);
+    const wet = wetnessOn(run.wetness, lap);
+    return dry * wetFactor(model.weather, compound, wet, car.wetPace ?? 0, car.dampPace);
+  };
+  const wearStep = (compound: string, lap: number) =>
+    (known.get(lap) ? 1 : wearMult) *
+    weatherWear(model.weather, compound, wetnessOn(run.wetness, lap));
+  // cur[i]: laps first..first+i-1 on the current set.
+  const cur = new Float64Array(n + 1);
+  {
+    let wear = car.tyreWear;
+    for (let i = 0; i < n; i++) {
+      const lap = first + i;
+      cur[i + 1] = (cur[i] as number) + lapCost(car.compound, wear, car.tyreAge + i, lap);
+      wear += wearStep(car.compound, lap);
+    }
+  }
+  // fresh[c][a][j]: laps a..a+j-1 on a new set of c fitted at out-lap a (index a - first).
+  const fresh = compounds.map((c) =>
+    Array.from({ length: n }, (_, ai) => {
+      const a = first + ai;
+      const t = new Float64Array(last - a + 2);
+      let wear = 0;
+      for (let j = 0; a + j <= last; j++) {
+        t[j + 1] = (t[j] as number) + lapCost(c, wear, j, a + j);
+        wear += wearStep(c, a + j);
+      }
+      return t;
+    }),
+  );
+  const loss = (outLap: number, to: string) => {
+    if (redFlagFree(run, outLap)) return 0;
+    const flag = known.get(outLap);
+    const { track } = model;
+    const base =
+      flag === 'sc' ? track.pitLossUnderSC : flag === 'vsc' ? track.pitLossUnderVSC : track.pitLoss;
+    return base + (pitLaneClosed(model, known, outLap, to) ? stopGoCost(model) : 0);
+  };
+  const meets = (met: boolean, c: string) =>
+    met ||
+    isWetTyre(c) ||
+    ((DRY_COMPOUNDS as readonly string[]).includes(c) && !car.compoundsUsed.includes(c));
+  // best[at(left, met, ai)]: the time from a stop at out-lap first+ai (its pit loss included)
+  // to the flag, with `left` more stops after it and the two-compound rule met (1) or not (0)
+  // before it; fit / next: that stop's compound index and the next stop's out-lap index.
+  const INF = Number.POSITIVE_INFINITY;
+  const at = (left: number, met: number, ai: number) => (left * 2 + met) * n + ai;
+  const best = new Float64Array(2 * k * n).fill(INF);
+  const fit = new Int32Array(2 * k * n).fill(-1);
+  const next = new Int32Array(2 * k * n).fill(-1);
+  for (let left = 0; left < k; left++) {
+    for (let ai = n - 1; ai >= 0; ai--) {
+      const a = first + ai;
+      for (let met = 0; met <= 1; met++) {
+        const i = at(left, met, ai);
+        compounds.forEach((c, ci) => {
+          const t = fresh[ci]?.[ai] as Float64Array;
+          const met2 = meets(met === 1, c) ? 1 : 0;
+          const pit = loss(a, c);
+          // The last stop runs to the flag; it must leave the two-compound rule met.
+          const ends = left === 0 ? [n] : Array.from({ length: n - ai - 1 }, (_, j) => ai + 1 + j);
+          for (const bi of ends) {
+            const rest = left === 0 ? (met2 ? 0 : INF) : (best[at(left - 1, met2, bi)] as number);
+            const total = pit + (t[bi - ai] as number) + rest;
+            if (total < (best[i] as number)) {
+              best[i] = total;
+              fit[i] = ci;
+              next[i] = bi;
+            }
+          }
+        });
+      }
+    }
+  }
+  // The first stop, after a stint on the current set.
+  let met = ruleSatisfied(car, model.rules) ? 1 : 0;
+  let ai = -1;
+  let bestT = INF;
+  for (let s = 0; s < n; s++) {
+    const total = (cur[s] as number) + (best[at(k - 1, met, s)] as number);
+    if (total < bestT) {
+      bestT = total;
+      ai = s;
+    }
+  }
+  const stops: PitStop[] = [];
+  for (let left = k - 1; left >= 0 && ai >= 0 && bestT < INF; left--) {
+    const i = at(left, met, ai);
+    const c = compounds[fit[i] as number] as string;
+    stops.push({ lap: first + ai, to: c });
+    met = meets(met === 1, c) ? 1 : 0;
+    ai = next[i] as number;
+  }
+  return stops;
+}
+
 /** True once the chequered flag has fallen. */
 export function isFinished(run: Run): boolean {
   return run.state.lap >= run.model.race.laps;
@@ -1182,6 +1936,7 @@ export function isFinished(run: Run): boolean {
 export function stepLap(run: Run): RaceState {
   const { model, state } = run;
   if (isFinished(run)) return state;
+  assertRivalReady(run);
   const lap = state.lap + 1;
   const flag = run.neutral.get(lap);
   applyDecisions(run, lap);
@@ -1196,6 +1951,12 @@ export function stepLap(run: Run): RaceState {
   pitted.clear();
   let battle: EngineerLap | null = null;
   for (const code of running) prevTime[code] = (cars[code] as CarState).totalTime;
+  if (run.storyline.length) storylineBeforeLap(run, lap, running, prevTime);
+  // The SC restart's jump and spread (scripted.ts; Eras race files carry track.restart).
+  const restart = track.restart && isRestartLap(run.neutral, run.red, lap) ? track.restart : null;
+  // An SC that picked up a car behind the leader (`pickup`): the cars ahead of it on the road
+  // run a racing lap on the SC's first lap (they are ahead of the safety car).
+  const front = flag === 'sc' ? scFront(running, run.scPickup.get(lap)) : new Set<string>();
 
   for (let i = 0; i < running.length; i++) {
     const code = running[i] as string;
@@ -1218,9 +1979,26 @@ export function stepLap(run: Run): RaceState {
         behind !== undefined
           ? (prevTime[behind] as number) - (prevTime[code] as number)
           : Number.POSITIVE_INFINITY;
-      if (gapBehind <= (stop.loss ?? stopCost(run, code, flag, false, lap))) {
+      // Era rules (minStops): never skipped when the rival needs it for the minimum. In a
+      // refuelling race it's never skipped either: the fill before it ran only to this stop,
+      // so skipping it would leave the car dry on the last laps.
+      const needed =
+        stopsOwed(model.rules, c) > c.strategy.length - 1 || model.rules?.refuelling === true;
+      if (
+        !needed &&
+        gapBehind <= (stopLoss(run, stop, lap) ?? stopCost(run, code, flag, false, lap))
+      ) {
         c.strategy.splice(stopIdx, 1);
         stopIdx = -1;
+      }
+    }
+    // Era rules (rules.ts): a stop-go owed for a closed pit lane is served on a green lap.
+    if (c.stopGo) {
+      const served = serveStopGo(c, flag, lap, model.race.laps);
+      if (served) {
+        pitCost += served;
+        pitted.add(code);
+        run.notes.push({ lap, kind: 'stop-go', driver: code, detail: 'served', value: served });
       }
     }
     if (stopIdx >= 0) {
@@ -1228,11 +2006,38 @@ export function stepLap(run: Run): RaceState {
       c.strategy.splice(stopIdx, 1);
       pitted.add(code);
       c.pittedThisLap = true;
-      c.compound = stop.to;
-      if (!c.compoundsUsed.includes(stop.to)) c.compoundsUsed.push(stop.to);
-      c.tyreAge = 0;
-      c.tyreWear = 0;
-      pitCost = stop.loss ?? stopCost(run, code, flag, stop.added === true, lap);
+      if (c.stops !== undefined) c.stops++; // era rules: minStops
+      // Pace by stint: the stint begun on this lap runs at the real one's offset if the real car
+      // began one here, else 0. The player's car in live play keeps its race-wide offset
+      // (playerStintOffset, set at the takeover).
+      if (!(run.live && code === model.userSide)) {
+        const offset = stintOffset(model, code, lap);
+        if (offset !== 0 || c.stintPace !== undefined) c.stintPace = offset;
+      }
+      // Era rules (rules.ts): with no tyre changes (2005) a stop keeps the set.
+      if (stopChangesTyres(model.rules, c.compound, stop)) {
+        c.compound = stop.to;
+        if (!c.compoundsUsed.includes(stop.to)) c.compoundsUsed.push(stop.to);
+        c.tyreAge = 0;
+        c.tyreWear = 0;
+      }
+      // A red flag's stoppage: the tyre change there is free (redflag.ts), the fill too.
+      const free = redFlagFree(run, lap);
+      if (!free) {
+        pitCost += stopLoss(run, stop, lap) ?? stopCost(run, code, flag, stop.added === true, lap);
+      }
+      // Refuelling (refuel.ts): fill for the next stint; the fill time over the base cost.
+      if (c.tank !== undefined) {
+        const fillTime = refuelAtStop(model, c, stop, lap, realOf(model, code));
+        if (!free) pitCost += fillTime;
+      }
+      // Era rules: an added stop into a closed pit lane (2007-08) owes a stop-go.
+      if (stop.added && pitLaneClosed(model, run.neutral, lap, stop.to)) {
+        const cost = stopGoCost(model);
+        c.stopGo = (c.stopGo ?? 0) + cost;
+        run.notes.push({ lap, kind: 'stop-go', driver: code, detail: 'owed', value: cost });
+        if (lap >= model.race.laps) pitCost += serveStopGo(c, flag, lap, model.race.laps);
+      }
       const eng = code === model.userSide ? state.engineer : undefined;
       if (eng && eng.damage > 0) {
         // A new nose on the stop: slower than a tyre change alone.
@@ -1242,6 +2047,20 @@ export function stepLap(run: Run): RaceState {
       }
     }
 
+    // A stop with no tyre change (a repair, a stop-go, a drive-through; Eras builds): whatever
+    // the car's strategy, it pays its measured loss on its real lap and keeps its set.
+    const service = serviceStopLoss(model, code, lap);
+    if (service !== undefined) {
+      pitted.add(code);
+      c.pittedThisLap = true;
+      if (!redFlagFree(run, lap)) pitCost += service;
+    }
+    // A car fault (faults.ts): its pace loss on green laps, its slow lap on its own lap.
+    const fault = faultCost(run.faults, code, lap, c.pittedThisLap, !flag);
+    if (fault.struck) run.notes.push({ lap, kind: 'fault', driver: code, detail: fault.struck });
+    // A contact (damage) lap: the car spun or ran off, so the pairs around it go to the time
+    // order like a stop's (it doesn't hold up the cars behind it).
+    if (fault.contact) pitted.add(code);
     const wet = wetnessOn(run.wetness, lap);
     const base = cleanLap(model, c, lap, wet);
     const eng = code === model.userSide && !flag ? state.engineer : undefined;
@@ -1251,14 +2070,16 @@ export function stepLap(run: Run): RaceState {
       ? 0
       : modeLapDelta(run, c) + (lapEng?.pace ?? 0) + fuelLapDelta(run, c, lap);
     let lt: number;
-    if (flag === 'sc' && scTime) lt = scTime;
+    if (front.has(code)) lt = base + run.rng.get(NOISE_STREAM, code).normal(c.noise);
+    else if (flag === 'sc' && scTime) lt = scTime;
     else if (flag === 'vsc' && vscTime) lt = vscTime;
     else if (flag === 'red' && green) lt = green;
     else {
       lt = base + run.rng.get(NOISE_STREAM, code).normal(c.noise);
       const ahead = i > 0 ? (running[i - 1] as string) : code;
       const aheadGap = c.totalTime - (prevTime[ahead] ?? c.totalTime);
-      if (aheadGap > 0 && aheadGap < DIRTY_AIR_RANGE) lt += track.dirtyAirPenalty;
+      lt += dirtyAirCost(track, aheadGap);
+      if (restart) lt += restartExtra(restart, i);
       lt += modeDelta + (lapEng?.extra ?? 0);
       const behind = running[i + 1];
       if (behind && holdingUp(run, code, behind)) {
@@ -1280,7 +2101,8 @@ export function stepLap(run: Run): RaceState {
         run.notes.push({ lap, kind: 'error', driver: code });
       }
     }
-    clean[code] = base + modeDelta;
+    lt += fault.pace + fault.extra;
+    clean[code] = base + modeDelta + fault.pace;
     c.totalTime += lt + pitCost;
     c.tyreAge += 1;
     c.tyreWear +=
@@ -1291,6 +2113,7 @@ export function stepLap(run: Run): RaceState {
       c.battery = Math.min(100, Math.max(0, c.battery + gain));
     }
     burnFuel(run, c, lap, !!flag);
+    if (c.tank !== undefined) burnRefuelTank(run, c, lap, !!flag);
   }
 
   if (run.incidents && !flag) incidents(run, lap, prevTime);
@@ -1302,6 +2125,7 @@ export function stepLap(run: Run): RaceState {
       c.retiredLap = lap;
     }
   }
+  if (run.storyline.length) storylineAfterLap(run, lap);
 
   if (flag) {
     // No overtaking under neutralization: sorting by total time moves only cars that pitted.
@@ -1312,26 +2136,94 @@ export function stepLap(run: Run): RaceState {
       // Deployment lap: gaps kept. Middle laps: SC_GAP_KEEP of the excess. Last lap: bunched.
       const keep = run.neutral.get(lap + 1) === 'sc' ? SC_GAP_KEEP : 0;
       bunch(
-        order,
+        keep > 0 ? queueBehind(order, run.scPickup.get(lap - 1)) : order,
         cars,
         green,
         keep,
-        model.race.scUnlap === 'duel' ? [model.userSide, model.rival] : null,
+        scQueue(model),
+        model.rules !== undefined,
+        run.lapsDown.get(lap),
       );
       state.order = [...sortByTime(order, cars), ...retiredInOrder(run)];
     }
   } else {
     resolveOrder(run, lap, clean, prevTime, pitted);
     applySwap(run, lap, prevTime);
+    if (run.orders.length) scriptedOrders(run, lap);
+  }
+  const wipe = run.red.wipes.get(lap);
+  if (wipe && run.neutral.get(wipe.redLap) === 'red') {
+    // No unlapping (scUnlap 'none'): the lapped cars line up where they are on the road.
+    const unlap = scQueue(model) !== 'none';
+    lineUp(live(run), cars, wipe.gap, unlap ? undefined : green, run.lapsDown.get(lap));
   }
   if (state.engineer) engineerAfterLap(run, lap, battle, prevTime, pitted);
+  const rivalBefore = rivalPlanBefore(run);
   rivalReacts(run, lap, flag, prevTime);
   rivalGoesLong(run, lap);
 
   state.lap = lap;
   state.flag = flag ?? 'green';
   markNextFlag(run);
+  rivalAfterLap(run, lap, rivalBefore);
   return state;
+}
+
+/** A green lap's scripted team orders and let-bys (scripted.ts), after its passes. */
+function scriptedOrders(run: Run, lap: number): void {
+  const swaps = applyTeamOrders(run.orders, run.state.cars, lap, run.model.race.laps, run.passedBy);
+  if (!swaps.length) return;
+  for (const [yielder, passer] of swaps) {
+    run.notes.push({ lap, kind: 'team-order', driver: passer, detail: yielder });
+  }
+  run.state.order = withRetired(run, sortByTime(live(run), run.state.cars));
+}
+
+/** Live play: the player's car at the start of the lap, and any storyline call judged now. */
+function storylineBeforeLap(
+  run: Run,
+  lap: number,
+  running: string[],
+  prevTime: Record<string, number>,
+): void {
+  const user = run.state.cars[run.model.userSide];
+  if (!user || user.retired) return;
+  const me = prevTime[user.code] as number;
+  const gaps: Record<string, number> = {};
+  for (const code of running) if (code !== user.code) gaps[code] = (prevTime[code] as number) - me;
+  run.storylineLaps.push({ lap, modes: { ...user.modes }, tyreAge: user.tyreAge, gaps });
+  for (const p of run.storyline) {
+    if (p.judgeLap === lap && p.met === undefined) {
+      p.met = conditionMet(p.condition, run.storylineLaps, lap);
+    }
+  }
+}
+
+/** Live play: a storyline retirement on its lap, if the player repeated the real call. */
+function storylineAfterLap(run: Run, lap: number): void {
+  const retire = (code: string) => {
+    const c = run.state.cars[code];
+    if (c && !c.retired) {
+      c.retired = true;
+      c.retiredLap = lap;
+    }
+  };
+  for (const p of run.storyline) {
+    if (p.lap === lap) {
+      const user = run.state.cars[run.model.userSide];
+      if (user && !user.retired) {
+        if (p.met) retire(user.code);
+        run.notes.push({
+          lap,
+          kind: 'storyline',
+          driver: run.model.userSide,
+          detail: p.met ? 'retired' : 'avoided',
+        });
+      }
+    }
+    if (!p.met) continue;
+    for (const [code, at] of p.linked) if (at === lap) retire(code);
+  }
 }
 
 /**
@@ -1340,7 +2232,7 @@ export function stepLap(run: Run): RaceState {
  * shifts another's. The chance of each grows with what provokes it: pushing (failures,
  * punctures), tyres past their cliff (punctures), attacking or defending in a fight
  * (crashes). A crash or a failure retires the car; a crash also brings out a SC or VSC from
- * the next lap (not in grader playouts, which sample those). A puncture costs a slow lap and
+ * the next lap (not in grader playouts, which sample those; none before 1993: allowedFlag). A puncture costs a slow lap and
  * forces a stop next lap onto the next planned compound (or mediums, or hards).
  */
 function incidents(run: Run, lap: number, prevTime: Record<string, number>): void {
@@ -1384,7 +2276,7 @@ function incidents(run: Run, lap: number, prevTime: Record<string, number>): voi
       const next = c.strategy.filter((st) => st.lap > lap).sort((a, b) => a.lap - b.lap)[0];
       const to = next?.to ?? forcedCompound(model, c, wetnessOn(run.wetness, lap));
       c.strategy = c.strategy.filter((st) => st !== next && st.lap !== lap + 1);
-      c.strategy.push({ lap: lap + 1, to, added: true });
+      c.strategy.push({ lap: lap + 1, to, added: true, damaged: true });
       continue;
     }
     c.retired = true;
@@ -1393,10 +2285,13 @@ function incidents(run: Run, lap: number, prevTime: Record<string, number>): voi
       const cfg = run.headset?.neutralization;
       const sc = rng.next() < rates.scShare;
       const from = lap + 1;
-      if (cfg && !run.neutral.has(from)) {
-        const laps = Math.min(sc ? cfg.scLaps : cfg.vscLaps, model.race.laps - from + 1);
+      // Era rules (rules.ts allowedFlag): before 1993 a crash brings out no SC or VSC (the draw
+      // above is still taken, so the streams don't move).
+      const flag = allowedFlag(model, sc ? 'sc' : 'vsc');
+      if (cfg && flag && !run.neutral.has(from)) {
+        const laps = Math.min(flag === 'sc' ? cfg.scLaps : cfg.vscLaps, model.race.laps - from + 1);
         // New arrays: forks share the parent's events until they change them.
-        run.events = [...run.events, { lap: from, laps, flag: sc ? 'sc' : 'vsc' }];
+        run.events = [...run.events, { lap: from, laps, flag }];
         run.neutral = neutralMap(run.events);
       }
     }
@@ -1413,7 +2308,7 @@ function forcedCompound(model: RaceModel, c: CarState, w = 0): string {
   // In the wet, the tyre for the track.
   if (model.weather && w >= 0.15) return w >= 0.6 && model.compounds.WET ? 'WET' : 'INTERMEDIATE';
   const prefs = ['MEDIUM', 'HARD', 'SOFT'].filter((x) => model.compounds[x]);
-  if (!ruleSatisfied(c)) {
+  if (!ruleSatisfied(c, model.rules)) {
     const fresh = prefs.find((x) => !c.compoundsUsed.includes(x));
     if (fresh) return fresh;
   }
@@ -1428,15 +2323,31 @@ function forcedCompound(model: RaceModel, c: CarState, w = 0): string {
  * a lap down, and on the last lap (keep 0) the lapped cars sitting between the user's car and
  * the rival are waved through to the back of the lead-lap queue. Mirrors _bunch in
  * sim_reference.py.
+ *
+ * An Eras race (`eras`: it has a rules block) closes a middle lap gap by gap (closeGaps, the
+ * fit of pipeline sc_queue.py). With scUnlap 'none' (no unlapping: before 2007 and 2010-11)
+ * the lapped cars stay in the queue where they are on the road, a lap down (bunchRoad).
+ * `known` (redflag.ts realLapsDown): the scripted cars' real laps down, which win over their
+ * gaps (roadOrder).
  */
 function bunch(
   live: string[],
   cars: Record<string, CarState>,
   lapTime: number | undefined,
   keep: number,
-  duel: [string, string] | null,
+  duel: [string, string] | 'none' | null,
+  eras = false,
+  known?: Map<string, number>,
 ): void {
   if (!live.length) return;
+  if (duel === 'none' && lapTime) {
+    bunchRoad(live, cars, lapTime, keep, eras, known);
+    return;
+  }
+  if (!duel && eras && keep > 0) {
+    closeGaps(live, cars);
+    return;
+  }
   if (!duel) {
     for (let i = 1; i < live.length; i++) {
       const ahead = cars[live[i - 1] as string] as CarState;
@@ -1446,15 +2357,19 @@ function bunch(
     }
     return;
   }
-  const len = lapTime ?? 0;
   const time = (c: string) => (cars[c] as CarState).totalTime;
   const lead = time(live[0] as string);
-  const down = new Map(live.map((c) => [c, len ? Math.floor((time(c) - lead) / len) : 0]));
-  const onTrack = new Map(live.map((c) => [c, time(c) - lead - (down.get(c) as number) * len]));
+  const { down, onRoad: onTrack } = lapTime
+    ? roadOrder(live, cars, lapTime, known)
+    : {
+        down: new Map(live.map((c) => [c, 0])),
+        onRoad: new Map(live.map((c) => [c, time(c) - lead])),
+      };
   const leadLap = live.filter((c) => down.get(c) === 0);
   let waved: string[] = [];
-  const [a, b] = duel;
-  if (keep === 0 && leadLap.includes(a) && leadLap.includes(b)) {
+  // scUnlap 'none' (rules.ts scQueue): the lead lap closes up and nobody is waved through.
+  const [a, b] = duel === 'none' ? ['', ''] : duel;
+  if (duel !== 'none' && keep === 0 && leadLap.includes(a) && leadLap.includes(b)) {
     const lo = Math.min(onTrack.get(a) as number, onTrack.get(b) as number);
     const hi = Math.max(onTrack.get(a) as number, onTrack.get(b) as number);
     waved = live
@@ -1476,6 +2391,54 @@ function bunch(
   for (const c of waved) {
     last += BUNCH_GAP;
     (cars[c] as CarState).totalTime = last;
+  }
+}
+
+/** An Eras middle SC lap: each gap over SC_QUEUE_SPACING keeps SC_QUEUE_KEEP of its excess,
+ * measured on the queue as it stood (sim_reference.py _close_gaps). */
+function closeGaps(live: string[], cars: Record<string, CarState>): void {
+  const old = live.map((c) => (cars[c] as CarState).totalTime);
+  for (let i = 1; i < live.length; i++) {
+    let gap = (old[i] as number) - (old[i - 1] as number);
+    if (gap > SC_QUEUE_SPACING) gap = SC_QUEUE_SPACING + SC_QUEUE_KEEP * (gap - SC_QUEUE_SPACING);
+    (cars[live[i] as string] as CarState).totalTime =
+      (cars[live[i - 1] as string] as CarState).totalTime + gap;
+  }
+}
+
+/** No unlapping (scUnlap 'none'): the whole queue closes up in road order, lapped cars where
+ * they are on the road, each keeping its laps down; the last lap (keep 0) is nose-to-tail
+ * (sim_reference.py _bunch_road). */
+function bunchRoad(
+  live: string[],
+  cars: Record<string, CarState>,
+  lapTime: number,
+  keep: number,
+  eras: boolean,
+  known?: Map<string, number>,
+): void {
+  const lead = (cars[live[0] as string] as CarState).totalTime;
+  const { road, down, onRoad } = roadOrder(live, cars, lapTime, known);
+  const placed = new Map<string, number>([
+    [road[0] as string, onRoad.get(road[0] as string) as number],
+  ]);
+  for (let i = 1; i < road.length; i++) {
+    const ahead = road[i - 1] as string;
+    const car = road[i] as string;
+    let gap = (onRoad.get(car) as number) - (onRoad.get(ahead) as number);
+    if (keep === 0) gap = BUNCH_GAP;
+    else if (eras) {
+      if (gap > SC_QUEUE_SPACING) gap = SC_QUEUE_SPACING + SC_QUEUE_KEEP * (gap - SC_QUEUE_SPACING);
+    } else {
+      gap =
+        BUNCH_GAP +
+        keep * Math.max(0, (onRoad.get(car) as number) - (placed.get(ahead) as number) - BUNCH_GAP);
+    }
+    placed.set(car, (placed.get(ahead) as number) + gap);
+  }
+  for (const c of live) {
+    (cars[c] as CarState).totalTime =
+      lead + (placed.get(c) as number) + (down.get(c) as number) * lapTime;
   }
 }
 
@@ -1788,6 +2751,30 @@ function engineerAfterLap(
  * against the car that passed it. Pairs involving a car that pitted this lap, or that
  * started further apart, are left to the natural time order.
  */
+function passShift(run: Run, lap: number, a: CarState, b: CarState): number {
+  return (
+    (effect(run, b, 'battle').attackLogit ?? 0) +
+    (effect(run, a, 'battle').defendLogit ?? 0) +
+    (effect(run, b, 'ers').attackLogit ?? 0) +
+    (effect(run, a, 'ers').defendLogit ?? 0) +
+    (holdingUp(run, a.code, b.code) ? (run.headset?.teamOrders?.holdUpLogit ?? 0) : 0) +
+    engineerShift(run, lap, a.code, b.code)
+  );
+}
+
+/**
+ * Seconds a car loses on a green lap it starts `gap` s behind the car ahead: by the file's
+ * dirtyAirBands (Eras builds of timed races), else dirtyAirPenalty within DIRTY_AIR_RANGE.
+ * Mirrors sim_reference.dirty_air_cost.
+ */
+export function dirtyAirCost(track: RaceModel['track'], gap: number): number {
+  if (!(gap > 0)) return 0;
+  const bands = track.dirtyAirBands;
+  if (bands === undefined) return gap < DIRTY_AIR_RANGE ? track.dirtyAirPenalty : 0;
+  for (const band of bands) if (gap < band.upTo) return band.penalty;
+  return 0;
+}
+
 function resolveOrder(
   run: Run,
   lap: number,
@@ -1796,22 +2783,31 @@ function resolveOrder(
   pitted: Set<string>,
 ): void {
   const overtake = run.model.track.overtakeModel;
+  const trainCoef = overtake.trainCoef;
+  // An Eras build (pipeline dirty_air.py) may hold a failed follower at its fitted heldGap.
+  const follow = overtake.heldGap ?? FOLLOW_GAP;
+  const rollOnly = overtake.rollOnly === true;
+  const won = new Set<string>();
   const cars = run.state.cars;
   const order = live(run);
+  const start = [...order];
   for (let i = 1; i < order.length; i++) {
     const a = cars[order[i - 1] as string] as CarState;
     const b = cars[order[i] as string] as CarState;
     if (pitted.has(a.code) || pitted.has(b.code)) continue;
     const gap = (prevTime[b.code] as number) - (prevTime[a.code] as number);
-    if (!(gap >= 0 && gap < PASS_WINDOW)) continue;
+    if (!(gap >= 0 && gap < PASS_WINDOW)) {
+      // rollOnly: from further back no roll, so no pass this lap.
+      if (rollOnly && gap >= PASS_WINDOW && b.totalTime < a.totalTime + follow)
+        b.totalTime = a.totalTime + follow;
+      continue;
+    }
     const advantage = (clean[a.code] as number) - (clean[b.code] as number);
-    const shift =
-      (effect(run, b, 'battle').attackLogit ?? 0) +
-      (effect(run, a, 'battle').defendLogit ?? 0) +
-      (effect(run, b, 'ers').attackLogit ?? 0) +
-      (effect(run, a, 'ers').defendLogit ?? 0) +
-      (holdingUp(run, a.code, b.code) ? (run.headset?.teamOrders?.holdUpLogit ?? 0) : 0) +
-      engineerShift(run, lap, a.code, b.code);
+    // An Eras model (trainCoef): the car ahead is harder to pass in a train (TRAIN_GAP).
+    const aheadGap =
+      i > 1 ? (prevTime[a.code] as number) - (prevTime[order[i - 2] as string] as number) : -1;
+    const train = trainCoef !== undefined && aheadGap >= 0 && aheadGap < TRAIN_GAP;
+    const shift = passShift(run, lap, a, b) + (train ? (trainCoef as number) : 0);
     // No roll (and no draw) while b is in its cooldown after being passed by a.
     const cooling = lap - (run.passedBy.get(`${b.code}>${a.code}`) ?? -1e9) <= REPASS_COOLDOWN;
     if (
@@ -1819,13 +2815,50 @@ function resolveOrder(
       run.rng.get(OVERTAKE_STREAM, b.code).next() < passProbability(overtake, advantage, gap, shift)
     ) {
       run.passedBy.set(`${a.code}>${b.code}`, lap);
+      won.add(`${a.code}>${b.code}`);
       if (b.totalTime >= a.totalTime) b.totalTime = a.totalTime - PASS_MARGIN;
-    } else if (b.totalTime < a.totalTime + FOLLOW_GAP) {
-      b.totalTime = a.totalTime + FOLLOW_GAP;
+    } else if (b.totalTime < a.totalTime + follow) {
+      b.totalTime = a.totalTime + follow;
     }
   }
+  if (rollOnly) noPassWithoutRoll(start, cars, pitted, won, follow);
   sortByTime(order, cars);
   run.state.order = withRetired(run, order);
+}
+
+/**
+ * rollOnly: a car that ends the lap ahead of one that started it ahead of it (neither pitting)
+ * without winning its roll against that car is held `follow` behind it, until no such pair is
+ * left. `start`: the start-of-lap order. Mirrors sim_reference._no_pass_without_roll.
+ */
+function noPassWithoutRoll(
+  start: string[],
+  cars: Record<string, CarState>,
+  pitted: Set<string>,
+  won: Set<string>,
+  follow: number,
+): void {
+  const idx = new Map(start.map((c, i) => [c, i]));
+  const time = (c: string) => (cars[c] as CarState).totalTime;
+  for (let n = 0; n < start.length * start.length; n++) {
+    const now = [...start].sort((p, q) => time(p) - time(q));
+    let moved = false;
+    for (let j = 1; j < now.length; j++) {
+      const y = now[j - 1] as string;
+      const x = now[j] as string;
+      if (
+        (idx.get(y) as number) > (idx.get(x) as number) &&
+        !pitted.has(x) &&
+        !pitted.has(y) &&
+        !won.has(`${x}>${y}`)
+      ) {
+        (cars[y] as CarState).totalTime = time(x) + follow;
+        moved = true;
+        break;
+      }
+    }
+    if (!moved) return;
+  }
 }
 
 /** Classification: finishers by time, then retirees (latest retirement first). */
@@ -1833,10 +2866,12 @@ function resolveOrder(
 export const DRY_COMPOUNDS = ['SOFT', 'MEDIUM', 'HARD'] as const;
 
 /**
- * Two-compound rule: in a dry race every car must run at least two different dry compounds.
- * (No modelled race is wet; wet tyres would waive it.)
+ * Two-compound rule: a car that hasn't run a wet tyre (intermediates or wets, at any point:
+ * before the takeover, on it at the takeover, or after) must run at least two different dry
+ * compounds. A car that has run one is free of it.
  */
-export function ruleSatisfied(car: CarState): boolean {
+export function ruleSatisfied(car: CarState, rules?: RaceModel['rules']): boolean {
+  if (!twoCompoundRule(rules)) return true; // era rules: no such rule before 2007
   // Running wet tyres waives the rule (weather spec W6).
   if (isWetTyre(car.compound) || car.compoundsUsed.some(isWetTyre)) return true;
   const dry = new Set(
@@ -1847,8 +2882,8 @@ export function ruleSatisfied(car: CarState): boolean {
 
 /**
  * Classification: finishers by time, then retirees (latest retirement first). In a live run
- * a car that reaches the flag without satisfying the two-compound rule is disqualified and
- * listed last, as in the real rules. Scripted real strategies always comply, so replays
+ * a car that reaches the flag without satisfying the two-compound rule, or short of the
+ * race's minimum stops (rules.minStops), is disqualified and listed last, as in the real rules. Scripted real strategies always comply, so replays
  * (and Python parity) are unaffected.
  */
 export function classify(run: Run): RaceResult {
@@ -1858,8 +2893,9 @@ export function classify(run: Run): RaceResult {
     car(run, c).totalTime + (penalty && c === run.model.userSide ? penalty : 0);
   const running = live(run).sort((a, b) => time(a) - time(b));
   const finished = isFinished(run);
-  const disqualified =
-    run.live && finished ? running.filter((c) => !ruleSatisfied(car(run, c))) : [];
+  const legalFinish = (c: string) =>
+    ruleSatisfied(car(run, c), run.model.rules) && stopsOwed(run.model.rules, car(run, c)) === 0;
+  const disqualified = run.live && finished ? running.filter((c) => !legalFinish(c)) : [];
   const finishers = running.filter((c) => !disqualified.includes(c));
   const retirees = retiredInOrder(run).sort(
     (a, b) => (car(run, b).retiredLap ?? 0) - (car(run, a).retiredLap ?? 0),
