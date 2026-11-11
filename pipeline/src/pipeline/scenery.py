@@ -160,6 +160,10 @@ CIRCUITS: dict[str, dict] = {
         "name": "Sochi",
         "centre": (43.4057, 39.9578),
         "length": 5848,
+        # most of the circuit is mapped as the Olympic Park's pedestrian ways (sport=motor),
+        # not as a raceway: without them the road fit settled on the street grid north-west
+        # of the park
+        "extra": True,
         "races": ["russia-2020", "russia-2021"],
         "light": "afternoon",
         "ground": "park",
@@ -188,7 +192,218 @@ CIRCUITS: dict[str, dict] = {
         "light": "afternoon",
         "ground": "dry",
     },
+    "adelaide": {
+        "name": "Adelaide",
+        "centre": (-34.9272, 138.6172),
+        "length": 3780,
+        "races": [],
+        "light": "summer",
+        "ground": "dry",
+    },
+    "baku": {
+        "name": "Baku",
+        "centre": (40.3725, 49.8533),
+        "length": 6003,
+        "races": [],
+        "light": "afternoon",
+        "ground": "dry",
+    },
+    "donington": {
+        "name": "Donington Park",
+        "centre": (52.8298, -1.3796),
+        "length": 4023,
+        "races": [],
+        "light": "overcast",
+        "ground": "park",
+    },
+    "estoril": {
+        "name": "Estoril",
+        "centre": (38.7508, -9.3942),
+        "length": 4349,
+        "races": [],
+        "light": "summer",
+        "ground": "dry",
+    },
+    "hockenheim": {
+        "name": "Hockenheim",
+        "centre": (49.3278, 8.5658),
+        "length": 4574,
+        # the old long layout's forest loop (gone since 2002) is in OSM as abandoned raceway:
+        # fit the old layouts to the raceway sections (the road fit turned them round onto
+        # the motorways and the town)
+        "extra": True,
+        "radius": 3200,  # the old Ostkurve is 2.3 km east of the centre
+        "layouts": {"hockenheimring-2": {"on": "raceway"}, "hockenheimring-3": {"on": "raceway"}},
+        "races": [],
+        "light": "afternoon",
+        "ground": "forest",
+    },
+    "imola": {
+        "name": "Imola",
+        "centre": (44.3411, 11.7133),
+        "length": 4909,
+        "races": [],
+        "light": "afternoon",
+        "ground": "park",
+    },
+    "indianapolis": {
+        "name": "Indianapolis",
+        "centre": (39.7983, -86.2328),
+        "length": 4192,
+        "races": [],
+        "light": "afternoon",
+        "ground": "park",
+    },
+    "interlagos": {
+        "name": "Interlagos",
+        "centre": (-23.7011, -46.6972),
+        "length": 4309,
+        "races": [],
+        "light": "afternoon",
+        "ground": "park",
+    },
+    "istanbul": {
+        "name": "Istanbul Park",
+        "centre": (40.9517, 29.4050),
+        "length": 5338,
+        "races": [],
+        "light": "afternoon",
+        "ground": "dry",
+    },
+    "jerez": {
+        "name": "Jerez",
+        "centre": (36.7083, -6.0342),
+        "length": 4428,
+        "races": [],
+        "light": "summer",
+        "ground": "dry",
+    },
+    "kyalami": {
+        "name": "Kyalami",
+        "centre": (-25.9986, 28.0689),
+        "length": 4104,
+        # the 1983 lap (4104 m) has no raceway cycle as long: the road fit took the motorway
+        # a kilometre north-east. Of the old lap only Sunset, Clubhouse and the Esses are
+        # still in today's (Wikipedia, Kyalami): fit it to those (OSM ways, Sunset to the
+        # Esses).
+        "layouts": {
+            "kyalami-1": {"on": "ways", "ways": list(range(1359379871, 1359379876))},
+        },
+        "races": [],
+        "light": "summer",
+        "ground": "dry",
+    },
+    "magny-cours": {
+        "name": "Magny-Cours",
+        "centre": (46.8632, 3.1642),
+        "length": 4411,
+        "races": [],
+        "light": "afternoon",
+        "ground": "park",
+    },
+    "marina-bay": {
+        "name": "Marina Bay",
+        "centre": (1.2915, 103.8638),
+        "length": 4940,
+        # OSM has only the pit straight and turns 1-3 as raceway: the road fit alone put the
+        # outline on the street grid north of Stamford Road. Fit it to those and the streets
+        # the circuit runs on (Wikipedia, Marina Bay Street Circuit).
+        "fit": {
+            "around": (1.2905, 103.857),
+            "reach": 400,
+            "streets": "raffles av|republic boulevard|raffles boulevard|nicoll|stamford road"
+            "|st\\.? andrew|connaught|fullerton road|esplanade drive|anderson bridge"
+            "|bayfront avenue|sheares",
+        },
+        # the 2014 layout (5065 m): fitted to the part of today's lap it shares (on the
+        # roads alone it went on the CBD's street grid, mirrored)
+        "layouts": {"marina-bay-2": {"on": "lap"}},
+        "races": [],
+        "light": "dusk",
+        "ground": "park",
+    },
+    "melbourne": {
+        "name": "Albert Park",
+        "centre": (-37.8497, 144.9683),
+        "length": 5278,
+        "races": [],
+        "light": "afternoon",
+        "ground": "park",
+    },
+    "monaco": {
+        "name": "Monaco",
+        "centre": (43.7347, 7.4206),
+        "length": 3337,
+        "races": [],
+        "light": "summer",
+        "ground": "dry",
+    },
+    "nurburgring": {
+        "name": "Nürburgring",
+        "centre": (50.3356, 6.9475),
+        "length": 5148,
+        "races": [],
+        "light": "overcast",
+        "ground": "forest",
+    },
+    "phoenix": {
+        "name": "Phoenix",
+        "centre": (33.4479, -112.0746),
+        "length": 3800,
+        # downtown's regular grid fits the outline on many blocks: the road fit alone chose
+        # one four blocks south. Pin it to the 1989-90 lap's place, its straights on
+        # Washington and Jefferson streets and turn 1 at Jefferson and Central.
+        "fit": {"around": (33.44798, -112.07131), "reach": 120, "turn": (-10, 10)},
+        "races": [],
+        "light": "afternoon",
+        "ground": "desert",
+    },
+    "sepang": {
+        "name": "Sepang",
+        "centre": (2.7606, 101.7375),
+        "length": 5543,
+        "races": [],
+        "light": "afternoon",
+        "ground": "park",
+    },
+    "silverstone": {
+        "name": "Silverstone",
+        "centre": (52.0786, -1.0169),
+        "length": 5891,
+        "races": [],
+        "light": "overcast",
+        "ground": "park",
+    },
+    "valencia": {
+        "name": "Valencia",
+        "centre": (39.4588, -0.3256),
+        "length": 5419,
+        # no raceway in OSM: the road fit alone settled on El Cabanyal's street grid, north
+        # of the harbour the circuit runs round
+        "fit": {"around": (39.457, -0.327), "reach": 400},
+        "races": [],
+        "light": "summer",
+        "ground": "dry",
+    },
 }
+
+# Every race's circuit, F1DB layout and official lap length (data/scenery/layouts.json, from
+# F1DB's race table): which races sit on each circuit's ground, and how long each one's lap is
+# (an older layout's differs from today's).
+LAYOUTS: dict[str, dict] = json.loads((paths.DATA_DIR / "scenery" / "layouts.json").read_text())
+
+
+def races_of(circuit: str) -> list[str]:
+    """The races on a circuit: its listed ones first (the first picks the lap), then the rest
+    of the layout table's, newest first."""
+    listed = CIRCUITS[circuit]["races"]
+    rest = sorted(
+        (r for r, x in LAYOUTS.items() if x["circuit"] == circuit and r not in listed),
+        key=lambda r: r.rsplit("-", 1)[1],
+        reverse=True,
+    )
+    return [*listed, *rest]
+
 
 RADIUS = 2600  # m around the centre to download
 MARGIN = 550  # m of scenery kept around the lap
@@ -252,10 +467,39 @@ def osm(circuit: str, lat: float, lon: float, radius: float = RADIUS) -> dict:
         'way["power"="line"]',
     ]
     q = "[out:json][timeout:180];(" + "".join(f"{k}({bb});" for k in keys) + ");out geom;"
-    body = _fetch(
-        OVERPASS, urllib.parse.urlencode({"data": q}).encode(), CACHE / f"{circuit}-osm.json"
-    )
+    name = f"{circuit}-osm.json" if radius == RADIUS else f"{circuit}-r{radius:.0f}-osm.json"
+    body = _fetch(OVERPASS, urllib.parse.urlencode({"data": q}).encode(), CACHE / name)
     return json.loads(body)
+
+
+EXTRA_RADIUS = 4500  # m: an old layout can reach well beyond today's lap (old Hockenheim)
+
+
+def osm_extra(circuit: str, lat: float, lon: float, radius: float = EXTRA_RADIUS) -> list[dict]:
+    """Circuit ways OSM doesn't tag as a raceway, retagged as one so the lap search and the
+    fits take them: ways tagged sport=motor (Sochi's circuit is mapped as the Olympic Park's
+    pedestrian ways) and a layout that's gone, mapped as abandoned:highway=raceway or
+    historic=raceway (old Hockenheim's forest loop)."""
+    dlat = radius / 110574
+    dlon = radius / (111320 * math.cos(math.radians(lat)))
+    bb = f"{lat - dlat},{lon - dlon},{lat + dlat},{lon + dlon}"
+    q = (
+        "[out:json][timeout:180];("
+        f'way["sport"="motor"]["highway"]["highway"!="raceway"]({bb});'
+        f'way["abandoned:highway"="raceway"]({bb});'
+        f'way["historic"="raceway"]({bb});'
+        ");out geom;"
+    )
+    body = _fetch(
+        OVERPASS, urllib.parse.urlencode({"data": q}).encode(), CACHE / f"{circuit}-extra.json"
+    )
+    return [
+        {**e, "tags": {**e["tags"], "highway": "raceway"}}
+        for e in json.loads(body)["elements"]
+        if e["type"] == "way"
+        and e["tags"].get("motor_vehicle") != "no"
+        and e["tags"].get("highway") != "raceway"
+    ]
 
 
 class Frame:
@@ -465,11 +709,30 @@ def align(game: np.ndarray, real: np.ndarray) -> tuple[np.ndarray, np.ndarray, f
     return M, t, float(d.mean())
 
 
-def road_points(elements: list[dict], frame: Frame, step: float = 4.0) -> np.ndarray:
-    """Points every `step` m along every road and raceway."""
+FOOT = re.compile(r"footway|path|cycleway|steps|pedestrian|bridleway|corridor|track")
+
+
+def road_points(
+    elements: list[dict],
+    frame: Frame,
+    step: float = 4.0,
+    vehicles: bool = False,
+    streets: str | None = None,
+) -> np.ndarray:
+    """Points every `step` m along every road and raceway (`vehicles`: not paths and
+    footways; `streets`: only the raceways and the roads whose name matches it)."""
     out: list[tuple[float, float]] = []
+    named = re.compile(streets, re.I) if streets else None
     for e in elements:
         if e["type"] != "way" or "highway" not in e.get("tags", {}):
+            continue
+        if vehicles and FOOT.fullmatch(e["tags"]["highway"]):
+            continue
+        if (
+            named
+            and e["tags"]["highway"] != "raceway"
+            and not named.search(e["tags"].get("name", ""))
+        ):
             continue
         pts = [frame.xz(p["lat"], p["lon"]) for p in e.get("geometry", [])]
         if len(pts) >= 2:
@@ -477,13 +740,37 @@ def road_points(elements: list[dict], frame: Frame, step: float = 4.0) -> np.nda
     return np.asarray(out, float)
 
 
+def _turn_ok(deg: float, turn: tuple[float, float] | None) -> bool:
+    """Whether a rotation (degrees) lies in the range `turn` (lo, hi), going round from lo."""
+    return turn is None or (deg - turn[0]) % 360 <= (turn[1] - turn[0]) % 360
+
+
+def _rot(deg: float) -> np.ndarray:
+    a = math.radians(deg)
+    return np.array([[math.cos(a), -math.sin(a)], [math.sin(a), math.cos(a)]])
+
+
 def align_to_roads(
-    game: np.ndarray, roads: np.ndarray, official: float, reach: float = 900.0
+    game: np.ndarray,
+    roads: np.ndarray,
+    official: float,
+    reach: float = 900.0,
+    *,
+    around: tuple[float, float] = (0.0, 0.0),
+    flips: tuple[int, ...] = (1, -1),
+    turn: tuple[float, float] | None = None,
+    need: float = 0.3,
+    rigid: bool = False,
 ) -> tuple[np.ndarray, np.ndarray, float]:
     """Fit the game's outline onto a road network (a circuit with no raceway lap): the scale
-    from the official length, then a search over mirror, rotation and position near the
-    centre for the fit that keeps the outline on the roads, refined on the near roads only.
-    Returns M, t (real ~ game @ M.T + t) and the mean distance left (m)."""
+    from the official length, then a search over mirror, rotation and position for the fit
+    that keeps the outline on the roads, refined on the near roads only. The search puts the
+    outline's middle within `reach` of `around` (m in the frame), with the mirrors in `flips`
+    and the rotations in `turn` (degrees, lo to hi) only: a venue whose streets would let the
+    outline sit on many blocks is pinned to the right one. `rigid` keeps the official size
+    in the refinement, and `need` is the share of the outline that must be on a road for it
+    to refine at all (a layout that has mostly gone: a small share).
+    Returns M, t (real ~ game @ M.T + t) and the median distance left (m)."""
     tree = cKDTree(roads)
     g_len = float(np.linalg.norm(np.diff(np.vstack([game, game[:1]]), axis=0), axis=1).sum())
     s = official / g_len
@@ -491,31 +778,50 @@ def align_to_roads(
     g0 = game - g_mu
     probe = g0[:: max(1, len(g0) // 240)]
     clip = 40.0
+    c0 = np.asarray(around, float)
+    grid = 60.0 if reach > 300 else max(10.0, reach / 6)
 
     def score(M: np.ndarray, t: np.ndarray, pts: np.ndarray) -> float:
         d, _ = tree.query(pts @ M.T + t)
         return float(np.minimum(d, clip).mean())
 
     best = (math.inf, None, None)
-    for flip in (1, -1):
+    for flip in flips:
         F = np.diag([1, flip])
         for deg in range(0, 360, 3):
-            a = math.radians(deg)
-            R = np.array([[math.cos(a), -math.sin(a)], [math.sin(a), math.cos(a)]])
-            M = s * R @ F
-            for dx in np.arange(-reach, reach + 1, 60.0):
-                for dz in np.arange(-reach, reach + 1, 60.0):
-                    t = np.array([dx, dz])
+            if not _turn_ok(deg, turn):
+                continue
+            M = s * _rot(deg) @ F
+            for dx in np.arange(-reach, reach + 1, grid):
+                for dz in np.arange(-reach, reach + 1, grid):
+                    t = c0 + np.array([dx, dz])
                     v = score(M, t, probe)
                     if v < best[0]:
                         best = (v, M, t)
     _, M, t = best
-    # Finer around the best, then least squares on the near points (a road within 15 m).
+    if rigid:
+        # a partial fit has no near roads all round to pull it in: search finer round the best
+        F = np.diag([1, np.sign(np.linalg.det(M))])
+        R0 = M @ F / s
+        deg0 = math.degrees(math.atan2(R0[1, 0], R0[0, 0]))
+        t0 = t
+        for ddeg in np.arange(-3, 3.01, 0.5):
+            if not _turn_ok((deg0 + ddeg) % 360, turn):
+                continue
+            Mc = s * _rot(deg0 + ddeg) @ F
+            for dx in np.arange(-40, 41, 8.0):
+                for dz in np.arange(-40, 41, 8.0):
+                    tc = t0 + np.array([dx, dz])
+                    v = score(Mc, tc, g0)
+                    if v < best[0]:
+                        best = (v, Mc, tc)
+        _, M, t = best
+    # Least squares on the near points (a road within 15 m).
     for _ in range(40):
         moved = g0 @ M.T + t
         d, idx = tree.query(moved)
         near = d < 15
-        if near.sum() < len(g0) * 0.3:
+        if near.sum() < len(g0) * need:
             break
         A, B = g0[near], roads[idx[near]]
         am, bm = A.mean(0), B.mean(0)
@@ -524,12 +830,161 @@ def align_to_roads(
         U, S, Vt = np.linalg.svd(Af.T @ (B - bm))
         D = np.diag([1, np.sign(np.linalg.det(U @ Vt))])
         R = (U @ D @ Vt).T
-        scale = (S * np.diag(D)).sum() / (Af**2).sum()
+        scale = s if rigid else (S * np.diag(D)).sum() / (Af**2).sum()
         M = scale * R @ F
         t = bm - am @ M.T
     t = t - g_mu @ M.T
     d, _ = tree.query(game @ M.T + t)
     return M, t, float(np.median(d))
+
+
+def _road_kw(hint: dict, frame: Frame) -> dict:
+    """A circuit's `fit` hint as align_to_roads' search limits, in the frame's metres."""
+    kw: dict = {k: hint[k] for k in ("reach", "turn", "flips") if k in hint}
+    if "around" in hint:
+        kw["around"] = frame.xz(*hint["around"])
+    return kw
+
+
+def _hint_roads(elements: list[dict], hint: dict, frame: Frame) -> np.ndarray:
+    """The road points a venue's fit uses: vehicle roads (only the raceways and the streets
+    the circuit runs on, with the hint's `streets`), within its `near` metres of its `around`
+    when it has one."""
+    pts = road_points(elements, frame, vehicles=True, streets=hint.get("streets"))
+    return _near(pts, hint, frame)
+
+
+def _near(pts: np.ndarray, hint: dict, frame: Frame) -> np.ndarray:
+    """The road points within the hint's `near` metres of its `around` (all without one)."""
+    if "near" not in hint:
+        return pts
+    c = np.asarray(frame.xz(*hint["around"]))
+    return pts[np.linalg.norm(pts - c, axis=1) <= hint["near"]]
+
+
+def fit_hint(circuit: str, race_id: str) -> dict:
+    """The fit hint for a race: its circuit's `fit`, with its layout's entry over it."""
+    cfg = CIRCUITS[circuit]
+    layout = LAYOUTS.get(race_id, {}).get("layout")
+    return {**cfg.get("fit", {}), **cfg.get("layouts", {}).get(layout, {})}
+
+
+FIT_NEAR = 12.0  # m: a point of the outline this close to real tarmac counts as on it
+SIZE_SLACK = 0.08  # a fit may scale the outline this far from its official length
+
+
+def _refine(
+    game: np.ndarray, M: np.ndarray, t: np.ndarray, tree: cKDTree, pts: np.ndarray
+) -> tuple[np.ndarray, np.ndarray]:
+    """Robust least squares (the outline's points within 25 m of a real road or raceway only):
+    a layout that has partly gone keeps its fit on the part that's still there."""
+    F = np.diag([1, np.sign(np.linalg.det(M))])
+    for reach in (40.0, 25.0, 25.0, 15.0, 15.0, 15.0):
+        d, idx = tree.query(game @ M.T + t)
+        near = d < reach
+        if near.sum() < len(game) * 0.25:
+            break
+        A, B = game[near] @ F.T, pts[idx[near]]
+        am, bm = A.mean(0), B.mean(0)
+        U, S, Vt = np.linalg.svd((A - am).T @ (B - bm))
+        D = np.diag([1, np.sign(np.linalg.det(U @ Vt))])
+        R = (U @ D @ Vt).T
+        scale = (S * np.diag(D)).sum() / ((A - am) ** 2).sum()
+        M = scale * R @ F
+        t = bm - (game[near] @ F.T).mean(0) @ (scale * R).T
+    return M, t
+
+
+def fit_race(
+    game: np.ndarray,
+    lap: list[tuple[float, float]],
+    edges: list[dict],
+    elements: list[dict],
+    frame: Frame,
+    length: float,
+    found: dict,
+    hint: dict | None = None,
+) -> dict:
+    """A race's outline placed on the real ground, and how well it sits there. Tried in turn,
+    keeping the best: today's lap; any raceway lap as long as this race's own (an older
+    layout); the road network (a street circuit, or a layout that's gone). Each fit is then
+    refined on every road and raceway nearby. `err` is the median distance from the outline to
+    real tarmac (m), `cover` the share of it within FIT_NEAR, `scale` the outline's length over
+    the official one (1 when its shape is true to size).
+
+    `hint` (the circuit's `fit`, with its layout's entry in `layouts` over it) pins a venue
+    where the search alone finds the wrong place: the road fit's search is limited to it
+    (`_road_kw`), and an `on` hint fits the outline only to part of the real ground ("lap":
+    today's lap, "raceway": every raceway section, "ways": the OSM ways listed in `ways`), at
+    its official size, for a layout of which only some still stands (old Hockenheim, whose
+    forest loop OSM keeps as abandoned raceway; Kyalami's 1983 lap)."""
+    hint = hint or {}
+    if found["roads"] is None:
+        pts = _hint_roads(elements, hint, frame)
+        found["roads"] = (pts, cKDTree(pts))
+    pts, tree = found["roads"]
+    g_len = float(np.linalg.norm(np.diff(np.vstack([game, game[:1]]), axis=0), axis=1).sum())
+
+    def judge(M: np.ndarray, t: np.ndarray, how: str, refine: bool = True) -> dict:
+        if refine:
+            M, t = _refine(game, M, t, tree, pts)
+        d, _ = tree.query(game @ M.T + t)
+        s = math.sqrt(abs(np.linalg.det(M)))
+        return {
+            "M": M,
+            "t": t,
+            "err": float(np.median(d)),
+            "cover": float((d < FIT_NEAR).mean()),
+            "scale": g_len * s / length,
+            "how": how,
+        }
+
+    def sized(a: dict) -> bool:
+        # true to its official length: a fit that shrinks or stretches the outline to sit on
+        # some other lap (old Hockenheim's 6.8 km on today's 4.6 km) isn't the right place
+        return abs(a["scale"] - 1) <= SIZE_SLACK
+
+    def better(a: dict, b: dict | None) -> bool:
+        return b is None or (sized(a), a["cover"], -a["err"]) > (sized(b), b["cover"], -b["err"])
+
+    real = resample(lap, SAMPLE, closed=True)
+    if hint.get("on"):
+        if hint["on"] == "raceway":
+            target = np.vstack([resample(e["pts"], SAMPLE, closed=False) for e in edges])
+        elif hint["on"] == "ways":
+            target = np.vstack(
+                [
+                    resample([frame.xz(q["lat"], q["lon"]) for q in e["geometry"]], SAMPLE, False)
+                    for e in elements
+                    if e["type"] == "way" and e["id"] in hint["ways"]
+                ]
+            )
+        else:
+            target = real
+        M, t, _ = align_to_roads(
+            game, target, length, need=0.1, rigid=True, **_road_kw(hint, frame)
+        )
+        return judge(M, t, "partial", refine=False)
+    M, t, _ = align(game, real)
+    best = judge(M, t, "lap")
+    if best["cover"] < 0.95:
+        key = round(length / 25)
+        if key not in found["cycles"]:
+            found["cycles"][key] = lap_cycles(edges, length, budget=600_000, keep=60)
+        for cyc in found["cycles"][key][:60]:
+            cp: list[tuple[float, float]] = []
+            for e in cyc:
+                cp += e["pts"] if not cp else e["pts"][1:]
+            M, t, _ = align(game, resample(cp, SAMPLE, closed=True))
+            cand = judge(M, t, "layout")
+            if better(cand, best):
+                best = cand
+    if best["cover"] < 0.85 or not sized(best):
+        M, t, _ = align_to_roads(game, pts, length, **_road_kw(hint, frame))
+        cand = judge(M, t, "roads")
+        if better(cand, best):
+            best = cand
+    return best
 
 
 def fraction_table(
@@ -674,13 +1129,15 @@ def build(circuit: str) -> dict:
     cfg = CIRCUITS[circuit]
     lat0, lon0 = cfg["centre"]
     frame = Frame(lat0, lon0)
-    data = osm(circuit, lat0, lon0)
+    data = osm(circuit, lat0, lon0, cfg.get("radius", RADIUS))
     E = data["elements"]
+    if cfg.get("extra"):
+        E = E + osm_extra(circuit, lat0, lon0)
 
     # The lap: the cycle matching the official length and the game's outline best.
     edges = raceway_edges(E, frame)
     cycles = lap_cycles(edges, cfg["length"])
-    first_race = cfg["races"][0]
+    first_race = races_of(circuit)[0]
     outline = json.loads((paths.DATA_DIR / "tracks" / f"{first_race}.json").read_text())
     game = resample([tuple(p) for p in outline["points"]], 2, closed=True)
     lap_pts: list[tuple[float, float]] = []
@@ -702,14 +1159,37 @@ def build(circuit: str) -> dict:
             bridge_pts += [e["bridge"]] * len(add)
     else:
         # No lap tagged as a raceway (Sochi runs on the Olympic Park's roads): the game's own
-        # outline, fitted onto the real roads, stands in for it.
-        M, t, err = align_to_roads(game, road_points(E, frame), cfg["length"])
+        # outline, fitted onto the real roads, stands in for it. Vehicle roads only (as
+        # fit_race): with the footways in, Albert Park's outline settled on the street grid
+        # west of the park instead of the lake road.
+        hint = fit_hint(circuit, first_race)
+        M, t, err = align_to_roads(
+            game,
+            _hint_roads(E, hint, frame),
+            cfg["length"],
+            **_road_kw({k: v for k, v in hint.items() if k != "on"}, frame),
+        )
         lap_pts = [tuple(p) for p in (game @ M.T + t)]
         bridge_pts = [False] * len(lap_pts)
 
-    # Scenery box round the lap, in a frame whose origin is its corner.
-    xs = [p[0] for p in lap_pts]
-    zs = [p[1] for p in lap_pts]
+    # Each race's outline on the real ground (fit_race), before the box: an older layout can
+    # reach beyond today's lap.
+    fits: dict[str, dict] = {}
+    found = {"cycles": {}, "roads": None}
+    for race_id in races_of(circuit):
+        f = paths.DATA_DIR / "tracks" / f"{race_id}.json"
+        if not f.exists():
+            continue
+        o = json.loads(f.read_text())
+        g = resample([tuple(p) for p in o["points"]], 2, closed=True)
+        length = LAYOUTS.get(race_id, {}).get("length", cfg["length"])
+        fit = fit_race(g, lap_pts, edges, E, frame, length, found, fit_hint(circuit, race_id))
+        fits[race_id] = {"o": o, "g": g, **fit}
+
+    # Scenery box round the lap and every race's outline, in a frame whose origin is its corner.
+    placed = [lap_pts] + [list(map(tuple, x["g"] @ x["M"].T + x["t"])) for x in fits.values()]
+    xs = [p[0] for pts in placed for p in pts]
+    zs = [p[1] for pts in placed for p in pts]
     X0, Z0 = min(xs) - MARGIN, min(zs) - MARGIN
     X1, Z1 = max(xs) + MARGIN, max(zs) + MARGIN
     shift = lambda p: (p[0] - X0, p[1] - Z0)  # noqa: E731
@@ -941,24 +1421,25 @@ def build(circuit: str) -> dict:
                         ]
                     )
             continue
-        if closed:
+        # a closed path (the cycleway round Albert Park Lake) is a ring, not an area: its
+        # surface tag would fill the lake with gravel
+        if closed and (tg.get("area") == "yes" or tg.get("highway") is None):
             kind = area_kind(tg)
             if kind:
                 areas.setdefault(kind, []).append(R(simplify(pts, 1.5)))
 
     # Each race on this circuit: its outline lined up with the lap, and the fraction table.
     races = {}
-    for race_id in cfg["races"]:
-        f = paths.DATA_DIR / "tracks" / f"{race_id}.json"
-        if not f.exists():
-            continue
-        o = json.loads(f.read_text())
-        g = resample([tuple(p) for p in o["points"]], 2, closed=True)
-        M, tt, e2 = align(g, lap)
+    for race_id, x in fits.items():
+        o, M = x["o"], x["M"]
+        tt = x["t"] - np.array([X0, Z0])
         races[race_id] = {
             "m": [round(float(v), 6) for v in M.ravel()],
             "t": [round(float(v), 3) for v in tt],
-            "err": round(e2, 2),
+            "err": round(x["err"], 2),
+            "cover": round(x["cover"], 3),
+            "how": x["how"],
+            "scale": round(x["scale"], 4),
             "frac": fraction_table(np.asarray(o["points"], float), lap, M, tt),
             "corners": [
                 [c[0], *[round(float(v), 1) for v in (np.asarray(c[1:]) @ M.T + tt)]]
