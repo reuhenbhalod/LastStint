@@ -78,8 +78,8 @@ describe('pool races: Daily and Gauntlet grades are frozen', () => {
     samples: number;
     hashes: Record<string, string>;
   };
-  it('covers all 39 pool races', () => {
-    expect(ids).toHaveLength(39);
+  it('covers all 40 pool races', () => {
+    expect(ids).toHaveLength(40);
     expect(Object.keys(recorded.hashes).sort()).toEqual(ids);
     expect(recorded.samples).toBe(SAMPLES);
   });

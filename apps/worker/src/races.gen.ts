@@ -125,20 +125,21 @@ import e82 from '../../../data/races/singapore-2014.json';
 import e83 from '../../../data/races/south-africa-1983.json';
 import e84 from '../../../data/races/spain-1994.json';
 import e85 from '../../../data/races/spain-1996.json';
+import r33 from '../../../data/races/spain-2013.json';
 import e86 from '../../../data/races/spain-2016.json';
 import e87 from '../../../data/races/spain-2017.json';
-import r33 from '../../../data/races/spain-2020.json';
-import r34 from '../../../data/races/spain-2023.json';
-import r35 from '../../../data/races/styria-2020.json';
+import r34 from '../../../data/races/spain-2020.json';
+import r35 from '../../../data/races/spain-2023.json';
+import r36 from '../../../data/races/styria-2020.json';
 import e88 from '../../../data/races/styria-2021.json';
 import e89 from '../../../data/races/turkey-2008.json';
 import e90 from '../../../data/races/turkey-2020.json';
 import e91 from '../../../data/races/turkey-2021.json';
 import e92 from '../../../data/races/united-states-1990.json';
 import e93 from '../../../data/races/united-states-2014.json';
-import r36 from '../../../data/races/united-states-2019.json';
-import r37 from '../../../data/races/united-states-2022.json';
-import r38 from '../../../data/races/united-states-2023.json';
+import r37 from '../../../data/races/united-states-2019.json';
+import r38 from '../../../data/races/united-states-2022.json';
+import r39 from '../../../data/races/united-states-2023.json';
 
 export const RACE_FILES: Record<string, unknown> = {
   'abu-dhabi-2020': r0,
@@ -174,12 +175,13 @@ export const RACE_FILES: Record<string, unknown> = {
   'russia-2020': r30,
   'russia-2021': r31,
   'saudi-arabia-2025': r32,
-  'spain-2020': r33,
-  'spain-2023': r34,
-  'styria-2020': r35,
-  'united-states-2019': r36,
-  'united-states-2022': r37,
-  'united-states-2023': r38,
+  'spain-2013': r33,
+  'spain-2020': r34,
+  'spain-2023': r35,
+  'styria-2020': r36,
+  'united-states-2019': r37,
+  'united-states-2022': r38,
+  'united-states-2023': r39,
 };
 
 /** Eras races in no Daily or Gauntlet pool that have a race file (served by the Eras API). */

@@ -54,8 +54,8 @@ function digest(model: RaceModel): string {
 }
 
 describe('Daily and Gauntlet grades are frozen', () => {
-  it('lists the 39 pool races, none of them an Eras race file', () => {
-    expect(ids.length).toBe(39);
+  it('lists the 40 pool races, none of them an Eras race file', () => {
+    expect(ids.length).toBe(40);
     for (const id of ids) expect(erasRace(race(id)), id).toBe(false);
   });
 
