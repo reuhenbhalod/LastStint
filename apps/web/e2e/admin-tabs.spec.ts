@@ -278,7 +278,7 @@ test('every admin tab opens and shows its content', async ({ page }) => {
   await expect(page.getByRole('cell', { name: 'Fast Ann ann@example.com' })).toBeVisible();
   await page.getByRole('button', { name: 'Open Daily run by Fast Ann' }).click();
   const runPanel = page.getByRole('region', { name: 'Run' });
-  await expect(runPanel).toContainText('sc-stop');
+  await expect(runPanel).toContainText('SC stop');
   await runPanel.getByRole('button', { name: 'Re-verify', exact: true }).click();
   expect(posted.at(-1)).toEqual({
     path: '/api/admin/runs/reverify',
