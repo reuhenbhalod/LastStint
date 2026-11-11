@@ -1,7 +1,7 @@
 [
   {
-    "id": "stop-21",
-    "lap": 21,
+    "id": "stop-20",
+    "lap": 20,
     "trigger": "cliff",
     "target": {
       "kind": "beat-rival"
@@ -17,7 +17,7 @@
         "label": "Box, softs",
         "decisions": [
           {
-            "lap": 21,
+            "lap": 20,
             "kind": "pit",
             "compound": "SOFT"
           }
@@ -28,7 +28,7 @@
         "label": "Box, hards",
         "decisions": [
           {
-            "lap": 21,
+            "lap": 20,
             "kind": "pit",
             "compound": "HARD"
           }
@@ -39,18 +39,18 @@
         "label": "Box next lap, hards",
         "decisions": [
           {
-            "lap": 22,
+            "lap": 21,
             "kind": "pit",
             "compound": "HARD"
           }
         ]
       }
     ],
-    "realOptionId": "box-hard"
+    "realOptionId": "box-next-hard"
   },
   {
-    "id": "pace-32",
-    "lap": 32,
+    "id": "pace-36",
+    "lap": 36,
     "trigger": "cliff",
     "target": {
       "kind": "beat-rival"
@@ -61,7 +61,7 @@
         "label": "Push now",
         "decisions": [
           {
-            "lap": 32,
+            "lap": 36,
             "kind": "mode",
             "key": "pace",
             "value": "push"
@@ -73,7 +73,7 @@
         "label": "Standard pace",
         "decisions": [
           {
-            "lap": 32,
+            "lap": 36,
             "kind": "mode",
             "key": "pace",
             "value": "standard"
@@ -85,7 +85,7 @@
         "label": "Manage the tyres",
         "decisions": [
           {
-            "lap": 32,
+            "lap": 36,
             "kind": "mode",
             "key": "pace",
             "value": "manage"
@@ -97,13 +97,78 @@
         "label": "Push and attack",
         "decisions": [
           {
-            "lap": 32,
+            "lap": 36,
             "kind": "mode",
             "key": "pace",
             "value": "push"
           },
           {
-            "lap": 32,
+            "lap": 36,
+            "kind": "mode",
+            "key": "battle",
+            "value": "attack"
+          }
+        ]
+      }
+    ],
+    "realOptionId": null
+  },
+  {
+    "id": "pace-40",
+    "lap": 40,
+    "trigger": "cliff",
+    "target": {
+      "kind": "beat-rival"
+    },
+    "options": [
+      {
+        "id": "push",
+        "label": "Push now",
+        "decisions": [
+          {
+            "lap": 40,
+            "kind": "mode",
+            "key": "pace",
+            "value": "push"
+          }
+        ]
+      },
+      {
+        "id": "standard",
+        "label": "Standard pace",
+        "decisions": [
+          {
+            "lap": 40,
+            "kind": "mode",
+            "key": "pace",
+            "value": "standard"
+          }
+        ]
+      },
+      {
+        "id": "manage",
+        "label": "Manage the tyres",
+        "decisions": [
+          {
+            "lap": 40,
+            "kind": "mode",
+            "key": "pace",
+            "value": "manage"
+          }
+        ]
+      },
+      {
+        "id": "push-attack",
+        "label": "Push and attack",
+        "decisions": [
+          {
+            "lap": 40,
+            "kind": "mode",
+            "key": "pace",
+            "value": "push"
+          },
+          {
+            "lap": 40,
             "kind": "mode",
             "key": "battle",
             "value": "attack"
@@ -169,71 +234,6 @@
           },
           {
             "lap": 44,
-            "kind": "mode",
-            "key": "battle",
-            "value": "attack"
-          }
-        ]
-      }
-    ],
-    "realOptionId": null
-  },
-  {
-    "id": "pace-48",
-    "lap": 48,
-    "trigger": "cliff",
-    "target": {
-      "kind": "beat-rival"
-    },
-    "options": [
-      {
-        "id": "push",
-        "label": "Push now",
-        "decisions": [
-          {
-            "lap": 48,
-            "kind": "mode",
-            "key": "pace",
-            "value": "push"
-          }
-        ]
-      },
-      {
-        "id": "standard",
-        "label": "Standard pace",
-        "decisions": [
-          {
-            "lap": 48,
-            "kind": "mode",
-            "key": "pace",
-            "value": "standard"
-          }
-        ]
-      },
-      {
-        "id": "manage",
-        "label": "Manage the tyres",
-        "decisions": [
-          {
-            "lap": 48,
-            "kind": "mode",
-            "key": "pace",
-            "value": "manage"
-          }
-        ]
-      },
-      {
-        "id": "push-attack",
-        "label": "Push and attack",
-        "decisions": [
-          {
-            "lap": 48,
-            "kind": "mode",
-            "key": "pace",
-            "value": "push"
-          },
-          {
-            "lap": 48,
             "kind": "mode",
             "key": "battle",
             "value": "attack"
