@@ -3,6 +3,7 @@
 // rules the tabs share: how an era's release reads, which pools a race is in, how a log entry
 // reads. The types copy the Worker's; keep the two in step.
 
+import { type MomentTrigger, VERSUS_CARS, VERSUS_TRACKS } from '@laststint/sim';
 import { shortDate } from './players.js';
 import { adminCall } from './session.js';
 
@@ -22,7 +23,7 @@ export interface AdminToday {
   days: { today: TodayDay | null; tomorrow: TodayDay | null };
   queue: { days: number; low: boolean; warnUnder: number };
   stale: TodayDay[];
-  runs: { total: number; verified: number; corrected: number; disqualified: number };
+  runs: { total: number; verified: number; corrected: number; unverified: number };
 }
 
 export interface Announcement {
@@ -34,6 +35,16 @@ export interface Announcement {
 }
 
 export const getToday = () => adminCall<AdminToday>('/api/admin/today');
+
+/** An ISO time as the rest of the admin page shows it: '2026-11-12 06:00 UTC'. */
+export function utcText(iso: string): string {
+  return `${new Date(iso).toISOString().replace('T', ' ').slice(0, 16)} UTC`;
+}
+
+/** A datetime-local value ('2026-11-12T06:00'), read as UTC, as an ISO time. */
+export function utcInput(value: string): string {
+  return new Date(`${value}:00Z`).toISOString();
+}
 export const repinDays = () =>
   adminCall<{ repinned: string[]; skipped: string[] }>('/api/admin/repin', {});
 export const setAnnouncement = (a: { text: string; tone: string; endsAt: string | null }) =>
@@ -69,6 +80,18 @@ export const publishRace = (raceId: string, published: boolean) =>
   adminCall('/api/admin/eras/race', { raceId, published });
 export const releaseEra = (eraId: number, at: string | null, confirm = false) =>
   adminCall('/api/admin/eras/release', { eraId, at, ...(confirm ? { confirm: true } : {}) });
+
+/**
+ * Whether setting `date` (YYYY-MM-DD, midnight UTC) would move an era that is out now to a later
+ * day, taking it from players until then. The Worker asks for confirmation for this too.
+ */
+export function releaseMovesLater(
+  era: Pick<AdminEra, 'status'>,
+  date: string,
+  now: number,
+): boolean {
+  return era.status === 'released' && Date.parse(`${date}T00:00:00Z`) > now;
+}
 
 /** "Coming soon", "Releases on 1 Jan 2027" or "Released". */
 export function eraStatusText(era: Pick<AdminEra, 'status' | 'releasedAt'>): string {
@@ -158,8 +181,9 @@ export const getRun = (mode: RunMode, id: string) =>
   adminCall<RunDetail>(`/api/admin/runs/${mode}/${encodeURIComponent(id)}`);
 export const reverifyRun = (mode: RunMode, id: string) =>
   adminCall<{ marked: number }>('/api/admin/runs/reverify', { mode, id });
-export const reverifyDay = (date: string) =>
-  adminCall<{ marked: number }>('/api/admin/runs/reverify', { date });
+/** Every run submitted on the day (UTC), in every mode or just `mode`. */
+export const reverifyDay = (date: string, mode?: RunMode) =>
+  adminCall<{ marked: number }>('/api/admin/runs/reverify', { date, ...(mode ? { mode } : {}) });
 export const deleteRun = (id: string) => adminCall('/api/admin/runs/delete', { id });
 
 /** How a run's check reads: corrected, checked, or waiting for the nightly check. */
@@ -213,6 +237,36 @@ export interface LiveRoom {
 
 export const getVersus = () =>
   adminCall<{ matches: VersusMatch[]; rooms: LiveRoom[] }>('/api/admin/versus');
+
+/** A Versus track's or car's display name ('monza' reads Monza), or the id if it's unknown. */
+export const trackName = (id: string) => VERSUS_TRACKS.find((t) => t.id === id)?.name ?? id;
+export const carName = (id: string) => VERSUS_CARS.find((c) => c.id === id)?.name ?? id;
+
+const PHASES: Record<string, string> = {
+  lobby: 'Waiting for a player',
+  pick: 'Picking cars',
+  race: 'Racing',
+  grading: 'Grading',
+  done: 'Finished',
+};
+/** A live room's phase as words. */
+export const phaseText = (phase: string) => PHASES[phase] ?? phase;
+
+const TRIGGERS: Record<MomentTrigger, string> = {
+  SC: 'Safety car',
+  VSC: 'Virtual safety car',
+  RED: 'Red flag',
+  preRed: 'Before the red flag',
+  rivalPit: 'Rival pits',
+  undercut: 'Undercut window',
+  cliff: 'Tyre cliff',
+  rain: 'Rain',
+  drying: 'Track drying',
+  fault: 'Car fault',
+  teamOrder: 'Team order',
+};
+/** What set off a decision moment, as words ('cliff' reads Tyre cliff). */
+export const triggerText = (t: string) => TRIGGERS[t as MomentTrigger] ?? t;
 
 /** "Alex won by 1.4 s", "Sam won (Alex left)", or "No result". */
 export function matchResult(m: VersusMatch): string {
@@ -324,7 +378,7 @@ export function logSummary(e: Pick<LogEntry, 'action' | 'detail'>): string {
         ? `Era ${s(d.eraId)} releases ${s(d.to)}`
         : `Era ${s(d.eraId)} back to Coming soon`;
     case 'reverify':
-      return `${s(d.marked)} marked for the nightly check (${d.date ? `day ${s(d.date)}` : `${s(d.mode)} ${s(d.id)}`})`;
+      return `${s(d.marked)} marked for the nightly check (${d.date ? `${d.mode ? `${s(d.mode)} runs, ` : ''}day ${s(d.date)}` : `${s(d.mode)} ${s(d.id)}`})`;
     case 'delete-run':
       return `Daily run ${s(d.id)} on ${s(d.date)} deleted`;
     case 'player-name':
@@ -365,13 +419,11 @@ export function poolsOf(raceId: string, pools: Pools): string[] {
   return out;
 }
 
-/** The race's fit on the real ground: median distance, and the share on real tarmac if known. */
-export function fitText(fit: { err?: number; cover?: number } | null): string {
+/**
+ * The race's fit on the real ground: the median distance from the real track. The share on real
+ * tarmac the spec asks for isn't in the data yet (the scenery pipeline writes only the median).
+ */
+export function fitText(fit: { err?: number } | null): string {
   if (!fit || typeof fit.err !== 'number') return 'No ground fit yet.';
-  const parts = [`median ${fit.err.toFixed(1)} m from the real track`];
-  // A share (0-1); a value over 1 is read as a percentage already.
-  if (typeof fit.cover === 'number') {
-    parts.push(`${pct(fit.cover > 1 ? fit.cover / 100 : fit.cover)} on real tarmac`);
-  }
-  return parts.join(', ');
+  return `median ${fit.err.toFixed(1)} m from the real track (tarmac share not in the data yet)`;
 }

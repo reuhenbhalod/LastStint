@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { apiGet } from '../api.js';
 import { ErrorLine, Heading, NoteLine, Tile, useAction } from './Notice.js';
 import { errorText } from './tickets.js';
-import { btn, danger, field, primary } from './ui.js';
+import { btn, danger, field, inlineField, primary } from './ui.js';
 import {
   type AdminToday,
   type Announcement,
@@ -14,6 +14,8 @@ import {
   getToday,
   repinDays,
   setAnnouncement,
+  utcInput,
+  utcText,
 } from './v2.js';
 
 function DayCard({ label, day }: { label: string; day: TodayDay | null }) {
@@ -67,7 +69,7 @@ function AnnouncementForm() {
               {current.text}{' '}
               <span className="text-[var(--muted)]">
                 ({current.tone === 'warning' ? 'warning' : 'info'}
-                {current.endsAt ? `, until ${new Date(current.endsAt).toLocaleString()}` : ''})
+                {current.endsAt ? `, until ${utcText(current.endsAt)}` : ''})
               </span>
             </span>
             <button
@@ -96,7 +98,7 @@ function AnnouncementForm() {
             await setAnnouncement({
               text,
               tone,
-              endsAt: ends ? new Date(ends).toISOString() : null,
+              endsAt: ends ? utcInput(ends) : null,
             });
             setText('');
             setEnds('');
@@ -120,19 +122,19 @@ function AnnouncementForm() {
             <select
               value={tone}
               onChange={(e) => setTone(e.target.value as 'info' | 'warning')}
-              className={`${field} w-auto`}
+              className={inlineField}
             >
               <option value="info">Info</option>
               <option value="warning">Warning</option>
             </select>
           </label>
           <label className="flex flex-col gap-1 text-[13px] text-[var(--muted)]">
-            Ends (optional)
+            Ends (UTC, optional)
             <input
               type="datetime-local"
               value={ends}
               onChange={(e) => setEnds(e.target.value)}
-              className={`${field} w-auto`}
+              className={inlineField}
             />
           </label>
           <button type="submit" className={primary} disabled={busy || !text.trim()}>
@@ -187,7 +189,7 @@ export function TodayPage() {
               <Tile label="Runs today" value={data.runs.total} />
               <Tile label="Verified" value={data.runs.verified} />
               <Tile label="Corrected" value={data.runs.corrected} warn={data.runs.corrected > 0} />
-              <Tile label="Disqualified" value={data.runs.disqualified} />
+              <Tile label="Not verified yet" value={data.runs.unverified} />
             </dl>
             {data.queue.low && (
               <p className="m-0 text-[14px] text-[var(--flag)]">

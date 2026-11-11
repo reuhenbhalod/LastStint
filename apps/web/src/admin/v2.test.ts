@@ -4,15 +4,22 @@ import { TABS, adminTab } from './AdminPage.js';
 import {
   type Pools,
   type VersusMatch,
+  carName,
   checkText,
   eraStatusText,
   fitText,
   logSummary,
   matchResult,
   pct,
+  phaseText,
   poolsOf,
   releaseBlock,
+  releaseMovesLater,
   runsQuery,
+  trackName,
+  triggerText,
+  utcInput,
+  utcText,
 } from './v2.js';
 
 describe('admin tabs', () => {
@@ -88,6 +95,14 @@ describe('Versus', () => {
     ...m,
   });
 
+  it('shows tracks, cars and phases by name, not id', () => {
+    expect(trackName('monza')).toBe('Monza');
+    expect(trackName('nowhere')).toBe('nowhere');
+    expect(carName('bullet')).toBe('Bullet');
+    expect(phaseText('race')).toBe('Racing');
+    expect(phaseText('pick')).toBe('Picking cars');
+  });
+
   it('says who won and how', () => {
     expect(matchResult(match({}))).toBe('Alex won by 1.4 s');
     expect(matchResult(match({ winner: 1, forfeit: 0, gap: null }))).toBe('Sam won (Alex left)');
@@ -106,6 +121,9 @@ describe('Log', () => {
     expect(logSummary({ action: 'reverify', detail: { date: '2026-11-11', marked: 4 } })).toBe(
       '4 marked for the nightly check (day 2026-11-11)',
     );
+    expect(
+      logSummary({ action: 'reverify', detail: { date: '2026-11-11', mode: 'eras', marked: 2 } }),
+    ).toBe('2 marked for the nightly check (eras runs, day 2026-11-11)');
     expect(logSummary({ action: 'hide', detail: { id: 'p1', hidden: true } })).toBe(
       'p1 hidden from leaderboards',
     );
@@ -129,15 +147,34 @@ describe('race preview', () => {
     expect(poolsOf('nowhere-1950', p)).toEqual([]);
   });
 
-  it('reads the ground fit, with or without the tarmac share', () => {
+  it('reads the ground fit, and says the tarmac share isn’t in the data yet', () => {
     expect(fitText(null)).toBe('No ground fit yet.');
-    expect(fitText({ err: 3.42 })).toBe('median 3.4 m from the real track');
-    expect(fitText({ err: 3.42, cover: 0.913 })).toBe(
-      'median 3.4 m from the real track, 91% on real tarmac',
-    );
-    expect(fitText({ err: 2, cover: 88 })).toBe(
-      'median 2.0 m from the real track, 88% on real tarmac',
+    expect(fitText({ err: 3.42 })).toBe(
+      'median 3.4 m from the real track (tarmac share not in the data yet)',
     );
     expect(pct(0.5)).toBe('50%');
+  });
+
+  it('names what set off each moment', () => {
+    expect(triggerText('cliff')).toBe('Tyre cliff');
+    expect(triggerText('VSC')).toBe('Virtual safety car');
+    expect(triggerText('something-new')).toBe('something-new');
+  });
+});
+
+describe('Eras release dates', () => {
+  const now = Date.parse('2026-11-11T12:00:00Z');
+  it('knows when a date would take a released era from players', () => {
+    expect(releaseMovesLater({ status: 'released' }, '2026-12-01', now)).toBe(true);
+    expect(releaseMovesLater({ status: 'released' }, '2026-11-01', now)).toBe(false);
+    expect(releaseMovesLater({ status: 'scheduled' }, '2026-12-01', now)).toBe(false);
+    expect(releaseMovesLater({ status: 'coming-soon' }, '2026-12-01', now)).toBe(false);
+  });
+});
+
+describe('announcement times', () => {
+  it('reads and shows the end time in UTC, like the rest of the admin page', () => {
+    expect(utcText('2026-11-12T06:00:00.000Z')).toBe('2026-11-12 06:00 UTC');
+    expect(utcInput('2026-11-12T06:00')).toBe('2026-11-12T06:00:00.000Z');
   });
 });

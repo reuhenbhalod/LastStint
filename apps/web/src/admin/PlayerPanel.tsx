@@ -5,11 +5,17 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { ErrorLine, NoteLine, Tile, useAction } from './Notice.js';
-import { RunsTable } from './RunsPage.js';
+import { RunPanel, RunsTable } from './RunsPage.js';
 import { shortDate } from './players.js';
 import { errorText } from './tickets.js';
 import { btn, danger, field, primary } from './ui.js';
-import { type PlayerDetail, getPlayer, setPlayerHidden, setPlayerName } from './v2.js';
+import {
+  type AdminRun,
+  type PlayerDetail,
+  getPlayer,
+  setPlayerHidden,
+  setPlayerName,
+} from './v2.js';
 
 export function PlayerPanel({
   id,
@@ -22,6 +28,7 @@ export function PlayerPanel({
 }) {
   const [p, setP] = useState<PlayerDetail | null>(null);
   const [name, setName] = useState('');
+  const [open, setOpen] = useState<AdminRun | null>(null);
   const load = useCallback(async () => {
     const got = await getPlayer(id);
     setP(got);
@@ -146,7 +153,16 @@ export function PlayerPanel({
 
           <div className="flex flex-col gap-2">
             <h3 className="m-0 text-[14px] font-semibold">Runs</h3>
-            <RunsTable runs={p.runs} />
+            {open && (
+              <RunPanel
+                key={`${open.mode}-${open.id}`}
+                mode={open.mode}
+                id={open.id}
+                onChanged={after}
+                onClose={() => setOpen(null)}
+              />
+            )}
+            <RunsTable runs={p.runs} open={open?.id} onOpen={setOpen} hidePlayer />
           </div>
         </>
       )}

@@ -1,8 +1,9 @@
 // The race preview on the Schedule tab (docs/admin-v2-spec.md A5): a playable race's map on
-// its real ground, how well it fits the ground (data/scenery: the median distance and the share
-// on real tarmac), its moments and real calls, its seed and side, and its pools. Opens without
-// starting a race. The scenery files are big, so each circuit's loads only when previewed; a
-// race without a fit, or a fit without `cover` / `how`, just shows less.
+// its real ground, how well it fits the ground (the median distance from the real track, from
+// data/basemap/index.json, or the circuit's scenery file when it has the race), its moments and
+// real calls, its seed and side, and its pools. Opens without starting a race. The scenery files
+// are big, so each circuit's loads only when previewed. The spec's share on real tarmac isn't in
+// the data yet (pipeline/src/pipeline/scenery.py writes only the median), so the line says so.
 
 import type { RaceModel } from '@laststint/sim';
 import { useEffect, useState } from 'react';
@@ -10,12 +11,10 @@ import basemap from '../../../../data/basemap/index.json';
 import pools from '../../../../data/pools.json';
 import { CircuitCard } from '../components/CircuitCard.js';
 import { btn } from './ui.js';
-import { type Pools, fitText, poolsOf } from './v2.js';
+import { type Pools, fitText, poolsOf, triggerText } from './v2.js';
 
 interface Fit {
   err?: number;
-  cover?: number;
-  how?: string;
 }
 
 const SCENERY = import.meta.glob<Record<string, Fit>>('../../../../data/scenery/*.json', {
@@ -24,7 +23,7 @@ const SCENERY = import.meta.glob<Record<string, Fit>>('../../../../data/scenery/
 
 const BASEMAP = basemap as { races: Record<string, { circuit: string; err?: number }> };
 
-/** The race's fit: the basemap index's median distance, and the scenery file's cover and how. */
+/** The race's fit: the median distance, from the scenery file when it has the race. */
 function useFit(raceId: string): Fit | null {
   const base = BASEMAP.races[raceId];
   const [fit, setFit] = useState<Fit | null>(base ? { err: base.err } : null);
@@ -37,7 +36,7 @@ function useFit(raceId: string): Fit | null {
     load().then(
       (races) => {
         const r = races?.[raceId];
-        if (alive && r) setFit({ err: r.err ?? b.err, cover: r.cover, how: r.how });
+        if (alive && r) setFit({ err: r.err ?? b.err });
       },
       () => {},
     );
@@ -66,10 +65,7 @@ export function RacePreview({ model, onClose }: { model: RaceModel; onClose: () 
       </div>
       <dl className="m-0 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-[13px]">
         <dt className="text-[var(--muted)]">Ground fit</dt>
-        <dd className="m-0">
-          {fitText(fit)}
-          {fit?.how ? ` (${fit.how})` : ''}
-        </dd>
+        <dd className="m-0">{fitText(fit)}</dd>
         <dt className="text-[var(--muted)]">Seed</dt>
         <dd className="m-0 tabular-nums">{model.race.seed}</dd>
         <dt className="text-[var(--muted)]">Side</dt>
@@ -88,7 +84,7 @@ export function RacePreview({ model, onClose }: { model: RaceModel; onClose: () 
         {model.decisionMoments.map((m) => (
           <li key={m.id} className="rounded-md bg-[var(--card-2)] px-2.5 py-1.5">
             <div className="font-semibold">
-              Lap {m.lap} · {m.trigger}
+              Lap {m.lap} · {triggerText(m.trigger)}
             </div>
             <div className="text-[var(--muted)]">
               {m.options

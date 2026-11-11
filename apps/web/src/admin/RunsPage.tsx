@@ -1,8 +1,9 @@
 // The admin page's Runs tab (/admin/runs, docs/admin-v2-spec.md A3): search runs by date,
-// player or mode; open one to see its calls and grades; mark one run (or every daily run on the
-// day) for the nightly check; delete a daily run. RunsTable is shared with a player's page.
+// player or mode; open one to see its calls and grades; mark one run (or every run on the day,
+// in the searched mode) for the nightly check; delete a daily run. RunsTable and RunPanel are
+// shared with a player's page.
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ErrorLine, Heading, NoteLine, useAction } from './Notice.js';
 import { errorText } from './tickets.js';
 import { btn, danger, field, primary } from './ui.js';
@@ -33,20 +34,25 @@ export function RunsTable({
   runs,
   open,
   onOpen,
+  hidePlayer = false,
 }: {
   runs: AdminRun[];
   open?: string | null;
   onOpen?: (r: AdminRun) => void;
+  /** On a player's own page, where every row is the same player. */
+  hidePlayer?: boolean;
 }) {
   if (runs.length === 0) return <p className="m-0 text-[14px] text-[var(--muted)]">No runs.</p>;
   return (
     <div className="overflow-x-auto rounded-lg border border-[var(--rule)]">
-      <table className="w-full text-left text-[13px]">
+      <table
+        className={`w-full ${hidePlayer ? 'min-w-[32rem]' : 'min-w-[44rem]'} text-left text-[13px]`}
+      >
         <thead className="text-[var(--muted)]">
           <tr className="border-b border-[var(--rule)]">
             <th className="px-3 py-2 font-semibold">When</th>
             <th className="px-3 py-2 font-semibold">Mode</th>
-            <th className="px-3 py-2 font-semibold">Player</th>
+            {!hidePlayer && <th className="px-3 py-2 font-semibold">Player</th>}
             <th className="px-3 py-2 font-semibold">Race</th>
             <th className="px-3 py-2 text-right font-semibold">Score</th>
             <th className="px-3 py-2 font-semibold">Result</th>
@@ -63,14 +69,16 @@ export function RunsTable({
                 {r.date}
                 <div className="text-[11px] text-[var(--muted)]">{r.at.slice(11, 16)} UTC</div>
               </td>
-              <td className="px-3 py-2">{MODE_LABELS[r.mode]}</td>
-              <td className="px-3 py-2">
-                <div className="font-semibold">{r.name}</div>
-                <div className="text-[11px] text-[var(--muted)]">
-                  {r.player ? r.player.email || r.player.name : 'not signed in'}
-                </div>
-              </td>
-              <td className="px-3 py-2">{r.raceName || '—'}</td>
+              <td className="px-3 py-2 whitespace-nowrap">{MODE_LABELS[r.mode]}</td>
+              {!hidePlayer && (
+                <td className="px-3 py-2">
+                  <div className="font-semibold">{r.name}</div>
+                  <div className="text-[11px] text-[var(--muted)]">
+                    {r.player ? r.player.email || r.player.name : 'not signed in'}
+                  </div>
+                </td>
+              )}
+              <td className="min-w-[10rem] px-3 py-2">{r.raceName || '—'}</td>
               <td className="px-3 py-2 text-right tabular-nums">
                 {r.score === null ? '—' : Math.round(r.score * 10) / 10}
               </td>
@@ -132,20 +140,25 @@ function Calls({ calls }: { calls: RunDetail['calls'] }) {
   );
 }
 
-function RunPanel({
+export function RunPanel({
   mode,
   id,
   onChanged,
+  onClose,
 }: {
   mode: RunMode;
   id: string;
   onChanged: () => Promise<void>;
+  onClose: () => void;
 }) {
   const [detail, setDetail] = useState<RunDetail | null>(null);
+  // Once the run is deleted there's nothing to reload: the panel says so and offers Close.
+  const [deleted, setDeleted] = useState(false);
+  const gone = useRef(false);
   const load = useCallback(async () => setDetail(await getRun(mode, id)), [mode, id]);
   const after = useCallback(async () => {
     await onChanged();
-    await load().catch(() => setDetail(null));
+    if (!gone.current) await load().catch(() => setDetail(null));
   }, [onChanged, load]);
   const { busy, note, error, setError, run } = useAction(after);
   useEffect(() => {
@@ -155,9 +168,16 @@ function RunPanel({
   const r = detail?.run;
   return (
     <section className="card flex flex-col gap-3" aria-label="Run">
+      <div className="flex justify-end">
+        <button type="button" className={btn} onClick={onClose}>
+          Close
+        </button>
+      </div>
       <ErrorLine text={error} />
       <NoteLine text={note} />
-      {!r ? (
+      {deleted ? (
+        <p className="m-0 text-[14px] text-[var(--muted)]">This run was deleted.</p>
+      ) : !r ? (
         !error && <p className="m-0 text-[14px] text-[var(--muted)]">Loading the run…</p>
       ) : (
         <>
@@ -195,6 +215,8 @@ function RunPanel({
                     return;
                   run(async () => {
                     await deleteRun(r.id);
+                    gone.current = true;
+                    setDeleted(true);
                     return 'Run deleted.';
                   });
                 }}
@@ -226,20 +248,25 @@ function RunPanel({
 
 export function RunsPage() {
   const [q, setQ] = useState<RunSearch>({ date: utcToday(), player: '', mode: '' });
+  // The search behind the list on screen (q is the form, which may have changed since).
+  const [shown, setShown] = useState<RunSearch>(q);
   const [runs, setRuns] = useState<AdminRun[] | null>(null);
   const [limit, setLimit] = useState(200);
   const [open, setOpen] = useState<AdminRun | null>(null);
-  const load = useCallback(async () => {
-    const r = await searchRuns(q);
+  const search = useCallback(async (s: RunSearch) => {
+    const r = await searchRuns(s);
     setRuns(r.runs);
     setLimit(r.limit);
-  }, [q]);
+    setShown(s);
+  }, []);
+  const load = useCallback(() => search(shown), [search, shown]);
   const { busy, note, error, setError, run } = useAction(load);
   // The first search; later ones run from the Search button.
   // biome-ignore lint/correctness/useExhaustiveDependencies: only on opening the tab
   useEffect(() => {
-    load().catch((e) => setError(errorText(e)));
+    search(q).catch((e) => setError(errorText(e)));
   }, []);
+  const dayModes = shown.mode ? `${MODE_LABELS[shown.mode]} ` : '';
 
   return (
     <section className="flex flex-col gap-4">
@@ -249,7 +276,7 @@ export function RunsPage() {
         onSubmit={(e) => {
           e.preventDefault();
           setOpen(null);
-          load().catch((err) => setError(errorText(err)));
+          search(q).catch((err) => setError(errorText(err)));
         }}
       >
         <label className="flex flex-col gap-1 text-[13px] text-[var(--muted)]">
@@ -295,26 +322,33 @@ export function RunsPage() {
       </p>
       <ErrorLine text={error} />
       <NoteLine text={note} />
-      {q.date && (q.mode === '' || q.mode === 'daily') && (
+      {shown.date && (
         <div>
           <button
             type="button"
             className={btn}
             disabled={busy}
             onClick={() => {
-              if (!confirm(`Mark every daily run on ${q.date} for the nightly check?`)) return;
+              const { date, mode } = shown;
+              if (!confirm(`Mark every ${dayModes}run on ${date} for the nightly check?`)) return;
               run(async () => {
-                const m = await reverifyDay(q.date);
-                return `Marked ${m.marked} daily runs on ${q.date} for the nightly check.`;
+                const m = await reverifyDay(date, mode || undefined);
+                return `Marked ${m.marked} ${dayModes}runs on ${date} for the nightly check.`;
               });
             }}
           >
-            Re-verify every daily run on {q.date}
+            Re-verify every {dayModes}run on {shown.date}
           </button>
         </div>
       )}
       {open && (
-        <RunPanel key={`${open.mode}-${open.id}`} mode={open.mode} id={open.id} onChanged={load} />
+        <RunPanel
+          key={`${open.mode}-${open.id}`}
+          mode={open.mode}
+          id={open.id}
+          onChanged={load}
+          onClose={() => setOpen(null)}
+        />
       )}
       {runs ? (
         <RunsTable runs={runs} open={open?.id} onOpen={setOpen} />

@@ -6,7 +6,15 @@ import { useCallback, useEffect, useState } from 'react';
 import { ErrorLine, Heading } from './Notice.js';
 import { errorText } from './tickets.js';
 import { btn } from './ui.js';
-import { type LiveRoom, type VersusMatch, getVersus, matchResult } from './v2.js';
+import {
+  type LiveRoom,
+  type VersusMatch,
+  carName,
+  getVersus,
+  matchResult,
+  phaseText,
+  trackName,
+} from './v2.js';
 
 const time = (iso: string) => iso.replace('T', ' ').slice(0, 16);
 
@@ -45,7 +53,7 @@ export function VersusAdminPage() {
             <p className="m-0 text-[14px] text-[var(--muted)]">No rooms open now.</p>
           ) : (
             <div className="overflow-x-auto rounded-lg border border-[var(--rule)]">
-              <table className="w-full text-left text-[13px]">
+              <table className="w-full min-w-[36rem] text-left text-[13px]">
                 <thead className="text-[var(--muted)]">
                   <tr className="border-b border-[var(--rule)]">
                     <th className="px-3 py-2 font-semibold">Code</th>
@@ -60,8 +68,8 @@ export function VersusAdminPage() {
                   {data.rooms.map((r) => (
                     <tr key={r.code} className="border-b border-[var(--rule)] last:border-b-0">
                       <td className="px-3 py-2 font-semibold">{r.code}</td>
-                      <td className="px-3 py-2">{r.track}</td>
-                      <td className="px-3 py-2">{r.phase}</td>
+                      <td className="px-3 py-2 whitespace-nowrap">{trackName(r.track)}</td>
+                      <td className="px-3 py-2 whitespace-nowrap">{phaseText(r.phase)}</td>
                       <td className="px-3 py-2">{r.players.join(', ') || '—'}</td>
                       <td className="px-3 py-2 text-right tabular-nums">{r.lap}</td>
                       <td className="px-3 py-2 whitespace-nowrap">{time(r.openedAt)}</td>
@@ -77,7 +85,7 @@ export function VersusAdminPage() {
             <p className="m-0 text-[14px] text-[var(--muted)]">No finished matches yet.</p>
           ) : (
             <div className="overflow-x-auto rounded-lg border border-[var(--rule)]">
-              <table className="w-full text-left text-[13px]">
+              <table className="w-full min-w-[44rem] text-left text-[13px]">
                 <thead className="text-[var(--muted)]">
                   <tr className="border-b border-[var(--rule)]">
                     <th className="px-3 py-2 font-semibold">Finished (UTC)</th>
@@ -93,16 +101,18 @@ export function VersusAdminPage() {
                     <tr key={m.id} className="border-b border-[var(--rule)] last:border-b-0">
                       <td className="px-3 py-2 whitespace-nowrap">{time(m.finishedAt)}</td>
                       <td className="px-3 py-2 font-semibold">{m.code}</td>
-                      <td className="px-3 py-2">{m.track}</td>
-                      <td className="px-3 py-2">
+                      <td className="px-3 py-2 whitespace-nowrap">{trackName(m.track)}</td>
+                      <td className="min-w-[14rem] px-3 py-2">
                         {m.players
                           .map((p, i) => {
                             const car = m.cars[i];
-                            return car ? `${p} (${car.car}, ${car.startTyre.toLowerCase()})` : p;
+                            return car
+                              ? `${p} (${carName(car.car)}, ${car.startTyre.toLowerCase()})`
+                              : p;
                           })
                           .join(' vs ')}
                       </td>
-                      <td className="px-3 py-2">{matchResult(m)}</td>
+                      <td className="px-3 py-2 whitespace-nowrap">{matchResult(m)}</td>
                       <td className="px-3 py-2 text-right tabular-nums">{m.battles}</td>
                     </tr>
                   ))}

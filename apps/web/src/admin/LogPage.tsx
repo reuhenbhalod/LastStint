@@ -4,7 +4,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { ErrorLine, Heading } from './Notice.js';
 import { errorText } from './tickets.js';
-import { btn, field } from './ui.js';
+import { btn, inlineField } from './ui.js';
 import { ACTION_LABELS, type LogEntry, getLog, logSummary } from './v2.js';
 
 const PAGE = 200;
@@ -41,7 +41,7 @@ export function LogPage() {
             <select
               value={action}
               onChange={(e) => setAction(e.target.value)}
-              className={`${field} w-auto`}
+              className={inlineField}
             >
               <option value="">All</option>
               {Object.entries(ACTION_LABELS).map(([id, label]) => (
@@ -66,7 +66,7 @@ export function LogPage() {
             <thead className="text-[var(--muted)]">
               <tr className="border-b border-[var(--rule)]">
                 <th className="px-3 py-2 font-semibold">When (UTC)</th>
-                <th className="px-3 py-2 font-semibold">Who</th>
+                <th className="hidden px-3 py-2 font-semibold sm:table-cell">Who</th>
                 <th className="px-3 py-2 font-semibold">Action</th>
                 <th className="px-3 py-2 font-semibold">What</th>
               </tr>
@@ -76,12 +76,16 @@ export function LogPage() {
                 <tr key={e.id} className="border-b border-[var(--rule)] last:border-b-0">
                   <td className="px-3 py-2 whitespace-nowrap">
                     {e.at.replace('T', ' ').slice(0, 19)}
+                    {/* On a phone the email sits under the time, so Action and What stay in view. */}
+                    <div className="max-w-[9rem] truncate text-[11px] text-[var(--muted)] sm:hidden">
+                      {e.email}
+                    </div>
                   </td>
-                  <td className="px-3 py-2">{e.email}</td>
+                  <td className="hidden px-3 py-2 sm:table-cell">{e.email}</td>
                   <td className="px-3 py-2 whitespace-nowrap">
                     {ACTION_LABELS[e.action] ?? e.action}
                   </td>
-                  <td className="px-3 py-2 break-words">{logSummary(e)}</td>
+                  <td className="min-w-[12rem] px-3 py-2 break-words">{logSummary(e)}</td>
                 </tr>
               ))}
             </tbody>

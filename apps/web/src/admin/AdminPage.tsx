@@ -231,6 +231,22 @@ export function AdminPage() {
   const signedIn = !!token && !!me;
   const showRaces = tab === 'schedule' && (signedIn || local);
   const previewed = races?.find((r) => r.id === preview)?.model;
+  // Keep the open tab in view in the tab bar (it scrolls sideways when the tabs don't fit).
+  const showNav = signedIn || local;
+  const nav = useRef<HTMLElement>(null);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: re-run when the open tab changes
+  useEffect(() => {
+    if (!showNav) return;
+    const bar = nav.current;
+    const on = bar?.querySelector<HTMLElement>('[aria-current="page"]');
+    if (!bar || !on) return;
+    if (
+      on.offsetLeft < bar.scrollLeft ||
+      on.offsetLeft + on.offsetWidth > bar.scrollLeft + bar.clientWidth
+    ) {
+      bar.scrollLeft = on.offsetLeft - 16;
+    }
+  }, [tab, showNav]);
   const nameOf = (id: string) => races?.find((r) => r.id === id)?.name ?? id;
 
   return (
@@ -264,25 +280,31 @@ export function AdminPage() {
             </a>
           </span>
         </div>
-        <nav
-          aria-label="Admin"
-          className="mx-auto flex max-w-6xl gap-1 overflow-x-auto px-4 sm:px-6"
-        >
-          {TABS.map((t) => (
-            <a
-              key={t.id}
-              href={t.href}
-              aria-current={tab === t.id ? 'page' : undefined}
-              className={`-mb-px shrink-0 border-b-2 px-3 py-2 text-[13px] font-semibold ${
-                tab === t.id
-                  ? 'border-[var(--you)] text-[var(--ink)]'
-                  : 'border-transparent text-[var(--muted)] hover:text-[var(--ink)]'
-              }`}
-            >
-              {t.label}
-            </a>
-          ))}
-        </nav>
+        {/* The tabs show once the server confirms an admin (on localhost, always, for the
+            sign-in-free race list). On a phone they wrap onto two rows, so every tab, and the
+            open one, stays in view. */}
+        {showNav && (
+          <nav
+            ref={nav}
+            aria-label="Admin"
+            className="mx-auto flex max-w-6xl flex-wrap gap-x-1 px-4 sm:flex-nowrap sm:overflow-x-auto sm:px-6"
+          >
+            {TABS.map((t) => (
+              <a
+                key={t.id}
+                href={t.href}
+                aria-current={tab === t.id ? 'page' : undefined}
+                className={`-mb-px shrink-0 border-b-2 px-3 py-2 text-[13px] font-semibold ${
+                  tab === t.id
+                    ? 'border-[var(--you)] text-[var(--ink)]'
+                    : 'border-transparent text-[var(--muted)] hover:text-[var(--ink)]'
+                }`}
+              >
+                {t.label}
+              </a>
+            ))}
+          </nav>
+        )}
       </header>
 
       <main className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-6 sm:px-6">
@@ -397,9 +419,20 @@ export function AdminPage() {
                   ))}
                 </div>
                 {previewed && (
-                  <div className="lg:sticky lg:top-4">
-                    <RacePreview model={previewed} onClose={() => setPreview(null)} />
-                  </div>
+                  <>
+                    {/* Below lg the preview is a sheet over the list, so it opens where the
+                        Preview button was tapped; from lg it sits beside the list, no taller
+                        than the window, and scrolls on its own. */}
+                    <button
+                      type="button"
+                      aria-label="Close the preview"
+                      className="fixed inset-0 z-30 bg-black/60 lg:hidden"
+                      onClick={() => setPreview(null)}
+                    />
+                    <div className="fixed inset-x-0 bottom-0 z-40 max-h-[85vh] overflow-y-auto p-3 lg:sticky lg:inset-x-auto lg:top-4 lg:bottom-auto lg:z-auto lg:max-h-[calc(100vh-2rem)] lg:p-0">
+                      <RacePreview model={previewed} onClose={() => setPreview(null)} />
+                    </div>
+                  </>
                 )}
               </div>
             )}

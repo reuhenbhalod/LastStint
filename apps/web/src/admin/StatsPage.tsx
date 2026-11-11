@@ -8,15 +8,33 @@ import { errorText } from './tickets.js';
 import { btn } from './ui.js';
 import { type AdminStats, getStats, pct } from './v2.js';
 
-function Table({ head, rows }: { head: string[]; rows: ReactNode[][] }) {
+/**
+ * A stats table. The first column and the `text` columns (names, calls) are left-aligned and
+ * keep a readable width, so on a phone the table scrolls sideways instead of crushing them; the
+ * rest are numbers, right-aligned.
+ */
+function Table({
+  head,
+  rows,
+  text = [],
+}: {
+  head: string[];
+  rows: ReactNode[][];
+  text?: number[];
+}) {
   if (rows.length === 0) return <p className="m-0 text-[14px] text-[var(--muted)]">None yet.</p>;
+  const align = (i: number) =>
+    i === 0 ? 'whitespace-nowrap' : text.includes(i) ? 'min-w-[11rem]' : 'text-right tabular-nums';
   return (
     <div className="overflow-x-auto rounded-lg border border-[var(--rule)]">
       <table className="w-full text-left text-[13px]">
         <thead className="text-[var(--muted)]">
           <tr className="border-b border-[var(--rule)]">
             {head.map((h, i) => (
-              <th key={h} className={`px-3 py-2 font-semibold ${i > 0 ? 'text-right' : ''}`}>
+              <th
+                key={h}
+                className={`px-3 py-2 font-semibold ${i > 0 && !text.includes(i) ? 'text-right' : ''}`}
+              >
                 {h}
               </th>
             ))}
@@ -31,7 +49,7 @@ function Table({ head, rows }: { head: string[]; rows: ReactNode[][] }) {
                 <td
                   // biome-ignore lint/suspicious/noArrayIndexKey: cells of a fixed row
                   key={i}
-                  className={`px-3 py-2 ${i > 0 ? 'text-right tabular-nums' : 'whitespace-nowrap'}`}
+                  className={`px-3 py-2 ${align(i)}`}
                 >
                   {cell}
                 </td>
@@ -90,6 +108,7 @@ export function StatsPage() {
           </h4>
           <Table
             head={['Date', 'Race', 'Lap', 'Call', 'Runs', 'Share']}
+            text={[1, 3]}
             rows={s.daily.missed.map((m) => [
               m.date,
               m.raceName,
@@ -120,10 +139,11 @@ export function StatsPage() {
 
           <h3 className="m-0 text-[16px] font-semibold">Eras</h3>
           <p className="m-0 text-[13px] text-[var(--muted)]">
-            {s.eras.playersWithStar} players have at least one star.
+            {s.eras.playersWithStar} players have at least one normal star. Stars count normal runs
+            only (Legend stars aren’t counted); attempts include Legend attempts.
           </p>
           <Table
-            head={['Era', 'Attempts', 'Stars', 'Players with a star']}
+            head={['Era', 'Attempts', 'Normal stars', 'Players with a normal star']}
             rows={s.eras.eras.map((e) => [`${e.id}: ${e.name}`, e.attempts, e.stars, e.players])}
           />
 

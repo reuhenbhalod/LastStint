@@ -6,7 +6,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { ErrorLine, Heading, NoteLine, useAction } from './Notice.js';
 import { errorText } from './tickets.js';
-import { btn, danger, field, primary } from './ui.js';
+import { btn, danger, inlineField, primary } from './ui.js';
 import {
   type AdminEra,
   eraStatusText,
@@ -14,6 +14,7 @@ import {
   publishRace,
   releaseBlock,
   releaseEra,
+  releaseMovesLater,
 } from './v2.js';
 
 function EraCard({
@@ -27,9 +28,12 @@ function EraCard({
   busy: boolean;
   run: (f: () => Promise<string>) => void;
 }) {
-  const [date, setDate] = useState('');
+  // The date field starts on the era's release date, when it has one.
+  const [date, setDate] = useState(era.releasedAt?.slice(0, 10) ?? '');
+  useEffect(() => setDate(era.releasedAt?.slice(0, 10) ?? ''), [era.releasedAt]);
   const block = releaseBlock(era, needed);
   const released = era.status !== 'coming-soon';
+  const locked = released && era.published > 0;
   return (
     <article className="card flex flex-col gap-3" aria-label={`Era ${era.id}`}>
       <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -69,18 +73,27 @@ function EraCard({
           aria-label={`Release date for era ${era.id}`}
           value={date}
           onChange={(e) => setDate(e.target.value)}
-          className={`${field} w-auto`}
+          className={`${inlineField} w-44`}
         />
         <button
           type="button"
           className={btn}
           disabled={busy || !!block || !date}
-          onClick={() =>
+          onClick={() => {
+            // A released era moved to a later date leaves players until then: ask, like Clear.
+            const later = releaseMovesLater(era, date, Date.now());
+            if (
+              later &&
+              !confirm(
+                `Era ${era.id} is out now. Move it to ${date}? Players lose access until then.`,
+              )
+            )
+              return;
             run(async () => {
-              await releaseEra(era.id, date);
+              await releaseEra(era.id, date, later);
               return `Era ${era.id} releases on ${date}.`;
-            })
-          }
+            });
+          }}
         >
           Set date
         </button>
@@ -103,8 +116,14 @@ function EraCard({
         )}
       </div>
       {block && <p className="m-0 text-[13px] text-[var(--flag)]">{block}</p>}
+      {locked && (
+        <p className="m-0 text-[13px] text-[var(--muted)]">
+          Published races are locked while the era has a release date. Clear the release to move one
+          back to Draft.
+        </p>
+      )}
       <div className="overflow-x-auto">
-        <table className="w-full text-left text-[13px]">
+        <table className="w-full min-w-[30rem] text-left text-[13px]">
           <thead className="text-[var(--muted)]">
             <tr className="border-b border-[var(--rule)]">
               <th className="px-2 py-1.5 font-semibold">#</th>
@@ -118,7 +137,7 @@ function EraCard({
             {era.races.map((r) => (
               <tr key={r.raceId} className="border-b border-[var(--rule)] last:border-b-0">
                 <td className="px-2 py-1.5 tabular-nums">{r.position}</td>
-                <td className="px-2 py-1.5">
+                <td className="min-w-[12rem] px-2 py-1.5">
                   {r.name}
                   {!r.file && <span className="text-[var(--flag)]"> · no race file</span>}
                 </td>
@@ -169,6 +188,9 @@ export function ErasAdminPage() {
       <ErrorLine text={error} />
       <NoteLine text={note} />
       {!data && !error && <p className="m-0 text-[14px] text-[var(--muted)]">Loading eras…</p>}
+      {data && data.eras.length === 0 && (
+        <p className="m-0 text-[14px] text-[var(--muted)]">No eras in the database.</p>
+      )}
       {data?.eras.map((e) => (
         <EraCard key={e.id} era={e} needed={data.needed} busy={busy} run={run} />
       ))}

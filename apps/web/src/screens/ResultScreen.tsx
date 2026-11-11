@@ -8,6 +8,7 @@ import { type Band, type DecisionMoment, autoStay, bandFor } from '@laststint/si
 import { useEffect, useState } from 'react';
 import type { AccountState } from '../account/useAccount.js';
 import { AccountBar } from '../components/AccountBar.js';
+import { AnnouncementBanner } from '../components/AnnouncementBanner.js';
 import { Brand } from '../components/Brand.js';
 import { Disclaimer } from '../components/Disclaimer.js';
 import { DriverDebrief } from '../components/DriverDebrief.js';
@@ -480,6 +481,7 @@ export function ResultScreen({
           · {model?.race.name ?? state.meta.raceId}
         </span>
       </header>
+      <AnnouncementBanner />
 
       {/* A laptop shows two columns: the result, score and share on the left; your calls and
           the day's numbers on the right. */}

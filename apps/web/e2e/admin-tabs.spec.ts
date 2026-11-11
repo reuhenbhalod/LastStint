@@ -69,7 +69,7 @@ const API: Record<string, unknown> = {
     days: { today: day(today, 40), tomorrow: day('2026-11-12', 41, false) },
     queue: { days: 3, low: true, warnUnder: 7 },
     stale: [day('2026-11-12', 41, false)],
-    runs: { total: 12, verified: 10, corrected: 1, disqualified: 2 },
+    runs: { total: 12, verified: 10, corrected: 1, unverified: 2 },
   },
   '/api/admin/eras': {
     needed: 10,
@@ -244,6 +244,7 @@ test('every admin tab opens and shows its content', async ({ page }) => {
   await expect(page.getByText('The queue is low.')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Re-pin stale days' })).toBeEnabled();
   await expect(page.getByText('No announcement.')).toBeVisible();
+  await expect(page.getByText('Not verified yet')).toBeVisible();
 
   // Set the announcement.
   await page.getByLabel('New announcement').fill('Servers move tonight.');
@@ -278,11 +279,19 @@ test('every admin tab opens and shows its content', async ({ page }) => {
   await page.getByRole('button', { name: 'Open Daily run by Fast Ann' }).click();
   const runPanel = page.getByRole('region', { name: 'Run' });
   await expect(runPanel).toContainText('sc-stop');
-  await runPanel.getByRole('button', { name: 'Re-verify' }).click();
+  await runPanel.getByRole('button', { name: 'Re-verify', exact: true }).click();
   expect(posted.at(-1)).toEqual({
     path: '/api/admin/runs/reverify',
     body: { mode: 'daily', id: 'r1' },
   });
+  // The day's re-verify uses the search on screen, not a date typed since.
+  await page.getByLabel('Date (UTC)').fill('2026-11-01');
+  page.once('dialog', (d) => d.accept());
+  const searched = new Date().toISOString().slice(0, 10);
+  await page.getByRole('button', { name: `Re-verify every run on ${searched}` }).click();
+  expect(posted.at(-1)).toEqual({ path: '/api/admin/runs/reverify', body: { date: searched } });
+  await runPanel.getByRole('button', { name: 'Close' }).click();
+  await expect(runPanel).toHaveCount(0);
 
   // Players: a player's page with the streak and the actions.
   await nav.getByRole('link', { name: 'Players' }).click();
@@ -295,6 +304,8 @@ test('every admin tab opens and shows its content', async ({ page }) => {
   // Versus.
   await nav.getByRole('link', { name: 'Versus' }).click();
   await expect(page.getByRole('cell', { name: 'QWER' })).toBeVisible();
+  await expect(page.getByRole('cell', { name: 'Racing' })).toBeVisible();
+  await expect(page.getByRole('cell', { name: 'Monza' }).first()).toBeVisible();
   await expect(page.getByText('Alex won by 1.4 s')).toBeVisible();
 
   // Stats.
