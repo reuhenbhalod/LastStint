@@ -28,7 +28,7 @@ import {
   versusCallsDue,
   versusFinished,
   versusTrack,
-} from '@boxthislap/sim';
+} from '@laststint/sim';
 import type { Env } from './index.js';
 import { getRace } from './races.js';
 

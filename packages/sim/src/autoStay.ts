@@ -9,9 +9,13 @@
 // Derived from the model and the call log alone (the calls made before the moment's pause), so
 // the game, the results screen and the server's score always agree. An answer the wall gave
 // isn't scored (verifyRun).
+//
+// An Eras race (sim erasRace) keeps round 2's rule only (a stop booked, or made in the last
+// AUTO_STAY_LAPS laps), and the wall's answers there are scored like any other: its races were
+// authored and checked for reachability on that rule (see `autoAnswered`).
 
 import type { DecisionMoment } from './moments.js';
-import { lifeOf } from './sim.js';
+import { erasRace, lifeOf } from './sim.js';
 import type { Decision, RaceModel } from './types.js';
 
 export const AUTO_STAY_LAPS = 5;
@@ -39,6 +43,8 @@ export function autoStay(
   const stay = moment.options.find((o) => o.decisions.length === 0);
   if (!stops || !stay) return null;
   const made = stopsBefore(moment, decisions);
+  if (erasRace(model))
+    return made.some((d) => d.lap >= moment.lap - AUTO_STAY_LAPS) ? stay.id : null;
   const neutral = moment.trigger === 'SC' || moment.trigger === 'VSC';
   const window = neutral ? AUTO_STAY_LAPS_NEUTRAL : AUTO_STAY_LAPS;
   if (made.some((d) => d.lap >= moment.lap - window)) return stay.id;
@@ -52,6 +58,19 @@ export function autoStay(
     if (!wearing) return stay.id;
   }
   return null;
+}
+
+/**
+ * True when `chosen` is the wall's own answer (autoStay), which isn't scored. Never in an Eras
+ * race, whose wall answers are scored as they were when its races were authored.
+ */
+export function autoAnswered(
+  model: RaceModel,
+  moment: DecisionMoment | undefined,
+  decisions: Decision[],
+  chosen: string | null | undefined,
+): boolean {
+  return !!moment && !!chosen && !erasRace(model) && autoStay(model, moment, decisions) === chosen;
 }
 
 /** A stop is booked and not yet made when the moment pauses the race (its in-lap is the lap

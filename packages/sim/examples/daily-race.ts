@@ -11,6 +11,7 @@ import {
   type Run,
   type RunScore,
   answerMoment,
+  autoAnswered,
   autoStay,
   claimGrade,
   classify,
@@ -77,9 +78,11 @@ export function playDailyRace(
       // itself (autoStay) and that answer isn't scored.
       const auto = autoStay(model, moment, run.decisions);
       const chosen = auto ?? choose(moment, run);
+      // Not scored (in Eras the wall's answer is scored: autoAnswered), as verifyRun decides.
+      const unscored = autoAnswered(model, moment, run.decisions, chosen);
       // Logs the radio answer and the option's calls: the server checks both (verifyRun).
       answerMoment(run, moment, chosen);
-      calls.push({ moment, grade, chosen, auto: auto !== null });
+      calls.push({ moment, grade, chosen, auto: unscored });
     }
     // Between moments the BOX button and headset modes call decide() for a future lap.
     stepLap(run);

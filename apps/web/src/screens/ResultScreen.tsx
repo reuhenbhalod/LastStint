@@ -1,8 +1,10 @@
 // End of race: the result, a grade per call against the best option and the real team's call,
 // the server's score, rank and percentile (live dailies), the day's leaderboard and stats, and
-// a spoiler-free share line. Practice runs show the game's own grades, not submitted.
+// a spoiler-free share line. Practice runs show the game's own grades, not submitted. An Eras
+// attempt (`eras`) shows the server's grades with its stars, accuracy and rank in place of the
+// daily's score (eras/EraResults.tsx), and offers a new attempt or the way back to its era.
 
-import { type Band, type DecisionMoment, autoStay, bandFor } from '@boxthislap/sim';
+import { type Band, type DecisionMoment, autoStay, bandFor } from '@laststint/sim';
 import { useEffect, useState } from 'react';
 import type { AccountState } from '../account/useAccount.js';
 import { AccountBar } from '../components/AccountBar.js';
@@ -20,6 +22,12 @@ import {
   type RunResponse,
   api,
 } from '../data/api.js';
+import {
+  EraResultActions,
+  EraResultsPanel,
+  type ErasResultInfo,
+  erasShareLine,
+} from '../eras/EraResults.js';
 import { goalOf } from '../game/goal.js';
 import { planGrade, stopsLine, stopsWord } from '../game/plans.js';
 import { TEAM_COLOR } from '../game/teamTheme.js';
@@ -37,8 +45,11 @@ const BAND: Record<Band, { label: string; square: string; color: string }> = {
 
 const pct = (p: number) => `${Math.round(p * 100)}%`;
 
+/** What the server graded: a daily run, or an Eras attempt (the same calls and result). */
+type Served = Pick<RunResponse, 'calls' | 'plan' | 'result' | 'finishPosition'>;
+
 /** The race plan's grade: the server's, or the game's own (practice). */
-function planFrom(state: GameState, response: RunResponse | null): PlanResult | null {
+function planFrom(state: GameState, response: Served | null): PlanResult | null {
   if (response) return response.plan ?? null;
   const picked = state.plan.picked;
   const grade = planGrade(state.plan, state.meta.takeoverLap);
@@ -216,7 +227,7 @@ function GradedCall({
 }
 
 /** The calls as the results screen shows them: the server's, or the game's own grades. */
-function callsFrom(state: GameState, response: RunResponse | null): CallResult[] {
+function callsFrom(state: GameState, response: Served | null): CallResult[] {
   if (response) return response.calls;
   return state.moments.flatMap((m): CallResult[] => {
     const graded = state.grades[m.id];
@@ -253,6 +264,11 @@ function labelOf(moment: DecisionMoment | undefined, optionId: string | null): s
   return moment?.options.find((o) => o.id === optionId)?.label ?? optionId;
 }
 
+/** The calls' bands as share squares. */
+export function squaresOf(calls: { band: Band }[]): string {
+  return calls.map((c) => BAND[c.band].square).join('');
+}
+
 export function shareLine(
   number: number | undefined,
   won: boolean,
@@ -260,7 +276,7 @@ export function shareLine(
   percentile: number | null,
   plan: { band: Band } | null = null,
 ): string {
-  const squares = [...(plan ? [plan] : []), ...calls].map((c) => BAND[c.band].square).join('');
+  const squares = squaresOf([...(plan ? [plan] : []), ...calls]);
   const head = number ? `LastStint #${number}` : 'LastStint (practice)';
   const tail = percentile !== null ? ` P${percentile}` : '';
   return `${head} ${won ? 'WIN ' : ''}${squares}${tail}`;
@@ -273,7 +289,7 @@ function CallRow({
 }: {
   call: CallResult;
   moment?: DecisionMoment;
-  /** The wall answered for you (just stopped, see game/autoStay.ts). */
+  /** The wall answered for you (sim autoStay.ts). */
   auto?: boolean;
 }) {
   const best = call.options.find((o) => o.id === call.best);
@@ -331,19 +347,24 @@ export function ResultScreen({
   game,
   account,
   onHome,
+  eras,
 }: {
   state: GameState;
   game: Game;
   account?: AccountState;
   /** The Pit Wall brand: the home page. */
   onHome?: () => void;
+  /** An Eras attempt: its era, difficulty and the way to a new attempt. */
+  eras?: ErasResultInfo;
 }) {
   const sub = state.submission;
   const response = sub.status === 'done' || sub.status === 'already' ? sub.response : null;
-  const order = response?.result.order ?? state.result?.order ?? state.race.order;
-  const gaps = response?.result.gaps ?? state.result?.gaps ?? {};
+  const attempt = sub.status === 'eras-done' ? sub.result : null;
+  const served: Served | null = response ?? attempt;
+  const order = served?.result.order ?? state.result?.order ?? state.race.order;
+  const gaps = served?.result.gaps ?? state.result?.gaps ?? {};
   const { userSide, rival, date, number } = state.meta;
-  const pos = response?.finishPosition ?? order.indexOf(userSide) + 1;
+  const pos = served?.finishPosition ?? order.indexOf(userSide) + 1;
   const beatRival = order.indexOf(userSide) < order.indexOf(rival);
   const model = game.model;
   const team = model?.drivers.find((d) => d.code === userSide)?.team ?? userSide;
@@ -357,13 +378,13 @@ export function ResultScreen({
     beatRival,
     model ? goalOf(model).kind === 'defend' : false,
   );
-  const calls = callsFrom(state, response);
-  const planResult = planFrom(state, response);
+  const calls = callsFrom(state, served);
+  const planResult = planFrom(state, served);
   const local = game.localScore();
   const score = response?.score ?? (calls.length ? local?.score : null);
   const momentById = new Map(state.moments.map((m) => [m.id, m]));
   const live = state.meta.source === 'live';
-  const finishers = response?.result.finishers ?? state.result?.finishers ?? [];
+  const finishers = served?.result.finishers ?? state.result?.finishers ?? [];
   const rivalPos = finishers.includes(rival) ? order.indexOf(rival) + 1 : 0;
   const gapToRival =
     gaps[userSide] !== undefined && gaps[rival] !== undefined
@@ -378,7 +399,7 @@ export function ResultScreen({
       userSide={userSide}
       rival={rival}
       pos={finishers.includes(userSide) ? pos : 0}
-      dsq={(response?.result.disqualified ?? state.result?.disqualified ?? []).includes(userSide)}
+      dsq={(served?.result.disqualified ?? state.result?.disqualified ?? []).includes(userSide)}
       realPos={realPos}
       rivalPos={rivalPos}
       team={team}
@@ -400,13 +421,14 @@ export function ResultScreen({
     api.stats(date).then(setStats, () => {});
   }, [response, date]);
 
-  const share = shareLine(
-    number,
-    v.outcome === 'beat',
-    calls,
-    response?.percentile ?? null,
-    planResult,
-  );
+  const share = eras
+    ? erasShareLine(
+        state.meta.raceId,
+        eras.legend,
+        squaresOf([...(planResult ? [planResult] : []), ...calls]),
+        attempt,
+      )
+    : shareLine(number, v.outcome === 'beat', calls, response?.percentile ?? null, planResult);
   const copy = async () => {
     const text = `${share}\n${location.origin}`;
     try {
@@ -450,7 +472,12 @@ export function ResultScreen({
           <Brand />
         </button>
         <span className="truncate text-[11px] font-extrabold uppercase tracking-[0.14em] text-[#9AA5A0]">
-          {number ? `Daily #${number}` : 'Practice run'} · {model?.race.name ?? state.meta.raceId}
+          {eras
+            ? `Eras · Era ${eras.era.id}${eras.legend ? ' · Legend' : ''}`
+            : number
+              ? `Daily #${number}`
+              : 'Practice run'}{' '}
+          · {model?.race.name ?? state.meta.raceId}
         </span>
       </header>
 
@@ -460,27 +487,33 @@ export function ResultScreen({
         <div className="flex flex-col gap-4 lg:sticky lg:top-6">
           {hero}
 
-          <section
-            aria-label="Score"
-            className="flex items-center gap-5 rounded-lg border border-[var(--glass-edge)] bg-[var(--glass)] p-4"
-          >
-            <ScoreRing score={score ?? null} />
-            <div className="flex min-w-0 flex-1 flex-col gap-3">
-              <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#9AA5A0]">
-                Score out of 100
-              </span>
-              <Stats cols={2}>
-                <Stat label="Rank today">
-                  <span className="text-[22px]">
-                    {response ? `${response.rank}/${response.total}` : '-'}
-                  </span>
-                </Stat>
-                <Stat label="Beat">
-                  <span className="text-[22px]">{response ? `${response.percentile}%` : '-'}</span>
-                </Stat>
-              </Stats>
-            </div>
-          </section>
+          {eras && <EraResultsPanel sub={sub} model={model} info={eras} onRetry={game.submit} />}
+
+          {!eras && (
+            <section
+              aria-label="Score"
+              className="flex items-center gap-5 rounded-lg border border-[var(--glass-edge)] bg-[var(--glass)] p-4"
+            >
+              <ScoreRing score={score ?? null} />
+              <div className="flex min-w-0 flex-1 flex-col gap-3">
+                <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#9AA5A0]">
+                  Score out of 100
+                </span>
+                <Stats cols={2}>
+                  <Stat label="Rank today">
+                    <span className="text-[22px]">
+                      {response ? `${response.rank}/${response.total}` : '-'}
+                    </span>
+                  </Stat>
+                  <Stat label="Beat">
+                    <span className="text-[22px]">
+                      {response ? `${response.percentile}%` : '-'}
+                    </span>
+                  </Stat>
+                </Stats>
+              </div>
+            </section>
+          )}
 
           {model && (
             <DriverDebrief race={state.race} model={model} notes={game.notes()} won={beatRival} />
@@ -498,7 +531,7 @@ export function ResultScreen({
               You’ve already played today’s race. Here’s your run; a new race arrives at midnight.
             </p>
           )}
-          {sub.status === 'error' && (
+          {sub.status === 'error' && !eras && (
             <div className="flex items-center justify-between gap-3 rounded-md border border-[var(--box)] bg-[color-mix(in_srgb,var(--box)_14%,#12171A)] px-3.5 py-3 text-[13px]">
               <span>Not submitted ({sub.error}). Your grades are below.</span>
               <button
@@ -660,18 +693,22 @@ export function ResultScreen({
             </ol>
           </details>
 
-          <a
-            href="/gauntlet"
-            className="call-plate !gap-1 hover:bg-[#192024]"
-            style={{ '--accent': 'var(--box)' } as React.CSSProperties}
-          >
-            <span className="disp text-[19px] leading-none">Keep racing: Gauntlet</span>
-            <span className="text-[13px] text-[#9AA5A0]">
-              Different races back to back until you lose one
-            </span>
-          </a>
+          {eras && <EraResultActions info={eras} />}
 
-          {!live && (
+          {!eras && (
+            <a
+              href="/gauntlet"
+              className="call-plate !gap-1 hover:bg-[#192024]"
+              style={{ '--accent': 'var(--box)' } as React.CSSProperties}
+            >
+              <span className="disp text-[19px] leading-none">Keep racing: Gauntlet</span>
+              <span className="text-[13px] text-[#9AA5A0]">
+                Different races back to back until you lose one
+              </span>
+            </a>
+          )}
+
+          {!live && !eras && (
             <button
               type="button"
               onClick={game.reset}

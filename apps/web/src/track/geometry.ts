@@ -4,7 +4,7 @@
 // behind the leader sits `gap / lapTime` of a lap behind it on track; a lapped car wraps round
 // and shows up among the leaders, as it does on a real circuit.
 
-import type { RaceModel, RaceState } from '@boxthislap/sim';
+import type { RaceModel, RaceState } from '@laststint/sim';
 
 export interface TrackOutline {
   raceId: string;

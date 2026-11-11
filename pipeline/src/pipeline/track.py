@@ -13,6 +13,7 @@ Fits the track-level constants the simulator needs:
 from __future__ import annotations
 
 import json
+import math
 import re
 from dataclasses import dataclass, field
 
@@ -21,6 +22,7 @@ import pandas as pd
 from .clean import gap_to_car_ahead, tyre_change_out_laps
 from .fit import LapTimeFit, predict
 from .paths import CONFIG_DIR
+from .refuel import fuel_lap_of
 
 
 @dataclass
@@ -50,6 +52,28 @@ def _is_neutralized(status_value: object) -> bool:
     return any(code in s for code in ("4", "6", "7"))
 
 
+def racing_status(status_value: object) -> bool:
+    """A lap run green, or partly green and partly under a local yellow ("12", "21"): racing
+    went on, so a stop on it is priced like a green one (Eras builds, `eras_stops`). A lap
+    under yellow throughout ("2") isn't: in a source with no status timing it is step 2.4's
+    ambiguous slow period (rain, or a SC the estimate couldn't call: Valencia 2012's laps
+    28-29 lead into the SC), where the sim frame's clean lap isn't the field's pace."""
+    s = "" if status_value is None or pd.isna(status_value) else str(status_value)
+    return s != "" and set(s) <= {"1", "2"} and "1" in s
+
+
+def chained_in_laps(laps: pd.DataFrame) -> set[tuple[str, int]]:
+    """(driver, lap) of the laps that are a stop's out-lap and another stop's in-lap: the car
+    pitted on the lap before too (back-to-back stops, canada-2011 MAS out-laps 53 and 54). The
+    lap's time belongs to the first stop; measured again for the second it counts twice."""
+    entered = laps[laps["PitInTime"].notna()]
+    return {
+        (str(d), int(n) + 1)
+        for d, n in zip(entered["Driver"], entered["LapNumber"], strict=True)
+        if not pd.isna(n)
+    }
+
+
 def pit_stops(laps: pd.DataFrame) -> list[tuple[str, pd.Series, pd.Series]]:
     """Return (driver, in_lap, out_lap) for each pit stop (in-lap paired with next out-lap).
 
@@ -63,6 +87,36 @@ def pit_stops(laps: pd.DataFrame) -> list[tuple[str, pd.Series, pd.Series]]:
             out = grp[(grp["LapNumber"] == in_lap["LapNumber"] + 1) & changed.loc[grp.index]]
             if len(out):
                 stops.append((str(driver), in_lap, out.iloc[0]))
+    return stops
+
+
+def service_stops(
+    laps: pd.DataFrame, eras_stops: bool = False
+) -> list[tuple[str, pd.Series, pd.Series]]:
+    """(driver, in_lap, out_lap) for each stop that changed no tyres (a repair, a penalty
+    stop-go, a drive-through: Baku 2017 HAM's headrest and VET's stop-go, Hungary 2015's
+    drive-throughs), the same set on and after its out-lap (clean.tyre_change_out_laps).
+    Only green stops (both laps green throughout, both timed) count: a pit-lane pass under a
+    SC or a red flag (Hungary 2015 laps 45-46, Brazil 2021) keeps its set too, but isn't a
+    stop. Timing that never shows a set change (estimated compounds) has none. `eras_stops`:
+    laps partly under a local yellow (racing_status) count as green too."""
+    green = racing_status if eras_stops else (lambda st: str(st) == "1")
+    stops: list[tuple[str, pd.Series, pd.Series]] = []
+    changed = tyre_change_out_laps(laps)
+    for driver, grp in laps.groupby("Driver"):
+        grp = grp.sort_values("LapNumber")
+        for _, in_lap in grp[grp["PitInTime"].notna()].iterrows():
+            out = grp[grp["LapNumber"] == in_lap["LapNumber"] + 1]
+            if not len(out):
+                continue
+            out_lap = out.iloc[0]
+            if bool(changed.loc[out_lap.name]) or pd.isna(out_lap["PitOutTime"]):
+                continue
+            if not all(green(r["TrackStatus"]) for r in (in_lap, out_lap)):
+                continue
+            if pd.isna(in_lap["LapTime"]) or pd.isna(out_lap["LapTime"]):
+                continue
+            stops.append((str(driver), in_lap, out_lap))
     return stops
 
 
@@ -99,7 +153,7 @@ def _has_vsc(status_value: object) -> bool:
     return "6" in s or "7" in s
 
 
-def stop_records(laps: pd.DataFrame) -> list[dict]:
+def stop_records(laps: pd.DataFrame, eras_stops: bool = False) -> list[dict]:
     """Per measurable pit stop: {driver, out_lap, flag, loss, in_loss}.
 
     Loss = in-lap + out-lap minus the median lap time
@@ -107,6 +161,11 @@ def stop_records(laps: pd.DataFrame) -> list[dict]:
     pace cancel out, minus twice the driver's own green-lap pace offset to that field median,
     so a slow car's slow in/out laps aren't counted as pit time. Flag is "SC" if either lap
     touched a safety car, "VSC" if either touched a virtual safety car, else "green".
+
+    `eras_stops` (Eras builds): a stop whose in-lap is the previous stop's out-lap
+    (chained_in_laps) is measured on its out-lap only, its in_loss 0, its flag from the
+    out-lap, and a VSC one's gap change from the end of its in-lap, so the shared lap isn't
+    counted in both stops.
     """
     stops = pit_stops(laps)
     pitting = set()
@@ -137,6 +196,7 @@ def stop_records(laps: pd.DataFrame) -> list[dict]:
             {int(in_lap["LapNumber"]), int(out_lap["LapNumber"])}
         )
 
+    chained = chained_in_laps(laps) if eras_stops else set()
     out: list[dict] = []
     for driver, in_lap, out_lap in stops:
         if pd.isna(in_lap["LapTime"]) or pd.isna(out_lap["LapTime"]):
@@ -145,6 +205,12 @@ def stop_records(laps: pd.DataFrame) -> list[dict]:
         if any(lap not in field_median.index for lap in laps_used):
             continue
         statuses = (in_lap["TrackStatus"], out_lap["TrackStatus"])
+        if any("5" in str(st) for st in statuses):
+            continue  # a red flag's stoppage: unmeasurable (redflag.stop_losses prices it)
+        if (driver, int(in_lap["LapNumber"])) in chained:
+            # Back-to-back: the in-lap is the previous stop's out-lap, already in its loss.
+            laps_used = (out_lap["LapNumber"],)
+            statuses = (out_lap["TrackStatus"],)
         if any(_has_sc(st) for st in statuses):
             flag = "SC"
         elif any(_has_vsc(st) for st in statuses):
@@ -153,17 +219,27 @@ def stop_records(laps: pd.DataFrame) -> list[dict]:
             flag = "green"
         # The in-lap's share of the stop, by the same pace-corrected comparison (it is already
         # in the takeover state when the in-lap is the takeover lap).
+        own = len(laps_used) == 2  # the in-lap is this stop's own
         in_loss = float(in_lap["LapTime"]) - float(field_median[in_lap["LapNumber"]])
         in_loss -= float(pace_offset.get(driver, 0.0))
+        in_loss = in_loss if own else 0.0
         if flag == "VSC":
             n = int(out_lap["LapNumber"])
-            loss = vsc_gap_change_loss(driver, n, end_time, stop_laps, settle_lap(green_laps, n))
+            loss = vsc_gap_change_loss(
+                driver,
+                n,
+                end_time,
+                stop_laps,
+                settle_lap(green_laps, n),
+                start_lap=None if own else n - 1,
+            )
             if loss is None:
                 continue
         else:
             reference = sum(float(field_median[lap]) for lap in laps_used)
-            reference += 2 * float(pace_offset.get(driver, 0.0))
-            loss = float(in_lap["LapTime"]) + float(out_lap["LapTime"]) - reference
+            reference += len(laps_used) * float(pace_offset.get(driver, 0.0))
+            loss = float(out_lap["LapTime"]) - reference
+            loss += float(in_lap["LapTime"]) if own else 0.0
         out.append(
             {
                 "driver": driver,
@@ -191,13 +267,15 @@ def vsc_gap_change_loss(
     end_time: dict[tuple[str, int], float],
     stop_laps: dict[str, set[int]],
     end_lap: int | None = None,
+    start_lap: int | None = None,
 ) -> float | None:
-    """A VSC stop's cost: the median change in gap, from the end of the lap before the in-lap
-    to the end of `end_lap` (default the out-lap; see settle_lap), to nearby cars that didn't
-    stop around then. None without a usable reference car."""
+    """A VSC stop's cost: the median change in gap, from the end of `start_lap` (default the
+    lap before the in-lap) to the end of `end_lap` (default the out-lap; see settle_lap), to
+    nearby cars that didn't stop around then. None without a usable reference car."""
     in_lap = out_lap - 1
     end_lap = out_lap if end_lap is None else end_lap
-    a0, a1 = end_time.get((driver, in_lap - 1)), end_time.get((driver, end_lap))
+    start_lap = in_lap - 1 if start_lap is None else start_lap
+    a0, a1 = end_time.get((driver, start_lap)), end_time.get((driver, end_lap))
     if a0 is None or a1 is None:
         return None
     window = range(in_lap - VSC_REF_CLEAR_LAPS, end_lap + VSC_REF_CLEAR_LAPS + 1)
@@ -205,20 +283,23 @@ def vsc_gap_change_loss(
     for other, laps_stopped in {**{d: set() for d, _ in end_time}, **stop_laps}.items():
         if other == driver or any(lap in laps_stopped for lap in window):
             continue
-        b0, b1 = end_time.get((other, in_lap - 1)), end_time.get((other, end_lap))
+        b0, b1 = end_time.get((other, start_lap)), end_time.get((other, end_lap))
         if b0 is None or b1 is None or abs(a0 - b0) > VSC_REF_WINDOW:
             continue
         changes.append((a1 - b1) - (a0 - b0))
     return float(pd.Series(changes).median()) if changes else None
 
 
-def stop_losses(laps: pd.DataFrame) -> list[tuple[str, str, float]]:
+def stop_losses(laps: pd.DataFrame, eras_stops: bool = False) -> list[tuple[str, str, float]]:
     """(driver, flag, loss) for every measurable stop (see stop_records)."""
-    return [(r["driver"], r["flag"], r["loss"]) for r in stop_records(laps)]
+    return [(r["driver"], r["flag"], r["loss"]) for r in stop_records(laps, eras_stops)]
 
 
 # Stops slower than this beyond the median are penalties or damage, not pit-stop variance.
 MAX_STOP_DEVIATION = 15.0
+# The pit-loss fixes below (docs/pit-loss-spec.md) apply to a build given its race id
+# (fit_track_params `race_id`), which build.py passes for every build but an Eras build: the
+# Eras races keep the pit losses they were authored and validated on.
 # Stops faster than this below the median are measurement noise: the lane can't be driven much
 # quicker than its median (Silverstone 2024 measured -13s, a 10s stop). docs/pit-loss-spec.md P2.
 MIN_STOP_DEVIATION = -4.0
@@ -239,7 +320,7 @@ CIRCUIT_ALIASES = {
 
 
 def measured_stop_losses(
-    laps: pd.DataFrame, takeover_lap: int | None = None
+    laps: pd.DataFrame, takeover_lap: int | None = None, eras_stops: bool = False
 ) -> dict[tuple[str, int], float]:
     """(driver, out-lap) -> measured loss for every green-flag or VSC stop (VSC by gap
     change). Stops touching a SC can't be measured and keep the track's SC figure.
@@ -248,7 +329,7 @@ def measured_stop_losses(
     in the takeover gaps, so only the rest of the loss is left to charge (at some tracks the
     timing line puts most of the stop in the in-lap, e.g. France 2019: ~20 of 25s)."""
     out = {}
-    for r in stop_records(laps):
+    for r in stop_records(laps, eras_stops):
         if r["flag"] == "SC":
             continue
         loss = r["loss"]
@@ -258,12 +339,19 @@ def measured_stop_losses(
     return out
 
 
-def pit_loss_deviations(laps: pd.DataFrame, median: float | None) -> list[float]:
-    """Green-stop losses minus the median, excluding penalty-sized outliers."""
+def pit_loss_deviations(
+    laps: pd.DataFrame,
+    median: float | None,
+    eras_stops: bool = False,
+    min_deviation: float | None = None,
+) -> list[float]:
+    """Green-stop losses minus the median, excluding penalty-sized outliers (and, with
+    `min_deviation`, noise-sized fast ones)."""
     if median is None:
         return []
-    devs = [loss - median for _, flag, loss in stop_losses(laps) if flag == "green"]
-    return sorted(round(d, 3) for d in devs if MIN_STOP_DEVIATION <= d <= MAX_STOP_DEVIATION)
+    devs = [loss - median for _, flag, loss in stop_losses(laps, eras_stops) if flag == "green"]
+    low = -MAX_STOP_DEVIATION if min_deviation is None else min_deviation
+    return sorted(round(d, 3) for d in devs if low <= d <= MAX_STOP_DEVIATION)
 
 
 def circuit_of(race_id: str) -> str:
@@ -292,15 +380,69 @@ def wet_stop_share(laps: pd.DataFrame) -> float:
     return wet / len(stops)
 
 
-def pit_loss(laps: pd.DataFrame) -> float | None:
-    """Green-flag pit loss: median over green stops of `stop_losses`. None if no stops."""
-    losses = [loss for _, flag, loss in stop_losses(laps) if flag == "green"]
+# The robust guard on the green pit loss (Eras builds, `pit_loss(guard=True)`): a damage or
+# repair stop is slower in the lane (a new nose, a long stationary time) or on its in-lap (the
+# car crawled back). Each is measured against the race's own median over all its stops (any
+# flag: the lane speed limit holds under a SC too, and the in-lap is compared with the same
+# lap's field). The limits are the 95th percentiles over the 3,351 measured stops of the races
+# built in data/races, reconstructed ones left out (Nov 7 2026): pit-lane time 7.6 s over the
+# race's median, in-lap 12.2 s.
+DAMAGE_LANE_EXCESS = 7.6
+DAMAGE_IN_LAP_EXCESS = 12.2
+
+
+def lane_times(laps: pd.DataFrame) -> dict[tuple[str, int], float]:
+    """(driver, out-lap) -> pit-lane time (lane exit on the out-lap minus lane entry on the
+    in-lap) for each tyre stop with both times."""
+    out = {}
+    for driver, in_lap, out_lap in pit_stops(laps):
+        if pd.isna(in_lap["PitInTime"]) or pd.isna(out_lap["PitOutTime"]):
+            continue
+        lane = float(out_lap["PitOutTime"]) - float(in_lap["PitInTime"])
+        out[(driver, int(out_lap["LapNumber"]))] = lane
+    return out
+
+
+def damage_stops(
+    laps: pd.DataFrame, lane: bool = True, eras_stops: bool = False
+) -> set[tuple[str, int]]:
+    """(driver, out-lap) of the stops the guard calls damage or repair stops: pit-lane time
+    over DAMAGE_LANE_EXCESS above the race's median (not with `lane` False: a refuelling
+    race's lane time holds its fill), or in-lap loss over DAMAGE_IN_LAP_EXCESS above it."""
+    records = stop_records(laps, eras_stops)
+    out: set[tuple[str, int]] = set()
+    if not records:
+        return out
+    in_median = float(pd.Series([r["in_loss"] for r in records]).median())
+    for r in records:
+        if r["in_loss"] - in_median > DAMAGE_IN_LAP_EXCESS:
+            out.add((r["driver"], r["out_lap"]))
+    times = lane_times(laps) if lane else {}
+    if times:
+        lane_median = float(pd.Series(list(times.values())).median())
+        out |= {key for key, t in times.items() if t - lane_median > DAMAGE_LANE_EXCESS}
+    return out
+
+
+def pit_loss(
+    laps: pd.DataFrame, guard: bool = False, lane: bool = True, eras_stops: bool = False
+) -> float | None:
+    """Green-flag pit loss: median over green stops of `stop_losses`. None if no stops.
+    `guard` (Eras builds): damage and repair stops (damage_stops; `lane` as there) are left
+    out, unless that would leave none. Saudi Arabia 2021: three green stops, two of them
+    damage stops (48.9 and 65.1 s), so the median was 48.9 s against ALO's normal 23.9 s."""
+    records = [r for r in stop_records(laps, eras_stops) if r["flag"] == "green"]
+    if guard:
+        bad = damage_stops(laps, lane, eras_stops)
+        kept = [r for r in records if (r["driver"], r["out_lap"]) not in bad]
+        records = kept or records
+    losses = [r["loss"] for r in records]
     return float(pd.Series(losses).median()) if losses else None
 
 
-def pit_loss_under_vsc(laps: pd.DataFrame) -> tuple[float | None, int]:
+def pit_loss_under_vsc(laps: pd.DataFrame, eras_stops: bool = False) -> tuple[float | None, int]:
     """Median VSC-stop loss and how many VSC stops it rests on (None if none measured)."""
-    losses = [loss for _, flag, loss in stop_losses(laps) if flag == "VSC"]
+    losses = [loss for _, flag, loss in stop_losses(laps, eras_stops) if flag == "VSC"]
     return (float(pd.Series(losses).median()) if losses else None), len(losses)
 
 
@@ -309,7 +451,7 @@ def dirty_air_penalty(traffic_laps: pd.DataFrame, fit: LapTimeFit) -> float:
     if traffic_laps.empty:
         return 0.0
     predicted = [
-        predict(fit, r.Driver, r.Compound, r.TyreLife, r.LapNumber)
+        predict(fit, r.Driver, r.Compound, r.TyreLife, fuel_lap_of(r))
         for r in traffic_laps.itertuples()
     ]
     residual = traffic_laps["LapTime"].astype(float).to_numpy() - predicted
@@ -391,10 +533,60 @@ def overtake_difficulty(laps: pd.DataFrame, close_gap: float = 2.0) -> tuple[flo
     return 1.0 - passes / n, n, passes
 
 
-# Overtake model fallback: between the Abu Dhabi and Spain 2021 fits. Used when a race has
-# too few passes to fit, or the fit has the wrong signs.
+# Overtake model fallback: between the Abu Dhabi and Spain 2021 fits. Used as is when a race
+# has no pass opportunities, a failed fit or a wrong-signed one. A race with too few passes to
+# fit keeps its slopes but gets an intercept from its own pass rate (rate_matched_fallback).
 DEFAULT_OVERTAKE_MODEL = {"intercept": 0.5, "paceCoef": 2.0, "gapCoef": -5.0}
 MIN_PASSES = 8
+# The rate the fallback is matched to: (passes + PASS_RATE_PRIOR) / (opportunities +
+# 2 * PASS_RATE_PRIOR), so a race with no pass at all still gets a small, finite rate.
+PASS_RATE_PRIOR = 0.5
+INTERCEPT_RANGE = (-30.0, 30.0)  # bisection bracket for the matched intercept
+
+
+def _sigmoid(x: float) -> float:
+    return 1.0 / (1.0 + math.exp(-x)) if x >= 0 else math.exp(x) / (1.0 + math.exp(x))
+
+
+def rate_matched_intercept(
+    advs: list[float], gaps: list[float], rate: float, pace_coef: float, gap_coef: float
+) -> float:
+    """The intercept b at which the mean over the opportunities of
+    sigmoid(b + pace_coef*adv + gap_coef*gap) equals `rate` (0 < rate < 1), by bisection (the
+    mean rises with b)."""
+    if not advs or len(advs) != len(gaps):
+        raise ValueError("need one adv and one gap per pass opportunity")
+    if not 0.0 < rate < 1.0:
+        raise ValueError(f"pass rate must be in (0, 1), got {rate}")
+    terms = [pace_coef * a + gap_coef * g for a, g in zip(advs, gaps, strict=True)]
+    lo, hi = INTERCEPT_RANGE
+    for _ in range(100):
+        mid = (lo + hi) / 2
+        if sum(_sigmoid(mid + t) for t in terms) / len(terms) < rate:
+            lo = mid
+        else:
+            hi = mid
+    return (lo + hi) / 2
+
+
+def rate_matched_fallback(events: pd.DataFrame) -> tuple[dict[str, float], float]:
+    """The fallback overtake model for a race with too few passes to fit: the default's slopes,
+    with the intercept set so the model's mean predicted P(pass) over the race's own pass
+    opportunities (`events`: adv, gap, passed; one row per close follower-lap with a model
+    pace advantage) equals the race's measured pass rate (smoothed by PASS_RATE_PRIOR).
+    Returns (model, the matched rate)."""
+    n, passes = len(events), int(events["passed"].sum())
+    rate = (passes + PASS_RATE_PRIOR) / (n + 2 * PASS_RATE_PRIOR)
+    pace_coef = DEFAULT_OVERTAKE_MODEL["paceCoef"]
+    gap_coef = DEFAULT_OVERTAKE_MODEL["gapCoef"]
+    intercept = rate_matched_intercept(
+        events["adv"].astype(float).tolist(),
+        events["gap"].astype(float).tolist(),
+        rate,
+        pace_coef,
+        gap_coef,
+    )
+    return {"intercept": intercept, "paceCoef": pace_coef, "gapCoef": gap_coef}, rate
 
 
 def fit_overtake_model(
@@ -405,7 +597,8 @@ def fit_overtake_model(
     `adv` is the follower's MODEL pace advantage (leader's predicted lap minus follower's,
     from the fitted lap-time model), the same quantity the simulator compares, rather than
     the observed lap delta (which the pass itself distorts). Returns (model, note); the note
-    is set when the default model was used.
+    is set when the default model was used. With fewer than MIN_PASSES passes the default's
+    slopes are kept and its intercept matched to the race's pass rate (rate_matched_fallback).
     """
     import statsmodels.api as sm
 
@@ -422,14 +615,20 @@ def fit_overtake_model(
         r = state.get((lap, driver))
         if r is None or driver not in fit.driver_pace:
             return float("nan")
-        return predict(fit, driver, str(r.Compound), float(r.TyreLife), lap)
+        return predict(fit, driver, str(r.Compound), float(r.TyreLife), fuel_lap_of(r))
 
     events = events.assign(
         adv=[predicted(e.leader, e.lap) - predicted(e.follower, e.lap) for e in events.itertuples()]
     ).dropna(subset=["adv"])
     n_passes = int(events["passed"].sum())
+    if events.empty:
+        return dict(DEFAULT_OVERTAKE_MODEL), "overtakeModel: no pass opportunities, default"
     if n_passes < MIN_PASSES:
-        return dict(DEFAULT_OVERTAKE_MODEL), f"overtakeModel: {n_passes} passes, default"
+        model, rate = rate_matched_fallback(events)
+        return model, (
+            f"overtakeModel: {n_passes} passes in {len(events)} opportunities, default slopes"
+            f" with intercept {model['intercept']:.2f} matching the pass rate {rate:.4f}"
+        )
     x = sm.add_constant(events[["adv", "gap"]].astype(float))
     try:
         params = sm.Logit(events["passed"].astype(float), x).fit(disp=0).params
@@ -445,22 +644,71 @@ def fit_overtake_model(
     return model, None
 
 
+def pass_opportunities(laps: pd.DataFrame, fit: LapTimeFit, close_gap: float = 2.0) -> pd.DataFrame:
+    """The race's pass opportunities (extract_pass_events) with what the Eras overtake model
+    (overtaking.py) is fitted on: `adv`, the follower's model pace advantage (as in
+    fit_overtake_model), `leader_gap`, the car ahead's own gap to the car ahead of it (a
+    train: both in DRS / dirty-air range), and `gap_next`, the follower's gap on the next lap
+    when it is still directly behind (NaN otherwise). Rows without a model pace are dropped."""
+    events = extract_pass_events(laps, close_gap=close_gap)
+    if events.empty:
+        return events
+    state = {
+        (int(r.LapNumber), str(r.Driver)): r
+        for r in laps.itertuples()
+        if not pd.isna(r.Compound) and not pd.isna(r.TyreLife)
+    }
+
+    def predicted(driver: str, lap: int) -> float:
+        r = state.get((lap, driver))
+        if r is None or driver not in fit.driver_pace:
+            return float("nan")
+        return predict(fit, driver, str(r.Compound), float(r.TyreLife), fuel_lap_of(r))
+
+    gap = gap_to_car_ahead(laps)
+    keys = list(zip(laps["LapNumber"].astype(int), laps["Driver"].astype(str), strict=True))
+    gaps = dict(zip(keys, gap, strict=True))
+    pos = dict(zip(keys, laps["Position"], strict=True))
+
+    def next_gap(e) -> float:
+        pf, pl = pos.get((e.lap + 1, e.follower)), pos.get((e.lap + 1, e.leader))
+        if pf is None or pl is None or pd.isna(pf) or pd.isna(pl) or pf != pl + 1:
+            return float("nan")
+        return float(gaps.get((e.lap + 1, e.follower), float("nan")))
+
+    rows = list(events.itertuples())
+    events = events.assign(
+        adv=[predicted(e.leader, e.lap) - predicted(e.follower, e.lap) for e in rows],
+        leader_gap=[float(gaps.get((e.lap, e.leader), float("nan"))) for e in rows],
+        gap_next=[next_gap(e) for e in rows],
+    )
+    return events.dropna(subset=["adv"]).reset_index(drop=True)
+
+
 def fit_track_params(
     laps: pd.DataFrame,
     clean_laps: pd.DataFrame,
     traffic_laps: pd.DataFrame,
     fit: LapTimeFit,
+    pit_loss_guard: bool = False,
+    refuelling: bool = False,
+    eras_stops: bool = False,
     race_id: str | None = None,
 ) -> TrackParams:
-    """Fit every track-level parameter from one race."""
+    """Fit every track-level parameter from one race. `pit_loss_guard` (Eras builds): the
+    green pit loss leaves out damage and repair stops (pit_loss; `refuelling`: by in-lap
+    only, since the lane time holds the fill). `eras_stops` (Eras builds): back-to-back stops
+    count their shared lap once (stop_records). `race_id` (every build but an Eras one): the
+    pit-loss fixes of docs/pit-loss-spec.md (wet races take the circuit reference, noise-fast
+    stops and implausible VSC losses dropped)."""
     times = sc_vsc_lap_times(laps)
     difficulty, n_opp, n_pass = overtake_difficulty(laps)
     green = times["green"]
-    green_pit = pit_loss(laps)
+    green_pit = pit_loss(laps, guard=pit_loss_guard, lane=not refuelling, eras_stops=eras_stops)
     measured_green = green_pit
     notes: list[str] = []
     reference = reference_pit_loss(race_id) if race_id else None
-    wet_share = wet_stop_share(laps)
+    wet_share = wet_stop_share(laps) if race_id else 0.0
     if reference is not None and wet_share >= WET_STOP_SHARE:
         notes.append(
             f"pitLoss: wet-affected ({wet_share:.0%} of stops on wet tyres), measured "
@@ -468,21 +716,29 @@ def fit_track_params(
             f"reference {reference}s"
         )
         green_pit = reference
+    if pit_loss_guard and green_pit is not None:
+        raw = pit_loss(laps, eras_stops=eras_stops)
+        if raw is not None and abs(raw - green_pit) >= 0.0005:
+            notes.append(
+                f"pitLoss {green_pit:.3f}s without damage/repair stops (median of all green"
+                f" stops {raw:.3f}s)"
+            )
     if green_pit is None:
         # No green stop to measure (Australia 2025: every stop under a SC or VSC, or in the
         # rain): back out the green loss from the neutralized ones.
         for flag, factor in (("SC", SC_PIT_LOSS_FACTOR), ("VSC", VSC_PIT_LOSS_FACTOR)):
-            losses = [loss for _, f, loss in stop_losses(laps) if f == flag]
+            losses = [loss for _, f, loss in stop_losses(laps, eras_stops) if f == flag]
             if losses:
                 green_pit = float(pd.Series(losses).median()) / factor
                 notes.append(f"pitLoss: no green stops, from {len(losses)} {flag} stops")
                 break
     sc_pit = green_pit * SC_PIT_LOSS_FACTOR if green_pit is not None else None
     notes.append(f"pitLossUnderSC estimated as {SC_PIT_LOSS_FACTOR} x green")
-    vsc_pit, n_vsc = pit_loss_under_vsc(laps)
+    vsc_pit, n_vsc = pit_loss_under_vsc(laps, eras_stops)
     lo, hi = VSC_SHARE_RANGE
     if (
-        n_vsc >= MIN_VSC_STOPS
+        race_id
+        and n_vsc >= MIN_VSC_STOPS
         and vsc_pit is not None
         and green_pit
         and not lo <= vsc_pit / green_pit <= hi
@@ -508,8 +764,13 @@ def fit_track_params(
         notes.append(overtake_note)
     return TrackParams(
         overtake_model=overtake,
-        # The spread around what this race's stops measured, not around a reference.
-        pit_loss_deviations=pit_loss_deviations(laps, measured_green),
+        # With `race_id`: the spread around what this race's stops measured, not around a
+        # reference.
+        pit_loss_deviations=(
+            pit_loss_deviations(laps, measured_green, eras_stops, MIN_STOP_DEVIATION)
+            if race_id
+            else pit_loss_deviations(laps, green_pit, eras_stops)
+        ),
         pit_loss=green_pit,
         pit_loss_under_sc=sc_pit,
         pit_loss_under_vsc=vsc_pit,

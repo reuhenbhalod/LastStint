@@ -1,0 +1,41 @@
+{
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": true
+  },
+  "eras": {
+    "eraId": 4,
+    "order": 10,
+    "userSide": "MSCM",
+    "target": {
+      "type": "position",
+      "position": 2
+    },
+    "storyline": {
+      "real": "Ralf Schumacher leads the opening laps for Williams with Michael right behind him. A quick lap just before his first stop takes Michael ahead of his brother, and he wins on three stops. R\u00e4ikk\u00f6nen runs long on two stops from sixth on the grid and finishes second, 1.882 s behind; Barrichello passes Ralf for third late on."
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 3,
+      "label": "Finish in the top two on three stops"
+    },
+    "hidden": {
+      "type": "team_result",
+      "positions": [
+        2,
+        3
+      ],
+      "label": "Top two with Barrichello on the podium"
+    },
+    "hardCalls": {
+      "MSCM": 0,
+      "RAI": 0
+    },
+    "briefing": "Imola, 2003. Ralf Schumacher's Williams has led from the front row, and you run Michael Schumacher's Ferrari, right behind him fifteen laps in. Ferrari and Williams are on three stops; R\u00e4ikk\u00f6nen's McLaren is running long on two. Get ahead of your brother in the stops and bring the Ferrari home in the top two."
+  }
+}

@@ -6,7 +6,7 @@
 // only once the server has confirmed the sign-in is an admin's. The Players tab (/admin/players,
 // PlayersPage.tsx) lists every account that has signed up, on the same terms.
 
-import type { RaceModel } from '@boxthislap/sim';
+import type { RaceModel } from '@laststint/sim';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AUTH0_ENABLED, completeLogin, idToken, login } from '../account/auth0.js';
 import { GOOGLE_CLIENT_ID, loadGoogle } from '../account/google.js';

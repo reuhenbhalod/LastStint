@@ -1,4 +1,5 @@
-// Phase-routed game shell: load today's race from the Worker (practice on the bundled race if
+// Path routing (the daily at `/`, the Gauntlet, Eras, admin, legal and credits pages), and the
+// phase-routed daily shell: load today's race from the Worker (practice on the bundled race if
 // there's no daily), then render by game phase.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -7,8 +8,11 @@ import { AdminPage } from './admin/AdminPage.js';
 import { adminToken } from './admin/session.js';
 import { ProfileSheet } from './components/ProfileSheet.js';
 import { ApiDailyProvider, RaceFileProvider } from './data/provider.js';
-import { useTeamTheme } from './game/teamTheme.js';
+import { Eras } from './eras/ErasScreen.js';
+import { type ErasRoute, erasRoute } from './eras/catalog.js';
+import { useFavouriteColour, useTeamTheme } from './game/teamTheme.js';
 import { useGame } from './game/useGame.js';
+import { Credits } from './screens/Credits.js';
 import { HowItWorks } from './screens/HowItWorks.js';
 import { IntroCard } from './screens/IntroCard.js';
 import { Privacy, Terms } from './screens/Legal.js';
@@ -18,15 +22,57 @@ import { Survivor } from './screens/Survivor.js';
 import { Tutorial } from './screens/Tutorial.js';
 import { Versus } from './screens/Versus.js';
 
+/** The page a path is on: the daily (`/`, and any path not below) or a mode's or page's own. */
+export type Route =
+  | {
+      page:
+        | 'admin'
+        | 'privacy'
+        | 'terms'
+        | 'credits'
+        | 'gauntlet'
+        | 'daily'
+        | 'tutorial'
+        | 'versus';
+    }
+  | { page: 'eras'; eras: ErasRoute };
+
+export function routeOf(pathname: string): Route {
+  if (pathname.startsWith('/admin')) return { page: 'admin' };
+  if (pathname.startsWith('/privacy')) return { page: 'privacy' };
+  if (pathname.startsWith('/tutorial')) return { page: 'tutorial' };
+  if (pathname.startsWith('/terms')) return { page: 'terms' };
+  if (pathname.startsWith('/credits')) return { page: 'credits' };
+  if (pathname.startsWith('/versus')) return { page: 'versus' };
+  if (pathname.startsWith('/gauntlet') || pathname.startsWith('/survivor'))
+    return { page: 'gauntlet' };
+  const eras = erasRoute(pathname);
+  if (eras) return { page: 'eras', eras };
+  return { page: 'daily' };
+}
+
 export function App() {
-  if (location.pathname.startsWith('/admin')) return <AdminPage />;
-  if (location.pathname.startsWith('/privacy')) return <Privacy />;
-  if (location.pathname.startsWith('/tutorial')) return <Tutorial />;
-  if (location.pathname.startsWith('/terms')) return <Terms />;
-  if (location.pathname.startsWith('/versus')) return <Versus />;
-  if (location.pathname.startsWith('/gauntlet') || location.pathname.startsWith('/survivor'))
-    return <Survivor />;
-  return <Game />;
+  const route = routeOf(location.pathname);
+  switch (route.page) {
+    case 'admin':
+      return <AdminPage />;
+    case 'privacy':
+      return <Privacy />;
+    case 'tutorial':
+      return <Tutorial />;
+    case 'terms':
+      return <Terms />;
+    case 'credits':
+      return <Credits />;
+    case 'versus':
+      return <Versus />;
+    case 'gauntlet':
+      return <Survivor />;
+    case 'eras':
+      return <Eras route={route.eras} />;
+    default:
+      return <Game />;
+  }
 }
 
 function Game() {
@@ -45,10 +91,10 @@ function Game() {
   const [help, setHelp] = useState(false);
   // The home page mid-race (the Pit Wall brand): the race holds until you go back to it.
   const [home, setHome] = useState(false);
-  // The race in the driver's team colours (game/teamTheme.ts); the home page in the player's
-  // favourite team's, if they have one.
-  const onHome = home || game.state?.phase === 'intro';
-  useTeamTheme(game.model, onHome ? account.player?.account?.favouriteTeam : null);
+  // The race, and its card on the home page, in the colours of the team you race for
+  // (game/teamTheme.ts); only the top bar's buttons take the player's favourite team's.
+  useTeamTheme(game.model);
+  useFavouriteColour(account.player?.account?.favouriteTeam);
   const { setHold } = game;
   const goHome = useCallback(() => {
     setHold(true);

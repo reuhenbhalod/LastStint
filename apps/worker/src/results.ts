@@ -1,7 +1,7 @@
 // A verified run as stored in D1 and shown on the results screen. Pure (no Worker types), so
 // the nightly re-grading script (scripts/reverify.ts) builds results exactly as the Worker does.
 
-import type { Band, OptionGrade, RealCall, VerifiedRun } from '@boxthislap/sim';
+import type { Band, OptionGrade, RealCall, VerifiedRun } from '@laststint/sim';
 
 /** One graded call, as the results screen and the share card show it. */
 export interface CallResult {

@@ -1,0 +1,44 @@
+{
+  "eras": {
+    "eraId": 1,
+    "order": 3,
+    "userSide": "LAU",
+    "target": {
+      "type": "position",
+      "position": 2
+    },
+    "storyline": {
+      "real": "Prost wins; Lauda, from 11th on the grid, takes second and the title by half a point",
+      "rewriteCondition": {
+        "type": "win"
+      },
+      "headline": "Lauda wins at Estoril and leaves no half-points in doubt"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 1,
+      "label": "Take second with exactly one tyre stop"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "push",
+      "maxLaps": 0,
+      "label": "Take second without a lap at PUSH"
+    },
+    "briefing": "Estoril, October 1984, the last race. Lauda leads the championship by 3.5 points from his McLaren team-mate Prost and needs second place if Prost wins. He started 11th. Turbo cars have 220 litres for the race. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports. Who led each lap is sourced; the lap times are reconstructed.",
+    "hardCalls": {
+      "LAU": 0,
+      "PRO": 0
+    }
+  },
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": false,
+    "fuelLimit": 187.0
+  }
+}

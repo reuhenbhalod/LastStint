@@ -1,7 +1,9 @@
 // Race plans (docs/strategy-planner-spec.md): the shape of a plan, the check every logged plan
 // passes, and the calls a plan makes. No sim state here (sim.ts validates plans with it); the
-// engineer's plans and their grading are in planner.ts.
+// engineer's plans and their grading are in planner.ts. In a refuelling race every planned
+// stop carries its fill (refuel.ts checkFill), and its pit call takes it.
 
+import { checkFill } from './refuel.js';
 import type { Decision, PaceMode, PlanId, RaceModel, RacePlan } from './types.js';
 
 export const PLAN_IDS: readonly PlanId[] = ['a', 'b', 'c', 'own'];
@@ -25,6 +27,7 @@ export function validatePlan(model: RaceModel, plan: RacePlan, fromLap: number):
     }
     if (last > fromLap && s.lap - last < MIN_STINT) throw new Error('planned stops too close');
     if (!model.compounds[s.compound]) throw new Error(`unknown compound ${s.compound}`);
+    checkFill(model, s.fill);
     last = s.lap;
   }
 }
@@ -37,6 +40,7 @@ export function stintStarts(plan: RacePlan, fromLap: number): number[] {
 /**
  * The calls a plan makes from the lap after `fromLap`: a pit call on each stop's in-lap and a
  * pace call where a stint's pace differs from the one before (`pace` is the car's pace now).
+ * A stop's fill (a refuelling race) rides on its pit call.
  */
 export function planCalls(plan: RacePlan, fromLap: number, pace: PaceMode): Decision[] {
   const calls: Decision[] = [];
@@ -47,6 +51,13 @@ export function planCalls(plan: RacePlan, fromLap: number, pace: PaceMode): Deci
       calls.push({ lap: starts[i] as number, kind: 'mode', key: 'pace', value: p });
     current = p;
   });
-  for (const s of plan.stops) calls.push({ lap: s.lap, kind: 'pit', compound: s.compound });
+  for (const s of plan.stops) {
+    calls.push({
+      lap: s.lap,
+      kind: 'pit',
+      compound: s.compound,
+      ...(s.fill !== undefined ? { fill: s.fill } : {}),
+    });
+  }
   return calls.sort((a, b) => a.lap - b.lap);
 }

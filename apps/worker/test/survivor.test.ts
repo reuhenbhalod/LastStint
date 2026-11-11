@@ -3,7 +3,7 @@
 // ranks runs by rounds survived.
 
 import { SELF } from 'cloudflare:test';
-import { type Decision, type RaceModel, decide } from '@boxthislap/sim';
+import { type Decision, type RaceModel, decide } from '@laststint/sim';
 import { describe, expect, it } from 'vitest';
 import canadaJson from '../../../data/races/canada-2022.json';
 import spainJson from '../../../data/races/spain-2020.json';

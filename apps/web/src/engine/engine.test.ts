@@ -1,4 +1,4 @@
-import { simulate } from '@boxthislap/sim';
+import { simulate } from '@laststint/sim';
 import { describe, expect, it } from 'vitest';
 import { StaticDailyProvider } from '../data/provider.js';
 import { GameEngine, decisionMoments } from './engine.js';

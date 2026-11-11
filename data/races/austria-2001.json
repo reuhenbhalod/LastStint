@@ -1,0 +1,741 @@
+{
+  "schemaVersion": 11,
+  "race": {
+    "id": "austria-2001",
+    "name": "Austria 2001: Coulthard vs Barrichello",
+    "laps": 71,
+    "takeoverLap": 44,
+    "seed": 1,
+    "scUnlap": "none"
+  },
+  "era": "1994-2009",
+  "track": {
+    "pitLoss": 27.598,
+    "pitLossUnderSC": 15.179,
+    "pitLossUnderVSC": 19.043,
+    "pitLossDeviations": [
+      -4.974,
+      -3.96,
+      -3.228,
+      -2.81,
+      -2.334,
+      -0.01,
+      0.01,
+      0.5,
+      1.247,
+      2.707,
+      4.915,
+      5.773
+    ],
+    "overtakeDifficulty": 0.9393,
+    "overtakeModel": {
+      "intercept": -0.2774,
+      "paceCoef": 0.8092,
+      "gapCoef": -4.1132,
+      "trainCoef": -0.0531
+    },
+    "dirtyAirPenalty": 0.148,
+    "greenLapTime": 73.621,
+    "scLapTime": 115.038,
+    "refuel": {
+      "secondsPerLap": 0.2509,
+      "laneBase": 26.483,
+      "refFill": 24.111,
+      "tankLaps": 27,
+      "stops": 9
+    }
+  },
+  "compounds": {
+    "MEDIUM": {
+      "offset": 0.0,
+      "degPerLap": 0.00885,
+      "cliffLap": 40,
+      "cliffDegPerLap": 0.0413,
+      "provenLaps": 70
+    }
+  },
+  "drivers": [
+    {
+      "code": "ALE",
+      "team": "Prost",
+      "basePace": 78.6518,
+      "noise": 0.5721,
+      "stateAtTakeover": {
+        "position": 10,
+        "gapAhead": 12.614,
+        "compound": "MEDIUM",
+        "tyreAge": 1,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 44,
+          "to": "MEDIUM",
+          "loss": 27.588
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": 0.004
+        }
+      ]
+    },
+    {
+      "code": "BAR",
+      "team": "Ferrari",
+      "basePace": 76.0271,
+      "noise": 0.3078,
+      "stateAtTakeover": {
+        "position": 1,
+        "gapAhead": 0.0,
+        "compound": "MEDIUM",
+        "tyreAge": 44,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 48,
+          "to": "MEDIUM",
+          "loss": 24.599
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 48,
+          "offset": 0.001
+        }
+      ]
+    },
+    {
+      "code": "BUR",
+      "team": "Prost",
+      "basePace": 78.508,
+      "noise": 0.6476,
+      "stateAtTakeover": {
+        "position": 9,
+        "gapAhead": 62.011,
+        "compound": "MEDIUM",
+        "tyreAge": 44,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 45,
+          "to": "MEDIUM",
+          "loss": 28.404
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 45,
+          "offset": -0.086
+        }
+      ]
+    },
+    {
+      "code": "BUT",
+      "team": "Benetton",
+      "basePace": 79.4017,
+      "noise": 0.7564,
+      "stateAtTakeover": {
+        "position": 12,
+        "gapAhead": 16.542,
+        "compound": "MEDIUM",
+        "tyreAge": 5,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": 0.072
+        }
+      ]
+    },
+    {
+      "code": "COU",
+      "team": "McLaren",
+      "basePace": 75.9669,
+      "noise": 0.4601,
+      "stateAtTakeover": {
+        "position": 2,
+        "gapAhead": 1.072,
+        "compound": "MEDIUM",
+        "tyreAge": 44,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 51,
+          "to": "MEDIUM",
+          "loss": 24.763
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.15
+        },
+        {
+          "lap": 51,
+          "offset": 0.089
+        }
+      ]
+    },
+    {
+      "code": "DLR",
+      "team": "Jaguar",
+      "basePace": 79.4567,
+      "noise": 0.6147,
+      "stateAtTakeover": {
+        "position": 13,
+        "gapAhead": 1.291,
+        "compound": "MEDIUM",
+        "tyreAge": 8,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.005
+        }
+      ]
+    },
+    {
+      "code": "HEI",
+      "team": "Sauber",
+      "basePace": 77.0302,
+      "noise": 0.4922,
+      "stateAtTakeover": {
+        "position": 11,
+        "gapAhead": 0.363,
+        "compound": "MEDIUM",
+        "tyreAge": 44,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -1.122
+        }
+      ]
+    },
+    {
+      "code": "IRV",
+      "team": "Jaguar",
+      "basePace": 77.5658,
+      "noise": 0.6653,
+      "stateAtTakeover": {
+        "position": 7,
+        "gapAhead": 9.609,
+        "compound": "MEDIUM",
+        "tyreAge": 44,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 49,
+          "to": "MEDIUM",
+          "loss": 25.287
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.383
+        },
+        {
+          "lap": 49,
+          "offset": 0.173
+        }
+      ]
+    },
+    {
+      "code": "MSCM",
+      "team": "Ferrari",
+      "basePace": 75.843,
+      "noise": 0.3981,
+      "stateAtTakeover": {
+        "position": 3,
+        "gapAhead": 0.577,
+        "compound": "MEDIUM",
+        "tyreAge": 44,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 47,
+          "to": "MEDIUM",
+          "loss": 27.153
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 47,
+          "offset": -0.018
+        }
+      ]
+    },
+    {
+      "code": "PAN",
+      "team": "BAR",
+      "basePace": 76.809,
+      "noise": 0.6259,
+      "stateAtTakeover": {
+        "position": 5,
+        "gapAhead": 11.557,
+        "compound": "MEDIUM",
+        "tyreAge": 44,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 45,
+          "to": "MEDIUM",
+          "loss": 23.147
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 45,
+          "offset": 0.024
+        }
+      ]
+    },
+    {
+      "code": "RAI",
+      "team": "Sauber",
+      "basePace": 76.4631,
+      "noise": 0.2896,
+      "stateAtTakeover": {
+        "position": 4,
+        "gapAhead": 14.067,
+        "compound": "MEDIUM",
+        "tyreAge": 44,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 47,
+          "to": "MEDIUM",
+          "loss": 34.619
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 47,
+          "offset": 0.043
+        }
+      ]
+    },
+    {
+      "code": "VERO",
+      "team": "Arrows",
+      "basePace": 77.6193,
+      "noise": 0.4359,
+      "stateAtTakeover": {
+        "position": 6,
+        "gapAhead": 18.1,
+        "compound": "MEDIUM",
+        "tyreAge": 21,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 46,
+          "to": "MEDIUM",
+          "loss": 26.99
+        }
+      ],
+      "stintPace": [
+        {
+          "lap": 46,
+          "offset": 0.016
+        }
+      ]
+    },
+    {
+      "code": "VIL",
+      "team": "BAR",
+      "basePace": 77.9523,
+      "noise": 0.6143,
+      "stateAtTakeover": {
+        "position": 8,
+        "gapAhead": 2.8,
+        "compound": "MEDIUM",
+        "tyreAge": 44,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [],
+      "stintPace": [
+        {
+          "lap": 0,
+          "offset": -0.986
+        }
+      ]
+    }
+  ],
+  "fuelEffectPerLap": 0.07297,
+  "freshTyre": {
+    "bonus": -0.3247,
+    "laps": 3
+  },
+  "events": [
+    {
+      "lap": 51,
+      "type": "RETIREMENT",
+      "driver": "DLR"
+    },
+    {
+      "lap": 63,
+      "type": "RETIREMENT",
+      "driver": "BUT"
+    }
+  ],
+  "decisionMoments": [
+    {
+      "id": "stop-50",
+      "lap": 50,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "Stay out",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "Box, mediums",
+          "decisions": [
+            {
+              "lap": 50,
+              "kind": "pit",
+              "compound": "MEDIUM",
+              "fill": {
+                "laps": 21
+              }
+            }
+          ]
+        },
+        {
+          "id": "box-next-medium",
+          "label": "Box next lap, mediums",
+          "decisions": [
+            {
+              "lap": 51,
+              "kind": "pit",
+              "compound": "MEDIUM",
+              "fill": "standard"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "box-medium"
+    },
+    {
+      "id": "pace-56",
+      "lap": 56,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "push",
+          "label": "Push now",
+          "decisions": [
+            {
+              "lap": 56,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "standard",
+          "label": "Standard pace",
+          "decisions": [
+            {
+              "lap": 56,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "manage",
+          "label": "Manage the tyres",
+          "decisions": [
+            {
+              "lap": 56,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "push-attack",
+          "label": "Push and attack",
+          "decisions": [
+            {
+              "lap": 56,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            },
+            {
+              "lap": 56,
+              "kind": "mode",
+              "key": "battle",
+              "value": "attack"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "pace-60",
+      "lap": 60,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "push",
+          "label": "Push now",
+          "decisions": [
+            {
+              "lap": 60,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "standard",
+          "label": "Standard pace",
+          "decisions": [
+            {
+              "lap": 60,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "manage",
+          "label": "Manage the tyres",
+          "decisions": [
+            {
+              "lap": 60,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "push-attack",
+          "label": "Push and attack",
+          "decisions": [
+            {
+              "lap": 60,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            },
+            {
+              "lap": 60,
+              "kind": "mode",
+              "key": "battle",
+              "value": "attack"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "pace-64",
+      "lap": 64,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "push",
+          "label": "Push now",
+          "decisions": [
+            {
+              "lap": 64,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "standard",
+          "label": "Standard pace",
+          "decisions": [
+            {
+              "lap": 64,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "manage",
+          "label": "Manage the tyres",
+          "decisions": [
+            {
+              "lap": 64,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "push-attack",
+          "label": "Push and attack",
+          "decisions": [
+            {
+              "lap": 64,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            },
+            {
+              "lap": 64,
+              "kind": "mode",
+              "key": "battle",
+              "value": "attack"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    }
+  ],
+  "candidateMomentLaps": [
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    51
+  ],
+  "realResult": [
+    "COU",
+    "MSCM",
+    "BAR",
+    "RAI",
+    "PAN",
+    "VERO",
+    "IRV",
+    "VIL",
+    "HEI",
+    "ALE",
+    "BUR",
+    "BUT",
+    "DLR",
+    "MON",
+    "ALO",
+    "MART",
+    "BERN",
+    "TRU",
+    "SCH",
+    "FIS",
+    "FRE",
+    "HAK"
+  ],
+  "userSide": "COU",
+  "rival": "BAR",
+  "eras": {
+    "eraId": 4,
+    "order": 6,
+    "userSide": "COU",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Montoya leads from the start until Schumacher goes for the lead at turn 2 on lap 16 and both run off the road, which hands Barrichello the lead. Coulthard, up from seventh on the grid, has saved fuel: he stops three laps after Barrichello, comes out ahead and wins by 2.19 s. Ferrari have Barrichello give second to Schumacher at the last corner."
+    },
+    "mastery": {
+      "type": "margin",
+      "seconds": 2.2,
+      "label": "Win by more than 2.2 seconds"
+    },
+    "hidden": {
+      "type": "stop_count",
+      "exact": 1,
+      "label": "Win on one stop"
+    },
+    "briefing": "A1-Ring, 2001. Schumacher started on pole and Coulthard seventh. You run Coulthard, second after 44 laps, a second behind Barrichello with Schumacher right behind you, and none of the three has stopped. You saved fuel early: stay out longer than the Ferrari and win.",
+    "hardCalls": {
+      "COU": 0,
+      "BAR": 0
+    }
+  },
+  "provenance": {
+    "kind": "real",
+    "estimated": [
+      "compounds",
+      "safetyCars",
+      "fuelLoads"
+    ]
+  },
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": true
+  }
+}

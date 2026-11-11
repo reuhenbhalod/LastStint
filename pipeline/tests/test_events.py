@@ -46,3 +46,35 @@ def test_extract_events_sorted_and_typed(laps: pd.DataFrame):
     evs = events.extract_events(laps)
     assert [e["lap"] for e in evs] == sorted(e["lap"] for e in evs)
     assert all(e["type"] in {"SC", "VSC", "RED", "RETIREMENT"} for e in evs)
+
+
+def test_from_takeover_keeps_a_period_running_at_the_takeover():
+    timeline = [
+        {"lap": 3, "type": "VSC", "laps": 2},  # over by lap 4: dropped
+        {"lap": 9, "type": "SC", "laps": 6},  # laps 9-14, takeover on 10: kept from lap 10
+        {"lap": 10, "type": "RETIREMENT", "driver": "AAA"},
+        {"lap": 39, "type": "SC", "laps": 4},
+    ]
+    assert events.from_takeover(timeline, 10) == [
+        {"lap": 10, "type": "SC", "laps": 5},
+        {"lap": 10, "type": "RETIREMENT", "driver": "AAA"},
+        {"lap": 39, "type": "SC", "laps": 4},
+    ]
+    assert timeline[1] == {"lap": 9, "type": "SC", "laps": 6}  # input not mutated
+
+
+def test_from_takeover_drops_a_period_ending_on_the_takeover_lap():
+    # Brazil 2021: SC laps 6-9, takeover on 9; the sim's first lap (10) is green.
+    assert events.from_takeover([{"lap": 6, "type": "SC", "laps": 4}], 9) == []
+    # A VSC still out after it is cut like an SC.
+    assert events.from_takeover([{"lap": 6, "type": "VSC", "laps": 5}], 9) == [
+        {"lap": 9, "type": "VSC", "laps": 2}
+    ]
+
+
+def test_from_takeover_does_not_cut_a_red_flag_or_a_fault():
+    timeline = [
+        {"lap": 5, "type": "RED", "laps": 3},
+        {"lap": 5, "type": "FAULT", "driver": "AAA", "fault": "power-loss", "paceLoss": 1.0},
+    ]
+    assert events.from_takeover(timeline, 6) == []  # faults are kept by assemble (lasts_past)

@@ -1,0 +1,37 @@
+{
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": true,
+    "drs": true,
+    "ers": "hybrid",
+    "refuelling": false
+  },
+  "eras": {
+    "eraId": 10,
+    "order": 3,
+    "userSide": "VER",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Verstappen wins from tenth on the grid, through a mid-race spin, after Ferrari moves Leclerc onto the hard tyres."
+    },
+    "mastery": {
+      "type": "compound_rule",
+      "mustAvoid": "HARD",
+      "label": "Win without running the hard tyre"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 8,
+      "label": "Win by more than 8 seconds"
+    },
+    "hardCalls": {
+      "VER": 1,
+      "LEC": 0
+    },
+    "briefing": "Hungary, 2022. A power unit problem in qualifying leaves Verstappen tenth on the grid. Russell is on pole, with Sainz and Leclerc right behind him."
+  }
+}

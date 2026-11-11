@@ -1,0 +1,37 @@
+{
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": true
+  },
+  "eras": {
+    "eraId": 3,
+    "order": 1,
+    "userSide": "HIL",
+    "hardCalls": {
+      "HIL": 1,
+      "MSCM": 0
+    },
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Hill wins by 24 seconds; Schumacher, stuck in fifth gear from his first stop, still finishes second"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "max": 1,
+      "label": "Win on one stop"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 10,
+      "label": "Win by more than 10 seconds"
+    },
+    "briefing": "Barcelona, 1994. Schumacher led from pole, but his Benetton is stuck in fifth gear after his first stop. Hill's Williams has the chance to take its first win of the season. In the real race Hill stopped once and Schumacher twice. Reconstructed race: no lap timing survives, so the laps are rebuilt to fit the result, the fastest laps, the sourced stops and who led each lap (Jolpica, F1DB, Motor Sport, Wikipedia). Who led each lap is sourced; the lap times, and the order behind the leader, are reconstructed."
+  }
+}

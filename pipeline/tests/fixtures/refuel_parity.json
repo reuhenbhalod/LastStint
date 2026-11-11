@@ -1,0 +1,2842 @@
+{
+ "cases": [
+  {
+   "name": "abu-dhabi-2021 refuelling, real strategies (the weight)",
+   "race": "abu-dhabi-2021",
+   "rules": {
+    "refuelling": true
+   },
+   "refuel": {
+    "secondsPerLap": 0.3,
+    "laneBase": 18.0,
+    "refFill": 15.0,
+    "tankLaps": 30,
+    "stops": 20
+   },
+   "fillCap": 30,
+   "results": {
+    "1": {
+     "order": [
+      "VER",
+      "HAM",
+      "SAI",
+      "BOT",
+      "TSU",
+      "NOR",
+      "GAS",
+      "OCO",
+      "ALO",
+      "LEC",
+      "VET",
+      "RIC",
+      "STR",
+      "MSC",
+      "PER",
+      "LAT"
+     ],
+     "gaps": {
+      "VER": 0.0,
+      "HAM": 0.231,
+      "SAI": 2.262,
+      "BOT": 2.562,
+      "TSU": 2.862,
+      "NOR": 3.162,
+      "GAS": 3.462,
+      "OCO": 92.773,
+      "ALO": 96.256,
+      "LEC": 100.339,
+      "VET": 108.039,
+      "RIC": 108.71,
+      "STR": 120.542,
+      "MSC": 155.077
+     },
+     "times": {
+      "VER": 2374.098,
+      "HAM": 2374.329,
+      "SAI": 2376.36,
+      "BOT": 2376.66,
+      "TSU": 2376.96,
+      "NOR": 2377.26,
+      "GAS": 2377.56,
+      "OCO": 2466.871,
+      "ALO": 2470.355,
+      "LEC": 2474.437,
+      "VET": 2482.137,
+      "RIC": 2482.808,
+      "STR": 2494.64,
+      "MSC": 2529.175
+     },
+     "finishers": [
+      "VER",
+      "HAM",
+      "SAI",
+      "BOT",
+      "TSU",
+      "NOR",
+      "GAS",
+      "OCO",
+      "ALO",
+      "LEC",
+      "VET",
+      "RIC",
+      "STR",
+      "MSC"
+     ]
+    },
+    "2": {
+     "order": [
+      "VER",
+      "HAM",
+      "SAI",
+      "BOT",
+      "TSU",
+      "NOR",
+      "GAS",
+      "OCO",
+      "LEC",
+      "ALO",
+      "RIC",
+      "VET",
+      "STR",
+      "MSC",
+      "PER",
+      "LAT"
+     ],
+     "gaps": {
+      "VER": 0.0,
+      "HAM": 0.552,
+      "SAI": 2.743,
+      "BOT": 3.043,
+      "TSU": 3.482,
+      "NOR": 3.782,
+      "GAS": 4.082,
+      "OCO": 97.942,
+      "LEC": 99.94,
+      "ALO": 100.0,
+      "RIC": 104.195,
+      "VET": 107.912,
+      "STR": 121.81,
+      "MSC": 159.146
+     },
+     "times": {
+      "VER": 2373.459,
+      "HAM": 2374.011,
+      "SAI": 2376.202,
+      "BOT": 2376.502,
+      "TSU": 2376.94,
+      "NOR": 2377.24,
+      "GAS": 2377.54,
+      "OCO": 2471.4,
+      "LEC": 2473.398,
+      "ALO": 2473.459,
+      "RIC": 2477.654,
+      "VET": 2481.371,
+      "STR": 2495.269,
+      "MSC": 2532.605
+     },
+     "finishers": [
+      "VER",
+      "HAM",
+      "SAI",
+      "BOT",
+      "TSU",
+      "NOR",
+      "GAS",
+      "OCO",
+      "LEC",
+      "ALO",
+      "RIC",
+      "VET",
+      "STR",
+      "MSC"
+     ]
+    },
+    "3": {
+     "order": [
+      "VER",
+      "HAM",
+      "GAS",
+      "SAI",
+      "BOT",
+      "TSU",
+      "NOR",
+      "LEC",
+      "OCO",
+      "RIC",
+      "ALO",
+      "VET",
+      "STR",
+      "MSC",
+      "PER",
+      "LAT"
+     ],
+     "gaps": {
+      "VER": 0.0,
+      "HAM": 1.039,
+      "GAS": 2.501,
+      "SAI": 2.515,
+      "BOT": 2.99,
+      "TSU": 3.29,
+      "NOR": 4.22,
+      "LEC": 96.35,
+      "OCO": 97.133,
+      "RIC": 97.578,
+      "ALO": 99.484,
+      "VET": 107.013,
+      "STR": 121.43,
+      "MSC": 153.625
+     },
+     "times": {
+      "VER": 2375.742,
+      "HAM": 2376.781,
+      "GAS": 2378.243,
+      "SAI": 2378.257,
+      "BOT": 2378.731,
+      "TSU": 2379.031,
+      "NOR": 2379.962,
+      "LEC": 2472.091,
+      "OCO": 2472.875,
+      "RIC": 2473.319,
+      "ALO": 2475.225,
+      "VET": 2482.755,
+      "STR": 2497.172,
+      "MSC": 2529.367
+     },
+     "finishers": [
+      "VER",
+      "HAM",
+      "GAS",
+      "SAI",
+      "BOT",
+      "TSU",
+      "NOR",
+      "LEC",
+      "OCO",
+      "RIC",
+      "ALO",
+      "VET",
+      "STR",
+      "MSC"
+     ]
+    },
+    "4": {
+     "order": [
+      "VER",
+      "HAM",
+      "TSU",
+      "GAS",
+      "SAI",
+      "BOT",
+      "NOR",
+      "OCO",
+      "LEC",
+      "ALO",
+      "RIC",
+      "VET",
+      "STR",
+      "MSC",
+      "PER",
+      "LAT"
+     ],
+     "gaps": {
+      "VER": 0.0,
+      "HAM": 0.305,
+      "TSU": 2.304,
+      "GAS": 2.604,
+      "SAI": 3.298,
+      "BOT": 3.598,
+      "NOR": 3.673,
+      "OCO": 97.109,
+      "LEC": 97.409,
+      "ALO": 101.337,
+      "RIC": 103.233,
+      "VET": 109.38,
+      "STR": 120.675,
+      "MSC": 154.223
+     },
+     "times": {
+      "VER": 2374.358,
+      "HAM": 2374.663,
+      "TSU": 2376.662,
+      "GAS": 2376.962,
+      "SAI": 2377.655,
+      "BOT": 2377.955,
+      "NOR": 2378.031,
+      "OCO": 2471.467,
+      "LEC": 2471.767,
+      "ALO": 2475.694,
+      "RIC": 2477.591,
+      "VET": 2483.738,
+      "STR": 2495.033,
+      "MSC": 2528.581
+     },
+     "finishers": [
+      "VER",
+      "HAM",
+      "TSU",
+      "GAS",
+      "SAI",
+      "BOT",
+      "NOR",
+      "OCO",
+      "LEC",
+      "ALO",
+      "RIC",
+      "VET",
+      "STR",
+      "MSC"
+     ]
+    },
+    "5": {
+     "order": [
+      "HAM",
+      "VER",
+      "TSU",
+      "SAI",
+      "GAS",
+      "BOT",
+      "NOR",
+      "OCO",
+      "ALO",
+      "LEC",
+      "VET",
+      "RIC",
+      "STR",
+      "MSC",
+      "PER",
+      "LAT"
+     ],
+     "gaps": {
+      "HAM": 0.0,
+      "VER": 0.3,
+      "TSU": 1.784,
+      "SAI": 2.032,
+      "GAS": 2.084,
+      "BOT": 2.364,
+      "NOR": 3.486,
+      "OCO": 94.644,
+      "ALO": 97.814,
+      "LEC": 100.079,
+      "VET": 109.257,
+      "RIC": 111.005,
+      "STR": 119.628,
+      "MSC": 156.651
+     },
+     "times": {
+      "HAM": 2373.811,
+      "VER": 2374.111,
+      "TSU": 2375.595,
+      "SAI": 2375.842,
+      "GAS": 2375.895,
+      "BOT": 2376.175,
+      "NOR": 2377.297,
+      "OCO": 2468.455,
+      "ALO": 2471.625,
+      "LEC": 2473.89,
+      "VET": 2483.068,
+      "RIC": 2484.815,
+      "STR": 2493.439,
+      "MSC": 2530.462
+     },
+     "finishers": [
+      "HAM",
+      "VER",
+      "TSU",
+      "SAI",
+      "GAS",
+      "BOT",
+      "NOR",
+      "OCO",
+      "ALO",
+      "LEC",
+      "VET",
+      "RIC",
+      "STR",
+      "MSC"
+     ]
+    }
+   }
+  },
+  {
+   "name": "abu-dhabi-2021 refuelling, new stops and fill choices",
+   "race": "abu-dhabi-2021",
+   "rules": {
+    "refuelling": true
+   },
+   "refuel": {
+    "secondsPerLap": 0.3,
+    "laneBase": 18.0,
+    "refFill": 15.0,
+    "tankLaps": 30,
+    "stops": 20
+   },
+   "strategies": {
+    "HAM": [
+     {
+      "lap": 40,
+      "to": "HARD"
+     },
+     {
+      "lap": 50,
+      "to": "SOFT"
+     }
+    ],
+    "SAI": [
+     {
+      "lap": 38,
+      "to": "HARD",
+      "fill": "short"
+     },
+     {
+      "lap": 47,
+      "to": "SOFT",
+      "fill": "long"
+     }
+    ],
+    "VER": [
+     {
+      "lap": 37,
+      "to": "HARD",
+      "loss": 10.684,
+      "fill": "long"
+     },
+     {
+      "lap": 54,
+      "to": "SOFT"
+     }
+    ],
+    "PER": [
+     {
+      "lap": 45,
+      "to": "HARD",
+      "fill": "standard"
+     }
+    ],
+    "LEC": [
+     {
+      "lap": 40,
+      "to": "HARD",
+      "fill": {
+       "laps": 9
+      }
+     },
+     {
+      "lap": 49,
+      "to": "SOFT",
+      "fill": {
+       "laps": 30
+      }
+     }
+    ]
+   },
+   "fillCap": 30,
+   "results": {
+    "1": {
+     "order": [
+      "VER",
+      "HAM",
+      "BOT",
+      "TSU",
+      "GAS",
+      "NOR",
+      "SAI",
+      "ALO",
+      "OCO",
+      "VET",
+      "RIC",
+      "LEC",
+      "STR",
+      "MSC",
+      "PER",
+      "LAT"
+     ],
+     "gaps": {
+      "VER": 0.0,
+      "HAM": 0.532,
+      "BOT": 2.419,
+      "TSU": 2.719,
+      "GAS": 3.019,
+      "NOR": 3.489,
+      "SAI": 4.93,
+      "ALO": 5.766,
+      "OCO": 6.309,
+      "VET": 6.692,
+      "RIC": 6.992,
+      "LEC": 97.786,
+      "STR": 98.696,
+      "MSC": 132.716
+     },
+     "times": {
+      "VER": 2396.459,
+      "HAM": 2396.991,
+      "BOT": 2398.878,
+      "TSU": 2399.178,
+      "GAS": 2399.478,
+      "NOR": 2399.948,
+      "SAI": 2401.389,
+      "ALO": 2402.225,
+      "OCO": 2402.768,
+      "VET": 2403.151,
+      "RIC": 2403.451,
+      "LEC": 2494.245,
+      "STR": 2495.155,
+      "MSC": 2529.175
+     },
+     "finishers": [
+      "VER",
+      "HAM",
+      "BOT",
+      "TSU",
+      "GAS",
+      "NOR",
+      "SAI",
+      "ALO",
+      "OCO",
+      "VET",
+      "RIC",
+      "LEC",
+      "STR",
+      "MSC"
+     ]
+    },
+    "2": {
+     "order": [
+      "HAM",
+      "VER",
+      "BOT",
+      "TSU",
+      "NOR",
+      "GAS",
+      "SAI",
+      "ALO",
+      "RIC",
+      "OCO",
+      "VET",
+      "LEC",
+      "STR",
+      "MSC",
+      "PER",
+      "LAT"
+     ],
+     "gaps": {
+      "HAM": 0.0,
+      "VER": 0.05,
+      "BOT": 3.267,
+      "TSU": 4.046,
+      "NOR": 4.346,
+      "GAS": 4.646,
+      "SAI": 4.961,
+      "ALO": 7.666,
+      "RIC": 7.966,
+      "OCO": 8.252,
+      "VET": 8.266,
+      "LEC": 97.234,
+      "STR": 100.878,
+      "MSC": 138.214
+     },
+     "times": {
+      "HAM": 2394.391,
+      "VER": 2394.441,
+      "BOT": 2397.658,
+      "TSU": 2398.437,
+      "NOR": 2398.737,
+      "GAS": 2399.037,
+      "SAI": 2399.352,
+      "ALO": 2402.056,
+      "RIC": 2402.356,
+      "OCO": 2402.643,
+      "VET": 2402.656,
+      "LEC": 2491.625,
+      "STR": 2495.269,
+      "MSC": 2532.605
+     },
+     "finishers": [
+      "HAM",
+      "VER",
+      "BOT",
+      "TSU",
+      "NOR",
+      "GAS",
+      "SAI",
+      "ALO",
+      "RIC",
+      "OCO",
+      "VET",
+      "LEC",
+      "STR",
+      "MSC"
+     ]
+    },
+    "3": {
+     "order": [
+      "VER",
+      "HAM",
+      "BOT",
+      "TSU",
+      "GAS",
+      "NOR",
+      "SAI",
+      "RIC",
+      "ALO",
+      "OCO",
+      "VET",
+      "LEC",
+      "STR",
+      "MSC",
+      "PER",
+      "LAT"
+     ],
+     "gaps": {
+      "VER": 0.0,
+      "HAM": 1.34,
+      "BOT": 3.504,
+      "TSU": 3.804,
+      "GAS": 4.104,
+      "NOR": 4.734,
+      "SAI": 5.034,
+      "RIC": 6.683,
+      "ALO": 7.849,
+      "OCO": 7.858,
+      "VET": 8.174,
+      "LEC": 99.248,
+      "STR": 105.402,
+      "MSC": 137.597
+     },
+     "times": {
+      "VER": 2391.77,
+      "HAM": 2393.111,
+      "BOT": 2395.274,
+      "TSU": 2395.574,
+      "GAS": 2395.874,
+      "NOR": 2396.505,
+      "SAI": 2396.805,
+      "RIC": 2398.453,
+      "ALO": 2399.62,
+      "OCO": 2399.628,
+      "VET": 2399.944,
+      "LEC": 2491.019,
+      "STR": 2497.172,
+      "MSC": 2529.367
+     },
+     "finishers": [
+      "VER",
+      "HAM",
+      "BOT",
+      "TSU",
+      "GAS",
+      "NOR",
+      "SAI",
+      "RIC",
+      "ALO",
+      "OCO",
+      "VET",
+      "LEC",
+      "STR",
+      "MSC"
+     ]
+    },
+    "4": {
+     "order": [
+      "VER",
+      "HAM",
+      "BOT",
+      "TSU",
+      "GAS",
+      "NOR",
+      "SAI",
+      "OCO",
+      "ALO",
+      "RIC",
+      "VET",
+      "LEC",
+      "STR",
+      "MSC",
+      "PER",
+      "LAT"
+     ],
+     "gaps": {
+      "VER": 0.0,
+      "HAM": 0.606,
+      "BOT": 2.759,
+      "TSU": 3.059,
+      "GAS": 3.359,
+      "NOR": 4.187,
+      "SAI": 5.465,
+      "OCO": 7.374,
+      "ALO": 7.674,
+      "RIC": 7.974,
+      "VET": 8.274,
+      "LEC": 96.985,
+      "STR": 100.736,
+      "MSC": 134.284
+     },
+     "times": {
+      "VER": 2394.297,
+      "HAM": 2394.903,
+      "BOT": 2397.056,
+      "TSU": 2397.356,
+      "GAS": 2397.656,
+      "NOR": 2398.484,
+      "SAI": 2399.762,
+      "OCO": 2401.671,
+      "ALO": 2401.971,
+      "RIC": 2402.271,
+      "VET": 2402.571,
+      "LEC": 2491.282,
+      "STR": 2495.033,
+      "MSC": 2528.581
+     },
+     "finishers": [
+      "VER",
+      "HAM",
+      "BOT",
+      "TSU",
+      "GAS",
+      "NOR",
+      "SAI",
+      "OCO",
+      "ALO",
+      "RIC",
+      "VET",
+      "LEC",
+      "STR",
+      "MSC"
+     ]
+    },
+    "5": {
+     "order": [
+      "VER",
+      "HAM",
+      "TSU",
+      "GAS",
+      "BOT",
+      "NOR",
+      "SAI",
+      "OCO",
+      "ALO",
+      "RIC",
+      "VET",
+      "STR",
+      "LEC",
+      "MSC",
+      "PER",
+      "LAT"
+     ],
+     "gaps": {
+      "VER": 0.0,
+      "HAM": 0.907,
+      "TSU": 2.904,
+      "GAS": 3.204,
+      "BOT": 3.485,
+      "NOR": 4.607,
+      "SAI": 5.305,
+      "OCO": 7.149,
+      "ALO": 7.161,
+      "RIC": 8.376,
+      "VET": 8.676,
+      "STR": 98.347,
+      "LEC": 99.318,
+      "MSC": 135.37
+     },
+     "times": {
+      "VER": 2395.092,
+      "HAM": 2395.999,
+      "TSU": 2397.996,
+      "GAS": 2398.296,
+      "BOT": 2398.577,
+      "NOR": 2399.699,
+      "SAI": 2400.397,
+      "OCO": 2402.241,
+      "ALO": 2402.253,
+      "RIC": 2403.468,
+      "VET": 2403.768,
+      "STR": 2493.439,
+      "LEC": 2494.41,
+      "MSC": 2530.462
+     },
+     "finishers": [
+      "VER",
+      "HAM",
+      "TSU",
+      "GAS",
+      "BOT",
+      "NOR",
+      "SAI",
+      "OCO",
+      "ALO",
+      "RIC",
+      "VET",
+      "STR",
+      "LEC",
+      "MSC"
+     ]
+    }
+   }
+  },
+  {
+   "name": "abu-dhabi-2021 2005 rules: a stop only refuels",
+   "race": "abu-dhabi-2021",
+   "rules": {
+    "refuelling": true,
+    "tyreChanges": false
+   },
+   "refuel": {
+    "secondsPerLap": 0.3,
+    "laneBase": 18.0,
+    "refFill": 15.0,
+    "tankLaps": 30,
+    "stops": 20
+   },
+   "strategies": {
+    "HAM": [
+     {
+      "lap": 40,
+      "to": "HARD"
+     },
+     {
+      "lap": 50,
+      "to": "SOFT"
+     }
+    ],
+    "SAI": [
+     {
+      "lap": 38,
+      "to": "HARD",
+      "fill": "short"
+     },
+     {
+      "lap": 47,
+      "to": "SOFT",
+      "fill": "long"
+     }
+    ],
+    "VER": [
+     {
+      "lap": 37,
+      "to": "HARD",
+      "loss": 10.684,
+      "fill": "long"
+     },
+     {
+      "lap": 54,
+      "to": "SOFT"
+     }
+    ],
+    "PER": [
+     {
+      "lap": 45,
+      "to": "HARD",
+      "fill": "standard"
+     }
+    ],
+    "LEC": [
+     {
+      "lap": 40,
+      "to": "HARD",
+      "fill": {
+       "laps": 9
+      }
+     },
+     {
+      "lap": 49,
+      "to": "SOFT",
+      "fill": {
+       "laps": 30
+      }
+     }
+    ]
+   },
+   "fillCap": 30,
+   "results": {
+    "1": {
+     "order": [
+      "VER",
+      "HAM",
+      "BOT",
+      "TSU",
+      "NOR",
+      "OCO",
+      "SAI",
+      "VET",
+      "RIC",
+      "GAS",
+      "STR",
+      "LEC",
+      "ALO",
+      "MSC",
+      "PER",
+      "LAT"
+     ],
+     "gaps": {
+      "VER": 0.0,
+      "HAM": 0.352,
+      "BOT": 0.652,
+      "TSU": 1.091,
+      "NOR": 2.233,
+      "OCO": 3.901,
+      "SAI": 4.201,
+      "VET": 4.501,
+      "RIC": 5.747,
+      "GAS": 6.656,
+      "STR": 94.318,
+      "LEC": 98.246,
+      "ALO": 98.362,
+      "MSC": 128.675
+     },
+     "times": {
+      "VER": 2402.736,
+      "HAM": 2403.087,
+      "BOT": 2403.387,
+      "TSU": 2403.827,
+      "NOR": 2404.969,
+      "OCO": 2406.636,
+      "SAI": 2406.936,
+      "VET": 2407.236,
+      "RIC": 2408.482,
+      "GAS": 2409.392,
+      "STR": 2497.054,
+      "LEC": 2500.982,
+      "ALO": 2501.098,
+      "MSC": 2531.411
+     },
+     "finishers": [
+      "VER",
+      "HAM",
+      "BOT",
+      "TSU",
+      "NOR",
+      "OCO",
+      "SAI",
+      "VET",
+      "RIC",
+      "GAS",
+      "STR",
+      "LEC",
+      "ALO",
+      "MSC"
+     ]
+    },
+    "2": {
+     "order": [
+      "HAM",
+      "VER",
+      "BOT",
+      "TSU",
+      "NOR",
+      "SAI",
+      "RIC",
+      "OCO",
+      "VET",
+      "GAS",
+      "STR",
+      "ALO",
+      "LEC",
+      "MSC",
+      "PER",
+      "LAT"
+     ],
+     "gaps": {
+      "HAM": 0.0,
+      "VER": 0.05,
+      "BOT": 1.359,
+      "TSU": 2.805,
+      "NOR": 3.32,
+      "SAI": 3.899,
+      "RIC": 5.189,
+      "OCO": 5.343,
+      "VET": 5.489,
+      "GAS": 8.232,
+      "STR": 95.471,
+      "ALO": 100.962,
+      "LEC": 101.262,
+      "MSC": 134.173
+     },
+     "times": {
+      "HAM": 2400.668,
+      "VER": 2400.718,
+      "BOT": 2402.026,
+      "TSU": 2403.472,
+      "NOR": 2403.987,
+      "SAI": 2404.567,
+      "RIC": 2405.857,
+      "OCO": 2406.011,
+      "VET": 2406.157,
+      "GAS": 2408.899,
+      "STR": 2496.139,
+      "ALO": 2501.629,
+      "LEC": 2501.929,
+      "MSC": 2534.841
+     },
+     "finishers": [
+      "HAM",
+      "VER",
+      "BOT",
+      "TSU",
+      "NOR",
+      "SAI",
+      "RIC",
+      "OCO",
+      "VET",
+      "GAS",
+      "STR",
+      "ALO",
+      "LEC",
+      "MSC"
+     ]
+    },
+    "3": {
+     "order": [
+      "VER",
+      "HAM",
+      "BOT",
+      "TSU",
+      "NOR",
+      "OCO",
+      "SAI",
+      "RIC",
+      "VET",
+      "GAS",
+      "STR",
+      "LEC",
+      "ALO",
+      "MSC",
+      "PER",
+      "LAT"
+     ],
+     "gaps": {
+      "VER": 0.0,
+      "HAM": 1.159,
+      "BOT": 1.595,
+      "TSU": 1.945,
+      "NOR": 3.479,
+      "OCO": 4.949,
+      "SAI": 5.249,
+      "RIC": 5.549,
+      "VET": 5.765,
+      "GAS": 6.743,
+      "STR": 99.658,
+      "LEC": 99.708,
+      "ALO": 105.349,
+      "MSC": 133.556
+     },
+     "times": {
+      "VER": 2398.047,
+      "HAM": 2399.206,
+      "BOT": 2399.643,
+      "TSU": 2399.993,
+      "NOR": 2401.526,
+      "OCO": 2402.997,
+      "SAI": 2403.297,
+      "RIC": 2403.597,
+      "VET": 2403.813,
+      "GAS": 2404.79,
+      "STR": 2497.706,
+      "LEC": 2497.756,
+      "ALO": 2503.396,
+      "MSC": 2531.603
+     },
+     "finishers": [
+      "VER",
+      "HAM",
+      "BOT",
+      "TSU",
+      "NOR",
+      "OCO",
+      "SAI",
+      "RIC",
+      "VET",
+      "GAS",
+      "STR",
+      "LEC",
+      "ALO",
+      "MSC"
+     ]
+    },
+    "4": {
+     "order": [
+      "VER",
+      "HAM",
+      "BOT",
+      "TSU",
+      "NOR",
+      "OCO",
+      "SAI",
+      "RIC",
+      "VET",
+      "GAS",
+      "STR",
+      "LEC",
+      "ALO",
+      "MSC",
+      "PER",
+      "LAT"
+     ],
+     "gaps": {
+      "VER": 0.0,
+      "HAM": 0.426,
+      "BOT": 0.85,
+      "TSU": 1.576,
+      "NOR": 2.931,
+      "OCO": 4.465,
+      "SAI": 4.765,
+      "RIC": 5.066,
+      "VET": 5.424,
+      "GAS": 6.6,
+      "STR": 94.997,
+      "LEC": 96.931,
+      "ALO": 104.32,
+      "MSC": 129.728
+     },
+     "times": {
+      "VER": 2401.088,
+      "HAM": 2401.514,
+      "BOT": 2401.938,
+      "TSU": 2402.665,
+      "NOR": 2404.02,
+      "OCO": 2405.554,
+      "SAI": 2405.854,
+      "RIC": 2406.154,
+      "VET": 2406.512,
+      "GAS": 2407.689,
+      "STR": 2496.085,
+      "LEC": 2498.019,
+      "ALO": 2505.408,
+      "MSC": 2530.817
+     },
+     "finishers": [
+      "VER",
+      "HAM",
+      "BOT",
+      "TSU",
+      "NOR",
+      "OCO",
+      "SAI",
+      "RIC",
+      "VET",
+      "GAS",
+      "STR",
+      "LEC",
+      "ALO",
+      "MSC"
+     ]
+    },
+    "5": {
+     "order": [
+      "HAM",
+      "VER",
+      "BOT",
+      "TSU",
+      "NOR",
+      "SAI",
+      "VET",
+      "OCO",
+      "RIC",
+      "GAS",
+      "STR",
+      "ALO",
+      "LEC",
+      "MSC",
+      "PER",
+      "LAT"
+     ],
+     "gaps": {
+      "HAM": 0.0,
+      "VER": 0.05,
+      "BOT": 1.626,
+      "TSU": 1.926,
+      "NOR": 3.401,
+      "SAI": 3.701,
+      "VET": 5.037,
+      "OCO": 5.29,
+      "RIC": 6.915,
+      "GAS": 6.965,
+      "STR": 94.534,
+      "ALO": 100.535,
+      "LEC": 100.835,
+      "MSC": 131.379
+     },
+     "times": {
+      "HAM": 2401.319,
+      "VER": 2401.369,
+      "BOT": 2402.945,
+      "TSU": 2403.245,
+      "NOR": 2404.72,
+      "SAI": 2405.02,
+      "VET": 2406.356,
+      "OCO": 2406.609,
+      "RIC": 2408.234,
+      "GAS": 2408.284,
+      "STR": 2495.852,
+      "ALO": 2501.853,
+      "LEC": 2502.153,
+      "MSC": 2532.698
+     },
+     "finishers": [
+      "HAM",
+      "VER",
+      "BOT",
+      "TSU",
+      "NOR",
+      "SAI",
+      "VET",
+      "OCO",
+      "RIC",
+      "GAS",
+      "STR",
+      "ALO",
+      "LEC",
+      "MSC"
+     ]
+    }
+   }
+  },
+  {
+   "name": "canada-2024 refuelling, no fit (the physical prior), wet stops",
+   "race": "canada-2024",
+   "rules": {
+    "refuelling": true
+   },
+   "fillCap": 70,
+   "results": {
+    "1": {
+     "order": [
+      "PIA",
+      "NOR",
+      "VER",
+      "RUS",
+      "HAM",
+      "ALO",
+      "MAG",
+      "STR",
+      "HUL",
+      "OCO",
+      "RIC",
+      "TSU",
+      "BOT",
+      "GAS",
+      "ZHO",
+      "ALB",
+      "SAI",
+      "PER"
+     ],
+     "gaps": {
+      "PIA": 0.0,
+      "NOR": 0.772,
+      "VER": 1.098,
+      "RUS": 3.916,
+      "HAM": 12.604,
+      "ALO": 14.58,
+      "MAG": 15.629,
+      "STR": 17.104,
+      "HUL": 19.401,
+      "OCO": 22.327,
+      "RIC": 23.46,
+      "TSU": 30.074,
+      "BOT": 30.374,
+      "GAS": 30.674,
+      "ZHO": 38.295
+     },
+     "times": {
+      "PIA": 4413.272,
+      "NOR": 4414.044,
+      "VER": 4414.371,
+      "RUS": 4417.188,
+      "HAM": 4425.877,
+      "ALO": 4427.852,
+      "MAG": 4428.901,
+      "STR": 4430.376,
+      "HUL": 4432.674,
+      "OCO": 4435.599,
+      "RIC": 4436.732,
+      "TSU": 4443.346,
+      "BOT": 4443.646,
+      "GAS": 4443.946,
+      "ZHO": 4451.567
+     },
+     "finishers": [
+      "PIA",
+      "NOR",
+      "VER",
+      "RUS",
+      "HAM",
+      "ALO",
+      "MAG",
+      "STR",
+      "HUL",
+      "OCO",
+      "RIC",
+      "TSU",
+      "BOT",
+      "GAS",
+      "ZHO"
+     ]
+    },
+    "2": {
+     "order": [
+      "VER",
+      "NOR",
+      "PIA",
+      "HAM",
+      "RUS",
+      "ALO",
+      "RIC",
+      "GAS",
+      "HUL",
+      "TSU",
+      "OCO",
+      "STR",
+      "BOT",
+      "MAG",
+      "ZHO",
+      "SAI",
+      "ALB",
+      "PER"
+     ],
+     "gaps": {
+      "VER": 0.0,
+      "NOR": 4.02,
+      "PIA": 8.957,
+      "HAM": 13.556,
+      "RUS": 16.716,
+      "ALO": 22.171,
+      "RIC": 28.849,
+      "GAS": 29.149,
+      "HUL": 29.449,
+      "TSU": 31.323,
+      "OCO": 31.573,
+      "STR": 31.623,
+      "BOT": 37.243,
+      "MAG": 37.543,
+      "ZHO": 43.265
+     },
+     "times": {
+      "VER": 4406.31,
+      "NOR": 4410.33,
+      "PIA": 4415.267,
+      "HAM": 4419.866,
+      "RUS": 4423.026,
+      "ALO": 4428.48,
+      "RIC": 4435.159,
+      "GAS": 4435.459,
+      "HUL": 4435.759,
+      "TSU": 4437.633,
+      "OCO": 4437.883,
+      "STR": 4437.933,
+      "BOT": 4443.552,
+      "MAG": 4443.852,
+      "ZHO": 4449.575
+     },
+     "finishers": [
+      "VER",
+      "NOR",
+      "PIA",
+      "HAM",
+      "RUS",
+      "ALO",
+      "RIC",
+      "GAS",
+      "HUL",
+      "TSU",
+      "OCO",
+      "STR",
+      "BOT",
+      "MAG",
+      "ZHO"
+     ]
+    },
+    "3": {
+     "order": [
+      "VER",
+      "PIA",
+      "NOR",
+      "HAM",
+      "RUS",
+      "ALO",
+      "RIC",
+      "HUL",
+      "OCO",
+      "MAG",
+      "STR",
+      "TSU",
+      "BOT",
+      "ZHO",
+      "GAS",
+      "ALB",
+      "SAI",
+      "PER"
+     ],
+     "gaps": {
+      "VER": 0.0,
+      "PIA": 2.479,
+      "NOR": 2.779,
+      "HAM": 4.562,
+      "RUS": 4.862,
+      "ALO": 13.869,
+      "RIC": 28.123,
+      "HUL": 28.423,
+      "OCO": 28.723,
+      "MAG": 29.063,
+      "STR": 31.153,
+      "TSU": 31.8,
+      "BOT": 32.039,
+      "ZHO": 35.273,
+      "GAS": 35.573
+     },
+     "times": {
+      "VER": 4419.996,
+      "PIA": 4422.475,
+      "NOR": 4422.775,
+      "HAM": 4424.559,
+      "RUS": 4424.859,
+      "ALO": 4433.866,
+      "RIC": 4448.119,
+      "HUL": 4448.419,
+      "OCO": 4448.719,
+      "MAG": 4449.059,
+      "STR": 4451.149,
+      "TSU": 4451.797,
+      "BOT": 4452.035,
+      "ZHO": 4455.27,
+      "GAS": 4455.57
+     },
+     "finishers": [
+      "VER",
+      "PIA",
+      "NOR",
+      "HAM",
+      "RUS",
+      "ALO",
+      "RIC",
+      "HUL",
+      "OCO",
+      "MAG",
+      "STR",
+      "TSU",
+      "BOT",
+      "ZHO",
+      "GAS"
+     ]
+    },
+    "4": {
+     "order": [
+      "VER",
+      "RUS",
+      "HAM",
+      "NOR",
+      "PIA",
+      "ALO",
+      "HUL",
+      "STR",
+      "MAG",
+      "OCO",
+      "RIC",
+      "TSU",
+      "GAS",
+      "ZHO",
+      "BOT",
+      "SAI",
+      "ALB",
+      "PER"
+     ],
+     "gaps": {
+      "VER": 0.0,
+      "RUS": 10.61,
+      "HAM": 10.703,
+      "NOR": 10.91,
+      "PIA": 11.418,
+      "ALO": 20.596,
+      "HUL": 20.896,
+      "STR": 25.628,
+      "MAG": 27.609,
+      "OCO": 33.398,
+      "RIC": 33.698,
+      "TSU": 34.589,
+      "GAS": 35.984,
+      "ZHO": 47.95,
+      "BOT": 50.451
+     },
+     "times": {
+      "VER": 4403.221,
+      "RUS": 4413.831,
+      "HAM": 4413.923,
+      "NOR": 4414.131,
+      "PIA": 4414.638,
+      "ALO": 4423.816,
+      "HUL": 4424.116,
+      "STR": 4428.849,
+      "MAG": 4430.83,
+      "OCO": 4436.619,
+      "RIC": 4436.919,
+      "TSU": 4437.81,
+      "GAS": 4439.204,
+      "ZHO": 4451.17,
+      "BOT": 4453.672
+     },
+     "finishers": [
+      "VER",
+      "RUS",
+      "HAM",
+      "NOR",
+      "PIA",
+      "ALO",
+      "HUL",
+      "STR",
+      "MAG",
+      "OCO",
+      "RIC",
+      "TSU",
+      "GAS",
+      "ZHO",
+      "BOT"
+     ]
+    },
+    "5": {
+     "order": [
+      "VER",
+      "RUS",
+      "HAM",
+      "NOR",
+      "PIA",
+      "STR",
+      "HUL",
+      "ALO",
+      "RIC",
+      "TSU",
+      "MAG",
+      "ZHO",
+      "OCO",
+      "GAS",
+      "BOT",
+      "SAI",
+      "ALB",
+      "PER"
+     ],
+     "gaps": {
+      "VER": 0.0,
+      "RUS": 6.315,
+      "HAM": 6.615,
+      "NOR": 8.545,
+      "PIA": 11.336,
+      "STR": 22.791,
+      "HUL": 27.829,
+      "ALO": 28.958,
+      "RIC": 30.317,
+      "TSU": 34.858,
+      "MAG": 34.87,
+      "ZHO": 37.917,
+      "OCO": 40.552,
+      "GAS": 40.852,
+      "BOT": 43.153
+     },
+     "times": {
+      "VER": 4399.839,
+      "RUS": 4406.154,
+      "HAM": 4406.454,
+      "NOR": 4408.384,
+      "PIA": 4411.175,
+      "STR": 4422.631,
+      "HUL": 4427.669,
+      "ALO": 4428.797,
+      "RIC": 4430.157,
+      "TSU": 4434.698,
+      "MAG": 4434.709,
+      "ZHO": 4437.757,
+      "OCO": 4440.391,
+      "GAS": 4440.691,
+      "BOT": 4442.992
+     },
+     "finishers": [
+      "VER",
+      "RUS",
+      "HAM",
+      "NOR",
+      "PIA",
+      "STR",
+      "HUL",
+      "ALO",
+      "RIC",
+      "TSU",
+      "MAG",
+      "ZHO",
+      "OCO",
+      "GAS",
+      "BOT"
+     ]
+    }
+   }
+  },
+  {
+   "name": "san-marino-2005, a stop with no fill fills to the tank, not the flag",
+   "race": "san-marino-2005",
+   "rules": {
+    "twoCompound": false,
+    "tyreChanges": false,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": true
+   },
+   "strategies": {
+    "MSCM": [
+     {
+      "lap": 30,
+      "to": "MEDIUM"
+     }
+    ]
+   },
+   "fillCap": 25,
+   "results": {
+    "1": {
+     "order": [
+      "MSCM",
+      "ALO",
+      "BUT",
+      "SAT",
+      "WUR",
+      "VIL",
+      "TRU",
+      "HEI",
+      "LIU",
+      "WEB",
+      "SCH",
+      "MAS",
+      "COU",
+      "KAR",
+      "TMO",
+      "ALBC"
+     ],
+     "gaps": {
+      "MSCM": 0.0,
+      "ALO": 19.376,
+      "BUT": 25.663,
+      "SAT": 51.99,
+      "WUR": 54.205,
+      "VIL": 80.955,
+      "TRU": 87.969,
+      "HEI": 90.45,
+      "LIU": 104.851,
+      "WEB": 106.795,
+      "SCH": 111.299,
+      "MAS": 112.759,
+      "COU": 133.38,
+      "KAR": 147.255,
+      "TMO": 264.419
+     },
+     "times": {
+      "MSCM": 3564.809,
+      "ALO": 3584.185,
+      "BUT": 3590.473,
+      "SAT": 3616.799,
+      "WUR": 3619.014,
+      "VIL": 3645.764,
+      "TRU": 3652.779,
+      "HEI": 3655.259,
+      "LIU": 3669.66,
+      "WEB": 3671.604,
+      "SCH": 3676.108,
+      "MAS": 3677.568,
+      "COU": 3698.189,
+      "KAR": 3712.064,
+      "TMO": 3829.229
+     },
+     "finishers": [
+      "MSCM",
+      "ALO",
+      "BUT",
+      "SAT",
+      "WUR",
+      "VIL",
+      "TRU",
+      "HEI",
+      "LIU",
+      "WEB",
+      "SCH",
+      "MAS",
+      "COU",
+      "KAR",
+      "TMO"
+     ]
+    },
+    "2": {
+     "order": [
+      "MSCM",
+      "ALO",
+      "BUT",
+      "WUR",
+      "SAT",
+      "TRU",
+      "VIL",
+      "HEI",
+      "WEB",
+      "LIU",
+      "SCH",
+      "MAS",
+      "COU",
+      "KAR",
+      "TMO",
+      "ALBC"
+     ],
+     "gaps": {
+      "MSCM": 0.0,
+      "ALO": 8.22,
+      "BUT": 23.828,
+      "WUR": 41.752,
+      "SAT": 49.398,
+      "TRU": 83.892,
+      "VIL": 84.192,
+      "HEI": 89.738,
+      "WEB": 92.712,
+      "LIU": 95.249,
+      "SCH": 105.404,
+      "MAS": 113.857,
+      "COU": 119.875,
+      "KAR": 143.847,
+      "TMO": 251.393
+     },
+     "times": {
+      "MSCM": 3570.154,
+      "ALO": 3578.375,
+      "BUT": 3593.982,
+      "WUR": 3611.906,
+      "SAT": 3619.553,
+      "TRU": 3654.046,
+      "VIL": 3654.346,
+      "HEI": 3659.893,
+      "WEB": 3662.867,
+      "LIU": 3665.403,
+      "SCH": 3675.558,
+      "MAS": 3684.011,
+      "COU": 3690.029,
+      "KAR": 3714.001,
+      "TMO": 3821.547
+     },
+     "finishers": [
+      "MSCM",
+      "ALO",
+      "BUT",
+      "WUR",
+      "SAT",
+      "TRU",
+      "VIL",
+      "HEI",
+      "WEB",
+      "LIU",
+      "SCH",
+      "MAS",
+      "COU",
+      "KAR",
+      "TMO"
+     ]
+    },
+    "3": {
+     "order": [
+      "MSCM",
+      "ALO",
+      "BUT",
+      "WUR",
+      "SAT",
+      "VIL",
+      "HEI",
+      "TRU",
+      "WEB",
+      "LIU",
+      "SCH",
+      "MAS",
+      "COU",
+      "KAR",
+      "TMO",
+      "ALBC"
+     ],
+     "gaps": {
+      "MSCM": 0.0,
+      "ALO": 9.64,
+      "BUT": 14.134,
+      "WUR": 33.251,
+      "SAT": 42.763,
+      "VIL": 75.61,
+      "HEI": 82.118,
+      "TRU": 83.991,
+      "WEB": 91.246,
+      "LIU": 94.033,
+      "SCH": 98.926,
+      "MAS": 122.998,
+      "COU": 123.298,
+      "KAR": 139.355,
+      "TMO": 255.184
+     },
+     "times": {
+      "MSCM": 3574.057,
+      "ALO": 3583.696,
+      "BUT": 3588.191,
+      "WUR": 3607.308,
+      "SAT": 3616.82,
+      "VIL": 3649.667,
+      "HEI": 3656.175,
+      "TRU": 3658.048,
+      "WEB": 3665.303,
+      "LIU": 3668.09,
+      "SCH": 3672.983,
+      "MAS": 3697.055,
+      "COU": 3697.355,
+      "KAR": 3713.412,
+      "TMO": 3829.241
+     },
+     "finishers": [
+      "MSCM",
+      "ALO",
+      "BUT",
+      "WUR",
+      "SAT",
+      "VIL",
+      "HEI",
+      "TRU",
+      "WEB",
+      "LIU",
+      "SCH",
+      "MAS",
+      "COU",
+      "KAR",
+      "TMO"
+     ]
+    },
+    "4": {
+     "order": [
+      "MSCM",
+      "ALO",
+      "BUT",
+      "WUR",
+      "SAT",
+      "VIL",
+      "TRU",
+      "HEI",
+      "WEB",
+      "SCH",
+      "LIU",
+      "MAS",
+      "COU",
+      "KAR",
+      "TMO",
+      "ALBC"
+     ],
+     "gaps": {
+      "MSCM": 0.0,
+      "ALO": 2.836,
+      "BUT": 15.313,
+      "WUR": 35.005,
+      "SAT": 38.592,
+      "VIL": 70.955,
+      "TRU": 73.269,
+      "HEI": 78.714,
+      "WEB": 85.864,
+      "SCH": 97.567,
+      "LIU": 97.867,
+      "MAS": 100.089,
+      "COU": 116.684,
+      "KAR": 127.655,
+      "TMO": 257.939
+     },
+     "times": {
+      "MSCM": 3579.841,
+      "ALO": 3582.677,
+      "BUT": 3595.154,
+      "WUR": 3614.846,
+      "SAT": 3618.433,
+      "VIL": 3650.795,
+      "TRU": 3653.11,
+      "HEI": 3658.555,
+      "WEB": 3665.704,
+      "SCH": 3677.408,
+      "LIU": 3677.708,
+      "MAS": 3679.93,
+      "COU": 3696.525,
+      "KAR": 3707.496,
+      "TMO": 3837.78
+     },
+     "finishers": [
+      "MSCM",
+      "ALO",
+      "BUT",
+      "WUR",
+      "SAT",
+      "VIL",
+      "TRU",
+      "HEI",
+      "WEB",
+      "SCH",
+      "LIU",
+      "MAS",
+      "COU",
+      "KAR",
+      "TMO"
+     ]
+    },
+    "5": {
+     "order": [
+      "MSCM",
+      "ALO",
+      "BUT",
+      "WUR",
+      "SAT",
+      "VIL",
+      "TRU",
+      "HEI",
+      "WEB",
+      "LIU",
+      "SCH",
+      "MAS",
+      "COU",
+      "KAR",
+      "TMO",
+      "ALBC"
+     ],
+     "gaps": {
+      "MSCM": 0.0,
+      "ALO": 2.625,
+      "BUT": 13.698,
+      "WUR": 27.846,
+      "SAT": 35.461,
+      "VIL": 65.342,
+      "TRU": 69.163,
+      "HEI": 69.69,
+      "WEB": 85.654,
+      "LIU": 86.886,
+      "SCH": 96.968,
+      "MAS": 106.935,
+      "COU": 115.275,
+      "KAR": 130.481,
+      "TMO": 252.949
+     },
+     "times": {
+      "MSCM": 3581.197,
+      "ALO": 3583.822,
+      "BUT": 3594.894,
+      "WUR": 3609.043,
+      "SAT": 3616.658,
+      "VIL": 3646.539,
+      "TRU": 3650.36,
+      "HEI": 3650.887,
+      "WEB": 3666.851,
+      "LIU": 3668.083,
+      "SCH": 3678.165,
+      "MAS": 3688.132,
+      "COU": 3696.472,
+      "KAR": 3711.677,
+      "TMO": 3834.146
+     },
+     "finishers": [
+      "MSCM",
+      "ALO",
+      "BUT",
+      "WUR",
+      "SAT",
+      "VIL",
+      "TRU",
+      "HEI",
+      "WEB",
+      "LIU",
+      "SCH",
+      "MAS",
+      "COU",
+      "KAR",
+      "TMO"
+     ]
+    }
+   }
+  }
+ ],
+ "functions": {
+  "fills": [
+   [
+    "short",
+    0,
+    12,
+    0
+   ],
+   [
+    "short",
+    0,
+    30,
+    0
+   ],
+   [
+    "short",
+    0,
+    33.5,
+    0
+   ],
+   [
+    "short",
+    0,
+    80,
+    0
+   ],
+   [
+    "short",
+    1,
+    12,
+    1
+   ],
+   [
+    "short",
+    1,
+    30,
+    1
+   ],
+   [
+    "short",
+    1,
+    33.5,
+    1
+   ],
+   [
+    "short",
+    1,
+    80,
+    1
+   ],
+   [
+    "short",
+    7,
+    12,
+    4
+   ],
+   [
+    "short",
+    7,
+    30,
+    4
+   ],
+   [
+    "short",
+    7,
+    33.5,
+    4
+   ],
+   [
+    "short",
+    7,
+    80,
+    4
+   ],
+   [
+    "short",
+    15,
+    12,
+    5
+   ],
+   [
+    "short",
+    15,
+    30,
+    8
+   ],
+   [
+    "short",
+    15,
+    33.5,
+    8
+   ],
+   [
+    "short",
+    15,
+    80,
+    8
+   ],
+   [
+    "short",
+    29,
+    12,
+    8
+   ],
+   [
+    "short",
+    29,
+    30,
+    15
+   ],
+   [
+    "short",
+    29,
+    33.5,
+    15
+   ],
+   [
+    "short",
+    29,
+    80,
+    15
+   ],
+   [
+    "short",
+    30,
+    12,
+    8
+   ],
+   [
+    "short",
+    30,
+    30,
+    15
+   ],
+   [
+    "short",
+    30,
+    33.5,
+    15
+   ],
+   [
+    "short",
+    30,
+    80,
+    15
+   ],
+   [
+    "short",
+    31,
+    12,
+    8
+   ],
+   [
+    "short",
+    31,
+    30,
+    11
+   ],
+   [
+    "short",
+    31,
+    33.5,
+    16
+   ],
+   [
+    "short",
+    31,
+    80,
+    16
+   ],
+   [
+    "short",
+    44,
+    12,
+    9
+   ],
+   [
+    "short",
+    44,
+    30,
+    15
+   ],
+   [
+    "short",
+    44,
+    33.5,
+    15
+   ],
+   [
+    "short",
+    44,
+    80,
+    22
+   ],
+   [
+    "short",
+    60,
+    12,
+    10
+   ],
+   [
+    "short",
+    60,
+    30,
+    20
+   ],
+   [
+    "short",
+    60,
+    33.5,
+    20
+   ],
+   [
+    "short",
+    60,
+    80,
+    30
+   ],
+   [
+    "short",
+    77,
+    12,
+    10
+   ],
+   [
+    "short",
+    77,
+    30,
+    20
+   ],
+   [
+    "short",
+    77,
+    33.5,
+    20
+   ],
+   [
+    "short",
+    77,
+    80,
+    39
+   ],
+   [
+    "standard",
+    0,
+    12,
+    0
+   ],
+   [
+    "standard",
+    0,
+    30,
+    0
+   ],
+   [
+    "standard",
+    0,
+    33.5,
+    0
+   ],
+   [
+    "standard",
+    0,
+    80,
+    0
+   ],
+   [
+    "standard",
+    1,
+    12,
+    1
+   ],
+   [
+    "standard",
+    1,
+    30,
+    1
+   ],
+   [
+    "standard",
+    1,
+    33.5,
+    1
+   ],
+   [
+    "standard",
+    1,
+    80,
+    1
+   ],
+   [
+    "standard",
+    7,
+    12,
+    7
+   ],
+   [
+    "standard",
+    7,
+    30,
+    7
+   ],
+   [
+    "standard",
+    7,
+    33.5,
+    7
+   ],
+   [
+    "standard",
+    7,
+    80,
+    7
+   ],
+   [
+    "standard",
+    15,
+    12,
+    8
+   ],
+   [
+    "standard",
+    15,
+    30,
+    15
+   ],
+   [
+    "standard",
+    15,
+    33.5,
+    15
+   ],
+   [
+    "standard",
+    15,
+    80,
+    15
+   ],
+   [
+    "standard",
+    29,
+    12,
+    10
+   ],
+   [
+    "standard",
+    29,
+    30,
+    29
+   ],
+   [
+    "standard",
+    29,
+    33.5,
+    29
+   ],
+   [
+    "standard",
+    29,
+    80,
+    29
+   ],
+   [
+    "standard",
+    30,
+    12,
+    10
+   ],
+   [
+    "standard",
+    30,
+    30,
+    30
+   ],
+   [
+    "standard",
+    30,
+    33.5,
+    30
+   ],
+   [
+    "standard",
+    30,
+    80,
+    30
+   ],
+   [
+    "standard",
+    31,
+    12,
+    11
+   ],
+   [
+    "standard",
+    31,
+    30,
+    16
+   ],
+   [
+    "standard",
+    31,
+    33.5,
+    31
+   ],
+   [
+    "standard",
+    31,
+    80,
+    31
+   ],
+   [
+    "standard",
+    44,
+    12,
+    11
+   ],
+   [
+    "standard",
+    44,
+    30,
+    22
+   ],
+   [
+    "standard",
+    44,
+    33.5,
+    22
+   ],
+   [
+    "standard",
+    44,
+    80,
+    44
+   ],
+   [
+    "standard",
+    60,
+    12,
+    12
+   ],
+   [
+    "standard",
+    60,
+    30,
+    30
+   ],
+   [
+    "standard",
+    60,
+    33.5,
+    30
+   ],
+   [
+    "standard",
+    60,
+    80,
+    60
+   ],
+   [
+    "standard",
+    77,
+    12,
+    11
+   ],
+   [
+    "standard",
+    77,
+    30,
+    26
+   ],
+   [
+    "standard",
+    77,
+    33.5,
+    26
+   ],
+   [
+    "standard",
+    77,
+    80,
+    77
+   ],
+   [
+    "long",
+    0,
+    12,
+    0
+   ],
+   [
+    "long",
+    0,
+    30,
+    0
+   ],
+   [
+    "long",
+    0,
+    33.5,
+    0
+   ],
+   [
+    "long",
+    0,
+    80,
+    0
+   ],
+   [
+    "long",
+    1,
+    12,
+    1
+   ],
+   [
+    "long",
+    1,
+    30,
+    1
+   ],
+   [
+    "long",
+    1,
+    33.5,
+    1
+   ],
+   [
+    "long",
+    1,
+    80,
+    1
+   ],
+   [
+    "long",
+    7,
+    12,
+    7
+   ],
+   [
+    "long",
+    7,
+    30,
+    7
+   ],
+   [
+    "long",
+    7,
+    33.5,
+    7
+   ],
+   [
+    "long",
+    7,
+    80,
+    7
+   ],
+   [
+    "long",
+    15,
+    12,
+    12
+   ],
+   [
+    "long",
+    15,
+    30,
+    15
+   ],
+   [
+    "long",
+    15,
+    33.5,
+    15
+   ],
+   [
+    "long",
+    15,
+    80,
+    15
+   ],
+   [
+    "long",
+    29,
+    12,
+    12
+   ],
+   [
+    "long",
+    29,
+    30,
+    29
+   ],
+   [
+    "long",
+    29,
+    33.5,
+    29
+   ],
+   [
+    "long",
+    29,
+    80,
+    29
+   ],
+   [
+    "long",
+    30,
+    12,
+    12
+   ],
+   [
+    "long",
+    30,
+    30,
+    30
+   ],
+   [
+    "long",
+    30,
+    33.5,
+    30
+   ],
+   [
+    "long",
+    30,
+    80,
+    30
+   ],
+   [
+    "long",
+    31,
+    12,
+    12
+   ],
+   [
+    "long",
+    31,
+    30,
+    30
+   ],
+   [
+    "long",
+    31,
+    33.5,
+    31
+   ],
+   [
+    "long",
+    31,
+    80,
+    31
+   ],
+   [
+    "long",
+    44,
+    12,
+    12
+   ],
+   [
+    "long",
+    44,
+    30,
+    30
+   ],
+   [
+    "long",
+    44,
+    33.5,
+    33
+   ],
+   [
+    "long",
+    44,
+    80,
+    44
+   ],
+   [
+    "long",
+    60,
+    12,
+    12
+   ],
+   [
+    "long",
+    60,
+    30,
+    30
+   ],
+   [
+    "long",
+    60,
+    33.5,
+    33
+   ],
+   [
+    "long",
+    60,
+    80,
+    60
+   ],
+   [
+    "long",
+    77,
+    12,
+    12
+   ],
+   [
+    "long",
+    77,
+    30,
+    30
+   ],
+   [
+    "long",
+    77,
+    33.5,
+    33
+   ],
+   [
+    "long",
+    77,
+    80,
+    77
+   ]
+  ],
+  "tanks": [
+   [
+    [],
+    25
+   ],
+   [
+    [
+     {
+      "lap": 40
+     }
+    ],
+    6
+   ],
+   [
+    [
+     {
+      "lap": 52
+     },
+     {
+      "lap": 38
+     }
+    ],
+    4
+   ],
+   [
+    [
+     {
+      "lap": 35
+     }
+    ],
+    1
+   ]
+  ],
+  "limits": {
+   "1982": null,
+   "1983": null,
+   "1984": 187.0,
+   "1985": 187.0,
+   "1986": 165.75,
+   "1987": 165.75,
+   "1988": 127.5,
+   "1989": null,
+   "1990": null
+  },
+  "exact": [
+   [
+    {
+     "laps": 1
+    },
+    0,
+    0
+   ],
+   [
+    {
+     "laps": 1
+    },
+    5,
+    1
+   ],
+   [
+    {
+     "laps": 1
+    },
+    12,
+    1
+   ],
+   [
+    {
+     "laps": 1
+    },
+    22,
+    1
+   ],
+   [
+    {
+     "laps": 12
+    },
+    0,
+    0
+   ],
+   [
+    {
+     "laps": 12
+    },
+    5,
+    5
+   ],
+   [
+    {
+     "laps": 12
+    },
+    12,
+    12
+   ],
+   [
+    {
+     "laps": 12
+    },
+    22,
+    12
+   ],
+   [
+    {
+     "laps": 30
+    },
+    0,
+    0
+   ],
+   [
+    {
+     "laps": 30
+    },
+    5,
+    5
+   ],
+   [
+    {
+     "laps": 30
+    },
+    12,
+    12
+   ],
+   [
+    {
+     "laps": 30
+    },
+    22,
+    22
+   ],
+   [
+    "short",
+    0,
+    0
+   ],
+   [
+    "short",
+    5,
+    3
+   ],
+   [
+    "short",
+    12,
+    6
+   ],
+   [
+    "short",
+    22,
+    11
+   ],
+   [
+    "long",
+    0,
+    0
+   ],
+   [
+    "long",
+    5,
+    5
+   ],
+   [
+    "long",
+    12,
+    12
+   ],
+   [
+    "long",
+    22,
+    22
+   ]
+  ]
+ }
+}

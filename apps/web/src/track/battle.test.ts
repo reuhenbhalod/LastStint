@@ -82,7 +82,7 @@ describe('corner kinds on real circuits', () => {
     ['hungary-2019', 1, 'hairpin'],
     ['belgium-2024', 1, 'hairpin'],
     ['austria-2019', 4, 'hairpin'],
-    ['usa-2022', 12, 'hairpin'],
+    ['united-states-2022', 12, 'hairpin'],
     ['russia-2020', 2, 'corner'],
   ] as const)('%s T%s is a %s', (id, n, want) => {
     expect(kind(id, n)).toBe(want);

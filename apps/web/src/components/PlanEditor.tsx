@@ -1,16 +1,27 @@
 // Build your own race plan (strategy planner spec): up to three stops, each a lap and a tyre,
 // and a pace for every stint. The strip shows it as you go; the chance comes from the game's
-// grading (null while it's worked out). A plan that breaks the two-compound rule says so.
+// grading (null while it's worked out). A plan that breaks the two-compound rule says so, in a
+// race that has the rule; a race without tyre changes offers only the tyres a stop may fit
+// (eras build plan 8.5, eras/raceRules.ts). A refuelling race asks each stop's fuel fill
+// (short, standard or long; an engineer's plan's stop fills exactly to its next stop), with
+// none picked on a new stop: the plan waits for every fill (game/plans.ts fillsMissing).
 
 import {
+  type CarState,
+  FILL_CHOICES,
+  type FillChoice,
   MAX_PLAN_STOPS,
   MIN_STINT,
   type PaceMode,
+  type PlanStop,
   type RaceModel,
   type RacePlan,
-  isWetTyre,
-} from '@boxthislap/sim';
-import { PACE_WORD, stintsOk, tyres } from '../game/plans.js';
+  fillOptions,
+  refuelling,
+  ruleSatisfied,
+} from '@laststint/sim';
+import { pitCompounds } from '../eras/raceRules.js';
+import { PACE_WORD, fillsMissing, stintsOk, tyres } from '../game/plans.js';
 import { PlanStrip } from './PlanStrip.js';
 
 const DRY = ['SOFT', 'MEDIUM', 'HARD'];
@@ -35,9 +46,11 @@ export function PlanEditor({
 }) {
   const laps = model.race.laps;
   const first = from + 1;
-  const compounds = Object.keys(model.compounds);
+  const compounds = pitCompounds(model);
   const set = (plan: Partial<RacePlan>) => onChange({ ...value, ...plan });
-  const legal = twoCompounds(car, value);
+  const legal = twoCompounds(car, value, model.rules);
+  const fuel = refuelling(model);
+  const unfuelled = fillsMissing(model, value);
 
   const moveStop = (i: number, lap: number) => {
     const prev = i === 0 ? first - 1 : (value.stops[i - 1]?.lap as number) + MIN_STINT - 1;
@@ -139,6 +152,16 @@ export function PlanEditor({
               value={value.pace[i + 1] ?? 'standard'}
               onPace={(p) => set({ pace: value.pace.map((x, k) => (k === i + 1 ? p : x)) })}
             />
+            {fuel && (
+              <StopFill
+                model={model}
+                stop={s}
+                n={i + 1}
+                onFill={(fill) =>
+                  set({ stops: value.stops.map((x, k) => (k === i ? { ...x, fill } : x)) })
+                }
+              />
+            )}
             <button
               type="button"
               onClick={() => removeStop(i)}
@@ -159,7 +182,7 @@ export function PlanEditor({
           + Add a stop
         </button>
         <span className="text-[13px]">
-          {!legal ? null : chance === undefined ? null : (
+          {!legal || unfuelled ? null : chance === undefined ? null : (
             <>
               Chance vs {model.rival}:{' '}
               <strong className="mono">
@@ -172,6 +195,9 @@ export function PlanEditor({
               Two dry compounds are compulsory: add a stop on a different tyre.
             </span>
           )}
+          {legal && unfuelled && (
+            <span className="text-[var(--box-ink)]">Pick a fuel fill for every stop.</span>
+          )}
         </span>
       </div>
     </div>
@@ -179,14 +205,70 @@ export function PlanEditor({
 }
 
 /**
- * True if the plan runs two dry compounds by the flag (or the car already has), or the car runs
- * a wet tyre at any point (already, on it now, or in the plan): wet tyres waive the rule, as in
- * the sim's `ruleSatisfied`. Counts every compound the car runs to the flag.
+ * True if the plan runs two dry compounds by the flag (or the car already has), the car runs a
+ * wet tyre at any point (already, on it now, or in the plan: wet tyres waive the rule), or the
+ * race has no such rule (`rules.twoCompound` false: before 2007). The sim's `ruleSatisfied` on
+ * every compound the car runs to the flag (a dry placeholder as its tyre: `used` holds it).
  */
-export function twoCompounds(car: { compound: string; compoundsUsed: string[] }, plan: RacePlan) {
+export function twoCompounds(
+  car: { compound: string; compoundsUsed: string[] },
+  plan: RacePlan,
+  rules?: RaceModel['rules'],
+) {
   const used = [...car.compoundsUsed, car.compound, ...plan.stops.map((s) => s.compound)];
-  if (used.some(isWetTyre)) return true;
-  return new Set(used.filter((c) => DRY.includes(c))).size >= 2;
+  return ruleSatisfied({ compound: DRY[0], compoundsUsed: used } as CarState, rules);
+}
+
+const FILL_WORD: Record<FillChoice, string> = {
+  short: 'Short',
+  standard: 'Standard',
+  long: 'Long',
+};
+
+/**
+ * A stop's fuel fill (a refuelling race): short, standard or long, each with the laps it
+ * fuels from the out-lap; none pressed until picked. An exact fill (an engineer's plan's,
+ * to its next stop) shows pressed as its laps.
+ */
+function StopFill({
+  model,
+  stop,
+  n,
+  onFill,
+}: {
+  model: RaceModel;
+  stop: PlanStop;
+  n: number;
+  onFill: (fill: FillChoice) => void;
+}) {
+  const laps = fillOptions(model, stop.lap + 1);
+  const exact = typeof stop.fill === 'object' ? stop.fill.laps : null;
+  return (
+    <fieldset
+      aria-label={`Stop ${n} fuel fill`}
+      className="m-0 flex overflow-hidden rounded-md border border-[var(--rule)] p-0"
+    >
+      {FILL_CHOICES.map((f) => (
+        <button
+          key={f}
+          type="button"
+          aria-pressed={stop.fill === f}
+          onClick={() => onFill(f)}
+          className={`px-2 py-0.5 text-[12px] font-semibold ${stop.fill === f ? 'bg-[var(--ink)] text-[var(--paper)]' : 'hover:bg-[var(--card-2)]'}`}
+        >
+          {FILL_WORD[f]} <span className="mono font-normal">{laps[f]}</span>
+        </button>
+      ))}
+      {exact !== null && (
+        <output
+          title={`Fuel for ${exact} laps, to the next stop or the flag`}
+          className="bg-[var(--ink)] px-2 py-0.5 text-[12px] font-semibold text-[var(--paper)]"
+        >
+          Fuel <span className="mono font-normal">{exact}</span>
+        </output>
+      )}
+    </fieldset>
+  );
 }
 
 /** A stint's pace: manage, standard or push. */

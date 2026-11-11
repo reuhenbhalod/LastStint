@@ -1,4 +1,4 @@
-# `@boxthislap/sim` API
+# `@laststint/sim` API
 
 The race simulator, grader and scoring for the game. It is pure TypeScript with no browser or Node dependencies, so the same code runs in the page, in Web Workers and in the Cloudflare Worker that verifies scores.
 
@@ -7,7 +7,7 @@ The race simulator, grader and scoring for the game. It is pure TypeScript with 
 - **Working example:** [`packages/sim/examples/daily-race.ts`](../packages/sim/examples/daily-race.ts) plays a full daily race. CI runs it (`tests/example.test.ts`), so it always matches this document.
 
 ```ts
-import { initRun, stepLap, decide, answerMoment, gradeMoment, classify, scoreRun } from '@boxthislap/sim';
+import { initRun, stepLap, decide, answerMoment, gradeMoment, classify, scoreRun } from '@laststint/sim';
 ```
 
 ## How a daily race runs
@@ -40,7 +40,7 @@ All calls go through `decide(run, call)`.
 
 | Call | Shape | Effect |
 |---|---|---|
-| Pit | `{ lap, kind: 'pit', compound }` | Box at the end of `lap`. The stop is charged on `lap + 1`, the out-lap. `compound` is a key of `model.compounds`. |
+| Pit | `{ lap, kind: 'pit', compound, fill? }` | Box at the end of `lap`. The stop is charged on `lap + 1`, the out-lap. `compound` is a key of `model.compounds`. `fill`: required in a refuelling race (`rules.refuelling`) and refused in any other: `'short'`, `'standard'`, `'long'` or `{ laps: n }` (docs/fuel-load-spec.md). |
 | Headset mode | `{ lap, kind: 'mode', key, value }` | Standing mode from `lap` on (green laps only). `key`: `pace` (`push` / `standard` / `manage`), `fuel` (`normal` / `liftAndCoast`), `battle` (`attack` / `hold` / `defend`), `ers` (`harvest` / `balanced` / `deploy` / `overtake`). |
 | Team order | `{ lap, kind: 'teamOrder', order }` | `letTeammatePast` or `teammateLetsYouPast`: the yielding car lifts if it starts a green lap directly ahead within 1s (open for 3 laps). `holdUp` / `release`: the teammate defends against the rival while directly ahead of it. Requires a teammate (`teammateOf(model)`). |
 | Radio answer | `{ lap, kind: 'radio', momentId, optionId }` | Records the option chosen at a moment; `answerMoment()` logs it with the option's calls. Every moment needs exactly one. |
@@ -81,7 +81,7 @@ Other useful parts of the model:
 
 - **Race-level:** `race` (`id`, `name`, `laps`, `takeoverLap`, `seed`), `userSide`, `rival`, `drivers`, `events`, `compounds`.
 - **Real result:** `realResult`.
-- **The real team's calls:** `realDecisions(model)`.
+- **The real team's calls:** `realDecisions(model)`. In a refuelling race each carries the real fill, `{ laps: n }` (the next real stint).
 
 ## Decision moments
 
@@ -93,7 +93,7 @@ Other useful parts of the model:
 - `options`: `{ id, label, decisions }[]`, 2–8 of them. An option's calls can be for a later lap ("Box next lap").
 - `realOptionId`: which option the real team took. Show it, graded, on the results screen.
 
-**Finding moments.** `pnpm --filter @boxthislap/sim moments <race-id>`:
+**Finding moments.** `pnpm --filter @laststint/sim moments <race-id>`:
 
 - Proposes moments from the race's triggers and grades each one from the real race's state.
 - Keeps genuine dilemmas: some option is more than 5 points behind the best, and the best doesn't lead by more than 30.
@@ -180,7 +180,7 @@ A run is fully defined by `(model, seed, decisions)`. Same inputs, same race, sa
 
 ## Versioning
 
-`@boxthislap/sim` follows semver; while it is 0.x, a breaking API change bumps the minor version (0.1 → 0.2). The race-model JSON has its own `schemaVersion`, bumped on any breaking change to the file. A breaking change to either is noted here.
+`@laststint/sim` follows semver; while it is 0.x, a breaking API change bumps the minor version (0.1 → 0.2). The race-model JSON has its own `schemaVersion`, bumped on any breaking change to the file. A breaking change to either is noted here.
 
 | Version | Schema | Notes |
 |---|---|---|

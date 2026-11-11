@@ -6,7 +6,7 @@
 //   GET  /api/admin/races              the playable races (with decision moments) and hashes
 //   GET  /api/admin/schedule           the scheduled days around today, with run counts and
 //                                      whether each still pins the race file's current hash
-//   POST /api/admin/schedule           { from, days, raceId? }: schedule days, rotating the
+//   POST /api/admin/schedule           { from, days, raceId? }: schedule days, shuffling the
 //                                      playable races (or one race); scheduled days are kept
 //   POST /api/admin/day                { date, raceId }: set one day's race (no runs on it yet)
 //   POST /api/admin/repin              re-pin today's and later days to their race file's
@@ -22,6 +22,7 @@ import type { Env } from './index.js';
 import { DAILY_POOL } from './pools.js';
 import { getRace } from './races.js';
 import { ApiError } from './runs.js';
+import { pickRaces } from './shuffle.js';
 
 type Ctx = Context<{ Bindings: Env }>;
 
@@ -125,22 +126,24 @@ async function maxNumber(db: D1Database): Promise<number> {
   return row?.n ?? 0;
 }
 
-/** Schedule `days` days from `from`, rotating the playable races (or always `raceId`). */
+/** Schedule `days` days from `from` in a shuffled order (src/shuffle.ts), or always `raceId`. */
 export async function scheduleDays(db: D1Database, from: string, days: number, raceId?: string) {
-  const pool = raceId ? [raceId] : (await playableRaces()).map((r) => r.id);
+  const playable = await playableRaces();
+  const pool = raceId
+    ? [playable.find((r) => r.id === raceId) ?? { id: raceId }]
+    : playable.map((r) => ({ id: r.id, userSide: r.userSide, rival: r.rival }));
   if (pool.length === 0) throw new ApiError(400, 'no-races');
   const { results: taken } = await db
     .prepare('SELECT date, race_id FROM daily ORDER BY number')
     .all<{ date: string; race_id: string }>();
+  const existing = taken.map((r) => ({ date: r.date, raceId: r.race_id }));
   const scheduled = new Set(taken.map((r) => r.date));
-  const last = taken.at(-1)?.race_id;
-  let next = last && pool.includes(last) ? pool.indexOf(last) + 1 : 0;
+  const open = Array.from({ length: days }, (_, i) => addDays(from, i)).filter(
+    (d) => !scheduled.has(d),
+  );
   let number = await maxNumber(db);
   const added: Array<{ date: string; raceId: string; number: number }> = [];
-  for (let i = 0; i < days; i++) {
-    const date = addDays(from, i);
-    if (scheduled.has(date)) continue;
-    const id = pool[next++ % pool.length] as string;
+  for (const { date, raceId: id } of pickRaces(pool, existing, open)) {
     number++;
     await insertDay(db, date, id, number);
     added.push({ date, raceId: id, number });

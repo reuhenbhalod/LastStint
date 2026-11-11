@@ -1,0 +1,39 @@
+{
+  "eras": {
+    "eraId": 1,
+    "order": 2,
+    "userSide": "PRO",
+    "target": {
+      "type": "defend"
+    },
+    "storyline": {
+      "real": "Prost leads in heavy rain; the race is stopped and the result taken from lap 31, Senna 7.4 s behind and closing"
+    },
+    "mastery": {
+      "type": "mode_rule",
+      "mode": "standard",
+      "maxLaps": 14,
+      "label": "Ease off in the spray: no more than 14 laps at standard pace"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 7.4,
+      "label": "Win by more than the real 7.4 seconds"
+    },
+    "briefing": "Monaco, June 1984. The start was delayed by heavy rain. Prost started on pole in the McLaren and leads; Senna started 13th in the Toleman and is closing fast. Turbo cars have 220 litres for the race. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports. Who led each lap is sourced; the lap times are reconstructed.",
+    "hardCalls": {
+      "PRO": 0,
+      "SENA": 0
+    }
+  },
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": false,
+    "fuelLimit": 187.0
+  }
+}

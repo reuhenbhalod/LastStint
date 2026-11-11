@@ -11,9 +11,14 @@ import json
 import pytest
 
 from pipeline import track
+from pipeline.build import ERAS_DIR, shared_races
 from pipeline.paths import RACES_DIR
 
-RACES = sorted(RACES_DIR.glob("*.json"))
+# An Eras build (a race with an Eras overlay that isn't a shared Daily/Gauntlet race) keeps the
+# pit losses it was authored and validated on: the fixes aren't applied to it (build.py passes
+# no race id to track.fit_track_params), so it isn't held to them here.
+ERAS_BUILDS = {p.stem for p in ERAS_DIR.glob("*.json")} - shared_races()
+RACES = sorted(p for p in RACES_DIR.glob("*.json") if p.stem not in ERAS_BUILDS)
 # Green loss this far from the circuit's reference is a measurement problem, not the track.
 REFERENCE_TOLERANCE = 3.0
 

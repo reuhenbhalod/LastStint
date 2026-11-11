@@ -1,6 +1,6 @@
 // Battle odds per move (race engineer spec): over many battle laps, how often the user's car ends
 // the lap ahead of the car it fought, and how often there's contact. For tuning headset.json.
-//   pnpm --filter @boxthislap/sim exec tsx scripts/battle-odds.ts canada-2022
+//   pnpm --filter @laststint/sim exec tsx scripts/battle-odds.ts canada-2022
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';

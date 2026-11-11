@@ -1,0 +1,38 @@
+{
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": true,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": true
+  },
+  "eras": {
+    "eraId": 5,
+    "order": 5,
+    "userSide": "RAI",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Hamilton starts from pole and leads the first stint. R\u00e4ikk\u00f6nen, alongside him on the front row, stops two laps later and comes out ahead of him, but Alonso's short first stop puts the second McLaren in front. R\u00e4ikk\u00f6nen runs longer again at the second stops, takes the lead for good on lap 43 and wins by 2.459 s from Alonso, with Hamilton third."
+    },
+    "mastery": {
+      "type": "margin",
+      "seconds": 2.4,
+      "label": "Win by more than 2.4 seconds"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "manage",
+      "maxLaps": 0,
+      "label": "Win without a single lap managing the tyres"
+    },
+    "hardCalls": {
+      "HAM": 0,
+      "RAI": 1
+    },
+    "briefing": "Silverstone, 2007. Hamilton took pole for McLaren. You run R\u00e4ikk\u00f6nen's Ferrari, second and half a second behind him after 13 laps, with Alonso's McLaren 2.4 s further back. Two stops each, and the fuel you take decides the order. Win it."
+  }
+}

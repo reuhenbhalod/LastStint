@@ -3,19 +3,36 @@
 // clock while racing, persists/resumes the run, and talks to the Worker: "already played
 // today?" on load, and the run submission (calls + the game's grades) at the flag.
 
-import type { Decision, PlanId, RaceModel, RaceNote, RacePlan } from '@boxthislap/sim';
+import type { Decision, PlanId, RaceModel, RaceNote, RacePlan } from '@laststint/sim';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ApiError, type RunResponse, type RunSubmission, api } from '../data/api.js';
 import { anonId } from '../data/player.js';
 import type { Daily, DailyProvider } from '../data/types.js';
 import { type Grader, browserGrader } from '../engine/grading.js';
-import type { GameState, Speed } from '../state/machine.js';
+import { eraDailyOf } from '../eras/EraProvider.js';
+import { type ErasApi, erasApi } from '../eras/api.js';
+import { submitAttempt } from '../eras/submit.js';
+import { type GameState, type Speed, submitRoute } from '../state/machine.js';
 import { GameSession } from '../state/session.js';
 import { RUN_KEY, clearRun, loadRun, saveRun } from '../state/storage.js';
 
+/**
+ * The end-to-end tests' hook (apps/web/e2e/eras.ts), set by a Playwright init script before
+ * the app loads; absent in normal use, when nothing changes. `lapScale` shortens every lap
+ * tick (the suite plays whole races), and `session` is the live race session, so a test can
+ * read what the race model noted (a car fault, a storyline retirement) that the screen
+ * doesn't show.
+ */
+interface E2EHook {
+  lapScale?: number;
+  session?: GameSession;
+}
+const e2eHook = (globalThis as { __laststintE2E?: E2EHook }).__laststintE2E;
+const lapScale = e2eHook?.lapScale && e2eHook.lapScale > 0 ? e2eHook.lapScale : 1;
+
 // One lap tick on screen. Testers found 3-5 s per lap too fast to follow (feedback spec D4).
 // The track map runs the field one lap round per tick, so this is also how fast the dots move.
-export const LAP_MS: Record<Speed, number> = { 1: 10000, 2: 5000 };
+export const LAP_MS: Record<Speed, number> = { 1: 10000 * lapScale, 2: 5000 * lapScale };
 /** The tutorial's fast-forward between its steps: laps run this many times quicker. */
 export const FAST_FORWARD = 8;
 /** A battle slows the lap by this much as the cars near the corner (race engineer spec D7). */
@@ -95,6 +112,8 @@ export function useGame(
   grader?: Grader,
   /** Where the in-progress race is saved (survivor keeps its own, apart from the daily's). */
   storageKey = RUN_KEY,
+  /** Where an Eras attempt is submitted (tests pass their own). */
+  eras: ErasApi = erasApi,
 ): Game {
   const session = useRef<GameSession | null>(null);
   const [daily, setDaily] = useState<Daily | null>(null);
@@ -121,6 +140,7 @@ export function useGame(
   const adopt = useCallback(
     (s: GameSession) => {
       session.current = s;
+      if (e2eHook) e2eHook.session = s;
       s.onChange = sync;
       sync();
     },
@@ -221,9 +241,20 @@ export function useGame(
     s.beginSubmit();
     sync();
     (async () => {
-      if (s.state.meta.source === 'practice') {
+      const route = submitRoute(s.state.meta.source);
+      if (route === 'practice') {
         await s.allGraded();
         s.finish({ status: 'practice' });
+        return;
+      }
+      if (route === 'eras') {
+        // The attempt's calls, claims, untimed mark and Expert rival choices (eras/submit.ts).
+        const attempt = eraDailyOf(daily);
+        if (!attempt) {
+          s.finish({ status: 'error', retry: false, error: 'This race has no Eras attempt.' });
+          return;
+        }
+        s.finish(await submitAttempt(s, attempt, eras));
         return;
       }
       try {
@@ -241,7 +272,7 @@ export function useGame(
     })()
       .catch(() => s.finish({ status: 'error', error: 'Can’t reach the server.' }))
       .finally(sync);
-  }, [sync]);
+  }, [sync, daily, eras]);
 
   // Clear the saved run and start a fresh session back at the daily card (practice only:
   // a submitted daily can't be replayed).

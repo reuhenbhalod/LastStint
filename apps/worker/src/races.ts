@@ -2,7 +2,7 @@
 // its canonical JSON. A daily pins the hash it was scheduled with, so a rebuilt race file can
 // never change the scores of a day already played.
 
-import type { RaceModel } from '@boxthislap/sim';
+import type { RaceModel } from '@laststint/sim';
 import { modelHash } from './hash.js';
 import { RACE_FILES } from './races.gen.js';
 

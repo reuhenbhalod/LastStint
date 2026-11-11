@@ -1,9 +1,19 @@
 // Your car's numbers, on the right of the race screen: tyre life to the drop-off, the last lap
 // against the rival's, the pace trend over the last laps, and the gap. All from the race state
-// and the lap log (game/raceLog.ts); the tyre life from the race model's compound fit.
+// and the lap log (game/raceLog.ts); the tyre life from the race model's compound fit. In Eras
+// (`info`, eras spec §7) the gap follows the information level: rounded at Limited, and at
+// Minimal shown only when the rival is directly ahead or behind. Your own tyres stay exact.
+// Without it, exactly as before.
 
-import { type RaceModel, type RaceState, tyreLife } from '@boxthislap/sim';
+import { type RaceModel, type RaceState, tyreLife } from '@laststint/sim';
 import { surname } from '../data/names.js';
+import {
+  FULL_INFORMATION,
+  type InformationView,
+  gapShown,
+  gapText,
+  shownGap,
+} from '../eras/difficulty/information.js';
 import { tyreName } from '../game/choices.js';
 import { FUEL_SHORT, fuelReading, liftText, marginText } from '../game/fuel.js';
 import type { LapEvents } from '../game/raceLog.js';
@@ -19,12 +29,15 @@ export function CarStats({
   log,
   userSide,
   rival,
+  info = FULL_INFORMATION,
 }: {
   race: RaceState;
   model: RaceModel;
   log: LapEvents[];
   userSide: string;
   rival: string;
+  /** What the Eras information level shows (everything, otherwise). */
+  info?: InformationView;
 }) {
   const me = race.cars[userSide];
   const them = race.cars[rival];
@@ -53,7 +66,10 @@ export function CarStats({
     .map((l) => [l.lapTimes[userSide], l.lapTimes[rival]] as const)
     .filter(([a, b]) => a !== undefined && b !== undefined) as Array<[number, number]>;
   const trend = recent.length ? recent.reduce((t, [a, b]) => t + (a - b), 0) / recent.length : null;
-  const gap = them && !them.retired ? them.totalTime - me.totalTime : null;
+  const gap =
+    them && !them.retired && gapShown(info, race.order, userSide, rival)
+      ? shownGap(info, them.totalTime - me.totalTime)
+      : null;
 
   const fuel = fuelReading(race, model);
   const gapTone = gap === null ? undefined : gap >= 0 ? 'var(--you)' : 'var(--rival)';
@@ -79,9 +95,7 @@ export function CarStats({
           <span className="mono text-[15px]">{theirs ? lapClock(theirs) : '-'}</span>
         </Stat>
         <Stat label="Gap" tone={gapTone}>
-          <span className="mono text-[15px]">
-            {gap === null ? '-' : `${gap >= 0 ? '+' : '−'}${Math.abs(gap).toFixed(1)}s`}
-          </span>
+          <span className="mono text-[15px]">{gapText(info, gap)}</span>
         </Stat>
       </Stats>
       {me.battery !== undefined && (

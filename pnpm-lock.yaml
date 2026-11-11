@@ -181,7 +181,7 @@ importers:
       '@auth0/auth0-spa-js':
         specifier: ^2.30.0
         version: 2.30.0
-      '@boxthislap/sim':
+      '@laststint/sim':
         specifier: workspace:*
         version: link:../../packages/sim
       react:
@@ -230,7 +230,7 @@ importers:
 
   apps/worker:
     dependencies:
-      '@boxthislap/sim':
+      '@laststint/sim':
         specifier: workspace:*
         version: link:../../packages/sim
       hono:

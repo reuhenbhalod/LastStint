@@ -1,0 +1,24 @@
+{
+ "race": "saudi-arabia-2021",
+ "scheduledLaps": 50,
+ "completedLaps": 50,
+ "timing": "Jolpica (no red-flag timing; FastF1 needs an F1TV login since Oct 2026)",
+ "redFlags": [
+  {
+   "lap": 13,
+   "resumeLap": 14,
+   "restart": "standing",
+   "restartScLaps": 0,
+   "source": "Wikipedia, 2021 Saudi Arabian Grand Prix: 'the red flag was issued on lap 13' (https://en.wikipedia.org/wiki/2021_Saudi_Arabian_Grand_Prix); J. Elson, 'Hamilton emerges from chaos to win: 2021 Saudi Arabian GP lap by lap', Motor Sport, 5 Dec 2021: 'On Lap 13 Michael Masi threw the red flag', 'The race resumed on Lap 15 with a standing start' (https://motorsportmagazine.com/articles/single-seaters/f1/hamilton-emerges-from-chaos-to-win-2021-saudi-arabian-gp-lap-by-lap); M. Coch, Speedcafe, 6 Dec 2021: 'The field took a standing restart' (https://speedcafe.com/second-red-flag-amid-championship-drama/); Wikipedia, 'List of red-flagged Formula One races' (https://en.wikipedia.org/wiki/List_of_red-flagged_Formula_One_races): lap 13; resumeLap 14: Jolpica-F1 CSV dump of 2026-10-24 (formula_one_lap.csv, CC BY-NC-SA 4.0; data/raw/saudi-arabia-2021.jolpica.json), the leader's lap 14 took 1190.2s against the race's median lap of 93.4s (over 3x: redflag.stoppage_lap, the first such leader lap from the flag lap on)",
+   "note": "Conflict: K. Collantine, RaceFans, 5 Dec 2021: 'originally stopped on the 14th lap' (https://www.racefans.net/?p=467498); Speedcafe: 'under red flag with 14 of 50 scheduled laps complete' and 'a Lap 14 restart'. Jolpica: leader's lap 14 holds the stoppage (1190s), so the 14 in those reports is the stoppage lap; the flag was shown on lap 13. Standing restart on lap 15 (Ocon, Hamilton, Verstappen order)."
+  },
+  {
+   "lap": 15,
+   "resumeLap": 16,
+   "restart": "standing",
+   "restartScLaps": 0,
+   "source": "Wikipedia, 'List of red-flagged Formula One races' (https://en.wikipedia.org/wiki/List_of_red-flagged_Formula_One_races): second red flag lap 15; Wikipedia, 2021 Saudi Arabian Grand Prix: 'At the third standing start on lap 17' (https://en.wikipedia.org/wiki/2021_Saudi_Arabian_Grand_Prix); Motor Sport lap by lap (J. Elson, 5 Dec 2021): 'Once the race got underway for a third time on Lap 17' (https://motorsportmagazine.com/articles/single-seaters/f1/hamilton-emerges-from-chaos-to-win-2021-saudi-arabian-gp-lap-by-lap); RaceFans: 'red-flagged twice by the 16th lap' (https://www.racefans.net/?p=467498); resumeLap 16: Jolpica-F1 CSV dump of 2026-10-24 (formula_one_lap.csv, CC BY-NC-SA 4.0; data/raw/saudi-arabia-2021.jolpica.json), the leader's lap 16 took 1297.1s against the race's median lap of 93.4s (over 3x: redflag.stoppage_lap, the first such leader lap from the flag lap on)",
+   "note": "Conflict: Motor Sport says 'The red flag was brought out again on Lap 16'. Jolpica: leader's lap 15 took 217s (the restart lap, cut short) and lap 16 holds the stoppage (1295s), the same pattern as the first red flag (shown 13, stoppage 14), so 15 taken. Caused by the Leclerc-Perez and Mazepin-Russell incidents on the restart lap. Standing restart on lap 17."
+  }
+ ]
+}

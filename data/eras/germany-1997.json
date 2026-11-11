@@ -1,0 +1,43 @@
+{
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": true
+  },
+  "eras": {
+    "eraId": 3,
+    "order": 9,
+    "userSide": "BER",
+    "target": {
+      "type": "defend"
+    },
+    "storyline": {
+      "real": "Berger leads from pole on two stops against Fisichella's one-stopping Jordan. Fisichella leads between Berger's stops; Berger rejoins behind him after his second stop on lap 34 and passes him again at the second chicane on the same lap. Fisichella's left-rear tyre fails with six laps to go, and Berger wins by 17.5 s from Michael Schumacher."
+    },
+    "mastery": {
+      "type": "margin",
+      "seconds": 17.5,
+      "label": "Win by more than 17.5 seconds"
+    },
+    "hidden": {
+      "type": "stop_count",
+      "exact": 2,
+      "label": "Win on two stops"
+    },
+    "hardCalls": {
+      "BER": 0,
+      "FIS": 0
+    },
+    "briefing": "Hockenheim, 1997. Berger took pole, 0.023 s ahead of Fisichella's Jordan. You run Berger, leading Fisichella by 11.8 s after 14 laps, with Benetton planning two stops. Keep the Jordan behind you to the flag."
+  },
+  "storylineEvents": [
+    [
+      41,
+      "RETIREMENT"
+    ]
+  ]
+}

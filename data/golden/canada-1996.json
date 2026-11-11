@@ -1,0 +1,982 @@
+{
+  "1": {
+    "order": [
+      "HIL",
+      "VIL",
+      "ALE",
+      "COU",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS",
+      "BAD",
+      "LAM",
+      "BER",
+      "MSCM",
+      "PAN",
+      "SAL",
+      "DIN"
+    ],
+    "gaps": {
+      "HIL": 0.0,
+      "VIL": 8.617,
+      "ALE": 49.702,
+      "COU": 62.881,
+      "HAK": 106.955,
+      "BRU": 120.925,
+      "HER": 132.209,
+      "FIS": 210.665
+    },
+    "times": {
+      "HIL": 3673.061,
+      "VIL": 3681.678,
+      "ALE": 3722.763,
+      "COU": 3735.942,
+      "HAK": 3780.016,
+      "BRU": 3793.986,
+      "HER": 3805.27,
+      "FIS": 3883.727
+    },
+    "finishers": [
+      "HIL",
+      "VIL",
+      "ALE",
+      "COU",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS"
+    ]
+  },
+  "2": {
+    "order": [
+      "VIL",
+      "HIL",
+      "ALE",
+      "COU",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS",
+      "BAD",
+      "LAM",
+      "BER",
+      "MSCM",
+      "PAN",
+      "SAL",
+      "DIN"
+    ],
+    "gaps": {
+      "VIL": 0.0,
+      "HIL": 3.255,
+      "ALE": 57.504,
+      "COU": 70.863,
+      "HAK": 102.643,
+      "BRU": 117.468,
+      "HER": 138.546,
+      "FIS": 211.179
+    },
+    "times": {
+      "VIL": 3671.041,
+      "HIL": 3674.296,
+      "ALE": 3728.545,
+      "COU": 3741.904,
+      "HAK": 3773.684,
+      "BRU": 3788.509,
+      "HER": 3809.587,
+      "FIS": 3882.22
+    },
+    "finishers": [
+      "VIL",
+      "HIL",
+      "ALE",
+      "COU",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS"
+    ]
+  },
+  "3": {
+    "order": [
+      "HIL",
+      "VIL",
+      "ALE",
+      "COU",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS",
+      "BAD",
+      "LAM",
+      "BER",
+      "MSCM",
+      "PAN",
+      "SAL",
+      "DIN"
+    ],
+    "gaps": {
+      "HIL": 0.0,
+      "VIL": 2.864,
+      "ALE": 53.177,
+      "COU": 66.384,
+      "HAK": 103.112,
+      "BRU": 125.858,
+      "HER": 138.16,
+      "FIS": 209.85
+    },
+    "times": {
+      "HIL": 3672.122,
+      "VIL": 3674.986,
+      "ALE": 3725.299,
+      "COU": 3738.506,
+      "HAK": 3775.234,
+      "BRU": 3797.98,
+      "HER": 3810.281,
+      "FIS": 3881.972
+    },
+    "finishers": [
+      "HIL",
+      "VIL",
+      "ALE",
+      "COU",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS"
+    ]
+  },
+  "4": {
+    "order": [
+      "HIL",
+      "VIL",
+      "ALE",
+      "COU",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS",
+      "BAD",
+      "LAM",
+      "BER",
+      "MSCM",
+      "PAN",
+      "SAL",
+      "DIN"
+    ],
+    "gaps": {
+      "HIL": 0.0,
+      "VIL": 4.152,
+      "ALE": 59.324,
+      "COU": 66.802,
+      "HAK": 98.447,
+      "BRU": 124.052,
+      "HER": 135.891,
+      "FIS": 210.578
+    },
+    "times": {
+      "HIL": 3671.518,
+      "VIL": 3675.671,
+      "ALE": 3730.843,
+      "COU": 3738.32,
+      "HAK": 3769.966,
+      "BRU": 3795.57,
+      "HER": 3807.409,
+      "FIS": 3882.096
+    },
+    "finishers": [
+      "HIL",
+      "VIL",
+      "ALE",
+      "COU",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS"
+    ]
+  },
+  "5": {
+    "order": [
+      "HIL",
+      "VIL",
+      "ALE",
+      "COU",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS",
+      "BAD",
+      "LAM",
+      "BER",
+      "MSCM",
+      "PAN",
+      "SAL",
+      "DIN"
+    ],
+    "gaps": {
+      "HIL": 0.0,
+      "VIL": 7.908,
+      "ALE": 58.977,
+      "COU": 62.567,
+      "HAK": 108.503,
+      "BRU": 122.939,
+      "HER": 139.372,
+      "FIS": 208.932
+    },
+    "times": {
+      "HIL": 3669.459,
+      "VIL": 3677.367,
+      "ALE": 3728.436,
+      "COU": 3732.026,
+      "HAK": 3777.962,
+      "BRU": 3792.398,
+      "HER": 3808.832,
+      "FIS": 3878.391
+    },
+    "finishers": [
+      "HIL",
+      "VIL",
+      "ALE",
+      "COU",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS"
+    ]
+  },
+  "6": {
+    "order": [
+      "VIL",
+      "HIL",
+      "ALE",
+      "COU",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS",
+      "BAD",
+      "LAM",
+      "BER",
+      "MSCM",
+      "PAN",
+      "SAL",
+      "DIN"
+    ],
+    "gaps": {
+      "VIL": 0.0,
+      "HIL": 0.682,
+      "ALE": 54.134,
+      "COU": 63.657,
+      "HAK": 90.563,
+      "BRU": 117.454,
+      "HER": 133.781,
+      "FIS": 205.998
+    },
+    "times": {
+      "VIL": 3676.736,
+      "HIL": 3677.419,
+      "ALE": 3730.87,
+      "COU": 3740.393,
+      "HAK": 3767.299,
+      "BRU": 3794.19,
+      "HER": 3810.517,
+      "FIS": 3882.735
+    },
+    "finishers": [
+      "VIL",
+      "HIL",
+      "ALE",
+      "COU",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS"
+    ]
+  },
+  "7": {
+    "order": [
+      "VIL",
+      "HIL",
+      "ALE",
+      "COU",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS",
+      "BAD",
+      "LAM",
+      "BER",
+      "MSCM",
+      "PAN",
+      "SAL",
+      "DIN"
+    ],
+    "gaps": {
+      "VIL": 0.0,
+      "HIL": 4.286,
+      "ALE": 59.132,
+      "COU": 65.38,
+      "HAK": 105.33,
+      "BRU": 121.8,
+      "HER": 142.066,
+      "FIS": 204.656
+    },
+    "times": {
+      "VIL": 3670.841,
+      "HIL": 3675.128,
+      "ALE": 3729.973,
+      "COU": 3736.222,
+      "HAK": 3776.171,
+      "BRU": 3792.641,
+      "HER": 3812.907,
+      "FIS": 3875.497
+    },
+    "finishers": [
+      "VIL",
+      "HIL",
+      "ALE",
+      "COU",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS"
+    ]
+  },
+  "8": {
+    "order": [
+      "HIL",
+      "VIL",
+      "ALE",
+      "COU",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS",
+      "BAD",
+      "LAM",
+      "BER",
+      "MSCM",
+      "PAN",
+      "SAL",
+      "DIN"
+    ],
+    "gaps": {
+      "HIL": 0.0,
+      "VIL": 12.616,
+      "ALE": 65.623,
+      "COU": 66.268,
+      "HAK": 111.53,
+      "BRU": 126.863,
+      "HER": 142.977,
+      "FIS": 215.627
+    },
+    "times": {
+      "HIL": 3667.585,
+      "VIL": 3680.202,
+      "ALE": 3733.209,
+      "COU": 3733.853,
+      "HAK": 3779.115,
+      "BRU": 3794.448,
+      "HER": 3810.563,
+      "FIS": 3883.212
+    },
+    "finishers": [
+      "HIL",
+      "VIL",
+      "ALE",
+      "COU",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS"
+    ]
+  },
+  "9": {
+    "order": [
+      "HIL",
+      "VIL",
+      "ALE",
+      "COU",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS",
+      "BAD",
+      "LAM",
+      "BER",
+      "MSCM",
+      "PAN",
+      "SAL",
+      "DIN"
+    ],
+    "gaps": {
+      "HIL": 0.0,
+      "VIL": 5.144,
+      "ALE": 47.535,
+      "COU": 62.303,
+      "HAK": 100.947,
+      "BRU": 115.968,
+      "HER": 132.09,
+      "FIS": 212.525
+    },
+    "times": {
+      "HIL": 3674.025,
+      "VIL": 3679.169,
+      "ALE": 3721.559,
+      "COU": 3736.328,
+      "HAK": 3774.972,
+      "BRU": 3789.992,
+      "HER": 3806.115,
+      "FIS": 3886.549
+    },
+    "finishers": [
+      "HIL",
+      "VIL",
+      "ALE",
+      "COU",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS"
+    ]
+  },
+  "10": {
+    "order": [
+      "HIL",
+      "VIL",
+      "ALE",
+      "COU",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS",
+      "BAD",
+      "LAM",
+      "BER",
+      "MSCM",
+      "PAN",
+      "SAL",
+      "DIN"
+    ],
+    "gaps": {
+      "HIL": 0.0,
+      "VIL": 7.149,
+      "ALE": 58.374,
+      "COU": 67.062,
+      "HAK": 103.139,
+      "BRU": 124.083,
+      "HER": 139.671,
+      "FIS": 207.443
+    },
+    "times": {
+      "HIL": 3670.16,
+      "VIL": 3677.31,
+      "ALE": 3728.535,
+      "COU": 3737.222,
+      "HAK": 3773.299,
+      "BRU": 3794.243,
+      "HER": 3809.831,
+      "FIS": 3877.603
+    },
+    "finishers": [
+      "HIL",
+      "VIL",
+      "ALE",
+      "COU",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS"
+    ]
+  },
+  "11": {
+    "order": [
+      "HIL",
+      "VIL",
+      "ALE",
+      "COU",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS",
+      "BAD",
+      "LAM",
+      "BER",
+      "MSCM",
+      "PAN",
+      "SAL",
+      "DIN"
+    ],
+    "gaps": {
+      "HIL": 0.0,
+      "VIL": 3.602,
+      "ALE": 55.247,
+      "COU": 67.166,
+      "HAK": 95.691,
+      "BRU": 118.64,
+      "HER": 134.437,
+      "FIS": 206.461
+    },
+    "times": {
+      "HIL": 3673.457,
+      "VIL": 3677.059,
+      "ALE": 3728.703,
+      "COU": 3740.622,
+      "HAK": 3769.147,
+      "BRU": 3792.097,
+      "HER": 3807.893,
+      "FIS": 3879.918
+    },
+    "finishers": [
+      "HIL",
+      "VIL",
+      "ALE",
+      "COU",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS"
+    ]
+  },
+  "12": {
+    "order": [
+      "HIL",
+      "VIL",
+      "ALE",
+      "COU",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS",
+      "BAD",
+      "LAM",
+      "BER",
+      "MSCM",
+      "PAN",
+      "SAL",
+      "DIN"
+    ],
+    "gaps": {
+      "HIL": 0.0,
+      "VIL": 3.839,
+      "ALE": 52.84,
+      "COU": 65.318,
+      "HAK": 101.678,
+      "BRU": 121.74,
+      "HER": 136.901,
+      "FIS": 207.25
+    },
+    "times": {
+      "HIL": 3673.346,
+      "VIL": 3677.185,
+      "ALE": 3726.186,
+      "COU": 3738.664,
+      "HAK": 3775.024,
+      "BRU": 3795.086,
+      "HER": 3810.247,
+      "FIS": 3880.596
+    },
+    "finishers": [
+      "HIL",
+      "VIL",
+      "ALE",
+      "COU",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS"
+    ]
+  },
+  "13": {
+    "order": [
+      "HIL",
+      "VIL",
+      "ALE",
+      "COU",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS",
+      "BAD",
+      "LAM",
+      "BER",
+      "MSCM",
+      "PAN",
+      "SAL",
+      "DIN"
+    ],
+    "gaps": {
+      "HIL": 0.0,
+      "VIL": 1.471,
+      "ALE": 53.069,
+      "COU": 59.753,
+      "HAK": 99.705,
+      "BRU": 119.489,
+      "HER": 137.205,
+      "FIS": 208.71
+    },
+    "times": {
+      "HIL": 3673.567,
+      "VIL": 3675.039,
+      "ALE": 3726.636,
+      "COU": 3733.32,
+      "HAK": 3773.272,
+      "BRU": 3793.056,
+      "HER": 3810.772,
+      "FIS": 3882.277
+    },
+    "finishers": [
+      "HIL",
+      "VIL",
+      "ALE",
+      "COU",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS"
+    ]
+  },
+  "14": {
+    "order": [
+      "HIL",
+      "VIL",
+      "ALE",
+      "COU",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS",
+      "BAD",
+      "LAM",
+      "BER",
+      "MSCM",
+      "PAN",
+      "SAL",
+      "DIN"
+    ],
+    "gaps": {
+      "HIL": 0.0,
+      "VIL": 2.922,
+      "ALE": 54.615,
+      "COU": 61.251,
+      "HAK": 90.626,
+      "BRU": 118.799,
+      "HER": 136.555,
+      "FIS": 206.745
+    },
+    "times": {
+      "HIL": 3674.907,
+      "VIL": 3677.829,
+      "ALE": 3729.523,
+      "COU": 3736.158,
+      "HAK": 3765.533,
+      "BRU": 3793.706,
+      "HER": 3811.462,
+      "FIS": 3881.652
+    },
+    "finishers": [
+      "HIL",
+      "VIL",
+      "ALE",
+      "COU",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS"
+    ]
+  },
+  "15": {
+    "order": [
+      "VIL",
+      "HIL",
+      "ALE",
+      "COU",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS",
+      "BAD",
+      "LAM",
+      "BER",
+      "MSCM",
+      "PAN",
+      "SAL",
+      "DIN"
+    ],
+    "gaps": {
+      "VIL": 0.0,
+      "HIL": 4.086,
+      "ALE": 59.697,
+      "COU": 65.402,
+      "HAK": 100.602,
+      "BRU": 118.217,
+      "HER": 138.084,
+      "FIS": 201.373
+    },
+    "times": {
+      "VIL": 3672.749,
+      "HIL": 3676.835,
+      "ALE": 3732.446,
+      "COU": 3738.151,
+      "HAK": 3773.352,
+      "BRU": 3790.966,
+      "HER": 3810.833,
+      "FIS": 3874.123
+    },
+    "finishers": [
+      "VIL",
+      "HIL",
+      "ALE",
+      "COU",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS"
+    ]
+  },
+  "16": {
+    "order": [
+      "HIL",
+      "VIL",
+      "COU",
+      "ALE",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS",
+      "BAD",
+      "LAM",
+      "BER",
+      "MSCM",
+      "PAN",
+      "SAL",
+      "DIN"
+    ],
+    "gaps": {
+      "HIL": 0.0,
+      "VIL": 7.757,
+      "COU": 65.527,
+      "ALE": 66.834,
+      "HAK": 105.906,
+      "BRU": 127.654,
+      "HER": 135.727,
+      "FIS": 208.908
+    },
+    "times": {
+      "HIL": 3672.136,
+      "VIL": 3679.893,
+      "COU": 3737.663,
+      "ALE": 3738.97,
+      "HAK": 3778.042,
+      "BRU": 3799.79,
+      "HER": 3807.864,
+      "FIS": 3881.044
+    },
+    "finishers": [
+      "HIL",
+      "VIL",
+      "COU",
+      "ALE",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS"
+    ]
+  },
+  "17": {
+    "order": [
+      "HIL",
+      "VIL",
+      "ALE",
+      "COU",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS",
+      "BAD",
+      "LAM",
+      "BER",
+      "MSCM",
+      "PAN",
+      "SAL",
+      "DIN"
+    ],
+    "gaps": {
+      "HIL": 0.0,
+      "VIL": 13.371,
+      "ALE": 55.826,
+      "COU": 74.575,
+      "HAK": 99.506,
+      "BRU": 120.274,
+      "HER": 140.614,
+      "FIS": 217.525
+    },
+    "times": {
+      "HIL": 3668.644,
+      "VIL": 3682.016,
+      "ALE": 3724.47,
+      "COU": 3743.219,
+      "HAK": 3768.15,
+      "BRU": 3788.918,
+      "HER": 3809.258,
+      "FIS": 3886.169
+    },
+    "finishers": [
+      "HIL",
+      "VIL",
+      "ALE",
+      "COU",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS"
+    ]
+  },
+  "18": {
+    "order": [
+      "HIL",
+      "VIL",
+      "ALE",
+      "COU",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS",
+      "BAD",
+      "LAM",
+      "BER",
+      "MSCM",
+      "PAN",
+      "SAL",
+      "DIN"
+    ],
+    "gaps": {
+      "HIL": 0.0,
+      "VIL": 4.334,
+      "ALE": 50.529,
+      "COU": 60.44,
+      "HAK": 100.678,
+      "BRU": 120.477,
+      "HER": 137.955,
+      "FIS": 201.098
+    },
+    "times": {
+      "HIL": 3675.581,
+      "VIL": 3679.915,
+      "ALE": 3726.11,
+      "COU": 3736.021,
+      "HAK": 3776.259,
+      "BRU": 3796.058,
+      "HER": 3813.536,
+      "FIS": 3876.679
+    },
+    "finishers": [
+      "HIL",
+      "VIL",
+      "ALE",
+      "COU",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS"
+    ]
+  },
+  "19": {
+    "order": [
+      "HIL",
+      "VIL",
+      "ALE",
+      "COU",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS",
+      "BAD",
+      "LAM",
+      "BER",
+      "MSCM",
+      "PAN",
+      "SAL",
+      "DIN"
+    ],
+    "gaps": {
+      "HIL": 0.0,
+      "VIL": 0.3,
+      "ALE": 51.273,
+      "COU": 63.067,
+      "HAK": 89.367,
+      "BRU": 117.619,
+      "HER": 132.817,
+      "FIS": 204.978
+    },
+    "times": {
+      "HIL": 3678.821,
+      "VIL": 3679.121,
+      "ALE": 3730.094,
+      "COU": 3741.888,
+      "HAK": 3768.188,
+      "BRU": 3796.439,
+      "HER": 3811.638,
+      "FIS": 3883.798
+    },
+    "finishers": [
+      "HIL",
+      "VIL",
+      "ALE",
+      "COU",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS"
+    ]
+  },
+  "20": {
+    "order": [
+      "HIL",
+      "VIL",
+      "ALE",
+      "COU",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS",
+      "BAD",
+      "LAM",
+      "BER",
+      "MSCM",
+      "PAN",
+      "SAL",
+      "DIN"
+    ],
+    "gaps": {
+      "HIL": 0.0,
+      "VIL": 12.165,
+      "ALE": 53.033,
+      "COU": 73.266,
+      "HAK": 104.481,
+      "BRU": 132.536,
+      "HER": 140.729,
+      "FIS": 208.212
+    },
+    "times": {
+      "HIL": 3671.105,
+      "VIL": 3683.269,
+      "ALE": 3724.138,
+      "COU": 3744.37,
+      "HAK": 3775.586,
+      "BRU": 3803.641,
+      "HER": 3811.833,
+      "FIS": 3879.317
+    },
+    "finishers": [
+      "HIL",
+      "VIL",
+      "ALE",
+      "COU",
+      "HAK",
+      "BRU",
+      "HER",
+      "FIS"
+    ]
+  }
+}

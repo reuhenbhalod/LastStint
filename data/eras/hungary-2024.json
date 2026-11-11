@@ -1,0 +1,52 @@
+{
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": true,
+    "drs": true,
+    "ers": "hybrid",
+    "refuelling": false
+  },
+  "eras": {
+    "eraId": 10,
+    "order": 7,
+    "userSide": "PIA",
+    "target": {
+      "type": "team",
+      "positions": [
+        2,
+        2
+      ]
+    },
+    "storyline": {
+      "real": "Piastri leads from the first corner, but Norris gets ahead with the earlier second stop. McLaren tell Norris to give the place back; he does on lap 68, and Piastri takes his first win by 2.1 s, McLaren's first one-two since Italy 2021."
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 2,
+      "label": "McLaren one-two on two more stops, as Piastri made"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "push",
+      "maxLaps": 0,
+      "label": "McLaren one-two without a single push lap"
+    },
+    "hardCalls": {
+      "NOR": 0,
+      "PIA": 2
+    },
+    "briefing": "Hungaroring, 2024. Norris and Piastri lock out the front row, McLaren's first since Brazil 2012, and Piastri takes the lead from Norris at the start. You run Piastri, 3.4 s ahead of Norris after 14 laps. Bring the McLarens home one-two."
+  },
+  "storylineEvents": [
+    [
+      63,
+      "FAULT"
+    ],
+    [
+      68,
+      "TEAM_ORDER"
+    ]
+  ]
+}

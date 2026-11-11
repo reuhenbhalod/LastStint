@@ -1,0 +1,528 @@
+{
+ "race": "malaysia-2013",
+ "source": "lap-times",
+ "neutralSource": "status",
+ "filled": [
+  "Compound: each stint's tyre class fitted from the lap times; dry stints keep step 2.4's estimated compound"
+ ],
+ "wetSpells": [
+  "1-9"
+ ],
+ "neutralLaps": [],
+ "ambiguous": [
+  {
+   "lap": 10,
+   "why": "borderline slowing: drizzle, or tyre wear"
+  },
+  {
+   "lap": 56,
+   "why": "borderline slowing: drizzle, or tyre wear"
+  }
+ ],
+ "stintClasses": [
+  {
+   "driver": "ALO",
+   "stint": 1,
+   "class": "inter"
+  },
+  {
+   "driver": "BIA",
+   "stint": 1,
+   "class": "inter"
+  },
+  {
+   "driver": "BOT",
+   "stint": 1,
+   "class": "inter"
+  },
+  {
+   "driver": "BUT",
+   "stint": 1,
+   "class": "inter"
+  },
+  {
+   "driver": "CHI",
+   "stint": 1,
+   "class": "inter"
+  },
+  {
+   "driver": "DIR",
+   "stint": 1,
+   "class": "inter"
+  },
+  {
+   "driver": "GRO",
+   "stint": 1,
+   "class": "inter"
+  },
+  {
+   "driver": "GUT",
+   "stint": 1,
+   "class": "inter"
+  },
+  {
+   "driver": "HAM",
+   "stint": 1,
+   "class": "inter"
+  },
+  {
+   "driver": "HUL",
+   "stint": 1,
+   "class": "inter"
+  },
+  {
+   "driver": "MAL",
+   "stint": 1,
+   "class": "inter"
+  },
+  {
+   "driver": "MAS",
+   "stint": 1,
+   "class": "inter"
+  },
+  {
+   "driver": "PER",
+   "stint": 1,
+   "class": "inter"
+  },
+  {
+   "driver": "PIC",
+   "stint": 1,
+   "class": "inter"
+  },
+  {
+   "driver": "RAI",
+   "stint": 1,
+   "class": "inter"
+  },
+  {
+   "driver": "RIC",
+   "stint": 1,
+   "class": "inter"
+  },
+  {
+   "driver": "ROS",
+   "stint": 1,
+   "class": "inter"
+  },
+  {
+   "driver": "SUT",
+   "stint": 1,
+   "class": "inter"
+  },
+  {
+   "driver": "VDG",
+   "stint": 1,
+   "class": "inter"
+  },
+  {
+   "driver": "VERJ",
+   "stint": 1,
+   "class": "inter"
+  },
+  {
+   "driver": "VET",
+   "stint": 1,
+   "class": "inter"
+  },
+  {
+   "driver": "WEB",
+   "stint": 1,
+   "class": "inter"
+  }
+ ],
+ "laps": [
+  {
+   "lap": 1,
+   "slowing": null,
+   "gap": 0.67,
+   "neutral": false,
+   "wet": true
+  },
+  {
+   "lap": 2,
+   "slowing": 0.1695,
+   "gap": 1.303,
+   "neutral": false,
+   "wet": true
+  },
+  {
+   "lap": 3,
+   "slowing": 0.165,
+   "gap": 1.669,
+   "neutral": false,
+   "wet": true
+  },
+  {
+   "lap": 4,
+   "slowing": 0.1601,
+   "gap": 2.075,
+   "neutral": false,
+   "wet": true
+  },
+  {
+   "lap": 5,
+   "slowing": 0.1579,
+   "gap": 2.259,
+   "neutral": false,
+   "wet": true
+  },
+  {
+   "lap": 6,
+   "slowing": 0.1473,
+   "gap": 2.979,
+   "neutral": false,
+   "wet": true
+  },
+  {
+   "lap": 7,
+   "slowing": 0.1268,
+   "gap": 1.694,
+   "neutral": false,
+   "wet": true
+  },
+  {
+   "lap": 8,
+   "slowing": 0.0731,
+   "gap": 2.421,
+   "neutral": false,
+   "wet": true
+  },
+  {
+   "lap": 9,
+   "slowing": 0.0527,
+   "gap": 4.097,
+   "neutral": false,
+   "wet": true
+  },
+  {
+   "lap": 10,
+   "slowing": 0.0336,
+   "gap": 4.447,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 11,
+   "slowing": 0.0232,
+   "gap": 3.63,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 12,
+   "slowing": 0.017,
+   "gap": 2.991,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 13,
+   "slowing": 0.015,
+   "gap": 2.764,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 14,
+   "slowing": 0.0106,
+   "gap": 2.534,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 15,
+   "slowing": 0.0081,
+   "gap": 2.543,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 16,
+   "slowing": 0.0068,
+   "gap": 2.556,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 17,
+   "slowing": 0.0063,
+   "gap": 2.77,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 18,
+   "slowing": 0.007,
+   "gap": 2.901,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 19,
+   "slowing": 0.0065,
+   "gap": 2.597,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 20,
+   "slowing": 0.0042,
+   "gap": 3.645,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 21,
+   "slowing": 0.0066,
+   "gap": 3.133,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 22,
+   "slowing": 0.0072,
+   "gap": 6.114,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 23,
+   "slowing": 0.0003,
+   "gap": 2.643,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 24,
+   "slowing": 0.0025,
+   "gap": 1.87,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 25,
+   "slowing": 0.0027,
+   "gap": 1.758,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 26,
+   "slowing": 0.0027,
+   "gap": 1.622,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 27,
+   "slowing": 0.0044,
+   "gap": 1.915,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 28,
+   "slowing": 0.0044,
+   "gap": 2.04,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 29,
+   "slowing": 0.0038,
+   "gap": 1.754,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 30,
+   "slowing": 0.0078,
+   "gap": 2.145,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 31,
+   "slowing": 0.0108,
+   "gap": 2.711,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 32,
+   "slowing": 0.0126,
+   "gap": 2.173,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 33,
+   "slowing": 0.0102,
+   "gap": 1.641,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 34,
+   "slowing": 0.0046,
+   "gap": 1.933,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 35,
+   "slowing": 0.0028,
+   "gap": 1.661,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 36,
+   "slowing": 0.002,
+   "gap": 1.024,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 37,
+   "slowing": 0.0018,
+   "gap": 1.395,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 38,
+   "slowing": 0.0043,
+   "gap": 2.658,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 39,
+   "slowing": 0.0048,
+   "gap": 2.667,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 40,
+   "slowing": 0.0046,
+   "gap": 3.198,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 41,
+   "slowing": 0.0059,
+   "gap": 4.252,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 42,
+   "slowing": 0.004,
+   "gap": 6.503,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 43,
+   "slowing": 0.0078,
+   "gap": 5.559,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 44,
+   "slowing": 0.0045,
+   "gap": 5.936,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 45,
+   "slowing": 0.0041,
+   "gap": 6.623,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 46,
+   "slowing": 0.0118,
+   "gap": 6.647,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 47,
+   "slowing": 0.0109,
+   "gap": 9.027,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 48,
+   "slowing": 0.0091,
+   "gap": 8.96,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 49,
+   "slowing": 0.0066,
+   "gap": 8.216,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 50,
+   "slowing": 0.0076,
+   "gap": 7.374,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 51,
+   "slowing": 0.0069,
+   "gap": 7.117,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 52,
+   "slowing": 0.0103,
+   "gap": 8.861,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 53,
+   "slowing": 0.0137,
+   "gap": 8.92,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 54,
+   "slowing": 0.0117,
+   "gap": 8.24,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 55,
+   "slowing": 0.0162,
+   "gap": 7.972,
+   "neutral": false,
+   "wet": false
+  },
+  {
+   "lap": 56,
+   "slowing": 0.0247,
+   "gap": 9.916,
+   "neutral": false,
+   "wet": false
+  }
+ ]
+}

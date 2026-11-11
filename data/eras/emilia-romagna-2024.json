@@ -1,0 +1,41 @@
+{
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": true,
+    "drs": true,
+    "ers": "hybrid",
+    "refuelling": false
+  },
+  "eras": {
+    "eraId": 10,
+    "order": 6,
+    "userSide": "NOR",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Verstappen leads from pole, bar a few laps for Sainz during the stops. Norris is the first of the leaders to stop, on lap 22, and Verstappen covers two laps later. On the hards Norris closes from about six seconds in the last 15 laps, but never gets into DRS range and loses by 0.725 s.",
+      "rewriteCondition": {
+        "type": "win"
+      },
+      "headline": "Norris finds the extra laps he needed at Imola"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 1,
+      "label": "Win on one stop, as Norris made"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 3,
+      "label": "Win by more than 3 seconds"
+    },
+    "hardCalls": {
+      "NOR": 0,
+      "VER": 0
+    },
+    "briefing": "Imola, 2024. Verstappen started from pole and leads; you run Norris, second and 5.9 s behind after 19 laps, with Leclerc 1.7 s behind you. All three of you started on mediums and have one stop to make. Catch him."
+  }
+}

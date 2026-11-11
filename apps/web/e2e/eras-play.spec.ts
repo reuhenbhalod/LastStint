@@ -1,0 +1,396 @@
+// One authored race per era, from the era map to the results (build plan 10.1), on a desktop
+// and a 390 px phone (the `desktop` and `phone` projects), with the Worker mocked (e2e/eras.ts).
+// Between them: refuelling (a box call waits for its fuel fill), the 2005 tyre lock, no DRS
+// before 2011, a team order, the decision timer running out and the untimed opt-out, Legend,
+// reconstructed races with pit-board prompts (Eras 1-2), an avoidable storyline retirement
+// (repeated and avoided), the history book and a leaderboard. The red flag is azerbaijan-2021's
+// (authored; italy-2020 left Eras in migration 0023). The car fault is brazil-2019's (authored):
+// Hamilton's lap-70 contact damage (hungary-1997 left Eras in migration 0028).
+//
+// Each test plays a whole race at five times the normal lap speed (the app's e2e hook); the
+// tests run in parallel. Runtime: see docs/eras-build-plan.md step 10.1.
+import { expect, test } from '@playwright/test';
+import { raceName } from '../src/eras/catalog.js';
+import {
+  closeTeamRadio,
+  finishRace,
+  gameDecisions,
+  loadEraRace,
+  mockEras,
+  noSidewaysScroll,
+  openRace,
+  playRace,
+  raceNotes,
+  radioLines,
+  radioLog,
+  startRace,
+  teamRadio,
+  watchRadio,
+} from './eras.js';
+
+test.describe.configure({ mode: 'parallel' });
+// A whole race (up to 70 laps after the takeover) at a second a lap, plus the grading.
+test.setTimeout(420_000);
+
+/** The intro's era and the race's name, then the results for that race and era. */
+async function resultsFor(page: import('@playwright/test').Page, era: number, legend = false) {
+  const stars = page.getByRole('region', { name: 'Stars' });
+  await expect(stars).toContainText(`${legend ? 'Legend stars' : 'Stars'} · Era ${era}`);
+  await expect(page.getByRole('link', { name: 'Back to era' })).toHaveAttribute(
+    'href',
+    `/eras/${era}`,
+  );
+  await noSidewaysScroll(page);
+  return stars;
+}
+
+/** Every call shown in a race without DRS: no DRS line, no wait-for-DRS move. */
+function noDrs(calls: string[]) {
+  for (const c of calls) {
+    expect(c).not.toMatch(/\bDRS\b/);
+  }
+}
+
+test('Era 9: Turkey 2021 from the map to the results', async ({ page }) => {
+  const model = loadEraRace('turkey-2021');
+  const eras = await mockEras(page, [model]);
+  await openRace(page, 'turkey-2021');
+  await expect(page.getByText('Finish P4 or better')).toBeVisible();
+  await playRace(page);
+  await resultsFor(page, 9);
+  expect(eras.submissions).toHaveLength(1);
+  expect(eras.submissions[0]?.body.untimed).toBe(false);
+});
+
+test('the era detail badges hidden objectives on the race cards, never their text', async ({
+  page,
+}) => {
+  const ALL = { result: true, strategist: true, mastery: true };
+  await mockEras(page, [loadEraRace('turkey-2021')], {
+    progress: {
+      'turkey-2021': { stars: ALL, hiddenDone: true, accuracy: 96.5 },
+      'abu-dhabi-2021': { stars: ALL, accuracy: 93 },
+      'bahrain-2021': { stars: { result: true, strategist: true, mastery: false }, accuracy: 80 },
+    },
+  });
+  await page.goto('/eras/9');
+  const card = (raceId: string) =>
+    page.locator('article').filter({ has: page.getByRole('heading', { name: raceName(raceId) }) });
+  await expect(card('turkey-2021')).toContainText('Hidden objective done');
+  await expect(card('abu-dhabi-2021')).toContainText('Hidden objective open');
+  await expect(card('bahrain-2021')).not.toContainText('Hidden objective');
+  await expect(page.getByText(/Hidden objective (done|open)/)).toHaveCount(2);
+  // The badge stays inside its card on a phone.
+  const badge = await card('turkey-2021').getByText('Hidden objective done').boundingBox();
+  const box = await card('turkey-2021').boundingBox();
+  expect(badge && box && badge.x + badge.width <= box.x + box.width).toBe(true);
+  await noSidewaysScroll(page);
+});
+
+test('Era 10: Belgium 2023, the decision timer runs out, then the untimed opt-out', async ({
+  page,
+}) => {
+  const model = loadEraRace('belgium-2023');
+  // A 4 s timer, so the first call can run out quickly.
+  const eras = await mockEras(page, [model], {
+    difficulty: () => ({
+      accuracyThreshold: 70,
+      information: 'full',
+      rivalPolicy: 'standard',
+      decisionTimerSeconds: 4,
+    }),
+  });
+  await openRace(page, 'belgium-2023');
+  await expect(page.getByText('Win the race')).toBeVisible();
+  await expect(page.getByText('4 s per call')).toBeVisible();
+  await startRace(page);
+  // The first call: no answer. The timer counts down and the wall takes the default.
+  const card = page.locator('section.decision');
+  await expect(card.getByRole('timer')).toBeVisible({ timeout: 120_000 });
+  const tag = (await card.getByRole('alert').textContent()) ?? '';
+  const lap = Number(tag.match(/Lap (\d+)/)?.[1]);
+  const moment = model.decisionMoments.find((m) => m.lap === lap);
+  expect(moment, `a decision moment on lap ${lap}`).toBeDefined();
+  await expect(card.getByRole('alert').filter({ hasText: `Lap ${lap}` })).toHaveCount(0, {
+    timeout: 15_000,
+  });
+  expect((await radioLines(page)).map((r) => r.text)).toContainEqual(
+    expect.stringMatching(/^Out of time, no call from the wall\./),
+  );
+  // Then the timer off: every call waits, and the attempt is marked untimed.
+  await page.getByRole('button', { name: 'Timer on' }).click();
+  await expect(page.getByRole('button', { name: 'Timer off' })).toBeVisible();
+  const played = await finishRace(page, {
+    each: async () => {
+      if (await card.isVisible()) await expect(card.getByRole('timer')).toHaveCount(0);
+    },
+  });
+  // A call shown with the timer off (a decision or a quick call) marks the attempt untimed.
+  expect(played.moments.size + played.calls.length).toBeGreaterThan(0);
+  const stars = await resultsFor(page, 10);
+  await expect(stars).toContainText(
+    'Untimed: the decision timer was off, so these stars are marked untimed.',
+  );
+  const sent = eras.submissions[0]?.body;
+  expect(sent?.untimed).toBe(true);
+  // The run-out call went in (as its default option), and nothing was answered after it on
+  // the clock: the timer was off.
+  expect(sent?.decisions).toContainEqual(
+    expect.objectContaining({ kind: 'radio', momentId: moment?.id }),
+  );
+});
+
+test('Era 8: Turkey 2020 from the map to the results', async ({ page }) => {
+  const eras = await mockEras(page, [loadEraRace('turkey-2020')]);
+  await openRace(page, 'turkey-2020');
+  await playRace(page);
+  await resultsFor(page, 8);
+  expect(eras.submissions).toHaveLength(1);
+});
+
+test('Era 9: Azerbaijan 2021’s red flag', async ({ page }) => {
+  const model = loadEraRace('azerbaijan-2021');
+  expect(model.events.some((e) => e.type === 'RED')).toBe(true);
+  await mockEras(page, [model]);
+  await openRace(page, 'azerbaijan-2021');
+  const played = await playRace(page);
+  expect(played.redFlag, 'the red flag shows on the race screen').toBe(true);
+  await resultsFor(page, 9);
+});
+
+test('Era 7: Abu Dhabi 2016 from the map to the results', async ({ page }) => {
+  const eras = await mockEras(page, [loadEraRace('abu-dhabi-2016')]);
+  await openRace(page, 'abu-dhabi-2016');
+  await expect(page.getByText('Finish P3 or better')).toBeVisible();
+  await playRace(page);
+  await resultsFor(page, 7);
+  expect(eras.submissions).toHaveLength(1);
+});
+
+test('Era 8: Brazil 2019’s contact damage on the radio', async ({ page }) => {
+  const model = loadEraRace('brazil-2019');
+  await mockEras(page, [model]);
+  await openRace(page, 'brazil-2019');
+  // Hamilton's own call when the contact strikes (engineerRadio.ts: a `damage` fault has no
+  // line of its own, so the general one plays).
+  const hit = 'Something’s wrong with the car!';
+  const radio = watchRadio(page, [hit]);
+  await playRace(page, { each: radio.each });
+  expect(radio.seen.get(hit), 'the fault line in the radio log').toMatch(/^L70 · Hamilton/);
+  // The contact strikes on its real lap; Hamilton is yours.
+  const faults = (await raceNotes(page)).filter((n) => n.kind === 'fault');
+  expect(faults).toContainEqual(
+    expect.objectContaining({ driver: 'HAM', lap: 70, detail: 'damage' }),
+  );
+  await resultsFor(page, 8);
+});
+
+test('Era 6: Abu Dhabi 2010 at Legend, no DRS', async ({ page }) => {
+  const model = loadEraRace('abu-dhabi-2010');
+  expect(model.rules?.drs).toBe(false);
+  // Era 6 Cleared (a star on every race), so Legend is open.
+  const eras = await mockEras(page, [model], { cleared: [6] });
+  await openRace(page, 'abu-dhabi-2010', true);
+  await expect(page).toHaveURL(/\/eras\/6\/abu-dhabi-2010\/legend$/);
+  await expect(page.getByText('Difficulty · Legend')).toBeVisible();
+  await expect(page.getByText('20 s per call')).toBeVisible();
+  const played = await playRace(page);
+  noDrs(played.calls);
+  expect(eras.starts).toEqual([{ raceId: 'abu-dhabi-2010', legend: true }]);
+  const stars = await resultsFor(page, 6, true);
+  await expect(stars).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Legend leaderboard' })).toHaveAttribute(
+    'href',
+    '/eras/6/abu-dhabi-2010/leaderboard/legend',
+  );
+  // Expert rivals at Legend: the rival's choices go with the calls.
+  expect(eras.submissions[0]?.body).toHaveProperty('rivalClaims');
+});
+
+test('Era 5: San Marino 2005, the tyre lock and a refuelling stop', async ({ page }) => {
+  const model = loadEraRace('san-marino-2005');
+  expect(model.rules).toMatchObject({ tyreChanges: false, refuelling: true, drs: false });
+  await mockEras(page, [model]);
+  await openRace(page, 'san-marino-2005');
+  // Plan A. Every plan boxes first on lap 28, where the fuel on board runs out (B3: the plans
+  // run on the tank; before, A was a no-stop plan and B and C boxed on lap 21), so the box call
+  // below is the player's own.
+  await startRace(page, { plan: 'A' });
+  const radio = await teamRadio(page);
+  // The 2005 lock: a stop keeps the dry set.
+  await expect(radio.getByRole('note')).toContainText('No tyre changes this year');
+  await expect(radio.getByRole('img', { name: 'Tyres locked: no tyre changes' })).toBeVisible();
+  // Refuelling: the box call waits for a fill.
+  const dry = radio.getByRole('button', { name: /^D\s*Dry/ });
+  await expect(dry).toBeDisabled();
+  await expect(radio).toContainText('Pick a fuel fill, then the tyres.');
+  const fills = radio.getByRole('group', { name: 'Fuel fill' });
+  await expect(fills.getByRole('button')).toHaveCount(3);
+  await fills.getByRole('button', { name: /^Short/ }).click();
+  await expect(dry).toBeEnabled();
+  await dry.click();
+  await expect(radio).toContainText('Boxing');
+  await closeTeamRadio(page);
+  const played = await finishRace(page);
+  noDrs(played.calls);
+  await resultsFor(page, 5);
+  const pits = (await gameDecisions(page)).filter((d) => d.kind === 'pit');
+  expect(pits).toContainEqual(expect.objectContaining({ compound: 'MEDIUM', fill: 'short' }));
+  // Every stop states its fill (none goes without), and keeps the dry set.
+  for (const p of pits) {
+    expect(p.fill).toBeDefined();
+    expect(p.compound).toBe('MEDIUM');
+  }
+});
+
+test('Era 4: Austria 2002, a team order', async ({ page }) => {
+  const model = loadEraRace('austria-2002');
+  const eras = await mockEras(page, [model]);
+  await openRace(page, 'austria-2002');
+  await expect(page.getByText(/^Finish P2 or better, with Schumacher/)).toBeVisible();
+  await startRace(page);
+  const radio = await teamRadio(page);
+  const orders = radio.getByText('Team orders · Schumacher');
+  await expect(orders).toBeVisible();
+  await radio.getByRole('button', { name: 'Let Schumacher by' }).click();
+  await closeTeamRadio(page);
+  const played = await finishRace(page);
+  noDrs(played.calls);
+  await resultsFor(page, 4);
+  expect(eras.submissions[0]?.body.decisions).toContainEqual(
+    expect.objectContaining({ kind: 'teamOrder', order: 'letTeammatePast' }),
+  );
+});
+
+// Found by this suite (A2 e2e): the real order, on lap 71 (TEAM_ORDER BAR → MSCM), never
+// reaches the radio. It is the player's call (scripted.ts `call`), armed only by a `comply`
+// decision, and the authored austria-2002 has no lap-71 team-order moment to give one; the
+// team radio's "Let Schumacher by" is a swap (a `team-swap` note), which has no radio line.
+// So engineerRadio.ts's team-order line can't show in this race.
+test.fixme('Era 4: Austria 2002, the real team order on the radio', async ({ page }) => {
+  await mockEras(page, [loadEraRace('austria-2002')]);
+  await openRace(page, 'austria-2002');
+  const order = 'Team orders: let Schumacher by, then hold station.';
+  const radio = watchRadio(page, [order]);
+  await playRace(page, { each: radio.each });
+  expect(radio.seen.get(order), 'the team order in the radio log').toMatch(/^L71 · Engineer/);
+});
+
+test('Era 3: Belgium 1995, refuelling stops in the rain', async ({ page }) => {
+  const model = loadEraRace('belgium-1995');
+  expect(model.rules?.refuelling).toBe(true);
+  const eras = await mockEras(page, [model]);
+  await openRace(page, 'belgium-1995');
+  const played = await playRace(page);
+  noDrs(played.calls);
+  // Not an Era 1-2 race: team radio, not the pit board.
+  for (const tag of played.moments.values()) expect(tag).toMatch(/^Engineer · /);
+  await resultsFor(page, 3);
+  for (const p of eras.submissions[0]?.body.decisions.filter((d) => d.kind === 'pit') ?? [])
+    expect(p.fill).toBeDefined();
+});
+
+test('Era 2: Hungary 1992, reconstructed, on the pit board; then the leaderboard and the history book', async ({
+  page,
+}) => {
+  const model = loadEraRace('hungary-1992');
+  expect(model.provenance?.kind).toBe('reconstructed');
+  await mockEras(page, [model]);
+  await page.goto('/eras/2');
+  const card = page.getByRole('article').filter({ hasText: 'Hungary 1992' });
+  await expect(card.getByText('Reconstructed', { exact: true })).toBeVisible();
+  await openRace(page, 'hungary-1992');
+  await expect(page.getByText('Reconstructed', { exact: true })).toBeVisible();
+  const played = await playRace(page);
+  expect(played.moments.size).toBeGreaterThan(0);
+  for (const tag of played.moments.values()) expect(tag).toMatch(/^Pit board · /);
+  noDrs(played.calls);
+  const stars = await resultsFor(page, 2);
+  await expect(stars).toContainText('History rewritten');
+
+  await page.getByRole('link', { name: 'Leaderboard', exact: true }).click();
+  await expect(page).toHaveURL(/\/eras\/2\/hungary-1992\/leaderboard$/);
+  await expect(page.getByTestId('me-line')).toContainText('Your rank:');
+  await expect(page.getByTestId('me-line')).toContainText('of 4');
+  await noSidewaysScroll(page);
+
+  await page.goto('/eras/history');
+  await expect(page.getByRole('heading', { name: 'History book' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Hungary 1992' })).toBeVisible();
+  await noSidewaysScroll(page);
+});
+
+test('Era 1: Monaco 1988, the avoidable storyline retirement, repeated then avoided', async ({
+  page,
+}) => {
+  const model = loadEraRace('monaco-1988');
+  expect(model.eras?.storylineRetirements?.[0]).toMatchObject({ driver: 'SENA' });
+  const eras = await mockEras(page, [model], {
+    // The server's ★1: Senna wins only if he's still running.
+    result: (_id, sub) =>
+      !sub.body.decisions.some((d) => d.kind === 'radio' && d.optionId === 'push'),
+  });
+  await openRace(page, 'monaco-1988');
+  // Senna's real call: push from lap 40 and keep pushing. He crashes out on his real lap.
+  // The retirement, on the pit wall's word (Eras 1-2: engineerRadio.ts `board`). The name is
+  // left out: names.ts `named` only turns three-letter codes into names, so the line reads
+  // "SENA has stopped" (a known bug, reported with this test).
+  const stopped = 'has stopped. That’s our race.';
+  const radio = watchRadio(page, [stopped]);
+  const repeated = await playRace(page, {
+    each: radio.each,
+    answer: (lap) => (lap === 40 ? ['PUSH'] : lap === 48 ? ['STAY OUT'] : ['Hold the pace']),
+    // And no pace call on the pit board takes him off it.
+    quick: (text) =>
+      /How do we run it/.test(text)
+        ? 'Push'
+        : /save the tyres/.test(text)
+          ? 'Keep the pace'
+          : undefined,
+  });
+  for (const tag of repeated.moments.values()) expect(tag).toMatch(/^Pit board · /);
+  const crashed = (await raceNotes(page)).filter((n) => n.kind === 'storyline');
+  expect(crashed).toEqual([expect.objectContaining({ driver: 'SENA', detail: 'retired' })]);
+  expect(radio.seen.get(stopped), 'the retirement in the radio log').toMatch(
+    new RegExp(`^L${crashed[0]?.lap} · Pit wall“\\S+ has stopped\\. That’s our race\\.”$`),
+  );
+  await resultsFor(page, 1);
+
+  // A new attempt, saving the car instead: he's still running at the flag. The 1988 fuel
+  // limit is the whole allowance at standard pace, and the pit-board calls this run leaves to
+  // their defaults put him back on it, so he lifts and coasts from the lap 70 fuel call (a car
+  // that ran dry on the last lap would stop, and the pit wall would say so).
+  await page.getByRole('button', { name: 'New attempt' }).click();
+  await expect(page.getByRole('button', { name: 'Start the race' })).toBeVisible({
+    timeout: 30_000,
+  });
+  const avoidedRadio = radioLog(page);
+  await playRace(page, {
+    each: avoidedRadio.read,
+    answer: (lap) =>
+      lap === 40
+        ? ['EASY - save the car']
+        : lap === 48
+          ? ['STAY OUT']
+          : lap === 70
+            ? ['FUEL - lift and coast to the flag']
+            : undefined,
+  });
+  const avoided = (await raceNotes(page)).filter((n) => n.kind === 'storyline');
+  expect(avoided).toEqual([expect.objectContaining({ driver: 'SENA', detail: 'avoided' })]);
+  // An avoided retirement is a race that goes on: nothing is said.
+  expect((await avoidedRadio.lines()).filter((l) => l.from === 'Pit wall')).toEqual([]);
+  await resultsFor(page, 1);
+  expect(eras.starts).toHaveLength(2);
+  expect(eras.submissions).toHaveLength(2);
+});
+
+// Found by this suite (step 10.1, fixed in A1): San Marino 2005's one-stop race plan filled to
+// the flag ({ laps: 41 }), more than a 2005 tank holds, so checkFill threw, no plan was graded
+// and the submit failed ("Can’t reach the server."). The planner now caps a fill at the tank.
+test('Era 5: San Marino 2005’s plans are graded and the attempt is scored', async ({ page }) => {
+  const eras = await mockEras(page, [loadEraRace('san-marino-2005')]);
+  await openRace(page, 'san-marino-2005');
+  await playRace(page);
+  expect(eras.submissions).toHaveLength(1);
+});

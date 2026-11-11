@@ -2,7 +2,7 @@
 // Serves the daily, verifies every run by replaying it with the shared TS sim, and computes
 // ranks, stats and the leaderboard. docs/api.md documents the endpoints for the web app.
 
-import { ROOM_CODE, VERSUS_TRACKS } from '@boxthislap/sim';
+import { ROOM_CODE, VERSUS_TRACKS } from '@laststint/sim';
 import { type Context, Hono } from 'hono';
 import { cors } from 'hono/cors';
 import type { ContentfulStatusCode } from 'hono/utils/http-status';
@@ -10,6 +10,8 @@ import { adminEmails, registerAdmin } from './admin.js';
 import { authConfigured, verifyCredential } from './auth.js';
 import { isDate, isPlayable, playableDates } from './dates.js';
 import { LEADERBOARD_SIZE, dailyStats, getDaily, getRun, leaderboard } from './db.js';
+import { registerEras } from './eras.js';
+import { registerErasHistory } from './erasHistory.js';
 import { displayName } from './names.js';
 import { checkQueue, queueDays } from './ops.js';
 import { accountOf, playedDates, setProfile, signIn, streakOf } from './players.js';
@@ -47,6 +49,8 @@ export interface Env {
   ADMIN_EMAILS?: string;
   /** A survivor pool to use instead of data/pools.json's (JSON; tests only). */
   SURVIVOR_POOL?: string;
+  /** "true" on staging only (eras spec §5): every era and race open, Draft races shown. */
+  ERAS_TEST_MODE?: string;
   /** Versus mode's rooms (docs/versus-spec.md V5): one Durable Object per match. */
   VERSUS: DurableObjectNamespace;
   /** The room's clocks in ms (tests shorten them): a lap, the car pick, a big call, a
@@ -119,6 +123,8 @@ async function cached(
 
 registerAdmin(app);
 registerTickets(app);
+registerEras(app);
+registerErasHistory(app);
 
 app.get('/api/health', async (c) =>
   c.json({ ok: true, queueDays: await queueDays(c.env.DB, Date.now()) }),

@@ -4,7 +4,7 @@
 // whose grade is still running says so. The running score is the same average the results
 // screen shows.
 
-import { BAND_POINTS, type Band, type RaceModel, autoStay } from '@boxthislap/sim';
+import { BAND_POINTS, type Band, type RaceModel, autoAnswered, autoStay } from '@laststint/sim';
 import { planGrade, stopsWord } from '../game/plans.js';
 import type { GameState } from '../state/machine.js';
 import { Panel } from './Panel.js';
@@ -32,6 +32,8 @@ export function LiveGrades({ state, model }: { state: GameState; model: RaceMode
         lap: m.lap,
         label: (m.options.find((o) => o.id === chosen)?.label ?? chosen ?? '').split(', ')[0],
         auto: !!chosen && autoStay(model, m, state.decisions) === chosen,
+        // Not in the score (never in Eras, where the wall's answers count: sim autoAnswered).
+        unscored: autoAnswered(model, m, state.decisions, chosen),
         mine,
         best,
       };
@@ -45,12 +47,13 @@ export function LiveGrades({ state, model }: { state: GameState; model: RaceMode
       lap: state.meta.takeoverLap + 1,
       label: `Plan ${picked.id === 'own' ? '(yours)' : picked.id.toUpperCase()}: ${stopsWord(picked).toLowerCase()}`,
       auto: false,
+      unscored: false,
       mine: grade?.options.find((o) => o.id === picked.id),
       best: grade?.options.find((o) => o.id === grade.best),
     });
   }
   // The wall's own answers (Auto) are shown but not scored, as on the server.
-  const scored = rows.flatMap((r) => (r.mine && !r.auto ? [BAND_POINTS[r.mine.band]] : []));
+  const scored = rows.flatMap((r) => (r.mine && !r.unscored ? [BAND_POINTS[r.mine.band]] : []));
   const score = scored.length ? scored.reduce((a, b) => a + b, 0) / scored.length : null;
 
   return (

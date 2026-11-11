@@ -3,7 +3,7 @@
 // finished behind, and the job is to hold your place. Worked out from the real result, so a
 // race needs no extra setting.
 
-import type { RaceModel } from '@boxthislap/sim';
+import type { RaceModel } from '@laststint/sim';
 import { surname } from '../data/names.js';
 
 export interface Goal {

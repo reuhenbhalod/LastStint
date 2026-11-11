@@ -1,0 +1,45 @@
+{
+  "raceId": "south-africa-1983",
+  "stops": [
+    {
+      "number": 5,
+      "name": "Nelson Piquet",
+      "lap": 28,
+      "laneTime": null,
+      "source": "https://www.grandprix.com/gpe/rr388.html (\"Piquet stopped without losing the lead on lap 28\"); also https://www.historyracingpedia.com/stories/nl/f1-1983-south-africa-titledecider-piquet-prost.html (\"In lap 28 he could come for fuel and tyres\")",
+      "note": "planned fuel-and-tyre stop; Motor Sport (Nov 1983) gives 12 s stationary by the Brabham crew's watch, 9.2 s by the TV count"
+    }
+  ],
+  "safetyCars": [],
+  "complete": {
+    "stops": false,
+    "safetyCars": true
+  },
+  "lapLeaders": [
+    {
+      "driver": "PIQN",
+      "name": "Nelson Piquet",
+      "fromLap": 1,
+      "toLap": 59,
+      "source": "https://en.wikipedia.org/wiki/1983_South_African_Grand_Prix (lap-leader chart, Template:F1Laps1983 'RSA')"
+    },
+    {
+      "driver": "PAT",
+      "name": "Riccardo Patrese",
+      "fromLap": 60,
+      "toLap": 77,
+      "source": "https://en.wikipedia.org/wiki/1983_South_African_Grand_Prix (lap-leader chart, Template:F1Laps1983 'RSA')"
+    }
+  ],
+  "runningOrder": [
+    {
+      "lap": 1,
+      "order": [
+        "PIQN",
+        "PAT"
+      ],
+      "source": "https://en.wikipedia.org/wiki/1983_South_African_Grand_Prix: 'At the start Piquet passed Tambay to take the lead, with Patrese moving into second place.'"
+    }
+  ],
+  "notes": "Planned refuelling stops by most front-runners; only Piquet's in-lap is sourced. Motor Sport Nov 1983 (https://www.motorsportmagazine.com/archive/article/november-1983/66/south-african-grand-prix-9/) describes Patrese (#6) serviced 'in just over ten seconds', Lauda (#8) held on the jacks 'more than 23 sec' by a baulking right-rear wheel, and Tambay (#27) losing a place to de Cesaris at his stop, all without laps. historyracingpedia gives Brabham's pre-race plan (stops on laps 27 and 46) and Renault's (36 and 42): plans, not actual laps, so not entered."
+}

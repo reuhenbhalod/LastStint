@@ -1,0 +1,211 @@
+[
+  {
+    "id": "stop-28",
+    "lap": 28,
+    "trigger": "cliff",
+    "target": {
+      "kind": "position",
+      "atBest": 4
+    },
+    "options": [
+      {
+        "id": "stay",
+        "label": "STAY OUT",
+        "decisions": []
+      },
+      {
+        "id": "box-medium",
+        "label": "IN - fuel and tyres",
+        "decisions": [
+          {
+            "lap": 28,
+            "kind": "pit",
+            "compound": "MEDIUM",
+            "fill": {
+              "laps": 49
+            }
+          }
+        ]
+      },
+      {
+        "id": "box-next-medium",
+        "label": "IN NEXT LAP - fuel and tyres",
+        "decisions": [
+          {
+            "lap": 29,
+            "kind": "pit",
+            "compound": "MEDIUM",
+            "fill": {
+              "laps": 48
+            }
+          }
+        ]
+      }
+    ],
+    "realOptionId": "box-medium"
+  },
+  {
+    "id": "pace-33",
+    "lap": 33,
+    "trigger": "cliff",
+    "target": {
+      "kind": "position",
+      "atBest": 4
+    },
+    "options": [
+      {
+        "id": "keep",
+        "label": "Hold the pace",
+        "decisions": []
+      },
+      {
+        "id": "push",
+        "label": "PUSH",
+        "decisions": [
+          {
+            "lap": 33,
+            "kind": "mode",
+            "key": "pace",
+            "value": "push"
+          }
+        ]
+      },
+      {
+        "id": "easy",
+        "label": "EASY - save the car",
+        "decisions": [
+          {
+            "lap": 33,
+            "kind": "mode",
+            "key": "pace",
+            "value": "manage"
+          }
+        ]
+      }
+    ],
+    "realOptionId": null
+  },
+  {
+    "id": "pace-38",
+    "lap": 38,
+    "trigger": "cliff",
+    "target": {
+      "kind": "position",
+      "atBest": 4
+    },
+    "options": [
+      {
+        "id": "easy",
+        "label": "EASY - save the car",
+        "decisions": [
+          {
+            "lap": 38,
+            "kind": "mode",
+            "key": "pace",
+            "value": "manage"
+          }
+        ]
+      },
+      {
+        "id": "keep",
+        "label": "Hold the pace",
+        "decisions": []
+      },
+      {
+        "id": "push",
+        "label": "PUSH",
+        "decisions": [
+          {
+            "lap": 38,
+            "kind": "mode",
+            "key": "pace",
+            "value": "push"
+          }
+        ]
+      }
+    ],
+    "realOptionId": "easy"
+  },
+  {
+    "id": "pace-50",
+    "lap": 50,
+    "trigger": "cliff",
+    "target": {
+      "kind": "position",
+      "atBest": 4
+    },
+    "options": [
+      {
+        "id": "easy",
+        "label": "EASY - save the car",
+        "decisions": [
+          {
+            "lap": 50,
+            "kind": "mode",
+            "key": "pace",
+            "value": "manage"
+          }
+        ]
+      },
+      {
+        "id": "keep",
+        "label": "Hold the pace",
+        "decisions": []
+      },
+      {
+        "id": "push",
+        "label": "PUSH",
+        "decisions": [
+          {
+            "lap": 50,
+            "kind": "mode",
+            "key": "pace",
+            "value": "push"
+          }
+        ]
+      }
+    ],
+    "realOptionId": null
+  },
+  {
+    "id": "pace-62",
+    "lap": 62,
+    "trigger": "cliff",
+    "target": {
+      "kind": "position",
+      "atBest": 4
+    },
+    "options": [
+      {
+        "id": "easy",
+        "label": "EASY - save the car",
+        "decisions": [
+          {
+            "lap": 62,
+            "kind": "mode",
+            "key": "pace",
+            "value": "manage"
+          }
+        ]
+      },
+      {
+        "id": "keep",
+        "label": "Hold the pace",
+        "decisions": []
+      },
+      {
+        "id": "push",
+        "label": "PUSH",
+        "decisions": [
+          {
+            "lap": 62,
+            "kind": "mode",
+            "key": "pace",
+            "value": "push"
+          }
+        ]
+      }
+    ],
+    "realOptionId": null
+  }
+]

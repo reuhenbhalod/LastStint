@@ -1,6 +1,6 @@
-# BoxThisLap API
+# LastStint API
 
-The game's backend: a Cloudflare Worker (`apps/worker`) with a D1 database. It serves the day's race and verifies every run by replaying it with the same sim the browser runs (`@boxthislap/sim`, see [sim-api.md](sim-api.md)). The client sends its calls, never a score.
+The game's backend: a Cloudflare Worker (`apps/worker`) with a D1 database. It serves the day's race and verifies every run by replaying it with the same sim the browser runs (`@laststint/sim`, see [sim-api.md](sim-api.md)). The client sends its calls, never a score.
 
 - **Base URL.**
   - Production: the Worker's URL (set `VITE_API_BASE` in the web app).
@@ -67,7 +67,7 @@ Each entry of `grades` is `{ momentId, probabilities, real? }`:
 - `probabilities` are the moment's option chances, in the moment's option order.
 - `real` is the real team's call's chance, present only when the real team took none of the options.
 
-`claimGrade()` (from `@boxthislap/sim`) builds the entry; don't build it by hand.
+`claimGrade()` (from `@laststint/sim`) builds the entry; don't build it by hand.
 
 **The race plan** (docs/strategy-planner-spec.md). A run that logged a plan at takeover (one `{ kind: "plan" }` call, made at the takeover lap) adds one more entry, `{ momentId: "plan", probabilities }`: each plan's chance, in the order graded (the engineer's plans a, b, c, then `own` if the player built and picked their own). `claimPlanGrade()` builds it. The plan counts as one more call in the score. A run without a plan has no plan entry and no plan grade.
 
@@ -246,13 +246,13 @@ The game-change ticket tracker (`apps/worker/src/tickets.ts`, the admin page's T
 
 | Task | Command (from the repo root) |
 |---|---|
-| Run the Worker locally | `pnpm --filter @boxthislap/worker dev` (port 8787; regenerates the race bundle first) |
-| Create local tables | `pnpm --filter @boxthislap/worker migrate:local` |
-| Schedule dailies | `pnpm --filter @boxthislap/worker schedule --local --days 7` (`--remote` for production; `--race <id>`, `--from <date>`, `--dry-run`) |
-| Play a daily against a Worker | `pnpm --filter @boxthislap/worker smoke --url http://localhost:8787` |
-| Test | `pnpm --filter @boxthislap/worker test` (runs in workerd with a local D1) |
-| Seed the ticket tracker | `pnpm --filter @boxthislap/worker tickets:seed:local` (`tickets:seed:remote` for production), after `migrate:local` / `migrate:remote`. Loads `apps/worker/data/tickets.json`; tickets whose title is already there are skipped, so it's safe to run again |
-| Rebundle races after `pipeline build` | `pnpm --filter @boxthislap/worker races` (CI fails if the bundle is stale) |
+| Run the Worker locally | `pnpm --filter @laststint/worker dev` (port 8787; regenerates the race bundle first) |
+| Create local tables | `pnpm --filter @laststint/worker migrate:local` |
+| Schedule dailies | `pnpm --filter @laststint/worker schedule --local --days 7` (`--remote` for production; `--race <id>`, `--from <date>`, `--dry-run`) |
+| Play a daily against a Worker | `pnpm --filter @laststint/worker smoke --url http://localhost:8787` |
+| Test | `pnpm --filter @laststint/worker test` (runs in workerd with a local D1) |
+| Seed the ticket tracker | `pnpm --filter @laststint/worker tickets:seed:local` (`tickets:seed:remote` for production), after `migrate:local` / `migrate:remote`. Loads `apps/worker/data/tickets.json`; tickets whose title is already there are skipped, so it's safe to run again |
+| Rebundle races after `pipeline build` | `pnpm --filter @laststint/worker races` (CI fails if the bundle is stale) |
 
 **Scheduling.**
 - Only races that have approved decision moments **and** a G1 pass or borderline in `docs/g1-report.md` can be scheduled.
@@ -267,10 +267,10 @@ The game-change ticket tracker (`apps/worker/src/tickets.ts`, the admin page's T
 ## Local development
 
 ```sh
-pnpm --filter @boxthislap/worker migrate:local          # once
-pnpm --filter @boxthislap/worker schedule --local --days 7
-pnpm --filter @boxthislap/worker dev                    # Worker on :8787
-pnpm --filter @boxthislap/web dev                       # Vite on :5173, proxies /api
+pnpm --filter @laststint/worker migrate:local          # once
+pnpm --filter @laststint/worker schedule --local --days 7
+pnpm --filter @laststint/worker dev                    # Worker on :8787
+pnpm --filter @laststint/web dev                       # Vite on :5173, proxies /api
 ```
 
 Local D1 data lives in `apps/worker/.wrangler/` (git-ignored).

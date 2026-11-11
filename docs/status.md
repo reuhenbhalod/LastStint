@@ -1,4 +1,4 @@
-# BoxThisLap: where things stand
+# LastStint: where things stand
 
 Oct 31, 2026 (updated Nov 1 for the beta feedback round, `feedback-round-1-spec.md`). A summary of what is built, the decisions that shaped it, and what to improve. The specs in this folder have the details.
 
@@ -105,7 +105,7 @@ Beta feedback round 2, part B (Nov 2, 2026):
     - With no car out, race control's words are used instead: a clash just before (debris), or a yellow in a sector.
     - All 20 neutralizations in the pool races are explained.
     - The game says it on the radio ("Race control: Safety car: Latifi crashed.") and under the flag on the map; a crash in live play brings its own cause.
-- **Seed tuner (`pnpm --filter @boxthislap/sim tune <race>`):** picks each race's daily seed so the real team's calls give the real result, a good player (best-graded call every time) wins, and random play wins about 15% of the time. Abu Dhabi 2021 keeps its seed (random play wins about 1%: the hardest race).
+- **Seed tuner (`pnpm --filter @laststint/sim tune <race>`):** picks each race's daily seed so the real team's calls give the real result, a good player (best-graded call every time) wins, and random play wins about 15% of the time. Abu Dhabi 2021 keeps its seed (random play wins about 1%: the hardest race).
 - **Admin page (`/admin`):** sign in with Google (emails in `ADMIN_EMAILS`); play any race with any seed; see and run the daily schedule (schedule days rotating the races, change a day's race, re-pin stale days, clear your own run to replay a day). API in `docs/api.md`.
 - **Ticket tracker (`/admin/tickets`):** the Tickets tab on the admin page, for admins only (same Google sign-in and `ADMIN_EMAILS`). Open and in-progress tickets grouped by category, a collapsible Completed section, a category filter, search, and create, edit, inline status and delete. Tickets live in `pitwall-db` (migration 0006); the 46 from `docs/Game changes.pdf` seed from `apps/worker/data/tickets.json` with `tickets:seed:local` / `tickets:seed:remote`. API in `docs/api.md`. It replaces the standalone `apps/tickets` app.
 - **Google sign-in + streaks:** the streak shows on the intro and results. Signing in links the browser to an account so the streak and one-run-a-day follow you.
@@ -136,22 +136,22 @@ With no daily scheduled, or no connection, the site plays the bundled copy of th
 
 - **Unit tests:** 171 sim, 27 web, 20 API and 111 Python. One proves that a game played through the UI's session produces a submission the server scores exactly as full grading does.
 - **Browser playthrough** (`apps/web/e2e/daily.spec.ts`): start → four calls → results → share on a phone-sized screen. It runs in CI before every deploy, with the API mocked.
-- **Seed check** (`pnpm --filter @boxthislap/sim combos abu-dhabi-2021`): all 36 answer combinations, with 0 live/full grading mismatches.
+- **Seed check** (`pnpm --filter @laststint/sim combos abu-dhabi-2021`): all 36 answer combinations, with 0 live/full grading mismatches.
 - **Live test, Oct 31, on a throwaway day since wiped:**
   - A real browser played the live site against the real server (score 100, rank 1/1, leaderboard and stats).
   - A second submit was refused, a tampered log was refused, and a cheated run was corrected by the nightly job.
 
 ## Running it locally
 
-- **The website against the live API:** `pnpm --filter @boxthislap/web dev:live`, then open http://localhost:5173. The API allows `localhost:5173`.
+- **The website against the live API:** `pnpm --filter @laststint/web dev:live`, then open http://localhost:5173. The API allows `localhost:5173`.
 - **Everything local:**
-  - Run `pnpm --filter @boxthislap/worker dev` (API on :8787, local database) next to `pnpm --filter @boxthislap/web dev`.
-  - Seed the local calendar with `pnpm --filter @boxthislap/worker schedule --local --days 2 --race abu-dhabi-2021`.
+  - Run `pnpm --filter @laststint/worker dev` (API on :8787, local database) next to `pnpm --filter @laststint/web dev`.
+  - Seed the local calendar with `pnpm --filter @laststint/worker schedule --local --days 2 --race abu-dhabi-2021`.
 - **"Practice · not saved"** (yellow badge) means there's no live daily: none is scheduled for that date, or the API can't be reached. The run is played locally and not submitted. This is what testers see until beta days are scheduled.
 
 ## Before the beta starts
 
-1. **Schedule the beta days:** `pnpm --filter @boxthislap/worker schedule --remote --from <YYYY-MM-DD> --days 7 --race abu-dhabi-2021`. The site switches from practice to the live daily automatically.
+1. **Schedule the beta days:** `pnpm --filter @laststint/worker schedule --remote --from <YYYY-MM-DD> --days 7 --race abu-dhabi-2021`. The site switches from practice to the live daily automatically.
 2. **Tell testers it's one run per day** (per browser).
 3. **Reuhen pulls `main`** before more UI work: the frontend was finished on top of his stage 3.3.
 

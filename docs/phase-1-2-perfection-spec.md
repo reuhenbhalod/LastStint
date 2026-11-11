@@ -209,7 +209,7 @@ In a dry race each car must use at least two dry compounds. Today the player can
 
 **D8. API documentation for the UI**
 
-- **a. `docs/sim-api.md` plus runnable examples (a daily race end to end), with semver for `@boxthislap/sim`.** ← recommended
+- **a. `docs/sim-api.md` plus runnable examples (a daily race end to end), with semver for `@laststint/sim`.** ← recommended
 - b. Code comments only.
 
 ### Decided during S4 (Oct 26, 2026)

@@ -13,7 +13,7 @@
 // gap puts it there, however the stop falls across lap ticks (a car well behind the leader is
 // still on its in-lap when the leader starts the next lap).
 
-import { type RaceModel, type RaceState, rivalCover } from '@boxthislap/sim';
+import { type RaceModel, type RaceState, rivalCover } from '@laststint/sim';
 import {
   type PitLane,
   type Polyline,

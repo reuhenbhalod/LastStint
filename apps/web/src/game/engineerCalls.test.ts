@@ -4,7 +4,13 @@
 
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { type RaceModel, answerMoment, engineerConfig, mulberry32 } from '@boxthislap/sim';
+import {
+  type RaceModel,
+  answerMoment,
+  engineerConfig,
+  mulberry32,
+  refuelling,
+} from '@laststint/sim';
 import { describe, expect, it } from 'vitest';
 import { GameEngine } from '../engine/engine.js';
 import { overtakingCorners } from '../track/corners.js';
@@ -95,7 +101,10 @@ function play(model: RaceModel, seed: number) {
       const next = lap + 1;
       // No answer (pick past the options): the driver's own move, if he has one.
       const calls = o ? [o.call, ...(o.also ?? [])] : [call.driverChoice];
-      for (const c of calls) if (c) engine.apply({ ...c, lap: next });
+      // A refuelling race: the card adds the player's fuel fill to a box answer (QuickCallCard).
+      const fill = refuelling(model) ? { fill: 'standard' as const } : {};
+      for (const c of calls)
+        if (c) engine.apply({ ...c, lap: next, ...(c.kind === 'pit' ? fill : {}) });
     } else if (
       lap - lastInfo >=
         (engine.state.nextFlag !== 'green' || engine.state.flag !== 'green' ? 1 : 2) &&
@@ -117,6 +126,12 @@ function engineRadioLines(
 ): number {
   return engineerRadio(engine.notes, lap, model.userSide, engine.state, cfg, corner).length;
 }
+
+// Races where the player's car is never in a battle: monaco-1988 (Senna leads by over 40 s at
+// the takeover, and his lap-66 retirement is frozen), and portugal-1985 (Senna led every lap
+// and was 30 s clear by lap 20, the reconstruction's sourced running order), so no car ever
+// comes within reach), and spain-1996 (Schumacher leads by 31 s at the takeover and won by 45 s).
+const NO_BATTLES = new Set(['monaco-1988', 'portugal-1985', 'spain-1996']);
 
 describe('the race engineer’s radio', () => {
   it.each(races.map((m) => [m.race.id, m] as const))(
@@ -144,7 +159,7 @@ describe('the race engineer’s radio', () => {
         }
         expect(longest).toBeLessThanOrEqual(2);
       }
-      expect(battles).toBeGreaterThan(0);
+      if (!NO_BATTLES.has(model.race.id)) expect(battles).toBeGreaterThan(0);
     },
   );
 

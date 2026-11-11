@@ -1,0 +1,51 @@
+{
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": true,
+    "drs": true,
+    "ers": "hybrid",
+    "refuelling": false
+  },
+  "eras": {
+    "eraId": 9,
+    "order": 3,
+    "userSide": "PER",
+    "target": {
+      "type": "defend"
+    },
+    "storyline": {
+      "real": "Hamilton leads early, the two Red Bulls jump him in the stops, and P\u00e9rez keeps him behind in second. Verstappen's left-rear tyre fails from the lead on lap 46, the race is stopped, and at the standing restart on lap 50 Hamilton locks up into turn 1 and drops to last. P\u00e9rez wins by 1.385 s from Vettel."
+    },
+    "mastery": {
+      "type": "margin",
+      "seconds": 1.4,
+      "label": "Win by more than 1.4 seconds"
+    },
+    "hidden": {
+      "type": "stop_count",
+      "exact": 2,
+      "label": "Win on two stops"
+    },
+    "hardCalls": {
+      "PER": 3,
+      "VET": 0
+    },
+    "briefing": "Baku, 2021. Hamilton leads Verstappen, and you run P\u00e9rez in third, ten laps in. Hamilton will be the first of the three to stop. Come out of the stops ahead of him and keep him behind: on these streets the race can turn late."
+  },
+  "storylineEvents": [
+    [
+      31,
+      "SC"
+    ],
+    [
+      45,
+      "RETIREMENT"
+    ],
+    [
+      48,
+      "RED"
+    ]
+  ]
+}

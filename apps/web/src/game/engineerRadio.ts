@@ -3,8 +3,8 @@
 // the wall going up or down. The driver's tone follows his mood: a calm driver says "good call",
 // a furious one asks whether anyone on the wall is watching.
 
-import type { EngineerConfig, Mood, RaceNote, RaceState, TrustReason } from '@boxthislap/sim';
-import { moodOf } from '@boxthislap/sim';
+import type { EngineerConfig, Mood, RaceNote, RaceState, TrustReason } from '@laststint/sim';
+import { moodOf } from '@laststint/sim';
 import { driverInfo } from '../data/drivers.js';
 
 export interface RadioLine {
@@ -46,6 +46,14 @@ const TRUST_LINES: Record<TrustReason, [calm: string, angry: string] | null> = {
   settled: null,
 };
 
+/** The driver's call when a car fault strikes (faults.ts kinds), and the pit board's sign. */
+const FAULT_LINES: Record<string, [radio: string, board: string]> = {
+  'gear-stuck': ['The gearbox is stuck in one gear! I’m losing loads.', 'SLOW · GEARBOX?'],
+  'power-loss': ['I’ve lost power! Something’s up with the engine.', 'SLOW · ENGINE?'],
+  puncture: ['Puncture! The tyre’s going down.', 'SLOW · TYRE?'],
+  'tyre-failure': ['The tyre’s failed! I’m getting it back slowly.', 'SLOW · TYRE?'],
+};
+
 /** Race control's name for a car ("Car 44 (HAM)"). */
 function car(code: string): string {
   const n = driverInfo(code)?.number;
@@ -54,7 +62,8 @@ function car(code: string): string {
 
 /**
  * The radio for the engineer notes of one lap. `cfg` gives the moods; `race` the state after
- * the lap (the driver's mood now).
+ * the lap (the driver's mood now). `board`: Eras 1-2, where team radio was limited, so the
+ * wall's word on a fault or a team order is a pit-board sign (eras/PitBoard.ts).
  */
 export function engineerRadio(
   notes: RaceNote[],
@@ -63,6 +72,7 @@ export function engineerRadio(
   race: RaceState,
   cfg: EngineerConfig | null,
   corner: number,
+  board = false,
 ): RadioLine[] {
   const out: RadioLine[] = [];
   const mood: Mood = race.engineer && cfg ? moodOf(cfg, race.engineer.trust) : 'calm';
@@ -70,7 +80,17 @@ export function engineerRadio(
     notes.filter((n) => n.lap === lap && n.kind === 'trust').map((n) => n.detail),
   );
   for (const n of notes) {
-    if (n.lap !== lap || n.driver !== side) continue;
+    if (n.lap !== lap) continue;
+    // A team order names the car let by; the player's car may be the one told to yield.
+    if (n.kind === 'team-order' && n.detail === side) {
+      out.push(
+        board
+          ? { from: 'Pit board', text: `LET ${n.driver} BY` }
+          : { from: 'Engineer', text: `Team orders: let ${n.driver} by, then hold station.` },
+      );
+      continue;
+    }
+    if (n.driver !== side) continue;
     switch (n.kind) {
       case 'battle':
         // A called move's outcome is told by the trust line; the driver's own moves here.
@@ -114,7 +134,22 @@ export function engineerRadio(
         out.push({ from: 'Engineer', text: 'New nose on. The pace should be back.' });
         break;
       case 'fuel':
-        out.push({ from: side, text: 'I’m out of fuel! I have to lift everywhere now.' });
+        // `out`: the tank ran dry and the car has stopped for good (a 1984-88 fuel limit, a
+        // refuelling race's tank). `empty`: a fuel load that only costs lap time. A fuel-limit
+        // car's empty tank notes both on the lap it stops: only the stop is told.
+        if (n.detail === 'out') {
+          out.push(
+            board
+              ? { from: 'Pit wall', text: `${side} has run out of fuel. That’s our race.` }
+              : { from: side, text: 'I’m out of fuel! The car’s stopped.' },
+          );
+        } else if (
+          !notes.some(
+            (o) => o.lap === lap && o.kind === 'fuel' && o.driver === side && o.detail === 'out',
+          )
+        ) {
+          out.push({ from: side, text: 'I’m out of fuel! I have to lift everywhere now.' });
+        }
         break;
       case 'blue':
         out.push({ from: side, text: `Past ${n.other}. Finally.` });
@@ -127,6 +162,30 @@ export function engineerRadio(
               ? 'I’m going for it. I’m doing this my way.'
               : 'I’m defending my way. Stop telling me what to do.',
         });
+        break;
+      case 'fault': {
+        const lines = FAULT_LINES[n.detail ?? ''] ?? [
+          'Something’s wrong with the car!',
+          'SLOW · PROBLEM?',
+        ];
+        out.push(board ? { from: 'Pit board', text: lines[1] } : { from: side, text: lines[0] });
+        break;
+      }
+      case 'storyline':
+        // Only a retirement is told; an avoided one is a race that simply goes on.
+        if (n.detail !== 'retired') break;
+        out.push(
+          board
+            ? { from: 'Pit wall', text: `${side} has stopped. That’s our race.` }
+            : { from: side, text: 'That’s it, I’m out. The car’s finished.' },
+        );
+        break;
+      case 'team-order':
+        out.push(
+          board
+            ? { from: 'Pit board', text: `${n.detail} LETS YOU BY` }
+            : { from: 'Engineer', text: `${n.detail} is letting you through. Take the place.` },
+        );
         break;
       case 'trust': {
         if (n.detail === 'settled') {

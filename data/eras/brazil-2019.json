@@ -1,0 +1,53 @@
+{
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": true,
+    "drs": true,
+    "ers": "hybrid",
+    "refuelling": false
+  },
+  "eras": {
+    "eraId": 8,
+    "order": 7,
+    "userSide": "HAM",
+    "target": {
+      "type": "beat-rival",
+      "rival": "GAS"
+    },
+    "storyline": {
+      "real": "After a late safety car Hamilton pits for soft tyres, collides with Albon on the penultimate lap and loses second to Gasly by 0.062 seconds at the line; a time penalty then drops him to seventh.",
+      "rewriteCondition": {
+        "type": "beat-rival",
+        "rival": "GAS"
+      },
+      "headline": "No photo finish this time: Hamilton beats Gasly to the line at Interlagos"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 3,
+      "label": "Beat Gasly on three more stops, as Hamilton made"
+    },
+    "hidden": {
+      "type": "compound_rule",
+      "mustAvoid": "HARD",
+      "label": "Never fit the hard tyre"
+    },
+    "hardCalls": {
+      "HAM": 4,
+      "GAS": 1
+    },
+    "briefing": "Interlagos, 2019. Verstappen starts from pole with Hamilton third; Gasly's Toro Rosso is sixth on the grid."
+  },
+  "storylineEvents": [
+    [
+      54,
+      "SC"
+    ],
+    [
+      66,
+      "SC"
+    ]
+  ]
+}

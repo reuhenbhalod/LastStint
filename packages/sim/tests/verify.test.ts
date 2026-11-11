@@ -5,9 +5,17 @@ import { describe, expect, it } from 'vitest';
 import abuJson from '../../../data/races/abu-dhabi-2021.json';
 import { playDailyRace } from '../examples/daily-race.js';
 import { battlesFor } from '../src/engineer.js';
-import { type Run, decide, engineerConfig, initRun } from '../src/sim.js';
+import { gradeMoment } from '../src/grade.js';
+import { legendMoments } from '../src/moments.js';
+import { type Run, decide, engineerConfig, initRun, isFinished, stepLap } from '../src/sim.js';
 import type { Decision, RaceModel } from '../src/types.js';
-import { VerifyError, verifyRun } from '../src/verify.js';
+import {
+  type ClaimedGrade,
+  VerifyError,
+  answerMoment,
+  claimGrade,
+  verifyRun,
+} from '../src/verify.js';
 
 const fullAbu = abuJson as unknown as RaceModel;
 const SAMPLES = 40;
@@ -356,5 +364,45 @@ describe('verifyRun', () => {
         VerifyError,
       );
     });
+  });
+});
+
+describe('Legend', () => {
+  // Seed 4363: Legend removes the real VSC, SC and restart moments and draws a SC on lap 35
+  // (Yas Marina's rates with abu-dhabi-2010, -2011 and -2012 in data/sc_rates.json), so the
+  // player is asked legend-sc-35, then the two green-flag calls.
+  const seed = 4363;
+  const moments = legendMoments(fullAbu, seed);
+  const run = initRun(fullAbu, seed, { decisions: [], legend: true });
+  const grades: ClaimedGrade[] = [];
+  while (!isFinished(run)) {
+    const m = moments.find((x) => x.lap === run.state.lap + 1);
+    if (m) {
+      const grade = gradeMoment(run, m.options, m.target, SAMPLES);
+      grades.push(claimGrade(run, m, grade, SAMPLES));
+      answerMoment(run, m, m.options[1]?.id as string);
+    }
+    stepLap(run);
+  }
+
+  it('checks and grades the moments the Legend attempt was asked', () => {
+    expect(moments.map((m) => m.id)).toContain('legend-sc-35');
+    expect(moments.map((m) => m.id)).not.toEqual(fullAbu.decisionMoments.map((m) => m.id));
+    const claimed = verifyRun(fullAbu, seed, run.decisions, SAMPLES, grades, { legend: true });
+    expect(claimed.moments.map((m) => m.momentId)).toEqual(moments.map((m) => m.id));
+    const full = verifyRun(fullAbu, seed, run.decisions, SAMPLES, undefined, { legend: true });
+    expect(full).toEqual(claimed);
+  });
+
+  it('refuses the Legend log as a normal run, and a normal log as Legend', () => {
+    expect(() => verifyRun(fullAbu, seed, run.decisions, SAMPLES, grades)).toThrow(VerifyError);
+    const normal = playDailyRace(fullAbu, seed, (m) => m.options[0]?.id as string, {
+      samples: SAMPLES,
+    });
+    expect(() =>
+      verifyRun(fullAbu, seed, normal.decisions, SAMPLES, normal.grades, {
+        legend: true,
+      }),
+    ).toThrow(VerifyError);
   });
 });

@@ -4,7 +4,7 @@
 // the race screen), the result between races, and the run's end. A run in progress is kept
 // (its id here, the race in its own save slot), so a refresh carries on where it was.
 
-import type { RaceModel } from '@boxthislap/sim';
+import type { RaceModel } from '@laststint/sim';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Brand } from '../components/Brand.js';
 import { Disclaimer } from '../components/Disclaimer.js';

@@ -1,0 +1,41 @@
+{
+  "eras": {
+    "eraId": 6,
+    "order": 10,
+    "userSide": "RAI",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Alonso wins his home race from 5th on the grid on four stops; R\u00e4ikk\u00f6nen, on three, finishes second, 9.3 s behind. Massa is third.",
+      "rewriteCondition": {
+        "type": "win"
+      },
+      "headline": "R\u00e4ikk\u00f6nen's three stops beat Alonso's four in Barcelona"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 2,
+      "label": "Win on two more stops, as R\u00e4ikk\u00f6nen made"
+    },
+    "hidden": {
+      "type": "compound_rule",
+      "mustAvoid": "SOFT",
+      "label": "Win without fitting the soft tyre again"
+    },
+    "hardCalls": {
+      "ALO": 1,
+      "RAI": 3
+    },
+    "briefing": "Barcelona, 2013. The tyres wear fast. Alonso started fifth, has already stopped once and leads. You run R\u00e4ikk\u00f6nen, fourth, on a plan with one stop fewer than Alonso's. Make it work and win."
+  },
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": true,
+    "ers": "kers",
+    "refuelling": false
+  }
+}

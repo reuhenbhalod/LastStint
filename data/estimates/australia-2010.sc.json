@@ -1,0 +1,35 @@
+{
+ "race": "australia-2010",
+ "how": "docs/eras-checks/2.4-estimates.md: check each period against a race report; set status to confirmed or rejected (edit startLap/endLap if they're off), then re-run `pipeline jolpica <race-id> --force`.",
+ "periods": [
+  {
+   "startLap": 1,
+   "endLap": 4,
+   "laps": 4,
+   "kind": "SC",
+   "confidence": "likely",
+   "peakRatio": 1.74,
+   "gapBefore": null,
+   "gapAfter": 4.0,
+   "reasons": [],
+   "status": "confirmed",
+   "source": "https://en.wikipedia.org/wiki/2010_Australian_Grand_Prix: first-lap incident, 'The incident prompted the deployment of the safety car'; 'Racing resumed at the end of lap four when the safety car pulled into the pit-lane'"
+  },
+  {
+   "startLap": 8,
+   "endLap": 8,
+   "laps": 1,
+   "kind": "SC",
+   "confidence": "ambiguous",
+   "peakRatio": 1.111,
+   "gapBefore": 4.9,
+   "gapAfter": 24.5,
+   "reasons": [
+    "only 1.11x slower: rain, yellow flags or a short SC?",
+    "the field didn't bunch up (P1-P6 4.9s -> 24.5s): rain?",
+    "a single slow lap"
+   ],
+   "status": "unchecked"
+  }
+ ]
+}

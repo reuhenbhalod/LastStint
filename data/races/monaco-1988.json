@@ -1,0 +1,701 @@
+{
+  "schemaVersion": 11,
+  "race": {
+    "id": "monaco-1988",
+    "name": "Monaco 1988: Senna vs Prost",
+    "laps": 78,
+    "takeoverLap": 36,
+    "seed": 1,
+    "scUnlap": "none"
+  },
+  "era": "1988-1993",
+  "track": {
+    "pitLoss": 20.0,
+    "pitLossUnderSC": 11.0,
+    "pitLossUnderVSC": 13.8,
+    "pitLossDeviations": [],
+    "overtakeDifficulty": 0.7394,
+    "overtakeModel": {
+      "intercept": 0.0163,
+      "paceCoef": 0.1404,
+      "gapCoef": -1.4282
+    },
+    "dirtyAirPenalty": 0.0,
+    "greenLapTime": 91.697
+  },
+  "compounds": {
+    "MEDIUM": {
+      "offset": 0.0,
+      "degPerLap": 0.035,
+      "cliffLap": 78,
+      "provenLaps": 78
+    }
+  },
+  "drivers": [
+    {
+      "code": "ALBM",
+      "team": "Ferrari",
+      "basePace": 91.1332,
+      "noise": 0.8203,
+      "stateAtTakeover": {
+        "position": 4,
+        "gapAhead": 2.161,
+        "compound": "MEDIUM",
+        "tyreAge": 36,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "ALL",
+      "team": "Larrousse",
+      "basePace": 92.6823,
+      "noise": 0.6183,
+      "stateAtTakeover": {
+        "position": 10,
+        "gapAhead": 6.362,
+        "compound": "MEDIUM",
+        "tyreAge": 36,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BER",
+      "team": "Ferrari",
+      "basePace": 90.9178,
+      "noise": 0.7998,
+      "stateAtTakeover": {
+        "position": 2,
+        "gapAhead": 32.673,
+        "compound": "MEDIUM",
+        "tyreAge": 36,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BOUT",
+      "team": "Benetton",
+      "basePace": 91.9823,
+      "noise": 1.6428,
+      "stateAtTakeover": {
+        "position": 13,
+        "gapAhead": 29.116,
+        "compound": "MEDIUM",
+        "tyreAge": 36,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "CAP",
+      "team": "March",
+      "basePace": 100.9967,
+      "noise": 5.174,
+      "stateAtTakeover": {
+        "position": 14,
+        "gapAhead": 18.67,
+        "compound": "MEDIUM",
+        "tyreAge": 36,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "DAL",
+      "team": "Larrousse",
+      "basePace": 91.0556,
+      "noise": 1.3941,
+      "stateAtTakeover": {
+        "position": 12,
+        "gapAhead": 0.87,
+        "compound": "MEDIUM",
+        "tyreAge": 36,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "GHI",
+      "team": "Zakspeed",
+      "basePace": 93.7409,
+      "noise": 0.9589,
+      "stateAtTakeover": {
+        "position": 15,
+        "gapAhead": 5.002,
+        "compound": "MEDIUM",
+        "tyreAge": 36,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "GUG",
+      "team": "March",
+      "basePace": 91.6404,
+      "noise": 0.9944,
+      "stateAtTakeover": {
+        "position": 8,
+        "gapAhead": 15.169,
+        "compound": "MEDIUM",
+        "tyreAge": 36,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "LAR",
+      "team": "Osella",
+      "basePace": 93.64,
+      "noise": 0.6355,
+      "stateAtTakeover": {
+        "position": 16,
+        "gapAhead": 0.041,
+        "compound": "MEDIUM",
+        "tyreAge": 36,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "NAN",
+      "team": "Benetton",
+      "basePace": 91.6858,
+      "noise": 1.1253,
+      "stateAtTakeover": {
+        "position": 6,
+        "gapAhead": 6.737,
+        "compound": "MEDIUM",
+        "tyreAge": 36,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "PALJ",
+      "team": "Tyrrell",
+      "basePace": 92.0704,
+      "noise": 0.5964,
+      "stateAtTakeover": {
+        "position": 7,
+        "gapAhead": 5.886,
+        "compound": "MEDIUM",
+        "tyreAge": 36,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "PAT",
+      "team": "Williams",
+      "basePace": 91.0689,
+      "noise": 1.6815,
+      "stateAtTakeover": {
+        "position": 11,
+        "gapAhead": 17.764,
+        "compound": "MEDIUM",
+        "tyreAge": 36,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "PERL",
+      "team": "Minardi",
+      "basePace": 92.2141,
+      "noise": 1.0643,
+      "stateAtTakeover": {
+        "position": 9,
+        "gapAhead": 6.785,
+        "compound": "MEDIUM",
+        "tyreAge": 36,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "PRO",
+      "team": "McLaren",
+      "basePace": 90.2652,
+      "noise": 1.0812,
+      "stateAtTakeover": {
+        "position": 3,
+        "gapAhead": 8.892,
+        "compound": "MEDIUM",
+        "tyreAge": 36,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "SENA",
+      "team": "McLaren",
+      "basePace": 89.0755,
+      "noise": 0.4205,
+      "stateAtTakeover": {
+        "position": 1,
+        "gapAhead": 0.0,
+        "compound": "MEDIUM",
+        "tyreAge": 36,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "WAR",
+      "team": "Arrows",
+      "basePace": 91.7902,
+      "noise": 0.7708,
+      "stateAtTakeover": {
+        "position": 5,
+        "gapAhead": 23.131,
+        "compound": "MEDIUM",
+        "tyreAge": 36,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    }
+  ],
+  "fuelEffectPerLap": 0.04359,
+  "freshTyre": {
+    "bonus": -0.0454,
+    "laps": 3
+  },
+  "events": [
+    {
+      "lap": 38,
+      "type": "RETIREMENT",
+      "driver": "PERL"
+    },
+    {
+      "lap": 39,
+      "type": "RETIREMENT",
+      "driver": "NAN"
+    },
+    {
+      "lap": 46,
+      "type": "RETIREMENT",
+      "driver": "GHI"
+    },
+    {
+      "lap": 47,
+      "type": "RETIREMENT",
+      "driver": "GUG"
+    },
+    {
+      "lap": 52,
+      "type": "RETIREMENT",
+      "driver": "ALL"
+    },
+    {
+      "lap": 66,
+      "type": "RETIREMENT",
+      "driver": "SENA",
+      "storylineEvent": true
+    }
+  ],
+  "decisionMoments": [
+    {
+      "id": "pace-40",
+      "lap": 40,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 40,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "easy",
+          "label": "EASY - save the car",
+          "decisions": [
+            {
+              "lap": 40,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "lift",
+          "label": "FUEL - lift and coast",
+          "decisions": [
+            {
+              "lap": 40,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "liftAndCoast"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "stop-48",
+      "lap": 48,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "STAY OUT",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "IN - fresh tyres",
+          "decisions": [
+            {
+              "lap": 48,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "pace-56",
+      "lap": 56,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 56,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "easy",
+          "label": "EASY - save the car",
+          "decisions": [
+            {
+              "lap": 56,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "lift",
+          "label": "FUEL - lift and coast",
+          "decisions": [
+            {
+              "lap": 56,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "liftAndCoast"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "pace-64",
+      "lap": 64,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 64,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "easy",
+          "label": "EASY - save the car",
+          "decisions": [
+            {
+              "lap": 64,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "lift",
+          "label": "FUEL - lift and coast",
+          "decisions": [
+            {
+              "lap": 64,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "liftAndCoast"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "fuel-70",
+      "lap": 70,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "lift",
+          "label": "FUEL - lift and coast to the flag",
+          "decisions": [
+            {
+              "lap": 70,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "liftAndCoast"
+            },
+            {
+              "lap": 70,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "full",
+          "label": "FUEL OK - full mixture",
+          "decisions": [
+            {
+              "lap": 70,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "normal"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "fuel-74",
+      "lap": 74,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "lift",
+          "label": "FUEL - lift and coast to the flag",
+          "decisions": [
+            {
+              "lap": 74,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "liftAndCoast"
+            },
+            {
+              "lap": 74,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "full",
+          "label": "FUEL OK - full mixture",
+          "decisions": [
+            {
+              "lap": 74,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "normal"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    }
+  ],
+  "candidateMomentLaps": [],
+  "realResult": [
+    "PRO",
+    "BER",
+    "ALBM",
+    "WAR",
+    "PALJ",
+    "PAT",
+    "DAL",
+    "BOUT",
+    "LAR",
+    "CAP",
+    "SENA",
+    "ALL",
+    "GUG",
+    "GHI",
+    "NAN",
+    "PERL",
+    "MAN",
+    "DEC",
+    "ARN",
+    "LAA",
+    "CHE",
+    "JOH",
+    "TAR",
+    "CAF",
+    "STRP",
+    "PIQN"
+  ],
+  "userSide": "SENA",
+  "rival": "PRO",
+  "eras": {
+    "eraId": 1,
+    "order": 10,
+    "userSide": "SENA",
+    "target": {
+      "type": "defend"
+    },
+    "storyline": {
+      "real": "Senna, far ahead of Prost, crashes at Portier on lap 67; Prost wins",
+      "rewriteCondition": {
+        "type": "defend"
+      },
+      "headline": "Senna keeps his concentration and wins in Monte Carlo"
+    },
+    "mastery": {
+      "type": "mode_rule",
+      "mode": "push",
+      "maxLaps": 0,
+      "label": "Bring it home: no laps at PUSH"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 50,
+      "label": "Win by more than 50 seconds"
+    },
+    "briefing": "Monaco, May 1988. Senna started on pole in the McLaren-Honda and leads; Prost spent the first half of the race stuck behind Berger's Ferrari. Turbo fuel is down to 150 litres this year. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports. Who led each lap is sourced; the lap times are reconstructed.",
+    "hardCalls": {
+      "SENA": 0,
+      "PRO": 0
+    },
+    "storylineRetirements": [
+      {
+        "driver": "SENA",
+        "condition": {
+          "type": "mode",
+          "key": "pace",
+          "value": "push",
+          "fromLap": 55
+        },
+        "real": "Prost passed Berger for second on lap 54 and started trading fastest laps with Senna, who answered (his fastest lap on lap 59); on lap 67, as McLaren radioed him to slow down, Senna lost concentration at Portier and crashed out of the lead",
+        "source": "https://en.wikipedia.org/wiki/1988_Monaco_Grand_Prix"
+      }
+    ]
+  },
+  "provenance": {
+    "kind": "reconstructed",
+    "estimated": [
+      "compounds",
+      "fuelLoads",
+      "weather"
+    ]
+  },
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": false,
+    "fuelLimit": 127.5
+  },
+  "reconstructed": true
+}

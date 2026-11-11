@@ -1,0 +1,44 @@
+{
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": true
+  },
+  "eras": {
+    "eraId": 4,
+    "order": 9,
+    "userSide": "ALO",
+    "target": {
+      "type": "defend"
+    },
+    "storyline": {
+      "real": "Alonso starts from pole and leads on three stops. Ferrari put Schumacher on four, his fast laps between the stops take him ahead, and he wins by 8.3 s. Barrichello passes Trulli for third two corners from the flag.",
+      "rewriteCondition": {
+        "type": "defend"
+      },
+      "headline": "Alonso holds off Ferrari's four stops at Magny-Cours"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 3,
+      "label": "Win on three stops"
+    },
+    "hidden": {
+      "type": "team_result",
+      "positions": [
+        1,
+        3
+      ],
+      "label": "Win with Trulli on the podium"
+    },
+    "hardCalls": {
+      "ALO": 1,
+      "MSCM": 0
+    },
+    "briefing": "Magny-Cours, 2004. Alonso takes pole for Renault with Schumacher beside him. You run Alonso, leading Schumacher by 1.1 s after eight laps. Keep him behind to the flag."
+  }
+}

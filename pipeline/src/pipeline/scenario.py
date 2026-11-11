@@ -12,6 +12,7 @@ import pandas as pd
 from .clean import fitted_compound, gap_to_car_ahead, tyre_change_out_laps
 
 DRY_COMPOUNDS = ("SOFT", "MEDIUM", "HARD")
+WET_TYRES = ("INTERMEDIATE", "WET")
 
 
 def real_strategy(laps: pd.DataFrame) -> dict[str, list[dict]]:
@@ -28,11 +29,14 @@ def real_strategy(laps: pd.DataFrame) -> dict[str, list[dict]]:
 
 
 def state_at_takeover(laps: pd.DataFrame, takeover_lap: int) -> dict[str, dict]:
-    """Per-car position, gap ahead (s), compound, tyre age and the dry compounds used so far
-    (for the two-compound rule) at the takeover lap."""
+    """Per-car position, gap ahead (s), compound, tyre age and the compounds used so far, the
+    takeover lap's included, at the takeover lap. Wet tyres count: a car that has run one is
+    free of the two-compound rule (sim.ts ruleSatisfied), so a car on intermediates at the
+    takeover, or one that started on them, may finish on a single dry compound."""
     gaps = gap_to_car_ahead(laps)
     rows = laps[laps["LapNumber"] == takeover_lap]
-    so_far = laps[(laps["LapNumber"] <= takeover_lap) & laps["Compound"].isin(DRY_COMPOUNDS)]
+    tyres = DRY_COMPOUNDS + WET_TYRES
+    so_far = laps[(laps["LapNumber"] <= takeover_lap) & laps["Compound"].isin(tyres)]
     used = so_far.groupby("Driver")["Compound"].agg(lambda c: sorted(set(map(str, c))))
     state: dict[str, dict] = {}
     for r in rows.itertuples():

@@ -5,7 +5,9 @@
 Least squares with an explicit design matrix: one absolute pace term per driver, a
 compound offset relative to the softest compound, a wear rate per compound
 (compound x tyre age), and one fuel term (slope on lap number). Fitting across every stint
-separates fuel (monotonic in lap number) from wear (resets to zero each stop).
+separates fuel (monotonic in lap number) from wear (resets to zero each stop). In a refuelling
+race the fuel term's lap is the FuelLap column (refuel.with_fuel_columns), so the weight saws
+up at each stop as the sim's tank does.
 
 Dry compounds are ordered and shrunk toward a physical baseline. In a single race each
 compound tends to run in one phase (opening stints on heavy fuel and a green track, or a
@@ -17,6 +19,12 @@ the data alone would collapse a step to zero, `prior_notes` records that the pri
 it. A per-compound cliff (an extra wear rate past a fitted tyre age) is searched jointly
 with the rest of the model and kept only when it lowers BIC. Noise is each driver's residual
 standard deviation.
+
+Eras model fix S4 (wear_shape.py): an Eras build adds a quadratic wear term per dry compound,
+`quad_compound x age^2`, so a long stint can fall off late. Each race's term is shrunk toward a
+prior pooled across the races at its track and era (`QuadPrior`: one prior row of weight
+noise / sd), so a race of short stints keeps its track's curve. Without priors (every other
+build) the model, and every number it gives, is exactly as before.
 """
 
 from __future__ import annotations
@@ -28,6 +36,7 @@ import numpy as np
 import pandas as pd
 
 from .paths import COMPOUND_PRIORS_PATH
+from .refuel import fuel_laps
 
 _FIT_COLUMNS = ["LapTime", "TyreLife", "LapNumber", "Compound", "Driver"]
 _COLLAPSED = 1e-6  # a data-only step at or below this is "no separation in the data"
@@ -53,6 +62,18 @@ class LapTimeFit:
     fresh_tyre_bonus: float = 0.0  # s at full weight on the first clean lap of a new set
     fresh_tyre_laps: int = 3
     prior_notes: list[str] = field(default_factory=list)  # where the prior decided a step
+    # Eras model fix S4: seconds per lap of tyre age squared, per dry compound (none: linear)
+    compound_quad: dict[str, float] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class QuadPrior:
+    """The prior on a compound's quadratic wear term (s per lap^2): its mean and sd, and the lap
+    noise (s) against which one prior row counts (weight noise / sd)."""
+
+    mean: float
+    sd: float
+    noise: float
 
 
 def load_compound_priors(era: str) -> dict:
@@ -87,8 +108,23 @@ def _cliff_term(df: pd.DataFrame, compound_cliff: dict) -> pd.Series:
     return extra
 
 
+def _quad_term(df: pd.DataFrame, compound_quad: dict[str, float]) -> pd.Series:
+    """Extra seconds from each lap's quadratic wear (0 for a compound with none)."""
+    extra = pd.Series(0.0, index=df.index)
+    for compound, q in compound_quad.items():
+        on = df["Compound"] == compound
+        extra[on] = q * df.loc[on, "TyreLife"].astype(float) ** 2
+    return extra
+
+
 def _driver_pace_from(
-    laps, compound_offset, compound_wear, fuel_per_lap, compound_cliff, fresh=(0.0, 3)
+    laps,
+    compound_offset,
+    compound_wear,
+    fuel_per_lap,
+    compound_cliff,
+    fresh=(0.0, 3),
+    compound_quad=None,
 ):
     """Per-driver base pace and noise from the tyre/fuel-adjusted laps given.
 
@@ -102,8 +138,9 @@ def _driver_pace_from(
         - df["Compound"].map(compound_offset).astype(float)
         - df["Compound"].map(compound_wear).astype(float) * df["TyreLife"].astype(float)
         - _cliff_term(df, compound_cliff)
+        - _quad_term(df, compound_quad or {})
         - fresh[0] * fresh_weight(df["TyreLife"], fresh[1])
-        + fuel_per_lap * df["LapNumber"].astype(float)
+        + fuel_per_lap * fuel_laps(df)
     )
     df = df.assign(_base=base)
     pace, noise = {}, {}
@@ -127,11 +164,17 @@ class _Core:
     data_only: dict[str, float]
     sse: float
     resid: np.ndarray
+    design: np.ndarray | None = None  # the solved rows (laps, then prior rows)
+    names: list[str] = field(default_factory=list)
 
 
-def _fit_core(df, drivers, ordered, free, reference, prior, cliff_ages, fixed_fuel=None) -> _Core:
+def _fit_core(
+    df, drivers, ordered, free, reference, prior, cliff_ages, fixed_fuel=None, quad=None
+) -> _Core:
     """Solve the ordered, prior-shrunk lap-time model with hinge columns at `cliff_ages`.
-    `fixed_fuel`: the fuel effect is taken as given (s/lap), not fitted."""
+    `fixed_fuel`: the fuel effect is taken as given (s/lap), not fitted. `quad`: a quadratic
+    wear column per compound named, shrunk to its QuadPrior (bounded at 0), or unshrunk and
+    unbounded where the prior is None (wear_shape's measurement)."""
     age = df["TyreLife"].astype(float).to_numpy()
     comp = df["Compound"].to_numpy()
     age_ref = float(np.median(age))  # turns a wear prior into lap-time units
@@ -159,17 +202,24 @@ def _fit_core(df, drivers, ordered, free, reference, prior, cliff_ages, fixed_fu
         add(age * (comp == c), f"wear::{c}", 0.0)
     for c, k in cliff_ages.items():  # extra wear past the cliff, fitted jointly
         add(np.maximum(0.0, age - k) * (comp == c), f"cliff::{c}", 0.0)
+    pseudo_weight = float(np.sqrt(prior["pseudoLaps"]))
+    for c, qp in (quad or {}).items():  # quadratic wear (S4), its own prior row
+        column = age * age * (comp == c)
+        if qp is None:
+            add(column, f"quad::{c}")
+        else:
+            add(column, f"quad::{c}", 0.0, qp.mean, qp.noise / qp.sd / pseudo_weight)
     fresh = prior.get("freshTyre")
     if fresh:  # bonus on a new set's first clean laps, shrunk toward the pooled prior
         scale = float(np.sqrt(fresh["pseudoLaps"] / prior["pseudoLaps"]))
         add(fresh_weight(age, fresh["laps"]), "fresh", -np.inf, fresh["bonus"], scale)
     if fixed_fuel is None:
-        add(-df["LapNumber"].astype(float).to_numpy(), "fuel")
+        add(-fuel_laps(df).to_numpy(), "fuel")
 
     x = np.column_stack(cols)
     y = df["LapTime"].astype(float).to_numpy()
     if fixed_fuel is not None:
-        y = y + fixed_fuel * df["LapNumber"].astype(float).to_numpy()
+        y = y + fixed_fuel * fuel_laps(df).to_numpy()
     lower = np.array([s[1] for s in specs])
     names = [s[0] for s in specs]
 
@@ -185,6 +235,7 @@ def _fit_core(df, drivers, ordered, free, reference, prior, cliff_ages, fixed_fu
         prior_targets.append(weight * scale * prior_value)
 
     data_only = dict(zip(names, _solve(x, y, lower), strict=True))
+    x_aug = x
     if prior_rows:
         x_aug = np.vstack([x, np.array(prior_rows)])
         y_aug = np.concatenate([y, np.array(prior_targets)])
@@ -194,11 +245,18 @@ def _fit_core(df, drivers, ordered, free, reference, prior, cliff_ages, fixed_fu
     resid = y - x @ np.array([params[n] for n in names])
     if fixed_fuel is not None:
         params["fuel"] = data_only["fuel"] = float(fixed_fuel)
-    return _Core(params=params, data_only=data_only, sse=float(resid @ resid), resid=resid)
+    return _Core(
+        params=params,
+        data_only=data_only,
+        sse=float(resid @ resid),
+        resid=resid,
+        design=x_aug,
+        names=names,
+    )
 
 
 def _search_cliffs(
-    df, drivers, ordered, free, reference, prior, min_laps, min_stints, fixed_fuel=None
+    df, drivers, ordered, free, reference, prior, min_laps, min_stints, fixed_fuel=None, quad=None
 ):
     """Per compound, the cliff age that best improves the joint fit, kept only if BIC drops.
 
@@ -219,7 +277,7 @@ def _search_cliffs(
         return n * np.log(sse / n) + extra_params * np.log(n)
 
     accepted: dict[str, int] = {}
-    current = _fit_core(df, drivers, ordered, free, reference, prior, accepted, fixed_fuel)
+    current = _fit_core(df, drivers, ordered, free, reference, prior, accepted, fixed_fuel, quad)
     for c in [*ordered, *free]:
         on = comp == c
         best_age, best_core = None, None
@@ -228,7 +286,7 @@ def _search_cliffs(
             if beyond.sum() < min_laps or len(set(stint_key[beyond])) < min_stints:
                 continue
             core = _fit_core(
-                df, drivers, ordered, free, reference, prior, {**accepted, c: k}, fixed_fuel
+                df, drivers, ordered, free, reference, prior, {**accepted, c: k}, fixed_fuel, quad
             )
             if core.params[f"cliff::{c}"] > 0 and (best_core is None or core.sse < best_core.sse):
                 best_age, best_core = k, core
@@ -247,6 +305,7 @@ def fit_lap_model(
     min_laps_beyond_cliff: int = 6,
     min_stints_beyond_cliff: int = 2,
     fixed_fuel: float | None = None,
+    quad_priors: dict[str, QuadPrior] | None = None,
 ) -> LapTimeFit:
     """Fit the lap-time model; return fitted driver pace, compound params, fuel, noise.
 
@@ -254,7 +313,8 @@ def fit_lap_model(
     described in the module docstring. Driver base pace and noise come from `pace_laps` (all
     green racing laps) when supplied, else from the clean-lap fit; a driver missing from
     `pace_laps` takes its pace from `fallback_pace_laps` if given. `reference_compound`
-    defaults to the softest dry compound present.
+    defaults to the softest dry compound present. `quad_priors` (Eras builds, wear_shape.py):
+    a quadratic wear term for each dry compound present that has a prior.
     """
     prior = load_compound_priors(era)
     df = clean_laps.dropna(subset=_FIT_COLUMNS).copy()
@@ -265,6 +325,7 @@ def fit_lap_model(
     free = sorted(present - set(ordered))
     reference = reference_compound or (ordered[0] if ordered else free[0])
     drivers = sorted(df["Driver"].unique())
+    quad = {c: qp for c, qp in (quad_priors or {}).items() if c in ordered}
 
     cliff_ages, core = _search_cliffs(
         df,
@@ -276,6 +337,7 @@ def fit_lap_model(
         min_laps_beyond_cliff,
         min_stints_beyond_cliff,
         fixed_fuel,
+        quad,
     )
     params, data_only = core.params, core.data_only
 
@@ -295,6 +357,7 @@ def fit_lap_model(
         c: ((cliff_ages[c], float(params[f"cliff::{c}"])) if c in cliff_ages else None)
         for c in present
     }
+    compound_quad = {c: float(params[f"quad::{c}"]) for c in quad}
     fuel_per_lap = float(params["fuel"])
     fresh_laps = int(prior.get("freshTyre", {}).get("laps", 3))
     fresh_bonus = float(params.get("fresh", 0.0))
@@ -313,11 +376,13 @@ def fit_lap_model(
 
     if pace_laps is not None:
         args = (compound_offset, compound_wear, fuel_per_lap, compound_cliff)
-        driver_pace, driver_noise = _driver_pace_from(pace_laps, *args, (fresh_bonus, fresh_laps))
+        driver_pace, driver_noise = _driver_pace_from(
+            pace_laps, *args, (fresh_bonus, fresh_laps), compound_quad
+        )
         if fallback_pace_laps is not None:
             # Drivers with no laps in `pace_laps` (e.g. a whole race in traffic) use these.
             more_pace, more_noise = _driver_pace_from(
-                fallback_pace_laps, *args, (fresh_bonus, fresh_laps)
+                fallback_pace_laps, *args, (fresh_bonus, fresh_laps), compound_quad
             )
             for d, p in more_pace.items():
                 if d not in driver_pace:
@@ -340,13 +405,61 @@ def fit_lap_model(
         fresh_tyre_bonus=fresh_bonus,
         fresh_tyre_laps=fresh_laps,
         prior_notes=notes,
+        compound_quad=compound_quad,
     )
+
+
+@dataclass(frozen=True)
+class QuadMeasure:
+    """One compound's quadratic wear in one race, unshrunk (wear_shape.py pools these)."""
+
+    q: float  # s per lap^2
+    se: float  # its standard error
+    laps: int  # clean laps on the compound
+    max_age: int  # its longest tyre age among them
+
+
+def measure_quad(
+    clean_laps: pd.DataFrame, era: str, fixed_fuel: float | None = None, min_laps: int = 30
+) -> tuple[dict[str, QuadMeasure], float]:
+    """Each dry compound's quadratic wear term in one race, fitted with the rest of the model
+    (the usual ordering and priors; no cliffs; the quadratic unshrunk and unbounded) and its
+    standard error, for compounds with `min_laps` clean laps or more; and the race's lap noise
+    (the residual standard deviation the standard errors are on)."""
+    prior = load_compound_priors(era)
+    df = clean_laps.dropna(subset=_FIT_COLUMNS).copy()
+    df["Compound"] = df["Compound"].astype(str)
+    present = set(df["Compound"].unique())
+    ordered = [c for c in prior["order"] if c in present]
+    free = sorted(present - set(ordered))
+    if not ordered:
+        return {}, float("nan")
+    comp = df["Compound"].to_numpy()
+    quad = {c: None for c in ordered if (comp == c).sum() >= min_laps}
+    drivers = sorted(df["Driver"].unique())
+    core = _fit_core(df, drivers, ordered, free, ordered[0], prior, {}, fixed_fuel, quad)
+    dof = max(1, len(df) - len(core.names))
+    sigma2 = core.sse / dof
+    cov = sigma2 * np.linalg.pinv(core.design.T @ core.design)
+    ages = df["TyreLife"].astype(float).to_numpy()
+    out = {}
+    for c in quad:
+        k = core.names.index(f"quad::{c}")
+        on = comp == c
+        out[c] = QuadMeasure(
+            q=float(core.params[f"quad::{c}"]),
+            se=float(np.sqrt(max(cov[k, k], 0.0))),
+            laps=int(on.sum()),
+            max_age=int(ages[on].max()),
+        )
+    return out, float(np.sqrt(sigma2))
 
 
 def predict(fit: LapTimeFit, driver: str, compound: str, tyre_age: float, lap: float) -> float:
     """Predicted lap time in seconds for the given state (no noise/traffic/events)."""
     hinge = fit.compound_cliff.get(compound)
     cliff = hinge[1] * max(0.0, tyre_age - hinge[0]) if hinge else 0.0
+    cliff += fit.compound_quad.get(compound, 0.0) * tyre_age * tyre_age
     return (
         fit.driver_pace[driver]
         + fit.compound_offset.get(compound, 0.0)

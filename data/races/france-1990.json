@@ -1,0 +1,787 @@
+{
+  "schemaVersion": 11,
+  "race": {
+    "id": "france-1990",
+    "name": "France 1990: Capelli vs Prost",
+    "laps": 80,
+    "takeoverLap": 24,
+    "seed": 1,
+    "scUnlap": "none"
+  },
+  "era": "1988-1993",
+  "track": {
+    "pitLoss": 19.69,
+    "pitLossUnderSC": 10.829,
+    "pitLossUnderVSC": 13.586,
+    "pitLossDeviations": [
+      -0.551,
+      -0.199,
+      -0.15,
+      0.15,
+      1.08,
+      1.287
+    ],
+    "overtakeDifficulty": 0.8207,
+    "overtakeModel": {
+      "intercept": -0.5911,
+      "paceCoef": 0.9938,
+      "gapCoef": -1.4372
+    },
+    "dirtyAirPenalty": 0.0,
+    "greenLapTime": 70.911
+  },
+  "compounds": {
+    "MEDIUM": {
+      "offset": 0.0,
+      "degPerLap": 0.02085,
+      "cliffLap": 80,
+      "provenLaps": 80
+    }
+  },
+  "drivers": [
+    {
+      "code": "ALBM",
+      "team": "Arrows",
+      "basePace": 71.7894,
+      "noise": 0.9813,
+      "stateAtTakeover": {
+        "position": 12,
+        "gapAhead": 2.659,
+        "compound": "MEDIUM",
+        "tyreAge": 24,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "ALL",
+      "team": "Ligier",
+      "basePace": 71.5835,
+      "noise": 0.1952,
+      "stateAtTakeover": {
+        "position": 9,
+        "gapAhead": 0.33,
+        "compound": "MEDIUM",
+        "tyreAge": 24,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BEN",
+      "team": "Larrousse",
+      "basePace": 71.3968,
+      "noise": 0.1771,
+      "stateAtTakeover": {
+        "position": 10,
+        "gapAhead": 0.05,
+        "compound": "MEDIUM",
+        "tyreAge": 24,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BER",
+      "team": "McLaren",
+      "basePace": 71.0781,
+      "noise": 0.0846,
+      "stateAtTakeover": {
+        "position": 1,
+        "gapAhead": 0.0,
+        "compound": "MEDIUM",
+        "tyreAge": 24,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 29,
+          "to": "MEDIUM",
+          "loss": 19.599
+        }
+      ]
+    },
+    {
+      "code": "BRA",
+      "team": "Brabham",
+      "basePace": 73.1911,
+      "noise": 0.8789,
+      "stateAtTakeover": {
+        "position": 20,
+        "gapAhead": 0.93,
+        "compound": "MEDIUM",
+        "tyreAge": 24,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "CAP",
+      "team": "Leyton House",
+      "basePace": 70.066,
+      "noise": 0.1973,
+      "stateAtTakeover": {
+        "position": 5,
+        "gapAhead": 1.432,
+        "compound": "MEDIUM",
+        "tyreAge": 24,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "DAL",
+      "team": "AGS",
+      "basePace": 74.4027,
+      "noise": 1.377,
+      "stateAtTakeover": {
+        "position": 22,
+        "gapAhead": 57.254,
+        "compound": "MEDIUM",
+        "tyreAge": 24,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "DEC",
+      "team": "Dallara",
+      "basePace": 72.4383,
+      "noise": 1.1282,
+      "stateAtTakeover": {
+        "position": 19,
+        "gapAhead": 19.081,
+        "compound": "MEDIUM",
+        "tyreAge": 24,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "DON",
+      "team": "Team Lotus",
+      "basePace": 71.502,
+      "noise": 1.0882,
+      "stateAtTakeover": {
+        "position": 16,
+        "gapAhead": 12.746,
+        "compound": "MEDIUM",
+        "tyreAge": 24,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "GUG",
+      "team": "Leyton House",
+      "basePace": 70.1884,
+      "noise": 0.0482,
+      "stateAtTakeover": {
+        "position": 8,
+        "gapAhead": 1.703,
+        "compound": "MEDIUM",
+        "tyreAge": 24,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "LAR",
+      "team": "Ligier",
+      "basePace": 72.7333,
+      "noise": 1.1712,
+      "stateAtTakeover": {
+        "position": 18,
+        "gapAhead": 3.992,
+        "compound": "MEDIUM",
+        "tyreAge": 24,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "MAN",
+      "team": "Ferrari",
+      "basePace": 70.1465,
+      "noise": 0.1628,
+      "stateAtTakeover": {
+        "position": 2,
+        "gapAhead": 7.855,
+        "compound": "MEDIUM",
+        "tyreAge": 24,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 33,
+          "to": "MEDIUM",
+          "loss": 18.731
+        }
+      ]
+    },
+    {
+      "code": "MAR",
+      "team": "Minardi",
+      "basePace": 73.021,
+      "noise": 0.4537,
+      "stateAtTakeover": {
+        "position": 21,
+        "gapAhead": 8.372,
+        "compound": "MEDIUM",
+        "tyreAge": 24,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "MOD",
+      "team": "Brabham",
+      "basePace": 72.5105,
+      "noise": 0.8017,
+      "stateAtTakeover": {
+        "position": 17,
+        "gapAhead": 3.889,
+        "compound": "MEDIUM",
+        "tyreAge": 24,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "NAKS",
+      "team": "Tyrrell",
+      "basePace": 71.2621,
+      "noise": 0.8974,
+      "stateAtTakeover": {
+        "position": 14,
+        "gapAhead": 4.154,
+        "compound": "MEDIUM",
+        "tyreAge": 24,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "NAN",
+      "team": "Benetton",
+      "basePace": 70.4078,
+      "noise": 0.9755,
+      "stateAtTakeover": {
+        "position": 7,
+        "gapAhead": 4.203,
+        "compound": "MEDIUM",
+        "tyreAge": 24,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "PAT",
+      "team": "Williams",
+      "basePace": 71.373,
+      "noise": 1.1686,
+      "stateAtTakeover": {
+        "position": 6,
+        "gapAhead": 1.784,
+        "compound": "MEDIUM",
+        "tyreAge": 24,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 34,
+          "to": "MEDIUM",
+          "loss": 18.124
+        }
+      ]
+    },
+    {
+      "code": "PIQN",
+      "team": "Benetton",
+      "basePace": 70.8793,
+      "noise": 0.1338,
+      "stateAtTakeover": {
+        "position": 13,
+        "gapAhead": 0.906,
+        "compound": "MEDIUM",
+        "tyreAge": 4,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "PRO",
+      "team": "Ferrari",
+      "basePace": 70.1543,
+      "noise": 0.1564,
+      "stateAtTakeover": {
+        "position": 4,
+        "gapAhead": 0.512,
+        "compound": "MEDIUM",
+        "tyreAge": 24,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 28,
+          "to": "MEDIUM",
+          "loss": 18.983
+        }
+      ]
+    },
+    {
+      "code": "SENA",
+      "team": "McLaren",
+      "basePace": 70.3953,
+      "noise": 0.0394,
+      "stateAtTakeover": {
+        "position": 3,
+        "gapAhead": 1.148,
+        "compound": "MEDIUM",
+        "tyreAge": 24,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 31,
+          "to": "MEDIUM",
+          "loss": 19.311
+        }
+      ]
+    },
+    {
+      "code": "SUZ",
+      "team": "Larrousse",
+      "basePace": 71.2323,
+      "noise": 0.1242,
+      "stateAtTakeover": {
+        "position": 11,
+        "gapAhead": 0.226,
+        "compound": "MEDIUM",
+        "tyreAge": 24,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "WAR",
+      "team": "Team Lotus",
+      "basePace": 71.6926,
+      "noise": 0.6574,
+      "stateAtTakeover": {
+        "position": 15,
+        "gapAhead": 1.825,
+        "compound": "MEDIUM",
+        "tyreAge": 24,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    }
+  ],
+  "fuelEffectPerLap": 0.02389,
+  "freshTyre": {
+    "bonus": 0.1162,
+    "laps": 3
+  },
+  "events": [
+    {
+      "lap": 24,
+      "type": "RETIREMENT",
+      "driver": "ALE"
+    },
+    {
+      "lap": 42,
+      "type": "RETIREMENT",
+      "driver": "MAR"
+    },
+    {
+      "lap": 59,
+      "type": "RETIREMENT",
+      "driver": "GUG"
+    },
+    {
+      "lap": 65,
+      "type": "RETIREMENT",
+      "driver": "NAKS"
+    },
+    {
+      "lap": 73,
+      "type": "RETIREMENT",
+      "driver": "MAN"
+    },
+    {
+      "lap": 76,
+      "type": "RETIREMENT",
+      "driver": "NAN"
+    }
+  ],
+  "decisionMoments": [
+    {
+      "id": "rivalpit-27",
+      "lap": 27,
+      "trigger": "rivalPit",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "STAY OUT",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "IN - fresh tyres",
+          "decisions": [
+            {
+              "lap": 27,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "box-next-medium",
+          "label": "IN NEXT LAP - fresh tyres",
+          "decisions": [
+            {
+              "lap": 28,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "stay"
+    },
+    {
+      "id": "pace-32",
+      "lap": 32,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 32,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "easy",
+          "label": "EASY - save the car",
+          "decisions": [
+            {
+              "lap": 32,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "pace-36",
+      "lap": 36,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 36,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "easy",
+          "label": "EASY - save the car",
+          "decisions": [
+            {
+              "lap": 36,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "pace-40",
+      "lap": 40,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 40,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "easy",
+          "label": "EASY - save the car",
+          "decisions": [
+            {
+              "lap": 40,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "pace-60",
+      "lap": 60,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 60,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "easy",
+          "label": "EASY - save the car",
+          "decisions": [
+            {
+              "lap": 60,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "battle-76",
+      "lap": 76,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "hold",
+          "label": "Hold position",
+          "decisions": []
+        },
+        {
+          "id": "defend",
+          "label": "DEFEND",
+          "decisions": [
+            {
+              "lap": 76,
+              "kind": "mode",
+              "key": "battle",
+              "value": "defend"
+            }
+          ]
+        },
+        {
+          "id": "attack",
+          "label": "ATTACK",
+          "decisions": [
+            {
+              "lap": 76,
+              "kind": "mode",
+              "key": "battle",
+              "value": "attack"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    }
+  ],
+  "candidateMomentLaps": [
+    28,
+    29,
+    31,
+    33,
+    34
+  ],
+  "realResult": [
+    "PRO",
+    "CAP",
+    "SENA",
+    "PIQN",
+    "BER",
+    "PAT",
+    "SUZ",
+    "BEN",
+    "ALL",
+    "ALBM",
+    "WAR",
+    "DON",
+    "MOD",
+    "LAR",
+    "BRA",
+    "NAN",
+    "DAL",
+    "MAN",
+    "DEC",
+    "NAKS",
+    "GUG",
+    "MAR",
+    "ALE",
+    "CAF",
+    "BOUT",
+    "PIR"
+  ],
+  "userSide": "CAP",
+  "rival": "PRO",
+  "eras": {
+    "eraId": 2,
+    "order": 1,
+    "userSide": "CAP",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Capelli, seventh on the grid, runs non-stop in the Leyton House while the front-runners stop for tyres; he leads from lap 33 until Prost passes him on lap 78, and finishes second, 8.6 seconds behind",
+      "rewriteCondition": {
+        "type": "win"
+      },
+      "headline": "Capelli's Leyton House goes the distance and wins at Paul Ricard"
+    },
+    "mastery": {
+      "type": "margin",
+      "seconds": 3,
+      "label": "Win by more than 3 seconds"
+    },
+    "hidden": {
+      "type": "stop_count",
+      "max": 1,
+      "label": "Win with no more than one tyre stop"
+    },
+    "briefing": "Paul Ricard, July 1990. Capelli started seventh in the Leyton House. The front-runners stop for fresh tyres from lap 20; Capelli and Gugelmin ran the race on one set. Prost, from fourth on the grid, stopped on lap 27. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports. Who led each lap is sourced; the lap times are reconstructed.",
+    "hardCalls": {
+      "CAP": 0,
+      "PRO": 0
+    }
+  },
+  "provenance": {
+    "kind": "reconstructed",
+    "estimated": [
+      "compounds",
+      "fuelLoads",
+      "weather"
+    ]
+  },
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": false
+  },
+  "reconstructed": true
+}

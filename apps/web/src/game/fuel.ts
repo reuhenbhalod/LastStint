@@ -8,7 +8,7 @@ import {
   fuelConfig,
   fuelMargin,
   modeEffects,
-} from '@boxthislap/sim';
+} from '@laststint/sim';
 
 /** Below this margin (kg) the car is short: the engineer asks to save. */
 export const FUEL_SHORT = -0.5;

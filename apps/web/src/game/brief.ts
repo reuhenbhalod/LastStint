@@ -10,7 +10,7 @@ import {
   isWetTyre,
   wetPenalty,
   wetnessOn,
-} from '@boxthislap/sim';
+} from '@laststint/sim';
 import { named } from '../data/names.js';
 import { tyreFacts } from './tyreTalk.js';
 

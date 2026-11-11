@@ -1,0 +1,653 @@
+{
+  "schemaVersion": 11,
+  "race": {
+    "id": "hungary-1986",
+    "name": "Hungary 1986: Piquet vs Senna",
+    "laps": 76,
+    "takeoverLap": 32,
+    "seed": 1,
+    "scUnlap": "none"
+  },
+  "era": "1988-1993",
+  "track": {
+    "pitLoss": 19.307,
+    "pitLossUnderSC": 10.619,
+    "pitLossUnderVSC": 13.322,
+    "pitLossDeviations": [
+      -4.02,
+      -1.28,
+      -0.651,
+      -0.091,
+      0.091,
+      0.121,
+      0.781,
+      7.61
+    ],
+    "overtakeDifficulty": 0.7263,
+    "overtakeModel": {
+      "intercept": 0.36,
+      "paceCoef": 0.7087,
+      "gapCoef": -1.7574
+    },
+    "dirtyAirPenalty": 0.0704,
+    "greenLapTime": 98.836
+  },
+  "compounds": {
+    "MEDIUM": {
+      "offset": 0.0,
+      "degPerLap": 0.01347,
+      "cliffLap": 74,
+      "provenLaps": 74
+    }
+  },
+  "drivers": [
+    {
+      "code": "ALL",
+      "team": "Ligier",
+      "basePace": 100.5492,
+      "noise": 0.7067,
+      "stateAtTakeover": {
+        "position": 11,
+        "gapAhead": 9.218,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "ARN",
+      "team": "Ligier",
+      "basePace": 100.6983,
+      "noise": 1.4219,
+      "stateAtTakeover": {
+        "position": 12,
+        "gapAhead": 6.07,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BER",
+      "team": "Benetton",
+      "basePace": 100.7928,
+      "noise": 1.0628,
+      "stateAtTakeover": {
+        "position": 13,
+        "gapAhead": 15.624,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BOUT",
+      "team": "Arrows",
+      "basePace": 106.5719,
+      "noise": 3.0534,
+      "stateAtTakeover": {
+        "position": 15,
+        "gapAhead": 56.333,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BRU",
+      "team": "Tyrrell",
+      "basePace": 100.1531,
+      "noise": 0.7633,
+      "stateAtTakeover": {
+        "position": 10,
+        "gapAhead": 1.07,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "DUM",
+      "team": "Team Lotus",
+      "basePace": 99.4859,
+      "noise": 0.517,
+      "stateAtTakeover": {
+        "position": 8,
+        "gapAhead": 4.261,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "FAB",
+      "team": "Benetton",
+      "basePace": 101.7361,
+      "noise": 1.0099,
+      "stateAtTakeover": {
+        "position": 14,
+        "gapAhead": 4.498,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "JOH",
+      "team": "Ferrari",
+      "basePace": 98.7205,
+      "noise": 0.7953,
+      "stateAtTakeover": {
+        "position": 5,
+        "gapAhead": 16.713,
+        "compound": "MEDIUM",
+        "tyreAge": 11,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "JON",
+      "team": "Lola",
+      "basePace": 99.6476,
+      "noise": 1.1396,
+      "stateAtTakeover": {
+        "position": 6,
+        "gapAhead": 0.321,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "MAN",
+      "team": "Williams",
+      "basePace": 98.9567,
+      "noise": 1.2112,
+      "stateAtTakeover": {
+        "position": 3,
+        "gapAhead": 70.201,
+        "compound": "MEDIUM",
+        "tyreAge": 4,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 47,
+          "to": "MEDIUM",
+          "loss": 18.35
+        }
+      ]
+    },
+    {
+      "code": "PALJ",
+      "team": "Zakspeed",
+      "basePace": 104.5428,
+      "noise": 0.9988,
+      "stateAtTakeover": {
+        "position": 16,
+        "gapAhead": 58.421,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "PIQN",
+      "team": "Williams",
+      "basePace": 96.9415,
+      "noise": 0.7919,
+      "stateAtTakeover": {
+        "position": 1,
+        "gapAhead": 0.0,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 36,
+          "to": "MEDIUM",
+          "loss": 18.991
+        }
+      ]
+    },
+    {
+      "code": "ROSK",
+      "team": "McLaren",
+      "basePace": 98.9692,
+      "noise": 1.0066,
+      "stateAtTakeover": {
+        "position": 7,
+        "gapAhead": 1.294,
+        "compound": "MEDIUM",
+        "tyreAge": 15,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "SENA",
+      "team": "Team Lotus",
+      "basePace": 97.15,
+      "noise": 0.7721,
+      "stateAtTakeover": {
+        "position": 2,
+        "gapAhead": 7.889,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 49,
+          "to": "MEDIUM",
+          "loss": 18.859
+        }
+      ]
+    },
+    {
+      "code": "STRP",
+      "team": "Tyrrell",
+      "basePace": 101.0326,
+      "noise": 1.5689,
+      "stateAtTakeover": {
+        "position": 4,
+        "gapAhead": 5.574,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "TAM",
+      "team": "Lola",
+      "basePace": 100.216,
+      "noise": 0.9199,
+      "stateAtTakeover": {
+        "position": 9,
+        "gapAhead": 17.203,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    }
+  ],
+  "fuelEffectPerLap": 0.05916,
+  "freshTyre": {
+    "bonus": -0.035,
+    "laps": 3
+  },
+  "events": [
+    {
+      "lap": 33,
+      "type": "RETIREMENT",
+      "driver": "NAN"
+    },
+    {
+      "lap": 34,
+      "type": "RETIREMENT",
+      "driver": "FAB"
+    },
+    {
+      "lap": 36,
+      "type": "RETIREMENT",
+      "driver": "ROSK"
+    },
+    {
+      "lap": 44,
+      "type": "RETIREMENT",
+      "driver": "BOUT"
+    },
+    {
+      "lap": 47,
+      "type": "RETIREMENT",
+      "driver": "BER"
+    },
+    {
+      "lap": 48,
+      "type": "RETIREMENT",
+      "driver": "JON"
+    },
+    {
+      "lap": 50,
+      "type": "RETIREMENT",
+      "driver": "ARN"
+    }
+  ],
+  "decisionMoments": [
+    {
+      "id": "stop-35",
+      "lap": 35,
+      "trigger": "cliff",
+      "target": {
+        "kind": "beat-rival",
+        "rival": "SENA"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "STAY OUT",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "IN - fresh tyres",
+          "decisions": [
+            {
+              "lap": 35,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "box-medium"
+    },
+    {
+      "id": "pace-42",
+      "lap": 42,
+      "trigger": "cliff",
+      "target": {
+        "kind": "beat-rival",
+        "rival": "SENA"
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 42,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "easy",
+          "label": "EASY - save the car",
+          "decisions": [
+            {
+              "lap": 42,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "lift",
+          "label": "FUEL - lift and coast",
+          "decisions": [
+            {
+              "lap": 42,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "liftAndCoast"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "stop-48",
+      "lap": 48,
+      "trigger": "rivalPit",
+      "target": {
+        "kind": "beat-rival",
+        "rival": "SENA"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "STAY OUT",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "IN - fresh tyres",
+          "decisions": [
+            {
+              "lap": 48,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "pace-57",
+      "lap": 57,
+      "trigger": "cliff",
+      "target": {
+        "kind": "beat-rival",
+        "rival": "SENA"
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 57,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "easy",
+          "label": "EASY - save the car",
+          "decisions": [
+            {
+              "lap": 57,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "lift",
+          "label": "FUEL - lift and coast",
+          "decisions": [
+            {
+              "lap": 57,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "liftAndCoast"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "fuel-66",
+      "lap": 66,
+      "trigger": "cliff",
+      "target": {
+        "kind": "beat-rival",
+        "rival": "SENA"
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "lift",
+          "label": "FUEL - lift and coast to the flag",
+          "decisions": [
+            {
+              "lap": 66,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "liftAndCoast"
+            },
+            {
+              "lap": 66,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "full",
+          "label": "FUEL OK - full mixture",
+          "decisions": [
+            {
+              "lap": 66,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "normal"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    }
+  ],
+  "candidateMomentLaps": [
+    36,
+    47,
+    49
+  ],
+  "realResult": [
+    "PIQN",
+    "SENA",
+    "MAN",
+    "JOH",
+    "DUM",
+    "BRU",
+    "TAM",
+    "STRP",
+    "ALL",
+    "PALJ",
+    "ARN",
+    "JON",
+    "BER",
+    "BOUT",
+    "ROSK",
+    "FAB",
+    "NAN",
+    "ALBM",
+    "WAR",
+    "PRO",
+    "GHI",
+    "DAN",
+    "PAT",
+    "DEC",
+    "ROT",
+    "BEG"
+  ],
+  "userSide": "PIQN",
+  "rival": "SENA",
+  "eras": {
+    "eraId": 1,
+    "order": 7,
+    "userSide": "PIQN",
+    "target": {
+      "type": "beat-rival",
+      "rival": "SENA"
+    },
+    "storyline": {
+      "real": "Piquet passes Senna around the outside into the first corner and wins by 17.7 seconds"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 1,
+      "label": "Beat Senna with one tyre stop, as Piquet did"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 14,
+      "label": "Win by more than 14 seconds"
+    },
+    "briefing": "Hungaroring, August 1986, the first Hungarian Grand Prix since 1936. Senna started on pole in the Lotus, Piquet second in the Williams. Tyres or track position? Fuel is limited to 195 litres. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports. Who led each lap is sourced; the lap times are reconstructed.",
+    "hardCalls": {
+      "PIQN": 2,
+      "SENA": 0
+    }
+  },
+  "provenance": {
+    "kind": "reconstructed",
+    "estimated": [
+      "compounds",
+      "fuelLoads",
+      "weather"
+    ]
+  },
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": false,
+    "fuelLimit": 165.75
+  },
+  "reconstructed": true
+}

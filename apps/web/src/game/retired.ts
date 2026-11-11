@@ -2,8 +2,8 @@
 // result statuses and race control) and live play's crashes and failures. The track map parks
 // a car that stops where it stopped, with the reason. Display only.
 
-import type { RaceNote } from '@boxthislap/sim';
 import retirements from '@data/retirements.json';
+import type { RaceNote } from '@laststint/sim';
 
 interface Retirement {
   lap: number;

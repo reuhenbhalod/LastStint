@@ -1,0 +1,41 @@
+{
+  "eras": {
+    "eraId": 9,
+    "order": 6,
+    "userSide": "NOR",
+    "target": {
+      "type": "defend"
+    },
+    "storyline": {
+      "real": "Norris, chasing his first win, stays on slick tyres as rain arrives in the closing laps; he slides off, pits for intermediates and finishes seventh, while Hamilton stops in time and wins.",
+      "rewriteCondition": {
+        "type": "defend"
+      },
+      "headline": "Norris reads the Sochi rain and takes his first win"
+    },
+    "mastery": {
+      "type": "compound_rule",
+      "mustUse": "INTERMEDIATE",
+      "label": "Win with a switch to intermediates"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 3,
+      "label": "Win by more than 3 seconds"
+    },
+    "hardCalls": {
+      "NOR": 1,
+      "HAM": 1
+    },
+    "briefing": "Sochi, 2021. Norris starts from his first pole position and leads Hamilton into the second half of the race. Rain is coming."
+  },
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": true,
+    "drs": true,
+    "ers": "hybrid",
+    "refuelling": false
+  }
+}

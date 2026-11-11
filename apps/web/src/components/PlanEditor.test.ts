@@ -1,7 +1,7 @@
 // The plan editor's two-compound check: wet tyres waive the rule, as in the sim's ruleSatisfied
 // (a car that takes over on intermediates and switches to one dry compound is legal).
 
-import type { RacePlan } from '@boxthislap/sim';
+import type { RacePlan } from '@laststint/sim';
 import { describe, expect, it } from 'vitest';
 import { twoCompounds } from './PlanEditor.js';
 

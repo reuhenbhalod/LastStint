@@ -1,0 +1,43 @@
+{
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": false
+  },
+  "eras": {
+    "eraId": 2,
+    "order": 8,
+    "userSide": "SENA",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Prost leads from pole until the rain comes; he stays out on slicks and crashes on lap 29. Hill leads behind the safety car; Senna, in for wets on lap 27 and for slicks at the end of lap 40, takes the lead when Hill stops for slicks a lap later and wins by 16.6 seconds"
+    },
+    "mastery": {
+      "type": "margin",
+      "seconds": 3,
+      "label": "Win by more than 3 seconds"
+    },
+    "hidden": {
+      "type": "stop_count",
+      "exact": 2,
+      "label": "Win with two tyre stops, as Senna did"
+    },
+    "briefing": "Interlagos, March 1993. Dry at the start: Prost leads from pole in the Williams, Hill second, Senna third in the McLaren. Rain is on the way. Pit boards only, no radio: every tyre call counts. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports. Who led each lap is sourced, and so is the order at a few laps; the lap times, and the rest of the order, are reconstructed.",
+    "hardCalls": {
+      "SENA": 4,
+      "HIL": 1
+    }
+  },
+  "storylineEvents": [
+    [
+      30,
+      "SC"
+    ]
+  ]
+}

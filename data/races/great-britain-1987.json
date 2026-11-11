@@ -1,0 +1,674 @@
+{
+  "schemaVersion": 11,
+  "race": {
+    "id": "great-britain-1987",
+    "name": "Britain 1987: Piquet vs Mansell",
+    "laps": 65,
+    "takeoverLap": 32,
+    "seed": 1,
+    "scUnlap": "none"
+  },
+  "era": "1988-1993",
+  "track": {
+    "pitLoss": 20.618,
+    "pitLossUnderSC": 11.34,
+    "pitLossUnderVSC": 14.226,
+    "pitLossDeviations": [
+      0.0
+    ],
+    "overtakeDifficulty": 0.7184,
+    "overtakeModel": {
+      "intercept": -0.1366,
+      "paceCoef": 1.3895,
+      "gapCoef": -1.0156
+    },
+    "dirtyAirPenalty": 0.0,
+    "greenLapTime": 77.235
+  },
+  "compounds": {
+    "MEDIUM": {
+      "offset": 0.0,
+      "degPerLap": 0.02744,
+      "cliffLap": 65,
+      "provenLaps": 65
+    }
+  },
+  "drivers": [
+    {
+      "code": "ALBM",
+      "team": "Ferrari",
+      "basePace": 77.0996,
+      "noise": 0.9825,
+      "stateAtTakeover": {
+        "position": 6,
+        "gapAhead": 12.89,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BOUT",
+      "team": "Benetton",
+      "basePace": 78.4607,
+      "noise": 0.697,
+      "stateAtTakeover": {
+        "position": 9,
+        "gapAhead": 23.977,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BRU",
+      "team": "Zakspeed",
+      "basePace": 88.7342,
+      "noise": 0.9524,
+      "stateAtTakeover": {
+        "position": 17,
+        "gapAhead": 172.1,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "CAF",
+      "team": "Osella",
+      "basePace": 81.4485,
+      "noise": 1.166,
+      "stateAtTakeover": {
+        "position": 12,
+        "gapAhead": 37.799,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "CAM",
+      "team": "Minardi",
+      "basePace": 83.6036,
+      "noise": 0.9781,
+      "stateAtTakeover": {
+        "position": 15,
+        "gapAhead": 27.131,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "CHE",
+      "team": "Arrows",
+      "basePace": 78.5472,
+      "noise": 0.9834,
+      "stateAtTakeover": {
+        "position": 10,
+        "gapAhead": 13.534,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "DAN",
+      "team": "Zakspeed",
+      "basePace": 84.2859,
+      "noise": 0.7436,
+      "stateAtTakeover": {
+        "position": 16,
+        "gapAhead": 27.461,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "FAB",
+      "team": "Benetton",
+      "basePace": 77.2692,
+      "noise": 0.6734,
+      "stateAtTakeover": {
+        "position": 7,
+        "gapAhead": 6.378,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "FAR",
+      "team": "AGS",
+      "basePace": 82.6376,
+      "noise": 0.6778,
+      "stateAtTakeover": {
+        "position": 13,
+        "gapAhead": 9.31,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "MAN",
+      "team": "Williams",
+      "basePace": 74.8159,
+      "noise": 0.5625,
+      "stateAtTakeover": {
+        "position": 2,
+        "gapAhead": 1.557,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 36,
+          "to": "MEDIUM",
+          "loss": 20.338
+        }
+      ]
+    },
+    {
+      "code": "NAKS",
+      "team": "Team Lotus",
+      "basePace": 77.1046,
+      "noise": 0.4073,
+      "stateAtTakeover": {
+        "position": 4,
+        "gapAhead": 20.093,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "PALJ",
+      "team": "Tyrrell",
+      "basePace": 81.4352,
+      "noise": 0.8586,
+      "stateAtTakeover": {
+        "position": 11,
+        "gapAhead": 48.291,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "PIQN",
+      "team": "Williams",
+      "basePace": 74.6524,
+      "noise": 0.3134,
+      "stateAtTakeover": {
+        "position": 1,
+        "gapAhead": 0.0,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "PRO",
+      "team": "McLaren",
+      "basePace": 77.407,
+      "noise": 1.1257,
+      "stateAtTakeover": {
+        "position": 8,
+        "gapAhead": 5.677,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "SENA",
+      "team": "Team Lotus",
+      "basePace": 75.8434,
+      "noise": 0.7348,
+      "stateAtTakeover": {
+        "position": 3,
+        "gapAhead": 58.498,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "STRP",
+      "team": "Tyrrell",
+      "basePace": 82.0505,
+      "noise": 0.9849,
+      "stateAtTakeover": {
+        "position": 14,
+        "gapAhead": 14.826,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "WAR",
+      "team": "Arrows",
+      "basePace": 77.3869,
+      "noise": 0.4928,
+      "stateAtTakeover": {
+        "position": 5,
+        "gapAhead": 5.192,
+        "compound": "MEDIUM",
+        "tyreAge": 32,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    }
+  ],
+  "fuelEffectPerLap": 0.07157,
+  "freshTyre": {
+    "bonus": -0.3639,
+    "laps": 3
+  },
+  "events": [
+    {
+      "lap": 36,
+      "type": "RETIREMENT",
+      "driver": "CAF"
+    },
+    {
+      "lap": 37,
+      "type": "RETIREMENT",
+      "driver": "DAN"
+    },
+    {
+      "lap": 39,
+      "type": "RETIREMENT",
+      "driver": "CAM"
+    },
+    {
+      "lap": 48,
+      "type": "RETIREMENT",
+      "driver": "CHE"
+    },
+    {
+      "lap": 55,
+      "type": "RETIREMENT",
+      "driver": "ALBM"
+    },
+    {
+      "lap": 56,
+      "type": "RETIREMENT",
+      "driver": "PRO"
+    },
+    {
+      "lap": 64,
+      "type": "RETIREMENT",
+      "driver": "STRP"
+    }
+  ],
+  "decisionMoments": [
+    {
+      "id": "rivalpit-35",
+      "lap": 35,
+      "trigger": "rivalPit",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "STAY OUT",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "IN - fresh tyres",
+          "decisions": [
+            {
+              "lap": 35,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "box-next-medium",
+          "label": "IN NEXT LAP - fresh tyres",
+          "decisions": [
+            {
+              "lap": 36,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "stay"
+    },
+    {
+      "id": "pace-40",
+      "lap": 40,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 40,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "standard",
+          "label": "STEADY - standard pace",
+          "decisions": [
+            {
+              "lap": 40,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "manage",
+          "label": "EASY - save the tyres",
+          "decisions": [
+            {
+              "lap": 40,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "push-attack",
+          "label": "PUSH - attack",
+          "decisions": [
+            {
+              "lap": 40,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            },
+            {
+              "lap": 40,
+              "kind": "mode",
+              "key": "battle",
+              "value": "attack"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "pace-48",
+      "lap": 48,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 48,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "standard",
+          "label": "STEADY - standard pace",
+          "decisions": [
+            {
+              "lap": 48,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "manage",
+          "label": "EASY - save the tyres",
+          "decisions": [
+            {
+              "lap": 48,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "push-attack",
+          "label": "PUSH - attack",
+          "decisions": [
+            {
+              "lap": 48,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            },
+            {
+              "lap": 48,
+              "kind": "mode",
+              "key": "battle",
+              "value": "attack"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "pace-52",
+      "lap": 52,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 52,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "standard",
+          "label": "STEADY - standard pace",
+          "decisions": [
+            {
+              "lap": 52,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "manage",
+          "label": "EASY - save the tyres",
+          "decisions": [
+            {
+              "lap": 52,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "push-attack",
+          "label": "PUSH - attack",
+          "decisions": [
+            {
+              "lap": 52,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            },
+            {
+              "lap": 52,
+              "kind": "mode",
+              "key": "battle",
+              "value": "attack"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    }
+  ],
+  "candidateMomentLaps": [
+    36
+  ],
+  "realResult": [
+    "MAN",
+    "PIQN",
+    "SENA",
+    "NAKS",
+    "WAR",
+    "FAB",
+    "BOUT",
+    "PALJ",
+    "FAR",
+    "STRP",
+    "BRU",
+    "PRO",
+    "ALBM",
+    "CHE",
+    "CAM",
+    "CAF",
+    "DAN",
+    "PAT",
+    "JOH",
+    "NAN",
+    "DEC",
+    "BER",
+    "ALL",
+    "ARN",
+    "CAP"
+  ],
+  "userSide": "PIQN",
+  "rival": "MAN",
+  "eras": {
+    "eraId": 1,
+    "order": 9,
+    "userSide": "PIQN",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Piquet runs non-stop; Mansell pits for fresh tyres on lap 35, catches him and passes on lap 63 to win by 1.9 seconds",
+      "rewriteCondition": {
+        "type": "win"
+      },
+      "headline": "Piquet holds off the charging Mansell at Silverstone"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 1,
+      "label": "Beat Mansell at his own game: win with one tyre stop"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 1.9,
+      "label": "Win by more than Mansell's real 1.9 seconds"
+    },
+    "briefing": "Silverstone, July 1987. Piquet started on pole, Mansell beside him; both Williams-Hondas were meant to run without a tyre change. Fuel is limited to 195 litres. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports. Who led each lap is sourced; the lap times are reconstructed.",
+    "hardCalls": {
+      "PIQN": 0,
+      "MAN": 0
+    }
+  },
+  "provenance": {
+    "kind": "reconstructed",
+    "estimated": [
+      "compounds",
+      "fuelLoads",
+      "weather"
+    ]
+  },
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": false,
+    "fuelLimit": 165.75
+  },
+  "reconstructed": true
+}

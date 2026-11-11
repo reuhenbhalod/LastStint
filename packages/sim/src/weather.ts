@@ -23,15 +23,23 @@ export function wetPenalty(weather: Weather, compound: Compound, w: number): num
   return c.a * w + c.b * w * w;
 }
 
-/** A dry lap's time is multiplied by this: the tyre's penalty and the driver's wet pace. */
+/** Wetness below this is damp: a car's dampPace applies there (pipeline wet.DAMP_EDGE). */
+export const DAMP_EDGE = 0.15;
+
+/**
+ * A dry lap's time is multiplied by this: the tyre's penalty and the driver's wet pace
+ * (`dampPace`, an Eras build's, under DAMP_EDGE; sim_reference.driver_wet).
+ */
 export function wetFactor(
   weather: Weather | undefined,
   compound: Compound,
   w: number,
   wetPace = 0,
+  dampPace?: number,
 ): number {
   if (!weather) return 1;
-  return 1 + wetPenalty(weather, compound, w) + wetPace * Math.min(1, w / 0.1);
+  const pace = dampPace !== undefined && w < DAMP_EDGE ? dampPace : wetPace;
+  return 1 + wetPenalty(weather, compound, w) + pace * Math.min(1, w / 0.1);
 }
 
 /**

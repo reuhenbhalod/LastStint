@@ -1,0 +1,704 @@
+{
+  "schemaVersion": 11,
+  "race": {
+    "id": "mexico-1986",
+    "name": "Mexico 1986: Berger vs Prost",
+    "laps": 68,
+    "takeoverLap": 31,
+    "seed": 1,
+    "scUnlap": "none"
+  },
+  "era": "1988-1993",
+  "track": {
+    "pitLoss": 20.0,
+    "pitLossUnderSC": 11.0,
+    "pitLossUnderVSC": 13.8,
+    "pitLossDeviations": [],
+    "overtakeDifficulty": 0.7375,
+    "overtakeModel": {
+      "intercept": 0.0837,
+      "paceCoef": 0.3866,
+      "gapCoef": -1.535
+    },
+    "dirtyAirPenalty": 0.2282,
+    "greenLapTime": 84.34
+  },
+  "compounds": {
+    "MEDIUM": {
+      "offset": 0.0,
+      "degPerLap": 0.035,
+      "cliffLap": 14,
+      "cliffDegPerLap": 0.086,
+      "provenLaps": 68
+    }
+  },
+  "drivers": [
+    {
+      "code": "ALL",
+      "team": "Ligier",
+      "basePace": 85.6659,
+      "noise": 0.7588,
+      "stateAtTakeover": {
+        "position": 10,
+        "gapAhead": 13.274,
+        "compound": "MEDIUM",
+        "tyreAge": 31,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "ARN",
+      "team": "Ligier",
+      "basePace": 85.9279,
+      "noise": 0.6289,
+      "stateAtTakeover": {
+        "position": 17,
+        "gapAhead": 2.447,
+        "compound": "MEDIUM",
+        "tyreAge": 31,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BEG",
+      "team": "Osella",
+      "basePace": 92.9154,
+      "noise": 0.8968,
+      "stateAtTakeover": {
+        "position": 20,
+        "gapAhead": 127.39,
+        "compound": "MEDIUM",
+        "tyreAge": 31,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BER",
+      "team": "Benetton",
+      "basePace": 84.0144,
+      "noise": 0.47,
+      "stateAtTakeover": {
+        "position": 2,
+        "gapAhead": 1.006,
+        "compound": "MEDIUM",
+        "tyreAge": 31,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BOUT",
+      "team": "Arrows",
+      "basePace": 86.2153,
+      "noise": 0.6099,
+      "stateAtTakeover": {
+        "position": 18,
+        "gapAhead": 13.315,
+        "compound": "MEDIUM",
+        "tyreAge": 31,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BRU",
+      "team": "Tyrrell",
+      "basePace": 89.1819,
+      "noise": 2.6224,
+      "stateAtTakeover": {
+        "position": 13,
+        "gapAhead": 1.785,
+        "compound": "MEDIUM",
+        "tyreAge": 31,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "DAN",
+      "team": "Arrows",
+      "basePace": 87.3677,
+      "noise": 1.0455,
+      "stateAtTakeover": {
+        "position": 14,
+        "gapAhead": 0.606,
+        "compound": "MEDIUM",
+        "tyreAge": 31,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "DEC",
+      "team": "Minardi",
+      "basePace": 86.6126,
+      "noise": 0.867,
+      "stateAtTakeover": {
+        "position": 16,
+        "gapAhead": 6.49,
+        "compound": "MEDIUM",
+        "tyreAge": 31,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "DUM",
+      "team": "Team Lotus",
+      "basePace": 86.612,
+      "noise": 1.3677,
+      "stateAtTakeover": {
+        "position": 9,
+        "gapAhead": 6.278,
+        "compound": "MEDIUM",
+        "tyreAge": 31,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "JOH",
+      "team": "Ferrari",
+      "basePace": 84.2629,
+      "noise": 0.9771,
+      "stateAtTakeover": {
+        "position": 5,
+        "gapAhead": 3.154,
+        "compound": "MEDIUM",
+        "tyreAge": 31,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "JON",
+      "team": "Lola",
+      "basePace": 85.9728,
+      "noise": 1.225,
+      "stateAtTakeover": {
+        "position": 12,
+        "gapAhead": 0.824,
+        "compound": "MEDIUM",
+        "tyreAge": 31,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "MAN",
+      "team": "Williams",
+      "basePace": 85.1392,
+      "noise": 1.1034,
+      "stateAtTakeover": {
+        "position": 8,
+        "gapAhead": 9.622,
+        "compound": "MEDIUM",
+        "tyreAge": 31,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "NAN",
+      "team": "Minardi",
+      "basePace": 88.689,
+      "noise": 0.7035,
+      "stateAtTakeover": {
+        "position": 19,
+        "gapAhead": 85.748,
+        "compound": "MEDIUM",
+        "tyreAge": 31,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "PALJ",
+      "team": "Zakspeed",
+      "basePace": 85.8324,
+      "noise": 0.4922,
+      "stateAtTakeover": {
+        "position": 15,
+        "gapAhead": 6.822,
+        "compound": "MEDIUM",
+        "tyreAge": 31,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "PAT",
+      "team": "Brabham",
+      "basePace": 85.6568,
+      "noise": 0.7422,
+      "stateAtTakeover": {
+        "position": 7,
+        "gapAhead": 6.823,
+        "compound": "MEDIUM",
+        "tyreAge": 31,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "PIQN",
+      "team": "Williams",
+      "basePace": 86.0565,
+      "noise": 1.9282,
+      "stateAtTakeover": {
+        "position": 1,
+        "gapAhead": 0.0,
+        "compound": "MEDIUM",
+        "tyreAge": 31,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "PRO",
+      "team": "McLaren",
+      "basePace": 84.3036,
+      "noise": 0.7429,
+      "stateAtTakeover": {
+        "position": 4,
+        "gapAhead": 4.744,
+        "compound": "MEDIUM",
+        "tyreAge": 31,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "ROSK",
+      "team": "McLaren",
+      "basePace": 84.7951,
+      "noise": 0.4048,
+      "stateAtTakeover": {
+        "position": 6,
+        "gapAhead": 8.979,
+        "compound": "MEDIUM",
+        "tyreAge": 31,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "SENA",
+      "team": "Team Lotus",
+      "basePace": 85.2157,
+      "noise": 0.9694,
+      "stateAtTakeover": {
+        "position": 3,
+        "gapAhead": 10.119,
+        "compound": "MEDIUM",
+        "tyreAge": 31,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "WAR",
+      "team": "Brabham",
+      "basePace": 86.434,
+      "noise": 1.1291,
+      "stateAtTakeover": {
+        "position": 11,
+        "gapAhead": 0.189,
+        "compound": "MEDIUM",
+        "tyreAge": 31,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    }
+  ],
+  "fuelEffectPerLap": 0.13916,
+  "freshTyre": {
+    "bonus": -0.2211,
+    "laps": 3
+  },
+  "events": [
+    {
+      "lap": 33,
+      "type": "RETIREMENT",
+      "driver": "ROSK"
+    },
+    {
+      "lap": 36,
+      "type": "RETIREMENT",
+      "driver": "JON"
+    },
+    {
+      "lap": 38,
+      "type": "RETIREMENT",
+      "driver": "WAR"
+    },
+    {
+      "lap": 55,
+      "type": "RETIREMENT",
+      "driver": "DUM"
+    },
+    {
+      "lap": 65,
+      "type": "RETIREMENT",
+      "driver": "ARN"
+    },
+    {
+      "lap": 65,
+      "type": "RETIREMENT",
+      "driver": "JOH"
+    },
+    {
+      "lap": 66,
+      "type": "RETIREMENT",
+      "driver": "PAT"
+    },
+    {
+      "lap": 67,
+      "type": "RETIREMENT",
+      "driver": "PALJ"
+    }
+  ],
+  "decisionMoments": [
+    {
+      "id": "pace-34",
+      "lap": 34,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 34,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "easy",
+          "label": "EASY - save the car",
+          "decisions": [
+            {
+              "lap": 34,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "lift",
+          "label": "FUEL - lift and coast",
+          "decisions": [
+            {
+              "lap": 34,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "liftAndCoast"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "stop-41",
+      "lap": 41,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "STAY OUT",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "IN - fresh tyres",
+          "decisions": [
+            {
+              "lap": 41,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "stay"
+    },
+    {
+      "id": "pace-50",
+      "lap": 50,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 50,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "easy",
+          "label": "EASY - save the car",
+          "decisions": [
+            {
+              "lap": 50,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "lift",
+          "label": "FUEL - lift and coast",
+          "decisions": [
+            {
+              "lap": 50,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "liftAndCoast"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "fuel-58",
+      "lap": 58,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "lift",
+          "label": "FUEL - lift and coast to the flag",
+          "decisions": [
+            {
+              "lap": 58,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "liftAndCoast"
+            },
+            {
+              "lap": 58,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "full",
+          "label": "FUEL OK - full mixture",
+          "decisions": [
+            {
+              "lap": 58,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "normal"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "fuel-63",
+      "lap": 63,
+      "trigger": "cliff",
+      "target": {
+        "kind": "win"
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "Hold the pace",
+          "decisions": []
+        },
+        {
+          "id": "lift",
+          "label": "FUEL - lift and coast to the flag",
+          "decisions": [
+            {
+              "lap": 63,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "liftAndCoast"
+            },
+            {
+              "lap": 63,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "full",
+          "label": "FUEL OK - full mixture",
+          "decisions": [
+            {
+              "lap": 63,
+              "kind": "mode",
+              "key": "fuel",
+              "value": "normal"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    }
+  ],
+  "candidateMomentLaps": [],
+  "realResult": [
+    "BER",
+    "PRO",
+    "SENA",
+    "PIQN",
+    "MAN",
+    "ALL",
+    "BOUT",
+    "DEC",
+    "DAN",
+    "PALJ",
+    "BRU",
+    "JOH",
+    "PAT",
+    "NAN",
+    "ARN",
+    "BEG",
+    "DUM",
+    "WAR",
+    "JON",
+    "ROSK",
+    "ALBM",
+    "STRP",
+    "GHI",
+    "FAB",
+    "TAM"
+  ],
+  "userSide": "BER",
+  "rival": "PRO",
+  "eras": {
+    "eraId": 1,
+    "order": 6,
+    "userSide": "BER",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Berger wins without a tyre stop on Pirellis, his and Benetton's first win; Prost second"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "max": 0,
+      "label": "Win without a tyre stop, as Berger did"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 25.4,
+      "label": "Win by more than Berger's real 25.4 seconds"
+    },
+    "briefing": "Mexico City, October 1986. Berger started fourth in the Benetton on Pirelli tyres; the Goodyear runners expect to stop. Fuel is limited to 195 litres. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports. Who led each lap is sourced; the lap times are reconstructed.",
+    "hardCalls": {
+      "BER": 0,
+      "PRO": 0
+    }
+  },
+  "provenance": {
+    "kind": "reconstructed",
+    "estimated": [
+      "compounds",
+      "fuelLoads",
+      "weather"
+    ]
+  },
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": false,
+    "fuelLimit": 165.75
+  },
+  "reconstructed": true
+}

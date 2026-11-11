@@ -1,0 +1,22 @@
+{
+ "race": "malaysia-2013",
+ "how": "docs/eras-checks/2.4-estimates.md: check each period against a race report; set status to confirmed or rejected (edit startLap/endLap if they're off), then re-run `pipeline jolpica <race-id> --force`.",
+ "periods": [
+  {
+   "startLap": 2,
+   "endLap": 6,
+   "laps": 5,
+   "kind": "SC",
+   "confidence": "ambiguous",
+   "peakRatio": 1.136,
+   "gapBefore": 5.9,
+   "gapAfter": 9.4,
+   "reasons": [
+    "only 1.14x slower: rain, yellow flags or a short SC?",
+    "the field didn't bunch up (P1-P6 5.9s -> 9.4s): rain?"
+   ],
+   "status": "rejected",
+   "source": "https://en.wikipedia.org/wiki/2013_Malaysian_Grand_Prix: the wet track, not an SC: 'a 30-minute torrential downpour half an hour before the start made the track wet ... all cars used intermediate tyres'; 'DRS was enabled on the third lap'; 'Vettel made his first pit stop for dry slick tyres on lap five'. The race report has no safety car"
+  }
+ ]
+}

@@ -1,0 +1,15 @@
+{
+ "race": "brazil-2003",
+ "scheduledLaps": 71,
+ "completedLaps": 54,
+ "timing": "Jolpica (no red-flag timing)",
+ "redFlags": [
+  {
+   "lap": 56,
+   "restart": "none",
+   "resultsLap": 54,
+   "source": "GrandPrix.com, 'The FIA confirms Fisichella', 11 Apr 2003: 'The race was thus stopped on the 56th lap', 'the classification is that at the end of lap 54', Fisichella 'crossed the line to complete 55 laps before the signal to stop the race was given' (https://www.grandprix.com/news/the-fia-confirms-fisichella.html); Wikipedia, 2003 Brazilian Grand Prix: 'the red flag had been thrown during lap 56 and Fisichella was leading at the end of lap 54', results 'two laps prior to that lap during which the signal to stop was given', 'race continuation behind the safety car was impossible' (https://en.wikipedia.org/wiki/2003_Brazilian_Grand_Prix); Wikipedia, 'List of red-flagged Formula One races' (https://en.wikipedia.org/wiki/List_of_red-flagged_Formula_One_races): lap 56, not restarted",
+   "note": "Not resumed (Webber and Alonso crashes). The stewards first gave the win to Raikkonen believing Fisichella was on lap 55 (results from lap 53); the FIA corrected it on 11 Apr 2003. Jolpica has laps 1-54 only (the classified distance)."
+  }
+ ]
+}

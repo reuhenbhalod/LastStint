@@ -1,0 +1,43 @@
+{
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": false
+  },
+  "eras": {
+    "eraId": 2,
+    "order": 7,
+    "userSide": "BER",
+    "hardCalls": {
+      "MAN": 0,
+      "BER": 0
+    },
+    "target": {
+      "type": "beat-rival",
+      "rival": "MAN"
+    },
+    "storyline": {
+      "real": "Mansell stops for tyres on lap 61, rejoins sixth and passes Berger for second, clinching the title with five races left; Berger finishes third",
+      "rewriteCondition": {
+        "type": "beat-rival",
+        "rival": "MAN"
+      },
+      "headline": "Berger keeps the Williams behind him at the Hungaroring"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 1,
+      "label": "Answer the Williams: make exactly one tyre stop"
+    },
+    "hidden": {
+      "type": "finish_position",
+      "position": 2,
+      "label": "Finish second"
+    },
+    "briefing": "Hungaroring, 1992. Mansell leads the championship on 86 points to Patrese's 40, and a good result here can make him champion with five races to spare. You run Berger's McLaren. Pit board only: keep the Williams behind. Reconstructed race: no lap timing survives, so the laps are rebuilt to fit the result, the fastest laps, the sourced stops and who led each lap (Jolpica, F1DB, Motor Sport, Wikipedia). Who led each lap is sourced, and so is the order at a few laps; the lap times, and the rest of the order, are reconstructed."
+  }
+}

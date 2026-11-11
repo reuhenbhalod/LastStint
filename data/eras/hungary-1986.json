@@ -1,0 +1,39 @@
+{
+  "eras": {
+    "eraId": 1,
+    "order": 7,
+    "userSide": "PIQN",
+    "target": {
+      "type": "beat-rival",
+      "rival": "SENA"
+    },
+    "storyline": {
+      "real": "Piquet passes Senna around the outside into the first corner and wins by 17.7 seconds"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 1,
+      "label": "Beat Senna with one tyre stop, as Piquet did"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 14,
+      "label": "Win by more than 14 seconds"
+    },
+    "briefing": "Hungaroring, August 1986, the first Hungarian Grand Prix since 1936. Senna started on pole in the Lotus, Piquet second in the Williams. Tyres or track position? Fuel is limited to 195 litres. Pit boards only, no radio. Reconstructed race: no lap timing survives, so the laps are rebuilt from the results and race reports. Who led each lap is sourced; the lap times are reconstructed.",
+    "hardCalls": {
+      "PIQN": 2,
+      "SENA": 0
+    }
+  },
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": false,
+    "fuelLimit": 165.75
+  }
+}

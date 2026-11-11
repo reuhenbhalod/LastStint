@@ -1,4 +1,4 @@
-import type { CarState } from '@boxthislap/sim';
+import type { CarState } from '@laststint/sim';
 import { describe, expect, it } from 'vitest';
 import { ignoreRate } from '../data/drivers.js';
 import { type LiveCall, refusal, roll } from './refusal.js';

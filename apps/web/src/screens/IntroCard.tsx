@@ -1,10 +1,11 @@
 // The home page (the daily card). A full-width hero: the day's circuit drawn large behind the
 // race's name and the duel, with your driver and the rival placed where they are when you take
 // over; the goal and Start. Under it, the duel in numbers and what your job is tonight. The top
-// bar has the brand, your streak and sign-in. The how-to-play walkthrough opens over it on a
-// fresh visit; coming back mid-race (the Pit Wall brand), Start becomes "Back to the race".
+// bar has the brand, the Gauntlet and Eras pills, your streak and sign-in. The how-to-play
+// walkthrough opens over it on a fresh visit; coming back mid-race (the Pit Wall brand), Start
+// becomes "Back to the race".
 
-import type { RaceModel } from '@boxthislap/sim';
+import type { RaceModel } from '@laststint/sim';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { takeHowToPending } from '../account/howTo.js';
 import type { AccountState } from '../account/useAccount.js';
@@ -21,6 +22,23 @@ import { carsOnTrack, pointAt, polyline } from '../track/geometry.js';
 import { groundFor } from '../track/ground.js';
 import { outlineFor } from '../track/outlines.js';
 import { HowToPlay } from './HowToPlay.js';
+
+const PILL =
+  'rounded-full border border-[var(--fav,var(--box))] bg-[color-mix(in_srgb,var(--fav,transparent)_12%,transparent)] px-3 py-1 text-[13px] font-semibold text-[var(--ink)] hover:bg-[color-mix(in_srgb,var(--fav,var(--box))_22%,transparent)]';
+
+/** The top bar's links to the other game modes: the Gauntlet and Eras. */
+export function ModePills() {
+  return (
+    <>
+      <a href="/gauntlet" className={PILL}>
+        Gauntlet
+      </a>
+      <a href="/eras" className={PILL}>
+        Eras
+      </a>
+    </>
+  );
+}
 
 /** The circuit on its real ground (track/ground.ts), with the two cars where they are at the
  * takeover. It covers its box; the hero's gradient fades it into the page. */
@@ -256,14 +274,7 @@ export function IntroCard({
             >
               Versus
             </a>
-            {source !== 'survivor' && (
-              <a
-                href="/gauntlet"
-                className="rounded-full border border-[var(--box)] px-3 py-1 text-[13px] font-semibold text-[var(--ink)] hover:bg-[color-mix(in_srgb,var(--box)_14%,transparent)]"
-              >
-                Gauntlet
-              </a>
-            )}
+            {source !== 'survivor' && <ModePills />}
             {account && <AccountBar account={account} compact />}
           </span>
         </div>

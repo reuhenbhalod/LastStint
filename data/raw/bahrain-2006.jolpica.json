@@ -1,0 +1,1205 @@
+{
+ "source": "jolpica",
+ "licence": "CC BY-NC-SA 4.0 (Jolpica-F1)",
+ "dump": "2026-10-24T01:04:07.015299Z",
+ "year": 2006,
+ "round": 1,
+ "scheduledLaps": 57,
+ "stops": "f1db",
+ "missing": {
+  "Compound": "not in Jolpica (estimated in step 2.4)",
+  "TrackStatus": "not in Jolpica (SC laps estimated in step 2.4); status JSON is []",
+  "TyreLife": "laps since the last stop (age of the set when fitted is unknown)",
+  "PitInTime": "the in-lap's end (the lane entry isn't timed)",
+  "PitOutTime": "PitInTime + the stop's pit-lane time"
+ },
+ "timingGaps": [],
+ "driversFromJolpica": [
+  {
+   "name": "Yuji Ide",
+   "code": "IDE"
+  }
+ ],
+ "driversWithoutCode": [],
+ "results": [
+  {
+   "driver": "ALO",
+   "name": "Fernando Alonso",
+   "team": "Renault",
+   "number": 1,
+   "grid": 4,
+   "position": 1,
+   "classified": true,
+   "status": "finished",
+   "detail": "Finished",
+   "laps": 57,
+   "time": 5386.205,
+   "points": 10.0
+  },
+  {
+   "driver": "MSCM",
+   "name": "Michael Schumacher",
+   "team": "Ferrari",
+   "number": 5,
+   "grid": 1,
+   "position": 2,
+   "classified": true,
+   "status": "finished",
+   "detail": "Finished",
+   "laps": 57,
+   "time": 5387.451,
+   "points": 8.0
+  },
+  {
+   "driver": "RAI",
+   "name": "Kimi R\u00e4ikk\u00f6nen",
+   "team": "McLaren",
+   "number": 3,
+   "grid": 22,
+   "position": 3,
+   "classified": true,
+   "status": "finished",
+   "detail": "Finished",
+   "laps": 57,
+   "time": 5405.565,
+   "points": 6.0
+  },
+  {
+   "driver": "BUT",
+   "name": "Jenson Button",
+   "team": "Honda",
+   "number": 12,
+   "grid": 3,
+   "position": 4,
+   "classified": true,
+   "status": "finished",
+   "detail": "Finished",
+   "laps": 57,
+   "time": 5406.197,
+   "points": 5.0
+  },
+  {
+   "driver": "MON",
+   "name": "Juan Pablo Montoya",
+   "team": "McLaren",
+   "number": 4,
+   "grid": 5,
+   "position": 5,
+   "classified": true,
+   "status": "finished",
+   "detail": "Finished",
+   "laps": 57,
+   "time": 5423.253,
+   "points": 4.0
+  },
+  {
+   "driver": "WEB",
+   "name": "Mark Webber",
+   "team": "Williams",
+   "number": 9,
+   "grid": 7,
+   "position": 6,
+   "classified": true,
+   "status": "finished",
+   "detail": "Finished",
+   "laps": 57,
+   "time": 5428.137,
+   "points": 3.0
+  },
+  {
+   "driver": "ROS",
+   "name": "Nico Rosberg",
+   "team": "Williams",
+   "number": 10,
+   "grid": 12,
+   "position": 7,
+   "classified": true,
+   "status": "finished",
+   "detail": "Finished",
+   "laps": 57,
+   "time": 5449.248,
+   "points": 2.0
+  },
+  {
+   "driver": "KLI",
+   "name": "Christian Klien",
+   "team": "Red Bull",
+   "number": 15,
+   "grid": 8,
+   "position": 8,
+   "classified": true,
+   "status": "finished",
+   "detail": "Finished",
+   "laps": 57,
+   "time": 5452.976,
+   "points": 1.0
+  },
+  {
+   "driver": "MAS",
+   "name": "Felipe Massa",
+   "team": "Ferrari",
+   "number": 6,
+   "grid": 2,
+   "position": 9,
+   "classified": true,
+   "status": "finished",
+   "detail": "Finished",
+   "laps": 57,
+   "time": 5456.112,
+   "points": 0.0
+  },
+  {
+   "driver": "COU",
+   "name": "David Coulthard",
+   "team": "Red Bull",
+   "number": 14,
+   "grid": 13,
+   "position": 10,
+   "classified": true,
+   "status": "finished",
+   "detail": "Finished",
+   "laps": 57,
+   "time": 5461.746,
+   "points": 0.0
+  },
+  {
+   "driver": "LIU",
+   "name": "Vitantonio Liuzzi",
+   "team": "Toro Rosso",
+   "number": 20,
+   "grid": 15,
+   "position": 11,
+   "classified": true,
+   "status": "finished",
+   "detail": "Finished",
+   "laps": 57,
+   "time": 5472.202,
+   "points": 0.0
+  },
+  {
+   "driver": "HEI",
+   "name": "Nick Heidfeld",
+   "team": "BMW Sauber",
+   "number": 16,
+   "grid": 10,
+   "position": 12,
+   "classified": true,
+   "status": "lapped",
+   "detail": "+1 Lap",
+   "laps": 56,
+   "time": null,
+   "points": 0.0
+  },
+  {
+   "driver": "SPE",
+   "name": "Scott Speed",
+   "team": "Toro Rosso",
+   "number": 21,
+   "grid": 16,
+   "position": 13,
+   "classified": true,
+   "status": "lapped",
+   "detail": "+1 Lap",
+   "laps": 56,
+   "time": null,
+   "points": 0.0
+  },
+  {
+   "driver": "SCH",
+   "name": "Ralf Schumacher",
+   "team": "Toyota",
+   "number": 7,
+   "grid": 17,
+   "position": 14,
+   "classified": true,
+   "status": "lapped",
+   "detail": "+1 Lap",
+   "laps": 56,
+   "time": null,
+   "points": 0.0
+  },
+  {
+   "driver": "BAR",
+   "name": "Rubens Barrichello",
+   "team": "Honda",
+   "number": 11,
+   "grid": 6,
+   "position": 15,
+   "classified": true,
+   "status": "lapped",
+   "detail": "+1 Lap",
+   "laps": 56,
+   "time": null,
+   "points": 0.0
+  },
+  {
+   "driver": "TRU",
+   "name": "Jarno Trulli",
+   "team": "Toyota",
+   "number": 8,
+   "grid": 14,
+   "position": 16,
+   "classified": true,
+   "status": "lapped",
+   "detail": "+1 Lap",
+   "laps": 56,
+   "time": null,
+   "points": 0.0
+  },
+  {
+   "driver": "TMO",
+   "name": "Tiago Monteiro",
+   "team": "MF1",
+   "number": 18,
+   "grid": 19,
+   "position": 17,
+   "classified": true,
+   "status": "lapped",
+   "detail": "+2 Laps",
+   "laps": 55,
+   "time": null,
+   "points": 0.0
+  },
+  {
+   "driver": "SAT",
+   "name": "Takuma Sato",
+   "team": "Super Aguri",
+   "number": 22,
+   "grid": 20,
+   "position": 18,
+   "classified": true,
+   "status": "lapped",
+   "detail": "+4 Laps",
+   "laps": 53,
+   "time": null,
+   "points": 0.0
+  },
+  {
+   "driver": "IDE",
+   "name": "Yuji Ide",
+   "team": "Super Aguri",
+   "number": 23,
+   "grid": 21,
+   "position": 19,
+   "classified": false,
+   "status": "retired",
+   "detail": "Mechanical",
+   "laps": 35,
+   "time": null,
+   "points": 0.0
+  },
+  {
+   "driver": "VIL",
+   "name": "Jacques Villeneuve",
+   "team": "BMW Sauber",
+   "number": 17,
+   "grid": 11,
+   "position": 20,
+   "classified": false,
+   "status": "retired",
+   "detail": "Engine",
+   "laps": 29,
+   "time": null,
+   "points": 0.0
+  },
+  {
+   "driver": "FIS",
+   "name": "Giancarlo Fisichella",
+   "team": "Renault",
+   "number": 2,
+   "grid": 9,
+   "position": 21,
+   "classified": false,
+   "status": "retired",
+   "detail": "Hydraulics",
+   "laps": 21,
+   "time": null,
+   "points": 0.0
+  },
+  {
+   "driver": "ALBC",
+   "name": "Christijan Albers",
+   "team": "MF1",
+   "number": 19,
+   "grid": 18,
+   "position": 22,
+   "classified": false,
+   "status": "retired",
+   "detail": "Driveshaft",
+   "laps": 0,
+   "time": null,
+   "points": 0.0
+  }
+ ],
+ "retirements": [
+  {
+   "driver": "IDE",
+   "laps": 35,
+   "status": "retired",
+   "detail": "Mechanical"
+  },
+  {
+   "driver": "VIL",
+   "laps": 29,
+   "status": "retired",
+   "detail": "Engine"
+  },
+  {
+   "driver": "FIS",
+   "laps": 21,
+   "status": "retired",
+   "detail": "Hydraulics"
+  },
+  {
+   "driver": "ALBC",
+   "laps": 0,
+   "status": "retired",
+   "detail": "Driveshaft"
+  }
+ ],
+ "standings": {
+  "drivers": [
+   {
+    "position": 1,
+    "driver": "ALO",
+    "name": "Fernando Alonso",
+    "points": 10.0,
+    "wins": 1
+   },
+   {
+    "position": 2,
+    "driver": "MSCM",
+    "name": "Michael Schumacher",
+    "points": 8.0,
+    "wins": 0
+   },
+   {
+    "position": 3,
+    "driver": "RAI",
+    "name": "Kimi R\u00e4ikk\u00f6nen",
+    "points": 6.0,
+    "wins": 0
+   },
+   {
+    "position": 4,
+    "driver": "BUT",
+    "name": "Jenson Button",
+    "points": 5.0,
+    "wins": 0
+   },
+   {
+    "position": 5,
+    "driver": "MON",
+    "name": "Juan Pablo Montoya",
+    "points": 4.0,
+    "wins": 0
+   },
+   {
+    "position": 6,
+    "driver": "WEB",
+    "name": "Mark Webber",
+    "points": 3.0,
+    "wins": 0
+   },
+   {
+    "position": 7,
+    "driver": "ROS",
+    "name": "Nico Rosberg",
+    "points": 2.0,
+    "wins": 0
+   },
+   {
+    "position": 8,
+    "driver": "KLI",
+    "name": "Christian Klien",
+    "points": 1.0,
+    "wins": 0
+   },
+   {
+    "position": 9,
+    "driver": "MAS",
+    "name": "Felipe Massa",
+    "points": 0.0,
+    "wins": 0
+   },
+   {
+    "position": 10,
+    "driver": "COU",
+    "name": "David Coulthard",
+    "points": 0.0,
+    "wins": 0
+   },
+   {
+    "position": 11,
+    "driver": "LIU",
+    "name": "Vitantonio Liuzzi",
+    "points": 0.0,
+    "wins": 0
+   },
+   {
+    "position": 12,
+    "driver": "HEI",
+    "name": "Nick Heidfeld",
+    "points": 0.0,
+    "wins": 0
+   },
+   {
+    "position": 13,
+    "driver": "SPE",
+    "name": "Scott Speed",
+    "points": 0.0,
+    "wins": 0
+   },
+   {
+    "position": 14,
+    "driver": "SCH",
+    "name": "Ralf Schumacher",
+    "points": 0.0,
+    "wins": 0
+   },
+   {
+    "position": 15,
+    "driver": "BAR",
+    "name": "Rubens Barrichello",
+    "points": 0.0,
+    "wins": 0
+   },
+   {
+    "position": 16,
+    "driver": "TRU",
+    "name": "Jarno Trulli",
+    "points": 0.0,
+    "wins": 0
+   },
+   {
+    "position": 17,
+    "driver": "TMO",
+    "name": "Tiago Monteiro",
+    "points": 0.0,
+    "wins": 0
+   },
+   {
+    "position": 18,
+    "driver": "SAT",
+    "name": "Takuma Sato",
+    "points": 0.0,
+    "wins": 0
+   },
+   {
+    "position": null,
+    "driver": "IDE",
+    "name": "Yuji Ide",
+    "points": 0.0,
+    "wins": 0
+   },
+   {
+    "position": null,
+    "driver": "VIL",
+    "name": "Jacques Villeneuve",
+    "points": 0.0,
+    "wins": 0
+   },
+   {
+    "position": null,
+    "driver": "FIS",
+    "name": "Giancarlo Fisichella",
+    "points": 0.0,
+    "wins": 0
+   },
+   {
+    "position": null,
+    "driver": "ALBC",
+    "name": "Christijan Albers",
+    "points": 0.0,
+    "wins": 0
+   }
+  ],
+  "teams": [
+   {
+    "position": 1,
+    "team": "Renault",
+    "points": 10.0,
+    "wins": 1
+   },
+   {
+    "position": 2,
+    "team": "McLaren",
+    "points": 10.0,
+    "wins": 0
+   },
+   {
+    "position": 3,
+    "team": "Ferrari",
+    "points": 8.0,
+    "wins": 0
+   },
+   {
+    "position": 4,
+    "team": "Honda",
+    "points": 5.0,
+    "wins": 0
+   },
+   {
+    "position": 5,
+    "team": "Williams",
+    "points": 5.0,
+    "wins": 0
+   },
+   {
+    "position": 6,
+    "team": "Red Bull",
+    "points": 1.0,
+    "wins": 0
+   },
+   {
+    "position": 7,
+    "team": "Toro Rosso",
+    "points": 0.0,
+    "wins": 0
+   },
+   {
+    "position": 8,
+    "team": "BMW Sauber",
+    "points": 0.0,
+    "wins": 0
+   },
+   {
+    "position": 9,
+    "team": "Toyota",
+    "points": 0.0,
+    "wins": 0
+   },
+   {
+    "position": 10,
+    "team": "MF1",
+    "points": 0.0,
+    "wins": 0
+   },
+   {
+    "position": 11,
+    "team": "Super Aguri",
+    "points": 0.0,
+    "wins": 0
+   }
+  ]
+ },
+ "q3": [
+  {
+   "driver": "MSCM",
+   "position": 1
+  },
+  {
+   "driver": "MAS",
+   "position": 2
+  },
+  {
+   "driver": "BUT",
+   "position": 3
+  },
+  {
+   "driver": "ALO",
+   "position": 4
+  },
+  {
+   "driver": "MON",
+   "position": 5
+  },
+  {
+   "driver": "BAR",
+   "position": 6
+  },
+  {
+   "driver": "WEB",
+   "position": 7
+  },
+  {
+   "driver": "KLI",
+   "position": 8
+  },
+  {
+   "driver": "FIS",
+   "position": 9
+  },
+  {
+   "driver": "HEI",
+   "position": 10
+  }
+ ],
+ "raceTimeCheck": [
+  {
+   "driver": "ALO",
+   "position": 1,
+   "official": 5386.205,
+   "summed": 5386.205,
+   "diff": -0.0
+  },
+  {
+   "driver": "MSCM",
+   "position": 2,
+   "official": 5387.451,
+   "summed": 5387.451,
+   "diff": -0.0
+  },
+  {
+   "driver": "RAI",
+   "position": 3,
+   "official": 5405.565,
+   "summed": 5405.565,
+   "diff": 0.0
+  },
+  {
+   "driver": "BUT",
+   "position": 4,
+   "official": 5406.197,
+   "summed": 5406.197,
+   "diff": 0.0
+  },
+  {
+   "driver": "MON",
+   "position": 5,
+   "official": 5423.253,
+   "summed": 5423.253,
+   "diff": 0.0
+  },
+  {
+   "driver": "WEB",
+   "position": 6,
+   "official": 5428.137,
+   "summed": 5428.137,
+   "diff": 0.0
+  },
+  {
+   "driver": "ROS",
+   "position": 7,
+   "official": 5449.248,
+   "summed": 5449.248,
+   "diff": 0.0
+  },
+  {
+   "driver": "KLI",
+   "position": 8,
+   "official": 5452.976,
+   "summed": 5452.976,
+   "diff": 0.0
+  },
+  {
+   "driver": "MAS",
+   "position": 9,
+   "official": 5456.112,
+   "summed": 5456.112,
+   "diff": -0.0
+  },
+  {
+   "driver": "COU",
+   "position": 10,
+   "official": 5461.746,
+   "summed": 5461.746,
+   "diff": 0.0
+  },
+  {
+   "driver": "LIU",
+   "position": 11,
+   "official": 5472.202,
+   "summed": 5472.202,
+   "diff": 0.0
+  }
+ ],
+ "estimates": {
+  "era": "1994-2009",
+  "safetyCars": {
+   "method": "field-wide slow laps (>= 1.1x the green baseline); likely SC when >= 1.25x and the field bunches up, else ambiguous (applied as yellow)",
+   "periods": [],
+   "handCheck": "data/estimates/bahrain-2006.sc.json"
+  },
+  "compounds": {
+   "method": "one dry compound before 2007: every lap MEDIUM",
+   "stints": [],
+   "notes": [
+    "wet tyres aren't estimated: a wet race needs its weather block"
+   ]
+  },
+  "fuelLoads": {
+   "method": "stint laps x the era's standard burn (headset.json fuel.burnPerLap)",
+   "burnPerLap": 1.7,
+   "unit": "kg",
+   "fillRate": "fill rate: an estimate, 0.25 s per lap of fuel (~3 L a lap through a ~12 L/s rig, prior sd 0.01 s), barely moved by the race's own stop times (refuel.py)",
+   "stints": [
+    {
+     "driver": "ALBC",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 1,
+     "fuelKg": 1.7
+    },
+    {
+     "driver": "ALO",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 19,
+     "fuelKg": 32.3
+    },
+    {
+     "driver": "ALO",
+     "stint": 2,
+     "fromLap": 20,
+     "laps": 20,
+     "fuelKg": 34.0
+    },
+    {
+     "driver": "ALO",
+     "stint": 3,
+     "fromLap": 40,
+     "laps": 18,
+     "fuelKg": 30.6
+    },
+    {
+     "driver": "BAR",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 16,
+     "fuelKg": 27.2
+    },
+    {
+     "driver": "BAR",
+     "stint": 2,
+     "fromLap": 17,
+     "laps": 22,
+     "fuelKg": 37.4
+    },
+    {
+     "driver": "BAR",
+     "stint": 3,
+     "fromLap": 39,
+     "laps": 18,
+     "fuelKg": 30.6
+    },
+    {
+     "driver": "BUT",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 18,
+     "fuelKg": 30.6
+    },
+    {
+     "driver": "BUT",
+     "stint": 2,
+     "fromLap": 19,
+     "laps": 22,
+     "fuelKg": 37.4
+    },
+    {
+     "driver": "BUT",
+     "stint": 3,
+     "fromLap": 41,
+     "laps": 17,
+     "fuelKg": 28.9
+    },
+    {
+     "driver": "COU",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 30,
+     "fuelKg": 51.0
+    },
+    {
+     "driver": "COU",
+     "stint": 2,
+     "fromLap": 31,
+     "laps": 27,
+     "fuelKg": 45.9
+    },
+    {
+     "driver": "FIS",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 16,
+     "fuelKg": 27.2
+    },
+    {
+     "driver": "FIS",
+     "stint": 2,
+     "fromLap": 17,
+     "laps": 5,
+     "fuelKg": 8.5
+    },
+    {
+     "driver": "HEI",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 17,
+     "fuelKg": 28.9
+    },
+    {
+     "driver": "HEI",
+     "stint": 2,
+     "fromLap": 18,
+     "laps": 18,
+     "fuelKg": 30.6
+    },
+    {
+     "driver": "HEI",
+     "stint": 3,
+     "fromLap": 36,
+     "laps": 21,
+     "fuelKg": 35.7
+    },
+    {
+     "driver": "IDE",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 7,
+     "fuelKg": 11.9
+    },
+    {
+     "driver": "IDE",
+     "stint": 2,
+     "fromLap": 8,
+     "laps": 7,
+     "fuelKg": 11.9
+    },
+    {
+     "driver": "IDE",
+     "stint": 3,
+     "fromLap": 15,
+     "laps": 3,
+     "fuelKg": 5.1
+    },
+    {
+     "driver": "IDE",
+     "stint": 4,
+     "fromLap": 18,
+     "laps": 18,
+     "fuelKg": 30.6
+    },
+    {
+     "driver": "KLI",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 22,
+     "fuelKg": 37.4
+    },
+    {
+     "driver": "KLI",
+     "stint": 2,
+     "fromLap": 23,
+     "laps": 19,
+     "fuelKg": 32.3
+    },
+    {
+     "driver": "KLI",
+     "stint": 3,
+     "fromLap": 42,
+     "laps": 16,
+     "fuelKg": 27.2
+    },
+    {
+     "driver": "LIU",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 22,
+     "fuelKg": 37.4
+    },
+    {
+     "driver": "LIU",
+     "stint": 2,
+     "fromLap": 23,
+     "laps": 17,
+     "fuelKg": 28.9
+    },
+    {
+     "driver": "LIU",
+     "stint": 3,
+     "fromLap": 40,
+     "laps": 18,
+     "fuelKg": 30.6
+    },
+    {
+     "driver": "MAS",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 8,
+     "fuelKg": 13.6
+    },
+    {
+     "driver": "MAS",
+     "stint": 2,
+     "fromLap": 9,
+     "laps": 24,
+     "fuelKg": 40.8
+    },
+    {
+     "driver": "MAS",
+     "stint": 3,
+     "fromLap": 33,
+     "laps": 25,
+     "fuelKg": 42.5
+    },
+    {
+     "driver": "MON",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 23,
+     "fuelKg": 39.1
+    },
+    {
+     "driver": "MON",
+     "stint": 2,
+     "fromLap": 24,
+     "laps": 21,
+     "fuelKg": 35.7
+    },
+    {
+     "driver": "MON",
+     "stint": 3,
+     "fromLap": 45,
+     "laps": 13,
+     "fuelKg": 22.1
+    },
+    {
+     "driver": "MSCM",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 15,
+     "fuelKg": 25.5
+    },
+    {
+     "driver": "MSCM",
+     "stint": 2,
+     "fromLap": 16,
+     "laps": 21,
+     "fuelKg": 35.7
+    },
+    {
+     "driver": "MSCM",
+     "stint": 3,
+     "fromLap": 37,
+     "laps": 21,
+     "fuelKg": 35.7
+    },
+    {
+     "driver": "RAI",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 30,
+     "fuelKg": 51.0
+    },
+    {
+     "driver": "RAI",
+     "stint": 2,
+     "fromLap": 31,
+     "laps": 27,
+     "fuelKg": 45.9
+    },
+    {
+     "driver": "ROS",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 1,
+     "fuelKg": 1.7
+    },
+    {
+     "driver": "ROS",
+     "stint": 2,
+     "fromLap": 2,
+     "laps": 26,
+     "fuelKg": 44.2
+    },
+    {
+     "driver": "ROS",
+     "stint": 3,
+     "fromLap": 28,
+     "laps": 16,
+     "fuelKg": 27.2
+    },
+    {
+     "driver": "ROS",
+     "stint": 4,
+     "fromLap": 44,
+     "laps": 14,
+     "fuelKg": 23.8
+    },
+    {
+     "driver": "SAT",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 18,
+     "fuelKg": 30.6
+    },
+    {
+     "driver": "SAT",
+     "stint": 2,
+     "fromLap": 19,
+     "laps": 1,
+     "fuelKg": 1.7
+    },
+    {
+     "driver": "SAT",
+     "stint": 3,
+     "fromLap": 20,
+     "laps": 1,
+     "fuelKg": 1.7
+    },
+    {
+     "driver": "SAT",
+     "stint": 4,
+     "fromLap": 21,
+     "laps": 2,
+     "fuelKg": 3.4
+    },
+    {
+     "driver": "SAT",
+     "stint": 5,
+     "fromLap": 23,
+     "laps": 3,
+     "fuelKg": 5.1
+    },
+    {
+     "driver": "SAT",
+     "stint": 6,
+     "fromLap": 26,
+     "laps": 14,
+     "fuelKg": 23.8
+    },
+    {
+     "driver": "SAT",
+     "stint": 7,
+     "fromLap": 40,
+     "laps": 14,
+     "fuelKg": 23.8
+    },
+    {
+     "driver": "SCH",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 12,
+     "fuelKg": 20.4
+    },
+    {
+     "driver": "SCH",
+     "stint": 2,
+     "fromLap": 13,
+     "laps": 14,
+     "fuelKg": 23.8
+    },
+    {
+     "driver": "SCH",
+     "stint": 3,
+     "fromLap": 27,
+     "laps": 15,
+     "fuelKg": 25.5
+    },
+    {
+     "driver": "SCH",
+     "stint": 4,
+     "fromLap": 42,
+     "laps": 15,
+     "fuelKg": 25.5
+    },
+    {
+     "driver": "SPE",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 25,
+     "fuelKg": 42.5
+    },
+    {
+     "driver": "SPE",
+     "stint": 2,
+     "fromLap": 26,
+     "laps": 18,
+     "fuelKg": 30.6
+    },
+    {
+     "driver": "SPE",
+     "stint": 3,
+     "fromLap": 44,
+     "laps": 13,
+     "fuelKg": 22.1
+    },
+    {
+     "driver": "TMO",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 18,
+     "fuelKg": 30.6
+    },
+    {
+     "driver": "TMO",
+     "stint": 2,
+     "fromLap": 19,
+     "laps": 19,
+     "fuelKg": 32.3
+    },
+    {
+     "driver": "TMO",
+     "stint": 3,
+     "fromLap": 38,
+     "laps": 18,
+     "fuelKg": 30.6
+    },
+    {
+     "driver": "TRU",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 22,
+     "fuelKg": 37.4
+    },
+    {
+     "driver": "TRU",
+     "stint": 2,
+     "fromLap": 23,
+     "laps": 17,
+     "fuelKg": 28.9
+    },
+    {
+     "driver": "TRU",
+     "stint": 3,
+     "fromLap": 40,
+     "laps": 17,
+     "fuelKg": 28.9
+    },
+    {
+     "driver": "VIL",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 23,
+     "fuelKg": 39.1
+    },
+    {
+     "driver": "VIL",
+     "stint": 2,
+     "fromLap": 24,
+     "laps": 6,
+     "fuelKg": 10.2
+    },
+    {
+     "driver": "WEB",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 23,
+     "fuelKg": 39.1
+    },
+    {
+     "driver": "WEB",
+     "stint": 2,
+     "fromLap": 24,
+     "laps": 16,
+     "fuelKg": 27.2
+    },
+    {
+     "driver": "WEB",
+     "stint": 3,
+     "fromLap": 40,
+     "laps": 18,
+     "fuelKg": 30.6
+    }
+   ]
+  },
+  "estimated": [
+   "compounds",
+   "safetyCars",
+   "fuelLoads"
+  ],
+  "quirks": []
+ }
+}

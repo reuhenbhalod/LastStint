@@ -4,7 +4,7 @@
 
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { type RaceModel, isWetTyre, tyreLife } from '@boxthislap/sim';
+import { type RaceModel, isWetTyre, tyreLife } from '@laststint/sim';
 import { describe, expect, it } from 'vitest';
 import { GameEngine } from '../engine/engine.js';
 import { briefFor } from './brief.js';

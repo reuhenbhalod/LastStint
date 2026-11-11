@@ -1,0 +1,110 @@
+{
+  "raceId": "monaco-1988",
+  "stops": [],
+  "safetyCars": [],
+  "complete": {
+    "stops": false,
+    "safetyCars": true
+  },
+  "lapLeaders": [
+    {
+      "driver": "SENA",
+      "name": "Ayrton Senna",
+      "fromLap": 1,
+      "toLap": 66,
+      "source": "https://en.wikipedia.org/wiki/1988_Monaco_Grand_Prix (lap-leader chart, Template:F1Laps1988 'MON')"
+    },
+    {
+      "driver": "PRO",
+      "name": "Alain Prost",
+      "fromLap": 67,
+      "toLap": 78,
+      "source": "https://en.wikipedia.org/wiki/1988_Monaco_Grand_Prix (lap-leader chart, Template:F1Laps1988 'MON')"
+    }
+  ],
+  "runningOrder": [
+    {
+      "lap": 1,
+      "order": [
+        "SENA",
+        "BER",
+        "PRO",
+        "MAN",
+        "ALBM",
+        "NAN"
+      ],
+      "source": "https://en.wikipedia.org/wiki/1988_Monaco_Grand_Prix: 'The running order of Senna, Berger, Prost, Mansell, Alboreto and Nannini was maintained until lap 33'"
+    },
+    {
+      "lap": 16,
+      "order": [
+        "SENA",
+        "BER",
+        "PRO",
+        "MAN",
+        "ALBM",
+        "NAN"
+      ],
+      "source": "https://en.wikipedia.org/wiki/1988_Monaco_Grand_Prix: 'The running order of Senna, Berger, Prost, Mansell, Alboreto and Nannini was maintained until lap 33'"
+    },
+    {
+      "lap": 32,
+      "order": [
+        "SENA",
+        "BER",
+        "PRO",
+        "MAN",
+        "ALBM",
+        "NAN"
+      ],
+      "source": "https://en.wikipedia.org/wiki/1988_Monaco_Grand_Prix: 'The running order of Senna, Berger, Prost, Mansell, Alboreto and Nannini was maintained until lap 33'"
+    },
+    {
+      "lap": 36,
+      "order": [
+        "SENA",
+        "BER",
+        "PRO",
+        "ALBM"
+      ],
+      "source": "https://en.wikipedia.org/wiki/1988_Monaco_Grand_Prix: 'The running order of Senna, Berger, Prost, Mansell, Alboreto and Nannini was maintained until lap 33 when Alboreto took Mansell off at the Swimming Pool' ... 'On lap 54, Prost passed Berger for second'",
+      "note": "Berger second until Prost passed him on lap 54; Mansell out on lap 33, Alboreto (who hit him) behind Prost"
+    },
+    {
+      "lap": 45,
+      "order": [
+        "SENA",
+        "BER",
+        "PRO",
+        "ALBM"
+      ],
+      "source": "https://en.wikipedia.org/wiki/1988_Monaco_Grand_Prix: 'The running order of Senna, Berger, Prost, Mansell, Alboreto and Nannini was maintained until lap 33 when Alboreto took Mansell off at the Swimming Pool' ... 'On lap 54, Prost passed Berger for second'",
+      "note": "Berger second until Prost passed him on lap 54; Mansell out on lap 33, Alboreto (who hit him) behind Prost"
+    },
+    {
+      "lap": 53,
+      "order": [
+        "SENA",
+        "BER",
+        "PRO",
+        "ALBM"
+      ],
+      "source": "https://en.wikipedia.org/wiki/1988_Monaco_Grand_Prix: 'The running order of Senna, Berger, Prost, Mansell, Alboreto and Nannini was maintained until lap 33 when Alboreto took Mansell off at the Swimming Pool' ... 'On lap 54, Prost passed Berger for second'",
+      "note": "Berger second until Prost passed him on lap 54; Mansell out on lap 33, Alboreto (who hit him) behind Prost"
+    },
+    {
+      "lap": 54,
+      "order": [
+        "SENA",
+        "PRO",
+        "BER"
+      ],
+      "gaps": {
+        "PRO": 50.0
+      },
+      "gapTolerance": 5.0,
+      "source": "https://en.wikipedia.org/wiki/1988_Monaco_Grand_Prix: 'On lap 54, Prost passed Berger for second on the run to Sainte-Dévote, though he was some 50 seconds behind Senna.'; https://www.motorsportmagazine.com/archive/article/june-1988/22/a-minute-error-of-judgement: 'until on lap 54 the Ferrari engine gave a hiccough and that was all Prost needed'"
+    }
+  ],
+  "notes": "No tyre stops reported for the leaders (Senna crashed out on lap 67 while leading). Patrese (#6) 'limped round to the pits for repairs' after colliding with Alliot on lap 51 (Motor Sport Jun 1988 https://www.motorsportmagazine.com/archive/article/june-1988/22/a-minute-error-of-judgement; Wikipedia lap 51); in-lap not given, so not entered."
+}

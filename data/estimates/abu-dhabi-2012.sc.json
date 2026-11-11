@@ -1,0 +1,32 @@
+{
+ "race": "abu-dhabi-2012",
+ "how": "docs/eras-checks/2.4-estimates.md: check each period against a race report; set status to confirmed or rejected (edit startLap/endLap if they're off), then re-run `pipeline jolpica <race-id> --force`.",
+ "periods": [
+  {
+   "startLap": 9,
+   "endLap": 14,
+   "laps": 6,
+   "kind": "SC",
+   "confidence": "likely",
+   "peakRatio": 1.472,
+   "gapBefore": 9.8,
+   "gapAfter": 3.0,
+   "reasons": [],
+   "status": "confirmed",
+   "source": "https://en.wikipedia.org/wiki/2012_Abu_Dhabi_Grand_Prix: Rosberg hit Karthikeyan, 'the intervention of the safety car on lap nine'; 'Racing resumed at the end of lap 14 when the safety car drove into the pit lane'"
+  },
+  {
+   "startLap": 39,
+   "endLap": 42,
+   "laps": 4,
+   "kind": "SC",
+   "confidence": "likely",
+   "peakRatio": 1.412,
+   "gapBefore": 32.6,
+   "gapAfter": 3.4,
+   "reasons": [],
+   "status": "confirmed",
+   "source": "https://en.wikipedia.org/wiki/2012_Abu_Dhabi_Grand_Prix: 'On lap 39' Grosjean and Webber collided, 'the debris on-track from the accident called for the second safety car period of the race'; 'once the safety car came in on the end of lap 42'"
+  }
+ ]
+}

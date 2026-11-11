@@ -1,0 +1,982 @@
+{
+  "1": {
+    "order": [
+      "HIL",
+      "SCH",
+      "ALE",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH",
+      "FIS",
+      "IRV",
+      "MSCM",
+      "TUE",
+      "VIL",
+      "TAK",
+      "VERO"
+    ],
+    "gaps": {
+      "HIL": 0.0,
+      "SCH": 0.3,
+      "ALE": 5.633,
+      "FRE": 34.472,
+      "DIN": 44.619,
+      "TRU": 260.061,
+      "COU": 676.336,
+      "NAKH": 780.762
+    },
+    "times": {
+      "HIL": 5049.662,
+      "SCH": 5049.962,
+      "ALE": 5055.295,
+      "FRE": 5084.134,
+      "DIN": 5094.281,
+      "TRU": 5309.723,
+      "COU": 5725.998,
+      "NAKH": 5830.424
+    },
+    "finishers": [
+      "HIL",
+      "SCH",
+      "ALE",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH"
+    ]
+  },
+  "2": {
+    "order": [
+      "HIL",
+      "SCH",
+      "ALE",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH",
+      "FIS",
+      "IRV",
+      "MSCM",
+      "TUE",
+      "VIL",
+      "TAK",
+      "VERO"
+    ],
+    "gaps": {
+      "HIL": 0.0,
+      "SCH": 0.483,
+      "ALE": 0.783,
+      "FRE": 36.546,
+      "DIN": 38.028,
+      "TRU": 248.664,
+      "COU": 658.694,
+      "NAKH": 768.35
+    },
+    "times": {
+      "HIL": 5051.807,
+      "SCH": 5052.291,
+      "ALE": 5052.591,
+      "FRE": 5088.353,
+      "DIN": 5089.836,
+      "TRU": 5300.471,
+      "COU": 5710.502,
+      "NAKH": 5820.158
+    },
+    "finishers": [
+      "HIL",
+      "SCH",
+      "ALE",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH"
+    ]
+  },
+  "3": {
+    "order": [
+      "ALE",
+      "HIL",
+      "SCH",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH",
+      "FIS",
+      "IRV",
+      "MSCM",
+      "TUE",
+      "VIL",
+      "TAK",
+      "VERO"
+    ],
+    "gaps": {
+      "ALE": 0.0,
+      "HIL": 21.511,
+      "SCH": 21.811,
+      "FRE": 43.051,
+      "DIN": 51.056,
+      "TRU": 261.259,
+      "COU": 691.004,
+      "NAKH": 785.281
+    },
+    "times": {
+      "ALE": 5029.583,
+      "HIL": 5051.094,
+      "SCH": 5051.394,
+      "FRE": 5072.634,
+      "DIN": 5080.64,
+      "TRU": 5290.842,
+      "COU": 5720.587,
+      "NAKH": 5814.865
+    },
+    "finishers": [
+      "ALE",
+      "HIL",
+      "SCH",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH"
+    ]
+  },
+  "4": {
+    "order": [
+      "HIL",
+      "ALE",
+      "SCH",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH",
+      "FIS",
+      "IRV",
+      "MSCM",
+      "TUE",
+      "VIL",
+      "TAK",
+      "VERO"
+    ],
+    "gaps": {
+      "HIL": 0.0,
+      "ALE": 0.3,
+      "SCH": 0.6,
+      "FRE": 19.819,
+      "DIN": 40.815,
+      "TRU": 252.058,
+      "COU": 669.405,
+      "NAKH": 770.627
+    },
+    "times": {
+      "HIL": 5045.392,
+      "ALE": 5045.692,
+      "SCH": 5045.992,
+      "FRE": 5065.212,
+      "DIN": 5086.207,
+      "TRU": 5297.45,
+      "COU": 5714.797,
+      "NAKH": 5816.019
+    },
+    "finishers": [
+      "HIL",
+      "ALE",
+      "SCH",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH"
+    ]
+  },
+  "5": {
+    "order": [
+      "ALE",
+      "HIL",
+      "SCH",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH",
+      "FIS",
+      "IRV",
+      "MSCM",
+      "TUE",
+      "VIL",
+      "TAK",
+      "VERO"
+    ],
+    "gaps": {
+      "ALE": 0.0,
+      "HIL": 3.111,
+      "SCH": 3.411,
+      "FRE": 29.483,
+      "DIN": 40.821,
+      "TRU": 255.483,
+      "COU": 659.845,
+      "NAKH": 778.421
+    },
+    "times": {
+      "ALE": 5055.933,
+      "HIL": 5059.044,
+      "SCH": 5059.344,
+      "FRE": 5085.416,
+      "DIN": 5096.754,
+      "TRU": 5311.417,
+      "COU": 5715.778,
+      "NAKH": 5834.354
+    },
+    "finishers": [
+      "ALE",
+      "HIL",
+      "SCH",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH"
+    ]
+  },
+  "6": {
+    "order": [
+      "HIL",
+      "SCH",
+      "ALE",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH",
+      "FIS",
+      "IRV",
+      "MSCM",
+      "TUE",
+      "VIL",
+      "TAK",
+      "VERO"
+    ],
+    "gaps": {
+      "HIL": 0.0,
+      "SCH": 0.3,
+      "ALE": 9.593,
+      "FRE": 40.332,
+      "DIN": 41.642,
+      "TRU": 261.613,
+      "COU": 682.077,
+      "NAKH": 781.92
+    },
+    "times": {
+      "HIL": 5043.818,
+      "SCH": 5044.118,
+      "ALE": 5053.411,
+      "FRE": 5084.149,
+      "DIN": 5085.46,
+      "TRU": 5305.431,
+      "COU": 5725.894,
+      "NAKH": 5825.738
+    },
+    "finishers": [
+      "HIL",
+      "SCH",
+      "ALE",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH"
+    ]
+  },
+  "7": {
+    "order": [
+      "ALE",
+      "HIL",
+      "SCH",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH",
+      "FIS",
+      "IRV",
+      "MSCM",
+      "TUE",
+      "VIL",
+      "TAK",
+      "VERO"
+    ],
+    "gaps": {
+      "ALE": 0.0,
+      "HIL": 8.572,
+      "SCH": 8.872,
+      "FRE": 20.018,
+      "DIN": 41.592,
+      "TRU": 254.958,
+      "COU": 688.684,
+      "NAKH": 778.293
+    },
+    "times": {
+      "ALE": 5042.073,
+      "HIL": 5050.645,
+      "SCH": 5050.945,
+      "FRE": 5062.091,
+      "DIN": 5083.666,
+      "TRU": 5297.031,
+      "COU": 5730.758,
+      "NAKH": 5820.366
+    },
+    "finishers": [
+      "ALE",
+      "HIL",
+      "SCH",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH"
+    ]
+  },
+  "8": {
+    "order": [
+      "ALE",
+      "HIL",
+      "SCH",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH",
+      "FIS",
+      "IRV",
+      "MSCM",
+      "TUE",
+      "VIL",
+      "TAK",
+      "VERO"
+    ],
+    "gaps": {
+      "ALE": 0.0,
+      "HIL": 17.94,
+      "SCH": 19.521,
+      "FRE": 36.564,
+      "DIN": 47.134,
+      "TRU": 260.387,
+      "COU": 682.325,
+      "NAKH": 781.303
+    },
+    "times": {
+      "ALE": 5032.933,
+      "HIL": 5050.873,
+      "SCH": 5052.454,
+      "FRE": 5069.497,
+      "DIN": 5080.067,
+      "TRU": 5293.32,
+      "COU": 5715.258,
+      "NAKH": 5814.236
+    },
+    "finishers": [
+      "ALE",
+      "HIL",
+      "SCH",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH"
+    ]
+  },
+  "9": {
+    "order": [
+      "ALE",
+      "HIL",
+      "SCH",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH",
+      "FIS",
+      "IRV",
+      "MSCM",
+      "TUE",
+      "VIL",
+      "TAK",
+      "VERO"
+    ],
+    "gaps": {
+      "ALE": 0.0,
+      "HIL": 7.298,
+      "SCH": 8.051,
+      "FRE": 44.898,
+      "DIN": 46.019,
+      "TRU": 262.1,
+      "COU": 670.793,
+      "NAKH": 781.247
+    },
+    "times": {
+      "ALE": 5042.793,
+      "HIL": 5050.091,
+      "SCH": 5050.844,
+      "FRE": 5087.691,
+      "DIN": 5088.812,
+      "TRU": 5304.893,
+      "COU": 5713.586,
+      "NAKH": 5824.04
+    },
+    "finishers": [
+      "ALE",
+      "HIL",
+      "SCH",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH"
+    ]
+  },
+  "10": {
+    "order": [
+      "ALE",
+      "HIL",
+      "SCH",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH",
+      "FIS",
+      "IRV",
+      "MSCM",
+      "TUE",
+      "VIL",
+      "TAK",
+      "VERO"
+    ],
+    "gaps": {
+      "ALE": 0.0,
+      "HIL": 4.473,
+      "SCH": 4.773,
+      "FRE": 33.931,
+      "DIN": 39.707,
+      "TRU": 254.094,
+      "COU": 674.364,
+      "NAKH": 777.099
+    },
+    "times": {
+      "ALE": 5058.773,
+      "HIL": 5063.246,
+      "SCH": 5063.546,
+      "FRE": 5092.704,
+      "DIN": 5098.479,
+      "TRU": 5312.866,
+      "COU": 5733.136,
+      "NAKH": 5835.871
+    },
+    "finishers": [
+      "ALE",
+      "HIL",
+      "SCH",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH"
+    ]
+  },
+  "11": {
+    "order": [
+      "ALE",
+      "HIL",
+      "SCH",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH",
+      "FIS",
+      "IRV",
+      "MSCM",
+      "TUE",
+      "VIL",
+      "TAK",
+      "VERO"
+    ],
+    "gaps": {
+      "ALE": 0.0,
+      "HIL": 1.021,
+      "SCH": 1.321,
+      "FRE": 31.425,
+      "DIN": 34.698,
+      "TRU": 246.659,
+      "COU": 666.625,
+      "NAKH": 763.443
+    },
+    "times": {
+      "ALE": 5054.258,
+      "HIL": 5055.28,
+      "SCH": 5055.58,
+      "FRE": 5085.683,
+      "DIN": 5088.956,
+      "TRU": 5300.918,
+      "COU": 5720.883,
+      "NAKH": 5817.702
+    },
+    "finishers": [
+      "ALE",
+      "HIL",
+      "SCH",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH"
+    ]
+  },
+  "12": {
+    "order": [
+      "ALE",
+      "HIL",
+      "SCH",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH",
+      "FIS",
+      "IRV",
+      "MSCM",
+      "TUE",
+      "VIL",
+      "TAK",
+      "VERO"
+    ],
+    "gaps": {
+      "ALE": 0.0,
+      "HIL": 11.528,
+      "SCH": 11.828,
+      "FRE": 25.533,
+      "DIN": 47.886,
+      "TRU": 261.54,
+      "COU": 689.505,
+      "NAKH": 773.599
+    },
+    "times": {
+      "ALE": 5029.554,
+      "HIL": 5041.083,
+      "SCH": 5041.383,
+      "FRE": 5055.087,
+      "DIN": 5077.44,
+      "TRU": 5291.094,
+      "COU": 5719.059,
+      "NAKH": 5803.153
+    },
+    "finishers": [
+      "ALE",
+      "HIL",
+      "SCH",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH"
+    ]
+  },
+  "13": {
+    "order": [
+      "HIL",
+      "SCH",
+      "ALE",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH",
+      "FIS",
+      "IRV",
+      "MSCM",
+      "TUE",
+      "VIL",
+      "TAK",
+      "VERO"
+    ],
+    "gaps": {
+      "HIL": 0.0,
+      "SCH": 0.3,
+      "ALE": 6.977,
+      "FRE": 30.89,
+      "DIN": 44.906,
+      "TRU": 262.107,
+      "COU": 675.385,
+      "NAKH": 777.581
+    },
+    "times": {
+      "HIL": 5043.06,
+      "SCH": 5043.36,
+      "ALE": 5050.037,
+      "FRE": 5073.95,
+      "DIN": 5087.966,
+      "TRU": 5305.168,
+      "COU": 5718.445,
+      "NAKH": 5820.642
+    },
+    "finishers": [
+      "HIL",
+      "SCH",
+      "ALE",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH"
+    ]
+  },
+  "14": {
+    "order": [
+      "ALE",
+      "HIL",
+      "SCH",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH",
+      "FIS",
+      "IRV",
+      "MSCM",
+      "TUE",
+      "VIL",
+      "TAK",
+      "VERO"
+    ],
+    "gaps": {
+      "ALE": 0.0,
+      "HIL": 4.646,
+      "SCH": 4.946,
+      "FRE": 28.283,
+      "DIN": 41.515,
+      "TRU": 255.279,
+      "COU": 679.948,
+      "NAKH": 782.548
+    },
+    "times": {
+      "ALE": 5052.162,
+      "HIL": 5056.808,
+      "SCH": 5057.108,
+      "FRE": 5080.444,
+      "DIN": 5093.677,
+      "TRU": 5307.441,
+      "COU": 5732.11,
+      "NAKH": 5834.71
+    },
+    "finishers": [
+      "ALE",
+      "HIL",
+      "SCH",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH"
+    ]
+  },
+  "15": {
+    "order": [
+      "ALE",
+      "HIL",
+      "SCH",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH",
+      "FIS",
+      "IRV",
+      "MSCM",
+      "TUE",
+      "VIL",
+      "TAK",
+      "VERO"
+    ],
+    "gaps": {
+      "ALE": 0.0,
+      "HIL": 1.442,
+      "SCH": 1.927,
+      "FRE": 32.66,
+      "DIN": 43.612,
+      "TRU": 249.446,
+      "COU": 680.028,
+      "NAKH": 777.411
+    },
+    "times": {
+      "ALE": 5049.75,
+      "HIL": 5051.192,
+      "SCH": 5051.677,
+      "FRE": 5082.41,
+      "DIN": 5093.362,
+      "TRU": 5299.196,
+      "COU": 5729.779,
+      "NAKH": 5827.162
+    },
+    "finishers": [
+      "ALE",
+      "HIL",
+      "SCH",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH"
+    ]
+  },
+  "16": {
+    "order": [
+      "ALE",
+      "HIL",
+      "SCH",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH",
+      "FIS",
+      "IRV",
+      "MSCM",
+      "TUE",
+      "VIL",
+      "TAK",
+      "VERO"
+    ],
+    "gaps": {
+      "ALE": 0.0,
+      "HIL": 10.987,
+      "SCH": 11.287,
+      "FRE": 25.382,
+      "DIN": 43.939,
+      "TRU": 258.667,
+      "COU": 665.621,
+      "NAKH": 779.89
+    },
+    "times": {
+      "ALE": 5047.581,
+      "HIL": 5058.568,
+      "SCH": 5058.868,
+      "FRE": 5072.963,
+      "DIN": 5091.52,
+      "TRU": 5306.248,
+      "COU": 5713.202,
+      "NAKH": 5827.471
+    },
+    "finishers": [
+      "ALE",
+      "HIL",
+      "SCH",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH"
+    ]
+  },
+  "17": {
+    "order": [
+      "ALE",
+      "HIL",
+      "SCH",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH",
+      "FIS",
+      "IRV",
+      "MSCM",
+      "TUE",
+      "VIL",
+      "TAK",
+      "VERO"
+    ],
+    "gaps": {
+      "ALE": 0.0,
+      "HIL": 2.213,
+      "SCH": 2.568,
+      "FRE": 41.915,
+      "DIN": 43.035,
+      "TRU": 259.231,
+      "COU": 686.344,
+      "NAKH": 779.54
+    },
+    "times": {
+      "ALE": 5042.484,
+      "HIL": 5044.697,
+      "SCH": 5045.052,
+      "FRE": 5084.399,
+      "DIN": 5085.518,
+      "TRU": 5301.715,
+      "COU": 5728.827,
+      "NAKH": 5822.024
+    },
+    "finishers": [
+      "ALE",
+      "HIL",
+      "SCH",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH"
+    ]
+  },
+  "18": {
+    "order": [
+      "ALE",
+      "HIL",
+      "SCH",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH",
+      "FIS",
+      "IRV",
+      "MSCM",
+      "TUE",
+      "VIL",
+      "TAK",
+      "VERO"
+    ],
+    "gaps": {
+      "ALE": 0.0,
+      "HIL": 5.106,
+      "SCH": 5.406,
+      "FRE": 19.658,
+      "DIN": 39.394,
+      "TRU": 254.8,
+      "COU": 667.331,
+      "NAKH": 776.129
+    },
+    "times": {
+      "ALE": 5049.028,
+      "HIL": 5054.134,
+      "SCH": 5054.434,
+      "FRE": 5068.686,
+      "DIN": 5088.422,
+      "TRU": 5303.828,
+      "COU": 5716.359,
+      "NAKH": 5825.157
+    },
+    "finishers": [
+      "ALE",
+      "HIL",
+      "SCH",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH"
+    ]
+  },
+  "19": {
+    "order": [
+      "HIL",
+      "SCH",
+      "ALE",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH",
+      "FIS",
+      "IRV",
+      "MSCM",
+      "TUE",
+      "VIL",
+      "TAK",
+      "VERO"
+    ],
+    "gaps": {
+      "HIL": 0.0,
+      "SCH": 0.3,
+      "ALE": 0.6,
+      "FRE": 36.282,
+      "DIN": 40.887,
+      "TRU": 259.182,
+      "COU": 674.502,
+      "NAKH": 779.461
+    },
+    "times": {
+      "HIL": 5050.928,
+      "SCH": 5051.228,
+      "ALE": 5051.528,
+      "FRE": 5087.211,
+      "DIN": 5091.816,
+      "TRU": 5310.111,
+      "COU": 5725.43,
+      "NAKH": 5830.389
+    },
+    "finishers": [
+      "HIL",
+      "SCH",
+      "ALE",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH"
+    ]
+  },
+  "20": {
+    "order": [
+      "ALE",
+      "HIL",
+      "SCH",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH",
+      "FIS",
+      "IRV",
+      "MSCM",
+      "TUE",
+      "VIL",
+      "TAK",
+      "VERO"
+    ],
+    "gaps": {
+      "ALE": 0.0,
+      "HIL": 1.597,
+      "SCH": 2.097,
+      "FRE": 32.776,
+      "DIN": 47.364,
+      "TRU": 265.355,
+      "COU": 686.431,
+      "NAKH": 783.779
+    },
+    "times": {
+      "ALE": 5041.498,
+      "HIL": 5043.095,
+      "SCH": 5043.595,
+      "FRE": 5074.274,
+      "DIN": 5088.862,
+      "TRU": 5306.853,
+      "COU": 5727.928,
+      "NAKH": 5825.276
+    },
+    "finishers": [
+      "ALE",
+      "HIL",
+      "SCH",
+      "FRE",
+      "DIN",
+      "TRU",
+      "COU",
+      "NAKH"
+    ]
+  }
+}

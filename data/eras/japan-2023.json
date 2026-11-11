@@ -1,0 +1,49 @@
+{
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": true,
+    "drs": true,
+    "ers": "hybrid",
+    "refuelling": false
+  },
+  "eras": {
+    "eraId": 10,
+    "order": 4,
+    "userSide": "RUS",
+    "target": {
+      "type": "position",
+      "position": 6
+    },
+    "storyline": {
+      "real": "Verstappen wins by 19.4 s. Russell runs long on his first mediums and stops once while Hamilton stops twice; with five laps left Mercedes swaps them, Sainz passes Russell too, and Russell finishes seventh, 8.3 s behind Hamilton in fifth.",
+      "rewriteCondition": {
+        "type": "position",
+        "position": 6
+      },
+      "headline": "Russell turns Suzuka's split strategy into sixth"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 2,
+      "label": "Finish sixth or better on two stops"
+    },
+    "hidden": {
+      "type": "compound_rule",
+      "mustUse": "SOFT",
+      "label": "Finish sixth or better with a stint on softs"
+    },
+    "hardCalls": {
+      "RUS": 2,
+      "HAM": 1
+    },
+    "briefing": "Suzuka, 2023. Verstappen leads from pole with the two McLarens behind him. You run Russell, eighth after ten laps on mediums, right behind his team-mate Hamilton. Mercedes splits its strategies: get Russell up to sixth or better."
+  },
+  "storylineEvents": [
+    [
+      14,
+      "VSC"
+    ]
+  ]
+}

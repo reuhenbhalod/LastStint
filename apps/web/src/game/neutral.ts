@@ -3,8 +3,8 @@
 // status, the corner from race control); for a crash in live play, that crash. Display only:
 // the race model never sees it.
 
-import type { RaceModel, RaceNote, RaceState } from '@boxthislap/sim';
 import incidents from '@data/incidents.json';
+import type { RaceModel, RaceNote, RaceState } from '@laststint/sim';
 import { driverInfo } from '../data/drivers.js';
 
 export interface Cause {
@@ -64,6 +64,18 @@ export function describeCause(c: Cause): string {
 }
 
 /**
+ * The recorded cause of one of the race's SC/VSC periods, matched on its start lap. A period
+ * that starts on the takeover lap may have been out already (the pipeline cuts a period running
+ * at the takeover to start there): its cause is then the latest of its type at or before it.
+ */
+function causeOf(model: RaceModel, event: { lap: number }, type: string): Cause | undefined {
+  const causes = CAUSES[model.race.id]?.filter((c) => c.type === type) ?? [];
+  const exact = causes.find((c) => c.lap === event.lap);
+  if (exact || event.lap !== model.race.takeoverLap) return exact;
+  return causes.filter((c) => c.lap < event.lap).sort((a, b) => b.lap - a.lap)[0];
+}
+
+/**
  * Why lap `lap` (the lap being driven, under `flag`) is neutralized, or null if it isn't. The
  * race's own SC/VSC first; otherwise a crash in live play in the laps just before.
  */
@@ -79,7 +91,7 @@ export function neutralCause(
     (e) => e.type === type && lap >= e.lap && lap < e.lap + (e.laps ?? 1),
   );
   if (event) {
-    const cause = CAUSES[model.race.id]?.find((c) => c.lap === event.lap && c.type === type);
+    const cause = causeOf(model, event, type);
     return cause ? describeCause(cause) : null;
   }
   const crash = [...notes]
@@ -104,7 +116,7 @@ export function neutralCar(
     (e) => e.type === type && lap >= e.lap && lap < e.lap + (e.laps ?? 1),
   );
   if (!event) return null;
-  const cause = CAUSES[model.race.id]?.find((c) => c.lap === event.lap && c.type === type);
+  const cause = causeOf(model, event, type);
   if (!cause?.driver || model.drivers.some((d) => d.code === cause.driver)) return null;
   return {
     driver: cause.driver,

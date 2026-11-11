@@ -1,0 +1,37 @@
+{
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": true,
+    "drs": true,
+    "ers": "hybrid",
+    "refuelling": false
+  },
+  "eras": {
+    "eraId": 10,
+    "order": 8,
+    "userSide": "VER",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Verstappen is fastest in qualifying but starts sixth after a grid penalty, passes his way to the front and wins by 22.3 s from P\u00e9rez."
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 2,
+      "label": "Win on two stops"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 5,
+      "label": "Win by more than 5 seconds"
+    },
+    "hardCalls": {
+      "VER": 2,
+      "PER": 0
+    },
+    "briefing": "Spa, 2023. Verstappen was fastest in qualifying, but a five-place grid penalty puts him sixth. You run him, second and 2.8 s behind P\u00e9rez after ten laps. A brief shower comes on lap 20. Win it."
+  }
+}

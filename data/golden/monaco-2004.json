@@ -1,0 +1,1022 @@
+{
+  "1": {
+    "order": [
+      "TRU",
+      "BUT",
+      "BAR",
+      "MON",
+      "MAS",
+      "DAMC",
+      "HEI",
+      "PAN",
+      "BAU",
+      "SCH",
+      "MSCM",
+      "ALO",
+      "RAI",
+      "BRUG"
+    ],
+    "gaps": {
+      "TRU": 0.0,
+      "BUT": 18.295,
+      "BAR": 57.283,
+      "MON": 108.883,
+      "MAS": 167.57,
+      "DAMC": 167.87,
+      "HEI": 246.034,
+      "PAN": 284.824,
+      "BAU": 500.468
+    },
+    "times": {
+      "TRU": 4900.693,
+      "BUT": 4918.988,
+      "BAR": 4957.977,
+      "MON": 5009.576,
+      "MAS": 5068.263,
+      "DAMC": 5068.563,
+      "HEI": 5146.727,
+      "PAN": 5185.518,
+      "BAU": 5401.161
+    },
+    "finishers": [
+      "TRU",
+      "BUT",
+      "BAR",
+      "MON",
+      "MAS",
+      "DAMC",
+      "HEI",
+      "PAN",
+      "BAU"
+    ]
+  },
+  "2": {
+    "order": [
+      "TRU",
+      "BUT",
+      "BAR",
+      "MON",
+      "MAS",
+      "DAMC",
+      "HEI",
+      "PAN",
+      "BAU",
+      "SCH",
+      "MSCM",
+      "ALO",
+      "RAI",
+      "BRUG"
+    ],
+    "gaps": {
+      "TRU": 0.0,
+      "BUT": 12.659,
+      "BAR": 68.639,
+      "MON": 142.008,
+      "MAS": 156.833,
+      "DAMC": 157.658,
+      "HEI": 233.175,
+      "PAN": 307.93,
+      "BAU": 495.358
+    },
+    "times": {
+      "TRU": 4908.018,
+      "BUT": 4920.677,
+      "BAR": 4976.657,
+      "MON": 5050.026,
+      "MAS": 5064.851,
+      "DAMC": 5065.676,
+      "HEI": 5141.193,
+      "PAN": 5215.948,
+      "BAU": 5403.376
+    },
+    "finishers": [
+      "TRU",
+      "BUT",
+      "BAR",
+      "MON",
+      "MAS",
+      "DAMC",
+      "HEI",
+      "PAN",
+      "BAU"
+    ]
+  },
+  "3": {
+    "order": [
+      "TRU",
+      "BUT",
+      "BAR",
+      "MON",
+      "MAS",
+      "DAMC",
+      "HEI",
+      "PAN",
+      "BAU",
+      "SCH",
+      "MSCM",
+      "ALO",
+      "RAI",
+      "BRUG"
+    ],
+    "gaps": {
+      "TRU": 0.0,
+      "BUT": 8.519,
+      "BAR": 63.936,
+      "MON": 104.469,
+      "MAS": 152.468,
+      "DAMC": 156.547,
+      "HEI": 231.918,
+      "PAN": 279.217,
+      "BAU": 473.939
+    },
+    "times": {
+      "TRU": 4900.775,
+      "BUT": 4909.294,
+      "BAR": 4964.711,
+      "MON": 5005.244,
+      "MAS": 5053.242,
+      "DAMC": 5057.322,
+      "HEI": 5132.692,
+      "PAN": 5179.992,
+      "BAU": 5374.714
+    },
+    "finishers": [
+      "TRU",
+      "BUT",
+      "BAR",
+      "MON",
+      "MAS",
+      "DAMC",
+      "HEI",
+      "PAN",
+      "BAU"
+    ]
+  },
+  "4": {
+    "order": [
+      "TRU",
+      "BUT",
+      "BAR",
+      "MON",
+      "DAMC",
+      "MAS",
+      "HEI",
+      "PAN",
+      "BAU",
+      "SCH",
+      "MSCM",
+      "ALO",
+      "RAI",
+      "BRUG"
+    ],
+    "gaps": {
+      "TRU": 0.0,
+      "BUT": 5.195,
+      "BAR": 72.835,
+      "MON": 111.488,
+      "DAMC": 149.28,
+      "MAS": 156.465,
+      "HEI": 235.769,
+      "PAN": 311.091,
+      "BAU": 539.132
+    },
+    "times": {
+      "TRU": 4887.767,
+      "BUT": 4892.962,
+      "BAR": 4960.602,
+      "MON": 4999.255,
+      "DAMC": 5037.047,
+      "MAS": 5044.232,
+      "HEI": 5123.536,
+      "PAN": 5198.858,
+      "BAU": 5426.899
+    },
+    "finishers": [
+      "TRU",
+      "BUT",
+      "BAR",
+      "MON",
+      "DAMC",
+      "MAS",
+      "HEI",
+      "PAN",
+      "BAU"
+    ]
+  },
+  "5": {
+    "order": [
+      "BUT",
+      "TRU",
+      "BAR",
+      "MON",
+      "MAS",
+      "DAMC",
+      "HEI",
+      "PAN",
+      "BAU",
+      "SCH",
+      "MSCM",
+      "ALO",
+      "RAI",
+      "BRUG"
+    ],
+    "gaps": {
+      "BUT": 0.0,
+      "TRU": 11.855,
+      "BAR": 69.861,
+      "MON": 116.968,
+      "MAS": 159.538,
+      "DAMC": 159.838,
+      "HEI": 233.019,
+      "PAN": 288.761,
+      "BAU": 529.432
+    },
+    "times": {
+      "BUT": 4890.59,
+      "TRU": 4902.444,
+      "BAR": 4960.451,
+      "MON": 5007.558,
+      "MAS": 5050.128,
+      "DAMC": 5050.428,
+      "HEI": 5123.609,
+      "PAN": 5179.351,
+      "BAU": 5420.022
+    },
+    "finishers": [
+      "BUT",
+      "TRU",
+      "BAR",
+      "MON",
+      "MAS",
+      "DAMC",
+      "HEI",
+      "PAN",
+      "BAU"
+    ]
+  },
+  "6": {
+    "order": [
+      "TRU",
+      "BUT",
+      "BAR",
+      "MAS",
+      "MON",
+      "DAMC",
+      "HEI",
+      "PAN",
+      "BAU",
+      "SCH",
+      "MSCM",
+      "ALO",
+      "RAI",
+      "BRUG"
+    ],
+    "gaps": {
+      "TRU": 0.0,
+      "BUT": 5.056,
+      "BAR": 80.919,
+      "MAS": 139.816,
+      "MON": 142.16,
+      "DAMC": 157.185,
+      "HEI": 223.072,
+      "PAN": 292.95,
+      "BAU": 505.308
+    },
+    "times": {
+      "TRU": 4900.044,
+      "BUT": 4905.1,
+      "BAR": 4980.963,
+      "MAS": 5039.86,
+      "MON": 5042.205,
+      "DAMC": 5057.229,
+      "HEI": 5123.116,
+      "PAN": 5192.994,
+      "BAU": 5405.352
+    },
+    "finishers": [
+      "TRU",
+      "BUT",
+      "BAR",
+      "MAS",
+      "MON",
+      "DAMC",
+      "HEI",
+      "PAN",
+      "BAU"
+    ]
+  },
+  "7": {
+    "order": [
+      "TRU",
+      "BUT",
+      "BAR",
+      "MON",
+      "MAS",
+      "DAMC",
+      "HEI",
+      "PAN",
+      "BAU",
+      "SCH",
+      "MSCM",
+      "ALO",
+      "RAI",
+      "BRUG"
+    ],
+    "gaps": {
+      "TRU": 0.0,
+      "BUT": 3.094,
+      "BAR": 84.25,
+      "MON": 103.002,
+      "MAS": 145.705,
+      "DAMC": 146.005,
+      "HEI": 208.498,
+      "PAN": 283.288,
+      "BAU": 506.556
+    },
+    "times": {
+      "TRU": 4900.859,
+      "BUT": 4903.953,
+      "BAR": 4985.109,
+      "MON": 5003.861,
+      "MAS": 5046.564,
+      "DAMC": 5046.864,
+      "HEI": 5109.357,
+      "PAN": 5184.147,
+      "BAU": 5407.415
+    },
+    "finishers": [
+      "TRU",
+      "BUT",
+      "BAR",
+      "MON",
+      "MAS",
+      "DAMC",
+      "HEI",
+      "PAN",
+      "BAU"
+    ]
+  },
+  "8": {
+    "order": [
+      "TRU",
+      "BUT",
+      "BAR",
+      "MON",
+      "DAMC",
+      "MAS",
+      "HEI",
+      "PAN",
+      "BAU",
+      "SCH",
+      "MSCM",
+      "ALO",
+      "RAI",
+      "BRUG"
+    ],
+    "gaps": {
+      "TRU": 0.0,
+      "BUT": 6.556,
+      "BAR": 54.908,
+      "MON": 99.788,
+      "DAMC": 146.604,
+      "MAS": 147.26,
+      "HEI": 228.994,
+      "PAN": 297.194,
+      "BAU": 503.965
+    },
+    "times": {
+      "TRU": 4900.503,
+      "BUT": 4907.058,
+      "BAR": 4955.411,
+      "MON": 5000.291,
+      "DAMC": 5047.107,
+      "MAS": 5047.763,
+      "HEI": 5129.496,
+      "PAN": 5197.697,
+      "BAU": 5404.468
+    },
+    "finishers": [
+      "TRU",
+      "BUT",
+      "BAR",
+      "MON",
+      "DAMC",
+      "MAS",
+      "HEI",
+      "PAN",
+      "BAU"
+    ]
+  },
+  "9": {
+    "order": [
+      "TRU",
+      "BUT",
+      "BAR",
+      "MON",
+      "MAS",
+      "DAMC",
+      "HEI",
+      "PAN",
+      "BAU",
+      "SCH",
+      "MSCM",
+      "ALO",
+      "RAI",
+      "BRUG"
+    ],
+    "gaps": {
+      "TRU": 0.0,
+      "BUT": 4.704,
+      "BAR": 72.576,
+      "MON": 140.309,
+      "MAS": 152.291,
+      "DAMC": 152.591,
+      "HEI": 224.341,
+      "PAN": 296.897,
+      "BAU": 497.953
+    },
+    "times": {
+      "TRU": 4903.866,
+      "BUT": 4908.571,
+      "BAR": 4976.442,
+      "MON": 5044.175,
+      "MAS": 5056.157,
+      "DAMC": 5056.457,
+      "HEI": 5128.207,
+      "PAN": 5200.764,
+      "BAU": 5401.82
+    },
+    "finishers": [
+      "TRU",
+      "BUT",
+      "BAR",
+      "MON",
+      "MAS",
+      "DAMC",
+      "HEI",
+      "PAN",
+      "BAU"
+    ]
+  },
+  "10": {
+    "order": [
+      "TRU",
+      "BUT",
+      "BAR",
+      "MON",
+      "MAS",
+      "DAMC",
+      "HEI",
+      "PAN",
+      "BAU",
+      "SCH",
+      "MSCM",
+      "ALO",
+      "RAI",
+      "BRUG"
+    ],
+    "gaps": {
+      "TRU": 0.0,
+      "BUT": 2.18,
+      "BAR": 52.005,
+      "MON": 99.532,
+      "MAS": 140.745,
+      "DAMC": 141.369,
+      "HEI": 219.884,
+      "PAN": 270.435,
+      "BAU": 504.796
+    },
+    "times": {
+      "TRU": 4908.026,
+      "BUT": 4910.206,
+      "BAR": 4960.031,
+      "MON": 5007.558,
+      "MAS": 5048.771,
+      "DAMC": 5049.395,
+      "HEI": 5127.91,
+      "PAN": 5178.46,
+      "BAU": 5412.822
+    },
+    "finishers": [
+      "TRU",
+      "BUT",
+      "BAR",
+      "MON",
+      "MAS",
+      "DAMC",
+      "HEI",
+      "PAN",
+      "BAU"
+    ]
+  },
+  "11": {
+    "order": [
+      "TRU",
+      "BUT",
+      "BAR",
+      "MON",
+      "DAMC",
+      "MAS",
+      "HEI",
+      "PAN",
+      "BAU",
+      "SCH",
+      "MSCM",
+      "ALO",
+      "RAI",
+      "BRUG"
+    ],
+    "gaps": {
+      "TRU": 0.0,
+      "BUT": 4.269,
+      "BAR": 52.533,
+      "MON": 91.772,
+      "DAMC": 130.032,
+      "MAS": 137.978,
+      "HEI": 211.031,
+      "PAN": 273.343,
+      "BAU": 477.007
+    },
+    "times": {
+      "TRU": 4909.642,
+      "BUT": 4913.912,
+      "BAR": 4962.175,
+      "MON": 5001.414,
+      "DAMC": 5039.674,
+      "MAS": 5047.62,
+      "HEI": 5120.674,
+      "PAN": 5182.985,
+      "BAU": 5386.65
+    },
+    "finishers": [
+      "TRU",
+      "BUT",
+      "BAR",
+      "MON",
+      "DAMC",
+      "MAS",
+      "HEI",
+      "PAN",
+      "BAU"
+    ]
+  },
+  "12": {
+    "order": [
+      "TRU",
+      "BUT",
+      "BAR",
+      "MON",
+      "MAS",
+      "DAMC",
+      "HEI",
+      "PAN",
+      "BAU",
+      "SCH",
+      "MSCM",
+      "ALO",
+      "RAI",
+      "BRUG"
+    ],
+    "gaps": {
+      "TRU": 0.0,
+      "BUT": 16.243,
+      "BAR": 71.361,
+      "MON": 119.992,
+      "MAS": 161.3,
+      "DAMC": 161.6,
+      "HEI": 243.234,
+      "PAN": 342.41,
+      "BAU": 515.877
+    },
+    "times": {
+      "TRU": 4884.297,
+      "BUT": 4900.54,
+      "BAR": 4955.658,
+      "MON": 5004.289,
+      "MAS": 5045.597,
+      "DAMC": 5045.897,
+      "HEI": 5127.531,
+      "PAN": 5226.707,
+      "BAU": 5400.174
+    },
+    "finishers": [
+      "TRU",
+      "BUT",
+      "BAR",
+      "MON",
+      "MAS",
+      "DAMC",
+      "HEI",
+      "PAN",
+      "BAU"
+    ]
+  },
+  "13": {
+    "order": [
+      "TRU",
+      "BUT",
+      "BAR",
+      "MON",
+      "MAS",
+      "DAMC",
+      "HEI",
+      "PAN",
+      "BAU",
+      "SCH",
+      "MSCM",
+      "ALO",
+      "RAI",
+      "BRUG"
+    ],
+    "gaps": {
+      "TRU": 0.0,
+      "BUT": 2.773,
+      "BAR": 68.257,
+      "MON": 115.141,
+      "MAS": 157.151,
+      "DAMC": 157.451,
+      "HEI": 229.929,
+      "PAN": 324.2,
+      "BAU": 501.068
+    },
+    "times": {
+      "TRU": 4902.887,
+      "BUT": 4905.661,
+      "BAR": 4971.144,
+      "MON": 5018.029,
+      "MAS": 5060.038,
+      "DAMC": 5060.338,
+      "HEI": 5132.816,
+      "PAN": 5227.087,
+      "BAU": 5403.955
+    },
+    "finishers": [
+      "TRU",
+      "BUT",
+      "BAR",
+      "MON",
+      "MAS",
+      "DAMC",
+      "HEI",
+      "PAN",
+      "BAU"
+    ]
+  },
+  "14": {
+    "order": [
+      "TRU",
+      "BUT",
+      "BAR",
+      "MON",
+      "DAMC",
+      "MAS",
+      "HEI",
+      "PAN",
+      "BAU",
+      "SCH",
+      "MSCM",
+      "ALO",
+      "RAI",
+      "BRUG"
+    ],
+    "gaps": {
+      "TRU": 0.0,
+      "BUT": 4.783,
+      "BAR": 61.115,
+      "MON": 127.571,
+      "DAMC": 144.56,
+      "MAS": 153.562,
+      "HEI": 238.102,
+      "PAN": 291.753,
+      "BAU": 502.112
+    },
+    "times": {
+      "TRU": 4903.322,
+      "BUT": 4908.105,
+      "BAR": 4964.438,
+      "MON": 5030.893,
+      "DAMC": 5047.882,
+      "MAS": 5056.884,
+      "HEI": 5141.425,
+      "PAN": 5195.075,
+      "BAU": 5405.434
+    },
+    "finishers": [
+      "TRU",
+      "BUT",
+      "BAR",
+      "MON",
+      "DAMC",
+      "MAS",
+      "HEI",
+      "PAN",
+      "BAU"
+    ]
+  },
+  "15": {
+    "order": [
+      "TRU",
+      "BUT",
+      "BAR",
+      "MON",
+      "DAMC",
+      "MAS",
+      "HEI",
+      "PAN",
+      "BAU",
+      "SCH",
+      "MSCM",
+      "ALO",
+      "RAI",
+      "BRUG"
+    ],
+    "gaps": {
+      "TRU": 0.0,
+      "BUT": 3.018,
+      "BAR": 64.85,
+      "MON": 120.276,
+      "DAMC": 147.922,
+      "MAS": 157.807,
+      "HEI": 221.22,
+      "PAN": 294.965,
+      "BAU": 496.036
+    },
+    "times": {
+      "TRU": 4899.943,
+      "BUT": 4902.961,
+      "BAR": 4964.793,
+      "MON": 5020.219,
+      "DAMC": 5047.865,
+      "MAS": 5057.75,
+      "HEI": 5121.163,
+      "PAN": 5194.908,
+      "BAU": 5395.979
+    },
+    "finishers": [
+      "TRU",
+      "BUT",
+      "BAR",
+      "MON",
+      "DAMC",
+      "MAS",
+      "HEI",
+      "PAN",
+      "BAU"
+    ]
+  },
+  "16": {
+    "order": [
+      "TRU",
+      "BUT",
+      "BAR",
+      "MON",
+      "DAMC",
+      "MAS",
+      "HEI",
+      "PAN",
+      "BAU",
+      "SCH",
+      "MSCM",
+      "ALO",
+      "RAI",
+      "BRUG"
+    ],
+    "gaps": {
+      "TRU": 0.0,
+      "BUT": 2.75,
+      "BAR": 67.076,
+      "MON": 129.69,
+      "DAMC": 153.625,
+      "MAS": 161.362,
+      "HEI": 229.381,
+      "PAN": 289.388,
+      "BAU": 498.659
+    },
+    "times": {
+      "TRU": 4901.429,
+      "BUT": 4904.179,
+      "BAR": 4968.506,
+      "MON": 5031.119,
+      "DAMC": 5055.055,
+      "MAS": 5062.792,
+      "HEI": 5130.81,
+      "PAN": 5190.818,
+      "BAU": 5400.089
+    },
+    "finishers": [
+      "TRU",
+      "BUT",
+      "BAR",
+      "MON",
+      "DAMC",
+      "MAS",
+      "HEI",
+      "PAN",
+      "BAU"
+    ]
+  },
+  "17": {
+    "order": [
+      "TRU",
+      "BUT",
+      "BAR",
+      "MON",
+      "MAS",
+      "DAMC",
+      "HEI",
+      "PAN",
+      "BAU",
+      "SCH",
+      "MSCM",
+      "ALO",
+      "RAI",
+      "BRUG"
+    ],
+    "gaps": {
+      "TRU": 0.0,
+      "BUT": 3.196,
+      "BAR": 62.191,
+      "MON": 113.882,
+      "MAS": 151.019,
+      "DAMC": 153.527,
+      "HEI": 237.841,
+      "PAN": 291.239,
+      "BAU": 503.212
+    },
+    "times": {
+      "TRU": 4919.024,
+      "BUT": 4922.22,
+      "BAR": 4981.215,
+      "MON": 5032.906,
+      "MAS": 5070.043,
+      "DAMC": 5072.551,
+      "HEI": 5156.865,
+      "PAN": 5210.263,
+      "BAU": 5422.236
+    },
+    "finishers": [
+      "TRU",
+      "BUT",
+      "BAR",
+      "MON",
+      "MAS",
+      "DAMC",
+      "HEI",
+      "PAN",
+      "BAU"
+    ]
+  },
+  "18": {
+    "order": [
+      "TRU",
+      "BUT",
+      "BAR",
+      "MON",
+      "MAS",
+      "DAMC",
+      "HEI",
+      "PAN",
+      "BAU",
+      "SCH",
+      "MSCM",
+      "ALO",
+      "RAI",
+      "BRUG"
+    ],
+    "gaps": {
+      "TRU": 0.0,
+      "BUT": 8.428,
+      "BAR": 71.829,
+      "MON": 111.0,
+      "MAS": 158.11,
+      "DAMC": 158.677,
+      "HEI": 229.548,
+      "PAN": 289.063,
+      "BAU": 504.713
+    },
+    "times": {
+      "TRU": 4906.423,
+      "BUT": 4914.851,
+      "BAR": 4978.252,
+      "MON": 5017.423,
+      "MAS": 5064.533,
+      "DAMC": 5065.1,
+      "HEI": 5135.971,
+      "PAN": 5195.486,
+      "BAU": 5411.136
+    },
+    "finishers": [
+      "TRU",
+      "BUT",
+      "BAR",
+      "MON",
+      "MAS",
+      "DAMC",
+      "HEI",
+      "PAN",
+      "BAU"
+    ]
+  },
+  "19": {
+    "order": [
+      "TRU",
+      "BUT",
+      "BAR",
+      "MON",
+      "DAMC",
+      "MAS",
+      "HEI",
+      "PAN",
+      "BAU",
+      "SCH",
+      "MSCM",
+      "ALO",
+      "RAI",
+      "BRUG"
+    ],
+    "gaps": {
+      "TRU": 0.0,
+      "BUT": 3.889,
+      "BAR": 56.69,
+      "MON": 120.542,
+      "DAMC": 142.951,
+      "MAS": 144.416,
+      "HEI": 228.341,
+      "PAN": 302.495,
+      "BAU": 496.334
+    },
+    "times": {
+      "TRU": 4907.529,
+      "BUT": 4911.418,
+      "BAR": 4964.219,
+      "MON": 5028.071,
+      "DAMC": 5050.48,
+      "MAS": 5051.945,
+      "HEI": 5135.87,
+      "PAN": 5210.024,
+      "BAU": 5403.863
+    },
+    "finishers": [
+      "TRU",
+      "BUT",
+      "BAR",
+      "MON",
+      "DAMC",
+      "MAS",
+      "HEI",
+      "PAN",
+      "BAU"
+    ]
+  },
+  "20": {
+    "order": [
+      "BUT",
+      "TRU",
+      "BAR",
+      "MON",
+      "MAS",
+      "DAMC",
+      "HEI",
+      "PAN",
+      "BAU",
+      "SCH",
+      "MSCM",
+      "ALO",
+      "RAI",
+      "BRUG"
+    ],
+    "gaps": {
+      "BUT": 0.0,
+      "TRU": 8.959,
+      "BAR": 69.815,
+      "MON": 137.748,
+      "MAS": 153.949,
+      "DAMC": 154.249,
+      "HEI": 227.528,
+      "PAN": 303.01,
+      "BAU": 504.409
+    },
+    "times": {
+      "BUT": 4892.034,
+      "TRU": 4900.994,
+      "BAR": 4961.849,
+      "MON": 5029.782,
+      "MAS": 5045.984,
+      "DAMC": 5046.284,
+      "HEI": 5119.562,
+      "PAN": 5195.045,
+      "BAU": 5396.443
+    },
+    "finishers": [
+      "BUT",
+      "TRU",
+      "BAR",
+      "MON",
+      "MAS",
+      "DAMC",
+      "HEI",
+      "PAN",
+      "BAU"
+    ]
+  }
+}

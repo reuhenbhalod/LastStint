@@ -1,0 +1,55 @@
+{
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": true,
+    "drs": true,
+    "ers": "hybrid",
+    "refuelling": false
+  },
+  "eras": {
+    "eraId": 8,
+    "order": 2,
+    "userSide": "VET",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Hamilton leads from pole. R\u00e4ikk\u00f6nen and then Hamilton stop early for softs while Vettel stays out. Both Haas cars retire after their stops with loosely fitted wheels, and under the virtual safety car for Grosjean's car Vettel makes his only stop and comes out ahead of Hamilton. Hamilton stays second to the flag, and Vettel wins by 5.036 s."
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 1,
+      "label": "Win on one stop, as Vettel did"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 3,
+      "label": "Win by more than 3 seconds"
+    },
+    "hardCalls": {
+      "VET": 2,
+      "HAM": 0
+    },
+    "briefing": "Melbourne, 2018. Hamilton leads from pole with R\u00e4ikk\u00f6nen second, and you run Vettel in third, sixteen laps in. R\u00e4ikk\u00f6nen and Hamilton will stop before you. Cover them or stay out longer, and find a way to come out ahead of Hamilton without having to pass him on the track."
+  },
+  "storylineEvents": [
+    [
+      23,
+      "RETIREMENT"
+    ],
+    [
+      25,
+      "RETIREMENT"
+    ],
+    [
+      26,
+      "VSC"
+    ],
+    [
+      28,
+      "SC"
+    ]
+  ]
+}

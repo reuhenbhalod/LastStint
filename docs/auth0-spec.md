@@ -9,7 +9,7 @@ Tickets 22 ("Improve auth and its UI") and 33 ("Add username and favourite team 
 | A1 | Ways to sign in | **Google, or email and password.** These are Auth0's `google-oauth2` and `Username-Password-Authentication` connections. Auth0 handles email verification and password resets. |
 | A2 | Existing Google accounts | **Linked automatically.** An Auth0 Google user's `sub` is `google-oauth2\|<Google ID>`. The Worker strips the prefix, so the user finds their existing account (keyed by Google ID), and their streak and runs carry over. |
 | A3 | The old Google button | **Replaced.** One "Sign in" button opens Auth0's login page, with Google as one of its options. |
-| A4 | Profile | **Display name and favourite team at sign-up.** After a first sign-in, or for an account without a display name, the game asks for both. The name shows on the leaderboard, and the team's colour themes the home page. Both can be changed later from the account bar. |
+| A4 | Profile | **Display name and favourite team at sign-up.** After a first sign-in, or for an account without a display name, the game asks for both. The name shows on the leaderboard, and the team's colour goes on the top bar's buttons (the race and its card keep the colours of the team you race for). Both can be changed later from the account bar. |
 
 ## Worker
 
@@ -37,7 +37,7 @@ Tickets 22 ("Improve auth and its UI") and 33 ("Add username and favourite team 
 - **Profile sheet:**
   - Fields: display name and favourite team (the current grid's teams).
   - It opens after a first sign-in or when `needsProfile`, and from "Edit profile" in the account bar.
-  - The favourite team's colour becomes the home page accent.
+  - The favourite team's colour goes on the top bar's buttons only; the race card and the race use the colours of the team you race for.
 
 ## Setup (the owner, in the Auth0 dashboard)
 

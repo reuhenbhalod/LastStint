@@ -1,5 +1,5 @@
 // Moment finder CLI (perfection spec D4):
-//   pnpm --filter @boxthislap/sim moments <race-id> [--samples N] [--hold P]
+//   pnpm --filter @laststint/sim moments <race-id> [--samples N] [--hold P]
 // (--hold P grades on finishing P or better instead of beating the rival.)
 // Grades every candidate decision moment from the real race's state, prints the verdicts, and
 // writes the ones that pass the plan 5.3 quality bar to data/moments/proposed/<race-id>.json.

@@ -1,0 +1,7479 @@
+{
+ "models": {
+  "spain-2021": {
+   "schemaVersion": 11,
+   "race": {
+    "id": "spain-2021",
+    "name": "Spain 2021: Hamilton vs Verstappen",
+    "laps": 66,
+    "takeoverLap": 20,
+    "seed": 49123
+   },
+   "era": "2014-2025",
+   "track": {
+    "pitLoss": 22.917,
+    "pitLossUnderSC": 12.604,
+    "pitLossUnderVSC": 15.813,
+    "pitLossDeviations": [
+     -4.061,
+     -2.718,
+     -2.628,
+     -2.452,
+     -1.686,
+     -1.453,
+     -1.142,
+     -1.029,
+     -0.869,
+     -0.819,
+     -0.79,
+     -0.753,
+     -0.701,
+     -0.652,
+     -0.236,
+     -0.232,
+     -0.179,
+     0.179,
+     0.303,
+     0.709,
+     0.714,
+     0.85,
+     1.258,
+     1.269,
+     1.727,
+     2.35,
+     2.653,
+     3.268,
+     3.357,
+     3.478,
+     3.513,
+     3.653,
+     6.93,
+     8.146
+    ],
+    "overtakeDifficulty": 0.9232,
+    "overtakeModel": {
+     "intercept": -0.1323,
+     "paceCoef": 1.8366,
+     "gapCoef": -3.8725,
+     "trainCoef": -0.9007
+    },
+    "dirtyAirPenalty": 0.4364,
+    "dirtyAirBands": [
+     {
+      "upTo": 0.5,
+      "penalty": 0.9727
+     },
+     {
+      "upTo": 1.0,
+      "penalty": 0.6524
+     },
+     {
+      "upTo": 1.5,
+      "penalty": 0.2495
+     },
+     {
+      "upTo": 2.0,
+      "penalty": 0.062
+     }
+    ],
+    "greenLapTime": 84.114,
+    "scLapTime": 117.318
+   },
+   "compounds": {
+    "SOFT": {
+     "offset": 0.0,
+     "degPerLap": 0.06058,
+     "cliffLap": 32,
+     "provenLaps": 32
+    },
+    "MEDIUM": {
+     "offset": 0.2234,
+     "degPerLap": 0.04189,
+     "cliffLap": 23,
+     "cliffDegPerLap": 0.1306,
+     "provenLaps": 42
+    }
+   },
+   "drivers": [
+    {
+     "code": "ALO",
+     "team": "Alpine",
+     "basePace": 85.2118,
+     "noise": 0.2928,
+     "stateAtTakeover": {
+      "position": 11,
+      "gapAhead": 1.549,
+      "compound": "SOFT",
+      "tyreAge": 23,
+      "compoundsUsed": [
+       "SOFT"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 22,
+       "to": "MEDIUM",
+       "loss": 20.894
+      },
+      {
+       "lap": 62,
+       "to": "SOFT",
+       "loss": 29.96
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 22,
+       "offset": 0.043
+      },
+      {
+       "lap": 62,
+       "offset": -0.114
+      }
+     ]
+    },
+    {
+     "code": "BOT",
+     "team": "Mercedes",
+     "basePace": 83.5498,
+     "noise": 0.4317,
+     "stateAtTakeover": {
+      "position": 4,
+      "gapAhead": 1.121,
+      "compound": "SOFT",
+      "tyreAge": 23,
+      "compoundsUsed": [
+       "SOFT"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 24,
+       "to": "MEDIUM",
+       "loss": 21.501
+      },
+      {
+       "lap": 54,
+       "to": "SOFT",
+       "loss": 23.745
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 24,
+       "offset": -0.106
+      },
+      {
+       "lap": 54,
+       "offset": 0.22
+      }
+     ]
+    },
+    {
+     "code": "GAS",
+     "team": "AlphaTauri",
+     "basePace": 85.1224,
+     "noise": 0.7657,
+     "stateAtTakeover": {
+      "position": 19,
+      "gapAhead": 6.354,
+      "compound": "MEDIUM",
+      "tyreAge": 2,
+      "compoundsUsed": [
+       "MEDIUM",
+       "SOFT"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 48,
+       "to": "SOFT",
+       "loss": 26.256
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 0,
+       "offset": -0.08
+      },
+      {
+       "lap": 48,
+       "offset": 0.097
+      }
+     ]
+    },
+    {
+     "code": "GIO",
+     "team": "Alfa Romeo Racing",
+     "basePace": 85.4171,
+     "noise": 0.516,
+     "stateAtTakeover": {
+      "position": 16,
+      "gapAhead": 2.272,
+      "compound": "MEDIUM",
+      "tyreAge": 15,
+      "compoundsUsed": [
+       "MEDIUM",
+       "SOFT"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 40,
+       "to": "SOFT",
+       "loss": 27.409
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 0,
+       "offset": 0.336
+      },
+      {
+       "lap": 40,
+       "offset": -0.217
+      }
+     ]
+    },
+    {
+     "code": "HAM",
+     "team": "Mercedes",
+     "basePace": 82.9783,
+     "noise": 0.2485,
+     "stateAtTakeover": {
+      "position": 2,
+      "gapAhead": 1.533,
+      "compound": "SOFT",
+      "tyreAge": 24,
+      "compoundsUsed": [
+       "SOFT"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 29,
+       "to": "MEDIUM",
+       "loss": 22.742
+      },
+      {
+       "lap": 43,
+       "to": "MEDIUM",
+       "loss": 22.641
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 0,
+       "offset": 0.064
+      },
+      {
+       "lap": 29,
+       "offset": -0.028
+      },
+      {
+       "lap": 43,
+       "offset": 0.007
+      }
+     ]
+    },
+    {
+     "code": "LAT",
+     "team": "Williams",
+     "basePace": 85.8324,
+     "noise": 0.5718,
+     "stateAtTakeover": {
+      "position": 15,
+      "gapAhead": 2.713,
+      "compound": "MEDIUM",
+      "tyreAge": 11,
+      "compoundsUsed": [
+       "MEDIUM",
+       "SOFT"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 28,
+       "to": "MEDIUM",
+       "loss": 22.038
+      },
+      {
+       "lap": 51,
+       "to": "SOFT",
+       "loss": 24.029
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 0,
+       "offset": -0.052
+      },
+      {
+       "lap": 28,
+       "offset": 0.003
+      },
+      {
+       "lap": 51,
+       "offset": -0.038
+      }
+     ]
+    },
+    {
+     "code": "LEC",
+     "team": "Ferrari",
+     "basePace": 84.0519,
+     "noise": 0.3073,
+     "stateAtTakeover": {
+      "position": 3,
+      "gapAhead": 6.16,
+      "compound": "SOFT",
+      "tyreAge": 23,
+      "compoundsUsed": [
+       "SOFT"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 29,
+       "to": "MEDIUM",
+       "loss": 22.927
+      },
+      {
+       "lap": 59,
+       "to": "SOFT",
+       "loss": 23.211,
+       "optional": true
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 0,
+       "offset": -0.102
+      },
+      {
+       "lap": 29,
+       "offset": 0.011
+      },
+      {
+       "lap": 59,
+       "offset": 0.154
+      }
+     ]
+    },
+    {
+     "code": "MAZ",
+     "team": "Haas F1 Team",
+     "basePace": 87.0187,
+     "noise": 0.6927,
+     "stateAtTakeover": {
+      "position": 18,
+      "gapAhead": 4.199,
+      "compound": "SOFT",
+      "tyreAge": 20,
+      "compoundsUsed": [
+       "SOFT"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 23,
+       "to": "MEDIUM",
+       "loss": 25.893
+      },
+      {
+       "lap": 43,
+       "to": "MEDIUM",
+       "loss": 24.223
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 23,
+       "offset": -0.312
+      },
+      {
+       "lap": 43,
+       "offset": 0.272
+      }
+     ]
+    },
+    {
+     "code": "MSC",
+     "team": "Haas F1 Team",
+     "basePace": 85.9852,
+     "noise": 0.8037,
+     "stateAtTakeover": {
+      "position": 17,
+      "gapAhead": 4.302,
+      "compound": "SOFT",
+      "tyreAge": 20,
+      "compoundsUsed": [
+       "SOFT"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 24,
+       "to": "MEDIUM",
+       "loss": 25.248
+      },
+      {
+       "lap": 51,
+       "to": "MEDIUM",
+       "loss": 22.55
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 24,
+       "offset": -0.114
+      },
+      {
+       "lap": 51,
+       "offset": 0.216
+      }
+     ]
+    },
+    {
+     "code": "NOR",
+     "team": "McLaren",
+     "basePace": 85.0322,
+     "noise": 0.7774,
+     "stateAtTakeover": {
+      "position": 9,
+      "gapAhead": 2.305,
+      "compound": "SOFT",
+      "tyreAge": 23,
+      "compoundsUsed": [
+       "SOFT"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 24,
+       "to": "MEDIUM",
+       "loss": 21.599
+      },
+      {
+       "lap": 52,
+       "to": "SOFT",
+       "loss": 21.836
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 24,
+       "offset": -0.007
+      },
+      {
+       "lap": 52,
+       "offset": 0.112
+      }
+     ]
+    },
+    {
+     "code": "OCO",
+     "team": "Alpine",
+     "basePace": 85.0807,
+     "noise": 0.5174,
+     "stateAtTakeover": {
+      "position": 7,
+      "gapAhead": 3.704,
+      "compound": "SOFT",
+      "tyreAge": 23,
+      "compoundsUsed": [
+       "SOFT"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 24,
+       "to": "MEDIUM",
+       "loss": 21.737
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 24,
+       "offset": 0.04
+      }
+     ]
+    },
+    {
+     "code": "PER",
+     "team": "Red Bull Racing",
+     "basePace": 84.0885,
+     "noise": 0.4892,
+     "stateAtTakeover": {
+      "position": 6,
+      "gapAhead": 1.166,
+      "compound": "SOFT",
+      "tyreAge": 23,
+      "compoundsUsed": [
+       "SOFT"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 28,
+       "to": "MEDIUM",
+       "loss": 22.722
+      },
+      {
+       "lap": 58,
+       "to": "SOFT",
+       "loss": 23.174,
+       "optional": true
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 0,
+       "offset": 0.125
+      },
+      {
+       "lap": 28,
+       "offset": -0.027
+      },
+      {
+       "lap": 58,
+       "offset": -0.058
+      }
+     ]
+    },
+    {
+     "code": "RAI",
+     "team": "Alfa Romeo Racing",
+     "basePace": 85.2411,
+     "noise": 0.5458,
+     "stateAtTakeover": {
+      "position": 13,
+      "gapAhead": 2.143,
+      "compound": "MEDIUM",
+      "tyreAge": 20,
+      "compoundsUsed": [
+       "MEDIUM"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 38,
+       "to": "SOFT",
+       "loss": 24.651
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 0,
+       "offset": -0.412
+      },
+      {
+       "lap": 38,
+       "offset": 0.24
+      }
+     ]
+    },
+    {
+     "code": "RIC",
+     "team": "McLaren",
+     "basePace": 84.4943,
+     "noise": 0.2599,
+     "stateAtTakeover": {
+      "position": 5,
+      "gapAhead": 7.788,
+      "compound": "SOFT",
+      "tyreAge": 23,
+      "compoundsUsed": [
+       "SOFT"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 26,
+       "to": "MEDIUM",
+       "loss": 22.113
+      },
+      {
+       "lap": 47,
+       "to": "SOFT",
+       "loss": 24.096
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 0,
+       "offset": -0.102
+      },
+      {
+       "lap": 26,
+       "offset": -0.051
+      },
+      {
+       "lap": 47,
+       "offset": 0.13
+      }
+     ]
+    },
+    {
+     "code": "RUS",
+     "team": "Williams",
+     "basePace": 85.7064,
+     "noise": 0.6412,
+     "stateAtTakeover": {
+      "position": 14,
+      "gapAhead": 1.769,
+      "compound": "MEDIUM",
+      "tyreAge": 11,
+      "compoundsUsed": [
+       "MEDIUM",
+       "SOFT"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 29,
+       "to": "MEDIUM",
+       "loss": 19.09
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 0,
+       "offset": -0.072
+      },
+      {
+       "lap": 29,
+       "offset": 0.023
+      }
+     ]
+    },
+    {
+     "code": "SAI",
+     "team": "Ferrari",
+     "basePace": 84.4075,
+     "noise": 0.5218,
+     "stateAtTakeover": {
+      "position": 8,
+      "gapAhead": 1.386,
+      "compound": "SOFT",
+      "tyreAge": 23,
+      "compoundsUsed": [
+       "SOFT"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 23,
+       "to": "MEDIUM",
+       "loss": 21.371
+      },
+      {
+       "lap": 47,
+       "to": "SOFT",
+       "loss": 22.747
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 23,
+       "offset": -0.057
+      },
+      {
+       "lap": 47,
+       "offset": 0.071
+      }
+     ]
+    },
+    {
+     "code": "STR",
+     "team": "Aston Martin",
+     "basePace": 85.4308,
+     "noise": 0.5596,
+     "stateAtTakeover": {
+      "position": 10,
+      "gapAhead": 2.67,
+      "compound": "SOFT",
+      "tyreAge": 20,
+      "compoundsUsed": [
+       "SOFT"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 23,
+       "to": "MEDIUM",
+       "loss": 20.084
+      },
+      {
+       "lap": 40,
+       "to": "SOFT",
+       "loss": 21.207
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 23,
+       "offset": -0.052
+      },
+      {
+       "lap": 40,
+       "offset": 0.056
+      }
+     ]
+    },
+    {
+     "code": "VER",
+     "team": "Red Bull Racing",
+     "basePace": 83.1312,
+     "noise": 0.2978,
+     "stateAtTakeover": {
+      "position": 1,
+      "gapAhead": 0.0,
+      "compound": "SOFT",
+      "tyreAge": 23,
+      "compoundsUsed": [
+       "SOFT"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 25,
+       "to": "MEDIUM",
+       "loss": 23.915
+      },
+      {
+       "lap": 61,
+       "to": "SOFT",
+       "loss": 26.401
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 0,
+       "offset": 0.033
+      },
+      {
+       "lap": 25,
+       "offset": 0.035
+      },
+      {
+       "lap": 61,
+       "offset": -0.092
+      }
+     ]
+    },
+    {
+     "code": "VET",
+     "team": "Aston Martin",
+     "basePace": 85.3985,
+     "noise": 0.4746,
+     "stateAtTakeover": {
+      "position": 12,
+      "gapAhead": 1.206,
+      "compound": "SOFT",
+      "tyreAge": 20,
+      "compoundsUsed": [
+       "SOFT"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 22,
+       "to": "MEDIUM",
+       "loss": 23.122
+      },
+      {
+       "lap": 39,
+       "to": "SOFT",
+       "loss": 21.907
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 22,
+       "offset": -0.136
+      },
+      {
+       "lap": 39,
+       "offset": 0.123
+      }
+     ]
+    }
+   ],
+   "fuelEffectPerLap": 0.05022,
+   "freshTyre": {
+    "bonus": -0.2828,
+    "laps": 3
+   },
+   "events": [],
+   "decisionMoments": [],
+   "candidateMomentLaps": [
+    22,
+    23,
+    24,
+    25,
+    26,
+    28,
+    29,
+    38,
+    39,
+    40,
+    43,
+    47,
+    48,
+    51,
+    52,
+    54,
+    58,
+    59,
+    61,
+    62
+   ],
+   "realResult": [
+    "HAM",
+    "VER",
+    "BOT",
+    "LEC",
+    "PER",
+    "RIC",
+    "SAI",
+    "NOR",
+    "OCO",
+    "GAS",
+    "STR",
+    "RAI",
+    "VET",
+    "RUS",
+    "GIO",
+    "LAT",
+    "ALO",
+    "MSC",
+    "MAZ",
+    "TSU"
+   ],
+   "userSide": "VER",
+   "rival": "HAM",
+   "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": true,
+    "drs": true,
+    "ers": "hybrid",
+    "refuelling": false
+   }
+  },
+  "spain-2021-held-roll": {
+   "schemaVersion": 11,
+   "race": {
+    "id": "spain-2021",
+    "name": "Spain 2021: Hamilton vs Verstappen",
+    "laps": 66,
+    "takeoverLap": 20,
+    "seed": 49123
+   },
+   "era": "2014-2025",
+   "track": {
+    "pitLoss": 22.917,
+    "pitLossUnderSC": 12.604,
+    "pitLossUnderVSC": 15.813,
+    "pitLossDeviations": [
+     -4.061,
+     -2.718,
+     -2.628,
+     -2.452,
+     -1.686,
+     -1.453,
+     -1.142,
+     -1.029,
+     -0.869,
+     -0.819,
+     -0.79,
+     -0.753,
+     -0.701,
+     -0.652,
+     -0.236,
+     -0.232,
+     -0.179,
+     0.179,
+     0.303,
+     0.709,
+     0.714,
+     0.85,
+     1.258,
+     1.269,
+     1.727,
+     2.35,
+     2.653,
+     3.268,
+     3.357,
+     3.478,
+     3.513,
+     3.653,
+     6.93,
+     8.146
+    ],
+    "overtakeDifficulty": 0.9232,
+    "overtakeModel": {
+     "intercept": -0.1323,
+     "paceCoef": 1.8366,
+     "gapCoef": -3.8725,
+     "trainCoef": -0.9007,
+     "heldGap": 0.79,
+     "rollOnly": true
+    },
+    "dirtyAirPenalty": 0.4364,
+    "dirtyAirBands": [
+     {
+      "upTo": 0.5,
+      "penalty": 0.9727
+     },
+     {
+      "upTo": 1.0,
+      "penalty": 0.6524
+     },
+     {
+      "upTo": 1.5,
+      "penalty": 0.2495
+     },
+     {
+      "upTo": 2.0,
+      "penalty": 0.062
+     }
+    ],
+    "greenLapTime": 84.114,
+    "scLapTime": 117.318
+   },
+   "compounds": {
+    "SOFT": {
+     "offset": 0.0,
+     "degPerLap": 0.06058,
+     "cliffLap": 32,
+     "provenLaps": 32
+    },
+    "MEDIUM": {
+     "offset": 0.2234,
+     "degPerLap": 0.04189,
+     "cliffLap": 23,
+     "cliffDegPerLap": 0.1306,
+     "provenLaps": 42
+    }
+   },
+   "drivers": [
+    {
+     "code": "ALO",
+     "team": "Alpine",
+     "basePace": 85.2118,
+     "noise": 0.2928,
+     "stateAtTakeover": {
+      "position": 11,
+      "gapAhead": 1.549,
+      "compound": "SOFT",
+      "tyreAge": 23,
+      "compoundsUsed": [
+       "SOFT"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 22,
+       "to": "MEDIUM",
+       "loss": 20.894
+      },
+      {
+       "lap": 62,
+       "to": "SOFT",
+       "loss": 29.96
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 22,
+       "offset": 0.043
+      },
+      {
+       "lap": 62,
+       "offset": -0.114
+      }
+     ]
+    },
+    {
+     "code": "BOT",
+     "team": "Mercedes",
+     "basePace": 83.5498,
+     "noise": 0.4317,
+     "stateAtTakeover": {
+      "position": 4,
+      "gapAhead": 1.121,
+      "compound": "SOFT",
+      "tyreAge": 23,
+      "compoundsUsed": [
+       "SOFT"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 24,
+       "to": "MEDIUM",
+       "loss": 21.501
+      },
+      {
+       "lap": 54,
+       "to": "SOFT",
+       "loss": 23.745
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 24,
+       "offset": -0.106
+      },
+      {
+       "lap": 54,
+       "offset": 0.22
+      }
+     ]
+    },
+    {
+     "code": "GAS",
+     "team": "AlphaTauri",
+     "basePace": 85.1224,
+     "noise": 0.7657,
+     "stateAtTakeover": {
+      "position": 19,
+      "gapAhead": 6.354,
+      "compound": "MEDIUM",
+      "tyreAge": 2,
+      "compoundsUsed": [
+       "MEDIUM",
+       "SOFT"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 48,
+       "to": "SOFT",
+       "loss": 26.256
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 0,
+       "offset": -0.08
+      },
+      {
+       "lap": 48,
+       "offset": 0.097
+      }
+     ]
+    },
+    {
+     "code": "GIO",
+     "team": "Alfa Romeo Racing",
+     "basePace": 85.4171,
+     "noise": 0.516,
+     "stateAtTakeover": {
+      "position": 16,
+      "gapAhead": 2.272,
+      "compound": "MEDIUM",
+      "tyreAge": 15,
+      "compoundsUsed": [
+       "MEDIUM",
+       "SOFT"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 40,
+       "to": "SOFT",
+       "loss": 27.409
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 0,
+       "offset": 0.336
+      },
+      {
+       "lap": 40,
+       "offset": -0.217
+      }
+     ]
+    },
+    {
+     "code": "HAM",
+     "team": "Mercedes",
+     "basePace": 82.9783,
+     "noise": 0.2485,
+     "stateAtTakeover": {
+      "position": 2,
+      "gapAhead": 1.533,
+      "compound": "SOFT",
+      "tyreAge": 24,
+      "compoundsUsed": [
+       "SOFT"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 29,
+       "to": "MEDIUM",
+       "loss": 22.742
+      },
+      {
+       "lap": 43,
+       "to": "MEDIUM",
+       "loss": 22.641
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 0,
+       "offset": 0.064
+      },
+      {
+       "lap": 29,
+       "offset": -0.028
+      },
+      {
+       "lap": 43,
+       "offset": 0.007
+      }
+     ]
+    },
+    {
+     "code": "LAT",
+     "team": "Williams",
+     "basePace": 85.8324,
+     "noise": 0.5718,
+     "stateAtTakeover": {
+      "position": 15,
+      "gapAhead": 2.713,
+      "compound": "MEDIUM",
+      "tyreAge": 11,
+      "compoundsUsed": [
+       "MEDIUM",
+       "SOFT"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 28,
+       "to": "MEDIUM",
+       "loss": 22.038
+      },
+      {
+       "lap": 51,
+       "to": "SOFT",
+       "loss": 24.029
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 0,
+       "offset": -0.052
+      },
+      {
+       "lap": 28,
+       "offset": 0.003
+      },
+      {
+       "lap": 51,
+       "offset": -0.038
+      }
+     ]
+    },
+    {
+     "code": "LEC",
+     "team": "Ferrari",
+     "basePace": 84.0519,
+     "noise": 0.3073,
+     "stateAtTakeover": {
+      "position": 3,
+      "gapAhead": 6.16,
+      "compound": "SOFT",
+      "tyreAge": 23,
+      "compoundsUsed": [
+       "SOFT"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 29,
+       "to": "MEDIUM",
+       "loss": 22.927
+      },
+      {
+       "lap": 59,
+       "to": "SOFT",
+       "loss": 23.211,
+       "optional": true
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 0,
+       "offset": -0.102
+      },
+      {
+       "lap": 29,
+       "offset": 0.011
+      },
+      {
+       "lap": 59,
+       "offset": 0.154
+      }
+     ]
+    },
+    {
+     "code": "MAZ",
+     "team": "Haas F1 Team",
+     "basePace": 87.0187,
+     "noise": 0.6927,
+     "stateAtTakeover": {
+      "position": 18,
+      "gapAhead": 4.199,
+      "compound": "SOFT",
+      "tyreAge": 20,
+      "compoundsUsed": [
+       "SOFT"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 23,
+       "to": "MEDIUM",
+       "loss": 25.893
+      },
+      {
+       "lap": 43,
+       "to": "MEDIUM",
+       "loss": 24.223
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 23,
+       "offset": -0.312
+      },
+      {
+       "lap": 43,
+       "offset": 0.272
+      }
+     ]
+    },
+    {
+     "code": "MSC",
+     "team": "Haas F1 Team",
+     "basePace": 85.9852,
+     "noise": 0.8037,
+     "stateAtTakeover": {
+      "position": 17,
+      "gapAhead": 4.302,
+      "compound": "SOFT",
+      "tyreAge": 20,
+      "compoundsUsed": [
+       "SOFT"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 24,
+       "to": "MEDIUM",
+       "loss": 25.248
+      },
+      {
+       "lap": 51,
+       "to": "MEDIUM",
+       "loss": 22.55
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 24,
+       "offset": -0.114
+      },
+      {
+       "lap": 51,
+       "offset": 0.216
+      }
+     ]
+    },
+    {
+     "code": "NOR",
+     "team": "McLaren",
+     "basePace": 85.0322,
+     "noise": 0.7774,
+     "stateAtTakeover": {
+      "position": 9,
+      "gapAhead": 2.305,
+      "compound": "SOFT",
+      "tyreAge": 23,
+      "compoundsUsed": [
+       "SOFT"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 24,
+       "to": "MEDIUM",
+       "loss": 21.599
+      },
+      {
+       "lap": 52,
+       "to": "SOFT",
+       "loss": 21.836
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 24,
+       "offset": -0.007
+      },
+      {
+       "lap": 52,
+       "offset": 0.112
+      }
+     ]
+    },
+    {
+     "code": "OCO",
+     "team": "Alpine",
+     "basePace": 85.0807,
+     "noise": 0.5174,
+     "stateAtTakeover": {
+      "position": 7,
+      "gapAhead": 3.704,
+      "compound": "SOFT",
+      "tyreAge": 23,
+      "compoundsUsed": [
+       "SOFT"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 24,
+       "to": "MEDIUM",
+       "loss": 21.737
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 24,
+       "offset": 0.04
+      }
+     ]
+    },
+    {
+     "code": "PER",
+     "team": "Red Bull Racing",
+     "basePace": 84.0885,
+     "noise": 0.4892,
+     "stateAtTakeover": {
+      "position": 6,
+      "gapAhead": 1.166,
+      "compound": "SOFT",
+      "tyreAge": 23,
+      "compoundsUsed": [
+       "SOFT"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 28,
+       "to": "MEDIUM",
+       "loss": 22.722
+      },
+      {
+       "lap": 58,
+       "to": "SOFT",
+       "loss": 23.174,
+       "optional": true
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 0,
+       "offset": 0.125
+      },
+      {
+       "lap": 28,
+       "offset": -0.027
+      },
+      {
+       "lap": 58,
+       "offset": -0.058
+      }
+     ]
+    },
+    {
+     "code": "RAI",
+     "team": "Alfa Romeo Racing",
+     "basePace": 85.2411,
+     "noise": 0.5458,
+     "stateAtTakeover": {
+      "position": 13,
+      "gapAhead": 2.143,
+      "compound": "MEDIUM",
+      "tyreAge": 20,
+      "compoundsUsed": [
+       "MEDIUM"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 38,
+       "to": "SOFT",
+       "loss": 24.651
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 0,
+       "offset": -0.412
+      },
+      {
+       "lap": 38,
+       "offset": 0.24
+      }
+     ]
+    },
+    {
+     "code": "RIC",
+     "team": "McLaren",
+     "basePace": 84.4943,
+     "noise": 0.2599,
+     "stateAtTakeover": {
+      "position": 5,
+      "gapAhead": 7.788,
+      "compound": "SOFT",
+      "tyreAge": 23,
+      "compoundsUsed": [
+       "SOFT"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 26,
+       "to": "MEDIUM",
+       "loss": 22.113
+      },
+      {
+       "lap": 47,
+       "to": "SOFT",
+       "loss": 24.096
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 0,
+       "offset": -0.102
+      },
+      {
+       "lap": 26,
+       "offset": -0.051
+      },
+      {
+       "lap": 47,
+       "offset": 0.13
+      }
+     ]
+    },
+    {
+     "code": "RUS",
+     "team": "Williams",
+     "basePace": 85.7064,
+     "noise": 0.6412,
+     "stateAtTakeover": {
+      "position": 14,
+      "gapAhead": 1.769,
+      "compound": "MEDIUM",
+      "tyreAge": 11,
+      "compoundsUsed": [
+       "MEDIUM",
+       "SOFT"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 29,
+       "to": "MEDIUM",
+       "loss": 19.09
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 0,
+       "offset": -0.072
+      },
+      {
+       "lap": 29,
+       "offset": 0.023
+      }
+     ]
+    },
+    {
+     "code": "SAI",
+     "team": "Ferrari",
+     "basePace": 84.4075,
+     "noise": 0.5218,
+     "stateAtTakeover": {
+      "position": 8,
+      "gapAhead": 1.386,
+      "compound": "SOFT",
+      "tyreAge": 23,
+      "compoundsUsed": [
+       "SOFT"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 23,
+       "to": "MEDIUM",
+       "loss": 21.371
+      },
+      {
+       "lap": 47,
+       "to": "SOFT",
+       "loss": 22.747
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 23,
+       "offset": -0.057
+      },
+      {
+       "lap": 47,
+       "offset": 0.071
+      }
+     ]
+    },
+    {
+     "code": "STR",
+     "team": "Aston Martin",
+     "basePace": 85.4308,
+     "noise": 0.5596,
+     "stateAtTakeover": {
+      "position": 10,
+      "gapAhead": 2.67,
+      "compound": "SOFT",
+      "tyreAge": 20,
+      "compoundsUsed": [
+       "SOFT"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 23,
+       "to": "MEDIUM",
+       "loss": 20.084
+      },
+      {
+       "lap": 40,
+       "to": "SOFT",
+       "loss": 21.207
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 23,
+       "offset": -0.052
+      },
+      {
+       "lap": 40,
+       "offset": 0.056
+      }
+     ]
+    },
+    {
+     "code": "VER",
+     "team": "Red Bull Racing",
+     "basePace": 83.1312,
+     "noise": 0.2978,
+     "stateAtTakeover": {
+      "position": 1,
+      "gapAhead": 0.0,
+      "compound": "SOFT",
+      "tyreAge": 23,
+      "compoundsUsed": [
+       "SOFT"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 25,
+       "to": "MEDIUM",
+       "loss": 23.915
+      },
+      {
+       "lap": 61,
+       "to": "SOFT",
+       "loss": 26.401
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 0,
+       "offset": 0.033
+      },
+      {
+       "lap": 25,
+       "offset": 0.035
+      },
+      {
+       "lap": 61,
+       "offset": -0.092
+      }
+     ]
+    },
+    {
+     "code": "VET",
+     "team": "Aston Martin",
+     "basePace": 85.3985,
+     "noise": 0.4746,
+     "stateAtTakeover": {
+      "position": 12,
+      "gapAhead": 1.206,
+      "compound": "SOFT",
+      "tyreAge": 20,
+      "compoundsUsed": [
+       "SOFT"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 22,
+       "to": "MEDIUM",
+       "loss": 23.122
+      },
+      {
+       "lap": 39,
+       "to": "SOFT",
+       "loss": 21.907
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 22,
+       "offset": -0.136
+      },
+      {
+       "lap": 39,
+       "offset": 0.123
+      }
+     ]
+    }
+   ],
+   "fuelEffectPerLap": 0.05022,
+   "freshTyre": {
+    "bonus": -0.2828,
+    "laps": 3
+   },
+   "events": [],
+   "decisionMoments": [],
+   "candidateMomentLaps": [
+    22,
+    23,
+    24,
+    25,
+    26,
+    28,
+    29,
+    38,
+    39,
+    40,
+    43,
+    47,
+    48,
+    51,
+    52,
+    54,
+    58,
+    59,
+    61,
+    62
+   ],
+   "realResult": [
+    "HAM",
+    "VER",
+    "BOT",
+    "LEC",
+    "PER",
+    "RIC",
+    "SAI",
+    "NOR",
+    "OCO",
+    "GAS",
+    "STR",
+    "RAI",
+    "VET",
+    "RUS",
+    "GIO",
+    "LAT",
+    "ALO",
+    "MSC",
+    "MAZ",
+    "TSU"
+   ],
+   "userSide": "VER",
+   "rival": "HAM",
+   "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": true,
+    "drs": true,
+    "ers": "hybrid",
+    "refuelling": false
+   }
+  },
+  "brazil-2006-roll": {
+   "schemaVersion": 11,
+   "race": {
+    "id": "brazil-2006",
+    "name": "Brazil 2006: Alonso vs Schumacher",
+    "laps": 71,
+    "takeoverLap": 23,
+    "seed": 1,
+    "scUnlap": "none"
+   },
+   "era": "1994-2009",
+   "track": {
+    "pitLoss": 22.545,
+    "pitLossUnderSC": 12.4,
+    "pitLossUnderVSC": 15.556,
+    "pitLossDeviations": [
+     -2.832,
+     -2.238,
+     -2.114,
+     -2.09,
+     -1.228,
+     -1.019,
+     -0.869,
+     -0.614,
+     -0.557,
+     -0.52,
+     -0.374,
+     -0.315,
+     -0.283,
+     -0.281,
+     -0.183,
+     -0.022,
+     0.022,
+     0.23,
+     0.27,
+     0.349,
+     0.595,
+     0.605,
+     0.705,
+     0.715,
+     0.718,
+     1.011,
+     1.169,
+     1.922,
+     2.137,
+     2.547,
+     3.933,
+     4.475
+    ],
+    "overtakeDifficulty": 0.9615,
+    "overtakeModel": {
+     "intercept": -1.0629,
+     "paceCoef": 0.8092,
+     "gapCoef": -4.1132,
+     "trainCoef": -0.0531,
+     "rollOnly": true
+    },
+    "dirtyAirPenalty": 0.3123,
+    "dirtyAirBands": [
+     {
+      "upTo": 0.5,
+      "penalty": 1.0951
+     },
+     {
+      "upTo": 1.0,
+      "penalty": 0.4742
+     },
+     {
+      "upTo": 1.5,
+      "penalty": 0.2062
+     },
+     {
+      "upTo": 2.0,
+      "penalty": 0.017
+     }
+    ],
+    "greenLapTime": 74.612,
+    "refuel": {
+     "secondsPerLap": 0.2328,
+     "laneBase": 19.999,
+     "refFill": 21.613,
+     "tankLaps": 38,
+     "stops": 31
+    }
+   },
+   "compounds": {
+    "MEDIUM": {
+     "offset": 0.0,
+     "degPerLap": 0.0188,
+     "cliffLap": 39,
+     "provenLaps": 39
+    }
+   },
+   "drivers": [
+    {
+     "code": "ALBC",
+     "team": "Spyker MF1",
+     "basePace": 78.6817,
+     "noise": 0.4953,
+     "stateAtTakeover": {
+      "position": 13,
+      "gapAhead": 0.596,
+      "compound": "MEDIUM",
+      "tyreAge": 23,
+      "compoundsUsed": [
+       "MEDIUM"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 27,
+       "to": "MEDIUM",
+       "loss": 22.125
+      },
+      {
+       "lap": 49,
+       "to": "MEDIUM",
+       "loss": 23.345
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 27,
+       "offset": -0.049
+      },
+      {
+       "lap": 49,
+       "offset": 0.006
+      }
+     ]
+    },
+    {
+     "code": "ALO",
+     "team": "Renault",
+     "basePace": 77.1452,
+     "noise": 0.2516,
+     "stateAtTakeover": {
+      "position": 2,
+      "gapAhead": 14.124,
+      "compound": "MEDIUM",
+      "tyreAge": 23,
+      "compoundsUsed": [
+       "MEDIUM"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 27,
+       "to": "MEDIUM",
+       "loss": 24.266
+      },
+      {
+       "lap": 55,
+       "to": "MEDIUM",
+       "loss": 22.89
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 27,
+       "offset": 0.03
+      },
+      {
+       "lap": 55,
+       "offset": -0.045
+      }
+     ]
+    },
+    {
+     "code": "BAR",
+     "team": "Honda",
+     "basePace": 77.4189,
+     "noise": 0.3204,
+     "stateAtTakeover": {
+      "position": 9,
+      "gapAhead": 1.248,
+      "compound": "MEDIUM",
+      "tyreAge": 2,
+      "compoundsUsed": [
+       "MEDIUM"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 47,
+       "to": "MEDIUM",
+       "loss": 23.242
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 0,
+       "offset": 0.04
+      },
+      {
+       "lap": 47,
+       "offset": -0.057
+      }
+     ]
+    },
+    {
+     "code": "BUT",
+     "team": "Honda",
+     "basePace": 77.1436,
+     "noise": 0.4587,
+     "stateAtTakeover": {
+      "position": 3,
+      "gapAhead": 5.195,
+      "compound": "MEDIUM",
+      "tyreAge": 23,
+      "compoundsUsed": [
+       "MEDIUM"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 26,
+       "to": "MEDIUM",
+       "loss": 21.951
+      },
+      {
+       "lap": 51,
+       "to": "MEDIUM",
+       "loss": 22.106
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 51,
+       "offset": -0.161
+      }
+     ]
+    },
+    {
+     "code": "DLR",
+     "team": "McLaren",
+     "basePace": 77.4949,
+     "noise": 0.3976,
+     "stateAtTakeover": {
+      "position": 5,
+      "gapAhead": 3.738,
+      "compound": "MEDIUM",
+      "tyreAge": 23,
+      "compoundsUsed": [
+       "MEDIUM"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 36,
+       "to": "MEDIUM",
+       "loss": 25.173
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 0,
+       "offset": 0.309
+      },
+      {
+       "lap": 36,
+       "offset": -0.121
+      }
+     ]
+    },
+    {
+     "code": "DOOR",
+     "team": "Red Bull",
+     "basePace": 78.1145,
+     "noise": 0.7071,
+     "stateAtTakeover": {
+      "position": 15,
+      "gapAhead": 0.728,
+      "compound": "MEDIUM",
+      "tyreAge": 23,
+      "compoundsUsed": [
+       "MEDIUM"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 36,
+       "to": "MEDIUM",
+       "loss": 22.556
+      },
+      {
+       "lap": 60,
+       "to": "MEDIUM",
+       "loss": 22.493
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 0,
+       "offset": 0.122
+      },
+      {
+       "lap": 36,
+       "offset": 0.027
+      },
+      {
+       "lap": 60,
+       "offset": -0.199
+      }
+     ]
+    },
+    {
+     "code": "FIS",
+     "team": "Renault",
+     "basePace": 77.2961,
+     "noise": 0.4207,
+     "stateAtTakeover": {
+      "position": 8,
+      "gapAhead": 5.917,
+      "compound": "MEDIUM",
+      "tyreAge": 2,
+      "compoundsUsed": [
+       "MEDIUM"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 50,
+       "to": "MEDIUM",
+       "loss": 20.213
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 0,
+       "offset": 0.014
+      },
+      {
+       "lap": 50,
+       "offset": -0.031
+      }
+     ]
+    },
+    {
+     "code": "HEI",
+     "team": "BMW Sauber",
+     "basePace": 78.0826,
+     "noise": 0.4703,
+     "stateAtTakeover": {
+      "position": 6,
+      "gapAhead": 0.711,
+      "compound": "MEDIUM",
+      "tyreAge": 23,
+      "compoundsUsed": [
+       "MEDIUM"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 29,
+       "to": "MEDIUM",
+       "loss": 21.188
+      },
+      {
+       "lap": 39,
+       "to": "MEDIUM",
+       "loss": 24.958
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 29,
+       "offset": 0.257
+      },
+      {
+       "lap": 39,
+       "offset": -0.107
+      }
+     ]
+    },
+    {
+     "code": "KUB",
+     "team": "BMW Sauber",
+     "basePace": 77.9151,
+     "noise": 0.3121,
+     "stateAtTakeover": {
+      "position": 4,
+      "gapAhead": 11.539,
+      "compound": "MEDIUM",
+      "tyreAge": 23,
+      "compoundsUsed": [
+       "MEDIUM"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 28,
+       "to": "MEDIUM",
+       "loss": 22.67
+      },
+      {
+       "lap": 50,
+       "to": "MEDIUM",
+       "loss": 23.04
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 0,
+       "offset": -0.077
+      },
+      {
+       "lap": 28,
+       "offset": -0.053
+      },
+      {
+       "lap": 50,
+       "offset": 0.091
+      }
+     ]
+    },
+    {
+     "code": "LIU",
+     "team": "Toro Rosso",
+     "basePace": 78.41,
+     "noise": 0.6779,
+     "stateAtTakeover": {
+      "position": 11,
+      "gapAhead": 2.176,
+      "compound": "MEDIUM",
+      "tyreAge": 23,
+      "compoundsUsed": [
+       "MEDIUM"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 33,
+       "to": "MEDIUM",
+       "loss": 24.435
+      },
+      {
+       "lap": 54,
+       "to": "MEDIUM",
+       "loss": 22.655
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 0,
+       "offset": 0.13
+      },
+      {
+       "lap": 33,
+       "offset": 0.068
+      },
+      {
+       "lap": 54,
+       "offset": -0.144
+      }
+     ]
+    },
+    {
+     "code": "MAS",
+     "team": "Ferrari",
+     "basePace": 77.0346,
+     "noise": 0.6152,
+     "stateAtTakeover": {
+      "position": 1,
+      "gapAhead": 0.0,
+      "compound": "MEDIUM",
+      "tyreAge": 23,
+      "compoundsUsed": [
+       "MEDIUM"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 25,
+       "to": "MEDIUM",
+       "loss": 23.409
+      },
+      {
+       "lap": 53,
+       "to": "MEDIUM",
+       "loss": 22.592
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 25,
+       "offset": -0.231
+      },
+      {
+       "lap": 53,
+       "offset": 0.344
+      }
+     ]
+    },
+    {
+     "code": "MSCM",
+     "team": "Ferrari",
+     "basePace": 76.4186,
+     "noise": 0.393,
+     "stateAtTakeover": {
+      "position": 17,
+      "gapAhead": 8.531,
+      "compound": "MEDIUM",
+      "tyreAge": 14,
+      "compoundsUsed": [
+       "MEDIUM"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 48,
+       "to": "MEDIUM",
+       "loss": 19.977
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 0,
+       "offset": -0.159
+      },
+      {
+       "lap": 48,
+       "offset": 0.229
+      }
+     ]
+    },
+    {
+     "code": "RAI",
+     "team": "McLaren",
+     "basePace": 77.3422,
+     "noise": 0.4198,
+     "stateAtTakeover": {
+      "position": 7,
+      "gapAhead": 1.512,
+      "compound": "MEDIUM",
+      "tyreAge": 2,
+      "compoundsUsed": [
+       "MEDIUM"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 52,
+       "to": "MEDIUM",
+       "loss": 20.942
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 0,
+       "offset": -0.022
+      },
+      {
+       "lap": 52,
+       "offset": 0.038
+      }
+     ]
+    },
+    {
+     "code": "SAT",
+     "team": "Super Aguri",
+     "basePace": 77.6345,
+     "noise": 0.6745,
+     "stateAtTakeover": {
+      "position": 12,
+      "gapAhead": 0.234,
+      "compound": "MEDIUM",
+      "tyreAge": 23,
+      "compoundsUsed": [
+       "MEDIUM"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 29,
+       "to": "MEDIUM",
+       "loss": 22.926
+      },
+      {
+       "lap": 49,
+       "to": "MEDIUM",
+       "loss": 22.265
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 29,
+       "offset": -0.221
+      },
+      {
+       "lap": 49,
+       "offset": 0.056
+      }
+     ]
+    },
+    {
+     "code": "SPE",
+     "team": "Toro Rosso",
+     "basePace": 78.2115,
+     "noise": 0.5169,
+     "stateAtTakeover": {
+      "position": 10,
+      "gapAhead": 7.169,
+      "compound": "MEDIUM",
+      "tyreAge": 23,
+      "compoundsUsed": [
+       "MEDIUM"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 34,
+       "to": "MEDIUM",
+       "loss": 22.871
+      },
+      {
+       "lap": 55,
+       "to": "MEDIUM",
+       "loss": 22.342
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 0,
+       "offset": 0.018
+      },
+      {
+       "lap": 34,
+       "offset": 0.129
+      },
+      {
+       "lap": 55,
+       "offset": -0.158
+      }
+     ]
+    },
+    {
+     "code": "TMO",
+     "team": "Spyker MF1",
+     "basePace": 79.0629,
+     "noise": 0.7286,
+     "stateAtTakeover": {
+      "position": 16,
+      "gapAhead": 6.326,
+      "compound": "MEDIUM",
+      "tyreAge": 23,
+      "compoundsUsed": [
+       "MEDIUM"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 40,
+       "to": "MEDIUM",
+       "loss": 26.285
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 0,
+       "offset": -0.611
+      },
+      {
+       "lap": 40,
+       "offset": 0.217
+      }
+     ]
+    },
+    {
+     "code": "YAM",
+     "team": "Super Aguri",
+     "basePace": 79.0515,
+     "noise": 0.7581,
+     "stateAtTakeover": {
+      "position": 14,
+      "gapAhead": 1.814,
+      "compound": "MEDIUM",
+      "tyreAge": 23,
+      "compoundsUsed": [
+       "MEDIUM"
+      ]
+     },
+     "realStrategy": [
+      {
+       "lap": 28,
+       "to": "MEDIUM",
+       "loss": 22.768
+      },
+      {
+       "lap": 47,
+       "to": "MEDIUM",
+       "loss": 22.361
+      },
+      {
+       "lap": 64,
+       "to": "MEDIUM",
+       "loss": 22.237
+      }
+     ],
+     "stintPace": [
+      {
+       "lap": 0,
+       "offset": -0.11
+      },
+      {
+       "lap": 28,
+       "offset": -0.309
+      },
+      {
+       "lap": 47,
+       "offset": 0.269
+      },
+      {
+       "lap": 64,
+       "offset": -0.407
+      }
+     ]
+    }
+   ],
+   "fuelEffectPerLap": 0.05723,
+   "freshTyre": {
+    "bonus": -0.3134,
+    "laps": 3
+   },
+   "events": [
+    {
+     "lap": 65,
+     "type": "RETIREMENT",
+     "driver": "HEI"
+    }
+   ],
+   "decisionMoments": [],
+   "candidateMomentLaps": [
+    25,
+    26,
+    27,
+    28,
+    29,
+    33,
+    34,
+    36,
+    39,
+    40,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    60,
+    64
+   ],
+   "realResult": [
+    "MAS",
+    "ALO",
+    "BUT",
+    "MSCM",
+    "RAI",
+    "FIS",
+    "BAR",
+    "DLR",
+    "KUB",
+    "SAT",
+    "SPE",
+    "DOOR",
+    "LIU",
+    "ALBC",
+    "TMO",
+    "YAM",
+    "HEI",
+    "COU",
+    "TRU",
+    "SCH",
+    "ROS",
+    "WEB"
+   ],
+   "userSide": "ALO",
+   "rival": "MSCM",
+   "provenance": {
+    "kind": "real",
+    "estimated": [
+     "compounds",
+     "safetyCars",
+     "fuelLoads"
+    ]
+   },
+   "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": true
+   }
+  }
+ },
+ "golden": {
+  "spain-2021": {
+   "1": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "GAS",
+     "OCO",
+     "STR",
+     "VET",
+     "GIO",
+     "RAI",
+     "RUS",
+     "LAT",
+     "MSC",
+     "ALO",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 30.187,
+     "BOT": 34.278,
+     "LEC": 59.485,
+     "PER": 76.66,
+     "RIC": 82.185,
+     "SAI": 84.911,
+     "NOR": 117.742,
+     "GAS": 139.649,
+     "OCO": 141.846,
+     "STR": 149.263,
+     "VET": 154.229,
+     "GIO": 156.123,
+     "RAI": 156.278,
+     "RUS": 160.347,
+     "LAT": 163.586,
+     "MSC": 165.933,
+     "ALO": 170.275,
+     "MAZ": 232.189
+    },
+    "times": {
+     "HAM": 3802.944,
+     "VER": 3833.13,
+     "BOT": 3837.222,
+     "LEC": 3862.428,
+     "PER": 3879.603,
+     "RIC": 3885.129,
+     "SAI": 3887.855,
+     "NOR": 3920.686,
+     "GAS": 3942.593,
+     "OCO": 3944.79,
+     "STR": 3952.207,
+     "VET": 3957.173,
+     "GIO": 3959.067,
+     "RAI": 3959.222,
+     "RUS": 3963.291,
+     "LAT": 3966.53,
+     "MSC": 3968.877,
+     "ALO": 3973.219,
+     "MAZ": 4035.133
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "GAS",
+     "OCO",
+     "STR",
+     "VET",
+     "GIO",
+     "RAI",
+     "RUS",
+     "LAT",
+     "MSC",
+     "ALO",
+     "MAZ"
+    ]
+   },
+   "2": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "STR",
+     "OCO",
+     "VET",
+     "GAS",
+     "RAI",
+     "GIO",
+     "RUS",
+     "LAT",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 18.551,
+     "BOT": 26.861,
+     "LEC": 55.022,
+     "PER": 57.521,
+     "RIC": 80.793,
+     "SAI": 82.22,
+     "NOR": 115.454,
+     "STR": 126.916,
+     "OCO": 133.468,
+     "VET": 138.728,
+     "GAS": 139.58,
+     "RAI": 142.147,
+     "GIO": 142.697,
+     "RUS": 151.356,
+     "LAT": 155.762,
+     "ALO": 163.022,
+     "MSC": 170.35,
+     "MAZ": 223.702
+    },
+    "times": {
+     "HAM": 3807.445,
+     "VER": 3825.996,
+     "BOT": 3834.305,
+     "LEC": 3862.467,
+     "PER": 3864.966,
+     "RIC": 3888.238,
+     "SAI": 3889.665,
+     "NOR": 3922.898,
+     "STR": 3934.361,
+     "OCO": 3940.912,
+     "VET": 3946.173,
+     "GAS": 3947.025,
+     "RAI": 3949.592,
+     "GIO": 3950.142,
+     "RUS": 3958.801,
+     "LAT": 3963.207,
+     "ALO": 3970.467,
+     "MSC": 3977.794,
+     "MAZ": 4031.147
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "STR",
+     "OCO",
+     "VET",
+     "GAS",
+     "RAI",
+     "GIO",
+     "RUS",
+     "LAT",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ]
+   },
+   "3": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "OCO",
+     "GAS",
+     "NOR",
+     "STR",
+     "RAI",
+     "VET",
+     "GIO",
+     "RUS",
+     "LAT",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 18.708,
+     "BOT": 29.33,
+     "LEC": 55.632,
+     "PER": 76.512,
+     "RIC": 80.834,
+     "SAI": 82.563,
+     "OCO": 123.464,
+     "GAS": 130.994,
+     "NOR": 134.217,
+     "STR": 139.738,
+     "RAI": 142.166,
+     "VET": 144.431,
+     "GIO": 147.69,
+     "RUS": 153.107,
+     "LAT": 157.085,
+     "ALO": 166.783,
+     "MSC": 175.105,
+     "MAZ": 226.014
+    },
+    "times": {
+     "HAM": 3805.737,
+     "VER": 3824.445,
+     "BOT": 3835.067,
+     "LEC": 3861.369,
+     "PER": 3882.249,
+     "RIC": 3886.57,
+     "SAI": 3888.3,
+     "OCO": 3929.201,
+     "GAS": 3936.731,
+     "NOR": 3939.954,
+     "STR": 3945.474,
+     "RAI": 3947.903,
+     "VET": 3950.168,
+     "GIO": 3953.427,
+     "RUS": 3958.844,
+     "LAT": 3962.822,
+     "ALO": 3972.519,
+     "MSC": 3980.842,
+     "MAZ": 4031.75
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "OCO",
+     "GAS",
+     "NOR",
+     "STR",
+     "RAI",
+     "VET",
+     "GIO",
+     "RUS",
+     "LAT",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ]
+   },
+   "4": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "STR",
+     "OCO",
+     "GAS",
+     "RAI",
+     "VET",
+     "GIO",
+     "LAT",
+     "RUS",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 25.008,
+     "BOT": 32.696,
+     "LEC": 58.866,
+     "PER": 74.329,
+     "RIC": 75.922,
+     "SAI": 84.949,
+     "NOR": 127.579,
+     "STR": 135.117,
+     "OCO": 136.497,
+     "GAS": 143.399,
+     "RAI": 144.817,
+     "VET": 147.279,
+     "GIO": 152.689,
+     "LAT": 153.205,
+     "RUS": 154.36,
+     "ALO": 164.04,
+     "MSC": 172.811,
+     "MAZ": 224.868
+    },
+    "times": {
+     "HAM": 3802.889,
+     "VER": 3827.896,
+     "BOT": 3835.585,
+     "LEC": 3861.754,
+     "PER": 3877.218,
+     "RIC": 3878.811,
+     "SAI": 3887.838,
+     "NOR": 3930.467,
+     "STR": 3938.005,
+     "OCO": 3939.386,
+     "GAS": 3946.287,
+     "RAI": 3947.705,
+     "VET": 3950.168,
+     "GIO": 3955.578,
+     "LAT": 3956.094,
+     "RUS": 3957.249,
+     "ALO": 3966.928,
+     "MSC": 3975.699,
+     "MAZ": 4027.756
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "STR",
+     "OCO",
+     "GAS",
+     "RAI",
+     "VET",
+     "GIO",
+     "LAT",
+     "RUS",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ]
+   },
+   "5": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "RIC",
+     "PER",
+     "SAI",
+     "NOR",
+     "STR",
+     "RAI",
+     "GAS",
+     "OCO",
+     "VET",
+     "GIO",
+     "LAT",
+     "RUS",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 21.749,
+     "BOT": 33.063,
+     "LEC": 59.499,
+     "RIC": 82.63,
+     "PER": 82.93,
+     "SAI": 84.76,
+     "NOR": 114.634,
+     "STR": 137.05,
+     "RAI": 140.327,
+     "GAS": 143.606,
+     "OCO": 145.415,
+     "VET": 149.572,
+     "GIO": 159.781,
+     "LAT": 161.572,
+     "RUS": 161.703,
+     "ALO": 168.969,
+     "MSC": 176.66,
+     "MAZ": 229.687
+    },
+    "times": {
+     "HAM": 3800.768,
+     "VER": 3822.517,
+     "BOT": 3833.831,
+     "LEC": 3860.268,
+     "RIC": 3883.398,
+     "PER": 3883.698,
+     "SAI": 3885.529,
+     "NOR": 3915.402,
+     "STR": 3937.818,
+     "RAI": 3941.095,
+     "GAS": 3944.374,
+     "OCO": 3946.183,
+     "VET": 3950.34,
+     "GIO": 3960.549,
+     "LAT": 3962.341,
+     "RUS": 3962.472,
+     "ALO": 3969.737,
+     "MSC": 3977.428,
+     "MAZ": 4030.455
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "RIC",
+     "PER",
+     "SAI",
+     "NOR",
+     "STR",
+     "RAI",
+     "GAS",
+     "OCO",
+     "VET",
+     "GIO",
+     "LAT",
+     "RUS",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ]
+   },
+   "6": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "SAI",
+     "PER",
+     "RIC",
+     "NOR",
+     "OCO",
+     "RAI",
+     "GAS",
+     "VET",
+     "STR",
+     "GIO",
+     "LAT",
+     "RUS",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 24.802,
+     "BOT": 34.615,
+     "LEC": 60.729,
+     "SAI": 75.04,
+     "PER": 78.163,
+     "RIC": 87.206,
+     "NOR": 131.246,
+     "OCO": 133.605,
+     "RAI": 137.443,
+     "GAS": 138.956,
+     "VET": 139.006,
+     "STR": 143.905,
+     "GIO": 151.747,
+     "LAT": 154.772,
+     "RUS": 158.473,
+     "ALO": 166.196,
+     "MSC": 178.866,
+     "MAZ": 220.82
+    },
+    "times": {
+     "HAM": 3803.124,
+     "VER": 3827.926,
+     "BOT": 3837.739,
+     "LEC": 3863.853,
+     "SAI": 3878.164,
+     "PER": 3881.287,
+     "RIC": 3890.33,
+     "NOR": 3934.37,
+     "OCO": 3936.729,
+     "RAI": 3940.567,
+     "GAS": 3942.08,
+     "VET": 3942.13,
+     "STR": 3947.029,
+     "GIO": 3954.871,
+     "LAT": 3957.896,
+     "RUS": 3961.597,
+     "ALO": 3969.32,
+     "MSC": 3981.99,
+     "MAZ": 4023.944
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "SAI",
+     "PER",
+     "RIC",
+     "NOR",
+     "OCO",
+     "RAI",
+     "GAS",
+     "VET",
+     "STR",
+     "GIO",
+     "LAT",
+     "RUS",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ]
+   },
+   "7": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "OCO",
+     "RAI",
+     "STR",
+     "GAS",
+     "VET",
+     "RUS",
+     "GIO",
+     "LAT",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 18.97,
+     "BOT": 28.677,
+     "LEC": 51.727,
+     "PER": 72.78,
+     "RIC": 74.975,
+     "SAI": 77.977,
+     "NOR": 127.047,
+     "OCO": 137.461,
+     "RAI": 142.845,
+     "STR": 144.584,
+     "GAS": 144.884,
+     "VET": 147.424,
+     "RUS": 147.474,
+     "GIO": 147.724,
+     "LAT": 150.772,
+     "ALO": 163.697,
+     "MSC": 180.302,
+     "MAZ": 225.539
+    },
+    "times": {
+     "HAM": 3807.142,
+     "VER": 3826.112,
+     "BOT": 3835.82,
+     "LEC": 3858.869,
+     "PER": 3879.923,
+     "RIC": 3882.118,
+     "SAI": 3885.12,
+     "NOR": 3934.189,
+     "OCO": 3944.603,
+     "RAI": 3949.987,
+     "STR": 3951.727,
+     "GAS": 3952.027,
+     "VET": 3954.567,
+     "RUS": 3954.617,
+     "GIO": 3954.867,
+     "LAT": 3957.915,
+     "ALO": 3970.839,
+     "MSC": 3987.445,
+     "MAZ": 4032.681
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "OCO",
+     "RAI",
+     "STR",
+     "GAS",
+     "VET",
+     "RUS",
+     "GIO",
+     "LAT",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ]
+   },
+   "8": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "GAS",
+     "OCO",
+     "STR",
+     "RAI",
+     "VET",
+     "GIO",
+     "LAT",
+     "ALO",
+     "RUS",
+     "MSC",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 26.678,
+     "BOT": 29.132,
+     "LEC": 63.961,
+     "PER": 81.408,
+     "RIC": 84.586,
+     "SAI": 88.351,
+     "NOR": 118.255,
+     "GAS": 139.233,
+     "OCO": 140.505,
+     "STR": 145.836,
+     "RAI": 149.996,
+     "VET": 153.536,
+     "GIO": 155.932,
+     "LAT": 161.437,
+     "ALO": 164.737,
+     "RUS": 165.253,
+     "MSC": 182.935,
+     "MAZ": 238.067
+    },
+    "times": {
+     "HAM": 3798.759,
+     "VER": 3825.437,
+     "BOT": 3827.891,
+     "LEC": 3862.72,
+     "PER": 3880.168,
+     "RIC": 3883.346,
+     "SAI": 3887.11,
+     "NOR": 3917.015,
+     "GAS": 3937.992,
+     "OCO": 3939.264,
+     "STR": 3944.596,
+     "RAI": 3948.755,
+     "VET": 3952.295,
+     "GIO": 3954.691,
+     "LAT": 3960.197,
+     "ALO": 3963.496,
+     "RUS": 3964.012,
+     "MSC": 3981.694,
+     "MAZ": 4036.826
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "GAS",
+     "OCO",
+     "STR",
+     "RAI",
+     "VET",
+     "GIO",
+     "LAT",
+     "ALO",
+     "RUS",
+     "MSC",
+     "MAZ"
+    ]
+   },
+   "9": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "OCO",
+     "RAI",
+     "GAS",
+     "STR",
+     "VET",
+     "GIO",
+     "LAT",
+     "RUS",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 22.67,
+     "BOT": 33.256,
+     "LEC": 64.33,
+     "PER": 74.898,
+     "RIC": 84.439,
+     "SAI": 89.021,
+     "NOR": 118.757,
+     "OCO": 134.714,
+     "RAI": 143.45,
+     "GAS": 145.764,
+     "STR": 146.168,
+     "VET": 149.56,
+     "GIO": 150.759,
+     "LAT": 158.176,
+     "RUS": 161.853,
+     "ALO": 166.422,
+     "MSC": 171.909,
+     "MAZ": 231.991
+    },
+    "times": {
+     "HAM": 3800.571,
+     "VER": 3823.241,
+     "BOT": 3833.827,
+     "LEC": 3864.901,
+     "PER": 3875.469,
+     "RIC": 3885.009,
+     "SAI": 3889.592,
+     "NOR": 3919.328,
+     "OCO": 3935.285,
+     "RAI": 3944.021,
+     "GAS": 3946.335,
+     "STR": 3946.739,
+     "VET": 3950.131,
+     "GIO": 3951.33,
+     "LAT": 3958.747,
+     "RUS": 3962.424,
+     "ALO": 3966.993,
+     "MSC": 3972.48,
+     "MAZ": 4032.562
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "OCO",
+     "RAI",
+     "GAS",
+     "STR",
+     "VET",
+     "GIO",
+     "LAT",
+     "RUS",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ]
+   },
+   "10": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "OCO",
+     "RAI",
+     "STR",
+     "GAS",
+     "GIO",
+     "VET",
+     "RUS",
+     "LAT",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 28.719,
+     "BOT": 34.241,
+     "LEC": 55.309,
+     "PER": 67.881,
+     "RIC": 80.826,
+     "SAI": 83.894,
+     "NOR": 117.195,
+     "OCO": 135.398,
+     "RAI": 138.594,
+     "STR": 143.608,
+     "GAS": 143.908,
+     "GIO": 144.208,
+     "VET": 148.305,
+     "RUS": 152.799,
+     "LAT": 160.826,
+     "ALO": 161.126,
+     "MSC": 176.703,
+     "MAZ": 224.211
+    },
+    "times": {
+     "HAM": 3803.982,
+     "VER": 3832.701,
+     "BOT": 3838.223,
+     "LEC": 3859.291,
+     "PER": 3871.863,
+     "RIC": 3884.808,
+     "SAI": 3887.876,
+     "NOR": 3921.177,
+     "OCO": 3939.38,
+     "RAI": 3942.576,
+     "STR": 3947.589,
+     "GAS": 3947.889,
+     "GIO": 3948.189,
+     "VET": 3952.287,
+     "RUS": 3956.78,
+     "LAT": 3964.808,
+     "ALO": 3965.108,
+     "MSC": 3980.684,
+     "MAZ": 4028.193
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "OCO",
+     "RAI",
+     "STR",
+     "GAS",
+     "GIO",
+     "VET",
+     "RUS",
+     "LAT",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ]
+   },
+   "11": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "OCO",
+     "GAS",
+     "RAI",
+     "STR",
+     "VET",
+     "GIO",
+     "LAT",
+     "RUS",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 20.78,
+     "BOT": 24.82,
+     "LEC": 53.856,
+     "PER": 66.577,
+     "RIC": 80.31,
+     "SAI": 81.561,
+     "NOR": 113.736,
+     "OCO": 131.025,
+     "GAS": 131.922,
+     "RAI": 137.134,
+     "STR": 139.774,
+     "VET": 143.312,
+     "GIO": 145.046,
+     "LAT": 155.501,
+     "RUS": 158.956,
+     "ALO": 159.256,
+     "MSC": 168.95,
+     "MAZ": 218.838
+    },
+    "times": {
+     "HAM": 3808.187,
+     "VER": 3828.967,
+     "BOT": 3833.007,
+     "LEC": 3862.044,
+     "PER": 3874.765,
+     "RIC": 3888.498,
+     "SAI": 3889.748,
+     "NOR": 3921.924,
+     "OCO": 3939.212,
+     "GAS": 3940.11,
+     "RAI": 3945.322,
+     "STR": 3947.962,
+     "VET": 3951.499,
+     "GIO": 3953.233,
+     "LAT": 3963.688,
+     "RUS": 3967.144,
+     "ALO": 3967.444,
+     "MSC": 3977.137,
+     "MAZ": 4027.025
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "OCO",
+     "GAS",
+     "RAI",
+     "STR",
+     "VET",
+     "GIO",
+     "LAT",
+     "RUS",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ]
+   },
+   "12": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "OCO",
+     "RAI",
+     "STR",
+     "GAS",
+     "LAT",
+     "VET",
+     "GIO",
+     "RUS",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 18.641,
+     "BOT": 26.3,
+     "LEC": 56.033,
+     "PER": 73.036,
+     "RIC": 77.844,
+     "SAI": 85.426,
+     "NOR": 115.2,
+     "OCO": 135.276,
+     "RAI": 135.408,
+     "STR": 139.625,
+     "GAS": 139.925,
+     "LAT": 151.083,
+     "VET": 154.636,
+     "GIO": 155.473,
+     "RUS": 158.786,
+     "ALO": 162.481,
+     "MSC": 174.157,
+     "MAZ": 227.364
+    },
+    "times": {
+     "HAM": 3805.93,
+     "VER": 3824.571,
+     "BOT": 3832.23,
+     "LEC": 3861.963,
+     "PER": 3878.966,
+     "RIC": 3883.774,
+     "SAI": 3891.356,
+     "NOR": 3921.129,
+     "OCO": 3941.206,
+     "RAI": 3941.338,
+     "STR": 3945.555,
+     "GAS": 3945.855,
+     "LAT": 3957.013,
+     "VET": 3960.566,
+     "GIO": 3961.403,
+     "RUS": 3964.716,
+     "ALO": 3968.41,
+     "MSC": 3980.086,
+     "MAZ": 4033.293
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "OCO",
+     "RAI",
+     "STR",
+     "GAS",
+     "LAT",
+     "VET",
+     "GIO",
+     "RUS",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ]
+   },
+   "13": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "SAI",
+     "RIC",
+     "NOR",
+     "OCO",
+     "RAI",
+     "STR",
+     "GAS",
+     "VET",
+     "GIO",
+     "RUS",
+     "LAT",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 28.446,
+     "BOT": 28.496,
+     "LEC": 61.649,
+     "PER": 75.803,
+     "SAI": 84.557,
+     "RIC": 89.358,
+     "NOR": 115.794,
+     "OCO": 137.329,
+     "RAI": 137.36,
+     "STR": 140.694,
+     "GAS": 141.189,
+     "VET": 146.703,
+     "GIO": 149.409,
+     "RUS": 156.659,
+     "LAT": 160.087,
+     "ALO": 162.498,
+     "MSC": 176.06,
+     "MAZ": 227.817
+    },
+    "times": {
+     "HAM": 3802.476,
+     "VER": 3830.922,
+     "BOT": 3830.972,
+     "LEC": 3864.124,
+     "PER": 3878.279,
+     "SAI": 3887.032,
+     "RIC": 3891.834,
+     "NOR": 3918.27,
+     "OCO": 3939.804,
+     "RAI": 3939.836,
+     "STR": 3943.17,
+     "GAS": 3943.664,
+     "VET": 3949.178,
+     "GIO": 3951.884,
+     "RUS": 3959.134,
+     "LAT": 3962.562,
+     "ALO": 3964.974,
+     "MSC": 3978.536,
+     "MAZ": 4030.293
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "SAI",
+     "RIC",
+     "NOR",
+     "OCO",
+     "RAI",
+     "STR",
+     "GAS",
+     "VET",
+     "GIO",
+     "RUS",
+     "LAT",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ]
+   },
+   "14": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "SAI",
+     "PER",
+     "RIC",
+     "NOR",
+     "OCO",
+     "RAI",
+     "GAS",
+     "STR",
+     "VET",
+     "GIO",
+     "RUS",
+     "LAT",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 24.3,
+     "BOT": 33.12,
+     "LEC": 56.327,
+     "SAI": 75.48,
+     "PER": 75.78,
+     "RIC": 79.416,
+     "NOR": 128.404,
+     "OCO": 133.96,
+     "RAI": 141.389,
+     "GAS": 142.664,
+     "STR": 144.359,
+     "VET": 145.99,
+     "GIO": 148.851,
+     "RUS": 155.929,
+     "LAT": 158.765,
+     "ALO": 161.49,
+     "MSC": 181.807,
+     "MAZ": 215.396
+    },
+    "times": {
+     "HAM": 3804.481,
+     "VER": 3828.781,
+     "BOT": 3837.6,
+     "LEC": 3860.807,
+     "SAI": 3879.961,
+     "PER": 3880.261,
+     "RIC": 3883.897,
+     "NOR": 3932.884,
+     "OCO": 3938.441,
+     "RAI": 3945.869,
+     "GAS": 3947.145,
+     "STR": 3948.84,
+     "VET": 3950.47,
+     "GIO": 3953.332,
+     "RUS": 3960.41,
+     "LAT": 3963.245,
+     "ALO": 3965.971,
+     "MSC": 3986.288,
+     "MAZ": 4019.877
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "SAI",
+     "PER",
+     "RIC",
+     "NOR",
+     "OCO",
+     "RAI",
+     "GAS",
+     "STR",
+     "VET",
+     "GIO",
+     "RUS",
+     "LAT",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ]
+   },
+   "15": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "OCO",
+     "GAS",
+     "VET",
+     "RAI",
+     "STR",
+     "GIO",
+     "LAT",
+     "RUS",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 24.512,
+     "BOT": 33.319,
+     "LEC": 54.049,
+     "PER": 69.108,
+     "RIC": 79.798,
+     "SAI": 86.024,
+     "NOR": 128.437,
+     "OCO": 138.4,
+     "GAS": 138.7,
+     "VET": 149.757,
+     "RAI": 151.139,
+     "STR": 151.439,
+     "GIO": 151.739,
+     "LAT": 156.052,
+     "RUS": 156.792,
+     "ALO": 176.217,
+     "MSC": 180.93,
+     "MAZ": 226.916
+    },
+    "times": {
+     "HAM": 3803.527,
+     "VER": 3828.039,
+     "BOT": 3836.846,
+     "LEC": 3857.576,
+     "PER": 3872.635,
+     "RIC": 3883.325,
+     "SAI": 3889.551,
+     "NOR": 3931.964,
+     "OCO": 3941.928,
+     "GAS": 3942.228,
+     "VET": 3953.285,
+     "RAI": 3954.666,
+     "STR": 3954.966,
+     "GIO": 3955.266,
+     "LAT": 3959.579,
+     "RUS": 3960.32,
+     "ALO": 3979.744,
+     "MSC": 3984.457,
+     "MAZ": 4030.443
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "OCO",
+     "GAS",
+     "VET",
+     "RAI",
+     "STR",
+     "GIO",
+     "LAT",
+     "RUS",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ]
+   },
+   "16": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "RIC",
+     "PER",
+     "SAI",
+     "NOR",
+     "GAS",
+     "STR",
+     "OCO",
+     "RAI",
+     "VET",
+     "GIO",
+     "LAT",
+     "RUS",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 19.569,
+     "BOT": 31.791,
+     "LEC": 60.383,
+     "RIC": 79.519,
+     "PER": 79.819,
+     "SAI": 90.521,
+     "NOR": 116.348,
+     "GAS": 129.304,
+     "STR": 138.795,
+     "OCO": 144.564,
+     "RAI": 147.12,
+     "VET": 150.676,
+     "GIO": 152.866,
+     "LAT": 161.34,
+     "RUS": 161.61,
+     "ALO": 173.584,
+     "MSC": 173.719,
+     "MAZ": 233.225
+    },
+    "times": {
+     "HAM": 3801.926,
+     "VER": 3821.496,
+     "BOT": 3833.718,
+     "LEC": 3862.309,
+     "RIC": 3881.445,
+     "PER": 3881.745,
+     "SAI": 3892.447,
+     "NOR": 3918.274,
+     "GAS": 3931.23,
+     "STR": 3940.721,
+     "OCO": 3946.49,
+     "RAI": 3949.046,
+     "VET": 3952.602,
+     "GIO": 3954.792,
+     "LAT": 3963.266,
+     "RUS": 3963.536,
+     "ALO": 3975.51,
+     "MSC": 3975.645,
+     "MAZ": 4035.151
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "RIC",
+     "PER",
+     "SAI",
+     "NOR",
+     "GAS",
+     "STR",
+     "OCO",
+     "RAI",
+     "VET",
+     "GIO",
+     "LAT",
+     "RUS",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ]
+   },
+   "17": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "OCO",
+     "STR",
+     "RAI",
+     "VET",
+     "GAS",
+     "GIO",
+     "LAT",
+     "RUS",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 21.51,
+     "BOT": 37.051,
+     "LEC": 58.995,
+     "PER": 84.148,
+     "RIC": 84.179,
+     "SAI": 88.463,
+     "NOR": 110.065,
+     "OCO": 137.657,
+     "STR": 137.73,
+     "RAI": 144.011,
+     "VET": 147.873,
+     "GAS": 148.173,
+     "GIO": 149.557,
+     "LAT": 155.075,
+     "RUS": 162.5,
+     "ALO": 166.599,
+     "MSC": 173.732,
+     "MAZ": 227.764
+    },
+    "times": {
+     "HAM": 3804.191,
+     "VER": 3825.701,
+     "BOT": 3841.242,
+     "LEC": 3863.185,
+     "PER": 3888.338,
+     "RIC": 3888.369,
+     "SAI": 3892.654,
+     "NOR": 3914.256,
+     "OCO": 3941.848,
+     "STR": 3941.92,
+     "RAI": 3948.201,
+     "VET": 3952.064,
+     "GAS": 3952.364,
+     "GIO": 3953.748,
+     "LAT": 3959.265,
+     "RUS": 3966.691,
+     "ALO": 3970.789,
+     "MSC": 3977.923,
+     "MAZ": 4031.955
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "OCO",
+     "STR",
+     "RAI",
+     "VET",
+     "GAS",
+     "GIO",
+     "LAT",
+     "RUS",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ]
+   },
+   "18": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "SAI",
+     "PER",
+     "RIC",
+     "NOR",
+     "OCO",
+     "RAI",
+     "GAS",
+     "STR",
+     "VET",
+     "GIO",
+     "ALO",
+     "RUS",
+     "LAT",
+     "MSC",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 19.362,
+     "BOT": 33.517,
+     "LEC": 54.894,
+     "SAI": 79.184,
+     "PER": 79.484,
+     "RIC": 85.835,
+     "NOR": 130.127,
+     "OCO": 132.648,
+     "RAI": 143.083,
+     "GAS": 143.383,
+     "STR": 144.867,
+     "VET": 147.462,
+     "GIO": 154.245,
+     "ALO": 156.707,
+     "RUS": 158.552,
+     "LAT": 166.089,
+     "MSC": 185.815,
+     "MAZ": 230.788
+    },
+    "times": {
+     "HAM": 3803.799,
+     "VER": 3823.161,
+     "BOT": 3837.317,
+     "LEC": 3858.693,
+     "SAI": 3882.983,
+     "PER": 3883.283,
+     "RIC": 3889.635,
+     "NOR": 3933.927,
+     "OCO": 3936.447,
+     "RAI": 3946.883,
+     "GAS": 3947.183,
+     "STR": 3948.666,
+     "VET": 3951.262,
+     "GIO": 3958.045,
+     "ALO": 3960.507,
+     "RUS": 3962.352,
+     "LAT": 3969.888,
+     "MSC": 3989.614,
+     "MAZ": 4034.588
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "SAI",
+     "PER",
+     "RIC",
+     "NOR",
+     "OCO",
+     "RAI",
+     "GAS",
+     "STR",
+     "VET",
+     "GIO",
+     "ALO",
+     "RUS",
+     "LAT",
+     "MSC",
+     "MAZ"
+    ]
+   },
+   "19": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "STR",
+     "OCO",
+     "NOR",
+     "GAS",
+     "RAI",
+     "VET",
+     "GIO",
+     "RUS",
+     "LAT",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 19.062,
+     "BOT": 29.207,
+     "LEC": 57.875,
+     "PER": 66.651,
+     "RIC": 79.908,
+     "SAI": 90.868,
+     "STR": 124.997,
+     "OCO": 133.872,
+     "NOR": 134.593,
+     "GAS": 140.719,
+     "RAI": 142.207,
+     "VET": 144.628,
+     "GIO": 154.11,
+     "RUS": 155.161,
+     "LAT": 157.358,
+     "ALO": 167.549,
+     "MSC": 179.367,
+     "MAZ": 219.424
+    },
+    "times": {
+     "HAM": 3805.602,
+     "VER": 3824.664,
+     "BOT": 3834.808,
+     "LEC": 3863.477,
+     "PER": 3872.253,
+     "RIC": 3885.51,
+     "SAI": 3896.47,
+     "STR": 3930.599,
+     "OCO": 3939.474,
+     "NOR": 3940.194,
+     "GAS": 3946.321,
+     "RAI": 3947.809,
+     "VET": 3950.23,
+     "GIO": 3959.712,
+     "RUS": 3960.762,
+     "LAT": 3962.96,
+     "ALO": 3973.151,
+     "MSC": 3984.969,
+     "MAZ": 4025.026
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "STR",
+     "OCO",
+     "NOR",
+     "GAS",
+     "RAI",
+     "VET",
+     "GIO",
+     "RUS",
+     "LAT",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ]
+   },
+   "20": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "OCO",
+     "GAS",
+     "RAI",
+     "STR",
+     "VET",
+     "GIO",
+     "RUS",
+     "LAT",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 20.629,
+     "BOT": 32.66,
+     "LEC": 54.322,
+     "PER": 72.258,
+     "RIC": 76.403,
+     "SAI": 86.083,
+     "NOR": 112.864,
+     "OCO": 135.577,
+     "GAS": 136.894,
+     "RAI": 139.994,
+     "STR": 140.664,
+     "VET": 148.015,
+     "GIO": 155.549,
+     "RUS": 157.03,
+     "LAT": 158.691,
+     "ALO": 158.991,
+     "MSC": 178.192,
+     "MAZ": 227.468
+    },
+    "times": {
+     "HAM": 3805.615,
+     "VER": 3826.244,
+     "BOT": 3838.274,
+     "LEC": 3859.936,
+     "PER": 3877.873,
+     "RIC": 3882.018,
+     "SAI": 3891.697,
+     "NOR": 3918.478,
+     "OCO": 3941.191,
+     "GAS": 3942.508,
+     "RAI": 3945.609,
+     "STR": 3946.279,
+     "VET": 3953.629,
+     "GIO": 3961.163,
+     "RUS": 3962.644,
+     "LAT": 3964.306,
+     "ALO": 3964.606,
+     "MSC": 3983.806,
+     "MAZ": 4033.082
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "OCO",
+     "GAS",
+     "RAI",
+     "STR",
+     "VET",
+     "GIO",
+     "RUS",
+     "LAT",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ]
+   }
+  },
+  "spain-2021-held-roll": {
+   "1": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "OCO",
+     "RAI",
+     "STR",
+     "VET",
+     "GIO",
+     "RUS",
+     "GAS",
+     "LAT",
+     "MSC",
+     "ALO",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 26.372,
+     "BOT": 30.52,
+     "LEC": 55.744,
+     "PER": 74.087,
+     "RIC": 76.271,
+     "SAI": 87.56,
+     "NOR": 121.282,
+     "OCO": 137.208,
+     "RAI": 151.759,
+     "STR": 154.441,
+     "VET": 160.649,
+     "GIO": 162.764,
+     "RUS": 164.869,
+     "GAS": 165.659,
+     "LAT": 165.659,
+     "MSC": 167.806,
+     "ALO": 171.915,
+     "MAZ": 228.664
+    },
+    "times": {
+     "HAM": 3806.872,
+     "VER": 3833.244,
+     "BOT": 3837.392,
+     "LEC": 3862.616,
+     "PER": 3880.959,
+     "RIC": 3883.143,
+     "SAI": 3894.432,
+     "NOR": 3928.154,
+     "OCO": 3944.08,
+     "RAI": 3958.631,
+     "STR": 3961.313,
+     "VET": 3967.521,
+     "GIO": 3969.636,
+     "RUS": 3971.741,
+     "GAS": 3972.531,
+     "LAT": 3972.531,
+     "MSC": 3974.678,
+     "ALO": 3978.787,
+     "MAZ": 4035.536
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "OCO",
+     "RAI",
+     "STR",
+     "VET",
+     "GIO",
+     "RUS",
+     "GAS",
+     "LAT",
+     "MSC",
+     "ALO",
+     "MAZ"
+    ]
+   },
+   "2": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "OCO",
+     "STR",
+     "NOR",
+     "VET",
+     "RAI",
+     "RUS",
+     "GIO",
+     "GAS",
+     "LAT",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 19.542,
+     "BOT": 26.355,
+     "LEC": 54.027,
+     "PER": 62.483,
+     "RIC": 78.814,
+     "SAI": 85.664,
+     "OCO": 130.408,
+     "STR": 133.007,
+     "NOR": 135.799,
+     "VET": 146.184,
+     "RAI": 152.927,
+     "RUS": 154.186,
+     "GIO": 154.976,
+     "GAS": 155.766,
+     "LAT": 156.556,
+     "ALO": 162.423,
+     "MSC": 172.21,
+     "MAZ": 223.276
+    },
+    "times": {
+     "HAM": 3807.871,
+     "VER": 3827.413,
+     "BOT": 3834.226,
+     "LEC": 3861.897,
+     "PER": 3870.354,
+     "RIC": 3886.685,
+     "SAI": 3893.535,
+     "OCO": 3938.279,
+     "STR": 3940.878,
+     "NOR": 3943.669,
+     "VET": 3954.055,
+     "RAI": 3960.797,
+     "RUS": 3962.056,
+     "GIO": 3962.846,
+     "GAS": 3963.636,
+     "LAT": 3964.426,
+     "ALO": 3970.294,
+     "MSC": 3980.081,
+     "MAZ": 4031.147
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "OCO",
+     "STR",
+     "NOR",
+     "VET",
+     "RAI",
+     "RUS",
+     "GIO",
+     "GAS",
+     "LAT",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ]
+   },
+   "3": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "OCO",
+     "RAI",
+     "STR",
+     "VET",
+     "RUS",
+     "GIO",
+     "GAS",
+     "LAT",
+     "MSC",
+     "ALO",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 18.539,
+     "BOT": 29.24,
+     "LEC": 55.865,
+     "PER": 70.821,
+     "RIC": 85.535,
+     "SAI": 87.571,
+     "NOR": 111.438,
+     "OCO": 127.755,
+     "RAI": 154.959,
+     "STR": 159.104,
+     "VET": 161.8,
+     "RUS": 165.306,
+     "GIO": 166.096,
+     "GAS": 166.886,
+     "LAT": 169.647,
+     "MSC": 175.837,
+     "ALO": 176.627,
+     "MAZ": 224.871
+    },
+    "times": {
+     "HAM": 3805.906,
+     "VER": 3824.445,
+     "BOT": 3835.147,
+     "LEC": 3861.772,
+     "PER": 3876.728,
+     "RIC": 3891.441,
+     "SAI": 3893.477,
+     "NOR": 3917.344,
+     "OCO": 3933.661,
+     "RAI": 3960.865,
+     "STR": 3965.01,
+     "VET": 3967.706,
+     "RUS": 3971.212,
+     "GIO": 3972.002,
+     "GAS": 3972.792,
+     "LAT": 3975.554,
+     "MSC": 3981.744,
+     "ALO": 3982.534,
+     "MAZ": 4030.778
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "OCO",
+     "RAI",
+     "STR",
+     "VET",
+     "RUS",
+     "GIO",
+     "GAS",
+     "LAT",
+     "MSC",
+     "ALO",
+     "MAZ"
+    ]
+   },
+   "4": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "RIC",
+     "PER",
+     "SAI",
+     "OCO",
+     "NOR",
+     "RAI",
+     "STR",
+     "VET",
+     "GIO",
+     "GAS",
+     "RUS",
+     "LAT",
+     "MSC",
+     "ALO",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 19.932,
+     "BOT": 28.381,
+     "LEC": 54.763,
+     "RIC": 72.868,
+     "PER": 73.74,
+     "SAI": 90.526,
+     "OCO": 137.271,
+     "NOR": 138.061,
+     "RAI": 141.178,
+     "STR": 146.614,
+     "VET": 156.867,
+     "GIO": 158.126,
+     "GAS": 159.602,
+     "RUS": 161.595,
+     "LAT": 162.385,
+     "MSC": 168.387,
+     "ALO": 169.297,
+     "MAZ": 220.445
+    },
+    "times": {
+     "HAM": 3807.312,
+     "VER": 3827.244,
+     "BOT": 3835.692,
+     "LEC": 3862.074,
+     "RIC": 3880.18,
+     "PER": 3881.052,
+     "SAI": 3897.837,
+     "OCO": 3944.582,
+     "NOR": 3945.372,
+     "RAI": 3948.489,
+     "STR": 3953.925,
+     "VET": 3964.179,
+     "GIO": 3965.437,
+     "GAS": 3966.913,
+     "RUS": 3968.906,
+     "LAT": 3969.696,
+     "MSC": 3975.699,
+     "ALO": 3976.609,
+     "MAZ": 4027.756
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "RIC",
+     "PER",
+     "SAI",
+     "OCO",
+     "NOR",
+     "RAI",
+     "STR",
+     "VET",
+     "GIO",
+     "GAS",
+     "RUS",
+     "LAT",
+     "MSC",
+     "ALO",
+     "MAZ"
+    ]
+   },
+   "5": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "RIC",
+     "SAI",
+     "PER",
+     "NOR",
+     "RAI",
+     "OCO",
+     "STR",
+     "VET",
+     "GAS",
+     "GIO",
+     "RUS",
+     "LAT",
+     "MSC",
+     "ALO",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 18.852,
+     "BOT": 30.477,
+     "LEC": 56.851,
+     "RIC": 79.982,
+     "SAI": 81.744,
+     "PER": 82.534,
+     "NOR": 117.012,
+     "RAI": 138.205,
+     "OCO": 140.628,
+     "STR": 150.041,
+     "VET": 154.825,
+     "GAS": 155.677,
+     "GIO": 162.508,
+     "RUS": 164.261,
+     "LAT": 165.051,
+     "MSC": 174.832,
+     "ALO": 175.622,
+     "MAZ": 227.039
+    },
+    "times": {
+     "HAM": 3803.416,
+     "VER": 3822.268,
+     "BOT": 3833.893,
+     "LEC": 3860.268,
+     "RIC": 3883.398,
+     "SAI": 3885.16,
+     "PER": 3885.95,
+     "NOR": 3920.428,
+     "RAI": 3941.621,
+     "OCO": 3944.044,
+     "STR": 3953.457,
+     "VET": 3958.241,
+     "GAS": 3959.093,
+     "GIO": 3965.924,
+     "RUS": 3967.677,
+     "LAT": 3968.467,
+     "MSC": 3978.248,
+     "ALO": 3979.038,
+     "MAZ": 4030.455
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "RIC",
+     "SAI",
+     "PER",
+     "NOR",
+     "RAI",
+     "OCO",
+     "STR",
+     "VET",
+     "GAS",
+     "GIO",
+     "RUS",
+     "LAT",
+     "MSC",
+     "ALO",
+     "MAZ"
+    ]
+   },
+   "6": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "SAI",
+     "RIC",
+     "RAI",
+     "OCO",
+     "STR",
+     "NOR",
+     "VET",
+     "GIO",
+     "GAS",
+     "LAT",
+     "RUS",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 19.3,
+     "BOT": 29.936,
+     "LEC": 56.2,
+     "PER": 69.051,
+     "SAI": 79.822,
+     "RIC": 90.304,
+     "RAI": 134.197,
+     "OCO": 135.143,
+     "STR": 142.669,
+     "NOR": 143.459,
+     "VET": 148.053,
+     "GIO": 148.843,
+     "GAS": 150.414,
+     "LAT": 160.717,
+     "RUS": 161.448,
+     "ALO": 162.981,
+     "MSC": 173.239,
+     "MAZ": 215.319
+    },
+    "times": {
+     "HAM": 3807.973,
+     "VER": 3827.273,
+     "BOT": 3837.909,
+     "LEC": 3864.174,
+     "PER": 3877.024,
+     "SAI": 3887.795,
+     "RIC": 3898.277,
+     "RAI": 3942.17,
+     "OCO": 3943.116,
+     "STR": 3950.642,
+     "NOR": 3951.432,
+     "VET": 3956.026,
+     "GIO": 3956.816,
+     "GAS": 3958.387,
+     "LAT": 3968.69,
+     "RUS": 3969.422,
+     "ALO": 3970.954,
+     "MSC": 3981.212,
+     "MAZ": 4023.292
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "SAI",
+     "RIC",
+     "RAI",
+     "OCO",
+     "STR",
+     "NOR",
+     "VET",
+     "GIO",
+     "GAS",
+     "LAT",
+     "RUS",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ]
+   },
+   "7": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "RIC",
+     "PER",
+     "SAI",
+     "OCO",
+     "NOR",
+     "STR",
+     "RAI",
+     "VET",
+     "RUS",
+     "GAS",
+     "GIO",
+     "LAT",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 18.8,
+     "BOT": 30.446,
+     "LEC": 50.584,
+     "RIC": 76.195,
+     "PER": 76.985,
+     "SAI": 88.303,
+     "OCO": 128.571,
+     "NOR": 129.361,
+     "STR": 149.194,
+     "RAI": 153.622,
+     "VET": 157.389,
+     "RUS": 157.439,
+     "GAS": 158.179,
+     "GIO": 159.701,
+     "LAT": 160.491,
+     "ALO": 168.083,
+     "MSC": 179.471,
+     "MAZ": 225.369
+    },
+    "times": {
+     "HAM": 3807.312,
+     "VER": 3826.112,
+     "BOT": 3837.758,
+     "LEC": 3857.896,
+     "RIC": 3883.508,
+     "PER": 3884.298,
+     "SAI": 3895.615,
+     "OCO": 3935.883,
+     "NOR": 3936.673,
+     "STR": 3956.507,
+     "RAI": 3960.934,
+     "VET": 3964.701,
+     "RUS": 3964.751,
+     "GAS": 3965.491,
+     "GIO": 3967.014,
+     "LAT": 3967.804,
+     "ALO": 3975.395,
+     "MSC": 3986.784,
+     "MAZ": 4032.681
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "RIC",
+     "PER",
+     "SAI",
+     "OCO",
+     "NOR",
+     "STR",
+     "RAI",
+     "VET",
+     "RUS",
+     "GAS",
+     "GIO",
+     "LAT",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ]
+   },
+   "8": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "OCO",
+     "STR",
+     "RAI",
+     "GAS",
+     "GIO",
+     "VET",
+     "LAT",
+     "RUS",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 25.049,
+     "BOT": 31.707,
+     "LEC": 63.64,
+     "PER": 77.606,
+     "RIC": 84.586,
+     "SAI": 107.926,
+     "NOR": 125.729,
+     "OCO": 143.642,
+     "STR": 154.051,
+     "RAI": 158.674,
+     "GAS": 159.68,
+     "GIO": 165.778,
+     "VET": 167.223,
+     "LAT": 168.564,
+     "RUS": 170.062,
+     "ALO": 173.256,
+     "MSC": 183.649,
+     "MAZ": 238.067
+    },
+    "times": {
+     "HAM": 3798.759,
+     "VER": 3823.808,
+     "BOT": 3830.467,
+     "LEC": 3862.4,
+     "PER": 3876.365,
+     "RIC": 3883.346,
+     "SAI": 3906.685,
+     "NOR": 3924.488,
+     "OCO": 3942.401,
+     "STR": 3952.811,
+     "RAI": 3957.433,
+     "GAS": 3958.439,
+     "GIO": 3964.537,
+     "VET": 3965.982,
+     "LAT": 3967.323,
+     "RUS": 3968.821,
+     "ALO": 3972.016,
+     "MSC": 3982.408,
+     "MAZ": 4036.826
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "OCO",
+     "STR",
+     "RAI",
+     "GAS",
+     "GIO",
+     "VET",
+     "LAT",
+     "RUS",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ]
+   },
+   "9": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "OCO",
+     "RAI",
+     "STR",
+     "VET",
+     "GIO",
+     "GAS",
+     "LAT",
+     "RUS",
+     "MSC",
+     "ALO",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 22.575,
+     "BOT": 32.84,
+     "LEC": 63.914,
+     "PER": 78.963,
+     "RIC": 85.802,
+     "SAI": 103.682,
+     "NOR": 123.981,
+     "OCO": 148.246,
+     "RAI": 152.379,
+     "STR": 154.301,
+     "VET": 157.367,
+     "GIO": 159.981,
+     "GAS": 162.315,
+     "LAT": 167.674,
+     "RUS": 171.406,
+     "MSC": 172.196,
+     "ALO": 172.986,
+     "MAZ": 231.575
+    },
+    "times": {
+     "HAM": 3800.987,
+     "VER": 3823.561,
+     "BOT": 3833.827,
+     "LEC": 3864.901,
+     "PER": 3879.95,
+     "RIC": 3886.789,
+     "SAI": 3904.669,
+     "NOR": 3924.968,
+     "OCO": 3949.232,
+     "RAI": 3953.366,
+     "STR": 3955.288,
+     "VET": 3958.354,
+     "GIO": 3960.968,
+     "GAS": 3963.301,
+     "LAT": 3968.661,
+     "RUS": 3972.393,
+     "MSC": 3973.183,
+     "ALO": 3973.973,
+     "MAZ": 4032.562
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "OCO",
+     "RAI",
+     "STR",
+     "VET",
+     "GIO",
+     "GAS",
+     "LAT",
+     "RUS",
+     "MSC",
+     "ALO",
+     "MAZ"
+    ]
+   },
+   "10": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "OCO",
+     "RAI",
+     "STR",
+     "RUS",
+     "VET",
+     "GIO",
+     "GAS",
+     "LAT",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 21.866,
+     "BOT": 30.303,
+     "LEC": 50.881,
+     "PER": 68.784,
+     "RIC": 76.318,
+     "SAI": 91.06,
+     "NOR": 122.688,
+     "OCO": 131.685,
+     "RAI": 148.3,
+     "STR": 151.419,
+     "RUS": 154.783,
+     "VET": 155.573,
+     "GIO": 156.363,
+     "GAS": 157.153,
+     "LAT": 157.943,
+     "ALO": 161.879,
+     "MSC": 172.212,
+     "MAZ": 219.783
+    },
+    "times": {
+     "HAM": 3808.41,
+     "VER": 3830.276,
+     "BOT": 3838.713,
+     "LEC": 3859.291,
+     "PER": 3877.194,
+     "RIC": 3884.728,
+     "SAI": 3899.47,
+     "NOR": 3931.098,
+     "OCO": 3940.095,
+     "RAI": 3956.71,
+     "STR": 3959.829,
+     "RUS": 3963.193,
+     "VET": 3963.983,
+     "GIO": 3964.773,
+     "GAS": 3965.563,
+     "LAT": 3966.353,
+     "ALO": 3970.289,
+     "MSC": 3980.622,
+     "MAZ": 4028.193
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "OCO",
+     "RAI",
+     "STR",
+     "RUS",
+     "VET",
+     "GIO",
+     "GAS",
+     "LAT",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ]
+   },
+   "11": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "OCO",
+     "STR",
+     "RAI",
+     "VET",
+     "GIO",
+     "LAT",
+     "GAS",
+     "RUS",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 19.896,
+     "BOT": 29.652,
+     "LEC": 51.741,
+     "PER": 67.768,
+     "RIC": 79.603,
+     "SAI": 91.713,
+     "NOR": 123.55,
+     "OCO": 133.001,
+     "STR": 147.113,
+     "RAI": 148.215,
+     "VET": 150.143,
+     "GIO": 153.161,
+     "LAT": 156.728,
+     "GAS": 157.518,
+     "RUS": 163.503,
+     "ALO": 166.232,
+     "MSC": 168.834,
+     "MAZ": 218.016
+    },
+    "times": {
+     "HAM": 3808.357,
+     "VER": 3828.253,
+     "BOT": 3838.009,
+     "LEC": 3860.098,
+     "PER": 3876.125,
+     "RIC": 3887.96,
+     "SAI": 3900.07,
+     "NOR": 3931.907,
+     "OCO": 3941.358,
+     "STR": 3955.47,
+     "RAI": 3956.572,
+     "VET": 3958.5,
+     "GIO": 3961.518,
+     "LAT": 3965.085,
+     "GAS": 3965.875,
+     "RUS": 3971.86,
+     "ALO": 3974.589,
+     "MSC": 3977.191,
+     "MAZ": 4026.373
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "OCO",
+     "STR",
+     "RAI",
+     "VET",
+     "GIO",
+     "LAT",
+     "GAS",
+     "RUS",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ]
+   },
+   "12": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "OCO",
+     "RAI",
+     "STR",
+     "GAS",
+     "VET",
+     "GIO",
+     "LAT",
+     "RUS",
+     "MSC",
+     "ALO",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 18.005,
+     "BOT": 31.788,
+     "LEC": 54.174,
+     "PER": 75.137,
+     "RIC": 77.198,
+     "SAI": 94.119,
+     "NOR": 121.18,
+     "OCO": 134.622,
+     "RAI": 135.981,
+     "STR": 144.243,
+     "GAS": 145.033,
+     "VET": 159.077,
+     "GIO": 160.716,
+     "LAT": 161.821,
+     "RUS": 164.357,
+     "MSC": 172.486,
+     "ALO": 176.475,
+     "MAZ": 225.755
+    },
+    "times": {
+     "HAM": 3806.566,
+     "VER": 3824.571,
+     "BOT": 3838.354,
+     "LEC": 3860.74,
+     "PER": 3881.703,
+     "RIC": 3883.764,
+     "SAI": 3900.685,
+     "NOR": 3927.746,
+     "OCO": 3941.188,
+     "RAI": 3942.547,
+     "STR": 3950.809,
+     "GAS": 3951.599,
+     "VET": 3965.643,
+     "GIO": 3967.282,
+     "LAT": 3968.386,
+     "RUS": 3970.923,
+     "MSC": 3979.052,
+     "ALO": 3983.041,
+     "MAZ": 4032.321
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "OCO",
+     "RAI",
+     "STR",
+     "GAS",
+     "VET",
+     "GIO",
+     "LAT",
+     "RUS",
+     "MSC",
+     "ALO",
+     "MAZ"
+    ]
+   },
+   "13": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "OCO",
+     "RAI",
+     "GIO",
+     "VET",
+     "RUS",
+     "STR",
+     "GAS",
+     "LAT",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 20.383,
+     "BOT": 24.878,
+     "LEC": 55.092,
+     "PER": 71.125,
+     "RIC": 80.873,
+     "SAI": 85.03,
+     "NOR": 129.825,
+     "OCO": 143.216,
+     "RAI": 148.251,
+     "GIO": 152.48,
+     "VET": 154.022,
+     "RUS": 160.576,
+     "STR": 161.366,
+     "GAS": 162.156,
+     "LAT": 162.946,
+     "ALO": 169.1,
+     "MSC": 170.913,
+     "MAZ": 222.482
+    },
+    "times": {
+     "HAM": 3807.81,
+     "VER": 3828.194,
+     "BOT": 3832.688,
+     "LEC": 3862.902,
+     "PER": 3878.936,
+     "RIC": 3888.683,
+     "SAI": 3892.84,
+     "NOR": 3937.635,
+     "OCO": 3951.026,
+     "RAI": 3956.061,
+     "GIO": 3960.291,
+     "VET": 3961.833,
+     "RUS": 3968.386,
+     "STR": 3969.176,
+     "GAS": 3969.966,
+     "LAT": 3970.756,
+     "ALO": 3976.91,
+     "MSC": 3978.723,
+     "MAZ": 4030.293
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "OCO",
+     "RAI",
+     "GIO",
+     "VET",
+     "RUS",
+     "STR",
+     "GAS",
+     "LAT",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ]
+   },
+   "14": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "OCO",
+     "RAI",
+     "STR",
+     "VET",
+     "GAS",
+     "GIO",
+     "RUS",
+     "LAT",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 22.413,
+     "BOT": 31.233,
+     "LEC": 54.44,
+     "PER": 70.932,
+     "RIC": 77.346,
+     "SAI": 84.28,
+     "NOR": 134.947,
+     "OCO": 137.103,
+     "RAI": 141.19,
+     "STR": 149.11,
+     "VET": 153.557,
+     "GAS": 154.596,
+     "GIO": 158.503,
+     "RUS": 159.222,
+     "LAT": 159.293,
+     "ALO": 160.083,
+     "MSC": 178.171,
+     "MAZ": 213.51
+    },
+    "times": {
+     "HAM": 3806.367,
+     "VER": 3828.781,
+     "BOT": 3837.6,
+     "LEC": 3860.807,
+     "PER": 3877.3,
+     "RIC": 3883.714,
+     "SAI": 3890.647,
+     "NOR": 3941.314,
+     "OCO": 3943.471,
+     "RAI": 3947.557,
+     "STR": 3955.478,
+     "VET": 3959.925,
+     "GAS": 3960.963,
+     "GIO": 3964.871,
+     "RUS": 3965.59,
+     "LAT": 3965.661,
+     "ALO": 3966.451,
+     "MSC": 3984.539,
+     "MAZ": 4019.877
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "OCO",
+     "RAI",
+     "STR",
+     "VET",
+     "GAS",
+     "GIO",
+     "RUS",
+     "LAT",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ]
+   },
+   "15": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "OCO",
+     "RAI",
+     "STR",
+     "GAS",
+     "RUS",
+     "VET",
+     "GIO",
+     "LAT",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 19.071,
+     "BOT": 29.02,
+     "LEC": 49.581,
+     "PER": 64.64,
+     "RIC": 75.33,
+     "SAI": 78.432,
+     "NOR": 125.05,
+     "OCO": 135.366,
+     "RAI": 148.644,
+     "STR": 155.523,
+     "GAS": 156.726,
+     "RUS": 158.561,
+     "VET": 159.351,
+     "GIO": 160.141,
+     "LAT": 160.931,
+     "ALO": 167.102,
+     "MSC": 176.071,
+     "MAZ": 221.795
+    },
+    "times": {
+     "HAM": 3807.996,
+     "VER": 3827.066,
+     "BOT": 3837.016,
+     "LEC": 3857.576,
+     "PER": 3872.635,
+     "RIC": 3883.325,
+     "SAI": 3886.428,
+     "NOR": 3933.046,
+     "OCO": 3943.362,
+     "RAI": 3956.639,
+     "STR": 3963.518,
+     "GAS": 3964.721,
+     "RUS": 3966.556,
+     "VET": 3967.346,
+     "GIO": 3968.136,
+     "LAT": 3968.926,
+     "ALO": 3975.097,
+     "MSC": 3984.066,
+     "MAZ": 4029.791
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "OCO",
+     "RAI",
+     "STR",
+     "GAS",
+     "RUS",
+     "VET",
+     "GIO",
+     "LAT",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ]
+   },
+   "16": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "RIC",
+     "PER",
+     "SAI",
+     "NOR",
+     "OCO",
+     "STR",
+     "RAI",
+     "GAS",
+     "VET",
+     "RUS",
+     "GIO",
+     "LAT",
+     "MSC",
+     "ALO",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 19.23,
+     "BOT": 33.66,
+     "LEC": 60.364,
+     "RIC": 79.333,
+     "PER": 80.123,
+     "SAI": 97.829,
+     "NOR": 131.906,
+     "OCO": 146.118,
+     "STR": 155.14,
+     "RAI": 157.351,
+     "GAS": 158.141,
+     "VET": 166.851,
+     "RUS": 167.655,
+     "GIO": 168.445,
+     "LAT": 169.135,
+     "MSC": 173.297,
+     "ALO": 175.106,
+     "MAZ": 232.886
+    },
+    "times": {
+     "HAM": 3802.266,
+     "VER": 3821.496,
+     "BOT": 3835.925,
+     "LEC": 3862.629,
+     "RIC": 3881.598,
+     "PER": 3882.388,
+     "SAI": 3900.095,
+     "NOR": 3934.171,
+     "OCO": 3948.383,
+     "STR": 3957.405,
+     "RAI": 3959.617,
+     "GAS": 3960.407,
+     "VET": 3969.117,
+     "RUS": 3969.92,
+     "GIO": 3970.71,
+     "LAT": 3971.401,
+     "MSC": 3975.563,
+     "ALO": 3977.372,
+     "MAZ": 4035.151
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "RIC",
+     "PER",
+     "SAI",
+     "NOR",
+     "OCO",
+     "STR",
+     "RAI",
+     "GAS",
+     "VET",
+     "RUS",
+     "GIO",
+     "LAT",
+     "MSC",
+     "ALO",
+     "MAZ"
+    ]
+   },
+   "17": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "RIC",
+     "PER",
+     "SAI",
+     "NOR",
+     "OCO",
+     "RAI",
+     "GIO",
+     "STR",
+     "GAS",
+     "VET",
+     "LAT",
+     "RUS",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 18.354,
+     "BOT": 34.227,
+     "LEC": 56.087,
+     "RIC": 78.616,
+     "PER": 81.926,
+     "SAI": 81.976,
+     "NOR": 122.797,
+     "OCO": 141.066,
+     "RAI": 147.868,
+     "GIO": 149.788,
+     "STR": 151.021,
+     "GAS": 151.811,
+     "VET": 157.704,
+     "LAT": 158.593,
+     "RUS": 163.585,
+     "ALO": 171.743,
+     "MSC": 173.306,
+     "MAZ": 224.608
+    },
+    "times": {
+     "HAM": 3807.098,
+     "VER": 3825.452,
+     "BOT": 3841.325,
+     "LEC": 3863.185,
+     "RIC": 3885.714,
+     "PER": 3889.024,
+     "SAI": 3889.074,
+     "NOR": 3929.895,
+     "OCO": 3948.164,
+     "RAI": 3954.966,
+     "GIO": 3956.885,
+     "STR": 3958.118,
+     "GAS": 3958.908,
+     "VET": 3964.802,
+     "LAT": 3965.691,
+     "RUS": 3970.682,
+     "ALO": 3978.841,
+     "MSC": 3980.404,
+     "MAZ": 4031.705
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "RIC",
+     "PER",
+     "SAI",
+     "NOR",
+     "OCO",
+     "RAI",
+     "GIO",
+     "STR",
+     "GAS",
+     "VET",
+     "LAT",
+     "RUS",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ]
+   },
+   "18": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "OCO",
+     "NOR",
+     "RAI",
+     "STR",
+     "GAS",
+     "RUS",
+     "VET",
+     "GIO",
+     "LAT",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 19.192,
+     "BOT": 33.517,
+     "LEC": 54.724,
+     "PER": 81.709,
+     "RIC": 84.633,
+     "SAI": 85.989,
+     "OCO": 131.947,
+     "NOR": 140.754,
+     "RAI": 140.804,
+     "STR": 149.433,
+     "GAS": 150.223,
+     "RUS": 162.233,
+     "VET": 163.023,
+     "GIO": 163.813,
+     "LAT": 164.603,
+     "ALO": 172.371,
+     "MSC": 184.54,
+     "MAZ": 230.618
+    },
+    "times": {
+     "HAM": 3803.969,
+     "VER": 3823.161,
+     "BOT": 3837.487,
+     "LEC": 3858.693,
+     "PER": 3885.678,
+     "RIC": 3888.602,
+     "SAI": 3889.959,
+     "OCO": 3935.917,
+     "NOR": 3944.723,
+     "RAI": 3944.773,
+     "STR": 3953.402,
+     "GAS": 3954.192,
+     "RUS": 3966.202,
+     "VET": 3966.992,
+     "GIO": 3967.782,
+     "LAT": 3968.572,
+     "ALO": 3976.341,
+     "MSC": 3988.509,
+     "MAZ": 4034.588
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "OCO",
+     "NOR",
+     "RAI",
+     "STR",
+     "GAS",
+     "RUS",
+     "VET",
+     "GIO",
+     "LAT",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ]
+   },
+   "19": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "RIC",
+     "PER",
+     "SAI",
+     "STR",
+     "OCO",
+     "NOR",
+     "RAI",
+     "GAS",
+     "VET",
+     "GIO",
+     "RUS",
+     "LAT",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 15.972,
+     "BOT": 30.899,
+     "LEC": 54.132,
+     "RIC": 75.835,
+     "PER": 76.625,
+     "SAI": 100.005,
+     "STR": 130.451,
+     "OCO": 135.921,
+     "NOR": 141.81,
+     "RAI": 150.961,
+     "GAS": 152.197,
+     "VET": 153.094,
+     "GIO": 158.195,
+     "RUS": 160.034,
+     "LAT": 160.824,
+     "ALO": 162.206,
+     "MSC": 176.597,
+     "MAZ": 216.334
+    },
+    "times": {
+     "HAM": 3808.692,
+     "VER": 3824.664,
+     "BOT": 3839.591,
+     "LEC": 3862.824,
+     "RIC": 3884.527,
+     "PER": 3885.317,
+     "SAI": 3908.697,
+     "STR": 3939.143,
+     "OCO": 3944.614,
+     "NOR": 3950.502,
+     "RAI": 3959.653,
+     "GAS": 3960.889,
+     "VET": 3961.786,
+     "GIO": 3966.887,
+     "RUS": 3968.726,
+     "LAT": 3969.516,
+     "ALO": 3970.898,
+     "MSC": 3985.289,
+     "MAZ": 4025.026
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "RIC",
+     "PER",
+     "SAI",
+     "STR",
+     "OCO",
+     "NOR",
+     "RAI",
+     "GAS",
+     "VET",
+     "GIO",
+     "RUS",
+     "LAT",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ]
+   },
+   "20": {
+    "order": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "OCO",
+     "RAI",
+     "STR",
+     "GAS",
+     "VET",
+     "GIO",
+     "RUS",
+     "LAT",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ],
+    "gaps": {
+     "HAM": 0.0,
+     "VER": 18.12,
+     "BOT": 31.317,
+     "LEC": 52.785,
+     "PER": 73.93,
+     "RIC": 73.98,
+     "SAI": 98.886,
+     "NOR": 118.154,
+     "OCO": 137.898,
+     "RAI": 143.628,
+     "STR": 154.13,
+     "GAS": 156.636,
+     "VET": 165.887,
+     "GIO": 167.046,
+     "RUS": 169.31,
+     "LAT": 170.1,
+     "ALO": 170.1,
+     "MSC": 178.127,
+     "MAZ": 225.931
+    },
+    "times": {
+     "HAM": 3807.151,
+     "VER": 3825.271,
+     "BOT": 3838.468,
+     "LEC": 3859.936,
+     "PER": 3881.081,
+     "RIC": 3881.131,
+     "SAI": 3906.037,
+     "NOR": 3925.305,
+     "OCO": 3945.049,
+     "RAI": 3950.779,
+     "STR": 3961.281,
+     "GAS": 3963.787,
+     "VET": 3973.038,
+     "GIO": 3974.197,
+     "RUS": 3976.461,
+     "LAT": 3977.251,
+     "ALO": 3977.251,
+     "MSC": 3985.278,
+     "MAZ": 4033.082
+    },
+    "finishers": [
+     "HAM",
+     "VER",
+     "BOT",
+     "LEC",
+     "PER",
+     "RIC",
+     "SAI",
+     "NOR",
+     "OCO",
+     "RAI",
+     "STR",
+     "GAS",
+     "VET",
+     "GIO",
+     "RUS",
+     "LAT",
+     "ALO",
+     "MSC",
+     "MAZ"
+    ]
+   }
+  },
+  "brazil-2006-roll": {
+   "1": {
+    "order": [
+     "MAS",
+     "ALO",
+     "FIS",
+     "BUT",
+     "RAI",
+     "BAR",
+     "DLR",
+     "KUB",
+     "MSCM",
+     "SAT",
+     "LIU",
+     "DOOR",
+     "SPE",
+     "ALBC",
+     "TMO",
+     "YAM",
+     "HEI"
+    ],
+    "gaps": {
+     "MAS": 0.0,
+     "ALO": 19.904,
+     "FIS": 35.2,
+     "BUT": 35.5,
+     "RAI": 38.188,
+     "BAR": 40.272,
+     "DLR": 50.053,
+     "KUB": 61.747,
+     "MSCM": 62.808,
+     "SAT": 70.999,
+     "LIU": 117.273,
+     "DOOR": 118.98,
+     "SPE": 119.407,
+     "ALBC": 125.736,
+     "TMO": 149.862,
+     "YAM": 167.219
+    },
+    "times": {
+     "MAS": 3593.406,
+     "ALO": 3613.31,
+     "FIS": 3628.606,
+     "BUT": 3628.906,
+     "RAI": 3631.594,
+     "BAR": 3633.678,
+     "DLR": 3643.459,
+     "KUB": 3655.153,
+     "MSCM": 3656.214,
+     "SAT": 3664.405,
+     "LIU": 3710.679,
+     "DOOR": 3712.386,
+     "SPE": 3712.813,
+     "ALBC": 3719.142,
+     "TMO": 3743.268,
+     "YAM": 3760.625
+    },
+    "finishers": [
+     "MAS",
+     "ALO",
+     "FIS",
+     "BUT",
+     "RAI",
+     "BAR",
+     "DLR",
+     "KUB",
+     "MSCM",
+     "SAT",
+     "LIU",
+     "DOOR",
+     "SPE",
+     "ALBC",
+     "TMO",
+     "YAM"
+    ]
+   },
+   "2": {
+    "order": [
+     "MAS",
+     "ALO",
+     "BUT",
+     "RAI",
+     "FIS",
+     "BAR",
+     "MSCM",
+     "DLR",
+     "KUB",
+     "SPE",
+     "SAT",
+     "DOOR",
+     "LIU",
+     "ALBC",
+     "TMO",
+     "YAM",
+     "HEI"
+    ],
+    "gaps": {
+     "MAS": 0.0,
+     "ALO": 18.516,
+     "BUT": 19.804,
+     "RAI": 33.362,
+     "FIS": 36.763,
+     "BAR": 43.332,
+     "MSCM": 44.066,
+     "DLR": 60.612,
+     "KUB": 68.832,
+     "SPE": 97.649,
+     "SAT": 106.916,
+     "DOOR": 115.041,
+     "LIU": 119.418,
+     "ALBC": 131.16,
+     "TMO": 150.384,
+     "YAM": 161.875
+    },
+    "times": {
+     "MAS": 3591.417,
+     "ALO": 3609.934,
+     "BUT": 3611.222,
+     "RAI": 3624.779,
+     "FIS": 3628.181,
+     "BAR": 3634.749,
+     "MSCM": 3635.484,
+     "DLR": 3652.029,
+     "KUB": 3660.249,
+     "SPE": 3689.066,
+     "SAT": 3698.333,
+     "DOOR": 3706.458,
+     "LIU": 3710.835,
+     "ALBC": 3722.577,
+     "TMO": 3741.802,
+     "YAM": 3753.292
+    },
+    "finishers": [
+     "MAS",
+     "ALO",
+     "BUT",
+     "RAI",
+     "FIS",
+     "BAR",
+     "MSCM",
+     "DLR",
+     "KUB",
+     "SPE",
+     "SAT",
+     "DOOR",
+     "LIU",
+     "ALBC",
+     "TMO",
+     "YAM"
+    ]
+   },
+   "3": {
+    "order": [
+     "MAS",
+     "ALO",
+     "RAI",
+     "FIS",
+     "BUT",
+     "BAR",
+     "MSCM",
+     "DLR",
+     "KUB",
+     "SAT",
+     "SPE",
+     "LIU",
+     "DOOR",
+     "TMO",
+     "ALBC",
+     "YAM",
+     "HEI"
+    ],
+    "gaps": {
+     "MAS": 0.0,
+     "ALO": 29.575,
+     "RAI": 43.568,
+     "FIS": 46.289,
+     "BUT": 47.34,
+     "BAR": 53.351,
+     "MSCM": 56.617,
+     "DLR": 67.82,
+     "KUB": 82.463,
+     "SAT": 102.975,
+     "SPE": 110.204,
+     "LIU": 123.288,
+     "DOOR": 125.705,
+     "TMO": 156.58,
+     "ALBC": 158.18,
+     "YAM": 176.229
+    },
+    "times": {
+     "MAS": 3581.252,
+     "ALO": 3610.827,
+     "RAI": 3624.82,
+     "FIS": 3627.541,
+     "BUT": 3628.592,
+     "BAR": 3634.603,
+     "MSCM": 3637.87,
+     "DLR": 3649.073,
+     "KUB": 3663.715,
+     "SAT": 3684.227,
+     "SPE": 3691.456,
+     "LIU": 3704.541,
+     "DOOR": 3706.958,
+     "TMO": 3737.832,
+     "ALBC": 3739.433,
+     "YAM": 3757.481
+    },
+    "finishers": [
+     "MAS",
+     "ALO",
+     "RAI",
+     "FIS",
+     "BUT",
+     "BAR",
+     "MSCM",
+     "DLR",
+     "KUB",
+     "SAT",
+     "SPE",
+     "LIU",
+     "DOOR",
+     "TMO",
+     "ALBC",
+     "YAM"
+    ]
+   },
+   "4": {
+    "order": [
+     "MAS",
+     "ALO",
+     "BUT",
+     "RAI",
+     "FIS",
+     "BAR",
+     "MSCM",
+     "DLR",
+     "KUB",
+     "SAT",
+     "SPE",
+     "DOOR",
+     "LIU",
+     "ALBC",
+     "YAM",
+     "TMO",
+     "HEI"
+    ],
+    "gaps": {
+     "MAS": 0.0,
+     "ALO": 20.845,
+     "BUT": 24.924,
+     "RAI": 33.68,
+     "FIS": 34.961,
+     "BAR": 49.091,
+     "MSCM": 51.381,
+     "DLR": 54.969,
+     "KUB": 67.595,
+     "SAT": 76.587,
+     "SPE": 99.766,
+     "DOOR": 100.184,
+     "LIU": 114.843,
+     "ALBC": 137.276,
+     "YAM": 153.021,
+     "TMO": 155.593
+    },
+    "times": {
+     "MAS": 3591.268,
+     "ALO": 3612.113,
+     "BUT": 3616.192,
+     "RAI": 3624.948,
+     "FIS": 3626.229,
+     "BAR": 3640.359,
+     "MSCM": 3642.649,
+     "DLR": 3646.237,
+     "KUB": 3658.864,
+     "SAT": 3667.855,
+     "SPE": 3691.034,
+     "DOOR": 3691.452,
+     "LIU": 3706.111,
+     "ALBC": 3728.544,
+     "YAM": 3744.29,
+     "TMO": 3746.861
+    },
+    "finishers": [
+     "MAS",
+     "ALO",
+     "BUT",
+     "RAI",
+     "FIS",
+     "BAR",
+     "MSCM",
+     "DLR",
+     "KUB",
+     "SAT",
+     "SPE",
+     "DOOR",
+     "LIU",
+     "ALBC",
+     "YAM",
+     "TMO"
+    ]
+   },
+   "5": {
+    "order": [
+     "MAS",
+     "ALO",
+     "RAI",
+     "FIS",
+     "BUT",
+     "BAR",
+     "DLR",
+     "MSCM",
+     "KUB",
+     "SAT",
+     "SPE",
+     "LIU",
+     "DOOR",
+     "ALBC",
+     "TMO",
+     "YAM",
+     "HEI"
+    ],
+    "gaps": {
+     "MAS": 0.0,
+     "ALO": 15.458,
+     "RAI": 21.964,
+     "FIS": 26.414,
+     "BUT": 28.846,
+     "BAR": 39.167,
+     "DLR": 42.657,
+     "MSCM": 52.374,
+     "KUB": 63.57,
+     "SAT": 80.453,
+     "SPE": 97.622,
+     "LIU": 105.406,
+     "DOOR": 106.171,
+     "ALBC": 127.758,
+     "TMO": 145.957,
+     "YAM": 153.525
+    },
+    "times": {
+     "MAS": 3597.536,
+     "ALO": 3612.993,
+     "RAI": 3619.499,
+     "FIS": 3623.95,
+     "BUT": 3626.382,
+     "BAR": 3636.703,
+     "DLR": 3640.193,
+     "MSCM": 3649.91,
+     "KUB": 3661.106,
+     "SAT": 3677.988,
+     "SPE": 3695.158,
+     "LIU": 3702.942,
+     "DOOR": 3703.707,
+     "ALBC": 3725.294,
+     "TMO": 3743.492,
+     "YAM": 3751.061
+    },
+    "finishers": [
+     "MAS",
+     "ALO",
+     "RAI",
+     "FIS",
+     "BUT",
+     "BAR",
+     "DLR",
+     "MSCM",
+     "KUB",
+     "SAT",
+     "SPE",
+     "LIU",
+     "DOOR",
+     "ALBC",
+     "TMO",
+     "YAM"
+    ]
+   },
+   "6": {
+    "order": [
+     "MAS",
+     "ALO",
+     "BUT",
+     "RAI",
+     "FIS",
+     "BAR",
+     "DLR",
+     "MSCM",
+     "KUB",
+     "SAT",
+     "SPE",
+     "DOOR",
+     "LIU",
+     "ALBC",
+     "TMO",
+     "YAM",
+     "HEI"
+    ],
+    "gaps": {
+     "MAS": 0.0,
+     "ALO": 26.299,
+     "BUT": 31.896,
+     "RAI": 34.077,
+     "FIS": 36.069,
+     "BAR": 46.957,
+     "DLR": 62.427,
+     "MSCM": 63.358,
+     "KUB": 73.697,
+     "SAT": 92.539,
+     "SPE": 105.268,
+     "DOOR": 111.796,
+     "LIU": 125.802,
+     "ALBC": 141.952,
+     "TMO": 147.097,
+     "YAM": 164.868
+    },
+    "times": {
+     "MAS": 3587.632,
+     "ALO": 3613.931,
+     "BUT": 3619.528,
+     "RAI": 3621.709,
+     "FIS": 3623.701,
+     "BAR": 3634.589,
+     "DLR": 3650.059,
+     "MSCM": 3650.99,
+     "KUB": 3661.329,
+     "SAT": 3680.171,
+     "SPE": 3692.9,
+     "DOOR": 3699.428,
+     "LIU": 3713.434,
+     "ALBC": 3729.584,
+     "TMO": 3734.729,
+     "YAM": 3752.5
+    },
+    "finishers": [
+     "MAS",
+     "ALO",
+     "BUT",
+     "RAI",
+     "FIS",
+     "BAR",
+     "DLR",
+     "MSCM",
+     "KUB",
+     "SAT",
+     "SPE",
+     "DOOR",
+     "LIU",
+     "ALBC",
+     "TMO",
+     "YAM"
+    ]
+   },
+   "7": {
+    "order": [
+     "MAS",
+     "BUT",
+     "ALO",
+     "RAI",
+     "FIS",
+     "BAR",
+     "MSCM",
+     "DLR",
+     "KUB",
+     "SAT",
+     "SPE",
+     "DOOR",
+     "LIU",
+     "ALBC",
+     "TMO",
+     "YAM",
+     "HEI"
+    ],
+    "gaps": {
+     "MAS": 0.0,
+     "BUT": 23.236,
+     "ALO": 26.206,
+     "RAI": 35.039,
+     "FIS": 36.186,
+     "BAR": 46.51,
+     "MSCM": 48.157,
+     "DLR": 53.295,
+     "KUB": 72.869,
+     "SAT": 94.907,
+     "SPE": 95.522,
+     "DOOR": 107.271,
+     "LIU": 118.049,
+     "ALBC": 140.485,
+     "TMO": 151.744,
+     "YAM": 163.486
+    },
+    "times": {
+     "MAS": 3590.795,
+     "BUT": 3614.031,
+     "ALO": 3617.001,
+     "RAI": 3625.834,
+     "FIS": 3626.981,
+     "BAR": 3637.305,
+     "MSCM": 3638.952,
+     "DLR": 3644.09,
+     "KUB": 3663.664,
+     "SAT": 3685.702,
+     "SPE": 3686.317,
+     "DOOR": 3698.066,
+     "LIU": 3708.844,
+     "ALBC": 3731.28,
+     "TMO": 3742.539,
+     "YAM": 3754.281
+    },
+    "finishers": [
+     "MAS",
+     "BUT",
+     "ALO",
+     "RAI",
+     "FIS",
+     "BAR",
+     "MSCM",
+     "DLR",
+     "KUB",
+     "SAT",
+     "SPE",
+     "DOOR",
+     "LIU",
+     "ALBC",
+     "TMO",
+     "YAM"
+    ]
+   },
+   "8": {
+    "order": [
+     "MAS",
+     "ALO",
+     "RAI",
+     "BUT",
+     "FIS",
+     "BAR",
+     "DLR",
+     "MSCM",
+     "KUB",
+     "SAT",
+     "SPE",
+     "DOOR",
+     "LIU",
+     "TMO",
+     "ALBC",
+     "YAM",
+     "HEI"
+    ],
+    "gaps": {
+     "MAS": 0.0,
+     "ALO": 16.525,
+     "RAI": 32.169,
+     "BUT": 33.089,
+     "FIS": 35.053,
+     "BAR": 45.476,
+     "DLR": 51.821,
+     "MSCM": 57.63,
+     "KUB": 72.482,
+     "SAT": 90.041,
+     "SPE": 106.405,
+     "DOOR": 107.585,
+     "LIU": 119.32,
+     "TMO": 156.077,
+     "ALBC": 156.377,
+     "YAM": 170.753
+    },
+    "times": {
+     "MAS": 3590.997,
+     "ALO": 3607.522,
+     "RAI": 3623.166,
+     "BUT": 3624.087,
+     "FIS": 3626.05,
+     "BAR": 3636.474,
+     "DLR": 3642.818,
+     "MSCM": 3648.627,
+     "KUB": 3663.48,
+     "SAT": 3681.039,
+     "SPE": 3697.402,
+     "DOOR": 3698.583,
+     "LIU": 3710.317,
+     "TMO": 3747.075,
+     "ALBC": 3747.375,
+     "YAM": 3761.751
+    },
+    "finishers": [
+     "MAS",
+     "ALO",
+     "RAI",
+     "BUT",
+     "FIS",
+     "BAR",
+     "DLR",
+     "MSCM",
+     "KUB",
+     "SAT",
+     "SPE",
+     "DOOR",
+     "LIU",
+     "TMO",
+     "ALBC",
+     "YAM"
+    ]
+   },
+   "9": {
+    "order": [
+     "MAS",
+     "ALO",
+     "BUT",
+     "RAI",
+     "FIS",
+     "MSCM",
+     "BAR",
+     "DLR",
+     "KUB",
+     "SAT",
+     "SPE",
+     "DOOR",
+     "LIU",
+     "ALBC",
+     "TMO",
+     "YAM",
+     "HEI"
+    ],
+    "gaps": {
+     "MAS": 0.0,
+     "ALO": 23.632,
+     "BUT": 25.796,
+     "RAI": 34.807,
+     "FIS": 37.3,
+     "MSCM": 40.11,
+     "BAR": 48.432,
+     "DLR": 57.334,
+     "KUB": 68.076,
+     "SAT": 80.799,
+     "SPE": 107.206,
+     "DOOR": 110.496,
+     "LIU": 118.239,
+     "ALBC": 149.878,
+     "TMO": 162.423,
+     "YAM": 164.44
+    },
+    "times": {
+     "MAS": 3588.813,
+     "ALO": 3612.445,
+     "BUT": 3614.608,
+     "RAI": 3623.62,
+     "FIS": 3626.113,
+     "MSCM": 3628.922,
+     "BAR": 3637.244,
+     "DLR": 3646.147,
+     "KUB": 3656.889,
+     "SAT": 3669.612,
+     "SPE": 3696.019,
+     "DOOR": 3699.309,
+     "LIU": 3707.052,
+     "ALBC": 3738.69,
+     "TMO": 3751.236,
+     "YAM": 3753.253
+    },
+    "finishers": [
+     "MAS",
+     "ALO",
+     "BUT",
+     "RAI",
+     "FIS",
+     "MSCM",
+     "BAR",
+     "DLR",
+     "KUB",
+     "SAT",
+     "SPE",
+     "DOOR",
+     "LIU",
+     "ALBC",
+     "TMO",
+     "YAM"
+    ]
+   },
+   "10": {
+    "order": [
+     "MAS",
+     "ALO",
+     "BUT",
+     "RAI",
+     "FIS",
+     "BAR",
+     "DLR",
+     "MSCM",
+     "KUB",
+     "SAT",
+     "SPE",
+     "DOOR",
+     "LIU",
+     "ALBC",
+     "TMO",
+     "YAM",
+     "HEI"
+    ],
+    "gaps": {
+     "MAS": 0.0,
+     "ALO": 21.177,
+     "BUT": 25.045,
+     "RAI": 37.445,
+     "FIS": 37.745,
+     "BAR": 41.942,
+     "DLR": 50.723,
+     "MSCM": 63.056,
+     "KUB": 68.35,
+     "SAT": 84.175,
+     "SPE": 112.396,
+     "DOOR": 113.229,
+     "LIU": 117.814,
+     "ALBC": 128.761,
+     "TMO": 149.954,
+     "YAM": 167.546
+    },
+    "times": {
+     "MAS": 3592.842,
+     "ALO": 3614.019,
+     "BUT": 3617.887,
+     "RAI": 3630.287,
+     "FIS": 3630.587,
+     "BAR": 3634.784,
+     "DLR": 3643.565,
+     "MSCM": 3655.898,
+     "KUB": 3661.192,
+     "SAT": 3677.017,
+     "SPE": 3705.238,
+     "DOOR": 3706.071,
+     "LIU": 3710.656,
+     "ALBC": 3721.603,
+     "TMO": 3742.796,
+     "YAM": 3760.388
+    },
+    "finishers": [
+     "MAS",
+     "ALO",
+     "BUT",
+     "RAI",
+     "FIS",
+     "BAR",
+     "DLR",
+     "MSCM",
+     "KUB",
+     "SAT",
+     "SPE",
+     "DOOR",
+     "LIU",
+     "ALBC",
+     "TMO",
+     "YAM"
+    ]
+   },
+   "11": {
+    "order": [
+     "MAS",
+     "ALO",
+     "RAI",
+     "BUT",
+     "FIS",
+     "MSCM",
+     "BAR",
+     "DLR",
+     "KUB",
+     "SAT",
+     "SPE",
+     "DOOR",
+     "LIU",
+     "ALBC",
+     "TMO",
+     "YAM",
+     "HEI"
+    ],
+    "gaps": {
+     "MAS": 0.0,
+     "ALO": 26.275,
+     "RAI": 41.974,
+     "BUT": 42.274,
+     "FIS": 44.551,
+     "MSCM": 44.851,
+     "BAR": 50.01,
+     "DLR": 64.633,
+     "KUB": 75.426,
+     "SAT": 99.078,
+     "SPE": 106.896,
+     "DOOR": 109.281,
+     "LIU": 125.653,
+     "ALBC": 139.758,
+     "TMO": 159.255,
+     "YAM": 171.149
+    },
+    "times": {
+     "MAS": 3584.675,
+     "ALO": 3610.95,
+     "RAI": 3626.649,
+     "BUT": 3626.949,
+     "FIS": 3629.226,
+     "MSCM": 3629.526,
+     "BAR": 3634.684,
+     "DLR": 3649.308,
+     "KUB": 3660.1,
+     "SAT": 3683.753,
+     "SPE": 3691.571,
+     "DOOR": 3693.956,
+     "LIU": 3710.328,
+     "ALBC": 3724.432,
+     "TMO": 3743.93,
+     "YAM": 3755.824
+    },
+    "finishers": [
+     "MAS",
+     "ALO",
+     "RAI",
+     "BUT",
+     "FIS",
+     "MSCM",
+     "BAR",
+     "DLR",
+     "KUB",
+     "SAT",
+     "SPE",
+     "DOOR",
+     "LIU",
+     "ALBC",
+     "TMO",
+     "YAM"
+    ]
+   },
+   "12": {
+    "order": [
+     "MAS",
+     "ALO",
+     "BUT",
+     "RAI",
+     "FIS",
+     "BAR",
+     "DLR",
+     "MSCM",
+     "KUB",
+     "SAT",
+     "DOOR",
+     "SPE",
+     "LIU",
+     "ALBC",
+     "TMO",
+     "YAM",
+     "HEI"
+    ],
+    "gaps": {
+     "MAS": 0.0,
+     "ALO": 13.645,
+     "BUT": 21.866,
+     "RAI": 25.61,
+     "FIS": 28.55,
+     "BAR": 35.956,
+     "DLR": 47.801,
+     "MSCM": 49.716,
+     "KUB": 65.54,
+     "SAT": 75.642,
+     "DOOR": 89.471,
+     "SPE": 96.644,
+     "LIU": 117.037,
+     "ALBC": 125.179,
+     "TMO": 147.683,
+     "YAM": 158.107
+    },
+    "times": {
+     "MAS": 3597.1,
+     "ALO": 3610.744,
+     "BUT": 3618.966,
+     "RAI": 3622.71,
+     "FIS": 3625.65,
+     "BAR": 3633.056,
+     "DLR": 3644.901,
+     "MSCM": 3646.815,
+     "KUB": 3662.64,
+     "SAT": 3672.742,
+     "DOOR": 3686.571,
+     "SPE": 3693.743,
+     "LIU": 3714.137,
+     "ALBC": 3722.279,
+     "TMO": 3744.783,
+     "YAM": 3755.207
+    },
+    "finishers": [
+     "MAS",
+     "ALO",
+     "BUT",
+     "RAI",
+     "FIS",
+     "BAR",
+     "DLR",
+     "MSCM",
+     "KUB",
+     "SAT",
+     "DOOR",
+     "SPE",
+     "LIU",
+     "ALBC",
+     "TMO",
+     "YAM"
+    ]
+   },
+   "13": {
+    "order": [
+     "MAS",
+     "BUT",
+     "ALO",
+     "RAI",
+     "FIS",
+     "DLR",
+     "BAR",
+     "MSCM",
+     "KUB",
+     "SAT",
+     "SPE",
+     "LIU",
+     "DOOR",
+     "ALBC",
+     "TMO",
+     "YAM",
+     "HEI"
+    ],
+    "gaps": {
+     "MAS": 0.0,
+     "BUT": 13.824,
+     "ALO": 17.271,
+     "RAI": 24.65,
+     "FIS": 27.944,
+     "DLR": 42.021,
+     "BAR": 45.098,
+     "MSCM": 46.47,
+     "KUB": 64.352,
+     "SAT": 71.706,
+     "SPE": 93.469,
+     "LIU": 112.048,
+     "DOOR": 112.917,
+     "ALBC": 132.63,
+     "TMO": 146.332,
+     "YAM": 162.495
+    },
+    "times": {
+     "MAS": 3595.96,
+     "BUT": 3609.784,
+     "ALO": 3613.231,
+     "RAI": 3620.61,
+     "FIS": 3623.904,
+     "DLR": 3637.981,
+     "BAR": 3641.058,
+     "MSCM": 3642.43,
+     "KUB": 3660.312,
+     "SAT": 3667.666,
+     "SPE": 3689.429,
+     "LIU": 3708.008,
+     "DOOR": 3708.877,
+     "ALBC": 3728.59,
+     "TMO": 3742.293,
+     "YAM": 3758.455
+    },
+    "finishers": [
+     "MAS",
+     "BUT",
+     "ALO",
+     "RAI",
+     "FIS",
+     "DLR",
+     "BAR",
+     "MSCM",
+     "KUB",
+     "SAT",
+     "SPE",
+     "LIU",
+     "DOOR",
+     "ALBC",
+     "TMO",
+     "YAM"
+    ]
+   },
+   "14": {
+    "order": [
+     "MAS",
+     "ALO",
+     "BUT",
+     "RAI",
+     "FIS",
+     "BAR",
+     "DLR",
+     "MSCM",
+     "KUB",
+     "SPE",
+     "SAT",
+     "DOOR",
+     "LIU",
+     "TMO",
+     "ALBC",
+     "YAM",
+     "HEI"
+    ],
+    "gaps": {
+     "MAS": 0.0,
+     "ALO": 23.127,
+     "BUT": 31.718,
+     "RAI": 35.065,
+     "FIS": 38.31,
+     "BAR": 41.237,
+     "DLR": 50.697,
+     "MSCM": 51.701,
+     "KUB": 71.383,
+     "SPE": 98.63,
+     "SAT": 100.913,
+     "DOOR": 105.864,
+     "LIU": 122.94,
+     "TMO": 141.426,
+     "ALBC": 141.821,
+     "YAM": 162.918
+    },
+    "times": {
+     "MAS": 3592.904,
+     "ALO": 3616.031,
+     "BUT": 3624.623,
+     "RAI": 3627.969,
+     "FIS": 3631.214,
+     "BAR": 3634.142,
+     "DLR": 3643.601,
+     "MSCM": 3644.606,
+     "KUB": 3664.288,
+     "SPE": 3691.534,
+     "SAT": 3693.818,
+     "DOOR": 3698.769,
+     "LIU": 3715.844,
+     "TMO": 3734.33,
+     "ALBC": 3734.725,
+     "YAM": 3755.823
+    },
+    "finishers": [
+     "MAS",
+     "ALO",
+     "BUT",
+     "RAI",
+     "FIS",
+     "BAR",
+     "DLR",
+     "MSCM",
+     "KUB",
+     "SPE",
+     "SAT",
+     "DOOR",
+     "LIU",
+     "TMO",
+     "ALBC",
+     "YAM"
+    ]
+   },
+   "15": {
+    "order": [
+     "MAS",
+     "ALO",
+     "RAI",
+     "BUT",
+     "FIS",
+     "BAR",
+     "MSCM",
+     "DLR",
+     "KUB",
+     "SAT",
+     "SPE",
+     "DOOR",
+     "LIU",
+     "ALBC",
+     "TMO",
+     "YAM",
+     "HEI"
+    ],
+    "gaps": {
+     "MAS": 0.0,
+     "ALO": 19.516,
+     "RAI": 29.305,
+     "BUT": 29.606,
+     "FIS": 30.98,
+     "BAR": 44.375,
+     "MSCM": 45.475,
+     "DLR": 55.825,
+     "KUB": 73.594,
+     "SAT": 84.109,
+     "SPE": 97.232,
+     "DOOR": 118.309,
+     "LIU": 122.082,
+     "ALBC": 133.994,
+     "TMO": 153.693,
+     "YAM": 171.2
+    },
+    "times": {
+     "MAS": 3591.422,
+     "ALO": 3610.938,
+     "RAI": 3620.727,
+     "BUT": 3621.029,
+     "FIS": 3622.402,
+     "BAR": 3635.797,
+     "MSCM": 3636.898,
+     "DLR": 3647.248,
+     "KUB": 3665.016,
+     "SAT": 3675.531,
+     "SPE": 3688.654,
+     "DOOR": 3709.731,
+     "LIU": 3713.505,
+     "ALBC": 3725.416,
+     "TMO": 3745.115,
+     "YAM": 3762.623
+    },
+    "finishers": [
+     "MAS",
+     "ALO",
+     "RAI",
+     "BUT",
+     "FIS",
+     "BAR",
+     "MSCM",
+     "DLR",
+     "KUB",
+     "SAT",
+     "SPE",
+     "DOOR",
+     "LIU",
+     "ALBC",
+     "TMO",
+     "YAM"
+    ]
+   },
+   "16": {
+    "order": [
+     "MAS",
+     "ALO",
+     "BUT",
+     "FIS",
+     "RAI",
+     "BAR",
+     "DLR",
+     "MSCM",
+     "KUB",
+     "SAT",
+     "SPE",
+     "DOOR",
+     "LIU",
+     "ALBC",
+     "TMO",
+     "YAM",
+     "HEI"
+    ],
+    "gaps": {
+     "MAS": 0.0,
+     "ALO": 11.918,
+     "BUT": 16.331,
+     "FIS": 27.5,
+     "RAI": 31.745,
+     "BAR": 34.5,
+     "DLR": 45.666,
+     "MSCM": 46.741,
+     "KUB": 62.297,
+     "SAT": 89.045,
+     "SPE": 97.964,
+     "DOOR": 108.257,
+     "LIU": 115.646,
+     "ALBC": 129.485,
+     "TMO": 152.7,
+     "YAM": 165.21
+    },
+    "times": {
+     "MAS": 3597.623,
+     "ALO": 3609.541,
+     "BUT": 3613.955,
+     "FIS": 3625.123,
+     "RAI": 3629.369,
+     "BAR": 3632.123,
+     "DLR": 3643.289,
+     "MSCM": 3644.364,
+     "KUB": 3659.92,
+     "SAT": 3686.668,
+     "SPE": 3695.587,
+     "DOOR": 3705.88,
+     "LIU": 3713.269,
+     "ALBC": 3727.109,
+     "TMO": 3750.323,
+     "YAM": 3762.833
+    },
+    "finishers": [
+     "MAS",
+     "ALO",
+     "BUT",
+     "FIS",
+     "RAI",
+     "BAR",
+     "DLR",
+     "MSCM",
+     "KUB",
+     "SAT",
+     "SPE",
+     "DOOR",
+     "LIU",
+     "ALBC",
+     "TMO",
+     "YAM"
+    ]
+   },
+   "17": {
+    "order": [
+     "MAS",
+     "ALO",
+     "BUT",
+     "RAI",
+     "FIS",
+     "BAR",
+     "MSCM",
+     "DLR",
+     "KUB",
+     "SAT",
+     "SPE",
+     "LIU",
+     "DOOR",
+     "ALBC",
+     "TMO",
+     "YAM",
+     "HEI"
+    ],
+    "gaps": {
+     "MAS": 0.0,
+     "ALO": 21.345,
+     "BUT": 24.04,
+     "RAI": 30.367,
+     "FIS": 33.738,
+     "BAR": 44.627,
+     "MSCM": 54.086,
+     "DLR": 56.913,
+     "KUB": 67.03,
+     "SAT": 89.41,
+     "SPE": 103.324,
+     "LIU": 109.749,
+     "DOOR": 110.049,
+     "ALBC": 136.197,
+     "TMO": 154.167,
+     "YAM": 154.628
+    },
+    "times": {
+     "MAS": 3594.112,
+     "ALO": 3615.457,
+     "BUT": 3618.152,
+     "RAI": 3624.48,
+     "FIS": 3627.851,
+     "BAR": 3638.739,
+     "MSCM": 3648.198,
+     "DLR": 3651.025,
+     "KUB": 3661.143,
+     "SAT": 3683.522,
+     "SPE": 3697.437,
+     "LIU": 3703.861,
+     "DOOR": 3704.161,
+     "ALBC": 3730.309,
+     "TMO": 3748.279,
+     "YAM": 3748.74
+    },
+    "finishers": [
+     "MAS",
+     "ALO",
+     "BUT",
+     "RAI",
+     "FIS",
+     "BAR",
+     "MSCM",
+     "DLR",
+     "KUB",
+     "SAT",
+     "SPE",
+     "LIU",
+     "DOOR",
+     "ALBC",
+     "TMO",
+     "YAM"
+    ]
+   },
+   "18": {
+    "order": [
+     "MAS",
+     "BUT",
+     "ALO",
+     "RAI",
+     "FIS",
+     "BAR",
+     "DLR",
+     "MSCM",
+     "KUB",
+     "SAT",
+     "SPE",
+     "DOOR",
+     "LIU",
+     "ALBC",
+     "TMO",
+     "YAM",
+     "HEI"
+    ],
+    "gaps": {
+     "MAS": 0.0,
+     "BUT": 21.57,
+     "ALO": 24.814,
+     "RAI": 37.823,
+     "FIS": 38.991,
+     "BAR": 48.918,
+     "DLR": 56.234,
+     "MSCM": 56.564,
+     "KUB": 74.968,
+     "SAT": 87.012,
+     "SPE": 108.11,
+     "DOOR": 119.336,
+     "LIU": 125.964,
+     "ALBC": 142.976,
+     "TMO": 155.701,
+     "YAM": 161.383
+    },
+    "times": {
+     "MAS": 3588.49,
+     "BUT": 3610.06,
+     "ALO": 3613.305,
+     "RAI": 3626.313,
+     "FIS": 3627.481,
+     "BAR": 3637.408,
+     "DLR": 3644.724,
+     "MSCM": 3645.054,
+     "KUB": 3663.458,
+     "SAT": 3675.502,
+     "SPE": 3696.6,
+     "DOOR": 3707.826,
+     "LIU": 3714.455,
+     "ALBC": 3731.466,
+     "TMO": 3744.191,
+     "YAM": 3749.873
+    },
+    "finishers": [
+     "MAS",
+     "BUT",
+     "ALO",
+     "RAI",
+     "FIS",
+     "BAR",
+     "DLR",
+     "MSCM",
+     "KUB",
+     "SAT",
+     "SPE",
+     "DOOR",
+     "LIU",
+     "ALBC",
+     "TMO",
+     "YAM"
+    ]
+   },
+   "19": {
+    "order": [
+     "MAS",
+     "ALO",
+     "BUT",
+     "RAI",
+     "FIS",
+     "BAR",
+     "DLR",
+     "MSCM",
+     "KUB",
+     "SAT",
+     "SPE",
+     "DOOR",
+     "ALBC",
+     "LIU",
+     "TMO",
+     "YAM",
+     "HEI"
+    ],
+    "gaps": {
+     "MAS": 0.0,
+     "ALO": 22.04,
+     "BUT": 26.22,
+     "RAI": 38.582,
+     "FIS": 40.245,
+     "BAR": 44.183,
+     "DLR": 56.931,
+     "MSCM": 58.577,
+     "KUB": 71.572,
+     "SAT": 91.073,
+     "SPE": 109.077,
+     "DOOR": 110.465,
+     "ALBC": 135.285,
+     "LIU": 135.585,
+     "TMO": 160.305,
+     "YAM": 160.605
+    },
+    "times": {
+     "MAS": 3590.105,
+     "ALO": 3612.145,
+     "BUT": 3616.325,
+     "RAI": 3628.687,
+     "FIS": 3630.35,
+     "BAR": 3634.288,
+     "DLR": 3647.036,
+     "MSCM": 3648.682,
+     "KUB": 3661.677,
+     "SAT": 3681.178,
+     "SPE": 3699.182,
+     "DOOR": 3700.569,
+     "ALBC": 3725.39,
+     "LIU": 3725.69,
+     "TMO": 3750.41,
+     "YAM": 3750.71
+    },
+    "finishers": [
+     "MAS",
+     "ALO",
+     "BUT",
+     "RAI",
+     "FIS",
+     "BAR",
+     "DLR",
+     "MSCM",
+     "KUB",
+     "SAT",
+     "SPE",
+     "DOOR",
+     "ALBC",
+     "LIU",
+     "TMO",
+     "YAM"
+    ]
+   },
+   "20": {
+    "order": [
+     "MAS",
+     "ALO",
+     "BUT",
+     "FIS",
+     "RAI",
+     "BAR",
+     "DLR",
+     "MSCM",
+     "KUB",
+     "SAT",
+     "SPE",
+     "LIU",
+     "DOOR",
+     "ALBC",
+     "TMO",
+     "YAM",
+     "HEI"
+    ],
+    "gaps": {
+     "MAS": 0.0,
+     "ALO": 16.775,
+     "BUT": 20.495,
+     "FIS": 27.981,
+     "RAI": 31.654,
+     "BAR": 37.867,
+     "DLR": 55.547,
+     "MSCM": 56.385,
+     "KUB": 67.733,
+     "SAT": 84.376,
+     "SPE": 100.014,
+     "LIU": 107.854,
+     "DOOR": 113.488,
+     "ALBC": 128.031,
+     "TMO": 151.439,
+     "YAM": 159.65
+    },
+    "times": {
+     "MAS": 3595.638,
+     "ALO": 3612.413,
+     "BUT": 3616.133,
+     "FIS": 3623.619,
+     "RAI": 3627.292,
+     "BAR": 3633.505,
+     "DLR": 3651.185,
+     "MSCM": 3652.023,
+     "KUB": 3663.371,
+     "SAT": 3680.014,
+     "SPE": 3695.652,
+     "LIU": 3703.491,
+     "DOOR": 3709.126,
+     "ALBC": 3723.669,
+     "TMO": 3747.077,
+     "YAM": 3755.288
+    },
+    "finishers": [
+     "MAS",
+     "ALO",
+     "BUT",
+     "FIS",
+     "RAI",
+     "BAR",
+     "DLR",
+     "MSCM",
+     "KUB",
+     "SAT",
+     "SPE",
+     "LIU",
+     "DOOR",
+     "ALBC",
+     "TMO",
+     "YAM"
+    ]
+   }
+  }
+ }
+}

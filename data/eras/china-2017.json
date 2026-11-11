@@ -1,0 +1,43 @@
+{
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": true,
+    "drs": true,
+    "ers": "hybrid",
+    "refuelling": false
+  },
+  "eras": {
+    "eraId": 8,
+    "order": 8,
+    "userSide": "HAM",
+    "target": {
+      "type": "defend"
+    },
+    "storyline": {
+      "real": "Rain before the start leaves the track damp. Vettel changes to slicks early under the virtual safety car, but a safety car soon after lets Hamilton and the others change for free. Hamilton leads from pole while Vettel loses laps stuck behind Räikkönen. Vettel makes his second stop two laps before Hamilton, and Hamilton keeps the lead to win by 6.250 s."
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 1,
+      "label": "Win on one stop"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 6.25,
+      "label": "Win by more than 6.25 seconds"
+    },
+    "hardCalls": {
+      "HAM": 1,
+      "VET": 0
+    },
+    "briefing": "Shanghai, 2017. The early rain has gone and the track is dry. You run Hamilton, leading from pole, 11 s ahead of Vettel after 31 laps. Both of you have one more stop to make, and Vettel, on older tyres, will come in first."
+  },
+  "storylineEvents": [
+    [
+      35,
+      "RETIREMENT"
+    ]
+  ]
+}

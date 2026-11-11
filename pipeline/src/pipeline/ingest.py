@@ -90,7 +90,11 @@ def project_track_status(track_status: pd.DataFrame) -> list[dict]:
 def save_track_status(race_id: str, session, raw_dir: Path = RAW_DIR) -> Path:
     path = track_status_path(race_id, raw_dir)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(project_track_status(session.track_status), indent=1) + "\n")
+    path.write_text(
+        json.dumps(project_track_status(session.track_status), indent=1) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
     return path
 
 
@@ -120,7 +124,7 @@ def project_weather(weather: pd.DataFrame) -> list[dict]:
 def save_weather(race_id: str, weather: list[dict], raw_dir: Path = RAW_DIR) -> Path:
     path = weather_path(race_id, raw_dir)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(weather, indent=1) + "\n")
+    path.write_text(json.dumps(weather, indent=1) + "\n", encoding="utf-8", newline="\n")
     return path
 
 
@@ -129,14 +133,29 @@ def load_weather(race_id: str, raw_dir: Path = RAW_DIR) -> list[dict] | None:
     return json.loads(path.read_text()) if path.exists() else None
 
 
-def load_race(year: int, event: str, cache_dir: Path = CACHE_DIR):
-    """Load a race session (laps + weather + messages, no telemetry)."""
+def load_race(year: int, event: str, cache_dir: Path = CACHE_DIR, offline: bool = False):
+    """Load a race session (laps + weather + messages, no telemetry). `offline`: from the
+    on-disk cache only, never the network (FastF1's archive needs an F1TV login since Oct
+    2026); weather or race control the cache doesn't hold stay unloaded (`loaded`)."""
     import fastf1
 
     enable_cache(cache_dir)
+    if offline:
+        fastf1.Cache.offline_mode(True)
     session = fastf1.get_session(year, event, "R")
     session.load(laps=True, telemetry=False, weather=True, messages=True)
     return session
+
+
+def loaded(session, name: str):
+    """A session's `name` data (race_control_messages, weather_data), or None if FastF1
+    didn't load it (an offline cache without it), rather than FastF1's DataNotLoadedError."""
+    from fastf1.exceptions import DataNotLoadedError
+
+    try:
+        return getattr(session, name, None)
+    except DataNotLoadedError:
+        return None
 
 
 def project_laps(laps: pd.DataFrame) -> pd.DataFrame:
@@ -171,13 +190,32 @@ def relabel_2018_compounds(df: pd.DataFrame) -> pd.DataFrame:
     return df.assign(Compound=df["Compound"].map(lambda c: mapping.get(c, c)))
 
 
+# The red-flag code in the track-status timeline and the per-lap TrackStatus (FastF1's; OpenF1
+# race control is mapped onto the same codes). Red-flag races are modelled since eras build
+# plan 4.3 (redflag.py).
+RED_FLAG = "5"
+
+
 def race_suitability(df: pd.DataFrame) -> list[str]:
-    """Reasons a race can't be modelled yet (spec D8): a red flag. (Wet races are, since the
-    weather spec.)"""
-    reasons = []
-    if df["TrackStatus"].astype(str).str.contains("5").any():
-        reasons.append("red flag")
-    return reasons
+    """Reasons a race can't be modelled yet (spec D8). None today: wet races are modelled
+    since the weather spec, red flags since eras build plan 4.3 (redflag.py)."""
+    return []
+
+
+def has_red_flag(df: pd.DataFrame) -> bool:
+    """True if any lap ran under a red flag."""
+    return bool(df["TrackStatus"].astype(str).str.contains(RED_FLAG).any())
+
+
+def save_red_flags(
+    race_id: str, messages: list[dict], origin: str, raw_dir: Path = RAW_DIR
+) -> Path | None:
+    """Write data/raw/<race-id>.redflags.json: each red flag's restart, from race control's
+    messages (redflag.py). Nothing for a race without a red flag or a word on its restart."""
+    from . import redflag
+
+    entries = redflag.restarts_from_messages(messages, origin)
+    return redflag.write_entries(race_id, entries, raw_dir) if entries else None
 
 
 def race_facts(session) -> dict:
@@ -226,17 +264,25 @@ def ingest_race(
     cache_dir: Path = CACHE_DIR,
     raw_dir: Path = RAW_DIR,
     sleep=time.sleep,
+    offline: bool = False,
 ) -> tuple[pd.DataFrame, dict]:
     """Load a race, project laps, save the raw parquet snapshot. Returns (laps, facts).
 
     Retries with backoff when FastF1 rate-limits (RATE_LIMIT_WAITS); the on-disk cache means
     a retry only fetches what is still missing. Refuses to write an incomplete snapshot.
+    `offline`: read the FastF1 cache only (load_race); a race whose cache has no race control
+    or weather is written without its red-flag or weather file (a hand-entered red-flag file
+    and `pipeline wet-laps` cover those).
     """
     from fastf1.req import RateLimitExceededError
 
     for attempt in range(len(RATE_LIMIT_WAITS) + 1):
         try:
-            session = load_race(year, event, cache_dir)
+            session = (
+                load_race(year, event, cache_dir, offline=True)
+                if offline
+                else load_race(year, event, cache_dir)
+            )
             break
         except RateLimitExceededError:
             if attempt == len(RATE_LIMIT_WAITS):
@@ -252,22 +298,37 @@ def ingest_race(
     path.parent.mkdir(parents=True, exist_ok=True)
     df.to_parquet(path)
     save_track_status(race_id, session, raw_dir)
-    if getattr(session, "weather_data", None) is not None and len(session.weather_data):
-        save_weather(race_id, project_weather(session.weather_data), raw_dir)
+    messages = loaded(session, "race_control_messages")
+    if has_red_flag(df) and messages is not None and len(messages):
+        from .redflag import fastf1_messages
+
+        save_red_flags(race_id, fastf1_messages(messages), "FastF1", raw_dir)
+    weather = loaded(session, "weather_data")
+    if weather is not None and len(weather):
+        save_weather(race_id, project_weather(weather), raw_dir)
     return df, facts
 
 
 def ingest_openf1(
-    race_id: str, year: int, country: str, cache_dir: Path = CACHE_DIR, raw_dir: Path = RAW_DIR
+    race_id: str,
+    year: int,
+    country: str,
+    cache_dir: Path = CACHE_DIR,
+    raw_dir: Path = RAW_DIR,
+    location: str | None = None,
 ) -> tuple[pd.DataFrame, dict]:
     """Load a race from OpenF1 (openf1.py) and save the same raw snapshot, track status and
-    weather as the FastF1 ingest."""
+    weather as the FastF1 ingest. `location` picks one race when a country has two in a season
+    (Italy 2024: Imola and Monza)."""
     import urllib.parse
     import urllib.request
 
     from . import openf1
 
-    query = urllib.parse.urlencode({"year": year, "session_name": "Race", "country_name": country})
+    params = {"year": year, "session_name": "Race", "country_name": country}
+    if location:
+        params["location"] = location
+    query = urllib.parse.urlencode(params)
     with urllib.request.urlopen(f"{openf1.API}/sessions?{query}", timeout=60) as r:
         sessions = json.load(r)
     if len(sessions) != 1:
@@ -279,6 +340,10 @@ def ingest_openf1(
     path.parent.mkdir(parents=True, exist_ok=True)
     df.to_parquet(path)
     status = track_status_path(race_id, raw_dir)
-    status.write_text(json.dumps(openf1.track_status(raw), indent=1) + "\n")
+    status.write_text(
+        json.dumps(openf1.track_status(raw), indent=1) + "\n", encoding="utf-8", newline="\n"
+    )
     save_weather(race_id, openf1.weather(raw), raw_dir)
+    if has_red_flag(df):
+        save_red_flags(race_id, raw["race_control"], "OpenF1", raw_dir)
     return df, openf1.race_facts(raw, df)

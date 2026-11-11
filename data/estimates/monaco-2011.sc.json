@@ -1,0 +1,36 @@
+{
+ "race": "monaco-2011",
+ "how": "docs/eras-checks/2.4-estimates.md: check each period against a race report; set status to confirmed or rejected (edit startLap/endLap if they're off), then re-run `pipeline jolpica <race-id> --force`.",
+ "periods": [
+  {
+   "startLap": 34,
+   "endLap": 38,
+   "laps": 5,
+   "kind": "SC",
+   "confidence": "ambiguous",
+   "peakRatio": 1.62,
+   "gapBefore": 70.3,
+   "gapAfter": 50.1,
+   "reasons": [
+    "the field didn't bunch up (P1-P6 70.3s -> 50.1s): rain?"
+   ],
+   "status": "confirmed",
+   "source": "https://en.wikipedia.org/wiki/2011_Monaco_Grand_Prix: 'An incident between Hamilton and Massa caused Massa to crash in the tunnel, bringing out the first safety car' (Massa's last lap is 32 in the timing). One SC: the article gives no laps; the leader (VET) ran 86.3 s on lap 34 (the deployment), 115-129 s on laps 35-38 and 81.0 s on lap 39 (green 79 s), so the estimate's laps 34-35 and 38 are one period with 36-37 between"
+  },
+  {
+   "startLap": 69,
+   "endLap": 71,
+   "laps": 3,
+   "kind": "SC",
+   "confidence": "ambiguous",
+   "peakRatio": 16.42,
+   "gapBefore": 77.3,
+   "gapAfter": 13.2,
+   "reasons": [
+    "a 16.4x lap: a red flag?"
+   ],
+   "status": "confirmed",
+   "source": "https://en.wikipedia.org/wiki/2011_Monaco_Grand_Prix: after the Sutil / Alguersuari / Petrov crash, 'This brought out the safety car again and on lap 72 the race was red flagged'; the red flag (lap 72) and the SC lap after it (73, 'the safety car, which went in at the end of lap 73') are data/redflags/monaco-2011.json's. Lap 69 from the timing (leader 85.7 s, then 123-130 s)"
+  }
+ ]
+}

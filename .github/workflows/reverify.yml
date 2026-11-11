@@ -28,4 +28,4 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Re-grade
-        run: pnpm --filter @boxthislap/worker reverify --remote
+        run: pnpm --filter @laststint/worker reverify --remote

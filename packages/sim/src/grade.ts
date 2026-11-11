@@ -12,20 +12,42 @@
 // blindAfter). The race the player sees still has every real event.
 //
 // After an option's calls, the player's car follows a "sensible strategist" continuation in
-// every playout: the model-planned best of no more stops or one stop (planRemainingStop).
+// every playout: the model-planned best of no more stops or one stop (planRemainingStop), or,
+// a car owing the race's minimum stops more than one (rules.minStops), the best plan of that
+// many (planRemainingStops).
 // The spec doesn't define the continuation; this choice is recorded in the implementation
 // plan (2.7).
+//
+// Eras races (sim.ts erasRace: a race with a `rules` or `eras` block; never a Daily or
+// Gauntlet file, so their grades are unchanged) differ in three ways (Eras grader fixes, Nov 8
+// 2026; docs/eras-grader.md):
+// - the continuation is the real team's plan (sim.ts erasContinuation), not the planner's best
+//   stop: a "stay out" where the real team boxed doesn't get a perfect later stop for free;
+//   the planner steps in only to keep the car legal (two compounds, minimum stops), and a
+//   player's own logged plan is followed as called;
+// - in a race with a fuel rule (refuelling, a 1984-88 fuel limit) playouts carry the fuel
+//   load and the live tank (sim.ts forkRun), so a car can run dry and stop;
+// - as everywhere, a playout's result is classified as live play's: a car short of the
+//   two-compound rule or the minimum stops is disqualified (classify), and the live incident
+//   draws (crashes, failures, punctures) run in playouts too. Storyline retirements and faults
+//   still to come are left out (playouts don't know the future).
 
+import type { RivalPolicy } from './eras/config.js';
+import type { RivalChoice } from './rivals/react.js';
 import { deriveSeed } from './rng.js';
 import {
   type Run,
   classify,
+  erasContinuation,
+  erasRace,
   forkRun,
   initRun,
   isFinished,
-  planRemainingStop,
+  planRemainingStops,
+  playerStopsBy,
   realDecisions,
   stepLap,
+  teammateOf,
 } from './sim.js';
 import type { Decision, RaceModel, RaceResult } from './types.js';
 
@@ -36,10 +58,18 @@ export const GRADE_STREAM = 3000;
 export const BAND_EDGES = { green: 0.5, yellow: 5, orange: 15 } as const;
 export type Band = 'green' | 'yellow' | 'orange' | 'red';
 
+/**
+ * The result a call is graded against, from the player's side. `beat-rival`: ahead of
+ * `rival` (default: the race's rival). `deny` (eras spec 6): `rival` finishes P`position`
+ * or worse, or doesn't finish, whatever the player's car does. `team`: the player's car at
+ * P`positions[0]` or better and its teammate at P`positions[1]` or better, both classified.
+ */
 export type Target =
   | { kind: 'win' }
-  | { kind: 'beat-rival' }
-  | { kind: 'position'; atBest: number };
+  | { kind: 'beat-rival'; rival?: string }
+  | { kind: 'position'; atBest: number }
+  | { kind: 'deny'; rival: string; position: number }
+  | { kind: 'team'; positions: [number, number] };
 
 export interface GradeOption {
   id: string;
@@ -76,13 +106,33 @@ export function bandFor(behindBest: number): Band {
   return 'red';
 }
 
-export function reachedTarget(run: Run, result: RaceResult, target: Target): boolean {
+export function reachedTarget(
+  run: Pick<Run, 'model'>,
+  result: RaceResult,
+  target: Target,
+): boolean {
   const user = run.model.userSide;
   const pos = result.order.indexOf(user);
   if (target.kind === 'win') return pos === 0 && result.finishers.includes(user);
   if (target.kind === 'position')
     return result.finishers.includes(user) && pos + 1 <= target.atBest;
-  const rivalPos = result.order.indexOf(run.model.rival);
+  if (target.kind === 'deny') {
+    // A rival that retired or was disqualified isn't a finisher: denied.
+    if (!result.finishers.includes(target.rival)) return true;
+    return result.order.indexOf(target.rival) + 1 >= target.position;
+  }
+  if (target.kind === 'team') {
+    const mate = teammateOf(run.model);
+    if (!mate) throw new Error(`team target: ${user} has no teammate in this race`);
+    const [userAtBest, mateAtBest] = target.positions;
+    return (
+      result.finishers.includes(user) &&
+      result.finishers.includes(mate) &&
+      pos + 1 <= userAtBest &&
+      result.order.indexOf(mate) + 1 <= mateAtBest
+    );
+  }
+  const rivalPos = result.order.indexOf(target.rival ?? run.model.rival);
   return result.finishers.includes(user) && pos < rivalPos;
 }
 
@@ -100,12 +150,22 @@ export function sampleSeed(run: Run, i: number): number {
   return deriveSeed(deriveSeed(run.seed, GRADE_STREAM + run.state.lap), i);
 }
 
+/** True if some option makes a pit call: the moment asks whether to stop. */
+export function asksStop(options: readonly GradeOption[]): boolean {
+  return options.some((o) => !o.final && o.decisions.some((d) => d.kind === 'pit'));
+}
+
 /**
  * Fork the run for one sample of one option: apply the option's calls, run until the last of
  * them has taken effect (a pit call is charged the lap after it), then hand the player's car
- * to the sensible-strategist continuation (planRemainingStop) for the rest of the race.
+ * to the sensible-strategist continuation (planRemainingStops) for the rest of the race.
  */
-export function playOption(run: Run, seed: number, option: GradeOption): Run {
+export function playOption(
+  run: Run,
+  seed: number,
+  option: GradeOption,
+  stopQuestion = asksStop([option]),
+): Run {
   // The decision lap's own events (e.g. the SC that prompted the call) are known; the rest of
   // the race's future isn't (spec decision Oct 26 2026: grade against the sim, not hindsight).
   const fork = forkRun(run, seed, option.decisions, { blindAfter: run.state.lap + 1 });
@@ -115,14 +175,22 @@ export function playOption(run: Run, seed: number, option: GradeOption): Run {
   );
   while (fork.state.lap < settled && !isFinished(fork)) stepLap(fork);
   const user = fork.state.cars[fork.model.userSide];
-  if (
-    !option.final &&
-    user &&
-    !isFinished(fork) &&
-    !user.strategy.some((s) => s.lap > fork.state.lap)
-  ) {
-    const stop = planRemainingStop(fork);
-    if (stop) user.strategy.push({ ...stop, added: true });
+  if (!option.final && user && !isFinished(fork)) {
+    const queued = user.strategy.some((s) => s.lap > fork.state.lap);
+    if (!erasRace(run.model)) {
+      if (!queued)
+        for (const stop of planRemainingStops(fork)) user.strategy.push({ ...stop, added: true });
+    } else if (!fork.decisions.some((d) => d.kind === 'pit' && d.lap > fork.state.lap)) {
+      // Eras: the real team's plan (erasContinuation), unless the player has logged a plan of
+      // their own (its later pit calls are in the run and play out as called).
+      // A stop question (some option boxes) answers the moment's box-now stop too: staying out
+      // there skips it (the real team's stop on that lap isn't made later).
+      // A stop already queued (the real call made the lap before the moment) stays, and the
+      // remaining real stops follow it (erasContinuation).
+      const answered = stopQuestion ? Math.max(settled, run.state.lap + 2) : settled;
+      const made = playerStopsBy([...run.decisions, ...option.decisions], fork.state.lap);
+      for (const stop of erasContinuation(fork, answered, made)) user.strategy.push(stop);
+    }
   }
   return fork;
 }
@@ -139,10 +207,11 @@ export function countHits(
   to: number,
 ): number[] {
   const hits = new Array<number>(options.length).fill(0);
+  const stopQuestion = asksStop(options);
   for (let i = from; i < to; i++) {
     const seed = sampleSeed(run, i);
     for (let k = 0; k < options.length; k++) {
-      const fork = playOption(run, seed, options[k] as GradeOption);
+      const fork = playOption(run, seed, options[k] as GradeOption, stopQuestion);
       while (!isFinished(fork)) stepLap(fork);
       if (reachedTarget(fork, classify(fork), target)) hits[k] = (hits[k] ?? 0) + 1;
     }
@@ -206,6 +275,12 @@ export interface GradeJob {
   options: GradeOption[];
   target: Target;
   samples?: number;
+  /** The run's rival policy (Run.rivalPolicy; absent: standard). */
+  rivalPolicy?: RivalPolicy;
+  /** Expert: the rival's choices so far (rivals/react.ts rivalChoices), replayed, not re-graded. */
+  rivalChoices?: RivalChoice[];
+  /** Legend difficulty (Run.legend): the run replays with Legend's safety cars. */
+  legend?: boolean;
 }
 
 export interface GradeJobResult {
@@ -229,12 +304,35 @@ export function gradeJob(
     options,
     target,
     samples,
+    ...(run.rivalPolicy === 'standard' ? {} : { rivalPolicy: run.rivalPolicy }),
+    ...(run.legend ? { legend: true } : {}),
+    ...(run.rival
+      ? { rivalChoices: run.rival.points.map((p) => ({ lap: p.lap, option: p.chosen })) }
+      : {}),
   };
 }
 
-/** Rebuild the paused run from a job (deterministic replay). */
-export function runFromJob(job: GradeJob): Run {
-  const run = initRun(job.model, job.seed, { decisions: job.decisions });
+/**
+ * Rebuild the paused run from a job (deterministic replay), with the job's rival and, for a
+ * Legend run, Legend's safety cars. An Expert
+ * rival replays its recorded choices and never grades here: a decision point without one
+ * waits (a decision at the paused lap stays pending for the rival's own grade job; an earlier
+ * one throws).
+ */
+export function runFromJob(
+  job: Pick<
+    GradeJob,
+    'model' | 'seed' | 'decisions' | 'pausedAtLap' | 'rivalPolicy' | 'rivalChoices' | 'legend'
+  >,
+): Run {
+  const run = initRun(job.model, job.seed, {
+    decisions: job.decisions,
+    ...(job.rivalPolicy ? { rivalPolicy: job.rivalPolicy } : {}),
+    ...(job.legend ? { legend: true } : {}),
+    ...(job.rivalPolicy === 'expert'
+      ? { rivalChoices: job.rivalChoices ?? [], rivalGrading: 'deferred' as const }
+      : {}),
+  });
   while (run.state.lap < job.pausedAtLap) stepLap(run);
   return run;
 }

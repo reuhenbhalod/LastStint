@@ -2,18 +2,34 @@
 // is re-graded here with full playouts. A run that matches is marked verified; one that doesn't
 // (its claimed grades were edited) gets its true score and is marked corrected.
 //
-//   pnpm --filter @boxthislap/worker reverify --remote            (what CI runs nightly)
-//   pnpm --filter @boxthislap/worker reverify --local --dry-run
+//   pnpm --filter @laststint/worker reverify --remote            (what CI runs nightly)
+//   pnpm --filter @laststint/worker reverify --local --dry-run
 //
 // A run whose daily's race file changed since it was scheduled can't be re-graded and is
 // reported and left unverified.
+//
+// Eras attempts (eras build plan 7.3) get the same re-grade: a corrected attempt's race
+// progress is rebuilt from all of the player's attempts there (src/reverify.ts
+// recheckAttemptSql), so it never loses a star earned on another attempt. An Expert rival's
+// claimed choices are re-graded too, and wrong ones corrected. An attempt whose race file
+// changed since it started is left for later. A shared race's attempt is re-graded from the
+// race file merged with its Eras overlay, the model it pinned.
 
 import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import type { RaceModel } from '@boxthislap/sim';
+import type { RaceModel } from '@laststint/sim';
+import { withErasOverlay } from '../src/erasOverlay.js';
 import { modelHash } from '../src/hash.js';
-import { type UnverifiedRun, recheckRun, recheckSql } from '../src/reverify.js';
+import { ERAS_OVERLAYS } from '../src/races.gen.js';
+import {
+  type UnverifiedAttempt,
+  type UnverifiedRun,
+  recheckAttempt,
+  recheckAttemptSql,
+  recheckRun,
+  recheckSql,
+} from '../src/reverify.js';
 import { type Target, query, repo, wrangler } from './d1.js';
 
 const args = process.argv.slice(2);
@@ -35,11 +51,17 @@ const runs = query<UnverifiedRun & { model_hash: string }>(
 );
 
 const models = new Map<string, RaceModel | null>();
-async function modelFor(raceId: string, hash: string): Promise<RaceModel | null> {
-  const key = `${raceId}:${hash}`;
+async function modelFor(raceId: string, hash: string, eras = false): Promise<RaceModel | null> {
+  const key = `${raceId}:${hash}:${eras}`;
   if (!models.has(key)) {
     const file = join(repo, 'data', 'races', `${raceId}.json`);
-    const model = JSON.parse(readFileSync(file, 'utf8')) as RaceModel;
+    let model = JSON.parse(readFileSync(file, 'utf8')) as RaceModel;
+    // A shared race's Eras attempt pinned its file merged with its overlay (src/erasOverlay.ts;
+    // eras build plan, "Shared races"), which only races.gen.ts's ERAS_OVERLAYS lists.
+    if (eras && Object.hasOwn(ERAS_OVERLAYS, raceId)) {
+      const overlay = join(repo, 'data', 'eras', `${raceId}.json`);
+      model = withErasOverlay(model, JSON.parse(readFileSync(overlay, 'utf8')));
+    }
     models.set(key, (await modelHash(model)) === hash ? model : null);
   }
   return models.get(key) ?? null;
@@ -131,6 +153,49 @@ for (const r of rounds) {
   }
 }
 console.log(`${rounds.length} survivor rounds: ${roundsOk} verified, ${roundsFixed} corrected`);
+
+// Eras attempts, oldest first, so a progress rebuild sees every earlier correction.
+const attempts = query<UnverifiedAttempt & { model_hash: string | null }>(
+  target,
+  `SELECT a.id, a.player_id, a.race_id, a.legend, a.seed, e.play_order, a.model_hash,
+     a.decisions, a.rival_claims, a.untimed, a.result
+   FROM era_attempts a JOIN era_races r ON r.race_id = a.race_id JOIN eras e ON e.id = r.era_id
+   WHERE a.verified = 0 AND a.submitted_at IS NOT NULL AND a.decisions IS NOT NULL
+   ORDER BY a.submitted_at, a.id`,
+);
+let attemptsOk = 0;
+let attemptsFixed = 0;
+let attemptsLeft = 0;
+for (const a of attempts) {
+  const model = a.model_hash ? await modelFor(a.race_id, a.model_hash, true) : null;
+  if (!model) {
+    console.warn(`eras attempt ${a.id}: ${a.race_id} changed since it started, skipped`);
+    attemptsLeft++;
+    continue;
+  }
+  const check = recheckAttempt(model, a);
+  if (check.rival && !check.rival.honest) {
+    console.warn(
+      `eras attempt ${a.id} (${a.race_id}): rival claims wrong ${
+        check.rival.error ?? `after laps ${check.rival.wrong.join(', ')}`
+      }`,
+    );
+  }
+  if (check.correct) attemptsOk++;
+  else {
+    attemptsFixed++;
+    const before = a.result === null ? 'none' : (JSON.parse(a.result) as { stars: unknown }).stars;
+    console.warn(
+      `eras attempt ${a.id} (${a.race_id}): stored stars ${JSON.stringify(before)}, true ${JSON.stringify(
+        check.result.stars,
+      )}`,
+    );
+  }
+  statements.push(...recheckAttemptSql(check, a));
+}
+console.log(
+  `${attempts.length} eras attempts: ${attemptsOk} verified, ${attemptsFixed} corrected or evaluated, ${attemptsLeft} left for later`,
+);
 if (dryRun || statements.length === 0) {
   console.log(dryRun ? '(dry run: nothing written)' : 'nothing to write');
 } else {

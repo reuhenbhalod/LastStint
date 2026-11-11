@@ -1,0 +1,574 @@
+{
+  "schemaVersion": 11,
+  "race": {
+    "id": "hungary-1992",
+    "name": "Hungary 1992: Berger vs Mansell",
+    "laps": 77,
+    "takeoverLap": 58,
+    "seed": 1,
+    "scUnlap": "none"
+  },
+  "era": "1988-1993",
+  "track": {
+    "pitLoss": 18.086,
+    "pitLossUnderSC": 9.947,
+    "pitLossUnderVSC": 12.48,
+    "pitLossDeviations": [
+      -0.337,
+      0.337
+    ],
+    "overtakeDifficulty": 0.7222,
+    "overtakeModel": {
+      "intercept": 0.2051,
+      "paceCoef": 0.5244,
+      "gapCoef": -1.3852
+    },
+    "dirtyAirPenalty": 0.1162,
+    "greenLapTime": 84.998
+  },
+  "compounds": {
+    "MEDIUM": {
+      "offset": 0.0,
+      "degPerLap": 0.03655,
+      "cliffLap": 77,
+      "provenLaps": 77
+    }
+  },
+  "drivers": [
+    {
+      "code": "ALBM",
+      "team": "Footwork",
+      "basePace": 86.8373,
+      "noise": 1.2185,
+      "stateAtTakeover": {
+        "position": 8,
+        "gapAhead": 7.127,
+        "compound": "MEDIUM",
+        "tyreAge": 58,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BELP",
+      "team": "March",
+      "basePace": 87.187,
+      "noise": 0.9769,
+      "stateAtTakeover": {
+        "position": 10,
+        "gapAhead": 50.52,
+        "compound": "MEDIUM",
+        "tyreAge": 58,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BER",
+      "team": "McLaren",
+      "basePace": 84.4533,
+      "noise": 0.9835,
+      "stateAtTakeover": {
+        "position": 2,
+        "gapAhead": 38.147,
+        "compound": "MEDIUM",
+        "tyreAge": 58,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "BRU",
+      "team": "Benetton",
+      "basePace": 83.6768,
+      "noise": 1.3633,
+      "stateAtTakeover": {
+        "position": 5,
+        "gapAhead": 3.587,
+        "compound": "MEDIUM",
+        "tyreAge": 58,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "CAP",
+      "team": "Ferrari",
+      "basePace": 85.8146,
+      "noise": 0.8729,
+      "stateAtTakeover": {
+        "position": 6,
+        "gapAhead": 11.478,
+        "compound": "MEDIUM",
+        "tyreAge": 58,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "DEC",
+      "team": "Tyrrell",
+      "basePace": 85.7793,
+      "noise": 1.4099,
+      "stateAtTakeover": {
+        "position": 9,
+        "gapAhead": 45.088,
+        "compound": "MEDIUM",
+        "tyreAge": 58,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "GUG",
+      "team": "Jordan",
+      "basePace": 90.4497,
+      "noise": 2.0034,
+      "stateAtTakeover": {
+        "position": 11,
+        "gapAhead": 36.947,
+        "compound": "MEDIUM",
+        "tyreAge": 58,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "HAK",
+      "team": "Team Lotus",
+      "basePace": 84.3962,
+      "noise": 1.083,
+      "stateAtTakeover": {
+        "position": 3,
+        "gapAhead": 5.656,
+        "compound": "MEDIUM",
+        "tyreAge": 58,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "HIL",
+      "team": "Brabham",
+      "basePace": 87.9775,
+      "noise": 1.1527,
+      "stateAtTakeover": {
+        "position": 12,
+        "gapAhead": 60.538,
+        "compound": "MEDIUM",
+        "tyreAge": 58,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "MAN",
+      "team": "Williams",
+      "basePace": 83.7395,
+      "noise": 1.2716,
+      "stateAtTakeover": {
+        "position": 4,
+        "gapAhead": 15.953,
+        "compound": "MEDIUM",
+        "tyreAge": 58,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 62,
+          "to": "MEDIUM",
+          "loss": 21.407
+        }
+      ]
+    },
+    {
+      "code": "MSCM",
+      "team": "Benetton",
+      "basePace": 85.1148,
+      "noise": 1.1918,
+      "stateAtTakeover": {
+        "position": 7,
+        "gapAhead": 48.702,
+        "compound": "MEDIUM",
+        "tyreAge": 58,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "SENA",
+      "team": "McLaren",
+      "basePace": 83.9715,
+      "noise": 1.4273,
+      "stateAtTakeover": {
+        "position": 1,
+        "gapAhead": 0.0,
+        "compound": "MEDIUM",
+        "tyreAge": 58,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 68,
+          "to": "MEDIUM",
+          "loss": 19.701
+        }
+      ]
+    }
+  ],
+  "fuelEffectPerLap": 0.05878,
+  "freshTyre": {
+    "bonus": -0.036,
+    "laps": 3
+  },
+  "events": [
+    {
+      "lap": 65,
+      "type": "RETIREMENT",
+      "driver": "MSCM"
+    }
+  ],
+  "decisionMoments": [
+    {
+      "id": "rivalpit-61",
+      "lap": 61,
+      "trigger": "rivalPit",
+      "target": {
+        "kind": "beat-rival"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "STAY OUT",
+          "decisions": []
+        },
+        {
+          "id": "box-medium",
+          "label": "IN - fresh tyres",
+          "decisions": [
+            {
+              "lap": 61,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "box-next-medium",
+          "label": "IN NEXT LAP - fresh tyres",
+          "decisions": [
+            {
+              "lap": 62,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "stay"
+    },
+    {
+      "id": "pace-66",
+      "lap": 66,
+      "trigger": "cliff",
+      "target": {
+        "kind": "beat-rival"
+      },
+      "options": [
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 66,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "standard",
+          "label": "STEADY - standard pace",
+          "decisions": [
+            {
+              "lap": 66,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "manage",
+          "label": "EASY - save the tyres",
+          "decisions": [
+            {
+              "lap": 66,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "push-attack",
+          "label": "PUSH - attack",
+          "decisions": [
+            {
+              "lap": 66,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            },
+            {
+              "lap": 66,
+              "kind": "mode",
+              "key": "battle",
+              "value": "attack"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "pace-70",
+      "lap": 70,
+      "trigger": "cliff",
+      "target": {
+        "kind": "beat-rival"
+      },
+      "options": [
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 70,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "standard",
+          "label": "STEADY - standard pace",
+          "decisions": [
+            {
+              "lap": 70,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "manage",
+          "label": "EASY - save the tyres",
+          "decisions": [
+            {
+              "lap": 70,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "push-attack",
+          "label": "PUSH - attack",
+          "decisions": [
+            {
+              "lap": 70,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            },
+            {
+              "lap": 70,
+              "kind": "mode",
+              "key": "battle",
+              "value": "attack"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    },
+    {
+      "id": "pace-74",
+      "lap": 74,
+      "trigger": "cliff",
+      "target": {
+        "kind": "beat-rival"
+      },
+      "options": [
+        {
+          "id": "push",
+          "label": "PUSH",
+          "decisions": [
+            {
+              "lap": 74,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "standard",
+          "label": "STEADY - standard pace",
+          "decisions": [
+            {
+              "lap": 74,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "manage",
+          "label": "EASY - save the tyres",
+          "decisions": [
+            {
+              "lap": 74,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "push-attack",
+          "label": "PUSH - attack",
+          "decisions": [
+            {
+              "lap": 74,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            },
+            {
+              "lap": 74,
+              "kind": "mode",
+              "key": "battle",
+              "value": "attack"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    }
+  ],
+  "candidateMomentLaps": [
+    62,
+    68
+  ],
+  "realResult": [
+    "SENA",
+    "MAN",
+    "BER",
+    "HAK",
+    "BRU",
+    "CAP",
+    "ALBM",
+    "DEC",
+    "BELP",
+    "GUG",
+    "HIL",
+    "MSCM",
+    "PAT",
+    "MAR",
+    "KAT",
+    "ALE",
+    "SUZ",
+    "GAC",
+    "WEN",
+    "GROO",
+    "MOD",
+    "VANE",
+    "BOUT",
+    "COM",
+    "HER",
+    "TAR"
+  ],
+  "userSide": "BER",
+  "rival": "MAN",
+  "eras": {
+    "eraId": 2,
+    "order": 7,
+    "userSide": "BER",
+    "hardCalls": {
+      "MAN": 0,
+      "BER": 0
+    },
+    "target": {
+      "type": "beat-rival",
+      "rival": "MAN"
+    },
+    "storyline": {
+      "real": "Mansell stops for tyres on lap 61, rejoins sixth and passes Berger for second, clinching the title with five races left; Berger finishes third",
+      "rewriteCondition": {
+        "type": "beat-rival",
+        "rival": "MAN"
+      },
+      "headline": "Berger keeps the Williams behind him at the Hungaroring"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 1,
+      "label": "Answer the Williams: make exactly one tyre stop"
+    },
+    "hidden": {
+      "type": "finish_position",
+      "position": 2,
+      "label": "Finish second"
+    },
+    "briefing": "Hungaroring, 1992. Mansell leads the championship on 86 points to Patrese's 40, and a good result here can make him champion with five races to spare. You run Berger's McLaren. Pit board only: keep the Williams behind. Reconstructed race: no lap timing survives, so the laps are rebuilt to fit the result, the fastest laps, the sourced stops and who led each lap (Jolpica, F1DB, Motor Sport, Wikipedia). Who led each lap is sourced, and so is the order at a few laps; the lap times, and the rest of the order, are reconstructed."
+  },
+  "provenance": {
+    "kind": "reconstructed",
+    "estimated": [
+      "compounds",
+      "fuelLoads",
+      "weather"
+    ]
+  },
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": false
+  },
+  "reconstructed": true
+}

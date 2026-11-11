@@ -31,9 +31,9 @@ test('plays the Abu Dhabi daily end to end', async ({ page, context }) => {
   await plans.getByRole('button', { name: /Go with plan A/ }).click();
   await page.getByRole('button', { name: '2×' }).click();
 
-  // Tap the rival on the map: the driver card opens. (The dot never stops moving, so the click
-  // is dispatched rather than waiting for it to be still.)
-  await page.getByRole('button', { name: 'VER: details' }).dispatchEvent('click');
+  // Tap the rival on the map: the driver card opens on the press. (The dot never stops moving,
+  // so the press is dispatched rather than waiting for it to be still.)
+  await page.getByRole('button', { name: 'VER: details' }).dispatchEvent('pointerdown');
   await expect(page.getByLabel('Max Verstappen details')).toContainText('Red Bull Racing');
   await page.getByRole('button', { name: 'Close driver details' }).click();
 

@@ -7,13 +7,23 @@ import { fileURLToPath } from 'node:url';
 
 export const workerDir = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const repo = join(workerDir, '..', '..');
-const DB_NAME = 'pitwall-db';
 
-export type Target = 'local' | 'remote';
+/** local and remote are production's D1 (pitwall-db); staging is pitwall-staging-db (remote). */
+export type Target = 'local' | 'remote' | 'staging';
 
-/** Run `wrangler d1 execute` on the local or remote D1; throws with Wrangler's output. */
+/** The `wrangler d1 execute` database and flags for a target. */
+export function d1Args(target: Target): string[] {
+  return target === 'staging'
+    ? ['pitwall-staging-db', '--remote', '--env', 'staging']
+    : ['pitwall-db', `--${target}`];
+}
+
+/** Run `wrangler d1 execute` on the chosen D1; throws with Wrangler's output. */
 export function wrangler(target: Target, ...args: string[]): string {
-  const res = spawnSync('npx', ['wrangler', 'd1', 'execute', DB_NAME, `--${target}`, ...args], {
+  // Run Wrangler's JS entry with this Node rather than `npx`: npx is npx.cmd on Windows, which
+  // Node only spawns through a shell, and a shell would split the SQL in `--command`.
+  const bin = join(workerDir, 'node_modules', 'wrangler', 'bin', 'wrangler.js');
+  const res = spawnSync(process.execPath, [bin, 'd1', 'execute', ...d1Args(target), ...args], {
     cwd: workerDir,
     encoding: 'utf8',
   });

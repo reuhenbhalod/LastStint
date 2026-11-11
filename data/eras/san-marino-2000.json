@@ -1,0 +1,43 @@
+{
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": true
+  },
+  "eras": {
+    "eraId": 4,
+    "order": 3,
+    "userSide": "MSCM",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "H\u00e4kkinen leads from pole, 3.3 s clear after 22 laps. At the first stops on lap 27 Ferrari give Schumacher the bigger fill for a longer middle stint, while H\u00e4kkinen runs with a damaged splitter and loses about 2 s to a brief engine cut-out. H\u00e4kkinen makes his second stop on lap 44; Schumacher stays out four more laps, rejoins ahead after his lap-48 stop and wins by 1.168 s."
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 2,
+      "label": "Win on two stops"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 1.2,
+      "label": "Win by more than 1.2 seconds"
+    },
+    "hardCalls": {
+      "MSCM": 0,
+      "HAK": 0
+    },
+    "briefing": "Imola, 2000. H\u00e4kkinen took pole and leads you by 3.3 s after 22 laps; you run Schumacher in the Ferrari. Two refuelling stops each: get the fill and the timing right and come out of the second stops in front."
+  },
+  "storylineEvents": [
+    [
+      46,
+      "RETIREMENT"
+    ]
+  ]
+}

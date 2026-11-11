@@ -1,0 +1,26 @@
+{
+  "raceId": "portugal-1984",
+  "stops": [],
+  "safetyCars": [],
+  "complete": {
+    "stops": false,
+    "safetyCars": true
+  },
+  "lapLeaders": [
+    {
+      "driver": "ROSK",
+      "name": "Keke Rosberg",
+      "fromLap": 1,
+      "toLap": 8,
+      "source": "https://en.wikipedia.org/wiki/1984_Portuguese_Grand_Prix (lap-leader chart, Template:F1Laps1984 'POR')"
+    },
+    {
+      "driver": "PRO",
+      "name": "Alain Prost",
+      "fromLap": 9,
+      "toLap": 70,
+      "source": "https://en.wikipedia.org/wiki/1984_Portuguese_Grand_Prix (lap-leader chart, Template:F1Laps1984 'POR')"
+    }
+  ],
+  "notes": "No front-runner's tyre stop is reported (Prost, Lauda, Senna appear to have run non-stop, but no source states it). Motor Sport Nov 1984 (https://www.motorsportmagazine.com/archive/article/november-1984/76/another-mclaren-double/) reports Johansson (#20) stopping for a new nose after contact and Warwick (#16) stopping for new Michelins after a spin, both without laps."
+}

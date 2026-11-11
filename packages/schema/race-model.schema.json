@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://boxthislap.app/schema/race-model.schema.json",
+  "$id": "https://laststint.com/schema/race-model.schema.json",
   "title": "RaceModel",
   "description": "Compact fitted model + event timeline for one race. Written by the Python pipeline, consumed by the TypeScript simulator.",
   "type": "object",
@@ -24,7 +24,7 @@
     "schemaVersion": {
       "type": "integer",
       "minimum": 1,
-      "description": "Bumped on any breaking change to this schema."
+      "description": "The schema version the file was written with. Every change so far is additive (new fields are optional, with defaults matching the older behaviour), so a reader accepts any version up to the current one (v11: eras, provenance, rules, events[].storylineEvent, scUnlap none)."
     },
     "race": {
       "type": "object",
@@ -58,9 +58,10 @@
           "type": "string",
           "enum": [
             "all",
-            "duel"
+            "duel",
+            "none"
           ],
-          "description": "Which lapped cars unlap before a safety-car restart: all of them (the rule, default), or only those between userSide and rival (Abu Dhabi 2021's race-control call)."
+          "description": "Which lapped cars unlap before a safety-car restart: all of them (the rule since 2012, default), only those between userSide and rival (Abu Dhabi 2021's race-control call), or none (before 2007 and 2010-11, roadmap R5: lapped cars stay in the SC queue and the red-flag restart queue where they are on the road, a lap down)."
         }
       }
     },
@@ -109,7 +110,7 @@
         },
         "overtakeModel": {
           "type": "object",
-          "description": "P(pass) = sigmoid(intercept + paceCoef*paceAdvantage + gapCoef*gap), rolled once per lap for a follower within 2s.",
+          "description": "P(pass) = sigmoid(intercept + paceCoef*paceAdvantage + gapCoef*gap), rolled once per lap for a follower within 2s. An Eras build's model (pipeline overtaking.py: slopes pooled per era group, intercept per track layout) adds trainCoef when the car ahead started the lap within 1 s of its own car ahead.",
           "additionalProperties": false,
           "required": [
             "intercept",
@@ -127,12 +128,39 @@
             "gapCoef": {
               "type": "number",
               "exclusiveMaximum": 0
+            },
+            "trainCoef": {
+              "type": "number",
+              "description": "Eras builds only: logit shift when the car ahead is itself within 1 s of the car ahead of it (a DRS train). Absent: no train term."
+            },
+            "heldGap": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "description": "Eras builds of timed races only (pipeline dirty_air.py): a follower that fails its pass roll is held this far (s) behind. Absent: 0.3 s."
+            },
+            "rollOnly": {
+              "type": "boolean",
+              "description": "Eras switch (pipeline dirty_air.py): no pass without a won roll; a car that would end a lap ahead of one that started it ahead, without beating it on a roll, is held behind it. Absent: off."
             }
           }
         },
         "dirtyAirPenalty": {
           "type": "number",
           "minimum": 0
+        },
+        "dirtyAirBands": {
+          "type": "array",
+          "description": "Eras builds of timed races only (pipeline dirty_air.py): the dirty-air loss (s) by start-of-lap gap to the car ahead; a gap under upTo (bands ascending) pays penalty, a gap past the last band none. Absent: dirtyAirPenalty within 1 s.",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["upTo", "penalty"],
+            "properties": {
+              "upTo": { "type": "number", "exclusiveMinimum": 0 },
+              "penalty": { "type": "number", "minimum": 0 }
+            }
+          }
         },
         "greenLapTime": {
           "type": "number"
@@ -142,6 +170,67 @@
         },
         "vscLapTime": {
           "type": "number"
+        },
+        "refuel": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "A refuelling race's fill model, fitted from the real stops (eras build plan 4.2, pipeline refuel.py): lane time = laneBase + secondsPerLap x laps of fuel added, the slope shrunk toward a physical prior of 0.25 s per lap of fuel (an estimate: provenance lists fuelLoads). Absent: that prior.",
+          "required": [
+            "secondsPerLap",
+            "laneBase",
+            "refFill",
+            "tankLaps",
+            "stops"
+          ],
+          "properties": {
+            "secondsPerLap": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Fill time per lap of fuel added (s)."
+            },
+            "laneBase": {
+              "type": "number",
+              "description": "The fitted pit-lane time of a stop adding no fuel (s)."
+            },
+            "refFill": {
+              "type": "number",
+              "minimum": 0,
+              "description": "The mean fill of the real stops (laps): what pitLoss already holds."
+            },
+            "tankLaps": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "The longest real stint (laps): the tank's capacity less the reserve."
+            },
+            "stops": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Real stops in the fit."
+            }
+          }
+        },
+        "restart": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "jump",
+            "spread",
+            "places"
+          ],
+          "description": "The SC restart (Eras builds; pipeline restart.py, fitted on the 2018+ timed races' restarts): on a green lap straight after an SC lap the car k places behind the leader loses jump + spread x min(k, places) s. Absent: a restart lap is an ordinary green lap.",
+          "properties": {
+            "jump": {
+              "type": "number"
+            },
+            "spread": {
+              "type": "number",
+              "minimum": 0
+            },
+            "places": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
         }
       }
     },
@@ -172,6 +261,11 @@
             "type": "number",
             "minimum": 0,
             "description": "Extra seconds per lap of tyre age past cliffLap. Absent: no fitted cliff."
+          },
+          "degQuad": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Seconds per lap of tyre wear squared: the lap costs degQuad x wear^2 on top of degPerLap x wear, so a long stint falls off late (Eras model fix S4, pooled by track and era). Absent: linear wear."
           },
           "provenLaps": {
             "type": "integer",
@@ -277,7 +371,57 @@
           },
           "wetPace": {
             "type": "number",
-            "description": "A wet race: the driver's extra share of a lap on a wet track beyond the weather curves (negative: quicker in the wet), fading in up to wetness 0.1 (pipeline/wet.py)."
+            "description": "A wet race: the driver's extra share of a lap on a wet track beyond the weather curves (negative: quicker in the wet), fading in up to wetness 0.1 (pipeline/wet.py). With dampPace: its pace at wetness 0.15 and up."
+          },
+          "dampPace": {
+            "type": "number",
+            "description": "An Eras build's wet race: the driver's extra share of a lap on a damp track (wetness under 0.15), where wetPace is its pace on a wet one; fades in up to wetness 0.1 the same way (pipeline wet.driver_band_pace). Absent: wetPace at any wetness."
+          },
+          "stintPace": {
+            "type": "array",
+            "description": "Pace by stint (Eras model fix M2; pipeline pace.stint_offsets): the car's pace offset (s/lap, added to basePace) in each real stint after the takeover, fitted from its clean laps in that stint and shrunk toward 0. Keyed by the lap the stint began: a real stop's out-lap, or 0 for the stint the car is on at the takeover. A car runs an offset while its current stint began on that lap; a stint begun on any other lap runs at 0. The player's car in live play runs its race-wide mean (weighted by the stints' real laps) in every stint (sim.ts playerStintOffset). Eras builds only; absent: none.",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "lap",
+                "offset"
+              ],
+              "properties": {
+                "lap": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "The out-lap the stint began on (a realStrategy lap), or 0 for the takeover stint."
+                },
+                "offset": {
+                  "type": "number",
+                  "description": "Seconds per lap added to basePace in this stint (negative: quicker)."
+                }
+              }
+            }
+          },
+          "serviceStops": {
+            "type": "array",
+            "description": "Real stops after the takeover that changed no tyres (a repair, a penalty stop-go, a drive-through; pipeline track.service_stops): the car pays each one's measured loss on its out-lap whatever its strategy, and keeps its set. Eras builds only; absent: none.",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "lap",
+                "loss"
+              ],
+              "properties": {
+                "lap": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "description": "The out-lap (the stop's time is charged on it)."
+                },
+                "loss": {
+                  "type": "number",
+                  "description": "Measured time lost to the stop (in- and out-lap against the car's clean laps, in the sim frame)."
+                }
+              }
+            }
           }
         }
       }
@@ -325,17 +469,106 @@
               "VSC",
               "RED",
               "RAIN",
-              "RETIREMENT"
+              "RETIREMENT",
+              "FAULT",
+              "TEAM_ORDER"
             ]
           },
           "laps": {
             "type": "integer",
-            "minimum": 1
+            "minimum": 1,
+            "description": "How many laps the event lasts. A FAULT without it lasts to the flag (or to the car's next stop with untilStop)."
           },
           "driver": {
-            "type": "string"
+            "type": "string",
+            "description": "The car the event is about; a TEAM_ORDER's car told to let `other` by."
+          },
+          "pickup": {
+            "type": "string",
+            "description": "An SC event (Eras builds, sourced in data/incidents.json as SC_PICKUP): the car the safety car picked up when it wasn't the leader. Both sims run the cars ahead of it on the road a racing lap on the SC's first lap and keep their gaps on its second."
+          },
+          "restart": {
+            "enum": [
+              "standing",
+              "rolling"
+            ],
+            "description": "A RED event: how the race resumed (eras build plan 4.3): from a standing start on the grid, or rolling behind the safety car. Absent: it wasn't resumed."
+          },
+          "storylineEvent": {
+            "type": "boolean",
+            "default": false,
+            "description": "The event defines the race's storyline: Legend difficulty always runs it on its real lap instead of re-rolling it (eras spec section 8)."
+          },
+          "fault": {
+            "enum": [
+              "gear-stuck",
+              "power-loss",
+              "puncture",
+              "tyre-failure",
+              "damage"
+            ],
+            "description": "A FAULT's kind (simulator roadmap R2; pipeline/faults.py)."
+          },
+          "paceLoss": {
+            "type": "number",
+            "minimum": 0,
+            "description": "A FAULT: seconds a green lap the faulted car loses while it lasts, fitted from the car's real laps after the fault."
+          },
+          "slowLap": {
+            "type": "number",
+            "minimum": 0,
+            "description": "A FAULT: extra seconds on the fault's own lap (the forced slow lap of a puncture or tyre failure), fitted like paceLoss."
+          },
+          "untilStop": {
+            "type": "boolean",
+            "description": "A FAULT that lasts until the car's next stop (a puncture or failed tyre is fixed by new tyres)."
+          },
+          "other": {
+            "type": "string",
+            "description": "A TEAM_ORDER (Eras builds, sourced in data/incidents.json): the car let by. Both sims swap the two on the order's lap (packages/sim scripted.ts)."
+          },
+          "lapsDown": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "An SC or RED event of a no-unlapping race (race.scUnlap none; Eras builds, pipeline restart.py): each car still running at the event's last lap with the most laps down it was at the end of any of the event's laps, counted from the real lap counts. The sims take a scripted car's lapped status in that event's queue from it, not from their own gaps."
           }
-        }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "FAULT"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "driver",
+                "fault",
+                "paceLoss"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "TEAM_ORDER"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "driver",
+                "other"
+              ]
+            }
+          }
+        ]
       }
     },
     "decisionMoments": {
@@ -369,7 +602,11 @@
               "cliff",
               "takeover",
               "rain",
-              "drying"
+              "drying",
+              "fault",
+              "RED",
+              "preRed",
+              "teamOrder"
             ]
           },
           "target": {
@@ -439,7 +676,7 @@
     },
     "reconstructed": {
       "type": "boolean",
-      "description": "True for hand-built races without official lap timing (labelled in the UI)."
+      "description": "True for hand-built races without official lap timing (labelled in the UI). Must agree with provenance.kind when both are set."
     },
     "weather": {
       "type": "object",
@@ -544,6 +781,744 @@
           }
         }
       }
+    },
+    "eras": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "eraId",
+        "order"
+      ],
+      "description": "Eras mode (eras spec section 11). Daily and Gauntlet ignore it. Only eraId and order are required so a race can join an era before its content is written; the content checklist (spec section 15) requires the rest before it is published.",
+      "properties": {
+        "eraId": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10,
+          "description": "The era (1 = turbo era ... 10 = ground-effect era), not the play order."
+        },
+        "order": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10,
+          "description": "The race's number within its era."
+        },
+        "userSide": {
+          "$ref": "#/$defs/driverCode",
+          "description": "The driver the player runs in Eras (the one with more hard calls, eras spec section 4). Absent: the top-level userSide. It may differ from the Daily side of a race in both pools."
+        },
+        "target": {
+          "$ref": "#/$defs/erasTarget",
+          "description": "The star 1 target."
+        },
+        "storyline": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "real"
+          ],
+          "dependentRequired": {
+            "rewriteCondition": [
+              "headline"
+            ],
+            "headline": [
+              "rewriteCondition"
+            ]
+          },
+          "properties": {
+            "real": {
+              "type": "string",
+              "minLength": 1,
+              "description": "What really happened."
+            },
+            "rewriteCondition": {
+              "$ref": "#/$defs/erasTarget",
+              "description": "The result that rewrites the storyline, from the player's side. Absent: the Eras side really won, so the race has no history-book rewrite (owner decision, Nov 8 2026)."
+            },
+            "headline": {
+              "type": "string",
+              "minLength": 1,
+              "description": "An original history-book headline (never quoted team radio): with a rewrite condition, and only with one."
+            }
+          }
+        },
+        "mastery": {
+          "$ref": "#/$defs/erasObjective"
+        },
+        "hidden": {
+          "$ref": "#/$defs/erasObjective"
+        },
+        "hardCalls": {
+          "type": "object",
+          "description": "Hard calls per storyline driver (driver code -> count), written by `pipeline hard-calls`.",
+          "propertyNames": {
+            "minLength": 2,
+            "maxLength": 4
+          },
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "briefing": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The short era-appropriate intro shown before the race."
+        },
+        "storylineCalls": {
+          "type": "array",
+          "description": "The rival's real stops the storyline turns on (Eras grader fixes, Nov 8 2026): when the driver is the race's rival from the Eras side, in live play it makes them on their real laps whatever its policy; no rival rule or decision point changes its plan before the last of them (or to the flag after one marked untilFlag).",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "driver",
+              "lap",
+              "real",
+              "source"
+            ],
+            "properties": {
+              "driver": {
+                "$ref": "#/$defs/driverCode",
+                "description": "The storyline driver."
+              },
+              "lap": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "The stop's out-lap: one of the driver's real stops."
+              },
+              "real": {
+                "type": "string",
+                "minLength": 1,
+                "description": "What really happened."
+              },
+              "source": {
+                "type": "string",
+                "pattern": "^https?://",
+                "description": "Where the fact was checked (URLs, '; '-separated)."
+              },
+              "untilFlag": {
+                "type": "boolean",
+                "description": "The rival keeps its real plan after this stop too, to the flag."
+              }
+            }
+          }
+        },
+        "storylineRetirements": {
+          "type": "array",
+          "description": "Avoidable storyline retirements (owner decision, Nov 8 2026): in live play the player's car retires on its real retirement lap only if the player repeats the real call (the condition). Scripted cars keep their real retirements.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "driver",
+              "condition",
+              "real",
+              "source"
+            ],
+            "properties": {
+              "driver": {
+                "$ref": "#/$defs/driverCode",
+                "description": "The storyline driver: conditional only when he is the player's car. His RETIREMENT event gives the lap."
+              },
+              "condition": {
+                "$ref": "#/$defs/storylineCondition"
+              },
+              "alsoRetires": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/driverCode"
+                },
+                "description": "Cars whose real retirement is the same incident (a collision): they retire with the player's car, or not at all."
+              },
+              "real": {
+                "type": "string",
+                "minLength": 1,
+                "description": "What really happened."
+              },
+              "source": {
+                "type": "string",
+                "pattern": "^https?://",
+                "description": "Where the fact and the call were checked (URLs, '; '-separated)."
+              }
+            }
+          }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind"
+      ],
+      "description": "Where the race's data came from. Absent: real, nothing estimated.",
+      "properties": {
+        "kind": {
+          "enum": [
+            "real",
+            "reconstructed"
+          ],
+          "description": "real: built from lap timing; reconstructed: fitted to results and race reports (labelled in the UI)."
+        },
+        "estimated": {
+          "type": "array",
+          "uniqueItems": true,
+          "default": [],
+          "description": "Fields estimated rather than measured (eras build plan 2.4): stint compounds, safety-car laps, fuel loads (and a refuelling race's fill rate), the wetness timeline, and the dry pace of a car that ran only wet laps (model fix 1.6: from its wet laps against the field, or its team-mate's).",
+          "items": {
+            "enum": [
+              "compounds",
+              "safetyCars",
+              "fuelLoads",
+              "weather",
+              "driverPace"
+            ]
+          }
+        }
+      }
+    },
+    "rules": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "The race's sporting rules (roadmap R5). Each absent field keeps today's behaviour; drs and ers default to the era's headset.json block. Behaviour lands in eras build plan 4.1 / 4.2.",
+      "properties": {
+        "twoCompound": {
+          "type": "boolean",
+          "default": true,
+          "description": "A dry race must use two dry compounds (2007+)."
+        },
+        "tyreChanges": {
+          "type": "boolean",
+          "default": true,
+          "description": "False: a stop only refuels (2005)."
+        },
+        "minStops": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "The fewest pit stops a car must make in the race (Monaco 2025: 2); a car reaching the flag with fewer is disqualified, as by the two-compound rule (wet tyres waive it). Absent: no minimum."
+        },
+        "refuelling": {
+          "type": "boolean",
+          "default": false,
+          "description": "Stops refuel (1994-2009, and 1983)."
+        },
+        "fuelLimit": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "The fixed race fuel allowance in kg (1984-88). Absent: no cap."
+        },
+        "pitLaneClosedUnderSC": {
+          "type": "boolean",
+          "default": false,
+          "description": "The pit lane closes when the SC is called; a stop takes a penalty (2007-09)."
+        },
+        "vsc": {
+          "type": "boolean",
+          "default": true,
+          "description": "A virtual safety car exists (2015+)."
+        },
+        "drs": {
+          "type": "boolean",
+          "description": "DRS and the wait-drs move. Absent: the era block's drs."
+        },
+        "ers": {
+          "enum": [
+            "none",
+            "kers",
+            "hybrid"
+          ],
+          "description": "The battery: none, KERS (2009, 2011-13) or the hybrid ERS (2014+). Absent: the era block's (an ers mode means hybrid)."
+        }
+      },
+      "if": {
+        "required": [
+          "fuelLimit"
+        ]
+      },
+      "then": {
+        "properties": {
+          "refuelling": {
+            "const": false
+          }
+        }
+      }
     }
-  }
+  },
+  "$defs": {
+    "driverCode": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 4
+    },
+    "erasTarget": {
+      "description": "A result condition from the player's side (eras spec section 6 targets). position/deny count from P1: position N means P N or better; deny N means the rival finishes P N or worse (or doesn't finish). team: positions[0] is the player's car and positions[1] its teammate, each at or better.",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "const": "win"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "const": "defend"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "position"
+          ],
+          "properties": {
+            "type": {
+              "const": "position"
+            },
+            "position": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "rival"
+          ],
+          "properties": {
+            "type": {
+              "const": "beat-rival"
+            },
+            "rival": {
+              "$ref": "#/$defs/driverCode"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "positions"
+          ],
+          "properties": {
+            "type": {
+              "const": "team"
+            },
+            "positions": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "minItems": 2,
+              "maxItems": 2
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "rival",
+            "position"
+          ],
+          "properties": {
+            "type": {
+              "const": "deny"
+            },
+            "rival": {
+              "$ref": "#/$defs/driverCode"
+            },
+            "position": {
+              "type": "integer",
+              "minimum": 2
+            }
+          }
+        }
+      ]
+    },
+    "erasObjective": {
+      "description": "A mastery or hidden objective (eras spec section 6): one of the 8 types with its parameters, and the label the UI shows.",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "label"
+          ],
+          "properties": {
+            "type": {
+              "const": "stop_count"
+            },
+            "label": {
+              "type": "string",
+              "minLength": 1
+            },
+            "max": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "exact": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "oneOf": [
+            {
+              "required": [
+                "max"
+              ]
+            },
+            {
+              "required": [
+                "exact"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "label"
+          ],
+          "properties": {
+            "type": {
+              "const": "beat_real_call"
+            },
+            "label": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "label",
+            "position"
+          ],
+          "properties": {
+            "type": {
+              "const": "finish_position"
+            },
+            "label": {
+              "type": "string",
+              "minLength": 1
+            },
+            "position": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "label",
+            "seconds"
+          ],
+          "properties": {
+            "type": {
+              "const": "margin"
+            },
+            "label": {
+              "type": "string",
+              "minLength": 1
+            },
+            "seconds": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "label"
+          ],
+          "properties": {
+            "type": {
+              "const": "compound_rule"
+            },
+            "label": {
+              "type": "string",
+              "minLength": 1
+            },
+            "mustUse": {
+              "type": "string",
+              "minLength": 1
+            },
+            "mustAvoid": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "anyOf": [
+            {
+              "required": [
+                "mustUse"
+              ]
+            },
+            {
+              "required": [
+                "mustAvoid"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "label",
+            "mode",
+            "maxLaps"
+          ],
+          "properties": {
+            "type": {
+              "const": "mode_rule"
+            },
+            "label": {
+              "type": "string",
+              "minLength": 1
+            },
+            "mode": {
+              "enum": [
+                "push",
+                "standard",
+                "manage",
+                "normal",
+                "liftAndCoast",
+                "attack",
+                "hold",
+                "defend",
+                "harvest",
+                "balanced",
+                "deploy",
+                "overtake"
+              ],
+              "description": "A mode value (Modes in packages/sim/src/types.ts); each names its key."
+            },
+            "maxLaps": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "label"
+          ],
+          "properties": {
+            "type": {
+              "const": "no_neutralized_stop"
+            },
+            "label": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "label",
+            "positions"
+          ],
+          "properties": {
+            "type": {
+              "const": "team_result"
+            },
+            "label": {
+              "type": "string",
+              "minLength": 1
+            },
+            "positions": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "minItems": 2,
+              "maxItems": 2,
+              "description": "The player's car then its teammate, each at or better."
+            }
+          }
+        }
+      ]
+    },
+    "storylineCondition": {
+      "description": "The real call (packages/sim scripted.ts conditionMet, pipeline storyline.py).",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "key",
+            "value",
+            "fromLap"
+          ],
+          "properties": {
+            "type": {
+              "const": "mode"
+            },
+            "key": {
+              "enum": [
+                "pace",
+                "fuel",
+                "battle",
+                "ers"
+              ]
+            },
+            "value": {
+              "type": "string"
+            },
+            "fromLap": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "description": "The standing mode `key` was `value` on every lap from fromLap to the retirement lap."
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "minLaps"
+          ],
+          "properties": {
+            "type": {
+              "const": "tyre_age"
+            },
+            "minLaps": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "description": "The car started the retirement lap on tyres at least minLaps laps old."
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "driver",
+            "seconds"
+          ],
+          "properties": {
+            "type": {
+              "const": "pressure"
+            },
+            "driver": {
+              "$ref": "#/$defs/driverCode"
+            },
+            "seconds": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          },
+          "description": "`driver` started the retirement lap behind the player's car, within `seconds`."
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "const": "fuel"
+            }
+          },
+          "description": "The fuel model decides: the frozen retirement is dropped, and the car stops if its tank runs dry (a fuel-limit race)."
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "required": [
+          "reconstructed",
+          "provenance"
+        ],
+        "properties": {
+          "reconstructed": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "provenance": {
+            "properties": {
+              "kind": {
+                "const": "reconstructed"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "reconstructed",
+          "provenance"
+        ],
+        "properties": {
+          "reconstructed": {
+            "const": false
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "provenance": {
+            "properties": {
+              "kind": {
+                "const": "real"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
 }

@@ -1,0 +1,56 @@
+{
+  "eras": {
+    "eraId": 4,
+    "order": 4,
+    "userSide": "BAR",
+    "target": {
+      "type": "team",
+      "positions": [
+        2,
+        2
+      ]
+    },
+    "storyline": {
+      "real": "Barrichello starts on pole and leads most of the race. Ferrari order him to let Schumacher win, and he yields on the last lap: Schumacher wins by 0.18 s.",
+      "rewriteCondition": {
+        "type": "team",
+        "positions": [
+          1,
+          2
+        ]
+      },
+      "headline": "No swap at the A1-Ring: Barrichello keeps his win"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 1,
+      "label": "Ferrari one-two on one more stop"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "push",
+      "maxLaps": 0,
+      "label": "Bring the one-two home without a single push lap"
+    },
+    "hardCalls": {
+      "BAR": 1,
+      "MSCM": 0
+    },
+    "briefing": "A1-Ring, 2002. The safety car is out and both Ferraris have just refuelled under it. You run Barrichello, on pole and leading; Schumacher is third, behind Ralf Schumacher, who has yet to stop. One more stop each. Bring the Ferraris home one-two."
+  },
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": true
+  },
+  "storylineEvents": [
+    [
+      26,
+      "SC"
+    ]
+  ]
+}

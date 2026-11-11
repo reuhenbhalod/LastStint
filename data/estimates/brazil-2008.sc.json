@@ -1,0 +1,19 @@
+{
+ "race": "brazil-2008",
+ "how": "docs/eras-checks/2.4-estimates.md: check each period against a race report; set status to confirmed or rejected (edit startLap/endLap if they're off), then re-run `pipeline jolpica <race-id> --force`.",
+ "periods": [
+  {
+   "startLap": 1,
+   "endLap": 4,
+   "laps": 4,
+   "kind": "SC",
+   "confidence": "likely",
+   "peakRatio": 1.639,
+   "gapBefore": null,
+   "gapAfter": 3.0,
+   "reasons": [],
+   "status": "confirmed",
+   "source": "https://en.wikipedia.org/wiki/2008_Brazilian_Grand_Prix: 'The accidents of Coulthard and Piquet prompted the deployment of the safety car at the end of the first lap'; 'Racing resumed on lap five when the safety car pulled into the pit-lane'"
+  }
+ ]
+}

@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import type { RaceModel } from '@boxthislap/sim';
 import pools from '@data/pools.json';
+import type { RaceModel } from '@laststint/sim';
 import { describe, expect, it } from 'vitest';
 import { neutralCause } from './neutral.js';
 
@@ -29,6 +29,13 @@ describe('why the safety car is out', () => {
     expect(neutralCause(model, [], 36, 'vsc')).toBe('Giovinazzi stopped with a gearbox failure');
     expect(neutralCause(model, [], 55, 'sc')).toBe('Latifi crashed');
     expect(neutralCause(model, [], 45, 'green')).toBeNull();
+  });
+
+  it('an SC already out at the takeover keeps its cause (Abu Dhabi 2012, SC laps 9-14)', () => {
+    const model = load('abu-dhabi-2012');
+    expect(model.race.takeoverLap).toBe(10);
+    expect(neutralCause(model, [], 11, 'sc')).toBe('Rosberg is out after a collision');
+    expect(neutralCause(model, [], 40, 'sc')).toContain('Grosjean');
   });
 
   it('a crash in live play brings its own cause', () => {

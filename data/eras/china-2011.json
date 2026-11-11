@@ -1,0 +1,41 @@
+{
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": true,
+    "ers": "kers",
+    "refuelling": false
+  },
+  "eras": {
+    "eraId": 6,
+    "order": 3,
+    "userSide": "VET",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Vettel starts from pole and stops twice; Hamilton, on three stops, catches him late on fresher tyres, passes him and wins by 5.2 s.",
+      "rewriteCondition": {
+        "type": "win"
+      },
+      "headline": "Vettel's two stops hold off Hamilton in Shanghai"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 2,
+      "label": "Win on two stops"
+    },
+    "hidden": {
+      "type": "margin",
+      "seconds": 3,
+      "label": "Win by more than 3 seconds"
+    },
+    "hardCalls": {
+      "VET": 1,
+      "HAM": 1
+    },
+    "briefing": "Shanghai, 2011. Vettel starts from pole, Button second and Hamilton third. You run Vettel, third after ten laps and 1.8 s behind Button in the lead. Win it."
+  }
+}

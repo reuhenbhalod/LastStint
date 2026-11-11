@@ -1,0 +1,1270 @@
+{
+ "raceId": "spain-1994",
+ "year": 1994,
+ "laps": 65,
+ "reconstructed": true,
+ "provenance": {
+  "kind": "reconstructed",
+  "estimated": [
+   "compounds",
+   "safetyCars",
+   "fuelLoads",
+   "weather"
+  ]
+ },
+ "estimates": [
+  "Every lap time and lap-end Time is synthetic: solved to the anchors, not measured",
+  "Position each lap follows from the synthetic times; the lap-1 order is the grid order, with the sourced lap-1 order at the front; each lap's leader and the sourced snapshots of the order and gaps are anchors, the rest of the order is estimated",
+  "Lap times in between the anchors: pace + tyre wear + fuel + seeded noise, the pace moved by a constant between the laps the sourced order marks",
+  "Fuel: 0.06s per lap of fuel on board; each stop refuels to the next stop",
+  "Stop loss: pit-lane time - 5.0s, 35% on the in-lap",
+  "PitInTime is the in-lap's end; PitOutTime adds the out-lap's share of the lane time",
+  "Compound is left empty (one dry compound per race, estimated in step 2.4)",
+  "No weather timeline: the race is assumed dry",
+  "Safety cars: only the sourced ones (none found is not none run)"
+ ],
+ "sources": {
+  "jolpica": "Jolpica-F1 dump 2026-10-24T01:04:07.015299Z (CC BY-NC-SA 4.0)",
+  "f1db": "F1DB v2026.19.0 (CC BY 4.0), f1db/spain-1994.*.csv",
+  "facts": "spain-1994.json",
+  "jolpicaRound": 5,
+  "eventName": "Spanish Grand Prix"
+ },
+ "classified": [
+  "HIL",
+  "MSCM",
+  "BLU",
+  "ALE",
+  "MAR",
+  "IRV",
+  "PAN",
+  "BEN",
+  "ZAN",
+  "BRA",
+  "BRU"
+ ],
+ "roadPositions": [],
+ "lastLapStops": [],
+ "stopsComplete": true,
+ "safetyCarsComplete": false,
+ "params": {
+  "seed": 0,
+  "sigma": 0.35,
+  "fuel_per_lap": 0.06,
+  "wear_prior": 0.04,
+  "wear_max": 0.25,
+  "start_loss": 4.0,
+  "grid_gap": 0.6,
+  "fastest_margin": 0.05,
+  "pit_bypass": 5.0,
+  "pit_in_share": 0.35,
+  "default_lane_time": 25.0,
+  "sc_factor": 1.4,
+  "sc_gap": 0.8,
+  "sc_iterations": 12,
+  "order_gap": 0.5,
+  "lead_margin": 1.0,
+  "lap_gap_tolerance": 1.0,
+  "order_iterations": 6,
+  "pace_weight": 0.05,
+  "pack_weight": 1.0,
+  "gap_tolerance": 2.0,
+  "attempts": 6,
+  "refuel": null
+ },
+ "solver": {
+  "attempts": 1,
+  "sigma": 0.35,
+  "passed": true
+ },
+ "fitted": {
+  "HIL": {
+   "pace": 85.635,
+   "wear": 0.1,
+   "noise": 1.05,
+   "target": 5774.3
+  },
+  "MSCM": {
+   "pace": 87.534,
+   "wear": 0.0,
+   "noise": 1.05,
+   "target": 5798.466
+  },
+  "BLU": {
+   "pace": 88.048,
+   "wear": 0.025,
+   "noise": 0.7,
+   "target": 5861.269
+  },
+  "ALE": {
+   "pace": 87.746,
+   "wear": 0.075,
+   "noise": 0.525,
+   "target": 5776.026
+  },
+  "MAR": {
+   "pace": 89.402,
+   "wear": 0.0,
+   "noise": 0.525,
+   "target": 5842.521
+  },
+  "IRV": {
+   "pace": 88.525,
+   "wear": 0.0,
+   "noise": 0.7,
+   "target": 5843.021
+  },
+  "PAN": {
+   "pace": 90.08,
+   "wear": 0.0,
+   "noise": 0.525,
+   "target": 5794.859
+  },
+  "BEN": {
+   "pace": 90.96,
+   "wear": 0.0,
+   "noise": 1.05,
+   "target": 5774.8
+  },
+  "ZAN": {
+   "pace": 90.44,
+   "wear": 0.1,
+   "noise": 0.7,
+   "target": 5780.585
+  },
+  "BRA": {
+   "pace": 92.293,
+   "wear": 0.025,
+   "noise": 1.05,
+   "target": 5774.8
+  },
+  "BRU": {
+   "pace": 87.466,
+   "wear": 0.0,
+   "noise": 0.7,
+   "target": 5271.141
+  },
+  "JAR": {
+   "pace": 87.691,
+   "wear": 0.0,
+   "noise": 0.7,
+   "target": 4761.537
+  },
+  "HAK": {
+   "pace": 87.116,
+   "wear": 0.025,
+   "noise": 0.7,
+   "target": 4307.514
+  },
+  "HER": {
+   "pace": 89.838,
+   "wear": 0.0,
+   "noise": 0.525,
+   "target": 3755.905
+  },
+  "BAR": {
+   "pace": 87.108,
+   "wear": 0.075,
+   "noise": 0.525,
+   "target": 3502.642
+  },
+  "FITC": {
+   "pace": 88.896,
+   "wear": 0.0,
+   "noise": 0.525,
+   "target": 3140.371
+  },
+  "COU": {
+   "pace": 87.716,
+   "wear": 0.025,
+   "noise": 0.525,
+   "target": 2928.366
+  },
+  "GAC": {
+   "pace": 92.191,
+   "wear": 0.025,
+   "noise": 0.525,
+   "target": 3045.845
+  },
+  "BER": {
+   "pace": 88.508,
+   "wear": 0.0,
+   "noise": 0.7,
+   "target": 2446.219
+  },
+  "MOR": {
+   "pace": 88.958,
+   "wear": 0.0,
+   "noise": 0.525,
+   "target": 2159.57
+  },
+  "FRE": {
+   "pace": 89.143,
+   "wear": 0.0,
+   "noise": 0.525,
+   "target": 1896.084
+  },
+  "COM": {
+   "pace": 88.444,
+   "wear": 0.0,
+   "noise": 0.525,
+   "target": 1738.844
+  },
+  "KAT": {
+   "pace": 87.506,
+   "wear": 0.0,
+   "noise": 0.525,
+   "target": 1423.486
+  },
+  "ALBM": {
+   "pace": 90.155,
+   "wear": 0.0,
+   "noise": 1.05,
+   "target": 374.974
+  },
+  "BELP": {
+   "pace": 95.061,
+   "wear": 0.04,
+   "noise": 0.35,
+   "target": 203.589
+  }
+ },
+ "summary": {
+  "grid": {
+   "pass": 1,
+   "total": 1
+  },
+  "order": {
+   "pass": 1,
+   "total": 1
+  },
+  "gap": {
+   "pass": 2,
+   "total": 2
+  },
+  "fastest": {
+   "pass": 25,
+   "total": 25
+  },
+  "retirement": {
+   "pass": 16,
+   "total": 16
+  },
+  "retirement event": {
+   "pass": 16,
+   "total": 16
+  },
+  "laps down": {
+   "pass": 7,
+   "total": 7
+  },
+  "stop": {
+   "pass": 35,
+   "total": 35
+  },
+  "safety car": {
+   "pass": 1,
+   "total": 1
+  },
+  "leader": {
+   "pass": 5,
+   "total": 5
+  }
+ },
+ "anchors": [
+  {
+   "anchor": "grid",
+   "subject": "lap-1 order is the grid order",
+   "target": [
+    "MSCM",
+    "HIL",
+    "HAK",
+    "JAR",
+    "BAR",
+    "ALE",
+    "BER",
+    "BRU",
+    "COU",
+    "KAT",
+    "BLU",
+    "FRE",
+    "IRV",
+    "ALBM",
+    "MOR",
+    "COM",
+    "MAR",
+    "PAN",
+    "BEN",
+    "FITC",
+    "HER",
+    "ZAN",
+    "BRA",
+    "GAC",
+    "BELP"
+   ],
+   "achieved": [
+    "MSCM",
+    "HIL",
+    "HAK",
+    "JAR",
+    "BAR",
+    "ALE",
+    "BER",
+    "BRU",
+    "COU",
+    "KAT",
+    "BLU",
+    "FRE",
+    "IRV",
+    "ALBM",
+    "MOR",
+    "COM",
+    "MAR",
+    "PAN",
+    "BEN",
+    "FITC",
+    "HER",
+    "ZAN",
+    "BRA",
+    "GAC",
+    "BELP"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "order",
+   "subject": "classification",
+   "target": [
+    "HIL",
+    "MSCM",
+    "BLU",
+    "ALE",
+    "MAR",
+    "IRV",
+    "PAN",
+    "BEN",
+    "ZAN",
+    "BRA",
+    "BRU"
+   ],
+   "achieved": [
+    "HIL",
+    "MSCM",
+    "BLU",
+    "ALE",
+    "MAR",
+    "IRV",
+    "PAN",
+    "BEN",
+    "ZAN",
+    "BRA",
+    "BRU"
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "gap",
+   "subject": "MSCM",
+   "target": 24.166,
+   "achieved": 24.163,
+   "pass": true
+  },
+  {
+   "anchor": "gap",
+   "subject": "BLU",
+   "target": 86.969,
+   "achieved": 86.97,
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "HIL",
+   "target": [
+    85.874,
+    17
+   ],
+   "achieved": [
+    85.874,
+    17
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "MSCM",
+   "target": [
+    85.155,
+    18
+   ],
+   "achieved": [
+    85.155,
+    18
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "BLU",
+   "target": [
+    87.468,
+    14
+   ],
+   "achieved": [
+    87.468,
+    14
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "ALE",
+   "target": [
+    87.558,
+    9
+   ],
+   "achieved": [
+    87.558,
+    9
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "MAR",
+   "target": [
+    88.61,
+    58
+   ],
+   "achieved": [
+    88.61,
+    58
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "IRV",
+   "target": [
+    86.58,
+    40
+   ],
+   "achieved": [
+    86.58,
+    40
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "PAN",
+   "target": [
+    89.118,
+    39
+   ],
+   "achieved": [
+    89.118,
+    39
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "BEN",
+   "target": [
+    89.233,
+    34
+   ],
+   "achieved": [
+    89.233,
+    34
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "ZAN",
+   "target": [
+    90.493,
+    9
+   ],
+   "achieved": [
+    90.493,
+    9
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "BRA",
+   "target": [
+    90.558,
+    13
+   ],
+   "achieved": [
+    90.558,
+    13
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "BRU",
+   "target": [
+    86.233,
+    33
+   ],
+   "achieved": [
+    86.233,
+    33
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "JAR",
+   "target": [
+    86.346,
+    38
+   ],
+   "achieved": [
+    86.346,
+    38
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "HAK",
+   "target": [
+    85.872,
+    29
+   ],
+   "achieved": [
+    85.872,
+    29
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "HER",
+   "target": [
+    88.901,
+    38
+   ],
+   "achieved": [
+    88.901,
+    38
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "BAR",
+   "target": [
+    86.863,
+    31
+   ],
+   "achieved": [
+    86.863,
+    31
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "FITC",
+   "target": [
+    88.002,
+    27
+   ],
+   "achieved": [
+    88.002,
+    27
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "COU",
+   "target": [
+    86.983,
+    10
+   ],
+   "achieved": [
+    86.983,
+    10
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "GAC",
+   "target": [
+    91.557,
+    28
+   ],
+   "achieved": [
+    91.557,
+    28
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "BER",
+   "target": [
+    87.614,
+    11
+   ],
+   "achieved": [
+    87.614,
+    11
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "MOR",
+   "target": [
+    88.032,
+    23
+   ],
+   "achieved": [
+    88.032,
+    23
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "FRE",
+   "target": [
+    88.279,
+    17
+   ],
+   "achieved": [
+    88.279,
+    17
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "COM",
+   "target": [
+    87.533,
+    14
+   ],
+   "achieved": [
+    87.533,
+    14
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "KAT",
+   "target": [
+    86.658,
+    15
+   ],
+   "achieved": [
+    86.658,
+    15
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "ALBM",
+   "target": [
+    89.88,
+    4
+   ],
+   "achieved": [
+    89.88,
+    4
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "fastest",
+   "subject": "BELP",
+   "target": [
+    95.061,
+    2
+   ],
+   "achieved": [
+    95.061,
+    2
+   ],
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "BRU",
+   "target": 59,
+   "achieved": 59,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "BRU",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "JAR",
+   "target": 53,
+   "achieved": 53,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "JAR",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "HAK",
+   "target": 48,
+   "achieved": 48,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "HAK",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "HER",
+   "target": 41,
+   "achieved": 41,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "HER",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "BAR",
+   "target": 39,
+   "achieved": 39,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "BAR",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "FITC",
+   "target": 35,
+   "achieved": 35,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "FITC",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "COU",
+   "target": 32,
+   "achieved": 32,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "COU",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "GAC",
+   "target": 32,
+   "achieved": 32,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "GAC",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "BER",
+   "target": 27,
+   "achieved": 27,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "BER",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "MOR",
+   "target": 24,
+   "achieved": 24,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "MOR",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "FRE",
+   "target": 21,
+   "achieved": 21,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "FRE",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "COM",
+   "target": 19,
+   "achieved": 19,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "COM",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "KAT",
+   "target": 16,
+   "achieved": 16,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "KAT",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "ALBM",
+   "target": 4,
+   "achieved": 4,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "ALBM",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "BELP",
+   "target": 2,
+   "achieved": 2,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "BELP",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "retirement",
+   "subject": "BEE",
+   "target": 0,
+   "achieved": 0,
+   "pass": true
+  },
+  {
+   "anchor": "retirement event",
+   "subject": "BEE",
+   "target": true,
+   "achieved": true,
+   "pass": true
+  },
+  {
+   "anchor": "laps down",
+   "subject": "ALE",
+   "target": 1,
+   "achieved": 1,
+   "pass": true
+  },
+  {
+   "anchor": "laps down",
+   "subject": "MAR",
+   "target": 1,
+   "achieved": 1,
+   "pass": true
+  },
+  {
+   "anchor": "laps down",
+   "subject": "IRV",
+   "target": 1,
+   "achieved": 1,
+   "pass": true
+  },
+  {
+   "anchor": "laps down",
+   "subject": "PAN",
+   "target": 2,
+   "achieved": 2,
+   "pass": true
+  },
+  {
+   "anchor": "laps down",
+   "subject": "BEN",
+   "target": 3,
+   "achieved": 3,
+   "pass": true
+  },
+  {
+   "anchor": "laps down",
+   "subject": "ZAN",
+   "target": 3,
+   "achieved": 3,
+   "pass": true
+  },
+  {
+   "anchor": "laps down",
+   "subject": "BRA",
+   "target": 4,
+   "achieved": 4,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "HIL",
+   "target": 42,
+   "achieved": 42,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "MSCM",
+   "target": 22,
+   "achieved": 22,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "MSCM",
+   "target": 46,
+   "achieved": 46,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "BLU",
+   "target": 20,
+   "achieved": 20,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "BLU",
+   "target": 37,
+   "achieved": 37,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "ALE",
+   "target": 20,
+   "achieved": 20,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "ALE",
+   "target": 39,
+   "achieved": 39,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "MAR",
+   "target": 20,
+   "achieved": 20,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "MAR",
+   "target": 42,
+   "achieved": 42,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "IRV",
+   "target": 19,
+   "achieved": 19,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "IRV",
+   "target": 42,
+   "achieved": 42,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "IRV",
+   "target": 49,
+   "achieved": 49,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "PAN",
+   "target": 20,
+   "achieved": 20,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "PAN",
+   "target": 41,
+   "achieved": 41,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "BEN",
+   "target": 8,
+   "achieved": 8,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "BEN",
+   "target": 23,
+   "achieved": 23,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "BEN",
+   "target": 43,
+   "achieved": 43,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "ZAN",
+   "target": 24,
+   "achieved": 24,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "ZAN",
+   "target": 45,
+   "achieved": 45,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "BRA",
+   "target": 22,
+   "achieved": 22,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "BRA",
+   "target": 36,
+   "achieved": 36,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "BRU",
+   "target": 18,
+   "achieved": 18,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "BRU",
+   "target": 41,
+   "achieved": 41,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "JAR",
+   "target": 19,
+   "achieved": 19,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "JAR",
+   "target": 41,
+   "achieved": 41,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "JAR",
+   "target": 53,
+   "achieved": 53,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "HAK",
+   "target": 16,
+   "achieved": 16,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "HAK",
+   "target": 31,
+   "achieved": 31,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "HAK",
+   "target": 46,
+   "achieved": 46,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "HER",
+   "target": 21,
+   "achieved": 21,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "BAR",
+   "target": 22,
+   "achieved": 22,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "COU",
+   "target": 17,
+   "achieved": 17,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "GAC",
+   "target": 30,
+   "achieved": 30,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "BER",
+   "target": 17,
+   "achieved": 17,
+   "pass": true
+  },
+  {
+   "anchor": "stop",
+   "subject": "COM",
+   "target": 18,
+   "achieved": 18,
+   "pass": true
+  },
+  {
+   "anchor": "safety car",
+   "subject": "leader's SC laps, sourced (others unknown)",
+   "target": [],
+   "achieved": [],
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "MSCM laps 1-22",
+   "target": "22 laps",
+   "achieved": "22 of 22 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "HAK laps 23-30",
+   "target": "8 laps",
+   "achieved": "8 of 8 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "HIL laps 31-40",
+   "target": "10 laps",
+   "achieved": "10 of 10 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "MSCM laps 41-45",
+   "target": "5 laps",
+   "achieved": "5 of 5 laps",
+   "pass": true
+  },
+  {
+   "anchor": "leader",
+   "subject": "HIL laps 46-65",
+   "target": "20 laps",
+   "achieved": "20 of 20 laps",
+   "pass": true
+  }
+ ],
+ "notes": [
+  "HER: stop on lap 42, the lap it retired on; not run",
+  "incident (not modelled): lap 22 FAULT MSCM: Stuck in fifth gear from his first pit stop to the finish",
+  "IRV: no time fits both its classification and its window"
+ ]
+}

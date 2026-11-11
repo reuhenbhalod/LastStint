@@ -1,0 +1,43 @@
+{
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": true,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": true
+  },
+  "eras": {
+    "eraId": 5,
+    "order": 9,
+    "userSide": "HAM",
+    "target": {
+      "type": "position",
+      "position": 2
+    },
+    "storyline": {
+      "real": "A tyre warning puts Hamilton on three stops in a light McLaren. He passes Massa for the lead on lap 24 and is 14.4 s clear of him on lap 43, but after his last stop on lap 45 he rejoins behind him. Massa wins by 3.8 s, his third Istanbul win in a row, with R\u00e4ikk\u00f6nen half a second behind Hamilton.",
+      "rewriteCondition": {
+        "type": "win"
+      },
+      "headline": "Hamilton's three stops beat Massa in Istanbul"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 3,
+      "label": "Finish second or better on three stops"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "push",
+      "maxLaps": 30,
+      "label": "Finish second or better pushing for no more than 30 laps"
+    },
+    "hardCalls": {
+      "HAM": 0,
+      "MAS": 0
+    },
+    "briefing": "Istanbul, 2008. Massa takes pole for Ferrari, Hamilton qualifies third. Bridgestone fears for Hamilton's front-right tyre, so McLaren run him light on three stops. You run Hamilton, second and 1.2 s behind Massa after 13 laps. Finish second at least, and beat Massa's two-stop Ferrari if you can."
+  }
+}

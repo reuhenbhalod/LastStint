@@ -1,0 +1,43 @@
+{
+  "rules": {
+    "twoCompound": false,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": false,
+    "drs": false,
+    "ers": "none",
+    "refuelling": true
+  },
+  "eras": {
+    "eraId": 5,
+    "order": 10,
+    "userSide": "ALO",
+    "target": {
+      "type": "position",
+      "position": 2
+    },
+    "storyline": {
+      "real": "A fuel calculation problem leaves Alonso heavy in qualifying and he starts seventh, but he is third after the first lap. His first stint runs ten laps longer than Fisichella's, and he leads laps 20 to 26 and 39 to 43. After a quick final stop he rejoins second, behind his team-mate and ahead of Button, and finishes 4.6 s behind Fisichella.",
+      "rewriteCondition": {
+        "type": "win"
+      },
+      "headline": "Alonso's long first stint takes Sepang from Fisichella"
+    },
+    "mastery": {
+      "type": "stop_count",
+      "exact": 2,
+      "label": "Finish second or better on two stops"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "manage",
+      "maxLaps": 0,
+      "label": "Finish second or better without a lap managing the tyres"
+    },
+    "hardCalls": {
+      "ALO": 1,
+      "FIS": 1
+    },
+    "briefing": "Sepang, 2006. A fuel calculation problem left Alonso heavy in qualifying, and he starts seventh. You run his Renault, third after 14 laps and 17.9 s behind Fisichella in the lead, with Button between them and a long first stint still to run. Finish second at least, and beat your team-mate if you can."
+  }
+}

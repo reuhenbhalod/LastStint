@@ -1,0 +1,52 @@
+{
+  "rules": {
+    "twoCompound": true,
+    "tyreChanges": true,
+    "pitLaneClosedUnderSC": false,
+    "vsc": true,
+    "drs": true,
+    "ers": "hybrid",
+    "refuelling": false
+  },
+  "eras": {
+    "eraId": 8,
+    "order": 10,
+    "userSide": "BOT",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Ricciardo wins by 8.894 s. Bottas undercuts Vettel at the first stops and passes R\u00e4ikk\u00f6nen, who stays out long, for the lead. When the Toro Rosso collision brings out the safety car, both Red Bulls stop at once for new softs while Mercedes keeps Bottas out on old mediums. Ricciardo works his way forward and passes Bottas for the lead on lap 45.",
+      "rewriteCondition": {
+        "type": "win"
+      },
+      "headline": "Bottas holds off the Red Bulls to win in Shanghai"
+    },
+    "mastery": {
+      "type": "margin",
+      "seconds": 8.9,
+      "label": "Win by more than 8.9 seconds, Ricciardo's real margin"
+    },
+    "hidden": {
+      "type": "mode_rule",
+      "mode": "manage",
+      "maxLaps": 0,
+      "label": "Win without a lap managing the tyres"
+    },
+    "hardCalls": {
+      "BOT": 3,
+      "RIC": 2
+    },
+    "briefing": "Shanghai, 2018. Vettel leads from pole and you run Bottas second, fourteen laps in, with Verstappen third and Ricciardo sixth. Mercedes and Ferrari started on softs, the Red Bulls on ultrasofts, and everyone will stop for mediums. Get ahead of Vettel, then keep both Red Bulls behind you to the flag."
+  },
+  "storylineEvents": [
+    [
+      31,
+      "SC"
+    ],
+    [
+      53,
+      "RETIREMENT"
+    ]
+  ]
+}

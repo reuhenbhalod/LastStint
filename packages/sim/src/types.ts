@@ -4,6 +4,13 @@ import type { DecisionMoment } from './moments.js';
 // A run is fully defined by (race model, seed, list of decisions) — that is what the
 // Worker replays to verify a score.
 
+/**
+ * The race-model schema version the pipeline writes (pipeline.SCHEMA_VERSION). v11 added
+ * eras, provenance, rules, events[].storylineEvent and scUnlap 'none', all optional: files
+ * at any earlier version still load unchanged.
+ */
+export const SCHEMA_VERSION = 11;
+
 export type Compound = string; // e.g. 'SOFT' | 'MEDIUM' | 'HARD'; era-dependent set
 
 export type Era = '1988-1993' | '1994-2009' | '2010-2013' | '2014-2025' | '2026+';
@@ -34,6 +41,8 @@ export interface Weather {
 export interface PlanStop {
   lap: number;
   compound: Compound;
+  /** A refuelling race: the stop's fill, required there (refuel.ts); the call carries it. */
+  fill?: Fill;
 }
 
 /**
@@ -66,6 +75,11 @@ export interface CompoundModel {
   cliffLap: number;
   /** Extra seconds per lap of tyre age past cliffLap; absent when no cliff was fitted. */
   cliffDegPerLap?: number;
+  /**
+   * Seconds per lap of tyre wear squared (Eras model fix S4): the lap costs degQuad x wear^2 on
+   * top of the linear wear, so a long stint falls off late. Absent: linear wear.
+   */
+  degQuad?: number;
   /** The longest stint run on it in the real race: its life is at least this (tyre-life fix 2). */
   provenLaps?: number;
 }
@@ -77,26 +91,315 @@ export interface DriverModel {
   noise: number;
   /** A wet race: the driver's extra share of a lap in the wet beyond the curves. */
   wetPace?: number;
+  /** An Eras build: the driver's share on a damp track (wetness < DAMP_EDGE); absent: wetPace. */
+  dampPace?: number;
   stateAtTakeover: {
     position: number;
     gapAhead: number;
     compound: Compound;
     tyreAge: number;
-    /** Dry compounds run up to the takeover lap (two-compound rule). */
+    /**
+     * Compounds run up to the takeover lap (two-compound rule), wet tyres included since the
+     * wet-tyre fix; an older file lists dry ones only (rules.ts takeoverCompoundsUsed).
+     */
     compoundsUsed: Compound[];
   };
   realStrategy: PitStop[];
+  /**
+   * Real stops after the takeover that changed no tyres (a repair, a penalty stop-go, a
+   * drive-through; pipeline track.service_stops): the car pays each one's measured loss on its
+   * out-lap whatever its strategy, and keeps its set. Eras builds only.
+   */
+  serviceStops?: ServiceStop[];
+  /**
+   * Pace by stint (Eras model fix M2; pipeline pace.stint_offsets): the car's offset to
+   * basePace in each real stint after the takeover, keyed by the lap the stint began (a real
+   * stop's out-lap, or 0 for the takeover stint). A car runs an offset while its current stint
+   * began on that lap; any other stint runs at 0. The player's car in live play runs its
+   * race-wide mean in every stint (sim.ts playerStintOffset).
+   * Eras builds only.
+   */
+  stintPace?: StintPace[];
 }
+
+/** One stint's pace offset (DriverModel.stintPace). */
+export interface StintPace {
+  /** The out-lap the stint began on, or 0 for the stint the car is on at the takeover. */
+  lap: number;
+  /** Seconds per lap added to basePace in the stint (negative: quicker). */
+  offset: number;
+}
+
+/** A stop with no tyre change (DriverModel.serviceStops). */
+export interface ServiceStop {
+  /** The out-lap: its loss is charged on this lap. */
+  lap: number;
+  /** Measured time lost to the stop (s). */
+  loss: number;
+}
+
+/** A car fault's kind (simulator roadmap R2; faults.ts). */
+export type FaultKind = 'gear-stuck' | 'power-loss' | 'puncture' | 'tyre-failure' | 'damage';
 
 export interface RaceEvent {
   lap: number;
-  type: 'SC' | 'VSC' | 'RED' | 'RAIN' | 'RETIREMENT';
+  type: 'SC' | 'VSC' | 'RED' | 'RAIN' | 'RETIREMENT' | 'FAULT' | 'TEAM_ORDER';
+  /** How long it lasts. A FAULT without it lasts to the flag (or its car's next stop). */
   laps?: number;
+  /** A TEAM_ORDER: the car told to let `other` by (scripted.ts). */
   driver?: string;
+  /** A TEAM_ORDER (Eras builds; sourced in data/incidents.json): the car let by. */
+  other?: string;
+  /**
+   * An SC event (Eras builds; sourced in data/incidents.json as SC_PICKUP): the car the safety
+   * car picked up, when it wasn't the leader. The cars ahead of it on the road run a racing lap
+   * on the SC's first lap and keep their gaps on its second (sim.ts scFront / queueBehind).
+   */
+  pickup?: string;
+  /** A RED event: how the race resumed (eras build plan 4.3, redflag.ts). Absent: it didn't. */
+  restart?: 'standing' | 'rolling';
+  /** Defines the storyline: Legend difficulty always runs it on its real lap (eras spec 8). */
+  storylineEvent?: boolean;
+  /** A FAULT (driver required): its kind. */
+  fault?: FaultKind;
+  /** A FAULT: seconds a green lap the car loses while it lasts (fitted from its real laps). */
+  paceLoss?: number;
+  /** A FAULT: extra seconds on the fault's own lap (a puncture's forced slow lap). */
+  slowLap?: number;
+  /** A FAULT that lasts until the car's next stop (new tyres fix a puncture). */
+  untilStop?: boolean;
+  /**
+   * An SC or RED event of a no-unlapping race (Eras builds): each running car's real laps down
+   * (the most it was at the end of any of the event's laps). A scripted car's lapped status in the queue comes from it.
+   */
+  lapsDown?: Record<string, number>;
+}
+
+// Eras mode (eras spec sections 6, 8 and 11; schema v11). Types and validation only: the
+// evaluator is eras build plan 1.4, the rules' behaviour 4.1 / 4.2.
+
+/** The six star 1 target types (eras spec 6). */
+export const ERAS_TARGET_TYPES = [
+  'win',
+  'defend',
+  'position',
+  'beat-rival',
+  'team',
+  'deny',
+] as const;
+export type ErasTargetType = (typeof ERAS_TARGET_TYPES)[number];
+
+/**
+ * A result condition from the player's side: the star 1 target, and the storyline's rewrite
+ * condition. `position`: P`position` or better. `deny`: the rival finishes P`position` or worse
+ * (or doesn't finish). `team`: positions[0] is the player's car, positions[1] its teammate,
+ * each at or better. `defend` is `win` from P1, framed as a defence.
+ */
+export type ErasTarget =
+  | { type: 'win' }
+  | { type: 'defend' }
+  | { type: 'position'; position: number }
+  | { type: 'beat-rival'; rival: string }
+  | { type: 'team'; positions: [number, number] }
+  | { type: 'deny'; rival: string; position: number };
+
+/** The eight mastery / hidden objective types (eras spec 6). */
+export const ERAS_OBJECTIVE_TYPES = [
+  'stop_count',
+  'beat_real_call',
+  'finish_position',
+  'margin',
+  'compound_rule',
+  'mode_rule',
+  'no_neutralized_stop',
+  'team_result',
+] as const;
+export type ErasObjectiveType = (typeof ERAS_OBJECTIVE_TYPES)[number];
+
+/** Every mode value (each names its Modes key): what a `mode_rule` limits. */
+export type ModeValue = Modes[keyof Modes];
+export const MODE_VALUES: readonly ModeValue[] = [
+  'push',
+  'standard',
+  'manage',
+  'normal',
+  'liftAndCoast',
+  'attack',
+  'hold',
+  'defend',
+  'harvest',
+  'balanced',
+  'deploy',
+  'overtake',
+];
+
+/** A mastery or hidden objective, with the label the UI shows. */
+export type ErasObjective = { label: string } & (
+  | { type: 'stop_count'; max: number; exact?: never }
+  | { type: 'stop_count'; exact: number; max?: never }
+  | { type: 'beat_real_call' }
+  | { type: 'finish_position'; position: number }
+  | { type: 'margin'; seconds: number }
+  | { type: 'compound_rule'; mustUse: Compound; mustAvoid?: Compound }
+  | { type: 'compound_rule'; mustUse?: Compound; mustAvoid: Compound }
+  | { type: 'mode_rule'; mode: ModeValue; maxLaps: number }
+  | { type: 'no_neutralized_stop' }
+  | { type: 'team_result'; positions: [number, number] }
+);
+
+export interface ErasStoryline {
+  /** What really happened. */
+  real: string;
+  /**
+   * The result that rewrites the storyline, from the player's side. Absent: the Eras side
+   * really won, so no result rewrites history and the race has no history-book rewrite (owner
+   * decision, Nov 8 2026).
+   */
+  rewriteCondition?: ErasTarget;
+  /** An original history-book headline (never quoted team radio): with a rewrite condition,
+   * and only with one. */
+  headline?: string;
+}
+
+/**
+ * The race's Eras block. Only `eraId` and `order` are required, so a race can join an era
+ * before its content is written; the content checklist (spec 15) requires the rest.
+ */
+export interface ErasBlock {
+  /** The era, 1 (turbo era) to 10 (ground effect): not the play order. */
+  eraId: number;
+  /** The race's number within its era, 1-10. */
+  order: number;
+  /** The driver the player runs in Eras (more hard calls). Absent: the top-level userSide. */
+  userSide?: string;
+  target?: ErasTarget;
+  storyline?: ErasStoryline;
+  mastery?: ErasObjective;
+  hidden?: ErasObjective;
+  /** Hard calls per storyline driver (driver code -> count; `pipeline hard-calls`). */
+  hardCalls?: Record<string, number>;
+  /** The short era-appropriate intro shown before the race. */
+  briefing?: string;
+  /**
+   * Avoidable storyline retirements (owner decision, Nov 8 2026; scripted.ts): the player's
+   * car retires on its real lap only if the player repeats the real call. Scripted cars keep
+   * their real retirements.
+   */
+  storylineRetirements?: StorylineRetirement[];
+  /**
+   * The rival's real stops the storyline turns on (Eras grader fixes, Nov 8 2026; sim.ts
+   * rivalHeld): in live play the rival makes them on their real laps whatever its policy, so an
+   * Expert rival can't undo the real rival's mistake (belgium-1992: Mansell's late slicks).
+   */
+  storylineCalls?: StorylineCall[];
+}
+
+/**
+ * A real stop of a storyline driver that the storyline turns on. When `driver` is the race's
+ * rival (from the Eras side), its plan up to and including this stop is its real one: no rival
+ * rule or decision point changes it before then (Standard's cover and going long, Smart's
+ * overcut and wet switch, Expert's grader). After its last such stop the policy runs as usual.
+ */
+export interface StorylineCall {
+  /** The storyline driver. */
+  driver: string;
+  /** The stop's out-lap: one of the driver's real stops. */
+  lap: number;
+  /** What really happened, in words. */
+  real: string;
+  /** Where the fact was checked (http(s) URLs, '; '-separated). */
+  source: string;
+  /**
+   * The rival keeps its real plan after this stop too, to the flag (europe-1993: Hill's later
+   * stops aren't sourced, so his real race after the lap-24 wets is the reconstruction's).
+   */
+  untilFlag?: boolean;
+}
+
+/**
+ * The real call behind a storyline retirement (scripted.ts conditionMet). `mode`: the
+ * standing mode `key` was `value` on every lap from `fromLap` to the retirement lap (Monaco
+ * 1988: still pushing). `tyre_age`: the car started the retirement lap on tyres at least
+ * `minLaps` old (Australia 1986: the original set). `pressure`: `driver` started the lap behind
+ * the player's car, within `seconds` (Australia 1994: Hill catching). `fuel`: the fuel model
+ * decides (the frozen retirement is dropped; the car stops if its tank runs dry).
+ */
+export type StorylineCondition =
+  | { type: 'mode'; key: keyof Modes; value: ModeValue; fromLap: number }
+  | { type: 'tyre_age'; minLaps: number }
+  | { type: 'pressure'; driver: string; seconds: number }
+  | { type: 'fuel' };
+
+export interface StorylineRetirement {
+  /** The storyline driver: conditional only when he is the player's car. */
+  driver: string;
+  condition: StorylineCondition;
+  /** Other cars whose real retirement is the same incident (a collision): they retire with
+   * the player's car, or not at all. */
+  alsoRetires?: string[];
+  /** What really happened, in words. */
+  real: string;
+  /** Where the fact and the call were checked (http(s) URLs, '; '-separated). */
+  source: string;
+}
+
+/** The SC restart (track.restart; pipeline restart.py): the restart lap's extra time for the
+ * car k places behind the leader is jump + spread x min(k, places). */
+export interface RestartModel {
+  jump: number;
+  spread: number;
+  places: number;
+}
+
+/** Fields estimated rather than measured (eras build plan 2.4). */
+export const ESTIMATED_FIELDS = [
+  'compounds',
+  'safetyCars',
+  'fuelLoads',
+  'weather',
+  // A car that ran only wet laps: its dry pace from its wet laps (or its team-mate's).
+  'driverPace',
+] as const;
+export type EstimatedField = (typeof ESTIMATED_FIELDS)[number];
+
+/** Where the race's data came from. Absent: real, nothing estimated. */
+export interface Provenance {
+  kind: 'real' | 'reconstructed';
+  estimated?: EstimatedField[];
+}
+
+/**
+ * The race's sporting rules (roadmap R5). An absent field keeps today's behaviour (the
+ * defaults below); `drs` and `ers` default to the era's headset.json block.
+ */
+export interface RaceRules {
+  /** A dry race must use two dry compounds (2007+). Default true. */
+  twoCompound?: boolean;
+  /** False: a stop only refuels (2005). Default true. */
+  tyreChanges?: boolean;
+  /**
+   * The fewest pit stops a car must make in the race (Monaco 2025: 2); a car that reaches the
+   * flag with fewer is disqualified, like the two-compound rule (wet tyres waive it). Absent:
+   * no minimum.
+   */
+  minStops?: number;
+  /** Stops refuel (1994-2009, 1983). Default false. */
+  refuelling?: boolean;
+  /** The fixed race fuel allowance in kg (1984-88); not with refuelling. Absent: no cap. */
+  fuelLimit?: number;
+  /** The pit lane closes when the SC is called; a stop takes a penalty (2007-09). Default false. */
+  pitLaneClosedUnderSC?: boolean;
+  /** A virtual safety car exists (2015+). Default true. */
+  vsc?: boolean;
+  /** DRS and the wait-drs move. Absent: the era block's `drs`. */
+  drs?: boolean;
+  /** The battery: none, KERS (2009, 2011-13) or hybrid ERS (2014+). Absent: the era block's. */
+  ers?: 'none' | 'kers' | 'hybrid';
 }
 
 // Parsed + validated race JSON (validated at load time with zod or ajv).
 export interface RaceModel {
+  /** The version written; every version is additive, so any up to SCHEMA_VERSION loads. */
   schemaVersion: number;
   race: {
     id: string;
@@ -104,9 +407,10 @@ export interface RaceModel {
     laps: number;
     takeoverLap: number;
     seed: number;
-    /** Which lapped cars unlap before a SC restart: all (the rule, default), or only those
-     * between userSide and rival (Abu Dhabi 2021's race-control call). */
-    scUnlap?: 'all' | 'duel';
+    /** Which lapped cars unlap before a SC restart: all (the rule, default), only those
+     * between userSide and rival (Abu Dhabi 2021's race-control call), or none (lapped cars
+     * stay a lap down: before 2007 and 2010-11; rules.ts scQueue). */
+    scUnlap?: 'all' | 'duel' | 'none';
   };
   era: Era;
   track: {
@@ -116,12 +420,37 @@ export interface RaceModel {
     /** Measured green-stop losses minus pitLoss: new stops sample from these (spec B1). */
     pitLossDeviations?: number[];
     overtakeDifficulty: number;
-    /** P(pass) = sigmoid(intercept + paceCoef * paceAdvantage + gapCoef * gap). */
-    overtakeModel: { intercept: number; paceCoef: number; gapCoef: number };
+    /**
+     * P(pass) = sigmoid(intercept + paceCoef * paceAdvantage + gapCoef * gap). An Eras build's
+     * model (pipeline overtaking.py: pooled slopes per era group, intercept per track layout)
+     * adds trainCoef when the car ahead started the lap within TRAIN_GAP of its own car ahead.
+     */
+    overtakeModel: {
+      intercept: number;
+      paceCoef: number;
+      gapCoef: number;
+      trainCoef?: number;
+      /** Eras builds of timed races (pipeline dirty_air.py): a follower that fails its roll is
+       * held this far (s) behind instead of FOLLOW_GAP. */
+      heldGap?: number;
+      /** Eras switch (pipeline dirty_air.py): no pass without a won roll; a car that would end
+       * a lap ahead of one that started it ahead, without beating it on a roll, is held. */
+      rollOnly?: boolean;
+    };
     dirtyAirPenalty: number;
+    /** Eras builds of timed races (pipeline dirty_air.py): the dirty-air loss by start-of-lap
+     * gap to the car ahead, ascending bands (gap < upTo pays penalty). Absent: dirtyAirPenalty
+     * within DIRTY_AIR_RANGE. */
+    dirtyAirBands?: { upTo: number; penalty: number }[];
     greenLapTime?: number;
     scLapTime?: number;
     vscLapTime?: number;
+    /** A refuelling race's fill model, fitted from the real stops (eras build plan 4.2;
+     * refuel.ts). Absent: the physical prior (0.25 s per lap of fuel). */
+    refuel?: RefuelModel;
+    /** The SC restart's leader jump and field spread (Eras builds; scripted.ts). Absent: a
+     * restart lap is an ordinary green lap. */
+    restart?: RestartModel;
   };
   compounds: Record<Compound, CompoundModel>;
   drivers: DriverModel[];
@@ -139,8 +468,43 @@ export interface RaceModel {
   userSide: string;
   /** The direct rival: reacts to the user's calls (rival policy); everyone else is scripted. */
   rival: string;
+  /** Hand-built without official lap timing; agrees with `provenance.kind` when both are set. */
   reconstructed?: boolean;
+  /** Eras mode (eras spec 11); Daily and Gauntlet ignore it. */
+  eras?: ErasBlock;
+  provenance?: Provenance;
+  rules?: RaceRules;
 }
+
+/**
+ * A refuelling race's fill model (eras build plan 4.2), fitted per race by
+ * pipeline/src/pipeline/refuel.py from the real stops: pit-lane time = laneBase +
+ * secondsPerLap x the laps of fuel put in (the next stint's length). Fuel is counted in laps
+ * at the standard burn.
+ */
+export interface RefuelModel {
+  /** Fill time per lap of fuel added (s). */
+  secondsPerLap: number;
+  /** The fitted pit-lane time of a stop that adds no fuel (s); informative. */
+  laneBase: number;
+  /** The mean fill of the real stops (laps): what the track's pitLoss figures already hold. */
+  refFill: number;
+  /** The longest real stint (laps): the tank's capacity, less the reserve. */
+  tankLaps: number;
+  /** Real stops in the fit. */
+  stops: number;
+}
+
+/** The player's fill at a refuelling stop (refuel.ts fillStint has the definitions). */
+export type FillChoice = 'short' | 'standard' | 'long';
+
+/**
+ * A stop's fill in a refuelling race (refuel.ts): one of the player's three choices, or an
+ * exact number of laps of fuel from the out-lap (the reserve goes on top). The real team's
+ * calls (realDecisions) and the engineer's plans carry exact laps: the real next stint, or the
+ * plan's. In a refuelling race every pit call must carry one (owner decision, Nov 7 2026).
+ */
+export type Fill = FillChoice | { laps: number };
 
 export interface PitStop {
   /** The out-lap: the first lap run on the new tyres (pit loss is charged on this lap). */
@@ -156,6 +520,12 @@ export interface PitStop {
    * the stop's cost; replays and every other car keep it.
    */
   optional?: boolean;
+  /** A stop forced by a damaged tyre (a puncture): it fits new tyres even when a race allows
+   * no tyre changes (rules.tyreChanges false, eras build plan 4.1). */
+  damaged?: boolean;
+  /** A refuelling race: the stop's fill (refuel.ts; every pit call's carries one). Absent:
+   * fuel for the next planned stint, as every scripted car (the real fill, for a real stop). */
+  fill?: Fill;
 }
 
 export interface CarState {
@@ -165,12 +535,16 @@ export interface CarState {
   noise: number;
   /** A wet race: the driver's extra share of a lap in the wet (DriverModel.wetPace). */
   wetPace?: number;
+  /** An Eras build: its share on a damp track (DriverModel.dampPace). */
+  dampPace?: number;
+  /** Pace by stint: the offset of the stint the car is on (DriverModel.stintPace; 0 if none). */
+  stintPace?: number;
   compound: Compound;
   /** Laps on the current tyres (what the timing tower shows). */
   tyreAge: number;
   /** Effective wear in laps: advances by the headset wear multiplier each green lap. */
   tyreWear: number;
-  /** Dry compounds run so far, including the takeover state (two-compound rule). */
+  /** Compounds run so far, wet tyres and the takeover tyre included (two-compound rule). */
   compoundsUsed: Compound[];
   /** Cumulative race time (s) since the takeover snapshot; order is by this. */
   totalTime: number;
@@ -184,6 +558,15 @@ export interface CarState {
   battery?: number;
   /** Fuel in the tank, kg (the player's car in live play only; fuel load spec). */
   fuel?: number;
+  /** A stop-go penalty owed (s), for entering a closed pit lane (rules.pitLaneClosedUnderSC). */
+  stopGo?: number;
+  /** Pit stops made so far, takeover included (rules.minStops; set only in a race with it). */
+  stops?: number;
+  /** A refuelling race (refuel.ts): fuel on board, in laps at the standard burn (every car). */
+  tank?: number;
+  /** The tank burns by the modes and an empty one stops the car: the player's car in live
+   * play with incidents (off in replays and the grader's playouts). */
+  tankLive?: boolean;
 }
 
 /**
@@ -197,7 +580,13 @@ export interface CarState {
  * yielding car is directly ahead within the swap window. `holdUp`: the teammate defends
  * against the rival whenever directly ahead of it, until `release`.
  */
-export type TeamOrder = 'letTeammatePast' | 'teammateLetsYouPast' | 'holdUp' | 'release';
+export type TeamOrder =
+  | 'letTeammatePast'
+  | 'teammateLetsYouPast'
+  | 'holdUp'
+  | 'release'
+  /** Obey a scripted team order telling the player's car to let a car by (TEAM_ORDER). */
+  | 'comply';
 
 /**
  * Race engineer spec: a battle call for one lap, against the car directly behind (the defending
@@ -234,7 +623,7 @@ export type DriverRequest = 'box' | 'push';
 export type BlueAction = 'complain' | 'go-round';
 
 export type Decision = (
-  | { lap: number; kind: 'pit'; compound: Compound }
+  | { lap: number; kind: 'pit'; compound: Compound; fill?: Fill }
   | { lap: number; kind: 'mode'; key: keyof Modes; value: string }
   | { lap: number; kind: 'teamOrder'; order: TeamOrder }
   | { lap: number; kind: 'radio'; momentId: string; optionId: string }
@@ -267,6 +656,11 @@ export interface RaceNote {
     | 'rival-stays-out'
     | 'error'
     | 'team-swap'
+    // A scripted team order or let-by (TEAM_ORDER): driver the car let by, detail the yielder.
+    | 'team-order'
+    // An avoidable storyline retirement (eras.storylineRetirements): detail 'retired' (the
+    // player repeated the real call) or 'avoided'.
+    | 'storyline'
     | 'incident'
     // Race engineer spec (the user's car, live play):
     | 'battle' // detail: 'passed' | 'held' | 'lost' | 'stuck' (other: the car fought)
@@ -277,7 +671,10 @@ export interface RaceNote {
     | 'blue' // went round a lapped car; value: the time it gained (negative)
     | 'trust' // value: the change; detail: why (TrustReason)
     | 'rogue' // a furious driver picks his own battle move (detail: the move)
-    | 'fuel'; // fuel load spec: detail 'empty' (the tank ran dry)
+    | 'fuel' // fuel load spec: detail 'empty' (the tank ran dry); 'out' (the car stopped:
+    // a refuelling or fuel-limit race, eras build plan 4.2); 'fill' (value: laps put in)
+    | 'stop-go' // era rules: a closed pit lane's penalty; detail 'owed' | 'served', value: s
+    | 'fault'; // a car fault struck (faults.ts); detail: its kind
   driver: string;
   /** For an incident: 'crash', 'mechanical' or 'puncture'; see the kinds above. */
   detail?: string;

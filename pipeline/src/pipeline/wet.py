@@ -15,6 +15,10 @@ since the dry laps may be few), by tyre class, and a smooth path through them (a
 to dry on dry-looking laps, and away from bone dry where it was raining). Slicks barely wear
 on a wet track, inters and wets wear fast on a dry one (wear multipliers below; the sims use
 the same). Both sims read the curves and the timeline from the race model.
+
+Eras builds of timed races (model fix 1.3) take their own curves, data/wet-eras.json, refitted
+on the Eras wet races' mixed-tyre laps (`pipeline wet-fit --eras`, fit_eras_curves), with each
+race's slick curve scaled by its own mixed laps (slick_scale); every other build keeps wet.json.
 """
 
 from __future__ import annotations
@@ -25,8 +29,12 @@ import numpy as np
 import pandas as pd
 
 from .paths import REPO_ROOT
+from .refuel import fuel_lap_of
 
 WET_CURVES_PATH = REPO_ROOT / "data" / "wet.json"
+# Eras builds of timed races (model fix 1.3): the curves refitted on the Eras wet races'
+# mixed-tyre laps (fit_eras_curves, `pipeline wet-fit --eras`). Every other build keeps wet.json.
+ERAS_CURVES_PATH = REPO_ROOT / "data" / "wet-eras.json"
 WET_COMPOUNDS = ("INTERMEDIATE", "WET")
 # The fuel effect wet races are fitted with (s/lap): the median of the dry races' fits. A wet
 # race's dry laps can be a short window, too short to fit it.
@@ -34,12 +42,23 @@ FUEL_PRIOR = 0.056
 # The wetness grid the timeline is fitted on, and how smooth it must be lap to lap.
 GRID = np.linspace(0.0, 1.0, 101)
 SMOOTH = 0.05
+# An Eras build's timeline (wet_side): a lap the field runs on wet tyres only (no slick car in
+# the observations) is at least as wet as the slick / intermediate crossover, the wetness where
+# inters stop losing to slicks. With one tyre class on the lap, the inter curve fits the lap
+# time on either side of its best (dry side or wet side) and the smooth path can take the dry
+# one (netherlands-2023's finish shower: w 0.06-0.10, where slicks beat inters by ~9%), though
+# the whole field chose inters. Weight of the pull, per unit of wetness short of the crossover.
+WET_SIDE_PULL = 0.5
 # Model compounds for the wet tyres (no dry evidence to fit them on): their pace is in the
 # curves; wear in seconds a lap of tyre age, and their life.
 WET_TYRES = {
     "INTERMEDIATE": {"offset": 0.0, "degPerLap": 0.05, "cliffLap": 30},
     "WET": {"offset": 0.0, "degPerLap": 0.04, "cliffLap": 35},
 }
+
+
+# A tyre class's model compound (penalty reads the class from it).
+CLASS_COMPOUND = {"slick": "SOFT", "inter": "INTERMEDIATE", "wet": "WET"}
 
 
 def tyre_class(compound: str) -> str:
@@ -70,8 +89,9 @@ def wear_mult(compound: str, w: float) -> float:
     return 1.0 + 2.0 * max(0.0, (edge - w) / edge)
 
 
-def load_curves() -> dict:
-    return json.loads(WET_CURVES_PATH.read_text())
+def load_curves(eras: bool = False) -> dict:
+    """The shared wet curves, or (`eras`) the Eras builds' (ERAS_CURVES_PATH)."""
+    return json.loads((ERAS_CURVES_PATH if eras else WET_CURVES_PATH).read_text())
 
 
 def is_wet_race(laps: pd.DataFrame, weather: list[dict] | None) -> bool:
@@ -81,9 +101,12 @@ def is_wet_race(laps: pd.DataFrame, weather: list[dict] | None) -> bool:
 
 
 def rain_laps(laps: pd.DataFrame, weather: list[dict] | None) -> set[int]:
-    """Laps on which rain fell in the five minutes before the leader finished them."""
+    """Laps on which rain fell in the five minutes before the leader finished them (records
+    with a `lap`: the laps the lap times say were wet, wet_laps.py)."""
     if not weather:
         return set()
+    if "lap" in weather[0]:
+        return {int(x["lap"]) for x in weather if x["rain"]}
     ends = laps.groupby("LapNumber")["Time"].min()
     out = set()
     for lap, t in ends.items():
@@ -136,9 +159,9 @@ def observations(
     for idx, r in laps[ok].iterrows():
         cls = tyre_class(str(r.Compound))
         dry = (
-            predict(r.Driver, str(r.Compound), float(eff.loc[idx]), float(r.LapNumber))
+            predict(r.Driver, str(r.Compound), float(eff.loc[idx]), fuel_lap_of(r))
             if cls == "slick"
-            else predict(r.Driver, None, 0.0, float(r.LapNumber))
+            else predict(r.Driver, None, 0.0, fuel_lap_of(r))
         )
         if dry is None:
             continue
@@ -149,12 +172,42 @@ def observations(
     return obs.groupby(["lap", "cls"])["share"].agg(["median", "count"]).reset_index()
 
 
-def timeline(obs: pd.DataFrame, laps: int, rain: set[int], curves: dict) -> list[float]:
-    """The race's wetness on each lap 1..laps: the smooth path that best explains `obs`."""
+# Before 2018 (wet_laps.py): the pull to dry on the laps the lap times call dry (no rain
+# gauge to say so, and the dry model's misses would otherwise read as a damp track).
+DRY_FIRM = 0.05
+
+
+def dry_laps(weather: list[dict] | None) -> set[int]:
+    """The laps lap-time records (wet_laps.py) call dry, ambiguous ones aside; none for a
+    rain gauge's records."""
+    if not weather or "lap" not in weather[0]:
+        return set()
+    return {int(x["lap"]) for x in weather if not x["rain"] and not x.get("ambiguous")}
+
+
+def crossover(curves: dict) -> float:
+    """The lowest wetness on GRID where inters lose no more than slicks (1.0 if none)."""
+    gap = penalty(curves, "INTERMEDIATE", GRID) - penalty(curves, "SOFT", GRID)
+    at = np.flatnonzero(gap <= 0.0)
+    return float(GRID[at[0]]) if at.size else 1.0
+
+
+def timeline(
+    obs: pd.DataFrame,
+    laps: int,
+    rain: set[int],
+    curves: dict,
+    dry: set[int] | None = None,
+    wet_side: bool = False,
+) -> list[float]:
+    """The race's wetness on each lap 1..laps: the smooth path that best explains `obs`
+    (`dry`: laps firmly pulled to dry, wet_laps.py; `wet_side`: an Eras build's pull of a
+    wet-tyres-only lap to at least the slick / inter crossover, WET_SIDE_PULL)."""
     model = {
         cls: penalty(curves, comp, GRID)
         for cls, comp in (("slick", "SOFT"), ("inter", "INTERMEDIATE"), ("wet", "WET"))
     }
+    cross = crossover(curves) if wet_side else 0.0
     cost = np.zeros((laps + 1, len(GRID)))
     by_lap = {lap: g for lap, g in obs.groupby("lap")}
     for lap in range(1, laps + 1):
@@ -170,6 +223,10 @@ def timeline(obs: pd.DataFrame, laps: int, rain: set[int], curves: dict) -> list
             # Raining: at least damp (slicks then wear slowly, wear_mult), even where the
             # lap times hardly show it.
             c += 0.5 * np.maximum(0.0, 0.05 - GRID)
+        if dry and lap in dry:
+            c += DRY_FIRM * GRID
+        if wet_side and g is not None and not g["cls"].eq("slick").any():
+            c += WET_SIDE_PULL * np.maximum(0.0, cross - GRID)
         cost[lap] = c
     trans = SMOOTH * (GRID[:, None] - GRID[None, :]) ** 2
     best = np.full_like(cost, np.inf)
@@ -259,9 +316,14 @@ def sim_wear(laps: pd.DataFrame, weather: dict) -> pd.Series:
 
 
 def race_observations(
-    laps: pd.DataFrame, weather: list[dict] | None, fitted, curves: dict | None = None
+    laps: pd.DataFrame,
+    weather: list[dict] | None,
+    fitted,
+    curves: dict | None = None,
+    wet_side: bool = False,
 ) -> tuple[pd.DataFrame, int, set[int]]:
-    """A wet race's observations against its dry model, its laps, and its rain laps."""
+    """A wet race's observations against its dry model, its laps, and its rain laps
+    (`wet_side`: timeline's)."""
     from . import fit as fit_mod
 
     def predict(driver, compound, age, lap):
@@ -274,15 +336,176 @@ def race_observations(
     total, rain = int(laps["LapNumber"].max()), rain_laps(laps, weather)
     obs = observations(laps, predict, wet_period(laps, weather))
     if curves is not None:
-        first = {"curves": curves, "wetness": timeline(obs, total, rain, curves)}
+        first = {
+            "curves": curves,
+            "wetness": timeline(obs, total, rain, curves, dry_laps(weather), wet_side),
+        }
         obs = observations(laps, predict, wet_period(laps, weather), sim_wear(laps, first))
     return obs, total, rain
 
 
-def weather_block(laps: pd.DataFrame, weather: list[dict] | None, fitted, curves: dict) -> dict:
-    """The race model's `weather`: the curves and the race's wetness on every lap."""
-    obs, total, rain = race_observations(laps, weather, fitted, curves)
-    return {"curves": curves, "wetness": timeline(obs, total, rain, curves)}
+# Eras model fix 1.3 (docs/g1-report.md): the Eras curves are refitted on the Eras wet races'
+# mixed-tyre laps, and each race scales its slick curve by its own mixed laps.
+#
+# The pooled fit (fit_eras_curves). With one wetness a lap, a lap where the whole field is on
+# one tyre class fits any curve (the wetness moves to suit), so only the laps with cars on two
+# classes at once say how far apart the classes are. The fit is fit_curves' (every lap's field
+# median per class, each race's own timeline) plus MIXED_WEIGHT x the squared miss of the gap
+# between two classes' clear-air medians on the laps with MIXED_MIN_FIELD clear-air cars on
+# each (mixed_laps; weighted by the smaller count, at most MIXED_CAP), under curve_prior and
+# then eras_prior.
+MIXED_MIN_FIELD = 2
+MIXED_CAP = 4
+MIXED_WEIGHT = 30.0
+MIXED_PAIRS = (("slick", "inter"), ("inter", "wet"), ("slick", "wet"))
+# Physics past the data: the Eras races' inter / wet mixed laps are all on a track drying out
+# of the wet (inters quicker), none in standing water, where full wets are the tyre. So on a
+# soaked track (wetness SOAKED and up) wets are held SOAKED_MARGIN of a lap quicker than inters
+# (fit_eras_curves' second stage, on the full wet's curve alone).
+SOAKED = (0.8, 1.0)
+SOAKED_MARGIN = 0.03
+
+
+def eras_prior(c: dict) -> float:
+    """curve_prior, and full wets ahead of inters on a soaked track (SOAKED)."""
+    out = curve_prior(c)
+    for w in SOAKED:
+        gap = float(penalty(c, "WET", w) - penalty(c, "INTERMEDIATE", w))
+        out += 200 * max(0.0, gap + SOAKED_MARGIN) ** 2
+    return out
+
+
+# The race's slicks against its inters (slick_scale): a track that dries on a line, or is wet
+# in one part only (Hockenheim 2000's forest, where Barrichello's slicks kept the inters'
+# pace), costs slicks less than the pooled curves say; Indianapolis 2003's more. On every
+# green lap with cars on both (observations' field medians), r = the real slick-inter gap less
+# the curves' at the fitted wetness, n the smaller count (at most MIXED_CAP), s the slick
+# penalty; the race's slick curve is scaled by k = 1 + sum(n·r·s) / (sum(n·s²) +
+# SLICK_SCALE_PRIOR), held in SLICK_SCALE_BOUNDS. The prior is empirical Bayes on the Eras
+# wet races' mixed laps under the pooled curves: lap noise 0.0028 (n-weighted squared share of
+# a lap), between-race sd of k 0.22 (17 races with mixed laps enough to say), prior
+# 0.0028 / 0.051 = 0.055.
+SLICK_SCALE_PRIOR = 0.05
+SLICK_SCALE_BOUNDS = (0.6, 1.6)
+
+
+def mixed_laps(laps: pd.DataFrame, weather: dict, fitted) -> list[tuple[int, str, str, float, int]]:
+    """The race's mixed-tyre laps in clear air: (lap, class a, class b, a's median share of a
+    dry lap less b's, the smaller count), for each pair of MIXED_PAIRS with MIXED_MIN_FIELD
+    clear-air cars on both (clear_air_shares, the curves added back)."""
+    df = clear_air_shares(laps, weather, fitted)
+    out = []
+    for lap, g in df.groupby("lap"):
+        raw = g["share"] + [
+            float(penalty(weather["curves"], CLASS_COMPOUND[c], w))
+            for c, w in zip(g["cls"], g["w"], strict=True)
+        ]
+        n, med = g.groupby("cls").size(), raw.groupby(g["cls"]).median()
+        for a, b in MIXED_PAIRS:
+            if n.get(a, 0) >= MIXED_MIN_FIELD and n.get(b, 0) >= MIXED_MIN_FIELD:
+                out.append((int(lap), a, b, float(med[a] - med[b]), int(min(n[a], n[b]))))
+    return out
+
+
+def mixed_cost(mixed: list, wetness: list[float], curves: dict) -> float:
+    """The squared miss of the curves' class gaps on mixed laps (mixed_laps)."""
+    err = 0.0
+    for lap, a, b, gap, n in mixed:
+        w = wetness[lap - 1]
+        model = penalty(curves, CLASS_COMPOUND[a], w) - penalty(curves, CLASS_COMPOUND[b], w)
+        err += min(n, MIXED_CAP) * (gap - float(model)) ** 2
+    return err
+
+
+def fit_eras_curves(races: list[tuple], start: dict) -> dict:
+    """The Eras curves: those that best explain every Eras wet race at once, each with its
+    own timeline, with the mixed laps' gaps weighted MIXED_WEIGHT (see above). Two stages:
+    all ten parameters under curve_prior, then the full wet's four alone under eras_prior
+    (the soaked-track physics moves only the tyre it is about). `races`: (observations, laps,
+    rain laps, dry laps, mixed laps) per race."""
+    from scipy.optimize import minimize
+
+    def cost(x, prior):
+        if min(x) < 0 or x[5] > 1 or x[9] > 1:
+            return 1e9
+        c = curves_from(x)
+        out = prior(c)
+        for obs, n, rain, dry, mixed in races:
+            w = timeline(obs, n, rain, c, dry)
+            out += level_cost(obs, w, c) + MIXED_WEIGHT * mixed_cost(mixed, w, c)
+        return out
+
+    opts = {"maxiter": 2500, "xatol": 1e-4, "fatol": 1e-6}
+    x0 = [start["slick"]["a"], start["slick"]["b"]] + [
+        start[k][f] for k in ("inter", "wet") for f in ("min", "dry", "wet", "best")
+    ]
+    x1 = list(minimize(cost, x0, args=(curve_prior,), method="Nelder-Mead", options=opts).x)
+    res = minimize(
+        lambda y: cost(x1[:6] + list(y), eras_prior), x1[6:], method="Nelder-Mead", options=opts
+    )
+    x = x1[:6] + list(res.x)
+    return {k: {f: round(v, 4) for f, v in d.items()} for k, d in curves_from(x).items()}
+
+
+def level_cost(obs: pd.DataFrame, wetness: list[float], curves: dict) -> float:
+    """fit_cost's squared error on a given timeline."""
+    err = 0.0
+    for r in obs.itertuples():
+        pen = float(penalty(curves, CLASS_COMPOUND[r.cls], wetness[r.lap - 1]))
+        err += min(int(r.count), 8) * (float(r.median) - pen) ** 2
+    return err
+
+
+def slick_scale(obs: pd.DataFrame, wetness: list[float], curves: dict) -> float:
+    """The race's slick-curve factor (1: the pooled curves; see SLICK_SCALE_PRIOR), from its
+    mixed slick / inter laps (`obs`: observations' lap, cls, median, count)."""
+    num = den = 0.0
+    for lap, g in obs.groupby("lap"):
+        by = g.set_index("cls")
+        if "slick" not in by.index or "inter" not in by.index:
+            continue
+        w = wetness[int(lap) - 1]
+        s = float(penalty(curves, "SOFT", w))
+        model = s - float(penalty(curves, "INTERMEDIATE", w))
+        r = float(by.at["slick", "median"] - by.at["inter", "median"]) - model
+        n = min(int(by.at["slick", "count"]), int(by.at["inter", "count"]), MIXED_CAP)
+        num += n * r * s
+        den += n * s * s
+    if den == 0.0:
+        return 1.0
+    lo, hi = SLICK_SCALE_BOUNDS
+    return round(min(hi, max(lo, 1.0 + num / (den + SLICK_SCALE_PRIOR))), 3)
+
+
+def scaled_curves(curves: dict, k: float) -> dict:
+    """The curves with the slick's scaled by k (slick_scale)."""
+    out = {key: dict(v) for key, v in curves.items()}
+    out["slick"] = {f: round(v * k, 4) for f, v in curves["slick"].items()}
+    return out
+
+
+def eras_weather_block(laps: pd.DataFrame, weather: list[dict] | None, fitted) -> dict:
+    """An Eras build's weather (model fix 1.3): the Eras curves (ERAS_CURVES_PATH) with the
+    race's slick factor (slick_scale, on the timeline the pooled curves fit), and the
+    timeline they fit, with a wet-tyres-only lap on the wet side (timeline's `wet_side`)."""
+    curves = load_curves(eras=True)
+    obs, total, rain = race_observations(laps, weather, fitted, curves, wet_side=True)
+    k = slick_scale(
+        obs, timeline(obs, total, rain, curves, dry_laps(weather), wet_side=True), curves
+    )
+    return weather_block(
+        laps, weather, fitted, scaled_curves(curves, k) if k != 1.0 else curves, wet_side=True
+    )
+
+
+def weather_block(
+    laps: pd.DataFrame, weather: list[dict] | None, fitted, curves: dict, wet_side: bool = False
+) -> dict:
+    """The race model's `weather`: the curves and the race's wetness on every lap (`wet_side`:
+    an Eras build's, timeline's)."""
+    obs, total, rain = race_observations(laps, weather, fitted, curves, wet_side)
+    wetness = timeline(obs, total, rain, curves, dry_laps(weather), wet_side)
+    return {"curves": curves, "wetness": wetness}
 
 
 def rms(obs: pd.DataFrame, wetness: list[float], curves: dict) -> float:
@@ -332,7 +555,7 @@ def driver_wet_pace(
             d,
             comp if slick else fitted.reference_compound,
             float(eff.loc[idx]) if slick else 0.0,
-            float(r.LapNumber),
+            fuel_lap_of(r),
         )
         share = float(r.LapTime) / dry - 1 - float(penalty(weather["curves"], comp, w))
         if abs(share) < 0.3:
@@ -341,3 +564,256 @@ def driver_wet_pace(
         d: round(float(np.median(v)) * len(v) / (len(v) + WET_PACE_SHRINK), 4)
         for d, v in res.items()
     }
+
+
+# Eras builds (model fix M1): driver pace by track state. A driver's pace on a damp track and
+# on a wet one, from their clear-air laps, measured against the rest of the field on the same
+# lap and tyre class, and shrunk toward the field (pace 0) so a few laps can't overfit.
+# A lap is clear air with no car within this many seconds ahead (the dirty air of a car
+# within ~1.5 s costs time the sim adds itself).
+BAND_TRAFFIC_GAP = 1.5
+# Wetness below this is damp (slick weather: the slick-inter crossover is about 0.16 on the
+# fitted curves), from it wet.
+DAMP_EDGE = 0.15
+# Prior strength, in full-wetness laps (wet_scale 1): a driver's overall wet-weather pace is
+# shrunk toward the field's by FIELD_PRIOR laps of evidence, and each band's toward the
+# driver's overall by BAND_PRIOR. Empirical Bayes on the 17 wet Eras races' clear-air laps
+# (docs/g1-report.md, model fix M1): lap noise sd 2.0% of a lap, driver sd 1.5% (prior
+# 2.0^2 / 1.5^2 = 1.8 laps); a driver's damp and wet pace correlate 0.47, so a band's own
+# deviation sd is about 1.1% (prior 3.3 laps). A residual is capped at BAND_CLIP (an off).
+FIELD_PRIOR = 2.0
+BAND_PRIOR = 3.0
+BAND_CLIP = 0.06
+# A lap's field reference needs this many other clear-air cars on the same tyre class.
+BAND_MIN_FIELD = 2
+
+
+def band_of(w: float) -> str:
+    return "damp" if w < DAMP_EDGE else "wet"
+
+
+def racing_laps(laps: pd.DataFrame) -> pd.Series:
+    """Laps that show a car's pace: accurate, green, the lap before green too (no restart), no
+    pit in or out, not lap 1, timed."""
+    from .track import racing_status
+
+    racing = laps["TrackStatus"].map(racing_status).astype(bool)
+    prev_green = (
+        laps.assign(_g=racing)
+        .sort_values("LapNumber")
+        .groupby("Driver")["_g"]
+        .shift(1, fill_value=False)
+        .reindex(laps.index, fill_value=False)
+    )
+    return (
+        laps["IsAccurate"].fillna(False).astype(bool)
+        & racing
+        & prev_green
+        & laps["PitInTime"].isna()
+        & laps["PitOutTime"].isna()
+        & (laps["LapNumber"] > 1)
+        & laps["LapTime"].notna()
+    )
+
+
+def clear_air(laps: pd.DataFrame) -> pd.Series:
+    """Laps with no car within BAND_TRAFFIC_GAP ahead."""
+    from .clean import gap_to_car_ahead
+
+    return ~(gap_to_car_ahead(laps) < BAND_TRAFFIC_GAP).fillna(False)
+
+
+def clear_air_shares(laps: pd.DataFrame, weather: dict, fitted) -> pd.DataFrame:
+    """Each clear-air wet lap's share of a dry lap lost beyond the curves. Clear air: green,
+    the lap before green too (no restart), no pit in or out, not lap 1, no car within
+    BAND_TRAFFIC_GAP ahead. Columns driver, lap, w, cls, share."""
+    from . import fit as fit_mod
+
+    eff = sim_wear(laps, weather) + 1.0
+    ok = racing_laps(laps) & clear_air(laps)
+    rows = []
+    for idx, r in laps[ok].iterrows():
+        d = str(r.Driver)
+        w = float(weather["wetness"][int(r.LapNumber) - 1])
+        if d not in fitted.driver_pace or w < DRY_BELOW:
+            continue
+        comp = str(r.Compound)
+        slick = tyre_class(comp) == "slick"
+        dry = fit_mod.predict(
+            fitted,
+            d,
+            comp if slick else fitted.reference_compound,
+            float(eff.loc[idx]) if slick else 0.0,
+            fuel_lap_of(r),
+        )
+        share = float(r.LapTime) / dry - 1 - float(penalty(weather["curves"], comp, w))
+        if abs(share) < 0.3:
+            rows.append((d, int(r.LapNumber), w, tyre_class(comp), share))
+    return pd.DataFrame(rows, columns=["driver", "lap", "w", "cls", "share"])
+
+
+def band_residuals(laps: pd.DataFrame, weather: dict, fitted) -> pd.DataFrame:
+    """Each clear-air wet lap's residual against the field: its share (clear_air_shares) less
+    the median of the other clear-air cars on that lap and tyre class (BAND_MIN_FIELD of them
+    at least), capped at BAND_CLIP. Columns driver, lap, w, band, cls, r."""
+    df = clear_air_shares(laps, weather, fitted)
+    out = []
+    for _, g in df.groupby(["lap", "cls"]):
+        if len(g) < BAND_MIN_FIELD + 1:
+            continue
+        vals = g["share"].to_numpy()
+        for i, r in enumerate(g.itertuples()):
+            ref = float(np.median(np.delete(vals, i)))
+            res = float(np.clip(r.share - ref, -BAND_CLIP, BAND_CLIP))
+            out.append((r.driver, r.lap, r.w, band_of(r.w), r.cls, res))
+    return pd.DataFrame(out, columns=["driver", "lap", "w", "band", "cls", "r"])
+
+
+def driver_band_pace(
+    laps: pd.DataFrame, weather: dict, fitted
+) -> tuple[dict[str, float], dict[str, float]]:
+    """Eras builds: each driver's pace (share of a lap, negative quicker) on a wet track
+    (wetness DAMP_EDGE and up: the race model's `wetPace`) and a damp one (`dampPace`), both
+    fading in with wet_scale as the sims apply them. A ridge fit through wet_scale: the
+    driver's overall pace is sum(r·s) / (sum(s²) + FIELD_PRIOR), and each band's
+    (sum_b(r·s) + BAND_PRIOR·overall) / (sum_b(s²) + BAND_PRIOR), so a band with few laps
+    keeps the driver's overall pace and a driver with few laps the field's."""
+    res = band_residuals(laps, weather, fitted)
+    wet_out: dict[str, float] = {}
+    damp_out: dict[str, float] = {}
+    for d, g in res.groupby("driver"):
+        s = g["w"].map(wet_scale).to_numpy()
+        r = g["r"].to_numpy()
+        overall = float((r * s).sum() / ((s * s).sum() + FIELD_PRIOR))
+        for band, out in (("wet", wet_out), ("damp", damp_out)):
+            m = (g["band"] == band).to_numpy()
+            p = ((r[m] * s[m]).sum() + BAND_PRIOR * overall) / ((s[m] * s[m]).sum() + BAND_PRIOR)
+            out[str(d)] = round(float(p), 4)
+    return wet_out, damp_out
+
+
+# Eras builds (model fix M1): the full wet against the intermediate, per race, where the race
+# can tell them apart: laps with at least TYRE_MIN_FIELD clear-air cars on each, TYRE_MIN_LAPS
+# such laps at least. The shift of the wet curve is the mean gap between the two tyres'
+# residuals on those laps, shrunk by TYRE_PRIOR laps toward the shared curves (none).
+TYRE_MIN_FIELD = 2
+TYRE_MIN_LAPS = 5
+TYRE_PRIOR = 3.0
+
+
+def wet_tyre_shift(laps: pd.DataFrame, weather: dict, fitted) -> float:
+    """The race's full wets against its inters beyond the shared curves (share of a lap,
+    negative: the wets were quicker than the curves say); 0 where the race can't tell."""
+    df = clear_air_shares(laps, weather, fitted)
+    diffs = []
+    for _, g in df.groupby("lap"):
+        inter, wets = g[g["cls"] == "inter"]["share"], g[g["cls"] == "wet"]["share"]
+        if len(inter) >= TYRE_MIN_FIELD and len(wets) >= TYRE_MIN_FIELD:
+            diffs.append(float(wets.median() - inter.median()))
+    if len(diffs) < TYRE_MIN_LAPS:
+        return 0.0
+    return round(sum(diffs) / (len(diffs) + TYRE_PRIOR), 4)
+
+
+def shifted_curves(curves: dict, shift: float) -> dict:
+    """The curves with the full wet's moved by `shift` (wet_tyre_shift)."""
+    out = {k: dict(v) for k, v in curves.items()}
+    out["wet"]["min"] = round(max(0.0, out["wet"]["min"] + shift), 4)
+    return out
+
+
+# Eras builds (model fix 1.6): a car that ran only wet laps (it retired, or the takeover came,
+# before the track dried) has no dry lap to fit its dry pace on. Its dry pace is the wet model
+# inverted on its own laps: a lap's time is dry x (1 + the curve's penalty + the car's wet
+# offset), and the car's own offset, which its laps can't tell from its dry pace, is shrunk all
+# the way to the field's: the median offset of the cars with a dry pace on the same lap and
+# tyre class (the curves alone where too few of them ran it). The median over the car's laps
+# (its clear-air ones where it has ESTIMATE_MIN_LAPS of them) is that estimate; it is blended
+# with the car's pace (its team-mate's dry pace) at ESTIMATE_WET_WEIGHT. Fewer usable laps:
+# the team-mate's pace alone, else the field's median. The weight is the leave-one-out best
+# over the wet Eras races (job 1.6: 391 cars with a fitted dry pace and a team-mate, 27
+# races, each one's estimate from its wet-period laps with its own pace removed, against its
+# fitted pace): rms error 1.29 s from its wet laps alone, 1.18 s from its team-mate, 0.95 s
+# blended at 0.4 (0.3-0.5 within 0.03 s; the two errors correlate 0.17). The car's own wet
+# offset then comes from its wet laps against that pace (driver_band_pace, shrunk to the
+# field's), so its wet laps still replay as it ran them.
+ESTIMATE_MIN_LAPS = 3
+ESTIMATE_WET_WEIGHT = 0.4
+
+
+def estimated_dry_pace(
+    laps: pd.DataFrame, weather: dict | None, fitted, drivers: list[str]
+) -> dict[str, tuple[float, float, str]]:
+    """Each of `drivers` (none with a dry pace in `fitted`): (dry pace, noise, how), the pace
+    on fit.LapTimeFit's terms (reference compound, age 0, lap 0), the noise the field's
+    median. `how` names the method for the build report."""
+    from dataclasses import replace
+
+    from . import fit as fit_mod
+
+    noise = float(np.median(list(fitted.driver_noise.values())))
+    field_pace = float(np.median(list(fitted.driver_pace.values())))
+    refs: dict[tuple[int, str], float] = {}
+    eff = None
+    if weather is not None:
+        eff = sim_wear(laps, weather) + 1.0
+        shares = clear_air_shares(laps, weather, fitted)
+        for (lap, cls), g in shares.groupby(["lap", "cls"]):
+            if len(g) >= BAND_MIN_FIELD:
+                refs[(int(lap), str(cls))] = float(g["share"].median())
+    racing = racing_laps(laps)
+    clear = clear_air(laps)
+    teams = (
+        laps.dropna(subset=["Team"]).groupby("Driver")["Team"].first()
+        if "Team" in laps
+        else pd.Series(dtype=str)
+    )
+    out: dict[str, tuple[float, float, str]] = {}
+    for d in drivers:
+        mine = laps["Driver"].astype(str).eq(d) & racing
+        if weather is not None and (mine & clear).sum() >= ESTIMATE_MIN_LAPS:
+            mine &= clear
+        probe = replace(fitted, driver_pace={**fitted.driver_pace, d: 0.0})
+        est, n_field = [], 0
+        for idx, r in laps[mine].iterrows() if weather is not None else iter(()):
+            lap = int(r.LapNumber)
+            w = float(weather["wetness"][lap - 1])
+            comp = str(r.Compound)
+            cls = tyre_class(comp)
+            slick = cls == "slick"
+            base = fit_mod.predict(
+                probe,
+                d,
+                comp if slick else fitted.reference_compound,
+                float(eff.loc[idx]) if slick else 0.0,
+                fuel_lap_of(r),
+            )
+            ref = refs.get((lap, cls))
+            n_field += ref is not None
+            pen = float(penalty(weather["curves"], comp, w)) + (ref or 0.0)
+            est.append(float(r.LapTime) / (1 + pen) - base)
+        team = teams.get(d)
+        mates = sorted(
+            c for c, t in teams.items() if t == team and c != d and c in fitted.driver_pace
+        )
+        if len(est) >= ESTIMATE_MIN_LAPS:
+            own = float(np.median(est))
+            how = (
+                f"its {len(est)} laps against the wet model, offset at the field's"
+                f" ({n_field} of them against the field on the same lap and tyre): {own:.3f} s"
+            )
+            if mates:
+                car = float(fitted.driver_pace[mates[0]])
+                own = ESTIMATE_WET_WEIGHT * own + (1 - ESTIMATE_WET_WEIGHT) * car
+                how += f", blended {ESTIMATE_WET_WEIGHT} with team-mate {mates[0]}'s {car:.3f} s"
+            out[d] = (round(own, 4), noise, how)
+            continue
+        if mates:
+            out[d] = (
+                round(float(fitted.driver_pace[mates[0]]), 4),
+                noise,
+                f"too few laps to measure ({len(est)}): its team-mate {mates[0]}'s dry pace",
+            )
+        else:
+            out[d] = (round(field_pace, 4), noise, "too few laps, no team-mate: the field's median")
+    return out

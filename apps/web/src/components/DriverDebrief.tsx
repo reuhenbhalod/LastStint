@@ -8,7 +8,7 @@ import {
   type TrustReason,
   engineerConfig,
   moodOf,
-} from '@boxthislap/sim';
+} from '@laststint/sim';
 import { MOOD_LABEL } from '../game/engineerCalls.js';
 import { postRaceRadio } from '../game/engineerRadio.js';
 import { MoodLight } from './Icons.js';
