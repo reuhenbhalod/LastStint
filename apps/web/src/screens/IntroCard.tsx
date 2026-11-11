@@ -12,6 +12,7 @@ import type { AccountState } from '../account/useAccount.js';
 import { AccountBar } from '../components/AccountBar.js';
 import { Disclaimer } from '../components/Disclaimer.js';
 import { HeadsetIcon, OvertakeIcon, TyreIcon } from '../components/Icons.js';
+import { MapCredit } from '../components/MapCredit.js';
 import { TopBar } from '../components/TopBar.js';
 import { TyreBadge } from '../components/TyreBadge.js';
 import { TIER_LABEL, driverInfo } from '../data/drivers.js';
@@ -257,6 +258,12 @@ export function IntroCard({
               background:
                 'linear-gradient(90deg, var(--paper) 0%, var(--paper) 34%, color-mix(in srgb, var(--paper) 55%, transparent) 50%, transparent 70%), linear-gradient(0deg, var(--paper) 0%, transparent 18%)',
             }}
+          />
+          {/* The map's OpenStreetMap credit, in the hero's top corner (with the map, on a
+              computer). */}
+          <MapCredit
+            raceId={model.race.id}
+            className="absolute right-3 top-3 z-10 hidden lg:block"
           />
           <div className="relative mx-auto grid max-w-7xl items-center gap-6 px-4 py-8 sm:px-6 lg:min-h-[600px] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:py-14">
             <div className="flex flex-col gap-5">

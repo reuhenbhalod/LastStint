@@ -74,6 +74,7 @@ export function Versus() {
     <main className="relative isolate min-h-[100dvh] text-[#EEF1EE]">
       {/* Versus runs at the five 3D circuits; Spa stands behind the lobby. */}
       {!code && <GroundBackdrop raceId="belgium-2024" />}
+      {!code && <MapCredit raceId="belgium-2024" className="fixed right-2 bottom-2 z-10" />}
       <TopBar active="versus" />
       {!named ? (
         <NameCard

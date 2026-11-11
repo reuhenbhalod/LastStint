@@ -60,7 +60,7 @@ function SignedIn({ account }: { account: AccountState }) {
   if (!a) return null;
   return (
     <span className="flex items-center gap-2 text-[13px]">
-      {a.admin && <AdminLink top={false} />}
+      {a.admin && <AdminLink />}
       <button
         type="button"
         onClick={() => account.setProfileOpen(true)}
@@ -103,8 +103,9 @@ function AccountMenu({ account }: { account: AccountState }) {
   }, [open]);
   if (!a) return null;
   const name = a.displayName || a.name || a.email || 'Account';
-  const item =
-    'block w-full rounded-md px-3 py-2 text-left text-[14px] font-semibold text-[var(--ink)] hover:bg-[var(--card-2)]';
+  const base =
+    'block w-full rounded-md px-3 py-2 text-left text-[14px] font-semibold hover:bg-[var(--card-2)]';
+  const item = `${base} text-[var(--ink)]`;
   return (
     <div ref={box} className="relative">
       <button
@@ -146,14 +147,14 @@ function AccountMenu({ account }: { account: AccountState }) {
             Edit profile
           </button>
           {a.admin && (
-            <a role="menuitem" href="/admin" className={item}>
+            <a role="menuitem" href="/admin" className={`${base} text-[var(--fav,var(--ink))]`}>
               Admin
             </a>
           )}
           <button
             type="button"
             role="menuitem"
-            className={`${item} text-[var(--muted)]`}
+            className={`${base} text-[var(--muted)]`}
             onClick={() => {
               setOpen(false);
               account.signOut();
@@ -167,19 +168,12 @@ function AccountMenu({ account }: { account: AccountState }) {
   );
 }
 
-/**
- * Only for accounts on the admin list (the server says so; it checks every admin call too).
- * `top`: in the top bar, in the favourite team's colour.
- */
-function AdminLink({ top }: { top: boolean }) {
+/** Only for accounts on the admin list (the server says so; it checks every admin call too). */
+function AdminLink() {
   return (
     <a
       href="/admin"
-      className={
-        top
-          ? 'rounded-full border border-[var(--fav,var(--you))] px-3 py-1 font-semibold text-[var(--fav,var(--you))] hover:bg-[color-mix(in_srgb,var(--fav,var(--you))_12%,transparent)]'
-          : 'rounded-full border border-[var(--you)] px-3 py-1 font-semibold text-[var(--you)] hover:bg-[color-mix(in_srgb,var(--you)_12%,transparent)]'
-      }
+      className="rounded-full border border-[var(--you)] px-3 py-1 font-semibold text-[var(--you)] hover:bg-[color-mix(in_srgb,var(--you)_12%,transparent)]"
     >
       Admin
     </a>

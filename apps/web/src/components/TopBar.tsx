@@ -1,9 +1,11 @@
-// The top bar on the home page, the Gauntlet and Versus: the brand, the four ways to play as
-// tabs (today's daily, the Gauntlet, Eras, Versus), and on the right whatever the page puts there (the
-// streak and the account menu). On a phone the tabs take a row of their own under the brand.
+// The top bar on the home page, the Gauntlet, Eras and Versus: the brand, the four ways to play as
+// tabs (today's daily, the Gauntlet, Eras, Versus), and on the right the streak and the account
+// menu: the page's own account when it passes `right`, else the bar loads it (SiteAccount). On a
+// phone the tabs take a row of their own under the brand.
 
 import type { ReactNode } from 'react';
 import { Brand } from './Brand.js';
+import { SiteAccount } from './SiteAccount.js';
 
 export type Mode = 'daily' | 'gauntlet' | 'eras' | 'versus';
 
@@ -49,7 +51,7 @@ export function TopBar({ active, right }: { active: Mode; right?: ReactNode }) {
           })}
         </nav>
         <div className="col-start-2 row-start-1 flex min-w-0 items-center justify-end md:col-start-3">
-          {right}
+          {right ?? <SiteAccount />}
         </div>
       </div>
     </header>

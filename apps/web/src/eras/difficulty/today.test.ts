@@ -248,7 +248,8 @@ const TODAY = {
   // Before the merge: '79aa9a7697842f85' (8.8's phone spacing), 'a3ff5c603c39a2f9' (before 8.8).
   // 'ee1d94ac9fe089d8' before the logo went white (Brand: text-white, not the team colour).
   // 'ff65482385daa3aa' before the map's OpenStreetMap credit (components/MapCredit.tsx).
-  screen: '0a151c0f15589328',
+  // '0a151c0f15589328' before the credit moved to the map's bottom right (clear of the strip).
+  screen: '3ea81a4162b5cb5a',
   decision: 'f71311307784d55e',
   cards: '82ea30e0dbd15610',
   radio: {

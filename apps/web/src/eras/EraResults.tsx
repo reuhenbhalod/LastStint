@@ -108,7 +108,7 @@ export function EraStars({ stars, newStars }: { stars: Stars; newStars: Stars })
             className={`flex flex-col items-center gap-1 rounded-md border px-2 py-2.5 text-center ${
               earned
                 ? 'border-[var(--flag)] text-[var(--flag)]'
-                : 'border-[#262C2A] text-[var(--muted)]'
+                : 'border-[var(--glass-edge)] text-[var(--muted)]'
             } ${fresh ? 'star-new' : ''}`}
           >
             <span className="text-[22px] leading-none">
@@ -262,7 +262,7 @@ export function EraResultsPanel({
           )}
           {community && <p className="m-0 text-[13px] text-[var(--ink)]">{community}</p>}
           {hidden && allStars(result.progress.stars) && (
-            <div className="flex flex-col gap-1 rounded-md border border-[#262C2A] px-3 py-2.5">
+            <div className="flex flex-col gap-1 rounded-md border border-[var(--glass-edge)] px-3 py-2.5">
               <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--muted)]">
                 Hidden objective
               </span>
@@ -288,7 +288,7 @@ export function EraResultsPanel({
  * leaderboard (the Legend one after a Legend attempt) and the history book. */
 export function EraResultActions({ info }: { info: ErasResultInfo }) {
   const link =
-    'flex items-center justify-center rounded-md border border-[#262C2A] px-2 py-2.5 text-center text-[13px] font-semibold text-[var(--ink)] hover:border-[#6B736F]';
+    'flex items-center justify-center rounded-md border border-[var(--glass-edge)] px-2 py-2.5 text-center text-[13px] font-semibold text-[var(--ink)] hover:border-[var(--muted)]';
   return (
     <div className="flex flex-col gap-3">
       <div className="grid grid-cols-2 gap-3">
@@ -301,7 +301,7 @@ export function EraResultActions({ info }: { info: ErasResultInfo }) {
         </button>
         <a
           href={`/eras/${info.era.id}`}
-          className="flex items-center justify-center rounded-md border border-[#333A37] py-3 text-center font-semibold text-[#D5DAD7] hover:border-[#6B736F]"
+          className="flex items-center justify-center rounded-md border border-[var(--rule)] py-3 text-center font-semibold text-[var(--ink)] hover:border-[var(--muted)]"
         >
           Back to era
         </a>

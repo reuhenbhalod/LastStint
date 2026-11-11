@@ -1120,7 +1120,6 @@ function RaceScreenBody({
             data-tour="map"
             className={`absolute inset-0 flex flex-col overflow-hidden bg-[var(--ground)] ${stats ? 'md:rounded-xl' : ''} ${paused ? 'map-alert' : ''}`}
           >
-            <MapCredit raceId={model.race.id} className="absolute right-2 top-1.5 z-10" />
             {wetNow >= 0.03 && (
               <div
                 aria-hidden="true"
@@ -1242,6 +1241,13 @@ function RaceScreenBody({
                 </div>
               )}
             </div>
+            {/* The map's OpenStreetMap credit: bottom right, just above the call and the dock
+                (the strip over the circuit takes the top). */}
+            <MapCredit
+              raceId={model.race.id}
+              className="absolute right-2 z-20"
+              style={{ bottom: stackH + 6 }}
+            />
           </div>
 
           <div
