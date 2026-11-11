@@ -215,6 +215,13 @@ export const TEAM_COLOR_BY_YEAR: TeamEraColour[] = [
     source: 'https://en.wikipedia.org/wiki/Forti_FG01',
   },
   {
+    team: 'Forti',
+    from: 1996,
+    to: 1996,
+    colour: '#2fa85a',
+    source: 'https://en.wikipedia.org/wiki/Forti_FG03',
+  },
+  {
     team: 'HRT',
     from: 2010,
     to: 2012,
