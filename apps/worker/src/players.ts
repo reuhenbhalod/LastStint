@@ -96,7 +96,7 @@ export async function signIn(
 }
 
 /** A display name: 3-20 letters, digits, spaces, `_`, `-` or `.` (trimmed). */
-const NAME = /^[\p{L}\p{N} _.-]{3,20}$/u;
+export const NAME = /^[\p{L}\p{N} _.-]{3,20}$/u;
 /** A team name as the game shows it ("Red Bull Racing", "Kick Sauber"). */
 const TEAM = /^[\p{L}\p{N} &.'-]{0,40}$/u;
 
@@ -149,6 +149,14 @@ export async function accountOf(db: D1Database, anonId: string): Promise<Account
 export const DISPLAY_NAME = (anonCol: string) => `COALESCE((
   SELECT p.display_name FROM player_ids l JOIN players p ON p.id = l.player_id
    WHERE l.anon_id = ${anonCol}), '')`;
+
+/**
+ * SQL: `col` (an anonId, or an Eras player ID) isn't a hidden player's (docs/admin-v2-spec.md
+ * A6). An account's own ID is linked in player_ids too (signIn), so one list covers both.
+ * Hidden players still play and their runs count for them; only the leaderboards skip them.
+ */
+export const NOT_HIDDEN = (col: string) => `${col} NOT IN (
+  SELECT l.anon_id FROM player_ids l JOIN players p ON p.id = l.player_id WHERE p.hidden = 1)`;
 
 /**
  * Every anonId whose runs count as this player's: the IDs linked to the same account, or just

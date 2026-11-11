@@ -1,6 +1,7 @@
-// The admin page (/admin) against a mocked admin API: signed out it only offers sign-in;
-// signed in (a stand-in Google token in sessionStorage) it lists every playable race with a
-// Play link and runs the daily schedule; an account off the admin list is told so.
+// The admin page's Schedule tab (/admin/schedule) against a mocked admin API: signed out it
+// only offers sign-in; signed in (a stand-in Google token in sessionStorage) it lists every
+// playable race with a Play link and a preview, and runs the daily schedule; an account off
+// the admin list is told so. admin-tabs.spec.ts opens every other tab.
 import { type Page, expect, test } from '@playwright/test';
 
 const today = '2026-11-03';
@@ -22,7 +23,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('signed out: only the sign-in card', async ({ page }) => {
-  await page.goto('/admin');
+  await page.goto('/admin/schedule');
   await expect(page.getByRole('heading', { name: 'Admin sign-in' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Play any race' })).toHaveCount(0);
   await expect(page.getByRole('heading', { name: 'Daily schedule' })).toHaveCount(0);
@@ -53,7 +54,7 @@ test('signed in: plays any race and runs the schedule', async ({ page }) => {
     return route.fulfill({ status: 404, json: { error: 'not-found' } });
   });
 
-  await page.goto('/admin');
+  await page.goto('/admin/schedule');
   await expect(page.getByText(email)).toBeVisible();
 
   // Every playable race, with its goal and a Play link carrying the seed.
@@ -65,6 +66,16 @@ test('signed in: plays any race and runs the schedule', async ({ page }) => {
     '/?race=spain-2020&seed=1234',
   );
   await expect(page.locator('article', { hasText: 'Abu Dhabi 2021' })).toContainText('Beat');
+
+  // The preview opens beside the list without starting a race.
+  await spain.getByRole('button', { name: 'Preview' }).click();
+  const preview = page.getByRole('complementary', { name: 'Race preview' });
+  await expect(preview).toContainText('Spain 2020');
+  await expect(preview).toContainText('Pools');
+  await expect(preview).toContainText(/Moments \(\d+\)/);
+  await expect(page).toHaveURL(/\/admin\/schedule$/);
+  await preview.getByRole('button', { name: 'Close' }).click();
+  await expect(preview).toHaveCount(0);
 
   // The schedule: today highlighted, a stale day flagged, then schedule more.
   await expect(page.getByRole('row', { name: new RegExp(`${today} · today`) })).toBeVisible();

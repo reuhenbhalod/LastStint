@@ -41,6 +41,7 @@ import {
 import { withErasOverlay } from './erasOverlay.js';
 import { modelHash } from './hash.js';
 import type { Env } from './index.js';
+import { NOT_HIDDEN } from './players.js';
 import { ERAS_OVERLAYS, ERAS_RACE_FILES } from './races.gen.js';
 import { type BundledRace, getRace } from './races.js';
 import { ApiError, isAnonId } from './runs.js';
@@ -540,9 +541,10 @@ async function submitAttempt(c: Ctx, attemptId: string, now: number) {
     .prepare(
       `SELECT count(*) AS total,
          sum(CASE WHEN best_accuracy > ?3 THEN 1 ELSE 0 END) AS ahead
-       FROM era_progress WHERE race_id = ?1 AND legend = ?2 AND best_accuracy IS NOT NULL`,
+       FROM era_progress WHERE race_id = ?1 AND legend = ?2 AND best_accuracy IS NOT NULL
+         AND (${NOT_HIDDEN('player_id')} OR player_id = ?4)`,
     )
-    .bind(attempt.race_id, attempt.legend, after.bestAccuracy)
+    .bind(attempt.race_id, attempt.legend, after.bestAccuracy, playerId)
     .first<{ total: number; ahead: number | null }>();
 
   const response: SubmitResponse = {

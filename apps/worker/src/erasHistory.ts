@@ -30,7 +30,7 @@ import type { Context, Hono } from 'hono';
 import { erasTestMode, getErasRace, hasRewrite, playerOf } from './eras.js';
 import type { Env } from './index.js';
 import { displayName } from './names.js';
-import { DISPLAY_NAME } from './players.js';
+import { DISPLAY_NAME, NOT_HIDDEN } from './players.js';
 import { ApiError, isAnonId } from './runs.js';
 
 type Ctx = Context<{ Bindings: Env }>;
@@ -413,11 +413,15 @@ export async function historyBook(
 /**
  * Each player's best accuracy on the race (normal or Legend), and when an attempt first reached
  * it. Binds ?1 race, ?2 legend. The order: best accuracy, then who reached it first, then the
- * player ID, so equal boards always come out the same.
+ * player ID, so equal boards always come out the same. Hidden players (admin) aren't on it, except
+ * ?3: the asking player, who keeps their own place (pass null for the public list). A hidden
+ * player is ranked among the visible players; nobody else's rank or total counts them.
  */
 const BOARD = `WITH best AS (
     SELECT player_id, max(accuracy) AS accuracy FROM era_attempts
-    WHERE race_id = ?1 AND legend = ?2 AND accuracy IS NOT NULL GROUP BY player_id),
+    WHERE race_id = ?1 AND legend = ?2 AND accuracy IS NOT NULL
+      AND (${NOT_HIDDEN('player_id')} OR player_id = ?3)
+    GROUP BY player_id),
   board AS (
     SELECT b.player_id, b.accuracy,
       (SELECT min(a.submitted_at) FROM era_attempts a
@@ -445,7 +449,7 @@ export async function topOfBoard(db: D1Database, raceId: string, legend: boolean
          ${DISPLAY_NAME('ranked.player_id')} AS name
        FROM ranked ORDER BY rank LIMIT ${ERAS_LEADERBOARD_SIZE}`,
     )
-    .bind(raceId, legend ? 1 : 0)
+    .bind(raceId, legend ? 1 : 0, null)
     .all<BoardRow>();
   return {
     total: results[0]?.total ?? 0,

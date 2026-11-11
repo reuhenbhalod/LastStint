@@ -17,6 +17,8 @@ export interface AdminPlayer {
   dailyRuns: number;
   gauntletRuns: number;
   lastPlayed: string | null;
+  /** Left off every leaderboard (the player's page hides and shows them). */
+  hidden?: boolean;
 }
 
 export interface PlayerList {
