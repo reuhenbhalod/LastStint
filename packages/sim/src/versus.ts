@@ -763,6 +763,25 @@ export function battleDue(
   return { lap, attacker, corner: c.corner, at: c.at };
 }
 
+/** What a stop at the end of the next lap gains on the other car (the undercut, action spec
+ * A3): the out-lap on fresh `compound` against theirs on their old tyres, less the cold
+ * out-lap. If they stop a lap later, this is how much of the gap it takes back. */
+export function undercutEdge(run: VersusRun, player: PlayerIndex, compound: Compound): number {
+  const { model, track } = run;
+  const lap = Math.min(VERSUS_LAPS, run.state.lap + 2);
+  const base = median(model.drivers.map((d) => d.basePace));
+  const me = run.state.cars[player];
+  const them = run.state.cars[player === 0 ? 1 : 0];
+  const fresh =
+    tyreLapTime(model, base, compound, 0, modelLap(run, lap)) +
+    freshTyreDelta(model, 1) +
+    statPace(track, versusCar(me.car).stats);
+  const old =
+    tyreLapTime(model, base, them.compound, them.tyreWear + 1, modelLap(run, lap)) +
+    statPace(track, versusCar(them.car).stats);
+  return old - fresh - OUT_LAP_COST;
+}
+
 /** Can this car boost in a battle on `lap`? */
 export function canBoost(car: VersusCarState, lap: number): boolean {
   return car.boosts > 0 && lap >= car.ersFaultUntil;

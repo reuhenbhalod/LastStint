@@ -32,11 +32,13 @@ export interface LapClock {
   start: number;
   ms: number;
   frozen?: number;
+  /** Runs no further than this (a versus battle's braking zone, until the picks are in). */
+  until?: number;
 }
 
 /** How far through its tick the clock is at `now` (0-0.995). */
 export function clockProgress(clock: LapClock, now = performance.now()): number {
-  const p = clock.frozen ?? (now - clock.start) / clock.ms;
+  const p = clock.frozen ?? Math.min((now - clock.start) / clock.ms, clock.until ?? 1);
   return Math.min(0.995, Math.max(0, p));
 }
 

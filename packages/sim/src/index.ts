@@ -151,6 +151,7 @@ export {
   autoPick,
   battleDue,
   canBoost,
+  undercutEdge,
 } from './versus.js';
 export type {
   CarStat,

@@ -1,6 +1,13 @@
 # Versus: action
 
-**Status:** decided (Nov 10, 2026), building. Builds on `versus-spec.md`.
+**Status:** built (Nov 10, 2026), on the `realistic-ui` branch, for testing on localhost. Builds
+on `versus-spec.md`. Differences from the plan below:
+- **One battle a lap at most,** at one of the track's three best overtaking corners (rotated
+  lap to lap). After a battle there's a lap's break, unless the attacker waited.
+- **No replay filter on the calls.** The undercut and cover calls show their own numbers
+  instead: what fresh tyres take back on the out-lap, and where you'd come out.
+- **Measured:** about 4 battles and 3 strategy calls in a race, on every track (plus a restart
+  after a safety car). Battle picks aren't graded.
 
 **Decided (the owner, Nov 10):**
 - **The winner** is whoever is first past the flag. The calls' grades are shown as a breakdown.

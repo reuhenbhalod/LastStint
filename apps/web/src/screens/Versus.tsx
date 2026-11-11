@@ -3,6 +3,10 @@
 // for both walls at once, the headset and battle calls) and the graded result.
 
 import {
+  type AttackPick,
+  BOOSTS,
+  type DefendPick,
+  OUT_LAP_COST,
   type PlayerIndex,
   type RaceModel,
   STAT_SCALE,
@@ -15,15 +19,20 @@ import {
   type VersusOutcome,
   type VersusRun,
   lifeOf,
+  simulateVersus,
+  undercutEdge,
   versusOptions,
+  versusRuleMet,
   versusTrack,
 } from '@boxthislap/sim';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ApiError, apiPost } from '../api.js';
 import { Brand } from '../components/Brand.js';
 import { GroundBackdrop } from '../components/GroundBackdrop.js';
-import { TrackMap } from '../components/TrackMap.js';
+import { type BattleView, TrackMap } from '../components/TrackMap.js';
 import { TyreBadge } from '../components/TyreBadge.js';
+import type { BattleLine } from '../game/quickCalls.js';
+import { clockProgress } from '../game/useGame.js';
 import { RaceStage } from '../three/RaceStage.js';
 import type { MapFeed } from '../track/feed.js';
 import { outlineFor } from '../track/outlines.js';
@@ -437,18 +446,60 @@ function StatBar({ label, value }: { label: string; value: number }) {
 
 // --- The race -----------------------------------------------------------------------------------
 
-const MOVES_DEFEND: Array<{ move: string; label: string; tag: string }> = [
-  { move: 'cover-inside', label: 'Cover the inside', tag: 'Balanced' },
-  { move: 'defend-hard', label: 'Defend hard', tag: 'Risky' },
-  { move: 'let-go', label: 'Let him by', tag: 'Gives way' },
+/** The battle picks (action spec A1), in the words on the buttons, and the line each draws on
+ * the map. */
+const ATTACKS: Array<{ pick: AttackPick; label: string; tag: string; line: BattleLine | null }> = [
+  { pick: 'inside', label: 'Dive down the inside', tag: 'Beats a cover outside', line: 'inside' },
+  { pick: 'outside', label: 'Round the outside', tag: 'Beats a cover inside', line: 'outside' },
+  {
+    pick: 'switchback',
+    label: 'Switchback',
+    tag: 'Fake one way, cut back. Loses to defending hard',
+    line: null,
+  },
+  {
+    pick: 'wait',
+    label: 'Wait for a better run',
+    tag: 'Safe. A stronger attack next lap',
+    line: 'wait',
+  },
 ];
-const MOVES_ATTACK: Array<{ move: string; label: string; tag: string }> = [
-  { move: 'dive-inside', label: 'Dive down the inside', tag: 'Risky' },
-  { move: 'round-outside', label: 'Round the outside', tag: 'Balanced' },
-  { move: 'wait-drs', label: 'Wait for DRS', tag: 'Safer' },
-  { move: 'overtake-button', label: 'Overtake button', tag: 'Safer' },
+const DEFENCES: Array<{ pick: DefendPick; label: string; tag: string; line: BattleLine | null }> = [
+  { pick: 'cover-inside', label: 'Cover the inside', tag: 'Shuts the dive', line: 'inside' },
+  {
+    pick: 'cover-outside',
+    label: 'Cover the outside',
+    tag: 'Shuts the round-the-outside',
+    line: 'outside',
+  },
+  {
+    pick: 'defend-hard',
+    label: 'Defend hard',
+    tag: 'Beats the switchback. Risks contact',
+    line: 'hard',
+  },
 ];
-const BATTLE_WINDOW = 1.5;
+const PICK_WORDS: Record<string, string> = {
+  inside: 'dived down the inside',
+  outside: 'went round the outside',
+  switchback: 'tried the switchback',
+  wait: 'waited for a better run',
+  'cover-inside': 'covered the inside',
+  'cover-outside': 'covered the outside',
+  'defend-hard': 'defended hard',
+};
+
+/** A battle on screen: from its call to a moment after its result. */
+interface ShownBattle {
+  lap: number;
+  corner: number;
+  at: number;
+  attacker: PlayerIndex;
+  /** The result, once the lap is resolved (from the race's battle note). */
+  result: { attack: string; defence: string; outcome: string } | null;
+  stage: 'approach' | 'move' | 'done';
+  zoom: boolean;
+}
 
 function Race({
   view,
@@ -469,13 +520,16 @@ function Race({
   const model = useMemo(() => versusModel(base, setup, seat), [base, setup, seat]);
   const outline = outlineFor(base.race.id);
   const other: PlayerIndex = seat === 0 ? 1 : 0;
+  const theirName = setup.players[other].name;
   const feed = useRef<MapFeed | null>(null);
-  // The map glides from the lap's start to its end while the lap runs.
+  // The map glides from the lap's start to its end while the lap runs (a battle's lap holds at
+  // the braking zone, not yet run, until the picks are in).
   const shown = view.before ?? run.state;
   const race = versusRaceState(shown, model, setup, run.calls);
-  const ahead = view.before
-    ? { race: versusRaceState(run.state, model, setup, run.calls), notes: [] }
-    : null;
+  const ahead =
+    view.before && run.state.lap === view.before.lap + 1
+      ? { race: versusRaceState(run.state, model, setup, run.calls), notes: [] }
+      : null;
   const me = shown.cars[seat];
   const them = shown.cars[other];
   const gap = them.totalTime - me.totalTime; // > 0: we lead
@@ -492,15 +546,127 @@ function Race({
       .find((c) => c.player === seat && c.kind === 'mode' && c.key === key);
     return last && last.kind === 'mode' ? last.value : run.state.cars[seat].modes[key];
   };
-  const fighting =
-    run.state.flag === 'green' && Math.abs(gap) < BATTLE_WINDOW && !view.moments.length;
-  const moveCalled = pending.find((c) => c.kind === 'move' && c.lap === nextLap);
   const lapsLeft = VERSUS_LAPS - shown.lap;
   const flag = run.state.nextFlag !== 'green' ? run.state.nextFlag : shown.flag;
+  const owed = !versusRuleMet(me);
+
+  // The battle (action spec A1): the call raises it, the lap runs to the braking zone, the
+  // picks come in, then the cars take the corner and the result shows there.
+  const [battle, setBattle] = useState<ShownBattle | null>(null);
+  const battleRef = useRef<ShownBattle | null>(null);
+  battleRef.current = battle;
+  const [myPick, setMyPick] = useState<string | null>(null);
+  const [flash, setFlash] = useState<{ text: string; good: boolean; corner: number } | null>(null);
+  const battleMoment = view.moments.find((m) => m.kind === 'battle' && m.player === seat);
+  useEffect(() => {
+    const b = battleMoment?.battle;
+    if (!battleMoment || !b || battleRef.current?.lap === battleMoment.lap) return;
+    setMyPick(null);
+    setBattle({
+      lap: battleMoment.lap,
+      corner: b.corner,
+      at: b.at,
+      attacker: b.attacker,
+      result: null,
+      stage: 'approach',
+      zoom: true,
+    });
+  }, [battleMoment]);
+  // Resolved: the lap has run with the picks in.
+  const note = battle
+    ? run.state.notes.find((n) => n.kind === 'battle' && n.lap === battle.lap)
+    : undefined;
+  useEffect(() => {
+    if (!battle || battle.result || !note?.detail) return;
+    const [attack = '', defence = '', outcome = ''] = note.detail.split('|');
+    setBattle({ ...battle, result: { attack, defence, outcome }, stage: 'move' });
+  }, [battle, note]);
+  // The result shows as the cars reach the corner; the camera eases out after.
+  const clockRef = useRef(view.clock);
+  clockRef.current = view.clock;
+  const stage = battle?.stage;
+  useEffect(() => {
+    if (stage !== 'move') return;
+    let raf = 0;
+    const frame = () => {
+      const b = battleRef.current;
+      const c = clockRef.current;
+      const p = c ? clockProgress(c) : 1;
+      if (b?.result && (p >= b.at + 0.01 || !c)) {
+        const attacking = b.attacker === seat;
+        const o = b.result.outcome;
+        const text =
+          o === 'contact'
+            ? 'CONTACT'
+            : o === 'pass'
+              ? attacking
+                ? 'PASSED'
+                : 'PASSED BY'
+              : o === 'wait'
+                ? attacking
+                  ? 'BIDING TIME'
+                  : 'HELD'
+                : attacking
+                  ? 'HELD UP'
+                  : 'HELD';
+        const good =
+          o === 'contact' ? false : o === 'pass' ? attacking : !attacking || o === 'wait';
+        setFlash({ text, good, corner: b.corner });
+        setBattle({ ...b, stage: 'done' });
+        return;
+      }
+      raf = requestAnimationFrame(frame);
+    };
+    raf = requestAnimationFrame(frame);
+    return () => cancelAnimationFrame(raf);
+  }, [stage, seat]);
+  useEffect(() => {
+    if (stage !== 'done') return;
+    const id = setTimeout(() => {
+      const b = battleRef.current;
+      if (b) setBattle({ ...b, zoom: false });
+    }, 2500);
+    const end = setTimeout(() => setBattle(null), 4500);
+    return () => {
+      clearTimeout(id);
+      clearTimeout(end);
+    };
+  }, [stage]);
+  useEffect(() => {
+    if (!flash) return;
+    const id = setTimeout(() => setFlash(null), 3500);
+    return () => clearTimeout(id);
+  }, [flash]);
+
+  const attacking = battle?.attacker === seat;
+  const picks = attacking ? ATTACKS : DEFENCES;
+  const chosenLine = picks.find((x) => x.pick === (myPick ?? '').split('+')[0])?.line ?? null;
+  const battleView: BattleView | null = battle
+    ? {
+        other: model.rival,
+        corner: battle.corner,
+        at: battle.at,
+        options: picks
+          .map((x, i) => ({ n: i + 1, line: x.line }))
+          .filter((x): x is { n: number; line: BattleLine } => x.line !== null),
+        chosen: chosenLine,
+        zoom: battle.zoom,
+        swap: battle.result ? { at: battle.at } : null,
+      }
+    : null;
+  const answerBattle = (option: string) => {
+    if (!battleMoment) return;
+    setMyPick(option);
+    onAnswer(battleMoment.lap, option);
+  };
+  // A gremlin on the lap running: the radio says so.
+  const gremlin = run.state.notes.find(
+    (n) => n.kind === 'gremlin' && n.lap === shown.lap + (view.before ? 1 : 0),
+  );
 
   return (
     <section className="mx-auto flex max-w-6xl flex-col gap-3 px-3 py-3 md:px-4">
-      <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-[var(--glass-edge)] bg-[var(--glass)] px-3 py-2">
+      <div className="glass flex flex-wrap items-center justify-between gap-2 rounded-xl px-3 py-2">
         <Driver name={setup.players[seat].name} car={setup.players[seat].car} you />
         <span className="flex flex-col items-center">
           <span className="disp text-[22px] tabular-nums">
@@ -510,7 +676,7 @@ function Race({
             {gap >= 0 ? `${gap.toFixed(1)} s ahead` : `${(-gap).toFixed(1)} s behind`}
           </span>
         </span>
-        <Driver name={setup.players[other].name} car={setup.players[other].car} />
+        <Driver name={theirName} car={setup.players[other].car} />
       </div>
       {flag !== 'green' && (
         <div className="rounded bg-[var(--flag)] px-3 py-1 text-center text-[13px] font-extrabold uppercase tracking-[0.14em] text-[#151A1D]">
@@ -520,7 +686,7 @@ function Race({
 
       <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_320px]">
         <div className="flex min-w-0 flex-col gap-3">
-          <div className="relative h-[42vh] min-h-[240px] overflow-hidden rounded-lg border border-[var(--glass-edge)] bg-[var(--glass)] md:h-[56vh]">
+          <div className="relative h-[42vh] min-h-[240px] overflow-hidden rounded-xl border border-[var(--glass-edge)] bg-[var(--ground)] md:h-[56vh]">
             {outline ? (
               <RaceStage
                 raceId={base.race.id}
@@ -536,8 +702,10 @@ function Race({
                   clock={view.clock}
                   selected={null}
                   onSelect={() => undefined}
-                  dim={!!view.moments.length}
+                  dim={!!view.moments.length && !battle}
                   ahead={ahead}
+                  battle={battleView}
+                  flash={flash}
                   carShapes={{
                     [model.userSide]: setup.players[seat].car,
                     [model.rival]: setup.players[other].car,
@@ -548,6 +716,14 @@ function Race({
             ) : (
               <p className="p-8 text-center text-[var(--muted)]">No map for this track.</p>
             )}
+            {gremlin && (
+              <div className="glass-strong absolute left-3 top-3 max-w-[70%] rounded-lg px-3 py-2 text-[13px] font-semibold">
+                <span className="mr-2 text-[11px] font-extrabold uppercase tracking-[0.14em] text-[var(--box)]">
+                  Radio
+                </span>
+                {gremlinText(gremlin.detail, gremlin.player === seat ? null : theirName)}
+              </div>
+            )}
           </div>
 
           {view.waiting ? (
@@ -557,50 +733,50 @@ function Race({
                 <Countdown until={view.waiting.until} /> for them to come back.
               </p>
             </Plate>
+          ) : myMoment?.kind === 'battle' && myMoment.battle ? (
+            <BattleCard
+              key={myMoment.lap}
+              attacking={myMoment.battle.attacker === seat}
+              corner={myMoment.battle.corner}
+              theirName={theirName}
+              gap={Math.abs(gap)}
+              until={view.momentsUntil}
+              boosts={run.state.cars[seat].boosts}
+              canBoost={myMoment.battle.canBoost}
+              onPick={answerBattle}
+            />
           ) : myMoment ? (
             <MomentCard
+              run={run}
               moment={myMoment}
               until={view.momentsUntil}
               me={run.state.cars[seat]}
               them={run.state.cars[other]}
-              theirName={setup.players[other].name}
+              theirName={theirName}
               model={base}
               lapsLeft={VERSUS_LAPS - run.state.lap}
               onAnswer={(o) => onAnswer(myMoment.lap, o)}
             />
+          ) : battle && !battle.result && view.moments.length ? (
+            <Plate tag="Battle · locked in" accent="var(--box)">
+              <p className="m-0 text-[16px] font-bold">
+                You {PICK_WORDS[(myPick ?? '').split('+')[0] ?? ''] ?? 'left it to the driver'}
+                {myPick?.endsWith('+boost') ? ', with a boost' : ''}.{' '}
+                {theirMoment ? `${theirName} is still deciding…` : 'Into the corner…'}
+              </p>
+            </Plate>
+          ) : battle?.result && battle.stage === 'done' ? (
+            <Plate
+              tag={`Turn ${battle.corner} · ${battle.result.outcome === 'pass' ? 'pass' : battle.result.outcome === 'contact' ? 'contact' : 'held'}`}
+              accent={flash?.good ? 'var(--good)' : 'var(--box)'}
+            >
+              <p className="m-0 text-[16px] font-bold">
+                {battleStory(battle.result, battle.attacker === seat, theirName)}
+              </p>
+            </Plate>
           ) : theirMoment ? (
             <Plate tag="Paused" accent="var(--rival)">
               <p className="m-0 text-[16px] font-bold">The other wall is deciding…</p>
-            </Plate>
-          ) : fighting ? (
-            <Plate tag={`Battle · ${gap >= 0 ? 'defending' : 'attacking'}`} accent="var(--box-ink)">
-              <p className="m-0 text-[15px] font-semibold">
-                {gap >= 0
-                  ? `${setup.players[other].name} is ${gap.toFixed(1)} s behind. Next lap's move:`
-                  : `${(-gap).toFixed(1)} s behind ${setup.players[other].name}. Next lap's move:`}
-              </p>
-              <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
-                {(gap >= 0 ? MOVES_DEFEND : MOVES_ATTACK).map((m) => (
-                  <button
-                    key={m.move}
-                    type="button"
-                    className={`call-opt ${moveCalled?.kind === 'move' && moveCalled.move === m.move ? 'main' : ''}`}
-                    disabled={
-                      !!moveCalled ||
-                      (m.move === 'overtake-button' && run.state.cars[seat].battery < 25)
-                    }
-                    onClick={() =>
-                      onCall({ lap: nextLap, kind: 'move', move: m.move } as Omit<
-                        VersusCall,
-                        'player'
-                      >)
-                    }
-                  >
-                    <span className="label">{m.label}</span>
-                    <span className="text-[11px] text-[var(--muted)]">{m.tag}</span>
-                  </button>
-                ))}
-              </div>
             </Plate>
           ) : null}
         </div>
@@ -615,12 +791,17 @@ function Race({
               </span>
             </div>
             <div className="flex justify-between text-[12px] text-[var(--muted)]">
-              <span>Battery {Math.round(me.battery)}%</span>
               <span>
-                Fuel {me.fuel.toFixed(1)} kg
-                {me.stops === 0 && ' · stop still owed'}
+                Boosts {me.boosts}/{BOOSTS}
+                {me.ersFaultUntil > shown.lap + 1 && ' · ERS fault'}
               </span>
+              <span>Fuel {me.fuel.toFixed(1)} kg</span>
             </div>
+            {owed && !boxing && (
+              <p className="m-0 rounded bg-[color-mix(in_srgb,var(--flag)_18%,transparent)] px-2 py-1.5 text-[13px] font-semibold">
+                Stop owed: box by the end of lap {VERSUS_LAPS - 1}
+              </p>
+            )}
             {boxing && boxing.kind === 'pit' ? (
               <p className="m-0 rounded bg-[color-mix(in_srgb,var(--box)_20%,transparent)] px-2 py-1.5 text-[13px] font-semibold">
                 Boxing for {TYRE_NAME[boxing.compound]} at the end of lap {boxing.lap}
@@ -668,21 +849,6 @@ function Race({
               }
             />
             <Modes
-              label="Battery"
-              value={modeOf('ers')}
-              options={[
-                ['harvest', 'Harvest'],
-                ['balanced', 'Balanced'],
-                ['deploy', 'Deploy'],
-              ]}
-              onPick={(v) =>
-                onCall({ lap: nextLap, kind: 'mode', key: 'ers', value: v } as Omit<
-                  VersusCall,
-                  'player'
-                >)
-              }
-            />
-            <Modes
               label="Fuel"
               value={modeOf('fuel')}
               options={[
@@ -697,11 +863,12 @@ function Race({
               }
             />
           </Panel>
-          <Panel title={setup.players[other].name}>
+          <Panel title={theirName}>
             <div className="flex items-center justify-between">
               <TyreBadge compound={them.compound} age={them.tyreAge} />
               <span className="text-[12px] text-[var(--muted)]">
-                {them.stops === 0 ? 'Not stopped yet' : `Stopped ${them.stops}×`}
+                {them.stops === 0 ? 'Not stopped yet' : `Stopped ${them.stops}×`} · Boosts{' '}
+                {them.boosts}
               </span>
             </div>
           </Panel>
@@ -718,6 +885,113 @@ function Race({
         </aside>
       </div>
     </section>
+  );
+}
+
+/** The battle's story in a line: what each did, and how it ended. */
+function battleStory(
+  r: { attack: string; defence: string; outcome: string },
+  attacking: boolean,
+  theirName: string,
+): string {
+  const mine = PICK_WORDS[attacking ? r.attack : r.defence];
+  const theirs = PICK_WORDS[attacking ? r.defence : r.attack];
+  const end =
+    r.outcome === 'contact'
+      ? 'Contact!'
+      : r.outcome === 'pass'
+        ? attacking
+          ? 'You’re through.'
+          : `${theirName} is through.`
+        : r.outcome === 'wait'
+          ? attacking
+            ? 'You’re right with them for the next go.'
+            : 'They’ll come again next lap.'
+          : attacking
+            ? 'The door was shut.'
+            : 'You held on.';
+  return `You ${mine}; ${theirName} ${theirs}. ${end}`;
+}
+
+function gremlinText(kind: string | undefined, other: string | null): string {
+  const who = other ? `${other} has` : 'We have';
+  if (kind === 'ers') return `${who} an ERS fault: no boosts for two laps.`;
+  if (kind === 'flatspot')
+    return other
+      ? `${other} has flat-spotted the tyres. They'll wear quicker until the stop.`
+      : 'Lock-up, we have a flat spot. The tyres will wear quicker until we stop.';
+  return other
+    ? `${other}'s crew has a problem with a wheel gun. Their next stop will be slow.`
+    : 'Problem with a wheel gun in the garage. Our next stop will be slow.';
+}
+
+/** A battle (action spec A1): blind picks on a short clock, an optional boost. */
+function BattleCard({
+  attacking,
+  corner,
+  theirName,
+  gap,
+  until,
+  boosts,
+  canBoost,
+  onPick,
+}: {
+  attacking: boolean;
+  corner: number;
+  theirName: string;
+  gap: number;
+  until: number;
+  boosts: number;
+  canBoost: boolean;
+  onPick: (option: string) => void;
+}) {
+  const left = useCountdown(until);
+  const [boost, setBoost] = useState(false);
+  const list = attacking ? ATTACKS : DEFENCES;
+  return (
+    <Plate tag={`Battle · turn ${corner} · ${left}s`} accent="var(--box)">
+      <p className="m-0 text-[17px] font-bold leading-snug">
+        {attacking
+          ? `${gap.toFixed(1)} s behind ${theirName} into turn ${corner}. Where do you go?`
+          : `${theirName} is ${gap.toFixed(1)} s behind into turn ${corner}. What do you cover?`}
+      </p>
+      <div
+        className={`grid gap-2 ${list.length > 3 ? 'grid-cols-2 lg:grid-cols-4' : 'grid-cols-3'}`}
+      >
+        {list.map((x, i) => (
+          <button
+            key={x.pick}
+            type="button"
+            className="call-opt"
+            onClick={() => onPick(boost ? `${x.pick}+boost` : x.pick)}
+          >
+            <span className="label">
+              <span className="mr-1.5 text-[var(--muted)]">{i + 1}</span>
+              {x.label}
+            </span>
+            <span className="text-[11px] text-[var(--muted)]">{x.tag}</span>
+          </button>
+        ))}
+      </div>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <button
+          type="button"
+          aria-pressed={boost}
+          disabled={!canBoost}
+          onClick={() => setBoost(!boost)}
+          className={`rounded-full border px-3 py-1.5 text-[13px] font-bold ${
+            boost
+              ? 'border-[var(--you)] bg-[color-mix(in_srgb,var(--you)_20%,transparent)]'
+              : 'border-[var(--glass-edge)]'
+          } disabled:opacity-40`}
+        >
+          Boost {boost ? 'on' : 'off'} · {boosts} left
+        </button>
+        <span className="text-[12px] text-[var(--muted)]">
+          Blind: {theirName} can’t see your pick. No pick: your driver chooses.
+        </span>
+      </div>
+    </Plate>
   );
 }
 
@@ -818,6 +1092,7 @@ function Countdown({ until }: { until: number }) {
 
 /** A big call (spec V3): the question from the race as it stands, the options, the clock. */
 function MomentCard({
+  run,
   moment,
   until,
   me,
@@ -827,6 +1102,7 @@ function MomentCard({
   lapsLeft,
   onAnswer,
 }: {
+  run: VersusRun;
   moment: VersusMoment;
   until: number;
   me: VersusCarState;
@@ -838,29 +1114,45 @@ function MomentCard({
 }) {
   const left = useCountdown(until);
   const life = Math.max(0, Math.round(lifeOf(model, me.compound) - me.tyreWear));
-  const gap = them.totalTime - me.totalTime;
+  const gap = them.totalTime - me.totalTime; // > 0: we lead
   const t = model.track;
+  const tyre = (c: string) => TYRE_NAME[c]?.toLowerCase() ?? c;
+  // Where a stop now would put you: the pit lane's cost (and the cold out-lap) against the gap.
+  const rejoin = -gap + t.pitLoss + OUT_LAP_COST; // > 0: behind them after the stop
+  const rejoinText =
+    rejoin > 0 ? `about ${rejoin.toFixed(1)} s behind` : `about ${(-rejoin).toFixed(1)} s ahead`;
+  // The undercut: what the best fresh tyre that lasts to the flag takes back on the out-lap
+  // against theirs (and, covering, what theirs would take back on you).
+  const best = (car: VersusCarState) =>
+    TYRES.filter((c) => c !== car.compound && model.compounds[c])
+      .filter((c) => lifeOf(model, c) >= lapsLeft - 1)
+      .map((c) => ({ c, edge: undercutEdge(run, car.player, c) }))
+      .sort((x, y) => y.edge - x.edge)[0] ?? { c: 'HARD', edge: 0 };
+  const { c: fresh, edge } = best(me);
+  const theirEdge = best(them).edge;
   const text =
     moment.kind === 'neutral'
       ? `The safety car is coming out. A stop under it costs about ${t.pitLossUnderSC.toFixed(0)} s instead of ${t.pitLoss.toFixed(0)} s. Box?`
-      : moment.kind === 'theyPitted'
-        ? `${theirName} has pitted for ${TYRE_NAME[them.compound]?.toLowerCase() ?? them.compound}. Box to answer, or stay out?`
-        : moment.kind === 'finalLaps'
-          ? `${lapsLeft} laps to go, ${Math.abs(gap).toFixed(1)} s ${gap >= 0 ? 'ahead of' : 'behind'} ${theirName}. How do we race it?`
-          : me.stops === 0 && lapsLeft <= 2
-            ? `Last chance: the stop is still owed. Stay out now and you're classified last.`
-            : `About ${life} ${life === 1 ? 'lap' : 'laps'} left in these ${TYRE_NAME[me.compound]?.toLowerCase()}, ${lapsLeft} to go${me.stops === 0 ? ', and the stop is still owed' : ''}. Box, or stay out?`;
+      : moment.kind === 'restart'
+        ? 'Safety car in this lap. Jump the restart (the stewards catch about one in three: 3 s penalty) or go normally?'
+        : moment.kind === 'theyPitted'
+          ? `${theirName} has pitted for ${tyre(them.compound)}. Box to answer (you'd rejoin ${rejoinText} of them, on fresh tyres too), or stay out and go long?`
+          : moment.kind === 'undercut'
+            ? `${(-gap).toFixed(1)} s behind ${theirName}. Undercut? Fresh ${tyre(fresh)} should be about ${edge.toFixed(1)} s quicker on the out-lap than their ${them.tyreAge}-lap-old ${tyre(them.compound)}: if they stop a lap after you, you come out about ${Math.abs(edge + gap).toFixed(1)} s ${edge + gap >= 0 ? 'ahead' : 'behind'}.`
+            : moment.kind === 'cover'
+              ? `${theirName} is ${gap.toFixed(1)} s behind on ${them.tyreAge}-lap-old ${tyre(them.compound)}. If they box first, fresh tyres take back about ${Math.max(0, theirEdge).toFixed(1)} s: ${theirEdge > gap ? 'enough to get by' : 'not quite enough'}. Box to cover it, or stay out and go long?`
+              : me.stops === 0 && lapsLeft <= 2
+                ? 'Last chance: the stop is still owed. Stay out now and you’re classified last.'
+                : `These ${tyre(me.compound)} have about ${life} ${life === 1 ? 'lap' : 'laps'} left and there are ${lapsLeft} to go. They won’t make the flag. Box?`;
   const options = versusOptions(moment);
   const label = (o: string) =>
     o.startsWith('box-')
       ? `Box: ${TYRE_NAME[o.slice(4)]}`
       : o === 'stay'
         ? 'Stay out'
-        : o === 'attack'
-          ? 'Attack'
-          : o === 'defend'
-            ? 'Defend'
-            : 'Race him normally';
+        : o === 'early'
+          ? 'Jump the restart'
+          : 'Go normally';
   return (
     <Plate tag={`Your call · ${left}s`} accent="var(--you)">
       <p className="m-0 text-[17px] font-bold leading-snug">{text}</p>
@@ -879,7 +1171,8 @@ function MomentCard({
         ))}
       </div>
       <p className="m-0 text-[12px] text-[var(--muted)]">
-        No answer by then: stay out (or race him normally). They can't see your call.
+        No answer by then: {moment.kind === 'restart' ? 'go normally' : 'stay out'}. They can’t see
+        your call.
       </p>
     </Plate>
   );
@@ -888,25 +1181,30 @@ function MomentCard({
 function Feed({ run, seat, upTo }: { run: VersusRun; seat: PlayerIndex; upTo: number }) {
   const names = run.setup.players.map((p) => p.name);
   const lines = run.state.notes
-    .filter((n) => n.lap <= upTo)
+    .filter((n) => n.lap <= upTo && n.kind !== 'pass' && n.kind !== 'held')
     .slice(-6)
     .reverse()
     .map((n) => {
       const who = n.player === seat ? 'You' : names[n.player];
+      const [atk, , outcome] = (n.detail ?? '').split('|');
       const text =
         n.kind === 'pit'
           ? `${who} pitted for ${TYRE_NAME[n.detail ?? '']?.toLowerCase() ?? n.detail}`
-          : n.kind === 'pass'
-            ? `${who} got past`
-            : n.kind === 'held'
-              ? `${who} held on`
-              : n.kind === 'wing'
-                ? `${who} damaged the front wing`
-                : n.kind === 'contact'
-                  ? `${who} spun after contact`
-                  : n.kind === 'fuel'
-                    ? `${who} ran out of fuel`
-                    : `${who} made a mistake`;
+          : n.kind === 'battle'
+            ? `${who} ${PICK_WORDS[atk ?? ''] ?? 'attacked'}: ${outcome === 'pass' ? 'through' : outcome === 'contact' ? 'contact' : 'no way by'}`
+            : n.kind === 'gremlin'
+              ? `${who === 'You' ? 'Your' : `${who}’s`} car: ${n.detail === 'ers' ? 'ERS fault' : n.detail === 'flatspot' ? 'flat-spotted tyres' : 'slow stop coming'}`
+              : n.kind === 'penalty'
+                ? `${who} jumped the restart: 3 s penalty`
+                : n.kind === 'jump'
+                  ? `${who} got a flying restart`
+                  : n.kind === 'wing'
+                    ? `${who} damaged the front wing`
+                    : n.kind === 'contact'
+                      ? `${who} spun after contact`
+                      : n.kind === 'fuel'
+                        ? `${who} ran out of fuel`
+                        : `${who} made a mistake`;
       return { lap: n.lap, text };
     });
   if (!lines.length) return null;
@@ -937,12 +1235,29 @@ const BAND_COLOR: Record<string, string> = {
 function Result({
   outcome,
   seat,
+  model,
 }: {
   outcome: VersusOutcome;
   seat: PlayerIndex | null;
   model: RaceModel | null;
 }) {
   const names = outcome.players.map((p) => p.name);
+  // The battles, from the race replayed with its calls: who won each (a pass for the attacker,
+  // a hold for the defender).
+  const battles = useMemo(() => {
+    if (!model) return null;
+    const { run } = simulateVersus(model, outcome.setup, outcome.calls);
+    const notes = run.state.notes.filter((n) => n.kind === 'battle');
+    const won: [number, number] = [0, 0];
+    let contact = 0;
+    for (const n of notes) {
+      const r = n.detail?.split('|')[2];
+      if (r === 'contact') contact++;
+      else if (r === 'pass') won[n.player]++;
+      else if (r === 'held') won[n.player === 0 ? 1 : 0]++;
+    }
+    return { total: notes.length, won, contact };
+  }, [model, outcome]);
   const score = outcome.score;
   const winner: PlayerIndex | null =
     outcome.forfeit !== undefined ? (outcome.forfeit === 0 ? 1 : 0) : (score?.winner ?? null);
@@ -951,11 +1266,7 @@ function Result({
   const by =
     outcome.forfeit !== undefined
       ? `${names[outcome.forfeit]} retired from the race.`
-      : score?.by === 'score'
-        ? 'On the calls.'
-        : score?.by === 'chance'
-          ? 'Calls level: decided on the average chance of the calls made.'
-          : 'Calls level: decided on the road.';
+      : 'First past the flag.';
   return (
     <section className="mx-auto flex max-w-3xl flex-col gap-6 px-4 py-10">
       <div className="flex flex-col items-center gap-2 text-center">
@@ -963,20 +1274,26 @@ function Result({
           {versusTrack(outcome.setup.track).name} · head to head
         </p>
         <h1 className="disp text-[40px] leading-tight">{headline}</h1>
-        {score && (
-          <p className="disp m-0 text-[26px] tabular-nums">
-            {Math.round(score.scores[0].score)} <span className="text-[var(--muted)]">vs</span>{' '}
-            {Math.round(score.scores[1].score)}
-          </p>
-        )}
         <p className="m-0 text-[14px] text-[var(--muted)]">{by}</p>
         {score && (
-          <p className="m-0 text-[14px]">
-            On the road: {names[score.road.order[0] as number]} first, {score.road.gap.toFixed(1)} s
-            ahead
+          <p className="m-0 text-[15px]">
+            {names[score.road.order[0] as number]} by {score.road.gap.toFixed(1)} s
             {score.road.disqualified.length > 0 &&
               ` (${score.road.disqualified.map((p) => names[p]).join(' and ')} never stopped: classified last)`}
             .
+          </p>
+        )}
+        {battles && battles.total > 0 && (
+          <p className="m-0 text-[14px] text-[var(--muted)]">
+            {battles.total} {battles.total === 1 ? 'battle' : 'battles'}: {names[0]} won{' '}
+            {battles.won[0]}, {names[1]} won {battles.won[1]}
+            {battles.contact > 0 && `, ${battles.contact} ended in contact`}.
+          </p>
+        )}
+        {score && (
+          <p className="m-0 text-[13px] text-[var(--muted)]">
+            Strategy calls: {names[0]} {Math.round(score.scores[0].score)}, {names[1]}{' '}
+            {Math.round(score.scores[1].score)}
           </p>
         )}
       </div>
@@ -1034,7 +1351,5 @@ function Result({
 
 function optionText(id: string): string {
   if (id.startsWith('box-')) return `Boxed for ${TYRE_NAME[id.slice(4)]?.toLowerCase()}`;
-  if (id === 'stay') return 'Stayed out';
-  if (id === 'hold') return 'Raced him normally';
-  return id === 'attack' ? 'Attacked' : 'Defended';
+  return 'Stayed out';
 }

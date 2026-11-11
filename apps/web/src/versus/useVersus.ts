@@ -123,8 +123,13 @@ export function useVersus(code: string, name: string) {
       let clock: LapClock | null = null;
       if (sync.running) {
         before = structuredClone(run.state);
-        stepVersus(run);
-        clock = { start: performance.now() - sync.running.elapsed, ms: sync.running.ms };
+        // A battle's lap waiting for its picks isn't resolved yet: it holds at the braking zone.
+        if (!sync.running.held) stepVersus(run);
+        clock = {
+          start: performance.now() - sync.running.elapsed,
+          ms: sync.running.ms,
+          ...(sync.running.held ? { until: sync.running.brake } : {}),
+        };
       }
       runRef.current = run;
       patch((v) => ({
@@ -179,13 +184,25 @@ export function useVersus(code: string, name: string) {
           }
           break;
         case 'moments':
-          patch({
-            moments: m.moments,
-            momentsUntil: m.until,
-            answered: [],
-            clock: null,
-            before: null,
-          });
+          // A battle's lap runs to its braking zone while the picks are made (not stepped: the
+          // picks decide it); other calls pause the race between laps.
+          patch(
+            m.approach && run
+              ? {
+                  moments: m.moments,
+                  momentsUntil: m.until,
+                  answered: [],
+                  before: structuredClone(run.state),
+                  clock: { start: performance.now(), ms: m.approach.ms, until: m.approach.brake },
+                }
+              : {
+                  moments: m.moments,
+                  momentsUntil: m.until,
+                  answered: [],
+                  clock: null,
+                  before: null,
+                },
+          );
           break;
         case 'answered':
           patch((v) => ({ answered: [...v.answered, m.player] }));
@@ -198,7 +215,8 @@ export function useVersus(code: string, name: string) {
             patch((v) => ({
               before,
               moments: [],
-              clock: { start: performance.now(), ms: m.ms },
+              // After a battle the lap runs on from its braking zone.
+              clock: { start: performance.now() - (m.from ?? 0) * m.ms, ms: m.ms },
               tick: v.tick + 1,
             }));
           }
