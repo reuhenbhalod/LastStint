@@ -354,7 +354,10 @@ const RACE_TABLE: Record<number, ReadonlyArray<readonly [string, string]>> = {
       'Ferrari brings the leader in first on lap 24; McLaren keeps Häkkinen out four more laps on a light car to jump him in the pits',
     ],
     ['europe-1997', 'The title decider at Jerez'],
-    ['hungary-1998', 'Ferrari switches to three stops mid-race'],
+    [
+      'brazil-1999',
+      'Held up behind Schumacher until Ferrari stops first: four laps to push and overcut him',
+    ],
     [
       'germany-1996',
       'Boxed in behind the one-stopping Benettons: a short first stop for Hill to find clear air',

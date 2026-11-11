@@ -15,13 +15,7 @@
  },
  "timingGaps": [],
  "driversFromJolpica": [],
- "driversWithoutCode": [
-  {
-   "name": "St\u00e9phane Sarrazin",
-   "reference": "sarrazin",
-   "why": "no code"
-  }
- ],
+ "driversWithoutCode": [],
  "results": [
   {
    "driver": "HAK",
@@ -234,7 +228,7 @@
    "points": 0.0
   },
   {
-   "driver": "sarrazin",
+   "driver": "SARS",
    "name": "St\u00e9phane Sarrazin",
    "team": "Minardi",
    "number": 20,
@@ -362,7 +356,7 @@
    "detail": "Clutch"
   },
   {
-   "driver": "sarrazin",
+   "driver": "SARS",
    "laps": 31,
    "status": "accident",
    "detail": "Spun off"
@@ -528,7 +522,7 @@
    },
    {
     "position": null,
-    "driver": "sarrazin",
+    "driver": "SARS",
     "name": "St\u00e9phane Sarrazin",
     "points": 0.0,
     "wins": 0
@@ -858,6 +852,13 @@
      "fuelKg": 40.8
     },
     {
+     "driver": "SARS",
+     "stint": 1,
+     "fromLap": 1,
+     "laps": 31,
+     "fuelKg": 52.7
+    },
+    {
      "driver": "SCH",
      "stint": 1,
      "fromLap": 1,
@@ -947,13 +948,6 @@
      "fromLap": 43,
      "laps": 1,
      "fuelKg": 1.7
-    },
-    {
-     "driver": "sarrazin",
-     "stint": 1,
-     "fromLap": 1,
-     "laps": 31,
-     "fuelKg": 52.7
     }
    ]
   },

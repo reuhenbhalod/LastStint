@@ -2374,6 +2374,8 @@ RACES: dict[str, dict] = {
         "takeover_lap": None,  # D3 rule
         "seed": 1,
         # Eras side by hard calls (Eras 6.2 re-author, the honest grader: COU 2, MSCM 0).
+        # Swapped out of Era 3 for brazil-1999 (Nov 10, migration 0029): unwinnable at Legend
+        # with the Expert rival grader fix. Kept as a rules-only Eras-build fixture.
         "user_side": "COU",
         "rival": "MSCM",
         "score_positions": 6,
@@ -2554,7 +2556,8 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
-    # Eras 3 scout 4 (eras-scout4-era3): swap candidates for hungary-1998, measured only.
+    # Eras 3 scout 4 (eras-scout4-era3): swap candidates for hungary-1998. brazil-1999 went in;
+    # canada-1996 and japan-1999 are measured only.
     "canada-1996": {
         "year": 1996,
         "event": "Canadian",
@@ -2574,12 +2577,13 @@ RACES: dict[str, dict] = {
         "year": 1999,
         "event": "Brazilian",
         "source": "jolpica",
-        "name": "Brazil 1999: Hakkinen vs Schumacher",
+        "name": "Brazil 1999: Häkkinen vs Schumacher",
         "era": "1994-2009",
         "takeover_lap": None,  # D3 rule
         "seed": 1,
-        # Swap candidate for hungary-1998 (Era 3). Side provisional until `pipeline hard-calls`:
-        # one stop each, Schumacher in on lap 38 and Hakkinen on lap 42 (F1DB); hard-calls 0-0.
+        # Swapped in for hungary-1998 (Era 3 #7, Nov 10, migration 0029;
+        # docs/eras-checks/b1-brazil-1999.md). One stop each, Schumacher in on lap 38 and
+        # Häkkinen on lap 42 (F1DB). Hard calls HAK 0, MSCM 0: the race-file side.
         "user_side": "HAK",
         "rival": "MSCM",
         "score_positions": 6,

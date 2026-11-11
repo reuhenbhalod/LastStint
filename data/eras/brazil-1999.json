@@ -7,5 +7,31 @@
     "drs": false,
     "ers": "none",
     "refuelling": true
+  },
+  "eras": {
+    "eraId": 3,
+    "order": 7,
+    "userSide": "HAK",
+    "target": {
+      "type": "win"
+    },
+    "storyline": {
+      "real": "Häkkinen leads from pole until a transmission glitch on lap 4 lets Barrichello and Schumacher by. Schumacher leads after Barrichello's lap-27 stop, with Häkkinen held up behind him. Ferrari bring Schumacher in on lap 38; Häkkinen pushes for a few laps, stops on lap 42 and comes out still in front. He wins by 4.9 s."
+    },
+    "mastery": {
+      "type": "margin",
+      "seconds": 4.9,
+      "label": "Win by more than 4.9 seconds"
+    },
+    "hidden": {
+      "type": "stop_count",
+      "exact": 1,
+      "label": "Win on one stop"
+    },
+    "hardCalls": {
+      "HAK": 0,
+      "MSCM": 0
+    },
+    "briefing": "Interlagos, 1999. Häkkinen started on pole, but a transmission glitch on lap 4 dropped him behind Barrichello and Schumacher. You run Häkkinen, second after 35 laps and 1.1 s behind Schumacher, both on one stop. Ferrari will pit first: stay out, find the time and win."
   }
 }
