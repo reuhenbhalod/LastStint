@@ -12,8 +12,10 @@
 //   POST /api/admin/repin              re-pin today's and later days to their race file's
 //                                      current hash (days that have runs are left alone)
 //   POST /api/admin/runs/clear         { date }: delete your own run(s) on a day, to replay it
+//   GET  /api/admin/players            every signed-up account, newest first (adminPlayers.ts)
 
 import type { Context } from 'hono';
+import { listPlayers } from './adminPlayers.js';
 import { authConfigured, verifyCredential } from './auth.js';
 import { addDays, isDate, todayUtc } from './dates.js';
 import type { Env } from './index.js';
@@ -253,5 +255,10 @@ export function registerAdmin(app: import('hono').Hono<{ Bindings: Env }>) {
     const b = await body(c);
     if (!isDate(b.date)) throw new ApiError(400, 'bad-request');
     return c.json(await clearOwnRuns(c.env.DB, who.sub, b.date as string));
+  });
+
+  app.get('/api/admin/players', async (c) => {
+    await requireAdmin(c);
+    return c.json(await listPlayers(c.env.DB));
   });
 }
