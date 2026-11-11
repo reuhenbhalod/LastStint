@@ -6,6 +6,7 @@
 import { ERA_UNLOCK_SHARE } from '@laststint/sim';
 import { type ReactNode, useCallback, useEffect, useState } from 'react';
 import { Disclaimer } from '../components/Disclaimer.js';
+import { GroundBackdrop } from '../components/GroundBackdrop.js';
 import { TopBar } from '../components/TopBar.js';
 import { EraDetailBody } from './EraDetail.js';
 import { EraMapBody } from './EraMap.js';
@@ -20,6 +21,7 @@ import {
   HISTORY_PATH,
   eraLeaderboardPath,
   raceName,
+  racesOfEra,
 } from './catalog.js';
 import { type EraDetailState, loadEraDetail } from './eraDetailState.js';
 import { type EraMapState, loadEraMap } from './eraMapState.js';
@@ -34,9 +36,12 @@ function Header() {
   return <TopBar active="eras" />;
 }
 
-function Shell({ children }: { children: ReactNode }) {
+/** An Eras page: the top bar, the page, the data credit. `backdrop`: a race whose circuit
+ * stands behind the page on its real ground, dimmed (realistic UI spec). */
+function Shell({ children, backdrop }: { children: ReactNode; backdrop?: string }) {
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="relative isolate flex min-h-screen flex-col">
+      {backdrop && <GroundBackdrop raceId={backdrop} dim={0.28} />}
       <Header />
       <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-4 py-8 sm:px-6">
         {children}
@@ -138,7 +143,7 @@ export function EraDetailScreen({
   }, [api, era.id, attempt]);
 
   return (
-    <Shell>
+    <Shell backdrop={racesOfEra(era.id)[0]?.raceId}>
       <a href="/eras" className="text-[13px] text-[var(--muted)] underline hover:text-[var(--ink)]">
         All eras
       </a>
@@ -234,7 +239,7 @@ export function RaceLeaderboardScreen({
   }, [api, race.raceId, legend, attempt]);
 
   return (
-    <Shell>
+    <Shell backdrop={race.raceId}>
       <a
         href={`/eras/${era.id}`}
         className="text-[13px] text-[var(--muted)] underline hover:text-[var(--ink)]"

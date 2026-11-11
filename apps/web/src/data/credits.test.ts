@@ -9,7 +9,16 @@ describe('the sources', () => {
   it('lists each source once, with a link', () => {
     const ids = SOURCES.map((s) => s.id);
     expect(new Set(ids).size).toBe(ids.length);
-    expect(ids).toEqual(['tum', 'jolpica', 'f1db', 'openf1', 'fastf1', 'multiviewer']);
+    expect(ids).toEqual([
+      'tum',
+      'jolpica',
+      'f1db',
+      'osm',
+      'openf1',
+      'fastf1',
+      'multiviewer',
+      'terrain',
+    ]);
     for (const s of SOURCES) expect(s.url).toMatch(/^https:\/\//);
   });
 

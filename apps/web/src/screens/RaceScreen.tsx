@@ -31,6 +31,7 @@ import { GroundBackdrop } from '../components/GroundBackdrop.js';
 import { ChequeredIcon, OvertakeIcon, SoundOffIcon, SoundOnIcon } from '../components/Icons.js';
 import { LeadersTower } from '../components/LeadersTower.js';
 import { LiveGrades } from '../components/LiveGrades.js';
+import { MapCredit } from '../components/MapCredit.js';
 import { RadioMark, TimingMark } from '../components/Marks.js';
 import { Panel } from '../components/Panel.js';
 import { PitCard } from '../components/PitCard.js';
@@ -1119,6 +1120,7 @@ function RaceScreenBody({
             data-tour="map"
             className={`absolute inset-0 flex flex-col overflow-hidden bg-[var(--ground)] ${stats ? 'md:rounded-xl' : ''} ${paused ? 'map-alert' : ''}`}
           >
+            <MapCredit raceId={model.race.id} className="absolute right-2 top-1.5 z-10" />
             {wetNow >= 0.03 && (
               <div
                 aria-hidden="true"

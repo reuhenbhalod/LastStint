@@ -28,6 +28,7 @@ import {
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ApiError, apiPost } from '../api.js';
 import { GroundBackdrop } from '../components/GroundBackdrop.js';
+import { MapCredit } from '../components/MapCredit.js';
 import { TopBar } from '../components/TopBar.js';
 import { type BattleView, TrackMap } from '../components/TrackMap.js';
 import { TyreBadge } from '../components/TyreBadge.js';
@@ -680,6 +681,7 @@ function Race({
       <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_320px]">
         <div className="flex min-w-0 flex-col gap-3">
           <div className="relative h-[42vh] min-h-[240px] overflow-hidden rounded-xl border border-[var(--glass-edge)] bg-[var(--ground)] md:h-[56vh]">
+            <MapCredit raceId={base.race.id} className="absolute right-2 bottom-1.5 z-10" />
             {outline ? (
               <RaceStage
                 raceId={base.race.id}

@@ -9,7 +9,15 @@
 // - <race-id>.reconstruction.json: a reconstructed race, from Jolpica results and F1DB.
 // The race file's own `provenance` block (kind, estimated fields) doesn't name its sources.
 
-export type SourceId = 'tum' | 'jolpica' | 'f1db' | 'openf1' | 'fastf1' | 'multiviewer';
+export type SourceId =
+  | 'tum'
+  | 'jolpica'
+  | 'f1db'
+  | 'osm'
+  | 'openf1'
+  | 'fastf1'
+  | 'multiviewer'
+  | 'terrain';
 
 export interface Licence {
   name: string;
@@ -41,6 +49,10 @@ const BY_NC_SA_3: Licence = {
 const BY_NC_SA_4: Licence = {
   name: 'CC BY-NC-SA 4.0',
   url: 'https://creativecommons.org/licenses/by-nc-sa/4.0/',
+};
+const ODBL: Licence = {
+  name: 'ODbL 1.0',
+  url: 'https://opendatacommons.org/licenses/odbl/1-0/',
 };
 const BY_4: Licence = { name: 'CC BY 4.0', url: 'https://creativecommons.org/licenses/by/4.0/' };
 
@@ -80,6 +92,17 @@ export const SOURCES: readonly Source[] = [
     shareAlike: false,
   },
   {
+    id: 'osm',
+    name: 'OpenStreetMap',
+    by: 'OpenStreetMap contributors',
+    url: 'https://www.openstreetmap.org/copyright',
+    gives:
+      'The ground around every circuit on the race map: grass, trees, water, buildings, grandstands, barriers and roads (pipeline basemap).',
+    licence: ODBL,
+    shareAlike: false,
+    note: 'The maps are drawn from the data (a produced work), so the credit is what the licence asks.',
+  },
+  {
     id: 'openf1',
     name: 'OpenF1',
     url: 'https://openf1.org',
@@ -106,6 +129,16 @@ export const SOURCES: readonly Source[] = [
     licence: null,
     shareAlike: false,
     note: 'The circuit information FastF1 also reads. MultiViewer publishes no terms for it.',
+  },
+  {
+    id: 'terrain',
+    name: 'Terrain Tiles',
+    by: 'Mapzen, on the Registry of Open Data on AWS',
+    url: 'https://github.com/tilezen/joerd/blob/master/docs/attribution.md',
+    gives: 'The hill shading on the race map.',
+    licence: null,
+    shareAlike: false,
+    note: 'Built from SRTM, GMTED, ETOPO1 and national elevation data; the linked page lists every source.',
   },
 ];
 

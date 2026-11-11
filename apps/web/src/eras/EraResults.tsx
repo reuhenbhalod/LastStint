@@ -142,8 +142,8 @@ function Note({ children, tone = 'muted' }: { children: ReactNode; tone?: 'muted
     <p
       className={`m-0 rounded-md border px-3.5 py-3 text-[13px] ${
         tone === 'box'
-          ? 'border-[var(--box)] bg-[color-mix(in_srgb,var(--box)_14%,#0F1312)]'
-          : 'border-[#1F2523] bg-[#0F1312] text-[#B7BEBA]'
+          ? 'border-[var(--box)] bg-[color-mix(in_srgb,var(--box)_14%,var(--glass-strong))]'
+          : 'border-[var(--glass-edge)] bg-[var(--glass)] backdrop-blur text-[var(--ink)]'
       }`}
     >
       {children}
@@ -158,7 +158,7 @@ function SubmitStatus({ sub, onRetry }: { sub: Submission; onRetry: () => void }
     return (
       <div
         role="alert"
-        className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-[var(--box)] bg-[color-mix(in_srgb,var(--box)_14%,#0F1312)] px-3.5 py-3 text-[13px]"
+        className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-[var(--box)] bg-[color-mix(in_srgb,var(--box)_14%,var(--glass-strong))] px-3.5 py-3 text-[13px]"
       >
         <span className="min-w-0 flex-1">No stars yet. {sub.error}</span>
         {sub.retry !== false && (
@@ -198,10 +198,10 @@ export function EraResultsPanel({
   return (
     <section
       aria-label="Stars"
-      className="flex flex-col gap-3 rounded-lg border border-[#1F2523] bg-[#0F1312] p-4"
+      className="flex flex-col gap-3 rounded-lg border border-[var(--glass-edge)] bg-[var(--glass)] backdrop-blur p-4"
     >
       <div className="flex items-center justify-between gap-3">
-        <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#8D9692]">
+        <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--muted)]">
           {info.legend ? 'Legend stars' : 'Stars'} · Era {info.era.id}
         </span>
         {result?.untimed && (
@@ -219,12 +219,12 @@ export function EraResultsPanel({
           <EraStars stars={result.stars} newStars={result.newStars} />
           <dl className="m-0 grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-0.5">
-              <dt className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#8D9692]">
+              <dt className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--muted)]">
                 Accuracy
               </dt>
               <dd className="m-0">
                 <span className="mono text-[22px] font-bold">{accuracyText(result.accuracy)}</span>
-                <span className="block text-[12px] text-[#B7BEBA]">
+                <span className="block text-[12px] text-[var(--ink)]">
                   ★2 needs {threshold}:{' '}
                   {result.accuracy >= threshold
                     ? 'reached'
@@ -233,19 +233,19 @@ export function EraResultsPanel({
               </dd>
             </div>
             <div className="flex flex-col gap-0.5">
-              <dt className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#8D9692]">
+              <dt className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--muted)]">
                 Rank on this race
               </dt>
               <dd className="m-0">
                 <span className="mono text-[22px] font-bold">
                   {result.total > 0 ? `${result.rank}/${result.total}` : '-'}
                 </span>
-                <span className="block text-[12px] text-[#B7BEBA]">by best accuracy</span>
+                <span className="block text-[12px] text-[var(--ink)]">by best accuracy</span>
               </dd>
             </div>
           </dl>
           {result.untimed && (
-            <p className="m-0 text-[12px] text-[#8D9692]">
+            <p className="m-0 text-[12px] text-[var(--muted)]">
               Untimed: the decision timer was off, so these stars are marked untimed.
             </p>
           )}
@@ -256,18 +256,18 @@ export function EraResultsPanel({
               </span>
               <p className="disp m-0 text-[18px] leading-snug">{rewriteHeadline(model)}</p>
               {result.historyEntry && (
-                <span className="text-[12px] text-[#B7BEBA]">Added to your history book.</span>
+                <span className="text-[12px] text-[var(--ink)]">Added to your history book.</span>
               )}
             </div>
           )}
-          {community && <p className="m-0 text-[13px] text-[#B7BEBA]">{community}</p>}
+          {community && <p className="m-0 text-[13px] text-[var(--ink)]">{community}</p>}
           {hidden && allStars(result.progress.stars) && (
             <div className="flex flex-col gap-1 rounded-md border border-[#262C2A] px-3 py-2.5">
-              <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#8D9692]">
+              <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--muted)]">
                 Hidden objective
               </span>
               <span className="text-[14px] font-semibold">{hidden.label}</span>
-              <span className="text-[12px] text-[#B7BEBA]">
+              <span className="text-[12px] text-[var(--ink)]">
                 {result.hidden === true
                   ? 'Done on this attempt: added to your history book.'
                   : result.progress.hiddenDone
@@ -288,7 +288,7 @@ export function EraResultsPanel({
  * leaderboard (the Legend one after a Legend attempt) and the history book. */
 export function EraResultActions({ info }: { info: ErasResultInfo }) {
   const link =
-    'flex items-center justify-center rounded-md border border-[#262C2A] px-2 py-2.5 text-center text-[13px] font-semibold text-[#B7BEBA] hover:border-[#6B736F]';
+    'flex items-center justify-center rounded-md border border-[#262C2A] px-2 py-2.5 text-center text-[13px] font-semibold text-[var(--ink)] hover:border-[#6B736F]';
   return (
     <div className="flex flex-col gap-3">
       <div className="grid grid-cols-2 gap-3">
