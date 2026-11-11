@@ -472,8 +472,10 @@ function Race({
   const feed = useRef<MapFeed | null>(null);
   // The map glides from the lap's start to its end while the lap runs.
   const shown = view.before ?? run.state;
-  const race = versusRaceState(shown, model, setup);
-  const ahead = view.before ? { race: versusRaceState(run.state, model, setup), notes: [] } : null;
+  const race = versusRaceState(shown, model, setup, run.calls);
+  const ahead = view.before
+    ? { race: versusRaceState(run.state, model, setup, run.calls), notes: [] }
+    : null;
   const me = shown.cars[seat];
   const them = shown.cars[other];
   const gap = them.totalTime - me.totalTime; // > 0: we lead

@@ -7,6 +7,7 @@ import type {
   PlayerIndex,
   RaceModel,
   RaceState,
+  VersusCall,
   VersusSetup,
   VersusState,
 } from '@boxthislap/sim';
@@ -50,11 +51,14 @@ export function versusModel(base: RaceModel, setup: VersusSetup, me: PlayerIndex
   };
 }
 
-/** The versus state as a solo RaceState for the map. */
+/** The versus state as a solo RaceState for the map. The pit calls known so far become each
+ * car's strategy, so the map drives it down the pit lane: a stop called for lap L boxes at the
+ * end of it, and its out-lap (the solo strategy's lap) is L + 1. */
 export function versusRaceState(
   state: VersusState,
   model: RaceModel,
   setup: VersusSetup,
+  calls: readonly VersusCall[] = [],
 ): RaceState {
   const codes = codesFor(setup);
   const cars: Record<string, CarState> = {};
@@ -71,7 +75,9 @@ export function versusRaceState(
       tyreWear: c.tyreWear,
       compoundsUsed: [...c.compoundsUsed],
       totalTime: c.totalTime,
-      strategy: [],
+      strategy: calls.flatMap((x) =>
+        x.player === c.player && x.kind === 'pit' ? [{ lap: x.lap + 1, to: x.compound }] : [],
+      ),
       pittedThisLap: c.pittedThisLap,
       retired: false,
       retiredLap: null,
