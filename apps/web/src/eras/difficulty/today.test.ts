@@ -246,7 +246,8 @@ const TODAY = {
     stats: '41a6d50080639e8b',
   },
   // Before the merge: '79aa9a7697842f85' (8.8's phone spacing), 'a3ff5c603c39a2f9' (before 8.8).
-  screen: 'ee1d94ac9fe089d8',
+  // 'ee1d94ac9fe089d8' before the logo went white (Brand: text-white, not the team colour).
+  screen: 'ff65482385daa3aa',
   decision: 'f71311307784d55e',
   cards: '82ea30e0dbd15610',
   radio: {
