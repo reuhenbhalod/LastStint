@@ -278,3 +278,46 @@ describe('the rival’s grader (Expert’s mechanism)', () => {
     expect(rivalAhead(run, result([userSide, rival], [userSide]))).toBe(false);
   });
 });
+
+describe("the rival's grader keeps the player's later real stops after a queued one", () => {
+  // As the player's grader (grade.ts playOption, A3): japan-2000 from Hakkinen's side (real
+  // stops out on laps 23 and 38, refuelling). The real call is made on lap 22, so at a pause
+  // after lap 22 the lap-23 stop is queued; the rival's playouts used to add nothing then, so
+  // the player's car ran dry after its 15-lap fill and the rival's grade was against a car
+  // that could never finish.
+  const m = race('japan-2000');
+  const first = realDecisions(m)[0] as Decision;
+  const pause = (model: RaceModel, call: Decision) => {
+    const run = initRun(model, model.race.seed, { decisions: [call] });
+    while (run.state.lap < call.lap) stepLap(run);
+    return run;
+  };
+  const stay = (run: ReturnType<typeof pause>): RivalOption => ({
+    id: 'stay',
+    stops: (run.state.cars[run.model.rival]?.strategy ?? []).filter((s) => s.lap > run.state.lap),
+  });
+
+  it('follows the queued stop with the remaining real stops (Eras)', () => {
+    expect(m.userSide).toBe('HAK');
+    expect(first.lap).toBe(22);
+    const run = pause(m, first);
+    expect(run.state.cars.HAK?.strategy.map((s) => s.lap)).toEqual([23]);
+    const fork = rivalPlayout(run, 1, stay(run));
+    expect(fork.state.cars.HAK?.strategy.map((s) => s.lap)).toEqual([23, 38]);
+    while (!isFinished(fork)) stepLap(fork);
+    expect(fork.notes.some((n) => n.kind === 'fuel' && n.driver === 'HAK')).toBe(false);
+    // An early stop queued instead (called on lap 20) stands in for the lap-23 one.
+    const early = pause(m, { ...first, lap: 20 });
+    const fork2 = rivalPlayout(early, 1, stay(early));
+    expect(fork2.state.cars.HAK?.strategy.map((s) => s.lap)).toEqual([21, 38]);
+  });
+
+  it('adds nothing after a queued stop in a Daily race (unchanged)', () => {
+    const { rules: _rules, eras: _eras, ...rest } = m;
+    const day = rest as RaceModel;
+    const { fill: _fill, ...dry } = first as Extract<Decision, { kind: 'pit' }>;
+    const run = pause(day, dry);
+    const fork = rivalPlayout(run, 1, stay(run));
+    expect(fork.state.cars.HAK?.strategy.map((s) => s.lap)).toEqual([23]);
+  });
+});
