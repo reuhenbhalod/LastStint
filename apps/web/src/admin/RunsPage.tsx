@@ -50,13 +50,13 @@ export function RunsTable({
       >
         <thead className="text-[var(--muted)]">
           <tr className="border-b border-[var(--rule)]">
-            <th className="px-3 py-2 font-semibold">When</th>
-            <th className="px-3 py-2 font-semibold">Mode</th>
-            {!hidePlayer && <th className="px-3 py-2 font-semibold">Player</th>}
-            <th className="px-3 py-2 font-semibold">Race</th>
-            <th className="px-3 py-2 text-right font-semibold">Score</th>
-            <th className="px-3 py-2 font-semibold">Result</th>
-            <th className="px-3 py-2 font-semibold">Check</th>
+            <th className="whitespace-nowrap px-3 py-2 font-semibold">When</th>
+            <th className="whitespace-nowrap px-3 py-2 font-semibold">Mode</th>
+            {!hidePlayer && <th className="whitespace-nowrap px-3 py-2 font-semibold">Player</th>}
+            <th className="whitespace-nowrap px-3 py-2 font-semibold">Race</th>
+            <th className="whitespace-nowrap px-3 py-2 text-right font-semibold">Score</th>
+            <th className="whitespace-nowrap px-3 py-2 font-semibold">Result</th>
+            <th className="whitespace-nowrap px-3 py-2 font-semibold">Check</th>
           </tr>
         </thead>
         <tbody>
@@ -105,38 +105,55 @@ export function RunsTable({
   );
 }
 
+/** A call or option id in words: "sc-stop" -> "SC stop", "box-HARD" -> "Box: hards",
+ * "stay" -> "Stay out". */
+export function callWords(id: string): string {
+  if (id === 'stay') return 'Stay out';
+  const box = /^box-([A-Z]+)$/.exec(id);
+  if (box) return `Box: ${(box[1] as string).toLowerCase()}s`;
+  const words = id
+    .split('-')
+    .map((w) => (/^(sc|vsc|drs|ers)$/i.test(w) ? w.toUpperCase() : w))
+    .join(' ');
+  return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
 function Calls({ calls }: { calls: RunDetail['calls'] }) {
   if (calls.length === 0) return <p className="m-0 text-[13px] text-[var(--muted)]">No calls.</p>;
   return (
-    <table className="w-full text-left text-[13px]">
-      <thead className="text-[var(--muted)]">
-        <tr className="border-b border-[var(--rule)]">
-          <th className="px-2 py-1.5 font-semibold">Lap</th>
-          <th className="px-2 py-1.5 font-semibold">Call</th>
-          <th className="px-2 py-1.5 font-semibold">Chose</th>
-          <th className="px-2 py-1.5 font-semibold">Grade</th>
-          <th className="px-2 py-1.5 font-semibold">Best</th>
-          <th className="px-2 py-1.5 font-semibold">Real</th>
-        </tr>
-      </thead>
-      <tbody>
-        {calls.map((c) => (
-          <tr key={c.momentId} className="border-b border-[var(--rule)] last:border-b-0">
-            <td className="px-2 py-1.5 tabular-nums">{c.lap}</td>
-            <td className="px-2 py-1.5">{c.momentId}</td>
-            <td className="px-2 py-1.5">{c.chosen}</td>
-            <td className="px-2 py-1.5 font-semibold" style={{ color: BAND_COLOURS[c.band] }}>
-              {c.band}
-            </td>
-            <td className="px-2 py-1.5">{c.best}</td>
-            <td className="px-2 py-1.5">
-              {c.real ?? '—'}
-              {c.matchedReal ? ' (matched)' : ''}
-            </td>
+    <div className="overflow-x-auto">
+      <table className="w-full min-w-[34rem] text-left text-[13px]">
+        <thead className="text-[var(--muted)]">
+          <tr className="border-b border-[var(--rule)]">
+            <th className="whitespace-nowrap px-2 py-1.5 font-semibold">Lap</th>
+            <th className="whitespace-nowrap px-2 py-1.5 font-semibold">Call</th>
+            <th className="whitespace-nowrap px-2 py-1.5 font-semibold">Chose</th>
+            <th className="whitespace-nowrap px-2 py-1.5 font-semibold">Grade</th>
+            <th className="whitespace-nowrap px-2 py-1.5 font-semibold">Best</th>
+            <th className="whitespace-nowrap px-2 py-1.5 font-semibold">Real</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {calls.map((c) => (
+            <tr key={c.momentId} className="border-b border-[var(--rule)] last:border-b-0">
+              <td className="px-2 py-1.5 tabular-nums">{c.lap}</td>
+              <td className="px-2 py-1.5" title={c.momentId}>
+                {callWords(c.momentId)}
+              </td>
+              <td className="px-2 py-1.5">{callWords(c.chosen)}</td>
+              <td className="px-2 py-1.5 font-semibold" style={{ color: BAND_COLOURS[c.band] }}>
+                {c.band}
+              </td>
+              <td className="px-2 py-1.5">{callWords(c.best)}</td>
+              <td className="px-2 py-1.5">
+                {c.real ? callWords(c.real) : '—'}
+                {c.matchedReal ? ' (matched)' : ''}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 
@@ -168,7 +185,8 @@ export function RunPanel({
   const r = detail?.run;
   return (
     <section className="card flex flex-col gap-3" aria-label="Run">
-      <div className="flex justify-end">
+      <div className="flex items-start justify-between gap-3">
+        <h2 className="disp m-0 text-[20px] leading-tight">Run</h2>
         <button type="button" className={btn} onClick={onClose}>
           Close
         </button>

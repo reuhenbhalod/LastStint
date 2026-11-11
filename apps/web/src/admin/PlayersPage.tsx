@@ -133,14 +133,14 @@ export function PlayersPage() {
           <table className="w-full text-left text-[13px]">
             <thead className="text-[var(--muted)]">
               <tr className="border-b border-[var(--rule)]">
-                <th className="px-3 py-2 font-semibold">Player</th>
-                <th className="px-3 py-2 font-semibold">Sign-in</th>
-                <th className="px-3 py-2 font-semibold">Team</th>
-                <th className="px-3 py-2 font-semibold">Joined</th>
-                <th className="px-3 py-2 text-right font-semibold">Devices</th>
-                <th className="px-3 py-2 text-right font-semibold">Daily</th>
-                <th className="px-3 py-2 text-right font-semibold">Gauntlet</th>
-                <th className="px-3 py-2 font-semibold">Last played</th>
+                <th className="whitespace-nowrap px-3 py-2 font-semibold">Player</th>
+                <th className="whitespace-nowrap px-3 py-2 font-semibold">Sign-in</th>
+                <th className="whitespace-nowrap px-3 py-2 font-semibold">Team</th>
+                <th className="whitespace-nowrap px-3 py-2 font-semibold">Joined</th>
+                <th className="whitespace-nowrap px-3 py-2 text-right font-semibold">Devices</th>
+                <th className="whitespace-nowrap px-3 py-2 text-right font-semibold">Daily</th>
+                <th className="whitespace-nowrap px-3 py-2 text-right font-semibold">Gauntlet</th>
+                <th className="whitespace-nowrap px-3 py-2 font-semibold">Last played</th>
               </tr>
             </thead>
             <tbody>

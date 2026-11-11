@@ -33,7 +33,7 @@ function Table({
             {head.map((h, i) => (
               <th
                 key={h}
-                className={`px-3 py-2 font-semibold ${i > 0 && !text.includes(i) ? 'text-right' : ''}`}
+                className={`whitespace-nowrap px-3 py-2 font-semibold ${i > 0 && !text.includes(i) ? 'text-right' : ''}`}
               >
                 {h}
               </th>

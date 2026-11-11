@@ -56,12 +56,12 @@ export function VersusAdminPage() {
               <table className="w-full min-w-[36rem] text-left text-[13px]">
                 <thead className="text-[var(--muted)]">
                   <tr className="border-b border-[var(--rule)]">
-                    <th className="px-3 py-2 font-semibold">Code</th>
-                    <th className="px-3 py-2 font-semibold">Track</th>
-                    <th className="px-3 py-2 font-semibold">Phase</th>
-                    <th className="px-3 py-2 font-semibold">Players</th>
-                    <th className="px-3 py-2 text-right font-semibold">Lap</th>
-                    <th className="px-3 py-2 font-semibold">Opened (UTC)</th>
+                    <th className="whitespace-nowrap px-3 py-2 font-semibold">Code</th>
+                    <th className="whitespace-nowrap px-3 py-2 font-semibold">Track</th>
+                    <th className="whitespace-nowrap px-3 py-2 font-semibold">Phase</th>
+                    <th className="whitespace-nowrap px-3 py-2 font-semibold">Players</th>
+                    <th className="whitespace-nowrap px-3 py-2 text-right font-semibold">Lap</th>
+                    <th className="whitespace-nowrap px-3 py-2 font-semibold">Opened (UTC)</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -88,12 +88,14 @@ export function VersusAdminPage() {
               <table className="w-full min-w-[44rem] text-left text-[13px]">
                 <thead className="text-[var(--muted)]">
                   <tr className="border-b border-[var(--rule)]">
-                    <th className="px-3 py-2 font-semibold">Finished (UTC)</th>
-                    <th className="px-3 py-2 font-semibold">Code</th>
-                    <th className="px-3 py-2 font-semibold">Track</th>
-                    <th className="px-3 py-2 font-semibold">Players and cars</th>
-                    <th className="px-3 py-2 font-semibold">Result</th>
-                    <th className="px-3 py-2 text-right font-semibold">Battles</th>
+                    <th className="whitespace-nowrap px-3 py-2 font-semibold">Finished (UTC)</th>
+                    <th className="whitespace-nowrap px-3 py-2 font-semibold">Code</th>
+                    <th className="whitespace-nowrap px-3 py-2 font-semibold">Track</th>
+                    <th className="whitespace-nowrap px-3 py-2 font-semibold">Players and cars</th>
+                    <th className="whitespace-nowrap px-3 py-2 font-semibold">Result</th>
+                    <th className="whitespace-nowrap px-3 py-2 text-right font-semibold">
+                      Battles
+                    </th>
                   </tr>
                 </thead>
                 <tbody>

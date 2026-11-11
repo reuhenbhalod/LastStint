@@ -126,11 +126,11 @@ function EraCard({
         <table className="w-full min-w-[30rem] text-left text-[13px]">
           <thead className="text-[var(--muted)]">
             <tr className="border-b border-[var(--rule)]">
-              <th className="px-2 py-1.5 font-semibold">#</th>
-              <th className="px-2 py-1.5 font-semibold">Race</th>
-              <th className="px-2 py-1.5 font-semibold">State</th>
-              <th className="px-2 py-1.5 text-right font-semibold">Attempts</th>
-              <th className="px-2 py-1.5 text-right font-semibold">Players</th>
+              <th className="whitespace-nowrap px-2 py-1.5 font-semibold">#</th>
+              <th className="whitespace-nowrap px-2 py-1.5 font-semibold">Race</th>
+              <th className="whitespace-nowrap px-2 py-1.5 font-semibold">State</th>
+              <th className="whitespace-nowrap px-2 py-1.5 text-right font-semibold">Attempts</th>
+              <th className="whitespace-nowrap px-2 py-1.5 text-right font-semibold">Players</th>
             </tr>
           </thead>
           <tbody>
