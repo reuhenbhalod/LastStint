@@ -47,7 +47,7 @@ export function PlanStrip({
         {stints.map((s, i) => (
           <div
             key={`${s.start}-${s.tyre}`}
-            className="flex items-center justify-center overflow-hidden text-[10px] font-bold uppercase tracking-wider text-[#141716]"
+            className="flex items-center justify-center overflow-hidden text-[10px] font-bold uppercase tracking-wider text-[#151A1D]"
             style={{
               width: `${(s.laps / total) * 100}%`,
               background: TYRE_VAR[s.tyre] ?? 'var(--muted)',

@@ -32,6 +32,7 @@ export default defineConfig(async () => {
             VERSUS_LAP_MS: '15',
             VERSUS_PICK_MS: '3000',
             VERSUS_CALL_MS: '300',
+            VERSUS_BATTLE_MS: '300',
             VERSUS_RECONNECT_MS: '400',
             VERSUS_REVEAL_MS: '10',
           },

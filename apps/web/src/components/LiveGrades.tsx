@@ -57,7 +57,7 @@ export function LiveGrades({ state, model }: { state: GameState; model: RaceMode
     <Panel
       title="Your calls"
       right={
-        <span className="mono text-[12px] font-bold text-[#B7BEBA]">
+        <span className="mono text-[12px] font-bold text-[#B9C2BD]">
           {score === null
             ? `0 of ${state.moments.length + (state.plan.offered.length ? 1 : 0)}`
             : `Score ${Math.round(score)}`}
@@ -65,7 +65,7 @@ export function LiveGrades({ state, model }: { state: GameState; model: RaceMode
       }
     >
       {rows.length === 0 ? (
-        <p className="m-0 text-[12px] text-[#8D9692]">
+        <p className="m-0 text-[12px] text-[#9AA5A0]">
           Each big call is graded here as you make it.
         </p>
       ) : (
@@ -75,31 +75,31 @@ export function LiveGrades({ state, model }: { state: GameState; model: RaceMode
             return (
               <li
                 key={r.id}
-                className="grid grid-cols-[3px_minmax(0,1fr)_auto] items-center gap-x-2.5 border-t border-[#1B201E] py-2 first:border-t-0 first:pt-0 last:pb-0"
+                className="grid grid-cols-[3px_minmax(0,1fr)_auto] items-center gap-x-2.5 border-t border-[#1B2226] py-2 first:border-t-0 first:pt-0 last:pb-0"
               >
                 <span
                   aria-hidden="true"
                   className="row-span-2 h-full min-h-[30px] -skew-x-12"
-                  style={{ background: band?.color ?? '#333A37' }}
+                  style={{ background: band?.color ?? '#343D42' }}
                 />
                 <span className="min-w-0 truncate text-[13px] font-semibold">
-                  <span className="mono mr-1.5 text-[11px] font-normal text-[#8D9692]">
+                  <span className="mono mr-1.5 text-[11px] font-normal text-[#9AA5A0]">
                     L{r.lap}
                   </span>
                   {r.label}
                   {r.auto && (
-                    <span className="ml-1.5 text-[11px] font-normal text-[#8D9692]">
+                    <span className="ml-1.5 text-[11px] font-normal text-[#9AA5A0]">
                       Auto · not scored
                     </span>
                   )}
                 </span>
                 <span
                   className="text-[11px] font-extrabold uppercase tracking-wider"
-                  style={{ color: band?.color ?? '#8D9692' }}
+                  style={{ color: band?.color ?? '#9AA5A0' }}
                 >
                   {band ? band.label : 'Grading…'}
                 </span>
-                <span className="col-span-2 text-[11.5px] text-[#8D9692]">
+                <span className="col-span-2 text-[11.5px] text-[#9AA5A0]">
                   {r.mine && r.best
                     ? `${pct(r.mine.probability)} chance${r.mine.id === r.best.id ? ' · the best option' : ` · best ${pct(r.best.probability)}`}`
                     : ''}

@@ -54,6 +54,7 @@ export interface Env {
   VERSUS_LAP_MS?: string;
   VERSUS_PICK_MS?: string;
   VERSUS_CALL_MS?: string;
+  VERSUS_BATTLE_MS?: string;
   VERSUS_RECONNECT_MS?: string;
   VERSUS_REVEAL_MS?: string;
 }

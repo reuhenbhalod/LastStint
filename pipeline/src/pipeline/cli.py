@@ -106,6 +106,40 @@ def outline_cmd(
     )
 
 
+@app.command("basemap")
+def basemap_cmd(
+    circuits: list[str] = typer.Argument(None, help="Circuits (default: all with scenery)."),  # noqa: B008
+) -> None:
+    """Write the ground under the 2D map: cache/basemap/<circuit>.svg (in metres),
+    data/basemap/index.json (where each race's outline sits on it) and the images,
+    apps/web/public/basemap/<circuit>.webp (rendered in a headless browser)."""
+    from . import basemap
+
+    print(basemap.write(circuits or None))
+    for p in basemap.images(circuits or None):
+        print(p, f"{p.stat().st_size // 1024} KB")
+
+
+@app.command("scenery")
+def scenery_cmd(
+    circuits: list[str] = typer.Argument(None, help="Circuits, e.g. spa (default: all)."),  # noqa: B008
+) -> None:
+    """Write data/scenery/<circuit>.json: the 3D view's scenery (network: OpenStreetMap and
+    the Terrarium terrain tiles; cached in cache/scenery)."""
+    from . import scenery
+
+    for c in circuits or list(scenery.CIRCUITS):
+        path = scenery.write(c)
+        d = json.loads(path.read_text())
+        fits = ", ".join(f"{r} {v['err']} m" for r, v in d["races"].items())
+        typer.echo(
+            f"{c}: lap {d['lap']['length']:.0f} m (fit {d['fit']} m),"
+            f" {len(d['buildings'])} buildings,"
+            f" {sum(len(v) for v in d['areas'].values())} areas, races: {fits},"
+            f" {path.stat().st_size // 1024} KB"
+        )
+
+
 @app.command("incidents")
 def incidents_cmd(
     race_ids: list[str] = typer.Argument(..., help="Registered races, e.g. abu-dhabi-2021."),  # noqa: B008

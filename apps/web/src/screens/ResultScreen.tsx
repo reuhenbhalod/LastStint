@@ -9,6 +9,7 @@ import { AccountBar } from '../components/AccountBar.js';
 import { Brand } from '../components/Brand.js';
 import { Disclaimer } from '../components/Disclaimer.js';
 import { DriverDebrief } from '../components/DriverDebrief.js';
+import { GroundBackdrop } from '../components/GroundBackdrop.js';
 import { Panel, Stat, Stats } from '../components/Panel.js';
 import { ResultHero } from '../components/ResultHero.js';
 import {
@@ -112,17 +113,17 @@ function ChanceBar({
 }) {
   const at = (p: number) => `${Math.max(0, Math.min(100, p * 100))}%`;
   return (
-    <span aria-hidden="true" className="relative block h-2 bg-[#232927]">
+    <span aria-hidden="true" className="relative block h-2 bg-[#252D31]">
       <span className="absolute inset-y-0 left-0" style={{ width: at(you), background: color }} />
       {real !== null && (
         <span
-          className="absolute -inset-y-1 w-[3px] -translate-x-1/2 border border-[#EEF1EF] bg-[#0F1312]"
+          className="absolute -inset-y-1 w-[3px] -translate-x-1/2 border border-[#EEF1EE] bg-[var(--glass)]"
           style={{ left: at(real) }}
         />
       )}
       {best !== null && (
         <span
-          className="absolute -inset-y-1 w-[3px] -translate-x-1/2 bg-[#EEF1EF]"
+          className="absolute -inset-y-1 w-[3px] -translate-x-1/2 bg-[#EEF1EE]"
           style={{ left: at(best) }}
         />
       )}
@@ -156,18 +157,18 @@ function GradedCall({
     <li className="relative grid grid-cols-[44px_minmax(0,1fr)] gap-3">
       {/* The timeline: the lap, a node in the band's colour, the line on to the next call. */}
       <span className="flex flex-col items-center gap-1.5 pt-3">
-        <span className="mono text-[11px] font-bold text-[#8D9692]">{lap}</span>
+        <span className="mono text-[11px] font-bold text-[#9AA5A0]">{lap}</span>
         <span className="h-3 w-3 rotate-45" style={{ background: b.color }} />
-        <span className="w-px flex-1 bg-[#262C2A]" />
+        <span className="w-px flex-1 bg-[#283034]" />
       </span>
       <div
-        className="mb-2.5 flex min-w-0 flex-col gap-2.5 rounded-md border border-[#1F2523] bg-[#0F1312] px-3.5 py-3"
+        className="mb-2.5 flex min-w-0 flex-col gap-2.5 rounded-md border border-[var(--glass-edge)] bg-[var(--glass)] px-3.5 py-3"
         style={{ borderLeft: `3px solid ${b.color}` }}
       >
         <div className="flex items-start justify-between gap-3">
           <span className="flex min-w-0 flex-col gap-0.5">
             {kind && (
-              <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#8D9692]">
+              <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#9AA5A0]">
                 {kind}
               </span>
             )}
@@ -175,7 +176,7 @@ function GradedCall({
               {title}
               {auto && (
                 <span
-                  className="ml-2 bg-[#232927] px-1.5 py-0.5 align-middle text-[10px] font-bold uppercase tracking-wider text-[#8D9692]"
+                  className="ml-2 bg-[#252D31] px-1.5 py-0.5 align-middle text-[10px] font-bold uppercase tracking-wider text-[#9AA5A0]"
                   title="The wall stayed out without asking (a stop just made, or tyres still good). Not scored."
                 >
                   Auto · not scored
@@ -191,20 +192,20 @@ function GradedCall({
           </span>
         </div>
         <ChanceBar you={you} best={best?.p ?? null} real={real?.p ?? null} color={b.color} />
-        <div className="flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-[#B7BEBA]">
+        <div className="flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-[#B9C2BD]">
           <span>
-            <span className="text-[#8D9692]">You </span>
+            <span className="text-[#9AA5A0]">You </span>
             <b className="mono">{pct(you)}</b>
           </span>
           {best && (
             <span className="min-w-0">
-              <span className="text-[#8D9692]">Best </span>
+              <span className="text-[#9AA5A0]">Best </span>
               {best.label} <b className="mono">{pct(best.p)}</b>
             </span>
           )}
           {real && (
             <span className="min-w-0">
-              <span className="text-[#8D9692]">Real team </span>
+              <span className="text-[#9AA5A0]">Real team </span>
               {real.matched ? 'same call' : real.label} <b className="mono">{pct(real.p)}</b>
             </span>
           )}
@@ -306,7 +307,7 @@ function ScoreRing({ score }: { score: number | null }) {
   return (
     <span className="relative flex h-[88px] w-[88px] shrink-0 items-center justify-center">
       <svg viewBox="0 0 80 80" className="absolute inset-0 -rotate-90" aria-hidden="true">
-        <circle cx="40" cy="40" r={r} fill="none" stroke="#232927" strokeWidth="7" />
+        <circle cx="40" cy="40" r={r} fill="none" stroke="#252D31" strokeWidth="7" />
         <circle
           cx="40"
           cy="40"
@@ -369,7 +370,7 @@ export function ResultScreen({
       ? (gaps[rival] as number) - (gaps[userSide] as number)
       : null;
   const teamOf = (code: string) =>
-    TEAM_COLOR[model?.drivers.find((d) => d.code === code)?.team ?? ''] ?? '#3A413E';
+    TEAM_COLOR[model?.drivers.find((d) => d.code === code)?.team ?? ''] ?? '#3B454A';
   const hero = (
     <ResultHero
       v={v}
@@ -438,8 +439,9 @@ export function ResultScreen({
   }
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b border-[#1F2523] px-4 md:h-16 md:px-6">
+    <div className="relative isolate flex min-h-screen flex-col">
+      <GroundBackdrop raceId={state.meta.raceId} />
+      <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b border-[var(--glass-edge)] bg-[var(--paper)]/70 px-4 backdrop-blur md:h-16 md:px-6">
         <button
           type="button"
           onClick={onHome}
@@ -447,7 +449,7 @@ export function ResultScreen({
         >
           <Brand />
         </button>
-        <span className="truncate text-[11px] font-extrabold uppercase tracking-[0.14em] text-[#8D9692]">
+        <span className="truncate text-[11px] font-extrabold uppercase tracking-[0.14em] text-[#9AA5A0]">
           {number ? `Daily #${number}` : 'Practice run'} · {model?.race.name ?? state.meta.raceId}
         </span>
       </header>
@@ -460,11 +462,11 @@ export function ResultScreen({
 
           <section
             aria-label="Score"
-            className="flex items-center gap-5 rounded-lg border border-[#1F2523] bg-[#0F1312] p-4"
+            className="flex items-center gap-5 rounded-lg border border-[var(--glass-edge)] bg-[var(--glass)] p-4"
           >
             <ScoreRing score={score ?? null} />
             <div className="flex min-w-0 flex-1 flex-col gap-3">
-              <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#8D9692]">
+              <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#9AA5A0]">
                 Score out of 100
               </span>
               <Stats cols={2}>
@@ -487,17 +489,17 @@ export function ResultScreen({
           {account && live && <AccountBar account={account} />}
 
           {sub.status === 'practice' && (
-            <p className="m-0 rounded-md border border-[#1F2523] bg-[#0F1312] px-3.5 py-3 text-[13px] text-[#B7BEBA]">
+            <p className="m-0 rounded-md border border-[var(--glass-edge)] bg-[var(--glass)] px-3.5 py-3 text-[13px] text-[#B9C2BD]">
               Practice run: graded on this device, not submitted.
             </p>
           )}
           {sub.status === 'already' && (
-            <p className="m-0 rounded-md border border-[#1F2523] bg-[#0F1312] px-3.5 py-3 text-[13px] text-[#B7BEBA]">
+            <p className="m-0 rounded-md border border-[var(--glass-edge)] bg-[var(--glass)] px-3.5 py-3 text-[13px] text-[#B9C2BD]">
               You’ve already played today’s race. Here’s your run; a new race arrives at midnight.
             </p>
           )}
           {sub.status === 'error' && (
-            <div className="flex items-center justify-between gap-3 rounded-md border border-[var(--box)] bg-[color-mix(in_srgb,var(--box)_14%,#0F1312)] px-3.5 py-3 text-[13px]">
+            <div className="flex items-center justify-between gap-3 rounded-md border border-[var(--box)] bg-[color-mix(in_srgb,var(--box)_14%,#12171A)] px-3.5 py-3 text-[13px]">
               <span>Not submitted ({sub.error}). Your grades are below.</span>
               <button
                 type="button"
@@ -512,11 +514,11 @@ export function ResultScreen({
           <Panel title="Share">
             <div className="flex flex-col gap-3">
               <GradeStrip bands={bands} size="lg" />
-              <p className="mono m-0 break-words text-[13px] text-[#B7BEBA]">{share}</p>
+              <p className="mono m-0 break-words text-[13px] text-[#B9C2BD]">{share}</p>
               <button
                 type="button"
                 onClick={copy}
-                className="disp rounded-md bg-[#EEF1EF] py-3 text-[15px] tracking-wide text-[#0B0E0D] hover:bg-white"
+                className="disp rounded-md bg-[#EEF1EE] py-3 text-[15px] tracking-wide text-[#0E1214] hover:bg-white"
               >
                 {copied ? 'Copied!' : 'Share result'}
               </button>
@@ -540,15 +542,15 @@ export function ResultScreen({
               </span>
             </div>
             {/* How to read the bars. */}
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-[#8D9692]">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-[#9AA5A0]">
               <span className="flex items-center gap-1.5">
-                <span className="h-2 w-5 bg-[#8D9692]" /> Your chance of the goal
+                <span className="h-2 w-5 bg-[#9AA5A0]" /> Your chance of the goal
               </span>
               <span className="flex items-center gap-1.5">
-                <span className="h-3 w-[3px] bg-[#EEF1EF]" /> Best call
+                <span className="h-3 w-[3px] bg-[#EEF1EE]" /> Best call
               </span>
               <span className="flex items-center gap-1.5">
-                <span className="h-3 w-[3px] border border-[#EEF1EF]" /> Real team
+                <span className="h-3 w-[3px] border border-[#EEF1EE]" /> Real team
               </span>
             </div>
             <ol className="m-0 flex list-none flex-col p-0">
@@ -571,7 +573,7 @@ export function ResultScreen({
             <Panel
               title="Today"
               right={
-                <span className="mono text-[12px] font-bold text-[#B7BEBA]">
+                <span className="mono text-[12px] font-bold text-[#B9C2BD]">
                   {stats.runs} {stats.runs === 1 ? 'run' : 'runs'} · avg{' '}
                   {Math.round(stats.meanScore)}
                 </span>
@@ -585,19 +587,19 @@ export function ResultScreen({
                     <li key={m.id} className="flex flex-col gap-1">
                       <span className="flex justify-between gap-3 text-[12px]">
                         <span className="min-w-0 truncate">
-                          <span className="mono mr-1.5 text-[#8D9692]">L{moment?.lap}</span>
+                          <span className="mono mr-1.5 text-[#9AA5A0]">L{moment?.lap}</span>
                           {top ? `“${labelOf(moment, top.id)}”` : ''}
                         </span>
                         <span className="mono shrink-0 font-bold">{top ? pct(top.share) : ''}</span>
                       </span>
-                      <span className="block h-1.5 bg-[#232927]">
+                      <span className="block h-1.5 bg-[#252D31]">
                         <span
-                          className="block h-full bg-[#8D9692]"
+                          className="block h-full bg-[#9AA5A0]"
                           style={{ width: top ? pct(top.share) : 0 }}
                         />
                       </span>
                       {moment?.realOptionId && (
-                        <span className="text-[11px] text-[#8D9692]">
+                        <span className="text-[11px] text-[#9AA5A0]">
                           {pct(m.matchedReal)} matched the real team
                         </span>
                       )}
@@ -614,9 +616,9 @@ export function ResultScreen({
                 {board.map((e) => (
                   <li
                     key={`${e.rank}-${e.name}`}
-                    className="grid grid-cols-[28px_minmax(0,1fr)_auto] items-center gap-2 border-t border-[#1B201E] py-1.5 text-[13px] first:border-t-0"
+                    className="grid grid-cols-[28px_minmax(0,1fr)_auto] items-center gap-2 border-t border-[#1B2226] py-1.5 text-[13px] first:border-t-0"
                   >
-                    <span className="mono text-[#8D9692]">{e.rank}</span>
+                    <span className="mono text-[#9AA5A0]">{e.rank}</span>
                     <span className="truncate font-semibold">{e.name}</span>
                     <span className="mono font-bold">{Math.round(e.score)}</span>
                   </li>
@@ -625,13 +627,13 @@ export function ResultScreen({
             </Panel>
           )}
 
-          <details className="group rounded-lg border border-[#1F2523] bg-[#0F1312] p-3.5">
+          <details className="group rounded-lg border border-[var(--glass-edge)] bg-[var(--glass)] p-3.5">
             <summary className="flex cursor-pointer list-none items-center justify-between gap-2">
               <span className="flex items-center gap-2">
                 <span aria-hidden="true" className="h-3.5 w-[5px] -skew-x-12 bg-[var(--you)]" />
                 <span className="disp text-[12px] tracking-[0.08em]">Classification</span>
               </span>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#8D9692] group-open:hidden">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#9AA5A0] group-open:hidden">
                 Show
               </span>
             </summary>
@@ -641,16 +643,16 @@ export function ResultScreen({
                   key={code}
                   className={`grid grid-cols-[24px_4px_minmax(0,1fr)_auto] items-center gap-2 px-1.5 py-1 text-[13px] ${
                     code === userSide
-                      ? 'bg-[color-mix(in_srgb,var(--you)_24%,#0F1312)]'
+                      ? 'bg-[color-mix(in_srgb,var(--you)_24%,#12171A)]'
                       : code === rival
-                        ? 'bg-[color-mix(in_srgb,var(--rival)_16%,#0F1312)]'
+                        ? 'bg-[color-mix(in_srgb,var(--rival)_16%,#12171A)]'
                         : ''
                   }`}
                 >
-                  <span className="mono text-right text-[#8D9692]">{i + 1}</span>
+                  <span className="mono text-right text-[#9AA5A0]">{i + 1}</span>
                   <span className="h-3.5 w-1 -skew-x-12" style={{ background: teamOf(code) }} />
                   <span className="disp text-[13px]">{code}</span>
-                  <span className="mono text-[12px] text-[#B7BEBA]">
+                  <span className="mono text-[12px] text-[#B9C2BD]">
                     {i === 0 ? 'Winner' : gaps[code] != null ? `+${gaps[code]?.toFixed(1)}` : ''}
                   </span>
                 </li>
@@ -660,11 +662,11 @@ export function ResultScreen({
 
           <a
             href="/gauntlet"
-            className="call-plate !gap-1 hover:bg-[#181D1B]"
+            className="call-plate !gap-1 hover:bg-[#192024]"
             style={{ '--accent': 'var(--box)' } as React.CSSProperties}
           >
             <span className="disp text-[19px] leading-none">Keep racing: Gauntlet</span>
-            <span className="text-[13px] text-[#8D9692]">
+            <span className="text-[13px] text-[#9AA5A0]">
               Different races back to back until you lose one
             </span>
           </a>
@@ -673,7 +675,7 @@ export function ResultScreen({
             <button
               type="button"
               onClick={game.reset}
-              className="rounded-md border border-[#333A37] py-3 font-semibold text-[#D5DAD7] hover:border-[#6B736F]"
+              className="rounded-md border border-[#343D42] py-3 font-semibold text-[#D5DBD7] hover:border-[#6E7A75]"
             >
               Play again
             </button>

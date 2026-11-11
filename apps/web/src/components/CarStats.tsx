@@ -31,7 +31,7 @@ export function CarStats({
   if (!me || me.retired) {
     return (
       <Panel label="Car stats" title="Car">
-        <p className="m-0 text-[13px] text-[#8D9692]">{surname(userSide)} is out of the race.</p>
+        <p className="m-0 text-[13px] text-[#9AA5A0]">{surname(userSide)} is out of the race.</p>
       </Panel>
     );
   }
@@ -87,7 +87,7 @@ export function CarStats({
       {me.battery !== undefined && (
         <div className="flex flex-col gap-1.5">
           <div className="flex items-baseline justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#8D9692]">
+            <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#9AA5A0]">
               Battery
             </span>
             <span className="mono text-[12px] font-semibold capitalize">
@@ -100,7 +100,7 @@ export function CarStats({
       {fuel && (
         <div className="flex flex-col gap-1.5" aria-label="Fuel">
           <div className="flex items-baseline justify-between gap-2">
-            <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#8D9692]">
+            <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#9AA5A0]">
               Fuel
             </span>
             <span className="mono text-[12px] font-semibold">
@@ -136,7 +136,7 @@ export function CarStats({
             }
           />
           {fuel.savePerLap > 0 && !fuel.empty && (
-            <span className="text-[11.5px] text-[#8D9692]">
+            <span className="text-[11.5px] text-[#9AA5A0]">
               {me.modes.fuel === 'liftAndCoast'
                 ? `Lifting and coasting · ${liftText(fuel.liftLaps)} to go`
                 : `To make it up: ${liftText(fuel.liftLaps)}`}
@@ -145,7 +145,7 @@ export function CarStats({
         </div>
       )}
       {trend !== null && (
-        <p className="m-0 border-t border-[#232927] pt-2.5 text-[12px] text-[#B7BEBA]">
+        <p className="m-0 border-t border-[#252D31] pt-2.5 text-[12px] text-[#B9C2BD]">
           {Math.abs(trend) < 0.05
             ? `Same pace as ${surname(rival)} over the last laps`
             : trend < 0

@@ -137,12 +137,21 @@ export {
   versusRuleMet,
   versusTrack,
   versusCallsDue,
-  FINAL_GAP,
-  FINAL_LAPS,
   NEUTRAL_CHANCE,
-  PIT_WINDOW_EVERY,
-  PIT_WINDOW_LAP,
   PIT_WINDOW_NEAR,
+  ATTACK_PICKS,
+  BATTLE_GAP,
+  BOOSTS,
+  DEFEND_PICKS,
+  DUEL,
+  GRADED_KINDS,
+  OUT_LAP_COST,
+  UNDERCUT_AGE,
+  UNDERCUT_GAP,
+  autoPick,
+  battleDue,
+  canBoost,
+  undercutEdge,
 } from './versus.js';
 export type {
   CarStat,
@@ -161,12 +170,17 @@ export type {
   VersusTrack,
   VersusMoment,
   VersusMomentKind,
+  AttackPick,
+  BattlePick,
+  DefendPick,
+  GremlinKind,
 } from './versus.js';
 export {
   VERSUS_GRADE_SAMPLES,
   gradeVersus,
   gradeVersusCall,
   optionCalls,
+  validOption,
   versusOptions,
 } from './versusGrade.js';
 export type { VersusAnswer, VersusScore } from './versusGrade.js';

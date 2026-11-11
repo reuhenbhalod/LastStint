@@ -32,8 +32,10 @@ export interface RaceSync {
   answers: VersusAnswer[];
   /** Laps completed. */
   lap: number;
-  /** The lap running now (its clock started `elapsed` ms ago), or null while paused. */
-  running: { lap: number; ms: number; elapsed: number } | null;
+  /** The lap running now (its clock started `elapsed` ms ago), or null while paused. A
+   * battle's lap (`brake`) runs to its braking zone and holds there until the picks are in
+   * (`held`: not yet resolved, so not stepped). */
+  running: { lap: number; ms: number; elapsed: number; brake?: number; held?: boolean } | null;
   /** Big calls waiting for answers, and when they close. */
   moments: VersusMoment[];
   momentsUntil?: number;
@@ -57,11 +59,18 @@ export type ServerMessage =
   /** A reconnecting browser's full state. */
   | { t: 'sync'; room: RoomView; sync: RaceSync | null; result?: VersusOutcome }
   | { t: 'call'; call: VersusCall }
-  /** Big calls: the race is paused until they're answered or `until`. */
-  | { t: 'moments'; moments: VersusMoment[]; until: number }
+  /** Big calls: the race is paused until they're answered or `until`. A battle's (action spec
+   * A1) come with its lap already running: it runs to `brake` (a share of the lap) and holds
+   * there. */
+  | {
+      t: 'moments';
+      moments: VersusMoment[];
+      until: number;
+      approach?: { lap: number; ms: number; brake: number };
+    }
   | { t: 'answered'; player: PlayerIndex; answer?: VersusAnswer }
-  /** Lap `lap` runs now and takes `ms`. */
-  | { t: 'run'; lap: number; ms: number }
+  /** Lap `lap` runs now and takes `ms` (from `from` of the way round, after a battle). */
+  | { t: 'run'; lap: number; ms: number; from?: number }
   /** A player dropped: the race waits for them until `until`. */
   | { t: 'paused'; player: PlayerIndex; until: number }
   | { t: 'resumed' }

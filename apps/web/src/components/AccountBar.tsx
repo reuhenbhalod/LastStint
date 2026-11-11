@@ -43,7 +43,7 @@ function SignInControl({ account, large = false }: { account: AccountState; larg
       <button
         type="button"
         onClick={account.startSignIn}
-        className={`disp rounded-full bg-[#EEF1EF] text-[#0B0E0D] hover:bg-white ${large ? 'px-5 py-2 text-[14px]' : 'px-4 py-1.5 text-[12px]'}`}
+        className={`disp rounded-full bg-[#EEF1EE] text-[#0E1214] hover:bg-white ${large ? 'px-5 py-2 text-[14px]' : 'px-4 py-1.5 text-[12px]'}`}
       >
         Sign in
       </button>

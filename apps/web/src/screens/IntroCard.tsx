@@ -18,12 +18,15 @@ import { surname } from '../data/names.js';
 import { goalOf } from '../game/goal.js';
 import type { GameState } from '../state/machine.js';
 import { carsOnTrack, pointAt, polyline } from '../track/geometry.js';
+import { groundFor } from '../track/ground.js';
 import { outlineFor } from '../track/outlines.js';
 import { HowToPlay } from './HowToPlay.js';
 
-/** The circuit as a glowing line, with the two cars where they are at the takeover. */
+/** The circuit on its real ground (track/ground.ts), with the two cars where they are at the
+ * takeover. It covers its box; the hero's gradient fades it into the page. */
 function Circuit({ state, model }: { state: GameState; model: RaceModel }) {
   const outline = outlineFor(model.race.id);
+  const ground = useMemo(() => groundFor(model.race.id), [model.race.id]);
   const { userSide, rival } = state.meta;
   const drawn = useMemo(() => {
     if (!outline) return null;
@@ -40,43 +43,44 @@ function Circuit({ state, model }: { state: GameState; model: RaceModel }) {
   return (
     <svg
       viewBox={`-40 -40 ${outline.width + 80} ${outline.height + 80}`}
+      preserveAspectRatio="xMidYMid slice"
       className="h-full w-full"
+      style={{ background: ground?.base ?? 'var(--ground)' }}
       aria-hidden="true"
     >
-      <defs>
-        <filter id="home-glow" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="9" />
-        </filter>
-      </defs>
+      {ground && (
+        <image
+          href={ground.src}
+          x={0}
+          y={0}
+          width={ground.w}
+          height={ground.h}
+          preserveAspectRatio="none"
+          transform={`matrix(${ground.matrix.join(' ')})`}
+        />
+      )}
       <path
         d={drawn.d}
         fill="none"
-        stroke="var(--you)"
-        strokeWidth={34}
-        opacity={0.22}
-        filter="url(#home-glow)"
-      />
-      <path
-        d={drawn.d}
-        fill="none"
-        stroke="var(--tarmac-edge)"
+        stroke="#000"
+        strokeOpacity={0.35}
         strokeWidth={30}
         strokeLinejoin="round"
-      />
-      <path
-        d={drawn.d}
-        fill="none"
-        stroke="var(--tarmac)"
-        strokeWidth={22}
-        strokeLinejoin="round"
+        transform="translate(1.5,2)"
       />
       <path
         d={drawn.d}
         fill="none"
         stroke="var(--track-line)"
-        strokeWidth={1.5}
-        strokeDasharray="10 14"
-        opacity={0.35}
+        strokeWidth={24}
+        strokeLinejoin="round"
+      />
+      <path
+        d={drawn.d}
+        fill="none"
+        stroke="var(--tarmac-lane)"
+        strokeWidth={21}
+        strokeLinejoin="round"
       />
       {(
         [
@@ -86,12 +90,16 @@ function Circuit({ state, model }: { state: GameState; model: RaceModel }) {
       ).map(([p, color, code]) =>
         p ? (
           <g key={code} transform={`translate(${p[0].toFixed(1)},${p[1].toFixed(1)})`}>
-            <circle r={26} fill={color} opacity={0.25} className="battle-ring" />
-            <circle r={13} fill={color} stroke="var(--paper)" strokeWidth={3} />
+            <circle r={26} fill={color} opacity={0.3} className="battle-ring" />
+            <circle r={12} fill={color} stroke="#fff" strokeWidth={3} />
             <text
               y={-24}
               textAnchor="middle"
               fill="#fff"
+              stroke="rgba(8,11,12,0.85)"
+              strokeWidth={5}
+              strokeLinejoin="round"
+              paintOrder="stroke"
               fontSize={22}
               fontWeight={800}
               fontFamily="var(--display)"
@@ -142,8 +150,10 @@ function Side({
         <span className="hidden truncate text-[13px] font-semibold sm:block">
           {info?.name ?? code}
         </span>
-        <span className="flex items-center gap-1.5 text-[12px] text-[var(--muted)]">
-          <span className="hidden truncate sm:inline">{team}</span>
+        <span
+          className={`flex min-w-0 max-w-full items-center gap-1.5 text-[12px] text-[var(--muted)] ${right ? 'flex-row-reverse' : ''}`}
+        >
+          <span className="hidden min-w-0 truncate sm:inline">{team}</span>
           {compound && age !== undefined && <TyreBadge compound={compound} age={age} />}
         </span>
       </span>
@@ -227,7 +237,7 @@ export function IntroCard({
         />
       )}
 
-      <header className="relative z-10 border-b border-[var(--rule)] bg-[var(--paper)]/80 backdrop-blur">
+      <header className="relative z-10 border-b border-[var(--glass-edge)] bg-[var(--paper)]/80 backdrop-blur">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
           <a href="/" className="flex items-baseline gap-2">
             <Brand className="text-[20px]" />
@@ -262,19 +272,23 @@ export function IntroCard({
       <main className="flex flex-1 flex-col">
         {/* The hero: the circuit behind the race's name. */}
         <section className="relative overflow-hidden border-b border-[var(--rule)]">
+          {/* On a computer the circuit's real ground fills the right of the hero and fades
+              into the page under the words. */}
+          <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-[68%] lg:block">
+            <Circuit state={state} model={model} />
+          </div>
           <div
-            className="pointer-events-none absolute inset-0"
+            className="pointer-events-none absolute inset-0 hidden lg:block"
             style={{
               background:
-                'radial-gradient(ellipse at 75% 40%, color-mix(in srgb, var(--you) 12%, transparent), transparent 60%), radial-gradient(ellipse at 10% 90%, color-mix(in srgb, var(--rival) 8%, transparent), transparent 55%)',
+                'linear-gradient(90deg, var(--paper) 0%, var(--paper) 34%, color-mix(in srgb, var(--paper) 55%, transparent) 50%, transparent 70%), linear-gradient(0deg, var(--paper) 0%, transparent 18%)',
             }}
           />
-          <div className="checker pointer-events-none absolute inset-x-0 top-0 h-2 opacity-60" />
-          <div className="relative mx-auto grid max-w-7xl items-center gap-6 px-4 py-8 sm:px-6 lg:min-h-[540px] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:py-12">
+          <div className="relative mx-auto grid max-w-7xl items-center gap-6 px-4 py-8 sm:px-6 lg:min-h-[600px] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:py-14">
             <div className="flex flex-col gap-5">
               {source === 'practice' && (
                 <p className="m-0 flex w-fit items-center gap-2 rounded-full border border-yellow-700/60 bg-yellow-950/40 py-1 pl-1 pr-3 text-[12px] text-yellow-200">
-                  <span className="rounded-full bg-[var(--flag)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#141716]">
+                  <span className="rounded-full bg-[var(--flag)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#151A1D]">
                     Practice
                   </span>
                   {practiceReason ?? 'Practice mode'} · not submitted
@@ -330,7 +344,7 @@ export function IntroCard({
                 <button
                   type="button"
                   onClick={onStart}
-                  className="group flex items-center justify-center gap-3 rounded-xl bg-[var(--you)] px-8 py-4 text-[18px] font-bold text-[var(--you-ink)] shadow-[0_10px_40px_-10px_var(--you)] hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
+                  className="group flex items-center justify-center gap-3 rounded-xl bg-[var(--ink)] px-8 py-4 text-[18px] font-extrabold text-[var(--paper)] shadow-[0_10px_40px_-14px_rgba(255,255,255,0.5)] hover:brightness-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--you)]"
                 >
                   {resume ?? `Take the ${userTeam ? `${userTeam} ` : ''}pit wall`}
                 </button>
@@ -362,10 +376,11 @@ export function IntroCard({
               </div>
             </div>
 
-            {/* The circuit, with the duel card over its lower edge. */}
-            <div className="relative flex flex-col">
+            {/* The duel card, over the circuit's lower edge (on a phone, the circuit is drawn
+                above it). */}
+            <div className="relative flex flex-col lg:justify-end lg:self-stretch">
               <div
-                className="mx-auto w-full max-w-[640px] lg:!aspect-auto lg:h-[420px]"
+                className="mx-auto w-full max-w-[640px] overflow-hidden rounded-2xl lg:hidden"
                 style={(() => {
                   const o = outlineFor(model.race.id);
                   return o ? { aspectRatio: `${o.width + 80} / ${o.height + 80}` } : undefined;
@@ -375,7 +390,7 @@ export function IntroCard({
               </div>
               <section
                 aria-label="The situation"
-                className="card relative -mt-6 flex flex-col gap-4 !border-[var(--tarmac-edge)] !bg-[var(--card)]/95 !p-4 shadow-2xl backdrop-blur sm:mx-6"
+                className="glass relative -mt-6 flex flex-col gap-4 p-4 shadow-2xl sm:mx-6 lg:mx-0 lg:mt-0 lg:ml-auto lg:w-[600px]"
               >
                 <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
                   <Side
@@ -385,12 +400,12 @@ export function IntroCard({
                     compound={me?.compound}
                     age={me?.tyreAge}
                   />
-                  <div className="flex flex-col items-center text-center">
+                  <div className="flex w-[96px] flex-col items-center text-center">
                     <span className="eyebrow">Gap</span>
                     <span className="disp wide text-[24px] leading-none">
                       {gap === null ? '-' : `${Math.abs(gap).toFixed(1)}s`}
                     </span>
-                    <span className="text-[11px] text-[var(--muted)]">
+                    <span className="text-[11px] leading-tight text-[var(--muted)]">
                       {gap === null
                         ? ''
                         : gap >= 0

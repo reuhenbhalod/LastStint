@@ -134,10 +134,10 @@ export function BroadcastDecision({
         <dl className="m-0 hidden flex-wrap gap-x-4 gap-y-1 md:flex">
           {facts.map(([k, v]) => (
             <div key={k} className="flex items-baseline gap-1.5 text-[12px]">
-              <dt className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#8D9692]">
+              <dt className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#9AA5A0]">
                 {k}
               </dt>
-              <dd className="mono m-0 font-semibold text-[#D5DAD7]">{v}</dd>
+              <dd className="mono m-0 font-semibold text-[#D5DBD7]">{v}</dd>
             </div>
           ))}
         </dl>
@@ -147,10 +147,10 @@ export function BroadcastDecision({
       </span>
       {box ? (
         <div className="flex flex-col gap-2">
-          <span className="text-[12px] font-bold uppercase tracking-wider text-[#D5DAD7]">
+          <span className="text-[12px] font-bold uppercase tracking-wider text-[#D5DBD7]">
             {box.label}: which tyres?
             {(outlooks[0]?.greenLaps ?? 0) > 0 && (
-              <span className="font-normal normal-case tracking-normal text-[#8D9692]">
+              <span className="font-normal normal-case tracking-normal text-[#9AA5A0]">
                 {' '}
                 Gain is lap time over the {outlooks[0]?.greenLaps} green laps left, against staying
                 out.
@@ -199,7 +199,7 @@ export function BroadcastDecision({
           <button
             type="button"
             onClick={() => setPicking(null)}
-            className="self-start px-1 text-[13px] font-bold text-[#B7BEBA] underline hover:text-white"
+            className="self-start px-1 text-[13px] font-bold text-[#B9C2BD] underline hover:text-white"
           >
             Back
           </button>

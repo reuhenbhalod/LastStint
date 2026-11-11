@@ -2,13 +2,15 @@
 // built for the solo game's RaceState and RaceModel, so a versus race is shown as one with two
 // cars: yours (userSide) and theirs (rival), each under a code from the player's name.
 
-import type {
-  CarState,
-  PlayerIndex,
-  RaceModel,
-  RaceState,
-  VersusSetup,
-  VersusState,
+import {
+  type CarState,
+  type PlayerIndex,
+  type RaceModel,
+  type RaceState,
+  VERSUS_LAPS,
+  type VersusCall,
+  type VersusSetup,
+  type VersusState,
 } from '@boxthislap/sim';
 
 /** A three-letter code for each player (their name's letters, made distinct). */
@@ -23,7 +25,7 @@ export function codesFor(setup: VersusSetup): [string, string] {
   return [a, b];
 }
 
-/** The race file's model, reshaped as a two-car race of 20 laps seen from `me`'s side. */
+/** The race file's model, reshaped as a two-car versus race seen from `me`'s side. */
 export function versusModel(base: RaceModel, setup: VersusSetup, me: PlayerIndex): RaceModel {
   const codes = codesFor(setup);
   // Garages on the map belong to teams of the race's season: borrow the two real teams.
@@ -39,7 +41,7 @@ export function versusModel(base: RaceModel, setup: VersusSetup, me: PlayerIndex
   });
   return {
     ...base,
-    race: { ...base.race, laps: 20, takeoverLap: 0 },
+    race: { ...base.race, laps: VERSUS_LAPS, takeoverLap: 0 },
     drivers: [driver(0), driver(1)],
     // The race's SC or VSC isn't known ahead (the state's next flag says when it's coming).
     events: [],
@@ -50,11 +52,14 @@ export function versusModel(base: RaceModel, setup: VersusSetup, me: PlayerIndex
   };
 }
 
-/** The versus state as a solo RaceState for the map. */
+/** The versus state as a solo RaceState for the map. The pit calls known so far become each
+ * car's strategy, so the map drives it down the pit lane: a stop called for lap L boxes at the
+ * end of it, and its out-lap (the solo strategy's lap) is L + 1. */
 export function versusRaceState(
   state: VersusState,
   model: RaceModel,
   setup: VersusSetup,
+  calls: readonly VersusCall[] = [],
 ): RaceState {
   const codes = codesFor(setup);
   const cars: Record<string, CarState> = {};
@@ -71,7 +76,9 @@ export function versusRaceState(
       tyreWear: c.tyreWear,
       compoundsUsed: [...c.compoundsUsed],
       totalTime: c.totalTime,
-      strategy: [],
+      strategy: calls.flatMap((x) =>
+        x.player === c.player && x.kind === 'pit' ? [{ lap: x.lap + 1, to: x.compound }] : [],
+      ),
       pittedThisLap: c.pittedThisLap,
       retired: false,
       retiredLap: null,

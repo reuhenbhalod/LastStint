@@ -8,6 +8,7 @@ import type { RaceModel } from '@boxthislap/sim';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Brand } from '../components/Brand.js';
 import { Disclaimer } from '../components/Disclaimer.js';
+import { GroundBackdrop } from '../components/GroundBackdrop.js';
 import { ChequeredIcon, FlagIcon, OvertakeIcon } from '../components/Icons.js';
 import { ApiError, type SurvivorBoardEntry, type SurvivorState, survivorApi } from '../data/api.js';
 import { anonId } from '../data/player.js';
@@ -487,7 +488,8 @@ export function Survivor() {
     return <RoundRace key={run.current.round} run={run} onResult={onResult} onHome={home} />;
   }
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="relative isolate flex min-h-screen flex-col">
+      <GroundBackdrop raceId="italy-2024" />
       <Header onHome={home} />
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6 sm:px-6">
         {view === 'loading' && <p className="text-center text-[var(--muted)]">Loading…</p>}

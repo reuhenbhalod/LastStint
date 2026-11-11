@@ -7,6 +7,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Brand } from '../components/Brand.js';
+import { GroundBackdrop } from '../components/GroundBackdrop.js';
 import { surname } from '../data/names.js';
 import { RaceFileProvider } from '../data/provider.js';
 import { useTeamTheme } from '../game/teamTheme.js';
@@ -239,10 +240,10 @@ export function Tutorial() {
     [seen],
   );
 
-  if (game.error) return <p className="p-8 text-center text-[#8D9692]">{game.error}</p>;
+  if (game.error) return <p className="p-8 text-center text-[#9AA5A0]">{game.error}</p>;
   if (!game.state || !model) {
     return (
-      <p className="p-8 text-center font-mono text-sm text-[#8D9692]">Loading the tutorial…</p>
+      <p className="p-8 text-center font-mono text-sm text-[#9AA5A0]">Loading the tutorial…</p>
     );
   }
 
@@ -258,12 +259,13 @@ export function Tutorial() {
 
   if (phase === 'intro') {
     return (
-      <main className="mx-auto flex min-h-screen max-w-lg flex-col justify-center gap-5 p-6">
+      <main className="relative isolate mx-auto flex min-h-screen max-w-lg flex-col justify-center gap-5 p-6">
+        <GroundBackdrop raceId={RACE} dim={0.42} />
         <Brand className="text-[20px]" />
         <section className="call-plate !gap-3 !p-5">
           <span className="call-tag">Tutorial race · not scored</span>
           <h1 className="disp m-0 text-[26px] leading-none">Canada 2022</h1>
-          <p className="m-0 text-[15px] leading-relaxed text-[#D5DAD7]">
+          <p className="m-0 text-[15px] leading-relaxed text-[#D5DBD7]">
             Take Sainz’s pit wall for the last {model.race.laps - model.race.takeoverLap} laps,
             chasing Verstappen. The race stops to explain each control the first time it matters,
             and skips ahead in between. Takes about five minutes.
@@ -272,7 +274,7 @@ export function Tutorial() {
             <button
               type="button"
               onClick={skip}
-              className="text-[13px] font-semibold text-[#8D9692] underline hover:text-white"
+              className="text-[13px] font-semibold text-[#9AA5A0] underline hover:text-white"
             >
               Skip the tutorial
             </button>
@@ -339,17 +341,17 @@ function Coach({
         <button
           type="button"
           onClick={onSkip}
-          className="text-[12px] font-semibold text-[#8D9692] underline hover:text-white"
+          className="text-[12px] font-semibold text-[#9AA5A0] underline hover:text-white"
         >
           Skip tutorial
         </button>
       </div>
       <h2 className="disp m-0 text-[18px] leading-tight">{step.title}</h2>
-      <p className="m-0 text-[14px] leading-relaxed text-[#D5DAD7]">{step.body}</p>
+      <p className="m-0 text-[14px] leading-relaxed text-[#D5DBD7]">{step.body}</p>
       <button
         type="button"
         onClick={onNext}
-        className="disp self-end rounded-md bg-[#EEF1EF] px-5 py-2 text-[14px] text-[#0B0E0D] hover:bg-white"
+        className="disp self-end rounded-md bg-[#EEF1EE] px-5 py-2 text-[14px] text-[#0E1214] hover:bg-white"
       >
         {step.id === 'results' ? 'Finish' : 'Got it'}
       </button>
