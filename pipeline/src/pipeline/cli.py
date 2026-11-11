@@ -473,7 +473,10 @@ def scenery_cmd(
     for c in circuits or list(scenery.CIRCUITS):
         path = scenery.write(c)
         d = json.loads(path.read_text())
-        fits = ", ".join(f"{r} {v['err']} m" for r, v in d["races"].items())
+        fits = ", ".join(
+            f"{r} {v['how']} {v['err']} m {v['cover']:.0%} x{v['scale']}"
+            for r, v in d["races"].items()
+        )
         typer.echo(
             f"{c}: lap {d['lap']['length']:.0f} m (fit {d['fit']} m),"
             f" {len(d['buildings'])} buildings,"
