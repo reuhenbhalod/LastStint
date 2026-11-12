@@ -21,7 +21,11 @@ if ! grep -qi microsoft /proc/version; then echo "This doesn't look like WSL; co
 
 # 1. systemd, so the runners start as services whenever WSL starts.
 if ! grep -qs '^systemd=true' /etc/wsl.conf; then
-  printf '[boot]\nsystemd=true\n' | sudo tee -a /etc/wsl.conf >/dev/null
+  if sudo grep -qs '^\[boot\]' /etc/wsl.conf; then
+    sudo sed -i '/^\[boot\]/a systemd=true' /etc/wsl.conf   # existing [boot] section
+  else
+    printf '[boot]\nsystemd=true\n' | sudo tee -a /etc/wsl.conf >/dev/null
+  fi
   echo
   echo "systemd was just enabled. In Windows PowerShell run:  wsl --shutdown"
   echo "then open Ubuntu again and re-run this script with the same arguments."

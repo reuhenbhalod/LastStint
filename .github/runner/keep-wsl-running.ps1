@@ -6,7 +6,8 @@
 #   powershell -ExecutionPolicy Bypass -File keep-wsl-running.ps1 [-Distro Ubuntu]
 param([string]$Distro = "Ubuntu")
 
-$action  = New-ScheduledTaskAction -Execute "wsl.exe" -Argument "-d $Distro --exec /bin/sleep infinity"
+# conhost --headless: no console window to close by mistake (closing it would stop WSL).
+$action  = New-ScheduledTaskAction -Execute "conhost.exe" -Argument "--headless wsl.exe -d $Distro --exec /bin/sleep infinity"
 $trigger = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME
 $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries `
   -ExecutionTimeLimit ([TimeSpan]::Zero) -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1)
