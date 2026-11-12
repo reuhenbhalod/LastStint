@@ -13,8 +13,14 @@
 //                                      current hash (days that have runs are left alone)
 //   POST /api/admin/runs/clear         { date }: delete your own run(s) on a day, to replay it
 //   GET  /api/admin/players            every signed-up account, newest first (adminPlayers.ts)
+//
+// Admin page v2 (docs/admin-v2-spec.md) adds the Today, Eras, Runs, Players, Versus, Stats and
+// Log tabs' endpoints in adminToday.ts, adminEras.ts, adminRuns.ts, adminPlayers.ts,
+// adminVersus.ts, adminStats.ts, adminLog.ts and announcements.ts. Every change made here is
+// written to the audit log (adminLog.ts).
 
 import type { Context } from 'hono';
+import { logAdmin } from './adminLog.js';
 import { listPlayers } from './adminPlayers.js';
 import { authConfigured, verifyCredential } from './auth.js';
 import { addDays, isDate, todayUtc } from './dates.js';
@@ -230,7 +236,7 @@ export function registerAdmin(app: import('hono').Hono<{ Bindings: Env }>) {
   });
 
   app.post('/api/admin/schedule', async (c) => {
-    await requireAdmin(c);
+    const who = await requireAdmin(c);
     const b = await body(c);
     const from = typeof b.from === 'string' ? b.from : todayUtc(Date.now());
     const days = Number(b.days ?? 14);
@@ -238,26 +244,34 @@ export function registerAdmin(app: import('hono').Hono<{ Bindings: Env }>) {
     if (!isDate(from) || !Number.isInteger(days) || days < 1 || days > 366) {
       throw new ApiError(400, 'bad-request', 'from must be YYYY-MM-DD and days 1-366');
     }
-    return c.json({ added: await scheduleDays(c.env.DB, from, days, raceId) });
+    const added = await scheduleDays(c.env.DB, from, days, raceId);
+    await logAdmin(c.env.DB, who.email, 'schedule', { from, days, raceId: raceId ?? null, added });
+    return c.json({ added });
   });
 
   app.post('/api/admin/day', async (c) => {
-    await requireAdmin(c);
+    const who = await requireAdmin(c);
     const b = await body(c);
     if (!isDate(b.date) || typeof b.raceId !== 'string') throw new ApiError(400, 'bad-request');
-    return c.json(await setDay(c.env.DB, b.date as string, b.raceId));
+    const day = await setDay(c.env.DB, b.date as string, b.raceId);
+    await logAdmin(c.env.DB, who.email, 'day', day);
+    return c.json(day);
   });
 
   app.post('/api/admin/repin', async (c) => {
-    await requireAdmin(c);
-    return c.json(await repin(c.env.DB, todayUtc(Date.now())));
+    const who = await requireAdmin(c);
+    const res = await repin(c.env.DB, todayUtc(Date.now()));
+    await logAdmin(c.env.DB, who.email, 'repin', res);
+    return c.json(res);
   });
 
   app.post('/api/admin/runs/clear', async (c) => {
     const who = await requireAdmin(c);
     const b = await body(c);
     if (!isDate(b.date)) throw new ApiError(400, 'bad-request');
-    return c.json(await clearOwnRuns(c.env.DB, who.sub, b.date as string));
+    const res = await clearOwnRuns(c.env.DB, who.sub, b.date as string);
+    await logAdmin(c.env.DB, who.email, 'clear-run', { date: b.date, ...res });
+    return c.json(res);
   });
 
   app.get('/api/admin/players', async (c) => {

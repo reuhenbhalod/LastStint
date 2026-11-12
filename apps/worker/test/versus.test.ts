@@ -18,6 +18,7 @@ import {
 import { describe, expect, it } from 'vitest';
 import bahrainJson from '../../../data/races/bahrain-2022.json';
 import { RACE_FILES } from '../src/races.gen.js';
+import { idToken } from './helpers.js';
 
 const bahrain = bahrainJson as unknown as RaceModel;
 
@@ -204,5 +205,56 @@ describe('versus room', () => {
     b.send({ t: 'leave' });
     const r = await back.next('result', 30_000);
     expect(r).toMatchObject({ result: { forfeit: 1, score: null } });
+  });
+
+  it('keeps the admin page’s list of rooms and stores the finished match', async () => {
+    const code = await create('monza');
+    const rooms = async () =>
+      (await (
+        await SELF.fetch('https://api.test/api/admin/versus', {
+          headers: { Authorization: `Bearer ${await idToken()}` },
+        })
+      ).json()) as {
+        rooms: Array<{ code: string; phase: string; players: string[] }>;
+        matches: Array<Record<string, unknown>>;
+      };
+    const until = async (ok: (v: Awaited<ReturnType<typeof rooms>>) => boolean) => {
+      for (let i = 0; i < 100; i++) {
+        const v = await rooms();
+        if (ok(v)) return v;
+        await new Promise((r) => setTimeout(r, 50));
+      }
+      throw new Error('never got there');
+    };
+    await until((v) => v.rooms.some((r) => r.code === code && r.phase === 'lobby'));
+
+    const a = await connect(code);
+    a.send({ t: 'join', name: 'Alex' });
+    await a.next('welcome');
+    const b = await connect(code);
+    b.send({ t: 'join', name: 'Sam' });
+    await b.next('welcome');
+    a.send({ t: 'pick', car: 'bullet', startTyre: 'SOFT' });
+    b.send({ t: 'pick', car: 'glider', startTyre: 'MEDIUM' });
+    await a.next('start');
+    const live = await until((v) => v.rooms.some((r) => r.code === code && r.phase === 'race'));
+    expect(live.rooms.find((r) => r.code === code)?.players).toEqual(['Alex', 'Sam']);
+
+    await a.next('moments'); // lap 1's battle
+    a.send({ t: 'leave' });
+    await b.next('result', 30_000);
+    const done = await until((v) => v.matches.some((m) => m.code === code));
+    expect(done.rooms.some((r) => r.code === code)).toBe(false);
+    expect(done.matches.find((m) => m.code === code)).toMatchObject({
+      track: 'monza',
+      players: ['Alex', 'Sam'],
+      cars: [
+        { car: 'bullet', startTyre: 'SOFT' },
+        { car: 'glider', startTyre: 'MEDIUM' },
+      ],
+      winner: 1,
+      gap: null,
+      forfeit: 0,
+    });
   });
 });

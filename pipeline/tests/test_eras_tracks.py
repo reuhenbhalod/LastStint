@@ -108,9 +108,23 @@ def test_every_appendix_race_has_a_plan_and_a_track_file():
         assert (et.LAYOUTS / f"{layout}.svg").exists()
 
 
+def test_redrawn_outlines_keep_their_f1db_frame_and_corners():
+    # The Sepang files redrawn from the real lap keep F1DB's frame, point count and corners.
+    et = _eras_tracks()
+    tracks = paths.DATA_DIR / "tracks"
+    for race_id in et.REDRAWN:
+        f1db = et.layout_outline(et.F1DB[race_id])
+        now = json.loads((tracks / f"{race_id}.json").read_text())
+        assert (now["width"], now["height"]) == (f1db["width"], f1db["height"]), race_id
+        assert len(now["points"]) == len(f1db["points"]), race_id
+        assert [c[0] for c in now["corners"]] == [c[0] for c in f1db["corners"]], race_id
+
+
 def test_f1db_layouts_rebuild_to_the_committed_files():
     et = _eras_tracks()
     tracks = paths.DATA_DIR / "tracks"
     for race_id, layout in et.F1DB.items():
+        if race_id in et.REDRAWN:  # redrawn from the real lap since (sepang_outlines.py)
+            continue
         built = {"raceId": race_id, **et.layout_outline(layout)}
         assert json.loads((tracks / f"{race_id}.json").read_text()) == built, race_id

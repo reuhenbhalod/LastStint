@@ -31,6 +31,7 @@ import { GroundBackdrop } from '../components/GroundBackdrop.js';
 import { ChequeredIcon, OvertakeIcon, SoundOffIcon, SoundOnIcon } from '../components/Icons.js';
 import { LeadersTower } from '../components/LeadersTower.js';
 import { LiveGrades } from '../components/LiveGrades.js';
+import { MapCredit } from '../components/MapCredit.js';
 import { RadioMark, TimingMark } from '../components/Marks.js';
 import { Panel } from '../components/Panel.js';
 import { PitCard } from '../components/PitCard.js';
@@ -1240,6 +1241,13 @@ function RaceScreenBody({
                 </div>
               )}
             </div>
+            {/* The map's OpenStreetMap credit: bottom right, just above the call and the dock
+                (the strip over the circuit takes the top). */}
+            <MapCredit
+              raceId={model.race.id}
+              className="absolute right-2 z-20"
+              style={{ bottom: stackH + 6 }}
+            />
           </div>
 
           <div

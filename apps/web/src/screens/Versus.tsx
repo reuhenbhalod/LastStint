@@ -27,8 +27,9 @@ import {
 } from '@laststint/sim';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ApiError, apiPost } from '../api.js';
-import { Brand } from '../components/Brand.js';
 import { GroundBackdrop } from '../components/GroundBackdrop.js';
+import { MapCredit } from '../components/MapCredit.js';
+import { TopBar } from '../components/TopBar.js';
 import { type BattleView, TrackMap } from '../components/TrackMap.js';
 import { TyreBadge } from '../components/TyreBadge.js';
 import type { BattleLine } from '../game/quickCalls.js';
@@ -73,14 +74,8 @@ export function Versus() {
     <main className="relative isolate min-h-[100dvh] text-[#EEF1EE]">
       {/* Versus runs at the five 3D circuits; Spa stands behind the lobby. */}
       {!code && <GroundBackdrop raceId="belgium-2024" />}
-      <header className="flex h-14 items-center justify-between border-b border-[var(--glass-edge)] bg-[var(--paper)]/70 px-4 backdrop-blur">
-        <a href="/" aria-label="LastStint home">
-          <Brand className="text-[20px]" />
-        </a>
-        <span className="text-[12px] font-extrabold uppercase tracking-[0.16em] text-[var(--rival)]">
-          Versus
-        </span>
-      </header>
+      {!code && <MapCredit raceId="belgium-2024" className="fixed right-2 bottom-2 z-10" />}
+      <TopBar active="versus" />
       {!named ? (
         <NameCard
           name={name}
@@ -687,6 +682,7 @@ function Race({
       <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_320px]">
         <div className="flex min-w-0 flex-col gap-3">
           <div className="relative h-[42vh] min-h-[240px] overflow-hidden rounded-xl border border-[var(--glass-edge)] bg-[var(--ground)] md:h-[56vh]">
+            <MapCredit raceId={base.race.id} className="absolute right-2 bottom-1.5 z-10" />
             {outline ? (
               <RaceStage
                 raceId={base.race.id}

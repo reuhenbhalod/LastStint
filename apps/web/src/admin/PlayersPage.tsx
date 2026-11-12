@@ -1,8 +1,10 @@
 // The admin page's Players tab (/admin/players): every account that has signed up, with a
-// summary, a search and a choice of order. Read-only. AdminPage only renders this for a
-// signed-in admin; the Worker checks every call again (apps/worker/src/adminPlayers.ts).
+// summary, a search and a choice of order. Open a player for their page (PlayerPanel.tsx:
+// runs, streak, name edit, hide). AdminPage only renders this for a signed-in admin; the Worker
+// checks every call again (apps/worker/src/adminPlayers.ts).
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { PlayerPanel } from './PlayerPanel.js';
 import {
   type PlayerList,
   type PlayerSort,
@@ -22,6 +24,7 @@ export function PlayersPage() {
   const [loading, setLoading] = useState(false);
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState<PlayerSort>('newest');
+  const [open, setOpen] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setError(null);
@@ -103,6 +106,15 @@ export function PlayersPage() {
         </label>
       </div>
 
+      {open && (
+        <PlayerPanel
+          key={open}
+          id={open}
+          onChanged={async () => setList(await listPlayers())}
+          onClose={() => setOpen(null)}
+        />
+      )}
+
       {list && list.players.length < list.total && (
         <p className="m-0 text-[13px] text-[var(--muted)]">
           Showing the newest {list.players.length} of {list.total} accounts.
@@ -121,25 +133,34 @@ export function PlayersPage() {
           <table className="w-full text-left text-[13px]">
             <thead className="text-[var(--muted)]">
               <tr className="border-b border-[var(--rule)]">
-                <th className="px-3 py-2 font-semibold">Player</th>
-                <th className="px-3 py-2 font-semibold">Sign-in</th>
-                <th className="px-3 py-2 font-semibold">Team</th>
-                <th className="px-3 py-2 font-semibold">Joined</th>
-                <th className="px-3 py-2 text-right font-semibold">Devices</th>
-                <th className="px-3 py-2 text-right font-semibold">Daily</th>
-                <th className="px-3 py-2 text-right font-semibold">Gauntlet</th>
-                <th className="px-3 py-2 font-semibold">Last played</th>
+                <th className="whitespace-nowrap px-3 py-2 font-semibold">Player</th>
+                <th className="whitespace-nowrap px-3 py-2 font-semibold">Sign-in</th>
+                <th className="whitespace-nowrap px-3 py-2 font-semibold">Team</th>
+                <th className="whitespace-nowrap px-3 py-2 font-semibold">Joined</th>
+                <th className="whitespace-nowrap px-3 py-2 text-right font-semibold">Devices</th>
+                <th className="whitespace-nowrap px-3 py-2 text-right font-semibold">Daily</th>
+                <th className="whitespace-nowrap px-3 py-2 text-right font-semibold">Gauntlet</th>
+                <th className="whitespace-nowrap px-3 py-2 font-semibold">Last played</th>
               </tr>
             </thead>
             <tbody>
               {shown.map((p) => (
                 <tr key={p.id} className="border-b border-[var(--rule)] last:border-b-0">
                   <td className="px-3 py-2">
-                    <div className="font-semibold">
+                    <button
+                      type="button"
+                      className="text-left font-semibold underline-offset-2 hover:underline"
+                      onClick={() => setOpen(p.id)}
+                    >
                       {p.displayName || (
                         <span className="text-[var(--muted)]">{p.name || 'No name'}</span>
                       )}
-                    </div>
+                      {p.hidden && (
+                        <span className="ml-1.5 text-[11px] font-bold text-[var(--flag)]">
+                          Hidden
+                        </span>
+                      )}
+                    </button>
                     <div className="text-[12px] text-[var(--muted)]">
                       {p.displayName && p.name ? `${p.name} · ` : ''}
                       {p.email || 'no email'}

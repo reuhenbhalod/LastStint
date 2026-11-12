@@ -7,8 +7,11 @@
 // licences ask.
 
 import type { DifficultySettings, RaceModel } from '@laststint/sim';
-import { Brand } from '../components/Brand.js';
+import { CircuitCard } from '../components/CircuitCard.js';
 import { Disclaimer } from '../components/Disclaimer.js';
+import { GroundBackdrop } from '../components/GroundBackdrop.js';
+import { MapCredit } from '../components/MapCredit.js';
+import { TopBar } from '../components/TopBar.js';
 import { raceCreditText } from '../data/credits.js';
 import { surname } from '../data/names.js';
 import { Badge } from './EraDetail.js';
@@ -27,7 +30,7 @@ import {
 
 function Star({ line }: { line: StarLine }) {
   return (
-    <li className="flex min-w-0 gap-3 rounded-lg border border-[var(--rule)] px-3 py-2.5">
+    <li className="glass flex min-w-0 gap-3 px-3 py-2.5">
       <span aria-hidden="true" className="text-[20px] leading-none text-[var(--flag)]">
         ★{line.star}
       </span>
@@ -108,7 +111,7 @@ function Difficulty({
       </h2>
       <dl className="m-0 grid grid-cols-1 gap-2 sm:grid-cols-3">
         {rows.map(([term, value, detail]) => (
-          <div key={term} className="min-w-0 rounded-lg border border-[var(--rule)] px-3 py-2">
+          <div key={term} className="glass min-w-0 px-3 py-2">
             <dt className="eyebrow">{term}</dt>
             <dd className="m-0 font-semibold">{value}</dd>
             {detail && (
@@ -154,80 +157,90 @@ export function EraIntro({
   const briefing = model.eras?.briefing;
   const credit = raceCreditText(model.race.id);
   return (
-    <div className="flex min-h-screen flex-col">
-      <header className="border-b border-[var(--rule)]">
-        <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
-          <a href="/eras" className="flex items-baseline gap-2 hover:text-[var(--you)]">
-            <Brand className="text-[20px]" />
-            <span className="eyebrow">Eras</span>
-          </a>
+    <div className="relative isolate flex min-h-screen flex-col">
+      {/* The circuit on its real ground behind the page, dimmed (realistic UI spec). */}
+      <GroundBackdrop raceId={model.race.id} dim={0.3} />
+      <TopBar active="eras" />
+      <main className="mx-auto grid w-full min-w-0 max-w-6xl flex-1 grid-cols-1 items-start gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)]">
+        <div className="flex min-w-0 flex-col gap-6">
           <a
             href={`/eras/${era.id}`}
-            className="rounded-lg border border-[var(--rule)] px-3 py-1.5 text-[13px] font-semibold hover:bg-[var(--card-2)]"
+            className="w-fit text-[13px] text-[var(--muted)] underline underline-offset-2 hover:text-[var(--ink)]"
           >
             Back to the era
           </a>
-        </div>
-      </header>
-      <main className="mx-auto flex w-full min-w-0 max-w-3xl flex-1 flex-col gap-6 px-4 py-8 sm:px-6">
-        <div className="flex flex-col gap-2">
-          <div className="flex flex-wrap items-center gap-1.5">
-            <p className="eyebrow m-0 mr-auto !text-[var(--box-ink)]">
-              Era {era.id} · {era.name} · Race {race.position}
-            </p>
-            {legend && (
-              <span className="rounded border border-[var(--box-ink)] px-1.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-[var(--box-ink)]">
-                Legend
-              </span>
-            )}
-            {isReconstructed(model) && <Badge tone="muted">Reconstructed</Badge>}
-            {draft && <Badge tone="flag">Draft</Badge>}
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <p className="eyebrow m-0 mr-auto !text-[var(--box-ink)]">
+                Era {era.id} · {era.name} · Race {race.position}
+              </p>
+              {legend && (
+                <span className="rounded border border-[var(--box-ink)] px-1.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-[var(--box-ink)]">
+                  Legend
+                </span>
+              )}
+              {isReconstructed(model) && <Badge tone="muted">Reconstructed</Badge>}
+              {draft && <Badge tone="flag">Draft</Badge>}
+            </div>
+            <h1 className="disp wide m-0 break-words text-[40px] leading-[0.95] sm:text-[60px]">
+              {raceName(race.raceId)}
+            </h1>
           </div>
-          <h1 className="disp wide m-0 break-words text-[40px] leading-[0.95] sm:text-[60px]">
-            {raceName(race.raceId)}
-          </h1>
+
+          <section aria-labelledby="intro-dilemma" className="flex flex-col gap-2">
+            <h2 id="intro-dilemma" className="eyebrow m-0">
+              The dilemma
+            </h2>
+            <p className="m-0 break-words text-[22px] font-semibold leading-snug">{race.dilemma}</p>
+            {briefing && <p className="m-0 text-[15px]">{briefing}</p>}
+            <p className="m-0 text-[15px] text-[var(--muted)]">
+              You’re {surname(userSide)}’s race engineer{team ? ` at ${team}` : ''} from lap{' '}
+              {takeoverLap} of {laps}, against {surname(rival)}.
+            </p>
+          </section>
+
+          <Objectives model={model} difficulty={difficulty} />
+          <Difficulty difficulty={difficulty} legend={legend} timed={timed} />
+
+          <div className="flex w-full flex-col items-stretch gap-2.5 sm:w-fit">
+            <button
+              type="button"
+              onClick={onStart}
+              className="rounded-xl bg-[var(--you)] px-8 py-4 text-[18px] font-bold text-[var(--you-ink)] hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
+            >
+              {resume ?? (legend ? 'Start the race · Legend' : 'Start the race')}
+            </button>
+            <button
+              type="button"
+              onClick={onHelp}
+              className="text-[13px] text-[var(--muted)] underline hover:text-[var(--ink)]"
+            >
+              How it works
+            </button>
+          </div>
+
+          {credit && (
+            <p data-credit="race" className="m-0 break-words text-[13px] text-[var(--muted)]">
+              {credit}{' '}
+              <a href="/credits" className="underline underline-offset-2 hover:text-[var(--ink)]">
+                Credits
+              </a>
+            </p>
+          )}
         </div>
-
-        <section aria-labelledby="intro-dilemma" className="flex flex-col gap-2">
-          <h2 id="intro-dilemma" className="eyebrow m-0">
-            The dilemma
-          </h2>
-          <p className="m-0 break-words text-[22px] font-semibold leading-snug">{race.dilemma}</p>
-          {briefing && <p className="m-0 text-[15px]">{briefing}</p>}
-          <p className="m-0 text-[15px] text-[var(--muted)]">
-            You’re {surname(userSide)}’s race engineer{team ? ` at ${team}` : ''} from lap{' '}
-            {takeoverLap} of {laps}, against {surname(rival)}.
-          </p>
-        </section>
-
-        <Objectives model={model} difficulty={difficulty} />
-        <Difficulty difficulty={difficulty} legend={legend} timed={timed} />
-
-        <div className="flex w-full flex-col items-stretch gap-2.5 sm:w-fit">
-          <button
-            type="button"
-            onClick={onStart}
-            className="rounded-xl bg-[var(--you)] px-8 py-4 text-[18px] font-bold text-[var(--you-ink)] hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
-          >
-            {resume ?? (legend ? 'Start the race · Legend' : 'Start the race')}
-          </button>
-          <button
-            type="button"
-            onClick={onHelp}
-            className="text-[13px] text-[var(--muted)] underline hover:text-[var(--ink)]"
-          >
-            How it works
-          </button>
-        </div>
-
-        {credit && (
-          <p data-credit="race" className="m-0 break-words text-[13px] text-[var(--muted)]">
-            {credit}{' '}
-            <a href="/credits" className="underline underline-offset-2 hover:text-[var(--ink)]">
-              Credits
-            </a>
-          </p>
-        )}
+        {/* Where it's run: the circuit on its ground, beside the briefing on a computer. */}
+        <aside className="glass-strong overflow-hidden lg:sticky lg:top-6">
+          <div className="relative">
+            <CircuitCard raceId={model.race.id} />
+            <MapCredit raceId={model.race.id} className="absolute right-2 bottom-1.5" />
+          </div>
+          <div className="flex flex-wrap items-baseline justify-between gap-2 px-4 py-3">
+            <span className="disp text-[18px]">{raceName(race.raceId)}</span>
+            <span className="text-[13px] text-[var(--muted)]">
+              {surname(userSide)} vs {surname(rival)} · from lap {takeoverLap} of {laps}
+            </span>
+          </div>
+        </aside>
       </main>
       <Disclaimer />
     </div>

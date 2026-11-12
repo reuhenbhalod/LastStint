@@ -294,6 +294,16 @@ def multiviewer_outline(race_id: str) -> dict:
     return mv_outline.build(info, pit)
 
 
+# Drawn from F1DB first, then redrawn from the real lap (scripts/sepang_outlines.py, Nov 11
+# 2026): F1DB's sepang-1 pinches the straights and the last hairpin up to 32 m inside the track.
+# The committed files are the redrawn ones; this script only writes missing files, so it never
+# overwrites them.
+REDRAWN: dict[str, str] = {
+    r: "scripts/sepang_outlines.py"
+    for r in ("malaysia-1999", "malaysia-2001", "malaysia-2006", "malaysia-2013", "malaysia-2015")
+}
+
+
 def outline_for(race_id: str) -> dict:
     if race_id in FASTF1:
         shape = source_outline(race_id)

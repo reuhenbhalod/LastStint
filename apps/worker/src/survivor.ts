@@ -11,7 +11,7 @@
 
 import { GRADE_SAMPLES, type RaceModel, VerifyError, verifyRun } from '@laststint/sim';
 import { displayName } from './names.js';
-import { DISPLAY_NAME } from './players.js';
+import { DISPLAY_NAME, NOT_HIDDEN } from './players.js';
 import { SURVIVOR_POOL } from './pools.js';
 import { getRace } from './races.js';
 import { type StoredResult, stored } from './results.js';
@@ -140,15 +140,19 @@ async function rounds(db: D1Database, runId: string): Promise<RoundRow[]> {
   return results;
 }
 
+/** Hidden players count only in their own rank, so the rank matches the board (see standing). */
 async function rankOf(db: D1Database, run: RunRow): Promise<{ rank: number; total: number }> {
   const row = await db
     .prepare(
-      `SELECT
-         (SELECT COUNT(*) FROM survivor_runs WHERE rounds > ?1
+      `WITH counted AS (
+         SELECT rounds, score_sum FROM survivor_runs
+         WHERE ${NOT_HIDDEN('anon_id')} OR anon_id = ?3)
+       SELECT
+         (SELECT COUNT(*) FROM counted WHERE rounds > ?1
             OR (rounds = ?1 AND score_sum > ?2)) AS ahead,
-         (SELECT COUNT(*) FROM survivor_runs) AS total`,
+         (SELECT COUNT(*) FROM counted) AS total`,
     )
-    .bind(run.rounds, run.score_sum)
+    .bind(run.rounds, run.score_sum, run.anon_id)
     .first<{ ahead: number; total: number }>();
   return { rank: (row?.ahead ?? 0) + 1, total: row?.total ?? 1 };
 }
@@ -280,7 +284,8 @@ export async function survivorBoard(db: D1Database, now: number) {
       .prepare(
         `SELECT anon_id, rounds, score_sum, status, started_at,
                 ${DISPLAY_NAME('survivor_runs.anon_id')} AS name FROM survivor_runs
-         WHERE rounds > 0 ${since ? 'AND started_at >= ?' : ''}
+         WHERE rounds > 0 AND ${NOT_HIDDEN('survivor_runs.anon_id')}
+           ${since ? 'AND started_at >= ?' : ''}
          ORDER BY rounds DESC, score_sum DESC, started_at LIMIT ${SURVIVOR_BOARD}`,
       )
       .bind(...(since ? [since] : []))

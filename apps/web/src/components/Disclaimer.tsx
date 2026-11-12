@@ -44,6 +44,18 @@ export function Disclaimer({
             driver names are used only to describe the real races, and team names and colours belong
             to their owners.
           </p>
+          <p className="m-0">
+            Circuit maps drawn from data ©{' '}
+            <a
+              href="https://www.openstreetmap.org/copyright"
+              target="_blank"
+              rel="noreferrer"
+              className="underline underline-offset-2 hover:text-[var(--ink)]"
+            >
+              OpenStreetMap contributors
+            </a>{' '}
+            (ODbL).
+          </p>
           <p className="m-0 flex flex-wrap gap-x-4 gap-y-1">
             <a
               href="/privacy"
