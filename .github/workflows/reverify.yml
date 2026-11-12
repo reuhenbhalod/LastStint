@@ -15,7 +15,7 @@ concurrency:
 jobs:
   reverify:
     name: Re-grade unverified runs
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, wsl]  # the PC (docs/pc-ci-runner.md)
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

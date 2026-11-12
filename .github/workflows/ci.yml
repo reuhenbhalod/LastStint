@@ -14,7 +14,7 @@ concurrency:
 jobs:
   python:
     name: Python pipeline
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, wsl]  # the PC (docs/pc-ci-runner.md)
     defaults:
       run:
         working-directory: pipeline
@@ -33,7 +33,7 @@ jobs:
 
   js:
     name: JS/TS workspace
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, wsl]  # the PC (docs/pc-ci-runner.md)
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4  # version from package.json "packageManager"
@@ -59,7 +59,7 @@ jobs:
   # PR already tested (.github/scripts/eras-checks-needed.sh). Run it by hand with workflow_dispatch.
   eras-reachability:
     name: Eras reachability
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, wsl]  # the PC (docs/pc-ci-runner.md)
     steps:
       - uses: actions/checkout@v4
         with:
@@ -93,7 +93,7 @@ jobs:
   # Python pipeline produces from the committed snapshots, and the TS sim must reproduce them.
   parity:
     name: TS<->Python parity
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, wsl]  # the PC (docs/pc-ci-runner.md)
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v4
@@ -140,7 +140,7 @@ jobs:
   # PR already tested (.github/scripts/eras-checks-needed.sh). The API is mocked, so no Worker.
   e2e:
     name: Web end-to-end
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, wsl]  # the PC (docs/pc-ci-runner.md)
     steps:
       - uses: actions/checkout@v4
         with:
@@ -158,7 +158,7 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @laststint/web exec playwright install --with-deps chromium
+      - run: pnpm --filter @laststint/web exec playwright install chromium  # system libraries: .github/runner/setup-wsl-runner.sh
       - name: Playthrough
         run: pnpm --filter @laststint/web e2e
 
@@ -167,7 +167,7 @@ jobs:
     name: Deploy Worker + D1 migrations
     needs: [python, js, eras-reachability, parity, e2e]
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, wsl]  # the PC (docs/pc-ci-runner.md)
     concurrency:
       group: deploy-worker
       cancel-in-progress: false
@@ -193,7 +193,7 @@ jobs:
     name: Deploy website
     needs: [deploy]
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, wsl]  # the PC (docs/pc-ci-runner.md)
     concurrency:
       group: deploy-web
       cancel-in-progress: false
