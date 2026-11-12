@@ -25,6 +25,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4  # version from package.json "packageManager"
+        with:
+          dest: ${{ runner.temp }}/setup-pnpm  # per job: the PC runners share one home folder
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -46,6 +48,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4  # version from package.json "packageManager"
+        with:
+          dest: ${{ runner.temp }}/setup-pnpm  # per job: the PC runners share one home folder
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -71,6 +75,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4  # version from package.json "packageManager"
+        with:
+          dest: ${{ runner.temp }}/setup-pnpm  # per job: the PC runners share one home folder
       - uses: actions/setup-node@v4
         with:
           node-version: 22
