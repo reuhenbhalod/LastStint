@@ -11,6 +11,11 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
+# The PC runners run up to three jobs at once, so the sim's wall-clock budget test gets 4 s
+# (packages/sim/tests/grade.test.ts; 1 s on a quiet machine).
+env:
+  SIM_RUNTIME_BUDGET_MS: 4000
+
 jobs:
   python:
     name: Python pipeline
