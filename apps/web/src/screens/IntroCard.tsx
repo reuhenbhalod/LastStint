@@ -10,9 +10,10 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { takeHowToPending } from '../account/howTo.js';
 import type { AccountState } from '../account/useAccount.js';
 import { AccountBar } from '../components/AccountBar.js';
-import { Brand } from '../components/Brand.js';
 import { Disclaimer } from '../components/Disclaimer.js';
 import { HeadsetIcon, OvertakeIcon, TyreIcon } from '../components/Icons.js';
+import { MapCredit } from '../components/MapCredit.js';
+import { TopBar } from '../components/TopBar.js';
 import { TyreBadge } from '../components/TyreBadge.js';
 import { TIER_LABEL, driverInfo } from '../data/drivers.js';
 import { surname } from '../data/names.js';
@@ -22,23 +23,6 @@ import { carsOnTrack, pointAt, polyline } from '../track/geometry.js';
 import { groundFor } from '../track/ground.js';
 import { outlineFor } from '../track/outlines.js';
 import { HowToPlay } from './HowToPlay.js';
-
-const PILL =
-  'rounded-full border border-[var(--fav,var(--box))] bg-[color-mix(in_srgb,var(--fav,transparent)_12%,transparent)] px-3 py-1 text-[13px] font-semibold text-[var(--ink)] hover:bg-[color-mix(in_srgb,var(--fav,var(--box))_22%,transparent)]';
-
-/** The top bar's links to the other game modes: the Gauntlet and Eras. */
-export function ModePills() {
-  return (
-    <>
-      <a href="/gauntlet" className={PILL}>
-        Gauntlet
-      </a>
-      <a href="/eras" className={PILL}>
-        Eras
-      </a>
-    </>
-  );
-}
 
 /** The circuit on its real ground (track/ground.ts), with the two cars where they are at the
  * takeover. It covers its box; the hero's gradient fades it into the page. */
@@ -255,30 +239,10 @@ export function IntroCard({
         />
       )}
 
-      <header className="relative z-10 border-b border-[var(--glass-edge)] bg-[var(--paper)]/80 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
-          <a href="/" className="flex items-baseline gap-2">
-            <Brand className="text-[20px]" />
-            <span className="eyebrow hidden sm:inline">Daily race strategy</span>
-          </a>
-          <span className="flex flex-wrap items-center gap-2">
-            <a
-              href="/tutorial"
-              className="rounded-full border border-[var(--rule)] px-3 py-1 text-[13px] font-semibold text-[var(--ink)] hover:border-[var(--you)] hover:bg-[color-mix(in_srgb,var(--you)_12%,transparent)]"
-            >
-              Tutorial
-            </a>
-            <a
-              href="/versus"
-              className="rounded-full border border-[var(--rival)] px-3 py-1 text-[13px] font-semibold text-[var(--ink)] hover:bg-[color-mix(in_srgb,var(--rival)_14%,transparent)]"
-            >
-              Versus
-            </a>
-            {source !== 'survivor' && <ModePills />}
-            {account && <AccountBar account={account} compact />}
-          </span>
-        </div>
-      </header>
+      <TopBar
+        active={source === 'survivor' ? 'gauntlet' : 'daily'}
+        right={account && <AccountBar account={account} compact />}
+      />
 
       <main className="flex flex-1 flex-col">
         {/* The hero: the circuit behind the race's name. */}
@@ -294,6 +258,12 @@ export function IntroCard({
               background:
                 'linear-gradient(90deg, var(--paper) 0%, var(--paper) 34%, color-mix(in srgb, var(--paper) 55%, transparent) 50%, transparent 70%), linear-gradient(0deg, var(--paper) 0%, transparent 18%)',
             }}
+          />
+          {/* The map's OpenStreetMap credit, in the hero's top corner (with the map, on a
+              computer). */}
+          <MapCredit
+            raceId={model.race.id}
+            className="absolute right-3 top-3 z-10 hidden lg:block"
           />
           <div className="relative mx-auto grid max-w-7xl items-center gap-6 px-4 py-8 sm:px-6 lg:min-h-[600px] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:py-14">
             <div className="flex flex-col gap-5">
@@ -391,13 +361,14 @@ export function IntroCard({
                 above it). */}
             <div className="relative flex flex-col lg:justify-end lg:self-stretch">
               <div
-                className="mx-auto w-full max-w-[640px] overflow-hidden rounded-2xl lg:hidden"
+                className="relative mx-auto w-full max-w-[640px] overflow-hidden rounded-2xl lg:hidden"
                 style={(() => {
                   const o = outlineFor(model.race.id);
                   return o ? { aspectRatio: `${o.width + 80} / ${o.height + 80}` } : undefined;
                 })()}
               >
                 <Circuit state={state} model={model} />
+                <MapCredit raceId={model.race.id} className="absolute right-2 top-2 z-10" />
               </div>
               <section
                 aria-label="The situation"

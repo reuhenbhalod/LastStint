@@ -6,10 +6,10 @@
 
 import type { RaceModel } from '@laststint/sim';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Brand } from '../components/Brand.js';
 import { Disclaimer } from '../components/Disclaimer.js';
 import { GroundBackdrop } from '../components/GroundBackdrop.js';
 import { ChequeredIcon, FlagIcon, OvertakeIcon } from '../components/Icons.js';
+import { TopBar } from '../components/TopBar.js';
 import { ApiError, type SurvivorBoardEntry, type SurvivorState, survivorApi } from '../data/api.js';
 import { anonId } from '../data/player.js';
 import { SurvivorProvider } from '../data/provider.js';
@@ -66,28 +66,8 @@ function useRaceName(raceId: string | undefined) {
   return model;
 }
 
-function Header({ onHome }: { onHome: () => void }) {
-  return (
-    <header className="border-b border-[var(--rule)]">
-      <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
-        <button
-          type="button"
-          onClick={onHome}
-          className="flex items-baseline gap-2 hover:text-[var(--you)]"
-        >
-          <Brand className="text-[20px]" />
-          <span className="eyebrow">Gauntlet</span>
-        </button>
-        <button
-          type="button"
-          onClick={onHome}
-          className="rounded-lg border border-[var(--rule)] px-3 py-1.5 text-[13px] font-semibold hover:bg-[var(--card-2)]"
-        >
-          Today’s daily
-        </button>
-      </div>
-    </header>
-  );
+function Header() {
+  return <TopBar active="gauntlet" />;
 }
 
 function Board({ mine }: { mine?: string }) {
@@ -490,7 +470,7 @@ export function Survivor() {
   return (
     <div className="relative isolate flex min-h-screen flex-col">
       <GroundBackdrop raceId="italy-2024" />
-      <Header onHome={home} />
+      <Header />
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6 sm:px-6">
         {view === 'loading' && <p className="text-center text-[var(--muted)]">Loading…</p>}
         {view === 'lobby' && <Lobby onStart={start} busy={busy} error={error} />}

@@ -3,6 +3,11 @@
 // each call on before the lap it acts on (lockstep: both browsers run the same race), waits for
 // a dropped player, and grades the race at the flag. It runs the race itself too: it raises
 // the big calls, and its copy is the one graded.
+//
+// For the admin page (docs/admin-v2-spec.md A7) the room keeps its row in versus_rooms up to
+// date (phase, players, lap; closed at the flag) and stores the finished match in
+// versus_matches. Those writes never hold up or break the race: they queue one after another
+// and a failure is only logged.
 
 import {
   type ClientMessage,
@@ -107,10 +112,16 @@ export class VersusRoom implements DurableObject {
   private held: VersusCall[] = [];
   private waitingFor: PlayerIndex | null = null;
   private result: VersusOutcome | null = null;
+  private startedAt = '';
+  private openedAt = '';
   private readonly timing: Timing;
+  private readonly db: D1Database | undefined;
+  /** The admin records' writes, in order. */
+  private saving: Promise<void> = Promise.resolve();
 
   constructor(_state: DurableObjectState, env: Env) {
     this.timing = timingOf(env);
+    this.db = env.DB;
   }
 
   async fetch(request: Request): Promise<Response> {
@@ -121,6 +132,8 @@ export class VersusRoom implements DurableObject {
       this.code = body.code;
       this.track = body.track;
       this.seed = body.seed;
+      this.openedAt = new Date().toISOString();
+      this.saveRoom();
       return Response.json(this.view());
     }
     if (url.pathname === '/view') {
@@ -295,6 +308,7 @@ export class VersusRoom implements DurableObject {
     this.setup = { track: this.track, seed: this.seed, players };
     this.run = initVersus(race.model, this.setup);
     this.phase = 'race';
+    this.startedAt = new Date().toISOString();
     this.broadcast({ t: 'room', room: this.view() });
     this.broadcast({ t: 'start', sync: this.sync() as RaceSync });
     this.later(this.timing.reveal, () => this.nextLap());
@@ -398,6 +412,7 @@ export class VersusRoom implements DurableObject {
     this.later(ms * (1 - from), () => {
       stepVersus(run);
       this.running = null;
+      this.saveRoom();
       this.nextLap();
     });
   }
@@ -442,6 +457,76 @@ export class VersusRoom implements DurableObject {
     this.phase = 'done';
     this.broadcast({ t: 'room', room: this.view() });
     this.broadcast({ t: 'result', result: this.result });
+    this.saveMatch(this.result);
+  }
+
+  // --- The admin page's records (versus_rooms, versus_matches) ---------------------------
+
+  private record(write: (db: D1Database) => Promise<unknown>): void {
+    const db = this.db;
+    if (!db || !this.code) return;
+    this.saving = this.saving
+      .then(() => write(db))
+      .then(
+        () => undefined,
+        (e) => console.error('versus record failed', e),
+      );
+  }
+
+  /** The room as the admin page lists it: open until the match is done. */
+  private saveRoom(): void {
+    const now = new Date().toISOString();
+    const names = this.seats.flatMap((s) => (s ? [s.name] : []));
+    const lap = this.run?.state.lap ?? 0;
+    const closed = this.phase === 'done' ? now : null;
+    this.record((db) =>
+      db
+        .prepare(
+          `INSERT INTO versus_rooms (code, track, phase, players, lap, opened_at, updated_at, closed_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+           ON CONFLICT (code) DO UPDATE SET track = excluded.track, phase = excluded.phase,
+             players = excluded.players, lap = excluded.lap, opened_at = excluded.opened_at,
+             updated_at = excluded.updated_at, closed_at = excluded.closed_at`,
+        )
+        .bind(
+          this.code,
+          this.track,
+          this.phase,
+          JSON.stringify(names),
+          lap,
+          this.openedAt || now,
+          now,
+          closed,
+        )
+        .run(),
+    );
+  }
+
+  /** A finished match: who raced in what, who won and by how much. */
+  private saveMatch(r: VersusOutcome): void {
+    const winner = r.score ? r.score.winner : r.forfeit !== undefined ? 1 - r.forfeit : null;
+    const battles = new Set(r.answers.filter((a) => a.kind === 'battle').map((a) => a.lap)).size;
+    this.record((db) =>
+      db
+        .prepare(
+          `INSERT INTO versus_matches (code, track, players, cars, winner, gap, forfeit, battles,
+             started_at, finished_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        )
+        .bind(
+          this.code,
+          this.track,
+          JSON.stringify(r.players.map((p) => p.name)),
+          JSON.stringify(r.players.map((p) => ({ car: p.car, startTyre: p.startTyre }))),
+          winner,
+          r.score?.road.gap ?? null,
+          r.forfeit ?? null,
+          battles,
+          this.startedAt || new Date().toISOString(),
+          new Date().toISOString(),
+        )
+        .run(),
+    );
   }
 
   // --- Plumbing ---------------------------------------------------------------------------
@@ -514,6 +599,8 @@ export class VersusRoom implements DurableObject {
 
   private broadcast(msg: ServerMessage): void {
     for (const s of this.seats) if (s?.ws) this.send(s.ws, msg);
+    // The room changed (seats, picks or phase): so does its row on the admin page.
+    if (msg.t === 'room') this.saveRoom();
   }
 }
 

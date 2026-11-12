@@ -10,9 +10,25 @@ game itself doesn't change: every call, panel and control stays where the player
 
 ## Decisions
 
-- **Everything is redesigned except eras.** The home page, the race, the result, versus, survivor,
-  how to play, how it works, the tutorial, the legal page and the account bits. The eras branches
-  (`origin/eras*`) are not touched.
+- **Everything is redesigned, Eras too.** The home page, the race, the result, versus, survivor,
+  how to play, how it works, the tutorial, the legal page and the account bits. Eras (once
+  merged from `origin/eras*`) gets the look as well: the era and leaderboard pages stand over a
+  dimmed circuit backdrop, the race intro shows the circuit on its ground (`CircuitCard`), and
+  the stars panel is glass. An Eras race only has ground where `data/basemap/index.json` has a
+  transform for that exact race id; today that is 7 of the 100 Eras races (none in era 10), and
+  the rest fall back to the plain ground colour under the outline. Adding the others means
+  running `pipeline basemap` for those race ids.
+- **One top bar on every mode.** Home, the Gauntlet, Eras and Versus share one bar: the brand,
+  Daily / Gauntlet / Eras / Versus as tabs (no Tutorial button; the tutorial is linked from the
+  home page), and on the right the streak and the account menu (Sign in, or the player's
+  initial and name opening Edit profile, Admin for admins, Sign out). The daily passes its own
+  account; the other modes' bar loads it itself. The favourite team's colour (`--fav`) is only
+  on the bar: the streak chip, the avatar and the menu's Admin entry.
+- **OpenStreetMap credit wherever the ground shows.** The ground is OpenStreetMap data (ODbL),
+  so every map that draws it carries "© OpenStreetMap contributors" linked to the copyright
+  page (`MapCredit`): the race map (bottom right, above the call and the dock), the home hero
+  (top right, on a computer), the Versus match map and lobby backdrop, and the Eras intro card.
+  The footer has the same line, and the credits page lists OpenStreetMap and the terrain tiles.
 - **The same race screen behaviour.** Focus view: the map takes the screen, the leaders beside it.
   "Show stats" brings the timing tower and the stats in at the sides and the map shrinks between
   them. The calls, the dock and the control bar work as now. Only the look changes.

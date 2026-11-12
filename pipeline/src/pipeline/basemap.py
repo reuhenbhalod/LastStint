@@ -23,7 +23,8 @@ import math
 from pathlib import Path
 
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageDraw
+from scipy import ndimage
 
 from . import paths
 from .scenery import CIRCUITS, SCENERY_DIR
@@ -141,6 +142,59 @@ def _shade_png(h: np.ndarray, step: float) -> str:
     flat = math.sin(math.radians(45))
     tone = np.clip(1 - (flat - s) * 0.9, 0.45, 1.0)
     img = Image.fromarray((tone * 255).astype(np.uint8), "L")
+    buf = io.BytesIO()
+    img.save(buf, "PNG", optimize=True)
+    return base64.b64encode(buf.getvalue()).decode()
+
+
+SEA_STEP = 3.0  # m a pixel of the sea layer
+
+
+def _sea_png(s: dict, pal: dict) -> str | None:
+    """The sea, which OpenStreetMap maps only as coastlines (lines, with the land on their
+    left): the coastlines split the image into regions, and a region with almost no roads or
+    buildings in it is sea. Returned as a PNG in the water colour (transparent elsewhere), or
+    None when there is no coast."""
+    coast = s.get("coast") or []
+    if not coast:
+        return None
+    w, h = s["size"]
+    nx, nz = int(w / SEA_STEP) + 1, int(h / SEA_STEP) + 1
+    lines = Image.new("L", (nx, nz), 0)
+    draw = ImageDraw.Draw(lines)
+    for c in coast:
+        draw.line([(x / SEA_STEP, z / SEA_STEP) for x, z in c], fill=255, width=2)
+    regions, n = ndimage.label(np.asarray(lines) == 0)
+    if n < 2:
+        return None
+    # Land signs per region: road points and building corners.
+    signs = np.zeros(n + 1)
+    for r in s.get("roads", []) + s.get("raceways", []):
+        for x, z in r["p"]:
+            i, j = int(x / SEA_STEP), int(z / SEA_STEP)
+            if 0 <= i < nx and 0 <= j < nz:
+                signs[regions[j, i]] += 1
+    for b in s.get("buildings", []):
+        x, z = b["p"][0]
+        i, j = int(x / SEA_STEP), int(z / SEA_STEP)
+        if 0 <= i < nx and 0 <= j < nz:
+            signs[regions[j, i]] += 1
+    size = np.bincount(regions.ravel(), minlength=n + 1).astype(float)
+    density = signs / np.maximum(size, 1)
+    land = density[1:][size[1:] > 2000]
+    if not len(land) or land.max() == 0:
+        return None
+    sea = np.zeros(n + 1, bool)
+    sea[1:] = (size[1:] > 2000) & (density[1:] < 0.05 * land.max())
+    if not sea.any():
+        return None
+    mask = sea[regions] | (np.asarray(lines) > 0) & ndimage.binary_dilation(
+        sea[regions], iterations=2
+    )
+    r, g, b = (int(pal["water"][k : k + 2], 16) for k in (1, 3, 5))
+    rgba = np.zeros((nz, nx, 4), np.uint8)
+    rgba[mask] = (r, g, b, 255)
+    img = Image.fromarray(rgba, "RGBA")
     buf = io.BytesIO()
     img.save(buf, "PNG", optimize=True)
     return base64.b64encode(buf.getvalue()).decode()
@@ -266,6 +320,20 @@ def svg(circuit: str) -> str:
         f'<path d="{_line(r["p"])}" stroke-width="{r["w"] + 1.6:.1f}"/>' for r in roads
     )
     road = "".join(f'<path d="{_line(r["p"])}" stroke-width="{r["w"]:.1f}"/>' for r in roads)
+    # Today's tarmac: every raceway in use (under the race's own track, which the game draws).
+    raceways = s.get("raceways", [])
+    raceway_edge = "".join(
+        f'<path d="{_line(r["p"])}" stroke-width="{r["w"] + 2.4:.1f}"/>' for r in raceways
+    )
+    raceway = "".join(f'<path d="{_line(r["p"])}" stroke-width="{r["w"]:.1f}"/>' for r in raceways)
+    sea_png = _sea_png(s, pal)
+    sea = (
+        f'<image href="data:image/png;base64,{sea_png}" x="0" y="0" '
+        f'width="{(int(w / SEA_STEP) + 1) * SEA_STEP:.1f}" '
+        f'height="{(int(h / SEA_STEP) + 1) * SEA_STEP:.1f}" preserveAspectRatio="none"/>'
+        if sea_png
+        else ""
+    )
     streams = "".join(
         f'<path d="{_line(r["p"])}" stroke-width="{max(r["w"], 2):.1f}"/>'
         for r in s.get("streams", [])
@@ -294,12 +362,15 @@ def svg(circuit: str) -> str:
 <g filter="url(#shadow)">{area("forest", pal["forest"], 'filter="url(#canopy)"')}</g>
 {area("forest", "none", f'stroke="{pal["forest_edge"]}" stroke-width="3" opacity="0.7"')}
 <g fill="{pal["tree"]}">{trees}</g>
+{sea}
 {area("water", pal["water"])}
 {area("gravel", pal["gravel"])}
 {area("asphalt", pal["asphalt"])}
 <g stroke="{pal["stream"]}" {line}>{streams}</g>
 <g stroke="{pal["road_edge"]}" {line}>{road_edge}</g>
 <g stroke="{pal["road"]}" {line}>{road}</g>
+<g stroke="{pal["road_edge"]}" {line}>{raceway_edge}</g>
+<g stroke="{pal["asphalt"]}" {line}>{raceway}</g>
 {shading}
 {_barriers(s)}
 {buildings}

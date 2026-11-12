@@ -16,9 +16,12 @@
 // when it leaves done. Bodies are JSON (415 otherwise, 413 over 64 KB, 400 bad-json / invalid).
 // Every query is parameterised; the only SQL built at run time is an update's SET list, whose
 // column names come from a fixed list, never from the request.
+// Tickets keep their own history; creating one, changing its status and deleting it are also
+// written to the admin log (adminLog.ts, docs/admin-v2-spec.md A9).
 
 import type { Context, Hono } from 'hono';
 import { adminEmails, requireAdmin } from './admin.js';
+import { logAdmin } from './adminLog.js';
 import type { Env } from './index.js';
 import { ApiError } from './runs.js';
 import {
@@ -214,26 +217,39 @@ export function registerTickets(app: Hono<{ Bindings: Env }>) {
       who.email,
       Date.now(),
     );
+    await logAdmin(c.env.DB, who.email, 'ticket-create', { id: ticket.id, title: ticket.title });
     return c.json({ ticket }, 201);
   });
 
   app.patch('/api/admin/tickets/:id', async (c) => {
-    await requireAdmin(c);
+    const who = await requireAdmin(c);
     const id = ticketId(c);
     const parsed = parseTicketInput(await jsonBody(c), false);
     if (!parsed.ok) throw new ApiError(400, 'invalid', parsed.error);
     checkAssignee(c, parsed.value);
+    const before = await c.env.DB.prepare('SELECT status FROM tickets WHERE id = ?')
+      .bind(id)
+      .first<{ status: Status }>();
     const ticket = await updateTicket(c.env.DB, id, parsed.value, Date.now());
     if (!ticket) throw new ApiError(404, 'not-found', `no ticket ${id}`);
+    if (before && before.status !== ticket.status) {
+      await logAdmin(c.env.DB, who.email, 'ticket-status', {
+        id,
+        title: ticket.title,
+        from: before.status,
+        to: ticket.status,
+      });
+    }
     return c.json({ ticket });
   });
 
   app.delete('/api/admin/tickets/:id', async (c) => {
-    await requireAdmin(c);
+    const who = await requireAdmin(c);
     const id = ticketId(c);
     if (!(await deleteTicket(c.env.DB, id))) {
       throw new ApiError(404, 'not-found', `no ticket ${id}`);
     }
+    await logAdmin(c.env.DB, who.email, 'ticket-delete', { id });
     return c.json({ ok: true });
   });
 }

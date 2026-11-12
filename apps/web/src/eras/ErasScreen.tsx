@@ -5,8 +5,9 @@
 
 import { ERA_UNLOCK_SHARE } from '@laststint/sim';
 import { type ReactNode, useCallback, useEffect, useState } from 'react';
-import { Brand } from '../components/Brand.js';
 import { Disclaimer } from '../components/Disclaimer.js';
+import { GroundBackdrop } from '../components/GroundBackdrop.js';
+import { TopBar } from '../components/TopBar.js';
 import { EraDetailBody } from './EraDetail.js';
 import { EraMapBody } from './EraMap.js';
 import { EraRace } from './EraRace.js';
@@ -20,6 +21,7 @@ import {
   HISTORY_PATH,
   eraLeaderboardPath,
   raceName,
+  racesOfEra,
 } from './catalog.js';
 import { type EraDetailState, loadEraDetail } from './eraDetailState.js';
 import { type EraMapState, loadEraMap } from './eraMapState.js';
@@ -31,27 +33,15 @@ import {
 } from './historyState.js';
 
 function Header() {
-  return (
-    <header className="border-b border-[var(--rule)]">
-      <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
-        <a href="/eras" className="flex items-baseline gap-2 hover:text-[var(--you)]">
-          <Brand className="text-[20px]" />
-          <span className="eyebrow">Eras</span>
-        </a>
-        <a
-          href="/"
-          className="rounded-lg border border-[var(--rule)] px-3 py-1.5 text-[13px] font-semibold hover:bg-[var(--card-2)]"
-        >
-          Today’s daily
-        </a>
-      </div>
-    </header>
-  );
+  return <TopBar active="eras" />;
 }
 
-function Shell({ children }: { children: ReactNode }) {
+/** An Eras page: the top bar, the page, the data credit. `backdrop`: a race whose circuit
+ * stands behind the page on its real ground, dimmed (realistic UI spec). */
+function Shell({ children, backdrop }: { children: ReactNode; backdrop?: string }) {
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="relative isolate flex min-h-screen flex-col">
+      {backdrop && <GroundBackdrop raceId={backdrop} dim={0.28} />}
       <Header />
       <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-4 py-8 sm:px-6">
         {children}
@@ -153,7 +143,7 @@ export function EraDetailScreen({
   }, [api, era.id, attempt]);
 
   return (
-    <Shell>
+    <Shell backdrop={racesOfEra(era.id)[0]?.raceId}>
       <a href="/eras" className="text-[13px] text-[var(--muted)] underline hover:text-[var(--ink)]">
         All eras
       </a>
@@ -249,7 +239,7 @@ export function RaceLeaderboardScreen({
   }, [api, race.raceId, legend, attempt]);
 
   return (
-    <Shell>
+    <Shell backdrop={race.raceId}>
       <a
         href={`/eras/${era.id}`}
         className="text-[13px] text-[var(--muted)] underline hover:text-[var(--ink)]"

@@ -1,0 +1,922 @@
+{
+ "abu-dhabi-2010": {
+  "circuit": "yas-marina",
+  "layout": "yas-marina-1",
+  "length": 5554
+ },
+ "abu-dhabi-2011": {
+  "circuit": "yas-marina",
+  "layout": "yas-marina-1",
+  "length": 5554
+ },
+ "abu-dhabi-2012": {
+  "circuit": "yas-marina",
+  "layout": "yas-marina-1",
+  "length": 5554
+ },
+ "abu-dhabi-2015": {
+  "circuit": "yas-marina",
+  "layout": "yas-marina-1",
+  "length": 5554
+ },
+ "abu-dhabi-2016": {
+  "circuit": "yas-marina",
+  "layout": "yas-marina-1",
+  "length": 5554
+ },
+ "abu-dhabi-2020": {
+  "circuit": "yas-marina",
+  "layout": "yas-marina-1",
+  "length": 5554
+ },
+ "abu-dhabi-2021": {
+  "circuit": "yas-marina",
+  "layout": "yas-marina-2",
+  "length": 5281
+ },
+ "abu-dhabi-2022": {
+  "circuit": "yas-marina",
+  "layout": "yas-marina-2",
+  "length": 5281
+ },
+ "abu-dhabi-2024": {
+  "circuit": "yas-marina",
+  "layout": "yas-marina-2",
+  "length": 5281
+ },
+ "australia-1986": {
+  "circuit": "adelaide",
+  "layout": "adelaide-1",
+  "length": 3780
+ },
+ "australia-1993": {
+  "circuit": "adelaide",
+  "layout": "adelaide-1",
+  "length": 3780
+ },
+ "australia-1994": {
+  "circuit": "adelaide",
+  "layout": "adelaide-1",
+  "length": 3780
+ },
+ "australia-2010": {
+  "circuit": "melbourne",
+  "layout": "melbourne-1",
+  "length": 5303
+ },
+ "australia-2013": {
+  "circuit": "melbourne",
+  "layout": "melbourne-1",
+  "length": 5303
+ },
+ "australia-2017": {
+  "circuit": "melbourne",
+  "layout": "melbourne-1",
+  "length": 5303
+ },
+ "australia-2018": {
+  "circuit": "melbourne",
+  "layout": "melbourne-1",
+  "length": 5303
+ },
+ "australia-2025": {
+  "circuit": "melbourne",
+  "layout": "melbourne-2",
+  "length": 5278
+ },
+ "austria-2001": {
+  "circuit": "red-bull-ring",
+  "layout": "spielberg-3",
+  "length": 4326
+ },
+ "austria-2002": {
+  "circuit": "red-bull-ring",
+  "layout": "spielberg-3",
+  "length": 4326
+ },
+ "austria-2019": {
+  "circuit": "red-bull-ring",
+  "layout": "spielberg-3",
+  "length": 4318
+ },
+ "austria-2025": {
+  "circuit": "red-bull-ring",
+  "layout": "spielberg-3",
+  "length": 4326
+ },
+ "azerbaijan-2017": {
+  "circuit": "baku",
+  "layout": "baku-1",
+  "length": 6003
+ },
+ "azerbaijan-2021": {
+  "circuit": "baku",
+  "layout": "baku-1",
+  "length": 6003
+ },
+ "bahrain-2006": {
+  "circuit": "bahrain",
+  "layout": "bahrain-1",
+  "length": 5412
+ },
+ "bahrain-2012": {
+  "circuit": "bahrain",
+  "layout": "bahrain-1",
+  "length": 5412
+ },
+ "bahrain-2014": {
+  "circuit": "bahrain",
+  "layout": "bahrain-1",
+  "length": 5412
+ },
+ "bahrain-2015": {
+  "circuit": "bahrain",
+  "layout": "bahrain-1",
+  "length": 5412
+ },
+ "bahrain-2021": {
+  "circuit": "bahrain",
+  "layout": "bahrain-1",
+  "length": 5412
+ },
+ "bahrain-2022": {
+  "circuit": "bahrain",
+  "layout": "bahrain-1",
+  "length": 5412
+ },
+ "bahrain-2023": {
+  "circuit": "bahrain",
+  "layout": "bahrain-1",
+  "length": 5412
+ },
+ "belgium-1992": {
+  "circuit": "spa",
+  "layout": "spa-francorchamps-2",
+  "length": 6940
+ },
+ "belgium-1995": {
+  "circuit": "spa",
+  "layout": "spa-francorchamps-2",
+  "length": 6968
+ },
+ "belgium-1998": {
+  "circuit": "spa",
+  "layout": "spa-francorchamps-2",
+  "length": 6968
+ },
+ "belgium-2009": {
+  "circuit": "spa",
+  "layout": "spa-francorchamps-4",
+  "length": 7004
+ },
+ "belgium-2023": {
+  "circuit": "spa",
+  "layout": "spa-francorchamps-4",
+  "length": 7004
+ },
+ "belgium-2024": {
+  "circuit": "spa",
+  "layout": "spa-francorchamps-4",
+  "length": 7004
+ },
+ "brazil-1991": {
+  "circuit": "interlagos",
+  "layout": "interlagos-2",
+  "length": 4325
+ },
+ "brazil-1993": {
+  "circuit": "interlagos",
+  "layout": "interlagos-2",
+  "length": 4325
+ },
+ "brazil-1999": {
+  "circuit": "interlagos",
+  "layout": "interlagos-2",
+  "length": 4309
+ },
+ "brazil-2003": {
+  "circuit": "interlagos",
+  "layout": "interlagos-2",
+  "length": 4309
+ },
+ "brazil-2006": {
+  "circuit": "interlagos",
+  "layout": "interlagos-2",
+  "length": 4309
+ },
+ "brazil-2007": {
+  "circuit": "interlagos",
+  "layout": "interlagos-2",
+  "length": 4309
+ },
+ "brazil-2008": {
+  "circuit": "interlagos",
+  "layout": "interlagos-2",
+  "length": 4309
+ },
+ "brazil-2009": {
+  "circuit": "interlagos",
+  "layout": "interlagos-2",
+  "length": 4309
+ },
+ "brazil-2012": {
+  "circuit": "interlagos",
+  "layout": "interlagos-2",
+  "length": 4309
+ },
+ "brazil-2014": {
+  "circuit": "interlagos",
+  "layout": "interlagos-2",
+  "length": 4309
+ },
+ "brazil-2019": {
+  "circuit": "interlagos",
+  "layout": "interlagos-2",
+  "length": 4309
+ },
+ "brazil-2021": {
+  "circuit": "interlagos",
+  "layout": "interlagos-2",
+  "length": 4309
+ },
+ "canada-2003": {
+  "circuit": "villeneuve",
+  "layout": "montreal-6",
+  "length": 4361
+ },
+ "canada-2011": {
+  "circuit": "villeneuve",
+  "layout": "montreal-6",
+  "length": 4361
+ },
+ "canada-2014": {
+  "circuit": "villeneuve",
+  "layout": "montreal-6",
+  "length": 4361
+ },
+ "canada-2016": {
+  "circuit": "villeneuve",
+  "layout": "montreal-6",
+  "length": 4361
+ },
+ "canada-2019": {
+  "circuit": "villeneuve",
+  "layout": "montreal-6",
+  "length": 4361
+ },
+ "canada-2022": {
+  "circuit": "villeneuve",
+  "layout": "montreal-6",
+  "length": 4361
+ },
+ "canada-2024": {
+  "circuit": "villeneuve",
+  "layout": "montreal-6",
+  "length": 4361
+ },
+ "china-2007": {
+  "circuit": "shanghai",
+  "layout": "shanghai-1",
+  "length": 5451
+ },
+ "china-2011": {
+  "circuit": "shanghai",
+  "layout": "shanghai-1",
+  "length": 5451
+ },
+ "china-2013": {
+  "circuit": "shanghai",
+  "layout": "shanghai-1",
+  "length": 5451
+ },
+ "china-2017": {
+  "circuit": "shanghai",
+  "layout": "shanghai-1",
+  "length": 5451
+ },
+ "china-2018": {
+  "circuit": "shanghai",
+  "layout": "shanghai-1",
+  "length": 5451
+ },
+ "china-2024": {
+  "circuit": "shanghai",
+  "layout": "shanghai-1",
+  "length": 5451
+ },
+ "china-2025": {
+  "circuit": "shanghai",
+  "layout": "shanghai-1",
+  "length": 5451
+ },
+ "emilia-romagna-2024": {
+  "circuit": "imola",
+  "layout": "imola-3",
+  "length": 4909
+ },
+ "europe-1993": {
+  "circuit": "donington",
+  "layout": "donington-1",
+  "length": 4023
+ },
+ "europe-1997": {
+  "circuit": "jerez",
+  "layout": "jerez-2",
+  "length": 4428
+ },
+ "europe-1999": {
+  "circuit": "nurburgring",
+  "layout": "nurburgring-3",
+  "length": 4556
+ },
+ "europe-2007": {
+  "circuit": "nurburgring",
+  "layout": "nurburgring-4",
+  "length": 5148
+ },
+ "europe-2009": {
+  "circuit": "valencia",
+  "layout": "valencia-1",
+  "length": 5419
+ },
+ "europe-2012": {
+  "circuit": "valencia",
+  "layout": "valencia-1",
+  "length": 5419
+ },
+ "france-1990": {
+  "circuit": "paul-ricard",
+  "layout": "paul-ricard-2",
+  "length": 3813
+ },
+ "france-2001": {
+  "circuit": "magny-cours",
+  "layout": "magny-cours-2",
+  "length": 4250
+ },
+ "france-2004": {
+  "circuit": "magny-cours",
+  "layout": "magny-cours-3",
+  "length": 4411
+ },
+ "france-2007": {
+  "circuit": "magny-cours",
+  "layout": "magny-cours-3",
+  "length": 4411
+ },
+ "france-2019": {
+  "circuit": "paul-ricard",
+  "layout": "paul-ricard-3",
+  "length": 5842
+ },
+ "france-2021": {
+  "circuit": "paul-ricard",
+  "layout": "paul-ricard-3",
+  "length": 5842
+ },
+ "germany-1986": {
+  "circuit": "hockenheim",
+  "layout": "hockenheimring-2",
+  "length": 6802
+ },
+ "germany-1996": {
+  "circuit": "hockenheim",
+  "layout": "hockenheimring-3",
+  "length": 6823
+ },
+ "germany-1997": {
+  "circuit": "hockenheim",
+  "layout": "hockenheimring-3",
+  "length": 6823
+ },
+ "germany-2000": {
+  "circuit": "hockenheim",
+  "layout": "hockenheimring-3",
+  "length": 6823
+ },
+ "germany-2012": {
+  "circuit": "hockenheim",
+  "layout": "hockenheimring-4",
+  "length": 4574
+ },
+ "germany-2013": {
+  "circuit": "nurburgring",
+  "layout": "nurburgring-4",
+  "length": 5148
+ },
+ "germany-2016": {
+  "circuit": "hockenheim",
+  "layout": "hockenheimring-4",
+  "length": 4574
+ },
+ "germany-2018": {
+  "circuit": "hockenheim",
+  "layout": "hockenheimring-4",
+  "length": 4574
+ },
+ "germany-2019": {
+  "circuit": "hockenheim",
+  "layout": "hockenheimring-4",
+  "length": 4574
+ },
+ "great-britain-1987": {
+  "circuit": "silverstone",
+  "layout": "silverstone-3",
+  "length": 4778
+ },
+ "great-britain-2007": {
+  "circuit": "silverstone",
+  "layout": "silverstone-7",
+  "length": 5141
+ },
+ "great-britain-2016": {
+  "circuit": "silverstone",
+  "layout": "silverstone-8",
+  "length": 5891
+ },
+ "great-britain-2021": {
+  "circuit": "silverstone",
+  "layout": "silverstone-8",
+  "length": 5891
+ },
+ "great-britain-2022": {
+  "circuit": "silverstone",
+  "layout": "silverstone-8",
+  "length": 5891
+ },
+ "great-britain-2023": {
+  "circuit": "silverstone",
+  "layout": "silverstone-8",
+  "length": 5891
+ },
+ "hungary-1986": {
+  "circuit": "hungaroring",
+  "layout": "hungaroring-1",
+  "length": 4014
+ },
+ "hungary-1992": {
+  "circuit": "hungaroring",
+  "layout": "hungaroring-2",
+  "length": 3968
+ },
+ "hungary-1997": {
+  "circuit": "hungaroring",
+  "layout": "hungaroring-2",
+  "length": 3968
+ },
+ "hungary-1998": {
+  "circuit": "hungaroring",
+  "layout": "hungaroring-2",
+  "length": 3972
+ },
+ "hungary-2001": {
+  "circuit": "hungaroring",
+  "layout": "hungaroring-2",
+  "length": 3975
+ },
+ "hungary-2003": {
+  "circuit": "hungaroring",
+  "layout": "hungaroring-3",
+  "length": 4381
+ },
+ "hungary-2006": {
+  "circuit": "hungaroring",
+  "layout": "hungaroring-3",
+  "length": 4381
+ },
+ "hungary-2007": {
+  "circuit": "hungaroring",
+  "layout": "hungaroring-3",
+  "length": 4381
+ },
+ "hungary-2014": {
+  "circuit": "hungaroring",
+  "layout": "hungaroring-3",
+  "length": 4381
+ },
+ "hungary-2015": {
+  "circuit": "hungaroring",
+  "layout": "hungaroring-3",
+  "length": 4381
+ },
+ "hungary-2019": {
+  "circuit": "hungaroring",
+  "layout": "hungaroring-3",
+  "length": 4381
+ },
+ "hungary-2021": {
+  "circuit": "hungaroring",
+  "layout": "hungaroring-3",
+  "length": 4381
+ },
+ "hungary-2022": {
+  "circuit": "hungaroring",
+  "layout": "hungaroring-3",
+  "length": 4381
+ },
+ "hungary-2024": {
+  "circuit": "hungaroring",
+  "layout": "hungaroring-3",
+  "length": 4381
+ },
+ "hungary-2025": {
+  "circuit": "hungaroring",
+  "layout": "hungaroring-3",
+  "length": 4381
+ },
+ "italy-2001": {
+  "circuit": "monza",
+  "layout": "monza-7",
+  "length": 5793
+ },
+ "italy-2010": {
+  "circuit": "monza",
+  "layout": "monza-7",
+  "length": 5793
+ },
+ "italy-2019": {
+  "circuit": "monza",
+  "layout": "monza-7",
+  "length": 5793
+ },
+ "italy-2020": {
+  "circuit": "monza",
+  "layout": "monza-7",
+  "length": 5793
+ },
+ "italy-2022": {
+  "circuit": "monza",
+  "layout": "monza-7",
+  "length": 5793
+ },
+ "italy-2024": {
+  "circuit": "monza",
+  "layout": "monza-7",
+  "length": 5793
+ },
+ "japan-2000": {
+  "circuit": "suzuka",
+  "layout": "suzuka-1",
+  "length": 5860
+ },
+ "japan-2003": {
+  "circuit": "suzuka",
+  "layout": "suzuka-2",
+  "length": 5807
+ },
+ "japan-2005": {
+  "circuit": "suzuka",
+  "layout": "suzuka-2",
+  "length": 5807
+ },
+ "japan-2023": {
+  "circuit": "suzuka",
+  "layout": "suzuka-2",
+  "length": 5807
+ },
+ "japan-2024": {
+  "circuit": "suzuka",
+  "layout": "suzuka-2",
+  "length": 5807
+ },
+ "luxembourg-1998": {
+  "circuit": "nurburgring",
+  "layout": "nurburgring-3",
+  "length": 4556
+ },
+ "malaysia-1999": {
+  "circuit": "sepang",
+  "layout": "sepang-1",
+  "length": 5543
+ },
+ "malaysia-2001": {
+  "circuit": "sepang",
+  "layout": "sepang-1",
+  "length": 5543
+ },
+ "malaysia-2006": {
+  "circuit": "sepang",
+  "layout": "sepang-1",
+  "length": 5543
+ },
+ "malaysia-2013": {
+  "circuit": "sepang",
+  "layout": "sepang-1",
+  "length": 5543
+ },
+ "malaysia-2015": {
+  "circuit": "sepang",
+  "layout": "sepang-1",
+  "length": 5543
+ },
+ "mexico-1986": {
+  "circuit": "mexico-city",
+  "layout": "mexico-city-2",
+  "length": 4421
+ },
+ "mexico-1990": {
+  "circuit": "mexico-city",
+  "layout": "mexico-city-2",
+  "length": 4421
+ },
+ "mexico-2019": {
+  "circuit": "mexico-city",
+  "layout": "mexico-city-3",
+  "length": 4304
+ },
+ "mexico-2021": {
+  "circuit": "mexico-city",
+  "layout": "mexico-city-3",
+  "length": 4304
+ },
+ "mexico-2022": {
+  "circuit": "mexico-city",
+  "layout": "mexico-city-3",
+  "length": 4304
+ },
+ "mexico-2024": {
+  "circuit": "mexico-city",
+  "layout": "mexico-city-3",
+  "length": 4304
+ },
+ "miami-2022": {
+  "circuit": "miami",
+  "layout": "miami-1",
+  "length": 5412
+ },
+ "miami-2023": {
+  "circuit": "miami",
+  "layout": "miami-1",
+  "length": 5412
+ },
+ "miami-2024": {
+  "circuit": "miami",
+  "layout": "miami-1",
+  "length": 5412
+ },
+ "monaco-1984": {
+  "circuit": "monaco",
+  "layout": "monaco-4",
+  "length": 3312
+ },
+ "monaco-1988": {
+  "circuit": "monaco",
+  "layout": "monaco-5",
+  "length": 3328
+ },
+ "monaco-1992": {
+  "circuit": "monaco",
+  "layout": "monaco-5",
+  "length": 3328
+ },
+ "monaco-2004": {
+  "circuit": "monaco",
+  "layout": "monaco-6",
+  "length": 3340
+ },
+ "monaco-2008": {
+  "circuit": "monaco",
+  "layout": "monaco-6",
+  "length": 3340
+ },
+ "monaco-2011": {
+  "circuit": "monaco",
+  "layout": "monaco-6",
+  "length": 3340
+ },
+ "monaco-2015": {
+  "circuit": "monaco",
+  "layout": "monaco-6",
+  "length": 3337
+ },
+ "monaco-2016": {
+  "circuit": "monaco",
+  "layout": "monaco-6",
+  "length": 3337
+ },
+ "monaco-2017": {
+  "circuit": "monaco",
+  "layout": "monaco-6",
+  "length": 3337
+ },
+ "monaco-2022": {
+  "circuit": "monaco",
+  "layout": "monaco-6",
+  "length": 3337
+ },
+ "monaco-2025": {
+  "circuit": "monaco",
+  "layout": "monaco-6",
+  "length": 3337
+ },
+ "netherlands-2021": {
+  "circuit": "zandvoort",
+  "layout": "zandvoort-5",
+  "length": 4259
+ },
+ "netherlands-2022": {
+  "circuit": "zandvoort",
+  "layout": "zandvoort-5",
+  "length": 4259
+ },
+ "netherlands-2023": {
+  "circuit": "zandvoort",
+  "layout": "zandvoort-5",
+  "length": 4259
+ },
+ "portugal-1984": {
+  "circuit": "estoril",
+  "layout": "estoril-1",
+  "length": 4349
+ },
+ "portugal-1985": {
+  "circuit": "estoril",
+  "layout": "estoril-1",
+  "length": 4349
+ },
+ "portugal-2020": {
+  "circuit": "portimao",
+  "layout": "portimao-1",
+  "length": 4653
+ },
+ "portugal-2021": {
+  "circuit": "portimao",
+  "layout": "portimao-1",
+  "length": 4653
+ },
+ "russia-2018": {
+  "circuit": "sochi",
+  "layout": "sirius-1",
+  "length": 5848
+ },
+ "russia-2020": {
+  "circuit": "sochi",
+  "layout": "sirius-1",
+  "length": 5848
+ },
+ "russia-2021": {
+  "circuit": "sochi",
+  "layout": "sirius-1",
+  "length": 5848
+ },
+ "sakhir-2020": {
+  "circuit": "bahrain",
+  "layout": "bahrain-3",
+  "length": 3543
+ },
+ "san-marino-1999": {
+  "circuit": "imola",
+  "layout": "imola-2",
+  "length": 4933
+ },
+ "san-marino-2000": {
+  "circuit": "imola",
+  "layout": "imola-2",
+  "length": 4933
+ },
+ "san-marino-2003": {
+  "circuit": "imola",
+  "layout": "imola-2",
+  "length": 4933
+ },
+ "san-marino-2005": {
+  "circuit": "imola",
+  "layout": "imola-2",
+  "length": 4933
+ },
+ "san-marino-2006": {
+  "circuit": "imola",
+  "layout": "imola-2",
+  "length": 4933
+ },
+ "saudi-arabia-2021": {
+  "circuit": "jeddah",
+  "layout": "jeddah-1",
+  "length": 6174
+ },
+ "saudi-arabia-2023": {
+  "circuit": "jeddah",
+  "layout": "jeddah-1",
+  "length": 6174
+ },
+ "saudi-arabia-2025": {
+  "circuit": "jeddah",
+  "layout": "jeddah-1",
+  "length": 6174
+ },
+ "singapore-2014": {
+  "circuit": "marina-bay",
+  "layout": "marina-bay-2",
+  "length": 5065
+ },
+ "singapore-2023": {
+  "circuit": "marina-bay",
+  "layout": "marina-bay-4",
+  "length": 4940
+ },
+ "south-africa-1983": {
+  "circuit": "kyalami",
+  "layout": "kyalami-1",
+  "length": 4104
+ },
+ "spain-1994": {
+  "circuit": "barcelona",
+  "layout": "catalunya-1",
+  "length": 4745
+ },
+ "spain-1996": {
+  "circuit": "barcelona",
+  "layout": "catalunya-2",
+  "length": 4727
+ },
+ "spain-2013": {
+  "circuit": "barcelona",
+  "layout": "catalunya-4",
+  "length": 4655
+ },
+ "spain-2016": {
+  "circuit": "barcelona",
+  "layout": "catalunya-4",
+  "length": 4655
+ },
+ "spain-2017": {
+  "circuit": "barcelona",
+  "layout": "catalunya-4",
+  "length": 4655
+ },
+ "spain-2020": {
+  "circuit": "barcelona",
+  "layout": "catalunya-4",
+  "length": 4655
+ },
+ "spain-2021": {
+  "circuit": "barcelona",
+  "layout": "catalunya-5",
+  "length": 4675
+ },
+ "spain-2023": {
+  "circuit": "barcelona",
+  "layout": "catalunya-6",
+  "length": 4657
+ },
+ "styria-2020": {
+  "circuit": "red-bull-ring",
+  "layout": "spielberg-3",
+  "length": 4318
+ },
+ "styria-2021": {
+  "circuit": "red-bull-ring",
+  "layout": "spielberg-3",
+  "length": 4318
+ },
+ "turkey-2008": {
+  "circuit": "istanbul",
+  "layout": "istanbul-1",
+  "length": 5338
+ },
+ "turkey-2020": {
+  "circuit": "istanbul",
+  "layout": "istanbul-1",
+  "length": 5338
+ },
+ "turkey-2021": {
+  "circuit": "istanbul",
+  "layout": "istanbul-1",
+  "length": 5338
+ },
+ "united-states-1990": {
+  "circuit": "phoenix",
+  "layout": "phoenix-1",
+  "length": 3800
+ },
+ "united-states-2003": {
+  "circuit": "indianapolis",
+  "layout": "indianapolis-2",
+  "length": 4192
+ },
+ "united-states-2014": {
+  "circuit": "cota",
+  "layout": "austin-1",
+  "length": 5513
+ },
+ "united-states-2015": {
+  "circuit": "cota",
+  "layout": "austin-1",
+  "length": 5513
+ },
+ "united-states-2019": {
+  "circuit": "cota",
+  "layout": "austin-1",
+  "length": 5513
+ },
+ "united-states-2022": {
+  "circuit": "cota",
+  "layout": "austin-1",
+  "length": 5513
+ },
+ "united-states-2023": {
+  "circuit": "cota",
+  "layout": "austin-1",
+  "length": 5513
+ }
+}

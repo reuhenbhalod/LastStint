@@ -7,6 +7,14 @@ import { type Context, Hono } from 'hono';
 import { cors } from 'hono/cors';
 import type { ContentfulStatusCode } from 'hono/utils/http-status';
 import { adminEmails, registerAdmin } from './admin.js';
+import { registerAdminEras } from './adminEras.js';
+import { registerAdminLog } from './adminLog.js';
+import { registerAdminPlayers } from './adminPlayers.js';
+import { registerAdminRuns } from './adminRuns.js';
+import { registerAdminStats } from './adminStats.js';
+import { registerAdminToday } from './adminToday.js';
+import { registerAdminVersus } from './adminVersus.js';
+import { registerAnnouncements } from './announcements.js';
 import { authConfigured, verifyCredential } from './auth.js';
 import { isDate, isPlayable, playableDates } from './dates.js';
 import { LEADERBOARD_SIZE, dailyStats, getDaily, getRun, leaderboard } from './db.js';
@@ -122,6 +130,15 @@ async function cached(
 }
 
 registerAdmin(app);
+// Admin page v2 (docs/admin-v2-spec.md): each tab's endpoints, and the public announcement.
+registerAdminToday(app);
+registerAdminEras(app);
+registerAdminRuns(app);
+registerAdminPlayers(app);
+registerAdminVersus(app);
+registerAdminStats(app);
+registerAdminLog(app);
+registerAnnouncements(app);
 registerTickets(app);
 registerEras(app);
 registerErasHistory(app);
