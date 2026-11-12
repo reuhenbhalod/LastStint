@@ -71,3 +71,16 @@ The owner approved, on Nov 10 at about 23:00:
 - **Still owner-only:**
   - The canada-2024 `verified=0` SQL.
   - Sign-offs, C3 publish, and D5 (`released_at`).
+
+## 2026-11-11 day: release, Gauntlet, CI moves to the PC
+
+- **~16:45 Eras released in production.** On the owner's request, without sign-offs, the owner ran `UPDATE era_races SET published = 1; UPDATE eras SET released_at = '2026-11-11T00:00:00Z' WHERE released_at IS NULL;` on `pitwall-db`. 100 races published, 10 eras released; `/api/eras` shows every era released and Era 10 unlocked. (A migration for this was tried and dropped: 26 worker tests assume production starts unreleased.)
+- **Staging URL not added to Auth0/Google** (owner's call). Signed-in testing uses production's workers.dev site; staging is played signed out. The owner's bought domain will become production later, and staging stays the test site.
+- **PR #47 (merged, deployed 19:41 UTC):** this log, the favicon (`favicon.ico` 16/32/48 and a 180 px Apple touch icon from the ring mark, links cache-busted with `?v=2`), and the LastStint logo always white instead of the team colour.
+- **CI gating.** Eras reachability (~100 min) and the Eras browser specs (57 of 68 e2e tests, ~40 min) run only when race data, the sim, the schema, Eras worker/web code or the Eras specs change (unit-test files don't count). On main they're skipped when the merge is exactly what its PR tested and that PR's CI passed (PR #50, `.github/scripts/eras-checks-needed.sh`). A UI-only PR now takes ~20 min.
+- **The first e2e attempt on PR #47 hung** for 88 min in the playthrough step; the log expired before it could be read. The rerun passed.
+- **PR #48: spain-2013 joins the Gauntlet** (survivor pool 18 → 19, seeds 1, 52021, 76680, 26539, 71378), rebuilt and re-authored as a plain race, with its Eras overlay removed. china-2011 stays out: as a plain build it fails G1 (3.07 s robust). No existing pool race or golden changed; the three grade/radio fixtures each gained one line.
+- **GitHub Actions minutes ran out** (private repo, billing kept at $0); the PR #50 main deploy job was refused. The owner deployed main (`db40af4`) from the Mac at 01:00 UTC Nov 12; spain-2013's model returns 200 in production.
+- **CI moves to the PC** (PR #51): every workflow runs on `[self-hosted, linux, wsl]`, three runners (`pc-wsl-1..3`) in WSL2 Ubuntu on the PC. Setup: `docs/pc-ci-runner.md`. WSL on the PC had been hung since Nov 8 and needed a reboot first. With three jobs sharing the PC, the sim's wall-clock runtime-budget test took 1.6–2.0 s, so CI sets `SIM_RUNTIME_BUDGET_MS=4000` (1 s elsewhere).
+- **canada-2024 `verified=0` SQL:** not needed. The owner says no one played that Daily before the fix.
+- **Local clean-up:** removed 48 merged, clean worktrees. 108 `eras-*` worktrees with uncommitted agent rebuilds or scratch measurements are left for the owner to decide on, plus 7 that aren't merged (netherlands-2023, austria-1999, brazil-2021, italy-2021, las-vegas-2023, san-marino-1996, spain-2024).

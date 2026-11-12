@@ -11,10 +11,15 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
+# The PC runners run up to three jobs at once, so the sim's wall-clock budget test gets 4 s
+# (packages/sim/tests/grade.test.ts; 1 s on a quiet machine).
+env:
+  SIM_RUNTIME_BUDGET_MS: 4000
+
 jobs:
   python:
     name: Python pipeline
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, wsl]  # the PC (docs/pc-ci-runner.md)
     defaults:
       run:
         working-directory: pipeline
@@ -33,10 +38,12 @@ jobs:
 
   js:
     name: JS/TS workspace
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, wsl]  # the PC (docs/pc-ci-runner.md)
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4  # version from package.json "packageManager"
+        with:
+          dest: ${{ runner.temp }}/setup-pnpm  # per job: the PC runners share one home folder
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -59,7 +66,7 @@ jobs:
   # PR already tested (.github/scripts/eras-checks-needed.sh). Run it by hand with workflow_dispatch.
   eras-reachability:
     name: Eras reachability
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, wsl]  # the PC (docs/pc-ci-runner.md)
     steps:
       - uses: actions/checkout@v4
         with:
@@ -73,6 +80,8 @@ jobs:
         run: echo "run=$(.github/scripts/eras-checks-needed.sh)" >> "$GITHUB_OUTPUT"
       - if: steps.changed.outputs.run == 'true'
         uses: pnpm/action-setup@v4  # version from package.json "packageManager"
+        with:
+          dest: ${{ runner.temp }}/setup-pnpm  # per job: the PC runners share one home folder
       - if: steps.changed.outputs.run == 'true'
         uses: actions/setup-node@v4
         with:
@@ -93,13 +102,15 @@ jobs:
   # Python pipeline produces from the committed snapshots, and the TS sim must reproduce them.
   parity:
     name: TS<->Python parity
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, wsl]  # the PC (docs/pc-ci-runner.md)
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v4
         with:
           enable-cache: true
       - uses: pnpm/action-setup@v4  # version from package.json "packageManager"
+        with:
+          dest: ${{ runner.temp }}/setup-pnpm  # per job: the PC runners share one home folder
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -140,7 +151,7 @@ jobs:
   # PR already tested (.github/scripts/eras-checks-needed.sh). The API is mocked, so no Worker.
   e2e:
     name: Web end-to-end
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, wsl]  # the PC (docs/pc-ci-runner.md)
     steps:
       - uses: actions/checkout@v4
         with:
@@ -153,12 +164,14 @@ jobs:
         run: |
           if [ "$(.github/scripts/eras-checks-needed.sh)" = false ]; then echo "E2E_SKIP_ERAS=1" >> "$GITHUB_ENV"; fi
       - uses: pnpm/action-setup@v4  # version from package.json "packageManager"
+        with:
+          dest: ${{ runner.temp }}/setup-pnpm  # per job: the PC runners share one home folder
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @laststint/web exec playwright install --with-deps chromium
+      - run: pnpm --filter @laststint/web exec playwright install chromium  # system libraries: .github/runner/setup-wsl-runner.sh
       - name: Playthrough
         run: pnpm --filter @laststint/web e2e
 
@@ -167,7 +180,7 @@ jobs:
     name: Deploy Worker + D1 migrations
     needs: [python, js, eras-reachability, parity, e2e]
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, wsl]  # the PC (docs/pc-ci-runner.md)
     concurrency:
       group: deploy-worker
       cancel-in-progress: false
@@ -177,6 +190,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4  # version from package.json "packageManager"
+        with:
+          dest: ${{ runner.temp }}/setup-pnpm  # per job: the PC runners share one home folder
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -193,7 +208,7 @@ jobs:
     name: Deploy website
     needs: [deploy]
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, wsl]  # the PC (docs/pc-ci-runner.md)
     concurrency:
       group: deploy-web
       cancel-in-progress: false
@@ -207,6 +222,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4  # version from package.json "packageManager"
+        with:
+          dest: ${{ runner.temp }}/setup-pnpm  # per job: the PC runners share one home folder
       - uses: actions/setup-node@v4
         with:
           node-version: 22
