@@ -957,6 +957,29 @@ function RaceScreenBody({
       {/* The top bar: brand, the duel as a scoreboard, the lap and the clock. Tighter spacing
           below md so the duel fits a 390 px phone next to the Eras timer toggle. */}
       <header className="flex h-14 shrink-0 items-stretch border-b border-[var(--glass-edge)] bg-[var(--paper)]/60 backdrop-blur-[14px] md:h-16">
+        {/* A Gauntlet run: back to the mode's menu, on every screen size. The race is saved and
+            waits; there's no restart, since a run is one go at each race. */}
+        {source === 'survivor' && onHome && (
+          <button
+            type="button"
+            onClick={onHome}
+            aria-label="Back to the Gauntlet menu"
+            title="Back to the Gauntlet menu (the race waits for you)"
+            className="flex shrink-0 items-center gap-1.5 border-r border-[var(--glass-edge)] px-3 text-[13px] font-bold text-[#C9D0CD] hover:text-white md:px-4"
+          >
+            <svg viewBox="0 0 16 16" width={16} height={16} aria-hidden="true">
+              <path
+                d="M10 3 5 8l5 5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <span className="hidden sm:inline">Menu</span>
+          </button>
+        )}
         <button
           type="button"
           onClick={onHome}

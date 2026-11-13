@@ -863,3 +863,250 @@ li:nth-child(even) > .hb-stamp-earned {
     padding: 1px 4px;
   }
 }
+
+/* Versus lobby (versus/Lobby.tsx): the garage, with its own look as Eras has its own. */
+.gp {
+  --gp-display: "Titillium Web", "Inter Tight", "Helvetica Neue", Arial, sans-serif;
+  --gp-red: #e10600;
+}
+.gp-body {
+  font-family: var(--gp-display);
+}
+/* Italic capitals lean past their box, so the big headings carry a little side padding. */
+.gp-display {
+  font-family: var(--gp-display);
+  font-weight: 900;
+  font-style: italic;
+  text-transform: uppercase;
+}
+/* The garage: the back wall (panels and a dark kick strip), then the epoxy floor under the
+   work lights, brightest where the car stands. */
+.gp-scene {
+  position: relative;
+  isolation: isolate;
+  background: radial-gradient(
+      ellipse 34% 46% at 50% 52%,
+      rgba(255, 246, 225, 0.16),
+      transparent 72%
+    ), linear-gradient(180deg, #2c3034 0, #1f2225 55%, #141618 100%);
+}
+.gp-scene::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 210px;
+  z-index: 0;
+  background: linear-gradient(180deg, transparent 0 196px, #0a0b0c 196px),
+    repeating-linear-gradient(90deg, #15181b 0 158px, #0e1012 158px 160px);
+}
+/* LED strips along the top of the wall. */
+.gp-led {
+  position: absolute;
+  inset: 22px 0 auto 0;
+  height: 5px;
+  z-index: 0;
+  background: repeating-linear-gradient(90deg, #f6f2e8 0 240px, transparent 240px 320px);
+  filter: drop-shadow(0 0 10px rgba(255, 248, 228, 0.75));
+  opacity: 0.85;
+}
+/* The pit box painted on the floor: yellow sides and front line. */
+.gp-box {
+  border: 4px solid rgba(232, 181, 0, 0.75);
+  border-top-color: transparent;
+  border-radius: 2px;
+}
+/* The rival's bay: a roller shutter, pulled down. */
+.gp-shutter {
+  background-color: #1b1d20;
+  background-image: repeating-linear-gradient(180deg, #24272b 0 9px, #16181b 9px 12px);
+}
+/* The pit lane (versus/PitLane.tsx), from above. A pit box open to the lane. */
+.gp-box-out {
+  border-top-color: rgba(232, 181, 0, 0.75);
+  border-bottom-color: transparent;
+}
+/* An open garage: the lit back wall. */
+.gp-garage {
+  background: linear-gradient(180deg, rgba(246, 242, 232, 0.16) 0 4px, transparent 4px),
+    radial-gradient(ellipse 70% 90% at 50% 0%, rgba(255, 246, 225, 0.14), transparent 70%),
+    repeating-linear-gradient(90deg, #1b1e21 0 78px, #141618 78px 80px);
+}
+/* The garage apron: epoxy floor in front of each garage. */
+.gp-apron {
+  background: linear-gradient(180deg, #2c3034, #23262a);
+}
+/* The fast lane: asphalt with its white edge lines. */
+.gp-lane {
+  background: linear-gradient(
+      180deg,
+      #f2f2f2 0 4px,
+      transparent 4px calc(100% - 4px),
+      #f2f2f2 calc(100% - 4px)
+    ), radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1.3px) 0 0 / 6px 6px, #2a2d30;
+}
+/* The pit wall: concrete, with the gantry's shadow at the top. */
+.gp-wall {
+  background: linear-gradient(180deg, #0b0c0d 0 10px, transparent 10px),
+    linear-gradient(180deg, #4a4d50, #3a3d40 40%, #2a2c2f);
+}
+/* The pit lane's arrival (versus/PitLane.tsx): the rival's shutter rolls up, then the car drives
+   in from along the lane and pulls into its box. Skipped for anyone who asks for less motion. */
+.pl-shutter-up {
+  transform-box: fill-box;
+  transform-origin: top;
+  animation: pl-shutter 0.6s ease-in both;
+}
+@keyframes pl-shutter {
+  to {
+    transform: scaleY(0);
+  }
+}
+.pl-arrive-right {
+  animation: pl-arrive-right 1.6s 0.45s cubic-bezier(0.15, 0.7, 0.25, 1) both;
+}
+.pl-arrive-left {
+  animation: pl-arrive-left 1.6s 0.2s cubic-bezier(0.15, 0.7, 0.25, 1) both;
+}
+@keyframes pl-arrive-right {
+  0% {
+    transform: translate(520px, 20px) rotate(-6deg) scale(0.92);
+  }
+  70% {
+    transform: translate(-10px, 0) rotate(1deg);
+  }
+  100% {
+    transform: none;
+  }
+}
+@keyframes pl-arrive-left {
+  0% {
+    transform: translate(-520px, 20px) rotate(6deg) scale(0.92);
+  }
+  70% {
+    transform: translate(10px, 0) rotate(-1deg);
+  }
+  100% {
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pl-shutter-up {
+    animation: none;
+    transform: scaleY(0);
+  }
+  .pl-arrive-right,
+  .pl-arrive-left {
+    animation: none;
+  }
+}
+
+/* Gauntlet (gauntlet/Straight.tsx): the floodlit straight, with its own look as Eras and
+   Versus have theirs. */
+.fl {
+  --fl-display: "Saira Extra Condensed", "Inter Tight", "Helvetica Neue", Arial, sans-serif;
+  --fl-amber: #ffb347;
+  --fl-green: #3ddc84;
+  --fl-red: #ff6a5e;
+  background: #05070d;
+  color: #f4efe6;
+}
+.fl-display {
+  font-family: var(--fl-display);
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 0.88;
+}
+/* A panel standing over the scene: dark glass. */
+.fl-panel {
+  background: rgb(6 10 20 / 0.82);
+  border: 1px solid rgb(58 68 112 / 0.6);
+  backdrop-filter: blur(10px);
+}
+/* Driving one round down the straight: the whole world scales about the vanishing point, so the
+   gantry just won passes overhead and the next one comes up to take its place. */
+.fl-world {
+  transform-origin: 0 0;
+}
+.fl-advance {
+  animation: fl-advance 2.4s 0.5s cubic-bezier(0.5, 0, 0.25, 1) both;
+}
+@keyframes fl-advance {
+  to {
+    transform: scale(var(--fl-step));
+  }
+}
+/* The gantry just won fades as it passes overhead. */
+.fl-passed {
+  animation: fl-passed 2.4s 0.5s linear both;
+}
+@keyframes fl-passed {
+  0%,
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+/* The car's buzz at speed while it drives. */
+.fl-shake {
+  animation: fl-shake 0.1s 0.5s linear 24;
+}
+@keyframes fl-shake {
+  50% {
+    transform: translate(1px, -2px);
+  }
+}
+/* The next round's lamps flicker on as its gantry arrives. */
+.fl-lamp-on {
+  animation: fl-lamp-on 0.6s 2.7s steps(1) both;
+}
+@keyframes fl-lamp-on {
+  0% {
+    opacity: 0.12;
+  }
+  30% {
+    opacity: 1;
+  }
+  45% {
+    opacity: 0.3;
+  }
+  60%,
+  100% {
+    opacity: 1;
+  }
+}
+/* The run's over: the floodlights go out, nearest first (each delay set inline). */
+.fl-blackout {
+  animation: fl-blackout 0.5s steps(3) both;
+}
+@keyframes fl-blackout {
+  to {
+    opacity: 0;
+  }
+}
+/* The rain light flashes a few times. */
+.fl-blink {
+  animation: fl-blink 0.8s 0.4s steps(1) 5;
+}
+@keyframes fl-blink {
+  50% {
+    opacity: 0.25;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fl-advance {
+    animation: none;
+    transform: scale(var(--fl-step));
+  }
+  .fl-shake,
+  .fl-lamp-on,
+  .fl-blink {
+    animation: none;
+  }
+  .fl-blackout,
+  .fl-passed {
+    animation: none;
+    opacity: 0;
+  }
+}
