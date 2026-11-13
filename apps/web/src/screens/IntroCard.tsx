@@ -10,6 +10,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { takeHowToPending } from '../account/howTo.js';
 import type { AccountState } from '../account/useAccount.js';
 import { AccountBar } from '../components/AccountBar.js';
+import { CarIcon } from '../components/CarIcon.js';
 import { Disclaimer } from '../components/Disclaimer.js';
 import { HeadsetIcon, OvertakeIcon, TyreIcon } from '../components/Icons.js';
 import { MapCredit } from '../components/MapCredit.js';
@@ -24,12 +25,36 @@ import { groundFor } from '../track/ground.js';
 import { outlineFor } from '../track/outlines.js';
 import { HowToPlay } from './HowToPlay.js';
 
+/** The tyre on a car's wheels, as on the race map (TrackMap). */
+const TYRE: Record<string, string> = {
+  SOFT: 'var(--soft)',
+  MEDIUM: 'var(--medium)',
+  HARD: 'var(--hard)',
+};
+
+/** Where the two cars sit in the hero's map box (shares of its width and height): right of the
+ * words' fade and above the gap card. */
+const AIM: [number, number] = [0.62, 0.36];
+
 /** The circuit on its real ground (track/ground.ts), with the two cars where they are at the
- * takeover. It covers its box; the hero's gradient fades it into the page. */
+ * takeover, drawn as on the race map (CarIcon, pointing along the track). It covers its box at
+ * the whole track's scale, the view aimed so the cars sit at AIM (covering crops the track's
+ * edges, and the cars could be cut off); the hero's gradient fades it into the page. */
 function Circuit({ state, model }: { state: GameState; model: RaceModel }) {
   const outline = outlineFor(model.race.id);
   const ground = useMemo(() => groundFor(model.race.id), [model.race.id]);
   const { userSide, rival } = state.meta;
+  const box = useRef<SVGSVGElement>(null);
+  const [size, setSize] = useState<[number, number] | null>(null);
+  useEffect(() => {
+    const el = box.current;
+    if (!el) return;
+    const read = () => setSize([el.clientWidth, el.clientHeight]);
+    read();
+    const watch = new ResizeObserver(read);
+    watch.observe(el);
+    return () => watch.disconnect();
+  }, []);
   const drawn = useMemo(() => {
     if (!outline) return null;
     const line = polyline(outline.points);
@@ -37,14 +62,31 @@ function Circuit({ state, model }: { state: GameState; model: RaceModel }) {
     const cars = carsOnTrack(state.race, model, 'green');
     const at = (code: string) => {
       const c = cars.find((x) => x.code === code);
-      return c ? pointAt(line, -c.behind) : null;
+      if (!c) return null;
+      const [ax, ay] = pointAt(line, -c.behind - 0.004);
+      const [bx, by] = pointAt(line, -c.behind + 0.004);
+      const deg = (Math.atan2(by - ay, bx - ax) * 180) / Math.PI;
+      return { p: pointAt(line, -c.behind), deg };
     };
     return { d, me: at(userSide), them: at(rival) };
   }, [outline, state.race, model, userSide, rival]);
   if (!outline || !drawn) return null;
+  const vw = outline.width + 80;
+  const vh = outline.height + 80;
+  let view = `-40 -40 ${vw} ${vh}`;
+  const mid: readonly [number, number] | undefined =
+    drawn.me && drawn.them
+      ? [(drawn.me.p[0] + drawn.them.p[0]) / 2, (drawn.me.p[1] + drawn.them.p[1]) / 2]
+      : (drawn.me ?? drawn.them)?.p;
+  if (size && size[0] > 0 && size[1] > 0 && mid) {
+    const scale = Math.max(size[0] / vw, size[1] / vh);
+    const [w, h] = [size[0] / scale, size[1] / scale];
+    view = `${(mid[0] - AIM[0] * w).toFixed(1)} ${(mid[1] - AIM[1] * h).toFixed(1)} ${w.toFixed(1)} ${h.toFixed(1)}`;
+  }
   return (
     <svg
-      viewBox={`-40 -40 ${outline.width + 80} ${outline.height + 80}`}
+      ref={box}
+      viewBox={view}
       preserveAspectRatio="xMidYMid slice"
       className="h-full w-full"
       style={{ background: ground?.base ?? 'var(--ground)' }}
@@ -89,13 +131,18 @@ function Circuit({ state, model }: { state: GameState; model: RaceModel }) {
           [drawn.them, 'var(--rival)', rival],
           [drawn.me, 'var(--you)', userSide],
         ] as const
-      ).map(([p, color, code]) =>
-        p ? (
-          <g key={code} transform={`translate(${p[0].toFixed(1)},${p[1].toFixed(1)})`}>
-            <circle r={26} fill={color} opacity={0.3} className="battle-ring" />
-            <circle r={12} fill={color} stroke="#fff" strokeWidth={3} />
+      ).map(([at, color, code]) =>
+        at ? (
+          <g key={code} transform={`translate(${at.p[0].toFixed(1)},${at.p[1].toFixed(1)})`}>
+            <circle r={30} fill={color} opacity={0.22} />
+            <g transform={`rotate(${at.deg.toFixed(1)}) scale(1.25)`}>
+              <CarIcon
+                color={color}
+                tyre={TYRE[state.race.cars[code]?.compound ?? ''] ?? 'var(--tarmac)'}
+              />
+            </g>
             <text
-              y={-24}
+              y={-36}
               textAnchor="middle"
               fill="#fff"
               stroke="rgba(8,11,12,0.85)"

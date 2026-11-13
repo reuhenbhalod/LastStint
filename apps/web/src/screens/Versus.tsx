@@ -37,19 +37,14 @@ import { clockProgress } from '../game/useGame.js';
 import { RaceStage } from '../three/RaceStage.js';
 import type { MapFeed } from '../track/feed.js';
 import { outlineFor } from '../track/outlines.js';
+import { Lobby } from '../versus/Lobby.js';
+import { PitLane } from '../versus/PitLane.js';
+import { STAT_NAME, TYRES, lapEdge, loadSetup } from '../versus/setup.js';
 import { type VersusView, useVersus } from '../versus/useVersus.js';
 import { versusModel, versusRaceState } from '../versus/view.js';
 
 const NAME_KEY = 'laststint:versus-name';
-const TYRES = ['SOFT', 'MEDIUM', 'HARD'] as const;
 const TYRE_NAME: Record<string, string> = { SOFT: 'Softs', MEDIUM: 'Mediums', HARD: 'Hards' };
-const STAT_NAME: Record<string, string> = {
-  topSpeed: 'Top speed',
-  cornering: 'Cornering',
-  tyreWear: 'Tyre life',
-  fuelUse: 'Fuel saving',
-  pitCrew: 'Pit crew',
-};
 
 function storedName(): string {
   try {
@@ -71,10 +66,7 @@ export function Versus() {
   const [name, setName] = useState(storedName);
   const [named, setNamed] = useState(!!storedName());
   return (
-    <main className="relative isolate min-h-[100dvh] text-[#EEF1EE]">
-      {/* Versus runs at the five 3D circuits; Spa stands behind the lobby. */}
-      {!code && <GroundBackdrop raceId="belgium-2024" />}
-      {!code && <MapCredit raceId="belgium-2024" className="fixed right-2 bottom-2 z-10" />}
+    <main className="relative isolate flex min-h-[100dvh] flex-col text-[#EEF1EE]">
       <TopBar active="versus" />
       {!named ? (
         <NameCard
@@ -136,112 +128,28 @@ function NameCard({
   );
 }
 
-// --- Create or join -----------------------------------------------------------------------------
-
-function Lobby({ name, onRename }: { name: string; onRename: () => void }) {
-  const [track, setTrack] = useState(VERSUS_TRACKS[0]?.id ?? 'monza');
-  const [join, setJoin] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const create = async () => {
-    setBusy(true);
-    setError(null);
-    try {
-      const room = await apiPost<{ code: string }>('/api/versus', { track });
-      location.assign(`/versus/${room.code}`);
-    } catch (e) {
-      setError(e instanceof ApiError ? e.code : String(e));
-      setBusy(false);
-    }
-  };
-  const code = join.trim().toUpperCase();
-  return (
-    <section className="mx-auto flex max-w-3xl flex-col gap-8 px-4 py-10">
-      <div className="flex flex-col gap-2">
-        <h1 className="disp text-[32px] leading-tight md:text-[40px]">Head to head</h1>
-        <p className="m-0 max-w-[60ch] text-[15px] text-[var(--muted)]">
-          Two players, two cars, 20 laps, nobody else on track. Whoever makes the better calls wins,
-          graded like the daily. Racing as <strong className="text-[var(--ink)]">{name}</strong>{' '}
-          <button type="button" onClick={onRename} className="underline">
-            change
-          </button>
-        </p>
-      </div>
-
-      <div className="flex flex-col gap-3">
-        <h2 className="text-[12px] font-extrabold uppercase tracking-[0.16em] text-[var(--muted)]">
-          New match: pick the track
-        </h2>
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          {VERSUS_TRACKS.map((t) => (
-            <button
-              key={t.id}
-              type="button"
-              onClick={() => setTrack(t.id)}
-              aria-pressed={track === t.id}
-              className={`flex flex-col items-start gap-1 rounded-lg border px-4 py-3 text-left ${
-                track === t.id
-                  ? 'border-[var(--you)] bg-[color-mix(in_srgb,var(--you)_12%,transparent)]'
-                  : 'border-[var(--rule)] bg-[var(--card)] hover:border-[#4A555B]'
-              }`}
-            >
-              <span className="text-[16px] font-bold">{t.name}</span>
-              <span className="text-[13px] text-[var(--muted)]">{t.character}</span>
-            </button>
-          ))}
-        </div>
-        <button
-          type="button"
-          onClick={create}
-          disabled={busy}
-          className="self-start rounded-xl bg-[var(--you)] px-6 py-3 text-[16px] font-bold text-[var(--you-ink)] disabled:opacity-50"
-        >
-          {busy ? 'Creating…' : 'Create match'}
-        </button>
-        {error && <p className="m-0 text-[13px] text-[var(--box-ink)]">Couldn't create: {error}</p>}
-      </div>
-
-      <form
-        className="flex flex-col gap-3"
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (/^[A-Z]{4}$/.test(code)) location.assign(`/versus/${code}`);
-        }}
-      >
-        <h2 className="text-[12px] font-extrabold uppercase tracking-[0.16em] text-[var(--muted)]">
-          Join a match
-        </h2>
-        <div className="flex gap-2">
-          <input
-            value={join}
-            onChange={(e) => setJoin(e.target.value)}
-            maxLength={4}
-            placeholder="CODE"
-            aria-label="Match code"
-            className="w-36 rounded-lg border border-[var(--rule)] bg-[var(--card)] px-3 py-2.5 text-center text-[18px] font-bold uppercase tracking-[0.3em]"
-          />
-          <button
-            type="submit"
-            disabled={!/^[A-Z]{4}$/.test(code)}
-            className="rounded-lg border border-[var(--rule)] px-5 font-bold disabled:opacity-40"
-          >
-            Join
-          </button>
-        </div>
-      </form>
-    </section>
-  );
-}
-
-// --- The match ----------------------------------------------------------------------------------
+/** How long the pit lane shows the second car arriving before the car pick (the pick has 30 s). */
+const ARRIVAL_MS = 2600;
 
 function Match({ code, name }: { code: string; name: string }) {
   const { view, call, answer, pick, leave } = useVersus(code, name);
   const phase = view.room?.phase;
+  // When the second car arrives the pit lane plays it in (PitLane `arriving`) for a moment
+  // before the car pick: the rival's car if you were waiting in the lobby, yours if you joined.
+  const sawLobby = useRef(false);
+  const [arrival, setArrival] = useState<'idle' | 'playing' | 'done'>('idle');
+  useEffect(() => {
+    if (phase === 'lobby') sawLobby.current = true;
+    if (phase !== 'pick' || arrival !== 'idle') return;
+    setArrival('playing');
+    window.setTimeout(() => setArrival('done'), ARRIVAL_MS);
+  }, [phase, arrival]);
   if (view.error && !view.room)
     return <Notice title="No such match" text={`${code}: ${view.error}`} />;
   if (!view.room) return <Notice title="Connecting…" text={`Match ${code}`} />;
   if (phase === 'lobby') return <Waiting code={code} view={view} />;
+  if (phase === 'pick' && arrival !== 'done')
+    return <PitLane code={code} view={view} arriving={sawLobby.current ? 'them' : 'me'} />;
   if (phase === 'pick') return <Pick view={view} onPick={pick} />;
   if (view.result) return <Result outcome={view.result} seat={view.seat} model={view.model} />;
   if (phase === 'grading' || view.grading)
@@ -261,36 +169,7 @@ function Notice({ title, text }: { title: string; text: string }) {
 }
 
 function Waiting({ code, view }: { code: string; view: VersusView }) {
-  const [copied, setCopied] = useState(false);
-  const link = `${location.origin}/versus/${code}`;
-  const track = view.room ? versusTrack(view.room.track) : null;
-  return (
-    <section className="mx-auto flex max-w-md flex-col items-center gap-5 px-4 py-14 text-center">
-      <p className="m-0 text-[12px] font-extrabold uppercase tracking-[0.16em] text-[var(--muted)]">
-        {track?.name} · 20 laps
-      </p>
-      <h1 className="disp text-[56px] tracking-[0.2em]">{code}</h1>
-      <p className="m-0 text-[15px] text-[var(--muted)]">
-        Send the code or the link. The car pick starts when they join.
-      </p>
-      <div className="flex w-full items-center gap-2 rounded-lg border border-[var(--rule)] bg-[var(--card)] p-2">
-        <span className="min-w-0 flex-1 truncate px-2 text-left text-[13px]">{link}</span>
-        <button
-          type="button"
-          onClick={() => {
-            navigator.clipboard
-              .writeText(link)
-              .then(() => setCopied(true))
-              .catch(() => setCopied(false));
-          }}
-          className="rounded-md bg-[var(--you)] px-3 py-1.5 text-[13px] font-bold text-[var(--you-ink)]"
-        >
-          {copied ? 'Copied' : 'Copy link'}
-        </button>
-      </div>
-      <Seats view={view} />
-    </section>
-  );
+  return <PitLane code={code} view={view} />;
 }
 
 function Seats({ view }: { view: VersusView }) {
@@ -328,8 +207,9 @@ function useCountdown(until: number | undefined): number {
 }
 
 function Pick({ view, onPick }: { view: VersusView; onPick: (car: string, tyre: string) => void }) {
-  const [car, setCar] = useState('balanced');
-  const [tyre, setTyre] = useState<string>('MEDIUM');
+  // Starts from the setup picked in the garage (versus/setup.ts); still yours to change here.
+  const [car, setCar] = useState(() => loadSetup().car);
+  const [tyre, setTyre] = useState<string>(() => loadSetup().tyre);
   const left = useCountdown(view.room?.pickUntil);
   const track = view.room ? versusTrack(view.room.track) : null;
   const mine = view.seat !== null ? view.room?.seats[view.seat] : null;
@@ -403,21 +283,6 @@ function Pick({ view, onPick }: { view: VersusView; onPick: (car: string, tyre: 
       <Seats view={view} />
     </section>
   );
-}
-
-/** What a car's pace stats come to on this track (s a lap vs a Balanced car). */
-function lapEdge(
-  track: ReturnType<typeof versusTrack> | null,
-  stats: Record<string, number>,
-): string {
-  if (!track) return '';
-  const mean = VERSUS_TRACKS.reduce((a, t) => a + t.straightShare, 0) / VERSUS_TRACKS.length;
-  const s = track.straightShare;
-  const d =
-    -STAT_SCALE.pace *
-    ((stats.topSpeed ?? 0) * (s / mean) + (stats.cornering ?? 0) * ((1 - s) / (1 - mean)));
-  if (Math.abs(d) < 0.005) return 'same pace as Balanced';
-  return `${Math.abs(d).toFixed(2)} s a lap ${d < 0 ? 'quicker' : 'slower'} than Balanced`;
 }
 
 function StatBar({ label, value }: { label: string; value: number }) {

@@ -1,6 +1,7 @@
 // Survivor mode end to end (docs/survivor-spec.md): the lobby, a run's first race played to the
-// flag, the server's verdict (mocked: won), and the next race dealt. Abu Dhabi 2021 stands in
-// for a survivor race (the shortest race: 24 laps to run).
+// flag, the server's verdict (mocked: won), the next race's brief, and round 2 straight into
+// the race, with a trip out to the menu and back. Abu Dhabi 2021 stands in for a survivor race
+// (the shortest race: 24 laps to run).
 import { expect, test } from '@playwright/test';
 import { loadRace } from './mock.js';
 
@@ -42,8 +43,12 @@ test('survivor: start a run, win round 1, get round 2', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Gauntlet' })).toBeVisible();
   await expect(page.getByText('No runs yet')).toBeVisible();
   await page.getByRole('button', { name: /Start a run/ }).click();
-  await expect(page.getByText(/Gauntlet · round 1/)).toBeVisible();
-  await page.getByRole('button', { name: /Start round 1/ }).click();
+  // Straight into the race: no race card inside a run.
+  await expect(page.getByRole('button', { name: /Go with plan/ })).toBeVisible();
+  // Out to the menu and back: a live run offers only the way back, not a new run.
+  await page.getByRole('button', { name: 'Back to the Gauntlet menu' }).click();
+  await expect(page.getByRole('button', { name: /Start a run/ })).toHaveCount(0);
+  await page.getByRole('button', { name: /Back to round 1/ }).click();
   await page.getByRole('button', { name: /Go with plan/ }).click();
 
   // Answer every big call with its first choice until the race is over.
@@ -63,6 +68,8 @@ test('survivor: start a run, win round 1, get round 2', async ({ page }) => {
   expect(sent?.round).toBe(1);
   expect(sent?.decisions?.length).toBeGreaterThan(0);
   await expect(page.getByText(`${model.userSide} P1, ${model.rival} P2`)).toBeVisible();
+  // The next race's brief, then straight into it.
+  await expect(page.getByText(/laps to run/)).toBeVisible();
   await page.getByRole('button', { name: /Next race/ }).click();
-  await expect(page.getByRole('button', { name: /Start round 2/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: /Go with plan/ })).toBeVisible();
 });
