@@ -1,28 +1,6 @@
 {
-  "_comment": "Which races each game mode plays (survivor spec D3). A race is in at most one of daily and survivor (Gauntlet), and may also be in eras (Eras spec §5). daily: the scheduler and the admin page rotate these (each plays on its race file's tuned seed). survivor: race id -> the seeds survivor deals from (each passes scripts/tune.ts: the real way gives the real result, good play wins, random play mostly loses); a run picks one at random per race. eras: era number -> its ten race ids in position order (Eras spec §4; seeded in D1 by apps/worker/migrations/0010_eras.sql).",
-  "daily": [
-    "abu-dhabi-2021",
-    "abu-dhabi-2024",
-    "austria-2019",
-    "bahrain-2021",
-    "bahrain-2022",
-    "canada-2022",
-    "france-2019",
-    "france-2021",
-    "hungary-2019",
-    "hungary-2025",
-    "italy-2019",
-    "italy-2024",
-    "mexico-2019",
-    "mexico-2021",
-    "mexico-2024",
-    "miami-2022",
-    "portugal-2020",
-    "spain-2020",
-    "united-states-2022",
-    "russia-2021",
-    "canada-2024"
-  ],
+  "_comment": "Which races each game mode plays (survivor spec D3). A race is in at most one of daily and survivor (Gauntlet), and may also be in eras (Eras spec §5). daily: empty since 2026-11-18 (its 21 races moved to survivor until Daily gets its own shorter races); the scheduler and the admin page rotate these (each plays on its race file's tuned seed). survivor: race id -> the seeds survivor deals from (each passes scripts/tune.ts: the real way gives the real result, good play wins, random play mostly loses); a run picks one at random per race. eras: era number -> its ten race ids in position order (Eras spec §4; seeded in D1 by apps/worker/migrations/0010_eras.sql).",
+  "daily": [],
   "survivor": {
     "abu-dhabi-2020": [
       1,
@@ -31,12 +9,47 @@
       68491,
       20494
     ],
+    "abu-dhabi-2021": [
+      74020,
+      62474,
+      28419,
+      37267,
+      59664
+    ],
+    "abu-dhabi-2024": [
+      21142,
+      95056,
+      40907,
+      73145,
+      3049
+    ],
+    "austria-2019": [
+      76990,
+      17751,
+      23327,
+      70690,
+      21498
+    ],
     "austria-2025": [
       69561,
       7447,
       25849,
       76064,
       83622
+    ],
+    "bahrain-2021": [
+      8485,
+      55755,
+      31909,
+      1702,
+      94445
+    ],
+    "bahrain-2022": [
+      29893,
+      21846,
+      82305,
+      9105,
+      75386
     ],
     "belgium-2024": [
       19844,
@@ -52,6 +65,16 @@
       13153,
       59797
     ],
+    "canada-2022": [
+      592,
+      52898,
+      37568,
+      12652,
+      66964
+    ],
+    "canada-2024": [
+      54281
+    ],
     "china-2024": [
       80708,
       8760,
@@ -63,12 +86,54 @@
       838,
       3816
     ],
+    "france-2019": [
+      50312,
+      18172,
+      5138,
+      60585,
+      64299
+    ],
+    "france-2021": [
+      6466,
+      78856,
+      66735,
+      14814,
+      30681
+    ],
+    "hungary-2019": [
+      56769,
+      80506,
+      70641,
+      53566,
+      61585
+    ],
+    "hungary-2025": [
+      93402,
+      48277,
+      20931,
+      37149,
+      40414
+    ],
+    "italy-2019": [
+      18948,
+      64135,
+      71394,
+      18215,
+      86482
+    ],
     "italy-2022": [
       32408,
       73279,
       67042,
       69990,
       22194
+    ],
+    "italy-2024": [
+      66325,
+      66256,
+      19165,
+      36870,
+      26438
     ],
     "japan-2024": [
       79274,
@@ -77,12 +142,40 @@
       77040,
       56730
     ],
+    "mexico-2019": [
+      11977,
+      54197,
+      29603,
+      30175,
+      13527
+    ],
+    "mexico-2021": [
+      7383,
+      95694,
+      31605,
+      30934,
+      43080
+    ],
     "mexico-2022": [
       1,
       92343,
       76131,
       18198,
       31287
+    ],
+    "mexico-2024": [
+      39237,
+      72111,
+      61403,
+      36038,
+      17907
+    ],
+    "miami-2022": [
+      95565,
+      7799,
+      72942,
+      78200,
+      99405
     ],
     "miami-2023": [
       1,
@@ -98,6 +191,13 @@
       56441,
       32824
     ],
+    "portugal-2020": [
+      26892,
+      55373,
+      3837,
+      9705,
+      35512
+    ],
     "portugal-2021": [
       43245,
       78559,
@@ -111,6 +211,13 @@
       12907,
       3677,
       36531
+    ],
+    "russia-2021": [
+      13605,
+      52389,
+      93023,
+      40755,
+      85432
     ],
     "saudi-arabia-2025": [
       1,
@@ -126,6 +233,13 @@
       26539,
       71378
     ],
+    "spain-2020": [
+      27170,
+      79265,
+      8478,
+      1456,
+      32666
+    ],
     "spain-2023": [
       16322,
       72595,
@@ -140,6 +254,13 @@
       1667,
       56435,
       12173
+    ],
+    "united-states-2022": [
+      84707,
+      11839,
+      7961,
+      91054,
+      32286
     ],
     "united-states-2023": [
       95940,

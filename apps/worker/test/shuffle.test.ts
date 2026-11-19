@@ -2,9 +2,34 @@
 // no two days in a row alike.
 import { describe, expect, it } from 'vitest';
 import { addDays } from '../src/dates.js';
-import { DAILY_POOL } from '../src/pools.js';
 import { getRace } from '../src/races.js';
 import { type RaceFacts, circuitOf, clash, pickRaces, usedThisPass } from '../src/shuffle.js';
+
+// The 21 races the daily pool held before they moved to Gauntlet (Nov 18): data/pools.json's
+// daily list is empty for now, and the shuffle needs a real-sized pool.
+const DAILY_POOL = [
+  'abu-dhabi-2021',
+  'abu-dhabi-2024',
+  'austria-2019',
+  'bahrain-2021',
+  'bahrain-2022',
+  'canada-2022',
+  'france-2019',
+  'france-2021',
+  'hungary-2019',
+  'hungary-2025',
+  'italy-2019',
+  'italy-2024',
+  'mexico-2019',
+  'mexico-2021',
+  'mexico-2024',
+  'miami-2022',
+  'portugal-2020',
+  'spain-2020',
+  'united-states-2022',
+  'russia-2021',
+  'canada-2024',
+];
 
 /** A seeded random source, so a failure can be replayed. */
 function seeded(seed: number): () => number {
