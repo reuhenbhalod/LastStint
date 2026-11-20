@@ -2,7 +2,9 @@
 // director's calls (lap, kind, who, text, options), answered at random on a fixed seed, match
 // the sequence recorded before the Eras-only radio changes (a SHA-256 per race over its seeds' call
 // lines, to keep the fixture small) (the safety-car stop question's
-// stop-question gap, b9fbf17, is Eras-gated). Regenerate the fixture only on purpose:
+// stop-question gap, b9fbf17, is Eras-gated). Re-recorded on purpose 2026-11-14 (owner's
+// request): the worn-tyre box request asks once per step as the tyres get worse, not every 6
+// laps. Regenerate the fixture only on purpose:
 //   RECORD_POOL_RADIO=1 pnpm --filter @laststint/web test engineerCalls.pool
 
 import { createHash } from 'node:crypto';

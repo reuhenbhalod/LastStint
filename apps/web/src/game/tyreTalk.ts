@@ -183,9 +183,28 @@ export function startingToGo(compound: string, lap: number): string {
   );
 }
 
-/** The driver: the tyres are gone, he wants to box. */
-export function wantToBox(compound: string, lap: number): string {
+/** The driver: the tyres are gone, he wants to box. Asked again only as they get worse
+ * (engineerCalls requestCall): `level` 2 is past their life, 3 is nothing left at all. */
+export function wantToBox(compound: string, lap: number, level: 1 | 2 | 3 = 1): string {
   const t = TYRE[compound] ?? 'tyres';
+  if (level === 3) {
+    return pick(
+      [
+        `There's nothing left in these ${t}. I can barely keep it on the road. Box!`,
+        `These ${t} are completely finished. I'm a passenger out here. Box me!`,
+      ],
+      lap,
+    );
+  }
+  if (level === 2) {
+    return pick(
+      [
+        `These ${t} are way past it now. I'm losing seconds every lap. Box?`,
+        `It's getting worse. These ${t} are done. Can we stop?`,
+      ],
+      lap,
+    );
+  }
   return pick(
     [
       `These ${t} are gone. I want to box!`,

@@ -253,9 +253,11 @@ const TODAY = {
   screen: 'ccf7241ff273c1b3',
   decision: 'f71311307784d55e',
   cards: '82ea30e0dbd15610',
+  // Before the worn-tyre box request asked only as the tyres got worse (2026-11-14):
+  // bahrain-2021 '23f7c24ac4ac5b24', austria-2019 '68bbb551ab858735'.
   radio: {
     'abu-dhabi-2021': 'eac4bbd654ee15dc',
-    'bahrain-2021': '23f7c24ac4ac5b24',
-    'austria-2019': '68bbb551ab858735',
+    'bahrain-2021': '791ddd20cd3c9725',
+    'austria-2019': '30e494d6b88a057a',
   } as Record<string, string>,
 };
