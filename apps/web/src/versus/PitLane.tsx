@@ -5,7 +5,7 @@
 // before the car pick). Below, the pit wall holds the race code on a pit board, with the link to
 // send. Same look as the garage (Lobby.tsx, the `gp-` classes in index.css).
 
-import { type RoomSeat, VERSUS_LAPS, versusTrack } from '@laststint/sim';
+import { type RoomSeat, VERSUS_CARS, VERSUS_LAPS, versusTrack } from '@laststint/sim';
 import { useState } from 'react';
 import { CAR_SHAPES, type Shape } from '../components/CarIcon.js';
 import { FrontCar, GREY, RED } from './FrontCar.js';
@@ -13,6 +13,8 @@ import { loadSetup } from './setup.js';
 import type { VersusView } from './useVersus.js';
 
 const MONO = 'mono font-bold';
+const TYRE_WORD: Record<string, string> = { SOFT: 'softs', MEDIUM: 'mediums', HARD: 'hards' };
+const carName = (id: string) => VERSUS_CARS.find((c) => c.id === id)?.name ?? 'car';
 const TYRE_COLOUR: Record<string, string> = {
   SOFT: 'var(--soft)',
   MEDIUM: 'var(--medium)',
@@ -25,12 +27,15 @@ export function PitLane({
   code,
   view,
   arriving,
+  lockedIn,
 }: {
   code: string;
   view: VersusView;
   /** The car driving into its box right now: the rival's (you were waiting) or yours (you
    * joined). */
   arriving?: 'me' | 'them';
+  /** Your garage setup is locked in (Versus.tsx Match): no car pick, lights out once both are. */
+  lockedIn?: boolean;
 }) {
   const [copied, setCopied] = useState<'yes' | 'no' | null>(null);
   const link = `${location.origin}/versus/${code}`;
@@ -53,7 +58,9 @@ export function PitLane({
         </h1>
         <p aria-live="polite" className="m-0 max-w-[56ch] text-[15px] text-[#B4B7BC]">
           {rival
-            ? 'Both cars are in their boxes. Off to the car pick.'
+            ? lockedIn
+              ? `Both cars are in their boxes. Your ${carName(setup.car)} on ${TYRE_WORD[setup.tyre] ?? 'mediums'} is locked in: lights out as soon as your rival is ready.`
+              : 'Both cars are in their boxes. Off to the car pick.'
             : 'Send them the code or the link below. The car pick starts as soon as they join.'}
         </p>
       </div>

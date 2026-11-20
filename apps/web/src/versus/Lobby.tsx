@@ -19,6 +19,7 @@ import {
   TYRES,
   lapEdge,
   loadSetup,
+  markFromGarage,
   saveSetup,
 } from './setup.js';
 
@@ -73,6 +74,7 @@ export function Lobby({ name, onRename }: { name: string; onRename: () => void }
     setError(null);
     try {
       const room = await apiPost<{ code: string }>('/api/versus', { track });
+      markFromGarage(room.code);
       location.assign(`/versus/${room.code}`);
     } catch (e) {
       setError(e instanceof ApiError ? e.code : String(e));
@@ -248,7 +250,9 @@ export function Lobby({ name, onRename }: { name: string; onRename: () => void }
               className="flex flex-col gap-2.5 border-t border-white/10 pt-4"
               onSubmit={(e) => {
                 e.preventDefault();
-                if (/^[A-Z]{4}$/.test(code)) location.assign(`/versus/${code}`);
+                if (!/^[A-Z]{4}$/.test(code)) return;
+                markFromGarage(code);
+                location.assign(`/versus/${code}`);
               }}
             >
               <span className="gp-display text-[22px] leading-none">Or join a race</span>
