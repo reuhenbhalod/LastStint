@@ -1,0 +1,16 @@
+{
+ "race": "australia-2016",
+ "scheduledLaps": 57,
+ "completedLaps": 57,
+ "timing": "TUM (no red-flag timing)",
+ "redFlags": [
+  {
+   "lap": 18,
+   "resumeLap": 19,
+   "restart": "rolling",
+   "restartScLaps": 0,
+   "source": "Wikipedia, 2016 Australian Grand Prix: 'The race was stopped on lap 18 following an accident involving Fernando Alonso and Esteban Gutiérrez', 'a safety car was deployed for a short time before the race direction decided to red flag the race', 'As the race resumed behind the safety car' (https://en.wikipedia.org/wiki/2016_Australian_Grand_Prix); Wikipedia, 'List of red-flagged Formula One races' (https://en.wikipedia.org/wiki/List_of_red-flagged_Formula_One_races): lap 18, code R (restarted), 'Race was stopped behind the safety car' (citing BBC Sport); Jolpica lap times (api.jolpi.ca/ergast/f1/2016/1/laps), leader's lap 17 took 99.4s (the crash), lap 18 201.6s (behind the SC to the pit lane), lap 19 1213.5s (the stoppage), lap 20 at green pace (90.5s)",
+   "note": "Resumed behind the SC (the 2005-2017 rule), which came in at the end of the stoppage lap 19, so no extra SC laps after it. Alonso crashed into Gutiérrez on lap 17 (leader time); the brief SC before the flag is inside the red laps. Haryanto retired during the stoppage; Grosjean, who had not stopped, changed tyres in the break."
+  }
+ ]
+}

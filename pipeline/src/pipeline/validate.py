@@ -114,6 +114,20 @@ def real_finishing_gaps(laps: pd.DataFrame, total_laps: int | None = None) -> di
     return {c: t - winner_time for c, t in finish.items()}
 
 
+def with_penalties(real_gaps: dict[str, float], model: dict) -> dict[str, float]:
+    """The real gaps with the stewards' post-race penalties added (races batch 3): the sims
+    add them at the flag, so the real side of every check does too."""
+    penalties = model.get("postRacePenalties") or []
+    if not penalties:
+        return real_gaps
+    times = dict(real_gaps)
+    for p in penalties:
+        if p["driver"] in times:
+            times[p["driver"]] += p["seconds"]
+    winner = min(times.values())
+    return {c: t - winner for c, t in times.items()}
+
+
 def tie_groups(order: list[str], real_gaps: dict[str, float]) -> dict[str, int]:
     """Group index per car in real order; a car within TIE_GAP of the one ahead shares its
     group (chains of near-ties form one group)."""
@@ -135,6 +149,7 @@ def validate_race(
     score_positions: int = DEFAULT_SCORE_POSITIONS,
 ) -> ValidationReport:
     """Replay real strategies `runs` times and score the G1 checks (module docstring)."""
+    real_gaps = with_penalties(real_gaps, model)
     real_order = [c for c in model["realResult"] if c in real_gaps]
     contenders = real_order[:score_positions]
     podium = real_order[:PODIUM]

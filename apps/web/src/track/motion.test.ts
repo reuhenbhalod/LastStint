@@ -132,7 +132,11 @@ describe('the map’s motion', () => {
     expect(r.fastest).toBeLessThan(6);
     expect(r.fastestUnlapping).toBeLessThan(8);
     expect(r.quick / r.frames).toBeLessThan(0.0005);
-    expect(r.entries).toBeGreaterThan(5);
+    // A Daily with 15-25 laps left (races batch 3) sees only a few stops after the takeover.
+    const { race } = JSON.parse(
+      readFileSync(join(root, 'races', `${id}.json`), 'utf8'),
+    ) as RaceModel;
+    expect(r.entries).toBeGreaterThan(race.laps - race.takeoverLap > 25 ? 5 : 0);
     expect(r.exits).toBeGreaterThanOrEqual(r.entries - 2); // a stop or two in the lane at the flag
     expect(r.offEntry).toBeLessThanOrEqual(Math.max(1, r.entries * 0.1));
     expect(r.offExit).toBeLessThanOrEqual(Math.max(1, r.exits * 0.1));

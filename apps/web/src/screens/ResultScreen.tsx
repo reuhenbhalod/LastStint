@@ -23,6 +23,7 @@ import {
   type RunResponse,
   api,
 } from '../data/api.js';
+import { surname } from '../data/names.js';
 import {
   EraResultActions,
   EraResultsPanel,
@@ -520,6 +521,16 @@ export function ResultScreen({
           {model && (
             <DriverDebrief race={state.race} model={model} notes={game.notes()} won={beatRival} />
           )}
+
+          {model?.postRacePenalties?.length ? (
+            <p className="m-0 rounded-md border border-[var(--glass-edge)] bg-[var(--glass)] px-3.5 py-3 text-[13px] text-[#B9C2BD]">
+              Stewards after the flag, as in the real race:{' '}
+              {model.postRacePenalties
+                .map((p) => `${surname(p.driver)} +${p.seconds}s (${p.reason})`)
+                .join(', ')}
+              .
+            </p>
+          ) : null}
 
           {account && live && <AccountBar account={account} />}
 

@@ -271,5 +271,208 @@
    "status": "Collision",
    "turn": 12
   }
- }
+ },
+ "70th-anniversary-2020": {
+  "MAG": {
+   "lap": 45,
+   "status": "Retired"
+  }
+ },
+ "abu-dhabi-2019": {
+  "STR": {
+   "lap": 47,
+   "status": "Brakes"
+  }
+ },
+ "abu-dhabi-2025": {},
+ "australia-2019": {
+  "SAI": {
+   "lap": 12,
+   "status": "Engine"
+  },
+  "RIC": {
+   "lap": 31,
+   "status": "Damage"
+  },
+  "GRO": {
+   "lap": 32,
+   "status": "Wheel",
+   "turn": 15
+  }
+ },
+ "australia-2022": {
+  "VER": {
+   "lap": 40,
+   "status": "Fuel leak"
+  }
+ },
+ "austria-2021": {},
+ "austria-2024": {
+  "NOR": {
+   "lap": 65,
+   "status": "Lapped"
+  }
+ },
+ "azerbaijan-2023": {
+  "ZHO": {
+   "lap": 37,
+   "status": "Retired"
+  }
+ },
+ "azerbaijan-2025": {},
+ "bahrain-2018": {},
+ "bahrain-2024": {},
+ "belgium-2018": {
+  "RIC": {
+   "lap": 31,
+   "status": "Retired"
+  }
+ },
+ "brazil-2018": {},
+ "brazil-2023": {
+  "RUS": {
+   "lap": 59,
+   "status": "Retired"
+  }
+ },
+ "brazil-2025": {},
+ "china-2019": {
+  "KVY": {
+   "lap": 43,
+   "status": "Collision"
+  },
+  "NOR": {
+   "lap": 53,
+   "status": "Collision"
+  }
+ },
+ "eifel-2020": {
+  "NOR": {
+   "lap": 45,
+   "status": "Power Unit"
+  }
+ },
+ "emilia-romagna-2025": {
+  "ANT": {
+   "lap": 45,
+   "status": "Retired"
+  }
+ },
+ "great-britain-2018": {
+  "ERI": {
+   "lap": 34,
+   "status": "Accident"
+  },
+  "GRO": {
+   "lap": 39,
+   "status": "Collision"
+  },
+  "SAI": {
+   "lap": 39,
+   "status": "Collision"
+  },
+  "VER": {
+   "lap": 48,
+   "status": "Brakes"
+  }
+ },
+ "hungary-2020": {},
+ "italy-2021": {
+  "MAZ": {
+   "lap": 44,
+   "status": "Power Unit",
+   "turn": 10
+  }
+ },
+ "italy-2025": {},
+ "japan-2018": {
+  "HUL": {
+   "lap": 39,
+   "status": "Engine"
+  },
+  "LEC": {
+   "lap": 41,
+   "status": "Mechanical",
+   "turn": 10
+  }
+ },
+ "japan-2025": {},
+ "las-vegas-2023": {
+  "HUL": {
+   "lap": 46,
+   "status": "Retired"
+  },
+  "TSU": {
+   "lap": 47,
+   "status": "Retired"
+  }
+ },
+ "las-vegas-2024": {},
+ "mexico-2025": {
+  "SAI": {
+   "lap": 69,
+   "status": "Retired"
+  }
+ },
+ "monaco-2021": {},
+ "netherlands-2024": {},
+ "netherlands-2025": {
+  "LEC": {
+   "lap": 53,
+   "status": "Retired"
+  },
+  "NOR": {
+   "lap": 65,
+   "status": "Retired"
+  }
+ },
+ "qatar-2025": {
+  "BEA": {
+   "lap": 43,
+   "status": "Retired"
+  },
+  "HAD": {
+   "lap": 57,
+   "status": "Retired"
+  },
+  "STR": {
+   "lap": 57,
+   "status": "Retired"
+  }
+ },
+ "singapore-2025": {},
+ "spain-2019": {
+  "NOR": {
+   "lap": 47,
+   "status": "Collision"
+  },
+  "STR": {
+   "lap": 47,
+   "status": "Collision"
+  }
+ },
+ "spain-2022": {},
+ "spain-2025": {
+  "ANT": {
+   "lap": 56,
+   "status": "Retired"
+  }
+ },
+ "united-states-2018": {},
+ "united-states-2021": {
+  "GAS": {
+   "lap": 15,
+   "status": "Suspension"
+  },
+  "OCO": {
+   "lap": 42,
+   "status": "Mechanical"
+  },
+  "ALO": {
+   "lap": 51,
+   "status": "Rear wing"
+  }
+ },
+ "united-states-2024": {},
+ "united-states-2025": {}
 }

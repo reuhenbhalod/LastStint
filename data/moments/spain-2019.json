@@ -1,0 +1,122 @@
+[
+  {
+    "id": "cliff-27",
+    "lap": 27,
+    "trigger": "cliff",
+    "target": {
+      "kind": "beat-rival"
+    },
+    "options": [
+      {
+        "id": "stay",
+        "label": "Stay out",
+        "decisions": []
+      },
+      {
+        "id": "box-soft",
+        "label": "Box, softs",
+        "decisions": [
+          {
+            "lap": 27,
+            "kind": "pit",
+            "compound": "SOFT"
+          }
+        ]
+      },
+      {
+        "id": "box-medium",
+        "label": "Box, mediums",
+        "decisions": [
+          {
+            "lap": 27,
+            "kind": "pit",
+            "compound": "MEDIUM"
+          }
+        ]
+      },
+      {
+        "id": "box-hard",
+        "label": "Box, hards",
+        "decisions": [
+          {
+            "lap": 27,
+            "kind": "pit",
+            "compound": "HARD"
+          }
+        ]
+      },
+      {
+        "id": "box-next-hard",
+        "label": "Box next lap, hards",
+        "decisions": [
+          {
+            "lap": 28,
+            "kind": "pit",
+            "compound": "HARD"
+          }
+        ]
+      }
+    ],
+    "realOptionId": "stay"
+  },
+  {
+    "id": "stop-45",
+    "lap": 45,
+    "trigger": "cliff",
+    "target": {
+      "kind": "beat-rival"
+    },
+    "options": [
+      {
+        "id": "stay",
+        "label": "Stay out",
+        "decisions": []
+      },
+      {
+        "id": "box-soft",
+        "label": "Box, softs",
+        "decisions": [
+          {
+            "lap": 45,
+            "kind": "pit",
+            "compound": "SOFT"
+          }
+        ]
+      },
+      {
+        "id": "box-medium",
+        "label": "Box, mediums",
+        "decisions": [
+          {
+            "lap": 45,
+            "kind": "pit",
+            "compound": "MEDIUM"
+          }
+        ]
+      },
+      {
+        "id": "box-hard",
+        "label": "Box, hards",
+        "decisions": [
+          {
+            "lap": 45,
+            "kind": "pit",
+            "compound": "HARD"
+          }
+        ]
+      },
+      {
+        "id": "box-next-medium",
+        "label": "Box next lap, mediums",
+        "decisions": [
+          {
+            "lap": 46,
+            "kind": "pit",
+            "compound": "MEDIUM"
+          }
+        ]
+      }
+    ],
+    "realOptionId": "box-soft"
+  }
+]

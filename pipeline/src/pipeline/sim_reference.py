@@ -485,6 +485,11 @@ def simulate(
                 active_codes(), cars, wipe[0], None if unlap else green, known_down.get(lap)
             )
 
+    # The stewards' real post-race penalties (races batch 3; sim.ts classify), at the flag.
+    for p in model.get("postRacePenalties", []):
+        car = cars.get(p["driver"])
+        if car is not None and not car.retired:
+            car.total_time += p["seconds"]
     return _classify(order, cars)
 
 
