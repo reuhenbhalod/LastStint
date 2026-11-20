@@ -227,12 +227,11 @@ function RaceScreenBody({
   const battleWait = tutorial ? NO_TIMEOUT : BATTLE_WAIT_MS;
   const planning = state.phase === 'planning';
   // The race plan: the heads-up before a planned stop (once per stop), the engineer's better
-  // plan (until you keep yours), and the plan editor.
+  // plan (kept ours: not again until the race changes, below), and the plan editor.
   const headsUp = headsUpStop(state);
   const [headsUpSeen, setHeadsUpSeen] = useState<number | null>(null);
   const replan = betterPlan(state);
-  const replanKey = replan ? JSON.stringify([replan.plan.stops, replan.plan.pace]) : null;
-  const [keepKey, setKeepKey] = useState<string | null>(null);
+  const [keptAt, setKeptAt] = useState<string | null>(null);
   const [planEdit, setPlanEdit] = useState(false);
   const outline = outlineFor(model.race.id);
   const [selected, setSelected] = useState<string | null>(null);
@@ -246,6 +245,22 @@ function RaceScreenBody({
   // A wet race: the conditions on the lap being driven and the engineer's radar.
   const wetNow = model.weather ? wetnessOn(model.weather.wetness, state.race.lap + 1) : 0;
   const radar = forecast(model, state.race.lap);
+  // What the strategy turns on, beyond laps ticking by: either car's tyres changing, a safety
+  // car or VSC coming out, rain arriving or going, the rival retiring, and our own plan. After
+  // "Keep ours" the engineer asks again only once one of these has changed.
+  const neutrals = useRef({ count: 0, last: drivenFlag });
+  if (neutrals.current.last !== drivenFlag) {
+    if (drivenFlag !== 'green' && neutrals.current.last === 'green') neutrals.current.count++;
+    neutrals.current.last = drivenFlag;
+  }
+  const situation = JSON.stringify([
+    me ? state.race.lap - me.tyreAge : null,
+    them ? state.race.lap - them.tyreAge : null,
+    !!them?.retired,
+    neutrals.current.count,
+    wetNow >= 0.12,
+    state.plan.active ? [state.plan.active.stops, state.plan.active.pace] : null,
+  ]);
   const lapsLeft = totalLaps - state.race.lap;
   const gap = me && them && !me.retired && !them.retired ? them.totalTime - me.totalTime : null;
   // The Eras information level (everything, outside Eras): at Minimal the rival's gap shows
@@ -683,6 +698,7 @@ function RaceScreenBody({
   const [live, setLive] = useState<LiveStanding[] | null>(null);
   const running = state.phase === 'racing' && !!game.clock && game.clock.frozen === undefined;
   const racing = state.phase === 'racing';
+  const replanUp = !!replan && racing && !quick && situation !== keptAt;
   useEffect(() => {
     if (!racing) setLive(null);
   }, [racing]);
@@ -752,7 +768,7 @@ function RaceScreenBody({
     (paused && !!state.currentMoment) ||
     (!!shownBattle && racing && (shownBattle.stage !== 'done' || shownBattle.zoom)) ||
     (!!headsUp && racing && headsUpSeen !== headsUp.lap) ||
-    (!!replan && racing && !quick && replanKey !== keepKey) ||
+    replanUp ||
     (!!quick && racing);
   const planLabel = (() => {
     const a = state.plan.active;
@@ -892,11 +908,14 @@ function RaceScreenBody({
         setPanelOpen('plan');
       }}
     />
-  ) : replan && racing && !quick && replanKey !== keepKey ? (
+  ) : replan && replanUp ? (
     <ReplanOffer
       offer={replan}
-      onSwitch={() => game.changePlan(replan.plan)}
-      onKeep={() => setKeepKey(replanKey)}
+      // A plan the car can't take any more (its stop is past) is kept, not left on screen.
+      onSwitch={() => {
+        if (!game.changePlan(replan.plan)) setKeptAt(situation);
+      }}
+      onKeep={() => setKeptAt(situation)}
     />
   ) : quick && racing ? (
     <QuickCallCard
@@ -934,7 +953,7 @@ function RaceScreenBody({
         ? { kind: 'battle' }
         : headsUp && racing && headsUpSeen !== headsUp.lap
           ? { kind: 'headsUp' }
-          : replan && racing && !quick && replanKey !== keepKey
+          : replanUp
             ? { kind: 'replan' }
             : quick && racing
               ? { kind: quick.kind === 'battle' ? 'battle' : 'quick' }
