@@ -1176,5 +1176,150 @@
    "source": "https://en.wikipedia.org/wiki/2019_Brazilian_Grand_Prix",
    "note": "No source names damage: it costs its contact lap only (laps 1), fitted from the timing"
   }
+ ],
+ "70th-anniversary-2020": [],
+ "abu-dhabi-2019": [],
+ "abu-dhabi-2025": [],
+ "australia-2019": [],
+ "australia-2022": [
+  {
+   "lap": 39,
+   "type": "VSC",
+   "driver": "VER",
+   "status": "Fuel leak"
+  }
+ ],
+ "austria-2021": [],
+ "austria-2024": [
+  {
+   "lap": 66,
+   "type": "VSC",
+   "driver": "NOR",
+   "status": "Lapped"
+  }
+ ],
+ "azerbaijan-2023": [],
+ "azerbaijan-2025": [],
+ "bahrain-2018": [],
+ "bahrain-2024": [],
+ "belgium-2018": [],
+ "brazil-2018": [],
+ "brazil-2023": [],
+ "brazil-2025": [],
+ "china-2019": [],
+ "eifel-2020": [
+  {
+   "lap": 45,
+   "type": "SC",
+   "driver": "NOR",
+   "status": "Power Unit"
+  }
+ ],
+ "emilia-romagna-2025": [
+  {
+   "lap": 46,
+   "type": "SC",
+   "driver": "ANT",
+   "status": "Retired"
+  }
+ ],
+ "great-britain-2018": [
+  {
+   "lap": 33,
+   "type": "SC",
+   "driver": "ERI",
+   "status": "Accident"
+  }
+ ],
+ "hungary-2020": [],
+ "italy-2021": [
+  {
+   "lap": 44,
+   "type": "VSC",
+   "driver": "MAZ",
+   "status": "Power Unit",
+   "turn": 10
+  }
+ ],
+ "italy-2025": [],
+ "japan-2018": [
+  {
+   "lap": 41,
+   "type": "VSC",
+   "driver": "LEC",
+   "status": "Mechanical",
+   "turn": 10
+  }
+ ],
+ "japan-2025": [],
+ "las-vegas-2023": [],
+ "las-vegas-2024": [],
+ "mexico-2025": [
+  {
+   "lap": 70,
+   "type": "VSC",
+   "driver": "SAI",
+   "status": "Retired"
+  }
+ ],
+ "monaco-2021": [],
+ "netherlands-2024": [],
+ "netherlands-2025": [
+  {
+   "lap": 53,
+   "type": "SC",
+   "driver": "LEC",
+   "status": "Retired"
+  },
+  {
+   "lap": 65,
+   "type": "SC",
+   "driver": "NOR",
+   "status": "Retired"
+  }
+ ],
+ "qatar-2025": [],
+ "singapore-2025": [],
+ "spain-2019": [
+  {
+   "lap": 46,
+   "type": "SC",
+   "driver": "NOR",
+   "status": "Collision"
+  }
+ ],
+ "spain-2022": [],
+ "spain-2025": [
+  {
+   "lap": 55,
+   "type": "SC",
+   "driver": "ANT",
+   "status": "Retired"
+  }
+ ],
+ "united-states-2018": [],
+ "united-states-2021": [
+  {
+   "lap": 28,
+   "type": "VSC",
+   "status": "Debris",
+   "cars": [
+    "GIO",
+    "ALO"
+   ],
+   "turn": 12
+  }
+ ],
+ "united-states-2024": [],
+ "united-states-2025": [],
+ "mexico-2015": [
+  {
+   "lap": 52,
+   "type": "SC",
+   "driver": "VET",
+   "status": "Accident",
+   "turn": 7,
+   "source": "https://en.wikipedia.org/w/index.php?title=2015_Mexican_Grand_Prix&action=raw"
+  }
  ]
 }

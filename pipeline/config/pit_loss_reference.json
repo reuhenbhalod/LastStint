@@ -1,10 +1,22 @@
 {
-  "_note": "Green-flag pit loss (s) per circuit, used for a wet-affected race (docs/pit-loss-spec.md P1). 'measured' is the median of that circuit's dry races; 'estimate' is a published typical figure where no dry race is in the game yet.",
+  "_note": "Green-flag pit loss (s) per circuit, used for a wet-affected race (docs/pit-loss-spec.md P1). 'measured' is the median of that circuit's dry races; 'estimate' is a published typical figure where no dry race is in the game yet. 'before': the loss up to a season, for a pit lane rebuilt since.",
   "circuits": {
     "canada": { "seconds": 18.94, "source": "measured", "races": ["canada-2019", "canada-2022"] },
     "great-britain": { "seconds": 18.76, "source": "measured", "races": ["70th-anniversary-2020"] },
     "russia": { "seconds": 25.38, "source": "measured", "races": ["russia-2020"] },
     "monaco": { "seconds": 20.0, "source": "estimate" },
-    "australia": { "seconds": 19.5, "source": "estimate" }
+    "australia": {
+      "seconds": 19.5,
+      "source": "estimate",
+      "before": [
+        {
+          "until": 2021,
+          "seconds": 24.06,
+          "source": "measured",
+          "races": ["australia-2019"],
+          "note": "Before the 2022 changes the pit lane was narrower and limited to 60 km/h (80 from 2022): https://en.wikipedia.org/wiki/2022_Australian_Grand_Prix, citing Speedcafe. Measured from australia-2019 alone (races batch 3)."
+        }
+      ]
+    }
   }
 }

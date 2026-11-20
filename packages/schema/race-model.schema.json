@@ -666,6 +666,20 @@
         "type": "string"
       }
     },
+    "postRacePenalties": {
+      "description": "Real time penalties the stewards added after the flag (races batch 3); both sims add them to each car's time at the flag.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["driver", "seconds", "reason"],
+        "additionalProperties": false,
+        "properties": {
+          "driver": { "type": "string" },
+          "seconds": { "type": "number", "exclusiveMinimum": 0 },
+          "reason": { "type": "string" }
+        }
+      }
+    },
     "userSide": {
       "type": "string",
       "description": "Driver code the user controls — always the hard/controversial side."

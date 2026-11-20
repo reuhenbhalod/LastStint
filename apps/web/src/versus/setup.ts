@@ -51,6 +51,27 @@ export function saveSetup(setup: Setup): void {
   }
 }
 
+// A match entered from the garage (Lobby.tsx create or join) already has its setup: the match
+// locks it in on its own (Versus.tsx Match) instead of showing the car pick again. Per tab, by
+// match code; a shared link opened directly still gets the car pick.
+const GARAGE_KEY = 'laststint:versus-from-garage';
+
+export function markFromGarage(code: string): void {
+  try {
+    sessionStorage.setItem(GARAGE_KEY, code.toUpperCase());
+  } catch {
+    // private mode
+  }
+}
+
+export function cameFromGarage(code: string): boolean {
+  try {
+    return sessionStorage.getItem(GARAGE_KEY) === code.toUpperCase();
+  } catch {
+    return false;
+  }
+}
+
 /** What a car's pace stats come to on this track (s a lap vs a Balanced car). */
 export function lapEdge(
   track: ReturnType<typeof versusTrack> | null,

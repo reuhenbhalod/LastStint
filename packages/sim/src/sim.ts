@@ -2889,10 +2889,14 @@ export function ruleSatisfied(car: CarState, rules?: RaceModel['rules']): boolea
 export function classify(run: Run): RaceResult {
   // Track-limit penalties are added at the flag (race engineer spec).
   const penalty = run.state.engineer?.penalty ?? 0;
-  const time = (c: string) =>
-    car(run, c).totalTime + (penalty && c === run.model.userSide ? penalty : 0);
-  const running = live(run).sort((a, b) => time(a) - time(b));
   const finished = isFinished(run);
+  // The stewards' real post-race penalties too, once the race is run (races batch 3).
+  const post = finished ? (run.model.postRacePenalties ?? []) : [];
+  const stewards = (c: string) =>
+    post.reduce((sum, p) => (p.driver === c ? sum + p.seconds : sum), 0);
+  const time = (c: string) =>
+    car(run, c).totalTime + (penalty && c === run.model.userSide ? penalty : 0) + stewards(c);
+  const running = live(run).sort((a, b) => time(a) - time(b));
   const legalFinish = (c: string) =>
     ruleSatisfied(car(run, c), run.model.rules) && stopsOwed(run.model.rules, car(run, c)) === 0;
   const disqualified = run.live && finished ? running.filter((c) => !legalFinish(c)) : [];

@@ -250,6 +250,42 @@ def assemble_race_model(
     facts = fault_facts or []
     takeover_state = scenario_mod.state_at_takeover(laps, takeover_lap)
     strategy = scenario_mod.real_strategy(laps)
+    # A "stop" onto no known tyre is a car pitting to retire (Alonso, Canada 2018) or a pit
+    # entry after the flag (every car, Canada 2025): no lap follows, so the replay drops it
+    # (races batch 3; such a race failed to simulate before, so no built race changes).
+    unknown = ("nan", "None")
+    if any(str(s["to"]) in unknown for stops in strategy.values() for s in stops):
+        strategy = {
+            d: [s for s in stops if str(s["to"]) not in unknown] for d, stops in strategy.items()
+        }
+    # A dry tyre a car runs from the takeover on that nobody ran long enough to fit (races
+    # batch 3: Mazepin's late softs at Monza 2021): the era's prior against the nearest fitted
+    # one, as for a wet race's damp-track softs above. Only tyres the replay uses, so a race
+    # that already built (and simulated) is unchanged.
+    replayed = {str(s["compound"]) for s in takeover_state.values() if s["compound"]} | {
+        s["to"] for stops in strategy.values() for s in stops if s["lap"] > takeover_lap
+    }
+    if any(c not in compounds for c in replayed):
+        from .fit import load_compound_priors
+
+        prior = load_compound_priors(era)
+        fitted_dry = [c for c in prior["order"] if c in compounds]
+        for c in prior["order"]:
+            if c in replayed and c not in compounds and fitted_dry:
+                anchor = min(
+                    fitted_dry,
+                    key=lambda f: abs(prior["order"].index(f) - prior["order"].index(c)),
+                )
+                compounds[c] = {
+                    "offset": round(
+                        compounds[anchor]["offset"] + prior["offset"][c] - prior["offset"][anchor],
+                        4,
+                    ),
+                    "degPerLap": prior["wear"][c],
+                    "cliffLap": max(
+                        longest.get(c, 1), life_floor(c, longest, stints, total_laps) or 1
+                    ),
+                }
     teams = _team_map(laps)
     # Real stops keep their measured time (spec B1): a slow or quick stop is a real event.
     measured = track_mod.measured_stop_losses(laps, takeover_lap, eras_stops)

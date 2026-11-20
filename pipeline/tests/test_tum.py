@@ -165,6 +165,17 @@ def test_teams_use_fastf1_names(abu, fastf1_abu):
 # --- status timeline and notes ---------------------------------------------------------
 
 
+def test_mid_season_team_moves():
+    # TUM has one team per driver per season; Jolpica's per-race constructors give the moves.
+    assert tum.team_name("ToroRosso", "2016-04-17", "VER") == "Toro Rosso"  # China 2016
+    assert tum.team_name("ToroRosso", "2016-07-24", "VER") == "Red Bull Racing"  # Hungary
+    assert tum.team_name("RedBull", "2016-07-24", "KVY") == "Toro Rosso"
+    assert tum.team_name("ToroRosso", "2017-10-22", "SAI") == "Renault"  # United States
+    assert tum.team_name("ToroRosso", "2017-10-01", "SAI") == "Toro Rosso"  # Malaysia
+    assert tum.team_name("ToroRosso", "2017-10-22", "KVY") == "Toro Rosso"
+    assert tum.team_name("RedBull", "2016-07-24") == "Red Bull Racing"
+
+
 def test_status_timeline_abu_dhabi(con):
     assert tum.track_status(con, _race(con, 2018, "YasMarina")) == [
         {"time": 0.0, "status": "1"},

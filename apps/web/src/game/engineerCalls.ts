@@ -98,7 +98,14 @@ export interface DirectorMemory {
   last: Partial<Record<string, number>>;
   /** The running battle: the other car and how many laps in a row it's been asked about. */
   fight?: { other: string; streak: number };
+  /** How bad the tyres were the last time the driver asked to box on this set (the lap the set
+   * went on): he asks again only when they're worse. */
+  boxAsk?: { set: number; level: number };
 }
+
+/** Tyre loss (s a lap against new ones) where the driver asks to box: worn out (1.2 s), past
+ * their life (the sim's tyreLife loss, 2 s), and nothing left (4 s). */
+const BOX_ASK_LOSS = [1.2, 2.0, 4.0] as const;
 
 export const newMemory = (): DirectorMemory => ({ last: {} });
 
@@ -691,17 +698,22 @@ function requestCall(
   const next = race.lap + 1;
   const left = model.race.laps - race.lap;
   const us = model.userSide;
-  // The tyres really are gone: well worn, and losing over a second a lap to new ones.
-  const gone = me.tyreAge >= 6 && tyreLoss(model, me.compound, me.tyreWear) >= 1.2;
-  if (canStop && gone && left > 4 && race.lap - (mem.last.reqBox ?? -99) >= 6) {
+  // The tyres really are gone: well worn, and losing over a second a lap to new ones. Asked
+  // once at each step as they get worse (a "stay out" stands until then), not every few laps.
+  const loss = me.tyreAge >= 6 ? tyreLoss(model, me.compound, me.tyreWear) : 0;
+  const level = BOX_ASK_LOSS.filter((l) => loss >= l).length as 0 | 1 | 2 | 3;
+  const set = race.lap - me.tyreAge;
+  const askedAt = mem.boxAsk?.set === set ? mem.boxAsk.level : 0;
+  if (canStop && level > askedAt && left > 4) {
     mem.last.reqBox = race.lap;
+    mem.boxAsk = { set, level };
     const compound = lastingCompound(race, model);
     return {
       lap: race.lap,
       from: us,
       kind: 'request',
       asked: true,
-      text: wantToBox(me.compound, race.lap),
+      text: wantToBox(me.compound, race.lap, level as 1 | 2 | 3),
       options: [
         {
           id: 'yes',

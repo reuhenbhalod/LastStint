@@ -39,7 +39,7 @@ import type { MapFeed } from '../track/feed.js';
 import { outlineFor } from '../track/outlines.js';
 import { Lobby } from '../versus/Lobby.js';
 import { PitLane } from '../versus/PitLane.js';
-import { STAT_NAME, TYRES, lapEdge, loadSetup } from '../versus/setup.js';
+import { STAT_NAME, TYRES, cameFromGarage, lapEdge, loadSetup } from '../versus/setup.js';
 import { type VersusView, useVersus } from '../versus/useVersus.js';
 import { versusModel, versusRaceState } from '../versus/view.js';
 
@@ -144,12 +144,32 @@ function Match({ code, name }: { code: string; name: string }) {
     setArrival('playing');
     window.setTimeout(() => setArrival('done'), ARRIVAL_MS);
   }, [phase, arrival]);
+  // Entered from the garage, where the car and start tyre were picked: lock that setup in once
+  // the second car has driven in (the race starts when both are in) and stay in the pit lane,
+  // rather than asking for the car again.
+  const fromGarage = useMemo(() => cameFromGarage(code), [code]);
+  const mine = view.seat !== null ? view.room?.seats[view.seat] : null;
+  const lockedIn = useRef(false);
+  useEffect(() => {
+    if (!fromGarage || phase !== 'pick' || arrival !== 'done') return;
+    if (mine?.picked || lockedIn.current) return;
+    lockedIn.current = true;
+    const s = loadSetup();
+    pick(s.car, s.tyre);
+  }, [fromGarage, phase, arrival, mine?.picked, pick]);
   if (view.error && !view.room)
     return <Notice title="No such match" text={`${code}: ${view.error}`} />;
   if (!view.room) return <Notice title="Connecting…" text={`Match ${code}`} />;
   if (phase === 'lobby') return <Waiting code={code} view={view} />;
-  if (phase === 'pick' && arrival !== 'done')
-    return <PitLane code={code} view={view} arriving={sawLobby.current ? 'them' : 'me'} />;
+  if (phase === 'pick' && (arrival !== 'done' || fromGarage))
+    return (
+      <PitLane
+        code={code}
+        view={view}
+        arriving={arrival === 'done' ? undefined : sawLobby.current ? 'them' : 'me'}
+        lockedIn={fromGarage}
+      />
+    );
   if (phase === 'pick') return <Pick view={view} onPick={pick} />;
   if (view.result) return <Result outcome={view.result} seat={view.seat} model={view.model} />;
   if (phase === 'grading' || view.grading)
@@ -525,7 +545,7 @@ function Race({
   );
 
   return (
-    <section className="mx-auto flex max-w-6xl flex-col gap-3 px-3 py-3 md:px-4">
+    <section className="mx-auto flex w-full max-w-6xl flex-col gap-3 px-3 py-3 md:px-4">
       <div className="glass flex flex-wrap items-center justify-between gap-2 rounded-xl px-3 py-2">
         <Driver name={setup.players[seat].name} car={setup.players[seat].car} you />
         <span className="flex flex-col items-center">

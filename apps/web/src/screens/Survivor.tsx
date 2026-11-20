@@ -317,21 +317,68 @@ function RoundRace({
   }, []);
 
   // No race card in a run: the straight already briefed the round, so the race starts as soon
-  // as it has loaded (and a reload mid-run lands back on the race).
+  // as it has loaded. Started once; if it hasn't gone (an error, a slow load), a button does it.
   const phase = game.state?.phase;
-  const start = game.start;
+  const startRef = useRef(game.start);
+  startRef.current = game.start;
+  const started = useRef(false);
+  const [stuck, setStuck] = useState<string | null>(null);
+  const go = useCallback(() => {
+    setStuck(null);
+    try {
+      startRef.current();
+    } catch (e) {
+      setStuck(`Round ${cur.round} wouldn’t start (${String((e as Error).message ?? e)}).`);
+    }
+  }, [cur.round]);
   useEffect(() => {
-    if (phase === 'intro') start();
-  }, [phase, start]);
+    if (phase !== 'intro' || started.current) return;
+    started.current = true;
+    go();
+  }, [phase, go]);
+  const waiting = !game.error && (!game.state || !game.model || phase === 'intro');
+  useEffect(() => {
+    if (!waiting) return;
+    const id = setTimeout(() => setStuck((s) => s ?? ''), 4000);
+    return () => clearTimeout(id);
+  }, [waiting]);
 
-  if (game.error) return <p className="p-6 text-center text-[var(--muted)]">{game.error}</p>;
-  if (!game.state || !game.model || phase === 'intro') {
+  if (game.error || waiting) {
     return (
-      <div className="fl flex min-h-screen items-center justify-center">
+      <div className="fl flex min-h-screen flex-col items-center justify-center gap-4 p-6 text-center">
         <p className={`${EYEBROW} text-[var(--fl-amber)]`}>Round {cur.round} · lights out</p>
+        {game.error && <p className="m-0 max-w-md text-[15px]">{game.error}</p>}
+        {stuck && <p className="m-0 max-w-md text-[15px]">{stuck}</p>}
+        {(game.error || stuck !== null) && (
+          <div className="flex flex-wrap justify-center gap-3">
+            <button
+              type="button"
+              onClick={
+                game.error || !game.state
+                  ? () => {
+                      started.current = false;
+                      setStuck(null);
+                      game.reload();
+                    }
+                  : go
+              }
+              className={GO}
+            >
+              {game.error || !game.state ? 'Try again' : `Start round ${cur.round}`}
+            </button>
+            <button
+              type="button"
+              onClick={onHome}
+              className="rounded-xl border border-white/20 px-6 text-[15px] font-bold"
+            >
+              Gauntlet menu
+            </button>
+          </div>
+        )}
       </div>
     );
   }
+  if (!game.state || !game.model) return null;
   if (sending || error) {
     return (
       <main className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center gap-4 p-6 text-center">

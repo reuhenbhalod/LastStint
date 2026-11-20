@@ -111,6 +111,17 @@ TEAM_NAMES = {
 # Force India raced as Racing Point Force India from the 2018 Belgian GP (TUM keeps
 # "ForceIndia"; FastF1 says "Racing Point").
 RACING_POINT_FROM = "2018-08-26"
+# TUM keeps one team per driver per season (starterfields), so a mid-season move is missed.
+# driver -> [(first race date, last race date, TUM team)], checked against Jolpica's
+# per-race constructors (https://api.jolpi.ca/ergast/f1/<year>/<round>/results.json):
+# Verstappen and Kvyat swapped seats from the 2016 Spanish GP (round 5; Hungary, round 11:
+# VER Red Bull, KVY Toro Rosso); Sainz drove for Renault from the 2017 United States GP
+# (rounds 17-18: Renault).
+TEAM_MOVES: dict[str, list[tuple[str, str, str]]] = {
+    "VER": [("2016-05-15", "2016-12-31", "RedBull")],
+    "KVY": [("2016-05-15", "2016-12-31", "ToroRosso")],
+    "SAI": [("2017-10-22", "2017-12-31", "Renault")],
+}
 
 DRY_LABELS = ["SOFT", "MEDIUM", "HARD"]
 WET_CODES = {"I": "INTERMEDIATE", "W": "WET"}
@@ -186,9 +197,12 @@ def compound_map(available: str) -> dict[str, str]:
     return mapping
 
 
-def team_name(tum_team: str | None, date: str) -> str | None:
+def team_name(tum_team: str | None, date: str, driver: str | None = None) -> str | None:
     if tum_team is None:
         return None
+    for first, last, team in TEAM_MOVES.get(driver or "", []):
+        if first <= date[:10] <= last:
+            tum_team = team
     if tum_team == "ForceIndia" and date >= RACING_POINT_FROM:
         return "Racing Point"
     return TEAM_NAMES.get(tum_team, tum_team)
@@ -261,7 +275,10 @@ def laps_frame(con: sqlite3.Connection, race: dict) -> pd.DataFrame:
     df = pd.DataFrame(
         {
             "Driver": raw["Driver"].astype(str),
-            "Team": [team_name(t, race["date"]) for t in raw["tum_team"]],
+            "Team": [
+                team_name(t, race["date"], d)
+                for t, d in zip(raw["tum_team"], raw["Driver"], strict=True)
+            ],
             "LapNumber": raw["lapno"].astype("float64"),
             "LapTime": raw["laptime"].astype("float64"),
             "Time": raw["racetime"].astype("float64"),
@@ -312,7 +329,7 @@ def retirement_rows(
         rows.append(
             {
                 "Driver": str(g["Driver"]),
-                "Team": team_name(g["tum_team"], date),
+                "Team": team_name(g["tum_team"], date, str(g["Driver"])),
                 "LapNumber": lap,
                 "LapTime": float("nan"),
                 "Time": start + float(fastest[lap]),
