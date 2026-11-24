@@ -8,8 +8,9 @@
 // the era map, the era detail, attempt refusals and race models answer as production does, and
 // an attempt production would start falls through to the test-mode mock to play.
 // Map nodes are found by role and text (era name and state), not layout.
-import { type Page, expect, test } from '@playwright/test';
+import type { Page } from '@playwright/test';
 import { ERAS, eraRace, raceName, racesOfEra } from '../src/eras/catalog.js';
+import { expect, test } from './coverage.js';
 import { loadEraRace, mockEras } from './eras.js';
 import {
   LAUNCH,

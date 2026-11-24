@@ -3,7 +3,8 @@
 // ("Coming soon") opens as soon as it's released. The Worker is mocked (e2e/eras.ts with
 // `production`), since test mode opens every era. Nodes are found by their era name and state,
 // not by the map's layout.
-import { type Page, expect, test } from '@playwright/test';
+import type { Page } from '@playwright/test';
+import { expect, test } from './coverage.js';
 import { loadEraRace, mockEras } from './eras.js';
 import type { ErasProduction } from './erasProduction.js';
 

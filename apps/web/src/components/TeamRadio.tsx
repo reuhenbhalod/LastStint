@@ -90,6 +90,8 @@ export function TeamRadio({
       <button
         type="button"
         aria-expanded={open}
+        // The header's chips (pace, ERS) change as orders go in; the name stays put.
+        aria-label="Team radio orders"
         onClick={() => setOpen(!open)}
         className="flex w-full flex-wrap items-center gap-x-3 gap-y-1 text-left"
       >

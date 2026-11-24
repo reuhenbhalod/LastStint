@@ -1,3 +1,4 @@
+import { raceName } from '../src/eras/catalog.js';
 // One authored race per era, from the era map to the results (build plan 10.1), on a desktop
 // and a 390 px phone (the `desktop` and `phone` projects), with the Worker mocked (e2e/eras.ts).
 // Between them: refuelling (a box call waits for its fuel fill), the 2005 tyre lock, no DRS
@@ -9,8 +10,7 @@
 //
 // Each test plays a whole race at five times the normal lap speed (the app's e2e hook); the
 // tests run in parallel. Runtime: see docs/eras-build-plan.md step 10.1.
-import { expect, test } from '@playwright/test';
-import { raceName } from '../src/eras/catalog.js';
+import { expect, test } from './coverage.js';
 import {
   closeTeamRadio,
   finishRace,

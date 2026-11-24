@@ -1,7 +1,7 @@
 // A defend race end to end on a laptop screen (Spain 2020: VER holds P2 from BOT): the goal
 // reads as a defend, every call the race asks is answered (generically, so the test follows
 // the race file's calls), and the results come back. The Worker is mocked (e2e/mock.ts).
-import { expect, test } from '@playwright/test';
+import { expect, test } from './coverage.js';
 import { loadRace, mockApi } from './mock.js';
 
 const model = loadRace('spain-2020');
