@@ -1,0 +1,684 @@
+{
+  "schemaVersion": 11,
+  "race": {
+    "id": "netherlands-2024",
+    "name": "Netherlands 2024: Gasly vs Alonso",
+    "laps": 72,
+    "takeoverLap": 28,
+    "seed": 1
+  },
+  "era": "2014-2025",
+  "track": {
+    "pitLoss": 22.754,
+    "pitLossUnderSC": 12.515,
+    "pitLossUnderVSC": 15.7,
+    "pitLossDeviations": [
+      -2.014,
+      -1.728,
+      -0.904,
+      -0.779,
+      -0.569,
+      -0.551,
+      -0.539,
+      -0.481,
+      -0.43,
+      -0.291,
+      -0.129,
+      -0.107,
+      -0.039,
+      0.039,
+      0.08,
+      0.168,
+      0.492,
+      0.762,
+      0.806,
+      0.925,
+      0.959,
+      1.26,
+      2.28,
+      2.381,
+      3.281,
+      4.549
+    ],
+    "overtakeDifficulty": 0.9317,
+    "overtakeModel": {
+      "intercept": -1.4563,
+      "paceCoef": 4.1989,
+      "gapCoef": -6.1138
+    },
+    "dirtyAirPenalty": 0.2596,
+    "greenLapTime": 76.322
+  },
+  "compounds": {
+    "SOFT": {
+      "offset": 0.0,
+      "degPerLap": 0.07423,
+      "cliffLap": 24,
+      "provenLaps": 24
+    },
+    "MEDIUM": {
+      "offset": 0.3997,
+      "degPerLap": 0.05118,
+      "cliffLap": 37,
+      "provenLaps": 33
+    },
+    "HARD": {
+      "offset": 0.4177,
+      "degPerLap": 0.03328,
+      "cliffLap": 57,
+      "provenLaps": 57
+    }
+  },
+  "drivers": [
+    {
+      "code": "ALB",
+      "team": "Williams",
+      "basePace": 76.8956,
+      "noise": 0.3951,
+      "stateAtTakeover": {
+        "position": 17,
+        "gapAhead": 0.375,
+        "compound": "HARD",
+        "tyreAge": 16,
+        "compoundsUsed": [
+          "HARD",
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 55,
+          "to": "MEDIUM",
+          "loss": 22.103
+        }
+      ]
+    },
+    {
+      "code": "ALO",
+      "team": "Aston Martin",
+      "basePace": 76.654,
+      "noise": 0.488,
+      "stateAtTakeover": {
+        "position": 9,
+        "gapAhead": 4.983,
+        "compound": "MEDIUM",
+        "tyreAge": 28,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 32,
+          "to": "HARD",
+          "loss": 24.531
+        }
+      ]
+    },
+    {
+      "code": "BOT",
+      "team": "Kick Sauber",
+      "basePace": 77.688,
+      "noise": 0.3412,
+      "stateAtTakeover": {
+        "position": 18,
+        "gapAhead": 6.424,
+        "compound": "HARD",
+        "tyreAge": 13,
+        "compoundsUsed": [
+          "HARD",
+          "SOFT"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 44,
+          "to": "MEDIUM",
+          "loss": 23.058
+        }
+      ]
+    },
+    {
+      "code": "GAS",
+      "team": "Alpine",
+      "basePace": 76.648,
+      "noise": 0.2688,
+      "stateAtTakeover": {
+        "position": 7,
+        "gapAhead": 0.026,
+        "compound": "MEDIUM",
+        "tyreAge": 28,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 33,
+          "to": "HARD",
+          "loss": 24.754
+        }
+      ]
+    },
+    {
+      "code": "HAM",
+      "team": "Mercedes",
+      "basePace": 75.8163,
+      "noise": 0.6199,
+      "stateAtTakeover": {
+        "position": 14,
+        "gapAhead": 0.209,
+        "compound": "HARD",
+        "tyreAge": 5,
+        "compoundsUsed": [
+          "HARD",
+          "SOFT"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 49,
+          "to": "SOFT",
+          "loss": 22.722
+        }
+      ]
+    },
+    {
+      "code": "HUL",
+      "team": "Haas F1 Team",
+      "basePace": 76.6215,
+      "noise": 0.4005,
+      "stateAtTakeover": {
+        "position": 13,
+        "gapAhead": 1.877,
+        "compound": "HARD",
+        "tyreAge": 14,
+        "compoundsUsed": [
+          "HARD",
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "LEC",
+      "team": "Ferrari",
+      "basePace": 75.7639,
+      "noise": 0.277,
+      "stateAtTakeover": {
+        "position": 6,
+        "gapAhead": 3.098,
+        "compound": "HARD",
+        "tyreAge": 4,
+        "compoundsUsed": [
+          "HARD",
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "MAG",
+      "team": "Haas F1 Team",
+      "basePace": 77.4577,
+      "noise": 0.4326,
+      "stateAtTakeover": {
+        "position": 12,
+        "gapAhead": 1.999,
+        "compound": "HARD",
+        "tyreAge": 28,
+        "compoundsUsed": [
+          "HARD"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 41,
+          "to": "MEDIUM",
+          "loss": 25.193
+        }
+      ]
+    },
+    {
+      "code": "NOR",
+      "team": "McLaren",
+      "basePace": 75.5065,
+      "noise": 0.3474,
+      "stateAtTakeover": {
+        "position": 1,
+        "gapAhead": 0.0,
+        "compound": "MEDIUM",
+        "tyreAge": 28,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 29,
+          "to": "HARD",
+          "loss": 20.335
+        }
+      ]
+    },
+    {
+      "code": "OCO",
+      "team": "Alpine",
+      "basePace": 77.0934,
+      "noise": 0.3729,
+      "stateAtTakeover": {
+        "position": 15,
+        "gapAhead": 4.192,
+        "compound": "MEDIUM",
+        "tyreAge": 28,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 31,
+          "to": "HARD",
+          "loss": 22.609
+        }
+      ]
+    },
+    {
+      "code": "PER",
+      "team": "Red Bull Racing",
+      "basePace": 75.9688,
+      "noise": 0.2813,
+      "stateAtTakeover": {
+        "position": 3,
+        "gapAhead": 5.147,
+        "compound": "MEDIUM",
+        "tyreAge": 28,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 30,
+          "to": "HARD",
+          "loss": 24.788
+        }
+      ]
+    },
+    {
+      "code": "PIA",
+      "team": "McLaren",
+      "basePace": 75.8614,
+      "noise": 0.2574,
+      "stateAtTakeover": {
+        "position": 2,
+        "gapAhead": 9.279,
+        "compound": "MEDIUM",
+        "tyreAge": 28,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 34,
+          "to": "HARD",
+          "loss": 22.449
+        }
+      ]
+    },
+    {
+      "code": "RIC",
+      "team": "RB",
+      "basePace": 76.6722,
+      "noise": 0.4245,
+      "stateAtTakeover": {
+        "position": 11,
+        "gapAhead": 3.302,
+        "compound": "MEDIUM",
+        "tyreAge": 28,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 30,
+          "to": "HARD",
+          "loss": 24.206
+        }
+      ]
+    },
+    {
+      "code": "RUS",
+      "team": "Mercedes",
+      "basePace": 76.0173,
+      "noise": 0.3072,
+      "stateAtTakeover": {
+        "position": 8,
+        "gapAhead": 0.873,
+        "compound": "HARD",
+        "tyreAge": 3,
+        "compoundsUsed": [
+          "HARD",
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 55,
+          "to": "SOFT",
+          "loss": 23.094
+        }
+      ]
+    },
+    {
+      "code": "SAI",
+      "team": "Ferrari",
+      "basePace": 75.8017,
+      "noise": 0.2772,
+      "stateAtTakeover": {
+        "position": 4,
+        "gapAhead": 2.165,
+        "compound": "MEDIUM",
+        "tyreAge": 28,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 31,
+          "to": "HARD",
+          "loss": 23.019
+        }
+      ]
+    },
+    {
+      "code": "SAR",
+      "team": "Williams",
+      "basePace": 77.411,
+      "noise": 0.3996,
+      "stateAtTakeover": {
+        "position": 19,
+        "gapAhead": 9.369,
+        "compound": "HARD",
+        "tyreAge": 6,
+        "compoundsUsed": [
+          "HARD",
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "STR",
+      "team": "Aston Martin",
+      "basePace": 76.7806,
+      "noise": 0.3724,
+      "stateAtTakeover": {
+        "position": 10,
+        "gapAhead": 4.163,
+        "compound": "MEDIUM",
+        "tyreAge": 28,
+        "compoundsUsed": [
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 31,
+          "to": "HARD",
+          "loss": 22.171
+        }
+      ]
+    },
+    {
+      "code": "TSU",
+      "team": "RB",
+      "basePace": 77.5578,
+      "noise": 0.5123,
+      "stateAtTakeover": {
+        "position": 16,
+        "gapAhead": 1.139,
+        "compound": "MEDIUM",
+        "tyreAge": 14,
+        "compoundsUsed": [
+          "MEDIUM",
+          "SOFT"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 33,
+          "to": "HARD",
+          "loss": 21.433
+        }
+      ]
+    },
+    {
+      "code": "VER",
+      "team": "Red Bull Racing",
+      "basePace": 75.8755,
+      "noise": 0.127,
+      "stateAtTakeover": {
+        "position": 5,
+        "gapAhead": 8.542,
+        "compound": "HARD",
+        "tyreAge": 1,
+        "compoundsUsed": [
+          "HARD",
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 28,
+          "to": "HARD",
+          "loss": 22.185
+        }
+      ]
+    },
+    {
+      "code": "ZHO",
+      "team": "Kick Sauber",
+      "basePace": 78.1466,
+      "noise": 0.5376,
+      "stateAtTakeover": {
+        "position": 20,
+        "gapAhead": 6.802,
+        "compound": "HARD",
+        "tyreAge": 10,
+        "compoundsUsed": [
+          "HARD",
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 52,
+          "to": "SOFT",
+          "loss": 26.376
+        }
+      ]
+    }
+  ],
+  "fuelEffectPerLap": 0.03824,
+  "freshTyre": {
+    "bonus": -0.1958,
+    "laps": 3
+  },
+  "events": [],
+  "decisionMoments": [
+    {
+      "id": "stop-32",
+      "lap": 32,
+      "trigger": "cliff",
+      "target": {
+        "kind": "beat-rival"
+      },
+      "options": [
+        {
+          "id": "stay",
+          "label": "Stay out",
+          "decisions": []
+        },
+        {
+          "id": "box-soft",
+          "label": "Box, softs",
+          "decisions": [
+            {
+              "lap": 32,
+              "kind": "pit",
+              "compound": "SOFT"
+            }
+          ]
+        },
+        {
+          "id": "box-medium",
+          "label": "Box, mediums",
+          "decisions": [
+            {
+              "lap": 32,
+              "kind": "pit",
+              "compound": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "box-hard",
+          "label": "Box, hards",
+          "decisions": [
+            {
+              "lap": 32,
+              "kind": "pit",
+              "compound": "HARD"
+            }
+          ]
+        },
+        {
+          "id": "box-next-hard",
+          "label": "Box next lap, hards",
+          "decisions": [
+            {
+              "lap": 33,
+              "kind": "pit",
+              "compound": "HARD"
+            }
+          ]
+        }
+      ],
+      "realOptionId": "box-hard"
+    },
+    {
+      "id": "pace-52",
+      "lap": 52,
+      "trigger": "cliff",
+      "target": {
+        "kind": "beat-rival"
+      },
+      "options": [
+        {
+          "id": "push",
+          "label": "Push now",
+          "decisions": [
+            {
+              "lap": 52,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            }
+          ]
+        },
+        {
+          "id": "standard",
+          "label": "Standard pace",
+          "decisions": [
+            {
+              "lap": 52,
+              "kind": "mode",
+              "key": "pace",
+              "value": "standard"
+            }
+          ]
+        },
+        {
+          "id": "manage",
+          "label": "Manage the tyres",
+          "decisions": [
+            {
+              "lap": 52,
+              "kind": "mode",
+              "key": "pace",
+              "value": "manage"
+            }
+          ]
+        },
+        {
+          "id": "push-attack",
+          "label": "Push and attack",
+          "decisions": [
+            {
+              "lap": 52,
+              "kind": "mode",
+              "key": "pace",
+              "value": "push"
+            },
+            {
+              "lap": 52,
+              "kind": "mode",
+              "key": "battle",
+              "value": "attack"
+            }
+          ]
+        }
+      ],
+      "realOptionId": null
+    }
+  ],
+  "candidateMomentLaps": [
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    41,
+    44,
+    49,
+    52,
+    55
+  ],
+  "realResult": [
+    "NOR",
+    "VER",
+    "LEC",
+    "PIA",
+    "SAI",
+    "PER",
+    "RUS",
+    "HAM",
+    "GAS",
+    "ALO",
+    "HUL",
+    "RIC",
+    "STR",
+    "ALB",
+    "OCO",
+    "SAR",
+    "TSU",
+    "MAG",
+    "BOT",
+    "ZHO"
+  ],
+  "userSide": "GAS",
+  "rival": "ALO",
+  "postRacePenalties": [
+    {
+      "driver": "STR",
+      "seconds": 5,
+      "reason": "pit-lane speeding"
+    }
+  ]
+}

@@ -465,6 +465,10 @@ export interface RaceModel {
   /** Laps where a strategic event happened (SC/VSC starts, stops): raw input for the finder. */
   candidateMomentLaps?: number[];
   realResult: string[];
+  /** Real time penalties the stewards added after the flag (races batch 3), added to each
+   *  car's time at the flag so the replay finishes in the official order. Sourced per race in
+   *  build.py's registry. */
+  postRacePenalties?: PostRacePenalty[];
   userSide: string;
   /** The direct rival: reacts to the user's calls (rival policy); everyone else is scripted. */
   rival: string;
@@ -649,6 +653,13 @@ export type Decision = (
 };
 
 /** Something the sim did on its own that the game may narrate (e.g. the rival covering). */
+/** A real post-race time penalty (RaceModel.postRacePenalties). */
+export interface PostRacePenalty {
+  driver: string;
+  seconds: number;
+  reason: string;
+}
+
 export interface RaceNote {
   lap: number;
   kind:

@@ -3,7 +3,7 @@
 // car's colour and the tyre's colour on the wheels. Versus cars each have their own shape.
 
 /** Proportions of a car shape (versus cars: docs/versus-spec.md). */
-interface Shape {
+export interface Shape {
   /** Nose tip. */
   nose: number;
   /** Sidepods' half-width. */
@@ -15,7 +15,7 @@ interface Shape {
   body: number;
 }
 
-const SHAPES: Record<string, Shape> = {
+export const CAR_SHAPES: Record<string, Shape> = {
   balanced: { nose: 20, pod: 6.5, fw: 9.5, rw: 8, body: 5 },
   bullet: { nose: 24, pod: 5, fw: 8.5, rw: 6.5, body: 4.4 },
   glider: { nose: 19, pod: 6, fw: 11.5, rw: 10, body: 4.8 },
@@ -33,7 +33,7 @@ export function CarIcon({
   tyre: string;
   shape?: string;
 }) {
-  const s = SHAPES[shape] ?? (SHAPES.balanced as Shape);
+  const s = CAR_SHAPES[shape] ?? (CAR_SHAPES.balanced as Shape);
   const wheel = (x: number, y: number, w: number, h: number, band: number) => (
     <>
       <rect x={x} y={y} width={w} height={h} rx={1.3} fill={DARK} />

@@ -364,7 +364,14 @@ def reference_pit_loss(race_id: str) -> float | None:
     """The circuit's reference green loss (config/pit_loss_reference.json), if it has one."""
     ref = json.loads((CONFIG_DIR / "pit_loss_reference.json").read_text())["circuits"]
     entry = ref.get(circuit_of(race_id))
-    return float(entry["seconds"]) if entry else None
+    if not entry:
+        return None
+    # A pit lane rebuilt part-way through the races (`before`: the loss up to a season).
+    year = re.search(r"-(\d{4})$", race_id)
+    for earlier in entry.get("before", []):
+        if year and int(year.group(1)) <= earlier["until"]:
+            return float(earlier["seconds"])
+    return float(entry["seconds"])
 
 
 def wet_stop_share(laps: pd.DataFrame) -> float:

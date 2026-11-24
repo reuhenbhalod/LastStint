@@ -1,0 +1,16 @@
+{
+ "race": "belgium-2016",
+ "scheduledLaps": 44,
+ "completedLaps": 44,
+ "timing": "TUM (no red-flag timing)",
+ "redFlags": [
+  {
+   "lap": 9,
+   "resumeLap": 10,
+   "restart": "rolling",
+   "restartScLaps": 0,
+   "source": "Wikipedia, 2016 Belgian Grand Prix: 'The race was stopped on lap 9 after Kevin Magnussen crashed heavily at Raidillon', 'the race was initially neutralised under the safety car before being stopped two laps later so they could repair the tyre barrier' (https://en.wikipedia.org/wiki/2016_Belgian_Grand_Prix); Wikipedia, 'List of red-flagged Formula One races' (https://en.wikipedia.org/wiki/List_of_red-flagged_Formula_One_races): lap 9, code R (restarted), 'Race was stopped behind the safety car' (citing Fox Sports), and 'From 2005 ... the race is resumed behind the safety car, which leads the field for a lap'; Jolpica lap times (api.jolpi.ca/ergast/f1/2016/13/laps), leader's laps 6-9 behind the SC (136.4s, 167.2s, 175.6s, 182.7s), lap 10 took 1160.2s (the stoppage), lap 11 at green pace (111.7s)",
+   "note": "Resumed behind the SC (the 2005-2017 rule; the race article's lead says the race resumed 'under green flag conditions', but its race report gives no restart procedure), and the SC came in at the end of the stoppage lap 10, so no extra SC laps after it. The SC period before the flag (Magnussen, from lap 6) is a separate event; the VSC for Sainz's tyre failure came earlier still."
+  }
+ ]
+}

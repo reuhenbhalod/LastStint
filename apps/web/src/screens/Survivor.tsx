@@ -1,23 +1,24 @@
 // Survivor mode (docs/survivor-spec.md): races back to back from the survivor pool until the
 // first loss. The server deals each race and its seed and verifies each finished race; this
-// screen runs the mode: the lobby (rules, Start, the leaderboards), each race (its card, then
-// the race screen), the result between races, and the run's end. A run in progress is kept
-// (its id here, the race in its own save slot), so a refresh carries on where it was.
+// screen runs the mode: the lobby (rules, Start, the leaderboards), each race (straight into the
+// race screen), the result and the next race's brief between races, and the run's end. A run
+// in progress is kept (its id here, the race in its own save slot): leaving a race for the menu,
+// or a refresh, lands on the lobby with only a way back to it, never a new run.
 
 import type { RaceModel } from '@laststint/sim';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Disclaimer } from '../components/Disclaimer.js';
-import { GroundBackdrop } from '../components/GroundBackdrop.js';
 import { ChequeredIcon, FlagIcon, OvertakeIcon } from '../components/Icons.js';
 import { TopBar } from '../components/TopBar.js';
+import { TyreBadge } from '../components/TyreBadge.js';
 import { ApiError, type SurvivorBoardEntry, type SurvivorState, survivorApi } from '../data/api.js';
 import { anonId } from '../data/player.js';
 import { SurvivorProvider } from '../data/provider.js';
 import { goalOf } from '../game/goal.js';
 import { useTeamTheme } from '../game/teamTheme.js';
 import { useGame } from '../game/useGame.js';
+import { Straight, type StraightState } from '../gauntlet/Straight.js';
 import { clearRun } from '../state/storage.js';
-import { IntroCard } from './IntroCard.js';
 import { RaceScreen } from './RaceScreen.js';
 
 const RUN_KEY = 'pitwall:survivor-run';
@@ -70,7 +71,46 @@ function Header() {
   return <TopBar active="gauntlet" />;
 }
 
-function Board({ mine }: { mine?: string }) {
+const PANEL = 'fl-panel flex min-w-0 flex-col gap-5 rounded-2xl p-6';
+const EYEBROW = 'm-0 text-[12px] font-bold uppercase tracking-[0.18em]';
+const GO =
+  'fl-display h-[60px] rounded-md bg-[var(--fl-amber)] px-8 text-[26px] tracking-[0.06em] text-[#1A0E00] shadow-[0_0_48px_-8px_rgba(255,179,71,0.75)] hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:opacity-60';
+
+/**
+ * The floodlit straight (gauntlet/Straight.tsx) across the page, with a panel either side of the
+ * car. On a phone the scene is a band at the top and the panels stack under it.
+ */
+function Floodlit({
+  next,
+  state,
+  label,
+  left,
+  right,
+}: {
+  next: number;
+  state: StraightState;
+  label: string;
+  left: ReactNode;
+  right: ReactNode;
+}) {
+  return (
+    <section className="relative isolate overflow-hidden">
+      <Straight
+        next={next}
+        state={state}
+        label={label}
+        className="relative block aspect-[4/3] w-full sm:aspect-[16/9] lg:absolute lg:inset-0 lg:aspect-auto lg:h-full"
+      />
+      <div className="relative mx-auto grid w-full max-w-[1440px] grid-cols-1 gap-4 px-4 py-5 lg:min-h-[calc(100dvh-56px)] lg:grid-cols-[360px_minmax(0,1fr)_360px] lg:items-center lg:px-8 lg:py-10 xl:grid-cols-[400px_minmax(0,1fr)_380px]">
+        <div className="min-w-0">{left}</div>
+        <div aria-hidden="true" className="hidden lg:block" />
+        <div className="min-w-0">{right}</div>
+      </div>
+    </section>
+  );
+}
+
+function Board({ title = 'Furthest down the straight' }: { title?: string }) {
   const [board, setBoard] = useState<{
     allTime: SurvivorBoardEntry[];
     week: SurvivorBoardEntry[];
@@ -82,9 +122,9 @@ function Board({ mine }: { mine?: string }) {
   }, []);
   const rows = board?.[tab] ?? [];
   return (
-    <section aria-label="Gauntlet leaderboard" className="card flex flex-col gap-3">
-      <div className="flex items-center justify-between gap-2">
-        <h2 className="disp m-0 text-[18px] leading-none">Leaderboard</h2>
+    <section aria-label="Gauntlet leaderboard" className={PANEL}>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 className="fl-display m-0 text-[24px]">{title}</h2>
         <div className="flex gap-1 text-[12px] font-semibold">
           {(
             [
@@ -97,7 +137,7 @@ function Board({ mine }: { mine?: string }) {
               type="button"
               aria-pressed={tab === k}
               onClick={() => setTab(k)}
-              className={`rounded-md px-2.5 py-1 ${tab === k ? 'bg-[var(--ink)] text-[var(--paper)]' : 'text-[var(--muted)] hover:text-[var(--ink)]'}`}
+              className={`rounded px-2.5 py-1.5 ${tab === k ? 'bg-[#F4EFE6] text-[#05070D]' : 'text-[#A9B0C6] hover:text-white'}`}
             >
               {label}
             </button>
@@ -105,31 +145,39 @@ function Board({ mine }: { mine?: string }) {
         </div>
       </div>
       {failed ? (
-        <p className="m-0 text-[13px] text-[var(--muted)]">The leaderboard isn’t available.</p>
+        <p className="m-0 text-[14px] text-[#A9B0C6]">The leaderboard isn’t available.</p>
       ) : !board ? (
-        <p className="m-0 text-[13px] text-[var(--muted)]">Loading…</p>
+        <p className="m-0 text-[14px] text-[#A9B0C6]">Loading…</p>
       ) : rows.length === 0 ? (
-        <p className="m-0 text-[13px] text-[var(--muted)]">No runs yet. Be the first.</p>
+        <p className="m-0 text-[14px] text-[#A9B0C6]">
+          No runs yet. Be the first down the straight.
+        </p>
       ) : (
-        <ol className="m-0 flex list-none flex-col gap-1 p-0 text-[14px]">
-          {rows.slice(0, 15).map((r) => (
+        <ol className="m-0 flex list-none flex-col gap-0.5 p-0 text-[15px]">
+          {rows.slice(0, 10).map((r) => (
             <li
               key={`${r.rank}-${r.name}`}
-              className={`grid grid-cols-[2rem_1fr_auto_auto] items-baseline gap-3 rounded-md px-2 py-1 ${r.name === mine ? 'bg-[color-mix(in_srgb,var(--you)_14%,transparent)]' : ''}`}
+              className="grid grid-cols-[1.5rem_minmax(0,1fr)_auto_3.5rem] items-center gap-3 border-b border-white/5 py-1.5"
             >
-              <span className="mono text-[var(--muted)]">{r.rank}</span>
+              <span className="mono text-[12px] text-[#7F88A3]">{r.rank}</span>
               <span className="truncate font-semibold">
                 {r.name}
-                {r.live && <span className="ml-2 text-[11px] text-[var(--you)]">racing</span>}
+                {r.live && (
+                  <span className="ml-2 text-[11px] font-bold text-[var(--fl-green)]">racing</span>
+                )}
               </span>
-              <span className="disp">{r.rounds}</span>
-              <span className="mono w-12 text-right text-[12px] text-[var(--muted)]">
+              <span className="fl-display text-[22px] text-[var(--fl-amber)]">
+                <span className="sr-only">Round </span>
+                {r.rounds}
+              </span>
+              <span className="mono text-right text-[12px] text-[#A9B0C6]">
                 {r.meanScore.toFixed(0)} pts
               </span>
             </li>
           ))}
         </ol>
       )}
+      <p className="m-0 text-[12px] text-[#7F88A3]">Rounds survived, then the points a call.</p>
     </section>
   );
 }
@@ -138,62 +186,72 @@ function Lobby({
   onStart,
   busy,
   error,
+  live,
+  onResume,
 }: {
   onStart: () => void;
   busy: boolean;
   error: string | null;
+  /** A run in progress: the menu offers only to go back to it (no new run, so leaving a race
+   * can't restart it). */
+  live: SurvivorState | null;
+  onResume: () => void;
 }) {
+  const round = live?.current?.round ?? 1;
   return (
-    <div className="flex flex-col gap-6">
-      <section className="relative overflow-hidden rounded-2xl border border-[var(--rule)] bg-[var(--card)] p-6 sm:p-8">
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              'radial-gradient(ellipse at 85% 20%, color-mix(in srgb, var(--box) 16%, transparent), transparent 60%)',
-          }}
-        />
-        <div className="relative flex flex-col gap-4">
-          <p className="eyebrow m-0 !text-[var(--box-ink)]">Game mode</p>
-          <h1 className="disp wide m-0 text-[48px] leading-[0.9] sm:text-[68px]">Gauntlet</h1>
-          <p className="m-0 max-w-[52ch] text-[17px] leading-relaxed">
-            Race after race, each one a different real race you haven’t seen in the daily. Win and
-            you go on. Lose once and the run is over. How far can you go?
+    <Floodlit
+      next={round}
+      state="idle"
+      label={`Your car on a floodlit straight at night. Round ${round}'s gantry is ahead, its lamps amber, and more gantries stretch away behind it.`}
+      left={
+        <div className={PANEL}>
+          <p className={`${EYEBROW} text-[var(--fl-amber)]`}>Game mode · Survival</p>
+          <h1 className="fl-display m-0 text-[80px] sm:text-[100px]">Gauntlet</h1>
+          <p className="m-0 text-[17px] leading-relaxed text-[#E4DFD5]">
+            Every gantry is a race. Win it and you drive under, and the next one lights up. Lose
+            once and the lights go out.
           </p>
-          <ul className="m-0 flex list-none flex-col gap-2 p-0 text-[14px] text-[var(--muted)]">
-            <li className="flex items-center gap-2">
-              <OvertakeIcon size={16} className="text-[var(--you)]" /> Beat the rival, or hold them
-              off in a defend race, to survive the round
+          <ul className="m-0 flex list-none flex-col gap-2.5 p-0 text-[14px] text-[#C3C8D8]">
+            <li className="flex items-start gap-2.5">
+              <OvertakeIcon size={16} className="mt-0.5 shrink-0 text-[var(--fl-amber)]" /> Beat the
+              rival, or hold them off in a defend race
             </li>
-            <li className="flex items-center gap-2">
-              <FlagIcon size={16} className="text-[var(--you)]" /> Short races: 2-3 big calls each,
-              with the radio between
+            <li className="flex items-start gap-2.5">
+              <FlagIcon size={16} className="mt-0.5 shrink-0 text-[var(--fl-amber)]" /> Short races:
+              two or three big calls, with the radio between
             </li>
-            <li className="flex items-center gap-2">
-              <ChequeredIcon size={16} className="text-[var(--you)]" /> Its own leaderboard: rounds
-              survived, then your calls
+            <li className="flex items-start gap-2.5">
+              <ChequeredIcon size={16} className="mt-0.5 shrink-0 text-[var(--fl-amber)]" /> Real
+              races you won’t get in the daily, in a random order
             </li>
           </ul>
-          <div className="flex flex-wrap items-center gap-3 pt-1">
-            <button
-              type="button"
-              disabled={busy}
-              onClick={onStart}
-              className="rounded-xl bg-[var(--box)] px-8 py-4 text-[18px] font-bold text-white shadow-[0_10px_40px_-12px_var(--box)] hover:brightness-110 disabled:opacity-60"
-            >
-              {busy ? 'Dealing the first race…' : 'Start a run'}
-            </button>
-            <span className="text-[13px] text-[var(--muted)]">Play as many runs as you like.</span>
-          </div>
+          {live ? (
+            <div className="flex flex-col gap-2">
+              <button type="button" onClick={onResume} className={GO}>
+                Back to round {round}
+              </button>
+              <span className="text-[13px] text-[#A9B0C6]">
+                Your run is still on: {live.rounds} {live.rounds === 1 ? 'round' : 'rounds'}{' '}
+                survived. Your race waits where you left it.
+              </span>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              <button type="button" disabled={busy} onClick={onStart} className={GO}>
+                {busy ? 'Dealing round 1…' : 'Start a run'}
+              </button>
+              <span className="text-[13px] text-[#A9B0C6]">Play as many runs as you like.</span>
+            </div>
+          )}
           {error && (
-            <p className="m-0 rounded-lg border border-[var(--box)] px-3 py-2 text-[14px]">
+            <p className="m-0 rounded-lg border border-[var(--fl-red)] px-3 py-2 text-[14px]">
               {error}
             </p>
           )}
         </div>
-      </section>
-      <Board />
-    </div>
+      }
+      right={<Board />}
+    />
   );
 }
 
@@ -258,22 +316,69 @@ function RoundRace({
     sendRef.current();
   }, []);
 
-  if (game.error) return <p className="p-6 text-center text-[var(--muted)]">{game.error}</p>;
-  if (!game.state || !game.model) {
-    return <p className="p-6 text-center text-[var(--muted)]">Loading round {cur.round}…</p>;
-  }
-  const phase = game.state.phase;
-  if (phase === 'intro') {
+  // No race card in a run: the straight already briefed the round, so the race starts as soon
+  // as it has loaded. Started once; if it hasn't gone (an error, a slow load), a button does it.
+  const phase = game.state?.phase;
+  const startRef = useRef(game.start);
+  startRef.current = game.start;
+  const started = useRef(false);
+  const [stuck, setStuck] = useState<string | null>(null);
+  const go = useCallback(() => {
+    setStuck(null);
+    try {
+      startRef.current();
+    } catch (e) {
+      setStuck(`Round ${cur.round} wouldn’t start (${String((e as Error).message ?? e)}).`);
+    }
+  }, [cur.round]);
+  useEffect(() => {
+    if (phase !== 'intro' || started.current) return;
+    started.current = true;
+    go();
+  }, [phase, go]);
+  const waiting = !game.error && (!game.state || !game.model || phase === 'intro');
+  useEffect(() => {
+    if (!waiting) return;
+    const id = setTimeout(() => setStuck((s) => s ?? ''), 4000);
+    return () => clearTimeout(id);
+  }, [waiting]);
+
+  if (game.error || waiting) {
     return (
-      <IntroCard
-        state={game.state}
-        model={game.model}
-        onStart={game.start}
-        onHelp={() => {}}
-        resume={`Start round ${cur.round}`}
-      />
+      <div className="fl flex min-h-screen flex-col items-center justify-center gap-4 p-6 text-center">
+        <p className={`${EYEBROW} text-[var(--fl-amber)]`}>Round {cur.round} · lights out</p>
+        {game.error && <p className="m-0 max-w-md text-[15px]">{game.error}</p>}
+        {stuck && <p className="m-0 max-w-md text-[15px]">{stuck}</p>}
+        {(game.error || stuck !== null) && (
+          <div className="flex flex-wrap justify-center gap-3">
+            <button
+              type="button"
+              onClick={
+                game.error || !game.state
+                  ? () => {
+                      started.current = false;
+                      setStuck(null);
+                      game.reload();
+                    }
+                  : go
+              }
+              className={GO}
+            >
+              {game.error || !game.state ? 'Try again' : `Start round ${cur.round}`}
+            </button>
+            <button
+              type="button"
+              onClick={onHome}
+              className="rounded-xl border border-white/20 px-6 text-[15px] font-bold"
+            >
+              Gauntlet menu
+            </button>
+          </div>
+        )}
+      </div>
     );
   }
+  if (!game.state || !game.model) return null;
   if (sending || error) {
     return (
       <main className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center gap-4 p-6 text-center">
@@ -315,31 +420,127 @@ function Between({
   onNext: () => void;
 }) {
   const next = useRaceName(run.current?.raceId);
-  const goal = next ? goalOf(next) : null;
+  const round = run.current?.round ?? run.rounds + 1;
   return (
-    <section className="flex flex-col items-center gap-6 py-6 text-center">
-      <p className="eyebrow m-0 !text-[var(--you)]">Round {run.rounds} survived</p>
-      <h1 className="disp wide m-0 text-[56px] leading-[0.9] sm:text-[80px]">{run.rounds}</h1>
-      <p className="m-0 text-[16px] text-[var(--muted)]">{finish}</p>
-      <div className="card flex w-full max-w-md flex-col gap-2 text-left">
-        <span className="eyebrow">Next · round {run.current?.round}</span>
-        <span className="disp text-[24px] leading-tight">
-          {next?.race.name ?? run.current?.raceId}
+    <Floodlit
+      next={round}
+      state="advance"
+      label={`Your car drives under round ${run.rounds}'s gantry, its lamps green. Round ${round}'s gantry comes up and its lamps light amber.`}
+      left={
+        <div className={PANEL}>
+          <p className={`${EYEBROW} text-[var(--fl-green)]`}>Round {run.rounds} survived</p>
+          <h1 className="fl-display m-0 text-[120px] leading-[0.8]">
+            {run.rounds}
+            <span className="sr-only"> {run.rounds === 1 ? 'round' : 'rounds'} survived</span>
+          </h1>
+          {finish && <p className="m-0 text-[16px] text-[#E4DFD5]">{finish}</p>}
+          <p className="m-0 text-[14px] text-[#A9B0C6]">
+            Through the gantry. Round {round} is lit.
+          </p>
+        </div>
+      }
+      right={
+        <div className={PANEL}>
+          <p className={`${EYEBROW} text-[var(--fl-amber)]`}>Next · round {round}</p>
+          {next ? (
+            <RaceBrief model={next} />
+          ) : (
+            <h2 className="fl-display m-0 text-[40px] leading-[0.95]">Next race</h2>
+          )}
+          <button type="button" onClick={onNext} className={GO}>
+            Next race
+          </button>
+          <p className="m-0 text-[13px] text-[#A9B0C6]">
+            {run.meanScore.toFixed(0)} pts a call so far.
+          </p>
+        </div>
+      }
+    />
+  );
+}
+
+/** The seconds from one car to the other at the takeover, from the cars' gaps to the car
+ * ahead; positive when `a` is ahead. */
+function gapAt(model: RaceModel, a: string, b: string): number | null {
+  const pos = (c: string) => model.drivers.find((d) => d.code === c)?.stateAtTakeover.position;
+  const pa = pos(a);
+  const pb = pos(b);
+  if (!pa || !pb) return null;
+  const [lo, hi] = pa < pb ? [pa, pb] : [pb, pa];
+  const sum = model.drivers
+    .filter((d) => d.stateAtTakeover.position > lo && d.stateAtTakeover.position <= hi)
+    .reduce((t, d) => t + d.stateAtTakeover.gapAhead, 0);
+  return pa < pb ? sum : -sum;
+}
+
+/** One side of the brief's duel: code, place and tyre at the takeover. */
+function BriefSide({ model, code, you }: { model: RaceModel; code: string; you?: boolean }) {
+  const at = model.drivers.find((d) => d.code === code)?.stateAtTakeover;
+  return (
+    <div className={`flex min-w-0 flex-col gap-1 ${you ? '' : 'items-end text-right'}`}>
+      <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#7F88A3]">
+        {you ? 'You run' : 'Rival'}
+      </span>
+      <span
+        className="fl-display text-[34px] leading-none"
+        style={{ color: you ? 'var(--fl-amber)' : '#F4EFE6' }}
+      >
+        {code}
+      </span>
+      {at && (
+        <span className="flex items-center gap-2 text-[13px] text-[#C3C8D8]">
+          P{at.position} <TyreBadge compound={at.compound} age={at.tyreAge} />
         </span>
-        {next && goal && (
-          <span className="text-[14px] text-[var(--muted)]">
-            You run {next.userSide}. {goal.short}.
+      )}
+    </div>
+  );
+}
+
+/** The next race in a few lines: where and when you take over, the duel, and the job. */
+function RaceBrief({ model }: { model: RaceModel }) {
+  const goal = goalOf(model);
+  const [title, subtitle] = (model.race.name ?? model.race.id).split(': ');
+  const lapsLeft = model.race.laps - model.race.takeoverLap;
+  const gap = gapAt(model, model.userSide, model.rival);
+  const team = model.drivers.find((d) => d.code === model.userSide)?.team;
+  const realPos = goal.place;
+  return (
+    <>
+      <div className="flex flex-col gap-1">
+        <h2 className="fl-display m-0 text-[40px] leading-[0.95]">{title}</h2>
+        {subtitle && <p className="m-0 text-[14px] text-[#A9B0C6]">{subtitle}</p>}
+      </div>
+      <p className="m-0 text-[14px] text-[#E4DFD5]">
+        You take over on lap {model.race.takeoverLap} of {model.race.laps}:{' '}
+        <span className="font-semibold">{lapsLeft} laps to run</span>
+        {team ? ` on the ${team} pit wall.` : '.'}
+      </p>
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-xl border border-white/10 bg-black/30 p-3">
+        <BriefSide model={model} code={model.userSide} you />
+        <div className="flex flex-col items-center text-center">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#7F88A3]">
+            Gap
+          </span>
+          <span className="fl-display text-[26px] leading-none">
+            {gap === null ? '-' : `${Math.abs(gap).toFixed(1)}s`}
+          </span>
+          <span className="text-[11px] text-[#7F88A3]">
+            {gap === null ? '' : gap >= 0 ? 'you lead' : 'ahead of you'}
+          </span>
+        </div>
+        <BriefSide model={model} code={model.rival} />
+      </div>
+      <p className="m-0 flex flex-wrap items-center gap-2 text-[14px]">
+        <span className="rounded-full bg-[color-mix(in_srgb,var(--fl-amber)_18%,transparent)] px-3 py-1 font-bold text-[var(--fl-amber)]">
+          {goal.short}
+        </span>
+        {realPos > 0 && (
+          <span className="text-[#A9B0C6]">
+            The real pit wall got P{realPos}. {goal.kind === 'defend' ? 'Keep it.' : 'Beat it.'}
           </span>
         )}
-      </div>
-      <button
-        type="button"
-        onClick={onNext}
-        className="rounded-xl bg-[var(--you)] px-10 py-4 text-[18px] font-bold text-[var(--you-ink)] hover:brightness-110"
-      >
-        Next race
-      </button>
-    </section>
+      </p>
+    </>
   );
 }
 
@@ -352,54 +553,72 @@ function Over({
   finish: string;
   onAgain: () => void;
 }) {
+  const lost = run.rounds + 1;
   return (
-    <div className="flex flex-col gap-6">
-      <section className="flex flex-col items-center gap-4 py-4 text-center">
-        <p className="eyebrow m-0 !text-[var(--box-ink)]">Run over</p>
-        <h1 className="disp wide m-0 text-[56px] leading-[0.9] sm:text-[80px]">
-          {run.rounds} {run.rounds === 1 ? 'round' : 'rounds'}
-        </h1>
-        {finish && <p className="m-0 text-[16px] text-[var(--muted)]">Last race: {finish}</p>}
-        {run.rank && run.rounds > 0 && (
-          <p className="m-0 text-[15px]">
-            #{run.rank} of {run.total} runs all time
-            {run.rounds ? ` · ${run.meanScore.toFixed(0)} pts a call` : ''}
-          </p>
-        )}
-        <button
-          type="button"
-          onClick={onAgain}
-          className="rounded-xl bg-[var(--box)] px-10 py-4 text-[18px] font-bold text-white hover:brightness-110"
-        >
-          Start a new run
-        </button>
-      </section>
+    <>
+      <Floodlit
+        next={lost}
+        state="out"
+        label={`Round ${lost}'s lamps are red, and the floodlights go out down the straight.`}
+        left={
+          <div className={PANEL}>
+            <p className={`${EYEBROW} text-[var(--fl-red)]`}>Lights out · run over</p>
+            <h1 className="fl-display m-0 text-[88px] leading-[0.85]">
+              {run.rounds} {run.rounds === 1 ? 'round' : 'rounds'}
+            </h1>
+            {finish && <p className="m-0 text-[16px] text-[#E4DFD5]">Last race: {finish}</p>}
+            {run.rank && run.rounds > 0 && (
+              <p className="m-0 text-[15px]">
+                #{run.rank} of {run.total} runs all time · {run.meanScore.toFixed(0)} pts a call
+              </p>
+            )}
+            <button type="button" onClick={onAgain} className={GO}>
+              Start a new run
+            </button>
+          </div>
+        }
+        right={
+          run.history.length > 0 ? (
+            <section aria-label="Your run" className={PANEL}>
+              <h2 className="fl-display m-0 text-[24px]">Your run</h2>
+              <ol className="m-0 flex list-none flex-col gap-1.5 p-0 text-[14px]">
+                {run.history.map((h) => (
+                  <li key={h.round} className="flex items-center gap-3">
+                    <span
+                      aria-hidden="true"
+                      className="h-2.5 w-2.5 shrink-0 rounded-full"
+                      style={{
+                        background: h.won ? 'var(--fl-green)' : 'var(--fl-red)',
+                        boxShadow: `0 0 10px ${h.won ? 'var(--fl-green)' : 'var(--fl-red)'}`,
+                      }}
+                    />
+                    <span className="mono w-6 text-[#7F88A3]">{h.round}</span>
+                    <span className="min-w-0 flex-1 truncate">
+                      <RaceName id={h.raceId} />
+                    </span>
+                    <span
+                      className="font-semibold"
+                      style={{ color: h.won ? 'var(--fl-green)' : 'var(--fl-red)' }}
+                    >
+                      {h.won ? 'Survived' : 'Out'} · P{h.finishPosition}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          ) : (
+            <Board />
+          )
+        }
+      />
       {run.history.length > 0 && (
-        <section className="card flex flex-col gap-2">
-          <span className="eyebrow">Your run</span>
-          <ol className="m-0 flex list-none flex-col gap-1 p-0 text-[14px]">
-            {run.history.map((h) => (
-              <li key={h.round} className="flex items-baseline justify-between gap-3">
-                <span>
-                  <span className="mono mr-2 text-[var(--muted)]">{h.round}</span>
-                  <RaceName id={h.raceId} />
-                </span>
-                <span
-                  className="font-semibold"
-                  style={{ color: h.won ? 'var(--good)' : 'var(--box-ink)' }}
-                >
-                  {h.won ? 'Survived' : 'Out'} · P{h.finishPosition}
-                </span>
-              </li>
-            ))}
-          </ol>
-        </section>
+        <div className="mx-auto w-full max-w-3xl px-4 py-8">
+          <Board />
+        </div>
       )}
-      <Board />
-    </div>
+    </>
   );
 }
-
 function RaceName({ id }: { id: string }) {
   const m = useRaceName(id);
   return <>{m?.race.name ?? id}</>;
@@ -411,8 +630,10 @@ export function Survivor() {
   const [finish, setFinish] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Out of a race to the Gauntlet menu: the race is saved and the run stays live.
   const home = useCallback(() => {
-    location.href = '/';
+    setView('lobby');
+    window.scrollTo(0, 0);
   }, []);
 
   // Carry on a run in progress.
@@ -426,7 +647,7 @@ export function Survivor() {
       (s) => {
         if (s.status === 'live' && s.current) {
           setRun(s);
-          setView('race');
+          setView('lobby');
         } else {
           saveRunId(null);
           setView('lobby');
@@ -468,12 +689,19 @@ export function Survivor() {
     return <RoundRace key={run.current.round} run={run} onResult={onResult} onHome={home} />;
   }
   return (
-    <div className="relative isolate flex min-h-screen flex-col">
-      <GroundBackdrop raceId="italy-2024" />
+    <div className="fl relative isolate flex min-h-screen flex-col">
       <Header />
-      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6 sm:px-6">
-        {view === 'loading' && <p className="text-center text-[var(--muted)]">Loading…</p>}
-        {view === 'lobby' && <Lobby onStart={start} busy={busy} error={error} />}
+      <main className="flex w-full flex-1 flex-col">
+        {view === 'loading' && <p className="p-6 text-center text-[#A9B0C6]">Loading…</p>}
+        {view === 'lobby' && (
+          <Lobby
+            onStart={start}
+            busy={busy}
+            error={error}
+            live={run?.status === 'live' && run.current ? run : null}
+            onResume={() => setView('race')}
+          />
+        )}
         {view === 'between' && run && (
           <Between run={run} finish={finish} onNext={() => setView('race')} />
         )}

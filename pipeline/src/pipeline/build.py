@@ -114,18 +114,17 @@ RACES: dict[str, dict] = {
         "split": "tune",
         "dilemma": "Cover Red Bull's second stop or stay on one stop",
     },
-    "united-states-2021": {
+    "united-states-2021": {  # races batch 3: Gauntlet
         "year": 2021,
         "event": "United States",
-        "name": "USA 2021: Hamilton vs Verstappen",
+        "name": "United States 2021: Tsunoda vs Vettel",
         "era": "2014-2025",
-        "takeover_lap": 10,  # D3 rule
-        "seed": 96860,
-        "user_side": "HAM",
-        "rival": "VER",
+        "takeover_lap": 14,  # pinned: races batch 3
+        "seed": 1,  # Gauntlet: seeds in data/pools.json (scripts/tune.ts --survivor)
+        "user_side": "TSU",
+        "rival": "VET",
         "score_positions": 6,
         "split": "tune",
-        "dilemma": "Undercut war; Mercedes went long",
     },
     "brazil-2021": {
         "year": 2021,
@@ -218,27 +217,42 @@ RACES: dict[str, dict] = {
         "split": "tune",
         "dilemma": "Ferrari's hard-tyre call",
     },
-    "bahrain-2018": {
+    "bahrain-2018": {  # races batch 3: Daily, 15-25 laps left
         "year": 2018,
         "event": "Bahrain",
-        "name": "Bahrain 2018",
+        "name": "Bahrain 2018: Hülkenberg vs Alonso",
         "era": "2014-2025",
-        "takeover_lap": None,  # D3 rule
-        "seed": 57550,
-        "user_side": None,  # validation race: automatic duel, runner-up vs winner
-        "rival": None,
+        "takeover_lap": 36,  # pinned: races batch 3
+        "seed": 85012,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "HUL",
+        "rival": "ALO",
         "score_positions": 6,
         "split": "holdout",
+        # Added to race time after the flag (races batch 3, sim.ts classify).
+        "post_race_penalties": [
+            {
+                "driver": "PER",
+                "seconds": 30,
+                "reason": "overtaking on the formation lap",
+                "source": "https://en.wikipedia.org/w/index.php?title=2018_Bahrain_Grand_Prix&action=raw",
+            },
+            {
+                "driver": "HAR",
+                "seconds": 30,
+                "reason": "failing to retake starting position on formation lap",
+                "source": "https://en.wikipedia.org/w/index.php?title=2018_Bahrain_Grand_Prix&action=raw",
+            },
+        ],
     },
-    "united-states-2018": {
+    "united-states-2018": {  # races batch 3: Daily, 15-25 laps left
         "year": 2018,
         "event": "United States",
-        "name": "United States 2018",
+        "name": "United States 2018: Verstappen vs Hamilton",
         "era": "2014-2025",
-        "takeover_lap": None,  # D3 rule
-        "seed": 68577,
-        "user_side": None,  # validation race: automatic duel, runner-up vs winner
-        "rival": None,
+        "takeover_lap": 34,  # pinned: races batch 3
+        "seed": 1,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "VER",
+        "rival": "HAM",
         "score_positions": 6,
         "split": "holdout",
     },
@@ -326,15 +340,15 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "holdout",
     },
-    "70th-anniversary-2020": {
+    "70th-anniversary-2020": {  # races batch 3: Daily, 15-20 laps left
         "year": 2020,
         "event": "70th Anniversary",
-        "name": "70th Anniversary 2020",
+        "name": "70th Anniversary 2020: Norris vs Kvyat",
         "era": "2014-2025",
-        "takeover_lap": None,  # D3 rule
-        "seed": 32219,
-        "user_side": None,  # validation race: automatic duel, runner-up vs winner
-        "rival": None,
+        "takeover_lap": 32,  # pinned: races batch 3
+        "seed": 37882,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "NOR",
+        "rival": "KVY",
         "score_positions": 6,
         "split": "holdout",
     },
@@ -2846,6 +2860,982 @@ RACES: dict[str, dict] = {
         "score_positions": 6,
         "split": "eras",
     },
+    "abu-dhabi-2019": {  # races batch 3: Daily, 15-20 laps left
+        "year": 2019,
+        "event": "Abu Dhabi",
+        "name": "Abu Dhabi 2019: Hülkenberg vs Ricciardo",
+        "era": "2014-2025",
+        "takeover_lap": 39,  # pinned: races batch 3
+        "seed": 55702,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "HUL",
+        "rival": "RIC",
+        "score_positions": 6,
+        "split": "tune",
+    },
+    "abu-dhabi-2025": {  # races batch 3: Daily, 15-20 laps left
+        "year": 2025,
+        "event": "United Arab Emirates",
+        "source": "openf1",  # FastF1 needs F1TV since Oct 2026 (pipeline/openf1.py)
+        "location": "Yas Island",
+        "name": "Abu Dhabi 2025: Piastri vs Norris",
+        "era": "2014-2025",
+        "takeover_lap": 38,  # pinned: races batch 3
+        "seed": 62046,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "PIA",
+        "rival": "NOR",
+        "score_positions": 6,
+        "split": "tune",
+        # Added to race time after the flag (races batch 3, sim.ts classify).
+        "post_race_penalties": [
+            {
+                "driver": "STR",
+                "seconds": 5,
+                "reason": "more than one change of direction",
+                "source": "https://www.racefans.net/2025/12/07/bearman-miffed-latest-penalty-puts-him-at-risk-of-automatic-race-ban-in-2026/",
+            },
+            {
+                "driver": "BEA",
+                "seconds": 5,
+                "reason": "more than one change of direction",
+                "source": "https://www.racefans.net/2025/12/07/bearman-miffed-latest-penalty-puts-him-at-risk-of-automatic-race-ban-in-2026/",
+            },
+            {
+                "driver": "ALB",
+                "seconds": 5,
+                "reason": "pit-lane speeding",
+                "source": "https://en.wikipedia.org/w/index.php?title=2025_Abu_Dhabi_Grand_Prix&action=raw",
+            },
+            {
+                "driver": "GAS",
+                "seconds": 5,
+                "reason": "track limits",
+                "source": "https://en.wikipedia.org/w/index.php?title=2025_Abu_Dhabi_Grand_Prix&action=raw",
+            },
+        ],
+    },
+    "austria-2024": {  # races batch 3: Daily, 15-20 laps left
+        "year": 2024,
+        "event": "Austria",
+        "name": "Austria 2024: Ricciardo vs Gasly",
+        "era": "2014-2025",
+        "takeover_lap": 56,  # pinned: races batch 3
+        "seed": 41224,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "RIC",
+        "rival": "GAS",
+        "score_positions": 6,
+        "split": "tune",
+        # Added to race time after the flag (races batch 3, sim.ts classify).
+        "post_race_penalties": [
+            {
+                "driver": "VER",
+                "seconds": 10,
+                "reason": "causing a collision",
+                "source": "https://en.wikipedia.org/w/index.php?title=2024_Austrian_Grand_Prix&action=raw",
+            },
+            {
+                "driver": "ALB",
+                "seconds": 5,
+                "reason": "crossing the line at pit entry",
+                "source": "https://en.wikipedia.org/w/index.php?title=2024_Austrian_Grand_Prix&action=raw",
+            },
+            {
+                "driver": "NOR",
+                "seconds": 5,
+                "reason": "track limits",
+                "source": "https://en.wikipedia.org/w/index.php?title=2024_Austrian_Grand_Prix&action=raw",
+            },
+        ],
+    },
+    "azerbaijan-2023": {  # races batch 3: Daily, 15-20 laps left
+        "year": 2023,
+        "event": "Azerbaijan",
+        "name": "Azerbaijan 2023: Russell vs Stroll",
+        "era": "2014-2025",
+        "takeover_lap": 36,  # pinned: races batch 3
+        "seed": 52138,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "RUS",
+        "rival": "STR",
+        "score_positions": 6,
+        "split": "tune",
+    },
+    "azerbaijan-2025": {  # races batch 3: Daily, 15-20 laps left
+        "year": 2025,
+        "event": "Azerbaijan",
+        "source": "openf1",  # FastF1 needs F1TV since Oct 2026 (pipeline/openf1.py)
+        "location": "Baku",
+        "name": "Azerbaijan 2025: Tsunoda vs Lawson",
+        "era": "2014-2025",
+        "takeover_lap": 35,  # pinned: races batch 3
+        "seed": 1,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "TSU",
+        "rival": "LAW",
+        "score_positions": 6,
+        "split": "tune",
+        # Added to race time after the flag (races batch 3, sim.ts classify).
+        "post_race_penalties": [
+            {
+                "driver": "ALB",
+                "seconds": 10,
+                "reason": "causing a collision with Colapinto (lap 17)",
+                "source": "https://en.wikipedia.org/wiki/2025_Azerbaijan_Grand_Prix",
+            },
+        ],
+    },
+    "brazil-2023": {  # races batch 3: Daily, 15-20 laps left
+        "year": 2023,
+        "event": "Brazil",
+        "source": "openf1",  # FastF1 needs F1TV since Oct 2026 (pipeline/openf1.py)
+        "location": "São Paulo",
+        "name": "Brazil 2023: Hamilton vs Tsunoda",
+        "era": "2014-2025",
+        "takeover_lap": 52,  # pinned: races batch 3
+        "seed": 56203,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "HAM",
+        "rival": "TSU",
+        "score_positions": 6,
+        "split": "tune",
+    },
+    "brazil-2025": {  # races batch 3: Daily, 15-20 laps left
+        "year": 2025,
+        "event": "Brazil",
+        "source": "openf1",  # FastF1 needs F1TV since Oct 2026 (pipeline/openf1.py)
+        "location": "São Paulo",
+        "name": "Brazil 2025: Gasly vs Albon",
+        "era": "2014-2025",
+        "takeover_lap": 52,  # pinned: races batch 3
+        "seed": 61680,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "GAS",
+        "rival": "ALB",
+        "score_positions": 6,
+        "split": "tune",
+    },
+    "china-2019": {  # races batch 3: Daily, 15-20 laps left
+        "year": 2019,
+        "event": "China",
+        "name": "China 2019: Verstappen vs Leclerc",
+        "era": "2014-2025",
+        "takeover_lap": 39,  # pinned: races batch 3
+        "seed": 66046,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "VER",
+        "rival": "LEC",
+        "score_positions": 6,
+        "split": "tune",
+    },
+    "eifel-2020": {  # races batch 3: Daily, 15-20 laps left
+        "year": 2020,
+        "event": "Eifel",
+        "name": "Eifel 2020: Ricciardo vs Pérez",
+        "era": "2014-2025",
+        "takeover_lap": 40,  # pinned: races batch 3
+        "seed": 1,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "RIC",
+        "rival": "PER",
+        "score_positions": 6,
+        "split": "tune",
+    },
+    "emilia-romagna-2025": {  # races batch 3: Daily, 15-20 laps left
+        "year": 2025,
+        "event": "Italy",
+        "source": "openf1",  # FastF1 needs F1TV since Oct 2026 (pipeline/openf1.py)
+        "location": "Imola",
+        "name": "Emilia Romagna 2025: Alonso vs Hülkenberg",
+        "era": "2014-2025",
+        "takeover_lap": 43,  # pinned: races batch 3
+        "seed": 1498,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "ALO",
+        "rival": "HUL",
+        "score_positions": 6,
+        "split": "tune",
+    },
+    "italy-2025": {  # races batch 3: Daily, 15-20 laps left
+        "year": 2025,
+        "event": "Italy",
+        "source": "openf1",  # FastF1 needs F1TV since Oct 2026 (pipeline/openf1.py)
+        "location": "Monza",
+        "name": "Italy 2025: Russell vs Hamilton",
+        "era": "2014-2025",
+        "takeover_lap": 35,  # pinned: races batch 3
+        "seed": 1,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "RUS",
+        "rival": "HAM",
+        "score_positions": 6,
+        "split": "tune",
+        # Added to race time after the flag (races batch 3, sim.ts classify).
+        "post_race_penalties": [
+            {
+                "driver": "ANT",
+                "seconds": 5,
+                "reason": "forcing another driver off track",
+                "source": "https://en.wikipedia.org/w/index.php?title=2025_Italian_Grand_Prix&action=raw",
+            },
+        ],
+    },
+    "japan-2018": {  # races batch 3: Daily, 15-20 laps left
+        "year": 2018,
+        "event": "Japan",
+        "name": "Japan 2018: Alonso vs Hartley",
+        "era": "2014-2025",
+        "takeover_lap": 36,  # pinned: races batch 3
+        "seed": 95213,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "ALO",
+        "rival": "HAR",
+        "score_positions": 6,
+        "split": "tune",
+    },
+    "las-vegas-2023": {  # races batch 3: Daily, 15-20 laps left
+        "year": 2023,
+        "event": "United States",
+        "source": "openf1",  # FastF1 needs F1TV since Oct 2026 (pipeline/openf1.py)
+        "location": "Las Vegas",
+        "name": "Las Vegas 2023: Piastri vs Alonso",
+        "era": "2014-2025",
+        "takeover_lap": 35,  # pinned: races batch 3
+        "seed": 18632,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "PIA",
+        "rival": "ALO",
+        "score_positions": 6,
+        "split": "tune",
+        # Added to race time after the flag (races batch 3, sim.ts classify).
+        "post_race_penalties": [
+            {
+                "driver": "RUS",
+                "seconds": 5,
+                "reason": "causing a collision",
+                "source": "https://en.wikipedia.org/w/index.php?title=2023_Las_Vegas_Grand_Prix&action=raw",
+            },
+        ],
+    },
+    "las-vegas-2024": {  # races batch 3: Daily, 15-20 laps left
+        "year": 2024,
+        "event": "United States",
+        "source": "openf1",  # FastF1 needs F1TV since Oct 2026 (pipeline/openf1.py)
+        "location": "Las Vegas",
+        "name": "Las Vegas 2024: Zhou vs Colapinto",
+        "era": "2014-2025",
+        "takeover_lap": 31,  # pinned: races batch 3
+        "seed": 14959,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "ZHO",
+        "rival": "COL",
+        "score_positions": 6,
+        "split": "tune",
+    },
+    "mexico-2025": {  # races batch 3: Daily, 15-20 laps left
+        "year": 2025,
+        "event": "Mexico",
+        "source": "openf1",  # FastF1 needs F1TV since Oct 2026 (pipeline/openf1.py)
+        "location": "Mexico City",
+        "name": "Mexico 2025: Leclerc vs Verstappen",
+        "era": "2014-2025",
+        "takeover_lap": 56,  # pinned: races batch 3
+        "seed": 5027,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "LEC",
+        "rival": "VER",
+        "score_positions": 6,
+        "split": "tune",
+    },
+    "singapore-2025": {  # races batch 3: Daily, 15-20 laps left
+        "year": 2025,
+        "event": "Singapore",
+        "source": "openf1",  # FastF1 needs F1TV since Oct 2026 (pipeline/openf1.py)
+        "location": "Marina Bay",
+        "name": "Singapore 2025: Sainz vs Hadjar",
+        "era": "2014-2025",
+        "takeover_lap": 47,  # pinned: races batch 3
+        "seed": 20731,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "SAI",
+        "rival": "HAD",
+        "score_positions": 6,
+        "split": "tune",
+        # Added to race time after the flag (races batch 3, sim.ts classify).
+        "post_race_penalties": [
+            {
+                "driver": "HAM",
+                "seconds": 5,
+                "reason": "track limits",
+                "source": "https://en.wikipedia.org/w/index.php?title=2025_Singapore_Grand_Prix&action=raw",
+            },
+        ],
+    },
+    "spain-2022": {  # races batch 3: Daily, 15-20 laps left
+        "year": 2022,
+        "event": "Spain",
+        "name": "Spain 2022: Tsunoda vs Alonso",
+        "era": "2014-2025",
+        "takeover_lap": 49,  # pinned: races batch 3
+        "seed": 99945,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "TSU",
+        "rival": "ALO",
+        "score_positions": 6,
+        "split": "tune",
+        # Added to race time after the flag (races batch 3, sim.ts classify).
+        "post_race_penalties": [
+            {
+                "driver": "ALB",
+                "seconds": 5,
+                "reason": "leaving the track multiple times",
+                "source": "https://en.wikipedia.org/w/index.php?title=2022_Spanish_Grand_Prix&action=raw",
+            },
+        ],
+    },
+    "belgium-2018": {  # races batch 3: Gauntlet
+        "year": 2018,
+        "event": "Belgium",
+        "name": "Belgium 2018: Vettel vs Hamilton",
+        "era": "2014-2025",
+        "takeover_lap": 18,  # pinned: races batch 3
+        "seed": 1,  # Gauntlet: seeds in data/pools.json (scripts/tune.ts --survivor)
+        "user_side": "VET",
+        "rival": "HAM",
+        "score_positions": 6,
+        "split": "tune",
+        # Added to race time after the flag (races batch 3, sim.ts classify).
+        "post_race_penalties": [
+            {
+                "driver": "BOT",
+                "seconds": 5,
+                "reason": "causing a collision with Sirotkin (lap 1)",
+                "source": "https://www.motorsport.com/f1/news/bottas-penalised-for-first-lap-sirotkin-clash/3165859/",
+            },
+        ],
+    },
+    "japan-2025": {  # races batch 3: Gauntlet
+        "year": 2025,
+        "event": "Japan",
+        "name": "Japan 2025: Hamilton vs Hadjar",
+        "era": "2014-2025",
+        "takeover_lap": 22,  # pinned: races batch 3
+        "seed": 1,  # Gauntlet: seeds in data/pools.json (scripts/tune.ts --survivor)
+        "user_side": "HAM",
+        "rival": "HAD",
+        "score_positions": 6,
+        "split": "tune",
+    },
+    "monaco-2021": {  # races batch 3: Gauntlet
+        "year": 2021,
+        "event": "Monaco",
+        "name": "Monaco 2021: Stroll vs Ocon",
+        "era": "2014-2025",
+        "takeover_lap": 34,  # pinned: races batch 3
+        "seed": 1,  # Gauntlet: seeds in data/pools.json (scripts/tune.ts --survivor)
+        "user_side": "STR",
+        "rival": "OCO",
+        "score_positions": 6,
+        "split": "tune",
+    },
+    "netherlands-2024": {  # races batch 3: Gauntlet
+        "year": 2024,
+        "event": "Netherlands",
+        "name": "Netherlands 2024: Gasly vs Alonso",
+        "era": "2014-2025",
+        "takeover_lap": 28,  # pinned: races batch 3
+        "seed": 1,  # Gauntlet: seeds in data/pools.json (scripts/tune.ts --survivor)
+        "user_side": "GAS",
+        "rival": "ALO",
+        "score_positions": 6,
+        "split": "tune",
+        # Added to race time after the flag (races batch 3, sim.ts classify).
+        "post_race_penalties": [
+            {
+                "driver": "STR",
+                "seconds": 5,
+                "reason": "pit-lane speeding",
+                "source": "https://en.wikipedia.org/w/index.php?title=2024_Dutch_Grand_Prix&action=raw",
+            },
+        ],
+    },
+    "qatar-2025": {  # races batch 3: Gauntlet
+        "year": 2025,
+        "event": "Qatar",
+        "source": "openf1",  # FastF1 needs F1TV since Oct 2026 (pipeline/openf1.py)
+        "location": "Lusail",
+        "name": "Qatar 2025: Sainz vs Piastri",
+        "era": "2014-2025",
+        "takeover_lap": 21,  # pinned: races batch 3
+        "seed": 1,  # Gauntlet: seeds in data/pools.json (scripts/tune.ts --survivor)
+        "user_side": "SAI",
+        "rival": "PIA",
+        "score_positions": 6,
+        "split": "tune",
+    },
+    "spain-2019": {  # races batch 3: Gauntlet
+        "year": 2019,
+        "event": "Spain",
+        "name": "Spain 2019: Magnussen vs Sainz",
+        "era": "2014-2025",
+        "takeover_lap": 20,  # pinned: races batch 3
+        "seed": 1,  # Gauntlet: seeds in data/pools.json (scripts/tune.ts --survivor)
+        "user_side": "MAG",
+        "rival": "SAI",
+        "score_positions": 6,
+        "split": "tune",
+    },
+    "united-states-2025": {  # races batch 3: Gauntlet
+        "year": 2025,
+        "event": "United States",
+        "source": "openf1",  # FastF1 needs F1TV since Oct 2026 (pipeline/openf1.py)
+        "location": "Austin",
+        "name": "United States 2025: Piastri vs Russell",
+        "era": "2014-2025",
+        "takeover_lap": 27,  # pinned: races batch 3
+        "seed": 1,  # Gauntlet: seeds in data/pools.json (scripts/tune.ts --survivor)
+        "user_side": "PIA",
+        "rival": "RUS",
+        "score_positions": 6,
+        "split": "tune",
+        # Added to race time after the flag (races batch 3, sim.ts classify).
+        "post_race_penalties": [
+            {
+                "driver": "BEA",
+                "seconds": 10,
+                "reason": "leaving the track and gaining an advantage",
+                "source": "https://en.wikipedia.org/wiki/2025_United_States_Grand_Prix",
+            },
+        ],
+    },
+    "australia-2022": {  # races batch 3: Daily, 15-25 laps left
+        "year": 2022,
+        "event": "Australia",
+        "name": "Australia 2022: Ocon vs Bottas",
+        "era": "2014-2025",
+        "takeover_lap": 36,  # pinned: races batch 3
+        "seed": 45588,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "OCO",
+        "rival": "BOT",
+        "score_positions": 6,
+        "split": "tune",
+        # Added to race time after the flag (races batch 3, sim.ts classify).
+        "post_race_penalties": [
+            {
+                "driver": "STR",
+                "seconds": 5,
+                "reason": "weaving (more than one change of direction) defending against Bottas",
+                "source": "https://www.racefans.net/?p=477113",
+            },
+        ],
+    },
+    "brazil-2018": {  # races batch 3: Daily, 15-25 laps left
+        "year": 2018,
+        "event": "Brazil",
+        "name": "Brazil 2018: Hartley vs Sainz",
+        "era": "2014-2025",
+        "takeover_lap": 46,  # pinned: races batch 3
+        "seed": 1,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "HAR",
+        "rival": "SAI",
+        "score_positions": 6,
+        "split": "tune",
+        # Added to race time after the flag (races batch 3, sim.ts classify).
+        "post_race_penalties": [
+            {
+                "driver": "ALO",
+                "seconds": 5,
+                "reason": "Ignoring blue flags",
+                "source": "https://www.motorsport.com/f1/news/alonso-vandoorne-punished-brazilian-gp/3212344/",
+            },
+            {
+                "driver": "VAN",
+                "seconds": 5,
+                "reason": "Ignoring blue flags (slow to let Grosjean by)",
+                "source": "https://www.motorsport.com/f1/news/alonso-vandoorne-punished-brazilian-gp/3212344/",
+            },
+        ],
+    },
+    "great-britain-2018": {  # races batch 3: Daily, 15-25 laps left
+        "year": 2018,
+        "event": "Great Britain",
+        "name": "Great Britain 2018: Hamilton vs Räikkönen",
+        "era": "2014-2025",
+        "takeover_lap": 29,  # pinned: races batch 3
+        "seed": 43760,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "HAM",
+        "rival": "RAI",
+        "score_positions": 6,
+        "split": "tune",
+        # Added to race time after the flag (races batch 3, sim.ts classify).
+        "post_race_penalties": [
+            {
+                "driver": "GAS",
+                "seconds": 5,
+                "reason": "Causing a collision with Perez in the fight for 10th",
+                "source": "https://us.motorsport.com/f1/news/gasly-loses-silverstone-point-collision-perez-1057827/3138012/",
+            },
+        ],
+    },
+    "hungary-2020": {  # races batch 3: Daily, 15-25 laps left
+        "year": 2020,
+        "event": "Hungary",
+        "name": "Hungary 2020: Bottas vs Verstappen",
+        "era": "2014-2025",
+        "takeover_lap": 46,  # pinned: races batch 3
+        "seed": 1,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "BOT",
+        "rival": "VER",
+        "score_positions": 6,
+        "split": "tune",
+        # Added to race time after the flag (races batch 3, sim.ts classify).
+        "post_race_penalties": [
+            {
+                "driver": "MAG",
+                "seconds": 10,
+                "reason": "illegal radio help on the formation lap",
+                "source": "https://www.autosport.com/f1/news/haas-hit-with-double-penalty-for-formation-lap-hungarian-gp-guidance-4980972/4980972/",
+            },
+            {
+                "driver": "GRO",
+                "seconds": 10,
+                "reason": "Team radio instruction on formation lap",
+                "source": "https://www.autosport.com/f1/news/haas-hit-with-double-penalty-for-formation-lap-hungarian-gp-guidance-4980972/4980972/",
+            },
+        ],
+    },
+    "italy-2021": {  # races batch 3: Daily, 15-25 laps left
+        "year": 2021,
+        "event": "Italy",
+        "name": "Italy 2021: Stroll vs Alonso",
+        "era": "2014-2025",
+        "takeover_lap": 38,  # pinned: races batch 3
+        "seed": 1,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "STR",
+        "rival": "ALO",
+        "score_positions": 6,
+        "split": "tune",
+        # Added to race time after the flag (races batch 3, sim.ts classify).
+        "post_race_penalties": [
+            {
+                "driver": "PER",
+                "seconds": 5,
+                "reason": "leaving the track and gaining an advantage (pass on Leclerc)",
+                "source": "https://en.wikipedia.org/wiki/2021_Italian_Grand_Prix",
+            },
+        ],
+    },
+    "netherlands-2025": {  # races batch 3: Daily, 15-25 laps left
+        "year": 2025,
+        "event": "Netherlands",
+        "source": "openf1",  # FastF1 needs F1TV since Oct 2026 (pipeline/openf1.py)
+        "location": "Zandvoort",
+        "name": "Netherlands 2025: Verstappen vs Hadjar",
+        "era": "2014-2025",
+        "takeover_lap": 49,  # pinned: races batch 3
+        "seed": 1,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "VER",
+        "rival": "HAD",
+        "score_positions": 6,
+        "split": "tune",
+        # Added to race time after the flag (races batch 3, sim.ts classify).
+        "post_race_penalties": [
+            {
+                "driver": "ANT",
+                "seconds": 10,
+                "reason": "causing a collision",
+                "source": "https://en.wikipedia.org/w/index.php?title=2025_Dutch_Grand_Prix&action=raw",
+            },
+            {
+                "driver": "ANT",
+                "seconds": 5,
+                "reason": "pit-lane speeding",
+                "source": "https://www.threads.com/@fiadocs/post/DOBv1vlDryF/new-document-doc-52-decision-car-12-pit-lane-speedingpublished-on-31-08-2025-171",
+            },
+        ],
+    },
+    "spain-2025": {  # races batch 3: Daily, 15-25 laps left
+        "year": 2025,
+        "event": "Spain",
+        "name": "Spain 2025: Gasly vs Alonso",
+        "era": "2014-2025",
+        "takeover_lap": 51,  # pinned: races batch 3
+        "seed": 86061,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "GAS",
+        "rival": "ALO",
+        "score_positions": 6,
+        "split": "tune",
+        # Added to race time after the flag (races batch 3, sim.ts classify).
+        "post_race_penalties": [
+            {
+                "driver": "VER",
+                "seconds": 10,
+                "reason": "causing a collision",
+                "source": "https://en.wikipedia.org/w/index.php?title=2025_Spanish_Grand_Prix&action=raw",
+            },
+            {
+                "driver": "BEA",
+                "seconds": 10,
+                "reason": "leaving the track and gaining an advantage",
+                "source": "https://en.wikipedia.org/w/index.php?title=2025_Spanish_Grand_Prix&action=raw",
+            },
+        ],
+    },
+    "australia-2019": {  # races batch 3: Gauntlet
+        "year": 2019,
+        "event": "Australia",
+        "name": "Australia 2019: Magnussen vs Hülkenberg",
+        "era": "2014-2025",
+        "takeover_lap": 10,  # pinned: races batch 3
+        "seed": 1,  # Gauntlet: seeds in data/pools.json (scripts/tune.ts --survivor)
+        "user_side": "MAG",
+        "rival": "HUL",
+        "score_positions": 6,
+        "split": "tune",
+    },
+    "austria-2021": {  # races batch 3: Gauntlet
+        "year": 2021,
+        "event": "Austria",
+        "name": "Austria 2021: Alonso vs Russell",
+        "era": "2014-2025",
+        "takeover_lap": 27,  # pinned: races batch 3
+        "seed": 1,  # Gauntlet: seeds in data/pools.json (scripts/tune.ts --survivor)
+        "user_side": "ALO",
+        "rival": "RUS",
+        "score_positions": 6,
+        "split": "tune",
+        # Added to race time after the flag (races batch 3, sim.ts classify).
+        "post_race_penalties": [
+            {
+                "driver": "PER",
+                "seconds": 10,
+                "reason": "forcing Leclerc off track (twice)",
+                "source": "https://www.crash.net/f1/feature/982764/1/f1-driver-ratings-2021-austrian-grand-prix",
+            },
+            {
+                "driver": "RAI",
+                "seconds": 20,
+                "reason": "causing a collision with Vettel",
+                "source": "https://au.motorsport.com/f1/news/mazepin-latifi-and-raikkonen-penalised-f1-austrian-gp-six-others-cleared/6625763/",
+            },
+            {
+                "driver": "LAT",
+                "seconds": 30,
+                "reason": "Not respecting double-waved yellows (10 s stop-go converted to 30 s)",
+                "source": "https://au.motorsport.com/f1/news/mazepin-latifi-and-raikkonen-penalised-f1-austrian-gp-six-others-cleared/6625763/",
+            },
+            {
+                "driver": "MAZ",
+                "seconds": 30,
+                "reason": "Not respecting double-waved yellows (10 s stop-go converted to 30 s)",
+                "source": "https://au.motorsport.com/f1/news/mazepin-latifi-and-raikkonen-penalised-f1-austrian-gp-six-others-cleared/6625763/",
+            },
+        ],
+    },
+    "bahrain-2024": {  # races batch 3: Gauntlet
+        "year": 2024,
+        "event": "Bahrain",
+        "name": "Bahrain 2024: Stroll vs Zhou",
+        "era": "2014-2025",
+        "takeover_lap": 24,  # pinned: races batch 3
+        "seed": 1,  # Gauntlet: seeds in data/pools.json (scripts/tune.ts --survivor)
+        "user_side": "STR",
+        "rival": "ZHO",
+        "score_positions": 6,
+        "split": "tune",
+    },
+    "united-states-2024": {  # races batch 3: Gauntlet
+        "year": 2024,
+        "event": "United States",
+        "name": "United States 2024: Hülkenberg vs Pérez",
+        "era": "2014-2025",
+        "takeover_lap": 23,  # pinned: races batch 3
+        "seed": 1,  # Gauntlet: seeds in data/pools.json (scripts/tune.ts --survivor)
+        "user_side": "HUL",
+        "rival": "PER",
+        "score_positions": 6,
+        "split": "tune",
+        # Added to race time after the flag (races batch 3, sim.ts classify).
+        "post_race_penalties": [
+            {
+                "driver": "NOR",
+                "seconds": 5,
+                "reason": "leaving the track and gaining an advantage",
+                "source": "https://au.motorsport.com/f1/news/f1-us-gp-leclerc-leads-ferrari-1-2-as-penalty-drops-norris-behind-verstappen/10665082/",
+            },
+        ],
+    },
+    "abu-dhabi-2014": {  # races batch 3: Daily, 2014-2017 (TUM), 15-25 laps left
+        "year": 2014,
+        "event": "Abu Dhabi",
+        "source": "tum",
+        "name": "Abu Dhabi 2014: Massa vs Hamilton",
+        "era": "2014-2025",
+        "takeover_lap": 40,  # pinned: races batch 3
+        "seed": 85885,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "MAS",
+        "rival": "HAM",
+        "score_positions": 6,
+        "split": "holdout",
+    },
+    "australia-2015": {  # races batch 3: Daily, 2014-2017 (TUM), 15-25 laps left
+        "year": 2015,
+        "event": "Australia",
+        "source": "tum",
+        "name": "Australia 2015: Ericsson vs Sainz",
+        "era": "2014-2025",
+        "takeover_lap": 40,  # pinned: races batch 3
+        "seed": 93457,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "ERI",
+        "rival": "SAI",
+        "score_positions": 6,
+        "split": "holdout",
+    },
+    "australia-2016": {  # races batch 3: Daily, 2014-2017 (TUM), 15-25 laps left
+        "year": 2016,
+        "event": "Australia",
+        "source": "tum",
+        "name": "Australia 2016: Vettel vs Hamilton",
+        "era": "2014-2025",
+        "takeover_lap": 32,  # pinned: races batch 3
+        "seed": 1,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "VET",
+        "rival": "HAM",
+        "score_positions": 6,
+        "split": "holdout",
+    },
+    "austria-2014": {  # races batch 3: Daily, 2014-2017 (TUM), 15-25 laps left
+        "year": 2014,
+        "event": "Austria",
+        "source": "tum",
+        "name": "Austria 2014: Pérez vs Magnussen",
+        "era": "2014-2025",
+        "takeover_lap": 52,  # pinned: races batch 3
+        "seed": 42687,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "PER",
+        "rival": "MAG",
+        "score_positions": 6,
+        "split": "holdout",
+    },
+    "bahrain-2016": {  # races batch 3: Daily, 2014-2017 (TUM), 15-25 laps left
+        "year": 2016,
+        "event": "Bahrain",
+        "source": "tum",
+        "name": "Bahrain 2016: Massa vs Kvyat",
+        "era": "2014-2025",
+        "takeover_lap": 41,  # pinned: races batch 3
+        "seed": 94209,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "MAS",
+        "rival": "KVY",
+        "score_positions": 6,
+        "split": "holdout",
+    },
+    "belgium-2014": {  # races batch 3: Daily, 2014-2017 (TUM), 15-25 laps left
+        "year": 2014,
+        "event": "Belgium",
+        "source": "tum",
+        "name": "Belgium 2014: Pérez vs Kvyat",
+        "era": "2014-2025",
+        "takeover_lap": 19,  # pinned: races batch 3
+        "seed": 46022,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "PER",
+        "rival": "KVY",
+        "score_positions": 6,
+        "split": "holdout",
+        # Added to race time after the flag (races batch 3, sim.ts classify).
+        "post_race_penalties": [
+            {
+                "driver": "MAG",
+                "seconds": 20,
+                "reason": "forcing Alonso off track on Kemmel Straight",
+                "source": "https://en.wikipedia.org/w/index.php?title=2014_Belgian_Grand_Prix&action=raw",
+            },
+        ],
+    },
+    "belgium-2016": {  # races batch 3: Daily, 2014-2017 (TUM), 15-25 laps left
+        "year": 2016,
+        "event": "Belgium",
+        "source": "tum",
+        "name": "Belgium 2016: Pérez vs Vettel",
+        "era": "2014-2025",
+        "takeover_lap": 20,  # pinned: races batch 3
+        "seed": 40572,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "PER",
+        "rival": "VET",
+        "score_positions": 6,
+        "split": "holdout",
+    },
+    "canada-2017": {  # races batch 3: Daily, 2014-2017 (TUM), 15-25 laps left
+        "year": 2017,
+        "event": "Canada",
+        "source": "tum",
+        "name": "Canada 2017: Pérez vs Vettel",
+        "era": "2014-2025",
+        "takeover_lap": 46,  # pinned: races batch 3
+        "seed": 74600,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "PER",
+        "rival": "VET",
+        "score_positions": 6,
+        "split": "holdout",
+    },
+    "china-2016": {  # races batch 3: Daily, 2014-2017 (TUM), 15-25 laps left
+        "year": 2016,
+        "event": "China",
+        "source": "tum",
+        "name": "China 2016: Sainz vs Verstappen",
+        "era": "2014-2025",
+        "takeover_lap": 36,  # pinned: races batch 3
+        "seed": 56788,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "SAI",
+        "rival": "VER",
+        "score_positions": 6,
+        "split": "holdout",
+    },
+    "china-2014": {  # races batch 3: Daily, 2014-2017 (TUM), 15-25 laps left
+        "year": 2014,
+        "event": "China",
+        "source": "tum",
+        "name": "China 2014: Alonso vs Rosberg",
+        "era": "2014-2025",
+        "takeover_lap": 30,  # pinned: races batch 3
+        "seed": 92225,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "ALO",
+        "rival": "ROS",
+        "score_positions": 6,
+        "split": "holdout",
+    },
+    "germany-2014": {  # races batch 3: Daily, 2014-2017 (TUM), 15-25 laps left
+        "year": 2014,
+        "event": "Germany",
+        "source": "tum",
+        "name": "Germany 2014: Bottas vs Hamilton",
+        "era": "2014-2025",
+        "takeover_lap": 47,  # pinned: races batch 3
+        "seed": 99711,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "BOT",
+        "rival": "HAM",
+        "score_positions": 6,
+        "split": "holdout",
+    },
+    "hungary-2016": {  # races batch 3: Daily, 2014-2017 (TUM), 15-25 laps left
+        "year": 2016,
+        "event": "Hungary",
+        "source": "tum",
+        "name": "Hungary 2016: Räikkönen vs Verstappen",
+        "era": "2014-2025",
+        "takeover_lap": 47,  # pinned: races batch 3
+        "seed": 17845,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "RAI",
+        "rival": "VER",
+        "score_positions": 6,
+        "split": "holdout",
+        # Added to race time after the flag (races batch 3, sim.ts classify).
+        "post_race_penalties": [
+            {
+                "driver": "GUT",
+                "seconds": 5,
+                "reason": "ignoring blue flags",
+                "source": "https://en.wikipedia.org/w/index.php?title=2016_Hungarian_Grand_Prix&action=raw",
+            },
+        ],
+    },
+    "italy-2017": {  # races batch 3: Daily, 2014-2017 (TUM), 15-25 laps left
+        "year": 2017,
+        "event": "Italy",
+        "source": "tum",
+        "name": "Italy 2017: Pérez vs Massa",
+        "era": "2014-2025",
+        "takeover_lap": 29,  # pinned: races batch 3
+        "seed": 1,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "PER",
+        "rival": "MAS",
+        "score_positions": 6,
+        "split": "holdout",
+    },
+    "japan-2015": {  # races batch 3: Daily, 2014-2017 (TUM), 15-25 laps left
+        "year": 2015,
+        "event": "Japan",
+        "source": "tum",
+        "name": "Japan 2015: Grosjean vs Maldonado",
+        "era": "2014-2025",
+        "takeover_lap": 30,  # pinned: races batch 3
+        "seed": 27257,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "GRO",
+        "rival": "MAL",
+        "score_positions": 6,
+        "split": "holdout",
+    },
+    "malaysia-2014": {  # races batch 3: Daily, 2014-2017 (TUM), 15-25 laps left
+        "year": 2014,
+        "event": "Malaysia",
+        "source": "tum",
+        "name": "Malaysia 2014: Massa vs Bottas",
+        "era": "2014-2025",
+        "takeover_lap": 39,  # pinned: races batch 3
+        "seed": 59802,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "MAS",
+        "rival": "BOT",
+        "score_positions": 6,
+        "split": "holdout",
+    },
+    "mexico-2015": {  # races batch 3: Daily, 2014-2017 (TUM), 15-25 laps left
+        "year": 2015,
+        "event": "Mexico",
+        "source": "tum",
+        "name": "Mexico 2015: Bottas vs Kvyat",
+        "era": "2014-2025",
+        "takeover_lap": 46,  # pinned: races batch 3
+        "seed": 68443,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "BOT",
+        "rival": "KVY",
+        "score_positions": 6,
+        "split": "holdout",
+    },
+    "mexico-2017": {  # races batch 3: Daily, 2014-2017 (TUM), 15-25 laps left
+        "year": 2017,
+        "event": "Mexico",
+        "source": "tum",
+        "name": "Mexico 2017: Pérez vs Stroll",
+        "era": "2014-2025",
+        "takeover_lap": 47,  # pinned: races batch 3
+        "seed": 8500,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "PER",
+        "rival": "STR",
+        "score_positions": 6,
+        "split": "holdout",
+    },
+    "russia-2017": {  # races batch 3: Daily, 2014-2017 (TUM), 15-25 laps left
+        "year": 2017,
+        "event": "Russia",
+        "source": "tum",
+        "name": "Russia 2017: Hülkenberg vs Ocon",
+        "era": "2014-2025",
+        "takeover_lap": 37,  # pinned: races batch 3
+        "seed": 1,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "HUL",
+        "rival": "OCO",
+        "score_positions": 6,
+        "split": "holdout",
+    },
+    "spain-2015": {  # races batch 3: Daily, 2014-2017 (TUM), 15-25 laps left
+        "year": 2015,
+        "event": "Spain",
+        "source": "tum",
+        "name": "Spain 2015: Ericsson vs Pérez",
+        "era": "2014-2025",
+        "takeover_lap": 42,  # pinned: races batch 3
+        "seed": 7887,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "ERI",
+        "rival": "PER",
+        "score_positions": 6,
+        "split": "holdout",
+    },
+    "united-states-2017": {  # races batch 3: Daily, 2014-2017 (TUM), 15-25 laps left
+        "year": 2017,
+        "event": "United States",
+        "source": "tum",
+        "name": "United States 2017: Stroll vs Vandoorne",
+        "era": "2014-2025",
+        "takeover_lap": 33,  # pinned: races batch 3
+        "seed": 39139,  # tuned: scripts/tune.ts (races batch 3)
+        "user_side": "STR",
+        "rival": "VAN",
+        "score_positions": 6,
+        "split": "holdout",
+        # Added to race time after the flag (races batch 3, sim.ts classify).
+        "post_race_penalties": [
+            {
+                "driver": "VER",
+                "seconds": 5,
+                "reason": "left the track gaining an advantage passing Raikkonen on the last lap",
+                "source": "https://www.motorsportmagazine.com/articles/single-seaters/f1/2017-united-states-grand-prix-report/",
+            },
+        ],
+    },
 }
 
 
@@ -2926,6 +3916,33 @@ def official_result(model: dict, recon: dict) -> tuple[dict, list[str]]:
         if r["driver"] in order
     ]
     return {**model, "realResult": order}, lines
+
+
+def penalised_result(model: dict, laps: pd.DataFrame, penalties: list[dict]) -> tuple[dict, list]:
+    """Races batch 3: the stewards' real post-race time penalties (registry
+    `post_race_penalties`, each with its source) go in the race file for both sims to add at
+    the flag, and the realResult takes them: cars on the same lap count order by finish time
+    plus penalty, as the official classification does."""
+    added: dict[str, float] = {}
+    for p in penalties:
+        added[p["driver"]] = added.get(p["driver"], 0.0) + float(p["seconds"])
+    last = laps.loc[laps.groupby("Driver")["LapNumber"].idxmax()]
+    done = {str(r.Driver): (int(r.LapNumber), float(r.Time)) for r in last.itertuples()}
+    order = list(model["realResult"])
+    key = {c: (-done[c][0], done[c][1] + added.get(c, 0.0)) for c in order if c in done}
+    # Re-sort only the cars the timing places (all of them on a timed race), keeping slots.
+    placed = [c for c in order if c in key]
+    slots = [i for i, c in enumerate(order) if c in key]
+    for i, c in zip(slots, sorted(placed, key=key.__getitem__), strict=True):
+        order[i] = c
+    out = [
+        {"driver": p["driver"], "seconds": p["seconds"], "reason": p["reason"]} for p in penalties
+    ]
+    lines = [
+        f"  realResult: {p['driver']} +{p['seconds']}s after the flag ({p['reason']})"
+        for p in penalties
+    ]
+    return {**model, "postRacePenalties": out, "realResult": order}, lines
 
 
 def scripted_blocks(
@@ -3486,6 +4503,9 @@ def build_race(
     official_lines: list[str] = []
     if recon is not None and recon.get("roadPositions"):
         model, official_lines = official_result(model, recon)
+    if meta.get("post_race_penalties"):
+        model, penalty_lines = penalised_result(model, laps, meta["post_race_penalties"])
+        official_lines += penalty_lines
     scripted_lines: list[str] = []
     if eras_build:
         model, scripted_lines = scripted_blocks(model, race_id, recon)

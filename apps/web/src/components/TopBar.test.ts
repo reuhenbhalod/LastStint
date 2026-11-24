@@ -1,7 +1,7 @@
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
-import { TopBar } from './TopBar.js';
+import { TopBar, tabs } from './TopBar.js';
 
 describe('TopBar', () => {
   it('links the four ways to play, in order, and marks the page you are on', () => {
@@ -17,5 +17,10 @@ describe('TopBar', () => {
     ]);
     expect(html).toMatch(/href="\/eras" aria-current="page"/);
     expect(html.match(/aria-current/g)?.length).toBe(1);
+  });
+
+  it('leaves Versus out where it is off (a deployed build: not in the first release)', () => {
+    expect(tabs(false).map((t) => t.id)).toEqual(['daily', 'gauntlet', 'eras']);
+    expect(tabs(true).map((t) => t.id)).toEqual(['daily', 'gauntlet', 'eras', 'versus']);
   });
 });

@@ -2,6 +2,20 @@ import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { App, routeOf } from './App.js';
+import { versusOn } from './features.js';
+
+describe('Versus in the first release', () => {
+  it('is on in a dev build and off in a production build unless VITE_VERSUS=1', () => {
+    expect(versusOn({ PROD: false })).toBe(true);
+    expect(versusOn({ PROD: true })).toBe(false);
+    expect(versusOn({ PROD: true, VITE_VERSUS: '1' })).toBe(true);
+  });
+
+  it('sends /versus to the home page where it is off', () => {
+    expect(routeOf('/versus', true)).toEqual({ page: 'versus' });
+    expect(routeOf('/versus/ABCD', false)).toEqual({ page: 'daily' });
+  });
+});
 
 describe('routeOf', () => {
   it('keeps the daily, Gauntlet, admin and legal routes', () => {

@@ -373,18 +373,24 @@ export class GameSession {
 
   /**
    * Change the plan the car runs to during the race (not graded; the plan picked at takeover
-   * is). Its stops must be after the coming lap, whose calls are already made.
+   * is). Its stops must be after the lap just run. The engineer's plans can box on the coming
+   * lap, whose calls are already made: that stop's call is made now, while racing, as a box
+   * on the radio would be (at a pause the calls wait for the answer).
    */
   changePlan(plan: RacePlan): boolean {
     if (!this.state.plan.picked || this.engine.isFinished()) return false;
     const next: RacePlan = { ...plan, id: 'own' };
+    const coming = this.engine.lap + 1;
+    const now = next.stops[0]?.lap === coming;
+    if (now && this.state.phase !== 'racing') return false;
     try {
-      validatePlan(this.daily.model, next, this.engine.lap + 1);
+      validatePlan(this.daily.model, next, this.engine.lap);
     } catch {
       return false;
     }
     this.setPlan({ ...this.state.plan, active: next, live: null });
-    this.say('Engineer', `New plan. ${planRadio(next)}`, false, this.engine.lap + 1);
+    this.say('Engineer', `New plan. ${planRadio(next)}`, false, coming);
+    if (now) this.followPlan();
     return true;
   }
 
@@ -432,8 +438,9 @@ export class GameSession {
 
   /**
    * Re-rank the plan after a lap (spec D4, D5): the rest of the player's plan against the
-   * engineer's plans from now, in the worker. Skipped while a stop is booked. A result that
-   * arrives after the next lap has run is dropped.
+   * engineer's plans from now, in the worker. Skipped while a stop is booked or under way (in
+   * the pit lane, the engineer's plans would offer the stop being made as a new one). A result
+   * that arrives after the next lap has run is dropped.
    */
   private rerank(): void {
     const active = this.state.plan.active;
@@ -441,6 +448,7 @@ export class GameSession {
     const car = this.engine.state.cars[this.state.meta.userSide];
     if (!active || !car || car.retired || this.engine.isFinished()) return;
     if (this.engine.decisions.some((d) => d.kind === 'pit' && d.lap > n)) return;
+    if (car.strategy.some((s) => s.lap > n)) return;
     const mine = { ...remainder(active, n), id: 'own' as const };
     const alts = this.engine.plans();
     const job = this.engine.planJob([mine, ...alts], LIVE_SAMPLES, [
