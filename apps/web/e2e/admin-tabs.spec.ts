@@ -1,15 +1,12 @@
 // Admin page v2 (docs/admin-v2-spec.md): every tab opens against a mocked admin API, signed in
 // with a stand-in token (as in admin.spec.ts), and shows its own content. The announcement
 // set on Today shows under the top bar of the game's pages, and dismissing it sticks.
-import { type Page, expect, test } from '@playwright/test';
+import type { Page } from '@playwright/test';
+import { expect, test } from './coverage.js';
+import { token } from './screens/adminApi.js';
 
 const today = '2026-11-11';
 const email = 'admin@example.com';
-
-const token = () => {
-  const part = (o: object) => Buffer.from(JSON.stringify(o)).toString('base64url');
-  return `${part({ alg: 'none' })}.${part({ exp: Math.floor(Date.now() / 1000) + 3600 })}.x`;
-};
 
 const day = (date: string, number: number, current = true) => ({
   date,
@@ -323,8 +320,9 @@ test('every admin tab opens and shows its content', async ({ page }) => {
   await nav.getByRole('link', { name: 'Log' }).click();
   await expect(page.getByRole('cell', { name: 'race-1 published' })).toBeVisible();
 
-  // The banner shows under the game's top bar, and stays dismissed.
-  await page.goto('/versus');
+  // The banner shows under the game's top bar, and stays dismissed. (The Gauntlet page: /versus
+  // goes home in a production build now, where the first-visit intro covers the banner.)
+  await page.goto('/gauntlet');
   const banner = page.getByRole('status').filter({ hasText: 'Servers move tonight.' });
   await expect(banner).toBeVisible();
   await banner.getByRole('button', { name: 'Dismiss announcement' }).click();

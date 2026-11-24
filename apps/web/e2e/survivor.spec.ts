@@ -2,7 +2,7 @@
 // flag, the server's verdict (mocked: won), the next race's brief, and round 2 straight into
 // the race, with a trip out to the menu and back. Abu Dhabi 2021 stands in for a survivor race
 // (the shortest race: 24 laps to run).
-import { expect, test } from '@playwright/test';
+import { expect, test } from './coverage.js';
 import { loadRace } from './mock.js';
 
 const model = loadRace('abu-dhabi-2021');

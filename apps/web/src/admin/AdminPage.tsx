@@ -447,6 +447,7 @@ export function AdminPage() {
                 <label className="flex items-center gap-1.5 text-[13px] text-[var(--muted)]">
                   Next
                   <input
+                    aria-label="Days to schedule"
                     value={count}
                     onChange={(e) => setCount(e.target.value)}
                     inputMode="numeric"
@@ -561,15 +562,15 @@ export function AdminPage() {
                           aria-label={`Race on ${d.date}`}
                           disabled={busy || d.runs > 0 || d.date < today}
                           value={d.raceId}
-                          onChange={(e) =>
+                          onChange={(e) => {
+                            // Read the pick now: the controlled select shows the day's race
+                            // again until the reload, so e.target.value changes back.
+                            const raceId = e.target.value;
                             act(async () => {
-                              await adminCall('/api/admin/day', {
-                                date: d.date,
-                                raceId: e.target.value,
-                              });
-                              return `${d.date} is now ${nameOf(e.target.value)}.`;
-                            })
-                          }
+                              await adminCall('/api/admin/day', { date: d.date, raceId });
+                              return `${d.date} is now ${nameOf(raceId)}.`;
+                            });
+                          }}
                           className="rounded-md border border-[var(--rule)] bg-[var(--card-2)] px-2 py-1 text-[13px] disabled:opacity-40"
                         >
                           {races?.map((r) => (

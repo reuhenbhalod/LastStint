@@ -319,6 +319,7 @@ export function RunsPage() {
         <label className="flex flex-col gap-1 text-[13px] text-[var(--muted)]">
           Mode
           <select
+            aria-label="Mode"
             value={q.mode}
             onChange={(e) => setQ({ ...q, mode: e.target.value as RunSearch['mode'] })}
             className={`${field} sm:w-auto`}

@@ -50,6 +50,7 @@ export function AssigneeSelect({
       <Avatar email={assignee} me={me} />
       <span className="sr-only">Assignee for #{ticketId}</span>
       <select
+        aria-label={`Assignee for #${ticketId}`}
         value={assignee}
         disabled={disabled}
         onChange={(e) => onChange(e.target.value)}

@@ -90,6 +90,7 @@ export function TicketEditor({
           <label className={label}>
             Category
             <select
+              aria-label="Category"
               value={category}
               onChange={(e) => setCategory(e.target.value as Category)}
               className={field}
@@ -104,6 +105,7 @@ export function TicketEditor({
           <label className={label}>
             Status
             <select
+              aria-label="Status"
               value={status}
               onChange={(e) => setStatus(e.target.value as Status)}
               className={field}
@@ -118,7 +120,12 @@ export function TicketEditor({
         </div>
         <label className={label}>
           Assignee
-          <select value={assignee} onChange={(e) => setAssignee(e.target.value)} className={field}>
+          <select
+            aria-label="Assignee"
+            value={assignee}
+            onChange={(e) => setAssignee(e.target.value)}
+            className={field}
+          >
             <option value="">Unassigned</option>
             {people.map((p) => (
               <option key={p} value={p}>
