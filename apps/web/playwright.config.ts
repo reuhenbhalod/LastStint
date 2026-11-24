@@ -27,6 +27,9 @@ export default defineConfig({
   ],
   webServer: {
     command: `pnpm build && pnpm preview --port ${port} --strictPort`,
+    // Versus is left out of a deployed build (src/features.ts) but stays in the tests: the
+    // specs open /versus, which a build without this sends to the home page.
+    env: { VITE_VERSUS: '1' },
     url: `http://localhost:${port}`,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
