@@ -10,6 +10,7 @@ import { ProfileSheet } from './components/ProfileSheet.js';
 import { ApiDailyProvider, RaceFileProvider } from './data/provider.js';
 import { Eras } from './eras/ErasScreen.js';
 import { type ErasRoute, erasRoute } from './eras/catalog.js';
+import { VERSUS_ON } from './features.js';
 import { useFavouriteColour, useTeamTheme } from './game/teamTheme.js';
 import { useGame } from './game/useGame.js';
 import { Credits } from './screens/Credits.js';
@@ -37,13 +38,14 @@ export type Route =
     }
   | { page: 'eras'; eras: ErasRoute };
 
-export function routeOf(pathname: string): Route {
+export function routeOf(pathname: string, versus = VERSUS_ON): Route {
   if (pathname.startsWith('/admin')) return { page: 'admin' };
   if (pathname.startsWith('/privacy')) return { page: 'privacy' };
   if (pathname.startsWith('/tutorial')) return { page: 'tutorial' };
   if (pathname.startsWith('/terms')) return { page: 'terms' };
   if (pathname.startsWith('/credits')) return { page: 'credits' };
-  if (pathname.startsWith('/versus')) return { page: 'versus' };
+  // Versus isn't in the first release (features.ts): a deployed build sends /versus home.
+  if (pathname.startsWith('/versus')) return versus ? { page: 'versus' } : { page: 'daily' };
   if (pathname.startsWith('/gauntlet') || pathname.startsWith('/survivor'))
     return { page: 'gauntlet' };
   const eras = erasRoute(pathname);
@@ -52,6 +54,7 @@ export function routeOf(pathname: string): Route {
 }
 
 export function App() {
+  if (!VERSUS_ON && location.pathname.startsWith('/versus')) history.replaceState(null, '', '/');
   const route = routeOf(location.pathname);
   switch (route.page) {
     case 'admin':

@@ -5,18 +5,24 @@
 // The announcement banner (AnnouncementBanner.tsx) sits directly under it.
 
 import type { ReactNode } from 'react';
+import { VERSUS_ON } from '../features.js';
 import { AnnouncementBanner } from './AnnouncementBanner.js';
 import { Brand } from './Brand.js';
 import { SiteAccount } from './SiteAccount.js';
 
 export type Mode = 'daily' | 'gauntlet' | 'eras' | 'versus';
 
-const TABS: Array<{ id: Mode; label: string; href: string }> = [
+const ALL_TABS: Array<{ id: Mode; label: string; href: string }> = [
   { id: 'daily', label: 'Daily', href: '/' },
   { id: 'gauntlet', label: 'Gauntlet', href: '/gauntlet' },
   { id: 'eras', label: 'Eras', href: '/eras' },
   { id: 'versus', label: 'Versus', href: '/versus' },
 ];
+
+/** The tabs shown: Versus only where it's on (features.ts; not in the first release). */
+export function tabs(versus = VERSUS_ON) {
+  return versus ? ALL_TABS : ALL_TABS.filter((t) => t.id !== 'versus');
+}
 
 export function TopBar({ active, right }: { active: Mode; right?: ReactNode }) {
   return (
@@ -34,7 +40,7 @@ export function TopBar({ active, right }: { active: Mode; right?: ReactNode }) {
             aria-label="Ways to play"
             className="col-span-2 col-start-1 row-start-2 -mx-1 flex md:col-span-1 md:col-start-2 md:row-start-1"
           >
-            {TABS.map((t) => {
+            {tabs().map((t) => {
               const on = t.id === active;
               return (
                 <a
