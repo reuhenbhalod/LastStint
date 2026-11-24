@@ -57,7 +57,10 @@ export function TimingTower({
     return interval === null ? '' : `+${shownGap(info, interval).toFixed(1)}`;
   };
   return (
-    <ol className="m-0 flex min-h-full list-none flex-col justify-around p-1">
+    <ol
+      aria-label="Standings"
+      className="m-0 flex min-h-full list-none flex-col justify-around p-1"
+    >
       {order.map((code, i) => {
         const car = race.cars[code];
         if (!car) return null;
