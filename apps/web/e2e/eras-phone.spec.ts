@@ -2,7 +2,8 @@
 // (build plan 8.8), with the Worker mocked: nothing wider than the screen, and the top bar's
 // duel (your driver, the gap, the rival) not clipped, in Eras (with its timer toggle) and in
 // the daily.
-import { type Page, expect, test } from '@playwright/test';
+import type { Page } from '@playwright/test';
+import { expect, test } from './coverage.js';
 import { loadRace, mockApi } from './mock.js';
 
 const model = loadRace('abu-dhabi-2021');

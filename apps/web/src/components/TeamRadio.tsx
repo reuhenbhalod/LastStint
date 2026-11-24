@@ -90,6 +90,7 @@ export function TeamRadio({
       <button
         type="button"
         aria-expanded={open}
+        aria-label="Orders for next lap"
         onClick={() => setOpen(!open)}
         className="flex w-full flex-wrap items-center gap-x-3 gap-y-1 text-left"
       >

@@ -1,6 +1,6 @@
 // Start → six calls (with the radio alert, and a driver card from the map) → results → share,
 // on a 390 px phone screen, with the Worker mocked (e2e/mock.ts).
-import { expect, test } from '@playwright/test';
+import { expect, test } from './coverage.js';
 import { loadRace, mockApi } from './mock.js';
 
 const model = loadRace('abu-dhabi-2021');

@@ -1002,6 +1002,7 @@ function RaceScreenBody({
         <button
           type="button"
           onClick={onHome}
+          aria-label="LastStint home (the race waits)"
           title="Home (the race waits for you)"
           className="hidden min-w-0 flex-col items-start justify-center gap-1 border-r border-[var(--glass-edge)] px-5 text-left md:flex"
         >

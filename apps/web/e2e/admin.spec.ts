@@ -2,7 +2,8 @@
 // only offers sign-in; signed in (a stand-in Google token in sessionStorage) it lists every
 // playable race with a Play link and a preview, and runs the daily schedule; an account off
 // the admin list is told so. admin-tabs.spec.ts opens every other tab.
-import { type Page, expect, test } from '@playwright/test';
+import type { Page } from '@playwright/test';
+import { expect, test } from './coverage.js';
 
 const today = '2026-11-03';
 const email = 'admin@example.com';

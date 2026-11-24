@@ -1,7 +1,8 @@
 // The admin Players tab (/admin/players) against a mocked players API: the summary, the table,
 // search and sort, and the page staying within a phone's width. SHOTS=<dir> also saves desktop
 // and phone screenshots.
-import { type Page, expect, test } from '@playwright/test';
+import type { Page } from '@playwright/test';
+import { expect, test } from './coverage.js';
 
 const token = () => {
   const part = (o: object) => Buffer.from(JSON.stringify(o)).toString('base64url');
