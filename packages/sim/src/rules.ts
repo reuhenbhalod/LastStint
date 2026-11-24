@@ -65,6 +65,14 @@ export function raceYear(raceId: string): number | null {
 }
 
 /**
+ * The race a variant id is cut from ('canada-2014-daily' -> 'canada-2014'): a variant shares
+ * its base race's circuit, outline, incidents and retirements. Any other id is its own base.
+ */
+export function baseRaceId(raceId: string): string {
+  return raceId.replace(/^(.+?-\d{4})-.*$/, '$1');
+}
+
+/**
  * True if the race runs with a safety car (from SAFETY_CAR_FROM). A race id without a year
  * (a test fixture) counts as modern.
  */

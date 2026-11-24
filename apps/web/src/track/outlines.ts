@@ -1,6 +1,7 @@
 // Circuit outlines bundled from the repo's data/tracks (written by `pipeline outline`). A race
 // without one plays without the map.
 
+import { baseRaceId } from '@laststint/sim';
 import type { TrackOutline } from './geometry.js';
 
 const files = import.meta.glob<TrackOutline>('../../../../data/tracks/*.json', {
@@ -11,5 +12,5 @@ const files = import.meta.glob<TrackOutline>('../../../../data/tracks/*.json', {
 const byRace = new Map(Object.values(files).map((o) => [o.raceId, o]));
 
 export function outlineFor(raceId: string): TrackOutline | null {
-  return byRace.get(raceId) ?? null;
+  return byRace.get(raceId) ?? byRace.get(baseRaceId(raceId)) ?? null;
 }

@@ -1,6 +1,7 @@
 // A circuit's 3D scenery (data/scenery, written by `pipeline scenery`; docs/3d-spec.md), and
 // where a car on the game's lap is in it.
 
+import { baseRaceId } from '@laststint/sim';
 import { SCENE_3D } from './switch.js';
 
 export interface SceneryRace {
@@ -65,8 +66,9 @@ const RACES: Record<string, string[]> = {
 
 /** The circuit with scenery for this race, or null. */
 export function circuitFor(raceId: string): string | null {
-  const c = CIRCUIT_OF[raceId.replace(/-\d{4}$/, '')];
-  if (!c || !RACES[c]?.includes(raceId)) return null;
+  const base = baseRaceId(raceId);
+  const c = CIRCUIT_OF[base.replace(/-\d{4}$/, '')];
+  if (!c || !RACES[c]?.includes(base)) return null;
   return FILES[`../../../../data/scenery/${c}.json`] ? c : null;
 }
 

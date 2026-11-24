@@ -1,0 +1,565 @@
+{
+  "schemaVersion": 11,
+  "race": {
+    "id": "australia-2025-daily",
+    "name": "Australia 2025: H\u00fclkenberg vs Leclerc",
+    "laps": 57,
+    "takeoverLap": 42,
+    "seed": 1
+  },
+  "era": "2014-2025",
+  "track": {
+    "pitLoss": 19.5,
+    "pitLossUnderSC": 10.725,
+    "pitLossUnderVSC": 13.455,
+    "pitLossDeviations": [
+      -3.0,
+      -2.499,
+      -1.665,
+      -0.062,
+      0.0,
+      1.779,
+      2.634
+    ],
+    "overtakeDifficulty": 0.957,
+    "overtakeModel": {
+      "intercept": -0.7468,
+      "paceCoef": 0.6261,
+      "gapCoef": -2.7148
+    },
+    "dirtyAirPenalty": 0.0,
+    "greenLapTime": 91.861,
+    "scLapTime": 131.829
+  },
+  "compounds": {
+    "MEDIUM": {
+      "offset": 0.0,
+      "degPerLap": 0.035,
+      "cliffLap": 41,
+      "provenLaps": 41
+    },
+    "HARD": {
+      "offset": 0.4,
+      "degPerLap": 0.02,
+      "cliffLap": 16,
+      "provenLaps": 16
+    },
+    "INTERMEDIATE": {
+      "offset": 0.0,
+      "degPerLap": 0.05,
+      "cliffLap": 30
+    },
+    "WET": {
+      "offset": 0.0,
+      "degPerLap": 0.04,
+      "cliffLap": 35
+    }
+  },
+  "drivers": [
+    {
+      "code": "ALB",
+      "team": "Williams",
+      "basePace": 88.726,
+      "noise": 0.3,
+      "wetPace": -0.0037,
+      "stateAtTakeover": {
+        "position": 7,
+        "gapAhead": 0.399,
+        "compound": "MEDIUM",
+        "tyreAge": 10,
+        "compoundsUsed": [
+          "INTERMEDIATE",
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 45,
+          "to": "INTERMEDIATE",
+          "loss": 20.617
+        }
+      ]
+    },
+    {
+      "code": "ANT",
+      "team": "Mercedes",
+      "basePace": 88.8377,
+      "noise": 0.3,
+      "wetPace": -0.0085,
+      "stateAtTakeover": {
+        "position": 10,
+        "gapAhead": 0.527,
+        "compound": "HARD",
+        "tyreAge": 10,
+        "compoundsUsed": [
+          "HARD",
+          "INTERMEDIATE"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 45,
+          "to": "INTERMEDIATE",
+          "loss": 23.116
+        }
+      ]
+    },
+    {
+      "code": "BEA",
+      "team": "Haas F1 Team",
+      "basePace": 89.3243,
+      "noise": 0.3,
+      "wetPace": -0.0062,
+      "stateAtTakeover": {
+        "position": 16,
+        "gapAhead": 21.079,
+        "compound": "MEDIUM",
+        "tyreAge": 39,
+        "compoundsUsed": [
+          "INTERMEDIATE",
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 45,
+          "to": "INTERMEDIATE",
+          "loss": 40.847
+        }
+      ]
+    },
+    {
+      "code": "BOR",
+      "team": "Kick Sauber",
+      "basePace": 85.8193,
+      "noise": 0.3,
+      "wetPace": 0.0198,
+      "stateAtTakeover": {
+        "position": 13,
+        "gapAhead": 10.878,
+        "compound": "MEDIUM",
+        "tyreAge": 39,
+        "compoundsUsed": [
+          "INTERMEDIATE",
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 45,
+          "to": "INTERMEDIATE",
+          "loss": 25.75
+        }
+      ]
+    },
+    {
+      "code": "GAS",
+      "team": "Alpine",
+      "basePace": 89.2217,
+      "noise": 0.3,
+      "wetPace": -0.0074,
+      "stateAtTakeover": {
+        "position": 9,
+        "gapAhead": 1.0,
+        "compound": "HARD",
+        "tyreAge": 10,
+        "compoundsUsed": [
+          "HARD",
+          "INTERMEDIATE"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 47,
+          "to": "INTERMEDIATE",
+          "loss": 19.5
+        }
+      ]
+    },
+    {
+      "code": "HAM",
+      "team": "Ferrari",
+      "basePace": 88.7063,
+      "noise": 0.3,
+      "wetPace": -0.004,
+      "stateAtTakeover": {
+        "position": 8,
+        "gapAhead": 0.717,
+        "compound": "HARD",
+        "tyreAge": 11,
+        "compoundsUsed": [
+          "HARD",
+          "INTERMEDIATE"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 48,
+          "to": "INTERMEDIATE"
+        }
+      ]
+    },
+    {
+      "code": "HUL",
+      "team": "Kick Sauber",
+      "basePace": 89.1212,
+      "noise": 0.3,
+      "wetPace": -0.0011,
+      "stateAtTakeover": {
+        "position": 12,
+        "gapAhead": 0.824,
+        "compound": "MEDIUM",
+        "tyreAge": 10,
+        "compoundsUsed": [
+          "INTERMEDIATE",
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 45,
+          "to": "INTERMEDIATE",
+          "loss": 21.451
+        }
+      ]
+    },
+    {
+      "code": "LAW",
+      "team": "Red Bull Racing",
+      "basePace": 85.9307,
+      "noise": 0.3,
+      "wetPace": 0.0393,
+      "stateAtTakeover": {
+        "position": 14,
+        "gapAhead": 1.241,
+        "compound": "MEDIUM",
+        "tyreAge": 10,
+        "compoundsUsed": [
+          "INTERMEDIATE",
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": []
+    },
+    {
+      "code": "LEC",
+      "team": "Ferrari",
+      "basePace": 88.335,
+      "noise": 0.3,
+      "wetPace": -0.003,
+      "stateAtTakeover": {
+        "position": 5,
+        "gapAhead": 1.311,
+        "compound": "HARD",
+        "tyreAge": 10,
+        "compoundsUsed": [
+          "HARD",
+          "INTERMEDIATE"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 48,
+          "to": "INTERMEDIATE"
+        }
+      ]
+    },
+    {
+      "code": "NOR",
+      "team": "McLaren",
+      "basePace": 85.2893,
+      "noise": 0.3,
+      "wetPace": 0.0132,
+      "stateAtTakeover": {
+        "position": 1,
+        "gapAhead": 0.0,
+        "compound": "HARD",
+        "tyreAge": 10,
+        "compoundsUsed": [
+          "HARD",
+          "INTERMEDIATE"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 45,
+          "to": "INTERMEDIATE",
+          "loss": 24.895
+        }
+      ]
+    },
+    {
+      "code": "OCO",
+      "team": "Haas F1 Team",
+      "basePace": 89.3311,
+      "noise": 0.3,
+      "wetPace": 0.0129,
+      "stateAtTakeover": {
+        "position": 15,
+        "gapAhead": 28.123,
+        "compound": "MEDIUM",
+        "tyreAge": 4,
+        "compoundsUsed": [
+          "INTERMEDIATE",
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 47,
+          "to": "INTERMEDIATE"
+        }
+      ]
+    },
+    {
+      "code": "PIA",
+      "team": "McLaren",
+      "basePace": 86.1235,
+      "noise": 0.3,
+      "wetPace": 0.0067,
+      "stateAtTakeover": {
+        "position": 2,
+        "gapAhead": 1.597,
+        "compound": "HARD",
+        "tyreAge": 10,
+        "compoundsUsed": [
+          "HARD",
+          "INTERMEDIATE"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 45,
+          "to": "INTERMEDIATE",
+          "loss": 111.81
+        }
+      ]
+    },
+    {
+      "code": "RUS",
+      "team": "Mercedes",
+      "basePace": 87.8273,
+      "noise": 0.3,
+      "wetPace": -0.0011,
+      "stateAtTakeover": {
+        "position": 4,
+        "gapAhead": 1.887,
+        "compound": "HARD",
+        "tyreAge": 9,
+        "compoundsUsed": [
+          "HARD",
+          "INTERMEDIATE"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 45,
+          "to": "INTERMEDIATE",
+          "loss": 23.054
+        }
+      ]
+    },
+    {
+      "code": "STR",
+      "team": "Aston Martin",
+      "basePace": 88.7538,
+      "noise": 0.3,
+      "wetPace": 0.0016,
+      "stateAtTakeover": {
+        "position": 11,
+        "gapAhead": 0.787,
+        "compound": "HARD",
+        "tyreAge": 11,
+        "compoundsUsed": [
+          "HARD",
+          "INTERMEDIATE"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 45,
+          "to": "INTERMEDIATE",
+          "loss": 20.117
+        }
+      ]
+    },
+    {
+      "code": "TSU",
+      "team": "Racing Bulls",
+      "basePace": 88.6747,
+      "noise": 0.3,
+      "wetPace": -0.0026,
+      "stateAtTakeover": {
+        "position": 6,
+        "gapAhead": 0.703,
+        "compound": "MEDIUM",
+        "tyreAge": 10,
+        "compoundsUsed": [
+          "INTERMEDIATE",
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 48,
+          "to": "INTERMEDIATE"
+        }
+      ]
+    },
+    {
+      "code": "VER",
+      "team": "Red Bull Racing",
+      "basePace": 86.9953,
+      "noise": 0.3,
+      "wetPace": -0.0014,
+      "stateAtTakeover": {
+        "position": 3,
+        "gapAhead": 1.131,
+        "compound": "MEDIUM",
+        "tyreAge": 9,
+        "compoundsUsed": [
+          "INTERMEDIATE",
+          "MEDIUM"
+        ]
+      },
+      "realStrategy": [
+        {
+          "lap": 47,
+          "to": "INTERMEDIATE",
+          "loss": 19.5
+        }
+      ]
+    }
+  ],
+  "fuelEffectPerLap": 0.056,
+  "freshTyre": {
+    "bonus": -0.2,
+    "laps": 3
+  },
+  "events": [
+    {
+      "lap": 46,
+      "type": "RETIREMENT",
+      "driver": "BOR"
+    },
+    {
+      "lap": 47,
+      "type": "RETIREMENT",
+      "driver": "LAW"
+    },
+    {
+      "lap": 47,
+      "type": "SC",
+      "laps": 5
+    }
+  ],
+  "decisionMoments": [],
+  "candidateMomentLaps": [
+    45,
+    47,
+    48
+  ],
+  "realResult": [
+    "NOR",
+    "VER",
+    "RUS",
+    "ANT",
+    "ALB",
+    "STR",
+    "HUL",
+    "LEC",
+    "PIA",
+    "HAM",
+    "GAS",
+    "TSU",
+    "OCO",
+    "BEA",
+    "LAW",
+    "BOR",
+    "ALO",
+    "DOO",
+    "HAD",
+    "SAI"
+  ],
+  "userSide": "HUL",
+  "rival": "LEC",
+  "weather": {
+    "curves": {
+      "slick": {
+        "a": 0.1855,
+        "b": 0.9993
+      },
+      "inter": {
+        "min": 0.0345,
+        "dry": 1.0187,
+        "wet": 0.789,
+        "best": 0.18
+      },
+      "wet": {
+        "min": 0.1486,
+        "dry": 0.4006,
+        "wet": 0.6344,
+        "best": 0.2833
+      }
+    },
+    "wetness": [
+      0.13,
+      0.15,
+      0.17,
+      0.19,
+      0.21,
+      0.23,
+      0.25,
+      0.29,
+      0.25,
+      0.23,
+      0.22,
+      0.22,
+      0.21,
+      0.21,
+      0.2,
+      0.2,
+      0.21,
+      0.21,
+      0.21,
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.19,
+      0.19,
+      0.19,
+      0.18,
+      0.18,
+      0.18,
+      0.18,
+      0.18,
+      0.17,
+      0.09,
+      0.04,
+      0.01,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.07,
+      0.16,
+      0.25,
+      0.25,
+      0.25,
+      0.25,
+      0.25,
+      0.25,
+      0.28,
+      0.23,
+      0.21,
+      0.21,
+      0.2,
+      0.21
+    ]
+  }
+}

@@ -15,16 +15,16 @@
   "lengths": {
     "scLaps": 5,
     "vscLaps": 2,
-    "scPeriodsMeasured": 163,
-    "vscPeriodsMeasured": 72
+    "scPeriodsMeasured": 173,
+    "vscPeriodsMeasured": 78
   },
   "allTracks": {
-    "races": 254,
-    "vscRaces": 168,
-    "scPeriods": 167,
-    "vscPeriods": 78,
-    "scPerRace": 0.6575,
-    "vscPerRace": 0.4643
+    "races": 265,
+    "vscRaces": 179,
+    "scPeriods": 180,
+    "vscPeriods": 85,
+    "scPerRace": 0.6792,
+    "vscPerRace": 0.4749
   },
   "circuits": {
     "albert_park": {
@@ -98,12 +98,12 @@
     },
     "baku": {
       "name": "Baku City Circuit",
-      "races": 5,
-      "vscRaces": 5,
+      "races": 6,
+      "vscRaces": 6,
       "scPeriods": 5,
-      "vscPeriods": 1,
-      "scPerRace": 1.0,
-      "vscPerRace": 0.2,
+      "vscPeriods": 2,
+      "scPerRace": 0.8333,
+      "vscPerRace": 0.3333,
       "scFallback": false,
       "vscFallback": false,
       "counted": [
@@ -111,17 +111,18 @@
         "azerbaijan-2018 (tum): 2 SC, 0 VSC",
         "azerbaijan-2019 (tum): 0 SC, 1 VSC",
         "azerbaijan-2021 (jolpica-estimate): 1 SC, 0 VSC",
+        "azerbaijan-2024 (fastf1): 0 SC, 1 VSC",
         "europe-2016 (tum): 0 SC, 0 VSC"
       ]
     },
     "catalunya": {
       "name": "Circuit de Barcelona-Catalunya",
-      "races": 11,
-      "vscRaces": 8,
-      "scPeriods": 4,
+      "races": 12,
+      "vscRaces": 9,
+      "scPeriods": 5,
       "vscPeriods": 2,
-      "scPerRace": 0.3636,
-      "vscPerRace": 0.25,
+      "scPerRace": 0.4167,
+      "vscPerRace": 0.2222,
       "scFallback": false,
       "vscFallback": false,
       "counted": [
@@ -135,7 +136,8 @@
         "spain-2019 (tum): 1 SC, 0 VSC",
         "spain-2020 (fastf1): 0 SC, 0 VSC",
         "spain-2021 (fastf1): 1 SC, 0 VSC",
-        "spain-2023 (fastf1): 0 SC, 0 VSC"
+        "spain-2023 (fastf1): 0 SC, 0 VSC",
+        "spain-2025 (fastf1): 1 SC, 0 VSC"
       ]
     },
     "hockenheimring": {
@@ -190,16 +192,17 @@
     },
     "imola": {
       "name": "Autodromo Enzo e Dino Ferrari",
-      "races": 6,
-      "vscRaces": 1,
-      "scPeriods": 0,
-      "vscPeriods": 0,
-      "scPerRace": 0.0,
-      "vscPerRace": 0.4643,
+      "races": 7,
+      "vscRaces": 2,
+      "scPeriods": 1,
+      "vscPeriods": 1,
+      "scPerRace": 0.1429,
+      "vscPerRace": 0.4749,
       "scFallback": false,
       "vscFallback": true,
       "counted": [
         "emilia-romagna-2024 (fastf1): 0 SC, 0 VSC",
+        "emilia-romagna-2025 (fastf1): 1 SC, 1 VSC",
         "san-marino-1999 (jolpica-estimate): 0 SC, 0 VSC",
         "san-marino-2000 (jolpica-estimate): 0 SC, 0 VSC",
         "san-marino-2003 (jolpica-estimate): 0 SC, 0 VSC",
@@ -213,8 +216,8 @@
       "vscRaces": 0,
       "scPeriods": 0,
       "vscPeriods": 0,
-      "scPerRace": 0.6575,
-      "vscPerRace": 0.4643,
+      "scPerRace": 0.6792,
+      "vscPerRace": 0.4749,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -223,12 +226,12 @@
     },
     "interlagos": {
       "name": "Autódromo José Carlos Pace",
-      "races": 14,
-      "vscRaces": 6,
-      "scPeriods": 16,
-      "vscPeriods": 2,
-      "scPerRace": 1.1429,
-      "vscPerRace": 0.3333,
+      "races": 16,
+      "vscRaces": 8,
+      "scPeriods": 18,
+      "vscPeriods": 3,
+      "scPerRace": 1.125,
+      "vscPerRace": 0.375,
       "scFallback": false,
       "vscFallback": false,
       "counted": [
@@ -245,7 +248,9 @@
         "brazil-2017 (tum): 1 SC, 0 VSC",
         "brazil-2018 (tum): 0 SC, 0 VSC",
         "brazil-2019 (tum): 2 SC, 0 VSC",
-        "brazil-2021 (fastf1): 1 SC, 2 VSC"
+        "brazil-2021 (fastf1): 1 SC, 2 VSC",
+        "brazil-2023 (fastf1): 1 SC, 0 VSC",
+        "brazil-2025 (fastf1): 1 SC, 1 VSC"
       ]
     },
     "istanbul": {
@@ -255,7 +260,7 @@
       "scPeriods": 1,
       "vscPeriods": 0,
       "scPerRace": 0.3333,
-      "vscPerRace": 0.4643,
+      "vscPerRace": 0.4749,
       "scFallback": false,
       "vscFallback": true,
       "counted": [
@@ -287,12 +292,26 @@
       "vscRaces": 0,
       "scPeriods": 0,
       "vscPeriods": 0,
-      "scPerRace": 0.6575,
-      "vscPerRace": 0.4643,
+      "scPerRace": 0.6792,
+      "vscPerRace": 0.4749,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
         "europe-1997 (jolpica-estimate): 0 SC, 0 VSC"
+      ]
+    },
+    "losail": {
+      "name": "Lusail International Circuit",
+      "races": 1,
+      "vscRaces": 1,
+      "scPeriods": 3,
+      "vscPeriods": 1,
+      "scPerRace": 0.6792,
+      "vscPerRace": 0.4749,
+      "scFallback": true,
+      "vscFallback": true,
+      "counted": [
+        "qatar-2024 (fastf1): 3 SC, 1 VSC"
       ]
     },
     "magny_cours": {
@@ -302,7 +321,7 @@
       "scPeriods": 0,
       "vscPeriods": 0,
       "scPerRace": 0.0,
-      "vscPerRace": 0.4643,
+      "vscPerRace": 0.4749,
       "scFallback": false,
       "vscFallback": true,
       "counted": [
@@ -404,7 +423,7 @@
       "scPeriods": 2,
       "vscPeriods": 0,
       "scPerRace": 0.5,
-      "vscPerRace": 0.4643,
+      "vscPerRace": 0.4749,
       "scFallback": false,
       "vscFallback": true,
       "counted": [
@@ -420,8 +439,8 @@
       "vscRaces": 2,
       "scPeriods": 1,
       "vscPeriods": 0,
-      "scPerRace": 0.6575,
-      "vscPerRace": 0.4643,
+      "scPerRace": 0.6792,
+      "vscPerRace": 0.4749,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -431,12 +450,12 @@
     },
     "red_bull_ring": {
       "name": "Red Bull Ring",
-      "races": 11,
-      "vscRaces": 8,
+      "races": 12,
+      "vscRaces": 9,
       "scPeriods": 7,
-      "vscPeriods": 1,
-      "scPerRace": 0.6364,
-      "vscPerRace": 0.125,
+      "vscPeriods": 2,
+      "scPerRace": 0.5833,
+      "vscPerRace": 0.2222,
       "scFallback": false,
       "vscFallback": false,
       "counted": [
@@ -448,6 +467,7 @@
         "austria-2017 (tum): 0 SC, 0 VSC",
         "austria-2018 (tum): 0 SC, 1 VSC",
         "austria-2019 (fastf1): 0 SC, 0 VSC",
+        "austria-2024 (fastf1): 0 SC, 1 VSC",
         "austria-2025 (fastf1): 1 SC, 0 VSC",
         "styria-2020 (fastf1): 1 SC, 0 VSC",
         "styria-2021 (fastf1): 0 SC, 0 VSC"
@@ -635,8 +655,8 @@
       "vscRaces": 0,
       "scPeriods": 1,
       "vscPeriods": 0,
-      "scPerRace": 0.6575,
-      "vscPerRace": 0.4643,
+      "scPerRace": 0.6792,
+      "vscPerRace": 0.4749,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -644,14 +664,28 @@
         "europe-2012 (jolpica-estimate): 1 SC, 0 VSC"
       ]
     },
+    "vegas": {
+      "name": "Las Vegas Strip Street Circuit",
+      "races": 1,
+      "vscRaces": 1,
+      "scPeriods": 2,
+      "vscPeriods": 1,
+      "scPerRace": 0.6792,
+      "vscPerRace": 0.4749,
+      "scFallback": true,
+      "vscFallback": true,
+      "counted": [
+        "las-vegas-2023 (fastf1): 2 SC, 1 VSC"
+      ]
+    },
     "villeneuve": {
       "name": "Circuit Gilles Villeneuve",
-      "races": 11,
-      "vscRaces": 7,
-      "scPeriods": 11,
+      "races": 12,
+      "vscRaces": 8,
+      "scPeriods": 12,
       "vscPeriods": 4,
       "scPerRace": 1.0,
-      "vscPerRace": 0.5714,
+      "vscPerRace": 0.5,
       "scFallback": false,
       "vscFallback": false,
       "counted": [
@@ -665,17 +699,18 @@
         "canada-2018 (tum): 1 SC, 0 VSC",
         "canada-2019 (fastf1): 0 SC, 0 VSC",
         "canada-2022 (fastf1): 1 SC, 2 VSC",
-        "canada-2024 (fastf1): 2 SC, 0 VSC"
+        "canada-2024 (fastf1): 2 SC, 0 VSC",
+        "canada-2025 (fastf1): 1 SC, 0 VSC"
       ]
     },
     "yas_marina": {
       "name": "Yas Marina Circuit",
-      "races": 13,
-      "vscRaces": 9,
+      "races": 14,
+      "vscRaces": 10,
       "scPeriods": 6,
       "vscPeriods": 4,
-      "scPerRace": 0.4615,
-      "vscPerRace": 0.4444,
+      "scPerRace": 0.4286,
+      "vscPerRace": 0.4,
       "scFallback": false,
       "vscFallback": false,
       "counted": [
@@ -691,23 +726,25 @@
         "abu-dhabi-2020 (fastf1): 1 SC, 1 VSC",
         "abu-dhabi-2021 (fastf1): 1 SC, 1 VSC",
         "abu-dhabi-2022 (jolpica-estimate): 0 SC, 0 VSC",
-        "abu-dhabi-2024 (fastf1): 0 SC, 1 VSC"
+        "abu-dhabi-2024 (fastf1): 0 SC, 1 VSC",
+        "abu-dhabi-2025 (fastf1): 0 SC, 0 VSC"
       ]
     },
     "zandvoort": {
       "name": "Circuit Park Zandvoort",
-      "races": 3,
-      "vscRaces": 3,
-      "scPeriods": 2,
-      "vscPeriods": 2,
-      "scPerRace": 0.6667,
-      "vscPerRace": 0.6667,
+      "races": 4,
+      "vscRaces": 4,
+      "scPeriods": 5,
+      "vscPeriods": 3,
+      "scPerRace": 1.25,
+      "vscPerRace": 0.75,
       "scFallback": false,
       "vscFallback": false,
       "counted": [
         "netherlands-2021 (jolpica-estimate): 0 SC, 0 VSC",
         "netherlands-2022 (fastf1): 1 SC, 1 VSC",
-        "netherlands-2023 (fastf1): 1 SC, 1 VSC"
+        "netherlands-2023 (fastf1): 1 SC, 1 VSC",
+        "netherlands-2025 (fastf1): 3 SC, 1 VSC"
       ]
     }
   },

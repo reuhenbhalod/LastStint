@@ -80,7 +80,7 @@ export function g1Statuses(report: string): Map<string, string> {
   for (const line of report.split('\n')) {
     const cells = line.split('|').map((c) => c.trim());
     // | race | duel | status | ...
-    if (cells.length > 4 && /^[a-z0-9-]+-\d{4}$/.test(cells[1] ?? '')) {
+    if (cells.length > 4 && /^[a-z0-9-]+-\d{4}(-[a-z]+)?$/.test(cells[1] ?? '')) {
       statuses.set(cells[1] as string, cells[3] as string);
     }
   }

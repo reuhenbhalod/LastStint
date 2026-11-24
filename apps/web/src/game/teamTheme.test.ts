@@ -2,6 +2,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import type { RaceModel } from '@laststint/sim';
 import { describe, expect, it } from 'vitest';
+import { seasonOf } from '../track/garages.js';
 import { TEAM_COLOR, colourDistance, inkOn, teamColour, teamTheme } from './teamTheme.js';
 
 const dir = join(__dirname, '..', '..', '..', '..', 'data', 'races');
@@ -15,7 +16,7 @@ describe('team colours', () => {
     // In the race's year: Eras teams (Caterham, Lotus F1...) have only a historic livery.
     const missing = races.flatMap((m) =>
       m.drivers
-        .filter((d) => !teamColour(d.team, Number(m.race.id.slice(-4))))
+        .filter((d) => !teamColour(d.team, seasonOf(m.race.id)))
         .map((d) => `${m.race.id}: ${d.team}`),
     );
     expect([...new Set(missing)]).toEqual([]);
