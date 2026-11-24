@@ -62,7 +62,7 @@ describe('daily shuffle', () => {
         );
       }
     }
-  });
+  }, 300_000);
 
   it('keeps a race from coming straight back where one pass meets the next', async () => {
     const pool = await dailyPool();
@@ -74,7 +74,7 @@ describe('daily shuffle', () => {
         expect(back, `seed ${seed}, day ${i}`).not.toContain(id);
       });
     }
-  });
+  }, 300_000); // 68 races x 50 seeds: about 17 s on a laptop, over a minute on a CI runner
 
   it('keeps scheduled days, counts them in the bag, and avoids their neighbours', () => {
     const pool: RaceFacts[] = [
