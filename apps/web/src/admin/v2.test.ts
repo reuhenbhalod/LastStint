@@ -138,8 +138,8 @@ describe('Log', () => {
 describe('race preview', () => {
   it('names the pools a race is in', () => {
     const p = pools as unknown as Pools;
-    // The real daily list is empty for now (every Daily race moved to Gauntlet, Nov 18).
-    expect(poolsOf('short-2030', { ...p, daily: ['short-2030'] })).toEqual(['Daily']);
+    const daily = p.daily[0] as string;
+    expect(poolsOf(daily, p)).toContain('Daily');
     const gauntlet = Object.keys(p.survivor)[0] as string;
     expect(poolsOf(gauntlet, p)).toContain('Gauntlet');
     const [era, ids] = Object.entries(p.eras)[0] as [string, string[]];

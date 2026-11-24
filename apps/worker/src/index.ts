@@ -55,8 +55,6 @@ export interface Env {
   AUTH0_JWKS?: string;
   /** Admins (src/admin.ts): Google account emails, comma-separated. */
   ADMIN_EMAILS?: string;
-  /** A daily pool to use instead of data/pools.json's (JSON list of race ids; tests only). */
-  DAILY_POOL?: string;
   /** A survivor pool to use instead of data/pools.json's (JSON; tests only). */
   SURVIVOR_POOL?: string;
   /** "true" on staging only (eras spec §5): every era and race open, Draft races shown. */

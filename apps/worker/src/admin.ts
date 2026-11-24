@@ -53,15 +53,10 @@ export async function requireAdmin(c: Ctx): Promise<{ email: string; sub: string
   return { email, sub: who.sub };
 }
 
-/** The daily pool (data/pools.json, or the tests' own). */
-function dailyPool(env: Pick<Env, 'DAILY_POOL'>): readonly string[] {
-  return env.DAILY_POOL ? JSON.parse(env.DAILY_POOL) : DAILY_POOL;
-}
-
-/** Races that can be played as a daily: the daily pool's, with moments. */
-export async function playableRaces(pool: readonly string[] = DAILY_POOL) {
+/** Races that can be played as a daily: the daily pool's (data/pools.json), with moments. */
+export async function playableRaces() {
   const out = [];
-  for (const id of [...pool].sort()) {
+  for (const id of [...DAILY_POOL].sort()) {
     const race = await getRace(id);
     if (!race || race.model.decisionMoments.length === 0) continue;
     const m = race.model;
@@ -138,14 +133,8 @@ async function maxNumber(db: D1Database): Promise<number> {
 }
 
 /** Schedule `days` days from `from` in a shuffled order (src/shuffle.ts), or always `raceId`. */
-export async function scheduleDays(
-  db: D1Database,
-  from: string,
-  days: number,
-  raceId?: string,
-  dailyRaces: readonly string[] = DAILY_POOL,
-) {
-  const playable = await playableRaces(dailyRaces);
+export async function scheduleDays(db: D1Database, from: string, days: number, raceId?: string) {
+  const playable = await playableRaces();
   const pool = raceId
     ? [playable.find((r) => r.id === raceId) ?? { id: raceId }]
     : playable.map((r) => ({ id: r.id, userSide: r.userSide, rival: r.rival }));
@@ -234,7 +223,7 @@ export function registerAdmin(app: import('hono').Hono<{ Bindings: Env }>) {
 
   app.get('/api/admin/races', async (c) => {
     await requireAdmin(c);
-    return c.json({ races: await playableRaces(dailyPool(c.env)) });
+    return c.json({ races: await playableRaces() });
   });
 
   app.get('/api/admin/schedule', async (c) => {
@@ -255,7 +244,7 @@ export function registerAdmin(app: import('hono').Hono<{ Bindings: Env }>) {
     if (!isDate(from) || !Number.isInteger(days) || days < 1 || days > 366) {
       throw new ApiError(400, 'bad-request', 'from must be YYYY-MM-DD and days 1-366');
     }
-    const added = await scheduleDays(c.env.DB, from, days, raceId, dailyPool(c.env));
+    const added = await scheduleDays(c.env.DB, from, days, raceId);
     await logAdmin(c.env.DB, who.email, 'schedule', { from, days, raceId: raceId ?? null, added });
     return c.json({ added });
   });
