@@ -1,7 +1,8 @@
 // The admin Tickets tab (/admin/tickets) against a mocked ticket API: pick up an unassigned
 // ticket (it becomes yours and in progress), hand one to the other admin, unassign it, and
 // filter by owner. SHOTS=<dir> also saves desktop and phone screenshots.
-import { type Page, expect, test } from '@playwright/test';
+import type { Page } from '@playwright/test';
+import { expect, test } from './coverage.js';
 
 const me = 'reuhenbhalod@gmail.com';
 const other = 'purohit.abhiram@gmail.com';
