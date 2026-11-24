@@ -13,6 +13,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "e2e": "playwright test",
+    "e2e:flows": "playwright test -c playwright.flows.config.ts",
+    "coverage:report": "node scripts/coverage-report.mjs",
     "deploy": "wrangler deploy",
     "build:staging": "VITE_API_BASE=https://pitwall-staging.boxboxbox.workers.dev VITE_GOOGLE_CLIENT_ID=318278030629-s860fnjjpk6ihcn4iubjqiakf8vu0pqi.apps.googleusercontent.com VITE_AUTH0_DOMAIN=dev-umxcdh2y62l4e0gy.us.auth0.com VITE_AUTH0_CLIENT_ID=Pdlxz3iAqJse61VUhOGpF8wSeFgV7yxM pnpm run build",
     "deploy:staging": "pnpm run build:staging && wrangler deploy --env staging"

@@ -1,7 +1,7 @@
 // An Eras race from its intro to its results on a 390 px phone (build plan 8.7), on the real
 // HTTP Eras client with the Worker mocked: the attempt, its pinned race file, the submit (which
 // answers with stars, a new star, a rewrite and a rank) and the community stat.
-import { expect, test } from '@playwright/test';
+import { expect, test } from './coverage.js';
 import { loadRace } from './mock.js';
 
 const model = loadRace('abu-dhabi-2021');

@@ -11,11 +11,21 @@ export const repo = join(workerDir, '..', '..');
 /** local and remote are production's D1 (pitwall-db); staging is pitwall-staging-db (remote). */
 export type Target = 'local' | 'remote' | 'staging';
 
+/** A local D1 kept somewhere other than .wrangler/state (`--persist-to`; local only). */
+let localPersistTo: string | undefined;
+
+/** Use the local D1 in `dir` (wrangler's --persist-to), as the browser flows' stack does. */
+export function setLocalPersistTo(dir: string | undefined): void {
+  localPersistTo = dir;
+}
+
 /** The `wrangler d1 execute` database and flags for a target. */
 export function d1Args(target: Target): string[] {
-  return target === 'staging'
-    ? ['pitwall-staging-db', '--remote', '--env', 'staging']
-    : ['pitwall-db', `--${target}`];
+  if (target === 'staging') return ['pitwall-staging-db', '--remote', '--env', 'staging'];
+  if (target === 'local' && localPersistTo) {
+    return ['pitwall-db', '--local', '--persist-to', localPersistTo];
+  }
+  return ['pitwall-db', `--${target}`];
 }
 
 /** Run `wrangler d1 execute` on the chosen D1; throws with Wrangler's output. */
