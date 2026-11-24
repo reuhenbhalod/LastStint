@@ -25,19 +25,24 @@ describe('race pools', () => {
     expect(new Set(pools.daily).size).toBe(pools.daily.length);
   });
 
-  it('lets a daily race be in Eras too: the five shared ones', () => {
-    const shared = ['abu-dhabi-2021', 'bahrain-2021', 'france-2021', 'russia-2021', 'hungary-2019'];
-    for (const id of shared) {
-      expect(pools.daily, id).toContain(id);
-      expect(erasRaces, id).toContain(id);
-    }
+  it('lets a daily race be in Eras too: the two short shared ones', () => {
+    const shared = erasRaces.filter((id) => pools.daily.includes(id)).sort();
+    expect(shared).toEqual(['abu-dhabi-2021', 'russia-2021']);
   });
 
-  it('lets a Gauntlet race be in Eras too: portugal-2021 (Era 9 swap, Nov 9)', () => {
+  it('lets a Gauntlet race be in Eras too: the four long shared ones', () => {
+    // bahrain-2021, france-2021 and hungary-2019 came over with the long Daily races (Nov 24:
+    // Daily keeps races of 26 laps or fewer); portugal-2021 was here (Era 9 swap, Nov 9).
     const survivor = Object.keys(pools.survivor);
-    const shared = erasRaces.filter((id) => survivor.includes(id));
-    expect(shared).toEqual(['portugal-2021']);
+    const shared = erasRaces.filter((id) => survivor.includes(id)).sort();
+    expect(shared).toEqual(['bahrain-2021', 'france-2021', 'hungary-2019', 'portugal-2021']);
     expect(pools.eras['9']?.[4]).toBe('portugal-2021');
+  });
+
+  it('keeps Daily short and Gauntlet long (laps from the takeover to the flag)', () => {
+    const played = (id: string) => race(id).race.laps - race(id).race.takeoverLap + 1;
+    for (const id of pools.daily) expect(played(id), id).toBeLessThanOrEqual(26);
+    for (const id of Object.keys(pools.survivor)) expect(played(id), id).toBeGreaterThan(26);
   });
 
   it('lists the ten eras, ten distinct races each', () => {
