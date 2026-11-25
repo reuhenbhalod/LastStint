@@ -112,6 +112,8 @@ function AccountMenu({ account }: { account: AccountState }) {
         type="button"
         aria-haspopup="menu"
         aria-expanded={open}
+        // On a phone only the initial shows; the name says whose account it is.
+        aria-label={`Account: ${name}`}
         onClick={() => setOpen(!open)}
         className="flex items-center gap-2 rounded-full border border-[var(--rule)] py-1 pl-1 pr-3 text-[13px] font-semibold hover:border-[var(--muted)]"
       >
