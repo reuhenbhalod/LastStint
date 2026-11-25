@@ -95,16 +95,18 @@ test('open a ticket, edit it, and mark it done', async ({ page }) => {
   await dialog.getByRole('textbox', { name: 'Notes' }).fill('');
   await dialog.getByRole('button', { name: 'Save' }).click();
   await expect(dialog).toHaveCount(0);
-  expect(api.calls('PATCH', '/api/admin/tickets/1').map((c) => c.body)).toEqual([
-    {
-      title: 'Hard tyres: 40 laps',
-      description: 'Hards last 40 laps.',
-      category: 'content',
-      status: 'done',
-      notes: '',
-      assignee: EMAIL,
-    },
-  ]);
+  await expect
+    .poll(() => api.calls('PATCH', '/api/admin/tickets/1').map((c) => c.body))
+    .toEqual([
+      {
+        title: 'Hard tyres: 40 laps',
+        description: 'Hards last 40 laps.',
+        category: 'content',
+        status: 'done',
+        notes: '',
+        assignee: EMAIL,
+      },
+    ]);
   // Done now: out of the open groups, into Completed.
   await expect(card(page, 'Hard tyres: 40 laps')).toHaveCount(0);
   await page.getByRole('button', { name: /^Completed \(2\)/ }).click();
@@ -154,14 +156,16 @@ test('create a ticket: defaults, Cancel, Escape, saving and a refusal', async ({
   await expect(dialog.getByRole('button', { name: 'Saving…' })).toBeDisabled();
   release();
   await expect(dialog).toHaveCount(0);
-  expect(api.last('POST', '/api/admin/tickets')).toEqual({
-    title: 'Night mode',
-    description: 'Darker map.',
-    category: 'feature',
-    status: 'open',
-    notes: 'Ask players.',
-    assignee: OTHER,
-  });
+  await expect
+    .poll(() => api.last('POST', '/api/admin/tickets'))
+    .toEqual({
+      title: 'Night mode',
+      description: 'Darker map.',
+      category: 'feature',
+      status: 'open',
+      notes: 'Ask players.',
+      assignee: OTHER,
+    });
   await expect(page.getByRole('heading', { name: 'Feature (2)' })).toBeVisible();
   expect(await titles(page)).toEqual(['Add wet tyres', 'Night mode']);
 });
@@ -182,9 +186,9 @@ test('switch status, pick up an in-progress ticket, delete one', async ({ page }
     'aria-pressed',
     'true',
   );
-  expect(api.calls('PATCH', '/api/admin/tickets/3').map((c) => c.body)).toEqual([
-    { status: 'open' },
-  ]);
+  await expect
+    .poll(() => api.calls('PATCH', '/api/admin/tickets/3').map((c) => c.body))
+    .toEqual([{ status: 'open' }]);
   await fav.getByRole('button', { name: 'In progress', exact: true }).click();
   await expect(fav.getByRole('button', { name: 'In progress', exact: true })).toHaveAttribute(
     'aria-pressed',
@@ -194,11 +198,11 @@ test('switch status, pick up an in-progress ticket, delete one', async ({ page }
   // Picking up an in-progress ticket only assigns it.
   await fav.getByRole('button', { name: 'Pick up #3', exact: true }).click();
   await expect(fav.getByLabel('Assignee for #3')).toHaveValue(EMAIL);
-  expect(api.last('PATCH', '/api/admin/tickets/3')).toEqual({ assignee: EMAIL });
+  await expect.poll(() => api.last('PATCH', '/api/admin/tickets/3')).toEqual({ assignee: EMAIL });
 
   // Unassign my own ticket.
   await card(page, 'Taken already').getByLabel('Assignee for #4').selectOption('');
-  expect(api.last('PATCH', '/api/admin/tickets/4')).toEqual({ assignee: '' });
+  await expect.poll(() => api.last('PATCH', '/api/admin/tickets/4')).toEqual({ assignee: '' });
   await expect(
     card(page, 'Taken already').getByRole('button', { name: 'Pick up #4 and mark it in progress' }),
   ).toBeVisible();
@@ -219,7 +223,7 @@ test('switch status, pick up an in-progress ticket, delete one', async ({ page }
   await mine.getByRole('button', { name: 'Delete' }).click();
   await mine.getByRole('button', { name: 'Delete' }).click();
   await expect(card(page, 'Taken already')).toHaveCount(0);
-  expect(api.calls('DELETE', '/api/admin/tickets/4')).toHaveLength(1);
+  await expect.poll(() => api.calls('DELETE', '/api/admin/tickets/4')).toHaveLength(1);
   await expect(page.getByRole('heading', { name: 'UI (1)' })).toHaveCount(0);
 });
 
@@ -269,6 +273,16 @@ test('search, category and owner filters, and their empty messages', async ({ pa
   ]);
   await page.getByRole('button', { name: /^Everyone/ }).click();
   await expect(page.getByRole('heading', { level: 2 })).toHaveCount(3);
+
+  // One card found: open it, and pick it up from there.
+  await search.fill('favicon');
+  const fav = card(page, 'Add a favicon');
+  const toggle = fav.getByRole('button', { name: /^Add a favicon/ });
+  await toggle.click();
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  await fav.getByRole('button', { name: 'Pick up #3', exact: true }).click();
+  await expect(fav.getByLabel('Assignee for #3')).toHaveValue(EMAIL);
+  await search.fill('');
 });
 
 test('nothing assigned to me, no tickets, a failed change and a failed load', async ({ page }) => {
@@ -321,4 +335,20 @@ test('nothing assigned to me, no tickets, a failed change and a failed load', as
   ).toBeVisible();
   await page.getByRole('button', { name: 'Try again' }).click();
   await expect(page.getByText('No open tickets.', { exact: true })).toBeVisible();
+});
+
+test('the owner filter picked while the tickets load', async ({ page }) => {
+  const api = await fakeAdmin(page);
+  await signIn(page);
+  const release = api.hold('GET', '/api/admin/tickets');
+  await openTab(page, '/admin/tickets');
+  await expect(page.getByText('Loading tickets…')).toBeVisible();
+  for (const name of [/^(Mine|Assigned to me)/, /^Everyone/, /^Unassigned/]) {
+    const chip = page.getByRole('button', { name });
+    await chip.click();
+    await expect(chip).toHaveAttribute('aria-pressed', 'true');
+  }
+  release();
+  expect(await titles(page)).toEqual(['Make hard tyres last longer', 'Add a favicon']);
+  await expect(page.getByRole('button', { name: /^Unassigned/ })).toHaveText(/2$/);
 });

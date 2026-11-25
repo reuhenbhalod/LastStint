@@ -55,8 +55,8 @@ test('signed in: checks the token, then shows the tabs', async ({ page }) => {
   const nav = page.getByRole('navigation', { name: 'Admin' });
   await expect(nav.getByRole('link', { name: 'Today' })).toHaveAttribute('aria-current', 'page');
   // Every admin call carries the token.
-  expect(api.calls('GET', '/api/admin/me')[0]?.auth).toBe(`Bearer ${t}`);
-  expect(api.calls('GET', '/api/admin/today')[0]?.auth).toBe(`Bearer ${t}`);
+  await expect.poll(() => api.calls('GET', '/api/admin/me')[0]?.auth).toBe(`Bearer ${t}`);
+  await expect.poll(() => api.calls('GET', '/api/admin/today')[0]?.auth).toBe(`Bearer ${t}`);
 });
 
 test('sign out drops the token and stays signed out after a reload', async ({ page }) => {

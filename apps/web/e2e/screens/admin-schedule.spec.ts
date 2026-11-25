@@ -58,7 +58,7 @@ test('the race preview opens, switches and closes', async ({ page, isMobile }) =
   await expect(preview).toContainText(/Ground fit\s*median \d+\.\d m from the real track/);
   await expect(preview).toContainText('Seed27170');
   await expect(preview).toContainText('SideVER (Red Bull Racing) against BOT');
-  await expect(preview).toContainText('PoolsDaily');
+  await expect(preview).toContainText('PoolsGauntlet');
   await expect(preview).toContainText('Laps66, taking over on lap 18');
   await expect(preview.getByRole('heading', { name: 'Moments (5)' })).toBeVisible();
   await expect(preview.getByRole('listitem').first()).toContainText('Lap 21 · Tyre cliff');
@@ -110,9 +110,9 @@ test('pick a race for a day', async ({ page }) => {
   await open(page);
   await page.getByRole('combobox', { name: 'Race on 2026-11-13' }).selectOption({ label: ABU });
   await expect(page.getByText(`2026-11-13 is now ${ABU}.`)).toBeVisible();
-  expect(api.calls('POST', '/api/admin/day').map((c) => c.body)).toEqual([
-    { date: '2026-11-13', raceId: 'abu-dhabi-2021' },
-  ]);
+  await expect
+    .poll(() => api.calls('POST', '/api/admin/day').map((c) => c.body))
+    .toEqual([{ date: '2026-11-13', raceId: 'abu-dhabi-2021' }]);
   await expect(row(page, '2026-11-13')).toContainText(ABU);
   await expect(page.getByRole('combobox', { name: 'Race on 2026-11-13' })).toHaveValue(
     'abu-dhabi-2021',
@@ -139,7 +139,9 @@ test('schedule the next days: all races, or only one', async ({ page }) => {
   await expect(
     page.getByText('Scheduled 2 new days (days already scheduled are kept).'),
   ).toBeVisible();
-  expect(api.last('POST', '/api/admin/schedule')).toEqual({ from: TODAY, days: 2 });
+  await expect
+    .poll(() => api.last('POST', '/api/admin/schedule'))
+    .toEqual({ from: TODAY, days: 2 });
   await expect(row(page, '2026-11-15')).toContainText(ABU);
   // A new day's race can be picked (six rows now).
   await page.getByRole('combobox', { name: 'Race on 2026-11-14' }).selectOption({ label: CANADA });
@@ -152,11 +154,13 @@ test('schedule the next days: all races, or only one', async ({ page }) => {
   await expect(
     page.getByText('Scheduled 1 new day (days already scheduled are kept).'),
   ).toBeVisible();
-  expect(api.last('POST', '/api/admin/schedule')).toEqual({
-    from: TODAY,
-    days: 1,
-    raceId: 'spain-2020',
-  });
+  await expect
+    .poll(() => api.last('POST', '/api/admin/schedule'))
+    .toEqual({
+      from: TODAY,
+      days: 1,
+      raceId: 'spain-2020',
+    });
   await expect(row(page, '2026-11-16')).toContainText(SPAIN);
 
   // A count the server refuses.
@@ -175,10 +179,10 @@ test('re-pin stale days', async ({ page }) => {
   await expect(row(page, '2026-11-12')).toContainText('Stale: re-pin');
   await page.getByRole('button', { name: 'Re-pin stale days' }).click();
   await expect(page.getByText('Re-pinned 1 day(s) to the current race files.')).toBeVisible();
-  expect(api.calls('POST', '/api/admin/repin').map((c) => c.body)).toEqual([{}]);
+  await expect.poll(() => api.calls('POST', '/api/admin/repin').map((c) => c.body)).toEqual([{}]);
   await expect(row(page, '2026-11-12')).toContainText('Current');
   // The table reloads after every change.
-  expect(api.calls('GET', '/api/admin/schedule')).toHaveLength(2);
+  await expect.poll(() => api.calls('GET', '/api/admin/schedule')).toHaveLength(2);
 });
 
 test('clear my run today, then again with no run left', async ({ page }) => {
@@ -190,7 +194,9 @@ test('clear my run today, then again with no run left', async ({ page }) => {
   await expect(
     page.getByText(`Cleared your run for ${TODAY}: you can play it again.`),
   ).toBeVisible();
-  expect(api.calls('POST', '/api/admin/runs/clear').map((c) => c.body)).toEqual([{ date: TODAY }]);
+  await expect
+    .poll(() => api.calls('POST', '/api/admin/runs/clear').map((c) => c.body))
+    .toEqual([{ date: TODAY }]);
   expect(await page.evaluate(() => localStorage.getItem('pitwall:run'))).toBeNull();
   await page.getByRole('button', { name: 'Clear my run today' }).click();
   await expect(page.getByText(`You have no run on ${TODAY}.`)).toBeVisible();

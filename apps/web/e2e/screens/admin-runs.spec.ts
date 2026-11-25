@@ -17,7 +17,9 @@ test('the day’s runs, and the search', async ({ page }) => {
   const api = await fakeAdmin(page);
   await signIn(page);
   await open(page);
-  expect(api.calls('GET', '/api/admin/runs').map((c) => c.query)).toEqual([`date=${TODAY}`]);
+  await expect
+    .poll(() => api.calls('GET', '/api/admin/runs').map((c) => c.query))
+    .toEqual([`date=${TODAY}`]);
   await expect(page.getByLabel('Date (UTC)')).toHaveValue(TODAY);
   await expect(page.getByRole('combobox', { name: 'Mode' })).toHaveValue('');
   await expect(rows(page)).toHaveCount(3);
@@ -38,15 +40,17 @@ test('the day’s runs, and the search', async ({ page }) => {
   await page.getByRole('combobox', { name: 'Mode' }).selectOption('Gauntlet');
   await page.getByRole('button', { name: 'Search' }).click();
   await expect(rows(page)).toHaveCount(1);
-  expect(api.calls('GET', '/api/admin/runs').at(-1)?.query).toBe(
-    `date=${TODAY}&player=bo&mode=gauntlet`,
-  );
+  await expect
+    .poll(() => api.calls('GET', '/api/admin/runs').at(-1)?.query)
+    .toBe(`date=${TODAY}&player=bo&mode=gauntlet`);
   page.once('dialog', (d) => d.accept());
   await page.getByRole('button', { name: `Re-verify every Gauntlet run on ${TODAY}` }).click();
   await expect(
     page.getByText(`Marked 1 Gauntlet runs on ${TODAY} for the nightly check.`),
   ).toBeVisible();
-  expect(api.last('POST', '/api/admin/runs/reverify')).toEqual({ date: TODAY, mode: 'gauntlet' });
+  await expect
+    .poll(() => api.last('POST', '/api/admin/runs/reverify'))
+    .toEqual({ date: TODAY, mode: 'gauntlet' });
 
   // No date: every day, for the player; the day's re-verify goes.
   await page.getByLabel('Date (UTC)').fill('');
@@ -82,7 +86,7 @@ test('re-verify every run on the day asks first', async ({ page }) => {
   await day.click();
   await asked;
   await expect(page.getByText(`Marked 3 runs on ${TODAY} for the nightly check.`)).toBeVisible();
-  expect(api.last('POST', '/api/admin/runs/reverify')).toEqual({ date: TODAY });
+  await expect.poll(() => api.last('POST', '/api/admin/runs/reverify')).toEqual({ date: TODAY });
 
   // In one mode.
   await page.getByRole('combobox', { name: 'Mode' }).selectOption('Daily');
@@ -93,7 +97,9 @@ test('re-verify every run on the day asks first', async ({ page }) => {
   await expect(
     page.getByText(`Marked 1 Daily runs on ${TODAY} for the nightly check.`),
   ).toBeVisible();
-  expect(api.last('POST', '/api/admin/runs/reverify')).toEqual({ date: TODAY, mode: 'daily' });
+  await expect
+    .poll(() => api.last('POST', '/api/admin/runs/reverify'))
+    .toEqual({ date: TODAY, mode: 'daily' });
 
   // Refused.
   api.fail('POST', '/api/admin/runs/reverify', { status: 429, error: 'rate-limited' });
@@ -131,7 +137,9 @@ test('a daily run: its calls, re-verify, delete (asks first)', async ({ page }) 
 
   await panel.getByRole('button', { name: 'Re-verify' }).click();
   await expect(panel.getByText('Marked 1 for the nightly check.')).toBeVisible();
-  expect(api.last('POST', '/api/admin/runs/reverify')).toEqual({ mode: 'daily', id: 'r1' });
+  await expect
+    .poll(() => api.last('POST', '/api/admin/runs/reverify'))
+    .toEqual({ mode: 'daily', id: 'r1' });
 
   let asked = nextDialog(page, false);
   await panel.getByRole('button', { name: 'Delete run' }).click();
@@ -143,7 +151,7 @@ test('a daily run: its calls, re-verify, delete (asks first)', async ({ page }) 
   await asked;
   await expect(panel.getByText('Run deleted.')).toBeVisible();
   await expect(panel.getByText('This run was deleted.')).toBeVisible();
-  expect(api.last('POST', '/api/admin/runs/delete')).toEqual({ id: 'r1' });
+  await expect.poll(() => api.last('POST', '/api/admin/runs/delete')).toEqual({ id: 'r1' });
   await expect(rows(page)).toHaveCount(2);
   await panel.getByRole('button', { name: 'Close' }).click();
   await expect(panel).toHaveCount(0);

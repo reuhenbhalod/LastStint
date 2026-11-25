@@ -77,10 +77,12 @@ test('publish and unpublish races; ten published unblocks the release', async ({
   const e9 = eraCard(page, 9);
   await e9.getByRole('button', { name: 'E9 Race 10: Draft' }).click();
   await expect(page.getByText('E9 Race 10 is published.')).toBeVisible();
-  expect(api.last('POST', '/api/admin/eras/race')).toEqual({
-    raceId: 'e9-race-10',
-    published: true,
-  });
+  await expect
+    .poll(() => api.last('POST', '/api/admin/eras/race'))
+    .toEqual({
+      raceId: 'e9-race-10',
+      published: true,
+    });
   await expect(e9.getByRole('button', { name: 'E9 Race 10: Published' })).toHaveAttribute(
     'aria-pressed',
     'true',
@@ -91,10 +93,12 @@ test('publish and unpublish races; ten published unblocks the release', async ({
 
   await e9.getByRole('button', { name: 'E9 Race 3: Published' }).click();
   await expect(page.getByText('E9 Race 3 is back to Draft.')).toBeVisible();
-  expect(api.last('POST', '/api/admin/eras/race')).toEqual({
-    raceId: 'e9-race-3',
-    published: false,
-  });
+  await expect
+    .poll(() => api.last('POST', '/api/admin/eras/race'))
+    .toEqual({
+      raceId: 'e9-race-3',
+      published: false,
+    });
   await expect(e9).toContainText('9 of 10 published');
   await expect(e9.getByRole('button', { name: 'Release now' })).toBeDisabled();
 });
@@ -108,14 +112,18 @@ test('release an era now, or set a date', async ({ page }) => {
   await date.fill('2027-02-01');
   await e10.getByRole('button', { name: 'Set date' }).click();
   await expect(page.getByText('Era 10 releases on 2027-02-01.')).toBeVisible();
-  expect(api.last('POST', '/api/admin/eras/release')).toEqual({ eraId: 10, at: '2027-02-01' });
+  await expect
+    .poll(() => api.last('POST', '/api/admin/eras/release'))
+    .toEqual({ eraId: 10, at: '2027-02-01' });
   await expect(e10).toContainText('Releases on 1 Feb 2027');
   // Scheduled now, so its races lock.
   await expect(e10.getByRole('button', { name: 'E10 Race 1: Published' })).toBeDisabled();
 
   await e10.getByRole('button', { name: 'Release now' }).click();
   await expect(page.getByText('Era 10 is released.')).toBeVisible();
-  expect(api.last('POST', '/api/admin/eras/release')).toEqual({ eraId: 10, at: 'now' });
+  await expect
+    .poll(() => api.last('POST', '/api/admin/eras/release'))
+    .toEqual({ eraId: 10, at: 'now' });
   await expect(e10.getByText('Released', { exact: true })).toBeVisible();
   await expect(e10.getByRole('button', { name: 'Release now' })).toBeDisabled();
   await expect(date).toHaveValue('2026-11-11');
@@ -142,11 +150,13 @@ test('a released era: moving it later asks first, earlier does not', async ({ pa
   await setDate.click();
   await asked;
   await expect(page.getByText('Era 8 releases on 2027-02-01.')).toBeVisible();
-  expect(api.last('POST', '/api/admin/eras/release')).toEqual({
-    eraId: 8,
-    at: '2027-02-01',
-    confirm: true,
-  });
+  await expect
+    .poll(() => api.last('POST', '/api/admin/eras/release'))
+    .toEqual({
+      eraId: 8,
+      at: '2027-02-01',
+      confirm: true,
+    });
   await expect(e8).toContainText('Releases on 1 Feb 2027');
 
   // A scheduled era moved earlier (to a past day): no question, no confirm flag.
@@ -157,7 +167,9 @@ test('a released era: moving it later asks first, earlier does not', async ({ pa
   await date.fill('2026-11-01');
   await setDate.click();
   await expect(page.getByText('Era 8 releases on 2026-11-01.')).toBeVisible();
-  expect(api.last('POST', '/api/admin/eras/release')).toEqual({ eraId: 8, at: '2026-11-01' });
+  await expect
+    .poll(() => api.last('POST', '/api/admin/eras/release'))
+    .toEqual({ eraId: 8, at: '2026-11-01' });
   expect(dialogs).toBe(0);
 });
 
@@ -175,11 +187,13 @@ test('clear a release asks first, then unlocks the races', async ({ page }) => {
   await e8.getByRole('button', { name: 'Clear release' }).click();
   await asked;
   await expect(page.getByText('Era 8 is back to Coming soon.')).toBeVisible();
-  expect(api.last('POST', '/api/admin/eras/release')).toEqual({
-    eraId: 8,
-    at: null,
-    confirm: true,
-  });
+  await expect
+    .poll(() => api.last('POST', '/api/admin/eras/release'))
+    .toEqual({
+      eraId: 8,
+      at: null,
+      confirm: true,
+    });
   await expect(e8).toContainText('Coming soon');
   await expect(e8.getByRole('button', { name: 'Clear release' })).toHaveCount(0);
   await expect(e8.getByRole('button', { name: 'E8 Race 1: Published' })).toBeEnabled();

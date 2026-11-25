@@ -33,16 +33,16 @@ test('the health check, Refresh and Re-pin stale days', async ({ page }) => {
   api.state.today.runs.total = 13;
   await page.getByRole('button', { name: 'Refresh' }).click();
   await expect(tile(page, 'Runs today')).toHaveText('13');
-  expect(api.calls('GET', '/api/admin/today')).toHaveLength(2);
+  await expect.poll(() => api.calls('GET', '/api/admin/today')).toHaveLength(2);
 
   // Re-pin: the day without runs is re-pinned, the one with runs left; the list reloads.
   await page.getByRole('button', { name: 'Re-pin stale days' }).click();
   await expect(page.getByText('Re-pinned 1 day(s); 1 with runs left as they were.')).toBeVisible();
-  expect(api.calls('POST', '/api/admin/repin').map((c) => c.body)).toEqual([{}]);
+  await expect.poll(() => api.calls('POST', '/api/admin/repin').map((c) => c.body)).toEqual([{}]);
   await expect(page.getByRole('listitem')).toHaveText([
     '2026-11-13 · Canada 2022 · 1 runs (kept as it is)',
   ]);
-  expect(api.calls('GET', '/api/admin/today')).toHaveLength(3);
+  await expect.poll(() => api.calls('GET', '/api/admin/today')).toHaveLength(3);
 
   // A failed re-pin says why.
   api.fail('POST', '/api/admin/repin', { status: 500, error: 'db-error' });
@@ -108,11 +108,13 @@ test('set an announcement with a tone and an end time, then clear it', async ({ 
   await ends.fill('2026-11-12T06:00');
   await set.click();
   await expect(page.getByText('Announcement set.')).toBeVisible();
-  expect(api.last('POST', '/api/admin/announcement')).toEqual({
-    text: 'Servers move tonight.',
-    tone: 'warning',
-    endsAt: '2026-11-12T06:00:00.000Z',
-  });
+  await expect
+    .poll(() => api.last('POST', '/api/admin/announcement'))
+    .toEqual({
+      text: 'Servers move tonight.',
+      tone: 'warning',
+      endsAt: '2026-11-12T06:00:00.000Z',
+    });
   await expect(showing).toContainText(
     'Servers move tonight. (warning, until 2026-11-12 06:00 UTC)',
   );
@@ -124,7 +126,9 @@ test('set an announcement with a tone and an end time, then clear it', async ({ 
   // Clear.
   await showing.getByRole('button', { name: 'Clear' }).click();
   await expect(page.getByText('Announcement cleared.')).toBeVisible();
-  expect(api.calls('POST', '/api/admin/announcement/clear').map((c) => c.body)).toEqual([{}]);
+  await expect
+    .poll(() => api.calls('POST', '/api/admin/announcement/clear').map((c) => c.body))
+    .toEqual([{}]);
   await expect(showing).toContainText('No announcement.');
   await expect(showing.getByRole('button', { name: 'Clear' })).toHaveCount(0);
 });

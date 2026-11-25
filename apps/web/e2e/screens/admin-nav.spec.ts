@@ -1,6 +1,7 @@
 // The admin page's tab bar and header (docs/test-suite-spec.md S3): from every tab, every tab
 // link opens its tab (marked as the open one, with its own content), and the header's two links
-// go back to the game. One test per tab, so they run side by side.
+// go back to the game. One test per tab, so they run side by side. The Versus tab is left out:
+// Versus isn't in the first release (docs/test-suite-spec.md D2).
 import { expect, test } from '../coverage.js';
 import { STUB_PAGE, fakeAdmin, openTab, signIn } from './adminApi.js';
 
@@ -10,7 +11,6 @@ const TABS = [
   { label: 'Eras', href: '/admin/eras', heading: 'Eras' },
   { label: 'Runs', href: '/admin/runs', heading: 'Runs' },
   { label: 'Players', href: '/admin/players', heading: 'Players' },
-  { label: 'Versus', href: '/admin/versus', heading: 'Versus' },
   { label: 'Stats', href: '/admin/stats', heading: 'Stats' },
   { label: 'Tickets', href: '/admin/tickets', heading: 'Tickets' },
   { label: 'Log', href: '/admin/log', heading: 'Log' },

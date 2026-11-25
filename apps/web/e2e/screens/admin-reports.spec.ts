@@ -1,6 +1,7 @@
 // The admin page's read-only tabs (docs/test-suite-spec.md S3): Stats (every section, the
-// empty tables, Refresh, an error), Log (the entries, the Action filter, Load older, empty, an
-// error) and Versus (the live rooms and recent matches, read only: Refresh, empty, an error).
+// empty tables, Refresh, an error) and Log (the entries, the Action filter, Load older, empty, an
+// error). Versus isn't in the first release (docs/test-suite-spec.md D2), so its tab isn't tested.
+// admin-audit.spec.ts checks each edit reaching the Log.
 import type { Page } from '@playwright/test';
 import { expect, test } from '../coverage.js';
 import { EMAIL, TODAY, fakeAdmin, openTab, signIn } from './adminApi.js';
@@ -69,7 +70,7 @@ test('Stats: every section, Refresh, empty tables and an error', async ({ page }
   await expect(page.getByRole('table')).toHaveCount(0);
   await expect(tile(page, 'Best run')).toHaveText('None yet');
   await expect(tile(page, 'Of them signed in')).toHaveText('0%');
-  expect(api.calls('GET', '/api/admin/stats')).toHaveLength(2);
+  await expect.poll(() => api.calls('GET', '/api/admin/stats')).toHaveLength(2);
 
   api.fail('GET', '/api/admin/stats', { status: 500, error: 'db-error' });
   await page.getByRole('button', { name: 'Refresh' }).click();
@@ -117,12 +118,12 @@ test('Log: the entries, the Action filter, empty and an error', async ({ page, i
   await expect(action).toHaveValue('');
   await action.selectOption('Release era');
   await expect(rows).toHaveCount(1);
-  expect(api.calls('GET', '/api/admin/log').at(-1)?.query).toBe('action=release');
+  await expect.poll(() => api.calls('GET', '/api/admin/log').at(-1)?.query).toBe('action=release');
   await action.selectOption('Delete ticket');
   await expect(page.getByText('No changes logged yet.')).toBeVisible();
   await action.selectOption('All');
   await expect(rows).toHaveCount(4);
-  expect(api.calls('GET', '/api/admin/log').at(-1)?.query).toBe('');
+  await expect.poll(() => api.calls('GET', '/api/admin/log').at(-1)?.query).toBe('');
 
   api.fail('GET', '/api/admin/log', { status: 500, error: 'db-error' });
   await action.selectOption('Schedule');
@@ -146,53 +147,7 @@ test('Log: Load older pages back 200 at a time', async ({ page }) => {
   await expect(rows.last()).toContainText('p6 hidden from leaderboards');
   await page.getByRole('button', { name: 'Load older' }).click();
   await expect(rows).toHaveCount(205);
-  expect(api.calls('GET', '/api/admin/log').at(-1)?.query).toBe('before=6');
+  await expect.poll(() => api.calls('GET', '/api/admin/log').at(-1)?.query).toBe('before=6');
   await expect(rows.last()).toContainText('p1 hidden from leaderboards');
   await expect(page.getByRole('button', { name: 'Load older' })).toHaveCount(0);
-});
-
-test('Versus: live rooms and recent matches, read only', async ({ page }) => {
-  const api = await fakeAdmin(page);
-  await signIn(page);
-  await openTab(page, '/admin/versus');
-  await expect(page.getByRole('heading', { name: 'Live rooms (2)' })).toBeVisible();
-  expect(await table(page, 0)).toEqual([
-    ['QWER', 'Monza', 'Racing', 'Alex, Sam', '4', `${TODAY} 09:00`],
-    ['ZXCV', 'not-a-track', 'Waiting for a player', '—', '0', `${TODAY} 09:30`],
-  ]);
-  expect(await table(page, 1)).toEqual([
-    [
-      `${TODAY} 08:03`,
-      'ABCD',
-      'Bahrain',
-      'Alex (Bullet, soft) vs Sam (Glider, medium)',
-      'Alex won by 1.4 s',
-      '2',
-    ],
-    [`${TODAY} 07:01`, 'EFGH', 'Monza', 'Kim vs', 'Player 2 won (Kim left)', '0'],
-    [`${TODAY} 06:04`, 'IJKL', 'Monza', 'Lee vs Max', 'No result', '1'],
-  ]);
-  // Nothing on the tab changes anything.
-  await expect(page.getByRole('main').getByRole('button')).toHaveText(['Refresh']);
-
-  api.state.versus = { rooms: [], matches: [] };
-  await page.getByRole('button', { name: 'Refresh' }).click();
-  await expect(page.getByText('No rooms open now.')).toBeVisible();
-  await expect(page.getByText('No finished matches yet.')).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Live rooms (0)' })).toBeVisible();
-  expect(api.sent.filter((s) => s.method !== 'GET')).toEqual([]);
-
-  api.fail('GET', '/api/admin/versus', { status: 500, error: 'db-error' });
-  await page.getByRole('button', { name: 'Refresh' }).click();
-  await expect(page.getByText('The server said db-error (500).')).toBeVisible();
-});
-
-test('Versus loading', async ({ page }) => {
-  const api = await fakeAdmin(page);
-  await signIn(page);
-  const release = api.hold('GET', '/api/admin/versus');
-  await openTab(page, '/admin/versus');
-  await expect(page.getByText('Loading…')).toBeVisible();
-  release();
-  await expect(page.getByRole('heading', { name: 'Live rooms (2)' })).toBeVisible();
 });

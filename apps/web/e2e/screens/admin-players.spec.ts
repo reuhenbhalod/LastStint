@@ -59,7 +59,7 @@ test('summary, search, every sort and Refresh', async ({ page }) => {
   release();
   await expect(page.getByRole('button', { name: 'Refresh' })).toBeEnabled();
   await expect(stat(page, 'Accounts')).toHaveText('4');
-  expect(api.calls('GET', '/api/admin/players')).toHaveLength(2);
+  await expect.poll(() => api.calls('GET', '/api/admin/players')).toHaveLength(2);
 });
 
 test('a capped list, no accounts and a load error', async ({ page }) => {
@@ -108,7 +108,9 @@ test('a player: rename, clear the name, a refused name', async ({ page }) => {
   await name.fill('Quick Ann');
   await save.click();
   await expect(panel.getByText('Display name set to Quick Ann.')).toBeVisible();
-  expect(api.last('POST', '/api/admin/players/p1/name')).toEqual({ displayName: 'Quick Ann' });
+  await expect
+    .poll(() => api.last('POST', '/api/admin/players/p1/name'))
+    .toEqual({ displayName: 'Quick Ann' });
   await expect(panel.getByRole('heading', { name: 'Quick Ann' })).toBeVisible();
   // The list reloads behind the panel.
   await page.getByRole('button', { name: 'Quick Ann' }).click();
@@ -123,7 +125,9 @@ test('a player: rename, clear the name, a refused name', async ({ page }) => {
 
   await panel.getByRole('button', { name: 'Clear name' }).click();
   await expect(panel.getByText('Display name cleared.')).toBeVisible();
-  expect(api.last('POST', '/api/admin/players/p1/name')).toEqual({ displayName: '' });
+  await expect
+    .poll(() => api.last('POST', '/api/admin/players/p1/name'))
+    .toEqual({ displayName: '' });
   await expect(panel.getByRole('heading', { name: 'Ann' })).toBeVisible();
   await expect(panel.getByRole('button', { name: 'Clear name' })).toBeDisabled();
   await expect(name).toHaveValue('');
@@ -143,14 +147,16 @@ test('a player: hide and show, their runs, Close', async ({ page }) => {
   await expect(
     panel.getByText('Hidden from every leaderboard. They can still play.'),
   ).toBeVisible();
-  expect(api.last('POST', '/api/admin/players/p1/hide')).toEqual({ hidden: true });
+  await expect.poll(() => api.last('POST', '/api/admin/players/p1/hide')).toEqual({ hidden: true });
   await expect(panel.getByRole('heading', { name: /^Fast Ann\s*Hidden$/ })).toBeVisible();
   // The list marks them too; opening them from it keeps the panel on them.
   await page.getByRole('button', { name: /^Fast Ann\s*Hidden$/ }).click();
   await expect(panel.getByRole('button', { name: 'Show on leaderboards' })).toBeVisible();
   await panel.getByRole('button', { name: 'Show on leaderboards' }).click();
   await expect(panel.getByText('Shown on the leaderboards again.')).toBeVisible();
-  expect(api.last('POST', '/api/admin/players/p1/hide')).toEqual({ hidden: false });
+  await expect
+    .poll(() => api.last('POST', '/api/admin/players/p1/hide'))
+    .toEqual({ hidden: false });
   await expect(page.getByRole('button', { name: 'Fast Ann', exact: true })).toBeVisible();
 
   // Their runs, without the player column; open one and re-verify it.
@@ -167,7 +173,9 @@ test('a player: hide and show, their runs, Close', async ({ page }) => {
   await expect(run).toContainText('Daily: Abu Dhabi 2021');
   await run.getByRole('button', { name: 'Re-verify' }).click();
   await expect(run.getByText('Marked 1 for the nightly check.')).toBeVisible();
-  expect(api.last('POST', '/api/admin/runs/reverify')).toEqual({ mode: 'daily', id: 'r1' });
+  await expect
+    .poll(() => api.last('POST', '/api/admin/runs/reverify'))
+    .toEqual({ mode: 'daily', id: 'r1' });
   // Delete asks first; dismissed, nothing is sent.
   page.once('dialog', (d) => d.dismiss());
   await run.getByRole('button', { name: 'Delete run' }).click();

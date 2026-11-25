@@ -1,9 +1,10 @@
 // A fake admin API for the admin screen specs (docs/test-suite-spec.md S3, L2): every
 // /api/admin/* route the admin page calls, plus /api/announcement, answered from state held in the
 // test, so a change (publish a race, set a day, edit a ticket) shows on the next load the way the
-// Worker would show it. Every request is logged (method, path, query, body, Authorization) so a
-// test checks what a control sent. `fail` makes the next matching call answer with an error the
-// Worker's way ({ error, detail }); `hold` keeps a call waiting, for loading and busy states.
+// Worker would show it, and is written to the Log the way the Worker logs it (adminLog.ts).
+// Every request is logged (method, path, query, body, Authorization) so a test checks what a
+// control sent. `fail` makes the next matching call answer with an error the Worker's way
+// ({ error, detail }); `hold` keeps a call waiting, for loading and busy states.
 // Nothing leaves the machine: requests to any other origin are aborted, and the game's own
 // pages ('/', '/?race=...') are answered with a stub page so a link out of the admin page can be
 // followed without loading the game.
@@ -633,6 +634,12 @@ export async function fakeAdmin(page: Page, edit?: (s: State) => void): Promise<
   };
 }
 
+/** Log a change the way the Worker does (adminLog.ts): newest first, the same detail shapes. */
+function audit(s: State, action: string, detail: unknown) {
+  const id = Math.max(0, ...s.log.entries.map((e) => e.id)) + 1;
+  s.log.entries.unshift({ id, at: new Date(NOW).toISOString(), email: s.email, action, detail });
+}
+
 /** The Worker's answers, from (and changing) the state. undefined: no such route (404). */
 function answer(
   s: State,
@@ -654,9 +661,11 @@ function answer(
       endsAt: (b.endsAt as string | null) ?? null,
       createdAt: new Date(NOW).toISOString(),
     };
+    audit(s, 'announcement', { set: s.announcement });
     return { announcement: s.announcement };
   }
   if (path === '/api/admin/announcement/clear' && method === 'POST') {
+    audit(s, 'announcement', { cleared: s.announcement?.id ?? null });
     s.announcement = null;
     return { announcement: null };
   }
@@ -666,6 +675,7 @@ function answer(
     const skipped = s.today.stale.filter((d) => d.runs > 0).map((d) => d.date);
     s.today.stale = s.today.stale.filter((d) => d.runs > 0);
     for (const d of s.schedule.days) if (repinned.includes(d.date)) d.current = true;
+    audit(s, 'repin', { repinned, skipped });
     return { repinned, skipped };
   }
   if (path === '/api/admin/schedule' && get) return s.schedule;
@@ -682,18 +692,22 @@ function answer(
       return day(date, last.number + i + 1, { raceId: (b.raceId as string) ?? 'abu-dhabi-2021' });
     });
     s.schedule.days.push(...added);
-    return { added: added.map(({ date, number, raceId }) => ({ date, number, raceId })) };
+    const out = added.map(({ date, number, raceId }) => ({ date, number, raceId }));
+    audit(s, 'schedule', { from: b.from, days, raceId: b.raceId ?? null, added: out });
+    return { added: out };
   }
   if (path === '/api/admin/day' && method === 'POST') {
     const d = s.schedule.days.find((x) => x.date === b.date);
     if (!d) throw new Refused(404, 'no-day');
     if (d.runs > 0) throw new Refused(409, 'day-has-runs', `${d.date} has runs`);
     d.raceId = String(b.raceId);
+    audit(s, 'day', { date: d.date, raceId: d.raceId });
     return { date: d.date, raceId: d.raceId };
   }
   if (path === '/api/admin/runs/clear' && method === 'POST') {
     const cleared = s.ownRun ? 1 : 0;
     s.ownRun = false;
+    audit(s, 'clear-run', { date: b.date, cleared });
     return { cleared };
   }
 
@@ -711,6 +725,7 @@ function answer(
     }
     r.published = !!b.published;
     e.published = e.races.filter((x) => x.published).length;
+    audit(s, 'publish', { raceId: r.raceId, eraId: e.id, published: r.published });
     return { raceId: r.raceId, published: r.published };
   }
   if (path === '/api/admin/eras/release' && method === 'POST') {
@@ -736,6 +751,7 @@ function answer(
     if (at && live && Date.parse(at) > NOW && !b.confirm) {
       throw new Refused(409, 'confirm-needed', 'moving a released era later needs confirmation');
     }
+    audit(s, 'release', { eraId: e.id, from: e.releasedAt, to: at });
     e.releasedAt = at;
     e.status = !at ? 'coming-soon' : Date.parse(at) <= NOW ? 'released' : 'scheduled';
     return { eraId: e.id, releasedAt: at };
@@ -763,13 +779,17 @@ function answer(
     return d;
   }
   if (path === '/api/admin/runs/reverify' && method === 'POST') {
-    if (b.id) return { marked: 1 };
-    return {
-      marked: s.runs.filter((r) => r.date === b.date && (!b.mode || r.mode === b.mode)).length,
-    };
+    const marked = b.id
+      ? 1
+      : s.runs.filter((r) => r.date === b.date && (!b.mode || r.mode === b.mode)).length;
+    audit(s, 'reverify', { ...b, marked });
+    return { marked };
   }
   if (path === '/api/admin/runs/delete' && method === 'POST') {
-    s.runs = s.runs.filter((r) => !(r.mode === 'daily' && r.id === b.id));
+    const gone = s.runs.find((r) => r.mode === 'daily' && r.id === b.id);
+    if (!gone) throw new Refused(404, 'no-run');
+    audit(s, 'delete-run', { id: gone.id, date: gone.date, anonId: 'anon', score: gone.score });
+    s.runs = s.runs.filter((r) => r !== gone);
     delete s.details[`daily/${String(b.id)}`];
     return { ok: true };
   }
@@ -796,11 +816,13 @@ function answer(
       if (name && !/^[A-Za-z0-9 ]{3,20}$/.test(name)) {
         throw new Refused(400, 'bad-name', 'a display name is 3-20 letters, digits or spaces');
       }
+      audit(s, 'player-name', { id: p.id, from: p.displayName, to: name });
       p.displayName = name;
       return { id: p.id, displayName: name };
     }
     if (pl[2] === '/hide' && method === 'POST') {
       p.hidden = !!b.hidden;
+      audit(s, 'hide', { id: p.id, hidden: p.hidden });
       return { id: p.id, hidden: p.hidden };
     }
   }
@@ -817,6 +839,7 @@ function answer(
       updatedAt: NOW,
     });
     s.tickets.tickets.push(t);
+    audit(s, 'ticket-create', { id: t.id, title: t.title });
     return { ticket: t };
   }
   const tk = /^\/api\/admin\/tickets\/(\d+)$/.exec(path);
@@ -824,12 +847,17 @@ function answer(
     const t = s.tickets.tickets.find((x) => x.id === Number(tk[1]));
     if (!t) throw new Refused(404, 'not-found', `no ticket ${tk[1]}`);
     if (method === 'PATCH') {
+      const from = t.status;
       Object.assign(t, b, { updatedAt: NOW });
       if (b.status) t.completedAt = b.status === 'done' ? NOW : null;
+      if (t.status !== from) {
+        audit(s, 'ticket-status', { id: t.id, title: t.title, from, to: t.status });
+      }
       return { ticket: t };
     }
     if (method === 'DELETE') {
       s.tickets.tickets = s.tickets.tickets.filter((x) => x !== t);
+      audit(s, 'ticket-delete', { id: t.id });
       return { ok: true };
     }
   }
