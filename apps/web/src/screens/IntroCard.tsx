@@ -324,12 +324,8 @@ export function IntroCard({
               )}
               <p className="eyebrow m-0 flex items-center gap-2 !text-[var(--you)]">
                 <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-[var(--you)]" />
-                {source === 'survivor'
-                  ? `Gauntlet · round ${number}`
-                  : number
-                    ? `Daily race #${number}`
-                    : 'Daily race'}{' '}
-                · lap {takeoverLap} of {totalLaps}
+                {source === 'survivor' ? `Gauntlet · round ${number}` : 'Daily race'} · lap{' '}
+                {takeoverLap} of {totalLaps}
               </p>
               <h1 className="m-0 flex flex-col gap-3">
                 <span className="disp wide text-[52px] leading-[0.9] sm:text-[76px]">{title}</span>
