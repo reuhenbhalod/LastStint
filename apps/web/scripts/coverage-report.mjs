@@ -31,10 +31,19 @@ if (!events.length) {
 /** route -> "role: name" -> { projects, used, tests } */
 const routes = new Map();
 const unnamed = new Map();
+/** route -> lower-cased key -> the key as first seen */
+const spelling = new Map();
 for (const e of events) {
-  const key = `${e.role}: ${e.name || '(no name)'}`;
+  // Names match without case, as getByRole's do: a label styled to capitals ("push" shown as
+  // "Push") is one control. The first spelling seen is the one listed.
+  const shown = `${e.role}: ${e.name || '(no name)'}`;
+  const folded = shown.toLowerCase();
   if (!routes.has(e.route)) routes.set(e.route, new Map());
   const controls = routes.get(e.route);
+  if (!spelling.has(e.route)) spelling.set(e.route, new Map());
+  const spell = spelling.get(e.route);
+  if (!spell.has(folded)) spell.set(folded, shown);
+  const key = spell.get(folded);
   if (!controls.has(key)) controls.set(key, { projects: new Set(), used: false, tests: new Set() });
   const c = controls.get(key);
   c.projects.add(e.project);
