@@ -14,7 +14,9 @@ const skipEras = process.env.E2E_SKIP_ERAS === '1';
 
 export default defineConfig({
   testDir: 'e2e',
-  testIgnore: skipEras ? /eras-[^/]*\.spec\.ts$/ : undefined,
+  // e2e/flows/ runs against a local Worker and D1 with its own config (playwright.flows.config.ts,
+  // `pnpm e2e:flows`), so it's left out here.
+  testIgnore: [/(^|\/)flows\//, ...(skipEras ? [/eras-[^/]*\.spec\.ts$/] : [])],
   timeout: 300_000,
   use: { baseURL: `http://localhost:${port}`, actionTimeout: 30_000 },
   projects: [

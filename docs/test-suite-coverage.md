@@ -6,245 +6,471 @@ way `getByRole` finds it; numbers in names are `#`. "Pressed" means a test click
 changed it. Controls a test never brings on screen are missing here; the source table at the
 end shows where they live.
 
-**144 of 707 controls seen on screen are pressed by a test (20%),
-across 15 routes. 0 controls have no accessible name.**
+**826 of 1209 controls seen on screen are pressed by a test (68%),
+across 22 routes. 0 controls have no accessible name.**
 
 ## By route
 
-### `/` (19 of 119 pressed)
+### `/` (138 of 212 pressed)
 
 | Control | Pressed | On | Pressed by |
 |---|---|---|---|
-| button: (a row of: Leaders) | **no** | desktop, phone |  |
-| button: (a row of: Standings) | **no** | desktop, phone |  |
-| button: #× | yes | desktop, phone | daily.spec.ts, defend.spec.ts |
-| button: #Brake late, make it wideContact and track-limits risk · he’s expecting it nowRi | **no** | phone |  |
-| button: #Brake late, make it wideContact and track-limits riskRisky | **no** | phone |  |
-| button: #Clean exit, attack at the nextBetter run out of the chicaneSafer | **no** | phone |  |
-| button: #Cover the inside under brakingShut the door, slower exitBalanced | **no** | phone |  |
-| button: #Cut back at the second apexGive him the first part, win the exitBalanced | **no** | phone |  |
-| button: #Get a better exit, go next lapSlingshot onto the straight next timeSafer | **no** | desktop, phone |  |
-| button: #Late-brake up the insideClassic hairpin lungeRisky | **no** | desktop, phone |  |
-| button: #Let him goSave the tyresGives way | **no** | phone |  |
-| button: #Lunge into the first apexBrake as late as you dareRisky | **no** | phone |  |
-| button: #Overtake boostInside line, spends #% batterySafer | **no** | desktop, phone |  |
-| button: #Square it off on the exitNormal line, watch the switchbackSafer | **no** | phone |  |
-| button: #Switchback on the exitLet him turn in, cut back under himBalanced | **no** | desktop, phone |  |
-| button: A · No stop…Stay out to the flagL#L# | **no** | desktop, phone |  |
-| button: A · No stopEngineer’s pick#%Stay out to the flagL#L# | yes | desktop, phone | daily.spec.ts |
-| button: A · One stop…hards on lap # · standard, then pushPushL#L#L# | **no** | phone |  |
-| button: ALB: details | **no** | phone |  |
+| button: (a row of: Leaders) | yes | desktop, phone | screens/daily-race.spec.ts |
+| button: (a row of: Race plan) | yes | desktop, phone | screens/daily-race.spec.ts |
+| button: (a row of: Standings) | yes | desktop, phone | screens/daily-race.spec.ts |
+| button: #× | yes | desktop, phone | daily.spec.ts, defend.spec.ts, screens/daily-calls.spec.ts, screens/daily-race.spec.ts |
+| button: #ALO+# | **no** | desktop, phone |  |
+| button: #ALOOUT | **no** | desktop, phone |  |
+| button: #BOT+# | **no** | desktop, phone |  |
+| button: #GAS+# | **no** | desktop, phone |  |
+| button: #GASPIT | **no** | desktop, phone |  |
+| button: #HAD+# | **no** | desktop |  |
+| button: #OCO+# | **no** | desktop, phone |  |
+| button: #SAI+# | **no** | desktop |  |
+| button: + Add a stop | yes | desktop, phone | screens/daily-race.spec.ts |
+| button: A · No stop, #% | yes | desktop, phone | screens/daily-race.spec.ts |
+| button: A · No stop, #%, engineer’s pick | yes | desktop, phone | daily.spec.ts |
+| button: A · No stop, chance being worked out | **no** | desktop, phone |  |
+| button: A · One stop, #% | **no** | desktop, phone |  |
+| button: A · One stop, #%, engineer’s pick | **no** | desktop, phone |  |
+| button: A · One stop, chance being worked out | **no** | desktop, phone |  |
+| button: ALB: details | **no** | desktop, phone |  |
 | button: ALO: details | **no** | desktop, phone |  |
-| button: Attack | yes | desktop, phone | daily.spec.ts |
-| button: B · One stop…hards on lap # · standard, then pushPushL#L# | **no** | desktop, phone |  |
-| button: B · One stop…mediums on lap #L#L#L# | **no** | phone |  |
-| button: Back | **no** | desktop, phone |  |
-| button: Back off at the exits#About # s a lap, far fewer strikes | **no** | phone |  |
+| button: ANT: details | **no** | desktop, phone |  |
+| button: Attack | yes | desktop, phone | daily.spec.ts, screens/daily-calls.spec.ts, screens/daily-race.spec.ts |
+| button: B · One stop, #% | **no** | desktop, phone |  |
+| button: B · One stop, #%, engineer’s pick | yes | desktop, phone | screens/daily-calls.spec.ts, screens/daily-race.spec.ts, screens/daily-result.spec.ts |
+| button: B · One stop, chance being worked out | **no** | desktop, phone |  |
+| button: Back | yes | desktop, phone | screens/daily-calls.spec.ts, screens/daily-intro.spec.ts |
+| button: Back off at the exits | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: Back to the race · lap # | yes | desktop | screens/daily-race.spec.ts |
+| button: Back: close How it works | yes | desktop, phone | screens/daily-intro.spec.ts, screens/pages.spec.ts |
+| button: balanced | yes | desktop, phone | screens/daily-race.spec.ts |
+| button: BEA: details | **no** | desktop, phone |  |
+| button: BOR: details | **no** | desktop, phone |  |
 | button: BOT: details | **no** | desktop, phone |  |
-| button: Box | yes | desktop, phone | daily.spec.ts |
-| button: Box as planned | **no** | phone |  |
-| button: Box next lap, hards | **no** | phone |  |
-| button: Box next lap, mediums | **no** | desktop, phone |  |
-| button: Box next lap, softs | **no** | desktop, phone |  |
-| button: Build your own | **no** | desktop, phone |  |
-| button: C · Two stops…softs on lap #, mediums on lap # · standard, then standard, then p | **no** | phone |  |
-| button: C · Two stops…softs on lap #, softs on lap # · standard, then standard, then pus | **no** | desktop, phone |  |
-| button: Calls | **no** | phone |  |
-| button: Car | **no** | phone |  |
-| button: Change plan | **no** | phone |  |
-| button: ClassificationShow | **no** | desktop, phone |  |
-| button: Close driver details | yes | desktop, phone | daily.spec.ts |
-| button: Defend hard | **no** | desktop, phone |  |
-| button: Drop back, cool the tyres#Back off a second, go again fresh | **no** | phone |  |
-| button: Follow car | **no** | desktop, phone |  |
+| button: Box | yes | desktop, phone | daily.spec.ts, screens/daily-calls.spec.ts |
+| button: Box as planned | yes | desktop, phone | screens/daily-race.spec.ts |
+| button: Box next lap | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: Box next lap, hards | **no** | desktop, phone |  |
+| button: Box next lap, inters | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: Box next lap, mediums | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: Box next lap, softs | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: Box, hards | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: Box, softs | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: Brake late, make it wide | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: Build your own | yes | desktop, phone | screens/daily-race.spec.ts |
+| button: C · One stop, #% | yes | desktop, phone | screens/daily-race.spec.ts |
+| button: C · One stop, #%, engineer’s pick | **no** | desktop, phone |  |
+| button: C · One stop, chance being worked out | **no** | desktop, phone |  |
+| button: C · Two stops, #% | **no** | desktop, phone |  |
+| button: C · Two stops, chance being worked out | **no** | desktop, phone |  |
+| button: Calls | yes | phone | screens/daily-race.spec.ts |
+| button: Cancel | yes | desktop, phone | screens/daily-race.spec.ts |
+| button: Car | yes | phone | screens/daily-race.spec.ts |
+| button: Change | yes | desktop, phone | screens/daily-race.spec.ts |
+| button: Change plan | yes | desktop, phone | screens/daily-race.spec.ts |
+| button: ClassificationShow | yes | desktop, phone | screens/daily-result.spec.ts |
+| button: Clean exit, attack at the next | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: Close driver details | yes | desktop, phone | daily.spec.ts, screens/daily-race.spec.ts |
+| button: COL: details | **no** | desktop, phone |  |
+| button: Colapinto lets you by | yes | desktop, phone | screens/daily-race.spec.ts |
+| button: Cover the inside under braking | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: Cut back at the second apex | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: defend | yes | desktop, phone | screens/daily-calls.spec.ts, screens/daily-race.spec.ts |
+| button: Defend hard | yes | desktop, phone | screens/daily-calls.spec.ts, screens/daily-result.spec.ts |
+| button: deploy | yes | desktop, phone | screens/daily-race.spec.ts |
+| button: Dive up the inside | **no** | desktop, phone |  |
+| button: DOO: details | **no** | desktop, phone |  |
+| button: Drop back, cool the tyres | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: Flat out | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: Focus view | yes | desktop | screens/daily-race.spec.ts |
+| button: Follow car | yes | desktop, phone | screens/daily-race.spec.ts |
 | button: GAS: details | **no** | desktop, phone |  |
-| button: GIO: details | **no** | phone |  |
-| button: Go round him now#Gains # s, a small risk of contact | **no** | phone |  |
-| button: Go with plan A | yes | desktop, phone | daily.spec.ts, defend.spec.ts |
-| button: Got it | yes | desktop, phone | daily.spec.ts, eras-phone.spec.ts |
-| button: GRO: details | **no** | phone |  |
+| button: Get a better exit, go next lap | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: GIO: details | **no** | desktop, phone |  |
+| button: Go round him now | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: Go with plan A | yes | desktop, phone | daily.spec.ts, screens/daily-calls.spec.ts, screens/daily-race.spec.ts |
+| button: Go with plan B | yes | desktop, phone | screens/daily-calls.spec.ts, screens/daily-race.spec.ts, screens/daily-result.spec.ts |
+| button: Go with plan C | yes | desktop, phone | defend.spec.ts, screens/daily-calls.spec.ts, screens/daily-race.spec.ts |
+| button: Go with your plan | yes | desktop, phone | screens/daily-race.spec.ts |
+| button: Got it | yes | desktop, phone | daily.spec.ts, eras-phone.spec.ts, screens/daily-intro.spec.ts |
+| button: GRO: details | **no** | desktop, phone |  |
+| button: HAD: details | **no** | desktop, phone |  |
 | button: HAM: details | **no** | desktop, phone |  |
-| button: Hards | yes | desktop, phone | daily.spec.ts |
-| button: Hold the line | **no** | desktop, phone |  |
-| button: How it works | **no** | desktop, phone |  |
-| button: How to play | **no** | desktop, phone |  |
-| button: Keep ours | **no** | desktop, phone |  |
-| button: Keep the pace# | **no** | phone |  |
-| button: Keep the pressure on#Stay in his gearbox: his tyres overheat | **no** | phone |  |
-| button: Keep using the kerbs#Faster, risks the penalty | **no** | phone |  |
-| button: KVY: details | **no** | phone |  |
-| button: LastStint | yes | desktop, phone | daily.spec.ts |
+| button: Hards | yes | desktop, phone | daily.spec.ts, screens/daily-calls.spec.ts |
+| button: harvest | yes | desktop, phone | screens/daily-race.spec.ts |
+| button: HHards | yes | desktop, phone | screens/daily-race.spec.ts |
+| button: hold | yes | desktop, phone | screens/daily-race.spec.ts |
+| button: Hold the line | yes | desktop, phone | screens/daily-calls.spec.ts, screens/daily-race.spec.ts |
+| button: Hold up Alonso | yes | desktop, phone | screens/daily-race.spec.ts |
+| button: How it works | yes | desktop, phone | screens/daily-intro.spec.ts, screens/pages.spec.ts |
+| button: How to play | yes | desktop, phone | screens/daily-intro.spec.ts |
+| button: HUL: details | **no** | desktop, phone |  |
+| button: Inters | **no** | phone |  |
+| button: Keep ours | yes | desktop, phone | screens/daily-race.spec.ts |
+| button: Keep pushing | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: Keep the pace | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: Keep the pressure on | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: Keep using the kerbs | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: KUB: details | **no** | desktop, phone |  |
+| button: KVY: details | **no** | desktop, phone |  |
+| button: LastStint | yes | desktop, phone | daily.spec.ts, screens/daily-intro.spec.ts, screens/daily-result.spec.ts |
+| button: LastStintGasly’s race engineer · Alpine | yes | desktop | screens/daily-race.spec.ts |
 | button: LastStintHamilton’s race engineer · Mercedes | **no** | desktop |  |
+| button: LastStintLeclerc’s race engineer · Ferrari | **no** | desktop |  |
+| button: LastStintNorris’s race engineer · McLaren | **no** | desktop |  |
+| button: LastStintOcon’s race engineer · Alpine | **no** | desktop |  |
+| button: LastStintPiastri’s race engineer · McLaren | **no** | desktop |  |
+| button: LastStintRicciardo’s race engineer · RB | **no** | desktop |  |
+| button: LastStintSainz’s race engineer · Ferrari | **no** | desktop |  |
+| button: LastStintSainz’s race engineer · Williams | **no** | desktop |  |
 | button: LastStintVerstappen’s race engineer · Red Bull Racing | **no** | phone |  |
+| button: LastStintVettel’s race engineer · Ferrari | **no** | desktop |  |
 | button: LAT: details | **no** | desktop, phone |  |
+| button: Late-brake up the inside | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: LAW: details | **no** | desktop, phone |  |
 | button: LEC: details | **no** | desktop, phone |  |
-| button: Lift and coast#A bit slower, saves fuel and tyres | **no** | phone |  |
-| button: MAG: details | **no** | phone |  |
-| button: Manage the tyres | **no** | desktop, phone |  |
-| button: Manage# | **no** | phone |  |
+| button: Let Colapinto by | yes | desktop, phone | screens/daily-race.spec.ts |
+| button: Let him go | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: Lift & coast | yes | desktop, phone | screens/daily-race.spec.ts |
+| button: Lift and coast | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: Lunge into the first apex | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: MAG: details | **no** | desktop, phone |  |
+| button: manage | yes | desktop, phone | screens/daily-calls.spec.ts, screens/daily-race.spec.ts |
+| button: Manage the tyres | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: Manage them | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: MAZ: details | **no** | desktop, phone |  |
+| button: Mediums | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: MMediums | yes | desktop, phone | screens/daily-race.spec.ts |
 | button: MSC: details | **no** | desktop, phone |  |
-| button: Next | yes | desktop, phone | daily.spec.ts, eras-phone.spec.ts |
-| button: No, stay out#He’ll remember if he was right | **no** | phone |  |
+| button: Next | yes | desktop, phone | daily.spec.ts, eras-phone.spec.ts, screens/daily-intro.spec.ts |
+| button: No, save the tyres | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: No, stay out | yes | desktop, phone | screens/daily-calls.spec.ts |
 | button: NOR: details | **no** | desktop, phone |  |
-| button: Not yet#Save it later; run dry and it costs seconds a lap | **no** | phone |  |
+| button: normal | yes | desktop, phone | screens/daily-race.spec.ts |
+| button: Not yet | yes | desktop, phone | screens/daily-calls.spec.ts |
 | button: OCO: details | **no** | desktop, phone |  |
-| button: One more lap | **no** | phone |  |
+| button: One more lap | yes | desktop, phone | screens/daily-race.spec.ts |
+| button: overtake | yes | desktop, phone | screens/daily-race.spec.ts |
+| button: Overtake boost | yes | desktop, phone | screens/daily-calls.spec.ts |
 | button: PER: details | **no** | desktop, phone |  |
+| button: PIA: details | **no** | desktop, phone |  |
 | button: Plan | **no** | desktop, phone |  |
-| button: Plan · box L# | **no** | phone |  |
-| button: Plan · to the flag | **no** | desktop, phone |  |
-| button: Push and attack | **no** | desktop, phone |  |
-| button: Push now | yes | desktop, phone | daily.spec.ts, defend.spec.ts |
-| button: Push# | **no** | desktop, phone |  |
-| button: Radio | **no** | phone |  |
-| button: Radio sound off | **no** | desktop, phone |  |
-| button: RAI: details | **no** | phone |  |
+| button: Plan · box L# | yes | desktop, phone | screens/daily-race.spec.ts |
+| button: Plan · to the flag | yes | desktop, phone | screens/daily-race.spec.ts |
+| button: Push | yes | desktop, phone | screens/daily-calls.spec.ts, screens/daily-race.spec.ts |
+| button: Push and attack | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: Push now | yes | desktop, phone | daily.spec.ts, defend.spec.ts, screens/daily-calls.spec.ts, screens/daily-race.spec.ts, screens/daily-result.spec.ts |
+| button: Push on the exits | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: Race him normally | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: Radio | yes | phone | screens/daily-race.spec.ts |
+| button: Radio sound off | yes | desktop, phone | screens/daily-race.spec.ts |
+| button: Radio sound on | yes | desktop | screens/daily-race.spec.ts |
+| button: RAI: details | **no** | desktop, phone |  |
+| button: Release Alonso | yes | desktop, phone | screens/daily-race.spec.ts |
+| button: Retry | yes | desktop, phone | screens/daily-result.spec.ts |
 | button: RIC: details | **no** | desktop, phone |  |
-| button: RUS: details | **no** | phone |  |
+| button: Round the outside | **no** | desktop, phone |  |
+| button: Run this plan | yes | desktop, phone | screens/daily-race.spec.ts |
+| button: RUS: details | **no** | desktop, phone |  |
 | button: SAI: details | **no** | desktop, phone |  |
-| button: See how you did | yes | desktop, phone | daily.spec.ts, defend.spec.ts |
-| button: See your result | yes | desktop, phone | daily.spec.ts |
-| button: Share result | yes | desktop, phone | daily.spec.ts |
-| button: Show stats | **no** | desktop, phone |  |
-| button: Skip | yes | desktop, phone | defend.spec.ts |
-| button: Softs | yes | desktop, phone | daily.spec.ts |
-| button: Standard pace | **no** | desktop, phone |  |
-| button: Standings | **no** | phone |  |
-| button: Stay on plan# | **no** | phone |  |
-| button: Stay out | yes | desktop, phone | defend.spec.ts |
-| button: Steady# | **no** | desktop, phone |  |
+| button: SAR: details | **no** | desktop, phone |  |
+| button: Save it for later | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: Save them, defend the slow corners | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: See how you did | yes | desktop, phone | daily.spec.ts, defend.spec.ts, screens/daily-calls.spec.ts, screens/daily-race.spec.ts, screens/daily-result.spec.ts |
+| button: See your result | yes | desktop, phone | daily.spec.ts, screens/daily-intro.spec.ts, screens/daily-result.spec.ts |
+| button: Share result | yes | desktop, phone | daily.spec.ts, screens/daily-result.spec.ts |
+| button: Show stats | yes | desktop, phone | screens/daily-race.spec.ts |
+| button: Skip | yes | desktop, phone | defend.spec.ts, screens/daily-calls.spec.ts, screens/daily-intro.spec.ts, screens/daily-race.spec.ts, screens/daily-result.spec.ts |
+| button: Softs | yes | desktop, phone | daily.spec.ts, screens/daily-calls.spec.ts |
+| button: Square it off on the exit | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: SSofts | yes | desktop, phone | screens/daily-race.spec.ts |
+| button: standard | yes | desktop, phone | screens/daily-race.spec.ts |
+| button: Standard pace | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: Standings | yes | phone | screens/daily-race.spec.ts |
+| button: Stay on plan | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: Stay out | yes | desktop, phone | defend.spec.ts, screens/daily-calls.spec.ts |
+| button: Steady | yes | desktop, phone | screens/daily-calls.spec.ts |
 | button: STR: details | **no** | desktop, phone |  |
-| button: Switch | **no** | desktop, phone |  |
-| button: Take the Mercedes pit wall | yes | desktop, phone | daily.spec.ts, eras-phone.spec.ts |
+| button: Switch | yes | desktop, phone | screens/daily-race.spec.ts |
+| button: Switchback on the exit | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: Take the Alpine pit wall | yes | desktop, phone | screens/daily-calls.spec.ts, screens/daily-intro.spec.ts, screens/daily-race.spec.ts, screens/daily-result.spec.ts |
+| button: Take the Ferrari pit wall | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: Take the McLaren pit wall | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: Take the Mercedes pit wall | yes | desktop, phone | daily.spec.ts, eras-phone.spec.ts, screens/daily-calls.spec.ts |
+| button: Take the RB pit wall | yes | desktop, phone | screens/daily-calls.spec.ts |
 | button: Take the Red Bull Racing pit wall | yes | phone | defend.spec.ts |
-| button: Team radio | **no** | desktop, phone |  |
+| button: Take the Williams pit wall | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: Team radio | yes | desktop, phone | screens/daily-calls.spec.ts, screens/daily-race.spec.ts |
+| button: The engineer’s plans | yes | desktop, phone | screens/daily-race.spec.ts |
 | button: TSU: details | **no** | desktop, phone |  |
 | button: VER: details | **no** | desktop, phone |  |
 | button: VET: details | **no** | desktop, phone |  |
-| button: Wait, we’ll tell race control#He’ll move over; no risk | **no** | phone |  |
-| button: Yes, box for hards# | **no** | phone |  |
+| button: Wait for DRS, go next lap | **no** | desktop, phone |  |
+| button: Wait, we’ll tell race control | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: Wets | **no** | phone |  |
+| button: Yes, box for softs | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: Yes, push | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: ZHO: details | **no** | desktop, phone |  |
 | link: © OpenStreetMap contributors | **no** | desktop, phone |  |
-| link: Credits | **no** | desktop, phone |  |
-| link: Daily | **no** | desktop, phone |  |
-| link: Eras | **no** | desktop, phone |  |
-| link: Gauntlet | **no** | desktop, phone |  |
-| link: Keep racing: GauntletDifferent races back to back until you lose one | **no** | desktop, phone |  |
-| link: LastStint home | **no** | desktop, phone |  |
-| link: New here? Play the tutorial race· # min | **no** | desktop, phone |  |
+| link: Credits | yes | desktop, phone | screens/daily-intro.spec.ts |
+| link: Daily | yes | desktop, phone | screens/daily-intro.spec.ts |
+| link: Eras | yes | desktop, phone | screens/daily-intro.spec.ts |
+| link: Gauntlet | yes | desktop, phone | screens/daily-intro.spec.ts |
+| link: Keep racing: GauntletDifferent races back to back until you lose one | yes | desktop, phone | screens/daily-result.spec.ts |
+| link: LastStint home | yes | desktop, phone | screens/daily-intro.spec.ts |
+| link: New here? Play the tutorial race· # min | yes | desktop, phone | screens/daily-intro.spec.ts |
 | link: OpenStreetMap contributors | **no** | desktop, phone |  |
-| link: Privacy | **no** | desktop, phone |  |
-| link: Terms | **no** | desktop, phone |  |
+| link: Play the tutorial race (# min) | yes | desktop, phone | screens/daily-intro.spec.ts |
+| link: Privacy | yes | desktop, phone | screens/daily-intro.spec.ts |
+| link: Terms | yes | desktop, phone | screens/daily-intro.spec.ts |
+| link: Versus | **no** | desktop, phone |  |
+| slider: Stop # lap | yes | desktop, phone | screens/daily-race.spec.ts |
 
-### `/admin` (4 of 19 pressed)
+### `/admin` (21 of 21 pressed)
 
 | Control | Pressed | On | Pressed by |
 |---|---|---|---|
-| button: Re-pin stale days | **no** | phone |  |
-| button: Refresh | **no** | phone |  |
-| button: Set announcement | yes | phone | admin-tabs.spec.ts |
-| button: Sign out | **no** | phone |  |
-| combobox: ToneInfoWarning | **no** | phone |  |
-| link: Back to the game | **no** | phone |  |
-| link: Eras | **no** | phone |  |
-| link: LastStint | **no** | phone |  |
-| link: Log | **no** | phone |  |
-| link: Players | **no** | phone |  |
-| link: Runs | **no** | phone |  |
-| link: Schedule | yes | phone | admin-tabs.spec.ts |
-| link: Stats | **no** | phone |  |
-| link: Tickets | **no** | phone |  |
-| link: Today | **no** | phone |  |
+| button: Clear | yes | desktop, phone | screens/admin-audit.spec.ts, screens/admin-today.spec.ts |
+| button: Re-pin stale days | yes | desktop, phone | screens/admin-audit.spec.ts, screens/admin-today.spec.ts |
+| button: Refresh | yes | desktop, phone | screens/admin-today.spec.ts |
+| button: Set announcement | yes | desktop, phone | admin-tabs.spec.ts, screens/admin-audit.spec.ts, screens/admin-today.spec.ts |
+| button: Sign out | yes | desktop, phone | screens/admin-access.spec.ts, screens/admin-nav.spec.ts |
+| combobox: Tone | yes | desktop, phone | screens/admin-today.spec.ts |
+| link: Back to the game | yes | desktop, phone | screens/admin-access.spec.ts, screens/admin-nav.spec.ts |
+| link: Eras | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: LastStint | yes | desktop, phone | screens/admin-access.spec.ts, screens/admin-nav.spec.ts |
+| link: Log | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Players | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Runs | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Schedule | yes | desktop, phone | admin-tabs.spec.ts, screens/admin-audit.spec.ts, screens/admin-nav.spec.ts |
+| link: Stats | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Tickets | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Today | yes | desktop, phone | screens/admin-nav.spec.ts |
+| textbox: Ends (UTC, optional) | yes | desktop, phone | screens/admin-today.spec.ts |
+| textbox: New announcement | yes | desktop, phone | admin-tabs.spec.ts, screens/admin-audit.spec.ts, screens/admin-today.spec.ts |
+| textbox: New announcementBack soon. | yes | desktop, phone | screens/admin-audit.spec.ts, screens/admin-today.spec.ts |
+| textbox: New announcementServers move tonight. | yes | desktop, phone | admin-tabs.spec.ts, screens/admin-today.spec.ts |
+| textbox: New announcementxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx | yes | desktop, phone | screens/admin-today.spec.ts |
+
+### `/admin/eras` (16 of 17 pressed)
+
+| Control | Pressed | On | Pressed by |
+|---|---|---|---|
+| button: (a row of: Era #) | yes | desktop, phone | admin-tabs.spec.ts, screens/admin-audit.spec.ts, screens/admin-eras.spec.ts |
+| button: Clear release | yes | desktop, phone | screens/admin-eras.spec.ts |
+| button: Release now | yes | desktop, phone | screens/admin-audit.spec.ts, screens/admin-eras.spec.ts |
+| button: Set date | yes | desktop, phone | screens/admin-eras.spec.ts |
+| button: Sign out | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Back to the game | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Eras | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: LastStint | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Log | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Players | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Runs | yes | desktop, phone | admin-tabs.spec.ts, screens/admin-audit.spec.ts, screens/admin-nav.spec.ts |
+| link: Schedule | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Stats | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Tickets | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Today | yes | desktop, phone | screens/admin-nav.spec.ts |
 | link: Versus | **no** | phone |  |
-| textbox: Ends (UTC, optional) | **no** | phone |  |
-| textbox: New announcement | yes | phone | admin-tabs.spec.ts |
-| textbox: New announcementServers move tonight. | yes | phone | admin-tabs.spec.ts |
+| textbox: Release date for era # | yes | desktop, phone | screens/admin-eras.spec.ts |
 
-### `/admin/eras` (2 of 16 pressed)
+### `/admin/log` (13 of 14 pressed)
 
 | Control | Pressed | On | Pressed by |
 |---|---|---|---|
-| button: (a row of: Era #) | yes | phone | admin-tabs.spec.ts |
-| button: Release now | **no** | phone |  |
-| button: Set date | **no** | phone |  |
-| button: Sign out | **no** | phone |  |
-| link: Back to the game | **no** | phone |  |
-| link: Eras | **no** | phone |  |
-| link: LastStint | **no** | phone |  |
-| link: Log | **no** | phone |  |
-| link: Players | **no** | phone |  |
-| link: Runs | yes | phone | admin-tabs.spec.ts |
-| link: Schedule | **no** | phone |  |
-| link: Stats | **no** | phone |  |
-| link: Tickets | **no** | phone |  |
-| link: Today | **no** | phone |  |
-| link: Versus | **no** | phone |  |
-| textbox: Release date for era # | **no** | phone |  |
+| button: Load older | yes | desktop, phone | screens/admin-reports.spec.ts |
+| button: Sign out | yes | desktop, phone | screens/admin-nav.spec.ts |
+| combobox: Action | yes | desktop, phone | screens/admin-audit.spec.ts, screens/admin-reports.spec.ts |
+| link: Back to the game | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Eras | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: LastStint | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Log | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Players | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Runs | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Schedule | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Stats | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Tickets | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Today | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Versus | **no** | desktop, phone |  |
 
-### `/admin/players` (5 of 5 pressed)
+### `/admin/players` (31 of 31 pressed)
 
 | Control | Pressed | On | Pressed by |
 |---|---|---|---|
-| button: Fast Ann | yes | phone | admin-tabs.spec.ts |
-| button: Hide from leaderboards | yes | phone | admin-tabs.spec.ts |
-| combobox: SortNewestLast playedMost played | yes | phone | players.spec.ts |
-| link: Versus | yes | phone | admin-tabs.spec.ts |
-| textbox: Search players | yes | phone | players.spec.ts |
+| button: Ann | yes | desktop, phone | screens/admin-players.spec.ts |
+| button: Bo | yes | desktop, phone | screens/admin-players.spec.ts |
+| button: Clear name | yes | desktop, phone | screens/admin-players.spec.ts |
+| button: Close | yes | desktop, phone | screens/admin-players.spec.ts |
+| button: Delete run | yes | desktop, phone | screens/admin-players.spec.ts |
+| button: Fast Ann | yes | desktop, phone | admin-tabs.spec.ts, screens/admin-audit.spec.ts, screens/admin-players.spec.ts |
+| button: Fast AnnHidden | yes | desktop, phone | screens/admin-players.spec.ts |
+| button: Hide from leaderboards | yes | desktop, phone | admin-tabs.spec.ts, screens/admin-audit.spec.ts, screens/admin-players.spec.ts |
+| button: No name | yes | desktop, phone | screens/admin-players.spec.ts |
+| button: Open Daily run by Fast Ann | yes | desktop, phone | screens/admin-players.spec.ts |
+| button: Quick Ann | yes | desktop, phone | screens/admin-players.spec.ts |
+| button: Quick AnnHidden | yes | desktop, phone | screens/admin-audit.spec.ts |
+| button: Re-verify | yes | desktop, phone | screens/admin-players.spec.ts |
+| button: Refresh | yes | desktop, phone | screens/admin-players.spec.ts |
+| button: Save name | yes | desktop, phone | screens/admin-audit.spec.ts, screens/admin-players.spec.ts |
+| button: Show on leaderboards | yes | desktop, phone | screens/admin-players.spec.ts |
+| button: Sign out | yes | desktop, phone | screens/admin-access.spec.ts, screens/admin-nav.spec.ts |
+| combobox: Sort | yes | desktop, phone | players.spec.ts, screens/admin-players.spec.ts |
+| link: Back to the game | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Eras | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: LastStint | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Log | yes | desktop, phone | screens/admin-audit.spec.ts, screens/admin-nav.spec.ts |
+| link: Players | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Runs | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Schedule | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Stats | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Tickets | yes | desktop, phone | screens/admin-audit.spec.ts, screens/admin-nav.spec.ts |
+| link: Today | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Versus | yes | desktop, phone | admin-tabs.spec.ts |
+| textbox: Display name | yes | desktop, phone | screens/admin-audit.spec.ts, screens/admin-players.spec.ts |
+| textbox: Search players | yes | desktop, phone | players.spec.ts, screens/admin-players.spec.ts |
 
-### `/admin/runs` (6 of 6 pressed)
-
-| Control | Pressed | On | Pressed by |
-|---|---|---|---|
-| button: Close | yes | phone | admin-tabs.spec.ts |
-| button: Open Daily run by Fast Ann | yes | phone | admin-tabs.spec.ts |
-| button: Re-verify | yes | phone | admin-tabs.spec.ts |
-| button: Re-verify every run on #-#-# | yes | phone | admin-tabs.spec.ts |
-| link: Players | yes | phone | admin-tabs.spec.ts |
-| textbox: Date (UTC) | yes | phone | admin-tabs.spec.ts |
-
-### `/admin/schedule` (6 of 22 pressed)
-
-| Control | Pressed | On | Pressed by |
-|---|---|---|---|
-| button: Clear my run today | **no** | phone |  |
-| button: Close | yes | phone | admin.spec.ts |
-| button: Preview | yes | phone | admin.spec.ts |
-| button: Re-pin stale days | **no** | phone |  |
-| button: Schedule | yes | phone | admin.spec.ts |
-| button: Sign out | yes | phone | admin.spec.ts |
-| combobox: Race on #-#-# | **no** | phone |  |
-| combobox: Races to schedule | **no** | phone |  |
-| link: Back to the game | **no** | phone |  |
-| link: Eras | yes | phone | admin-tabs.spec.ts |
-| link: LastStint | **no** | phone |  |
-| link: Log | **no** | phone |  |
-| link: Play | **no** | phone |  |
-| link: Players | **no** | phone |  |
-| link: Runs | **no** | phone |  |
-| link: Schedule | **no** | phone |  |
-| link: Stats | **no** | phone |  |
-| link: Tickets | **no** | phone |  |
-| link: Today | **no** | phone |  |
-| link: Versus | **no** | phone |  |
-| textbox: Nextdays | **no** | phone |  |
-| textbox: Seed | yes | phone | admin.spec.ts |
-
-### `/admin/stats` (1 of 1 pressed)
+### `/admin/runs` (24 of 24 pressed)
 
 | Control | Pressed | On | Pressed by |
 |---|---|---|---|
-| link: Tickets | yes | phone | admin-tabs.spec.ts |
+| button: Close | yes | desktop, phone | admin-tabs.spec.ts, screens/admin-runs.spec.ts |
+| button: Delete run | yes | desktop, phone | screens/admin-audit.spec.ts, screens/admin-runs.spec.ts |
+| button: Open Daily run by Fast Ann | yes | desktop, phone | admin-tabs.spec.ts, screens/admin-audit.spec.ts, screens/admin-runs.spec.ts |
+| button: Open Eras run by Guest # | yes | desktop, phone | screens/admin-runs.spec.ts |
+| button: Open Gauntlet run by Undercut | yes | desktop, phone | screens/admin-runs.spec.ts |
+| button: Re-verify | yes | desktop, phone | admin-tabs.spec.ts, screens/admin-audit.spec.ts, screens/admin-runs.spec.ts |
+| button: Re-verify every Daily run on #-#-# | yes | desktop, phone | screens/admin-runs.spec.ts |
+| button: Re-verify every Gauntlet run on #-#-# | yes | desktop, phone | screens/admin-runs.spec.ts |
+| button: Re-verify every run on #-#-# | yes | desktop, phone | admin-tabs.spec.ts, screens/admin-runs.spec.ts |
+| button: Search | yes | desktop, phone | screens/admin-runs.spec.ts |
+| button: Sign out | yes | desktop, phone | screens/admin-nav.spec.ts |
+| combobox: Mode | yes | desktop, phone | screens/admin-runs.spec.ts |
+| link: Back to the game | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Eras | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: LastStint | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Log | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Players | yes | desktop, phone | admin-tabs.spec.ts, screens/admin-audit.spec.ts, screens/admin-nav.spec.ts |
+| link: Runs | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Schedule | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Stats | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Tickets | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Today | yes | desktop, phone | screens/admin-nav.spec.ts |
+| textbox: Date (UTC) | yes | desktop, phone | admin-tabs.spec.ts, screens/admin-runs.spec.ts |
+| textbox: Player | yes | desktop, phone | screens/admin-runs.spec.ts |
 
-### `/admin/tickets` (7 of 7 pressed)
+### `/admin/schedule` (23 of 24 pressed)
 
 | Control | Pressed | On | Pressed by |
 |---|---|---|---|
-| button: Everyone# | yes | phone | tickets.spec.ts |
-| button: MineAssigned to me# | yes | phone | tickets.spec.ts |
-| button: Pick up ## and mark it in progress | yes | phone | tickets.spec.ts |
-| button: Unassigned# | yes | phone | tickets.spec.ts |
-| combobox: PAAssignee for ##UnassignedYouPurohit Abhiram | yes | phone | tickets.spec.ts |
-| combobox: REAssignee for ##UnassignedYouPurohit Abhiram | yes | phone | tickets.spec.ts |
-| link: Log | yes | phone | admin-tabs.spec.ts |
+| button: Clear my run today | yes | desktop, phone | screens/admin-audit.spec.ts, screens/admin-schedule.spec.ts |
+| button: Close | yes | desktop, phone | admin.spec.ts, screens/admin-schedule.spec.ts |
+| button: Close the preview | yes | phone | screens/admin-schedule.spec.ts |
+| button: Preview | yes | desktop, phone | admin.spec.ts, screens/admin-schedule.spec.ts |
+| button: Re-pin stale days | yes | desktop, phone | screens/admin-schedule.spec.ts |
+| button: Schedule | yes | desktop, phone | admin.spec.ts, screens/admin-audit.spec.ts, screens/admin-schedule.spec.ts |
+| button: Sign out | yes | desktop, phone | admin.spec.ts, screens/admin-nav.spec.ts |
+| combobox: (a row of: table) | yes | desktop, phone | screens/admin-audit.spec.ts, screens/admin-schedule.spec.ts |
+| combobox: Race on #-#-# | yes | desktop, phone | screens/admin-schedule.spec.ts |
+| combobox: Races to schedule | yes | desktop, phone | screens/admin-schedule.spec.ts |
+| link: Back to the game | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Eras | yes | desktop, phone | admin-tabs.spec.ts, screens/admin-audit.spec.ts, screens/admin-nav.spec.ts |
+| link: LastStint | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Log | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Play | yes | desktop, phone | screens/admin-schedule.spec.ts |
+| link: Players | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Runs | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Schedule | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Stats | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Tickets | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Today | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Versus | **no** | desktop, phone |  |
+| textbox: Days to schedule | yes | desktop, phone | screens/admin-audit.spec.ts, screens/admin-schedule.spec.ts |
+| textbox: Seed | yes | desktop, phone | admin.spec.ts, screens/admin-schedule.spec.ts |
+
+### `/admin/stats` (12 of 12 pressed)
+
+| Control | Pressed | On | Pressed by |
+|---|---|---|---|
+| button: Refresh | yes | desktop, phone | screens/admin-reports.spec.ts |
+| button: Sign out | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Back to the game | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Eras | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: LastStint | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Log | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Players | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Runs | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Schedule | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Stats | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Tickets | yes | desktop, phone | admin-tabs.spec.ts, screens/admin-nav.spec.ts |
+| link: Today | yes | desktop, phone | screens/admin-nav.spec.ts |
+
+### `/admin/tickets` (60 of 61 pressed)
+
+| Control | Pressed | On | Pressed by |
+|---|---|---|---|
+| button: (a row of: ul) | yes | desktop, phone | screens/admin-audit.spec.ts, screens/admin-tickets.spec.ts |
+| button: Add a favicon / main page icon## · Game changes.pdf p# · added Dec #, # | yes | phone | tickets.spec.ts |
+| button: Add a favicon## · added Nov #, # | yes | desktop, phone | screens/admin-tickets.spec.ts |
+| button: Add ticket | yes | desktop, phone | screens/admin-audit.spec.ts, screens/admin-tickets.spec.ts |
+| button: Add weather and wet tyres## · Game changes.pdf p# · added Dec #, # | yes | phone | tickets.spec.ts |
+| button: Add wet tyres## · added Nov #, # | yes | desktop, phone | screens/admin-tickets.spec.ts |
+| button: All | yes | desktop, phone | screens/admin-tickets.spec.ts |
+| button: Bug | yes | desktop, phone | screens/admin-tickets.spec.ts |
+| button: Cancel | yes | desktop, phone | screens/admin-tickets.spec.ts |
+| button: Completed (#)+ | yes | desktop, phone | screens/admin-tickets.spec.ts, tickets.spec.ts |
+| button: Completed (#)− | yes | desktop, phone | screens/admin-tickets.spec.ts |
+| button: Content | yes | desktop, phone | screens/admin-tickets.spec.ts |
+| button: Dismiss | yes | desktop, phone | screens/admin-tickets.spec.ts |
+| button: Done | yes | desktop, phone | screens/admin-tickets.spec.ts |
+| button: Everyone | yes | desktop, phone | screens/admin-tickets.spec.ts |
+| button: Everyone# | yes | desktop, phone | screens/admin-tickets.spec.ts, tickets.spec.ts |
+| button: Feature | yes | desktop, phone | screens/admin-tickets.spec.ts |
+| button: In progress | yes | desktop, phone | tickets.spec.ts |
+| button: Make hard tyres last a realistic number of laps## · Game changes.pdf p# · added  | yes | phone | tickets.spec.ts |
+| button: Make hard tyres last longer## · Game changes.pdf p# · added Nov #, # | yes | desktop, phone | screens/admin-tickets.spec.ts |
+| button: MineAssigned to me | yes | desktop, phone | screens/admin-tickets.spec.ts |
+| button: MineAssigned to me# | yes | desktop, phone | screens/admin-tickets.spec.ts, tickets.spec.ts |
+| button: New ticket | yes | desktop, phone | screens/admin-audit.spec.ts, screens/admin-tickets.spec.ts |
+| button: Open | yes | desktop, phone | tickets.spec.ts |
+| button: Other | yes | desktop, phone | screens/admin-tickets.spec.ts |
+| button: Pick up ## | yes | desktop, phone | screens/admin-tickets.spec.ts |
+| button: Pick up ## and mark it in progress | yes | desktop, phone | tickets.spec.ts |
+| button: Question | yes | desktop, phone | screens/admin-tickets.spec.ts |
+| button: Save | yes | desktop, phone | screens/admin-tickets.spec.ts |
+| button: Sign out | yes | desktop, phone | screens/admin-nav.spec.ts |
+| button: Slow the race down## · UI · done Nov #, # | yes | desktop, phone | screens/admin-tickets.spec.ts |
+| button: Slow the race down## · UI · Game changes.pdf p# · done Dec #, # | yes | phone | tickets.spec.ts |
+| button: Taken already## · added Nov #, # | yes | desktop, phone | screens/admin-audit.spec.ts, screens/admin-tickets.spec.ts |
+| button: Try again | yes | desktop, phone | screens/admin-tickets.spec.ts |
+| button: UI | yes | desktop, phone | screens/admin-tickets.spec.ts |
+| button: Unassigned | yes | desktop, phone | screens/admin-tickets.spec.ts |
+| button: Unassigned# | yes | desktop, phone | screens/admin-tickets.spec.ts, tickets.spec.ts |
+| combobox: Assignee | yes | desktop, phone | screens/admin-tickets.spec.ts |
+| combobox: Assignee for ## | yes | desktop, phone | screens/admin-tickets.spec.ts, tickets.spec.ts |
+| combobox: Category | yes | desktop, phone | screens/admin-tickets.spec.ts |
+| combobox: Status | yes | desktop, phone | screens/admin-tickets.spec.ts |
+| link: Back to the game | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Eras | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: LastStint | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Log | yes | desktop, phone | admin-tabs.spec.ts, screens/admin-audit.spec.ts, screens/admin-nav.spec.ts |
+| link: Players | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Runs | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Schedule | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Stats | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Tickets | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Today | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Versus | **no** | desktop, phone |  |
+| textbox: Description | yes | desktop, phone | screens/admin-tickets.spec.ts |
+| textbox: DescriptionDarker map. | yes | desktop, phone | screens/admin-tickets.spec.ts |
+| textbox: DescriptionHards fall off too early. | yes | desktop, phone | screens/admin-tickets.spec.ts |
+| textbox: DescriptionHards last # laps. | yes | desktop, phone | screens/admin-tickets.spec.ts |
+| textbox: Notes | yes | desktop, phone | screens/admin-tickets.spec.ts |
+| textbox: NotesAsk players. | yes | desktop, phone | screens/admin-tickets.spec.ts |
+| textbox: NotesCheck the # data. | yes | desktop, phone | screens/admin-tickets.spec.ts |
+| textbox: Search tickets | yes | desktop, phone | screens/admin-tickets.spec.ts |
+| textbox: Title | yes | desktop, phone | screens/admin-audit.spec.ts, screens/admin-tickets.spec.ts |
 
 ### `/admin/versus` (1 of 1 pressed)
 
@@ -252,546 +478,857 @@ across 15 routes. 0 controls have no accessible name.**
 |---|---|---|---|
 | link: Stats | yes | phone | admin-tabs.spec.ts |
 
-### `/eras` (1 of 11 pressed)
+### `/credits` (11 of 11 pressed)
 
 | Control | Pressed | On | Pressed by |
 |---|---|---|---|
-| link: (a row of: Eras, in play order from # back to #) | yes | desktop, phone | eras-launch.spec.ts, eras-play.spec.ts, eras-unlock.spec.ts |
-| link: Credits | **no** | desktop, phone |  |
-| link: Daily | **no** | desktop, phone |  |
-| link: data credits | **no** | desktop, phone |  |
-| link: Eras | **no** | desktop, phone |  |
-| link: Gauntlet | **no** | desktop, phone |  |
-| link: LastStint home | **no** | desktop, phone |  |
-| link: OpenStreetMap contributors | **no** | desktop, phone |  |
-| link: Privacy | **no** | desktop, phone |  |
-| link: Terms | **no** | desktop, phone |  |
-| link: Your history book | **no** | desktop, phone |  |
+| link: (a row of: ul) | yes | desktop, phone | screens/pages.spec.ts |
+| link: Credits | yes | desktop, phone | screens/pages.spec.ts |
+| link: FastF# | yes | desktop, phone | screens/pages.spec.ts |
+| link: LastStint | yes | desktop, phone | screens/pages.spec.ts |
+| link: MultiViewer | yes | desktop, phone | screens/pages.spec.ts |
+| link: OpenF# | yes | desktop, phone | screens/pages.spec.ts |
+| link: OpenStreetMap contributors | yes | desktop, phone | screens/pages.spec.ts |
+| link: Privacy | yes | desktop, phone | screens/pages.spec.ts |
+| link: privacy policy | yes | desktop, phone | screens/pages.spec.ts |
+| link: Terms | yes | desktop, phone | screens/pages.spec.ts |
+| link: Terrain Tiles | yes | desktop, phone | screens/pages.spec.ts |
 
-### `/eras/:n` (3 of 13 pressed)
-
-| Control | Pressed | On | Pressed by |
-|---|---|---|---|
-| button: Legend off | yes | desktop, phone | eras-play.spec.ts |
-| link: (a row of: Races · Legend difficulty) | yes | desktop, phone | eras-play.spec.ts |
-| link: (a row of: Races) | yes | desktop, phone | eras-launch.spec.ts, eras-play.spec.ts, eras-unlock.spec.ts |
-| link: All eras | **no** | desktop |  |
-| link: Credits | **no** | desktop |  |
-| link: Daily | **no** | desktop |  |
-| link: data credits | **no** | desktop |  |
-| link: Eras | **no** | desktop |  |
-| link: Gauntlet | **no** | desktop |  |
-| link: LastStint home | **no** | desktop |  |
-| link: OpenStreetMap contributors | **no** | desktop |  |
-| link: Privacy | **no** | desktop |  |
-| link: Terms | **no** | desktop |  |
-
-### `/eras/:n/:race` (60 of 304 pressed)
+### `/eras` (13 of 13 pressed)
 
 | Control | Pressed | On | Pressed by |
 |---|---|---|---|
-| button: (a row of: Leaders) | **no** | desktop, phone |  |
-| button: (a row of: Standings) | **no** | desktop |  |
-| button: #× | yes | desktop, phone | eras-play.spec.ts, eras-results.spec.ts |
-| button: #Around the outside, flatFull commitment, no room for error · he’s covering it n | yes | desktop, phone | eras-play.spec.ts |
-| button: #Around the outside, flatFull commitment, no room for errorBalanced | yes | desktop, phone | eras-play.spec.ts |
-| button: #Block the lunge on the brakesContact and track-limits riskRisky | **no** | desktop, phone |  |
-| button: #Brake late, make it wideContact and track-limits riskRisky | **no** | desktop, phone |  |
-| button: #Clean exit, attack at the nextBetter run out of the chicaneSafer | yes | desktop, phone | eras-play.spec.ts |
-| button: #Cover the inside under brakingShut the door, slower exitBalanced | **no** | desktop, phone |  |
-| button: #Cover the insideSolid, costs a little timeBalanced | **no** | desktop, phone |  |
-| button: #Cut back at the second apexGive him the first part, win the exit · he’s coverin | yes | desktop, phone | eras-play.spec.ts |
-| button: #Cut back at the second apexGive him the first part, win the exitBalanced | yes | desktop, phone | eras-play.spec.ts |
-| button: #Defend hardContact and track-limits riskRisky | **no** | desktop, phone |  |
-| button: #Defend the second apexWatch the cutbackSafer | **no** | desktop, phone |  |
-| button: #Dive up the insideLate on the brakesRisky | **no** | desktop, phone |  |
-| button: #Get a better exit, go next lapSlingshot onto the straight next timeSafer | yes | desktop, phone | eras-play.spec.ts |
-| button: #Hold the inside lineCost a little speed through itBalanced | **no** | desktop, phone |  |
-| button: #Hold the outside lineQuicker, easier to passSafer | **no** | desktop, phone |  |
-| button: #Keep the racing line, full speedQuickest, easier to passSafer | **no** | desktop, phone |  |
-| button: #Late-brake up the insideClassic hairpin lunge · he’s covering it nowRisky | **no** | desktop, phone |  |
-| button: #Late-brake up the insideClassic hairpin lungeRisky | **no** | desktop, phone |  |
+| button: Try again | yes | desktop, phone | screens/eras-map.spec.ts |
+| link: (a row of: Eras, in play order from # back to #) | yes | desktop, phone | eras-launch.spec.ts, eras-play.spec.ts, eras-unlock.spec.ts, screens/eras-map.spec.ts |
+| link: Credits | yes | desktop, phone | screens/eras-map.spec.ts |
+| link: Daily | yes | desktop, phone | screens/eras-map.spec.ts |
+| link: data credits | yes | desktop, phone | screens/eras-map.spec.ts |
+| link: Eras | yes | desktop, phone | screens/eras-map.spec.ts |
+| link: Gauntlet | yes | desktop, phone | screens/eras-map.spec.ts |
+| link: LastStint home | yes | desktop, phone | screens/eras-map.spec.ts |
+| link: OpenStreetMap contributors | yes | desktop, phone | screens/eras-map.spec.ts |
+| link: Privacy | yes | desktop, phone | screens/eras-map.spec.ts |
+| link: Terms | yes | desktop, phone | screens/eras-map.spec.ts |
+| link: Versus | yes | desktop, phone | screens/eras-map.spec.ts |
+| link: Your history book | yes | desktop, phone | screens/eras-map.spec.ts |
+
+### `/eras/:n` (16 of 16 pressed)
+
+| Control | Pressed | On | Pressed by |
+|---|---|---|---|
+| button: Legend off | yes | desktop, phone | eras-play.spec.ts, screens/eras-detail.spec.ts |
+| button: Legend on | yes | desktop, phone | screens/eras-detail.spec.ts |
+| button: Try again | yes | desktop, phone | screens/eras-detail.spec.ts |
+| link: (a row of: Races · Legend difficulty) | yes | desktop, phone | eras-play.spec.ts, screens/eras-detail.spec.ts |
+| link: (a row of: Races) | yes | desktop, phone | eras-launch.spec.ts, eras-play.spec.ts, eras-unlock.spec.ts, screens/eras-detail.spec.ts, screens/eras-map.spec.ts |
+| link: All eras | yes | desktop, phone | screens/eras-detail.spec.ts |
+| link: Credits | yes | desktop, phone | screens/eras-detail.spec.ts |
+| link: Daily | yes | desktop, phone | screens/eras-detail.spec.ts |
+| link: data credits | yes | desktop, phone | screens/eras-detail.spec.ts |
+| link: Eras | yes | desktop, phone | screens/eras-detail.spec.ts |
+| link: Gauntlet | yes | desktop, phone | screens/eras-detail.spec.ts |
+| link: LastStint home | yes | desktop, phone | screens/eras-detail.spec.ts |
+| link: OpenStreetMap contributors | yes | desktop, phone | screens/eras-detail.spec.ts |
+| link: Privacy | yes | desktop, phone | screens/eras-detail.spec.ts |
+| link: Terms | yes | desktop, phone | screens/eras-detail.spec.ts |
+| link: Versus | yes | desktop, phone | screens/eras-detail.spec.ts |
+
+### `/eras/:n/:race` (155 of 303 pressed)
+
+| Control | Pressed | On | Pressed by |
+|---|---|---|---|
+| button: (a row of: Leaders) | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: (a row of: Race plan) | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: (a row of: Standings) | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: #× | yes | desktop, phone | eras-play.spec.ts, eras-results.spec.ts, screens/eras-history.spec.ts, screens/eras-map.spec.ts, screens/eras-race.spec.ts, screens/eras-results.spec.ts |
 | button: #LECOUT | **no** | desktop, phone |  |
-| button: #Let him goSave the tyresGives way | yes | desktop, phone | eras-play.spec.ts |
-| button: #Lunge into the first apexBrake as late as you dareRisky | **no** | desktop, phone |  |
-| button: #Move once on the straightRisky at this speedRisky | **no** | desktop, phone |  |
 | button: #MSCM+# | **no** | desktop, phone |  |
 | button: #MSCMPIT | **no** | desktop, phone |  |
-| button: #Overtake boostInside line, spends #% battery · he’s covering it nowSafer | yes | desktop, phone | eras-play.spec.ts |
-| button: #Overtake boostInside line, spends #% batterySafer | yes | desktop, phone | eras-play.spec.ts, eras-results.spec.ts |
-| button: #Protect the first apexSolid, costs a little timeBalanced | **no** | desktop, phone |  |
-| button: #Round the outsideCleaner, harder to make stick · he’s covering it nowBalanced | yes | desktop, phone | eras-play.spec.ts |
-| button: #Round the outsideCleaner, harder to make stickBalanced | yes | desktop, phone | eras-play.spec.ts |
-| button: #Send it up the insideBrave through the fast oneRisky | **no** | desktop, phone |  |
-| button: #Square it off on the exitNormal line, watch the switchbackSafer | **no** | desktop, phone |  |
-| button: #Stay in the tow, DRS next lapFollow him through, set it upSafer | yes | desktop, phone | eras-play.spec.ts |
-| button: #Switchback on the exitLet him turn in, cut back under himBalanced | yes | desktop, phone | eras-play.spec.ts |
-| button: #Wait for DRS, go next lapNo risk now, a better shot next lapSafer | yes | desktop, phone | eras-play.spec.ts |
-| button: A · No stop…Stay out to the flag · manageManageL#L# | **no** | desktop, phone |  |
-| button: A · No stop…Stay out to the flag · pushPushL#L# | **no** | desktop, phone |  |
-| button: A · No stop…Stay out to the flagL#L# | **no** | desktop, phone |  |
-| button: A · No stop#%Stay out to the flag · pushPushL#L# | **no** | phone |  |
-| button: A · No stopEngineer’s pick#%Stay out to the flag · pushPushL#L# | **no** | desktop |  |
-| button: A · No stopEngineer’s pick#%Stay out to the flagL#L# | yes | desktop, phone | eras-results.spec.ts |
-| button: A · One stop…hards on lap # · standard, then pushPushL#L# | **no** | desktop, phone |  |
-| button: A · One stop…inters on lap #L#L#L# | **no** | desktop, phone |  |
-| button: A · One stop…mediums on lap # · standard, then pushPushL#L#L# | **no** | desktop, phone |  |
-| button: A · One stop…mediums on lap #L#L#L# | **no** | desktop, phone |  |
-| button: A · One stop#%mediums on lap # · standard, then pushPushL#L#L# | **no** | phone |  |
-| button: A · One stopEngineer’s pick#%hards on lap # · standard, then pushPushL#L# | **no** | desktop, phone |  |
-| button: A · One stopEngineer’s pick#%inters on lap #L#L#L# | **no** | desktop, phone |  |
-| button: A · One stopEngineer’s pick#%mediums on lap #L#L#L# | **no** | desktop, phone |  |
-| button: A · Two stops…mediums on lap #, mediums on lap #L#L#L#L# | **no** | desktop, phone |  |
-| button: A · Two stopsEngineer’s pick#%mediums on lap #, mediums on lap #L#L#L#L# | yes | desktop, phone | eras-play.spec.ts |
+| button: + Add a stop | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: A · No stop, #% | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: A · No stop, #%, engineer’s pick | yes | desktop, phone | eras-results.spec.ts, screens/eras-race.spec.ts |
+| button: A · No stop, chance being worked out | **no** | desktop, phone |  |
+| button: A · One stop, #% | **no** | desktop, phone |  |
+| button: A · One stop, #%, engineer’s pick | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: A · One stop, chance being worked out | **no** | desktop, phone |  |
+| button: A · Two stops, #%, engineer’s pick | yes | desktop, phone | eras-play.spec.ts |
+| button: A · Two stops, chance being worked out | **no** | desktop, phone |  |
 | button: ALB: details | **no** | desktop, phone |  |
 | button: ALBC: details | **no** | desktop, phone |  |
 | button: ALBM: details | **no** | desktop, phone |  |
+| button: ALE: details | **no** | desktop, phone |  |
 | button: ALL: details | **no** | desktop, phone |  |
-| button: ALO: details | **no** | desktop, phone |  |
-| button: attack | **no** | desktop, phone |  |
-| button: Attack | yes | desktop, phone | eras-results.spec.ts |
-| button: B · One stop…hards on lap # · standard, then pushPushL#L# | **no** | desktop, phone |  |
-| button: B · One stop…hards on lap # · standard, then pushPushL#L#L# | **no** | desktop, phone |  |
-| button: B · One stop…mediums on lap # · standard, then pushPushL#L# | **no** | desktop, phone |  |
-| button: B · One stop…mediums on lap # · standard, then pushPushL#L#L# | **no** | desktop, phone |  |
-| button: B · One stop…mediums on lap #L#L#L# | **no** | desktop, phone |  |
-| button: B · One stop…softs on lap # · standard, then manageManageL#L#L# | **no** | desktop, phone |  |
-| button: B · One stop…softs on lap # · standard, then pushPushL#L#L# | **no** | desktop, phone |  |
-| button: B · One stop#%hards on lap # · standard, then pushPushL#L#L# | **no** | desktop, phone |  |
-| button: B · One stop#%mediums on lap # · standard, then pushPushL#L# | **no** | desktop |  |
-| button: B · One stop#%mediums on lap # · standard, then pushPushL#L#L# | **no** | desktop, phone |  |
-| button: B · One stop#%mediums on lap #L#L#L# | **no** | desktop, phone |  |
-| button: B · One stop#%softs on lap # · standard, then pushPushL#L#L# | **no** | desktop |  |
-| button: B · One stopEngineer’s pick#%mediums on lap # · standard, then pushPushL#L# | **no** | phone |  |
-| button: B · One stopEngineer’s pick#%mediums on lap # · standard, then pushPushL#L#L# | **no** | phone |  |
-| button: B · Two stops…mediums on lap #, mediums on lap #L#L#L#L# | **no** | desktop, phone |  |
-| button: B · Two stops#%mediums on lap #, mediums on lap #L#L#L#L# | **no** | desktop, phone |  |
-| button: Back off at the exits#About # s a lap, far fewer strikes | **no** | desktop, phone |  |
-| button: Back to normal#Full pace again | **no** | desktop, phone |  |
+| button: ALO: details | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: Around the outside, flat | yes | desktop, phone | eras-play.spec.ts |
+| button: Attack | yes | desktop, phone | eras-results.spec.ts, screens/eras-race.spec.ts |
+| button: B · One stop, #% | **no** | desktop, phone |  |
+| button: B · One stop, #%, engineer’s pick | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: B · One stop, chance being worked out | **no** | desktop, phone |  |
+| button: B · Two stops, #% | **no** | desktop, phone |  |
+| button: B · Two stops, chance being worked out | **no** | desktop, phone |  |
+| button: Back | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: Back off at the exits | **no** | desktop, phone |  |
+| button: Back to normal | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: Back: close How it works | yes | desktop, phone | screens/eras-intro.spec.ts |
 | button: BAD: details | **no** | desktop, phone |  |
+| button: balanced | yes | desktop, phone | screens/eras-race.spec.ts |
 | button: BAR: details | **no** | desktop, phone |  |
 | button: BELP: details | **no** | desktop, phone |  |
 | button: BER: details | **no** | desktop, phone |  |
+| button: Block the lunge on the brakes | **no** | desktop, phone |  |
 | button: BLU: details | **no** | desktop, phone |  |
-| button: BOT: details | **no** | desktop, phone |  |
+| button: BOT: details | yes | desktop, phone | screens/eras-race.spec.ts |
 | button: BOUJ: details | **no** | desktop, phone |  |
 | button: BOUT: details | **no** | desktop, phone |  |
-| button: Box | yes | desktop, phone | eras-results.spec.ts |
-| button: Box as planned | yes | desktop, phone | eras-play.spec.ts |
-| button: Box for a new nose#A slower stop (+# s), the pace back | **no** | desktop, phone |  |
+| button: Box | yes | desktop, phone | eras-results.spec.ts, screens/eras-race.spec.ts |
+| button: Box as planned | yes | desktop, phone | eras-play.spec.ts, screens/eras-race.spec.ts |
+| button: Box for a new nose | **no** | desktop, phone |  |
 | button: Box next lap, hards | **no** | desktop, phone |  |
 | button: Box next lap, inters | **no** | desktop, phone |  |
 | button: Box next lap, mediums | **no** | desktop, phone |  |
 | button: Box next lap, softs | **no** | desktop, phone |  |
 | button: Box next lap, wets | **no** | desktop, phone |  |
 | button: Box, mediums | **no** | desktop, phone |  |
+| button: Brake late, make it wide | **no** | desktop, phone |  |
 | button: BRU: details | **no** | desktop, phone |  |
-| button: Build your own | **no** | desktop, phone |  |
+| button: Build your own | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: BUR: details | **no** | desktop, phone |  |
 | button: BUT: details | **no** | desktop, phone |  |
-| button: C · Two stops…hards on lap #, hards on lap # · standard, then standard, then pus | **no** | desktop, phone |  |
-| button: C · Two stops…inters on lap #, inters on lap # · standard, then standard, then p | **no** | desktop, phone |  |
-| button: C · Two stops…mediums on lap #, mediums on lap # · standard, then standard, then | **no** | desktop, phone |  |
-| button: C · Two stops…mediums on lap #, mediums on lap #L#L#L#L# | **no** | desktop, phone |  |
-| button: C · Two stops…softs on lap #, mediums on lap # · standard, then standard, then p | **no** | desktop, phone |  |
-| button: C · Two stops…softs on lap #, softs on lap # · standard, then standard, then pus | **no** | desktop, phone |  |
-| button: C · Two stops#%hards on lap #, hards on lap # · standard, then standard, then pu | **no** | desktop, phone |  |
-| button: C · Two stops#%inters on lap #, inters on lap # · standard, then standard, then  | **no** | desktop, phone |  |
-| button: C · Two stops#%mediums on lap #, mediums on lap # · standard, then standard, the | **no** | desktop, phone |  |
-| button: C · Two stops#%mediums on lap #, mediums on lap #L#L#L#L# | **no** | desktop, phone |  |
-| button: C · Two stops#%softs on lap #, mediums on lap # · standard, then standard, then  | **no** | desktop, phone |  |
-| button: C · Two stops#%softs on lap #, softs on lap # · standard, then standard, then pu | **no** | desktop |  |
-| button: Calls | **no** | phone |  |
+| button: C · One stop, #% | **no** | desktop, phone |  |
+| button: C · Two stops, #% | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: C · Two stops, chance being worked out | **no** | desktop, phone |  |
+| button: Calls | yes | phone | screens/eras-race.spec.ts |
+| button: Cancel | yes | desktop, phone | screens/eras-race.spec.ts |
 | button: CAP: details | **no** | desktop, phone |  |
-| button: Car | **no** | phone |  |
-| button: Carry on# s a lap to the flag | yes | desktop, phone | eras-play.spec.ts |
-| button: Change plan | **no** | desktop, phone |  |
-| button: ClassificationShow | **no** | desktop, phone |  |
+| button: Car | yes | phone | screens/eras-race.spec.ts |
+| button: Carry on | yes | desktop, phone | eras-play.spec.ts |
+| button: Change | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: Change plan | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: ClassificationShow | yes | desktop, phone | screens/eras-results.spec.ts |
+| button: Clean exit, attack at the next | yes | desktop, phone | eras-play.spec.ts |
+| button: Close driver details | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: COM: details | **no** | desktop, phone |  |
+| button: Copied! | **no** | desktop, phone |  |
 | button: COU: details | **no** | desktop, phone |  |
+| button: Cover the inside | **no** | desktop, phone |  |
+| button: Cover the inside under braking | **no** | desktop, phone |  |
+| button: Cut back at the second apex | yes | desktop, phone | eras-play.spec.ts, screens/eras-race.spec.ts, screens/eras-results.spec.ts |
 | button: DAL: details | **no** | desktop, phone |  |
-| button: DDry | yes | desktop, phone | eras-play.spec.ts |
+| button: DDry | yes | desktop, phone | eras-play.spec.ts, screens/eras-race.spec.ts |
 | button: DEC: details | **no** | desktop, phone |  |
-| button: defend | **no** | desktop, phone |  |
-| button: Defend hard | yes | desktop, phone | eras-play.spec.ts |
+| button: defend | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: Defend hard | yes | desktop, phone | eras-play.spec.ts, screens/eras-race.spec.ts |
+| button: Defend the second apex | **no** | desktop, phone |  |
+| button: deploy | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: DEV: details | **no** | desktop, phone |  |
 | button: DIN: details | **no** | desktop, phone |  |
-| button: Drop back, cool the tyres#Back off a second, go again fresh | yes | desktop, phone | eras-play.spec.ts |
-| button: EASY - save the car | yes | desktop, phone | eras-play.spec.ts |
+| button: Dive up the inside | **no** | desktop, phone |  |
+| button: DLR: details | **no** | desktop, phone |  |
+| button: Drop back, cool the tyres | yes | desktop, phone | eras-play.spec.ts |
+| button: EASY - save the car | yes | desktop, phone | eras-play.spec.ts, screens/eras-race.spec.ts |
 | button: EASY - save the tyres | **no** | desktop, phone |  |
 | button: ERI: details | **no** | desktop, phone |  |
 | button: FIS: details | **no** | desktop, phone |  |
-| button: Flat out# | **no** | desktop, phone |  |
-| button: Focus view | **no** | desktop |  |
-| button: Follow car | **no** | desktop, phone |  |
+| button: FITC: details | **no** | desktop, phone |  |
+| button: Flat out | **no** | desktop, phone |  |
+| button: Focus view | yes | desktop | screens/eras-race.spec.ts |
+| button: Follow car | yes | desktop, phone | screens/eras-race.spec.ts |
 | button: FRE: details | **no** | desktop, phone |  |
 | button: FUEL - lift and coast | **no** | desktop, phone |  |
-| button: FUEL - lift and coast to the flag | yes | desktop, phone | eras-play.spec.ts |
-| button: FUEL OK - full mixture | **no** | desktop, phone |  |
-| button: GAS: details | **no** | desktop, phone |  |
+| button: FUEL - lift and coast to the flag | yes | desktop, phone | eras-play.spec.ts, screens/eras-race.spec.ts |
+| button: FUEL OK - full mixture | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: GAC: details | **no** | desktop, phone |  |
+| button: GAS: details | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: Get a better exit, go next lap | yes | desktop, phone | eras-play.spec.ts |
 | button: GHI: details | **no** | desktop, phone |  |
-| button: GIO: details | **no** | desktop, phone |  |
-| button: Go round him now#Gains # s, a small risk of contact | yes | desktop, phone | eras-play.spec.ts |
-| button: Go with plan A | yes | desktop, phone | eras-play.spec.ts, eras-results.spec.ts |
-| button: Go with plan B | yes | desktop, phone | eras-play.spec.ts |
-| button: Grading your calls… | **no** | desktop |  |
+| button: GIO: details | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: Go round him now | yes | desktop, phone | eras-play.spec.ts, screens/eras-race.spec.ts |
+| button: Go with plan A | yes | desktop, phone | eras-play.spec.ts, eras-results.spec.ts, screens/eras-history.spec.ts, screens/eras-map.spec.ts, screens/eras-race.spec.ts, screens/eras-results.spec.ts |
+| button: Go with plan B | yes | desktop, phone | eras-play.spec.ts, screens/eras-race.spec.ts |
+| button: Go with plan C | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: Go with your plan | yes | desktop, phone | screens/eras-race.spec.ts |
 | button: GRO: details | **no** | desktop, phone |  |
 | button: GUG: details | **no** | desktop, phone |  |
 | button: GUT: details | **no** | desktop, phone |  |
 | button: HAK: details | **no** | desktop, phone |  |
-| button: HAM: details | **no** | desktop, phone |  |
+| button: HAM: details | yes | desktop, phone | screens/eras-race.spec.ts |
 | button: Hards | yes | phone | eras-results.spec.ts |
-| button: Harvest this lap#Slower now, battery for the fight | **no** | desktop, phone |  |
+| button: harvest | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: Harvest this lap | **no** | desktop, phone |  |
 | button: HEI: details | **no** | desktop, phone |  |
 | button: HER: details | **no** | desktop, phone |  |
 | button: HIL: details | **no** | desktop, phone |  |
-| button: hold | **no** | desktop, phone |  |
-| button: Hold the line | **no** | desktop, phone |  |
-| button: Hold the pace | yes | desktop, phone | eras-play.spec.ts |
+| button: hold | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: Hold position | **no** | desktop, phone |  |
+| button: Hold the inside line | **no** | desktop, phone |  |
+| button: Hold the line | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: Hold the outside line | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: Hold the pace | yes | desktop, phone | eras-play.spec.ts, screens/eras-race.spec.ts |
+| button: Hold up Hamilton | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: Hold up Prost | **no** | desktop, phone |  |
 | button: Hold up Schumacher | **no** | desktop, phone |  |
-| button: How it works | **no** | desktop, phone |  |
+| button: How it works | yes | desktop, phone | screens/eras-intro.spec.ts |
 | button: HUL: details | **no** | desktop, phone |  |
 | button: INO: details | **no** | desktop, phone |  |
 | button: IRV: details | **no** | desktop, phone |  |
+| button: JAR: details | **no** | desktop, phone |  |
 | button: KAR: details | **no** | desktop, phone |  |
 | button: KAT: details | **no** | desktop, phone |  |
-| button: Keep it balanced# | yes | desktop, phone | eras-play.spec.ts |
-| button: Keep ours | yes | desktop, phone | eras-play.spec.ts |
-| button: Keep pushing# | yes | desktop, phone | eras-play.spec.ts |
-| button: Keep saving#More in hand for the end | yes | desktop, phone | eras-play.spec.ts |
-| button: Keep the pace# | yes | desktop, phone | eras-play.spec.ts |
-| button: Keep the pressure on#Stay in his gearbox: his tyres overheat | **no** | desktop, phone |  |
-| button: Keep using the kerbs#Faster, risks the penalty | yes | desktop, phone | eras-play.spec.ts |
+| button: Keep it balanced | yes | desktop, phone | eras-play.spec.ts |
+| button: Keep ours | yes | desktop, phone | eras-play.spec.ts, screens/eras-race.spec.ts |
+| button: Keep pushing | yes | desktop, phone | eras-play.spec.ts, screens/eras-race.spec.ts |
+| button: Keep saving | yes | desktop, phone | eras-play.spec.ts, screens/eras-race.spec.ts |
+| button: Keep the pace | yes | desktop, phone | eras-play.spec.ts, screens/eras-race.spec.ts |
+| button: Keep the pressure on | **no** | desktop, phone |  |
+| button: Keep the racing line, full speed | **no** | desktop, phone |  |
+| button: Keep using the kerbs | yes | desktop, phone | eras-play.spec.ts |
 | button: KUB: details | **no** | desktop, phone |  |
 | button: KVY: details | **no** | desktop, phone |  |
 | button: LAM: details | **no** | desktop, phone |  |
 | button: LAR: details | **no** | desktop, phone |  |
-| button: LastStint | **no** | desktop, phone |  |
+| button: LastStint | yes | desktop, phone | screens/eras-results.spec.ts |
 | button: LastStintBarrichello’s race engineer · Ferrari | **no** | desktop |  |
 | button: LastStintBerger’s race engineer · McLaren | **no** | desktop |  |
+| button: LastStintCoulthard’s race engineer · McLaren | **no** | desktop |  |
 | button: LastStintHamilton’s race engineer · Mercedes | **no** | desktop |  |
-| button: LastStintLeclerc’s race engineer · Ferrari | **no** | desktop |  |
+| button: LastStintLeclerc’s race engineer · Ferrari | yes | desktop | screens/eras-race.spec.ts |
+| button: LastStintNorris’s race engineer · McLaren | **no** | desktop |  |
 | button: LastStintPérez’s race engineer · Red Bull | **no** | desktop |  |
 | button: LastStintRosberg’s race engineer · Mercedes | **no** | desktop |  |
 | button: LastStintSchumacher’s race engineer · Benetton | **no** | desktop |  |
 | button: LastStintSchumacher’s race engineer · Ferrari | **no** | desktop |  |
 | button: LastStintSenna’s race engineer · McLaren | **no** | desktop |  |
 | button: LastStintVerstappen’s race engineer · Red Bull Racing | **no** | desktop |  |
-| button: LAT: details | **no** | desktop, phone |  |
+| button: LAT: details | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: Late-brake up the inside | **no** | desktop, phone |  |
 | button: LAV: details | **no** | desktop, phone |  |
-| button: LEC: details | **no** | desktop, phone |  |
+| button: LEC: details | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: Let him go | yes | desktop, phone | eras-play.spec.ts, screens/eras-race.spec.ts |
+| button: Let Prost by | **no** | desktop, phone |  |
+| button: Let Sainz by | yes | desktop, phone | screens/eras-race.spec.ts |
 | button: Let Schumacher by | yes | desktop, phone | eras-play.spec.ts |
-| button: Lift & coast | **no** | desktop, phone |  |
-| button: Lift and coast#A bit slower, saves fuel and tyres | **no** | desktop, phone |  |
+| button: Lift & coast | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: Lift and coast | yes | desktop, phone | screens/eras-race.spec.ts |
 | button: LIU: details | **no** | desktop, phone |  |
-| button: Long# laps · #s | **no** | desktop, phone |  |
+| button: Long# laps · #s | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: Lunge into the first apex | yes | desktop, phone | screens/eras-race.spec.ts |
 | button: MAG: details | **no** | desktop, phone |  |
 | button: MAN: details | **no** | desktop, phone |  |
-| button: manage | **no** | desktop, phone |  |
+| button: Manage | yes | desktop, phone | screens/eras-race.spec.ts |
 | button: Manage the tyres | **no** | desktop, phone |  |
-| button: Manage them# | **no** | desktop, phone |  |
-| button: Manage# | **no** | desktop, phone |  |
+| button: Manage them | yes | desktop, phone | screens/eras-race.spec.ts |
 | button: MAS: details | **no** | desktop, phone |  |
-| button: MAZ: details | **no** | desktop, phone |  |
+| button: MAZ: details | yes | desktop, phone | screens/eras-race.spec.ts |
 | button: MCN: details | **no** | desktop, phone |  |
+| button: Mediums | **no** | phone |  |
 | button: MOE: details | **no** | desktop, phone |  |
 | button: MON: details | **no** | desktop, phone |  |
 | button: MONA: details | **no** | desktop, phone |  |
-| button: MSC: details | **no** | desktop, phone |  |
+| button: Move once on the straight | **no** | desktop, phone |  |
+| button: MSC: details | yes | desktop, phone | screens/eras-race.spec.ts |
 | button: MSCM: details | **no** | desktop, phone |  |
 | button: NAN: details | **no** | desktop, phone |  |
 | button: NAS: details | **no** | desktop, phone |  |
-| button: New attempt | yes | desktop, phone | eras-play.spec.ts, eras-results.spec.ts |
-| button: No, save the tyres#He’ll remember if he was right | yes | desktop, phone | eras-play.spec.ts |
-| button: No, stay out#He’ll remember if he was right | yes | desktop, phone | eras-play.spec.ts |
-| button: NOR: details | **no** | desktop, phone |  |
-| button: normal | **no** | desktop, phone |  |
-| button: Not yet#Save it later; run dry and it costs seconds a lap | yes | desktop, phone | eras-play.spec.ts |
-| button: OCO: details | **no** | desktop, phone |  |
-| button: One more lap | **no** | desktop, phone |  |
+| button: New attempt | yes | desktop, phone | eras-play.spec.ts, eras-results.spec.ts, screens/eras-results.spec.ts |
+| button: No, save the tyres | yes | desktop, phone | eras-play.spec.ts, screens/eras-race.spec.ts |
+| button: No, stay out | yes | desktop, phone | eras-play.spec.ts, screens/eras-race.spec.ts |
+| button: NOR: details | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: normal | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: Not yet | yes | desktop, phone | eras-play.spec.ts, screens/eras-race.spec.ts |
+| button: OCO: details | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: One more lap | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: overtake | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: Overtake boost | yes | desktop, phone | eras-play.spec.ts, eras-results.spec.ts, screens/eras-race.spec.ts |
 | button: PAL: details | **no** | desktop, phone |  |
 | button: PALJ: details | **no** | desktop, phone |  |
 | button: PAN: details | **no** | desktop, phone |  |
 | button: PAP: details | **no** | desktop, phone |  |
 | button: PAT: details | **no** | desktop, phone |  |
-| button: PER: details | **no** | desktop, phone |  |
+| button: PER: details | yes | desktop, phone | screens/eras-race.spec.ts |
 | button: PERL: details | **no** | desktop, phone |  |
+| button: PIA: details | **no** | desktop, phone |  |
 | button: Plan | **no** | desktop, phone |  |
-| button: Plan · box L# | **no** | desktop, phone |  |
-| button: Plan · to the flag | **no** | desktop, phone |  |
+| button: Plan · box L# | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: Plan · to the flag | yes | desktop, phone | screens/eras-race.spec.ts |
 | button: PRO: details | **no** | desktop, phone |  |
-| button: push | **no** | desktop, phone |  |
-| button: PUSH | yes | desktop, phone | eras-play.spec.ts |
+| button: Prost lets you by | **no** | desktop, phone |  |
+| button: Protect the first apex | **no** | desktop, phone |  |
+| button: Push | yes | desktop, phone | eras-play.spec.ts, screens/eras-race.spec.ts |
 | button: PUSH - attack | **no** | desktop, phone |  |
 | button: Push and attack | **no** | desktop, phone |  |
 | button: Push now | yes | desktop, phone | eras-play.spec.ts, eras-results.spec.ts |
-| button: Push on the exits#Break the tow, harder on the tyres | **no** | desktop, phone |  |
-| button: Push# | yes | desktop, phone | eras-play.spec.ts |
-| button: Radio | yes | phone | eras-play.spec.ts |
-| button: Radio sound off | **no** | desktop |  |
-| button: RAI: details | **no** | desktop, phone |  |
-| button: RIC: details | **no** | desktop, phone |  |
+| button: Push on the exits | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: Radio | yes | phone | eras-play.spec.ts, screens/eras-race.spec.ts |
+| button: Radio sound off | yes | desktop | screens/eras-race.spec.ts |
+| button: Radio sound on | yes | desktop | screens/eras-race.spec.ts |
+| button: RAI: details | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: Release Hamilton | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: Retry | yes | desktop, phone | screens/eras-results.spec.ts |
+| button: RIC: details | yes | desktop, phone | screens/eras-race.spec.ts |
 | button: ROS: details | **no** | desktop, phone |  |
-| button: RUS: details | **no** | desktop, phone |  |
-| button: SAI: details | **no** | desktop, phone |  |
+| button: Round the outside | yes | desktop, phone | eras-play.spec.ts, screens/eras-race.spec.ts |
+| button: RUS: details | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: SAI: details | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: Sainz lets you by | yes | desktop, phone | screens/eras-race.spec.ts |
 | button: SAL: details | **no** | desktop, phone |  |
 | button: SAR: details | **no** | desktop, phone |  |
 | button: SAT: details | **no** | desktop, phone |  |
-| button: Save it for later# | yes | desktop, phone | eras-play.spec.ts |
-| button: Save them, defend the slow corners#Easier on the tyres, he stays close | yes | desktop, phone | eras-play.spec.ts |
+| button: Save it for later | yes | desktop, phone | eras-play.spec.ts |
+| button: Save them, defend the slow corners | yes | desktop, phone | eras-play.spec.ts, screens/eras-race.spec.ts |
 | button: SCH: details | **no** | desktop, phone |  |
 | button: Schumacher lets you by | **no** | desktop, phone |  |
-| button: See how you did | yes | desktop, phone | eras-play.spec.ts, eras-results.spec.ts |
+| button: See how you did | yes | desktop, phone | eras-play.spec.ts, eras-results.spec.ts, screens/eras-history.spec.ts, screens/eras-map.spec.ts, screens/eras-race.spec.ts, screens/eras-results.spec.ts |
 | button: SENA: details | **no** | desktop, phone |  |
-| button: Share result | **no** | desktop, phone |  |
-| button: Short# laps · #s | yes | desktop, phone | eras-play.spec.ts |
-| button: Show stats | yes | desktop | eras-play.spec.ts |
-| button: Softs | yes | phone | eras-results.spec.ts |
-| button: standard | **no** | desktop, phone |  |
-| button: Standard pace | **no** | desktop, phone |  |
-| button: Standard# laps · #s | **no** | desktop, phone |  |
-| button: Standings | **no** | phone |  |
-| button: Start the race | yes | desktop, phone | eras-phone.spec.ts, eras-play.spec.ts, eras-results.spec.ts |
-| button: Stay on plan# | yes | desktop, phone | eras-play.spec.ts |
-| button: Stay out | yes | desktop, phone | eras-play.spec.ts |
-| button: STAY OUT | yes | desktop, phone | eras-play.spec.ts |
+| button: Send it up the inside | **no** | desktop, phone |  |
+| button: Share result | yes | desktop, phone | screens/eras-results.spec.ts |
+| button: Short# laps · #s | yes | desktop, phone | eras-play.spec.ts, screens/eras-race.spec.ts |
+| button: Show stats | yes | desktop | eras-play.spec.ts, screens/eras-race.spec.ts |
+| button: Softs | yes | desktop, phone | eras-results.spec.ts, screens/eras-race.spec.ts |
+| button: Square it off on the exit | **no** | desktop, phone |  |
+| button: standard | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: Standard pace | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: Standard# laps · #s | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: Standings | yes | phone | screens/eras-race.spec.ts |
+| button: Start the race | yes | desktop, phone | eras-phone.spec.ts, eras-play.spec.ts, eras-results.spec.ts, screens/eras-history.spec.ts, screens/eras-intro.spec.ts, screens/eras-map.spec.ts, screens/eras-race.spec.ts, screens/eras-results.spec.ts |
+| button: Stay in the tow, DRS next lap | yes | desktop, phone | eras-play.spec.ts |
+| button: Stay on plan | yes | desktop, phone | eras-play.spec.ts, screens/eras-race.spec.ts |
+| button: Stay out | yes | desktop, phone | eras-play.spec.ts, screens/eras-race.spec.ts |
+| button: Steady | yes | desktop, phone | eras-play.spec.ts, eras-results.spec.ts, screens/eras-race.spec.ts |
 | button: STEADY - standard pace | **no** | desktop, phone |  |
-| button: Steady# | yes | desktop, phone | eras-play.spec.ts, eras-results.spec.ts |
-| button: STR: details | **no** | desktop, phone |  |
-| button: Switch | **no** | desktop, phone |  |
-| button: Team radio | yes | desktop, phone | eras-play.spec.ts |
-| button: Team radioOrders for next lapBoxing · MediumsPace manage▴ | **no** | desktop, phone |  |
-| button: Team radioOrders for next lapBoxing · MediumsPace standard▴ | **no** | desktop, phone |  |
-| button: Team radioOrders for next lapPace manage▴ | **no** | desktop, phone |  |
-| button: Team radioOrders for next lapPace push▴ | **no** | desktop, phone |  |
-| button: Team radioOrders for next lapPace standard▴ | **no** | desktop, phone |  |
-| button: Timer off | **no** | desktop, phone |  |
-| button: Timer on | yes | desktop, phone | eras-play.spec.ts |
+| button: STR: details | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: SUZ: details | **no** | desktop, phone |  |
+| button: Switch | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: Switchback on the exit | yes | desktop, phone | eras-play.spec.ts |
+| button: Team radio | yes | desktop, phone | eras-play.spec.ts, screens/eras-race.spec.ts |
+| button: The engineer’s plans | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: Timer off | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: Timer on | yes | desktop, phone | eras-play.spec.ts, screens/eras-race.spec.ts |
 | button: TMO: details | **no** | desktop, phone |  |
 | button: TRU: details | **no** | desktop, phone |  |
-| button: TSU: details | **no** | desktop, phone |  |
-| button: VER: details | **no** | desktop, phone |  |
-| button: VET: details | **no** | desktop, phone |  |
+| button: Try again | yes | desktop, phone | screens/eras-intro.spec.ts |
+| button: TSU: details | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: VER: details | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: VERO: details | **no** | desktop, phone |  |
+| button: VET: details | yes | desktop, phone | screens/eras-race.spec.ts |
 | button: VIL: details | **no** | desktop, phone |  |
-| button: Wait, we’ll tell race control#He’ll move over; no risk | **no** | desktop, phone |  |
+| button: Wait for DRS, go next lap | yes | desktop, phone | eras-play.spec.ts, screens/eras-race.spec.ts |
+| button: Wait, we’ll tell race control | **no** | desktop, phone |  |
 | button: WAR: details | **no** | desktop, phone |  |
 | button: WEB: details | **no** | desktop, phone |  |
 | button: WEH: details | **no** | desktop, phone |  |
 | button: WUR: details | **no** | desktop, phone |  |
-| button: Yes, box for hards# | **no** | desktop, phone |  |
-| button: Yes, box for mediums# | **no** | desktop, phone |  |
-| button: Yes, box for softs# | **no** | desktop, phone |  |
-| button: Yes, push# | **no** | desktop, phone |  |
+| button: Yes, box for hards | **no** | desktop, phone |  |
+| button: Yes, box for mediums | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: Yes, box for softs | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: Yes, push | yes | desktop, phone | screens/eras-race.spec.ts |
 | button: YOO: details | **no** | desktop, phone |  |
 | button: ZHO: details | **no** | desktop, phone |  |
-| link: © OpenStreetMap contributors | **no** | desktop, phone |  |
-| link: Back to era | **no** | desktop, phone |  |
-| link: Back to the era | **no** | desktop, phone |  |
-| link: Credits | **no** | desktop, phone |  |
-| link: Daily | **no** | desktop, phone |  |
-| link: Eras | **no** | desktop, phone |  |
-| link: Gauntlet | **no** | desktop, phone |  |
-| link: History book | **no** | desktop, phone |  |
-| link: LastStint home | **no** | desktop, phone |  |
-| link: Leaderboard | yes | desktop, phone | eras-play.spec.ts |
-| link: OpenStreetMap contributors | **no** | desktop, phone |  |
-| link: Privacy | **no** | desktop, phone |  |
-| link: Terms | **no** | desktop, phone |  |
+| link: © OpenStreetMap contributors | yes | desktop, phone | screens/eras-intro.spec.ts |
+| link: Back to era | yes | desktop, phone | screens/eras-results.spec.ts |
+| link: Back to Senna vs Prost | yes | desktop, phone | screens/eras-intro.spec.ts |
+| link: Back to the era | yes | desktop, phone | screens/eras-intro.spec.ts |
+| link: Credits | yes | desktop, phone | screens/eras-intro.spec.ts |
+| link: Daily | yes | desktop, phone | screens/eras-intro.spec.ts |
+| link: Eras | yes | desktop, phone | screens/eras-intro.spec.ts |
+| link: Gauntlet | yes | desktop, phone | screens/eras-intro.spec.ts |
+| link: History book | yes | desktop, phone | screens/eras-history.spec.ts, screens/eras-results.spec.ts |
+| link: LastStint home | yes | desktop, phone | screens/eras-intro.spec.ts |
+| link: Leaderboard | yes | desktop, phone | eras-play.spec.ts, screens/eras-results.spec.ts |
+| link: OpenStreetMap contributors | yes | desktop, phone | screens/eras-intro.spec.ts |
+| link: Privacy | yes | desktop, phone | screens/eras-intro.spec.ts |
+| link: See all eras | yes | desktop, phone | screens/eras-map.spec.ts |
+| link: Terms | yes | desktop, phone | screens/eras-intro.spec.ts |
+| link: Versus | yes | desktop, phone | screens/eras-intro.spec.ts |
+| slider: Stop # lap | yes | desktop, phone | screens/eras-race.spec.ts |
 
-### `/eras/:n/:race/leaderboard` (1 of 12 pressed)
-
-| Control | Pressed | On | Pressed by |
-|---|---|---|---|
-| link: Back to era # | **no** | desktop |  |
-| link: Credits | **no** | desktop |  |
-| link: Daily | **no** | desktop |  |
-| link: data credits | **no** | desktop |  |
-| link: Eras | **no** | desktop |  |
-| link: Gauntlet | **no** | desktop |  |
-| link: LastStint home | **no** | desktop |  |
-| link: OpenStreetMap contributors | **no** | desktop |  |
-| link: Privacy | **no** | desktop |  |
-| link: Terms | **no** | desktop |  |
-| tab: Legend | yes | desktop, phone | eras-phone.spec.ts |
-| tab: Normal | **no** | desktop |  |
-
-### `/eras/:n/:race/legend` (18 of 98 pressed)
+### `/eras/:n/:race/leaderboard` (14 of 14 pressed)
 
 | Control | Pressed | On | Pressed by |
 |---|---|---|---|
-| button: (a row of: Leaders) | **no** | desktop, phone |  |
-| button: (a row of: Standings) | **no** | desktop |  |
-| button: #× | yes | desktop, phone | eras-play.spec.ts |
+| button: Try again | yes | desktop, phone | screens/eras-leaderboard.spec.ts |
+| link: Back to era # | yes | desktop, phone | screens/eras-leaderboard.spec.ts |
+| link: Credits | yes | desktop, phone | screens/eras-leaderboard.spec.ts |
+| link: Daily | yes | desktop, phone | screens/eras-leaderboard.spec.ts |
+| link: data credits | yes | desktop, phone | screens/eras-leaderboard.spec.ts |
+| link: Eras | yes | desktop, phone | screens/eras-leaderboard.spec.ts |
+| link: Gauntlet | yes | desktop, phone | screens/eras-leaderboard.spec.ts |
+| link: LastStint home | yes | desktop, phone | screens/eras-leaderboard.spec.ts |
+| link: OpenStreetMap contributors | yes | desktop, phone | screens/eras-leaderboard.spec.ts |
+| link: Privacy | yes | desktop, phone | screens/eras-leaderboard.spec.ts |
+| link: Terms | yes | desktop, phone | screens/eras-leaderboard.spec.ts |
+| link: Versus | yes | desktop, phone | screens/eras-leaderboard.spec.ts |
+| tab: Legend | yes | desktop, phone | eras-phone.spec.ts, screens/eras-leaderboard.spec.ts |
+| tab: Normal | yes | desktop, phone | screens/eras-leaderboard.spec.ts |
+
+### `/eras/:n/:race/leaderboard/legend` (13 of 13 pressed)
+
+| Control | Pressed | On | Pressed by |
+|---|---|---|---|
+| link: Back to era # | yes | desktop, phone | screens/eras-leaderboard.spec.ts |
+| link: Credits | yes | desktop, phone | screens/eras-legend.spec.ts |
+| link: Daily | yes | desktop, phone | screens/eras-legend.spec.ts |
+| link: data credits | yes | desktop, phone | screens/eras-legend.spec.ts |
+| link: Eras | yes | desktop, phone | screens/eras-legend.spec.ts |
+| link: Gauntlet | yes | desktop, phone | screens/eras-legend.spec.ts |
+| link: LastStint home | yes | desktop, phone | screens/eras-legend.spec.ts |
+| link: OpenStreetMap contributors | yes | desktop, phone | screens/eras-legend.spec.ts |
+| link: Privacy | yes | desktop, phone | screens/eras-legend.spec.ts |
+| link: Terms | yes | desktop, phone | screens/eras-legend.spec.ts |
+| link: Versus | yes | desktop, phone | screens/eras-legend.spec.ts |
+| tab: Legend | yes | desktop, phone | screens/eras-leaderboard.spec.ts |
+| tab: Normal | yes | desktop, phone | screens/eras-leaderboard.spec.ts |
+
+### `/eras/:n/:race/legend` (61 of 129 pressed)
+
+| Control | Pressed | On | Pressed by |
+|---|---|---|---|
+| button: (a row of: Leaders) | yes | desktop, phone | screens/eras-legend.spec.ts |
+| button: (a row of: Standings) | yes | desktop | screens/eras-legend.spec.ts |
+| button: #× | yes | desktop, phone | eras-play.spec.ts, screens/eras-legend.spec.ts |
 | button: #ALO | **no** | desktop, phone |  |
 | button: #ALO+# | **no** | desktop, phone |  |
-| button: #Block the lunge on the brakesContact and track-limits risk · he’s expecting it  | **no** | desktop, phone |  |
-| button: #Block the lunge on the brakesContact and track-limits riskRisky | **no** | desktop, phone |  |
-| button: #Cover the insideSolid, costs a little timeBalanced | **no** | desktop, phone |  |
-| button: #Cut back at the second apexGive him the first part, win the exit · he’s coverin | yes | desktop, phone | eras-play.spec.ts |
-| button: #Cut back at the second apexGive him the first part, win the exitBalanced | yes | desktop, phone | eras-play.spec.ts |
-| button: #Defend hardContact and track-limits riskRisky | **no** | desktop, phone |  |
-| button: #Defend the second apexWatch the cutbackSafer | **no** | desktop, phone |  |
-| button: #Dive up the insideLate on the brakes · he’s covering it nowRisky | **no** | desktop, phone |  |
-| button: #Dive up the insideLate on the brakesRisky | **no** | desktop, phone |  |
-| button: #Hold the outside lineQuicker, easier to passSafer | **no** | desktop, phone |  |
-| button: #Late-brake up the insideClassic hairpin lungeRisky | **no** | desktop, phone |  |
-| button: #Let him goSave the tyresGives way | yes | desktop, phone | eras-play.spec.ts |
-| button: #Lunge into the first apexBrake as late as you dare · he’s covering it nowRisky | **no** | desktop, phone |  |
-| button: #Lunge into the first apexBrake as late as you dareRisky | **no** | desktop, phone |  |
 | button: #PET+# | **no** | desktop, phone |  |
-| button: #Protect the first apexSolid, costs a little timeBalanced | **no** | desktop, phone |  |
-| button: #Round the outsideCleaner, harder to make stick · he’s covering it nowBalanced | yes | desktop, phone | eras-play.spec.ts |
-| button: #Round the outsideCleaner, harder to make stickBalanced | yes | desktop, phone | eras-play.spec.ts |
-| button: #Switchback on the exitLet him turn in, cut back under him · he’s covering it no | yes | desktop, phone | eras-play.spec.ts |
-| button: #Switchback on the exitLet him turn in, cut back under himBalanced | yes | desktop, phone | eras-play.spec.ts |
-| button: A · No stop…Stay out to the flag · pushPushL#L# | **no** | desktop, phone |  |
-| button: A · No stopEngineer’s pick#%Stay out to the flag · pushPushL#L# | **no** | desktop, phone |  |
+| button: A · No stop, #% | yes | desktop, phone | screens/eras-legend.spec.ts |
+| button: A · No stop, #%, engineer’s pick | **no** | desktop, phone |  |
+| button: A · No stop, chance being worked out | **no** | desktop, phone |  |
+| button: ALBM: details | **no** | desktop, phone |  |
 | button: ALG: details | **no** | desktop, phone |  |
 | button: ALO: details | **no** | desktop, phone |  |
-| button: Attack | **no** | desktop, phone |  |
-| button: B · One stop…hards on lap # · standard, then pushPushL#L# | **no** | desktop, phone |  |
-| button: B · One stop#%hards on lap # · standard, then pushPushL#L# | **no** | desktop, phone |  |
+| button: attack | yes | desktop, phone | screens/eras-legend.spec.ts |
+| button: B · One stop, #% | **no** | desktop, phone |  |
+| button: B · One stop, #%, engineer’s pick | yes | desktop, phone | screens/eras-legend.spec.ts |
+| button: B · One stop, chance being worked out | **no** | desktop, phone |  |
+| button: Back: close How it works | yes | desktop, phone | screens/eras-legend.spec.ts |
 | button: BAR: details | **no** | desktop, phone |  |
+| button: Block the lunge on the brakes | **no** | desktop, phone |  |
+| button: BOUT: details | **no** | desktop, phone |  |
+| button: BRU: details | **no** | desktop, phone |  |
 | button: BUE: details | **no** | desktop, phone |  |
-| button: Build your own | **no** | desktop, phone |  |
+| button: Build your own | yes | desktop, phone | screens/eras-legend.spec.ts |
 | button: BUT: details | **no** | desktop, phone |  |
-| button: C · Two stops…softs on lap #, hards on lap # · standard, then standard, then pus | **no** | desktop, phone |  |
-| button: C · Two stops#%softs on lap #, hards on lap # · standard, then standard, then pu | **no** | desktop, phone |  |
-| button: Calls | **no** | phone |  |
-| button: Car | **no** | phone |  |
-| button: ClassificationShow | **no** | desktop, phone |  |
+| button: C · One stop, #% | yes | desktop, phone | screens/eras-legend.spec.ts |
+| button: C · Two stops, #% | **no** | desktop, phone |  |
+| button: C · Two stops, chance being worked out | **no** | desktop, phone |  |
+| button: Calls | yes | phone | screens/eras-legend.spec.ts |
+| button: Car | yes | phone | screens/eras-legend.spec.ts |
+| button: Change | **no** | phone |  |
+| button: ClassificationShow | yes | desktop, phone | screens/eras-legend.spec.ts |
+| button: Close driver details | yes | desktop, phone | screens/eras-legend.spec.ts |
+| button: COM: details | **no** | desktop, phone |  |
+| button: Copied! | **no** | desktop, phone |  |
+| button: Cover the inside | **no** | desktop, phone |  |
+| button: Cut back at the second apex | yes | desktop, phone | eras-play.spec.ts, screens/eras-legend.spec.ts |
+| button: defend | **no** | desktop, phone |  |
 | button: Defend hard | yes | desktop, phone | eras-play.spec.ts |
+| button: Defend the second apex | **no** | desktop, phone |  |
 | button: DIG: details | **no** | desktop, phone |  |
-| button: Drop back, cool the tyres#Back off a second, go again fresh | yes | desktop, phone | eras-play.spec.ts |
-| button: Follow car | **no** | desktop, phone |  |
+| button: Dive up the inside | **no** | desktop, phone |  |
+| button: Drop back, cool the tyres | yes | desktop, phone | eras-play.spec.ts |
+| button: FITC: details | **no** | desktop, phone |  |
+| button: Focus view | yes | desktop | screens/eras-legend.spec.ts |
+| button: Follow car | yes | desktop, phone | screens/eras-legend.spec.ts |
+| button: GAC: details | **no** | desktop, phone |  |
 | button: GLO: details | **no** | desktop, phone |  |
-| button: Go with plan A | yes | desktop, phone | eras-play.spec.ts |
+| button: Go with plan A | yes | desktop, phone | eras-play.spec.ts, screens/eras-legend.spec.ts |
+| button: Go with plan B | yes | desktop, phone | screens/eras-legend.spec.ts |
 | button: HAM: details | **no** | desktop, phone |  |
 | button: HEI: details | **no** | desktop, phone |  |
+| button: hold | **no** | desktop, phone |  |
 | button: Hold the line | **no** | desktop, phone |  |
+| button: Hold the outside line | **no** | desktop, phone |  |
+| button: How it works | yes | desktop, phone | screens/eras-legend.spec.ts |
 | button: HUL: details | **no** | desktop, phone |  |
-| button: Keep the pressure on#Stay in his gearbox: his tyres overheat | **no** | desktop, phone |  |
+| button: JAR: details | **no** | desktop, phone |  |
+| button: Keep the pressure on | **no** | desktop, phone |  |
 | button: KLI: details | **no** | desktop, phone |  |
 | button: KOB: details | **no** | desktop, phone |  |
 | button: KOV: details | **no** | desktop, phone |  |
 | button: KUB: details | **no** | desktop, phone |  |
-| button: LastStint | **no** | desktop, phone |  |
+| button: LastStint | yes | desktop, phone | screens/eras-legend.spec.ts |
 | button: LastStintPetrov’s race engineer · Renault | **no** | desktop |  |
-| button: Lift and coast#A bit slower, saves fuel and tyres | **no** | desktop, phone |  |
+| button: LastStintSenna’s race engineer · McLaren | yes | desktop | screens/eras-legend.spec.ts |
+| button: Late-brake up the inside | **no** | desktop, phone |  |
+| button: Let him go | yes | desktop, phone | eras-play.spec.ts |
+| button: Lift & coast | yes | desktop, phone | screens/eras-legend.spec.ts |
+| button: Lift and coast | **no** | desktop, phone |  |
+| button: Lunge into the first apex | **no** | desktop, phone |  |
+| button: MAN: details | **no** | desktop, phone |  |
+| button: manage | **no** | desktop, phone |  |
 | button: Manage the tyres | **no** | desktop, phone |  |
 | button: MAS: details | **no** | desktop, phone |  |
-| button: New attempt | **no** | desktop, phone |  |
-| button: No, save the tyres#He’ll remember if he was right | yes | desktop, phone | eras-play.spec.ts |
-| button: Not yet#Save it later; run dry and it costs seconds a lap | yes | desktop, phone | eras-play.spec.ts |
+| button: MSCM: details | **no** | desktop, phone |  |
+| button: New attempt | yes | desktop, phone | screens/eras-legend.spec.ts |
+| button: No, save the tyres | yes | desktop, phone | eras-play.spec.ts |
+| button: normal | **no** | desktop, phone |  |
+| button: Not yet | yes | desktop, phone | eras-play.spec.ts |
+| button: PAT: details | **no** | desktop, phone |  |
 | button: PET: details | **no** | desktop, phone |  |
 | button: Plan | **no** | desktop, phone |  |
+| button: Plan · box L# | yes | desktop, phone | screens/eras-legend.spec.ts |
 | button: Plan · to the flag | **no** | desktop, phone |  |
+| button: Protect the first apex | **no** | desktop, phone |  |
+| button: push | yes | desktop, phone | screens/eras-legend.spec.ts |
 | button: Push and attack | **no** | desktop, phone |  |
 | button: Push now | yes | desktop, phone | eras-play.spec.ts |
-| button: Push on the exits#Break the tow, harder on the tyres | **no** | desktop, phone |  |
-| button: Push# | **no** | desktop, phone |  |
-| button: Radio | **no** | phone |  |
-| button: Radio sound off | **no** | desktop |  |
+| button: Push on the exits | **no** | desktop, phone |  |
+| button: Radio | yes | phone | screens/eras-legend.spec.ts |
+| button: Radio sound off | yes | desktop | screens/eras-legend.spec.ts |
+| button: Radio sound on | yes | desktop | screens/eras-legend.spec.ts |
 | button: ROS: details | **no** | desktop, phone |  |
-| button: Save them, defend the slow corners#Easier on the tyres, he stays close | yes | desktop, phone | eras-play.spec.ts |
-| button: See how you did | yes | desktop, phone | eras-play.spec.ts |
+| button: Round the outside | yes | desktop, phone | eras-play.spec.ts |
+| button: Save them, defend the slow corners | yes | desktop, phone | eras-play.spec.ts |
+| button: See how you did | yes | desktop, phone | eras-play.spec.ts, screens/eras-legend.spec.ts |
 | button: SEN: details | **no** | desktop, phone |  |
-| button: Share result | **no** | desktop, phone |  |
-| button: Show stats | **no** | desktop |  |
+| button: SENA: details | yes | desktop, phone | screens/eras-legend.spec.ts |
+| button: Share result | yes | desktop, phone | screens/eras-legend.spec.ts |
+| button: Show stats | yes | desktop | screens/eras-legend.spec.ts |
+| button: standard | **no** | desktop, phone |  |
 | button: Standard pace | **no** | desktop, phone |  |
-| button: Standings | **no** | phone |  |
-| button: Start the race · Legend | yes | desktop, phone | eras-play.spec.ts |
-| button: Steady# | yes | desktop, phone | eras-play.spec.ts |
+| button: Standings | yes | phone | screens/eras-legend.spec.ts |
+| button: Start the race · Legend | yes | desktop, phone | eras-play.spec.ts, screens/eras-legend.spec.ts |
+| button: Steady | yes | desktop, phone | eras-play.spec.ts |
 | button: SUT: details | **no** | desktop, phone |  |
-| button: Team radio | **no** | desktop, phone |  |
-| button: Timer on | **no** | desktop, phone |  |
+| button: SUZ: details | **no** | desktop, phone |  |
+| button: Switchback on the exit | yes | desktop, phone | eras-play.spec.ts |
+| button: Team radio | yes | desktop, phone | screens/eras-legend.spec.ts |
+| button: Timer off | yes | desktop, phone | screens/eras-legend.spec.ts |
+| button: Timer on | yes | desktop, phone | screens/eras-legend.spec.ts |
 | button: TRU: details | **no** | desktop, phone |  |
 | button: VET: details | **no** | desktop, phone |  |
 | button: WEB: details | **no** | desktop, phone |  |
-| button: Yes, push# | **no** | desktop, phone |  |
-| link: © OpenStreetMap contributors | **no** | desktop, phone |  |
-| link: Back to era | **no** | desktop, phone |  |
-| link: Credits | **no** | desktop, phone |  |
-| link: History book | **no** | desktop, phone |  |
-| link: Legend leaderboard | **no** | desktop, phone |  |
-| link: OpenStreetMap contributors | **no** | desktop, phone |  |
-| link: Privacy | **no** | desktop, phone |  |
-| link: Terms | **no** | desktop, phone |  |
+| button: Yes, push | **no** | desktop, phone |  |
+| link: © OpenStreetMap contributors | yes | desktop, phone | screens/eras-legend.spec.ts |
+| link: Back to era | yes | desktop, phone | screens/eras-legend.spec.ts |
+| link: Back to the era | yes | desktop, phone | screens/eras-legend.spec.ts |
+| link: Credits | yes | desktop, phone | screens/eras-legend.spec.ts |
+| link: Daily | yes | desktop, phone | screens/eras-legend.spec.ts |
+| link: Eras | yes | desktop, phone | screens/eras-legend.spec.ts |
+| link: Gauntlet | yes | desktop, phone | screens/eras-legend.spec.ts |
+| link: History book | yes | desktop, phone | screens/eras-legend.spec.ts |
+| link: LastStint home | yes | desktop, phone | screens/eras-legend.spec.ts |
+| link: Legend leaderboard | yes | desktop, phone | screens/eras-legend.spec.ts |
+| link: OpenStreetMap contributors | yes | desktop, phone | screens/eras-legend.spec.ts |
+| link: Privacy | yes | desktop, phone | screens/eras-legend.spec.ts |
+| link: Terms | yes | desktop, phone | screens/eras-legend.spec.ts |
+| link: Versus | yes | desktop, phone | screens/eras-legend.spec.ts |
 
-### `/gauntlet` (10 of 73 pressed)
+### `/eras/history` (16 of 16 pressed)
 
 | Control | Pressed | On | Pressed by |
 |---|---|---|---|
-| button: (a row of: Leaders) | **no** | phone |  |
-| button: (a row of: Standings) | **no** | phone |  |
-| button: #× | yes | phone | survivor.spec.ts |
-| button: #Brake late, make it wideContact and track-limits riskRisky | **no** | phone |  |
-| button: #Cover the inside under brakingShut the door, slower exitBalanced | **no** | phone |  |
-| button: #Let him goSave the tyresGives way | **no** | phone |  |
-| button: #Square it off on the exitNormal line, watch the switchbackSafer | **no** | phone |  |
-| button: A · No stop…Stay out to the flagL#L# | **no** | phone |  |
-| button: All time | **no** | phone |  |
-| button: ALO: details | **no** | phone |  |
-| button: Attack | **no** | phone |  |
-| button: B · One stop…hards on lap # · standard, then pushPushL#L# | **no** | phone |  |
-| button: Back to round # | yes | phone | survivor.spec.ts |
-| button: Back to the Gauntlet menu | yes | phone | survivor.spec.ts |
-| button: BOT: details | **no** | phone |  |
-| button: Box | **no** | phone |  |
-| button: Box next lap | **no** | phone |  |
-| button: Box next lap, mediums | **no** | phone |  |
-| button: Box next lap, softs | **no** | phone |  |
-| button: Build your own | **no** | phone |  |
-| button: C · Two stops…softs on lap #, softs on lap # · standard, then standard, then pus | **no** | phone |  |
-| button: Defend hard | yes | phone | survivor.spec.ts |
-| button: Dismiss announcement | yes | phone | admin-tabs.spec.ts |
-| button: Follow car | **no** | phone |  |
-| button: GAS: details | **no** | phone |  |
-| button: Go round him now#Gains # s, a small risk of contact | **no** | phone |  |
-| button: Go with plan A | yes | phone | survivor.spec.ts |
-| button: HAM: details | **no** | phone |  |
-| button: Hold the line | **no** | phone |  |
-| button: Keep ours | **no** | phone |  |
-| button: Keep the pace# | **no** | phone |  |
-| button: LastStintHamilton’s race engineer · Mercedes | **no** | phone |  |
-| button: LAT: details | **no** | phone |  |
-| button: LEC: details | **no** | phone |  |
-| button: Manage the tyres | **no** | phone |  |
-| button: Manage# | **no** | phone |  |
-| button: MSC: details | **no** | phone |  |
-| button: Next race | yes | phone | survivor.spec.ts |
-| button: No, save the tyres#He’ll remember if he was right | **no** | phone |  |
-| button: NOR: details | **no** | phone |  |
-| button: OCO: details | **no** | phone |  |
-| button: PER: details | **no** | phone |  |
-| button: Plan | **no** | phone |  |
-| button: Plan · to the flag | **no** | phone |  |
-| button: Push and attack | **no** | phone |  |
-| button: Push now | yes | phone | survivor.spec.ts |
-| button: Push# | **no** | phone |  |
-| button: Radio sound off | **no** | phone |  |
-| button: RIC: details | **no** | phone |  |
-| button: SAI: details | **no** | phone |  |
-| button: Show stats | **no** | phone |  |
-| button: Standard pace | **no** | phone |  |
-| button: Start a run | yes | phone | survivor.spec.ts |
-| button: Stay on plan# | **no** | phone |  |
-| button: Stay out | yes | phone | survivor.spec.ts |
-| button: STR: details | **no** | phone |  |
-| button: Switch | **no** | phone |  |
-| button: Team radio | **no** | phone |  |
-| button: This week | **no** | phone |  |
-| button: TSU: details | **no** | phone |  |
-| button: VER: details | **no** | phone |  |
-| button: VET: details | **no** | phone |  |
-| button: Wait, we’ll tell race control#He’ll move over; no risk | **no** | phone |  |
-| button: Yes, push# | **no** | phone |  |
-| link: © OpenStreetMap contributors | **no** | phone |  |
-| link: Credits | **no** | phone |  |
-| link: Daily | **no** | phone |  |
-| link: Eras | **no** | phone |  |
-| link: Gauntlet | **no** | phone |  |
-| link: LastStint home | **no** | phone |  |
-| link: OpenStreetMap contributors | **no** | phone |  |
-| link: Privacy | **no** | phone |  |
-| link: Terms | **no** | phone |  |
+| button: Try again | yes | desktop, phone | screens/eras-history.spec.ts |
+| link: (a row of: Chapters) | yes | desktop, phone | screens/eras-history.spec.ts |
+| link: All eras | yes | desktop, phone | screens/eras-history.spec.ts |
+| link: Credits | yes | desktop, phone | screens/eras-history.spec.ts |
+| link: Daily | yes | desktop, phone | screens/eras-history.spec.ts |
+| link: data credits | yes | desktop, phone | screens/eras-history.spec.ts |
+| link: Eras | yes | desktop, phone | screens/eras-history.spec.ts |
+| link: Gauntlet | yes | desktop, phone | screens/eras-history.spec.ts |
+| link: LastStint home | yes | desktop, phone | screens/eras-history.spec.ts |
+| link: Leaderboard for Hungary # | yes | desktop, phone | screens/eras-history.spec.ts |
+| link: Leaderboard for Turkey # | yes | desktop, phone | screens/eras-history.spec.ts |
+| link: Legend leaderboard for Great Britain # | yes | desktop, phone | screens/eras-history.spec.ts |
+| link: OpenStreetMap contributors | yes | desktop, phone | screens/eras-history.spec.ts |
+| link: Privacy | yes | desktop, phone | screens/eras-history.spec.ts |
+| link: Terms | yes | desktop, phone | screens/eras-history.spec.ts |
+| link: Versus | yes | desktop, phone | screens/eras-history.spec.ts |
+
+### `/gauntlet` (150 of 174 pressed)
+
+| Control | Pressed | On | Pressed by |
+|---|---|---|---|
+| button: (a row of: Leaders) | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: (a row of: Race plan) | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: (a row of: Standings) | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: #× | yes | desktop, phone | screens/gauntlet.spec.ts, survivor.spec.ts |
+| button: + Add a stop | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: A · No stop, #%, engineer’s pick | **no** | desktop, phone |  |
+| button: A · No stop, chance being worked out | **no** | desktop, phone |  |
+| button: A · One stop, #% | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: A · One stop, chance being worked out | **no** | desktop, phone |  |
+| button: Account: Ada Lovelace | yes | desktop, phone | screens/account.spec.ts |
+| button: Account: Undercut | yes | desktop, phone | screens/account.spec.ts |
+| button: ALB: details | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Albon lets you by | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: All time | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: ALO: details | **no** | desktop, phone |  |
+| button: Alpine | yes | desktop, phone | screens/account.spec.ts |
+| button: Aston Martin | yes | desktop, phone | screens/account.spec.ts |
+| button: Attack | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: B · One stop, #% | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: B · One stop, chance being worked out | **no** | desktop, phone |  |
+| button: Back | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Back off at the exits | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Back to round # | yes | desktop, phone | screens/gauntlet.spec.ts, survivor.spec.ts |
+| button: Back to the Gauntlet menu | yes | desktop, phone | screens/gauntlet.spec.ts, survivor.spec.ts |
+| button: balanced | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Block the lunge on the brakes | **no** | desktop, phone |  |
+| button: BOT: details | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Bottas lets you by | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Box | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Box as planned | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Box next lap | **no** | desktop, phone |  |
+| button: Box next lap, hards | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Box next lap, mediums | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Box next lap, softs | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Brake late, make it wide | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Build your own | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: C · Two stops, #% | **no** | desktop, phone |  |
+| button: C · Two stops, #%, engineer’s pick | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: C · Two stops, chance being worked out | **no** | desktop, phone |  |
+| button: Calls | yes | phone | screens/gauntlet.spec.ts |
+| button: Cancel | yes | desktop, phone | screens/account.spec.ts, screens/gauntlet.spec.ts |
+| button: Car | yes | phone | screens/gauntlet.spec.ts |
+| button: Change | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Change plan | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Close driver details | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Cover the inside under braking | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Dealing round #… | **no** | desktop, phone |  |
+| button: defend | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Defend hard | yes | desktop, phone | screens/gauntlet.spec.ts, survivor.spec.ts |
+| button: Defend the second apex | **no** | desktop, phone |  |
+| button: deploy | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Dismiss announcement | yes | desktop, phone | admin-tabs.spec.ts, screens/account.spec.ts |
+| button: Drop back, cool the tyres | **no** | phone |  |
+| button: Ferrari | yes | desktop, phone | screens/account.spec.ts |
+| button: Flat out | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Focus view | yes | desktop | screens/gauntlet.spec.ts |
+| button: Follow car | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: GAS: details | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Gauntlet menu | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Get a better exit, go next lap | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: GIO: details | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Go round him now | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Go with plan A | yes | desktop, phone | screens/gauntlet.spec.ts, survivor.spec.ts |
+| button: Go with plan B | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Go with plan C | **no** | desktop, phone |  |
+| button: Go with your plan | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: GRO: details | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Haas F# Team | yes | desktop, phone | screens/account.spec.ts |
+| button: HAM: details | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Hards | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: harvest | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Harvest this lap | yes | desktop | screens/gauntlet.spec.ts |
+| button: HHards | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: hold | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Hold the line | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Hold up Bottas | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Hold up Verstappen | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Keep it balanced | **no** | desktop |  |
+| button: Keep ours | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Keep the pace | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Keep the pressure on | yes | phone | screens/gauntlet.spec.ts |
+| button: Keep using the kerbs | **no** | desktop, phone |  |
+| button: Kick Sauber | yes | desktop, phone | screens/account.spec.ts |
+| button: KVY: details | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: LastStintHamilton’s race engineer · Mercedes | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: LastStintVerstappen’s race engineer · Red Bull Racing | **no** | desktop |  |
+| button: LAT: details | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Late-brake up the inside | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Later | yes | desktop, phone | screens/account.spec.ts |
+| button: LEC: details | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Let Albon by | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Let Bottas by | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Let him go | **no** | desktop, phone |  |
+| button: Lift & coast | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Lift and coast | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: MAG: details | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Manage | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Manage the tyres | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: McLaren | yes | desktop, phone | screens/account.spec.ts |
+| button: Mediums | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Mercedes | yes | desktop, phone | screens/account.spec.ts |
+| button: MMediums | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: MSC: details | **no** | desktop, phone |  |
+| button: Next race | yes | desktop, phone | screens/gauntlet.spec.ts, survivor.spec.ts |
+| button: No, save the tyres | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: NOR: details | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: normal | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Not yet | **no** | desktop, phone |  |
+| button: OCO: details | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: One more lap | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: overtake | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Overtake boost | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: PER: details | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Plan | **no** | desktop, phone |  |
+| button: Plan · box L# | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Plan · to the flag | **no** | desktop, phone |  |
+| button: Protect the first apex | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Push | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Push and attack | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Push now | yes | desktop, phone | screens/gauntlet.spec.ts, survivor.spec.ts |
+| button: Racing Bulls | yes | desktop, phone | screens/account.spec.ts |
+| button: Radio | yes | phone | screens/gauntlet.spec.ts |
+| button: Radio sound off | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Radio sound on | yes | desktop | screens/gauntlet.spec.ts |
+| button: RAI: details | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Red Bull Racing | yes | desktop, phone | screens/account.spec.ts |
+| button: Release Bottas | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Release Verstappen | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: RIC: details | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Run this plan | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: RUS: details | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: SAI: details | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Save | yes | desktop, phone | screens/account.spec.ts |
+| button: Save it for later | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Show stats | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Square it off on the exit | **no** | desktop, phone |  |
+| button: SSofts | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Standard | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Standard pace | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Standings | yes | phone | screens/gauntlet.spec.ts |
+| button: Start a new run | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Start a run | yes | desktop, phone | screens/gauntlet.spec.ts, survivor.spec.ts |
+| button: Start round # | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Stay on plan | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Stay out | yes | desktop, phone | screens/gauntlet.spec.ts, survivor.spec.ts |
+| button: Steady | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: STR: details | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Switch | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Switchback on the exit | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Team radio | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: The engineer’s plans | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: This week | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Try again | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: TSU: details | **no** | desktop, phone |  |
+| button: VER: details | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: VET: details | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Wait, we’ll tell race control | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Williams | yes | desktop, phone | screens/account.spec.ts |
+| button: Yes, push | yes | desktop, phone | screens/gauntlet.spec.ts |
+| link: © OpenStreetMap contributors | yes | desktop, phone | screens/gauntlet.spec.ts |
+| link: Credits | yes | desktop, phone | screens/gauntlet.spec.ts |
+| link: Daily | yes | desktop, phone | screens/gauntlet.spec.ts |
+| link: Eras | yes | desktop, phone | screens/gauntlet.spec.ts |
+| link: Gauntlet | yes | desktop, phone | screens/gauntlet.spec.ts |
+| link: LastStint home | yes | desktop, phone | screens/gauntlet.spec.ts |
+| link: OpenStreetMap contributors | yes | desktop, phone | screens/gauntlet.spec.ts |
+| link: Privacy | yes | desktop, phone | screens/gauntlet.spec.ts |
+| link: Terms | yes | desktop, phone | screens/gauntlet.spec.ts |
+| link: Versus | **no** | desktop, phone |  |
+| menuitem: Admin | yes | desktop, phone | screens/account.spec.ts |
+| menuitem: Edit profile | yes | desktop, phone | screens/account.spec.ts |
+| menuitem: Sign out | yes | desktop, phone | screens/account.spec.ts |
+| slider: Stop # lap | yes | desktop, phone | screens/gauntlet.spec.ts |
+| textbox: Display name | yes | desktop, phone | screens/account.spec.ts |
+
+### `/privacy` (6 of 6 pressed)
+
+| Control | Pressed | On | Pressed by |
+|---|---|---|---|
+| link: Credits | yes | desktop, phone | screens/pages.spec.ts |
+| link: LastStint | yes | desktop, phone | screens/pages.spec.ts |
+| link: OpenStreetMap contributors | yes | desktop, phone | screens/pages.spec.ts |
+| link: Privacy | yes | desktop, phone | screens/pages.spec.ts |
+| link: purohit.abhiram@gmail.com | yes | desktop, phone | screens/pages.spec.ts |
+| link: Terms | yes | desktop, phone | screens/pages.spec.ts |
+
+### `/terms` (7 of 7 pressed)
+
+| Control | Pressed | On | Pressed by |
+|---|---|---|---|
+| link: Credits | yes | desktop, phone | screens/pages.spec.ts |
+| link: LastStint | yes | desktop, phone | screens/pages.spec.ts |
+| link: OpenStreetMap contributors | yes | desktop, phone | screens/pages.spec.ts |
+| link: Privacy | yes | desktop, phone | screens/pages.spec.ts |
+| link: privacy policy | yes | desktop, phone | screens/pages.spec.ts |
+| link: purohit.abhiram@gmail.com | yes | desktop, phone | screens/pages.spec.ts |
+| link: Terms | yes | desktop, phone | screens/pages.spec.ts |
+
+### `/tutorial` (25 of 90 pressed)
+
+| Control | Pressed | On | Pressed by |
+|---|---|---|---|
+| button: (a row of: Leaders) | **no** | desktop, phone |  |
+| button: (a row of: Race plan) | **no** | desktop, phone |  |
+| button: (a row of: Standings) | **no** | desktop |  |
+| button: #× | yes | desktop, phone | screens/pages.spec.ts |
+| button: + Add a stop | **no** | desktop, phone |  |
+| button: A · One stop, #% | **no** | desktop, phone |  |
+| button: A · One stop, chance being worked out | **no** | desktop, phone |  |
+| button: ALB: details | **no** | desktop, phone |  |
+| button: ALO: details | **no** | desktop, phone |  |
+| button: attack | **no** | desktop, phone |  |
+| button: B · One stop, #%, engineer’s pick | **no** | desktop, phone |  |
+| button: B · One stop, chance being worked out | **no** | desktop, phone |  |
+| button: balanced | **no** | desktop, phone |  |
+| button: Block the lunge on the brakes | **no** | desktop, phone |  |
+| button: BOT: details | **no** | desktop, phone |  |
+| button: Box | **no** | desktop, phone |  |
+| button: Box as planned | **no** | desktop, phone |  |
+| button: Box next lap, hards | **no** | desktop, phone |  |
+| button: Build your own | yes | desktop, phone | screens/pages.spec.ts |
+| button: C · Two stops, #% | **no** | desktop, phone |  |
+| button: C · Two stops, chance being worked out | **no** | desktop, phone |  |
+| button: Calls | yes | phone | screens/pages.spec.ts |
+| button: Car | yes | phone | screens/pages.spec.ts |
+| button: Change plan | **no** | desktop, phone |  |
+| button: ClassificationShow | yes | desktop, phone | screens/pages.spec.ts |
+| button: defend | **no** | desktop, phone |  |
+| button: Defend the second apex | **no** | desktop, phone |  |
+| button: deploy | **no** | desktop, phone |  |
+| button: Finish | yes | desktop, phone | screens/pages.spec.ts |
+| button: Focus view | yes | desktop | screens/pages.spec.ts |
+| button: Follow car | yes | desktop, phone | screens/pages.spec.ts |
+| button: GAS: details | **no** | desktop, phone |  |
+| button: Go with plan A | **no** | desktop, phone |  |
+| button: Go with plan B | yes | desktop, phone | screens/pages.spec.ts |
+| button: Go with your plan | **no** | desktop, phone |  |
+| button: Got it | yes | desktop, phone | screens/pages.spec.ts |
+| button: HAM: details | **no** | desktop, phone |  |
+| button: harvest | **no** | desktop, phone |  |
+| button: HHards | **no** | desktop, phone |  |
+| button: hold | **no** | desktop, phone |  |
+| button: Hold up Verstappen | **no** | desktop, phone |  |
+| button: LastStintSainz’s race engineer · Ferrari | yes | desktop | screens/pages.spec.ts |
+| button: LAT: details | **no** | desktop, phone |  |
+| button: LEC: details | **no** | desktop, phone |  |
+| button: Leclerc lets you by | **no** | desktop, phone |  |
+| button: Let him go | **no** | desktop, phone |  |
+| button: Let Leclerc by | **no** | desktop, phone |  |
+| button: Lift & coast | **no** | desktop, phone |  |
+| button: MAG: details | **no** | desktop, phone |  |
+| button: manage | **no** | desktop, phone |  |
+| button: Manage the tyres | **no** | desktop, phone |  |
+| button: MMediums | **no** | desktop, phone |  |
+| button: MSC: details | **no** | desktop, phone |  |
+| button: NOR: details | **no** | desktop, phone |  |
+| button: normal | **no** | desktop, phone |  |
+| button: OCO: details | **no** | desktop, phone |  |
+| button: One more lap | **no** | desktop, phone |  |
+| button: overtake | **no** | desktop, phone |  |
+| button: Plan | **no** | desktop, phone |  |
+| button: Plan · box L# | **no** | desktop, phone |  |
+| button: Plan · to the flag | **no** | desktop, phone |  |
+| button: Protect the first apex | yes | desktop, phone | screens/pages.spec.ts |
+| button: Push | yes | desktop, phone | screens/pages.spec.ts |
+| button: Push and attack | **no** | desktop, phone |  |
+| button: Push now | yes | desktop, phone | screens/pages.spec.ts |
+| button: Radio | yes | phone | screens/pages.spec.ts |
+| button: Radio sound off | **no** | desktop |  |
+| button: Restart the race | yes | desktop | screens/pages.spec.ts |
+| button: RIC: details | **no** | desktop, phone |  |
+| button: RUS: details | **no** | desktop, phone |  |
+| button: SAI: details | **no** | desktop, phone |  |
+| button: See how you did | yes | desktop, phone | screens/pages.spec.ts |
+| button: Show stats | yes | desktop | screens/pages.spec.ts |
+| button: Skip the tutorial | yes | desktop, phone | screens/pages.spec.ts |
+| button: Skip tutorial | yes | desktop, phone | screens/pages.spec.ts |
+| button: standard | **no** | desktop, phone |  |
+| button: Standard pace | **no** | desktop, phone |  |
+| button: Standings | yes | phone | screens/pages.spec.ts |
+| button: Start the tutorial | yes | desktop, phone | screens/pages.spec.ts |
+| button: Stay out | yes | desktop, phone | screens/pages.spec.ts |
+| button: Steady | **no** | desktop, phone |  |
+| button: STR: details | **no** | desktop, phone |  |
+| button: Team radio | yes | desktop, phone | screens/pages.spec.ts |
+| button: The engineer’s plans | yes | desktop, phone | screens/pages.spec.ts |
+| button: TSU: details | **no** | desktop, phone |  |
+| button: VER: details | **no** | desktop, phone |  |
+| button: VET: details | **no** | desktop, phone |  |
+| button: ZHO: details | **no** | desktop, phone |  |
+| link: © OpenStreetMap contributors | **no** | desktop, phone |  |
+| slider: Stop # lap | **no** | desktop, phone |  |
 
 ## Controls with no accessible name (D7)
 
