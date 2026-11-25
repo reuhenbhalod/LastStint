@@ -3,14 +3,10 @@
 // filter by owner. SHOTS=<dir> also saves desktop and phone screenshots.
 import type { Page } from '@playwright/test';
 import { expect, test } from './coverage.js';
+import { token } from './screens/adminApi.js';
 
 const me = 'reuhenbhalod@gmail.com';
 const other = 'purohit.abhiram@gmail.com';
-
-const token = () => {
-  const part = (o: object) => Buffer.from(JSON.stringify(o)).toString('base64url');
-  return `${part({ alg: 'none' })}.${part({ exp: Math.floor(Date.now() / 1000) + 3600 })}.x`;
-};
 
 function ticket(id: number, over: Record<string, unknown> = {}) {
   return {
@@ -105,6 +101,24 @@ test('pick up, reassign, unassign and filter by owner', async ({ page }) => {
     { id: 1, assignee: '' },
   ]);
   await expect(hard.getByRole('button', { name: 'Pick up #1' })).toBeVisible();
+
+  // The status switch, and every card opening (screens/admin-tickets.spec.ts goes further).
+  const icon = page.locator('li', { hasText: 'favicon' });
+  await icon.getByRole('button', { name: 'In progress', exact: true }).click();
+  await expect(icon.getByRole('button', { name: 'In progress', exact: true })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await icon.getByRole('button', { name: 'Open', exact: true }).click();
+  expect(patches.slice(3)).toEqual([
+    { id: 3, status: 'in_progress' },
+    { id: 3, status: 'open' },
+  ]);
+  await page.getByRole('button', { name: /^Completed/ }).click();
+  for (const toggle of await page.locator('li button[aria-expanded]').all()) {
+    await toggle.click();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  }
 });
 
 test('phone layout', async ({ page }) => {

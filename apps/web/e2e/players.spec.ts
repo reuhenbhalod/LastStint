@@ -3,11 +3,7 @@
 // and phone screenshots.
 import type { Page } from '@playwright/test';
 import { expect, test } from './coverage.js';
-
-const token = () => {
-  const part = (o: object) => Buffer.from(JSON.stringify(o)).toString('base64url');
-  return `${part({ alg: 'none' })}.${part({ exp: Math.floor(Date.now() / 1000) + 3600 })}.x`;
-};
+import { token } from './screens/adminApi.js';
 
 const day = (n: number) => new Date(Date.now() - n * 86_400_000).toISOString();
 

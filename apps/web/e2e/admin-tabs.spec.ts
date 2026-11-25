@@ -3,14 +3,10 @@
 // set on Today shows under the top bar of the game's pages, and dismissing it sticks.
 import type { Page } from '@playwright/test';
 import { expect, test } from './coverage.js';
+import { token } from './screens/adminApi.js';
 
 const today = '2026-11-11';
 const email = 'admin@example.com';
-
-const token = () => {
-  const part = (o: object) => Buffer.from(JSON.stringify(o)).toString('base64url');
-  return `${part({ alg: 'none' })}.${part({ exp: Math.floor(Date.now() / 1000) + 3600 })}.x`;
-};
 
 const day = (date: string, number: number, current = true) => ({
   date,

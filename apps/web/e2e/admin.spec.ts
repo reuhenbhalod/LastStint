@@ -4,15 +4,10 @@
 // the admin list is told so. admin-tabs.spec.ts opens every other tab.
 import type { Page } from '@playwright/test';
 import { expect, test } from './coverage.js';
+import { token } from './screens/adminApi.js';
 
 const today = '2026-11-03';
 const email = 'admin@example.com';
-
-/** A token the page accepts until the server says otherwise (only its expiry is read). */
-const token = () => {
-  const part = (o: object) => Buffer.from(JSON.stringify(o)).toString('base64url');
-  return `${part({ alg: 'none' })}.${part({ exp: Math.floor(Date.now() / 1000) + 3600 })}.x`;
-};
 
 async function signIn(page: Page) {
   const t = token();
