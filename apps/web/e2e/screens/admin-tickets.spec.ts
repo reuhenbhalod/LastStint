@@ -26,12 +26,9 @@ test('the list: groups, counts and the Completed section', async ({ page }) => {
     'UI (2)',
   ]);
   // In progress before open, within a group.
-  expect(await titles(page)).toEqual([
-    'Make hard tyres last longer',
-    'Add wet tyres',
-    'Add a favicon',
-    'Taken already',
-  ]);
+  await expect
+    .poll(() => titles(page))
+    .toEqual(['Make hard tyres last longer', 'Add wet tyres', 'Add a favicon', 'Taken already']);
   await expect(page.getByRole('button', { name: /^Everyone/ })).toHaveText(/4$/);
   await expect(page.getByRole('button', { name: /^(Mine|Assigned to me) ?\d/ })).toHaveText(/1$/);
   await expect(page.getByRole('button', { name: /^Unassigned/ })).toHaveText(/2$/);
@@ -167,7 +164,7 @@ test('create a ticket: defaults, Cancel, Escape, saving and a refusal', async ({
       assignee: OTHER,
     });
   await expect(page.getByRole('heading', { name: 'Feature (2)' })).toBeVisible();
-  expect(await titles(page)).toEqual(['Add wet tyres', 'Night mode']);
+  await expect.poll(() => titles(page)).toEqual(['Add wet tyres', 'Night mode']);
 });
 
 test('switch status, pick up an in-progress ticket, delete one', async ({ page }) => {
@@ -233,11 +230,11 @@ test('search, category and owner filters, and their empty messages', async ({ pa
   await open(page);
   const search = page.getByRole('searchbox', { name: 'Search tickets' });
   await search.fill('#2');
-  expect(await titles(page)).toEqual(['Add wet tyres']);
+  await expect.poll(() => titles(page)).toEqual(['Add wet tyres']);
   await search.fill('purohit');
-  expect(await titles(page)).toEqual(['Add wet tyres']);
+  await expect.poll(() => titles(page)).toEqual(['Add wet tyres']);
   await search.fill('2021 DATA');
-  expect(await titles(page)).toEqual(['Make hard tyres last longer']);
+  await expect.poll(() => titles(page)).toEqual(['Make hard tyres last longer']);
   await search.fill('zzz');
   await expect(page.getByText('No open tickets match.')).toBeVisible();
   await page.getByRole('button', { name: /^Completed/ }).click();
@@ -257,7 +254,9 @@ test('search, category and owner filters, and their empty messages', async ({ pa
     await expect(chip).toHaveAttribute('aria-pressed', 'true');
     if (shown[c]) {
       // Done tickets in the Completed list (open) count too.
-      expect((await titles(page)).filter((t) => t !== 'Slow the race down')).toEqual(shown[c]);
+      await expect
+        .poll(async () => (await titles(page)).filter((t) => t !== 'Slow the race down'))
+        .toEqual(shown[c]);
     } else await expect(page.getByText('No open tickets match.')).toBeVisible();
   }
   await page.getByRole('button', { name: 'All', exact: true }).click();
@@ -265,23 +264,24 @@ test('search, category and owner filters, and their empty messages', async ({ pa
   const mine = page.getByRole('button', { name: /^(Mine|Assigned to me) ?\d/ });
   await mine.click();
   await expect(mine).toHaveAttribute('aria-pressed', 'true');
-  expect((await titles(page)).filter((t) => t !== 'Slow the race down')).toEqual(['Taken already']);
+  await expect
+    .poll(async () => (await titles(page)).filter((t) => t !== 'Slow the race down'))
+    .toEqual(['Taken already']);
   await page.getByRole('button', { name: /^Unassigned/ }).click();
-  expect((await titles(page)).filter((t) => t !== 'Slow the race down')).toEqual([
-    'Make hard tyres last longer',
-    'Add a favicon',
-  ]);
+  await expect
+    .poll(async () => (await titles(page)).filter((t) => t !== 'Slow the race down'))
+    .toEqual(['Make hard tyres last longer', 'Add a favicon']);
   await page.getByRole('button', { name: /^Everyone/ }).click();
   await expect(page.getByRole('heading', { level: 2 })).toHaveCount(3);
 
-  // One card found: open it, and pick it up from there.
+  // One card found: pick it up, then open it.
   await search.fill('favicon');
   const fav = card(page, 'Add a favicon');
+  await fav.getByRole('button', { name: 'Pick up #3', exact: true }).click();
+  await expect(fav.getByLabel('Assignee for #3')).toHaveValue(EMAIL);
   const toggle = fav.getByRole('button', { name: /^Add a favicon/ });
   await toggle.click();
   await expect(toggle).toHaveAttribute('aria-expanded', 'true');
-  await fav.getByRole('button', { name: 'Pick up #3', exact: true }).click();
-  await expect(fav.getByLabel('Assignee for #3')).toHaveValue(EMAIL);
   await search.fill('');
 });
 
@@ -349,6 +349,10 @@ test('the owner filter picked while the tickets load', async ({ page }) => {
     await expect(chip).toHaveAttribute('aria-pressed', 'true');
   }
   release();
-  expect(await titles(page)).toEqual(['Make hard tyres last longer', 'Add a favicon']);
   await expect(page.getByRole('button', { name: /^Unassigned/ })).toHaveText(/2$/);
+  await expect(page.getByRole('button', { name: /^Unassigned/ })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await expect.poll(() => titles(page)).toEqual(['Make hard tyres last longer', 'Add a favicon']);
 });

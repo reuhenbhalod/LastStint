@@ -29,18 +29,18 @@ test('summary, search, every sort and Refresh', async ({ page }) => {
 
   const sort = page.getByRole('combobox', { name: 'Sort' });
   await expect(sort).toHaveValue('newest');
-  expect(await firstCells(page)).toEqual(['Fast Ann', 'Bo', 'No name']);
+  await expect.poll(() => firstCells(page)).toEqual(['Fast Ann', 'Bo', 'No name']);
   await sort.selectOption('Last played');
-  expect(await firstCells(page)).toEqual(['Fast Ann', 'No name', 'Bo']);
+  await expect.poll(() => firstCells(page)).toEqual(['Fast Ann', 'No name', 'Bo']);
   await sort.selectOption('Most played');
-  expect(await firstCells(page)).toEqual(['Fast Ann', 'Bo', 'No name']);
+  await expect.poll(() => firstCells(page)).toEqual(['Fast Ann', 'Bo', 'No name']);
   await sort.selectOption('Newest');
 
   const search = page.getByRole('searchbox', { name: 'Search players' });
   await search.fill('mclaren');
-  expect(await firstCells(page)).toEqual(['Fast Ann']);
+  await expect.poll(() => firstCells(page)).toEqual(['Fast Ann']);
   await search.fill('BO EXAMPLE');
-  expect(await firstCells(page)).toEqual(['Bo']);
+  await expect.poll(() => firstCells(page)).toEqual(['Bo']);
   await search.fill('nobody');
   await expect(page.getByText('No players match the search.')).toBeVisible();
   await search.fill('');

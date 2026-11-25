@@ -26,37 +26,47 @@ test('Stats: every section, Refresh, empty tables and an error', async ({ page }
     page.getByText(`2026-10-13 to ${TODAY} (UTC), from stored runs only.`),
   ).toBeVisible();
   // Newest day first.
-  expect(await table(page, 0)).toEqual([
-    [TODAY, '12', '90%', '71.5'],
-    ['2026-11-10', '9', '75%', '64.2'],
-  ]);
-  expect(await table(page, 1)).toEqual([
-    [TODAY, 'Abu Dhabi 2021', '53', 'Stay out', '5', '42%'],
-    ['2026-11-10', 'Spain 2020', '—', 'Box: hards', '2', '20%'],
-  ]);
+  await expect
+    .poll(() => table(page, 0))
+    .toEqual([
+      [TODAY, '12', '90%', '71.5'],
+      ['2026-11-10', '9', '75%', '64.2'],
+    ]);
+  await expect
+    .poll(() => table(page, 1))
+    .toEqual([
+      [TODAY, 'Abu Dhabi 2021', '53', 'Stay out', '5', '42%'],
+      ['2026-11-10', 'Spain 2020', '—', 'Box: hards', '2', '20%'],
+    ]);
   await expect(tile(page, 'Runs started')).toHaveText('30');
   await expect(tile(page, 'Started in 30 days')).toHaveText('12');
   await expect(tile(page, 'Best run')).toHaveText('6 rounds, Fast Ann');
-  expect(await table(page, 2)).toEqual([
-    ['1', '14'],
-    ['2', '8'],
-  ]);
+  await expect
+    .poll(() => table(page, 2))
+    .toEqual([
+      ['1', '14'],
+      ['2', '8'],
+    ]);
   await expect(
     page.getByText('2 players have at least one normal star.', { exact: false }),
   ).toBeVisible();
-  expect(await table(page, 3)).toEqual([['10: Ground-effect era', '4', '5', '2']]);
+  await expect.poll(() => table(page, 3)).toEqual([['10: Ground-effect era', '4', '5', '2']]);
   await expect(page.getByText('4 matches stored.')).toBeVisible();
-  expect(await table(page, 4)).toEqual([
-    [TODAY, '3'],
-    ['2026-11-10', '1'],
-  ]);
+  await expect
+    .poll(() => table(page, 4))
+    .toEqual([
+      [TODAY, '3'],
+      ['2026-11-10', '1'],
+    ]);
   await expect(tile(page, 'Accounts')).toHaveText('20');
   await expect(tile(page, 'Daily players in 30 days')).toHaveText('40');
   await expect(tile(page, 'Of them signed in')).toHaveText('25%');
-  expect(await table(page, 5)).toEqual([
-    [TODAY, '2'],
-    ['2026-11-10', '1'],
-  ]);
+  await expect
+    .poll(() => table(page, 5))
+    .toEqual([
+      [TODAY, '2'],
+      ['2026-11-10', '1'],
+    ]);
 
   // Refresh: nothing stored yet.
   const s = api.state.stats;
