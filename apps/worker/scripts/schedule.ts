@@ -18,8 +18,11 @@
 //   --allow-ineligible     allow races that aren't eligible (local or staging, for testing)
 //   --dry-run              print the plan without writing
 //
-// A race is eligible when it's in the daily pool (data/pools.json), has approved decision
-// moments, and its Gate G1 status in docs/g1-report.md is pass or borderline. Dates already scheduled are never changed.
+// A race is eligible when it's in the daily pool (data/pools.json) and has approved decision
+// moments: the same rule as the admin page (src/admin.ts playableRaces). A race passes robust
+// G1 before it joins the pool, so the pool is the gate (docs/g1-report.md no longer lists every
+// pool race, and its later tables repeat race ids with other columns). Dates already scheduled
+// are never changed.
 
 import { mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -74,19 +77,6 @@ function parseArgs(argv: string[]) {
   return args as typeof args & { target: Target };
 }
 
-/** Gate G1 status per race, from the generated report's tables. */
-export function g1Statuses(report: string): Map<string, string> {
-  const statuses = new Map<string, string>();
-  for (const line of report.split('\n')) {
-    const cells = line.split('|').map((c) => c.trim());
-    // | race | duel | status | ...
-    if (cells.length > 4 && /^[a-z0-9-]+-\d{4}$/.test(cells[1] ?? '')) {
-      statuses.set(cells[1] as string, cells[3] as string);
-    }
-  }
-  return statuses;
-}
-
 function loadModels(): Map<string, Model> {
   const dir = join(repo, 'data', 'races');
   const models = new Map<string, Model>();
@@ -118,22 +108,15 @@ function query<T>(target: Target, sql: string): T[] {
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   const models = loadModels();
-  const statuses = g1Statuses(readFileSync(join(repo, 'docs', 'g1-report.md'), 'utf8'));
   const daily = (
     JSON.parse(readFileSync(join(repo, 'data', 'pools.json'), 'utf8')) as {
       daily: string[];
     }
   ).daily;
-  // In the daily pool (survivor races never play as dailies), with moments, passing G1.
+  // In the daily pool (survivor races never play as dailies), with moments.
   const eligible = (id: string) => {
     const m = models.get(id);
-    const status = statuses.get(id);
-    return (
-      daily.includes(id) &&
-      !!m &&
-      m.decisionMoments.length > 0 &&
-      (status === 'pass' || status === 'borderline')
-    );
+    return daily.includes(id) && !!m && m.decisionMoments.length > 0;
   };
 
   let pool: string[];
@@ -141,7 +124,7 @@ async function main() {
     if (!models.has(args.race)) fail(`unknown race ${args.race}`);
     if (!eligible(args.race) && !args.allowIneligible) {
       fail(
-        `${args.race} is not eligible (moments: ${models.get(args.race)?.decisionMoments.length}, G1: ${statuses.get(args.race) ?? 'not validated'})`,
+        `${args.race} is not eligible (in the daily pool: ${daily.includes(args.race)}, moments: ${models.get(args.race)?.decisionMoments.length})`,
       );
     }
     pool = [args.race];

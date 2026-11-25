@@ -19,7 +19,7 @@ test('plays the Abu Dhabi daily end to end', async ({ page, context }) => {
   for (let i = 0; i < 5; i++) await page.getByRole('button', { name: 'Next' }).click();
   await page.getByRole('button', { name: 'Got it' }).click();
   await expect(page.getByRole('dialog')).toHaveCount(0);
-  await expect(page.getByText('Daily Race #1')).toBeVisible();
+  await expect(page.getByText(/^Daily race · lap/i)).toBeVisible();
   if (shots) await page.screenshot({ path: `${shots}/1-intro.png`, fullPage: true });
   await page.getByRole('button', { name: /pit wall/ }).click();
   // The race plan comes first (the strategy planner): the engineer's plans, each with its
@@ -66,7 +66,7 @@ test('plays the Abu Dhabi daily end to end', async ({ page, context }) => {
   expect(JSON.stringify(submitted())).toContain('"momentId":"plan"');
   expect(submitted()).not.toBeNull();
   await expect(page.getByText('2/3')).toBeVisible(); // the server's rank
-  await expect(page.getByText(/LastStint #1 .*P50/)).toBeVisible();
+  await expect(page.getByText(/LastStint .*P50/)).toBeVisible();
   if (shots) await page.screenshot({ path: `${shots}/4-results.png`, fullPage: true });
   await page.getByRole('button', { name: 'Share result' }).click();
   await expect(page.getByRole('button', { name: 'Copied!' })).toBeVisible();

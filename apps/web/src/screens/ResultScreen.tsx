@@ -279,7 +279,8 @@ export function shareLine(
   plan: { band: Band } | null = null,
 ): string {
   const squares = squaresOf([...(plan ? [plan] : []), ...calls]);
-  const head = number ? `LastStint #${number}` : 'LastStint (practice)';
+  // The Daily's number isn't shown (owner, Nov 24 2026): it only tells a Daily from practice.
+  const head = number ? 'LastStint' : 'LastStint (practice)';
   const tail = percentile !== null ? ` P${percentile}` : '';
   return `${head} ${won ? 'WIN ' : ''}${squares}${tail}`;
 }
@@ -477,7 +478,7 @@ export function ResultScreen({
           {eras
             ? `Eras · Era ${eras.era.id}${eras.legend ? ' · Legend' : ''}`
             : number
-              ? `Daily #${number}`
+              ? 'Daily'
               : 'Practice run'}{' '}
           · {model?.race.name ?? state.meta.raceId}
         </span>
