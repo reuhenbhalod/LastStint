@@ -562,6 +562,9 @@ async function between(page: Page) {
 async function whileRacing(page: Page, act: () => Promise<void>) {
   for (let i = 0; ; i++) {
     await between(page);
+    // A driver card a call cut short is shut first (on a phone it hides the leaders).
+    const close = page.getByRole('button', { name: 'Close driver details' });
+    if (i > 0 && (await close.isVisible())) await close.click().catch(() => {});
     try {
       await act();
       return;
@@ -936,6 +939,31 @@ test.describe('race controls', () => {
       await radio.getByRole('button', { name: /mediums/i }).click({ timeout: 3000 });
       await expect(radio.getByText(/Boxing · mediums/i).first()).toBeVisible({ timeout: 3000 });
     });
+    // Team orders for Bottas, one a lap: hold up Verstappen (the button turns to Release once
+    // it's in), then each swap. An order goes in once; a retry only waits for it to show.
+    const orders: Array<[string, ReturnType<Page['getByText']>]> = [
+      ['Hold up Verstappen', radio.getByRole('button', { name: 'Release Verstappen' })],
+      // Who gives way: Bottas, then Hamilton.
+      ['Bottas lets you by', radio.getByText(/Swap called: (BOT|Bottas) yields/)],
+      ['Let Bottas by', radio.getByText(/Swap called: (HAM|Hamilton) yields/)],
+    ];
+    for (const [name, done] of orders) {
+      let sent = false;
+      await expect(async () => {
+        if (!sent) {
+          const lap = await lapOf(page);
+          while ((await lapOf(page)) <= lap) await between(page);
+        } else await between(page);
+        if ((await radioPill.getAttribute('aria-pressed')) !== 'true')
+          await radioPill.click({ timeout: 1000 });
+        if (!sent) {
+          await radio.getByRole('button', { name, exact: true }).click({ timeout: 1000 });
+          sent = true;
+        }
+        await expect(done).toBeVisible({ timeout: 3000 });
+      }).toPass({ timeout: 60_000 });
+      if (name.startsWith('Hold up')) await expect(done).toHaveAttribute('aria-pressed', 'true');
+    }
     // Once that stop is made, the tyre buttons come back: the other two compounds, in turn.
     for (const tyre of ['Hards', 'Softs']) {
       await expect(async () => {
@@ -959,6 +987,7 @@ test.describe('race controls', () => {
     );
     for (const c of ['MEDIUM', 'HARD', 'SOFT'])
       expect(decisions.some((d) => d.kind === 'pit' && d.compound === c)).toBe(true);
+
     await radioPill.click();
     await expect(radioPill).toHaveAttribute('aria-pressed', 'false');
   });

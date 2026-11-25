@@ -116,6 +116,90 @@ test.describe('tutorial', () => {
     expect(await page.evaluate((k) => localStorage.getItem(k), DONE_KEY)).toBe('1');
   });
 
+  test('the race’s controls the coach points at, and Restart', async ({ page }) => {
+    await fastLaps(page, 0.05);
+    await offline(page);
+    await page.goto('/tutorial');
+    await page.getByRole('button', { name: 'Start the tutorial' }).click();
+    const coach = page.getByRole('complementary', { name: 'Tutorial' });
+    const title = coach.getByRole('heading', { level: 2 });
+    for (let i = 0; i < 4; i++) await coach.getByRole('button', { name: 'Got it' }).click();
+    const plan = page.getByRole('region', { name: 'Race plan' });
+    // The plan editor and back.
+    await plan.getByRole('button', { name: 'Build your own' }).click();
+    await expect(plan.getByRole('button', { name: 'Go with your plan' })).toBeVisible();
+    await plan.getByRole('button', { name: 'The engineer’s plans' }).click();
+    await plan.getByRole('button', { name: /^Go with plan/ }).click();
+    await expect(plan).toHaveCount(0);
+
+    const controls = page.getByRole('navigation', { name: 'Controls' });
+    const wide = test.info().project.name === 'desktop';
+    // The coach stops on team radio, then on stats. (On a phone its card sits over the dock, so
+    // the dock's buttons are pressed once it's gone.)
+    await expect(title).toHaveText('Team radio', { timeout: 60_000 });
+    await coach.getByRole('button', { name: 'Got it' }).click();
+    await expect(title).toHaveText('Show stats', { timeout: 60_000 });
+    await coach.getByRole('button', { name: 'Got it' }).click();
+    await expect(coach).toHaveCount(0);
+
+    // Between calls (answered with their first choice) and later coach steps (passed).
+    const seen: Answered[] = [];
+    const clear = async () => {
+      for (let i = 0; i < 50; i++) {
+        if (await coach.isVisible()) {
+          await coach
+            .getByRole('button', { name: 'Got it' })
+            .click({ timeout: 1000 })
+            .catch(() => {});
+        } else if (!(await answerCall(page, seen))) return;
+      }
+    };
+    // The pill opens and shuts the radio's orders.
+    const pill = controls.getByRole('button', { name: 'Team radio', exact: true });
+    await expect(async () => {
+      await clear();
+      if ((await pill.getAttribute('aria-pressed')) !== 'true') await pill.click({ timeout: 1000 });
+      await expect(page.getByRole('region', { name: 'Team radio' })).toBeVisible({ timeout: 1000 });
+      await clear();
+      await pill.click({ timeout: 1000 });
+      await expect(pill).toHaveAttribute('aria-pressed', 'false', { timeout: 1000 });
+    }).toPass({ timeout: 60_000 });
+
+    // Stats: the side panels on a wide screen, the dock's tabs on a phone.
+    if (wide) {
+      const stats = controls.getByRole('button', { name: 'Show stats' });
+      await expect(async () => {
+        await clear();
+        await stats.click({ timeout: 1000 });
+        await expect(page.getByRole('complementary', { name: 'Stats' })).toHaveAttribute(
+          'aria-hidden',
+          'false',
+          { timeout: 1000 },
+        );
+        await clear();
+        await controls.getByRole('button', { name: 'Focus view' }).click({ timeout: 1000 });
+        await expect(stats).toHaveAttribute('aria-pressed', 'false', { timeout: 1000 });
+      }).toPass({ timeout: 60_000 });
+    } else {
+      for (const tab of ['Standings', 'Car', 'Calls', 'Radio']) {
+        const b = controls.getByRole('button', { name: tab, exact: true });
+        await expect(async () => {
+          await clear();
+          if ((await b.getAttribute('aria-pressed')) !== 'true') await b.click({ timeout: 1000 });
+          await expect(b).toHaveAttribute('aria-pressed', 'true', { timeout: 1000 });
+        }).toPass({ timeout: 60_000 });
+      }
+    }
+
+    if (wide) {
+      // Practice can be restarted (a Gauntlet race can't): back to the tutorial's card.
+      await clear();
+      await page.getByRole('button', { name: 'Restart the race' }).click();
+      await expect(page.getByRole('button', { name: 'Start the tutorial' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Canada 2022', level: 1 })).toBeVisible();
+    }
+  });
+
   test('Skip tutorial on the coach goes home mid-race', async ({ page }) => {
     await offline(page);
     await page.goto('/tutorial');
