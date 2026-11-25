@@ -4,7 +4,7 @@
 // the race model never sees it.
 
 import incidents from '@data/incidents.json';
-import type { RaceModel, RaceNote, RaceState } from '@laststint/sim';
+import { type RaceModel, type RaceNote, type RaceState, baseRaceId } from '@laststint/sim';
 import { driverInfo } from '../data/drivers.js';
 
 export interface Cause {
@@ -69,7 +69,9 @@ export function describeCause(c: Cause): string {
  * at the takeover to start there): its cause is then the latest of its type at or before it.
  */
 function causeOf(model: RaceModel, event: { lap: number }, type: string): Cause | undefined {
-  const causes = CAUSES[model.race.id]?.filter((c) => c.type === type) ?? [];
+  const causes =
+    (CAUSES[model.race.id] ?? CAUSES[baseRaceId(model.race.id)])?.filter((c) => c.type === type) ??
+    [];
   const exact = causes.find((c) => c.lap === event.lap);
   if (exact || event.lap !== model.race.takeoverLap) return exact;
   return causes.filter((c) => c.lap < event.lap).sort((a, b) => b.lap - a.lap)[0];

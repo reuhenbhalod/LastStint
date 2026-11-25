@@ -15,16 +15,16 @@
   "lengths": {
     "scLaps": 5,
     "vscLaps": 2,
-    "scPeriodsMeasured": 180,
-    "vscPeriodsMeasured": 83
+    "scPeriodsMeasured": 182,
+    "vscPeriodsMeasured": 84
   },
   "allTracks": {
-    "races": 281,
-    "vscRaces": 195,
-    "scPeriods": 185,
-    "vscPeriods": 90,
-    "scPerRace": 0.6584,
-    "vscPerRace": 0.4615
+    "races": 284,
+    "vscRaces": 198,
+    "scPeriods": 189,
+    "vscPeriods": 92,
+    "scPerRace": 0.6655,
+    "vscPerRace": 0.4646
   },
   "circuits": {
     "albert_park": {
@@ -102,12 +102,12 @@
     },
     "baku": {
       "name": "Baku City Circuit",
-      "races": 7,
-      "vscRaces": 7,
+      "races": 8,
+      "vscRaces": 8,
       "scPeriods": 7,
-      "vscPeriods": 1,
-      "scPerRace": 1.0,
-      "vscPerRace": 0.1429,
+      "vscPeriods": 2,
+      "scPerRace": 0.875,
+      "vscPerRace": 0.25,
       "scFallback": false,
       "vscFallback": false,
       "counted": [
@@ -116,6 +116,7 @@
         "azerbaijan-2019 (tum): 0 SC, 1 VSC",
         "azerbaijan-2021 (jolpica-estimate): 1 SC, 0 VSC",
         "azerbaijan-2023 (fastf1): 1 SC, 0 VSC",
+        "azerbaijan-2024 (fastf1): 0 SC, 1 VSC",
         "azerbaijan-2025 (fastf1): 1 SC, 0 VSC",
         "europe-2016 (tum): 0 SC, 0 VSC"
       ]
@@ -138,7 +139,7 @@
         "spain-2016 (tum): 1 SC, 0 VSC",
         "spain-2017 (tum): 0 SC, 1 VSC",
         "spain-2018 (tum): 1 SC, 1 VSC",
-        "spain-2019 (fastf1): 1 SC, 0 VSC",
+        "spain-2019 (tum): 1 SC, 0 VSC",
         "spain-2020 (fastf1): 0 SC, 0 VSC",
         "spain-2021 (fastf1): 1 SC, 0 VSC",
         "spain-2022 (fastf1): 0 SC, 0 VSC",
@@ -204,7 +205,7 @@
       "scPeriods": 1,
       "vscPeriods": 1,
       "scPerRace": 0.1429,
-      "vscPerRace": 0.4615,
+      "vscPerRace": 0.4646,
       "scFallback": false,
       "vscFallback": true,
       "counted": [
@@ -223,8 +224,8 @@
       "vscRaces": 0,
       "scPeriods": 0,
       "vscPeriods": 0,
-      "scPerRace": 0.6584,
-      "vscPerRace": 0.4615,
+      "scPerRace": 0.6655,
+      "vscPerRace": 0.4646,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -267,7 +268,7 @@
       "scPeriods": 1,
       "vscPeriods": 0,
       "scPerRace": 0.3333,
-      "vscPerRace": 0.4615,
+      "vscPerRace": 0.4646,
       "scFallback": false,
       "vscFallback": true,
       "counted": [
@@ -299,8 +300,8 @@
       "vscRaces": 0,
       "scPeriods": 0,
       "vscPeriods": 0,
-      "scPerRace": 0.6584,
-      "vscPerRace": 0.4615,
+      "scPerRace": 0.6655,
+      "vscPerRace": 0.4646,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -309,15 +310,16 @@
     },
     "losail": {
       "name": "Lusail International Circuit",
-      "races": 1,
-      "vscRaces": 1,
-      "scPeriods": 1,
-      "vscPeriods": 0,
-      "scPerRace": 0.6584,
-      "vscPerRace": 0.4615,
+      "races": 2,
+      "vscRaces": 2,
+      "scPeriods": 4,
+      "vscPeriods": 1,
+      "scPerRace": 0.6655,
+      "vscPerRace": 0.4646,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
+        "qatar-2024 (fastf1): 3 SC, 1 VSC",
         "qatar-2025 (fastf1): 1 SC, 0 VSC"
       ]
     },
@@ -328,7 +330,7 @@
       "scPeriods": 0,
       "vscPeriods": 0,
       "scPerRace": 0.0,
-      "vscPerRace": 0.4615,
+      "vscPerRace": 0.4646,
       "scFallback": false,
       "vscFallback": true,
       "counted": [
@@ -434,7 +436,7 @@
       "scPeriods": 3,
       "vscPeriods": 1,
       "scPerRace": 0.6,
-      "vscPerRace": 0.4615,
+      "vscPerRace": 0.4646,
       "scFallback": false,
       "vscFallback": true,
       "counted": [
@@ -451,8 +453,8 @@
       "vscRaces": 2,
       "scPeriods": 1,
       "vscPeriods": 0,
-      "scPerRace": 0.6584,
-      "vscPerRace": 0.4615,
+      "scPerRace": 0.6655,
+      "vscPerRace": 0.4646,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -586,7 +588,7 @@
         "great-britain-2015 (tum): 1 SC, 1 VSC",
         "great-britain-2016 (tum): 1 SC, 1 VSC",
         "great-britain-2017 (tum): 1 SC, 0 VSC",
-        "great-britain-2018 (fastf1): 2 SC, 0 VSC",
+        "great-britain-2018 (tum): 2 SC, 0 VSC",
         "great-britain-2019 (tum): 1 SC, 0 VSC",
         "great-britain-2021 (fastf1): 1 SC, 0 VSC",
         "great-britain-2022 (jolpica-estimate): 1 SC, 0 VSC",
@@ -670,8 +672,8 @@
       "vscRaces": 0,
       "scPeriods": 1,
       "vscPeriods": 0,
-      "scPerRace": 0.6584,
-      "vscPerRace": 0.4615,
+      "scPerRace": 0.6655,
+      "vscPerRace": 0.4646,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -685,8 +687,8 @@
       "vscRaces": 2,
       "scPeriods": 2,
       "vscPeriods": 1,
-      "scPerRace": 0.6584,
-      "vscPerRace": 0.4615,
+      "scPerRace": 0.6655,
+      "vscPerRace": 0.4646,
       "scFallback": true,
       "vscFallback": true,
       "counted": [
@@ -696,12 +698,12 @@
     },
     "villeneuve": {
       "name": "Circuit Gilles Villeneuve",
-      "races": 11,
-      "vscRaces": 7,
-      "scPeriods": 11,
+      "races": 12,
+      "vscRaces": 8,
+      "scPeriods": 12,
       "vscPeriods": 4,
       "scPerRace": 1.0,
-      "vscPerRace": 0.5714,
+      "vscPerRace": 0.5,
       "scFallback": false,
       "vscFallback": false,
       "counted": [
@@ -715,7 +717,8 @@
         "canada-2018 (tum): 1 SC, 0 VSC",
         "canada-2019 (fastf1): 0 SC, 0 VSC",
         "canada-2022 (fastf1): 1 SC, 2 VSC",
-        "canada-2024 (fastf1): 2 SC, 0 VSC"
+        "canada-2024 (fastf1): 2 SC, 0 VSC",
+        "canada-2025 (fastf1): 1 SC, 0 VSC"
       ]
     },
     "yas_marina": {

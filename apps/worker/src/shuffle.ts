@@ -3,6 +3,7 @@
 // avoids looking like its neighbours: the same circuit first, then the same rival, then the
 // same driver. Among the races that clash least, the pick is random.
 
+import { baseRaceId } from '@laststint/sim';
 import { addDays } from './dates.js';
 
 export interface RaceFacts {
@@ -19,7 +20,7 @@ const SAME_CIRCUIT: Record<string, string> = {
 
 /** The circuit a race id runs at: `mexico-2021` -> `mexico`. */
 export function circuitOf(raceId: string): string {
-  const name = raceId.replace(/-\d{4}$/, '');
+  const name = baseRaceId(raceId).replace(/-\d{4}$/, '');
   return SAME_CIRCUIT[name] ?? name;
 }
 

@@ -64,6 +64,9 @@ def ingest_race(
     Source "jolpica" races are skipped: `pipeline jolpica` reads them. `--offline` builds a
     FastF1 race from the project cache alone (FastF1 needs an F1TV login since Oct 2026)."""
     for rid in _race_ids(race_id, all_races):
+        if build_mod.RACES[rid].get("raw"):
+            typer.echo(f"{rid}: a variant of {build_mod.RACES[rid]['raw']} (its snapshot), skipped")
+            continue
         if ingest.raw_snapshot_path(rid).exists() and not force:
             typer.echo(f"{rid}: snapshot exists, skipped")
             continue

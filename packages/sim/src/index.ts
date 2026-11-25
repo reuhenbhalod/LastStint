@@ -158,6 +158,7 @@ export {
   illegalPitCompound,
   minStopsRule,
   pitLaneClosed,
+  baseRaceId,
   raceYear,
   resolveRules,
   safetyCarRule,

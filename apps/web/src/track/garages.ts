@@ -2,6 +2,8 @@
 // constructors' championship, the champions nearest the exit, so each list is that standings
 // order reversed, under the season's own team names (as the race models spell them).
 
+import { raceYear } from '@laststint/sim';
+
 /** Previous season's constructors' standings, champions first, in this season's names. */
 const STANDINGS: Record<number, string[]> = {
   // 1983 (Eras, reconstructed): the 1982 final standings from the Jolpica dump (2026-10-24,
@@ -719,4 +721,4 @@ export function garagesFor(season: number, teams: string[] = []): Array<[string,
 }
 
 /** A race's season, from its id (e.g. abu-dhabi-2021). */
-export const seasonOf = (raceId: string): number => Number(raceId.slice(-4)) || 2021;
+export const seasonOf = (raceId: string): number => raceYear(raceId) ?? 2021;

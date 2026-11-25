@@ -3,7 +3,7 @@
 // a car that stops where it stopped, with the reason. Display only.
 
 import retirements from '@data/retirements.json';
-import type { RaceNote } from '@laststint/sim';
+import { type RaceNote, baseRaceId } from '@laststint/sim';
 
 interface Retirement {
   lap: number;
@@ -15,7 +15,7 @@ const RETIRED = retirements as unknown as Record<string, Record<string, Retireme
 
 /** The real retirement of `code` in race `raceId` on `lap`, if it's the one happening. */
 export function realRetirement(raceId: string, code: string, lap: number): Retirement | null {
-  const r = RETIRED[raceId]?.[code];
+  const r = (RETIRED[raceId] ?? RETIRED[baseRaceId(raceId)])?.[code];
   return r && Math.abs(r.lap - lap) <= 1 ? r : null;
 }
 

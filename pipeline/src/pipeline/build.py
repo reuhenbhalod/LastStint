@@ -3839,6 +3839,127 @@ RACES: dict[str, dict] = {
 }
 
 
+# Short Daily races (Nov 18 2026): 15-20 laps from the takeover to the flag, picked from the
+# lap data for a close fight in that window (the user's car is the one that really came out
+# ahead). A race that already has a file under its own id (an Eras or validation race, with
+# another side and takeover) is built as the variant "<id>-daily": it reads that race's
+# snapshot (`raw`) and takes its source, year and event. Seeds are untuned.
+# Ingested but left out (their snapshots are in data/raw): brazil-2016 and japan-2014 (wet from
+# start to finish: no dry lap to fit), azerbaijan-2024 and canada-2025 (a late stop for softs
+# the race has too few laps on to fit: the golden run has no SOFT compound), australia-2016 (the
+# red flag's laps inflate the pit loss: 25.2 s against the circuit's 19.5 s; it needs a
+# hand-entered red-flag file). qatar-2024 takes over at lap 43, the first green lap after the
+# safety cars of laps 34-42. Where the user's car really stopped on the picked takeover lap, the
+# takeover moved a lap (a call can't be made on the takeover lap itself).
+# germany-2014, malaysia-2014 and mexico-2015 were picked with the same fight races batch 3
+# already plays in Daily, so they are not repeated here.
+# (race id, takeover lap, user's driver, rival)
+DAILY_SHORT: list[tuple[str, int, str, str]] = [
+    ("abu-dhabi-2014", 41, "HAM", "MAS"),
+    ("abu-dhabi-2025", 43, "NOR", "LEC"),
+    ("australia-2025", 42, "HUL", "LEC"),  # variant: the race has a file
+    ("austria-2016", 53, "HAM", "ROS"),
+    ("austria-2024", 57, "PIA", "SAI"),
+    ("azerbaijan-2018", 36, "HAM", "VET"),
+    ("azerbaijan-2019", 32, "BOT", "HAM"),
+    ("bahrain-2014", 40, "MAS", "BOT"),  # variant: the race has a file
+    ("bahrain-2019", 38, "HAM", "LEC"),
+    ("belgium-2017", 28, "MAS", "OCO"),
+    ("brazil-2023", 56, "ALO", "PER"),
+    ("brazil-2025", 54, "ANT", "VER"),
+    ("canada-2014", 55, "RIC", "ROS"),  # variant: the race has a file
+    ("china-2015", 42, "HAM", "ROS"),
+    ("emilia-romagna-2025", 49, "NOR", "PIA"),
+    ("great-britain-2014", 33, "BOT", "VET"),
+    ("great-britain-2015", 33, "ROS", "MAS"),
+    ("great-britain-2018", 35, "VET", "BOT"),
+    ("great-britain-2022", 33, "SAI", "LEC"),  # variant: the race has a file
+    ("hungary-2014", 51, "HAM", "ROS"),  # variant: the race has a file
+    ("hungary-2021", 54, "OCO", "VET"),  # variant: the race has a file
+    ("italy-2015", 39, "MAS", "BOT"),
+    ("italy-2020", 39, "GAS", "SAI"),  # variant: the race has a file
+    ("japan-2017", 39, "HAM", "VER"),
+    ("las-vegas-2023", 33, "LEC", "PER"),
+    ("malaysia-2016", 38, "ROS", "RAI"),
+    ("monaco-2015", 59, "ROS", "HAM"),  # variant: the race has a file
+    ("monaco-2017", 64, "RAI", "RIC"),  # variant: the race has a file
+    ("monaco-2018", 62, "GAS", "HUL"),
+    ("monaco-2023", 59, "OCO", "HAM"),  # variant: the race has a file
+    ("netherlands-2025", 54, "OCO", "COL"),
+    ("qatar-2024", 43, "LEC", "PIA"),
+    ("sakhir-2020", 68, "PER", "OCO"),  # variant: the race has a file
+    ("saudi-arabia-2021", 32, "HAM", "VER"),  # variant: the race has a file
+    ("saudi-arabia-2022", 32, "VER", "LEC"),  # variant: the race has a file
+    ("singapore-2016", 47, "ROS", "RIC"),
+    ("singapore-2017", 40, "STR", "GRO"),
+    ("singapore-2019", 43, "VET", "LEC"),  # variant: the race has a file
+    ("singapore-2023", 43, "SAI", "HAM"),  # variant: the race has a file
+    ("spain-2019", 52, "VER", "VET"),
+    ("spain-2025", 51, "HUL", "HAD"),
+    ("united-states-2015", 38, "HAM", "ROS"),  # variant: the race has a file
+]
+
+# OpenF1's country (and town, where a country has two races) for the downloaded ones.
+_DAILY_OPENF1 = {
+    "abu-dhabi-2025": ("United Arab Emirates", None),
+    "austria-2024": ("Austria", None),
+    "azerbaijan-2024": ("Azerbaijan", None),
+    "brazil-2023": ("Brazil", None),
+    "brazil-2025": ("Brazil", None),
+    "canada-2025": ("Canada", None),
+    "emilia-romagna-2025": ("Italy", "Imola"),
+    "las-vegas-2023": ("United States", "Las Vegas"),
+    "netherlands-2025": ("Netherlands", None),
+    "qatar-2024": ("Qatar", None),
+    "spain-2025": ("Spain", None),
+}
+
+
+def _daily_short_entry(base: str, takeover: int, user: str, rival: str, names: dict) -> dict:
+    year = int(base.rsplit("-", 1)[1])
+    place = base.rsplit("-", 1)[0].replace("-", " ").title()
+    existing = RACES.get(base)
+    entry = {
+        "year": year,
+        "event": place,
+        "name": f"{place} {year}: {names[user]} vs {names[rival]}",
+        "era": "2014-2025",
+        "takeover_lap": takeover,
+        "seed": 1,
+        "user_side": user,
+        "rival": rival,
+        "score_positions": 6,
+        "split": "daily",
+    }
+    if existing is not None:
+        entry["event"] = existing["event"]
+        entry["raw"] = base
+        for key in ("source", "location"):
+            if key in existing:
+                entry[key] = existing[key]
+    elif base in _DAILY_OPENF1:
+        entry["source"] = "openf1"
+        entry["event"], location = _DAILY_OPENF1[base]
+        if location:
+            entry["location"] = location
+    else:
+        entry["source"] = "tum"
+    return entry
+
+
+def _register_daily_short() -> None:
+    drivers = json.loads((DATA_DIR / "drivers.json").read_text(encoding="utf-8"))["drivers"]
+    names = {code: d["name"].split(" ", 1)[-1] for code, d in drivers.items()}
+    entries = {}
+    for base, takeover, user, rival in DAILY_SHORT:
+        race_id = f"{base}-daily" if base in RACES else base
+        entries[race_id] = _daily_short_entry(base, takeover, user, rival, names)
+    RACES.update(entries)
+
+
+_register_daily_short()
+
+
 @dataclass
 class BuildResult:
     model: dict
@@ -4334,20 +4455,23 @@ def build_race(
     records, dry model) to, for the Eras wet-curve fit (`pipeline wet-fit --eras`).
     `wear_shape`: False leaves out Eras model fix S4's quadratic wear (wear_shape.py measures
     races without it)."""
+    # A variant of a race (registry `raw`: a short Daily cut of a race that already has a file)
+    # reads the base race's snapshot and facts; its own id names its file, moments and overlay.
+    raw_id = RACES.get(race_id, {}).get("raw", race_id)
     if laps is None:
-        laps = pd.read_parquet(ingest.raw_snapshot_path(race_id, raw_dir))
+        laps = pd.read_parquet(ingest.raw_snapshot_path(raw_id, raw_dir))
     # Red flags (eras build plan 4.3): a race ended under the red flag ends at its results
     # lap; a hand-entered file marks the red laps a source without red-flag timing (TUM,
     # Jolpica) can't show; a voided start is a fresh race (redflag.race_entries).
-    red_flags = redflag.load_entries(race_id, raw_dir)
+    red_flags = redflag.load_entries(raw_id, raw_dir)
     laps = redflag.cut_at_results(laps, red_flags)
     meta = resolved_meta(race_id, laps, raw_dir)
     laps, red_flags, red_notes = redflag.race_entries(laps, red_flags, meta.get("year"))
     if fault_facts is None:
-        fault_facts = incidents.fault_facts(race_id)
+        fault_facts = incidents.fault_facts(raw_id)
     # A race rebuilt from its anchors (step 4.6): its compounds are filled here, and its file
     # is marked reconstructed with the sidecar's provenance (eras build plan 5.1).
-    recon = load_reconstruction(race_id, raw_dir)
+    recon = load_reconstruction(raw_id, raw_dir)
     unfitted: list[dict] = []
     if recon is not None:
         laps = reconstructed_laps(laps, int(recon["year"]))
@@ -4357,7 +4481,7 @@ def build_race(
         # built into the faulted car's laps (reported, never guessed).
         unfitted, fault_facts = fault_facts, []
     fault_facts, fault_notes = faults.split_retired(laps, fault_facts)
-    sidecar = load_sidecar(race_id, raw_dir) or {}
+    sidecar = load_sidecar(raw_id, raw_dir) or {}
     block = sidecar.get("estimates")
     overlay = load_overlay(race_id, eras_dir)
     shared = overlay is not None and race_id in shared_races(pools_path)
@@ -4384,7 +4508,7 @@ def build_race(
     # A car's laps that a source says weren't racing laps stay out of its pace fits (Eras
     # builds only; registry `pace_skip`, facts in docs/eras-checks).
     pace_skip = meta.get("pace_skip") if eras_build else None
-    dry = dry_fit(race_id, laps, meta["era"], fault_facts, raw_dir, recon, quad_priors, pace_skip)
+    dry = dry_fit(raw_id, laps, meta["era"], fault_facts, raw_dir, recon, quad_priors, pace_skip)
     clean_df, traffic_df, fitted = dry.clean, dry.traffic, dry.fitted
     weather = wet.weather_block(laps, dry.rain, fitted, wet.load_curves()) if dry.wet else None
     # Eras sim fixes (a race whose file takes its Eras overlay; never a Daily/Gauntlet race,
@@ -4439,7 +4563,7 @@ def build_race(
         pit_loss_guard=eras_build,
         refuelling=refuelling,
         eras_stops=eras_build,
-        race_id=None if eras_build else race_id,
+        race_id=None if eras_build else raw_id,
     )
     if recon is not None:
         params = reconstructed_pit_loss(params, recon)
@@ -4477,7 +4601,7 @@ def build_race(
         user_side=meta["user_side"],
         fastest_lap_point=meta["year"] in scenario.FASTEST_LAP_POINT_YEARS,
         rival=meta["rival"],
-        track_status=_from_raw(ingest.load_track_status, race_id, raw_dir),
+        track_status=_from_raw(ingest.load_track_status, raw_id, raw_dir),
         sc_unlap=meta.get("sc_unlap")
         or (eras_sc_unlap(meta.get("year") or race_rules.year_of(race_id)) if eras_build else None),
         weather=weather,
