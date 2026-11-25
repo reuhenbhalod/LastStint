@@ -185,6 +185,15 @@ test.describe('the planned stop', () => {
     );
     await bar.getByRole('slider', { name: 'Stop 1 lap' }).fill('58');
     await bar.getByRole('button', { name: 'mediums', exact: true }).click();
+    // The new stint's pace: push, then back to standard.
+    const pace = bar.getByRole('group', { name: 'Stint 2 pace' });
+    for (const p of ['Push', 'Standard']) {
+      await pace.getByRole('button', { name: p, exact: true }).click();
+      await expect(pace.getByRole('button', { name: p, exact: true })).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      );
+    }
     await bar.getByRole('button', { name: 'Run this plan' }).click();
     await expect(bar.getByRole('button', { name: 'Run this plan' })).toHaveCount(0);
     await expect(bar).toContainText('Box lap 58 for mediums');
