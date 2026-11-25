@@ -36,12 +36,27 @@ test('the Legend intro: its difficulty, the way back and the start', async ({ pa
   expect(await pressLink(page, page.getByRole('link', { name: 'Back to the era' }))).toBe(
     '/eras/2',
   );
+  expect(
+    await pressLink(page, page.getByRole('link', { name: '© OpenStreetMap contributors' })),
+  ).toBe('https://www.openstreetmap.org/copyright');
   await siteLinks(page);
   await page.getByRole('button', { name: 'How it works' }).click();
+  await expect(start).toHaveCount(0);
   await page.getByRole('button', { name: 'Close How it works' }).click();
   await start.click();
-  await expect(page.getByRole('region', { name: 'Race plan' })).toBeVisible();
+  const plans = page.getByRole('region', { name: 'Race plan' });
+  await expect(plans).toBeVisible();
   expect(eras.starts).toEqual([{ raceId: RACE, legend: true }]);
+  // The Legend race's plans: each picks, and your own.
+  const go = plans.getByRole('button', { name: /^Go with/ });
+  for (const id of ['B', 'C', 'A']) {
+    const card = plans.getByRole('button', { name: new RegExp(`^${id} · `) });
+    await card.click();
+    await expect(card).toHaveAttribute('aria-pressed', 'true');
+    await expect(go).toHaveText(`Go with plan ${id}`);
+  }
+  await plans.getByRole('button', { name: 'Build your own' }).click();
+  await expect(go).toHaveText('Go with your plan');
 });
 
 test('the race screen at Legend: the bar, the views, the radio and a car', async ({ page }) => {
@@ -97,10 +112,18 @@ test('the race screen at Legend: the bar, the views, the radio and a car', async
   await expect(page.getByRole('region', { name: 'Race plan' })).toBeVisible();
   await plan.click();
   const radio = await teamRadio(page);
-  await radio.getByRole('group', { name: 'Pace' }).getByRole('button', { name: 'manage' }).click();
-  await expect(
-    radio.getByRole('group', { name: 'Pace' }).getByRole('button', { name: 'manage' }),
-  ).toHaveAttribute('aria-pressed', 'true');
+  // The headset at Legend: one call of a kind a lap, each booked.
+  for (const [group, value] of [
+    ['Pace', 'push'],
+    ['Battle', 'attack'],
+    ['Fuel', 'Lift & coast'],
+  ] as const) {
+    const b = radio
+      .getByRole('group', { name: group })
+      .getByRole('button', { name: value, exact: true });
+    await b.click();
+    await expect(b).toHaveAttribute('aria-pressed', 'true');
+  }
   await closeTeamRadio(page);
   if (!isPhone(page)) {
     await page.getByRole('button', { name: /^LastStint.*race engineer/ }).click();
@@ -140,8 +163,28 @@ test('the Legend results: Legend stars, its leaderboard, the share line and a ne
   ]);
   await startRace(page, { graded: false });
   await finishRace(page);
+  // The classification opens from its summary, and closes.
+  const classification = page.locator('summary').filter({ hasText: 'Classification' });
+  await classification.click();
+  await expect(page.locator('details[open]')).toContainText('SEN');
+  await classification.click();
+  await expect(page.locator('details[open]')).toHaveCount(0);
   await page.getByRole('link', { name: 'Legend leaderboard' }).click();
   await expect(page).toHaveURL(new RegExp(`/eras/2/${RACE}/leaderboard/legend$`));
   await expect(page.getByRole('tab', { name: 'Legend' })).toHaveAttribute('aria-selected', 'true');
   await expect(page.getByTestId('me-line')).toContainText('Your rank:');
+  expect(await pressLink(page, page.getByRole('link', { name: 'data credits' }))).toBe('/credits');
+  await siteLinks(page);
+});
+
+test('the Legend results: home from the brand is the era', async ({ page }) => {
+  await mockEras(page, [shortRace(loadEraRace(RACE))], { cleared: [2], lapScale: 0.05 });
+  await page.goto(URL);
+  await startRace(page, { graded: false });
+  await finishRace(page);
+  await page
+    .getByRole('banner')
+    .getByRole('button', { name: /^LastStint/ })
+    .click();
+  await expect(page).toHaveURL(/\/eras\/2$/);
 });

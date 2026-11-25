@@ -756,3 +756,283 @@ test('a safety car (Great Britain 2023): flagged on the map, and the call it bri
     expect.objectContaining({ momentId: call.moment.id }),
   );
 });
+
+/** The plan the car is running (through the test hook): its stops. */
+const activeStops = (page: Page) =>
+  page.evaluate(
+    () =>
+      (
+        window as unknown as {
+          __laststintE2E?: {
+            session?: {
+              state: {
+                plan: { active: { stops: Array<{ lap: number; compound: string }> } | null };
+              };
+            };
+          };
+        }
+      ).__laststintE2E?.session?.state.plan.active?.stops ?? [],
+  );
+
+/** Run the race (decisions: their first option) until the planned stop's heads-up is up. */
+async function toHeadsUp(page: Page) {
+  const planned = page.getByRole('region', { name: 'Planned stop' });
+  const deadline = Date.now() + 90_000;
+  while (!(await planned.isVisible())) {
+    expect(Date.now(), 'the planned stop comes up').toBeLessThan(deadline);
+    const card = decision(page);
+    if (await card.isVisible()) {
+      // Stay out (the first option): the plan's own stop is what this test is after.
+      await card
+        .getByRole('button')
+        .first()
+        .click({ timeout: 2_000 })
+        .catch(() => {});
+      continue;
+    }
+    const quick = page.locator(
+      'section[aria-label="Quick call"], section[aria-label="Battle call"]',
+    );
+    if (await quick.first().isVisible()) {
+      // Never box from a quick call here: the last option keeps the plan.
+      await quick
+        .first()
+        .getByRole('button')
+        .last()
+        .click({ timeout: 2_000 })
+        .catch(() => {});
+      continue;
+    }
+    const replan = page.getByRole('region', { name: 'New plan' });
+    if (await replan.isVisible()) {
+      await replan
+        .getByRole('button', { name: 'Keep ours' })
+        .click({ timeout: 2_000 })
+        .catch(() => {});
+      continue;
+    }
+    await page.waitForTimeout(100);
+  }
+  return planned;
+}
+
+/** The car's tyres now (through the test hook). */
+const myTyres = (page: Page, side: string) =>
+  page.evaluate(
+    (code) =>
+      (
+        window as unknown as {
+          __laststintE2E?: {
+            session?: {
+              state: { race: { cars: Record<string, { compound: string; tyreAge: number }> } };
+            };
+          };
+        }
+      ).__laststintE2E?.session?.state.race.cars[code],
+    side,
+  );
+
+/** Start Turkey 2021 on your own plan: B's one stop, moved to lap `lap`. */
+async function ownStopAt(page: Page, lap: number) {
+  await page.goto(`/eras/9/${TURKEY}`);
+  await page.getByRole('button', { name: 'Start the race' }).click();
+  const plans = page.getByRole('region', { name: 'Race plan' });
+  await plans.getByRole('button', { name: /^B · One stop/ }).click();
+  await plans.getByRole('button', { name: 'Build your own' }).click();
+  const stop = plans.getByRole('slider', { name: 'Stop 1 lap' });
+  await stop.fill(String(lap));
+  await expect(stop).toHaveValue(String(lap));
+  const go = plans.getByRole('button', { name: 'Go with your plan' });
+  await expect(go).toBeEnabled({ timeout: 60_000 });
+  await go.click();
+  await expect(plans).toHaveCount(0);
+  expect((await activeStops(page))[0]?.lap).toBe(lap);
+}
+
+test('the planned stop: One more lap moves it, then Box as planned makes it', async ({ page }) => {
+  const model = loadEraRace(TURKEY);
+  await mockEras(page, [model], { lapScale: 0.1 });
+  await ownStopAt(page, 50);
+  let planned = await toHeadsUp(page);
+  await expect(planned).toContainText('as planned. Still good?');
+  // One more lap: the stop goes a lap later, and the heads-up comes again before it.
+  await planned.getByRole('button', { name: 'One more lap' }).click();
+  await expect(planned).toHaveCount(0);
+  expect((await activeStops(page))[0]?.lap).toBe(51);
+  await expect(pill(page, 'Plan · box L51')).toBeVisible();
+  planned = await toHeadsUp(page);
+  // Box as planned: the stop stays where it is, and is made on its lap.
+  const { compound } = (await activeStops(page))[0] ?? { compound: '' };
+  await planned.getByRole('button', { name: 'Box as planned' }).click();
+  await expect(planned).toHaveCount(0);
+  expect((await activeStops(page))[0]?.lap).toBe(51);
+  await expect
+    .poll(async () => (await myTyres(page, model.userSide))?.compound, { timeout: 60_000 })
+    .toBe(compound);
+});
+
+test('the planned stop: Change plan opens the plan editor', async ({ page }) => {
+  await mockEras(page, [loadEraRace(TURKEY)], { lapScale: 0.1 });
+  await ownStopAt(page, 50);
+  const planned = await toHeadsUp(page);
+  await planned.getByRole('button', { name: 'Change plan' }).click();
+  await expect(planned).toHaveCount(0);
+  const bar = page.getByRole('region', { name: 'Race plan' });
+  await expect(bar.getByRole('button', { name: 'Run this plan' })).toBeVisible();
+  await expect(pill(page, /^Plan · /)).toHaveAttribute('aria-pressed', 'true');
+});
+
+/**
+ * Every call of a race answered in turn: the n-th call (a decision, a quick or battle call)
+ * gets its option n (mod its options), so over a race each kind of answer is pressed; a new
+ * plan is switched to, the next one kept, in turn. Returns what was pressed.
+ */
+async function playInTurn(page: Page, model: EraModel) {
+  const done = page.getByRole('button', { name: 'See how you did' });
+  const card = decision(page);
+  const calls = page.locator('section[aria-label="Quick call"], section[aria-label="Battle call"]');
+  const planned = page.getByRole('region', { name: 'Planned stop' });
+  const replan = page.getByRole('region', { name: 'New plan' });
+  const nameOf = (b: Locator) =>
+    b.evaluate((e) => (e.getAttribute('aria-label') ?? e.textContent ?? '').trim());
+  const pressed = {
+    decisions: [] as Array<{ lap: number; label: string }>,
+    calls: [] as string[],
+    switched: 0,
+    changed: 0,
+    kept: 0,
+  };
+  let n = 0;
+  const deadline = Date.now() + 200_000;
+  while (!(await done.isVisible())) {
+    expect(Date.now(), 'the race reaches the flag').toBeLessThan(deadline);
+    if (await card.isVisible()) {
+      const tag =
+        (await card
+          .getByRole('alert')
+          .textContent()
+          .catch(() => '')) ?? '';
+      const lap = Number(tag.match(/Lap (\d+)$/)?.[1] ?? 0);
+      // The tyre step after a Box: one of its tyres, in turn (never Back).
+      const buttons = card.getByRole('button').filter({ hasNotText: /^Back$/ });
+      const count = await buttons.count();
+      if (!count) continue;
+      const b = buttons.nth(n % count);
+      const label = await nameOf(b).catch(() => '');
+      if (
+        await b.click({ timeout: 2_000 }).then(
+          () => true,
+          () => false,
+        )
+      ) {
+        if (!/^Box$/.test(label)) {
+          pressed.decisions.push({ lap, label });
+          n += 1;
+        }
+      }
+      continue;
+    }
+    const call = calls.first();
+    if (await call.isVisible()) {
+      const fills = call.getByRole('group', { name: 'Fuel fill' });
+      if (await fills.isVisible()) {
+        const f = fills.getByRole('button');
+        await f
+          .nth(n % (await f.count()))
+          .click({ timeout: 2_000 })
+          .catch(() => {});
+      }
+      // Its answers (not the fills), those it takes now.
+      const answers = call.locator(
+        'xpath=.//button[not(ancestor::*[@aria-label="Fuel fill"]) and not(@disabled)]',
+      );
+      const count = await answers.count();
+      if (count > 0) {
+        const b = answers.nth(n % count);
+        const label = await nameOf(b).catch(() => '');
+        if (
+          await b.click({ timeout: 2_000 }).then(
+            () => true,
+            () => false,
+          )
+        ) {
+          pressed.calls.push(label);
+          n += 1;
+        }
+      }
+      continue;
+    }
+    if (await planned.isVisible()) {
+      await planned
+        .getByRole('button', { name: 'Box as planned' })
+        .click({ timeout: 2_000 })
+        .catch(() => {});
+      continue;
+    }
+    if (await replan.isVisible()) {
+      const before = JSON.stringify(await activeStops(page));
+      if ((pressed.switched + pressed.kept) % 2 === 0) {
+        if (
+          await replan
+            .getByRole('button', { name: 'Switch' })
+            .click({ timeout: 2_000 })
+            .then(
+              () => true,
+              () => false,
+            )
+        ) {
+          pressed.switched += 1;
+          // The car runs the new plan (unless its stop was already past: then it's kept).
+          await expect(replan).toHaveCount(0);
+          if (JSON.stringify(await activeStops(page)) !== before) pressed.changed += 1;
+        }
+      } else if (
+        await replan
+          .getByRole('button', { name: 'Keep ours' })
+          .click({ timeout: 2_000 })
+          .then(
+            () => true,
+            () => false,
+          )
+      ) {
+        pressed.kept += 1;
+        await expect(replan).toHaveCount(0);
+        expect(JSON.stringify(await activeStops(page))).toBe(before);
+      }
+      continue;
+    }
+    await page.waitForTimeout(100);
+  }
+  // Each decision answered went in as the option pressed.
+  const sent = await answered(page);
+  for (const d of pressed.decisions) {
+    const m = model.decisionMoments.find((x) => x.lap === d.lap);
+    const o = m?.options.find((x) => d.label.replace(/^\d/, '') === x.label);
+    if (m && o)
+      expect(sent).toContainEqual(expect.objectContaining({ momentId: m.id, optionId: o.id }));
+  }
+  return pressed;
+}
+
+// The last number: new plans the engineer offers that are switched to (and run).
+for (const [era, id, cut, switched] of [
+  [9, TURKEY, 0, 0],
+  [10, 'great-britain-2023', 0, 0],
+  [2, 'monaco-1992', 0, 1],
+  [1, 'monaco-1988', 22, 1],
+] as const) {
+  test(`every call answered in turn: ${id}`, async ({ page }) => {
+    const model = cut ? shortRace(loadEraRace(id), cut) : loadEraRace(id);
+    const eras = await mockEras(page, [model], { lapScale: 0.1 });
+    await raceOn(page, `/eras/${era}/${id}`);
+    const pressed = await playInTurn(page, model);
+    expect(pressed.decisions.length + pressed.calls.length).toBeGreaterThan(1);
+    // More than one answer of each kind of call pressed over the race.
+    expect(new Set(pressed.calls).size).toBeGreaterThan(1);
+    expect(pressed.changed).toBeGreaterThanOrEqual(switched);
+    await page.getByRole('button', { name: 'See how you did' }).click();
+    await expect(page.getByRole('region', { name: 'Stars' })).toBeVisible({ timeout: 90_000 });
+    expect(eras.submissions).toHaveLength(1);
+    test.info().annotations.push({ type: 'pressed', description: JSON.stringify(pressed) });
+  });
+}

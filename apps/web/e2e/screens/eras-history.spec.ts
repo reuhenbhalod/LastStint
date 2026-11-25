@@ -176,4 +176,6 @@ test('a rewrite earned in play is written in the book', async ({ page }) => {
   const rewrites = page.getByRole('region', { name: 'History rewritten' });
   await expect(rewrites.getByRole('heading', { name: 'Hungary 1992' })).toBeVisible();
   await expect(rewrites).toContainText('Era 2 · Race 7');
+  await rewrites.getByRole('link', { name: 'Leaderboard for Hungary 1992' }).click();
+  await expect(page).toHaveURL(/\/eras\/2\/hungary-1992\/leaderboard$/);
 });
