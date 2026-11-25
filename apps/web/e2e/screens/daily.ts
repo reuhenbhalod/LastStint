@@ -216,12 +216,13 @@ export async function radio(page: Page) {
 }
 
 /**
- * To lap `lap - 1` lap by lap, then the last lap at 2× on the race's own clock, so the lap shown
- * starts at its line as in play: a battle's corner is drawn from where the car is when the call
- * comes, so it's the same corner every run.
+ * To lap `lap` lap by lap, then on at 2× on the race's own clock: a battle the engineer brings
+ * up after lap `lap` is drawn at a corner the car reaches on the clock (lap-by-lap running
+ * skips it), and comes up as the car nears it. The race file and the calls fix the corner and
+ * the moves, so it's the same battle every run.
  */
 export async function runToOnClock(page: Page, lap: number) {
-  await runTo(page, lap - 1);
+  await runTo(page, lap);
   await page.getByRole('button', { name: '2×' }).click();
-  await expect.poll(async () => (await session(page)).lap, { timeout: 15_000 }).toBe(lap);
+  await expect(page.getByRole('button', { name: '2×' })).toHaveAttribute('aria-pressed', 'true');
 }

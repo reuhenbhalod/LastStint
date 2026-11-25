@@ -46,11 +46,11 @@ test.describe('the race plan at takeover', () => {
     await expect(plans).toContainText('15 laps to go · +5.1s on Alonso · 20-lap-old mediums');
     await expect(plans).not.toContainText('…', { timeout: 60_000 });
     const a = plans.getByRole('button', { name: 'A · No stop' });
-    const b = plans.getByRole('button', { name: 'B · One stop, engineer’s pick' });
-    const c = plans.getByRole('button', { name: 'C · One stop', exact: true });
+    const b = plans.getByRole('button', { name: /^B · One stop, \d+%, engineer’s pick$/ });
+    const c = plans.getByRole('button', { name: /^C · One stop, \d+%$/ });
     // The engineer's pick is picked to start with; each card's chance and line describe it.
     await expect(b).toHaveAttribute('aria-pressed', 'true');
-    await expect(b).toHaveAccessibleDescription(/\d+% softs on lap 52/);
+    await expect(b).toHaveAccessibleDescription(/softs on lap 52/);
     await expect(plans.getByRole('button', { name: 'Go with plan B' })).toBeEnabled();
     await a.click();
     await expect(a).toHaveAttribute('aria-pressed', 'true');
@@ -85,35 +85,36 @@ test.describe('the race plan at takeover', () => {
     const stop = plans.getByRole('slider', { name: 'Stop 1 lap' });
     await expect(stop).toBeVisible();
     const lap = Number(await stop.inputValue());
-    await plans.getByRole('button', { name: 'Later' }).click();
+    await plans.getByRole('button', { name: 'Stop 1 later' }).click();
     await expect(stop).toHaveValue(String(lap + 1));
-    await plans.getByRole('button', { name: 'Earlier' }).click();
-    await plans.getByRole('button', { name: 'Earlier' }).click();
+    await plans.getByRole('button', { name: 'Stop 1 earlier' }).click();
+    await plans.getByRole('button', { name: 'Stop 1 earlier' }).click();
     await expect(stop).toHaveValue(String(lap - 1));
     await stop.fill('56');
     await expect(plans).toContainText('lap 56');
     // The tyres: each pressed in turn, one at a time.
+    const tyre = plans.getByRole('group', { name: 'Stop 1 tyre' });
     for (const t of ['softs', 'hards', 'mediums', 'softs']) {
-      await plans.getByRole('button', { name: t, exact: true }).click();
-      await expect(plans.getByRole('button', { name: t, exact: true })).toHaveAttribute(
+      await tyre.getByRole('button', { name: t, exact: true }).click();
+      await expect(tyre.getByRole('button', { name: t, exact: true })).toHaveAttribute(
         'aria-pressed',
         'true',
       );
     }
     // Pace per stint: the first stint's three, then the last stint push.
-    const stints = plans.getByRole('listitem');
+    const first = plans.getByRole('group', { name: 'Stint 1 pace' });
     for (const p of ['Manage', 'Push', 'Standard']) {
-      await stints.nth(0).getByRole('button', { name: p }).click();
-      await expect(stints.nth(0).getByRole('button', { name: p })).toHaveAttribute(
-        'aria-pressed',
-        'true',
-      );
+      await first.getByRole('button', { name: p }).click();
+      await expect(first.getByRole('button', { name: p })).toHaveAttribute('aria-pressed', 'true');
     }
-    await stints.nth(1).getByRole('button', { name: 'Push' }).click();
+    await plans
+      .getByRole('group', { name: 'Stint 2 pace' })
+      .getByRole('button', { name: 'Push' })
+      .click();
     // A second stop, then remove it again.
     await add.click();
     await expect(plans.getByRole('slider')).toHaveCount(2);
-    await stints.nth(2).getByRole('button', { name: 'Remove' }).click();
+    await plans.getByRole('button', { name: 'Remove stop 2' }).click();
     await expect(plans.getByRole('slider')).toHaveCount(1);
     // Graded like the engineer's (the chance appears), then picked.
     await expect(plans).toContainText(/Chance vs ALO: \d+%/, { timeout: 60_000 });
@@ -357,14 +358,31 @@ test.describe('the top bar and the control bar', () => {
     await expect(page.getByRole('region', { name: 'Leaders' })).toBeVisible();
   });
 
+  test('the plan pill on a no-stop plan opens and closes the plan', async ({ page }) => {
+    await openDaily(page, model);
+    await startRace(page, 'A');
+    const pill = controls(page).getByRole('button', { name: 'Plan · to the flag' });
+    await expect(pill).toHaveAttribute('aria-pressed', 'false');
+    await pill.click();
+    await expect(pill).toHaveAttribute('aria-pressed', 'true');
+    const bar = page.getByRole('region', { name: 'Race plan' });
+    await expect(bar).toContainText(/flag/i);
+    // The dock slides up open, and folds away again (its panel stays until the next one).
+    const dock = bar.locator('xpath=ancestor::div[contains(@class, "grid")][1]');
+    await expect(dock).toHaveAttribute('style', /grid-template-rows: 1fr/);
+    await pill.click();
+    await expect(pill).toHaveAttribute('aria-pressed', 'false');
+    await expect(dock).toHaveAttribute('style', /grid-template-rows: 0fr/);
+  });
+
   test('the phone’s tabs: standings, car, calls, radio', async ({ page }, info) => {
     test.skip(info.project.name === 'desktop', 'a laptop shows them in the stats view');
     await openDaily(page, model);
     await startRace(page, 'B');
     await openPanel(page, 'Standings');
-    await expect(page.getByRole('list', { name: 'Timing tower' })).toBeVisible();
+    await expect(page.getByRole('list', { name: 'Standings' })).toBeVisible();
     await openPanel(page, 'Car');
-    await expect(page.getByRole('list', { name: 'Timing tower' })).toBeHidden();
+    await expect(page.getByRole('list', { name: 'Standings' })).toBeHidden();
     await expect(page.locator('section[aria-label="Race"]')).toContainText(/softs|mediums/i);
     await openPanel(page, 'Calls');
     await openPanel(page, 'Radio');
@@ -380,7 +398,7 @@ test.describe('the top bar and the control bar', () => {
     test.skip(info.project.name !== 'desktop', 'the race’s brand is on a laptop’s top bar');
     await openDaily(page, model);
     await startRace(page, 'B');
-    await page.getByRole('button', { name: 'LastStint home (the race waits)' }).click();
+    await page.getByRole('button', { name: /^LastStint.*’s race engineer · Alpine$/ }).click();
     await page.getByRole('button', { name: 'Back to the race · lap 51' }).click();
     await expect(controls(page)).toBeVisible();
     expect((await session(page)).lap).toBe(51);
@@ -419,7 +437,7 @@ test.describe('the team radio', () => {
       if (r < rounds.length - 1) await fastForward(page, lap + 1);
     }
     // The orders bar folds the orders away and opens them again.
-    const fold = tr.getByRole('button', { name: 'Orders for next lap' });
+    const fold = tr.getByRole('button', { name: 'Team radio', exact: true });
     await fold.click();
     await expect(fold).toHaveAttribute('aria-expanded', 'false');
     await expect(tr.getByRole('group', { name: 'Pace' })).toHaveCount(0);
@@ -507,7 +525,7 @@ test.describe('the cars on the map and in the towers', () => {
     if (info.project.name === 'desktop')
       await controls(page).getByRole('button', { name: 'Show stats' }).click();
     else await openPanel(page, 'Standings');
-    const tower = page.getByRole('list', { name: 'Timing tower' });
+    const tower = page.getByRole('list', { name: 'Standings' });
     await tower.getByRole('button', { name: /ALO/ }).click();
     if (info.project.name !== 'desktop')
       await controls(page).getByRole('button', { name: 'Standings' }).click(); // the card waits for the dock

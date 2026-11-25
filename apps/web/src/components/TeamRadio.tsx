@@ -10,7 +10,7 @@
 
 import type { Decision, Modes, RaceModel, RaceState, TeamOrder } from '@laststint/sim';
 import { isWetTyre, teammateOf } from '@laststint/sim';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { surname } from '../data/names.js';
 import { PitLaneNotice } from '../eras/PitLaneNotice.js';
 import { FuelFillChoice, FuelGauge } from '../eras/RefuelControls.js';
@@ -73,6 +73,7 @@ export function TeamRadio({
   const order = (o: TeamOrder) => onCall({ lap: next, kind: 'teamOrder', order: o });
   // No preselection: a refuelling race's box call waits for the player's fill.
   const [fill, setFill] = useState<FuelFill | null>(null);
+  const summaryId = useId();
   if (!me) return null;
   const era = raceScreenEra(model);
   const tyresOffered = pitCompounds(model);
@@ -90,7 +91,8 @@ export function TeamRadio({
       <button
         type="button"
         aria-expanded={open}
-        aria-label="Orders for next lap"
+        aria-label="Team radio"
+        aria-describedby={summaryId}
         onClick={() => setOpen(!open)}
         className="flex w-full flex-wrap items-center gap-x-3 gap-y-1 text-left"
       >
@@ -98,7 +100,10 @@ export function TeamRadio({
           <RadioMark size={20} className="text-[var(--you)]" /> Team radio
         </span>
         <span className="text-[12px] text-[var(--muted)]">Orders for next lap</span>
-        <span className="ml-auto flex flex-wrap items-center gap-1.5 text-[12px] capitalize">
+        <span
+          id={summaryId}
+          className="ml-auto flex flex-wrap items-center gap-1.5 text-[12px] capitalize"
+        >
           {boxing && (
             <span className="rounded bg-[var(--box)] px-1.5 py-0.5 font-semibold text-white">
               Boxing · {tyreName(boxing.compound)}

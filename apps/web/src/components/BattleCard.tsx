@@ -105,7 +105,7 @@ export function BattleCard({
   }, [call, chosen, onAnswer]);
 
   const picked = call.options.find((o) => o.id === chosen);
-  // Each move is named by its label alone; its note and tag describe it (D7).
+  // Each move's button is named by its label; its note and risk tag describe it.
   const uid = useId();
   const other = surname(call.other ?? '');
   const who = call.attacking ? `Attacking ${other}` : `Defending from ${other}`;

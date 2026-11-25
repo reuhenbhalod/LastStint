@@ -32,6 +32,8 @@ test('the result: score, rank, calls, penalties, streak, leaderboard and stats',
 }) => {
   const { submitted, seen } = await finish(page);
   await expect(page.getByText('Your calls')).toBeVisible({ timeout: 60_000 });
+  // The header names the mode and race, with no Daily number (#58).
+  await expect(page.getByText(`Daily · ${model.race.name}`, { exact: true })).toBeVisible();
   // What was sent: the calls (the plan among them) and the game's grades.
   const body = submitted() as { decisions: Array<{ kind: string; id?: string }> };
   expect(body.decisions).toContainEqual(expect.objectContaining({ kind: 'plan', id: 'b' }));
@@ -68,7 +70,7 @@ test('the result: score, rank, calls, penalties, streak, leaderboard and stats',
 test('share: the spoiler-free line, copied with the site’s address', async ({ page, context }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await finish(page);
-  const share = page.getByText(/^LastStint #1 WIN [🟩🟨🟧🟥]+ P50$/);
+  const share = page.getByText(/^LastStint WIN [🟩🟨🟧🟥]+ P50$/u);
   await expect(share).toBeVisible({ timeout: 60_000 });
   const line = (await share.textContent()) as string;
   // One square per graded call, the plan first.
@@ -96,7 +98,7 @@ test('share with the clipboard blocked: the line in a prompt to copy', async ({ 
   await expect.poll(() => asked.length).toBe(1);
   expect(asked[0]?.type).toBe('prompt');
   expect(asked[0]?.message).toBe('Copy your result:');
-  expect(asked[0]?.value).toMatch(/^LastStint #1 WIN .* P50\nhttp/);
+  expect(asked[0]?.value).toMatch(/^LastStint WIN .* P50\nhttp/);
   await expect(page.getByRole('button', { name: 'Copied!' })).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Share result' })).toBeVisible();
 });

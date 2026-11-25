@@ -16,8 +16,8 @@ import {
   openDaily,
   openPanel,
   quickCall,
-  radio,
   raceWith,
+  radio,
   runTo,
   runToOnClock,
   session,
@@ -33,7 +33,7 @@ async function callAfter(page: Page, id: string, lap: number) {
   return model;
 }
 
-/** The same for a battle: the last lap on the race's clock (its corner depends on it). */
+/** The same for a battle: run to `lap`, then on the race's clock to the battle after it. */
 async function battleAfter(page: Page, id: string, lap: number) {
   const model = loadRace(id);
   await openDaily(page, model);
@@ -303,19 +303,20 @@ test.describe('the two-compound rule: the stop owed', () => {
 
 test.describe('battles', () => {
   test('attacking: the moves, the call, and the result at the corner', async ({ page }) => {
-    await battleAfter(page, 'australia-2022', 37);
+    await battleAfter(page, 'australia-2022', 36);
     const b = battleCall(page);
     // The card comes up as the car nears the corner's braking zone.
     await expect(b).toBeVisible({ timeout: 30_000 });
-    await expect(b).toContainText('Attacking Albon');
-    await expect(b).toContainText('Tell me where.');
+    await expect(b).toContainText('Battle · T3');
+    await expect(b).toContainText('Attacking Albon · 0.5 s');
+    await expect(b).toContainText('Your call.');
     // Each move is named by itself; its note and risk describe it.
-    const dive = b.getByRole('button', { name: 'Dive up the inside' });
-    await expect(dive).toHaveAccessibleDescription(/Late on the brakes Risky/i);
+    const dive = b.getByRole('button', { name: 'Lunge into the first apex' });
+    await expect(dive).toHaveAccessibleDescription('Brake as late as you dare Risky');
     await dive.click();
     await expect(b).toContainText('· watch the corner');
     expect(await calls(page, 'battle')).toContainEqual(
-      expect.objectContaining({ move: 'dive-inside', lap: 38 }),
+      expect.objectContaining({ move: 'dive-inside', lap: 37 }),
     );
     // The result shows at the corner, then the card goes.
     await expect(b.getByRole('status')).toHaveText(/PAST ALBON!|NO WAY BY|CONTACT!|SPIN!/, {
@@ -324,7 +325,7 @@ test.describe('battles', () => {
   });
 
   test('no call at the braking zone: the driver makes his own move', async ({ page }) => {
-    await battleAfter(page, 'australia-2022', 37);
+    await battleAfter(page, 'australia-2022', 36);
     const b = battleCall(page);
     // The card comes up as the car nears the corner's braking zone.
     await expect(b).toBeVisible({ timeout: 30_000 });
@@ -337,10 +338,11 @@ test.describe('battles', () => {
 
 // Every move of a battle, each pressed in its own race: the move it calls for the next lap.
 const MOVES: Array<[string, number, string, string]> = [
-  ['australia-2022', 37, 'Dive up the inside', 'dive-inside'],
-  ['australia-2022', 37, 'Round the outside', 'round-outside'],
-  ['australia-2022', 37, 'Wait for DRS, go next lap', 'wait-drs'],
-  ['australia-2022', 37, 'Overtake boost', 'overtake-button'],
+  // Attacking Albon into the T3 chicane.
+  ['australia-2022', 36, 'Lunge into the first apex', 'dive-inside'],
+  ['australia-2022', 36, 'Cut back at the second apex', 'round-outside'],
+  ['australia-2022', 36, 'Clean exit, attack at the next', 'wait-drs'],
+  ['australia-2022', 36, 'Overtake boost', 'overtake-button'],
   // Defending from the rival (Norris), and attacking him into the hairpin.
   ['abu-dhabi-2024', 51, 'Cover the inside under braking', 'cover-inside'],
   ['abu-dhabi-2024', 51, 'Square it off on the exit', 'hold-outside'],
@@ -349,6 +351,7 @@ const MOVES: Array<[string, number, string, string]> = [
   ['abu-dhabi-2024', 54, 'Late-brake up the inside', 'dive-inside'],
   ['abu-dhabi-2024', 54, 'Switchback on the exit', 'round-outside'],
   ['abu-dhabi-2024', 54, 'Get a better exit, go next lap', 'wait-drs'],
+  ['abu-dhabi-2024', 54, 'Overtake boost', 'overtake-button'],
 ];
 for (const [race, lap, name, move] of MOVES) {
   test(`${race} lap ${lap + 1} battle: “${name}”`, async ({ page }) => {
@@ -471,6 +474,16 @@ const BOXES: Array<[number, string, RegExp | null, string]> = [
   [44, 'Box', /softs/i, 'box-soft'],
   [44, 'Box next lap', /mediums/i, 'box-next-medium'],
   [44, 'Box next lap', /hards/i, 'box-next-hard'],
+  // The lap-53 safety car: one tyre for next lap, so it's its own option.
+  [53, 'Box next lap, softs', null, 'box-next-soft'],
+  // The lap-49 pace call and the lap-57 restart: every option.
+  [49, 'Push now', null, 'push'],
+  [49, 'Standard pace', null, 'standard'],
+  [49, 'Manage the tyres', null, 'manage'],
+  [49, 'Push and attack', null, 'push-attack'],
+  [57, 'Defend hard', null, 'defend'],
+  [57, 'Hold the line', null, 'hold'],
+  [57, 'Attack', null, 'attack'],
 ];
 for (const [lap, option, tyre, id] of BOXES) {
   test(`abu-dhabi-2021 lap ${lap}: “${option}”${tyre ? ` then ${tyre.source}` : ''}`, async ({

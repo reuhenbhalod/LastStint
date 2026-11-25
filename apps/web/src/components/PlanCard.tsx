@@ -37,8 +37,6 @@ export function PlanCard({
   const them = state.race.cars[rival];
   const [picked, setPicked] = useState<PlanId | null>(null);
   const [draft, setDraft] = useState<RacePlan | null>(null);
-  // A plan's button is named by its letter, stops and the engineer's pick; its chance and line
-  // describe it (D7).
   const uid = useId();
 
   // The engineer's pick: the best chance, once every plan has one.
@@ -107,8 +105,10 @@ export function PlanCard({
                 key={p.id}
                 type="button"
                 aria-pressed={on}
-                aria-label={`${p.id.toUpperCase()} · ${stopsWord(p)}${best === p.id ? ', engineer’s pick' : ''}`}
-                aria-describedby={`${uid}-${p.id}-chance ${uid}-${p.id}-line`}
+                // The name is the plan and its chance; its stops are the description (they ran
+                // together as one name before: "A · One stopEngineer’s pick54%Hards on lap 30").
+                aria-label={`${p.id.toUpperCase()} · ${stopsWord(p)}, ${c === null ? 'chance being worked out' : `${Math.round(c * 100)}%`}${best === p.id ? ', engineer’s pick' : ''}`}
+                aria-describedby={`${uid}-${p.id}`}
                 onClick={() => setPicked(p.id)}
                 className={`flex min-w-0 flex-col items-stretch gap-1.5 rounded-md border px-2.5 py-2 text-left transition-colors ${on ? 'border-[var(--you)] bg-[color-mix(in_srgb,var(--you)_14%,#192024)]' : 'border-[#2E373B] bg-[#192024] hover:border-[#6E7A75]'}`}
               >
@@ -123,15 +123,12 @@ export function PlanCard({
                       </span>
                     )}
                   </span>
-                  <span
-                    id={`${uid}-${p.id}-chance`}
-                    className="mono shrink-0 text-[16px] font-bold leading-none"
-                  >
+                  <span className="mono shrink-0 text-[16px] font-bold leading-none">
                     {c === null ? '…' : `${Math.round(c * 100)}%`}
                   </span>
                 </span>
                 <span
-                  id={`${uid}-${p.id}-line`}
+                  id={`${uid}-${p.id}`}
                   className="truncate text-[12px] text-[var(--muted)]"
                   title={line}
                 >

@@ -54,7 +54,7 @@ test('the walkthrough’s tutorial link goes to the tutorial', async ({ page }) 
 
 test('the daily card: the race, the duel, How it works and the start', async ({ page }) => {
   await openDaily(page, model);
-  await expect(page.getByText('Daily race #1 · lap 51 of 66')).toBeVisible();
+  await expect(page.getByText('Daily race · lap 51 of 66')).toBeVisible();
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   // The goal names the rival; the real result is the bar to beat.
   await expect(page.getByText(/Alonso/).first()).toBeVisible();
@@ -67,11 +67,11 @@ test('the daily card: the race, the duel, How it works and the start', async ({ 
 
   // How it works takes the page, and closes back to the card.
   await page.getByRole('button', { name: 'How it works' }).click();
-  const close = page.getByRole('button', { name: 'Close How it works' });
+  const close = page.getByRole('button', { name: 'Back: close How it works' });
   await expect(close).toBeVisible();
-  await expect(page.getByText('Daily race #1')).toHaveCount(0);
+  await expect(page.getByText('Daily race · lap 51 of 66')).toHaveCount(0);
   await close.click();
-  await expect(page.getByText('Daily race #1 · lap 51 of 66')).toBeVisible();
+  await expect(page.getByText('Daily race · lap 51 of 66')).toBeVisible();
   // The card shows again, and with it the walkthrough (it opens every time the card shows).
   await expect(dialog(page)).toContainText('1 of 6');
   await dialog(page).getByRole('button', { name: 'Skip' }).click();

@@ -58,7 +58,7 @@ export function TimingTower({
   };
   return (
     <ol
-      aria-label="Timing tower"
+      aria-label="Standings"
       className="m-0 flex min-h-full list-none flex-col justify-around p-1"
     >
       {order.map((code, i) => {

@@ -73,9 +73,9 @@ export function QuickCallCard({
     return () => window.removeEventListener('keydown', onKey);
   }, [call]);
 
-  const board = useRaceEra().prompts === 'board';
-  // Each answer is named by its label alone; its note describes it (D7).
+  // Each answer's button is named by its label; its note describes it.
   const uid = useId();
+  const board = useRaceEra().prompts === 'board';
   const battle = call.kind === 'battle';
   const accent = battle ? 'var(--box)' : 'var(--you)';
   const radioTag = battle

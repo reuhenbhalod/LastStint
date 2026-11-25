@@ -15,7 +15,7 @@ export function HowItWorks({ onClose }: { onClose: () => void }) {
             type="button"
             onClick={onClose}
             className="rounded-lg border border-[var(--rule)] px-3 py-1 text-sm"
-            aria-label="Close How it works"
+            aria-label="Back: close How it works"
           >
             Back
           </button>
