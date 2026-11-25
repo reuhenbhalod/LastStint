@@ -117,7 +117,9 @@ describe('IntroCard', () => {
         account={account({ loaded: false })}
       />,
     );
-    expect(screen.getByText(/Daily race #12/)).toBeInTheDocument();
+    // #58: the Daily shows no number.
+    expect(screen.getByText(/Daily race · lap/)).toBeInTheDocument();
+    expect(screen.queryByText(/#12/)).not.toBeInTheDocument();
     const start = screen.getByRole('button', { name: 'Take the Mercedes pit wall' });
     await user.click(start);
     start.focus();
