@@ -11,7 +11,11 @@ import { addDays } from '../src/dates.js';
 import worker, { type Env } from '../src/index.js';
 import { getRace } from '../src/races.js';
 import { resetFlowsClock } from '../src/testClock.js';
+import wranglerConfig from '../wrangler.jsonc?raw';
 import { idToken, ids, play, schedule, today } from './helpers.js';
+
+/** The real Date, captured before any test could swap it (src/testClock.ts). */
+const RealDate = Date;
 
 // ---- helpers ------------------------------------------------------------------------------
 
@@ -583,6 +587,68 @@ describe('admin routes: success, bad input, not found', () => {
     );
   });
 
+  it('a real run and player: detail, reverify, delete; the player page, rename, hide', async () => {
+    const token = await admin();
+    await schedule(today());
+    const run = play('stay');
+    const submitted = await call('POST', '/api/runs', {
+      body: { date: today(), anonId: ids.a, decisions: run.decisions, grades: run.grades },
+    });
+    expect(submitted.status).toBe(201);
+    const list = (await (await call('GET', '/api/admin/runs', { token })).json()) as {
+      runs: Array<{ mode: string; id: string; playerKey: string }>;
+    };
+    const mine = list.runs.find((r) => r.mode === 'daily' && r.playerKey === ids.a);
+    expect(mine).toBeDefined();
+    const id = mine?.id as string;
+    const detail = await call('GET', `/api/admin/runs/daily/${id}`, { token });
+    expect(detail.status).toBe(200);
+    expect(await detail.json()).toMatchObject({ run: { id, mode: 'daily' } });
+    const one = await call('POST', '/api/admin/runs/reverify', {
+      token,
+      body: { mode: 'daily', id },
+    });
+    expect(one.status).toBe(200);
+    expect(await one.json()).toEqual({ marked: 1 });
+    const del = await call('POST', '/api/admin/runs/delete', { token, body: { id } });
+    expect(del.status).toBe(200);
+    expect(await del.json()).toEqual({ deleted: id });
+    await expectError(await call('GET', `/api/admin/runs/daily/${id}`, { token }), 404, 'no-run');
+    await expectError(
+      await call('POST', '/api/admin/runs/delete', { token, body: { id } }),
+      404,
+      'no-run',
+    );
+
+    // A signed-in player is an account the admin can open, rename and hide.
+    const signed = await call('POST', '/api/auth', {
+      body: {
+        credential: await idToken({ sub: 'google-renamed', email: 'renamed@example.com' }),
+        anonId: ids.b,
+      },
+    });
+    const { playerId } = (await signed.json()) as { playerId: string };
+    const page = await call('GET', `/api/admin/players/${playerId}`, { token });
+    expect(page.status).toBe(200);
+    const renamed = await call('POST', `/api/admin/players/${playerId}/name`, {
+      token,
+      body: { displayName: 'Renamed One' },
+    });
+    expect(renamed.status).toBe(200);
+    const hidden = await call('POST', `/api/admin/players/${playerId}/hide`, {
+      token,
+      body: { hidden: true },
+    });
+    expect(hidden.status).toBe(200);
+    expect(await hidden.json()).toEqual({ id: playerId, hidden: true });
+    const log = (await (await call('GET', '/api/admin/log', { token })).json()) as {
+      entries: Array<{ action: string }>;
+    };
+    expect(log.entries.map((e) => e.action)).toEqual(
+      expect.arrayContaining(['delete-run', 'hide']),
+    );
+  });
+
   it('tickets: content type, size, JSON, fields, id, not found', async () => {
     const token = await admin();
     const list = await call('GET', '/api/admin/tickets', { token });
@@ -724,7 +790,7 @@ describe('daily routes', () => {
     expect(loose.headers.get('Cache-Control')).toBe('public, max-age=300');
   });
 
-  it('POST /api/runs: body, fields, dates, verification, duplicates', async () => {
+  it('POST /api/runs: body, fields, dates, verification, duplicates, 429', async () => {
     await schedule(today());
     const run = play('stay');
     const good = { date: today(), anonId: ids.a, decisions: run.decisions, grades: run.grades };
@@ -791,6 +857,10 @@ describe('daily routes', () => {
       total: 1,
     });
     await expectError(await call('POST', '/api/runs', { body: good }), 409, 'already-submitted');
+    // 10 a minute from one IP (RUNS_LIMITER), counted before the body is read.
+    const ip = freshIp();
+    for (let i = 0; i < 10; i++) await call('POST', '/api/runs', { ip, body: 'x' });
+    await expectError(await call('POST', '/api/runs', { ip, body: good }), 429, 'rate-limited');
   });
 
   it('GET /api/runs/:date/:anonId: bad params, none, the run', async () => {
@@ -1371,6 +1441,28 @@ describe('unknown routes and CORS', () => {
       404,
       'no-daily',
     );
+    // Only exactly "true" turns it on.
+    for (const FLOWS_TEST of ['TRUE', '1', 'yes', '', undefined]) {
+      await expectError(
+        await callWith(
+          { FLOWS_TEST, FLOWS_NOW: '2001-01-01T12:00:00.000Z' },
+          'GET',
+          '/api/daily?date=2001-01-01',
+        ),
+        404,
+        'no-daily',
+      );
+    }
+    // The global clock was never swapped: Date is the real one and reads the real time.
+    expect(Date).toBe(RealDate);
+    expect(new Date().getFullYear()).toBeGreaterThan(2020);
+  });
+
+  it('production and staging never set the flows clock vars (wrangler.jsonc)', () => {
+    expect(wranglerConfig).toContain('"vars"');
+    expect(wranglerConfig).not.toMatch(/FLOWS_TEST|FLOWS_NOW/);
+    expect(env.FLOWS_TEST).toBeUndefined();
+    expect(env.FLOWS_NOW).toBeUndefined();
   });
 
   it('with FLOWS_TEST "true", runs on the x-flows-now header or FLOWS_NOW', async () => {
