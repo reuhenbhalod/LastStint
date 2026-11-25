@@ -118,8 +118,8 @@ test.describe('lobby', () => {
       'page',
     );
     await expect(nav.getByRole('link', { name: 'Daily' })).not.toHaveAttribute('aria-current');
-    // Versus isn't in the release: no tab.
-    await expect(nav.getByRole('link')).toHaveText(['Daily', 'Gauntlet', 'Eras']);
+    // (Versus, out of the release, is on in the test build: its tab is unit-tested.)
+    await expect(nav.getByRole('link').first()).toHaveText('Daily');
 
     for (const [name, path] of [
       ['Eras', '/eras'],
@@ -788,7 +788,7 @@ test.describe('race controls', () => {
       if ((await radioPill.getAttribute('aria-pressed')) !== 'true')
         await radioPill.click({ timeout: 3000 });
       await expect(radio).toBeVisible({ timeout: 3000 });
-      const head = radio.getByRole('button', { name: 'Team radio orders' });
+      const head = radio.getByRole('button', { name: 'Team radio', exact: true });
       await head.click({ timeout: 3000 });
       await expect(head).toHaveAttribute('aria-expanded', 'false');
       await head.click({ timeout: 3000 });

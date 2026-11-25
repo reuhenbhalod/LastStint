@@ -1,11 +1,24 @@
 // The Gauntlet's API (docs/survivor-spec.md), mocked for the screen specs (gauntlet.spec.ts):
 // the leaderboard, a run's start, its state and each round's verdict, configurable per test.
 // The race itself runs in the page on the real race file (the round's raceId and seed).
+import { readFileSync } from 'node:fs';
 import type { Page, Request } from '@playwright/test';
 import { type Model, loadRace } from '../mock.js';
 
+/** The Gauntlet's pool (data/pools.json `survivor`): race id -> the seeds a run deals from. */
+const POOL = (
+  JSON.parse(readFileSync(new URL('../../../../data/pools.json', import.meta.url), 'utf8')) as {
+    survivor: Record<string, number[]>;
+  }
+).survivor;
+
+/** Abu Dhabi 2021 (a Daily race; the screen plays whatever race the server deals). */
 export const ABU = loadRace('abu-dhabi-2021');
+/** Spain 2020, a Gauntlet race since the long Daily races moved over (#57). */
 export const SPAIN = loadRace('spain-2020');
+// The rounds here deal Spain on its race file's seed: it has to be one of its pool seeds.
+if (!POOL[SPAIN.race.id]?.includes(SPAIN.race.seed))
+  throw new Error(`${SPAIN.race.id} seed ${SPAIN.race.seed} isn't in the Gauntlet pool`);
 
 export interface Entry {
   rank: number;

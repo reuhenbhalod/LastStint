@@ -1,10 +1,12 @@
 // The pages around the game (docs/test-suite-spec.md S3): the tutorial race (/tutorial), the
-// privacy policy, the terms and the credits, every link on them pressed and followed, and
-// Versus held back from the release (a production build sends /versus home, with no tab).
+// privacy policy, the terms and the credits, every link on them pressed and followed. (Versus
+// held back from the release is unit-tested, App.test.ts and TopBar.test.ts: the test build
+// has it on, playwright.config.ts.)
 // Links off the site are answered by a stand-in page, so nothing leaves the machine.
 import type { Page } from '@playwright/test';
 import { expect, test } from '../coverage.js';
-import { fastLaps } from './gauntlet.js';
+import { loadRace, mockApi } from '../mock.js';
+import { type Answered, answerCall, fastLaps } from './gauntlet.js';
 
 /** The API answers nothing (the pages here need none); off-site links get a stand-in page. */
 async function offline(page: Page) {
@@ -73,9 +75,7 @@ test.describe('tutorial', () => {
 
     // Then each step as its moment comes; the race's calls are answered with their first choice.
     const titles: string[] = [];
-    const call = page.locator(
-      'section[aria-label="Your call"], section[aria-label="Quick call"], section[aria-label="Battle call"], section[aria-label="Planned stop"], section[aria-label="New plan"]',
-    );
+    const answered: Answered[] = [];
     const results = page.getByRole('button', { name: 'See how you did' });
     const deadline = Date.now() + 240_000;
     while (!page.url().endsWith('/') || page.url().includes('tutorial')) {
@@ -104,18 +104,11 @@ test.describe('tutorial', () => {
         await results.click().catch(() => {});
         continue;
       }
-      if (await call.first().isVisible()) {
-        await call
-          .first()
-          .getByRole('button')
-          .first()
-          .click({ timeout: 2000 })
-          .catch(() => {});
-        continue;
-      }
+      if (await answerCall(page, answered)) continue;
       await page.waitForTimeout(100);
     }
     expect(titles.slice(0, 2)).toEqual(['Team radio', 'Show stats']);
+    expect(answered.length).toBeGreaterThan(0);
     for (const t of ['Quick calls', 'A battle', 'The flag', 'How you did'])
       expect(titles).toContain(t);
     // Finish goes home, and the tutorial counts as done.
@@ -228,12 +221,33 @@ test.describe('legal and credits', () => {
   });
 });
 
-test('Versus is out of the release: /versus goes home, and no tab offers it', async ({ page }) => {
-  await offline(page);
-  await page.goto('/versus');
-  await expect(page).toHaveURL('/');
-  await page.goto('/gauntlet');
-  const nav = page.getByRole('navigation', { name: 'Ways to play' });
-  await expect(nav.getByRole('link', { name: 'Gauntlet' })).toBeVisible();
-  await expect(nav.getByRole('link', { name: 'Versus' })).toHaveCount(0);
+test.describe('how it works', () => {
+  test('from the Daily card: the rules and grading, and Back to the card', async ({ page }) => {
+    await mockApi(page, loadRace('abu-dhabi-2021'));
+    await page.goto('/');
+    // A signed-out player gets How to play first; Escape shuts it.
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+    await page.getByRole('button', { name: 'How it works', exact: true }).click();
+
+    await expect(page.getByRole('heading', { name: 'How it works', level: 1 })).toBeVisible();
+    for (const h of ['The race', 'Grading', 'Data'])
+      await expect(page.getByRole('heading', { name: h, level: 2 })).toBeVisible();
+    await expect(page.getByText('Best call, or within half a point of it')).toBeVisible();
+    await expect(page.getByText('A big miss')).toBeVisible();
+    expect(await noSideScroll(page)).toBeLessThanOrEqual(0);
+    // No race card while it's open.
+    await expect(page.getByRole('button', { name: /pit wall/ })).toHaveCount(0);
+
+    await page.getByRole('button', { name: 'Back: close How it works' }).click();
+    await expect(page.getByRole('heading', { name: 'How it works', level: 1 })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /pit wall/ })).toBeVisible();
+    // The card comes back as it opens (signed out, with How to play over it again).
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await page.keyboard.press('Escape');
+    // Opening it again works the same.
+    await page.getByRole('button', { name: 'How it works', exact: true }).click();
+    await expect(page.getByRole('heading', { name: 'How it works', level: 1 })).toBeVisible();
+  });
 });
