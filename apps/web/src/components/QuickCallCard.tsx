@@ -9,7 +9,7 @@
 // (owner decision, Nov 7 2026). The card shows the fills with none picked, and its box answers
 // wait until one is; the timer running out still answers "no change" (stay out).
 
-import { type ReactNode, useEffect, useRef, useState } from 'react';
+import { type ReactNode, useEffect, useId, useRef, useState } from 'react';
 import { named, surname } from '../data/names.js';
 import { BOARD_ACCENT, PIT_BOARD_CLASS, boardTag } from '../eras/PitBoard.js';
 import { useRaceEra } from '../eras/RaceEraContext.js';
@@ -73,6 +73,8 @@ export function QuickCallCard({
     return () => window.removeEventListener('keydown', onKey);
   }, [call]);
 
+  // Each answer's button is named by its label; its note describes it.
+  const uid = useId();
   const board = useRaceEra().prompts === 'board';
   const battle = call.kind === 'battle';
   const accent = battle ? 'var(--box)' : 'var(--you)';
@@ -150,6 +152,8 @@ export function QuickCallCard({
             key={o.id}
             type="button"
             disabled={waiting(o)}
+            aria-label={named(o.label)}
+            aria-describedby={o.note ? `${uid}-${i}-note` : undefined}
             title={waiting(o) ? 'Pick a fuel fill first' : undefined}
             onClick={() => answer(o)}
             className={needsFill ? 'call-opt disabled:opacity-40' : 'call-opt'}
@@ -160,7 +164,11 @@ export function QuickCallCard({
                 {i + 1}
               </span>
             </span>
-            {o.note && <span className="note">{named(o.note)}</span>}
+            {o.note && (
+              <span id={`${uid}-${i}-note`} className="note">
+                {named(o.note)}
+              </span>
+            )}
           </button>
         ))}
       </div>

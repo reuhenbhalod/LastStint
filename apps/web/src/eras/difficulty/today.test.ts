@@ -240,7 +240,8 @@ describe('outside Eras, byte-identical to before the information levels', () => 
  */
 const TODAY = {
   components: {
-    towers: '744def06d2cc0263',
+    // '744def06d2cc0263' before the standings list was labelled (test suite S2: aria-label).
+    towers: '96056f1fcf83dfdb',
     leaders: '92b7aa6722da2ecb',
     cards: 'efcfeeeb0a03435b',
     stats: '41a6d50080639e8b',
@@ -250,9 +251,13 @@ const TODAY = {
   // 'ff65482385daa3aa' before the map's OpenStreetMap credit (components/MapCredit.tsx).
   // '0a151c0f15589328' before the credit moved to the map's bottom right (clear of the strip).
   // '3ea81a4162b5cb5a' before every venue was re-fitted (31efc59): the ground image's placement matrix moved.
-  screen: 'ccf7241ff273c1b3',
+  // 'ccf7241ff273c1b3' before S2's accessible names (the standings list, the Team radio bar,
+  // the call options): only aria-label, aria-describedby and id attributes changed.
+  screen: 'c3c629e73e5ab46d',
   decision: 'f71311307784d55e',
-  cards: '82ea30e0dbd15610',
+  // '82ea30e0dbd15610' before the call options were named by their label alone, the note
+  // and the risk tag as the description (test suite S2: aria-label, aria-describedby).
+  cards: '68a086f33117b7e1',
   // Before the worn-tyre box request asked only as the tyres got worse (2026-11-14):
   // bahrain-2021 '23f7c24ac4ac5b24', austria-2019 '68bbb551ab858735'.
   radio: {

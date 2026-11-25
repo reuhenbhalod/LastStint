@@ -21,5 +21,11 @@ export default defineConfig({
       '/api': { target: 'http://localhost:8787', ws: true },
     },
   },
-  test: { environment: 'node', include: ['src/**/*.test.ts'] },
+  // Tests run on node; component tests (`*.test.tsx`) switch to jsdom with a
+  // `// @vitest-environment jsdom` docblock at the top of the file.
+  test: {
+    environment: 'node',
+    include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
+    setupFiles: ['./src/test/setup.ts'],
+  },
 });

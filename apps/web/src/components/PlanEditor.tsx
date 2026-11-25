@@ -100,6 +100,7 @@ export function PlanEditor({
             {tyres(car.compound)}
           </span>
           <Pace
+            label="Stint 1 pace"
             value={value.pace[0] ?? 'standard'}
             onPace={(p) => set({ pace: value.pace.map((x, k) => (k === 0 ? p : x)) })}
           />
@@ -111,13 +112,13 @@ export function PlanEditor({
           >
             <span className="eyebrow">Stop {i + 1}</span>
             <span className="flex items-center gap-1">
-              <Step label="Earlier" onClick={() => moveStop(i, s.lap - 1)}>
+              <Step label={`Stop ${i + 1} earlier`} onClick={() => moveStop(i, s.lap - 1)}>
                 −
               </Step>
               <span className="mono min-w-[52px] text-center text-[13px] font-bold">
                 lap {s.lap}
               </span>
-              <Step label="Later" onClick={() => moveStop(i, s.lap + 1)}>
+              <Step label={`Stop ${i + 1} later`} onClick={() => moveStop(i, s.lap + 1)}>
                 +
               </Step>
             </span>
@@ -130,7 +131,8 @@ export function PlanEditor({
               onChange={(e) => moveStop(i, Number(e.target.value))}
               className="min-w-[120px] flex-1 accent-[var(--you)]"
             />
-            <span className="flex gap-1">
+            {/* biome-ignore lint/a11y/useSemanticElements: a span keeps the row's layout as it was */}
+            <span role="group" aria-label={`Stop ${i + 1} tyre`} className="flex gap-1">
               {compounds.map((c) => (
                 <button
                   key={c}
@@ -149,6 +151,7 @@ export function PlanEditor({
               ))}
             </span>
             <Pace
+              label={`Stint ${i + 2} pace`}
               value={value.pace[i + 1] ?? 'standard'}
               onPace={(p) => set({ pace: value.pace.map((x, k) => (k === i + 1 ? p : x)) })}
             />
@@ -165,6 +168,7 @@ export function PlanEditor({
             <button
               type="button"
               onClick={() => removeStop(i)}
+              aria-label={`Remove stop ${i + 1}`}
               className="text-[12px] font-semibold text-[var(--muted)] underline-offset-2 hover:text-[var(--ink)] hover:underline"
             >
               Remove
@@ -272,9 +276,22 @@ function StopFill({
 }
 
 /** A stint's pace: manage, standard or push. */
-function Pace({ value, onPace }: { value: PaceMode; onPace: (p: PaceMode) => void }) {
+function Pace({
+  label,
+  value,
+  onPace,
+}: {
+  label: string;
+  value: PaceMode;
+  onPace: (p: PaceMode) => void;
+}) {
   return (
-    <span className="flex overflow-hidden rounded-md border border-[var(--rule)]">
+    // biome-ignore lint/a11y/useSemanticElements: a span keeps the toggle's layout as it was
+    <span
+      role="group"
+      aria-label={label}
+      className="flex overflow-hidden rounded-md border border-[var(--rule)]"
+    >
       {(['manage', 'standard', 'push'] as PaceMode[]).map((p) => (
         <button
           key={p}
