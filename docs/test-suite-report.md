@@ -123,23 +123,89 @@ From the game's calls and radio (`apps/web/src/game`, `state`, `engine`):
 After them: review, verify (break each control and see its test fail), fix, then QA. S6 (the CI
 guard on GitHub-hosted runners) comes after S3, once the matrix is near 100%.
 
-## Paused (Nov 24): where to resume
+## S4: L3 flows against a local Worker and D1 (agent F)
 
-Nothing in the test-suite effort is committed. The work is in worktrees under `.worktrees/`, all
-from `origin/main` cf6d89e plus the S1 patch:
+`pnpm --filter @laststint/web e2e:flows` (`apps/web/playwright.flows.config.ts`, specs in
+`apps/web/e2e/flows`). Nothing is mocked except Google's sign-in script.
 
-| Worktree | State |
+**The local stack** (started fresh on every run, never reused):
+
+1. `e2e/flows/stack.mjs`: a new local D1 in a temp directory (`--persist-to`), every
+   migration, the dailies from the fixed date (`schedule --local --persist-to <dir> --from
+   2026-06-01 --days 28 --race abu-dhabi-2021`), an Eras seed (Eras 10 and 9 released and
+   published; each project's Eras player on 20 Era 10 stars), then `wrangler dev --local` on
+   port 8851 (inspector 5352) with an env file: `FLOWS_TEST=true`, `FLOWS_NOW`, Google sign-in with the flows' own
+   key (`GOOGLE_JWKS`, Auth0 off), `ADMIN_EMAILS=admin@flows.test`, `SURVIVOR_POOL` (Spain 2020),
+   `ERAS_TEST_MODE=false`.
+2. `vite build` + `vite preview` (`e2e/flows/vite.flows.config.ts`) on port 5351, with
+   the Google sign-in path on and `/api` proxied to (1).
+
+**The fixed date.** The Worker reads the time in about 40 places, so the least invasive hook
+is one clock swap at the top of `fetch()` (`apps/worker/src/testClock.ts`). It does nothing
+unless the `FLOWS_TEST` var is exactly `"true"`, which only the flows' env file sets (not
+`wrangler.jsonc`, not staging). When on, "now" is the request's `x-flows-now` header, else
+`FLOWS_NOW`, running on in real time. The browser's clock is put at the same time
+(`page.clock.install`), and Playwright sends the header with every request, so the next day is
+one `setTime()` call. A contract test checks the header is ignored when the var is off.
+
+| Flow | What it checks |
 |---|---|
-| `test-suite` | S1 done: recorder, report script, spec (D1-D7, D4 = keep the PC runner), this report, the admin-tabs fix, the `screens/` desktop match |
-| `ts-a-components` | **S2 done:** jsdom + Testing Library harness, 21 component test files (233 tests), 7 attribute-only accessibility fixes, 3 Eras digests updated in `today.test.ts`. Web suite 1289 passed; 25 mutation checks all caught |
-| `ts-b-daily` | S3 Daily: stopped mid-work (one spec file under `e2e/screens/`, unfinished: battle tests being rewritten) |
-| `ts-c-gauntlet-misc` | S3 Gauntlet, pages, account: stopped mid-work (one spec file) |
-| `ts-d-eras` | S3 Eras: stopped mid-work (one spec file) |
-| `ts-e-admin` | S3 admin: stopped mid-work (one spec file) |
-| `ts-f-flows-api` | S4 flows + S5 Worker contracts: stopped mid-work (flows config and Worker tests started; the Gauntlet flow was running) |
+| `daily.spec.ts` | The day's Daily (the card shows no number, #58) intro → plan → every call → result; the Worker's 201 (its own score, rank 1/1, number in the API); the stored run, streak 1 and leaderboard from the API; Share result: the line (no number) and link on the clipboard, "Copied!"; reload → straight to the result; with the browser's saved run gone, the game fetches the run from the Worker and shows it; a second submit is 409; next day: the next Daily, streak 2 in the API and on screen; day 1 not playable on day 4 |
+| `gauntlet.spec.ts` | Start (201, Spain 2020), round 1 won (the Worker's verdict), the next race's brief, round 2 lost (box for softs at every stop call), "run over"; the run in the API (over, 1 round, history won/lost), the all-time board one longer, a late round refused (409) |
+| `eras.spec.ts` | Production mode: Era 9 locked "1 to go" and the Worker refuses its attempt (403 era-locked); Belgium 2023 from the Era 10 page to its stars (the Worker deals the seed, replays and scores); the new star makes Era 10 21+ stars; Era 9 opens on the map and Turkey 2021 starts (201) |
+| `account.spec.ts` | A bad token (401, still signed out); sign-in (a new account adopts its player ID), the profile sheet saved (POST /api/profile), the account in the API, the old anonymous ID linked, reload stays signed in, sign out (fresh anonymous ID, no account), another browser finds the same account with no profile prompt; an admin account gets the Admin menu item |
+| `admin.spec.ts` | A non-admin is refused on /admin (403 from the Worker); the admin signs in, sets an announcement, changes day 4's race to Spain 2020; both edits in the audit log; a player sees the banner, and on day 4 the Spain 2020 daily; clearing it takes the banner down |
 
-To resume: finish S3-S5 in their worktrees (re-brief an agent per worktree from its own
-changes), then merge all six into `test-suite`. Reconcile e2e selectors with S2's new
-accessible names (battle options are now named by their label alone, plan cards as "B · One
-stop, 61%, engineer's pick"). Then run the full suite plus coverage, review and verify, S6 (the
-CI guard on the PC runner, Linux screenshot baselines), and one PR.
+**Not covered locally:** Auth0's hosted login and its redirect back (`completeLogin`), Google's
+own popup and One Tap, fetching the real issuers' keys, the daily cron (`scheduled`), and the
+nightly re-verification. The Worker's Auth0 token path is in `apps/worker/test/auth.test.ts`.
+**Phone and desktop.** Both projects run every flow against the one stack. Each plays its own
+days and players (`e2e/flows/env.ts` PROJECTS: desktop from 2026-06-01, phone from 2026-06-15;
+its own Eras player, account and display name), so they never meet; the Gauntlet's shared
+all-time board is checked relative to what was there before.
+
+**Runtime:** 9-11 minutes for both projects (stack start and web build ~1.5 min; per project
+Daily ~1.3 min, Eras ~1 min, Gauntlet ~2.5 min, the rest seconds). Two full runs back to back
+(the second with `E2E_COVERAGE=1`) passed 12/12. Run it detached or with a long timeout: a
+shell that kills the run at 10 minutes takes the stack down mid-test (the "Gauntlet never
+answers" failure seen before the pause). `FLOWS_DEBUG=1` shows the Worker's request log;
+`stack.mjs` always reports on stderr if `wrangler dev` exits. A run's D1 is in
+`$TMPDIR/laststint-flows-*`; Playwright kills the stack hard, so the folder can be left behind.
+
+**Control coverage** (`E2E_COVERAGE=1`): the flows press 70 of the 362 controls they bring on
+screen across 7 routes (`/` 23/102, `/gauntlet` 22/100, `/eras/:n/:race` 15/94, `/admin` 6/21,
+`/admin/schedule` 2/21, `/eras` 1/12, `/eras/:n` 1/12), with none unnamed. The flows press what
+the journeys need; every control is the S3 screen specs' job.
+
+**Mutation checks** (each broke a test, then restored): Share result not setting "Copied!";
+the Gauntlet board tabs doing nothing; the admin announcement sent changed (caught only after
+the banner check was made case-exact); the profile sheet dropping the team.
+
+## S5: Worker contract tests (agent F)
+
+`apps/worker/test/contract.test.ts` walks all 54 routes (28 admin, 26 public): every admin
+route signed out, with a non-Bearer header, an oversize token, a bad token and a player (401,
+401, 401, 401, 403 with the exact body) and with sign-in off (503 auth-off); expired, wrong
+audience, wrong issuer, unverified and re-signed admin tokens; then each route's success, bad
+input (missing, wrong type, invalid, oversize), not found, the RUNS_LIMITER limit where it
+applies (runs, auth, survivor start and round, Eras start and submit) and the exact error. A
+real run and player go through the admin run detail, reverify, delete, player page, rename and
+hide, and the audit log. Mutation checks caught: the test clock on for any FLOWS_TEST value,
+the POST /api/runs limiter ignored, a day with runs re-raced, and any verified account taken
+as admin (28 failures, one per admin route).
+
+## Bugs and notes from S4/S5
+
+- **`scripts/schedule.ts` misread `docs/g1-report.md`**: fixed on main by #58 (eligible = in
+  the daily pool with moments). The flows no longer pass `--allow-ineligible`.
+- **The test clock is off in production**: contract tests check that only `FLOWS_TEST` exactly
+  `"true"` turns it on (`TRUE`, `1`, `yes`, empty and unset don't), that `Date` stays the real
+  one when off, and that `wrangler.jsonc` (production and staging) sets neither var.
+- **A failed sign-in is silent on the daily card** (web, not changed): the compact account bar
+  on the intro doesn't show `account.error`; only the result screen's bar does.
+- **Gauntlet rounds share the daily's rate-limit key** (`POST /api/survivor/:id/round` and
+  `POST /api/runs` both count against the bare IP), so a player's daily run and Gauntlet rounds
+  draw from the same 10 a minute. Probably fine; noted.
+- `test/shuffle.test.ts` "keeps a race from coming straight back…" is CPU-bound and times out
+  (60 s) under heavy machine load (load average 25-37 from parallel agents' e2e runs; the file
+  alone took 86 s then). It passes when the machine is quieter. Not changed here.
