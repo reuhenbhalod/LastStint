@@ -943,6 +943,8 @@ test.describe('race controls', () => {
     // it's in), then each swap. An order goes in once; a retry only waits for it to show.
     const orders: Array<[string, ReturnType<Page['getByText']>]> = [
       ['Hold up Verstappen', radio.getByRole('button', { name: 'Release Verstappen' })],
+      // And Release turns it back.
+      ['Release Verstappen', radio.getByRole('button', { name: 'Hold up Verstappen' })],
       // Who gives way: Bottas, then Hamilton.
       ['Bottas lets you by', radio.getByText(/Swap called: (BOT|Bottas) yields/)],
       ['Let Bottas by', radio.getByText(/Swap called: (HAM|Hamilton) yields/)],
@@ -963,6 +965,7 @@ test.describe('race controls', () => {
         await expect(done).toBeVisible({ timeout: 3000 });
       }).toPass({ timeout: 60_000 });
       if (name.startsWith('Hold up')) await expect(done).toHaveAttribute('aria-pressed', 'true');
+      if (name.startsWith('Release')) await expect(done).toHaveAttribute('aria-pressed', 'false');
     }
     // Once that stop is made, the tyre buttons come back: the other two compounds, in turn.
     for (const tyre of ['Hards', 'Softs']) {
