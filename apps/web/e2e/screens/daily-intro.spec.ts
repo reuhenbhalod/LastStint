@@ -112,7 +112,9 @@ test('the home and Daily links stay on the daily; the map credit links out', asy
   await expect(page).toHaveURL(/\/$/);
   await expect(page.getByRole('dialog')).toBeVisible(); // a fresh visit: the walkthrough again
   await page.getByRole('button', { name: 'Skip' }).click();
-  for (const credit of await page.getByRole('link', { name: /OpenStreetMap contributors/ }).all())
+  const credits = page.getByRole('link', { name: /OpenStreetMap contributors/ });
+  await expect(credits).toHaveCount(1); // the map's credit
+  for (const credit of await credits.all())
     await expect(credit).toHaveAttribute('href', 'https://www.openstreetmap.org/copyright');
 });
 

@@ -183,7 +183,8 @@ export async function openPanel(page: Page, name: string | RegExp): Promise<Loca
  * buttons for a call by its lap instead). The quick calls on the way go unanswered.
  */
 export async function runTo(page: Page, lap: number, answers: Record<number, string[]> = {}) {
-  for (let guard = 0; guard < 120; guard++) {
+  const guards = 120;
+  for (let guard = 0; guard < guards; guard++) {
     const s = await session(page);
     if (s.lap >= lap) return;
     if (s.phase === 'decision') {
@@ -200,9 +201,14 @@ export async function runTo(page: Page, lap: number, answers: Record<number, str
       await expect.poll(async () => (await session(page)).phase).not.toBe('decision');
       continue;
     }
-    if (s.phase !== 'racing') return;
+    if (s.phase !== 'racing')
+      throw new Error(`runTo(${lap}): the race stopped at lap ${s.lap} in phase '${s.phase}'`);
     await fastForward(page, s.lap + 1);
   }
+  const s = await session(page);
+  throw new Error(
+    `runTo(${lap}): not there after ${guards} steps (lap ${s.lap}, phase '${s.phase}')`,
+  );
 }
 
 /** The calls the game has made so far of a kind (through the test hook). */

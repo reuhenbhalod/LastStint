@@ -115,7 +115,9 @@ test('pick up, reassign, unassign and filter by owner', async ({ page }) => {
     { id: 3, status: 'open' },
   ]);
   await page.getByRole('button', { name: /^Completed/ }).click();
-  for (const toggle of await page.locator('li button[aria-expanded]').all()) {
+  const toggles = page.locator('li button[aria-expanded]');
+  await expect(toggles).toHaveCount(4); // the four tickets, the completed one too
+  for (const toggle of await toggles.all()) {
     await toggle.click();
     await expect(toggle).toHaveAttribute('aria-expanded', 'true');
   }

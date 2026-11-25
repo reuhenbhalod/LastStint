@@ -33,6 +33,15 @@ import { outlineFor } from '../../track/outlines.js';
 const digest = (parts: string[]) =>
   createHash('sha256').update(parts.join('\n---\n')).digest('hex').slice(0, 16);
 
+/**
+ * Rendered markup as the digests take it: with its `aria-*` and `id` attributes left out, so an
+ * accessibility-only edit (a name, a description and the ids it points at) leaves a digest as it
+ * was. Everything else (elements, text, classes, styles, every other attribute) still counts, so
+ * any change to what a player sees outside Eras still changes a digest.
+ */
+const markup = (html: string) => html.replace(/\s(?:aria-[\w-]+|id)="[^"]*"/g, '');
+const digestMarkup = (parts: string[]) => digest(parts.map(markup));
+
 let daily: Daily;
 beforeAll(async () => {
   daily = await new StaticDailyProvider().today();
@@ -117,10 +126,10 @@ describe('outside Eras, byte-identical to before the information levels', () => 
       stats.push(renderToStaticMarkup(createElement(CarStats, { ...base, log })));
     }
     expect({
-      towers: digest(towers),
-      leaders: digest(leaders),
-      cards: digest(cards),
-      stats: digest(stats),
+      towers: digestMarkup(towers),
+      leaders: digestMarkup(leaders),
+      cards: digestMarkup(cards),
+      stats: digestMarkup(stats),
     }).toEqual(TODAY.components);
   });
 
@@ -138,7 +147,7 @@ describe('outside Eras, byte-identical to before the information levels', () => 
         createElement(RaceScreen, { game, state: s.state, model: daily.model }),
       );
     });
-    expect(digest(html)).toBe(TODAY.screen);
+    expect(digestMarkup(html)).toBe(TODAY.screen);
   });
 
   it('the big call', () => {
@@ -153,7 +162,7 @@ describe('outside Eras, byte-identical to before the information levels', () => 
         onChoose: () => {},
       }),
     );
-    expect(digest([html])).toBe(TODAY.decision);
+    expect(digestMarkup([html])).toBe(TODAY.decision);
   });
 
   it('the quick-call and battle cards', () => {
@@ -222,7 +231,7 @@ describe('outside Eras, byte-identical to before the information levels', () => 
         ),
       ),
     ];
-    expect(digest(html)).toBe(TODAY.cards);
+    expect(digestMarkup(html)).toBe(TODAY.cards);
   });
 
   it.each(RADIO_RACES)('the engineer’s radio over %s', (id) => {
@@ -239,25 +248,28 @@ describe('outside Eras, byte-identical to before the information levels', () => 
  * radio pill, the tapped car's card over the map, the top bar's phone spacing).
  */
 const TODAY = {
+  // The markup digests are taken without `aria-*` and `id` attributes (`markup` above). Retaken
+  // when that began (test suite review, Nov 24 2026): the same values from an origin/main
+  // checkout and from this branch, whose S2 accessible names (the standings list, the Team radio
+  // bar, the call options) changed only those attributes. Before (attributes in):
+  // towers '744def06d2cc0263' (main; the same now, as it had none), leaders '92b7aa6722da2ecb',
+  // cards 'efcfeeeb0a03435b', stats '41a6d50080639e8b', screen 'ccf7241ff273c1b3',
+  // decision 'f71311307784d55e', quick-call and battle cards '82ea30e0dbd15610' (all main's).
   components: {
-    // '744def06d2cc0263' before the standings list was labelled (test suite S2: aria-label).
-    towers: '96056f1fcf83dfdb',
-    leaders: '92b7aa6722da2ecb',
-    cards: 'efcfeeeb0a03435b',
-    stats: '41a6d50080639e8b',
+    towers: '744def06d2cc0263',
+    leaders: '23ea455fbeb70cc8',
+    cards: '201ffee3e433cf12',
+    stats: '092ae83ef054f2af',
   },
   // Before the merge: '79aa9a7697842f85' (8.8's phone spacing), 'a3ff5c603c39a2f9' (before 8.8).
   // 'ee1d94ac9fe089d8' before the logo went white (Brand: text-white, not the team colour).
   // 'ff65482385daa3aa' before the map's OpenStreetMap credit (components/MapCredit.tsx).
   // '0a151c0f15589328' before the credit moved to the map's bottom right (clear of the strip).
   // '3ea81a4162b5cb5a' before every venue was re-fitted (31efc59): the ground image's placement matrix moved.
-  // 'ccf7241ff273c1b3' before S2's accessible names (the standings list, the Team radio bar,
-  // the call options): only aria-label, aria-describedby and id attributes changed.
-  screen: 'c3c629e73e5ab46d',
-  decision: 'f71311307784d55e',
-  // '82ea30e0dbd15610' before the call options were named by their label alone, the note
-  // and the risk tag as the description (test suite S2: aria-label, aria-describedby).
-  cards: '68a086f33117b7e1',
+  // (Those with the attributes in.)
+  screen: 'aeedbfe3f6149a5a',
+  decision: '12a19a92cafd6399',
+  cards: '471cfe4cfeefbe2e',
   // Before the worn-tyre box request asked only as the tyres got worse (2026-11-14):
   // bahrain-2021 '23f7c24ac4ac5b24', austria-2019 '68bbb551ab858735'.
   radio: {

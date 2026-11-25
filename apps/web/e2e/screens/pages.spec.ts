@@ -6,6 +6,7 @@
 import type { Page } from '@playwright/test';
 import { expect, test } from '../coverage.js';
 import { loadRace, mockApi } from '../mock.js';
+import { shownLap } from './daily.js';
 import { type Answered, answerCall, fastLaps } from './gauntlet.js';
 
 /** The API answers nothing (the pages here need none); off-site links get a stand-in page. */
@@ -97,11 +98,17 @@ test.describe('tutorial', () => {
           await expect(classification.locator('xpath=..')).toHaveAttribute('open', '');
           await expect(next).toHaveText('Finish');
         }
-        await next.click({ timeout: 3000 }).catch(() => {});
+        // One press moves the coach on: to another step, or away.
+        await next.click({ timeout: 3000 });
+        await expect
+          .poll(async () => ((await coach.isVisible()) ? await title.textContent() : null), {
+            message: `one press of ${t}'s button moves the coach on`,
+          })
+          .not.toBe(t);
         continue;
       }
       if (await results.isVisible().catch(() => false)) {
-        await results.click().catch(() => {});
+        await results.click();
         continue;
       }
       if (await answerCall(page, answered)) continue;
@@ -125,6 +132,10 @@ test.describe('tutorial', () => {
     const title = coach.getByRole('heading', { level: 2 });
     for (let i = 0; i < 4; i++) await coach.getByRole('button', { name: 'Got it' }).click();
     const plan = page.getByRole('region', { name: 'Race plan' });
+    // The lap the race starts from (its takeover), for Restart below.
+    await expect(plan).toBeVisible();
+    const startLap = await shownLap(page);
+    expect(startLap).toBeGreaterThan(0);
     // The plan editor and back.
     await plan.getByRole('button', { name: 'Build your own' }).click();
     await expect(plan.getByRole('button', { name: 'Go with your plan' })).toBeVisible();
@@ -167,17 +178,24 @@ test.describe('tutorial', () => {
 
     // Stats: the side panels on a wide screen, the dock's tabs on a phone.
     if (wide) {
+      // One button: "Show stats" opens the side panels and becomes "Focus view", which shuts
+      // them. Each step presses only while its state isn't there yet, so a retry never toggles
+      // back what an earlier try did.
       const stats = controls.getByRole('button', { name: 'Show stats' });
+      const focus = controls.getByRole('button', { name: 'Focus view' });
       await expect(async () => {
         await clear();
-        await stats.click({ timeout: 1000 });
+        if (await stats.count()) await stats.click({ timeout: 1000 });
         await expect(page.getByRole('complementary', { name: 'Stats' })).toHaveAttribute(
           'aria-hidden',
           'false',
           { timeout: 1000 },
         );
+        await expect(focus).toHaveAttribute('aria-pressed', 'true', { timeout: 1000 });
+      }).toPass({ timeout: 60_000 });
+      await expect(async () => {
         await clear();
-        await controls.getByRole('button', { name: 'Focus view' }).click({ timeout: 1000 });
+        if (await focus.count()) await focus.click({ timeout: 1000 });
         await expect(stats).toHaveAttribute('aria-pressed', 'false', { timeout: 1000 });
       }).toPass({ timeout: 60_000 });
     } else {
@@ -192,11 +210,18 @@ test.describe('tutorial', () => {
     }
 
     if (wide) {
-      // Practice can be restarted (a Gauntlet race can't): back to the tutorial's card.
+      // Practice can be restarted (a Gauntlet race can't): back to the tutorial's card, with
+      // the race itself fresh (a new session: the plan to pick again, from the takeover lap).
       await clear();
+      const reached = await shownLap(page);
+      expect(reached).toBeGreaterThan(startLap);
       await page.getByRole('button', { name: 'Restart the race' }).click();
       await expect(page.getByRole('button', { name: 'Start the tutorial' })).toBeVisible();
       await expect(page.getByRole('heading', { name: 'Canada 2022', level: 1 })).toBeVisible();
+      await page.getByRole('button', { name: 'Start the tutorial' }).click();
+      await expect(plan).toBeVisible();
+      await expect(plan.getByRole('button', { name: /^Go with plan/ })).toBeVisible();
+      await expect.poll(() => shownLap(page)).toBe(startLap);
     }
   });
 

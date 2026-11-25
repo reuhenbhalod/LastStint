@@ -44,6 +44,21 @@ const pill = (page: Page, name: string | RegExp) =>
   controls(page).getByRole('button', { name, exact: typeof name === 'string' });
 const decision = (page: Page) => page.getByRole('region', { name: 'Your call' });
 
+/**
+ * Press `button` on the call `card`. A call can go before the press lands (a quick call's
+ * timer runs out, or the race moves on and takes it away): then there's nothing to press, and
+ * false. A press that fails with the card still up is a real failure and throws.
+ */
+async function pressOn(card: Locator, button: Locator): Promise<boolean> {
+  try {
+    await button.click({ timeout: 2_000 });
+    return true;
+  } catch (e) {
+    if (await card.isVisible()) throw e;
+    return false;
+  }
+}
+
 /** Open the race at its intro and start it on plan `plan` (default A), without waiting on
  * the grades (which pick the engineer's plan once in). */
 async function raceOn(page: Page, path: string, plan = 'A') {
@@ -63,28 +78,18 @@ async function answerOthers(page: Page): Promise<boolean> {
   if (await quick.first().isVisible()) {
     const call = quick.first();
     const fill = call.getByRole('group', { name: 'Fuel fill' });
-    if (await fill.isVisible()) await fill.getByRole('button').first().click({ timeout: 2_000 });
-    await call
-      .getByRole('button')
-      .last()
-      .click({ timeout: 2_000 })
-      .catch(() => {});
+    if (await fill.isVisible()) await pressOn(call, fill.getByRole('button').first());
+    await pressOn(call, call.getByRole('button').last());
     return true;
   }
   const planned = page.getByRole('region', { name: 'Planned stop' });
   if (await planned.isVisible()) {
-    await planned
-      .getByRole('button', { name: 'Box as planned' })
-      .click({ timeout: 2_000 })
-      .catch(() => {});
+    await pressOn(planned, planned.getByRole('button', { name: 'Box as planned' }));
     return true;
   }
   const replan = page.getByRole('region', { name: 'New plan' });
   if (await replan.isVisible()) {
-    await replan
-      .getByRole('button', { name: 'Keep ours' })
-      .click({ timeout: 2_000 })
-      .catch(() => {});
+    await pressOn(replan, replan.getByRole('button', { name: 'Keep ours' }));
     return true;
   }
   return false;
@@ -97,11 +102,7 @@ async function settle(page: Page) {
   while (quiet < 3) {
     const card = decision(page);
     if (await card.isVisible()) {
-      await card
-        .getByRole('button')
-        .first()
-        .click({ timeout: 2_000 })
-        .catch(() => {});
+      await pressOn(card, card.getByRole('button').first());
       quiet = 0;
     } else if (await answerOthers(page)) quiet = 0;
     else quiet += 1;
@@ -153,7 +154,7 @@ test('the race plan: each of the engineer’s plans, then your own', async ({ pa
   const go = plans.getByRole('button', { name: /^Go with/ });
   // Graded: the engineer picks one (selected until you pick), and each card picks its plan.
   await expect(plans).not.toContainText('…', { timeout: 90_000 });
-  const pick = plans.getByRole('button', { name: /Engineer’s pick/ });
+  const pick = plans.getByRole('button', { name: /engineer’s pick/i });
   await expect(pick).toHaveCount(1);
   const pickId = ((await pick.textContent()) ?? '').charAt(0);
   await expect(go).toHaveText(`Go with plan ${pickId}`);
@@ -525,8 +526,16 @@ test('a decision: Box opens the tyres, Back, then a tyre; the next by its number
     /^Time to make the call: \d+ seconds$/,
   );
   // The race holds while the call is up, and the bar's panels wait.
+  // (Laps of 0.5 s here: two of the timer's seconds going by would be several laps.)
   const lap = await shownLap(page);
-  await page.waitForTimeout(800);
+  const timerSeconds = async () =>
+    Number(
+      ((await card.getByRole('timer').getAttribute('aria-label')) ?? '').match(
+        /(\d+) seconds/,
+      )?.[1],
+    );
+  const from = await timerSeconds();
+  await expect.poll(timerSeconds, { timeout: 10_000 }).toBeLessThanOrEqual(from - 2);
   expect(await shownLap(page)).toBe(lap);
   await expect(pill(page, 'Team radio')).toBeDisabled();
   // Box opens the tyre step; Back closes it; then the number key 1 picks Stay out.
@@ -583,11 +592,17 @@ test('a timed call runs out to the default; with the timer off nothing runs out,
   // The opt-out: no call shows a timer from here, and the calls wait as long as they take.
   await page.getByRole('button', { name: 'Timer on' }).click();
   await expect(page.getByRole('button', { name: 'Timer off' })).toBeVisible();
+  let untimedCards = 0;
   const played = await finishRace(page, {
     each: async () => {
-      if (await card.isVisible()) await expect(card.getByRole('timer')).toHaveCount(0);
+      if (await card.isVisible()) {
+        await expect(card.getByRole('timer')).toHaveCount(0);
+        untimedCards += 1;
+      }
     },
   });
+  // A decision was up with the timer off (so the check above ran on a card).
+  expect(untimedCards, 'a decision card seen with the timer off').toBeGreaterThan(0);
   // A call shown with the timer off (a decision or a quick call) marks the attempt untimed.
   expect(played.moments.size + played.calls.length).toBeGreaterThan(1);
   expect(eras.submissions[0]?.body.untimed).toBe(true);
@@ -632,6 +647,8 @@ test('refuelling: the plan editor asks each stop’s fill', async ({ page }) => 
   await plans.getByRole('button', { name: 'Build your own' }).click();
   const fill = plans.getByRole('group', { name: 'Stop 1 fuel fill' });
   await expect(fill).toBeVisible();
+  // Short, Standard, Long.
+  await expect(fill.getByRole('button')).toHaveCount(3);
   for (const b of await fill.getByRole('button').all()) {
     await b.click();
     await expect(b).toHaveAttribute('aria-pressed', 'true');
@@ -784,11 +801,7 @@ async function toHeadsUp(page: Page) {
     const card = decision(page);
     if (await card.isVisible()) {
       // Stay out (the first option): the plan's own stop is what this test is after.
-      await card
-        .getByRole('button')
-        .first()
-        .click({ timeout: 2_000 })
-        .catch(() => {});
+      await pressOn(card, card.getByRole('button').first());
       continue;
     }
     const quick = page.locator(
@@ -796,20 +809,12 @@ async function toHeadsUp(page: Page) {
     );
     if (await quick.first().isVisible()) {
       // Never box from a quick call here: the last option keeps the plan.
-      await quick
-        .first()
-        .getByRole('button')
-        .last()
-        .click({ timeout: 2_000 })
-        .catch(() => {});
+      await pressOn(quick.first(), quick.first().getByRole('button').last());
       continue;
     }
     const replan = page.getByRole('region', { name: 'New plan' });
     if (await replan.isVisible()) {
-      await replan
-        .getByRole('button', { name: 'Keep ours' })
-        .click({ timeout: 2_000 })
-        .catch(() => {});
+      await pressOn(replan, replan.getByRole('button', { name: 'Keep ours' }));
       continue;
     }
     await page.waitForTimeout(100);
@@ -927,12 +932,7 @@ async function playInTurn(page: Page, model: EraModel) {
       if (!count) continue;
       const b = buttons.nth(n % count);
       const label = await nameOf(b).catch(() => '');
-      if (
-        await b.click({ timeout: 2_000 }).then(
-          () => true,
-          () => false,
-        )
-      ) {
+      if (await pressOn(card, b)) {
         if (!/^Box$/.test(label)) {
           pressed.decisions.push({ lap, label });
           n += 1;
@@ -945,10 +945,7 @@ async function playInTurn(page: Page, model: EraModel) {
       const fills = call.getByRole('group', { name: 'Fuel fill' });
       if (await fills.isVisible()) {
         const f = fills.getByRole('button');
-        await f
-          .nth(n % (await f.count()))
-          .click({ timeout: 2_000 })
-          .catch(() => {});
+        await pressOn(call, f.nth(n % (await f.count())));
       }
       // Its answers (not the fills), those it takes now.
       const answers = call.locator(
@@ -958,12 +955,7 @@ async function playInTurn(page: Page, model: EraModel) {
       if (count > 0) {
         const b = answers.nth(n % count);
         const label = await nameOf(b).catch(() => '');
-        if (
-          await b.click({ timeout: 2_000 }).then(
-            () => true,
-            () => false,
-          )
-        ) {
+        if (await pressOn(call, b)) {
           pressed.calls.push(label);
           n += 1;
         }
@@ -971,38 +963,19 @@ async function playInTurn(page: Page, model: EraModel) {
       continue;
     }
     if (await planned.isVisible()) {
-      await planned
-        .getByRole('button', { name: 'Box as planned' })
-        .click({ timeout: 2_000 })
-        .catch(() => {});
+      await pressOn(planned, planned.getByRole('button', { name: 'Box as planned' }));
       continue;
     }
     if (await replan.isVisible()) {
       const before = JSON.stringify(await activeStops(page));
       if ((pressed.switched + pressed.kept) % 2 === 0) {
-        if (
-          await replan
-            .getByRole('button', { name: 'Switch' })
-            .click({ timeout: 2_000 })
-            .then(
-              () => true,
-              () => false,
-            )
-        ) {
+        if (await pressOn(replan, replan.getByRole('button', { name: 'Switch' }))) {
           pressed.switched += 1;
           // The car runs the new plan (unless its stop was already past: then it's kept).
           await expect(replan).toHaveCount(0);
           if (JSON.stringify(await activeStops(page)) !== before) pressed.changed += 1;
         }
-      } else if (
-        await replan
-          .getByRole('button', { name: 'Keep ours' })
-          .click({ timeout: 2_000 })
-          .then(
-            () => true,
-            () => false,
-          )
-      ) {
+      } else if (await pressOn(replan, replan.getByRole('button', { name: 'Keep ours' }))) {
         pressed.kept += 1;
         await expect(replan).toHaveCount(0);
         expect(JSON.stringify(await activeStops(page))).toBe(before);

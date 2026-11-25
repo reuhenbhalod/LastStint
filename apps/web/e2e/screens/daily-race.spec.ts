@@ -24,6 +24,17 @@ import {
 
 const model = loadRace('spain-2025');
 
+/** The lap the engineer's latest re-rank was made after (session.ts `rerank`; none: null). */
+const rerankedLap = (page: Page) =>
+  page.evaluate(
+    () =>
+      (
+        window as unknown as {
+          __laststintE2E?: { session?: { state: { plan: { live?: { lap: number } | null } } } };
+        }
+      ).__laststintE2E?.session?.state.plan.live?.lap ?? null,
+  );
+
 /** The call was made, or the driver said no to it (he may refuse the wall: game/refusal.ts). */
 async function madeOrRefused(page: Page, kind: string, match: Record<string, unknown>) {
   await expect
@@ -244,10 +255,14 @@ test.describe('the engineer’s new plan under the safety car', () => {
     await toOffer(page);
     await offer(page).getByRole('button', { name: 'Keep ours' }).click();
     await expect(offer(page)).toHaveCount(0);
+    // Two more laps, each until its re-rank has answered (the live chance is for that lap,
+    // which is when an offer would show): no offer comes back.
     const lap = (await session(page)).lap;
-    await fastForward(page, lap + 1);
-    await page.waitForTimeout(1_000); // the re-rank's answer, had it been asked again
-    await expect(offer(page)).toHaveCount(0);
+    for (const to of [lap + 1, lap + 2]) {
+      await fastForward(page, to);
+      await expect.poll(() => rerankedLap(page), { timeout: 15_000 }).toBe(to);
+      await expect(offer(page)).toHaveCount(0);
+    }
     expect((await session(page)).decisions.filter((d) => d.kind === 'pit')).toHaveLength(1);
   });
 
