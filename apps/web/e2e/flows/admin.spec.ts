@@ -74,8 +74,12 @@ test('admin: announcement and schedule edits show in the game', async ({ page, b
     const player = await browser.newPage();
     await preparePage(player, { at: flow.now });
     await player.goto('/gauntlet');
+    // Exactly as typed (a filter's hasText ignores case; toContainText doesn't).
     const banner = player.getByRole('status').filter({ hasText: BANNER });
     await expect(banner).toBeVisible({ timeout: 30_000 });
+    await expect(banner).toContainText(BANNER);
+    const shown = await (await workerApi(flow.now)).get('/api/announcement');
+    expect(await shown.json()).toMatchObject({ announcement: { text: BANNER } });
 
     const later = await browser.newPage();
     await preparePage(later, { at: dayAt(EDITED) });
