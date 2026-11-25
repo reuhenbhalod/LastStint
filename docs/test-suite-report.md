@@ -164,10 +164,22 @@ days and players (`e2e/flows/env.ts` PROJECTS: desktop from 2026-06-01, phone fr
 its own Eras player, account and display name), so they never meet; the Gauntlet's shared
 all-time board is checked relative to what was there before.
 
-**Runtime:** 6-7 minutes per run (stack start ~20 s, web build ~30 s; Daily ~1.4 min, Eras
-~1.5 min, Gauntlet ~3 min, the rest seconds), about 11 minutes with the machine under heavy
-load. Three full runs from a clean D1 (two of them back to back) all passed. A run's D1 is in
+**Runtime:** 9-11 minutes for both projects (stack start and web build ~1.5 min; per project
+Daily ~1.3 min, Eras ~1 min, Gauntlet ~2.5 min, the rest seconds). Two full runs back to back
+(the second with `E2E_COVERAGE=1`) passed 12/12. Run it detached or with a long timeout: a
+shell that kills the run at 10 minutes takes the stack down mid-test (the "Gauntlet never
+answers" failure seen before the pause). `FLOWS_DEBUG=1` shows the Worker's request log;
+`stack.mjs` always reports on stderr if `wrangler dev` exits. A run's D1 is in
 `$TMPDIR/laststint-flows-*`; Playwright kills the stack hard, so the folder can be left behind.
+
+**Control coverage** (`E2E_COVERAGE=1`): the flows press 70 of the 362 controls they bring on
+screen across 7 routes (`/` 23/102, `/gauntlet` 22/100, `/eras/:n/:race` 15/94, `/admin` 6/21,
+`/admin/schedule` 2/21, `/eras` 1/12, `/eras/:n` 1/12), with none unnamed. The flows press what
+the journeys need; every control is the S3 screen specs' job.
+
+**Mutation checks** (each broke a test, then restored): Share result not setting "Copied!";
+the Gauntlet board tabs doing nothing; the admin announcement sent changed (caught only after
+the banner check was made case-exact); the profile sheet dropping the team.
 
 ## S5: Worker contract tests (agent F)
 
@@ -178,7 +190,9 @@ audience, wrong issuer, unverified and re-signed admin tokens; then each route's
 input (missing, wrong type, invalid, oversize), not found, the RUNS_LIMITER limit where it
 applies (runs, auth, survivor start and round, Eras start and submit) and the exact error. A
 real run and player go through the admin run detail, reverify, delete, player page, rename and
-hide, and the audit log.
+hide, and the audit log. Mutation checks caught: the test clock on for any FLOWS_TEST value,
+the POST /api/runs limiter ignored, a day with runs re-raced, and any verified account taken
+as admin (28 failures, one per admin route).
 
 ## Bugs and notes from S4/S5
 
