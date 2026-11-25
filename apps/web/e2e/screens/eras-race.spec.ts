@@ -322,7 +322,8 @@ test('the views: stats or the phone’s tabs, follow car and the plan', async ({
 
 test('every car’s details, from the map and the towers', async ({ page }) => {
   await mockEras(page, [loadEraRace(TURKEY)], STILL);
-  await raceOn(page, `/eras/9/${TURKEY}`);
+  // On plan C (the other tests go with A or B).
+  await raceOn(page, `/eras/9/${TURKEY}`, 'C');
   await answerOthers(page);
   const card = page.getByRole('region', { name: / details$/ });
   const close = page.getByRole('button', { name: 'Close driver details' });
@@ -853,6 +854,13 @@ test('the planned stop: One more lap moves it, then Box as planned makes it', as
   const model = loadEraRace(TURKEY);
   await mockEras(page, [model], { lapScale: 0.1 });
   await ownStopAt(page, 50);
+  // The plan pill names the coming stop, and opens the plan.
+  const plan = pill(page, 'Plan · box L50');
+  await plan.click();
+  await expect(plan).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('region', { name: 'Race plan' })).toBeVisible();
+  await plan.click();
+  await expect(plan).toHaveAttribute('aria-pressed', 'false');
   let planned = await toHeadsUp(page);
   await expect(planned).toContainText('as planned. Still good?');
   // One more lap: the stop goes a lap later, and the heads-up comes again before it.

@@ -892,6 +892,9 @@ export async function siteLinks(page: Page, { footer = true }: { footer?: boolea
   const eras = top.getByRole('link', { name: 'Eras' });
   await expect(eras).toHaveAttribute('aria-current', 'page');
   expect(await pressLink(page, eras)).toBe('/eras');
+  // Versus: only in a build with it on (the tests' build; a release leaves it out).
+  const versus = top.getByRole('link', { name: 'Versus' });
+  if (await versus.count()) expect(await pressLink(page, versus)).toBe('/versus');
   if (!footer) return;
   const foot = page.getByRole('contentinfo');
   for (const [name, href] of [
