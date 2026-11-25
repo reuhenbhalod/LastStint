@@ -6,15 +6,7 @@
 import type { Page } from '@playwright/test';
 import { expect, test } from '../coverage.js';
 import { ADMIN_EMAIL } from './env.js';
-import {
-  closeHowTo,
-  dateAt,
-  dayAt,
-  idToken,
-  preparePage,
-  useCredential,
-  workerApi,
-} from './helpers.js';
+import { closeHowTo, flowOf, idToken, preparePage, useCredential, workerApi } from './helpers.js';
 
 const BANNER = 'Flows: the pit lane closes at noon.';
 /** Day 4 (no runs, in the future): its race changes from Abu Dhabi 2021 to Spain 2020. */
@@ -27,19 +19,23 @@ async function adminSignIn(page: Page, token: string) {
   await page.getByRole('button', { name: 'Sign in with Google' }).click();
 }
 
-test('an account off the admin list is refused by the Worker', async ({ page }) => {
-  await preparePage(page);
+test('an account off the admin list is refused by the Worker', async ({ page }, info) => {
+  const flow = flowOf(info);
+  await preparePage(page, { at: flow.now });
   const refused = page.waitForResponse((r) => r.url().endsWith('/api/admin/me'));
-  await adminSignIn(page, idToken({ sub: 'flows-nobody', email: 'nobody@flows.test' }));
+  await adminSignIn(page, idToken(flow.now, { sub: 'flows-nobody', email: 'nobody@flows.test' }));
   expect((await refused).status()).toBe(403);
   await expect(page.getByText('isn’t an admin')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Daily schedule' })).toHaveCount(0);
 });
 
-test('admin: announcement and schedule edits show in the game', async ({ page, browser }) => {
+test('admin: announcement and schedule edits show in the game', async ({ page, browser }, info) => {
   test.setTimeout(300_000);
-  await preparePage(page);
-  const token = idToken();
+  const flow = flowOf(info);
+  const dateAt = flow.dateOf;
+  const dayAt = flow.day;
+  await preparePage(page, { at: flow.now });
+  const token = idToken(flow.now);
   await adminSignIn(page, token);
   await expect(page.getByText(ADMIN_EMAIL)).toBeVisible();
 
@@ -67,7 +63,7 @@ test('admin: announcement and schedule edits show in the game', async ({ page, b
   });
 
   await test.step('the Worker logged both edits', async () => {
-    const api = await workerApi();
+    const api = await workerApi(flow.now);
     const log = await api.get('/api/admin/log', { headers: { Authorization: `Bearer ${token}` } });
     const { entries } = (await log.json()) as { entries: Array<{ action: string; email: string }> };
     expect(entries.slice(0, 2).map((e) => e.action)).toEqual(['day', 'announcement']);
@@ -76,7 +72,7 @@ test('admin: announcement and schedule edits show in the game', async ({ page, b
 
   await test.step('a player sees the banner, and the new race on that day', async () => {
     const player = await browser.newPage();
-    await preparePage(player);
+    await preparePage(player, { at: flow.now });
     await player.goto('/gauntlet');
     const banner = player.getByRole('status').filter({ hasText: BANNER });
     await expect(banner).toBeVisible({ timeout: 30_000 });
@@ -85,11 +81,14 @@ test('admin: announcement and schedule edits show in the game', async ({ page, b
     await preparePage(later, { at: dayAt(EDITED) });
     await later.goto('/');
     await closeHowTo(later);
-    await expect(later.getByText(`Daily Race #${EDITED + 1}`)).toBeVisible();
+    await expect(later.getByText(/^Daily race · lap \d+ of \d+$/)).toBeVisible();
     // Spain 2020: Verstappen's Red Bull, not Abu Dhabi's Mercedes.
     await expect(later.getByRole('button', { name: /Red Bull.*pit wall/ })).toBeVisible();
     const daily = await (await workerApi(dayAt(EDITED))).get(`/api/daily?date=${dateAt(EDITED)}`);
-    expect(await daily.json()).toMatchObject({ raceId: 'spain-2020', number: EDITED + 1 });
+    expect(await daily.json()).toMatchObject({
+      raceId: 'spain-2020',
+      number: flow.base + EDITED + 1,
+    });
     await player.close();
     await later.close();
   });
@@ -101,7 +100,7 @@ test('admin: announcement and schedule edits show in the game', async ({ page, b
     expect((await cleared).status()).toBe(200);
     await expect(page.getByText('Announcement cleared.')).toBeVisible();
     const player = await browser.newPage();
-    await preparePage(player);
+    await preparePage(player, { at: flow.now });
     await player.goto('/gauntlet');
     await expect(player.getByRole('heading', { name: 'Gauntlet' })).toBeVisible();
     await expect(player.getByText(BANNER)).toHaveCount(0);

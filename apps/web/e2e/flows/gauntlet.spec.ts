@@ -5,7 +5,15 @@
 // nursing the tyres (Bottas gets by). Each round is replayed and judged by the Worker; the run
 // ends at the loss and is recorded (GET /api/survivor/:runId, the leaderboard).
 import { expect, test } from '../coverage.js';
-import { anonIdOf, closeHowTo, goWithPlan, preparePage, raceToFlag, workerApi } from './helpers.js';
+import {
+  anonIdOf,
+  closeHowTo,
+  flowOf,
+  goWithPlan,
+  preparePage,
+  raceToFlag,
+  workerApi,
+} from './helpers.js';
 
 const isRound = (r: import('@playwright/test').Response) =>
   /\/api\/survivor\/[^/]+\/round$/.test(r.url()) && r.request().method() === 'POST';
@@ -18,12 +26,27 @@ const losingCalls = (lap: number): string[] | undefined =>
       ? ['Manage the tyres']
       : undefined;
 
-test('Gauntlet: start, win a round, lose a round, the run recorded', async ({ page }) => {
+test('Gauntlet: start, win a round, lose a round, the run recorded', async ({ page }, info) => {
   test.setTimeout(600_000);
-  await preparePage(page);
+  const flow = flowOf(info);
+  const api = await workerApi(flow.now);
+  // The all-time board is shared by both projects: empty for the first, one run for the second.
+  const before = (await (await api.get('/api/survivor/leaderboard')).json()).allTime.length;
+  await preparePage(page, { at: flow.now });
   await page.goto('/gauntlet');
   await closeHowTo(page, false);
   await expect(page.getByRole('heading', { name: 'Gauntlet' })).toBeVisible();
+  // This week (each project's own week) has no runs yet; all time has the other project's.
+  const week = page.getByRole('button', { name: 'This week' });
+  const allTime = page.getByRole('button', { name: 'All time' });
+  await expect(week).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByText('No runs yet')).toBeVisible();
+  await allTime.click();
+  await expect(allTime).toHaveAttribute('aria-pressed', 'true');
+  await expect(week).toHaveAttribute('aria-pressed', 'false');
+  if (before === 0) await expect(page.getByText('No runs yet')).toBeVisible();
+  else await expect(page.getByText('No runs yet')).toHaveCount(0);
+  await week.click();
   await expect(page.getByText('No runs yet')).toBeVisible();
 
   const started = page.waitForResponse(
@@ -62,15 +85,16 @@ test('Gauntlet: start, win a round, lose a round, the run recorded', async ({ pa
   });
 
   await test.step('the run recorded by the Worker', async () => {
-    const api = await workerApi();
     const anonId = await anonIdOf(page);
     const state = await (await api.get(`/api/survivor/${run.runId}?anonId=${anonId}`)).json();
-    expect(state).toMatchObject({ status: 'over', rounds: 1, rank: 1, total: 1 });
+    expect(state).toMatchObject({ status: 'over', rounds: 1, total: before + 1 });
     expect(state.history).toHaveLength(2);
     expect(state.history.map((h: { won: boolean }) => h.won)).toEqual([true, false]);
     const board = await (await api.get('/api/survivor/leaderboard')).json();
-    expect(board.allTime).toHaveLength(1);
-    expect(board.allTime[0]).toMatchObject({ rounds: 1 });
+    expect(board.allTime).toHaveLength(before + 1);
+    expect(board.allTime.map((e: { rounds: number }) => e.rounds)).toEqual(
+      Array(before + 1).fill(1),
+    );
     // A finished run takes no more rounds.
     const late = await api.post(`/api/survivor/${run.runId}/round`, {
       data: { anonId, round: 2, decisions: [], grades: [] },

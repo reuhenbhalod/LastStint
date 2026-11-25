@@ -7,7 +7,8 @@
 //
 // Settings come from the environment (e2e/flows/env.ts via the config): FLOWS_DIR,
 // FLOWS_API_PORT, FLOWS_PUBLIC_JWKS, FLOWS_FIXED_NOW, FLOWS_DAYS, FLOWS_CLIENT_ID,
-// FLOWS_ADMIN_EMAIL, FLOWS_ERAS_PLAYER, FLOWS_SURVIVOR_POOL.
+// FLOWS_ADMIN_EMAIL, FLOWS_ERAS_PLAYERS, FLOWS_SURVIVOR_POOL,
+// FLOWS_INSPECTOR_PORT.
 
 import { spawn, spawnSync } from 'node:child_process';
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
@@ -50,8 +51,7 @@ run(
   'migrations',
 );
 // The dailies from the fixed date (Abu Dhabi 2021 every day: the flows know its calls). The
-// race is in the daily pool; --allow-ineligible is needed because scripts/schedule.ts misreads
-// docs/g1-report.md's later measurement tables (see docs/test-suite-report.md, S4 bugs).
+// race is in the daily pool with moments, so it is eligible as in production.
 run(
   [
     tsxBin,
@@ -65,15 +65,15 @@ run(
     need('FLOWS_DAYS'),
     '--race',
     'abu-dhabi-2021',
-    '--allow-ineligible',
   ],
   'schedule',
 );
 
 // Eras as production will have it: Eras 10 and 9 published and released a month before the
-// fixed date (ERAS_TEST_MODE stays false, so the unlock rule applies), and the Eras player with
-// 20 Era 10 stars on the nine races other than belgium-2023: one short of Era 9 (21 of 30).
-const player = need('FLOWS_ERAS_PLAYER');
+// fixed date (ERAS_TEST_MODE stays false, so the unlock rule applies), and each project's Eras
+// player with 20 Era 10 stars on the nine races other than belgium-2023: one short of Era 9
+// (21 of 30).
+const players = JSON.parse(need('FLOWS_ERAS_PLAYERS'));
 const released = '2026-05-01T00:00:00.000Z';
 const seeded = [
   'bahrain-2023',
@@ -91,10 +91,12 @@ const stars = [3, 3, 3, 3, 3, 3, 2, 0, 0];
 const sql = [
   'UPDATE era_races SET published = 1 WHERE era_id IN (10, 9);',
   `UPDATE eras SET released_at = '${released}' WHERE id IN (10, 9);`,
-  ...seeded.map((raceId, i) => {
-    const n = stars[i];
-    return `INSERT INTO era_progress (player_id, race_id, legend, star_result, star_strategist, star_mastery, hidden_done, best_accuracy, updated_at) VALUES ('${player}', '${raceId}', 0, ${n >= 1 ? 1 : 0}, ${n >= 2 ? 1 : 0}, ${n >= 3 ? 1 : 0}, 0, 90, '${released}');`;
-  }),
+  ...players.flatMap((player) =>
+    seeded.map((raceId, i) => {
+      const n = stars[i];
+      return `INSERT INTO era_progress (player_id, race_id, legend, star_result, star_strategist, star_mastery, hidden_done, best_accuracy, updated_at) VALUES ('${player}', '${raceId}', 0, ${n >= 1 ? 1 : 0}, ${n >= 2 ? 1 : 0}, ${n >= 3 ? 1 : 0}, 0, 90, '${released}');`;
+    }),
+  ),
 ];
 const seedFile = join(dir, 'seed.sql');
 writeFileSync(seedFile, sql.join('\n'));
@@ -144,6 +146,8 @@ const dev = spawn(
     '127.0.0.1',
     '--port',
     port,
+    '--inspector-port',
+    need('FLOWS_INSPECTOR_PORT'),
     '--persist-to',
     d1Dir,
     '--env-file',
@@ -156,7 +160,9 @@ const stop = () => dev.kill('SIGTERM');
 process.on('SIGTERM', stop);
 process.on('SIGINT', stop);
 // The run's D1 goes with the Worker.
-dev.on('exit', (code) => {
+dev.on('exit', (code, signal) => {
+  // On stderr, which the flows' config always shows: a Worker gone mid-run is otherwise silent.
+  console.error(`stack: wrangler dev exited (code ${code}, signal ${signal})`);
   rmSync(dir, { recursive: true, force: true });
   process.exit(code ?? 0);
 });

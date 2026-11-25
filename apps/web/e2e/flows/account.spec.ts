@@ -11,10 +11,15 @@
 // The Worker's Auth0 token path is covered by apps/worker/test/auth.test.ts.
 import type { Page } from '@playwright/test';
 import { expect, test } from '../coverage.js';
-import { FIXED_DATE } from './env.js';
-import { anonIdOf, closeHowTo, idToken, preparePage, useCredential, workerApi } from './helpers.js';
-
-const PLAYER = { sub: 'flows-player', email: 'player@flows.test', name: 'Flows Player' };
+import {
+  anonIdOf,
+  closeHowTo,
+  flowOf,
+  idToken,
+  preparePage,
+  useCredential,
+  workerApi,
+} from './helpers.js';
 
 const isPost = (path: string) => (r: import('@playwright/test').Response) =>
   r.url().endsWith(path) && r.request().method() === 'POST';
@@ -29,12 +34,21 @@ async function signInWithGoogle(page: Page, token: string) {
 test('sign in, set the profile, stay signed in, sign out, another browser', async ({
   page,
   browser,
-}) => {
-  await preparePage(page);
+}, info) => {
+  const flow = flowOf(info);
+  const FIXED_DATE = flow.date;
+  // Each project's own account and display name (names are unique).
+  const PLAYER = {
+    sub: `flows-player-${flow.name}`,
+    email: `player-${flow.name}@flows.test`,
+    name: 'Flows Player',
+  };
+  const RACER = `Flows Racer ${flow.tag}`;
+  await preparePage(page, { at: flow.now });
   await page.goto('/');
   await closeHowTo(page);
   const anonBefore = await anonIdOf(page);
-  const token = idToken(PLAYER);
+  const token = idToken(flow.now, PLAYER);
 
   await test.step('a bad token: the Worker refuses it, the game says so', async () => {
     const res = await signInWithGoogle(page, 'not.a.token');
@@ -58,48 +72,51 @@ test('sign in, set the profile, stay signed in, sign out, another browser', asyn
     await expect.poll(() => anonIdOf(page)).toBe(playerId);
     const sheet = page.getByRole('dialog', { name: 'Set up your profile' });
     await expect(sheet).toBeVisible();
-    await sheet.getByRole('textbox', { name: 'Display name' }).fill('Flows Racer');
+    await sheet.getByRole('textbox', { name: 'Display name' }).fill(RACER);
     await sheet.getByRole('button', { name: 'Ferrari' }).click();
     const saved = page.waitForResponse(isPost('/api/profile'));
     await sheet.getByRole('button', { name: 'Save' }).click();
     expect((await saved).status()).toBe(200);
     await expect(sheet).toHaveCount(0);
-    await expect(page.getByRole('button', { name: 'Flows Racer' }).first()).toBeVisible();
+    await expect(page.getByRole('button', { name: `Account: ${RACER}` }).first()).toBeVisible();
     // No Admin link for a player.
     await expect(page.getByRole('link', { name: 'Admin' })).toHaveCount(0);
   });
 
   await test.step('the Worker has the account; a reload stays signed in', async () => {
-    const api = await workerApi();
+    const api = await workerApi(flow.now);
     const p = await (await api.get(`/api/players/${playerId}?today=${FIXED_DATE}`)).json();
     expect(p.account).toMatchObject({
-      displayName: 'Flows Racer',
+      displayName: RACER,
       favouriteTeam: 'Ferrari',
       email: PLAYER.email,
       admin: false,
     });
     // The browser's old anonymous ID is linked to the account too.
     const old = await (await api.get(`/api/players/${anonBefore}?today=${FIXED_DATE}`)).json();
-    expect(old.account).toMatchObject({ displayName: 'Flows Racer' });
+    expect(old.account).toMatchObject({ displayName: RACER });
     await page.reload();
-    await expect(page.getByRole('button', { name: 'Flows Racer' }).first()).toBeVisible();
+    await expect(page.getByRole('button', { name: `Account: ${RACER}` }).first()).toBeVisible();
   });
 
   await test.step('sign out: a fresh anonymous player', async () => {
     // The account menu in the top bar: its name, then Sign out.
-    await page.getByRole('button', { name: 'Flows Racer' }).first().click();
+    await page
+      .getByRole('button', { name: `Account: ${RACER}` })
+      .first()
+      .click();
     await page.getByRole('menuitem', { name: 'Sign out' }).click();
     await expect(page.getByRole('button', { name: 'Sign in with Google' }).first()).toBeVisible();
     const fresh = await anonIdOf(page);
     expect(fresh).not.toBe(playerId);
-    const api = await workerApi();
+    const api = await workerApi(flow.now);
     const p = await (await api.get(`/api/players/${fresh}?today=${FIXED_DATE}`)).json();
     expect(p.account).toBeNull();
   });
 
   await test.step('another browser signs in to the same account, no profile prompt', async () => {
     const other = await browser.newPage();
-    await preparePage(other);
+    await preparePage(other, { at: flow.now });
     await other.goto('/');
     await closeHowTo(other);
     const res = await signInWithGoogle(other, token);
@@ -107,20 +124,23 @@ test('sign in, set the profile, stay signed in, sign out, another browser', asyn
       playerId,
       created: false,
       needsProfile: false,
-      displayName: 'Flows Racer',
+      displayName: RACER,
     });
     await expect.poll(() => anonIdOf(other)).toBe(playerId);
-    await expect(other.getByRole('button', { name: 'Flows Racer' }).first()).toBeVisible();
+    await expect(other.getByRole('button', { name: `Account: ${RACER}` }).first()).toBeVisible();
     await expect(other.getByRole('dialog', { name: /profile/ })).toHaveCount(0);
     await other.close();
   });
 
   await test.step('an admin account gets the Admin link', async () => {
     const other = await browser.newPage();
-    await preparePage(other);
+    await preparePage(other, { at: flow.now });
     await other.goto('/');
     await closeHowTo(other);
-    const res = await signInWithGoogle(other, idToken({ sub: 'flows-admin-home' }));
+    const res = await signInWithGoogle(
+      other,
+      idToken(flow.now, { sub: `flows-admin-home-${flow.name}` }),
+    );
     expect(await res.json()).toMatchObject({ admin: true, needsProfile: true });
     await other
       .getByRole('dialog', { name: 'Set up your profile' })
@@ -128,7 +148,7 @@ test('sign in, set the profile, stay signed in, sign out, another browser', asyn
       .click();
     // A new account sees how to play once.
     await closeHowTo(other, false);
-    await other.getByRole('button', { name: 'Flows Admin' }).first().click();
+    await other.getByRole('button', { name: 'Account: Flows Admin' }).first().click();
     await expect(other.getByRole('menuitem', { name: 'Admin' })).toHaveAttribute('href', '/admin');
     await other.close();
   });

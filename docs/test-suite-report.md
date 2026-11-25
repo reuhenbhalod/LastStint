@@ -132,12 +132,12 @@ guard on GitHub-hosted runners) comes after S3, once the matrix is near 100%.
 
 1. `e2e/flows/stack.mjs`: a new local D1 in a temp directory (`--persist-to`), every
    migration, the dailies from the fixed date (`schedule --local --persist-to <dir> --from
-   2026-06-01 --days 7 --race abu-dhabi-2021 --allow-ineligible`), an Eras seed (Eras 10 and 9
-   released and published; the Eras player on 20 Era 10 stars), then `wrangler dev --local` on a
-   free port with an env file: `FLOWS_TEST=true`, `FLOWS_NOW`, Google sign-in with the flows' own
+   2026-06-01 --days 28 --race abu-dhabi-2021`), an Eras seed (Eras 10 and 9 released and
+   published; each project's Eras player on 20 Era 10 stars), then `wrangler dev --local` on
+   port 8851 (inspector 5352) with an env file: `FLOWS_TEST=true`, `FLOWS_NOW`, Google sign-in with the flows' own
    key (`GOOGLE_JWKS`, Auth0 off), `ADMIN_EMAILS=admin@flows.test`, `SURVIVOR_POOL` (Spain 2020),
    `ERAS_TEST_MODE=false`.
-2. `vite build` + `vite preview` (`e2e/flows/vite.flows.config.ts`) on another free port, with
+2. `vite build` + `vite preview` (`e2e/flows/vite.flows.config.ts`) on port 5351, with
    the Google sign-in path on and `/api` proxied to (1).
 
 **The fixed date.** The Worker reads the time in about 40 places, so the least invasive hook
@@ -150,16 +150,19 @@ one `setTime()` call. A contract test checks the header is ignored when the var 
 
 | Flow | What it checks |
 |---|---|
-| `daily.spec.ts` | Daily #1 intro → plan → every call → result; the Worker's 201 (its own score, rank 1/1); the stored run, streak 1 and leaderboard from the API; reload → straight to the result; with the browser's saved run gone, the game fetches the run from the Worker and shows it; a second submit is 409; next day: Daily #2, streak 2 in the API and on screen; day 1 not playable on day 4 |
-| `gauntlet.spec.ts` | Start (201, Spain 2020), round 1 won (the Worker's verdict), the next race's brief, round 2 lost (box for softs at every stop call), "run over"; the run in the API (over, 1 round, history won/lost, rank 1/1), the leaderboard, a late round refused (409) |
+| `daily.spec.ts` | The day's Daily (the card shows no number, #58) intro → plan → every call → result; the Worker's 201 (its own score, rank 1/1, number in the API); the stored run, streak 1 and leaderboard from the API; Share result: the line (no number) and link on the clipboard, "Copied!"; reload → straight to the result; with the browser's saved run gone, the game fetches the run from the Worker and shows it; a second submit is 409; next day: the next Daily, streak 2 in the API and on screen; day 1 not playable on day 4 |
+| `gauntlet.spec.ts` | Start (201, Spain 2020), round 1 won (the Worker's verdict), the next race's brief, round 2 lost (box for softs at every stop call), "run over"; the run in the API (over, 1 round, history won/lost), the all-time board one longer, a late round refused (409) |
 | `eras.spec.ts` | Production mode: Era 9 locked "1 to go" and the Worker refuses its attempt (403 era-locked); Belgium 2023 from the Era 10 page to its stars (the Worker deals the seed, replays and scores); the new star makes Era 10 21+ stars; Era 9 opens on the map and Turkey 2021 starts (201) |
 | `account.spec.ts` | A bad token (401, still signed out); sign-in (a new account adopts its player ID), the profile sheet saved (POST /api/profile), the account in the API, the old anonymous ID linked, reload stays signed in, sign out (fresh anonymous ID, no account), another browser finds the same account with no profile prompt; an admin account gets the Admin menu item |
-| `admin.spec.ts` | A non-admin is refused on /admin (403 from the Worker); the admin signs in, sets an announcement, changes day 4's race to Spain 2020; both edits in the audit log; a player sees the banner, and on day 4 the Spain 2020 daily (#4); clearing it takes the banner down |
+| `admin.spec.ts` | A non-admin is refused on /admin (403 from the Worker); the admin signs in, sets an announcement, changes day 4's race to Spain 2020; both edits in the audit log; a player sees the banner, and on day 4 the Spain 2020 daily; clearing it takes the banner down |
 
 **Not covered locally:** Auth0's hosted login and its redirect back (`completeLogin`), Google's
 own popup and One Tap, fetching the real issuers' keys, the daily cron (`scheduled`), and the
 nightly re-verification. The Worker's Auth0 token path is in `apps/worker/test/auth.test.ts`.
-Phone layout isn't run in the flows (the mocked suite covers it).
+**Phone and desktop.** Both projects run every flow against the one stack. Each plays its own
+days and players (`e2e/flows/env.ts` PROJECTS: desktop from 2026-06-01, phone from 2026-06-15;
+its own Eras player, account and display name), so they never meet; the Gauntlet's shared
+all-time board is checked relative to what was there before.
 
 **Runtime:** 6-7 minutes per run (stack start ~20 s, web build ~30 s; Daily ~1.4 min, Eras
 ~1.5 min, Gauntlet ~3 min, the rest seconds), about 11 minutes with the machine under heavy
@@ -173,16 +176,17 @@ route signed out, with a non-Bearer header, an oversize token, a bad token and a
 401, 401, 401, 403 with the exact body) and with sign-in off (503 auth-off); expired, wrong
 audience, wrong issuer, unverified and re-signed admin tokens; then each route's success, bad
 input (missing, wrong type, invalid, oversize), not found, the RUNS_LIMITER limit where it
-applies (runs, auth, survivor start and round, Eras start and submit) and the exact error.
+applies (runs, auth, survivor start and round, Eras start and submit) and the exact error. A
+real run and player go through the admin run detail, reverify, delete, player page, rename and
+hide, and the audit log.
 
 ## Bugs and notes from S4/S5
 
-- **`scripts/schedule.ts` misreads `docs/g1-report.md`** (not fixed: it decides what production
-  schedules, so the owner should pick the rule). `g1Statuses` keeps the last table row per race,
-  and later measurement tables in the report ("pass, 2.28s", "**fail**, 2.19s") replace the G1
-  status. Six daily-pool races drop out as ineligible: abu-dhabi-2021, bahrain-2022,
-  canada-2022, mexico-2024, miami-2022, united-states-2022. The flows pass `--race
-  abu-dhabi-2021 --allow-ineligible` to get round it.
+- **`scripts/schedule.ts` misread `docs/g1-report.md`**: fixed on main by #58 (eligible = in
+  the daily pool with moments). The flows no longer pass `--allow-ineligible`.
+- **The test clock is off in production**: contract tests check that only `FLOWS_TEST` exactly
+  `"true"` turns it on (`TRUE`, `1`, `yes`, empty and unset don't), that `Date` stays the real
+  one when off, and that `wrangler.jsonc` (production and staging) sets neither var.
 - **A failed sign-in is silent on the daily card** (web, not changed): the compact account bar
   on the intro doesn't show `account.error`; only the result screen's bar does.
 - **Gauntlet rounds share the daily's rate-limit key** (`POST /api/survivor/:id/round` and

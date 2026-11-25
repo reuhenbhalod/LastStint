@@ -3,9 +3,15 @@
 // and a driver that plays a race to the flag through the real game screens.
 
 import { createPrivateKey, sign } from 'node:crypto';
-import { type APIRequestContext, type Locator, type Page, request } from '@playwright/test';
+import {
+  type APIRequestContext,
+  type Locator,
+  type Page,
+  type TestInfo,
+  request,
+} from '@playwright/test';
 import { expect } from '../coverage.js';
-import { ADMIN_EMAIL, CLIENT_ID, FIXED_NOW, flowsEnv } from './env.js';
+import { ADMIN_EMAIL, CLIENT_ID, FIXED_NOW, PROJECTS, type ProjectName, flowsEnv } from './env.js';
 
 export const env = flowsEnv();
 export const API = `http://127.0.0.1:${env.FLOWS_API_PORT}`;
@@ -20,6 +26,25 @@ export const dayAt = (days: number) =>
 export const dateAt = (days: number) => dayAt(days).slice(0, 10);
 
 /**
+ * This project's days and players (env.ts PROJECTS): `day(n)` and `date(n)` are n days after
+ * its first day, `tag` keeps its names apart from the other project's.
+ */
+export function flowOf(info: TestInfo) {
+  const name = info.project.name as ProjectName;
+  const { base, erasPlayer } = PROJECTS[name];
+  return {
+    name,
+    base,
+    tag: name === 'phone' ? 'P' : 'D',
+    erasPlayer,
+    now: dayAt(base),
+    date: dateAt(base),
+    day: (n: number) => dayAt(base + n),
+    dateOf: (n: number) => dateAt(base + n),
+  };
+}
+
+/**
  * Put the page (and every request it sends to the Worker) at `iso`: the browser's clock is
  * installed there and runs on in real time; the Worker reads the same time from the
  * x-flows-now header (its FLOWS_TEST clock).
@@ -30,11 +55,8 @@ export async function setTime(page: Page, iso: string, first = true) {
   await page.context().setExtraHTTPHeaders({ 'x-flows-now': iso });
 }
 
-/** A page that plays races quickly (lapScale), at the fixed time, as player `anonId` if set. */
-export async function preparePage(
-  page: Page,
-  { at = FIXED_NOW, anonId }: { at?: string; anonId?: string } = {},
-) {
+/** A page that plays races quickly (lapScale), at time `at`, as player `anonId` if set. */
+export async function preparePage(page: Page, { at, anonId }: { at: string; anonId?: string }) {
   await setTime(page, at);
   await page.addInitScript(
     ([lapScale, id]) => {
@@ -47,7 +69,7 @@ export async function preparePage(
 }
 
 /** Calls to the local Worker, at `iso` (its FLOWS_TEST clock). */
-export async function workerApi(iso = FIXED_NOW): Promise<APIRequestContext> {
+export async function workerApi(iso: string): Promise<APIRequestContext> {
   return request.newContext({ baseURL: API, extraHTTPHeaders: { 'x-flows-now': iso } });
 }
 
@@ -55,9 +77,9 @@ const b64url = (b: Buffer | string) => Buffer.from(b).toString('base64url');
 
 /**
  * A Google ID token signed with the flows' key, which the local Worker trusts (GOOGLE_JWKS):
- * the admin unless `claims` say otherwise. It expires an hour after `iso`.
+ * the admin unless `claims` say otherwise. It expires an hour after `iso` (the flow's time).
  */
-export function idToken(claims: Record<string, unknown> = {}, iso = FIXED_NOW): string {
+export function idToken(iso: string, claims: Record<string, unknown> = {}): string {
   const head = b64url(JSON.stringify({ alg: 'RS256', kid: 'flows-key', typ: 'JWT' }));
   const body = b64url(
     JSON.stringify({

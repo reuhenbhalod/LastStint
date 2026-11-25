@@ -5,8 +5,7 @@
 // its stars, scored by the Worker (the attempt's seed is the Worker's, the replay and the stars
 // too); the new star unlocks Era 9 on the map, and an Era 9 race then starts.
 import { expect, test } from '../coverage.js';
-import { ERAS_PLAYER } from './env.js';
-import { goWithPlan, preparePage, raceToFlag, workerApi } from './helpers.js';
+import { flowOf, goWithPlan, preparePage, raceToFlag, workerApi } from './helpers.js';
 
 const ERA_9 = 'The 2021 title fight';
 
@@ -16,10 +15,12 @@ interface Stars {
   mastery: boolean;
 }
 
-test('Eras: a race to its stars, and the star that unlocks Era 9', async ({ page }) => {
+test('Eras: a race to its stars, and the star that unlocks Era 9', async ({ page }, info) => {
   test.setTimeout(480_000);
-  await preparePage(page, { anonId: ERAS_PLAYER });
-  const api = await workerApi();
+  const flow = flowOf(info);
+  const ERAS_PLAYER = flow.erasPlayer;
+  await preparePage(page, { at: flow.now, anonId: ERAS_PLAYER });
+  const api = await workerApi(flow.now);
 
   await test.step('the map: Era 9 locked, one star to go', async () => {
     await page.goto('/eras');
