@@ -75,12 +75,18 @@ describe('race pools', () => {
     // spain-2013 moved to Gauntlet on Nov 11). hungary-1998 (Era 3, Nov 10) is a rules-only
     // fixture: its moments go when its race file is rebuilt.
     const swappedOut = ['china-2011', 'hungary-1998'];
+    // Short Daily candidates (Nov 25): authored and tuned, waiting outside the daily pool.
+    // Marina Bay's 2015-22 layout has no outline yet, and japan-2017's lap 47 VSC has no
+    // sourced cause. They aren't bundled or served.
+    const candidates = ['japan-2017', 'singapore-2017', 'singapore-2019-daily'];
     const pooled = new Set([
       ...pools.daily,
       ...Object.keys(pools.survivor),
       ...erasRaces,
       ...swappedOut,
+      ...candidates,
     ]);
+    expect(candidates.filter((id) => pools.daily.includes(id))).toEqual([]);
     expect(swappedOut.filter((id) => erasRaces.includes(id))).toEqual([]);
     const playable = readdirSync(join(data, 'races'))
       .filter((f) => f.endsWith('.json'))

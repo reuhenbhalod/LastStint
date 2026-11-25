@@ -3855,46 +3855,46 @@ RACES: dict[str, dict] = {
 # already plays in Daily, so they are not repeated here.
 # (race id, takeover lap, user's driver, rival)
 DAILY_SHORT: list[tuple[str, int, str, str]] = [
-    ("abu-dhabi-2014", 41, "HAM", "MAS"),
+    ("abu-dhabi-2014", 40, "HAM", "MAS"),
     ("abu-dhabi-2025", 43, "NOR", "LEC"),
     ("australia-2025", 42, "HUL", "LEC"),  # variant: the race has a file
     ("austria-2016", 53, "HAM", "ROS"),
-    ("austria-2024", 57, "PIA", "SAI"),
+    ("austria-2024", 54, "PIA", "SAI"),
     ("azerbaijan-2018", 36, "HAM", "VET"),
     ("azerbaijan-2019", 32, "BOT", "HAM"),
     ("bahrain-2014", 40, "MAS", "BOT"),  # variant: the race has a file
     ("bahrain-2019", 38, "HAM", "LEC"),
     ("belgium-2017", 28, "MAS", "OCO"),
-    ("brazil-2023", 56, "ALO", "PER"),
-    ("brazil-2025", 54, "ANT", "VER"),
+    ("brazil-2023", 50, "ALO", "PER"),
+    ("brazil-2025", 52, "ANT", "VER"),
     ("canada-2014", 55, "RIC", "ROS"),  # variant: the race has a file
     ("china-2015", 42, "HAM", "ROS"),
-    ("emilia-romagna-2025", 49, "NOR", "PIA"),
+    ("emilia-romagna-2025", 42, "NOR", "PIA"),
     ("great-britain-2014", 33, "BOT", "VET"),
     ("great-britain-2015", 33, "ROS", "MAS"),
     ("great-britain-2018", 35, "VET", "BOT"),
     ("great-britain-2022", 33, "SAI", "LEC"),  # variant: the race has a file
     ("hungary-2014", 51, "HAM", "ROS"),  # variant: the race has a file
-    ("hungary-2021", 54, "OCO", "VET"),  # variant: the race has a file
-    ("italy-2015", 39, "MAS", "BOT"),
-    ("italy-2020", 39, "GAS", "SAI"),  # variant: the race has a file
-    ("japan-2017", 39, "HAM", "VER"),
-    ("las-vegas-2023", 33, "LEC", "PER"),
+    ("hungary-2021", 49, "OCO", "VET"),  # variant: the race has a file
+    ("italy-2015", 36, "MAS", "BOT"),
+    ("italy-2020", 34, "GAS", "SAI"),  # variant: the race has a file
+    ("japan-2017", 38, "HAM", "VER"),
+    ("las-vegas-2023", 31, "LEC", "PER"),
     ("malaysia-2016", 38, "ROS", "RAI"),
     ("monaco-2015", 59, "ROS", "HAM"),  # variant: the race has a file
-    ("monaco-2017", 64, "RAI", "RIC"),  # variant: the race has a file
+    ("monaco-2017", 58, "RAI", "RIC"),  # variant: the race has a file
     ("monaco-2018", 62, "GAS", "HUL"),
     ("monaco-2023", 59, "OCO", "HAM"),  # variant: the race has a file
-    ("netherlands-2025", 54, "OCO", "COL"),
+    ("netherlands-2025", 49, "OCO", "COL"),
     ("qatar-2024", 43, "LEC", "PIA"),
     ("sakhir-2020", 68, "PER", "OCO"),  # variant: the race has a file
     ("saudi-arabia-2021", 32, "HAM", "VER"),  # variant: the race has a file
     ("saudi-arabia-2022", 32, "VER", "LEC"),  # variant: the race has a file
     ("singapore-2016", 47, "ROS", "RIC"),
-    ("singapore-2017", 40, "STR", "GRO"),
+    ("singapore-2017", 36, "STR", "GRO"),
     ("singapore-2019", 43, "VET", "LEC"),  # variant: the race has a file
     ("singapore-2023", 43, "SAI", "HAM"),  # variant: the race has a file
-    ("spain-2019", 52, "VER", "VET"),
+    ("spain-2019", 45, "VER", "VET"),
     ("spain-2025", 51, "HUL", "HAD"),
     ("united-states-2015", 38, "HAM", "ROS"),  # variant: the race has a file
 ]
@@ -3912,6 +3912,19 @@ _DAILY_OPENF1 = {
     "netherlands-2025": ("Netherlands", None),
     "qatar-2024": ("Qatar", None),
     "spain-2025": ("Spain", None),
+}
+
+
+# Tuned seeds (packages/sim scripts/tune.ts) of the short races that have decision moments;
+# the others keep seed 1 until they are authored.
+_DAILY_SHORT_SEEDS = {
+    "hungary-2021-daily": 52016,
+    "las-vegas-2023-daily": 40841,
+    "monaco-2018": 89551,
+    "netherlands-2025-daily": 78787,
+    "singapore-2017": 3037,
+    "singapore-2019-daily": 13751,
+    "spain-2019-daily": 61747,
 }
 
 
@@ -3934,7 +3947,8 @@ def _daily_short_entry(base: str, takeover: int, user: str, rival: str, names: d
     if existing is not None:
         entry["event"] = existing["event"]
         entry["raw"] = base
-        for key in ("source", "location"):
+        # The base race's source and its sourced facts (penalties added after the flag).
+        for key in ("source", "location", "post_race_penalties"):
             if key in existing:
                 entry[key] = existing[key]
     elif base in _DAILY_OPENF1:
@@ -3949,11 +3963,13 @@ def _daily_short_entry(base: str, takeover: int, user: str, rival: str, names: d
 
 def _register_daily_short() -> None:
     drivers = json.loads((DATA_DIR / "drivers.json").read_text(encoding="utf-8"))["drivers"]
-    names = {code: d["name"].split(" ", 1)[-1] for code, d in drivers.items()}
+    # Surnames for the race names ("Andrea Kimi Antonelli" -> "Antonelli").
+    names = {code: d["name"].rsplit(" ", 1)[-1] for code, d in drivers.items()}
     entries = {}
     for base, takeover, user, rival in DAILY_SHORT:
         race_id = f"{base}-daily" if base in RACES else base
         entries[race_id] = _daily_short_entry(base, takeover, user, rival, names)
+        entries[race_id]["seed"] = _DAILY_SHORT_SEEDS.get(race_id, 1)
     RACES.update(entries)
 
 

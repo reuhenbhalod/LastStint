@@ -488,22 +488,34 @@
     "NOR",
     "LEC",
     "RUS",
-    "VER",
     "HUL",
     "HAM",
     "HAD",
     "GAS",
     "ALO",
+    "VER",
     "LAW",
     "BOR",
-    "BEA",
     "TSU",
     "SAI",
     "COL",
     "OCO",
+    "BEA",
     "ANT",
     "ALB"
   ],
   "userSide": "HUL",
-  "rival": "HAD"
+  "rival": "HAD",
+  "postRacePenalties": [
+    {
+      "driver": "VER",
+      "seconds": 10,
+      "reason": "causing a collision"
+    },
+    {
+      "driver": "BEA",
+      "seconds": 10,
+      "reason": "leaving the track and gaining an advantage"
+    }
+  ]
 }

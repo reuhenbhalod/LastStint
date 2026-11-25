@@ -66,6 +66,10 @@ REUSE: dict[str, tuple[str, str]] = {
     "russia-2017": ("russia-2018", "Sochi"),
     "spain-2015": ("spain-2016", "Barcelona with the final chicane (to 2022)"),
     "united-states-2017": ("united-states-2015", "Circuit of the Americas"),
+    # Short Daily candidates (Nov 25): f1db gives each pair the same circuitLayoutId.
+    "italy-2015": ("italy-2019", "Monza (f1db monza-7)"),
+    "japan-2017": ("japan-2018", "Suzuka (f1db suzuka-2)"),
+    "monaco-2018": ("monaco-2017", "Monaco (f1db monaco-6)"),
 }
 
 # Race -> (MultiViewer circuit key, season asked for, season served, pit (entry, exit) as lap

@@ -441,10 +441,10 @@
     "ALO",
     "OCO",
     "HAM",
-    "STR",
-    "BEA",
     "HUL",
+    "STR",
     "BOR",
+    "BEA",
     "SAI",
     "TSU",
     "ANT",
@@ -455,5 +455,27 @@
     "COL"
   ],
   "userSide": "NOR",
-  "rival": "LEC"
+  "rival": "LEC",
+  "postRacePenalties": [
+    {
+      "driver": "STR",
+      "seconds": 5,
+      "reason": "more than one change of direction"
+    },
+    {
+      "driver": "BEA",
+      "seconds": 5,
+      "reason": "more than one change of direction"
+    },
+    {
+      "driver": "ALB",
+      "seconds": 5,
+      "reason": "pit-lane speeding"
+    },
+    {
+      "driver": "GAS",
+      "seconds": 5,
+      "reason": "track limits"
+    }
+  ]
 }

@@ -396,10 +396,10 @@
     "OCO",
     "ALO",
     "MAG",
-    "GAS",
     "PER",
     "VAN",
     "STR",
+    "GAS",
     "SIR",
     "VER",
     "GRO",
@@ -409,5 +409,12 @@
     "HAR"
   ],
   "userSide": "VET",
-  "rival": "BOT"
+  "rival": "BOT",
+  "postRacePenalties": [
+    {
+      "driver": "GAS",
+      "seconds": 5,
+      "reason": "Causing a collision with Perez in the fight for 10th"
+    }
+  ]
 }
