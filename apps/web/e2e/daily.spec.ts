@@ -19,7 +19,7 @@ test('plays the Abu Dhabi daily end to end', async ({ page, context }) => {
   for (let i = 0; i < 5; i++) await page.getByRole('button', { name: 'Next' }).click();
   await page.getByRole('button', { name: 'Got it' }).click();
   await expect(page.getByRole('dialog')).toHaveCount(0);
-  await expect(page.getByText('Daily Race #1')).toBeVisible();
+  await expect(page.getByText(/^Daily race · lap/i)).toBeVisible();
   if (shots) await page.screenshot({ path: `${shots}/1-intro.png`, fullPage: true });
   await page.getByRole('button', { name: /pit wall/ }).click();
   // The race plan comes first (the strategy planner): the engineer's plans, each with its
