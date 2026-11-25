@@ -60,6 +60,19 @@ export const loadEraRace = (id: string) =>
     readFileSync(new URL(`../../../data/races/${id}.json`, import.meta.url), 'utf8'),
   ) as EraModel;
 
+/**
+ * The race file with the takeover moved to `laps` laps from the flag and the decisions before
+ * it dropped: the cars start from the real takeover's running order, a few laps from the end.
+ * For the screens after the race (the results), whose numbers are the server's: the race
+ * itself is played by the race specs on the whole file.
+ */
+export function shortRace(model: EraModel, laps = 2): EraModel {
+  const short = JSON.parse(JSON.stringify(model)) as EraModel;
+  short.race.takeoverLap = short.race.laps - laps;
+  short.decisionMoments = short.decisionMoments.filter((m) => m.lap > short.race.takeoverLap);
+  return short;
+}
+
 export interface Difficulty {
   accuracyThreshold: number;
   information: string;
@@ -124,7 +137,19 @@ export interface ErasMockOptions {
   stars?: Record<number, number>;
   /** Serve as production (ERAS_TEST_MODE off; e2e/erasProduction.ts). Default: test mode. */
   production?: ErasProduction;
+  /** The lap tick's scale (default LAP_SCALE). Smaller runs a race faster. */
+  lapScale?: number;
+  /** The server's answer to the `n`th submit (1, 2, …) instead of the evaluation, e.g. an
+   * error. Undefined: evaluate as usual. */
+  submitReply?: (n: number, sub: Submitted) => { status: number; json: unknown } | undefined;
+  /** Change the evaluation the server sends (a hidden objective met, no rewrite…). */
+  evaluated?: (res: Evaluated, sub: Submitted) => Evaluated;
+  /** The race's community stats (default: 3 of 10 rewrote it); null answers 404. */
+  stats?: (raceId: string) => Record<string, unknown> | null;
 }
+
+/** The evaluation the mocked Worker sends for a submit (src/eras/api.ts AttemptResult). */
+export type Evaluated = ReturnType<typeof evaluate>;
 
 /** What the mocked Worker saw. */
 export interface ErasMock {
@@ -302,7 +327,7 @@ export async function mockEras(
       if (!w.__seen.redFlag && document.querySelector('main')?.textContent?.includes('Red flag'))
         w.__seen.redFlag = true;
     }, 100);
-  }, LAP_SCALE);
+  }, opts.lapScale ?? LAP_SCALE);
 
   await page.route('**/api/**', async (route) => {
     const req = route.request();
@@ -413,13 +438,22 @@ export async function mockEras(
         body: req.postDataJSON(),
       };
       seen.submissions.push(sub);
+      const reply = opts.submitReply?.(seen.submissions.length, sub);
+      if (reply) return route.fulfill(reply);
       const eraId = eraRace(a.raceId)?.eraId ?? 0;
       const before = starsOf(a.raceId, a.legend, eraId);
-      const res = evaluate(m, sub, a.difficulty, opts.result?.(a.raceId, sub) ?? true, before);
+      const evaluated = evaluate(
+        m,
+        sub,
+        a.difficulty,
+        opts.result?.(a.raceId, sub) ?? true,
+        before,
+      );
+      const res = opts.evaluated ? opts.evaluated(evaluated, sub) : evaluated;
       const prev = progress.get(key(a.raceId, a.legend));
       progress.set(key(a.raceId, a.legend), {
         stars: res.progress.stars,
-        hiddenDone: prev?.hiddenDone ?? false,
+        hiddenDone: res.progress.hiddenDone || (prev?.hiddenDone ?? false),
         accuracy: Math.max(prev?.accuracy ?? 0, res.accuracy),
       });
       if (res.historyEntry && !entries.some((e) => e.raceId === a.raceId)) {
@@ -440,6 +474,12 @@ export async function mockEras(
       return route.fulfill({ json: res });
     }
     const stats = path.match(/^\/api\/eras\/races\/([a-z0-9-]+)\/stats$/);
+    if (stats && opts.stats) {
+      const json = opts.stats(stats[1] as string);
+      return json
+        ? route.fulfill({ json })
+        : route.fulfill({ status: 404, json: { error: 'not-found' } });
+    }
     if (stats) {
       const rates = { players: 10, result: 0.5, strategist: 0.3, mastery: 0.1, hidden: 0.1 };
       return route.fulfill({
@@ -806,4 +846,63 @@ export function watchRadio(page: Page, lines: string[]) {
       }
     },
   };
+}
+
+/**
+ * Press a link without leaving the page: the click goes through (the coverage recorder and the
+ * page's own handlers see it), then the browser's navigation is cancelled. Returns where it
+ * would have gone (its href), or null for a control that isn't a link with somewhere to go
+ * (a locked era's node).
+ */
+export async function pressLink(
+  page: Page,
+  link: Locator,
+  { force = false }: { force?: boolean } = {},
+): Promise<string | null> {
+  await page.evaluate(() => {
+    const w = window as unknown as { __pressedHref?: string | null };
+    w.__pressedHref = null;
+    window.addEventListener(
+      'click',
+      (e) => {
+        const a = (e.target as Element | null)?.closest?.('a[href]');
+        if (!a) return;
+        e.preventDefault();
+        w.__pressedHref = a.getAttribute('href');
+      },
+      { once: true },
+    );
+  });
+  // `force` presses a disabled link (aria-disabled), which Playwright otherwise waits on.
+  await link.click({ force });
+  return page.evaluate(
+    () => (window as unknown as { __pressedHref?: string | null }).__pressedHref ?? null,
+  );
+}
+
+/**
+ * The site's own links on an Eras page (the top bar's modes and home, the footer's legal pages
+ * and the map credit), each pressed and going where it says.
+ */
+export async function siteLinks(page: Page, { footer = true }: { footer?: boolean } = {}) {
+  const top = page.getByRole('navigation', { name: 'Ways to play' });
+  expect(await pressLink(page, page.getByRole('link', { name: 'LastStint home' }))).toBe('/');
+  expect(await pressLink(page, top.getByRole('link', { name: 'Daily' }))).toBe('/');
+  expect(await pressLink(page, top.getByRole('link', { name: 'Gauntlet' }))).toBe('/gauntlet');
+  const eras = top.getByRole('link', { name: 'Eras' });
+  await expect(eras).toHaveAttribute('aria-current', 'page');
+  expect(await pressLink(page, eras)).toBe('/eras');
+  // Versus: only in a build with it on (the tests' build; a release leaves it out).
+  const versus = top.getByRole('link', { name: 'Versus' });
+  if (await versus.count()) expect(await pressLink(page, versus)).toBe('/versus');
+  if (!footer) return;
+  const foot = page.getByRole('contentinfo');
+  for (const [name, href] of [
+    ['Privacy', '/privacy'],
+    ['Terms', '/terms'],
+    ['Credits', '/credits'],
+    ['OpenStreetMap contributors', 'https://www.openstreetmap.org/copyright'],
+  ] as const) {
+    expect(await pressLink(page, foot.getByRole('link', { name, exact: true }))).toBe(href);
+  }
 }
