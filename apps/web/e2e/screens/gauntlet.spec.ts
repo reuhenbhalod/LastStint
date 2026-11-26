@@ -756,10 +756,19 @@ test.describe('race controls', () => {
       });
     }
 
-    // The plan, from the control bar: Change opens the editor, Cancel shuts it.
-    await whileRacing(page, async () => {
-      await controls.getByRole('button', { name: /^Plan · / }).click({ timeout: 3000 });
+    // The plan, from the control bar: Change opens the editor, Cancel shuts it. A call can cut
+    // a try short with the plan open or its editor up, so each try starts from the plan shown
+    // and the editor shut.
+    const planShown = async () => {
       const bar = page.getByRole('region', { name: 'Race plan' });
+      if (!(await bar.isVisible()))
+        await controls.getByRole('button', { name: /^Plan · / }).click({ timeout: 3000 });
+      const cancel = bar.getByRole('button', { name: 'Cancel' });
+      if (await cancel.isVisible()) await cancel.click({ timeout: 3000 });
+      return bar;
+    };
+    await whileRacing(page, async () => {
+      const bar = await planShown();
       await bar.getByRole('button', { name: 'Change' }).click({ timeout: 3000 });
       await expect(bar.getByRole('button', { name: 'Run this plan' })).toBeVisible({
         timeout: 3000,
@@ -769,9 +778,7 @@ test.describe('race controls', () => {
     });
     // Change again, and run the plan as it stands: the editor shuts and the plan carries on.
     await whileRacing(page, async () => {
-      const bar = page.getByRole('region', { name: 'Race plan' });
-      if (!(await bar.isVisible()))
-        await controls.getByRole('button', { name: /^Plan · / }).click({ timeout: 3000 });
+      const bar = await planShown();
       await bar.getByRole('button', { name: 'Change' }).click({ timeout: 3000 });
       const run = bar.getByRole('button', { name: 'Run this plan' });
       await expect(run).toBeEnabled({ timeout: 3000 });
