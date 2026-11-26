@@ -33,6 +33,8 @@ export interface DailyOptions {
   submitError?: { status: number; error: string; times?: number };
   /** Leave the how-to-play walkthrough to open (it opens on a fresh visit). */
   walkthrough?: boolean;
+  /** Signed in: the first player asked for has this account (a new id after Sign out has none). */
+  account?: Record<string, unknown>;
 }
 
 /** Today's daily is `model`; returns the submitted run's getter and the player calls seen. */
@@ -43,10 +45,16 @@ export async function openDaily(page: Page, model: Model, opts: DailyOptions = {
   const submitted = await mockApi(page, model);
   const seen = { player: 0, runs: 0, posts: 0 };
   // Routes added later are tried first; the rest fall back to mockApi's.
+  let owner: string | undefined;
   await page.route('**/api/players/**', (route) => {
     seen.player++;
-    return opts.streak
-      ? route.fulfill({ json: { account: null, streak: opts.streak } })
+    const id = new URL(route.request().url()).pathname.split('/').pop();
+    owner ??= id;
+    const account = opts.account && id === owner ? opts.account : null;
+    return opts.streak || account
+      ? route.fulfill({
+          json: { account, streak: opts.streak ?? { current: 0, best: 0, days: 0 } },
+        })
       : route.fulfill({ status: 404, json: { error: 'not-found' } });
   });
   await page.route(/\/api\/runs(\/|$)/, (route) => {

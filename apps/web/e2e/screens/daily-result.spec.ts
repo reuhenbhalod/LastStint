@@ -67,6 +67,38 @@ test('the result: score, rank, calls, penalties, streak, leaderboard and stats',
   await expect(page.getByText('3 runs · avg 80')).toBeVisible();
 });
 
+test('signed in: the result’s account bar, its name opens the profile, Sign out', async ({
+  page,
+}) => {
+  // The full account bar shows only here: on the result of a run just played, signed in.
+  await page.context().route(/accounts\.google\.com/, (r) => r.abort());
+  // A signed-in player gets no walkthrough.
+  await finish(page, {
+    walkthrough: true,
+    account: {
+      playerId: 'p1',
+      name: 'Ada Lovelace',
+      email: 'ada@example.com',
+      displayName: 'Undercut',
+    },
+  });
+  await expect(page.getByText('Your calls')).toBeVisible({ timeout: 60_000 });
+  const id = await page.evaluate(() => localStorage.getItem('pitwall:anonId'));
+  const name = page.getByRole('button', { name: 'Undercut', exact: true });
+  await name.click();
+  const sheet = page.getByRole('dialog', { name: 'Edit your profile' });
+  await expect(sheet).toBeVisible();
+  await sheet.getByRole('button', { name: 'Cancel' }).click();
+  await expect(sheet).toHaveCount(0);
+  // Sign out: a fresh anonymous player; the bar goes (no sign-in is configured in tests).
+  await page.getByRole('button', { name: 'Sign out', exact: true }).click();
+  await expect(name).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Sign out', exact: true })).toHaveCount(0);
+  const after = await page.evaluate(() => localStorage.getItem('pitwall:anonId'));
+  expect(after).not.toBe(id);
+  expect(after).toMatch(/^[0-9a-f-]{36}$/);
+});
+
 test('share: the spoiler-free line, copied with the site’s address', async ({ page, context }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await finish(page);
