@@ -47,6 +47,10 @@ and the account button named by its email), and the "Loading…",
 CI, press it in a spec or excuse it with a reason; don't loosen the guard. The second CI run
 flagged five more: the admin Players rows in `players.spec.ts` (now each pressed) and a defend
 move one race path offers, "Protect the first apex" (added to the battle-answers exception).
+Runs 3-5 each hit a test that failed only on the slower runner (an Eras call's press, the
+Gauntlet race test's Box answer and its plan retries); each was fixed. Run 6 passed all 619 and
+flagged another era's race rows (Belgium, Hungary), now one group: every era's rows come from
+one component, and eras-detail.spec presses every row of its era.
 
 ## S1: where we start (Nov 24)
 

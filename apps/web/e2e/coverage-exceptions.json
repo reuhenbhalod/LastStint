@@ -3,6 +3,13 @@
   "exceptions": [
     {
       "group": true,
+      "route": "/eras/:n",
+      "role": "link",
+      "name": "(.+ #, play( at legend difficulty)?|leaderboard for .+ #)",
+      "reason": "An era's race rows are named for its races, so each era has its own; one component draws them all (EraDetail). eras-detail.spec presses every row of its era, play and Legend; other specs pass through other eras' pages. Passes only if a row on /eras/:n is pressed."
+    },
+    {
+      "group": true,
       "role": "button",
       "name": ".{1,8}: details",
       "reason": "A car's details dot is named for its driver, so each race has its own; every dot is pressed in some race and the dots share one handler (TrackMap)."
