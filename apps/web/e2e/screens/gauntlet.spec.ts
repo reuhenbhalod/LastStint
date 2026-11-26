@@ -577,12 +577,14 @@ async function whileRacing(page: Page, act: () => Promise<void>) {
 test.describe('race controls', () => {
   test('every control of a round’s race, pressed and checked', async ({ page }) => {
     test.setTimeout(300_000);
-    // Every call answered a different way where it can be (Box opens the tyres, Back shuts
-    // them the first time), whether it comes up while the controls are pressed or after.
+    // Every call answered a different way where it can be (the first call with Box takes it,
+    // so Box opens the tyres, and Back shuts them the first time), whether it comes up while
+    // the controls are pressed or after.
     const pressed = new Set<string>();
     const choose: Choose = (_kind, names) => {
       const pick =
         (names.includes('Back') && !pressed.has('Back') && 'Back') ||
+        (names.includes('Box') && !pressed.has('Box') && 'Box') ||
         names.find((n) => !pressed.has(n)) ||
         names[0];
       pressed.add(pick as string);
@@ -877,7 +879,8 @@ test.describe('race controls', () => {
     // Where a call offered Box, it opened the tyres and Back shut them (the call with Box
     // depends on the path the race took; its own test is below).
     const all = [...betweenCalls.seen, ...seen];
-    if (all.some((c) => c.names.includes('Box'))) expect(pressed.has('Box')).toBe(true);
+    if (all.some((c) => c.names.includes('Box')))
+      expect(all.some((c) => c.chose === 'Box')).toBe(true);
   });
 
   test('a big call: Box opens the tyres, Back shuts them, a tyre boxes', async ({ page }) => {
