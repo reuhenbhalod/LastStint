@@ -84,6 +84,17 @@ test('lists the accounts with a summary, search and sort', async ({ page }) => {
   await expect(page.locator('tbody tr')).toContainText('Old Timer');
   await page.getByLabel('Search players').fill('nobody');
   await expect(page.getByText('No players match the search.')).toBeVisible();
+
+  // Each row's name opens that player's panel, and Close shuts it. (This mock has no player
+  // API; admin-players.spec.ts checks the panel's contents.)
+  await page.getByLabel('Search players').fill('');
+  for (const name of ['New Player', 'Undercut', 'Old Timer']) {
+    await page.getByRole('button', { name, exact: true }).click();
+    const panel = page.getByRole('region', { name: 'Player' });
+    await expect(panel).toBeVisible();
+    await panel.getByRole('button', { name: 'Close' }).click();
+    await expect(panel).toHaveCount(0);
+  }
 });
 
 test('fits a phone screen', async ({ page }) => {

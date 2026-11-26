@@ -45,7 +45,7 @@
     },
     {
       "role": "button",
-      "name": "(dive up the inside|block the lunge on the brakes|defend the second apex|cover the inside|hold the inside line|move once on the straight|send it up the inside|keep the racing line, full speed|hold position|box for a new nose|keep it balanced|round the outside|wait for drs, go next lap)",
+      "name": "(dive up the inside|block the lunge on the brakes|defend the second apex|cover the inside|hold the inside line|move once on the straight|send it up the inside|keep the racing line, full speed|hold position|box for a new nose|keep it balanced|round the outside|wait for drs, go next lap|protect the first apex)",
       "reason": "Battle and quick-call answers offered only on some race paths (the corner and the race as it runs). One answer per card is pressed in the screen specs, and every option of BattleCard and QuickCallCard is pressed in their component tests."
     },
     {

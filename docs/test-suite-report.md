@@ -44,7 +44,9 @@ run (Nov 26, 619 passed, screenshots included) flagged six more that only the sl
 reached: three are now pressed (the Legend board's Try again, a history book leaderboard link
 and the account button named by its email), and the "Loading…",
 "Saving…" and tutorial "Play again" labels are excused with reasons. If the guard flags one in
-CI, press it in a spec or excuse it with a reason; don't loosen the guard.
+CI, press it in a spec or excuse it with a reason; don't loosen the guard. The second CI run
+flagged five more: the admin Players rows in `players.spec.ts` (now each pressed) and a defend
+move one race path offers, "Protect the first apex" (added to the battle-answers exception).
 
 ## S1: where we start (Nov 24)
 
