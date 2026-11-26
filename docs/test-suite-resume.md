@@ -114,3 +114,14 @@ Extra for `ts-f-flows-api`:
 
 Budget: about 3 hours. The agents' share (S3-S5) is the largest; integration plus the full runs
 take about 1.5 hours.
+
+## Paused Nov 25 (night)
+
+- Merged and committed through eeb5b7d (S6 guard, flows job in CI). Guard: 0 uncovered.
+- Uncommitted on purpose: `apps/web/e2e/screens/shots.spec.ts` (8 shots x phone/desktop,
+  Linux only) and the "Screenshots (D6)" section in `docs/test-suite-report.md`. Don't commit
+  the spec until its baselines exist.
+- Next: make baselines in `mcr.microsoft.com/playwright:v1.49.1-noble` with
+  `--update-snapshots`, run twice more (16/16), inspect, commit; re-run full e2e with
+  E2E_COVERAGE=1 and the guard; finish the report; ask the owner before push/PR.
+- Owner decision pending: Turkey 2021 team radio shows "Dry" for every dry tyre (test.fixme).

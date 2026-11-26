@@ -209,3 +209,45 @@ as admin (28 failures, one per admin route).
 - `test/shuffle.test.ts` "keeps a race from coming straight back…" is CPU-bound and times out
   (60 s) under heavy machine load (load average 25-37 from parallel agents' e2e runs; the file
   alone took 86 s then). It passes when the machine is quieter. Not changed here.
+
+## Screenshots (D6)
+
+`apps/web/e2e/screens/shots.spec.ts` takes `toHaveScreenshot` shots of the key screens only, on
+both projects (phone 390 px, desktop 1440 × 900):
+
+| Shot | State |
+|---|---|
+| `daily-card.png` | The Daily card (Spain 2025), the walkthrough closed |
+| `daily-plan.png` | The race plan at the takeover, every plan graded |
+| `daily-result.png` | A result: today's run already played (score, rank 3/10, 72%) |
+| `gauntlet-lobby.png` | The Gauntlet lobby with a two-row weekly leaderboard |
+| `eras-map.png` | The era map in production: Era 10 Mastered, Era 9 open, Era 8 locked, the rest coming soon |
+| `eras-intro.png` | Hungary 1992's intro |
+| `eras-results.png` | Hungary 1992's results with three new stars and the rewrite |
+| `admin-today.png` | Admin Today with a warning announcement |
+
+Each is set up with the screen specs' mocks. The clock is fixed (2026-11-11 12:00 UTC) except
+for the Eras results, whose race has to run to the flag (cut to its last two laps). Every shot
+waits for the fonts and an idle network, turns animations off, hides the caret, masks every
+`<canvas>` (the 3D view) and allows `maxDiffPixelRatio: 0.01`.
+
+**Linux only.** The baselines (`apps/web/e2e/screens/shots.spec.ts-snapshots/*-linux.png`) are
+made in the Playwright Docker image so they match CI's ubuntu-latest; the spec skips on any
+other platform. Never commit baselines made on macOS.
+
+**Updating on purpose** (after a design change). From the repo root, with Docker running. The
+anonymous volumes keep the container's Linux `node_modules` off the Mac's:
+
+```sh
+docker run --rm --ipc=host -v "$PWD":/repo -w /repo \
+  -v /repo/node_modules -v /repo/apps/web/node_modules -v /repo/apps/worker/node_modules \
+  -v /repo/packages/sim/node_modules \
+  mcr.microsoft.com/playwright:v1.49.1-noble bash -c '
+    corepack enable && pnpm install --frozen-lockfile && cd apps/web &&
+    CI=1 E2E_PORT=5381 npx playwright test e2e/screens/shots.spec.ts --update-snapshots'
+```
+
+Then run the same command without `--update-snapshots` twice to check the shots are stable,
+look at the new PNGs, and commit only `apps/web/e2e/screens/shots.spec.ts-snapshots/`. The image
+tag follows `@playwright/test` in `apps/web/package.json`; `noble` is Ubuntu 24.04, the same as
+ubuntu-latest.
