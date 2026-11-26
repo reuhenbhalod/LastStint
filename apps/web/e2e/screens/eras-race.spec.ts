@@ -434,8 +434,6 @@ test('the team radio: the headset (one call a kind a lap), team orders and a box
   expect(orders.map((d) => d.order)).toEqual(['holdUp']);
 
   // Box: a tyre pressed, and the stop shows as under way.
-  // (Turkey 2021 is wet: no two-compound rule, so its two dry tyres both read "Dry". A bug:
-  // see the fixme below.)
   const tyre = radio.getByRole('button', { name: /(Dry|Softs|Mediums|Hards|Inters|Wets)$/ });
   await tyre.first().click();
   await expect(radio).toContainText(/· boxing (this|next) lap/);
@@ -448,13 +446,9 @@ test('the team radio: the headset (one call a kind a lap), team orders and a box
   await expect(pill(page, 'Team radio')).toHaveAttribute('aria-pressed', 'false');
 });
 
-// Found by this suite: in a race with no two-compound rule (a wet 2021 race, turkey-2021, the
-// only such Eras race) every dry tyre reads "Dry" (raceRules.ts `tyres: 'single-dry'` follows
-// `twoCompound`, meant for the one-tyre years before 2007). The team radio then shows two
-// "D Dry" buttons, softs and hards, that look and read the same; the decision card on the same
-// screen says "Softs" and "Hards". Owner call: key the single-dry look on the race offering one
-// dry tyre (pre-2007 races do; the raceRules unit test builds a 2005 race from a modern file).
-test.fixme('every tyre the team radio offers has its own name', async ({ page }) => {
+// Found by this suite: turkey-2021 (wet, so no two-compound rule) showed its softs and hards
+// both as "D Dry". The single-dry look is now kept for races offering one dry tyre.
+test('every tyre the team radio offers has its own name', async ({ page }) => {
   await mockEras(page, [loadEraRace(TURKEY)], STILL);
   await raceOn(page, `/eras/9/${TURKEY}`);
   const radio = await teamRadio(page);

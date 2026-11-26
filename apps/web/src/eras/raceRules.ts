@@ -41,7 +41,8 @@ export interface RaceScreenEra {
   prompts: 'radio' | 'board';
   /**
    * How tyre badges read: the compound (S / M / H), or a single dry tyre where the race has no
-   * compound rule (before 2007: one dry specification a weekend, so the letter means nothing).
+   * compound rule and the player can fit only one dry tyre (before 2007: one dry specification a
+   * weekend, so the letter means nothing; 2005: no tyre changes).
    */
   tyres: 'compounds' | 'single-dry';
   /** No tyre changes (2005): the dry set fitted at the takeover, which every stop keeps. */
@@ -64,11 +65,20 @@ export function raceScreenEra(model: RaceModel): RaceScreenEra {
     battery: moveAllowed(model, 'overtake-button'),
     eraId,
     prompts: eraId !== null && PIT_BOARD_ERAS.includes(eraId) ? 'board' : 'radio',
-    tyres: rules.twoCompound ? 'compounds' : 'single-dry',
+    tyres: oneDryTyre(model, rules) ? 'single-dry' : 'compounds',
     lockedTyre: rules.tyreChanges ? null : takeoverDry(model),
   };
   cache.set(model, out);
   return out;
+}
+
+/** The player only ever fits one dry tyre: no compound rule, and either one dry compound on
+ * offer (before 2007) or no tyre changes (2005). A wet race since 2007 has no two-compound rule
+ * either but offers several (turkey-2021: softs and hards), so they keep their names. */
+function oneDryTyre(model: RaceModel, rules: ResolvedRules): boolean {
+  if (rules.twoCompound) return false;
+  if (!rules.tyreChanges) return true;
+  return (Object.keys(model.compounds) as Compound[]).filter((c) => !isWetTyre(c)).length <= 1;
 }
 
 /** The user's dry compound at the takeover (what a 2005 stop keeps), or null on wet tyres. */

@@ -22,12 +22,13 @@ CI (`.github/workflows/ci.yml`, GitHub-hosted): the e2e job records coverage and
 guard, uploads `control-coverage`, and a new `flows` job runs before deploy.
 
 **Bugs fixed here, each with a test:** the admin race picker's message named the previous race;
-the phone account button had no accessible name. (`scripts/schedule.ts` misreading the G1
+the phone account button had no accessible name; Turkey 2021's team radio labelled both its dry
+tyres (softs and hards) "Dry" (`raceRules.ts`: the single-dry look is now kept for races where
+the player can fit only one dry tyre: one dry compound on offer, or no tyre changes in 2005;
+Turkey 2021 is the only race this changes). (`scripts/schedule.ts` misreading the G1
 report was fixed on main by #58.)
 
 **For the owner (not changed):**
-- Turkey 2021's team radio labels every dry tyre "Dry" (`raceRules.ts` two-compound rule); the
-  test is `test.fixme`.
 - On phone, the tutorial coach card covers the button it points at.
 - A failed sign-in shows no message on the Daily card.
 - Gauntlet rounds and the Daily share one per-IP rate limit.
