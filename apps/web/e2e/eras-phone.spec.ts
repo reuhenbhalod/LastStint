@@ -133,6 +133,9 @@ test('the history book fits a phone', async ({ page }) => {
   await expect(page.getByText('Only 9% of strategists rewrote this race.')).toBeVisible();
   await noSidewaysScroll(page);
   if (shots) await page.screenshot({ path: `${shots}/eras-history.png`, fullPage: true });
+  // Each rewrite's leaderboard link opens that race's board.
+  await page.getByRole('link', { name: 'Leaderboard for Abu Dhabi 2021' }).click();
+  await expect(page).toHaveURL(/\/eras\/9\/abu-dhabi-2021\/leaderboard$/);
 });
 
 test('a race leaderboard fits a phone, both tabs', async ({ page }) => {

@@ -70,6 +70,24 @@
       "reason": "The result button's label while the run is sent: disabled, and on screen only as long as the send takes, so it is recorded in some runs and not others. 'See how you did' is pressed."
     },
     {
+      "route": "/admin/players",
+      "role": "button",
+      "name": "loading…",
+      "reason": "The Refresh button's label while the players load: disabled, and on screen only as long as the request takes, so slower machines record it and faster ones don't. Refresh is pressed (admin-players.spec)."
+    },
+    {
+      "route": "/admin/tickets",
+      "role": "button",
+      "name": "saving…",
+      "reason": "The Save button's label while a ticket is sent: disabled, and on screen only as long as the request takes. Save and Add ticket are pressed (admin-tickets.spec)."
+    },
+    {
+      "route": "/tutorial",
+      "role": "button",
+      "name": "play again",
+      "reason": "The tutorial result's Play again comes on screen under the 'How you did' coach, whose Finish is the way on (pages.spec). Pressing it resets the race but, from the code, leaves that coach step open over the intro: an owner question (hide it in the tutorial?), in docs/test-suite-report.md."
+    },
+    {
       "role": "link",
       "name": "versus",
       "reason": "Versus is out of the first release (PR #54, D2); the tab only shows in test builds."

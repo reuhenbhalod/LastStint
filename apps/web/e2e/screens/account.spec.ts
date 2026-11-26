@@ -159,6 +159,9 @@ test.describe('signed in', () => {
     await page.goto('/gauntlet');
     await expect(menuButton(page)).toHaveAccessibleName('Account: ada@example.com');
     await expect(menuButton(page)).toContainText('A');
+    // Named by the email, it still opens the menu.
+    await menuButton(page).click();
+    await expect(menuButton(page)).toHaveAttribute('aria-expanded', 'true');
     await page.unrouteAll();
     await mock(page, { account: account({ displayName: '' }) });
     await page.reload();

@@ -33,11 +33,18 @@ report was fixed on main by #58.)
 - On phone, the tutorial coach card covers the button it points at.
 - A failed sign-in shows no message on the Daily card.
 - Gauntlet rounds and the Daily share one per-IP rate limit.
+- The tutorial's result shows Play again (it is not a live Daily). From the code, pressing it
+  resets the race but leaves the "How you did" coach step open over the intro. Hide it in the
+  tutorial, or reset the coach too? Excused in the guard until decided.
 
 **Watch in CI:** controls that show only for a moment or on some race paths (a disabled
 "Grading your calls…", a battle answer one path offers) can be recorded in one run and not the
-next. Two showed up across three full runs and are now pressed or excused. If the guard flags
-one in CI, press it in a spec or excuse it with a reason; don't loosen the guard.
+next. Two showed up across three full runs and are now pressed or excused. The first full CI
+run (Nov 26, 619 passed, screenshots included) flagged six more that only the slower runner
+reached: three are now pressed (the Legend board's Try again, a history book leaderboard link
+and the account button named by its email), and the "Loading…",
+"Saving…" and tutorial "Play again" labels are excused with reasons. If the guard flags one in
+CI, press it in a spec or excuse it with a reason; don't loosen the guard.
 
 ## S1: where we start (Nov 24)
 

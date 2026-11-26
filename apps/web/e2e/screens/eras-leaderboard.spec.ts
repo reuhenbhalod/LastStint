@@ -135,9 +135,17 @@ test('a load error, Try again, and the way back', async ({ page }) => {
 });
 
 test('the Legend board’s load error names it', async ({ page }) => {
-  await boards(page, (legend) => (legend ? null : { total: 0, entries: [], me: null }));
+  let legendAsks = 0;
+  await boards(page, (legend) =>
+    legend && ++legendAsks === 1 ? null : { total: 0, entries: [], me: null },
+  );
   await page.goto(`${BASE}/legend`);
-  await expect(page.getByRole('alert')).toContainText('Couldn’t load the Legend leaderboard');
+  const alert = page.getByRole('alert');
+  await expect(alert).toContainText('Couldn’t load the Legend leaderboard');
+  // Try again asks for the Legend board again.
+  await alert.getByRole('button', { name: 'Try again' }).click();
+  await expect(alert).toHaveCount(0);
+  expect(legendAsks).toBe(2);
   await page.getByRole('link', { name: 'Back to era 2' }).click();
   await expect(page).toHaveURL(/\/eras\/2$/);
 });
