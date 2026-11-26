@@ -330,14 +330,22 @@ test.describe('legal and credits', () => {
   });
 });
 
+/** Escape shuts How to play. Its key listener is attached just after the dialog paints, so on a
+ * slow runner a first press can land before it: press until the dialog is gone. */
+async function escapeHowToPlay(page: Page) {
+  await expect(async () => {
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('dialog')).toHaveCount(0, { timeout: 500 });
+  }).toPass({ timeout: 10_000 });
+}
+
 test.describe('how it works', () => {
   test('from the Daily card: the rules and grading, and Back to the card', async ({ page }) => {
     await mockApi(page, loadRace('abu-dhabi-2021'));
     await page.goto('/');
     // A signed-out player gets How to play first; Escape shuts it.
     await expect(page.getByRole('dialog')).toBeVisible();
-    await page.keyboard.press('Escape');
-    await expect(page.getByRole('dialog')).toHaveCount(0);
+    await escapeHowToPlay(page);
     await page.getByRole('button', { name: 'How it works', exact: true }).click();
 
     await expect(page.getByRole('heading', { name: 'How it works', level: 1 })).toBeVisible();
@@ -354,7 +362,7 @@ test.describe('how it works', () => {
     await expect(page.getByRole('button', { name: /pit wall/ })).toBeVisible();
     // The card comes back as it opens (signed out, with How to play over it again).
     await expect(page.getByRole('dialog')).toBeVisible();
-    await page.keyboard.press('Escape');
+    await escapeHowToPlay(page);
     // Opening it again works the same.
     await page.getByRole('button', { name: 'How it works', exact: true }).click();
     await expect(page.getByRole('heading', { name: 'How it works', level: 1 })).toBeVisible();
