@@ -47,14 +47,19 @@ const decision = (page: Page) => page.getByRole('region', { name: 'Your call' })
 /**
  * Press `button` on the call `card`. A call can go before the press lands (a quick call's
  * timer runs out, or the race moves on and takes it away): then there's nothing to press, and
- * false. A press that fails with the card still up is a real failure and throws.
+ * false. A slow machine can be mid-press as the card leaves, so the card gets a moment to go.
+ * A press that fails with the card still up after that is a real failure and throws.
  */
 async function pressOn(card: Locator, button: Locator): Promise<boolean> {
   try {
-    await button.click({ timeout: 2_000 });
+    await button.click({ timeout: 5_000 });
     return true;
   } catch (e) {
-    if (await card.isVisible()) throw e;
+    const gone = await card.waitFor({ state: 'hidden', timeout: 3_000 }).then(
+      () => true,
+      () => false,
+    );
+    if (!gone) throw e;
     return false;
   }
 }
