@@ -107,6 +107,9 @@ ones are fixed in place, bigger ones need the owner first.
   minutes ran out on Nov 12, which is why CI moved to the PC). Every PR runs the whole suite on
   the PC (D3). Since the PC was offline Nov 13-24, S6 also documents how to check the runner is
   up and how to deploy from the Mac when it isn't.
+  **Superseded by PR #55** (88a6d6a): CI now runs on GitHub-hosted `ubuntu-latest`, free since
+  the repo went public, so the suite and the guard run there on every PR. The screenshot
+  baselines are made in the Playwright 1.49.1 Ubuntu 24.04 (noble) image to match that runner.
 - **D5. Real Worker in CI.** L3 flows run in CI against `wrangler dev` with a fresh local D1 and
   fixed dates.
 - **D6. Screenshots of the key screens only.** Phone and desktop, main states; updated on purpose

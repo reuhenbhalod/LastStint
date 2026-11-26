@@ -6,12 +6,12 @@ way `getByRole` finds it; numbers in names are `#`. "Pressed" means a test click
 changed it. Controls a test never brings on screen are missing here; the source table at the
 end shows where they live.
 
-**826 of 1209 controls seen on screen are pressed by a test (68%),
+**832 of 1219 controls seen on screen are pressed by a test (68%),
 across 22 routes. 0 controls have no accessible name.**
 
 ## By route
 
-### `/` (138 of 212 pressed)
+### `/` (138 of 221 pressed)
 
 | Control | Pressed | On | Pressed by |
 |---|---|---|---|
@@ -21,10 +21,10 @@ across 22 routes. 0 controls have no accessible name.**
 | button: #× | yes | desktop, phone | daily.spec.ts, defend.spec.ts, screens/daily-calls.spec.ts, screens/daily-race.spec.ts |
 | button: #ALO+# | **no** | desktop, phone |  |
 | button: #ALOOUT | **no** | desktop, phone |  |
+| button: #ALOPIT | **no** | desktop |  |
 | button: #BOT+# | **no** | desktop, phone |  |
 | button: #GAS+# | **no** | desktop, phone |  |
-| button: #GASPIT | **no** | desktop, phone |  |
-| button: #HAD+# | **no** | desktop |  |
+| button: #HAD+# | **no** | desktop, phone |  |
 | button: #OCO+# | **no** | desktop, phone |  |
 | button: #SAI+# | **no** | desktop |  |
 | button: + Add a stop | yes | desktop, phone | screens/daily-race.spec.ts |
@@ -32,7 +32,7 @@ across 22 routes. 0 controls have no accessible name.**
 | button: A · No stop, #%, engineer’s pick | yes | desktop, phone | daily.spec.ts |
 | button: A · No stop, chance being worked out | **no** | desktop, phone |  |
 | button: A · One stop, #% | **no** | desktop, phone |  |
-| button: A · One stop, #%, engineer’s pick | **no** | desktop, phone |  |
+| button: A · One stop, #%, engineer’s pick | **no** | desktop |  |
 | button: A · One stop, chance being worked out | **no** | desktop, phone |  |
 | button: ALB: details | **no** | desktop, phone |  |
 | button: ALO: details | **no** | desktop, phone |  |
@@ -43,6 +43,7 @@ across 22 routes. 0 controls have no accessible name.**
 | button: B · One stop, chance being worked out | **no** | desktop, phone |  |
 | button: Back | yes | desktop, phone | screens/daily-calls.spec.ts, screens/daily-intro.spec.ts |
 | button: Back off at the exits | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: Back to normal | **no** | desktop, phone |  |
 | button: Back to the race · lap # | yes | desktop | screens/daily-race.spec.ts |
 | button: Back: close How it works | yes | desktop, phone | screens/daily-intro.spec.ts, screens/pages.spec.ts |
 | button: balanced | yes | desktop, phone | screens/daily-race.spec.ts |
@@ -80,7 +81,7 @@ across 22 routes. 0 controls have no accessible name.**
 | button: defend | yes | desktop, phone | screens/daily-calls.spec.ts, screens/daily-race.spec.ts |
 | button: Defend hard | yes | desktop, phone | screens/daily-calls.spec.ts, screens/daily-result.spec.ts |
 | button: deploy | yes | desktop, phone | screens/daily-race.spec.ts |
-| button: Dive up the inside | **no** | desktop, phone |  |
+| button: Dive up the inside | **no** | phone |  |
 | button: DOO: details | **no** | desktop, phone |  |
 | button: Drop back, cool the tyres | yes | desktop, phone | screens/daily-calls.spec.ts |
 | button: Flat out | yes | desktop, phone | screens/daily-calls.spec.ts |
@@ -90,11 +91,12 @@ across 22 routes. 0 controls have no accessible name.**
 | button: Get a better exit, go next lap | yes | desktop, phone | screens/daily-calls.spec.ts |
 | button: GIO: details | **no** | desktop, phone |  |
 | button: Go round him now | yes | desktop, phone | screens/daily-calls.spec.ts |
-| button: Go with plan A | yes | desktop, phone | daily.spec.ts, screens/daily-calls.spec.ts, screens/daily-race.spec.ts |
+| button: Go with plan A | yes | desktop, phone | daily.spec.ts, defend.spec.ts, screens/daily-calls.spec.ts, screens/daily-race.spec.ts |
 | button: Go with plan B | yes | desktop, phone | screens/daily-calls.spec.ts, screens/daily-race.spec.ts, screens/daily-result.spec.ts |
-| button: Go with plan C | yes | desktop, phone | defend.spec.ts, screens/daily-calls.spec.ts, screens/daily-race.spec.ts |
+| button: Go with plan C | yes | desktop, phone | screens/daily-calls.spec.ts, screens/daily-race.spec.ts |
 | button: Go with your plan | yes | desktop, phone | screens/daily-race.spec.ts |
 | button: Got it | yes | desktop, phone | daily.spec.ts, eras-phone.spec.ts, screens/daily-intro.spec.ts |
+| button: Grading your calls… | **no** | phone |  |
 | button: GRO: details | **no** | desktop, phone |  |
 | button: HAD: details | **no** | desktop, phone |  |
 | button: HAM: details | **no** | desktop, phone |  |
@@ -104,12 +106,15 @@ across 22 routes. 0 controls have no accessible name.**
 | button: hold | yes | desktop, phone | screens/daily-race.spec.ts |
 | button: Hold the line | yes | desktop, phone | screens/daily-calls.spec.ts, screens/daily-race.spec.ts |
 | button: Hold up Alonso | yes | desktop, phone | screens/daily-race.spec.ts |
+| button: Hold up Hamilton | **no** | desktop |  |
 | button: How it works | yes | desktop, phone | screens/daily-intro.spec.ts, screens/pages.spec.ts |
 | button: How to play | yes | desktop, phone | screens/daily-intro.spec.ts |
 | button: HUL: details | **no** | desktop, phone |  |
-| button: Inters | **no** | phone |  |
+| button: IInters | **no** | desktop |  |
+| button: Inters | **no** | desktop |  |
 | button: Keep ours | yes | desktop, phone | screens/daily-race.spec.ts |
 | button: Keep pushing | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: Keep saving | **no** | desktop, phone |  |
 | button: Keep the pace | yes | desktop, phone | screens/daily-calls.spec.ts |
 | button: Keep the pressure on | yes | desktop, phone | screens/daily-calls.spec.ts |
 | button: Keep using the kerbs | yes | desktop, phone | screens/daily-calls.spec.ts |
@@ -133,11 +138,12 @@ across 22 routes. 0 controls have no accessible name.**
 | button: LEC: details | **no** | desktop, phone |  |
 | button: Let Colapinto by | yes | desktop, phone | screens/daily-race.spec.ts |
 | button: Let him go | yes | desktop, phone | screens/daily-calls.spec.ts |
+| button: Let Ricciardo by | **no** | desktop |  |
 | button: Lift & coast | yes | desktop, phone | screens/daily-race.spec.ts |
 | button: Lift and coast | yes | desktop, phone | screens/daily-calls.spec.ts |
 | button: Lunge into the first apex | yes | desktop, phone | screens/daily-calls.spec.ts |
 | button: MAG: details | **no** | desktop, phone |  |
-| button: manage | yes | desktop, phone | screens/daily-calls.spec.ts, screens/daily-race.spec.ts |
+| button: Manage | yes | desktop, phone | screens/daily-calls.spec.ts, screens/daily-race.spec.ts |
 | button: Manage the tyres | yes | desktop, phone | screens/daily-calls.spec.ts |
 | button: Manage them | yes | desktop, phone | screens/daily-calls.spec.ts |
 | button: MAZ: details | **no** | desktop, phone |  |
@@ -171,7 +177,8 @@ across 22 routes. 0 controls have no accessible name.**
 | button: Release Alonso | yes | desktop, phone | screens/daily-race.spec.ts |
 | button: Retry | yes | desktop, phone | screens/daily-result.spec.ts |
 | button: RIC: details | **no** | desktop, phone |  |
-| button: Round the outside | **no** | desktop, phone |  |
+| button: Ricciardo lets you by | **no** | desktop |  |
+| button: Round the outside | **no** | phone |  |
 | button: Run this plan | yes | desktop, phone | screens/daily-race.spec.ts |
 | button: RUS: details | **no** | desktop, phone |  |
 | button: SAI: details | **no** | desktop, phone |  |
@@ -186,7 +193,7 @@ across 22 routes. 0 controls have no accessible name.**
 | button: Softs | yes | desktop, phone | daily.spec.ts, screens/daily-calls.spec.ts |
 | button: Square it off on the exit | yes | desktop, phone | screens/daily-calls.spec.ts |
 | button: SSofts | yes | desktop, phone | screens/daily-race.spec.ts |
-| button: standard | yes | desktop, phone | screens/daily-race.spec.ts |
+| button: Standard | yes | desktop, phone | screens/daily-race.spec.ts |
 | button: Standard pace | yes | desktop, phone | screens/daily-calls.spec.ts |
 | button: Standings | yes | phone | screens/daily-race.spec.ts |
 | button: Stay on plan | yes | desktop, phone | screens/daily-calls.spec.ts |
@@ -207,9 +214,11 @@ across 22 routes. 0 controls have no accessible name.**
 | button: TSU: details | **no** | desktop, phone |  |
 | button: VER: details | **no** | desktop, phone |  |
 | button: VET: details | **no** | desktop, phone |  |
-| button: Wait for DRS, go next lap | **no** | desktop, phone |  |
+| button: Wait for DRS, go next lap | **no** | phone |  |
 | button: Wait, we’ll tell race control | yes | desktop, phone | screens/daily-calls.spec.ts |
-| button: Wets | **no** | phone |  |
+| button: Wets | **no** | desktop |  |
+| button: WWets | **no** | desktop |  |
+| button: Yes, box for hards | **no** | desktop, phone |  |
 | button: Yes, box for softs | yes | desktop, phone | screens/daily-calls.spec.ts |
 | button: Yes, push | yes | desktop, phone | screens/daily-calls.spec.ts |
 | button: ZHO: details | **no** | desktop, phone |  |
@@ -228,7 +237,7 @@ across 22 routes. 0 controls have no accessible name.**
 | link: Versus | **no** | desktop, phone |  |
 | slider: Stop # lap | yes | desktop, phone | screens/daily-race.spec.ts |
 
-### `/admin` (21 of 21 pressed)
+### `/admin` (21 of 22 pressed)
 
 | Control | Pressed | On | Pressed by |
 |---|---|---|---|
@@ -248,6 +257,7 @@ across 22 routes. 0 controls have no accessible name.**
 | link: Stats | yes | desktop, phone | screens/admin-nav.spec.ts |
 | link: Tickets | yes | desktop, phone | screens/admin-nav.spec.ts |
 | link: Today | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Versus | **no** | desktop |  |
 | textbox: Ends (UTC, optional) | yes | desktop, phone | screens/admin-today.spec.ts |
 | textbox: New announcement | yes | desktop, phone | admin-tabs.spec.ts, screens/admin-audit.spec.ts, screens/admin-today.spec.ts |
 | textbox: New announcementBack soon. | yes | desktop, phone | screens/admin-audit.spec.ts, screens/admin-today.spec.ts |
@@ -273,7 +283,7 @@ across 22 routes. 0 controls have no accessible name.**
 | link: Stats | yes | desktop, phone | screens/admin-nav.spec.ts |
 | link: Tickets | yes | desktop, phone | screens/admin-nav.spec.ts |
 | link: Today | yes | desktop, phone | screens/admin-nav.spec.ts |
-| link: Versus | **no** | phone |  |
+| link: Versus | **no** | desktop |  |
 | textbox: Release date for era # | yes | desktop, phone | screens/admin-eras.spec.ts |
 
 ### `/admin/log` (13 of 14 pressed)
@@ -295,7 +305,7 @@ across 22 routes. 0 controls have no accessible name.**
 | link: Today | yes | desktop, phone | screens/admin-nav.spec.ts |
 | link: Versus | **no** | desktop, phone |  |
 
-### `/admin/players` (31 of 31 pressed)
+### `/admin/players` (32 of 32 pressed)
 
 | Control | Pressed | On | Pressed by |
 |---|---|---|---|
@@ -303,6 +313,7 @@ across 22 routes. 0 controls have no accessible name.**
 | button: Bo | yes | desktop, phone | screens/admin-players.spec.ts |
 | button: Clear name | yes | desktop, phone | screens/admin-players.spec.ts |
 | button: Close | yes | desktop, phone | screens/admin-players.spec.ts |
+| button: Cy | yes | desktop, phone | screens/admin-players.spec.ts |
 | button: Delete run | yes | desktop, phone | screens/admin-players.spec.ts |
 | button: Fast Ann | yes | desktop, phone | admin-tabs.spec.ts, screens/admin-audit.spec.ts, screens/admin-players.spec.ts |
 | button: Fast AnnHidden | yes | desktop, phone | screens/admin-players.spec.ts |
@@ -331,7 +342,7 @@ across 22 routes. 0 controls have no accessible name.**
 | textbox: Display name | yes | desktop, phone | screens/admin-audit.spec.ts, screens/admin-players.spec.ts |
 | textbox: Search players | yes | desktop, phone | players.spec.ts, screens/admin-players.spec.ts |
 
-### `/admin/runs` (24 of 24 pressed)
+### `/admin/runs` (24 of 25 pressed)
 
 | Control | Pressed | On | Pressed by |
 |---|---|---|---|
@@ -357,6 +368,7 @@ across 22 routes. 0 controls have no accessible name.**
 | link: Stats | yes | desktop, phone | screens/admin-nav.spec.ts |
 | link: Tickets | yes | desktop, phone | screens/admin-nav.spec.ts |
 | link: Today | yes | desktop, phone | screens/admin-nav.spec.ts |
+| link: Versus | **no** | desktop, phone |  |
 | textbox: Date (UTC) | yes | desktop, phone | admin-tabs.spec.ts, screens/admin-runs.spec.ts |
 | textbox: Player | yes | desktop, phone | screens/admin-runs.spec.ts |
 
@@ -478,11 +490,13 @@ across 22 routes. 0 controls have no accessible name.**
 |---|---|---|---|
 | link: Stats | yes | phone | admin-tabs.spec.ts |
 
-### `/credits` (11 of 11 pressed)
+### `/credits` (13 of 13 pressed)
 
 | Control | Pressed | On | Pressed by |
 |---|---|---|---|
 | link: (a row of: ul) | yes | desktop, phone | screens/pages.spec.ts |
+| link: CC BY # | yes | desktop, phone | screens/pages.spec.ts |
+| link: CC BY-NC-SA # | yes | desktop, phone | screens/pages.spec.ts |
 | link: Credits | yes | desktop, phone | screens/pages.spec.ts |
 | link: FastF# | yes | desktop, phone | screens/pages.spec.ts |
 | link: LastStint | yes | desktop, phone | screens/pages.spec.ts |
@@ -533,7 +547,7 @@ across 22 routes. 0 controls have no accessible name.**
 | link: Terms | yes | desktop, phone | screens/eras-detail.spec.ts |
 | link: Versus | yes | desktop, phone | screens/eras-detail.spec.ts |
 
-### `/eras/:n/:race` (155 of 303 pressed)
+### `/eras/:n/:race` (157 of 303 pressed)
 
 | Control | Pressed | On | Pressed by |
 |---|---|---|---|
@@ -547,10 +561,10 @@ across 22 routes. 0 controls have no accessible name.**
 | button: + Add a stop | yes | desktop, phone | screens/eras-race.spec.ts |
 | button: A · No stop, #% | yes | desktop, phone | screens/eras-race.spec.ts |
 | button: A · No stop, #%, engineer’s pick | yes | desktop, phone | eras-results.spec.ts, screens/eras-race.spec.ts |
-| button: A · No stop, chance being worked out | **no** | desktop, phone |  |
-| button: A · One stop, #% | **no** | desktop, phone |  |
+| button: A · No stop, chance being worked out | yes | desktop, phone | screens/eras-race.spec.ts |
+| button: A · One stop, #% | **no** | phone |  |
 | button: A · One stop, #%, engineer’s pick | yes | desktop, phone | screens/eras-race.spec.ts |
-| button: A · One stop, chance being worked out | **no** | desktop, phone |  |
+| button: A · One stop, chance being worked out | yes | desktop, phone | screens/eras-race.spec.ts |
 | button: A · Two stops, #%, engineer’s pick | yes | desktop, phone | eras-play.spec.ts |
 | button: A · Two stops, chance being worked out | **no** | desktop, phone |  |
 | button: ALB: details | **no** | desktop, phone |  |
@@ -595,6 +609,7 @@ across 22 routes. 0 controls have no accessible name.**
 | button: BUR: details | **no** | desktop, phone |  |
 | button: BUT: details | **no** | desktop, phone |  |
 | button: C · One stop, #% | **no** | desktop, phone |  |
+| button: C · One stop, chance being worked out | **no** | desktop |  |
 | button: C · Two stops, #% | yes | desktop, phone | screens/eras-race.spec.ts |
 | button: C · Two stops, chance being worked out | **no** | desktop, phone |  |
 | button: Calls | yes | phone | screens/eras-race.spec.ts |
@@ -720,7 +735,6 @@ across 22 routes. 0 controls have no accessible name.**
 | button: MAS: details | **no** | desktop, phone |  |
 | button: MAZ: details | yes | desktop, phone | screens/eras-race.spec.ts |
 | button: MCN: details | **no** | desktop, phone |  |
-| button: Mediums | **no** | phone |  |
 | button: MOE: details | **no** | desktop, phone |  |
 | button: MON: details | **no** | desktop, phone |  |
 | button: MONA: details | **no** | desktop, phone |  |
@@ -878,12 +892,12 @@ across 22 routes. 0 controls have no accessible name.**
 | tab: Legend | yes | desktop, phone | screens/eras-leaderboard.spec.ts |
 | tab: Normal | yes | desktop, phone | screens/eras-leaderboard.spec.ts |
 
-### `/eras/:n/:race/legend` (61 of 129 pressed)
+### `/eras/:n/:race/legend` (61 of 128 pressed)
 
 | Control | Pressed | On | Pressed by |
 |---|---|---|---|
 | button: (a row of: Leaders) | yes | desktop, phone | screens/eras-legend.spec.ts |
-| button: (a row of: Standings) | yes | desktop | screens/eras-legend.spec.ts |
+| button: (a row of: Standings) | yes | desktop, phone | screens/eras-legend.spec.ts |
 | button: #× | yes | desktop, phone | eras-play.spec.ts, screens/eras-legend.spec.ts |
 | button: #ALO | **no** | desktop, phone |  |
 | button: #ALO+# | **no** | desktop, phone |  |
@@ -894,7 +908,7 @@ across 22 routes. 0 controls have no accessible name.**
 | button: ALBM: details | **no** | desktop, phone |  |
 | button: ALG: details | **no** | desktop, phone |  |
 | button: ALO: details | **no** | desktop, phone |  |
-| button: attack | yes | desktop, phone | screens/eras-legend.spec.ts |
+| button: Attack | yes | desktop, phone | screens/eras-legend.spec.ts |
 | button: B · One stop, #% | **no** | desktop, phone |  |
 | button: B · One stop, #%, engineer’s pick | yes | desktop, phone | screens/eras-legend.spec.ts |
 | button: B · One stop, chance being worked out | **no** | desktop, phone |  |
@@ -907,15 +921,14 @@ across 22 routes. 0 controls have no accessible name.**
 | button: Build your own | yes | desktop, phone | screens/eras-legend.spec.ts |
 | button: BUT: details | **no** | desktop, phone |  |
 | button: C · One stop, #% | yes | desktop, phone | screens/eras-legend.spec.ts |
-| button: C · Two stops, #% | **no** | desktop, phone |  |
+| button: C · Two stops, #% | **no** | phone |  |
 | button: C · Two stops, chance being worked out | **no** | desktop, phone |  |
 | button: Calls | yes | phone | screens/eras-legend.spec.ts |
 | button: Car | yes | phone | screens/eras-legend.spec.ts |
-| button: Change | **no** | phone |  |
 | button: ClassificationShow | yes | desktop, phone | screens/eras-legend.spec.ts |
 | button: Close driver details | yes | desktop, phone | screens/eras-legend.spec.ts |
 | button: COM: details | **no** | desktop, phone |  |
-| button: Copied! | **no** | desktop, phone |  |
+| button: Copied! | **no** | desktop |  |
 | button: Cover the inside | **no** | desktop, phone |  |
 | button: Cut back at the second apex | yes | desktop, phone | eras-play.spec.ts, screens/eras-legend.spec.ts |
 | button: defend | **no** | desktop, phone |  |
@@ -967,7 +980,7 @@ across 22 routes. 0 controls have no accessible name.**
 | button: Plan · box L# | yes | desktop, phone | screens/eras-legend.spec.ts |
 | button: Plan · to the flag | **no** | desktop, phone |  |
 | button: Protect the first apex | **no** | desktop, phone |  |
-| button: push | yes | desktop, phone | screens/eras-legend.spec.ts |
+| button: Push | yes | desktop, phone | screens/eras-legend.spec.ts |
 | button: Push and attack | **no** | desktop, phone |  |
 | button: Push now | yes | desktop, phone | eras-play.spec.ts |
 | button: Push on the exits | **no** | desktop, phone |  |
@@ -1033,7 +1046,7 @@ across 22 routes. 0 controls have no accessible name.**
 | link: Terms | yes | desktop, phone | screens/eras-history.spec.ts |
 | link: Versus | yes | desktop, phone | screens/eras-history.spec.ts |
 
-### `/gauntlet` (150 of 174 pressed)
+### `/gauntlet` (150 of 172 pressed)
 
 | Control | Pressed | On | Pressed by |
 |---|---|---|---|
@@ -1042,10 +1055,9 @@ across 22 routes. 0 controls have no accessible name.**
 | button: (a row of: Standings) | yes | desktop, phone | screens/gauntlet.spec.ts |
 | button: #× | yes | desktop, phone | screens/gauntlet.spec.ts, survivor.spec.ts |
 | button: + Add a stop | yes | desktop, phone | screens/gauntlet.spec.ts |
-| button: A · No stop, #%, engineer’s pick | **no** | desktop, phone |  |
 | button: A · No stop, chance being worked out | **no** | desktop, phone |  |
-| button: A · One stop, #% | yes | desktop, phone | screens/gauntlet.spec.ts |
-| button: A · One stop, chance being worked out | **no** | desktop, phone |  |
+| button: A · One stop, #% | yes | desktop | screens/gauntlet.spec.ts |
+| button: A · One stop, chance being worked out | yes | desktop, phone | screens/gauntlet.spec.ts |
 | button: Account: Ada Lovelace | yes | desktop, phone | screens/account.spec.ts |
 | button: Account: Undercut | yes | desktop, phone | screens/account.spec.ts |
 | button: ALB: details | yes | desktop, phone | screens/gauntlet.spec.ts |
@@ -1056,13 +1068,13 @@ across 22 routes. 0 controls have no accessible name.**
 | button: Aston Martin | yes | desktop, phone | screens/account.spec.ts |
 | button: Attack | yes | desktop, phone | screens/gauntlet.spec.ts |
 | button: B · One stop, #% | yes | desktop, phone | screens/gauntlet.spec.ts |
-| button: B · One stop, chance being worked out | **no** | desktop, phone |  |
+| button: B · One stop, chance being worked out | yes | desktop, phone | screens/gauntlet.spec.ts |
 | button: Back | yes | desktop, phone | screens/gauntlet.spec.ts |
 | button: Back off at the exits | yes | desktop, phone | screens/gauntlet.spec.ts |
 | button: Back to round # | yes | desktop, phone | screens/gauntlet.spec.ts, survivor.spec.ts |
 | button: Back to the Gauntlet menu | yes | desktop, phone | screens/gauntlet.spec.ts, survivor.spec.ts |
 | button: balanced | yes | desktop, phone | screens/gauntlet.spec.ts |
-| button: Block the lunge on the brakes | **no** | desktop, phone |  |
+| button: Block the lunge on the brakes | **no** | phone |  |
 | button: BOT: details | yes | desktop, phone | screens/gauntlet.spec.ts |
 | button: Bottas lets you by | yes | desktop, phone | screens/gauntlet.spec.ts |
 | button: Box | yes | desktop, phone | screens/gauntlet.spec.ts |
@@ -1073,20 +1085,19 @@ across 22 routes. 0 controls have no accessible name.**
 | button: Box next lap, softs | yes | desktop, phone | screens/gauntlet.spec.ts |
 | button: Brake late, make it wide | yes | desktop, phone | screens/gauntlet.spec.ts |
 | button: Build your own | yes | desktop, phone | screens/gauntlet.spec.ts |
-| button: C · Two stops, #% | **no** | desktop, phone |  |
 | button: C · Two stops, #%, engineer’s pick | yes | desktop, phone | screens/gauntlet.spec.ts |
-| button: C · Two stops, chance being worked out | **no** | desktop, phone |  |
+| button: C · Two stops, chance being worked out | yes | desktop, phone | screens/gauntlet.spec.ts |
 | button: Calls | yes | phone | screens/gauntlet.spec.ts |
 | button: Cancel | yes | desktop, phone | screens/account.spec.ts, screens/gauntlet.spec.ts |
 | button: Car | yes | phone | screens/gauntlet.spec.ts |
 | button: Change | yes | desktop, phone | screens/gauntlet.spec.ts |
-| button: Change plan | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Change plan | **no** | desktop |  |
 | button: Close driver details | yes | desktop, phone | screens/gauntlet.spec.ts |
 | button: Cover the inside under braking | yes | desktop, phone | screens/gauntlet.spec.ts |
 | button: Dealing round #… | **no** | desktop, phone |  |
 | button: defend | yes | desktop, phone | screens/gauntlet.spec.ts |
 | button: Defend hard | yes | desktop, phone | screens/gauntlet.spec.ts, survivor.spec.ts |
-| button: Defend the second apex | **no** | desktop, phone |  |
+| button: Defend the second apex | **no** | phone |  |
 | button: deploy | yes | desktop, phone | screens/gauntlet.spec.ts |
 | button: Dismiss announcement | yes | desktop, phone | admin-tabs.spec.ts, screens/account.spec.ts |
 | button: Drop back, cool the tyres | **no** | phone |  |
@@ -1101,7 +1112,7 @@ across 22 routes. 0 controls have no accessible name.**
 | button: Go round him now | yes | desktop, phone | screens/gauntlet.spec.ts |
 | button: Go with plan A | yes | desktop, phone | screens/gauntlet.spec.ts, survivor.spec.ts |
 | button: Go with plan B | yes | desktop, phone | screens/gauntlet.spec.ts |
-| button: Go with plan C | **no** | desktop, phone |  |
+| button: Go with plan C | **no** | desktop |  |
 | button: Go with your plan | yes | desktop, phone | screens/gauntlet.spec.ts |
 | button: GRO: details | yes | desktop, phone | screens/gauntlet.spec.ts |
 | button: Haas F# Team | yes | desktop, phone | screens/account.spec.ts |
@@ -1131,7 +1142,7 @@ across 22 routes. 0 controls have no accessible name.**
 | button: Let Bottas by | yes | desktop, phone | screens/gauntlet.spec.ts |
 | button: Let him go | **no** | desktop, phone |  |
 | button: Lift & coast | yes | desktop, phone | screens/gauntlet.spec.ts |
-| button: Lift and coast | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Lift and coast | yes | phone | screens/gauntlet.spec.ts |
 | button: MAG: details | yes | desktop, phone | screens/gauntlet.spec.ts |
 | button: Manage | yes | desktop, phone | screens/gauntlet.spec.ts |
 | button: Manage the tyres | yes | desktop, phone | screens/gauntlet.spec.ts |
@@ -1144,16 +1155,16 @@ across 22 routes. 0 controls have no accessible name.**
 | button: No, save the tyres | yes | desktop, phone | screens/gauntlet.spec.ts |
 | button: NOR: details | yes | desktop, phone | screens/gauntlet.spec.ts |
 | button: normal | yes | desktop, phone | screens/gauntlet.spec.ts |
-| button: Not yet | **no** | desktop, phone |  |
+| button: Not yet | **no** | phone |  |
 | button: OCO: details | yes | desktop, phone | screens/gauntlet.spec.ts |
-| button: One more lap | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: One more lap | **no** | desktop |  |
 | button: overtake | yes | desktop, phone | screens/gauntlet.spec.ts |
-| button: Overtake boost | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Overtake boost | **no** | desktop, phone |  |
 | button: PER: details | yes | desktop, phone | screens/gauntlet.spec.ts |
 | button: Plan | **no** | desktop, phone |  |
 | button: Plan · box L# | yes | desktop, phone | screens/gauntlet.spec.ts |
 | button: Plan · to the flag | **no** | desktop, phone |  |
-| button: Protect the first apex | yes | desktop, phone | screens/gauntlet.spec.ts |
+| button: Protect the first apex | yes | phone | screens/gauntlet.spec.ts |
 | button: Push | yes | desktop, phone | screens/gauntlet.spec.ts |
 | button: Push and attack | yes | desktop, phone | screens/gauntlet.spec.ts |
 | button: Push now | yes | desktop, phone | screens/gauntlet.spec.ts, survivor.spec.ts |
@@ -1235,21 +1246,19 @@ across 22 routes. 0 controls have no accessible name.**
 | link: purohit.abhiram@gmail.com | yes | desktop, phone | screens/pages.spec.ts |
 | link: Terms | yes | desktop, phone | screens/pages.spec.ts |
 
-### `/tutorial` (25 of 90 pressed)
+### `/tutorial` (26 of 89 pressed)
 
 | Control | Pressed | On | Pressed by |
 |---|---|---|---|
 | button: (a row of: Leaders) | **no** | desktop, phone |  |
-| button: (a row of: Race plan) | **no** | desktop, phone |  |
-| button: (a row of: Standings) | **no** | desktop |  |
+| button: (a row of: Race plan) | **no** | phone |  |
+| button: (a row of: Standings) | **no** | desktop, phone |  |
 | button: #× | yes | desktop, phone | screens/pages.spec.ts |
-| button: + Add a stop | **no** | desktop, phone |  |
-| button: A · One stop, #% | **no** | desktop, phone |  |
+| button: + Add a stop | **no** | phone |  |
 | button: A · One stop, chance being worked out | **no** | desktop, phone |  |
 | button: ALB: details | **no** | desktop, phone |  |
 | button: ALO: details | **no** | desktop, phone |  |
 | button: attack | **no** | desktop, phone |  |
-| button: B · One stop, #%, engineer’s pick | **no** | desktop, phone |  |
 | button: B · One stop, chance being worked out | **no** | desktop, phone |  |
 | button: balanced | **no** | desktop, phone |  |
 | button: Block the lunge on the brakes | **no** | desktop, phone |  |
@@ -1257,8 +1266,8 @@ across 22 routes. 0 controls have no accessible name.**
 | button: Box | **no** | desktop, phone |  |
 | button: Box as planned | **no** | desktop, phone |  |
 | button: Box next lap, hards | **no** | desktop, phone |  |
+| button: Box next lap, mediums | **no** | desktop |  |
 | button: Build your own | yes | desktop, phone | screens/pages.spec.ts |
-| button: C · Two stops, #% | **no** | desktop, phone |  |
 | button: C · Two stops, chance being worked out | **no** | desktop, phone |  |
 | button: Calls | yes | phone | screens/pages.spec.ts |
 | button: Car | yes | phone | screens/pages.spec.ts |
@@ -1271,10 +1280,11 @@ across 22 routes. 0 controls have no accessible name.**
 | button: Focus view | yes | desktop | screens/pages.spec.ts |
 | button: Follow car | yes | desktop, phone | screens/pages.spec.ts |
 | button: GAS: details | **no** | desktop, phone |  |
-| button: Go with plan A | **no** | desktop, phone |  |
+| button: Go with plan A | yes | desktop, phone | screens/pages.spec.ts |
 | button: Go with plan B | yes | desktop, phone | screens/pages.spec.ts |
-| button: Go with your plan | **no** | desktop, phone |  |
+| button: Go with your plan | **no** | phone |  |
 | button: Got it | yes | desktop, phone | screens/pages.spec.ts |
+| button: Grading your calls… | **no** | desktop |  |
 | button: HAM: details | **no** | desktop, phone |  |
 | button: harvest | **no** | desktop, phone |  |
 | button: HHards | **no** | desktop, phone |  |
@@ -1328,7 +1338,7 @@ across 22 routes. 0 controls have no accessible name.**
 | button: VET: details | **no** | desktop, phone |  |
 | button: ZHO: details | **no** | desktop, phone |  |
 | link: © OpenStreetMap contributors | **no** | desktop, phone |  |
-| slider: Stop # lap | **no** | desktop, phone |  |
+| slider: Stop # lap | **no** | phone |  |
 
 ## Controls with no accessible name (D7)
 

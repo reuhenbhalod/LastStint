@@ -4,6 +4,39 @@ Spec: `docs/test-suite-spec.md`. The full control list is generated into
 `docs/test-suite-coverage.md` (`E2E_COVERAGE=1 pnpm --filter @laststint/web e2e`, then
 `pnpm --filter @laststint/web coverage:report`).
 
+## Result (Nov 25)
+
+All on branch `test-suite` (local, not pushed), merged from the six agent branches, reviewed,
+fixed and re-run:
+
+| Suite | Result |
+|---|---|
+| Unit and component (`pnpm test`) | sim 2386, worker 331 (72 contract tests over all 54 routes), web 1289 + 1 skipped |
+| Browser screens (`e2e`, phone + desktop) | 599 passed, 24 skipped (16 Linux-only screenshots, 8 existing skips), 28 min on the Mac |
+| Flows against wrangler dev + local D1 (`e2e:flows`) | 12 passed, 9.5 min |
+| Screenshots (Linux, Playwright noble image) | 16 passed on three runs |
+| Coverage guard (`coverage:guard`) | 0 not covered: 831 of 1218 controls pressed, 172 through the race screen on another route, 215 excused (`e2e/coverage-exceptions.json`) |
+| Typecheck, biome | clean |
+
+CI (`.github/workflows/ci.yml`, GitHub-hosted): the e2e job records coverage and fails on the
+guard, uploads `control-coverage`, and a new `flows` job runs before deploy.
+
+**Bugs fixed here, each with a test:** the admin race picker's message named the previous race;
+the phone account button had no accessible name. (`scripts/schedule.ts` misreading the G1
+report was fixed on main by #58.)
+
+**For the owner (not changed):**
+- Turkey 2021's team radio labels every dry tyre "Dry" (`raceRules.ts` two-compound rule); the
+  test is `test.fixme`.
+- On phone, the tutorial coach card covers the button it points at.
+- A failed sign-in shows no message on the Daily card.
+- Gauntlet rounds and the Daily share one per-IP rate limit.
+
+**Watch in CI:** controls that show only for a moment or on some race paths (a disabled
+"Grading your calls…", a battle answer one path offers) can be recorded in one run and not the
+next. Two showed up across three full runs and are now pressed or excused. If the guard flags
+one in CI, press it in a spec or excuse it with a reason; don't loosen the guard.
+
 ## S1: where we start (Nov 24)
 
 ### Browser tests
@@ -219,7 +252,7 @@ both projects (phone 390 px, desktop 1440 × 900):
 |---|---|
 | `daily-card.png` | The Daily card (Spain 2025), the walkthrough closed |
 | `daily-plan.png` | The race plan at the takeover, every plan graded |
-| `daily-result.png` | A result: today's run already played (score, rank 3/10, 72%) |
+| `daily-result.png` | A result: today's run already played (P1 ahead of Alonso, score 85, rank 3/10, 72%) |
 | `gauntlet-lobby.png` | The Gauntlet lobby with a two-row weekly leaderboard |
 | `eras-map.png` | The era map in production: Era 10 Mastered, Era 9 open, Era 8 locked, the rest coming soon |
 | `eras-intro.png` | Hungary 1992's intro |
@@ -243,11 +276,11 @@ docker run --rm --ipc=host -v "$PWD":/repo -w /repo \
   -v /repo/node_modules -v /repo/apps/web/node_modules -v /repo/apps/worker/node_modules \
   -v /repo/packages/sim/node_modules \
   mcr.microsoft.com/playwright:v1.49.1-noble bash -c '
-    corepack enable && pnpm install --frozen-lockfile && cd apps/web &&
+    npm i -g pnpm@12.15.0 && pnpm install --frozen-lockfile && cd apps/web &&
     CI=1 E2E_PORT=5381 npx playwright test e2e/screens/shots.spec.ts --update-snapshots'
 ```
 
 Then run the same command without `--update-snapshots` twice to check the shots are stable,
 look at the new PNGs, and commit only `apps/web/e2e/screens/shots.spec.ts-snapshots/`. The image
 tag follows `@playwright/test` in `apps/web/package.json`; `noble` is Ubuntu 24.04, the same as
-ubuntu-latest.
+ubuntu-latest. The image's corepack fails on an old npm signing key, so pnpm comes from npm.

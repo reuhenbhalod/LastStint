@@ -313,12 +313,12 @@ test.describe('legal and credits', () => {
     // the text, and the terms and privacy links.
     for (const name of ['TUM f1-timing-database', 'Jolpica-F1', 'F1DB', 'OpenF1', 'FastF1'])
       expect(links.map((l) => l.name)).toContain(name);
-    const done = new Set<string>();
-    for (const { name, href } of links) {
-      if (done.has(`${name}|${href}`)) continue;
-      done.add(`${name}|${href}`);
+    // Every link, each copy too (the licences are linked in the list and again in the text).
+    for (const [i, { name, href }] of links.entries()) {
       await page.goto('/credits');
-      await main.getByRole('link', { name, exact: true }).first().click();
+      const link = main.getByRole('link').nth(i);
+      await expect(link).toHaveText(name);
+      await link.click();
       await expect(page).toHaveURL(href.startsWith('/') ? href : new URL(href).href);
     }
     // Licences are marked as such.

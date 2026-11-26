@@ -121,7 +121,8 @@ take about 1.5 hours.
 - Uncommitted on purpose: `apps/web/e2e/screens/shots.spec.ts` (8 shots x phone/desktop,
   Linux only) and the "Screenshots (D6)" section in `docs/test-suite-report.md`. Don't commit
   the spec until its baselines exist.
-- Next: make baselines in `mcr.microsoft.com/playwright:v1.49.1-noble` with
-  `--update-snapshots`, run twice more (16/16), inspect, commit; re-run full e2e with
-  E2E_COVERAGE=1 and the guard; finish the report; ask the owner before push/PR.
+- Nov 25 (resumed): baselines made in `mcr.microsoft.com/playwright:v1.49.1-noble`, 16/16 on two
+  further runs, committed (61fb78c). In the image, install pnpm with `npm i -g pnpm@12.15.0`
+  (its corepack fails on an old signing key). Left: the full e2e with E2E_COVERAGE=1 and the
+  guard, the final report, then ask the owner before push/PR.
 - Owner decision pending: Turkey 2021 team radio shows "Dry" for every dry tyre (test.fixme).

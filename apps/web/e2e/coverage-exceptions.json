@@ -65,6 +65,11 @@
       "reason": "The Start button while the round is being dealt: disabled; the spec checks it's disabled."
     },
     {
+      "role": "button",
+      "name": "grading your calls…",
+      "reason": "The result button's label while the run is sent: disabled, and on screen only as long as the send takes, so it is recorded in some runs and not others. 'See how you did' is pressed."
+    },
+    {
       "role": "link",
       "name": "versus",
       "reason": "Versus is out of the first release (PR #54, D2); the tab only shows in test builds."

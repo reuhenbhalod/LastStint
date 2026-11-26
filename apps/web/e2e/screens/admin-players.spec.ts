@@ -60,6 +60,11 @@ test('summary, search, every sort and Refresh', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Refresh' })).toBeEnabled();
   await expect(stat(page, 'Accounts')).toHaveText('4');
   await expect.poll(() => api.calls('GET', '/api/admin/players')).toHaveLength(2);
+  // The new row is a player like the others: it opens their page.
+  await page.getByRole('button', { name: 'Cy', exact: true }).click();
+  await expect(
+    page.getByRole('region', { name: 'Player' }).getByRole('heading', { name: 'Cy' }),
+  ).toBeVisible();
 });
 
 test('a capped list, no accounts and a load error', async ({ page }) => {
