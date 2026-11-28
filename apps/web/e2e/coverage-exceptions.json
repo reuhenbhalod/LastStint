@@ -5,8 +5,8 @@
       "group": true,
       "route": "/eras/:n",
       "role": "link",
-      "name": "(.+ #, play( at legend difficulty)?|leaderboard for .+ #)",
-      "reason": "An era's race rows are named for its races, so each era has its own; one component draws them all (EraDetail). eras-detail.spec presses every row of its era, play and Legend; other specs pass through other eras' pages. Passes only if a row on /eras/:n is pressed."
+      "name": "(.+ #, play( at legend difficulty)?|leaderboard for .+ #|\\(a row of: races( · legend difficulty)?\\))",
+      "reason": "An era's race rows are named for its races, so each era has its own; one component draws them all (EraDetail). A list of six or more is recorded as one '(a row of: Races)' control, a shorter one row by row. eras-detail.spec presses every row of its era, play and Legend; other specs pass through other eras' pages. Passes only if a row on /eras/:n is pressed."
     },
     {
       "group": true,

@@ -52,7 +52,10 @@ Gauntlet race test's Box answer and its plan retries); each was fixed. Run 6 pas
 flagged another era's race rows (Belgium, Hungary), now one group: every era's rows come from
 one component, and eras-detail.spec presses every row of its era.
 Run 7 (Nov 27, a3dd32b) was green on every job: 619 passed in 44 min, screenshots included;
-guard 0 not covered (835 of 1249 pressed, 192 through the race screen, 222 excused).
+guard 0 not covered (835 of 1249 pressed, 192 through the race screen, 222 excused). Run 8
+flagged the same era rows: the group missed the presses, which the recorder logs as one
+'(a row of: Races)' control when a list has six or more rows. The group now includes that name
+(checked against run 8's coverage report, where it was pressed).
 
 ## S1: where we start (Nov 24)
 
