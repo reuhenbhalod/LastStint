@@ -4,7 +4,7 @@ Spec: `docs/test-suite-spec.md`. The full control list is generated into
 `docs/test-suite-coverage.md` (`E2E_COVERAGE=1 pnpm --filter @laststint/web e2e`, then
 `pnpm --filter @laststint/web coverage:report`).
 
-## Result (Nov 25)
+## Result (Nov 25; CI green Nov 28)
 
 All on branch `test-suite` (local, not pushed), merged from the six agent branches, reviewed,
 fixed and re-run:
@@ -56,6 +56,8 @@ guard 0 not covered (835 of 1249 pressed, 192 through the race screen, 222 excus
 flagged the same era rows: the group missed the presses, which the recorder logs as one
 '(a row of: Races)' control when a list has six or more rows. The group now includes that name
 (checked against run 8's coverage report, where it was pressed).
+Run 9 (Nov 28, 05c593e) was green on every job: 619 passed in 45 min, screenshots included;
+guard 0 not covered (841 of 1236 pressed, 176 through the race screen, 219 excused).
 
 ## S1: where we start (Nov 24)
 

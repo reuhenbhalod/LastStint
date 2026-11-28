@@ -126,3 +126,12 @@ take about 1.5 hours.
   (its corepack fails on an old signing key). Left: the full e2e with E2E_COVERAGE=1 and the
   guard, the final report, then ask the owner before push/PR.
 - Owner decision pending: Turkey 2021 team radio shows "Dry" for every dry tyre (test.fixme).
+
+## Done (Nov 28)
+
+- S1-S7 finished. PR #59 open; CI run 9 (05c593e) green on every job (e2e 619 passed,
+  screenshots and the coverage guard included).
+- Left for the owner: sign-off on `docs/test-suite-report.md` and
+  `apps/web/e2e/coverage-exceptions.json`, the four owner items in the report, then the merge.
+- If the guard flags a control in a later CI run (some show only on some race paths or on a
+  slow runner), press it in a spec or excuse it with a reason; don't loosen the guard.
