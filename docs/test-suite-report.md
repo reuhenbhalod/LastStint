@@ -51,6 +51,8 @@ Runs 3-5 each hit a test that failed only on the slower runner (an Eras call's p
 Gauntlet race test's Box answer and its plan retries); each was fixed. Run 6 passed all 619 and
 flagged another era's race rows (Belgium, Hungary), now one group: every era's rows come from
 one component, and eras-detail.spec presses every row of its era.
+Run 7 (Nov 27, a3dd32b) was green on every job: 619 passed in 44 min, screenshots included;
+guard 0 not covered (835 of 1249 pressed, 192 through the race screen, 222 excused).
 
 ## S1: where we start (Nov 24)
 
