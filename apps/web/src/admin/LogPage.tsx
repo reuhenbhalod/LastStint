@@ -39,6 +39,7 @@ export function LogPage() {
           <label className="flex items-center gap-2 text-[13px] text-[var(--muted)]">
             Action
             <select
+              aria-label="Action"
               value={action}
               onChange={(e) => setAction(e.target.value)}
               className={inlineField}

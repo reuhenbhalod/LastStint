@@ -81,11 +81,28 @@ describe('raceScreenEra', () => {
   });
 
   it('reads a 2005 race: no DRS, no battery, one dry tyre, locked to the takeover set', () => {
-    const e = raceScreenEra(raced('1994-2009', RULES_2005, 5));
+    const e = raceScreenEra({
+      ...raced('1994-2009', RULES_2005, 5),
+      compounds: { MEDIUM: abu.compounds.MEDIUM },
+    } as RaceModel);
     const on = abu.drivers.find((d) => d.code === abu.userSide)?.stateAtTakeover.compound;
     expect(e).toMatchObject({ drs: false, battery: false, eraId: 5, prompts: 'radio' });
     expect(e.tyres).toBe('single-dry');
     expect(e.lockedTyre).toBe(on);
+  });
+
+  it('names the compounds in a race with no compound rule but several dry tyres', () => {
+    // A wet race since 2007 (turkey-2021) has no two-compound rule; its softs and hards still
+    // read as softs and hards, not both "Dry".
+    const wet = raceScreenEra(raced('2014-2025', { ...RULES_2005, tyreChanges: true }, 9));
+    expect(Object.keys(abu.compounds).length).toBeGreaterThan(1);
+    expect(wet.tyres).toBe('compounds');
+    // Before 2007 with tyre changes: one dry compound on offer, so one "Dry" tyre.
+    const one = {
+      ...raced('1988-1993', { ...RULES_2005, tyreChanges: true }, 2),
+      compounds: { MEDIUM: abu.compounds.MEDIUM },
+    } as RaceModel;
+    expect(raceScreenEra(one).tyres).toBe('single-dry');
   });
 
   it('puts prompts on the pit board in Eras 1 and 2 only', () => {

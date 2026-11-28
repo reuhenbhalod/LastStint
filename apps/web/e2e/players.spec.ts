@@ -1,12 +1,9 @@
 // The admin Players tab (/admin/players) against a mocked players API: the summary, the table,
 // search and sort, and the page staying within a phone's width. SHOTS=<dir> also saves desktop
 // and phone screenshots.
-import { type Page, expect, test } from '@playwright/test';
-
-const token = () => {
-  const part = (o: object) => Buffer.from(JSON.stringify(o)).toString('base64url');
-  return `${part({ alg: 'none' })}.${part({ exp: Math.floor(Date.now() / 1000) + 3600 })}.x`;
-};
+import type { Page } from '@playwright/test';
+import { expect, test } from './coverage.js';
+import { token } from './screens/adminApi.js';
 
 const day = (n: number) => new Date(Date.now() - n * 86_400_000).toISOString();
 
@@ -87,6 +84,17 @@ test('lists the accounts with a summary, search and sort', async ({ page }) => {
   await expect(page.locator('tbody tr')).toContainText('Old Timer');
   await page.getByLabel('Search players').fill('nobody');
   await expect(page.getByText('No players match the search.')).toBeVisible();
+
+  // Each row's name opens that player's panel, and Close shuts it. (This mock has no player
+  // API; admin-players.spec.ts checks the panel's contents.)
+  await page.getByLabel('Search players').fill('');
+  for (const name of ['New Player', 'Undercut', 'Old Timer']) {
+    await page.getByRole('button', { name, exact: true }).click();
+    const panel = page.getByRole('region', { name: 'Player' });
+    await expect(panel).toBeVisible();
+    await panel.getByRole('button', { name: 'Close' }).click();
+    await expect(panel).toHaveCount(0);
+  }
 });
 
 test('fits a phone screen', async ({ page }) => {

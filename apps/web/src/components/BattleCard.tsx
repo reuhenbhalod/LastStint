@@ -7,7 +7,7 @@
 // of the short bar; the race screen makes the driver's own move when it runs out. Without it,
 // exactly as before.
 
-import { type ReactNode, useEffect, useState } from 'react';
+import { type ReactNode, useEffect, useId, useState } from 'react';
 import { named, surname } from '../data/names.js';
 import type { BattleTag, QuickCall } from '../game/quickCalls.js';
 import { type LapClock, clockProgress } from '../game/useGame.js';
@@ -105,6 +105,8 @@ export function BattleCard({
   }, [call, chosen, onAnswer]);
 
   const picked = call.options.find((o) => o.id === chosen);
+  // Each move's button is named by its label; its note and risk tag describe it.
+  const uid = useId();
   const other = surname(call.other ?? '');
   const who = call.attacking ? `Attacking ${other}` : `Defending from ${other}`;
   return (
@@ -194,6 +196,12 @@ export function BattleCard({
               <button
                 key={o.id}
                 type="button"
+                aria-label={o.label}
+                aria-describedby={
+                  [o.note && `${uid}-${i}-note`, o.tag && `${uid}-${i}-tag`]
+                    .filter(Boolean)
+                    .join(' ') || undefined
+                }
                 onClick={() => onAnswer(o.id)}
                 className="call-opt min-h-[64px] !justify-start !gap-1"
                 style={{ borderLeft: `3px solid ${color}` }}
@@ -207,9 +215,14 @@ export function BattleCard({
                   </span>
                   {o.label}
                 </span>
-                {o.note && <span className="note">{o.note}</span>}
+                {o.note && (
+                  <span id={`${uid}-${i}-note`} className="note">
+                    {o.note}
+                  </span>
+                )}
                 {o.tag && (
                   <span
+                    id={`${uid}-${i}-tag`}
                     className="w-fit text-[10px] font-extrabold uppercase tracking-[0.12em]"
                     style={{ color: TAG_COLOR[o.tag] }}
                   >

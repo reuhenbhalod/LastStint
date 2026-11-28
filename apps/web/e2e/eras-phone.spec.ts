@@ -2,7 +2,8 @@
 // (build plan 8.8), with the Worker mocked: nothing wider than the screen, and the top bar's
 // duel (your driver, the gap, the rival) not clipped, in Eras (with its timer toggle) and in
 // the daily.
-import { type Page, expect, test } from '@playwright/test';
+import type { Page } from '@playwright/test';
+import { expect, test } from './coverage.js';
 import { loadRace, mockApi } from './mock.js';
 
 const model = loadRace('abu-dhabi-2021');
@@ -132,6 +133,9 @@ test('the history book fits a phone', async ({ page }) => {
   await expect(page.getByText('Only 9% of strategists rewrote this race.')).toBeVisible();
   await noSidewaysScroll(page);
   if (shots) await page.screenshot({ path: `${shots}/eras-history.png`, fullPage: true });
+  // Each rewrite's leaderboard link opens that race's board.
+  await page.getByRole('link', { name: 'Leaderboard for Abu Dhabi 2021' }).click();
+  await expect(page).toHaveURL(/\/eras\/9\/abu-dhabi-2021\/leaderboard$/);
 });
 
 test('a race leaderboard fits a phone, both tabs', async ({ page }) => {

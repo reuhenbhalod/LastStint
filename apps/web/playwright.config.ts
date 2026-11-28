@@ -14,14 +14,16 @@ const skipEras = process.env.E2E_SKIP_ERAS === '1';
 
 export default defineConfig({
   testDir: 'e2e',
-  testIgnore: skipEras ? /eras-[^/]*\.spec\.ts$/ : undefined,
+  // e2e/flows/ runs against a local Worker and D1 with its own config (playwright.flows.config.ts,
+  // `pnpm e2e:flows`), so it's left out here.
+  testIgnore: [/(^|\/)flows\//, ...(skipEras ? [/eras-[^/]*\.spec\.ts$/] : [])],
   timeout: 300_000,
   use: { baseURL: `http://localhost:${port}`, actionTimeout: 30_000 },
   projects: [
     { name: 'phone', use: { ...devices['iPhone 13'], browserName: 'chromium' } },
     {
       name: 'desktop',
-      testMatch: /(eras-play|eras-unlock|eras-launch|daily)\.spec\.ts$/,
+      testMatch: /(eras-play|eras-unlock|eras-launch|daily|screens\/.*)\.spec\.ts$/,
       use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
     },
   ],

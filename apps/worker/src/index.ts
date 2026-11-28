@@ -27,6 +27,7 @@ import { SURVIVOR_POOL } from './pools.js';
 import { getRace } from './races.js';
 import { ApiError, dailyWithModel, isAnonId, submitRun, withStanding } from './runs.js';
 import { getState, startRun, submitRound, survivorBoard } from './survivor.js';
+import { setFlowsClock } from './testClock.js';
 import { registerTickets } from './tickets.js';
 import { VersusRoom } from './versus.js';
 
@@ -69,6 +70,11 @@ export interface Env {
   VERSUS_BATTLE_MS?: string;
   VERSUS_RECONNECT_MS?: string;
   VERSUS_REVEAL_MS?: string;
+  /** "true" only in the browser flows' local stack (apps/web/e2e/flows): turns on the fixed
+   * test clock (src/testClock.ts). Never set in wrangler.jsonc. */
+  FLOWS_TEST?: string;
+  /** The flows' fixed "now" (ISO time), when a request sends no x-flows-now header. */
+  FLOWS_NOW?: string;
 }
 
 /** The survivor races and their seeds (data/pools.json, or the tests' own). */
@@ -403,6 +409,8 @@ const VERSUS_WS = /^\/api\/versus\/([A-Za-z]{4})\/ws$/;
 
 export default {
   fetch(request: Request, env: Env, ctx: ExecutionContext) {
+    // The flows' fixed clock: does nothing unless FLOWS_TEST is "true" (local flows only).
+    setFlowsClock(request, env);
     // A match's WebSocket goes straight to its room (no CORS layer: a 101 can't be changed).
     const ws = VERSUS_WS.exec(new URL(request.url).pathname);
     if (ws) {

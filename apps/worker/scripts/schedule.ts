@@ -17,6 +17,8 @@
 //   --race ID              schedule this race on every date (default: shuffle eligible races)
 //   --allow-ineligible     allow races that aren't eligible (local or staging, for testing)
 //   --dry-run              print the plan without writing
+//   --persist-to DIR       (--local only) the local D1 in DIR instead of .wrangler/state, as
+//                          `wrangler --persist-to` (the browser flows' fresh D1)
 //
 // A race is eligible when it's in the daily pool (data/pools.json) and has approved decision
 // moments: the same rule as the admin page (src/admin.ts playableRaces). A race passes robust
@@ -30,7 +32,14 @@ import { join } from 'node:path';
 import { addDays, isDate, todayUtc } from '../src/dates.js';
 import { modelHash } from '../src/hash.js';
 import { pickRaces } from '../src/shuffle.js';
-import { type Target, wrangler as d1, query as d1Query, repo, sqlString } from './d1.js';
+import {
+  type Target,
+  wrangler as d1,
+  query as d1Query,
+  repo,
+  setLocalPersistTo,
+  sqlString,
+} from './d1.js';
 
 interface Model {
   race: { id: string; seed: number };
@@ -52,6 +61,7 @@ function parseArgs(argv: string[]) {
     race: undefined as string | undefined,
     allowIneligible: false,
     dryRun: false,
+    persistTo: undefined as string | undefined,
   };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
@@ -64,6 +74,7 @@ function parseArgs(argv: string[]) {
     else if (a === '--race') args.race = value();
     else if (a === '--allow-ineligible') args.allowIneligible = true;
     else if (a === '--dry-run') args.dryRun = true;
+    else if (a === '--persist-to') args.persistTo = value();
     else fail(`unknown option ${a}`);
   }
   if (!args.target) fail('pass --local, --remote or --staging');
@@ -71,6 +82,7 @@ function parseArgs(argv: string[]) {
   if (!Number.isInteger(args.days) || args.days < 1 || args.days > 366) {
     fail('--days must be 1-366');
   }
+  if (args.persistTo && args.target !== 'local') fail('--persist-to is for --local only');
   if (args.allowIneligible && args.target === 'remote') {
     fail('--allow-ineligible is for local or staging testing only');
   }
@@ -107,6 +119,7 @@ function query<T>(target: Target, sql: string): T[] {
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
+  setLocalPersistTo(args.persistTo);
   const models = loadModels();
   const daily = (
     JSON.parse(readFileSync(join(repo, 'data', 'pools.json'), 'utf8')) as {

@@ -3,7 +3,7 @@
 // the best. Pick one, or build your own from any of them. The pick is graded like a call.
 
 import type { PlanId, RaceModel, RacePlan } from '@laststint/sim';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { surname } from '../data/names.js';
 import {
   chanceOf,
@@ -37,6 +37,7 @@ export function PlanCard({
   const them = state.race.cars[rival];
   const [picked, setPicked] = useState<PlanId | null>(null);
   const [draft, setDraft] = useState<RacePlan | null>(null);
+  const uid = useId();
 
   // The engineer's pick: the best chance, once every plan has one.
   const chances = plan.offered.map((p) => chanceOf(plan, p.id));
@@ -104,6 +105,10 @@ export function PlanCard({
                 key={p.id}
                 type="button"
                 aria-pressed={on}
+                // The name is the plan and its chance; its stops are the description (they ran
+                // together as one name before: "A · One stopEngineer’s pick54%Hards on lap 30").
+                aria-label={`${p.id.toUpperCase()} · ${stopsWord(p)}, ${c === null ? 'chance being worked out' : `${Math.round(c * 100)}%`}${best === p.id ? ', engineer’s pick' : ''}`}
+                aria-describedby={`${uid}-${p.id}`}
                 onClick={() => setPicked(p.id)}
                 className={`flex min-w-0 flex-col items-stretch gap-1.5 rounded-md border px-2.5 py-2 text-left transition-colors ${on ? 'border-[var(--you)] bg-[color-mix(in_srgb,var(--you)_14%,#192024)]' : 'border-[#2E373B] bg-[#192024] hover:border-[#6E7A75]'}`}
               >
@@ -122,7 +127,11 @@ export function PlanCard({
                     {c === null ? '…' : `${Math.round(c * 100)}%`}
                   </span>
                 </span>
-                <span className="truncate text-[12px] text-[var(--muted)]" title={line}>
+                <span
+                  id={`${uid}-${p.id}`}
+                  className="truncate text-[12px] text-[var(--muted)]"
+                  title={line}
+                >
                   {line}
                 </span>
                 <span className="hidden sm:block">

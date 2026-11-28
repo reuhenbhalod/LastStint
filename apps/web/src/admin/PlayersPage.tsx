@@ -93,6 +93,7 @@ export function PlayersPage() {
         <label className="flex items-center gap-2 text-[13px] text-[var(--muted)] sm:shrink-0">
           Sort
           <select
+            aria-label="Sort"
             value={sort}
             onChange={(e) => setSort(e.target.value as PlayerSort)}
             className={`${field} sm:w-auto`}

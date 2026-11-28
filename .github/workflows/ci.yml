@@ -173,13 +173,49 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @laststint/web exec playwright install --with-deps chromium
-      - name: Playthrough
+      # E2E_COVERAGE=1 records which controls each spec brings on screen and presses
+      # (apps/web/e2e/coverage.ts). The guard then fails if a control on a release route is never
+      # pressed and isn't in apps/web/e2e/coverage-exceptions.json (docs/test-suite-spec.md D1, S6).
+      - name: Playthrough and screen specs
         run: pnpm --filter @laststint/web e2e
+        env:
+          E2E_COVERAGE: '1'
+      - name: Every control is pressed by a test
+        run: pnpm --filter @laststint/web coverage:guard
+      - name: Control coverage report
+        if: always()
+        run: pnpm --filter @laststint/web coverage:report || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: control-coverage
+          path: docs/test-suite-coverage.md
+          if-no-files-found: ignore
+
+  # Journeys across screens against a real local Worker (wrangler dev) and a fresh local D1 with
+  # fixed dates (docs/test-suite-spec.md L3, D5): a Daily to its result, share and streak; a
+  # Gauntlet run; an Eras race to stars and an unlock; sign-in; admin edits. No remote resources.
+  flows:
+    name: Web flows (local Worker + D1)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4  # version from package.json "packageManager"
+        with:
+          dest: ${{ runner.temp }}/setup-pnpm
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @laststint/web exec playwright install --with-deps chromium
+      - name: Flows
+        run: pnpm --filter @laststint/web e2e:flows
 
   # Deploy runs only on main and only once every check above has passed.
   deploy:
     name: Deploy Worker + D1 migrations
-    needs: [python, js, eras-reachability, parity, e2e]
+    needs: [python, js, eras-reachability, parity, e2e, flows]
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     concurrency:

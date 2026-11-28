@@ -331,8 +331,11 @@ describe('the 2005 tyre lock', () => {
     expect(badge(MODEL_2005, locked)).toContain('Tyres locked');
     expect(badge(MODEL_2005, 'INTERMEDIATE')).toContain('class="tyre INTERMEDIATE"');
     expect(badge(MODEL_2005, 'INTERMEDIATE')).not.toContain('Tyres locked');
-    // Before 2007 with tyre changes (1988): one dry tyre, no lock.
-    const y1988 = tagged('1988-1993', { twoCompound: false });
+    // Before 2007 with tyre changes (1988): one dry tyre on offer, no lock.
+    const y1988 = {
+      ...tagged('1988-1993', { twoCompound: false }),
+      compounds: { HARD: abu.compounds.HARD },
+    } as RaceModel;
     expect(badge(y1988, 'HARD')).toContain('class="tyre DRY"');
     expect(badge(y1988, 'HARD')).not.toContain('Tyres locked');
     // Outside Eras, as before.

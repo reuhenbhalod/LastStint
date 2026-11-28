@@ -1,0 +1,103 @@
+{
+  "about": "Controls the coverage guard (scripts/coverage-guard.mjs) accepts as unpressed, each with a reason. A `group` is one control whose name changes with the race or state: it passes only if a test presses at least one member (on its route, or on any route when it names none). Names are regular expressions over the recorded name, without case; numbers are recorded as '#'. Keep this list short: a control that can be pressed belongs in a spec.",
+  "exceptions": [
+    {
+      "group": true,
+      "route": "/eras/:n",
+      "role": "link",
+      "name": "(.+ #, play( at legend difficulty)?|leaderboard for .+ #|\\(a row of: races( · legend difficulty)?\\))",
+      "reason": "An era's race rows are named for its races, so each era has its own; one component draws them all (EraDetail). A list of six or more is recorded as one '(a row of: Races)' control, a shorter one row by row. eras-detail.spec presses every row of its era, play and Legend; other specs pass through other eras' pages. Passes only if a row on /eras/:n is pressed."
+    },
+    {
+      "group": true,
+      "role": "button",
+      "name": ".{1,8}: details",
+      "reason": "A car's details dot is named for its driver, so each race has its own; every dot is pressed in some race and the dots share one handler (TrackMap)."
+    },
+    {
+      "group": true,
+      "role": "button",
+      "name": "(#[a-z]{3,4}.*|\\(a row of: (leaders|standings)\\))",
+      "reason": "A timing tower or leaders row is named by its position and gap, which change lap to lap; a list of six or more is recorded as one '(a row of: …)' control. Pressing any row covers them (TimingTower)."
+    },
+    {
+      "group": true,
+      "role": "button",
+      "name": "[abc] · .*",
+      "reason": "A plan card is named by its letter, stops and chance; the chance reads 'being worked out' until it's graded. Each card is pressed once graded (PlanCard)."
+    },
+    {
+      "group": true,
+      "role": "button",
+      "name": "LastStint.+’s race engineer · .+",
+      "reason": "The brand button carries the race's driver and team."
+    },
+    {
+      "group": true,
+      "role": "button",
+      "name": "(.+ lets you by|let .+ by|hold up .+)",
+      "reason": "Team-order buttons carry the team-mate's name (TeamRadio)."
+    },
+    {
+      "group": true,
+      "role": "button",
+      "name": "(box next lap, .+|box, .+|yes, box for .+|.?(softs|mediums|hards|inters|wets))",
+      "reason": "Tyre choices name the compounds the race offers at that moment."
+    },
+    {
+      "group": true,
+      "role": "button",
+      "name": "(easy|fuel|push|steady) - .+",
+      "reason": "Pit-board signs (Eras 1-2) depend on the race's state when the board comes up."
+    },
+    {
+      "role": "button",
+      "name": "(dive up the inside|block the lunge on the brakes|defend the second apex|cover the inside|hold the inside line|move once on the straight|send it up the inside|keep the racing line, full speed|hold position|box for a new nose|keep it balanced|round the outside|wait for drs, go next lap|protect the first apex)",
+      "reason": "Battle and quick-call answers offered only on some race paths (the corner and the race as it runs). One answer per card is pressed in the screen specs, and every option of BattleCard and QuickCallCard is pressed in their component tests."
+    },
+    {
+      "role": "button",
+      "name": "plan",
+      "reason": "The bare 'Plan' pill shows only before a plan is picked and is disabled while the race plan is open; once a plan is on it reads 'Plan · …', which is pressed."
+    },
+    {
+      "role": "button",
+      "name": "copied!",
+      "reason": "The share button's own label just after it's pressed."
+    },
+    {
+      "route": "/gauntlet",
+      "role": "button",
+      "name": "dealing round #…",
+      "reason": "The Start button while the round is being dealt: disabled; the spec checks it's disabled."
+    },
+    {
+      "role": "button",
+      "name": "grading your calls…",
+      "reason": "The result button's label while the run is sent: disabled, and on screen only as long as the send takes, so it is recorded in some runs and not others. 'See how you did' is pressed."
+    },
+    {
+      "route": "/admin/players",
+      "role": "button",
+      "name": "loading…",
+      "reason": "The Refresh button's label while the players load: disabled, and on screen only as long as the request takes, so slower machines record it and faster ones don't. Refresh is pressed (admin-players.spec)."
+    },
+    {
+      "route": "/admin/tickets",
+      "role": "button",
+      "name": "saving…",
+      "reason": "The Save button's label while a ticket is sent: disabled, and on screen only as long as the request takes. Save and Add ticket are pressed (admin-tickets.spec)."
+    },
+    {
+      "route": "/tutorial",
+      "role": "button",
+      "name": "play again",
+      "reason": "The tutorial result's Play again comes on screen under the 'How you did' coach, whose Finish is the way on (pages.spec). Pressing it resets the race but, from the code, leaves that coach step open over the intro: an owner question (hide it in the tutorial?), in docs/test-suite-report.md."
+    },
+    {
+      "role": "link",
+      "name": "versus",
+      "reason": "Versus is out of the first release (PR #54, D2); the tab only shows in test builds."
+    }
+  ]
+}
